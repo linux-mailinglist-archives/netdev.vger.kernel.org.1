@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-129748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1D93985E94
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:38:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56E0D985E9C
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:39:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E5EC1C210BF
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DBB7289ECC
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B47212EEB;
-	Wed, 25 Sep 2024 12:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 232021D0790;
+	Wed, 25 Sep 2024 12:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="khv2x5hi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qEyjckme"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8D7212EE7;
-	Wed, 25 Sep 2024 12:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF35C1D078C;
+	Wed, 25 Sep 2024 12:12:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266340; cv=none; b=JlhpjX5Dvfpfod98X9CK9JOipcN1SwXmmt8XvFiVomq+46VrD2CqJb10lL+qAEuBAnrx7/CjcdjLh4HhjP4Tnd4TpOxZBfjWrbfp0CpaVMApCxP0eRNakZmEfE34mVRUAJzdEW+b91d8rQkcaFML7BQVLj4lDaivxNx2UpaxclQ=
+	t=1727266348; cv=none; b=sP8nDoAr83ueI1FVutQwbsMV1M5wGlGRPxviYlIlnPj/Y85EOUXU9me6SlrzKjEac6MS41SOcscMUQYU4zFGqnqXWjH+yuxb3qVSERXuXfok+WH89UO7uzIAT4AendtM5wkR3FuJGveGJRusvfM4h6Gk4NxmY/XRLit/4spvCGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266340; c=relaxed/simple;
-	bh=efPEQVsn/u4JRC2jcGC/mNjRx6++mnw/8wnsLTZVvC0=;
+	s=arc-20240116; t=1727266348; c=relaxed/simple;
+	bh=0NBvuPXswHaz7CQCzj43Yy17NgK7h6H+upnPzF9YFdI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J0zjQZWtr4yFxT8Z9mUTwyh/0FKzriC74hdve3xdAjm3H5g1GuJ7It9xknEe2LKnrQDa+jHlTFhcR//YgJxrWzcFOSixBxzKF/Iv0dxldlbBYbcDMRQOCb9SlMG3HiFVbySgHFm/jDY704NUmi+qMm9q9FQ9HAKX8Yoechp690E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=khv2x5hi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 696F9C4CECD;
-	Wed, 25 Sep 2024 12:12:18 +0000 (UTC)
+	 MIME-Version; b=H7yj+M3ZaDB99fykTxhlMx2iYkmon7YtXe6gdsa1B9iStFA6HzKvuNPG6ZUZdkxNpNysorKcGXkN3PxpDZutYxddmz432HcQyqfi7LvfNmhgZ1eZGCaycUykElG6CQr4GCeIjRLNmDdIIZVlswAnYi/Kku0Xs3JE1LMfvP9SfTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qEyjckme; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1DF3C4CECD;
+	Wed, 25 Sep 2024 12:12:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266340;
-	bh=efPEQVsn/u4JRC2jcGC/mNjRx6++mnw/8wnsLTZVvC0=;
+	s=k20201202; t=1727266346;
+	bh=0NBvuPXswHaz7CQCzj43Yy17NgK7h6H+upnPzF9YFdI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=khv2x5hiX9rE+HNOfm6dowCh22nrIrpH4M58UzmkgEVFXItLFN/caxGCBZmaCjvRN
-	 xJEDIRLLQngn17Vzi0ab0a1O06jBhzvkuGVsagrZtkQnDT/39oDzH92cqBBADO90zX
-	 u/z0tvrIXhZmikT403VsjK1tlNZ4LgA9Wa6fWr+0A1XzKGtUput7e1Sm2Pz+NGfN3j
-	 CqKhyCXC06RaRcz0Q3vlWyo5Wm8PZVOypbXQk9B1hZRp8EXZAYE4FKQQiY0pY5Rdai
-	 0+9f1+4Iwpl+QXZGCXoh0xzltE/HvjF5S/vjKaIZUzi9b1NAajYRrpqU1qMxcf/Xd5
-	 fS0cJJlt5pqGQ==
+	b=qEyjckmexsk2zvsgrQyP/AJCQebKoy6u4TTDH+MfA2SOFKEABVhUWKmM73noRcWj9
+	 PS8QBkna1EyO94tLjAKfVM4xNCc8EN4hpnevdgsVC+gW5ctsZkul22+0jVosDtKtVZ
+	 XC9cbiNNqYp9kcVW0EqOyJJhf950uyLKVfIRQrz3f66cHNbNOthjwzvcIAaLVTqYge
+	 5upO8ARcd55SA8ST0kaYRYg9SfRRqXFXGMYE95P1U/Igy4HT/e0DSSsDznfcUkBPLq
+	 qJOQdIPgRHWda2Bmsqm1dEd/cbigGZs+lMFU0l1Z14T/r6xL6eoviLskOtEPirY5CK
+	 1EtLi/hlqJeRA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Dima Ruinskiy <dima.ruinskiy@intel.com>,
-	Mor Bar-Gabay <morx.bar.gabay@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	przemyslaw.kitszel@intel.com,
-	davem@davemloft.net,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 018/139] e1000e: avoid failing the system during pm_suspend
-Date: Wed, 25 Sep 2024 08:07:18 -0400
-Message-ID: <20240925121137.1307574-18-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 020/139] net: sched: consistently use rcu_replace_pointer() in taprio_change()
+Date: Wed, 25 Sep 2024 08:07:20 -0400
+Message-ID: <20240925121137.1307574-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
 References: <20240925121137.1307574-1-sashal@kernel.org>
@@ -73,102 +72,40 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.52
 Content-Transfer-Encoding: 8bit
 
-From: Vitaly Lifshits <vitaly.lifshits@intel.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 0a6ad4d9e1690c7faa3a53f762c877e477093657 ]
+[ Upstream commit d5c4546062fd6f5dbce575c7ea52ad66d1968678 ]
 
-Occasionally when the system goes into pm_suspend, the suspend might fail
-due to a PHY access error on the network adapter. Previously, this would
-have caused the whole system to fail to go to a low power state.
-An example of this was reported in the following Bugzilla:
-https://bugzilla.kernel.org/show_bug.cgi?id=205015
+According to Vinicius (and carefully looking through the whole
+https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
+once again), txtime branch of 'taprio_change()' is not going to
+race against 'advance_sched()'. But using 'rcu_replace_pointer()'
+in the former may be a good idea as well.
 
-[ 1663.694828] e1000e 0000:00:19.0 eth0: Failed to disable ULP
-[ 1664.731040] asix 2-3:1.0 eth1: link up, 100Mbps, full-duplex, lpa 0xC1E1
-[ 1665.093513] e1000e 0000:00:19.0 eth0: Hardware Error
-[ 1665.596760] e1000e 0000:00:19.0: pci_pm_resume+0x0/0x80 returned 0 after 2975399 usecs
-
-and then the system never recovers from it, and all the following suspend failed due to this
-[22909.393854] PM: pci_pm_suspend(): e1000e_pm_suspend+0x0/0x760 [e1000e] returns -2
-[22909.393858] PM: dpm_run_callback(): pci_pm_suspend+0x0/0x160 returns -2
-[22909.393861] PM: Device 0000:00:1f.6 failed to suspend async: error -2
-
-This can be avoided by changing the return values of __e1000_shutdown and
-e1000e_pm_suspend functions so that they always return 0 (success). This
-is consistent with what other drivers do.
-
-If the e1000e driver encounters a hardware error during suspend, potential
-side effects include slightly higher power draw or non-working wake on
-LAN. This is preferred to a system-level suspend failure, and a warning
-message is written to the system log, so that the user can be aware that
-the LAN controller experienced a problem during suspend.
-
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=205015
-Suggested-by: Dima Ruinskiy <dima.ruinskiy@intel.com>
-Signed-off-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
-Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/e1000e/netdev.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ net/sched/sch_taprio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 334f652c60601..d377a286c0e1b 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -6672,8 +6672,10 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 		if (adapter->flags2 & FLAG2_HAS_PHY_WAKEUP) {
- 			/* enable wakeup by the PHY */
- 			retval = e1000_init_phy_wakeup(adapter, wufc);
--			if (retval)
--				return retval;
-+			if (retval) {
-+				e_err("Failed to enable wakeup\n");
-+				goto skip_phy_configurations;
-+			}
- 		} else {
- 			/* enable wakeup by the MAC */
- 			ew32(WUFC, wufc);
-@@ -6694,8 +6696,10 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 			 * or broadcast.
- 			 */
- 			retval = e1000_enable_ulp_lpt_lp(hw, !runtime);
--			if (retval)
--				return retval;
-+			if (retval) {
-+				e_err("Failed to enable ULP\n");
-+				goto skip_phy_configurations;
-+			}
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index 418d4a846d04a..87090d6790362 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -1975,7 +1975,9 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 			goto unlock;
  		}
  
- 		/* Force SMBUS to allow WOL */
-@@ -6744,6 +6748,7 @@ static int __e1000_shutdown(struct pci_dev *pdev, bool runtime)
- 		hw->phy.ops.release(hw);
- 	}
- 
-+skip_phy_configurations:
- 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
- 	 * would have already happened in close and is redundant.
- 	 */
-@@ -6986,15 +6991,13 @@ static __maybe_unused int e1000e_pm_suspend(struct device *dev)
- 	e1000e_pm_freeze(dev);
- 
- 	rc = __e1000_shutdown(pdev, false);
--	if (rc) {
--		e1000e_pm_thaw(dev);
--	} else {
-+	if (!rc) {
- 		/* Introduce S0ix implementation */
- 		if (adapter->flags2 & FLAG2_ENABLE_S0IX_FLOWS)
- 			e1000e_s0ix_entry_flow(adapter);
- 	}
- 
--	return rc;
-+	return 0;
- }
- 
- static __maybe_unused int e1000e_pm_resume(struct device *dev)
+-		rcu_assign_pointer(q->admin_sched, new_admin);
++		/* Not going to race against advance_sched(), but still */
++		admin = rcu_replace_pointer(q->admin_sched, new_admin,
++					    lockdep_rtnl_is_held());
+ 		if (admin)
+ 			call_rcu(&admin->rcu, taprio_free_sched_cb);
+ 	} else {
 -- 
 2.43.0
 
