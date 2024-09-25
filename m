@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-129703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15288985929
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:50:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A417998593B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469A41C236E2
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:50:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6394D280F4B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C3F19AA5A;
-	Wed, 25 Sep 2024 11:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63C719C57D;
+	Wed, 25 Sep 2024 11:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NxPgt+Q4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKCH4sUw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA0D19AA57;
-	Wed, 25 Sep 2024 11:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACCAC19B3EA;
+	Wed, 25 Sep 2024 11:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264307; cv=none; b=hZDexT7G1w+5kDX2ZM//noR+/7vTZHu+3uceN/IQGvIm3Ph+5pIwiqPDCyWdNx5huGXBOE/k4bMTord+TXx1PaU+OndWLAGHdAqKviNkW+OCJGKTzMojOfKZgzhimif0CP5vIbgyWvfG+vdvfpS0H6esmkLia3T5tfDE7zvJTrg=
+	t=1727264313; cv=none; b=ofOGhRhjo41lLUf56+rOf7Hyu2ejCWoixRBFNPwQwtnAPHIIB7Om3eoxkEcQpFLPEPyR0o0G9H0MIFJl90LGGXW55+8sDWpg2GVUVpst56pHjRvcJjAAzN2Xl5UaQOwsLhxrdZbb0upFl38q0fo25o0+JH4FLSfwQ1OYNtujUJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264307; c=relaxed/simple;
-	bh=Dg6F9/TsOKG9pUqppnD8udwkdrd50YCxFON/evrdAGg=;
+	s=arc-20240116; t=1727264313; c=relaxed/simple;
+	bh=mDyc+IvJ/ZBsaxLzIyo213o4lRKpU5tTwGC0GzrCB44=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Iv7Op0I/p5H62fROlh2FQArn5dSeKPIEZZdgU449yO513gsujm6EhCjEzy81dtys5MQ5r3wO6PxbxlwobKfKqgBQaov2PaPJkG/TTuNMyh+eIItifgO+FP133iosKFiFKzdx5A+9FKFi6weXXzhebp/mLwYkuz7m2uF7uwEDi4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NxPgt+Q4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4224CC4CEC7;
-	Wed, 25 Sep 2024 11:38:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=csVgqsVTXaKg3iGKPuaqsW9SanmCzAPdHhYZf2+L2BLMy4MKW2akrTfm7IxNlNibImBo1z+w9lCZ565Af3OBKb7KppCSd5RwhMblKE/Unek7w9VLmnX1GPKvoMyQgbuHPS/ZZVh11GhHFx4NVBhSC0ubkjCCwDuL0vqTkOBkrzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKCH4sUw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F76FC4CECE;
+	Wed, 25 Sep 2024 11:38:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264306;
-	bh=Dg6F9/TsOKG9pUqppnD8udwkdrd50YCxFON/evrdAGg=;
+	s=k20201202; t=1727264313;
+	bh=mDyc+IvJ/ZBsaxLzIyo213o4lRKpU5tTwGC0GzrCB44=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NxPgt+Q44wZBRc9Q9zVyRt1bOdk/Ifq68iGtwplC2ThGfXJOSSQPglstzEUV0RjmT
-	 aK2/wL3ICJlV+0s4NRuFhLIKiY0m2UD4yNQJm/m53S/uJpeebc2ybRTibMKIM/Kg5c
-	 0p2kjYFgvHK4YDzXU3yKnCDxNp6R82qBhLF7trOUdeX3RDsWfkiqf/JneP3jeKyoj8
-	 CkIAndlXwS8RMNwtqzzjRu54eCe6tM5ng/pAQHpn2lwbvEXsH/f5m1RcRqiYcgDbZd
-	 q0qfnbIb2UqAob13ebFwAZsLkTmkzC4Hqkd7tHGkMd0h14J9pCorT+3NNrvEkhUeHI
-	 GOZX+1tRMTeiw==
+	b=mKCH4sUwANj6Wv9Muro9M0F6JoIxBVReXAdQ1+TL6i9fbNobVkxSd+Z+B8b0w+vHx
+	 bUOp+Mu9jlBHeBQVz3DV7nc9k9zexpN6SDcRWnxVa1vb26P91Ghxjpq7+B28ZaF/Nr
+	 vTjxaIvLyHn0u5yv4A/dA1PbBLoJ/WZH4vC/i4O/kWFKpe8O/FjX6ZCFv6NaDIjd4i
+	 y+jn834NWVj+7QL85nGHhgMvXoa3bhQdjvUJjPT3tjsjv5VBKxmofkMAwycWOX9IAW
+	 wCBBn9Oy+LbQSu8VgU62CzjnmQUZVUBh3QHye3uR7BnKBD5YZIIMmHl8mldyX/qFqb
+	 8Tj4tzoFVLe9w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	irusskikh@marvell.com,
 	davem@davemloft.net,
-	dsahern@kernel.org,
 	edumazet@google.com,
-	kuba@kernel.org,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 050/244] ipv4: Mask upper DSCP bits and ECN bits in NETLINK_FIB_LOOKUP family
-Date: Wed, 25 Sep 2024 07:24:31 -0400
-Message-ID: <20240925113641.1297102-50-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 054/244] net: atlantic: Avoid warning about potential string truncation
+Date: Wed, 25 Sep 2024 07:24:35 -0400
+Message-ID: <20240925113641.1297102-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
 References: <20240925113641.1297102-1-sashal@kernel.org>
@@ -65,53 +64,80 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
 
-From: Ido Schimmel <idosch@nvidia.com>
+From: Simon Horman <horms@kernel.org>
 
-[ Upstream commit 8fed54758cd248cd311a2b5c1e180abef1866237 ]
+[ Upstream commit 5874e0c9f25661c2faefe4809907166defae3d7f ]
 
-The NETLINK_FIB_LOOKUP netlink family can be used to perform a FIB
-lookup according to user provided parameters and communicate the result
-back to user space.
+W=1 builds with GCC 14.2.0 warn that:
 
-However, unlike other users of the FIB lookup API, the upper DSCP bits
-and the ECN bits of the DS field are not masked, which can result in the
-wrong result being returned.
+.../aq_ethtool.c:278:59: warning: ‘%d’ directive output may be truncated writing between 1 and 11 bytes into a region of size 6 [-Wformat-truncation=]
+  278 |                                 snprintf(tc_string, 8, "TC%d ", tc);
+      |                                                           ^~
+.../aq_ethtool.c:278:56: note: directive argument in the range [-2147483641, 254]
+  278 |                                 snprintf(tc_string, 8, "TC%d ", tc);
+      |                                                        ^~~~~~~
+.../aq_ethtool.c:278:33: note: ‘snprintf’ output between 5 and 15 bytes into a destination of size 8
+  278 |                                 snprintf(tc_string, 8, "TC%d ", tc);
+      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Solve this by masking the upper DSCP bits and the ECN bits using
-IPTOS_RT_MASK.
+tc is always in the range 0 - cfg->tcs. And as cfg->tcs is a u8,
+the range is 0 - 255. Further, on inspecting the code, it seems
+that cfg->tcs will never be more than AQ_CFG_TCS_MAX (8), so
+the range is actually 0 - 8.
 
-The structure that communicates the request and the response is not
-exported to user space, so it is unlikely that this netlink family is
-actually in use [1].
+So, it seems that the condition that GCC flags will not occur.
+But, nonetheless, it would be nice if it didn't emit the warning.
 
-[1] https://lore.kernel.org/netdev/ZpqpB8vJU%2FQ6LSqa@debian/
+It seems that this can be achieved by changing the format specifier
+from %d to %u, in which case I believe GCC recognises an upper bound
+on the range of tc of 0 - 255. After some experimentation I think
+this is due to the combination of the use of %u and the type of
+cfg->tcs (u8).
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Empirically, updating the type of the tc variable to unsigned int
+has the same effect.
+
+As both of these changes seem to make sense in relation to what the code
+is actually doing - iterating over unsigned values - do both.
+
+Compile tested only.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20240821-atlantic-str-v1-1-fa2cfe38ca00@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/fib_frontend.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-index 7ad2cafb92763..da540ddb7af65 100644
---- a/net/ipv4/fib_frontend.c
-+++ b/net/ipv4/fib_frontend.c
-@@ -1343,7 +1343,7 @@ static void nl_fib_lookup(struct net *net, struct fib_result_nl *frn)
- 	struct flowi4           fl4 = {
- 		.flowi4_mark = frn->fl_mark,
- 		.daddr = frn->fl_addr,
--		.flowi4_tos = frn->fl_tos,
-+		.flowi4_tos = frn->fl_tos & IPTOS_RT_MASK,
- 		.flowi4_scope = frn->fl_scope,
- 	};
- 	struct fib_table *tb;
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+index d0aecd1d73573..876b95306404e 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ethtool.c
+@@ -266,7 +266,7 @@ static void aq_ethtool_get_strings(struct net_device *ndev,
+ 		const int rx_stat_cnt = ARRAY_SIZE(aq_ethtool_queue_rx_stat_names);
+ 		const int tx_stat_cnt = ARRAY_SIZE(aq_ethtool_queue_tx_stat_names);
+ 		char tc_string[8];
+-		int tc;
++		unsigned int tc;
+ 
+ 		memset(tc_string, 0, sizeof(tc_string));
+ 		memcpy(p, aq_ethtool_stat_names,
+@@ -275,7 +275,7 @@ static void aq_ethtool_get_strings(struct net_device *ndev,
+ 
+ 		for (tc = 0; tc < cfg->tcs; tc++) {
+ 			if (cfg->is_qos)
+-				snprintf(tc_string, 8, "TC%d ", tc);
++				snprintf(tc_string, 8, "TC%u ", tc);
+ 
+ 			for (i = 0; i < cfg->vecs; i++) {
+ 				for (si = 0; si < rx_stat_cnt; si++) {
 -- 
 2.43.0
 
