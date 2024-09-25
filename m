@@ -1,93 +1,158 @@
-Return-Path: <netdev+bounces-129670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14A2198556A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:26:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C4198557E
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:29:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACA2B1F2177F
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:26:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25559282AAB
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01FA158DC3;
-	Wed, 25 Sep 2024 08:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB011598F4;
+	Wed, 25 Sep 2024 08:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FRGjZU7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CAC7E574;
-	Wed, 25 Sep 2024 08:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3841598E9
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 08:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727252779; cv=none; b=k7y+8ZiVPKF+WZiH1lJ6BbFZYiEyNfQQWtOMbA23EZrzPqq8v6kf5w1L1BifMU3voZ4cCOYXVjseeFcqq9BPeh/OQejAx19/LKPAYsRhrwzMtmXfAzBdkOgvwBhicHkfi3jppsyyUU9/tGhqJGT1uDBApF1FAGBiYUoECqIWQAM=
+	t=1727252980; cv=none; b=kLMkGNaxg7gSYbV2uF2NgAdrVD3Mnc9ggS2s3yTkC3wRjBcWxPH+KqRr72/mjPTBXhlGJDCw3u2o52qsPtVi2EHDBJFjsWkcZsvXuENH86IhbAqVvZi6OMBeburANwEZzCSsmI7LY+WSU1yobv14VSBFrvqJwpbd+vpp4Zd9j1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727252779; c=relaxed/simple;
-	bh=ZGixcCrfPDSlQq13Vc/iK8J9fZ1D9NrD1Mjn8nVlCz8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GwSjrPX9wBkJdSWQF4hgV2/1rSRKocKCDknOKsw37lbEq9DmKpfHWV4Et3odtvaNdFyKO+BNbmMW15GtpRlydzICS4lS7D4Nc2ptHGe6oqDoFPf+OxJ96y7281M6HXJiP16D3h7Z7cOsLaNbI/HL++yWwTx4898hcnikW+CFIpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ict.ac.cn; spf=pass smtp.mailfrom=ict.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ict.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ict.ac.cn
-Received: from localhost.localdomain (unknown [58.206.203.187])
-	by APP-03 (Coremail) with SMTP id rQCowABnPBEgyfNmA+_lAA--.9685S2;
-	Wed, 25 Sep 2024 16:26:09 +0800 (CST)
-From: zyf <zhouyangfan20s@ict.ac.cn>
-To: bpf@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	zyf <zhouyangfan20s@ict.ac.cn>
-Subject: [PATCH] BPF : arch/x86/net/bpf_jit_comp.c : fix wrong condition code in jit compiler
-Date: Wed, 25 Sep 2024 16:23:32 +0800
-Message-Id: <20240925082332.2849923-1-zhouyangfan20s@ict.ac.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1727252980; c=relaxed/simple;
+	bh=YBpfptIeybOZ1fFLnfnzMvFJaT8t1rJ7YQ4EcaxwGWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QdmxQDaGiG3DT/buW7qsUMVOL3oGorxP6u4QF9rpcbgxda3UlEVebwQxChZ4q1wxR3ht+b4/7W2SXVtg014nJTE+0ix6gC8nIgy+sLP+DyDOimLn2mO+GTLizUyfCuyLIchx0y7+xsmtpSIYzMmLK6xvWK/WfRjCAE0NHFAUqY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FRGjZU7P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A332DC4CEC3;
+	Wed, 25 Sep 2024 08:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727252980;
+	bh=YBpfptIeybOZ1fFLnfnzMvFJaT8t1rJ7YQ4EcaxwGWg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FRGjZU7P0WI3I/WjYZAtafqFJPh61tFRAzqGageigU1gZ/OK+KRUQ3yGTUM0zn5kZ
+	 kpRFP0/tYQU/lLF1g3e5220g1XyUE5zacbi5u2NstU1QHUdpnTVU7Mb9cQA+0Dq+lg
+	 zvhH1Gw3Jb3f4E0VQBQo26NZ9l1cUvFg/f1naF9/7vWUzotGtDd4fPtM2i07WRPJdp
+	 5RksKhmqhjAHP3ASdWByPRsPOkOFHqTjiFpUBFJQigOKjoatfK3GYqQxVR+5W05wI3
+	 kDIERdfVI71EsaHQg7Cb0Jk51wRAHtmIrvOkFZ3CJXE09YvF0JXqwsOpz3uWLDVj21
+	 iX4McKFKhizlQ==
+Date: Wed, 25 Sep 2024 11:29:35 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20240925082935.GC967758@unreal>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240831173934.GC4000@unreal>
+ <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+ <20240902094452.GE4026@unreal>
+ <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
+ <20240911104040.GG4026@unreal>
+ <ZvKVuBTkh2dts8Qy@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowABnPBEgyfNmA+_lAA--.9685S2
-X-Coremail-Antispam: 1UD129KBjvdXoWruw13KrykGw48Cry8KrWfKrg_yoW3Xrg_A3
-	W3Za1xXw1F9Fy5ZFn5ZF45JrsxCr4ruF43uFnYqrWYkas8XF45ZFyvyF1UKw17XFW5KrZ5
-	u393tw13JwsxtjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb48FF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AKxVWU
-	AVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14
-	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkG
-	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4U
-	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUjuHq7UUUU
-	U==
-X-CM-SenderInfo: 52kr35xdqjwtjqsq2qxlfwhtffof0/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvKVuBTkh2dts8Qy@gauss3.secunet.de>
 
-change 'case BPF_ALU64 | BPF_END | BPF_FROM_LE' to 'case BPF_ALU64 | BPF_END | BPF_FROM_BE'
+On Tue, Sep 24, 2024 at 12:34:32PM +0200, Steffen Klassert wrote:
+> On Wed, Sep 11, 2024 at 01:40:40PM +0300, Leon Romanovsky wrote:
+> > On Mon, Sep 09, 2024 at 11:09:05AM +0200, Steffen Klassert wrote:
+> > > On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
+> > > > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
+> > > > > > 
+> > > > > > Steffen,
+> > > > > > 
+> > > > > > What is your position on this patch?
+> > > > > > It is the same patch (logically) as the one that was rejected before?
+> > > > > > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
+> > > > > 
+> > > > > This is an infrastructure patch to support routing based IPsec
+> > > > > with xfrm interfaces. I just did not notice it because it was not
+> > > > > mentioned in the commit message of the first patchset. This should have
+> > > > > been included into the packet offload API patchset, but I overlooked
+> > > > > that xfrm interfaces can't work with packet offload mode. The stack
+> > > > > infrastructure should be complete, so that drivers can implement
+> > > > > that without the need to fix the stack before.
+> > > > 
+> > > > Core implementation that is not used by any upstream code is rarely
+> > > > right thing to do. It is not tested, complicates the code and mostly
+> > > > overlooked when patches are reviewed. The better way will be to extend
+> > > > the stack when this feature will be actually used and needed.
+> > > 
+> > > This is our tradeoff, an API should be fully designed from the
+> > > beginning, everything else is bad design and will likely result
+> > > in band aids (as it happens here). The API can be connected to
+> > > netdevsim to test it.
+> > > 
+> > > Currently the combination of xfrm interfaces and packet offload
+> > > is just broken. 
+> > 
+> > I don't think that it is broken.
+> 
+> I don't see anything that prevents you from offloading a SA
+> with an xfrm interface ID. The binding to the interface is
+> just ignored in that case.
+> 
+> > It is just not implemented. XFRM
+> > interfaces are optional field, which is not really popular in the
+> > field.
+> 
+> It is very popular, I know of more than a billion devices that
+> are using xfrm interfaces.
 
-Signed-off-by: zyf <zhouyangfan20s@ict.ac.cn>
----
- arch/x86/net/bpf_jit_comp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We see different parts of "the field". In my case it it enterprise/cloud
+world, and I can say same sentence as you with "are NOT using ..."
+words instead. This is why so important to see google's driver (which is Android)
+to understand the real need from this feature.
 
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index 06b080b61aa5..7f954d76b3a6 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -1786,7 +1786,7 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image, u8 *rw_image
- 			break;
- 
- 		case BPF_ALU | BPF_END | BPF_FROM_BE:
--		case BPF_ALU64 | BPF_END | BPF_FROM_LE:
-+		case BPF_ALU64 | BPF_END | BPF_FROM_BE:
- 			switch (imm32) {
- 			case 16:
- 				/* Emit 'ror %ax, 8' to swap lower 2 bytes */
--- 
-2.39.2
+> 
+> > 
+> > > Unfortunalely this patch does not fix it.
+> > > 
+> > > I think we need to do three things:
+> > > 
+> > > - Fix xfrm interfaces + packet offload combination
+> > > 
+> > > - Extend netdevsim to support packet offload
+> > > 
+> > > - Extend the API for xfrm interfaces (and everything
+> > >   else we forgot).
+> > 
+> > This is the most challenging part. It is not clear what should
+> > we extend if customers are not asking for it and they are extremely
+> > happy with the current IPsec packet offload state.
+> 
+> We just need to push the information down to the driver,
+> and reject the offload if not supported.
 
+Yes and in addition to that it will be beneficial do not add this information
+to SKB if it won't be used.
+
+> 
+> > 
+> > BTW, I'm aware of one gap, which is not clear how to handle, and
+> > it is combination of policy sockets and offload.
+> 
+> Socket policies are a bit special as they are configured by
+> the application that uses the socket. I don't think that
+> we can even configure offload for a socket policy.
+
+One of the idea is to iterate over all devices and check if they
+support offload, if yes, then offload, if not, then fallback
+to software for that device. This is just rough idea with many
+caveats.
+
+Thanks
 
