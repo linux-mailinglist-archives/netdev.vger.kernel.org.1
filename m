@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-129737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F596985CD8
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:55:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D12F985CDF
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 456BC1F21895
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:55:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC321C23A63
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:56:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831771D47C6;
-	Wed, 25 Sep 2024 12:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3EF1D5CD0;
+	Wed, 25 Sep 2024 12:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VdmBU+oI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5i/waos"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C461D47AE;
-	Wed, 25 Sep 2024 12:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20A01D5CCB;
+	Wed, 25 Sep 2024 12:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265646; cv=none; b=EhJrU4uyIchn9HxOpjzO3ldO290DhQTW0H8/ndRecSOTavrgRJT2o9F3OvlY3Uk6bumEv4dPazQ4HqfPca7IlXpQkuwK+KuNHsL3kO+cN0IP+yd70X+cMzQoMak6vgM9tB/f8aNXmbWWYVH/DFYCMOGCuQz5xSYaJHrrAJjR8uM=
+	t=1727265652; cv=none; b=tu+CR3zUDvC+0GBrx5aeghndTb3isLNhRmQ+KG4+Ri+Uh0vXAFrCYyuzK11gfAARE7JGSNozkqJqYvnPjt+Yu31W4UHPPMur6QjdSj69JuverllCJsW69l7mQ90zlD1FPtb3tXBAe1vMTIHI+sP6TWYpBksbOCwNVSA+JeswqNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265646; c=relaxed/simple;
-	bh=3XwSyHE1LtYwsC7u9Yy/+DIikL5Zx2KWUqPTHkcH4QM=;
+	s=arc-20240116; t=1727265652; c=relaxed/simple;
+	bh=C8mB3wjrG+2zjcbFXnCEKkxtBLMLigQxms7/qABLo38=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FJX3C3ki+JAhRg5wldCTuirDzjfne+bTCiVBlmWzxz3hjrreZh5PuD1D7eCWM5sTFDnbGbjKyLmjFwGjz7DXWPkog1nRydI3qwzajHrQQI2qPX9V6Dgf4NGi9C4ybe9nu8kMSjb6yd/36mypGKhZXLR1dQx4UiUIE8sTg/4YTao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VdmBU+oI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 974C5C4CEC3;
-	Wed, 25 Sep 2024 12:00:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=m1lz1jMmJqU0ijbZJ2WBh267KflpKJo/IQQ/YfZ2tHoI8dmX7nuzLedaTCYxoQ2+jIjWB59qUp6iL4vZvGkCd3I7bx7IK/qKyeYrI1ceoE8Epwny7+lA6IK1+YzgFn25TiHONJnylaG2XXrjueAxDdEU/sAVRszu3t7LhPx9kbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5i/waos; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA162C4CEC3;
+	Wed, 25 Sep 2024 12:00:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727265646;
-	bh=3XwSyHE1LtYwsC7u9Yy/+DIikL5Zx2KWUqPTHkcH4QM=;
+	s=k20201202; t=1727265652;
+	bh=C8mB3wjrG+2zjcbFXnCEKkxtBLMLigQxms7/qABLo38=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VdmBU+oIhIEWFqEqHtxdiYwWXt4dXtbXKueax3FW1kOiQH6GxGjIJelXKej+GSahO
-	 RUxv3ROdUCouP1zHRtZ2utPX0//R4Rb6MjX64BHzdA0p02Smql55h8XEs1pTmhHsO0
-	 0grXuj8G30EjQr1NZHaB0x4zKN2ajv+R5ZuRScL5kfUf1Fmjr9RalrUANRjdbid1GV
-	 0r6r7e2eDw+BSKstx9KUZyVlDsHOfQrurUV2WGzok7y69zqlcTGndb0ELmVrEImjZo
-	 e0H2xii9Yxtow36vUuP5SppzKQjN6iLdb4emA6blOk3OheHei+2f851AWGwaTmQ+oh
-	 G+qVwtV5G27OQ==
+	b=n5i/waos1vIpAu7BPH9gQBObwEi3ts5b/f1k5Rr2POSC8zbqALJY4iw4CkL8X9dfX
+	 RPFL3BtyRoov7pbUQIgP6Nt5Esslu2OKl7XRhkmudQbQ9KUsPO4l8AhJeiOcTlNqGj
+	 c7xRblB13vVJ5OF2rMp7ccbmXwwm9M3EbalCxnevH7HY0JmbcsLwB5l9xD07eq+Z9b
+	 6PszbzHGDexDnhWz/mV5GQwKsmOA1C36FI2PXNupIGTaxsHvT7kr3G4b6MYVSEG2fh
+	 qnikl3CJpWNBLSaAfCiO0+zCAy0v1Y4j2nCxc7C5pAnN49zPPFcXlYHNWPHMl3tizs
+	 0MLfz0wPUDWnw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
+Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	hkallweit1@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	sdf@fomichev.me,
-	danielj@nvidia.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 057/197] netdev-genl: Set extack and fix error on napi-get
-Date: Wed, 25 Sep 2024 07:51:16 -0400
-Message-ID: <20240925115823.1303019-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.10 060/197] net: phy: Check for read errors in SIOCGMIIREG
+Date: Wed, 25 Sep 2024 07:51:19 -0400
+Message-ID: <20240925115823.1303019-60-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925115823.1303019-1-sashal@kernel.org>
 References: <20240925115823.1303019-1-sashal@kernel.org>
@@ -67,67 +68,83 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.11
 Content-Transfer-Encoding: 8bit
 
-From: Joe Damato <jdamato@fastly.com>
+From: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-[ Upstream commit 4e3a024b437ec0aee82550cc66a0f4e1a7a88a67 ]
+[ Upstream commit 569bf6d481b0b823c3c9c3b8be77908fd7caf66b ]
 
-In commit 27f91aaf49b3 ("netdev-genl: Add netlink framework functions
-for napi"), when an invalid NAPI ID is specified the return value
--EINVAL is used and no extack is set.
+When reading registers from the PHY using the SIOCGMIIREG IOCTL any
+errors returned from either mdiobus_read() or mdiobus_c45_read() are
+ignored, and parts of the returned error is passed as the register value
+back to user-space.
 
-Change the return value to -ENOENT and set the extack.
+For example, if mdiobus_c45_read() is used with a bus that do not
+implement the read_c45() callback -EOPNOTSUPP is returned. This is
+however directly stored in mii_data->val_out and returned as the
+registers content. As val_out is a u16 the error code is truncated and
+returned as a plausible register value.
 
-Before this commit:
+Fix this by first checking the return value for errors before returning
+it as the register content.
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                          --do napi-get --json='{"id": 451}'
-Netlink error: Invalid argument
-nl_len = 36 (20) nl_flags = 0x100 nl_type = 2
-	error: -22
+Before this patch,
 
-After this commit:
+    # phytool read eth0/0:1/0
+    0xffa1
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --do napi-get --json='{"id": 451}'
-Netlink error: No such file or directory
-nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-	error: -2
-	extack: {'bad-attr': '.id'}
+After this change,
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Link: https://patch.msgid.link/20240831121707.17562-1-jdamato@fastly.com
+    $ phytool read eth0/0:1/0
+    error: phy_read (-95)
+
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Tested-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Link: https://patch.msgid.link/20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/core/netdev-genl.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/net/phy/phy.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 05f9515d2c05c..a17d7eaeb0019 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -216,10 +216,12 @@ int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	rtnl_lock();
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index c4236564c1cd0..8495b111a524a 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -342,14 +342,19 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
+ 		if (mdio_phy_id_is_c45(mii_data->phy_id)) {
+ 			prtad = mdio_phy_id_prtad(mii_data->phy_id);
+ 			devad = mdio_phy_id_devad(mii_data->phy_id);
+-			mii_data->val_out = mdiobus_c45_read(
+-				phydev->mdio.bus, prtad, devad,
+-				mii_data->reg_num);
++			ret = mdiobus_c45_read(phydev->mdio.bus, prtad, devad,
++					       mii_data->reg_num);
++
+ 		} else {
+-			mii_data->val_out = mdiobus_read(
+-				phydev->mdio.bus, mii_data->phy_id,
+-				mii_data->reg_num);
++			ret = mdiobus_read(phydev->mdio.bus, mii_data->phy_id,
++					   mii_data->reg_num);
+ 		}
++
++		if (ret < 0)
++			return ret;
++
++		mii_data->val_out = ret;
++
+ 		return 0;
  
- 	napi = napi_by_id(napi_id);
--	if (napi)
-+	if (napi) {
- 		err = netdev_nl_napi_fill_one(rsp, napi, info);
--	else
--		err = -EINVAL;
-+	} else {
-+		NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_NAPI_ID]);
-+		err = -ENOENT;
-+	}
- 
- 	rtnl_unlock();
- 
+ 	case SIOCSMIIREG:
 -- 
 2.43.0
 
