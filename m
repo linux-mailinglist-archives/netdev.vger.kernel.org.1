@@ -1,130 +1,133 @@
-Return-Path: <netdev+bounces-129860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5FA98684B
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:27:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87E94986856
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34FEF1F21399
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:27:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C411F22762
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F67C154BF5;
-	Wed, 25 Sep 2024 21:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA6C147C79;
+	Wed, 25 Sep 2024 21:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEH15f+W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/TywTnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021BD147C79
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 21:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D70441D5AD5
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 21:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727299620; cv=none; b=K72LEkwzSHjzU6o8n6J2t8aj1SYcNsCV9vUSc6qEfZXlwI/JpcNiaySOAyQo2p5odDmUaFdSk8hu4Z5g2kdRqRxd6tWdhq5sKI9/WUsZV9AXSsOFUrj0Xt/qvampW7kMf2FG18pblX+O6Ye84jfcjbQUfGscB8CPF8Co+9waxTg=
+	t=1727299798; cv=none; b=k4WLbxhLv9BIc/spj2rmXkFI1sCXQ11H8fKloP5UOxspx8gRbzMQUpokl6MsvADojCivQA4b+/BPhllWxWD+vtczJgQ3Dia1upexXfcmt9XFqD7Jtz5dsqkUhlV8nIvprN8KoeqeCqm/7baOsDkJbZjYJSboL/2pTZlaPuvVSZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727299620; c=relaxed/simple;
-	bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=E8d8cDJr6peRFxTOJIHWQcUcnrkxAy7evFIRBG02/F5rsU2poEcK3pXqdaGBXW/BDvH1EuvrVF0reXTX9ixof0gnBYGAKwEAWvMyZ+BEiRnowEVV53cpxENPUH55QQzrXY4I2nXBmmvA5Qq1rvYLYDRnVAkadQDfgvRwT/WlFQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEH15f+W; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1727299798; c=relaxed/simple;
+	bh=oPcvEjs5Gf3WI3M0hzil/Mum/KqrVuk3eWsOj6fmbto=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IY2R/PxysL6BiBSmys8Cns0rsVXVZd8UoDRaKpwydONYuBfDtffyTbbhokiRiL73T5N0uKs7o40EZu2nC6UwVPJ2xcSyl3CLNlCTzLgT8kNkMekv0BaVphJvJ91qYtub/kzbHOPvr3ETFXsMjkE+eijPU57YURfCbXN9mIq0DQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/TywTnP; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53653682246so417234e87.1
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 14:26:58 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a93a1cda54dso42997966b.2
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 14:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727299617; x=1727904417; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
-        b=NEH15f+WbFOXP8gkt2b6y9G2XKBEMI8T3r5KX4QUc3AFpR+WeecFZP6YPS4mg41DXo
-         H019j5Ji2X5qDRSj1mieBD4xrqiuGyJDyZ6EsDNfA8tj1avLhn3RrtKnZr+EvGOEK30u
-         DK8+Il03N4cIWwx+bAhS+t5SuhEULO+IxaFY71A/28oBWdB0Qco+WbM8del7O+ymapUQ
-         NE1tbR9vSmpefvttid+4aOHrqCoqSoy9qxU4EiCPAHEtLABE2XXsw+utGuGy6pdwMlQ5
-         U2idFAB+WttlElXop/KNDLJ6/xz7ejyKQVlzrwviLnrz4T4lC9lg5qx1xexOlxDSPTJT
-         3jsQ==
+        d=gmail.com; s=20230601; t=1727299795; x=1727904595; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QTzoK02kTYZcBxixIlCmmqrz5NjJYrBjw1wg41nBqzI=;
+        b=L/TywTnPC+2J/pZTZtHhzW+DTderNPfzcUXN9ZW4XCaqWEz28spPkxgSzgnHwRc9h8
+         J9X6SFho6LWA9eCWtOSymAYboZSthilSkCw6bo35XsPheGDRhsNnJGbUd7/c5X/Gy4fh
+         +Tka4FQTjOKSPlpxAwt1F22MbUYN1YUAYZvNg+waMu6qElIEdNeERuVS0PTtCsghsOtV
+         1ab08M3pKcL7th2RDBtipFPM9rILb5uS6syMa7it7m9fWcqxr1T8Vy11yEC8E86DgtGI
+         7mR5WYbFdi/2M4NxpaFDnNKMvXOx93djbJGiU7ADXhqQsnh8hENI/OIgg6Jr5OWSqHIl
+         E6qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727299617; x=1727904417;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
-        b=hHh2yoXSyaf3krVY/2ZjiQvaVfjnbSAMAGQjOdjLTNhhV6QA5HK4DbW8ZzxmKVZdHT
-         Gs0FHrYnQI4OEefL/jt82xM+rBSWIOeEABhO5czM3+lOdsv4o0ddmsz9dp3KoaSAjYfY
-         TnFkYXE0DBg3PhVN357ByrQBDu4eIsYPAS7hAZZkmBP8N0rNFDdXsGaru3Fol6raRtTA
-         cxxf7h6M6dxOd48j7Ew1txXb4EbfiB1m+WsGhGS+ZeGmBzszjQEqL9rgtnq/vgitnR8y
-         QDo/QSDpp+CP9CFRGw9LvYRlPIEFursD4xxammuK3DDSOj/c/jclnGIAoIoYQlb0GsMd
-         3gpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUmK6KtQ8EkRe4hBdnhi4fVTNrZkUJx+Sa2agRiP2oVp2DxlY7pRVEBM3yEL/i3Mw5brYfbCBY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOU2+lEVw9RJvLYoHD2Q9v+A6y7fgitW2njcypK319CroZzQ8w
-	/LugwqWNQTzQ314hLrtWr+QYP2Jxid7Ftpc0ApxrKLdU3mYNGovR
-X-Google-Smtp-Source: AGHT+IG5fIFAQxZTmIQCZsUr7ZUrDdAyu12GX8KHFbwx9i7nUDEK3Sraw1KRj6OmOyq7j6ebfSFZ3Q==
-X-Received: by 2002:a05:6512:220d:b0:533:4722:ebb0 with SMTP id 2adb3069b0e04-53873455ef1mr2878247e87.6.1727299616717;
-        Wed, 25 Sep 2024 14:26:56 -0700 (PDT)
-Received: from [127.0.0.1] ([193.252.226.10])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93930f0b23sm267607466b.144.2024.09.25.14.26.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Sep 2024 14:26:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727299795; x=1727904595;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QTzoK02kTYZcBxixIlCmmqrz5NjJYrBjw1wg41nBqzI=;
+        b=jI2klA3J0bsb4ePiVOac8zj9543kp96aQatpyxHLWpOPMO58Ml7j2kQ4vwI1cwoK61
+         Gtsafun9cBqxpzgrBPA3VYvJH14sj5P3SgCHLrBVecFb+9sthL6I4YCo1E6Ti5UqaU2H
+         2ZIt5pAtLoXbPQGQbAxQ7a60fuUbhlyptQaJIDOT293sf73UJRVVOPYx7Jyf9NnQ1jyb
+         TWxjZ6XP2LzpEWn/ujhyo8qoe9jIbIT26VHGLO70NSv6GV01LWtRxN9WHVG/K5kPUihe
+         j5KQ02qD2why6YhjsLrqWcrgeBoy2xHLdg1fQCXv2jGHKqKHDSac325RFnvmT2Y0erR4
+         qGKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVaGCbDYgvP+AiChhq1/qcJwwqMWYIocEwsYKEJUp6OerD7WakrDHfrKx8ae1PcQdl2SMgd1Mk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBODttjGokPO0l7Bcfv3O1Jzqa9n1PP1bKhIcHLamhO0XHKNbf
+	HMDEHD4y+Ic9bPLshhik+Bl26Rgwxl+M1RzLgkUUi6QiR0rjUwKgkNnwQkfr
+X-Google-Smtp-Source: AGHT+IEo55bPlJBN1p9atGCDChXlBpZ+/BWRb3A+yu22Pys0UPNZmGJq5kmEm+QLdftlvbPy39G/5w==
+X-Received: by 2002:a17:907:7d8a:b0:a8b:6ee7:ba29 with SMTP id a640c23a62f3a-a93a05e7e95mr389573866b.44.1727299794863;
+        Wed, 25 Sep 2024 14:29:54 -0700 (PDT)
+Received: from getafix.rd.francetelecom.fr ([193.252.226.10])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9392f4fb94sm263612366b.58.2024.09.25.14.29.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 14:29:54 -0700 (PDT)
 From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
 X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-Message-ID: <d1f402df-f4cc-4c31-b590-d13de9cea028@orange.com>
-Date: Wed, 25 Sep 2024 23:26:55 +0200
+To: edumazet@google.com
+Cc: alexandre.ferrieux@orange.com,
+	nicolas.dichtel@6wind.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net] ipv4: avoid quadratic behavior in FIB insertion of common address
+Date: Wed, 25 Sep 2024 23:29:42 +0200
+Message-Id: <20240925212942.3784786-1-alexandre.ferrieux@orange.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Linux)
-Subject: Re: Massive hash collisions on FIB
-To: Eric Dumazet <edumazet@google.com>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Simon Horman <horms@kernel.org>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, nicolas.dichtel@6wind.com,
- netdev@vger.kernel.org
-References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
- <db6ecdc4-8053-42d6-89cc-39c70b199bde@intel.com>
- <20240916140130.GB415778@kernel.org>
- <e74ac4d7-44df-43f0-8b5d-46ef6697604f@orange.com>
- <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
- <c739f928-86a2-46f8-b92e-86366758bb82@orange.com>
- <CANn89i+nMyTsY8+KcoYXZPor8Y3r+rbt5LvZe1sC3yZq1wqGeQ@mail.gmail.com>
- <290f16f7-8f31-46c9-907d-ce298a9b8630@orange.com>
- <d1d6fd2c-c631-44a0-9962-c482540b3847@orange.com>
- <CANn89iL0Cy0sEiYZnFbHFAJpj1dUD-Z93wLyHJyr=f-xuLzZtQ@mail.gmail.com>
- <8e3fcb81-0b3f-4871-b613-0f1d2ed321a3@orange.com>
- <CANn89iL5XEZ0S6c-amu_Q_k8fXYqDKLVh1bPv8kPhc4eKR6UYw@mail.gmail.com>
-Content-Language: fr, en-US
-Organization: Orange
-In-Reply-To: <CANn89iL5XEZ0S6c-amu_Q_k8fXYqDKLVh1bPv8kPhc4eKR6UYw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On 25/09/2024 22:12, Eric Dumazet wrote:
-> On Wed, Sep 25, 2024 at 9:46=E2=80=AFPM Alexandre Ferrieux
->>
->>
->> [...] I was not wondering about the history behind net_hash_mix(), but=
- more
->> generally why there are two parallel implementations of FIB insertion.=
+Mix netns into all IPv4 FIB hashes to avoid massive collision when
+inserting the same address in many netns.
 
->=20
-> ipv6 has been done after ipv4, and by different contributors.
+Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+---
+ net/ipv4/fib_semantics.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Okay :}
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index ba2df3d2ac15..89fa8fd1a4a5 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -347,10 +347,12 @@ static unsigned int fib_info_hashfn_1(int init_val, u8 protocol, u8 scope,
+ 	return val;
+ }
+ 
+-static unsigned int fib_info_hashfn_result(unsigned int val)
++static unsigned int fib_info_hashfn_result(struct net *net, unsigned int val)
+ {
+ 	unsigned int mask = (fib_info_hash_size - 1);
+ 
++	val ^= net_hash_mix(net);
++
+ 	return (val ^ (val >> 7) ^ (val >> 12)) & mask;
+ }
+ 
+@@ -370,7 +372,7 @@ static inline unsigned int fib_info_hashfn(struct fib_info *fi)
+ 		} endfor_nexthops(fi)
+ 	}
+ 
+-	return fib_info_hashfn_result(val);
++	return fib_info_hashfn_result(fi->fib_net, val);
+ }
+ 
+ /* no metrics, only nexthop id */
+@@ -385,7 +387,7 @@ static struct fib_info *fib_find_info_nh(struct net *net,
+ 				 cfg->fc_protocol, cfg->fc_scope,
+ 				 (__force u32)cfg->fc_prefsrc,
+ 				 cfg->fc_priority);
+-	hash = fib_info_hashfn_result(hash);
++	hash = fib_info_hashfn_result(net, hash);
+ 	head = &fib_info_hash[hash];
+ 
+ 	hlist_for_each_entry(fi, head, fib_hash) {
+-- 
+2.30.2
 
-> BTW, inet6_addr_hash() does not really need the net_hash_mix() because =
-ipv6 uses
-> a per-netns hashtable (net->ipv6.inet6_addr_lst[]), with pros and cons
-> (vs IPv4 resizable hashtable)
-
-Interesting. I somehow felt that the system-wide IPv4 resizable table was=
- a good
-idea in terms of scaling, as it amortizes the necessary overheads in the =
-case of
-many-netns (though it is monotonic: grows but never shrinks !)... But now=
- I
-wonder: why is it a good idea for v4 and not for v6 ?
 
