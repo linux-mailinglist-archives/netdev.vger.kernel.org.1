@@ -1,155 +1,140 @@
-Return-Path: <netdev+bounces-129804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A40D09864B5
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:21:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA729864CA
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0C57B22C4F
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 691911F25B72
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12236F30E;
-	Wed, 25 Sep 2024 16:21:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F974D59F;
+	Wed, 25 Sep 2024 16:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="f1iH8eqz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLKkrw16"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C00A4CDEC
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 16:21:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2C71BC2A;
+	Wed, 25 Sep 2024 16:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727281264; cv=none; b=UR1l9hPLwu5zhkNQ0lZnoYIuGBl7EuBH+N1f31y6jEM/0XhunQXVZps0ibaVA25HEZbKHpKEAKC9bGkV3HB+TNAmUF1/7ujiv3ojzthaumjfELnpM1e34+lAZ0w6EUfTPvnBaiXto7AYvi8jVpZt2q9dYtmrFrBpGjtp1jI9GVs=
+	t=1727281565; cv=none; b=OV1lLAQkbKVH0h+t9uQChxVReJhLsmUUhl1re3UvsPFtWDr8QFb9AHHvPg5teFv0rPXfe6Z43aMK5GWAJBHW9Ki0ifWeU5FlswluduS7PU9nL+DM/GBshPyBlHm9WZfKjeQC2ZNzsj7Ag6C5TvuvQkhNgkboakBVqqzPmIAfSzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727281264; c=relaxed/simple;
-	bh=dKt1w+hORDTSGCSREIgcSOY/polV8gNEtej77pHHn2Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sn3bXcr64q/EIdWxO6ylB628dDneXdhWUjbBISCYd2Z6V6SIh8Mu8PTogSfHEcvMAjk//5gXVpiHvwtLHhX9fgZ7ZfvsJHLldmgQcv8G2sJ0jL6Cts9M63X1ihrF+JeoP2CdaCSgla/cmWZYUlkbh9Ql/5BPOkOgqwiHicfXAQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=f1iH8eqz; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a1a4870713so52575ab.0
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 09:21:03 -0700 (PDT)
+	s=arc-20240116; t=1727281565; c=relaxed/simple;
+	bh=cI6lyNFuQzUTS7t+rqJMQnOPi9+rdmD9ZefQND902cI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZSFryfJfkGKMbL82wSaqzWKDZ1kHdP5iMw+x6BTGUAzA01AA+2+V7JNebWLbTj0Nf9eYnfYZG1GYRApz9MEixhOB5Yek5/MxMwEU/FemcsVV6Lw6wDxbRpdqmiH+XDdTTmlvj8tQBg292IHzpUJw9SpF8E10KaOc1fGC2W3/Y78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLKkrw16; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cbface8d6so88592305e9.3;
+        Wed, 25 Sep 2024 09:26:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727281262; x=1727886062; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ds+S/MZetPsKWvU7c9jTLdR0Y2FRO8ABAdvsJaaWkZs=;
-        b=f1iH8eqz8uwKPz/wo7iN42SiE9QiMFRwos6IQL3zvPqDWEUKQ+IjrTCCUH/g1WyStQ
-         USdpmwzvOoy6U6jvsOgvxTTofOpLqva6ndpi5YN/C65VPpOr2cUoYkYBTMtyYeQgDP7F
-         zTq7eV1W52mtPHbgFYePJ6Q4oYpSaXDYUW/ag=
+        d=gmail.com; s=20230601; t=1727281562; x=1727886362; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=H/UtXLfeBskg7av7Jxvz+w2dEjZcwNE7yygFxh5xpPU=;
+        b=HLKkrw16Omsmq2k0YWGGgCXCYO4RcVm5KeMv4em2sxcbMITwW/WVX50Bx63l5PrOCr
+         QSzjCgkOkuu0cia4IW34OV17EsAfvmoMdyKh8BxICOdKuhSQQL8ORrWLD7J+V0y0LiFy
+         SxD5VqFB2G5VZm6HhVHvDP+7GRv/vQnOOYWY32AHOi87ui+0oZfhldHU3tKx77vCOKl2
+         N4B0VSzlr5NjuCDt4Q9t0jZh02bpWEI3fOrhUAW7ctLep+O6S3tlsVp0dIFNf4Ge+Y22
+         QinJEDu94h0TBngqgvD77PSLsslcoRdr/59IpTWg3UbHnDv7ZOQF/RqHHO9bBjqSbJ/X
+         MoQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727281262; x=1727886062;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ds+S/MZetPsKWvU7c9jTLdR0Y2FRO8ABAdvsJaaWkZs=;
-        b=NXjj1yKeAlqG8DyPsTBT30dhQtI2D4UuAfWJUfW/+vZxu5Z8hk7piw0w0xt6n5fHnr
-         b8Al13wJCSXGYfNIhXtbxG94/sojqZL1QyH3b42laHE8NHmOw/avWDNXiNtceJe5W5yo
-         vFsnA4r8s17ogFSWqZFKjW8lWTl0uOpwMRDECqbKdB5H9rE2GtCenmtrVO36A47EGYgT
-         X4Ti8ZkjeHrqe6SsWbH7fy22UIvRS+O2HoRIYJwlOnmvBi+kOanGfFRjx9rIej5tBKan
-         OOD7cFXutadXq2MgsHaKJV9+nANXF9uCKihhoa8X/OiGnGptIVi/YVVBPMJe3Vn4nz3D
-         P3Lw==
-X-Gm-Message-State: AOJu0Yx5HpsGbeeuArmhWq2MQyq0nHXAg+9VJwz9BjfxuSOi3vhoLUpC
-	Hd3LUH5RbrJ4lKWELAiln0SvGaw8lMmS+tJ+38ATKOgklQi1paPECOC+mYOmn1AkP73IsZVELuO
-	gN7o+v2XJL67AjqMDn1L5rbFV36eWZnIdXcRRD/j8oOIbr7Ehw3abMXJLyej3K12AMwV8ogTMm9
-	EsJiHUaRC1ecVZGmbJJaIGwbCTgNVvlr+gmE4=
-X-Google-Smtp-Source: AGHT+IFaxcC34k7ddgcU2fJhDTtJSAWSQ1OP73ZVmq50xBFAa2+XpiHScPN2QaIUpK0YEokOuADvrA==
-X-Received: by 2002:a05:6e02:188c:b0:3a0:8d2f:2914 with SMTP id e9e14a558f8ab-3a26d7f0e76mr36241535ab.23.1727281261959;
-        Wed, 25 Sep 2024 09:21:01 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6b7c73341sm2948433a12.72.2024.09.25.09.21.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 09:21:01 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net-next v2 2/2] tg3: Link queues to NAPIs
-Date: Wed, 25 Sep 2024 16:20:48 +0000
-Message-Id: <20240925162048.16208-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240925162048.16208-1-jdamato@fastly.com>
-References: <20240925162048.16208-1-jdamato@fastly.com>
+        d=1e100.net; s=20230601; t=1727281562; x=1727886362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=H/UtXLfeBskg7av7Jxvz+w2dEjZcwNE7yygFxh5xpPU=;
+        b=vZyn9yzjGlLyvpd+x5+HDLKp7K4f4X+bFvMaWCk8jMI0P9vga2wge2K3rVvU1qoDob
+         Sw54QIT0c/55X/ZAj8HxjA2xVFvilz5Y0et8y07TNCO9Qza5DCMnPq7saMRNmDGubYu6
+         SOhVdTOSxfXkJGaTxiIkG5MTKNuSmL/XpDZhHjCN7Nh0sk959E+ztj3uu9DvcNBZARLN
+         xyYq2VELD2PWkRrmQgy7kE47kZ7ocNOo9LF3kfUUXo1CTM/Pj8eANYY8JUN8V+2mPOoA
+         04MLZwfqTblXbn9NMVGVNwjUihgcV1gdHGBW8VvRWxOIwMWciGUZsAg7VV+XCJSPp9pC
+         r4GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNkwdc+rDQuQLqLZri9KqnSGKX/xfNUJYBVeRdkwD7NNF3ZMdHTa+DxRZxaPD1esJgYdnaR2GMWlmFHHc=@vger.kernel.org, AJvYcCW8TekLkdkONg9V+xprgNxRzufQ54q+Q4bKj6a1zPMBvEA7xEgtVDZMF6wI03jQQqeY+ETfeoUV@vger.kernel.org, AJvYcCX8CrxdBhkZpRjTZE7nYoBiMHDinQ2H9JIOk6kISEPGI2gV33vC1hbd9z2wf1Mzbh8tcAgMAMWCQZ79yw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6JuHOdrlLI3VE/0MFHb/KB3prrdl4x+TXJ3VJ9Wn4eLoy8ns+
+	pUxbnwpQcAfZZfVK57TM+2laIZGDCUSkLizRim622pEQL/JjCLkK
+X-Google-Smtp-Source: AGHT+IFnUcAaIeFzw5E9a6d4pDhxJA51W3OA4HKs+9mXTYSBF++MSHEBdMd2l1J6YgLA5fH5oKDXlw==
+X-Received: by 2002:a05:600c:1e03:b0:42c:c8be:4215 with SMTP id 5b1f17b1804b1-42e9610252bmr27899125e9.4.1727281562296;
+        Wed, 25 Sep 2024 09:26:02 -0700 (PDT)
+Received: from ?IPV6:2a02:8389:41cf:e200:ec17:8f60:3966:3e7b? (2a02-8389-41cf-e200-ec17-8f60-3966-3e7b.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:ec17:8f60:3966:3e7b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e969ffa3dsm23280735e9.23.2024.09.25.09.25.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Sep 2024 09:26:01 -0700 (PDT)
+Message-ID: <70864b3b-ad84-49b2-859c-8c7e6814c3f1@gmail.com>
+Date: Wed, 25 Sep 2024 18:25:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] selftests: exec: update gitignore for load_address
+To: Shuah Khan <skhan@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com, linux-mm@kvack.org
+References: <20240924-selftests-gitignore-v1-0-9755ac883388@gmail.com>
+ <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
+ <e537539f-85a5-42eb-be8a-8a865db53ca2@linuxfoundation.org>
+Content-Language: en-US, de-AT
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+In-Reply-To: <e537539f-85a5-42eb-be8a-8a865db53ca2@linuxfoundation.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Link queues to NAPIs using the netdev-genl API so this information is
-queryable.
+On 25/09/2024 17:46, Shuah Khan wrote:
+> On 9/24/24 06:49, Javier Carrasco wrote:
+>> The name of the "load_address" objects has been modified, but the
+>> corresponding entry in the gitignore file must be updated.
+>>
+>> Update the load_address entry in the gitignore file to account for
+>> the new names.
+>>
+>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+>> ---
+>>   tools/testing/selftests/exec/.gitignore | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/exec/.gitignore b/tools/testing/
+>> selftests/exec/.gitignore
+>> index 90c238ba6a4b..4d9fb7b20ea7 100644
+>> --- a/tools/testing/selftests/exec/.gitignore
+>> +++ b/tools/testing/selftests/exec/.gitignore
+>> @@ -9,7 +9,7 @@ execveat.ephemeral
+>>   execveat.denatured
+>>   non-regular
+>>   null-argv
+>> -/load_address_*
+>> +/load_address.*
+> 
+> Hmm. This will include the load_address.c which shouldn't
+> be included in the .gitignore?
+> 
+>>   /recursion-depth
+>>   xxxxxxxx*
+>>   pipe
+>>
+> 
+> thanks,
+> -- Shuah
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
 
-[{'id': 0, 'ifindex': 2, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 146, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 147, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 148, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'tx'}]
+Hi, the kernel test robot already notified me about that issue, and I
+sent a v2 to fix it shortly after. Please take a look at the newer
+version where I added the exception for load_address.c.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/broadcom/tg3.c | 24 ++++++++++++++++++++----
- 1 file changed, 20 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index ddf0bb65c929..f78d7e8c40b2 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -7395,18 +7395,34 @@ static int tg3_poll(struct napi_struct *napi, int budget)
- 
- static void tg3_napi_disable(struct tg3 *tp)
- {
-+	struct tg3_napi *tnapi;
- 	int i;
- 
--	for (i = tp->irq_cnt - 1; i >= 0; i--)
--		napi_disable(&tp->napi[i].napi);
-+	ASSERT_RTNL();
-+	for (i = tp->irq_cnt - 1; i >= 0; i--) {
-+		tnapi = &tp->napi[i];
-+		if (tnapi->tx_buffers)
-+			netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_TX, NULL);
-+		else if (tnapi->rx_rcb)
-+			netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_RX, NULL);
-+		napi_disable(&tnapi->napi);
-+	}
- }
- 
- static void tg3_napi_enable(struct tg3 *tp)
- {
-+	struct tg3_napi *tnapi;
- 	int i;
- 
--	for (i = 0; i < tp->irq_cnt; i++)
--		napi_enable(&tp->napi[i].napi);
-+	ASSERT_RTNL();
-+	for (i = 0; i < tp->irq_cnt; i++) {
-+		tnapi = &tp->napi[i];
-+		napi_enable(&tnapi->napi);
-+		if (tnapi->tx_buffers)
-+			netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_TX, &tnapi->napi);
-+		else if (tnapi->rx_rcb)
-+			netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_RX, &tnapi->napi);
-+	}
- }
- 
- static void tg3_napi_init(struct tg3 *tp)
--- 
-2.25.1
-
+Thanks and best regards,
+Javier Carrasco
 
