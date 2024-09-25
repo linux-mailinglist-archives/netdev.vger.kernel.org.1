@@ -1,61 +1,67 @@
-Return-Path: <netdev+bounces-129740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FEA0985D46
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:06:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 366D6985D0E
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FE99B22186
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:59:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6726E1C24C46
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832D31D7E40;
-	Wed, 25 Sep 2024 12:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C331D88AF;
+	Wed, 25 Sep 2024 12:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X3WcDHSY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F6MRMuCI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E551D7E3C;
-	Wed, 25 Sep 2024 12:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F041B0139;
+	Wed, 25 Sep 2024 12:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265679; cv=none; b=NdLGRSyhx/kk7aywYJVJvk8yDrwQgjfRud9WkIc/KIpqrotQ2Z82S4H5fPU2hvU4C4ZSJ9+sH4thNZxdYR+f5mTWy/TgtVAxZnIYfDI1Xw472jrP2tyCy/J6aEFQEIPIDn9ygJdQsjKVaaOrq0hBzIrOr+/WuCrzAzPZV1p7Ny0=
+	t=1727265690; cv=none; b=KVck5k1m6mu9cp+D5vAKY4lJIg5AZOFFodZ+y/4I1NGgLm3nFKZeAuknGx1NPNnwXHBhScrX+WPepX2dsQIeQ6YJb+0WTudFVj9hm4RgWybpT6QfVjD7Qi0+lZhWwA9abTrDOdFhqNRaTJ8RJEuPMBJJsIjooFJeQnHdeO7zkfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265679; c=relaxed/simple;
-	bh=IUv1tIoJR84HoODyOk7lB+rahWRJkrUfc2DKrwX3hnU=;
+	s=arc-20240116; t=1727265690; c=relaxed/simple;
+	bh=PyseLeQpvsNGIa7+PLlAdvIqATHgC6d93pVMovqchg8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g98GWIIUlTZk3AC2pn30ZGk5u+BhNw8Nj9uoFR+bE5hY+PEfHsfOICrN5gFFyTVP6zRHPOjhh1WxHiZOV6+7l1vRV0gs283PzUrHNFwFqNjQpR0AepA+a8ciT2HOQ2/Fjo18Ba/TH80J7cquvj1B7anya9BfmOUZoAwkIlwwJfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X3WcDHSY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA454C4CEC3;
-	Wed, 25 Sep 2024 12:01:17 +0000 (UTC)
+	 MIME-Version; b=S3eMFNP763MGgO8iuDcx8JCgc01VJfWykSscRzTFN2Wg/5ubhBFtGNPUY6atVnhXul8H5q7F4Dc8EV4yrEUXWBlwplNknIi8Nq3b6Qx3wiA1o+bbzNyTu7webRyBfTW+ubgLY7y070IVk/fcqBn4WSkcHtSqxsnAdIOCnNRTfYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F6MRMuCI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5692AC4CEC7;
+	Wed, 25 Sep 2024 12:01:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727265679;
-	bh=IUv1tIoJR84HoODyOk7lB+rahWRJkrUfc2DKrwX3hnU=;
+	s=k20201202; t=1727265690;
+	bh=PyseLeQpvsNGIa7+PLlAdvIqATHgC6d93pVMovqchg8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=X3WcDHSY3JfBllKeU52NQTWRQmr0xUJZCt72D6LsaTkNANXREocFUkancD60h+jFw
-	 EfNPr+XyDG/+erOCXgk4P2cYx0O5TzXmnN5oA7GnR/NZaniW6Q6Td8e6T1yzcs2Ub3
-	 kAUbV/PW8ySRVIDT6KDs6ebG1k4GuWGPX95J5i6xVOuoWIEULXJJMzj8y9jT/IFw6t
-	 dP3u9xtWgBdPEdWLZGms197e1OXAHPb+5wI38FavKu0pYy7weO74Qw0mKVbapURx8r
-	 WA6xtb6HNePOT6rErabDEYTI00BJdaEq5V1dToyU5nfqoOyH+AxYJF/so8IF3VqWtl
-	 VNmdEue9DhNiQ==
+	b=F6MRMuCIHlzlsc+c0Gkug6aNtb243tZgZv1hlxkXsT8d3S3KxDmhY8gRivr1tslph
+	 PfKhjDV1mpqOQ0EmUBUa0IdWwuk0u+tEfsx8jS5ExGlRJkWpEo3U5q2hUfNXp1rDV/
+	 +wXaClHDeza/7LAiGBm4P5R718nRc2s6JZ236j989grMC21XeBXKSkEdp01GVNdN65
+	 lZfHZQSyZwCUEqoz8POR6h0k7eVuEHc1QVBmKNubTQS4aOgscSZBFDLOb8O0CC3eXK
+	 NcRff0Bmy7u+Mm/ny11uMwdYr1WN3zVBSjcFtrHaSMEypgvppi1A+XO4+u0DIKnGRP
+	 I10UQ5wMmgp2A==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+Cc: Jinjie Ruan <ruanjinjie@huawei.com>,
+	Louis Peens <louis.peens@corigine.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	borisp@nvidia.com,
-	john.fastabend@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	horms@kernel.org,
+	yinjun.zhang@corigine.com,
+	james.hershaw@corigine.com,
+	ryno.swart@corigine.com,
+	johannes.berg@intel.com,
+	fei.qin@corigine.com,
+	oss-drivers@corigine.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 069/197] net: tls: wait for async completion on last message
-Date: Wed, 25 Sep 2024 07:51:28 -0400
-Message-ID: <20240925115823.1303019-69-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.10 072/197] nfp: Use IRQF_NO_AUTOEN flag in request_irq()
+Date: Wed, 25 Sep 2024 07:51:31 -0400
+Message-ID: <20240925115823.1303019-72-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925115823.1303019-1-sashal@kernel.org>
 References: <20240925115823.1303019-1-sashal@kernel.org>
@@ -70,49 +76,44 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.11
 Content-Transfer-Encoding: 8bit
 
-From: Sascha Hauer <s.hauer@pengutronix.de>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
 
-[ Upstream commit 54001d0f2fdbc7852136a00f3e6fc395a9547ae5 ]
+[ Upstream commit daaba19d357f0900b303a530ced96c78086267ea ]
 
-When asynchronous encryption is used KTLS sends out the final data at
-proto->close time. This becomes problematic when the task calling
-close() receives a signal. In this case it can happen that
-tcp_sendmsg_locked() called at close time returns -ERESTARTSYS and the
-final data is not sent.
+disable_irq() after request_irq() still has a time gap in which
+interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
+disable IRQ auto-enable when request IRQ.
 
-The described situation happens when KTLS is used in conjunction with
-io_uring, as io_uring uses task_work_add() to add work to the current
-userspace task. A discussion of the problem along with a reproducer can
-be found in [1] and [2]
-
-Fix this by waiting for the asynchronous encryption to be completed on
-the final message. With this there is no data left to be sent at close
-time.
-
-[1] https://lore.kernel.org/all/20231010141932.GD3114228@pengutronix.de/
-[2] https://lore.kernel.org/all/20240315100159.3898944-1-s.hauer@pengutronix.de/
-
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
-Link: https://patch.msgid.link/20240904-ktls-wait-async-v1-1-a62892833110@pengutronix.de
+Reviewed-by: Louis Peens <louis.peens@corigine.com>
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+Link: https://patch.msgid.link/20240911094445.1922476-4-ruanjinjie@huawei.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/tls/tls_sw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 305a412785f50..bbf26cc4f6ee2 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1201,7 +1201,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
+index 182ba0a8b095b..6e0929af0f725 100644
+--- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
++++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
+@@ -821,14 +821,13 @@ nfp_net_prepare_vector(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
  
- 	if (!num_async) {
- 		goto send_end;
--	} else if (num_zc) {
-+	} else if (num_zc || eor) {
- 		int err;
+ 	snprintf(r_vec->name, sizeof(r_vec->name),
+ 		 "%s-rxtx-%d", nfp_net_name(nn), idx);
+-	err = request_irq(r_vec->irq_vector, r_vec->handler, 0, r_vec->name,
+-			  r_vec);
++	err = request_irq(r_vec->irq_vector, r_vec->handler, IRQF_NO_AUTOEN,
++			  r_vec->name, r_vec);
+ 	if (err) {
+ 		nfp_net_napi_del(&nn->dp, r_vec);
+ 		nn_err(nn, "Error requesting IRQ %d\n", r_vec->irq_vector);
+ 		return err;
+ 	}
+-	disable_irq(r_vec->irq_vector);
  
- 		/* Wait for pending encryptions to get completed */
+ 	irq_set_affinity_hint(r_vec->irq_vector, &r_vec->affinity_mask);
+ 
 -- 
 2.43.0
 
