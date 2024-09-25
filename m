@@ -1,113 +1,124 @@
-Return-Path: <netdev+bounces-129813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9088198660F
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:00:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3162986612
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36D451F256A4
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:00:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F6BEB23263
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA1984A31;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACB7135A53;
 	Wed, 25 Sep 2024 18:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CDBo+/6N"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="OG4ptymS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FDEAD520
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACAA15AC4
 	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 18:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727287226; cv=none; b=kDmGyZkAPRJBP5sEw2d8FcDN7oQBU7/blJHzvMBwXke2hpg2jJOQKSZAkXPiviJ2Rvh5VwglHyb1JpjZ7yYEatpxcpwuCFPmdAtTXCBTWIzyvvKXnwlia0P6zofuxVgm0lwvstCjjoNOuzWF/ov7xNtgezx4TmZbWN3ZdTqPKEs=
+	t=1727287226; cv=none; b=czfR27wPgiTPYyRDMYoPyT7Jo5mDNxPBsukAJr9kydmkErEGvaQSyjDsyRnpd8zLURSOPsux6KopSiNIGqZQ49VGZ7aZL1vU5/330fArN7KvEt1TShjU4n4GLTc/bVRemokcpxojYo97GikSm6exY3FimBT0EKMcNxzEmlPP56s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727287226; c=relaxed/simple;
-	bh=v3FGxLuzTHzQv8alNgzW+UaBYHHybhyS7oNk+efmsmQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=hnT6hzOVnGQeEOb2fzS8sgxVJLBuos5w28wfb9xLaYi/rc/a5ob6cLDGtf6X4adNAxFeifaWyeCnv5/jXt1gQfb+xObZXqNTW+imOQfbdxVq3JkeOONDYIhhGpl0NWXCjAvKYBCqjOPSX6OShzSqGJ7oCNF+ZZIBl8GhVhfV1eY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CDBo+/6N; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c275491c61so51575a12.0
+	bh=ml7Lf8R+3X+VkfxghOUGl4HkedqDwORC7CzGX9bOHwM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dbKHkGJZRsEIGmidt3swIMCbc/vUIWoe3zL3qyAfpkAtXsu0MRBg+ooSiK7I/lX/FG3qZXP1XncplArcpdIqFfCI2UoBj360aZRsV2nD72ZNj4yoAxv27xa3oL2vxnNiYhfxZp2mHL0N/yAJRlRIF+k2K45/tahlFLI2y3YeEAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=OG4ptymS; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7db4c1a54easo62432a12.1
         for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:00:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727287223; x=1727892023; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3FGxLuzTHzQv8alNgzW+UaBYHHybhyS7oNk+efmsmQ=;
-        b=CDBo+/6NyJqAty8xy7flNgqaWlK7gEW1EPNKZMPzCEKq0a5VeivMCOZPIbfXjs0ni0
-         qSfyT7XIp8lDnuBstnAYPSxu1SY4XHzbDysrVQRYlkf7AxAYoum6HXa77liKus7MBLMf
-         hSwqAQTgOi4QD2yW5Dni90vufNhiCbeUXc+ZSRpMdpru8CAxSDqoeJAoiDgRK0HoKu7Q
-         zFKdUQRrtYYS81KlBCYcICK5OqizdulrL2p7FTxbuwGZu7v01AkMs4XJs775hKmKOWtb
-         /O24HHL99XgZ5/dp7c7pIfInMynyR0uuNf3CbXysxl7BSYLqnf4SB8xbA+cm1JY5g9JE
-         06yg==
+        d=fastly.com; s=google; t=1727287223; x=1727892023; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=80NsANXDl6afdpJyUxRTROzlpMEuv9TyTDUFDqoq4HI=;
+        b=OG4ptymSYvriSg796+FKu67afq1ipv9Z7zKmEoz0oF0qnMMM7PQIn/ZwEcJ24nbSq8
+         ggnxn7ilVGFLfgHBnXoR9HqvylYLbj/IdYVzS2cZcEMKKxCiZsbSVxcMsCDIQKpanrhx
+         /hhiiMlijMaf1uJCAgSRBT1EZLgDeC073SbR0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1727287223; x=1727892023;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v3FGxLuzTHzQv8alNgzW+UaBYHHybhyS7oNk+efmsmQ=;
-        b=TvNHN7JBk3qDU57NSYR8ExblAg68CIl4yIf2SJ4wYVd5wzL/SjMmvDVyWdXZ81p1zD
-         Gokk3LGDbVvLJ4GT1on+2lyr6fa+hk1WJwkoSUTD/OGih+sr7Rj2ak+X5VC7OROK2n66
-         x5czvp0ffMMUbTcvVKs1gk5LHaF1BC5JR6CPL01KkqGHtInmvbPuUJ8tF9fU/mkQVVor
-         OmJaJqW8GSJD70hbOL/Je28QxLYXYu3lrwWSmgWfabzFlLv+7nugSaiR+SE1Y6aqS7yf
-         WC/E60uXoQ3yPyN0/lvLmKQD0qMOagBaoqjRWiDs+CCYgksdBCV6VQ08h36q+dXcrYx4
-         SzLw==
-X-Forwarded-Encrypted: i=1; AJvYcCUyiEI25z8/DJKg/Zw3dQkRRSL8EUmm1IVHrci5D/FDhLM2Ur2xuI4xaikQumKyCwvjkYafN44=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoRhWA0JtWGbx6EzQEbgpxLjdy6qit09BBY7B3NwueE5SdpBk3
-	Grs1QiBn4vMsaabqQLNYFUT88hLg4tl8b0FHWLrAnnJf4ZHN9EQm2uAiXnaPQzjGR+ANaBTj1xN
-	U2rcyi/scK3TzIHjLPCyfnk9KIyZCQMl5TVzW
-X-Google-Smtp-Source: AGHT+IHM2DIk6oL+al1xfH47FAGny4q63Pfz3shBWwj95WHyjVnFBY39G2TSIOC2uMoLCp8I7WI0/B6pPsLMw/HNfFQ=
-X-Received: by 2002:a05:6402:254a:b0:5c5:c0ef:282c with SMTP id
- 4fb4d7f45d1cf-5c72061a2bamr3260506a12.11.1727287222539; Wed, 25 Sep 2024
- 11:00:22 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=80NsANXDl6afdpJyUxRTROzlpMEuv9TyTDUFDqoq4HI=;
+        b=d43zSExJ+0Cgkxp0Z7stpaOSecrxn3V6AMEPI8uzuyC9eQ8CNA/u/KIlJWxfAFJSnD
+         UQt9JgZV0bMc6gz2hWdxSWRufLJ/ZtG+tQ+FYDC4yuRjvzI60vq5W6qnjAqUhR8TNa2j
+         n19QECAi1IUfFeWg1+9Il5DSmNZmnxbkG6zl6q3ErlIB/aM98YeWLPMwY+TaWm8YfsDT
+         ad8V5XP9GWV/npZ3EL3oycOruncMnk/NVgsir7aXqexHNYCuzLUFuKjdNiHTimdxKI4H
+         EXkskqmcUDe4vpFIW4ZKgu2DsNmAF2eKIxuambJXrsz9FMlqouR2rZCRMyLefRo1ovPG
+         47Qw==
+X-Gm-Message-State: AOJu0YwWC7OesusFGJOofdMict2vuV8CS5lJCCVvddfmCs3OZQ9BlvbJ
+	clO09ct0JhTdht2BjqDJnEwlgMTFsW3N8N7LDW5a10iVIKKRe5gdrmDVJ5ZmBINpgKuTfQAdlJL
+	vqbeznDVA/543xD/GsygS4TG4U86LUCVfjwa4pUDvQFei24GsfEBw3gavG7KAJ/zvcKdyGJi9Es
+	5Kvb/y+Vr97VUc2WKXqRWcHMNVFiwRvIOJYWk=
+X-Google-Smtp-Source: AGHT+IHuEEr9A4jmt4t0IDsNG4JI3VKgSWVYhK1yjS6ZBQdIfGIEb27Yn7hFv1mpig5rQWcSs3VyZQ==
+X-Received: by 2002:a05:6a20:cfa3:b0:1d2:e888:3982 with SMTP id adf61e73a8af0-1d4d4aaf7fdmr4336724637.19.1727287223334;
+        Wed, 25 Sep 2024 11:00:23 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6b7c73092sm2980539a12.64.2024.09.25.11.00.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 11:00:22 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: Joe Damato <jdamato@fastly.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org (open list),
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [RFC net-next 0/1] idpf: Don't hardcode napi_struct size
+Date: Wed, 25 Sep 2024 18:00:16 +0000
+Message-Id: <20240925180017.82891-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924150257.1059524-1-edumazet@google.com> <20240924150257.1059524-3-edumazet@google.com>
- <ZvRNvTdnCxzeXmse@LQ3V64L9R2>
-In-Reply-To: <ZvRNvTdnCxzeXmse@LQ3V64L9R2>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Sep 2024 20:00:08 +0200
-Message-ID: <CANn89iKnOEoH8hUd==FVi=P58q=Y6PG1Busc1E=GPiBTyZg1Jw@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] net: add more sanity checks to qdisc_pkt_len_init()
-To: Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemb@google.com>, Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 25, 2024 at 7:52=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
-te:
->
-> On Tue, Sep 24, 2024 at 03:02:57PM +0000, Eric Dumazet wrote:
-> > One path takes care of SKB_GSO_DODGY, assuming
-> > skb->len is bigger than hdr_len.
->
-> My only comment, which you may feel free to ignore, is that we've
-> recently merged a change to replace the term 'sanity check' in the
-> code [1].
->
-> Given that work is being done to replace terminology in the source
-> code, I am wondering if that same ruling applies to commit messages.
->
-> If so, perhaps the title of this commit can be adjusted?
->
-> [1]: https://lore.kernel.org/netdev/20240912171446.12854-1-stephen@networ=
-kplumber.org/
+Greetings:
 
-I guess I could write the changelog in French, to make sure it is all good.
+While working on an RFC which adds fields to napi_struct [1], I got a
+warning from the kernel test robot about tripping an assertion in idpf
+which seems to hardcode the size of napi_struct. The assertion was
+triggered after applying patch 3 from the RFC [2].
 
-git log --oneline --grep "sanity check" | wc -l
-3397
+I'm submitting this as an RFC so the Intel folks have time to take a
+look and request changes, but I plan to submit this next week when
+net-next reopens.
 
-I dunno...
+I did not want to the include this change in my RFC v4 because I wanted
+to keep the review of that RFC focused on the in core work instead, so I
+was hoping Intel would be OK to merge this (or a change which
+accomplishes the same thing).
+
+Please note: I do not have this hardware and thus have only compile
+tested this.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20240912100738.16567-1-jdamato@fastly.com/
+[2]: https://lore.kernel.org/netdev/20240912100738.16567-6-jdamato@fastly.com/
+
+Joe Damato (1):
+  idpf: Don't hard code napi_struct size
+
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+-- 
+2.25.1
+
 
