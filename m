@@ -1,240 +1,270 @@
-Return-Path: <netdev+bounces-129761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428FF985FFF
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:11:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B41B985FF2
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 175EAB2D9D1
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:47:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE1D21F218CD
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA8218871E;
-	Wed, 25 Sep 2024 12:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sXCM0pwA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3274F22D747;
+	Wed, 25 Sep 2024 12:18:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B189D188719;
-	Wed, 25 Sep 2024 12:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483491D55AC;
+	Wed, 25 Sep 2024 12:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266411; cv=none; b=D5Kp35pn6C3SFvJKXRlyAiWDWgGxn8VbMAd6MAwmUtK8OA069mJjab9q101QVFT/KCSL/VvoRqcZ/vXoeALAwnxepNxHGEvVpy7fp4kfylh1+DwBIYJ175ZZ8//UyvtNVVl7EnU55J2dRwWTfTSKvPhflXOLs88AsbV1jOQ801k=
+	t=1727266691; cv=none; b=Zb4Kpv84lgPO3Dzo3OKI3O1UMxjOtMaILvGCRRDVquux/TkTvtbxBE2PORjczLWXf/Rk4iIETCQXNZzQtvLs1+emB//YgwSWJRo6VkDFCqoZm8gdF91PL6wT92kczOrUVJkIhITFjKlM3Xe8OuOpMFoV9xNbzwZ3zEoGcACSq2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266411; c=relaxed/simple;
-	bh=kRWR6qYrxWbNzYcGxDDO/mF6H7avlIAs8xLSBm1IsR8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tELQMYT746avoGT/tvEv87mOc3N0Q3mxftksKBcNDy/s3TNYVOGHJ1YmowMZ+S5VX7cvHS/am7kYmwjjki0xL3aDzgJIMQc70zALZzVyIaM6opgnpsdjzYdJL8Dc1l1XeXIMNedUcb7VNlZI3rAHwslROPyUmWQvYppoEeEi4dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sXCM0pwA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3755C4CECD;
-	Wed, 25 Sep 2024 12:13:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266411;
-	bh=kRWR6qYrxWbNzYcGxDDO/mF6H7avlIAs8xLSBm1IsR8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sXCM0pwAJUB4S7yL0B8GP1Vmx0CkxLx6d5K/DpFlG9QtbtoGPX+v35XPE/l0sP22S
-	 +rOFF3UTU94U5bO5l7njWSTIvK/W3h2ILLLLPoVHAEwqLJnuS9qE8e8oOy6X0vWqt8
-	 V4uSQCk99WeoD2ANZaawjTXmnm2FQqJJOY/MbeAcFa2w4qYaBdk/B/LHcnDvmvzZzr
-	 0SDTSLfm9H1lvLpKcdy6VwhMy5k54kbfYMATQfX6xatI+YWsOT0x3qyxF26HNLKJaj
-	 CT+AhQfFAFbsnJmX/ZkihNcjZsZoDD8p9vFslp8D5QglPsYWdPAaF2roClUjy+/oX0
-	 YR6pDPcgeekfA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Sasha Levin <sashal@kernel.org>,
-	mailhol.vincent@wanadoo.fr,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.jayat@mobile-devices.fr,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 050/139] can: netlink: avoid call to do_set_data_bittiming callback with stale can_priv::ctrlmode
-Date: Wed, 25 Sep 2024 08:07:50 -0400
-Message-ID: <20240925121137.1307574-50-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
-References: <20240925121137.1307574-1-sashal@kernel.org>
+	s=arc-20240116; t=1727266691; c=relaxed/simple;
+	bh=KIWi6UV11qdsj/3jICtJLwq2sT3rLbBlGrQYqqzSqgA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=ut1kLsEDaszWT5z5KJpCmdHOZElDU3eE2/WwwyAgAv3C7UujAY6E8lgk207LxnpOUoH2uWGLW9QoU4X2TniD8jh+zYRSlkJwUGYywC40uM9584xIJmiJcy1j4DyjhAJNTE9yQdrKSouU8q2DUzg7z6XCylGgJTQmVWcAvtjDflU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XDG1F1bjPzyRsP;
+	Wed, 25 Sep 2024 20:16:33 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 899CC140392;
+	Wed, 25 Sep 2024 20:17:58 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 25 Sep 2024 20:17:54 +0800
+Message-ID: <45ab87a3-beba-b5f6-ef25-8b19a4b1dcee@huawei-partners.com>
+Date: Wed, 25 Sep 2024 15:17:50 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.52
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 14/19] selftests/landlock: Test socketpair(2)
+ restriction
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-15-ivanov.mikhail1@huawei-partners.com>
+ <ZurZ7nuRRl0Zf2iM@google.com>
+ <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
+In-Reply-To: <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500001.china.huawei.com (7.191.163.213) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-From: Stefan Mätje <stefan.maetje@esd.eu>
+On 9/23/2024 3:57 PM, Mikhail Ivanov wrote:
+> On 9/18/2024 4:47 PM, Günther Noack wrote:
+>> On Wed, Sep 04, 2024 at 06:48:19PM +0800, Mikhail Ivanov wrote:
+>>> Add test that checks the restriction on socket creation using
+>>> socketpair(2).
+>>>
+>>> Add `socket_creation` fixture to configure sandboxing in tests in
+>>> which different socket creation actions are tested.
+>>>
+>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>>> ---
+>>>   .../testing/selftests/landlock/socket_test.c  | 101 ++++++++++++++++++
+>>>   1 file changed, 101 insertions(+)
+>>>
+>>> diff --git a/tools/testing/selftests/landlock/socket_test.c 
+>>> b/tools/testing/selftests/landlock/socket_test.c
+>>> index 8fc507bf902a..67db0e1c1121 100644
+>>> --- a/tools/testing/selftests/landlock/socket_test.c
+>>> +++ b/tools/testing/selftests/landlock/socket_test.c
+>>> @@ -738,4 +738,105 @@ TEST_F(packet_protocol, alias_restriction)
+>>>       EXPECT_EQ(0, test_socket_variant(&self->prot_tested));
+>>>   }
+>>> +static int test_socketpair(int family, int type, int protocol)
+>>> +{
+>>> +    int fds[2];
+>>> +    int err;
+>>> +
+>>> +    err = socketpair(family, type | SOCK_CLOEXEC, protocol, fds);
+>>> +    if (err)
+>>> +        return errno;
+>>> +    /*
+>>> +     * Mixing error codes from close(2) and socketpair(2) should not 
+>>> lead to
+>>> +     * any (access type) confusion for this test.
+>>> +     */
+>>> +    if (close(fds[0]) != 0)
+>>> +        return errno;
+>>> +    if (close(fds[1]) != 0)
+>>> +        return errno;
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +FIXTURE(socket_creation)
+>>> +{
+>>> +    bool sandboxed;
+>>> +    bool allowed;
+>>> +};
+>>> +
+>>> +FIXTURE_VARIANT(socket_creation)
+>>> +{
+>>> +    bool sandboxed;
+>>> +    bool allowed;
+>>> +};
+>>> +
+>>> +FIXTURE_SETUP(socket_creation)
+>>> +{
+>>> +    self->sandboxed = variant->sandboxed;
+>>> +    self->allowed = variant->allowed;
+>>> +
+>>> +    setup_loopback(_metadata);
+>>> +};
+>>> +
+>>> +FIXTURE_TEARDOWN(socket_creation)
+>>> +{
+>>> +}
+>>> +
+>>> +/* clang-format off */
+>>> +FIXTURE_VARIANT_ADD(socket_creation, no_sandbox) {
+>>> +    /* clang-format on */
+>>> +    .sandboxed = false,
+>>> +};
+>>> +
+>>> +/* clang-format off */
+>>> +FIXTURE_VARIANT_ADD(socket_creation, sandbox_allow) {
+>>> +    /* clang-format on */
+>>> +    .sandboxed = true,
+>>> +    .allowed = true,
+>>> +};
+>>> +
+>>> +/* clang-format off */
+>>> +FIXTURE_VARIANT_ADD(socket_creation, sandbox_deny) {
+>>> +    /* clang-format on */
+>>> +    .sandboxed = true,
+>>> +    .allowed = false,
+>>> +};
+>>> +
+>>> +TEST_F(socket_creation, socketpair)
+>>> +{
+>>> +    const struct landlock_ruleset_attr ruleset_attr = {
+>>> +        .handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>> +    };
+>>> +    struct landlock_socket_attr unix_socket_create = {
+>>> +        .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>> +        .family = AF_UNIX,
+>>> +        .type = SOCK_STREAM,
+>>> +    };
+>>> +    int ruleset_fd;
+>>> +
+>>> +    if (self->sandboxed) {
+>>> +        ruleset_fd = landlock_create_ruleset(&ruleset_attr,
+>>> +                             sizeof(ruleset_attr), 0);
+>>> +        ASSERT_LE(0, ruleset_fd);
+>>> +
+>>> +        if (self->allowed) {
+>>> +            ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
+>>> +                               LANDLOCK_RULE_SOCKET,
+>>> +                               &unix_socket_create, 0));
+>>> +        }
+>>> +        enforce_ruleset(_metadata, ruleset_fd);
+>>> +        ASSERT_EQ(0, close(ruleset_fd));
+>>> +    }
+>>> +
+>>> +    if (!self->sandboxed || self->allowed) {
+>>> +        /*
+>>> +         * Tries to create sockets when ruleset is not established
+>>> +         * or protocol is allowed.
+>>> +         */
+>>> +        EXPECT_EQ(0, test_socketpair(AF_UNIX, SOCK_STREAM, 0));
+>>> +    } else {
+>>> +        /* Tries to create sockets when protocol is restricted. */
+>>> +        EXPECT_EQ(EACCES, test_socketpair(AF_UNIX, SOCK_STREAM, 0));
+>>> +    }
+>>
+>> I am torn on whether socketpair() should be denied at all --
+>>
+>>    * on one hand, the created sockets are connected to each other
+>>      and the creating process can only talk to itself (or pass one of 
+>> them on),
+>>      which seems legitimate and harmless.
+>>
+>>    * on the other hand, it *does* create two sockets, and
+>>      if they are datagram sockets, it it probably currently possible
+>>      to disassociate them with connect(AF_UNSPEC). >
+>> What are your thoughts on that?
+> 
+> Good catch! According to the discussion that you've mentioned [1] (I
+> believe I found correct one), you've already discussed socketpair(2)
+> control with Mickaël and came to the conclusion that socketpair(2) and
+> unnamed pipes do not give access to new resources to the process,
+> therefore should not be restricted.
+> 
+> [1] 
+> https://lore.kernel.org/all/e7e24682-5da7-3b09-323e-a4f784f10158@digikod.net/
+> 
+> Therefore, this is more like connect(AF_UNSPEC)-related issue. On
+> security summit you've mentioned that it will be useful to implement
+> restriction of connection dissociation for sockets. This feature will
+> solve the problem of reusage of UNIX sockets that were created with
+> socketpair(2).
 
-[ Upstream commit 2423cc20087ae9a7b7af575aa62304ef67cad7b6 ]
+Btw, I can suggest one more scenario, where restriction of
+disassociation can be useful.
 
-This patch moves the evaluation of data[IFLA_CAN_CTRLMODE] in function
-can_changelink in front of the evaluation of data[IFLA_CAN_BITTIMING].
+SMC sockets (AF_SMC+SOCK_STREAM) can fall back to TCP during the
+connection (cf. smc_connect_decline_fallback). Then user can call
+connect(AF_UNSPEC) to eventually get a TCP socket in the initial
+(TCP_CLOSE) state which can be used to establish another connection.
 
-This avoids a call to do_set_data_bittiming providing a stale
-can_priv::ctrlmode with a CAN_CTRLMODE_FD flag not matching the
-requested state when switching between a CAN Classic and CAN-FD bitrate.
+This can be considered as an issue for the current patchset, because
+there is a way to "create" a TCP socket while TCP is restricted by
+Landlock (if ruleset allows SMC).
 
-In the same manner the evaluation of data[IFLA_CAN_CTRLMODE] in function
-can_validate is also moved in front of the evaluation of
-data[IFLA_CAN_BITTIMING].
+Besides it, there is another issue with SMC restriction that I'm going
+to fix in the next RFC: recently has been applied patchset that
+allows to create SMC sockets via AF_INET [1]. Such creation should be
+denied if Landlock restricts SMC.
 
-This is a preparation for patches where the nominal and data bittiming
-may have interdependencies on the driver side depending on the
-CAN_CTRLMODE_FD flag state.
+[1] 
+https://lore.kernel.org/all/1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com/
 
-Signed-off-by: Stefan Mätje <stefan.maetje@esd.eu>
-Link: https://patch.msgid.link/20240808164224.213522-1-stefan.maetje@esd.eu
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/can/dev/netlink.c | 102 +++++++++++++++++-----------------
- 1 file changed, 51 insertions(+), 51 deletions(-)
-
-diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
-index dfdc039d92a6c..01aacdcda2606 100644
---- a/drivers/net/can/dev/netlink.c
-+++ b/drivers/net/can/dev/netlink.c
-@@ -65,15 +65,6 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
- 	if (!data)
- 		return 0;
- 
--	if (data[IFLA_CAN_BITTIMING]) {
--		struct can_bittiming bt;
--
--		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
--		err = can_validate_bittiming(&bt, extack);
--		if (err)
--			return err;
--	}
--
- 	if (data[IFLA_CAN_CTRLMODE]) {
- 		struct can_ctrlmode *cm = nla_data(data[IFLA_CAN_CTRLMODE]);
- 		u32 tdc_flags = cm->flags & CAN_CTRLMODE_TDC_MASK;
-@@ -114,6 +105,15 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
- 		}
- 	}
- 
-+	if (data[IFLA_CAN_BITTIMING]) {
-+		struct can_bittiming bt;
-+
-+		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
-+		err = can_validate_bittiming(&bt, extack);
-+		if (err)
-+			return err;
-+	}
-+
- 	if (is_can_fd) {
- 		if (!data[IFLA_CAN_BITTIMING] || !data[IFLA_CAN_DATA_BITTIMING])
- 			return -EOPNOTSUPP;
-@@ -195,48 +195,6 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 	/* We need synchronization with dev->stop() */
- 	ASSERT_RTNL();
- 
--	if (data[IFLA_CAN_BITTIMING]) {
--		struct can_bittiming bt;
--
--		/* Do not allow changing bittiming while running */
--		if (dev->flags & IFF_UP)
--			return -EBUSY;
--
--		/* Calculate bittiming parameters based on
--		 * bittiming_const if set, otherwise pass bitrate
--		 * directly via do_set_bitrate(). Bail out if neither
--		 * is given.
--		 */
--		if (!priv->bittiming_const && !priv->do_set_bittiming &&
--		    !priv->bitrate_const)
--			return -EOPNOTSUPP;
--
--		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
--		err = can_get_bittiming(dev, &bt,
--					priv->bittiming_const,
--					priv->bitrate_const,
--					priv->bitrate_const_cnt,
--					extack);
--		if (err)
--			return err;
--
--		if (priv->bitrate_max && bt.bitrate > priv->bitrate_max) {
--			NL_SET_ERR_MSG_FMT(extack,
--					   "arbitration bitrate %u bps surpasses transceiver capabilities of %u bps",
--					   bt.bitrate, priv->bitrate_max);
--			return -EINVAL;
--		}
--
--		memcpy(&priv->bittiming, &bt, sizeof(bt));
--
--		if (priv->do_set_bittiming) {
--			/* Finally, set the bit-timing registers */
--			err = priv->do_set_bittiming(dev);
--			if (err)
--				return err;
--		}
--	}
--
- 	if (data[IFLA_CAN_CTRLMODE]) {
- 		struct can_ctrlmode *cm;
- 		u32 ctrlstatic;
-@@ -284,6 +242,48 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
- 			priv->ctrlmode &= cm->flags | ~CAN_CTRLMODE_TDC_MASK;
- 	}
- 
-+	if (data[IFLA_CAN_BITTIMING]) {
-+		struct can_bittiming bt;
-+
-+		/* Do not allow changing bittiming while running */
-+		if (dev->flags & IFF_UP)
-+			return -EBUSY;
-+
-+		/* Calculate bittiming parameters based on
-+		 * bittiming_const if set, otherwise pass bitrate
-+		 * directly via do_set_bitrate(). Bail out if neither
-+		 * is given.
-+		 */
-+		if (!priv->bittiming_const && !priv->do_set_bittiming &&
-+		    !priv->bitrate_const)
-+			return -EOPNOTSUPP;
-+
-+		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
-+		err = can_get_bittiming(dev, &bt,
-+					priv->bittiming_const,
-+					priv->bitrate_const,
-+					priv->bitrate_const_cnt,
-+					extack);
-+		if (err)
-+			return err;
-+
-+		if (priv->bitrate_max && bt.bitrate > priv->bitrate_max) {
-+			NL_SET_ERR_MSG_FMT(extack,
-+					   "arbitration bitrate %u bps surpasses transceiver capabilities of %u bps",
-+					   bt.bitrate, priv->bitrate_max);
-+			return -EINVAL;
-+		}
-+
-+		memcpy(&priv->bittiming, &bt, sizeof(bt));
-+
-+		if (priv->do_set_bittiming) {
-+			/* Finally, set the bit-timing registers */
-+			err = priv->do_set_bittiming(dev);
-+			if (err)
-+				return err;
-+		}
-+	}
-+
- 	if (data[IFLA_CAN_RESTART_MS]) {
- 		/* Do not allow changing restart delay while running */
- 		if (dev->flags & IFF_UP)
--- 
-2.43.0
-
+> 
+> If we want such feature to be implemented, I suggest leaving current
+> implementation as it is (to prevent vulnerable creation of UNIX dgram
+> sockets) and enable socketpair(2) in the patchset dedicated to
+> connect(AF_UNSPEC) restriction. Also it will be useful to create a
+> dedicated issue on github. WDYT?
+> 
+> (Btw I think that disassociation control can be really useful. If
+> it were possible to restrict this action for each protocol, we would
+> have stricter control over the protocols used.)
+> 
+>>
+>> Mickaël, I believe we have also discussed similar questions for 
+>> pipe(2) in the
+>> past, and you had opinions on that?
+>>
+>>
+>> (On a much more technical note; consider replacing self->allowed with
+>> self->socketpair_error to directly indicate the expected error? It 
+>> feels that
+>> this could be more straightforward?)
+> 
+> I've considered this approach and decided that this would
+> * negatively affect the readability of conditional for adding Landlock
+>    rule,
+> * make checking the test_socketpair() error code less explicit.
+> 
+>>
+>> —Günther
 
