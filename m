@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-129750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1CCB985FD2
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:07:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F01985FBE
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4B46B2F2F9
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:41:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD4CBB28D7B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4671214D80;
-	Wed, 25 Sep 2024 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1ADF215F71;
+	Wed, 25 Sep 2024 12:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SPITD/sp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQWxlOkj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA9818E764;
-	Wed, 25 Sep 2024 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C004F215F64;
+	Wed, 25 Sep 2024 12:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266363; cv=none; b=lxXtXlhtguRHUr/oxsvxIyLcxG/7xAfh9s9CGPuk/hfT/Wg+r2wmOJbKvQ83i5rStP0NzHm/QEyILVs3dIWHJuFUQOj1amBYduWBz2S9kQy+nIwrJKmH5MScX96GjkSsaClmqExzIKxpqZBFzGO1k6LeuT9cKgB2JTpmnBijjB0=
+	t=1727266368; cv=none; b=OwgjNhn3Jw5DBWYiOQrvzF9qoVfTTdvqdiVGRIt3b/s7rGGHxbvJ362jdUOkD8Ex+bF6rlAnU6prWY6clDbZ2N7GPXD93y3GsZzeP/IcAitYfjkmyLCNBJfNWdwJEAHfwH6Lkw4YUXiDaBlchJdZZmpG8b1w4nHVHCOPpLihmvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266363; c=relaxed/simple;
-	bh=TTbWIZdXyMpVuDN8EeQgVRhdDYyXSiHziBvITL0YI6Y=;
+	s=arc-20240116; t=1727266368; c=relaxed/simple;
+	bh=qH+35EJtY/CJZO2ZhXddPaWDqfoduAQDG3OYBQ9fNOI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dsbLvS4/63NGRtKRWEYF2uwYaX6SK1uAHqAiNjTCjZypClusbW8p6+Wy9AsmkcCUUtT6veMD9CFVUQyev/zmBFUpsspZXkt3w5kMKwyKEbS9etYn7kWhYWYLYgq+hLK5D5vrdXUImLlvLqFIKzmNqTj5uSH4I+amTjoPklowQRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SPITD/sp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56510C4CECD;
-	Wed, 25 Sep 2024 12:12:42 +0000 (UTC)
+	 MIME-Version; b=UVgM1AKbOhUliUQTnQOPNeJwmeoONFL8Vr/lAfvNZ+rnFwsZJEIIzt8QyeS1CWQXxtrX5U/rzbQt7WEhBNfnnfqCKU+o2Y2CZ7xiDHh/gW5GOBJ92/4pYOTtM1Me8fmRKpvZ85C4X8+rQ3CabFwaiFYkhJdLsL9QAM7Cbqc1uGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQWxlOkj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28343C4CEC3;
+	Wed, 25 Sep 2024 12:12:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266363;
-	bh=TTbWIZdXyMpVuDN8EeQgVRhdDYyXSiHziBvITL0YI6Y=;
+	s=k20201202; t=1727266368;
+	bh=qH+35EJtY/CJZO2ZhXddPaWDqfoduAQDG3OYBQ9fNOI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=SPITD/spOFFg8K9BL7N65wss4X8vMvyE6VhSkFaqFOPR9BrlgASLrwsL/ZS1lB4gc
-	 PJqg4ZGVvVbHhy+wzh2xivc37j3XAV8taMcRf+LR20sWA8sOiw0CiQ9B0WY2m3kCjT
-	 PEcARPpyOskDUbq16bEd03Yzj2HeyKcDeNJQhGldOu1s2ogbM5GI2c9bGHpqaqZEFT
-	 oQLnAXDdp09qi/Lm0KdTi5EDfCLzK3stoY/6Ge0zU37VJkWepl68QPQAi6ZyuZeH53
-	 fkCLd12cvv/YlQ2kRYc6Ofb9BMhhGY5JErSN0buMMCu/WjyIqD+fyrAf48KSBNouMC
-	 PNzKGf7lSL/Zg==
+	b=BQWxlOkjTdPF+qBsyvfqHG2zipeVLksK+CJgJ4yGH5Gga++phmyXtvq+1ReR3KYeJ
+	 7MCKmrzTqoOxWBPPP069hqGZYX9ooMmYVfPGzhog+uagUn5SCX8z9tmQ+MFZz5S/LW
+	 l2aJUegrGTldATJZPjUG/25GxQcUN1yyxRXVGyAFpioEGy4he/8YxqbrTCLF5WnmtB
+	 SvUoyMghAZWSCZSC7KvjEn4g0sADc6tG45g88sp/M5cKQF8ANI7eIEBc+fSi+Z0rZX
+	 dnaGbA27JpeDeOe9Ktb8901dd4GE2Rbu2A+ixMD84bueCMEFSXc//DHzYw7NASjHuW
+	 Fuv0smjZPNGuw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
+	jmaloy@redhat.com,
+	ying.xue@windriver.com,
+	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 030/139] l2tp: don't use tunnel socket sk_user_data in ppp procfs output
-Date: Wed, 25 Sep 2024 08:07:30 -0400
-Message-ID: <20240925121137.1307574-30-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Subject: [PATCH AUTOSEL 6.6 033/139] tipc: guard against string buffer overrun
+Date: Wed, 25 Sep 2024 08:07:33 -0400
+Message-ID: <20240925121137.1307574-33-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
 References: <20240925121137.1307574-1-sashal@kernel.org>
@@ -69,36 +71,51 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.52
 Content-Transfer-Encoding: 8bit
 
-From: James Chapman <jchapman@katalix.com>
+From: Simon Horman <horms@kernel.org>
 
-[ Upstream commit eeb11209e000797d555aefd642e24ed6f4e70140 ]
+[ Upstream commit 6555a2a9212be6983d2319d65276484f7c5f431a ]
 
-l2tp's ppp procfs output can be used to show internal state of
-pppol2tp. It includes a 'user-data-ok' field, which is derived from
-the tunnel socket's sk_user_data being non-NULL. Use tunnel->sock
-being non-NULL to indicate this instead.
+Smatch reports that copying media_name and if_name to name_parts may
+overwrite the destination.
 
-Signed-off-by: James Chapman <jchapman@katalix.com>
-Signed-off-by: Tom Parkin <tparkin@katalix.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+ .../bearer.c:166 bearer_name_validate() error: strcpy() 'media_name' too large for 'name_parts->media_name' (32 vs 16)
+ .../bearer.c:167 bearer_name_validate() error: strcpy() 'if_name' too large for 'name_parts->if_name' (1010102 vs 16)
+
+This does seem to be the case so guard against this possibility by using
+strscpy() and failing if truncation occurs.
+
+Introduced by commit b97bf3fd8f6a ("[TIPC] Initial merge")
+
+Compile tested only.
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Simon Horman <horms@kernel.org>
+Link: https://patch.msgid.link/20240801-tipic-overrun-v2-1-c5b869d1f074@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/l2tp/l2tp_ppp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/tipc/bearer.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index 6146e4e67bbb5..6ab8c47487161 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -1511,7 +1511,7 @@ static void pppol2tp_seq_tunnel_show(struct seq_file *m, void *v)
+diff --git a/net/tipc/bearer.c b/net/tipc/bearer.c
+index 878415c435276..fec638e494c9d 100644
+--- a/net/tipc/bearer.c
++++ b/net/tipc/bearer.c
+@@ -163,8 +163,12 @@ static int bearer_name_validate(const char *name,
  
- 	seq_printf(m, "\nTUNNEL '%s', %c %d\n",
- 		   tunnel->name,
--		   (tunnel == tunnel->sock->sk_user_data) ? 'Y' : 'N',
-+		   tunnel->sock ? 'Y' : 'N',
- 		   refcount_read(&tunnel->ref_count) - 1);
- 	seq_printf(m, " %08x %ld/%ld/%ld %ld/%ld/%ld\n",
- 		   0,
+ 	/* return bearer name components, if necessary */
+ 	if (name_parts) {
+-		strcpy(name_parts->media_name, media_name);
+-		strcpy(name_parts->if_name, if_name);
++		if (strscpy(name_parts->media_name, media_name,
++			    TIPC_MAX_MEDIA_NAME) < 0)
++			return 0;
++		if (strscpy(name_parts->if_name, if_name,
++			    TIPC_MAX_IF_NAME) < 0)
++			return 0;
+ 	}
+ 	return 1;
+ }
 -- 
 2.43.0
 
