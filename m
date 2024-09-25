@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-129706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595A898595B
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:52:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F76985975
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA8F8B2534A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7321F241AE
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B2719F41E;
-	Wed, 25 Sep 2024 11:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8964E1A0BF8;
+	Wed, 25 Sep 2024 11:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tnqDxSOC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VC3hMn/m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503F219F416;
-	Wed, 25 Sep 2024 11:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3561714CD;
+	Wed, 25 Sep 2024 11:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264321; cv=none; b=urBNYuihiMTm5Z0pzYzhlu0Go/fyiViLSLT8y5y1l81A/ooQt1cQavK6lMlVmGIbZaSVtxJ7C5y2ZPd3lQKoZNPqVWa5dmimck8Bv8IQ5OqdfLqsjsP2iVyxHpO2XzQt7I4F8HSUiXtXJDBGcqrezm5HXRUR29Z5gSaCni1ngMo=
+	t=1727264347; cv=none; b=SAPz6zHe+Ij0lcfaWmMfC38mURxRhYZejMNwXtqYeTXp82u7XERYfb+LM2lfF4l3h2KbbQT6zARBqeA+0X9mV//N+6ezQknm1nLRo0uyZ6Q61bZHUv8noRIxC9HAU9INJMpsvdkOKfmNJsZaNK/uerPs30SiE5i6gyYkkxnjioM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264321; c=relaxed/simple;
-	bh=BgjobYrsJh27T8JlqNPIa3v/ibUQLsfFkrmHT8zuep0=;
+	s=arc-20240116; t=1727264347; c=relaxed/simple;
+	bh=jF0abiIBhipUZJz2L6J7yK+HxKzqN7eourDEO/NO2Wc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ehw+SpJQCj91q+am2Uly83yJ8olRbcKbKPyjR4mr74E7PZTaq4T+XdiIJ/pNy8mUTTBxih6w4WU/+3nybxptHHqhD/yDaECWAouCO4pFQ/FlGR/dBC3qjABnrIxNO22sgzFv8AtUaphdsA5pvbgkIPBEJEZyPeW9Q15geV87/I4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tnqDxSOC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EC03C4CECE;
-	Wed, 25 Sep 2024 11:38:39 +0000 (UTC)
+	 MIME-Version; b=tjo+HlcVanGYhJ4dPfww6KqgpCoi1s57KGeTQJb9M0H9eDvdxtr7QKs8uloga4PWl/rCvEZPqIw1An7pGrgTRr/2TjctDwFYNDu5zMwd5YVNlgYhfqLpHpFB5XjZUgrqs8ICTSvY0ygRF31l9QYsrcV/MweF1IYOlS/oqZ23KQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VC3hMn/m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CCBC4AF0B;
+	Wed, 25 Sep 2024 11:39:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264320;
-	bh=BgjobYrsJh27T8JlqNPIa3v/ibUQLsfFkrmHT8zuep0=;
+	s=k20201202; t=1727264347;
+	bh=jF0abiIBhipUZJz2L6J7yK+HxKzqN7eourDEO/NO2Wc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tnqDxSOCH7a0duNP71c8z8sVZ5+bD1PosjadSnFsfmx7h5uHzt8TT4Xj26HiUIqOr
-	 I2J1gXKCLOtDxnVvQdANjr40XFekrD05/T9TeYlosXDWdS8Gqfd6ZKqCaj4QlfcO91
-	 UeLoS+gj04O7Nrk7u7o7Y8DdK7RXN/wB085w/Z/K1kx8q7kxoAPjW0o7cz1RziyPWZ
-	 ZZlnkkgJ/3B1cyzTCG84d/GabOSXcNPXVT1vTXNwsNs0vvDdgep+Tl1PsvlUq7Hv/C
-	 WlaaiJyLkA8Q2naVbNokMQ27vHrnoDHV70ph0E/35zPavKsiCxiyCWYmVLqesIbf5d
-	 Bo0KDxAAgP41Q==
+	b=VC3hMn/mHJK50XH73K0LkQJ1YKn4F5zBrv+B5hEdHm0GUuQudVbUE7JVLBngL72ob
+	 v7uZ3zM9/LCYq/P41ddK1SP/cGD1WDSQScJzMsan+j16iuWqzafQjOaE167rWA/8cS
+	 RHPNMfibeCKgqF6JzPikjzBRGGh3yZPwl1ryiJCtuoWlnLiypwjrGgBr2FKo2dk2Q6
+	 DhQQVne5wzWMsykAN32u86comZPHm3LcyYNM6KMex9cpFsagTHdPmzzZN2BYYJmf/5
+	 Uwa4iZ3qCHuHLD+Q4KTxP+XMOEfHhYXNjkAxi5nxfShdD9wRFPWvOQSmpAGE7xpLv4
+	 QdqaQ70noyF+w==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jason Xing <kernelxing@tencent.com>,
-	Jade Dong <jadedong@tencent.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Johannes Berg <johannes.berg@intel.com>,
+	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
-	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 057/244] tcp: avoid reusing FIN_WAIT2 when trying to find port in connect() process
-Date: Wed, 25 Sep 2024 07:24:38 -0400
-Message-ID: <20240925113641.1297102-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 062/244] wifi: mac80211: fix RCU list iterations
+Date: Wed, 25 Sep 2024 07:24:43 -0400
+Message-ID: <20240925113641.1297102-62-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
 References: <20240925113641.1297102-1-sashal@kernel.org>
@@ -70,79 +71,82 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
+From: Johannes Berg <johannes.berg@intel.com>
 
-[ Upstream commit 0d9e5df4a257afc3a471a82961ace9a22b88295a ]
+[ Upstream commit ac35180032fbc5d80b29af00ba4881815ceefcb6 ]
 
-We found that one close-wait socket was reset by the other side
-due to a new connection reusing the same port which is beyond our
-expectation, so we have to investigate the underlying reason.
+There are a number of places where RCU list iteration is
+used, but that aren't (always) called with RCU held. Use
+just list_for_each_entry() in most, and annotate iface
+iteration with the required locks.
 
-The following experiment is conducted in the test environment. We
-limit the port range from 40000 to 40010 and delay the time to close()
-after receiving a fin from the active close side, which can help us
-easily reproduce like what happened in production.
-
-Here are three connections captured by tcpdump:
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-// a few seconds later, within 60 seconds
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-// later, very quickly
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-
-As we can see, the first flow is reset because:
-1) client starts a new connection, I mean, the second one
-2) client tries to find a suitable port which is a timewait socket
-   (its state is timewait, substate is fin_wait2)
-3) client occupies that timewait port to send a SYN
-4) server finds a corresponding close-wait socket in ehash table,
-   then replies with a challenge ack
-5) client sends an RST to terminate this old close-wait socket.
-
-I don't think the port selection algo can choose a FIN_WAIT2 socket
-when we turn on tcp_tw_reuse because on the server side there
-remain unread data. In some cases, if one side haven't call close() yet,
-we should not consider it as expendable and treat it at will.
-
-Even though, sometimes, the server isn't able to call close() as soon
-as possible like what we expect, it can not be terminated easily,
-especially due to a second unrelated connection happening.
-
-After this patch, we can see the expected failure if we start a
-connection when all the ports are occupied in fin_wait2 state:
-"Ncat: Cannot assign requested address."
-
-Reported-by: Jade Dong <jadedong@tencent.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://patch.msgid.link/20240823001152.31004-1-kerneljasonxing@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
+Link: https://patch.msgid.link/20240827094939.ed8ac0b2f897.I8443c9c3c0f8051841353491dae758021b53115e@changeid
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/tcp_ipv4.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/mac80211/chan.c | 4 +++-
+ net/mac80211/mlme.c | 2 +-
+ net/mac80211/scan.c | 2 +-
+ net/mac80211/util.c | 4 +++-
+ 4 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a4e510846905e..5087e12209a19 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -120,6 +120,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	int ts_recent_stamp;
+diff --git a/net/mac80211/chan.c b/net/mac80211/chan.c
+index e8567723e94d5..b72e4036526bf 100644
+--- a/net/mac80211/chan.c
++++ b/net/mac80211/chan.c
+@@ -286,7 +286,9 @@ ieee80211_get_max_required_bw(struct ieee80211_link_data *link)
+ 	enum nl80211_chan_width max_bw = NL80211_CHAN_WIDTH_20_NOHT;
+ 	struct sta_info *sta;
  
-+	if (tw->tw_substate == TCP_FIN_WAIT2)
-+		reuse = 0;
+-	list_for_each_entry_rcu(sta, &sdata->local->sta_list, list) {
++	lockdep_assert_wiphy(sdata->local->hw.wiphy);
 +
- 	if (reuse == 2) {
- 		/* Still does not detect *everything* that goes through
- 		 * lo, since we require a loopback src or dst address
++	list_for_each_entry(sta, &sdata->local->sta_list, list) {
+ 		if (sdata != sta->sdata &&
+ 		    !(sta->sdata->bss && sta->sdata->bss == sdata->bss))
+ 			continue;
+diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
+index f9526bbc36337..3a0433e088906 100644
+--- a/net/mac80211/mlme.c
++++ b/net/mac80211/mlme.c
+@@ -1231,7 +1231,7 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
+ 		bool disable_mu_mimo = false;
+ 		struct ieee80211_sub_if_data *other;
+ 
+-		list_for_each_entry_rcu(other, &local->interfaces, list) {
++		list_for_each_entry(other, &local->interfaces, list) {
+ 			if (other->vif.bss_conf.mu_mimo_owner) {
+ 				disable_mu_mimo = true;
+ 				break;
+diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
+index b5f2df61c7f67..2dd84fc542b2a 100644
+--- a/net/mac80211/scan.c
++++ b/net/mac80211/scan.c
+@@ -504,7 +504,7 @@ static void __ieee80211_scan_completed(struct ieee80211_hw *hw, bool aborted)
+ 	 * the scan was in progress; if there was none this will
+ 	 * just be a no-op for the particular interface.
+ 	 */
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++	list_for_each_entry(sdata, &local->interfaces, list) {
+ 		if (ieee80211_sdata_running(sdata))
+ 			wiphy_work_queue(sdata->local->hw.wiphy, &sdata->work);
+ 	}
+diff --git a/net/mac80211/util.c b/net/mac80211/util.c
+index c7ad9bc5973a0..aed72794d9fe3 100644
+--- a/net/mac80211/util.c
++++ b/net/mac80211/util.c
+@@ -751,7 +751,9 @@ static void __iterate_interfaces(struct ieee80211_local *local,
+ 	struct ieee80211_sub_if_data *sdata;
+ 	bool active_only = iter_flags & IEEE80211_IFACE_ITER_ACTIVE;
+ 
+-	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
++	list_for_each_entry_rcu(sdata, &local->interfaces, list,
++				lockdep_is_held(&local->iflist_mtx) ||
++				lockdep_is_held(&local->hw.wiphy->mtx)) {
+ 		switch (sdata->vif.type) {
+ 		case NL80211_IFTYPE_MONITOR:
+ 			if (!(sdata->u.mntr.flags & MONITOR_FLAG_ACTIVE))
 -- 
 2.43.0
 
