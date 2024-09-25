@@ -1,164 +1,111 @@
-Return-Path: <netdev+bounces-129824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE86798668B
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:52:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6F4986697
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E256A1C239B0
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:52:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F57B281772
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492A649624;
-	Wed, 25 Sep 2024 18:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E46130E58;
+	Wed, 25 Sep 2024 18:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="ltWCszGJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r6bhlq2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05731D5ADC;
-	Wed, 25 Sep 2024 18:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37111EEE9
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 18:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727290345; cv=none; b=riAl8Os3PdLxIBYMFBcGIyYFtr+Eoy1S0OPe1SmcawUFM++tGToZ9Cmzs4HHiCpk7nFmF/dKvGTH4UTJUQSY32ckgxPmJEXlODCRHHt9V3pIWGkigx7CUcMwelyhXGOYSgS3PQJWDHPqyJBkCg0W8M6HD5yhjsI/pPbPE+jYRBo=
+	t=1727290534; cv=none; b=IoDd1LQrYYXQhviUSc/05jKgwyAs3UOuQMmDo8Qbyd1FSZHgqGQllXwJGSpBQx8XbXKohbowEDlkpFhtRWnoW7kEkyMPmro2SU/FYbLfyJtcRRQaFlLPxcS6lw1kwbm7UFGgn2QdkBadzGNIZzAgo4v6PglDNkKw6j9mzTAl3Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727290345; c=relaxed/simple;
-	bh=nG5opVv7ZDVyKdL5pMZWoYGAOsg3kaxOzrAySOKYDAw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TzBEMVw15VnkkIZNpgMgwVo52JTQVqSZzF6G+FNFlbHWBif+Xc4TkvAde5JL8hxqFrJGtooAil1JeVCaVspF3P1gNb51TrBcvBZJYSdPVXYTdN81x03OeWuDxvvgh7NYQOUmm0jCIaoBijfbrbBs6x7M7bF1vo9wHQAKMGtjfIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=ltWCszGJ; arc=none smtp.client-ip=148.163.129.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id E9AB7C0006D;
-	Wed, 25 Sep 2024 18:52:20 +0000 (UTC)
-Received: from ben-dt5.candelatech.com (unknown [50.251.239.81])
-	by mail3.candelatech.com (Postfix) with ESMTP id 5BEBE13C2B0;
-	Wed, 25 Sep 2024 11:52:20 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 5BEBE13C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1727290340;
-	bh=nG5opVv7ZDVyKdL5pMZWoYGAOsg3kaxOzrAySOKYDAw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=ltWCszGJ7kFRBijocMhPGPsR3b+TyV/ym1Fqh3+aTZmvw/f2qywF+VvNPXvyekj3d
-	 Li1BR87BgjIv9GdgIbZLiwAtkUNviWZP/YIJwy9BZ3pY9s0ANHx46tRmC0h+cpPQ4j
-	 f7dac8UkQ874FDcmGneBV7lRoAs6EByut/2rj774=
-From: greearb@candelatech.com
-To: netdev@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	Ben Greear <greearb@candelatech.com>
-Subject: [PATCH v2] Revert "vrf: Remove unnecessary RCU-bh critical section"
-Date: Wed, 25 Sep 2024 11:52:16 -0700
-Message-ID: <20240925185216.1990381-1-greearb@candelatech.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1727290534; c=relaxed/simple;
+	bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=sht7lXpiCYbTEnb8dhxtXAfT1GzbewyaAcekuqiE9Fbiynx1ej3/RSm7UKfSbHwKnazScPQ8CEDD3cOMoBZfHjJc5SUnm7p5Dn+xoyYUzgpd4BS081zPA5yUj/54F7MHVKcT9xG9s5U+P7KDgGPUz0otOzwJ8FFrjJh3fswvJB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r6bhlq2/; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5356bb5522bso226842e87.1
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727290531; x=1727895331; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
+        b=r6bhlq2/I3SJ4BDyZsRg4h6WeaYA0KTDpfgNwQWSSsuhIHyfVGqEOZwFry3FZgheG+
+         q/9it9s5dgCaQ5ObZu3luaOzn+O+VNATFHgCKmFDoYKvdaKCSyktYTCzOrmYSsLaFVtL
+         ntj7kgXarQY/oZDhjMXJ35bg4X0EXy+0IV7KBU+6HuIpdPzwPr/w6+K7z5AiM+9213R2
+         8PeRvaCp75lut+MlIoz3yZHicgBhVBb+/Evo/8cioBXi2JEe9M1LB2scCT8vqX1YBp78
+         67CE3CDH/tEaIdZ92aseFjFxVi61hp3JIJNHcRWhNGbaNqrpzSO59gqwe+5YKn2aQbz3
+         e9DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727290531; x=1727895331;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
+        b=TEx4p2g7KJuGgQ/cTOoBJPsjBenbCC6gsva/MvwfREOT3AUJT32AL4sQtseoP69XPU
+         zaoS0KedvWSUbqeCF3fxWVM5sRZJ9THNB+snsgSGFmv047w89N/FpmH9k5XKt6B85Umb
+         NmR2SgPn+zFNSrhZf5ozyWCUVrUPjkDhINZdQIdq6IV9XCqc0/lti6Xj9dOlIkG8FEy9
+         9IehzGj13Rv0BJbOQcWuUmOVavMHx4Fa14WFy/3oBJp8Jgp4QR/E9q+257XUt2bT9ZrB
+         /z8b6u6quEVL9/ja7KUjDys6S+Fi4u3dv2kbWX7/GVbZzfm14L5TbxDOGecFb+UG+sgL
+         UZ3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiDCk/odgTpGW8g5zbh+mWNUCy6cKx9SG63lF4kXoFoi8A7yPPl/8TJYftH0SlSXdx6gLzVmw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeTV0EUNOp5fUOkv1uz05quxfezaNMZGdDDDkjffZxkePSQ63+
+	WPyQ7uDf8i+WcdPOWjUP6kzP+GMzURJ+18jULWMFFTG8nZyqqWgf+PSMdZFanegAcrF6MGvD/aA
+	Ep2TyH5sSbvVPt8f4w1Jfk122gFcKin7MZnUE
+X-Google-Smtp-Source: AGHT+IH/S+tAQgecGTR1SoGVP/pIQ5w2xb/dpf+LifA4G+1e8jTGV1BYw7P9Sv/j1U5ojzTPH6Q5IrouDIRs55E7yco=
+X-Received: by 2002:a05:6512:3c9f:b0:536:54fd:275b with SMTP id
+ 2adb3069b0e04-53877565f1dmr2471966e87.54.1727290530451; Wed, 25 Sep 2024
+ 11:55:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-MDID: 1727290341-F5v1dfTop0YS
-X-MDID-O:
- us5;ut7;1727290341;F5v1dfTop0YS;<greearb@candelatech.com>;d8e40e63ee4d65c981bd03b298aac33b
+References: <20240924150257.1059524-1-edumazet@google.com> <20240924150257.1059524-3-edumazet@google.com>
+ <ZvRNvTdnCxzeXmse@LQ3V64L9R2> <CANn89iKnOEoH8hUd==FVi=P58q=Y6PG1Busc1E=GPiBTyZg1Jw@mail.gmail.com>
+ <ZvRVRL6xCTIbfnAe@LQ3V64L9R2>
+In-Reply-To: <ZvRVRL6xCTIbfnAe@LQ3V64L9R2>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 25 Sep 2024 20:55:16 +0200
+Message-ID: <CANn89i+yDakwWW0t0ESrV4XJYjeutvtSdHj1gEJdxBS8qMEQBQ@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] net: add more sanity checks to qdisc_pkt_len_init()
+To: Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Ben Greear <greearb@candelatech.com>
+On Wed, Sep 25, 2024 at 8:24=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
+te:
+>
 
-This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+>
+> > git log --oneline --grep "sanity check" | wc -l
+> > 3397
+>
+> I don't know what this means. We've done it in the past and so
+> should continue to do it in the future? OK.
 
-dev_queue_xmit_nit needs to run with bh locking, otherwise
-it conflicts with packets coming in from a nic in softirq
-context and packets being transmitted from user context.
+This means that if they are in the changelogs, they can not be removed.
+This is immutable stuff.
+Should we zap git history because of some 'bad words' that most
+authors/committers/reviewers were not even aware of?
 
-================================
-WARNING: inconsistent lock state
-6.11.0 #1 Tainted: G        W
---------------------------------
-inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
-ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
-{IN-SOFTIRQ-W} state was registered at:
-  lock_acquire+0x19a/0x4f0
-  _raw_spin_lock+0x27/0x40
-  packet_rcv+0xa33/0x1320
-  __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
-  __netif_receive_skb_list_core+0x2c9/0x890
-  netif_receive_skb_list_internal+0x610/0xcc0
-  napi_complete_done+0x1c0/0x7c0
-  igb_poll+0x1dbb/0x57e0 [igb]
-  __napi_poll.constprop.0+0x99/0x430
-  net_rx_action+0x8e7/0xe10
-  handle_softirqs+0x1b7/0x800
-  __irq_exit_rcu+0x91/0xc0
-  irq_exit_rcu+0x5/0x10
-  [snip]
+I would understand for stuff visible in the code (comments, error messages)=
+,
+but the changelogs are there and can not be changed.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(rlock-AF_PACKET);
-  <Interrupt>
-    lock(rlock-AF_PACKET);
-
- *** DEADLOCK ***
-
-Call Trace:
- <TASK>
- dump_stack_lvl+0x73/0xa0
- mark_lock+0x102e/0x16b0
- __lock_acquire+0x9ae/0x6170
- lock_acquire+0x19a/0x4f0
- _raw_spin_lock+0x27/0x40
- tpacket_rcv+0x863/0x3b30
- dev_queue_xmit_nit+0x709/0xa40
- vrf_finish_direct+0x26e/0x340 [vrf]
- vrf_l3_out+0x5f4/0xe80 [vrf]
- __ip_local_out+0x51e/0x7a0
-[snip]
-
-Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
-Link: https://lore.kernel.org/netdev/05765015-f727-2f30-58da-2ad6fa7ea99f@candelatech.com/T/
-
-Signed-off-by: Ben Greear <greearb@candelatech.com>
----
-
-v2:  Edit patch description.
-
- drivers/net/vrf.c | 2 ++
- net/core/dev.c    | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 4d8ccaf9a2b4..4087f72f0d2b 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
- 		eth_zero_addr(eth->h_dest);
- 		eth->h_proto = skb->protocol;
- 
-+		rcu_read_lock_bh();
- 		dev_queue_xmit_nit(skb, vrf_dev);
-+		rcu_read_unlock_bh();
- 
- 		skb_pull(skb, ETH_HLEN);
- 	}
-diff --git a/net/core/dev.c b/net/core/dev.c
-index cd479f5f22f6..566e69a38eed 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2285,6 +2285,7 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
- /*
-  *	Support routine. Sends outgoing frames to any network
-  *	taps currently in use.
-+ *	BH must be disabled before calling this.
-  */
- 
- void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
--- 
-2.42.0
-
+Who knows, maybe in 10 years 'Malicious packet.' will be very offensive,
+then we can remove/change the _comment_ I added in this patch.
 
