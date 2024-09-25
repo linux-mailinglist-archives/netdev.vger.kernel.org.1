@@ -1,174 +1,188 @@
-Return-Path: <netdev+bounces-129654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D6C39852B4
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 07:58:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E829852CD
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8048A1C21875
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 05:58:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7BBB1C20C47
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 06:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B193F154C18;
-	Wed, 25 Sep 2024 05:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807811547D5;
+	Wed, 25 Sep 2024 06:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A80vH/kQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lxIN9x2n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2078.outbound.protection.outlook.com [40.107.237.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFB8647;
-	Wed, 25 Sep 2024 05:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727243927; cv=none; b=SKcHVrO+D3CzygkEXMUWDko3gF8JeR08EW1x3J9QwudRplHwpyDw8n21SwrsElMm8GXYbEjYoQu7tlZV2qHeYcEg5YWocYg/UWiCkou2+RAAQmfeN2EApc7f8+6r5qiS0XdfAfQCnzq8HyaWZqkXnFpEs/XkIsm48Hyv88oWsCI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727243927; c=relaxed/simple;
-	bh=R5iO86c9PhBZIXFBuzoB9GO9RtZOAFqW+RKHK3yqFEo=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=I5aYQQADwfPxkZnEwXW5lrMn7XORmZ2NyBxWpCljlNANSP0zylsLXf6mcOAVgKJvu0HwlDflqaEEZJfeBK443zoGWErlBdv+cX09tVPrzPhF0CdRd77/FWI8FunxX4ugTKnamMjjkOuEjZY4FZLVsgCvatp5EGc9+1yLW58uB4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A80vH/kQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CCE1C4CEC3;
-	Wed, 25 Sep 2024 05:58:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727243927;
-	bh=R5iO86c9PhBZIXFBuzoB9GO9RtZOAFqW+RKHK3yqFEo=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=A80vH/kQJWCU74aJSDRYFOgMTTr0Tb2L6qd6VlJYJBMVXVKTJSX0NPs9v+ea7Co3N
-	 ROIFLvbErHcLPFiZbJWtXsVLAtXddNffbHXIW09pixr/Rz9MBm3YvZlwlIp5meNny4
-	 x8R0OYaCGkfh+X7BeacihYg7vH+0phu+Ee2RKC21brT0AUYc9bHVFcak2KgWs1hcxh
-	 KNKPWgJmT7SUafBDF8Op5n9ysqiWsTK31SfFmSI7e/xmfe/FY9i83/X1LL4j/cKidG
-	 YqxbA98sGTKr1A87g8/gTw+oRP8bLKyT6fHRsAgvZgoiVr/S5GHZ5ACKnueveP6iwL
-	 BuE/THconEoig==
-From: Kalle Valo <kvalo@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Jeff Johnson <jjohnson@kernel.org>,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  ath11k@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
- inputs of the ath11k on WCN6855
-References: <20240814082301.8091-1-brgl@bgdev.pl>
-	<83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
-	<87msk49j8m.fsf@kernel.org>
-	<ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org>
-	<87a5g2bz6j.fsf@kernel.org>
-	<3ba2ce52-4da3-4066-baf0-5bab1a9f872a@kernel.org>
-Date: Wed, 25 Sep 2024 08:58:41 +0300
-In-Reply-To: <3ba2ce52-4da3-4066-baf0-5bab1a9f872a@kernel.org> (Krzysztof
-	Kozlowski's message of "Tue, 24 Sep 2024 10:04:59 +0200")
-Message-ID: <87zfnw8eb2.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F6C20E6;
+	Wed, 25 Sep 2024 06:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727245055; cv=fail; b=Gdi3oGzNJjrZKUjJ6vFDaju5qb1MOpmFQ2olbHnlhfe1FjjHvNwus9L/DCtNd6RcTkMeaMtbwomwQInOsPWmBr3Y1RhJ3gWfMNT+lac3aCQkhfef4FEA5F82XbQxFztVgqUab/i5a6nQn9icNRzl0yIIa/yzDJmkN1a6pG+M+fo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727245055; c=relaxed/simple;
+	bh=Y/vlkPnCSHck/Wg1Euxc0tqXiFX0+Fqq1z0qkT8FUWA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=LGDiHum3QvuBl0wBr9+OYuLNttlfLNVmvNmpqKDhIg+fLPmNwwRg5qpKCCyzLG1jPbdLzkqIG6aQqNG6ElQeT9/BhGO/PcW6H6XkMf3rA6hOGZoq4YBFQjt40PlLcQiFR/bAhOZgKgrl9mhOqvHks3eqEiMkj30aC1eSVSTkaV4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lxIN9x2n; arc=fail smtp.client-ip=40.107.237.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=m+M5wlJMUC+I3Y1p3nPYtR7pA2x2R1BZBjCsZZ67sdxG6KV8nb0OL92VTPFzuLLETUg2bO6Ya6rRYQa33XsYrxxwwY6IVRAtcny+pGPCyCh3tuBgwK8JZPpQj3ABplwHDGGPiMDspI2kmDmCrSoJPiTs7Gr0DUSJSxcBXePlFYxBzFm3ORDTM8PqU+rX2pSzb9+aJ35INCwlZmWzT0c1xH4192xA7JunR1bWmPnQNpBCHt7poCI/ya22t7mWW5zy0EmZWruMW+SbpRlpPyx/MdGjULOtPfeTVumcKOpExqmATvFN2HWQAL9kEGV1e2VsMCJA7g5+JaqmlqOgPuj5Sg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=htqyn6EdlibfdNDMmWsNykqVwf5CfWMuHjlLS7kFz3I=;
+ b=qhavcA/SOHy6Ma6tKddreVz7x5NWa0EMeuls3jZsgth/Z8gvI8W5T+02S+p0m5O6lsdpu+Tkz109jO/nZRd+sNstkNxyST51B7YnzA6bPfcvcuIWkIyjfh2/sxXjyfAvXMczjr9yPxJi6mPloldCqK885YgCpUkj6t2DAIR39CmBKcXK5WHwduf6N+38WqhQX0JfGPb9MCatqrWH7hyNjz7SbFQj0rpeFYZUrD/DpUUJf9e6K7fAlf4YGBzjfxB5BLPuUXOnpQobGu7gJ/ghPVZP2YA+DDHwksq/8M0u1Bge/gH2e11jUbrJAZG0Tn4TBynE/9PfXeAoNGCmEj6jZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=htqyn6EdlibfdNDMmWsNykqVwf5CfWMuHjlLS7kFz3I=;
+ b=lxIN9x2nVPKnBKheEOu8YQg+9gUu6esBi3iaMn33y1edbEQfVdIbYfG44EUrOcKvkm59oAC0CFrIrlfwPk7p/9GBx8ClnXHXDMSsuGSOKaeWVOnZt3ddy+obVIapiUn20Eq9REeYuxr9NrlAdGpwKT3yYro5qPQ/4Ov/qf6RgrYxqbX/7ZDh/sEdToRe6sHxcPOfRaqznQ0pGkMGBl1Kf28MWYKEve0O+YM/77IEzgkvA6DRM0KnrYVYIZhp4t5msr1KBwFXzwenhy8/a9JVm7TgrPv+riFemS1cDiCM+IHG6XozmjUASubT/YrP8Yujq9CNuM72/7y7hsqVaKcqrA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8691.namprd12.prod.outlook.com (2603:10b6:a03:541::10)
+ by PH7PR12MB7985.namprd12.prod.outlook.com (2603:10b6:510:27b::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Wed, 25 Sep
+ 2024 06:17:29 +0000
+Received: from SJ2PR12MB8691.namprd12.prod.outlook.com
+ ([fe80::63d0:a045:4ab1:d430]) by SJ2PR12MB8691.namprd12.prod.outlook.com
+ ([fe80::63d0:a045:4ab1:d430%5]) with mapi id 15.20.7982.022; Wed, 25 Sep 2024
+ 06:17:29 +0000
+Message-ID: <dd887023-673c-4303-8707-14aab8ccb045@nvidia.com>
+Date: Wed, 25 Sep 2024 09:17:19 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net/mlx5e: Fix NULL deref in
+ mlx5e_tir_builder_alloc()
+To: Elena Salomatkina <esalomatkina@ispras.ru>, lvc-project@linuxtesting.org,
+ Saeed Mahameed <saeedm@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxim Mikityanskiy <maximmi@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Maor Dickman <maord@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240924160018.29049-1-esalomatkina@ispras.ru>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <20240924160018.29049-1-esalomatkina@ispras.ru>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MM0P280CA0095.SWEP280.PROD.OUTLOOK.COM
+ (2603:10a6:190:9::13) To SJ2PR12MB8691.namprd12.prod.outlook.com
+ (2603:10b6:a03:541::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8691:EE_|PH7PR12MB7985:EE_
+X-MS-Office365-Filtering-Correlation-Id: e67f5ef9-3b90-4c44-ef1d-08dcdd29bb9a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aVh5VkI4ZHpVOGVieWUrV0pPb2hlbjdqbjZyVlRjbjhuL3V4R2hLeERzbGpP?=
+ =?utf-8?B?UHBieHk4S2pRbjlteWU2UW4zbkFYTmovMnhrNDdFSFZXbUcxZHNuL0dQMG0z?=
+ =?utf-8?B?dHRxNkhYTlFuN0F0OXQ5c3ZFMnozSis4TmI1dTh5TkxYTnJPN0pzNDdBZ1Jz?=
+ =?utf-8?B?Q3JITEVDSGt6OHY4ZlkvcVJFNkVqTU9MRkcyK1liUWJHMUJuRnUrbU1FV0Vm?=
+ =?utf-8?B?SWtHeVRJT2tPQmZ1YXhtQXBFMFlYeFdmMEZQTFRXaUdYdldwMEFycnZNZi9y?=
+ =?utf-8?B?MkpKRDVKd001Z3dPVm52Q0ZDQlk0dW1LMzdXRmMrNmh0c1hKLzJjN3cwTHdX?=
+ =?utf-8?B?Qlo2OTQyTHNib3V4Ymt0dHU5ZVJrQ1M0YXE2bXA4R1gveGhpcklwdnRhRnQx?=
+ =?utf-8?B?cGtWWUJraEg1MWJpaTMzUGdNS2NoczBYckdmSUNhNWZDeG5jUlg3NUVDMWhP?=
+ =?utf-8?B?M0JMZCt0K3hmZ1MxbGJCTkg5cXBuNGZ5eTI3RklKZVZFUFpaaFJIRDJsUWho?=
+ =?utf-8?B?OGZXZS94YlFaQ1h6N0FLZjJpNXNBMU1xZWZyTTJibGphaDdQc0MrZ2FmT1hK?=
+ =?utf-8?B?TzdzczQzY080RVhTTEU2U0hNZ2VLdzFMQ2E4S1VaRElqMGxYWlRBV0lOd29t?=
+ =?utf-8?B?aUs0aVBZYXIyanhaaTBNaFhVck84dSttRjZ3WXdrZGYvQSswTUdDNzRjWTN0?=
+ =?utf-8?B?aGM1dFBZS2w1aE9DeTF4RktYalRIRlkwQjA1QlBPc3pUeXgzbEpiVlRaY1lo?=
+ =?utf-8?B?WEhEZGQ4Qlo5Yy9TZXlZYWI2dy9uRmZ6Sk8vQkFXeTBEdFRwa1NTaXp0dm9x?=
+ =?utf-8?B?OXo4Y3AwR2IrSEw2SXgwWCszTUVIWFN2Rmd0YkRySW1hcDFNUU1xVVJzaERV?=
+ =?utf-8?B?U3Fuenl0NzBmTnpIVWxValM3WUZKSENsVFhXMkFEODA1ckNRc0RPNVREa0pT?=
+ =?utf-8?B?dWJRSldnVEdLOVlJbkxVeE9GV3M2dEtRTlNHL0pnMGFWaU45d2lRYi8xc1hz?=
+ =?utf-8?B?OEdTZzUrMzZ4cHVGOEx5Z2YvU2lyY0ZSUmF5a2dWVUlZdjFYTzNlOHVoL0Zq?=
+ =?utf-8?B?MEZ5c2lZV1hkL2dVeG8xc1g0L21jL0pQYWZ1akRLWFNjQldiMit4NnpqSUtN?=
+ =?utf-8?B?RGFXNGp0OC9JMEkzUEE2T0E5cFR5VzVEdE5MRTdNemJIUDFtdVRJVzFxSENC?=
+ =?utf-8?B?b1owcUFOWW9LaFhHaUM1YVoyRHMzbVY5V3AvSXJSU0Zab3oxUXRuampyNHlN?=
+ =?utf-8?B?RmVLYXdrUldydUxjVzZVMW1aTG9HWkNqVFpVR3ZoS244b2hrSWJycGlNNGov?=
+ =?utf-8?B?WnppVkdKM3hkTzA4NmloVkE3QkpTRVlXVy9wSkVLaFVDSU1qS3FSb2t3ZEx1?=
+ =?utf-8?B?bjlZUjQwb3gxRXVzcE1rck9DTnNLYm1BeUYxSEdKdStxZWtxQjhPWDhpRUQ0?=
+ =?utf-8?B?ckZ5NjZqSStIcTcxWmpUQjdQMEp1aWlML0psTmJubEttNTZJcnZEVEQ2MHNP?=
+ =?utf-8?B?VVdCTFA4K2l2bkxZRGFRV3RPbEZSWEo0N1dhK250Q0JYcEdzYWh0SjF4NlpR?=
+ =?utf-8?B?eklwbmxPTlNEY0hCQjBFd2pXa25FbHVRQnI4NXRia0FNK3JpZ0l5UW5ZVitE?=
+ =?utf-8?B?cDhPMGRIL3UxUjRXa1Y0TXQ2cDh4Ukp2Z0JjTDZHcFZRNGw1NGVOZXcwWWFP?=
+ =?utf-8?B?emZxVjI1NHFPd0I0U0RVbkI1QWNweVExMjd3dVRXb1lBYzhhWWgydk13PT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8691.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZVJhUXVHZWZTQU9iS1psOXYwb0RXdTFKZXROSHRjTERzZWtueHNVU2t3VXND?=
+ =?utf-8?B?VVpGUmsySGxNL0hONk5kVVVTWk80NkRvT0ZXQzVCUkM5VEttZXB2Y2FXUjNo?=
+ =?utf-8?B?Tld1V2U2UlhXb05aUTVYaWwvcEtqL1c4VElzL0RTQThMRkpTVlRSMnArOUtS?=
+ =?utf-8?B?UmJpWlh6MkJRTitRZ3ltT095TWI4MXNkRHVJMFJPRjJRTlVXTDRHQW1Qb0p0?=
+ =?utf-8?B?VmszZzk5S0dFdVJiYmsrSTR2RDIyMlpOQVhiUWhYaEw2VnBqS2VUUmFNamZh?=
+ =?utf-8?B?NlJ6YVY3NXN0S1hrSjh4LzdTRlNGSVV3VXFmV2JXT3FCR0tOblNvbDMzUTNM?=
+ =?utf-8?B?ZVBOTlhucW9iK0hKU01XRzRpSk04aCt1dHNtUzd4NVowbXhja2I5TDBkV1h2?=
+ =?utf-8?B?bDN4NXcxQWpMNlFLMjZVTFJsRE1ZQkwwVHVLdHdwUVVPZ0Y2QWhZc2UxYkU1?=
+ =?utf-8?B?Y0xtMmZtQ3VST2E4Y3RkV2QvQ1dBUzVZR1JyZ1UzNEVFOW5aMy9sSVozNUlR?=
+ =?utf-8?B?eEZWSHhvUEIyK1hEMktLM01mNmhSaEtTYjY2YWtEdXNaVGp5a3FtelF5VGRm?=
+ =?utf-8?B?cWRzd3VpeURRU01Ed1FzeTZFTk5JMG5WM3RscXRmdThoV3NzRThBZXN6a2dr?=
+ =?utf-8?B?N2E5RWRMS3BNWDlGTXZmY0h4N1lzMVMzQnRjU1pmeHZFU01WaE9uUU9BTTJI?=
+ =?utf-8?B?ajA5aWt5Ky9DZlRpaTZkT0poN08xYzhLZVBaWW15RGY4cGxFNDN3Q21paERN?=
+ =?utf-8?B?ay9SL01EK3RGSFA1aWVZSU5Md2p0djFrTkNFWjUrc0JKZVZ2bmwvVEtVREJa?=
+ =?utf-8?B?WVMyUVJFbjhtWDNOYmNkYWNjOC9MbHlnejJEYVJLOXQrQ3NnZVl3RVJ0ZGoz?=
+ =?utf-8?B?QVArVzBZL1NzTm11dFdzMEJXVzFOSk5sVWNKb2pKbFFNN3RoekU4K2c0cmw4?=
+ =?utf-8?B?L1lqZlI5RDBjMnVEWUVLcXpHc1N1NGJjU2EwbDlrK3RYUExLVWwzbFd1aEdF?=
+ =?utf-8?B?UjRCQWpYaEV1N1daaWdvaTIxc0ljK3FBeVN0VjF3YUYwaGpaWUtEV2xSWUR2?=
+ =?utf-8?B?enQyeTdseUhNRzdTQXpYeGtWL0NUUFZqUEFFaGdpZGZ4UU1udVpEMEZFdGNh?=
+ =?utf-8?B?S2RRb0hmZjdBRUFTMWVFVkpJUTM4Z2FOMzlZNXZrQkhOcHZIOUs1L3lkVFI1?=
+ =?utf-8?B?M2hFbzltTkVQQWx2MFovOTJGQ29KY2RwVFlKbzRPdWozek5CckNVMlpKTU1z?=
+ =?utf-8?B?TlFIM2NrZHdFeGdnRnJrK2xLdzhvSkFHS01HTWlmQURpNGYwVXNneTZza3k5?=
+ =?utf-8?B?QVRwTEhtdUd2MUprS2srT1JaYzFHRWlPRWRxOWN0Snp0Qk9INTNuU2N4NmFz?=
+ =?utf-8?B?ZGZ1WXlMMmJlM0hQaE4yMWFUYzdTSTlIbjNFRmdlUXRCMTFzRm5oQU4xVnlq?=
+ =?utf-8?B?c0dlT1hZYUFOQm5GRHhNN2pZMDZ3UUlNeERBN2NYU1RvdmtlS2hybUdIa3pD?=
+ =?utf-8?B?UExKWnVERTVNSW1uV0x1R0tFRUxSNlNGZmxwZ3FuR1JVcitDTFFIMzN6RStB?=
+ =?utf-8?B?NzRLbmdjZ2s4RWY0eWFOSTF5dk1Bbkg3aEhMS1ZlRlE5Q0NKTWV1YS9pL25w?=
+ =?utf-8?B?ajNkeUluaW40UzdETzhIVFhNNkxnM0dKWWZnVU9KMEhBbU9Nb3lpclBOZjdO?=
+ =?utf-8?B?TXJVWnVPK1VqOEIvUEFWalc1eGwyNmVjMFVpRHFJYzZLMmMvTjFMRVkrcnJ0?=
+ =?utf-8?B?eG5XR0V6dnN0NXJ2QzU3TkR5aHo4RVpKQjAyNUhjT0ZwbG5WNEJpa0E1dk10?=
+ =?utf-8?B?L0JzWEZyZEIvT1RSSWJad0t0aW5EdEdseGNZZ0JXd28yRjNOd1NCL211V2Iv?=
+ =?utf-8?B?dU5PWXVicTM1TWFpc3RyM3hlKzJwZ0VuNWttbGJzZFUvNFd4dHFBOEFSeGdx?=
+ =?utf-8?B?ZHJaRDRzUGVWMDhhcFdjNTV2SVlTNWhKdnFVWFo2L0dhMlFEV3B3OHl2RFp6?=
+ =?utf-8?B?VkU2WmV3WXZ6cmR2TEFacDYrU0xiNC9lSXd2MERyejE4SnNBVkpLdWdNa3NH?=
+ =?utf-8?B?OCt4c051Ri9pR0JoY1o2dHJPbVJaaVlXVTRJSVhwYnI0RG1wZXI1SnhVK1lt?=
+ =?utf-8?Q?02GVhTTz9oYX3Ks7S5B9gCcf/?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e67f5ef9-3b90-4c44-ef1d-08dcdd29bb9a
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8691.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 06:17:29.3798
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NP1zya8V39t5CqZRHrnF8mMeWpaLmglV7262R6NjOwTWz0UDQEcK6zmelcoiTS5a
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7985
 
-Krzysztof Kozlowski <krzk@kernel.org> writes:
+On 24/09/2024 19:00, Elena Salomatkina wrote:
+> In mlx5e_tir_builder_alloc() kvzalloc() may return NULL
+> which is dereferenced on the next line in a reference
+> to the modify field.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: a6696735d694 ("net/mlx5e: Convert TIR to a dedicated object")
+> Signed-off-by: Elena Salomatkina <esalomatkina@ispras.ru>
 
-> On 20/09/2024 08:45, Kalle Valo wrote:
->
->> Krzysztof Kozlowski <krzk@kernel.org> writes:
->> 
->>> On 19/09/2024 09:48, Kalle Valo wrote:
->>>> Krzysztof Kozlowski <krzk@kernel.org> writes:
->>>>
->>>>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
->>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>>>>
->>>>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
->>>>>>
->>>>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>>>> ---
->>>>>> v1 -> v2:
->>>>>> - update the example
->>>>>
->>>>> I don't understand why this patch is no being picked up. The code
->>>>> correct represents the piece of hardware. The supplies should be
->>>>> required, because this one particular device - the one described in this
->>>>> binding - cannot work without them.
->>>>
->>>> I have already explained the situation. With supplies changed to
->>>> optional I'm happy take the patch.
->>>
->>> You did not provide any relevant argument to this case. Your concerns
->>> described quite different case and are no applicable to DT based platforms.
->> 
->> Ok, I'll try to explain my concerns one more time. I'll try to be
->> thorough so will be a longer mail.
->> 
->> In ath11k we have board files, it's basically board/product specific
->> calibration data which is combined with the calibration data from chip's
->> OTP. Choosing the correct board file is essential as otherwise the
->> performance can be bad or the device doesn't work at all.
->> 
->> The board files are stored in board-2.bin file in /lib/firmware. ath11k
->> chooses the correct board file based on the information provided by the
->> ath11k firmware and then transfers the board file to firmware. From
->> board-2.bin the correct board file is search based on strings like this:
->> 
->> bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255
->> bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255,variant=HO_BNM
->> 
->> But the firmware does not always provide unique enough information for
->> choosing the correct board file and that's why we added the variant
->> property (the second example above). This variant property gives us the
->> means to name the board files uniquely and not have any conflicts. In
->> x86 systems we retrieve it from SMBIOS and in DT systems using
->> qcom,ath11k-calibration-variant property.
->> 
->> If WCN6855 supplies are marked as required, it means that we cannot use
->> qcom,ath11k-calibration-variant DT property anymore with WCN6855 M.2
->> boards. So if we have devices which don't provide unique information
->
-> No, it does not mean that.
->
->> then for those devices it's impossible to automatically to choose the
->> correct board file.
->
-> Anyway, only this device must be fully described, because you cannot
-> have pci17cb,1103 without these supplies. It's just electrically not
-> possible, according to our investigation.
-
-Yeah, you have been telling that all along. But on the contrary I have
-WCN6855 (pci17cb,1103) M.2 board which I installed to my NUC and they
-haven't needed any supplies (unless BIOS does something automatically).
-Also I have QCA6390 and WCN7850 M.2 boards, both which you claim needs
-the supplies, and they just work out-of-box as well. So I have a hard
-time trusting your spec and believing it's the ultimate authority. To me
-if reality and spec doesn't match, reality wins.
-
->> So based on this, to me the correct solution here is to make the
->> supplies optional so that qcom,ath11k-calibration-variant DT property
->> can continue to be used with WCN6855 M.2 boards.
->
-> WCN6855 can still do whatever they want. They are not restricted, not
-> limited. pci17cb,1103 must provide suppplies, because pci17cb,1103
-> cannot work without them.
-
-Claiming that WCN6885 can still do whatever they want is confusing to me
-because WCN6855 is pci17cb,1103, there are no other ids. See
-ath11k/pci.c:
-
-#define WCN6855_DEVICE_ID		0x1103
-
-{ PCI_VDEVICE(QCOM, WCN6855_DEVICE_ID) },
-
-But this discussion is going circles and honestly is waste of time. I
-don't think the patch is right but I'll apply it anyway, let's deal with
-the problems if/when they come up.
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Thanks!
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 
