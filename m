@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-129643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F4E985121
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 04:57:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 812FC98515E
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 05:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67307B228CB
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 02:57:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D018B20B8A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 03:17:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D57E148FE6;
-	Wed, 25 Sep 2024 02:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462A514883B;
+	Wed, 25 Sep 2024 03:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="rMPFKytj"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bbHWULm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADB6130E58;
-	Wed, 25 Sep 2024 02:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503E31487FF;
+	Wed, 25 Sep 2024 03:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727233056; cv=none; b=YDAMZMo2qSoqQAuHxq6oSP0m75/vU20JhoO2SaKZLsZM7EIwSzR77fRCIch/jSWUFaq2DcYd49F4dUqNEzkeq2pVTNQiIy/rtWQPNdwfBiA76ZfZOj5J0j6W9JDrypFvByH/zg1ttfM5pq3cHQjq5OWr+MfAkz9tmPfoOzLp81E=
+	t=1727234221; cv=none; b=QPnPmes+0VJnnOsou64o5ZjpI8ynjEWfh0y+BxMBStqqZN/J571mafNu8JQftiLdwYjnzbaNArXcvhn+hm/qaVMemJIoRj4AarCvUVEuuLSFCYmMEbevQBZBgSBSIa2l6U47GmJbC+0HQrQLsrN2RDg28oRHQ9r33eZBXGf0PJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727233056; c=relaxed/simple;
-	bh=R2RJ7l+Eb6FbAZJXjRsY8f+2nozGaTBMfNV+zXgvonc=;
+	s=arc-20240116; t=1727234221; c=relaxed/simple;
+	bh=eSLOudwo/gNlwHCaosTH6LuuU8d+3VhzM0tpxUzQTkY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a0T9MgACXPmVUWMOpAl9LV7FYpWNQ9XuXYyGTo2i9Bcn4wHieHc8O4ncUlNn837WANgvPxTJkyGPSor/jtUmVuEi0mSGXNjWn8srg7DnMl83fjLWiyPmJx342vbDJTeq4uSAM3PqTy08ohPeEnldzec+47lUVkdvALSODZXtaxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=rMPFKytj; arc=none smtp.client-ip=115.124.30.119
+	 In-Reply-To:Content-Type; b=bOxKxn+Vz1bKguoDNolM7mJAcBHdrXh/jDU3cwoeulcs7ITXJjWVlbSxl1RAnBIVMt/9hw9CmBymBfg/3lR1Gr3t7KXpHFqv6+lE9VJMbgHWXwT2kPXAMxRRxab5SH6BT+SDvqdpE5VRl5oKYICFDXSiaZ5uMb7QCIHMe2cd/hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bbHWULm2; arc=none smtp.client-ip=115.124.30.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1727233050; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=bQwYUC4FT+aFcJ4E0MXChh0bNog0WSgq5FbQ3SZqSFY=;
-	b=rMPFKytj/HjSaYtQSo3Oj1x0Y2Dt19Rin/mmtq7EzXnF2aB3vZdyi41fOcoyXBlweWg1w1lVAVKAXbXgNjzKlEcdsOR0xSkAgJzznpCfEfF8xAt5MC53d3HBUL6vQaGu0cYG4zM/VrMSSGw871FGolg5+JfFRhw+sTXjs2vc38M=
-Received: from 30.221.128.100(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WFi20yv_1727233048)
+	t=1727234216; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=vBmybkyManHrqJ/9QxLToxzghGi40MtTOZyEj7zvSaU=;
+	b=bbHWULm2HBnxfmV0uarqZnPEelxAaICiV5E8QdervlCD11ul8ISzV/Le0FCmy9WLc2SVGMTIXgmIIHn0vbWHiB5tVC3T/l5irKneHNo67PldZ8lll2BY5oGx/UYPAHOUAi/5u3jelchvabvAZAVyJbMZUq+ufCrhtneMRvAB2tg=
+Received: from 30.221.128.100(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WFi0I1F_1727234213)
           by smtp.aliyun-inc.com;
-          Wed, 25 Sep 2024 10:57:29 +0800
-Message-ID: <7fdfc76d-cf7d-47f3-afcf-c963c44f01b7@linux.alibaba.com>
-Date: Wed, 25 Sep 2024 10:57:25 +0800
+          Wed, 25 Sep 2024 11:16:54 +0800
+Message-ID: <0fb425e0-5482-4cdf-9dc1-3906751f8f81@linux.alibaba.com>
+Date: Wed, 25 Sep 2024 11:16:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,50 +48,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCHv2 net-next 1/3] net/udp: Add a new struct for hash2
- slot
+Subject: Re: [RFC PATCHv2 net-next 3/3] ipv4/udp: Add 4-tuple hash for
+ connected socket
 To: Gur Stavi <gur.stavi@huawei.com>
 Cc: antony.antony@secunet.com, davem@davemloft.net, dsahern@kernel.org,
  dust.li@linux.alibaba.com, edumazet@google.com, fred.cc@alibaba-inc.com,
  jakub@cloudflare.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com,
  willemdebruijn.kernel@gmail.com, yubing.qiuyubing@alibaba-inc.com
-References: <20240924110414.52618-2-lulie@linux.alibaba.com>
- <20240924125101.1688823-1-gur.stavi@huawei.com>
+References: <20240924110414.52618-4-lulie@linux.alibaba.com>
+ <20240924123113.1688315-1-gur.stavi@huawei.com>
 From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <20240924125101.1688823-1-gur.stavi@huawei.com>
+In-Reply-To: <20240924123113.1688315-1-gur.stavi@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
-On 2024/9/24 20:51, Gur Stavi wrote:
->> @@ -224,13 +224,12 @@ struct sock *__udp6_lib_lookup(const struct net *net,
->>   			       struct sk_buff *skb)
->>   {
->>   	unsigned short hnum = ntohs(dport);
->> -	unsigned int hash2, slot2;
->>   	struct udp_hslot *hslot2;
->>   	struct sock *result, *sk;
->> +	unsigned int hash2;
->>
->>   	hash2 = ipv6_portaddr_hash(net, daddr, hnum);
->> -	slot2 = hash2 & udptable->mask;
->> -	hslot2 = &udptable->hash2[slot2];
->> +	hslot2 = udp_hashslot2(udptable, hash2);
->>
+On 2024/9/24 20:31, Gur Stavi wrote:
+>> +/* In hash4, rehash can also happen in connect(), where hash4_cnt keeps unchanged. */
+>> +static void udp4_rehash4(struct udp_table *udptable, struct sock *sk, u16 newhash4)
+>> +{
+>> +	struct udp_hslot *hslot4, *nhslot4;
+>> +
+>> +	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
+>> +	nhslot4 = udp_hashslot4(udptable, newhash4);
+>> +	udp_sk(sk)->udp_lrpa_hash = newhash4;
+>> +
+>> +	if (hslot4 != nhslot4) {
+>> +		spin_lock_bh(&hslot4->lock);
+>> +		hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
+>> +		hslot4->count--;
+>> +		spin_unlock_bh(&hslot4->lock);
 > 
-> Why not minimize the code change by using udptable->hash2[slot2].hslot?
-> Especially since later you do it in __udp6_lib_mcast_deliver.
-> I think that many developers would find usage of C primitives more
-> readable.
+> I realize this is copied from udp_lib_rehash, but isn't it an RCU bug?
+> Once a node is removed from a list, shouldn't synchronize_rcu be called
+> before it is reused for a new list? A reader that was traversing the
+> old list may find itself on the new list.
+> 
+>> +
+>> +		spin_lock_bh(&nhslot4->lock);
+>> +		hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &nhslot4->head);
+>> +		nhslot4->count++;
+>> +		spin_unlock_bh(&nhslot4->lock);
+>> +	}
+>> +}
+>> +
 
-Yes I can use udptable->hash2[slot2].hslot. But I prefer the 
-udp_hashslot2() helper, because I found I have to add ".hslot" at many 
-places, while most of them look exactly what udp_hashslot2() does. I 
-think replacing them may get the codes simpler and benefit future coding.
+Good catch! IIUC, synchronize_rcu() is needed here, or otherwise, this 
+could happen:
 
-Some places like __udp6_lib_mcast_deliver() get hslot2 differently from 
-udp_hashslot2(), so just appending ".hslot" to avoid functionality change.
+    Reader(lookup)     Writer(rehash)
+    -----------------  ---------------
+1. rcu_read_lock()
+2. pos = sk;
+3.                     hlist_del_init_rcu(sk, old_slot)
+4.                     hlist_add_head_rcu(sk, new_slot)
+5. pos = pos->next; <=
+6. rcu_read_unlock()
+
+In step 5, we wrongly moved from old_slot to new_slot.
+
+Perhaps the similar codes in udp_lib_rehash() for hslot2 also need a fix.
 
 Thanks.
 -- 
