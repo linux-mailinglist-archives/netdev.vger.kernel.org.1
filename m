@@ -1,114 +1,115 @@
-Return-Path: <netdev+bounces-129640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A7F9850D3
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 04:04:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39DDE985108
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 04:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 863BD28534A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 02:04:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D67B11F23FB4
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 02:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A5E1442E8;
-	Wed, 25 Sep 2024 02:04:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426E8148FF0;
+	Wed, 25 Sep 2024 02:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CPBfgyjY"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LFHeZ1im"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17983770C
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 02:04:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D98136664;
+	Wed, 25 Sep 2024 02:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727229892; cv=none; b=Gc8SDQJNVQN55BeIsJJ5EmGWKAtdcN2wSjD9VI4toBuLhixc8w4JKN0KkJ+ubs3X/SQauIE3+9V5DrCtMTqsjzY3jUMnWnkC2b15eKK5AWD8o1LcBZ7Igs+V/l2hMFm5payyBkOfg2B+UZJhpwZor9/+SvjJR3JutDVBHwSMlsk=
+	t=1727232198; cv=none; b=BYJExTvtmrXfgh4w1mJlVE1oGkl1QmT1zkFWcIMd3Fq2z3u9iwSNbL0jGCzqT15CRsJlYRNs6isvyrxyLM+jxhJ4YQqP73l+dQH1KTQfZ8v2aktQXvxw6IfPnb4IeykHpM3ZZK5pndKAdJJh2zX2+l+wCJ4q02EzkzmboFO02CE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727229892; c=relaxed/simple;
-	bh=OyJbYtQuzpkGp8l3UUy4EU1UEqjMBaXysPhoEQJv3Q8=;
+	s=arc-20240116; t=1727232198; c=relaxed/simple;
+	bh=wVbtPoPDt22mMWLfs3oIxJaZ1qXbvANDx7EAhMds3po=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mktnJgmITk2EPl+zRE3RnnlsQLybwSuIiqEngMPoL9TJkCCDOuCOQ1Jisjw2cbF558D5PcFAi7wGvv8+0uX8rXXqbHZE/FX4YJr9/NuoPqGAGpHuxYQsOph4ndCZHWyD4EwuweXoYpXEUNe9I4oy7xr4WZO6LsEG45E4QKnkccQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CPBfgyjY; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5b86861b-60f7-4c90-bc0e-d863b422850f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727229889;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xvrOmFpqgHeJjVfW0WRu/b1Bim7C3zrcjnNBL44ieqM=;
-	b=CPBfgyjYf4724Xojqchvv9GpTuWN/znBUdzcJbZAZZg4iKu30zV02itpLE5hfWqOPUBj+s
-	akunaWblvi06iRGsOIRVWs7wp+EzyKNUc2k5ViUGA+stuF7TYq5SBARwB9Cb6WYgQcv29e
-	l2FJ2MMnRE9M0+G800m469JSzISMqCU=
-Date: Wed, 25 Sep 2024 10:04:21 +0800
+	 In-Reply-To:Content-Type; b=WbjvH+noJnyRl5dtyDk8qgIUUsgIO0OT+Y/44slq+G6hP5+prz2PCh3vGZrjUGFBctyfQscIMzkLfjWIe66AeDF9qiQHCH0wrsXeCnTf5ktATzwzok74EuFUAz3pM1lgQ57A4uAUmProBH4T4mSWVC5Je4RUQGA0JoUtYT/PRW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LFHeZ1im; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1727232193; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=9vTeNwrPvHBGZWsAzy8amRKVHrtyN+XFrFTU7Gd8C3I=;
+	b=LFHeZ1im4NGkk7uENe0oONbXEqoNQ5qlGDMgb7dxNaLJqq2i9Ok9GCCXyMLCqUyMNUQ3gB4PUkMVyD+qyxpZnlhpv4uC6cTYe99I1AH6YvVfaSw+pb+KuTjp7fep9fAyPbaN2x4uq2xdBmKErSXUJGH5XNtKFwmCOU0R+5KevzU=
+Received: from 30.221.128.100(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WFhyJqP_1727232190)
+          by smtp.aliyun-inc.com;
+          Wed, 25 Sep 2024 10:43:11 +0800
+Message-ID: <6c50d750-5a7c-4ddb-9415-17d0a963dbc9@linux.alibaba.com>
+Date: Wed, 25 Sep 2024 10:43:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
-To: Haakon Bugge <haakon.bugge@oracle.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>,
- Allison Henderson <allison.henderson@oracle.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- OFED mailing list <linux-rdma@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
-References: <20240918083552.77531-1-haakon.bugge@oracle.com>
- <Zuwyf0N_6E6Alx-H@infradead.org>
- <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
- <Zu191hsvJmvBlJ4J@infradead.org>
- <525e9a31-31ee-4acf-a25c-8bf3a617283f@linux.dev>
- <ZvFY_4mCGq2upmFl@infradead.org>
- <aea6b986-2d25-4ebc-93e8-05da9c6f3ba2@linux.dev>
- <ZvJiKGtuX62jkIwY@infradead.org>
- <1ad540cb-bf1b-456b-be2d-6c35999bdaa8@linux.dev>
- <66A7418F-4989-4765-AC0F-1D23342C6950@oracle.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <66A7418F-4989-4765-AC0F-1D23342C6950@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCHv2 net-next 1/3] net/udp: Add a new struct for hash2
+ slot
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: antony.antony@secunet.com, davem@davemloft.net, dsahern@kernel.org,
+ dust.li@linux.alibaba.com, edumazet@google.com, fred.cc@alibaba-inc.com,
+ jakub@cloudflare.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com,
+ willemdebruijn.kernel@gmail.com, yubing.qiuyubing@alibaba-inc.com
+References: <20240924110414.52618-2-lulie@linux.alibaba.com>
+ <20240924123017.1688277-1-gur.stavi@huawei.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <20240924123017.1688277-1-gur.stavi@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
-在 2024/9/24 23:16, Haakon Bugge 写道:
+
+On 2024/9/24 20:30, Gur Stavi wrote:
+>> + *	@hslot:	basic hash slot
+>> + *	@hash4_cnt: number of sockets in hslot4 of the same (local port, local address)
+>> + */
+>> +struct udp_hslot_main {
+>> +	struct udp_hslot	hslot; /* must be the first member */
+>> +	u32			hash4_cnt;
+>> +} __aligned(2 * sizeof(long));
+>> +#define UDP_HSLOT_MAIN(__hslot) ((struct udp_hslot_main *)(__hslot))
 > 
+> Wouldn't container_of be more suitable than brutal cast?
+
+I think struct udp_hslot_main is like a subclass of struct udp_hslot, so 
+casting is reasonable here.
+
 > 
->> On 24 Sep 2024, at 15:59, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+>> @@ -91,7 +110,7 @@ static inline struct udp_hslot *udp_hashslot(struct udp_table *table,
+>>   static inline struct udp_hslot *udp_hashslot2(struct udp_table *table,
+>>   					      unsigned int hash)
+>>   {
+>> -	return &table->hash2[hash & table->mask];
+>> +	return (struct udp_hslot *)udp_hashslot2_main(table, hash);
+> 
+> Why cast and not use ->hslot. Preferably with a local variable?
+
+Got it. Will fix.
+
+> 
+>> @@ -3438,16 +3436,17 @@ void __init udp_table_init(struct udp_table *table, const char *name)
+>>   					      UDP_HTABLE_SIZE_MIN,
+>>   					      UDP_HTABLE_SIZE_MAX);
 >>
->> 在 2024/9/24 14:54, Christoph Hellwig 写道:
->>> On Tue, Sep 24, 2024 at 09:58:24AM +0800, Zhu Yanjun wrote:
->>>> The users that I mentioned is not in the kernel tree.
->>> And why do you think that would matter the slightest?
->>
->> I noticed that the same cq functions are used. And I also made tests with this patch series. Without this patch series, dim mechanism will not be invoked.
+>> -	table->hash2 = table->hash + (table->mask + 1);
+>> +	table->hash2 = UDP_HSLOT_MAIN(table->hash + (table->mask + 1));
 > 
-> Christoph alluded to say: Do not modify the old cq_create_cq() code in order to support DIM, it is better to change the ULP to use ib_alloc_cq(), and get DIM enabled that way.
+> Wouldn't it be simpler to just cast to void? It is pure pointer
+> arithmetic where type checking is meaningless.
+> (void *)(table->hash + (table->mask + 1))
+> I realize now why UDP_HSLOT_MAIN couldn't use container_of but it
+> just demonstrates how convoluted this is.
 
-Hi, Haakon
+Will fix. I agree that (void *) is better here.
 
-To be honest, I like your original commit that enable DIM for legacy 
-ULPs because this can fix this problem once for all and improve the old 
-ib_create_cq function.
+Thank you for your review, Gur.
 
-The idea from Christoph will cause a lot of changes in ULPs. I am not 
-very sure if these changes cause risks or not.
-
-Thus, I prefer to your original commit. But I will follow the advice 
-from Leon and Jason.
-
-Zhu Yanjun
-
-> 
-> 
-> Thxs, Håkon
-> 
+-- 
+Philo
 
 
