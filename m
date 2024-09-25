@@ -1,163 +1,191 @@
-Return-Path: <netdev+bounces-129638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A4D09850A8
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 03:37:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B5F19850CB
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 04:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F16284A57
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:37:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF9621F24C3A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 02:02:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 931DE1487D1;
-	Wed, 25 Sep 2024 01:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C7CF13D244;
+	Wed, 25 Sep 2024 02:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UYpEefUu"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Rwqx1ikD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4297E136672
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 01:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6154C91
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 02:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727228249; cv=none; b=QNSUswMrvOtMJPTwymsef1GmVLawZes6KI89YAo9pZfdd24FE9euV78M62MUVX/UWRHDZesZjvMyXtbJGsCWUPR/k//MENsGbcnV8oRD+xCCNzMQFyJRcl+R8dNYHPsmMfFb8z3wFmGf8VAdf87UY1BbELXtB8j9eZ1/vk43eE8=
+	t=1727229723; cv=none; b=nhkmm2qHrKvGJ9efjjxtTWqDIDbGMpK70Zg5RnXONR96LONX0QrXSXF4TNmq248Lhuz2LzTn/Yr4jMmAmk3TY0n+e/H+rhmVkQFwO/T5k/h9HK2IRHjIBI119SiM5sIOsdBXCfyxjRSo2IdSW8MBRZEDyTKX6sZ7pRvo7YcmcFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727228249; c=relaxed/simple;
-	bh=BZaHkkXLrZxyKUJQEi/+1D/Onl/0da0dOYn7LMLZgB8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZNd24UfdraSqCLQ6CXfXhayvDatDUAPYRZDdzppMPPxsSC1R2vIy7otKGqtmH/4QxCibJt0tG4SHxp+fYdXAs2kYvG5SBsEdixUHu7RJpFS7vTfpmX5YHLQYCzHL0DkH21Hngpz6bpn5oDcj5rZMw5zEcBCCaXLgesKtO+XafxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UYpEefUu; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727228244;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bsjzIUFUK2eSpfDDLWyGCwHbfrqw1/UK8ZIA6jybj/4=;
-	b=UYpEefUuJW30uWju94YCQi3A40EhvjHsRfoMjMSDZDRQW5/zV8jX5JjXb+nHtydgqfruoZ
-	MwQu0M8xXbEJNqG7PshiFej0SbGoKfjHhWZV1kC7x9eGCeb6af6v5KDg8SxwdT1doRqsWl
-	ByO9R8im93b1xPnNnIC8TY8+/h+BObI=
-Date: Tue, 24 Sep 2024 18:37:06 -0700
+	s=arc-20240116; t=1727229723; c=relaxed/simple;
+	bh=in8+gLt9Rt+ph2ZBLYkYNXzyOgAVSn0Wh7Y4vBcD3IM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S/jDBe/aXSVQatzmrdBRG/mgFmAE5RPklVjc27HHT1GGVrrkvJAu9zik9a8DcGwggzDxAHnwW2f3WcND9TaGJp0oVrLvC0c3KUrbP++5FJOQHCkfqfMaNeIi+1p1UeNlwm4M6kgXNtyd9lcz4+WAhK74sxB02BdAGEiEzNDPeVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Rwqx1ikD; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5365b6bd901so7364127e87.2
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 19:02:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1727229719; x=1727834519; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=in8+gLt9Rt+ph2ZBLYkYNXzyOgAVSn0Wh7Y4vBcD3IM=;
+        b=Rwqx1ikDvs7UVLTefkpRUV7JEVNPuUpifWV1oiG1ERuB+dh5Mc0cZIvnntCfciYIwL
+         E1rv7Vsb9V3Lxus/7xFQ68/ZVghoe5MBDbPRYdejyLcSgLcCPXK93sLgfX8QhxwCoXOz
+         hN0UghTDYuJbA0Ky66vLgaaN11vA7wtnD2OXo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727229719; x=1727834519;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=in8+gLt9Rt+ph2ZBLYkYNXzyOgAVSn0Wh7Y4vBcD3IM=;
+        b=uGAPprX/lOpvkt+5sTMREEcZ7RtMQMrrMzmTdK7dpzmoSaOWSIwanjj0+n8KzKqQ7e
+         5fx7umyY/PC8fxsyGBWYeuIGIdK/oK2hMU7u43pYeJt23NuI0s//DX7n5ZPHRqK0tgGQ
+         XDV75BEUNFWfRwczfyK66H3WP3O5LDw11Xk7KJHmkO5UusH54T2pOwD/lYt9DVq42xk5
+         eEahggTMotwrMOCjfz3sq1l+RA4+EESJ9SvHuScJV8awBWcZOZK11Pp4EDgBSIHQVM4B
+         r0aACkeFFUeahmWdicMDeKGplmfZsHfOq7uFag96/FkLb5YhsLl1gavGkaibvf9Um48M
+         a1tA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGt3GCXQhi7hqWQi8lCsGcjnkeHwotUVM03vt5XBNhGWsf6RK+iZuIgDtQTQ6TdJrbAhqjXfo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1WYpXpnMKiQv/1brdYMwhGnMXdc27EVNfVsiNyPFDA2l2Ld7Z
+	rsqoRncvoT78F9OAXGEdmsiiqe9EV65s/4KC20VRQJc9yKzGghfpPkl+JeFp36jQn3fcQoZIZLY
+	jD1qsIh4tPodMpfavPfV1tcPcU+GD/dRSDKiu
+X-Google-Smtp-Source: AGHT+IH0RldaZ2U2VNdo5MEiA5JjiL9RyKrCuoJAU7Lf3b4NOBVfTaVJY/yTlD4R3JxotBtpA4uEFUN4vW3DjLU5NWw=
+X-Received: by 2002:a05:6512:3b95:b0:52c:adc4:137c with SMTP id
+ 2adb3069b0e04-53870496b19mr465675e87.20.1727229718908; Tue, 24 Sep 2024
+ 19:01:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
- to test_progs
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
- <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev> <ZuVWmxoqXFI3qvVI@lore-desk>
- <20240914063828.7bd73c5e@kernel.org>
- <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240924160018.29049-1-esalomatkina@ispras.ru>
+In-Reply-To: <20240924160018.29049-1-esalomatkina@ispras.ru>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 25 Sep 2024 07:31:47 +0530
+Message-ID: <CAH-L+nPKOVW-EKJ-LcOCGh-DUG4HxfVePnvvKzgmUUjvyUQMPg@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/mlx5e: Fix NULL deref in mlx5e_tir_builder_alloc()
+To: Elena Salomatkina <esalomatkina@ispras.ru>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxim Mikityanskiy <maximmi@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Maor Dickman <maord@nvidia.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000dd90520622e80182"
 
-On 9/22/24 12:04 PM, Alexis Lothoré wrote:
-> Hello all, sorry for the slow feedback, I have been off last week.
-> 
-> On 9/14/24 15:38, Jakub Kicinski wrote:
->> On Sat, 14 Sep 2024 11:25:47 +0200 Lorenzo Bianconi wrote:
->>> On Sep 13, Martin KaFai Lau wrote:
->>>> test a physical network device that supports a certain XDP features.
->>>>
->>>> iiuc, test_xdp_features.sh only uses the veth and veth will also be the only
->>>> device tested after moving to prog_tests/xdp_features.c? It is a reasonable
->>>> addition to test_progs for an end-to-end xdp test by using veth. However,
->>>> test_progs will not be able to test the physical network device.
->>>>
->>>> Lorenzo, is the xdp_features.c still used for device testing?
->>>
->>> correct, xdp_features.c is intended to test the real xdp features supported by
->>> the NIC under test (DUT), not just the advertised ones (iirc that was a
->>> requisite to add xdp kernel feature support). For this reason we need two
->>> separated processes running on the tester device and on the DUT (they are
->>> usually two different devices). test_xdp_features.sh was just a simple test
->>> script used to develop xdp_features.c.
->>> What about extending xdp_features.c to integrate it in the CI?
-> 
-> So IIUC Lorenzo's answer, we _need_ to keep the possibility to run this test on
-> real hardware, and so we _need_ to still be able to run two processes, possibly
-> on two different machines. If that's so, indeed my rework breaks this. I have
-> then multiple questions/doubts before being able to rework this:
-> - the main goal of this rework is to be able to automatically run this test in
-> CI, and the resulting constraint is that it must integrate in a standalone,
-> already-existing c program (test_progs). I guess I can preserve the standalone
-> xdp_features program as it is, and make test_progs just start  it twice (on two
-> different veths). It would involve the following changes:
->    - keep a dedicated build step for this small, standalone xdp_features.c, and
-> add a "controller" part in test_progs (instead of fully migrating xdp_features
-> program into test_progs, which  is what the current series revision does)
->    - simply make the controller part create the testing network in CI, fork/start
-> the xdp_features program on both veths, and check return codes.
-> My main concern is about the possible flakiness of this whole setup (multiple
+--000000000000dd90520622e80182
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The test could be simpler if it does not need to run in two separate machines.
+On Tue, Sep 24, 2024 at 9:31=E2=80=AFPM Elena Salomatkina
+<esalomatkina@ispras.ru> wrote:
+>
+> In mlx5e_tir_builder_alloc() kvzalloc() may return NULL
+> which is dereferenced on the next line in a reference
+> to the modify field.
+>
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>
+> Fixes: a6696735d694 ("net/mlx5e: Convert TIR to a dedicated object")
+> Signed-off-by: Elena Salomatkina <esalomatkina@ispras.ru>
+LGTM
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-Also, there are bpf_prog_test_run_opts() style tests that provide a device 
-agnostic way to test the xdp helpers/features which should have covered most of 
-the cases exercised in progs/xdp_features.c?
 
-I am not sure which case in xdp_features.c does not have existing coverage in 
-test_progs. From a quick look, it seems only BPF_MAP_TYPE_CPUMAP is missing 
-(please check)? If that is the case, it may be more straight forward to add this 
-one test case to the test_progs. Check if it can borrow a similar setup from 
-prog_tests/test_xdp_veth.c, and then leave xdp_features.* as-is.
+--=20
+Regards,
+Kalesh A P
 
-There are other .sh tests that could better use the test_progs migration. In 
-particular the ones without existing test coverage. For non XDP related, 
-test_tcp_check_syncookie.sh, test_flow_dissector.sh, and test_tc_edt.sh should 
-be the good ones.
+--000000000000dd90520622e80182
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-For XDP, test_xdp_meta.sh should be useful also. You may also want to check the 
-test_xdp_redirect_*.sh.
-
-> processes and tcp/udp channels involved), but if keeping the standalone version
-> is really needed, I can give a try. Does it sound reasonable ?
-> - one part of my overall goal is to clean up the tools/testing/selftests/bpf
-> directory from anything that is not tested automatically. What should we do with
-> the wrapping shell script (test_xdp_features.sh) ? Since test_progs will
-> automate the test with veths, I guess it is still ok to just remove it ?
-> 
->> No preference but just to raise awareness - drivers/net's NetDrvEpEnv
->> class provides the setup for running tests with an endpoint.
->> XDP tests intended for HW would fit there pretty well.
-> 
-> Thanks for the hint. If we want to keep some tooling for real hw xdp features
-> testing, maybe we could add a small part in tools/testing/selftests/drivers/net
-> and make it use this NetDrvEpEnv ? Or it is a bigger hint that the whole test
-> about xdp features could be moved there (and then tested by net kselftests
-> rather than by ebpf ci specifically) ? @Lorenzo and eBPF tests maintainers, any
-> opinion ?
-> 
-> Thanks,
-> 
-> Alexis
-> 
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIFlMFOfFujUEZhmKGOfR9rHBPZIS6Ae3myVtcUkIdL5iMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkyNTAyMDE1OVowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBa93eG/Fc6
+fFKZJZmAXxcWvUOMi0QpiU5OKDUWWgNDEbHfaPFa/8Q3iyywICef4rat9HuS4Mk5eGSt82Qkho7u
+m4WeqOOlKAQIFSOrxja++fiHv3Sj54XZeR/ctTsYO00LugkFK1/7DAShErBvl+zwyzCbH0LSJHJw
+GTo+fb2wR8ItANqxzLqh6QiapD6LkP09eOHshL97ZyHa5MUese949oelIKmf3MJAMbWdP/+ARyRM
+u6cuvtMYSXGeoOZEqsZom4A0IeTlwyqO82KTb9+AhLoc+Qm/1DhVe7ifQ8ZBaF5N6X//hIIXjxqx
+msxlOM8ZDjoE7fibM86zz81vXd08
+--000000000000dd90520622e80182--
 
