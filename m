@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-129728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B44985C8E
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:49:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418A2985C97
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:50:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E2141F21E57
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:49:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B23B28634A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF5AA1D0DE9;
-	Wed, 25 Sep 2024 11:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC10B1D1728;
+	Wed, 25 Sep 2024 11:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NaTdeK8I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCwrSL6s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71921D0DE5;
-	Wed, 25 Sep 2024 11:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9E81D131E;
+	Wed, 25 Sep 2024 11:59:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265588; cv=none; b=mQaddU6FVEXP/WAfjHZdWa3uY+p3w5VwKS2TBiOUlAM/4qvcygMHnP7fYaJXb78HS9SXH4lKaXCleM3ZJing0w4ivkyFdpld3ECeBDR//5xLzsJ4zI3BVQQUPZyQERKNtmsmH4GK0XxkydnIt+smZXrAoUp750brnVscpgzOtaI=
+	t=1727265592; cv=none; b=K7jmi/FJrgc9SMUu2oZWxY3mPDmD1kXcoXorZmhWYYQRa3wKELi8G9bRrM3yGua8r+RYqxcDRVdREpvuFuNT0x4tKyKgpavx6VsJyG4j/k0YtU7STdKNKvAcN7c569fWVtCra8kGut3au5nK9iakGCbduAFX5VHrtqMnylrfeZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265588; c=relaxed/simple;
-	bh=tH+8dhPdj/JhWy6xc84AHQPMNwr4o6vP7XY04izVe5Q=;
+	s=arc-20240116; t=1727265592; c=relaxed/simple;
+	bh=DxyhDsY+mD6RFxzE1w0Q+rgTbbD43GElQZDaZIaLLWk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PGSzXO5JRe4LWqDkN5sgkzZHZa+4ZhhO1MMyI89jtPON93n9pZW/jVwgPqk/zmmsi8l3MRU24x3xyq9HrIHCRyk/LwDEK4Wx0Vc0o51lIRJP5xQwN4Z93/489rFv8vK1Zdhx29lh19QNf0mXREz76b+pIoq65l5RhEV9xWZHfTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NaTdeK8I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D255C4CEC7;
-	Wed, 25 Sep 2024 11:59:47 +0000 (UTC)
+	 MIME-Version; b=bQ8/sneghSUR76q8bRz6NgBbCB5i8NnztKdKNEOkgH/D/xj41kxT8ck4J8v7/flDNggcuPibWWZ0WGp6Ta7XrH7uIIfCyfAJea7+jCbgPVhWn1Mg8FAmTA2zJBy143m6JnYIy29C3dNU4hUruHMR2vdnK6RT0VmiPX72DOakR1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCwrSL6s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C732C4CEC3;
+	Wed, 25 Sep 2024 11:59:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727265588;
-	bh=tH+8dhPdj/JhWy6xc84AHQPMNwr4o6vP7XY04izVe5Q=;
+	s=k20201202; t=1727265592;
+	bh=DxyhDsY+mD6RFxzE1w0Q+rgTbbD43GElQZDaZIaLLWk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NaTdeK8IpDgZCuMVRg1vL/8EkysYjQpmUPE/fUtOanN2UlPHJKUiykS1W8RIoBdRw
-	 T3m+7xrLZdtXFx7pEQcTJAeywoQwCKUa6H9YTe5z+R1MyU/8YraorCuc+egta1+yNq
-	 8qqDpLQbyM1gFAYSeJ7i8ALbGoiufEvfoOSyqSk+ejRivQrg5PViABhIF/PxE5FNAI
-	 HXeiL7T6WehvoHdbhSy6SEEZ9Meu0npxa1Ve3nsSlpdFmfALsvZR/t8FGFNK6fgW1u
-	 Gad0O6M17zYReVcsK4CxQC6KrGu9e7FsBpVmwV3wYOs71x7JfY+9nG6v6SrP+uMDfQ
-	 kNDzBCGOIYF0A==
+	b=RCwrSL6sTLJXLDUK64eO4z2YjJdyUmcQmZs71sakPzjpz3/T0VLC4aJEqYuonTyHb
+	 lXLu/yqii9eOFyNw2+THhdeto1pHZkamCeJvH199b54UY1E/OElrjyxiD51KhyHDSJ
+	 KBjqpv7VTuFL8gKkEahqMtn+4j5LIy1znV6P1McMnmMOWk98qSg4PqNaOSlcGCuTgx
+	 gt9bElkKWM3RdWRX8iyYVOH99O/lqX5fOctVhfHj6GzCjiQVNYvJtnmcDbf/qYZbRV
+	 uOsTLWbYbUlKFAmsF1IqU4iSm5EGbm4Gv9iILIfKfTZfeNkrfRQ94bD3aHiNI4zQRa
+	 Slnl0XqE/6TvA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
 	Sasha Levin <sashal@kernel.org>,
+	kadlec@netfilter.org,
 	davem@davemloft.net,
-	dsahern@kernel.org,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 038/197] ipv4: Check !in_dev earlier for ioctl(SIOCSIFADDR).
-Date: Wed, 25 Sep 2024 07:50:57 -0400
-Message-ID: <20240925115823.1303019-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.10 040/197] netfilter: nf_tables: don't initialize registers in nft_do_chain()
+Date: Wed, 25 Sep 2024 07:50:59 -0400
+Message-ID: <20240925115823.1303019-40-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925115823.1303019-1-sashal@kernel.org>
 References: <20240925115823.1303019-1-sashal@kernel.org>
@@ -69,50 +72,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.11
 Content-Transfer-Encoding: 8bit
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
+From: Florian Westphal <fw@strlen.de>
 
-[ Upstream commit e3af3d3c5b26c33a7950e34e137584f6056c4319 ]
+[ Upstream commit c88baabf16d1ef74ab8832de9761226406af5507 ]
 
-dev->ip_ptr could be NULL if we set an invalid MTU.
+revert commit 4c905f6740a3 ("netfilter: nf_tables: initialize registers in
+nft_do_chain()").
 
-Even then, if we issue ioctl(SIOCSIFADDR) for a new IPv4 address,
-devinet_ioctl() allocates struct in_ifaddr and fails later in
-inet_set_ifa() because in_dev is NULL.
+Previous patch makes sure that loads from uninitialized registers are
+detected from the control plane. in this case rule blob auto-zeroes
+registers.  Thus the explicit zeroing is not needed anymore.
 
-Let's move the check earlier.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://patch.msgid.link/20240809235406.50187-2-kuniyu@amazon.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/devinet.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/netfilter/nf_tables_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index d09f557eaa779..73effd2d2994a 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -574,10 +574,6 @@ static int inet_set_ifa(struct net_device *dev, struct in_ifaddr *ifa)
- 
- 	ASSERT_RTNL();
- 
--	if (!in_dev) {
--		inet_free_ifa(ifa);
--		return -ENOBUFS;
--	}
- 	ipv4_devconf_setall(in_dev);
- 	neigh_parms_data_state_setall(in_dev->arp_parms);
- 	if (ifa->ifa_dev != in_dev) {
-@@ -1184,6 +1180,8 @@ int devinet_ioctl(struct net *net, unsigned int cmd, struct ifreq *ifr)
- 
- 		if (!ifa) {
- 			ret = -ENOBUFS;
-+			if (!in_dev)
-+				break;
- 			ifa = inet_alloc_ifa();
- 			if (!ifa)
- 				break;
+diff --git a/net/netfilter/nf_tables_core.c b/net/netfilter/nf_tables_core.c
+index a48d5f0e2f3e1..75598520b0fa0 100644
+--- a/net/netfilter/nf_tables_core.c
++++ b/net/netfilter/nf_tables_core.c
+@@ -256,7 +256,7 @@ nft_do_chain(struct nft_pktinfo *pkt, void *priv)
+ 	const struct net *net = nft_net(pkt);
+ 	const struct nft_expr *expr, *last;
+ 	const struct nft_rule_dp *rule;
+-	struct nft_regs regs = {};
++	struct nft_regs regs;
+ 	unsigned int stackptr = 0;
+ 	struct nft_jumpstack jumpstack[NFT_JUMP_STACK_SIZE];
+ 	bool genbit = READ_ONCE(net->nft.gencursor);
 -- 
 2.43.0
 
