@@ -1,138 +1,185 @@
-Return-Path: <netdev+bounces-129818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C9898664A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:30:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C702986651
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0FC01F20F43
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:30:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EAAFEB240B6
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA734D8BF;
-	Wed, 25 Sep 2024 18:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AE81369BC;
+	Wed, 25 Sep 2024 18:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m1b61+9l"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="MZShkSLm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B486E1D5ADC;
-	Wed, 25 Sep 2024 18:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0815D43ABD
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 18:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727289042; cv=none; b=lRkbScIW8z2ihGdNder3sNh4URyJTrcsEK28+HjT7OpPNaVkjxcCQfbN2Ym/MVwT8urNLfSoiDgQ8amxnT7sggEqWdyZ/BVr3oINDuXdIDDrIAY9Qsd6/PAo2WW0HgjzdxOCZJAF3M/tQhrQ+Na9/xQL/gFWAdx1s5OJ/bBw0PQ=
+	t=1727289093; cv=none; b=pYsL1v/RImAjg9AfOEvbB/sFgvuiv+B/Ta3HQ/3HtjXLdV5HDKxh1QPOtQTEtsXqbCDtmxN1d3gjJn4OtgGN2qe8TNho9407v4lFjKZRSUxtTxUA66kzfMF4Day6sgv7JKv6WgprxQt6vd7Xecwy31eWWFCPWb8wHm6XfwcCmBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727289042; c=relaxed/simple;
-	bh=rCVfh1YcnQdRwRTGp5hSq3bNXJ39sMKutBAw1jlny9A=;
+	s=arc-20240116; t=1727289093; c=relaxed/simple;
+	bh=O8iYvYw3zsv7+xeHawxeg0kYWliGnBVpbxH7QFAnDPg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hbs2vaWhtEjwjzm0OJcKeNdS8d6VIDOQ+VUK1Ao7l9fuPGS/ITVtoZ0utrguoR9BjXeuT56yyFrwR3CdvhzpnvH3dSC04zMJpGC9R3dKLdi3SJGdlPjub1/fshhowWzcqTz/VP+vGGA+VlF2pMh+/eImzS0PhXgLBdkU8V/bcW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m1b61+9l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7A54C4CEC3;
-	Wed, 25 Sep 2024 18:30:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727289041;
-	bh=rCVfh1YcnQdRwRTGp5hSq3bNXJ39sMKutBAw1jlny9A=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=LqrSlOdXMKCeCxNAQrdIUIG5BUGgj01DDi+vJrLZvlr6ScuTyuf7tvDGYu8PUAC74O8jllNO+qW+gx+ktkUPEO67hZJWwh83m6DLRgc8NrEuPHcM0ySc6bMues7QzWfb/b/q4nDcmlbZ6ZXO/p/mwrgK4ZWXqb1IZmMnkIDt8FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=MZShkSLm; arc=none smtp.client-ip=83.166.143.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XDQKh3PNszK8F;
+	Wed, 25 Sep 2024 20:31:20 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1727289080;
+	bh=mkpu7cuq+yO3FRbUc5w7sH1IMCpOtL6ugJfjenJnpAs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m1b61+9lBP1hv0l8LCCNmAdETPhM1Amw6RRUwFaWxRlZ/HZhCcaTulJ4YiqxrcXt6
-	 kETQaFMixIBRCzStOBxfvJdRBJCW73swjJzKXcWcHt/1XDUx1zQxVdtH9ebq5BI49z
-	 GxCQS9xJkmWY7s9i84S8lCMlYmCNZKoE7wNHJ2wXgEcQMAMDpLz1iSeHuT+VOxT4CT
-	 n2JEGJlbnVd6bHw8dFYpNao/D2AIExLJEw3HSef/x3rLjBTcqyRFke4nRAEzF2mdcj
-	 q9B8DC9ITKhkSJhYj27r3PQkMYvxqMqB3AEAKrFOK16Uag87i13XPHKQizMjm5JPBq
-	 emquRfqSpi3QA==
-Date: Wed, 25 Sep 2024 19:30:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mohamed Khalfella <mkhalfella@purestorage.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Auke Kok <auke-jan.h.kok@intel.com>,
-	Yuanyuan Zhong <yzhong@purestorage.com>,
-	Jeff Garzik <jgarzik@redhat.com>, Ying Hsu <yinghsu@chromium.org>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] igb: Do not bring the device up after non-fatal
- error
-Message-ID: <20240925183035.GV4029621@kernel.org>
-References: <20240924210604.123175-1-mkhalfella@purestorage.com>
- <20240924210604.123175-2-mkhalfella@purestorage.com>
+	b=MZShkSLmGqawVT7d/guPX4Gu1I+Wa5LPMZSFX6eq7Au/iiGV2zm6Ksvfs2GIBqeg3
+	 QAn5gtO8iCLtjxAS/T981JutmUopRoY+5rHbYs+ao1y85lxNN4b9dioYtjEpu1nNA5
+	 u7djLgh+AVVJ1gAgz4/Wm/xM7LHQVNDQu9iPdWas=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4XDQKg53NVzNL0;
+	Wed, 25 Sep 2024 20:31:19 +0200 (CEST)
+Date: Wed, 25 Sep 2024 20:31:15 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	Matthieu Buffet <matthieu@buffet.re>
+Subject: Re: [RFC PATCH v2 02/12] landlock: Add hook on socket creation
+Message-ID: <20240925.jah8aibekaH3@digikod.net>
+References: <20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com>
+ <20240524093015.2402952-3-ivanov.mikhail1@huawei-partners.com>
+ <ZlRI-gqDNkYOV_Th@google.com>
+ <3cd4fad8-d72e-87cd-3cf9-2648a770f13c@huawei-partners.com>
+ <ZmCf9JVIXmRZrCWk@google.com>
+ <3433b163-2371-e679-cc8a-e540a0218bca@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240924210604.123175-2-mkhalfella@purestorage.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3433b163-2371-e679-cc8a-e540a0218bca@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-On Tue, Sep 24, 2024 at 03:06:01PM -0600, Mohamed Khalfella wrote:
-> Commit 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
-> changed igb_io_error_detected() to ignore non-fatal pcie errors in order
-> to avoid hung task that can happen when igb_down() is called multiple
-> times. This caused an issue when processing transient non-fatal errors.
-> igb_io_resume(), which is called after igb_io_error_detected(), assumes
-> that device is brought down by igb_io_error_detected() if the interface
-> is up. This resulted in panic with stacktrace below.
+On Fri, Jun 07, 2024 at 05:45:46PM +0300, Mikhail Ivanov wrote:
+> 6/5/2024 8:27 PM, Günther Noack wrote:
+> > Hello!
+> > 
+> > On Thu, May 30, 2024 at 03:20:21PM +0300, Mikhail Ivanov wrote:
+> > > 5/27/2024 11:48 AM, Günther Noack wrote:
+> > > > On Fri, May 24, 2024 at 05:30:05PM +0800, Mikhail Ivanov wrote:
+> > > > > Add hook to security_socket_post_create(), which checks whether the socket
+> > > > > type and family are allowed by domain. Hook is called after initializing
+> > > > > the socket in the network stack to not wrongfully return EACCES for a
+> > > > > family-type pair, which is considered invalid by the protocol.
+> > > > > 
+> > > > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> > > > 
+> > > > ## Some observations that *do not* need to be addressed in this commit, IMHO:
+> > > > 
+> > > > get_raw_handled_socket_accesses, get_current_socket_domain and
+> > > > current_check_access_socket are based on the similarly-named functions from
+> > > > net.c (and fs.c), and it makes sense to stay consistent with these.
+> > > > 
+> > > > There are some possible refactorings that could maybe be applied to that code,
+> > > > but given that the same ones would apply to net.c as well, it's probably best to
+> > > > address these separately.
+> > > > 
+> > > >     * Should get_raw_handled_socket_accesses be inlined
+> > > It's a fairly simple and compact function, so compiler should inline it
+> > > without any problems. Mickaël was against optional inlines [1].
+> > > 
+> > > [1] https://lore.kernel.org/linux-security-module/5c6c99f7-4218-1f79-477e-5d943c9809fd@digikod.net/
+> > 
+> > Sorry for the confusion -- what I meant was not "should we add the inline
+> > keyword", but I meant "should we remove that function and place its
+> > implementation in the place where we are currently calling it"?
 > 
-> [ T3256] igb 0000:09:00.0 haeth0: igb: haeth0 NIC Link is Down
-> [  T292] pcieport 0000:00:1c.5: AER: Uncorrected (Non-Fatal) error received: 0000:09:00.0
-> [  T292] igb 0000:09:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
-> [  T292] igb 0000:09:00.0:   device [8086:1537] error status/mask=00004000/00000000
-> [  T292] igb 0000:09:00.0:    [14] CmpltTO [  200.105524,009][  T292] igb 0000:09:00.0: AER:   TLP Header: 00000000 00000000 00000000 00000000
-> [  T292] pcieport 0000:00:1c.5: AER: broadcast error_detected message
-> [  T292] igb 0000:09:00.0: Non-correctable non-fatal error reported.
-> [  T292] pcieport 0000:00:1c.5: AER: broadcast mmio_enabled message
-> [  T292] pcieport 0000:00:1c.5: AER: broadcast resume message
-> [  T292] ------------[ cut here ]------------
-> [  T292] kernel BUG at net/core/dev.c:6539!
-> [  T292] invalid opcode: 0000 [#1] PREEMPT SMP
-> [  T292] RIP: 0010:napi_enable+0x37/0x40
-> [  T292] Call Trace:
-> [  T292]  <TASK>
-> [  T292]  ? die+0x33/0x90
-> [  T292]  ? do_trap+0xdc/0x110
-> [  T292]  ? napi_enable+0x37/0x40
-> [  T292]  ? do_error_trap+0x70/0xb0
-> [  T292]  ? napi_enable+0x37/0x40
-> [  T292]  ? napi_enable+0x37/0x40
-> [  T292]  ? exc_invalid_op+0x4e/0x70
-> [  T292]  ? napi_enable+0x37/0x40
-> [  T292]  ? asm_exc_invalid_op+0x16/0x20
-> [  T292]  ? napi_enable+0x37/0x40
-> [  T292]  igb_up+0x41/0x150
-> [  T292]  igb_io_resume+0x25/0x70
-> [  T292]  report_resume+0x54/0x70
-> [  T292]  ? report_frozen_detected+0x20/0x20
-> [  T292]  pci_walk_bus+0x6c/0x90
-> [  T292]  ? aer_print_port_info+0xa0/0xa0
-> [  T292]  pcie_do_recovery+0x22f/0x380
-> [  T292]  aer_process_err_devices+0x110/0x160
-> [  T292]  aer_isr+0x1c1/0x1e0
-> [  T292]  ? disable_irq_nosync+0x10/0x10
-> [  T292]  irq_thread_fn+0x1a/0x60
-> [  T292]  irq_thread+0xe3/0x1a0
-> [  T292]  ? irq_set_affinity_notifier+0x120/0x120
-> [  T292]  ? irq_affinity_notify+0x100/0x100
-> [  T292]  kthread+0xe2/0x110
-> [  T292]  ? kthread_complete_and_exit+0x20/0x20
-> [  T292]  ret_from_fork+0x2d/0x50
-> [  T292]  ? kthread_complete_and_exit+0x20/0x20
-> [  T292]  ret_from_fork_asm+0x11/0x20
-> [  T292]  </TASK>
-> 
-> To fix this issue igb_io_resume() checks if the interface is running and
-> the device is not down this means igb_io_error_detected() did not bring
-> the device down and there is no need to bring it up.
-> 
-> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
-> Reviewed-by: Yuanyuan Zhong<yzhong@purestorage.com>
-> Fixes: 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+> Oh, I got it, thanks!
+> It will be great to find a way how to generalize this helpers. But if
+> we won't come up with some good design, it will be really better to
+> simply inline them. I added a mark about this in code refactoring issue
+> [1].
 
-Thanks for the update, this version looks good to me.
+Making such simple helper more generic might not be worth it.  Landlock
+doesn't handle a lot of different "objects".
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> [1] https://github.com/landlock-lsm/linux/issues/34
+> 
+> > 
+> > 
+> > > >     * Does the WARN_ON_ONCE(dom->num_layers < 1) check have the right return code?
+> > > 
+> > > Looks like a rudimental check. `dom` is always NULL when `num_layers`< 1
+> > > (see get_*_domain functions).
+> > 
+> > What I found irritating about it is that with 0 layers (= no Landlock policy was
+> > ever enabled), you would logically assume that we return a success?  But then I
+> > realized that this code was copied verbatim from other places in fs.c and net.c,
+> > and it is actually checking for an internal inconsistency that is never supposed
+> > to happen.  If we were to actually hit that case at some point, we have probably
+> > stumbled over our own feet and it might be better to not permit anything.
+> 
+> This check is probably really useful for validating code changes.
+
+Correct, this is mostly useful for developers when changing the kernel
+code.  We'll remove this kind of check when we'll have a proper struct
+landlock_domain. ;)
+
+> 
+> > 
+> > 
+> > > >     * Can we refactor out commonalities (probably not worth it right now though)?
+> > > 
+> > > I had a few ideas about refactoring commonalities, as currently landlock
+> > > has several repetitive patterns in the code. But solution requires a
+> > > good design and a separate patch. Probably it's worth opening an issue
+> > > on github. WDYT?
+> > 
+> > Absolutely, please do open one.  In my mind, patches in C which might not get
+> > accepted are an expensive way to iterate on such ideas, and it might make sense
+> > to collect some refactoring approaches on a bug or the mailing list before
+> > jumping into the implementation.
+> > 
+> > (You might want to keep an eye on https://github.com/landlock-lsm/linux/issues/1
+> > as well, which is about some ideas to refactor Landlock's internal data
+> > structures.)
+> 
+> Thank you! Discussing refactoring ideas before actually implementing
+> them sounds really great. We can collect multiple ideas, discuss them
+> and implement a single dedicated patchlist.
+> 
+> Issue: https://github.com/landlock-lsm/linux/issues/34.
+
+Yes, we are continuing the discussion there.
+
+> 
+> > 
+> > 
+> > > > ## The only actionable feedback that I have that is specific to this commit is:
+> > > > 
+> > > > In the past, we have introduced new (non-test) Landlock functionality in a
+> > > > single commit -- that way, we have no "loose ends" in the code between these two
+> > > > commits, and that simplifies it for people who want to patch your feature onto
+> > > > other kernel trees.  (e.g. I think we should maybe merge commit 01/12 and 02/12
+> > > > into a single commit.)  WDYT?
+> > > 
+> > > Yeah, this two should be merged and tests commits as well. I just wanted
+> > > to do this in one of the latest patch versions to simplify code review.
+> > 
+> > That sounds good, thanks!
+> > 
+> > —Günther
+> 
 
