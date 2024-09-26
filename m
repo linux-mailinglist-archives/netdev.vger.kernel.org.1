@@ -1,94 +1,91 @@
-Return-Path: <netdev+bounces-129919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA305986FFB
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:23:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9275498701A
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:28:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 849DA1F217C6
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:23:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55C9C284147
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F05D1AB6CA;
-	Thu, 26 Sep 2024 09:22:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03F81AAE15;
+	Thu, 26 Sep 2024 09:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iS31+wEp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbHbsCot"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799B31AB6F2;
-	Thu, 26 Sep 2024 09:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55761146596;
+	Thu, 26 Sep 2024 09:28:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727342577; cv=none; b=bBa9tEkftBGqNDCIJAHDNV5ZT3p8eSi4mbTXJjn/PSEpgZRnJi1rds/1StRBIAnGhU7isccPUt475XfGN1/tf8v/Ikbjj0xXG/DUqVXZS3yX7/RC0y1ibqvnAmpsO15sN28bZc5qoYgD8MGdejD0jsGcsJxW2cuJdVA+SR2yBGE=
+	t=1727342893; cv=none; b=f06jPN/68EVCWXU6HqRCVwwfFrnbIydKusS0Ch55+gsSUFn/7R0AJexKRVzhPNKAnt2c7fas2f8gkDZhL/jRs/IEg9LEmqIL7z6ve87t/7e0JzgAMSC0ufbSAnYWHBQHXVWqRSktEYsBTYhT+gh0jpIbN2KwFa/PTy/Z9678L1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727342577; c=relaxed/simple;
-	bh=WXMGo/VjG6N9HxCSkpebpXRk8ZJX8uCaKrQzAg3LTuI=;
+	s=arc-20240116; t=1727342893; c=relaxed/simple;
+	bh=25rFXqM2uBpI3RjHF1ZogNT2clAm8Lel1Rl0BiHxvwI=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=pF5wFZ4hlHuE4z8/ZjG7ADCrFlND0QKhtVtPvJdxWVOyB6gMmVYdW6i/6gbumS5p9sFCqcGWxz7paZ0a3G/vcNV+5PCG4v5t30blOLR4ENskmW6PziaA2HWUawBW15JhE7wS23GP3jPS2XaoLSTCSxXEVcgaZC0akCK0HRHP6cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iS31+wEp; arc=none smtp.client-ip=209.85.219.50
+	 Mime-Version:Content-Type; b=cC1XiZp1K1NRb/qZMvRxn8deBr8wjDfLuZhuv+82khlhJ2Zwrv1CQTBN0EQr+gyIafcp9PdQaUNh3uId5VhyH3nDoyVKJv8Et9SsQbs8eI2I+XckesbkuZR7tpgVFoiTIfDRhmoklHvjJFW7E3OV72E/ED4AIKqo2fwHEE1rmcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IbHbsCot; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6cb2d2a7d48so5114766d6.3;
-        Thu, 26 Sep 2024 02:22:56 -0700 (PDT)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7a9ad15d11bso67851485a.0;
+        Thu, 26 Sep 2024 02:28:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727342575; x=1727947375; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727342891; x=1727947691; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AoWMnzkVzH2m1ZK3d8Jln/bop2jnSvjpVfa21UQ4tqo=;
-        b=iS31+wEpSvZnST5ui2W4V+GyLmRSmrP7db1SQDEaKOBHKodmNsr68yGa8R3Xq5ybJq
-         ggjYpsZ5tvFNtUj/RvpTGNAvP+0864qtpoMh1I6soBkl9hz2nHs6AvmSsHBbLZsvkm26
-         SWa6ACgyIS8EvjH1YBOFVN7R4OMSt6tPi0K3euRx1G8EGXZ9+nZ4TEQYRIDq0vzp7PrL
-         8CyFzfJ4GthXhJwHl14/7j+c+tmHELMPzyV/gdIhRssRsLPl2h7iFsL5BgEXhNCznOXE
-         xJ7lsMMxgFMvgiunb4X2EQiyD6Z/3mQ4v+irA63rdVmGplK9/fTMl3GZ8hW4/USHpiQh
-         Jr7w==
+        bh=k5FkCK+JrIMChZjlzSiapcbDvabvUj4tqe2FIB4gEk0=;
+        b=IbHbsCotuu/6//CrxRYn+FGmQP0FIVbzq7srj+vsv0cnwUKYKWZ/4HkLCX4lKvJbr4
+         GuYi726Uz2diwJw9ZIInwfKXv4jH6U4ga7eahRgD3dqh8eN8ogTfDX4t61dRbAfVdw6A
+         WSx7EJ9pjd26NA1gJuYcbzMp6JG8oddaz0FkG0hBMzQ1fDWNeKB19mFkTsKJpY0bYGLr
+         2PIQEiOS4HKisbtjuryOPusgdCJpVCTvdD3K9LY6MtQxxiSe4g5pgH+gCDsqAHxrR0J3
+         bXOcmUYKQaOwuWbtox2ibhcGr35gIG6FcCPZf9vO5xbd5gbeDqt13FW4x50M9QHDb8qe
+         0jfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727342575; x=1727947375;
+        d=1e100.net; s=20230601; t=1727342891; x=1727947691;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=AoWMnzkVzH2m1ZK3d8Jln/bop2jnSvjpVfa21UQ4tqo=;
-        b=pcb3wW1Er2WLNse57atMPxbroBykbo/k0EIXjmyJ0gt5W/0iy/8QFlbjAh31oDjmZo
-         WFfYX1QtqaX5eWl/oQCwXtiE6xTgArvpE5aXU37rvclAcuFhcp563ieYEVJrxI+kkVOy
-         fh646SIONJ8FacRjL8BE3+jp5Y/RlAO9nYVIsh1J407HmMZkhKzA6sLHGSic5eR0kSvd
-         jqTfei012pF59yAKvfSqhSeyuQ3Jb4Z4gr9C2Hp7M8fpxqMb8qGIXSDjL+EOCGtB5jJm
-         PY2VRB2tDk9Rhxlsxad9ar1mIP0/vYb9e812D38FSl11k55OX8H6APmttHlic8vrtVqu
-         JpAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0qBSZ7sTHlnyu6eJqtBLaedqaB3vFyqWSY8cl4DOn2Vte80txIMqWOTNxbQYj4af5I0MRTT6X@vger.kernel.org, AJvYcCVAzxle/sYhF5KpMoMTeNhEpEPOGbB+APmIKY0fJjUXDHZgaCTT9oM1FygL4VplrCe9nShtma4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+1cJou6/UoPd8E3s31mrpHn431LPXLmsp5EdrLvxG3+HS13su
-	aPBgcvpvX9wJFQ2yYcdXgbt5c1injMe8vuEZaHcBdOkXH+9zSIgb
-X-Google-Smtp-Source: AGHT+IHtLB37qSDIJp+LXlz2EN6opY3uK6h6O2u3WusUvJ61gOa7yVIKhhZU9C822EsPpQ3G66civw==
-X-Received: by 2002:a05:6214:4a87:b0:6c5:8a9c:9020 with SMTP id 6a1803df08f44-6cb1ddeec53mr78057106d6.42.1727342575188;
-        Thu, 26 Sep 2024 02:22:55 -0700 (PDT)
+        bh=k5FkCK+JrIMChZjlzSiapcbDvabvUj4tqe2FIB4gEk0=;
+        b=wSPOia1kUzT4EeBk6p1BQrTIxTGndY8BMsMoeAUMzHVsrG7NrDDqeLdtuyVfARUMdK
+         zwEvtua7F/EV8NpctdzhPEQh599UHoSHIU4kgJdPMnv3jwmrjB2QfEGQBu3W0sgQ/SGY
+         Gigui53SSYRgMbBeEXReH3MW2n5orUeMv7anBiZydbbr+OYp/hMHED2d3PSCx0C6F4eH
+         ZAEsUJN+8XbzG3qJeeOQEXmPDteXfbXlWd8G8B3t//K/2JYl8QuKwgAN2cVMTQvnWQP8
+         whZ00AA1HXKyAhwW7oXyZvOB7i6PRp0/aUsFShHM2xSCU0H2Xmz6ta21zOB+9IDJfx+L
+         vYPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVV6KBqcqik7fH9aWSL+XW+cZTU1Me53lbX3xHMvh5lysNwI9EZFwi8wIiKP+7JTvhD5bFQptSw@vger.kernel.org, AJvYcCWocQLjuB5+IIz3M8QidlLnglRou39VNJmqNmGMbhGDX1SdGOaz8uPRbpVaQVcUbMdIqPSNgZCNlEOvH8B0RDM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxkg77dGR+A7T72f6PfcQhAGFSqwudkAqPNaYxfdKp3TZLFZ7FQ
+	1+U+PG3MpIPEATGdbI7nXaqhjOV33qSrFNGCc8RVLVkT/mo2lZA/
+X-Google-Smtp-Source: AGHT+IG/hvBHE8wLhkoCz375O9QtZF/PXItTvuRGUfoK5Kgwxy7SGCufCl9mmBmQuABhGU2ZNgL07g==
+X-Received: by 2002:a05:622a:1789:b0:458:4bf3:7c5e with SMTP id d75a77b69052e-45b5e04553dmr70828791cf.49.1727342891059;
+        Thu, 26 Sep 2024 02:28:11 -0700 (PDT)
 Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb2e738ec8sm7976306d6.8.2024.09.26.02.22.54
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45b5253a9f1sm24181881cf.15.2024.09.26.02.28.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 02:22:54 -0700 (PDT)
-Date: Thu, 26 Sep 2024 05:22:53 -0400
+        Thu, 26 Sep 2024 02:28:10 -0700 (PDT)
+Date: Thu, 26 Sep 2024 05:28:09 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Felix Fietkau <nbd@nbd.name>, 
+To: Matthieu Baerts <matttbe@kernel.org>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
  netdev@vger.kernel.org
 Cc: davem@davemloft.net, 
  kuba@kernel.org, 
  edumazet@google.com, 
  pabeni@redhat.com, 
- stable@vger.kernel.org, 
- maze@google.com, 
- shiming.cheng@mediatek.com, 
- daniel@iogearbox.net, 
- lena.wang@mediatek.com, 
- herbert@gondor.apana.org.au, 
+ sdf@fomichev.me, 
+ linux-kselftest@vger.kernel.org, 
  Willem de Bruijn <willemb@google.com>
-Message-ID: <66f527eddcce1_857c5294b4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <daf225a9-8194-40c6-b797-8ab37de773a0@nbd.name>
-References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
- <daf225a9-8194-40c6-b797-8ab37de773a0@nbd.name>
-Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
- frag_list
+Message-ID: <66f529298e48a_85aa62949d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <76d0de38-aff5-41e9-8085-afeb97b4d4f4@kernel.org>
+References: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
+ <0849977a-e772-4778-9130-c8ac0539bbdc@kernel.org>
+ <76d0de38-aff5-41e9-8085-afeb97b4d4f4@kernel.org>
+Subject: Re: [PATCH net] selftests/net: packetdrill: increase timing tolerance
+ in debug mode
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,37 +96,35 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Felix Fietkau wrote:
-> On 22.09.24 17:03, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
-> > 
-> > Detect gso fraglist skbs with corrupted geometry (see below) and
-> > pass these to skb_segment instead of skb_segment_list, as the first
-> > can segment them correctly.
-> > 
-> > Valid SKB_GSO_FRAGLIST skbs
-> > - consist of two or more segments
-> > - the head_skb holds the protocol headers plus first gso_size
-> > - one or more frag_list skbs hold exactly one segment
-> > - all but the last must be gso_size
-> > 
-> > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-> > modify these skbs, breaking these invariants.
-> > 
-> > In extreme cases they pull all data into skb linear. For UDP, this
-> > causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
-> > udp_hdr(seg->next)->dest.
-> > 
-> > Detect invalid geometry due to pull, by checking head_skb size.
-> > Don't just drop, as this may blackhole a destination. Convert to be
-> > able to pass to regular skb_segment.
-> > 
-> > Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
-> > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > Cc: stable@vger.kernel.org
+Matthieu Baerts wrote:
+> Hi Willem,
 > 
-> Reviewed-by: Felix Fietkau <nbd@nbd.name>
+> On 20/09/2024 00:03, Matthieu Baerts wrote:
+> > On 19/09/2024 14:43, Willem de Bruijn wrote:
+> >> From: Willem de Bruijn <willemb@google.com>
+> 
+> (...)
+> 
+> >> We have been doing this for debug builds outside ksft too.
+> >>
+> >> Previous setting was 10000. A manual 50 runs in virtme-ng showed two
+> >> failures that needed 12000. To be on the safe side, Increase to 14000.
+> > 
+> > So far (in 3 runs), it looks like 14000 is enough. But I guess it is
+> > still a bit too early to conclude that.
+> > 
+> > https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
+> > 
+> > (Your patch has been introduced in the net-next-2024-09-19--15-00 branch.)
+> One week after the introduction of this patch and >50 builds, it looks
+> like the results are good, only one issue related to timing issues:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-packetdrill-dbg/results/782181/1-tcp-slow-start-slow-start-after-win-update-pkt/stdout
+> 
+> And it passed after a retry.
+> 
+> https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=packetdrill
 
-I will respin with initialization of uh->check
+Thanks Matthieu.
+
 
