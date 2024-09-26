@@ -1,52 +1,75 @@
-Return-Path: <netdev+bounces-129930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC26987116
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:15:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1807987126
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD49E283A40
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:15:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B86932836D2
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C8F1ACDE3;
-	Thu, 26 Sep 2024 10:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763D31ABEBC;
+	Thu, 26 Sep 2024 10:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Q+xuC6B4"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="ifS/7Q9y"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568611AC439;
-	Thu, 26 Sep 2024 10:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1135647F
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 10:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727345705; cv=none; b=cl0/OapnjtmbBkIzoqMKEqajMJQiuXsdDuWVWXGIvaa2a+ninfrOsuCoN2kjix+jlIMfduQiY3u3HoPXZKOAf4yASUBiuenEyvDEpZiDz79RvYLS+gOlIN7cthj+JYuiXg+TbevdgowIiLKNv38O4opaTD/4JF3/F8hN8n04d8c=
+	t=1727345975; cv=none; b=hp5gnAMtjsriswwB4OIBhFq8uC9RhrPCirb30kDw51R9p4Yj6bm8VRsSG+pVoPtFJs0e+bG9l0/tg5RXDIC8Hj7z9Iwq06mS6oOX0KEirBn/PRk48g626FMVlaJTuqB2X6PFDbbaTRS2LhRYYZ1a/h9nlnWEHkm+wNRw23qtAa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727345705; c=relaxed/simple;
-	bh=mK8E6roVpKMN/3vVZJVnEYbNn+L5/AJNGPGcyLhdz+E=;
+	s=arc-20240116; t=1727345975; c=relaxed/simple;
+	bh=XqWP6jiPfw2E7M63/W1WeldxvOSVEdP6Hnjf5CBb5+M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oOrYrzce/bEmcCbvIPFxSHJ2HALL1M31bW4nQPNDadcRz45DGMbWx+HFz3n2kXhaYIyv0FHs4YAmkH+uvzGohIXiTV7A86IfOq9+gtr6tSADl/cNLlb83XyWn2cdL5zLu9VqA3KGKoqy0hAK2anmb5igbdeU1B28IstyC17wl7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Q+xuC6B4; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 038F71BF207;
-	Thu, 26 Sep 2024 10:14:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727345700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8udeDPcoMfeO/Ujp2zLkJzbghHjrfVi5kQRU+IvkPYM=;
-	b=Q+xuC6B443sFC1pIxGb9Hg+0FRffFUYJNmuiNeFaaRfJMCfJtBEJELJYVMC+pDMM7Us3ix
-	l1A42XPnsVipZQUoF2fekvC1umKiiwDuCDrLGGb9N3uKzE0bsQf+M0wZwWKhW0t/PA/dsl
-	nlpScQkGJapdUsThwkTLK5kqm8HoiFXH4s6jvuApehIdKHTmXZGenOE2JZtM+zjIGCL2tn
-	pODmdoLO0IPRV/kZ04QRm7UhgOyPLG8aoIRrHwyCK6tkasR8mJUtlaD1iWQ79t90+5d3u3
-	uhCyIWK0roOdz9fqk7VS65tTecgzC45wlRMto/C9tFCbhZfG0pJC0G3UgXNELQ==
-Message-ID: <b4b2f589-19fd-4d22-abb7-545c7121fbba@bootlin.com>
-Date: Thu, 26 Sep 2024 12:14:58 +0200
+	 In-Reply-To:Content-Type; b=XOspZhU3s88GlbGi31ppbFsW4aw0INuci/ULTFU96LNwntDbtuh5pHV7tB/DcKGJ9oHnHmQY1fQmKsgw8i2SBy7rgxw1nD6/EbPpJLaOqf47W1gBS1gxA/qsxkIz1szlSF3itYn3q+QuMuZc7QDcmy5zMIG+0BqVNFkAFM8+fB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=ifS/7Q9y; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-374d1dd1e75so45972f8f.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 03:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1727345972; x=1727950772; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=spZQdWS8XVsyY9M+JooQQPY5DbVkW7GJ1jFhF4UJcPg=;
+        b=ifS/7Q9y1xekQIZeeQVRpeUwOVMqNJJeGUaTuQpOXcaiRMc4KbsBDsP6FMh8p2Nusd
+         DNsDEMJ5541N4VCxX7r6T4/HkECin18gNiRR7em2jdayY9BJGTwYyHgt768WOvMorzOB
+         tUOYk/k3DYLfG1QxJO61jii5MgQuGayzTDBNPARbVRBS8L25miyvXou9JbA9gIbamNGA
+         WFGLBf9VnxUz2NaDDjgpSKH1cXVIVNFN4hIfXaXQ5a6b67FgGrJZSp/TBAOgJeiu7klx
+         GyvnyC4Blcnradr4sipSEcBH14y+fL3/TQz4soLcRBrfYFadJJMEw4bqLKRVgvkLLqvz
+         9WLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727345972; x=1727950772;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=spZQdWS8XVsyY9M+JooQQPY5DbVkW7GJ1jFhF4UJcPg=;
+        b=jdXuSe9Mqjd/351K9esivCgcFGNz1gYE5OrXXnjziAa0jVMtrD7CCb+uAH/T/PatzL
+         5J6IVc5O8M2a1AQ2WWVoIkscsanHcXo7lnsOlOuZ15+2bWrUiabdV9jrPbokZY3x1nXQ
+         A+zil3lFjyh+Ie7pKGPxStU4W2VCNvpZLdXiYj3uqEvLRs5vldygHxY0JxvP2U1JrfH8
+         N1qSoW9fUKcQTnpQze42otUFxqzrtymlT6qB//ORiQVqu2N4IPP81wclW5mHZPCCQe+5
+         pFuqi6LPhdGs7NwjPiGzS8JWUe4+5pu0fLma9CBau15K3pUcFTZ4Q285aFPgtk3OEA8t
+         YRZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqfT09/tVXuc6dqIrNIMy09/sSZuFmBDmpNV6VuEL325sL/YvEkgRQmIF/qK5/KP+5VkxU7H8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZHG03+ODDqBxMlvgf0XDOhBGmeYwhtA1TF7SXPdKwoLqICDly
+	ZhWVQdvycWFCBBKVXYSvAVpqctGB/60SNcupdMOAOyiw4S/CiXM/jSIcdCDZai8=
+X-Google-Smtp-Source: AGHT+IHB7wCRFaYLDNbuqbUOcU+fwSTMuK4M+T1cl1M9qDTKrk3ziuKOQLT46j+VO2Cu3mOcAZLEUQ==
+X-Received: by 2002:a5d:64e4:0:b0:374:c7a3:2d33 with SMTP id ffacd0b85a97d-37ccdd3d1c0mr914156f8f.9.1727345971610;
+        Thu, 26 Sep 2024 03:19:31 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:5572:265:5f6a:36f1? ([2a01:e0a:b41:c160:5572:265:5f6a:36f1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2f9786sm6087119f8f.74.2024.09.26.03.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Sep 2024 03:19:30 -0700 (PDT)
+Message-ID: <a942c0b0-4dfb-4725-a38b-e93d5650f9fb@6wind.com>
+Date: Thu, 26 Sep 2024 12:19:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,66 +77,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
- to test_progs
-To: Martin KaFai Lau <martin.lau@linux.dev>,
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
- <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev> <ZuVWmxoqXFI3qvVI@lore-desk>
- <20240914063828.7bd73c5e@kernel.org>
- <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
- <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
- <895a685b-7449-4bf1-b14d-00aee1d8f75b@linux.dev>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] ipv4: avoid quadratic behavior in FIB insertion
+ of common address
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, edumazet@google.com
+Cc: alexandre.ferrieux@orange.com, netdev@vger.kernel.org
+References: <20240926100807.3790287-1-alexandre.ferrieux@orange.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Content-Language: en-US
-In-Reply-To: <895a685b-7449-4bf1-b14d-00aee1d8f75b@linux.dev>
+Organization: 6WIND
+In-Reply-To: <20240926100807.3790287-1-alexandre.ferrieux@orange.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
 
-Hi Martin,
-
-On 9/25/24 22:01, Martin KaFai Lau wrote:
-> On 9/25/24 3:37 AM, Martin KaFai Lau wrote:
->> I am not sure which case in xdp_features.c does not have existing coverage in
->> test_progs. From a quick look, it seems only BPF_MAP_TYPE_CPUMAP is missing
->> (please check)?
+Le 26/09/2024 à 12:08, Alexandre Ferrieux a écrit :
+> Mix netns into all IPv4 FIB hashes to avoid massive collision
+> when inserting the same address in many netns.
 > 
-> Re: CPUMAP, I noticed there is a xdp_(cpu)map_attach.c test but it only does
-> attach test. May be something similar can be done like
-> https://lore.kernel.org/bpf/20240911-devel-koalo-fix-ingress-ifindex-v4-2-5c643ae10258@linutronix.de/ to exercise the xdp prog that does cpumap redirect.
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+> ---
+Please, wait 24 hours before send the v2:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/maintainer-netdev.rst#n394
 
-Thanks for the guidance, I was not aware of the possibility to perform those
-tests with BPF_PROG_RUN.
-Indeed, the basic return values from XDP programs seem to be covered with this
-method in other tests under prog_tests. For BPF_MAP_TYPE_CPUMAP, I can check and
-try to apply the same logic as the series in progress you have pointed.
+Also, update the commit title with the version number, for example ([PATCH
+net-next v2]).
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst#n666
 
-Once done, test_xdp_features.sh could be let as-is. Let me know if we should
-stillmove it elsewhere instead of keeping it in selftests
-(tools/bpf/xdp_features/ maybe ?)
-
-And noted for the most relevant tests to convert after that, thanks :)
-
-Alexis
+And add a log explaining the changes.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst#n723
 
 
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Regards,
+Nicolas
 
