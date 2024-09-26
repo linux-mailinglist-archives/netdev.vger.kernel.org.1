@@ -1,93 +1,86 @@
-Return-Path: <netdev+bounces-129983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58EB9876B1
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:41:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12FCC9876BA
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:42:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26915B215EC
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:41:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9671F25BA9
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8046B152165;
-	Thu, 26 Sep 2024 15:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000301531CC;
+	Thu, 26 Sep 2024 15:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="X3s6i1q6"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="YEXEwj5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FF914D6F6
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4AE14D6F6
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727365282; cv=none; b=X5v7aXZL8Be/XE8Pii7/VL2tOREr2IBUIw1AAn+HM7ZGEGM6YzX/M11hgP67/Ll/ZA0hXbum/PMyjfD+/+5V6qv+azv7wLifNZNR/D7kqxzx8pLpKQhktf5uuCFzySxMygvDDf+YI862EkqSf+EdkbHpXdYAg2+WGfGUK9335xw=
+	t=1727365358; cv=none; b=Z2B0aZ8RbAtD37ULc+G3VnfKZKagCQQMOIN+WfZHL/7woOBMFZH6rdruH+Orff0aIWA8+lH0etUSxZaQeAppwFoWf3yiVwyCfpqQPWbUx2RUtwhPXZWE0t/kDHhtBQmSElLyU96qnses9HNF6bmpu8LF1dMc9yvHook6ALEmxe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727365282; c=relaxed/simple;
-	bh=Tq15PAf8bBqdTxsQE4cDVFl0a8KvZb3Ovl8C3yzSe/8=;
+	s=arc-20240116; t=1727365358; c=relaxed/simple;
+	bh=YuuuYFG9J6VIce5wSFAppgfU6UAh20cdv9dMb/gRV8o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=svk3bxFrbQP8vVKPdYL2BjdmiJDV7l/ryQx33i1KsIT0i99ZEpKFrhGgn+AZRzsf6rbg7TvztUPmU20pCBIFZBZp8YjkZH5BZsbaHYO/fybKeV6Kc1O454eMSRCgZ9si5nnyAtymhiX+fJKprNWOX+IajtDkolIMUGMGzpeYaQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=X3s6i1q6; arc=none smtp.client-ip=209.85.214.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=RtwBRleTHuu5NtaMnjeyP1UvR4OzvjZFEhqlDhjAF2+/WcSjpvYZZ10VpxXSm3eD4frycQUdZ7sJfts0A896/sN7xuGbjosdKBE0VkWDmVtYntrl4jVR8Jx74WpS2zu9F1rLAwSgI/vpsc2biBHebHlJqXKf+4nWM7h3/rhA3x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=YEXEwj5s; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2068a7c9286so11118905ad.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 08:41:20 -0700 (PDT)
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso740137a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 08:42:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727365280; x=1727970080; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1727365357; x=1727970157; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3eaM0RqwLifKLh2YFEh4fOLFt1+WJYuD6B2ujcLtLnc=;
-        b=X3s6i1q6VSr2c2UHiRjL5QCD5wdrwBuY7fFARls0y2qEDJan1+CgxJbX4tICC5ekdy
-         TDRKN7Yo8+QrzRgnwhJtjzdPKC+3uSALAmYeAaJ8C9MAPBn+WDRLgrKhMCdT5HLJNzDa
-         rx5DH2tky791l73gLbz73N57iGO7QzDY2Im4s=
+        bh=0Mlojj9wGfJRRsMDZ0gQ5kDpNUAhG0uppHae6Ab1B3Y=;
+        b=YEXEwj5sSkdReSdTFRYnpGAAUl4aIMuDl9WwhAV006NHTSFEomnjWRFx3cjZE4BhE3
+         0HtJyVuWy6OkKRLdTHF/aVZgXC36jlzqTu4vy6IRmVDEPnKRDCb4WPwFpHqvWbAkInlN
+         d/7YIxb9iR0HyQQHPIixJp55APwq9hF1F+70U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727365280; x=1727970080;
+        d=1e100.net; s=20230601; t=1727365357; x=1727970157;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3eaM0RqwLifKLh2YFEh4fOLFt1+WJYuD6B2ujcLtLnc=;
-        b=vjlZWOcILlDmFA2YtN8j7rY7t5DoCPI1C21JNhWMBqO/SknUlr9hwTAmebzkYm/GfL
-         35Sdm8kOSmV7fJwqQnmTgYIZQEH10yxYOWy8t1LwgovK/gp4KzOlJ9ijvYq/11M73+Jm
-         EWlU5MtdFgTxP6/xyeYCxhyyvhpHkrwgJWrw+r+nD9WUdr4kHhjx7gKUfXjAmHRreK9x
-         t1jbKhexvifeoeyM5JPbcPnMMqkjmXYjZ5SLnZaBQI17G7FcGD+r10b9D2eovO3DDam2
-         IqBUSsA69CDRGc/ol2Eti3oqqumAFnPCKo3i+pytimOfOfBl/LehfehJS/WmMbQDUPHH
-         jzZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3rkJlp1t7fORbTm0ovIobwaab7qgqDzZaqTXhCz+eS+9XDTLmGh7L9x9t74GUdHyvE5HyqxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWux5aoojvXjzkd4vBzm3tsKy0WpCsGRECMpAmbdeY+X46TjNU
-	JEIY2HljyRRVx68aUBV726fFHrNLGSSZTfEZe4ndd0hCPD57SNryqWd/UFFGL4U=
-X-Google-Smtp-Source: AGHT+IGa+E5+xKNH2yBEt7+aqkt8n9AUgBdxvXRDx2MII627aAwouQm5FRS4vfH2fWSlYyB92HYtXg==
-X-Received: by 2002:a17:902:fb47:b0:202:4666:f018 with SMTP id d9443c01a7336-20b3767449dmr1581915ad.15.1727365280261;
-        Thu, 26 Sep 2024 08:41:20 -0700 (PDT)
+        bh=0Mlojj9wGfJRRsMDZ0gQ5kDpNUAhG0uppHae6Ab1B3Y=;
+        b=b70b4G4dM5ppiXvRqEC2DbazIYoRdd5v96S84N8Nv6R+G0lMi3J7OAKvqBCdEg11pR
+         Wnq8swR21JzGMASrqUgCeIwG7QAoV/ThdbXIwNIb1XMUa7Ntu+EZ+HEdDMAbhybKA7ky
+         QASVJiAmyWKdyfVSpUX1TSYqtlCKSOsKoJRRuDGItigwA1sd8Be0nAUSDOJa/CGeugPQ
+         kD0pM00GK2SXChgvdduLzvsY5TBvYwdSX9CJ4SCrYIWY28iMCf1Bsdg8BWSQp/Pzlcou
+         6EMHcy/bK8EP+QiksRha+ydkWyT/TVxJ29TjcpAcjcc3p2s8SyrCNq3fKt6LxLw4bOBS
+         DwgA==
+X-Gm-Message-State: AOJu0YyNWRaT8qWnCGE/Afab8bsHkKW8kekaWlOxbGql8CY/L93iVd1O
+	9GVdKK6Z78VwdbahApoGt/l2TPYcPy+nEjy9Izh/u9wPjs7tuKkevVHkXIlWH1M=
+X-Google-Smtp-Source: AGHT+IHV6GaKXHNCkoA4zPQtCf/BXs58H6nmWQupzcXJs+pFzHTxNVQD3FC8Qak4VmK6OdZr0R4qqg==
+X-Received: by 2002:a17:90a:f989:b0:2d3:c976:dd80 with SMTP id 98e67ed59e1d1-2e0b8ee02admr111057a91.39.1727365356836;
+        Thu, 26 Sep 2024 08:42:36 -0700 (PDT)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b096f96c9sm23921905ad.216.2024.09.26.08.41.18
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e06e1bb004sm3684740a91.19.2024.09.26.08.42.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 08:41:19 -0700 (PDT)
-Date: Thu, 26 Sep 2024 08:41:16 -0700
+        Thu, 26 Sep 2024 08:42:35 -0700 (PDT)
+Date: Thu, 26 Sep 2024 08:42:32 -0700
 From: Joe Damato <jdamato@fastly.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: Haiyang Zhang <haiyangz@microsoft.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Erni Sri Satya Vennela <ernis@microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
 	open list <linux-kernel@vger.kernel.org>
 Subject: Re: [RFC net-next 1/1] hv_netvsc: Link queues to NAPIs
-Message-ID: <ZvWAnB1cZ5gJcXH5@LQ3V64L9R2>
+Message-ID: <ZvWA6BjwVfYXnDcA@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
 	Haiyang Zhang <haiyangz@microsoft.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Erni Sri Satya Vennela <ernis@microsoft.com>,
-	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -95,8 +88,7 @@ Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	open list <linux-kernel@vger.kernel.org>
 References: <20240924234851.42348-1-jdamato@fastly.com>
  <20240924234851.42348-2-jdamato@fastly.com>
- <MW4PR21MB18590C4C1EDFF656E4600D62CA692@MW4PR21MB1859.namprd21.prod.outlook.com>
- <20240926103443.GA3014@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20240926151024.GE4029621@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,141 +97,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240926103443.GA3014@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20240926151024.GE4029621@kernel.org>
 
-On Thu, Sep 26, 2024 at 03:34:43AM -0700, Shradha Gupta wrote:
-> On Wed, Sep 25, 2024 at 07:39:03PM +0000, Haiyang Zhang wrote:
+On Thu, Sep 26, 2024 at 04:10:24PM +0100, Simon Horman wrote:
+> On Tue, Sep 24, 2024 at 11:48:51PM +0000, Joe Damato wrote:
+> > Use netif_queue_set_napi to link queues to NAPI instances so that they
+> > can be queried with netlink.
 > > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >  drivers/net/hyperv/netvsc.c       | 11 ++++++++++-
+> >  drivers/net/hyperv/rndis_filter.c |  9 +++++++--
+> >  2 files changed, 17 insertions(+), 3 deletions(-)
 > > 
-> > > -----Original Message-----
-> > > From: Joe Damato <jdamato@fastly.com>
-> > > Sent: Tuesday, September 24, 2024 7:49 PM
-> > > To: netdev@vger.kernel.org
-> > > Cc: Joe Damato <jdamato@fastly.com>; KY Srinivasan <kys@microsoft.com>;
-> > > Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu <wei.liu@kernel.org>;
-> > > Dexuan Cui <decui@microsoft.com>; David S. Miller <davem@davemloft.net>;
-> > > Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>;
-> > > Paolo Abeni <pabeni@redhat.com>; open list:Hyper-V/Azure CORE AND DRIVERS
-> > > <linux-hyperv@vger.kernel.org>; open list <linux-kernel@vger.kernel.org>
-> > > Subject: [RFC net-next 1/1] hv_netvsc: Link queues to NAPIs
-> > > 
-> > > [You don't often get email from jdamato@fastly.com. Learn why this is
-> > > important at https://aka.ms/LearnAboutSenderIdentification ]
-> > > 
-> > > Use netif_queue_set_napi to link queues to NAPI instances so that they
-> > > can be queried with netlink.
-> > > 
-> > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > ---
-> > >  drivers/net/hyperv/netvsc.c       | 11 ++++++++++-
-> > >  drivers/net/hyperv/rndis_filter.c |  9 +++++++--
-> > >  2 files changed, 17 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-> > > index 2b6ec979a62f..ccaa4690dba0 100644
-> > > --- a/drivers/net/hyperv/netvsc.c
-> > > +++ b/drivers/net/hyperv/netvsc.c
-> > > @@ -712,8 +712,11 @@ void netvsc_device_remove(struct hv_device *device)
-> > >         for (i = 0; i < net_device->num_chn; i++) {
-> > >                 /* See also vmbus_reset_channel_cb(). */
-> > >                 /* only disable enabled NAPI channel */
-> > > -               if (i < ndev->real_num_rx_queues)
-> > > +               if (i < ndev->real_num_rx_queues) {
-> > > +                       netif_queue_set_napi(ndev, i,
-> > > NETDEV_QUEUE_TYPE_TX, NULL);
-> > > +                       netif_queue_set_napi(ndev, i,
-> > > NETDEV_QUEUE_TYPE_RX, NULL);
-> > >                         napi_disable(&net_device->chan_table[i].napi);
-> > > +               }
-> > > 
-> > >                 netif_napi_del(&net_device->chan_table[i].napi);
-> > >         }
-> > > @@ -1787,6 +1790,10 @@ struct netvsc_device *netvsc_device_add(struct
-> > > hv_device *device,
-> > >         netdev_dbg(ndev, "hv_netvsc channel opened successfully\n");
-> > > 
-> > >         napi_enable(&net_device->chan_table[0].napi);
-> > > +       netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX,
-> > > +                            &net_device->chan_table[0].napi);
-> > > +       netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX,
-> > > +                            &net_device->chan_table[0].napi);
-> > > 
-> > >         /* Connect with the NetVsp */
-> > >         ret = netvsc_connect_vsp(device, net_device, device_info);
-> > > @@ -1805,6 +1812,8 @@ struct netvsc_device *netvsc_device_add(struct
-> > > hv_device *device,
-> > > 
-> > >  close:
-> > >         RCU_INIT_POINTER(net_device_ctx->nvdev, NULL);
-> > > +       netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
-> > > +       netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
-> > >         napi_disable(&net_device->chan_table[0].napi);
-> > > 
-> > >         /* Now, we can close the channel safely */
-> > > diff --git a/drivers/net/hyperv/rndis_filter.c
-> > > b/drivers/net/hyperv/rndis_filter.c
-> > > index ecc2128ca9b7..c0ceeef4fcd8 100644
-> > > --- a/drivers/net/hyperv/rndis_filter.c
-> > > +++ b/drivers/net/hyperv/rndis_filter.c
-> > > @@ -1269,10 +1269,15 @@ static void netvsc_sc_open(struct vmbus_channel
-> > > *new_sc)
-> > >         ret = vmbus_open(new_sc, netvsc_ring_bytes,
-> > >                          netvsc_ring_bytes, NULL, 0,
-> > >                          netvsc_channel_cb, nvchan);
-> > > -       if (ret == 0)
-> > > +       if (ret == 0) {
-> > >                 napi_enable(&nvchan->napi);
-> > > -       else
-> > > +               netif_queue_set_napi(ndev, chn_index,
-> > > NETDEV_QUEUE_TYPE_RX,
-> > > +                                    &nvchan->napi);
-> > > +               netif_queue_set_napi(ndev, chn_index,
-> > > NETDEV_QUEUE_TYPE_TX,
-> > > +                                    &nvchan->napi);
-> > > +       } else {
-> > >                 netdev_notice(ndev, "sub channel open failed: %d\n",
-> > > ret);
-> > > +       }
-> > > 
-> > >         if (atomic_inc_return(&nvscdev->open_chn) == nvscdev->num_chn)
-> > >                 wake_up(&nvscdev->subchan_open);
-> > > --
-> > 
-> > The code change looks fine to me.
-> > @Shradha Gupta or @Erni Sri Satya Vennela, Do you have time to test this?
-> > 
-> > Thanks,
-> > - Haiyang
-> > 
-> > 
-> Hi Joe, Haiyang,
+> > diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+> > index 2b6ec979a62f..ccaa4690dba0 100644
+> > --- a/drivers/net/hyperv/netvsc.c
+> > +++ b/drivers/net/hyperv/netvsc.c
+> > @@ -712,8 +712,11 @@ void netvsc_device_remove(struct hv_device *device)
+> >  	for (i = 0; i < net_device->num_chn; i++) {
+> >  		/* See also vmbus_reset_channel_cb(). */
+> >  		/* only disable enabled NAPI channel */
+> > -		if (i < ndev->real_num_rx_queues)
+> > +		if (i < ndev->real_num_rx_queues) {
+> > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_TX, NULL);
+> > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_RX, NULL);
 > 
-> I have verified the patch on a VM with netvsc interfaces and the seems
-> to be working as expected
+> Hi Joe,
 > 
-> CLI output after applying the patch:
+> When you post a non-RFC version of this patch, could you consider
+> line-wrapping the above to 80 columns, as is still preferred for
+> Networking code?
 > 
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 4, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
->  {'id': 5, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
->  {'id': 6, 'ifindex': 2, 'napi-id': 8199, 'type': 'rx'},
->  {'id': 7, 'ifindex': 2, 'napi-id': 8200, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'},
->  {'id': 4, 'ifindex': 2, 'napi-id': 8197, 'type': 'tx'},
->  {'id': 5, 'ifindex': 2, 'napi-id': 8198, 'type': 'tx'},
->  {'id': 6, 'ifindex': 2, 'napi-id': 8199, 'type': 'tx'},
->  {'id': 7, 'ifindex': 2, 'napi-id': 8200, 'type': 'tx'}]
-> 
-> The code changes also look good.
-> 
-> Tested-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> There is an option to checkpatch that will warn you about this.
 
-Thank you very much for testing, I will include your tested-by when
-I resend this next week when net-next is open.
+Thanks for letting me know.
+
+I run checkpatch.pl --strict and usually it seems to let me know if
+I am over 80, but maybe there's another option I need?
 
