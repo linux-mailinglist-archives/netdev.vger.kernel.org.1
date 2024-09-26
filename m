@@ -1,265 +1,173 @@
-Return-Path: <netdev+bounces-129917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5C2986FE1
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:20:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09131986FF7
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E01611C20AE1
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 918D81F21A0D
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5551A76D6;
-	Thu, 26 Sep 2024 09:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E32A1ABEBC;
+	Thu, 26 Sep 2024 09:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="W20fQ9wi";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="ajB9HqZz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J7CEwa7B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203891A4E9A;
-	Thu, 26 Sep 2024 09:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B798D1AB6F0
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727342409; cv=none; b=HBmy96fx5dWjdd4SgaR4QmTd5IdEGdH9avjIrUwJtEliIIvVZ4djfM4E/nGxha9C/ReE7qS7D2bzZpENKrIjLZQWWgaVWigRDj0APPfXlW8eU0Iy8cBZct4MYMn5c0DqI+23QhOkRBUS1kvpLslKv0qO3RcfaY9tVJTwGjOhjuk=
+	t=1727342572; cv=none; b=RqCebW82vfZQHh3ST5fOHqoGIffYAzbHHIm8NPi2inidTha6EpFeWCWPvt1gYmiceDhveO8pt1U2THJNNxyKfj4qHBz4JbAEKYeHHPHuICYxAp8/VcZAYiOE1LwGquC5KUw3eGJ3AftUMGlTfufFZHR7pgeHBUT2uy8sur0wkkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727342409; c=relaxed/simple;
-	bh=fPxIITGwvsR8oZaU7WU0RDsZkwH0CjGkd3lOuyO+iHQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BwcPN1R25v9qE46GOG1gOMv6rYpeMcyPQsjMxtpdIkuLBbez+egRipm/ZZ/0DE5uE6wH0b6NY7dySs6P48KUmWLdfb9Ye+jzd9ATsLNVopq35zhfvpmAjsfS/UOtJ1tyfuPj+YxLIo1k2eRXz50V/j5tuEIirn+uwGmiwCIkmws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=W20fQ9wi; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=ajB9HqZz reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1727342406; x=1758878406;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=rekTNiajdYTDYhal5o7yC/gc4wdPo/buylcC+7XLvf0=;
-  b=W20fQ9wiQETMjy/CGNJjJpUlhvJN4Nar2Zr1sBt4UtqTgCDI2OFY8mkU
-   nIil87LfcmL+plZZ9nKzZjACGML7XiLynYzm7bYu4D2SDXxC8aBuajXsQ
-   T7FhfLjR9px9L9Oo5ljURgrY3hAxzCuxcE8ZISfqu9i++Dn4plAf5AN+m
-   CPsQI6UQMPZat2yxG2GoKNph3SS2FrKs1e0mDXqP1XkZ8qkb92V8uK2u4
-   vB356Qf8zobL1oz6DkNtxMSOKbFnpWJ3Gg4hxTQLB1ruV5V7wX0msuord
-   1wkoKGtp1/EOYaKj4ElauLN1Xxi5ZiJOJV2l85qPjmuI8yUhYC9J0/nZd
-   Q==;
-X-CSE-ConnectionGUID: T5bvyQ9mR9OUij5kNx/G6g==
-X-CSE-MsgGUID: 2MhZBR0DTvCanKpiBK4F6w==
-X-IronPort-AV: E=Sophos;i="6.10,260,1719871200"; 
-   d="scan'208";a="39137207"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 26 Sep 2024 11:20:02 +0200
-X-CheckPoint: {66F52742-3-6BF03F0A-F83EAA27}
-X-MAIL-CPID: 91894B9D38675A8080ECBDF9025865E8_1
-X-Control-Analysis: str=0001.0A682F19.66F52742.0106,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ABB8D160BC1;
-	Thu, 26 Sep 2024 11:19:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1727342397;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=rekTNiajdYTDYhal5o7yC/gc4wdPo/buylcC+7XLvf0=;
-	b=ajB9HqZzhGnDclRMuLGMwuIUbY8GxA4vUb+UQKsqbP0BgWPOAqLBABmFZseWyPyVsok1VE
-	4IKw0aSQSOQ1NmQsizl15a0Xa9tmxWEOCHb9bi904fL6TKnsKraVA9VQjCDo7VVrgGgeyE
-	hJD+yXIiBGnJGUor2L1I16Uuwp8PDUasSfmzq3YdKshPaayDTIXAZhLxxeVIDty69gbrsf
-	B6ioduclBElMAotalzuErQADlp1C4vp9nfBYlOSoYE6GyxvfruZy5KO3sYg49E3powkCw1
-	I08kYXwYreAbJO0uUa1CxhN5PjwfLQjz3Hs71xbBrva+GSrQh4nfq7Yjqc2YNA==
-Message-ID: <1a4ed0696cbe222e50b5abdff08a5ce7f8223aae.camel@ew.tq-group.com>
-Subject: Re: [PATCH v3 2/2] can: m_can: fix missed interrupts with m_can_pci
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Markus Schneider-Pargmann <msp@baylibre.com>, Marc Kleine-Budde
-	 <mkl@pengutronix.de>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol
- <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,  Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
- <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, Raymond Tan
- <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
-Date: Thu, 26 Sep 2024 11:19:53 +0200
-In-Reply-To: <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
-References: 
-	<ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
-	 <4715d1cfed61d74d08dcc6a27085f43092da9412.1727092909.git.matthias.schiffer@ew.tq-group.com>
-	 <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727342572; c=relaxed/simple;
+	bh=aEKvNk2FiZ1iLDNVcf8q+9kZ64H5pWqyrVeZEMQ4y10=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fyvNR0/9aHqYIZsUUtZNRJx5fauJSIEoGBIZ566J4uNEVwY7T0iuULFNQoxtMFMS7Bs58POn/0azGiVABmxdHQCZImrusje+KUsdNucTMBzXpUKu/Qq88oWAF1jZaB6K9dcdGUkAt68BHc8pXlBNLss3RimNnpQyKmRufIrSeRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J7CEwa7B; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727342569;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xVwxEp61d36MeUHvdY6DKROPmKsWKa+K587S+dQB5rI=;
+	b=J7CEwa7ByWxt7fJnLyVKBxC+yLSzzVhHvb3TUW7X0s0bt8dx8gV+Yc2s1Ae4H4BbTZRZ4w
+	LOzptCn6CWYfu8m676b0al3OXvm2HtTagHYx8KA/9w9fuwwYdvG3lAWnc/B+L7YFXhIL8Z
+	SFDVEwIOHC5EPyvOksB0rdX0g8LTdB4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-A6oI5KNVMqy8beZ__1x41g-1; Thu, 26 Sep 2024 05:22:48 -0400
+X-MC-Unique: A6oI5KNVMqy8beZ__1x41g-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cceb06940so4601515e9.0
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:22:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727342567; x=1727947367;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xVwxEp61d36MeUHvdY6DKROPmKsWKa+K587S+dQB5rI=;
+        b=hhKj6eo0/GMM5JGwOA6ZfNjzhhMPrb/VJNc+aFnGegGvWkKf/f5foQM1qWbWp3DHeE
+         ceZCLoRgjKUziEJdkcVHwic1iFbklcGRL15w59p6kqzpXwVA+tLVL19kDu9jaxF4lCvO
+         cGVZiOCxaLTfnZZeQPgBxBRapr4tqS9reib3vdc4kG38pnpmSTrrLfftDysXhTj5Iqp5
+         lN45ClRxK4GUan0tYRgnCfo5Qa/W4IOx6PTwV9yVP622LrREbb8cjIB5kcqrfJkmRdAO
+         bYIKwhjYlSGbXjx83KC/ZQfIQAZfl8NAB6prVsFKx9RdG+T0HT9sDOjCdcc8yj/MIpyy
+         4iQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVye+CQE5QEcfN+Uc2lzwDkqIgU9fwdAiqP3Z58VqnI9dX2jIJaxXESd1RaJ1E9fRTHVTojrZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycgWzq47Z84tEKsDli0BSR09mNd1bU/SqM0tXjZWlVBtbx/Q7/
+	nlA8vETjxEwccsuS84KWQkf3iyTf/z61xOUbTxo4B27TCTZ7URRi+YghsI93dXNz9Wy8G9jrC2U
+	1Q+dL680S6WKHxUn6QQ5v0FSf0NDCwbcbB8T8htmTQa0z/pgdjX79rQ==
+X-Received: by 2002:a05:600c:314a:b0:42c:bd27:4c12 with SMTP id 5b1f17b1804b1-42e9610a9c8mr39799645e9.10.1727342567198;
+        Thu, 26 Sep 2024 02:22:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHZMn6vPjZvvRr0z4ON2PfRGPV7mbPum2AR4SR2M3xZoxDr2O7HU2Jo3C+NZbT24MrobqOmyQ==
+X-Received: by 2002:a05:600c:314a:b0:42c:bd27:4c12 with SMTP id 5b1f17b1804b1-42e9610a9c8mr39799265e9.10.1727342566712;
+        Thu, 26 Sep 2024 02:22:46 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b? ([2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e969ddb85sm41419025e9.2.2024.09.26.02.22.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Sep 2024 02:22:46 -0700 (PDT)
+Message-ID: <ec30359e-11a6-48fd-9d06-c030307f970c@redhat.com>
+Date: Thu, 26 Sep 2024 11:22:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6] ptp: Add support for the AMZNC10C 'vmclock' device
+To: David Woodhouse <dwmw2@infradead.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
+ "Chashper, David" <chashper@amazon.com>,
+ "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+Cc: "Christopher S . Hall" <christopher.s.hall@intel.com>,
+ Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+References: <00fb5876322d2fb77816304b5e2c31731d383b76.camel@infradead.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <00fb5876322d2fb77816304b5e2c31731d383b76.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2024-09-24 at 08:08 +0200, Markus Schneider-Pargmann wrote:
->=20
-> On Mon, Sep 23, 2024 at 05:32:16PM GMT, Matthias Schiffer wrote:
-> > The interrupt line of PCI devices is interpreted as edge-triggered,
-> > however the interrupt signal of the m_can controller integrated in Inte=
-l
-> > Elkhart Lake CPUs appears to be generated level-triggered.
-> >=20
-> > Consider the following sequence of events:
-> >=20
-> > - IR register is read, interrupt X is set
-> > - A new interrupt Y is triggered in the m_can controller
-> > - IR register is written to acknowledge interrupt X. Y remains set in I=
-R
-> >=20
-> > As at no point in this sequence no interrupt flag is set in IR, the
-> > m_can interrupt line will never become deasserted, and no edge will eve=
-r
-> > be observed to trigger another run of the ISR. This was observed to
-> > result in the TX queue of the EHL m_can to get stuck under high load,
-> > because frames were queued to the hardware in m_can_start_xmit(), but
-> > m_can_finish_tx() was never run to account for their successful
-> > transmission.
-> >=20
-> > To fix the issue, repeatedly read and acknowledge interrupts at the
-> > start of the ISR until no interrupt flags are set, so the next incoming
-> > interrupt will also result in an edge on the interrupt line.
-> >=20
-> > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart=
- Lake")
-> > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
->=20
-> Just a few comment nitpicks below. Otherwise:
->=20
-> Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
+On 9/20/24 11:32, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The vmclock device addresses the problem of live migration with
+> precision clocks. The tolerances of a hardware counter (e.g. TSC) are
+> typically around ±50PPM. A guest will use NTP/PTP/PPS to discipline that
+> counter against an external source of 'real' time, and track the precise
+> frequency of the counter as it changes with environmental conditions.
+> 
+> When a guest is live migrated, anything it knows about the frequency of
+> the underlying counter becomes invalid. It may move from a host where
+> the counter running at -50PPM of its nominal frequency, to a host where
+> it runs at +50PPM. There will also be a step change in the value of the
+> counter, as the correctness of its absolute value at migration is
+> limited by the accuracy of the source and destination host's time
+> synchronization.
+> 
+> In its simplest form, the device merely advertises a 'disruption_marker'
+> which indicates that the guest should throw away any NTP synchronization
+> it thinks it has, and start again.
+> 
+> Because the shared memory region can be exposed all the way to userspace
+> through the /dev/vmclock0 node, applications can still use time from a
+> fast vDSO 'system call', and check the disruption marker to be sure that
+> their timestamp is indeed truthful.
+> 
+> The structure also allows for the precise time, as known by the host, to
+> be exposed directly to guests so that they don't have to wait for NTP to
+> resync from scratch. The PTP driver consumes this information if present.
+> Like the KVM PTP clock, this PTP driver can convert TSC-based cross
+> timestamps into KVM clock values. Unlike the KVM PTP clock, it does so
+> only when such is actually helpful.
+> 
+> The values and fields are based on the nascent virtio-rtc specification,
+> and the intent is that a version (hopefully precisely this version) of
+> this structure will be included as an optional part of that spec. In the
+> meantime, this driver supports the simple ACPI form of the device which
+> is being shipped in certain commercial hypervisors (and submitted for
+> inclusion in QEMU).
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 
+Please have a better run at checkpatch before your next submission, 
+there are still a few ones - most relevant white-space damage.
 
-We have received a report that while this patch fixes a stuck queue issue r=
-eproducible with cangen,
-the problem has not disappeared with our customer's application. I will hol=
-d off sending a new
-version of the patch while we're investigating whether there is a separate =
-issue with the same
-symptoms or the patch is insufficient.
+Anyway this is net-next material...
 
-Patch 1/2 should be good to go and could be applied independently.
+## Form letter - net-next-closed
 
-Matthias
+The merge window for v6.12 and therefore net-next is closed for new
+drivers, features, code refactoring and optimizations. We are currently
+accepting bug fixes only.
 
+Please repost when net-next reopens after Sept 30th.
 
->=20
-> > ---
-> >=20
-> > v2: introduce flag is_edge_triggered, so we can avoid the loop on !m_ca=
-n_pci
-> > v3:
-> > - rename flag to irq_edge_triggered
-> > - update comment to describe the issue more generically as one of syste=
-ms with
-> >   edge-triggered interrupt line. m_can_pci is mentioned as an example, =
-as it
-> >   is the only m_can variant that currently sets the irq_edge_triggered =
-flag.
-> >=20
-> >  drivers/net/can/m_can/m_can.c     | 22 +++++++++++++++++-----
-> >  drivers/net/can/m_can/m_can.h     |  1 +
-> >  drivers/net/can/m_can/m_can_pci.c |  1 +
-> >  3 files changed, 19 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_ca=
-n.c
-> > index c85ac1b15f723..24e348f677714 100644
-> > --- a/drivers/net/can/m_can/m_can.c
-> > +++ b/drivers/net/can/m_can/m_can.c
-> > @@ -1207,20 +1207,32 @@ static void m_can_coalescing_update(struct m_ca=
-n_classdev *cdev, u32 ir)
-> >  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
-> >  {
-> >  	struct net_device *dev =3D cdev->net;
-> > -	u32 ir;
-> > +	u32 ir =3D 0, ir_read;
-> >  	int ret;
-> > =20
-> >  	if (pm_runtime_suspended(cdev->dev))
-> >  		return IRQ_NONE;
-> > =20
-> > -	ir =3D m_can_read(cdev, M_CAN_IR);
-> > +	/* The m_can controller signals its interrupt status as a level, but
-> > +	 * depending in the integration the CPU may interpret the signal as
->                  ^ on?
->=20
-> > +	 * edge-triggered (for example with m_can_pci).
-> > +	 * We must observe that IR is 0 at least once to be sure that the nex=
-t
->=20
-> As the loop has a break for non edge-triggered chips, I think you should
-> include that in the comment, like 'For these edge-triggered
-> integrations, we must observe...' or something similar.
->=20
-> Best
-> Markus
->=20
-> > +	 * interrupt will generate an edge.
-> > +	 */
-> > +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
-> > +		ir |=3D ir_read;
-> > +
-> > +		/* ACK all irqs */
-> > +		m_can_write(cdev, M_CAN_IR, ir);
-> > +
-> > +		if (!cdev->irq_edge_triggered)
-> > +			break;
-> > +	}
-> > +
-> >  	m_can_coalescing_update(cdev, ir);
-> >  	if (!ir)
-> >  		return IRQ_NONE;
-> > =20
-> > -	/* ACK all irqs */
-> > -	m_can_write(cdev, M_CAN_IR, ir);
-> > -
-> >  	if (cdev->ops->clear_interrupts)
-> >  		cdev->ops->clear_interrupts(cdev);
-> > =20
-> > diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_ca=
-n.h
-> > index 92b2bd8628e6b..ef39e8e527ab6 100644
-> > --- a/drivers/net/can/m_can/m_can.h
-> > +++ b/drivers/net/can/m_can/m_can.h
-> > @@ -99,6 +99,7 @@ struct m_can_classdev {
-> >  	int pm_clock_support;
-> >  	int pm_wake_source;
-> >  	int is_peripheral;
-> > +	bool irq_edge_triggered;
-> > =20
-> >  	// Cached M_CAN_IE register content
-> >  	u32 active_interrupts;
-> > diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/=
-m_can_pci.c
-> > index d72fe771dfc7a..9ad7419f88f83 100644
-> > --- a/drivers/net/can/m_can/m_can_pci.c
-> > +++ b/drivers/net/can/m_can/m_can_pci.c
-> > @@ -127,6 +127,7 @@ static int m_can_pci_probe(struct pci_dev *pci, con=
-st struct pci_device_id *id)
-> >  	mcan_class->pm_clock_support =3D 1;
-> >  	mcan_class->pm_wake_source =3D 0;
-> >  	mcan_class->can.clock.freq =3D id->driver_data;
-> > +	mcan_class->irq_edge_triggered =3D true;
-> >  	mcan_class->ops =3D &m_can_pci_ops;
-> > =20
-> >  	pci_set_drvdata(pci, mcan_class);
-> > --=20
-> > TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, =
-Germany
-> > Amtsgericht M=C3=BCnchen, HRB 105018
-> > Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan=
- Schneider
-> > https://www.tq-group.com/
+RFC patches sent for review only are obviously welcome at any time.
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+
 
