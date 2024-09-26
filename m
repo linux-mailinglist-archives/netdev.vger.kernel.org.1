@@ -1,171 +1,199 @@
-Return-Path: <netdev+bounces-129889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 988A8986DD2
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:38:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49525986DD4
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:38:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CACD1F22745
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 07:38:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88881F225C5
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 07:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA1418C357;
-	Thu, 26 Sep 2024 07:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1941925AC;
+	Thu, 26 Sep 2024 07:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XACVNiUn"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="GlqYWxa9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A556917BEA0;
-	Thu, 26 Sep 2024 07:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AECE1925A2;
+	Thu, 26 Sep 2024 07:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727336293; cv=none; b=S3ciCIec9gkpYz/v66UgeFoeiQNZoZevQUhdNg9thwFxFI44EqJgo1ocHbnispB4aXYFbyP6yGMWRKplyWrgpCWUK5PGDPdEr6Ow6F+7Bk7nia8VqGozjWCTYefwAFv3NGlA09q970G+YwKLuLw8PTRGuKWZfuGG8H5uGf/Dwt8=
+	t=1727336298; cv=none; b=Pif7XzFdIE76pRLUs8/DbLCILfftyqgxMSbioTkSkmTAff0Ym4ObL8wf1Nn/l4KeDZGf/VkfRy19YSYpyhXhImJlVu+ykiTmaBGWtMUDYeS2wTQjGRGx4c2b6q1f1aH1c1M3F1NJwda9fCeuJJnyBbUVeQqOa9gp2opuAyU0P4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727336293; c=relaxed/simple;
-	bh=Dp84neu+vynjrTHf4i2W8jzAHHaFlisszl3hFMQ+ZCA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hubvWkI7Eebr4804YBNcfBbmre0ENitCZoLPM9s65Kvp+urcFd0GVSalImckDaiKcRu+o+6XT1uctAeCpNOj3whDCAOGQbEJob9b3elEJFiJuHjOdLO7VyU1S/Sw2hgqNs/Hw4hieHjPiDPM0A5JYBNR7Yeda3CUJR9eJ27sdq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XACVNiUn; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-502b405abb1so209689e0c.1;
-        Thu, 26 Sep 2024 00:38:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727336290; x=1727941090; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Sjsal3XJocRUMBEqC7eulF6D2Ki2TAvQnVssNUiGcw=;
-        b=XACVNiUn1whigOkUBEi4SjQuu4pHLAdIm6Bq8M/My7muR1h3j53BNqlUY6/uS6XiMh
-         oNSPrzJnVz5HTvRvPREQQXLTftbZn8WEUkNzDyXF+Vu4oymHHcE8ziyiRy4V8VjPP+v3
-         pdLZH3jwDj6zAp8yMs+3T/U+13kYu6lkP3DVuIml8VpLmAq8Y/n7vv5mDEcCW+WR0hk0
-         U3z4MsULkgGIJq6mUXWln8WAs2hG7hDnUwS9APPsGWmH1hTsJE/UcJ2vX8NUVY0hXM4p
-         WrHeD0x912+jXgMPr8BOqjwKquM1FYc/h2gn0qCgbOlw3/rDjud44fzIFgkewbYTD/3U
-         augA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727336290; x=1727941090;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1Sjsal3XJocRUMBEqC7eulF6D2Ki2TAvQnVssNUiGcw=;
-        b=uyBsB2t+0i3C387QitbozQHsRom2OHI6AabhQ1EaZ79CGb01400fcSZyLCpinXoAqG
-         uLDDgVQTxoMSly+TnFzvPaLF2UAAXCW6+snnF3Yxaz+V7yclDLkoYLGkPapQyc+jJPTF
-         T+zcl43f+D17EVYfPNdS2Z4h9kSCDxjTfgoudj1yvxxq3PBhyUqELAwbb7PTb7bB5k10
-         j2eVaWBhDW+KChBjlHYpxjWBbJ04IJK1tefwD3aDWcNb3rhhKDBMwzVJxFjMLkD2MnuC
-         5x0orwMCzWsZTzAxTf3cUvwasVMM+CqdZI4F9JYntY7e1km8GMzcE7jP3RAH9EYm2kQn
-         /Syg==
-X-Forwarded-Encrypted: i=1; AJvYcCVdNc+JM+6a4t6sw9Lme3GgolCWRO6MKWaxiXn0elsKHCwmmFa6KXBJd7uV2LroX8bslP/8OaAtV9zS7vg=@vger.kernel.org, AJvYcCVyLo5bDLpHMkltHJz0NpEuFshUJKuy6rq1aC3xKCMQ3RAxYuzuBfdHNuxr7gNskHtolG+hX628@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxtg+J2kycVkkZ+iyS39JRFmI9pQCcgb1aEQTyXY+x5RjhSxiQA
-	xmGAzESmmySU6ScExXgk3oZ053msT5cPpWAjSMEWfCr8NBfOKiO0nD2sarkqD7kACkJ5d6L/kkG
-	ZzPfyqYAcdG88awJIiStwSfTwOiE=
-X-Google-Smtp-Source: AGHT+IFj2qGMlB0QH3Dqyg4frcCkP6Mef6gndDSEa0u4i1FL0L4exkBq3DgOBe9Ju/ytkZ8G65IMhPNdYUkIInlXxsY=
-X-Received: by 2002:a05:6122:920:b0:503:9cbc:1c9e with SMTP id
- 71dfb90a1353d-505c19b3481mr4733943e0c.0.1727336290249; Thu, 26 Sep 2024
- 00:38:10 -0700 (PDT)
+	s=arc-20240116; t=1727336298; c=relaxed/simple;
+	bh=iCCZJrQZDe2xg86gI5ECzRvHL32rTU7ZnkDgQ7YiTvI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HZExWtpZ4vP+ds69ZNydeO7Jkh45W0jYA+aYQnFaAp7380WP2l0mVh3ngG04dql1jJsexgOyTrhVGGPNsCNwifWJXmFc6lv9TBH/1oX4bFG9lPaeI6PglvDybrE8BfV2dPK5HqF/nZARO6jnH2FkpPjgFbJwF6lK/ozbSZ4qnxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=GlqYWxa9; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=oZQidhvB9AiP666SDRLQqqlTZweXQrXgNxzS1i3Nnko=; b=GlqYWxa9dKOx5BFa7BmUI9M5NP
+	i/jcaTmU1OvyNF0ZOXNZ1S/Je2YggWXcZHF1w4mRuhhY6X7iZHWkvbPAOA/2sHQ6wqBT6SCKkwkGN
+	OzcatGicc3068TfCtouLUIlMrXfekDRgqSED56yZx3dKxAAncFasgQCcQ96t1J453IJE=;
+Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1stj4f-001Huq-07;
+	Thu, 26 Sep 2024 09:38:05 +0200
+Message-ID: <53360620-839e-49d1-b9e4-6359e7588d81@nbd.name>
+Date: Thu, 26 Sep 2024 09:38:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925152927.4579-1-kdipendra88@gmail.com> <202409261447.R2kfrGVq-lkp@intel.com>
-In-Reply-To: <202409261447.R2kfrGVq-lkp@intel.com>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Thu, 26 Sep 2024 13:22:57 +0545
-Message-ID: <CAEKBCKOmtF8QFnpC_9rf-uKyLa6We_oR9UfuN4C-y99GLswciA@mail.gmail.com>
-Subject: Re: [PATCH net v4] net: systemport: Add error pointer checks in
- bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-To: kernel test robot <lkp@intel.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	maxime.chevallier@bootlin.com, horms@kernel.org, 
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
+ frag_list
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
+ shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
+ herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
+References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
+ <7144e848-9919-44a5-a313-f9b2076532bf@nbd.name>
+ <66f46003a38a0_65fdc29433@willemb.c.googlers.com.notmuch>
+ <68d4c9cf-f61f-4257-8d98-9a363142cc53@nbd.name>
+ <8f0a91a3-550f-46ec-81a9-021656906471@nbd.name>
+ <66f50b09cc7a5_7f2c829476@willemb.c.googlers.com.notmuch>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <66f50b09cc7a5_7f2c829476@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-I will fix this and will send v5.
+On 26.09.24 09:19, Willem de Bruijn wrote:
+> Felix Fietkau wrote:
+>> On 25.09.24 22:59, Felix Fietkau wrote:
+>> > On 25.09.24 21:09, Willem de Bruijn wrote:
+>> >> Felix Fietkau wrote:
+>> >>> On 22.09.24 17:03, Willem de Bruijn wrote:
+>> >>> > From: Willem de Bruijn <willemb@google.com>
+>> >>> > 
+>> >>> > Detect gso fraglist skbs with corrupted geometry (see below) and
+>> >>> > pass these to skb_segment instead of skb_segment_list, as the first
+>> >>> > can segment them correctly.
+>> >>> > 
+>> >>> > Valid SKB_GSO_FRAGLIST skbs
+>> >>> > - consist of two or more segments
+>> >>> > - the head_skb holds the protocol headers plus first gso_size
+>> >>> > - one or more frag_list skbs hold exactly one segment
+>> >>> > - all but the last must be gso_size
+>> >>> > 
+>> >>> > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+>> >>> > modify these skbs, breaking these invariants.
+>> >>> > 
+>> >>> > In extreme cases they pull all data into skb linear. For UDP, this
+>> >>> > causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
+>> >>> > udp_hdr(seg->next)->dest.
+>> >>> > 
+>> >>> > Detect invalid geometry due to pull, by checking head_skb size.
+>> >>> > Don't just drop, as this may blackhole a destination. Convert to be
+>> >>> > able to pass to regular skb_segment.
+>> >>> > 
+>> >>> > Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
+>> >>> > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+>> >>> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+>> >>> > Cc: stable@vger.kernel.org
+>> >>> > 
+>> >>> > ---
+>> >>> > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+>> >>> > index d842303587af..e457fa9143a6 100644
+>> >>> > --- a/net/ipv4/udp_offload.c
+>> >>> > +++ b/net/ipv4/udp_offload.c
+>> >>> > @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>> >>> >   		return NULL;
+>> >>> >   	}
+>> >>> >   
+>> >>> > -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+>> >>> > -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+>> >>> > +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
+>> >>> > +		 /* Detect modified geometry and pass these to skb_segment. */
+>> >>> > +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+>> >>> > +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+>> >>> > +
+>> >>> > +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+>> >>> > +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+>> >>> > +		gso_skb->csum_offset = offsetof(struct udphdr, check);
+>> >>> > +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
+>> >>> 
+>> >>> I also noticed this uh->check update done by udp4_gro_complete only in 
+>> >>> case of non-fraglist GRO:
+>> >>> 
+>> >>>      if (uh->check)
+>> >>>          uh->check = ~udp_v4_check(skb->len - nhoff, iph->saddr,
+>> >>>                        iph->daddr, 0);
+>> >>> 
+>> >>> I didn't see any equivalent in your patch. Is it missing or left out 
+>> >>> intentionally?
+>> >> 
+>> >> Thanks. That was not intentional. I think you're right. Am a bit
+>> >> concerned that all this testing did not catch it. Perhaps because
+>> >> CHECKSUM_PARTIAL looped to ingress on the same machine is simply
+>> >> interpreted as CHECKSUM_UNNECESSARY. Need to look into that.
+>> >> 
+>> >> If respinning this, I should also change the Fixes to
+>> >> 
+>> >> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+>> >> 
+>> >> Analogous to the eventual TCP fix to
+>> >> 
+>> >> Fixes: bee88cd5bd83 ("net: add support for segmenting TCP fraglist GSO packets")
+>> > 
+>> > In the mean time, I've been working on the TCP side. I managed to
+>> > reproduce the issue on one of my devices by routing traffic from
+>> > Ethernet to Wifi using your BPF test program.
+>> > 
+>> > The following patch makes it work for me for TCP v4. Still need to
+>> > test and fix v6.
+>> 
+>> Actually, here is something even simpler that should work for both v4
+>> and v6:
+> 
+> Makes sense. It does come with higher cost of calling skb_checksum.
 
-On Thu, 26 Sept 2024 at 13:06, kernel test robot <lkp@intel.com> wrote:
->
-> Hi Dipendra,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on net/main]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Dipendra-Khadka/net-systemport-Add-error-pointer-checks-in-bcm_sysport_map_queues-and-bcm_sysport_unmap_queues/20240925-233508
-> base:   net/main
-> patch link:    https://lore.kernel.org/r/20240925152927.4579-1-kdipendra88%40gmail.com
-> patch subject: [PATCH net v4] net: systemport: Add error pointer checks in bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-> config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240926/202409261447.R2kfrGVq-lkp@intel.com/config)
-> compiler: alpha-linux-gcc (GCC) 13.3.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240926/202409261447.R2kfrGVq-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202409261447.R2kfrGVq-lkp@intel.com/
->
-> All error/warnings (new ones prefixed by >>):
->
->    drivers/net/ethernet/broadcom/bcmsysport.c: In function 'bcm_sysport_unmap_queues':
-> >> drivers/net/ethernet/broadcom/bcmsysport.c:2401:35: error: expected ';' before ')' token
->     2401 |                 return PTR_ERR(dp));
->          |                                   ^
->          |                                   ;
-> >> drivers/net/ethernet/broadcom/bcmsysport.c:2400:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
->     2400 |         if (IS_ERR(dp))
->          |         ^~
->    drivers/net/ethernet/broadcom/bcmsysport.c:2401:35: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
->     2401 |                 return PTR_ERR(dp));
->          |                                   ^
-> >> drivers/net/ethernet/broadcom/bcmsysport.c:2401:35: error: expected statement before ')' token
->
->
-> vim +2401 drivers/net/ethernet/broadcom/bcmsysport.c
->
->   2389
->   2390  static int bcm_sysport_unmap_queues(struct net_device *dev,
->   2391                                      struct net_device *slave_dev)
->   2392  {
->   2393          struct bcm_sysport_priv *priv = netdev_priv(dev);
->   2394          struct bcm_sysport_tx_ring *ring;
->   2395          unsigned int num_tx_queues;
->   2396          unsigned int q, qp, port;
->   2397          struct dsa_port *dp;
->   2398
->   2399          dp = dsa_port_from_netdev(slave_dev);
-> > 2400          if (IS_ERR(dp))
-> > 2401                  return PTR_ERR(dp));
->   2402
->   2403          port = dp->index;
->   2404
->   2405          num_tx_queues = slave_dev->real_num_tx_queues;
->   2406
->   2407          for (q = 0; q < dev->num_tx_queues; q++) {
->   2408                  ring = &priv->tx_rings[q];
->   2409
->   2410                  if (ring->switch_port != port)
->   2411                          continue;
->   2412
->   2413                  if (!ring->inspect)
->   2414                          continue;
->   2415
->   2416                  ring->inspect = false;
->   2417                  qp = ring->switch_queue;
->   2418                  priv->ring_map[qp + port * num_tx_queues] = NULL;
->   2419          }
->   2420
->   2421          return 0;
->   2422  }
->   2423
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+But only if there is no checksum offload, right? Because the way I 
+implemented it, the lines further below starting with
+if (unlikely(skb->ip_summed != CHECKSUM_PARTIAL))
+will initialize th->check and set ip_summed to CHECKSUM_PARTIAL
+Or am I missing something?
 
-Best Regards,
-Dipendra
+Thanks,
+
+- Felix
 
