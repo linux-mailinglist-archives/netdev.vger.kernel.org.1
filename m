@@ -1,144 +1,157 @@
-Return-Path: <netdev+bounces-129912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1AD986FAE
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:12:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9124986FB2
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 348AA28225E
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:12:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84FA91F23A22
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CA71A4B73;
-	Thu, 26 Sep 2024 09:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22EC31AAE2A;
+	Thu, 26 Sep 2024 09:13:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kCoR6uN8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DctoVAt/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07FD155732;
-	Thu, 26 Sep 2024 09:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821D21A7ADF
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727341951; cv=none; b=Nae8B4pWkMbjgocvwNCCBE/bWpMu2LWw1FbNkCN7NVLLuVjgONDSdeaBsXl9jFTkRTojgRjiN8s50+j7Lk1HC32kZHxl1Mht9qIuhvFIjfjnU26sB8yEFP7pmABXU2E1kndaapmcWJrefTJ3RMGzx0sO+0Fu0evR6hh6FpA9+C8=
+	t=1727341999; cv=none; b=N1Hy/uKfB63oWHT83IQEGokUZuUfO5Wb1ddbLnF83C7XMNYTlaE24gks2Wc/lYQ+B47uWTCLC+AdZUfOQj7Ydw0+dqYbE8GXd5R3BfVg3UsYXlni8nEZnJsUtqMpgmC9xtqsE9iWxvQwCs4zNo2hy8yI6FgFJU+L4pj5V1wTxgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727341951; c=relaxed/simple;
-	bh=ZKPO7LaH1boT2Q/2fUSllK6Ezud3wVvP9yzCnH27P/E=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Z932e78OHi/ERvttvO/DvMF7OgQLTvaEiZNoK4VHkyV1tvWVoFvACoK9y5XzmqkHZNY2+J/yWMeVewfYd+UYIJJ0fl0qP4zxKjqp/GAXIhague3DMFPUMScbU4vpdO29cUX3EDQQ6jRFmd0IlivFCIUZ17TutE5ONFYw+NljBhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kCoR6uN8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7DB6C4CEC5;
-	Thu, 26 Sep 2024 09:12:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727341950;
-	bh=ZKPO7LaH1boT2Q/2fUSllK6Ezud3wVvP9yzCnH27P/E=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=kCoR6uN8OMKfJbqMZYho67I/IoM12JEYOhjVWglI1nPi6pi+6CfdRGxZb699MfLmB
-	 YIOf0h6j5Bsor6Fdk3YplhKIU4/M/LZmPBKgCcjaJ5SEZ8y2XITgDT07DONOLS/DeG
-	 O/tz9Ij/e60CFzJ1LrvYdOFevsVdvx6O8nBMTC9yNYy5avLtB0Be+UzREd/3fuTYUF
-	 TnK9HGtlt4sjdwKT1JYkrFQ8crky5syj187qTP9TqcUA+RiOjnnmrIjAeRWv7GEA1w
-	 LPkGBBRvkgZnH0PGP4EMvcpJUMfj5+86w+YCYlMOrfyGSCIY4WDS5irmPnmlRF0Hsz
-	 89WUEAP59aXGg==
-Message-ID: <76d0de38-aff5-41e9-8085-afeb97b4d4f4@kernel.org>
-Date: Thu, 26 Sep 2024 11:12:25 +0200
+	s=arc-20240116; t=1727341999; c=relaxed/simple;
+	bh=WkhCUHPyJ9RQNo5zDusO/KtKItZbO1OUKdSodd05rwA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=noHFjVteZEYFAm5ozQtrn/E1oMuQ54OLrlaJlLSnjlJz+jOwDZZ4Mt6Rvt89wWFzcAMXK9MpjcSievauO7hggw2D9kjCWiRA5jQBYolEfIIjWdv9rQyKewRMdSolpi+PUe9PjlDWsX6ie1oGvpcezrgFEbqiGrh6a+VtnQkCSUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DctoVAt/; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a9ae0e116cso74931685a.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:13:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727341996; x=1727946796; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uv8SoQiPmq2be8kj0JWq7o37OdbruRaBVLz6hTdwWqA=;
+        b=DctoVAt/idsPR2xPVcakJgG73xQDbu5zJKXggxkXbxQZ6CZGV1FqNHBoLkZz/5xZwG
+         g3A/DeURR41u8WWoeRjQ2k9Rco0jsXD24YwGTAQo6XQA12cR/esRT3jDPEgPatl35xu7
+         JI5tHvppPt0IOeF78oKvodtFJiichTxebWns+2r3VJ8VCXLtqMEya+TA/P4a3c6Gcvt3
+         L192ac6N6i9kw2zhKg4qRhOR+GM3JeFIJQ9DV4FmGYyjLJS/JFs8HobpUC77pIGU1zAl
+         hX+y6mndEBkcXHxQXv3tPLPyYhMb8nVhtSNr0vQRLOP18T9rux4EBqDs/vOUx1LN8+Hu
+         NxIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727341996; x=1727946796;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uv8SoQiPmq2be8kj0JWq7o37OdbruRaBVLz6hTdwWqA=;
+        b=Ld+X3PrH0Nb8z/V7+1uyqhg6Tk9krjlPMfhG5DH7EB326Gjagn42F5FIjMuyKb756G
+         Nf71iJsjJzbz6VHtrVZKtYiPcykZvrWkU8lioJKvUDk5WbzDab5VfXcX5Yojit0xREvp
+         eC3MX7T1Ys7JdfupnLmSJjtz2pPpfbl8xb4tgu/RCQhXnQ7lhoL7sfTtFfG2nFCI5uPD
+         HBy7FjBiwDl4WWa5X32KgERs6S16nTLod7aqLdxHaNTDAnZVY+2HMRjFhXCZAXnzteBh
+         +TckSGEW8XXJmqkHdJnWIzFP9jNOpY7HSLkBFoIIlYrc8YYlUOiGOd4fW/uOJpDL/W8F
+         bRVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIwtFxzzyFxy7Kk/UYR5vcKHIFTJs+OHdD8c/sr8ZU1IpxdZCUubIXVYwCxlMSWMmmdjPuUiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCOpEyf3EOKqwQjiLKJVrCXLMtRM5siMvUaxqFhCeeHN7XbqoA
+	zjKi2M3/7zjCcnAcsYgi9snRuSwb4XhSJGkj2hWva2RCJtRAQaid
+X-Google-Smtp-Source: AGHT+IFt/2+ZCo9QiqACdD3U0ajflg56n8bLfOIK9psZGCxOvBXfIS0MoGDb12I7Szz/WN0b4kvF2A==
+X-Received: by 2002:a05:620a:28c3:b0:7a9:b021:ee4 with SMTP id af79cd13be357-7ace74651e2mr795264585a.64.1727341996150;
+        Thu, 26 Sep 2024 02:13:16 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7acde5cd3fdsm261487785a.85.2024.09.26.02.13.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Sep 2024 02:13:15 -0700 (PDT)
+Date: Thu, 26 Sep 2024 05:13:14 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, 
+ netdev@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jonathan Davies <jonathan.davies@nutanix.com>, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <66f525aab17bb_8456129490@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240924150257.1059524-3-edumazet@google.com>
+References: <20240924150257.1059524-1-edumazet@google.com>
+ <20240924150257.1059524-3-edumazet@google.com>
+Subject: Re: [PATCH net 2/2] net: add more sanity checks to
+ qdisc_pkt_len_init()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net] selftests/net: packetdrill: increase timing tolerance
- in debug mode
-Content-Language: en-GB
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, sdf@fomichev.me, linux-kselftest@vger.kernel.org,
- Willem de Bruijn <willemb@google.com>
-References: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
- <0849977a-e772-4778-9130-c8ac0539bbdc@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <0849977a-e772-4778-9130-c8ac0539bbdc@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Hi Willem,
-
-On 20/09/2024 00:03, Matthieu Baerts wrote:
-> On 19/09/2024 14:43, Willem de Bruijn wrote:
->> From: Willem de Bruijn <willemb@google.com>
-
-(...)
-
->> We have been doing this for debug builds outside ksft too.
->>
->> Previous setting was 10000. A manual 50 runs in virtme-ng showed two
->> failures that needed 12000. To be on the safe side, Increase to 14000.
+Eric Dumazet wrote:
+> One path takes care of SKB_GSO_DODGY, assuming
+> skb->len is bigger than hdr_len.
 > 
-> So far (in 3 runs), it looks like 14000 is enough. But I guess it is
-> still a bit too early to conclude that.
+> virtio_net_hdr_to_skb() does not fully dissect TCP headers,
+> it only make sure it is at least 20 bytes.
 > 
-> https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
+> It is possible for an user to provide a malicious 'GSO' packet,
+> total length of 80 bytes.
 > 
-> (Your patch has been introduced in the net-next-2024-09-19--15-00 branch.)
-One week after the introduction of this patch and >50 builds, it looks
-like the results are good, only one issue related to timing issues:
+> - 20 bytes of IPv4 header
+> - 60 bytes TCP header
+> - a small gso_size like 8
+> 
+> virtio_net_hdr_to_skb() would declare this packet as a normal
+> GSO packet, because it would see 40 bytes of payload,
+> bigger than gso_size.
+> 
+> We need to make detect this case to not underflow
+> qdisc_skb_cb(skb)->pkt_len.
+> 
+> Fixes: 1def9238d4aa ("net_sched: more precise pkt_len computation")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/core/dev.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index f2c47da79f17d5ebe6b334b63d66c84c84c519fc..35b8bcfb209bd274c81380eaf6e445641306b018 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3766,10 +3766,14 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
+>  				hdr_len += sizeof(struct udphdr);
+>  		}
+>  
+> -		if (shinfo->gso_type & SKB_GSO_DODGY)
+> -			gso_segs = DIV_ROUND_UP(skb->len - hdr_len,
+> -						shinfo->gso_size);
+> +		if (unlikely(shinfo->gso_type & SKB_GSO_DODGY)) {
+> +			int payload = skb->len - hdr_len;
+>  
+> +			/* Malicious packet. */
+> +			if (payload <= 0)
+> +				return;
+> +			gso_segs = DIV_ROUND_UP(payload, shinfo->gso_size);
+> +		}
 
-https://netdev-3.bots.linux.dev/vmksft-packetdrill-dbg/results/782181/1-tcp-slow-start-slow-start-after-win-update-pkt/stdout
+Especially for a malicious packet, should gso_segs be reinitialized to
+a sane value? As sane as feasible when other fields cannot be fully
+trusted..
 
-And it passed after a retry.
+>  		qdisc_skb_cb(skb)->pkt_len += (gso_segs - 1) * hdr_len;
+>  	}
+>  }
+> -- 
+> 2.46.0.792.g87dc391469-goog
+> 
 
-https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=packetdrill
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
 
 
