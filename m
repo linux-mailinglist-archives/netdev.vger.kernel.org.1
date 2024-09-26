@@ -1,215 +1,175 @@
-Return-Path: <netdev+bounces-129939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CB09871F0
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:47:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34261987213
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:54:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00AFDB2AA05
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:47:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E267C280CF0
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71411AB51F;
-	Thu, 26 Sep 2024 10:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA85A1AD5D9;
+	Thu, 26 Sep 2024 10:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O9DcKNdA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1d66e2x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6A1A726A;
-	Thu, 26 Sep 2024 10:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195561ACE12
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 10:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727347642; cv=none; b=PzS4IqD4tXUdkhnnWLMaLbnPakJJoScdpM5NyeNCA447EsKcK+Vx+4GJ6D8Hzebztbf3Ji61ROP9tmg1dP1sjEoqDeMVDE7NemSon5AfyfsqrcYTk8966TlS4xC3y2MCLSm8PndQg/DR3ylmiXR+g9VdnvHkmDJydrCD8BysvI8=
+	t=1727348088; cv=none; b=tUhltGf2Vd8HthuGcKpBt8NsB7POleeed7o9FeQ8W46gyw8/Ernx5qo1xHrZ7pcEEcmhasF/N0m8K6JxpLLYkE6NpsBP2tynEz0g4sQvZx9WUzIPsU7sOFTXQwBVNHQ6p4b6Rwgay8YKeFD5ezASpCgX9HvKGcTTJaTMU6kDygg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727347642; c=relaxed/simple;
-	bh=kgTVEDiu1C/X/bxty3fOtvH3nFttn5jCBkrGOQolGMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFCU82b0DWwP2uGqTlGYzgibXUD9PnNOJGgo8BL1cEdQTaxtBsmGew5qyuTy7lX70ycyPWk4n7mkmBEcTNyQMhkXJntJteSUGgQrs/92QQWoAeQj9GXMcHFN6htYsjdAIoN8Jfo9mQODEgXr/VIuagpbHBO37ZqLV6qvoiDOFb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O9DcKNdA; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727347640; x=1758883640;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kgTVEDiu1C/X/bxty3fOtvH3nFttn5jCBkrGOQolGMY=;
-  b=O9DcKNdA00uVRzt3SVy0fP7ktS0AhFeoCCqPRiLMz/M2ZD0yFrucTL/y
-   nWPvdjLN1QOBAfHuKyCmgYKOisjnY/Iw/7riJ98OAqm0Xbzte/qZlIKyW
-   6qCbZEHXr/FzwLY1FZ5SW5/W4L5dWVbOf55iDTOATM1SSet0orkIFkp+x
-   LklF8bql2r3dJk5YVTkzhfm7XU97QdNPb7miuh6zIV5zPV3tsvIicIUfz
-   iUeaA+XwL3fJWf0lvwjjX1+11/n3vD+604slKkwZbe8Cz9GEtz5fnivN9
-   zO3+sVO+ZdHuC74cfVMe135izcJuER2fnu7tMuMFUddDZ+8Cqo/CXfzgD
-   Q==;
-X-CSE-ConnectionGUID: WZzqkdRWQoewGqnZk02cww==
-X-CSE-MsgGUID: S7JOb7iSTfu9IOmNSPJoeQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11206"; a="43947437"
-X-IronPort-AV: E=Sophos;i="6.10,155,1719903600"; 
-   d="scan'208";a="43947437"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2024 03:47:11 -0700
-X-CSE-ConnectionGUID: VBop/fJUTtWTJG9YeZpqjw==
-X-CSE-MsgGUID: f6+mt1YJQeKm6knOr+RLSQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,155,1719903600"; 
-   d="scan'208";a="76870270"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 26 Sep 2024 03:47:08 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1stm1Z-000KaF-1o;
-	Thu, 26 Sep 2024 10:47:05 +0000
-Date: Thu, 26 Sep 2024 18:46:28 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dipendra Khadka <kdipendra88@gmail.com>, florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	maxime.chevallier@bootlin.com, horms@kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Dipendra Khadka <kdipendra88@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4] net: systemport: Add error pointer checks in
- bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-Message-ID: <202409261836.eGX8TVKA-lkp@intel.com>
-References: <20240925152927.4579-1-kdipendra88@gmail.com>
+	s=arc-20240116; t=1727348088; c=relaxed/simple;
+	bh=4XlqGlbVV4R1uMYpPaM1u91hWeFZhoe0keGWzfBIbFc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=DmSi18USyymA99Bp2pKQLNTDWSnKYmleAMvmOKSogQxaklBdI+Pt4NgZfVmj+t3AmOmIPDCrc0iWGIc0p40e3dOZktQCyh4FY7hXnPMyHrs3q9MPLYSHpScSCfTZZDKwzi2yVVvME97vvDl/cNuE+QRxmC1/xfn/MFZTsZnVsRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1d66e2x; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727348086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nMAah5V6Hs369gZJo6DRHJeeBm1IDseuQxhG1iZY8ro=;
+	b=b1d66e2x+yPex92dqM6cdyh7uzyIOt7e0y6WeU9MdqTunmI36kjHcUk8bvDnkZfLr60Bce
+	oAG2+R0y21Hy2eJeXkreECQUWnPw4KbtjxIeyUE0xMhTLiftasuTFEiQWCSxerzmLfI/3k
+	TZjt8yx4Psnz5fjHn+movE6VPftq+tU=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-369-0jiMHRq8Mi2sgNRxtoHAfw-1; Thu, 26 Sep 2024 06:54:45 -0400
+X-MC-Unique: 0jiMHRq8Mi2sgNRxtoHAfw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5356a102038so986706e87.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 03:54:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727348083; x=1727952883;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nMAah5V6Hs369gZJo6DRHJeeBm1IDseuQxhG1iZY8ro=;
+        b=j09AYms5M7KygOlo/TJXF0Zg3w5kA9sB9wnBrVQ+YfyyixbAlCIZbpIwrsXVzAHGpc
+         wPBqDgrfFax8yDRTZ3VopLsGDJ8MY429S2lMmSItFXl/A7QVxW4ze0gDNfZ+UCMzx4u+
+         TXEPJJNH3Rbsg2dp19hL3HrXfTvjXyGsgqI7RXqrnJrnQ0q8QGxgT/G+R5xHIkMm+zoL
+         6NOX5MgBSaJ6M9J/OP9WOAUORKjWKt58+pOpR8rKYtP/GQTjJc+tuYCEhbymwp5l4ECE
+         yOF9fpTsm+6lB3MNIB2j0n2DUm/jfXiWX96UazO7Ww9Byq6yB39kWMWHE9nVBUL0zXV7
+         mfCA==
+X-Forwarded-Encrypted: i=1; AJvYcCVorVg3iooyhFGvGBTuX4tFi8IrxzZFVrkx0L6BbbBmxOImUvO2yI/RhmflOthosSHC+W1juLM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfWfmW/30QNy5RZ95NiRE0i/4wTd2FF5wpF/OBdivV7x1bAfbO
+	X0yIh3qjbCw38PNx64cNmahSheqYlR6+r289ri0S0fbGt3EXxW3cvI6JGLGUJTxGdl602KoqRYx
+	pb0fRlrdtYwxnC9axEW0UNqFWNs6c+WxzcpztqISpwx06fWqa2mBNAw==
+X-Received: by 2002:a05:6512:12c3:b0:536:7362:5912 with SMTP id 2adb3069b0e04-53877530ceemr5556739e87.30.1727348083435;
+        Thu, 26 Sep 2024 03:54:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPs6D/lrxvYcK40WRUY7e6VMRqpb6o1HwhSdRJSeV7mA2JYuu9QVeRQM49+yc5lijfGXDHEQ==
+X-Received: by 2002:a05:6512:12c3:b0:536:7362:5912 with SMTP id 2adb3069b0e04-53877530ceemr5556685e87.30.1727348082765;
+        Thu, 26 Sep 2024 03:54:42 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93a5b82fbasm192615366b.103.2024.09.26.03.54.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Sep 2024 03:54:41 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id E1DD0157FC51; Thu, 26 Sep 2024 12:54:40 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Arthur Fabre
+ <afabre@cloudflare.com>, Jakub Sitnicki <jakub@cloudflare.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
+ <lorenzo@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ kuba@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
+ pabeni@redhat.com, sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, mst@redhat.com, jasowang@redhat.com,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, kernel-team
+ <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+In-Reply-To: <ZvA6hIl6XWJ4UEJW@lore-desk>
+References: <cover.1726935917.git.lorenzo@kernel.org>
+ <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+ <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
+ <Zu_gvkXe4RYjJXtq@lore-desk> <87ldzkndqk.fsf@toke.dk>
+ <ZvA6hIl6XWJ4UEJW@lore-desk>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 26 Sep 2024 12:54:40 +0200
+Message-ID: <874j62u1lb.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240925152927.4579-1-kdipendra88@gmail.com>
+Content-Type: text/plain
 
-Hi Dipendra,
+Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
 
-kernel test robot noticed the following build errors:
+>> I'm hinting at some complications here (with the EFAULT return) that
+>> needs to be resolved: there is no guarantee that a given packet will be
+>> in sync with the current status of the registered metadata, so we need
+>> explicit checks for this. If metadata entries are de-registered again
+>> this also means dealing with holes and/or reshuffling the metadata
+>> layout to reuse the released space (incidentally, this is the one place
+>> where a TLV format would have advantages).
+>
+> I like this approach but it seems to me more suitable for 'sw' metadata
+> (this is main Arthur and Jakub use case iiuc) where the userspace would
+> enable/disable these functionalities system-wide.
+> Regarding device hw metadata (e.g. checksum offload) I can see some issues
+> since on a system we can have multiple NICs with different capabilities.
+> If we consider current codebase, stmmac driver supports only rx timestamp,
+> while mlx5 supports all of them. In a theoretical system with these two
+> NICs, since pkt_metadata_registry is global system-wide, we will end-up
+> with quite a lot of holes for the stmmac, right? (I am not sure if this
+> case is relevant or not). In other words, we will end-up with a fixed
+> struct for device rx hw metadata (like xdp_rx_meta). So I am wondering
+> if we really need all this complexity for xdp rx hw metadata?
 
-[auto build test ERROR on net/main]
+Well, the "holes" will be there anyway (in your static struct approach).
+They would just correspond to parts of the "struct xdp_rx_meta" being
+unset.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dipendra-Khadka/net-systemport-Add-error-pointer-checks-in-bcm_sysport_map_queues-and-bcm_sysport_unmap_queues/20240925-233508
-base:   net/main
-patch link:    https://lore.kernel.org/r/20240925152927.4579-1-kdipendra88%40gmail.com
-patch subject: [PATCH net v4] net: systemport: Add error pointer checks in bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240926/202409261836.eGX8TVKA-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 7773243d9916f98ba0ffce0c3a960e4aa9f03e81)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240926/202409261836.eGX8TVKA-lkp@intel.com/reproduce)
+What the "userspace can turn off the fields system wide" would
+accomplish is to *avoid* the holes if you know that you will never need
+them. E.g., say a system administrator know that they have no networks
+that use (offloaded) VLANs. They could then disable the vlan offload
+field system-wide, and thus reclaim the four bytes taken up by the
+"vlan" member of struct xdp_rx_meta, freeing that up for use by
+application metadata.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409261836.eGX8TVKA-lkp@intel.com/
+However, it may well be that the complexity of allowing fields to be
+turned off is not worth the gains. At least as long as there are only
+the couple of HW metadata fields that we have currently. Having the
+flexibility to change our minds later would be good, though, which is
+mostly a matter of making the API exposed to BPF and/or userspace
+flexible enough to allow us to move things around in memory in the
+future. Which was basically my thought with the API I sketched out in
+the previous email. I.e., you could go:
 
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/broadcom/bcmsysport.c:11:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     548 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/net/ethernet/broadcom/bcmsysport.c:11:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/net/ethernet/broadcom/bcmsysport.c:11:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:14:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     585 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   In file included from drivers/net/ethernet/broadcom/bcmsysport.c:14:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:10:
-   In file included from include/linux/mm.h:2232:
-   include/linux/vmstat.h:517:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/net/ethernet/broadcom/bcmsysport.c:2401:21: error: expected ';' after return statement
-    2401 |                 return PTR_ERR(dp));
-         |                                   ^
-         |                                   ;
-   7 warnings and 1 error generated.
+ret = bpf_get_packet_metadata_field(pkt, METADATA_ID_HW_HASH,
+                                    &my_hash_vlaue, sizeof(u32))
 
 
-vim +2401 drivers/net/ethernet/broadcom/bcmsysport.c
+...and the METADATA_ID_HW_HASH would be a constant defined by the
+kernel, for which the bpf_get_packet_metadata_field() kfunc just has a
+hardcoded lookup into struct xdp_rx_meta. And then, if we decide to move
+the field in the future, we just change the kfunc implementation, with
+no impact to the BPF programs calling it.
 
-  2389	
-  2390	static int bcm_sysport_unmap_queues(struct net_device *dev,
-  2391					    struct net_device *slave_dev)
-  2392	{
-  2393		struct bcm_sysport_priv *priv = netdev_priv(dev);
-  2394		struct bcm_sysport_tx_ring *ring;
-  2395		unsigned int num_tx_queues;
-  2396		unsigned int q, qp, port;
-  2397		struct dsa_port *dp;
-  2398	
-  2399		dp = dsa_port_from_netdev(slave_dev);
-  2400		if (IS_ERR(dp))
-> 2401			return PTR_ERR(dp));
-  2402	
-  2403		port = dp->index;
-  2404	
-  2405		num_tx_queues = slave_dev->real_num_tx_queues;
-  2406	
-  2407		for (q = 0; q < dev->num_tx_queues; q++) {
-  2408			ring = &priv->tx_rings[q];
-  2409	
-  2410			if (ring->switch_port != port)
-  2411				continue;
-  2412	
-  2413			if (!ring->inspect)
-  2414				continue;
-  2415	
-  2416			ring->inspect = false;
-  2417			qp = ring->switch_queue;
-  2418			priv->ring_map[qp + port * num_tx_queues] = NULL;
-  2419		}
-  2420	
-  2421		return 0;
-  2422	}
-  2423	
+> Maybe we can start with a simple approach for xdp rx hw metadata
+> putting the struct in xdp_frame as suggested by Jesper and covering
+> the most common use-cases. We can then integrate this approach with
+> Arthur/Jakub's solution without introducing any backward compatibility
+> issue since these field are not visible to userspace.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Yes, this is basically the gist of my suggestion (as I hopefully managed
+to clarify above): Expose the fields via an API that is flexible enough
+that we can move things around should the need arise, *and* which can
+co-exist with the user-defined application metadata.
+
+-Toke
+
 
