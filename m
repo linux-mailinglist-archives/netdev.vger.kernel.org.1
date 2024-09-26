@@ -1,94 +1,55 @@
-Return-Path: <netdev+bounces-129984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FCC9876BA
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:42:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DC99876C1
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9671F25BA9
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:42:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ECE81F2538D
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000301531CC;
-	Thu, 26 Sep 2024 15:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7281531C2;
+	Thu, 26 Sep 2024 15:43:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="YEXEwj5s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ocvum0iP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E4AE14D6F6
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8667713777E
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727365358; cv=none; b=Z2B0aZ8RbAtD37ULc+G3VnfKZKagCQQMOIN+WfZHL/7woOBMFZH6rdruH+Orff0aIWA8+lH0etUSxZaQeAppwFoWf3yiVwyCfpqQPWbUx2RUtwhPXZWE0t/kDHhtBQmSElLyU96qnses9HNF6bmpu8LF1dMc9yvHook6ALEmxe4=
+	t=1727365410; cv=none; b=noMCdmYv1oMHZfTLqZSfEdEN5ZDzNUwz4sZRh3/yeqFABp8ISMoN3QfoSaXVcvawitnWAuVBxZY0PTkiVM+4osOOqDUn7UDtPnZvzK5pc95WZ6OiWhV61CLzcxRNZPUFdqg4wYDhENOaznW3sqf9Xq6EgRlA45S3Ai3iyiU+NY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727365358; c=relaxed/simple;
-	bh=YuuuYFG9J6VIce5wSFAppgfU6UAh20cdv9dMb/gRV8o=;
+	s=arc-20240116; t=1727365410; c=relaxed/simple;
+	bh=mdTI3S3XFmSD6f8bQhYk9VdNzU5KONAoc7mNLtLK2Bs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RtwBRleTHuu5NtaMnjeyP1UvR4OzvjZFEhqlDhjAF2+/WcSjpvYZZ10VpxXSm3eD4frycQUdZ7sJfts0A896/sN7xuGbjosdKBE0VkWDmVtYntrl4jVR8Jx74WpS2zu9F1rLAwSgI/vpsc2biBHebHlJqXKf+4nWM7h3/rhA3x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=YEXEwj5s; arc=none smtp.client-ip=209.85.215.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso740137a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 08:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727365357; x=1727970157; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Mlojj9wGfJRRsMDZ0gQ5kDpNUAhG0uppHae6Ab1B3Y=;
-        b=YEXEwj5sSkdReSdTFRYnpGAAUl4aIMuDl9WwhAV006NHTSFEomnjWRFx3cjZE4BhE3
-         0HtJyVuWy6OkKRLdTHF/aVZgXC36jlzqTu4vy6IRmVDEPnKRDCb4WPwFpHqvWbAkInlN
-         d/7YIxb9iR0HyQQHPIixJp55APwq9hF1F+70U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727365357; x=1727970157;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0Mlojj9wGfJRRsMDZ0gQ5kDpNUAhG0uppHae6Ab1B3Y=;
-        b=b70b4G4dM5ppiXvRqEC2DbazIYoRdd5v96S84N8Nv6R+G0lMi3J7OAKvqBCdEg11pR
-         Wnq8swR21JzGMASrqUgCeIwG7QAoV/ThdbXIwNIb1XMUa7Ntu+EZ+HEdDMAbhybKA7ky
-         QASVJiAmyWKdyfVSpUX1TSYqtlCKSOsKoJRRuDGItigwA1sd8Be0nAUSDOJa/CGeugPQ
-         kD0pM00GK2SXChgvdduLzvsY5TBvYwdSX9CJ4SCrYIWY28iMCf1Bsdg8BWSQp/Pzlcou
-         6EMHcy/bK8EP+QiksRha+ydkWyT/TVxJ29TjcpAcjcc3p2s8SyrCNq3fKt6LxLw4bOBS
-         DwgA==
-X-Gm-Message-State: AOJu0YyNWRaT8qWnCGE/Afab8bsHkKW8kekaWlOxbGql8CY/L93iVd1O
-	9GVdKK6Z78VwdbahApoGt/l2TPYcPy+nEjy9Izh/u9wPjs7tuKkevVHkXIlWH1M=
-X-Google-Smtp-Source: AGHT+IHV6GaKXHNCkoA4zPQtCf/BXs58H6nmWQupzcXJs+pFzHTxNVQD3FC8Qak4VmK6OdZr0R4qqg==
-X-Received: by 2002:a17:90a:f989:b0:2d3:c976:dd80 with SMTP id 98e67ed59e1d1-2e0b8ee02admr111057a91.39.1727365356836;
-        Thu, 26 Sep 2024 08:42:36 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e06e1bb004sm3684740a91.19.2024.09.26.08.42.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 08:42:35 -0700 (PDT)
-Date: Thu, 26 Sep 2024 08:42:32 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, "K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 1/1] hv_netvsc: Link queues to NAPIs
-Message-ID: <ZvWA6BjwVfYXnDcA@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240924234851.42348-1-jdamato@fastly.com>
- <20240924234851.42348-2-jdamato@fastly.com>
- <20240926151024.GE4029621@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=asHKq2on0jI95VODiORwKRotR99g9sLSUkjyY4PySxvgkMCn62Ug/cT2y6aJ7TwjxT4fsN8GaA22eO8RPDFxFsaGKsCcYbjrbdyn/KUTVnltHDbuZQnMhn51dxozXGw5o/U4050u0T+89biJvDFZDunygZDn8xY/dwaadjFEYak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ocvum0iP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9B6C4CEC5;
+	Thu, 26 Sep 2024 15:43:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727365410;
+	bh=mdTI3S3XFmSD6f8bQhYk9VdNzU5KONAoc7mNLtLK2Bs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ocvum0iPq68u0gTgzZTQIT+wjv1x4+5Uh2aw2OYk3vGB1PuPhe7kAp+W1akYSYOvC
+	 zvxwvY8RcMc3GR1PVjsExVZ0psxU/obwVfVB9kW61esjz12pxJ3acDUt9L2mlY5U2h
+	 YS31ybDDFuctoO6AYnMeqN30oCRZCXzueqQ2LR3BYiP/fQ6oC/5dzsjAyj7iGB+ezu
+	 ia1EcTVekjeAXR5DHOIhmnTO7QDf3412lq286WzFb0wSHN6RY+2evVAbEnhkNtdCJR
+	 fNE2HBu3W16f7mum2cBkCqViC1OkrmBXhHoCjW0i654kk+kSYVOy36b1u3rXXf5vzI
+	 IDAibrIp3Sp4A==
+Date: Thu, 26 Sep 2024 16:43:26 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: edumazet@google.com, alexandre.ferrieux@orange.com,
+	nicolas.dichtel@6wind.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] ipv4: avoid quadratic behavior in FIB insertion
+ of common address
+Message-ID: <20240926154326.GF4029621@kernel.org>
+References: <20240926100807.3790287-1-alexandre.ferrieux@orange.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,42 +58,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240926151024.GE4029621@kernel.org>
+In-Reply-To: <20240926100807.3790287-1-alexandre.ferrieux@orange.com>
 
-On Thu, Sep 26, 2024 at 04:10:24PM +0100, Simon Horman wrote:
-> On Tue, Sep 24, 2024 at 11:48:51PM +0000, Joe Damato wrote:
-> > Use netif_queue_set_napi to link queues to NAPI instances so that they
-> > can be queried with netlink.
-> > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > ---
-> >  drivers/net/hyperv/netvsc.c       | 11 ++++++++++-
-> >  drivers/net/hyperv/rndis_filter.c |  9 +++++++--
-> >  2 files changed, 17 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-> > index 2b6ec979a62f..ccaa4690dba0 100644
-> > --- a/drivers/net/hyperv/netvsc.c
-> > +++ b/drivers/net/hyperv/netvsc.c
-> > @@ -712,8 +712,11 @@ void netvsc_device_remove(struct hv_device *device)
-> >  	for (i = 0; i < net_device->num_chn; i++) {
-> >  		/* See also vmbus_reset_channel_cb(). */
-> >  		/* only disable enabled NAPI channel */
-> > -		if (i < ndev->real_num_rx_queues)
-> > +		if (i < ndev->real_num_rx_queues) {
-> > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_TX, NULL);
-> > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_RX, NULL);
+On Thu, Sep 26, 2024 at 12:08:07PM +0200, Alexandre Ferrieux wrote:
+> Mix netns into all IPv4 FIB hashes to avoid massive collision
+> when inserting the same address in many netns.
 > 
-> Hi Joe,
-> 
-> When you post a non-RFC version of this patch, could you consider
-> line-wrapping the above to 80 columns, as is still preferred for
-> Networking code?
-> 
-> There is an option to checkpatch that will warn you about this.
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
 
-Thanks for letting me know.
+Hi Alexandre,
 
-I run checkpatch.pl --strict and usually it seems to let me know if
-I am over 80, but maybe there's another option I need?
+Thanks for your updated patch.
+
+net-next is currently closed for the v6.12 merge window. It should
+reopen next week, after v6.12-rc1 has been released. Please repost
+your patch, keeping in mind other feedback from Nicolas Dichtel after
+it has reopned.
+
+> ---
+>  net/ipv4/fib_semantics.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+> index ba2df3d2ac15..e25c8bc56067 100644
+> --- a/net/ipv4/fib_semantics.c
+> +++ b/net/ipv4/fib_semantics.c
+> @@ -347,11 +347,9 @@ static unsigned int fib_info_hashfn_1(int init_val, u8 protocol, u8 scope,
+>  	return val;
+>  }
+>  
+> -static unsigned int fib_info_hashfn_result(unsigned int val)
+> +static unsigned int fib_info_hashfn_result(const struct net *net, unsigned int val)
+
+Please line wrap the above so it fits within 80 columns, as is still
+preferred by Networking code.
+
+checkpatch can be run with an option to flag this.
+
+>  {
+> -	unsigned int mask = (fib_info_hash_size - 1);
+> -
+> -	return (val ^ (val >> 7) ^ (val >> 12)) & mask;
+> +	return hash_32(val ^ net_hash_mix(net), fib_info_hash_bits);
+>  }
+>  
+>  static inline unsigned int fib_info_hashfn(struct fib_info *fi)
+
+...
+
+-- 
+pw-bot: defer
 
