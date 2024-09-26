@@ -1,730 +1,370 @@
-Return-Path: <netdev+bounces-130027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C969879E1
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 21:58:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A56DF9879EC
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 21:59:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BA7F1C230E3
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 19:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 653B8286CBB
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 19:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4B3186285;
-	Thu, 26 Sep 2024 19:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE8B17BEB8;
+	Thu, 26 Sep 2024 19:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="t+zGwR8w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nU/oCeVh"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C9A18452E;
-	Thu, 26 Sep 2024 19:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E510C154C0A;
+	Thu, 26 Sep 2024 19:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727380661; cv=none; b=HaviA6x/djTGmAbvOGQTabqJlobqsTQiezYUERtliwIQYoNFos6WHJbSh+aU3co1V7j3a1WRzUffe0BcE0mwvdA4QrPuL5WYUEh2qWbWaHOTyKcSWXn+HI+cMZ79hMJ+JOihgJbabXfriJHhyU1LDwp4IlzvAlEMuWXB8zHl0Zg=
+	t=1727380781; cv=none; b=fdrq6SlohPNNc3kXRYq9zkMgeZje2QsmrKYYDxp4JIfR2VB/dWWsrhgV6HTdySlyTOzVdl/Nxy5cFR7UYs5GpdiWs3kqqSvoUbRK+u/Jp//8V6pFr3X92+1bwJ8w1RWtq2HQ7O8//XQQx1M7Ka6ucDSbEBJXug3XKv1DgghoMnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727380661; c=relaxed/simple;
-	bh=n2hAbay64muzc1eID9nyPUmEDgK2O385p6iWTnYMxH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PA2YCDnYbaBIu+4iRjLP4JJdBwVNzV5agXIsSBSCbFTFoeEddRicEf7GQ0EgcQnvLfX8cePb92kWphKp61sZurTvei252Q1JD1Jew9e7KTBcP1GBOPTkGN6LeK4NSj44FmTaJvlz8uuoxcFuYkCF6VKf4yC60uhyMR+NHCyD9Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=t+zGwR8w; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 9A05888DB6;
-	Thu, 26 Sep 2024 21:57:36 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727380657;
-	bh=AgQXQyEVKBTXVL/tY/YD8A/JUQF0aDO5JUyKmJLZr4w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=t+zGwR8woWUUeOFsVSb+JGLzwvZnKvWUHv2QeuVzR0Mh+4ece8jYnlS7xk8/pk6/1
-	 MsVPC2V+pHqeX7lXXJQzJcIiSeMcyz3XQsH6folXyydKYxddVPWWzYQTv+BJGCyXVO
-	 a0RX55wDwa4hLoZgBVbun4t3EI8IfBL6tfK8qcChqhRlykXjc6AEN8yb79SKoWT0rG
-	 yjlJLFmnIRrycvSalc1kFHaFx8yL8t2Th5cALHktnFiiKwhmRrCtvniuO3q03A+fTb
-	 TTkkHH6pyqfdaQ2wsQ0cFnUI7DUnzwGxj1Z+E/hufglM+FM3qq53aSCrMIPjFWfCz1
-	 ChW2V8lRkLkkQ==
-From: Marek Vasut <marex@denx.de>
-To: linux-wireless@vger.kernel.org
-Cc: Ajay Singh <ajay.kathat@microchip.com>,
-	Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Adham Abozaeid <adham.abozaeid@microchip.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kalle Valo <kvalo@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v6 7/7] wifi: wilc1000: Add WILC3000 support
-Date: Thu, 26 Sep 2024 21:55:47 +0200
-Message-ID: <20240926195700.2823751-7-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240926195700.2823751-1-marex@denx.de>
-References: <20240926195700.2823751-1-marex@denx.de>
+	s=arc-20240116; t=1727380781; c=relaxed/simple;
+	bh=B7xRmceLqOQECJKIP2YZzwCwsdhIJEa/XuxzZm3L1vE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XS3yJon4WMtZ+uZOxaFCKvsmkTrRhCf+zhuu1y1Uupxh7eNc5w27k4jkHWRmu5c4P7owE/cZNeDwFX5adCfD4MmlvYLqwFkTvVtBwrcPS8YoheHrnlOdQAL6w4eLNIjZbl7+z1vuT7SeLj/2SB1Ymt44Bixqg1n6pwRbP3lrsi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nU/oCeVh; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-374c1e5fe79so977612f8f.1;
+        Thu, 26 Sep 2024 12:59:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727380778; x=1727985578; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jN7DzpENRViOixLYvsj5FUd1KxtK1F+ddSDlgL0gXR4=;
+        b=nU/oCeVhdhkLBZndPxlIct2Wao6Mey2qtUtHAf8upfu9DeFHt35GN1qRB/N0RPhvMo
+         VvndYUkO0Ni/ab3rA449HAwKz7Ek4JwIpo8kiJfph+xQtidVxFTR6KgWxa9rFPrQLvsU
+         RTSUHlmuI6eXpdFO2qIPg0Mb+zeKJuuTjzLuY2f00r9tOqtdsxIHxpR26CXuWm+yi8Z1
+         5dnEeym+PHlhl0HCZHr79twp2dsledCnYD+yw3+pG9OJ4jECCJSi8xoryWtJirUrFJE2
+         i/r4g+MJptEf/fVQRyCjaNhAWTbfU08TXvx9O8PKR9Ubqpc5+iQqmsLl6D9s1DGlSoM1
+         8vuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727380778; x=1727985578;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jN7DzpENRViOixLYvsj5FUd1KxtK1F+ddSDlgL0gXR4=;
+        b=v7vYslLKmpFuq1VuY2x+7amCa/mY5En3/EpAwfUHOkhxc9ODtpCEDyFJgCkLKpT4u5
+         ISImzhrYaoTqscBOxFBtNbvxNq55jmyGXwDekMARNV125C0LAvPXu6JX6qSgsSRIJX+V
+         tbS3iXG9oESf/wXmHBMs6oZy1zSx6eYGQdXRdcNMwLdlB/QB6LN4YkeZEicipEQFgIik
+         9iWWIjXPThd1RmUQjoOLeG5LWGxl6EKMqyNHHfJ05x99bQbu5CPPH2Mwsxu1oHbkB2zZ
+         MFruHBvksEB4PWVGfmYthSYAZI7A3oQkt5vvBbt5vGuY3tkcalWcBi4g0K9PWB2JRQje
+         kkrA==
+X-Forwarded-Encrypted: i=1; AJvYcCV1k/7tyPcsi14eejzPnrwHg6Xaolk/2vmODaKXs/YFJ3wEFU9DpFiQegw/D3KFVB5kz1u3seb2beosaUk=@vger.kernel.org, AJvYcCWPAlXjRzriwEs0D1g/iXQL4XLovU/IKA5V0BwLuacffoTFYYTa+Y+N2NTr2QxJ/AL8xzSGNKqO@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvwZOlSP2wAdjgMfX7CBT+lY/dHuDkLQg4J3PN+tyx/IyYzvL7
+	0SIz18pu/L82hIPZwZilDw+mZ8K+kUChRBgJmEQYC9+gE4gli5BK/Ze+UA==
+X-Google-Smtp-Source: AGHT+IGqxxV43b9AZ83bp6yq01gUav0PxUNVKuBoUxm0BSLUtELWe4bs8vZbrpobZo6Vfnf1D9oleQ==
+X-Received: by 2002:a05:6000:1141:b0:378:89d8:822e with SMTP id ffacd0b85a97d-37cd5a99b65mr469450f8f.27.1727380777515;
+        Thu, 26 Sep 2024 12:59:37 -0700 (PDT)
+Received: from [192.168.178.20] (dh207-43-171.xnet.hr. [88.207.43.171])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c299e5bbsm32738466b.215.2024.09.26.12.59.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Sep 2024 12:59:37 -0700 (PDT)
+Message-ID: <40750d1b-ab1f-4ac4-93ad-97f3bd0aa142@gmail.com>
+Date: Thu, 26 Sep 2024 21:58:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/1] SUNRPC: Make enough room in servername[] for
+ AF_UNIX addresses
+To: NeilBrown <neilb@suse.de>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Chuck Lever <chuck.lever@oracle.com>,
+ Jeff Layton <jlayton@kernel.org>, Olga Kornievskaia <okorniev@redhat.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <> <1430dbab-0540-448b-b503-e53268f60bfc@gmail.com>
+ <172730054387.17050.12447592116066223771@noble.neil.brown.name>
+Content-Language: en-US
+From: Mirsad Todorovac <mtodorovac69@gmail.com>
+In-Reply-To: <172730054387.17050.12447592116066223771@noble.neil.brown.name>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-From: Ajay Singh <ajay.kathat@microchip.com>
+On 9/25/24 23:42, NeilBrown wrote:
+> On Thu, 26 Sep 2024, Mirsad Todorovac wrote:
+>> On 9/24/24 12:43, NeilBrown wrote:
+>>> On Tue, 24 Sep 2024, Mirsad Todorovac wrote:
+>>>> Hi, Neil,
+>>>>
+>>>> Apparently I was duplicating work.
+>>>>
+>>>> However, using
+>>>>
+>>>> 	char servername[UNIX_PATH_MAX];
+>>>>
+>>>> has some advantages when compared to hard-coded integer?
+>>>>
+>>>> Correct me if I'm wrong.
+>>>
+>>> I think you are wrong.  I agree that 48 is a poor choice.  I think that
+>>> UNIX_PATH_MAX is a poor choice too.  The "servername" string is used for
+>>> things other than a UNIX socket path.
+>>> Did you read all of the thread that I provided a link for?  I suggest a
+>>> more meaningful number in one of the later messages.
+>>
+>> I see. Thanks for the tip. However, if UNIX_PATH_MAX ever changes in the
+>> future, the decl
+>>
+>>     char servername[108];
+>>
+>> might be missed when fixing all the changes caused by the change of the
+>> macro definition? Am I wrong again?
+> 
+> Realistically UNIX_PATH_MAX is never going to change, and if it did that
+> would not affect the correctness of this code.
+> 
+>>
+>> Making it logically depend on the system limits might save some headache
+>> in the future, perhaps.
+> 
+> Unlikely.  Did you look to see what the failure mode is here?
+> servername is only ever used in log messages.  Truncating names in log
+> message at 8 bytes can certainly be annoying.  Truncating at 48 bytes is
+> much less of a problem.
 
-Add support for the WILC3000 chip. The chip is similar to WILC1000,
-except that the register layout is slightly different and it does
-not support WPA3/SAE.
+Well, I agree that in this particular case you are correct, but this is not
+about you or me being right or wrong, but that a macro would be more descriptive
+than "48" or "108", unless you are used to count the beads while chanting mantras
+:-)
 
-Signed-off-by: Ajay Singh <ajay.kathat@microchip.com>
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Note: Squashed and updated from the following downstream patches:
-wifi: wilc1000: wilc3000 support added
-wifi: wilc1000: wilc3000 interrupt handling
-wifi: wilc1000: wilc3000 added chip wake and sleep support
-wifi: wilc1000: wilc3000 FW file sepecific changes
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
-Cc: Ajay Singh <ajay.kathat@microchip.com>
-Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
-Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Cc: Conor Dooley <conor+dt@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kalle Valo <kvalo@kernel.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Rob Herring <robh@kernel.org>
-Cc: devicetree@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
-V2: - Return -EINVAL in wilc_sdio_init() if chip ID is not supported
-    - Dispose of wilc_chip_type, replace with is_wilc1000()/is_wilc3000()
-    - Remove wilc3000 DT compatible string handling, match on wilc1000 only,
-      the device type can be auto-detected based on chipID
-V3: - Define and use WILC3000_BOOTROM_STATUS and WILC3000_CORTUS_BOOT_REGISTER_2
-V4: - Fix up after dropping wilc_get_chipid() in netdev.c in 2/5
-V5: - Advertise WPA3/SAE to userspace only on WILC1000 in wilc_create_wiphy()
-V6: - Rebase on next-20240926
----
- .../wireless/microchip/wilc1000/cfg80211.c    |   4 +-
- .../net/wireless/microchip/wilc1000/netdev.c  |  27 ++-
- .../net/wireless/microchip/wilc1000/sdio.c    |  62 ++++-
- drivers/net/wireless/microchip/wilc1000/spi.c |   2 +-
- .../net/wireless/microchip/wilc1000/wlan.c    | 220 +++++++++++++++---
- .../net/wireless/microchip/wilc1000/wlan.h    |  45 +++-
- 6 files changed, 298 insertions(+), 62 deletions(-)
+>> If really the biggest string that will be copied there is: "/var/run/rpcbind.sock",
+>> you are then right - stack space is precious commodity, and allocating
+>> via kmalloc() might preempt the caller thread.
+> 
+> It might.  But the string is always passed to xprt_create_transport()
+> which always calls kstrdup() on it.  So maybe that doesn't matter.  (As
+> I said, understanding the big picture is important).
 
-diff --git a/drivers/net/wireless/microchip/wilc1000/cfg80211.c b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-index 30015c5920467..cdb4b0bbeab3b 100644
---- a/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-+++ b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
-@@ -1856,7 +1856,9 @@ EXPORT_SYMBOL_GPL(wilc_cfg80211_init);
- 
- int wilc_cfg80211_register(struct wilc *wilc)
- {
--	wilc->wiphy->features |= NL80211_FEATURE_SAE;
-+	/* WPA3/SAE supported only on WILC1000 */
-+	if (is_wilc1000(wilc->chipid))
-+		wilc->wiphy->features |= NL80211_FEATURE_SAE;
- 
- 	return wiphy_register(wilc->wiphy);
- }
-diff --git a/drivers/net/wireless/microchip/wilc1000/netdev.c b/drivers/net/wireless/microchip/wilc1000/netdev.c
-index 3e80d29a99ccf..920a15192a775 100644
---- a/drivers/net/wireless/microchip/wilc1000/netdev.c
-+++ b/drivers/net/wireless/microchip/wilc1000/netdev.c
-@@ -23,6 +23,12 @@
- #define __WILC1000_FW(api)		WILC1000_FW_PREFIX #api ".bin"
- #define WILC1000_FW(api)		__WILC1000_FW(api)
- 
-+#define WILC3000_API_VER		1
-+
-+#define WILC3000_FW_PREFIX		"atmel/wilc3000_wifi_firmware-"
-+#define __WILC3000_FW(api)		WILC3000_FW_PREFIX #api ".bin"
-+#define WILC3000_FW(api)		__WILC3000_FW(api)
-+
- static irqreturn_t isr_uh_routine(int irq, void *user_data)
- {
- 	struct wilc *wilc = user_data;
-@@ -196,19 +202,23 @@ static int wilc_wlan_get_firmware(struct net_device *dev)
- 	struct wilc_vif *vif = netdev_priv(dev);
- 	struct wilc *wilc = vif->wilc;
- 	const struct firmware *wilc_fw;
-+	char *firmware;
- 	int ret;
- 
--	if (!is_wilc1000(wilc->chipid))
-+	if (is_wilc1000(wilc->chipid))
-+		firmware = WILC1000_FW(WILC1000_API_VER);
-+	else if (is_wilc3000(wilc->chipid))
-+		firmware = WILC3000_FW(WILC3000_API_VER);
-+	else
- 		return -EINVAL;
- 
--	netdev_info(dev, "WILC1000 loading firmware [%s]\n",
-+	netdev_info(dev, "WILC%d loading firmware [%s]\n",
-+		    is_wilc1000(wilc->chipid) ? 1000 : 3000,
- 		    WILC1000_FW(WILC1000_API_VER));
- 
--	ret = request_firmware(&wilc_fw, WILC1000_FW(WILC1000_API_VER),
--			       wilc->dev);
-+	ret = request_firmware(&wilc_fw, firmware, wilc->dev);
- 	if (ret != 0) {
--		netdev_err(dev, "%s - firmware not available\n",
--			   WILC1000_FW(WILC1000_API_VER));
-+		netdev_err(dev, "%s - firmware not available\n", firmware);
- 		return -EINVAL;
- 	}
- 	wilc->firmware = wilc_fw;
-@@ -233,7 +243,7 @@ static int wilc_start_firmware(struct net_device *dev)
- 	return 0;
- }
- 
--static int wilc1000_firmware_download(struct net_device *dev)
-+static int wilc_firmware_download(struct net_device *dev)
- {
- 	struct wilc_vif *vif = netdev_priv(dev);
- 	struct wilc *wilc = vif->wilc;
-@@ -528,7 +538,7 @@ static int wilc_wlan_initialize(struct net_device *dev, struct wilc_vif *vif)
- 		if (ret)
- 			goto fail_irq_enable;
- 
--		ret = wilc1000_firmware_download(dev);
-+		ret = wilc_firmware_download(dev);
- 		if (ret)
- 			goto fail_irq_enable;
- 
-@@ -1014,3 +1024,4 @@ EXPORT_SYMBOL_GPL(wilc_netdev_ifc_init);
- MODULE_DESCRIPTION("Atmel WILC1000 core wireless driver");
- MODULE_LICENSE("GPL");
- MODULE_FIRMWARE(WILC1000_FW(WILC1000_API_VER));
-+MODULE_FIRMWARE(WILC3000_FW(WILC3000_API_VER));
-diff --git a/drivers/net/wireless/microchip/wilc1000/sdio.c b/drivers/net/wireless/microchip/wilc1000/sdio.c
-index 56a929281d6a7..5262c8846c13d 100644
---- a/drivers/net/wireless/microchip/wilc1000/sdio.c
-+++ b/drivers/net/wireless/microchip/wilc1000/sdio.c
-@@ -810,13 +810,19 @@ static int wilc_sdio_read_int(struct wilc *wilc, u32 *int_status)
- 		cmd.address = WILC_SDIO_EXT_IRQ_FLAG_REG;
- 	} else {
- 		cmd.function = 0;
--		cmd.address = WILC_SDIO_IRQ_FLAG_REG;
-+		cmd.address = is_wilc1000(wilc->chipid) ?
-+			      WILC1000_SDIO_IRQ_FLAG_REG :
-+			      WILC3000_SDIO_IRQ_FLAG_REG;
- 	}
- 	cmd.raw = 0;
- 	cmd.read_write = 0;
- 	cmd.data = 0;
- 	wilc_sdio_cmd52(wilc, &cmd);
- 	irq_flags = cmd.data;
-+
-+	if (sdio_priv->irq_gpio)
-+		irq_flags &= is_wilc1000(wilc->chipid) ? 0x1f : 0x0f;
-+
- 	tmp |= FIELD_PREP(IRG_FLAGS_MASK, cmd.data);
- 
- 	if (FIELD_GET(UNHANDLED_IRQ_MASK, irq_flags))
-@@ -838,22 +844,56 @@ static int wilc_sdio_clear_int_ext(struct wilc *wilc, u32 val)
- 	if (sdio_priv->irq_gpio)
- 		reg = val & (BIT(MAX_NUM_INT) - 1);
- 
--	/* select VMM table 0 */
--	if (val & SEL_VMM_TBL0)
--		reg |= BIT(5);
--	/* select VMM table 1 */
--	if (val & SEL_VMM_TBL1)
--		reg |= BIT(6);
--	/* enable VMM */
--	if (val & EN_VMM)
--		reg |= BIT(7);
-+	if (is_wilc1000(wilc->chipid)) {
-+		/* select VMM table 0 */
-+		if (val & SEL_VMM_TBL0)
-+			reg |= BIT(5);
-+		/* select VMM table 1 */
-+		if (val & SEL_VMM_TBL1)
-+			reg |= BIT(6);
-+		/* enable VMM */
-+		if (val & EN_VMM)
-+			reg |= BIT(7);
-+	} else {
-+		if (sdio_priv->irq_gpio && reg) {
-+			struct sdio_cmd52 cmd;
-+
-+			cmd.read_write = 1;
-+			cmd.function = 0;
-+			cmd.raw = 0;
-+			cmd.address = WILC3000_SDIO_IRQ_FLAG_REG;
-+			cmd.data = reg;
-+
-+			ret = wilc_sdio_cmd52(wilc, &cmd);
-+			if (ret) {
-+				dev_err(&func->dev,
-+					"Failed cmd52, set 0xfe data (%d) ...\n",
-+					__LINE__);
-+				return ret;
-+			}
-+		}
-+
-+		reg = 0;
-+		/* select VMM table 0 */
-+		if (val & SEL_VMM_TBL0)
-+			reg |= BIT(0);
-+		/* select VMM table 1 */
-+		if (val & SEL_VMM_TBL1)
-+			reg |= BIT(1);
-+		/* enable VMM */
-+		if (val & EN_VMM)
-+			reg |= BIT(2);
-+	}
-+
- 	if (reg) {
- 		struct sdio_cmd52 cmd;
- 
- 		cmd.read_write = 1;
- 		cmd.function = 0;
- 		cmd.raw = 0;
--		cmd.address = WILC_SDIO_IRQ_CLEAR_FLAG_REG;
-+		cmd.address = is_wilc1000(wilc->chipid) ?
-+			      WILC1000_SDIO_IRQ_CLEAR_FLAG_REG :
-+			      WILC3000_SDIO_VMM_TBL_CTRL_REG;
- 		cmd.data = reg;
- 
- 		ret = wilc_sdio_cmd52(wilc, &cmd);
-diff --git a/drivers/net/wireless/microchip/wilc1000/spi.c b/drivers/net/wireless/microchip/wilc1000/spi.c
-index 28d211ee60096..ce2a9cdd6aa78 100644
---- a/drivers/net/wireless/microchip/wilc1000/spi.c
-+++ b/drivers/net/wireless/microchip/wilc1000/spi.c
-@@ -1233,7 +1233,7 @@ static int wilc_validate_chipid(struct wilc *wilc)
- 		dev_err(&spi->dev, "Fail cmd read chip id...\n");
- 		return ret;
- 	}
--	if (!is_wilc1000(chipid)) {
-+	if (!is_wilc1000(chipid) && !is_wilc3000(chipid)) {
- 		dev_err(&spi->dev, "Unknown chip id 0x%x\n", chipid);
- 		return -ENODEV;
- 	}
-diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
-index 1aab8eca58169..0c0f78b97ba3f 100644
---- a/drivers/net/wireless/microchip/wilc1000/wlan.c
-+++ b/drivers/net/wireless/microchip/wilc1000/wlan.c
-@@ -541,7 +541,7 @@ static struct rxq_entry_t *wilc_wlan_rxq_remove(struct wilc *wilc)
- 	return rqe;
- }
- 
--static int chip_allow_sleep(struct wilc *wilc)
-+static int chip_allow_sleep_wilc1000(struct wilc *wilc)
- {
- 	u32 reg = 0;
- 	const struct wilc_hif_func *hif_func = wilc->hif_func;
-@@ -601,7 +601,41 @@ static int chip_allow_sleep(struct wilc *wilc)
- 	return 0;
- }
- 
--static int chip_wakeup(struct wilc *wilc)
-+static int chip_allow_sleep_wilc3000(struct wilc *wilc)
-+{
-+	u32 reg = 0;
-+	int ret;
-+	const struct wilc_hif_func *hif_func = wilc->hif_func;
-+
-+	if (wilc->io_type == WILC_HIF_SDIO) {
-+		ret = hif_func->hif_read_reg(wilc, WILC_SDIO_WAKEUP_REG, &reg);
-+		if (ret)
-+			return ret;
-+		ret = hif_func->hif_write_reg(wilc, WILC_SDIO_WAKEUP_REG,
-+					      reg & ~WILC_SDIO_WAKEUP_BIT);
-+		if (ret)
-+			return ret;
-+	} else {
-+		ret = hif_func->hif_read_reg(wilc, WILC_SPI_WAKEUP_REG, &reg);
-+		if (ret)
-+			return ret;
-+		ret = hif_func->hif_write_reg(wilc, WILC_SPI_WAKEUP_REG,
-+					      reg & ~WILC_SPI_WAKEUP_BIT);
-+		if (ret)
-+			return ret;
-+	}
-+	return 0;
-+}
-+
-+static int chip_allow_sleep(struct wilc *wilc)
-+{
-+	if (is_wilc1000(wilc->chipid))
-+		return chip_allow_sleep_wilc1000(wilc);
-+	else
-+		return chip_allow_sleep_wilc3000(wilc);
-+}
-+
-+static int chip_wakeup_wilc1000(struct wilc *wilc)
- {
- 	u32 ret = 0;
- 	u32 clk_status_val = 0, trials = 0;
-@@ -613,15 +647,15 @@ static int chip_wakeup(struct wilc *wilc)
- 	if (wilc->io_type == WILC_HIF_SDIO) {
- 		wakeup_reg = WILC_SDIO_WAKEUP_REG;
- 		wakeup_bit = WILC_SDIO_WAKEUP_BIT;
--		clk_status_reg = WILC_SDIO_CLK_STATUS_REG;
--		clk_status_bit = WILC_SDIO_CLK_STATUS_BIT;
-+		clk_status_reg = WILC1000_SDIO_CLK_STATUS_REG;
-+		clk_status_bit = WILC1000_SDIO_CLK_STATUS_BIT;
- 		from_host_to_fw_reg = WILC_SDIO_HOST_TO_FW_REG;
- 		from_host_to_fw_bit = WILC_SDIO_HOST_TO_FW_BIT;
- 	} else {
- 		wakeup_reg = WILC_SPI_WAKEUP_REG;
- 		wakeup_bit = WILC_SPI_WAKEUP_BIT;
--		clk_status_reg = WILC_SPI_CLK_STATUS_REG;
--		clk_status_bit = WILC_SPI_CLK_STATUS_BIT;
-+		clk_status_reg = WILC1000_SPI_CLK_STATUS_REG;
-+		clk_status_bit = WILC1000_SPI_CLK_STATUS_BIT;
- 		from_host_to_fw_reg = WILC_SPI_HOST_TO_FW_REG;
- 		from_host_to_fw_bit = WILC_SPI_HOST_TO_FW_BIT;
- 	}
-@@ -663,6 +697,74 @@ static int chip_wakeup(struct wilc *wilc)
- 	return 0;
- }
- 
-+static int chip_wakeup_wilc3000(struct wilc *wilc)
-+{
-+	u32 wakeup_reg_val, clk_status_reg_val, trials = 0;
-+	u32 wakeup_reg, wakeup_bit;
-+	u32 clk_status_reg, clk_status_bit;
-+	int wake_seq_trials = 5;
-+	const struct wilc_hif_func *hif_func = wilc->hif_func;
-+
-+	if (wilc->io_type == WILC_HIF_SDIO) {
-+		wakeup_reg = WILC_SDIO_WAKEUP_REG;
-+		wakeup_bit = WILC_SDIO_WAKEUP_BIT;
-+		clk_status_reg = WILC3000_SDIO_CLK_STATUS_REG;
-+		clk_status_bit = WILC3000_SDIO_CLK_STATUS_BIT;
-+	} else {
-+		wakeup_reg = WILC_SPI_WAKEUP_REG;
-+		wakeup_bit = WILC_SPI_WAKEUP_BIT;
-+		clk_status_reg = WILC3000_SPI_CLK_STATUS_REG;
-+		clk_status_bit = WILC3000_SPI_CLK_STATUS_BIT;
-+	}
-+
-+	hif_func->hif_read_reg(wilc, wakeup_reg, &wakeup_reg_val);
-+	do {
-+		hif_func->hif_write_reg(wilc, wakeup_reg, wakeup_reg_val |
-+							  wakeup_bit);
-+		/* Check the clock status */
-+		hif_func->hif_read_reg(wilc, clk_status_reg,
-+				       &clk_status_reg_val);
-+
-+		/* In case of clocks off, wait 1ms, and check it again.
-+		 * if still off, wait for another 1ms, for a total wait of 3ms.
-+		 * If still off, redo the wake up sequence
-+		 */
-+		while ((clk_status_reg_val & clk_status_bit) == 0 &&
-+		       (++trials % 4) != 0) {
-+			/* Wait for the chip to stabilize*/
-+			usleep_range(1000, 1100);
-+
-+			/* Make sure chip is awake. This is an extra step that
-+			 * can be removed later to avoid the bus access
-+			 * overhead
-+			 */
-+			hif_func->hif_read_reg(wilc, clk_status_reg,
-+					       &clk_status_reg_val);
-+		}
-+		/* in case of failure, Reset the wakeup bit to introduce a new
-+		 * edge on the next loop
-+		 */
-+		if ((clk_status_reg_val & clk_status_bit) == 0) {
-+			hif_func->hif_write_reg(wilc, wakeup_reg,
-+						wakeup_reg_val & (~wakeup_bit));
-+			/* added wait before wakeup sequence retry */
-+			usleep_range(200, 300);
-+		}
-+	} while ((clk_status_reg_val & clk_status_bit) == 0 && wake_seq_trials-- > 0);
-+	if (!wake_seq_trials)
-+		dev_err(wilc->dev, "clocks still OFF. Wake up failed\n");
-+
-+	return 0;
-+}
-+
-+static int chip_wakeup(struct wilc *wilc)
-+{
-+	if (is_wilc1000(wilc->chipid))
-+		return chip_wakeup_wilc1000(wilc);
-+	else
-+		return chip_wakeup_wilc3000(wilc);
-+}
-+
- static inline int acquire_bus(struct wilc *wilc, enum bus_acquire acquire)
- {
- 	int ret = 0;
-@@ -695,7 +797,9 @@ int host_wakeup_notify(struct wilc *wilc)
- 	if (ret)
- 		return ret;
- 
--	wilc->hif_func->hif_write_reg(wilc, WILC_CORTUS_INTERRUPT_2, 1);
-+	wilc->hif_func->hif_write_reg(wilc, is_wilc1000(wilc->chipid) ?
-+					    WILC1000_CORTUS_INTERRUPT_2 :
-+					    WILC3000_CORTUS_INTERRUPT_2, 1);
- 	return release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP);
- }
- EXPORT_SYMBOL_GPL(host_wakeup_notify);
-@@ -707,7 +811,9 @@ int host_sleep_notify(struct wilc *wilc)
- 	if (ret)
- 		return ret;
- 
--	wilc->hif_func->hif_write_reg(wilc, WILC_CORTUS_INTERRUPT_1, 1);
-+	wilc->hif_func->hif_write_reg(wilc, is_wilc1000(wilc->chipid) ?
-+					    WILC1000_CORTUS_INTERRUPT_1 :
-+					    WILC3000_CORTUS_INTERRUPT_1, 1);
- 	return release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP);
- }
- EXPORT_SYMBOL_GPL(host_sleep_notify);
-@@ -842,19 +948,45 @@ int wilc_wlan_handle_txq(struct wilc *wilc, u32 *txq_count)
- 		if (ret)
- 			break;
- 
--		ret = func->hif_write_reg(wilc, WILC_HOST_VMM_CTL, 0x2);
--		if (ret)
--			break;
-+		if (is_wilc1000(wilc->chipid)) {
-+			ret = func->hif_write_reg(wilc, WILC_HOST_VMM_CTL, 0x2);
-+			if (ret)
-+				break;
- 
--		do {
--			ret = func->hif_read_reg(wilc, WILC_HOST_VMM_CTL, &reg);
-+			do {
-+				ret = func->hif_read_reg(wilc, WILC_HOST_VMM_CTL, &reg);
-+				if (ret)
-+					break;
-+				if (FIELD_GET(WILC_VMM_ENTRY_AVAILABLE, reg)) {
-+					entries = FIELD_GET(WILC_VMM_ENTRY_COUNT, reg);
-+					break;
-+				}
-+			} while (--timeout);
-+		} else {
-+			ret = func->hif_write_reg(wilc, WILC_HOST_VMM_CTL, 0);
- 			if (ret)
- 				break;
--			if (FIELD_GET(WILC_VMM_ENTRY_AVAILABLE, reg)) {
--				entries = FIELD_GET(WILC_VMM_ENTRY_COUNT, reg);
-+
-+			/* interrupt firmware */
-+			ret = func->hif_write_reg(wilc, WILC_CORTUS_INTERRUPT_BASE, 1);
-+			if (ret)
- 				break;
--			}
--		} while (--timeout);
-+
-+			do {
-+				ret = func->hif_read_reg(wilc, WILC_CORTUS_INTERRUPT_BASE, &reg);
-+				if (ret)
-+					break;
-+				if (reg == 0) {
-+					/* Get the entries */
-+					ret = func->hif_read_reg(wilc, WILC_HOST_VMM_CTL, &reg);
-+					if (ret)
-+						break;
-+
-+					entries = FIELD_GET(WILC_VMM_ENTRY_COUNT, reg);
-+					break;
-+				}
-+			} while (--timeout);
-+		}
- 		if (timeout <= 0) {
- 			ret = func->hif_write_reg(wilc, WILC_HOST_VMM_CTL, 0x0);
- 			break;
-@@ -1212,6 +1344,9 @@ int wilc_wlan_start(struct wilc *wilc)
- 	if (wilc->io_type == WILC_HIF_SDIO && wilc->dev_irq_num)
- 		reg |= WILC_HAVE_SDIO_IRQ_GPIO;
- 
-+	if (is_wilc3000(wilc->chipid))
-+		reg |= WILC_HAVE_SLEEP_CLK_SRC_RTC;
-+
- 	ret = wilc->hif_func->hif_write_reg(wilc, WILC_GP_REG_1, reg);
- 	if (ret)
- 		goto release;
-@@ -1462,21 +1597,25 @@ int wilc_get_chipid(struct wilc *wilc)
- 	u32 rfrevid = 0;
- 
- 	if (wilc->chipid == 0) {
--		wilc->hif_func->hif_read_reg(wilc, WILC_CHIPID, &chipid);
--		wilc->hif_func->hif_read_reg(wilc, WILC_RF_REVISION_ID,
--					     &rfrevid);
--		if (!is_wilc1000(chipid)) {
--			wilc->chipid = 0;
--			return -EINVAL;
--		}
--		if (chipid == WILC_1000_BASE_ID_2A) { /* 0x1002A0 */
--			if (rfrevid != 0x1)
--				chipid = WILC_1000_BASE_ID_2A_REV1;
--		} else if (chipid == WILC_1000_BASE_ID_2B) { /* 0x1002B0 */
--			if (rfrevid == 0x4)
--				chipid = WILC_1000_BASE_ID_2B_REV1;
--			else if (rfrevid != 0x3)
--				chipid = WILC_1000_BASE_ID_2B_REV2;
-+		wilc->hif_func->hif_read_reg(wilc, WILC3000_CHIP_ID, &chipid);
-+		if (!is_wilc3000(chipid)) {
-+			wilc->hif_func->hif_read_reg(wilc, WILC_CHIPID, &chipid);
-+			wilc->hif_func->hif_read_reg(wilc, WILC_RF_REVISION_ID,
-+						     &rfrevid);
-+
-+			if (!is_wilc1000(chipid)) {
-+				wilc->chipid = 0;
-+				return -EINVAL;
-+			}
-+			if (chipid == WILC_1000_BASE_ID_2A) { /* 0x1002A0 */
-+				if (rfrevid != 0x1)
-+					chipid = WILC_1000_BASE_ID_2A_REV1;
-+			} else if (chipid == WILC_1000_BASE_ID_2B) { /* 0x1002B0 */
-+				if (rfrevid == 0x4)
-+					chipid = WILC_1000_BASE_ID_2B_REV1;
-+				else if (rfrevid != 0x3)
-+					chipid = WILC_1000_BASE_ID_2B_REV2;
-+			}
- 		}
- 
- 		wilc->chipid = chipid;
-@@ -1525,6 +1664,21 @@ static int init_chip(struct net_device *dev)
- 		}
- 	}
- 
-+	if (is_wilc3000(wilc->chipid)) {
-+		ret = wilc->hif_func->hif_read_reg(wilc, WILC3000_BOOTROM_STATUS, &reg);
-+		if (ret) {
-+			netdev_err(dev, "failed to read WILC3000 BootROM status register\n");
-+			goto release;
-+		}
-+
-+		ret = wilc->hif_func->hif_write_reg(wilc, WILC3000_CORTUS_BOOT_REGISTER_2,
-+						    WILC_CORTUS_BOOT_FROM_IRAM);
-+		if (ret) {
-+			netdev_err(dev, "failed to write WILC3000 Boot register\n");
-+			goto release;
-+		}
-+	}
-+
- release:
- 	rv = release_bus(wilc, WILC_BUS_RELEASE_ALLOW_SLEEP);
- 
-@@ -1606,7 +1760,7 @@ int wilc_wlan_init(struct net_device *dev)
- 		if (ret)
- 			goto fail;
- 
--		if (!is_wilc1000(wilc->chipid)) {
-+		if (!is_wilc1000(wilc->chipid) && !is_wilc3000(wilc->chipid)) {
- 			netdev_err(dev, "Unsupported chipid: %x\n", wilc->chipid);
- 			ret = -EINVAL;
- 			goto fail;
-diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.h b/drivers/net/wireless/microchip/wilc1000/wlan.h
-index 552590823e444..b9e7f9222eadd 100644
---- a/drivers/net/wireless/microchip/wilc1000/wlan.h
-+++ b/drivers/net/wireless/microchip/wilc1000/wlan.h
-@@ -96,8 +96,14 @@
- #define WILC_SPI_WAKEUP_REG		0x1
- #define WILC_SPI_WAKEUP_BIT		BIT(1)
- 
--#define WILC_SPI_CLK_STATUS_REG        0x0f
--#define WILC_SPI_CLK_STATUS_BIT        BIT(2)
-+/* WILC1000 specific */
-+#define WILC1000_SPI_CLK_STATUS_REG	0x0f
-+#define WILC1000_SPI_CLK_STATUS_BIT	BIT(2)
-+
-+/* WILC3000 specific */
-+#define WILC3000_SPI_CLK_STATUS_REG	0x13
-+#define WILC3000_SPI_CLK_STATUS_BIT	BIT(2)
-+
- #define WILC_SPI_HOST_TO_FW_REG		0x0b
- #define WILC_SPI_HOST_TO_FW_BIT		BIT(0)
- 
-@@ -123,14 +129,24 @@
- #define WILC_SDIO_WAKEUP_REG		0xf0
- #define WILC_SDIO_WAKEUP_BIT		BIT(0)
- 
--#define WILC_SDIO_CLK_STATUS_REG	0xf1
--#define WILC_SDIO_CLK_STATUS_BIT	BIT(0)
-+/* WILC1000 */
-+#define WILC1000_SDIO_CLK_STATUS_REG	0xf1
-+#define WILC1000_SDIO_CLK_STATUS_BIT	BIT(0)
-+
-+#define WILC1000_SDIO_IRQ_FLAG_REG	0xf7
-+#define WILC1000_SDIO_IRQ_CLEAR_FLAG_REG	0xf8
-+
-+/* WILC3000 specific */
-+#define WILC3000_SDIO_CLK_STATUS_REG	0xf0 /* clk & wakeup are on same reg */
-+#define WILC3000_SDIO_CLK_STATUS_BIT	BIT(4)
-+
-+#define WILC3000_SDIO_VMM_TBL_CTRL_REG	0xf1
-+#define WILC3000_SDIO_IRQ_FLAG_REG	0xfe
- 
-+/* Common vendor specific CCCR register */
- #define WILC_SDIO_INTERRUPT_DATA_SZ_REG	0xf2 /* Read size (2 bytes) */
- 
- #define WILC_SDIO_VMM_TBL_CTRL_REG	0xf6
--#define WILC_SDIO_IRQ_FLAG_REG		0xf7
--#define WILC_SDIO_IRQ_CLEAR_FLAG_REG	0xf8
- 
- #define WILC_SDIO_HOST_TO_FW_REG	0xfa
- #define WILC_SDIO_HOST_TO_FW_BIT	BIT(0)
-@@ -172,8 +188,11 @@
- #define WILC_HAVE_USE_IRQ_AS_HOST_WAKE	BIT(8)
- 
- #define WILC_CORTUS_INTERRUPT_BASE	0x10A8
--#define WILC_CORTUS_INTERRUPT_1		(WILC_CORTUS_INTERRUPT_BASE + 0x4)
--#define WILC_CORTUS_INTERRUPT_2		(WILC_CORTUS_INTERRUPT_BASE + 0x8)
-+#define WILC1000_CORTUS_INTERRUPT_1	(WILC_CORTUS_INTERRUPT_BASE + 0x4)
-+#define WILC3000_CORTUS_INTERRUPT_1	(WILC_CORTUS_INTERRUPT_BASE + 0x14)
-+
-+#define WILC1000_CORTUS_INTERRUPT_2	(WILC_CORTUS_INTERRUPT_BASE + 0x8)
-+#define WILC3000_CORTUS_INTERRUPT_2	(WILC_CORTUS_INTERRUPT_BASE + 0x18)
- 
- /* tx control register 1 to 4 for RX */
- #define WILC_REG_4_TO_1_RX		0x1e1c
-@@ -183,6 +202,9 @@
- 
- #define WILC_CORTUS_RESET_MUX_SEL	0x1118
- #define WILC_CORTUS_BOOT_REGISTER	0xc0000
-+#define WILC3000_BOOTROM_STATUS		0x207ac
-+#define WILC3000_CORTUS_BOOT_REGISTER_2	0x4f0000
-+#define WILC3000_CHIP_ID		0x3b0000
- 
- #define WILC_CORTUS_BOOT_FROM_IRAM	0x71
- 
-@@ -195,6 +217,8 @@
- #define WILC_1000_BASE_ID_2B_REV1	(WILC_1000_BASE_ID_2B + 1)
- #define WILC_1000_BASE_ID_2B_REV2	(WILC_1000_BASE_ID_2B + 2)
- 
-+#define WILC_3000_BASE_ID		0x300000
-+
- #define WILC_CHIP_REV_FIELD		GENMASK(11, 0)
- 
- /********************************************
-@@ -413,6 +437,11 @@ static inline bool is_wilc1000(u32 id)
- 	return (id & (~WILC_CHIP_REV_FIELD)) == WILC_1000_BASE_ID;
- }
- 
-+static inline bool is_wilc3000(u32 id)
-+{
-+	return (id & (~WILC_CHIP_REV_FIELD)) == WILC_3000_BASE_ID;
-+}
-+
- int wilc_wlan_firmware_download(struct wilc *wilc, const u8 *buffer,
- 				u32 buffer_size);
- int wilc_wlan_start(struct wilc *wilc);
--- 
-2.45.2
+Ah. I agree, this is why I consider myself a disciple. While in the old
+system it was considered asa breach of teacher's authority, other schools
+of thinking encouraged questions and debate. ;-)
 
+>> However, you got to this five weeks earlier - but the patch did not
+>> propagate to the main vanilla torvalds tree.
+> 
+> Actually it has.
+> 
+> Commit 9090a7f78623 ("SUNRPC: Fix -Wformat-truncation warning")
+> 
+> $ git show --format=fuller  9090a7f78623 | grep CommitDate
+> CommitDate: Mon Sep 23 15:03:13 2024 -0400
+> 
+> Linus merged it 
+> Commit 684a64bf32b6 ("Merge tag 'nfs-for-6.12-1' of git://git.linux-nfs.org/projects/anna/linux-nfs")
+> Date:   Tue Sep 24 15:44:18 2024 -0700
+> 
+> That patch used RPC_MAXNETNAMELEN which is the least-ugly simple fix.
+
+Yes, my build was somewhat before that date:
+
+-rw-r--r-- 1 root root 18977280 Sep 21 15:44 vmlinuz-6.11.0-gc13-x86-64-tmem-07462-g1868f9d0260e
+
+But I whole-heartedly agree with not taking a literal integer. As we build things to last,
+in a "design for life", so I believe that self-documenting source isan advantage to the
+counting of places where some integers appear, and what each one meant.
+
+As I said before, this is nothing target SUNRPC implementation, it was among the first compiler
+warnings with make W=1 in build. I apologise if that sounded personal.
+
+> Thanks for your interest in improving Linux.
+
+You are most welcome. Thank you for your kind remark.
+
+I am glad that you recognise my bug reports as a positive contribution, despite sometimes (or often)
+duplicating work. But, please understand, on my level I do not even have enough disk space for all
+the trees, let alone building all of them.
+
+Maybe the best I could promise is to test linux-next and net-next trees.
+
+Probably I could give more meaningful contribution with some expert advice, even when this episode
+on SUNRPC was not a waste of time, but an opportunity to learn from the best. :-)
+
+Best regards,
+Mirsad Todorovac
+
+> NeilBrown
+> 
+>>
+>> Best regards,
+>> Mirsad Todorovac
+>>
+>>> But I really think that the problem here is the warning.  The servername
+>>> array is ALWAYS big enough for any string that will actually be copied
+>>> into it.  gcc isn't clever enough to detect that, but it tries to be
+>>> clever enough to tell you that even though you used snprintf so you know
+>>> that the string might in theory overflow, it decides to warn you about
+>>> something you already know.
+>>>
+>>> i.e.  if you want to fix this, I would rather you complain the the
+>>> compiler writers.  Or maybe suggest a #pragma to silence the warning in
+>>> this case.  Or maybe examine all of the code instead of the one line
+>>> that triggers the warning and see if there is a better approach to
+>>> providing the functionality that is being provided here.
+>>>
+>>> NeilBrown
+>>>
+>>>>
+>>>> Best regards,
+>>>> Mirsad Todorovac
+>>>>
+>>>> On 9/23/24 23:24, NeilBrown wrote:
+>>>>> On Tue, 24 Sep 2024, Mirsad Todorovac wrote:
+>>>>>> GCC 13.2.0 reported with W=1 build option the following warning:
+>>>>>
+>>>>> See
+>>>>>   https://lore.kernel.org/all/20240814093853.48657-1-kunwu.chan@linux.dev/
+>>>>>
+>>>>> I don't think anyone really cares about this one.
+>>>>>
+>>>>> NeilBrown
+>>>>>
+>>>>>
+>>>>>>
+>>>>>> net/sunrpc/clnt.c: In function ‘rpc_create’:
+>>>>>> net/sunrpc/clnt.c:582:75: warning: ‘%s’ directive output may be truncated writing up to 107 bytes into \
+>>>>>> 					a region of size 48 [-Wformat-truncation=]
+>>>>>>   582 |                                 snprintf(servername, sizeof(servername), "%s",
+>>>>>>       |                                                                           ^~
+>>>>>> net/sunrpc/clnt.c:582:33: note: ‘snprintf’ output between 1 and 108 bytes into a destination of size 48
+>>>>>>   582 |                                 snprintf(servername, sizeof(servername), "%s",
+>>>>>>       |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>>>>>>   583 |                                          sun->sun_path);
+>>>>>>       |                                          ~~~~~~~~~~~~~~
+>>>>>>
+>>>>>>    548         };
+>>>>>>  → 549         char servername[48];
+>>>>>>    550         struct rpc_clnt *clnt;
+>>>>>>    551         int i;
+>>>>>>    552
+>>>>>>    553         if (args->bc_xprt) {
+>>>>>>    554                 WARN_ON_ONCE(!(args->protocol & XPRT_TRANSPORT_BC));
+>>>>>>    555                 xprt = args->bc_xprt->xpt_bc_xprt;
+>>>>>>    556                 if (xprt) {
+>>>>>>    557                         xprt_get(xprt);
+>>>>>>    558                         return rpc_create_xprt(args, xprt);
+>>>>>>    559                 }
+>>>>>>    560         }
+>>>>>>    561
+>>>>>>    562         if (args->flags & RPC_CLNT_CREATE_INFINITE_SLOTS)
+>>>>>>    563                 xprtargs.flags |= XPRT_CREATE_INFINITE_SLOTS;
+>>>>>>    564         if (args->flags & RPC_CLNT_CREATE_NO_IDLE_TIMEOUT)
+>>>>>>    565                 xprtargs.flags |= XPRT_CREATE_NO_IDLE_TIMEOUT;
+>>>>>>    566         /*
+>>>>>>    567          * If the caller chooses not to specify a hostname, whip
+>>>>>>    568          * up a string representation of the passed-in address.
+>>>>>>    569          */
+>>>>>>    570         if (xprtargs.servername == NULL) {
+>>>>>>    571                 struct sockaddr_un *sun =
+>>>>>>    572                                 (struct sockaddr_un *)args->address;
+>>>>>>    573                 struct sockaddr_in *sin =
+>>>>>>    574                                 (struct sockaddr_in *)args->address;
+>>>>>>    575                 struct sockaddr_in6 *sin6 =
+>>>>>>    576                                 (struct sockaddr_in6 *)args->address;
+>>>>>>    577
+>>>>>>    578                 servername[0] = '\0';
+>>>>>>    579                 switch (args->address->sa_family) {
+>>>>>>  → 580                 case AF_LOCAL:
+>>>>>>  → 581                         if (sun->sun_path[0])
+>>>>>>  → 582                                 snprintf(servername, sizeof(servername), "%s",
+>>>>>>  → 583                                          sun->sun_path);
+>>>>>>  → 584                         else
+>>>>>>  → 585                                 snprintf(servername, sizeof(servername), "@%s",
+>>>>>>  → 586                                          sun->sun_path+1);
+>>>>>>  → 587                         break;
+>>>>>>    588                 case AF_INET:
+>>>>>>    589                         snprintf(servername, sizeof(servername), "%pI4",
+>>>>>>    590                                  &sin->sin_addr.s_addr);
+>>>>>>    591                         break;
+>>>>>>    592                 case AF_INET6:
+>>>>>>    593                         snprintf(servername, sizeof(servername), "%pI6",
+>>>>>>    594                                  &sin6->sin6_addr);
+>>>>>>    595                         break;
+>>>>>>    596                 default:
+>>>>>>    597                         /* caller wants default server name, but
+>>>>>>    598                          * address family isn't recognized. */
+>>>>>>    599                         return ERR_PTR(-EINVAL);
+>>>>>>    600                 }
+>>>>>>    601                 xprtargs.servername = servername;
+>>>>>>    602         }
+>>>>>>    603
+>>>>>>    604         xprt = xprt_create_transport(&xprtargs);
+>>>>>>    605         if (IS_ERR(xprt))
+>>>>>>    606                 return (struct rpc_clnt *)xprt;
+>>>>>>
+>>>>>> After the address family AF_LOCAL was added in the commit 176e21ee2ec89, the old hard-coded
+>>>>>> size for servername of char servername[48] no longer fits. The maximum AF_UNIX address size
+>>>>>> has now grown to UNIX_PATH_MAX defined as 108 in "include/uapi/linux/un.h" .
+>>>>>>
+>>>>>> The lines 580-587 were added later, addressing the leading zero byte '\0', but did not fix
+>>>>>> the hard-coded servername limit.
+>>>>>>
+>>>>>> The AF_UNIX address was truncated to 47 bytes + terminating null byte. This patch will fix the
+>>>>>> servername in AF_UNIX family to the maximum permitted by the system:
+>>>>>>
+>>>>>>    548         };
+>>>>>>  → 549         char servername[UNIX_PATH_MAX];
+>>>>>>    550         struct rpc_clnt *clnt;
+>>>>>>
+>>>>>> Fixes: 4388ce05fa38b ("SUNRPC: support abstract unix socket addresses")
+>>>>>> Fixes: 510deb0d7035d ("SUNRPC: rpc_create() default hostname should support AF_INET6 addresses")
+>>>>>> Fixes: 176e21ee2ec89 ("SUNRPC: Support for RPC over AF_LOCAL transports")
+>>>>>> Cc: Neil Brown <neilb@suse.de>
+>>>>>> Cc: Chuck Lever <chuck.lever@oracle.com>
+>>>>>> Cc: Trond Myklebust <trondmy@kernel.org>
+>>>>>> Cc: Anna Schumaker <anna@kernel.org>
+>>>>>> Cc: Jeff Layton <jlayton@kernel.org>
+>>>>>> Cc: Olga Kornievskaia <okorniev@redhat.com>
+>>>>>> Cc: Dai Ngo <Dai.Ngo@oracle.com>
+>>>>>> Cc: Tom Talpey <tom@talpey.com>
+>>>>>> Cc: "David S. Miller" <davem@davemloft.net>
+>>>>>> Cc: Eric Dumazet <edumazet@google.com>
+>>>>>> Cc: Jakub Kicinski <kuba@kernel.org>
+>>>>>> Cc: Paolo Abeni <pabeni@redhat.com>
+>>>>>> Cc: linux-nfs@vger.kernel.org
+>>>>>> Cc: netdev@vger.kernel.org
+>>>>>> Cc: linux-kernel@vger.kernel.org
+>>>>>> Signed-off-by: Mirsad Todorovac <mtodorovac69@gmail.com>
+>>>>>> ---
+>>>>>>  v1:
+>>>>>> 	initial version.
+>>>>>>
+>>>>>>  net/sunrpc/clnt.c | 2 +-
+>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+>>>>>> index 09f29a95f2bc..67099719893e 100644
+>>>>>> --- a/net/sunrpc/clnt.c
+>>>>>> +++ b/net/sunrpc/clnt.c
+>>>>>> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *args)
+>>>>>>  		.connect_timeout = args->connect_timeout,
+>>>>>>  		.reconnect_timeout = args->reconnect_timeout,
+>>>>>>  	};
+>>>>>> -	char servername[48];
+>>>>>> +	char servername[UNIX_PATH_MAX];
+>>>>>>  	struct rpc_clnt *clnt;
+>>>>>>  	int i;
+>>>>>>  
+>>>>>> -- 
+>>>>>> 2.43.0
+>>>>>>
+>>>>>>
+>>>>>
+>>>>
+>>>
+>>
+> 
 
