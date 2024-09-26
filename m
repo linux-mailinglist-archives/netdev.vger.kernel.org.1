@@ -1,118 +1,136 @@
-Return-Path: <netdev+bounces-129925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4EC9870AE
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:50:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C322F9870BB
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0CF1F26978
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F35E31C20CC8
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D97D1ABECE;
-	Thu, 26 Sep 2024 09:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A141AB6EC;
+	Thu, 26 Sep 2024 09:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qxd8tN66"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfdoMWOO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1A61A76D7
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:50:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95D4189509;
+	Thu, 26 Sep 2024 09:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727344253; cv=none; b=aSNzSXwPrvDyexOaWOMJ//O5ljPM9EaqXNEeQLVrlGuu2+0trOSRSy1Fk6Pno4dOhMHTui3KxZbEBn6JYtOEnXiOKd7ruNA+IVe6RyFCw4hhjA3W0u4Cw4Rj5LKOFD+1XG2UEgG8CgeFI/PL3r9LsRyWPxJ4sv0DwDY6o3r3eSc=
+	t=1727344345; cv=none; b=JWsS7dWbdcWcYzQDbboY/CpA6HNv88lAm83/Iw4S9hBoVs/23j3cTISscMeLPBjM5EUewUyyj776QHeAfXMOS4zu3equscym+jrd/8iiG2Iavrlv4gncJa0Bcj4dokNRjQK7jR4/dG+xoFoPSn81fr0LBvaw0vDCe3uthwOlrls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727344253; c=relaxed/simple;
-	bh=3cvkulumzJ6UdUrBeMHHDpezKdFQ0Akz+kdIuBNYxXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=uUz8lue9SPs8+T38dF3O0+oQZeLIHMB8K4WJt0GDUcn1rLRLUzsaDA9gXByv/bar0DCoK/30+rATDwKRRmEO6nm5GU+X+tHPfJLXii7uCkij6ibxuwPiCcA/4jCm2qZAeUKGQT+YPTrSeibCIxH89IlU23TQhKJFyyfy94q9SpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Qxd8tN66; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cb8dac900so7385095e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:50:51 -0700 (PDT)
+	s=arc-20240116; t=1727344345; c=relaxed/simple;
+	bh=yZFc2DYfsGluZTXNOiYfeHuR6VWhgbRBOI4olWxsvis=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Di94c1qSELPpGqtaSfaCKJVmV1d+1CwcwWiyscW8S1Hf0udHv6tdHKDnDBfq3YMeolDlwmJ+j+X+McLnoC2GzXVTUO5oCjG7edkqbuMgSTYDyjglkZwZZEPX3efIfNUcd4xFLUpGVTSwFkrBs6DZyFQax199nySwYHEpD77iX/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfdoMWOO; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so1447101a12.0;
+        Thu, 26 Sep 2024 02:52:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1727344250; x=1727949050; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=gmail.com; s=20230601; t=1727344342; x=1727949142; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=AiyN9NWxSHbtdh7dFvLb4E3Ssa1wgf9JiJ/fTzuLzmA=;
-        b=Qxd8tN665nGhssp3zI9X6VQUF3IPVNAevegGHtgXdeuCgnS9J9UfFsIr3JFIGBYAN+
-         PMMnGDiiSAGwxELvN8wBSrtSuQVSI10SfpUZuUOScylPLCCC8tEx1KR3QPyRv5Wq0e0E
-         XkLaqyCJazOTKyYvyCEz+a/hJT1F7Up9Tdw/6t+l2Q5YCQnYkevyf6wEOVdhSJhvVbZe
-         QCcOKGw5hdjRTt+Iiv0kICiFKyQpTMBkqhs2sIMhsJniqOq2w0nPzuHLKfnJhBZR3Jk5
-         QC/8XRvST/3vykfmVD2TWp7X4KN8ixehRmFEdnf+kv5qhTqwfnkeLtEmFRDnopk//KHO
-         HxHA==
+        bh=ZEypOx7pACJ1pldoAKbaM/8U6Ia3BeCPrlCZA3BPX2U=;
+        b=jfdoMWOOOCYbjGMso5uZbd6IOutRwb5LS9J1iUKzEjyq8NIMC2hCX1AQ7Hv3RGevyP
+         u4Ono83r8p19BPt81bCcuoBS+dY4bEp0eQEortozqCB2PFYdOVHg1LX4mkIeRkAKIc21
+         oMuocZlq465M1DXoe3x79WsvcAc9xpvfU+Pu5AGIUoRqCA1oGgfhcg51E6Wv1koXZtm0
+         D6U331vBKCnS7XLjxAV2Ul4pFP5BhVf0qoo2QPpcrDknLYAbr8XFwZDfsJvbFFz4LYBm
+         S9lrthvuudaaputP2eHX3vvLbl4OePBi9SwCSHJfCLIIF6y9qTqsGUdfAEsduCbjaqMn
+         PDkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727344250; x=1727949050;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1727344342; x=1727949142;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AiyN9NWxSHbtdh7dFvLb4E3Ssa1wgf9JiJ/fTzuLzmA=;
-        b=u1lKehdh0a0VLS8r5qrpjrq2OC0vLZVul+K55W6F12LxZpxKTy63VvnqQkB856vSDv
-         DclcvuE6g5jsg3ONXZhfK/S/3/FkJ9QajONMb6FbDA3HsrUT3bcdPpngQBB1SfviQNfZ
-         gXKUzI80uMoTI2AAY3RpbdZEaCxCa6y66mZEyitnnJJkil573lVlmIAH82J2Ix9drO2z
-         l/llC9NmSAes/inTjCMzbWtqvhbuk2JaSNXTErCy2HqMJHcvqeOasYg+xC0fhJpryNtK
-         Njj0/9z101YhgeT3eTzDKHLAZLMmej/5UNHeS/XiCehXoUxdHmXa3E6mVbGb1WkhPsXJ
-         Hbmw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlMZsGZQCpehK+mC3fK6P1ndqijtqhwBn6tqVXmfGMUAHCrEax1iPyJNCQJCgp9wHbLQdSVBM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyD/UV5wKXZE4fhVbnf7rdU5R9uMvoojnp66AYUtRKKpuNmhbrT
-	nI1SIwTNO2PXUYmJauklcNnMIeGMNq4xQOUlO3jH620uIMT8xRNAtnYHKaj2fHk=
-X-Google-Smtp-Source: AGHT+IFCLIBXqKbOosYLGD7dpaW2Fa6+GR8VForuOcP/Zs87zlTaweE53g2UooMLElMqWLL8yLKfjg==
-X-Received: by 2002:a05:600c:548e:b0:42c:b95c:65b7 with SMTP id 5b1f17b1804b1-42e9610c908mr41002805e9.8.1727344250067;
-        Thu, 26 Sep 2024 02:50:50 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e969ddb85sm42060725e9.2.2024.09.26.02.50.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 02:50:49 -0700 (PDT)
-Date: Thu, 26 Sep 2024 12:50:45 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Julien Panis <jpanis@baylibre.com>,
-	Chintan Vankar <c-vankar@ti.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net: ethernet: ti: am65-cpsw: Fix forever loop in
- cleanup code
-Message-ID: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
+        bh=ZEypOx7pACJ1pldoAKbaM/8U6Ia3BeCPrlCZA3BPX2U=;
+        b=KUlGm1dyiCrvMjcBC3umueyDsPaUZxIT0fWPFmJPwpvKKpschnpG66kcPIHPLon5Q0
+         3yF4IPVr5T07wSJ+9TDwsP+i2Eu3qlRGOu6+qlCd76EsgZ8vlarfwsNEaoNVC3CTSdh1
+         fx0xG1bI2jTJ3Nn9+abxqHJa9S/wTMXxSPsfZJkvfJFs28TBngWo9oEfhSyelL7+vksj
+         VRYpR9HlBfDG7HUZxHBSCkmUzNMOQYdBN3ZyiO/igrVvMNWynq5+efQPysQfa8LqHcu8
+         v28SYZvf5H7dIzDCIZHqZXqcWbgp3EfYZMWRxARidQOuUb5yLHWBCgdmLZXWB2IVKdVW
+         TtTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUF1BCFa9wUw/RGgWVuHAV13nOdDMnZSxVd6+078ZFxnGAsPzVlLag2k+0iQbrs5Xuftw9ccLr05+KOWQ==@vger.kernel.org, AJvYcCXa8Rp//D84ar3cM0xgKtSq0T5yH5y9a8txanfaEH54aZmgp/vm0QNSmaRLdSKY19QmQPoC0XosaEHHeV8=@vger.kernel.org, AJvYcCXmaE5fcSEIW/rD0J0x9lTZm5l0cRVG8W7Fd+SJZRIWlb6mi94D3qYq7mVIslSjZg755F2ybwLJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkBFU2+ZsqBVF0PgKZb87NheTW2vEoWlQPPAIww05PYSk3qBWi
+	lQ2uKvUOy50wogJejpqRADuwp8ymAgRo/7C4RVKTeeJTA654Gn7B
+X-Google-Smtp-Source: AGHT+IFBa8H7U+B09fxkkx/DjtN54sGUPrDgiy0rQT/q65a9PuxkPQXWu9PINaowt/5DqsNbXKkzfQ==
+X-Received: by 2002:a05:6402:230e:b0:5c3:cc1c:4d9c with SMTP id 4fb4d7f45d1cf-5c8777eae4amr2213065a12.18.1727344341797;
+        Thu, 26 Sep 2024 02:52:21 -0700 (PDT)
+Received: from ?IPV6:2a02:8389:41cf:e200:4e5f:6907:8e4:4ed? (2a02-8389-41cf-e200-4e5f-6907-08e4-04ed.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:4e5f:6907:8e4:4ed])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c5cf49d23asm2956451a12.41.2024.09.26.02.52.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Sep 2024 02:52:20 -0700 (PDT)
+Message-ID: <f54a53f9-e2e7-488d-b69d-250251719c7e@gmail.com>
+Date: Thu, 26 Sep 2024 11:52:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/4] selftests: add unshare_test and msg_oob to
+ gitignore
+To: Paolo Abeni <pabeni@redhat.com>, Shuah Khan <skhan@linuxfoundation.org>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com, linux-mm@kvack.org
+References: <20240925-selftests-gitignore-v2-0-bbbbdef21959@gmail.com>
+ <20240925-selftests-gitignore-v2-1-bbbbdef21959@gmail.com>
+ <62f52cb9-1173-46aa-96a0-d48de011fdc2@linuxfoundation.org>
+ <327e2020-4cb6-469d-87a4-dddc0bcf7ecb@redhat.com>
+Content-Language: en-US, de-AT
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+In-Reply-To: <327e2020-4cb6-469d-87a4-dddc0bcf7ecb@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-This error handling has a typo.  It should i++ instead of i--.  In the
-original code the error handling will loop until it crashes.
+On 26/09/2024 11:32, Paolo Abeni wrote:
+> On 9/25/24 18:41, Shuah Khan wrote:
+>> On 9/25/24 06:23, Javier Carrasco wrote:
+>>> These executables are missing from their corresponding gitignore files.
+>>> Add them to the lists.
+>>>
+>>> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+>>> ---
+>>>    tools/testing/selftests/core/.gitignore | 1 +
+>>>    tools/testing/selftests/net/.gitignore  | 1 +
+>>>    2 files changed, 2 insertions(+)
+>>>
+>>
+>> Can you split these into two patches. It will be easier
+>> for the net patch to go through the net tree.
+>>
+>> I take the core changes through my tree. net changes go
+>> through net tree.
+> 
+> @Javier, while at the above, please split the changes in two separate
+> series: one for core and one for net. It will additionally simplify the
+> patch handling, thanks!
+> 
+> Paolo
+> 
 
-Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Paolo,
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index cbe99017cbfa..d253727b160f 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -763,7 +763,7 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
-	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
- 
- fail_rx:
--	for (i = 0; i < common->rx_ch_num_flows; i--)
-+	for (i = 0; i < common->rx_ch_num_flows; i++)
- 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
- 					  am65_cpsw_nuss_rx_cleanup, 0);
- 
--- 
-2.45.2
+as I have already sent a v3 where I split this patch, I will send a new
+series with the patches under selftests/net from that v3:
 
+selftests: net: add msg_oob to gitignore
+selftests: net: rds: add include.sh to EXTRA_CLEAN
+selftests: net: rds: add gitignore file for include.sh
+
+Best regards,
+Javier Carrasco
 
