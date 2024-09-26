@@ -1,86 +1,93 @@
-Return-Path: <netdev+bounces-129992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D595698773C
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 18:05:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E174E98776A
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 18:17:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1002E1C20AE6
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 16:05:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E14461C245C0
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 16:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A95158550;
-	Thu, 26 Sep 2024 16:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9574B2B9AA;
+	Thu, 26 Sep 2024 16:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjSHFzFV"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="kgYzXLx7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C576F158552;
-	Thu, 26 Sep 2024 16:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDCB522A
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 16:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727366724; cv=none; b=ZxUdQe/v+hYJTkgZIFwB9/19UuTi+2KFB1tuB44eNx+BSWy9JjR9uswxJPh3VhNfMrrYjE8E9EUjOFymM5u9zzlhL86GKLGM3RdSAlgY9dEUjIzteioTrTIoexqLzN+oiaa7BhWpIgWu+nImSv0smE8cZjBRMFM0QaFqKuW/jYA=
+	t=1727367446; cv=none; b=YxoKgwQhlXtyEeXnWyD4THRKUkmXK2DFzZjdr2iyTCL2kpbN3cuORUwGdK7csxHHEiKgQYmeIJciZ1bZF1Kmaa+oV2h60FsSwOon5OZHnr7pKU/pKjyZtgKKkymeEgbosjPdaRfSpa+VrQ2RU4sivr8SUp0i/SQju5vRPht317E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727366724; c=relaxed/simple;
-	bh=gknbzGZxjpw2CXS/PQNahlHmXMU1BTGcOerm6JEQ10A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lI6qT7tiHhzd5h7SGu4hCjjq/6jFHMNA7yfXfDAQdGsATmFH6ynvpLD3RT7kX50L2QIclMNVQ9aA35yR7QALIy/pH8qlCLBVrB93LbcBq7hQTNHof5TS48zpiZcXU2Ljz1DeXnnKZ1orrXsmoj5IefPvd08VoOkpEdSI5elT7SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KjSHFzFV; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-205909afad3so11550465ad.2;
-        Thu, 26 Sep 2024 09:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727366722; x=1727971522; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2pa/TWuTtJPirDcDBc/YlDUH5VGKlyuUuv6pDARm7Hs=;
-        b=KjSHFzFV5SfBbcMmqYOyBsQA/MaJMa283MBWuZvbOig230RfSXQ8zKCCcwEkjaYVyV
-         ZHQRJ5D2PMTnG0mz+Wp4kuE/I4QW4LmjKdslmilaBEM3pA0iz8BiT67kst2zWZJtiomD
-         7pEae+ccTxuzxiS74e/+5SZWqnl8VRSq4lzBGPLqHqI7FRIEKlyHWHjJgo9BYc+kJn3T
-         RcY3qDjBYaU6X/4ajMBiZ6/dcIhJh3X0GAcryjOOzqBHCnhuBEgyXyc/64ks/W0a+4tV
-         okcoLU5dkPVPupLLplc9TRlzJbYy7/sgQ0gp+WME0PaH00DD8aQFKR3miDzuMvaWVn20
-         OuLg==
+	s=arc-20240116; t=1727367446; c=relaxed/simple;
+	bh=7gDjgu4wElEbQxuDgDh35dLOIRlB1xp7/51JxMwantQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YarjBFpGt0L1nRa9TJX2GEL5FLvG0Ni8BAZCX2ViLQZQyx9WxxqVNuJr4QkB1D0X5F4FBwj+sYz1bnQAQVIAFxSi3pPtpsEzvQ8RY2hou78rb/sLmryhGESyLgW0g0AI8S9TQI3S426hzbKGTm5NzLlZPDiWHix2NlIMFv49PCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=kgYzXLx7; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com [209.85.128.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 926D03F282
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 16:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1727367440;
+	bh=b1Yy5Y+O/8SNdOfIY1NdJ3kg1DxrF1aZEa29oc+RxsM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=kgYzXLx7xPU3jO16+dByVml3IjOfBwbklD9+YQs0oS99RMCohU4IjZLc9Y9RPjU+b
+	 0k+p1S50pp7MrNq4ca5Dr6KFTE4Z+5n+N/8j/yAfqIfoZKlo7mt16t/ECJludUKWZf
+	 e7UEjq9gCsc9oTWcF7erlp0At8RBJIcCNGnnkFJcdO5Gzct4xfS7CvrRNWBVA35ql1
+	 qnDkH9Sw5qzmIyuEJsshPc/cLdY/6B/Hx0eUHfzUfEajULdhRtWDo/FDsrNY+cAbxH
+	 5Sum87k1Ksre12WgRikIAQFuQqm0he7rj4XeD/0mnOHhctkteES/z9SyAfO02eXcKC
+	 M4jORwUS+6/iA==
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42f310f0ed2so11063455e9.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:17:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727366722; x=1727971522;
+        d=1e100.net; s=20230601; t=1727367438; x=1727972238;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2pa/TWuTtJPirDcDBc/YlDUH5VGKlyuUuv6pDARm7Hs=;
-        b=a2eY/CiJDS+AciQlaBtCrub7Fgo/EW7nVZsyS682rL9T1zqWyOpOAlzDJMQOYhX/lC
-         6HtBefQpPvOuMaL/4z4hIcrs2QlWLQZI/N/wEvHW/ZgQD6jQH10sWjOG+5CUmaVai5ya
-         tuwOydIAvgi4/VJXTZ4Wd/QUTT5mqtA3ZyG+iU1wmI6cr/hkXKf5EE91xB/PPYsSJESk
-         /YXwcew+rj4ft5df7rmgtLehg3r9DCSrJ+XfUOQHg8PsJhM+VQiU7ZJ0RrQaF4dIKDMT
-         32b2lIeRrLv3DlCFgwvTwHuifgT4uVSvh0+ZNiw5h9wTW5TkRCD6rCilT5PfpHJFqX3W
-         id6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWkGo1cvQzWkyxh8HAiU1TfF98xHJSK13E48k8f8lXsFj6g3oe7ZYxGX90iFIJyJNQjM6P+bKkE5KhUViE=@vger.kernel.org, AJvYcCXVfMxw0PB4PI3+wKCJHtfWUhiTiZQrqo2HYDoGJc3PAA5uZITq8IkBFDMc6w3/9slDMaNuhd6J@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL8AHZUfDilyMYNHAsESqkrTOcw+7MtMSnLiPYpD88wRZ24pFQ
-	eqjhzf6AgSdZyZqZ+IfTHsO/4DYpYMKwCIHxDV0aws/staLNV6eI
-X-Google-Smtp-Source: AGHT+IE5QvZjfX4FN9dhLCk2nP5iL8ta9IysDy96i4ZfL3fey/npuCinZULm9eTYn8V2G8lVAJtBTg==
-X-Received: by 2002:a17:902:eb8a:b0:206:adc8:2dcb with SMTP id d9443c01a7336-20b36ec98c9mr2523255ad.25.1727366721677;
-        Thu, 26 Sep 2024 09:05:21 -0700 (PDT)
-Received: from ubuntu.worldlink.com.np ([27.34.65.236])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e61e14sm224295ad.279.2024.09.26.09.05.16
+        bh=b1Yy5Y+O/8SNdOfIY1NdJ3kg1DxrF1aZEa29oc+RxsM=;
+        b=JxswtYQNV0av8YK3Jgp4Yo66fYaH7c9VwaNaJoYbwXSLdqGIVsrRCyITFYFC412f18
+         loeLpDEbJUd/tyqaVhdL9FtTM2SP/irOFBk1XbDd1MpegxNjX31KduStL3X10/SO+PME
+         2CbjIqpSc7XMgql9dldPLWRMkEzediqScqIBCSDhmaCgw7d6GnU4pEaFV/TuQ1IBya9p
+         Ngl19zQvjL0PavjBaFbRmqvY9+2hhCHQ/psmqiHUfLgNM/NzqBbDFe0j/h5G4kuiPxNR
+         JsC3Jl5hEWHLIFf8+WNhm1uM6CY/j2+zQBuwA55Ronn9u9uy6zuZMmK1WizDQFF5MOht
+         DQZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXD5qySUc4oJbEEkwc3wBboDLpxAbNO+6yZFsDa0+F2axgRUMN93X3hRmjgifvqPp4feh76UmU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRSeBlggxFFpRE2WyI87h1zShcCV96kOyi5No75BBy3XmGQLhO
+	9QRG1WMmoavm1MzPPu1hSCcKEEJ6XlXgnwC8521PZGPqcOiB76vpsB++l6sEFhOwpK1FscTDRMS
+	X0fnD18PbYUa/nD6qPfMDGKQHpB2tUKQ2fHngH0s0XiuCqzfByGw/awk4aRQ3NVsM7dCl2w==
+X-Received: by 2002:a05:600c:1d88:b0:426:5e1c:1ac2 with SMTP id 5b1f17b1804b1-42f58433478mr169625e9.8.1727367437788;
+        Thu, 26 Sep 2024 09:17:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHzaX27OdIk12RXul9FuGgRDD+iCxKpGs0uDOQekLQVHE70zEjsFFHKV6Qz72FM1jylL5Re6g==
+X-Received: by 2002:a05:600c:1d88:b0:426:5e1c:1ac2 with SMTP id 5b1f17b1804b1-42f58433478mr169345e9.8.1727367437454;
+        Thu, 26 Sep 2024 09:17:17 -0700 (PDT)
+Received: from amikhalitsyn.lan ([188.192.113.77])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c2948231sm14104266b.99.2024.09.26.09.17.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 09:05:19 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maxime.chevallier@bootlin.com,
-	horms@kernel.org
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
+        Thu, 26 Sep 2024 09:17:17 -0700 (PDT)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: stefanha@redhat.com
+Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v5] net: systemport: Add error pointer checks in bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-Date: Thu, 26 Sep 2024 16:05:12 +0000
-Message-ID: <20240926160513.7252-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [PATCH] vhost/vsock: specify module version
+Date: Thu, 26 Sep 2024 18:16:40 +0200
+Message-Id: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,67 +96,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add error pointer checks in bcm_sysport_map_queues() and
-bcm_sysport_unmap_queues() after calling dsa_port_from_netdev().
+Add an explicit MODULE_VERSION("0.0.1") specification
+for a vhost_vsock module. It is useful because it allows
+userspace to check if vhost_vsock is there when it is
+configured as a built-in.
 
-Fixes: 1593cd40d785 ("net: systemport: use standard netdevice notifier to detect DSA presence")
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+Without this change, there is no /sys/module/vhost_vsock directory.
+
+With this change:
+$ ls -la /sys/module/vhost_vsock/
+total 0
+drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+--w-------   1 root root 4096 Sep 26 15:59 uevent
+-r--r--r--   1 root root 4096 Sep 26 15:59 version
+
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
 ---
-v5: 
- -Removed extra parentheses
-v4: https://lore.kernel.org/all/20240925152927.4579-1-kdipendra88@gmail.com/
- - Removed wrong and used correct Fixes: tag
-v3: https://lore.kernel.org/all/20240924185634.2358-1-kdipendra88@gmail.com/
- - Updated patch subject
- - Updated patch description
- - Added Fixes: tags
- - Fixed typo from PRT_ERR to PTR_ERR
- - Error is checked just after  assignment
-v2: https://lore.kernel.org/all/20240923053900.1310-1-kdipendra88@gmail.com/
- - Change the subject of the patch to net
-v1: https://lore.kernel.org/all/20240922181739.50056-1-kdipendra88@gmail.com/
- drivers/net/ethernet/broadcom/bcmsysport.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/vhost/vsock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index c9faa8540859..a7ad829f11d4 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -2331,11 +2331,15 @@ static const struct net_device_ops bcm_sysport_netdev_ops = {
- static int bcm_sysport_map_queues(struct net_device *dev,
- 				  struct net_device *slave_dev)
- {
--	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
- 	struct bcm_sysport_priv *priv = netdev_priv(dev);
- 	struct bcm_sysport_tx_ring *ring;
- 	unsigned int num_tx_queues;
- 	unsigned int q, qp, port;
-+	struct dsa_port *dp;
-+
-+	dp = dsa_port_from_netdev(slave_dev);
-+	if (IS_ERR(dp))
-+		return PTR_ERR(dp);
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 802153e23073..287ea8e480b5 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
  
- 	/* We can't be setting up queue inspection for non directly attached
- 	 * switches
-@@ -2386,11 +2390,15 @@ static int bcm_sysport_map_queues(struct net_device *dev,
- static int bcm_sysport_unmap_queues(struct net_device *dev,
- 				    struct net_device *slave_dev)
- {
--	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
- 	struct bcm_sysport_priv *priv = netdev_priv(dev);
- 	struct bcm_sysport_tx_ring *ring;
- 	unsigned int num_tx_queues;
- 	unsigned int q, qp, port;
-+	struct dsa_port *dp;
-+
-+	dp = dsa_port_from_netdev(slave_dev);
-+	if (IS_ERR(dp))
-+		return PTR_ERR(dp);
- 
- 	port = dp->index;
- 
+ module_init(vhost_vsock_init);
+ module_exit(vhost_vsock_exit);
++MODULE_VERSION("0.0.1");
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Asias He");
+ MODULE_DESCRIPTION("vhost transport for vsock ");
 -- 
-2.43.0
+2.34.1
 
 
