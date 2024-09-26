@@ -1,157 +1,265 @@
-Return-Path: <netdev+bounces-129916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96085986FE0
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:20:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD5C2986FE1
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C70FB1C20380
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:20:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E01611C20AE1
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB8E1A4F18;
-	Thu, 26 Sep 2024 09:19:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5551A76D6;
+	Thu, 26 Sep 2024 09:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y97r/nIz"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="W20fQ9wi";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="ajB9HqZz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C621A4E9A
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 203891A4E9A;
+	Thu, 26 Sep 2024 09:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727342399; cv=none; b=T/AwHXWQsNhHpFW1Y24aHiaXxICQOc1xEd/r4hrWb9L+3E4EUy+ugPIBIEE7KinTTNLfAcIKWbGivC0IyWLdk8Q8MkaGd9geVocpGpYmzRccJwTDTMZs9HCAk0wWxA3UYvwZs/Bm3jV2a+p+q4hJs9eOwxYpaoDQYArgd9VKQCc=
+	t=1727342409; cv=none; b=HBmy96fx5dWjdd4SgaR4QmTd5IdEGdH9avjIrUwJtEliIIvVZ4djfM4E/nGxha9C/ReE7qS7D2bzZpENKrIjLZQWWgaVWigRDj0APPfXlW8eU0Iy8cBZct4MYMn5c0DqI+23QhOkRBUS1kvpLslKv0qO3RcfaY9tVJTwGjOhjuk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727342399; c=relaxed/simple;
-	bh=DvDFTPz/i5rugDCoQq2HmgdqlkGLW0BZ7eDwMdp7K9Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CBIN3QAceiaPKgoP8jeCQbMp5u5RC5WTdkM61wLZaK/NayJ7npW9sJ36fy79HuxGNiP/JXf8amdUXDyllZCoP/09FXnHMxdEnfWUsca5d4HbJWLRSGRtIyw+dxRtWM9NXDKHweJpLbrzvvhn5DV/Do/JMronHdBIeOJ/LgdPgfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y97r/nIz; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c8784e3bc8so719201a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:19:57 -0700 (PDT)
+	s=arc-20240116; t=1727342409; c=relaxed/simple;
+	bh=fPxIITGwvsR8oZaU7WU0RDsZkwH0CjGkd3lOuyO+iHQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BwcPN1R25v9qE46GOG1gOMv6rYpeMcyPQsjMxtpdIkuLBbez+egRipm/ZZ/0DE5uE6wH0b6NY7dySs6P48KUmWLdfb9Ye+jzd9ATsLNVopq35zhfvpmAjsfS/UOtJ1tyfuPj+YxLIo1k2eRXz50V/j5tuEIirn+uwGmiwCIkmws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=W20fQ9wi; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=ajB9HqZz reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727342396; x=1727947196; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N6o0ZPPqNs5OKEvE6LJy16ez0xt1FXRTxMU/UK1sI/E=;
-        b=Y97r/nIz2f5APCkFQ6NJgdIu/E4k2FMY9ZsIawRee/qiq9kWF2D6MV1ob4PnrOg6vR
-         cwsVh8pmoi5ohsyIvp46Tu6q1IhZa74OA0knryP+Vwbi9AAvgphZeXJsYZmsR0pa6BD1
-         H3KJzsmsWHgjhB5eKZRUsQaOzZcGwIxRR+M0o47efw5GdBc0wYdUNY7rFzgvXaMDxqfA
-         xyJWbIDXn6ShZdd9iJg9QZfgjfi1Qz3jr6xrubTS+bF86Khfj+sLRKdnc0YVlN033xZd
-         p+1xnbjmQ8W7WlRGPFJ0qu1K4ySwTCVXoQyEzBt3kc9LcAFPKM8N3Y60N55s22+jEE3w
-         HA7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727342396; x=1727947196;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N6o0ZPPqNs5OKEvE6LJy16ez0xt1FXRTxMU/UK1sI/E=;
-        b=RzmSjk9PMjPrsLj3a75tUjf1W0a+5K3Y/pKgZ6/cWg+PyfZx/l2Ie2TaS1wFMUksQs
-         VJPfjYCZ6DCzGi237z4OfnO9aLmnvn1oOwsqMqCTJNur4Py1DJ1+T/DzbGNBOhOyXeNS
-         n89rU0Hs1FCECp3bwOuvXSzrl94K8dxTyxf56Wny87c9kD9+txDD8/towvECeq5xNFUw
-         g4HAzEwQLF+WNUZ0FQDEXrSD05IIVNsBUq8D0xFNIyR9rV7iI658G/qnK0vwXD0Ydf/d
-         BHzgQYgeTF4eoisk32HIsgjGjP5bh2GS5uuweSuc91WBIVqHxv/6esmEKV/4sL9qRIYm
-         UtSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBK7EFQRawRtNaL9U1QZz9SJTz0rVFfU6mZ3FyhTdd1Uols9K651OMooxTg7MAZAPDP6J4Ld8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq6u2/wW0eHKX5a2LKG9N+0kyrzrZZTbuKCMVX8dnyQl8oe6w+
-	WM9r9IV/c6P0Cfr+7GQxRGT7F8BTSQ0cE+nX935+nBzwYov6IhNiiqVUv2fBuYg3OVG50gH3VwW
-	B4Ly+t6fGtfzSOmshJ4IriRZ3CwyH1DGG9e9/
-X-Google-Smtp-Source: AGHT+IG6ogNq8IXQ6XBSyy7WlpEV0RW/9q/ds6DRJeV3YZsjG8wLdD7czlVCG8Kb/uXbpjHgzIXEe36sqcVcND8PpBM=
-X-Received: by 2002:a05:6402:518b:b0:5c5:b84a:8156 with SMTP id
- 4fb4d7f45d1cf-5c72062506bmr4200236a12.17.1727342395446; Thu, 26 Sep 2024
- 02:19:55 -0700 (PDT)
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1727342406; x=1758878406;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=rekTNiajdYTDYhal5o7yC/gc4wdPo/buylcC+7XLvf0=;
+  b=W20fQ9wiQETMjy/CGNJjJpUlhvJN4Nar2Zr1sBt4UtqTgCDI2OFY8mkU
+   nIil87LfcmL+plZZ9nKzZjACGML7XiLynYzm7bYu4D2SDXxC8aBuajXsQ
+   T7FhfLjR9px9L9Oo5ljURgrY3hAxzCuxcE8ZISfqu9i++Dn4plAf5AN+m
+   CPsQI6UQMPZat2yxG2GoKNph3SS2FrKs1e0mDXqP1XkZ8qkb92V8uK2u4
+   vB356Qf8zobL1oz6DkNtxMSOKbFnpWJ3Gg4hxTQLB1ruV5V7wX0msuord
+   1wkoKGtp1/EOYaKj4ElauLN1Xxi5ZiJOJV2l85qPjmuI8yUhYC9J0/nZd
+   Q==;
+X-CSE-ConnectionGUID: T5bvyQ9mR9OUij5kNx/G6g==
+X-CSE-MsgGUID: 2MhZBR0DTvCanKpiBK4F6w==
+X-IronPort-AV: E=Sophos;i="6.10,260,1719871200"; 
+   d="scan'208";a="39137207"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 26 Sep 2024 11:20:02 +0200
+X-CheckPoint: {66F52742-3-6BF03F0A-F83EAA27}
+X-MAIL-CPID: 91894B9D38675A8080ECBDF9025865E8_1
+X-Control-Analysis: str=0001.0A682F19.66F52742.0106,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ABB8D160BC1;
+	Thu, 26 Sep 2024 11:19:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1727342397;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=rekTNiajdYTDYhal5o7yC/gc4wdPo/buylcC+7XLvf0=;
+	b=ajB9HqZzhGnDclRMuLGMwuIUbY8GxA4vUb+UQKsqbP0BgWPOAqLBABmFZseWyPyVsok1VE
+	4IKw0aSQSOQ1NmQsizl15a0Xa9tmxWEOCHb9bi904fL6TKnsKraVA9VQjCDo7VVrgGgeyE
+	hJD+yXIiBGnJGUor2L1I16Uuwp8PDUasSfmzq3YdKshPaayDTIXAZhLxxeVIDty69gbrsf
+	B6ioduclBElMAotalzuErQADlp1C4vp9nfBYlOSoYE6GyxvfruZy5KO3sYg49E3powkCw1
+	I08kYXwYreAbJO0uUa1CxhN5PjwfLQjz3Hs71xbBrva+GSrQh4nfq7Yjqc2YNA==
+Message-ID: <1a4ed0696cbe222e50b5abdff08a5ce7f8223aae.camel@ew.tq-group.com>
+Subject: Re: [PATCH v3 2/2] can: m_can: fix missed interrupts with m_can_pci
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>, Marc Kleine-Budde
+	 <mkl@pengutronix.de>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol
+ <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
+ <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, Raymond Tan
+ <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux@ew.tq-group.com
+Date: Thu, 26 Sep 2024 11:19:53 +0200
+In-Reply-To: <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
+References: 
+	<ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
+	 <4715d1cfed61d74d08dcc6a27085f43092da9412.1727092909.git.matthias.schiffer@ew.tq-group.com>
+	 <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924150257.1059524-1-edumazet@google.com> <20240924150257.1059524-3-edumazet@google.com>
- <66f525aab17bb_8456129490@willemb.c.googlers.com.notmuch> <66f526c06b0fa_851bd294af@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66f526c06b0fa_851bd294af@willemb.c.googlers.com.notmuch>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 26 Sep 2024 11:19:44 +0200
-Message-ID: <CANn89iKTN0NgEcUAhBf19siC2FJ9hGpQppHf4wKmH7HgAtkn9g@mail.gmail.com>
-Subject: Re: [PATCH net 2/2] net: add more sanity checks to qdisc_pkt_len_init()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	Willem de Bruijn <willemb@google.com>, Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Sep 26, 2024 at 11:17=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Willem de Bruijn wrote:
-> > Eric Dumazet wrote:
-> > > One path takes care of SKB_GSO_DODGY, assuming
-> > > skb->len is bigger than hdr_len.
-> > >
-> > > virtio_net_hdr_to_skb() does not fully dissect TCP headers,
-> > > it only make sure it is at least 20 bytes.
-> > >
-> > > It is possible for an user to provide a malicious 'GSO' packet,
-> > > total length of 80 bytes.
-> > >
-> > > - 20 bytes of IPv4 header
-> > > - 60 bytes TCP header
-> > > - a small gso_size like 8
-> > >
-> > > virtio_net_hdr_to_skb() would declare this packet as a normal
-> > > GSO packet, because it would see 40 bytes of payload,
-> > > bigger than gso_size.
-> > >
-> > > We need to make detect this case to not underflow
-> > > qdisc_skb_cb(skb)->pkt_len.
-> > >
-> > > Fixes: 1def9238d4aa ("net_sched: more precise pkt_len computation")
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > ---
-> > >  net/core/dev.c | 10 +++++++---
-> > >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > index f2c47da79f17d5ebe6b334b63d66c84c84c519fc..35b8bcfb209bd274c8138=
-0eaf6e445641306b018 100644
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -3766,10 +3766,14 @@ static void qdisc_pkt_len_init(struct sk_buff=
- *skb)
-> > >                             hdr_len +=3D sizeof(struct udphdr);
-> > >             }
-> > >
-> > > -           if (shinfo->gso_type & SKB_GSO_DODGY)
-> > > -                   gso_segs =3D DIV_ROUND_UP(skb->len - hdr_len,
-> > > -                                           shinfo->gso_size);
-> > > +           if (unlikely(shinfo->gso_type & SKB_GSO_DODGY)) {
-> > > +                   int payload =3D skb->len - hdr_len;
-> > >
-> > > +                   /* Malicious packet. */
-> > > +                   if (payload <=3D 0)
-> > > +                           return;
-> > > +                   gso_segs =3D DIV_ROUND_UP(payload, shinfo->gso_si=
-ze);
-> > > +           }
-> >
-> > Especially for a malicious packet, should gso_segs be reinitialized to
-> > a sane value? As sane as feasible when other fields cannot be fully
-> > trusted..
->
-> Never mind. I guess the best thing we can do is to leave pkt_len as
-> skb->len, indeed.
->
+On Tue, 2024-09-24 at 08:08 +0200, Markus Schneider-Pargmann wrote:
+>=20
+> On Mon, Sep 23, 2024 at 05:32:16PM GMT, Matthias Schiffer wrote:
+> > The interrupt line of PCI devices is interpreted as edge-triggered,
+> > however the interrupt signal of the m_can controller integrated in Inte=
+l
+> > Elkhart Lake CPUs appears to be generated level-triggered.
+> >=20
+> > Consider the following sequence of events:
+> >=20
+> > - IR register is read, interrupt X is set
+> > - A new interrupt Y is triggered in the m_can controller
+> > - IR register is written to acknowledge interrupt X. Y remains set in I=
+R
+> >=20
+> > As at no point in this sequence no interrupt flag is set in IR, the
+> > m_can interrupt line will never become deasserted, and no edge will eve=
+r
+> > be observed to trigger another run of the ISR. This was observed to
+> > result in the TX queue of the EHL m_can to get stuck under high load,
+> > because frames were queued to the hardware in m_can_start_xmit(), but
+> > m_can_finish_tx() was never run to account for their successful
+> > transmission.
+> >=20
+> > To fix the issue, repeatedly read and acknowledge interrupts at the
+> > start of the ISR until no interrupt flags are set, so the next incoming
+> > interrupt will also result in an edge on the interrupt line.
+> >=20
+> > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart=
+ Lake")
+> > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+>=20
+> Just a few comment nitpicks below. Otherwise:
+>=20
+> Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
 
-It is unclear if we can change a field in skb here, I hope that in the
-future we can make virtio_net_hdr_to_skb() safer.
 
-Role of qdisc_pkt_len_init() is to set a private skb->cb[] field for
-qdisc layer.
+We have received a report that while this patch fixes a stuck queue issue r=
+eproducible with cangen,
+the problem has not disappeared with our customer's application. I will hol=
+d off sending a new
+version of the patch while we're investigating whether there is a separate =
+issue with the same
+symptoms or the patch is insufficient.
 
-Thanks !
+Patch 1/2 should be good to go and could be applied independently.
+
+Matthias
+
+
+>=20
+> > ---
+> >=20
+> > v2: introduce flag is_edge_triggered, so we can avoid the loop on !m_ca=
+n_pci
+> > v3:
+> > - rename flag to irq_edge_triggered
+> > - update comment to describe the issue more generically as one of syste=
+ms with
+> >   edge-triggered interrupt line. m_can_pci is mentioned as an example, =
+as it
+> >   is the only m_can variant that currently sets the irq_edge_triggered =
+flag.
+> >=20
+> >  drivers/net/can/m_can/m_can.c     | 22 +++++++++++++++++-----
+> >  drivers/net/can/m_can/m_can.h     |  1 +
+> >  drivers/net/can/m_can/m_can_pci.c |  1 +
+> >  3 files changed, 19 insertions(+), 5 deletions(-)
+> >=20
+> > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_ca=
+n.c
+> > index c85ac1b15f723..24e348f677714 100644
+> > --- a/drivers/net/can/m_can/m_can.c
+> > +++ b/drivers/net/can/m_can/m_can.c
+> > @@ -1207,20 +1207,32 @@ static void m_can_coalescing_update(struct m_ca=
+n_classdev *cdev, u32 ir)
+> >  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+> >  {
+> >  	struct net_device *dev =3D cdev->net;
+> > -	u32 ir;
+> > +	u32 ir =3D 0, ir_read;
+> >  	int ret;
+> > =20
+> >  	if (pm_runtime_suspended(cdev->dev))
+> >  		return IRQ_NONE;
+> > =20
+> > -	ir =3D m_can_read(cdev, M_CAN_IR);
+> > +	/* The m_can controller signals its interrupt status as a level, but
+> > +	 * depending in the integration the CPU may interpret the signal as
+>                  ^ on?
+>=20
+> > +	 * edge-triggered (for example with m_can_pci).
+> > +	 * We must observe that IR is 0 at least once to be sure that the nex=
+t
+>=20
+> As the loop has a break for non edge-triggered chips, I think you should
+> include that in the comment, like 'For these edge-triggered
+> integrations, we must observe...' or something similar.
+>=20
+> Best
+> Markus
+>=20
+> > +	 * interrupt will generate an edge.
+> > +	 */
+> > +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
+> > +		ir |=3D ir_read;
+> > +
+> > +		/* ACK all irqs */
+> > +		m_can_write(cdev, M_CAN_IR, ir);
+> > +
+> > +		if (!cdev->irq_edge_triggered)
+> > +			break;
+> > +	}
+> > +
+> >  	m_can_coalescing_update(cdev, ir);
+> >  	if (!ir)
+> >  		return IRQ_NONE;
+> > =20
+> > -	/* ACK all irqs */
+> > -	m_can_write(cdev, M_CAN_IR, ir);
+> > -
+> >  	if (cdev->ops->clear_interrupts)
+> >  		cdev->ops->clear_interrupts(cdev);
+> > =20
+> > diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_ca=
+n.h
+> > index 92b2bd8628e6b..ef39e8e527ab6 100644
+> > --- a/drivers/net/can/m_can/m_can.h
+> > +++ b/drivers/net/can/m_can/m_can.h
+> > @@ -99,6 +99,7 @@ struct m_can_classdev {
+> >  	int pm_clock_support;
+> >  	int pm_wake_source;
+> >  	int is_peripheral;
+> > +	bool irq_edge_triggered;
+> > =20
+> >  	// Cached M_CAN_IE register content
+> >  	u32 active_interrupts;
+> > diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/=
+m_can_pci.c
+> > index d72fe771dfc7a..9ad7419f88f83 100644
+> > --- a/drivers/net/can/m_can/m_can_pci.c
+> > +++ b/drivers/net/can/m_can/m_can_pci.c
+> > @@ -127,6 +127,7 @@ static int m_can_pci_probe(struct pci_dev *pci, con=
+st struct pci_device_id *id)
+> >  	mcan_class->pm_clock_support =3D 1;
+> >  	mcan_class->pm_wake_source =3D 0;
+> >  	mcan_class->can.clock.freq =3D id->driver_data;
+> > +	mcan_class->irq_edge_triggered =3D true;
+> >  	mcan_class->ops =3D &m_can_pci_ops;
+> > =20
+> >  	pci_set_drvdata(pci, mcan_class);
+> > --=20
+> > TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, =
+Germany
+> > Amtsgericht M=C3=BCnchen, HRB 105018
+> > Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan=
+ Schneider
+> > https://www.tq-group.com/
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
