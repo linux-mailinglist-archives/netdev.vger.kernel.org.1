@@ -1,175 +1,98 @@
-Return-Path: <netdev+bounces-129940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34261987213
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:54:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A08E98721F
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E267C280CF0
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:54:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 208CFB2856F
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA85A1AD5D9;
-	Thu, 26 Sep 2024 10:54:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1d66e2x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744F81AED24;
+	Thu, 26 Sep 2024 10:56:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195561ACE12
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 10:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E11AE84A;
+	Thu, 26 Sep 2024 10:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727348088; cv=none; b=tUhltGf2Vd8HthuGcKpBt8NsB7POleeed7o9FeQ8W46gyw8/Ernx5qo1xHrZ7pcEEcmhasF/N0m8K6JxpLLYkE6NpsBP2tynEz0g4sQvZx9WUzIPsU7sOFTXQwBVNHQ6p4b6Rwgay8YKeFD5ezASpCgX9HvKGcTTJaTMU6kDygg=
+	t=1727348173; cv=none; b=GtY877dEj6d3k+2n5Ztp/mBW/KXOBwFCNm3I8JFaonoWhZIZ5idHBe8e5xoOPMradE13+uRf658ilj55kO6ufqnAmRKld30ikXPOFwFYgRWE9Ey+Jyckte+GC0EAsvD9/Vgee3OYGWEezPXpHm5L7EZ2Lq1WHUo5aKnqsBKU3tg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727348088; c=relaxed/simple;
-	bh=4XlqGlbVV4R1uMYpPaM1u91hWeFZhoe0keGWzfBIbFc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=DmSi18USyymA99Bp2pKQLNTDWSnKYmleAMvmOKSogQxaklBdI+Pt4NgZfVmj+t3AmOmIPDCrc0iWGIc0p40e3dOZktQCyh4FY7hXnPMyHrs3q9MPLYSHpScSCfTZZDKwzi2yVVvME97vvDl/cNuE+QRxmC1/xfn/MFZTsZnVsRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b1d66e2x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727348086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nMAah5V6Hs369gZJo6DRHJeeBm1IDseuQxhG1iZY8ro=;
-	b=b1d66e2x+yPex92dqM6cdyh7uzyIOt7e0y6WeU9MdqTunmI36kjHcUk8bvDnkZfLr60Bce
-	oAG2+R0y21Hy2eJeXkreECQUWnPw4KbtjxIeyUE0xMhTLiftasuTFEiQWCSxerzmLfI/3k
-	TZjt8yx4Psnz5fjHn+movE6VPftq+tU=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-369-0jiMHRq8Mi2sgNRxtoHAfw-1; Thu, 26 Sep 2024 06:54:45 -0400
-X-MC-Unique: 0jiMHRq8Mi2sgNRxtoHAfw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5356a102038so986706e87.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 03:54:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727348083; x=1727952883;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nMAah5V6Hs369gZJo6DRHJeeBm1IDseuQxhG1iZY8ro=;
-        b=j09AYms5M7KygOlo/TJXF0Zg3w5kA9sB9wnBrVQ+YfyyixbAlCIZbpIwrsXVzAHGpc
-         wPBqDgrfFax8yDRTZ3VopLsGDJ8MY429S2lMmSItFXl/A7QVxW4ze0gDNfZ+UCMzx4u+
-         TXEPJJNH3Rbsg2dp19hL3HrXfTvjXyGsgqI7RXqrnJrnQ0q8QGxgT/G+R5xHIkMm+zoL
-         6NOX5MgBSaJ6M9J/OP9WOAUORKjWKt58+pOpR8rKYtP/GQTjJc+tuYCEhbymwp5l4ECE
-         yOF9fpTsm+6lB3MNIB2j0n2DUm/jfXiWX96UazO7Ww9Byq6yB39kWMWHE9nVBUL0zXV7
-         mfCA==
-X-Forwarded-Encrypted: i=1; AJvYcCVorVg3iooyhFGvGBTuX4tFi8IrxzZFVrkx0L6BbbBmxOImUvO2yI/RhmflOthosSHC+W1juLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfWfmW/30QNy5RZ95NiRE0i/4wTd2FF5wpF/OBdivV7x1bAfbO
-	X0yIh3qjbCw38PNx64cNmahSheqYlR6+r289ri0S0fbGt3EXxW3cvI6JGLGUJTxGdl602KoqRYx
-	pb0fRlrdtYwxnC9axEW0UNqFWNs6c+WxzcpztqISpwx06fWqa2mBNAw==
-X-Received: by 2002:a05:6512:12c3:b0:536:7362:5912 with SMTP id 2adb3069b0e04-53877530ceemr5556739e87.30.1727348083435;
-        Thu, 26 Sep 2024 03:54:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFPs6D/lrxvYcK40WRUY7e6VMRqpb6o1HwhSdRJSeV7mA2JYuu9QVeRQM49+yc5lijfGXDHEQ==
-X-Received: by 2002:a05:6512:12c3:b0:536:7362:5912 with SMTP id 2adb3069b0e04-53877530ceemr5556685e87.30.1727348082765;
-        Thu, 26 Sep 2024 03:54:42 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93a5b82fbasm192615366b.103.2024.09.26.03.54.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 03:54:41 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id E1DD0157FC51; Thu, 26 Sep 2024 12:54:40 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Arthur Fabre
- <afabre@cloudflare.com>, Jakub Sitnicki <jakub@cloudflare.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- kuba@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
- pabeni@redhat.com, sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, mst@redhat.com, jasowang@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, kernel-team
- <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-In-Reply-To: <ZvA6hIl6XWJ4UEJW@lore-desk>
-References: <cover.1726935917.git.lorenzo@kernel.org>
- <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
- <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
- <Zu_gvkXe4RYjJXtq@lore-desk> <87ldzkndqk.fsf@toke.dk>
- <ZvA6hIl6XWJ4UEJW@lore-desk>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 26 Sep 2024 12:54:40 +0200
-Message-ID: <874j62u1lb.fsf@toke.dk>
+	s=arc-20240116; t=1727348173; c=relaxed/simple;
+	bh=Qa2jT4/2s74MI1inINDuACkzaOSvq7JFkAWjbO2SnZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I69NOSh+2fPgYsMLTt2U4rQVIPKW2Lau68zYnU61sHIGy5ZwnFnlUYVCb3YF8f8iLMPxkNsngGDvsPpXxbIfNz8TuZK57UoroddtswDGLjdPtI7ZUG1pO4+9Qp8L+7D7tfc6yBh+OLuyBw6GC7wjvUvZvUtb3mCKFu9YNCen57E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=37144 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1stmAH-001Qk0-TP; Thu, 26 Sep 2024 12:56:07 +0200
+Date: Thu, 26 Sep 2024 12:56:05 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
+	davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
+	edumazet@google.com
+Subject: Re: [PATCH net 00/14] Netfilter fixes for net
+Message-ID: <ZvU9xUdMC4Ra_9gv@calendula>
+References: <20240924201401.2712-1-pablo@netfilter.org>
+ <c51519c0-c493-4408-9938-5fb650b4ed8b@redhat.com>
+ <20240926103737.GA15517@breakpoint.cc>
+ <ba889ffb-ba6f-450a-be9b-9fa75b20ee86@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ba889ffb-ba6f-450a-be9b-9fa75b20ee86@redhat.com>
+X-Spam-Score: -1.9 (-)
 
-Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
+On Thu, Sep 26, 2024 at 12:43:23PM +0200, Paolo Abeni wrote:
+> On 9/26/24 12:37, Florian Westphal wrote:
+> > Paolo Abeni <pabeni@redhat.com> wrote:
+> > > On 9/24/24 22:13, Pablo Neira Ayuso wrote:
+> > > > The following patchset contains Netfilter fixes for net:
+> > > > 
+> > > > Patch #1 and #2 handle an esoteric scenario: Given two tasks sending UDP
+> > > > packets to one another, two packets of the same flow in each direction
+> > > > handled by different CPUs that result in two conntrack objects in NEW
+> > > > state, where reply packet loses race. Then, patch #3 adds a testcase for
+> > > > this scenario. Series from Florian Westphal.
+> > > 
+> > > Kdoc complains against the lack of documentation for the return value in the
+> > > first 2 patches: 'Returns' should be '@Return'.
+> > 
+> > :-(
+> > 
+> > Apparently this is found via
+> > 
+> > scripts/kernel-doc -Wall -none <file>
+> > 
+> > I'll run this in the future, but, I have to say, its encouraging me
+> > to just not write such kdocs entries in first place, no risk of making
+> > a mistake.
+> > 
+> > Paolo, Pablo, what should I do now?
+> 
+> If an updated PR could be resent soon, say within ~1h, I can wait for the CI
+> to run on it, merge and delay the net PR after that.
+> 
+> Otherwise, if the fixes in here are urgent, I can pull the series as-is, and
+> you could follow-up on nf-next/net-next.
+> 
+> The last resort is just drop this from today's PR.
+> 
+> Please LMK your preference,
 
->> I'm hinting at some complications here (with the EFAULT return) that
->> needs to be resolved: there is no guarantee that a given packet will be
->> in sync with the current status of the registered metadata, so we need
->> explicit checks for this. If metadata entries are de-registered again
->> this also means dealing with holes and/or reshuffling the metadata
->> layout to reuse the released space (incidentally, this is the one place
->> where a TLV format would have advantages).
->
-> I like this approach but it seems to me more suitable for 'sw' metadata
-> (this is main Arthur and Jakub use case iiuc) where the userspace would
-> enable/disable these functionalities system-wide.
-> Regarding device hw metadata (e.g. checksum offload) I can see some issues
-> since on a system we can have multiple NICs with different capabilities.
-> If we consider current codebase, stmmac driver supports only rx timestamp,
-> while mlx5 supports all of them. In a theoretical system with these two
-> NICs, since pkt_metadata_registry is global system-wide, we will end-up
-> with quite a lot of holes for the stmmac, right? (I am not sure if this
-> case is relevant or not). In other words, we will end-up with a fixed
-> struct for device rx hw metadata (like xdp_rx_meta). So I am wondering
-> if we really need all this complexity for xdp rx hw metadata?
-
-Well, the "holes" will be there anyway (in your static struct approach).
-They would just correspond to parts of the "struct xdp_rx_meta" being
-unset.
-
-What the "userspace can turn off the fields system wide" would
-accomplish is to *avoid* the holes if you know that you will never need
-them. E.g., say a system administrator know that they have no networks
-that use (offloaded) VLANs. They could then disable the vlan offload
-field system-wide, and thus reclaim the four bytes taken up by the
-"vlan" member of struct xdp_rx_meta, freeing that up for use by
-application metadata.
-
-However, it may well be that the complexity of allowing fields to be
-turned off is not worth the gains. At least as long as there are only
-the couple of HW metadata fields that we have currently. Having the
-flexibility to change our minds later would be good, though, which is
-mostly a matter of making the API exposed to BPF and/or userspace
-flexible enough to allow us to move things around in memory in the
-future. Which was basically my thought with the API I sketched out in
-the previous email. I.e., you could go:
-
-ret = bpf_get_packet_metadata_field(pkt, METADATA_ID_HW_HASH,
-                                    &my_hash_vlaue, sizeof(u32))
-
-
-...and the METADATA_ID_HW_HASH would be a constant defined by the
-kernel, for which the bpf_get_packet_metadata_field() kfunc just has a
-hardcoded lookup into struct xdp_rx_meta. And then, if we decide to move
-the field in the future, we just change the kfunc implementation, with
-no impact to the BPF programs calling it.
-
-> Maybe we can start with a simple approach for xdp rx hw metadata
-> putting the struct in xdp_frame as suggested by Jesper and covering
-> the most common use-cases. We can then integrate this approach with
-> Arthur/Jakub's solution without introducing any backward compatibility
-> issue since these field are not visible to userspace.
-
-Yes, this is basically the gist of my suggestion (as I hopefully managed
-to clarify above): Expose the fields via an API that is flexible enough
-that we can move things around should the need arise, *and* which can
-co-exist with the user-defined application metadata.
-
--Toke
-
+I am working on this now.
 
