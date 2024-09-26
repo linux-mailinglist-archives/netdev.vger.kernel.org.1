@@ -1,207 +1,169 @@
-Return-Path: <netdev+bounces-130017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D548987977
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 20:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93BD198798D
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 21:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F6B1C22310
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 18:56:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1F9D1C2190B
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 19:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE6B16D33F;
-	Thu, 26 Sep 2024 18:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87447172BD5;
+	Thu, 26 Sep 2024 19:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MAlq+Kev"
+	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="dYfMKgYP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF28F4A24
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 18:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1943E1D5AC5
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 19:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727376975; cv=none; b=SdCigqFzNNbUBNO5qU6gVbMPEn4vmlcQiFAl3svzYtCJW8wNu/YnAM5Ib0b69bccNfIRDni9e2bH/5mskeWmo0eTGiuMKreG/enDA20rLPL5tZi6HbXcJ8y/JGHe0itJBhGyoCjL2fWx6PLzJjbmztrO61M5u2BDYbDOZDc8x2Q=
+	t=1727377990; cv=none; b=iY3XOVKnqPMjo3iWvIxPeyOXY+FgI8EBk9pOs8+tPXIgGwd+L4aZnnxB6nkTEKFmJUCbWuOClHH0bxXBpDUVNOXZ6WBZmrfRmXdnK9E9TDijvsuzXkr8gHioKbIVUZgvDQGImopuhF4ZCz/JFMP9v3wMIIHBfUXz/GYMCqaZoXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727376975; c=relaxed/simple;
-	bh=SYAzZf7fL7yIxfos7iOx2bw7k6KMuMFEtuuPb2VGYsk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MUWnAL5NsyI/UbvyCXs/MCf1rZURwX9aCeXJCnTIzhUZI7mLw8B44bkR/gE8Y87LZSQcR2Ia2WIqRx4ScV8Re/CTvaS1bXUqTzBqvicrb7tFcYAZATCswbHwO1sB2N/L8n84jNtuvnE/YuRGnXqRMqApTCaTuoWJWzylEOGAbLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MAlq+Kev; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-69a0536b23aso32373247b3.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 11:56:13 -0700 (PDT)
+	s=arc-20240116; t=1727377990; c=relaxed/simple;
+	bh=cPPMlB+vtFQT2CeU6d0BNvKEGolYxkwnjZlbZZtBpY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R+N7rVn3bR11yG/xPqKYhv+qCZrgzgk20zb8+sRlkBTaiUwX1y0F5Ot23UR0MhI3rvIT699dZIltCrzbIXe2zuaX8siKFtrLdfYCrAJC4ykPdcI0qQR6IvMdZb++tCYosdfCqAVJax9Ut6wqFVPmg42huzcQbTGT7J2P4IeQVEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=dYfMKgYP; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20b0b2528d8so14483515ad.2
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 12:13:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727376973; x=1727981773; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GYZcEJhsOftnMMZystmGPE1lb8+vlI2F7UUy9IdVj58=;
-        b=MAlq+KevMm7kdq+bz9f3If/wHNUfofV4tpCDBkRBPpZRa7nPfkY9/vI+91lK+gv9lr
-         TxRfm4JQkFdhrP6ywMQUacv14RVxzpVnL6CN8QFo1mgNB4Q77lGCwpKC+Jy2OpAB3x80
-         npg+1aLx6+Kt2ATt9Ul2rEYalwx/hfutendCSOgrsAMPYygyL9UIuOHdVp5edoZs1o9F
-         c1PD8KhJr+jQoLsvwjhfB/4dCpu/fros2cJttCQh3/C0bcu0ipCb2FATU5+uNIjhhzfv
-         MdNJL7wAE9NKg7XuOybsZEdhCZGZPiuQYXzfOoKp8dXFMd5hIinEtdPFJ5pIIhWtiQ6t
-         ZvJA==
+        d=tenstorrent.com; s=google; t=1727377988; x=1727982788; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y4WZTo6nI26Bhfdln9Gf7wFMawvUlUInYNk7SP122zU=;
+        b=dYfMKgYPKAVrvAJStpBvuHVRxAI0/8O/shzmLQsQKHxOwTyZvA9i9Kf5JPHCbv12vO
+         KlhIbQO9eaUjZielRtn3JjEP6DeD8b5H6J60tjuidfePU9CmNRwqC3h4CGuSxEeFny/w
+         wkQBu2sWWTp5D9D2b6kLU0jmJqEDUhhENAPjb7VXKrzxGv/tndhT+A5rSAboI+vwYrF+
+         yEbN/GSb83W5OhnqW+UspJnA2Ri1W2UZiz2Q2labCwMVWGVl2g5MP3dE4cjkA4bLfwt9
+         j+ZSdQ+aHBZL2E7VaBuEJHAq8yigPBHXW0Ljli2SMabz0Hejq2WnRUiwwX6pxpuW1idv
+         8QMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727376973; x=1727981773;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GYZcEJhsOftnMMZystmGPE1lb8+vlI2F7UUy9IdVj58=;
-        b=dbEQRvwy2bi336696rKzUoD8JbQNGmxKK7TnAXmaogodnqL6pZAYf34M9MQCPK3c2D
-         YgbUuX2EjZY7oBjJRzt67QpC2h/q58f9eUqWFTvrH1p7Cv2YQ5/xp/NDVO/VWFbR4fqK
-         Xh2zxQLeY5z55bI1aTk5OaFcwEwBb8w5/PAMgr5BJS3cfkRFBqP9AG+ISrVNi/p59sJ2
-         HCfPtoTo99JNfgngCRItjfCxhN1ENm7e5+tEgv+YwAzq0GfaD8KR2W5F7bFglBVWQHla
-         mkJgaqMGjjUXmI22Lp6tvHjDANJYibXjuYBXleFxjSQBEuUCB1W/KiAUQOGoXV7QLWx2
-         wDcQ==
-X-Gm-Message-State: AOJu0YzuiO5MJUiwuH62d0/YfMaRNHdfqb+t8x3XHPCIDbBqjINcFDef
-	1B3Yn/DTcEPa5Z6/Me7skEPqCRAWT1YsSNz+jmJeTpf4/YM5lOIamNmWDXoynI2ibdV2/aZM5et
-	00TDNVYo7/w==
-X-Google-Smtp-Source: AGHT+IG5p84FxDmTnqT3GKqUxH9flLKG8nSbZhQBrmsIghNSRqD/dCAwTrHidbSLrN8NSbU16qETxI42Lbpj8A==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:ef52:0:b0:dfa:8ed1:8f1b with SMTP id
- 3f1490d57ef6-e2604b1a436mr512276.1.1727376972889; Thu, 26 Sep 2024 11:56:12
- -0700 (PDT)
-Date: Thu, 26 Sep 2024 18:56:11 +0000
+        d=1e100.net; s=20230601; t=1727377988; x=1727982788;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4WZTo6nI26Bhfdln9Gf7wFMawvUlUInYNk7SP122zU=;
+        b=bfiNbAdzkH/O+O+AR4TEKHiQy2YqhonOwmBPmxt5xoazhNFLAvz9Mun0b1ZbXL7jLZ
+         E00xbWpX9PNFcICIK2f+kHOhCI1vO05Kvo/6+m7zJdjCHcRT5VS/2Eq0Qz8x3ShdMRdO
+         rFpDh6ROrBTyRHHCpnrKfDW3XPKdwEYaymQk9pZvERh3QHdfkh9QIMT8UEEqrhm4EXWm
+         debg0L6z9iE0hhklIG/16MHt0Shr+Fc6F4dp/H6opKfcew0fveQkjjiU+f1ObhMPRCrD
+         FO3V8OuUMo615jKta0G5GXkFzRLwdCRk1yV5LZHgCRdMmS0Yb9vfPjijKFXXUuOE25JW
+         KoaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYY9aT/YDkR1EVFVxG7B4yB3e9lA6T2mYkzB911Lz5kCCz9tbTQfMsmI2nw2wkcTRCqpck5PM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxM7A1zvKwi5Z5p9yeyBOR1HGMnKzO4TbQBp+vw0gZgEW1orOF5
+	3OUbzVZICB6pRM/ht3/e+iidxjOMFP5V5IrkFU8jIEvEhR/eg8IWxD0Q1dMaQkg=
+X-Google-Smtp-Source: AGHT+IEMklrWdPx+X7c21DcecTVJ7lxpddUaIsHWWZy+aOWGUu3YS5G/It5NPJNOcBI2+VtqDMCCmw==
+X-Received: by 2002:a17:903:41ca:b0:206:9ab3:2ebc with SMTP id d9443c01a7336-20b37b7c063mr8647165ad.47.1727377988323;
+        Thu, 26 Sep 2024 12:13:08 -0700 (PDT)
+Received: from x1 (71-34-69-82.ptld.qwest.net. [71.34.69.82])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e543dasm1740175ad.258.2024.09.26.12.13.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Sep 2024 12:13:08 -0700 (PDT)
+Date: Thu, 26 Sep 2024 12:13:06 -0700
+From: Drew Fustini <dfustini@tenstorrent.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 3/3] riscv: dts: thead: Add TH1520 ethernet nodes
+Message-ID: <ZvWyQo+2mwsC1HS6@x1>
+References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com>
+ <20240926-th1520-dwmac-v2-3-f34f28ad1dc9@tenstorrent.com>
+ <3e26f580-bc5d-448e-b5bd-9b607c33702b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
-Message-ID: <20240926185611.3988042-1-edumazet@google.com>
-Subject: [PATCH nf] netfilter: nf_tables: prevent nf_skb_duplicated corruption
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3e26f580-bc5d-448e-b5bd-9b607c33702b@lunn.ch>
 
-syzbot found that nf_dup_ipv4() or nf_dup_ipv6() could write
-per-cpu variable nf_skb_duplicated in an unsafe way [1].
+On Thu, Sep 26, 2024 at 08:39:29PM +0200, Andrew Lunn wrote:
+> > +&mdio0 {
+> > +	phy0: ethernet-phy@1 {
+> > +		reg = <1>;
+> > +	};
+> > +
+> > +	phy1: ethernet-phy@2 {
+> > +		reg = <2>;
+> > +	};
+> > +};
+> 
+> Two PHYs on one bus...
 
-Disabling preemption as hinted by the splat is not enough,
-we have to disable soft interrupts as well.
+Thanks for pointing this out. I will move phy1 to mdio1.
 
-[1]
-BUG: using __this_cpu_write() in preemptible [00000000] code: syz.4.282/6316
- caller is nf_dup_ipv4+0x651/0x8f0 net/ipv4/netfilter/nf_dup_ipv4.c:87
-CPU: 0 UID: 0 PID: 6316 Comm: syz.4.282 Not tainted 6.11.0-rc7-syzkaller-00104-g7052622fccb1 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:93 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
-  check_preemption_disabled+0x10e/0x120 lib/smp_processor_id.c:49
-  nf_dup_ipv4+0x651/0x8f0 net/ipv4/netfilter/nf_dup_ipv4.c:87
-  nft_dup_ipv4_eval+0x1db/0x300 net/ipv4/netfilter/nft_dup_ipv4.c:30
-  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
-  nft_do_chain+0x4ad/0x1da0 net/netfilter/nf_tables_core.c:288
-  nft_do_chain_ipv4+0x202/0x320 net/netfilter/nft_chain_filter.c:23
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xc3/0x220 net/netfilter/core.c:626
-  nf_hook+0x2c4/0x450 include/linux/netfilter.h:269
-  NF_HOOK_COND include/linux/netfilter.h:302 [inline]
-  ip_output+0x185/0x230 net/ipv4/ip_output.c:433
-  ip_local_out net/ipv4/ip_output.c:129 [inline]
-  ip_send_skb+0x74/0x100 net/ipv4/ip_output.c:1495
-  udp_send_skb+0xacf/0x1650 net/ipv4/udp.c:981
-  udp_sendmsg+0x1c21/0x2a60 net/ipv4/udp.c:1269
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x1a6/0x270 net/socket.c:745
-  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
-  ___sys_sendmsg net/socket.c:2651 [inline]
-  __sys_sendmmsg+0x3b2/0x740 net/socket.c:2737
-  __do_sys_sendmmsg net/socket.c:2766 [inline]
-  __se_sys_sendmmsg net/socket.c:2763 [inline]
-  __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2763
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f4ce4f7def9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f4ce5d4a038 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f4ce5135f80 RCX: 00007f4ce4f7def9
-RDX: 0000000000000001 RSI: 0000000020005d40 RDI: 0000000000000006
-RBP: 00007f4ce4ff0b76 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f4ce5135f80 R15: 00007ffd4cbc6d68
- </TASK>
+> 
+> > +		gmac1: ethernet@ffe7060000 {
+> > +			compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
+> > +			reg = <0xff 0xe7060000 0x0 0x2000>, <0xff 0xec004000 0x0 0x1000>;
+> > +			reg-names = "dwmac", "apb";
+> > +			interrupts = <67 IRQ_TYPE_LEVEL_HIGH>;
+> > +			interrupt-names = "macirq";
+> > +			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC_AXI>;
+> > +			clock-names = "stmmaceth", "pclk";
+> > +			snps,pbl = <32>;
+> > +			snps,fixed-burst;
+> > +			snps,multicast-filter-bins = <64>;
+> > +			snps,perfect-filter-entries = <32>;
+> > +			snps,axi-config = <&stmmac_axi_config>;
+> > +			status = "disabled";
+> > +
+> > +			mdio1: mdio {
+> > +				compatible = "snps,dwmac-mdio";
+> > +				#address-cells = <1>;
+> > +				#size-cells = <0>;
+> > +			};
+> > +		};
+> > +
+> > +		gmac0: ethernet@ffe7070000 {
+> > +			compatible = "thead,th1520-gmac", "snps,dwmac-3.70a";
+> > +			reg = <0xff 0xe7070000 0x0 0x2000>, <0xff 0xec003000 0x0 0x1000>;
+> > +			reg-names = "dwmac", "apb";
+> > +			interrupts = <66 IRQ_TYPE_LEVEL_HIGH>;
+> > +			interrupt-names = "macirq";
+> > +			clocks = <&clk CLK_GMAC_AXI>, <&clk CLK_GMAC_AXI>;
+> 
+> And the MACs are listed in opposite order. Does gmac1 probe first,
+> find the PHY does not exist, and return -EPROBE_DEFER. Then gmac0
+> probes successfully, and then sometime later gmac1 then reprobes?
+> 
+> I know it is normal to list nodes in address order, but you might be
+> able to avoid the EPROBE_DEFER if you reverse the order.
 
-Fixes: d877f07112f1 ("netfilter: nf_tables: add nft_dup expression")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/netfilter/nf_dup_ipv4.c | 7 +++++--
- net/ipv6/netfilter/nf_dup_ipv6.c | 7 +++++--
- 2 files changed, 10 insertions(+), 4 deletions(-)
+The probe order seems to always be the ethernet@ffe7060000 (gmac1) first
+and then ethernet@ffe7070000 (gmac0). I do not see any probe deferral
+in the boot log [1].
 
-diff --git a/net/ipv4/netfilter/nf_dup_ipv4.c b/net/ipv4/netfilter/nf_dup_ipv4.c
-index f4aed0789d69dce64377446d7cfded9c5ecd5f51..ec94ee1051c77f9af8f13d0842978f8cee5d7da7 100644
---- a/net/ipv4/netfilter/nf_dup_ipv4.c
-+++ b/net/ipv4/netfilter/nf_dup_ipv4.c
-@@ -53,8 +53,9 @@ void nf_dup_ipv4(struct net *net, struct sk_buff *skb, unsigned int hooknum,
- {
- 	struct iphdr *iph;
- 
-+	local_bh_disable();
- 	if (this_cpu_read(nf_skb_duplicated))
--		return;
-+		goto out;
- 	/*
- 	 * Copy the skb, and route the copy. Will later return %XT_CONTINUE for
- 	 * the original skb, which should continue on its way as if nothing has
-@@ -62,7 +63,7 @@ void nf_dup_ipv4(struct net *net, struct sk_buff *skb, unsigned int hooknum,
- 	 */
- 	skb = pskb_copy(skb, GFP_ATOMIC);
- 	if (skb == NULL)
--		return;
-+		goto out;
- 
- #if IS_ENABLED(CONFIG_NF_CONNTRACK)
- 	/* Avoid counting cloned packets towards the original connection. */
-@@ -91,6 +92,8 @@ void nf_dup_ipv4(struct net *net, struct sk_buff *skb, unsigned int hooknum,
- 	} else {
- 		kfree_skb(skb);
- 	}
-+out:
-+	local_bh_enable();
- }
- EXPORT_SYMBOL_GPL(nf_dup_ipv4);
- 
-diff --git a/net/ipv6/netfilter/nf_dup_ipv6.c b/net/ipv6/netfilter/nf_dup_ipv6.c
-index a0a2de30be3e7b6fa9aa34dcc6a918e566713e07..0c39c77fe8a8a4c7589cdd9e6b7fb78e6f0ef88b 100644
---- a/net/ipv6/netfilter/nf_dup_ipv6.c
-+++ b/net/ipv6/netfilter/nf_dup_ipv6.c
-@@ -47,11 +47,12 @@ static bool nf_dup_ipv6_route(struct net *net, struct sk_buff *skb,
- void nf_dup_ipv6(struct net *net, struct sk_buff *skb, unsigned int hooknum,
- 		 const struct in6_addr *gw, int oif)
- {
-+	local_bh_disable();
- 	if (this_cpu_read(nf_skb_duplicated))
--		return;
-+		goto out;
- 	skb = pskb_copy(skb, GFP_ATOMIC);
- 	if (skb == NULL)
--		return;
-+		goto out;
- 
- #if IS_ENABLED(CONFIG_NF_CONNTRACK)
- 	nf_reset_ct(skb);
-@@ -69,6 +70,8 @@ void nf_dup_ipv6(struct net *net, struct sk_buff *skb, unsigned int hooknum,
- 	} else {
- 		kfree_skb(skb);
- 	}
-+out:
-+	local_bh_enable();
- }
- EXPORT_SYMBOL_GPL(nf_dup_ipv6);
- 
--- 
-2.46.1.824.gd892dcdcdd-goog
+Thanks,
+Drew
 
+[1] https://gist.github.com/pdp7/02a44b024bdb6be5fe61ac21303ab29a
 
