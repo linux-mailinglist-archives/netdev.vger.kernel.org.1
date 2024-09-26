@@ -1,167 +1,157 @@
-Return-Path: <netdev+bounces-129915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD31986FD1
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:17:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96085986FE0
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:20:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8D3B1F23CC5
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:17:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C70FB1C20380
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D89F192B91;
-	Thu, 26 Sep 2024 09:17:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB8E1A4F18;
+	Thu, 26 Sep 2024 09:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDy9k9+6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y97r/nIz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27CB13BC11
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:17:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C621A4E9A
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727342276; cv=none; b=L4zXT4/uW8Zy7oG0t7LcBJpOkh1eQgI2OYdHzpZcRncvbds3SuhvXuLE3dv5BiD/0n5wELP8Idyw24lKWIz4V4fYc7Ey/zwdRgLB0Gn5phOfM+X0ORDvt7Xa5JQB8CLtWO8CRWGGwse+HgyTAyueBk/BbA7WzLtk4OvHuXLnbl8=
+	t=1727342399; cv=none; b=T/AwHXWQsNhHpFW1Y24aHiaXxICQOc1xEd/r4hrWb9L+3E4EUy+ugPIBIEE7KinTTNLfAcIKWbGivC0IyWLdk8Q8MkaGd9geVocpGpYmzRccJwTDTMZs9HCAk0wWxA3UYvwZs/Bm3jV2a+p+q4hJs9eOwxYpaoDQYArgd9VKQCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727342276; c=relaxed/simple;
-	bh=APoGCwI1ijsveaYeCbbkZyKzvH8F6xI/BZYnzZMOyP0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=T2msbhKL3S2H5eaqBozmBCWDKWRN9ccq1Fmh5nMIGE5V/41H9W0+cQ/p9NqIBOvb+XZ26pZXt0lmF74yezvZp1LR3qcJUJqEIeMlGK3UzR/SBh+oFYcvgWMrULzGHF2q0xxebI7XMgwRZSiYlP7fNHuBn8McuFkheJRGG/Pm2rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BDy9k9+6; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cb2d2a7d48so5089166d6.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:17:54 -0700 (PDT)
+	s=arc-20240116; t=1727342399; c=relaxed/simple;
+	bh=DvDFTPz/i5rugDCoQq2HmgdqlkGLW0BZ7eDwMdp7K9Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CBIN3QAceiaPKgoP8jeCQbMp5u5RC5WTdkM61wLZaK/NayJ7npW9sJ36fy79HuxGNiP/JXf8amdUXDyllZCoP/09FXnHMxdEnfWUsca5d4HbJWLRSGRtIyw+dxRtWM9NXDKHweJpLbrzvvhn5DV/Do/JMronHdBIeOJ/LgdPgfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y97r/nIz; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c8784e3bc8so719201a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:19:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727342273; x=1727947073; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1727342396; x=1727947196; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OqVpda1Hn5Vmj1CfkV/Bm1IACJrSf6jpUj+jmmqfYSk=;
-        b=BDy9k9+6HNP1BxNIoAt4bxxop0prV+ACgckPyTUcoZ4EwzcZGHETeBIe3c0eeGqnoB
-         syQuTuNMRiqj2AZ0m1sAqC+cc9wMffukIUqjeEQzEF4ruJ45k33h45XvkMDb9rYK7Xo1
-         N+Aqt9Eb6Wg2Fo2TbpAem/Yv0XImO9ZI3NeoeEUhoqo2vPrDQYWu4oxgVf+a9/PkXivU
-         UAHoT4g3kExAzc2+waqrdRK2UgMMXCC5vjIaiQEpukdjYqo1rjozbNG7B/QYpUjx2nUK
-         Sj6VB1sLyrV1yCQrcEaH0dm2rJzQhmRkBRv1k04Ua342mydD8zClAkiBQPprtyvYnQee
-         044g==
+        bh=N6o0ZPPqNs5OKEvE6LJy16ez0xt1FXRTxMU/UK1sI/E=;
+        b=Y97r/nIz2f5APCkFQ6NJgdIu/E4k2FMY9ZsIawRee/qiq9kWF2D6MV1ob4PnrOg6vR
+         cwsVh8pmoi5ohsyIvp46Tu6q1IhZa74OA0knryP+Vwbi9AAvgphZeXJsYZmsR0pa6BD1
+         H3KJzsmsWHgjhB5eKZRUsQaOzZcGwIxRR+M0o47efw5GdBc0wYdUNY7rFzgvXaMDxqfA
+         xyJWbIDXn6ShZdd9iJg9QZfgjfi1Qz3jr6xrubTS+bF86Khfj+sLRKdnc0YVlN033xZd
+         p+1xnbjmQ8W7WlRGPFJ0qu1K4ySwTCVXoQyEzBt3kc9LcAFPKM8N3Y60N55s22+jEE3w
+         HA7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727342273; x=1727947073;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OqVpda1Hn5Vmj1CfkV/Bm1IACJrSf6jpUj+jmmqfYSk=;
-        b=fvvxn8loN269rmjXKEREwLqTIJaxbDYm6woT6hmSJqO0Fwg1cXSUMnTNF34AhSjIbZ
-         B2yMMaz41fiFv7+LsBSEfpLLTrUjZ2DoeWQsLXkLEH/3ZBUKdtOtfraU/SIndE25BDlp
-         Eil3cb+OZe9GmPjiupA2uI/dVqLyw8roxdZUGAcuev0GvVNu3rWE72j88xGZCRJfvq6h
-         gnD47er88H3HZbEXk2+fBp8o1oHf5jVT6wjEu7LXN58dy6zlbCZyoO0D8kgB6sQ5S/41
-         0ppUe8yqq9ct/XR9e2bqPcCEzHE1gWUzx5FJxtug8BX53NVmUMtVOieq91nK97sgkTqa
-         BweQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDsOfsIcZ8FvdIdN9VmFgTE0BkaSo0hg6FqBT44W/LP3qn8mdCpeTUgturVIkAm3tc62wCB/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjjc3b10/xR5s2iQTYkc82MUiF1+pW4q+AIeJ3jHuFpRLvCpbS
-	zsIf9OR4sAmi+mhTy0PP+6B61s6I3LPVSrK9YO91CIlbH5CL5v2k
-X-Google-Smtp-Source: AGHT+IGYRFprjwr/3w32gD593j43CNzVFLxvv09WdU9jgZ7NDLuAM8Wk7xPfq72cQPvKmjawzu8uag==
-X-Received: by 2002:a05:6214:5992:b0:6c3:5496:3e06 with SMTP id 6a1803df08f44-6cb1dd1856bmr91029416d6.10.1727342273360;
-        Thu, 26 Sep 2024 02:17:53 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb31882c44sm4745756d6.138.2024.09.26.02.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 02:17:52 -0700 (PDT)
-Date: Thu, 26 Sep 2024 05:17:52 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, 
- netdev@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>, 
- Jonathan Davies <jonathan.davies@nutanix.com>, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <66f526c06b0fa_851bd294af@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66f525aab17bb_8456129490@willemb.c.googlers.com.notmuch>
-References: <20240924150257.1059524-1-edumazet@google.com>
- <20240924150257.1059524-3-edumazet@google.com>
- <66f525aab17bb_8456129490@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net 2/2] net: add more sanity checks to
- qdisc_pkt_len_init()
+        d=1e100.net; s=20230601; t=1727342396; x=1727947196;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N6o0ZPPqNs5OKEvE6LJy16ez0xt1FXRTxMU/UK1sI/E=;
+        b=RzmSjk9PMjPrsLj3a75tUjf1W0a+5K3Y/pKgZ6/cWg+PyfZx/l2Ie2TaS1wFMUksQs
+         VJPfjYCZ6DCzGi237z4OfnO9aLmnvn1oOwsqMqCTJNur4Py1DJ1+T/DzbGNBOhOyXeNS
+         n89rU0Hs1FCECp3bwOuvXSzrl94K8dxTyxf56Wny87c9kD9+txDD8/towvECeq5xNFUw
+         g4HAzEwQLF+WNUZ0FQDEXrSD05IIVNsBUq8D0xFNIyR9rV7iI658G/qnK0vwXD0Ydf/d
+         BHzgQYgeTF4eoisk32HIsgjGjP5bh2GS5uuweSuc91WBIVqHxv/6esmEKV/4sL9qRIYm
+         UtSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBK7EFQRawRtNaL9U1QZz9SJTz0rVFfU6mZ3FyhTdd1Uols9K651OMooxTg7MAZAPDP6J4Ld8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyq6u2/wW0eHKX5a2LKG9N+0kyrzrZZTbuKCMVX8dnyQl8oe6w+
+	WM9r9IV/c6P0Cfr+7GQxRGT7F8BTSQ0cE+nX935+nBzwYov6IhNiiqVUv2fBuYg3OVG50gH3VwW
+	B4Ly+t6fGtfzSOmshJ4IriRZ3CwyH1DGG9e9/
+X-Google-Smtp-Source: AGHT+IG6ogNq8IXQ6XBSyy7WlpEV0RW/9q/ds6DRJeV3YZsjG8wLdD7czlVCG8Kb/uXbpjHgzIXEe36sqcVcND8PpBM=
+X-Received: by 2002:a05:6402:518b:b0:5c5:b84a:8156 with SMTP id
+ 4fb4d7f45d1cf-5c72062506bmr4200236a12.17.1727342395446; Thu, 26 Sep 2024
+ 02:19:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240924150257.1059524-1-edumazet@google.com> <20240924150257.1059524-3-edumazet@google.com>
+ <66f525aab17bb_8456129490@willemb.c.googlers.com.notmuch> <66f526c06b0fa_851bd294af@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66f526c06b0fa_851bd294af@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 26 Sep 2024 11:19:44 +0200
+Message-ID: <CANn89iKTN0NgEcUAhBf19siC2FJ9hGpQppHf4wKmH7HgAtkn9g@mail.gmail.com>
+Subject: Re: [PATCH net 2/2] net: add more sanity checks to qdisc_pkt_len_init()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Willem de Bruijn wrote:
-> Eric Dumazet wrote:
-> > One path takes care of SKB_GSO_DODGY, assuming
-> > skb->len is bigger than hdr_len.
-> > 
-> > virtio_net_hdr_to_skb() does not fully dissect TCP headers,
-> > it only make sure it is at least 20 bytes.
-> > 
-> > It is possible for an user to provide a malicious 'GSO' packet,
-> > total length of 80 bytes.
-> > 
-> > - 20 bytes of IPv4 header
-> > - 60 bytes TCP header
-> > - a small gso_size like 8
-> > 
-> > virtio_net_hdr_to_skb() would declare this packet as a normal
-> > GSO packet, because it would see 40 bytes of payload,
-> > bigger than gso_size.
-> > 
-> > We need to make detect this case to not underflow
-> > qdisc_skb_cb(skb)->pkt_len.
-> > 
-> > Fixes: 1def9238d4aa ("net_sched: more precise pkt_len computation")
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >  net/core/dev.c | 10 +++++++---
-> >  1 file changed, 7 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index f2c47da79f17d5ebe6b334b63d66c84c84c519fc..35b8bcfb209bd274c81380eaf6e445641306b018 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -3766,10 +3766,14 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
-> >  				hdr_len += sizeof(struct udphdr);
-> >  		}
-> >  
-> > -		if (shinfo->gso_type & SKB_GSO_DODGY)
-> > -			gso_segs = DIV_ROUND_UP(skb->len - hdr_len,
-> > -						shinfo->gso_size);
-> > +		if (unlikely(shinfo->gso_type & SKB_GSO_DODGY)) {
-> > +			int payload = skb->len - hdr_len;
-> >  
-> > +			/* Malicious packet. */
-> > +			if (payload <= 0)
-> > +				return;
-> > +			gso_segs = DIV_ROUND_UP(payload, shinfo->gso_size);
-> > +		}
-> 
-> Especially for a malicious packet, should gso_segs be reinitialized to
-> a sane value? As sane as feasible when other fields cannot be fully
-> trusted..
+On Thu, Sep 26, 2024 at 11:17=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Willem de Bruijn wrote:
+> > Eric Dumazet wrote:
+> > > One path takes care of SKB_GSO_DODGY, assuming
+> > > skb->len is bigger than hdr_len.
+> > >
+> > > virtio_net_hdr_to_skb() does not fully dissect TCP headers,
+> > > it only make sure it is at least 20 bytes.
+> > >
+> > > It is possible for an user to provide a malicious 'GSO' packet,
+> > > total length of 80 bytes.
+> > >
+> > > - 20 bytes of IPv4 header
+> > > - 60 bytes TCP header
+> > > - a small gso_size like 8
+> > >
+> > > virtio_net_hdr_to_skb() would declare this packet as a normal
+> > > GSO packet, because it would see 40 bytes of payload,
+> > > bigger than gso_size.
+> > >
+> > > We need to make detect this case to not underflow
+> > > qdisc_skb_cb(skb)->pkt_len.
+> > >
+> > > Fixes: 1def9238d4aa ("net_sched: more precise pkt_len computation")
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > ---
+> > >  net/core/dev.c | 10 +++++++---
+> > >  1 file changed, 7 insertions(+), 3 deletions(-)
+> > >
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index f2c47da79f17d5ebe6b334b63d66c84c84c519fc..35b8bcfb209bd274c8138=
+0eaf6e445641306b018 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -3766,10 +3766,14 @@ static void qdisc_pkt_len_init(struct sk_buff=
+ *skb)
+> > >                             hdr_len +=3D sizeof(struct udphdr);
+> > >             }
+> > >
+> > > -           if (shinfo->gso_type & SKB_GSO_DODGY)
+> > > -                   gso_segs =3D DIV_ROUND_UP(skb->len - hdr_len,
+> > > -                                           shinfo->gso_size);
+> > > +           if (unlikely(shinfo->gso_type & SKB_GSO_DODGY)) {
+> > > +                   int payload =3D skb->len - hdr_len;
+> > >
+> > > +                   /* Malicious packet. */
+> > > +                   if (payload <=3D 0)
+> > > +                           return;
+> > > +                   gso_segs =3D DIV_ROUND_UP(payload, shinfo->gso_si=
+ze);
+> > > +           }
+> >
+> > Especially for a malicious packet, should gso_segs be reinitialized to
+> > a sane value? As sane as feasible when other fields cannot be fully
+> > trusted..
+>
+> Never mind. I guess the best thing we can do is to leave pkt_len as
+> skb->len, indeed.
+>
 
-Never mind. I guess the best thing we can do is to leave pkt_len as
-skb->len, indeed.
+It is unclear if we can change a field in skb here, I hope that in the
+future we can make virtio_net_hdr_to_skb() safer.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Role of qdisc_pkt_len_init() is to set a private skb->cb[] field for
+qdisc layer.
 
-> >  		qdisc_skb_cb(skb)->pkt_len += (gso_segs - 1) * hdr_len;
-> >  	}
-> >  }
-> > -- 
-> > 2.46.0.792.g87dc391469-goog
-> > 
-> 
-> 
-
-
+Thanks !
 
