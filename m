@@ -1,149 +1,81 @@
-Return-Path: <netdev+bounces-129963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3855D987361
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 14:16:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4783D987382
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 14:25:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5771F27730
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:16:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750E11C22686
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:25:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AB3158851;
-	Thu, 26 Sep 2024 12:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E73177992;
+	Thu, 26 Sep 2024 12:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcm8FqVf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KRoqJKeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F2EF9474;
-	Thu, 26 Sep 2024 12:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D76914B94F;
+	Thu, 26 Sep 2024 12:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727352995; cv=none; b=uMiN/me48OYhwMTzTUDPPnekuRYWR5uvGtc3KXFuWzBnfGcjeEAoO+cVlhKvMs2j2kAZRAkCqNuyzHhTM0EzHBHKaw8Nqlu8eHpST0DOpUbntArbykWvWWlq9AvRmsak6yPLSsNR+Ly45aw8Xxk3QKgOfabwfLe7QrFP6Mbfhog=
+	t=1727353510; cv=none; b=ltZjDO+P1RMsJ23tkdCXkEV2jK6qJ1gDglYW3OE7dCllRfpEB1P6uWBMehTCAawmDSopp9jz5Q80bAOgkMMeWQ4D+kbEC/CzYvU5wg9KodxyHfP3rifEwBYVal0OL4VZxjHMpFTffevsmc3XWnnzIQNFlVx1FelBQxQReCBJFbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727352995; c=relaxed/simple;
-	bh=6jDdywGd8sGLg0g+8ifYmBt7GKJcmc0mmZs+1uU2AaY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kldAGTVzcGT+eTi+2jFV9Yi82gw3jOIvvKBYYQscXtAbo79P48DnyqLnf6U+r1L81irTn33mjBKFab3oyzml/0rJ112aPOE9Kv58BRHHgmFKiMdEmS80h5KE+hmOz6l7Fm8o0GnUC6i7Mgou82VUMO6vWz2dRw+PG+riQDDMvRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcm8FqVf; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2059112f0a7so7047405ad.3;
-        Thu, 26 Sep 2024 05:16:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727352993; x=1727957793; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RFWRrrc/OB59rTuGIRSZF3RT/9LOUXYC3YSwE4RjXKQ=;
-        b=kcm8FqVfU6xhejk0fu7kJcTiRRk0zpPuQ62095E5NfjvfrT9+aC8w65Y/p4BdJkPXp
-         kiVT+WE7LXlqEDU20LFd1fNlWArdkzfruAiqwapa4c3Uwrh/5EWYI9y4781U0gwCpa4e
-         cEEeF9F/b87pbEwUt8DjdBNAu+tm6xUOQIdFZO1Dug4swYT1uWTnkccysu867Pb1442E
-         PBWNCNVh8wgqe9TEoleVbRzM6ydqIFRbc6cH+QpUa77mYWgf33+dI99oRl3Gf69qpXxz
-         xuuejHfwdyKjgaFOcYJ5IWNHbcYgPkfclKbxa3/hwEpO2DPJPdrwU5D6D1VquID65UgT
-         sknA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727352993; x=1727957793;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RFWRrrc/OB59rTuGIRSZF3RT/9LOUXYC3YSwE4RjXKQ=;
-        b=WjhTX1GeEifHyDkRIzYJ0PS6+51RJcIqke20H69QIbrGfCAze4VQPtDwH4OhkfxWRT
-         NZjLdRnbVYh4pt+5sQPhCdDZ5MDS0S30Ma1hFqPTWcdn0zkPELVXvPl72/lGrG9OwpLW
-         Ornk8keSJJ48Xy/x29vPqgglnn9DiXnA3aSH2/WWzg9XHD+EiUK+i3Rg7j/jeJl8eAdS
-         CfFtFILyd2gjKD3z1j/ZgmKTC2S2lTw0iy6fAeJQNRjkAOUfH4WYZ9kDY0Q4ZZDo1FLO
-         jqg0XDxSgF4D4DhMISgg5o8JoxwCvCTD5fCeZHg+Q8PwgTPNfCtBuhJYfsNr+ieE25PD
-         vLKw==
-X-Gm-Message-State: AOJu0YycN36oqqAX7tFMzVUk+Bn2gx6XSeyYgnDb6ZQFEjUap2cCUlYY
-	35Rr3dh97ieSI+c7JohDIJSUaQBpTOzawOacSPuMDhMiB1M0gcDGJ5S2LXKU
-X-Google-Smtp-Source: AGHT+IHyCVxo4uRC7+KQrVZwA38pdP8q+YT+SnlvhP6nlgn5ij9mjJRzqH+5BytSE/yLkRG3f8576g==
-X-Received: by 2002:a17:903:2bce:b0:205:5427:2231 with SMTP id d9443c01a7336-20afc5e1120mr81235105ad.47.1727352992831;
-        Thu, 26 Sep 2024 05:16:32 -0700 (PDT)
-Received: from localhost.localdomain (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20af1722177sm37722765ad.94.2024.09.26.05.16.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 05:16:32 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	tmgross@umich.edu,
-	aliceryhl@google.com,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kernel test robot <lkp@intel.com>
-Subject: [PATCH net v3] net: phy: qt2025: Fix warning: unused import DeviceId
-Date: Thu, 26 Sep 2024 12:14:03 +0000
-Message-ID: <20240926121404.242092-1-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1727353510; c=relaxed/simple;
+	bh=FnqH38wRAkVp3EZR3XksgSm/cQELxvlbKSkl27m+g20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rrI0NnIqohl5V5jJwyEHcjK/BmOic3dA8Xin8vEVFFWBDesgpNc/rSUzpXVCOYHDxVxFWiN1UAhhS9B8cCQtPZFSHe9X8pWDEQvY3/Gu0IQfhGrd3WpPVL7/4CIHEhUQk9DtjMlR64ade4499xMCG++IvRIFYfMKPjqCMnNPeVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KRoqJKeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A596EC4CEC5;
+	Thu, 26 Sep 2024 12:25:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727353509;
+	bh=FnqH38wRAkVp3EZR3XksgSm/cQELxvlbKSkl27m+g20=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=KRoqJKeqZQKGjYxZGqI+vXuvVmUsFs/uWMQSD4pgi6db0n9u2XseKMBWB3qcwNAZ0
+	 iY8Eb+72VLdlsYSNbPPS5pMY3Wfh35+MU0bdqVN3njTHi22TYwn4dh/BXpWiykq6++
+	 39z6hC8sayZlfcdcD+ZkA10oYlBXGIKSGDnGxk16N1K67PXTvRcIAII0f/BVdP/1Bh
+	 Ew3kiL9yFjLwbKm7jxOFf+9/Q9IQ+1Vr0ZMkCOBUAoXXy5J38VGsUHTr9wocW8rQCA
+	 1USiosNVW9COTIIARgdc+VKRPCEvl0eWAIWsf+Yy+oxan9YmABPyoG1Xb2DQslMS/F
+	 VL/abInkJlKxA==
+Message-ID: <e314597a-a779-473d-a406-b233efad2e23@kernel.org>
+Date: Thu, 26 Sep 2024 15:25:03 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix forever loop in
+ cleanup code
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Julien Panis <jpanis@baylibre.com>,
+ Chintan Vankar <c-vankar@ti.com>,
+ Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix the following warning when the driver is compiled as built-in:
 
-      warning: unused import: `DeviceId`
-      --> drivers/net/phy/qt2025.rs:18:5
-      |
-   18 |     DeviceId, Driver,
-      |     ^^^^^^^^
-      |
-      = note: `#[warn(unused_imports)]` on by default
 
-device_table in module_phy_driver macro is defined only when the
-driver is built as a module. Use phy::DeviceId in the macro instead of
-importing `DeviceId` since `phy` is always used.
+On 26/09/2024 12:50, Dan Carpenter wrote:
+> This error handling has a typo.  It should i++ instead of i--.  In the
+> original code the error handling will loop until it crashes.
+> 
+> Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Fixes: fd3eaad826da ("net: phy: add Applied Micro QT2025 PHY driver")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202409190717.i135rfVo-lkp@intel.com/
-Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-Reviewed-by: Trevor Gross <tmgross@umich.edu>
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
-v3:
- - add Fixes tag
-v2:
- - fix the commit log
- - add Alice and Trevor's Reviewed-by
----
- drivers/net/phy/qt2025.rs | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 28d8981f410b..1ab065798175 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -15,7 +15,7 @@
- use kernel::net::phy::{
-     self,
-     reg::{Mmd, C45},
--    DeviceId, Driver,
-+    Driver,
- };
- use kernel::prelude::*;
- use kernel::sizes::{SZ_16K, SZ_8K};
-@@ -23,7 +23,7 @@
- kernel::module_phy_driver! {
-     drivers: [PhyQT2025],
-     device_table: [
--        DeviceId::new_with_driver::<PhyQT2025>(),
-+        phy::DeviceId::new_with_driver::<PhyQT2025>(),
-     ],
-     name: "qt2025_phy",
-     author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-
-base-commit: 72ef07554c5dcabb0053a147c4fd221a8e39bcfd
--- 
-2.34.1
-
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
