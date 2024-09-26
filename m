@@ -1,116 +1,164 @@
-Return-Path: <netdev+bounces-129922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 395F1987074
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:41:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C52898708B
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D56D5B28773
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:41:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEC061F294BD
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6587E1AB6E7;
-	Thu, 26 Sep 2024 09:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dplgDuQ6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB7E1AC8BF;
+	Thu, 26 Sep 2024 09:43:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DF81AAE2A
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDCE61AC8A0
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727343708; cv=none; b=mjWi7q442b78XppEsCl2M0GR0TgFW23NpES/DE1LEvtUMqoIyukfx3Z9FIpdFTPjst542HLfvUwccFnDleETuy6Uu0SfWlTfZKYrDDM4tlls0n3SXfiWjvnJ8/aVQ01uNve6jjiA6lSM3UykfxNSKI8GUFrXtVSfSVLEynunahU=
+	t=1727343828; cv=none; b=DKjgcm+HEWzfTZzqktjVbqHvbb27B4aDCZrAqO0Eikh2UMXygzTRyVDiCwHJMZ4G/ah6eXmO7kUTTM4OtfTC36u0xRgUpufOsfI59t2F9Nnjc/AFGPEMLXxRUNm1zIaeQ/6XV8rfFII+kjEBHry1vCt35Wlb9DwQpg4cFS9M/qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727343708; c=relaxed/simple;
-	bh=7KjcE0B1b3Lo+UG6zGvriAp6T9t+938/9Ug99PMsz3w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M8j4TS5Ranj1CJVkSUo70NW8SEW87GNB1GkaIfrfS2flr30kbvVVT8Ethb7oLsf5QpifcQ2Ad+2CTILISNufbNUCAcGeDZNupcbnD9H3Svng2UGFYup1KFItvr0z6/qUTPJDIcAZKjXzN2eVHgC58jgosV2Irw86YR56FxchIbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dplgDuQ6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727343704;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=duedYL0F/SZtcaJ/2ctYIidXMcsINgd6fgzdoKb7MGU=;
-	b=dplgDuQ6i4d2DP6H7Ji6Z55GxBowjR8Ln/5BN0Yzq63YwnrqkTuPZbuHsSOCZgtGjMuczY
-	Y9L7B5ftdZEpepzrONR2++1YDOTSDEHrtvm99vZ69rZGWvt4ySdqTMFLG5aLbFeLq6mLxP
-	vRG8WkASPm2BhLz2RehhR48WjdXRFjo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-155-FDgcNYgTPYiMqA9yF9CELw-1; Thu, 26 Sep 2024 05:41:42 -0400
-X-MC-Unique: FDgcNYgTPYiMqA9yF9CELw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37cd19d0e83so132418f8f.2
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:41:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727343701; x=1727948501;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=duedYL0F/SZtcaJ/2ctYIidXMcsINgd6fgzdoKb7MGU=;
-        b=Mv3BqhhvaEKE6ugsINoItBEwgcmaxizWKLVnNvUzikeC6zvONxfDqiw6DqJJ80SYGI
-         52V6DnE9rljS87TeAqdzOCmH6tfcfwTobm6DYbbBIfQbEDv/pE3cMQk9B4lnaOzZePvS
-         0Rk2hVh4QTiVckORylV7YQHVcNGKx8c4SCCkpvzLrePdK7VZ4k6BIcCF4jUwlcv/Nwua
-         5+46OYv7o1W199loQe89n5l5N2XwR/I06bSPZZZsZievcvpY9Pk8dSu4Dh/rA4jzPcvM
-         n6Q7/fTXo2IQpTif74B5GUnznS5fMkytmcaWMnJYd9sJSzc71C1KyTUnESrJ10Lhh9yP
-         JNZw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfgU6w6hyEk9A5YUJJHwFoKO66E3tKZ8ohUAbkNRWgNbHIABIeVuDkP6FvkQOpvZuxSwjLTZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWwF2e7iX9QyYRcavMJn2cxAd1csp8ZZ2e8+FRelXg19zxqu+Q
-	oaS0+/ZTRuKM2XoOBpYpZflrwydBgZd7xuDjmx8ynZfkpYxJ4G9nB9bXCYKMmKkdeX3JQFE11Z3
-	ifses9lDDcLkAV8CsNAcJbznDme42CJL9c5YHFGFiXmZupCmQzTE9MA==
-X-Received: by 2002:adf:f5cc:0:b0:374:c31e:971a with SMTP id ffacd0b85a97d-37cc22c292amr3012474f8f.0.1727343701342;
-        Thu, 26 Sep 2024 02:41:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGbNFmaQ62WOIINYfB3CeWV9VfSJOSRt842DmCJ3cUVE5vR4WBvRiBLHJBBmQvDyTZzZ/7Axw==
-X-Received: by 2002:adf:f5cc:0:b0:374:c31e:971a with SMTP id ffacd0b85a97d-37cc22c292amr3012459f8f.0.1727343700913;
-        Thu, 26 Sep 2024 02:41:40 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b? ([2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2a8b55sm5994446f8f.17.2024.09.26.02.41.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2024 02:41:40 -0700 (PDT)
-Message-ID: <c51519c0-c493-4408-9938-5fb650b4ed8b@redhat.com>
-Date: Thu, 26 Sep 2024 11:41:38 +0200
+	s=arc-20240116; t=1727343828; c=relaxed/simple;
+	bh=J39S9SFF4nvbADpWj4XpcDkFu67NPPxdSgq9yoSez+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EYAlIbCTSeZQwJZr5ABAiz6ZFlp0kmvjwpJ/A5jm6/D1SFF8QAvPSRDAoZtZzSM/laaDRtle9e6RHYqfkJldFHWHg8ZeuQAj6Yb3lwdCsrhgVr+jxl0R152X4l6ahnsza1JowfV7dxNiXWjNa055EPsiXrRkKY/fer2K8LlJXuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1stl1q-0002On-HQ; Thu, 26 Sep 2024 11:43:18 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1stl1n-001ejo-F0; Thu, 26 Sep 2024 11:43:15 +0200
+Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id B47E8342FF1;
+	Thu, 26 Sep 2024 09:43:14 +0000 (UTC)
+Date: Thu, 26 Sep 2024 11:43:13 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Markus Schneider-Pargmann <msp@baylibre.com>, 
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH v3 2/2] can: m_can: fix missed interrupts with m_can_pci
+Message-ID: <20240926-resilient-arrogant-limpet-98af37-mkl@pengutronix.de>
+References: <ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
+ <4715d1cfed61d74d08dcc6a27085f43092da9412.1727092909.git.matthias.schiffer@ew.tq-group.com>
+ <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
+ <1a4ed0696cbe222e50b5abdff08a5ce7f8223aae.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 00/14] Netfilter fixes for net
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org,
- fw@strlen.de
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, fw@strlen.de
-References: <20240924201401.2712-1-pablo@netfilter.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240924201401.2712-1-pablo@netfilter.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="p64oeuz4yz67h6sr"
+Content-Disposition: inline
+In-Reply-To: <1a4ed0696cbe222e50b5abdff08a5ce7f8223aae.camel@ew.tq-group.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 9/24/24 22:13, Pablo Neira Ayuso wrote:
-> The following patchset contains Netfilter fixes for net:
-> 
-> Patch #1 and #2 handle an esoteric scenario: Given two tasks sending UDP
-> packets to one another, two packets of the same flow in each direction
-> handled by different CPUs that result in two conntrack objects in NEW
-> state, where reply packet loses race. Then, patch #3 adds a testcase for
-> this scenario. Series from Florian Westphal.
 
-Kdoc complains against the lack of documentation for the return value in 
-the first 2 patches: 'Returns' should be '@Return'.
+--p64oeuz4yz67h6sr
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If you could repost a new revision soon, I could possibly still include 
-it in today PR (delaying the latter a bit).
+On 26.09.2024 11:19:53, Matthias Schiffer wrote:
+> On Tue, 2024-09-24 at 08:08 +0200, Markus Schneider-Pargmann wrote:
+> >=20
+> > On Mon, Sep 23, 2024 at 05:32:16PM GMT, Matthias Schiffer wrote:
+> > > The interrupt line of PCI devices is interpreted as edge-triggered,
+> > > however the interrupt signal of the m_can controller integrated in In=
+tel
+> > > Elkhart Lake CPUs appears to be generated level-triggered.
+> > >=20
+> > > Consider the following sequence of events:
+> > >=20
+> > > - IR register is read, interrupt X is set
+> > > - A new interrupt Y is triggered in the m_can controller
+> > > - IR register is written to acknowledge interrupt X. Y remains set in=
+ IR
+> > >=20
+> > > As at no point in this sequence no interrupt flag is set in IR, the
+> > > m_can interrupt line will never become deasserted, and no edge will e=
+ver
+> > > be observed to trigger another run of the ISR. This was observed to
+> > > result in the TX queue of the EHL m_can to get stuck under high load,
+> > > because frames were queued to the hardware in m_can_start_xmit(), but
+> > > m_can_finish_tx() was never run to account for their successful
+> > > transmission.
+> > >=20
+> > > To fix the issue, repeatedly read and acknowledge interrupts at the
+> > > start of the ISR until no interrupt flags are set, so the next incomi=
+ng
+> > > interrupt will also result in an edge on the interrupt line.
+> > >=20
+> > > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkha=
+rt Lake")
+> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> >=20
+> > Just a few comment nitpicks below. Otherwise:
+> >=20
+> > Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
+>=20
+>=20
+> We have received a report that while this patch fixes a stuck queue issue=
+ reproducible with cangen,
+> the problem has not disappeared with our customer's application. I will h=
+old off sending a new
+> version of the patch while we're investigating whether there is a separat=
+e issue with the same
+> symptoms or the patch is insufficient.
+>=20
+> Patch 1/2 should be good to go and could be applied independently.
 
-Thanks!
+Can you post the reproducer here, too. So that we can add it to the
+patch or at least reference to it.
 
-Paolo
+regards,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--p64oeuz4yz67h6sr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmb1LK4ACgkQKDiiPnot
+vG8ygAf9F3z7iuju1FF4PZ5yNHEgp28yZl7t8Ot4b8R7yf5GjLjd4co76AEB+g/d
+Aa1stE3EBANxAalAwDUm+2/Bl6HBmGnU+Z/r6fstpKNjiqh53Cv0GcyEM0ZBDfhU
+YwbGSQab11HGFEcftHMw5gMQUEahdlZUeWuTR7kFERLOjRE1bZHEiigoUsCWqTX1
+29hHXxJuHfis8yA79Le/+77NWvNqm6+uciy1PvVLz9V89u570YVD9WHoBruwobju
+zIMLrqWSZgHoynMyNtYqB7h+ijRnfRHMknaVSTcUhlSFVD236ySX4ACAtU+t38jo
+NY/PAQ1sjmQvTo/RKgp8ywyHs8ETgQ==
+=nMju
+-----END PGP SIGNATURE-----
+
+--p64oeuz4yz67h6sr--
 
