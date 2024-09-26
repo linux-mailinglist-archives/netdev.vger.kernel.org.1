@@ -1,140 +1,167 @@
-Return-Path: <netdev+bounces-129893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB3A986E4B
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:55:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9201986EB3
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B52E4282570
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 07:55:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CB041F22904
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 08:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8101D194AD1;
-	Thu, 26 Sep 2024 07:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15DBC18FC7C;
+	Thu, 26 Sep 2024 08:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="YNgoiFsI"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="XZYXJPGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110A2192B79;
-	Thu, 26 Sep 2024 07:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B50135A53;
+	Thu, 26 Sep 2024 08:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727337318; cv=none; b=RkJsugLoC9lCh6p83gluQqMhUSZPJA3EHM8A01sTRG95tow2qPestc3niy3KXmoH65iMDoTj7OuAVcLOxO+FvOkABOF1LHI1g1QKd6bTThN66gwj7fbp1avY5HulACQvGLqrvnTWLwWQO68x+oTnxC6nuUSOyb80+ff+jq8GUmg=
+	t=1727339051; cv=none; b=n6L7JtvJQU1wImHGmjguSNI/rsS3XlkUTEwbJvUAnwT2OfTuRivDLbUCU/WqXd6lyTmAKZzBuv/u1A0bLHQ5K4ZRPp017aliejfehw4wP3sqPDiVPUv9XrsXL5qg0/EvjXYDNf8d+NAsRu2iYKziEBrOWFTZ1v3dNt1RZ0jvbBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727337318; c=relaxed/simple;
-	bh=14MN4WJFc40PK3xhiPHOoUBKfZx23EHVNRynp4GTYWM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rn4IZ/mS24WeRrrQom+vT6pFZCxOPWDTYe0/Y8/CZZvyAMVwDWg9lZSIrvwIe22edSh4bDghfraBWvGhcvEROD/bqL8wbOjUBlV5WTLbnZy1xJcsIh0ySlsPTBx4EZN0QpJ633GZ2qw10hJvVFo1AV51F7tPf5nqeeepX+J6HE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=YNgoiFsI; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: a40a76967bdc11efb66947d174671e26-20240926
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=e1SvC+8nTrTTGDqea1bs7+UZiB4ykSG5Yh6a6VUwB0w=;
-	b=YNgoiFsISDUPuyRj2XZAC/YlV1bIsLafV7Yb5bTENTzp134DN9QHQ5MCX4tvDPGm1Z1Hk17UJvqS3s73Ymyki7TmAhlIQ9n6PInOKPQyGaWc84Hb7FBwSt4MqKtIiHNaaxGTH+8w+x8w3Ki0YbViIUomHzeRA2ZaxhOgwL6gk3k=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:cbcc196c-1c37-4f2c-86b5-cac16f286100,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:6dc6a47,CLOUDID:d027ccd0-7921-4900-88a1-3aef019a55ce,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: a40a76967bdc11efb66947d174671e26-20240926
-Received: from mtkmbs09n1.mediatek.inc [(172.21.101.35)] by mailgw01.mediatek.com
-	(envelope-from <lena.wang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1200892854; Thu, 26 Sep 2024 15:55:04 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 26 Sep 2024 15:55:03 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Thu, 26 Sep 2024 15:55:02 +0800
-From: Lena Wang <lena.wang@mediatek.com>
-To: <edumazet@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<pabeni@redhat.com>, <kuba@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Lena Wang
-	<lena.wang@mediatek.com>
-Subject: [PATCH net] tcp: check if skb is true to avoid crash
-Date: Thu, 26 Sep 2024 15:56:38 +0800
-Message-ID: <20240926075646.15592-1-lena.wang@mediatek.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1727339051; c=relaxed/simple;
+	bh=qn1S5gIZmj+pt/uixqcwFQeYW2j1CqFYmNJS6MoqW/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aK6BHQrKKvSv5NGr8JG3o0A6ko+Z07byTLMv+dfLO0M++RTEq7NM0HjD6Nu6My56GQWYk0RRh5eNs5SxtFQCeX1Rkbx52RCEF4RDIXK136SxjAaJ/X0lDLruullRsdCmwm96cjAQ/sLMzQ0RmU/zAdH6As+h+FgdcmTFPY2hG6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=XZYXJPGm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E028DC4CEC5;
+	Thu, 26 Sep 2024 08:24:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1727339050;
+	bh=qn1S5gIZmj+pt/uixqcwFQeYW2j1CqFYmNJS6MoqW/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XZYXJPGmJP9/1VQAh5fjYjCEW+S51EIRE6ZSDu6enCJgc6L6W9m0aqV4AjauohoNP
+	 2aColS5TodmTbBxJOBdt7QXDE9UIAUj1ZWRslIFYDyjb1XyxsZU0o7yX+R7XmpUzxw
+	 9Ky8Toazeve5TwhwUpIQgIhyX2pj8K2xu6KAWBaE=
+Date: Thu, 26 Sep 2024 10:24:03 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: greearb@candelatech.com
+Cc: netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH v2] Revert "vrf: Remove unnecessary RCU-bh critical
+ section"
+Message-ID: <2024092650-clarify-marshland-1117@gregkh>
+References: <20240925185216.1990381-1-greearb@candelatech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-MTK: N
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240925185216.1990381-1-greearb@candelatech.com>
 
-A kernel NULL pointer dereference reported.
-Backtrace:
-vmlinux tcp_can_coalesce_send_queue_head(sk=0xFFFFFF80316D9400, len=755)
-+ 28 </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2315>
-vmlinux  tcp_mtu_probe(sk=0xFFFFFF80316D9400) + 3196
-</alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2452>
-vmlinux  tcp_write_xmit(sk=0xFFFFFF80316D9400, mss_now=128,
-nonagle=-2145862684, push_one=0, gfp=2080) + 3296
-</alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2689>
-vmlinux  tcp_tsq_write() + 172
-</alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1033>
-vmlinux  tcp_tsq_handler() + 104
-</alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1042>
-vmlinux  tcp_tasklet_func() + 208
+On Wed, Sep 25, 2024 at 11:52:16AM -0700, greearb@candelatech.com wrote:
+> From: Ben Greear <greearb@candelatech.com>
+> 
+> This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+> 
+> dev_queue_xmit_nit needs to run with bh locking, otherwise
+> it conflicts with packets coming in from a nic in softirq
+> context and packets being transmitted from user context.
+> 
+> ================================
+> WARNING: inconsistent lock state
+> 6.11.0 #1 Tainted: G        W
+> --------------------------------
+> inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+> btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+> ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+> {IN-SOFTIRQ-W} state was registered at:
+>   lock_acquire+0x19a/0x4f0
+>   _raw_spin_lock+0x27/0x40
+>   packet_rcv+0xa33/0x1320
+>   __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+>   __netif_receive_skb_list_core+0x2c9/0x890
+>   netif_receive_skb_list_internal+0x610/0xcc0
+>   napi_complete_done+0x1c0/0x7c0
+>   igb_poll+0x1dbb/0x57e0 [igb]
+>   __napi_poll.constprop.0+0x99/0x430
+>   net_rx_action+0x8e7/0xe10
+>   handle_softirqs+0x1b7/0x800
+>   __irq_exit_rcu+0x91/0xc0
+>   irq_exit_rcu+0x5/0x10
+>   [snip]
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(rlock-AF_PACKET);
+>   <Interrupt>
+>     lock(rlock-AF_PACKET);
+> 
+>  *** DEADLOCK ***
+> 
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x73/0xa0
+>  mark_lock+0x102e/0x16b0
+>  __lock_acquire+0x9ae/0x6170
+>  lock_acquire+0x19a/0x4f0
+>  _raw_spin_lock+0x27/0x40
+>  tpacket_rcv+0x863/0x3b30
+>  dev_queue_xmit_nit+0x709/0xa40
+>  vrf_finish_direct+0x26e/0x340 [vrf]
+>  vrf_l3_out+0x5f4/0xe80 [vrf]
+>  __ip_local_out+0x51e/0x7a0
+> [snip]
+> 
+> Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
+> Link: https://lore.kernel.org/netdev/05765015-f727-2f30-58da-2ad6fa7ea99f@candelatech.com/T/
+> 
+> Signed-off-by: Ben Greear <greearb@candelatech.com>
+> ---
+> 
+> v2:  Edit patch description.
+> 
+>  drivers/net/vrf.c | 2 ++
+>  net/core/dev.c    | 1 +
+>  2 files changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> index 4d8ccaf9a2b4..4087f72f0d2b 100644
+> --- a/drivers/net/vrf.c
+> +++ b/drivers/net/vrf.c
+> @@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
+>  		eth_zero_addr(eth->h_dest);
+>  		eth->h_proto = skb->protocol;
+>  
+> +		rcu_read_lock_bh();
+>  		dev_queue_xmit_nit(skb, vrf_dev);
+> +		rcu_read_unlock_bh();
+>  
+>  		skb_pull(skb, ETH_HLEN);
+>  	}
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index cd479f5f22f6..566e69a38eed 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -2285,6 +2285,7 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
+>  /*
+>   *	Support routine. Sends outgoing frames to any network
+>   *	taps currently in use.
+> + *	BH must be disabled before calling this.
+>   */
+>  
+>  void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
+> -- 
+> 2.42.0
+> 
+> 
 
-When there is no pending skb in sk->sk_write_queue, tcp_send_head
-returns NULL. Directly dereference of skb->len will result crash.
-So it is necessary to evaluate the skb to be true here.
+<formletter>
 
-Fixes: 808cf9e38cd7 ("tcp: Honor the eor bit in tcp_mtu_probe")
-Signed-off-by: Lena Wang <lena.wang@mediatek.com>
----
- net/ipv4/tcp_output.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+This is not the correct way to submit patches for inclusion in the
+stable kernel tree.  Please read:
+    https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+for how to do this properly.
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 4fd746bd4d54..12cde5d879c5 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -2338,17 +2338,19 @@ static bool tcp_can_coalesce_send_queue_head(struct sock *sk, int len)
- 	struct sk_buff *skb, *next;
- 
- 	skb = tcp_send_head(sk);
--	tcp_for_write_queue_from_safe(skb, next, sk) {
--		if (len <= skb->len)
--			break;
-+	if (skb) {
-+		tcp_for_write_queue_from_safe(skb, next, sk) {
-+			if (len <= skb->len)
-+				break;
- 
--		if (unlikely(TCP_SKB_CB(skb)->eor) ||
--		    tcp_has_tx_tstamp(skb) ||
--		    !skb_pure_zcopy_same(skb, next) ||
--		    skb_frags_readable(skb) != skb_frags_readable(next))
--			return false;
-+			if (unlikely(TCP_SKB_CB(skb)->eor) ||
-+			    tcp_has_tx_tstamp(skb) ||
-+			    !skb_pure_zcopy_same(skb, next) ||
-+			    skb_frags_readable(skb) != skb_frags_readable(next))
-+				return false;
- 
--		len -= skb->len;
-+			len -= skb->len;
-+		}
- 	}
- 
- 	return true;
--- 
-2.45.2
-
+</formletter>
 
