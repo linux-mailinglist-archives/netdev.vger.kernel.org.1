@@ -1,119 +1,92 @@
-Return-Path: <netdev+bounces-129874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1283986ADB
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 04:13:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA6D7986AED
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 04:27:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0825281B63
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 02:13:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 170D51C213F4
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 02:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D5B1714CB;
-	Thu, 26 Sep 2024 02:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5FE173320;
+	Thu, 26 Sep 2024 02:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPySTgRY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BSA+0x9r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B112F37B;
-	Thu, 26 Sep 2024 02:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0B3170A3F
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727316783; cv=none; b=QlUHt0OKk78Ej4mLkCeFSlXXtGMRSN1tzNWwe6YP9zjHyIcMjfnn0APlj6elRs9LdX2xIBbUksEawiivJNWYazM0nMw9K0TEMlI5sebXfbvGLMHsrjUwnOILsK3oYjt4MlVZ8hCFnyVArSbAsMsOCVUJ10Cx4dEsT/0w+Kqn7lo=
+	t=1727317617; cv=none; b=oteoTd1xBRPgrlwHA+Gvm4/89hwGW/+BTS+mQ4hN9Nej8dDpdU4YbB9Dw+PiueekLO3E202j4Q+61FPCavVoMb7lzGi6SeBKnKVjiSYZAeV1ECpvfDLGR5D4Xf7DIIWDXJXpSJLootvdZomi00nMXYZBiNKla5mRAJh20A08No4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727316783; c=relaxed/simple;
-	bh=VjYhNWGf61II4CY2QxOBu/gnUytEAceOX8dWG0RVpL8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hokAwxnP7yR1QjD9paNEDKg/PMmmrpAh/PGZDhxORmXbE+T53l108wTOL1kLAEHu4O43U71jSpzDoBNb0yGTZCHGmjWzAy1l3SSDhIoIxt8eftonZ6M5sc0e7vyQK+r35Xi4v3fAApnjHgi+ow0QcspbkUoPDkhf+zyQUQWBmt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPySTgRY; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db238d07b3so332217a12.2;
-        Wed, 25 Sep 2024 19:13:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727316781; x=1727921581; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YKbqGClK9XuI5to7fNeVcZww22R2M+z08fDYXnkwHOA=;
-        b=DPySTgRYpRSSmQgazZGeTWwjbCs7gaEBFO+RDwkacHEnkq1RcVG8tp3c22q7qIP5Ud
-         ZnPB1FKr0rx1eLUHYKhrN6E+mGUwB2Qy9ui1974pCzaAlTdukXlyUAZvMCBMQsnfWteh
-         oRoQD5177ujAPJcIlqWN9PrDwRLWL92ICyh2xw757P3B6tiKSkcKibCtzo25rnP25JqD
-         ym+dCSIxUkZ6l+QjDHjdXE8kuZkQ/vriR8X8olyErwE525t9ammQweWxFQhX43GDCYx0
-         w6H7KQRDsiAYNwR2vGTLCD+zlHmoHC6RqR6L+id8QAkqUKJddF07ErdHOoP9wyE+XW3l
-         qKWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727316781; x=1727921581;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YKbqGClK9XuI5to7fNeVcZww22R2M+z08fDYXnkwHOA=;
-        b=bltUU26GGRkuy2dCkAvHc+jwjHgz57IHsVIUcQO3pXfF90EfayHDrv7yfMZv7IdHmf
-         C8DzLMvgIabNOkwp/yhVrYJVWX0FToZ4k5bguFlwOPqt02Mf811L21ew1ewWPJ1Q11FD
-         tUXGS+hF4SobkRRDDiEDRR7wfL2AcVI5TqxveX5lYYfLq8dvnlAbDp6tPFEIBqkfieWe
-         xPcFcdpnb4sQU3E1vqywiE76PBXoW8Ti8rr4TSZGKzjHplGu4rAzSEJ47nDJ8M8Gj4TU
-         NkCPM4I6LDAolny1JuMgHXkz56mldufvzH30aOPtW+DrwZ0LdC2zIBo0GK2C6loHWwKA
-         AuLg==
-X-Forwarded-Encrypted: i=1; AJvYcCUkJrDdV5ly2R5fOZrgTuOWJ9t/50xV4QCLocnbczZbX0GWbTZ5ZZErWETrf4zqPj74AZN/eY0xV+MRrzYBt4Dc@vger.kernel.org, AJvYcCV0pxnonmHSYS3zeOK1r2QgNBsHiFZtAOYLhXI2MgyfJK1mfCRhQEHv6U8MhgBllOltaHOlaH9cK6A/2AU=@vger.kernel.org, AJvYcCVXDlFP7lpvoElWeYta162piskiePWs4lYGKwxYNKqZqJiUTkGjKZ05VEKsoi6WSoovcOT6zjOo@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+0N9wfkqIV8jTRIRxmnQpKqzopONh0vYaEF/pRDHnR0LTSRmE
-	z1Q5oTL/rKQK4vLbAsHYggdXDGAQLZtcjvvPlBqjv2H6zfhZ0qLYkHYbV9LOdD7XgQ==
-X-Google-Smtp-Source: AGHT+IFYcQSZQCHuj55PggHLx3bP9KBNAy6SA4mEMJ+O/Vvb7sFmAxPMVqtdc9RD6/JUJ3tKHOqGjA==
-X-Received: by 2002:a05:6a20:4393:b0:1cf:d746:22d0 with SMTP id adf61e73a8af0-1d4c6f307aemr7221549637.1.1727316780917;
-        Wed, 25 Sep 2024 19:13:00 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71afc97c3a9sm3323292b3a.168.2024.09.25.19.12.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 19:13:00 -0700 (PDT)
-Date: Thu, 26 Sep 2024 02:12:55 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Kacper Ludwinski <kacper@ludwinski.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, vladimir.oltean@nxp.com,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] Fix issue related with assigning two diffrent vids to
- the same interface.
-Message-ID: <ZvTDJyKatBVpgqMj@fedora>
-References: <20240925043724.1785-1-kacper@ludwinski.dev>
- <20240925050539.1906-1-kacper@ludwinski.dev>
+	s=arc-20240116; t=1727317617; c=relaxed/simple;
+	bh=kvW+FGqxzPIQK8RkZMIDGxlGVr2LgGUxvCIErGdrHa8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EFQdYJQW4juOj+AHddz8Yt3kS0j7yIxYncYX4sVHTF3PdjntONxXE8bkuGwhpI1735mQHoVZIsqWTf8SNBY5QH0rMXB6QB8hfyZUhryNaNGJ41uWI3b5OB9Y1hiCIivkzktIYmlNnkOQfXLn6PQzJD+IOfgX5g9eacqQEjVf5YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BSA+0x9r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF6A6C4CEC3;
+	Thu, 26 Sep 2024 02:26:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727317617;
+	bh=kvW+FGqxzPIQK8RkZMIDGxlGVr2LgGUxvCIErGdrHa8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BSA+0x9raKQZIh8H+qGYK5eyHhs/9sDbAOrCfQ889fMFDkIPhPn2IXBzaqa1OB9Hf
+	 nFja+MJQlaM++r9rPgQ14kwf6sq+4pWCPtUDICT+0y28p0LV9RqTfJ9vLJwMnpl+zR
+	 27OTH6/aDik3lK8J1mkHX/g8yy5iDVcbOFjzGmGtDYxLJ5ladB9QVk8uU3vZZEYhWX
+	 f+eKh5/SR5kY9F3qfvYahY2nH5ua6VIIvpXG3gsxbZGRx1+353ETm0Q2Zmj3ndqQl/
+	 kVk1cw5mcDrRKPCVgsiVIiXLPMlvYUmQ3/sZiYQiQ1KzasGGINOeOSVNg+0yhe+7Aj
+	 JFVEwXf0pjuHg==
+Message-ID: <814042a4-15e5-4288-a526-37213ddda710@kernel.org>
+Date: Wed, 25 Sep 2024 20:26:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240925050539.1906-1-kacper@ludwinski.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/2] net: two fixes for qdisc_pkt_len_init()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+ Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com
+References: <20240924150257.1059524-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240924150257.1059524-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Kacper,
-
-When you post a second patch, you need to add PATCHv2 in the subject.
-
-On Wed, Sep 25, 2024 at 02:05:39PM +0900, Kacper Ludwinski wrote:
-> Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
-> Signed-off-by: Kacper Ludwinski <kacper@ludwinski.dev>
-> ---
->  tools/testing/selftests/net/forwarding/no_forwarding.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On 9/24/24 9:02 AM, Eric Dumazet wrote:
+> Inspired by one syzbot report.
 > 
-> diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
-> index 9e677aa64a06..694ece9ba3a7 100755
-> --- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
-> +++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
-> @@ -202,7 +202,7 @@ one_bridge_two_pvids()
->  	ip link set $swp2 master br0
->  
->  	bridge vlan add dev $swp1 vid 1 pvid untagged
-> -	bridge vlan add dev $swp1 vid 2 pvid untagged
-> +	bridge vlan add dev $swp2 vid 2 pvid untagged
->  
->  	run_test "Switch ports in VLAN-aware bridge with different PVIDs"
->  
-The patch looks good to me.
+> At least one qdisc (fq_codel) depends on qdisc_skb_cb(skb)->pkt_len
+> having a sane value (not zero)
+> 
+> With the help of af_packet, syzbot was able to fool qdisc_pkt_len_init()
+> to precisely set qdisc_skb_cb(skb)->pkt_len to zero.
+> 
+> First patch fixes this issue.
+> 
+> Second one (a separate one to help future bisections) adds
+> more sanity check to SKB_GSO_DODGY users.
+> 
+> Eric Dumazet (2):
+>   net: avoid potential underflow in qdisc_pkt_len_init() with UFO
+>   net: add more sanity checks to qdisc_pkt_len_init()
+> 
+>  net/core/dev.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+LGTM. For the set:
 
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
