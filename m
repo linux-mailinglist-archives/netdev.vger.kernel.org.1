@@ -1,129 +1,155 @@
-Return-Path: <netdev+bounces-129991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A941298771F
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:59:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D595698773C
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 18:05:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8967B287D92
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:59:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1002E1C20AE6
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 16:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A72115C127;
-	Thu, 26 Sep 2024 15:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A95158550;
+	Thu, 26 Sep 2024 16:05:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHTsQPcS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KjSHFzFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FEB15B99D;
-	Thu, 26 Sep 2024 15:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C576F158552;
+	Thu, 26 Sep 2024 16:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727366323; cv=none; b=Q0Z024gVYP278b96Nt9xsq1szqfdmkyW03euMkYK7QWxEweq1u/4hrVlw6NluItVJ7vzqTIuk6lD11OFU0PGfsE9RB98PDqAywjyFWt7BDBj6h0pY6QvGZ8OC+H6tGcrhNFli/dOLplYTR6keiVKXJ42vI6ukBGH2qxfhBRwWvM=
+	t=1727366724; cv=none; b=ZxUdQe/v+hYJTkgZIFwB9/19UuTi+2KFB1tuB44eNx+BSWy9JjR9uswxJPh3VhNfMrrYjE8E9EUjOFymM5u9zzlhL86GKLGM3RdSAlgY9dEUjIzteioTrTIoexqLzN+oiaa7BhWpIgWu+nImSv0smE8cZjBRMFM0QaFqKuW/jYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727366323; c=relaxed/simple;
-	bh=igJ0G0OPnz/B3elCb/RuWY5dnt8N4bIiq+BlerzgzHw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=aUDxV1FNXN4UcwoFvqwRnPK7iuAnvim8bNJNnN3cU6qRtaaZkcdLIYTCF7MC3kVelJB92pJMPJNpS4p0x0pTn1OIC8iYyPu04mQk6p44j767he2OhvJzyzTsehM84JXwsbpwNtBGP8+QH+Jod7TqhoH4ePvzgxrfRvmbPSwnArA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHTsQPcS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A0ABC4CECE;
-	Thu, 26 Sep 2024 15:58:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727366321;
-	bh=igJ0G0OPnz/B3elCb/RuWY5dnt8N4bIiq+BlerzgzHw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=bHTsQPcSbxg85P9pIQPwMha5ShcMWjEr/16SMRgqIGc0KVuAdbzGQqlSA3sdEFtsh
-	 3maWznzVTHKHJO0pw13fpAHWusOih98hmsvwVVTKK9XrqwhyUZT987WGqV561PhFDK
-	 qD/q603YAskungMGSk5lQ+8a6irk64cgCLQ0kpDOorQIwbyu56uWdUjdO/ManXyc5W
-	 PszVvAFG/yhxfismT8Vr/bbp+R9fyLR0hylngWnCOwnxxNkkx5LEHu050RMiALBJ9+
-	 psF+INAfbFocSty46NMOk95uBDe6GW+nuEi4dOff+V1avkzMsyc9BzGna602i4YqN7
-	 0eMI67mlN0Pkw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Vladislav Efanov <VEfanov@ispras.ru>
-Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  "John W.
- Linville" <linville@tuxdriver.com>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  lvc-project@linuxtesting.org
-Subject: Re: [PATCH] cfg80211: Convert WARN_ON() to warning message
-References: <20240926133446.25445-1-VEfanov@ispras.ru>
-Date: Thu, 26 Sep 2024 18:58:37 +0300
-In-Reply-To: <20240926133446.25445-1-VEfanov@ispras.ru> (Vladislav Efanov's
-	message of "Thu, 26 Sep 2024 16:34:38 +0300")
-Message-ID: <874j629zki.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1727366724; c=relaxed/simple;
+	bh=gknbzGZxjpw2CXS/PQNahlHmXMU1BTGcOerm6JEQ10A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lI6qT7tiHhzd5h7SGu4hCjjq/6jFHMNA7yfXfDAQdGsATmFH6ynvpLD3RT7kX50L2QIclMNVQ9aA35yR7QALIy/pH8qlCLBVrB93LbcBq7hQTNHof5TS48zpiZcXU2Ljz1DeXnnKZ1orrXsmoj5IefPvd08VoOkpEdSI5elT7SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KjSHFzFV; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-205909afad3so11550465ad.2;
+        Thu, 26 Sep 2024 09:05:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727366722; x=1727971522; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2pa/TWuTtJPirDcDBc/YlDUH5VGKlyuUuv6pDARm7Hs=;
+        b=KjSHFzFV5SfBbcMmqYOyBsQA/MaJMa283MBWuZvbOig230RfSXQ8zKCCcwEkjaYVyV
+         ZHQRJ5D2PMTnG0mz+Wp4kuE/I4QW4LmjKdslmilaBEM3pA0iz8BiT67kst2zWZJtiomD
+         7pEae+ccTxuzxiS74e/+5SZWqnl8VRSq4lzBGPLqHqI7FRIEKlyHWHjJgo9BYc+kJn3T
+         RcY3qDjBYaU6X/4ajMBiZ6/dcIhJh3X0GAcryjOOzqBHCnhuBEgyXyc/64ks/W0a+4tV
+         okcoLU5dkPVPupLLplc9TRlzJbYy7/sgQ0gp+WME0PaH00DD8aQFKR3miDzuMvaWVn20
+         OuLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727366722; x=1727971522;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2pa/TWuTtJPirDcDBc/YlDUH5VGKlyuUuv6pDARm7Hs=;
+        b=a2eY/CiJDS+AciQlaBtCrub7Fgo/EW7nVZsyS682rL9T1zqWyOpOAlzDJMQOYhX/lC
+         6HtBefQpPvOuMaL/4z4hIcrs2QlWLQZI/N/wEvHW/ZgQD6jQH10sWjOG+5CUmaVai5ya
+         tuwOydIAvgi4/VJXTZ4Wd/QUTT5mqtA3ZyG+iU1wmI6cr/hkXKf5EE91xB/PPYsSJESk
+         /YXwcew+rj4ft5df7rmgtLehg3r9DCSrJ+XfUOQHg8PsJhM+VQiU7ZJ0RrQaF4dIKDMT
+         32b2lIeRrLv3DlCFgwvTwHuifgT4uVSvh0+ZNiw5h9wTW5TkRCD6rCilT5PfpHJFqX3W
+         id6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWkGo1cvQzWkyxh8HAiU1TfF98xHJSK13E48k8f8lXsFj6g3oe7ZYxGX90iFIJyJNQjM6P+bKkE5KhUViE=@vger.kernel.org, AJvYcCXVfMxw0PB4PI3+wKCJHtfWUhiTiZQrqo2HYDoGJc3PAA5uZITq8IkBFDMc6w3/9slDMaNuhd6J@vger.kernel.org
+X-Gm-Message-State: AOJu0YxL8AHZUfDilyMYNHAsESqkrTOcw+7MtMSnLiPYpD88wRZ24pFQ
+	eqjhzf6AgSdZyZqZ+IfTHsO/4DYpYMKwCIHxDV0aws/staLNV6eI
+X-Google-Smtp-Source: AGHT+IE5QvZjfX4FN9dhLCk2nP5iL8ta9IysDy96i4ZfL3fey/npuCinZULm9eTYn8V2G8lVAJtBTg==
+X-Received: by 2002:a17:902:eb8a:b0:206:adc8:2dcb with SMTP id d9443c01a7336-20b36ec98c9mr2523255ad.25.1727366721677;
+        Thu, 26 Sep 2024 09:05:21 -0700 (PDT)
+Received: from ubuntu.worldlink.com.np ([27.34.65.236])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e61e14sm224295ad.279.2024.09.26.09.05.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Sep 2024 09:05:19 -0700 (PDT)
+From: Dipendra Khadka <kdipendra88@gmail.com>
+To: florian.fainelli@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	maxime.chevallier@bootlin.com,
+	horms@kernel.org
+Cc: Dipendra Khadka <kdipendra88@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v5] net: systemport: Add error pointer checks in bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
+Date: Thu, 26 Sep 2024 16:05:12 +0000
+Message-ID: <20240926160513.7252-1-kdipendra88@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Vladislav Efanov <VEfanov@ispras.ru> writes:
+Add error pointer checks in bcm_sysport_map_queues() and
+bcm_sysport_unmap_queues() after calling dsa_port_from_netdev().
 
-> syzkaller got the following warning:
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 9992 at net/wireless/ibss.c:36 __cfg80211_ibss
->
-> This warning is the result of the race condition between the following
-> events:
->
-> event1                          event2                      event3
-> __ieee80211_sta_join_ibss()        |                          |
-> creates new cgf80211_bss           |                          |
-> structure.                         |                          |
-> Calls cfg80211_ibss_joined()       |                          |
-> which will scheduled               |                          |
-> new event_work.                    |                          |
->                          ieee80211_ibss_disconnect()          |
->                          is called due to connection          |
->                          dropped/ibss leaves to               |
->                          remove cfg80211_bss structure.       |
->                                                 event_work starts.
->                                           __cfg80211_ibss_joined()
->                                           is called and WARNING is
->                                           detected due to
->                                           cfg80211_bss structure was
->                                           removed by event2.
->
-> It is a normal situation when connection is dropped during handshaking.
-> So it looks reasonable to replace WARN_ON() with warning message to
-> prevent false alarm.
->
-> Found by Linux Verification Center (linuxtesting.org) with syzkaller.
-> Fixes: 04a773ade068 ("cfg80211/nl80211: add IBSS API")
-> Signed-off-by: Vladislav Efanov <VEfanov@ispras.ru>
-> ---
->  net/wireless/ibss.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/net/wireless/ibss.c b/net/wireless/ibss.c
-> index e6fdb0b8187d..93c8bee12bdf 100644
-> --- a/net/wireless/ibss.c
-> +++ b/net/wireless/ibss.c
-> @@ -34,8 +34,10 @@ void __cfg80211_ibss_joined(struct net_device *dev, const u8 *bssid,
->  	bss = cfg80211_get_bss(wdev->wiphy, channel, bssid, NULL, 0,
->  			       IEEE80211_BSS_TYPE_IBSS, IEEE80211_PRIVACY_ANY);
->  
-> -	if (WARN_ON(!bss))
-> +	if (!bss) {
-> +		pr_warn("cfg80211: cfg80211_bss with bssid %s not found.\n", bssid);
->  		return;
-> +	}
+Fixes: 1593cd40d785 ("net: systemport: use standard netdevice notifier to detect DSA presence")
+Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+---
+v5: 
+ -Removed extra parentheses
+v4: https://lore.kernel.org/all/20240925152927.4579-1-kdipendra88@gmail.com/
+ - Removed wrong and used correct Fixes: tag
+v3: https://lore.kernel.org/all/20240924185634.2358-1-kdipendra88@gmail.com/
+ - Updated patch subject
+ - Updated patch description
+ - Added Fixes: tags
+ - Fixed typo from PRT_ERR to PTR_ERR
+ - Error is checked just after  assignment
+v2: https://lore.kernel.org/all/20240923053900.1310-1-kdipendra88@gmail.com/
+ - Change the subject of the patch to net
+v1: https://lore.kernel.org/all/20240922181739.50056-1-kdipendra88@gmail.com/
+ drivers/net/ethernet/broadcom/bcmsysport.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-If it's a normal case (disclaimer: didn't investigate that) the warning
-message could be more descriptive. I suspect the user is just confused
-after seeing that.
-
-Also 'wifi:' missing from subject.
-
+diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
+index c9faa8540859..a7ad829f11d4 100644
+--- a/drivers/net/ethernet/broadcom/bcmsysport.c
++++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+@@ -2331,11 +2331,15 @@ static const struct net_device_ops bcm_sysport_netdev_ops = {
+ static int bcm_sysport_map_queues(struct net_device *dev,
+ 				  struct net_device *slave_dev)
+ {
+-	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
+ 	struct bcm_sysport_priv *priv = netdev_priv(dev);
+ 	struct bcm_sysport_tx_ring *ring;
+ 	unsigned int num_tx_queues;
+ 	unsigned int q, qp, port;
++	struct dsa_port *dp;
++
++	dp = dsa_port_from_netdev(slave_dev);
++	if (IS_ERR(dp))
++		return PTR_ERR(dp);
+ 
+ 	/* We can't be setting up queue inspection for non directly attached
+ 	 * switches
+@@ -2386,11 +2390,15 @@ static int bcm_sysport_map_queues(struct net_device *dev,
+ static int bcm_sysport_unmap_queues(struct net_device *dev,
+ 				    struct net_device *slave_dev)
+ {
+-	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
+ 	struct bcm_sysport_priv *priv = netdev_priv(dev);
+ 	struct bcm_sysport_tx_ring *ring;
+ 	unsigned int num_tx_queues;
+ 	unsigned int q, qp, port;
++	struct dsa_port *dp;
++
++	dp = dsa_port_from_netdev(slave_dev);
++	if (IS_ERR(dp))
++		return PTR_ERR(dp);
+ 
+ 	port = dp->index;
+ 
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.43.0
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
