@@ -1,128 +1,141 @@
-Return-Path: <netdev+bounces-129906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56183986F81
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:03:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D94986F91
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4084B232BA
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:03:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EB131F2188E
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EDFA1A4E81;
-	Thu, 26 Sep 2024 09:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4861AB52A;
+	Thu, 26 Sep 2024 09:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ilYAMrmW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GZ3cujDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA70208CA
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:03:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58C41AB6F0
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727341427; cv=none; b=Fq8IUsUVerNWww9FGOslV3xl0aL/7iywEk7aWh08qYqEujg5vSjCdfHkbyDz2bQqSs9sJG2+ojgykjWqNRgpSL8Z9ZV354lUJr4fyRPH6kKwkMH78xKRQtrj731mSahtMRaaL+G13CX5VFvradW0v498tgFfuH6ZG5RrRxQD7bY=
+	t=1727341589; cv=none; b=L0wZh6lLtu7jpBMGyFr7nWiPpR6trZP4VND6HDY76Nn/w7wocO8FpK8BIi1BHnoqlC6ihrXsZSBJeNKQBCEj8Yn7vpS99J3Dw4pZypKD+bPSqOPexcsYhi2OEh3f9cl8L5BHGnDf1DDlDmwzOHJ83Ne3Hnzt2CdfHJpDEL/pjYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727341427; c=relaxed/simple;
-	bh=5b9mweUAaDSj84VvXz+F6ZWoArtYwfW0voyzXonEC9Y=;
+	s=arc-20240116; t=1727341589; c=relaxed/simple;
+	bh=EkE9FfbB1Fp3JDlj4/hr0jrlTbfDS3RFOhiV3x3c+Ko=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i3zdJOyYDieAYhx7Sv0DJeeLM0Wrsb1Dyeuss09JH/E5L3wL/nsva9TVucbOBhK1YoooLvGtk0xoQ/gevQvS5u6t9Ag5WzZSsF8FHfQreCG3FcQxbAYhOOSvRjb+Iqbgb4qdOs0xQXAqgIajK9F+rkjjL42K2MRel7Z4suBqT3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ilYAMrmW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727341424;
+	 In-Reply-To:Content-Type; b=MA7WGXsPFvfwM+h56pzTOMemNPFYqB2jk3AOnSws1lJcMTa+yAu321Zh986g+gAcXPJ7SSofN/aNEZjT08x0oe6InG0WT70lUkLHwbFK+W++YPdX4O1ENnQAL5cd5LMLDYG/PyEV8soVYHcWKZd36mISQ4bpwi9/rmPA4O6zPks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GZ3cujDp; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <abbe18b1-b372-4044-8490-82e6c0b4ec36@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727341585;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=zeYgnZ1NLeFfc15a27WcTDPKUY4Xom7TLrWj14jy8pE=;
-	b=ilYAMrmWqoWjzZNJhDWWWojwONBr0h7DsFcx6Z1gm7KrIeaN5G5x0D/aON/MCnoAqb5mAJ
-	SuNlOXZAzF6+Q7KogUT53vrcwxERRHW6R5TP7EZ1lGfbTC2kSaN26um39ThZDAr33J8SLq
-	xZs1MyosyAikFYX0W7muD/I20rDThdg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-V_UYsF0xMECwE4GOV0kOgA-1; Thu, 26 Sep 2024 05:03:42 -0400
-X-MC-Unique: V_UYsF0xMECwE4GOV0kOgA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37ccbace251so363501f8f.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:03:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727341421; x=1727946221;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zeYgnZ1NLeFfc15a27WcTDPKUY4Xom7TLrWj14jy8pE=;
-        b=fMaZpXCXQVTSbxhNAhQb5Anz5yUEDPQ4rn25//3PXiDJhvhFDvRRJNtJwEDZ67JfiV
-         nazDddouqCgWX61gyxUeacOcf3dOqiTlRWxea7u8aUNPA8W26jnJQsID6s+u2nMWiObY
-         KjiKzC9QKVtPe+gV6OropBUctdR958jAjNP+vK+Peh+ZGO0WDeybEqGgFb8L+zB0o/q9
-         Cfwc8oNwPeKU1iMw9nHjTTqhb1/IlSdW/GDUIilBD5MGW5DkTvECFg69NfskY4f1UUsi
-         +mhG2XbKA+Y7x3/wDYFdCmFXBwy4SfV56YL3AaLgXXhkGnS1z/7ajXp/CEFx0fgCdY1O
-         REgw==
-X-Gm-Message-State: AOJu0YzT3SzsI8quTZG+k7oAikaylgwsEq9gP7dfX85g44zr8rDskTOb
-	zy/718Kp8Rp0hcouTKexc2coRd3WycFx8ziXHo+OtfCYoKS70NWrpEQXilIIZFWLC2NHr7V963i
-	sqLMBDd/k9GdSBtKUOnTF4dYG+I+ydi3lB7Z0DFfN+4t/f/lSOc4YjQ==
-X-Received: by 2002:adf:c04c:0:b0:374:c8e0:d76b with SMTP id ffacd0b85a97d-37cc245b083mr3770706f8f.6.1727341421613;
-        Thu, 26 Sep 2024 02:03:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGk2ngBr1QbZQb/K4S/LQ0JgJDBPWxzQZCoDjZ0iQBJMVTjcdGhO4Q3QhXtAkiHpVsmTPOlPw==
-X-Received: by 2002:adf:c04c:0:b0:374:c8e0:d76b with SMTP id ffacd0b85a97d-37cc245b083mr3770685f8f.6.1727341421145;
-        Thu, 26 Sep 2024 02:03:41 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b? ([2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ccc93f115sm2469665f8f.21.2024.09.26.02.03.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2024 02:03:40 -0700 (PDT)
-Message-ID: <fd29c5e5-219d-44ad-8403-1abe4015f75c@redhat.com>
-Date: Thu, 26 Sep 2024 11:03:38 +0200
+	bh=mvvbrtaS6dEUP6f63YZemxRSOMHEf03ko/qFj9tmROY=;
+	b=GZ3cujDpT7z6IB9Q6O+yA5eDjWVrFHkUSiL3+V9G6ovh7HBQcd/ZfBLDuCwPjdUTos6sR8
+	wcP9Q9arnPJ5i81oOhRzuSNdDZTfJxRoJ2Us9o0Hs0eSTR2s5/4d4/BMaX98omN558Fcsw
+	gU9cEt8WM7jUOXe9UOR+4dp3Cl3EuBE=
+Date: Thu, 26 Sep 2024 10:06:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] selftests/net: packetdrill: increase timing tolerance
- in debug mode
-To: Stanislav Fomichev <stfomichev@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, sdf@fomichev.me, matttbe@kernel.org,
- linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-References: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
- <ZuyR0JuU_H3MvEmX@mini-arch>
+Subject: Re: [PATCH net] tcp: check if skb is true to avoid crash
+To: Lena Wang <lena.wang@mediatek.com>, edumazet@google.com,
+ davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com, kuba@kernel.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240926075646.15592-1-lena.wang@mediatek.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <ZuyR0JuU_H3MvEmX@mini-arch>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240926075646.15592-1-lena.wang@mediatek.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 9/19/24 23:04, Stanislav Fomichev wrote:
-> On 09/19, Willem de Bruijn wrote:
->> From: Willem de Bruijn <willemb@google.com>
->>
->> Some packetdrill tests are flaky in debug mode. As discussed, increase
->> tolerance.
->>
->> We have been doing this for debug builds outside ksft too.
->>
->> Previous setting was 10000. A manual 50 runs in virtme-ng showed two
->> failures that needed 12000. To be on the safe side, Increase to 14000.
->>
->> Link: https://lore.kernel.org/netdev/Zuhhe4-MQHd3EkfN@mini-arch/
->> Fixes: 1e42f73fd3c2 ("selftests/net: packetdrill: import tcp/zerocopy")
->> Reported-by: Stanislav Fomichev <sdf@fomichev.me>
->> Signed-off-by: Willem de Bruijn <willemb@google.com>
+On 26/09/2024 08:56, Lena Wang wrote:
+> A kernel NULL pointer dereference reported.
+> Backtrace:
+> vmlinux tcp_can_coalesce_send_queue_head(sk=0xFFFFFF80316D9400, len=755)
+> + 28 </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2315>
+> vmlinux  tcp_mtu_probe(sk=0xFFFFFF80316D9400) + 3196
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2452>
+> vmlinux  tcp_write_xmit(sk=0xFFFFFF80316D9400, mss_now=128,
+> nonagle=-2145862684, push_one=0, gfp=2080) + 3296
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2689>
+> vmlinux  tcp_tsq_write() + 172
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1033>
+> vmlinux  tcp_tsq_handler() + 104
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1042>
+> vmlinux  tcp_tasklet_func() + 208
 > 
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> When there is no pending skb in sk->sk_write_queue, tcp_send_head
+> returns NULL. Directly dereference of skb->len will result crash.
+> So it is necessary to evaluate the skb to be true here.
 > 
-> Thanks! Should probably go to net-next though? (Not sure what's
-> the bar for selftests fixes for 'net')
+> Fixes: 808cf9e38cd7 ("tcp: Honor the eor bit in tcp_mtu_probe")
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> ---
+>   net/ipv4/tcp_output.c | 20 +++++++++++---------
+>   1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 4fd746bd4d54..12cde5d879c5 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -2338,17 +2338,19 @@ static bool tcp_can_coalesce_send_queue_head(struct sock *sk, int len)
+>   	struct sk_buff *skb, *next;
+>   
+>   	skb = tcp_send_head(sk);
+> -	tcp_for_write_queue_from_safe(skb, next, sk) {
+> -		if (len <= skb->len)
+> -			break;
+> +	if (skb) {
 
-FTR, we want this kind of fixes in net, to reach self-test stability in 
-both trees ASAP.
+Thinking more of this, I don't really understand how is it possible to
+reach tcp_can_coalesce_send_queue_head() with empty send queue, but
+anyway, this patch will move NULL dereference further to tcp_mtu_probe()
+where new skb is build with the same tcp_send_head() call.
 
-Cheers,
+I believe the proper way is to return false here in case of missing skb:
 
-Paolo
+if (!skb)
+	return false;
+
+This will prevent tcp_mtu_probe() to continue execution and avoid
+possible NULL dereference.
+
+> +		tcp_for_write_queue_from_safe(skb, next, sk) {
+> +			if (len <= skb->len)
+> +				break;
+>   
+> -		if (unlikely(TCP_SKB_CB(skb)->eor) ||
+> -		    tcp_has_tx_tstamp(skb) ||
+> -		    !skb_pure_zcopy_same(skb, next) ||
+> -		    skb_frags_readable(skb) != skb_frags_readable(next))
+> -			return false;
+> +			if (unlikely(TCP_SKB_CB(skb)->eor) ||
+> +			    tcp_has_tx_tstamp(skb) ||
+> +			    !skb_pure_zcopy_same(skb, next) ||
+> +			    skb_frags_readable(skb) != skb_frags_readable(next))
+> +				return false;
+>   
+> -		len -= skb->len;
+> +			len -= skb->len;
+> +		}
+>   	}
+>   
+>   	return true;
+
+
 
 
