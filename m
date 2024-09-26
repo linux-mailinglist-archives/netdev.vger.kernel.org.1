@@ -1,101 +1,137 @@
-Return-Path: <netdev+bounces-129900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98072986F48
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:50:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF5BD986F4F
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 587DB283265
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 08:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84F8EB21A11
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 08:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252C51A4F2E;
-	Thu, 26 Sep 2024 08:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6464C1A7254;
+	Thu, 26 Sep 2024 08:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T7zMMok6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="l9vnhjzP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8E41A4E9A;
-	Thu, 26 Sep 2024 08:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AA218E37C
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 08:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727340629; cv=none; b=bdytDbgl7IDP7EBSk+lRqcZALDt3w+F3DONB+3UQEl7PVFjR5NWV21D9sSOlVsfPaNZOlxyh/DTA4wJODArmAsdwPyR7keimftOJ1W0LtvtPAtkqRObhh1zJsMfwTKLF7zpjYuu7/dF4t5sTecnZ0JbD+eoWNFn/HFITb1p8Ibw=
+	t=1727340661; cv=none; b=Jpaxt9UbArlIuGND1YhGlrVY9W3S+/BWSN/QBtnQ+QusrBFjbCGNp9buFx1rrmODVUmEEi0ikDgwQh84nlQGQymPqx1POtzyZsSiNOdH+yIcyC0z/CSya2Hpuew2sG8L7TkdKr+tGbQOyBt3Wl1qyqQe9r44FCZbR/bx0+JIiP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727340629; c=relaxed/simple;
-	bh=GcRYZc0aYdKjKzm8dqTZs423b3rVkDA/yBEu7aO4lvc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bh8t1HzeaJQFQw7+hCFyPZSj5KIAX7/HcT+xKkHglQZZLeoYcE2rDc3FWlBLs+lExdh01twNOCSr/dTfyEWck+s98xazrw8/ca7bcnlOj9izmm6h8Cb3FnLbJKAGkbSq2nd9JI15hGAOwBhKMg95xwSh9MXAvQpCYi6etzJ9Xgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T7zMMok6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79B68C4CEC7;
-	Thu, 26 Sep 2024 08:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727340628;
-	bh=GcRYZc0aYdKjKzm8dqTZs423b3rVkDA/yBEu7aO4lvc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T7zMMok6AL8MgOS0GZUb2ZO196/h+wGaqUznwue4pQ1u0n66dxxYn2zOfohwAYSlJ
-	 t5ZCa0rrb4FGKZVoJQN6mrYZkm2BvBijKW0EHSicYUTsAWYtwO4LdzNb/xeDaQz2hE
-	 WpgBxpT2JYnliPPbOQs2ACce8ulAlU3MSVDazNzXktBkwo2GmbAAx1nzPbDskXVPSx
-	 w41Q93K1IAsLRGDwziTcFHN1LV6mzw7dY23pmPA6wYylz7TJDQgLiEwGhiZtmKJj7m
-	 HJVV9387mm3EtlpOdJGtCjc6ZKRUlCMCGjhbHpxD7H6Xb8ZUBOwktmQftoLxqSH2op
-	 18/D98E1mvlpg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D22380DBF5;
-	Thu, 26 Sep 2024 08:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727340661; c=relaxed/simple;
+	bh=yETufZoS0lRHCNMnbOu73O3jdm0VL2jpK1Sf5cEA47A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LWsT0G6orB9atx7mSYiCwqWGEANE/lRTyM35HGcOEelCshdMGAD6WkSTo9r/BWjaFEPOQbQ/cVEEHDfJjIOnIbBCD4/9mPgG0oCwaAjRf96pavNsZsyFRfaMgBrfEWl5Fku87Qo5N819l/ql7mBPSn3LuL9j1eQkrUT2n//oa+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=l9vnhjzP; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0aab72d9-1bb2-4ac7-b66f-2a337fb9cd1e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727340657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e+rnWrZWAWlC75h2sJyhYvkZZruzDFMIY7aTo2ro+yk=;
+	b=l9vnhjzPHKFQ2FhUiZBAfGoi32jGnh0vPcS5EqNJ+DKr9/LRBPK1D3lvLUlKLojtUCvFX8
+	2zOtT2SgaU8xhZ1F7ocGrnSNxVxRaTYY8yzwXZcI+hkUXLhKC/qANX0ogCPAF7wBg7mRWd
+	e7/NinIYjmoynFMIN9W77tlCd52YZJ0=
+Date: Thu, 26 Sep 2024 09:50:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if XDP is
- enabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172734063104.1173335.1175532614664829516.git-patchwork-notify@kernel.org>
-Date: Thu, 26 Sep 2024 08:50:31 +0000
-References: <20240919121028.1348023-1-0x1207@gmail.com>
-In-Reply-To: <20240919121028.1348023-1-0x1207@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: boon.leong.ong@intel.com, davem@davemloft.net,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
- jpinto@synopsys.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com
+Subject: Re: [PATCH net] tcp: check if skb is true to avoid crash
+To: Lena Wang <lena.wang@mediatek.com>, edumazet@google.com,
+ davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com, kuba@kernel.org
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240926075646.15592-1-lena.wang@mediatek.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240926075646.15592-1-lena.wang@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu, 19 Sep 2024 20:10:28 +0800 you wrote:
-> Commit 5fabb01207a2 ("net: stmmac: Add initial XDP support") sets
-> PP_FLAG_DMA_SYNC_DEV flag for page_pool unconditionally,
-> page_pool_recycle_direct() will call page_pool_dma_sync_for_device()
-> on every page even the page is not going to be reused by XDP program.
+On 26/09/2024 08:56, Lena Wang wrote:
+> A kernel NULL pointer dereference reported.
+> Backtrace:
+> vmlinux tcp_can_coalesce_send_queue_head(sk=0xFFFFFF80316D9400, len=755)
+> + 28 </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2315>
+> vmlinux  tcp_mtu_probe(sk=0xFFFFFF80316D9400) + 3196
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2452>
+> vmlinux  tcp_write_xmit(sk=0xFFFFFF80316D9400, mss_now=128,
+> nonagle=-2145862684, push_one=0, gfp=2080) + 3296
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:2689>
+> vmlinux  tcp_tsq_write() + 172
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1033>
+> vmlinux  tcp_tsq_handler() + 104
+> </alps/OfficialRelease/Of/alps/kernel-6.6/net/ipv4/tcp_output.c:1042>
+> vmlinux  tcp_tasklet_func() + 208
 > 
-> When XDP is not enabled, the page which holds the received buffer
-> will be recycled once the buffer is copied into new SKB by
-> skb_copy_to_linear_data(), then the MAC core will never reuse this
-> page any longer. Always setting PP_FLAG_DMA_SYNC_DEV wastes CPU cycles
-> on unnecessary calling of page_pool_dma_sync_for_device().
+> When there is no pending skb in sk->sk_write_queue, tcp_send_head
+> returns NULL. Directly dereference of skb->len will result crash.
+> So it is necessary to evaluate the skb to be true here.
 > 
-> [...]
+> Fixes: 808cf9e38cd7 ("tcp: Honor the eor bit in tcp_mtu_probe")
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> ---
+>   net/ipv4/tcp_output.c | 20 +++++++++++---------
+>   1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 4fd746bd4d54..12cde5d879c5 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -2338,17 +2338,19 @@ static bool tcp_can_coalesce_send_queue_head(struct sock *sk, int len)
+>   	struct sk_buff *skb, *next;
+>   
+>   	skb = tcp_send_head(sk);
+> -	tcp_for_write_queue_from_safe(skb, next, sk) {
+> -		if (len <= skb->len)
+> -			break;
+> +	if (skb) {
+> +		tcp_for_write_queue_from_safe(skb, next, sk) {
+> +			if (len <= skb->len)
+> +				break;
 
-Here is the summary with links:
-  - [net,v2] net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if XDP is enabled
-    https://git.kernel.org/netdev/net/c/b514c47ebf41
+Hi Lena!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I believe the patch can be simplified by using "fast return"
 
+if (!skb)
+	return true;
+
+This will make less changes and can simplify further bisecting.
+
+Thanks,
+Vadim
+
+> -		if (unlikely(TCP_SKB_CB(skb)->eor) ||
+> -		    tcp_has_tx_tstamp(skb) ||
+> -		    !skb_pure_zcopy_same(skb, next) ||
+> -		    skb_frags_readable(skb) != skb_frags_readable(next))
+> -			return false;
+> +			if (unlikely(TCP_SKB_CB(skb)->eor) ||
+> +			    tcp_has_tx_tstamp(skb) ||
+> +			    !skb_pure_zcopy_same(skb, next) ||
+> +			    skb_frags_readable(skb) != skb_frags_readable(next))
+> +				return false;
+>   
+> -		len -= skb->len;
+> +			len -= skb->len;
+> +		}
+>   	}
+>   
+>   	return true;
 
 
