@@ -1,62 +1,78 @@
-Return-Path: <netdev+bounces-129968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA1D987487
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:38:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647929874A5
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51F15B24E49
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 13:38:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E36691F23672
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 13:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D7D29405;
-	Thu, 26 Sep 2024 13:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACCF3B7A8;
+	Thu, 26 Sep 2024 13:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="UHN9UHy4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I3IHAHwX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D749062171;
-	Thu, 26 Sep 2024 13:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FC55258;
+	Thu, 26 Sep 2024 13:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727357909; cv=none; b=LLggsRNKiWP/1crGIBE2H5G4IfXp1K7+Yx+lNjZR8RVxwri5unRHus0+xURg4nYnEnPualohY1tc0zKxrfoG1DqpVkTIxVC//GUXNKFOdtvu6MUtIIehuQIcEj0Tjc8gTGQxkXnsZu2KoOfLfQcQX4XEs18jQKdLCyGIoVvk3ko=
+	t=1727358254; cv=none; b=oNfMT2SuOug/vEr+SLmd2MwupAC1OJ2u0zVaYvF4teuQLw8xVT5KKLMDDGbUco1ndPsD/2vKyvoNlf/+Spm5r34W77KYiKV1lfwdHQZ3tFVaZPuN3QdluMrOqYeBz9hTz+NkXlcKnl3m92fO/9+7UUrVHQBNdTgGYUgeqk/p1Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727357909; c=relaxed/simple;
-	bh=HM8hWjCaGTIhZ+L0lEK+WDF+Dg03Qo7kEWliuN+AiEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kssgP2hxkGMgSSH364qSJbjKrnQYLBHHfzFuPc/EVd0s+pI623TzzK80CqXFwzSbQjL/0t2CReUFRvqSA+I7rDEsFM1WAjLmMDw42fwPqmZG5Cn7ZTqLOLv9732PPYpkGM4vVVFATmIoTyG+HjCKjrXJpC6O6JnKCj2YjXxNKmM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=UHN9UHy4; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from vefanov-Precision-3650-Tower.intra.ispras.ru (unknown [10.10.2.69])
-	by mail.ispras.ru (Postfix) with ESMTPSA id 1A8C840769D4;
-	Thu, 26 Sep 2024 13:38:25 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru 1A8C840769D4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1727357905;
-	bh=U3C6gL58GGhS+NoBws1dkbyUPAYlkDpUF6lUMqgKoC8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=UHN9UHy4+CdcrAOYtcOpWdmVsyzKGVFU+Jnbd0fQK8Hdy1xJ9dlZFWJQxJfe+V46j
-	 Wlu6q/ckIcKHCHwdzaBp8TbK6TrFEkywV8Nv361vXKDkWnw/kCwOTAvSnIgM0b1fIL
-	 QEPyGb/JLXOMb3QG9UviBeZmmvhf+mDVTNZ2WnhM=
-From: Vladislav Efanov <VEfanov@ispras.ru>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Vladislav Efanov <VEfanov@ispras.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"John W. Linville" <linville@tuxdriver.com>,
-	linux-wireless@vger.kernel.org,
+	s=arc-20240116; t=1727358254; c=relaxed/simple;
+	bh=EwWY4YFFiTrI5gaJNADe+HhvhdjLiVd/51E26d97I8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OFKe4AjrcQPz2wou2Cw14ftw378Ts/5xH26nBRrw64As8weJtu48u+myyz5wa3ecIA8RXnC4Y4bV+M3jMFPFGWLuVWGnkamUXLbmoG1qhpKfoYvi/j0iwMNSqvxyZ8zfPysgKHAo013WSSBD4/Mx5QHOVKlKKF7aZi79nqhYGjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I3IHAHwX; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727358252; x=1758894252;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EwWY4YFFiTrI5gaJNADe+HhvhdjLiVd/51E26d97I8s=;
+  b=I3IHAHwXwPzYqv3LMLAi/WjDnNmqkYb5sB6CF4GYp1SpwUxzmPZ9FvAj
+   ykBv2KOMx8npH4GOpvXqlgUuFUg/bSgYHaGWBNsjIPwAeZ5o8k+Rx99hZ
+   YOsoC0p0ni4dFJl11U0BNGoNVrsJ5LLc7S0gEJkJDXXxaMbacgsquNJ2B
+   pjf3GgbVaDK/eTSPp7CvPS2TPBYTWJk+Hmvvrg4X5ycKVHsDHBsYYF54t
+   ZfbwathN+jdl0znJX/eMVfOdVtaeVWGSVn06BVVU43RXAvqi8IMVsTJGV
+   Tldnvqqlt/nlQxeg3nE+GVfOzZr6mGMvxp8guast6K9fmpYjBpsuqMbNk
+   Q==;
+X-CSE-ConnectionGUID: eqkPpwI6TCCxCJFqOUhtiA==
+X-CSE-MsgGUID: kOVRkQ/0Qd+k2cWhFjII7w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11207"; a="48983299"
+X-IronPort-AV: E=Sophos;i="6.11,155,1725346800"; 
+   d="scan'208";a="48983299"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Sep 2024 06:44:11 -0700
+X-CSE-ConnectionGUID: Kled27RQQFaToMDRYDhwjg==
+X-CSE-MsgGUID: 5PQNCPknRTGIhZFzbvlhWw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,155,1725346800"; 
+   d="scan'208";a="72048148"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa010.jf.intel.com with ESMTP; 26 Sep 2024 06:44:09 -0700
+Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.101])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6B09A28196;
+	Thu, 26 Sep 2024 14:44:06 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: linux-kernel@vger.kernel.org,
+	Peter Zijlstra <peterz@infradead.org>
+Cc: amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] cfg80211: Convert WARN_ON() to warning message
-Date: Thu, 26 Sep 2024 16:34:38 +0300
-Message-ID: <20240926133446.25445-1-VEfanov@ispras.ru>
-X-Mailer: git-send-email 2.43.0
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>
+Subject: [RFC PATCH] cleanup: make scoped_guard() to be return-friendly
+Date: Thu, 26 Sep 2024 15:41:38 +0200
+Message-ID: <20240926134347.19371-1-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,59 +81,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-syzkaller got the following warning:
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 9992 at net/wireless/ibss.c:36 __cfg80211_ibss
+Simply enable one to write code like:
 
-This warning is the result of the race condition between the following
-events:
+int foo(struct my_drv *adapter)
+{
+	scoped_guard(spinlock, &adapter->some_spinlock)
+		return adapter->spinlock_protected_var;
+}
 
-event1                          event2                      event3
-__ieee80211_sta_join_ibss()        |                          |
-creates new cgf80211_bss           |                          |
-structure.                         |                          |
-Calls cfg80211_ibss_joined()       |                          |
-which will scheduled               |                          |
-new event_work.                    |                          |
-                         ieee80211_ibss_disconnect()          |
-                         is called due to connection          |
-                         dropped/ibss leaves to               |
-                         remove cfg80211_bss structure.       |
-                                                event_work starts.
-                                          __cfg80211_ibss_joined()
-                                          is called and WARNING is
-                                          detected due to
-                                          cfg80211_bss structure was
-                                          removed by event2.
+Current scoped_guard() implementation does not support that,
+due to compiler complaining:
+error: control reaches end of non-void function [-Werror=return-type]
 
-It is a normal situation when connection is dropped during handshaking.
-So it looks reasonable to replace WARN_ON() with warning message to
-prevent false alarm.
+One could argue that for such use case it would be better to use
+guard(spinlock)(&adapter->some_spinlock), I disagree. I could also say
+that coding with my proposed locking style is also very pleasant, as I'm
+doing so for a few weeks already.
 
-Found by Linux Verification Center (linuxtesting.org) with syzkaller.
-Fixes: 04a773ade068 ("cfg80211/nl80211: add IBSS API")
-Signed-off-by: Vladislav Efanov <VEfanov@ispras.ru>
+Technical stuff about the change:
+scoped_guard() macro uses common idiom of using "for" statement to declare
+a scoped variable. Unfortunately, current logic is too hard for compiler
+diagnostics to be sure that there is exactly one loop step; fix that.
+
+To make any loop so trivial that there is no above warning, it must not
+depend on any variable to tell if there are more steps. There is no
+obvious solution for that in C, but one could use the compound statement
+expression with "goto" jumping past the "loop", effectively leaving only
+the subscope part of the loop semantics.
+
+More impl details:
+one more level of macro indirection is now needed to avoid duplicating
+label names;
+I didn't spot any other place that is using
+	if (0) past_the_loop:; else for (...; 1; ({goto past_the_loop}))
+idiom, so it's not packed for reuse what makes actual macros code cleaner.
+
+NAKed-by: Andy Shevchenko <andriy.shevchenko@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- net/wireless/ibss.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Andy believes that this change is completely wrong C, and wants me
+to keep the following 4 corncers attached (I either don't agree
+or they are irrelevant), but here we go:
+1. wrong usage of scoped_guard().
+   In the described cases the guard() needs to be used.
+2. the code like:
+	int foo(...)
+	{
+		my_macro(...)
+			return X;
+	}
+   without return 0; (which is a known dead code) is counter intuitive
+   from the C language perspective.
+3. [about netdev not liking guard()]
+   I do not buy "too hard" when it's too easy to get a preprocessed *.i
+   file if needed for any diagnosis which makes things quite clear.
+   Moreover, once done the developer will much easier understands how this
+   "magic" works (there is no rocket science, but yes, the initial
+   threshold probably a bit higher than just pure C).
+4. Besides that (if you was following the minmax discussion in LKML) the
+   macro expansion may be problematic and lead to the unbelievable huge .i
+   files that compiles dozens of seconds on modern CPUs (I experienced
+   myself that with AtomISP driver which drove the above mentioned minmax
+   discussion).
+   [Przemek - nested scoped_guard() usage expands linearly]
+---
+ include/linux/cleanup.h | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/net/wireless/ibss.c b/net/wireless/ibss.c
-index e6fdb0b8187d..93c8bee12bdf 100644
---- a/net/wireless/ibss.c
-+++ b/net/wireless/ibss.c
-@@ -34,8 +34,10 @@ void __cfg80211_ibss_joined(struct net_device *dev, const u8 *bssid,
- 	bss = cfg80211_get_bss(wdev->wiphy, channel, bssid, NULL, 0,
- 			       IEEE80211_BSS_TYPE_IBSS, IEEE80211_PRIVACY_ANY);
+diff --git a/include/linux/cleanup.h b/include/linux/cleanup.h
+index d9e613803df1..6b568a8a7f9c 100644
+--- a/include/linux/cleanup.h
++++ b/include/linux/cleanup.h
+@@ -168,9 +168,16 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
  
--	if (WARN_ON(!bss))
-+	if (!bss) {
-+		pr_warn("cfg80211: cfg80211_bss with bssid %s not found.\n", bssid);
- 		return;
-+	}
+ #define __guard_ptr(_name) class_##_name##_lock_ptr
  
- 	if (wdev->u.ibss.current_bss) {
- 		cfg80211_unhold_bss(wdev->u.ibss.current_bss);
+-#define scoped_guard(_name, args...)					\
+-	for (CLASS(_name, scope)(args),					\
+-	     *done = NULL; __guard_ptr(_name)(&scope) && !done; done = (void *)1)
++#define scoped_guard(_name, args...)	\
++	__scoped_guard_labeled(__UNIQUE_ID(label), _name, args)
++
++#define __scoped_guard_labeled(_label, _name, args...)	\
++	if (0)						\
++		_label: ;				\
++	else						\
++		for (CLASS(_name, scope)(args);		\
++		     __guard_ptr(_name)(&scope), 1;	\
++		     ({ goto _label; }))
+ 
+ #define scoped_cond_guard(_name, _fail, args...) \
+ 	for (CLASS(_name, scope)(args), \
+
+base-commit: 151ac45348afc5b56baa584c7cd4876addf461ff
 -- 
-2.34.1
+2.46.0
 
 
