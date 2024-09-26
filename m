@@ -1,124 +1,118 @@
-Return-Path: <netdev+bounces-129924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411009870A4
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:49:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4EC9870AE
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 915DFB29083
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:49:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A0CF1F26978
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 09:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A85D1AC8BB;
-	Thu, 26 Sep 2024 09:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D97D1ABECE;
+	Thu, 26 Sep 2024 09:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NvMXDfci"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qxd8tN66"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2BF1AC43F
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1A61A76D7
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 09:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727344125; cv=none; b=GZkRhQpzA3T/2Ww0yrvC/O0oAX5wHWF2aQgyTGAVvuLgZmhnzfb0u7XMBFKjXDsQybH3zltF0Wul8Wyu02qdwEmzRuUrDXDDjx6qg1jEBT3xZ7u5/h2GrX1VsROQ3WOqQfImW1gz+953pOmGWDcfM6FxqBxim7hiWZOZs/RYXcs=
+	t=1727344253; cv=none; b=aSNzSXwPrvDyexOaWOMJ//O5ljPM9EaqXNEeQLVrlGuu2+0trOSRSy1Fk6Pno4dOhMHTui3KxZbEBn6JYtOEnXiOKd7ruNA+IVe6RyFCw4hhjA3W0u4Cw4Rj5LKOFD+1XG2UEgG8CgeFI/PL3r9LsRyWPxJ4sv0DwDY6o3r3eSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727344125; c=relaxed/simple;
-	bh=KWYOEyZVojM+xzX1znoWGaX+B8Yit99GK8+kjVrKwI4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bw2xX6OUiHa1ftPURqna8A8FtsLFSp0yFnJDj6flLHUS2pZxBGfqTi2JnPHJ+Aey15BbLKDVoQnMJZYKYIGhMWMWQRQd4coIlrPlfp62P/8gQ6ExHlo4ei/Fac6BgftH2out0eA1imNylna++2bG6k0tp81IkYQWDsS3GUxWkJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NvMXDfci; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727344122;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VMXry1vusU7aXTZZMihQhOCF0i8Tmy+n1iWiG5OG1ZQ=;
-	b=NvMXDfciCdyIKz0mkKVgCuOFXxpeD2EqGH80mmkbMbLzgxHVFLJ4GvUy6Z0gk2L71UOoTg
-	KII0X+ENyBki6EBJlmNcSgXRrZFSLq3rvcHZtBEi8wPe9TYUF9lLACJ2p0WhvuXfhvdmVq
-	HMi/sumcYVU9faX1X6mhtlrja6qy5F8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-595-ncUmAfLUN_qw5p-GdSEyaw-1; Thu, 26 Sep 2024 05:48:41 -0400
-X-MC-Unique: ncUmAfLUN_qw5p-GdSEyaw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cb6ed7f9dso7159145e9.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:48:40 -0700 (PDT)
+	s=arc-20240116; t=1727344253; c=relaxed/simple;
+	bh=3cvkulumzJ6UdUrBeMHHDpezKdFQ0Akz+kdIuBNYxXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uUz8lue9SPs8+T38dF3O0+oQZeLIHMB8K4WJt0GDUcn1rLRLUzsaDA9gXByv/bar0DCoK/30+rATDwKRRmEO6nm5GU+X+tHPfJLXii7uCkij6ibxuwPiCcA/4jCm2qZAeUKGQT+YPTrSeibCIxH89IlU23TQhKJFyyfy94q9SpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Qxd8tN66; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cb8dac900so7385095e9.3
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 02:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1727344250; x=1727949050; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AiyN9NWxSHbtdh7dFvLb4E3Ssa1wgf9JiJ/fTzuLzmA=;
+        b=Qxd8tN665nGhssp3zI9X6VQUF3IPVNAevegGHtgXdeuCgnS9J9UfFsIr3JFIGBYAN+
+         PMMnGDiiSAGwxELvN8wBSrtSuQVSI10SfpUZuUOScylPLCCC8tEx1KR3QPyRv5Wq0e0E
+         XkLaqyCJazOTKyYvyCEz+a/hJT1F7Up9Tdw/6t+l2Q5YCQnYkevyf6wEOVdhSJhvVbZe
+         QCcOKGw5hdjRTt+Iiv0kICiFKyQpTMBkqhs2sIMhsJniqOq2w0nPzuHLKfnJhBZR3Jk5
+         QC/8XRvST/3vykfmVD2TWp7X4KN8ixehRmFEdnf+kv5qhTqwfnkeLtEmFRDnopk//KHO
+         HxHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727344119; x=1727948919;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1727344250; x=1727949050;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VMXry1vusU7aXTZZMihQhOCF0i8Tmy+n1iWiG5OG1ZQ=;
-        b=UAKlPkTy7sWXU1ppnXkDgfeFn1IXrHbIeOYWrgQw9jd2Aup3HsMJJaNisxD/ekOokk
-         Giv7tcV+GCZtMSoXf+tVvo4NXSS51Jidk521gmVyGzT8DQ01c86gCk7NYWASExjiBXQu
-         w7ZIObamhl0g52rTWwYB7CKVcfq0la3uqJzYnFHKhyWaddNLCB/IoQv5WGdFtXxuIVQC
-         rH+qIA70B0sDI48OMPzNrXqeyj0v63wlPdNQTZuclHq6CJ4Xn/2cZww3VPg6el2Mk9eY
-         Q4iTc+LnJFax4HiT3O2iF9bSGucvsamWBfeENiZr/LGvDj1KlznztVkKuM5ZmRaQ4l/y
-         k1Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrmc5TLCo34Gg5y8pAMOh0RMhPMKTtnlQTpL4oKqkh3EoTt6SatYuTahhzQhQmAviUrhSUQiQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywn3DZYTnKHRq34tWB5Ac+mra+HolLtgWyfyMEeJCdeqG+EASwZ
-	JitqoKkEWnfSXfJFBjIgQ2+h2Nhf9ewicEe6Tf2G51LeVjZtboVru1huF17lZDd6ZGnnI+8ACBk
-	96Els+Z63GXifOLNrPPsNmqPRKoiSMr4r6LRop1qdUnFXxOX99hrv6g==
-X-Received: by 2002:a05:600c:1e03:b0:42c:c8be:4215 with SMTP id 5b1f17b1804b1-42e9610252bmr48167085e9.4.1727344119616;
-        Thu, 26 Sep 2024 02:48:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRS+J/sZ/G5fv+a83nDaWz8bDo11SuUZe7AY0abL26WrXIAWVD2hvX7wGRR149+SRI0o61tw==
-X-Received: by 2002:a05:600c:1e03:b0:42c:c8be:4215 with SMTP id 5b1f17b1804b1-42e9610252bmr48166795e9.4.1727344119177;
-        Thu, 26 Sep 2024 02:48:39 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b? ([2a0d:3341:b089:3810:f39e:a72d:6cbc:c72b])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a1f2e6sm41966895e9.43.2024.09.26.02.48.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2024 02:48:38 -0700 (PDT)
-Message-ID: <1ef277af-3d66-4b8f-a6d9-e2066f40bbe3@redhat.com>
-Date: Thu, 26 Sep 2024 11:48:37 +0200
+        bh=AiyN9NWxSHbtdh7dFvLb4E3Ssa1wgf9JiJ/fTzuLzmA=;
+        b=u1lKehdh0a0VLS8r5qrpjrq2OC0vLZVul+K55W6F12LxZpxKTy63VvnqQkB856vSDv
+         DclcvuE6g5jsg3ONXZhfK/S/3/FkJ9QajONMb6FbDA3HsrUT3bcdPpngQBB1SfviQNfZ
+         gXKUzI80uMoTI2AAY3RpbdZEaCxCa6y66mZEyitnnJJkil573lVlmIAH82J2Ix9drO2z
+         l/llC9NmSAes/inTjCMzbWtqvhbuk2JaSNXTErCy2HqMJHcvqeOasYg+xC0fhJpryNtK
+         Njj0/9z101YhgeT3eTzDKHLAZLMmej/5UNHeS/XiCehXoUxdHmXa3E6mVbGb1WkhPsXJ
+         Hbmw==
+X-Forwarded-Encrypted: i=1; AJvYcCUlMZsGZQCpehK+mC3fK6P1ndqijtqhwBn6tqVXmfGMUAHCrEax1iPyJNCQJCgp9wHbLQdSVBM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD/UV5wKXZE4fhVbnf7rdU5R9uMvoojnp66AYUtRKKpuNmhbrT
+	nI1SIwTNO2PXUYmJauklcNnMIeGMNq4xQOUlO3jH620uIMT8xRNAtnYHKaj2fHk=
+X-Google-Smtp-Source: AGHT+IFCLIBXqKbOosYLGD7dpaW2Fa6+GR8VForuOcP/Zs87zlTaweE53g2UooMLElMqWLL8yLKfjg==
+X-Received: by 2002:a05:600c:548e:b0:42c:b95c:65b7 with SMTP id 5b1f17b1804b1-42e9610c908mr41002805e9.8.1727344250067;
+        Thu, 26 Sep 2024 02:50:50 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e969ddb85sm42060725e9.2.2024.09.26.02.50.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Sep 2024 02:50:49 -0700 (PDT)
+Date: Thu, 26 Sep 2024 12:50:45 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net: ethernet: ti: am65-cpsw: Fix forever loop in
+ cleanup code
+Message-ID: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: phy: qt2025: Fix warning: unused import
- DeviceId
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org, andrew@lunn.ch, tmgross@umich.edu,
- aliceryhl@google.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- kernel test robot <lkp@intel.com>
-References: <20240921062550.213839-1-fujita.tomonori@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240921062550.213839-1-fujita.tomonori@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On 9/21/24 08:25, FUJITA Tomonori wrote:
-> Fix the following warning when the driver is compiled as built-in:
-> 
->        warning: unused import: `DeviceId`
->        --> drivers/net/phy/qt2025.rs:18:5
->        |
->     18 |     DeviceId, Driver,
->        |     ^^^^^^^^
->        |
->        = note: `#[warn(unused_imports)]` on by default
-> 
-> device_table in module_phy_driver macro is defined only when the
-> driver is built as a module. Use phy::DeviceId in the macro instead of
-> importing `DeviceId` since `phy` is always used.
-> 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202409190717.i135rfVo-lkp@intel.com/
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+This error handling has a typo.  It should i++ instead of i--.  In the
+original code the error handling will loop until it crashes.
 
-Please additionally include a suitable fixes tag in the tag area, thanks!
+Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Paolo
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index cbe99017cbfa..d253727b160f 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -763,7 +763,7 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
+	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
+ 
+ fail_rx:
+-	for (i = 0; i < common->rx_ch_num_flows; i--)
++	for (i = 0; i < common->rx_ch_num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
+ 					  am65_cpsw_nuss_rx_cleanup, 0);
+ 
+-- 
+2.45.2
 
 
