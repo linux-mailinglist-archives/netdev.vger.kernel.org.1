@@ -1,96 +1,63 @@
-Return-Path: <netdev+bounces-129987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F30E89876EA
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:50:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4AC29876ED
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:51:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53F41B23E68
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:50:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 241A7B230FC
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:51:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C5F154429;
-	Thu, 26 Sep 2024 15:50:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7053515699D;
+	Thu, 26 Sep 2024 15:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qCMQJyI1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QvQCl6FS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A865F53368
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E96114B086;
+	Thu, 26 Sep 2024 15:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727365848; cv=none; b=KaXrTyFvLQ5CiZNh5vnakwbxdRBCk/GmHoOCDbtQLsH9YQHrfNRPWbp7jnbhI3kwGzpbETDtK43dmSb/rjPaCbE+mtmXr2CebIhdiVhKWIVqyZpesYLM9N8aBR1tEoxuwzZ7qS4OfgIwcv4QH0ENQA1Cr5+LhueCp5ibPxb61U4=
+	t=1727365905; cv=none; b=TFiZc5YcWAh9LjrTALEHMvLV/v/keJaioPI9ZKsxy7nHWWLA/58MEEJ3gBdmxkZxfna2stAyrZj5mwX6AhLMWc9rjj6vMU9rgP0SPFPWkK2eOsSpADziD0kS8puzjEhNFaXznmkcvnUuH7eWWKwIHAYOL2qgxdlU559QJc1QWRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727365848; c=relaxed/simple;
-	bh=IX0EuvDMjTW+YNQmUoVlvdmyaeGBf+T2lnX/5x4GabA=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AcRIyhyjFk+Chqa8/YD1mHEX2fJu3Mb6eAjUQthH7h126uz60Ebi3gVlIurtd9yObIrCnH60ibTsKokzsX665ncl28xJnPA2F1UYIThshC2HeeKz4f5GkAxU5+/MSBxq33NFO7kz58mcQgb/bYg2uPO3XgjEK824AZOLHIcrGEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qCMQJyI1; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71970655611so1045330b3a.0
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 08:50:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727365846; x=1727970646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4497cyjKPRI1PPIEvp39I++CetYP4FngtyziYodhtfk=;
-        b=qCMQJyI1GDf0SH3eEx37kOU3qJBk233wTdGaXJkCCahOpjB5jTy7dH24xjtojwdACV
-         rcYSw4DpcB8CLxk8u0Za/YQDHIWqjTq/lAmCGj7WFK/2orfC+z7nkEZGw2dAwtohOKop
-         2E2sAQiK4VaUwtx+GYb/D69D2KiIovJdCKz6E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727365846; x=1727970646;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4497cyjKPRI1PPIEvp39I++CetYP4FngtyziYodhtfk=;
-        b=kT+YIlszTdlLN5Oc9p/LLZyFXImeX+3tKPEQxGLePuhNsLiN7Zu5pN2cgJoKlaZsV6
-         MJD69HtOfemAyuXAiCHU+NKn4uS5l9MmyzGT9waUQoJvYJt+dEijli25ispDgHu2Cbws
-         1j1lb149nfX/jCDXHaZRMCTgxuwuNp5w0TF9XJ02A/NT6AccV228JXcSML4v9pyahCHj
-         0d0ZsCmFQoXptDnlnPRz6l1IsQdbmU7DLw0TQer9m4LfaB0ncK193Yqa0Z2XnvURKi3l
-         EpSaAdpAKd8MH/F8a6hlqwBh1e0Vwq9a1NAe+pL29dbDVfw+wfs+UsNPUhOPvi+vNW6T
-         Fp7A==
-X-Forwarded-Encrypted: i=1; AJvYcCX+FgHQ3dwFqTfhxTPKM7iQitB8ucbOfZvIKK/VyCy91+FAkvm58pTYRsZ2ijIhBCDGuhk3Z+c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAgEiSNCg/VmKjFInNjpgxwb5qNrQG4dkolQZbOfY9r2dn5BqY
-	WSsnmcvOWPIqzvV+cxaqkIBwkrisXReCZ2NNekJwXUbBN650WdEuUl5WH9I71R4=
-X-Google-Smtp-Source: AGHT+IEkQhkhz8M9XhbdcUG2MNIeKwnGlhXroclU7cIvREbDFN+d/Ne8bE0fjVwVOeH3tYuVP+gwkg==
-X-Received: by 2002:a05:6a00:10d5:b0:717:8deb:c195 with SMTP id d2e1a72fcca58-71b2604937emr366312b3a.21.1727365845970;
-        Thu, 26 Sep 2024 08:50:45 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b2653717esm40742b3a.204.2024.09.26.08.50.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 08:50:45 -0700 (PDT)
-Date: Thu, 26 Sep 2024 08:50:42 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	s=arc-20240116; t=1727365905; c=relaxed/simple;
+	bh=/zmH17S5Vfm0yDytaFwUjhdEpjDpunAgDGO95mzmn78=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I9mPRNf/zeKy+AB87CUct64stczqnafLyMnHZzeLCNAbaNp2A5bwsqlYEEf33dC7BSfaI4C38QWNuVzvGih6dJIlX2NdXnGsPXk1RoyqrH1rlQn4ff1e4CFasXnMTEnCXgWrJOEw17fSrIQeVpu/9b3Gqun5eXHw7AuzwBHdN/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QvQCl6FS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38176C4CECD;
+	Thu, 26 Sep 2024 15:51:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727365904;
+	bh=/zmH17S5Vfm0yDytaFwUjhdEpjDpunAgDGO95mzmn78=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QvQCl6FSrEpR+YD4IdpGNf5jOLSpCK692o5EO2AREFk5LGAmlfF+8M8Kb14Byd1D7
+	 eMKg2sCrIvIBGKVnhfrcXTY6+VGHZEsF3c6SgI7wA3P4af0i6Qxim6Sm2m1Qgmm2IC
+	 MpidG1X6ef2cQoViHH5w6OG08jZk1TDAdSQwfA9fL+aq0dMChmFjzzJHygigIjOOPx
+	 Z1WG75ndQjbX7QAcXgwv6fEC+T7QYujEr0hfkcP/LuL20QP5AQIW2Wk834EIPUW7eR
+	 WamG+oq40/tuDpYkpDnicKs9qlPKM6vMk6mfjqmeGbM2hFxp2i9rBxb8d3k0GHl7gK
+	 N0vg7GEl4vBHw==
+Date: Thu, 26 Sep 2024 16:51:39 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Roger Quadros <rogerq@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 1/1] hv_netvsc: Link queues to NAPIs
-Message-ID: <ZvWC0mhTW-y--X3a@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:Hyper-V/Azure CORE AND DRIVERS" <linux-hyperv@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240924234851.42348-1-jdamato@fastly.com>
- <20240924234851.42348-2-jdamato@fastly.com>
- <20240926151024.GE4029621@kernel.org>
- <ZvWA6BjwVfYXnDcA@LQ3V64L9R2>
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix forever loop in
+ cleanup code
+Message-ID: <20240926155139.GG4029621@kernel.org>
+References: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,51 +66,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZvWA6BjwVfYXnDcA@LQ3V64L9R2>
+In-Reply-To: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
 
-On Thu, Sep 26, 2024 at 08:42:32AM -0700, Joe Damato wrote:
-> On Thu, Sep 26, 2024 at 04:10:24PM +0100, Simon Horman wrote:
-> > On Tue, Sep 24, 2024 at 11:48:51PM +0000, Joe Damato wrote:
-> > > Use netif_queue_set_napi to link queues to NAPI instances so that they
-> > > can be queried with netlink.
-> > > 
-> > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > ---
-> > >  drivers/net/hyperv/netvsc.c       | 11 ++++++++++-
-> > >  drivers/net/hyperv/rndis_filter.c |  9 +++++++--
-> > >  2 files changed, 17 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-> > > index 2b6ec979a62f..ccaa4690dba0 100644
-> > > --- a/drivers/net/hyperv/netvsc.c
-> > > +++ b/drivers/net/hyperv/netvsc.c
-> > > @@ -712,8 +712,11 @@ void netvsc_device_remove(struct hv_device *device)
-> > >  	for (i = 0; i < net_device->num_chn; i++) {
-> > >  		/* See also vmbus_reset_channel_cb(). */
-> > >  		/* only disable enabled NAPI channel */
-> > > -		if (i < ndev->real_num_rx_queues)
-> > > +		if (i < ndev->real_num_rx_queues) {
-> > > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_TX, NULL);
-> > > +			netif_queue_set_napi(ndev, i, NETDEV_QUEUE_TYPE_RX, NULL);
-> > 
-> > Hi Joe,
-> > 
-> > When you post a non-RFC version of this patch, could you consider
-> > line-wrapping the above to 80 columns, as is still preferred for
-> > Networking code?
-> > 
-> > There is an option to checkpatch that will warn you about this.
+On Thu, Sep 26, 2024 at 12:50:45PM +0300, Dan Carpenter wrote:
+> This error handling has a typo.  It should i++ instead of i--.  In the
+> original code the error handling will loop until it crashes.
 > 
-> Thanks for letting me know.
-> 
-> I run checkpatch.pl --strict and usually it seems to let me know if
-> I am over 80, but maybe there's another option I need?
+> Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Ah, I see:
+Hi Dan,
 
---max-line-length=n set the maximum line length, (default 100)
+Unfortunately this patch didn't apply cleanly to net
+which throws our CI off. So, unfortunately, I think it needs to
+be rebased and reposted (after the 24h grace period).
 
-I didn't realize the checkpatch default was 100. Sorry about that,
-will make sure to pass that flag in the future; thanks for letting
-me know.
+-- 
+pw-bot: changes-requested
 
