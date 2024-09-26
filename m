@@ -1,167 +1,140 @@
-Return-Path: <netdev+bounces-129981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E59A98765A
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:18:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7F7A987674
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 17:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC945B262FA
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:18:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A178282C99
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 15:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38F4F14F9EA;
-	Thu, 26 Sep 2024 15:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65EDE14D703;
+	Thu, 26 Sep 2024 15:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KY4U4I7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C6A4F21D;
-	Thu, 26 Sep 2024 15:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8213114B959
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 15:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727363889; cv=none; b=LK059DGJ6nCtK9Pp7wPHhtDfsre7oN2ELlWLMOrlZzZUFXFeu6dB0tkBNNnRvi8hsdO4xR+05nnyJSpZ4kSH49VhBLt9l7oN/ZIn4L68j3YpYZvdfbFjc/wQn8caapaj30NC8P7jS5wY+28Mzj3Mb2I/LbQSjFGYwKz+eVMpqG4=
+	t=1727364363; cv=none; b=MCOtdyQg0+NP3jlXyH2kbwWFIel0V8I6R0jDo2Sxtr7f1HsfiGFMpBE7VdqIKZN8HTWsoBMdEzpjZorLsDSm/QYwWnrIMBlJFmvsGBqjFsU/OBhucq5V0DkgzeGpw+X4T689HIbivwME6FtykPQT8pUxE/WKhyCBwGwjlW/uHPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727363889; c=relaxed/simple;
-	bh=TCL06OTau/rgWgOh2hhmMvRSYfdo/Vj+wi/zZJ/ezeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ki0+JXgWJvSJ+4uEC/ivm2ICcLIgEP1jb6yyWGjP5RVt0/Ep2U6/IzgJJFtACauoBsIc0hGHvvypQxQLvBXtC0K2/30K6oVCjjCQVrHi1NsrBAb1MtdKBhPbPVrxOC3j5wttUxo4WbW+leel3f88qUsRJVITdxIIe/MR1X/9oa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=57678 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1stqFl-001gm6-C9; Thu, 26 Sep 2024 17:18:03 +0200
-Date: Thu, 26 Sep 2024 17:18:00 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH nf-next v5 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <ZvV7KFHXx3V30HEH@calendula>
-References: <20240909084620.3155679-1-leitao@debian.org>
- <Zuq12avxPonafdvv@calendula>
- <Zuq3ns-Ai05Hcooj@calendula>
- <ZvVBawvMot9nu2jE@gmail.com>
+	s=arc-20240116; t=1727364363; c=relaxed/simple;
+	bh=8O97gAQSQMSTIA1LZZJBwR/Vypo4UoHG527XvQ/bhCI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UvJlVe/tY75wmemBRWRBgc/nVGU39UR9s3dvpxVpFFqQbWQXXVCRbsoKYEhAHnN+Zfjh573LAGh0Nq8IUeSNY9sriwAOhqQBj1irBVFjLmuOUs0JETRAp/nqo0m00m9AnhyFJsB5XLUof4+uHTLiNyCa80K0hlzD6xIteWGBjo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KY4U4I7h; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8d19d735-c2a8-456a-ac97-7f8d86cd7ed1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727364359;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Z4ZlEW2hvu2WiB0zyG9qp5Yw8aOdRlroBQryAcoNJJ4=;
+	b=KY4U4I7hrDGJSp6YKullSWSD5lP2OkyMVPJoqQhWbnI4jzplUfAvFTcH639OiAiefibyig
+	EzCYgm91vBGkKuRpLuN/KhwHYK/O42gr6CaSUJTQEZAxRtOSKYdnq+NwFp6FmlTkJW++Bd
+	m/OHo6S1IFun6CIEdK6Zrm2+S87b158=
+Date: Thu, 26 Sep 2024 23:25:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZvVBawvMot9nu2jE@gmail.com>
-X-Spam-Score: -1.9 (-)
+Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Haakon Bugge <haakon.bugge@oracle.com>,
+ Christoph Hellwig <hch@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ OFED mailing list <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
+References: <Zuwyf0N_6E6Alx-H@infradead.org>
+ <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
+ <Zu191hsvJmvBlJ4J@infradead.org>
+ <525e9a31-31ee-4acf-a25c-8bf3a617283f@linux.dev>
+ <ZvFY_4mCGq2upmFl@infradead.org>
+ <aea6b986-2d25-4ebc-93e8-05da9c6f3ba2@linux.dev>
+ <ZvJiKGtuX62jkIwY@infradead.org>
+ <1ad540cb-bf1b-456b-be2d-6c35999bdaa8@linux.dev>
+ <66A7418F-4989-4765-AC0F-1D23342C6950@oracle.com>
+ <5b86861b-60f7-4c90-bc0e-d863b422850f@linux.dev>
+ <20240925092645.GD967758@unreal>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240925092645.GD967758@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 26, 2024 at 04:11:39AM -0700, Breno Leitao wrote:
-> Hello Pablo,
+在 2024/9/25 17:26, Leon Romanovsky 写道:
+> On Wed, Sep 25, 2024 at 10:04:21AM +0800, Zhu Yanjun wrote:
+>> 在 2024/9/24 23:16, Haakon Bugge 写道:
+>>>
+>>>
+>>>> On 24 Sep 2024, at 15:59, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
+>>>>
+>>>> 在 2024/9/24 14:54, Christoph Hellwig 写道:
+>>>>> On Tue, Sep 24, 2024 at 09:58:24AM +0800, Zhu Yanjun wrote:
+>>>>>> The users that I mentioned is not in the kernel tree.
+>>>>> And why do you think that would matter the slightest?
+>>>>
+>>>> I noticed that the same cq functions are used. And I also made tests with this patch series. Without this patch series, dim mechanism will not be invoked.
+>>>
+>>> Christoph alluded to say: Do not modify the old cq_create_cq() code in order to support DIM, it is better to change the ULP to use ib_alloc_cq(), and get DIM enabled that way.
+>>
+>> Hi, Haakon
+>>
+>> To be honest, I like your original commit that enable DIM for legacy ULPs
+>> because this can fix this problem once for all and improve the old
+>> ib_create_cq function.
+>>
+>> The idea from Christoph will cause a lot of changes in ULPs. I am not very
+>> sure if these changes cause risks or not.
+>>
+>> Thus, I prefer to your original commit. But I will follow the advice from
+>> Leon and Jason.
 > 
-> On Wed, Sep 18, 2024 at 01:21:02PM +0200, Pablo Neira Ayuso wrote:
-> > Single patch to update them all should be fine.
-> 
-> I am planning to send the following patch, please let me know if you
-> have any concern before I send it:
-> 
-> Author: Breno Leitao <leitao@debian.org>
-> Date:   Thu Aug 29 02:51:02 2024 -0700
-> 
->     netfilter: Make legacy configs user selectable
->     
->     This option makes legacy Netfilter Kconfig user selectable, giving users
->     the option to configure iptables without enabling any other config.
+> Christoph was very clear and he summarized our position very well. We
+> said similar thing to SMC folks in 2022 [1] and RDS is no different here.
 
-LGTM, a few cosmetic nitpicks below.
+Thanks, Leon. I will read this link carefully.
 
->     Make the following KConfig entries user selectable:
->      * BRIDGE_NF_EBTABLES_LEGACY
->      * IP_NF_ARPTABLES
->      * IP_NF_IPTABLES_LEGACY
->      * IP6_NF_IPTABLES_LEGACY
->     
->     Signed-off-by: Breno Leitao <leitao@debian.org>
 > 
-> diff --git a/net/bridge/netfilter/Kconfig b/net/bridge/netfilter/Kconfig
-> index 104c0125e32e..b7bdb094f708 100644
-> --- a/net/bridge/netfilter/Kconfig
-> +++ b/net/bridge/netfilter/Kconfig
-> @@ -41,7 +41,13 @@ config NF_CONNTRACK_BRIDGE
->  
->  # old sockopt interface and eval loop
->  config BRIDGE_NF_EBTABLES_LEGACY
-> -	tristate
-> +	tristate "Legacy EBTABLES support"
-> +	depends on BRIDGE && NETFILTER_XTABLES
-> +	default n
-> +	help
-> +	 Legacy ebtable packet/frame classifier.
-                ^^^^^^^
-                ebtables
+> So no, "old ib_create_cq" shouldn't be used by ULPs.
 
-> +	 This is not needed if you are using ebtables over nftables
-> +	 (iptables-nft).
->  
->  menuconfig BRIDGE_NF_EBTABLES
->  	tristate "Ethernet Bridge tables (ebtables) support"
-> diff --git a/net/ipv4/netfilter/Kconfig b/net/ipv4/netfilter/Kconfig
-> index 1b991b889506..2c4d42b5bed1 100644
-> --- a/net/ipv4/netfilter/Kconfig
-> +++ b/net/ipv4/netfilter/Kconfig
-> @@ -12,7 +12,13 @@ config NF_DEFRAG_IPV4
->  
->  # old sockopt interface and eval loop
->  config IP_NF_IPTABLES_LEGACY
-> -	tristate
-> +	tristate "Legacy IP tables support"
-> +	default	n
-> +	select NETFILTER_XTABLES
-> +	help
-> +	  iptables is a legacy packet classifier.
-> +	  This is not needed if you are using iptables over nftables
-> +	  (iptables-nft).
->  
->  config NF_SOCKET_IPV4
->  	tristate "IPv4 socket lookup support"
-> @@ -318,7 +324,13 @@ endif # IP_NF_IPTABLES
->  
->  # ARP tables
->  config IP_NF_ARPTABLES
-> -	tristate
-> +	tristate "Legacy ARPTABLE support"
-                         ^^^^^^^^
-                         ARPTABLES
+Got it. I have replaced ib_create_cq with ib cq pool APIs. Perhaps 
+drivers/infiniband/ulp/srpt/ib_srpt.c is a good example to use ib cq 
+pool APIs.
 
-> +	depends on NETFILTER_XTABLES
-> +	default n
-> +	help
-> +	  arptables is a legacy packet classifier.
-> +	  This is not needed if you are using arptables over nftables
-> +	  (iptables-nft).
->  
->  config NFT_COMPAT_ARP
->  	tristate
-> diff --git a/net/ipv6/netfilter/Kconfig b/net/ipv6/netfilter/Kconfig
-> index f3c8e2d918e1..e087a8e97ba7 100644
-> --- a/net/ipv6/netfilter/Kconfig
-> +++ b/net/ipv6/netfilter/Kconfig
-> @@ -8,7 +8,14 @@ menu "IPv6: Netfilter Configuration"
->  
->  # old sockopt interface and eval loop
->  config IP6_NF_IPTABLES_LEGACY
-> -	tristate
-> +	tristate "Legacy IP6 tables support"
-> +	depends on INET && IPV6
-> +	select NETFILTER_XTABLES
-> +	default n
-> +	help
-> +	  ip6tables is a legacy packet classifier.
-> +	  This is not needed if you are using iptables over nftables
-> +	  (iptables-nft).
->  
->  config NF_SOCKET_IPV6
->  	tristate "IPv6 socket lookup support"
+Best Regards,
+Zhu Yanjun
+
+> 
+> Thanks
+> 
+> [1] https://lore.kernel.org/netdev/YePesYRnrKCh1vFy@unreal/
+> 
+>>
+>> Zhu Yanjun
+>>
+>>>
+>>>
+>>> Thxs, Håkon
+>>>
+>>
+>>
+
 
