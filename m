@@ -1,94 +1,90 @@
-Return-Path: <netdev+bounces-130029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331559879FA
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 22:06:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F9FD987A03
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 22:14:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 462551C221C4
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 20:06:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D4532835BB
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 20:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0544417C9BE;
-	Thu, 26 Sep 2024 20:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A0817DFF3;
+	Thu, 26 Sep 2024 20:14:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pTKV43Z6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/6Ib0Zv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADFC1BC58
-	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 20:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CE717C9E7
+	for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 20:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727381181; cv=none; b=d2oUHolDzogFXn4iwE8/BKfbJfHBAere2BxhF/34lUeCP3hQJZW4x4BPfTp8+yaHnlHdyHGj2bPsqFgthhevUifdkmUyhy7R6wUxwncAUXsTkKQZD/9GtL5xVbNSM6FHIS2zml7JehmLJUiYRMGpJIlIpSBi1jh//zH0Xeuw0Cg=
+	t=1727381655; cv=none; b=g4hNkERbxJHC+Kh5RC+tEyHXBgAHqyqknHzqvEW5SM+YsarB8N6VFyHzzQHlQVHiPjGG9QZd12yWt7WPKyVfrmOu/ijsPdBhwp7tg7hfIyh+7Hsq4qf3jJrfs6wHLOdTd8M4iXpeG7v77OXqAId923CLnoM/fiunudJyKItdc1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727381181; c=relaxed/simple;
-	bh=MEssX4yILVeAC1uIdEzbSRQ9UX3RR5r8PJ4EaArQxLY=;
+	s=arc-20240116; t=1727381655; c=relaxed/simple;
+	bh=SywJ6IY4/ZKra54DmIZi64FJeAqVuZ29u2cS0EvQAT0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KRuj/5SXtGBkXKhl5iixuVGNvhEFhQf2Kgzj4mAjs+9QgcAC6prVtt0AX/abjiY6QPRZdWnZWqUvfNS3TFJuaDr4SbmyccddTyNxkR9+1Yp4K6S/RjvtystyTUSdjQq7m3pirjWzVpW0z1N2+nzQpkZOGNoovzAIaUb6Nxk2CcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pTKV43Z6; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7e6ba3f93fdso845756a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 13:06:20 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WILTPUXLO41Uwf056d5a23YKNumiCqIeYlCz4BbnkXHgjnMHuVU8VP5GOg4rX9RJ/IVxpY2jUhzz1wzb2VatZMWtsy9R5TUDtaPCj5Zwh2tyYIf5t09wfJGSMjg6/VTneBzgPz/u70AYToKyIcmV6fO4yOpgm/Ef+3bZ4eOxkYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h/6Ib0Zv; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cc43454d5so11657075e9.3
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 13:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727381179; x=1727985979; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=swZlxmG6FKIOk0zxgp4oMKx1YRyCiEGhvO9Bt8p8EKg=;
-        b=pTKV43Z6vl4297xdWUlkR3d3n6aP/F5O44r8Rzse5oBcljNT9dU44/QRTRrGD9D/8z
-         XFcz9k+gEyAwRkK+7BSjuRVm2oQG1UDo6m+7RojajbJB0o18ehtSKGTtCMtsyQcUFFCc
-         ftEyQG8lqXcZ8aOff5nrOnOevFh5DYVLOfWjI=
+        d=linaro.org; s=google; t=1727381652; x=1727986452; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=adNp+ex0aTTFAqiWEedrw/mOZftL/ye5N6g7vAI0S0g=;
+        b=h/6Ib0Zv1Qywp9YTBqrFaOk7L2Qcd9IMpfc5FotB22f+1oRgnYJ/j/DtPcdlSqup+3
+         ygN71C1KgfZtMLp6bLNIlYG1Pb/Ds0gsGjyHKgCbxQj7d/Z+JgK+Uz0+FAE8OHpwm/p6
+         sMojjiOsU+XvfNC7NLr2b/9ZudJVMTxUQ+ZqIeQUigo2f1jSpY4AanF7oyo69Bj+Q6tX
+         cOBZoqzbXEl7FALaQ0MQn60KmdDenZMb+NggDpQuHmjKjLFGPkWY7/DchaYRJ9x+AgkL
+         JOuTTiQ8pq+8EHhkO5lfGmSVtyNAx+W853wtoJm78bqELph437Kigw0N7uu2WHOHCV7a
+         p00g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727381179; x=1727985979;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=swZlxmG6FKIOk0zxgp4oMKx1YRyCiEGhvO9Bt8p8EKg=;
-        b=YthilBIB79iNk03ZbVZ/IYqTZTCgS8KhOkqZJBUYgnF7dQEa1cmSRs6/mthRrQiVRm
-         x8/Sp3dDN4Cm87mUhPCkPQOk2VVjEzrdLi06tUg9ejZ3yf+sGTEydShEriy13CZpYWTn
-         QJZQD8maDYF9FkPD6H+Ez4iVkBNd5UfIf8JKAfjPRsZGZcNkKe06wwxxF7JhrbByDX0f
-         1jqn7ab1l/zdcEG0xMkWQENqCMlHt5wT6RZJicM5pZk8Ve3T+Ozn+wzHeXh5YXwbHJeu
-         8RfwMqGD3iG3pazPCbGeQ30eoZRS88wH0PcqwGMfNQuA1I84Ri2UNW5Dz2+efGlihNRu
-         0NBg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2c+yhSsArW9sjbQd1AaPRMyO+dzrflusk2H+Kym8g54HTVt8M0GQ5a/V1XmFBR6jlUdLbCeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpWoSVplRac9xTc6V6vHqtjrv+yFzh04HKS9u2zpEicH6UCAR6
-	03KwjtNhelBJc0dZVLpoCXbFtCIeWujrOuWI5gId7rXciimhoJSzCC06a70vuaI=
-X-Google-Smtp-Source: AGHT+IEP5wXYfk8fD9KatnYjoAjOMUuIV20iBOhYJRWUVeWJ4snxL7VJgJ+3iQWN2UvxXlTBlznT4A==
-X-Received: by 2002:a05:6a21:a247:b0:1cf:4dc3:a89e with SMTP id adf61e73a8af0-1d4fa64d9d3mr817395637.9.1727381179484;
-        Thu, 26 Sep 2024 13:06:19 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6db617088sm283043a12.93.2024.09.26.13.06.17
+        d=1e100.net; s=20230601; t=1727381652; x=1727986452;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=adNp+ex0aTTFAqiWEedrw/mOZftL/ye5N6g7vAI0S0g=;
+        b=xF/MTpjjpUAwl89ttv6qZexyUYXJPg0g7Qt/Y8HL9H5JELzsbZt+Zt+G1iOqEsSPjD
+         vMnSg/+rmugCiw5CQtLhadfmwC1HeRv61uTpAy7i0WrXqS1bGVkwvu4v5/ZrOTIh0BNY
+         IldnWefvwpOn2hVhSjN/bIiXYeYvTNipeDzI1J+8BMmUst7oDbDvWqGosv3mXDDB4PWh
+         +j1Iyzd4fGvF/+hvmVw6hW7kGJcQhY2OO8BVruSABAffC2QcF9zHYwhTmJKwrRXYvzwU
+         E4zy7BXVGg6mjwlLvGXOVbCNkjgy1OqXRgE9xe10zxex/rbsSx1JwS8QlgLV4sKKV0D0
+         9ifQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUY6MJpBFnTxxAQnDtGqH1GvtNVJ9Oguwrh7INzN5TMvEGY4JCRRBOeTY3YmUcZNiOVU82QTcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTiceHHrvhg2KWNs8rRQTGa4/rBcfwvVUrlTDJVcm2b+oJRdkw
+	TGhQpLorqbZEIhou6yQD+PrS7J1s74azRf/5fo92fP8Pmt9cXwLRCK8QTks+ekrDDRl212LxA5e
+	w
+X-Google-Smtp-Source: AGHT+IHAVUKzMTH3MGv+LwYbAamyJU3xln7iWwZfpcoO7AqGhQqz3MkJaGIrNcTuk0zibF2YaiT2bw==
+X-Received: by 2002:a05:600c:3b04:b0:425:5ec3:570b with SMTP id 5b1f17b1804b1-42f58497da0mr3800515e9.35.1727381652444;
+        Thu, 26 Sep 2024 13:14:12 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57dec19bsm8350185e9.26.2024.09.26.13.14.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 13:06:18 -0700 (PDT)
-Date: Thu, 26 Sep 2024 13:06:16 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	liuyonglong@huawei.com, fanghaiqing@huawei.com,
-	zhangkun09@huawei.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mkarsten@uwaterloo.ca
-Subject: Re: [PATCH net v2 1/2] page_pool: fix timing for checking and
- disabling napi_local
-Message-ID: <ZvW-uEXITmZtncub@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, liuyonglong@huawei.com,
-	fanghaiqing@huawei.com, zhangkun09@huawei.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mkarsten@uwaterloo.ca
-References: <20240925075707.3970187-1-linyunsheng@huawei.com>
- <20240925075707.3970187-2-linyunsheng@huawei.com>
+        Thu, 26 Sep 2024 13:14:11 -0700 (PDT)
+Date: Thu, 26 Sep 2024 23:14:07 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Roger Quadros <rogerq@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix forever loop in
+ cleanup code
+Message-ID: <5ed2cd4e-cb50-4a21-93e2-8ba8d627f20a@stanley.mountain>
+References: <ae659b4e-a306-48ca-ac3c-110d64af5981@stanley.mountain>
+ <20240926155139.GG4029621@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,65 +93,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240925075707.3970187-2-linyunsheng@huawei.com>
+In-Reply-To: <20240926155139.GG4029621@kernel.org>
 
-On Wed, Sep 25, 2024 at 03:57:06PM +0800, Yunsheng Lin wrote:
-> page_pool page may be freed from skb_defer_free_flush() to
-> softirq context, it may cause concurrent access problem for
-> pool->alloc cache due to the below time window, as below,
-> both CPU0 and CPU1 may access the pool->alloc cache
-> concurrently in page_pool_empty_alloc_cache_once() and
-> page_pool_recycle_in_cache():
+On Thu, Sep 26, 2024 at 04:51:39PM +0100, Simon Horman wrote:
+> On Thu, Sep 26, 2024 at 12:50:45PM +0300, Dan Carpenter wrote:
+> > This error handling has a typo.  It should i++ instead of i--.  In the
+> > original code the error handling will loop until it crashes.
+> > 
+> > Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
->           CPU 0                           CPU1
->     page_pool_destroy()          skb_defer_free_flush()
->            .                               .
->            .                   page_pool_put_unrefed_page()
->            .                               .
->            .               allow_direct = page_pool_napi_local()
->            .                               .
-> page_pool_disable_direct_recycling()       .
->            .                               .
-> page_pool_empty_alloc_cache_once() page_pool_recycle_in_cache()
+> Hi Dan,
 > 
-> Use rcu mechanism to avoid the above concurrent access problem.
-> 
-> Note, the above was found during code reviewing on how to fix
-> the problem in [1].
-> 
-> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-> 
-> Fixes: dd64b232deb8 ("page_pool: unlink from napi during destroy")
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Unfortunately this patch didn't apply cleanly to net
+> which throws our CI off. So, unfortunately, I think it needs to
+> be rebased and reposted (after the 24h grace period).
 
-Sorry for the noise, but I hit an assert in page_pool_unref_netmem
-and I am trying to figure out if it is related to what you all are
-debugging? I thought it might be, but if not, my apologies.
+It's not a matter of rebasing...  I guess I accidentally deleted a space
+character at the start of the first line of the diff?  Weird.
 
-Just in case it is, I've put the backtrace on github [1]. I
-triggered this while testing an RFC [2] I've been working on. Please
-note, the RFC posted publicly does not currently apply cleanly to
-net-next and has some bugs I've fixed in my v4. I had planned to
-send the v4 early next week and mention the page pool issue I am
-hitting.
+Anyway, I'll resend.
 
-After triggering the assert in [1], I tried applying the patches of
-this series and retesting the RFC v4 I have queued locally. When I
-did that, I hit a new assertion page_pool_destroy [3].
+regards,
+dan carpenter
 
-There are a few possibilities:
-   1. I am hitting the same issue you are hitting
-   2. I am hitting a different issue caused by a bug I introduced
-   3. I am hitting a different page pool issue entirely
-
-In case of 2 and 3, my apologies for the noise.
-
-In case of 1: If you think I am hitting the same issue as you are
-trying to solve, I can reliably reproduce this with my RFC v4 and
-would be happy to test any patches meant to fix the issue.
-
-[1]: https://gist.githubusercontent.com/jdamato-fsly/eb628c8bf4e4d1c8158441644cdb7e52/raw/96dcf422303d9e64b5060f2fb0f1d71e04ab048e/warning1.txt
-[2]: https://lore.kernel.org/all/20240912100738.16567-1-jdamato@fastly.com/#r
-[3]: https://gist.githubusercontent.com/jdamato-fsly/eb628c8bf4e4d1c8158441644cdb7e52/raw/96dcf422303d9e64b5060f2fb0f1d71e04ab048e/warning2.txt
 
