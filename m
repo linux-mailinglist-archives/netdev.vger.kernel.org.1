@@ -1,98 +1,187 @@
-Return-Path: <netdev+bounces-129941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A08E98721F
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 12:56:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 264AE98725A
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 13:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 208CFB2856F
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 10:56:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA9D0282F2E
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 11:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744F81AED24;
-	Thu, 26 Sep 2024 10:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BFD1AED24;
+	Thu, 26 Sep 2024 11:07:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E11AE84A;
-	Thu, 26 Sep 2024 10:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4081AE853;
+	Thu, 26 Sep 2024 11:07:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727348173; cv=none; b=GtY877dEj6d3k+2n5Ztp/mBW/KXOBwFCNm3I8JFaonoWhZIZ5idHBe8e5xoOPMradE13+uRf658ilj55kO6ufqnAmRKld30ikXPOFwFYgRWE9Ey+Jyckte+GC0EAsvD9/Vgee3OYGWEezPXpHm5L7EZ2Lq1WHUo5aKnqsBKU3tg=
+	t=1727348854; cv=none; b=r9wo8IS3s12flLGnYOfGnjYeM7MTEaSkoUH5HnZruGUjdoUXRMS3jE7R88L88kdNplXvCnwUkbaKUKPOcc8o0jcoU/AHNkbHcQyWDtPDAJZSiQt+lvD/huVE+TkqWykM3vVW8V1pxwPUezLw90bGVr/laPqj+VdbY3heULfVG8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727348173; c=relaxed/simple;
-	bh=Qa2jT4/2s74MI1inINDuACkzaOSvq7JFkAWjbO2SnZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I69NOSh+2fPgYsMLTt2U4rQVIPKW2Lau68zYnU61sHIGy5ZwnFnlUYVCb3YF8f8iLMPxkNsngGDvsPpXxbIfNz8TuZK57UoroddtswDGLjdPtI7ZUG1pO4+9Qp8L+7D7tfc6yBh+OLuyBw6GC7wjvUvZvUtb3mCKFu9YNCen57E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+	s=arc-20240116; t=1727348854; c=relaxed/simple;
+	bh=zWgRg7nMrwKg/bUXSAkx21ciAIsuGerg3evJtaOEdAo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=ZwfuJfzA+IOWfMlagzuVTte+ILKV8QgDmAjhz/yw+jWBO2nC0porYE2ftYfSZprFTKWfwys8Zcnl3eI/pjn07TIbHdLv9DAlLsw0dEUKlokdAJzK9ogHpEBvOKblMqKgIuYieAagVeHQ1Fhd4mFMKZOE/G4aLSthoVNyP9IeWr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=37144 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1stmAH-001Qk0-TP; Thu, 26 Sep 2024 12:56:07 +0200
-Date: Thu, 26 Sep 2024 12:56:05 +0200
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
 From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	edumazet@google.com
-Subject: Re: [PATCH net 00/14] Netfilter fixes for net
-Message-ID: <ZvU9xUdMC4Ra_9gv@calendula>
-References: <20240924201401.2712-1-pablo@netfilter.org>
- <c51519c0-c493-4408-9938-5fb650b4ed8b@redhat.com>
- <20240926103737.GA15517@breakpoint.cc>
- <ba889ffb-ba6f-450a-be9b-9fa75b20ee86@redhat.com>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net,v2 00/14] Netfilter fixes for net
+Date: Thu, 26 Sep 2024 13:07:03 +0200
+Message-Id: <20240926110717.102194-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ba889ffb-ba6f-450a-be9b-9fa75b20ee86@redhat.com>
-X-Spam-Score: -1.9 (-)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 26, 2024 at 12:43:23PM +0200, Paolo Abeni wrote:
-> On 9/26/24 12:37, Florian Westphal wrote:
-> > Paolo Abeni <pabeni@redhat.com> wrote:
-> > > On 9/24/24 22:13, Pablo Neira Ayuso wrote:
-> > > > The following patchset contains Netfilter fixes for net:
-> > > > 
-> > > > Patch #1 and #2 handle an esoteric scenario: Given two tasks sending UDP
-> > > > packets to one another, two packets of the same flow in each direction
-> > > > handled by different CPUs that result in two conntrack objects in NEW
-> > > > state, where reply packet loses race. Then, patch #3 adds a testcase for
-> > > > this scenario. Series from Florian Westphal.
-> > > 
-> > > Kdoc complains against the lack of documentation for the return value in the
-> > > first 2 patches: 'Returns' should be '@Return'.
-> > 
-> > :-(
-> > 
-> > Apparently this is found via
-> > 
-> > scripts/kernel-doc -Wall -none <file>
-> > 
-> > I'll run this in the future, but, I have to say, its encouraging me
-> > to just not write such kdocs entries in first place, no risk of making
-> > a mistake.
-> > 
-> > Paolo, Pablo, what should I do now?
-> 
-> If an updated PR could be resent soon, say within ~1h, I can wait for the CI
-> to run on it, merge and delay the net PR after that.
-> 
-> Otherwise, if the fixes in here are urgent, I can pull the series as-is, and
-> you could follow-up on nf-next/net-next.
-> 
-> The last resort is just drop this from today's PR.
-> 
-> Please LMK your preference,
+v2: with kdoc fixes per Paolo Abeni.
 
-I am working on this now.
+-o-
+
+The following patchset contains Netfilter fixes for net:
+
+Patch #1 and #2 handle an esoteric scenario: Given two tasks sending UDP
+packets to one another, two packets of the same flow in each direction
+handled by different CPUs that result in two conntrack objects in NEW
+state, where reply packet loses race. Then, patch #3 adds a testcase for
+this scenario. Series from Florian Westphal.
+
+1) NAT engine can falsely detect a port collision if it happens to pick
+   up a reply packet as NEW rather than ESTABLISHED. Add extra code to
+   detect this and suppress port reallocation in this case.
+
+2) To complete the clash resolution in the reply direction, extend conntrack
+   logic to detect clashing conntrack in the reply direction to existing entry.
+
+3) Adds a test case.
+
+Then, an assorted list of fixes follow:
+
+4) Add a selftest for tproxy, from Antonio Ojea.
+
+5) Guard ctnetlink_*_size() functions under
+   #if defined(CONFIG_NETFILTER_NETLINK_GLUE_CT) || defined(CONFIG_NF_CONNTRACK_EVENTS)
+   From Andy Shevchenko.
+
+6) Use -m socket --transparent in iptables tproxy documentation.
+   From XIE Zhibang.
+
+7) Call kfree_rcu() when releasing flowtable hooks to address race with
+   netlink dump path, from Phil Sutter.
+
+8) Fix compilation warning in nf_reject with CONFIG_BRIDGE_NETFILTER=n.
+   From Simon Horman.
+
+9) Guard ctnetlink_label_size() under CONFIG_NF_CONNTRACK_EVENTS which
+   is its only user, to address a compilation warning. From Simon Horman.
+
+10) Use rcu-protected list iteration over basechain hooks from netlink
+    dump path.
+
+11) Fix memcg for nf_tables, use GFP_KERNEL_ACCOUNT is not complete.
+
+12) Remove old nfqueue conntrack clash resolution. Instead trying to
+    use same destination address consistently which requires double DNAT,
+    use the existing clash resolution which allows clashing packets
+    go through with different destination. Antonio Ojea originally
+    reported an issue from the postrouting chain, I proposed a fix:
+    https://lore.kernel.org/netfilter-devel/ZuwSwAqKgCB2a51-@calendula/T/
+    which he reported it did not work for him.
+
+13) Adds a selftest for patch 12.
+
+14) Fixes ipvs.sh selftest.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-09-26
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 9410645520e9b820069761f3450ef6661418e279:
+
+  Merge tag 'net-next-6.12' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next (2024-09-16 06:02:27 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-09-26
+
+for you to fetch changes up to fc786304ad9803e8bb86b8599bc64d1c1746c75f:
+
+  selftests: netfilter: Avoid hanging ipvs.sh (2024-09-26 13:03:03 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-09-26
+
+----------------------------------------------------------------
+Andy Shevchenko (1):
+      netfilter: ctnetlink: Guard possible unused functions
+
+Antonio Ojea (1):
+      selftests: netfilter: nft_tproxy.sh: add tcp tests
+
+Florian Westphal (5):
+      netfilter: nf_nat: don't try nat source port reallocation for reverse dir clash
+      netfilter: conntrack: add clash resolution for reverse collisions
+      selftests: netfilter: add reverse-clash resolution test case
+      netfilter: nfnetlink_queue: remove old clash resolution logic
+      kselftest: add test for nfqueue induced conntrack race
+
+Pablo Neira Ayuso (2):
+      netfilter: nf_tables: use rcu chain hook list iterator from netlink dump path
+      netfilter: nf_tables: missing objects with no memcg accounting
+
+Phil Sutter (2):
+      netfilter: nf_tables: Keep deleted flowtable hooks until after RCU
+      selftests: netfilter: Avoid hanging ipvs.sh
+
+Simon Horman (2):
+      netfilter: nf_reject: Fix build warning when CONFIG_BRIDGE_NETFILTER=n
+      netfilter: ctnetlink: compile ctnetlink_label_size with CONFIG_NF_CONNTRACK_EVENTS
+
+谢致邦 (XIE Zhibang) (1):
+      docs: tproxy: ignore non-transparent sockets in iptables
+
+ Documentation/networking/tproxy.rst                |   2 +-
+ include/linux/netfilter.h                          |   4 -
+ net/ipv4/netfilter/nf_reject_ipv4.c                |  10 +-
+ net/ipv6/netfilter/nf_reject_ipv6.c                |   5 +-
+ net/netfilter/nf_conntrack_core.c                  | 141 +++-----
+ net/netfilter/nf_conntrack_netlink.c               |   9 +-
+ net/netfilter/nf_nat_core.c                        | 121 ++++++-
+ net/netfilter/nf_tables_api.c                      |   6 +-
+ net/netfilter/nft_compat.c                         |   6 +-
+ net/netfilter/nft_log.c                            |   2 +-
+ net/netfilter/nft_meta.c                           |   2 +-
+ net/netfilter/nft_numgen.c                         |   2 +-
+ net/netfilter/nft_set_pipapo.c                     |  13 +-
+ net/netfilter/nft_tunnel.c                         |   5 +-
+ tools/testing/selftests/net/netfilter/Makefile     |   4 +
+ tools/testing/selftests/net/netfilter/config       |   1 +
+ .../net/netfilter/conntrack_reverse_clash.c        | 125 +++++++
+ .../net/netfilter/conntrack_reverse_clash.sh       |  51 +++
+ tools/testing/selftests/net/netfilter/ipvs.sh      |   2 +-
+ tools/testing/selftests/net/netfilter/nft_queue.sh |  92 +++++-
+ .../selftests/net/netfilter/nft_tproxy_tcp.sh      | 358 +++++++++++++++++++++
+ .../selftests/net/netfilter/nft_tproxy_udp.sh      | 262 +++++++++++++++
+ 22 files changed, 1091 insertions(+), 132 deletions(-)
+ create mode 100644 tools/testing/selftests/net/netfilter/conntrack_reverse_clash.c
+ create mode 100755 tools/testing/selftests/net/netfilter/conntrack_reverse_clash.sh
+ create mode 100755 tools/testing/selftests/net/netfilter/nft_tproxy_tcp.sh
+ create mode 100755 tools/testing/selftests/net/netfilter/nft_tproxy_udp.sh
 
