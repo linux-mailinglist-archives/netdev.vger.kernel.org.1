@@ -1,82 +1,85 @@
-Return-Path: <netdev+bounces-129882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DD56986C0D
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 07:31:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4F5986C1A
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 07:42:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 449192848F5
-	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 05:31:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56911C21CD8
+	for <lists+netdev@lfdr.de>; Thu, 26 Sep 2024 05:42:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9D72D600;
-	Thu, 26 Sep 2024 05:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E781714B4;
+	Thu, 26 Sep 2024 05:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3IeSWHs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TWfYV9w3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F38FBE6C;
-	Thu, 26 Sep 2024 05:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC55A1171C;
+	Thu, 26 Sep 2024 05:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727328668; cv=none; b=u62UIuvrdv0Eo9XRmGws3DyvjcBKP0jba4a91xiU9Ai1jueBQAY0IBCli+pOdeElybmkWtOe74DTZA0tDLIZQMrFtAahtbJh0DeYnfdWL/4T7jYZB6y7om+rBKn0GVfAF1CVH4Pcc3btlSz5IL68YMxjuZTy6Ap8l1HWWxrgG2w=
+	t=1727329341; cv=none; b=f3gQHv8pRW/rHcO2XoIcAGVosElkMgdT60Utpkymodp2Uw944CrXqLSFqV9kvAwJSI5MNv+EHceH5BCIuaigZRRuCsGQcTbDB4+8AX7JqH4g2WeSwGX1BTrf54nW015K04RQtYgFzkb1FTm2tHA5pUyM/W+Q9BHUeI4XaL1fRcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727328668; c=relaxed/simple;
-	bh=g+pxbbSKoeqeHK0uLZ4eJ+fdzHV5KPFjyS09Hxhu9sM=;
+	s=arc-20240116; t=1727329341; c=relaxed/simple;
+	bh=OMbQrqbQj4X6e2bryijPlq9YJFUeZSyo/0sQ6oBZbiE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qs4oQKRN6mpU8Fj+Bnjk03/22kRfi67zIO5WRcHIRYgBybfCYZ46zhGlMsPHZ7BS2egS2E72Eg5Xb7QYBzhu4pTSXJqQMLrnEitJP5oG8XvAvtO1suhlHHbtQnSkqbPBo0ZVlqAXDFaNMYCCh7P4ZS7s1Ll26PkyFdxAvNQj5+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3IeSWHs; arc=none smtp.client-ip=209.85.222.43
+	 To:Cc:Content-Type; b=To40szaoT9KPDSEWKcE1mBXGSjpTYVrDBiQmr3f3xWOt4OlTmFh+m4lmL5zieBP0BWw8cRx/zWZWwdTUlOD0CBmnkN2l7rEESIbLSgaacZNk/dr0pC03t8oxfuvq4MnGLeKBClUa+PpErJzN/fbFLVuiZTtmmF2+++sIdF73om8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TWfYV9w3; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-84ea1e5e964so152643241.0;
-        Wed, 25 Sep 2024 22:31:06 -0700 (PDT)
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-503f943f115so203348e0c.0;
+        Wed, 25 Sep 2024 22:42:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727328665; x=1727933465; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727329337; x=1727934137; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+z2xtOdQq+QmiK5LU+Fqb/lGf1zKXnWuQ8AIy/I1c+Q=;
-        b=K3IeSWHsczGM19kjIbQvblhXIkd65MgD/NUxodnE7dR6gT3H92kxINI9j1V3mPZqEU
-         yTUIEAqT31fScRTMFfgipCydPzEDMYr8VMuiZ3hNmL6q5HS/GQ8PwmMZN3Pe9QZXp8vy
-         P0owrKrDZTOdvZKFMGOHgZm0Gxf/tlQC9chbFo1oNqOEBAKEpfkw2OGeHV4dNKcmYAns
-         IlIkx2s+5KTgHn9Ioda8W0Iu1Ce7bGCkBgifroZ9Rsz+lGrEMh7gLhHyFlXq1P5epsoD
-         3prYeZSf1DaY+k9RiITnFfCNHslBBS4NLAxsfOv09iHawTvHdIvHGuEyET1KMJIFw9mN
-         TWMg==
+        bh=iLLnvZ8Qnw5olhuTraYaLYgbkUKswojzU6UirKeGBGE=;
+        b=TWfYV9w31tVJmlBcSNXwGOXpVB/YDamJvb2P3RqMhCrbDRF2gurvLOIViWiYa94vZe
+         x6hIvtV3TAgTnC7xKgrZnAU2iGT/BVGq8rAV/Q0sMckyn3+mGWnMtbDppzUEUwmlI+46
+         bfZc8FAj2jRbktiSuVV/5R9j/MhLXP2ukqFTbQxy7HNOWharPVR9JHY4YJ2jmgT7Qlep
+         xu/5A7Zh4xlXp7A3fOww6d5IBV18dOt5Z1gn8FnGvyMStzDtLBlke35gaTFDxb43WdbR
+         BoY9ebrgJTrTC1GlpSva5VWz04w8r8fDY9RoEVSL/qQ220mGcF/y4qeipyUoFbZnVj0Z
+         zHjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727328665; x=1727933465;
+        d=1e100.net; s=20230601; t=1727329337; x=1727934137;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+z2xtOdQq+QmiK5LU+Fqb/lGf1zKXnWuQ8AIy/I1c+Q=;
-        b=rwuFpaCGoVFBeUwggzJVHqbIN6tF1bbBq3lnh9O9OKCU6iEEOwvH2iixW2Y4072oAs
-         +lXwEQgRiw1GXaVlbv2bw2Ta1xWrczlr/gE9xEU2e/Gx4rHd5qJA0lzWF4Ox/1gTmeYS
-         Fe2STG2gDIJMNodSbuyDWkm5wTx9/lJWPIX5FSSVI+/faD43ETqECU6ZExrs+oh6+ECO
-         n9jVh9sXeHmrfyJGVvFW062kX655gYgLhDAtIWiNHFw97w3O9QonW5lyxD7PvwOawKZA
-         09IgWTWN17YQP4ywjaPuI77OOGU/DBVPoGlQCMaVKrhfafLq8Yt7I66TOIFE3clZxNt0
-         B1Kw==
-X-Forwarded-Encrypted: i=1; AJvYcCVycOPyaSr4U70b4SqTspxBgkWh7FkkOr24AD2sHVS73Xg+9tCcqkk03Ol8z+9chq8sHsomARcd3pRengY=@vger.kernel.org, AJvYcCXlLhXtxP+h+/vOQUoZd3ZKidviEojdslweHze8NqCPo1YAqGwvImtWG2Cd7CWXOAt+ysCBol6E@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcXr9Ojh2tRsCxx82PG1fkonjtJKG/XIHvwNAeWhdFDRBcsTbV
-	kJQZUl9Te+P6J2jvjgqq0iXxNBF3h6bCb5BuSwX4S+u8z1H1LrQJQoKIAy08w/wc6qbPpfZHRvy
-	QtJRP6I3BSh6Hj2FEYjufjBMQMiE=
-X-Google-Smtp-Source: AGHT+IHrDT73sQ0QXFC8MwPNgI4Wy+AofMtGmgQFH/Y9CYSte5TPYdh6URd6OPaZyurPIk9z7jKjbYev4Ury6R0jDZE=
-X-Received: by 2002:a05:6122:3193:b0:503:d876:5e0a with SMTP id
- 71dfb90a1353d-5073bf2c77fmr1906010e0c.0.1727328664737; Wed, 25 Sep 2024
- 22:31:04 -0700 (PDT)
+        bh=iLLnvZ8Qnw5olhuTraYaLYgbkUKswojzU6UirKeGBGE=;
+        b=Y5fybGrVuVnzS2BsRLTzOKHQUh9ObU9Xd8KJP30c2EZnvnaUSKqXjzrDhi7OtEC+Sy
+         qToNM0ClHpjXChmAkgjT/4IPkW8oE/98tb3bkXOmq1rVkGMF2GPQWn78avtxhXBASeea
+         OLtYv2CAMo4xaXX8rXkn7H2mSW4tCsQKoee2vlFvax6/2LvGWR8Y16FlUqYJk0hS2gUz
+         YWh7k5rwLthAIDJSgG69gI8z63AsUEemh4WBq8JPTNMimTWPgZOhJt5rhX/HV5X6bMQr
+         8WoEZ6cJxOILB9av6cmXX31zLChSZq8OYxLfALRmUgKW4eQxXOsy6XdBlL8RwtkSwLVV
+         0UTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWp+/Kf8CVKzlyCS5IgSaYQojCxaCeogoIZ4hrHnlUClg+vcLtEl93NGdgKJ2JHdR7i0I98r5Do@vger.kernel.org, AJvYcCXNrS2m80zKfQx5Lg/096dq2d8EMcS006ax4bxylS5CuOhlowWyf2aV+KNqnwQUY3Uo9sYj8uGCVsXjfhc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypPyLvyEm3nfapclKQEaK3NaNDAgpAvyKKTRC05E59jYrzHjYu
+	keI4yqpdD3r7jxY6x6f6FGQDrtzyorWjOrIrRG+0pQSArOLHeIPDsAyJRvLomZIQ50i3FHoHdwF
+	G0Eubdh2H3j+zp1FbcwDUZG514RRs6zV7GC8=
+X-Google-Smtp-Source: AGHT+IHK+I1v3MgXmnb9d2IhwgJ2kjr9VPoI7BOk1peZbrqGdQkdA+GYW0TAD3QD2EMjZBEpOFzJ3mIRynz5704kUBU=
+X-Received: by 2002:a05:6122:20a6:b0:4f5:22cc:71b9 with SMTP id
+ 71dfb90a1353d-505c1d96569mr4378359e0c.5.1727329337427; Wed, 25 Sep 2024
+ 22:42:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240922185235.50413-1-kdipendra88@gmail.com> <20240923155606.GJ3426578@kernel.org>
- <CAEKBCKOYi6TuDdDf0GV+aKtiKSgjckEFhdpsywk175MqMgz7ww@mail.gmail.com>
-In-Reply-To: <CAEKBCKOYi6TuDdDf0GV+aKtiKSgjckEFhdpsywk175MqMgz7ww@mail.gmail.com>
+References: <20240923113135.4366-1-kdipendra88@gmail.com> <20240924071026.GB4029621@kernel.org>
+ <CAEKBCKPw=uwN+MCLenOe6ZkLBYiwSg35eQ_rk_YeNBMOuqvVOw@mail.gmail.com>
+ <20240924155812.GR4029621@kernel.org> <CAEKBCKO45g4kLm-YPZHpbcS5AMUaqo6JHoDxo8QobaP_kxQn=w@mail.gmail.com>
+ <20240924181458.GT4029621@kernel.org> <CAEKBCKPz=gsLbUWNDinVVHD8t760jW+wt1GtFgJW_5cHCj0XbQ@mail.gmail.com>
+In-Reply-To: <CAEKBCKPz=gsLbUWNDinVVHD8t760jW+wt1GtFgJW_5cHCj0XbQ@mail.gmail.com>
 From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Thu, 26 Sep 2024 11:15:53 +0545
-Message-ID: <CAEKBCKOY-nZhXCKOg3mnwj5=LbO0XbqcaATMt8p5bWEuhMUKGQ@mail.gmail.com>
-Subject: Re: [PATCH] Staging: net: nic: Add error pointer check in otx2_flows.c
+Date: Thu, 26 Sep 2024 11:27:06 +0545
+Message-ID: <CAEKBCKOykRKyBGzBA6vC0Z7eM8q5yiND64fa4Xxk5s5vCufXtA@mail.gmail.com>
+Subject: Re: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error
+ pointer check in otx2_ethtool.c
 To: Simon Horman <horms@kernel.org>
 Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
 	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
@@ -85,84 +88,86 @@ Content-Type: text/plain; charset="UTF-8"
 
 Hi Simon,
 
-On Mon, 23 Sept 2024 at 21:48, Dipendra Khadka <kdipendra88@gmail.com> wrote:
+On Wed, 25 Sept 2024 at 12:07, Dipendra Khadka <kdipendra88@gmail.com> wrote:
 >
-> Hi,
->
-> Thank you for the response.I had already sent the v2 patch. I will
-> send v3 addressing all the issues.
->
-> On Mon, 23 Sept 2024 at 21:41, Simon Horman <horms@kernel.org> wrote:
+> On Wed, 25 Sept 2024 at 00:00, Simon Horman <horms@kernel.org> wrote:
 > >
-> > On Sun, Sep 22, 2024 at 06:52:35PM +0000, Dipendra Khadka wrote:
-> > > Smatch reported following:
-> > > '''
-> > > drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c:123 otx2_alloc_mcam_entries() error: 'rsp' dereferencing possible ERR_PTR()
-> > > drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c:201 otx2_mcam_entry_init() error: 'rsp' dereferencing possible ERR_PTR()
-> > > drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c:236 otx2_mcam_entry_init() error: 'frsp' dereferencing possible ERR_PTR()
-> > > '''
+> > On Tue, Sep 24, 2024 at 11:42:58PM +0545, Dipendra Khadka wrote:
+> > > Hi Simon,
 > > >
-> > > Adding error pointer check after calling otx2_mbox_get_rsp.
+> > > On Tue, 24 Sept 2024 at 21:43, Simon Horman <horms@kernel.org> wrote:
+> > > >
+> > > > On Tue, Sep 24, 2024 at 08:39:47PM +0545, Dipendra Khadka wrote:
+> > > > > Hi Simon,
+> > > > >
+> > > > > On Tue, 24 Sept 2024 at 12:55, Simon Horman <horms@kernel.org> wrote:
+> > > > > >
+> > > > > > On Mon, Sep 23, 2024 at 11:31:34AM +0000, Dipendra Khadka wrote:
+> > > > > > > Add error pointer check after calling otx2_mbox_get_rsp().
+> > > > > > >
+> > > > > >
+> > > > > > Hi Dipendra,
+> > > > > >
+> > > > > > Please add a fixes tag here (no blank line between it and your
+> > > > > > Signed-off-by line).
+> > > > > > > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> > > > > >
+> > > > > > As you have posted more than one patch for this driver, with very similar,
+> > > > > > not overly complex or verbose changes, it might make sense to combine them
+> > > > > > into a single patch. Or, if not, to bundle them up into a patch-set with a
+> > > > > > cover letter.
+> > > > > >
+> > > > > > Regarding the patch subject, looking at git history, I think
+> > > > > > an appropriate prefix would be 'octeontx2-pf:'. I would go for
+> > > > > > something like this:
+> > > > > >
+> > > > > >   Subject: [PATCH net v2] octeontx2-pf: handle otx2_mbox_get_rsp errors
+> > > > > >
+> > > > >
+> > > > > If I bundle all the patches for the
+> > > > > drivers/net/ethernet/marvell/octeontx2/ , will this subject without v2
+> > > > > work? Or do I need to change anything? I don't know how to send the
+> > > > > patch-set with the cover letter.
+> > > >
+> > > > Given that one of the patches is already at v2, probably v3 is best.
+> > > >
+> > > > If you use b4, it should send a cover letter if the series has more than 1
+> > > > patch.  You can use various options to b4 prep to set the prefix
+> > > > (net-next), version, and edit the cover (letter).  And you can use various
+> > > > options to b4 send, such as -d, to test your submission before sending it
+> > > > to the netdev ML.
+> > > >
 > > >
-> > > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> > > I did not get this -d and testing? testing in net-next and sending to net?
 > >
-> > Hi Dipendra,
-> >
-> > As noted by Andrew Lunn in relation to another patch [1],
-> > this driver isn't in Staging so the subject is not correct.
-> > And moreover, as Andrew suggested, please take a look at [2].
-> >
-> > [1] https://lore.kernel.org/all/13fbb6c3-661f-477a-b33b-99303cd11622@lunn.ch/
-> > [2] https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-> >
->
-> > > ---
-> > >  .../ethernet/marvell/octeontx2/nic/otx2_flows.c   | 15 +++++++++++++++
-> > >  1 file changed, 15 insertions(+)
-> > >
-> > > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-> > > index 98c31a16c70b..4b61236c7c41 100644
-> > > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-> > > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-> > > @@ -120,6 +120,11 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
-> > >               rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
-> > >                       (&pfvf->mbox.mbox, 0, &req->hdr);
-> >
-> > nit: No blank line here please.
-> >      Similarly in the other hunks of this patch.
+> > I meant that b4 prep -d allows you to see the emails that would be sent
+> > without actually sending them. I find this quite useful myself.
 > >
 > > >
-> > > +             if (IS_ERR(rsp)) {
-> > > +                     mutex_unlock(&bfvf->mbox.lock);
-> >
-> > This doesn't compile as bfvf doesn't exit in this context.
-> >
-> > > +                     return PTR_ERR(rsp);
-> >
-> > Looking at error handling elsewhere in the same loop, perhaps this
-> > is appropriate instead of returning.
-> >
-> >                         goto exit;
+> > > > Alternatively the following command will output 3 files: a cover letter and
+> > > > a file for each of two patches, with v3 and net-next in the subject of each
+> > > > file. You can edit these files and send them using git send-email.
+> > > >
+> > > > git format-patch --cover-letter -2 -v3 --subject-prefix="PATCH net-next"
+> > > >
 
-Is this ok to follow?
+Do I need to maintain patch history below  Signed-off-by for each
+patch when I send them in the patch set? If so, what to do with those
+which have v1 but no v2 but the patch-set in v3?
 
-if (IS_ERR(rsp)) {
-                        allocated = PTR_ERR(rsp);
-                        goto exit;
-                }
-
-> >
-> > > +             }
-> > > +
-> > >               for (ent = 0; ent < rsp->count; ent++)
-> > >                       flow_cfg->flow_ent[ent + allocated] = rsp->entry_list[ent];
 > > >
+> > > Should I send it to net-next or net?
+> >
+> > Sorry for the confusion. I wrote net-next in my example,
+> > but I think this patch-set would be for net.
 > >
 > > ...
 >
-> Best Regards,
+> Thank you Simon for everything.
+>
+> Best regards,
 > Dipendra
 
 Best regards,
-Dipendra Khadka
+Dipendra
 
