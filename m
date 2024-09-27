@@ -1,135 +1,169 @@
-Return-Path: <netdev+bounces-130090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824139882FA
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 13:02:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A9ED988300
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 13:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 163A1284D88
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 11:02:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0571C21F80
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 11:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88248185E7A;
-	Fri, 27 Sep 2024 11:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ujwwUHcm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AB8189BB2;
+	Fri, 27 Sep 2024 11:07:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail115-100.sinamail.sina.com.cn (mail115-100.sinamail.sina.com.cn [218.30.115.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601701741C6;
-	Fri, 27 Sep 2024 11:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2490C18870A
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 11:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727434961; cv=none; b=eCMpTx1aNHgAabt3/548qBk+CTD/PRCipnKMIBW7Eb5oOzUHIHQsrNsF/0R4mElQBHvJC+HgOBoC7TGVTXHH3P1irMub1HCXJxoFTFM7Cd93zKAZO9mhYUHsUOzUCSvpwviebGMYV1HjZAKTN5oRKt+p3YNQiKz0WygVL6s64JU=
+	t=1727435229; cv=none; b=ea07RtHrEAAzWMYzl6E4cy4k+AYOANi/1mkY6/9MXlhx3HaUTB9Cd3kQpytTsg5QFtownc46mCcZ1IUuvYbrq7BEBoL5H/6brBXFnrd2zuxoMTEVyIcZas0TZhVOKggAAIluVY7O/arOO2UElvDIGygUJvunrw4JtRtxXkmycIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727434961; c=relaxed/simple;
-	bh=4UPUuX+Trl4Y6sfymx/iQndzU9LD0gq1bEPGXiBZtFc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k1ZV7Uoci6fNUjJkDlhHM6ob8OvcE7Zt96v9dYHgVtCXBsI/wIzK+V5QIAJ+uOK3febH6lJIq84p7U+blukOXalh+RWC1WldzZTzGYs9w+BRH8oDSSjOcoXtn160S2n57Ou9/pmjZtsp9DX6E+l/W9XYsz6AnAPRnvTFJ+m7Dyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ujwwUHcm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA56EC4CEC4;
-	Fri, 27 Sep 2024 11:02:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727434961;
-	bh=4UPUuX+Trl4Y6sfymx/iQndzU9LD0gq1bEPGXiBZtFc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ujwwUHcmPp97C/xhQjjwj/gz60+VNaaokKw8sZYPYQdyUINq5UXPPCHZ1r66xELKG
-	 5zYbOOwUYsEb4AWdx1OPwsOOnDxuxbZjxvkwuSSDRa03ocAKuqNM1LqQrwSP+kq1AB
-	 xTT82tILsrGbg2O1d3mB5xTDEzhHXzNG9roywwkZHTiRrxQcGRvG8LRDc5kdl0cLN8
-	 UQaOzN8XNEXWy4K4+WhU1vjPzW0tFxybZBIdMjsEsS1RWCCDzVLQc0h56JgGluz2wL
-	 yaraiSEoQMXGshQymdd1HHUDmIkNL9uYkHxT4Zc4hs4qx4IpvbaO3p13qgpkEGKx72
-	 Yff/re53DwQEA==
-Date: Fri, 27 Sep 2024 12:02:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dipendra Khadka <kdipendra88@gmail.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net v5] net: systemport: Add error pointer checks in
- bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-Message-ID: <20240927110236.GK4029621@kernel.org>
-References: <20240926160513.7252-1-kdipendra88@gmail.com>
+	s=arc-20240116; t=1727435229; c=relaxed/simple;
+	bh=2tSp+dNwcQEwowgMcQOt+6/Tf3SFxGTWuF1blVlLegM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZViEYgfsIphPs20zP8E64Be17l90j6lgZl43GeEiK9SnMw+oLl5ou8arFESpa8YKrpV45/J333WSdL8OwGiqKAcOrD5s5duFira3/12q+ZqK7bTeBJOMAQ/OFfl0XL+ydoKSY+cCoF3izxrGq7nnVMMKgEWqWedItugWRAtobOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.71.54])
+	by sina.com (10.185.250.23) with ESMTP
+	id 66F6913C00004461; Fri, 27 Sep 2024 19:04:32 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 4710658913404
+X-SMAIL-UIID: FFEC4222DA184718A802C62B5670DD0B-20240927-190432-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: syzbot <syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com>,
+	linux-kernel@vger.kernel.org,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] INFO: task hung in new_device_store (5)
+Date: Fri, 27 Sep 2024 19:04:22 +0800
+Message-Id: <20240927110422.1084-1-hdanton@sina.com>
+In-Reply-To: <CANn89iKLTNs5LAuSz6xeKB39hQ2FOEJNmffZsv1F3iNHqXe0tQ@mail.gmail.com>
+References: <66f5a0ca.050a0220.46d20.0002.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240926160513.7252-1-kdipendra88@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-+ Vladimir
-
-On Thu, Sep 26, 2024 at 04:05:12PM +0000, Dipendra Khadka wrote:
-> Add error pointer checks in bcm_sysport_map_queues() and
-> bcm_sysport_unmap_queues() after calling dsa_port_from_netdev().
+On Thu, 26 Sep 2024 22:14:14 +0200 Eric Dumazet <edumazet@google.com>
+> On Thu, Sep 26, 2024 at 7:58 PM syzbot wrote:
+> >
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    97d8894b6f4c Merge tag 'riscv-for-linus-6.12-mw1' of git:/..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=12416a27980000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=bc30a30374b0753
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=05f9cecd28e356241aba
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> >
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/bd119f4fdc08/disk-97d8894b.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/4d0bfed66f93/vmlinux-97d8894b.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/0f9223ac9bfb/bzImage-97d8894b.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com
+> >
+> > INFO: task syz-executor:9916 blocked for more than 143 seconds.
+> >       Not tainted 6.11.0-syzkaller-10045-g97d8894b6f4c #0
+> > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> > task:syz-executor    state:D stack:21104 pid:9916  tgid:9916  ppid:1      flags:0x00000004
+> > Call Trace:
+> >  <TASK>
+> >  context_switch kernel/sched/core.c:5315 [inline]
+> >  __schedule+0x1895/0x4b30 kernel/sched/core.c:6674
+> >  __schedule_loop kernel/sched/core.c:6751 [inline]
+> >  schedule+0x14b/0x320 kernel/sched/core.c:6766
+> >  schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6823
+> >  __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+> >  __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
+> >  new_device_store+0x1b4/0x890 :166
+> >  kernfs_fop_write_iter+0x3a2/0x500 fs/kernfs/file.c:334
+> >  new_sync_write fs/read_write.c:590 [inline]
+> >  vfs_write+0xa6f/0xc90 fs/read_write.c:683
+> >  ksys_write+0x183/0x2b0 fs/read_write.c:736
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7f8310d7c9df
+> > RSP: 002b:00007ffe830a52e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+> > RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f8310d7c9df
+> > RDX: 0000000000000003 RSI: 00007ffe830a5330 RDI: 0000000000000005
+> > RBP: 00007f8310df1c39 R08: 0000000000000000 R09: 00007ffe830a5137
+> > R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
+> > R13: 00007ffe830a5330 R14: 00007f8311a64620 R15: 0000000000000003
+> >  </TASK>
 > 
-> Fixes: 1593cd40d785 ("net: systemport: use standard netdevice notifier to detect DSA presence")
-> Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-> ---
-> v5: 
->  -Removed extra parentheses
-> v4: https://lore.kernel.org/all/20240925152927.4579-1-kdipendra88@gmail.com/
->  - Removed wrong and used correct Fixes: tag
-> v3: https://lore.kernel.org/all/20240924185634.2358-1-kdipendra88@gmail.com/
->  - Updated patch subject
->  - Updated patch description
->  - Added Fixes: tags
->  - Fixed typo from PRT_ERR to PTR_ERR
->  - Error is checked just after  assignment
-> v2: https://lore.kernel.org/all/20240923053900.1310-1-kdipendra88@gmail.com/
->  - Change the subject of the patch to net
-> v1: https://lore.kernel.org/all/20240922181739.50056-1-kdipendra88@gmail.com/
->  drivers/net/ethernet/broadcom/bcmsysport.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
+> typical sysfs deadlock ?
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-> index c9faa8540859..a7ad829f11d4 100644
-> --- a/drivers/net/ethernet/broadcom/bcmsysport.c
-> +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-> @@ -2331,11 +2331,15 @@ static const struct net_device_ops bcm_sysport_netdev_ops = {
->  static int bcm_sysport_map_queues(struct net_device *dev,
->  				  struct net_device *slave_dev)
->  {
-> -	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
->  	struct bcm_sysport_priv *priv = netdev_priv(dev);
->  	struct bcm_sysport_tx_ring *ring;
->  	unsigned int num_tx_queues;
->  	unsigned int q, qp, port;
-> +	struct dsa_port *dp;
+> diff --git a/drivers/net/netdevsim/bus.c b/drivers/net/netdevsim/bus.c
+> index 64c0cdd31bf85468ce4fa2b2af5c8aff4cfba897..3bf0ce52d71653fd9b8c752d52d0b5b7e19042d8
+> 100644
+> --- a/drivers/net/netdevsim/bus.c
+> +++ b/drivers/net/netdevsim/bus.c
+> @@ -163,7 +163,9 @@ new_device_store(const struct bus_type *bus, const
+> char *buf, size_t count)
+>                 return -EINVAL;
+>         }
+> 
+> -       mutex_lock(&nsim_bus_dev_list_lock);
+> +       if (!mutex_trylock(&nsim_bus_dev_list_lock))
+> +               return restart_syscall();
 > +
-> +	dp = dsa_port_from_netdev(slave_dev);
-> +	if (IS_ERR(dp))
-> +		return PTR_ERR(dp);
->  
->  	/* We can't be setting up queue inspection for non directly attached
->  	 * switches
-> @@ -2386,11 +2390,15 @@ static int bcm_sysport_map_queues(struct net_device *dev,
->  static int bcm_sysport_unmap_queues(struct net_device *dev,
->  				    struct net_device *slave_dev)
->  {
-> -	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
->  	struct bcm_sysport_priv *priv = netdev_priv(dev);
->  	struct bcm_sysport_tx_ring *ring;
->  	unsigned int num_tx_queues;
->  	unsigned int q, qp, port;
-> +	struct dsa_port *dp;
-> +
-> +	dp = dsa_port_from_netdev(slave_dev);
-> +	if (IS_ERR(dp))
-> +		return PTR_ERR(dp);
->  
->  	port = dp->index;
->  
-> -- 
-> 2.43.0
+>         /* Prevent to use resource before initialization. */
+>         if (!smp_load_acquire(&nsim_bus_enable)) {
+>                 err = -EBUSY;
 > 
+> 
+> >
+> > Showing all locks held in the system:
+...
+> > 4 locks held by syz-executor/9916:
+> >  #0: ffff88807ca86420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2930 [inline]
+> >  #0: ffff88807ca86420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
+> >  #1: ffff88802e71e488 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
+> >  #2: ffff888144ff5968 (kn->active#50){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
+> >  #3: ffffffff8f56d3e8 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
+
+syz-executor/9916 is lock waiter, and
+
+> > 7 locks held by syz-executor/9976:
+> >  #0: ffff88807ca86420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2930 [inline]
+> >  #0: ffff88807ca86420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
+> >  #1: ffff88807abc2888 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
+> >  #2: ffff888144ff5a58 (kn->active#49){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
+> >  #3: ffffffff8f56d3e8 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: del_device_store+0xfc/0x480 drivers/net/netdevsim/bus.c:216
+> >  #4: ffff888060f5a0e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1014 [inline]
+> >  #4: ffff888060f5a0e8 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1095 [inline]
+> >  #4: ffff888060f5a0e8 (&dev->mutex){....}-{3:3}, at: device_release_driver_internal+0xce/0x7c0 drivers/base/dd.c:1293
+> >  #5: ffff888060f5b250 (&devlink->lock_key#40){+.+.}-{3:3}, at: nsim_drv_remove+0x50/0x160 drivers/net/netdevsim/dev.c:1672
+> >  #6: ffffffff8fccdc48 (rtnl_mutex){+.+.}-{3:3}, at: nsim_destroy+0x71/0x5c0 drivers/net/netdevsim/netdev.c:773
+
+syz-executor/9976 is lock owner. Given both waiter and owner printed,
+the proposed trylock looks like the typical paperover at least from a
+hoofed skull because of no real deadlock detected.
 
