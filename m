@@ -1,190 +1,217 @@
-Return-Path: <netdev+bounces-130079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22CD1988168
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 11:34:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4B51988172
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 11:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B78FA281442
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:34:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD6B81C21E74
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8E5189F57;
-	Fri, 27 Sep 2024 09:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECC41BA886;
+	Fri, 27 Sep 2024 09:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lw1IV33s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yqc0J3IH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7002E15ADAB;
-	Fri, 27 Sep 2024 09:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D545918C017;
+	Fri, 27 Sep 2024 09:35:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727429691; cv=none; b=XlSFctsl/Aop9GZ7/QBVTJhG7kW46zGMb8LXk3oiKLPHejJYE9dZSGPVi3PV71ydhgwpgUcqlNoyxdz3DfRA/cnrSPq2s7ZoZsJ21+TDeY4oXkyV+vMTko4m4N0bSRp1+vZmFq+QtlmhyVuGgk22hrpwXbB9jZMKifyctA/2itg=
+	t=1727429761; cv=none; b=IkHr2muecM9x4Kf9VqmzE6YsC3ElF0Fltn5HEt41W9sJcFis0FqhPAlJJrW+VsWCGD53ZDe0DjP8IV8W/ZApLWSC3o8R5BANplAY4veUn3VsApMarCrB0zmOjhnrfX+PhHBDoYfYO/M0F4uvLUoEXehxmqvpY0ydjLESCNmsAzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727429691; c=relaxed/simple;
-	bh=GxG+tu+21lu0yCzU+ifnIiJI9JUvz1/XTvqf4gwANmM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hmPQgc8swJ7pKaCXUHTaQ3LBtI52uxJ22r//9zCNLG9mWXiEpu5Q4y8FNYW/sbZ+H/c/uD1m/WvLbl0KhIfeL90PmGQvXJ3+miyK5/uf0P4vIzuZUA3ZSjC7/EqOqVlhWB/FkE1Ka95lsCr/4K9Gei06YGamggfL/3YlVYuySaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lw1IV33s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48821C4CECD;
-	Fri, 27 Sep 2024 09:34:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727429691;
-	bh=GxG+tu+21lu0yCzU+ifnIiJI9JUvz1/XTvqf4gwANmM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Lw1IV33snqufyRIefxyv34fx/122R7wwnm+AFm4YXxXC8ZzrLikLv3M5h5GOl4Nru
-	 22dmIY+6IjYvQk1aWxzWRqSvlr68B0W10pufCpST8OJzbksS1m9bsH/BtxTsFg3Xpo
-	 lJpExPQlaTE5gnCqW9Mi+ugyS9DPY+efipl/qCnBzpeS4dNYxdfFBLTjAVWBmkb3aA
-	 8G6I9gsPQP1/yqLRrdEwqaHFrrQ+d4uCeT0Qve8GCqsXgT11TyV3D4iezPLTTnN1oV
-	 qRUIkuxf7H3fghviSq7Aih0hdU+QXNadtj5nDEaKEqCTBhNwRcmHRy3CbkDuIU0si4
-	 lawvIy42bdk0Q==
-Date: Fri, 27 Sep 2024 11:34:48 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Drew Fustini <dfustini@tenstorrent.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
-	Conor Dooley <conor@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: Add T-HEAD dwmac support
-Message-ID: <4pxpku3btckw7chyxlqw56entdb2s3gqeas4w3owbu5egmq3nf@5v76h4cczv4z>
-References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com>
- <20240926-th1520-dwmac-v2-1-f34f28ad1dc9@tenstorrent.com>
+	s=arc-20240116; t=1727429761; c=relaxed/simple;
+	bh=eVciTcpsHtAZGOTgTHd20Rq/MWjkf5aWXV1FSiqpq6U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XnJnHehiY+mo/1EeD2H2MhOr+H1wJVPiVxtC1VBJd2fuU104oJosRMlR365Q5A7LMxuWz4wCeZWpXvOSkOfljiNW3krwfVN6OtnaTJkTiWwmWnPTA8IQ6YR4/ixd/15RVnEIAm1nDSi+YOzZIRbKth8Lc8rLmLaVCQqXVZz5Aac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yqc0J3IH; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4582face04dso17822201cf.1;
+        Fri, 27 Sep 2024 02:35:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727429757; x=1728034557; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j/T5vuF45xvtZpHqUulQB1LIDXs1iBkFmXTiWVqtQC8=;
+        b=Yqc0J3IHLgCaCj5qcvlXRpnjU0H3yKIcAWjuX9tflHAtwKk/N3E351hsy4Xut15dT/
+         KrPrRo0fHBClZJOyxNOcUn3FmsBHZUMmJ2DTOpm5S9QxlS+3FA5KYZI+2Vz0MBzW7uz7
+         buvnFRjZ1W2L2ycNFPUEOlvY3GGua+py5+Ik7POqIqNxEWCszr4RGmsEPV97l9qgnVsi
+         Gq7etMgIR1EKULOfLvLKDxaArbysy5Mjwh9BnODaFZXEIcpz3HmRb7qNg7EIvDC5XzG5
+         LxaW+6wn/8Bus5pdiFNo5KF4dvumzeIUx7qf7YW9+Qf+A0rz3K2IxCDelNXvmbpLO+Cb
+         eOrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727429757; x=1728034557;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=j/T5vuF45xvtZpHqUulQB1LIDXs1iBkFmXTiWVqtQC8=;
+        b=s0gnN54rDQjplyifCwBXBPww67eAxtwGgPeUDyZURze5X7VNu7f6t82qgk5IS08OT7
+         WyV9d0AwfK0rLbv3peBTw237KEGczsvJ5A7wlEP5iWVI1SH4hIqkdCpYBBlvkhOG7jnS
+         NDSaiwjXYyP7cvKpZv7sK7t3yPgrvySoirhypAUiVZRx/wVlb221ZY/a+X/dI7Al3lfA
+         gL43s65CeX1GWARTUyp8Hx++BIcJliprmqUsJHMqd30eW55OP4S9zsla84fbYtB0gvsU
+         9FeegedYBivzq8q4mC1SPxjzgpY/E86FBdEewZZI96zy43FyWSN3u7hwftte/qy2uoRs
+         p4vg==
+X-Forwarded-Encrypted: i=1; AJvYcCU03hACcZ18ZdFi6ZrT8NhhX6QHOaEqYQA19EcCYUHalIHcS41sv5IMh8E9iaUWCjnGgoQNBMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGHQi3Vw4vcsVQGyaRP/BVqEewEV2pksCgtlxpp1P78/3t6Yzl
+	jV/6QWaB5t6xTQmEegHyYk8BshvKnY3AhmmVil7AHRbtAdX3kX09
+X-Google-Smtp-Source: AGHT+IFvuqLk0pDSsS2e502GBJqZgOsLKcOMi4dt8alPdN+8f2ILQPEhWrtHUdZ6kytYSsGewI9vLQ==
+X-Received: by 2002:a05:622a:34f:b0:458:1e37:f82 with SMTP id d75a77b69052e-45c949a3b08mr88344701cf.18.1727429757520;
+        Fri, 27 Sep 2024 02:35:57 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45c9f33946esm6251561cf.68.2024.09.27.02.35.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Sep 2024 02:35:56 -0700 (PDT)
+Date: Fri, 27 Sep 2024 05:35:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Ben Greear <greearb@candelatech.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: stable@vger.kernel.org
+Message-ID: <66f67c7c5c1de_ba960294f7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1a2b63a4-edc7-c04d-3f80-0087a8415bc3@candelatech.com>
+References: <20240925185216.1990381-1-greearb@candelatech.com>
+ <66f5235d14130_8456129436@willemb.c.googlers.com.notmuch>
+ <1a2b63a4-edc7-c04d-3f80-0087a8415bc3@candelatech.com>
+Subject: Re: [PATCH v2] Revert "vrf: Remove unnecessary RCU-bh critical
+ section"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240926-th1520-dwmac-v2-1-f34f28ad1dc9@tenstorrent.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 26, 2024 at 11:15:50AM -0700, Drew Fustini wrote:
-> From: Jisheng Zhang <jszhang@kernel.org>
+Ben Greear wrote:
+> On 9/26/24 02:03, Willem de Bruijn wrote:
+> > greearb@ wrote:
+> >> From: Ben Greear <greearb@candelatech.com>
+> >>
+> >> This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+> >>
+> >> dev_queue_xmit_nit needs to run with bh locking, otherwise
+> >> it conflicts with packets coming in from a nic in softirq
+> >> context and packets being transmitted from user context.
+> >>
+> >> ================================
+> >> WARNING: inconsistent lock state
+> >> 6.11.0 #1 Tainted: G        W
+> >> --------------------------------
+> >> inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+> >> btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+> >> ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+> >> {IN-SOFTIRQ-W} state was registered at:
+> >>    lock_acquire+0x19a/0x4f0
+> >>    _raw_spin_lock+0x27/0x40
+> >>    packet_rcv+0xa33/0x1320
+> >>    __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+> >>    __netif_receive_skb_list_core+0x2c9/0x890
+> >>    netif_receive_skb_list_internal+0x610/0xcc0
+> >>    napi_complete_done+0x1c0/0x7c0
+> >>    igb_poll+0x1dbb/0x57e0 [igb]
+> >>    __napi_poll.constprop.0+0x99/0x430
+> >>    net_rx_action+0x8e7/0xe10
+> >>    handle_softirqs+0x1b7/0x800
+> >>    __irq_exit_rcu+0x91/0xc0
+> >>    irq_exit_rcu+0x5/0x10
+> >>    [snip]
+> >>
+> >> other info that might help us debug this:
+> >>   Possible unsafe locking scenario:
+> >>
+> >>         CPU0
+> >>         ----
+> >>    lock(rlock-AF_PACKET);
+> >>    <Interrupt>
+> >>      lock(rlock-AF_PACKET);
+> >>
+> >>   *** DEADLOCK ***
+> >>
+> >> Call Trace:
+> >>   <TASK>
+> >>   dump_stack_lvl+0x73/0xa0
+> >>   mark_lock+0x102e/0x16b0
+> >>   __lock_acquire+0x9ae/0x6170
+> >>   lock_acquire+0x19a/0x4f0
+> >>   _raw_spin_lock+0x27/0x40
+> >>   tpacket_rcv+0x863/0x3b30
+> >>   dev_queue_xmit_nit+0x709/0xa40
+> >>   vrf_finish_direct+0x26e/0x340 [vrf]
+> >>   vrf_l3_out+0x5f4/0xe80 [vrf]
+> >>   __ip_local_out+0x51e/0x7a0
+> >> [snip]
+> >>
+> >> Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
+> >> Link: https://lore.kernel.org/netdev/05765015-f727-2f30-58da-2ad6fa7ea99f@candelatech.com/T/
+> >>
+> >> Signed-off-by: Ben Greear <greearb@candelatech.com>
+> > 
+> > Please Cc: all previous reviewers and folks who participated in the
+> > discussion. I entirely missed this. No need to add as Cc tags, just
+> > --cc in git send-email will do.
+> > 
+> >> ---
+> >>
+> >> v2:  Edit patch description.
+> >>
+> >>   drivers/net/vrf.c | 2 ++
+> >>   net/core/dev.c    | 1 +
+> >>   2 files changed, 3 insertions(+)
+> >>
+> >> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+> >> index 4d8ccaf9a2b4..4087f72f0d2b 100644
+> >> --- a/drivers/net/vrf.c
+> >> +++ b/drivers/net/vrf.c
+> >> @@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
+> >>   		eth_zero_addr(eth->h_dest);
+> >>   		eth->h_proto = skb->protocol;
+> >>   
+> >> +		rcu_read_lock_bh();
+> >>   		dev_queue_xmit_nit(skb, vrf_dev);
+> >> +		rcu_read_unlock_bh();
+> >>   
+> >>   		skb_pull(skb, ETH_HLEN);
+> >>   	}
+> >> diff --git a/net/core/dev.c b/net/core/dev.c
+> >> index cd479f5f22f6..566e69a38eed 100644
+> >> --- a/net/core/dev.c
+> >> +++ b/net/core/dev.c
+> >> @@ -2285,6 +2285,7 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
+> >>   /*
+> >>    *	Support routine. Sends outgoing frames to any network
+> >>    *	taps currently in use.
+> >> + *	BH must be disabled before calling this.
+> > 
+> > Unnecessary. Especially patches for stable should be minimal to
+> > reduce the chance of conflicts.
 > 
-> Add documentation to describe T-HEAD dwmac.
-> 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> [drew: change apb registers from syscon to second reg of gmac node]
-> [drew: rename compatible, add thead rx/tx internal delay properties]
-> Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml        |   1 +
->  .../devicetree/bindings/net/thead,th1520-gmac.yaml | 109 +++++++++++++++++++++
->  MAINTAINERS                                        |   1 +
->  3 files changed, 111 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 4e2ba1bf788c..474ade185033 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -99,6 +99,7 @@ properties:
->          - snps,dwxgmac-2.10
->          - starfive,jh7100-dwmac
->          - starfive,jh7110-dwmac
-> +        - thead,th1520-gmac
->  
->    reg:
->      minItems: 1
-> diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> new file mode 100644
-> index 000000000000..1070e891c025
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> @@ -0,0 +1,109 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/thead,th1520-gmac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: T-HEAD TH1520 GMAC Ethernet controller
-> +
-> +maintainers:
-> +  - Drew Fustini <dfustini@tenstorrent.com>
-> +
-> +description: |
-> +  The TH1520 GMAC is described in the TH1520 Peripheral Interface User Manual
-> +  https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
-> +
-> +  Features include
-> +    - Compliant with IEEE802.3 Specification
-> +    - IEEE 1588-2008 standard for precision networked clock synchronization
-> +    - Supports 10/100/1000Mbps data transfer rate
-> +    - Supports RGMII/MII interface
-> +    - Preamble and start of frame data (SFD) insertion in Transmit path
-> +    - Preamble and SFD deletion in the Receive path
-> +    - Automatic CRC and pad generation options for receive frames
-> +    - MDIO master interface for PHY device configuration and management
-> +
-> +  The GMAC Registers consists of two parts
-> +    - APB registers are used to configure clock frequency/clock enable/clock
-> +      direction/PHY interface type.
-> +    - AHB registers are use to configure GMAC core (DesignWare Core part).
-> +      GMAC core register consists of DMA registers and GMAC registers.
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - thead,th1520-gmac
-> +  required:
-> +    - compatible
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    items:
-> +      - enum:
-> +          - thead,th1520-gmac
-> +      - const: snps,dwmac-3.70a
-> +
-> +  reg:
-> +    items:
-> +      - description: DesignWare GMAC IP core registers
-> +      - description: GMAC APB registers
-> +
-> +  reg-names:
-> +    items:
-> +      - const: dwmac
-> +      - const: apb
-> +
-> +  thead,rx-internal-delay:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +      RGMII receive clock delay. The value is used for the delay_ctrl
-> +      field in GMAC_RXCLK_DELAY_CTRL. Units are not specified.
+> I was asked to add this, and also asked to CC stable.
 
-What do you mean by "unspecified units"? They are always specified,
-hardware does not work randomly, e.g. once uses clock cycles, but next
-time you run it will use picoseconds.
+Conflicting feedback is annoying, but I disagree with the other
+comment.
 
-You also miss default (property is not required) and some sort of constraints.
+Not only does it potentially complicate backporting, it also is no
+longer a strict revert. In which case it must not be labeled as such.
 
-> +
-> +  thead,tx-internal-delay:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    description: |
-> +      RGMII transmit clock delay. The value is used for the delay_ctrl
-> +      field in GMAC_TXCLK_DELAY_CTRL. Units are not specified.
+Easier is to keep the revert unmodified, and add the comment to the
+commit message.
 
-Best regards,
-Krzysztof
+Most important is the Link to our earlier thread that explains the
+history.
+
+If the process appears byzantine, if you prefer I can also send it.
+
+Thanks,
+
+  Willem
+
 
 
