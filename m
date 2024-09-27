@@ -1,106 +1,78 @@
-Return-Path: <netdev+bounces-130149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4394988A16
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:31:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01467988AA2
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754A9282F88
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:31:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89D26B21CB8
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FB615B57C;
-	Fri, 27 Sep 2024 18:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E7C1C2DB6;
+	Fri, 27 Sep 2024 18:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kNBD/UnR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DJ0y+UUP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A85C52E630;
-	Fri, 27 Sep 2024 18:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12F21C2444;
+	Fri, 27 Sep 2024 18:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727461904; cv=none; b=f6XOVMO/OaXjVI8KUK7XWwfQGJ97s9UQ6hVez16i1REve/P+/upBOl29N9OYGk8/3IWevCJmw9/gkRvei2ViiBBtL0oiOymLOFpDPo9GsbxvmCPPM/gJHC5DesZ7CBtTnitOC2l2kZNcDaJpfA2mrWTEJFSi1YehRx7hyQlXJ2o=
+	t=1727463384; cv=none; b=HoeCpLuAXyGfbhupX2cgRy0zIRo9mXG7wZz0pAkNnHtse1Uv2WSV4366VlQ6wZEUHpQe7OJhaXuBdlWh/2VNupsMazMk8e8ge6TB4EHi3dd5V+hj1c6b6wLdDX1Kj2vTHVFLFASywWM1HbNtUXANlMrAcsF7cVLbpfipFrQ5NUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727461904; c=relaxed/simple;
-	bh=pRgcucGGq3NpbF+6ZpQ5ul4mRjbMP2mSXTKpDowm/hQ=;
+	s=arc-20240116; t=1727463384; c=relaxed/simple;
+	bh=57UfqbKak0MuDn5v35SpDlQoLJzb6ja81y08Z0VmtB0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gEvedEPtuin8pGuxJsu+JaOeFh64nMdFuCJoee6i1tbkGg1lHIVIe5XKt3PsT3A3935CqLyX913nNh8ngsvC3lazHHu0P29FwulE0yb+nYPksxYDgbcYeUd/dCovLrJhp01z+YnZ2TiGLgTcsHFvQ8ZDKdbesG3MRYgxDrBFm2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kNBD/UnR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C54C4CEC4;
-	Fri, 27 Sep 2024 18:31:42 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=sJbND/RFNU6iUEeRD1+ra7T/0YptCBgzPeSfj8OcRdeOBg+qVLdP1Urdhrh2+ZQB/670BZwBu7F8MSDgkWb8kHlAensSL1+f/Qd6ps56spa7pPMAMr+OidYLU93Z2qDQ1Hapk3w6YlRpdeezPrAEPrp+cUwQq5In1RcbF82Fn+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DJ0y+UUP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3209DC4CEC4;
+	Fri, 27 Sep 2024 18:56:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727461904;
-	bh=pRgcucGGq3NpbF+6ZpQ5ul4mRjbMP2mSXTKpDowm/hQ=;
+	s=k20201202; t=1727463383;
+	bh=57UfqbKak0MuDn5v35SpDlQoLJzb6ja81y08Z0VmtB0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kNBD/UnRsDKpRqriN9jslLVWaPnk+tEw810sivK70VMFzCw938UlOdoIuuYs5YohD
-	 5rCYjPQF6c0JGqbECwrpnfG0RXmFvpYB6ZrehBUCpMSiYdFroUcOxE6fP4d1m9LHSW
-	 d5mCqo/Vs4Hd/gKt1QEoxPK5Cdx1WOavVDwI4yU5KZ3VK02Z1jgAfSXYPbQErkucvH
-	 N3cxxukgXCtcshYOtnWyrMgk8v1Dn+ejKHrjbTbfyLsUry0ntWv5ScNJ5O+WHT/AKm
-	 QRTcc5K91IHUJ0NzToiqxZ5VUVwauPzcZINUK0TzJDckqQMFj6RAylOekUq5Thurls
-	 p6cI1mW6se7Zw==
-Date: Fri, 27 Sep 2024 19:31:40 +0100
+	b=DJ0y+UUP743BQag0pLdQe7PMQAGG7hbpp89GtkchAi2M9krgw0N5KirXj7QQNxiAu
+	 w7bU6wc5T+jaEl66Ir6I2N5ws55QBYRSrbJqAdWxGp7RFtKyXGzX5uJhzmluGGg4Ln
+	 HwrES4W8GTB8S9TQ4/lIim1u2M5WAKkIXvKxC9AMxBtCVNo90fdg2vbGy3L+JvYUrx
+	 5aLnZJvcXRyVIapREz+VfSLU+r7WP+QFEeMKB7Wx4O3oQZXJN4D2Z3p2izm8ryd9yr
+	 +FRu6q3EDfW9Ss9f4whiPzkkas4vof+F3BPVQlV7bmIooDAMiOGpkY0BOXMwjB2vQO
+	 kcFBUK2zVWp3Q==
+Date: Fri, 27 Sep 2024 19:56:19 +0100
 From: Simon Horman <horms@kernel.org>
-To: yanzhen <11171358@vivo.com>
-Cc: Yan Zhen <yanzhen@vivo.com>, 3chas3@gmail.com,
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] atm: Fix typo in the comment
-Message-ID: <20240927183140.GM4029621@kernel.org>
-References: <20240925105707.3313674-1-yanzhen@vivo.com>
- <20240925200539.GA4029621@kernel.org>
- <812b36ac-2fcc-4107-99ad-a44e3e2eda71@vivo.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next 1/2] gve: Map IRQs to NAPI instances
+Message-ID: <20240927185619.GN4029621@kernel.org>
+References: <20240926030025.226221-1-jdamato@fastly.com>
+ <20240926030025.226221-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <812b36ac-2fcc-4107-99ad-a44e3e2eda71@vivo.com>
+In-Reply-To: <20240926030025.226221-2-jdamato@fastly.com>
 
-On Fri, Sep 27, 2024 at 04:22:19PM +0800, yanzhen wrote:
-> 
-> 在 2024/9/26 4:05, Simon Horman 写道:
-> > On Wed, Sep 25, 2024 at 06:57:07PM +0800, Yan Zhen wrote:
-> > > Correctly spelled comments make it easier for the reader to understand
-> > > the code.
-> > > 
-> > > Fix typos:
-> > > 'behing' ==> 'being',
-> > > 'useable' ==> 'usable',
-> > > 'arry' ==> 'array',
-> > > 'receieve' ==> 'receive',
-> > > 'desriptor' ==> 'descriptor',
-> > > 'varients' ==> 'variants',
-> > > 'recevie' ==> 'receive',
-> > > 'Decriptor' ==> 'Descriptor',
-> > > 'Lable' ==> 'Label',
-> > > 'transmiting' ==> 'transmitting',
-> > > 'correspondance' ==> 'correspondence',
-> > > 'claculation' ==> 'calculation',
-> > > 'everone' ==> 'everyone',
-> > > 'contruct' ==> 'construct'.
-> > > 
-> > > 
-> > > Signed-off-by: Yan Zhen <yanzhen@vivo.com>
-> > Hi,
-> > 
-> > I am curious to know which tree is this based on?
-> > I don't seem to be able to apply it to net-next, linux-net,
-> > or Linus's tree.
-> I apologize, I may not have generated the patch based on the latest branch.
-> Is the net-next branch currently closed? Should I wait for it to reopen
-> before submitting?
+On Thu, Sep 26, 2024 at 03:00:21AM +0000, Joe Damato wrote:
+> Use netdev-genl interface to map IRQs to NAPI instances so that this
+> information is accesible by user apps via netlink.
 
-Yes, net-next is currently closed.
-And yes, I think it would be best to wait for it to reopen.
-I expect that will happen next week.
+nit: accessible
 
--- 
-pw-bot: defer
+Flagged by checkpatch.pl --codespell
+
+...
 
