@@ -1,83 +1,101 @@
-Return-Path: <netdev+bounces-130042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A26987C97
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 03:33:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 381B6987CA9
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 03:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B7E1B2183E
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 01:33:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D9CA2848B4
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 01:43:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3B0D53C;
-	Fri, 27 Sep 2024 01:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEE614A0B8;
+	Fri, 27 Sep 2024 01:43:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQe9wLsA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSZK14v4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C291534CDD
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 01:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3E914A09E;
+	Fri, 27 Sep 2024 01:43:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727400832; cv=none; b=Ii4JmUMmqnsiyPXKox2zQuH5G6rkkQL9OxypE1YAsWKEDEPZv0S17cnp8d6WEEwiGTsWXiEAbibftZM+MorXzftwMClc/L/xA4TRBsfOlw7gf4erFX+LUA6HpHXOfdw61AQ2IUUtMYIKd4mFCP8K1u/C8NFXiuG9BUFis/6qAIw=
+	t=1727401392; cv=none; b=Oe0T0lCHWzgbjRmMK08rA6Sh4YTG6VA0V1/JlrxRDHsui/D335LpuMJoEcR1jXqpnVw4BZKiyWK0lpa/0QAvRzOtCgy8csXeND36ijT9kyW3tUOGTXfh+2THRJz/DQIQIr7POmzrU+jTgErqpfCPmip758LFdrqiQnnk67y/1Nk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727400832; c=relaxed/simple;
-	bh=1eNBDY6OGKuSmxUZaUou4Lc4OOHRP8zXLkjGUFsI+lA=;
+	s=arc-20240116; t=1727401392; c=relaxed/simple;
+	bh=vO+LHsJGtoPwPjSq3QNJ7PtmP50p+WXR2S0ccd9+was=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K/2tQPzYmCDEdfTBQNTVtrV0zD3W5Em63CiqwdudTFH9MkrdEW2bfm+o9gPNxUIf7Tg1V0MWe0bPPO1Pqtmy1y1dV55pymsQt1iB1myExgFMZ7gSdOvjwrhRTHADZBvQaDHLpmpEOZGLnrpfrVnZsXo3Kd7inBFR6O2btEH74q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kQe9wLsA; arc=none smtp.client-ip=209.85.214.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFUoV3iS7OS1I9D7HfQI3+lAWdwd+O7S7LY/A3jHMhJYegvUhmm1J1eRDa9NG+zdtH2FiBWqtNUpfnN2eVZxhwfJAVbMv4PNiRibb2PjBXjyZKwfFfcJf95vShtsgKkWKepOpLG0fpM/G7nqUFDh+Y49NFctv9Avt21h3X2GgWo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSZK14v4; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-206f9b872b2so14926245ad.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 18:33:50 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7d666fb3fb9so914607a12.0;
+        Thu, 26 Sep 2024 18:43:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727400830; x=1728005630; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xN77D3WeBb8lwn/putJSFUXEJpA56+/Vtw6brC/xs94=;
-        b=kQe9wLsA8nFQgdHrH8hO/aESquwl64vvlLp5s1jdLUzkXmyYlBCjKW8G/unqjdC6HM
-         4t2idI1G9YNtj44CytJZf7kBfR+vlqXCqxcwTj+M6b2R3Tf/VUfJhjjYySGRLzL7gPSY
-         NzV0U5M+Q/oa0LX9TNVPxgjWHKK3k2n09VvCJZDXZ307vf6Kfr5PwVtyNAocSmwGyp2u
-         jFEcJsA46R5LgnR9RoQyCewBkNbKoGpMh3SHfuOE8WQ1X3GUqqJusD7gTFFe2KF3Rto8
-         D2F/WtIGgoysIkLMzvQo5ekBbvuBmp6EVFEh66DehCzB3BRXWqKryNIBjjpX1FuayFTK
-         2P6A==
+        d=gmail.com; s=20230601; t=1727401390; x=1728006190; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q653sQOlcSyRs9hPuoG+zXvugHIxRtEH110Wy2TqD8I=;
+        b=mSZK14v4sVVeEvbhjyCwrHjsHfd5scnhadKLCgKuZRiRJOt+PzJuU8/d4NpTJ1S0Em
+         WvDkU2TdPn1+hylXfuFXTgGZ3x9xAkjU0PuUXYQM8dIiXRn6NjqgBGB2mr4zVDSX61nL
+         w328AFQpzPPAtavsvg5MLc1MjhBStdTH9TEhMgBXzPqJh3V19u4WSwV8TBeeHGE0uBdm
+         jWcuJ51t8LWijUoZnoKTSICE2YIVpi87vD8GS9rg6bHD70m3OvymYsVtANlNvvPFkKbs
+         XNEktdkjFk9EU8dRk4VP7E04p5X5GTJ0BeleBXLJTmZo9GIwUGGTsQTedYvZEw/UUKGk
+         HMZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727400830; x=1728005630;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xN77D3WeBb8lwn/putJSFUXEJpA56+/Vtw6brC/xs94=;
-        b=qb7RV9AXaSGEcltzPDk44Qeq7k1UBuzxxjuJkFuvpN8h34Vs5Erdxy3BjJtyl3iScW
-         5MdVqlhRoXsK8cZM7mIuv40vkj8hA/+wrVh7lK6lpMPQZkFjlR3StI17K8GKiTpzJ1LG
-         TXrAcuHT5o+O480LYpLvjRd4sXkk1+k4HoS4++cdHGlcQ4ffD19kpdfl0YNKxjsYwGOL
-         UNHJhmWE+VaryOE37c6SPHl9yjBAvNJ88LXsL/QBxjYBxQ+CN8cfhCDnEgToZub91XH0
-         OYroYm8rzcZnbDxNSca8RmsEwwuM9nfyy0iNLovlxhUzUXK46o77guxnA9GlKL69MOU6
-         WOgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUufaFVLwm0FfqWkRxSKepPf/YLjwh6wOl8j5C0hGWnwY2LggdZ7PDtChComAapkRO8CKW8Dzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEqIbHExFtzPyEEQ6pH+jqdkiPX55d3+WbMY2L+KkFOoXis4yN
-	IMAulczQH3nL4CFHz9sdS7+Qxzsmxu95CeqF48X6OZiUKsDJZXo=
-X-Google-Smtp-Source: AGHT+IF+H/5xkio/ix3flWEguZpDI8NgqwbZg8JpBP0cUF3I9rvPqm9bgfSzZXhX01idigdo8C4QSg==
-X-Received: by 2002:a17:902:d50a:b0:206:ca91:1dda with SMTP id d9443c01a7336-20b367d994cmr27357495ad.17.1727400829907;
-        Thu, 26 Sep 2024 18:33:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727401390; x=1728006190;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q653sQOlcSyRs9hPuoG+zXvugHIxRtEH110Wy2TqD8I=;
+        b=ZEgbNHg687g2rRkfAQHMktSpm+WsI+XtNFm8c4R7c3N27cb/DkkT5fL3RZo8npungu
+         73wtF2uVBkR4nM5mk98WWZgebfifZUfYgpVCJ4vHOVdwjy2yJwqNgzOSsBhCesZFMVdJ
+         JniEUpcJPcq/+4Zo0s5oWU92tmo7o8/cvX8fVA0KrO271J0G+L899n2LGd45NwD9duiK
+         4VOInR4zM7qL8dW4mapsG40HbTT3YvHNOeKhqIJXib+EzwFhiX/w8mB8aVBB2RX4MJxT
+         b0dAEUKfxeOOh+BIM7vBZskh2VNehJmCQR1a1E/i/WpEVarqbrglaQvqhsdg9Py3HiY7
+         eFDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWm0bm1Ub4sxsFl2R6QS/e2mOpS6lao4urUw3B+hJv1vkmtmXwXhZrZc/EqLiBZxrFFF9rjQGss@vger.kernel.org, AJvYcCXmwatrfqqtOgHFCqdckH8myrZyjn3p0hI27VDSH6PWVrn8uwW63slQISBdPjLMi9PIrjE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR1rSmgo7+p1HGPbwOhj7bGrg0CtY/TZxDLNAUv+ESwVYl8qAQ
+	62k99PJN2TCzVLyF+MWd0YfVNpH6EmZ2fmvGWy8EVGuxgFq/EAY=
+X-Google-Smtp-Source: AGHT+IGk0A4RXFQ/svtxe8Nnc5iMxuLjkwJyk+b8Okdd8PJts4jl3XgDUgU/jpUwuW/i3drWNQgrpg==
+X-Received: by 2002:a05:6a21:33a6:b0:1cf:3f39:c469 with SMTP id adf61e73a8af0-1d4ebe2733bmr8274266637.2.1727401390353;
+        Thu, 26 Sep 2024 18:43:10 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37d89508sm4242445ad.64.2024.09.26.18.33.49
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6db612f6fsm542081a12.86.2024.09.26.18.43.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 18:33:49 -0700 (PDT)
-Date: Thu, 26 Sep 2024 18:33:48 -0700
+        Thu, 26 Sep 2024 18:43:09 -0700 (PDT)
+Date: Thu, 26 Sep 2024 18:43:09 -0700
 From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [RFC PATCH net-next v1 1/4] net: devmem: Implement TX path
-Message-ID: <ZvYLfLKpdZj58YKo@mini-arch>
-References: <20240913150913.1280238-1-sdf@fomichev.me>
- <20240913150913.1280238-2-sdf@fomichev.me>
- <CAHS8izPKX3rhUytviDa-=Do=jt_gLzE+7H5_0jp+N-6hjHC8dQ@mail.gmail.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Arthur Fabre <afabre@cloudflare.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
+	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
+	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	kernel-team <kernel-team@cloudflare.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+Message-ID: <ZvYNranHf9X5ZjK-@mini-arch>
+References: <cover.1726935917.git.lorenzo@kernel.org>
+ <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+ <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
+ <Zu_gvkXe4RYjJXtq@lore-desk>
+ <87ldzkndqk.fsf@toke.dk>
+ <ZvA6hIl6XWJ4UEJW@lore-desk>
+ <874j62u1lb.fsf@toke.dk>
+ <ZvV2WLUa1KB8qu3L@lore-rh-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,96 +104,100 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izPKX3rhUytviDa-=Do=jt_gLzE+7H5_0jp+N-6hjHC8dQ@mail.gmail.com>
+In-Reply-To: <ZvV2WLUa1KB8qu3L@lore-rh-laptop>
 
-On 09/26, Mina Almasry wrote:
-> On Fri, Sep 13, 2024 at 8:09 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
-> >
-> > Preliminary implementation of the TX path. The API is as follows:
-> >
-> > 1. bind-tx netlink call to attach dmabuf for TX; queue is not
-> >    required, only netdev for dmabuf attachment
-> > 2. a set of iovs where iov_base is the offset in the dmabuf and iov_len
-> >    is the size of the chunk to send; multiple iovs are supported
-> > 3. SCM_DEVMEM_DMABUF cmsg with the dmabuf id from bind-tx
-> > 4. MSG_SOCK_DEVMEM sendmsg flag to mirror receive path
-> >
-> > In sendmsg, lookup binding by id and refcnt it for every frag in the
-> > skb. None of the drivers are implemented, but skb_frag_dma_unmap
-> > should return proper DMA address. Extra care (TODO) must be taken in the
-> > drivers to not dma_unmap those mappings on completions.
-> >
-> > The changes in the kernel/dma/mapping.c are only required to make
-> > devmem work with virtual networking devices (and they expose 1:1
-> > identity mapping) and to enable 'loopback' mode. Loopback mode
-> > lets us test TCP and UAPI paths without having real HW. Not sure
-> > whether it should be a part of a real upstream submission, but it
-> > was useful during the development.
-> >
-> > TODO:
-> > - skb_page_unref and __skb_frag_ref seem out of place; unref paths
-> >   in general need more care
-> > - potentially something better than tx_iter/tx_vec with its
-> >   O(len/PAGE_SIZE) lookups
-> > - move xa_alloc_cyclic to the end
-> > - potentially better separate bind-rx and bind-tx;
-> >   direction == DMA_TO_DEVICE feels hacky
-> > - rename skb_add_rx_frag_netmem to skb_add_frag_netmem
-> >
+On 09/26, Lorenzo Bianconi wrote:
+> > Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
+> > 
+> > >> I'm hinting at some complications here (with the EFAULT return) that
+> > >> needs to be resolved: there is no guarantee that a given packet will be
+> > >> in sync with the current status of the registered metadata, so we need
+> > >> explicit checks for this. If metadata entries are de-registered again
+> > >> this also means dealing with holes and/or reshuffling the metadata
+> > >> layout to reuse the released space (incidentally, this is the one place
+> > >> where a TLV format would have advantages).
+> > >
+> > > I like this approach but it seems to me more suitable for 'sw' metadata
+> > > (this is main Arthur and Jakub use case iiuc) where the userspace would
+> > > enable/disable these functionalities system-wide.
+> > > Regarding device hw metadata (e.g. checksum offload) I can see some issues
+> > > since on a system we can have multiple NICs with different capabilities.
+> > > If we consider current codebase, stmmac driver supports only rx timestamp,
+> > > while mlx5 supports all of them. In a theoretical system with these two
+> > > NICs, since pkt_metadata_registry is global system-wide, we will end-up
+> > > with quite a lot of holes for the stmmac, right? (I am not sure if this
+> > > case is relevant or not). In other words, we will end-up with a fixed
+> > > struct for device rx hw metadata (like xdp_rx_meta). So I am wondering
+> > > if we really need all this complexity for xdp rx hw metadata?
+> > 
+> > Well, the "holes" will be there anyway (in your static struct approach).
+> > They would just correspond to parts of the "struct xdp_rx_meta" being
+> > unset.
 > 
-> Thank you very much for this, and sorry for the late reply. I think I
-> got busy with some post RX merge follow ups and then other stuff.
-> Coming back to look at this now.
+> yes, what I wanted to say is I have the feeling we will end up 90% of the
+> times in the same fields architecture and the cases where we can save some
+> space seem very limited. Anyway, I am fine to discuss about a common
+> architecture.
+> 
+> > 
+> > What the "userspace can turn off the fields system wide" would
+> > accomplish is to *avoid* the holes if you know that you will never need
+> > them. E.g., say a system administrator know that they have no networks
+> > that use (offloaded) VLANs. They could then disable the vlan offload
+> > field system-wide, and thus reclaim the four bytes taken up by the
+> > "vlan" member of struct xdp_rx_meta, freeing that up for use by
+> > application metadata.
+> 
+> Even if I like the idea of having a common approach for this kernel feature,
+> hw metadata seems to me quite a corner case with respect of 'user-defined
+> metadata', since:
+> - I do not think it is a common scenario to disable hw offload capabilities
+>   (e.g checksum offload in production)
+> - I guess it is not just enough to disable them via bpf, but the user/sysadmin
+>   will need even to configure the NIC via ethtool (so a 2-steps process).
+> 
+> I think we should pay attention to not overcomplicate something that is 99%
+> enabled and just need to be fast. E.g I can see an issue of putting the hw rx
+> metadata in metadata field since metadata grows backward and we will probably
+> end up putting them in a different cacheline with respect to xdp_frame
+> (xdp_headroom is usually 256B).
+> 
+> > 
+> > However, it may well be that the complexity of allowing fields to be
+> > turned off is not worth the gains. At least as long as there are only
+> > the couple of HW metadata fields that we have currently. Having the
+> > flexibility to change our minds later would be good, though, which is
+> > mostly a matter of making the API exposed to BPF and/or userspace
+> > flexible enough to allow us to move things around in memory in the
+> > future. Which was basically my thought with the API I sketched out in
+> > the previous email. I.e., you could go:
+> > 
+> > ret = bpf_get_packet_metadata_field(pkt, METADATA_ID_HW_HASH,
+> >                                     &my_hash_vlaue, sizeof(u32))
+> 
+> yes, my plan is to add dedicated bpf kfuncs to store hw metadata in
+> xdp_frame/xdp_buff
+> 
+> > 
+> > 
+> > ...and the METADATA_ID_HW_HASH would be a constant defined by the
+> > kernel, for which the bpf_get_packet_metadata_field() kfunc just has a
+> > hardcoded lookup into struct xdp_rx_meta. And then, if we decide to move
+> > the field in the future, we just change the kfunc implementation, with
+> > no impact to the BPF programs calling it.
+> > 
+> 
+> maybe we can use what we Stanislav have already added (maybe removing xdp
+> prefix):
+> 
+> enum xdp_rx_metadata {
+> 	XDP_METADATA_KFUNC_RX_TIMESTAMP,
+> 	XDP_METADATA_KFUNC_RX_HASH,
+> 	XDP_METADATA_KFUNC_RX_VLAN_TAG
+> };
 
-Sure and thanks for pushing it further!
-
-> This looks like a great start. Agreed with many of the todos above,
-> and in addition some things I wanna look deeper into (but not
-> necessarily set on changing yet):
-
-[..]
- 
-> Loopback: I do plan to drop that. My understanding is that it's a bit
-> complicated to make work. In addition to the mapping.c changes, the TX
-> zerocopy code falls back to copying for loopback for reasons I don't
-> have my head wrapped around. devmem can't be copied. You get around
-> that with a change in skb_copy_ubufs but I'm not sure we can assume
-> success there. In any case I don't have a use case for loop back and
-> it can be mode to work properly later.
-
-Up to you. It was useful during working on on the syscall side, but
-I understand that it's an unnecessary complication.
-
-> control path locking: You added net_devmem_dmabuf_lock, but AFAICT
-> dma-buf allocation should be already mutexed by rtnl_lock. Maybe I
-> missed something. I'll take a deeper look.
-
-Yeah, agreed, I think it was a leftover from my some other non-rcu
-attempt.
-
-> fast path locking: you use rcu, which is a good way to do it. I had
-> something else in mind, where we associate the binding with a socket
-> and keep it alive for the duration of the socket and (I think) no need
-> to lock anymore. Not sure which is better. Associating the binding
-> with a socket does require uapi. But it may be good to keep the
-> binding alive while the socket is using it anyway, rather than the
-> sendmsg returning -EINVAL if the binding has been freed underneath it.
-> I'll take a deeper look.
-
-That should work as well as long as we can bind multiple sockets.
-Maybe that's even better because it avoids xa_load on every sendmsg,
-so go for it.
-
-> get_page/put_page: I was thinking we need to implement
-> get_netmem/put_netmem equivalents as the tx path uses
-> get_page/put_page and page_pool refcounting is not used there. You
-> seem to instead ref/unref the binding. That may be fine, but we may
-> need get_page/put_page equivalents for netmem eventually and may be
-> worth getting them done now. I need to rack my brain a bit more.
-
-That should work as well, I haven't spent a ton of time polishing that
-part. Note that in my tests, I saw half throughput with this API+udmabuf
-vs regular MSG_ZEROCOPY. So it's either my sloppy locking, xa_load
-or iovec parsing. Or something else, idk :-)
+I think it was one of the ideas floating around back then for the
+xdp->skb case (including redirection): have an extra kfunc that the bpf
+program can call and make this kfunc store the metadata (in the metadata area)
+in some fixed format. Then the kernel can consume it.
 
