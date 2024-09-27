@@ -1,151 +1,100 @@
-Return-Path: <netdev+bounces-130056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2124F987D9A
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 06:31:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055F2987DCD
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:16:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50EE91C23043
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 04:31:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 376021C227BA
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 05:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07EB1741D9;
-	Fri, 27 Sep 2024 04:31:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA0771750;
+	Fri, 27 Sep 2024 05:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SU5EaLe4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="nuYOX2Kq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108FE14D703
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 04:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E699184F
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 05:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727411502; cv=none; b=HJlvNGuMayBuM5IQKz06NYDA4XmZjjlf3hnv/x+XQChwc07pqrqyIpjJ1wfX5yW6CXAbxyp+NVvzRCHg263lAnNN7RaEfI27mDBaodlVtQetelho/GB9LfjaETWaENwPJcB5379l9xYvrRJCJmJ4EIODJ+0vIq8kw89gmomMNtU=
+	t=1727414183; cv=none; b=ECNTPwTVQdThTd6UA9odyy4Qv1hgFU2YajX3m49QCg9rjUKXk19Khcsk1ojbiAcN1QMjBN8/XAz4SDb6mbMYBERKgtOOlR0x7m7KmyFUKTcxNN6MkNI3jBxP2zxCcvWiwVQh8qAiqkrI4ihnKCH98kunQcZQ7ygZO7r3gff+P9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727411502; c=relaxed/simple;
-	bh=uBFmWoNeX1W+Cqs2iNWdisHneux0lZanwha6u5m3aww=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q2exMJOx+c8FZiIAVfn9s0FeHc1pM6xB9u+W7N/abWAnEmW9GbxBsCcaNZIXaICLdhjmytzxT+0f+6ys7dbLVSOEXMzzjj7lcx6KWKIn3w2dtAIiXGJyb7LJWASwYEy0xJ690RMRux3P45zkkG6M0M6rGDM+ahKkVXETD3SGngo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SU5EaLe4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727411500;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uBFmWoNeX1W+Cqs2iNWdisHneux0lZanwha6u5m3aww=;
-	b=SU5EaLe4lNFhsr74QQnXXwGrnYvM8MS2xIMXFawfxs0PLa1b051GNpKSIn/AnZhGgH53GA
-	aJVmjzzqeOoIXSsJZBoSQFbxE0jnozfOjvZmVB8jsVuKhNbUTzACU/yeL4F5yFk5BAI9id
-	23CaMuWc4u9N6hfLmYD9WPE5Yl9W9iY=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-262-LYOjjR2xO-WCr68JEu1okw-1; Fri, 27 Sep 2024 00:31:36 -0400
-X-MC-Unique: LYOjjR2xO-WCr68JEu1okw-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-6818fa37eecso1810526a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 21:31:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727411495; x=1728016295;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uBFmWoNeX1W+Cqs2iNWdisHneux0lZanwha6u5m3aww=;
-        b=m2Eg+QbrM6GravQ9VdsuoABhx8urGb+1kEhk2REMMfodInlMnhKHiHaridGCmmn3lA
-         6Li2mIQ8dl2/NHWfommiKDpOfFxq2u/zmI1OFwv5akjbRuE29qNzgOFoaVozKT5Wz5yP
-         g0DwDptFwF/cWlIFMK6PV8YwC2Il26Rrv0wXsdB55/m89UsOSCvfacQlI1HIkFMc1c2U
-         IHLrRQNoTneLSlhOXpsviebB0aRCqAtWIWoBcivFWhvBUypR5tN7hdHtJrcSUn0TSVrs
-         c3Ieho3Oks7X+1B+WZqA6+X9bjvyRYZAh+SbOAMAwZVllack7eHtrkpRNwGbHYpSa03e
-         p2Dg==
-X-Forwarded-Encrypted: i=1; AJvYcCXC/vQysNJ6EyZWk8RA3B/2U+OEaSgHk7MItHbZhuyCM5elEIHGMXokeJZxGYGoSKl8ipq7+rs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjt5SP37lOgk0HXUgTKrG/LPa6uX9IHKLz8P+xX153oUhca9HM
-	C+nUTz5L9tPqY+8vyGs6ZhF+8NCDU2yt6LboNc0+N3jiSKbuqqtB2T73R8ytnghvO+kEOggcryO
-	HUi0WZmmfRxF2L/4FWoSYC+tvkzWrK9yb1PdqQn6Foiy9KWdGGSgMwgCWphoU1FyJTuGnlHXdGm
-	QdhZ8UM8gAJ5KchYPMzT4UYZswEe2O
-X-Received: by 2002:a17:90b:234a:b0:2c2:df58:bb8c with SMTP id 98e67ed59e1d1-2e0b8b149dcmr2167111a91.18.1727411495488;
-        Thu, 26 Sep 2024 21:31:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIh5lwZF9CJKh17SEpxaaZJy38bFfod3VEXz7y4ASCqLDiCeaKdZmiGJ67AwnOYjAbQZ+yUYlkT0W4m1tjn8U=
-X-Received: by 2002:a17:90b:234a:b0:2c2:df58:bb8c with SMTP id
- 98e67ed59e1d1-2e0b8b149dcmr2167084a91.18.1727411494914; Thu, 26 Sep 2024
- 21:31:34 -0700 (PDT)
+	s=arc-20240116; t=1727414183; c=relaxed/simple;
+	bh=9AAw5btleGGiV7XRXNQp6uOjmZ57QQoEoZeMw4x9J24=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=jR1eGDOML8+KasUDUrr0TvvPW34kXGuxrJzSl6RCTQt1ObK06ojUvDVGTEH5UxiOn1u6TRoiYjaoGciGAPNIZBF8rE14Yj6e6YK3mZovfGMaKY7VVsmVTXU4DaloBz/epU4jTty+XLdBvcuoLjPqIG0vdAeNCaXprUWWgCI6Z18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=nuYOX2Kq; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Type:To:Subject:Message-ID:Date:From:
+	MIME-Version:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9AAw5btleGGiV7XRXNQp6uOjmZ57QQoEoZeMw4x9J24=; t=1727414182; x=1728278182; 
+	b=nuYOX2KqVxy/bBObB8KwTqRQB1Xl/CTTvLFfTerHp+O/Qxo5zlJRbymyXDYKQsYjyqPlHDME0MG
+	WXfi+X8LiPqJUfOlkc1yHfRF0eqGB9ga2hlPI1eHouV4ogSNFbuX+RdIT/UZDdTyh6hK3nYdDPRGB
+	pjE/AYJPpj4LTOQqtx0+eKMqUI840pfbfnYaF4rf2jwblrxkZ8lG3TrXMIo3IJwvkhWJxXLW8GULc
+	UcYqHSbuXvAL7yI89kAiFwu+Yd/cJbk2wk5ritfoRerPuiCZFYN/NYY03zBAh7Ooj15vycJOW6lHF
+	3i/xq93wDHY9iWyEPGPd7P6slLBYXaXSA/Kw==;
+Received: from mail-oo1-f49.google.com ([209.85.161.49]:57828)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1su30I-0003Rn-FP
+	for netdev@vger.kernel.org; Thu, 26 Sep 2024 21:54:55 -0700
+Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5e1b35030aeso988917eaf.3
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 21:54:54 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yyta3xhHuFMPrdvNkKdhh2aS3xEvJr8UBcmrVBHkr68FQ9rW8+B
+	z65dCbwfN6m1kwfGWHZHb3SS+B1bGsCA4F10sWd8j8LovWjo5a805tFYD0BpM0bfbMOifZwFrvL
+	0vwosHpU4XdsvsLmxUNF9qtn+oyE=
+X-Google-Smtp-Source: AGHT+IHXoU8XQDvsSGxCnBbFTELKcascjyIqg/nIQ3ZDzwa5qWPLUwe7n6uBaTN7dzGodPja1RZgx9C5s2tvPmi1lcM=
+X-Received: by 2002:a05:6871:7295:b0:277:fe14:e68c with SMTP id
+ 586e51a60fabf-28710b9e1acmr1791368fac.33.1727412893887; Thu, 26 Sep 2024
+ 21:54:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com> <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
- <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
-In-Reply-To: <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 27 Sep 2024 12:31:23 +0800
-Message-ID: <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
-Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Thu, 26 Sep 2024 21:54:18 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
+Message-ID: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
+Subject: Advice on upstreaming Homa
+To: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 1.7
+X-Spam-Level: *
+X-Scan-Signature: acf3039aa8d32d1ac60a71149e52b94c
 
-On Fri, Sep 27, 2024 at 10:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@dayni=
-x.com> wrote:
->
-> On 2024/09/25 12:30, Jason Wang wrote:
-> > On Tue, Sep 24, 2024 at 5:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> virtio-net have two usage of hashes: one is RSS and another is hash
-> >> reporting. Conventionally the hash calculation was done by the VMM.
-> >> However, computing the hash after the queue was chosen defeats the
-> >> purpose of RSS.
-> >>
-> >> Another approach is to use eBPF steering program. This approach has
-> >> another downside: it cannot report the calculated hash due to the
-> >> restrictive nature of eBPF.
-> >>
-> >> Introduce the code to compute hashes to the kernel in order to overcom=
-e
-> >> thse challenges.
-> >>
-> >> An alternative solution is to extend the eBPF steering program so that=
- it
-> >> will be able to report to the userspace, but it is based on context
-> >> rewrites, which is in feature freeze. We can adopt kfuncs, but they wi=
-ll
-> >> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
-> >> and vhost_net).
-> >>
-> >
-> > I wonder if we could clone the skb and reuse some to store the hash,
-> > then the steering eBPF program can access these fields without
-> > introducing full RSS in the kernel?
->
-> I don't get how cloning the skb can solve the issue.
->
-> We can certainly implement Toeplitz function in the kernel or even with
-> tc-bpf to store a hash value that can be used for eBPF steering program
-> and virtio hash reporting. However we don't have a means of storing a
-> hash type, which is specific to virtio hash reporting and lacks a
-> corresponding skb field.
+I would like to start the process of upstreaming the Homa transport
+protocol, and I'm writing for some advice.
 
-I may miss something but looking at sk_filter_is_valid_access(). It
-looks to me we can make use of skb->cb[0..4]?
+Homa contains about 15 Klines of code. I have heard conflicting
+suggestions about how much to break it up for the upstreaming process,
+ranging from "just do it all in one patch set" to "it will need to be
+chopped up into chunks of a few hundred lines". The all-at-once
+approach is certainly easiest for me, and if it's broken up, the
+upstreamed code won't be functional until a significant fraction of it
+has been upstreamed. What's the recommended approach here?
 
-Thanks
+I'm still pretty much a newbie when it comes to submitting Linux code.
+Is there anyone with more experience who would be willing to act as my
+guide? This would involve answering occasional questions and pointing
+me to online information that I might otherwise miss, in order to
+minimize the number of stupid things that I do.
 
->
-> Regards,
-> Akihiko Odaki
->
+I am happy to serve as maintainer for the code once it is uploaded. Is
+it a prerequisite for there to be at least 2 maintainers?
 
+Any other thoughts and suggestions are also welcome.
+
+-John-
 
