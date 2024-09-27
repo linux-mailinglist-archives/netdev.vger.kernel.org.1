@@ -1,226 +1,209 @@
-Return-Path: <netdev+bounces-130088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C2D1988261
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 12:24:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 354F49882B5
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 12:41:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB3B5281C9D
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 10:24:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B04CE1F23761
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 10:41:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592D01BC086;
-	Fri, 27 Sep 2024 10:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B276B189526;
+	Fri, 27 Sep 2024 10:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZNAkwGJe"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="cNvJQPby"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8B31BAECB
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 10:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCBC13698F;
+	Fri, 27 Sep 2024 10:41:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727432674; cv=none; b=NkXrbTzuePRkZXaTsM6itxaww0G2HKTtD1HzcEWqoMYnsN1fn3QVQabWsgl24QUi0ZxDiFSdSk4UiKoB84tqKTW//mmMgvEBZLHAc/qDJxUA5mkjCzjvNynDr3tnAHznKqyCDkrKMHsT/AwK9x/RNIN1NrVwE2GjiKAygJSaeqs=
+	t=1727433687; cv=none; b=U4aHf2J2j2jKN64VBwWUBzcDe4SOVgTS7J2MVj2h1Rm6s799V0omDGbAm9cskmTNwDzGZfu5Mx0KhLUCDe5A9PBeuUVN8SCAZCdDTaP4l7VDzFLVOXkw3x9wRMJIwCuzCHZA0U3UqyuCzYs15vAuTLGT0i0QYoclsplljIQPX6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727432674; c=relaxed/simple;
-	bh=XIxx1Gqnh8W7x2jrzbkG+Yz0hMarOzuqSzj35yPNitg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Kfm25gxi7DWicPzltYgvKpSdX7oFNS9NknBxlj33mixDC65CcIk/5q3nmEbqtyDx4yxDK2hEYCHqCOaPtInfKivb6r4VsJKGYS8Gy4AjZqnq7GZnyLCga4RMcgCABVeIG9gj2b9cMpnshkHukMCgahMt/AHIbPz4ZxW6z56eUaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZNAkwGJe; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727432671;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XIxx1Gqnh8W7x2jrzbkG+Yz0hMarOzuqSzj35yPNitg=;
-	b=ZNAkwGJex5S1spnwY74V2/EaT0cH/3Nr5aPxKxrEh0z5dKSa4WJ26WxpmANnWvczbvEHm3
-	nqE5etzgSGCWWQBBOkKBBxTldYEv/5wcknRl+RZXHclTSdPvj0RzWfVaNMICt63cBZY+XB
-	RLHFlocC6j8/780eLxEwcR8HIgr0ROE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-_y_3El59PZyQ69w8uNO_WA-1; Fri, 27 Sep 2024 06:24:30 -0400
-X-MC-Unique: _y_3El59PZyQ69w8uNO_WA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37cda7514f8so254757f8f.0
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 03:24:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727432669; x=1728037469;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XIxx1Gqnh8W7x2jrzbkG+Yz0hMarOzuqSzj35yPNitg=;
-        b=L+uISh9pBLEkkfOMCNFdAKtF5gBW3sxwl9wJ0l1whfWn86ZQ0TIU++YPM8u97E+8K6
-         yUDIKPhqkxD25/f+VA8GBemQcxyVFZ7Drw3QiZYqnV84aw5cW2IO87GypTEFtFikJwZt
-         uIWza3iHevkDwQoiDCc17D8d07dNBS5LzYj5ZZ1HRUWVuWWs4gvWaioaKkAgiQks4VJd
-         B/wuv+aEWJCC5ws6Tt9hGzv6GDAeqK9wXLsxOpHnS7Mx01gaNmVQ7EGG59+SMmKg4JfH
-         1UgUcoPspfaZQAbPAqgtRO2o84mOc5BUi2ErHJANWJiruCqzlgdm8jfs1GyPYEk1uxoM
-         fQjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGIqdIAD1ZEUU8xF4VlyWN+NTOG9+PCwUquzT1nG95dE3VFQTyC8YOQvztpf9xr/52IWtLqFk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6zFmVHzoE4rKtv/UCH09DzIx9QuKSLSSePlZCZWPwXVTbKMoa
-	QfwTgVPzz6QqbR0ePRNVwoEFRW3ebYnG35uBEkqeuLs0sBO3eGU9ckB55amXcCvJT/dQ3R7BWf1
-	sIqnDp81MxRIH0MRjznuXp4qUNR/4Jrf53YDgk+x7viu8DcrDnsS/OQ==
-X-Received: by 2002:a5d:5408:0:b0:37c:c4c0:4545 with SMTP id ffacd0b85a97d-37cd568c351mr2074551f8f.10.1727432669168;
-        Fri, 27 Sep 2024 03:24:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzn/Hgbyr1j8TFmWW8rLoliM3ZBfnFOOaG1RI387NGbgDvZsVbVAlmnlZnn5QvDNrkUnRcIA==
-X-Received: by 2002:a5d:5408:0:b0:37c:c4c0:4545 with SMTP id ffacd0b85a97d-37cd568c351mr2074515f8f.10.1727432668693;
-        Fri, 27 Sep 2024 03:24:28 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd572fa48sm2035752f8f.66.2024.09.27.03.24.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2024 03:24:27 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 64AE8157FD23; Fri, 27 Sep 2024 12:24:26 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Arthur Fabre <afabre@cloudflare.com>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- kuba@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
- pabeni@redhat.com, sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, mst@redhat.com, jasowang@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, kernel-team
- <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-In-Reply-To: <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
-References: <cover.1726935917.git.lorenzo@kernel.org>
- <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
- <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
- <Zu_gvkXe4RYjJXtq@lore-desk> <87ldzkndqk.fsf@toke.dk>
- <CAOn4ftshf3pyAst27C2haaSj4eR2n34_pcwWBc5o3zHBkwRb3g@mail.gmail.com>
- <87wmiysi37.fsf@toke.dk> <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 27 Sep 2024 12:24:26 +0200
-Message-ID: <87ldzds8bp.fsf@toke.dk>
+	s=arc-20240116; t=1727433687; c=relaxed/simple;
+	bh=KoZaEI3JS55lBiC+OYgLUGIMIHYdubCt/PR1wyVVYdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RjXT0BycXQf6eFx3agiSNwJ2eccbwYkrSPF9N3fKQO0MmnJYcfc8tdv1GL46sziJ8/PwVoQrfvI/WCVtEafzPeDZLCMiNwXj1UULzmLP2ZmAnwmj55J4dK5dvYxp+wNY+4woXiVVcjGNHPm5ITP42Bi2tTrA6KI54qanFTSDSjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=cNvJQPby; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 073f6b8c7cbd11efb66947d174671e26-20240927
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=d2ip2mdxnBklx0orvnPYOI2t7UUGH6wKZQCQEfSWN/M=;
+	b=cNvJQPbyJ6oFPLgZyt/1g0EYfq8n3VH+y4XXUJZIB+r2wX2taVtwRXxIE531/RmUuT3BCcTY7MfQrx88Z+0CI2lIyGoSskhY6zGcnIGngCvVVQ4ceGQz1ScrT0G4CnJHcleh08BT3G9ai7Xf9DP0FcuIIocfI/daNvJesCthVR0=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:64f08183-e24a-4257-8530-75b5f9675b25,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:1353aa9e-8e9a-4ac1-b510-390a86b53c0a,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
+	l,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
+X-UUID: 073f6b8c7cbd11efb66947d174671e26-20240927
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1432560207; Fri, 27 Sep 2024 18:41:18 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 27 Sep 2024 18:41:17 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkmbs11n2.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
+ Transport; Fri, 27 Sep 2024 18:41:16 +0800
+Message-ID: <df270bf2-07f3-71a8-1f67-b8417f7a0719@mediatek.com>
+Date: Fri, 27 Sep 2024 18:41:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v6 2/2] dt-bindings: mfd: mediatek: mt6397: Convert to DT
+ schema format
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzk@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
+ Dooley <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Liam
+ Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Sean Wang
+	<sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, Dmitry Torokhov
+	<dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+	<lee@kernel.org>, Sebastian Reichel <sre@kernel.org>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, Chen Zhong <chen.zhong@mediatek.com>,
+	<linux-input@vger.kernel.org>, <linux-leds@vger.kernel.org>,
+	<linux-pm@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>
+CC: Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
+	MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+References: <20240918064955.6518-1-macpaul.lin@mediatek.com>
+ <20240918064955.6518-2-macpaul.lin@mediatek.com>
+ <339b4c83-201c-4f63-85d0-b0aa1eb164b0@kernel.org>
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+In-Reply-To: <339b4c83-201c-4f63-85d0-b0aa1eb164b0@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
-"Arthur Fabre" <afabre@cloudflare.com> writes:
 
->> >> The nice thing about an API like this, though, is that it's extensible,
->> >> and the kernel itself can be just another consumer of it for the
->> >> metadata fields Lorenzo is adding in this series. I.e., we could just
->> >> pre-define some IDs for metadata vlan, timestamp etc, and use the same
->> >> functions as above from within the kernel to set and get those values;
->> >> using the registry, there could even be an option to turn those off if
->> >> an application wants more space for its own usage. Or, alternatively, we
->> >> could keep the kernel-internal IDs hardcoded and always allocated, and
->> >> just use the getter/setter functions as the BPF API for accessing them.
->> >
->> > That's exactly what I'm thinking of too, a simple API like:
->> >
->> > get(u8 key, u8 len, void *val);
->> > set(u8 key, u8 len, void *val);
->> >
->> > With "well-known" keys like METADATA_ID_HW_HASH for hardware metadata.
->> >
->> > If a NIC doesn't support a certain well-known metadata, the key
->> > wouldn't be set, and get() would return ENOENT.
->> >
->> > I think this also lets us avoid having to "register" keys or bits of
->> > metadata with the kernel.
->> > We'd reserve some number of keys for hardware metadata.
->>
->> Right, but how do you allocate space/offset for each key without an
->> explicit allocation step? You'd basically have to encode the list of IDs
->> in the metadata area itself, which implies a TLV format that you have to
->> walk on every access? The registry idea in my example above was
->> basically to avoid that...
->
-> I've been playing around with having a small fixed header at the front
-> of the metadata itself, that lets you access values without walking them
-> all.
->
-> Still WIP, and maybe this is too restrictive, but it lets you encode 64
-> 2, 4, or 8 byte KVs with a single 16 byte header:
 
-Ohh, that's clever, I like it! :)
+On 9/27/24 17:45, Krzysztof Kozlowski wrote:
+> 	
+> 
+> External email : Please do not click links or open attachments until you 
+> have verified the sender or the content.
+> 
+> On 18/09/2024 08:49, Macpaul Lin wrote:
+>> Convert the mfd: mediatek: mt6397 binding to DT schema format.
+>> 
+>> MT6323, MT6358, and MT6397 are PMIC devices with multiple function
+>> subdevices. They share a common PMIC design but have variations in
+>> subdevice combinations.
+>> 
+>> Key updates in this conversion:
+>> 
+>> 1. RTC:
+>>    - Convert rtc-mt6397.txt and merge into parent MT6397 PMIC DT schema.
+>> 
+>> 2. Regulators:
+>>    - Align to generic name "regulators".
+>>    - Update references from .txt to .yaml for mt6323, mt6358, and mt6397
+>>      regulators.
+>>    - Simplify regulator name labels in device tree examples.
+>> 
+>> 3. Audio Codec:
+>>    - Convert sound/mt6358.txt and merge into parent MT6397 PMIC DT schema.
+>>    - Align to generic name "audio-codec" for codec and sound subdevices.
+>>    - Add "mediatek,dmic-mode" and "Avdd-supply" properties.
+>> 
+>> 4. Clocks:
+>>    - Align to generic name "clocks" for clockbuffer subdevices.
+>> 
+>> 5. LEDs:
+>>    - Convert leds-mt6323.txt and merge into parent MT6397 PMIC DT schema.
+>>    - Update LED binding.
+>> 
+>> 6. Keys:
+>>    - Add detailed descriptions for power and home keys.
+>>    - Add compatible: mediatek,mt6358-keys.
+>> 
+>> 7. Power Controller:
+>>    - Convert mt6323-poweroff.txt and merge into parent MT6397 PMIC DT
+>>      schema.
+>>    - Add #power-domain-cells property to fix dt-binding check error.
+>>    - Clarify "BBPU" as "Baseband power up".
+>> 
+>> 8. Pinctrl:
+>>    - Align to generic name "pinctrl" instead of "pin-controller".
+>> 
+>> 9. Compatible:
+>>    - Drop "mediatek,mt6357" since there is a separated DT Schema
+>>      for PMIC MT6357.
+>> 
+>> 10. Examples:
+>>    - MT6323: Retain complete examples for this PMIC.
+>>    - MT6358 and MT6397: simplify settings in regulators.
+>>     - Preserve "audio-codec", "clocks", "pinctrl", "rtc", and "keys"
+>>       sections as they contain typical settings for different PMICs.
+>> 
+>> Additional updates:
+>> - MAINTAINERS: Add co-maintainers and reference to
+>>   mfd/mediatek,mt6397.yaml for LED and power-controller drivers.
+>> - input/mediatek,pmic-keys.yaml: Update reference to
+>>   mfd/mediatek,mt6397.yaml.
+>> 
+>> Signed-off-by: Sen Chu <sen.chu@mediatek.com>
+>> Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
+> 
+> NAK
+> 
+> Follow up patch pointed out this is incorrect. I don't understand this
+> concept of sending knowingly incorrect code, so please sort it out at v7.
+> 
+> Best regards,
+> Krzysztof
+> 
 
-It's also extensible in the sense that the internal representation can
-change without impacting the API, so if we end up needing more bits we
-can always add those.
+Sorry I didn't know mt6359-codec and mt6358-sound are similar device
+until Sept 26 (just yesterday) when I was reviewing the DT
+bindings. Until I've found the previous DT Schema of mt6359-codec 
+incorrect.
+See [1] 
+https://lore.kernel.org/linux-arm-kernel/20240926092519.6556-3-macpaul.lin@mediatek.com/T/
+and [2] 
+https://lore.kernel.org/all/20240926092519.6556-2-macpaul.lin@mediatek.com/
 
-Maybe it would be a good idea to make the 'key' parameter a larger
-integer type (function parameters are always 64-bit anyway, so might as
-well go all the way up to u64)? That way we can use higher values for
-the kernel-reserved types instead of reserving part of the already-small
-key space for applications (assuming the kernel-internal data is stored
-somewhere else, like in a static struct as in Lorenzo's patch)?
+And.. I don't understand, the origin this patch v6 should be a text file
+conversion, shouldn't we keep the origin content just a conversion and
+trying not to broken other relate modules?
 
-[...]
+Please help to indicates what is a better approach here:
 
->> > The remaining keys would be up to users. They'd have to allocate keys
->> > to services, and configure services to use those keys.
->> > This is similar to the way listening on a certain port works: only one
->> > service can use port 80 or 443, and that can typically beconfigured in
->> > a service's config file.
->>
->> Right, well, port numbers *do* actually have an out of band service
->> registry (IANA), which I thought was what we wanted to avoid? ;)
->
-> Depends how you think about it ;)
->
-> I think we should avoid a global registry. But having a registry per
-> deployment / server doesn't seem awful. Services that want to use a
-> field would have a config file setting to set which index it corresponds
-> to.
-> Admins would just have to pick a free one on their system, and set it in
-> the config file of the service.
->
-> This is similar to what we do for non-IANA registered ports internally.
-> For example each service needs a port on an internal interface to expose
-> metrics, and we just track which ports are taken in our config
-> management.
+Should I merge the properties of mt6359-codec, mt6358-sound, and 
+mt6397-codec
+together and put them all into to mt6359.yaml and redo the converting of 
+mfd/medaitek,mt6397.yaml?
 
-Right, this would work, but it assumes that applications are
-well-behaved and do this correctly. Which they probably do in a
-centrally-managed system like yours, but for random applications shipped
-by distros, I'm not sure if it's going to work.
+That will be much simpler for the audio-codec node for mediatek,mt6397.yaml.
+However there will be a little mismatch from the origin text file.
 
-In fact, it's more or less the situation we have with skb->mark today,
-isn't it? I.e., applications can co-exist as long as they don't use the
-same bits, so they have to coordinate on which bits to use. Sure, with
-this scheme there will be more total bits to use, which can lessen the
-pressure somewhat, but the basic problem remains. In other words, I
-worry that in practice we will end up with another github repository
-serving as a registry for metadata keys...
-
-> Dynamically registering fields means you have to share the returned ID
-> with whoever is interested, which sounds tricky.
-> If an XDP program sets a field like packet_id, every tracing
-> program that looks at it, and userspace service, would need to know what
-> the ID of that field is.
-> Is there a way to easily share that ID with all of them?
-
-Right, so I'll admit this was one of the handwavy bits of my original
-proposal, but I don't think it's unsolvable. You could do something like
-(once, on application initialisation):
-
-__u64 my_key = bpf_register_metadata_field(my_size); /* maybe add a name for introspection? */
-bpf_map_update(&shared_application_config, &my_key_index, &my_key);
-
-and then just get the key out of that map from all programs that want to
-use it?
-
-We could combine such a registration API with your header format, so
-that the registration just becomes a way of allocating one of the keys
-from 0-63 (and the registry just becomes a global copy of the header).
-This would basically amount to moving the "service config file" into the
-kernel, since that seems to be the only common denominator we can rely
-on between BPF applications (as all attempts to write a common daemon
-for BPF management have shown).
-
--Toke
-
+Thanks
+Macpaul Lin
 
