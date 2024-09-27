@@ -1,186 +1,154 @@
-Return-Path: <netdev+bounces-130113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F32988522
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 14:41:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BBE79885B8
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 14:55:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EB03283B56
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 12:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7B9C284BF3
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 12:55:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4DF218C34D;
-	Fri, 27 Sep 2024 12:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AF318CC1E;
+	Fri, 27 Sep 2024 12:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SepOfOv0"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="uXKm6zd4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4F618C33F
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 12:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A5C18CBF1
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 12:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727440869; cv=none; b=CJYzQBUouQrpqA8Xzox/IcWB4hFzPMzDT0Qnu6XnhVEyeK7M4RHZw4GgB0TTSN44iJcm12c9cIfEa3LY69xA2/9ifLelY7shC3FGgnkopnZs1woT9zdnej0bECAdHDNkQWF53I1IBNI+tOU+Glf6eqfw9JZ62NelfxOKbNa42N8=
+	t=1727441717; cv=none; b=juUvrEoW5eyfyQAPx9OwpfSDUfSVbs8W6NGCPw0PXeylF1Ws/UlSM/dY39I3nwjbjIHYtp4YahgyEJkRshPeLaZumkigf9sUgAFHkDsx3NMSPRihVJyZRzCxzJevAB20RRv4DoipF9T84JNO5fB62eOXz9Wcn4NUtUqjh/Ez2vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727440869; c=relaxed/simple;
-	bh=r1Lr7tvYMwtc8w3SfFcWa0W0NlqvWIvdww5MJWGf+50=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rAFBbTL3SVZ9Ct/WQTxiS/74qfoz0cs1SWTQUTxgMAC2w6p9rQkyP75SMtYo0litp3nYkFAUE+GiCHp7EguxjHuRIYt1dqiPys5fPT1KnW8keSOriwrc04suYEc5XQB6qQNSKoQsitycN+qhcyi7U+ympxVYA2jBKGZJRvnsvkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SepOfOv0; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727440868; x=1758976868;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=r1Lr7tvYMwtc8w3SfFcWa0W0NlqvWIvdww5MJWGf+50=;
-  b=SepOfOv0cyPiqNI2CRNFwICySLZm250rFx4gz0uTeMRJKHONaRSvSRR4
-   IKIRRVcW8cU+6C6lyrWmwSDsObP2Lfwyow9AdiRLPa9n6DfUG2fsBBPWw
-   FsrCUbcgd/b3YsPhLQEx7t5AvDZY+s2+tFLfNtfwBxYXPxijDKfSB5PE9
-   p9N6VF7FMcqmCJSx7lETXBUhYmtJJf29beL1fV8xUA0lkbgM/9wQ9jy2L
-   Le07fGN7wNRprjAawtCZ4SnMF6qixiMuRgIx6kKxxrOpxxLSUZDS2vfWe
-   hAzOUqnvymahPvL8BnrcX+WM98FxonrHFdNGHBgDnTWc2ofW+g+ACs1Hn
-   Q==;
-X-CSE-ConnectionGUID: fsv6rPxSTVCwSckLdCd8mw==
-X-CSE-MsgGUID: slYVITCVQQSLTprpWasLLw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11207"; a="26385761"
-X-IronPort-AV: E=Sophos;i="6.11,158,1725346800"; 
-   d="scan'208";a="26385761"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2024 05:40:45 -0700
-X-CSE-ConnectionGUID: 8eMsemkkSNaHZM7mKKn3hQ==
-X-CSE-MsgGUID: yidCo77+QXqMI9eb6wcyJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,158,1725346800"; 
-   d="scan'208";a="76902945"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa005.fm.intel.com with ESMTP; 27 Sep 2024 05:40:43 -0700
-Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 3E9EF28195;
-	Fri, 27 Sep 2024 13:40:42 +0100 (IST)
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	marcin.szycik@linux.intel.com,
-	michal.swiatkowski@linux.intel.com
-Subject: [PATCH iwl-net v2] ice: Flush FDB entries before reset
-Date: Fri, 27 Sep 2024 14:38:01 +0200
-Message-Id: <20240927123801.14853-1-wojciech.drewek@intel.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1727441717; c=relaxed/simple;
+	bh=XIIAM18PIWY1uWyT4rOqqfqO716IvFJ3bHm8Si4kxpg=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GjzRMZ0iuV4DU58LYUk/rVCdC5RmMZeV7GHEvnvfIp0wXhaJaI3LfQLsCv/EhSAvbSfPsRKP3trCw9WcKQDUnodKQOhQ2VqEvnf38rtd4Dvt5XWbpNeeApkXxyu7HvUFs1c5Kl1B2opmzZEB8SKOHQzuy6itZrfE6uXRkIgnlpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=uXKm6zd4; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-oa1-f70.google.com (mail-oa1-f70.google.com [209.85.160.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 848823FB75
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 12:55:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1727441709;
+	bh=sSmJYgv7I+zUFEDVZuQHO2YXTAln9N/geQIOSH+hGyE=;
+	h=From:In-Reply-To:References:Mime-Version:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=uXKm6zd4EAe2V5JoRzcZUOozVzhp5k+omfmTAiok95gy5FDZyOdtnu1Py247nDQa2
+	 kEET8b2o0PB5+kFMmEeV7Ffcl2YE6xTB7vYSI0FpAMzbzvMhrc/oXuVLgC4/KR8zMJ
+	 UDrQninFy3T0O7BePZxehwj3XHTZGWF5Nonn1z+VFufgsTxQso54PTTeiBbM//nBMU
+	 wI+oal9611BXkNm5bH8Rb+174rULJFhwcOIw/DB0kfSIRAfX4CAhDEtcFzNj5NFdGU
+	 X616bqBYR7DluIkB8g9nHBozLqAWr3/UPEkJbFj2tO/jIqQGzvE/ZhxC4ijXV98Xap
+	 VMDIxv8rBR/Hw==
+Received: by mail-oa1-f70.google.com with SMTP id 586e51a60fabf-286f532c9d5so2000381fac.2
+        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 05:55:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727441705; x=1728046505;
+        h=cc:to:subject:message-id:date:mime-version:references:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sSmJYgv7I+zUFEDVZuQHO2YXTAln9N/geQIOSH+hGyE=;
+        b=a4uHvHdmxef/9P/rSpReDnX03WdIiRRFoiTYy0mRYou1v1A8II/InwQQoB6+ohjv3u
+         rLrylH0c4Ww0xQqzw6foHbxUKUQKXJXwQx5Xi6ZK+MVnPXAboAM3zo+lSVXoUHp78oj3
+         ZSOzPcg/oQusApzqxeGBz6XUClNA/QAs70dvHSb5iz1ZtvYkwmr6X3ZPwsWnj1qyHE/Q
+         2jSf3AhCSsK1JDvnpfx+OxPBFWAxZ4q2mTOZCk4xq5nFMbGgaC6VlS53W3H4FzhcmwDI
+         zqeMxvGlbzHojwL5MecHAh4OEJZjQDTDNMSP4PY6cLcLLNVvteeltlCGGNMneEL2KiJ9
+         O5OA==
+X-Gm-Message-State: AOJu0Yz6Rx/Jyx5YlNL0vzfPLOp/0IQnL6insfoWfguL1v17SlYwIpFP
+	XkXtI3/MIh3ncxr6AWXYqqOctiJ70qVnVD7yb5Q4/Z2qXktd2GFVMcYRrvUu33QLMHiNdrfZNYR
+	ZR3AKvDtWODDeuoCTFJkwNRCe7eIvX6aZ5BafVbHQH5fU5i5NST4BYTiBaStCX6C6709HQzNXmt
+	gfNUQKqL0Y0KQKLrL6dcqtcwo9s72XNkkF5ugVwh8SugJ1
+X-Received: by 2002:a05:6871:890e:b0:27b:66ea:add7 with SMTP id 586e51a60fabf-287109f5bb4mr2306177fac.4.1727441705663;
+        Fri, 27 Sep 2024 05:55:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFq2edOIUBYR+Xf5m9TknVcpYnAPqK6sQBsqv8AamrOSSkCMEyyDtCAwOwZQ7rY9zd/qv/ETMaRzLJy5zKgxVE=
+X-Received: by 2002:a05:6871:890e:b0:27b:66ea:add7 with SMTP id
+ 586e51a60fabf-287109f5bb4mr2306155fac.4.1727441705340; Fri, 27 Sep 2024
+ 05:55:05 -0700 (PDT)
+Received: from 348282803490 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 27 Sep 2024 05:55:04 -0700
+From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+In-Reply-To: <20240926-th1520-dwmac-v2-3-f34f28ad1dc9@tenstorrent.com>
+References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com> <20240926-th1520-dwmac-v2-3-f34f28ad1dc9@tenstorrent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Date: Fri, 27 Sep 2024 05:55:04 -0700
+Message-ID: <CAJM55Z-FLmpFfisNpJi8FP7o_5mwoDa7r18VXW7u7nF0V6oiRw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] riscv: dts: thead: Add TH1520 ethernet nodes
+To: Drew Fustini <dfustini@tenstorrent.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>, Drew Fustini <drew@pdp7.com>, 
+	Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 
-Triggering the reset while in switchdev mode causes
-errors[1]. Rules are already removed by this time
-because switch content is flushed in case of the reset.
-This means that rules were deleted from HW but SW
-still thinks they exist so when we get
-SWITCHDEV_FDB_DEL_TO_DEVICE notification we try to
-delete not existing rule.
+Drew Fustini wrote:
+> From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>
+> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+> [drew: change apb registers from syscon to second reg of gmac node]
+> [drew: add phy reset delay properties for beaglev ahead]
+> Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
+> ---
+>  arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts |  91 ++++++++++++++
+>  .../boot/dts/thead/th1520-lichee-module-4a.dtsi    | 135 +++++++++++++++++++++
+>  arch/riscv/boot/dts/thead/th1520.dtsi              |  50 ++++++++
+>  3 files changed, 276 insertions(+)
 
-We can avoid these errors by clearing the rules
-early in the reset flow before they are removed from HW.
-Switchdev API will get notified that the rule was removed
-so we won't get SWITCHDEV_FDB_DEL_TO_DEVICE notification.
-Remove unnecessary ice_clear_sw_switch_recipes.
+...
 
-[1]
-ice 0000:01:00.0: Failed to delete FDB forward rule, err: -2
-ice 0000:01:00.0: Failed to delete FDB guard rule, err: -2
+> diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+> index ca84bc2039ef..d9d2e1f4dc68 100644
+> --- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+> +++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+> @@ -11,6 +11,11 @@ / {
+>  	model = "Sipeed Lichee Module 4A";
+>  	compatible = "sipeed,lichee-module-4a", "thead,th1520";
+>
+> +	aliases {
+> +		ethernet0 = &gmac0;
+> +		ethernet1 = &gmac1;
+> +	};
+> +
+>  	memory@0 {
+>  		device_type = "memory";
+>  		reg = <0x0 0x00000000 0x2 0x00000000>;
+> @@ -25,6 +30,16 @@ &osc_32k {
+>  	clock-frequency = <32768>;
+>  };
+>
+> +&dmac0 {
+> +	status = "okay";
+> +};
+> +
+> +&aogpio {
+> +	gpio-line-names = "", "", "",
+> +			  "GPIO00",
+> +			  "GPIO04";
+> +};
+> +
 
-Fixes: 7c945a1a8e5f ("ice: Switchdev FDB events support")
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
----
-v2: extend commit msg, add NULL pointer check
----
- .../net/ethernet/intel/ice/ice_eswitch_br.c   |  5 +++-
- .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_main.c     | 24 +++----------------
- 3 files changed, 8 insertions(+), 22 deletions(-)
+These GPIO line names does not belong in this patch. They should
+already be included in your other patchset adding the names for the
+other lines.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-index f5aceb32bf4d..cccb7ddf61c9 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
-@@ -582,10 +582,13 @@ ice_eswitch_br_switchdev_event(struct notifier_block *nb,
- 	return NOTIFY_DONE;
- }
- 
--static void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge)
-+void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge)
- {
- 	struct ice_esw_br_fdb_entry *entry, *tmp;
- 
-+	if (!bridge)
-+		return;
-+
- 	list_for_each_entry_safe(entry, tmp, &bridge->fdb_list, list)
- 		ice_eswitch_br_fdb_entry_notify_and_cleanup(bridge, entry);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-index c15c7344d7f8..66a2c804338f 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
-@@ -117,5 +117,6 @@ void
- ice_eswitch_br_offloads_deinit(struct ice_pf *pf);
- int
- ice_eswitch_br_offloads_init(struct ice_pf *pf);
-+void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge);
- 
- #endif /* _ICE_ESWITCH_BR_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c7db88b517da..dcd4c8204753 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -519,25 +519,6 @@ static void ice_pf_dis_all_vsi(struct ice_pf *pf, bool locked)
- 		pf->vf_agg_node[node].num_vsis = 0;
- }
- 
--/**
-- * ice_clear_sw_switch_recipes - clear switch recipes
-- * @pf: board private structure
-- *
-- * Mark switch recipes as not created in sw structures. There are cases where
-- * rules (especially advanced rules) need to be restored, either re-read from
-- * hardware or added again. For example after the reset. 'recp_created' flag
-- * prevents from doing that and need to be cleared upfront.
-- */
--static void ice_clear_sw_switch_recipes(struct ice_pf *pf)
--{
--	struct ice_sw_recipe *recp;
--	u8 i;
--
--	recp = pf->hw.switch_info->recp_list;
--	for (i = 0; i < ICE_MAX_NUM_RECIPES; i++)
--		recp[i].recp_created = false;
--}
--
- /**
-  * ice_prepare_for_reset - prep for reset
-  * @pf: board private structure
-@@ -574,8 +555,9 @@ ice_prepare_for_reset(struct ice_pf *pf, enum ice_reset_req reset_type)
- 	mutex_unlock(&pf->vfs.table_lock);
- 
- 	if (ice_is_eswitch_mode_switchdev(pf)) {
--		if (reset_type != ICE_RESET_PFR)
--			ice_clear_sw_switch_recipes(pf);
-+		rtnl_lock();
-+		ice_eswitch_br_fdb_flush(pf->eswitch.br_offloads->bridge);
-+		rtnl_unlock();
- 	}
- 
- 	/* release ADQ specific HW and SW resources */
--- 
-2.39.3
-
+/Emil
 
