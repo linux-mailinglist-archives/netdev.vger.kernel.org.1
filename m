@@ -1,84 +1,98 @@
-Return-Path: <netdev+bounces-130143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A075988931
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:37:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40B8988907
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:25:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D301B28280A
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:37:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBDA1C20AEC
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AEA18872F;
-	Fri, 27 Sep 2024 16:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E88D17166E;
+	Fri, 27 Sep 2024 16:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="KDOPmqJA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kVlMyhzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A371714B6
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 16:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD252B9B5;
+	Fri, 27 Sep 2024 16:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727455040; cv=none; b=sT4vbj+G8S6t85jcK66KGAxn6fYpqNeqxztNP66AZac39s65utz4aA3P4wW85ORMdMjM6YhD+TB3oP/VoiD804j+5WXWB8t6xPjBGQdmCgCUUZJjOXzcONjZbiSmqtvAxDhGjGOZOxKhATP7mbfzXquILmxpdh1j8FZ0PC/8yQo=
+	t=1727454304; cv=none; b=txj6JDNyUloB0Qu8fmS5t2d01S/n2QZNed+8V+kyG6G1Ea2hLf5ivWL5PGjlLY579v19r6NlrJC35/uo/JafzPZQIl3CWwc9oPjP9m5RKoZ+21+o6DgiVHyOFcGgWxVvK3xoeuCVfvtfRiDasw05NnnwYeuzuKGvjtSTmNxd7cM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727455040; c=relaxed/simple;
-	bh=kG7beUEDBu4spnoxNTU7xqUf6zhqs7qRcLM8FX8fXHY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=W4RIq1ifYtKV8X60zKurLLVvDp4fJ9nRdYu5LvXe+XpSMZbs9WGpekeofvWvgAUCbUaFC0FPz4qUkQWeQvZrO5nww7mZvpDlGVt6wwEkJB9toU649EaAJHQrmx8j0f9lecSyMGcTsSoCS2eYUvquStWxuDC/GE+MtxDKCJy0Cn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=KDOPmqJA; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 2CD408839A;
-	Fri, 27 Sep 2024 18:37:15 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727455036;
-	bh=uR0tH3U7QzW4VSSqPaCwB8EBiTCMVM4YBGwkc/W9yL8=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=KDOPmqJAo2PWyGpgb7L9EsEUyi1NuwP2yzPBoKAythfX2mEOnVit8Mo6XWkOaK6Dm
-	 7BfPNkC7j1OfLBx2gza/TMom7znUYwMfrmmhl+nbHAiRdpZ+UbfpTOV+kXJALP0Et7
-	 F+cO/t+U0yo+/eJM0NhnAIfsXOaCVCGklEfMG8/WKSuTRZslFVDp/Dd5JIJusU+4BT
-	 RW9mLBJoG1JaywBU3SIwpiwN52voYzjH2TYxuhj+aBDXALNr+DdPD5uQ100D4OFGKY
-	 7cF0xN8rRWUs/T8kLZtBhK9b4aV7vxTmV28s1+twL2OEk+ECej2MlbdzcWH9199RnF
-	 rmNxSNqZqhzrQ==
-Message-ID: <e74c3f69-3c17-46bb-95c8-50075db39cb8@denx.de>
-Date: Fri, 27 Sep 2024 14:12:09 +0200
+	s=arc-20240116; t=1727454304; c=relaxed/simple;
+	bh=uHV78x04NiotWc7oMLtEikHJ+iec588lfT3Fa7lR8Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cTa3quLZerjAT5paaJgVx97lXLh3QyoaY9lcjDuSLNFwHWIoeKBbC2fwu1Hgi+eXBDD78MCFQqIAPEfIvigYZ4CXHzHp4XagAqRplL3MODLEkR63368CpcaxDB4vIoZ84rCFTEKv9a1e8JhNlyEFh+G7K+gaakHpo5AWfmtR0io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kVlMyhzD; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 97D2920008;
+	Fri, 27 Sep 2024 16:24:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727454294;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M/awAcCMMa99o4Y4kUEvD11vhsBuYYvwpwMnsRHMj5I=;
+	b=kVlMyhzDJwScPYvoFwNOlJTrlHD9Oh3KxSbS9Cevg0irT5MI7h/MP6yDePvC24iYgmifR3
+	/d9Hh+huHUo00PDjsEZsP04CXk4LTPViva/2bWAkpcjzS4caUdDj6ZaebSdLl1q3lXv0o9
+	V9fg1kEG4P9/wo62A98b2Pyrz7xcRpK9T6kEMtSnxi4az+IG4kxjZkeoQrlUBAe53b55Kr
+	trcnkkyMsueOBIxu5ESYgukxPEGW3bIlMWX2so8kVlTQLXT6anLdouTMzqXEBmYnBWik2k
+	dIxnAew+Xkwrc5tBeeZ2pYguKAkCzAeY6kwDIfQa8ven16aUPyyY75u2aM1imQ==
+Date: Fri, 27 Sep 2024 18:24:51 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Halaney <ahalaney@redhat.com>, "Russell King (Oracle)"
+ <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>, "linux-tegra@vger.kernel.org"
+ <linux-tegra@vger.kernel.org>, Brad Griffis <bgriffis@nvidia.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, Jon Hunter <jonathanh@nvidia.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, kernel@quicinc.com
+Subject: Re: [PATCH net v4 1/2] net: phy: aquantia: AQR115c fix up PMA
+ capabilities
+Message-ID: <20240927182451.2927c944@fedora.home>
+In-Reply-To: <20240927010553.3557571-2-quic_abchauha@quicinc.com>
+References: <20240927010553.3557571-1-quic_abchauha@quicinc.com>
+	<20240927010553.3557571-2-quic_abchauha@quicinc.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: phy: realtek: Check the index value in
- led_hw_control_get
-To: Hui Wang <hui.wang@canonical.com>, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
-References: <20240927114610.1278935-1-hui.wang@canonical.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <20240927114610.1278935-1-hui.wang@canonical.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 9/27/24 1:46 PM, Hui Wang wrote:
-> Just like rtl8211f_led_hw_is_supported() and
-> rtl8211f_led_hw_control_set(), the rtl8211f_led_hw_control_get() also
-> needs to check the index value, otherwise the caller is likely to get
-> an incorrect rules.
+On Thu, 26 Sep 2024 18:05:52 -0700
+Abhishek Chauhan <quic_abchauha@quicinc.com> wrote:
+
+> AQR115c reports incorrect PMA capabilities which includes
+> 10G/5G and also incorrectly disables capabilities like autoneg
+> and 10Mbps support.
 > 
-> Fixes: 17784801d888 ("net: phy: realtek: Add support for PHY LEDs on RTL8211F")
-> Signed-off-by: Hui Wang <hui.wang@canonical.com>
-Reviewed-by: Marek Vasut <marex@denx.de>
+> AQR115c as per the Marvell databook supports speeds up to 2.5Gbps
+> with autonegotiation.
+> 
+> Fixes: 0ebc581f8a4b ("net: phy: aquantia: add support for aqr115c")
+> Link: https://lore.kernel.org/all/20240913011635.1286027-1-quic_abchauha@quicinc.com/T/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 
-Thanks !
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Thanks for the changes,
+
+Maxime
 
