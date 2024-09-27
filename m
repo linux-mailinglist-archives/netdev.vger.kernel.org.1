@@ -1,213 +1,163 @@
-Return-Path: <netdev+bounces-130070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4974E987FB4
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:46:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0246E987FC4
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCDDF1F236E8
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:46:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 813FD1F21A34
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F86189514;
-	Fri, 27 Sep 2024 07:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD5218800E;
+	Fri, 27 Sep 2024 07:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vfkdV9Fo"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="jbpSondS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FAD17C98E
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 07:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F100E17ADE7
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 07:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727423158; cv=none; b=Kt2IBIUtWQ5oDgMNg43psyQH/6p1O8TdLrGFZO8NSDeP4flGRc9Srq4dlIA70xJL6MRdZNLBq2kG2zjbTJNiZrdmEyFM3v+CGACE37LrBZMHwgSlJ8yuvs5rtri1hMS88+cNyO7dXKCEPBc96f3HNrkJPhPiH11Qw8pDROHSJUY=
+	t=1727423461; cv=none; b=cIgLyBTqPgJDCibmVd5CQSvRZzrgT85V/J8Tno/hjZaiXG0SgVz9mDFDdPrvMDtvcEPhWmGqQtCLEQqm6QXNdcbRfEDH3JH9c/UReBQuDqaUZKNvuPx0HLi1Nqlivp9iHenVYlmFcxCv8GdN6GM84pLyJjhFPxmOXLisDEhTkLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727423158; c=relaxed/simple;
-	bh=dGHWEFKbK9NV3M7oFRGPIqxu8D9llSJvGCog9SZQu6Q=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fP7d4Yk7zwtXf6d5p8LHhlxFJsqcz1BKkK4Va8hAV+V1kCsrRc9tDFOpKXYDTJdzOgzRBDCJDioQpTk6R1qdLr5pyUJg7Xli0YpVDSGH9ufOWzwJW/CmWO91zhKcL8xFUB2A16g5mCnrK4cSvrnhnQ2BZj/KzRzHbUxsXurUQDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vfkdV9Fo; arc=none smtp.client-ip=209.85.222.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7acac374c62so320536685a.0
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 00:45:55 -0700 (PDT)
+	s=arc-20240116; t=1727423461; c=relaxed/simple;
+	bh=1XWbA421ewP3G2P/HXsU+35TLSJuYb8F5115d2JuIes=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EGvexbDNzgdYyYQFADDyMmD7zjNdd56VIrPclBBMGdT0/x+LhbowQmc9iK5gO4eatryfL2A73kO7LbOX+aqlQxQsRl7YknQ1sLQe0YwKzNB892yPaWqwZigi/Pd/51j6DjEr68SQsmRpuJij49ioY1wUuPaM6WxN+kyNIXISkZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=jbpSondS; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71b8d10e990so231285b3a.3
+        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 00:50:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727423155; x=1728027955; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pUF4RBI4M79Gi4DYza1gFrabJdISv0HpCIwZl1HdFfE=;
-        b=vfkdV9FoyPYXJP43kvc6Mkvm8ZQW99mXiwCeUX0ptgZq8+wvrUYyAh2iLPp1QiFYSN
-         hNqlckHWP7ad0OO3DA/BtHAptFApOE6YTxePISOBW0+v2TX6GwNtrLaOModccl/JgBoW
-         xsrp0FlyOknmBYkel+Sj9vARDva8K4IGy/ahuDM7ina7x7dw25zxF9r7+5M1UaDLohlt
-         XeQ8vAe7IvBd/inJSYRmEOmRiZ21Xaq4MwMgOOPz9h38qpeAYoPQutEzFmT9CSwrsffN
-         plK/Rk4FAgnB2rmo9bwwcwMZVlLkbESxhCwWM+kCqvBCxNAhUo10MwLyZ8vKTaK4Gr/2
-         ezPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727423155; x=1728027955;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727423459; x=1728028259; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=pUF4RBI4M79Gi4DYza1gFrabJdISv0HpCIwZl1HdFfE=;
-        b=JrRMDfglrbhUm2EIUk7oE3m23fHbe592sBHD3tq+XVYUpek1EwloyvdCY/LCjDxmWM
-         uVsqlm0J8J9Ewwk2G1xCl/jhZdl2VY5sLIgAYvfEjriRsHAfl2jUVYwK2b1fsWyKCC/I
-         iLftPBDlY5e8zXopVqsL9xoaRZsYfiv+ORpEljrnRKu5JMvH8fOhqgn2qFB+TMD9SUGb
-         frUFsK6OnGxAun4UWki9DhA7E3JDejvoVLvkl287GwgI7fzBzqRZLScTUCcLx+vWNrbK
-         XTMWcBCymKyNTwHMXT5B9RQLXhbjfzMhnmPMSMWyD1AHbb2mcu3iiE4pqfJ/a1Nv7KJA
-         tB2Q==
-X-Gm-Message-State: AOJu0YyVx47CqZ0/4081/Ii5SEVmEQBKlLeArrgUJNnL7vXZwzFMPlC1
-	xXE4cScguY4f6iH3HDtaB8S/fgNjSGzUPkgNMRJ5S5IOiH9ntHwsl7mlAkSXceV8P9/Xqr4bxGo
-	Sm4KZORMCBQ==
-X-Google-Smtp-Source: AGHT+IEweebBqYiy8/7NgifFD1X4JSJ0dea3dkGo3dgtab6WGPHpMIEIEDGFTuyCDzyXNaxWEORAiEetqSlMvQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:620a:4b42:b0:7ac:9ce5:82b0 with SMTP
- id af79cd13be357-7ae378b97bfmr159785a.9.1727423155130; Fri, 27 Sep 2024
- 00:45:55 -0700 (PDT)
-Date: Fri, 27 Sep 2024 07:45:53 +0000
+        bh=9mrBjCEzDghLMu7q7zU/heNlCn+vyTex908H4IY9f3o=;
+        b=jbpSondS9vHzeVvl0NRIjqQq1IbsSWUXsTkASEZx9sdChqY0OH9cHxOAqtYOElMyBE
+         XZ22/xHwifVjf0OBUr3BSG4LCqZ36JYV7YozWHHIrQ8iKTgTWjJcfibNR9xJhnjgfOME
+         PSFOtCRRgXCNBqO7H3ri9q/ZmsN6yunbC5m5eBBDc6Dkuvrc+OkVn9VYhvz+ItqAFO/E
+         VP/YS+aLrqJhzFtyCzwoLwUcZDv3zyUSHJ25OpC4I9EyjpOvAMSfQ5zmZtclvluHLV4p
+         FdXn+YmwATgLlL6wEzWu/88Dqv+9cZ74QBkiGpv2xxVMazO3ndFbnYVbaVyaNHlBjX5F
+         rZNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727423459; x=1728028259;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9mrBjCEzDghLMu7q7zU/heNlCn+vyTex908H4IY9f3o=;
+        b=iYp9aMmJMyUJ0xHHmsps+mI9EjeAIC122vt1W0hye1OmjELRRIXDYV/37yejsRWeFU
+         ft0FbcvYZSloI5wOAZeJiQHzUEaSrowDcpwGXCquycciqJCM9Evd5A1/PfAkgXBN9Wa7
+         edtbXqv/ht034WpG6o62GWaP3jhapovfcq2pee/kA3xHvgaZKkLnWIuU/30gibXwg8Ph
+         tb0HvbI2eqlz0N11VxSgvLh8f65H8DA1rAi+KMKBEjAArvfRXHtqejtZ8MTff7ynqBRa
+         xkqukNkJTdiNO4O3ZYtkqnu0sswEc41sFulFppQrRJGMAaSTC2VDt3WpCwwhRySymtkz
+         teEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXAeIRE46oPqtDxLftPs3dugOruI778LaHhPqIsMrKW7CZ8iaKTjYSG0G0cXvueLV1rIA5S7pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfBE0l10RH8chujMJOlMD5q90Eiydb4mZver6R3hg3P/c3PnPw
+	hstYOpixq+ck2KahxG2Pk0hSDVL22+OS3s9d/pNTJwkxl5cHTFbREHEqbHVu8Fk=
+X-Google-Smtp-Source: AGHT+IHo6DRnQxWatrhP0ZF10f+nLGL64WMuTqlvD8bPjr4v7ZsMqd6qebmeuqkhoZIrakB8io6gqA==
+X-Received: by 2002:a05:6a00:1806:b0:714:1a7c:b727 with SMTP id d2e1a72fcca58-71b25f36725mr3632502b3a.8.1727423459264;
+        Fri, 27 Sep 2024 00:50:59 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b2652bb69sm1009571b3a.150.2024.09.27.00.50.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2024 00:50:58 -0700 (PDT)
+Message-ID: <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
+Date: Fri, 27 Sep 2024 16:50:54 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
-Message-ID: <20240927074553.341910-1-edumazet@google.com>
-Subject: [PATCH net] ppp: do not assume bh is held in ppp_channel_bridge_input()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+bd8d55ee2acd0a71d8ce@syzkaller.appspotmail.com, 
-	Tom Parkin <tparkin@katalix.com>, James Chapman <jchapman@katalix.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
+ <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
+ <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
+ <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Networking receive path is usually handled from BH handler.
-However, some protocols need to acquire the socket lock, and
-packets might be stored in the socket backlog is the socket was
-owned by a user process.
+On 2024/09/27 13:31, Jason Wang wrote:
+> On Fri, Sep 27, 2024 at 10:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2024/09/25 12:30, Jason Wang wrote:
+>>> On Tue, Sep 24, 2024 at 5:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> virtio-net have two usage of hashes: one is RSS and another is hash
+>>>> reporting. Conventionally the hash calculation was done by the VMM.
+>>>> However, computing the hash after the queue was chosen defeats the
+>>>> purpose of RSS.
+>>>>
+>>>> Another approach is to use eBPF steering program. This approach has
+>>>> another downside: it cannot report the calculated hash due to the
+>>>> restrictive nature of eBPF.
+>>>>
+>>>> Introduce the code to compute hashes to the kernel in order to overcome
+>>>> thse challenges.
+>>>>
+>>>> An alternative solution is to extend the eBPF steering program so that it
+>>>> will be able to report to the userspace, but it is based on context
+>>>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+>>>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+>>>> and vhost_net).
+>>>>
+>>>
+>>> I wonder if we could clone the skb and reuse some to store the hash,
+>>> then the steering eBPF program can access these fields without
+>>> introducing full RSS in the kernel?
+>>
+>> I don't get how cloning the skb can solve the issue.
+>>
+>> We can certainly implement Toeplitz function in the kernel or even with
+>> tc-bpf to store a hash value that can be used for eBPF steering program
+>> and virtio hash reporting. However we don't have a means of storing a
+>> hash type, which is specific to virtio hash reporting and lacks a
+>> corresponding skb field.
+> 
+> I may miss something but looking at sk_filter_is_valid_access(). It
+> looks to me we can make use of skb->cb[0..4]?
 
-In this case, release_sock(), __release_sock(), and sk_backlog_rcv()
-might call the sk->sk_backlog_rcv() handler in process context.
+I didn't opt to using cb. Below is the rationale:
 
-sybot caught ppp was not considering this case in
-ppp_channel_bridge_input() :
+cb is for tail call so it means we reuse the field for a different 
+purpose. The context rewrite allows adding a field without increasing 
+the size of the underlying storage (the real sk_buff) so we should add a 
+new field instead of reusing an existing field to avoid confusion.
 
-WARNING: inconsistent lock state
-6.11.0-rc7-syzkaller-g5f5673607153 #0 Not tainted
---------------------------------
-inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-ksoftirqd/1/24 [HC0[0]:SC1[1]:HE1:SE0] takes:
- ffff0000db7f11e0 (&pch->downl){+.?.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
- ffff0000db7f11e0 (&pch->downl){+.?.}-{2:2}, at: ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
- ffff0000db7f11e0 (&pch->downl){+.?.}-{2:2}, at: ppp_input+0x16c/0x854 drivers/net/ppp/ppp_generic.c:2304
-{SOFTIRQ-ON-W} state was registered at:
-   lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
-   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-   _raw_spin_lock+0x48/0x60 kernel/locking/spinlock.c:154
-   spin_lock include/linux/spinlock.h:351 [inline]
-   ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
-   ppp_input+0x16c/0x854 drivers/net/ppp/ppp_generic.c:2304
-   pppoe_rcv_core+0xfc/0x314 drivers/net/ppp/pppoe.c:379
-   sk_backlog_rcv include/net/sock.h:1111 [inline]
-   __release_sock+0x1a8/0x3d8 net/core/sock.c:3004
-   release_sock+0x68/0x1b8 net/core/sock.c:3558
-   pppoe_sendmsg+0xc8/0x5d8 drivers/net/ppp/pppoe.c:903
-   sock_sendmsg_nosec net/socket.c:730 [inline]
-   __sock_sendmsg net/socket.c:745 [inline]
-   __sys_sendto+0x374/0x4f4 net/socket.c:2204
-   __do_sys_sendto net/socket.c:2216 [inline]
-   __se_sys_sendto net/socket.c:2212 [inline]
-   __arm64_sys_sendto+0xd8/0xf8 net/socket.c:2212
-   __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
-   invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
-   el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
-   do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
-   el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
-   el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
-   el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
-irq event stamp: 282914
- hardirqs last  enabled at (282914): [<ffff80008b42e30c>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
- hardirqs last  enabled at (282914): [<ffff80008b42e30c>] _raw_spin_unlock_irqrestore+0x38/0x98 kernel/locking/spinlock.c:194
- hardirqs last disabled at (282913): [<ffff80008b42e13c>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
- hardirqs last disabled at (282913): [<ffff80008b42e13c>] _raw_spin_lock_irqsave+0x2c/0x7c kernel/locking/spinlock.c:162
- softirqs last  enabled at (282904): [<ffff8000801f8e88>] softirq_handle_end kernel/softirq.c:400 [inline]
- softirqs last  enabled at (282904): [<ffff8000801f8e88>] handle_softirqs+0xa3c/0xbfc kernel/softirq.c:582
- softirqs last disabled at (282909): [<ffff8000801fbdf8>] run_ksoftirqd+0x70/0x158 kernel/softirq.c:928
+We are however no longer allowed to add a new field. In my 
+understanding, this is because it is an UAPI, and eBPF maintainers found 
+it is difficult to maintain its stability.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+Reusing cb for hash reporting is a workaround to avoid having a new 
+field, but it does not solve the underlying problem (i.e., keeping eBPF 
+as stable as UAPI is unreasonably hard). In my opinion, adding an ioctl 
+is a reasonable option to keep the API as stable as other virtualization 
+UAPIs while respecting the underlying intention of the context rewrite 
+feature freeze.
 
-       CPU0
-       ----
-  lock(&pch->downl);
-  <Interrupt>
-    lock(&pch->downl);
-
- *** DEADLOCK ***
-
-1 lock held by ksoftirqd/1/24:
-  #0: ffff80008f74dfa0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire+0x10/0x4c include/linux/rcupdate.h:325
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 24 Comm: ksoftirqd/1 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call trace:
-  dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
-  show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
-  __dump_stack lib/dump_stack.c:93 [inline]
-  dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
-  dump_stack+0x1c/0x28 lib/dump_stack.c:128
-  print_usage_bug+0x698/0x9ac kernel/locking/lockdep.c:4000
- mark_lock_irq+0x980/0xd2c
-  mark_lock+0x258/0x360 kernel/locking/lockdep.c:4677
-  __lock_acquire+0xf48/0x779c kernel/locking/lockdep.c:5096
-  lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
-  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-  _raw_spin_lock+0x48/0x60 kernel/locking/spinlock.c:154
-  spin_lock include/linux/spinlock.h:351 [inline]
-  ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
-  ppp_input+0x16c/0x854 drivers/net/ppp/ppp_generic.c:2304
-  ppp_async_process+0x98/0x150 drivers/net/ppp/ppp_async.c:495
-  tasklet_action_common+0x318/0x3f4 kernel/softirq.c:785
-  tasklet_action+0x68/0x8c kernel/softirq.c:811
-  handle_softirqs+0x2e4/0xbfc kernel/softirq.c:554
-  run_ksoftirqd+0x70/0x158 kernel/softirq.c:928
-  smpboot_thread_fn+0x4b0/0x90c kernel/smpboot.c:164
-  kthread+0x288/0x310 kernel/kthread.c:389
-  ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-Fixes: 4cf476ced45d ("ppp: add PPPIOCBRIDGECHAN and PPPIOCUNBRIDGECHAN ioctls")
-Reported-by: syzbot+bd8d55ee2acd0a71d8ce@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/66f661e2.050a0220.38ace9.000f.GAE@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Tom Parkin <tparkin@katalix.com>
-Cc: James Chapman <jchapman@katalix.com>
----
- drivers/net/ppp/ppp_generic.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-index 4b2971e2bf484a13b5e94ac3b9862224adac4c41..0d5cd705decb1fe19d15848125beabda40edf46b 100644
---- a/drivers/net/ppp/ppp_generic.c
-+++ b/drivers/net/ppp/ppp_generic.c
-@@ -2269,7 +2269,7 @@ static bool ppp_channel_bridge_input(struct channel *pch, struct sk_buff *skb)
- 	if (!pchb)
- 		goto out_rcu;
- 
--	spin_lock(&pchb->downl);
-+	spin_lock_bh(&pchb->downl);
- 	if (!pchb->chan) {
- 		/* channel got unregistered */
- 		kfree_skb(skb);
-@@ -2281,7 +2281,7 @@ static bool ppp_channel_bridge_input(struct channel *pch, struct sk_buff *skb)
- 		kfree_skb(skb);
- 
- outl:
--	spin_unlock(&pchb->downl);
-+	spin_unlock_bh(&pchb->downl);
- out_rcu:
- 	rcu_read_unlock();
- 
--- 
-2.46.1.824.gd892dcdcdd-goog
-
+Regards,
+Akihiko Odaki
 
