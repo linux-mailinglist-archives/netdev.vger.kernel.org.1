@@ -1,100 +1,224 @@
-Return-Path: <netdev+bounces-130057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 055F2987DCD
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:16:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C58B987E02
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 376021C227BA
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 05:16:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF3521C21F92
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 05:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA0771750;
-	Fri, 27 Sep 2024 05:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC8A176AC7;
+	Fri, 27 Sep 2024 05:54:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="nuYOX2Kq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lptup54I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E699184F
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 05:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA26F174EFA
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 05:54:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727414183; cv=none; b=ECNTPwTVQdThTd6UA9odyy4Qv1hgFU2YajX3m49QCg9rjUKXk19Khcsk1ojbiAcN1QMjBN8/XAz4SDb6mbMYBERKgtOOlR0x7m7KmyFUKTcxNN6MkNI3jBxP2zxCcvWiwVQh8qAiqkrI4ihnKCH98kunQcZQ7ygZO7r3gff+P9M=
+	t=1727416458; cv=none; b=BmB9W9Z9/LJObjGWyx5CoOZAoMO1124VAV7Js4sNgI9LLlW/W/KSktOK4LO+AXLKton9WJZ/WO0qq/LXpmlU2PXwDgw0sUHZ4AHPYYEDOnXqTOffFYwS5R2LCOsDdAcS2PPwe0X8DhSj47cEvKj457/4zteXneMRhbRQMwrJxI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727414183; c=relaxed/simple;
-	bh=9AAw5btleGGiV7XRXNQp6uOjmZ57QQoEoZeMw4x9J24=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=jR1eGDOML8+KasUDUrr0TvvPW34kXGuxrJzSl6RCTQt1ObK06ojUvDVGTEH5UxiOn1u6TRoiYjaoGciGAPNIZBF8rE14Yj6e6YK3mZovfGMaKY7VVsmVTXU4DaloBz/epU4jTty+XLdBvcuoLjPqIG0vdAeNCaXprUWWgCI6Z18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=nuYOX2Kq; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Type:To:Subject:Message-ID:Date:From:
-	MIME-Version:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9AAw5btleGGiV7XRXNQp6uOjmZ57QQoEoZeMw4x9J24=; t=1727414182; x=1728278182; 
-	b=nuYOX2KqVxy/bBObB8KwTqRQB1Xl/CTTvLFfTerHp+O/Qxo5zlJRbymyXDYKQsYjyqPlHDME0MG
-	WXfi+X8LiPqJUfOlkc1yHfRF0eqGB9ga2hlPI1eHouV4ogSNFbuX+RdIT/UZDdTyh6hK3nYdDPRGB
-	pjE/AYJPpj4LTOQqtx0+eKMqUI840pfbfnYaF4rf2jwblrxkZ8lG3TrXMIo3IJwvkhWJxXLW8GULc
-	UcYqHSbuXvAL7yI89kAiFwu+Yd/cJbk2wk5ritfoRerPuiCZFYN/NYY03zBAh7Ooj15vycJOW6lHF
-	3i/xq93wDHY9iWyEPGPd7P6slLBYXaXSA/Kw==;
-Received: from mail-oo1-f49.google.com ([209.85.161.49]:57828)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1su30I-0003Rn-FP
-	for netdev@vger.kernel.org; Thu, 26 Sep 2024 21:54:55 -0700
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5e1b35030aeso988917eaf.3
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 21:54:54 -0700 (PDT)
-X-Gm-Message-State: AOJu0Yyta3xhHuFMPrdvNkKdhh2aS3xEvJr8UBcmrVBHkr68FQ9rW8+B
-	z65dCbwfN6m1kwfGWHZHb3SS+B1bGsCA4F10sWd8j8LovWjo5a805tFYD0BpM0bfbMOifZwFrvL
-	0vwosHpU4XdsvsLmxUNF9qtn+oyE=
-X-Google-Smtp-Source: AGHT+IHXoU8XQDvsSGxCnBbFTELKcascjyIqg/nIQ3ZDzwa5qWPLUwe7n6uBaTN7dzGodPja1RZgx9C5s2tvPmi1lcM=
-X-Received: by 2002:a05:6871:7295:b0:277:fe14:e68c with SMTP id
- 586e51a60fabf-28710b9e1acmr1791368fac.33.1727412893887; Thu, 26 Sep 2024
- 21:54:53 -0700 (PDT)
+	s=arc-20240116; t=1727416458; c=relaxed/simple;
+	bh=G4hpnvLo0m/PQe/eCqe2pef7O4TSc1+b2w1IPvUZUSM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UXFY+RNXJnisTe+hJN2s90aw/MTxl5NFL9w/NWwaskyRMHamLvcemi79NHJzOckplx0x53Hjs/omASW25xaMS44aL+nX85leckg9CBhLf3j1KqrA8NjZiECumw9Z4q7wWR+kWnxOqkQ9c8m96zGtBDMNQllIt1uwHZvygNWmrCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lptup54I; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-45b4e638a9aso113191cf.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 22:54:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727416455; x=1728021255; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Fbg8QJSSUgH7Q4nHSRemybsPSlB855qz0uznqiadyvc=;
+        b=Lptup54IuW8FcaZfM/tPOF7A8ARekxwdyZJX2+ajQnPBv+RzcTqYiT3Z6aBICNzld7
+         B3Jshr6LVb0Im1ZhLfCuT6aLVrGmAOyGucG529+ZfR9k+mJUowt1IGcuWPXJ1GhGC0fy
+         zG7SipmI90f3ZLqWmjc1ftKXkvAOHdtbm3jOo+zK6M6YCl9Y1P7yf7uPl5KkV37L8mHe
+         2Xp2AbrEgMRgoHRpcSO8iYovN4fkqXlhg0fPiySP/BfdNmtkdlnWR/ZWk7i7h5sE31RX
+         B09848O4DfjmVnRJhF8mL5q/xiTb9kLFvVd6U5a1By8SEUIyiNhDKwD73gsdWNTNN90y
+         rd9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727416455; x=1728021255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fbg8QJSSUgH7Q4nHSRemybsPSlB855qz0uznqiadyvc=;
+        b=lTYe+O2W+kn7anlJnx5ibXwmjRUHcMDHWBj02SwUGdPilbhV+b8i0J7rBnpbGZr310
+         mLR1DwMaAV/+Z54Cz35/yMLxkEyhwXcEX3XVM0cAC1heMnS1u2wXa/IbK1P1ToWzqlf6
+         fKRBNUgKFD25vMQ03lNhl7qNos/NL2wZE2HrJF8B4WOeVuOVFbP4pBKc9Frwida+AFL2
+         mAvgjW0QU6qFYf5tkPu8PpCr+rPZe6JJ06VugKVB7l4OCsIggoRwpXRqTvBYGGTzAksP
+         hXwvzLqTZMBr/LjSnrmrjMCsccRGDs3g8CW9HZhE6IxFwthMqBoJNLzspl44m5EHIdIB
+         gLJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrRav14iU4zpIQRK+hHBWfWpV0LUNqSITcezxcg/Lzw2UV21e43O/rdi+gdyJapF8S71Pma/g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynglQqeZJa6tDdLCSkp9BtWxi9MvQqvGtQ05h6ylcFK9WtL/lz
+	97KptkCW/5Jvf0PnE5+eZtoct2piwh265zfBiBiPCR+HyZuCEVK1I2fs6LuxXwUGzpHKSjp0Hnj
+	0KqGDA5895j2/X8EB0ANeNOcH/C5HK/wrtrUj
+X-Google-Smtp-Source: AGHT+IFlWAzqms00GpX5qYW9TQZFSIQORw0rsVCeZaOGfdUcQ3vPP90oLkUJ8sEZ5IgWc6qBEG83z217FGnc5KOy/AE=
+X-Received: by 2002:a05:622a:7d0e:b0:453:58b6:e022 with SMTP id
+ d75a77b69052e-45ca02b0365mr2089571cf.28.1727416455179; Thu, 26 Sep 2024
+ 22:54:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 26 Sep 2024 21:54:18 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
-Message-ID: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
-Subject: Advice on upstreaming Homa
-To: netdev@vger.kernel.org
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-3-linyunsheng@huawei.com> <CAHS8izOxugzWJDTc-4CWqaKABTj=J4OHs=Lcb=SE9r8gX0J+yg@mail.gmail.com>
+ <842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com>
+In-Reply-To: <842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 26 Sep 2024 22:54:01 -0700
+Message-ID: <CAHS8izN-3Ooiexsr+Xp2234=GqMUy0sTTMqExKVkXAgmjeWQ6w@mail.gmail.com>
+Subject: Re: [PATCH net v2 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com, 
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	IOMMU <iommu@lists.linux.dev>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Score: 1.7
-X-Spam-Level: *
-X-Scan-Signature: acf3039aa8d32d1ac60a71149e52b94c
+Content-Transfer-Encoding: quoted-printable
 
-I would like to start the process of upstreaming the Homa transport
-protocol, and I'm writing for some advice.
+On Thu, Sep 26, 2024 at 8:58=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/9/27 2:15, Mina Almasry wrote:
+> >
+> >> In order not to do the dma unmmapping after driver has already
+> >> unbound and stall the unloading of the networking driver, add
+> >> the pool->items array to record all the pages including the ones
+> >> which are handed over to network stack, so the page_pool can
+> >> do the dma unmmapping for those pages when page_pool_destroy()
+> >> is called.
+> >
+> > One thing I could not understand from looking at the code: if the
+> > items array is in the struct page_pool, why do you need to modify the
+> > page_pool entry in the struct page and in the struct net_iov? I think
+> > the code could be made much simpler if you can remove these changes,
+> > and you wouldn't need to modify the public api of the page_pool.
+>
+> As mentioned in [1]:
+> "There is no space in 'struct page' to track the inflight pages, so
+> 'pp' in 'struct page' is renamed to 'pp_item' to enable the tracking
+> of inflight page"
+>
+> As we still need pp for "struct page_pool" for page_pool_put_page()
+> related API, the container_of() trick is used to get the pp from the
+> pp_item.
+>
+> As you had changed 'struct net_iov' to be mirroring the 'struct page',
+> so change 'struct net_iov' part accordingly.
+>
+> 1. https://lore.kernel.org/all/50a463d5-a5a1-422f-a4f7-d3587b12c265@huawe=
+i.com/
+>
 
-Homa contains about 15 Klines of code. I have heard conflicting
-suggestions about how much to break it up for the upstreaming process,
-ranging from "just do it all in one patch set" to "it will need to be
-chopped up into chunks of a few hundred lines". The all-at-once
-approach is certainly easiest for me, and if it's broken up, the
-upstreamed code won't be functional until a significant fraction of it
-has been upstreamed. What's the recommended approach here?
+I'm not sure we need the pages themselves to have the list of pages
+that need to be dma unmapped on page_pool_destroy. The pool can have
+the list of pages that need to be unmapped on page_pool_destroy, and
+the individual pages need not track them, unless I'm missing
+something.
 
-I'm still pretty much a newbie when it comes to submitting Linux code.
-Is there anyone with more experience who would be willing to act as my
-guide? This would involve answering occasional questions and pointing
-me to online information that I might otherwise miss, in order to
-minimize the number of stupid things that I do.
+> >
+> >> As the pool->items need to be large enough to avoid
+> >> performance degradation, add a 'item_full' stat to indicate the
+> >> allocation failure due to unavailability of pool->items.
+> >>
+> >
+> > I'm not sure there is any way to size the pool->items array correctly.
+>
+> Currently the size of pool->items is calculated in page_pool_create_percp=
+u()
+> as below, to make sure the size of pool->items is somewhat twice of the
+> size of pool->ring so that the number of page sitting in the driver's rx
+> ring waiting for the new packet is the similar to the number of page that=
+ is
+> still being handled in the network stack as most drivers seems to set the
+> pool->pool_size according to their rx ring size:
+>
+> +#define PAGE_POOL_MIN_INFLIGHT_ITEMS           512
+> +       unsigned int item_cnt =3D (params->pool_size ? : 1024) +
+> +                               PP_ALLOC_CACHE_SIZE + PAGE_POOL_MIN_INFLI=
+GHT_ITEMS;
+> +       item_cnt =3D roundup_pow_of_two(item_cnt);
+>
 
-I am happy to serve as maintainer for the code once it is uploaded. Is
-it a prerequisite for there to be at least 2 maintainers?
+I'm not sure it's OK to add a limitation to the page_pool that it can
+only allocate N pages. At the moment, AFAIU, N is unlimited and it may
+become a regression if we add a limitation.
 
-Any other thoughts and suggestions are also welcome.
+> > Can you use a data structure here that can grow? Linked list or
+> > xarray?
+> >
+> > AFAIU what we want is when the page pool allocates a netmem it will
+> > add the netmem to the items array, and when the pp releases a netmem
+> > it will remove it from the array. Both of these operations are slow
+> > paths, right? So the performance of a data structure more complicated
+> > than an array may be ok. bench_page_pool_simple will tell for sure.
+>
+> The question would be why do we need the pool->items to grow with the
+> additional overhead and complication by dynamic allocation of item, using
+> complicated data structure and concurrent handling?
+>
+> As mentioned in [2], it was the existing semantics, but it does not means
+> we need to keep it. The changing of semantics seems like an advantage
+> to me, as we are able to limit how many pages is allowed to be used by
+> a page_pool instance.
+>
+> 2. https://lore.kernel.org/all/2fb8d278-62e0-4a81-a537-8f601f61e81d@huawe=
+i.com/
+>
+> >
+> >> Note, the devmem patchset seems to make the bug harder to fix,
+> >> and may make backporting harder too. As there is no actual user
+> >> for the devmem and the fixing for devmem is unclear for now,
+> >> this patch does not consider fixing the case for devmem yet.
+> >>
+> >
+> > net_iovs don't hit this bug, dma_unmap_page_attrs() is never called on
+> > them, so no special handling is needed really. However for code
+>
+> I am really doubtful about your above claim. As at least the below
+> implementaion of dma_buf_unmap_attachment_unlocked() called in
+> __net_devmem_dmabuf_binding_free() seems be using the DMA API directly:
+>
+> https://elixir.bootlin.com/linux/v6.7-rc8/source/drivers/gpu/drm/amd/amdg=
+pu/amdgpu_dma_buf.c#L215
+>
+> Or am I missing something obvious here?
+>
 
--John-
+I mean currently net_iovs don't hit the __page_pool_release_page_dma
+function that causes the crash in the stack trace. The dmabuf layer
+handles the unmapping when the dmabuf dies (I assume correctly).
+
+--=20
+Thanks,
+Mina
 
