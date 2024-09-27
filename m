@@ -1,118 +1,144 @@
-Return-Path: <netdev+bounces-130146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A265A9889F5
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:15:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B01988A10
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:25:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAE641C21990
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:15:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1792B20C6B
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32E515A853;
-	Fri, 27 Sep 2024 18:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA051C1740;
+	Fri, 27 Sep 2024 18:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AX6/8PeW"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="j0x2MVlR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B47EEA6
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 18:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62A7174EFA
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 18:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727460954; cv=none; b=gVd7aRTi/9zR625rWJoXjlhI7twIXBNqZ+wSNtScvQB+cH8LgdyllCByn01ZEonp/FJkMox0Hwmd7dGKFj4uZarmJsTdVYchnbLpFjRXvX/drMzRNTK2QL0mUx2kOVC0f7Ty/VW/VP0zCfZNK6oky6YCBoa/PVDSoaVzh+56LeA=
+	t=1727461517; cv=none; b=Z/9VYZK8/v+UHMxAuEliDxz4fyWDOncBGoZYum8uo6LrbzSxXhdISlL4iZeinN8P6Jgmk4YZ3s6TgUXxbKt58j8obx7e59c0JxEvIspx+xGFDn9GP5Z7Si3uhAF/ogBzHUgUGLEitmV+oVR/fTnuLS2z4saeY9s4AhTjr+oWi+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727460954; c=relaxed/simple;
-	bh=cPGPrshc4QNk/99mTuoYkMhxWsse5tOYaZQsmXQjy6U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fW3FHxvYdLYbtAIH4883SpY08MZsoTkJelums/8+hBjOUQdC+E0apgSpDMoK0zEYTWi1vQ/bQvgTJCXtHVhEe6FWZGNDgXDL7x6C5eQr8iTigrwtn3F2E8WsfTj7VTHCWYO7+O9/C7Rh6oy10vBgMvfhdtYcLH0XKYlxAQeiTz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AX6/8PeW; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2f759688444so23385861fa.1
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 11:15:52 -0700 (PDT)
+	s=arc-20240116; t=1727461517; c=relaxed/simple;
+	bh=WTom9d4P3DTj5urOnbDKSuJDfB3lentN3oqWXTDx41M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S3Z9LEv12cDxm++Oudi2XZOD3EJoUzFQyFe2JLL1zFfjETDcz/H7C46mHULdwtWe7+a7tg/KrBsj0R/m34cSZLUAzSdrGpqXgtNm5fJPadRbUS23leNUWpXqs8/KNh5czIPeAHk30VAdXtukeLYXn9LIu6INYQiAvdT565uduR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=j0x2MVlR; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e0b0142bbfso1295354a91.1
+        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 11:25:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727460951; x=1728065751; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAXC1jjS+q2JfymL+BkIvB6rw6pd4yUqUxSez452AvA=;
-        b=AX6/8PeWqUWh8v/jtp95n1/7OLMWZpTGXw0b7iw/ttzaSEBejRS76SX5KKvja0Sfyz
-         0hiltl8dLOzyi7hg/huBhhTlr4ZfFuTWkvInH68IsltNr5HI+5URRaRbidy6ip51Ejaa
-         688ZQ+Sqj2n/BnjdZLRgYfnVnHW+zdvVPnuw3voOX/RXBUbjstr7FJbgA9GXz07+nIxC
-         qhb6SjgKawUGX/YewVFQ804rUHo5b3Nrs6OsNnELiEJ2JIdyqw6HiI5Y2OujeltCqOoi
-         9TpYGlch22p3qgQ6NzWUL4QWNUyDDLCRDQVUnbwPv0C20I6No9J8Llq9Mc8afghYHeMF
-         rizA==
+        d=fastly.com; s=google; t=1727461515; x=1728066315; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zbLiVDeu7cPLJ5tOpijYLiBAYihmkJtTqVbrieWuCxs=;
+        b=j0x2MVlRAqoIOFinMAdMYttuRQg1vZXQ+xtJLEJgNGTkze5olgrEOrdvC3wGiUIeyR
+         z4ZH3jOrgonlorE84YbOLSgZ6pqE4hH2aGKgnv6RfAY5pFbtgUBBtL5b4fZSgu0nASrT
+         sfcFvHiL/J9e/9SxdKJH2ozsM4wxFKtotllpw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727460951; x=1728065751;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BAXC1jjS+q2JfymL+BkIvB6rw6pd4yUqUxSez452AvA=;
-        b=w8khB8fhOu9j0xf10EC4PgLV9S2XGSmfFqE/n1zk7bPfqLgtONfbV/ZUmL5cVxSvZl
-         s9CM31KhINxbqydVuwWlq1pLYj0G5qhwCs58kqXevI660UFugB02Xw6HkmsOCRE1AYa+
-         iPe3651uI6np5zu8pP70C3PEMTCPovd+Hmey+9AHasbptVWnhX9bMLO/rIawyPEiyMzy
-         S8Oom2M8ruRz0NcqIcZjumvz2lHibigb0DO5gYr0eieb0xw1rdAPrNSbLTCnF+QXlYkI
-         Q5B73Zetm5KqxD6zPbtSC9zvtxKaX8TGVZY42YSpsPYKIYNLlQwqczO25B7YmFy7w7cl
-         mOEg==
-X-Gm-Message-State: AOJu0Ywm25e1GIZkpEFn9JgvdoLv5zyQW2jBTDQaOS6bcVYSjjfbYmbG
-	UxCCOymmt4J5LJp07dqTRyNDRy5cYrL+gL3dGa/O6UA+XAupaLIa+CN+mSCWYB/rUgyD0CkhU1o
-	btuCecQ6DdJ+prNIi3iVy4C/EAPvOcFBeFbji
-X-Google-Smtp-Source: AGHT+IFguB014B6EKl0Q/a5MJW3oPdzwrAqGbr/v6VQraq+wpGBJLmYOKfTJGKUPKSQiOem+2EK4Kwet0VNxh7U+gJ0=
-X-Received: by 2002:a05:651c:b0f:b0:2ec:1810:e50a with SMTP id
- 38308e7fff4ca-2f9d417a581mr26199411fa.32.1727460951099; Fri, 27 Sep 2024
- 11:15:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727461515; x=1728066315;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zbLiVDeu7cPLJ5tOpijYLiBAYihmkJtTqVbrieWuCxs=;
+        b=eZpmEKq2jkV5TfQIwk2C1alCG/qnC7QXBpr6zIqr3Ex62JaG1Gf3AJJuqhEFchwsYG
+         GYx9c88cWXZfAh3VdXM6NFGXtiDLh1lPmuWjTYBIG5a4wvhpL8cF2KIw4fPMbvTPhVc9
+         0un6OXsV+1QcECnzaNVOVtmO9SIZ8E6aIyESpse2922C6v3FfHe70UEXbwonZkCVHPjO
+         jTBKyr27ePU9LgQBXCtJNoxWXPWOIRyKdp8Fp7x4Rufz8mD5Np3wXkHbYQBhdIJV3mbN
+         paGbcGKwP6Ra5SHG17oP5pzkOrCby0g7uM+/UY7jKuNXDAylVwNTvuIgVehV6l+HMfAm
+         QoxQ==
+X-Gm-Message-State: AOJu0Yw3dtBjYFOyv/3CzVtfoXD7zAUP7qOVJzPy5ORSm63BgXqhKD81
+	SOF09C5/LgPJKTqn0G1piNhqY6KuYdL/ON73/bMuL7gfsqkv3I7p9ssVqijl/j8=
+X-Google-Smtp-Source: AGHT+IGfGEZYEO8uIlPHjzt0vYr6USHZBi1rNrfNVVivW46Jiz95XGsukSNzhAlzcCmvwQUsrhFUcQ==
+X-Received: by 2002:a17:90b:f90:b0:2d8:85fc:464c with SMTP id 98e67ed59e1d1-2e09113c9d2mr12209507a91.11.1727461515191;
+        Fri, 27 Sep 2024 11:25:15 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0d4af744bsm1372398a91.23.2024.09.27.11.25.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Sep 2024 11:25:14 -0700 (PDT)
+Date: Fri, 27 Sep 2024 11:25:11 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Praveen Kaligineedi <pkaligineedi@google.com>
+Cc: netdev@vger.kernel.org, Jeroen de Borst <jeroendb@google.com>,
+	Shailend Chand <shailend@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next 2/2] gve: Map NAPI instances to queues
+Message-ID: <Zvb4h7gZvrCErJsi@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>,
+	netdev@vger.kernel.org, Jeroen de Borst <jeroendb@google.com>,
+	Shailend Chand <shailend@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Ziwei Xiao <ziweixiao@google.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240926030025.226221-1-jdamato@fastly.com>
+ <20240926030025.226221-3-jdamato@fastly.com>
+ <CA+f9V1OsZgH37X-zjWqjkjoQwteXg4=n_HyfA_SOWN9YM=GLRg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240926030025.226221-1-jdamato@fastly.com> <20240926030025.226221-3-jdamato@fastly.com>
-In-Reply-To: <20240926030025.226221-3-jdamato@fastly.com>
-From: Praveen Kaligineedi <pkaligineedi@google.com>
-Date: Fri, 27 Sep 2024 11:15:39 -0700
-Message-ID: <CA+f9V1OsZgH37X-zjWqjkjoQwteXg4=n_HyfA_SOWN9YM=GLRg@mail.gmail.com>
-Subject: Re: [RFC net-next 2/2] gve: Map NAPI instances to queues
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, Jeroen de Borst <jeroendb@google.com>, 
-	Shailend Chand <shailend@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Ziwei Xiao <ziweixiao@google.com>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+f9V1OsZgH37X-zjWqjkjoQwteXg4=n_HyfA_SOWN9YM=GLRg@mail.gmail.com>
 
-> diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-> index 661566db68c8..da811e90bdfa 100644
-> --- a/drivers/net/ethernet/google/gve/gve_main.c
-> +++ b/drivers/net/ethernet/google/gve/gve_main.c
-> @@ -1875,6 +1875,9 @@ static void gve_turndown(struct gve_priv *priv)
->
->                 if (!gve_tx_was_added_to_block(priv, idx))
->                         continue;
-> +
-> +               netif_queue_set_napi(priv->dev, idx, NETDEV_QUEUE_TYPE_TX,
-> +                                    NULL);
->                 napi_disable(&block->napi);
->         }
-When XDP program is installed, the for loop iterates over both
-configured TX queues (idx <  priv->tx_cfg.num_queues) as well as
-dedicated XDP TX queues ( idx >= priv->tx_cfg.num_queues).
-Should add if (idx <  priv->tx_cfg.num_queues) check here.
+On Fri, Sep 27, 2024 at 11:15:39AM -0700, Praveen Kaligineedi wrote:
+> > diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+> > index 661566db68c8..da811e90bdfa 100644
+> > --- a/drivers/net/ethernet/google/gve/gve_main.c
+> > +++ b/drivers/net/ethernet/google/gve/gve_main.c
+> > @@ -1875,6 +1875,9 @@ static void gve_turndown(struct gve_priv *priv)
+> >
+> >                 if (!gve_tx_was_added_to_block(priv, idx))
+> >                         continue;
+> > +
+> > +               netif_queue_set_napi(priv->dev, idx, NETDEV_QUEUE_TYPE_TX,
+> > +                                    NULL);
+> >                 napi_disable(&block->napi);
+> >         }
+> When XDP program is installed, the for loop iterates over both
+> configured TX queues (idx <  priv->tx_cfg.num_queues) as well as
+> dedicated XDP TX queues ( idx >= priv->tx_cfg.num_queues).
+> Should add if (idx <  priv->tx_cfg.num_queues) check here.
+> 
+> > @@ -1909,6 +1915,9 @@ static void gve_turnup(struct gve_priv *priv)
+> >                         continue;
+> >
+> >                 napi_enable(&block->napi);
+> > +               netif_queue_set_napi(priv->dev, idx, NETDEV_QUEUE_TYPE_TX,
+> > +                                    &block->napi);
+> > +
+> >                 if (gve_is_gqi(priv)) {
+> >                         iowrite32be(0, gve_irq_doorbell(priv, block));
+> >                 } else {
+> 
+> Same as above. When XDP program is installed, the for loop iterates
+> over both configured TX queues (idx <  priv->tx_cfg.num_queues) as
+> well as dedicated XDP TX queues ( idx >= priv->tx_cfg.num_queues)
 
-> @@ -1909,6 +1915,9 @@ static void gve_turnup(struct gve_priv *priv)
->                         continue;
->
->                 napi_enable(&block->napi);
-> +               netif_queue_set_napi(priv->dev, idx, NETDEV_QUEUE_TYPE_TX,
-> +                                    &block->napi);
-> +
->                 if (gve_is_gqi(priv)) {
->                         iowrite32be(0, gve_irq_doorbell(priv, block));
->                 } else {
+Ah, OK. Thanks for the review. I'll make that change and retest it
+on my GCP instance.
 
-Same as above. When XDP program is installed, the for loop iterates
-over both configured TX queues (idx <  priv->tx_cfg.num_queues) as
-well as dedicated XDP TX queues ( idx >= priv->tx_cfg.num_queues)
+Since net-next is (I think) likely to reopen soon, I'll include that
+change in the submission I send next week and mention it in the
+changelog.
 
