@@ -1,228 +1,137 @@
-Return-Path: <netdev+bounces-130155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D83988B8C
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 22:51:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2377A988B8E
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 22:52:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 694D7B2439B
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:51:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDA1B1F24AFE
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 20:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473781C3300;
-	Fri, 27 Sep 2024 20:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63A51C2DC7;
+	Fri, 27 Sep 2024 20:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="Rzy7i+Ka"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNvUxch6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30951C1AAA
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 20:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BB3B381B1;
+	Fri, 27 Sep 2024 20:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727470278; cv=none; b=haJJWFsrw2K2rU3S6MFC0noTvcUKC9iBixNgqVzp3x3slCA94NO04JP+25ga54TIMDYoRRA5EAM2aQL9ymGLTRogaShz4SQACx2MajV+SO6AikWoR4p1DLBk0DDvdvWUeSetKlGBsshwaRyxnpTIRbxIqRUb7m4KQ3P4/vk7Htc=
+	t=1727470363; cv=none; b=WnIcLmsuDSqfzZK6w9E04chDfAj0P/tib60ugzKdg60GhD+nP2YfWeUhmyLT8V3gbdbakAGer2ERfn8qe0vkw/0cmhEE4wnYa0tYM/zo0GrWPApn52gPXBPTu6QDGGcF6RMO4qNpkxFPXWqCnH/wBytybZ4alb9KCzFfXniLNuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727470278; c=relaxed/simple;
-	bh=t5Z0F96nnpNVbvXiI93914QUNkWsiBwAzwQoJCfZ5Ew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWWQTSQ8Qnih3Pi5qawNPWYVT5MRtfdFeHSWEDEAj235Ns3aaZLg06mA0/operVfD0S/XT2q8lx5kjpf18cxj2NJjrx+EaqfjX5l9Vy4DsOoAGJ4o52ojkOQQwf25KFdCxV4lRgUsmJ8aG7jxhiW/yM+NAfdPrRsk3KV3B/zhe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=Rzy7i+Ka; arc=none smtp.client-ip=209.85.215.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7e6ed072cdaso51235a12.0
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 13:51:15 -0700 (PDT)
+	s=arc-20240116; t=1727470363; c=relaxed/simple;
+	bh=5HQ7nexSna66xPv4Uft4SvJSqfBv9IvTVQKyrU297/M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R+PHfDxsUeq5j4ueQ38THPY44fbHmIVn0yYlq9wgZNfvv5S7ftGquEXeyc/h+Zeyv7Py57Q/sERG7FjW9P2u3EWTngF6eLoIJE4FQrNCxDU9UiuI2OOwfma+02pjSMCcpVn6XdxnEtcUJVO021XSyW4wy0R8t5FtbvYS68F/fLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HNvUxch6; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e0b9bca173so1078963a91.0;
+        Fri, 27 Sep 2024 13:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tenstorrent.com; s=google; t=1727470275; x=1728075075; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bRdgVrabZHhxovBskXyfa2tZhEPgLz1eNAdYEQ47v4A=;
-        b=Rzy7i+KaY6oZlRoWG7tYY3YnfGjDMcAWIDuo+cvRC0JZ/fvo0MnClazthRZnHL2iUD
-         0gEMjpfFcTINWaoVOr1SbEPk6GV1jsddYG1bhyLoUp9hYJ0gzg0flr/OT/Z9VvelgpJg
-         Yy7e0hBcvo5JILKcJoRC4vJqVLvzMfrs1cioeMi6lqLEPby/E7AKdaEtY1m0Mh4PHHDY
-         T0SFZjGUqxPGkDbfQ/aVXvODzIIjwK1YgDrQrfhIqZ46sTyzk16j+EjkyiVAkzU1KcwL
-         TJ2zxmEKF+86mrss0wjd8tsBkNL7eIM23X+Yn68di5DqflaP2tg5b8wokIaLFrWCSvZP
-         MUww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727470275; x=1728075075;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1727470360; x=1728075160; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bRdgVrabZHhxovBskXyfa2tZhEPgLz1eNAdYEQ47v4A=;
-        b=IQ8GLN8DOe9yGL+gk9bT7wx+HXr2UijDf2otiqe+APJnBE3DulnRvNUDVGQoj/sRQf
-         znmxKo3OMg0HPkeW8DEpbhDmoRCplYRC/2LULkgqriEGpwkZz9RP+Io4vof0edUPX1ie
-         BkLRYxY2VZxfQ+7/a1dyxW7axFyY8QA6oTZDqpoQcFTU6gMdUtInlBO9iLyVAurqqySK
-         mYMFF2V+WEGVReeICsEFrZMtSIZI2tqeGds1e9Whry9A/uq7qIzV3WEw0Ov2N3Mt1Phd
-         TxQ5agVD9VgkaBaa0kMsRBjEl44+nqT8EFrwrnnJ1MCH2At58up/1+gl4SwsB/zMqDit
-         hKXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOMc64r0dG47s8i0eGwwqIgYkKFFDyi11ofQGOYPuTP9twrNSSsNBq9ApMsTu+F5xxNtMKwac=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxi3Kl0coWts3uF9ymcSlyTpuB4dxFHMTwJBhO0J+O1A38oQBh6
-	AMhbMc+Qj8TIbblV0riliiIKlfOT+CqvClAZajLfDkzf/TAqMu0Fbc/kkUywbqQ=
-X-Google-Smtp-Source: AGHT+IFG7leoR14jtfC3q5GGKEHjsTA70H4zEAbpBSmxJ/3keC3i6/61ObBCaup/qbxMFhZgbbqM5Q==
-X-Received: by 2002:a17:90a:ec11:b0:2e0:6cd4:973a with SMTP id 98e67ed59e1d1-2e0b887184amr5335905a91.5.1727470275087;
-        Fri, 27 Sep 2024 13:51:15 -0700 (PDT)
-Received: from x1 (71-34-69-82.ptld.qwest.net. [71.34.69.82])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0e4ca7019sm336000a91.18.2024.09.27.13.51.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2024 13:51:14 -0700 (PDT)
-Date: Fri, 27 Sep 2024 13:51:12 -0700
-From: Drew Fustini <dfustini@tenstorrent.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 1/3] dt-bindings: net: Add T-HEAD dwmac support
-Message-ID: <ZvcawOIcufEHXCHU@x1>
-References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com>
- <20240926-th1520-dwmac-v2-1-f34f28ad1dc9@tenstorrent.com>
- <4pxpku3btckw7chyxlqw56entdb2s3gqeas4w3owbu5egmq3nf@5v76h4cczv4z>
+        bh=S3TYipBZ3m1z5f8qjnQDPEJvDOrdajfpoFzHpH9lwD4=;
+        b=HNvUxch6BsPg4OHbIxYtsyx+Gcqrg8OzvlwJTrgJLJ0tmOHM8cG5V0p3whmA1tHEZn
+         aovsmTIb44/0TTSZvoV6DYRGljbgNO1HlGVRRWGl1suqdLO+O3i1uAFFJ/4W5YGq0VoR
+         bWpU06Rfc9jat6QH+VuEm8NApEN1lr7nLw2yK2mGDszWIg5I3e8MPCA9C0hUeb9pB9lY
+         BAPZ5rH4WuorpOv5zTQnKMnDNMNisGuPcdetJSVbPKIA4BHubbwQCOcGVbpKjfqNlc/Y
+         dWyfw2/flkA/3u7X3Z0+fwvNTDZsrMsRTb//PL4a4AW5f4LDfV1j6hJ4J+CmCFoqXOlW
+         1V2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727470360; x=1728075160;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S3TYipBZ3m1z5f8qjnQDPEJvDOrdajfpoFzHpH9lwD4=;
+        b=K1xaY7DxeR2o4yRcj1zE9EnmY69185T0oElQP65g1Gg6KNr+AWNyq0eCHJ598nzX4q
+         hlXcsC3zC2/BJbd6LNJUdgz8c+Yi/EtuV6i1uFnbrEAvQBkgHPktks8yx/xht6rH4SpA
+         I5HPr8BCQ24dLHl+4xBgE2AaZuz+1sO1EQZJXtp3I/4j7K4XSSQ4TPp6PE832Whbdg55
+         sejdMdl1LDAlpCem1D4JUBE7XRXP5zDjltI0PVyPTXb++KRS03/hDd6XIdOI6BDh/1YQ
+         4Y40D33C2tSSMNw2yo92iKJ58OM2QJtCGCSYTcm4MTcG6ux4kz1Dv5qGnER2Cb0COP0K
+         IakQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFUsDTAwyXNojwKkE4lCKsH6Ehe9lSnnMC0DDQJF1Y17srFNpVk6cQZN26iZVaJymRro8VWQqS@vger.kernel.org, AJvYcCVk3n89lwjdQ2AVOde6pg0qcVsKxvLlvFcFaPiqpD4Hpr4PdvTJ57ujQZRnFzPo0iGA41/qBMFn2wz2KXt6zfQw@vger.kernel.org, AJvYcCXEaYgiDenSgPsLGo+9UtSo08DBfCwknghfSBSzapaeJfOpjAmWoG6vI7rO1+fH+uFx4vvuDPYivb9GHKTf@vger.kernel.org, AJvYcCXZDLRhL0S8LwhQhJlRQXy6UJS3pVZ9zpFAAe0Ljl3aHb5VzTYa5Os95D2oX4eNS4YRkf0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy67Y8sri786ELITfipm+Z5jwocXj96mcwVbnl602jUKu7e9Mdj
+	7gBRnXtl4YxtuDzLRF/DPWczSsCYZvhldf9kSt/sdmNrwc82qNT8FrfaPzYNU0ZC7/XCFJDkMuU
+	DJqV4l8c1fjJoFY1pD+nvZ7NaRes=
+X-Google-Smtp-Source: AGHT+IEFhFMPeqUPjTgmjT1tXk15Ei+RGYN6cAMgWrzG7SlH7HHLGBUE3WXEHcKrs4bM5vI2Sf3P/hNnxP6niY+vBKE=
+X-Received: by 2002:a17:90b:3587:b0:2d8:94d6:3499 with SMTP id
+ 98e67ed59e1d1-2e0b8ed4c1fmr4973657a91.37.1727470360536; Fri, 27 Sep 2024
+ 13:52:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4pxpku3btckw7chyxlqw56entdb2s3gqeas4w3owbu5egmq3nf@5v76h4cczv4z>
+References: <20240927131355.350918-1-bjorn@kernel.org> <20240927131355.350918-2-bjorn@kernel.org>
+In-Reply-To: <20240927131355.350918-2-bjorn@kernel.org>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 27 Sep 2024 13:52:28 -0700
+Message-ID: <CAEf4BzaWneXBv401rOdW8ijBTqRn_Ut4FFvhbsPShh5_pjV33A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/2] selftests: bpf: Add missing per-arch include path
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Charlie Jenkins <charlie@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 27, 2024 at 11:34:48AM +0200, Krzysztof Kozlowski wrote:
-> On Thu, Sep 26, 2024 at 11:15:50AM -0700, Drew Fustini wrote:
-> > From: Jisheng Zhang <jszhang@kernel.org>
-> > 
-> > Add documentation to describe T-HEAD dwmac.
-> > 
-> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> > Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> > [drew: change apb registers from syscon to second reg of gmac node]
-> > [drew: rename compatible, add thead rx/tx internal delay properties]
-> > Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
-> > ---
-> >  .../devicetree/bindings/net/snps,dwmac.yaml        |   1 +
-> >  .../devicetree/bindings/net/thead,th1520-gmac.yaml | 109 +++++++++++++++++++++
-> >  MAINTAINERS                                        |   1 +
-> >  3 files changed, 111 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > index 4e2ba1bf788c..474ade185033 100644
-> > --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> > @@ -99,6 +99,7 @@ properties:
-> >          - snps,dwxgmac-2.10
-> >          - starfive,jh7100-dwmac
-> >          - starfive,jh7110-dwmac
-> > +        - thead,th1520-gmac
-> >  
-> >    reg:
-> >      minItems: 1
-> > diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> > new file mode 100644
-> > index 000000000000..1070e891c025
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> > @@ -0,0 +1,109 @@
-> > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/thead,th1520-gmac.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: T-HEAD TH1520 GMAC Ethernet controller
-> > +
-> > +maintainers:
-> > +  - Drew Fustini <dfustini@tenstorrent.com>
-> > +
-> > +description: |
-> > +  The TH1520 GMAC is described in the TH1520 Peripheral Interface User Manual
-> > +  https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
-> > +
-> > +  Features include
-> > +    - Compliant with IEEE802.3 Specification
-> > +    - IEEE 1588-2008 standard for precision networked clock synchronization
-> > +    - Supports 10/100/1000Mbps data transfer rate
-> > +    - Supports RGMII/MII interface
-> > +    - Preamble and start of frame data (SFD) insertion in Transmit path
-> > +    - Preamble and SFD deletion in the Receive path
-> > +    - Automatic CRC and pad generation options for receive frames
-> > +    - MDIO master interface for PHY device configuration and management
-> > +
-> > +  The GMAC Registers consists of two parts
-> > +    - APB registers are used to configure clock frequency/clock enable/clock
-> > +      direction/PHY interface type.
-> > +    - AHB registers are use to configure GMAC core (DesignWare Core part).
-> > +      GMAC core register consists of DMA registers and GMAC registers.
-> > +
-> > +select:
-> > +  properties:
-> > +    compatible:
-> > +      contains:
-> > +        enum:
-> > +          - thead,th1520-gmac
-> > +  required:
-> > +    - compatible
-> > +
-> > +allOf:
-> > +  - $ref: snps,dwmac.yaml#
-> > +
-> > +properties:
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - thead,th1520-gmac
-> > +      - const: snps,dwmac-3.70a
-> > +
-> > +  reg:
-> > +    items:
-> > +      - description: DesignWare GMAC IP core registers
-> > +      - description: GMAC APB registers
-> > +
-> > +  reg-names:
-> > +    items:
-> > +      - const: dwmac
-> > +      - const: apb
-> > +
-> > +  thead,rx-internal-delay:
-> > +    $ref: /schemas/types.yaml#/definitions/uint32
-> > +    description: |
-> > +      RGMII receive clock delay. The value is used for the delay_ctrl
-> > +      field in GMAC_RXCLK_DELAY_CTRL. Units are not specified.
-> 
-> What do you mean by "unspecified units"? They are always specified,
-> hardware does not work randomly, e.g. once uses clock cycles, but next
-> time you run it will use picoseconds.
-> 
-> You also miss default (property is not required) and some sort of constraints.
+On Fri, Sep 27, 2024 at 6:14=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kernel=
+.org> wrote:
+>
+> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+>
+> The prog_tests programs do not include the per-arch tools include
+> path, e.g. tools/arch/riscv/include. Some architectures depend those
+> files to build properly.
+>
+> Include tools/arch/$(SUBARCH)/include in the selftests bpf build.
+>
+> Fixes: 6d74d178fe6e ("tools: Add riscv barrier implementation")
+> Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+> ---
+>  tools/testing/selftests/bpf/Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftes=
+ts/bpf/Makefile
+> index 365740f24d2e..d6a53afa449f 100644
+> --- a/tools/testing/selftests/bpf/Makefile
+> +++ b/tools/testing/selftests/bpf/Makefile
+> @@ -10,6 +10,7 @@ TOOLSDIR :=3D $(abspath ../../..)
+>  LIBDIR :=3D $(TOOLSDIR)/lib
+>  BPFDIR :=3D $(LIBDIR)/bpf
+>  TOOLSINCDIR :=3D $(TOOLSDIR)/include
+> +TOOLSARCHINCDIR :=3D $(TOOLSDIR)/arch/$(SRCARCH)/include
+>  BPFTOOLDIR :=3D $(TOOLSDIR)/bpf/bpftool
+>  APIDIR :=3D $(TOOLSINCDIR)/uapi
+>  ifneq ($(O),)
+> @@ -44,7 +45,7 @@ CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic                  =
+                 \
+>           -Wall -Werror -fno-omit-frame-pointer                         \
+>           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)                    \
+>           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)          \
+> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+> +         -I$(TOOLSINCDIR) -I$(TOOLSARCHINCDIR) -I$(APIDIR) -I$(OUTPUT)
 
-I should have stated that I don't know the units for delay_ctrl. The
-5-bit field has a max value of 31 which seems far too small for
-picoseconds. Unfortunately, the documentation from the SoC vendor does
-not give anymore details about what the value represents.
+Eduard was going to switch selftests to use kernel UAPI headers, I
+wonder if we should do just that and then set up arch-specific
+includes from kernel (not from tools/) as well?
 
-Andrew Lunn replied [1] to my cover letter that it is best to hard code
-the field to 0 (which is the hardware reset value) if I don't know what
-the units are for delay_ctrl. The hardware that I have works okay with
-delay_ctrl of 0, so it seems these new vendor properties are not needed.
-
-Thanks,
-Drew
-
-[1] https://lore.kernel.org/lkml/5e379911-e3de-478c-b785-61dbcc9627b1@lunn.ch/
+>  LDFLAGS +=3D $(SAN_LDFLAGS)
+>  LDLIBS +=3D $(LIBELF_LIBS) -lz -lrt -lpthread
+>
+> --
+> 2.43.0
+>
 
