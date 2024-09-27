@@ -1,204 +1,328 @@
-Return-Path: <netdev+bounces-130128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 665E498879B
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:54:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2AB39887A4
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886631C226B8
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 14:54:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D6E9B2156E
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 14:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7254F1C0DE0;
-	Fri, 27 Sep 2024 14:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6429C1C0DE5;
+	Fri, 27 Sep 2024 14:57:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dBk6bscE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qBxWuXFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7614B1C0DE2
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 14:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4161C0DDB
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 14:57:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727448838; cv=none; b=NBRLnuGe8Kc7Fn+brCJH9YVqBnRu+Amme/yYw/hRhjjvD4I/xee24nO/ZjHF6jDFFDoYx4PfSZhCpwMvI+Ib+RIz4PIDoXoLLDOmhPcDNj46Lap6wDDLq8o4O2PBJ7GwaY+K3188OaHIWN9kN92jIG51+0LzuYPV8EJFWSuVX3A=
+	t=1727449027; cv=none; b=C7V10FbhgEG6AvkXLBmtdBqNopdBbTK2z+38p+URX376L3mQVHEI2PXjR8nFAoZi3xa3zHYJvqfnOd4fzX+ZVDy0Oy6lSmlqmXO8JdpLzvdLKYZZCvFQBcF1E+Gh4ZuW8T7eQq58Iolw8K/5EPVwH+pBXJkNfr7sEUUpkdHwlBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727448838; c=relaxed/simple;
-	bh=BbJbA5lC6dBh50vuIs6fufz8mni57IsrlAQxteFou9I=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QSZiuKiL29AuPvcTt0zdNZKIfXDqyWKq/PHQxY4o0Y0ECpiNW+mqG0mp3pIrljanp6dKoa3UWn2OsLORpvfyM6sMiYdzITQIA/UZ1c5E4L56Ml3TpJLGqTxnCbRsl9zC6GeTeteWGg3PAjGtUUnN+Jk7qh0mXyM3mwuopdaKdOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dBk6bscE; arc=none smtp.client-ip=209.85.218.74
+	s=arc-20240116; t=1727449027; c=relaxed/simple;
+	bh=KpFQjUYNoqorgSZR3P1u7MaHQxHtQSx0hYrOTa71UnQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VpDmKW4a7t8DwvFwt4IWYLklH3Y4l1MFm3z6jd6O2dL1T7/Iyt8MU8o+pEQf2pagBim0S2+bnKz9Ip8x029KuY0CSCvewuwv2BZZseG7W1b/mDukJQ7PJl4wC08qbRT65K8RUqpvJfRhesE5LiogqjAOgAl2egRP9mjcW3xCce4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qBxWuXFT; arc=none smtp.client-ip=209.85.208.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-a8a87c7c719so81297466b.1
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 07:53:55 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f75aaaade6so24838791fa.1
+        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 07:57:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727448834; x=1728053634; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMNDopMlhFUGwDKZkzabLCI0jVZ7GTFzxb2f7tDOYLg=;
-        b=dBk6bscEVkPwAPe8Q90W8XoO7p5LoiQZGE0pOf4zUccIi1zmkxCnz7J2icV6QjEvqW
-         hZHQoVxlVmldYbFRdDRJ8w6YrbkKv5bnt8lbD4NCjGBotN7SL470fYhFnpgAaqRY5ZLn
-         Gmmf2AxckshXPbzJ52X2GXrATR5rijwet95e0KUWLD6xgyFRa+op22uNk+QVYDr50N26
-         /5AMfJdtBmjjpI43qZLrisVlvMGHk7JpbhyXhOMpieYMS3xL9+h6BFWsWYUD7+dpuUUK
-         2a5xeioPRWJhCGerGsy5hdhuBq6l7e0uMoC9QTFc1biTSupT/bYJRoigmnL246qH8HKF
-         5BxQ==
+        d=google.com; s=20230601; t=1727449024; x=1728053824; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/18GyfMUmFmiPlGch6tCsiK6n05dByaKqzKUBTX5A9A=;
+        b=qBxWuXFTyNYy6D2xy5AbSYJNSWBDvFC08SrDvq+vJiLtqZIeKbBFhgHsKdZeWWdzIz
+         7NWXpeiSrfacXvRUO3OElk/+G7KzGmNGxbwcrl0De/T1pqkCnmXtqVmeipL7HX8/hy30
+         2KmwflU9OTI6OUbMzYo+oG54gVZDDbYECRggNDb2Rb104P5cnV+1QyQp+5EId+RHwrP0
+         5QUXO6M/oiYDrRKM5MD1XsTj8/z0MGOFQoJTcp7apDPh6Ds/5rQ7kH09JwadqPNEXzBn
+         RjYnYgdFA6h4mfyLXYmpzQ0QlawmrAuQ5rVBf1KBDPAM6VF3b6ioGicUVgFSBPVUhHBJ
+         h+AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727448834; x=1728053634;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EMNDopMlhFUGwDKZkzabLCI0jVZ7GTFzxb2f7tDOYLg=;
-        b=Wa++aaybTx8O/HWaLSXJSpaTFebWDs4+Tb1BT9xcCUuMcyXNN73/Q7Dx1JW0wd081/
-         y6ERT50va3BGqifNC7MVTP4NPeEhYANv8gRZqOhU8/8sq2XlsFQOCXugPrSgmn40HwRY
-         FmrK3CpNPkB03GlXS9ZFaoHxPEP+jWxSJPYOSYXHkd4HWpAPF9tXZw2y4WYZn36XdD59
-         EoCTLv16LsdECMqnU+HfcepluRZmxZdNEJnPaDirD4iqJlgW2mWWltc0m9okZVRjCtKl
-         sxFspVxLvxkGgMLpzjn9JqHNqXlcL6VLhWrZz3oha2LY96gbwudC2AHn9PtdWxT3t85/
-         V/Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5PlS8g8zToLHP41/QMphXwaphcMXD79rJ5moxEtTu143Jbm3WEg9sXUcwViJzmgk5cS1jRlM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGhKXkiAMzhqykWR4Y8RvCiuPJ7XJp6LgcZcXd4gGMWakV4dZz
-	16p2NYg86n1fxUZOyTvldibuVzfItQN17eIPIcqIUXyK1Omeh3ACSJDI5NMW+CaswVxNPX4kGsw
-	K3Q==
-X-Google-Smtp-Source: AGHT+IHksKlke7IXOcIb6Ducm9L8OtFULLO1vHaIevttg0RkGd3LMrgXVBNb9iHalLVGdSvXFjJmE2topP8=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:1948:b0:5c5:c4ab:8c68 with SMTP id
- 4fb4d7f45d1cf-5c8824e8386mr1747a12.2.1727448833301; Fri, 27 Sep 2024 07:53:53
- -0700 (PDT)
-Date: Fri, 27 Sep 2024 16:53:51 +0200
-In-Reply-To: <20240904104824.1844082-17-ivanov.mikhail1@huawei-partners.com>
+        d=1e100.net; s=20230601; t=1727449024; x=1728053824;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/18GyfMUmFmiPlGch6tCsiK6n05dByaKqzKUBTX5A9A=;
+        b=ihGVmZkdm5gQAGOpGzJvLkVPcbSgtbTmWbRqjL8Js2EDzihqztLdaBrSyPGuc1m6qj
+         sMrgZMrO5rLn5SIj5Hf5sz+bYBX37VCtRmj0+RbztIhORTtrE+TNAbNZH2CxpXwvmZbv
+         GSBcUWy8iDbOoFlrxgJi0caLbsXyzeR8/I9GWQhfBI8GSNt1tj3MsVq+bX9TIB18Si7Q
+         5lexXnw2W5vM0k7SjI+k3VgAgHDNbZMEQA+uWhTRW1dogBEm6CsiRzQS+CtX/4H6kl+z
+         Tl9TKgzB+Fy8ALw2dv/HOKglgwqwpZbyQp2NHBU6GXSoZqUEk6Z4Sq9M7GxlX2XZMvAD
+         8fBw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMr17rvaPkh2E2P3iKteIENQXg7otYD9g6DBoZE2xrMsVu1vDI+6JbXGxSyY95JU0nh0LQF4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6hgXl4akJulLN/0CH4AbbWSnmZ6NWL/zE/eevQcAdkpRORAgd
+	p6JF+dV33f/HvZ7rVe+3/kdJRh8NV52K8wFFMGE9/q/Go6Kupa1u5jK4WzAIrzqUL2C1eaaWKeP
+	p+BDo1ZGVnpSrswysgYYMBLMw9MgatkFaWovAY93dmocwFbOA1ncC
+X-Google-Smtp-Source: AGHT+IFRKkE0mGNhaH8ET6VLDg6TqeqTkqG/VObziBwEk4Ht7UIK/LQVwwPoMAoSz6jIyTC8gnOtwPvtsKVzIeRIZEg=
+X-Received: by 2002:a05:6512:b0b:b0:52c:e11e:d493 with SMTP id
+ 2adb3069b0e04-5389fc46d3dmr2530689e87.26.1727449023277; Fri, 27 Sep 2024
+ 07:57:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-17-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZvbG_ym1PKmVY6Ts@google.com>
-Subject: Re: [RFC PATCH v3 16/19] selftests/landlock: Test that accept(2) is
- not restricted
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <1718301630-63692-1-git-send-email-alibuda@linux.alibaba.com> <1718301630-63692-4-git-send-email-alibuda@linux.alibaba.com>
+In-Reply-To: <1718301630-63692-4-git-send-email-alibuda@linux.alibaba.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 27 Sep 2024 16:56:52 +0200
+Message-ID: <CANn89i+cKR+hBpXuKxO=dRX448qA3tzEkiOvC4PshWH0OVAD0w@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 3/3] net/smc: Introduce IPPROTO_SMC
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
+	wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org, 
+	davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 04, 2024 at 06:48:21PM +0800, Mikhail Ivanov wrote:
-> Add test validating that socket creation with accept(2) is not restricted
-> by Landlock.
-> 
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+On Thu, Jun 13, 2024 at 8:00=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+>
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+> This patch allows to create smc socket via AF_INET,
+> similar to the following code,
+>
+> /* create v4 smc sock */
+> v4 =3D socket(AF_INET, SOCK_STREAM, IPPROTO_SMC);
+>
+> /* create v6 smc sock */
+> v6 =3D socket(AF_INET6, SOCK_STREAM, IPPROTO_SMC);
+>
+> There are several reasons why we believe it is appropriate here:
+>
+> 1. For smc sockets, it actually use IPv4 (AF-INET) or IPv6 (AF-INET6)
+> address. There is no AF_SMC address at all.
+>
+> 2. Create smc socket in the AF_INET(6) path, which allows us to reuse
+> the infrastructure of AF_INET(6) path, such as common ebpf hooks.
+> Otherwise, smc have to implement it again in AF_SMC path.
+>
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+> Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> Tested-by: Wenjia Zhang <wenjia@linux.ibm.com>
 > ---
->  .../testing/selftests/landlock/socket_test.c  | 71 +++++++++++++++++++
->  1 file changed, 71 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
-> index 2ab27196fa3d..052dbe0d1227 100644
-> --- a/tools/testing/selftests/landlock/socket_test.c
-> +++ b/tools/testing/selftests/landlock/socket_test.c
-> @@ -939,4 +939,75 @@ TEST_F(socket_creation, sctp_peeloff)
->  	ASSERT_EQ(0, close(server_fd));
->  }
->  
-> +TEST_F(socket_creation, accept)
-> +{
-> +	int status;
-> +	pid_t child;
-> +	struct sockaddr_in addr;
-> +	int server_fd, client_fd;
-> +	char buf;
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
-> +	};
-> +	struct landlock_socket_attr tcp_socket_create = {
-        ^^^^^^
+>  include/uapi/linux/in.h |   2 +
+>  net/smc/Makefile        |   2 +-
+>  net/smc/af_smc.c        |  16 ++++-
+>  net/smc/smc_inet.c      | 159 ++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  net/smc/smc_inet.h      |  22 +++++++
+>  5 files changed, 198 insertions(+), 3 deletions(-)
+>  create mode 100644 net/smc/smc_inet.c
+>  create mode 100644 net/smc/smc_inet.h
+>
+> diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+> index e682ab6..d358add 100644
+> --- a/include/uapi/linux/in.h
+> +++ b/include/uapi/linux/in.h
+> @@ -81,6 +81,8 @@ enum {
+>  #define IPPROTO_ETHERNET       IPPROTO_ETHERNET
+>    IPPROTO_RAW =3D 255,           /* Raw IP packets                      =
+ */
+>  #define IPPROTO_RAW            IPPROTO_RAW
+> +  IPPROTO_SMC =3D 256,           /* Shared Memory Communications        =
+ */
+> +#define IPPROTO_SMC            IPPROTO_SMC
+>    IPPROTO_MPTCP =3D 262,         /* Multipath TCP connection            =
+ */
+>  #define IPPROTO_MPTCP          IPPROTO_MPTCP
+>    IPPROTO_MAX
+> diff --git a/net/smc/Makefile b/net/smc/Makefile
+> index 2c510d54..60f1c87 100644
+> --- a/net/smc/Makefile
+> +++ b/net/smc/Makefile
+> @@ -4,6 +4,6 @@ obj-$(CONFIG_SMC)       +=3D smc.o
+>  obj-$(CONFIG_SMC_DIAG) +=3D smc_diag.o
+>  smc-y :=3D af_smc.o smc_pnet.o smc_ib.o smc_clc.o smc_core.o smc_wr.o sm=
+c_llc.o
+>  smc-y +=3D smc_cdc.o smc_tx.o smc_rx.o smc_close.o smc_ism.o smc_netlink=
+.o smc_stats.o
+> -smc-y +=3D smc_tracepoint.o
+> +smc-y +=3D smc_tracepoint.o smc_inet.o
+>  smc-$(CONFIG_SYSCTL) +=3D smc_sysctl.o
+>  smc-$(CONFIG_SMC_LO) +=3D smc_loopback.o
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 8e3ce76..435f38b 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -54,6 +54,7 @@
+>  #include "smc_tracepoint.h"
+>  #include "smc_sysctl.h"
+>  #include "smc_loopback.h"
+> +#include "smc_inet.h"
+>
+>  static DEFINE_MUTEX(smc_server_lgr_pending);   /* serialize link group
+>                                                  * creation on server
+> @@ -3593,10 +3594,15 @@ static int __init smc_init(void)
+>                 pr_err("%s: tcp_ulp_register fails with %d\n", __func__, =
+rc);
+>                 goto out_lo;
+>         }
+> -
+> +       rc =3D smc_inet_init();
+> +       if (rc) {
+> +               pr_err("%s: smc_inet_init fails with %d\n", __func__, rc)=
+;
+> +               goto out_ulp;
+> +       }
+>         static_branch_enable(&tcp_have_smc);
+>         return 0;
+> -
+> +out_ulp:
+> +       tcp_unregister_ulp(&smc_ulp_ops);
+>  out_lo:
+>         smc_loopback_exit();
+>  out_ib:
+> @@ -3633,6 +3639,7 @@ static int __init smc_init(void)
+>  static void __exit smc_exit(void)
+>  {
+>         static_branch_disable(&tcp_have_smc);
+> +       smc_inet_exit();
+>         tcp_unregister_ulp(&smc_ulp_ops);
+>         sock_unregister(PF_SMC);
+>         smc_core_exit();
+> @@ -3660,4 +3667,9 @@ static void __exit smc_exit(void)
+>  MODULE_LICENSE("GPL");
+>  MODULE_ALIAS_NETPROTO(PF_SMC);
+>  MODULE_ALIAS_TCP_ULP("smc");
+> +/* 256 for IPPROTO_SMC and 1 for SOCK_STREAM */
+> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET, 256, 1);
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +MODULE_ALIAS_NET_PF_PROTO_TYPE(PF_INET6, 256, 1);
+> +#endif /* CONFIG_IPV6 */
+>  MODULE_ALIAS_GENL_FAMILY(SMC_GENL_FAMILY_NAME);
+> diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+> new file mode 100644
+> index 00000000..bece346
+> --- /dev/null
+> +++ b/net/smc/smc_inet.c
+> @@ -0,0 +1,159 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + *  Shared Memory Communications over RDMA (SMC-R) and RoCE
+> + *
+> + *  Definitions for the IPPROTO_SMC (socket related)
+> + *
+> + *  Copyright IBM Corp. 2016, 2018
+> + *  Copyright (c) 2024, Alibaba Inc.
+> + *
+> + *  Author: D. Wythe <alibuda@linux.alibaba.com>
+> + */
+> +
+> +#include <net/protocol.h>
+> +#include <net/sock.h>
+> +
+> +#include "smc_inet.h"
+> +#include "smc.h"
+> +
+> +static int smc_inet_init_sock(struct sock *sk);
+> +
+> +static struct proto smc_inet_prot =3D {
+> +       .name           =3D "INET_SMC",
+> +       .owner          =3D THIS_MODULE,
+> +       .init           =3D smc_inet_init_sock,
+> +       .hash           =3D smc_hash_sk,
+> +       .unhash         =3D smc_unhash_sk,
+> +       .release_cb     =3D smc_release_cb,
+> +       .obj_size       =3D sizeof(struct smc_sock),
+> +       .h.smc_hash     =3D &smc_v4_hashinfo,
+> +       .slab_flags     =3D SLAB_TYPESAFE_BY_RCU,
+> +};
+> +
+> +static const struct proto_ops smc_inet_stream_ops =3D {
+> +       .family         =3D PF_INET,
+> +       .owner          =3D THIS_MODULE,
+> +       .release        =3D smc_release,
+> +       .bind           =3D smc_bind,
+> +       .connect        =3D smc_connect,
+> +       .socketpair     =3D sock_no_socketpair,
+> +       .accept         =3D smc_accept,
+> +       .getname        =3D smc_getname,
+> +       .poll           =3D smc_poll,
+> +       .ioctl          =3D smc_ioctl,
+> +       .listen         =3D smc_listen,
+> +       .shutdown       =3D smc_shutdown,
+> +       .setsockopt     =3D smc_setsockopt,
+> +       .getsockopt     =3D smc_getsockopt,
+> +       .sendmsg        =3D smc_sendmsg,
+> +       .recvmsg        =3D smc_recvmsg,
+> +       .mmap           =3D sock_no_mmap,
+> +       .splice_read    =3D smc_splice_read,
+> +};
+> +
+> +static struct inet_protosw smc_inet_protosw =3D {
+> +       .type           =3D SOCK_STREAM,
+> +       .protocol       =3D IPPROTO_SMC,
+> +       .prot           =3D &smc_inet_prot,
+> +       .ops            =3D &smc_inet_stream_ops,
+> +       .flags          =3D INET_PROTOSW_ICSK,
 
-Could be const as well, just like the ruleset_attr?
+When this flag is set, icsk->icsk_sync_mss must be set.
 
-(I probably overlooked this as well in some of the other tests.)
-
-
-> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> +		.family = AF_INET,
-> +		.type = SOCK_STREAM,
-> +	};
-> +
-> +	server_fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> +	ASSERT_LE(0, server_fd);
-> +
-> +	addr.sin_family = AF_INET;
-> +	addr.sin_port = htons(loopback_port);
-> +	addr.sin_addr.s_addr = inet_addr(loopback_ipv4);
-> +
-> +	ASSERT_EQ(0, bind(server_fd, &addr, sizeof(addr)));
-> +	ASSERT_EQ(0, listen(server_fd, backlog));
-> +
-> +	child = fork();
-> +	ASSERT_LE(0, child);
-> +	if (child == 0) {
-
-Nit:
-I feel like the child code would benefit from a higher level comment,
-like "Connects to the server once and exits." or such.
-
-> +		/* Closes listening socket for the child. */
-> +		ASSERT_EQ(0, close(server_fd));
-> +
-> +		client_fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
-> +		ASSERT_LE(0, client_fd);
-> +
-> +		ASSERT_EQ(0, connect(client_fd, &addr, sizeof(addr)));
-> +		EXPECT_EQ(1, write(client_fd, ".", 1));
-> +
-> +		ASSERT_EQ(0, close(client_fd));
-> +		_exit(_metadata->exit_code);
-> +		return;
-> +	}
-> +
-> +	if (self->sandboxed) {
-> +		int ruleset_fd = landlock_create_ruleset(
-> +			&ruleset_attr, sizeof(ruleset_attr), 0);
-> +		ASSERT_LE(0, ruleset_fd);
-> +		if (self->allowed) {
-> +			ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
-> +						       LANDLOCK_RULE_SOCKET,
-> +						       &tcp_socket_create, 0));
-> +		}
-> +		enforce_ruleset(_metadata, ruleset_fd);
-> +		ASSERT_EQ(0, close(ruleset_fd));
-> +	}
-> +
-> +	client_fd = accept(server_fd, NULL, 0);
-> +
-> +	/* accept(2) should not be restricted by Landlock. */
-> +	EXPECT_LE(0, client_fd);
-
-Should be an ASSERT, IMHO.
-If this fails, client_fd will be -1,
-and a lot of the stuff afterwards will fail as well.
-
-> +
-> +	EXPECT_EQ(1, read(client_fd, &buf, 1));
-> +	EXPECT_EQ('.', buf);
-
-I'm torn on whether the "." write and the check for it is very useful in this test.
-It muddies the test's purpose a bit, and makes it harder to recognize the main use case.
-Might make the test a bit simpler to drop it.
-
-> +
-> +	ASSERT_EQ(child, waitpid(child, &status, 0));
-> +	ASSERT_EQ(1, WIFEXITED(status));
-> +	ASSERT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
-> +
-> +	ASSERT_EQ(0, close(server_fd));
-
-You are missing to close client_fd.
-
-> +}
-> +
->  TEST_HARNESS_MAIN
-> -- 
-> 2.34.1
-> 
+Unable to handle kernel NULL pointer dereference at virtual address
+0000000000000000
+Mem abort info:
+ESR =3D 0x0000000086000005
+EC =3D 0x21: IABT (current EL), IL =3D 32 bits
+SET =3D 0, FnV =3D 0
+EA =3D 0, S1PTW =3D 0
+FSC =3D 0x05: level 1 translation fault
+user pgtable: 4k pages, 48-bit VAs, pgdp=3D00000001195d1000
+[0000000000000000] pgd=3D0800000109c46003, p4d=3D0800000109c46003,
+pud=3D0000000000000000
+Internal error: Oops: 0000000086000005 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 UID: 0 PID: 8037 Comm: syz.3.265 Not tainted
+6.11.0-rc7-syzkaller-g5f5673607153 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 08/06/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+pc : 0x0
+lr : cipso_v4_sock_setattr+0x2a8/0x3c0 net/ipv4/cipso_ipv4.c:1910
+sp : ffff80009b887a90
+x29: ffff80009b887aa0 x28: ffff80008db94050 x27: 0000000000000000
+x26: 1fffe0001aa6f5b3 x25: dfff800000000000 x24: ffff0000db75da00
+x23: 0000000000000000 x22: ffff0000d8b78518 x21: 0000000000000000
+x20: ffff0000d537ad80 x19: ffff0000d8b78000 x18: 1fffe000366d79ee
+x17: ffff8000800614a8 x16: ffff800080569b84 x15: 0000000000000001
+x14: 000000008b336894 x13: 00000000cd96feaa x12: 0000000000000003
+x11: 0000000000040000 x10: 00000000000020a3 x9 : 1fffe0001b16f0f1
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000000000000003f
+x5 : 0000000000000040 x4 : 0000000000000001 x3 : 0000000000000000
+x2 : 0000000000000002 x1 : 0000000000000000 x0 : ffff0000d8b78000
+Call trace:
+0x0
+netlbl_sock_setattr+0x2e4/0x338 net/netlabel/netlabel_kapi.c:1000
+smack_netlbl_add+0xa4/0x154 security/smack/smack_lsm.c:2593
+smack_socket_post_create+0xa8/0x14c security/smack/smack_lsm.c:2973
+security_socket_post_create+0x94/0xd4 security/security.c:4425
+__sock_create+0x4c8/0x884 net/socket.c:1587
+sock_create net/socket.c:1622 [inline]
+__sys_socket_create net/socket.c:1659 [inline]
+__sys_socket+0x134/0x340 net/socket.c:1706
+__do_sys_socket net/socket.c:1720 [inline]
+__se_sys_socket net/socket.c:1718 [inline]
+__arm64_sys_socket+0x7c/0x94 net/socket.c:1718
+__invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Code: ???????? ???????? ???????? ???????? (????????)
+---[ end trace 0000000000000000 ]---
 
