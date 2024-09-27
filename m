@@ -1,151 +1,135 @@
-Return-Path: <netdev+bounces-130139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021129888D7
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ACD39888DB
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 18:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B344B24671
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:14:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AF0A1C2105C
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 16:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D6E1C1AA6;
-	Fri, 27 Sep 2024 16:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B91166F06;
+	Fri, 27 Sep 2024 16:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Sku4ooQn"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bmSxR155"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656B41C172D
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 16:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A05282481
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 16:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727453669; cv=none; b=lM5aECHwjhwCIPzpo8of696m+mlz8qJgpiE/Fa4/OlsmT29B/6Oh1M1naxMsCYiaz2N3t4tB/n0dAZa1ZC3CBOsJhQEeGg1U/kCw14HSeB/VOmpiuKJ7uCPzKC2+Sb5AW+zB17bDw61PsN1/TkimF40dGuDoZzPiB9cZ3M12e6I=
+	t=1727453796; cv=none; b=Xz1rJ+fq0vHhkVru+tasEs/I94UPhIAUtYYOAElWjn627s6FHivyQLkw2nHsot8vzNhAiY16Im8pY8it5Sf2+RqqiZduFD0m8GWJuw0l5fHYLG0UhXtVIp1p2VmO/INldOmtCJA1vP8SCOVRfs+IuxOi52mmujE4yOu5D21N+pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727453669; c=relaxed/simple;
-	bh=3RIMFSBP6CNFy3ASEfaPEk9hh3pVcFi6cjnKVKez7w0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WdqS+oaZ1U72eKbQELOMKhCVGQInP5ztq8+/L3NM4yry7HZPUlkHzFzGWLK/GMdy2a8Yuh2WCS+GcISLineqlhymabp6OP3OTG8SlWrq/RcntpDEdVhxyANqHYhwq6VZXm+huAeN8Oe8ZYq9YAuf/6gYBz4g1WgGfwXwEwDv2u8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Sku4ooQn; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20792913262so26760615ad.3
-        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 09:14:27 -0700 (PDT)
+	s=arc-20240116; t=1727453796; c=relaxed/simple;
+	bh=Wu52U0EBGUW8RDbNXrq7iBFkfNUHVmBD2A0I09aK/XU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gAtWKETr/Cw6VfQ2pdkZrMkv5nmvkpsL5/JhEMDOIM+SWjpqjfnoxldb7fppNXlJAY97MfChpUy6zVX4JT4sMaaDS1SCC7ximM3JLskziNbNOczYh8ioRNo9zAdt8S0wE+XMO+VnWZlX+Z9zjfRnkCo/IC8hhQ3bUGZdboKgITI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bmSxR155; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-82aa4fd82a4so85786039f.2
+        for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 09:16:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727453667; x=1728058467; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4so8gffKQiyHlooUmYMifdWdhzGqPHicjPRqtGrdk7o=;
-        b=Sku4ooQnvMd7v+ZkQ+g/Sb7ndiqU2/kAUsjxAGjylkG3W2VPMvJX034xpepK/XfNwy
-         5lmkcRXengxE/tEygD9fYoOV3ejxrl98AEOYAZIRwd17v7ysXkcewitTkg2Ezn+9Hpk5
-         KWOumnvg5XaZqJkz+gd+H9D+pB10hh9mFa4Cw=
+        d=linuxfoundation.org; s=google; t=1727453794; x=1728058594; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HR9L1tFGwvsuWLdcZhMfYeFWtiRJ32Evy1PyzIhswm4=;
+        b=bmSxR155LpztWLjHuK6OM0XH94QISn4Cqa81heCkCyb5UEC+4TRjr/I2E53cOBwyGX
+         42L0hLiGtkq/WGzzGYYaOa+BLvFHkkJGc2Os+T1omyzcbPEgFmiXkB42ab0pef67UTWE
+         JVKeSMdgXCc3TRjddUPE7HxeTXc5bw2ZNtiM4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727453667; x=1728058467;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4so8gffKQiyHlooUmYMifdWdhzGqPHicjPRqtGrdk7o=;
-        b=K0QSdDJJTdVUjTLdu/HIUoiVSyalPmj6lvyBugkTwd/N1pq1M3NBZvagiqrcMfMwZQ
-         NnBv87XGha7BSbxy5A5ZjXSKPM4g4qlieBzAZfGDEmm3sB7L8VNUAkjZ+yCQ13ZagwM4
-         aHIsRf8AKL+hKnmGZzewcnNQcwCTF/6ctMNTyD8NpEXhhAEP4fE/9U7CRAwLCU480CiI
-         HP7v053rmBNKSL/pR9m+PTTvmlx707U2rJEq/3EyPlp+8zHIjootVsvIvwe0lzqvCNOi
-         WIxg1uT41U/qLwrhQqlBgGkWUKNACJW4F/M9WmdK5E53uSL9O4f6i/LDqDFcUy/jDkhz
-         3qig==
-X-Gm-Message-State: AOJu0YzoC2OBdEkbLci+J9qXP4nMMcmMmX3YUVNst5WLB+V9A2Je2q7y
-	UxHMDBLXzHaCogaPrvZES1qccg9iHz0F98o4e/cUES4+EXTZzYuB0wCWSeIh1wU=
-X-Google-Smtp-Source: AGHT+IEjXaqfeQRAXRfoN5D9VsgOXKzfJXTb1NEO6DmBY3dq2QmLox7Y5Qeb0Qch3l/Xg+VnTQV0XA==
-X-Received: by 2002:a17:902:cec6:b0:20b:4d8a:290a with SMTP id d9443c01a7336-20b4d8a2dc6mr12777555ad.31.1727453666745;
-        Fri, 27 Sep 2024 09:14:26 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37d8e033sm15407225ad.70.2024.09.27.09.14.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Sep 2024 09:14:26 -0700 (PDT)
-Date: Fri, 27 Sep 2024 09:14:23 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: netdev@vger.kernel.org, Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 2/2] tg3: Link queues to NAPIs
-Message-ID: <ZvbZ33RYhTQAfBOQ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, netdev@vger.kernel.org,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240925162048.16208-1-jdamato@fastly.com>
- <20240925162048.16208-3-jdamato@fastly.com>
- <ZvXrbylj0Qt1ycio@LQ3V64L9R2>
- <CALs4sv1G1A8Ljfb2WAi7LkBN6oP62TzH6sgWyh5jaQsHw3vOFg@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1727453794; x=1728058594;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HR9L1tFGwvsuWLdcZhMfYeFWtiRJ32Evy1PyzIhswm4=;
+        b=Dy0qXsaSGFMyOj2pfPhjSGLVTuWHWvOjFPqOH7umvxKRTCFTJ1mxNamsrkM376uT8A
+         6Ca0VklqVhNppdydXkk5CJpW9yA6b6CKyu//lOygO0SQBSjHMC7s7ufTMAQJ+HGjWq03
+         ig8TS8QY6Ux0e4JCfRQgzvBbrXCSXyuFAIE/XB5/niQV2v4d/juJIjMSEZOd1ZmeaHKw
+         59vrVZwAojaPNaNCaIb+OdAB3PAvPPGlXrQzX/EQf/XPM5xtHgARo2hugpHY11aDDGZH
+         kKyv9mSnfngD2YCkD3yNc2Kz+e4gw4uNhjSYCug13925+msh124ENIH9LH4/PWMpXpXX
+         F1NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhJ6oufYzn8NnEyQYf2CUo6Bs8kovfc/xl1AdKJCmduEzoFBJfEQiEZjQqJL197WzBii6ZoB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzprSH16xGTFrTr2B9FWLv+VpWZwNFT55OMe+GATlblBSdRgciw
+	OTQuIM9dM9aTtKh6V3Shx6J5mb/RXMzGrtxLRCv06Sv+qH1WBMeV2jaezffou9Y=
+X-Google-Smtp-Source: AGHT+IEP5nmUu95Efe+WgHxrtI1tFEnKpgExLNzW4lKixMYXEZzO3I9iY25TPelr+EvCIoR5XQW/Sw==
+X-Received: by 2002:a05:6602:2b0b:b0:81f:8f5d:6e19 with SMTP id ca18e2360f4ac-834931ae996mr458104939f.2.1727453793860;
+        Fri, 27 Sep 2024 09:16:33 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d888835209sm554605173.11.2024.09.27.09.16.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 Sep 2024 09:16:33 -0700 (PDT)
+Message-ID: <765e0a55-8bb6-45a7-a32e-73b40f92f7dd@linuxfoundation.org>
+Date: Fri, 27 Sep 2024 10:16:32 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] selftests: forwarding: no_forwarding: Fix issue
+ related with assigning two different vids to the same interface.
+To: =?UTF-8?Q?Kacper_Ludwi=C5=84ski?= <kac.ludwinski@protonmail.com>,
+ "davem@davemloft.net" <davem@davemloft.net>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+ "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "petrm@nvidia.com"
+ <petrm@nvidia.com>, "horms@kernel.org" <horms@kernel.org>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "shuah@kernel.org" <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>
+References: <fQknN_r6POzmrp8UVjyA3cknLnB1HB9I_jfaHoQScvvgHr59VfUNRs9IDo4kQHm1uxEp8_Luym2Vi6_aUGJIec3ZPhjY2qnJ57NgLZGA3K4=@protonmail.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <fQknN_r6POzmrp8UVjyA3cknLnB1HB9I_jfaHoQScvvgHr59VfUNRs9IDo4kQHm1uxEp8_Luym2Vi6_aUGJIec3ZPhjY2qnJ57NgLZGA3K4=@protonmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALs4sv1G1A8Ljfb2WAi7LkBN6oP62TzH6sgWyh5jaQsHw3vOFg@mail.gmail.com>
 
-On Fri, Sep 27, 2024 at 09:33:51AM +0530, Pavan Chebbi wrote:
-> On Fri, Sep 27, 2024 at 4:47 AM Joe Damato <jdamato@fastly.com> wrote:
-> >
-> > On Wed, Sep 25, 2024 at 04:20:48PM +0000, Joe Damato wrote:
-> > > Link queues to NAPIs using the netdev-genl API so this information is
-> > > queryable.
-> > >
-> > > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-> > >                          --dump queue-get --json='{"ifindex": 2}'
-> > >
-> > > [{'id': 0, 'ifindex': 2, 'type': 'rx'},
-> > >  {'id': 1, 'ifindex': 2, 'napi-id': 146, 'type': 'rx'},
-> > >  {'id': 2, 'ifindex': 2, 'napi-id': 147, 'type': 'rx'},
-> > >  {'id': 3, 'ifindex': 2, 'napi-id': 148, 'type': 'rx'},
-> > >  {'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'tx'}]
-> > >
-> > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > ---
-> > >  drivers/net/ethernet/broadcom/tg3.c | 24 ++++++++++++++++++++----
-> > >  1 file changed, 20 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-> > > index ddf0bb65c929..f78d7e8c40b2 100644
-> > > --- a/drivers/net/ethernet/broadcom/tg3.c
-> > > +++ b/drivers/net/ethernet/broadcom/tg3.c
-> > > @@ -7395,18 +7395,34 @@ static int tg3_poll(struct napi_struct *napi, int budget)
-> > >
-> > >  static void tg3_napi_disable(struct tg3 *tp)
-> > >  {
-> > > +     struct tg3_napi *tnapi;
-> > >       int i;
-> > >
-> > > -     for (i = tp->irq_cnt - 1; i >= 0; i--)
-> > > -             napi_disable(&tp->napi[i].napi);
-> > > +     ASSERT_RTNL();
-> > > +     for (i = tp->irq_cnt - 1; i >= 0; i--) {
-> > > +             tnapi = &tp->napi[i];
-> > > +             if (tnapi->tx_buffers)
-> > > +                     netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_TX, NULL);
-> >
-> > It looks like the ASSERT_RTNL is unnecessary; netif_queue_set_napi
-> > will call it internally, so I'll remove it before sending this to
-> > the list (barring any other feedback).
+On 9/27/24 01:03, Kacper Ludwiński wrote:
+> Fix typo.
+
+Remove the above line. It gives the impression that this is
+a minor spelling fix when it is not. It is fixing a problem
+that prevents the test from running correctly.
+
+> Currently, the second bridge command overwrites the first one.
+> Fix this by adding this VID to the interface behind $swp2.
 > 
-> Thanks LGTM. You can use Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
+> Signed-off-by: Kacper Ludwinski <kacper@ludwinski.dev>
+> ---
+>   tools/testing/selftests/net/forwarding/no_forwarding.sh | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> index 9e677aa64a06..694ece9ba3a7 100755
+> --- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> +++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+> @@ -202,7 +202,7 @@ one_bridge_two_pvids()
+>   	ip link set $swp2 master br0
+> 
+>   	bridge vlan add dev $swp1 vid 1 pvid untagged
+> -	bridge vlan add dev $swp1 vid 2 pvid untagged
+> +	bridge vlan add dev $swp2 vid 2 pvid untagged
+> 
+>   	run_test "Switch ports in VLAN-aware bridge with different PVIDs"
+> 
+> --
+> 2.43.0
+> 
 
-Thanks, I've added your Reviewed-by for the official submission.
+With the above change:
 
-I'll mention this in the cover letter when net-next is open but the
-only changes I've made to the patch I posted are:
-  - Removal of ASSERT_RTNL (mentioned above, as it seems to be unnecessary)
-  - Wrapped lines at 80 characters (cosmetic change only)
+Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
+
+thanks,
+-- Shuah
 
