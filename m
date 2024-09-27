@@ -1,203 +1,137 @@
-Return-Path: <netdev+bounces-130043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 381B6987CA9
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 03:43:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 889FC987CDF
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 04:11:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D9CA2848B4
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 01:43:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39A002812F0
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 02:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEE614A0B8;
-	Fri, 27 Sep 2024 01:43:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C75D169AE6;
+	Fri, 27 Sep 2024 02:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSZK14v4"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="R3IQC8x6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3E914A09E;
-	Fri, 27 Sep 2024 01:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD9A3A1A8
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 02:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727401392; cv=none; b=Oe0T0lCHWzgbjRmMK08rA6Sh4YTG6VA0V1/JlrxRDHsui/D335LpuMJoEcR1jXqpnVw4BZKiyWK0lpa/0QAvRzOtCgy8csXeND36ijT9kyW3tUOGTXfh+2THRJz/DQIQIr7POmzrU+jTgErqpfCPmip758LFdrqiQnnk67y/1Nk=
+	t=1727403082; cv=none; b=moktD84GmIpxqAmBgEP9HgB8s5O1kYr6lYPsv74y9H/b1et6Vk/Bs0+ZzCha1C3cHeKVQL3vJqyyO4+Y7g43yMw5w5DW10nVooFlQCKIBJRf9oLa+SPsZu/HAjNr1YLv44eC0v5MvwWS9IizpVAMhl80yO2jatBcuHuz1pZ2MXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727401392; c=relaxed/simple;
-	bh=vO+LHsJGtoPwPjSq3QNJ7PtmP50p+WXR2S0ccd9+was=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFUoV3iS7OS1I9D7HfQI3+lAWdwd+O7S7LY/A3jHMhJYegvUhmm1J1eRDa9NG+zdtH2FiBWqtNUpfnN2eVZxhwfJAVbMv4PNiRibb2PjBXjyZKwfFfcJf95vShtsgKkWKepOpLG0fpM/G7nqUFDh+Y49NFctv9Avt21h3X2GgWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSZK14v4; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7d666fb3fb9so914607a12.0;
-        Thu, 26 Sep 2024 18:43:11 -0700 (PDT)
+	s=arc-20240116; t=1727403082; c=relaxed/simple;
+	bh=z2u3XIUIO6fq3zsKBJpUIQZilOD/xOQQm7u9WYiUdWA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UzmqZO7thNUj1CO2VAvhI0TzZ4tOD8ynDx8YV8ToG+refqj3KKNFVFO80uGxl7MLC8ID18Xrb+fslygFnAfz1cPRo9jLpR2NOISeaZ/NPYgA3JnLyBFslEm4xXNnJfd86Nd8kJ5JxcbuaSO1r5wL523f3eFUNhy/QfF//zxsMUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=R3IQC8x6; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso1079605a12.1
+        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 19:11:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727401390; x=1728006190; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q653sQOlcSyRs9hPuoG+zXvugHIxRtEH110Wy2TqD8I=;
-        b=mSZK14v4sVVeEvbhjyCwrHjsHfd5scnhadKLCgKuZRiRJOt+PzJuU8/d4NpTJ1S0Em
-         WvDkU2TdPn1+hylXfuFXTgGZ3x9xAkjU0PuUXYQM8dIiXRn6NjqgBGB2mr4zVDSX61nL
-         w328AFQpzPPAtavsvg5MLc1MjhBStdTH9TEhMgBXzPqJh3V19u4WSwV8TBeeHGE0uBdm
-         jWcuJ51t8LWijUoZnoKTSICE2YIVpi87vD8GS9rg6bHD70m3OvymYsVtANlNvvPFkKbs
-         XNEktdkjFk9EU8dRk4VP7E04p5X5GTJ0BeleBXLJTmZo9GIwUGGTsQTedYvZEw/UUKGk
-         HMZw==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727403080; x=1728007880; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uf2tPCUdEA01GCYGd4noA0WD0ijkHEkhZlFEu8nmNFY=;
+        b=R3IQC8x6Bcu4TPK3yCuQKMEcOAruWM0FQDmDaOnAyXyNaU1iZVkTGtIJfZpD/JFTkF
+         gSZzR5nnZ2m+JXiSNYh8mnFSqOsvMctpT+4qV+uCeVc1DJEoeuVVaNQzqmQgZi/B5vco
+         9IjRUqU0iytNbdwo2awIXQjF5DMBWG+i1Tle8Q1T3K90SwjqBybFfNU7f+z3AJu9LwoW
+         MhWhh4ZXuygLFjzHpWlfFbKnsjazY11p5yc6/5SJdX9OQrmTlUOvUOAgovnck4km9WdJ
+         R+2yQonls0SBjqxWZJBI7a8Y9zRbRL0xzxaHS2/UJjbevJ2o6yUD7CJ/gh55QPg2975+
+         zYCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727401390; x=1728006190;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q653sQOlcSyRs9hPuoG+zXvugHIxRtEH110Wy2TqD8I=;
-        b=ZEgbNHg687g2rRkfAQHMktSpm+WsI+XtNFm8c4R7c3N27cb/DkkT5fL3RZo8npungu
-         73wtF2uVBkR4nM5mk98WWZgebfifZUfYgpVCJ4vHOVdwjy2yJwqNgzOSsBhCesZFMVdJ
-         JniEUpcJPcq/+4Zo0s5oWU92tmo7o8/cvX8fVA0KrO271J0G+L899n2LGd45NwD9duiK
-         4VOInR4zM7qL8dW4mapsG40HbTT3YvHNOeKhqIJXib+EzwFhiX/w8mB8aVBB2RX4MJxT
-         b0dAEUKfxeOOh+BIM7vBZskh2VNehJmCQR1a1E/i/WpEVarqbrglaQvqhsdg9Py3HiY7
-         eFDg==
-X-Forwarded-Encrypted: i=1; AJvYcCWm0bm1Ub4sxsFl2R6QS/e2mOpS6lao4urUw3B+hJv1vkmtmXwXhZrZc/EqLiBZxrFFF9rjQGss@vger.kernel.org, AJvYcCXmwatrfqqtOgHFCqdckH8myrZyjn3p0hI27VDSH6PWVrn8uwW63slQISBdPjLMi9PIrjE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyR1rSmgo7+p1HGPbwOhj7bGrg0CtY/TZxDLNAUv+ESwVYl8qAQ
-	62k99PJN2TCzVLyF+MWd0YfVNpH6EmZ2fmvGWy8EVGuxgFq/EAY=
-X-Google-Smtp-Source: AGHT+IGk0A4RXFQ/svtxe8Nnc5iMxuLjkwJyk+b8Okdd8PJts4jl3XgDUgU/jpUwuW/i3drWNQgrpg==
-X-Received: by 2002:a05:6a21:33a6:b0:1cf:3f39:c469 with SMTP id adf61e73a8af0-1d4ebe2733bmr8274266637.2.1727401390353;
-        Thu, 26 Sep 2024 18:43:10 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6db612f6fsm542081a12.86.2024.09.26.18.43.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Sep 2024 18:43:09 -0700 (PDT)
-Date: Thu, 26 Sep 2024 18:43:09 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Arthur Fabre <afabre@cloudflare.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
-	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
-	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
-	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	kernel-team <kernel-team@cloudflare.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-Message-ID: <ZvYNranHf9X5ZjK-@mini-arch>
-References: <cover.1726935917.git.lorenzo@kernel.org>
- <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
- <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
- <Zu_gvkXe4RYjJXtq@lore-desk>
- <87ldzkndqk.fsf@toke.dk>
- <ZvA6hIl6XWJ4UEJW@lore-desk>
- <874j62u1lb.fsf@toke.dk>
- <ZvV2WLUa1KB8qu3L@lore-rh-laptop>
+        d=1e100.net; s=20230601; t=1727403080; x=1728007880;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uf2tPCUdEA01GCYGd4noA0WD0ijkHEkhZlFEu8nmNFY=;
+        b=cE0BkuloHEMpe5WHREIJBVQpMYKWaQhIb13k5YQjPU5696vr2gwLye6jSTYQLUyqb2
+         pXnqDQZqmxxbELqm46vNPbzeb2dAvJDJovU6JlJ760b5Slv4gk0PXr/XhtSnQr0KdQ/X
+         zAEuQURLh/3W+l7X+wR3uAz4bUsbVow5Lxj7jU+Yip1RHj+RHDBqdotWuZzKhQW0olsA
+         SyQCMByrGAcQ3x+4wRS0bQmIFb0uvj7AyYIohBQVdS3nuL9/r4oqjSzX6vOaO8D1oKWc
+         RWQuX651OYLq+0FNixxUD5gbGKJ8jPcC7m2Ie5ndB37R2EQ2GMQ8PdUNcE5m7eDL0U/H
+         EtwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUh280zWwlEkz3qGl5fRQohZiG9vO7LHTsBthBhpjphqRTIXb4kZH7XCE+zL92SFXnsG85dpzU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6txidxdATXeuW+Oywql9NSqvdmn0iENr+n3BRFfmZxdjK3I/R
+	reafcm3u0OOGoAf3aeD5GAYvCL5yj2u4MBGQzQaU3k4jVzzYCbp+cf1wpr8VuHA=
+X-Google-Smtp-Source: AGHT+IE7cjRrb25dzMXmo+VfgnfSpwEWOl/UW7HQEnq4EHsE9dGMvjEK+lxgfFogzB4DCdWpnrgmFQ==
+X-Received: by 2002:a05:6a20:4ca6:b0:1d4:fcfe:e1ee with SMTP id adf61e73a8af0-1d4fcfeee5fmr1089565637.9.1727403080438;
+        Thu, 26 Sep 2024 19:11:20 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264bc1a3sm559085b3a.75.2024.09.26.19.11.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Sep 2024 19:11:19 -0700 (PDT)
+Message-ID: <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
+Date: Fri, 27 Sep 2024 11:11:15 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZvV2WLUa1KB8qu3L@lore-rh-laptop>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
+ <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 09/26, Lorenzo Bianconi wrote:
-> > Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
-> > 
-> > >> I'm hinting at some complications here (with the EFAULT return) that
-> > >> needs to be resolved: there is no guarantee that a given packet will be
-> > >> in sync with the current status of the registered metadata, so we need
-> > >> explicit checks for this. If metadata entries are de-registered again
-> > >> this also means dealing with holes and/or reshuffling the metadata
-> > >> layout to reuse the released space (incidentally, this is the one place
-> > >> where a TLV format would have advantages).
-> > >
-> > > I like this approach but it seems to me more suitable for 'sw' metadata
-> > > (this is main Arthur and Jakub use case iiuc) where the userspace would
-> > > enable/disable these functionalities system-wide.
-> > > Regarding device hw metadata (e.g. checksum offload) I can see some issues
-> > > since on a system we can have multiple NICs with different capabilities.
-> > > If we consider current codebase, stmmac driver supports only rx timestamp,
-> > > while mlx5 supports all of them. In a theoretical system with these two
-> > > NICs, since pkt_metadata_registry is global system-wide, we will end-up
-> > > with quite a lot of holes for the stmmac, right? (I am not sure if this
-> > > case is relevant or not). In other words, we will end-up with a fixed
-> > > struct for device rx hw metadata (like xdp_rx_meta). So I am wondering
-> > > if we really need all this complexity for xdp rx hw metadata?
-> > 
-> > Well, the "holes" will be there anyway (in your static struct approach).
-> > They would just correspond to parts of the "struct xdp_rx_meta" being
-> > unset.
+On 2024/09/25 12:30, Jason Wang wrote:
+> On Tue, Sep 24, 2024 at 5:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> virtio-net have two usage of hashes: one is RSS and another is hash
+>> reporting. Conventionally the hash calculation was done by the VMM.
+>> However, computing the hash after the queue was chosen defeats the
+>> purpose of RSS.
+>>
+>> Another approach is to use eBPF steering program. This approach has
+>> another downside: it cannot report the calculated hash due to the
+>> restrictive nature of eBPF.
+>>
+>> Introduce the code to compute hashes to the kernel in order to overcome
+>> thse challenges.
+>>
+>> An alternative solution is to extend the eBPF steering program so that it
+>> will be able to report to the userspace, but it is based on context
+>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+>> and vhost_net).
+>>
 > 
-> yes, what I wanted to say is I have the feeling we will end up 90% of the
-> times in the same fields architecture and the cases where we can save some
-> space seem very limited. Anyway, I am fine to discuss about a common
-> architecture.
-> 
-> > 
-> > What the "userspace can turn off the fields system wide" would
-> > accomplish is to *avoid* the holes if you know that you will never need
-> > them. E.g., say a system administrator know that they have no networks
-> > that use (offloaded) VLANs. They could then disable the vlan offload
-> > field system-wide, and thus reclaim the four bytes taken up by the
-> > "vlan" member of struct xdp_rx_meta, freeing that up for use by
-> > application metadata.
-> 
-> Even if I like the idea of having a common approach for this kernel feature,
-> hw metadata seems to me quite a corner case with respect of 'user-defined
-> metadata', since:
-> - I do not think it is a common scenario to disable hw offload capabilities
->   (e.g checksum offload in production)
-> - I guess it is not just enough to disable them via bpf, but the user/sysadmin
->   will need even to configure the NIC via ethtool (so a 2-steps process).
-> 
-> I think we should pay attention to not overcomplicate something that is 99%
-> enabled and just need to be fast. E.g I can see an issue of putting the hw rx
-> metadata in metadata field since metadata grows backward and we will probably
-> end up putting them in a different cacheline with respect to xdp_frame
-> (xdp_headroom is usually 256B).
-> 
-> > 
-> > However, it may well be that the complexity of allowing fields to be
-> > turned off is not worth the gains. At least as long as there are only
-> > the couple of HW metadata fields that we have currently. Having the
-> > flexibility to change our minds later would be good, though, which is
-> > mostly a matter of making the API exposed to BPF and/or userspace
-> > flexible enough to allow us to move things around in memory in the
-> > future. Which was basically my thought with the API I sketched out in
-> > the previous email. I.e., you could go:
-> > 
-> > ret = bpf_get_packet_metadata_field(pkt, METADATA_ID_HW_HASH,
-> >                                     &my_hash_vlaue, sizeof(u32))
-> 
-> yes, my plan is to add dedicated bpf kfuncs to store hw metadata in
-> xdp_frame/xdp_buff
-> 
-> > 
-> > 
-> > ...and the METADATA_ID_HW_HASH would be a constant defined by the
-> > kernel, for which the bpf_get_packet_metadata_field() kfunc just has a
-> > hardcoded lookup into struct xdp_rx_meta. And then, if we decide to move
-> > the field in the future, we just change the kfunc implementation, with
-> > no impact to the BPF programs calling it.
-> > 
-> 
-> maybe we can use what we Stanislav have already added (maybe removing xdp
-> prefix):
-> 
-> enum xdp_rx_metadata {
-> 	XDP_METADATA_KFUNC_RX_TIMESTAMP,
-> 	XDP_METADATA_KFUNC_RX_HASH,
-> 	XDP_METADATA_KFUNC_RX_VLAN_TAG
-> };
+> I wonder if we could clone the skb and reuse some to store the hash,
+> then the steering eBPF program can access these fields without
+> introducing full RSS in the kernel?
 
-I think it was one of the ideas floating around back then for the
-xdp->skb case (including redirection): have an extra kfunc that the bpf
-program can call and make this kfunc store the metadata (in the metadata area)
-in some fixed format. Then the kernel can consume it.
+I don't get how cloning the skb can solve the issue.
+
+We can certainly implement Toeplitz function in the kernel or even with 
+tc-bpf to store a hash value that can be used for eBPF steering program 
+and virtio hash reporting. However we don't have a means of storing a 
+hash type, which is specific to virtio hash reporting and lacks a 
+corresponding skb field.
+
+Regards,
+Akihiko Odaki
 
