@@ -1,156 +1,151 @@
-Return-Path: <netdev+bounces-130045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F56D987CFB
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 04:23:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6512987D2F
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 04:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E14801F23C6C
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 02:23:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26ED2B22760
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 02:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E0D1509AB;
-	Fri, 27 Sep 2024 02:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5282916EBE8;
+	Fri, 27 Sep 2024 02:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="dQxZMayw"
+	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="wuzdyuV1";
+	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="h9MssA4x";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nY2fPuzV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F384041C79
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 02:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F000166F26;
+	Fri, 27 Sep 2024 02:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727403786; cv=none; b=QgILIdWzpiGAOmoSR4qP48IvpLKASzQcvtuch6t98xTMhSoIvI0HEHssIafcJNbOfgvCI5JOS08NI55ZU/0oSY61HnFzNFK3q8pHWL8RF/ucXO1Pcnjsl0x2uGr7vqsDcejfRPbJtKd2K8e7uo28V/t58DNjGViV/Vf3QbOmUak=
+	t=1727405585; cv=none; b=QwmU1bNoCo8gaksLiXWziNziicPZJUKLNwyh4VtsDPog1+1sjpxmvr2xoYB/gllkPtCLayKoVSwhwNYHsnHTIrU+XYAzZn/1f/w9qO3OdAb/Rz6D9fbeBMHYZpWSLARikfbfFAS6moyAugsVgHQnhbnPmMb680vE85EBxPP5+fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727403786; c=relaxed/simple;
-	bh=V5nTFEg40BS9fpyNzgTctWWGF7NZtj92BLrRC7NQ+HU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lIAvoYNE1pYaoEIGCgN6MGYeADKTTA9/LpUNvojooLn9jOgaqtB8AuS/olhTGgzqVCX/aoa3wUQy/esC/Up4dnmsz8Olm+LfHjF/EDsuMoNfhB09R8mBzGcdrRIdAQmRC28aaJQTk/AvukDJIvhodyt4YR8ncNUEI6kz3+CbH7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=dQxZMayw; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7db1f13b14aso1273993a12.1
-        for <netdev@vger.kernel.org>; Thu, 26 Sep 2024 19:23:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727403784; x=1728008584; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fm6FdUgor1DMp4AzKUDxfLdY/zKgjnsnnCTT3QZsc5c=;
-        b=dQxZMaywWfRVNSvsij2ddn5q1q3tEa2PKca/DKE35Xn8Kwh9VAwLuw+Sna8VhaD95U
-         vZQ8QEN1TXntbkxRvpab8otxeOB3U70/jJ4ikIYF+NY5CriZ+C5M4SESdvDZCOi2/3nJ
-         L65mW331pF8ED7xRIMZZvNLan3wnMFE+MDUw9Mp7D5ECuiNoSNBwSKV4/tn2+PLjQOcA
-         dOeCYby1SIZeHjRHtfgVvvdQXRljBcf4K74O25zKCpLaZfckDvoIcvkih+gKFS9Nhnq3
-         Qt/XGUVsaHxxXj2SKfkvfYeVPce8B14NLR8saB2OzBpjFOWE+BvS3YBKkdlpXxg1z3k2
-         1C9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727403784; x=1728008584;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fm6FdUgor1DMp4AzKUDxfLdY/zKgjnsnnCTT3QZsc5c=;
-        b=KVMEFu+waz96hvaIxxjdaFpJ2Pp+ZNTM34S6opf9Cs3fOM0Ye/xi/sVe9vMmRpeHzm
-         K2R3+Lk9lGiPCIxNRMGRRpJZnQGq/ZkZAOGnD+sZ/AdEmaPjRJDKoqvquNibp3hSHKVf
-         WJ71uGIgAkNp7UJ3NaC/B2fDG66bEk9dURBhL2T98o/KyenGSKGsLx7G7ewm4rRuUJyP
-         OnmVsoHrHi9cnmWk6q21skr9YaqjPWU2MlMhO3epG1ZsqOHDzawZOVUd0UnTheAo2TiG
-         lMAZ8g5JWxomxufGtSjx8z8ccKLTAgrakWA8mGVh9rfOpMhFNjrIardYnjCTqSznGxeM
-         qRpw==
-X-Forwarded-Encrypted: i=1; AJvYcCWD58iWPcdLmpiczuHPI1hVMjrFPD/zD/R6G1hkYQhTweA4HfrsD87r4s4Pnzqt0oLF155C35Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyf3K1Z3Z5gCb7AfJA8NUerpkhsqyfg1M5hJTvL0cGZYNweQq4h
-	TTlkJp1tBb681XMqfmj+eF3S/zj7Hey9WmAS69mQZOAT+MW/6TE4gp85ifPIAsY=
-X-Google-Smtp-Source: AGHT+IE8eclHHp/rZtYVB0h05WFJYdKId7bC7EfQYU296diw2AVIsMjGQmM4ppAbwhdAEFSQulsWLQ==
-X-Received: by 2002:a05:6a20:db0d:b0:1cf:3d14:6921 with SMTP id adf61e73a8af0-1d4fa78b468mr2830052637.35.1727403784277;
-        Thu, 26 Sep 2024 19:23:04 -0700 (PDT)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264bc443sm570468b3a.70.2024.09.26.19.23.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 Sep 2024 19:23:03 -0700 (PDT)
-Message-ID: <66438fad-d697-4b34-89de-528bd5e081b5@daynix.com>
-Date: Fri, 27 Sep 2024 11:22:59 +0900
+	s=arc-20240116; t=1727405585; c=relaxed/simple;
+	bh=WkPezx0o4HY/+AcdmTGqzF7F/xul+CpBZE2MPamOqDI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bsUdpCeDnHLLzjqrSeTXsvawws8YQrTRl45w7Kci3wD96Z9bXTupeflezMuYOXlHI0+3kRk4zeLsmEmc8w4bOdR3aNiXKjy1MZg2FNcX3RWIu+M63Y/p9yEbfor+ubxcLgl3XRFnHNKwtWysp1Xt5M+OI6lvXP1iOg1HzcEq+wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=wuzdyuV1; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=h9MssA4x; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nY2fPuzV; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfout.phl.internal (Postfix) with ESMTP id 79ADC13801A6;
+	Thu, 26 Sep 2024 22:53:02 -0400 (EDT)
+Received: from phl-frontend-02 ([10.202.2.161])
+  by phl-compute-02.internal (MEProxy); Thu, 26 Sep 2024 22:53:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=2016-12.pbsmtp; t=1727405582; x=1727491982; bh=chcNNPjcSE
+	3Sb8CDCL8RLtmY5d8nWZqtNTXTlkj4+po=; b=wuzdyuV1wcE7PF8z+O7e9bZVCf
+	O4FACUIK0PUFamBhpYZUz6EwLK7UA3U3GrqFBPLOdpT6WDMxnnMD8cbVPMUVd59s
+	zzYcI93nnPoAeualOjc0HgItljXYLvk4DiR2ZcnPcKvP5VAeWp2N320Lca7a7hT0
+	zJNCJeEWTqRpFHyV0=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1727405582; x=1727491982; bh=chcNNPjcSE3Sb8CDCL8RL
+	tmY5d8nWZqtNTXTlkj4+po=; b=h9MssA4xwXeMvWGwgTe+jVFO2Bp+fXsqEzypa
+	RYT3AJPLnd6ii3JSqdN4jl12HCHXrY0q7uQ4OLpqMR/0u1NpsseHBzuNALypE253
+	yf9Q7AraNWIZ/4ndu2IgVlvsr5NCfuJexXao0+VLL670+XtgjgTrdN8x/EjiLvLq
+	uwA65IQfdBYhfkcREdRsotXhrQRh3XJxn0VVzPr1EEX3obIhJL+pncaEd1S/bqkG
+	1MVRWaaAGDwfwIKN27pPFB+rQKm9tnCwdWpWUsZCMQiRUmY5j1rf9WMdBZgE5Iqz
+	1smSTfQ/IVGV59ur1qNSzi1i+OOTrhZQBm77a32TE2UTek9Rw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1727405582; x=1727491982; bh=chcNNPjcSE3Sb8CDCL8RLtmY5d8n
+	WZqtNTXTlkj4+po=; b=nY2fPuzVHTAV/NpWsLgViQA1v7rWumQSds/AIbRvr9Iw
+	CyTz+Qfw5QZGY8mQ8lkeqIPz3VCG9/7oOttbfY6tkl4r7hvP8yb0YseW1yDkG5Gu
+	dPPhNrL0FLRuPXtnKAA1fJPpbY/6IX1mmGCLr1M41r53K45zpcMvdjZwtechLD0T
+	i1aP9WbXJnnesenGM+923x+HiYdrvRSUD/6+X9siMO2fj49idoGDOaS2OITYXxDF
+	ghyyQR5vJfddkT1kYgRk7HOmWqvzA1TZMF1OQPFSJpAhjWk5lV+2mdC1XAmgsCyN
+	THX+Bt8YyGrJmynfx1RZXt5xijWkmIi1QyxGtjoUAA==
+X-ME-Sender: <xms:Dh72Zs4hZz0eUGT1TI5VSzbzozE8W1Aj_vZ8rwzr9lblOD7LNJNNEA>
+    <xme:Dh72Zt6UJuP5LHqHTjbBQv7IEF04l_s2LbV-IQfxtIQQzCMR7XjqKIdMAeOLHJUI9
+    PuC7T3plc987yeIFOI>
+X-ME-Received: <xmr:Dh72ZrcuNRnWMplJxiO9e3ccAIa2gZNLBE0BD0gnD343pQ15qBRNuzWO7WAesc1x2nDspglaSSQa-l4UG0YVTB93TB_0jRwL0WwnU15rtGc_vPoQ2g>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddtkedgieefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
+    rhhomheppfhitgholhgrshcurfhithhrvgcuoehnihgtohesfhhluhignhhitgdrnhgvth
+    eqnecuggftrfgrthhtvghrnhephefhfeetueeiteeigfffieelveethfduleegheelteeh
+    udetuedvjeffffdvhfevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepnhhitghosehflhhugihnihgtrdhnvghtpdhnsggprhgtphhtthhopeeh
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehnphhithhrvgessggrhihlihgsrh
+    gvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgt
+    phhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugi
+    dqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthgu
+    vghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:Dh72ZhK6NIvToZ2i-HFBmzW_m-vuIcj_b7ETuZUUWPpf_g7b-QmIUg>
+    <xmx:Dh72ZgIqewXLz6xkrGyNSbs8NhWk8Lxm5v8Tj2rh2oCFsK-wYX_f_A>
+    <xmx:Dh72ZixL7fP3IDqj1aESmkUsgUYci1ffVpbOwcI-VnPf8Ncvlx5JGQ>
+    <xmx:Dh72ZkIbwPR0OUypw-OLPP3rogca_BE5QXWQ5BpFTadTsNsy7Gc5HQ>
+    <xmx:Dh72Zo-WOKJo3Tro0BrDk9HX-5RMGAqhTjGnb8bjeo2bq02Mp6IG3SI7>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 26 Sep 2024 22:53:01 -0400 (EDT)
+Received: from xanadu.lan (OpenWrt.lan [192.168.1.1])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id 34420E25F6A;
+	Thu, 26 Sep 2024 22:53:01 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Nicolas Pitre <npitre@baylibre.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] net: ethernet: ti: am65-cpsw: prevent WARN_ON upon module removal
+Date: Thu, 26 Sep 2024 22:52:59 -0400
+Message-ID: <20240927025301.1312590-1-nico@fluxnic.net>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 7/9] tun: Introduce virtio-net RSS
-To: Simon Horman <horms@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
- <20240924-rss-v4-7-84e932ec0e6c@daynix.com>
- <20240924130550.GJ4029621@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20240924130550.GJ4029621@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2024/09/24 22:05, Simon Horman wrote:
-> On Tue, Sep 24, 2024 at 11:01:12AM +0200, Akihiko Odaki wrote:
->> RSS is a receive steering algorithm that can be negotiated to use with
->> virtio_net. Conventionally the hash calculation was done by the VMM.
->> However, computing the hash after the queue was chosen defeats the
->> purpose of RSS.
->>
->> Another approach is to use eBPF steering program. This approach has
->> another downside: it cannot report the calculated hash due to the
->> restrictive nature of eBPF steering program.
->>
->> Introduce the code to perform RSS to the kernel in order to overcome
->> thse challenges. An alternative solution is to extend the eBPF steering
->> program so that it will be able to report to the userspace, but I didn't
->> opt for it because extending the current mechanism of eBPF steering
->> program as is because it relies on legacy context rewriting, and
->> introducing kfunc-based eBPF will result in non-UAPI dependency while
->> the other relevant virtualization APIs such as KVM and vhost_net are
->> UAPIs.
->>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> 
-> ...
-> 
->> @@ -333,8 +336,10 @@ static long tun_set_vnet_be(struct tun_struct *tun, int __user *argp)
->>   		return -EFAULT;
->>   
->>   	if (be) {
->> +		struct tun_vnet_hash_container *vnet_hash = rtnl_dereference(tun->vnet_hash);
->> +
->>   		if (!(tun->flags & TUN_VNET_LE) &&
->> -		    (tun->vnet_hash.flags & TUN_VNET_HASH_REPORT))
->> +		    vnet_hash && (vnet_hash->flags & TUN_VNET_HASH_REPORT))
-> 
-> Hi Odaki-san,
-> 
-> I am wondering if the above should this be vnet_hash->common.flags?
-> I am seeing this:
-> 
-> ../drivers/net/tun.c:342:44: error: ‘struct tun_vnet_hash_container’ has no member named ‘flags’
->    342 |                     vnet_hash && (vnet_hash->flags & TUN_VNET_HASH_REPORT))
-> 
-> ...
+From: Nicolas Pitre <npitre@baylibre.com>
 
-You are right. I couldn't notice this error because I was testing 
-without CONFIG_TUN_VNET_CROSS_LE; I'll test with the configuration and 
-submit a new version with fix.
+In am65_cpsw_nuss_remove(), move the call to am65_cpsw_unregister_devlink()
+after am65_cpsw_nuss_cleanup_ndev() to avoid triggering the
+WARN_ON(devlink_port->type != DEVLINK_PORT_TYPE_NOTSET) in
+devl_port_unregister(). Makes it coherent with usage in
+m65_cpsw_nuss_register_ndevs()'s cleanup path.
 
-Regards,
-Akihiko Odaki
+Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index cbe99017cb..f6bc8a4dc6 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -3652,13 +3652,13 @@ static void am65_cpsw_nuss_remove(struct platform_device *pdev)
+ 		return;
+ 	}
+ 
+-	am65_cpsw_unregister_devlink(common);
+ 	am65_cpsw_unregister_notifiers(common);
+ 
+ 	/* must unregister ndevs here because DD release_driver routine calls
+ 	 * dma_deconfigure(dev) before devres_release_all(dev)
+ 	 */
+ 	am65_cpsw_nuss_cleanup_ndev(common);
++	am65_cpsw_unregister_devlink(common);
+ 	am65_cpsw_nuss_phylink_cleanup(common);
+ 	am65_cpts_release(common->cpts);
+ 	am65_cpsw_disable_serdes_phy(common);
+-- 
+2.46.1
+
 
