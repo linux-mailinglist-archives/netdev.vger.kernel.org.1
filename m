@@ -1,145 +1,97 @@
-Return-Path: <netdev+bounces-130160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF175988BBA
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 23:12:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FEBE988BBE
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 23:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91E672836DF
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 21:12:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839271C2142B
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 21:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97C241C3303;
-	Fri, 27 Sep 2024 21:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 015E21C2DAC;
+	Fri, 27 Sep 2024 21:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsJTpKKn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t6yEO5M5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4EEF1C244A
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 21:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDB314EC5E
+	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 21:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727471519; cv=none; b=blGB2NLaoxB9jVOW+rIfIWyk9PxUlJ/SssEd0Xj4jSBQPJPoJXtqrzbUpdL4ILjcxclY99Pq6NmBjb3Ss30FULN2kwunSVqxVg6oVfiUuf6EArRzuOU5zt7STpgFt/jupwWIprxrwt2vAfMruJkuag9fGpgblrgnnHbu7n4Fzz4=
+	t=1727472028; cv=none; b=qQdGJgmH8s2645FVRUsT8IzLeWvx2KbxpJPDz4URBMqnWxMcFJ3RYHzznVkY2+3CMlh+NMEvERLw9K1FcIwPG85ID18yBMG3M2J3z//BVibjnioj0DP4UUC99IMpBLAlM78fUQV/LafkPjx3s1C/Nm3h4SwxZg+q98LkbRyJGxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727471519; c=relaxed/simple;
-	bh=j3c5/Zh4p82GAk9vaXtDQNsggU/jIEjNscDXUpnSLwI=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=olgyAAmhMBB1k2YDRw74jlV6QleX98ZKXGqp7CH9nxt05RRzQD3v9fE8P/W8PYvaL3VjTIR1i7P00ziC9HJ74Eune5zujL7lnrMWX6GDknmuOC9LOFGTnXMDAoSy4RQwmSaQPLdqUox4W+brsXtREhVVCwqQu63mOm2kDZ1wGAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FsJTpKKn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727471515;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8uMxOBU2H6Hw+qD+HRMDEGiSShQKw6OKRseN26Hxg0M=;
-	b=FsJTpKKnXbio8SND1s1thRm9O+Ioa7LV/ohIU03LvcLBVubCeLSwPhE1dyTSBb+jfNKVZ8
-	GHwWXy1+trr933LG+RJ+dfxgJ0lRhulKrVE+XI8QT/vWODhKbkXZugqJuHOGNKH4WxTm6k
-	Vb4OZ/lpvZXFEEmyBeDVsN41G9vDUWQ=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-528-nkGTJbKIOsK6M6_0H6aoDw-1; Fri,
- 27 Sep 2024 17:11:52 -0400
-X-MC-Unique: nkGTJbKIOsK6M6_0H6aoDw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8F2381936B95;
-	Fri, 27 Sep 2024 21:11:49 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BC3D43003DF2;
-	Fri, 27 Sep 2024 21:11:43 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <55cef4bef5a14a70b97e104c4ddd8ef64430f168.camel@gmail.com>
-References: <55cef4bef5a14a70b97e104c4ddd8ef64430f168.camel@gmail.com> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <2663729.1727470216@warthog.procyon.org.uk>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: dhowells@redhat.com, Manu Bretelle <chantr4@gmail.com>,
-    asmadeus@codewreck.org, ceph-devel@vger.kernel.org,
-    christian@brauner.io, ericvh@kernel.org, hsiangkao@linux.alibaba.com,
-    idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+	s=arc-20240116; t=1727472028; c=relaxed/simple;
+	bh=opz6pQiAqq4a3coCyKHOsTWGN//bHUJSsO/2/3lFcGc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IL81MneajQdRe+jvlWz96Zak6lIZDbuOb9L4rri/a1Zqa7hO8nWuk8M2Yf5J0N+bSnDQ1IWHH26o6gWUm8f/HA2s/oy8nsYu+zKcuwNLbEt7kcCnxTZVNyLHcaxHicF9Cb7R09GGvIp0lBGeOOIdu10UUdwmau0W0qgiMfE2BzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t6yEO5M5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51433C4CEC4;
+	Fri, 27 Sep 2024 21:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727472028;
+	bh=opz6pQiAqq4a3coCyKHOsTWGN//bHUJSsO/2/3lFcGc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t6yEO5M5IPAGjB/BlE5Jxdd57PjqvwybaKWSGIRA0JtywVyuloFzP5jrDN/3BTie+
+	 vmYTwrqKiYKLdpQRFfB+bjlVU2Vtifr62VNx8btUCZ4GvMotRLnUxDpuvNaaVrVM/U
+	 2j54FjZgETXtrm/eNydtU5DmY53hI6M8MzYX/quECug/t4S6oU3H94S6ljO82lKhnv
+	 /ekxtAakydwDpZQ/ZdTSROEfzLTQAVIdhWKYa6ZnliaqSq0VnbUV7KwXBlXCBniGe5
+	 iv3fpMUPwMoBdwxk2+oBm/LtoSfnUOWU5ZKA9wQm3zGM9lnL8seaFw28D3LBNfz8Cj
+	 U2OsGFV9dKqaA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 359463809A80;
+	Fri, 27 Sep 2024 21:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2668611.1727471502.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 27 Sep 2024 22:11:42 +0100
-Message-ID: <2668612.1727471502@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
+Subject: Re: [iproute2, PATCH 1/2] bridge: mst: fix a musl build issue
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172747203103.2086938.7256358584550153269.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Sep 2024 21:20:31 +0000
+References: <20240922145011.2104040-1-dario.binacchi@amarulasolutions.com>
+In-Reply-To: <20240922145011.2104040-1-dario.binacchi@amarulasolutions.com>
+To: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org,
+ linux-amarula@amarulasolutions.com
 
-Eduard Zingerman <eddyz87@gmail.com> wrote:
+Hello:
 
-> On Fri, 2024-09-27 at 21:50 +0100, David Howells wrote:
-> > Is it possible for you to turn on some tracepoints and access the trac=
-es?
-> > Granted, you probably need to do the enablement during boot.
-> =
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-> Yes, sure, tell me what you need.
+On Sun, 22 Sep 2024 16:50:10 +0200 you wrote:
+> This patch fixes a compilation error raised by the bump to version 6.11.0
+> in Buildroot using musl as the C library for the cross-compilation
+> toolchain.
+> 
+> After setting the CFLGAS
+> 
+> ifeq ($(BR2_TOOLCHAIN_USES_MUSL),y)
+> IPROUTE2_CFLAGS += -D__UAPI_DEF_IN6_ADDR=0 -D__UAPI_DEF_SOCKADDR_IN6=0 \
+> 			-D__UAPI_DEF_IPV6_MREQ=0
+> endif
+> 
+> [...]
 
-If you look here:
+Here is the summary with links:
+  - [iproute2,1/2] bridge: mst: fix a musl build issue
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=6a77abab9251
+  - [iproute2,2/2] bridge: mst: fix a further musl build issue
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=043ef90e2fa9
 
-	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log=
-/?h=3Dnetfs-fixes
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-you can see some patches I've added.  If you can try this branch or cherry
-pick:
-
-	netfs: Fix write oops in generic/346 (9p) and generic/074 (cifs)
-	netfs: Advance iterator correctly rather than jumping it
-	netfs: Use a folio_queue allocation and free functions
-	netfs: Add a tracepoint to log the lifespan of folio_queue structs
-
-And then turn on the following "netfs" tracepoints:
-
-	read,sreq,rreq,failure,write,write_iter,folio,folioq,progress,donate
-
-which can be done by:
-
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_read/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_rreq/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_sreq/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_failure/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_write_iter/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_folio/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_folioq/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_progress/enable
-	echo 1 >/sys/kernel/debug/tracing/events/netfs/netfs_donate/enable
-
-or through trace-cmd.
-
-> Alternatively I can pack this thing in a dockerfile, so that you would
-> be able to reproduce locally (but that would have to wait till my evenin=
-g).
-
-I don't have Docker set up, so I'm not sure how easy that would be for me =
-to
-use.
-
-Thanks,
-David
 
 
