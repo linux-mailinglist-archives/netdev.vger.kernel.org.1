@@ -1,230 +1,201 @@
-Return-Path: <netdev+bounces-130065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B44987F5B
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:25:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD24987F72
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9421C22D35
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:25:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 551B11C20A83
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA171862B9;
-	Fri, 27 Sep 2024 07:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1453170A27;
+	Fri, 27 Sep 2024 07:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="DmGUjfu9"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0696817E000;
-	Fri, 27 Sep 2024 07:25:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0471B158557;
+	Fri, 27 Sep 2024 07:30:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727421920; cv=none; b=qI5r2a0760hkdBh241KOMtcemb40mD1smGJ7iz28VRFBEoI0KoW6tUPphW72rQxBdv6Ya0khzl/Br3SaOJNnvWa+ky2cmPj05aTXr5SUscOj/XykA/IvpqvOFhPqJOVnFe1o+15NTvliLneugjbsnmtnlr3WleV3LKD0946PLo0=
+	t=1727422221; cv=none; b=eNPaNy9F5jzmxkx1TTj/u22uMsdD+8WKksBK6oZ8LYiN++iE3XKrw65DwRpmndIYwl8/EYep0b7zwzo7/sRRYukOWMYqVS1A2cM6DMsAtlijWgQWzML9WzpiNFRBF58jD4UadaLgD8mMBp3NWaiY65DXn2+w64w7B+YmoKRyVrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727421920; c=relaxed/simple;
-	bh=qo3Cd6DVpmzQMbTciJkAYSD2fPKJTcdbunRKS19+MAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AjjdXxk+C1hfxz+Kpeg9mOJCBqflzNRZ6voPFoF+xLYpGgQkDyTh0jxBbDgYjE9pYJgjHjBxZOtBF8IPXnhsyBvUppeKPEP4IqDYoloPHl6ViuKLcqksgZWzphHGqYhH/gYyPMaxApww7T3nS91hvwGmj/iDa6i18K/yH3Cjw8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XFMMk1vKlz1HKGY;
-	Fri, 27 Sep 2024 15:21:22 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C25E81A0188;
-	Fri, 27 Sep 2024 15:25:14 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 27 Sep 2024 15:25:14 +0800
-Message-ID: <2a495d47-f1ca-42ee-a23d-736d4cd47880@huawei.com>
-Date: Fri, 27 Sep 2024 15:25:14 +0800
+	s=arc-20240116; t=1727422221; c=relaxed/simple;
+	bh=X1EbbchWBqe7kbUWUcRB4Udab8NrA9vLhm7bmk0PrAU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vap17U/EgpGLE81X/xpj+kk/FsyXpupURgy55aRcpea6CiVeGv4caKOkdAEaSEqHs9IuwQqov7uO5qW7ew1AU80QW3UFKM44qXCry3q5wXVRulEa/GlG7bNndXzHyj3ZUwn/U7umbilmQAARjFOv876A5fLBCH5YIKJtE/nFoKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=DmGUjfu9; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 81E2E2087B;
+	Fri, 27 Sep 2024 09:30:11 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 70YR9yFkRM4s; Fri, 27 Sep 2024 09:30:10 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 8AAF820520;
+	Fri, 27 Sep 2024 09:30:10 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 8AAF820520
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1727422210;
+	bh=Y7bDXPx3wgFkMtrWB50i7268p5aSWwld5cDeHJN70vQ=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=DmGUjfu9XoTS7oIw+WXmoCVkhHu0yVAdG0kzZ/O+q/NHPTxR/YpPCjdoTOnmyWXIx
+	 oyr18Wp/ospvb5o3Qc9B+Navo7ljSxyi+btD5A/A3DMow7vlMHSicmJswM5w+ducwP
+	 LzZ36qkvEzMytxAdUbiIcgZOsztRp9oM3QpLwL1FvMFosdD8Cc9Op6KoKzIMHhVoB7
+	 cphIBQ1Xh6jFunmSAY8eOpj4e+FqgCy8cCLA+fL8lcrXQn1AeUrJqgNCoCCTuqDLiS
+	 Jy9tTrHyyvMxfostnOuwoO11pgTOlflpd4WMITcLgLePfQukY9LFE6mO3Sr/rxKkkl
+	 8tloe3qZjil1A==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 27 Sep 2024 09:30:10 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 27 Sep
+ 2024 09:30:10 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id E96A23181523; Fri, 27 Sep 2024 09:30:09 +0200 (CEST)
+Date: Fri, 27 Sep 2024 09:30:09 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <pabeni@redhat.com>, syzbot
+	<syzbot+cc39f136925517aed571@syzkaller.appspotmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] UBSAN: shift-out-of-bounds in
+ xfrm_selector_match (2)
+Message-ID: <ZvZfAQ4IGX/3N/Ne@gauss3.secunet.de>
+References: <00000000000088906d0622445beb@google.com>
+ <66f33458.050a0220.457fc.001e.GAE@google.com>
+ <ZvPvQMDvWRygp4IC@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] page_pool: fix IOMMU crash when driver has
- already unbound
-To: Mina Almasry <almasrymina@google.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<liuyonglong@huawei.com>, <fanghaiqing@huawei.com>, <zhangkun09@huawei.com>,
-	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
-	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi
-	<lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
-	<shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle Valo
-	<kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew
- Morton <akpm@linux-foundation.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-mm@kvack.org>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<linaro-mm-sig@lists.linaro.org>
-References: <20240925075707.3970187-1-linyunsheng@huawei.com>
- <20240925075707.3970187-3-linyunsheng@huawei.com>
- <CAHS8izOxugzWJDTc-4CWqaKABTj=J4OHs=Lcb=SE9r8gX0J+yg@mail.gmail.com>
- <842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com>
- <CAHS8izN-3Ooiexsr+Xp2234=GqMUy0sTTMqExKVkXAgmjeWQ6w@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAHS8izN-3Ooiexsr+Xp2234=GqMUy0sTTMqExKVkXAgmjeWQ6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZvPvQMDvWRygp4IC@hog>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-adding Sumit & Christian & dma-buf maillist
-
-On 2024/9/27 13:54, Mina Almasry wrote:
-> On Thu, Sep 26, 2024 at 8:58 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2024/9/27 2:15, Mina Almasry wrote:
->>>
->>>> In order not to do the dma unmmapping after driver has already
->>>> unbound and stall the unloading of the networking driver, add
->>>> the pool->items array to record all the pages including the ones
->>>> which are handed over to network stack, so the page_pool can
->>>> do the dma unmmapping for those pages when page_pool_destroy()
->>>> is called.
->>>
->>> One thing I could not understand from looking at the code: if the
->>> items array is in the struct page_pool, why do you need to modify the
->>> page_pool entry in the struct page and in the struct net_iov? I think
->>> the code could be made much simpler if you can remove these changes,
->>> and you wouldn't need to modify the public api of the page_pool.
->>
->> As mentioned in [1]:
->> "There is no space in 'struct page' to track the inflight pages, so
->> 'pp' in 'struct page' is renamed to 'pp_item' to enable the tracking
->> of inflight page"
->>
->> As we still need pp for "struct page_pool" for page_pool_put_page()
->> related API, the container_of() trick is used to get the pp from the
->> pp_item.
->>
->> As you had changed 'struct net_iov' to be mirroring the 'struct page',
->> so change 'struct net_iov' part accordingly.
->>
->> 1. https://lore.kernel.org/all/50a463d5-a5a1-422f-a4f7-d3587b12c265@huawei.com/
->>
+On Wed, Sep 25, 2024 at 01:08:48PM +0200, Sabrina Dubroca wrote:
+> 2024-09-24, 14:51:20 -0700, syzbot wrote:
+> > syzbot has found a reproducer for the following issue on:
+> > 
+> > HEAD commit:    151ac45348af net: sparx5: Fix invalid timestamps
+> > git tree:       net-next
+> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=15808a80580000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=37c006d80708398d
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=cc39f136925517aed571
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122ad2a9980000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1387b107980000
 > 
-> I'm not sure we need the pages themselves to have the list of pages
-> that need to be dma unmapped on page_pool_destroy. The pool can have
-> the list of pages that need to be unmapped on page_pool_destroy, and
-> the individual pages need not track them, unless I'm missing
-> something.
+> syzbot managed to create an SA with:
+> 
+> usersa.sel.family = 0
+> usersa.sel.prefixlen_s = 128
+> usersa.family = AF_INET
+> 
+> Because of the AF_UNSPEC selector, verify_newsa_info doesn't put
+> limits on prefixlen_{s,d}. But then copy_from_user_state sets
+> x->sel.family to usersa.family (AF_INET).
+> 
+> So I think verify_newsa_info should do the same conversion before
+> checking prefixlen:
+> 
+> 
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 55f039ec3d59..8d06a37adbd9 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -201,6 +201,7 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+>  {
+>  	int err;
+>  	u8 sa_dir = attrs[XFRMA_SA_DIR] ? nla_get_u8(attrs[XFRMA_SA_DIR]) : 0;
+> +	u16 family = p->sel.family;
+>  
+>  	err = -EINVAL;
+>  	switch (p->family) {
+> @@ -221,7 +222,10 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+>  		goto out;
+>  	}
+>  
+> -	switch (p->sel.family) {
+> +	if (!family && !(p->flags & XFRM_STATE_AF_UNSPEC))
+> +		family = p->family;
+> +
+> +	switch (family) {
+>  	case AF_UNSPEC:
+>  		break;
+>  
+> 
+> 
+> Steffen, does that make sense?
 
-It is about the pool having the list of pages that need to be unmapped.
-The point is that the list of pages that need to be unmapped is dynamic,
-it is not a static list:
-1. How to find a empty space in the list and add a page to the list?
-2. How to find a page in the list and delete it from the list?
-3. How to do the about two steps concurrently without obvious overhead?
+Yes, it does. Later, in copy_from_user_state() we do
 
-I am not sure how it is possible to do the above without something like
-the 'pp_item' added in this patch? Even the lockless list in the
-include/linux/llist.h need a 'struct llist_node' for that to work.
-But if it is possible, please share the idea in your mind.
+if (!x->sel.family && !(p->flags & XFRM_STATE_AF_UNSPEC))
+	x->sel.family = p->family;
+
+anyway.
+
+> Without this, we have prefixlen=128 when we get to addr4_match, which
+> does a shift of (32 - prefixlen), so we get
+> 
+> UBSAN: shift-out-of-bounds in ./include/net/xfrm.h:900:23
+> shift exponent -96 is negative
+> 
+> 
+> Maybe a check for prefixlen < 128 would also be useful in the
+> XFRM_STATE_AF_UNSPEC case, to avoid the same problems with syzbot
+> passing prefixlen=200 for an ipv6 SA. I don't know how
+> XFRM_STATE_AF_UNSPEC is used, so I'm not sure what restrictions we can
+> put. If we end up with prefixlen = 100 used from ipv4 we'll still have
+> the same issues.
+
+I've introduced XFRM_STATE_AF_UNSPEC back in 2008 to make
+inter addressfamily tunnels working while maintaining
+backwards compatibility to openswan that did not set
+the selector family. At least that's what I found in
+an E-Mail conversation from back then.
+
+A check for prefixlen <= 128 would make sense in any case.
+But not sure if we can restrict that somehow further.
 
 > 
->>>
->>>> As the pool->items need to be large enough to avoid
->>>> performance degradation, add a 'item_full' stat to indicate the
->>>> allocation failure due to unavailability of pool->items.
->>>>
->>>
->>> I'm not sure there is any way to size the pool->items array correctly.
->>
->> Currently the size of pool->items is calculated in page_pool_create_percpu()
->> as below, to make sure the size of pool->items is somewhat twice of the
->> size of pool->ring so that the number of page sitting in the driver's rx
->> ring waiting for the new packet is the similar to the number of page that is
->> still being handled in the network stack as most drivers seems to set the
->> pool->pool_size according to their rx ring size:
->>
->> +#define PAGE_POOL_MIN_INFLIGHT_ITEMS           512
->> +       unsigned int item_cnt = (params->pool_size ? : 1024) +
->> +                               PP_ALLOC_CACHE_SIZE + PAGE_POOL_MIN_INFLIGHT_ITEMS;
->> +       item_cnt = roundup_pow_of_two(item_cnt);
->>
+> >  __ip4_datagram_connect+0x96c/0x1260 net/ipv4/datagram.c:49
+> >  __ip6_datagram_connect+0x194/0x1230
+> >  ip6_datagram_connect net/ipv6/datagram.c:279 [inline]
+> >  ip6_datagram_connect_v6_only+0x63/0xa0 net/ipv6/datagram.c:291
 > 
-> I'm not sure it's OK to add a limitation to the page_pool that it can
-> only allocate N pages. At the moment, AFAIU, N is unlimited and it may
-> become a regression if we add a limitation.
-
-Maybe, let's see if there is some stronger argument that it is not ok
-to add the limitation or some testing that does show the limitation
-does bring a regression.
-
+> This path also looks a bit dubious. From the reproducer, we have a
+> rawv6 socket trying to connect to a v4mapped address, despite having
+> ip6_datagram_connect_v6_only as its ->connect.
 > 
->>> Can you use a data structure here that can grow? Linked list or
->>> xarray?
->>>
->>> AFAIU what we want is when the page pool allocates a netmem it will
->>> add the netmem to the items array, and when the pp releases a netmem
->>> it will remove it from the array. Both of these operations are slow
->>> paths, right? So the performance of a data structure more complicated
->>> than an array may be ok. bench_page_pool_simple will tell for sure.
->>
->> The question would be why do we need the pool->items to grow with the
->> additional overhead and complication by dynamic allocation of item, using
->> complicated data structure and concurrent handling?
->>
->> As mentioned in [2], it was the existing semantics, but it does not means
->> we need to keep it. The changing of semantics seems like an advantage
->> to me, as we are able to limit how many pages is allowed to be used by
->> a page_pool instance.
->>
->> 2. https://lore.kernel.org/all/2fb8d278-62e0-4a81-a537-8f601f61e81d@huawei.com/
->>
->>>
->>>> Note, the devmem patchset seems to make the bug harder to fix,
->>>> and may make backporting harder too. As there is no actual user
->>>> for the devmem and the fixing for devmem is unclear for now,
->>>> this patch does not consider fixing the case for devmem yet.
->>>>
->>>
->>> net_iovs don't hit this bug, dma_unmap_page_attrs() is never called on
->>> them, so no special handling is needed really. However for code
->>
->> I am really doubtful about your above claim. As at least the below
->> implementaion of dma_buf_unmap_attachment_unlocked() called in
->> __net_devmem_dmabuf_binding_free() seems be using the DMA API directly:
->>
->> https://elixir.bootlin.com/linux/v6.7-rc8/source/drivers/gpu/drm/amd/amdgpu/amdgpu_dma_buf.c#L215
->>
->> Or am I missing something obvious here?
->>
+> pingv6 sockets also use ip6_datagram_connect_v6_only and set
+> sk->sk_ipv6only=1 (in net/ipv4/ping.c ping_init_sock), but rawv6 don't
+> have this, so __ip6_datagram_connect can end up in
+> __ip4_datagram_connect. I guess it would make sense to set it in rawv6
+> too. rawv6_bind already rejected v4mapped addresses.
 > 
-> I mean currently net_iovs don't hit the __page_pool_release_page_dma
-> function that causes the crash in the stack trace. The dmabuf layer
-> handles the unmapping when the dmabuf dies (I assume correctly).
+> And then we could add a DEBUG_NET_WARN_ON_ONCE(!ipv6_only_sock(sk)) in
+> ip6_datagram_connect_v6_only, or maybe even call ipv6_addr_type to
+> reject v4mapped addresses and reject them like the non-AF_INET6 case.
 
-It seems like the similar assumption made about the normal page.
-How is dmabuf layer able to handles the unmapping when the driver
-which creates the page_pool with the devmem pages has unbound and
-the 'struct device' behind the driver has became invalid?
+I can't comment on that now, let me have a closer look into it.
 
-If dmabuf layer is able to handle that, it seems the page_pool may
-be able to handle that too. Adding the maintainers of Dma-buf to see
-if there is some clarifying from them.
-
-> 
 
