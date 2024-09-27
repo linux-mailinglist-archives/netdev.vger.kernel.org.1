@@ -1,87 +1,91 @@
-Return-Path: <netdev+bounces-130063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0402987F15
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:03:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87924987F1F
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 09:06:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 759F028115E
-	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:03:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B84131C225E0
+	for <lists+netdev@lfdr.de>; Fri, 27 Sep 2024 07:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CACF17B425;
-	Fri, 27 Sep 2024 07:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A7E17C98C;
+	Fri, 27 Sep 2024 07:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="TsgjXtw5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="of5tmNRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-40137.protonmail.ch (mail-40137.protonmail.ch [185.70.40.137])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422D6381B1
-	for <netdev@vger.kernel.org>; Fri, 27 Sep 2024 07:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D0215DBA3;
+	Fri, 27 Sep 2024 07:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727420621; cv=none; b=k7Y7q5n8gW9p/f8V2fgQj6UxGmf/5/MTZoscyk9g4GcjbAq0W2o2QQynCT98X3uaELSJW2iMo3KQYP57MgcaRhhP94vbqiawoNMCxQyimiCkA8/7EO8fYcAwgllBdAIvR3/yG9MYZ5iG0HUIywscKdp7TWi6a2Zj4XHLcG5XTFA=
+	t=1727420781; cv=none; b=dAS0XHF0LWRGd2t7jM4if8LLCeEtNs7nsl+5/0EvhDWpqnp4akX0hJW+TD6dp13d7YEYxC+xOb2NFGaWjfgatLvvPy2a2rnuwIZ+E/oH27A10qDZmEEz/2UC/6jMejOfIHi8rYUqH3n0jyHqZz59oVBoUsC2boMkP/cbsqNY68U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727420621; c=relaxed/simple;
-	bh=lit4drWWoXlbmB5xZse2LmMCZxlhgrRVhkj6To1hqgQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=bVNi+CHAF1mUwAUO/dt+ctBo377iATzdTcpprmDGOSAmGIStyimIcSEP7H2VYmpXPuHgsJbRfQYcPHypzX2Dg0CxSr/UalgaIpiv8peEAfwT4qWaClhIccnum9z8htyMHw/fK8wQWensMZPty2gxPBGpTWNAsDAAH8Oxy2SlX8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=TsgjXtw5; arc=none smtp.client-ip=185.70.40.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1727420612; x=1727679812;
-	bh=lit4drWWoXlbmB5xZse2LmMCZxlhgrRVhkj6To1hqgQ=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=TsgjXtw5oLnaxqJigC6xC0V/xqHrIOg6CjZQf7itOmroJ9dE9/nq/sKkQZ5HmwSbC
-	 DLyGXmt3WZ6zaebx2yIoXcptiFH3O/4joGo6uzfVP4shV3mn8Zhv6PzuwOwE6lgvEM
-	 XDMjqgKD67zPUhmCEZyk1OFNAzaQdrnB2hkHATFwtFGlQkAtRNvHTzXS7UI+joxncJ
-	 6xFVQDWL7FI8U/kcrSTjNG7Ika6lEe6myG16ggU0egR1i8U9uISzKE+CgBkhrWdT93
-	 kjb5M3wPQ413rqvVZ500NZYQP3iO2MLeq8BDvfBfanfn/DB29pO+Ytkr/fSR/da4xD
-	 b+QJoBSXlTO3A==
-Date: Fri, 27 Sep 2024 07:03:28 +0000
-To: "davem@davemloft.net" <davem@davemloft.net>
-From: =?utf-8?Q?Kacper_Ludwi=C5=84ski?= <kac.ludwinski@protonmail.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>, "vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "petrm@nvidia.com" <petrm@nvidia.com>, "horms@kernel.org" <horms@kernel.org>, "edumazet@google.com" <edumazet@google.com>, "shuah@kernel.org" <shuah@kernel.org>
-Subject: [PATCH net v2] selftests: forwarding: no_forwarding: Fix issue  related with assigning two different vids to the same interface.
-Message-ID: <fQknN_r6POzmrp8UVjyA3cknLnB1HB9I_jfaHoQScvvgHr59VfUNRs9IDo4kQHm1uxEp8_Luym2Vi6_aUGJIec3ZPhjY2qnJ57NgLZGA3K4=@protonmail.com>
-Feedback-ID: 10783966:user:proton
-X-Pm-Message-ID: 8d9b28129d518c775345aac79bf29a46b24a3f0f
+	s=arc-20240116; t=1727420781; c=relaxed/simple;
+	bh=oFQtzGziY/6iXsdxTYP56etstVrlcox6WGvjzC6eQp8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jaW3np1MQOClJvvdQa/OCsMcNQlU+GXBkr2MRTuRGrtclSNMZksJGdZDS//ND20HXXOanUDSnZ5cicaQSTMxhTtd6/GUdaXRsaaW87wL0n6T2h8OLQBDIZEAJD05dOWE7xbRE2ssMUsESGE4hQQk90ufW/MX8qKtjHVF9/+I2no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=of5tmNRi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94761C4CEC4;
+	Fri, 27 Sep 2024 07:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727420781;
+	bh=oFQtzGziY/6iXsdxTYP56etstVrlcox6WGvjzC6eQp8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=of5tmNRiaM/+0729yFI16xvmWHjqtvORCSDTISfT/foc/cJMBcizvfT2Ttf+6ZYdG
+	 yPz61qcKPc/1PehS25vrMnxETH+MtaUZb0UAdazqVmCwWSHmTPpKhl9IySaE6WueOz
+	 EDXqW1DtwJP426jhjZ0NuCOLEK/NPEZh96dUAAbtqAPBFHGwH0Xvk29RFfzegIuMrn
+	 efZ3zAwf/uYqruiywtobXqdWMrg3AuZLcsHHjsGk9Ru0MPA1uJxUwcdJDoV+49vfdX
+	 Wmyzus+BLm/EjjfHAR14bddPCr0NI9MbWx8jnHKhV4PnBuTTFahzyTaRiBA5CNKYFS
+	 830mpB5bKR7AQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C5D3809A80;
+	Fri, 27 Sep 2024 07:06:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] Networking for v6.12-rc1
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172742078429.1792128.10518479788559834309.git-patchwork-notify@kernel.org>
+Date: Fri, 27 Sep 2024 07:06:24 +0000
+References: <20240926151325.43239-1-pabeni@redhat.com>
+In-Reply-To: <20240926151325.43239-1-pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Fix typo.
-Currently, the second bridge command overwrites the first one.
-Fix this by adding this VID to the interface behind $swp2.
+Hello:
 
-Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
-Signed-off-by: Kacper Ludwinski <kacper@ludwinski.dev>
----
- tools/testing/selftests/net/forwarding/no_forwarding.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This pull request was applied to netdev/net.git (main)
+by Linus Torvalds <torvalds@linux-foundation.org>:
 
-diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tool=
-s/testing/selftests/net/forwarding/no_forwarding.sh
-index 9e677aa64a06..694ece9ba3a7 100755
---- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
-+++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
-@@ -202,7 +202,7 @@ one_bridge_two_pvids()
- =09ip link set $swp2 master br0
+On Thu, 26 Sep 2024 17:13:25 +0200 you wrote:
+> Hi Linus!
+> 
+> It looks like that most people are still traveling: both the ML volume
+> and the processing capacity are low.
+> 
+> The following changes since commit 9410645520e9b820069761f3450ef6661418e279:
+> 
+> [...]
 
- =09bridge vlan add dev $swp1 vid 1 pvid untagged
--=09bridge vlan add dev $swp1 vid 2 pvid untagged
-+=09bridge vlan add dev $swp2 vid 2 pvid untagged
+Here is the summary with links:
+  - [GIT,PULL] Networking for v6.12-rc1
+    https://git.kernel.org/netdev/net/c/62a0e2fa40c5
 
- =09run_test "Switch ports in VLAN-aware bridge with different PVIDs"
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
---
-2.43.0
+
 
