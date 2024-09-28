@@ -1,85 +1,104 @@
-Return-Path: <netdev+bounces-130197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377EB98916A
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 22:57:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E54A7989175
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 23:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A0E21C22F96
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 20:57:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8221CB23B94
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 21:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2788F183CBE;
-	Sat, 28 Sep 2024 20:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835541779BD;
+	Sat, 28 Sep 2024 21:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K5ammNvw"
+	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="TJ0Pnlgw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC90F17C7D4;
-	Sat, 28 Sep 2024 20:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E889E15B995
+	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 21:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727557028; cv=none; b=BEzYP/PUbtaHPVUNWIhSWGtJD1v1y9SmSAV6agNaxw+T68FH18CJqpZZnG1frWGEwXKZDZs+SoPBigCdrelLCt7UoNyUo8C88zDKYKQLDjdBdZvol+tD1Gx6tk7ZgCRwbs8eWw9/+PSw/7o6DT4gwfUHU0L3E+wofUKS1xiWWcU=
+	t=1727557518; cv=none; b=dHQXGwjVEwDjaX1wpiZHNgKeCRdEcUxFOMJ4nRGBYb79XUDF41Ol5t/L7lYxJarFTPxN3/77RPTdX1Bm75JUCt1NrAimv31HY5VUjojqxy97LWS5GSulODJilLa5g88p07lRYoMIjSjAKiUNSXYeQj5nyA0/x0xPSAYNwtLzkhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727557028; c=relaxed/simple;
-	bh=OK5RveDLSz5tFyXUinR9c5kALUI2j3KDOCHCIRzL/ug=;
+	s=arc-20240116; t=1727557518; c=relaxed/simple;
+	bh=3iwNZf9694qndONfeZ/ixAk+ja9A/vLtbNrNa24+SFs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OawwzYEezWGqV5Y6msx5L0PXZum1Q4rfgNREjLirogJzcswvJaVtw68vtZ1ax4lJP4Ld6ypj5NhBM6R/GFgYfS/dk/eYghDamDHJpE5iMz0n+4aI2gpb+aHg8RvU6WUYYjKNsaUiG0yvtfVgekPa8XQufX4nAhuXdjOp3IkLa6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K5ammNvw; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727557025; x=1759093025;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OK5RveDLSz5tFyXUinR9c5kALUI2j3KDOCHCIRzL/ug=;
-  b=K5ammNvwqmIX83nFP6U1LVHv8plnNyZYRNKaE8uW8Af6D36VgF1kabOD
-   //XF9rA+yXJuKqPf7VVChGOaflVRr6r7q9gNcyf3T3TuyI7KIX/H5NW/d
-   yt37ebvCyAmquu0bm3r8xJjlqH2mHumz0SAKr1xgjdJ+fdzyAobS1nc2m
-   +hjv3XD4KMIxJDBbMqU9mSFTlnX6dFEEnpH10FXf0QtSvE9iyH3qUv3hV
-   yUxFxovV1qgCMgQio1FqNNy4RfemQOBAc1m5tmS9lUM7yhr835+ChUaWd
-   Vzqd36QX9EO2pOdC8qrQWIKADpf9k/Jb17R2XXPTIuHUmENeJB4k+RUvA
-   Q==;
-X-CSE-ConnectionGUID: V4Va7bwRRc+Uv68uQmpFwg==
-X-CSE-MsgGUID: r82VU8LZRCC71GLxShgDyw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11209"; a="30381435"
-X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
-   d="scan'208";a="30381435"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2024 13:57:05 -0700
-X-CSE-ConnectionGUID: 6qhZtbjVRJmEAVdY4rD6Yw==
-X-CSE-MsgGUID: RZ0r+Ll4ReGVrTFCGCBMVQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
-   d="scan'208";a="96208155"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 28 Sep 2024 13:56:59 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sueUq-000NeZ-27;
-	Sat, 28 Sep 2024 20:56:56 +0000
-Date: Sun, 29 Sep 2024 04:56:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	wei.huang2@amd.com, vadim.fedorenko@linux.dev, horms@kernel.org,
-	bagasdotme@gmail.com, bhelgaas@google.com, lukas@wunner.de,
-	paul.e.luse@intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH V6 2/5] PCI/TPH: Add Steering Tag support
-Message-ID: <202409290413.EtVuNEgl-lkp@intel.com>
-References: <20240927215653.1552411-3-wei.huang2@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mWs85KUIWIRNRAr/lC14+pWshGe91ArVwekLU1FZetAw2MreX5N8Vros1M5hX1GMUWlx1PyxN/S47k/CHl/rfgvxZ/OITATeOwkyhK34mQo5JVVzx1oerWaiwuqO+6V12ZPMH7Xy/9M10uV9CGJJbC12vv9xSso+3AkSc8gZyYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=TJ0Pnlgw; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71b070ff24dso2834769b3a.2
+        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 14:05:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tenstorrent.com; s=google; t=1727557515; x=1728162315; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9i+1khY6cZCPGetGL9p/QuDc4cg82jy9GCe3mjkCw+I=;
+        b=TJ0PnlgwvtgCoeoptViDmGj7d7BCzkxY3UkMTOVU1B2yK82C7FTsNmlgf+qyu919/V
+         MDTNFYU/mu6YzSG9mJWZkRTk9X9+nVCY9Wp8I++TsPo1jDxxfYzElgpd+9uM5DzvTOBo
+         L5fdLGbWfOOvsfg2diAWQH4lkgOyvlkIfBcoVlCMCm8h3XcSlXy0wTPY9ZMAELpRNNbL
+         gqpfKjfLHan0as0LftfMCsznYepTRGYy6wGRJUg8KsDY1XzCU+3XMWodf/GvPTIPLmaD
+         YhO2OlBlPLH7dtoPzbBhhf0x2mi+pmMNL3+fwWiG7NTaETpJBXynnhRxgjUle94ydd3D
+         lJ1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727557515; x=1728162315;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9i+1khY6cZCPGetGL9p/QuDc4cg82jy9GCe3mjkCw+I=;
+        b=mGZ5BW4BKLTNA8llG9ZyhU0XiGQk0JueyVRSw+Nv4E1NPXr3dblUjzHgYRx7xeJHfW
+         Fl7BNU1FiWjAP7/v6tzwe/oJ3BjB4a6iJkFj/yLAdjCwS9BxHxMuXjjWzK4TUXAgKPAZ
+         bsZUeDP8/+JFBKMT8B0OQH1U+nSUTwebhWqjXUJizs2F1qwep9b+SYEGLFQS9IWylPTB
+         NqXm+LIcHZ9PJ5qP0nUCYOHzoxn037m5dAVcsUr1wYzMkU/OzczzzKG0yV1R54xMbqos
+         7HGasmBVoSC70Z3Oq1vm57i0zxyGfKk5v1oiK3N6AJ+GXvhks/P9gdSH4rk+5VD9BO0e
+         OV9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXaY1OyHEyMf7lOWN98IgAHuJeqirqy9w8JHqiB8P2xammdye7d9WJe7OJqHnvNozcR5WBOIAk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyP8YstJOovBAxYHTDb7Qq39JCg7PFP4ADlf0/0iC4QSr0vmLnL
+	RIOFIumF0CQV5CPwlAH/4vsgnlNJSekhMT1uWJ6zGEmV9n6v9U/hSlftTTsHqSg=
+X-Google-Smtp-Source: AGHT+IFPA8N1lIApwXdlaSl/HNsi0gfOXQ+7UfB2eYS+MdF/mHrjX6Aptdb7GIyUvtzl3aI6WvOevg==
+X-Received: by 2002:a05:6a00:22c8:b0:70d:33b3:2d7f with SMTP id d2e1a72fcca58-71b260790a9mr10956907b3a.26.1727557515302;
+        Sat, 28 Sep 2024 14:05:15 -0700 (PDT)
+Received: from x1 (71-34-69-82.ptld.qwest.net. [71.34.69.82])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264bb2b8sm3550025b3a.61.2024.09.28.14.05.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2024 14:05:15 -0700 (PDT)
+Date: Sat, 28 Sep 2024 14:05:13 -0700
+From: Drew Fustini <dfustini@tenstorrent.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 3/3] riscv: dts: thead: Add TH1520 ethernet nodes
+Message-ID: <ZvhviRUb/CitmhgQ@x1>
+References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com>
+ <20240926-th1520-dwmac-v2-3-f34f28ad1dc9@tenstorrent.com>
+ <3e26f580-bc5d-448e-b5bd-9b607c33702b@lunn.ch>
+ <ZvWyQo+2mwsC1HS6@x1>
+ <0b49b681-2289-412a-8969-d134ffcfb7fc@lunn.ch>
+ <ZvYJfrPx75FA1IFC@x1>
+ <5076789c-3a35-4349-9733-f5d47528c184@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,121 +107,189 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240927215653.1552411-3-wei.huang2@amd.com>
+In-Reply-To: <5076789c-3a35-4349-9733-f5d47528c184@lunn.ch>
 
-Hi Wei,
+On Fri, Sep 27, 2024 at 01:58:40PM +0200, Andrew Lunn wrote:
+> > I tried to setup an nfs server with a rootfs on my local network. I can
+> > mount it okay from my laptop so I think it is working okay. However, it
+> > does not seem to work on the lpi4a [3]. It appears the rgmii-id
+> > validation fails and the dwmac driver can not open the phy:
+> > 
+> >  thead-dwmac ffe7060000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
+> >  thead-dwmac ffe7060000.ethernet eth0: validation of rgmii-id with support \
+> >              00,00000000,00000000,00006280 and advertisementa \
+> > 	     00,00000000,00000000,00006280 failed: -EINVAL
+> >  thead-dwmac ffe7060000.ethernet eth0: __stmmac_open: Cannot attach to PHY (error: -22)
+> 
+> Given what Emil said, i would suggest flipping the MDIO busses
+> around. Put the PHYs on gmac1's MDIO bus, and set the pinmux so that
+> its MDIO bus controller is connected to the outside world. Then, when
+> gmac1 probes first, its MDIO bus will be probed at the same time, and
+> its PHY found.
+> 
+> 	Andrew
 
-kernel test robot noticed the following build errors:
+I'm trying to configure the pinmux to have gmac1 control the mdio bus
+but it seems I've not done so correctly. I changed pins "GMAC0_MDC" and
+"GMAC0_MDIO" to function "gmac1" (see the patch below).
 
-[auto build test ERROR on pci/next]
-[also build test ERROR on pci/for-linus linus/master next-20240927]
-[cannot apply to v6.11]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I don't see any errors about the dwmac or phy in the boot log [1] but
+ultimately there is no carrier detected and the ethernet interface does
+not come up.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Add-TLP-Processing-Hints-TPH-support/20240928-055915
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
-patch link:    https://lore.kernel.org/r/20240927215653.1552411-3-wei.huang2%40amd.com
-patch subject: [PATCH V6 2/5] PCI/TPH: Add Steering Tag support
-config: x86_64-buildonly-randconfig-001-20240929 (https://download.01.org/0day-ci/archive/20240929/202409290413.EtVuNEgl-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240929/202409290413.EtVuNEgl-lkp@intel.com/reproduce)
+Section "3.3.4.103 G3_MUXCFG_007" in the TH1520 System User Manual shows
+that bits [19:16] control GMAC0_MDIO_MUX_CFG where value of 2 selects
+GMAC1_MDIO. Similarly, bits [15:12] control GMAC0_MDC_MUX_CFG where a
+value of 2 also selects GMAC1_MDC.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409290413.EtVuNEgl-lkp@intel.com/
+Emil - do you have any suggestion as to what I might be doing wrong with
+the pinmux?
 
-All errors (new ones prefixed by >>):
+Thanks,
+Drew
 
->> drivers/pci/tph.c:230:19: error: no member named 'msix_base' in 'struct pci_dev'; did you mean 'msix_cap'?
-     230 |         vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
-         |                          ^~~~~~~~~
-         |                          msix_cap
-   include/linux/pci.h:350:6: note: 'msix_cap' declared here
-     350 |         u8              msix_cap;       /* MSI-X capability offset */
-         |                         ^
-   drivers/pci/tph.c:236:9: warning: result of comparison of constant 18446744073709551615 with expression of type 'typeof (_Generic((mask), char: (unsigned char)0, unsigned char: (unsigned char)0, signed char: (unsigned char)0, unsigned short: (unsigned short)0, short: (unsigned short)0, unsigned int: (unsigned int)0, int: (unsigned int)0, unsigned long: (unsigned long)0, long: (unsigned long)0, unsigned long long: (unsigned long long)0, long long: (unsigned long long)0, default: (mask)))' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
-     236 |         val |= FIELD_PREP(mask, st_val);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
-     115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/bitfield.h:72:53: note: expanded from macro '__BF_FIELD_CHECK'
-      72 |                 BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
-      73 |                                  __bf_cast_unsigned(_reg, ~0ull),       \
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      74 |                                  _pfx "type of reg too small for mask"); \
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:58: note: expanded from macro 'BUILD_BUG_ON_MSG'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
-   include/linux/compiler_types.h:517:22: note: expanded from macro 'compiletime_assert'
-     517 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
-     505 |         __compiletime_assert(condition, msg, prefix, suffix)
-         |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
-     497 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   1 warning and 1 error generated.
+[1] https://gist.github.com/pdp7/1f9fcd76f26acd5715398d54f65a2e27
 
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for CRYPTO_CRC32C_INTEL
-   Depends on [n]: CRYPTO [=y] && !KMSAN [=y] && X86 [=y]
-   Selected by [y]:
-   - ISCSI_TARGET [=y] && TARGET_CORE [=y] && INET [=y] && X86 [=y]
+diff --git a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+index ca84bc2039ef..f2f6c9d9b590 100644
+--- a/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
++++ b/arch/riscv/boot/dts/thead/th1520-lichee-module-4a.dtsi
+@@ -11,6 +11,11 @@ / {
+        model = "Sipeed Lichee Module 4A";
+        compatible = "sipeed,lichee-module-4a", "thead,th1520";
 
++       aliases {
++               ethernet0 = &gmac0;
++               ethernet1 = &gmac1;
++       };
++
+        memory@0 {
+                device_type = "memory";
+                reg = <0x0 0x00000000 0x2 0x00000000>;
+@@ -55,6 +60,22 @@ &sdio0 {
+        status = "okay";
+ };
 
-vim +230 drivers/pci/tph.c
++&gmac0 {
++       pinctrl-names = "default";
++       pinctrl-0 = <&gmac0_pins>;
++       phy-handle = <&phy0>;
++       phy-mode = "rgmii-id";
++       status = "okay";
++};
++
++&gmac1 {
++       pinctrl-names = "default";
++       pinctrl-0 = <&gmac1_pins>, <&mdio1_pins>;
++       phy-handle = <&phy1>;
++       phy-mode = "rgmii-id";
++       status = "okay";
++};
++
+ &gpio0 {
+        gpio-line-names = "", "", "", "", "", "", "", "", "", "",
+                          "", "", "", "", "", "", "", "", "", "",
+@@ -87,3 +108,101 @@ &gpio3 {
+                          "GPIO09",
+                          "GPIO10";
+ };
++
++&mdio1 {
++       phy0: ethernet-phy@1 {
++               reg = <1>;
++       };
++
++       phy1: ethernet-phy@2 {
++               reg = <2>;
++       };
++};
++
++&padctrl0_apsys {
++       gmac0_pins: gmac0-0 {
++               tx-pins {
++                       pins = "GMAC0_TX_CLK",
++                              "GMAC0_TXEN",
++                              "GMAC0_TXD0",
++                              "GMAC0_TXD1",
++                              "GMAC0_TXD2",
++                              "GMAC0_TXD3";
++                       function = "gmac0";
++                       bias-disable;
++                       drive-strength = <25>;
++                       input-disable;
++                       input-schmitt-disable;
++                       slew-rate = <0>;
++               };
++
++               rx-pins {
++                       pins = "GMAC0_RX_CLK",
++                              "GMAC0_RXDV",
++                              "GMAC0_RXD0",
++                              "GMAC0_RXD1",
++                              "GMAC0_RXD2",
++                              "GMAC0_RXD3";
++                       function = "gmac0";
++                       bias-disable;
++                       drive-strength = <1>;
++                       input-enable;
++                       input-schmitt-disable;
++                       slew-rate = <0>;
++               };
++       };
++
++       gmac1_pins: gmac1-0 {
++               tx-pins {
++                       pins = "GPIO2_18", /* GMAC1_TX_CLK */
++                              "GPIO2_20", /* GMAC1_TXEN */
++                              "GPIO2_21", /* GMAC1_TXD0 */
++                              "GPIO2_22", /* GMAC1_TXD1 */
++                              "GPIO2_23", /* GMAC1_TXD2 */
++                              "GPIO2_24"; /* GMAC1_TXD3 */
++                       function = "gmac1";
++                       bias-disable;
++                       drive-strength = <25>;
++                       input-disable;
++                       input-schmitt-disable;
++                       slew-rate = <0>;
++               };
++
++               rx-pins {
++                       pins = "GPIO2_19", /* GMAC1_RX_CLK */
++                              "GPIO2_25", /* GMAC1_RXDV */
++                              "GPIO2_30", /* GMAC1_RXD0 */
++                              "GPIO2_31", /* GMAC1_RXD1 */
++                              "GPIO3_0",  /* GMAC1_RXD2 */
++                              "GPIO3_1";  /* GMAC1_RXD3 */
++                       function = "gmac1";
++                       bias-disable;
++                       drive-strength = <1>;
++                       input-enable;
++                       input-schmitt-disable;
++                       slew-rate = <0>;
++               };
++       };
++
++       mdio1_pins: mdio1-0 {
++               mdc-pins {
++                       pins = "GMAC0_MDC";
++                       function = "gmac1";
++                       bias-disable;
++                       drive-strength = <13>;
++                       input-disable;
++                       input-schmitt-disable;
++                       slew-rate = <0>;
++               };
++
++               mdio-pins {
++                       pins = "GMAC0_MDIO";
++                       function = "gmac1";
++                       bias-disable;
++                       drive-strength = <13>;
++                       input-enable;
++                       input-schmitt-enable;
++                       slew-rate = <0>;
++               };
++       };
++};
 
-   205	
-   206	/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise -errno */
-   207	static int write_tag_to_msix(struct pci_dev *pdev, int msix_idx, u16 tag)
-   208	{
-   209		struct msi_desc *msi_desc = NULL;
-   210		void __iomem *vec_ctrl;
-   211		u32 val, mask, st_val;
-   212		int err = 0;
-   213	
-   214		msi_lock_descs(&pdev->dev);
-   215	
-   216		/* Find the msi_desc entry with matching msix_idx */
-   217		msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
-   218			if (msi_desc->msi_index == msix_idx)
-   219				break;
-   220		}
-   221	
-   222		if (!msi_desc) {
-   223			err = -ENXIO;
-   224			goto err_out;
-   225		}
-   226	
-   227		st_val = (u32)tag;
-   228	
-   229		/* Get the vector control register (offset 0xc) pointed by msix_idx */
- > 230		vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
-   231		vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
-   232	
-   233		val = readl(vec_ctrl);
-   234		mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
-   235		val &= ~mask;
-   236		val |= FIELD_PREP(mask, st_val);
-   237		writel(val, vec_ctrl);
-   238	
-   239		/* Read back to flush the update */
-   240		val = readl(vec_ctrl);
-   241	
-   242	err_out:
-   243		msi_unlock_descs(&pdev->dev);
-   244		return err;
-   245	}
-   246	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
