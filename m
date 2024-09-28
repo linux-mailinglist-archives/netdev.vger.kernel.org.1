@@ -1,143 +1,141 @@
-Return-Path: <netdev+bounces-130185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C81F5988EFA
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 12:31:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40600988F28
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 14:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFCEA1C20DAD
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 10:31:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F13C0B21211
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 12:21:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ABD0170A37;
-	Sat, 28 Sep 2024 10:31:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vMDsb1F2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA48187353;
+	Sat, 28 Sep 2024 12:21:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail114-240.sinamail.sina.com.cn (mail114-240.sinamail.sina.com.cn [218.30.114.240])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630943D3B3
-	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 10:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B5BC139
+	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 12:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727519476; cv=none; b=CwydLZH+Rod6O/z/AOC8rnXN70k3zzkAADkGFlPT4U8CJgR5nPg3te0Oh9avARbKWdX8fASIvZKB4F/CPg5/LxpPlbFTDUP89PrSYHMdNv0mqmf9Nrsoxh0Bu/dxfSrocrpj77uqhRGPfa5CRkeWk9AeM0M+gqI8lpvUsTmSqg8=
+	t=1727526095; cv=none; b=dqaPpnRJHb9VsXLGmz0pzRwldDAMJnmyfX6LXz7pcMPSnkirzx1UiujABW/Y8hHZm/lksJTMztsX0M7TCxpl/RhEK6kpjBq/PpTO25tIiQiv9p3wJmV5tidrJY6VkOETR7/LNTQrRlBQ12m1SrR3DBjtgC4ovyKLHCMBrTSD23M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727519476; c=relaxed/simple;
-	bh=dDHrR22WmXcK1oZRFZfxwGP+7kFIwDMTIs076q/6V4A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YTsiEUzrz/SgSDMluE8K1wu3kXwa2A7pLsgJ1NjyjvkzZ6EiYv0Zz+f8ilJ7i4TACkWxeu/HXYf6UjW6C2O50kVYr51+HSJYZy2bCiE+gG/sTU+t+V3uiOQSy6qfKi26qsK0E7VQSq1wn/4VWmEt+0PetzDjcRbaawZOO0WP/ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vMDsb1F2; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c718af3354so3659568a12.0
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 03:31:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727519473; x=1728124273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OEisC0iRnLOpREGpVd6A93qrY+F/ucLTNFfZyjxhWMA=;
-        b=vMDsb1F2KdnOU0GIFE6G40oidLvkWLu/7WfqJFM2ZkWml30mg60h4CTPDlO+Sby9TY
-         YWRxCPE9CfMUdmY7eSKprGBhLGd8pVgGV65Jz48FKqjt2lMxmZt9QJuQN7ODKhe+rn/u
-         Vw0jfzB9pSH9P8Ey7wkvm1KHUj+HEckQxRrV7YrrxK8mlIJD0oiL05hHz8wh+WfOVsdH
-         98UBwHWqhVa4Yi+n8lsthdYxsGDUl4iZR94ifDyZ8qvb9CjPVwX3pmTi2gSOYoGkpVPT
-         FHU0T/S2oHQBA7e5RYw+JrZpt+xqQP/S2lCIr9Jhu+8vm1HhugY8iusUbUw5MU4/mUWl
-         zriA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727519473; x=1728124273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OEisC0iRnLOpREGpVd6A93qrY+F/ucLTNFfZyjxhWMA=;
-        b=FPBjcoVail+vAwKW01zmjos15Aj5fXmJXXcOgA6RxnhKam4EbzhzOa+v7CX6s+P/J0
-         +5ABiZVRtlY+8U+0hxSHqut5CEMc2J8jnIoZs88/3Nsn0ufWrHR2lHqLpJvU2ZK6sHSR
-         MUn4Z76/kvtV15cFKUx1PUUtIYo3Dx5Ol2I7VygjnlNwy6C2J8X49a5wOs6YVb+HO51/
-         aHw8S8U4qRmncBbdrBKJ9wsd+DrRS1hZAsyA+c0fIBcrGVC9pMsFo3bUXEqGF6xkTfS4
-         PKYVWFKfPijdoFdEdDT3vwV4lyCWZEBsypqhVhWsnGLokZ3H0Uy4fSggy7BKj3lRasve
-         Q1UQ==
-X-Gm-Message-State: AOJu0YwPWFL7zVkdOPIRi8Gysdv7SPYpCg2947UzBoacevJCqv5vWAKp
-	oZyWVfsG3mcmxpLMR8VdxNdz/2GIz3ryadJXbrwpZ/OSy7KOpeJuthO35vaDoKjhUVtjBHwT8JG
-	pGsD9BZJ1LnOwA3G3U8gSgTW8gV3HRRHFcNxpn04wZx3lIhSUhQ==
-X-Google-Smtp-Source: AGHT+IGs8s4/clyDBjxyWsfXBD07dUrX3uXFq6NNpNNKcODLAYZn3PgCmyDCXjPgjKTL4lCpqXExfBmGtguaX51yLAk=
-X-Received: by 2002:a05:6402:42c2:b0:5be:caf6:9dc7 with SMTP id
- 4fb4d7f45d1cf-5c8825fd2dbmr5517804a12.25.1727519472268; Sat, 28 Sep 2024
- 03:31:12 -0700 (PDT)
+	s=arc-20240116; t=1727526095; c=relaxed/simple;
+	bh=3vNRQfb8vdVrkvVrzATImGjzZL6Z7WiQUS82zKMTPuE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PZUe59yyybp5M8xdaFLMCFyUoANWYEt8SqEmxtgdQhUDYVjXbRu8WyUZ72oMB8MH/OoN9c4J6cBE3TJa6lNdcsp7jpT1vRliB9jZzS6l7rrduNjAs4BKseJPeiFxqBVQLe6mR1RvSZGkUVCSwMP3kyXiESNLsHcFFVaz3ulgYjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.8.191])
+	by sina.com (10.185.250.23) with ESMTP
+	id 66F7F4C100001548; Sat, 28 Sep 2024 20:21:24 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 3802538913194
+X-SMAIL-UIID: 00372D9D6125415B8635D32FD6DBA2C8-20240928-202124-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Denis Kirjanov <dkirjanov@suse.de>,
+	syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>,
+	linux-kernel@vger.kernel.org,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+Date: Sat, 28 Sep 2024 20:21:12 +0800
+Message-Id: <20240928122112.1412-1-hdanton@sina.com>
+In-Reply-To: <CANn89iKbygQsCLcb0STk7DVnseNQ6rkSxeJ1cFGDaufDo5eSgg@mail.gmail.com>
+References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-In-Reply-To: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 28 Sep 2024 12:30:58 +0200
-Message-ID: <CANn89iJb_ftSAE1vNCjtEvt-XBjXUy6DymLbxc+WOJELrk7+nQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-To: Anton Danilov <littlesmilingcloud@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Shigeru Yoshida <syoshida@redhat.com>, Suman Ghosh <sumang@marvell.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 25, 2024 at 1:53=E2=80=AFAM Anton Danilov
-<littlesmilingcloud@gmail.com> wrote:
->
-> Regression Description:
->
-> Depending on the options specified for the GRE tunnel device, small
-> packets may be dropped. This occurs because the pskb_network_may_pull
-> function fails due to the packet's insufficient length.
->
-> For example, if only the okey option is specified for the tunnel device,
-> original (before encapsulation) packets smaller than 28 bytes (including
-> the IPv4 header) will be dropped. This happens because the required
-> length is calculated relative to the network header, not the skb->head.
->
-> Here is how the required length is computed and checked:
->
-> * The pull_len variable is set to 28 bytes, consisting of:
->   * IPv4 header: 20 bytes
->   * GRE header with Key field: 8 bytes
->
-> * The pskb_network_may_pull function adds the network offset, shifting
-> the checkable space further to the beginning of the network header and
-> extending it to the beginning of the packet. As a result, the end of
-> the checkable space occurs beyond the actual end of the packet.
->
-> Instead of ensuring that 28 bytes are present in skb->head, the function
-> is requesting these 28 bytes starting from the network header. For small
-> packets, this requested length exceeds the actual packet size, causing
-> the check to fail and the packets to be dropped.
->
-> This issue affects both locally originated and forwarded packets in
-> DMVPN-like setups.
->
-> How to reproduce (for local originated packets):
->
->   ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
->           local <your-ip> remote 0.0.0.0
->
->   ip link set mtu 1400 dev gre1
->   ip link set up dev gre1
->   ip address add 192.168.13.1/24 dev gre1
->   ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
->   ping -s 1374 -c 10 192.168.13.2
->   tcpdump -vni gre1
->   tcpdump -vni <your-ext-iface> 'ip proto 47'
->   ip -s -s -d link show dev gre1
->
-> Solution:
->
-> Use the pskb_may_pull function instead the pskb_network_may_pull.
->
-> Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmi=
-t()")
->
-> Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
+On Mon, 25 Mar 2024 14:08:36 +0100 Eric Dumazet <edumazet@google.com>
+> On Mon, Mar 25, 2024 at 1:10 PM Denis Kirjanov <dkirjanov@suse.de> wrote:
+> > On 3/22/24 23:10, syzbot wrote:
+> > > Hello,
+> > >
+> > > syzbot found the following issue on:
+> > >
+> > > HEAD commit:    61387b8dcf1d Merge tag 'for-6.9/dm-vdo' of git://git.kerne..
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=11effbd1180000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=c6aea81bc9ff5e99
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+> > > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> > >
+> > > Unfortunately, I don't have any reproducer for this issue yet.
+> > >
+> > > Downloadable assets:
+> > > disk image: https://storage.googleapis.com/syzbot-assets/b972a52930fa/disk-61387b8d.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/caa2592898b6/vmlinux-61387b8d.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/4187257afcc5/bzImage-61387b8d.xz
+> > >
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
+> > >
+> > > ==================================================================
+> > > BUG: KASAN: slab-use-after-free in __ethtool_get_link_ksettings+0x186/0x190 net/ethtool/ioctl.c:441
+> > > Read of size 8 at addr ffff888021f46308 by task kworker/0:4/5169
+> > >
+> > > CPU: 0 PID: 5169 Comm: kworker/0:4 Not tainted 6.8.0-syzkaller-05562-g61387b8dcf1d #0
+> > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+> > > Workqueue: infiniband ib_cache_event_task
+> > > Call Trace:
+> > >  <TASK>
+> > >  __dump_stack lib/dump_stack.c:88 [inline]
+> > >  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
+> > >  print_address_description mm/kasan/report.c:377 [inline]
+> > >  print_report+0xc3/0x620 mm/kasan/report.c:488
+> > >  kasan_report+0xd9/0x110 mm/kasan/report.c:601
+> > >  __ethtool_get_link_ksettings+0x186/0x190 net/ethtool/ioctl.c:441
+> > >  __ethtool_get_link_ksettings+0xf5/0x190 net/ethtool/ioctl.c:445
+> >
+> > Hmm, report says that we have a net_device freed even that we have a dev_hold()
+> > before __ethtool_get_link_ksettings()
+> 
+>  dev_hold(dev) might be done too late, the device is already being dismantled.
+> 
+> ib_device_get_netdev() should probably be done under RTNL locking,
+> otherwise the final part is racy :
+> 
+> if (res && res->reg_state != NETREG_REGISTERED) {
+>      dev_put(res);
+>      return NULL;
+> }
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Given paranoia in netdev_run_todo(),
+
+		/* paranoia */
+		BUG_ON(netdev_refcnt_read(dev) != 1);
+
+the claim that dev_hold(dev) might be done too late could not explain
+the success of checking NETREG_REGISTERED, because of checking 
+NETREG_UNREGISTERING after rcu barrier.
+
+	/* Wait for rcu callbacks to finish before next phase */
+	if (!list_empty(&list))
+		rcu_barrier();
+
+	list_for_each_entry_safe(dev, tmp, &list, todo_list) {
+		if (unlikely(dev->reg_state != NETREG_UNREGISTERING)) {
+			netdev_WARN(dev, "run_todo but not unregistering\n");
+			list_del(&dev->todo_list);
+			continue;
+		}
 
