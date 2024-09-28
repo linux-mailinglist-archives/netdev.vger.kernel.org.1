@@ -1,134 +1,90 @@
-Return-Path: <netdev+bounces-130179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089AC988EB8
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 11:14:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66082988EC6
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 11:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 943991F2190F
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 09:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D131528252E
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 09:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487BA19EED0;
-	Sat, 28 Sep 2024 09:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596B019DFBB;
+	Sat, 28 Sep 2024 09:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsL87tHo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E2BoSkdh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A07B14D2B1;
-	Sat, 28 Sep 2024 09:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CE974BED;
+	Sat, 28 Sep 2024 09:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727514853; cv=none; b=M6JN0LwkoJfdluHsSbzWk+Kr4bbA6CBwOZ8w4Rb7243Wu102r5yLgIhPILTTM8CqpS6Yb8Rw3xK771jV5/Bz0e6eyQ7TrQMg/eJILedmJn8AmGH87WfgOaaA8eH3dtwO3Nq6oMmYCGcrBm7h30YSkBvoM5p7aoSejuXfMP94F98=
+	t=1727515325; cv=none; b=rwZ2lUjVlJ6p3oMxztiGVGsSfA3OYowWkmcOLoSlL9NYeOF2WUYPsZoMjoVSpTUypfeOjFMxmS2wblbZQkLLCU7BOC6Y1rJ8/wHERTt7Y75SmNY947rQfk+7udeX28S9paBg2j9b64p4PHgylYFWIoy0x8Ps953u5WzBaI481uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727514853; c=relaxed/simple;
-	bh=ZxUX2bSPp3e7OZZCI7nhMz8oj00AuqElgjuSvQ01SZQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IEClECQVcZ7hn7K2tVIT+DbJb4exhZxcaeKxH423UaI94qdLHntxg7T8AXhPDqBjeeYPzPVAjRfrtZS3qrgbv+WckDHxIfgmyqyqOt9HrpukJv9n9mv6TRAPLhD8S29ht9+Wg8TX0Pa7q6SmNdnS4419CBqtyfkf7Td6WOlXnqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsL87tHo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4822C4CEC3;
-	Sat, 28 Sep 2024 09:14:12 +0000 (UTC)
+	s=arc-20240116; t=1727515325; c=relaxed/simple;
+	bh=uCgtAKSgxvi3oFwpCxLapBxV0u9+nUh8QinzO5ofaro=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=dvL+Gaes22hJo4xM0b7nKPHUZMIXWD3K/uEPYeP+KtVOZ088Farx5urai1e3lesRppAyJOLXpYIcp498H4cDOGmq9JqbAZpfgyPm15Yh04VSABbRoE6pFtiZTdFkjJwf/HdT9ES177w8SZfSrD/bkkrTJMwQNLM6OFR8qlcw4Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E2BoSkdh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91AFFC4CEC3;
+	Sat, 28 Sep 2024 09:22:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727514852;
-	bh=ZxUX2bSPp3e7OZZCI7nhMz8oj00AuqElgjuSvQ01SZQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=jsL87tHoabQvgso0X70BChaJ8YD9i3hGMz2fN6J51wZszFHRe2b0i/Ocb5phYZhMU
-	 /aDvvB51dKXBsNVz7Cgagws98BCf0dW1NKltGawuJl6R44ME4a7pmpZqgCvCGUN1eD
-	 veKGN1FI0USmm07DotjjHzZ0pIwThuSM0hG88SY5c1l/v5WPxknPIJFMIP8AmynnV1
-	 CY21/H0j2TaMXJVQA428X0lgB8q3rT/qrEbrEHTdac5CB6UdRlIpLxR80tQ5Od1NFq
-	 tLfjDFCbOzWG7Us4dFAoFijyTBMBAJtsH55M29sbfdePSEDP8xeDE/xkcqABNQ6jBj
-	 IqCIDeJHCjvoA==
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7acdd65fbceso235181385a.3;
-        Sat, 28 Sep 2024 02:14:12 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUjjNJ2K4c8N5XV2FXIt4pf5sYI29gnK/QHFWj+nZJoDb4d+Z7ezVAFs6nahreZFsWT+1NGsJ9B@vger.kernel.org, AJvYcCVEp6SQwIlrgjGKE/79VFi0tmue43suEIKx72lNdnSjt2eUDpHMubL3xnR5JuVDKh1XmaA=@vger.kernel.org, AJvYcCVORc6C98r1F2IaeBpPY5phz9F5lcI/gRidNvsAjDI6PZWOcJbEdI/0FZloKNhTOAjyqHN4dTPMTXZtyMsM@vger.kernel.org, AJvYcCW8MXKdVU13pvtqYTDe5e+lPnrBoINaWINXuIgXWJLpvYw0FkAEDSUi3DwSoS3ngbQ9XSWzEiYYFsFdpa/Inp0q@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLakZePyPjzy4do++AcEVK1Ru3q5nJDTugnFYaXBchQuQqKCNk
-	gZI1k2kpv0Vw7ZonFE8ZAIzHhWVc9YE3gtfpDEstYgXptEWQ05Ij8FSJTKJuMGfJkwpuQmAViiM
-	JYeKqdJy/pe+EcvF8A4eychEPks4=
-X-Google-Smtp-Source: AGHT+IEIJBvI1ZnMqsnDSFPkfMNKVu+B+hYGK1Y1g1nidaxCR4JAFXKw3/qPbJRVW+JE/2IgHiMcPA8URIFsOtlvejU=
-X-Received: by 2002:a05:620a:370e:b0:7a2:a1d:f0c6 with SMTP id
- af79cd13be357-7ae37825602mr734291385a.5.1727514851848; Sat, 28 Sep 2024
- 02:14:11 -0700 (PDT)
+	s=k20201202; t=1727515324;
+	bh=uCgtAKSgxvi3oFwpCxLapBxV0u9+nUh8QinzO5ofaro=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=E2BoSkdh7EcgYYncu4sHIzlPwyxK84ixHU61HX94xf4KZ9JD7nreUCTEsGbmO+lG2
+	 HgMXEICrW1wWK412VPQxVkq/mGRiaKWq1VOeKoUxyMpcW8Xsh27MpECLeoeyfE+vtQ
+	 uIkaFrRfka/77Z3/VCSkrTI4gVuaDjxWgUr6ntUk9gYe3e2WzBbVx3R3YGXE57oYTM
+	 gKgO6xmhJYUy7DweOn8V0vSr2mv/0Wh8gWSKvNuKhsxsKO4oV4n25qeDguJw9clhwv
+	 fl6NfrkVvzoSO+TJRx00tMBelSYI8PtP+iasBcJRCIOYaF8XdXnspNAB/lDCK7BJrj
+	 8vybX7HEsILMQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927131355.350918-1-bjorn@kernel.org> <20240927131355.350918-2-bjorn@kernel.org>
- <CAEf4BzaWneXBv401rOdW8ijBTqRn_Ut4FFvhbsPShh5_pjV33A@mail.gmail.com>
-In-Reply-To: <CAEf4BzaWneXBv401rOdW8ijBTqRn_Ut4FFvhbsPShh5_pjV33A@mail.gmail.com>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Date: Sat, 28 Sep 2024 11:14:01 +0200
-X-Gmail-Original-Message-ID: <CAJ+HfNh+2oN_A4KtUkeSfvH+D6AHkVWErskq5+s2zgejot0BiA@mail.gmail.com>
-Message-ID: <CAJ+HfNh+2oN_A4KtUkeSfvH+D6AHkVWErskq5+s2zgejot0BiA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/2] selftests: bpf: Add missing per-arch include path
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-riscv@lists.infradead.org, Charlie Jenkins <charlie@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of
+ the ath11k on WCN6855
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240814082301.8091-1-brgl@bgdev.pl>
+References: <20240814082301.8091-1-brgl@bgdev.pl>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ ath11k@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <172751531994.2249584.3150490336155869162.kvalo@kernel.org>
+Date: Sat, 28 Sep 2024 09:22:01 +0000 (UTC)
 
-On Fri, 27 Sept 2024 at 22:52, Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Fri, Sep 27, 2024 at 6:14=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kern=
-el.org> wrote:
-> >
-> > From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
-> >
-> > The prog_tests programs do not include the per-arch tools include
-> > path, e.g. tools/arch/riscv/include. Some architectures depend those
-> > files to build properly.
-> >
-> > Include tools/arch/$(SUBARCH)/include in the selftests bpf build.
-> >
-> > Fixes: 6d74d178fe6e ("tools: Add riscv barrier implementation")
-> > Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
-> > ---
-> >  tools/testing/selftests/bpf/Makefile | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selft=
-ests/bpf/Makefile
-> > index 365740f24d2e..d6a53afa449f 100644
-> > --- a/tools/testing/selftests/bpf/Makefile
-> > +++ b/tools/testing/selftests/bpf/Makefile
-> > @@ -10,6 +10,7 @@ TOOLSDIR :=3D $(abspath ../../..)
-> >  LIBDIR :=3D $(TOOLSDIR)/lib
-> >  BPFDIR :=3D $(LIBDIR)/bpf
-> >  TOOLSINCDIR :=3D $(TOOLSDIR)/include
-> > +TOOLSARCHINCDIR :=3D $(TOOLSDIR)/arch/$(SRCARCH)/include
-> >  BPFTOOLDIR :=3D $(TOOLSDIR)/bpf/bpftool
-> >  APIDIR :=3D $(TOOLSINCDIR)/uapi
-> >  ifneq ($(O),)
-> > @@ -44,7 +45,7 @@ CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic                =
-                   \
-> >           -Wall -Werror -fno-omit-frame-pointer                        =
- \
-> >           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)                   =
- \
-> >           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)         =
- \
-> > -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
-> > +         -I$(TOOLSINCDIR) -I$(TOOLSARCHINCDIR) -I$(APIDIR) -I$(OUTPUT)
->
-> Eduard was going to switch selftests to use kernel UAPI headers, I
-> wonder if we should do just that and then set up arch-specific
-> includes from kernel (not from tools/) as well?
+Bartosz Golaszewski <brgl@bgdev.pl> wrote:
 
-In the end it's up to you guys! This is broken on Linus' master for
-RISC-V now, so from my (RISC-V) perspective having a workaround sooner
-than later would be nice!
+> Describe the inputs from the PMU of the ath11k module on WCN6855.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
 
-@Eduard Do you have any patches around? If so, I can take them for a spin o=
-n RV.
+Patch applied to ath-next branch of ath.git, thanks.
 
+02d697272cc6 dt-bindings: net: ath11k: document the inputs of the ath11k on WCN6855
 
-Bj=C3=B6rn
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20240814082301.8091-1-brgl@bgdev.pl/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+https://docs.kernel.org/process/submitting-patches.html
+
 
