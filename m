@@ -1,199 +1,262 @@
-Return-Path: <netdev+bounces-130194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C633989143
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 22:07:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B670989153
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 22:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9D931F23885
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 20:07:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BF161C22EDC
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 20:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E809157E9F;
-	Sat, 28 Sep 2024 20:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91947169AE6;
+	Sat, 28 Sep 2024 20:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mswEaIxt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HN6l/kql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79209136358
-	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 20:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B4923774;
+	Sat, 28 Sep 2024 20:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727554017; cv=none; b=OauG43tanIqdmFHXCXDYYvIW6PURzYiwor/2GbAnyorpl36ltR0QSsskov0DmPR0HFNtniXEIrQfmhpJoT+NNLQCGwWZTupUDhbCvuXL364WhPGN2wdWALn+ZD34/EOyOD+oZYTvP7HplqAnNbeAT2GUpr5GlwMW8WhkXkEc8oA=
+	t=1727554640; cv=none; b=rD9oQZlM1czX9pW+L9DSjhkIEG77TnaxdHKayjfqdxEOeKkcUQua6O6jz3v9eA9VmwmaaNQKTzYHjaGG2FKQpiTUcKiYrJ9dGyBBOFDV+fWCzJcAowGZlRFh9yYOuc1mh1AhdAt0pxM6p3kXXq49nSo4lUv+CUy4U/i/08zdeJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727554017; c=relaxed/simple;
-	bh=h0sNuBxsvoK2YChegc9QSYuEMp8d+DJBKteN7IMj0A4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Wg6rvzU8tBASsv1Zm5cMEJRJ9aRTghz350lJgqIOF4RszKZQ6Ry8D7hLCPuxyPj8MQg6iC7GFNq7xMDuAnH5gqnmG6eYRQ3PhW0WVm37bUMAgciwCCSJ1CB7XlWoHT89tiLrnVFrLF0WGlJ8hBmLlSOP9nCleRmnFcd2RtC6JLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mswEaIxt; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e251ba2243so17570447b3.1
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 13:06:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727554014; x=1728158814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y1SqGaOAQOPzAn14KPrnOehT0qxEpBZk7h3tAfBnOmM=;
-        b=mswEaIxtkZm5hRXLc/zPHoCM0SG07iYCduhZD+5ni+YVOtM2UZt7VYcFgig69nR6pg
-         cYMxUZzP2cOiLfavE58L6eJf/i+XgKALYxWAa0hNU4OOILB2lqy93fwli5fcNAu//Frc
-         eri1PUqHONpU30k1Kh+X2GZ2hx4TlTSHsDvHv5XNA3ySYkvppnYyWMTBjtZyxej9mLc2
-         sp0o+E7jS1STRlnCZnNupnTqmLVZ3Xk11mYXCvqqz61rG5oiGHYH8KHco5CDl8Kti+jE
-         3YRBmUvOjDNDVcsgUwUkQ7vL0Dwz/7GgrzGZ5UAEMu5G8wrB7TODn+UUHmUTCvDEXzpP
-         bs3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727554014; x=1728158814;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y1SqGaOAQOPzAn14KPrnOehT0qxEpBZk7h3tAfBnOmM=;
-        b=LfwCU/T8wzMTSb7NfRxnVYEuF1ZrDSIAzJ1wSF/kslGfJUKcZxTJls/dVPzA8vlN65
-         QjqeU2P42EgoXkIeQf8m/6l98kxMvqvoltS+GAVZzVV/TJYbFTUhzaMlxwA5ED9rI9F9
-         wkq6MtiJVdWkxNZDVJk1DVP+/UsTuHVtki3P7AUI+GVm9QXtWYiBC8m+++dYNeoX9VS0
-         KOJ0FfDwAjFsgtH021d63gAtb55StieNyZD6wcp3V/CUpU1jc9z2Hhe366v+1jqmvkfJ
-         Yvc0bS2aWBhYzwWa43wLCpDU5aWvpd4tjay618v/Fqlj3twlz03YL1hDBrWGcOISCH56
-         y2CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKQAM9Ge9WHeY9J67bQqMk8etVP4q4hieqhzGGoW+wuOjpekMslhRTiB+xF2Qb0+tGJ+e1Lsk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnE/8QSmfWWwk55hqyHajaI9AdScmp1d1ZQgDRkCNTBwZp3FRB
-	1ci3k0UeZ2xjMeDTm1cYp3k+JkJvRUqT0INOoxnzW0WA6saompRiU5uIcJn/AB2E4Or7WpZsLXY
-	SZw==
-X-Google-Smtp-Source: AGHT+IE80aZhCT4JHwgHwsEdaDWdBP8dNZdVjFPvbHZ/3cczSejefNhUNjkgqyWFX+K6tqTYQ9YkfEFTh9M=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:690c:4b92:b0:6dd:bb6e:ec89 with SMTP id
- 00721157ae682-6e245317e48mr935707b3.2.1727554014549; Sat, 28 Sep 2024
- 13:06:54 -0700 (PDT)
-Date: Sat, 28 Sep 2024 22:06:52 +0200
-In-Reply-To: <ZvZ_ZjcKJPm5B3_Z@google.com>
+	s=arc-20240116; t=1727554640; c=relaxed/simple;
+	bh=GxLnxv0XYQXvlin9TcvZ4RiHtAZjSqilKKtgN9ttjaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=bWpU6JlkPjs+vIpWZ+oLa20d2VyokvAP86K7sShakOYkoYvbYslFNPNFiQ/SHPh3j09ieqKNh1Fez4x3LKuk5J30gkudSrpWqil1UumFqHtax/wi+9cG39CxU/RBSB0+ByPyInUKs4bIVKD7BaswLk21aBELEVkbQbc5OmE5lb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HN6l/kql; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85778C4CEC3;
+	Sat, 28 Sep 2024 20:17:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727554639;
+	bh=GxLnxv0XYQXvlin9TcvZ4RiHtAZjSqilKKtgN9ttjaY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=HN6l/kqlpNLRnX4Tj3J6WmkbDtid6/YNBPS/tnLJtWZVxlTextqj2bwj8ktQuWByR
+	 TYBf6EnmSnIf1nXJODJHVTzzqZ4s8nq3czWZ9esZozC1LrmBHzsBdYHxjGulC3Gwmi
+	 KgNMC1fUuAf+wWNHdjhMht8FJNaYv/bV5HpQ0RlrS+0ZsPoFrDolCPWENRUPmxF93k
+	 G8pecxcSctXbSKJ67xAHr1Zs8GuZg6LHhZrrxt24NTJJyXPmo4SdafNQ8WkjSEsVW+
+	 zLblasZLivej8yvdAgRi1/mG7+RPJvxgwkp6csgTsA0646WhXcvKTUdQ/MaGnV0W7z
+	 H1TjnpPJ3ff5A==
+Date: Sat, 28 Sep 2024 15:17:17 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>, Lizhi Hou <lizhi.hou@amd.com>
+Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
+ parsed from DT
+Message-ID: <20240928201717.GA99402@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-15-ivanov.mikhail1@huawei-partners.com>
- <ZurZ7nuRRl0Zf2iM@google.com> <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
- <ZvZ_ZjcKJPm5B3_Z@google.com>
-Message-ID: <Zvhh3CRj9T7_KIhC@google.com>
-Subject: Re: [RFC PATCH v3 14/19] selftests/landlock: Test socketpair(2) restriction
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvZVPA6ov5XgScpz@apocalypse>
 
-On Fri, Sep 27, 2024 at 11:48:22AM +0200, G=C3=BCnther Noack wrote:
-> On Mon, Sep 23, 2024 at 03:57:47PM +0300, Mikhail Ivanov wrote:
-> > (Btw I think that disassociation control can be really useful. If
-> > it were possible to restrict this action for each protocol, we would
-> > have stricter control over the protocols used.)
->=20
-> In my understanding, the disassociation support is closely intertwined wi=
-th the
-> transport layer - the last paragraph of DESCRIPTION in connect(2) is list=
-ing
-> TCP, UDP and Unix Domain sockets in datagram mode. -- The relevant code i=
-n in
-> net/ipv4/af_inet.c in inet_dgram_connect() and __inet_stream_connect(), w=
-here
-> AF_UNSPEC is handled.
->=20
-> I would love to find a way to restrict this independent of the specific
-> transport protocol as well.
->=20
-> Remark on the side - in af_inet.c in inet_shutdown(), I also found a worr=
-ying
-> scenario where the same sk->sk_prot->disconnect() function is called and
-> sock->state also gets reset to SS_UNCONNECTED.  I have done a naive attem=
-pt to
-> hit that code path by calling shutdown() on a passive TCP socket, but was=
- not
-> able to reuse the socket for new connections afterwards. (Have not debugg=
-ed it
-> further though.)  I wonder whether this is a scnenario that we also need =
-to
-> cover?
+On Fri, Sep 27, 2024 at 08:48:28AM +0200, Andrea della Porta wrote:
+> On 15:16 Thu 05 Sep     , Bjorn Helgaas wrote:
+> > On Thu, Sep 05, 2024 at 06:43:35PM +0200, Andrea della Porta wrote:
+> > > On 17:26 Tue 03 Sep     , Bjorn Helgaas wrote:
+> > > > On Mon, Aug 26, 2024 at 09:51:02PM +0200, Andrea della Porta wrote:
+> > > > > On 10:24 Wed 21 Aug     , Bjorn Helgaas wrote:
+> > > > > > On Tue, Aug 20, 2024 at 04:36:05PM +0200, Andrea della Porta wrote:
+> > > > > > > The of_pci_set_address() function parses devicetree PCI range
+> > > > > > > specifier assuming the address is 'sanitized' at the origin,
+> > > > > > > i.e. without checking whether the incoming address is 32 or 64
+> > > > > > > bit has specified in the flags.  In this way an address with no
+> > > > > > > OF_PCI_ADDR_SPACE_MEM64 set in the flags could leak through and
+> > > > > > > the upper 32 bits of the address will be set too, and this
+> > > > > > > violates the PCI specs stating that in 32 bit address the upper
+> > > > > > > bit should be zero.
+> > > > 
+> > > > > > I don't understand this code, so I'm probably missing something.  It
+> > > > > > looks like the interesting path here is:
+> > > > > > 
+> > > > > >   of_pci_prop_ranges
+> > > > > >     res = &pdev->resource[...];
+> > > > > >     for (j = 0; j < num; j++) {
+> > > > > >       val64 = res[j].start;
+> > > > > >       of_pci_set_address(..., val64, 0, flags, false);
+> > > > > >  +      if (OF_PCI_ADDR_SPACE_MEM64)
+> > > > > >  +        prop[1] = upper_32_bits(val64);
+> > > > > >  +      else
+> > > > > >  +        prop[1] = 0;
+> > > ...
+> > > > However, the CPU physical address space and the PCI bus address are
+> > > > not the same.  Generic code paths should account for that different by
+> > > > applying an offset (the offset will be zero on many platforms where
+> > > > CPU and PCI bus addresses *look* the same).
+> > > > 
+> > > > So a generic code path like of_pci_prop_ranges() that basically copies
+> > > > a CPU physical address to a PCI bus address looks broken to me.
+> > > 
+> > > Hmmm, I'd say that a translation from one bus type to the other is
+> > > going on nonetheless, and this is done in the current upstream function
+> > > as well. This patch of course does not add the translation (which is
+> > > already in place), just to do it avoiding generating inconsistent address.
+> > 
+> > I think I was looking at this backwards.  I assumed we were *parsing"
+> > a "ranges" property, but I think in fact we're *building* a "ranges"
+> > property to describe an existing PCI device (either a PCI-to-PCI
+> > bridge or an endpoint).  For such devices there is no address
+> > translation.
+> > 
+> > Any address translation would only occur at a PCI host bridge that has
+> > CPU address space on the upstream side and PCI address space on the
+> > downstream side.
+> > 
+> > Since (IIUC), we're building "ranges" for a device in the interior of
+> > a PCI hierarchy where address translation doesn't happen, I think both
+> > the parent and child addresses in "ranges" should be in the PCI
+> > address space.
+> > 
+> > But right now, I think they're both in the CPU address space, and we
+> > basically do this:
+> > 
+> >   of_pci_prop_ranges(struct pci_dev *pdev, ...)
+> >     res = &pdev->resource[...];
+> >     for (j = 0; j < num; j++) {   # iterate through BARs or windows
+> >       val64 = res[j].start;       # CPU physical address
+> >       # <convert to PCI address space>
+> >       of_pci_set_address(..., rp[i].parent_addr, val64, ...)
+> >         rp[i].parent_addr = val64
+> >       if (pci_is_bridge(pdev))
+> >         memcpy(rp[i].child_addr, rp[i].parent_addr)
+> >       else
+> >         rp[i].child_addr[0] = j   # child addr unset/unused
+> > 
+> > Here "res" is a PCI BAR or bridge window, and it contains CPU physical
+> > addresses, so "val64" is a CPU physical address.  It looks to me like
+> > we should convert to a PCI bus address at the point noted above, based
+> > on any translation described by the PCI host bridge.  That *should*
+> > naturally result in a 32-bit value if OF_PCI_ADDR_SPACE_MEM64 is not
+> > set.
+> 
+> That's exactly the point, except that right now a 64 bit address would
+> "unnaturally" pass through even if OF_PCI_ADDR_SPACE_MEM64 is not set.
+> Hence the purpose of this patch.
 
-FYI, **this does turn out to work** (I just fumbled in my first experiment)=
-. --
-It is possible to reset a listening socket with shutdown() into a state whe=
-re it
-can be used for at least a new connect(2), and maybe also for new listen(2)=
-s.
+From your earlier email
+(https://lore.kernel.org/r/Zszcps6bnCcdFa54@apocalypse):
 
-The same might also be possible if a socket is in the TCP_SYN_SENT state at=
- the
-time of shutdown() (although that is a bit trickier to try out).
+> Without this patch the range translation chain is broken, like this:
 
-So a complete disassociation control for TCP/IP might not only need to have
-LANDLOCK_ACCESS_SOCKET_CONNECT_UNSPEC (or however we'd call it), but also
-LANDLOCK_ACCESS_SOCKET_PASSIVE_SHUTDOWN and maybe even another one for the
-TCP_SYN_SENT case...? *
+> pcie@120000: <0x2000000 0x00 0x00    0x1f 0x00                0x00 0xfffffffc>;
+> ~~~ chain breaks here ~~~
+> pci@0      : <0x82000000 0x1f 0x00   0x82000000 0x1f 0x00     0x00 0x600000>;
+> dev@0,0    : <0x01 0x00 0x00         0x82010000 0x1f 0x00     0x00 0x400000>;
+> rp1@0      : <0xc0 0x40000000        0x01 0x00 0x00           0x00 0x400000>;
 
-It makes me uneasy to think that I only looked at AF_INET{,6} and TCP so fa=
-r,
-and that other protocols would need a similarly close look.  It will be
-difficult to cover all the "disassociation" cases in all the different
-protocols, and even more difficult to detect new ones when they pop up.  If=
- we
-discover new ones and they'd need new Landlock access rights, it would also
-potentially mean that existing Landlock users would have to update their ru=
-les
-to spell that out.
+The cover letter said "RP1 is an MFD chipset that acts as a
+south-bridge PCIe endpoint .. the RP1 as an endpoint itself is
+discoverable via usual PCI enumeration".
 
-It might be easier after all to not rely on "disassociation" control too mu=
-ch
-and instead to design the network-related access rights in a way so that we=
- can
-provide the desired sandboxing guarantees by restricting the "constructive"
-operations (the ones that initiate new network connections or that listen o=
-n the
-network).
+I assume pcie@120000 is the PCI host bridge and is already in the
+original DT describing the platform.  I assume pci@0 is a Root Port
+and dev@0,0 is the RP1 Endpoint, and the existing code already adds
+them as they are enumerated when pci_bus_add_device() calls
+of_pci_make_dev_node(), and I think this series adds the rp1@0
+description.
 
-Mikhail, in your email I am quoting above, you are saying that "disassociat=
-ion
-control can be really useful"; do you know of any cases where a restriction=
- of
-connect/listen is *not* enough and where you'd still want the disassociatio=
-n
-control?
+And the "ranges" properties are built when of_pci_make_dev_node()
+eventually calls of_pci_prop_ranges().  With reference to sec 2.2.1.1
+of https://www.devicetree.org/open-firmware/bindings/pci/pci2_1.pdf
+and
+https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#ranges,
+I *think* your example says:
 
-(In my mind, the disassociation control would have mainly been needed if we=
- had
-gone with Micka=C3=ABl's "Use socket's Landlock domain" RFC [1]?  Micka=C3=
-=ABl and me have
-discussed this patch set at LSS and I am also now coming around to the
-realization that this would have introduced more complication.  - It might =
-have
-been a more "pure" approach, but comes at the expense of complicating Landl=
-ock
-usage.)
+pcie@120000 has:
+  child phys.hi	      0x02000000    n=0 p=0 t=0 ss=10b
+  child phys.mid,lo   0x00000000_00000000
+  parent phys.hi,lo   0x0000001f_00000000
+  length hi,lo        0x00000000_fffffffc
 
-=E2=80=94G=C3=BCnther
+which would make it a bridge where the child (PCI) address space is
+relocatable non-prefetchable 32-bit memory space at
+0x00000000-0xfffffffc, and the corresponding parent address space is
+0x1f_00000000-0x1f_fffffffc.  That means the host bridge applies an
+address translation of "child_addr = parent_addr - 0x1f_00000000".
 
-[1] https://lore.kernel.org/all/20240719150618.197991-1-mic@digikod.net/
+pci@0 has:
+  child phys.hi	      0x82000000    n=1 p=0 t=0 ss=10b
+  child phys.mid,lo   0x0000001f_00000000
+  parent phys.hi      0x82000000    n=1 p=0 t=0 ss=10b
+  parent phys.mid,lo  0x0000001f_00000000
+  length hi,lo        0x00000000_00600000
 
-* for later reference, my reasoning in the code is: net/ipv4/af_inet.c
-  implements the entry points for connect() and listen() at the address fam=
-ily
-  layer.  Both operations require that the sock->state is SS_UNCONNECTED.  =
-So
-  the rest is going through the other occurrences of SS_UNCONNECTED in that=
- same
-  file to see if there are any places where the socket can get back into th=
-at
-  state.  The places I found where it is set to that state are:
- =20
-  1. inet_create (right after creation, expected)
-  2. __inet_stream_connect in the AF_UNSPEC case (known issue)
-  3. __inet_stream_connect in the case of a failed connect (expected)
-  4. inet_shutdown in the case of TCP_LISTEN or TCP_SYN_SENT (mentioned abo=
-ve)
+which would make it a PCI-to-PCI bridge (I assume a PCIe Root Port),
+where the child (secondary bus) address space is the non-relocatable
+non-prefetchable 32-bit memory space 0x1f_00000000-0x1f_005fffff and
+the parent (primary bus) address space is also non-relocatable
+non-prefetchable 32-bit memory space at 0x1f_00000000-0x1f_005fffff.
+
+This looks wrong to me because the pci@0 parent address space
+(0x1f_00000000-0x1f_005fffff) should be inside the pcie@120000 child
+address space (0x00000000-0xfffffffc), but it's not.
+
+IIUC, this patch clears the upper 32 bits in the pci@0 parent address
+space.  That would make things work correctly in this case because
+that happens to be the exact translation of pcie@120000, so it results
+in pci@0 parent address space of 0x00000000-0x005fffff.
+
+But I don't think it works in general because there's no requirement
+that the host bridge address translation be that simple.  For example,
+if we have two host bridges, and we want each to have 2GB of 32-bit
+PCI address space starting at 0x0, it might look like this:
+
+  0x00000002_00000000 -> PCI 0x00000000 (subtract 0x00000002_00000000)
+  0x00000002_80000000 -> PCI 0x00000000 (subtract 0x00000002_80000000)
+
+In this case simply ignoring the high 32 bits of the CPU address isn't
+the correct translation for the second host bridge.  I think we should
+look at each host bridge's "ranges", find the difference between its
+parent and child addresses, and apply the same difference to
+everything below that bridge.
+
+> while with the patch applied the chain correctly become:
+
+> pcie@120000: <0x2000000 0x00 0x00    0x1f 0x00                0x00 0xfffffffc>;
+> pci@0      : <0x82000000 0x00 0x00   0x82000000 0x00 0x00     0x00 0x600000>;
+> dev@0,0    : <0x01 0x00 0x00         0x82010000 0x00 0x00     0x00 0x400000>;
+> rp1@0      : <0xc0 0x40000000        0x01 0x00 0x00           0x00 0x400000>;
+
+> > > > Maybe my expectation of this being described in DT is mistaken.
+> > > 
+> > > Not sure what you mean here, the address being translated are coming from
+> > > DT, in fact they are described by "ranges" properties.
+> > 
+> > Right, for my own future reference since I couldn't find a generic
+> > description of "ranges" in Documentation/devicetree/:
+> > 
+> > [1] https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#ranges
 
