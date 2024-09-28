@@ -1,123 +1,143 @@
-Return-Path: <netdev+bounces-130184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 764B2988EE5
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 12:04:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81F5988EFA
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 12:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED741282589
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 10:04:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFCEA1C20DAD
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 10:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EF1181334;
-	Sat, 28 Sep 2024 10:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ABD0170A37;
+	Sat, 28 Sep 2024 10:31:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z59+6Mbn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vMDsb1F2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA008381C7
-	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 10:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 630943D3B3
+	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 10:31:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727517848; cv=none; b=kD5S46+eQ0F4f4kFtepbEocO0vOgt+ullf4LRZabsUsJNDMELXZ5uKNQuwEGT/iXYltFSnIpTCLsxLKn7tD6dV4hKRttMnDeCer8wb15aD8hc/UXxG4/W6bNnr6KH29Ee/mQN7GSDEhxhFYboNYGfsYs4KzSr2R1y5j0fDqQSL0=
+	t=1727519476; cv=none; b=CwydLZH+Rod6O/z/AOC8rnXN70k3zzkAADkGFlPT4U8CJgR5nPg3te0Oh9avARbKWdX8fASIvZKB4F/CPg5/LxpPlbFTDUP89PrSYHMdNv0mqmf9Nrsoxh0Bu/dxfSrocrpj77uqhRGPfa5CRkeWk9AeM0M+gqI8lpvUsTmSqg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727517848; c=relaxed/simple;
-	bh=4+1mwT5zLcDgrEjzOfG3P87kf1xwTT+nnr6GaCcnKBA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=cQw3ZhaeStVAwsdz+QWhFFOPNQQEbIhkR6luobpk9k1SyyRrvLZ/ZsshNnbWcMDq84cYA7Uv1z4eZCxv97xjPOlaWjuuZVk+vk3YZUT+nv1vi6V2nPnD3PIRyxJzqo79gaotyQnTqvr2YS4D31Zt2i+ORqs214b67f6pPzu0PDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=z59+6Mbn; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42ca6ba750eso17900525e9.0
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 03:04:06 -0700 (PDT)
+	s=arc-20240116; t=1727519476; c=relaxed/simple;
+	bh=dDHrR22WmXcK1oZRFZfxwGP+7kFIwDMTIs076q/6V4A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YTsiEUzrz/SgSDMluE8K1wu3kXwa2A7pLsgJ1NjyjvkzZ6EiYv0Zz+f8ilJ7i4TACkWxeu/HXYf6UjW6C2O50kVYr51+HSJYZy2bCiE+gG/sTU+t+V3uiOQSy6qfKi26qsK0E7VQSq1wn/4VWmEt+0PetzDjcRbaawZOO0WP/ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vMDsb1F2; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c718af3354so3659568a12.0
+        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 03:31:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1727517845; x=1728122645; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BtK7Ih0GNRwfLjqmfDTPx6+2O4u4ad9cD8UabTfETxE=;
-        b=z59+6Mbn0z12d0b6sfK3VujYXpDl+fAONeq6/3sRkzxfclJOo0YdqcHN8qMLffwNIb
-         nOnmj6tC1TN3jdRd0Mt6ATBTD5+sThmB0Y7lCFzUCOG0MxmHr2qRWO60kEiJNcvkDFos
-         kjkW3K+K+Zr+j7c+sehw0q3cjzcsIEGMSmU7d1z7s/CIw9+70XtdxssTUjo4vbJ2Z0J7
-         LAwg8sR67A5wyIOKgiNGMifq4ezv4IZ91S6Cd1I+yl93ekw4Wa/Md0ki/5AqTZCd47CQ
-         ut0H0gO9AC5Wi+SNqMq6gopKeTUt4GDUHgrCwWUHvUK+bA6ESBvM1F6ptLfXtgLxHwmM
-         JV0Q==
+        d=google.com; s=20230601; t=1727519473; x=1728124273; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OEisC0iRnLOpREGpVd6A93qrY+F/ucLTNFfZyjxhWMA=;
+        b=vMDsb1F2KdnOU0GIFE6G40oidLvkWLu/7WfqJFM2ZkWml30mg60h4CTPDlO+Sby9TY
+         YWRxCPE9CfMUdmY7eSKprGBhLGd8pVgGV65Jz48FKqjt2lMxmZt9QJuQN7ODKhe+rn/u
+         Vw0jfzB9pSH9P8Ey7wkvm1KHUj+HEckQxRrV7YrrxK8mlIJD0oiL05hHz8wh+WfOVsdH
+         98UBwHWqhVa4Yi+n8lsthdYxsGDUl4iZR94ifDyZ8qvb9CjPVwX3pmTi2gSOYoGkpVPT
+         FHU0T/S2oHQBA7e5RYw+JrZpt+xqQP/S2lCIr9Jhu+8vm1HhugY8iusUbUw5MU4/mUWl
+         zriA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727517845; x=1728122645;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BtK7Ih0GNRwfLjqmfDTPx6+2O4u4ad9cD8UabTfETxE=;
-        b=AU2pgVO3md1aVb/qAsymF0wq9plmYV7MA4kgx8K39EMI2LP2EeeNEyYzcpfCaun7iC
-         FDZ6pSiNOTUSTmOzZ/GzRKkQh7iTbGAdl97XwqrezGXXNMvmcict0tHPYwftP4W8Cxtb
-         ygB8RccrBviC2v/VGXMCtJeLr5nZ1kuwmcOnbh963ucUnQGezsmaJlS1U3BIJjP7Es6h
-         Mcvueby4FKA6Mhq5cJeZVmZiyui5S11x3PjtGr+EHpYlfWIdCxy9AUJb2flRwm5VbqcP
-         rkq/IInzid0QbTv20rCprfO71pkp84sQ7kTz7PVnkWhkRcEC8XE2Ls+6s6yFk4gfQH0J
-         2BoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUdbLYG5rD7qOpdpkcjSmS3e8Ax3JFSEtHCr2a6lrMALDDbqIP68IRTkd49yjjefbm0uVUyy4Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4c1ZQ9GptD0aqwNzHFiCdmGxam9zjCD4C9ZQ4psOrmdSSXgjb
-	adz5S7ZZdabCwsgTPzP0zLuWXMwfhrtfgOOUhfB1LeS8IaCCW7126Ctv+doCwW4=
-X-Google-Smtp-Source: AGHT+IFU0bjRjLrQLfM0b06xv21LP9ly86RjBkJWZbMkiF/UDbns48K3HU5bwc/Yb08Uix53u3u4mg==
-X-Received: by 2002:a05:600c:1d08:b0:42c:b697:a62c with SMTP id 5b1f17b1804b1-42f521ce1a4mr63768475e9.5.1727517845154;
-        Sat, 28 Sep 2024 03:04:05 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e969ddb4csm97336095e9.6.2024.09.28.03.04.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Sep 2024 03:04:04 -0700 (PDT)
-Date: Sat, 28 Sep 2024 13:04:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Julien Panis <jpanis@baylibre.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	Chintan Vankar <c-vankar@ti.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH v2 net] net: ethernet: ti: am65-cpsw: Fix forever loop in
- cleanup code
-Message-ID: <8e7960cc-415d-48d7-99ce-f623022ec7b5@stanley.mountain>
+        d=1e100.net; s=20230601; t=1727519473; x=1728124273;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OEisC0iRnLOpREGpVd6A93qrY+F/ucLTNFfZyjxhWMA=;
+        b=FPBjcoVail+vAwKW01zmjos15Aj5fXmJXXcOgA6RxnhKam4EbzhzOa+v7CX6s+P/J0
+         +5ABiZVRtlY+8U+0hxSHqut5CEMc2J8jnIoZs88/3Nsn0ufWrHR2lHqLpJvU2ZK6sHSR
+         MUn4Z76/kvtV15cFKUx1PUUtIYo3Dx5Ol2I7VygjnlNwy6C2J8X49a5wOs6YVb+HO51/
+         aHw8S8U4qRmncBbdrBKJ9wsd+DrRS1hZAsyA+c0fIBcrGVC9pMsFo3bUXEqGF6xkTfS4
+         PKYVWFKfPijdoFdEdDT3vwV4lyCWZEBsypqhVhWsnGLokZ3H0Uy4fSggy7BKj3lRasve
+         Q1UQ==
+X-Gm-Message-State: AOJu0YwPWFL7zVkdOPIRi8Gysdv7SPYpCg2947UzBoacevJCqv5vWAKp
+	oZyWVfsG3mcmxpLMR8VdxNdz/2GIz3ryadJXbrwpZ/OSy7KOpeJuthO35vaDoKjhUVtjBHwT8JG
+	pGsD9BZJ1LnOwA3G3U8gSgTW8gV3HRRHFcNxpn04wZx3lIhSUhQ==
+X-Google-Smtp-Source: AGHT+IGs8s4/clyDBjxyWsfXBD07dUrX3uXFq6NNpNNKcODLAYZn3PgCmyDCXjPgjKTL4lCpqXExfBmGtguaX51yLAk=
+X-Received: by 2002:a05:6402:42c2:b0:5be:caf6:9dc7 with SMTP id
+ 4fb4d7f45d1cf-5c8825fd2dbmr5517804a12.25.1727519472268; Sat, 28 Sep 2024
+ 03:31:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+References: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
+In-Reply-To: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 28 Sep 2024 12:30:58 +0200
+Message-ID: <CANn89iJb_ftSAE1vNCjtEvt-XBjXUy6DymLbxc+WOJELrk7+nQ@mail.gmail.com>
+Subject: Re: [PATCH net v3] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+To: Anton Danilov <littlesmilingcloud@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shigeru Yoshida <syoshida@redhat.com>, Suman Ghosh <sumang@marvell.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This error handling has a typo.  It should i++ instead of i--.  In the
-original code the error handling will loop until it crashes.
+On Wed, Sep 25, 2024 at 1:53=E2=80=AFAM Anton Danilov
+<littlesmilingcloud@gmail.com> wrote:
+>
+> Regression Description:
+>
+> Depending on the options specified for the GRE tunnel device, small
+> packets may be dropped. This occurs because the pskb_network_may_pull
+> function fails due to the packet's insufficient length.
+>
+> For example, if only the okey option is specified for the tunnel device,
+> original (before encapsulation) packets smaller than 28 bytes (including
+> the IPv4 header) will be dropped. This happens because the required
+> length is calculated relative to the network header, not the skb->head.
+>
+> Here is how the required length is computed and checked:
+>
+> * The pull_len variable is set to 28 bytes, consisting of:
+>   * IPv4 header: 20 bytes
+>   * GRE header with Key field: 8 bytes
+>
+> * The pskb_network_may_pull function adds the network offset, shifting
+> the checkable space further to the beginning of the network header and
+> extending it to the beginning of the packet. As a result, the end of
+> the checkable space occurs beyond the actual end of the packet.
+>
+> Instead of ensuring that 28 bytes are present in skb->head, the function
+> is requesting these 28 bytes starting from the network header. For small
+> packets, this requested length exceeds the actual packet size, causing
+> the check to fail and the packets to be dropped.
+>
+> This issue affects both locally originated and forwarded packets in
+> DMVPN-like setups.
+>
+> How to reproduce (for local originated packets):
+>
+>   ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
+>           local <your-ip> remote 0.0.0.0
+>
+>   ip link set mtu 1400 dev gre1
+>   ip link set up dev gre1
+>   ip address add 192.168.13.1/24 dev gre1
+>   ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
+>   ping -s 1374 -c 10 192.168.13.2
+>   tcpdump -vni gre1
+>   tcpdump -vni <your-ext-iface> 'ip proto 47'
+>   ip -s -s -d link show dev gre1
+>
+> Solution:
+>
+> Use the pskb_may_pull function instead the pskb_network_may_pull.
+>
+> Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmi=
+t()")
+>
+> Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
 
-Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
----
-v2: The first version of this patch had white space corruption and didn't apply.
-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index cbe99017cbfa..d253727b160f 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -763,7 +763,7 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
- 
- fail_rx:
--	for (i = 0; i < common->rx_ch_num_flows; i--)
-+	for (i = 0; i < common->rx_ch_num_flows; i++)
- 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
- 					  am65_cpsw_nuss_rx_cleanup, 0);
- 
--- 
-2.45.2
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
