@@ -1,85 +1,103 @@
-Return-Path: <netdev+bounces-130169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0B6988D16
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 02:07:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE1D4988D21
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 02:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07F5EB21900
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 00:07:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2471C210CB
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 00:11:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A722223AB;
-	Sat, 28 Sep 2024 00:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FCA64A0C;
+	Sat, 28 Sep 2024 00:11:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AGRVXxCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-80.sinamail.sina.com.cn (mail115-80.sinamail.sina.com.cn [218.30.115.80])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C9D23A6
-	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 00:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.80
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FA23C0D
+	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 00:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727482038; cv=none; b=QLtk4/DAtsm4ZJCVTddev95zB0Eomkha8Kr1o60WNJIVzZ/6PTLlVpJjyD5/7bk/IFrSlH6rM4TkcRbq+dBiCvdBvJTDPnZfHj6bR+79TMAv6wH6WMRjHSkIqAKyd427ZzIuuMM9I5cshAvqQf+SJTOlh8sVpc6DsY2ZYklr200=
+	t=1727482275; cv=none; b=SOeYkKcq2wiYon9/6Im5fOxHrXbZ26rk4L+MrUCRGSNQzW5v00/Lh0uJUssH6XrZmuiPJQRZyxsjBOQEzgSRyBcyHrk6hHybN8Zwa+6zULwoxOyhdtFnq7JP4m596CZfId9qEigSDgLy2i5wPmM2W3gxYh+DtnhL9+Vu15pfuWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727482038; c=relaxed/simple;
-	bh=TDLqSD+lw4KY1+l7lU2eWWFIt//CZcprmLjdRyTXGTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f1dWxS3lIALRsh6H8Azcn0RkPPCiWx/pnvkkBqUUOnGgpJDVb8f/JR4wKrrWD2BAIo+Mxt6KTy+tP94KHJvQAF0oBm4TxgNc60NDAXKwc9UTaNrZT8fDxogfxv2jpHVdmfMSV/7JtgogqxxwoLbmdbeB035HwVomLilHYMAKc8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([116.24.8.191])
-	by sina.com (10.185.250.23) with ESMTP
-	id 66F748AB000065D5; Sat, 28 Sep 2024 08:07:09 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 8986698913264
-X-SMAIL-UIID: 7D19F44053FF4BA6B5F3BEF716CC94AF-20240928-080709-1
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: syzbot <syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com>,
-	linux-kernel@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] INFO: task hung in new_device_store (5)
-Date: Sat, 28 Sep 2024 08:06:57 +0800
-Message-Id: <20240928000657.1247-1-hdanton@sina.com>
-In-Reply-To: <CANn89iJMHqg4e_tErTERx=-ERXbA+CRbeC0chp9ofqANwwjhLA@mail.gmail.com>
-References: <66f5a0ca.050a0220.46d20.0002.GAE@google.com> <CANn89iKLTNs5LAuSz6xeKB39hQ2FOEJNmffZsv1F3iNHqXe0tQ@mail.gmail.com> <20240927110422.1084-1-hdanton@sina.com> <CANn89iLKhw-X-gzCJHgpEXe-1WuqTmSWLGOPf5oy1ZMkWyW9_w@mail.gmail.com> <20240927114158.1190-1-hdanton@sina.com>
+	s=arc-20240116; t=1727482275; c=relaxed/simple;
+	bh=4diWrNHrePOMA8xSdvVndkk4fzZ/RX3fUE7c6KjSltg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LVYQ1HlaJk3v1HNEtCt84pvbvT3Al/hg9hVsZZmM51sOBF4Np4YSdiezkwh54yvUw0Uc0FjdOBpTuxvAUp2eLKZVW0uRsmx1xeM18nQbokxbCYn1wi0gKLNcgS0eK8VOKKK6UmJwSuZeXPRHPO9NzHMsyVZlHQrJmqmSFCZxyb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AGRVXxCs; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 27 Sep 2024 20:11:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727482271;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GrqukxTWx5XrBVnAUtnZnhHOGhnkF/yjI6dQx0NlESs=;
+	b=AGRVXxCsWx5L22ff0J4oB5zCbKNrYkwwmFIwvfXPV7PdV3hoRJ1iVEIttc2pOM/80JQDcq
+	WLgq9OKBdgHNvgAlxKjAoaTN7U97/RVyMJiviuF88BedHYDfr6POEr8tnMB/IywAp1d4CZ
+	StGBJwW2+qkLiXxacEFJ3h/r7qb/DsY=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Kent Overstreet <kent.overstreet@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Dave Chinner <david@fromorbit.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linux-bcachefs@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Dave Chinner <dchinner@redhat.com>, Thomas Graf <tgraf@suug.ch>, 
+	netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bcachefs changes for 6.12-rc1
+Message-ID: <nlwn4yodlo54hdbyil3kyxhaqgg5dmmdfvizsyj77oczgzezt2@m3qbtep3fhln>
+References: <CAHk-=whQTx4xmWp9nGiFofSC-T0U_zfZ9L8yt9mG5Qvx8w=_RQ@mail.gmail.com>
+ <6vizzdoktqzzkyyvxqupr6jgzqcd4cclc24pujgx53irxtsy4h@lzevj646ccmg>
+ <ZvIHUL+3iO3ZXtw7@dread.disaster.area>
+ <CAHk-=whbD0zwn-0RMNdgAw-8wjVJFQh4o_hGqffazAiW7DwXSQ@mail.gmail.com>
+ <CAHk-=wh+atcBWa34mDdG1bFGRc28eJas3tP+9QrYXX6C7BX0JQ@mail.gmail.com>
+ <ZvI4N55fzO7kg0W/@dread.disaster.area>
+ <CAHk-=wjNPE4Oz2Qn-w-mo1EJSUCQ+XJfeR3oSgQtM0JJid2zzg@mail.gmail.com>
+ <ZvNWqhnUgqk5BlS4@dread.disaster.area>
+ <jeyayqez34guxgvzf4unzytbfgjv2thgrha5miul25y4eearp2@33junxiz2o7f>
+ <ZvYAzh1gEw3u5nyD@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvYAzh1gEw3u5nyD@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 27 Sep 2024 13:54:59 +0200 Eric Dumazet <edumazet@google.com>
-> On Fri, Sep 27, 2024 at 1:44 PM Hillf Danton <hdanton@sina.com> wrote:
+On Fri, Sep 27, 2024 at 08:48:14AM GMT, Herbert Xu wrote:
+> On Tue, Sep 24, 2024 at 10:48:07PM -0400, Kent Overstreet wrote:
 > >
-> > On Fri, 27 Sep 2024 13:24:54 +0200 Eric Dumazet <edumazet@google.com>
-> > > I suggest you look at why we have to use rtnl_trylock()
-> > >
-> > > If you know better, please send patches to remove all instances.
-> >
-> > No patch is needed before you show us deadlock. I suspect you could
-> > spot a case where lockdep fails to report deadlock.
+> > I've been noticing rhashtable resize is surprisingly heavy (the default
+> > parameters don't ever shrink the table, which is why it's not seen as
+> > much).
 > 
-> Please try to not educate maintainers about their stuff.
+> Most rhashtable users enable automatic shrinking.
 > 
-Is this the typical dude style in Paris when showing deadlock?
+> > And, when I was torture testing that code I tripped over what appeared
+> > to be an infinite loop in rht_bucket() when a rehsah is in progress,
+> > which I worked around in
+> > 
+> >   a592cdf5164d bcachefs: don't use rht_bucket() in btree_key_cache_scan()
+> 
+> You must not walk the rhashtable internal data structures by hand.
+> If you need to iterate through the whole table, use the provided
+> walking mechanism.
 
-> lockdep is usually right. And here there is an actua syzbot report.
+I was just doing rht_for_each_entry_rcu() (open coded because you don't
+provide a safe version).
 
-The word maintainer is abused in this case.
+> However, as rhashtable is dynamic, walking it during a resize may
+> cause you to see some elements twice.  If you want to avoid that,
+> set up your own linked list of all elements for a completely stable
+> walk.
+
+Yeah that's fine, but like I said, I was seeing an infinite loop inside
+rht_bucket(). That would be an rhashtable bug...
 
