@@ -1,115 +1,124 @@
-Return-Path: <netdev+bounces-130182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EF59988ECA
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 11:24:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B02988EB2
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 11:11:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC291B2155A
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 09:24:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BE001F218B8
+	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 09:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FBC19F106;
-	Sat, 28 Sep 2024 09:24:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCFDA19E962;
+	Sat, 28 Sep 2024 09:11:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="hx8TB12t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1/fXMcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7C819E965
-	for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 09:24:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9649319DFBB;
+	Sat, 28 Sep 2024 09:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727515453; cv=none; b=QTIvdueg/tT4BkhFLaIMdxPpClGReTr1Jd82KUDr0eb4N3cH5oxsly8tlEaab/U+k5101vmi+zVE91Mafap0OErw+2MsvBX2MVoW8CWLfM237bORiKjeH47VIFLY1u9jrISvlURIqUhqaEa8jJY84+gwFeQwURddY4CyzdXzvsQ=
+	t=1727514682; cv=none; b=EGEjmeKNJtO9nf4LkgCf48DDjm5uNuZoVm1ZVeRqUc1PpLm8wAup33mHY+bZ+y5takc52NPoNhsUVrS+CMYCDnqFbED9VYNffJ6AoQ4xiGkAD740awJJ0tmAoMo9GeXpI+o8WK4wcPsOcucwZBO1Sb/2f8pN+IwYYgqIWbSLKz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727515453; c=relaxed/simple;
-	bh=e4EOZ2HPxYQRtVI+xGqPOTIx6s2W5eP8aAW5ekT0Kew=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZQe3XBGx7Wk8ha8cvAXLT/Ng4VIm/ANsZl3Fj6RwbBzPxXg4vjYxXQxmonhqvtrDgTyvEmj1cEE2b/t975ir3LjnhR/iPdE0X6xGF1Stq45Jhw6gIc/8srsz1w8fx5L+QAlWi5GhO9d0/BTWwAHMlt/foiU5gaKv4E5cZw+8Jo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=hx8TB12t; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c4146c7b28so3298446a12.2
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 02:24:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google; t=1727515450; x=1728120250; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjIc1J/QOg1BolbQLwdYwIZ4pu/ITooUKCVTfwuJFjo=;
-        b=hx8TB12tiWFr8YFpmiGdi/zjXwTkb2sAPaGmEks1baoGUGlz8pOzdu4iEnmYbLHP45
-         Xo8uMvwB9SSaJyTJzmphNJQ0M9bu0zPTzUfFYB57gfuKEzU2hUURnBDxWxTE4FVCLN4u
-         xuyxl6xq7AUeZg4wKj+dz0VJEpBkJWiZjBzhg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727515450; x=1728120250;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rjIc1J/QOg1BolbQLwdYwIZ4pu/ITooUKCVTfwuJFjo=;
-        b=CYYVKGqmtgWkvryQ0Gm0zWhYCkU7YZYZTQkHizELNInax8slN85xVmKgQBE8JL5awC
-         TzNVLmwxIEZEpwOJgUQ2UofI4ht/7qvOJjmK6KaHzppRoZe1D4oulDfkIStWwrB9YenG
-         uUbqXfxXBZh/jMXVh70oVMpdCtrCu/dDpUgzap9r1BeiRPu90Fh4Vf0Jw3xh958izwKF
-         c0fQKOaJGDVu46wIoYbABIuoBP2NuLdcKDhoL3qHyvbhOXRnq6g+0nXY1m9l/xFsUih3
-         QGYB//T3LTwbhdfm+e3L8C/vx8c5w3JkfAIP24Edoo6CMJ8hHocNFzaA2VD1ccwFVnK/
-         GDZg==
-X-Gm-Message-State: AOJu0Yyauuymk653FWoTF6zVDR0pSVwnrwhtlVuKBQGSBTK2zbziJ9Bh
-	jAofY/Rnl5we3jEZwgbF2ZuA5puwDGyyis5wS55VgXVUp09IySBFzdAO2s6to/jguFCeTlrZLMp
-	6Cuo=
-X-Google-Smtp-Source: AGHT+IHt1LO35jWV7Gm2BcyboZ5q2IJZZ7LlKA8hp/yt3ivgfnrd0drwDSPPXAVrFoAciaOu7c2U6g==
-X-Received: by 2002:a05:6402:354c:b0:5c6:b7e0:a363 with SMTP id 4fb4d7f45d1cf-5c882601ba6mr4620373a12.23.1727515449672;
-        Sat, 28 Sep 2024 02:24:09 -0700 (PDT)
-Received: from dario-ThinkPad-T14s-Gen-2i.homenet.telecomitalia.it (host-79-54-102-102.retail.telecomitalia.it. [79.54.102.102])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c88248c672sm2104213a12.60.2024.09.28.02.24.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Sep 2024 02:24:08 -0700 (PDT)
-From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	linux-amarula@amarulasolutions.com,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>
-Subject: [iproute2, PATCH v2 2/2] arpd: drop useless initializers
-Date: Sat, 28 Sep 2024 11:03:12 +0200
-Message-ID: <20240928090312.1079952-2-dario.binacchi@amarulasolutions.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240928090312.1079952-1-dario.binacchi@amarulasolutions.com>
-References: <20240928090312.1079952-1-dario.binacchi@amarulasolutions.com>
+	s=arc-20240116; t=1727514682; c=relaxed/simple;
+	bh=li0bXHR0TvXcwt8qhQR9j/FFiIA5/ek6EQTh0iCst/Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=stBBYkxVN+M/K2ZjVTN6gLptg2xu9XjCjwaP5dow5+fdL0ZHDQKDj8I5rjeJhiYWdi1TMsHITE9FLYgblDcmle3tb3pBHUFWBBwc88mCg7vsCA+Nuj8HZudt2jcb7MoVQMCUr1HjsiOQ3GamW7TG7jy6ZL3HUe0D/+IDzNc4Mok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1/fXMcy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 041D7C4CECD;
+	Sat, 28 Sep 2024 09:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727514682;
+	bh=li0bXHR0TvXcwt8qhQR9j/FFiIA5/ek6EQTh0iCst/Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=b1/fXMcyj6RG+4FeYlLcnEoKnbZmjb4NUFZjgiidVyDyPc5ve0S22mvTiw4BTahWd
+	 lVLpFBvsUgtpKwHbj2sQpX3NtP6eiN4yh09Bg7NFhZa8zqs8S1tjQYUOj9+md/sM12
+	 VQ+7+3cXXyXJJ7OVqEUMpPBZc8Jsts+AoISCxUfTrAsb10z4bInevJzE5Kj1arWjxL
+	 jPed5Ds2y87JYWDbq7E6BbbNlgzMDXzglivDwOcaYKervxE/EThFLvDGuiH8hdJq+G
+	 AOaoBRSopNeN+Wm/30PPeSpi4+lfbEbk5rqZMmCFNJAJi8jDQBIkY95cPcHsaM7Ppm
+	 PGkE/TADjw+eA==
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-45812fdcd0aso35014481cf.0;
+        Sat, 28 Sep 2024 02:11:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWo7N6JWArAQ1uAcy6ixiCPPGuUqWU/uwbCKfmKhybRzv40rLbp7d5c/J9qxzsrqw5m5l/mvgMbbtchwJgP@vger.kernel.org, AJvYcCXF1+8Q3RbG2CDlcfO7DbmHfh7+u6rp/EZcwNqoVR62JDXwotabNhWjUAPQfjeSasg6nhRLuNLr@vger.kernel.org, AJvYcCXUQ5tYNO8WD3aRUN0WLbS68yrXwOM5ESt1l4FQAbwwYIqzwdy+jlfc1IvOAWWS7KUr32wrUSWttT0KEaWxA7gu@vger.kernel.org, AJvYcCXcKv69+J1a8jGAoueQntAzKchWpB/o79UX0jbzG5dD+O/nlc+ouk+vWR3AK+BzQtMcgus=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYPmQXo+10vjcZarm11tN9YUZgPApRQHe5ohvWkZQY/Cf2xXqR
+	2NQjaVW0QgFu2sQb1EUFVBf+nSSCX2M7PdxPTA8d1WwAI2RXIheCklRX489JWglX6R3LpGc77P5
+	NGnVltTbf/E7XCjOQj1THGxuK2+M=
+X-Google-Smtp-Source: AGHT+IGQzctwOpKFuOtCkRYlVjrpRKVgfRrk5wUSUePsrzDaXpPbQ/kK+OwI+9znW9FBFK+ZV1jb1ra9eyUnKzEamAU=
+X-Received: by 2002:a05:6214:5012:b0:6b5:d90d:ea4f with SMTP id
+ 6a1803df08f44-6cb2f29730emr166967016d6.15.1727514681117; Sat, 28 Sep 2024
+ 02:11:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240927131355.350918-1-bjorn@kernel.org> <CAEf4BzYCf2+8JkCjWZWGaNQcEc_=WO_emP2GPBQGZyrWm8APUg@mail.gmail.com>
+In-Reply-To: <CAEf4BzYCf2+8JkCjWZWGaNQcEc_=WO_emP2GPBQGZyrWm8APUg@mail.gmail.com>
+From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+Date: Sat, 28 Sep 2024 11:11:10 +0200
+X-Gmail-Original-Message-ID: <CAJ+HfNgrxUmHuY8b1AmWoR+YpBnsNZxSDCeUfBOQcC70POEU_w@mail.gmail.com>
+Message-ID: <CAJ+HfNgrxUmHuY8b1AmWoR+YpBnsNZxSDCeUfBOQcC70POEU_w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] libbpf: Add missing per-arch include path
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+	Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, Charlie Jenkins <charlie@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-It is useless to initialize the fields of a structure to their default
-values. This patch keeps the initialization only for those fields that
-are not set to their default values.
+Andrii,
 
-Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
----
-Changes v1 -> v2:
- - rework the changes based on the changes of v2 of PATCH 1/2.
+On Fri, 27 Sept 2024 at 22:51, Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Fri, Sep 27, 2024 at 6:14=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kern=
+el.org> wrote:
+> >
+> > From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+> >
+> > libbpf does not include the per-arch tools include path, e.g.
+> > tools/arch/riscv/include. Some architectures depend those files to
+> > build properly.
+> >
+> > Include tools/arch/$(SUBARCH)/include in the libbpf build.
+> >
+> > Fixes: 6d74d178fe6e ("tools: Add riscv barrier implementation")
+> > Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+> > ---
+> >  tools/lib/bpf/Makefile | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
+> > index 1b22f0f37288..857a5f7b413d 100644
+> > --- a/tools/lib/bpf/Makefile
+> > +++ b/tools/lib/bpf/Makefile
+> > @@ -61,7 +61,8 @@ ifndef VERBOSE
+> >  endif
+> >
+> >  INCLUDES =3D -I$(or $(OUTPUT),.) \
+> > -          -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi
+> > +          -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi \
+> > +          -I$(srctree)/tools/arch/$(SRCARCH)/include
+> >
+> >  export prefix libdir src obj
+> >
+>
+> Do you know what exactly is used from tools/arch/$(SRCARCH)/include
+> for (I assume) RISC-V? I'm asking because we'd need to make sure that
+> Github version of libbpf Makefile and include directory has all the
+> necessary pieces as well (so I'd appreciate if you could take a look
+> at that as well, if you haven't already).
 
- misc/arpd.c | 3 ---
- 1 file changed, 3 deletions(-)
+Ah, apologies for not stating that explicitly. It's
+tools/arch/riscv/include/asm/{barrier.h,fence.h}
 
-diff --git a/misc/arpd.c b/misc/arpd.c
-index 91f0006a60aa..a42603f60e70 100644
---- a/misc/arpd.c
-+++ b/misc/arpd.c
-@@ -441,9 +441,6 @@ static void get_kern_msg(void)
- 		.msg_namelen = sizeof(nladdr),
- 		.msg_iov = &iov,
- 		.msg_iovlen = 1,
--		.msg_control = NULL,
--		.msg_controllen = 0,
--		.msg_flags = 0
- 	};
- 
- 	iov.iov_base = buf;
--- 
-2.43.0
-
+Cheers,
+Bj=C3=B6rn
 
