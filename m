@@ -1,182 +1,102 @@
-Return-Path: <netdev+bounces-130208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B71E989294
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:07:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8874D9892B6
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46C55B20D8A
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 02:07:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D310281C58
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 02:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA98BEEB1;
-	Sun, 29 Sep 2024 02:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PFOwkDGf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9C918643;
+	Sun, 29 Sep 2024 02:37:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081B31BC46
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 02:07:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343A117580;
+	Sun, 29 Sep 2024 02:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727575647; cv=none; b=lQ/nmKkYCfXRIRWm4eE7HaVx4czOjXb4dv6ZiDKlOmt7WwC+1/QQfhx7eFT70wb7H+EpvLzmGxQ1FFZoRjMCTll14ZB4xaDVRD6/6dhC/NYYt8bhcG7qgu8mF+LZnxzXFKia8vKApMqU4ZyH7P2Fio9+tC2a9IX1YPhylgLE0xE=
+	t=1727577461; cv=none; b=gmOnCSE4WUBae3MdhAb3HSEvysduYalJUTaRAPhG71YH4fd7xPT25fEXUAkBkJlIdzECK7FsnZ8nl1xdfBJONXrV8iZT4K7zSY9mWfZVYf+5wnAcIMRgmEqyT3ECoGUsNTPxh6sxBvPAuDNOHI0MT/xjGFrg8qs8eiDmQm+FEwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727575647; c=relaxed/simple;
-	bh=TO6F9WUFFXlq7WPqrSDsnpUMpKF1xFzm56hCVzpmjMk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OYFg8QPMOxco57sfCz8qKZEzwZmn5J7PYlgF61i4PGYq8wj+1XTk7/JmZrDVP971eb/9mC8Nk3Dghrnc1TP9tfCetVtJqJVQzo5AH2sGruIsYs782zHu1iqMuDW+zoSMNYZwv9Ov3l8h22hvvMj5iFBqEc0z53c4cRWENJGr6k8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PFOwkDGf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727575645;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TO6F9WUFFXlq7WPqrSDsnpUMpKF1xFzm56hCVzpmjMk=;
-	b=PFOwkDGfqZRTdRa+vO2LbLy8UjqJg5awchQ37wMOJg5uTGD3IfXg3eIgD8DLcmn604+jcy
-	nu7qpdTEj/tFiaOUHbCN06ICgvLZTOWoyqQbomCT0+HWBHDQGhmmOoBs1T+MA60iR0nsRq
-	OYTOTkN77HTlLAFDLO3foo6zKFyztlE=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-12WV6A77M0iJI2Z1eIAdEw-1; Sat, 28 Sep 2024 22:07:23 -0400
-X-MC-Unique: 12WV6A77M0iJI2Z1eIAdEw-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2d8e7e427d5so3119009a91.0
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 19:07:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727575643; x=1728180443;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TO6F9WUFFXlq7WPqrSDsnpUMpKF1xFzm56hCVzpmjMk=;
-        b=NfPci53zSyL943Ad+KHKZhsLNHvWmbcxMRIEK8sox+KLb4NOv57Ust5ue4msTPPJN+
-         kG0XFPKtrAjrNe+2iYDMrP0mwd4O3QL1cgEbofcw1j7ObrLVtRVzUMc0RVdwPjwQ6nFY
-         gISTPBOuwZ9nvcifYxA4w3bZjmmEocgMsNoy4HEw3R5Xp2+7U06pLUgzjdVKsXFbkNeJ
-         Dkk1BPoOuyqhSKCOoe1CTxn8ECkKLskaYg6aKIhClqG6HFuiuyNbvDxCzOAWPvrfKKvz
-         Ztm1DavDyttJJBAE4ZB7/SzY5cQON+9Pp/vrkXblekiidmeZdrx2F78pmZB9fYRh+qWn
-         dVDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWQ7U1Fs4aGORldYTKKVMVuevIzfint5H3fa2k3sYuzllIbFOh+dGp6k5vcpqZk++KghNPwVMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/p1zMBtg6cG+lFfI9TpJdRej6KGTr0J+EpkvF+Cym+9pzWaDA
-	fzpkTfZsr+Nu1jGnWszaB7SBOiSG4yOMiM6IynqC8OeK8dSeiNhhOcxQbaI1qPFGIcpI7l6aN1d
-	YPAHTL5VRCm1rUinaTPuGJQ1Tc9hH43rrwdwTUbXaZW3UXNhEeZTt3qKfqnE448Eo8gFayN+oiw
-	et355T8kTQ/snhK2Aul7unzPTirk5+
-X-Received: by 2002:a17:90a:d994:b0:2d8:e6d8:14c8 with SMTP id 98e67ed59e1d1-2e0b72ebe66mr12848826a91.15.1727575642713;
-        Sat, 28 Sep 2024 19:07:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEj0CCQ8up3FJXqhdPxg4H3lCO7LjesFN419E2sMSG36WbFWRO8y7aomLGECK7sl9/s5dIhUxnui4OmPKl9ZQY=
-X-Received: by 2002:a17:90a:d994:b0:2d8:e6d8:14c8 with SMTP id
- 98e67ed59e1d1-2e0b72ebe66mr12848791a91.15.1727575642243; Sat, 28 Sep 2024
- 19:07:22 -0700 (PDT)
+	s=arc-20240116; t=1727577461; c=relaxed/simple;
+	bh=BC5G+eTcM5dQ2qI4tRZTbc6C1HLgSCR8KsMitCrqfnM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=roerI+y9M53azF7Wc4vvVEZahClGaoEun00OG88hD53kqf/Q1nxGkldWxrmaAwpCmyC/GyYOxb/j5T3WM4bKaPvsDkT9PdzYcuVNLnXXaaWwuvw70Pv/SAsjMXqpw77SeyxSzzBrcdmFVc82NEbwsSjGgR87N2ew2clWyAl7H6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from unicom145.biz-email.net
+        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id ZBO00025;
+        Sun, 29 Sep 2024 10:37:25 +0800
+Received: from jtjnmail201607.home.langchao.com (10.100.2.7) by
+ jtjnmail201623.home.langchao.com (10.100.2.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 29 Sep 2024 10:37:24 +0800
+Received: from localhost.localdomain (10.94.12.73) by
+ jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 29 Sep 2024 10:37:24 +0800
+From: Charles Han <hanchunchao@inspur.com>
+To: <m.grzeschik@pengutronix.de>, <davem@davemloft.net>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Charles Han
+	<hanchunchao@inspur.com>
+Subject: [PATCH] arcnet: com20020-pci: Add check devm_kasprintf() returned value
+Date: Sun, 29 Sep 2024 10:37:21 +0800
+Message-ID: <20240929023721.17338-1-hanchunchao@inspur.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com> <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
- <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com> <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
- <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
-In-Reply-To: <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Sun, 29 Sep 2024 10:07:11 +0800
-Message-ID: <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
-Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Jtjnmail201615.home.langchao.com (10.100.2.15) To
+ jtjnmail201607.home.langchao.com (10.100.2.7)
+tUid: 2024929103725add1256462f350b8bb3094b565fe72b7
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-On Fri, Sep 27, 2024 at 3:51=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
->
-> On 2024/09/27 13:31, Jason Wang wrote:
-> > On Fri, Sep 27, 2024 at 10:11=E2=80=AFAM Akihiko Odaki <akihiko.odaki@d=
-aynix.com> wrote:
-> >>
-> >> On 2024/09/25 12:30, Jason Wang wrote:
-> >>> On Tue, Sep 24, 2024 at 5:01=E2=80=AFPM Akihiko Odaki <akihiko.odaki@=
-daynix.com> wrote:
-> >>>>
-> >>>> virtio-net have two usage of hashes: one is RSS and another is hash
-> >>>> reporting. Conventionally the hash calculation was done by the VMM.
-> >>>> However, computing the hash after the queue was chosen defeats the
-> >>>> purpose of RSS.
-> >>>>
-> >>>> Another approach is to use eBPF steering program. This approach has
-> >>>> another downside: it cannot report the calculated hash due to the
-> >>>> restrictive nature of eBPF.
-> >>>>
-> >>>> Introduce the code to compute hashes to the kernel in order to overc=
-ome
-> >>>> thse challenges.
-> >>>>
-> >>>> An alternative solution is to extend the eBPF steering program so th=
-at it
-> >>>> will be able to report to the userspace, but it is based on context
-> >>>> rewrites, which is in feature freeze. We can adopt kfuncs, but they =
-will
-> >>>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KV=
-M
-> >>>> and vhost_net).
-> >>>>
-> >>>
-> >>> I wonder if we could clone the skb and reuse some to store the hash,
-> >>> then the steering eBPF program can access these fields without
-> >>> introducing full RSS in the kernel?
-> >>
-> >> I don't get how cloning the skb can solve the issue.
-> >>
-> >> We can certainly implement Toeplitz function in the kernel or even wit=
-h
-> >> tc-bpf to store a hash value that can be used for eBPF steering progra=
-m
-> >> and virtio hash reporting. However we don't have a means of storing a
-> >> hash type, which is specific to virtio hash reporting and lacks a
-> >> corresponding skb field.
-> >
-> > I may miss something but looking at sk_filter_is_valid_access(). It
-> > looks to me we can make use of skb->cb[0..4]?
->
-> I didn't opt to using cb. Below is the rationale:
->
-> cb is for tail call so it means we reuse the field for a different
-> purpose. The context rewrite allows adding a field without increasing
-> the size of the underlying storage (the real sk_buff) so we should add a
-> new field instead of reusing an existing field to avoid confusion.
->
-> We are however no longer allowed to add a new field. In my
-> understanding, this is because it is an UAPI, and eBPF maintainers found
-> it is difficult to maintain its stability.
->
-> Reusing cb for hash reporting is a workaround to avoid having a new
-> field, but it does not solve the underlying problem (i.e., keeping eBPF
-> as stable as UAPI is unreasonably hard). In my opinion, adding an ioctl
-> is a reasonable option to keep the API as stable as other virtualization
-> UAPIs while respecting the underlying intention of the context rewrite
-> feature freeze.
+devm_kasprintf() can return a NULL pointer on failure but this
+returned value in com20020pci_probe() is not checked.
 
-Fair enough.
+Fixes: 8890624a4e8c ("arcnet: com20020-pci: add led trigger support")
+Signed-off-by: Charles Han <hanchunchao@inspur.com>
+---
+ drivers/net/arcnet/com20020-pci.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Btw, I remember DPDK implements tuntap RSS via eBPF as well (probably
-via cls or other). It might worth to see if anything we miss here.
-
-Thanks
-
->
-> Regards,
-> Akihiko Odaki
->
+diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
+index c5e571ec94c9..6639ee11a7f8 100644
+--- a/drivers/net/arcnet/com20020-pci.c
++++ b/drivers/net/arcnet/com20020-pci.c
+@@ -254,6 +254,8 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 			card->tx_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
+ 							"pci:green:tx:%d-%d",
+ 							dev->dev_id, i);
++			if (!card->tx_led.default_trigger || !card->tx_led.name)
++				return -ENOMEM;
+ 
+ 			card->tx_led.dev = &dev->dev;
+ 			card->recon_led.brightness_set = led_recon_set;
+@@ -263,6 +265,9 @@ static int com20020pci_probe(struct pci_dev *pdev,
+ 			card->recon_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
+ 							"pci:red:recon:%d-%d",
+ 							dev->dev_id, i);
++			if (!card->recon_led.default_trigger || !card->recon_led.name)
++				return -ENOMEM;
++
+ 			card->recon_led.dev = &dev->dev;
+ 
+ 			ret = devm_led_classdev_register(&pdev->dev, &card->tx_led);
+-- 
+2.31.1
 
 
