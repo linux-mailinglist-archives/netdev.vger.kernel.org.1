@@ -1,182 +1,165 @@
-Return-Path: <netdev+bounces-130215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488F99892F4
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 05:58:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A370989312
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 06:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C39A11F2182B
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 03:58:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9278B23793
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61CD0249E5;
-	Sun, 29 Sep 2024 03:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D593BB50;
+	Sun, 29 Sep 2024 04:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="ATK5Ec35"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vCc2+lZP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C206EAD51
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 03:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F4E184D
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 04:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727582290; cv=none; b=mrH5Fxdzl8NNn0hVC+5e/dzpUBB3wId9ZjidqxlsmtnzdaYgVcUvvhkdF+67mJC6Otta5ZhT7f1YXd3/Askv/ZojWG0MeUqSQ/akGs0llRxLIss7AA7DngHB+vfPuhlTBAiYpAOivwxppWya+1MS2uFE5NTbI/YGngufq88Lbfk=
+	t=1727585648; cv=none; b=GiWaRT0E05G/qYbGihd5xX1yhJOqvhH5GaMSaB9wAYY9ulMbU6OL5y8psLpgsMJr2c9ZJIis0PYBQ0DANhSlYBSqqjhCntieAtHqZAW8U1n+7wYBOUiNz9nsABTaUj/ZJDF+gHogECJ8ynRGtUxvtySTqNEj3N6ROGCqVa58b3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727582290; c=relaxed/simple;
-	bh=aaVSKdkRgN4OaH6OgMY4XkDmYKUvaQpfJVKpqLC/iIc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l/Aau8C+V1BSWR3mA65seMdYceCKTS1ZKTt7aGCjOEE3HYbbFSDlGgkdF1IapuxlD+3JGsLjR9fGoTjaYm6UzbKFvhxWEhPplR/qywU0j2eXfwBpsYMXgMSVcAXTt2vuzZBbEww9KRPhg+TY0rq6xNWEbgrV2qXxr/FPdTqc76k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=ATK5Ec35; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-205722ba00cso30566925ad.0
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 20:58:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tenstorrent.com; s=google; t=1727582287; x=1728187087; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1YkWfPvtAH4vWwmKQhiADe/rYImGBQg3vsS8ImzGFis=;
-        b=ATK5Ec35NTMqsRmoTJEMJnDZwRkG786hWBuzzYWq0ASYfbzSdHxX4j7S9S7Jdu+Olt
-         IbbwpBHlQ5czooZr+XuoQIYjE/D9l99Dv2A6Tv/uJFv6wT4XSb5qS9OR/Y2ysN6Jg7Rt
-         nU4ZGj30RHs9qqUY78bjB6BlC63Pm2fZGuXZFwjQe9RKPxdE15JwiU8tdItUtLo9Kfdz
-         0pWfvMor4XlZGSjgCYcJp860OHnZTipVk94paAuZn0kroT30NJB/R9tNFiPR0JCYyS49
-         yS3KtfvBFPWRS6QOIXRHY4xBMUuzzwFUMTH85RXkHYMCQm1srxRTlperJ7671ir7YRkJ
-         6PDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727582287; x=1728187087;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1YkWfPvtAH4vWwmKQhiADe/rYImGBQg3vsS8ImzGFis=;
-        b=NMGKcTu4NEKC+3KHZ+sfN7cmTg8X10eF5WDdcEEp3TatYMjzDBRjcZpWcVH1d0dDjh
-         gwqOmQsUDDWr+mfahlAZMIp+JH9axE4lUX9EVD3+ZPmRLqadmt1vsdZEj8X4GaZb7Zag
-         8D8I+nR+YPilHmaHLnKNoFAfJZ1ydl9/xPNmcx9JSaYU3zL/X5qpo5CpoXkxh3Xw2e+2
-         8jTwD/wFgeFOy3ibXQYKI/C4uDgqTRL65y1FyUbIUfoAiarjfCUO/sdzH8dB6RylgEtM
-         pIG0k6aQ1Lf9Jd5kmuRpNxhy4ZX8y+5AeEge79FAdZkEWxRE4ZXEMWH/YsBMfLpmwtgW
-         CrJg==
-X-Forwarded-Encrypted: i=1; AJvYcCX0POcCYXR7bWAYCNm7cYlvgrDRaNbW99hls6KNqj0FYthQe/O27e3H5Eg4aOOY58IO5tsRVNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfsAjPLmV6XKTy+BduhUJ+mlApmSun9oOURPGJ1ysvbo2wNHV9
-	p02mr/Ul2oAx4VooeU9x5HsJw5gfQJk2PBEl18avOPWvv3WzJKMaB8iRLKhJ0DE=
-X-Google-Smtp-Source: AGHT+IGV/f9jzts7RDAjmlHZvifv1MNEX/u7uVlkFGTpdrqBwMyA+z/HUMV+o4vjzAPi2t1Jy3PuxA==
-X-Received: by 2002:a17:903:8cc:b0:20b:5b16:b16b with SMTP id d9443c01a7336-20b5b16b29dmr54329085ad.36.1727582286974;
-        Sat, 28 Sep 2024 20:58:06 -0700 (PDT)
-Received: from x1 (71-34-69-82.ptld.qwest.net. [71.34.69.82])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e36fe7sm33519615ad.211.2024.09.28.20.58.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Sep 2024 20:58:06 -0700 (PDT)
-Date: Sat, 28 Sep 2024 20:58:04 -0700
-From: Drew Fustini <dfustini@tenstorrent.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 3/3] riscv: dts: thead: Add TH1520 ethernet nodes
-Message-ID: <ZvjQTD9jG12rX8Gx@x1>
-References: <20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com>
- <20240926-th1520-dwmac-v2-3-f34f28ad1dc9@tenstorrent.com>
- <3e26f580-bc5d-448e-b5bd-9b607c33702b@lunn.ch>
- <ZvWyQo+2mwsC1HS6@x1>
- <0b49b681-2289-412a-8969-d134ffcfb7fc@lunn.ch>
- <ZvYJfrPx75FA1IFC@x1>
- <5076789c-3a35-4349-9733-f5d47528c184@lunn.ch>
- <ZvhviRUb/CitmhgQ@x1>
+	s=arc-20240116; t=1727585648; c=relaxed/simple;
+	bh=DDcStd9dj4GhKmuuYWqPICakSvn7nJ2Imq8JsqCJzSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T/G9rP8nfkP1bK39AoGgOUtOS6CntKz19pjhP7lMthLzsM8sLqmiY0pbjHw1bg0GCwk0gobdr37XwZuYYBELpZ8RB0WC8T47mgIewtNlXvZOZyqSbAmOkDX2sKtzcZdeY+bMTGsQE1N/1gNppfxG8M3JEzTji8GNZ2NkxNyXOyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vCc2+lZP; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=DDcStd9dj4GhKmuuYWqPICakSvn7nJ2Imq8JsqCJzSk=; t=1727585646; x=1728449646; 
+	b=vCc2+lZPgZDiMFaB3yR22leoXnYrswqYNyfDC/EWWSiYRBtKIij06fV+lrghZIeqwmWWcJUeFv6
+	Y3xQ+PT7QvhLbNmnjlTEjtkjUC91EXZopw95jYIA5/2FYqlkuNLOjIkxw5u2o1a/ue95fjxj7R8rO
+	9fGCinn2ySkXnqzvP2ml1FLyJuQQPFMiPKUttCbrJHVTBJ6HS6PXjsQKg8qgzp0ZTp4NBaqyR5IBI
+	BiSw1zrpZbk9TVa7vH96Vxc4IrS2iMSZRTJSpPassA04t3DknG46hxX0bwZPyn7FT60Wu3Lmon0Ft
+	ztbZbQyYNzyk0H2v/yOMi3yoUSIillJL4NQA==;
+Received: from mail-oo1-f45.google.com ([209.85.161.45]:54760)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1sulwV-0005Wf-Pz
+	for netdev@vger.kernel.org; Sat, 28 Sep 2024 21:54:00 -0700
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5e1cdfe241eso1240246eaf.1
+        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 21:53:59 -0700 (PDT)
+X-Gm-Message-State: AOJu0YzDgo2VYVNimUynS6yBJi21FY8HpecxcV4pTYacwtfGEVlVGXBq
+	DAn76tHQJGjxx9QypEG78pl2Kv7Y9/x4Phr3XQXHBMbgJabpNz1dkKUnnfIG1npsmh4uEtFRM9f
+	AbRQhkRQvspXVWzJo+ps90zpJh5g=
+X-Google-Smtp-Source: AGHT+IFJE/Z3+jHTyPbGtyE9yJ7jWOG/wCGHZcAUGDQ6NbNG9UTUGIUvZkwc3NA8SWPS6KwYgx0NpMrwCvLNO1WyQwo=
+X-Received: by 2002:a05:6870:670b:b0:261:39d:afa1 with SMTP id
+ 586e51a60fabf-28710aad16amr4422444fac.22.1727585639166; Sat, 28 Sep 2024
+ 21:53:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvhviRUb/CitmhgQ@x1>
+References: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
+ <577c1d8b-1437-4ff2-b3d1-1261c4f73fec@intel.com>
+In-Reply-To: <577c1d8b-1437-4ff2-b3d1-1261c4f73fec@intel.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Sat, 28 Sep 2024 21:53:22 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmwMNfoRK42veVS5uFgr0dVZ2G=jj6bR-kn2xV2v+TGFww@mail.gmail.com>
+Message-ID: <CAGXJAmwMNfoRK42veVS5uFgr0dVZ2G=jj6bR-kn2xV2v+TGFww@mail.gmail.com>
+Subject: Re: Advice on upstreaming Homa
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: ae7d61d5ad21aa0d569d6b6c8168eb46
 
-On Sat, Sep 28, 2024 at 02:05:13PM -0700, Drew Fustini wrote:
-> On Fri, Sep 27, 2024 at 01:58:40PM +0200, Andrew Lunn wrote:
-> > > I tried to setup an nfs server with a rootfs on my local network. I can
-> > > mount it okay from my laptop so I think it is working okay. However, it
-> > > does not seem to work on the lpi4a [3]. It appears the rgmii-id
-> > > validation fails and the dwmac driver can not open the phy:
-> > > 
-> > >  thead-dwmac ffe7060000.ethernet eth0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> > >  thead-dwmac ffe7060000.ethernet eth0: validation of rgmii-id with support \
-> > >              00,00000000,00000000,00006280 and advertisementa \
-> > > 	     00,00000000,00000000,00006280 failed: -EINVAL
-> > >  thead-dwmac ffe7060000.ethernet eth0: __stmmac_open: Cannot attach to PHY (error: -22)
-> > 
-> > Given what Emil said, i would suggest flipping the MDIO busses
-> > around. Put the PHYs on gmac1's MDIO bus, and set the pinmux so that
-> > its MDIO bus controller is connected to the outside world. Then, when
-> > gmac1 probes first, its MDIO bus will be probed at the same time, and
-> > its PHY found.
-> > 
-> > 	Andrew
-> 
-> I'm trying to configure the pinmux to have gmac1 control the mdio bus
-> but it seems I've not done so correctly. I changed pins "GMAC0_MDC" and
-> "GMAC0_MDIO" to function "gmac1" (see the patch below).
-> 
-> I don't see any errors about the dwmac or phy in the boot log [1] but
-> ultimately there is no carrier detected and the ethernet interface does
-> not come up.
-> 
-> Section "3.3.4.103 G3_MUXCFG_007" in the TH1520 System User Manual shows
-> that bits [19:16] control GMAC0_MDIO_MUX_CFG where value of 2 selects
-> GMAC1_MDIO. Similarly, bits [15:12] control GMAC0_MDC_MUX_CFG where a
-> value of 2 also selects GMAC1_MDC.
-> 
-> Emil - do you have any suggestion as to what I might be doing wrong with
-> the pinmux?
+On Fri, Sep 27, 2024 at 4:51=E2=80=AFAM Przemek Kitszel
+<przemyslaw.kitszel@intel.com> wrote:
+>
+> On 9/27/24 06:54, John Ousterhout wrote:
+> > I would like to start the process of upstreaming the Homa transport
+> > protocol, and I'm writing for some advice.
+>
+> I would start with a RFC mail stating what Homa is, what it will be used
+> for in kernel, what are the users, etc.
 
-I've been thinking about this and I don't think there is any problem on
-the LPi4a. Both Ethernet jacks work when I have the mdio bus muxed for
-gmac0 to control it. It seems to control both phy's okay.
+I think Homa is already pretty well known to the netdev community:
+I've given talks on it at multiple NetDev conferences and there are a
+couple of published papers describing both the overall protocol and
+the Linux implementation.There is also a Wiki with lots of links to
+topics related to Homa
+(https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview). Are
+you suggesting that Homa needs RFC standardization before uploading?
+I'd prefer to wait on standardization so that the protocol can evolve
+a bit more based on user experiences.
 
-Earlier, I tried to setup nfs root but it didn't work. I believe this is
-just due to my ignorance of how to configure it correctly. I've instead
-switched to just adding 'ip=dhcp' to the kernel command. This causes
-stmmac_open() to happen shortly after the thead-dwmac is probed for both
-gmac0 and gmac1. The phy is found for both and there are no errors.
+> I saw your github readmes on current OOT module and previous one on DPDK
+> plugin. Netdev community will certainly ask how it is connected to DPDK,
+> and how it could be used with assumed value of 0 for DPDK (IOW upstream
+> does not care about DPDK).
+>
+> describe what userspace is needed/how existing one is affected
 
-Without 'ip=dhcp', stmmac_open() is not called until around 40 seconds
-into boot when NetworkManager tries to open it. Everything works
-correctly but the delay of over 30 seconds from thead-dwmac probe to
-interface up looks odd in the logs, but I am pretty sure this is just
-due the point in time at which NetworkManager decides to bring up
-the network interfaces.
+There are a couple of Homa GitHub repos, and I suspect you may be
+looking at the one that is implemented in user space using DPDK. The
+kernel module I'd like to upstream is in this repo:
+https://github.com/PlatformLab/HomaModule. This is an in-kernel
+implementation that doesn't use DPDK.
 
-Booting with gmac0 connected to Ethernet cable:
-https://gist.github.com/pdp7/e1a8e7666706c7d3c99b6b7a3b43f070
+> > Homa contains about 15 Klines of code. I have heard conflicting
+> > suggestions about how much to break it up for the upstreaming process,
+> > ranging from "just do it all in one patch set" to "it will need to be
+> > chopped up into chunks of a few hundred lines". The all-at-once
+> > approach is certainly easiest for me, and if it's broken up, the
+> > upstreamed code won't be functional until a significant fraction of it
+> > has been upstreamed. What's the recommended approach here?
+>
+> the split up into patches is to have it easiest to review, test
+> incrementally, and so on
 
-Booting with gmac1 connected to Ethernet cable:
-https://gist.github.com/pdp7/8a9c2066a2c20377ec3b479213b9be4c
+I would be happy to have Homa reviewed, but is that likely, given its
+size? In any case, Homa has pretty extensive unit tests already.
 
-thead-dwmac probe for gmac happens around 6 seconds. stmmac_open()
-occurs shortly after that. The interface is up by around 10 seconds
-into boot. DHCP request works okay and the interface is up and working
-once the shell is ready.
+> if you will have the whole split ready, it's good to link to it,
+> but you are limited to 15 patches at a time
+>
+> >
+> > I'm still pretty much a newbie when it comes to submitting Linux code.
+> > Is there anyone with more experience who would be willing to act as my
+> > guide? This would involve answering occasional questions and pointing
+> > me to online information that I might otherwise miss, in order to
+> > minimize the number of stupid things that I do.
+> >
+> > I am happy to serve as maintainer for the code once it is uploaded. Is
+> > it a prerequisite for there to be at least 2 maintainers?
+>
+> are you with contact with the original implementers/maintainers of those
+> 15K lines? one thing that needs to be done is proper authorship, and
+> author is the best first candidate for a maintainer (though they could
+> be simply unwilling/not working in the topic anymore)
 
-In short, I believe the dts configuration in patch 3/3 of this series
-works okay for both Ethernet ports on the LPi4a.
+I am the original implementor/maintainer of almost all of those 15K lines.
 
-Thanks,
-Drew
+> 1 maintainer is not a blocker
+>
+> >
+> > Any other thoughts and suggestions are also welcome.
+>
+> no "inline" functions in .c,
+> reverse X-mass tree formatting rule
+> no space after a (cast *)
+> use a page_pool
+> avoid variable length arrays
+> write whole thing in C (or rust, no C++)
+
+Most of these are already done; the ones that aren't (e.g., reverse
+Xmas-tree formatting, which I only recently discovered) will be done
+before I submit anything.
 
