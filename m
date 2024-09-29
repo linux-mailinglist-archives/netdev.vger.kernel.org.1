@@ -1,118 +1,151 @@
-Return-Path: <netdev+bounces-130241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49193989648
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 18:32:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C250C98964A
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 18:32:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8A47281DB3
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 16:32:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E56C31C21047
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 16:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4ED17A5A1;
-	Sun, 29 Sep 2024 16:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED29517BEAC;
+	Sun, 29 Sep 2024 16:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4fvbiva"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZmb5rjd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FD02B9B7;
-	Sun, 29 Sep 2024 16:32:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39BF82F2F;
+	Sun, 29 Sep 2024 16:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727627551; cv=none; b=kNiLeqDYE98Mgu2LXs9lm0HOzGFQbMD9+L0MwB7lxq6UnAY5lbebZmOcpzQqX8PrGhl2Ke1Ikdbe0/52nD98AwVK8f4LGa4NcD6ipk1fADb9PGbkzkD3ToKzqqN5FfA27JlLWZbeRmU+LZzJEWa/GPjlxq66jh4Jf13cqxdKYhM=
+	t=1727627569; cv=none; b=BGxCNJHku9OqquuVHl4KLYmGXW98NrurF3NBNmaIOJSvy+yIgkmKfO8aKuVKtrCpVsUD6hr1uSnDGTV5UQS2sAD/4PGBzVnrLxtbJEsE86Qr0nNb4a3tLH52ehXjWpnKcSGofErZ3cF23ivpXO2BrbbnPOpjloCv0LCAcOqcQQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727627551; c=relaxed/simple;
-	bh=i908Yxa0CpGKiaBwpSxM83MAbs0HFj3QffWoptapr2I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OcRpCutkaQzV2aNBpyA9NF+idBAHAF76vKX69o4Fi8nQnnNbWmo7WACVhsrI/j4f+Cr+dBOVHZEvXhRmYObk+wIutyAI/1dWE0gnwHi7WdVZcckHZZ2w1CWpmmAWgOgYjJxeRybt0/GbcMlytv6LurJasSvcy5LV0RHVDtVIjdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4fvbiva; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42C3C4CEC5;
-	Sun, 29 Sep 2024 16:32:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727627550;
-	bh=i908Yxa0CpGKiaBwpSxM83MAbs0HFj3QffWoptapr2I=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=e4fvbiva9AlaLzkqr4WB3HjgcUbM5VhxTJJ1Nb5ASzWGNJDdvT+Qd3wTXy6bO/bpk
-	 Yv7yeFFJM66+eg0Y5EG/wKdOn5v1CMI2dTdWbRKupJWao/+5VGsheRZ0M5XlwWCzgw
-	 Zp/40Gz9PU6ikk/CJ/JPfoWHKPNd3N8ppd76MQy2ugBiZkhM3AjDoEupVuK8UT9qRo
-	 UIQsPZallNjWcqE6BkgyjmddwobBpBxhd9YS7IYgCFFdQYrz9zfE3+GKlmhdAgPwNn
-	 LnKRbwx0Nv8HajLnVf9EoFvBpgMfktqumw8llEbD1nMpmtiw2F1zXwRG9N+e4dHQUx
-	 yfkgPgNafri1Q==
-Message-ID: <6676d990-e7b4-4b90-8d2b-a96107e38b63@kernel.org>
-Date: Sun, 29 Sep 2024 10:32:28 -0600
+	s=arc-20240116; t=1727627569; c=relaxed/simple;
+	bh=x2tWXhhfoYEwR7wyOGb4wPQwzoNw09d1+OIlfWwnRKw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pHmKLQfO+gj00oVcLh8G9uNdgRaw2SIbUc/9SxldECnwvxQ5cUcd1Ry/o/OfRwM3bBq/UshPE/H0HsHpoBJKxUC3rRqBjj8MEAcZZprKv0arNdtATjWR+q9uEEK0yhDQ0c8WhS6A7C8/fsh6rVnkawc+x1l8vWP1lCbN8wjKM70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EZmb5rjd; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37cc846fbc4so2559036f8f.2;
+        Sun, 29 Sep 2024 09:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727627566; x=1728232366; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1dxHMAzVOWTbjEg0BO/ZeghpvvXEvPvLVh0DM6tLxH0=;
+        b=EZmb5rjd5Np/g4JME9R2cgDKsQIvDKrg/oLbV/PoTFDPPMuUBZL7AQLl+ovHs2lIVA
+         QhrIfuD2Zn4gVVekBhs6bBPeqZzyEFvQ5ugH4NNP27HAFqwa8LJGuj9i8GQY7JThA0+W
+         TZphJpmQ826yCJsqSE4DvKL7HBphIfk/fubwjaClGbNLacqOvGiUuzLZy5HJDls5Bswv
+         1C4I2zP0FL0Y3pBU2cGPOvxbXOAtQFDtaOge+TaRCQa1XOxLimfgb9c3SgxVdPCGjtSI
+         JJrohlN0QuZLLFk6PuxkyEg9hYl1nkhgfp5Q+t5maIlLsXlpEJOyYYlGZfWKZxTsynG7
+         xuQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727627566; x=1728232366;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1dxHMAzVOWTbjEg0BO/ZeghpvvXEvPvLVh0DM6tLxH0=;
+        b=tbzMVBIVpkrFppxgRojjNuiP37sEMadDgoQrVAmXdOGF3gDkLjZlIMNCmxuaXuUjQD
+         J2uZUsZwpvkhUCxDOYgihz8ADon9C8KT1LzGIyNk2PdyDy8ZDXfDByZS1OSb5Kb76AQo
+         am+kwI5hZ9qjrPYLWbF05PMvY6EM8ysnxGrQaC/pLl+i89VOaqCCdLruAOo4fshgJbR/
+         uRUc9NZNUJrM/F+cQvjHFrafcLW9XyUswqSDTSG8WlXsKIjLHH7Cm1UuGQv18gvCd0Ba
+         HhfT2XGifARlJzU7h4iwPM21SDOT00MvXUg6UhLINqI5NsHl8cN88Kj+iP8EHsd0Rn7p
+         SmDg==
+X-Forwarded-Encrypted: i=1; AJvYcCVp9aVfJo+LgcSVCorGqwAWGNuYKL+leEDkzRof7V4pDdPsG+3K1SB5bcEpuNq4R4edr4UanUc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2pGCAs2Ux/YT4aAm/MBRlCKuQx8VXdUCQuiHr6p5ugD5nAsAh
+	bfuZrlhczs5MLSV7qbSIbZwsYWOfzg1mQw1iwCAESRb+HpcZJq8RmnkvseQYIt86A5PW0/jW5y6
+	UAlfWCkWQp3am3ZwE73T1WllX5xGrUtGp
+X-Google-Smtp-Source: AGHT+IGLGL1i3us/pjUJQAa3cYhma8+dwH1YtTQm5K6RlM6dnNx+ZMCRchLbHC9NbrEbsLHIHLtwpzEU6ulcN3zOpSA=
+X-Received: by 2002:a5d:4e0e:0:b0:368:3731:1613 with SMTP id
+ ffacd0b85a97d-37cd5a9eaddmr5597797f8f.13.1727627566307; Sun, 29 Sep 2024
+ 09:32:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] vrf: revert "vrf: Remove unnecessary RCU-bh critical
- section"
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, stable@vger.kernel.org,
- greearb@candelatech.com, fw@strlen.de, Willem de Bruijn <willemb@google.com>
-References: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
- <ZvkZ0Ex0k6_G6hNo@shredder.mtl.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <ZvkZ0Ex0k6_G6hNo@shredder.mtl.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe> <20240929-libbpf-dup-extern-funcs-v2-1-0cc81de3f79f@hack3r.moe>
+In-Reply-To: <20240929-libbpf-dup-extern-funcs-v2-1-0cc81de3f79f@hack3r.moe>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 29 Sep 2024 09:32:34 -0700
+Message-ID: <CAADnVQLdmmvJRyf+br=CtJaDw6PowqKGTXb3z-q7LpbYiYFpHQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 1/2] libbpf: do not resolve size on duplicate FUNCs
+To: i@hack3r.moe
+Cc: bpf <bpf@vger.kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/29/24 3:11 AM, Ido Schimmel wrote:
-> On Sun, Sep 29, 2024 at 02:18:20AM -0400, Willem de Bruijn wrote:
->> From: Willem de Bruijn <willemb@google.com>
->>
->> This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
->>
->> dev_queue_xmit_nit is expected to be called with BH disabled.
->> __dev_queue_xmit has the following:
->>
->>         /* Disable soft irqs for various locks below. Also
->>          * stops preemption for RCU.
->>          */
->>         rcu_read_lock_bh();
->>
->> VRF must follow this invariant. The referenced commit removed this
->> protection. Which triggered a lockdep warning:
-> 
-> [...]
-> 
->>
->> Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
->> Link: https://lore.kernel.org/netdev/20240925185216.1990381-1-greearb@candelatech.com/
->> Reported-by: Ben Greear <greearb@candelatech.com>
->> Signed-off-by: Willem de Bruijn <willemb@google.com>
->> Cc: stable@vger.kernel.org
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Tested-by: Ido Schimmel <idosch@nvidia.com>
+On Sun, Sep 29, 2024 at 2:31=E2=80=AFAM Eric Long via B4 Relay
+<devnull+i.hack3r.moe@kernel.org> wrote:
+>
+> From: Eric Long <i@hack3r.moe>
+>
+> FUNCs do not have sizes, thus currently btf__resolve_size will fail
+> with -EINVAL. Add conditions so that we only update size when the BTF
+> object is not function or function prototype.
+>
+> Signed-off-by: Eric Long <i@hack3r.moe>
+> ---
+>  tools/lib/bpf/linker.c | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
+>
+> diff --git a/tools/lib/bpf/linker.c b/tools/lib/bpf/linker.c
+> index 81dbbdd79a7c65a4b048b85e1dba99cb5f7cb56b..cffb388fa40ef054c2661b836=
+3120f8a4d3c3784 100644
+> --- a/tools/lib/bpf/linker.c
+> +++ b/tools/lib/bpf/linker.c
+> @@ -2452,17 +2452,20 @@ static int linker_append_btf(struct bpf_linker *l=
+inker, struct src_obj *obj)
+>                                 __s64 sz;
+>
+>                                 dst_var =3D &dst_sec->sec_vars[glob_sym->=
+var_idx];
+> -                               /* Because underlying BTF type might have
+> -                                * changed, so might its size have change=
+d, so
+> -                                * re-calculate and update it in sec_var.
+> -                                */
+> -                               sz =3D btf__resolve_size(linker->btf, glo=
+b_sym->underlying_btf_id);
+> -                               if (sz < 0) {
+> -                                       pr_warn("global '%s': failed to r=
+esolve size of underlying type: %d\n",
+> -                                               name, (int)sz);
+> -                                       return -EINVAL;
+> +                               t =3D btf__type_by_id(linker->btf, glob_s=
+ym->underlying_btf_id);
+> +                               if (btf_kind(t) !=3D BTF_KIND_FUNC && btf=
+_kind(t) !=3D BTF_KIND_FUNC_PROTO) {
+> +                                       /* Because underlying BTF type mi=
+ght have
+> +                                        * changed, so might its size hav=
+e changed, so
+> +                                        * re-calculate and update it in =
+sec_var.
+> +                                        */
+> +                                       sz =3D btf__resolve_size(linker->=
+btf, glob_sym->underlying_btf_id);
+> +                                       if (sz < 0) {
+> +                                               pr_warn("global '%s': fai=
+led to resolve size of underlying type: %d\n",
+> +                                                       name, (int)sz);
+> +                                               return -EINVAL;
+> +                                       }
+> +                                       dst_var->size =3D sz;
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Looks like a hack to me.
 
+In the test you're using:
+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
 
-> 
-> Thanks Willem!
-> 
-> The reason my script from 504fc6f4f7f6 did not trigger the problem is
-> that it was pinging the address inside the VRF, so vrf_finish_direct()
-> was only called from the Rx path.
-> 
-> If you ping the address outside of the VRF:
-> 
-> ping -I vrf1 -i 0.1 -c 10 -q 192.0.2.1
-> 
-> Then vrf_finish_direct() is called from process context and the lockdep
-> warning is triggered. Tested that it does not trigger after applying the
-> revert.
-
-That case should be covered by the fcnal-test suite which does all
-combinations of addresses.
-
+but __weak is missing.
+Is that the reason you're hitting this issue?
 
