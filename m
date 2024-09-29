@@ -1,384 +1,376 @@
-Return-Path: <netdev+bounces-130255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4BD3989834
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 00:02:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7928D989844
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 00:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10BB31C20FDC
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 22:02:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C19FB22220
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 22:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3111217C9AC;
-	Sun, 29 Sep 2024 22:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B805314389F;
+	Sun, 29 Sep 2024 22:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV01UXUA"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC80F144D1A;
-	Sun, 29 Sep 2024 22:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985744C69
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 22:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727647367; cv=none; b=XtURXYvmwBjHzaBh0uiKPmjITxPrwtWfrwvHdx2QV+XicHSpJ+JSAofL1Qf3qn+A63zvx4Ju7H6TNz6ZEHe/bMhdOa2WSoVBB0Js43Fg1QqTf9w6BH+8Uhtl44YHlEIGAMUM8C59CD1dy3m8Xkh0g5U95O8bcWh8wgVJ0CfEIMg=
+	t=1727648225; cv=none; b=I2YLXJqqvMN1F2IFKYcK/PW6DmqtpGbGcLk/rjtKnq+lyRlZpYIYqzGj/GADuQYk3nZcPr42p6fWCXcBQsdc1jHqllmz9nHnna8o5Myr3a4T78x7Vu27fF1DNNOUpdZYi1FsrZrS1gignu9ZWlCgWK5T1iUXnyUd1QndvvKwSPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727647367; c=relaxed/simple;
-	bh=3B+Efk6LwEpH7qQJ/Vjl75IduNUnBUJ481ltwFF4sug=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=nS5UvnwxnZkW9gt1fSsvmz4y38Wswc4Gl/9VPOQMxZEBNpr3gZeFRsPj7hn7wLgKi+YT7R1CHHGeZ0JgB459YnYoWzXQYuVySdJ5kN1pWw3kcBfmVlTZhAA6Pqa9k0TfdD/CEVcpq3NwJZGuMtTR2IA2plQog2KP0a40WLqVnRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sv1zk-000000000CX-0EhH;
-	Sun, 29 Sep 2024 22:02:24 +0000
-Date: Sun, 29 Sep 2024 23:02:16 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Xu Liang <lxu@maxlinear.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Bauer <mail@david-bauer.net>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	John Crispin <john@phrozen.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RFC net-next] net: phy: mxl-gpy: add basic LED support
-Message-ID: <55a1f247beb80c11aa7c8a24509dd77bcf0c1338.1727645992.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1727648225; c=relaxed/simple;
+	bh=48H4fxqxU4LVk4a9IGYsFEQKUFzhXL6EIZajqkJ1BeA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OhrdFl83IzD3I7Kj42WEAKfvkWpkHx/IPvEekCAIJyodkn9fbCN9tH6H3EFtkSDg6Gs4xhkdph5QvV1Q0NLxqnJZ8HAGS7OyWU4mwWZD8SWc7W5zWwcg4fQG3jaAANZmU6v6FZJ4plkGmThc8Z5wqe9iIdxzUN5Cozq2ViVx8bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KV01UXUA; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5398b589032so1926767e87.1
+        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 15:17:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727648222; x=1728253022; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Izjhl0v5dQtj10Rwrq+MMgX7BNnDMZ1O7QMpOTgx4B0=;
+        b=KV01UXUAwdP0EGG3zJ4wW2IGpZvi4ex9NX98OEyEGZJsTE8/te2KHt/vdh7MJh2UFM
+         JFbEj6IG3gg5W/LRO169C5QhuZiDpvZCG2eePdhVn8woH4zG6CXQKIvpepcqA18vc/9B
+         dcPgrQuSH3M9ZpM0Eif7bXtqmo90B9o/5CymnlzzsYbQztBTPxHZE+yuSrCGZrtNYMeH
+         bhmFJpiPJW1rGtONDYTOqVQtxbDhr3Dpth22h/fcw0MBQgAdpqERI7u7GWwGyMZ2LZd6
+         oEAUXcKKSgGi84GailYEQgBqA20ZkbQ66hMQbhlH0/u38k0j5gUC6Hj2JBishxSQnduv
+         r5EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727648222; x=1728253022;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Izjhl0v5dQtj10Rwrq+MMgX7BNnDMZ1O7QMpOTgx4B0=;
+        b=a7Jwj0TAFZiSolksgikOo7z2/pqJSkk9Z8yMnRHXwQzfGb/8EYJOU8rUj9JxKREJVl
+         hq4kVlpDX8K041vmuK4VojguNUVaDsCsJIan/rXpxdNjsSWUGKybslZsV0DTnAMtHHIA
+         yVFmgJV/eIpjVL9InheyFcTTN9KZqr3f4gW6KoI/v6X/jiO0X48FiIktLyXh+13bWsi1
+         B5pbvwW8CglUBKOJRmGS0ToHTrrQY61uzr5Ph1vqcA9nN74lQbj9SBpTIk/l7gJQreB2
+         td3ykGy/NYj83qx7vR6L4PEd5OV5ExV6Xzdv70NMIv1STzsgd17mjB7H+F1zuLXqC1in
+         RVTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWsgNkYh2K3MDdTAIXQDr34U/VB7GpUqaznBRxK1BGRZx0+0bU4iNJ7woDWn0Y17gFQ6/oOlR4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzzfQcIFnZNfb3pvmqCKoMyIosE5JapNdJkAjYesdaLY02mnUr
+	p4EOZF76vW+sLwPc2r8cf0R3WpX0C5D5BAYzXrLjil+kOKK1zcjn
+X-Google-Smtp-Source: AGHT+IGJFBiQwOYIBwnmbXy03wwvtaYZedINXriwaRz02O6V+MX1nNzxgLqqd3FtA6MRfZx3wm133g==
+X-Received: by 2002:a05:6512:31c1:b0:536:5625:511f with SMTP id 2adb3069b0e04-5389fc7d145mr6470661e87.45.1727648221168;
+        Sun, 29 Sep 2024 15:17:01 -0700 (PDT)
+Received: from mobilestation ([95.79.225.241])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-538a044154asm1036056e87.261.2024.09.29.15.16.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Sep 2024 15:17:00 -0700 (PDT)
+Date: Mon, 30 Sep 2024 01:16:57 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jiawen Wu <jiawenwu@trustnetic.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 01/10] net: pcs: xpcs: move PCS reset to
+ .pcs_pre_config()
+Message-ID: <mykeabksgikgk6otbub2i3ksfettbozuhqy3gt5vyezmemvttg@cpjn5bcfiwei>
+References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="zw667ru7dw37dqxv"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
+
+
+--zw667ru7dw37dqxv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-Add basic support for LEDs connected to MaxLinear GPY2xx and GPY115 PHYs.
-The PHYs allow up to 4 LEDs to be connected.
-Implement controlling LEDs in software as well as netdev trigger offloading
-and LED polarity setup.
+Hi Russell
 
-The hardware claims to support 16 PWM brightness levels but there is no
-documentation on how to use that feature, hence this is not supported.
+On Mon, Sep 23, 2024 at 03:00:59PM GMT, Russell King (Oracle) wrote:
+> Move the PCS reset to .pcs_pre_config() rather than at creation time,
+> which means we call the reset function with the interface that we're
+> actually going to be using to talk to the downstream device.
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+The PCS-reset procedure actually can be converted to being independent
+from the PHY-interface. Thus you won't need to move the PCS resetting
+to the pre_config() method, and get rid from the pointer to
+dw_xpcs_compat utilization each time the reset is required.
+Please see the attached patch for details.*
+
+* I was going to submit it as a part of a one more XPCS-related series,
+but seeing my work interfere with yours I'll hold on with sending my
+patch set for until yours is merged in.
+
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/pcs/pcs-xpcs.c   | 39 +++++++++++++++++++++++++++---------
+>  include/linux/pcs/pcs-xpcs.h |  1 +
+>  2 files changed, 30 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 82463f9d50c8..7c6c40ddf722 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -659,6 +659,30 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
+>  }
+>  EXPORT_SYMBOL_GPL(xpcs_config_eee);
+>  
+> +static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
+> +{
+> +	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
+> +	const struct dw_xpcs_compat *compat;
+> +	int ret;
+> +
+> +	if (!xpcs->need_reset)
+> +		return;
+> +
+
+> +	compat = xpcs_find_compat(xpcs->desc, interface);
+> +	if (!compat) {
+> +		dev_err(&xpcs->mdiodev->dev, "unsupported interface %s\n",
+> +			phy_modes(interface));
+> +		return;
+> +	}
+
+Please note, it's better to preserve the xpcs_find_compat() call even
+if the need_reset flag is false, since it makes sure that the
+PHY-interface is actually supported by the PCS.
+
+> +
+> +	ret = xpcs_soft_reset(xpcs, compat);
+> +	if (ret)
+> +		dev_err(&xpcs->mdiodev->dev, "soft reset failed: %pe\n",
+> +			ERR_PTR(ret));
+> +
+> +	xpcs->need_reset = false;
+> +}
+> +
+>  static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
+>  				      unsigned int neg_mode)
+>  {
+> @@ -1365,6 +1389,7 @@ static const struct dw_xpcs_desc xpcs_desc_list[] = {
+>  
+>  static const struct phylink_pcs_ops xpcs_phylink_ops = {
+>  	.pcs_validate = xpcs_validate,
+> +	.pcs_pre_config = xpcs_pre_config,
+>  	.pcs_config = xpcs_config,
+>  	.pcs_get_state = xpcs_get_state,
+>  	.pcs_an_restart = xpcs_an_restart,
+> @@ -1460,18 +1485,12 @@ static int xpcs_init_id(struct dw_xpcs *xpcs)
+>  
+>  static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
+>  {
+> -	const struct dw_xpcs_compat *compat;
+> -
+> -	compat = xpcs_find_compat(xpcs->desc, interface);
+> -	if (!compat)
+> -		return -EINVAL;
+> -
+> -	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+> +	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
+>  		xpcs->pcs.poll = false;
+> -		return 0;
+> -	}
+> +	else
+> +		xpcs->need_reset = true;
+>  
+> -	return xpcs_soft_reset(xpcs, compat);
+> +	return 0;
+>  }
+>  
+>  static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+> diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+> index b4a4eb6c8866..fd75d0605bb6 100644
+> --- a/include/linux/pcs/pcs-xpcs.h
+> +++ b/include/linux/pcs/pcs-xpcs.h
+> @@ -61,6 +61,7 @@ struct dw_xpcs {
+>  	struct clk_bulk_data clks[DW_XPCS_NUM_CLKS];
+>  	struct phylink_pcs pcs;
+>  	phy_interface_t interface;
+
+> +	bool need_reset;
+
+If you still prefer the PCS-reset being done in the pre_config()
+function, then what about just directly checking the PMA id in there?
+
+	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
+		return 0;
+
+	return xpcs_soft_reset(xpcs);
+
+-Serge(y)
+
+>  };
+>  
+>  int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface);
+> -- 
+> 2.30.2
+> 
+> 
+
+--zw667ru7dw37dqxv
+Content-Type: text/x-patch; charset=iso-8859-1
+Content-Disposition: attachment;
+	filename="0001-net-pcs-xpcs-Drop-compat-arg-from-soft-reset-method.patch"
+Content-Transfer-Encoding: 8bit
+
+From 7e36cef5d954cc17586194b8e0b3c58fe0dfe592 Mon Sep 17 00:00:00 2001
+From: Serge Semin <fancer.lancer@gmail.com>
+Date: Tue, 4 Jul 2023 12:39:29 +0300
+Subject: [PATCH] net: pcs: xpcs: Drop compat arg from soft-reset method
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It's very much inconvenient to have the soft-reset method requiring the
+xpcs_compat structure instance passed. The later one is found based on the
+PHY-interface type which isn't always available. Such design makes an
+ordinary reset-method context depended and unnecessary limits its usage
+area. Indeed based on [1,2] all Soft-RST flags exported by the PMA/PMD,
+PCS, AN or MII MMDs are _shared_. It means it resets all the DWX_xpcs
+internal blocks including CSRs, but except the Management Interface (MDIO,
+MCI, APB). Thus it doesn't really matter which MMDs soft-reset flag is
+set, the result will be the same. So the AN-mode-depended code can be
+freely dropped from the soft-reset method. But depending on the DW XPCS
+device capabilities (basically it depends on the IP-core synthesize
+parameters) it can lack some of the MMDs. In order to solve that
+difficulty the Vendor-Specific 1 MMD can be utilized. It is also called as
+Control MMD and exports some generic device info about the device
+including a list of the available MMDs: PMA/PMD, XS/PCS, AN or MII. This
+MMD persists on all the DW XPCS device [3]. Thus it can be freely utilize
+to cross-platformly determine actual MMD to perform the soft-reset.
+
+[1] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.111.
+[2] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.268.
+[3] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.269.
+
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
 ---
- drivers/net/phy/mxl-gpy.c | 212 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 212 insertions(+)
+ drivers/net/pcs/pcs-xpcs.c   | 31 ++++++++++++++++---------------
+ drivers/net/pcs/pcs-xpcs.h   |  7 +++++++
+ include/linux/pcs/pcs-xpcs.h |  1 +
+ 3 files changed, 24 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-index e5f8ac4b4604..1fc636588c18 100644
---- a/drivers/net/phy/mxl-gpy.c
-+++ b/drivers/net/phy/mxl-gpy.c
-@@ -38,6 +38,7 @@
- #define PHY_MIISTAT		0x18	/* MII state */
- #define PHY_IMASK		0x19	/* interrupt mask */
- #define PHY_ISTAT		0x1A	/* interrupt status */
-+#define PHY_LED			0x1B	/* LEDs */
- #define PHY_FWV			0x1E	/* firmware version */
- 
- #define PHY_MIISTAT_SPD_MASK	GENMASK(2, 0)
-@@ -61,6 +62,11 @@
- 				 PHY_IMASK_ADSC | \
- 				 PHY_IMASK_ANC)
- 
-+#define GPY_MAX_LEDS		4
-+#define PHY_LED_POLARITY(idx)	BIT(12 + (idx))
-+#define PHY_LED_HWCONTROL(idx)	BIT(8 + (idx))
-+#define PHY_LED_ON(idx)		BIT(idx)
-+
- #define PHY_FWV_REL_MASK	BIT(15)
- #define PHY_FWV_MAJOR_MASK	GENMASK(11, 8)
- #define PHY_FWV_MINOR_MASK	GENMASK(7, 0)
-@@ -72,6 +78,23 @@
- #define PHY_MDI_MDI_X_CD	0x1
- #define PHY_MDI_MDI_X_CROSS	0x0
- 
-+/* LED */
-+#define VSPEC1_LED(idx)		(1 + (idx))
-+#define VSPEC1_LED_BLINKS	GENMASK(15, 12)
-+#define VSPEC1_LED_PULSE	GENMASK(11, 8)
-+#define VSPEC1_LED_CON		GENMASK(7, 4)
-+#define VSPEC1_LED_BLINKF	GENMASK(3, 0)
-+
-+#define VSPEC1_LED_LINK10	BIT(0)
-+#define VSPEC1_LED_LINK100	BIT(1)
-+#define VSPEC1_LED_LINK1000	BIT(2)
-+#define VSPEC1_LED_LINK2500	BIT(3)
-+
-+#define VSPEC1_LED_TXACT	BIT(0)
-+#define VSPEC1_LED_RXACT	BIT(1)
-+#define VSPEC1_LED_COL		BIT(2)
-+#define VSPEC1_LED_NO_CON	BIT(3)
-+
- /* SGMII */
- #define VSPEC1_SGMII_CTRL	0x08
- #define VSPEC1_SGMII_CTRL_ANEN	BIT(12)		/* Aneg enable */
-@@ -835,6 +858,150 @@ static int gpy115_loopback(struct phy_device *phydev, bool enable)
- 	return genphy_soft_reset(phydev);
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 014ca2b067f4..81c166726636 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -271,24 +271,18 @@ static int xpcs_poll_reset(struct dw_xpcs *xpcs, int dev)
+ 	return (ret & MDIO_CTRL1_RESET) ? -ETIMEDOUT : 0;
  }
  
-+static int gpy_led_brightness_set(struct phy_device *phydev,
-+				  u8 index, enum led_brightness value)
-+{
+-static int xpcs_soft_reset(struct dw_xpcs *xpcs,
+-			   const struct dw_xpcs_compat *compat)
++static int xpcs_soft_reset(struct dw_xpcs *xpcs)
+ {
+ 	int ret, dev;
+ 
+-	switch (compat->an_mode) {
+-	case DW_AN_C73:
+-	case DW_10GBASER:
+-		dev = MDIO_MMD_PCS;
+-		break;
+-	case DW_AN_C37_SGMII:
+-	case DW_2500BASEX:
+-	case DW_AN_C37_1000BASEX:
++	if (xpcs->mmd_ctrl & DW_SR_CTRL_MII_MMD_EN)
+ 		dev = MDIO_MMD_VEND2;
+-		break;
+-	default:
++	else if (xpcs->mmd_ctrl & DW_SR_CTRL_PCS_XS_MMD_EN)
++		dev = MDIO_MMD_PCS;
++	else if (xpcs->mmd_ctrl & DW_SR_CTRL_PMA_MMD_EN)
++		dev = MDIO_MMD_PMAPMD;
++	else
+ 		return -EINVAL;
+-	}
+ 
+ 	ret = xpcs_write(xpcs, dev, MDIO_CTRL1, MDIO_CTRL1_RESET);
+ 	if (ret < 0)
+@@ -935,7 +929,7 @@ static int xpcs_get_state_c73(struct dw_xpcs *xpcs,
+ 	/* ... and then we check the faults. */
+ 	ret = xpcs_read_fault_c73(xpcs, state, pcs_stat1);
+ 	if (ret) {
+-		ret = xpcs_soft_reset(xpcs, compat);
++		ret = xpcs_soft_reset(xpcs);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -1485,17 +1479,24 @@ static int xpcs_init_id(struct dw_xpcs *xpcs)
+ static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
+ {
+ 	const struct dw_xpcs_compat *compat;
 +	int ret;
-+
-+	if (index >= GPY_MAX_LEDS)
-+		return -EINVAL;
-+
-+	/* clear HWCONTROL and set manual LED state */
-+	ret = phy_modify(phydev, PHY_LED,
-+			 PHY_LED_HWCONTROL(index) | PHY_LED_ON(index),
-+			 (value == LED_OFF) ? 0 : PHY_LED_ON(index));
-+	if (ret)
+ 
+ 	compat = xpcs_find_compat(xpcs->desc, interface);
+ 	if (!compat)
+ 		return -EINVAL;
+ 
++	ret = xpcs_read(xpcs, MDIO_MMD_VEND1, DW_SR_CTRL_MMD_CTRL);
++	if (ret < 0)
 +		return ret;
 +
-+	/* clear HW LED setup */
-+	return phy_write_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_LED(index), 0);
-+}
++	xpcs->mmd_ctrl = ret;
 +
-+static const unsigned long supported_triggers = (BIT(TRIGGER_NETDEV_LINK) |
-+						 BIT(TRIGGER_NETDEV_LINK_100) |
-+						 BIT(TRIGGER_NETDEV_LINK_1000) |
-+						 BIT(TRIGGER_NETDEV_LINK_2500) |
-+						 BIT(TRIGGER_NETDEV_RX) |
-+						 BIT(TRIGGER_NETDEV_TX));
+ 	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+ 		xpcs->pcs.poll = false;
+ 		return 0;
+ 	}
+ 
+-	return xpcs_soft_reset(xpcs, compat);
++	return xpcs_soft_reset(xpcs);
+ }
+ 
+ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index fa05adfae220..774b71801cc0 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -52,6 +52,13 @@
+ #define DW_C73_2500KX			BIT(0)
+ #define DW_C73_5000KR			BIT(1)
+ 
++/* VR_CTRL_MMD */
++#define DW_SR_CTRL_MMD_CTRL		0x0009
++#define DW_SR_CTRL_AN_MMD_EN		BIT(0)
++#define DW_SR_CTRL_PCS_XS_MMD_EN	BIT(1)
++#define DW_SR_CTRL_MII_MMD_EN		BIT(2)
++#define DW_SR_CTRL_PMA_MMD_EN		BIT(3)
 +
-+static int gpy_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				   unsigned long rules)
-+{
-+	if (index >= GPY_MAX_LEDS)
-+		return -EINVAL;
-+
-+	/* All combinations of the supported triggers are allowed */
-+	if (rules & ~supported_triggers)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int gpy_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				  unsigned long *rules)
-+{
-+	int val;
-+
-+	if (index >= GPY_MAX_LEDS)
-+		return -EINVAL;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_LED(index));
-+	if (val < 0)
-+		return val;
-+
-+	if (FIELD_GET(VSPEC1_LED_CON, val) & VSPEC1_LED_LINK10)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_10);
-+
-+	if (FIELD_GET(VSPEC1_LED_CON, val) & VSPEC1_LED_LINK100)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_100);
-+
-+	if (FIELD_GET(VSPEC1_LED_CON, val) & VSPEC1_LED_LINK1000)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_1000);
-+
-+	if (FIELD_GET(VSPEC1_LED_CON, val) & VSPEC1_LED_LINK2500)
-+		*rules |= BIT(TRIGGER_NETDEV_LINK_2500);
-+
-+	if (FIELD_GET(VSPEC1_LED_CON, val) == (VSPEC1_LED_LINK10 |
-+					       VSPEC1_LED_LINK100 |
-+					       VSPEC1_LED_LINK1000 |
-+					       VSPEC1_LED_LINK2500))
-+		*rules |= BIT(TRIGGER_NETDEV_LINK);
-+
-+	if (FIELD_GET(VSPEC1_LED_PULSE, val) & VSPEC1_LED_TXACT)
-+		*rules |= BIT(TRIGGER_NETDEV_TX);
-+
-+	if (FIELD_GET(VSPEC1_LED_PULSE, val) & VSPEC1_LED_RXACT)
-+		*rules |= BIT(TRIGGER_NETDEV_RX);
-+
-+	return 0;
-+}
-+
-+static int gpy_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				  unsigned long rules)
-+{
-+	int ret;
-+	u16 val = 0;
-+
-+	if (index >= GPY_MAX_LEDS)
-+		return -EINVAL;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK) ||
-+	    rules & BIT(TRIGGER_NETDEV_LINK_10))
-+		val |= FIELD_PREP(VSPEC1_LED_CON, VSPEC1_LED_LINK10);
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK) ||
-+	    rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		val |= FIELD_PREP(VSPEC1_LED_CON, VSPEC1_LED_LINK100);
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK) ||
-+	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		val |= FIELD_PREP(VSPEC1_LED_CON, VSPEC1_LED_LINK1000);
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK) ||
-+	    rules & BIT(TRIGGER_NETDEV_LINK_2500))
-+		val |= FIELD_PREP(VSPEC1_LED_CON, VSPEC1_LED_LINK2500);
-+
-+	if (rules & BIT(TRIGGER_NETDEV_TX))
-+		val |= FIELD_PREP(VSPEC1_LED_PULSE, VSPEC1_LED_TXACT);
-+
-+	if (rules & BIT(TRIGGER_NETDEV_RX))
-+		val |= FIELD_PREP(VSPEC1_LED_PULSE, VSPEC1_LED_RXACT);
-+
-+	/* allow RX/TX pulse without link indication */
-+	if ((rules & BIT(TRIGGER_NETDEV_TX) || rules & BIT(TRIGGER_NETDEV_RX)) &&
-+	    !(val & VSPEC1_LED_CON))
-+		val |= FIELD_PREP(VSPEC1_LED_PULSE, VSPEC1_LED_NO_CON) | VSPEC1_LED_CON;
-+
-+	ret = phy_set_bits(phydev, PHY_LED, PHY_LED_HWCONTROL(index));
-+	if (ret)
-+		return ret;
-+
-+	return phy_write_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_LED(index), val);
-+}
-+
-+static int gpy_led_polarity_set(struct phy_device *phydev, int index,
-+				unsigned long modes)
-+{
-+	bool active_low = false;
-+	u32 mode;
-+
-+	if (index >= GPY_MAX_LEDS)
-+		return -EINVAL;
-+
-+	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
-+		switch (mode) {
-+		case PHY_LED_ACTIVE_LOW:
-+			active_low = true;
-+			break;
-+		default:
-+		return -EINVAL;
-+		}
-+	}
-+
-+	return phy_modify(phydev, PHY_LED, PHY_LED_POLARITY(index),
-+			  active_low ? 0 : PHY_LED_POLARITY(index));
-+}
-+
- static struct phy_driver gpy_drivers[] = {
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY2xx),
-@@ -852,6 +1019,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		.phy_id		= PHY_ID_GPY115B,
-@@ -870,6 +1042,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy115_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY115C),
-@@ -887,6 +1064,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy115_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		.phy_id		= PHY_ID_GPY211B,
-@@ -905,6 +1087,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY211C),
-@@ -922,6 +1109,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		.phy_id		= PHY_ID_GPY212B,
-@@ -940,6 +1132,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY212C),
-@@ -957,6 +1154,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		.phy_id		= PHY_ID_GPY215B,
-@@ -975,6 +1177,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY215C),
-@@ -992,6 +1199,11 @@ static struct phy_driver gpy_drivers[] = {
- 		.set_wol	= gpy_set_wol,
- 		.get_wol	= gpy_get_wol,
- 		.set_loopback	= gpy_loopback,
-+		.led_brightness_set = gpy_led_brightness_set,
-+		.led_hw_is_supported = gpy_led_hw_is_supported,
-+		.led_hw_control_get = gpy_led_hw_control_get,
-+		.led_hw_control_set = gpy_led_hw_control_set,
-+		.led_polarity_set = gpy_led_polarity_set,
- 	},
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_GPY241B),
+ /* Clause 37 Defines */
+ /* VR MII MMD registers offsets */
+ #define DW_VR_MII_MMD_CTRL		0x0000
+diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+index b4a4eb6c8866..241a1a959406 100644
+--- a/include/linux/pcs/pcs-xpcs.h
++++ b/include/linux/pcs/pcs-xpcs.h
+@@ -59,6 +59,7 @@ struct dw_xpcs {
+ 	const struct dw_xpcs_desc *desc;
+ 	struct mdio_device *mdiodev;
+ 	struct clk_bulk_data clks[DW_XPCS_NUM_CLKS];
++	u16 mmd_ctrl;
+ 	struct phylink_pcs pcs;
+ 	phy_interface_t interface;
+ };
 -- 
-2.46.2
+2.46.1
 
+
+--zw667ru7dw37dqxv--
 
