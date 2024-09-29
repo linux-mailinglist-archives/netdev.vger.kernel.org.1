@@ -1,183 +1,130 @@
-Return-Path: <netdev+bounces-130248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520F19896AA
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:48:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14D499896B1
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 246B5B23C21
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 17:48:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C55461F224A1
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 17:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780C842AB4;
-	Sun, 29 Sep 2024 17:48:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D824206D;
+	Sun, 29 Sep 2024 17:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TdWDHJd9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtGqsHxH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA704084D
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 17:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9D842052;
+	Sun, 29 Sep 2024 17:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727632128; cv=none; b=ba0t3E8+t8frOc382joXyRol+yQ49ufWAYVDdtfgYgvcRKn3gk1w/ZshSOLV7IvzKb8gO1dx7tKbry3jRcTt59gVOy6r8RHjhlPedPFqw/mF/SSdheJkM16u9DWeRJQwFKV29RruceLUEKIPWNPfFLMRkQKQMTxei7/R/gt4yWE=
+	t=1727632629; cv=none; b=GW1909V0oa65eO8UJtYfg2iNrnsS3Xvx+mN9NEVB4PUMfJ7HygppYWHAZotLz0VYgwX/B06koyshGt4FoJFXucoWnM+Ro78UPn3IJSg3yF6d8/dJ0pa25iCUjHGSBUHeFAWJgv7l99KK2R3HlRkmGVSfAqfX9zN8IN2wCjmPZwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727632128; c=relaxed/simple;
-	bh=do27kc5Fwyi6Kx7WwmJUxF9V16BLmQ7JLqwuhDUy4Yc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=quAXd1f2f2XbMFlrDeCpERpBAnv3qeemyN8T5yd0QtJiatV+osQNf+8eZyaDDDaiZTbjBX0WItM28zZEt6MVfb7ifEJOdLExnHilT8YYDFcXfn9R2c4MjBCiWWRsK7gOLfxIPTQVRRg2FldAT3JNm6n1BWpGYX6O99DlnLc0+Hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TdWDHJd9; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727632126;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wPatogrvfeQytgMf1DGOYNKKTCyiWPsjq+uNPqesLks=;
-	b=TdWDHJd9BPPH2HTP4lnkPvCAjdjmWM6jZqnCaKxeXcMhsS/uvCF8XFUw65X3k9Poog3Ofm
-	5xZfkf1wKjKMp5SKgY13J5HSbVqzbFT02aoD7siQeQvhKS5TsYTyfSNWaLj++4MLAPqCrz
-	paxrOeD9H24r+NnplX06YSc6+/BM8pQ=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-0yAxJpsLNX65vqjvQ2pLeA-1; Sun, 29 Sep 2024 13:48:44 -0400
-X-MC-Unique: 0yAxJpsLNX65vqjvQ2pLeA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a8d0d87f204so562004566b.1
-        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 10:48:44 -0700 (PDT)
+	s=arc-20240116; t=1727632629; c=relaxed/simple;
+	bh=iWgTGifBakNI41kLE4UIYfM/KM6Ekd3osCDXkifEj6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ges9ZwgydKWNUOXZ3kYsVh/a2gL8Qd3/HrDvPWhzB8xdyaB0ucAvtvRsBRsFHA1b1lxVT3oX5RE7H/lOE/inmlgPVzuXX1WK4h9b4LlrNMN86lc+1y0VQhuI8tmv3ZWmz5JL+4PfgR9M54NHqplbglRqtbe0DVCMkSO/tAvqUw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtGqsHxH; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a8b155b5e9eso577637366b.1;
+        Sun, 29 Sep 2024 10:57:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727632626; x=1728237426; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x+E7BYwg3MBBSzwH1rru8pxpa3+5KQwtjCo/BuFfYDE=;
+        b=HtGqsHxHatqs8UCrODVmk66/Z2OtQtRXaG3YbvPRxlNmWLWVIsDpizYjJTg9eV0uAV
+         NsilJx7n1u4oJ6H4wer2/gfWBiY9T5zIcenJAUXKFdPMxuBgFN4WESp8pfNWMaay2bJ4
+         HX7grDVWVsTBAytaQDxjjNvbTiqYZk/fnUQdueGhIckzwQZTS3nfn3zLKR7wAqvAVv13
+         41qrOR0Yy9se02OICD81sEX7c4Y7ky5BgAFacv+YR5JAP4XDnv+dKtFt9/TFF1dOPRJi
+         r+BacLleZJ1d4BDeSS89KW5bFHRSK0rmA4b+c2M5IBFOPNfAbhK8Epfu89MW32iJe8/m
+         n9QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727632123; x=1728236923;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wPatogrvfeQytgMf1DGOYNKKTCyiWPsjq+uNPqesLks=;
-        b=YkSs5p8pemZ4Q4gLjg8uYD2602/VgLWMKpyvGgJX7jn3KN4oYkXVLXnKBiIPIvRR3j
-         fNlcitltVl6s0axowQhQrpiRP4vYQRgvGqDU/Ep7lPoRwXzv3MIg4tyVqcWV6X/bOakx
-         iJabOMaI/zSZBU2nNspLVzDN0rzoIHV8DTBiy8sYtiLA/VnkxlQ/5fn8uPJRcipWdt7Z
-         EoVeJL89ubxR4tz0Nv0v/PglCYk58adp58reSr16h1NfFpvgXa2SrpvK22HggYdluzHy
-         TRdUDLRNB0xwX53jsqHDQvAIXYH2qvdgz/8CGH9xrhmVN1U2YtoqVUSWSviTlMvfM7IH
-         02Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCGkP7v3pp1C23Djp+1S56MwRMvZUeS7ZDv2qp/r1ruqZdiLcVVsRklfPV1gyHpuAAGxbEPv8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOal61PgKEhfdyoTKj9rNFxzcnqhyDQE5Drd6tFDY4wBxNxUGm
-	p3BJoGRc3U5U7djCbHI7R+928Ba1A+78rKeJ2/qOsa6/tmzbZDEEoMuNvdOH0IKKUlB3ZplbP4k
-	GQ1+WMjaVkNpaFA3b4P5PXfjCZWYrptE3uX7xQucsj17NUQJ0IHkUag==
-X-Received: by 2002:a17:907:8687:b0:a8d:4954:c209 with SMTP id a640c23a62f3a-a93b165dacamr1584444666b.22.1727632123588;
-        Sun, 29 Sep 2024 10:48:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG8yhcltAXNNOPlgdZbg2eX/lkfZ7eFhPOsGjV+HlVBPUltwDUsyTd38J3Fyn/QINeqZ/Q5XA==
-X-Received: by 2002:a17:907:8687:b0:a8d:4954:c209 with SMTP id a640c23a62f3a-a93b165dacamr1584442566b.22.1727632122934;
-        Sun, 29 Sep 2024 10:48:42 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:17b:822e:847c:4023:a734:1389])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c2948fc7sm404346366b.137.2024.09.29.10.48.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Sep 2024 10:48:42 -0700 (PDT)
-Date: Sun, 29 Sep 2024 13:48:36 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: specify module version
-Message-ID: <20240929134815-mutt-send-email-mst@kernel.org>
-References: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
- <20240929125245-mutt-send-email-mst@kernel.org>
- <CAEivzxdiEu3Tzg7rK=TqDg4Ats-H+=JiPjvZRAnmqO7-jZv2Zw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1727632626; x=1728237426;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x+E7BYwg3MBBSzwH1rru8pxpa3+5KQwtjCo/BuFfYDE=;
+        b=HHs2AYDeQO/Oy5yPFgBWMwjThwMGMxg0uPVC9FzX6eLe1j2lC5W+fNCXnBKXhDHLHr
+         tiIt3LXku+Gjhep8v7p3FKWBprLzJINL6Olsa8D9QdCrrI8TFqBBjUqDhjvt0aEOfoXK
+         sElRe8GYcXpIm2TlCV7gcvdZr36yKnfv7tlSOSHeeCewFvpdiIdYrB9ndUULLOQmhJca
+         uPO2Kt5UT9b96v19ke7s/5Wrz5CJDAa8fB8Ngkl0Q0YF96LYsGQXqBrTaLz/aoak0Kyp
+         oNCC3kuPl7TwLSdOu6dIU6OzbQHHyQjWkbwSoI6J25OiZfH9hT+dAKlZHLYR20KD2vCZ
+         BjVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1B5CCyX8j0JiwNy6PT9rdgEtNRlW8DsMCRFHdN09BwEWEfQ+1IWaDPvU2w57olp1jUXmQ6Vkt@vger.kernel.org, AJvYcCVuucgCt+3wEmlDjdYHswlqFkkZ0ItxYpyAI4l4IYYFvj2QEfoYZsDbjgYqcVqgZhmUCfw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4C14iHRylwEiYCZw7cwtkkLQY1hQ/8WFqiSYR8lhj9Yw3Ad/Y
+	oZ6lB3lzrNlKWNYIOxq67POi0U7PoFmaz+rZs/4wR64YCFSEBCNvz7PjHvVh98/qZd8UwU1y7wz
+	G4IUmZagy3XMofiWfRFZFdu6AMBU9SSfN
+X-Google-Smtp-Source: AGHT+IGjKDm0VGJwF86cqnzkppBYiJx+kLAPc+vhYM4MjsvaqwgOFtwlWHRBnYLE2Q3Mm5TNOQ6Y/hDzKnnlya8Azjw=
+X-Received: by 2002:a17:907:36c2:b0:a86:789b:71fe with SMTP id
+ a640c23a62f3a-a93c4ae8f90mr1067090966b.48.1727632625597; Sun, 29 Sep 2024
+ 10:57:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEivzxdiEu3Tzg7rK=TqDg4Ats-H+=JiPjvZRAnmqO7-jZv2Zw@mail.gmail.com>
+References: <20240929124134.24288-1-chenyuan_fl@163.com>
+In-Reply-To: <20240929124134.24288-1-chenyuan_fl@163.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 29 Sep 2024 10:56:54 -0700
+Message-ID: <CAADnVQJneRNysmQNy3vPrMkXUGsW3EM_papHufErKFjnGX8q3g@mail.gmail.com>
+Subject: Re: [PATCH] bpf: fix the xdp_adjust_tail sample prog issue
+To: Yuan Chen <chenyuan_fl@163.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 29, 2024 at 07:35:35PM +0200, Aleksandr Mikhalitsyn wrote:
-> On Sun, Sep 29, 2024 at 6:56 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Thu, Sep 26, 2024 at 06:16:40PM +0200, Alexander Mikhalitsyn wrote:
-> > > Add an explicit MODULE_VERSION("0.0.1") specification
-> > > for a vhost_vsock module. It is useful because it allows
-> > > userspace to check if vhost_vsock is there when it is
-> > > configured as a built-in.
-> > >
-> > > Without this change, there is no /sys/module/vhost_vsock directory.
-> > >
-> > > With this change:
-> > > $ ls -la /sys/module/vhost_vsock/
-> > > total 0
-> > > drwxr-xr-x   2 root root    0 Sep 26 15:59 .
-> > > drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
-> > > --w-------   1 root root 4096 Sep 26 15:59 uevent
-> > > -r--r--r--   1 root root 4096 Sep 26 15:59 version
-> > >
-> > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-> >
-> >
-> 
-> Dear Michael,
-> 
-> > Why not check that the misc device is registered?
-> 
-> It is possible to read /proc/misc and check if "241 vhost-vsock" is
-> there, but it means that userspace
-> needs to have a specific logic for vsock. At the same time, it's quite
-> convenient to do something like:
->     if [ ! -d /sys/modules/vhost_vsock ]; then
->         modprobe vhost_vsock
->     fi
-> 
-> > I'd rather not add a new UAPI until actually necessary.
-> 
-> I don't insist. I decided to send this patch because, while I was
-> debugging a non-related kernel issue
-> on my local dev environment I accidentally discovered that LXD
-> (containers and VM manager)
-> fails to run VMs because it fails to load the vhost_vsock module (but
-> it was built-in in my debug kernel
-> and the module file didn't exist). Then I discovered that before
-> trying to load a module we
-> check if /sys/module/<module name> exists. And found that, for some
-> reason /sys/module/vhost_vsock
-> does not exist when vhost_vsock is configured as a built-in, and
-> /sys/module/vhost_vsock *does* exist when
-> vhost_vsock is loaded as a module. It looks like an inconsistency and
-> I also checked that other modules in
-> drivers/vhost have MODULE_VERSION specified and version is 0.0.1. I
-> thought that this change looks legitimate
-> and convenient for userspace consumers.
-> 
-> Kind regards,
-> Alex
+On Sun, Sep 29, 2024 at 5:41=E2=80=AFAM Yuan Chen <chenyuan_fl@163.com> wro=
+te:
+>
+> From: Yuan Chen <chenyuan@kylinos.cn>
+>
+> During the xdp_adjust_tail test, probabilistic failure occurs and SKB pac=
+kage
+> is discarded by the kernel. After checking the issues by tracking SKB pac=
+kage,
+> it is identified that they were caused by checksum errors. Refer to check=
+sum
+> of the arch/arm64/include/asm/checksum.h for fixing.
+>
+> Fixes: c6ffd1ff7856 (bpf: add bpf_xdp_adjust_tail sample prog)
+> Signed-off-by: Yuan Chen <chenyuan@kylinos.cn>
+> ---
+>  samples/bpf/xdp_adjust_tail_kern.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/samples/bpf/xdp_adjust_tail_kern.c b/samples/bpf/xdp_adjust_=
+tail_kern.c
+> index ffdd548627f0..3543ddd62ef4 100644
+> --- a/samples/bpf/xdp_adjust_tail_kern.c
+> +++ b/samples/bpf/xdp_adjust_tail_kern.c
+> @@ -57,7 +57,8 @@ static __always_inline void swap_mac(void *data, struct=
+ ethhdr *orig_eth)
+>
+>  static __always_inline __u16 csum_fold_helper(__u32 csum)
+>  {
+> -       return ~((csum & 0xffff) + (csum >> 16));
+> +       csum +=3D (csum >> 16) | (csum << 16);
+> +       return ~(__sum16)(csum >> 16);
+>  }
 
+progs/xdping_kern.c is doing it differently:
+static __always_inline __u16 csum_fold_helper(__wsum sum)
+{
+        sum =3D (sum & 0xffff) + (sum >> 16);
+        return ~((sum & 0xffff) + (sum >> 16));
+}
 
-I'll ask you to put this explanation in the commit log,
-and I'll pick this up.
+Let's make it common.
 
-> >
-> > > ---
-> > >  drivers/vhost/vsock.c | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > >
-> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > index 802153e23073..287ea8e480b5 100644
-> > > --- a/drivers/vhost/vsock.c
-> > > +++ b/drivers/vhost/vsock.c
-> > > @@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
-> > >
-> > >  module_init(vhost_vsock_init);
-> > >  module_exit(vhost_vsock_exit);
-> > > +MODULE_VERSION("0.0.1");
-> > >  MODULE_LICENSE("GPL v2");
-> > >  MODULE_AUTHOR("Asias He");
-> > >  MODULE_DESCRIPTION("vhost transport for vsock ");
-> > > --
-> > > 2.34.1
-> >
-
+pw-bot: cr
 
