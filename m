@@ -1,133 +1,271 @@
-Return-Path: <netdev+bounces-130236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49877989533
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 13:47:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E77E9989537
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 13:57:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04E01B21D1C
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:47:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124241C21EEE
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398011386B4;
-	Sun, 29 Sep 2024 11:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B33170A14;
+	Sun, 29 Sep 2024 11:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c16J43vL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-79.sinamail.sina.com.cn (mail115-79.sinamail.sina.com.cn [218.30.115.79])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB91314BF86
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 11:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C286B15B108
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 11:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727610417; cv=none; b=adLOkONpFc0snDsmUxasRkUeG7AkRo+wUrRmCwKTN6MXtIJLbEhX4kDcadi4GvX9QCxpuEbIlck4C/W8hT7g+QdOEj1wKM+6aHbyfxrzeLMNplOsAokNunfRLeUhOUQ20PCpgByM96Gv9OFHDYp/5h7110rBqmg3HaUrSIdqMAk=
+	t=1727611017; cv=none; b=SOr2wxZW9R5dSMbxnLrprNyE6CvcAMXB6cwdAtsHRRncemclJxFo/uvgpW+fHQbCIfC1obnkb+x7lMDiVJgZb5zOuRqPNrzS/HJjWd59anI3NTyJkkSKfIL1mLcpZMEfWVWHjQT/4H4/868wpkcPii9NMZ65PGxyDmkjW4s2zTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727610417; c=relaxed/simple;
-	bh=Lws+eowf/tzTNG6urWd/LBgP4Qy7OF+1BFqhhFUD5Rw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lrYJwv7kOZ4XdpJ1mHgGROA/7bquQAgwaLvBx2TPg0RnQra87iczqlRe2Rl5WXIkQvFB8Bwuzwran3tSjSM2lwB7y1qzhLywgHuTbbGgbBpb+82MYAq2sVvZ9BWceemtb8+2xA7anDnz5ZuLQg9cNCU4ujh5JhLMb0c/TTkzXm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.88.51.162])
-	by sina.com (10.185.250.22) with ESMTP
-	id 66F93E0200007CE5; Sun, 29 Sep 2024 19:46:13 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 8993327602666
-X-SMAIL-UIID: 58B3E161AA5F4C4E93B714895E90C0E3-20240929-194613-1
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Denis Kirjanov <dkirjanov@suse.de>,
-	syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>,
-	linux-kernel@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-Date: Sun, 29 Sep 2024 19:46:01 +0800
-Message-Id: <20240929114601.1584-1-hdanton@sina.com>
-In-Reply-To: <20240928122112.1412-1-hdanton@sina.com>
-References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de>
+	s=arc-20240116; t=1727611017; c=relaxed/simple;
+	bh=kRdlNh2IHMBzOlcxstBQXWNI19MwftyElilV8HkvdK4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ddYLiv5epJCvZXjk1cBsr4PKHWCa5mUibKQKjUM5vf/cmq7S+jdAxqIhdZ1nPr+EfQdFhk8cc0X54dSexJWtzLOWJNRMVYlxTTCtAz49IBFpbAbqdUhat0TtjymB05B8vdgus8qrTW/Shkcah0eYs+VtNt4KvMviEMWxdbzJZS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c16J43vL; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f60061bb-109a-4fa8-b419-07585cbb79e3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727611011;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hAC//q1Q0snEPQ/btU6qHTHCF/zamSYZtJr8ip76b+8=;
+	b=c16J43vLB2hZPHz6tqz1HC9iB1xmdlprrXdGrQVKOfjC40iLWd8pDmUjeHHwgem1CKxzGL
+	Ng5nZZUJo8UqQRfBFImIqFuZFgu2gq6gdbZEYpu50omzXoS8Kf7yg0al9ZZIr83bb6Am1r
+	Z2sy3Fygp6gN4K2Tke2melQjUDtFCXU=
+Date: Sun, 29 Sep 2024 19:56:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC PATCH net-next v2] net/smc: Introduce a hook to modify
+ syn_smc at runtime
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+ guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com,
+ bpf@vger.kernel.org
+References: <1727408549-106551-1-git-send-email-alibuda@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <1727408549-106551-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 28 Sep 2024 20:21:12 +0800 Hillf Danton <hdanton@sina.com>
-> On Mon, 25 Mar 2024 14:08:36 +0100 Eric Dumazet <edumazet@google.com>
-> > On Mon, Mar 25, 2024 at 1:10 PM Denis Kirjanov <dkirjanov@suse.de> wrote:
-> > >
-> > > Hmm, report says that we have a net_device freed even that we have a dev_hold()
-> > > before __ethtool_get_link_ksettings()
-> > 
-> > dev_hold(dev) might be done too late, the device is already being dismantled.
-> > 
-> > ib_device_get_netdev() should probably be done under RTNL locking,
-> > otherwise the final part is racy :
-> > 
-> > if (res && res->reg_state != NETREG_REGISTERED) {
-> >      dev_put(res);
-> >      return NULL;
-> > }
+在 2024/9/27 11:42, D. Wythe 写道:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
 > 
-> Given paranoia in netdev_run_todo(),
+> The introduction of IPPROTO_SMC enables eBPF programs to determine
+> whether to use SMC based on the context of socket creation, such as
+> network namespaces, PID and comm name, etc.
 > 
-> 		/* paranoia */
-> 		BUG_ON(netdev_refcnt_read(dev) != 1);
+> As a subsequent enhancement, this patch introduces a new hook for eBPF
+> programs that allows decisions on whether to use SMC or not at runtime,
+> including but not limited to local/remote IP address or ports. In
+> simpler words, this feature allows modifications to syn_smc through eBPF
+> programs before the TCP three-way handshake got established.
 > 
-> the claim that dev_hold(dev) might be done too late could not explain
-> the success of checking NETREG_REGISTERED, because of checking 
-> NETREG_UNREGISTERING after rcu barrier.
+> Thanks to kfunc for making it easier for us to implement this feature in
+> SMC.
 > 
-> 	/* Wait for rcu callbacks to finish before next phase */
-> 	if (!list_empty(&list))
-> 		rcu_barrier();
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 > 
-> 	list_for_each_entry_safe(dev, tmp, &list, todo_list) {
-> 		if (unlikely(dev->reg_state != NETREG_UNREGISTERING)) {
-> 			netdev_WARN(dev, "run_todo but not unregistering\n");
-> 			list_del(&dev->todo_list);
-> 			continue;
-> 		}
+> ---
+> v1 -> v2:
+> 1. Fix wrong use of ireq->smc_ok, should be rx_opt->smc_ok.
+> 2. Fix compile error when CONFIG_IPV6 or CONFIG_BPF_SYSCALL was not set.
 > 
-As simply bumping kref up could survive the syzbot reproducer [1], Eric's reclaim
-is incorrect.
+> ---
+>   include/linux/tcp.h  |  4 ++-
+>   net/ipv4/tcp_input.c |  4 +--
+>   net/smc/af_smc.c     | 75 ++++++++++++++++++++++++++++++++++++++++++++++------
+>   3 files changed, 72 insertions(+), 11 deletions(-)
+> 
+> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> index 6a5e08b..d028d76 100644
+> --- a/include/linux/tcp.h
+> +++ b/include/linux/tcp.h
+> @@ -478,7 +478,9 @@ struct tcp_sock {
+>   #endif
+>   #if IS_ENABLED(CONFIG_SMC)
+>   	bool	syn_smc;	/* SYN includes SMC */
+> -	bool	(*smc_hs_congested)(const struct sock *sk);
+> +	void	(*smc_openreq_init)(struct request_sock *req,
+> +			     const struct tcp_options_received *rx_opt,
+> +			     struct sk_buff *skb, const struct sock *sk);
+>   #endif
+>   
+>   #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 9f314df..99f34f5 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -7036,8 +7036,8 @@ static void tcp_openreq_init(struct request_sock *req,
+>   	ireq->ir_num = ntohs(tcp_hdr(skb)->dest);
+>   	ireq->ir_mark = inet_request_mark(sk, skb);
+>   #if IS_ENABLED(CONFIG_SMC)
+> -	ireq->smc_ok = rx_opt->smc_ok && !(tcp_sk(sk)->smc_hs_congested &&
+> -			tcp_sk(sk)->smc_hs_congested(sk));
+> +	if (rx_opt->smc_ok && tcp_sk(sk)->smc_openreq_init)
+> +		tcp_sk(sk)->smc_openreq_init(req, rx_opt, skb, sk);
+>   #endif
+>   }
+>   
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 0316217..fdac7e2b 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -70,6 +70,15 @@
+>   static void smc_tcp_listen_work(struct work_struct *);
+>   static void smc_connect_work(struct work_struct *);
+>   
+> +__bpf_hook_start();
+> +
+> +__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
+> +{
+> +	return 1;
+> +}
+> +
+> +__bpf_hook_end();
+> +
+>   int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
+>   {
+>   	struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
+> @@ -156,19 +165,43 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+>   	return NULL;
+>   }
+>   
+> -static bool smc_hs_congested(const struct sock *sk)
+> +static void smc_openreq_init(struct request_sock *req,
+> +			     const struct tcp_options_received *rx_opt,
+> +			     struct sk_buff *skb, const struct sock *sk)
+>   {
+> +	struct inet_request_sock *ireq = inet_rsk(req);
+> +	struct sockaddr_storage rmt_sockaddr = {0};
 
---- l/drivers/infiniband/core/verbs.c
-+++ v/drivers/infiniband/core/verbs.c
-@@ -1979,6 +1979,7 @@ int ib_get_eth_speed(struct ib_device *d
- 	netdev = ib_device_get_netdev(dev, port_num);
- 	if (!netdev)
- 		return -ENODEV;
-+	dev_hold(netdev);
- 
- 	rtnl_lock();
- 	rc = __ethtool_get_link_ksettings(netdev, &lksettings);
-@@ -1995,6 +1996,7 @@ int ib_get_eth_speed(struct ib_device *d
- 				netdev->name, netdev_speed);
- 	}
- 
-+	dev_put(netdev);
- 	ib_get_width_and_speed(netdev_speed, lksettings.lanes,
- 			       speed, width);
- 
---
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+A trivial problem.
 
-Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-Tested-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
+The following should be better?
 
-[1] https://lore.kernel.org/lkml/66f9372f.050a0220.aab67.001a.GAE@google.com/
+struct sockaddr_storage rmt_sockaddr = {};
+
+I think, we have discussed this problem in RDMA maillist for several times.
+
+Zhu Yanjun
+
+>   	const struct smc_sock *smc;
+>   
+>   	smc = smc_clcsock_user_data(sk);
+>   
+>   	if (!smc)
+> -		return true;
+> +		return;
+>   
+> -	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+> -		return true;
+> +	if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+> +		goto out_no_smc;
+>   
+> -	return false;
+> +	rmt_sockaddr.ss_family = sk->sk_family;
+> +
+> +	if (rmt_sockaddr.ss_family == AF_INET) {
+> +		struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
+> +
+> +		rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
+> +		rmt4_sockaddr->sin_port	= ireq->ir_rmt_port;
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	} else {
+> +		struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
+> +
+> +		rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
+> +		rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
+> +#endif /* CONFIG_IPV6 */
+> +	}
+> +
+> +	ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
+> +	return;
+> +out_no_smc:
+> +	ireq->smc_ok = 0;
+> +	return;
+>   }
+>   
+>   struct smc_hashinfo smc_v4_hashinfo = {
+> @@ -1671,7 +1704,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
+>   	}
+>   
+>   	smc_copy_sock_settings_to_clc(smc);
+> -	tcp_sk(smc->clcsock->sk)->syn_smc = 1;
+> +	tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
+>   	if (smc->connect_nonblock) {
+>   		rc = -EALREADY;
+>   		goto out;
+> @@ -2650,8 +2683,7 @@ int smc_listen(struct socket *sock, int backlog)
+>   
+>   	inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
+>   
+> -	if (smc->limit_smc_hs)
+> -		tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
+> +	tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
+>   
+>   	rc = kernel_listen(smc->clcsock, backlog);
+>   	if (rc) {
+> @@ -3475,6 +3507,24 @@ static void __net_exit smc_net_stat_exit(struct net *net)
+>   	.exit = smc_net_stat_exit,
+>   };
+>   
+> +#if IS_ENABLED(CONFIG_BPF_SYSCALL)
+> +BTF_SET8_START(bpf_smc_fmodret_ids)
+> +BTF_ID_FLAGS(func, select_syn_smc)
+> +BTF_SET8_END(bpf_smc_fmodret_ids)
+> +
+> +static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
+> +	.owner = THIS_MODULE,
+> +	.set   = &bpf_smc_fmodret_ids,
+> +};
+> +
+> +static int bpf_smc_kfunc_init(void)
+> +{
+> +	return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
+> +}
+> +#else
+> +static inline int bpf_smc_kfunc_init(void) { return 0; }
+> +#endif /* CONFIG_BPF_SYSCALL */
+> +
+>   static int __init smc_init(void)
+>   {
+>   	int rc;
+> @@ -3574,8 +3624,17 @@ static int __init smc_init(void)
+>   		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
+>   		goto out_ulp;
+>   	}
+> +
+> +	rc = bpf_smc_kfunc_init();
+> +	if (rc) {
+> +		pr_err("%s: bpf_smc_kfunc_init fails with %d\n", __func__, rc);
+> +		goto out_inet;
+> +	}
+> +
+>   	static_branch_enable(&tcp_have_smc);
+>   	return 0;
+> +out_inet:
+> +	smc_inet_exit();
+>   out_ulp:
+>   	tcp_unregister_ulp(&smc_ulp_ops);
+>   out_lo:
+
 
