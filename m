@@ -1,271 +1,183 @@
-Return-Path: <netdev+bounces-130237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E77E9989537
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 13:57:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F205E989562
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 14:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124241C21EEE
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:57:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CF3BB22F04
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 12:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B33170A14;
-	Sun, 29 Sep 2024 11:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D0B179954;
+	Sun, 29 Sep 2024 12:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c16J43vL"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="s8q59sSZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2050.outbound.protection.outlook.com [40.107.101.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C286B15B108
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 11:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727611017; cv=none; b=SOr2wxZW9R5dSMbxnLrprNyE6CvcAMXB6cwdAtsHRRncemclJxFo/uvgpW+fHQbCIfC1obnkb+x7lMDiVJgZb5zOuRqPNrzS/HJjWd59anI3NTyJkkSKfIL1mLcpZMEfWVWHjQT/4H4/868wpkcPii9NMZ65PGxyDmkjW4s2zTc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727611017; c=relaxed/simple;
-	bh=kRdlNh2IHMBzOlcxstBQXWNI19MwftyElilV8HkvdK4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ddYLiv5epJCvZXjk1cBsr4PKHWCa5mUibKQKjUM5vf/cmq7S+jdAxqIhdZ1nPr+EfQdFhk8cc0X54dSexJWtzLOWJNRMVYlxTTCtAz49IBFpbAbqdUhat0TtjymB05B8vdgus8qrTW/Shkcah0eYs+VtNt4KvMviEMWxdbzJZS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c16J43vL; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f60061bb-109a-4fa8-b419-07585cbb79e3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1727611011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hAC//q1Q0snEPQ/btU6qHTHCF/zamSYZtJr8ip76b+8=;
-	b=c16J43vLB2hZPHz6tqz1HC9iB1xmdlprrXdGrQVKOfjC40iLWd8pDmUjeHHwgem1CKxzGL
-	Ng5nZZUJo8UqQRfBFImIqFuZFgu2gq6gdbZEYpu50omzXoS8Kf7yg0al9ZZIr83bb6Am1r
-	Z2sy3Fygp6gN4K2Tke2melQjUDtFCXU=
-Date: Sun, 29 Sep 2024 19:56:17 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D9816F851
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 12:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727613443; cv=fail; b=bH+VTGPBg4dJW24DQgegJq7sut3xj8GW193VKzMZkUW7lPJKXfR2TGRD3YJNqkG/O0PEPcMFOuP0hFLS2S8tESMMkFb/BHkg1B2kka/s9KVvAW99qG+0HnwSuarQy6LpazK/b8p6/0hixq7XKeXqAziniYMj4Do1FTXL0q8icGU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727613443; c=relaxed/simple;
+	bh=xozYNy1KOnOoYNTGcitbSOTfARDzOyfo94hlMMiiq/s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JNDp9bOXrQg/mcvb1FCgrkdTH5TpqRU2bmCUcMd4LWdQVKy3/+rnHc5HwcZZKpAc8eesJmnLlw5MjZSkKRv3NR2oPY9gvSu/cdA1AfUlulq28DhtBoqxX7YIV0uFGJpWQx3JH0EF/66IqEi6xloku4nfs6rTiC/MK55aMn4uvsI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=s8q59sSZ; arc=fail smtp.client-ip=40.107.101.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=twZGJmRQr3/XcB1lOfD90k2pm7W6jQ4dvkk+zuCJztmIefh6VpRClh8Vb8udiymF3qiXcFJhfAQoH7mZeiWMwcidsJjml1zgYk7z66bP/KggHxf/qLLp9f0eLmYNg/2OFoN3RR9X/eGyxQPszFErhPtq8gNJLosakMSSRQWr5jJ8DogjHjbwNsvaKwAWAGlCP7sQFRIEuCeZWEEiXPTwESUjn0YFNe6yoSrHfpkwebaUNGVnrtJaQLQAR3GNq75y1UylVGBZnxONnmpRrNqf2RhLTyKvqd8XDxZs7kq0k2aMKP982uCoRd0iERuQWWzB6wn6yJkiNtfL0ExW7ET5sQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=atfclzYkj5kpQWMqle75FcavfPVhXUKVByhgk4AqosA=;
+ b=qUZKRaed1ChNtiJezpa5t5GB97MT96kR6KCIcKhCYRap2wdUiF5N58+gSUMfcBNU5BiWOnEK8jrg4c6EBmiqiNoB5NiAgH0ECYA09u7EFtse7L9rwGkFxPVJTfkcBP73S3U/UZPwL510xSaw+MP84/2bxBGFhVNpZ3KA3NZ0TOQZ18wYpDrSSqNJp9rxW8OujeUyBdFKUt8E5gphdsl+ax75Nh7+1s4hen5M424ezYwuWZkXB4Nzf98UusZ/Mc81IVrVEIyhlL4YYb6jHkHXbwvxamtE5BNWwnfzbFhEq8/41mBOqtnIzBR+w7WMwgqAZy0qWI7KmL15UQRge1fCHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=atfclzYkj5kpQWMqle75FcavfPVhXUKVByhgk4AqosA=;
+ b=s8q59sSZLLX/tDVhOy95DQO6j7soSZ5jmdWYMCmhXbT07ytQviWtqYgN+tT1Dvk5QnGs/oNe81f/hpWtD7ynnvN4SFg9sWW24/oDkPJW7jn0ITaMDPC3PI/MaIsYf5MAWicx4gwiirFh8FtavCNm6dCkAyKr2mADZWhOicIXZAVQgPJ9ibPsCtGrdOfVRbpYKKZeVKgONrvAYnqBWI93Yg8SBOVgp55zTNglfibdDU7M7Q0Mjc+X2nR2DMBXgj/4HieOC7dqAOCROqBgH/JyfstexyB9E6QBGi1WfiQkmSLPtP+MUltzL6FxWpzNxB7KQxqjxyOC41KAJAKAEW6dfw==
+Received: from CH0PR04CA0083.namprd04.prod.outlook.com (2603:10b6:610:74::28)
+ by SA3PR12MB7923.namprd12.prod.outlook.com (2603:10b6:806:317::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.28; Sun, 29 Sep
+ 2024 12:37:18 +0000
+Received: from CH3PEPF00000012.namprd21.prod.outlook.com
+ (2603:10b6:610:74:cafe::ee) by CH0PR04CA0083.outlook.office365.com
+ (2603:10b6:610:74::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26 via Frontend
+ Transport; Sun, 29 Sep 2024 12:37:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH3PEPF00000012.mail.protection.outlook.com (10.167.244.117) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8048.1 via Frontend Transport; Sun, 29 Sep 2024 12:37:18 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 29 Sep
+ 2024 05:37:08 -0700
+Received: from shredder.nvidia.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 29 Sep
+ 2024 05:37:05 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <razor@blackwall.org>, <roopa@nvidia.com>,
+	<bridge@lists.linux.dev>, <jamie.bainbridge@gmail.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH net] bridge: mcast: Fail MDB get request on empty entry
+Date: Sun, 29 Sep 2024 15:36:40 +0300
+Message-ID: <20240929123640.558525-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH net-next v2] net/smc: Introduce a hook to modify
- syn_smc at runtime
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
- guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com,
- bpf@vger.kernel.org
-References: <1727408549-106551-1-git-send-email-alibuda@linux.alibaba.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <1727408549-106551-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000012:EE_|SA3PR12MB7923:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98f872b1-862f-4333-baa4-08dce08374af
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kS2Lvj7EiP+l77wEJBoTmfjvAMuqWIuZ8tddpBgdrCXBMdE5XbH6IA1tgrhv?=
+ =?us-ascii?Q?LXNbmP3x67Pqs+Ner6xYkpD6zL3c2ZVcXxB5tFrp+tDVFrLay8dG9GL5bZxD?=
+ =?us-ascii?Q?c4v94mMXpKCikzXx9jh38PzAWwTxkLmNXo2sR4mMED+GKjcTcHg6UO9mnX39?=
+ =?us-ascii?Q?beRPHLo46j1UgQHCUpJhhDAkaplRC2RQTkcgrMbsE4NmdqGTjYO6smzBeAxP?=
+ =?us-ascii?Q?c/HO3uvzaFG/2Q+x0men8jJWb7z6Ea7sOo+DcDb9aYRegNZeR6ti94TAbkiJ?=
+ =?us-ascii?Q?uygIy58D5Ozko5vcUjjB+obvtpu/TPgOP/YndLUeTJiHx7zs5DiwdrTll22a?=
+ =?us-ascii?Q?xHOcCmPw7UhsTdlrxbpEQE9GW2r0MvJKjW9o5tPp1JKGsLcvQ0Gsw8xu0Zw2?=
+ =?us-ascii?Q?jdjBLYGndcS2zxISo1YIkVZVukbQ1EAoHEqRtuzfA3Nh3DOJ5JXIXoUFoGXn?=
+ =?us-ascii?Q?9oHeiPm0uEaW9IdUkXtPzgxeVz6WhTObDdp085zoBRO5sGGv0bZheFNYvc8O?=
+ =?us-ascii?Q?phLfbpIkhfRKlvKl7iUXIGF9S+skbd+sxPBHTnxzjL81PDKEeaMva+uxE+hb?=
+ =?us-ascii?Q?8CcSyKnS3lnRQVYhHZ62m1dqxai0mekExtHhQMOXxVAvykhpskoV64QhlQtn?=
+ =?us-ascii?Q?eVKx4g8bJX6zDRuBoGTORmVod+pAG9cHfWhQcK60mzfJjBbNiZxAmoPYY+Pp?=
+ =?us-ascii?Q?dDrD5f+DzaTLIwGRKaDlxhM4sYNrSAGenxIWmpqNVFgwnEJft+JPx16bYT/O?=
+ =?us-ascii?Q?CxBEJbXPF6jkjN/8BTT77pwKqskUvAN1+DZ2c89/arybByXWJqX9oFWTSMBx?=
+ =?us-ascii?Q?NrwmFii/8erDG/vQdKP3EOeEemrrD0LbQD1RUlQr7KfVw9nvF+8ebL9Hx0VJ?=
+ =?us-ascii?Q?X+S7GXwK4TWTkmHS2mMGQDtkucfh6Z3OVD9BKrRsg9M/B08ot2ws+bx/YSkK?=
+ =?us-ascii?Q?u2pr5cXN7tU+pjCGRTRwYmX10u0hSZbogxpqabaNYtC5sWD3s3DVXlQILWYE?=
+ =?us-ascii?Q?I4tUdw6wxwENTFcEnvCGfe775hgyub9jYx7+uqTscoVYaKmKWM328LknS5Nt?=
+ =?us-ascii?Q?fnmPre+oSoCSOuDpK4Q/eihWBDvZK1M6wJrBw0YR8OfGLH+vGsnKAUJ7rfsA?=
+ =?us-ascii?Q?v5YSoNJwLoe00Xp7IjfyyJH2fk3kADvJf+V30KcUoFC2GcP86fLMvTL5iT1R?=
+ =?us-ascii?Q?ai2zcFRshbdLbRw73M4di3tNb9lqyFK+u5ZxKmHoo9ZDg8NG1WVWOWt5LP0v?=
+ =?us-ascii?Q?wwqf1vug95Tz/RRUVS+ITQsyazl6M0DQGjQBvkzicH+oLTTDH++//mc/HG5o?=
+ =?us-ascii?Q?J/QQ3ldbXju74v0o5PPhQG467GZ62rXIDa/Y7fxi4WqU/oLJPS2TmFP7Ox58?=
+ =?us-ascii?Q?7EW/Uvri3eC0Y3I1acDdPhi65Y+X?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2024 12:37:18.0121
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98f872b1-862f-4333-baa4-08dce08374af
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000012.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7923
 
-在 2024/9/27 11:42, D. Wythe 写道:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> The introduction of IPPROTO_SMC enables eBPF programs to determine
-> whether to use SMC based on the context of socket creation, such as
-> network namespaces, PID and comm name, etc.
-> 
-> As a subsequent enhancement, this patch introduces a new hook for eBPF
-> programs that allows decisions on whether to use SMC or not at runtime,
-> including but not limited to local/remote IP address or ports. In
-> simpler words, this feature allows modifications to syn_smc through eBPF
-> programs before the TCP three-way handshake got established.
-> 
-> Thanks to kfunc for making it easier for us to implement this feature in
-> SMC.
-> 
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> 
-> ---
-> v1 -> v2:
-> 1. Fix wrong use of ireq->smc_ok, should be rx_opt->smc_ok.
-> 2. Fix compile error when CONFIG_IPV6 or CONFIG_BPF_SYSCALL was not set.
-> 
-> ---
->   include/linux/tcp.h  |  4 ++-
->   net/ipv4/tcp_input.c |  4 +--
->   net/smc/af_smc.c     | 75 ++++++++++++++++++++++++++++++++++++++++++++++------
->   3 files changed, 72 insertions(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-> index 6a5e08b..d028d76 100644
-> --- a/include/linux/tcp.h
-> +++ b/include/linux/tcp.h
-> @@ -478,7 +478,9 @@ struct tcp_sock {
->   #endif
->   #if IS_ENABLED(CONFIG_SMC)
->   	bool	syn_smc;	/* SYN includes SMC */
-> -	bool	(*smc_hs_congested)(const struct sock *sk);
-> +	void	(*smc_openreq_init)(struct request_sock *req,
-> +			     const struct tcp_options_received *rx_opt,
-> +			     struct sk_buff *skb, const struct sock *sk);
->   #endif
->   
->   #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 9f314df..99f34f5 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -7036,8 +7036,8 @@ static void tcp_openreq_init(struct request_sock *req,
->   	ireq->ir_num = ntohs(tcp_hdr(skb)->dest);
->   	ireq->ir_mark = inet_request_mark(sk, skb);
->   #if IS_ENABLED(CONFIG_SMC)
-> -	ireq->smc_ok = rx_opt->smc_ok && !(tcp_sk(sk)->smc_hs_congested &&
-> -			tcp_sk(sk)->smc_hs_congested(sk));
-> +	if (rx_opt->smc_ok && tcp_sk(sk)->smc_openreq_init)
-> +		tcp_sk(sk)->smc_openreq_init(req, rx_opt, skb, sk);
->   #endif
->   }
->   
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 0316217..fdac7e2b 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -70,6 +70,15 @@
->   static void smc_tcp_listen_work(struct work_struct *);
->   static void smc_connect_work(struct work_struct *);
->   
-> +__bpf_hook_start();
-> +
-> +__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
-> +{
-> +	return 1;
-> +}
-> +
-> +__bpf_hook_end();
-> +
->   int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
->   {
->   	struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
-> @@ -156,19 +165,43 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
->   	return NULL;
->   }
->   
-> -static bool smc_hs_congested(const struct sock *sk)
-> +static void smc_openreq_init(struct request_sock *req,
-> +			     const struct tcp_options_received *rx_opt,
-> +			     struct sk_buff *skb, const struct sock *sk)
->   {
-> +	struct inet_request_sock *ireq = inet_rsk(req);
-> +	struct sockaddr_storage rmt_sockaddr = {0};
+When user space deletes a port from an MDB entry, the port is removed
+synchronously. If this was the last port in the entry and the entry is
+not joined by the host itself, then the entry is scheduled for deletion
+via a timer.
 
-A trivial problem.
+The above means that it is possible for the MDB get netlink request to
+retrieve an empty entry which is scheduled for deletion. This is
+problematic as after deleting the last port in an entry, user space
+cannot rely on a non-zero return code from the MDB get request as an
+indication that the port was successfully removed.
 
-The following should be better?
+Fix by returning an error when the entry's port list is empty and the
+entry is not joined by the host.
 
-struct sockaddr_storage rmt_sockaddr = {};
+Fixes: 68b380a395a7 ("bridge: mcast: Add MDB get support")
+Reported-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Closes: https://lore.kernel.org/netdev/c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com/
+Tested-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/bridge/br_mdb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think, we have discussed this problem in RDMA maillist for several times.
-
-Zhu Yanjun
-
->   	const struct smc_sock *smc;
->   
->   	smc = smc_clcsock_user_data(sk);
->   
->   	if (!smc)
-> -		return true;
-> +		return;
->   
-> -	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
-> -		return true;
-> +	if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
-> +		goto out_no_smc;
->   
-> -	return false;
-> +	rmt_sockaddr.ss_family = sk->sk_family;
-> +
-> +	if (rmt_sockaddr.ss_family == AF_INET) {
-> +		struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
-> +
-> +		rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
-> +		rmt4_sockaddr->sin_port	= ireq->ir_rmt_port;
-> +#if IS_ENABLED(CONFIG_IPV6)
-> +	} else {
-> +		struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
-> +
-> +		rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
-> +		rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
-> +#endif /* CONFIG_IPV6 */
-> +	}
-> +
-> +	ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
-> +	return;
-> +out_no_smc:
-> +	ireq->smc_ok = 0;
-> +	return;
->   }
->   
->   struct smc_hashinfo smc_v4_hashinfo = {
-> @@ -1671,7 +1704,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
->   	}
->   
->   	smc_copy_sock_settings_to_clc(smc);
-> -	tcp_sk(smc->clcsock->sk)->syn_smc = 1;
-> +	tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
->   	if (smc->connect_nonblock) {
->   		rc = -EALREADY;
->   		goto out;
-> @@ -2650,8 +2683,7 @@ int smc_listen(struct socket *sock, int backlog)
->   
->   	inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
->   
-> -	if (smc->limit_smc_hs)
-> -		tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
-> +	tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
->   
->   	rc = kernel_listen(smc->clcsock, backlog);
->   	if (rc) {
-> @@ -3475,6 +3507,24 @@ static void __net_exit smc_net_stat_exit(struct net *net)
->   	.exit = smc_net_stat_exit,
->   };
->   
-> +#if IS_ENABLED(CONFIG_BPF_SYSCALL)
-> +BTF_SET8_START(bpf_smc_fmodret_ids)
-> +BTF_ID_FLAGS(func, select_syn_smc)
-> +BTF_SET8_END(bpf_smc_fmodret_ids)
-> +
-> +static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
-> +	.owner = THIS_MODULE,
-> +	.set   = &bpf_smc_fmodret_ids,
-> +};
-> +
-> +static int bpf_smc_kfunc_init(void)
-> +{
-> +	return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
-> +}
-> +#else
-> +static inline int bpf_smc_kfunc_init(void) { return 0; }
-> +#endif /* CONFIG_BPF_SYSCALL */
-> +
->   static int __init smc_init(void)
->   {
->   	int rc;
-> @@ -3574,8 +3624,17 @@ static int __init smc_init(void)
->   		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
->   		goto out_ulp;
->   	}
-> +
-> +	rc = bpf_smc_kfunc_init();
-> +	if (rc) {
-> +		pr_err("%s: bpf_smc_kfunc_init fails with %d\n", __func__, rc);
-> +		goto out_inet;
-> +	}
-> +
->   	static_branch_enable(&tcp_have_smc);
->   	return 0;
-> +out_inet:
-> +	smc_inet_exit();
->   out_ulp:
->   	tcp_unregister_ulp(&smc_ulp_ops);
->   out_lo:
+diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
+index bc37e47ad829..1a52a0bca086 100644
+--- a/net/bridge/br_mdb.c
++++ b/net/bridge/br_mdb.c
+@@ -1674,7 +1674,7 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
+ 	spin_lock_bh(&br->multicast_lock);
+ 
+ 	mp = br_mdb_ip_get(br, &group);
+-	if (!mp) {
++	if (!mp || (!mp->ports && !mp->host_joined)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "MDB entry not found");
+ 		err = -ENOENT;
+ 		goto unlock;
+-- 
+2.46.1
 
 
