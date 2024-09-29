@@ -1,186 +1,196 @@
-Return-Path: <netdev+bounces-130221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832669893DB
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 10:48:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 663E898941A
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA59F1C20910
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 08:48:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8DAF1F24A3A
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D737E13CA99;
-	Sun, 29 Sep 2024 08:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DF213E05F;
+	Sun, 29 Sep 2024 09:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ocdoutji"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QoSFgTt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1BFAD2F;
-	Sun, 29 Sep 2024 08:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727599684; cv=none; b=mtfsREOXsO3nOQdJRb0eDchsreRI1nsFQkL8fptLvw2Vf+cVUfyUGwf8Emu1ze3vfV9r1J66o6zWXpAGQiNmFWoiZ5N7i7z376OCzcjrpROQce1XX5qNKOwA/neK3RUN8epLLREBAQeNw0l7CNYCsbOKaU+I5+/0OuehDk7g3H0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727599684; c=relaxed/simple;
-	bh=uacsQ/Wk7pWbwC6Lw38VvY6F4rtZM4EvO3CycqJmmQs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=LVuHXvq1kstkcH21ymIfqKE0Hd/dLtT/Pvi203BxA8IfvYaDNubTIe1grF9HI1VbM3Sv3qSU331oJ7l9kffUYJAhK9Z06/9HrVqBqf/bXIAh3MOSsGwX6QuYNcERLns0qQo1b396nqvVlL7h2uIAbaE6CcK7gi/TvNwvSl3mFFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ocdoutji; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84F7BC4CEC7;
-	Sun, 29 Sep 2024 08:48:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727599684;
-	bh=uacsQ/Wk7pWbwC6Lw38VvY6F4rtZM4EvO3CycqJmmQs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=ocdoutjiYmFtWjWIr6JSVvO5eTLq/oyUv+AuKzRuodq//76GZeyVbOCRgp6wVvpbY
-	 7Xar/hv7B10UJDpK3zDv90VOuwGxV25msOcn42o0WsCas5bJRlb7Syspw7VqxZxtJW
-	 nfT/UyOIOwkBCzxZHIUMfWOI3WlJaZxYL+hKENWz6c+MV0WT9LiJoxLyBuREzFoD/g
-	 2MW0wDyz9oKsMGZT6b4Z2A/Os9nwIGK0Ts0CEdoO6rQ9bfIoUOImf8P8woaUlQOyyI
-	 CUkHK/SQxYGWYtvwdu2RF8ZAm92YVQLRhppVnq+XADnsYEWxW3EZlOG8C3CfFK7sD7
-	 YFtuR8TO8Fzcw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C4BCF6495;
-	Sun, 29 Sep 2024 08:48:04 +0000 (UTC)
-From: Eric Long via B4 Relay <devnull+i.hack3r.moe@kernel.org>
-Date: Sun, 29 Sep 2024 16:48:01 +0800
-Subject: [PATCH bpf-next 2/2] selftests/bpf: make sure linking objects with
- duplicate extern functions doesn't fail
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6284BE4E;
+	Sun, 29 Sep 2024 09:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727601119; cv=fail; b=YQjai3rj85YaIQa2Hp499L3DT5RhOvEXDY7TXx5QfidsuFrdTJWKt9m6FiTU4h4WeScZdacmnSvsOTB5XJv6wcVVT58KMUmVUdrG8VCWeRyAA/mLkPNiliijtsEZ8VRbWvVZX818DJK9FFOVc+kITKuehtlH/TQcQKwVciIMfbs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727601119; c=relaxed/simple;
+	bh=5MrPrnEhlb2kTZZKtqE6/zmxKBVG0gwTLdn33fa5u+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=u9JuXTW9HoL428Tc3qAK3eZB+Oy90xmP+AQyyPZ8A3aPUMj1WW7V9hDs891M4BM0BNboCXYMg3GTvyb+xSYMsJXmIyY1rpTD2pUu2p9TSzsNsP7vIbp2KJmmqopETp65ecXFRED+haSgo+QBbVCFb29Jw5yDWhzImWCecsLMoDg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QoSFgTt1; arc=fail smtp.client-ip=40.107.243.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Qu5EhPV9P+NZeukntvhnQHwSf+TuOQ3Fw0J6+7+iraovMTZkbaIys/Cck2v3UqqkGB8KYSW8j3hNu/yc6xR+aaDqoQO2Q+5dpuyKjTeVeO2reBunPob1AA1vF2E41EeXxM1Q5U1bR79kSyBBF1lcCbv8cIy532oaaq56hXsZHRxQ4ICsbmufLo9/IuxEkR4BCU69s382EGRuSkJ7bIKvQjrlnQgWlPcn6kwj1Mk7qQxgCDTCDW7cQk95MuNIBooqAvn3P+ekDJpg699L1I+dsks8c/PB+KSpBlt+6IHHp7t9fcq2YShOl+vDYwKZQtep08P138BpUVd2JyUD11Oj3g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WyFtzztl/OT3B9zLNeC6p2DN1q4ySB+/XQQMyDQch54=;
+ b=Js+fItA0+TP2GjiAcyKHiyhzRGp6FiHEXVhMzwd1d/M7vxSTLRvQZqXsYWa/pOW0R/8SRh+9EyGNFrdfLe66a/MIwxhw/SXXtS8fvhorcDrFT6YJmlF7lkRzwu3owcgpubQBJeowZdKg84dvZrIzI+cm37WJdfFH84Ya5SFp1crB7VU7PLyLIQHrYhlPo7wqG1BA3WOv29sul5m30l88oJ7xPqXhPB08FinmRHnOteyG39hrcz9rLt5MOEOU4JRVsoin2SNZct0u127TPT/GVvqfUvXqqUIwpyGEqsl9UKW6glM5ylwGt31FYpMlz9R54aP0KoVVYwQbcMmaW5AK7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WyFtzztl/OT3B9zLNeC6p2DN1q4ySB+/XQQMyDQch54=;
+ b=QoSFgTt1LTsTnVX95gotJUZJUfFocMJKnng8V/IJV6WaTTC6CA9LUlC0lKOmIyOEqcAyYkCL31J4KgNcJCACb9umsxpL8fp8eYfrutWCEaZFkNDY6J/+lovPDg6/2iF5aOylJQ+wMehmSbkhjumATvqneUS5Iw4lIc63Vt4R2XB4aj+lXLesch4/Q/6cNqkzxsKYBOZZNDMputDzfDZTxLgqwei+QFWGxgw4W/BQ5HvGM/Ei+DrNyicEYONBRMUfiXVPBo4QMfZn+NyCUqFsbO4E4nuTVgAMPWTlQAV+0VgYaK4cia7+ELGS3hxwuuyKfjfrrLhrp0HoVtf73+qlNQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by IA0PR12MB9047.namprd12.prod.outlook.com (2603:10b6:208:402::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26; Sun, 29 Sep
+ 2024 09:11:55 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%3]) with mapi id 15.20.8005.024; Sun, 29 Sep 2024
+ 09:11:55 +0000
+Date: Sun, 29 Sep 2024 12:11:44 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, stable@vger.kernel.org,
+	greearb@candelatech.com, fw@strlen.de, dsahern@kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net] vrf: revert "vrf: Remove unnecessary RCU-bh critical
+ section"
+Message-ID: <ZvkZ0Ex0k6_G6hNo@shredder.mtl.com>
+References: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
+X-ClientProxiedBy: LO4P123CA0114.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:192::11) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240929-libbpf-dup-extern-funcs-v1-2-df15fbd6525b@hack3r.moe>
-References: <20240929-libbpf-dup-extern-funcs-v1-0-df15fbd6525b@hack3r.moe>
-In-Reply-To: <20240929-libbpf-dup-extern-funcs-v1-0-df15fbd6525b@hack3r.moe>
-To: bpf@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, 
- Eric Long <i@hack3r.moe>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3770; i=i@hack3r.moe;
- h=from:subject:message-id;
- bh=Hww+IY99Jvgbtqt0tYLYI8/UdyT0Cd78O9SVglyM2YM=;
- b=owGbwMvMwCUWYb/agfVY0D7G02pJDGk/RZznnT8b0pEw9x7T5Gc3koIqE9kmBZ0WS2MzS/t4k
- cHQjGNrRykLgxgXg6yYIsuWw3/UEvS7Ny3hnlMOM4eVCWQIAxenAExkhgzD/wCJvRGhXHcCG+80
- 6MgqF7GcXfcmyEfW5tXn9AUfG2t/MTIyrDz6qixQ6O/utK+T97k9d9PZf5UzVuDPgtK6xc1WB6c
- xMAEA
-X-Developer-Key: i=i@hack3r.moe; a=openpgp;
- fpr=3A7A1F5A7257780C45A9A147E1487564916D3DF5
-X-Endpoint-Received: by B4 Relay for i@hack3r.moe/default with auth_id=225
-X-Original-From: Eric Long <i@hack3r.moe>
-Reply-To: i@hack3r.moe
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|IA0PR12MB9047:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90c35c0f-b668-4907-24a6-08dce066c35d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?eg0Vo61fQwcd/F2yiN+QjY6WzwW2K/zhfehHmbsGPxpE6B+hMY0kzgYKzCtr?=
+ =?us-ascii?Q?pUStma3Gb4NjvX5rKyx4qDSzdbGZ4G31zamb3y8baWcL/7fNZMcvDXvEiB4L?=
+ =?us-ascii?Q?+3qX0lwuUKWbxvTP062ZklOp93RYBJ6Cv5RFGyIRKpxxE9tz712t9cUe/8B4?=
+ =?us-ascii?Q?xXCc/JWvDe5kDWKi3kaJFfeJ+h+MACijLUza+i1+zCCrAFGxrtiLULIL1uVN?=
+ =?us-ascii?Q?X4hZpuwtQQKCsRjc477DREu/8SeDGs3ZTZ4c/aPw2DPKrNoIIB0jurKso2pe?=
+ =?us-ascii?Q?JFH9m67dX8mgGD2TRBVpsbXNI4iW/ct5xzNYFdL6hhBrV4TP0UfDzBjBD5+7?=
+ =?us-ascii?Q?VWoKoB5QzY5T8RGveW8VPkRdH1In5tm85K4La5RFusD+l5t4osBQw877UvyU?=
+ =?us-ascii?Q?KBccBqvvnnr2WpscD9qkFGB6PBlerF5tYupJ9+GKG17btUWzo+sSc8bE7VHd?=
+ =?us-ascii?Q?msxBp1b5FNSUTYnuqzlDWMLM13yjgiIOUdTGrNWMFO0tZDK/9FJomFQkzAuw?=
+ =?us-ascii?Q?U2+FgysoI0b449X3XbQ5Cg3NjnK86Z0jiMLnpb+ZGdPCh9KGgekwD4XLf8cQ?=
+ =?us-ascii?Q?utn3M9Wlbxv7Hg6fcy0I3oBuXzip3UnrZBhcGYZqKfwOEM5F2OxFQ929QRRz?=
+ =?us-ascii?Q?itqkzrLYRPWcLNjyrJrwgS0vqjV1sarYGsuPGn6PTHAHrJdvTjFP44THJGdd?=
+ =?us-ascii?Q?mu2RbPhH/pgq7PjUQCbZyxPS5uzQCraIDosJmprxHN3bSdLvFpNJ9dfk8Jzx?=
+ =?us-ascii?Q?16eNh7J/Y9fUpQu8q8MP6hBIFF+VfznyJZVX9J9eJP4ZsXGBLutW067vkr0T?=
+ =?us-ascii?Q?L7P+D+82uc0qTmXNgIsmWhzMVdRWo0k+VgUFTmkrWv13FCOQReI8RcigwaiB?=
+ =?us-ascii?Q?vSkI22U+eu6IGQPmPDGTbqagFyx2BmHt6kOzv+6OWIA8BnQ7Xm0yisSRWEu3?=
+ =?us-ascii?Q?cU/NlDCh5pSkPDkI8n/nmuJP4YK0dAbhNn7TNEpm0IcZKT78AzoWS5ro20qe?=
+ =?us-ascii?Q?ubE9aXEGAleJa15vyskrjWQvm0u/PSL+UxsT61kMdmz9FhB+JcB9Yl478Y9s?=
+ =?us-ascii?Q?VPD3K7lKM+AkodwdHExfY0n+ydl6lsfOEtjdj7ht2gN6WBB0z0cgUdUno4GG?=
+ =?us-ascii?Q?gSt4iCA0jHxdyn8mn0zpzC12zYwSDzeaFod2AMfQsBi1TfAF6ysuuCTXv4Qf?=
+ =?us-ascii?Q?jL2KtxR2m6RPgDN7hLtJiUC1ClccBy2ZcBQP1oVmtMhkJAxrI+j/qWRl1t7U?=
+ =?us-ascii?Q?l/7rMtUFN3vooFgv0Td83p4nS1l4iUqK3yoU4iyI/Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tPwuezuKsbi9HielUd80yzeE829KyG6ZylsIf4H367IwkVNp+4pPBba36VmL?=
+ =?us-ascii?Q?fPPF9ndy0vdH6ZqJxSffpJCi3RookQzuLKnedot8Gc54txC5ZasvaTvKvwmo?=
+ =?us-ascii?Q?geW8iAhK8gMzkopypeXRbchqjQ3ZaS3sHKHFVX6qAI30qBYFFET24cMyxOEX?=
+ =?us-ascii?Q?6hDepUmGeg6ztLqtEGQHRO1ESmbuI1joEymNSFwt/jQCmMWfVf0VXwEC4MAa?=
+ =?us-ascii?Q?2lOUtL6fEO6Ept1kLSGKRTtSdVR6rorhd0ZX4QinfLTr0S39r8KxnMKZVovb?=
+ =?us-ascii?Q?J2Z1B0VNtMFzLNgc1XmmIl7vQCk7Wu+YV0dDetWpzMTNPk1cqmkT3xxT9VXW?=
+ =?us-ascii?Q?GgUAh8jYNOneMFw4yzWcjW9iFuu9hpVqVANguW0MZTLFqvocSGjE+XhHvzeT?=
+ =?us-ascii?Q?+Ogma8jbN66KooXTmwUfOwFUzSuIsUlin7EE0lOX44mplrPgcJMVNBEqsw4w?=
+ =?us-ascii?Q?3QqNGY8Wxx2it+m6JvQfWok8KHj4IkuvoAJa0cdvzTyfqBudbuKjWI7aeADU?=
+ =?us-ascii?Q?eAOWuGchNzucKJs2/Tdkmv3PthVgDg+GOS5n9scDQYvfx8vVWV+SSXXPwauL?=
+ =?us-ascii?Q?fZEG/5qmg7Je5eNEEmZSR7pbdgYC4kLu5jdRtmCFDAvtyOS1MV1qula5yEpt?=
+ =?us-ascii?Q?PelmGU+BqL7X5/o2bGFiVPLTRx2LEiPaGis/yHkXryP6ti7wTMz2gn3uEYEL?=
+ =?us-ascii?Q?4a4f2T1kZ4Jwyky714dxo7jfoj/VbEVzge7Oe8o7cj/MnzuDU/47aCClK5wl?=
+ =?us-ascii?Q?TNk4pT0BVl4j1nZ59/Lt/QJS/nSkXZgoRogMUlrbp4lgo1Z434HOf3gwqYzg?=
+ =?us-ascii?Q?zmP5veVp2VxfkYvfSUdZPC9sMkNSy+GkSX5JwBP9PJb640ZdUlSDzdN4kmbw?=
+ =?us-ascii?Q?Y3+Qc/27NMIFL/8k/tYuhqWjs3msugy2WHU906TN72868M4DOHMnzHmiDM+5?=
+ =?us-ascii?Q?xPGjzohoR+2BqXfoKOWa9S+e9ZSQckrkRBEWTY4SBbCowuf2HC9NX40scgBH?=
+ =?us-ascii?Q?NJqo11njrt6lYX83NopkcCVdNdk86BUwS81QM+UbzXgGlpEBaos9pcPOVIHW?=
+ =?us-ascii?Q?QVPZr53ke497tdolxbsvgEvlgUnjJR1p0VQrnL/7ShDy/3g4ubVzI8sqYMyU?=
+ =?us-ascii?Q?G6UaY2+OtTMkeg6+Bo1iZwzm+bjGlZ/wsSLjJ2ELoimBC9viIA4uxDw0cEHC?=
+ =?us-ascii?Q?cDYh7JniGZHk/i49OkE6HxQx0KIcDIsQDB74V035ZAkaTLWBsgpTCGDElyXt?=
+ =?us-ascii?Q?5sdTqC2mHH98MiuEN0MKjdhHDTftmISNJDmdtq8wXyKkChVVs16rc7eOrBpk?=
+ =?us-ascii?Q?VlFIY7u2W/ZIDXjWt9lhm3ABR3lUM+nT4T9KINcE4AkZNclrE2jf4Y9WEMY/?=
+ =?us-ascii?Q?7wWioz1chZkq3D8G5n+aN3TowmtmPZSt6ebg0A0BuOJmAcdLkWFAfyBcMVRZ?=
+ =?us-ascii?Q?/OB2hD1nkxF8gkKoW6xFwapNqQZqvvyD1ylo4Uuo+w50wUnNqcF4/Jq/mnQY?=
+ =?us-ascii?Q?fRgK0sg60L0UqJpAQESeTSum9+Q79r5qUgnV5HQdFxbFSs4lSlKI3NGTeuv1?=
+ =?us-ascii?Q?DZqYfTVSdgbwmuZaD/zEErMqA2vaim1UVc025RVX?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90c35c0f-b668-4907-24a6-08dce066c35d
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Sep 2024 09:11:54.9903
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Px/asOPRxVDfjjQHWg/JtcLgMfvwlh3q1ZRhcoAaSFSBo44td7/bJkJLYTUn8ahRuZFPqxoo8Vjnmrn9J0r9ZQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB9047
 
-From: Eric Long <i@hack3r.moe>
+On Sun, Sep 29, 2024 at 02:18:20AM -0400, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
+> 
+> This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+> 
+> dev_queue_xmit_nit is expected to be called with BH disabled.
+> __dev_queue_xmit has the following:
+> 
+>         /* Disable soft irqs for various locks below. Also
+>          * stops preemption for RCU.
+>          */
+>         rcu_read_lock_bh();
+> 
+> VRF must follow this invariant. The referenced commit removed this
+> protection. Which triggered a lockdep warning:
 
-Previously when multiple BPF object files referencing the same extern
-function (usually kfunc) are statically linked using `bpftool gen
-object`, libbpf tries to get the nonexistent size of BTF_KIND_FUNC_PROTO
-and fails. This test ensures it is fixed.
+[...]
 
-Signed-off-by: Eric Long <i@hack3r.moe>
----
- tools/testing/selftests/bpf/Makefile                 |  3 ++-
- .../selftests/bpf/prog_tests/dup_extern_funcs.c      |  9 +++++++++
- .../testing/selftests/bpf/progs/dup_extern_funcs1.c  | 20 ++++++++++++++++++++
- .../testing/selftests/bpf/progs/dup_extern_funcs2.c  | 18 ++++++++++++++++++
- 4 files changed, 49 insertions(+), 1 deletion(-)
+> 
+> Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
+> Link: https://lore.kernel.org/netdev/20240925185216.1990381-1-greearb@candelatech.com/
+> Reported-by: Ben Greear <greearb@candelatech.com>
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Cc: stable@vger.kernel.org
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index e295e3df5ec6c3c21abe368038514cfb34b42f69..644c4dd6002c691a9cd94ef26ddf51f6dc84e2cc 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -496,7 +496,7 @@ SKEL_BLACKLIST := btf__% test_pinning_invalid.c test_sk_assign.c
- LINKED_SKELS := test_static_linked.skel.h linked_funcs.skel.h		\
- 		linked_vars.skel.h linked_maps.skel.h 			\
- 		test_subskeleton.skel.h test_subskeleton_lib.skel.h	\
--		test_usdt.skel.h
-+		test_usdt.skel.h dup_extern_funcs.skel.h
- 
- LSKELS := fentry_test.c fexit_test.c fexit_sleep.c atomics.c 		\
- 	trace_printk.c trace_vprintk.c map_ptr_kern.c 			\
-@@ -520,6 +520,7 @@ test_usdt.skel.h-deps := test_usdt.bpf.o test_usdt_multispec.bpf.o
- xsk_xdp_progs.skel.h-deps := xsk_xdp_progs.bpf.o
- xdp_hw_metadata.skel.h-deps := xdp_hw_metadata.bpf.o
- xdp_features.skel.h-deps := xdp_features.bpf.o
-+dup_extern_funcs.skel.h-deps := dup_extern_funcs1.bpf.o dup_extern_funcs2.bpf.o
- 
- LINKED_BPF_OBJS := $(foreach skel,$(LINKED_SKELS),$($(skel)-deps))
- LINKED_BPF_SRCS := $(patsubst %.bpf.o,%.c,$(LINKED_BPF_OBJS))
-diff --git a/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c b/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..b26f855745b451f7f53e44b27d47a2f659ad1378
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c
-@@ -0,0 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <test_progs.h>
-+#include "dup_extern_funcs.skel.h"
-+
-+void test_dup_extern_funcs(void)
-+{
-+	RUN_TESTS(dup_extern_funcs);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c b/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..6850e01d1455c0a2da947ad6d5b1c5dab0187e00
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c
-@@ -0,0 +1,20 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
-+SEC("tc")
-+int handler1(struct __sk_buff *skb)
-+{
-+	struct sk_buff *skb_kern = bpf_cast_to_kern_ctx(skb);
-+
-+	if (!skb_kern)
-+		return -1;
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c b/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..66ba3620274497cc40f8dfbb8d98856d4eab707e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
-+SEC("xdp")
-+int handler2(struct xdp_md *xdp)
-+{
-+	struct xdp_buff *xdp_kern = bpf_cast_to_kern_ctx(xdp);
-+
-+	if (!xdp_kern)
-+		return -1;
-+
-+	return 0;
-+}
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
--- 
-2.46.2
+Thanks Willem!
 
+The reason my script from 504fc6f4f7f6 did not trigger the problem is
+that it was pinging the address inside the VRF, so vrf_finish_direct()
+was only called from the Rx path.
 
+If you ping the address outside of the VRF:
+
+ping -I vrf1 -i 0.1 -c 10 -q 192.0.2.1
+
+Then vrf_finish_direct() is called from process context and the lockdep
+warning is triggered. Tested that it does not trigger after applying the
+revert.
 
