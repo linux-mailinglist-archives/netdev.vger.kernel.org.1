@@ -1,186 +1,118 @@
-Return-Path: <netdev+bounces-130226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C758C989487
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:31:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0876A989494
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05CB2281FC2
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:31:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B403C284640
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:37:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D6E13C8F9;
-	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60E6144D0C;
+	Sun, 29 Sep 2024 09:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzKjfzaB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MgsuDCWR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C3A9224F0;
-	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B33D18641;
+	Sun, 29 Sep 2024 09:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727602278; cv=none; b=OZQ2iuzTESYqkNUP9cVI5YQBhN3J1Nwpk4kE9bYGhsbiQsDsZ6eGvvWi1ixstCZVy987hG7MwBs27Hw7tvJZhQfL15WV6sFO919Yh0+NTZRcnrFrWZXB+brSUGVF78aJGTVTGehsdBgg8WEbf7EmyeS/qzfC22NE3SvWMtfvXVQ=
+	t=1727602672; cv=none; b=A1l9bJE56LP5+s4cpzc/cynKEBd5AVUv0sA4l9vyT+Erv+tZ+FoE5sYFY9b1jqT2L8hw22sifNTWN+hfYyLI4SMl+3pvkyVhn88sjjIrANyWg5sXrirBfkGT2vGNOjXFKyxvkEFbLc9whJ1nOpCbbX0G9xPFCVFdjfGiK8b3FXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727602278; c=relaxed/simple;
-	bh=uacsQ/Wk7pWbwC6Lw38VvY6F4rtZM4EvO3CycqJmmQs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=VefPVCWPAoJWOOX4NxiZkU41jrfE2bEAoeJADOIwTCMoEpyYNxdCx9Z9ehSuijZtUoBC8BgJhEMSZACZrXEzvwj6HRTYp5/QvzrcNA+A8+3ueEiDyrclGV0YczO+B2DoI12LRNsR8xW/AiEW/jZRrGchTPaQPCrWJtXMVUoAFdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzKjfzaB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E5F6C4CEC7;
-	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727602278;
-	bh=uacsQ/Wk7pWbwC6Lw38VvY6F4rtZM4EvO3CycqJmmQs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=OzKjfzaBqEFt+nsZ/xQQnH6V1fSFZyMp+b5tfKlNKaVysN9Q9hCn3ulwsmaZ38f6x
-	 svbxHPzAA3+9JNLf9ZN0IKXUd8bBZWTPA8fQIwPDEowamS3FMf8pEsq23lr4WUACu9
-	 +Chi/O+HGd3eC5IpAO9s+7ScYrvPlNX5IAHTCuG/nFYekuPT7dPZXhQY4flB0h4bSD
-	 wVJa6NBUPpoNftjp99WZFiG8g/1j/cU7Y0th9m+NrwW0zt96wadk+cnVK2Fl5wnKZJ
-	 GnXDlMyJp0lHbauTlAHqD305COOm4q/40n3qNpjRioNCq5CPIqpJ9gUIhHfyIOEI/Z
-	 45PKki7gT2/OQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6797ACF6497;
-	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
-From: Eric Long via B4 Relay <devnull+i.hack3r.moe@kernel.org>
-Date: Sun, 29 Sep 2024 17:31:15 +0800
-Subject: [PATCH bpf-next v2 2/2] selftests/bpf: make sure linking objects
- with duplicate extern functions doesn't fail
+	s=arc-20240116; t=1727602672; c=relaxed/simple;
+	bh=JhnlrgiwaYgmf+C4P4rH3Grzmw0UD30oyedNJem4K74=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cItpCZg5EOJ57iJXgpjLs3yjfsNU3IK6P+b/DXWQYXK+KAEcgphVCzvyF0Gbh102ekbQtl4AR4wkdrso/VMIyhLBxDUe9Z+LuT/vpFBiTKqPSg1/iQrYP17KudXkNdA4HPthf569YR1ItqYQ4DH2/m7euVeaIK+Ydyl7p20rRNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MgsuDCWR; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7db0fb03df5so2634578a12.3;
+        Sun, 29 Sep 2024 02:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727602670; x=1728207470; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UI3JnvNxoordn6WEYDEb5d80WQsWt5pSs8xiHh3j060=;
+        b=MgsuDCWR8KS9gbixT/tLGdkM3TJRDqVlvShmApWlOfS4jUpXn+PB50Y3/+bLj6eZ12
+         ek4n3Mb7Eeh73IL3xFlR+bqsvIcz+9jeZqNhZNOpjd+sFt9jWrTMqwxmRmP6gYugmsmz
+         vmmQIcfWEXgIF1MIqNJMtAHDbPQWrvmNI5dLEXfNhe0Q8uLoCNVTLjD4X1Q7EE5qtmEO
+         T007P/YbEsRt1QQPd/HI5gEIynQGYyMUD2rGj78lFVUoohFUAUdkHs3XAiVb0xey8df+
+         lO9pNYmaQx294pMY6c4vgMz4d9tzxCMkp/5t+IE293lL9ExnSbwWHGacUUU2ru1TWrCc
+         FQlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727602670; x=1728207470;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UI3JnvNxoordn6WEYDEb5d80WQsWt5pSs8xiHh3j060=;
+        b=tX13EjWJgTdP3jwYazUPJMZczzyEliquuenuNFTXeZOx7ZVdcpqc9MzGmaVTRDSFH/
+         m3i1hwG9qt6AmLS+g+IUvZYvsonT5hGBk8Rh0UkzmPc28b0xyQUiUolkr0NxAGyGleXZ
+         FdpnuuAvUT66F/pKgjheO/M8982to0wU+dPjSlETlZo4beYM40iSii6q+yAqsZImxFpP
+         g9c6ktu+AByTINYQDpE6yJ19C9xmy0MHm6BnE/l7m/+Dj8+Y0lMw6wgxac9Tf8ttrejz
+         IeKAlky5p/glxeGWN0hLcgEzMllen6pOd2XT/ytwIkBhoUHcbIjO9HqINvAf/4hjUirV
+         JjdA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8NYMf0I+qiXcUhfDXnYJ6IlbiJ1P+YeTEKg6OiPh3WX+5rKb2JNDVcjgxZk2jamrI7iv5Vix1CixfIu2qVA==@vger.kernel.org, AJvYcCUhh6Jl2n4s0pSEn0qI/tunOhdffgMf+8L0/auhvevJ03bBX7MrUnY7i86/9mluRx47NNSIjJKa@vger.kernel.org, AJvYcCUo6qRcaCU2NUUenC6riT57fZuWi7OMt8v3sBFwuhwR1hCm5wRHFPp27I2h+OiLTDuuEABToyYbas+StA3G@vger.kernel.org, AJvYcCVRK9RKPYvWIhMuhvfOMLZMIElioCvWjVTSnCq+6FppQgbXkZowEJB2YpoVbAUOJM1CwOzWdysGQtz2@vger.kernel.org, AJvYcCVhUr4tL85Efse0OOckcguoa/Iq6b45PQ6mCthJXQseGuqY1gnhREcYwwLIxACXByBA2gdisXozA0F6TA==@vger.kernel.org, AJvYcCWdedSoRDcrjNPlq+YvVwqBuwoq0HddTec/00Elyjb3C7/tvAgXFUore5dg4AGVMEg0s4nQ1SJ8eR+t@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeEkW7ejp3yU19eteePTK+9l+mYTSdY1uRCsRTehmozZR6EP3k
+	kfLV5W7dErl40USelOVZk6nRVG/+a1fwi1oSNnjuVy2mg7YUrXNP
+X-Google-Smtp-Source: AGHT+IGlIri+CO3nO7SHxYS35QDjVZ1ed/TCsk0eNd1dMV/4gMLjT42I+WIsw+2rLAY8Xe2G636KQA==
+X-Received: by 2002:a05:6a20:cf8b:b0:1d2:e81c:adc0 with SMTP id adf61e73a8af0-1d4fa7b53bemr13375412637.46.1727602670436;
+        Sun, 29 Sep 2024 02:37:50 -0700 (PDT)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264bebedsm4292766b3a.85.2024.09.29.02.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Sep 2024 02:37:49 -0700 (PDT)
+Message-ID: <c688c115af578e6b6ae18d0eabe4aded9db2aad9.camel@gmail.com>
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: David Howells <dhowells@redhat.com>, Leon Romanovsky <leon@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>, Manu Bretelle
+ <chantr4@gmail.com>,  asmadeus@codewreck.org, ceph-devel@vger.kernel.org,
+ christian@brauner.io,  ericvh@kernel.org, hsiangkao@linux.alibaba.com,
+ idryomov@gmail.com,  jlayton@kernel.org, linux-afs@lists.infradead.org,
+ linux-cifs@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
+ linux-fsdevel@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-mm@kvack.org, linux-nfs@vger.kernel.org,  marc.dionne@auristor.com,
+ netdev@vger.kernel.org, netfs@lists.linux.dev,  pc@manguebit.com,
+ smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
+ v9fs@lists.linux.dev, willy@infradead.org
+Date: Sun, 29 Sep 2024 02:37:44 -0700
+In-Reply-To: <2808175.1727601153@warthog.procyon.org.uk>
+References: <20240925103118.GE967758@unreal>
+	 <20240923183432.1876750-1-chantr4@gmail.com>
+	 <20240814203850.2240469-20-dhowells@redhat.com>
+	 <1279816.1727220013@warthog.procyon.org.uk>
+	 <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+	 <2808175.1727601153@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240929-libbpf-dup-extern-funcs-v2-2-0cc81de3f79f@hack3r.moe>
-References: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe>
-In-Reply-To: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe>
-To: bpf@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, 
- Eric Long <i@hack3r.moe>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3770; i=i@hack3r.moe;
- h=from:subject:message-id;
- bh=Hww+IY99Jvgbtqt0tYLYI8/UdyT0Cd78O9SVglyM2YM=;
- b=owGbwMvMwCUWYb/agfVY0D7G02pJDGk/5VKnPdIy9koRPHK/2LZgprpRPB/vvSsr2LIk4oRay
- lL0b0l0lLIwiHExyIopsmw5/EctQb970xLuOeUwc1iZQIYwcHEKwERO72Zk+CH0WuWwFVtj+IqX
- jRcW8F2LuWr9JiRVdGfGwz2Skwv36TIyPK35xfsrnzliRrlOXOOcGjYPyZnr/xVGvE6zYf/+YKE
- CAwA=
-X-Developer-Key: i=i@hack3r.moe; a=openpgp;
- fpr=3A7A1F5A7257780C45A9A147E1487564916D3DF5
-X-Endpoint-Received: by B4 Relay for i@hack3r.moe/default with auth_id=225
-X-Original-From: Eric Long <i@hack3r.moe>
-Reply-To: i@hack3r.moe
 
-From: Eric Long <i@hack3r.moe>
+On Sun, 2024-09-29 at 10:12 +0100, David Howells wrote:
+> Can you try the attached?  I've also put it on my branch here:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log=
+/?h=3Dnetfs-fixes
 
-Previously when multiple BPF object files referencing the same extern
-function (usually kfunc) are statically linked using `bpftool gen
-object`, libbpf tries to get the nonexistent size of BTF_KIND_FUNC_PROTO
-and fails. This test ensures it is fixed.
+Used your branch:
+fc22830c5a07 ("9p: Don't revert the I/O iterator after reading")
 
-Signed-off-by: Eric Long <i@hack3r.moe>
----
- tools/testing/selftests/bpf/Makefile                 |  3 ++-
- .../selftests/bpf/prog_tests/dup_extern_funcs.c      |  9 +++++++++
- .../testing/selftests/bpf/progs/dup_extern_funcs1.c  | 20 ++++++++++++++++++++
- .../testing/selftests/bpf/progs/dup_extern_funcs2.c  | 18 ++++++++++++++++++
- 4 files changed, 49 insertions(+), 1 deletion(-)
+dmesg is here:
+https://gist.github.com/eddyz87/4cd50c2cf01323641999dc386e2d41eb
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index e295e3df5ec6c3c21abe368038514cfb34b42f69..644c4dd6002c691a9cd94ef26ddf51f6dc84e2cc 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -496,7 +496,7 @@ SKEL_BLACKLIST := btf__% test_pinning_invalid.c test_sk_assign.c
- LINKED_SKELS := test_static_linked.skel.h linked_funcs.skel.h		\
- 		linked_vars.skel.h linked_maps.skel.h 			\
- 		test_subskeleton.skel.h test_subskeleton_lib.skel.h	\
--		test_usdt.skel.h
-+		test_usdt.skel.h dup_extern_funcs.skel.h
- 
- LSKELS := fentry_test.c fexit_test.c fexit_sleep.c atomics.c 		\
- 	trace_printk.c trace_vprintk.c map_ptr_kern.c 			\
-@@ -520,6 +520,7 @@ test_usdt.skel.h-deps := test_usdt.bpf.o test_usdt_multispec.bpf.o
- xsk_xdp_progs.skel.h-deps := xsk_xdp_progs.bpf.o
- xdp_hw_metadata.skel.h-deps := xdp_hw_metadata.bpf.o
- xdp_features.skel.h-deps := xdp_features.bpf.o
-+dup_extern_funcs.skel.h-deps := dup_extern_funcs1.bpf.o dup_extern_funcs2.bpf.o
- 
- LINKED_BPF_OBJS := $(foreach skel,$(LINKED_SKELS),$($(skel)-deps))
- LINKED_BPF_SRCS := $(patsubst %.bpf.o,%.c,$(LINKED_BPF_OBJS))
-diff --git a/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c b/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..b26f855745b451f7f53e44b27d47a2f659ad1378
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/dup_extern_funcs.c
-@@ -0,0 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <test_progs.h>
-+#include "dup_extern_funcs.skel.h"
-+
-+void test_dup_extern_funcs(void)
-+{
-+	RUN_TESTS(dup_extern_funcs);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c b/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..6850e01d1455c0a2da947ad6d5b1c5dab0187e00
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/dup_extern_funcs1.c
-@@ -0,0 +1,20 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+char _license[] SEC("license") = "GPL";
-+
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
-+SEC("tc")
-+int handler1(struct __sk_buff *skb)
-+{
-+	struct sk_buff *skb_kern = bpf_cast_to_kern_ctx(skb);
-+
-+	if (!skb_kern)
-+		return -1;
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c b/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..66ba3620274497cc40f8dfbb8d98856d4eab707e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/dup_extern_funcs2.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
-+SEC("xdp")
-+int handler2(struct xdp_md *xdp)
-+{
-+	struct xdp_buff *xdp_kern = bpf_cast_to_kern_ctx(xdp);
-+
-+	if (!xdp_kern)
-+		return -1;
-+
-+	return 0;
-+}
+Still see null-ptr-deref.
 
--- 
-2.46.2
-
+[...]
 
 
