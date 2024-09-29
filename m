@@ -1,174 +1,177 @@
-Return-Path: <netdev+bounces-130201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D42449891E3
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 00:21:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BD398922C
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 02:51:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87E2328534C
-	for <lists+netdev@lfdr.de>; Sat, 28 Sep 2024 22:21:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 821261F2371B
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 00:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FE9187352;
-	Sat, 28 Sep 2024 22:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A83E5538A;
+	Sun, 29 Sep 2024 00:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZaRm8IAU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xu76kUuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CBD1F5EA;
-	Sat, 28 Sep 2024 22:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2380C28EF;
+	Sun, 29 Sep 2024 00:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727562069; cv=none; b=XZ8htIDUnSxYHWClI/2HeDN8LIeyePyfgt8HSeKGHABywZqO4RfDOHYtLOYLxIrDJ/0r4i33OifGvSwfGnG3miQZSdygvg5dirQuTjnWtDS7crH9uN5xPJuUAPiiiV/tU67ROfxaaO+94Pm9jbjKFWtPIvoTOKYmiLaUlhksiUM=
+	t=1727571054; cv=none; b=PwcsOvVDgFz2OtVz5ZisIJPuWONVpVU6IxPiTbG65in17sm1Zdz/LtTEzHGTCLLC/mNXxG4At2mzlkZfQaEkhofk3rRv6r85dgDGfRpaPh7t8Tc0xde06z5hHfdUu1V8lodxqEh1Tl3glgzMNTPplojgWQtEpc2ysgeZWwyvB1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727562069; c=relaxed/simple;
-	bh=753n/HZnmHMAeAEp/81I+HWoLFnnpgyNJSj2QobhRAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t+8mcm98UiUJhk5ZWFVlbe7I6OsnDCKNaq8k1yaWsaQMBgZuslRuZY+mXTXVY2V4UB2BR+lKTksrS3WyJX3l4xdaQzalQbcKN+RdLy8juv0jTZ2UXPe4urGqeC4trC5kve3xAfUaXPd8KpEUkr0A6QbCxD5nZl9qjTUA2T+LLBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZaRm8IAU; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727562068; x=1759098068;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=753n/HZnmHMAeAEp/81I+HWoLFnnpgyNJSj2QobhRAI=;
-  b=ZaRm8IAUdNKloL8n7zj6tQSWg5EGKegpjRY1f+Pe21X4JYfMm2sshBt8
-   C391kDDtynyFuvgOxGLj/LLAfcoBJ4cFxH81gxAukC374vCfpFdaSH/Ds
-   A8Lw5I+EN+PHKfmWrYMIin5FIKcYLeWWXuQ9uK9/VBLY4MYUm0AcLgeys
-   VAFfhz3PtNxiCNAEsJM/6xrumZmnI1i65Y54VjsD8bgtcndEzzB3Jl+FC
-   uptQ4NtBokAxyY0eJCnsU/Cbzk15pqsbKdgUyjegQ4bUgeNLeWwvXJofo
-   G1PCF8ZDISGl0fALtVq7iOBqV758cbQlw4aviTw4XORTil031br7iLpCs
-   w==;
-X-CSE-ConnectionGUID: Wa6qfH7FSASG3jfRLf8ngQ==
-X-CSE-MsgGUID: 6GHH03N7SmOVWOWc9Qo29Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11209"; a="37247974"
-X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
-   d="scan'208";a="37247974"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Sep 2024 15:21:07 -0700
-X-CSE-ConnectionGUID: SZ77uNqsRS+YvGRrXkIpJQ==
-X-CSE-MsgGUID: EF6fF7mjRKyzfeRhvubsoQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,162,1725346800"; 
-   d="scan'208";a="73183641"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 28 Sep 2024 15:21:01 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sufoA-000Nhj-2I;
-	Sat, 28 Sep 2024 22:20:58 +0000
-Date: Sun, 29 Sep 2024 06:20:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jonathan.Cameron@huawei.com,
-	helgaas@kernel.org, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	wei.huang2@amd.com, vadim.fedorenko@linux.dev, horms@kernel.org,
-	bagasdotme@gmail.com, bhelgaas@google.com, lukas@wunner.de,
-	paul.e.luse@intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH V6 2/5] PCI/TPH: Add Steering Tag support
-Message-ID: <202409290628.jR98LDA9-lkp@intel.com>
-References: <20240927215653.1552411-3-wei.huang2@amd.com>
+	s=arc-20240116; t=1727571054; c=relaxed/simple;
+	bh=Qn+pIqUYweu8EZ+bLGwoknjYMd7EzzvBNty++7THH2M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PtbZ2L+poTRf10pWPG263o9okxnr+BM1xk84puYt+mHgKlX/Oli7/TXffHbfV1LJlf2qgdBTuQ1HIFpf+ArITnMiPaPJQYA0XA9y4ODxcZqe95QgHlNVOcrXFaf7Wa2KGVeOGzL7OZ4rl/mKlo4sNIiqUp8ugY50R9orp756Aog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xu76kUuw; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71c5df16b10so1324385b3a.0;
+        Sat, 28 Sep 2024 17:50:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727571052; x=1728175852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zsU7CWgjM1UsFEJ24JSmjSnHHeZkMF6S2e9wKCHHVoA=;
+        b=Xu76kUuw5pmnUJqweoMEY56ZvgBR8LYVPsFk2LQeLG6Di4JxrksA3MPHcEwXJkb7Vk
+         rTRiriIYEawnh/Gq0gz5CYBWMWaVR2615OdZQiiuBULCLKLCkoziaCkBgf9YjUnyzoiH
+         7NJ7iuNAULhGXi81eU1wpLD0LvxI44rYivhZsTrIqkfHLUY3z3pf3wLGkFCQJtk38ShI
+         ukVR1EIBPpE1HmUGmrCzEe2S+TEDr5hNOAoiCbUw1KEktLoLoA6QXe5kPZ76nS1eDkhz
+         59CBbqqQz0td6SH3+W2ytCnuwfKeTFymKhc65RxUssrtv/f+4mUdRjuz1qLVqWWIXCw6
+         gv5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727571052; x=1728175852;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zsU7CWgjM1UsFEJ24JSmjSnHHeZkMF6S2e9wKCHHVoA=;
+        b=WAO6KTYEkVJ9+TBB7/uIDsy+Vpor6kCxl183J4UtmLJ6ipeGWXwIk7xPj9bIfr7LFr
+         NkiTuaznTFW0itlNH7TcnKKPg5dprZxmtIiFrZNxRBVyMVt8/APIdKVZytiqZg13cypv
+         w6B3UrmQZSVN9eqEclNyktAOC52/HVi1BAQAdhsdZI8mDppg7ZBKxM4KlRmFjAyeMoIV
+         a8MBA4pl4vco5yiUJyehHryiAgIZ3REEyPnFd/TPISGGwaLCo6AQBFfLLigxlJzx89z8
+         YUTDzRT+kgBLYiWvvXbx5pJKSNZX2NNDrJIIdJlp/q/YC74sKZlI3YzkIivPTtr7kn/x
+         KEXw==
+X-Forwarded-Encrypted: i=1; AJvYcCURlLs8lcnr4x4GaGgPrPGNLUrQgbdktofOurVLk0DClC/3gT8RalQjePe/muD0qLx7J+dbk79NemncoVMB@vger.kernel.org, AJvYcCWoaNE5tolkXgmH2y0QW/hkViqFnUhe9ZT9hK1C+MoTdXonG0DH6wxicAV8A784RHhOAAFNAn763eM=@vger.kernel.org, AJvYcCXYi62CZv0gEKSvlAtgaXdXrRassuHoTmyeKpTgrLkb+mPrJ0Tgtc6NthfYKbAiYUVYVqsiRBg7@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKAfRM3zUBg/3gi9Blpi1rlpPlu6qu3zvOanmjFISZnfWDeXTP
+	ujJSlWkJF7HhHMgVAdnzPTY61gcF7EwiLHohs4QcmnScqrU8+5To
+X-Google-Smtp-Source: AGHT+IEX9arcIqOdoeQ6I52TYmZER7sGAhx3wBhVAyDDDYCLHrnyPUfX8+t1K9Q4qxsL7BktBYwPDg==
+X-Received: by 2002:a05:6a00:2d25:b0:717:8d9f:2dbc with SMTP id d2e1a72fcca58-71b2606c524mr12222150b3a.23.1727571052202;
+        Sat, 28 Sep 2024 17:50:52 -0700 (PDT)
+Received: from tc.. (c-67-171-216-181.hsd1.or.comcast.net. [67.171.216.181])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264c23b6sm3731737b3a.88.2024.09.28.17.50.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2024 17:50:51 -0700 (PDT)
+From: Leo Stone <leocstone@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	corbet@lwn.net
+Cc: Leo Stone <leocstone@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	anupnewsmail@gmail.com
+Subject: [PATCH] Documentation: networking/tcp_ao: typo and grammar fixes
+Date: Sat, 28 Sep 2024 17:49:34 -0700
+Message-ID: <20240929005001.370991-1-leocstone@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240927215653.1552411-3-wei.huang2@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Wei,
+Fix multiple grammatical issues and add a missing period to improve
+readability.
 
-kernel test robot noticed the following build errors:
+Signed-off-by: Leo Stone <leocstone@gmail.com>
+---
+ Documentation/networking/tcp_ao.rst | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-[auto build test ERROR on pci/next]
-[also build test ERROR on pci/for-linus linus/master next-20240927]
-[cannot apply to v6.11]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Add-TLP-Processing-Hints-TPH-support/20240928-055915
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
-patch link:    https://lore.kernel.org/r/20240927215653.1552411-3-wei.huang2%40amd.com
-patch subject: [PATCH V6 2/5] PCI/TPH: Add Steering Tag support
-config: sparc64-randconfig-r062-20240929 (https://download.01.org/0day-ci/archive/20240929/202409290628.jR98LDA9-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240929/202409290628.jR98LDA9-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409290628.jR98LDA9-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/pci/tph.c: In function 'write_tag_to_msix':
->> drivers/pci/tph.c:230:26: error: 'struct pci_dev' has no member named 'msix_base'; did you mean 'msix_cap'?
-     230 |         vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
-         |                          ^~~~~~~~~
-         |                          msix_cap
-
-
-vim +230 drivers/pci/tph.c
-
-   205	
-   206	/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise -errno */
-   207	static int write_tag_to_msix(struct pci_dev *pdev, int msix_idx, u16 tag)
-   208	{
-   209		struct msi_desc *msi_desc = NULL;
-   210		void __iomem *vec_ctrl;
-   211		u32 val, mask, st_val;
-   212		int err = 0;
-   213	
-   214		msi_lock_descs(&pdev->dev);
-   215	
-   216		/* Find the msi_desc entry with matching msix_idx */
-   217		msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
-   218			if (msi_desc->msi_index == msix_idx)
-   219				break;
-   220		}
-   221	
-   222		if (!msi_desc) {
-   223			err = -ENXIO;
-   224			goto err_out;
-   225		}
-   226	
-   227		st_val = (u32)tag;
-   228	
-   229		/* Get the vector control register (offset 0xc) pointed by msix_idx */
- > 230		vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
-   231		vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
-   232	
-   233		val = readl(vec_ctrl);
-   234		mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
-   235		val &= ~mask;
-   236		val |= FIELD_PREP(mask, st_val);
-   237		writel(val, vec_ctrl);
-   238	
-   239		/* Read back to flush the update */
-   240		val = readl(vec_ctrl);
-   241	
-   242	err_out:
-   243		msi_unlock_descs(&pdev->dev);
-   244		return err;
-   245	}
-   246	
-
+diff --git a/Documentation/networking/tcp_ao.rst b/Documentation/networking/tcp_ao.rst
+index e96e62d1dab3..d5b6d0df63c3 100644
+--- a/Documentation/networking/tcp_ao.rst
++++ b/Documentation/networking/tcp_ao.rst
+@@ -9,7 +9,7 @@ segments between trusted peers. It adds a new TCP header option with
+ a Message Authentication Code (MAC). MACs are produced from the content
+ of a TCP segment using a hashing function with a password known to both peers.
+ The intent of TCP-AO is to deprecate TCP-MD5 providing better security,
+-key rotation and support for variety of hashing algorithms.
++key rotation and support for a variety of hashing algorithms.
+ 
+ 1. Introduction
+ ===============
+@@ -164,9 +164,9 @@ A: It should not, no action needs to be performed [7.5.2.e]::
+        is not available, no action is required (RNextKeyID of a received
+        segment needs to match the MKT’s SendID).
+ 
+-Q: How current_key is set and when does it change? It is a user-triggered
+-change, or is it by a request from the remote peer? Is it set by the user
+-explicitly, or by a matching rule?
++Q: How is current_key set, and when does it change? Is it a user-triggered
++change, or is it triggered by a request from the remote peer? Is it set by the
++user explicitly, or by a matching rule?
+ 
+ A: current_key is set by RNextKeyID [6.1]::
+ 
+@@ -233,8 +233,8 @@ always have one current_key [3.3]::
+ 
+ Q: Can a non-TCP-AO connection become a TCP-AO-enabled one?
+ 
+-A: No: for already established non-TCP-AO connection it would be impossible
+-to switch using TCP-AO as the traffic key generation requires the initial
++A: No: for an already established non-TCP-AO connection it would be impossible
++to switch to using TCP-AO, as the traffic key generation requires the initial
+ sequence numbers. Paraphrasing, starting using TCP-AO would require
+ re-establishing the TCP connection.
+ 
+@@ -292,7 +292,7 @@ no transparency is really needed and modern BGP daemons already have
+ 
+ Linux provides a set of ``setsockopt()s`` and ``getsockopt()s`` that let
+ userspace manage TCP-AO on a per-socket basis. In order to add/delete MKTs
+-``TCP_AO_ADD_KEY`` and ``TCP_AO_DEL_KEY`` TCP socket options must be used
++``TCP_AO_ADD_KEY`` and ``TCP_AO_DEL_KEY`` TCP socket options must be used.
+ It is not allowed to add a key on an established non-TCP-AO connection
+ as well as to remove the last key from TCP-AO connection.
+ 
+@@ -361,7 +361,7 @@ not implemented.
+ 4. ``setsockopt()`` vs ``accept()`` race
+ ========================================
+ 
+-In contrast with TCP-MD5 established connection which has just one key,
++In contrast with an established TCP-MD5 connection which has just one key,
+ TCP-AO connections may have many keys, which means that accepted connections
+ on a listen socket may have any amount of keys as well. As copying all those
+ keys on a first properly signed SYN would make the request socket bigger, that
+@@ -374,7 +374,7 @@ keys from sockets that were already established, but not yet ``accept()``'ed,
+ hanging in the accept queue.
+ 
+ The reverse is valid as well: if userspace adds a new key for a peer on
+-a listener socket, the established sockets in accept queue won't
++a listener socket, the established sockets in the accept queue won't
+ have the new keys.
+ 
+ At this moment, the resolution for the two races:
+@@ -382,7 +382,7 @@ At this moment, the resolution for the two races:
+ and ``setsockopt(TCP_AO_DEL_KEY)`` vs ``accept()`` is delegated to userspace.
+ This means that it's expected that userspace would check the MKTs on the socket
+ that was returned by ``accept()`` to verify that any key rotation that
+-happened on listen socket is reflected on the newly established connection.
++happened on the listen socket is reflected on the newly established connection.
+ 
+ This is a similar "do-nothing" approach to TCP-MD5 from the kernel side and
+ may be changed later by introducing new flags to ``tcp_ao_add``
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
