@@ -1,130 +1,185 @@
-Return-Path: <netdev+bounces-130249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D499896B1
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:57:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C94B98970E
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 21:18:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C55461F224A1
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 17:57:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759CA1C209E4
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D824206D;
-	Sun, 29 Sep 2024 17:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B4736AEC;
+	Sun, 29 Sep 2024 19:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HtGqsHxH"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="cqXIMzg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9D842052;
-	Sun, 29 Sep 2024 17:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0655B1362
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 19:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727632629; cv=none; b=GW1909V0oa65eO8UJtYfg2iNrnsS3Xvx+mN9NEVB4PUMfJ7HygppYWHAZotLz0VYgwX/B06koyshGt4FoJFXucoWnM+Ro78UPn3IJSg3yF6d8/dJ0pa25iCUjHGSBUHeFAWJgv7l99KK2R3HlRkmGVSfAqfX9zN8IN2wCjmPZwI=
+	t=1727637520; cv=none; b=QKAO4SezcJNOeWnsSQmnIG5MkLhQZy61xpjJOhUDGZ0ZLNd2BTXKPhxMH8cq0vdXJgwVCxL4XGoXpq3tp0No+8Rq3+veEG1aL/9j8PcZar13HLMsgBAcAC+hvUNSMKeRJ7kB2BfAoB+DYyIZgNqiRckAJ2PbXMBjGpVxrzomu9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727632629; c=relaxed/simple;
-	bh=iWgTGifBakNI41kLE4UIYfM/KM6Ekd3osCDXkifEj6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ges9ZwgydKWNUOXZ3kYsVh/a2gL8Qd3/HrDvPWhzB8xdyaB0ucAvtvRsBRsFHA1b1lxVT3oX5RE7H/lOE/inmlgPVzuXX1WK4h9b4LlrNMN86lc+1y0VQhuI8tmv3ZWmz5JL+4PfgR9M54NHqplbglRqtbe0DVCMkSO/tAvqUw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HtGqsHxH; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a8b155b5e9eso577637366b.1;
-        Sun, 29 Sep 2024 10:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727632626; x=1728237426; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x+E7BYwg3MBBSzwH1rru8pxpa3+5KQwtjCo/BuFfYDE=;
-        b=HtGqsHxHatqs8UCrODVmk66/Z2OtQtRXaG3YbvPRxlNmWLWVIsDpizYjJTg9eV0uAV
-         NsilJx7n1u4oJ6H4wer2/gfWBiY9T5zIcenJAUXKFdPMxuBgFN4WESp8pfNWMaay2bJ4
-         HX7grDVWVsTBAytaQDxjjNvbTiqYZk/fnUQdueGhIckzwQZTS3nfn3zLKR7wAqvAVv13
-         41qrOR0Yy9se02OICD81sEX7c4Y7ky5BgAFacv+YR5JAP4XDnv+dKtFt9/TFF1dOPRJi
-         r+BacLleZJ1d4BDeSS89KW5bFHRSK0rmA4b+c2M5IBFOPNfAbhK8Epfu89MW32iJe8/m
-         n9QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727632626; x=1728237426;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x+E7BYwg3MBBSzwH1rru8pxpa3+5KQwtjCo/BuFfYDE=;
-        b=HHs2AYDeQO/Oy5yPFgBWMwjThwMGMxg0uPVC9FzX6eLe1j2lC5W+fNCXnBKXhDHLHr
-         tiIt3LXku+Gjhep8v7p3FKWBprLzJINL6Olsa8D9QdCrrI8TFqBBjUqDhjvt0aEOfoXK
-         sElRe8GYcXpIm2TlCV7gcvdZr36yKnfv7tlSOSHeeCewFvpdiIdYrB9ndUULLOQmhJca
-         uPO2Kt5UT9b96v19ke7s/5Wrz5CJDAa8fB8Ngkl0Q0YF96LYsGQXqBrTaLz/aoak0Kyp
-         oNCC3kuPl7TwLSdOu6dIU6OzbQHHyQjWkbwSoI6J25OiZfH9hT+dAKlZHLYR20KD2vCZ
-         BjVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1B5CCyX8j0JiwNy6PT9rdgEtNRlW8DsMCRFHdN09BwEWEfQ+1IWaDPvU2w57olp1jUXmQ6Vkt@vger.kernel.org, AJvYcCVuucgCt+3wEmlDjdYHswlqFkkZ0ItxYpyAI4l4IYYFvj2QEfoYZsDbjgYqcVqgZhmUCfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4C14iHRylwEiYCZw7cwtkkLQY1hQ/8WFqiSYR8lhj9Yw3Ad/Y
-	oZ6lB3lzrNlKWNYIOxq67POi0U7PoFmaz+rZs/4wR64YCFSEBCNvz7PjHvVh98/qZd8UwU1y7wz
-	G4IUmZagy3XMofiWfRFZFdu6AMBU9SSfN
-X-Google-Smtp-Source: AGHT+IGjKDm0VGJwF86cqnzkppBYiJx+kLAPc+vhYM4MjsvaqwgOFtwlWHRBnYLE2Q3Mm5TNOQ6Y/hDzKnnlya8Azjw=
-X-Received: by 2002:a17:907:36c2:b0:a86:789b:71fe with SMTP id
- a640c23a62f3a-a93c4ae8f90mr1067090966b.48.1727632625597; Sun, 29 Sep 2024
- 10:57:05 -0700 (PDT)
+	s=arc-20240116; t=1727637520; c=relaxed/simple;
+	bh=1Q00rePAyFfAo3avVDnteWAYzPkEEWSICDfpstp89mE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rewv7JJ4dsmqNRHHWqhYUaYOmSmB0sA3G6z+PaRiG+fOR67jZNGtI+qQdcMosyKDbEAic7b7ICEJCjgneUFTj1c8Wd8KZKD5Ah4gda5fnzY3agC/y7LoASMZ7F93vhJ/Fo0HuDkC6DdrjVBkLSh1p0T0B7VdPABbO/YrW/U9Cbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=cqXIMzg9; arc=none smtp.client-ip=84.16.66.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XGrqP2r1wzQmQ;
+	Sun, 29 Sep 2024 19:32:01 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1727631121;
+	bh=U3PkyRoQ7rdPQAeVu0I06DBylGmJ6f/VayaDJ+KK9DE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cqXIMzg95A6dDvttEsMDdx5wnprTsNQpVP9KeZYzRXPljPG8OrAhhCHSZNb9rjbH8
+	 HAuik39KfsUJwGP2lvnqhB5pBHdJA2DQ0Cy/Euk26S56aL4DMfIVRHerqI9d/7+IMs
+	 SdMZl7DHdH2/FCBIhQbWCMu6P8X2yBaJ4G2z+gdU=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XGrqN1wm0zv4h;
+	Sun, 29 Sep 2024 19:32:00 +0200 (CEST)
+Date: Sun, 29 Sep 2024 19:31:58 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
+Cc: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	Matthieu Buffet <matthieu@buffet.re>
+Subject: Re: [RFC PATCH v3 14/19] selftests/landlock: Test socketpair(2)
+ restriction
+Message-ID: <20240929.Noovae0izai8@digikod.net>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-15-ivanov.mikhail1@huawei-partners.com>
+ <ZurZ7nuRRl0Zf2iM@google.com>
+ <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
+ <ZvZ_ZjcKJPm5B3_Z@google.com>
+ <Zvhh3CRj9T7_KIhC@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240929124134.24288-1-chenyuan_fl@163.com>
-In-Reply-To: <20240929124134.24288-1-chenyuan_fl@163.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 29 Sep 2024 10:56:54 -0700
-Message-ID: <CAADnVQJneRNysmQNy3vPrMkXUGsW3EM_papHufErKFjnGX8q3g@mail.gmail.com>
-Subject: Re: [PATCH] bpf: fix the xdp_adjust_tail sample prog issue
-To: Yuan Chen <chenyuan_fl@163.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zvhh3CRj9T7_KIhC@google.com>
+X-Infomaniak-Routing: alpha
 
-On Sun, Sep 29, 2024 at 5:41=E2=80=AFAM Yuan Chen <chenyuan_fl@163.com> wro=
-te:
->
-> From: Yuan Chen <chenyuan@kylinos.cn>
->
-> During the xdp_adjust_tail test, probabilistic failure occurs and SKB pac=
-kage
-> is discarded by the kernel. After checking the issues by tracking SKB pac=
-kage,
-> it is identified that they were caused by checksum errors. Refer to check=
-sum
-> of the arch/arm64/include/asm/checksum.h for fixing.
->
-> Fixes: c6ffd1ff7856 (bpf: add bpf_xdp_adjust_tail sample prog)
-> Signed-off-by: Yuan Chen <chenyuan@kylinos.cn>
-> ---
->  samples/bpf/xdp_adjust_tail_kern.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/samples/bpf/xdp_adjust_tail_kern.c b/samples/bpf/xdp_adjust_=
-tail_kern.c
-> index ffdd548627f0..3543ddd62ef4 100644
-> --- a/samples/bpf/xdp_adjust_tail_kern.c
-> +++ b/samples/bpf/xdp_adjust_tail_kern.c
-> @@ -57,7 +57,8 @@ static __always_inline void swap_mac(void *data, struct=
- ethhdr *orig_eth)
->
->  static __always_inline __u16 csum_fold_helper(__u32 csum)
->  {
-> -       return ~((csum & 0xffff) + (csum >> 16));
-> +       csum +=3D (csum >> 16) | (csum << 16);
-> +       return ~(__sum16)(csum >> 16);
->  }
+On Sat, Sep 28, 2024 at 10:06:52PM +0200, Günther Noack wrote:
+> On Fri, Sep 27, 2024 at 11:48:22AM +0200, Günther Noack wrote:
+> > On Mon, Sep 23, 2024 at 03:57:47PM +0300, Mikhail Ivanov wrote:
+> > > (Btw I think that disassociation control can be really useful. If
+> > > it were possible to restrict this action for each protocol, we would
+> > > have stricter control over the protocols used.)
+> > 
+> > In my understanding, the disassociation support is closely intertwined with the
+> > transport layer - the last paragraph of DESCRIPTION in connect(2) is listing
+> > TCP, UDP and Unix Domain sockets in datagram mode. -- The relevant code in in
+> > net/ipv4/af_inet.c in inet_dgram_connect() and __inet_stream_connect(), where
+> > AF_UNSPEC is handled.
+> > 
+> > I would love to find a way to restrict this independent of the specific
+> > transport protocol as well.
+> > 
+> > Remark on the side - in af_inet.c in inet_shutdown(), I also found a worrying
+> > scenario where the same sk->sk_prot->disconnect() function is called and
+> > sock->state also gets reset to SS_UNCONNECTED.  I have done a naive attempt to
+> > hit that code path by calling shutdown() on a passive TCP socket, but was not
+> > able to reuse the socket for new connections afterwards. (Have not debugged it
+> > further though.)  I wonder whether this is a scnenario that we also need to
+> > cover?
+> 
+> FYI, **this does turn out to work** (I just fumbled in my first experiment). --
+> It is possible to reset a listening socket with shutdown() into a state where it
+> can be used for at least a new connect(2), and maybe also for new listen(2)s.
 
-progs/xdping_kern.c is doing it differently:
-static __always_inline __u16 csum_fold_helper(__wsum sum)
-{
-        sum =3D (sum & 0xffff) + (sum >> 16);
-        return ~((sum & 0xffff) + (sum >> 16));
-}
+Interesting syscall...
 
-Let's make it common.
+> 
+> The same might also be possible if a socket is in the TCP_SYN_SENT state at the
+> time of shutdown() (although that is a bit trickier to try out).
+> 
+> So a complete disassociation control for TCP/IP might not only need to have
+> LANDLOCK_ACCESS_SOCKET_CONNECT_UNSPEC (or however we'd call it), but also
+> LANDLOCK_ACCESS_SOCKET_PASSIVE_SHUTDOWN and maybe even another one for the
+> TCP_SYN_SENT case...? *
 
-pw-bot: cr
+That would make the Landlock interface too complex, we would need a more
+generic approach instead e.g. with a single flag.
+
+> 
+> It makes me uneasy to think that I only looked at AF_INET{,6} and TCP so far,
+> and that other protocols would need a similarly close look.  It will be
+> difficult to cover all the "disassociation" cases in all the different
+> protocols, and even more difficult to detect new ones when they pop up.  If we
+> discover new ones and they'd need new Landlock access rights, it would also
+> potentially mean that existing Landlock users would have to update their rules
+> to spell that out.
+> 
+> It might be easier after all to not rely on "disassociation" control too much
+> and instead to design the network-related access rights in a way so that we can
+> provide the desired sandboxing guarantees by restricting the "constructive"
+> operations (the ones that initiate new network connections or that listen on the
+> network).
+
+I agree.  So, with the ability to control socket creation and to also
+control listen/bind/connect (and sendmsg/recvmsg for datagram protocols)
+we should be good right?
+
+> 
+> Mikhail, in your email I am quoting above, you are saying that "disassociation
+> control can be really useful"; do you know of any cases where a restriction of
+> connect/listen is *not* enough and where you'd still want the disassociation
+> control?
+> 
+> (In my mind, the disassociation control would have mainly been needed if we had
+> gone with Mickaël's "Use socket's Landlock domain" RFC [1]?  Mickaël and me have
+> discussed this patch set at LSS and I am also now coming around to the
+> realization that this would have introduced more complication.  - It might have
+> been a more "pure" approach, but comes at the expense of complicating Landlock
+> usage.)
+
+Indeed, and this RFC will not be continued.  We should not think of a
+socket as a security object (i.e. a real capability), whereas sockets
+are kernel objects used to configure and exchange data, a bit like a
+command multiplexer for network actions that can also be used to
+identify peers.
+
+Because Landlock is a sandboxing mechanism, the security policy tied to
+a task may change during its execution, which is not the case for other
+access control systems such as SELinux.  That's why we should not
+blindly follow other security models.  In the case of socket control,
+Landlock uses the calling task's credential to check if the call should
+be allowed.  In the case of abstract UNIX socket control (with Linux
+5.12), the check is done on the domain that created the peer's socket,
+not the domain that will received the packet.  In this case Landlock can
+rely on the peer socket's domain because it is a consistent and
+race-free way to identify a peer, and this peer socket is not the one
+doing the action.  It's a bit different with non-UNIX sockets because
+peers may not be local to the system.
+
+> 
+> —Günther
+> 
+> [1] https://lore.kernel.org/all/20240719150618.197991-1-mic@digikod.net/
+> 
+> * for later reference, my reasoning in the code is: net/ipv4/af_inet.c
+>   implements the entry points for connect() and listen() at the address family
+>   layer.  Both operations require that the sock->state is SS_UNCONNECTED.  So
+>   the rest is going through the other occurrences of SS_UNCONNECTED in that same
+>   file to see if there are any places where the socket can get back into that
+>   state.  The places I found where it is set to that state are:
+>   
+>   1. inet_create (right after creation, expected)
+>   2. __inet_stream_connect in the AF_UNSPEC case (known issue)
+>   3. __inet_stream_connect in the case of a failed connect (expected)
+>   4. inet_shutdown in the case of TCP_LISTEN or TCP_SYN_SENT (mentioned above)
+> 
 
