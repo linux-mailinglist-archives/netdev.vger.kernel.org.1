@@ -1,145 +1,133 @@
-Return-Path: <netdev+bounces-130235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99FF29894C7
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 12:21:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49877989533
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 13:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F3F128215E
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 10:21:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04E01B21D1C
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BF11531D8;
-	Sun, 29 Sep 2024 10:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boEBA0Qb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398011386B4;
+	Sun, 29 Sep 2024 11:46:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail115-79.sinamail.sina.com.cn (mail115-79.sinamail.sina.com.cn [218.30.115.79])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1CA143C49;
-	Sun, 29 Sep 2024 10:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB91314BF86
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 11:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.79
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727605279; cv=none; b=CVeUo3vK5sUy3ui/UETlp+PQ8HHEF8rbjeCGFD9JcnJPsIl7qwMNYH7jYlK4G5cMQ1sVDbrDnan01PSvnXfUj2BVIayMIZfRnK46RofwVvtfxl4sOGCK3blcDFmOQpLlmvz3F+YM2hv5YDBu+Owz2pzGW0yzFXV1vrBNcpSng10=
+	t=1727610417; cv=none; b=adLOkONpFc0snDsmUxasRkUeG7AkRo+wUrRmCwKTN6MXtIJLbEhX4kDcadi4GvX9QCxpuEbIlck4C/W8hT7g+QdOEj1wKM+6aHbyfxrzeLMNplOsAokNunfRLeUhOUQ20PCpgByM96Gv9OFHDYp/5h7110rBqmg3HaUrSIdqMAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727605279; c=relaxed/simple;
-	bh=hPtnaW9AxYGdsgYJ++T1Vj846oduxLU672fnSDCjmQ0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=W/XF+Ti2vMdHT1T8qQHpXt/9F/yhgggQRjaKkGb84cp0S+ti7DaM5uwY1qOZVXbKNY3QDL+Ih3X6u1/HquVAL8T/Slsgd2EnLqqilFEpxVWlqKPPfzNBGscvTOYTKmRHSfrkM6Ylr/lcMhrAtNtzp/EJ+nI/MdmusECJ2BgseCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=boEBA0Qb; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6cb2e5d0104so26046926d6.3;
-        Sun, 29 Sep 2024 03:21:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727605277; x=1728210077; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NzDn66nvfxb/RF8p67v+9ji03REicd7HmvitNQOUA40=;
-        b=boEBA0QbBDKs/Sy8Ww93KwoPMppcpdk0OnANUrwWQF0JwXDw9CdF6rfVX3BrwoCd5f
-         wAS51r8goc8sKsE+tPZS8UTtrfFrfZzNNhlEmsmfQsx3lAd6wOv9SKm5PjDZgPLId+DP
-         PisN0ogiDkGuMwASY82TCSROJtiuUG7BlBPZIQ1QGiYM+4blUhLgnf40vjplROAjr0rT
-         RTQhJhkIn+kjMUg/tzq7QaXe2f1vxz3p29iT9juK57P9UILforLSL1rwA3OOGcmfroxf
-         Ylr2P0XE/ZcE0PuTQnwAglMlfEx/TAiDpIYp6VhlOZiAX64Pr5mVkZ1ugCkB+aKbl6M1
-         ONwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727605277; x=1728210077;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NzDn66nvfxb/RF8p67v+9ji03REicd7HmvitNQOUA40=;
-        b=MHAtSvvQEb7gTVbQ3fwcu9xGOqg0pZaupHe5m36PB1ayroOjSaEWQDityCh3Awa2hC
-         dkYHAG879Oau6gpA9OrpHORF13w5L9UkrSaCc/D5w6mKSGuFGirmWAQopo+Tq3T3e/lg
-         KmlW4DLhEPt1PlejWnpvRBtsnlsKvXSK5VYQRFppZud92HOJ7OWKrGEDeIk8OvE7pZbC
-         dZi38YHy++paJ4NHLaT3tR/YF/dP8AenYzoJHZ91QYdabcM0yBM12t2++3Y7xBZJY2HA
-         KQgXSDj21bx4Jw3xjpZboLWy2bq4nZwfHEIAUifeRKuGkP954KJTGK0Pg1gRe8ayjww3
-         Euzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcq/opxKLQ/nLOeiQIYeWGDwsMJEztYWDFd55Owij6JRy/XAswwvGOgmBXllPRys6h/fh4+ZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKSV/6fpVTshLVfEeTCHCcyvM31wP+u12aY0ZVK2Uyb/UNkZxJ
-	kll2d0sg+4+GYSJpzRkwNGSkYNXxLETRF9/npm04q5+0AUi08BU5
-X-Google-Smtp-Source: AGHT+IFemweOiq+ZasIJspHRQ1Hu7H7VreQRyNeGeOYAOiVgnv8JKeAclQ3KHlauwLndqKX4wMUiNA==
-X-Received: by 2002:a05:6214:5f0d:b0:6c5:3122:ffac with SMTP id 6a1803df08f44-6cb3b6497ccmr94720016d6.45.1727605276660;
-        Sun, 29 Sep 2024 03:21:16 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b5ff1basm28983886d6.12.2024.09.29.03.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Sep 2024 03:21:15 -0700 (PDT)
-Date: Sun, 29 Sep 2024 06:21:15 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Ido Schimmel <idosch@nvidia.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- stable@vger.kernel.org, 
- greearb@candelatech.com, 
- fw@strlen.de, 
- dsahern@kernel.org, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <66f92a1b7e5d0_13018c29434@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ZvkZ0Ex0k6_G6hNo@shredder.mtl.com>
-References: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
- <ZvkZ0Ex0k6_G6hNo@shredder.mtl.com>
-Subject: Re: [PATCH net] vrf: revert "vrf: Remove unnecessary RCU-bh critical
- section"
+	s=arc-20240116; t=1727610417; c=relaxed/simple;
+	bh=Lws+eowf/tzTNG6urWd/LBgP4Qy7OF+1BFqhhFUD5Rw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lrYJwv7kOZ4XdpJ1mHgGROA/7bquQAgwaLvBx2TPg0RnQra87iczqlRe2Rl5WXIkQvFB8Bwuzwran3tSjSM2lwB7y1qzhLywgHuTbbGgbBpb+82MYAq2sVvZ9BWceemtb8+2xA7anDnz5ZuLQg9cNCU4ujh5JhLMb0c/TTkzXm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.51.162])
+	by sina.com (10.185.250.22) with ESMTP
+	id 66F93E0200007CE5; Sun, 29 Sep 2024 19:46:13 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 8993327602666
+X-SMAIL-UIID: 58B3E161AA5F4C4E93B714895E90C0E3-20240929-194613-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Denis Kirjanov <dkirjanov@suse.de>,
+	syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>,
+	linux-kernel@vger.kernel.org,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+Date: Sun, 29 Sep 2024 19:46:01 +0800
+Message-Id: <20240929114601.1584-1-hdanton@sina.com>
+In-Reply-To: <20240928122112.1412-1-hdanton@sina.com>
+References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Ido Schimmel wrote:
-> On Sun, Sep 29, 2024 at 02:18:20AM -0400, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
+On Sat, 28 Sep 2024 20:21:12 +0800 Hillf Danton <hdanton@sina.com>
+> On Mon, 25 Mar 2024 14:08:36 +0100 Eric Dumazet <edumazet@google.com>
+> > On Mon, Mar 25, 2024 at 1:10 PM Denis Kirjanov <dkirjanov@suse.de> wrote:
+> > >
+> > > Hmm, report says that we have a net_device freed even that we have a dev_hold()
+> > > before __ethtool_get_link_ksettings()
 > > 
-> > This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+> > dev_hold(dev) might be done too late, the device is already being dismantled.
 > > 
-> > dev_queue_xmit_nit is expected to be called with BH disabled.
-> > __dev_queue_xmit has the following:
+> > ib_device_get_netdev() should probably be done under RTNL locking,
+> > otherwise the final part is racy :
 > > 
-> >         /* Disable soft irqs for various locks below. Also
-> >          * stops preemption for RCU.
-> >          */
-> >         rcu_read_lock_bh();
-> > 
-> > VRF must follow this invariant. The referenced commit removed this
-> > protection. Which triggered a lockdep warning:
+> > if (res && res->reg_state != NETREG_REGISTERED) {
+> >      dev_put(res);
+> >      return NULL;
+> > }
 > 
-> [...]
+> Given paranoia in netdev_run_todo(),
 > 
-> > 
-> > Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
-> > Link: https://lore.kernel.org/netdev/20240925185216.1990381-1-greearb@candelatech.com/
-> > Reported-by: Ben Greear <greearb@candelatech.com>
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > Cc: stable@vger.kernel.org
+> 		/* paranoia */
+> 		BUG_ON(netdev_refcnt_read(dev) != 1);
 > 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Tested-by: Ido Schimmel <idosch@nvidia.com>
+> the claim that dev_hold(dev) might be done too late could not explain
+> the success of checking NETREG_REGISTERED, because of checking 
+> NETREG_UNREGISTERING after rcu barrier.
 > 
-> Thanks Willem!
+> 	/* Wait for rcu callbacks to finish before next phase */
+> 	if (!list_empty(&list))
+> 		rcu_barrier();
+> 
+> 	list_for_each_entry_safe(dev, tmp, &list, todo_list) {
+> 		if (unlikely(dev->reg_state != NETREG_UNREGISTERING)) {
+> 			netdev_WARN(dev, "run_todo but not unregistering\n");
+> 			list_del(&dev->todo_list);
+> 			continue;
+> 		}
+> 
+As simply bumping kref up could survive the syzbot reproducer [1], Eric's reclaim
+is incorrect.
 
-Thanks for testing immediately and sharing the below context, Ido!
+--- l/drivers/infiniband/core/verbs.c
++++ v/drivers/infiniband/core/verbs.c
+@@ -1979,6 +1979,7 @@ int ib_get_eth_speed(struct ib_device *d
+ 	netdev = ib_device_get_netdev(dev, port_num);
+ 	if (!netdev)
+ 		return -ENODEV;
++	dev_hold(netdev);
+ 
+ 	rtnl_lock();
+ 	rc = __ethtool_get_link_ksettings(netdev, &lksettings);
+@@ -1995,6 +1996,7 @@ int ib_get_eth_speed(struct ib_device *d
+ 				netdev->name, netdev_speed);
+ 	}
+ 
++	dev_put(netdev);
+ 	ib_get_width_and_speed(netdev_speed, lksettings.lanes,
+ 			       speed, width);
+ 
+--
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-> The reason my script from 504fc6f4f7f6 did not trigger the problem is
-> that it was pinging the address inside the VRF, so vrf_finish_direct()
-> was only called from the Rx path.
-> 
-> If you ping the address outside of the VRF:
-> 
-> ping -I vrf1 -i 0.1 -c 10 -q 192.0.2.1
-> 
-> Then vrf_finish_direct() is called from process context and the lockdep
-> warning is triggered. Tested that it does not trigger after applying the
-> revert.
+Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
+Tested-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
 
+[1] https://lore.kernel.org/lkml/66f9372f.050a0220.aab67.001a.GAE@google.com/
 
