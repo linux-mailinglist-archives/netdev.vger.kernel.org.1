@@ -1,102 +1,158 @@
-Return-Path: <netdev+bounces-130209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8874D9892B6
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:37:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A4B9892C3
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D310281C58
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 02:37:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F08128503A
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 02:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A9C918643;
-	Sun, 29 Sep 2024 02:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDF918EB0;
+	Sun, 29 Sep 2024 02:45:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from unicom145.biz-email.net (unicom145.biz-email.net [210.51.26.145])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343A117580;
-	Sun, 29 Sep 2024 02:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.26.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16D21CAA4;
+	Sun, 29 Sep 2024 02:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727577461; cv=none; b=gmOnCSE4WUBae3MdhAb3HSEvysduYalJUTaRAPhG71YH4fd7xPT25fEXUAkBkJlIdzECK7FsnZ8nl1xdfBJONXrV8iZT4K7zSY9mWfZVYf+5wnAcIMRgmEqyT3ECoGUsNTPxh6sxBvPAuDNOHI0MT/xjGFrg8qs8eiDmQm+FEwY=
+	t=1727577905; cv=none; b=m9Q1B8smutbJHruLhOY21nIvSV0qTfsGFZhbKvBd65bybPTW0GuSL0FPowuuSts7C0J/LJ/x80lQ7ZJLvW4sJX2ILXrAiofXSyQsUdEPxKWJiu5yLk7n1jv4Olm0beMHa5riHNxBYdj5qKgZKf0yfxWBVr6MdQ4mXqI/FPunhc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727577461; c=relaxed/simple;
-	bh=BC5G+eTcM5dQ2qI4tRZTbc6C1HLgSCR8KsMitCrqfnM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=roerI+y9M53azF7Wc4vvVEZahClGaoEun00OG88hD53kqf/Q1nxGkldWxrmaAwpCmyC/GyYOxb/j5T3WM4bKaPvsDkT9PdzYcuVNLnXXaaWwuvw70Pv/SAsjMXqpw77SeyxSzzBrcdmFVc82NEbwsSjGgR87N2ew2clWyAl7H6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.26.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from unicom145.biz-email.net
-        by unicom145.biz-email.net ((D)) with ASMTP (SSL) id ZBO00025;
-        Sun, 29 Sep 2024 10:37:25 +0800
-Received: from jtjnmail201607.home.langchao.com (10.100.2.7) by
- jtjnmail201623.home.langchao.com (10.100.2.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sun, 29 Sep 2024 10:37:24 +0800
-Received: from localhost.localdomain (10.94.12.73) by
- jtjnmail201607.home.langchao.com (10.100.2.7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sun, 29 Sep 2024 10:37:24 +0800
-From: Charles Han <hanchunchao@inspur.com>
-To: <m.grzeschik@pengutronix.de>, <davem@davemloft.net>
-CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Charles Han
-	<hanchunchao@inspur.com>
-Subject: [PATCH] arcnet: com20020-pci: Add check devm_kasprintf() returned value
-Date: Sun, 29 Sep 2024 10:37:21 +0800
-Message-ID: <20240929023721.17338-1-hanchunchao@inspur.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1727577905; c=relaxed/simple;
+	bh=FiYG/fkLGxsbz6lmYbBjKleWZNMsSfiS+c65d3bFVCU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=dx1aYe5ieB6KYuk3IQUcNfqZq/tJ6fFH8HiqladNaqSs6A0E2GvZi4AzQTtCx3ARcieDEuxKmncZeCUPUbjPw58wHCVoUKZm4NkWQYoxSge6h9nI1F34+jwQ3unxLazAjsOm2WP1Um2Fbnj83GhMnXCaquQTvge+j1bxdPMTAWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XGT571jzCzfbjm;
+	Sun, 29 Sep 2024 10:42:35 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 219E918007C;
+	Sun, 29 Sep 2024 10:44:54 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 29 Sep 2024 10:44:53 +0800
+Message-ID: <ac2eec69-8f44-4adb-8182-02c78625851d@huawei.com>
+Date: Sun, 29 Sep 2024 10:44:53 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Jtjnmail201615.home.langchao.com (10.100.2.15) To
- jtjnmail201607.home.langchao.com (10.100.2.7)
-tUid: 2024929103725add1256462f350b8bb3094b565fe72b7
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: Mina Almasry <almasrymina@google.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Robin Murphy
+	<robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, IOMMU
+	<iommu@lists.linux.dev>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet
+	<edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek
+ Kitszel <przemyslaw.kitszel@intel.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle Valo
+	<kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew
+ Morton <akpm@linux-foundation.org>, <imx@lists.linux.dev>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-mm@kvack.org>
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-3-linyunsheng@huawei.com>
+ <CAHS8izOxugzWJDTc-4CWqaKABTj=J4OHs=Lcb=SE9r8gX0J+yg@mail.gmail.com>
+ <842c8cc6-f716-437a-bc98-70bc26d6fd38@huawei.com>
+ <CAC_iWjLgNOtsbhqrhvvEz2C3S668qB8KatL_W+tPHMSkDrNS=w@mail.gmail.com>
+ <0ef315df-e8e9-41e8-9ba8-dcb69492c616@huawei.com>
+ <CAC_iWjKeajwn3otjdEekE6VDLHGEvqmnQRwpN5R3yHj8UpEiDw@mail.gmail.com>
+ <934d601f-be43-4e04-b126-dc86890a4bfa@huawei.com>
+ <CAC_iWjL7m4ZL2W2OZM5F22dLvZhxU6fyCXV_xjyGf+W7UP43EQ@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAC_iWjL7m4ZL2W2OZM5F22dLvZhxU6fyCXV_xjyGf+W7UP43EQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-devm_kasprintf() can return a NULL pointer on failure but this
-returned value in com20020pci_probe() is not checked.
+On 2024/9/28 15:34, Ilias Apalodimas wrote:
 
-Fixes: 8890624a4e8c ("arcnet: com20020-pci: add led trigger support")
-Signed-off-by: Charles Han <hanchunchao@inspur.com>
----
- drivers/net/arcnet/com20020-pci.c | 5 +++++
- 1 file changed, 5 insertions(+)
+...
 
-diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-index c5e571ec94c9..6639ee11a7f8 100644
---- a/drivers/net/arcnet/com20020-pci.c
-+++ b/drivers/net/arcnet/com20020-pci.c
-@@ -254,6 +254,8 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 			card->tx_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
- 							"pci:green:tx:%d-%d",
- 							dev->dev_id, i);
-+			if (!card->tx_led.default_trigger || !card->tx_led.name)
-+				return -ENOMEM;
- 
- 			card->tx_led.dev = &dev->dev;
- 			card->recon_led.brightness_set = led_recon_set;
-@@ -263,6 +265,9 @@ static int com20020pci_probe(struct pci_dev *pdev,
- 			card->recon_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
- 							"pci:red:recon:%d-%d",
- 							dev->dev_id, i);
-+			if (!card->recon_led.default_trigger || !card->recon_led.name)
-+				return -ENOMEM;
-+
- 			card->recon_led.dev = &dev->dev;
- 
- 			ret = devm_led_classdev_register(&pdev->dev, &card->tx_led);
--- 
-2.31.1
+> 
+> Yes, that wasn't very clear indeed, apologies for any confusion. I was
+> trying to ask on a linked list that only lives in struct page_pool.
+> But I now realize this was a bad idea since the lookup would be way
+> slower.
+> 
+>> If I understand question correctly, the single/doubly linked list
+>> is more costly than array as the page_pool case as my understanding.
+>>
+>> For single linked list, it doesn't allow deleting a specific entry but
+>> only support deleting the first entry and all the entries. It does support
+>> lockless operation using llist, but have limitation as below:
+>> https://elixir.bootlin.com/linux/v6.7-rc8/source/include/linux/llist.h#L13
+>>
+>> For doubly linked list, it needs two pointer to support deleting a specific
+>> entry and it does not support lockless operation.
+> 
+> I didn't look at the patch too carefully at first. Looking a bit
+> closer now, the array is indeed better, since the lookup is faster.
+> You just need the stored index in struct page to find the page we need
+> to unmap. Do you remember if we can reduce the atomic pp_ref_count to
+> 32bits? If so we can reuse that space for the index. Looking at it
 
+For 64 bits system, yes, we can reuse that.
+But for 32 bits system, we may have only 16 bits for each of them, and it
+seems that there is no atomic operation for variable that is less than 32
+bits.
+
+> requires a bit more work in netmem, but that's mostly swapping all the
+> atomic64 calls to atomic ones.
+> 
+>>
+>> For pool->items, as the alloc side is protected by NAPI context, and the
+>> free side use item->pp_idx to ensure there is only one producer for each
+>> item, which means for each item in pool->items, there is only one consumer
+>> and one producer, which seems much like the case when the page is not
+>> recyclable in __page_pool_put_page, we don't need a lock protection when
+>> calling page_pool_return_page(), the 'struct page' is also one consumer
+>> and one producer as the pool->items[item->pp_idx] does:
+>> https://elixir.bootlin.com/linux/v6.7-rc8/source/net/core/page_pool.c#L645
+>>
+>> We only need a lock protection when page_pool_destroy() is called to
+>> check if there is inflight page to be unmapped as a consumer, and the
+>> __page_pool_put_page() may also called to unmapped the inflight page as
+>> another consumer,
+> 
+> Thanks for the explanation. On the locking side, page_pool_destroy is
+> called once from the driver and then it's either the workqueue for
+> inflight packets or an SKB that got freed and tried to recycle right?
+> But do we still need to do all the unmapping etc from the delayed
+> work? Since the new function will unmap all packets in
+> page_pool_destroy, we can just skip unmapping when the delayed work
+> runs
+
+Yes, the pool->dma_map is clear in page_pool_item_uninit() after it does
+the unmapping for all inflight pages with the protection of pool->destroy_lock,
+so that the unmapping is skipped in page_pool_return_page() when those inflight
+pages are returned back to page_pool.
+
+> 
 
