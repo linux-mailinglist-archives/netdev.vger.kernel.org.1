@@ -1,137 +1,249 @@
-Return-Path: <netdev+bounces-130243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D12DB989657
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 18:56:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0BFF98965B
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E18941C211AE
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 16:56:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 459161F21FBC
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 17:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DA417E019;
-	Sun, 29 Sep 2024 16:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB8917C22A;
+	Sun, 29 Sep 2024 17:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvxRlCpN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GlXDCSCe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6EEF79FD
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 16:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C39156F33
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 17:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727628981; cv=none; b=tQXVXzLaQtD4V3B2qQM5TxSPoObIYQa/tGWlomBxhq80e4ej7BxyxoI9Pi4z9KnB0jkRTGLw6R6gIZMdxK5bDRdz2krjpRRy3U7kwrLiFH1Wi9ZwSbEBcC6H8WgNF/Gfvzx8+N0Eq/GQadw1doLKWDMWsZlQNSQooupjT0NBQCY=
+	t=1727629350; cv=none; b=r9RWaOPfpsp1INe/AdhKCJwWRQFr0ZggxALltSFB6+e8nzaQybMZW8AS8kqLR3TkMCSOc+nEBHclnasP1epzVDAhFZLHosT09KRoXEuX9WOps0s/obrKbu9sW7X65w2Nlt5yKEMiDoW4zm2MtBbImjjKUEsw/JfVm4lRWRoiS/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727628981; c=relaxed/simple;
-	bh=OuNHc8PIGaHQxuUXtKbA+OFDsOJlQHplpqTyjl6z6CQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VR4poFSkdoQaHR01TnV49cyfUKYbENht2K9UOwVH6Fm1injqooFMFTg0yMVZDDFb7yjBN1wsSZ02kUvNBR2OmkI2QTfB9wLtTQFhmTfb3cVK2tT2PIw9l2yf94XM/3v5oxsYAh3bwL5JAnjwQkjmLR6P7E5Hld19VfxG9cRcQ/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvxRlCpN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727628977;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kqpozjXyhnvHlQRJu2I4WgyAmmMM5tqK0NqWHw3trQE=;
-	b=gvxRlCpNpVZ/2muNJIXrtsPCkMWrzb0f30fzbR6/QAs9BVlLOBxh6MB9msoNcLkA6O5FEl
-	acTAM6+5T9oTtivrfqQ6frPcHqzAORtKbbsOXF6zLFEjZxMA0PDbQeHLj0bWIsW0GCpn+U
-	htMEbr3JngO63MMUVAJ+le02n3f2AoM=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-doUQnSjBMOqorRBNdJdMpw-1; Sun, 29 Sep 2024 12:56:16 -0400
-X-MC-Unique: doUQnSjBMOqorRBNdJdMpw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a8ff95023b6so291967166b.3
-        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 09:56:16 -0700 (PDT)
+	s=arc-20240116; t=1727629350; c=relaxed/simple;
+	bh=WDCBKsTHjp/NHJDHJqjkOEXRzEWg6l9ME3B2bbxpytA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NAmHTHbDVA6BAtpvEmGh7e5WlY6ZIC8fDzoEprJ0PaQBRL8JuyMBNZRSia0CfLbPFFaiQUyguLnpLnDhk15V09FG0vdfPb04+KIjFLE8RyA97pUnol+ok8biLbukJ1y8gXXMYZsczzzJY6HASv0/7Xzy2YAK8He8Up4S4XwjWN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GlXDCSCe; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02fff66a83so5491530276.0
+        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 10:02:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727629348; x=1728234148; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RkT0NKS4Ufiuoo5uZ02wVyiBMA1288PpHUseO+PJhjU=;
+        b=GlXDCSCeL9EZaVDX60XXzA6tm56jN8REE9SgTenEvthEIgYQfAK8lSiCKv2QlUTiRf
+         GrtiF2vXvfoVys2PPcXZIHcO8vrZ3tryVn5J0jgFodzSWqZp8I/CaV1RAUpiC6rGUqQp
+         0nr4yDfRDqWlGGh2lCpRTqTx8HickTTuXGOUZvp0c3Ss7uXCtQdJdFNI5+DCRngRDAPy
+         VoZNCepesmamFvMZVYVxdIs2JrG+oB+7YhMPr3T0EGw4SbbKFsBMCfizkOQvpPiL7Xtv
+         tiTMHUu9MppsBWaOBps525fJUE4fgAA0uzi37i+fc4jhBYm9ziGggb8/SdYWq96WORu9
+         V/nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727628975; x=1728233775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kqpozjXyhnvHlQRJu2I4WgyAmmMM5tqK0NqWHw3trQE=;
-        b=lP1U/pYLtMUFYBLrGudtlJidxuR6WjJXAiMnZDbb9plcwifIgBpyBA8RqXzpP1S6CJ
-         4duxgEBOrlTvBQysJEMJck+KGctfbLZZjsZfjAST9l4hX3t+7252icprjrwnX5XYhsYP
-         /aUOlx6UsXxbSid8ZMXQVaRkWcq/fC5Mjbok5dlRVo9zLKRoAOtMV0be3qidEAtRvy09
-         Tanb1T919Z6/sNKVMc5WtasjnAVnnFcl1dzqeu8W8XSQgbZ6qxQNk+24bKLFzScOZsIg
-         pmpGfbuGFRVjETAhNVTI7L+XWr9O4Bk8ihYW/b1/8RQ2NGnqlje9VnUdTzi6Lga4Kt6j
-         4Yqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXKQJzaqwSQQBpGFpuAuSLIlIdGmW8ceqESFfGULEg37TrfIz/dKCzIqjZBsFL0oAUYpJhF1bw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4hMuSOW3a6TOxa11HLK0s3k8XluoXH4kDL5qWPvBVLyw1TliJ
-	idRnb4BofkSNtJ4KZjq/QcrPbzTkcXAskZbFd0wb2QZPxotB4EF5mkYPDy4+8wT6alk1x4fSG9D
-	zGiQFVzqxNQIGfZhCLD2skzbMFAPeSRel0dHefubbqhtp837ZCFNDxg==
-X-Received: by 2002:a17:907:3eaa:b0:a8a:9054:8391 with SMTP id a640c23a62f3a-a93c48f8884mr1026229066b.5.1727628975220;
-        Sun, 29 Sep 2024 09:56:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBabYhMMakXtMQtZ10IYuTuTjIcGwfv1lKDLcZNtfQ8gg556HasAqswG+Wg0TAOWoqjInzRQ==
-X-Received: by 2002:a17:907:3eaa:b0:a8a:9054:8391 with SMTP id a640c23a62f3a-a93c48f8884mr1026226866b.5.1727628974679;
-        Sun, 29 Sep 2024 09:56:14 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:17b:822e:847c:4023:a734:1389])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c2775995sm398955366b.41.2024.09.29.09.56.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Sep 2024 09:56:13 -0700 (PDT)
-Date: Sun, 29 Sep 2024 12:56:09 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost/vsock: specify module version
-Message-ID: <20240929125245-mutt-send-email-mst@kernel.org>
-References: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
+        d=1e100.net; s=20230601; t=1727629348; x=1728234148;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RkT0NKS4Ufiuoo5uZ02wVyiBMA1288PpHUseO+PJhjU=;
+        b=EqTxzUp57pDklR/wGLpcUezF5X99W5n0epWwj7VK3Gj0GnfeIVPNzkzojjYQzvSDke
+         CbwmnNdd2PFG82fJGCWl393rVGeweELHH9my1hKZeiAF+CdHvBbIp+5lDNY2Jc1Kk3ZG
+         8fA4K4N1gU+A/Bl4rbfR18YInlI/xHl/SIwhW8IU6oA7o9ZBrnRBVq8RcbeMX/4zSDas
+         5eX6ZeWVjwJR9U/PJQZxl5coxDhTKAOjXMY4+YrRHHsbS9Ycf7veR3oCtK4kH+s00ksO
+         jpSdlNjdHlilTFMI5HBCORCE55NswIm/8H2WARBRYHuABPfi/2aS76kdL08uiyryykc8
+         zdNg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4iElg08Xz7av/foTphD5qDhrwfejdcnCOdlG5PNnbjwdLrZ9VMwUHH+jXJ0bo8cEj28f4saE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG+e4Zu/Wls7EzwYaogg78cC4713pxQkkOTcJ814fsy9YO0gcw
+	P5DoxLyJNxLF5HOsCs9gn3MGmyCG3fgWEU4ae5N2UCf3MOQgTG2w4vjn9xDcGGdHvFkSSwjqmQ=
+	=
+X-Google-Smtp-Source: AGHT+IEvP3/T6gZjub63r0EOa02Spj51ZwcQya0k90XDKjGRzN6mR0VBe3+AMfLmQiv05cITdeBe1vcYbg==
+X-Received: from jrife-kvm.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:63c1])
+ (user=jrife job=sendgmr) by 2002:a25:ace6:0:b0:e16:6e0a:bb0b with SMTP id
+ 3f1490d57ef6-e26049562f0mr8295276.0.1727629347546; Sun, 29 Sep 2024 10:02:27
+ -0700 (PDT)
+Date: Sun, 29 Sep 2024 17:02:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240926161641.189193-1-aleksandr.mikhalitsyn@canonical.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
+Message-ID: <20240929170219.1881536-1-jrife@google.com>
+Subject: [PATCH v1] bpf: Prevent infinite loops with bpf_redirect_peer
+From: Jordan Rife <jrife@google.com>
+To: bpf@vger.kernel.org
+Cc: Jordan Rife <jrife@google.com>, netdev@vger.kernel.org, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Kui-Feng Lee <thinker.li@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Sep 26, 2024 at 06:16:40PM +0200, Alexander Mikhalitsyn wrote:
-> Add an explicit MODULE_VERSION("0.0.1") specification
-> for a vhost_vsock module. It is useful because it allows
-> userspace to check if vhost_vsock is there when it is
-> configured as a built-in.
-> 
-> Without this change, there is no /sys/module/vhost_vsock directory.
-> 
-> With this change:
-> $ ls -la /sys/module/vhost_vsock/
-> total 0
-> drwxr-xr-x   2 root root    0 Sep 26 15:59 .
-> drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
-> --w-------   1 root root 4096 Sep 26 15:59 uevent
-> -r--r--r--   1 root root 4096 Sep 26 15:59 version
-> 
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+It is possible to create cycles using bpf_redirect_peer which lead to an
+an infinite loop inside __netif_receive_skb_core. The simplest way to
+illustrate this is by attaching a TC program to the ingress hook on both
+sides of a veth or netkit device pair which redirects to its own peer,
+although other cycles are possible. This patch places an upper limit on
+the number of iterations allowed inside __netif_receive_skb_core to
+prevent this.
 
+Signed-off-by: Jordan Rife <jrife@google.com>
+Fixes: 9aa1206e8f48 ("bpf: Add redirect_peer helper")
+Cc: stable@vger.kernel.org
+---
+ net/core/dev.c                                | 11 +++-
+ net/core/dev.h                                |  1 +
+ .../selftests/bpf/prog_tests/tc_redirect.c    | 51 +++++++++++++++++++
+ .../selftests/bpf/progs/test_tc_peer.c        | 13 +++++
+ 4 files changed, 75 insertions(+), 1 deletion(-)
 
-Why not check that the misc device is registered?
-I'd rather not add a new UAPI until actually necessary.
-
-> ---
->  drivers/vhost/vsock.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 802153e23073..287ea8e480b5 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
->  
->  module_init(vhost_vsock_init);
->  module_exit(vhost_vsock_exit);
-> +MODULE_VERSION("0.0.1");
->  MODULE_LICENSE("GPL v2");
->  MODULE_AUTHOR("Asias He");
->  MODULE_DESCRIPTION("vhost transport for vsock ");
-> -- 
-> 2.34.1
+diff --git a/net/core/dev.c b/net/core/dev.c
+index cd479f5f22f6..753f8d27f47c 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -5455,6 +5455,7 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 	struct net_device *orig_dev;
+ 	bool deliver_exact = false;
+ 	int ret = NET_RX_DROP;
++	int loops = 0;
+ 	__be16 type;
+ 
+ 	net_timestamp_check(!READ_ONCE(net_hotdata.tstamp_prequeue), skb);
+@@ -5521,8 +5522,16 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+ 		nf_skip_egress(skb, true);
+ 		skb = sch_handle_ingress(skb, &pt_prev, &ret, orig_dev,
+ 					 &another);
+-		if (another)
++		if (another) {
++			loops++;
++			if (unlikely(loops == RX_LOOP_LIMIT)) {
++				ret = NET_RX_DROP;
++				net_crit_ratelimited("bpf: loop limit reached on datapath, buggy bpf program?\n");
++				goto out;
++			}
++
+ 			goto another_round;
++		}
+ 		if (!skb)
+ 			goto out;
+ 
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 5654325c5b71..28d1cf2f9069 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -150,6 +150,7 @@ struct napi_struct *napi_by_id(unsigned int napi_id);
+ void kick_defer_list_purge(struct softnet_data *sd, unsigned int cpu);
+ 
+ #define XMIT_RECURSION_LIMIT	8
++#define RX_LOOP_LIMIT	        8
+ 
+ #ifndef CONFIG_PREEMPT_RT
+ static inline bool dev_xmit_recursion(void)
+diff --git a/tools/testing/selftests/bpf/prog_tests/tc_redirect.c b/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
+index c85798966aec..db1b36090d6c 100644
+--- a/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
++++ b/tools/testing/selftests/bpf/prog_tests/tc_redirect.c
+@@ -1081,6 +1081,55 @@ static void test_tc_redirect_peer(struct netns_setup_result *setup_result)
+ 	close_netns(nstoken);
+ }
+ 
++static void test_tc_redirect_peer_loop(struct netns_setup_result *setup_result)
++{
++	LIBBPF_OPTS(bpf_tc_hook, qdisc_src_fwd);
++	LIBBPF_OPTS(bpf_tc_hook, qdisc_src);
++	struct test_tc_peer *skel;
++	struct nstoken *nstoken;
++	int err;
++
++	/* Set up an infinite redirect loop using bpf_redirect_peer with ingress
++	 * hooks on either side of a veth/netkit pair redirecting to its own
++	 * peer. This should not lock up the kernel.
++	 */
++	nstoken = open_netns(NS_SRC);
++	if (!ASSERT_OK_PTR(nstoken, "setns src"))
++		return;
++
++	skel = test_tc_peer__open();
++	if (!ASSERT_OK_PTR(skel, "test_tc_peer__open"))
++		goto done;
++
++	skel->rodata->IFINDEX_SRC = setup_result->ifindex_src;
++	skel->rodata->IFINDEX_SRC_FWD = setup_result->ifindex_src_fwd;
++
++	err = test_tc_peer__load(skel);
++	if (!ASSERT_OK(err, "test_tc_peer__load"))
++		goto done;
++
++	QDISC_CLSACT_CREATE(&qdisc_src, setup_result->ifindex_src);
++	XGRESS_FILTER_ADD(&qdisc_src, BPF_TC_INGRESS, skel->progs.tc_src_self, 0);
++	close_netns(nstoken);
++
++	nstoken = open_netns(NS_FWD);
++	if (!ASSERT_OK_PTR(nstoken, "setns fwd"))
++		return;
++	QDISC_CLSACT_CREATE(&qdisc_src_fwd, setup_result->ifindex_src_fwd);
++	XGRESS_FILTER_ADD(&qdisc_src_fwd, BPF_TC_INGRESS, skel->progs.tc_src_fwd_self, 0);
++
++	if (!ASSERT_OK(set_forwarding(false), "disable forwarding"))
++		goto done;
++
++	SYS_NOFAIL("ip netns exec " NS_SRC " %s -c 1 -W 1 -q %s > /dev/null",
++		   ping_command(AF_INET), IP4_DST);
++fail:
++done:
++	if (skel)
++		test_tc_peer__destroy(skel);
++	close_netns(nstoken);
++}
++
+ static int tun_open(char *name)
+ {
+ 	struct ifreq ifr;
+@@ -1280,6 +1329,8 @@ static void *test_tc_redirect_run_tests(void *arg)
+ 	RUN_TEST(tc_redirect_peer, MODE_VETH);
+ 	RUN_TEST(tc_redirect_peer, MODE_NETKIT);
+ 	RUN_TEST(tc_redirect_peer_l3, MODE_VETH);
++	RUN_TEST(tc_redirect_peer_loop, MODE_VETH);
++	RUN_TEST(tc_redirect_peer_loop, MODE_NETKIT);
+ 	RUN_TEST(tc_redirect_peer_l3, MODE_NETKIT);
+ 	RUN_TEST(tc_redirect_neigh, MODE_VETH);
+ 	RUN_TEST(tc_redirect_neigh_fib, MODE_VETH);
+diff --git a/tools/testing/selftests/bpf/progs/test_tc_peer.c b/tools/testing/selftests/bpf/progs/test_tc_peer.c
+index 365eacb5dc34..9b8a00ccad42 100644
+--- a/tools/testing/selftests/bpf/progs/test_tc_peer.c
++++ b/tools/testing/selftests/bpf/progs/test_tc_peer.c
+@@ -10,6 +10,7 @@
+ 
+ #include <bpf/bpf_helpers.h>
+ 
++volatile const __u32 IFINDEX_SRC_FWD;
+ volatile const __u32 IFINDEX_SRC;
+ volatile const __u32 IFINDEX_DST;
+ 
+@@ -34,6 +35,18 @@ int tc_src(struct __sk_buff *skb)
+ 	return bpf_redirect_peer(IFINDEX_DST, 0);
+ }
+ 
++SEC("tc")
++int tc_src_self(struct __sk_buff *skb)
++{
++	return bpf_redirect_peer(IFINDEX_SRC, 0);
++}
++
++SEC("tc")
++int tc_src_fwd_self(struct __sk_buff *skb)
++{
++	return bpf_redirect_peer(IFINDEX_SRC_FWD, 0);
++}
++
+ SEC("tc")
+ int tc_dst_l3(struct __sk_buff *skb)
+ {
+-- 
+2.46.1.824.gd892dcdcdd-goog
 
 
