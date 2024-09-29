@@ -1,174 +1,180 @@
-Return-Path: <netdev+bounces-130217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D07D989341
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 08:18:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BE9A98935D
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070431F2387D
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 06:18:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4EAF1C21D12
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 07:10:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1ACB3FB3B;
-	Sun, 29 Sep 2024 06:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED7F13A878;
+	Sun, 29 Sep 2024 07:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WuhkQd4P"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="lH5SQ1u3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF57B65C;
-	Sun, 29 Sep 2024 06:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6F357DA6F
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 07:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727590726; cv=none; b=aQDJOr2Ry21TTr1EqEcSLCWCCuRY+W6F25nsyELgxfXV0IDMIXMyz8vYFJsK3JjVi8M8fCjTmwtA1GxdKQh2SxEA/9QjoJluoFLP80sfuy7FdqoCd+wgx+/jIWhCPBtzMr+Q6fS9TYeY+EldGCvDAa+sfJzBq/Oa3FRGd3wWGO8=
+	t=1727593855; cv=none; b=gtwNUYFZo5QLjqDaVWYqebG0PxDSLbq/nkAeYVicYkCXuVL2lFH46pSTL4VjSnJoYNhMsPa82uT/ufNorDgLHWcs15oWsnUJMGrWooh+1beWUASWYRs7cijZ6jtCpS8mgZZty1wzHv8mJSSRuTzfu2+HeDw+OdQHKPhkLwNP5vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727590726; c=relaxed/simple;
-	bh=xO6ysQFEQSU8GQuLwhaYGu4B1cQcmCxn8wOY7WiKZVM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G2b0/GgOipsynXIr3vy30Q7uDGfsiZBKUcCnSYNp5AvWcPdsBQRxoUCmNA5pEYezs+6Rd1dcVZoMdzOr/ljUjueJ8ZWtM5NpcA/Wcb7VkobdpAHjqwv+ufc0AcT571hU8eVqt0Z4XSdqygMXvsOJWbIvcg1jZX+l5IL3cWo2ZF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WuhkQd4P; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6cb2458774dso25084026d6.3;
-        Sat, 28 Sep 2024 23:18:44 -0700 (PDT)
+	s=arc-20240116; t=1727593855; c=relaxed/simple;
+	bh=n4Jy/g4Eh6+BSVVGvl01aw6en9RlnVRu3g0HXU8COnc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NIr376RyrNa832FHw3vGdRQINjAA7+mdY5/SgWVD92fb8Rcf5yi0c89sbzD6CWxWQow/Xqc1wQTGOKcnhfzIBY5iiRqHand0asK4DJhvvFZtr7V+nRmn6acYqjaS7qbVnVk0E0dXs2MLwnLl1fmKf5oHLzovSfG2kL+a2T1kRKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=lH5SQ1u3; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7d50e7a3652so2288084a12.3
+        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 00:10:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727590724; x=1728195524; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q6prHHvVXufFaX5cL74jbezatyZL1UkIMWvI9U1k34I=;
-        b=WuhkQd4P507+Nx3OCqRnuWeaTNQ96y5dXK4d0jQwGVGtB+yh6dFo1J5PaQz+RM/3Fq
-         9uycxwm6VDPoHXbRZVYgob19eqTLoEbJ9P8wuUV3IZgv0rcEsJF/yHtOgMcp7FRb40jD
-         QJUtYjxBKJR+P3hjeAes1RHgUX4QCQgUgqpr7VqzyjAV4xyXckEIsyBR+5B2N7YXxc5e
-         7UJHY+wCDj3e/7kAjZUrMc9ne+pi5ITamSS7p9K3KNaumQy5x9rS7S26AabURvSMGobt
-         0Moz4zySoP2RgoM8Q8JpXYcOAR4L2dR63kP6akrC2oVV5E2RudNmcZkmEKqZEfeWl7EB
-         LSbg==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727593853; x=1728198653; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wupXfiTFRgbbCCMXc+w3GmGZhuh2PGEq/8NKT31sCcc=;
+        b=lH5SQ1u3H+QhpHmcIbUuQdBBmCtOCKG3bZbvt+aUo4LUny7tHnubZu1hhHoIgmJzI6
+         6SUWkb3PtRXZ/UsqDhMgT6kgMNUBhq6jZYS7ks+cQuIyXZgMzpN+W1ONEyfIHHK/eqVT
+         F10TO1N3TXHgnts3vk3vFsJkUR8++cvRCRg3De7U6E8cru3qlL+wORqJX4BBd+KcCgwj
+         2SEQCTz3+SECmvUfQA2LWVFuOUhiy4DGFAl0XbSNVU4lABaoWfsz1wQ/arEMTfvRfNdk
+         flOOasikzJXONwTtskHjfXnQxDPSxP3vAyIuz2ldv35mSLsuXr+H3iCxGejFD8ymlqVe
+         4H6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727590724; x=1728195524;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q6prHHvVXufFaX5cL74jbezatyZL1UkIMWvI9U1k34I=;
-        b=mQwkEXlWgWgdrO36lnI2nmJd1u2kLttdXXOxh802owIZ9HVx5LpAonspE3orQnHHP6
-         tqpXJzIurjFYtqi9Jr5xTQ2cGNc5fXUzOEhQDAHlP8UN4ICOUh28+EA+u4x5HCgSc1Rp
-         EqNpddjlaXvH/mNw/QXTmtu3AVrP+0cBDE2fc+aJNFflX+51e4oT9UkiPh9hHn4X9h8f
-         btT3Wkb8b76PP+nUbJe3awfPPgQTQVXFuEml4Oxc9wEN9cgap8SKrcce6dAag01Xj3ji
-         oa50UmwoSLvCqYGzfuuaxXko4qhK6NBYvGKoi8J72gcQrYW4/hyS+6LUvqA7g+Y7DY/E
-         ViWg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQLmFiCx5phhuPcuBZ/B3Ou8qrDAPa7YVIOOetCqHgCQDPF7bfnXEo8+9a8BZXqi6yKsrQpts=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+fK6f2hrvN5iRQimwj5T0WL352O5pk/lJIBUQE/9t0zl9qj9I
-	di0t61jjGUY6aPm2pl++r+1zTJ3efv+Wn8JUBfy0MgsrjovDfycFlPQLAQ==
-X-Google-Smtp-Source: AGHT+IEh6OYV60gvxV/QcKhGx64139+NULnzFQ4/DGTc7+pvF0x8XVmowiDXLyNHQlSX5USY5QA8Vg==
-X-Received: by 2002:a05:6214:460b:b0:6cb:6089:eb83 with SMTP id 6a1803df08f44-6cb6089ef29mr7076966d6.28.1727590723676;
-        Sat, 28 Sep 2024 23:18:43 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b62c057sm26470016d6.60.2024.09.28.23.18.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 28 Sep 2024 23:18:42 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	greearb@candelatech.com,
-	fw@strlen.de,
-	dsahern@kernel.org,
-	idosch@nvidia.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net] vrf: revert "vrf: Remove unnecessary RCU-bh critical section"
-Date: Sun, 29 Sep 2024 02:18:20 -0400
-Message-ID: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
+        d=1e100.net; s=20230601; t=1727593853; x=1728198653;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wupXfiTFRgbbCCMXc+w3GmGZhuh2PGEq/8NKT31sCcc=;
+        b=pR84xk8sYOMljJkkRRzLwsPmMIAMOKiICXR43zTUQRWWQowHuWt7vePEoATVfgO1+0
+         gAddI17BwoHKvGFrrqrBVcOCf+g26A8PsGhcc0QQq4T9P5OY0VULdZqWws4qQltnqYOT
+         KIHmEXjf/21E5SoJVEPZwnP7hiYoai+GzdJwWVU6f6z5IsXLtsGDml3COklAp2knlbrz
+         mrHP2SyTUw1gAmA+Eww1T1Cyw0X20SnWN9aLQWFK/u98rNcYGbA/IybUiCLWOVIsefF/
+         DuvHUs0Mnc0Kct/wzmji+eC+WuCn04YquwOopNEXE1+zHdzsvjKoNe+8HUV7jhmz/ZWM
+         zANg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcbVXmSwpkonl5mSjthMPx2e+AvYdNHIfm0Opf/t3Qc86EOfqtCpoVIWdOA3vIbOWRlvdeHSk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjHoIInuLIWuPR2sE7LDZz3yLaDrVgL73u6lo5RFeZ3yFdYXkj
+	Zecm+kPXLFiM6gjIwvc7yuJ/boEF4cOzhwC+/jDqgpAbqbkNOYtuU4jM4kGee7s=
+X-Google-Smtp-Source: AGHT+IGrcYY05To+/yLZrdZKHUuaT4lGmCtj4wsgyrCWwclUUaolM2+fnTgp4t6z/cgOYbzvWvn9bg==
+X-Received: by 2002:a17:90a:ad91:b0:2d4:924:8891 with SMTP id 98e67ed59e1d1-2e0b8ede168mr9323964a91.38.1727593852980;
+        Sun, 29 Sep 2024 00:10:52 -0700 (PDT)
+Received: from [157.82.207.107] ([157.82.207.107])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c7942csm5324497a91.16.2024.09.29.00.10.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Sep 2024 00:10:52 -0700 (PDT)
+Message-ID: <447dca19-58c5-4c01-b60e-cfe5e601961a@daynix.com>
+Date: Sun, 29 Sep 2024 16:10:47 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
+To: Jason Wang <jasowang@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
+ <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
+ <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
+ <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
+ <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
+ <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Willem de Bruijn <willemb@google.com>
+On 2024/09/29 11:07, Jason Wang wrote:
+> On Fri, Sep 27, 2024 at 3:51 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2024/09/27 13:31, Jason Wang wrote:
+>>> On Fri, Sep 27, 2024 at 10:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2024/09/25 12:30, Jason Wang wrote:
+>>>>> On Tue, Sep 24, 2024 at 5:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> virtio-net have two usage of hashes: one is RSS and another is hash
+>>>>>> reporting. Conventionally the hash calculation was done by the VMM.
+>>>>>> However, computing the hash after the queue was chosen defeats the
+>>>>>> purpose of RSS.
+>>>>>>
+>>>>>> Another approach is to use eBPF steering program. This approach has
+>>>>>> another downside: it cannot report the calculated hash due to the
+>>>>>> restrictive nature of eBPF.
+>>>>>>
+>>>>>> Introduce the code to compute hashes to the kernel in order to overcome
+>>>>>> thse challenges.
+>>>>>>
+>>>>>> An alternative solution is to extend the eBPF steering program so that it
+>>>>>> will be able to report to the userspace, but it is based on context
+>>>>>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+>>>>>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+>>>>>> and vhost_net).
+>>>>>>
+>>>>>
+>>>>> I wonder if we could clone the skb and reuse some to store the hash,
+>>>>> then the steering eBPF program can access these fields without
+>>>>> introducing full RSS in the kernel?
+>>>>
+>>>> I don't get how cloning the skb can solve the issue.
+>>>>
+>>>> We can certainly implement Toeplitz function in the kernel or even with
+>>>> tc-bpf to store a hash value that can be used for eBPF steering program
+>>>> and virtio hash reporting. However we don't have a means of storing a
+>>>> hash type, which is specific to virtio hash reporting and lacks a
+>>>> corresponding skb field.
+>>>
+>>> I may miss something but looking at sk_filter_is_valid_access(). It
+>>> looks to me we can make use of skb->cb[0..4]?
+>>
+>> I didn't opt to using cb. Below is the rationale:
+>>
+>> cb is for tail call so it means we reuse the field for a different
+>> purpose. The context rewrite allows adding a field without increasing
+>> the size of the underlying storage (the real sk_buff) so we should add a
+>> new field instead of reusing an existing field to avoid confusion.
+>>
+>> We are however no longer allowed to add a new field. In my
+>> understanding, this is because it is an UAPI, and eBPF maintainers found
+>> it is difficult to maintain its stability.
+>>
+>> Reusing cb for hash reporting is a workaround to avoid having a new
+>> field, but it does not solve the underlying problem (i.e., keeping eBPF
+>> as stable as UAPI is unreasonably hard). In my opinion, adding an ioctl
+>> is a reasonable option to keep the API as stable as other virtualization
+>> UAPIs while respecting the underlying intention of the context rewrite
+>> feature freeze.
+> 
+> Fair enough.
+> 
+> Btw, I remember DPDK implements tuntap RSS via eBPF as well (probably
+> via cls or other). It might worth to see if anything we miss here.
 
-This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
+Thanks for the information. I wonder why they used cls instead of 
+steering program. Perhaps it may be due to compatibility with macvtap 
+and ipvtap, which don't steering program.
 
-dev_queue_xmit_nit is expected to be called with BH disabled.
-__dev_queue_xmit has the following:
+Their RSS implementation looks cleaner so I will improve my RSS 
+implementation accordingly.
 
-        /* Disable soft irqs for various locks below. Also
-         * stops preemption for RCU.
-         */
-        rcu_read_lock_bh();
-
-VRF must follow this invariant. The referenced commit removed this
-protection. Which triggered a lockdep warning:
-
-	================================
-	WARNING: inconsistent lock state
-	6.11.0 #1 Tainted: G        W
-	--------------------------------
-	inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-	btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
-	ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
-	{IN-SOFTIRQ-W} state was registered at:
-	  lock_acquire+0x19a/0x4f0
-	  _raw_spin_lock+0x27/0x40
-	  packet_rcv+0xa33/0x1320
-	  __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
-	  __netif_receive_skb_list_core+0x2c9/0x890
-	  netif_receive_skb_list_internal+0x610/0xcc0
-          [...]
-
-	other info that might help us debug this:
-	 Possible unsafe locking scenario:
-
-	       CPU0
-	       ----
-	  lock(rlock-AF_PACKET);
-	  <Interrupt>
-	    lock(rlock-AF_PACKET);
-
-	 *** DEADLOCK ***
-
-	Call Trace:
-	 <TASK>
-	 dump_stack_lvl+0x73/0xa0
-	 mark_lock+0x102e/0x16b0
-	 __lock_acquire+0x9ae/0x6170
-	 lock_acquire+0x19a/0x4f0
-	 _raw_spin_lock+0x27/0x40
-	 tpacket_rcv+0x863/0x3b30
-	 dev_queue_xmit_nit+0x709/0xa40
-	 vrf_finish_direct+0x26e/0x340 [vrf]
-	 vrf_l3_out+0x5f4/0xe80 [vrf]
-	 __ip_local_out+0x51e/0x7a0
-          [...]
-
-Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
-Link: https://lore.kernel.org/netdev/20240925185216.1990381-1-greearb@candelatech.com/
-Reported-by: Ben Greear <greearb@candelatech.com>
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-Cc: stable@vger.kernel.org
----
- drivers/net/vrf.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 4d8ccaf9a2b4..4087f72f0d2b 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
- 		eth_zero_addr(eth->h_dest);
- 		eth->h_proto = skb->protocol;
- 
-+		rcu_read_lock_bh();
- 		dev_queue_xmit_nit(skb, vrf_dev);
-+		rcu_read_unlock_bh();
- 
- 		skb_pull(skb, ETH_HLEN);
- 	}
--- 
-2.46.1.824.gd892dcdcdd-goog
-
+Regards,
+Akihiko Odaki
 
