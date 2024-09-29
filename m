@@ -1,165 +1,174 @@
-Return-Path: <netdev+bounces-130216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A370989312
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 06:54:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D07D989341
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 08:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9278B23793
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 04:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070431F2387D
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 06:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D593BB50;
-	Sun, 29 Sep 2024 04:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1ACB3FB3B;
+	Sun, 29 Sep 2024 06:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vCc2+lZP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WuhkQd4P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F4E184D
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 04:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DF57B65C;
+	Sun, 29 Sep 2024 06:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727585648; cv=none; b=GiWaRT0E05G/qYbGihd5xX1yhJOqvhH5GaMSaB9wAYY9ulMbU6OL5y8psLpgsMJr2c9ZJIis0PYBQ0DANhSlYBSqqjhCntieAtHqZAW8U1n+7wYBOUiNz9nsABTaUj/ZJDF+gHogECJ8ynRGtUxvtySTqNEj3N6ROGCqVa58b3g=
+	t=1727590726; cv=none; b=aQDJOr2Ry21TTr1EqEcSLCWCCuRY+W6F25nsyELgxfXV0IDMIXMyz8vYFJsK3JjVi8M8fCjTmwtA1GxdKQh2SxEA/9QjoJluoFLP80sfuy7FdqoCd+wgx+/jIWhCPBtzMr+Q6fS9TYeY+EldGCvDAa+sfJzBq/Oa3FRGd3wWGO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727585648; c=relaxed/simple;
-	bh=DDcStd9dj4GhKmuuYWqPICakSvn7nJ2Imq8JsqCJzSk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T/G9rP8nfkP1bK39AoGgOUtOS6CntKz19pjhP7lMthLzsM8sLqmiY0pbjHw1bg0GCwk0gobdr37XwZuYYBELpZ8RB0WC8T47mgIewtNlXvZOZyqSbAmOkDX2sKtzcZdeY+bMTGsQE1N/1gNppfxG8M3JEzTji8GNZ2NkxNyXOyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vCc2+lZP; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=DDcStd9dj4GhKmuuYWqPICakSvn7nJ2Imq8JsqCJzSk=; t=1727585646; x=1728449646; 
-	b=vCc2+lZPgZDiMFaB3yR22leoXnYrswqYNyfDC/EWWSiYRBtKIij06fV+lrghZIeqwmWWcJUeFv6
-	Y3xQ+PT7QvhLbNmnjlTEjtkjUC91EXZopw95jYIA5/2FYqlkuNLOjIkxw5u2o1a/ue95fjxj7R8rO
-	9fGCinn2ySkXnqzvP2ml1FLyJuQQPFMiPKUttCbrJHVTBJ6HS6PXjsQKg8qgzp0ZTp4NBaqyR5IBI
-	BiSw1zrpZbk9TVa7vH96Vxc4IrS2iMSZRTJSpPassA04t3DknG46hxX0bwZPyn7FT60Wu3Lmon0Ft
-	ztbZbQyYNzyk0H2v/yOMi3yoUSIillJL4NQA==;
-Received: from mail-oo1-f45.google.com ([209.85.161.45]:54760)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1sulwV-0005Wf-Pz
-	for netdev@vger.kernel.org; Sat, 28 Sep 2024 21:54:00 -0700
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5e1cdfe241eso1240246eaf.1
-        for <netdev@vger.kernel.org>; Sat, 28 Sep 2024 21:53:59 -0700 (PDT)
-X-Gm-Message-State: AOJu0YzDgo2VYVNimUynS6yBJi21FY8HpecxcV4pTYacwtfGEVlVGXBq
-	DAn76tHQJGjxx9QypEG78pl2Kv7Y9/x4Phr3XQXHBMbgJabpNz1dkKUnnfIG1npsmh4uEtFRM9f
-	AbRQhkRQvspXVWzJo+ps90zpJh5g=
-X-Google-Smtp-Source: AGHT+IFJE/Z3+jHTyPbGtyE9yJ7jWOG/wCGHZcAUGDQ6NbNG9UTUGIUvZkwc3NA8SWPS6KwYgx0NpMrwCvLNO1WyQwo=
-X-Received: by 2002:a05:6870:670b:b0:261:39d:afa1 with SMTP id
- 586e51a60fabf-28710aad16amr4422444fac.22.1727585639166; Sat, 28 Sep 2024
- 21:53:59 -0700 (PDT)
+	s=arc-20240116; t=1727590726; c=relaxed/simple;
+	bh=xO6ysQFEQSU8GQuLwhaYGu4B1cQcmCxn8wOY7WiKZVM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G2b0/GgOipsynXIr3vy30Q7uDGfsiZBKUcCnSYNp5AvWcPdsBQRxoUCmNA5pEYezs+6Rd1dcVZoMdzOr/ljUjueJ8ZWtM5NpcA/Wcb7VkobdpAHjqwv+ufc0AcT571hU8eVqt0Z4XSdqygMXvsOJWbIvcg1jZX+l5IL3cWo2ZF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WuhkQd4P; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6cb2458774dso25084026d6.3;
+        Sat, 28 Sep 2024 23:18:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727590724; x=1728195524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q6prHHvVXufFaX5cL74jbezatyZL1UkIMWvI9U1k34I=;
+        b=WuhkQd4P507+Nx3OCqRnuWeaTNQ96y5dXK4d0jQwGVGtB+yh6dFo1J5PaQz+RM/3Fq
+         9uycxwm6VDPoHXbRZVYgob19eqTLoEbJ9P8wuUV3IZgv0rcEsJF/yHtOgMcp7FRb40jD
+         QJUtYjxBKJR+P3hjeAes1RHgUX4QCQgUgqpr7VqzyjAV4xyXckEIsyBR+5B2N7YXxc5e
+         7UJHY+wCDj3e/7kAjZUrMc9ne+pi5ITamSS7p9K3KNaumQy5x9rS7S26AabURvSMGobt
+         0Moz4zySoP2RgoM8Q8JpXYcOAR4L2dR63kP6akrC2oVV5E2RudNmcZkmEKqZEfeWl7EB
+         LSbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727590724; x=1728195524;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q6prHHvVXufFaX5cL74jbezatyZL1UkIMWvI9U1k34I=;
+        b=mQwkEXlWgWgdrO36lnI2nmJd1u2kLttdXXOxh802owIZ9HVx5LpAonspE3orQnHHP6
+         tqpXJzIurjFYtqi9Jr5xTQ2cGNc5fXUzOEhQDAHlP8UN4ICOUh28+EA+u4x5HCgSc1Rp
+         EqNpddjlaXvH/mNw/QXTmtu3AVrP+0cBDE2fc+aJNFflX+51e4oT9UkiPh9hHn4X9h8f
+         btT3Wkb8b76PP+nUbJe3awfPPgQTQVXFuEml4Oxc9wEN9cgap8SKrcce6dAag01Xj3ji
+         oa50UmwoSLvCqYGzfuuaxXko4qhK6NBYvGKoi8J72gcQrYW4/hyS+6LUvqA7g+Y7DY/E
+         ViWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXQLmFiCx5phhuPcuBZ/B3Ou8qrDAPa7YVIOOetCqHgCQDPF7bfnXEo8+9a8BZXqi6yKsrQpts=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+fK6f2hrvN5iRQimwj5T0WL352O5pk/lJIBUQE/9t0zl9qj9I
+	di0t61jjGUY6aPm2pl++r+1zTJ3efv+Wn8JUBfy0MgsrjovDfycFlPQLAQ==
+X-Google-Smtp-Source: AGHT+IEh6OYV60gvxV/QcKhGx64139+NULnzFQ4/DGTc7+pvF0x8XVmowiDXLyNHQlSX5USY5QA8Vg==
+X-Received: by 2002:a05:6214:460b:b0:6cb:6089:eb83 with SMTP id 6a1803df08f44-6cb6089ef29mr7076966d6.28.1727590723676;
+        Sat, 28 Sep 2024 23:18:43 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b62c057sm26470016d6.60.2024.09.28.23.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2024 23:18:42 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	greearb@candelatech.com,
+	fw@strlen.de,
+	dsahern@kernel.org,
+	idosch@nvidia.com,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net] vrf: revert "vrf: Remove unnecessary RCU-bh critical section"
+Date: Sun, 29 Sep 2024 02:18:20 -0400
+Message-ID: <20240929061839.1175300-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAGXJAmxbJ7tN-8c0sT6WC_OBmJRTvrt-xvAZyQoM0HoNJFYycQ@mail.gmail.com>
- <577c1d8b-1437-4ff2-b3d1-1261c4f73fec@intel.com>
-In-Reply-To: <577c1d8b-1437-4ff2-b3d1-1261c4f73fec@intel.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Sat, 28 Sep 2024 21:53:22 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmwMNfoRK42veVS5uFgr0dVZ2G=jj6bR-kn2xV2v+TGFww@mail.gmail.com>
-Message-ID: <CAGXJAmwMNfoRK42veVS5uFgr0dVZ2G=jj6bR-kn2xV2v+TGFww@mail.gmail.com>
-Subject: Re: Advice on upstreaming Homa
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: ae7d61d5ad21aa0d569d6b6c8168eb46
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 27, 2024 at 4:51=E2=80=AFAM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> On 9/27/24 06:54, John Ousterhout wrote:
-> > I would like to start the process of upstreaming the Homa transport
-> > protocol, and I'm writing for some advice.
->
-> I would start with a RFC mail stating what Homa is, what it will be used
-> for in kernel, what are the users, etc.
+From: Willem de Bruijn <willemb@google.com>
 
-I think Homa is already pretty well known to the netdev community:
-I've given talks on it at multiple NetDev conferences and there are a
-couple of published papers describing both the overall protocol and
-the Linux implementation.There is also a Wiki with lots of links to
-topics related to Homa
-(https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview). Are
-you suggesting that Homa needs RFC standardization before uploading?
-I'd prefer to wait on standardization so that the protocol can evolve
-a bit more based on user experiences.
+This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
 
-> I saw your github readmes on current OOT module and previous one on DPDK
-> plugin. Netdev community will certainly ask how it is connected to DPDK,
-> and how it could be used with assumed value of 0 for DPDK (IOW upstream
-> does not care about DPDK).
->
-> describe what userspace is needed/how existing one is affected
+dev_queue_xmit_nit is expected to be called with BH disabled.
+__dev_queue_xmit has the following:
 
-There are a couple of Homa GitHub repos, and I suspect you may be
-looking at the one that is implemented in user space using DPDK. The
-kernel module I'd like to upstream is in this repo:
-https://github.com/PlatformLab/HomaModule. This is an in-kernel
-implementation that doesn't use DPDK.
+        /* Disable soft irqs for various locks below. Also
+         * stops preemption for RCU.
+         */
+        rcu_read_lock_bh();
 
-> > Homa contains about 15 Klines of code. I have heard conflicting
-> > suggestions about how much to break it up for the upstreaming process,
-> > ranging from "just do it all in one patch set" to "it will need to be
-> > chopped up into chunks of a few hundred lines". The all-at-once
-> > approach is certainly easiest for me, and if it's broken up, the
-> > upstreamed code won't be functional until a significant fraction of it
-> > has been upstreamed. What's the recommended approach here?
->
-> the split up into patches is to have it easiest to review, test
-> incrementally, and so on
+VRF must follow this invariant. The referenced commit removed this
+protection. Which triggered a lockdep warning:
 
-I would be happy to have Homa reviewed, but is that likely, given its
-size? In any case, Homa has pretty extensive unit tests already.
+	================================
+	WARNING: inconsistent lock state
+	6.11.0 #1 Tainted: G        W
+	--------------------------------
+	inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+	btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+	ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+	{IN-SOFTIRQ-W} state was registered at:
+	  lock_acquire+0x19a/0x4f0
+	  _raw_spin_lock+0x27/0x40
+	  packet_rcv+0xa33/0x1320
+	  __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+	  __netif_receive_skb_list_core+0x2c9/0x890
+	  netif_receive_skb_list_internal+0x610/0xcc0
+          [...]
 
-> if you will have the whole split ready, it's good to link to it,
-> but you are limited to 15 patches at a time
->
-> >
-> > I'm still pretty much a newbie when it comes to submitting Linux code.
-> > Is there anyone with more experience who would be willing to act as my
-> > guide? This would involve answering occasional questions and pointing
-> > me to online information that I might otherwise miss, in order to
-> > minimize the number of stupid things that I do.
-> >
-> > I am happy to serve as maintainer for the code once it is uploaded. Is
-> > it a prerequisite for there to be at least 2 maintainers?
->
-> are you with contact with the original implementers/maintainers of those
-> 15K lines? one thing that needs to be done is proper authorship, and
-> author is the best first candidate for a maintainer (though they could
-> be simply unwilling/not working in the topic anymore)
+	other info that might help us debug this:
+	 Possible unsafe locking scenario:
 
-I am the original implementor/maintainer of almost all of those 15K lines.
+	       CPU0
+	       ----
+	  lock(rlock-AF_PACKET);
+	  <Interrupt>
+	    lock(rlock-AF_PACKET);
 
-> 1 maintainer is not a blocker
->
-> >
-> > Any other thoughts and suggestions are also welcome.
->
-> no "inline" functions in .c,
-> reverse X-mass tree formatting rule
-> no space after a (cast *)
-> use a page_pool
-> avoid variable length arrays
-> write whole thing in C (or rust, no C++)
+	 *** DEADLOCK ***
 
-Most of these are already done; the ones that aren't (e.g., reverse
-Xmas-tree formatting, which I only recently discovered) will be done
-before I submit anything.
+	Call Trace:
+	 <TASK>
+	 dump_stack_lvl+0x73/0xa0
+	 mark_lock+0x102e/0x16b0
+	 __lock_acquire+0x9ae/0x6170
+	 lock_acquire+0x19a/0x4f0
+	 _raw_spin_lock+0x27/0x40
+	 tpacket_rcv+0x863/0x3b30
+	 dev_queue_xmit_nit+0x709/0xa40
+	 vrf_finish_direct+0x26e/0x340 [vrf]
+	 vrf_l3_out+0x5f4/0xe80 [vrf]
+	 __ip_local_out+0x51e/0x7a0
+          [...]
+
+Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
+Link: https://lore.kernel.org/netdev/20240925185216.1990381-1-greearb@candelatech.com/
+Reported-by: Ben Greear <greearb@candelatech.com>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/net/vrf.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index 4d8ccaf9a2b4..4087f72f0d2b 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
+ 		eth_zero_addr(eth->h_dest);
+ 		eth->h_proto = skb->protocol;
+ 
++		rcu_read_lock_bh();
+ 		dev_queue_xmit_nit(skb, vrf_dev);
++		rcu_read_unlock_bh();
+ 
+ 		skb_pull(skb, ETH_HLEN);
+ 	}
+-- 
+2.46.1.824.gd892dcdcdd-goog
+
 
