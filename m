@@ -1,177 +1,119 @@
-Return-Path: <netdev+bounces-130225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA80298943F
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:13:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 455AC989488
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 11:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10F4A1F24A1D
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:13:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FAE4282F47
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 09:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5592E1465B8;
-	Sun, 29 Sep 2024 09:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD7E14A4C5;
+	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9qxlis2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OIsS4/iZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCAD143738
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 09:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDD43CF6A;
+	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727601172; cv=none; b=ebMhDSxG/YpJ4Faay+S1cqf1L4107BiF7jYgYTVY8cjzWARGhnrC2TAjRM1qUwbp9m8Dr0aIqGIR/yBybfpmudQiWaP/XMDjCsvbkvCYFylEF74b8K5UIBhcPpaFI3IBVoxaUe/q1fg9lCwogx8INfhm4fhLfe0GpLRU2hd5jbA=
+	t=1727602278; cv=none; b=Dt8jbjN8H8K6w7THYGqZ8n47SalQv+PGdfN1svzpdBLlHE04ml76vlwEzbOQeBX7d7hHYvRwrsUf4jvURvQX5QWl2JlU3FT9Pg2BpJ9Od0F7qJpycCJpOwNl+qJ1xtC5wXVXT93aXcFHVE9F4aOspdWInwIb2Dw/342zIy6Pj6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727601172; c=relaxed/simple;
-	bh=f9dQE09AdUkmncuy/YNZ8fl3PlvEKyh1yrqvan2WfdA=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=e/WID351WCseYEcTwTJ1sYhPE1GrkeAkcnZr2jyqVFAYJuFnhoV5if1JqWy22Lf+czU+GDiGrMejkzs9v/IuCXgUBjLCiEcWGo32FFshXr/AUmiqAOzXVQPipnEsySvxs9RUtrKLdvxSJwvfDlXfZAp4yiGhcL0OjzE3nB1Dyl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H9qxlis2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727601168;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JiqqlxmQYH/fiwHpJ0K7lC2A6lz/Rw3eIk1FtzNUMEY=;
-	b=H9qxlis2y3VOGsiZ3bhL86nHU6iN0yBa1MCzv/Hd7lvs3cNOBUz+gTWyibgUe7hflptBNa
-	HBiLgdEB6drxhp0N68kJdypgy/Q2O1FCy+VVlSM3+6w4w3mu+/4mZ2jEK2E33Qks+34rRZ
-	lGCm4AbqSerwld8stht57TVSyPqzQOk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-263-ngDjsBEOMcCfzSSWO9NFYQ-1; Sun,
- 29 Sep 2024 05:12:45 -0400
-X-MC-Unique: ngDjsBEOMcCfzSSWO9NFYQ-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3F5D4195FE25;
-	Sun, 29 Sep 2024 09:12:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F1CB519560AE;
-	Sun, 29 Sep 2024 09:12:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240925103118.GE967758@unreal>
-References: <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: dhowells@redhat.com, Eduard Zingerman <eddyz87@gmail.com>,
-    Christian Brauner <brauner@kernel.org>,
-    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
-    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
-    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+	s=arc-20240116; t=1727602278; c=relaxed/simple;
+	bh=1QtNEJ0qw4oxe75cbYLASOSc6BQCu8RhthtnE0JuaMY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=X6x0arMvhkhR7WVwMYqr893nBzZNY55OIeBq3ic2BB/M0lCI68yXDU0e+SihpoXzJAWYBHb0jJ2bxz8S8DzQ4tJP+ae6km0SdWnphFpatUyVS4Y2LRZVUg0C1P0YOnW1yP2nTexcfvPMvLgxf5tT9I+FD6q8fUzX/7LbVp6hq/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OIsS4/iZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 546D1C4CEC5;
+	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727602278;
+	bh=1QtNEJ0qw4oxe75cbYLASOSc6BQCu8RhthtnE0JuaMY=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=OIsS4/iZbb5Ghg/C50bzPBIrfs1B8I1wZ6ckOxBS1qqheme3EhjbwzLPIm0SPobZs
+	 XmnXg3e9dKCifQ8aIEf3dO8QRxp49TM82WQBVHFeMTlEVyMyamZmlSyMdINKP3LBdb
+	 wMjqgIic+hRBHLBRYF6ymbqnHIV70l+DNWVeKUoOa0KFHBsRQVJgK3pRSUGtqFdp+Y
+	 INBO21obICgubD3RjDWgqagVNOzYIvfOhWzZe/yEcUxSRoyoHsy8nF+IYBm41nf08V
+	 5kb4HJqcbWrO9UEouzIo6/Y7KlM5TgC42mFGlulQbbGeWkElAYfrlUv0BxovsDjKP/
+	 NMNqR6ahfXQIA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D22CF6498;
+	Sun, 29 Sep 2024 09:31:18 +0000 (UTC)
+From: Eric Long via B4 Relay <devnull+i.hack3r.moe@kernel.org>
+Subject: [PATCH bpf-next v2 0/2] BPF static linker: fix failure when
+ encountering duplicate extern functions
+Date: Sun, 29 Sep 2024 17:31:13 +0800
+Message-Id: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2808174.1727601153.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 29 Sep 2024 10:12:33 +0100
-Message-ID: <2808175.1727601153@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGEe+WYC/4WNQQ6CMBBFr0Jm7Rg6ggor72FYUDqVidqSFgiGc
+ HcrF3D58v9/f4XIQThCna0QeJYo3iWgQwZd37oHo5jEQDkVeUUVvkTrwaKZBuRl5ODQTq6LeL0
+ oW+jWkCKCtB4CW1l28x1+C5fq0KSklzj68NkvZ7Xnf+2zwhyNVaXV5lxSqW992z1P4fj2DM22b
+ V9G6MjTyQAAAA==
+X-Change-ID: 20240929-libbpf-dup-extern-funcs-871f4bad2122
+To: bpf@vger.kernel.org
+Cc: Andrii Nakryiko <andrii@kernel.org>, 
+ Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, 
+ Eric Long <i@hack3r.moe>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1485; i=i@hack3r.moe;
+ h=from:subject:message-id;
+ bh=1QtNEJ0qw4oxe75cbYLASOSc6BQCu8RhthtnE0JuaMY=;
+ b=owGbwMvMwCUWYb/agfVY0D7G02pJDGk/5VK0KvnlzI51P/H58F1/7ZFpV/9n54i6XN3ofbtCM
+ OHs8e47HaUsDGJcDLJiiixbDv9RS9Dv3rSEe045zBxWJpAhDFycAjCRrl8M/zTP3o4yvbR+8ac3
+ /CtOn3/lVNWcudR2E2vNwXPs/z0YBaMYGRZZzzLV3bX+ljeTmJB6XoGE5AqdxMfsCXlC+QrVvCq
+ v2QA=
+X-Developer-Key: i=i@hack3r.moe; a=openpgp;
+ fpr=3A7A1F5A7257780C45A9A147E1487564916D3DF5
+X-Endpoint-Received: by B4 Relay for i@hack3r.moe/default with auth_id=225
+X-Original-From: Eric Long <i@hack3r.moe>
+Reply-To: i@hack3r.moe
 
-Can you try the attached?  I've also put it on my branch here:
+Currently, if `bpftool gen object` tries to link two objects that
+contains the same extern function prototype, libbpf will try to get
+their (non-existent) size by calling bpf__resolve_size like extern
+variables and fail with:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/=
-?h=3Dnetfs-fixes
+	libbpf: global 'whatever': failed to resolve size of underlying type: -22
 
-David
+This should not be the case, and this series adds conditions to update
+size only when the BTF kind is not function.
+
+Fixes: a46349227cd8 ("libbpf: Add linker extern resolution support for functions and global variables")
+Signed-off-by: Eric Long <i@hack3r.moe>
 ---
-9p: Don't revert the I/O iterator after reading
+Changes in v2:
+- Fix compile errors. Oops!
+- Link to v1: https://lore.kernel.org/r/20240929-libbpf-dup-extern-funcs-v1-0-df15fbd6525b@hack3r.moe
 
-Don't revert the I/O iterator before returning from p9_client_read_once().
-netfslib doesn't require the reversion and nor doed 9P directory reading.
-
-Make p9_client_read() use a temporary iterator to call down into
-p9_client_read_once(), and advance that by the amount read.
-
-Reported-by: Manu Bretelle <chantr4@gmail.com>
-Reported-by: Eduard Zingerman <eddyz87@gmail.com>
-Reported-by: Leon Romanovsky <leon@kernel.org>
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Eric Van Hensbergen <ericvh@kernel.org>
-cc: Latchesar Ionkov <lucho@ionkov.net>
-cc: Dominique Martinet <asmadeus@codewreck.org>
-cc: Christian Schoenebeck <linux_oss@crudebyte.com>
-cc: v9fs@lists.linux.dev
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
 ---
- net/9p/client.c |   10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+Eric Long (2):
+      libbpf: do not resolve size on duplicate FUNCs
+      selftests/bpf: make sure linking objects with duplicate extern functions doesn't fail
 
-diff --git a/net/9p/client.c b/net/9p/client.c
-index 5cd94721d974..be59b0a94eaf 100644
---- a/net/9p/client.c
-+++ b/net/9p/client.c
-@@ -1519,13 +1519,15 @@ p9_client_read(struct p9_fid *fid, u64 offset, str=
-uct iov_iter *to, int *err)
- 	*err =3D 0;
- =
+ tools/lib/bpf/linker.c                             | 23 ++++++++++++----------
+ tools/testing/selftests/bpf/Makefile               |  3 ++-
+ .../selftests/bpf/prog_tests/dup_extern_funcs.c    |  9 +++++++++
+ .../selftests/bpf/progs/dup_extern_funcs1.c        | 20 +++++++++++++++++++
+ .../selftests/bpf/progs/dup_extern_funcs2.c        | 18 +++++++++++++++++
+ 5 files changed, 62 insertions(+), 11 deletions(-)
+---
+base-commit: 93eeaab4563cc7fc0309bc1c4d301139762bbd60
+change-id: 20240929-libbpf-dup-extern-funcs-871f4bad2122
 
- 	while (iov_iter_count(to)) {
-+		struct iov_iter tmp =3D *to;
- 		int count;
- =
+Best regards,
+-- 
+Eric Long <i@hack3r.moe>
 
--		count =3D p9_client_read_once(fid, offset, to, err);
-+		count =3D p9_client_read_once(fid, offset, &tmp, err);
- 		if (!count || *err)
- 			break;
- 		offset +=3D count;
- 		total +=3D count;
-+		iov_iter_advance(to, count);
- 	}
- 	return total;
- }
-@@ -1567,16 +1569,12 @@ p9_client_read_once(struct p9_fid *fid, u64 offset=
-, struct iov_iter *to,
- 	}
- 	if (IS_ERR(req)) {
- 		*err =3D PTR_ERR(req);
--		if (!non_zc)
--			iov_iter_revert(to, count - iov_iter_count(to));
- 		return 0;
- 	}
- =
-
- 	*err =3D p9pdu_readf(&req->rc, clnt->proto_version,
- 			   "D", &received, &dataptr);
- 	if (*err) {
--		if (!non_zc)
--			iov_iter_revert(to, count - iov_iter_count(to));
- 		trace_9p_protocol_dump(clnt, &req->rc);
- 		p9_req_put(clnt, req);
- 		return 0;
-@@ -1596,8 +1594,6 @@ p9_client_read_once(struct p9_fid *fid, u64 offset, =
-struct iov_iter *to,
- 			p9_req_put(clnt, req);
- 			return n;
- 		}
--	} else {
--		iov_iter_revert(to, count - received - iov_iter_count(to));
- 	}
- 	p9_req_put(clnt, req);
- 	return received;
 
 
