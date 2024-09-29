@@ -1,185 +1,153 @@
-Return-Path: <netdev+bounces-130254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C94B98970E
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 21:18:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E0D9896BD
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 20:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759CA1C209E4
-	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 19:18:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D283D2844AC
+	for <lists+netdev@lfdr.de>; Sun, 29 Sep 2024 18:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B4736AEC;
-	Sun, 29 Sep 2024 19:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 368F34207A;
+	Sun, 29 Sep 2024 18:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="cqXIMzg9"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="JTkHnp8s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0655B1362
-	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 19:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51F536AEC
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 18:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727637520; cv=none; b=QKAO4SezcJNOeWnsSQmnIG5MkLhQZy61xpjJOhUDGZ0ZLNd2BTXKPhxMH8cq0vdXJgwVCxL4XGoXpq3tp0No+8Rq3+veEG1aL/9j8PcZar13HLMsgBAcAC+hvUNSMKeRJ7kB2BfAoB+DYyIZgNqiRckAJ2PbXMBjGpVxrzomu9Y=
+	t=1727634085; cv=none; b=TMD2JSbDRyrEam0WZ3EbSYNy6Z72aMITUnTXIbn9LSDa9jPG88ZsZWgpbu9TjoS0JZCYA5x4xbTSw75LpFBBBojCx9rZJK/Y/UznpNy8V2qGpd2OTQRaoPqeQh/dOfOMQm8zgKL3BWtuX4ZiHH2IcQpdGDC2JCQZpd7JCDP6HIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727637520; c=relaxed/simple;
-	bh=1Q00rePAyFfAo3avVDnteWAYzPkEEWSICDfpstp89mE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rewv7JJ4dsmqNRHHWqhYUaYOmSmB0sA3G6z+PaRiG+fOR67jZNGtI+qQdcMosyKDbEAic7b7ICEJCjgneUFTj1c8Wd8KZKD5Ah4gda5fnzY3agC/y7LoASMZ7F93vhJ/Fo0HuDkC6DdrjVBkLSh1p0T0B7VdPABbO/YrW/U9Cbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=cqXIMzg9; arc=none smtp.client-ip=84.16.66.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XGrqP2r1wzQmQ;
-	Sun, 29 Sep 2024 19:32:01 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1727631121;
-	bh=U3PkyRoQ7rdPQAeVu0I06DBylGmJ6f/VayaDJ+KK9DE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cqXIMzg95A6dDvttEsMDdx5wnprTsNQpVP9KeZYzRXPljPG8OrAhhCHSZNb9rjbH8
-	 HAuik39KfsUJwGP2lvnqhB5pBHdJA2DQ0Cy/Euk26S56aL4DMfIVRHerqI9d/7+IMs
-	 SdMZl7DHdH2/FCBIhQbWCMu6P8X2yBaJ4G2z+gdU=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XGrqN1wm0zv4h;
-	Sun, 29 Sep 2024 19:32:00 +0200 (CEST)
-Date: Sun, 29 Sep 2024 19:31:58 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>
-Cc: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: Re: [RFC PATCH v3 14/19] selftests/landlock: Test socketpair(2)
- restriction
-Message-ID: <20240929.Noovae0izai8@digikod.net>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-15-ivanov.mikhail1@huawei-partners.com>
- <ZurZ7nuRRl0Zf2iM@google.com>
- <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
- <ZvZ_ZjcKJPm5B3_Z@google.com>
- <Zvhh3CRj9T7_KIhC@google.com>
+	s=arc-20240116; t=1727634085; c=relaxed/simple;
+	bh=IiI7k5eKIv3t3egjU4Ltp6qafG9X3D4ad7adQ1hTsrs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K4JY5nbJH0UeAT1+0iuQnu2SLp2ReW7YvLweYLxBCHbEu/FJnC9s392VomoY2CWr47GJ1nfiGQ2zVDIRMXmHMsj98eOBot7DXNbBA+UYLHkSYR74tRIwnjFF+21hOFP2lHlk8nVo0GTmTzLuK9DovzHCYbqmnRou+1MacINoj3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=JTkHnp8s; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id CA1253F20D
+	for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 18:21:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1727634080;
+	bh=NcSFbsIXgiNSIJxntSXwkK9zAY/t+TLdWZ5xLvbV6u8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=JTkHnp8s6k+gJbbZgFS4BB1kLdAjjM7ktdb/5StUZ3B7Fepl9qIC/ssnTA5BFFEst
+	 QHn/NCi5ePPNTn3LJenRjuyn7j1YykP0buURCX03+ehUIdA2E9KMDXoQRcgf/Dgr6i
+	 pl53t4ao+RO4FOiCLBzPfp+/q4BPII3a97MwBYrCmtvetum7WMnr320xKQC1H7v9Sc
+	 VdNdA63dh9mPfMA/GkWU85BhpiKGxqK6jKI3wAEFdXh+kWg3yBvmFmaGKJ8oJJksB2
+	 AktGuBlSmXEHnvJDSr3o80XnK1B7oWC6I8Rk+DpJRx3mHKrZl3eLOFmY1RlFerFlMI
+	 tIlZagQO0gBeg==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a8a84b60255so355608566b.1
+        for <netdev@vger.kernel.org>; Sun, 29 Sep 2024 11:21:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727634080; x=1728238880;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NcSFbsIXgiNSIJxntSXwkK9zAY/t+TLdWZ5xLvbV6u8=;
+        b=uAELb1FEGHrUxP04i2BK0Cd8sB8B3UFuXaY7Oki/ZG+LXvfbL613lMci/OZnP9+ASi
+         aYTtqEaQhqGnNFVI6g+QerO5iNAKP4BIgXJ6yyEF9eSlZ4LYy8xv/RVdX3JJCXkxFVFM
+         H/fMjb4XMUVJh68a8HMypFW7P/gh2SIGGI7RuPATYNs6rfBkbb5uF/En0G76jmlliZpj
+         x2qeGpS1ETJlkELw9iiHAL8KzFhgg2ELNKZTkLEL+gZ2qF0E6XBiy7MQp3HtBGdvW3TE
+         Pu5o78xJnTR00tikolG4ggQiPYlqxmTRCXFr9BKLjE/hC1yPLQcxDOJCZq2ZLeNcWbkj
+         Yb4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWWcecXERHtzsmd/xhQiR2LyhKpcjrPt9eAcxHtVjetrcQXHgxWG+7IDOJA4Vl+SjwVIuSuP54=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPmVpLMJc1bT0Ws1+EKVsbZXr28u8fpl9Tn9/Myvedpd2+QMIJ
+	rcSMMEmj5apRTRzRgFoCWZtwlm4W29qoLg1s6i8i4UDt4ZMWXJkFfu0S6Xb74af8IKdhiYXtCcL
+	vi5ZqCTGPoaR+a4BNOsbzwUwXqUAcgIkek2aMWcqwBKZCjCevFYYW2hFg1aPIEKEBs+JUBg==
+X-Received: by 2002:a17:906:6a02:b0:a8d:2c00:949a with SMTP id a640c23a62f3a-a93c48f2108mr1109687966b.9.1727634080071;
+        Sun, 29 Sep 2024 11:21:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH/dwfX8CpFC/wMaqb9ON9AqBmf3Q6FpW0kLVPD+7epq6zvyosEb7pk9U9oZmP8xLkgLxMtPw==
+X-Received: by 2002:a17:906:6a02:b0:a8d:2c00:949a with SMTP id a640c23a62f3a-a93c48f2108mr1109685266b.9.1727634079417;
+        Sun, 29 Sep 2024 11:21:19 -0700 (PDT)
+Received: from amikhalitsyn.lan (ipbcc0714d.dynamic.kabel-deutschland.de. [188.192.113.77])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c88248af1bsm3420056a12.75.2024.09.29.11.21.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 29 Sep 2024 11:21:18 -0700 (PDT)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: stefanha@redhat.com
+Cc: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2] vhost/vsock: specify module version
+Date: Sun, 29 Sep 2024 20:21:03 +0200
+Message-Id: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zvhh3CRj9T7_KIhC@google.com>
-X-Infomaniak-Routing: alpha
 
-On Sat, Sep 28, 2024 at 10:06:52PM +0200, Günther Noack wrote:
-> On Fri, Sep 27, 2024 at 11:48:22AM +0200, Günther Noack wrote:
-> > On Mon, Sep 23, 2024 at 03:57:47PM +0300, Mikhail Ivanov wrote:
-> > > (Btw I think that disassociation control can be really useful. If
-> > > it were possible to restrict this action for each protocol, we would
-> > > have stricter control over the protocols used.)
-> > 
-> > In my understanding, the disassociation support is closely intertwined with the
-> > transport layer - the last paragraph of DESCRIPTION in connect(2) is listing
-> > TCP, UDP and Unix Domain sockets in datagram mode. -- The relevant code in in
-> > net/ipv4/af_inet.c in inet_dgram_connect() and __inet_stream_connect(), where
-> > AF_UNSPEC is handled.
-> > 
-> > I would love to find a way to restrict this independent of the specific
-> > transport protocol as well.
-> > 
-> > Remark on the side - in af_inet.c in inet_shutdown(), I also found a worrying
-> > scenario where the same sk->sk_prot->disconnect() function is called and
-> > sock->state also gets reset to SS_UNCONNECTED.  I have done a naive attempt to
-> > hit that code path by calling shutdown() on a passive TCP socket, but was not
-> > able to reuse the socket for new connections afterwards. (Have not debugged it
-> > further though.)  I wonder whether this is a scnenario that we also need to
-> > cover?
-> 
-> FYI, **this does turn out to work** (I just fumbled in my first experiment). --
-> It is possible to reset a listening socket with shutdown() into a state where it
-> can be used for at least a new connect(2), and maybe also for new listen(2)s.
+Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
 
-Interesting syscall...
+It is useful because it allows userspace to check if vhost_vsock is there when it is
+configured as a built-in.
 
-> 
-> The same might also be possible if a socket is in the TCP_SYN_SENT state at the
-> time of shutdown() (although that is a bit trickier to try out).
-> 
-> So a complete disassociation control for TCP/IP might not only need to have
-> LANDLOCK_ACCESS_SOCKET_CONNECT_UNSPEC (or however we'd call it), but also
-> LANDLOCK_ACCESS_SOCKET_PASSIVE_SHUTDOWN and maybe even another one for the
-> TCP_SYN_SENT case...? *
+This is what we have *without* this change and when vhost_vsock is configured
+as a module and loaded:
 
-That would make the Landlock interface too complex, we would need a more
-generic approach instead e.g. with a single flag.
+$ ls -la /sys/module/vhost_vsock
+total 0
+drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+-r--r--r--   1 root root 4096 Sep 29 20:05 taint
+--w-------   1 root root 4096 Sep 29 19:00 uevent
 
-> 
-> It makes me uneasy to think that I only looked at AF_INET{,6} and TCP so far,
-> and that other protocols would need a similarly close look.  It will be
-> difficult to cover all the "disassociation" cases in all the different
-> protocols, and even more difficult to detect new ones when they pop up.  If we
-> discover new ones and they'd need new Landlock access rights, it would also
-> potentially mean that existing Landlock users would have to update their rules
-> to spell that out.
-> 
-> It might be easier after all to not rely on "disassociation" control too much
-> and instead to design the network-related access rights in a way so that we can
-> provide the desired sandboxing guarantees by restricting the "constructive"
-> operations (the ones that initiate new network connections or that listen on the
-> network).
+When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
+And this looks like an inconsistency.
 
-I agree.  So, with the ability to control socket creation and to also
-control listen/bind/connect (and sendmsg/recvmsg for datagram protocols)
-we should be good right?
+With this change, when vhost_vsock is configured as a built-in we get:
+$ ls -la /sys/module/vhost_vsock/
+total 0
+drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+--w-------   1 root root 4096 Sep 26 15:59 uevent
+-r--r--r--   1 root root 4096 Sep 26 15:59 version
 
-> 
-> Mikhail, in your email I am quoting above, you are saying that "disassociation
-> control can be really useful"; do you know of any cases where a restriction of
-> connect/listen is *not* enough and where you'd still want the disassociation
-> control?
-> 
-> (In my mind, the disassociation control would have mainly been needed if we had
-> gone with Mickaël's "Use socket's Landlock domain" RFC [1]?  Mickaël and me have
-> discussed this patch set at LSS and I am also now coming around to the
-> realization that this would have introduced more complication.  - It might have
-> been a more "pure" approach, but comes at the expense of complicating Landlock
-> usage.)
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+---
+ drivers/vhost/vsock.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Indeed, and this RFC will not be continued.  We should not think of a
-socket as a security object (i.e. a real capability), whereas sockets
-are kernel objects used to configure and exchange data, a bit like a
-command multiplexer for network actions that can also be used to
-identify peers.
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index 802153e23073..287ea8e480b5 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+ 
+ module_init(vhost_vsock_init);
+ module_exit(vhost_vsock_exit);
++MODULE_VERSION("0.0.1");
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Asias He");
+ MODULE_DESCRIPTION("vhost transport for vsock ");
+-- 
+2.34.1
 
-Because Landlock is a sandboxing mechanism, the security policy tied to
-a task may change during its execution, which is not the case for other
-access control systems such as SELinux.  That's why we should not
-blindly follow other security models.  In the case of socket control,
-Landlock uses the calling task's credential to check if the call should
-be allowed.  In the case of abstract UNIX socket control (with Linux
-5.12), the check is done on the domain that created the peer's socket,
-not the domain that will received the packet.  In this case Landlock can
-rely on the peer socket's domain because it is a consistent and
-race-free way to identify a peer, and this peer socket is not the one
-doing the action.  It's a bit different with non-UNIX sockets because
-peers may not be local to the system.
-
-> 
-> —Günther
-> 
-> [1] https://lore.kernel.org/all/20240719150618.197991-1-mic@digikod.net/
-> 
-> * for later reference, my reasoning in the code is: net/ipv4/af_inet.c
->   implements the entry points for connect() and listen() at the address family
->   layer.  Both operations require that the sock->state is SS_UNCONNECTED.  So
->   the rest is going through the other occurrences of SS_UNCONNECTED in that same
->   file to see if there are any places where the socket can get back into that
->   state.  The places I found where it is set to that state are:
->   
->   1. inet_create (right after creation, expected)
->   2. __inet_stream_connect in the AF_UNSPEC case (known issue)
->   3. __inet_stream_connect in the case of a failed connect (expected)
->   4. inet_shutdown in the case of TCP_LISTEN or TCP_SYN_SENT (mentioned above)
-> 
 
