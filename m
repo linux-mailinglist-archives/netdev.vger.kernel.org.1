@@ -1,132 +1,150 @@
-Return-Path: <netdev+bounces-130289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC62989F17
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:06:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D034989F35
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:15:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1FC1C219E1
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 10:06:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDD39283953
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 10:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D20F1741D1;
-	Mon, 30 Sep 2024 10:06:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBBF18A6D4;
+	Mon, 30 Sep 2024 10:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="pSN4td9s"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rJ+/s2ZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A160558BA
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 10:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000AD189F55
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 10:14:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727690790; cv=none; b=QvFuUg12Cy6mAzle/1qWMStZgZQlxKs3ANUMI5Iy3Fokh3dB/KFBPKmu6QLXIEHxCQfNkmH+UZ/+k+FtmJmXvgqG+Rcq5HevtlvBK/g9F1NnPamgkBbDoausZRgfcwIsUgnzOf7gJ/iRXK3MgLCw+BDcGjNUnnNSwRVAxX8A5rQ=
+	t=1727691296; cv=none; b=rM3QNCXb1zZg27vbVWfUNu0tFF89LAFs1+IsGohbtoFw7GXnkBWwhj3EAVmG21aHXmTL9H+6+avk9aeuin5nkFsykB3p1HGqaUAYxSXnmFB94662cZ/FNwmeRuVeJ3BiVN2Y2wJHLdFST6THpMBhYsQfvgcos0hiSgXc8BO/aoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727690790; c=relaxed/simple;
-	bh=wQenqqC5rFf6LNvtPngLZ2vPjI6ubNFAVrQv2EewOoM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ONaP6jcMLuOpILmtfAGCil7+Xox4klUAOfrH22nZSaIGNM5TePAu3zD/yrXUWp8EfNkUt5jCM8AWLtVQWkfs8ukC/8xq2vOeKSddH1I7+lHNZpzLnTg8kZdXl4rG26piQDTsHFIUzFMSwblJYmiH2CV8vBiuuGQRMuSbfomKDDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=pSN4td9s; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53994aadb66so714604e87.2
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 03:06:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1727690786; x=1728295586; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LK/6hIFc6R+Q+3qL3TGrc7l6PDeV/3Luhg3R8QTWgLU=;
-        b=pSN4td9ssM6Q1MIIDildV04767sILnaqvmMYR9XTbN7yjF+JsQgxbHMj2Ok6+97g2m
-         AfmoPynIvUPDCS56DXkalEIJY4U8VxAEWvk9bIjvcTCMzRh3ZB6eDhppHTKR9PhB6hJm
-         32J83GV6Xz+tWNGCBhzxjP8IgT2HO0PhwfG7xPpIXe1WcXjO/YWrVYFD9fug/83yn8SC
-         VzKCuzWwQBbvG69C63/pEqeRdzrOslah4V9Z5nLCu208muYchnqo/p3CEBGgKd0lYRS6
-         gXWV4yCadAh6fcwNDvY10ucwsXaZPYiA5okcfod8x46kBVjkib+66k1a1GY+f+AWLkQC
-         T2Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727690786; x=1728295586;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LK/6hIFc6R+Q+3qL3TGrc7l6PDeV/3Luhg3R8QTWgLU=;
-        b=MS8FD4zq1MI7cmMv1hWCPICL0K3TvbWnXoS+6zak5OhDmo+sDPUkm8f0jq4S6YmucO
-         DkXWYxe+zTR8VkIRSzZnTf3G/QeWWg5rueGMDCDFj7lnR3iR5hXAiGrVbArsv45uRBHj
-         yg7rankZUpisXiSmE6ZgRq68ReozRDVA00xx4LneQANEdTgvkzaFB0UJl/yGho8rtEMC
-         vtNg9guwlsNkr59/0gNG8B84CNF3kWRb4DIwyY6+Lp2qePEKXnh+01eLzi72REivhPU6
-         M6u2ZaQ1LqvICUCK7rpZ6pjbCb8WQwcURvQGNbc5QsdtsTkFoaZ4nwxaN382+p0HTYkt
-         uegA==
-X-Forwarded-Encrypted: i=1; AJvYcCUcy/fhmmDEypkqhA+8KzRdAtKouD0GbTTTyU6FrQ8Ti0U0KAnVV2xDr5UPLKRtZpS3yzaXUvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCKi05jEZry+/74m5pTiG7784VVs1uFm0pd9Kg6Dvw9Stnm7oN
-	OzSxm7JvyWeyKCS0WXF8PeWXuE/SIey8SCskk6GV/Cm9fZK84kT1B7ijsLALAwmx4PVD43TKNjb
-	4
-X-Google-Smtp-Source: AGHT+IGAHgFxCQCJq1B5VvaJKWcHBh8e9dNIeWpP4myTAS2i0+MebsS7UNOcWE2YO2bCvp4aR252VQ==
-X-Received: by 2002:a05:6512:3c8f:b0:531:4c6d:b8ef with SMTP id 2adb3069b0e04-5389fc34548mr6133879e87.6.1727690785629;
-        Mon, 30 Sep 2024 03:06:25 -0700 (PDT)
-Received: from [192.168.1.18] (176.111.185.181.kyiv.nat.volia.net. [176.111.185.181])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-538a04399d3sm1189833e87.191.2024.09.30.03.06.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2024 03:06:24 -0700 (PDT)
-Message-ID: <7ff94e87-1b9d-41e6-82a0-c13ff986adf5@blackwall.org>
-Date: Mon, 30 Sep 2024 13:06:23 +0300
+	s=arc-20240116; t=1727691296; c=relaxed/simple;
+	bh=uQX3p3gTWX8Hab2b8pic/KY4piqxMKyjairDi0YpJlQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kCKID5+iEobdFsjNrfQkXjQPU6Q57DQIBNSqh/+JHdNFq2SD2TBnRuxSRlSYDSOETrwMD3Zos+K5B1WKm009Ro7Y5d1pv0HPP2xJeoq9lt0Fz3Ha2M+dlaNGxpGaaPU2t0cI4CcCNHVIIgcka2vQIRes6N1+hQ9l8ahRI52GXZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rJ+/s2ZZ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9OlRk2qJffviTG3xiJHPw655zAjPrxKfaoMhCDVoxhU=; b=rJ+/s2ZZ+r1qhJgR5sXdq8swui
+	jsh1nMH1fR4V/oWf9FZXMwwI/Hk5nIBQyd3S1HfKYvC29P1K1iye7WHFjWYQVVMAEwD8R4YP2joJC
+	AyP0nT9kdNN8pIzpO5LyUgufmVf9HADZ+gBuCTWQu0jMZeQfOqu511rej5iysuuHHt0b5ueYYx6hw
+	pKvOhV3HWIGc7INL0rpdBLz61nVMLGXFJiSEVwwGQ+RbufWUgkJ0XAdLfbtlEdPdBwvBBK9LgLDhi
+	QtYbKhUxGZYBcDE1uygEP/jJQ1R10aZEl3CMA37vcsPOGp0zPhS1UE5wBwL3uRo0DcvA3NpaEiuUe
+	NDKjZSTw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44266)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1svDQ7-00041t-03;
+	Mon, 30 Sep 2024 11:14:22 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1svDPz-0003uN-0e;
+	Mon, 30 Sep 2024 11:14:15 +0100
+Date: Mon, 30 Sep 2024 11:14:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 01/10] net: pcs: xpcs: move PCS reset to
+ .pcs_pre_config()
+Message-ID: <Zvp59w0kId/t8CZs@shell.armlinux.org.uk>
+References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
+ <mykeabksgikgk6otbub2i3ksfettbozuhqy3gt5vyezmemvttg@cpjn5bcfiwei>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bridge: mcast: Fail MDB get request on empty entry
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, roopa@nvidia.com, bridge@lists.linux.dev,
- jamie.bainbridge@gmail.com
-References: <20240929123640.558525-1-idosch@nvidia.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240929123640.558525-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mykeabksgikgk6otbub2i3ksfettbozuhqy3gt5vyezmemvttg@cpjn5bcfiwei>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 9/29/24 15:36, Ido Schimmel wrote:
-> When user space deletes a port from an MDB entry, the port is removed
-> synchronously. If this was the last port in the entry and the entry is
-> not joined by the host itself, then the entry is scheduled for deletion
-> via a timer.
+On Mon, Sep 30, 2024 at 01:16:57AM +0300, Serge Semin wrote:
+> Hi Russell
 > 
-> The above means that it is possible for the MDB get netlink request to
-> retrieve an empty entry which is scheduled for deletion. This is
-> problematic as after deleting the last port in an entry, user space
-> cannot rely on a non-zero return code from the MDB get request as an
-> indication that the port was successfully removed.
+> On Mon, Sep 23, 2024 at 03:00:59PM GMT, Russell King (Oracle) wrote:
+> > +static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
+> > +{
+> > +	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
+> > +	const struct dw_xpcs_compat *compat;
+> > +	int ret;
+> > +
+> > +	if (!xpcs->need_reset)
+> > +		return;
+> > +
 > 
-> Fix by returning an error when the entry's port list is empty and the
-> entry is not joined by the host.
+> > +	compat = xpcs_find_compat(xpcs->desc, interface);
+> > +	if (!compat) {
+> > +		dev_err(&xpcs->mdiodev->dev, "unsupported interface %s\n",
+> > +			phy_modes(interface));
+> > +		return;
+> > +	}
 > 
-> Fixes: 68b380a395a7 ("bridge: mcast: Add MDB get support")
-> Reported-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-> Closes: https://lore.kernel.org/netdev/c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com/
-> Tested-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  net/bridge/br_mdb.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
-> index bc37e47ad829..1a52a0bca086 100644
-> --- a/net/bridge/br_mdb.c
-> +++ b/net/bridge/br_mdb.c
-> @@ -1674,7 +1674,7 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
->  	spin_lock_bh(&br->multicast_lock);
->  
->  	mp = br_mdb_ip_get(br, &group);
-> -	if (!mp) {
-> +	if (!mp || (!mp->ports && !mp->host_joined)) {
->  		NL_SET_ERR_MSG_MOD(extack, "MDB entry not found");
->  		err = -ENOENT;
->  		goto unlock;
+> Please note, it's better to preserve the xpcs_find_compat() call even
+> if the need_reset flag is false, since it makes sure that the
+> PHY-interface is actually supported by the PCS.
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+Sorry, but I strongly disagree. xpcs_validate() will already have dealt
+with that, so we can be sure at this point that the interface is always
+valid. The NULL check is really only there because it'll stop the
+"you've forgotten to check for NULL on this function that can return
+NULL" brigade endlessly submitting patches to add something there -
+just like xpcs_get_state() and xpcs_do_config().
 
+> > +	bool need_reset;
+> 
+> If you still prefer the PCS-reset being done in the pre_config()
+> function, then what about just directly checking the PMA id in there?
+> 
+> 	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
+> 		return 0;
+> 
+> 	return xpcs_soft_reset(xpcs);
+
+I think you've missed what "need_reset" is doing as you seem to
+think it's just to make it conditional on the PMA ID. That's only
+part of the story.
+
+In the existing code, the reset only happens _once_ when the create
+happens, not every time the PCS is configured. I am preserving this
+behaviour, because I do _NOT_ wish to incorporate multiple functional
+changes into one patch - and certainly in a cleanup series keep the
+number of functional changes to a minimum.
+
+So, all in all, I don't see the need to change anything in my patch.
+
+Thanks for the feedback anyway.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
