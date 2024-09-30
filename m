@@ -1,123 +1,117 @@
-Return-Path: <netdev+bounces-130559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5620698AD35
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:48:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4465E98AD3A
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2778B21005
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:48:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5BA1B21D7D
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:48:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CFD19D89D;
-	Mon, 30 Sep 2024 19:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="da9EiT4s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4B614F9D9;
+	Mon, 30 Sep 2024 19:48:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8AE192D63;
-	Mon, 30 Sep 2024 19:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F5419AA57;
+	Mon, 30 Sep 2024 19:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727725684; cv=none; b=BRQkFQLWxpNSnnCkQYiP5aXIzHy/KYIoyZ6JdTJMOyo1YZOusrjPygfwUb5Hc3ChTbARArgCBeELyqlvQ4Xdo1q4sw+mGc1C1cqjsF9eqSA3CwuiV8fZA+Nm/EDL49FERFkFWh7hX1kVpsPdvzYmApI7QQHSVZIAGkDkBRq+e2s=
+	t=1727725715; cv=none; b=eOEJnI1SQI6KDDk2wyg+RwWSPke2Zb5/ZEOHJsbsmwvg9g18FeQKnDyCYM208zXcHSl+RGb+949px0K6qh/+s/bAr8WkeEAZi18M9ver8sgBbU7pYXUeOiw9PBu9RezKbGJ4Rp8ztasDBghKVQL5E2ZYf4DaODudcZlIFH5qLHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727725684; c=relaxed/simple;
-	bh=zX7Xv4j1Jpsk1DHjtJhzuQXPGJa1B1XRYJxc7YlDcfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B90EBLgLzmkwuo4jAQ78rBg3OKoCxUGN2zFw5WUItTWE4NEx48R7jme69NjZch0H5yrvuT/R1e/qLaOc3B0PGnkoBPL3+CJKBFqx8dOyG/82upqBEz8wGyAvdQxW3gCEo1r35wy+zIXT+r/PTQEaTeU4lv/GJJ4v8GridSYFz08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=da9EiT4s; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5pKQqLfBTINSnLOUO4PPSoPYAul9k4y7qrDes6Ya/zA=; b=da9EiT4smaqz9J4nKnLz9YIVEw
-	wTkXmBPpdWjucPrSppu+46W3tMA/tggdniQKO9ztb3f+JC1cXdVp5ozLGE+x0VO02BB2fHW1hEtCs
-	14BRvtpRB3FjgGjcEcPY9Iqqz1eA8854uSb/2gLFihLjtclXOSCQ08s+FlsKszzOUIJU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svMNC-008eqQ-Lj; Mon, 30 Sep 2024 21:47:58 +0200
-Date: Mon, 30 Sep 2024 21:47:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, kuba@kernel.org,
-	stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcgrof@kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <a4e8d2ac-a303-4c5b-9a1d-3ba6c09d92dc@lunn.ch>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
- <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
- <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
- <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
- <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+	s=arc-20240116; t=1727725715; c=relaxed/simple;
+	bh=r5FyKux8zGz3zmiBX4vVHKn+OvvumLwKJ4ixmdiCFso=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=K48Av3YXpg+SEM4hme77YboQXiyaka9fXSPcL0XmjjsrmC/Sn6GaMfbQxD5nVj93Pzbk0K90YyHvdGfjYgEL1bi9ZmrW4Whxs0ywoT4GCmV30Qk7Iljdcmz92Dpip0U564dAe2VKkwaCcrYz9AnoOlchB9vNwf7lBF6lTBQbUXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.154.82) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 30 Sep
+ 2024 22:48:23 +0300
+Message-ID: <0670959e-a46c-4d63-bd25-261df88f6872@omp.ru>
+Date: Mon, 30 Sep 2024 22:48:22 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 08/11] net: ravb: Support ICMP TX checksum
+ offload for GbEth
+To: Paul Barker <paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+CC: Paul Barker <paul.barker.ct@bp.renesas.com>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930160845.8520-1-paul@pbarker.dev>
+ <20240930160845.8520-9-paul@pbarker.dev>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20240930160845.8520-9-paul@pbarker.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 09/30/2024 19:30:17
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188103 [Sep 30 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 35 0.3.35
+ d90443ea3cdf6e421a9ef5a0a400f1251229ba23
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.154.82 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.82
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/30/2024 19:34:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/30/2024 3:37:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-> > >Hi Stefano,
-> > >
-> > >>
-> > >> I was looking at other commits to see how versioning is handled in order
-> > >> to make sense (e.g. using the same version of the kernel), and I saw
-> > >> many commits that are removing MODULE_VERSION because they say it
-> > >> doesn't make sense in in-tree modules.
-> > >
-> > >Yeah, I agree absolutely. I guess that's why all vhost modules have
-> > >had version 0.0.1 for years now
-> > >and there is no reason to increment version numbers at all.
-> >
-> > Yeah, I see.
-> >
-> > >
-> > >My proposal is not about version itself, having MODULE_VERSION
-> > >specified is a hack which
-> > >makes a built-in module appear in /sys/modules/ directory.
-> >
-> > Hmm, should we base a kind of UAPI on a hack?
+On 9/30/24 19:08, Paul Barker wrote:
+
+> From: Paul Barker <paul.barker.ct@bp.renesas.com>
 > 
-> Good question ;-)
-> 
-> >
-> > I don't want to block this change, but I just wonder why many modules
-> > are removing MODULE_VERSION and we are adding it instead.
-> 
-> Yep, that's a good point. I didn't know that other modules started to
-> remove MODULE_VERSION.
+> This aligns TX capabilities with RX capabilities.
 
-As you said, all over vhost modules say version 0.0.1 for years. But
-the kernel around these modules has had many changes. So 0.0.1 tells
-you nothing useful. When a user reports a problem using vhost_vsock
-version 0.0.1 your first question is going to be, what kernel version
-from which distribution?
+   I suspect the ICMP TX checksums aren't offloaded anywway...
 
-If the information is useless, let just remove it.
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+[...]
 
-I would not base a kAPI around this. Isn't there a system call you can
-perform and get an EOPNOTSUPP, ENODEV, EMORECOFFEE?
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Also, at least in networking and probably in other subsystems,
-performing an operation is often needed to trigger the module to
-load. So it not being listed in /sys/modules does not mean the module
-is missing, it could be its just not been needed until now.
-
-Take a step back, what is your real use case here? Describe it and
-maybe we can think of a better kAPI.
-
-	Andrew
+MBR, Sergey
 
 
