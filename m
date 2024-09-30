@@ -1,110 +1,109 @@
-Return-Path: <netdev+bounces-130365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E3298A37F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:52:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89D0998A384
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:52:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498D21C22EB0
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:52:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFFB1F254E8
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:52:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C9518E023;
-	Mon, 30 Sep 2024 12:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9599618E36E;
+	Mon, 30 Sep 2024 12:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="eX0ojKVc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cH205+xI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C75118EFE1;
-	Mon, 30 Sep 2024 12:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FEFE18FC65
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727700736; cv=none; b=LuBC6jua1t5/Dgh/LYisEcuSVO74OPp7SAx1k7Sx77BaUJMe4t15KlDWr7t6e1PDwqc+W74L7j/WkkSiyg0fDu6nLbJimXj42lkqj3xAZT8q/9SStC9lmEOC6HCg+lLbWdyx4Q+k8LKLLBJHvt/tFetyy9wjwNEitXm/ZvbTnGQ=
+	t=1727700742; cv=none; b=LlHgJBZd7CpqEU37wO5O7JaM5K3qsb6TxQmUOYInr02yEl8w1qiLgREosUwAa6Mu+ZTWcfchlKgX5vCGNHWzt8r8zgE3JkaDgyfRuj/spNzZZXxLUU7gT3aFYceEXPTq3knm/CMjsj3Y7mDwddPAp9JCX1mFBcG3HBEoFX3LxIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727700736; c=relaxed/simple;
-	bh=KXWDpFrAIhachM2EMwPDXtL0tFet7X4Ku8wgw9+P3y4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VpqE5oInwbagfdFGH5pmwBdX9ytA2qqd/2SUrOfD2ANwB03b49AX20nvX/rJOQ82xP8d96CjP+YhOiDx72dtFicL0pXSmKctdf3I3djHGgvs3ttu0M0kEEX2sFGKZA1QAKMlVDt+Fy+nnQplZaA5js2f8jdU6acxALwFvSQ2cJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=eX0ojKVc; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1727700705; x=1728305505; i=markus.elfring@web.de;
-	bh=KXWDpFrAIhachM2EMwPDXtL0tFet7X4Ku8wgw9+P3y4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=eX0ojKVctUoGhhukf8ccA6EtfnMcphjBOrNC6sxdX5lRCDk6bzv2X/teIngs7Qdw
-	 DE2N/yKAtOSV5oSoeljkJ+HKM5FRdLyFxcolTqveujxuHUgS+i0ntQ0MiowC0mwZI
-	 85vDDHE0gNc1NAsk0o+pwsjDO0sL9ghkcPWT4/cBZsd7ADAyLJ4ydUDbiLQYCMTcz
-	 xYCpOMT14XnrZvxYHdyUojyWNHEuC86zm8sKbHu92spqkS+AqUaDO9cxiA4kCb0G1
-	 7J7N/bOID8yN68nNj9FnIvqNKewIkun5YvCbNBo6WELUxPF+EkyG9RCtDK1F5R6xp
-	 GGD6sNCY4f9daWLOGg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.84.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MT7aV-1sTZRW0fWB-00StZN; Mon, 30
- Sep 2024 14:51:45 +0200
-Message-ID: <3f4228f2-3ad5-4491-8236-6a7fbc5274ff@web.de>
-Date: Mon, 30 Sep 2024 14:51:43 +0200
+	s=arc-20240116; t=1727700742; c=relaxed/simple;
+	bh=I3XAswTbM6b/JGrNsCLhXccVrlOMtrETAjtdN/rctYU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=NVt8Hb0enrNm74GJam4umt2wy51DVqE1BNHyozFJxNe+/uUlaIkM40B9HNkNIgA0sYq9hqxawgcVUzb/9XwTjuXumDw1tUOnYASLSz7yV9ZuWmU17Y6ywZu4LVYRMXSiN2uf8TZem0YLGoP3Wh/1bpxLSO5XdRF6HETzyGRGlLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cH205+xI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727700740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iheTQuAAGoNV0Ml7YHfX3/4X0Beg93WMcxdOLm415Rw=;
+	b=cH205+xIKcOA13VsaHLU9wDsshtW2wGtjjHXfI3C8xS/LS0ag6Z3TklaxeB4aKRGGh2QvC
+	BF1qkQ9rbCqb3N7PGGmBMfN9R3AXAs4AEz0bfwFItKi6G7ATxD44+qXmlZdloeDf9F9LFS
+	BfpfvsP5kkdZmDmYRIlApDKEz/JsEQ8=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-124-yIEMnkANOcKlKeIOv07qjw-1; Mon,
+ 30 Sep 2024 08:52:17 -0400
+X-MC-Unique: yIEMnkANOcKlKeIOv07qjw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9E827197730E;
+	Mon, 30 Sep 2024 12:52:13 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 28F8519541A0;
+	Mon, 30 Sep 2024 12:51:58 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <2968940.1727700270@warthog.procyon.org.uk>
+References: <2968940.1727700270@warthog.procyon.org.uk> <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: dhowells@redhat.com, Eduard Zingerman <eddyz87@gmail.com>,
+    Christian Brauner <brauner@kernel.org>,
+    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] cleanup: make scoped_guard() to be return-friendly
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- kernel-janitors@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
- =?UTF-8?Q?Amadeusz_S=C5=82awi=C5=84ski?=
- <amadeuszx.slawinski@linux.intel.com>,
- Andy Shevchenko <andriy.shevchenko@intel.com>,
- Simon Horman <horms@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Peter Zijlstra <peterz@infradead.org>
-References: <20240926134347.19371-1-przemyslaw.kitszel@intel.com>
- <21be0ed9-7b72-42fb-a2fb-b655a7ebc072@web.de>
- <34d2f916-3551-4b75-b87a-9d413662369b@intel.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <34d2f916-3551-4b75-b87a-9d413662369b@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2969659.1727700717.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:kAxrK46s8Wcx8kQGjxB1JNRJToJMJxN4A2l42eOMuO4XWZv2p+0
- abDsr+S8U/ZrPYMkqQVuKJa7qfyU9Rosw6Ug3XyivMVNBnOhs4uipe/e6uuyLyoLPl2AhlB
- ZzpgId0/Rr0BqfxvhgQisQRXIaipG4A+9afB9IYZVGj5/CjiJ5jEWTQ6JxHw04FH2wfNu1K
- rTNWhKtSV2ZasmaLiLSNw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:pgE1M2bA76s=;zenY1a8l/x+gQ+Pvwa4rnufisuH
- BBwUyCoA9lDJlBQYER7Xtpb6kfkl72B6emyZRfwD/I5BvbeyMQp5vW6HqKqi89EPHXSwxmRRq
- RYDUSGyoJ2f7ibdZrNNLICa586I0d1qsgg30h13F54m/t4K0S1Z+CBVNhL0hvBeWnnmEcfbA6
- ratQzQG1/HnoC/GAA3RTKHIB0QAo3giRURA/iCh9pjifEzaQd4fcz1CJiNZ8fGGewa3oyF7lL
- 9UahG6/FO7jGoS+KrqSrjmBKacUmqhlUHZhp3UogPIyDFHy4jrYFP5ftY4SopgvKgKSdG3DEF
- FhLSVh5Z9TrLi/pEzDRPjEXnvPACbgS0HsvkOb036mXr0nhXDT3KMa5+pxR4bBCSOrLOlNGGT
- LZRFUyVx15ZQvEeM6U9b8W6ecKMz/sl35nmqhOxu1YXlePlKNy8i7LcV1XQ1Ce71IQO0PBhNS
- 9V0L6fIrI1QHCLfAfsdPALZx5gZ2HuqD0nyu4b6wkYuwjBDFONl2CaJmjjmYijdD2XFqZ2W5w
- nx/pXjEjJ7YME4ZjmyzsFmueG4cJJ2OH2D1AcOsk+jy0z3X583PNaRB60ZrAXr986IedrHIGO
- uR8teT5rNT7ER6cyAU4NxoSj1C7/RRpNVvADyoyHtxrRyNATNb+7qYZFXO2Ou8chStMYyZjgo
- WQ9xjAjhmG0hOTc5tE8R3UIfX7J7XRUT1Mya0DBI+uh5It8oyg/yx7VIocFs3Z5VFoGpDAQEM
- b16ihtYH5aYiCWLH3aW8PWT/yFHdlJsQMlhYRDVOvlw9za0mM6M2gAWr4SfAnr725yPPBfXvn
- MhuwBvZdC/kpXmQinRxCNzNA==
+Date: Mon, 30 Sep 2024 13:51:57 +0100
+Message-ID: <2969660.1727700717@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
->> * Would you ever like to avoid reserved identifiers in such source code=
-?
->> =C2=A0 https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+de=
-clare+or+define+a+reserved+identifier
->
-> we already don't care about this guideline (see __guard_ptr())
+David Howells <dhowells@redhat.com> wrote:
 
-Please take another look at name conventions.
-How do you think about to avoid that this software depends on undefined be=
-haviour?
+> Okay, let's try something a little more drastic.  See if we can at least=
+ get
+> it booting to the point we can read the tracelog.  If you can apply the
+> attached patch?
 
-Regards,
-Markus
+It's also on my branch:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log=
+/?h=3Dnetfs-fixes
+
+along with another one that clears the folio pointer after unlocking.
+
+David
+
 
