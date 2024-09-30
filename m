@@ -1,137 +1,162 @@
-Return-Path: <netdev+bounces-130370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 709AC98A3EA
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:04:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C66A98A3FA
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74EF8B20B32
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:04:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 507561C203E1
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:08:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB05141A84;
-	Mon, 30 Sep 2024 13:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DAAB18E74D;
+	Mon, 30 Sep 2024 13:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Vih0aST7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+9ctvT8"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BC21DA3D;
-	Mon, 30 Sep 2024 13:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB4617A924;
+	Mon, 30 Sep 2024 13:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727701453; cv=none; b=C1ocIgloDe7S8amkGiYmO2annpBz7sSpwDxMatwlXbRDvOp4A/UgGTQvpuMmWR+9qB9Y+Cnq+BCm9978/RQlBdY33CH1LDJmTEi+34sgSpE5oaDYRynHtjAyNW0T0IzuzuDRzoQ3F6aAC+FTURQpuU+nzFBrDdKQTA0Rh6L2iHA=
+	t=1727701680; cv=none; b=IcuuYS4cn3huOQx1JOqBFPrNtHcztI60XrTR70/UMjneZRD0hI8pxMNsb+QKrXW/BIiZxNsVNvKf7JEqaEC1Bjr7kjxhmBdMKblwBdaabZByRRCSxtvmXeoFgGqigUc7pDW+JHfuEYzbVhShjvjSfsW0R7iuu3UUEzh4AYb9U7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727701453; c=relaxed/simple;
-	bh=X1w+aHZ1aSEC/ce63NVfAhp4cMR5ClhM0fpq2w+I4m4=;
-	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=drnQ2hA2r3oM5d7slGyO97IXlqnMSM6KLYjhEOvEnHR1NfA6Mc9PakZ26IrxA4briopsU2Eb5PjWZokg1mtmufLUFpB37KWgXvyZ7Eq9t7/zl+u61EbujJWlzVZm4dzdackptSWeSGATz5H9wEMC4iiCwf8OfA9rAnp5Fm3eHn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Vih0aST7; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1727701451; x=1759237451;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=X1w+aHZ1aSEC/ce63NVfAhp4cMR5ClhM0fpq2w+I4m4=;
-  b=Vih0aST7MeAzYbKrxOKgVfhRu35Bz2JPfLM080jR0DuM3ClTSttEUn2q
-   tf+RZ35KqUqQa1C6/mxScnHDX9hw9n//YQcepOHhGLYL4nMrE0tp2ojeS
-   GK9OlvOsSAaDVsqQ/IiKi53LhLM75MdfqRakad16AlG0+4NKruxgRWsBu
-   aQ5Gyxzx5XcXUOb/7FqFA3bt2P8AaxxU31JtuXSik2bNq7MM9E76hsUV7
-   Ke/oSSmrzYh6H8D+xeMIvLn5p3DMm7E9m5yX2K3V4+tNSQUCLJAsixIUW
-   +gaYwhEDhtWzWP5CE3t/KVXzOVyMzHNqsIp79qwHKnVqzVDztE+Pt6kJx
-   g==;
-X-CSE-ConnectionGUID: vO9Oy7ojQeG5B541OJjihw==
-X-CSE-MsgGUID: 5bccPyKoRgKxoVZkWYFVeQ==
-X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
-   d="scan'208";a="35659350"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Sep 2024 06:04:09 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 30 Sep 2024 06:04:02 -0700
-Received: from DEN-DL-M31857.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 30 Sep 2024 06:03:57 -0700
-Message-ID: <e3fca0f385e489cc30fc79c09d642c110125fd89.camel@microchip.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item
- when cpu-syscon is not present
-From: Steen Hegelund <steen.hegelund@microchip.com>
-To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
-	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
- Horman" <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
-	<arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
-	<dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
- Lunn" <andrew@lunn.ch>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Allan
- Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
-	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Date: Mon, 30 Sep 2024 15:03:56 +0200
-In-Reply-To: <20240930121601.172216-3-herve.codina@bootlin.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
-	 <20240930121601.172216-3-herve.codina@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1727701680; c=relaxed/simple;
+	bh=slBJildSLS8lvUx0hquew3Id4g/8MV7J25bixsZpogc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i/vKfXH+A9hEUlRL8GcuHIGerPsq9a1U3J+yqsuNxKPslSBnjvlvvHb1RLxTDYdhQd6zwDzmunwiXiQmiLdr5FfBXNcEsdjKiHovRY7hyMK4ztP16DIvYpSBR6qWatg2Z1kGQ1rpOdLvIBb9PYdXKNE+bcjf619OKw4JisNH0RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+9ctvT8; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e06f5d4bc7so3733829a91.2;
+        Mon, 30 Sep 2024 06:07:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727701678; x=1728306478; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xtWyt8Wc5r3RiOGFMVOEwNeg5crfeCiOe+iG3jYozms=;
+        b=S+9ctvT8GY6f+Jnzm2lqTPUIvN1Wzu9yBYKV4KB5lztP0i7XM0y7b7SLyfJVaDENbl
+         jlZMFNUc1leVQpf8Sd+mEmNl6bHw0uaXb6YCLHhb4u7mdOzYJMyUIe1xrSw28eZ2bvHi
+         cIjfvCgq49xD5qjKcLDJVPx/7t1+FjYezhkv7xqMLOSdHNTscpEXD4rF7LuFiZbjANMS
+         VlcpAIKLUCm5pmGxM9fR/TXRexJck+bknp8hGQBr0Ck4Qio3sst31vMPfOx6UM4deLqC
+         +6bGhS4dynWIHN/KlGQNgBf4qRrIx06XjCPcs3zzRLeoknGBCiU52lzFGPcO0Dm6UMvf
+         2dLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727701678; x=1728306478;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xtWyt8Wc5r3RiOGFMVOEwNeg5crfeCiOe+iG3jYozms=;
+        b=gsnUOf/EZ4hroqVRRmi+MXLaiOcC3L10jNQ4QpMw8EGRthomuPe3agpTjsI7N0cObE
+         1fTOmh+UYu6kojg2H5hp1QCDfjzqZ0VYHlvMKpNm4zkizcdB9nVK0sZOlZNQlXL9Ab8b
+         A4pCwUiwg/imZuWlzuzyYaQNvPKsSBKB+VkuPrXzp3nw6etUXWOwC0JNsneo9bQfvU70
+         2gKfur1M1jC92tz35uukp0hGqkn+n2X77zJ8RkbDAdrWRXgG9/nQii24aCj+GaPbFR9M
+         vJatE4loUJzrwEyNYgqq8eTW33WEQIHaD06vUQK6y8OAQEnxonuYcEdICiJ2KqHHv/NT
+         SyNw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/pKetmIONZpUNFVZBwI4Ti2WpICf7PAgptnDnR6KBD5VJyTgyMLKeuA9/d6h/1GPpq7TMkTwP2XGScWo=@vger.kernel.org, AJvYcCUwH3SNbs0tI3yvVS1/wOEroIHl6YoJ5O5elLBFrqqtXgzJoj8WZJ0AH6oBScMAf8mOuDlDRyfL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb00dW2fI+UXjpa3Vhggy0ylM89Xb2QELeaq/+rPyH9PzE3Scn
+	E49ondpabqj2mGEU2d13mCHQaLE044sjcyOJD+HdckIXVSa9fX4uGnZyl0Dhg54=
+X-Google-Smtp-Source: AGHT+IGFNLMf9Iv3d8clzn2xPx0gj/ssQNa7jGMzoLycBLhjBOQZLwQAoSeXnLBfNSAY6BywqlIkuQ==
+X-Received: by 2002:a17:90a:a009:b0:2d8:7561:db71 with SMTP id 98e67ed59e1d1-2e0b8ea16f8mr13833976a91.25.1727701678223;
+        Mon, 30 Sep 2024 06:07:58 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:671d:78af:f80f:975b])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c6cbc8sm7888043a91.13.2024.09.30.06.07.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 06:07:57 -0700 (PDT)
+Date: Mon, 30 Sep 2024 06:07:54 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+	amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	Andy Shevchenko <andriy.shevchenko@intel.com>
+Subject: Re: [RFC PATCH] cleanup: make scoped_guard() to be return-friendly
+Message-ID: <ZvqiqiAhn7EG_l_V@google.com>
+References: <20240926134347.19371-1-przemyslaw.kitszel@intel.com>
+ <10515bca-782a-47bf-9bcd-eab7fd2fa49e@stanley.mountain>
+ <bb531337-b155-40d2-96e3-8ece7ea2d927@intel.com>
+ <faff2ffd-d36b-4655-80dc-35f772748a6c@stanley.mountain>
+ <84f41bd3-2e98-4d69-9075-d808faece2ce@intel.com>
+ <129309f3-93d6-4926-8af1-b8d5ea995d48@stanley.mountain>
+ <e86748a9-6b72-4404-9042-c9b6308a9bc1@intel.com>
+ <bf348b5d-f6d5-4315-b072-cc1175ca4eff@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bf348b5d-f6d5-4315-b072-cc1175ca4eff@stanley.mountain>
 
-SGkgSGVydmUsCgpPbiBNb24sIDIwMjQtMDktMzAgYXQgMTQ6MTUgKzAyMDAsIEhlcnZlIENvZGlu
-YSB3cm90ZToKPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0
-YWNobWVudHMgdW5sZXNzIHlvdQo+IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQo+IAo+IEluIHRo
-ZSBMQU45NjZ4IFBDSSBkZXZpY2UgdXNlIGNhc2UsIHN5c2NvbiBjYW5ub3QgYmUgdXNlZCBhcyBz
-eXNjb24KPiBkZXZpY2VzIGRvIG5vdCBzdXBwb3J0IHJlbW92YWwgWzFdLiBBIHN5c2NvbiBkZXZp
-Y2UgaXMgYSBjb3JlCj4gInN5c3RlbSIKPiBkZXZpY2UgYW5kIG5vdCBhIGRldmljZSBhdmFpbGFi
-bGUgaW4gc29tZSBhZGRvbiBib2FyZHMgYW5kIHNvLCBpdCBpcwo+IG5vdAo+IHN1cHBvc2VkIHRv
-IGJlIHJlbW92ZWQuCj4gCj4gSW4gb3JkZXIgdG8gcmVtb3ZlIHRoZSBzeXNjb24gdXNhZ2UsIHVz
-ZSBhIGxvY2FsIG1hcHBpbmcgb2YgYSByZWcKPiBhZGRyZXNzIHJhbmdlIHdoZW4gY3B1LXN5c2Nv
-biBpcyBub3QgcHJlc2VudC4KPiAKPiBMaW5rOgo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2Fs
-bC8yMDI0MDkyMzEwMDc0MS4xMTI3NzQzOUBib290bGluLmNvbS/CoFsxXQo+IFNpZ25lZC1vZmYt
-Ynk6IEhlcnZlIENvZGluYSA8aGVydmUuY29kaW5hQGJvb3RsaW4uY29tPgo+IC0tLQo+IMKgZHJp
-dmVycy9yZXNldC9yZXNldC1taWNyb2NoaXAtc3Bhcng1LmMgfCAxNiArKysrKysrKysrKysrKyst
-Cj4gwqAxIGZpbGUgY2hhbmdlZCwgMTUgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQo+IAo+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL3Jlc2V0L3Jlc2V0LW1pY3JvY2hpcC1zcGFyeDUuYwo+IGIv
-ZHJpdmVycy9yZXNldC9yZXNldC1taWNyb2NoaXAtc3Bhcng1LmMKPiBpbmRleCA2MzZlODVjMzg4
-YjAuLjFjMDk1ZmE0MWQ2OSAxMDA2NDQKPiAtLS0gYS9kcml2ZXJzL3Jlc2V0L3Jlc2V0LW1pY3Jv
-Y2hpcC1zcGFyeDUuYwo+ICsrKyBiL2RyaXZlcnMvcmVzZXQvcmVzZXQtbWljcm9jaGlwLXNwYXJ4
-NS5jCj4gQEAgLTExNCw4ICsxMTQsMjIgQEAgc3RhdGljIGludCBtY2hwX3NwYXJ4NV9yZXNldF9w
-cm9iZShzdHJ1Y3QKPiBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpCj4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgIHJldHVybiAtRU5PTUVNOwo+IAo+IMKgwqDCoMKgwqDCoMKgIGVyciA9IG1j
-aHBfc3Bhcng1X21hcF9zeXNjb24ocGRldiwgImNwdS1zeXNjb24iLCAmY3R4LQo+ID5jcHVfY3Ry
-bCk7Cj4gLcKgwqDCoMKgwqDCoCBpZiAoZXJyKQo+ICvCoMKgwqDCoMKgwqAgc3dpdGNoIChlcnIp
-IHsKPiArwqDCoMKgwqDCoMKgIGNhc2UgMDoKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCBicmVhazsKPiArwqDCoMKgwqDCoMKgIGNhc2UgLUVOT0RFVjoKPiArwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoCAvKgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKiBUaGUg
-Y3B1LXN5c2NvbiBkZXZpY2UgaXMgbm90IGF2YWlsYWJsZS4KPiArwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgICogRmFsbCBiYWNrIHdpdGggSU8gbWFwcGluZyAoaS5lLiBtYXBwaW5nIGZy
-b20gcmVnCj4gcHJvcGVydHkpLgo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8K
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnIgPSBtY2hwX3NwYXJ4NV9tYXBfaW8o
-cGRldiwgMSwgJmN0eC0+Y3B1X2N0cmwpOwo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGlmIChlcnIpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHJldHVybiBlcnI7Cj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgYnJlYWs7Cj4gK8Kg
-wqDCoMKgwqDCoCBkZWZhdWx0Ogo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXR1
-cm4gZXJyOwo+ICvCoMKgwqDCoMKgwqAgfQo+ICsKPiDCoMKgwqDCoMKgwqDCoCBlcnIgPSBtY2hw
-X3NwYXJ4NV9tYXBfaW8ocGRldiwgMCwgJmN0eC0+Z2NiX2N0cmwpOwo+IMKgwqDCoMKgwqDCoMKg
-IGlmIChlcnIpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiBlcnI7Cj4g
-LS0KPiAyLjQ2LjEKPiAKCkxHVE0KClJldmlld2VkLWJ5OiBTdGVlbiBIZWdlbHVuZCA8U3RlZW4u
-SGVnZWx1bmRAbWljcm9jaGlwLmNvbT4KCkJSClN0ZWVuCg==
+On Mon, Sep 30, 2024 at 03:57:08PM +0300, Dan Carpenter wrote:
+> On Mon, Sep 30, 2024 at 01:30:58PM +0200, Przemek Kitszel wrote:
+> > > but your macro is wrong and will need to be re-written
+> > 
+> > could you please elaborate here?
+> 
+> - 		__guard_ptr(_name)(&scope) && !done;
+> +		__guard_ptr(_name)(&scope), 1;     \
+> 
+> The __guard_ptr(_name)(&scope) check is checking whether lock function
+> succeeded.  With the new macro we only use scoped_guard() for locks which can't
+> fail.  We can (basically must) remove the __guard_ptr(_name)(&scope) check since
+> we're ignoring the result.
+> 
+> There are only four drivers which rely on conditional scoped_guard() locks.
+> 
+> $ git grep scoped_guard | egrep '(try|_intr)'
+> drivers/input/keyboard/atkbd.c: scoped_guard(mutex_intr, &atkbd->mutex) {
+> drivers/input/touchscreen/tsc200x-core.c:       scoped_guard(mutex_try, &ts->mutex) {
+> drivers/input/touchscreen/wacom_w8001.c:        scoped_guard(mutex_intr, &w8001->mutex) {
+> drivers/platform/x86/ideapad-laptop.c:  scoped_guard(mutex_intr, &dytc->mutex) {
 
+FTR I have many more pending changes using scoped_guard() this way.
+
+> 
+> This change breaks the drivers at runtime, but you need to ensure that drivers
+> using the old API will break at compile time so that people don't introduce new
+> bugs during the transition.  In other words, you will need to update the
+> DEFINE_GUARD_COND() stuff as well.
+> 
+> $ git grep DEFINE_GUARD_COND
+> include/linux/cleanup.h: * DEFINE_GUARD_COND(name, ext, condlock)
+> include/linux/cleanup.h:#define DEFINE_GUARD_COND(_name, _ext, _condlock) \
+> include/linux/iio/iio.h:DEFINE_GUARD_COND(iio_claim_direct, _try, ({
+> include/linux/mutex.h:DEFINE_GUARD_COND(mutex, _try, mutex_trylock(_T))
+> include/linux/mutex.h:DEFINE_GUARD_COND(mutex, _intr, mutex_lock_interruptible(_T) == 0)
+> include/linux/rwsem.h:DEFINE_GUARD_COND(rwsem_read, _try, down_read_trylock(_T))
+> include/linux/rwsem.h:DEFINE_GUARD_COND(rwsem_read, _intr, down_read_interruptible(_T) == 0)
+> include/linux/rwsem.h:DEFINE_GUARD_COND(rwsem_write, _try, down_write_trylock(_T))
+> 
+> I propose that you use scoped_try_guard() and scoped_guard_interruptible() to
+> support conditional locking.  Creating different macros for conditional locks is
+> the only way you can silence your GCC warnings and it makes life easier for me
+> as a static checker developer as well.  It's probably more complicated than I
+> have described so I'll leave that up to you, but this first draft doesn't work.
+
+No, please do not. Right now the whether resource acquisition can fail
+or not is decided by a particular class (which in turn can be used in
+various guard macros). You are proposing to bubble this knowledge up and
+make specialized "try" and "interruptible" and "killable" and "fallible"
+version of the previously generic macros.
+
+Now, the whole issue is because GCC is unable to figure out the flow
+control of a complex macro. Please either fix GCC or rework that one
+call site to shut GCC up. Do not wreck nice generic guard
+implementation, that is flexible and supports several styles of use.
+
+Again, the fact that scoped_guard() body can be skipped if the
+constructor fails is explicitly documented as a desirable property.
+
+Thanks.
+
+-- 
+Dmitry
 
