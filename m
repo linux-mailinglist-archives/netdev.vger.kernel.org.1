@@ -1,140 +1,214 @@
-Return-Path: <netdev+bounces-130319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E7EC98A135
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:54:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A3E98A16E
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 289301C2096F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:54:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BEC21C212C4
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8449B18CC0F;
-	Mon, 30 Sep 2024 11:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FEAC19004D;
+	Mon, 30 Sep 2024 12:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WaRZXSQp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eLw7zRUb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1694026AEC;
-	Mon, 30 Sep 2024 11:54:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B1519005D
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727697289; cv=none; b=q7vsW6aAxJ8Wk7F9Sj5Oj6iMM8F+hTtaeoafO9M+qMbPjpP4ohKIWNIwIci87/4YsCfjocSXGu9KMtJNKzfsTiB1RQGA4Dj6eRyu7sHswkSFCHno/iJj7/iI0pjhxgpGTCx27AVt6TK9dbo6bbDGR58bqwR3XW/2dvz7kvHGWWQ=
+	t=1727697859; cv=none; b=Td5N9BHXUWPYcswM+ylADg4r9VBrOpSF1nRDCBaF0L0OjWDn9+bOwAZsq1b5TJteMFSSeExW83p/gTOXZ7vuFIcX4Mrh5IpzykjIQ4dS5TqM7cyZyO763SrAcIQ+TIxov79+zB7dtQKWMGbu4so9K58N4dnSWSfLylcVt8B52Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727697289; c=relaxed/simple;
-	bh=6LreWhW0Fa8SDW7CDi5FN1XVRQPTC32Zs31DUoR9NWc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=gn0OsSL7Tor/GsTpaIeO7hOgwHkC6oPq2CPjQ4+8gEcfKMID26kY1nzJAg86qGx5WTCOQgM8KfVeA3wFGFRLVIK8NnzudveaBJKqM/DPATSPDVBs8e2O23ETffwzqJj55CPVzpoTBS8wEZVl9bkCInTU2aNVJ0spa/0l7TWtrVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WaRZXSQp; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-710da656c0bso1531053a34.0;
-        Mon, 30 Sep 2024 04:54:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727697287; x=1728302087; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6LreWhW0Fa8SDW7CDi5FN1XVRQPTC32Zs31DUoR9NWc=;
-        b=WaRZXSQp4RLEnk+KxiTHCXNhmAU551hTp62Q2MLxNYyvuxu4FrANNVx2oQCiPb5uNS
-         R38UuimEPLLa0sIZz+yVMF5iOU0VVIyEIt4nPZzmrAPjiGP3SHCI9lX7e5J5k2Zfy9Kz
-         tgD6uUr90qrFGax8k2EusFY+1aFdYfWc2xjKuLWq2IoK9OJnFPD2GlnEn6VLrzBuQtdn
-         nxIcfkLIPTOLIFQ8hjaEUydaLe/L5H/2VtOOd7XAGH5A7uPVkixD671Tp98iX998r2S+
-         WD7XKKEOE+nOSgwUqOtA1AHX7yPdKrIAVGiiHk2xLfVbPYTThR+uyeRJK1kkjhdBUSIM
-         tZlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727697287; x=1728302087;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6LreWhW0Fa8SDW7CDi5FN1XVRQPTC32Zs31DUoR9NWc=;
-        b=HowAmnHWA95FlKXv9Fhu++XZ8qEkNWchb/qm1BDYwsvQuVMd+f5cj0clYSDkn7BorB
-         cqajp/Tn7QWX78xAJIzuv3HntEbBn12dPHbQNwUVWEg2dgxzDoeZ7/rrg1V3hbAVpNjr
-         39QHhVc3AJ+UrNdi92zoEmwc/yfhDsSzG91DxBMPAWz3TvpBH1Py8z6bvqFCVJfbkmKp
-         IJDSsBMZveRhveFuLWXxsdVofFds7UPwZLwVNEzuyosdABjzWuzpe8tSR5VSuA8U+oNh
-         zchSd/J6vmBYuO+c0LyycTa29O5jLpOD4X2USzS6MnmyxW9bGZdIYsg73in0fAZJ+Xy8
-         DSIw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAcMhdId2H0FYS22hvnVEpnecOqC+bGIEK1++f1iwcX1R77P8xPjiKdl5txQdmZfrkDbep7f2E@vger.kernel.org, AJvYcCWc7ylzyGBrg2Md6OwCXU0F3KIcthQqqS+p1ekPjh/9hsiEA0hpa2C1NBF+8/ejFpMAmf5+L6y1UzQKFnSEX34=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr+d8GUJrIeLuYayhKf/lNmFTqPg0uXbyzTJpUrNwO/qUq2nU0
-	miVJeioBJygkwUeOxHwN2Uvgx2t0s5cF67tfqhZtkINxaole16Fu
-X-Google-Smtp-Source: AGHT+IGkGsY8esK8eMYKVyA+Y4pN91wR2RE7qdpfq8GodAab1cmemEBoa6mdhamVVc3KU4jbXjHvDw==
-X-Received: by 2002:a05:6871:582c:b0:277:ce3a:9202 with SMTP id 586e51a60fabf-28710bb5a34mr6725666fac.37.1727697287215;
-        Mon, 30 Sep 2024 04:54:47 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae377ec00dsm404286285a.60.2024.09.30.04.54.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 04:54:46 -0700 (PDT)
-Date: Mon, 30 Sep 2024 07:54:46 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66fa91864f534_17d4532943a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoD+Xn0s01ZqfaTRcUOLU7HfLx06FcWKabTcenCXPnXoQQ@mail.gmail.com>
-References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
- <20240930092416.80830-3-kerneljasonxing@gmail.com>
- <66fa808374566_17948d2947c@willemb.c.googlers.com.notmuch>
- <CAL+tcoD+Xn0s01ZqfaTRcUOLU7HfLx06FcWKabTcenCXPnXoQQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net-timestamp: add OPT_ID_TCP test in
- selftests
+	s=arc-20240116; t=1727697859; c=relaxed/simple;
+	bh=gZ8JVl2WGVwXFlP5gdbP2qd3VtW20mt6bXYgnZ3/0l8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KNtyhovToTd/pKlNV/HlcJClFgyAtT+N9/GQAJtkYkWEclW5jUzOMhosGO7ZgWVMbna1IqWk0GVzmSSYFjfVsk7SpBWvLTwallhthkgVnSd8RSeTqcIPcPIScX/gf4WtP9LHNbRZmH4FPK0Srn/pDi9hbN9GCCCgB1S8UiaMeHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eLw7zRUb; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727697857; x=1759233857;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gZ8JVl2WGVwXFlP5gdbP2qd3VtW20mt6bXYgnZ3/0l8=;
+  b=eLw7zRUb1uRNx2oZvV4UAVhgG4FVuyxIksPqZWfIzCnAZ8RAA4WyuKXh
+   og+3EILicTd/EhIPLpmU91ewLl/wTmZiORIILagiTX1RhsJ/O42Fquvz3
+   m2v4IYm/ex6bHAIgjKyB6CY+xNPC/WSSuX9jVMdN54d+fc1cFjjvUUlA5
+   zqWJWfVUOPJrjWo34fgUrWSekzKgjES37aaMqsYXI9mJUcNsuHX6G/HFO
+   LwfItuHD4aDCa7HORIg5pcmH0vdyUqqUU2XsMStEp8hUnC7AplwElpkK4
+   2Wzbf+wXaz3qT9KBLKKvCe8tfFd4ywEc9u5a3yYpWt+gVTl1EA+oG4Mo+
+   w==;
+X-CSE-ConnectionGUID: k6OR+a0iTs2kmOLoE6AIkw==
+X-CSE-MsgGUID: tZ6al29kQmOG+jWat8TeXA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11210"; a="29665514"
+X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
+   d="scan'208";a="29665514"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:04:06 -0700
+X-CSE-ConnectionGUID: w+ZFZ/O9QomhFpkHICqhCQ==
+X-CSE-MsgGUID: ZLH+GTP5TUyTFN5j4TxSAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
+   d="scan'208";a="77363447"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by fmviesa003.fm.intel.com with ESMTP; 30 Sep 2024 05:04:02 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	pawel.chmielewski@intel.com,
+	sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com,
+	pio.raczynski@gmail.com,
+	konrad.knitter@intel.com,
+	marcin.szycik@intel.com,
+	wojciech.drewek@intel.com,
+	nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jiri@resnulli.us
+Subject: [iwl-next v4 0/8] ice: managing MSI-X in driver
+Date: Mon, 30 Sep 2024 14:03:54 +0200
+Message-ID: <20240930120402.3468-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jason Xing wrote:
-> On Mon, Sep 30, 2024 at 6:42=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Introduce a test for SOF_TIMESTAMPING_OPT_ID_TCP for TCP proto so
-> > > that we can get aware of whether using write_seq as an initial key
-> > > value works as expected.
-> >
-> > Does the test behave different with this flag set?
-> >
-> =
+Hi,
 
-> Sorry, my mistake, the last email is not open to the mailing list. So
-> I copy that here.
-> =
+It is another try to allow user to manage amount of MSI-X used for each
+feature in ice. First was via devlink resources API, it wasn't accepted
+in upstream. Also static MSI-X allocation using devlink resources isn't
+really user friendly.
 
-> Not that much, only at the very beginning, this new test will use
-> write_seq directly.
+This try is using more dynamic way. "Dynamic" across whole kernel when
+platform supports it and "dynamic" across the driver when not.
 
-The kernel will act differently. But the test does not detect this.
- =
+To achieve that reuse global devlink parameter pf_msix_max and
+pf_msix_min. It fits how ice hardware counts MSI-X. In case of ice amount
+of MSI-X reported on PCI is a whole MSI-X for the card (with MSI-X for
+VFs also). Having pf_msix_max allow user to statically set how many
+MSI-X he wants on PF and how many should be reserved for VFs.
 
-> I once thought and wondered if I need to setsockopt() when one or two
-> sendmsg() are already done, then we check the behaviour of subsequent
-> sendmsg() calls. Then I changed my mind because it's a bit complex. Do
-> you think it's a good way to test?
+pf_msix_min is used to set minimum number of MSI-X with which ice driver
+should probe correctly.
 
-Packetdrill is more suitable for deterministically testing such subtle
-differences.
+Meaning of this field in case of dynamic vs static allocation:
+- on system with dynamic MSI-X allocation support
+ * alloc pf_msix_min as static, rest will be allocated dynamically
+- on system without dynamic MSI-X allocation support
+ * try alloc pf_msix_max as static, minimum acceptable result is
+ pf_msix_min
 
-I have a packetdrill test for OPT_ID with and without OPT_ID_TCP. It
-is not public yet. As part of upstreaming our packetdrill tests, this
-will eventually also be available.
+As Jesse and Piotr suggested pf_msix_max and pf_msix_min can (an
+probably should) be stored in NVM. This patchset isn't implementing
+that.
 
+Dynamic (kernel or driver) way means that splitting MSI-X across the
+RDMA and eth in case there is a MSI-X shortage isn't correct. Can work
+when dynamic is only on driver site, but can't when dynamic is on kernel
+site.
+
+Let's remove this code and move to MSI-X allocation feature by feature.
+If there is no more MSI-X for a feature, a feature is working with less
+MSI-X or it is turned off.
+
+There is a regression here. With MSI-X splitting user can run RDMA and
+eth even on system with not enough MSI-X. Now only eth will work. RDMA
+can be turned on by changing number of PF queues (lowering) and reprobe
+RDMA driver.
+
+Example:
+72 CPU number, eth, RDMA and flow director (1 MSI-X), 1 MSI-X for OICR
+on PF, and 1 more for RDMA. Card is using 1 + 72 + 1 + 72 + 1 = 147.
+
+We set pf_msix_min = 2, pf_msix_max = 128
+
+OICR: 1
+eth: 72
+flow director: 1
+RDMA: 128 - 74 = 54
+
+We can change number of queues on pf to 36 and do devlink reinit
+
+OICR: 1
+eth: 36
+RDMA: 73
+flow director: 1
+
+We can also (implemented in "ice: enable_rdma devlink param") turned
+RDMA off.
+
+OICR: 1
+eth: 72
+RDMA: 0 (turned off)
+flow director: 1
+
+After this changes we have a static base vector for SRIOV (SIOV probably
+in the feature). Last patch from this series is simplifying managing VF
+MSI-X code based on static vector.
+
+Now changing queues using ethtool is also changing MSI-X. If there is
+enough MSI-X it is always one to one. When there is not enough there
+will be more queues than MSI-X. There is a lack of ability to set how
+many queues should be used per MSI-X. Maybe we should introduce another
+ethtool param for it? Sth like queues_per_vector?
+
+v3 --> v4: [3]
+ * drop unnecessary text in devlink validation comments
+ * assume that devl_param_driverinit...() shouldn't return error in
+   normal execution path
+
+v2 --> v3: [2]
+ * move flow director init before RDMA init
+ * fix unrolling RDMA MSI-X allocation
+ * add comment in commit message about lowering control RDMA MSI-X
+   amount
+
+v1 --> v2: [1]
+ * change permanent MSI-X cmode parameters to driverinit
+ * remove locking during devlink parameter registration (it is now
+   locked for whole init/deinit part)
+
+[3] https://lore.kernel.org/netdev/20240808072016.10321-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20240801093115.8553-1-michal.swiatkowski@linux.intel.com/
+[1] https://lore.kernel.org/netdev/20240213073509.77622-1-michal.swiatkowski@linux.intel.com/
+
+Michal Swiatkowski (8):
+  ice: devlink PF MSI-X max and min parameter
+  ice: remove splitting MSI-X between features
+  ice: get rid of num_lan_msix field
+  ice, irdma: move interrupts code to irdma
+  ice: treat dyn_allowed only as suggestion
+  ice: enable_rdma devlink param
+  ice: simplify VF MSI-X managing
+  ice: init flow director before RDMA
+
+ drivers/infiniband/hw/irdma/hw.c              |   2 -
+ drivers/infiniband/hw/irdma/main.c            |  46 ++-
+ drivers/infiniband/hw/irdma/main.h            |   3 +
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  75 ++++-
+ drivers/net/ethernet/intel/ice/ice.h          |  21 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   8 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c      |  64 +----
+ drivers/net/ethernet/intel/ice/ice_irq.c      | 272 ++++++------------
+ drivers/net/ethernet/intel/ice/ice_irq.h      |  13 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  36 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    | 154 +---------
+ include/linux/net/intel/iidc.h                |   2 +
+ 14 files changed, 287 insertions(+), 425 deletions(-)
+
+-- 
+2.42.0
 
 
