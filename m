@@ -1,143 +1,173 @@
-Return-Path: <netdev+bounces-130427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42DDA98A6F2
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:26:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 135CD98A6F4
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:27:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C16282927
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 375621C21F23
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:27:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C59190688;
-	Mon, 30 Sep 2024 14:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB44F1917E9;
+	Mon, 30 Sep 2024 14:27:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lJk5Id0U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+YJyeal"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BC813D539;
-	Mon, 30 Sep 2024 14:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE6E18FDD8
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727706384; cv=none; b=t9OeU5T6vVj/zKMH9cWt0/qxnsqAh4+9riWghhgnfFM95LeShZzhhbckYPTlI8ta1yESEqdRjFGmgZGWap0cTQdIf3JE/jo65IQLR2KFAcY7TruN9tHpanNcQALjTxjmKh4Jtdk+c4JlAmX5ZvtbIxh6uPiAft2L57sRskBie4s=
+	t=1727706463; cv=none; b=JY0Ybs1F0fDgF+ztQwMDuYjSji6SaomCZyHGvKA79VhTiNlv0S0YbIbr8gt1wMP5aUKHUqFY3sVqMG7dyZFswlzVIJqt69/CAuPXYZPtLloHoEevMvIS/itnSHrP3Hhf4aPc8YxpBgfEOwswMIb+tWJa2XmPb+G5LAGuwGzN9R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727706384; c=relaxed/simple;
-	bh=D/K4G0cY8c9Tt7CPwn45PDwSHjjMdVwTLalAuFeMgGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Iu8jjlMfTw1XT+xHKwyc90vW2sQDZEt6MYsPk+u1ITypLDzRFAmB8ltLY9zqnxl5RgbLLaqalA0zwelCoeRxUHTbBb9vPCmSaouMabHZ14uLZzS2WksdNT8C6P1SA/AfUzdQNUwZZgla6qPEHy6yAID+5KM1o9rJL900p+5VaX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lJk5Id0U; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 877491BF203;
-	Mon, 30 Sep 2024 14:26:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727706379;
+	s=arc-20240116; t=1727706463; c=relaxed/simple;
+	bh=EeYyLF20aDFEbuavaL7j2KagAYQQasGHqOcT6pXxFaI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fBJJIjqOojE2fIAYHH1Q7+TMmISGpxk9yZJqfr8Ya+Hf59O77ogpKVM7lgbJjki07zTKbPGNPvSqjhN0LRVw8Zxa8S6GppuUoQepHFPMES+nY6EPMUiS2EcZknANPqoFmgelr/cPB0UXgXsuknrnQif5fUW65xOQzH7H6nQlK6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q+YJyeal; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727706461;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bHMb96CYM+I+SvYzsm1sJNO/ARCPSEaKP4XT+TbHTIM=;
-	b=lJk5Id0UepP86gzHpP/dlKkKwbypXwcEBW3CFsDfgEeBQifjRwKcN7ldV4IH7iiKc6SheF
-	/nI8Pep9ZoT15NkY1KJ2XDfoPvV5TxqWN12eizzTfvlYIb1ZwL74iK59lKnbbTvOjVVDaa
-	1nQGU9RgCeQg/W9xEi8UlyhF9jtTd5YvN4o0kcQ1FqeO4IlTYF6wXr3cNYUYo4dcNxX3zD
-	ql9MmxvShpL4H432wVUQchnzC3n6LFq48khfjvzg2ITiBneBHmbf2L4WeM6Th90n3SFCDC
-	Hmn+SA9CDyq6dkLkKj2G+Jw/kT8BHsEqa6khY+XcggMgeCpjJlyGiJQJ8jW4Nw==
-Date: Mon, 30 Sep 2024 16:26:16 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
- <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
- <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
- <lars.povlsen@microchip.com>, "Steen Hegelund"
- <Steen.Hegelund@microchip.com>, "Daniel Machon"
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
- <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
- "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
- Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
- <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item
- when cpu-syscon is not present
-Message-ID: <20240930162616.2241e46f@bootlin.com>
-In-Reply-To: <d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
-	<20240930121601.172216-3-herve.codina@bootlin.com>
-	<d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=4ytbPBd95cWqX8Nn+fM7i9ZT4U+6yWcLeNhuCcF4JcQ=;
+	b=Q+YJyealfuOlFs5Y2qZZ23YpxmCHLdBf5Y8ZE+DqwvCfi/K3Ka9es6PHoyLpSHjLmv+EqT
+	iFeG1SdL+ivUF9wXFju/Y44vzZ/j44lErkKXgYOBTKxZB7BcxpuTjzYWwUpeFinfn4pin8
+	DPxGf/fYG2Ptkk7bAtXPAMcGY5oaGHY=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-iLSKm_0wNo61leSVoM04cA-1; Mon, 30 Sep 2024 10:27:39 -0400
+X-MC-Unique: iLSKm_0wNo61leSVoM04cA-1
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5dc96240f1dso3258001eaf.0
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 07:27:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727706459; x=1728311259;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4ytbPBd95cWqX8Nn+fM7i9ZT4U+6yWcLeNhuCcF4JcQ=;
+        b=osUQI7W2GtR3IL9kq8VAFCj7UIrj23Ce7DkbNy5Ps5xUnhLHi1Bgt4QPaIU8smtlF8
+         0p/jBnLJVAmUex1manKHg+tL0DjemKCb1UGmS+d+D3n+zMZgNwC1ItV5db3XShmq8ZP7
+         5YchbJGtCtVIaFgk+3ai3rw/tG064oA/7bngYCPxgvvY6YafyJCW+nEGCaTG3pOp4RP2
+         6deolveff0fbfThPzBaSb880OrbVyKc9yAaOgulLhWgmfxQpJ9VTtNucVQU6V0s7nXUE
+         YozYf3vk22DZSHJqU/C8QYCxkpyPtPr9Sz60QKDiS13tKV2vBLNMgQUjpyMYI1V+UPLk
+         yxHA==
+X-Forwarded-Encrypted: i=1; AJvYcCUoU4wu+6OlAX+cuFYdNhH+qecc0AAHRunR4E6N18BwRTtDucGOpZ9Ukx9FUOe+guPXhnUKSug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZGJDryh5cUP6gVM02wo0Qy7pb91NF3GsrEHUl6kAzPppq6K7n
+	tCyogBNJ3dHauFIKbA6taS8Y+/0zi/K0JMXRduZODiEuPzOHFeGmrYF4LC47un0bZsF71uwCUoL
+	cS4F6bTgUJsq2p3MJnAkis+HNk6KLDYjyPL9oB7L9gylmBDI2j8OimQ==
+X-Received: by 2002:a05:6358:7201:b0:1af:15b5:7ca0 with SMTP id e5c5f4694b2df-1becbc29d1emr438413555d.6.1727706458914;
+        Mon, 30 Sep 2024 07:27:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIrMRsWhZz29fSWrh8R6+DMZiFE0fzWTDB+zeNZvgXRTdMVS2bFMuus9C1n6IS1/FhZMePYA==
+X-Received: by 2002:a05:6358:7201:b0:1af:15b5:7ca0 with SMTP id e5c5f4694b2df-1becbc29d1emr438410055d.6.1727706458474;
+        Mon, 30 Sep 2024 07:27:38 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b68ec20sm40159986d6.135.2024.09.30.07.27.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 07:27:37 -0700 (PDT)
+Date: Mon, 30 Sep 2024 16:27:14 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>, 
+	kuba@kernel.org
+Cc: stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+Message-ID: <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
 
-On Mon, 30 Sep 2024 13:57:01 +0000
-"Arnd Bergmann" <arnd@arndb.de> wrote:
+On Sun, Sep 29, 2024 at 08:21:03PM GMT, Alexander Mikhalitsyn wrote:
+>Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
+>
+>It is useful because it allows userspace to check if vhost_vsock is there when it is
+>configured as a built-in.
+>
+>This is what we have *without* this change and when vhost_vsock is configured
+>as a module and loaded:
+>
+>$ ls -la /sys/module/vhost_vsock
+>total 0
+>drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+>drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+>-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+>drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+>-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+>-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+>drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+>-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+>drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+>-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+>-r--r--r--   1 root root 4096 Sep 29 20:05 taint
+>--w-------   1 root root 4096 Sep 29 19:00 uevent
+>
+>When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
+>And this looks like an inconsistency.
+>
+>With this change, when vhost_vsock is configured as a built-in we get:
+>$ ls -la /sys/module/vhost_vsock/
+>total 0
+>drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+>drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+>--w-------   1 root root 4096 Sep 26 15:59 uevent
+>-r--r--r--   1 root root 4096 Sep 26 15:59 version
+>
+>Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+>---
+> drivers/vhost/vsock.c | 1 +
+> 1 file changed, 1 insertion(+)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 802153e23073..287ea8e480b5 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+>
+> module_init(vhost_vsock_init);
+> module_exit(vhost_vsock_exit);
+>+MODULE_VERSION("0.0.1");
 
-> On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
-> > In the LAN966x PCI device use case, syscon cannot be used as syscon
-> > devices do not support removal [1]. A syscon device is a core "system"
-> > device and not a device available in some addon boards and so, it is not
-> > supposed to be removed.
-> >
-> > In order to remove the syscon usage, use a local mapping of a reg
-> > address range when cpu-syscon is not present.
-> >
-> > Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1]
-> > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > ---  
-> 
-> >>  	err = mchp_sparx5_map_syscon(pdev, "cpu-syscon", &ctx->cpu_ctrl);  
-> > -	if (err)
-> > +	switch (err) {
-> > +	case 0:
-> > +		break;
-> > +	case -ENODEV:  
-> 
-> I was expecting a patch that would read the phandle and map the
-> syscon node to keep the behavior unchanged, but I guess this one
-> works as well.
-> 
-> The downside of your approach is that it requires an different
-> DT binding, which only works as long as there are no other
-> users of the syscon registers.
+I was looking at other commits to see how versioning is handled in order 
+to make sense (e.g. using the same version of the kernel), and I saw 
+many commits that are removing MODULE_VERSION because they say it 
+doesn't make sense in in-tree modules.
 
-Yes, I knwow but keeping the binding with the syscon device (i.e. compatible
-= "...", "syscon";) leads to confusion.
-Indeed, the syscon API cannot be used because using this API leads issues
-when the syscon device is removed.
-That means the you have a "syscon" node (compatible = "syscon") but we cannot
-use the syscon API (include/linux/mfd/syscon.h) with this node.
+In particular the interesting thing is from nfp, where 
+`MODULE_VERSION(UTS_RELEASE);` was added with this commit:
 
-Also, in order to share resources between several consumers of the "syscon"
-registers, we need exactly what is done in syscon. I mean we need to map
-resources only once, provide this resource throught a regmap an share this
-regmap between the consumers. Indeed a lock needs to be shared in order to
-protect against registers RMW accesses done by several consumers.
-In other word, we need to copy/paste syscon code with support for removal
-implemented (feature needed in the LAN966x PCI device use case).
+1a5e8e350005 ("nfp: populate MODULE_VERSION")
 
-So, I found really simpler and less confusing to fully discard the syscon node
-and handle registers directly in the only one consumer.
+And then removed completely with this commit:
 
-With all of these, do you thing my approach can be acceptable ?
+b4f37219813f ("net/nfp: Update driver to use global kernel version")
 
-Best regards,
-Hervé
+CCing Jakub since he was involved, so maybe he can give us some 
+pointers.
+
+Thanks,
+Stefano
+
+> MODULE_LICENSE("GPL v2");
+> MODULE_AUTHOR("Asias He");
+> MODULE_DESCRIPTION("vhost transport for vsock ");
+>-- 
+>2.34.1
+>
+
 
