@@ -1,650 +1,332 @@
-Return-Path: <netdev+bounces-130351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6AE98A226
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:23:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93CDE98A1FD
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AB98282EED
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:23:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B88721C225A8
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8AA0199FBE;
-	Mon, 30 Sep 2024 12:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A93418F2FB;
+	Mon, 30 Sep 2024 12:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gue5J8PX"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aFhwXdju"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82726199FD0
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D4318E033;
+	Mon, 30 Sep 2024 12:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727698590; cv=none; b=C7ilvqUYhAEA4ER6H2w6rdNk04YizdHqYINvXlCvl8Z9aIZK9gsA/SRivCk0z0z/6OLVF8Xh0osQryMPerOHH07/LVmfo9JHaaRUJhmDi/Io6BSFclRdq7carZAiwKwF3lBflTDDHz4dmP1pSPYPWjmILhhiic7X+P1+xR3jxLA=
+	t=1727698574; cv=none; b=j9GVl74gAKbCqRmSOrrVPG5cDO/2LjHo1M4JGmEtaNpmw/uqLD1t5KpKyfOzgeqjhCtHe1dnxgRZ3iktv9p0n/lLgB5s4jy/1FxKioneRjHdrA5MJhOeP70L7HKTueEdI2/EYc3oFVLv5xwM1IEZ6r38IZNAzNNq9+9aabZMDSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727698590; c=relaxed/simple;
-	bh=1Gu1SnUxX3exliKYP/oaD1rfz7BIzW6H+rlEhOqinbA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fBck5lkzFrFhFjH+Be/YQWKjN9crcvBtA3nRkijabaG5pLeXiGawfMcNvRhmkHWYGREMkqx9JrMBxSo0i7ZsQB+LGObXksolpCkF5HOyhTTOK/KLA8JRmvrwX2oWFhUIiy+CqcGAtCEKgqrnfuHv2tY12+3v+NwYFlU9CN+utSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gue5J8PX; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727698589; x=1759234589;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1Gu1SnUxX3exliKYP/oaD1rfz7BIzW6H+rlEhOqinbA=;
-  b=gue5J8PXHE+Y7XEYhOctDn5eiepU2sHl7+WVWyJuqKPqtOQpliBBxDWF
-   wEhMpXq0DQPAHvq1R6H3J88atkaCBBU3Bt6s56MwkXXcyD8XRAHEEY8Tb
-   AmgUQXQ9eIpOZfAAYTuZ+9X/cXci8kYtvnQutN3/rqTnJ7gjl/0vcLF1G
-   HfpUzMC91d7tqtq2RNCOwMJeR10WO+kfc/7+LJC4k3OB6UzwrK05oni7l
-   jVeqidZjEZTryreD3jE1/CEsg5kZF7IKxsDFMo4ieja9hQT/7AX6A1dDV
-   QqRGVhTiDdGt5Eb3X4JpcDRwDNvFcDHXV6CCKCKRlgcoPrKuZqU9tcNdv
-   g==;
-X-CSE-ConnectionGUID: aLYwYL1VQ0idgTD+fyRJtg==
-X-CSE-MsgGUID: zI2KYhu+RlmFAkPiRu4t/w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11210"; a="26666796"
-X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
-   d="scan'208";a="26666796"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 05:16:28 -0700
-X-CSE-ConnectionGUID: m1/9i67lSWiY6aLOQEYL8w==
-X-CSE-MsgGUID: Kurdfh4tRSi6vHcxZYSziw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,165,1725346800"; 
-   d="scan'208";a="73592854"
-Received: from kkolacin-desk1.igk.intel.com ([10.217.160.108])
-  by fmviesa010.fm.intel.com with ESMTP; 30 Sep 2024 05:16:25 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Michal Michalik <michal.michalik@intel.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v12 iwl-next 7/7] ice: Implement PTP support for E830 devices
-Date: Mon, 30 Sep 2024 14:12:44 +0200
-Message-ID: <20240930121610.679430-16-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1727698574; c=relaxed/simple;
+	bh=nrN2cpxF/aU4Sug36pYa1watYo6LTdFsPBi337F7r78=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fO8bHC/QwKFhnvQXrqZsYyZgpkO3jS1kFUKfwxdgjTssvvz9VYP1O8+1XJPgpb4GX0G57AB5yeHEUJqhwJDLIqCUeIEZoLlIqwEVY/zMfczBQZH59rFk7JlRC1B6F8DSGfNQbqHCPzi5yXGjx9tRQNU5mvKcYFthn8RgbsgRULw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aFhwXdju; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id D89161C0002;
+	Mon, 30 Sep 2024 12:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727698568;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CYmQ3teWH0DmDKBWDTUVjoT25JTMm7Z7ojuMJ8WTDzg=;
+	b=aFhwXdju0zIHEONgAfyqhNT5cigDon1RzvLV4pZncby7ilcE16VLea8huzKMPLbhzm35CC
+	Zux2uRjLj45rpRwmOVGlPeM0lvpqa7FDPjBNgFcm0wBXqZ2aDQjwiQSvPhAII42EgRbDcz
+	pPWKHPl6MDbhYTaq8mD1buv07jjbCElu8mydcW8kNZVFuHc2nY3rg1IwVSciuE/uFztLca
+	idE9IJ2ueWN5d6OcH2EO3Vvb4aCNYkWFhH8/ZGqazC5RLPu4Svvr7dHsUh5NKqygAXvpen
+	togUYC/q+SFGos/BpnKz5STg62Gr1dw00LXYrf5KxjfSLOLeYnesDcjK4tCTKQ==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v6 0/7] Add support for the LAN966x PCI device using a DT overlay
+Date: Mon, 30 Sep 2024 14:15:40 +0200
+Message-ID: <20240930121601.172216-1-herve.codina@bootlin.com>
 X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20240930121610.679430-9-karol.kolacinski@intel.com>
-References: <20240930121610.679430-9-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-From: Michal Michalik <michal.michalik@intel.com>
+Hi,
 
-Add specific functions and definitions for E830 devices to enable
-PTP support.
+This series adds support for the LAN966x chip when used as a PCI
+device.
 
-E830 devices support direct write to GLTSYN_ registers without shadow
-registers and 64 bit read of PHC time.
+For reference, the LAN996x chip is a System-on-chip that integrates an
+Ethernet switch and a number of other traditional hardware blocks such
+as a GPIO controller, I2C controllers, SPI controllers, etc. The
+LAN996x can be used in two different modes:
 
-Enable PTM for E830 device, which is required for cross timestamp and
-and dependency on PCIE_PTM for ICE_HWTS.
+- With Linux running on its Linux built-in ARM cores.
+  This mode is already supported by the upstream Linux kernel, with the
+  LAN996x described as a standard ARM Device Tree in
+  arch/arm/boot/dts/microchip/lan966x.dtsi. Thanks to this support,
+  all hardware blocks in the LAN996x already have drivers in the
+  upstream Linux kernel.
 
-Check X86_FEATURE_ART for E830 as it may not be present in the CPU.
+- As a PCI device, thanks to its built-in PCI endpoint controller.
+  In this case, the LAN996x ARM cores are not used, but all peripherals
+  of the LAN996x can be accessed by the PCI host using memory-mapped
+  I/O through the PCI BARs.
 
-Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Co-developed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Co-developed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V11 -> V12: Fixed missing E830 case in ice_get_base_incval() 
-V10 -> V11: Fixed adjustments not working on E830
-V9 -> V10: Removed ICE_FLAG_PTP_SUPPORTED check for E830, which was disabling
-           PTP only for E830
-V7 -> V8: Moved E830 parts of other patches to this patch
-V6 -> V7: Fixed timestamp acquisition
-V4 -> V5: Edited return values
-V3 -> V4: Fixed kdoc for other ice_is_e***() and other _e830() functions in
-          ice_ptp_hw.c
-V2 -> V3: Fixed kdoc for ice_is_e***() and ice_ptp_init_phy_e830()
-V1 -> V2: Fixed compilation issue with GENMASK bits higher than 32
+This series aims at supporting this second use-case. As all peripherals
+of the LAN996x already have drivers in the Linux kernel, our goal is to
+reuse them as-is to support this second use-case.
 
- drivers/net/ethernet/intel/Kconfig            |   2 +-
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 ++
- drivers/net/ethernet/intel/ice/ice_main.c     |   9 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  71 +++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 167 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   8 +
- 6 files changed, 262 insertions(+), 7 deletions(-)
+Therefore, this patch series introduces a PCI driver that binds on the
+LAN996x PCI VID/PID, and when probed, instantiates all devices that are
+accessible through the PCI BAR. As the list and characteristics of such
+devices are non-discoverable, this PCI driver loads a Device Tree
+overlay that allows to teach the kernel about which devices are
+available, and allows to probe the relevant drivers in kernel, re-using
+all existing drivers with no change.
 
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 0375c7448a57..90415fe785ac 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -334,7 +334,7 @@ config ICE_SWITCHDEV
- config ICE_HWTS
- 	bool "Support HW cross-timestamp on platforms with PTM support"
- 	default y
--	depends on ICE && X86
-+	depends on ICE && X86 && PCIE_PTM
- 	help
- 	  Say Y to enable hardware supported cross-timestamping on platforms
- 	  with PCIe PTM support. The cross-timestamp is available through
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 8d31bfe28cc8..b692be1cf7bf 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -533,10 +533,22 @@
- #define PFPM_WUS_MAG_M				BIT(1)
- #define PFPM_WUS_MNG_M				BIT(3)
- #define PFPM_WUS_FW_RST_WK_M			BIT(31)
-+#define E830_PRTMAC_TS_TX_MEM_VALID_H		0x001E2020
-+#define E830_PRTMAC_TS_TX_MEM_VALID_L		0x001E2000
- #define E830_PRTMAC_CL01_PS_QNT			0x001E32A0
- #define E830_PRTMAC_CL01_PS_QNT_CL0_M		GENMASK(15, 0)
- #define E830_PRTMAC_CL01_QNT_THR		0x001E3320
- #define E830_PRTMAC_CL01_QNT_THR_CL0_M		GENMASK(15, 0)
-+#define E830_PRTTSYN_TXTIME_H(_i)		(0x001E5800 + ((_i) * 32))
-+#define E830_PRTTSYN_TXTIME_L(_i)		(0x001E5000 + ((_i) * 32))
-+#define E830_GLPTM_ART_CTL			0x00088B50
-+#define E830_GLPTM_ART_CTL_ACTIVE_M		BIT(0)
-+#define E830_GLPTM_ART_TIME_H			0x00088B54
-+#define E830_GLPTM_ART_TIME_L			0x00088B58
-+#define E830_GLTSYN_PTMTIME_H(_i)		(0x00088B48 + ((_i) * 4))
-+#define E830_GLTSYN_PTMTIME_L(_i)		(0x00088B40 + ((_i) * 4))
-+#define E830_PFPTM_SEM				0x00088B00
-+#define E830_PFPTM_SEM_BUSY_M			BIT(0)
- #define VFINT_DYN_CTLN(_i)			(0x00003800 + ((_i) * 4))
- #define VFINT_DYN_CTLN_CLEARPBA_M		BIT(1)
- #define E830_MBX_PF_IN_FLIGHT_VF_MSGS_THRESH	0x00234000
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index bd798e47fc07..25497ff5d5a5 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4035,8 +4035,7 @@ static void ice_set_pf_caps(struct ice_pf *pf)
- 	}
- 
- 	clear_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags);
--	if (func_caps->common_cap.ieee_1588 &&
--	    !(pf->hw.mac_type == ICE_MAC_E830))
-+	if (func_caps->common_cap.ieee_1588)
- 		set_bit(ICE_FLAG_PTP_SUPPORTED, pf->flags);
- 
- 	pf->max_pf_txqs = func_caps->common_cap.num_txq;
-@@ -5099,6 +5098,12 @@ static int ice_init(struct ice_pf *pf)
- 	if (err)
- 		return err;
- 
-+	if (pf->hw.mac_type == ICE_MAC_E830) {
-+		err = pci_enable_ptm(pf->pdev, NULL);
-+		if (err)
-+			dev_dbg(ice_pf_to_dev(pf), "PCIe PTM not supported by PCIe bus/controller\n");
-+	}
-+
- 	err = ice_alloc_vsis(pf);
- 	if (err)
- 		goto err_alloc_vsis;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index cf8a9dc0e29f..9bc22620f838 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -310,6 +310,15 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
- 	/* Read the system timestamp pre PHC read */
- 	ptp_read_system_prets(sts);
- 
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		u64 clk_time = rd64(hw, E830_GLTSYN_TIME_L(tmr_idx));
-+
-+		/* Read the system timestamp post PHC read */
-+		ptp_read_system_postts(sts);
-+
-+		return clk_time;
-+	}
-+
- 	lo = rd32(hw, GLTSYN_TIME_L(tmr_idx));
- 
- 	/* Read the system timestamp post PHC read */
-@@ -1279,6 +1288,7 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		err = 0;
- 		break;
- 	case ICE_MAC_GENERIC:
-@@ -1325,6 +1335,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		err = 0;
- 		break;
- 	case ICE_MAC_GENERIC:
-@@ -1400,7 +1411,8 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
--		/* Do not reconfigure E810 PHY */
-+	case ICE_MAC_E830:
-+		/* Do not reconfigure E810 or E830 PHY */
- 		return;
- 	case ICE_MAC_GENERIC:
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -1433,6 +1445,7 @@ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		return 0;
- 	case ICE_MAC_GENERIC: {
- 		int quad;
-@@ -2172,6 +2185,21 @@ static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e82x = {
- 	.dev_time_h[1] = GLTSYN_HHTIME_H(1),
- };
- 
-+#ifdef CONFIG_ICE_HWTS
-+static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e830 = {
-+	.lock_reg = E830_PFPTM_SEM,
-+	.lock_busy = E830_PFPTM_SEM_BUSY_M,
-+	.ctl_reg = E830_GLPTM_ART_CTL,
-+	.ctl_active = E830_GLPTM_ART_CTL_ACTIVE_M,
-+	.art_time_l = E830_GLPTM_ART_TIME_L,
-+	.art_time_h = E830_GLPTM_ART_TIME_H,
-+	.dev_time_l[0] = E830_GLTSYN_PTMTIME_L(0),
-+	.dev_time_h[0] = E830_GLTSYN_PTMTIME_H(0),
-+	.dev_time_l[1] = E830_GLTSYN_PTMTIME_L(1),
-+	.dev_time_h[1] = E830_GLTSYN_PTMTIME_H(1),
-+};
-+
-+#endif /* CONFIG_ICE_HWTS */
- /**
-  * struct ice_crosststamp_ctx - Device cross timestamp context
-  * @snapshot: snapshot of system clocks for historic interpolation
-@@ -2293,6 +2321,11 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
- 	case ICE_MAC_GENERIC_3K_E825:
- 		ctx.cfg = &ice_crosststamp_cfg_e82x;
- 		break;
-+#ifdef CONFIG_ICE_HWTS
-+	case ICE_MAC_E830:
-+		ctx.cfg = &ice_crosststamp_cfg_e830;
-+		break;
-+#endif /* CONFIG_ICE_HWTS */
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -2628,6 +2661,28 @@ static void ice_ptp_set_funcs_e810(struct ice_pf *pf)
- 	}
- }
- 
-+/**
-+ * ice_ptp_set_funcs_e830 - Set specialized functions for E830 support
-+ * @pf: Board private structure
-+ *
-+ * Assign functions to the PTP capabiltiies structure for E830 devices.
-+ * Functions which operate across all device families should be set directly
-+ * in ice_ptp_set_caps. Only add functions here which are distinct for E830
-+ * devices.
-+ */
-+static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
-+{
-+#ifdef CONFIG_ICE_HWTS
-+	if (pcie_ptm_enabled(pf->pdev) && boot_cpu_has(X86_FEATURE_ART))
-+		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
-+
-+#endif /* CONFIG_ICE_HWTS */
-+	/* Rest of the config is the same as base E810 */
-+	pf->ptp.ice_pin_desc = ice_pin_desc_e810;
-+	pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e810);
-+	ice_ptp_setup_pin_cfg(pf);
-+}
-+
- /**
-  * ice_ptp_set_caps - Set PTP capabilities
-  * @pf: Board private structure
-@@ -2654,6 +2709,9 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 	case ICE_MAC_E810:
- 		ice_ptp_set_funcs_e810(pf);
- 		return;
-+	case ICE_MAC_E830:
-+		ice_ptp_set_funcs_e830(pf);
-+		return;
- 	case ICE_MAC_GENERIC:
- 	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_set_funcs_e82x(pf);
-@@ -2814,6 +2872,16 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
- 
- 		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
- 		return IRQ_WAKE_THREAD;
-+	case ICE_MAC_E830:
-+		/* E830 can read timestamps in the top half using rd32() */
-+		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
-+			/* Process outstanding Tx timestamps. If there
-+			 * is more work, re-arm the interrupt to trigger again.
-+			 */
-+			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
-+			ice_flush(hw);
-+		}
-+		return IRQ_HANDLED;
- 	default:
- 		return IRQ_HANDLED;
- 	}
-@@ -3199,6 +3267,7 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 	case ICE_MAC_GENERIC_3K_E825:
- 		return ice_ptp_init_tx(pf, &ptp_port->tx, ptp_port->port_num);
- 	case ICE_MAC_GENERIC:
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 65a66225797e..c68d7468f69d 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -831,6 +831,7 @@ static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
- 	 */
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		return ice_ptp_tmr_cmd_to_src_reg(hw, cmd) & TS_CMD_MASK_E810;
- 	default:
- 		break;
-@@ -897,6 +898,17 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- 	ice_flush(hw);
- }
- 
-+/**
-+ * ice_ptp_cfg_sync_delay - Configure PHC to PHY synchronization delay
-+ * @hw: pointer to HW struct
-+ * @delay: delay between PHC and PHY SYNC command execution in nanoseconds
-+ */
-+static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
-+{
-+	wr32(hw, GLTSYN_SYNC_DLAY, delay);
-+	ice_flush(hw);
-+}
-+
- /* 56G PHY device functions
-  *
-  * The following functions operate on devices with the ETH 56G PHY.
-@@ -5018,8 +5030,7 @@ static int ice_ptp_init_phc_e810(struct ice_hw *hw)
- 	u8 tmr_idx;
- 	int err;
- 
--	/* Ensure synchronization delay is zero */
--	wr32(hw, GLTSYN_SYNC_DLAY, 0);
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 	err = ice_write_phy_reg_e810(hw, ETH_GLTSYN_ENA(tmr_idx),
-@@ -5313,6 +5324,128 @@ static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- 	ptp->ports_per_phy = 4;
- }
- 
-+/* E830 functions
-+ *
-+ * The following functions operate on the E830 series devices.
-+ *
-+ */
-+
-+/**
-+ * ice_ptp_init_phc_e830 - Perform E830 specific PHC initialization
-+ * @hw: pointer to HW struct
-+ *
-+ * Perform E830-specific PTP hardware clock initialization steps.
-+ */
-+static void ice_ptp_init_phc_e830(const struct ice_hw *hw)
-+{
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
-+}
-+
-+/**
-+ * ice_ptp_write_direct_incval_e830 - Prep PHY port increment value change
-+ * @hw: pointer to HW struct
-+ * @incval: The new 40bit increment value to prepare
-+ *
-+ * Prepare the PHY port for a new increment value by programming the PHC
-+ * GLTSYN_INCVAL_L and GLTSYN_INCVAL_H registers. The actual change is
-+ * completed by FW automatically.
-+ */
-+static void ice_ptp_write_direct_incval_e830(const struct ice_hw *hw,
-+					     u64 incval)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_INCVAL_L(tmr_idx), lower_32_bits(incval));
-+	wr32(hw, GLTSYN_INCVAL_H(tmr_idx), upper_32_bits(incval));
-+}
-+
-+/**
-+ * ice_ptp_write_direct_phc_time_e830 - Prepare PHY port with initial time
-+ * @hw: Board private structure
-+ * @time: Time to initialize the PHY port clock to
-+ *
-+ * Program the PHY port ETH_GLTSYN_SHTIME registers in preparation setting the
-+ * initial clock time. The time will not actually be programmed until the
-+ * driver issues an ICE_PTP_INIT_TIME command.
-+ *
-+ * The time value is the upper 32 bits of the PHY timer, usually in units of
-+ * nominal nanoseconds.
-+ */
-+static void ice_ptp_write_direct_phc_time_e830(const struct ice_hw *hw,
-+					       u64 time)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_TIME_0(tmr_idx), 0);
-+	wr32(hw, GLTSYN_TIME_L(tmr_idx), lower_32_bits(time));
-+	wr32(hw, GLTSYN_TIME_H(tmr_idx), upper_32_bits(time));
-+}
-+
-+/**
-+ * ice_ptp_port_cmd_e830 - Prepare all external PHYs for a timer command
-+ * @hw: pointer to HW struct
-+ * @cmd: Command to be sent to the port
-+ *
-+ * Prepare the external PHYs connected to this device for a timer sync
-+ * command.
-+ *
-+ * Return: 0 on success, negative error code when PHY write failed
-+ */
-+static int ice_ptp_port_cmd_e830(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+{
-+	u32 val = ice_ptp_tmr_cmd_to_port_reg(hw, cmd);
-+
-+	return ice_write_phy_reg_e810(hw, E830_ETH_GLTSYN_CMD, val);
-+}
-+
-+/**
-+ * ice_read_phy_tstamp_e830 - Read a PHY timestamp out of the external PHY
-+ * @hw: pointer to the HW struct
-+ * @idx: the timestamp index to read
-+ * @tstamp: on return, the 40bit timestamp value
-+ *
-+ * Read a 40bit timestamp value out of the timestamp block of the external PHY
-+ * on the E830 device.
-+ */
-+static void ice_read_phy_tstamp_e830(const struct ice_hw *hw, u8 idx,
-+				     u64 *tstamp)
-+{
-+	u32 hi, lo;
-+
-+	hi = rd32(hw, E830_PRTTSYN_TXTIME_H(idx));
-+	lo = rd32(hw, E830_PRTTSYN_TXTIME_L(idx));
-+
-+	/* For E830 devices, the timestamp is reported with the lower 32 bits
-+	 * in the low register, and the upper 8 bits in the high register.
-+	 */
-+	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
-+}
-+
-+/**
-+ * ice_get_phy_tx_tstamp_ready_e830 - Read Tx memory status register
-+ * @hw: pointer to the HW struct
-+ * @port: the PHY port to read
-+ * @tstamp_ready: contents of the Tx memory status register
-+ */
-+static void ice_get_phy_tx_tstamp_ready_e830(const struct ice_hw *hw, u8 port,
-+					     u64 *tstamp_ready)
-+{
-+	*tstamp_ready = rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_H);
-+	*tstamp_ready <<= 32;
-+	*tstamp_ready |= rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_L);
-+}
-+
-+/**
-+ * ice_ptp_init_phy_e830 - initialize PHY parameters
-+ * @ptp: pointer to the PTP HW struct
-+ */
-+static void ice_ptp_init_phy_e830(struct ice_ptp_hw *ptp)
-+{
-+	ptp->num_lports = 8;
-+	ptp->ports_per_phy = 4;
-+}
-+
- /* Device agnostic functions
-  *
-  * The following functions implement shared behavior common to all devices,
-@@ -5383,6 +5516,9 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- 	case ICE_MAC_E810:
- 		ice_ptp_init_phy_e810(ptp);
- 		break;
-+	case ICE_MAC_E830:
-+		ice_ptp_init_phy_e830(ptp);
-+		break;
- 	case ICE_MAC_GENERIC:
- 		ice_ptp_init_phy_e82x(ptp);
- 		break;
-@@ -5480,6 +5616,8 @@ static int ice_ptp_port_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_ptp_port_cmd_e810(hw, cmd);
-+	case ICE_MAC_E830:
-+		return ice_ptp_port_cmd_e830(hw, cmd);
- 	default:
- 		break;
- 	}
-@@ -5550,6 +5688,12 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
- 	/* Source timers */
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		ice_ptp_write_direct_phc_time_e830(hw, time);
-+		return 0;
-+	}
-+
- 	wr32(hw, GLTSYN_SHTIME_L(tmr_idx), lower_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_H(tmr_idx), upper_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_0(tmr_idx), 0);
-@@ -5598,6 +5742,12 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		ice_ptp_write_direct_incval_e830(hw, incval);
-+		return 0;
-+	}
-+
- 	/* Shadow Adjust */
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
-@@ -5675,6 +5825,9 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
- 	case ICE_MAC_E810:
- 		err = ice_ptp_prep_phy_adj_e810(hw, adj);
- 		break;
-+	case ICE_MAC_E830:
-+		/* E830 sync PHYs automatically after setting GLTSYN_SHADJ */
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		err = ice_ptp_prep_phy_adj_e82x(hw, adj);
- 		break;
-@@ -5707,6 +5860,9 @@ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_read_phy_tstamp_e810(hw, block, idx, tstamp);
-+	case ICE_MAC_E830:
-+		ice_read_phy_tstamp_e830(hw, idx, tstamp);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_read_phy_tstamp_e82x(hw, block, idx, tstamp);
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -5829,6 +5985,9 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_ptp_init_phc_e810(hw);
-+	case ICE_MAC_E830:
-+		ice_ptp_init_phc_e830(hw);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -5855,13 +6014,15 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- 	case ICE_MAC_E810:
- 		return ice_get_phy_tx_tstamp_ready_e810(hw, block,
- 							tstamp_ready);
-+	case ICE_MAC_E830:
-+		ice_get_phy_tx_tstamp_ready_e830(hw, block, tstamp_ready);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_get_phy_tx_tstamp_ready_e82x(hw, block,
- 							tstamp_ready);
- 	case ICE_MAC_GENERIC_3K_E825:
- 		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
- 							  tstamp_ready);
--		break;
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 6328c0bbddd6..f81e2e9b0200 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -327,6 +327,7 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
- #define ICE_E810_PLL_FREQ		812500000
- #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
- #define ICE_E810_OUT_PROP_DELAY_NS	1
-+#define ICE_E810_E830_SYNC_DELAY	0
- #define ICE_E825C_OUT_PROP_DELAY_NS	11
- 
- /* Device agnostic functions */
-@@ -454,6 +455,7 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
- {
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		return ICE_PTP_NOMINAL_INCVAL_E810;
- 	case ICE_MAC_GENERIC:
- 		return ice_e82x_nominal_incval(ice_e82x_time_ref(hw));
-@@ -671,6 +673,12 @@ static inline bool ice_is_dual(struct ice_hw *hw)
- /* E810 timer command register */
- #define E810_ETH_GLTSYN_CMD		0x03000344
- 
-+/* E830 timer command register */
-+#define E830_ETH_GLTSYN_CMD		0x00088814
-+
-+/* E810 PHC time register */
-+#define E830_GLTSYN_TIME_L(_tmr_idx)	(0x0008A000 + 0x1000 * (_tmr_idx))
-+
- /* Source timer incval macros */
- #define INCVAL_HIGH_M			0xFF
- 
+This patch series for now adds a Device Tree overlay that describes an
+initial subset of the devices available over PCI in the LAN996x, and
+follow-up patch series will add support for more once this initial
+support has landed.
+
+In order to add this PCI driver, a number of preparation changes are
+needed:
+ - Patches 1 and 2 (new in this version) allow to remove the syscon
+   device usage from the reset driver (only the reset driver use the
+   syscon device)
+
+ - Patches 3 and 4 introduce the LAN996x PCI driver itself, together
+   with its DT overlay and the related MAINTAINER entry.
+
+ - Patches 5 to 7 allow the reset driver used for the LAN996x to be
+   built as a module. Indeed, in the case where Linux runs on the ARM
+   cores, it is common to have the reset driver built-in. However, when
+   the LAN996x is used as a PCI device, it makes sense that all its
+   drivers can be loaded as modules.
+
+Compare to the previous iteration:
+  https://lore.kernel.org/lkml/20240808154658.247873-1-herve.codina@bootlin.com/
+this v6 series mainly:
+  - Remove patches adding support for refcounting and device removal in
+    syscon.
+  - Remove the syscon usage from the reset controller (the only syscon
+    user).
+  - Remove a patch already applied.
+  - Add a 'Acked-by'
+  - Rebase on top of v6.12-rc1
+
+Best regards,
+Hervé
+
+Changes v5 -> v6
+  - Patch 1
+    New patch in v6 relatead to removing syscon usage.
+
+  - Patch 2
+    New patch in v6 related to removing syscon usage.
+
+  - Patch 3 (patch 1 in v5)
+    Add 'Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>'
+    Remove syscon node from the overlay.
+
+  - Patch 4, 5, 6 and 7 (patches 2, 4, 5 and 8 in v5)
+    No changes
+
+  Patches removed in v6
+    - Patch 3 in v5
+      Rejected
+
+    - Patch 6 in v5
+      No more applicable
+
+    - Patch 7 in v5
+      Already applied
+
+Changes v4 -> v5
+  - Patch 1
+    Add missing include files and keep pci_ids.h.
+    Remove IRQ_RETVAL() usage.
+    Use __free().
+    Remove the pdev->irq check.
+    Avoid local variables in devm_pci_dev_remove_intr_ctrl() and
+    lan966x_pci_load_overlay().
+    Use dev_err_probe().
+    Sort header includes in alphabetical order in dtbs file.
+
+  - Patch 3
+    Fix a typo in commit log.
+    Simplify modification done in device_node_get_syscon().
+    Use devm_add_action_or_reset().
+
+  - Patches 4, 5, 6 and 8
+    Add 'Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>'
+
+Changes v3 -> v4
+  - Patch 1 and 2 (v3 patch 6 and 7)
+    Move the driver from drivers/mfd to drivers/misc.
+
+  - Patch 4 and 5 (v3 patch 2)
+    Rework reset driver dependencies and module building support.
+    Split v3 patch into two distinct patches:
+      - patch 4, as suggested by Geert, add a dependency on the
+        LAN966x PCI device
+      - patch 5, allows to build the reset controller driver as a module
+
+  - Other patches
+    Except reordering, no changes
+
+Changes v2 -> v3
+  - Patches 1 and 5
+    No changes
+
+  - Patch 6 (v2 patch 18)
+    Add a blank line in the commit log to split paragraphs
+    Remove unneeded header file inclusion
+    Use IRQ_RETVAL()
+    Remove blank line
+    Use dev_of_node()
+    Use pci_{set,get}_drvdata()
+    Remove unneeded pci_clear_master() call
+    Move { 0, } to { }
+    Remove the unneeded pci_dev member from the lan966x_pci structure
+    Use PCI_VENDOR_ID_EFAR instead of the hardcoded 0x1055 PCI Vendor ID
+    Add a comment related to the of_node check.
+
+  - Patch 7 (v2 patch 19)
+    No changes
+
+  Patches removed in v3
+    - Patches 6 and 7
+      Extracted and sent separately
+      https://lore.kernel.org/lkml/20240620120126.412323-1-herve.codina@bootlin.com/
+
+    - Patches 9
+      Already applied
+
+    - Patches 8, 10 to 12
+      Extracted, reworked and sent separately
+      https://lore.kernel.org/lkml/20240614173232.1184015-1-herve.codina@bootlin.com/
+
+    - Patches 13 to 14
+      Already applied
+
+Changes v1 -> v2
+  - Patch 1
+    Fix a typo in syscon.h (s/intline/inline/)
+
+  - Patches 2..5
+    No changes
+
+  - Patch 6
+    Improve the reset property description
+
+  - Patch 7
+    Fix a wrong reverse x-mass tree declaration
+
+  - Patch 8 removed (sent alone to net)
+    https://lore.kernel.org/lkml/20240513111853.58668-1-herve.codina@bootlin.com/
+
+  - Patch 8 (v1 patch 9)
+    Add 'Reviewed-by: Rob Herring (Arm) <robh@kernel.org>'
+
+  - Patch 9 (v1 patch 10)
+    Rephrase and ident parameters descriptions
+
+  - Patch 10 (v1 patch 11)
+    No changes
+
+  - Patch 11 (v1 patch 12)
+    Fix a missing ret value assignment before a goto in .probe()
+    Limit lines to 80 columns
+    Use indices in register offset definitions
+
+  - Patch 13 and 14 (new patches in v2)
+    Add new test cases for existing of_changeset_add_prop_*()
+
+  - Patch 15 (v1 patch 14)
+    No changes
+
+  - Patch 16 (new patches in v2)
+    Add tests for of_changeset_add_prop_bool()
+
+  - Patch 17 (v1 patch 15)
+    Update commit subject
+    Rewrap a paragraph in commit log
+
+  - Patch 18 (v1 patch 16)
+    Use PCI_IRQ_INTX instead of PCI_IRQ_LEGACY
+
+  - Patch 19 (v1 patch 17)
+    No changes
+
+Clément Léger (2):
+  reset: mchp: sparx5: Allow building as a module
+  reset: mchp: sparx5: set the dev member of the reset controller
+
+Herve Codina (5):
+  dt-bindings: reset: microchip,rst: Allow to replace cpu-syscon by an
+    additional reg item
+  reset: mchp: sparx5: Use the second reg item when cpu-syscon is not
+    present
+  misc: Add support for LAN966x PCI device
+  MAINTAINERS: Add the Microchip LAN966x PCI driver entry
+  reset: mchp: sparx5: Add MCHP_LAN966X_PCI dependency
+
+ .../bindings/reset/microchip,rst.yaml         |  35 ++-
+ MAINTAINERS                                   |   6 +
+ drivers/misc/Kconfig                          |  24 ++
+ drivers/misc/Makefile                         |   3 +
+ drivers/misc/lan966x_pci.c                    | 215 ++++++++++++++++++
+ drivers/misc/lan966x_pci.dtso                 | 161 +++++++++++++
+ drivers/pci/quirks.c                          |   1 +
+ drivers/reset/Kconfig                         |   4 +-
+ drivers/reset/reset-microchip-sparx5.c        |  19 +-
+ 9 files changed, 464 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/misc/lan966x_pci.c
+ create mode 100644 drivers/misc/lan966x_pci.dtso
+
 -- 
 2.46.1
 
