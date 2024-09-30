@@ -1,125 +1,116 @@
-Return-Path: <netdev+bounces-130438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB49498A859
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:21:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8DE398A862
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:23:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD3541C2111F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:21:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EDAF1F2366D
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F3541922F5;
-	Mon, 30 Sep 2024 15:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FEF18DF8A;
+	Mon, 30 Sep 2024 15:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l7fycc9d"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uxTFH2X3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4603518FDDA;
-	Mon, 30 Sep 2024 15:21:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3992CA5
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 15:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727709713; cv=none; b=DI4uKj94FpLypSN/URMsx9gN1CfTmtT5eseeFHrjqrH5C5oOTK49R5IwI63FQCK9yMSYER1xI0+iCliorupnl6IRZXnRt3eUg4+EQsdEXffsr/BWR5D8sE3c4xan+iMqinCW3BmmAtwK02tZx/3Uw+JL8QA0BNVycc86Qaz9q90=
+	t=1727709788; cv=none; b=L+MITJh/9Tn5fa5Onxrg3dl8VM0LVhJflvvQVMo45+hSf9dTfEZOOW+uZRvGkS/Gq5P/K3cbO85aKjXvznXfPTXP2xuax3sYP1v5NX4pdZMzoTm0s8rlO9X51+k6aJ13qUHbZ1CVAgD/h70SOyAUaPJoVMHRFPHoVTqYhzsUPTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727709713; c=relaxed/simple;
-	bh=O6PAlEcBeLqb//qxewQqvAg+zzu5JiWub7QTSYxU0Bg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RQauqAsV8rj+MKmdaKBmUraX5QQ1SHweRM0zkXRkkBdENiDeHrihUZD7ZMRGHyWiPX+cr6/ztenOJx3FcG40rDDh4NSR5Rjgr1a0ddV562hknN2s/MlJg9FP25uv2dm0vJphrLFA6dcCbrhBKr+1bCdxWBuxv+MtjQZ6OpqOZ4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l7fycc9d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46F0EC4CEC7;
-	Mon, 30 Sep 2024 15:21:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727709712;
-	bh=O6PAlEcBeLqb//qxewQqvAg+zzu5JiWub7QTSYxU0Bg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l7fycc9ddJaYOyuQ6tc7BaA+msFGJTACJ67JrmDzLGN/dyQlstm2TSpB0wDJecNdd
-	 6t7qNHmA2uAp5DId91GiCFK9Nv1Er6wU9+v5P/A5Ro7BCl4F04HyoahY94JMVENMnR
-	 39sC23bWeiGlytpsOym1QEuIRumfp3QcXbbjPPK1rDmM2bMK9hDvgWjuMnKG9Qk/Xh
-	 rTaggLSrH2WeLVK0/jEWypMl7BUSfsvJN2OV5cK0uoJccdcpxICVHIKdIYYZXkXIOA
-	 wDOb4Bu1nUBZ3xnZGwDPxw4suGvYFQSzrKushbgGDljCu+kdKVWg5n5jrXJ1z8IIg+
-	 aH+4TWQNyvwGQ==
-Date: Mon, 30 Sep 2024 16:21:49 +0100
-From: Simon Horman <horms@kernel.org>
-To: Charles Han <hanchunchao@inspur.com>
-Cc: m.grzeschik@pengutronix.de, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] arcnet: com20020-pci: Add check devm_kasprintf()
- returned value
-Message-ID: <20240930152149.GC1310185@kernel.org>
-References: <20240929023721.17338-1-hanchunchao@inspur.com>
+	s=arc-20240116; t=1727709788; c=relaxed/simple;
+	bh=6F3WfmZZLMFsHFH/YOConu36frhNlhQGKVYPrDcbn6M=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=n72vz3Io6KpCY8BTbZCR7mT02V28snTvV6Kq2WDd1duUYMx0rwZJLJDypnw0y42L8SCKecjWmFlnCLyH6l76kR4Xy5Wv9pCQYQVQLCnZ5EtTrY9LXcK1EaaWy8kOsZMuHUYXLrUXsheCwj9G1dtJo6NOg9yABsOMZLGBdCeYDQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uxTFH2X3; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e22f8dc491so25137457b3.1
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 08:23:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727709786; x=1728314586; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=wtLH9jpd0PpZZ9goQRCr1u6YzXUJhVSrznB/rdtnqkM=;
+        b=uxTFH2X3/d2z5tOsAEbjcpK3xyqKxoW76d2tKv7O7WStoAc7AcMHGMjgltYXWr0U6F
+         iRf09WpKV12tfzr3onZ7GGJJcqlkIFINR/q6i8SxbjVjbQKi+eHc9SfrJMdq14fAe+HF
+         rxpfAGTjhS+A5pTzTQ48shSGg7Xmg8yTCEHucUWjWiRT4Bjde5ap7q8h8ukjQBWtDuOa
+         hAWKTj0bB2gFm9vd90xyXa3VvQsErorLlsyCWhVSulDoxrs3aJtUjo3LjMQ+yl13OVnZ
+         iQA6Rx1vUf3ow7mkGO62PrjvnB4gw2Fw0ymnzKIXlxi+EFYZt7eD1DAgS0lYcDFTokLH
+         qkPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727709786; x=1728314586;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wtLH9jpd0PpZZ9goQRCr1u6YzXUJhVSrznB/rdtnqkM=;
+        b=QUxExa91ITFM61EDrItbuoVtVD5tj6kQmhUgbqM3v1p5PcIAS4d2ADqaWuCXNMLMQO
+         YYqIUoknTHLCQDQr95sdHV7QQLrP5uusTD5NshEhDlbD7+ZJcKZEu60XdXnQfQ3VM6eK
+         0OFTOTeV/MtTHhTaMfqhRo5svDygcYshyJfivCDOspLuTWRZv5+5rr76cKdc0+wVh9gS
+         IoAhvE9huSx+tMzGscW7aLygIV1Pbyq5/zrWaVRxhNbheKNESQpAQ81mQ9MiyhVVUztU
+         03arLtouWDf0BlL2RZ2rAWS0IEYwLk1yFI8giPZPqOnMlOfslt+kAosqsoPYIQsq/DKB
+         zxhA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwcjZyU9EvNADwf9jecQBkDUp1xIH1InQaevNpiYk3y7hoAttOdYTDNm/WajJ9C4Mmy49YYOE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz8XMdTv+qatLtSLntOk3MUaBOFr1mYLdCJ5D7N5fL2OyE3tls
+	b5gIBVayh04KQeXpZhu7FkqPWotbO40Xh3THm2bEhnGmfIWlf2DywiF/U6YE9RzNHwyLSsmz45d
+	45Sh2nn+iNg==
+X-Google-Smtp-Source: AGHT+IHi3hT9JDXfUWsmJxXkdAc+N9FuTESs1uypN+g0PxAYKrf1KHKT00PQ3UA/QqU0ZZcC22vUAk0MsiQziQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:488a:b0:6de:19f:34d7 with SMTP
+ id 00721157ae682-6e24754e9a0mr4736057b3.2.1727709786339; Mon, 30 Sep 2024
+ 08:23:06 -0700 (PDT)
+Date: Mon, 30 Sep 2024 15:23:02 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240929023721.17338-1-hanchunchao@inspur.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
+Message-ID: <20240930152304.472767-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] net: prepare pacing offload support
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, Jeffrey Ji <jeffreyji@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Sep 29, 2024 at 10:37:21AM +0800, Charles Han wrote:
-> devm_kasprintf() can return a NULL pointer on failure but this
-> returned value in com20020pci_probe() is not checked.
-> 
-> Fixes: 8890624a4e8c ("arcnet: com20020-pci: add led trigger support")
-> Signed-off-by: Charles Han <hanchunchao@inspur.com>
+Some network devices have the ability to offload EDT (Earliest
+Departure Time) which is the model used for TCP pacing and FQ
+packet scheduler.
 
-Hi Charles,
+Some of them implement the timing wheel mechanism described in
+https://saeed.github.io/files/carousel-sigcomm17.pdf
+with an associated 'timing wheel horizon'.
 
-As a fix for Networking code this looks like it should be targeted
-at the 'net' tree. Please do that by using 'net' in the subject like this:
+In order to upstream the NIC support, this series adds :
 
-        Subject: [PATCH net v2] ...
+1) timing wheel horizon as a per-device attribute.
 
-Link: https://docs.kernel.org/process/maintainer-netdev.html
+2) FQ packet scheduler support, to let paced packets
+   below the timing wheel horizon be handled by the driver.
 
-> ---
->  drivers/net/arcnet/com20020-pci.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/drivers/net/arcnet/com20020-pci.c b/drivers/net/arcnet/com20020-pci.c
-> index c5e571ec94c9..6639ee11a7f8 100644
-> --- a/drivers/net/arcnet/com20020-pci.c
-> +++ b/drivers/net/arcnet/com20020-pci.c
-> @@ -254,6 +254,8 @@ static int com20020pci_probe(struct pci_dev *pdev,
->  			card->tx_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
->  							"pci:green:tx:%d-%d",
->  							dev->dev_id, i);
-> +			if (!card->tx_led.default_trigger || !card->tx_led.name)
-> +				return -ENOMEM;
+Eric Dumazet (1):
+  net: add IFLA_MAX_PACING_OFFLOAD_HORIZON device attribute
 
-Looking at the rest of this function, I think the
-correct unwind procedure is as follows (completely untested!):
+Jeffrey Ji (1):
+  net_sched: sch_fq: add the ability to offload pacing
 
-			if (!card->tx_led.default_trigger ||
-			    !card->tx_led.name) {
-				ret = -ENOMEM;
-				goto err_free_arcdev;
-			}
-
->  
->  			card->tx_led.dev = &dev->dev;
->  			card->recon_led.brightness_set = led_recon_set;
-> @@ -263,6 +265,9 @@ static int com20020pci_probe(struct pci_dev *pdev,
->  			card->recon_led.name = devm_kasprintf(&pdev->dev, GFP_KERNEL,
->  							"pci:red:recon:%d-%d",
->  							dev->dev_id, i);
-> +			if (!card->recon_led.default_trigger || !card->recon_led.name)
-
-Please line-wrap the line above so that it is <= 80 columns wide,
-as is still preferred by Networking code. Checkpatch will flag
-this when used with the --max-line-length=80 command line option.
-
-> +				return -ENOMEM;
-> +
->  			card->recon_led.dev = &dev->dev;
->  
->  			ret = devm_led_classdev_register(&pdev->dev, &card->tx_led);
+ .../networking/net_cachelines/net_device.rst  |  1 +
+ include/linux/netdevice.h                     |  4 +++
+ include/uapi/linux/if_link.h                  |  1 +
+ include/uapi/linux/pkt_sched.h                |  2 ++
+ net/core/rtnetlink.c                          |  5 +++
+ net/sched/sch_fq.c                            | 33 +++++++++++++++----
+ tools/include/uapi/linux/if_link.h            |  1 +
+ 7 files changed, 41 insertions(+), 6 deletions(-)
 
 -- 
-pw-bot: changes-requested
+2.46.1.824.gd892dcdcdd-goog
+
 
