@@ -1,95 +1,116 @@
-Return-Path: <netdev+bounces-130476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5EF898AA67
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:56:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 053E998AA7C
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3F51F23E81
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:56:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F79EB24461
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5844C193418;
-	Mon, 30 Sep 2024 16:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UhXuE3K7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051EB198A2F;
+	Mon, 30 Sep 2024 17:02:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3290D193070
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 16:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891F119047D;
+	Mon, 30 Sep 2024 17:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727715403; cv=none; b=OgufXifxryXb0p5wPvRh1DOKwS8xKbjQcz2Ckqvh9UrHD40MGXA9huj2EGs9zi9QQD863KxtWlWtUPPp1ZrHScrZRZPcR8wbQpIAqoy2MoEHKaGzi+NfNfX9ai1P7eiVPliorVqv8k1l6gmdFEfoKhBnMglEzGogIQ4b5b+gIDI=
+	t=1727715757; cv=none; b=kc/fjzaTkNARDSWB/Vak7NNYHVY+VfRqVtKG1REOA2WBVbTT+KE02mhBILRCmGhlJxgv7TvfuKeVsCi1zuzoX1E9tV+NSk3G3x/e58XX26adSMEFfmpxLwZgsM31hI/c+Y1Dbnj6G1ixNQiSEiJv0fXF7ofp/9m4TpRjN53wwLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727715403; c=relaxed/simple;
-	bh=smJ41339DXJMcFTyUmTXVKb/FV6x2vzFLgBVAC9IMvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ingjPe8If1WBUfbUvvV38/aa7jaMZbzfd4WNaldSFf18QMhi3XNZTlRpZ47N8wNklbRR9HvKjpN7+k6eVZgyfR9s2gSw8InvGyBd1DYJfru+qk1jMQtuR/zWG+TcDBGdNbYPvfzSYBOn2iLSaTR3Uvnmc+VhgYuiAxO76Lt9jVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UhXuE3K7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4430DC4CEC7;
-	Mon, 30 Sep 2024 16:56:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727715401;
-	bh=smJ41339DXJMcFTyUmTXVKb/FV6x2vzFLgBVAC9IMvM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UhXuE3K7tbg7qM/NRg1MrIViYVa0Awz/srh4rC1oMYFwuAI97JZTfoNufFXg0734R
-	 38z2m5vxCtecOva9DV5J7JZJ+xZWIJHeDylmaGznqMxXxb8NvrlLTIsknJlqx2phq7
-	 qdWQamFr7qs9Jo4WHqA/eMw+i5pI7JqbU1DirLgjH/tyh9ZFhhHUtJsJ/ShFeCvpfG
-	 bIlUrS6SrS7Rgrv/LEkSSjLeEPxte2XxOpzujKZ15+a1dTn2fu7BsRskrdHMs/2CPr
-	 FRiRaLY4+ODIoLKiVf9zbjF+3zDltgic9G9ztAHe0OzzyDOQLssaTRhVDCkkWT68Ud
-	 xXiduAkRmNEAQ==
-Date: Mon, 30 Sep 2024 17:56:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next 1/2] net: airoha: read default PSE reserved
- pages value before updating
-Message-ID: <20240930165637.GI1310185@kernel.org>
-References: <20240930-airoha-eth-pse-fix-v1-0-f41f2f35abb9@kernel.org>
- <20240930-airoha-eth-pse-fix-v1-1-f41f2f35abb9@kernel.org>
+	s=arc-20240116; t=1727715757; c=relaxed/simple;
+	bh=9Ud71Wyupzdrxuy4g9sq72365AxzIrh/k/Ka3ub/Hng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qnh5tDFcm5heL8QTqMoHnRdY6+DeZK84akvD84iBNSMCdzPurP77DfLdZShmcwWpvzcniAajQewcWYZX1yqqDC3GQxU8LOM5BXMXyVVzyivRQzsfPa8WLObkbOYq8D0OLDBX8budCXtc+gwxAar7CaXW4+NSdv45wCNsuqz0buU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.154.82) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 30 Sep
+ 2024 20:02:17 +0300
+Message-ID: <6a001642-1537-4713-a482-98aba1266922@omp.ru>
+Date: Mon, 30 Sep 2024 20:02:16 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240930-airoha-eth-pse-fix-v1-1-f41f2f35abb9@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 01/11] net: ravb: Factor out checksum offload
+ enable bits
+To: Paul Barker <paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+CC: Paul Barker <paul.barker.ct@bp.renesas.com>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930160845.8520-1-paul@pbarker.dev>
+ <20240930160845.8520-2-paul@pbarker.dev>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20240930160845.8520-2-paul@pbarker.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 09/30/2024 16:47:38
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188099 [Sep 30 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 35 0.3.35
+ d90443ea3cdf6e421a9ef5a0a400f1251229ba23
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.82
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/30/2024 16:52:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/30/2024 2:10:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Mon, Sep 30, 2024 at 02:33:48PM +0200, Lorenzo Bianconi wrote:
-> Store the default value for the number of PSE reserved pages in orig_val
-> at the beginning of airoha_fe_set_pse_oq_rsv routine, before updating it
-> with airoha_fe_set_pse_queue_rsv_pages().
-> Introduce airoha_fe_get_pse_all_rsv utility routine.
+On 9/30/24 19:08, Paul Barker wrote:
+
+> From: Paul Barker <paul.barker.ct@bp.renesas.com>
 > 
-> commit 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> Introduce new constants for the CSR1 (TX) and CSR2 (RX) checksum enable
+> bits, removing the risk of inconsistency when we change which flags we
+> enable.
+> 
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-Hi Lorenzo,
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Sorry, but I think the above syntax is due to me not explaining things
-properly. I think you want something more like. In particular, commit, is
-not a tag, so you should have a blank line between it and the tags:
+[...]
 
-...
+MBR, Sergey
 
-Introduce airoha_fe_get_pse_all_rsv utility routine.
-
-Introduced by commit 23020f049327 ("net: airoha: Introduce ethernet support
-for EN7581 SoC").
-
-Signed-off-by: ...
 
