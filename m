@@ -1,174 +1,232 @@
-Return-Path: <netdev+bounces-130300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4894B98A022
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:15:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89A7698A03F
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F04451F22316
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46938283B75
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2549B18DF62;
-	Mon, 30 Sep 2024 11:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9C418E75F;
+	Mon, 30 Sep 2024 11:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lEjgyIlU"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="N5Crvn6K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB4218CBEE;
-	Mon, 30 Sep 2024 11:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBDA318A926;
+	Mon, 30 Sep 2024 11:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727694906; cv=none; b=alo2ChV5x9sqSBPu7W3psr3v5f+TX3NeWgs62wnehK84E9TL3S/MjIAea6LX3snYh4oT8Q6ZVXiQRUMLDZs7phyK23v7fCnXgOLn64b1y1hHLtLsyny/rNQVBZzvOGI1zpX5M3r6dLieYsFrIwztBvMUQHI/+nLdpL/xYIJav7M=
+	t=1727695303; cv=none; b=kSu9CAI+ScKlSUuIn1DvxRezgW6Y1TL9l4xF8GDjp9vu6aekQokRutr1paDy+SSwl0Zt1Ij1nvGrtl0GuDdlHUG2ufp2AEf2RT9+UeA40j1OliYcgIvZSIcpLVaId+iWTSaM1TDXZVniSJ9Xg9cS/8TRwyKQrx4rGkApmpc/E9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727694906; c=relaxed/simple;
-	bh=Fm/jwymiVG6aluV8SzUl+/aNXa6EyqXf4LxGaqQhncg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HmD5bVojhTMkRZU8cBmfknmfek4ShkoIPV8OXBp6yshvPaXnOxAFMem75GTu64cHkZ92/3kGEpBadwpPdAtgtPqv+WxPUPuBsImBISZxcl+6kPhmuVdJgskETmgZkAS5eqnQQvXAVdez8elIX6FvkR4NIVfQ0DA5PIw/fEZ/TUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lEjgyIlU; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-831e62bfa98so186169139f.1;
-        Mon, 30 Sep 2024 04:15:04 -0700 (PDT)
+	s=arc-20240116; t=1727695303; c=relaxed/simple;
+	bh=rgAYbIHR+nhPtrrRBq3CzRqixIFEvPXFZ9pgtqmmkAg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ROhyPYffgSwvQDgDORnIJTC12zIIBI+gCs6Lda8MKoiXmcZCBwdVBaIBEgM5/FGpV/xs89ge33ssn193gCriXY0rnogV90f7RvCAsUd5JXLv+SKKjWkYfOEC868WRKD9RTHXo0qtfvTCc0mcwD0NjReJhZfv0PX7ezy8d7bJX6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=N5Crvn6K; arc=none smtp.client-ip=192.134.164.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727694903; x=1728299703; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cvO1fI5LVfatVmb1BgSfqE/N8FdFcxW2MnpATHdB/KQ=;
-        b=lEjgyIlU/4hriTv+B9rAMugsvcWjU9j177h/T+JDvCGoAcTsWxtiCCuJPLhMXrJnnR
-         F9HAfEKE2cdZ9bzGCAhqzUjTTPJ6v2dIh5oL8bq+invgcDRBHtv4phWW21B3D8seuu03
-         9yLvfNPLZhRSU7ubRimRu77hZI/FGhfNjADmm5i9AIIlYj9hCLsH7yDyJ8jvVmou+JIf
-         SyDwlxCU4naZVZ3mUq6S64XXKdXS5rwmAtOmdP0iWyyLoahDxKdy7dh1NwxLHOfJTj4B
-         /T/v0z00In9w0q0hub2266rql2Ps2+pMUnl54dvw0+t7pjju5xiDj3JYnFumX32kM9LW
-         XHEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727694903; x=1728299703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cvO1fI5LVfatVmb1BgSfqE/N8FdFcxW2MnpATHdB/KQ=;
-        b=TrdJN8o5KR+kCHodfRZRNfw3MKNb8vA88GiMsKutxKrYhSYl+uhvwXIryDb1XcSFxq
-         /LPdAgCxGTpTa6dXwUgOodIudI9oqbm2tx9cnRsEzbmdFHe9jmskdtWHUBGoxSWXi54U
-         xQ/d0u47gRw1b+R2+T/vuvtsZEpdX26rfs/GHr6h5tXTziebz67u8nN98GnVHM/WAqG3
-         kXvuBpEqhnxOm1/B2Ex4DfmOumlmfRQDHB2dz9Ap9BzWLx/GV8SBP/IAcssrOho2ObUX
-         e4joU7PMF+dlPtcQaxpPXi5dE3yMb5gNLcrJk8x5Hu7i54zl7R/Jfg/GIbNxy4cn8wUA
-         xz7g==
-X-Forwarded-Encrypted: i=1; AJvYcCVMURySGXXkjNg5RhfoKLwKqHWdTdcehaCkIbLEpeivE37PX9Ffgub+N8mww01ZKWPRWYncY01smRnqEqEhmuM=@vger.kernel.org, AJvYcCWb76iVggflBicuU8AeqVRvrHQdJVtgXDzJq6R9DKb8emzGgmO8d3/M3CtWa+JTdoxJoF3GSyIV@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2FbepbBUq8xNAh7D54np9/tp11AnwsiqSlBlJPa27hOKABjyZ
-	nqvlWA2uvmSV2R41kYJUepYxV8CMJs7DKi5fDu987GAQRs3oTYkXfILZcNkKZUe0pR5XPdl7F2E
-	bybDnQ+1ryHdg2iNHBSZdVT0W9hxtQw==
-X-Google-Smtp-Source: AGHT+IEuabbt3muDpmwV9fFuCqXP/WTomEA+OreuKtxeBBmDAMGZJc+XjTfeEZTflQ3zyGRYWVusUGIGy952ysoaf8E=
-X-Received: by 2002:a92:ca47:0:b0:3a0:9050:702a with SMTP id
- e9e14a558f8ab-3a3451bc245mr81566185ab.17.1727694903537; Mon, 30 Sep 2024
- 04:15:03 -0700 (PDT)
+  d=inria.fr; s=dc;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=9JFHu5GN4m1ZIa7hFOr/S0cR7gAkAibwxtDh3yT9bKQ=;
+  b=N5Crvn6Kq6KpHSPNN73aCiDy+RvsqlM0pHtSseTwUaXi/R+AUcNhRU/s
+   cjlHPMFgIZOJllRTItDSSyRCzG1SoWucsK69kp3cC+hyWG6w77VR7U5lk
+   50vSZgwZFWWTGfQ7neSTgSg1frKowyQAjCduh7p7sY9rw2OBXSFMSw4B2
+   4=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.11,165,1725314400"; 
+   d="scan'208";a="185956867"
+Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:21:25 +0200
+From: Julia Lawall <Julia.Lawall@inria.fr>
+To: linux-gpio@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	audit@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org,
+	linux-mm@kvack.org,
+	maple-tree@lists.infradead.org,
+	alsa-devel@alsa-project.org,
+	Sanyog Kale <sanyog.r.kale@intel.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	dccp@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Jan Kara <jack@suse.cz>,
+	drbd-dev@lists.linbit.com,
+	linux-sound@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-leds@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	tipc-discussion@lists.sourceforge.net,
+	Robin Murphy <robin.murphy@arm.com>,
+	iommu@lists.linux.dev,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-trace-kernel@vger.kernel.org,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-nfs@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org,
+	linux-wireless@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: [PATCH 00/35] Reorganize kerneldoc parameter names
+Date: Mon, 30 Sep 2024 13:20:46 +0200
+Message-Id: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
- <20240930092416.80830-4-kerneljasonxing@gmail.com> <66fa81b2ddf10_17948d294bb@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66fa81b2ddf10_17948d294bb@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 30 Sep 2024 19:14:27 +0800
-Message-ID: <CAL+tcoDo8-q_pkQBTSMM9v7ESZKO2v5aTK=W1mLxF3JJutBjYA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net-timestamp: namespacify the sysctl_tstamp_allow_data
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org, willemb@google.com, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 30, 2024 at 6:47=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Let it be tuned in per netns by admins.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> +1 on the idea
->
-> > ---
-> >  include/net/netns/core.h   |  1 +
-> >  include/net/sock.h         |  2 --
->
-> also remove the static global from sock.c
+Reorganize kerneldoc parameter names to match the parameter
+order in the function header.
 
-Thanks for pointing this out.
+The misordered cases were identified using the following
+Coccinelle semantic patch:
 
->
-> >  net/core/net_namespace.c   |  1 +
-> >  net/core/skbuff.c          |  2 +-
-> >  net/core/sysctl_net_core.c | 18 +++++++++---------
-> >  5 files changed, 12 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/include/net/netns/core.h b/include/net/netns/core.h
-> > index 78214f1b43a2..ef8b3105c632 100644
-> > --- a/include/net/netns/core.h
-> > +++ b/include/net/netns/core.h
-> > @@ -23,6 +23,7 @@ struct netns_core {
-> >  #if IS_ENABLED(CONFIG_RPS) && IS_ENABLED(CONFIG_SYSCTL)
-> >       struct cpumask *rps_default_mask;
-> >  #endif
-> > +     int     sysctl_tstamp_allow_data;
-> >  };
-> >
-> >  #endif
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index c58ca8dd561b..4f31be0fd671 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -2808,8 +2808,6 @@ void sk_get_meminfo(const struct sock *sk, u32 *m=
-eminfo);
-> >  extern __u32 sysctl_wmem_max;
-> >  extern __u32 sysctl_rmem_max;
-> >
-> > -extern int sysctl_tstamp_allow_data;
-> > -
-> >  extern __u32 sysctl_wmem_default;
-> >  extern __u32 sysctl_rmem_default;
-> >
-> > diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> > index e39479f1c9a4..e78c01912c64 100644
-> > --- a/net/core/net_namespace.c
-> > +++ b/net/core/net_namespace.c
-> > @@ -317,6 +317,7 @@ static __net_init void preinit_net_sysctl(struct ne=
-t *net)
-> >        */
-> >       net->core.sysctl_optmem_max =3D 128 * 1024;
-> >       net->core.sysctl_txrehash =3D SOCK_TXREHASH_ENABLED;
-> > +     net->core.sysctl_tstamp_allow_data =3D 1;
-> >  }
-> >
-> >  /* init code that must occur even if setup_net() is not called. */
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 74149dc4ee31..ad727d924f73 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5506,7 +5506,7 @@ static bool skb_may_tx_timestamp(struct sock *sk,=
- bool tsonly)
-> >  {
-> >       bool ret;
-> >
-> > -     if (likely(READ_ONCE(sysctl_tstamp_allow_data) || tsonly))
-> > +     if (likely(READ_ONCE(sock_net(sk)->core.sysctl_tstamp_allow_data)=
- || tsonly))
-> >               return true;
->
-> Let's switch order of the tests here too
+// <smpl>
+@initialize:ocaml@
+@@
 
-Got it. Will do it.
+let parse_doc l =
+  let pieces = List.map String.trim (String.split_on_char '*' l) in
+  let l = String.concat " " pieces in
+  match String.split_on_char ':' l with
+    x::xs -> x
+  | _ -> ""
 
-Thanks,
-Jason
+let params ps =
+  List.rev
+    (List.fold_left
+       (fun prev (pm,_) ->
+	 let ty =
+	   String.trim(Pretty_print_c.string_of_fullType pm.Ast_c.p_type) in
+	 if ty = "void" && pm.Ast_c.p_namei = None
+	 then prev
+	 else
+	   let name =
+	     match pm.Ast_c.p_namei with
+	       Some name -> name
+	     | None -> failwith "function parameter has no name" in
+	   (String.trim (Pretty_print_c.string_of_name name),ty)::prev)
+       [] ps)
+
+@r@
+comments c;
+identifier fn;
+position p;
+parameter list ps;
+type T;
+@@
+
+T@c fn@p(ps) { ... }
+
+@script:ocaml@
+p << r.p;
+c << r.c;
+(_,ps) << r.ps;
+@@
+
+let isdoc c ps =
+  List.length ps > 1 &&
+  (let c = String.trim c in
+  String.length c > 3 && String.sub c 0 3 = "/**" && String.get c 3 != '*') in
+
+let subset l1 l2 =
+  List.for_all (fun x -> List.mem x l2) l1 in
+
+let (cb,cm,ca) = List.hd c in
+match List.rev cb with
+  c::_ when isdoc c ps ->
+    let pieces = String.split_on_char '@' c in
+    (match pieces with
+      _::tl ->
+	let d_names = List.map parse_doc tl in
+	(* check parameters *)
+	let p_names = List.map fst (params ps) in
+	if d_names <> [] && not(d_names = p_names)
+	then
+	  begin
+	    if List.sort compare d_names = List.sort compare p_names
+	    then Coccilib.print_main "out of order" p
+	    else if subset d_names p_names
+	    then Coccilib.print_main "doc is missing a parameter" p
+	    else if subset d_names p_names
+	    then Coccilib.print_main "doc has an extra parameter" p
+	  end
+    | _ -> ())
+| _ -> ()
+// </smpl>
+
+---
+
+ arch/arm/mach-omap2/prm2xxx_3xxx.c              |    1 -
+ arch/powerpc/platforms/ps3/interrupt.c          |    2 +-
+ arch/powerpc/platforms/ps3/repository.c         |    2 +-
+ drivers/base/firmware_loader/main.c             |    2 +-
+ drivers/comedi/drivers/comedi_8254.c            |    2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_vm.c          |    2 +-
+ drivers/gpu/drm/amd/display/dc/core/dc.c        |    2 +-
+ drivers/gpu/drm/drm_gem_framebuffer_helper.c    |    3 +--
+ drivers/gpu/drm/drm_gpuvm.c                     |    2 +-
+ drivers/gpu/drm/radeon/radeon_ib.c              |    2 +-
+ drivers/iommu/iommu.c                           |    2 +-
+ drivers/leds/leds-gpio-register.c               |    2 +-
+ drivers/mfd/atmel-smc.c                         |    4 ++--
+ drivers/misc/mei/bus.c                          |    2 +-
+ drivers/mtd/ubi/eba.c                           |    2 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt_hwrm.c  |    2 +-
+ drivers/net/ethernet/intel/e1000/e1000_hw.c     |    2 +-
+ drivers/net/ethernet/intel/i40e/i40e_common.c   |    7 +++----
+ drivers/net/ethernet/intel/ice/ice_common.c     |    2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_common.c |    2 +-
+ drivers/nvdimm/dimm_devs.c                      |    2 +-
+ drivers/pci/hotplug/pci_hotplug_core.c          |    2 +-
+ drivers/pinctrl/pinmux.c                        |    2 +-
+ drivers/slimbus/messaging.c                     |    2 +-
+ drivers/soc/qcom/qmi_interface.c                |    2 +-
+ drivers/soundwire/stream.c                      |    2 +-
+ drivers/usb/gadget/config.c                     |    4 ++--
+ fs/char_dev.c                                   |    2 +-
+ fs/dcache.c                                     |    4 ++--
+ fs/seq_file.c                                   |    2 +-
+ kernel/audit.c                                  |    2 +-
+ kernel/resource.c                               |    2 +-
+ kernel/sysctl.c                                 |    1 -
+ kernel/trace/ring_buffer.c                      |    2 +-
+ lib/lru_cache.c                                 |    2 +-
+ lib/maple_tree.c                                |    2 +-
+ mm/mmu_notifier.c                               |    2 +-
+ net/dccp/feat.c                                 |    2 +-
+ net/mac80211/mesh_hwmp.c                        |    6 +++---
+ net/mac80211/mesh_pathtbl.c                     |   10 +++++-----
+ net/socket.c                                    |    2 +-
+ net/sunrpc/xprt.c                               |    2 +-
+ net/tipc/link.c                                 |   14 +++++++-------
+ net/tipc/msg.c                                  |    2 +-
+ sound/pci/hda/hda_codec.c                       |    2 +-
+ 45 files changed, 60 insertions(+), 64 deletions(-)
 
