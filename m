@@ -1,180 +1,136 @@
-Return-Path: <netdev+bounces-130632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D71698AFC7
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 00:20:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD60598AFDA
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 00:32:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40E59283557
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:20:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82DD61F21B3B
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35616188596;
-	Mon, 30 Sep 2024 22:20:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XMRAW2Sj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9BE1865E0;
+	Mon, 30 Sep 2024 22:32:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C2B15E97;
-	Mon, 30 Sep 2024 22:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5A321373;
+	Mon, 30 Sep 2024 22:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727734849; cv=none; b=GfvFCJKuGij1sBgFeAz1PUVvsBqa93j/h+bmka0/9V8aaUYpsCGpynaFzmr4KVLnO6mI2MzN1qvUpAtgdQrmEYTPSowORp9MZxTCxDYp9UvxiKJHztuZ1CRGS9ENMmvASsoeNEXOIJUNEAuqOtZJeMQTLCEz7Mt8SMVa0BzqExQ=
+	t=1727735573; cv=none; b=TAS0qKlKT5KAxBEH9ECrd+4r+HWhqT3x4EEtHW3U/0do6pDKURfgGWtb0ApNZSkB2mauMIL1MUopcS4E53yTQa7m3uyIptG07SRlWKqvh9oXPy6eQbPT4U2roJB7mMFxG4CGSBB2suD7WmvpkoxK1R5LwN/n1r9elhkcyezfoBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727734849; c=relaxed/simple;
-	bh=h+kptMDd8OFDZwYoRg44FvEUq5MMRV1dFKa3fH2hs8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AZjAfmBsG82ZInhjTTTcLWCRrDujR7tDdENUzgBusPcTXO19FyftfFfonoUKDjjYHaqvk0SWb3Fs/3uYQeTGTblIDCzaj8KAKtAN3RVt8heCD2tmRhMjHfci4MNa2PqZtnFckvU2avV/GOdh0c3rNmttbS3K5vU5rxZSQ2CG8L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XMRAW2Sj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F61C4CEC7;
-	Mon, 30 Sep 2024 22:20:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727734848;
-	bh=h+kptMDd8OFDZwYoRg44FvEUq5MMRV1dFKa3fH2hs8U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XMRAW2SjUTR1VOj8+HnjNPlAEfjW/Yoce7VbCB19eCTUeRmtiqh305Vec+IAydo73
-	 ZLzXQOMYNsdumse75fGuxXf5uGQD7w1N5acipeolR7ZcxIkC209RECpQEYPTPziNi+
-	 znnS4oG/E0q1I6UHL1mdJAjYPM3TiWEKvOjG1XKDdn22TcSzX8TqZ+BuICZ5VqVqfa
-	 DHGxScur8mF0357SwzCog+C41vlmH0aUZ0EvaiGlhIwEvyV8hN3C2LVUeaK0Xuytzw
-	 UXbzhftyUwS4jNIRaGkl0NDCgprcvor8ryVlHXCE4IrEhyBOjH80dvqaQcSypGY/r2
-	 vDepQstTO65HQ==
-Date: Mon, 30 Sep 2024 23:20:45 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: Okan Tumuklu <okantumukluu@gmail.com>, shuah@kernel.org,
-	linux-kernel@vger.kernel.org, krzk@kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] Update core.c
-Message-ID: <20240930-plant-brim-b8178db46885@spud>
-References: <20240930220649.6954-1-okantumukluu@gmail.com>
- <7dcaa550-4c12-4c2e-9ae2-794c87048ea9@linuxfoundation.org>
+	s=arc-20240116; t=1727735573; c=relaxed/simple;
+	bh=yB8t28v0rVVG8l1ITb+2azCXJ2SY+9Yr+Bcj/YPUWsQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=TATI2wR6JkLMxXY1S07aVH5Ow/zvfbxPAxqJLeqkP71QvBb/QtgKieMjZnOdgyadoa6iDs43K+Bjov5Usj3zero6z7kP6vHrk4/fK/1Pj6XJvjvbuw3/x8syLAUFThOd8uOirzGDisKP8MiFOb8Y3ccy3rR5gHlAYuNodkZAMhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.144.249) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 1 Oct
+ 2024 01:32:40 +0300
+Message-ID: <2664c044-bb38-44f0-821e-28d813589d15@omp.ru>
+Date: Tue, 1 Oct 2024 01:32:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="wEGPIiq33+tRNw/F"
-Content-Disposition: inline
-In-Reply-To: <7dcaa550-4c12-4c2e-9ae2-794c87048ea9@linuxfoundation.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 11/11] net: ravb: Add VLAN checksum support
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+To: Paul Barker <paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+CC: Paul Barker <paul.barker.ct@bp.renesas.com>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930160845.8520-1-paul@pbarker.dev>
+ <20240930160845.8520-12-paul@pbarker.dev>
+ <ab7482f9-6833-416f-8adf-5e1347628dec@omp.ru>
+Content-Language: en-US
+Organization: Open Mobile Platform
+In-Reply-To: <ab7482f9-6833-416f-8adf-5e1347628dec@omp.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 09/30/2024 22:19:07
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188103 [Sep 30 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 35 0.3.35
+ d90443ea3cdf6e421a9ef5a0a400f1251229ba23
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.144.249 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.144.249
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/30/2024 22:22:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/30/2024 9:25:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 9/30/24 23:36, Sergey Shtylyov wrote:
+[...]
 
---wEGPIiq33+tRNw/F
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+>> From: Paul Barker <paul.barker.ct@bp.renesas.com>
+>>
+>> The GbEth IP supports offloading checksum calculation for VLAN-tagged
+>> packets, provided that the EtherType is 0x8100 and only one VLAN tag is
+>> present.
+>>
+>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> [...]
+> 
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 832132d44fb4..eb7499d42a9b 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -2063,11 +2063,30 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+[...]
+>> -	switch (ntohs(skb->protocol)) {
+>> +	if (net_protocol == ETH_P_8021Q) {
+>> +		struct vlan_hdr vhdr, *vh;
+>> +
+>> +		vh = skb_header_pointer(skb, ETH_HLEN, sizeof(vhdr), &vhdr);
+> 
+>    Hm, I thought the VLAN header starts at ETH_HLEN - 2, not at ETH_HLEN...
 
-On Mon, Sep 30, 2024 at 04:12:41PM -0600, Shuah Khan wrote:
-> On 9/30/24 16:06, Okan Tumuklu wrote:
-> > From: Okan T=FCm=FCkl=FC <117488504+Okan-tumuklu@users.noreply.github.c=
-om>
-> >=20
-> > 1:The control flow was simplified by using else if statements instead o=
-f goto structure.
-> >=20
-> > 2:Error conditions are handled more clearly.
-> >=20
-> > 3:The device_unlock call at the end of the function is guaranteed in al=
-l cases.
->=20
-> Write a paragraph - don't use bullet lists.
->=20
-> Please refer to submitting patches for details on how to
-> write shortlogs and change logs.
->=20
-> "Update core.c" with what? Write a better short log.
->=20
-> Why do you this 117488504+Okan-tumuklu@users.noreply.github.com
-> in the list? It will complain every time someone responds
-> to this thread. This is not how patches are sent. Refer to
-> documents in the kernel repo on how to send patches.
->=20
-> You are missing net maintainers and mailing lists.
->=20
-> Include all reviewers - run get_maintainers.pl
+    Wikipedia indeed says that the VLAN header begins with TPID word (0x8100)
+and then the TCI word follows -- while in Linux, *struct* vlan_hgr starts with
+the TCI word -- hence my confusion... :-)
 
-And consider whether the patch is a trip up the garden path, or
-actually worthwhile.
+> [...]
 
-Why would if/else be better than a goto?
-What's unclear about the current error handling?
-In what case is the device_unlock() call missed?
+MBR, Sergey
 
-Maybe there's some value in using the scoped cleanup here (do netdev
-folks even want scoped cleanup?), but this patch may not be worth the
-time spent improving it. +CC Krzk and netdev, before more time is
-potentially wasted here.
-
-Cheers,
-Conor.
-
->=20
-> > ---
-> >   net/nfc/core.c | 28 ++++++++++------------------
-> >   1 file changed, 10 insertions(+), 18 deletions(-)
-> >=20
-> > diff --git a/net/nfc/core.c b/net/nfc/core.c
-> > index e58dc6405054..4e8f01145c37 100644
-> > --- a/net/nfc/core.c
-> > +++ b/net/nfc/core.c
-> > @@ -40,27 +40,19 @@ int nfc_fw_download(struct nfc_dev *dev, const char=
- *firmware_name)
-> >   	if (dev->shutting_down) {
-> >   		rc =3D -ENODEV;
-> > -		goto error;
-> > -	}
-> > -
-> > -	if (dev->dev_up) {
-> > +	}else if (dev->dev_up) {
-> >   		rc =3D -EBUSY;
-> > -		goto error;
-> > -	}
->=20
-> Did you run checkpack script on this patch? There are a few
-> coding style errors.
->=20
-> > -
-> > -	if (!dev->ops->fw_download) {
-> > +	}else if (!dev->ops->fw_download) {
-> >   		rc =3D -EOPNOTSUPP;
-> > -		goto error;
-> > -	}
-> > -
-> > -	dev->fw_download_in_progress =3D true;
-> > -	rc =3D dev->ops->fw_download(dev, firmware_name);
-> > -	if (rc)
-> > -		dev->fw_download_in_progress =3D false;
-> > +	}else{
-> > +		dev->fw_download_in_progress =3D true;
-> > +		rc =3D dev->ops->fw_download(dev, firmware_name);
-> > +		if (rc)
-> > +			dev->fw_download_in_progress =3D false;
-> > +		}
-> > -error:
-> > -	device_unlock(&dev->dev);
-> > -	return rc;
-> > +		device_unlock(&dev->dev);
-> > +		return rc;
-> >   }
-> >   /**
->=20
-> thanks,
-> -- Shuah
-
---wEGPIiq33+tRNw/F
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZvskPQAKCRB4tDGHoIJi
-0tbmAQDg9JEINw94BV/ssP4fgELMXaH0zKhqEjpblWaUymVl9AEAoxJXxnnQ1SSi
-P2qIs4zoFSHZA6MEz8KGNJmxKkRkMgw=
-=y9nV
------END PGP SIGNATURE-----
-
---wEGPIiq33+tRNw/F--
 
