@@ -1,162 +1,154 @@
-Return-Path: <netdev+bounces-130362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3193E98A359
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:47:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCD698A351
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 372F7B25CF8
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FE581F24390
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91AD18E74C;
-	Mon, 30 Sep 2024 12:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C7B1917FE;
+	Mon, 30 Sep 2024 12:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PrAiO2Hs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ESp4XrK8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5AA18990E;
-	Mon, 30 Sep 2024 12:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D36018E779
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727700186; cv=none; b=tr+B2R/pUXsqb/ytJvWd+poBTtoSu90fc4ezbSAHB+xBOdxy3eb0WhKUhekgjQ8k8LEsi0VMWLUz7lL6VCRwCQXbiaGokM5QBlIl0jgIN+75jqWm5q8tmoDbfmLMCUoEtr+R3HpMb4ECo6InsENyj2BzrcT/eLU7mzVqCRa7flo=
+	t=1727700287; cv=none; b=YkSeN+UGVK4FpcbR08KHPwgdyW+3ejBXFbvEcUzrQYEgQI9VhqGJaMoRfja4tyMlkw15sWYpebwfTrLFltwEMX+VxjYzPMagbwUVKUtgrZRR0arlVTyxVZAtRglBIVF0dvgzRBJBe2x6SUqlwCDfXekEMid3mJ/lyTY9k6HquIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727700186; c=relaxed/simple;
-	bh=gEzfPaK0TpvnVynQ506A9D0uyk+SyDbxtCqzyu9DbDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HFA+GcwA6a9fGK/eyRTsG7waT4qq7g6oWdVFvK/1EM6kv1DauztgbJwiXGJ4s6Iwu6oS56Sv1oDq7mec3sZKh+POR93RtVLRbX6z5Si+GpXMTBehldmEmtvR2U/7tU9Vn7mCtMCMSp9uzESLq7dI5zSt8RzL/8vu9MaWt0VbeLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PrAiO2Hs; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a34ccc6a9aso5835055ab.1;
-        Mon, 30 Sep 2024 05:43:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727700184; x=1728304984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=38/U6EdWtSaSJAwey3tZ/dl54aPcoLZSVUhkiWNOg6M=;
-        b=PrAiO2HsNfQyFOn4di3hkZqUjIWT4bgdv9ePvtyqpwmiyVasySe/y9NGn7rZ83nfUL
-         APIqv/h1/tmhrLfqD4m6RhfJuZyZ+ngH4ub++LQSDVguMD2iRpo6cTAyL/YC3AjA+HLR
-         ePt7jkpcKQNRy91TjyEOq/7fZYvuhHWo9Jw/OXGnbOUAQ0k3LWIKYg0oJA8A2HNfJV5K
-         p2VMuZ559AciKthM3vp1XhkR3i2fslgzetp9UZl0H+Kiiiq/HBaah/jr3LVEe5ZuWnrx
-         tcXsZkqcYR1kAa+TH8l9Q/7eXK9iyWsbwqf+fxa1H3vB8oeitGceItI+XC4IC3ZJ67hu
-         0fEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727700184; x=1728304984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=38/U6EdWtSaSJAwey3tZ/dl54aPcoLZSVUhkiWNOg6M=;
-        b=HFlIn8hhxjaxtWkk9fyFHZBuXa2spO71+xEHKDeJCRulGq1cXhbIDt1u6BjRtqJq2e
-         3n0qIN/itH+KqSqKqTqcETby3cpDK3rPNgsaHzxz3S3EIqGUypRh8pzL9uutKdcNgqRE
-         LP/CMo9f00xbWtve8EHofK+IlnzMhppP8Jha94BeLvioszXVoyPLU3HnApeJqT2Bx0dL
-         Fs85x1dR1HVri2e0Z6YYY0GDtgo5ppmeEqDZeVJB+lY2LjMgUtJsK42suyY1YdsUlUpT
-         QW5Z4703hdbwtRgXdw6huR/+4y+wHRMb0V2kBuFXUXgtEzZQw1pqDwOg2Ad9t4e8te9R
-         wzMA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5GT9dyI2BpszhwTHsKdDFuwMtiLHT/ag86mAJiuBnLP7ftf3IibE9YTUiebAHdx/wLe9mUtwtzXTS7VJ1kxQ=@vger.kernel.org, AJvYcCVTawuz1NCVi+iiLR5fK6dJDlj9LIJ/S2fZI3JpchXBfeewDQRsWdyM2BmPad2/vbsRUQIx9q1x@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgvzOEM0MqN+3bi72Td6Uq8vFsCKCqNbev/atztLSxUNUgH8FE
-	mb+J97N9xVUae9SO6DyXLhIVASt1i+lbZjhHlY/84HjzemzenMHdRNnlE/+/9BWQfXeaDrZ2Knc
-	o4zzEAZUTbRqLRouO/cIqal9DZac=
-X-Google-Smtp-Source: AGHT+IF0nZM6lTJMpefZD4qIC7brprKUBxnG0KYje/r7g2JEFhUbqi9ibaTSFcqgKSSenlYPLf1qosLveRUqUohqWtY=
-X-Received: by 2002:a05:6e02:1a6e:b0:3a0:8c5f:90d8 with SMTP id
- e9e14a558f8ab-3a34515ad44mr90780505ab.6.1727700184285; Mon, 30 Sep 2024
- 05:43:04 -0700 (PDT)
+	s=arc-20240116; t=1727700287; c=relaxed/simple;
+	bh=6vUuZ2dmjzVrkKIoa9FfLBuOBd8yL0AJKjCVHkJVKs0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=rVmuEEAShaPydf/VP1MHIYSSYQUZ3u1/4u/MTqRKqBJBts4q9ILwlZIwMK1kzY4CZcK5eMoIpd2H7VX6KlLrF6wHoMsdA+8VkGZLSgjlwshwoF4NG0ipRTquuJBIs6Qv0smhqJdl9wpShJqR16dBQusoZOzzZ26ov/8Ox6Vyb2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ESp4XrK8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727700283;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6bVDH90pWvwnLUcopy8GzWW9f5uyvFXFYBMlGFlIsT8=;
+	b=ESp4XrK8ugs1enaSltg3WyLRmon32/oqcDhvwu8jo31FLvkUhCB3tq91sJyPn9EpCurq5S
+	rw/VXtnMLOv9Xz/b+DnSFB/tUpnyRsGn4aEGf1K1ocKqv1FNRRaiUiSDcM3RXJpN7S4OQ9
+	XkV+gjlXmWr9xJZ1ME3JX/iAyJyXwR8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-401-q9x6f1A7NQmqo91dzCKIUg-1; Mon,
+ 30 Sep 2024 08:44:41 -0400
+X-MC-Unique: q9x6f1A7NQmqo91dzCKIUg-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 722E31944DDB;
+	Mon, 30 Sep 2024 12:44:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3243E1979060;
+	Mon, 30 Sep 2024 12:44:31 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240925103118.GE967758@unreal>
+References: <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: dhowells@redhat.com, Eduard Zingerman <eddyz87@gmail.com>,
+    Christian Brauner <brauner@kernel.org>,
+    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
- <20240930092416.80830-2-kerneljasonxing@gmail.com> <66fa7fe46392e_17948d294bb@willemb.c.googlers.com.notmuch>
- <CAL+tcoC+VEs1UusEKKVhutw+e=uyEqoaBhRTUV1G4HakM3JVYQ@mail.gmail.com> <66fa904185c3_17cd892948a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66fa904185c3_17cd892948a@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 30 Sep 2024 20:42:27 +0800
-Message-ID: <CAL+tcoBMXtQ_TbjKmO5CazL5zu1dDBBB+enckkM9+0ojF3qutQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net-timestamp: add strict check when setting
- tx flags
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org, willemb@google.com, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2968939.1727700270.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Mon, 30 Sep 2024 13:44:30 +0100
+Message-ID: <2968940.1727700270@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Mon, Sep 30, 2024 at 7:49=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Mon, Sep 30, 2024 at 6:39=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Even though this case is unlikely to happen, we have to avoid such
-> > > > a case occurring at an earlier point: the sk_rmem_alloc could get
-> > > > increased because of inserting more and more skbs into the errqueue
-> > > > when calling __skb_complete_tx_timestamp(). This bad case would sto=
-p
-> > > > the socket transmitting soon.
-> > >
-> > > It is up to the application to read from the error queue frequently
-> > > enough and/or increase SO_RCVBUF.
-> >
-> > Sure thing. If we test it without setting SOF_TIMESTAMPING_SOFTWARE on
-> > the loopback, it will soon stop. That's the reason why I tried to add
-> > the restriction just in case.
->
-> I don't follow at all.
->
-> That bit does not affect the core issue: that the application is not
-> clearing its error queue quickly enough.
->
-> > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > >  net/core/sock.c | 4 ++++
-> > > >  1 file changed, 4 insertions(+)
-> > > >
-> > > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > > index fe87f9bd8f16..4bddd6f62e4f 100644
-> > > > --- a/net/core/sock.c
-> > > > +++ b/net/core/sock.c
-> > > > @@ -905,6 +905,10 @@ int sock_set_timestamping(struct sock *sk, int=
- optname,
-> > > >       if (val & ~SOF_TIMESTAMPING_MASK)
-> > > >               return -EINVAL;
-> > > >
-> > > > +     if (val & SOF_TIMESTAMPING_TX_RECORD_MASK &&
-> > > > +         !(val & SOF_TIMESTAMPING_SOFTWARE))
-> > > > +             return -EINVAL;
-> > > > +
-> > >
-> > > This breaks hardware timestamping
-> >
-> > Yes, and sorry about that. I'll fix this.
->
-> As is I don't understand the purpose of this patch. Please do not
-> just resubmit with a change, but explain the problem and suggested
-> solution first.
->
+Okay, let's try something a little more drastic.  See if we can at least g=
+et
+it booting to the point we can read the tracelog.  If you can apply the
+attached patch?  It won't release any folio_queue struct or put the refs o=
+n
+any pages, so it will quickly run out of memory - but if you have sufficie=
+nt
+menory, it might be enough to boot.
 
-I will drop this patch because I just tested with my program in the
-local machine and found there is one mistake I made about calculating
-the diff between those two . Sorry for the noise.
+David
+---
+9p: [DEBUGGING] Don't release pages or folioq structs
 
-Well, I only need to send a V2 patch of patch [3/3] in the next few days.
+diff --git a/fs/netfs/buffered_read.c b/fs/netfs/buffered_read.c
+index af46a598f4d7..702286484176 100644
+--- a/fs/netfs/buffered_read.c
++++ b/fs/netfs/buffered_read.c
+@@ -84,8 +84,8 @@ static size_t netfs_load_buffer_from_ra(struct netfs_io_=
+request *rreq,
+ 		folioq->orders[i] =3D order;
+ 		size +=3D PAGE_SIZE << order;
+ =
 
-BTW, please allow me to ask one question unrelated to this patch
-again. I do wonder: if we batch the recv skbs from the errqueue when
-calling tcp_recvmsg() -> inet_recv_error(), it could break users,
-right?
+-		if (!folio_batch_add(put_batch, folio))
+-			folio_batch_release(put_batch);
++		//if (!folio_batch_add(put_batch, folio))
++		//	folio_batch_release(put_batch);
+ 	}
+ =
 
-Thanks,
-Jason
+ 	for (int i =3D nr; i < folioq_nr_slots(folioq); i++)
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index 63280791de3b..cec55b7eb5bc 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -88,7 +88,7 @@ struct folio_queue *netfs_delete_buffer_head(struct netf=
+s_io_request *wreq)
+ 	if (next)
+ 		next->prev =3D NULL;
+ 	netfs_stat_d(&netfs_n_folioq);
+-	kfree(head);
++	//kfree(head);
+ 	wreq->buffer =3D next;
+ 	return next;
+ }
+@@ -108,11 +108,11 @@ void netfs_clear_buffer(struct netfs_io_request *rre=
+q)
+ 				continue;
+ 			if (folioq_is_marked(p, slot)) {
+ 				trace_netfs_folio(folio, netfs_folio_trace_put);
+-				folio_put(folio);
++				//folio_put(folio);
+ 			}
+ 		}
+ 		netfs_stat_d(&netfs_n_folioq);
+-		kfree(p);
++		//kfree(p);
+ 	}
+ }
+ =
+
 
