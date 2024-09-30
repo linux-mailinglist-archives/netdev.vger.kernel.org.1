@@ -1,169 +1,184 @@
-Return-Path: <netdev+bounces-130384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C5698A4BF
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:25:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBCF98A50D
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:30:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 909E61F22223
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:25:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBF581C214C9
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507D018FDC0;
-	Mon, 30 Sep 2024 13:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ED4F18FDCE;
+	Mon, 30 Sep 2024 13:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ELXANkFh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B11D18EFE0;
-	Mon, 30 Sep 2024 13:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 598B02AE8E;
+	Mon, 30 Sep 2024 13:30:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727702635; cv=none; b=UoOwMGW6goQn/ZhrmXaHXtHsMggu9cUsGTli3IXPUzNSyXONBnLB/SVHtLJZWcvJFPQm4LWoSKsI538MumRpAoEpMceqrXq64K/83nKwSvD61vt1pPADzNxx75AqX2z5V8WofwoJUTIeF7/vSl33l3k6ojx/A3fcuKOk3i7zoOI=
+	t=1727703004; cv=none; b=Vf2jFPl2vZb/uYokeOTvOiAwxY54ru7w+9JJ8l6ER9646CPMWbaJ5Mp5lzEZ/qpfMglVszIkrixcAL73IUi0wQN/T3F9voW27S44R83lHnxcLr4Jh2BBv4KLVuu5MO31sCTZz1PVRGNOWwqxQIw97voMbXQLTQXuN50ZF3dgOEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727702635; c=relaxed/simple;
-	bh=NP8jjB23QLX+S3BSx5sj/XPrv18+qsyiocQiyL4WsKQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qOYeOeWGkMo+mIAjrr+NdVYJ9fN/5V1dcKN+xtaPj3VPwNyovDVtB4vqXqfQw43ZJykdcSMbEtK+p4RdTTTUeRjlk9S5278bRzqY0VzxD8ngUibLsHTSL2IbezdGRaN03pJ//GQVqIYHmPnt1p4QiOywClqn5szdkYjpjDQAzdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6e25f3748e0so13168407b3.0;
-        Mon, 30 Sep 2024 06:23:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727702632; x=1728307432;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XZEBwxrpoLE/VvANGlwD0fZQRFkLr5Jij21iFhSOg0E=;
-        b=Ny+brfuRI0mD5jGft+XwV0ns+QULBfUaRHokH4l6opSGxQ/Ts2IFunUdOwcxcMYqvR
-         BPnB7yWoTgQD01gTouoSukmJzk2q4R35oOV1FWsPhVY68aleH6ZE1PYj50JAoafVqSMh
-         IHuGvhyav1/86KhMnBEQaRT7XK5PNqJRAM7OJckism28eAmwQl/dOnc8aPirtMM6zXH3
-         09IzTcxVRKQ9TfykgxzH8YF25pr6gK1HiHA0vJRFPFYp52/v6vPalO9PDsiIhU0vhrDh
-         uFBVq7jjWmcorMfzYOYMPsInZ+jk3A6FuBml2l1BZgpL17kG+SYvTptf36bv74mbPkWY
-         liwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTFkfjpjQnAtssSdAFa/xHw2hPa9G9GfmfUKBQIBFRzr1PQrAsI8ntYKQEfiYwz3gDe4B9UVC3ZPmp@vger.kernel.org, AJvYcCWFCvipBFthvROU+Y9wWOa3DdPlRUqAW3qBvFGYZAwFoh5X5vjGwYCJyCVZNzgxYo3OTU+m+hVX@vger.kernel.org, AJvYcCWGVMSwRWvi1oLDt4f1qO2vPN5fZu7Mi/65iYjcYdv6WpSk39lFrKcjpa8ctvsStHL93AbLgra1w9/WuUl4@vger.kernel.org, AJvYcCXBqxI43nFQ2jyBlYocJoingNPDbER3E8lwL7RjGoVUzt4av+K9EJZl1W0fOAYxxGlkmO8U+9WEJ23E@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2s3hMwR4s6i4G3kBAJliUZg7lYB2z+a8Gox/T1bVk7XBHGzaE
-	qK3TFmCK/Ln+QkjrsvzxzAqFKs5ZyNjM49GO47d29J8mp1xDqNd1r8p/DrYK
-X-Google-Smtp-Source: AGHT+IGLCnlU657xJcYU/8fHe95pp7TnjlS5Glm36BYWtS0N1BCldXcsEtAzK3PM1O9s1GCVcUaSKw==
-X-Received: by 2002:a05:690c:4285:b0:6d7:f32:735b with SMTP id 00721157ae682-6e24759c116mr68881877b3.27.1727702631701;
-        Mon, 30 Sep 2024 06:23:51 -0700 (PDT)
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com. [209.85.128.170])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e2454a1dc9sm13480477b3.142.2024.09.30.06.23.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2024 06:23:51 -0700 (PDT)
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6e25f3748e0so13167997b3.0;
-        Mon, 30 Sep 2024 06:23:50 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVMbdbgKtE3FE4bCYDvMaOinVTZJM7SY25+4sTCjhMXo6v8cidvEDvupA80tes0wkwoNqgg3P4v3yGj@vger.kernel.org, AJvYcCVeyQS82wYUgZblU2lfXUsTIRVY6ioJoCOg5MgYbOqBT2neZiHGjrSQzPNJzgJuwmX3Ry+yn6Av@vger.kernel.org, AJvYcCVxJ3KShLqjwbQn4q71izq/vp7Q0dVIUGFEebCmnI/xsAn57u5d7s86cNWDPO2kgvKPt72dyr0McXnD@vger.kernel.org, AJvYcCXDKSV3TDRNc5XBpXJu9FmQe9xeUIdPCsOmU4y6utHfABRTWWaQZAOM2SgkqtsSEQovTYEF3UYn7Phw+IuN@vger.kernel.org
-X-Received: by 2002:a05:690c:26c6:b0:6e2:1b46:27c1 with SMTP id
- 00721157ae682-6e24761f502mr54518597b3.45.1727702630751; Mon, 30 Sep 2024
- 06:23:50 -0700 (PDT)
+	s=arc-20240116; t=1727703004; c=relaxed/simple;
+	bh=1L/OdZOYzihyBZ8iWjDHXXTLkYr0K1ESnol75f87IN8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=udd7xhdiRmzAnBoYGI8Z9xZQjXk1saPyKdHF6QWzPl9H/wpqc2Ks3h3b/kb5KjfTUH53a8lxsQcxCDVFc/9NfxltvofTS0y02pjlRzhWN5AgUZMlYoRD+idK/CQUYiJMbjFqUxn5uLj6IcOKxY2Tc47HCj2/sRktUMgIpUlIzEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ELXANkFh; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=d2J3hptl9JSPtcZnGVTo57UhG3UXBHxQTz1e3Wd4U+U=; b=ELXANkFhQxiEp8Ao
+	GHMW9fUKy/KNYqv+gbaQr/s/PYSNPc84PAgSRSRZR0mQ/QqZH27k7wKZdriU2yxC3jf1hsKV3HyAL
+	hpcI0wf2NL8jqGeLEQgsl8QYy44pPzpBlafkvop0ZTfEiBXgT5IBBjjoFSsBveRFWxX5EMXjFrJ41
+	I9851esQO3NW7q45sHPQ++eifCqBRerDdPYHE/7jwhorJgRCkS4epNwDm68Q3NFEDwrb/t1qpASvD
+	HAYYLPGj8nrmTWBj0It1GEjt9q6S+zSYO+oiIgqzz8u12RQyFYQelcJdXOGqHd7CE2flgxzvYDJC6
+	tGVSVJL3er3XY9RXww==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1svGTL-007ylV-2b;
+	Mon, 30 Sep 2024 13:29:55 +0000
+From: linux@treblig.org
+To: willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next] appletalk: Remove deadcode
+Date: Mon, 30 Sep 2024 14:29:53 +0100
+Message-ID: <20240930132953.46962-1-linux@treblig.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930121601.172216-1-herve.codina@bootlin.com> <20240930121601.172216-3-herve.codina@bootlin.com>
-In-Reply-To: <20240930121601.172216-3-herve.codina@bootlin.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 30 Sep 2024 15:23:37 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdX97ESvg-htynOJC5408Hf1bKN46ji-fnuzr94wBcZSXw@mail.gmail.com>
-Message-ID: <CAMuHMdX97ESvg-htynOJC5408Hf1bKN46ji-fnuzr94wBcZSXw@mail.gmail.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item when
- cpu-syscon is not present
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, 
-	Dragan Cvetic <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
-	Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Herv=C3=A9,
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-On Mon, Sep 30, 2024 at 2:16=E2=80=AFPM Herve Codina <herve.codina@bootlin.=
-com> wrote:
-> In the LAN966x PCI device use case, syscon cannot be used as syscon
-> devices do not support removal [1]. A syscon device is a core "system"
-> device and not a device available in some addon boards and so, it is not
-> supposed to be removed.
->
-> In order to remove the syscon usage, use a local mapping of a reg
-> address range when cpu-syscon is not present.
->
-> Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1=
-]
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+alloc_ltalkdev in net/appletalk/dev.c is dead since
+commit 00f3696f7555 ("net: appletalk: remove cops support")
 
-Thanks for your patch!
+Removing it (and it's helper) leaves dev.c and if_ltalk.h empty;
+remove them and the Makefile entry.
 
-> --- a/drivers/reset/reset-microchip-sparx5.c
-> +++ b/drivers/reset/reset-microchip-sparx5.c
-> @@ -114,8 +114,22 @@ static int mchp_sparx5_reset_probe(struct platform_d=
-evice *pdev)
->                 return -ENOMEM;
->
->         err =3D mchp_sparx5_map_syscon(pdev, "cpu-syscon", &ctx->cpu_ctrl=
-);
-> -       if (err)
-> +       switch (err) {
-> +       case 0:
-> +               break;
-> +       case -ENODEV:
-> +               /*
-> +                * The cpu-syscon device is not available.
-> +                * Fall back with IO mapping (i.e. mapping from reg prope=
-rty).
-> +                */
-> +               err =3D mchp_sparx5_map_io(pdev, 1, &ctx->cpu_ctrl);
-> +               if (err)
-> +                       return err;
-> +               break;
-> +       default:
->                 return err;
-> +       }
-> +
+tun.c was including that if_ltalk.h but actually wanted
+the uapi version for LTALK_ALEN, fix up the path.
 
-This can be shortened to:
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+---
+ drivers/net/tun.c        |  2 +-
+ include/linux/if_ltalk.h |  8 -------
+ net/appletalk/Makefile   |  2 +-
+ net/appletalk/dev.c      | 46 ----------------------------------------
+ 4 files changed, 2 insertions(+), 56 deletions(-)
+ delete mode 100644 include/linux/if_ltalk.h
+ delete mode 100644 net/appletalk/dev.c
 
-    if (err =3D=3D -ENODEV) {
-            /*
-             * The cpu-syscon device is not available.
-             * Fall back with IO mapping (i.e. mapping from reg property).
-             */
-            err =3D mchp_sparx5_map_io(pdev, 1, &ctx->cpu_ctrl);
-    }
-    if (err)
-            return err;
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 9a0f6eb32016..d7a865ef370b 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -71,7 +71,7 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/mutex.h>
+ #include <linux/ieee802154.h>
+-#include <linux/if_ltalk.h>
++#include <uapi/linux/if_ltalk.h>
+ #include <uapi/linux/if_fddi.h>
+ #include <uapi/linux/if_hippi.h>
+ #include <uapi/linux/if_fc.h>
+diff --git a/include/linux/if_ltalk.h b/include/linux/if_ltalk.h
+deleted file mode 100644
+index 4cc1c0b77870..000000000000
+--- a/include/linux/if_ltalk.h
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __LINUX_LTALK_H
+-#define __LINUX_LTALK_H
+-
+-#include <uapi/linux/if_ltalk.h>
+-
+-extern struct net_device *alloc_ltalkdev(int sizeof_priv);
+-#endif
+diff --git a/net/appletalk/Makefile b/net/appletalk/Makefile
+index 33164d972d37..152312a15180 100644
+--- a/net/appletalk/Makefile
++++ b/net/appletalk/Makefile
+@@ -5,6 +5,6 @@
+ 
+ obj-$(CONFIG_ATALK) += appletalk.o
+ 
+-appletalk-y			:= aarp.o ddp.o dev.o
++appletalk-y			:= aarp.o ddp.o
+ appletalk-$(CONFIG_PROC_FS)	+= atalk_proc.o
+ appletalk-$(CONFIG_SYSCTL)	+= sysctl_net_atalk.o
+diff --git a/net/appletalk/dev.c b/net/appletalk/dev.c
+deleted file mode 100644
+index 284c8e585533..000000000000
+--- a/net/appletalk/dev.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * Moved here from drivers/net/net_init.c, which is:
+- *	Written 1993,1994,1995 by Donald Becker.
+- */
+-
+-#include <linux/errno.h>
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/if_arp.h>
+-#include <linux/if_ltalk.h>
+-
+-static void ltalk_setup(struct net_device *dev)
+-{
+-	/* Fill in the fields of the device structure with localtalk-generic values. */
+-
+-	dev->type		= ARPHRD_LOCALTLK;
+-	dev->hard_header_len 	= LTALK_HLEN;
+-	dev->mtu		= LTALK_MTU;
+-	dev->addr_len		= LTALK_ALEN;
+-	dev->tx_queue_len	= 10;
+-
+-	dev->broadcast[0]	= 0xFF;
+-
+-	dev->flags		= IFF_BROADCAST|IFF_MULTICAST|IFF_NOARP;
+-}
+-
+-/**
+- * alloc_ltalkdev - Allocates and sets up an localtalk device
+- * @sizeof_priv: Size of additional driver-private structure to be allocated
+- *	for this localtalk device
+- *
+- * Fill in the fields of the device structure with localtalk-generic
+- * values. Basically does everything except registering the device.
+- *
+- * Constructs a new net device, complete with a private data area of
+- * size @sizeof_priv.  A 32-byte (not bit) alignment is enforced for
+- * this private data area.
+- */
+-
+-struct net_device *alloc_ltalkdev(int sizeof_priv)
+-{
+-	return alloc_netdev(sizeof_priv, "lt%d", NET_NAME_UNKNOWN,
+-			    ltalk_setup);
+-}
+-EXPORT_SYMBOL(alloc_ltalkdev);
+-- 
+2.46.2
 
->         err =3D mchp_sparx5_map_io(pdev, 0, &ctx->gcb_ctrl);
->         if (err)
->                 return err;
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
