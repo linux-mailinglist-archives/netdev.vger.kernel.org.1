@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-130433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D231D98A7CA
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:53:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD8398A7D0
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EA131F247B4
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C3A286197
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B47B192B7A;
-	Mon, 30 Sep 2024 14:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1354D192D68;
+	Mon, 30 Sep 2024 14:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ISLgR2V5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvuyuIfu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AEF23D2
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B5A19048F
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727707870; cv=none; b=IAbM18yHqKflB+2tE9EyNKIf3y9d62nhmdK8Hea33n1ifsIFbs6TYA93YQo0dT+iNuwnZ6926cnmaFX/XsHvnRbYJwz1IqTipzxs9AEBDzTjxZ4gIA8aogbeWw7GHkt+JO1AOLB+0gj5i3Dl87zwRbB563tMGdZvucarKp/YJaQ=
+	t=1727707905; cv=none; b=gUjV6fWFqHeAL/3w0B3N9LGRPP+PyUTHllK7hX8XfTgutGT0CTRg7o0IB4HPlidWpJWkK4FXRAGuLu/3VAwb/qhfpwlWgvQgB1pNnI97F4eF5oMOj0XQBUnXqdBq6Puhxre4wYhrYh8Y4HGmvvoZuJGWYcff+aPNzQ8ghJfpRac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727707870; c=relaxed/simple;
-	bh=SI+2KXzG9ocXcs8B/P6Lwx+RXKjc8P5F/1EgU8LxBFA=;
+	s=arc-20240116; t=1727707905; c=relaxed/simple;
+	bh=LZ21acJUlmDDdoVxxT6yhtqKNPjH/hUR3in9MD3hqRY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lt/Mcio3Cq2SvZwBZL6AnFGMwyWGvSrsYEJszZZTcRju0vVz8g7Nbdf0NG3qsy3jGWBfm4kWAnVvGpZu0qWbSFkn9bQJvRyD4Fe5Q9//87SnFE4ieGfm76z2wIOgheWJt32o0nGAgUKI/Oc3KB+wlzxFLz9898EIbQPelKFVmAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ISLgR2V5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xK0/f32VgbSAHaxYTwiLp4tpPwQGenWwu2VFvCDg/JI=; b=ISLgR2V5rTeyDAKyxSlT/HrvCH
-	K5UQp/V7VrL95LoMrlWNcBekUquzoENP3ACXb2rj8os8HactFzWiVcr0HGCxF4EGWIuoXZjn+1//o
-	55E/lrrxOXKUOu5JBwEvrP+pzDy9radwScyy5UGH6seoLfZfHA6/L/H4cbcuYr/TpPlM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svHjv-008dLj-6n; Mon, 30 Sep 2024 16:51:07 +0200
-Date: Mon, 30 Sep 2024 16:51:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Shenghao Yang <me@shenghaoyang.info>
-Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
-	pavana.sharma@digi.com, ashkan.boldaji@digi.com, kabel@kernel.org
-Subject: Re: [PATCH net 0/3] net: dsa: mv88e6xxx: fix MV88E6393X PHC
- frequency on internal clock
-Message-ID: <2a6ecc1b-7e77-4808-8b5c-b1a905f21411@lunn.ch>
-References: <20240929101949.723658-1-me@shenghaoyang.info>
+	 Content-Type:Content-Disposition:In-Reply-To; b=X1M3/LUxp6U+lNf8ow+no1NbgsB9jhrHOLOwHjHe/d8n2PsZUUYYgjDvF9Qrx3yNP8IVzMtTeedy1Ot9V+Ow3qg4RQ6ENQabBhXCfUVf+fdgtP/dHozRReljZiq4H7ejyHS/06z0wsOrULaviyy53oVcUkiN/hWwmTegxTvWBkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvuyuIfu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42308C4CEC7;
+	Mon, 30 Sep 2024 14:51:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727707904;
+	bh=LZ21acJUlmDDdoVxxT6yhtqKNPjH/hUR3in9MD3hqRY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=TvuyuIfuvpOehNOb3T8RpTBQDz6/Ti0x2fX/7+fSvH51jGhHa5VuSlI4jWnsu/LAm
+	 6mgdrQN6Mio8noBQMclZPmPvOkiqZyhNoww/TzMcBX0PoXnVPdM7pPdQ3rZiqOGU7N
+	 NIRjoIBkjtdPWAnuQrnLz3Swrp+hj1dq8d+l72KTU6Zs0UKdEWa6SB7GdC6gKkMSN4
+	 MdOOtyVeWn11halzjPsjFBG7YHgsxxs9q6r9zp0befdiKOwEwITn5yjbn5xT2hoO9s
+	 1G6QZoI91nrylsl7BOOiLdu5ouONh+Xk2t0/eBskWenqlJh4p0c3jKriExlHIb9FvB
+	 ewTmZsBCsX2Tg==
+Date: Mon, 30 Sep 2024 15:51:41 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH iwl-net] ice: Fix increasing MSI-X on VF
+Message-ID: <20240930145141.GA1310185@kernel.org>
+References: <20240927151541.15704-1-marcin.szycik@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,14 +59,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240929101949.723658-1-me@shenghaoyang.info>
+In-Reply-To: <20240927151541.15704-1-marcin.szycik@linux.intel.com>
 
-On Sun, Sep 29, 2024 at 06:19:44PM +0800, Shenghao Yang wrote:
-> The MV88E6393X family of switches can additionally run their cycle
-> counters using a 250MHz internal clock instead of the usual 125MHz
-> externa clock [1].
+On Fri, Sep 27, 2024 at 05:15:40PM +0200, Marcin Szycik wrote:
+> Increasing MSI-X value on a VF leads to invalid memory operations. This
+> is caused by not reallocating some arrays.
+> 
+> Reproducer:
+>   modprobe ice
+>   echo 0 > /sys/bus/pci/devices/$PF_PCI/sriov_drivers_autoprobe
+>   echo 1 > /sys/bus/pci/devices/$PF_PCI/sriov_numvfs
+>   echo 17 > /sys/bus/pci/devices/$VF0_PCI/sriov_vf_msix_count
+> 
+> Default MSI-X is 16, so 17 and above triggers this issue.
+> 
+> KASAN reports:
+> 
+>   BUG: KASAN: slab-out-of-bounds in ice_vsi_alloc_ring_stats+0x38d/0x4b0 [ice]
+>   Read of size 8 at addr ffff8888b937d180 by task bash/28433
+>   (...)
+> 
+>   Call Trace:
+>    (...)
+>    ? ice_vsi_alloc_ring_stats+0x38d/0x4b0 [ice]
+>    kasan_report+0xed/0x120
+>    ? ice_vsi_alloc_ring_stats+0x38d/0x4b0 [ice]
+>    ice_vsi_alloc_ring_stats+0x38d/0x4b0 [ice]
+>    ice_vsi_cfg_def+0x3360/0x4770 [ice]
+>    ? mutex_unlock+0x83/0xd0
+>    ? __pfx_ice_vsi_cfg_def+0x10/0x10 [ice]
+>    ? __pfx_ice_remove_vsi_lkup_fltr+0x10/0x10 [ice]
+>    ice_vsi_cfg+0x7f/0x3b0 [ice]
+>    ice_vf_reconfig_vsi+0x114/0x210 [ice]
+>    ice_sriov_set_msix_vec_count+0x3d0/0x960 [ice]
+>    sriov_vf_msix_count_store+0x21c/0x300
+>    (...)
+> 
+>   Allocated by task 28201:
+>    (...)
+>    ice_vsi_cfg_def+0x1c8e/0x4770 [ice]
+>    ice_vsi_cfg+0x7f/0x3b0 [ice]
+>    ice_vsi_setup+0x179/0xa30 [ice]
+>    ice_sriov_configure+0xcaa/0x1520 [ice]
+>    sriov_numvfs_store+0x212/0x390
+>    (...)
+> 
+> To fix it, use ice_vsi_rebuild() instead of ice_vf_reconfig_vsi(). This
+> causes the required arrays to be reallocated taking the new queue count
+> into account (ice_vsi_realloc_stat_arrays()). Set req_txq and req_rxq
+> before ice_vsi_rebuild(), so that realloc uses the newly set queue
+> count.
+> 
+> Additionally, ice_vsi_rebuild() does not remove VSI filters
+> (ice_fltr_remove_all()), so ice_vf_init_host_cfg() is no longer
+> necessary.
+> 
+> Reported-by: Jacob Keller <jacob.e.keller@intel.com>
+> Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 
-external
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-	Andrew
 
