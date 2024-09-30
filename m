@@ -1,181 +1,171 @@
-Return-Path: <netdev+bounces-130316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9F898A113
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:49:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5438498A124
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 360BC1C20AC9
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:49:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFACAB26854
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:49:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13E9718CBF7;
-	Mon, 30 Sep 2024 11:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F221B18D625;
+	Mon, 30 Sep 2024 11:49:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZWN0ibqQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bkwm81XV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8DF1E87B;
-	Mon, 30 Sep 2024 11:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9811E87B;
+	Mon, 30 Sep 2024 11:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727696957; cv=none; b=Z0Q1wpsr1UbSCDWZy4y73VlcIdyK/D4ytbbqZCGtknVhwe5KXuNA6yyiJaRKdbQithcZt7QvhIkNJfAoABe0XPpc+8TCoJazqy9IU6L5C/dUiRUTCscemtfIHfAxf7MediMJQ6Rki//CyDOGDnxRleqNB3tTPt1a4qkcz4puH9s=
+	t=1727696964; cv=none; b=QNUIaaVdYckmERWIoWJ5pp/gAdeAPCWRxfH/If7XHRPwG9tJTfqZSa+RgeaS54nukhR4x+2KscTwpQJWzAYm6tF0QphazcQs76tKXimR5azRNww88c0IvHZ90bYlBF2MnJpHDzivWN0QkZHdo6kXRBSDa9leUAW95hxT3K92DC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727696957; c=relaxed/simple;
-	bh=LdMjeWOvWQmXsFOhFljZfMzxfLvHYOZPCl97KMG/8oU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=foCIv8w5Cq8Cf7SWR4ThUzNOaQyqL/91jRAJsz/4TAuhDx/WQ3+AggpMrF8qY+HatppdLl7XSy7tAi770QD/tsmRwkRZgArzPfPFc1KMbSGCYaPwPUrdIiOY2lL1GehXgGQw2LqNMgCKZkbWhcKj3+d3obKiNrgtGEjpuXRkoTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZWN0ibqQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36EFDC4CEC7;
-	Mon, 30 Sep 2024 11:49:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727696956;
-	bh=LdMjeWOvWQmXsFOhFljZfMzxfLvHYOZPCl97KMG/8oU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZWN0ibqQxBa9ir+uHeF6E3sKHf5StyJomm75FIZRoE3KpNG2zjD+YJafRUJzZbNVY
-	 oZBfEhrlIM0WQuFp4iVP8NQpkDkJrN9rV2qljAmzjI5a2jq8MuhYcN+Hfdf8BVjjXK
-	 gHeSJwU7foyOmKlq/3KznzjFgQ4WgqtVXe21J/4/iLBAEMZVcDoACTBTvhgKGmG6G2
-	 i3umOgeNLlVliUZMCgktr/OrYjH3Q1m0cM5bZlCIpbEXaSJDhWueSmNLRDifpZBQ81
-	 N1TPpS82JemMksVtMVFaxoLBO/OOun+GZCrwO4jFnXnanlGB+Os5kFCdNjejm6t4IQ
-	 ci0tpg/YFGeZQ==
-Date: Mon, 30 Sep 2024 13:49:14 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: Arthur Fabre <afabre@cloudflare.com>,
-	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
-	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
-	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
-	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	kernel-team <kernel-team@cloudflare.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-Message-ID: <ZvqQOpqnK9hBmXNn@lore-desk>
-References: <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
- <Zu_gvkXe4RYjJXtq@lore-desk>
- <87ldzkndqk.fsf@toke.dk>
- <CAOn4ftshf3pyAst27C2haaSj4eR2n34_pcwWBc5o3zHBkwRb3g@mail.gmail.com>
- <87wmiysi37.fsf@toke.dk>
- <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
- <87ldzds8bp.fsf@toke.dk>
- <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
- <ZvbKDT-2xqx2unrx@lore-rh-laptop>
- <871q11s91e.fsf@toke.dk>
+	s=arc-20240116; t=1727696964; c=relaxed/simple;
+	bh=dV01gujH/B64uv2r3404PO2MsRllqLGH4/usAsdPCx4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=LMrPox9YTLrC5P3RMSPlJSocXxtsh7GL/Njo7oVFIgnRa2W+x/Ka0xbiURi6YiqN+HvMXWNNBglOaQFSAQBPDbmtDR7bP5VXeeGxRdSdCr6MDHg35xz6DcD5G3aUHWQ6c8jn650Yp8T8YQhoWcO/Z0OWp9lKn8KGinQ6AD1Ch5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bkwm81XV; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6cb2aac40faso38377076d6.1;
+        Mon, 30 Sep 2024 04:49:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727696962; x=1728301762; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oIkfDWwMUEDd7Uebcbfthdgy/uHUylx5rO59fmCE2Xg=;
+        b=Bkwm81XVYW00RVjwSvo/aK9nozavq2Ua4FqCKTe9oG2Dn37etJN+KNtOSvv99Khewa
+         A7cGEekwKWCXwTf2f8EvRdtsMU7725dIpf8/M1wtsMCeXNdGwWf23YPzeOYLgMQgyn1d
+         tMsNlLxggAVvGC+4CuZvLFDvYhmuLkhL3O2q6btyGoxYYb+tUY153E+ALWChp+E4Qh6I
+         l1iWJQJlo5gewNMQZYQVZJuKSVMFoL/SjCG/8zIskjwiQ2jCW5pv+B7orCfQ66l3ctYb
+         L8U/befEcAW8UzylCepdD5V7M74AyxLfpqb2KKl9osfKEIK0znN54WZkr4mPD3qclooy
+         AO4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727696962; x=1728301762;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oIkfDWwMUEDd7Uebcbfthdgy/uHUylx5rO59fmCE2Xg=;
+        b=if44sdtgpp5cbpw3yQNLvhA0vsnHA6fODsu4wbvygBeqyIYB6Mu90iHOHnyNpjoZpk
+         xEPDP0yIFLHsXdnDiN+4Mie6eL5ERSiu0Yx7k7nOkMAtrSUDkNILUTELGLWAzpMVwvYR
+         ljExHkbfMUJh/ykv0fUOrGerbS/ZAtc5HOc3h2HOXL6fI6GyFf3SnKj3Id1E/w0ccW56
+         RlH6oGzL9JaoABfbRzF4QVnhpFuZxjlec7bkmmfCekGcB+BZBsBzBzbeX7+sxrZAvc+f
+         +TFUb0MaUorFMT/wWqQkdeOYW8jZvCllWYsEQYHb0qiey69Vp8U/TslYx2vMLlBePtKu
+         Zxdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpXBjHlpVSKkArXwvl5MSNqRwgvKEcrrH/ON3EgI7prDDOro6v8h2BcB32kDCyLYyUdwA36RAsD3MiyEh2PZM=@vger.kernel.org, AJvYcCWF476u7nhlUONMcCv5vLgRZM73VFUYcHqYOUVJrkbe5/hUEoV34RdtAKDLpOTDl8osNibSy4i4@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjtIbW30ZgDmvxz0/n1s3Z5YBAf3wgYcgtl45M0Z5PWuVj9n2E
+	JXdpAP+rvNQg9cH+hYPt8Rx8KIhZ3wfxpm25zwCnOlJpzDeu1Edf
+X-Google-Smtp-Source: AGHT+IH2UNeV8WA4/DyRxRYxeH2DpmLMzo1WXjCAghqGcgffv09qazmGAQeiWj3HWZuFpinewl6ZgQ==
+X-Received: by 2002:a05:6214:212f:b0:6c3:6477:16e7 with SMTP id 6a1803df08f44-6cb2f283867mr268349326d6.11.1727696962062;
+        Mon, 30 Sep 2024 04:49:22 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b68d808sm39166066d6.130.2024.09.30.04.49.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 04:49:21 -0700 (PDT)
+Date: Mon, 30 Sep 2024 07:49:21 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66fa904185c3_17cd892948a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoC+VEs1UusEKKVhutw+e=uyEqoaBhRTUV1G4HakM3JVYQ@mail.gmail.com>
+References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
+ <20240930092416.80830-2-kerneljasonxing@gmail.com>
+ <66fa7fe46392e_17948d294bb@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC+VEs1UusEKKVhutw+e=uyEqoaBhRTUV1G4HakM3JVYQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net-timestamp: add strict check when setting
+ tx flags
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="GQ4+YiJqd2ay7ThK"
-Content-Disposition: inline
-In-Reply-To: <871q11s91e.fsf@toke.dk>
-
-
---GQ4+YiJqd2ay7ThK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->=20
-> >> > We could combine such a registration API with your header format, so
-> >> > that the registration just becomes a way of allocating one of the ke=
-ys
-> >> > from 0-63 (and the registry just becomes a global copy of the header=
-).
-> >> > This would basically amount to moving the "service config file" into=
- the
-> >> > kernel, since that seems to be the only common denominator we can re=
-ly
-> >> > on between BPF applications (as all attempts to write a common daemon
-> >> > for BPF management have shown).
-> >>=20
-> >> That sounds reasonable. And I guess we'd have set() check the global
-> >> registry to enforce that the key has been registered beforehand?
-> >>=20
-> >> >
-> >> > -Toke
-> >>=20
-> >> Thanks for all the feedback!
+Jason Xing wrote:
+> On Mon, Sep 30, 2024 at 6:39=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > I like this 'fast' KV approach but I guess we should really evaluate its
-> > impact on performances (especially for xdp) since, based on the kfunc c=
-alls
-> > order in the ebpf program, we can have one or multiple memmove/memcpy f=
-or
-> > each packet, right?
->=20
-> Yes, with Arthur's scheme, performance will be ordering dependent. Using
-> a global registry for offsets would sidestep this, but have the
-> synchronisation issues we discussed up-thread. So on balance, I think
-> the memmove() suggestion will probably lead to the least pain.
->=20
-> For the HW metadata we could sidestep this by always having a fixed
-> struct for it (but using the same set/get() API with reserved keys). The
-> only drawback of doing that is that we statically reserve a bit of
-> space, but I'm not sure that is such a big issue in practice (at least
-> not until this becomes to popular that the space starts to be contended;
-> but surely 256 bytes ought to be enough for everybody, right? :)).
+> > Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Even though this case is unlikely to happen, we have to avoid such
+> > > a case occurring at an earlier point: the sk_rmem_alloc could get
+> > > increased because of inserting more and more skbs into the errqueue=
 
-I am fine with the proposed approach, but I think we need to verify what is=
- the
-impact on performances (in the worst case??)
-
->=20
-> > Moreover, I still think the metadata area in the xdp_frame/xdp_buff is =
-not
-> > so suitable for nic hw metadata since:
-> > - it grows backward=20
-> > - it is probably in a different cacheline with respect to xdp_frame
-> > - nic hw metadata will not start at fixed and immutable address, but it=
- depends
-> >   on the running ebpf program
+> > > when calling __skb_complete_tx_timestamp(). This bad case would sto=
+p
+> > > the socket transmitting soon.
 > >
-> > What about having something like:
-> > - fixed hw nic metadata: just after xdp_frame struct (or if you want at=
- the end
-> >   of the metadata area :)). Here he can reuse the same KV approach if i=
-t is fast
-> > - user defined metadata: in the metadata area of the xdp_frame/xdp_buff
->=20
-> AFAIU, none of this will live in the (current) XDP metadata area. It
-> will all live just after the xdp_frame struct (so sharing the space with
-> the metadata area in the sense that adding more metadata kv fields will
-> decrease the amount of space that is usable by the current XDP metadata
-> APIs).
->=20
-> -Toke
->=20
+> > It is up to the application to read from the error queue frequently
+> > enough and/or increase SO_RCVBUF.
+> =
 
-ah, ok. I was thinking the proposed approach was to put them in the current
-metadata field.
+> Sure thing. If we test it without setting SOF_TIMESTAMPING_SOFTWARE on
+> the loopback, it will soon stop. That's the reason why I tried to add
+> the restriction just in case.
 
-Regards,
-Lorenzo
+I don't follow at all.
 
---GQ4+YiJqd2ay7ThK
-Content-Type: application/pgp-signature; name="signature.asc"
+That bit does not affect the core issue: that the application is not
+clearing its error queue quickly enough.
+ =
 
------BEGIN PGP SIGNATURE-----
+> >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > >  net/core/sock.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > index fe87f9bd8f16..4bddd6f62e4f 100644
+> > > --- a/net/core/sock.c
+> > > +++ b/net/core/sock.c
+> > > @@ -905,6 +905,10 @@ int sock_set_timestamping(struct sock *sk, int=
+ optname,
+> > >       if (val & ~SOF_TIMESTAMPING_MASK)
+> > >               return -EINVAL;
+> > >
+> > > +     if (val & SOF_TIMESTAMPING_TX_RECORD_MASK &&
+> > > +         !(val & SOF_TIMESTAMPING_SOFTWARE))
+> > > +             return -EINVAL;
+> > > +
+> >
+> > This breaks hardware timestamping
+> =
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZvqQOgAKCRA6cBh0uS2t
-rGkuAQCmulofR6KOgXgxkWcGibFa1jwuC0775cIm7T7UJF/UGgD+LckA1Ajz0mTw
-JthRYUOaufHS5mqZINS8eYzxUnCRwgo=
-=HK1x
------END PGP SIGNATURE-----
+> Yes, and sorry about that. I'll fix this.
 
---GQ4+YiJqd2ay7ThK--
+As is I don't understand the purpose of this patch. Please do not
+just resubmit with a change, but explain the problem and suggested
+solution first.
+
+> >
+> > >       if (val & SOF_TIMESTAMPING_OPT_ID_TCP &&
+> > >           !(val & SOF_TIMESTAMPING_OPT_ID))
+> > >               return -EINVAL;
+> > > --
+> > > 2.37.3
+> > >
+> >
+> >
+
+
 
