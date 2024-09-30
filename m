@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-130359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F5298A295
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:34:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9120A98A296
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2F11C229F0
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:34:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1B37B211FF
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AA018E361;
-	Mon, 30 Sep 2024 12:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651A118E755;
+	Mon, 30 Sep 2024 12:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyfpVD7i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FY50tfti"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5D018E357
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DED118BBBC
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727699660; cv=none; b=Z9w8ep+MhdBqRGKiWvuDcM/FsVMHPSgU7IoywmM5s14LUuEQXedWaNL4z/viALte+1WRHStFwSH+2TDQKf4Pa5kWO07jydDryiGcq75TbxVLvwcdTbVf93K/a5WyMI2BGtRN1gjqn/MaGZe9G/Ag1pJe3q2n5Azc64ujkybDvs0=
+	t=1727699663; cv=none; b=RtB5MMZYZI51rCJmWUgYYYziOslGoYRIrpOWboe6F0KrXSJxoFYpMoAvm3+GN458/QcnIu0CDvBgp6v098ZTIsk+24msClsgAkrCookmS9ZwV19xeXqwzy/+1a+tkpbBn3kCIXeS92nY7DRho8N7Pp70u8iSUyqdkFBjkBWafR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727699660; c=relaxed/simple;
-	bh=Z/4YAYam6JnULP3t1IK5jI6tEWcPLOHTYHfr4Vko5D8=;
+	s=arc-20240116; t=1727699663; c=relaxed/simple;
+	bh=qTB9g6Mdenjq1zRKKss5v3af9DwJHerHGR2vXvjGRHs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nJY2mHrhmR97b5sfT3uoupRcWSJDIJZSQub0zqSupDKSd+bjZpUs9pLHv9J8nrKuuKebCpvLCxcr801qDF0iE2WWcSEbCUFrAJudD2HnUogjQ0zWzN5AEebrBHpDWJp27WR0H3jiumWchzQcp3STlgRgSnlCAVLsqW7NOCu9F/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyfpVD7i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC11FC4CEC7;
-	Mon, 30 Sep 2024 12:34:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G5yeTxmuywu9qyWSsGJh0qVciHyDage7bdPJ2NUFlaNZKfZd4ZTcxfmY+MD48Xr325QyxiOJf+xeVEJQ8mluaBndoSRGP8EkMzU3FpqNR7QDfRHQqdkdbLBnv0iPHOZjWI8PXOheD6/DnZPC5wx/Jj4rgwyR3tVLFLMsF5e+BEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FY50tfti; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41ECDC4CEC7;
+	Mon, 30 Sep 2024 12:34:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727699660;
-	bh=Z/4YAYam6JnULP3t1IK5jI6tEWcPLOHTYHfr4Vko5D8=;
+	s=k20201202; t=1727699662;
+	bh=qTB9g6Mdenjq1zRKKss5v3af9DwJHerHGR2vXvjGRHs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=GyfpVD7ieTL/0P/lAUCh6H8l6dIZfCYFefix1Vw/fkB2v0GkvRdaVpYMY4MZA6/EM
-	 7zf9P8nTL9cqZfdea7b2zecl9v2q3x/WykpCJYyJYwkSn2C4ZTKlG5QiPBjIN9bBA/
-	 3YJrGFvfI5PV+LH9egc0Lhsk4jwiBnRma+jUAVff/kUz9+nkq9BFMXvxNedAup2pGE
-	 TYpquaOyALB6lgtTrP4PGgZc4aySyz+UWcLtZnRgM+OkmDCiKGfBnqXzyWgdMHU3RP
-	 gxB2gRgXH19loPhp3QvRPBKMyixV5XraWQR/LpOACGNJbMRhb/K+lb24XOcaimHYzZ
-	 XaKmVpCJmGPiw==
+	b=FY50tftipJWwI6IGb+PAARkL12B7fochTa2vApQ4msqXoVsKecvwGWQj7sf9jDe15
+	 SWZFf7SRc0ySXu4332vsKX9Cu1+jG4J+M8u5m0iCnba/J/ax2jPzsTegKVi2sB/nRd
+	 qZDcRtAO1TXh2/TWFkhI71zilIdqJYKwy3Lcwq5Gja/T2PKoHsj28k/qdk+al6OLoh
+	 Qw9Gfc+exWLprRRLeegDzqUD1lHJEvvlMeIKV1i9/S1ijiCHKsnixQnk8OX198xEt+
+	 FOhfB7uyMRuYR5+SIfW6CqtQBEnbj9jSlE+TcFzz7UHIjTRt6rQwaSaYTlTJIsgFzF
+	 rIZWku+q33AkA==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 30 Sep 2024 14:33:48 +0200
-Subject: [PATCH net-next 1/2] net: airoha: read default PSE reserved pages
- value before updating
+Date: Mon, 30 Sep 2024 14:33:49 +0200
+Subject: [PATCH net-next 2/2] net: airoha: fix PSE memory configuration in
+ airoha_fe_pse_ports_init()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240930-airoha-eth-pse-fix-v1-1-f41f2f35abb9@kernel.org>
+Message-Id: <20240930-airoha-eth-pse-fix-v1-2-f41f2f35abb9@kernel.org>
 References: <20240930-airoha-eth-pse-fix-v1-0-f41f2f35abb9@kernel.org>
 In-Reply-To: <20240930-airoha-eth-pse-fix-v1-0-f41f2f35abb9@kernel.org>
 To: Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
@@ -67,49 +67,37 @@ Cc: linux-arm-kernel@lists.infradead.org,
  Simon Horman <horms@kernel.org>, upstream@airoha.com
 X-Mailer: b4 0.14.1
 
-Store the default value for the number of PSE reserved pages in orig_val
-at the beginning of airoha_fe_set_pse_oq_rsv routine, before updating it
-with airoha_fe_set_pse_queue_rsv_pages().
-Introduce airoha_fe_get_pse_all_rsv utility routine.
+Align PSE memory configuration to vendor SDK. In particular, increase
+initial value of PSE reserved memory in airoha_fe_pse_ports_init()
+routine by the value used for the second Packet Processor Engine (PPE2)
+and do not overwrite the default value.
 
 commit 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/mediatek/airoha_eth.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mediatek/airoha_eth.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 930f180688e5..480540526bdb 100644
+index 480540526bdb..2e01abc70c17 100644
 --- a/drivers/net/ethernet/mediatek/airoha_eth.c
 +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -1116,17 +1116,23 @@ static void airoha_fe_set_pse_queue_rsv_pages(struct airoha_eth *eth,
- 		      PSE_CFG_WR_EN_MASK | PSE_CFG_OQRSV_SEL_MASK);
- }
+@@ -1172,11 +1172,13 @@ static void airoha_fe_pse_ports_init(struct airoha_eth *eth)
+ 		[FE_PSE_PORT_GDM4] = 2,
+ 		[FE_PSE_PORT_CDM5] = 2,
+ 	};
++	u32 all_rsv;
+ 	int q;
  
-+static u32 airoha_fe_get_pse_all_rsv(struct airoha_eth *eth)
-+{
-+	u32 val = airoha_fe_rr(eth, REG_FE_PSE_BUF_SET);
-+
-+	return FIELD_GET(PSE_ALLRSV_MASK, val);
-+}
-+
- static int airoha_fe_set_pse_oq_rsv(struct airoha_eth *eth,
- 				    u32 port, u32 queue, u32 val)
- {
--	u32 orig_val, tmp, all_rsv, fq_limit;
-+	u32 orig_val = airoha_fe_get_pse_queue_rsv_pages(eth, port, queue);
-+	u32 tmp, all_rsv, fq_limit;
- 
- 	airoha_fe_set_pse_queue_rsv_pages(eth, port, queue, val);
- 
- 	/* modify all rsv */
--	orig_val = airoha_fe_get_pse_queue_rsv_pages(eth, port, queue);
--	tmp = airoha_fe_rr(eth, REG_FE_PSE_BUF_SET);
--	all_rsv = FIELD_GET(PSE_ALLRSV_MASK, tmp);
 +	all_rsv = airoha_fe_get_pse_all_rsv(eth);
- 	all_rsv += (val - orig_val);
- 	airoha_fe_rmw(eth, REG_FE_PSE_BUF_SET, PSE_ALLRSV_MASK,
- 		      FIELD_PREP(PSE_ALLRSV_MASK, all_rsv));
+ 	/* hw misses PPE2 oq rsv */
+-	airoha_fe_set(eth, REG_FE_PSE_BUF_SET,
+-		      PSE_RSV_PAGES * pse_port_num_queues[FE_PSE_PORT_PPE2]);
++	all_rsv += PSE_RSV_PAGES * pse_port_num_queues[FE_PSE_PORT_PPE2];
++	airoha_fe_set(eth, REG_FE_PSE_BUF_SET, all_rsv);
+ 
+ 	/* CMD1 */
+ 	for (q = 0; q < pse_port_num_queues[FE_PSE_PORT_CDM1]; q++)
 
 -- 
 2.46.2
