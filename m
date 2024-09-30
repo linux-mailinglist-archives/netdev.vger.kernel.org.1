@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-130526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E910F98AB91
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:03:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D54098AB93
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 264121C20E0C
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8FB282E99
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2E819D8AD;
-	Mon, 30 Sep 2024 18:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F9F199230;
+	Mon, 30 Sep 2024 18:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="acTZOfQ3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gs3B4aTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DDA19CC17;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ADD19DF40;
 	Mon, 30 Sep 2024 18:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727719260; cv=none; b=GdY93Mi5G2EAoLnhP83OM2fDkIu6GhkzleBLr2SR8eM9lG5h0JLUkwA465AqujXlaq5aUSGP9iaIcYZWYrql/WkyxD95OcMRDxFefNkk+CV7IxrW/o+pJRgQswX7qw9je5VHlWhPja4wAaFSM72p1fjDPz5K9ur7ep/uW+qHCBM=
+	t=1727719262; cv=none; b=JMD6W3Lj+ddxuQmYg4saBGfg618QejFIeoEQGGuuNIDEr057IpXFPblt7s4dqR/0LlFa2c5vEgHuMzS7B3yDvFc2IYNsdpkmFRXWc8iC/bp63e7VRvn01BTkmeOj9NpChBNnwhbJ7PQpdqcIbD3ayIvx/g14jBg4sPKa5pCPyDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727719260; c=relaxed/simple;
-	bh=/JFQ1f+yHsjb5Zt6+gt8OydljzAA9ds8/yUsrr7/NQY=;
+	s=arc-20240116; t=1727719262; c=relaxed/simple;
+	bh=kih75HuZ1ZXc3JQHkzwuj//sPN9nSONeRe7im09vADU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=avqrzg1QAzxeSqVogvXMKSvuxc7KOD8sKICdhkFclYpLexoGjr8IUxW3PlcGEixFK7BwP4riFil0xsR8iihmB+Z2UEwWvYNlKUepO2wEKIBbN/PIFRWBVVfhzl5Ors0/UAkUED6d90PtydVQTwuppkghTCGtRhPVztWROqMGdXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=acTZOfQ3; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=Gcff/x7Ss025cwR6xU8pjLW9ulrZZkh9wAxS1+F5Bqkgkp1/Osd+GHCbiEGu06Zak2zludiqZ1yA7ZHbAgqe2TVYYpOja5d6Az3flI1SywY9b7+xBeNrqDGydAEm4qEcPVjbfDxxi0zQzZOyg9KSQx1WdD7TWG50+T1bt4SftkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gs3B4aTV; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71b8d10e9b3so2470139b3a.3;
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7e6afa8baeaso3976932a12.3;
         Mon, 30 Sep 2024 11:00:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727719258; x=1728324058; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727719259; x=1728324059; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JLSo4Y+RlvJE8rHN+xUYDaCM/v2W+3AtNr9b9F2/l8E=;
-        b=acTZOfQ3ft9NpqR1I3xeHxjC4DkjC6srTFmE5IKKzGsgdU3UmiaT/yoYSb2fuQBr8n
-         usOXQM7ZEXhc4SeRjBZWi+d3XuQv08epnAvZuiqVgAJKuqj8MtKSTKXVB/KLMkLnmfcE
-         CUEkOgMalj+dCQDj9FM7bBZIjVXCUaL66WPfvpFOYkKkbyvfblgkcIDbRPAnZY0+0Dug
-         wSOUospH4W/H27Pb7cAXpAzxn1rud54dGqjYn6fIG2eezfsPYVx7NdIAYUr3l7MeyKxI
-         qqHsMg5H3D8ibnqKp8bfHEqgUhPYarDlCsqh5DxRudWfQRll8U4ckqVmJxxksHqhnBy4
-         oxKQ==
+        bh=RUV0cdXbjkkkderKYay9dxBu1U/jTzVeigZXhXzokHI=;
+        b=gs3B4aTVYoetG63PlToRv1ehZKmk9Z4VRAWbe74ahKVqyf/SJ6/1kpJ54DU/JACVKQ
+         9rSTQQtpzR1JdZ+RbaT9N4ySHjIxBpdmIWfMwwNgqI6WG7Q89id1In6wnUSDIrOTokxC
+         1/cwKg58T1Mken3/f0N/eVU0SWAaNNBc2K57Rex/S8iSNwvfIFWIeu5pkR8jGvn6P0+K
+         /STOV8hmWhAg9sywOjnpMR22XUQY0wDv8amtGrpMTPS3JwOOsknLsq/BrwCVA6LUniO2
+         rTdzu9qeupARVf5EJjOhAWa3zrfSWgaV5UB1ppTDBbx/JagPnYQjFWbwHRvCa/reKtCE
+         Yacw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727719258; x=1728324058;
+        d=1e100.net; s=20230601; t=1727719259; x=1728324059;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JLSo4Y+RlvJE8rHN+xUYDaCM/v2W+3AtNr9b9F2/l8E=;
-        b=w8K4oWOjqkRxbgR7Icjcri3sZ4o+ZwVhsmU7GTztV3oDqJyAMDPTyxB0pjraZbZuqK
-         wbtRyXvRoSt55GU8hCA9ic1y2WDgUzfgCXGSG5uhVdgNDoDkTAq1hJvezOaHsgGtOOJf
-         wyZEo5x+Ep5sxED3CnYNLx4E9la4V1cFuA7kWP71S+PK8PRyBLIyaEluCNjr0iey1mfp
-         5gqe516Islis2rt7gifsqLOJjKE8XMjw+XzsezXS+IredHzYaz568llcORTE82QTMbrT
-         jN8OocgbFZxKl8o3ZOMqxWp9+SPEP9/oSGkJGqUlvUnAxVdjkEON2HNzAj1wMHQIl0aK
-         Gi5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVlYdRX7ETLZtsrUknasNOv2f6LY3ITrPykAlTPKRX6N0smZ1EqebBINquYkKSfJWIBGHL9OFiRFiLCjRA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydQdrtE6Q0bAG09H8uCY/qWgI1o/2Ar+k2kIJtAOUn1UXP6PCx
-	QSPdsJV3p5OEsAao29dmQub4TdtbyMIfGCvoDn8Cbica/wfV4TIpbbP9SDEp
-X-Google-Smtp-Source: AGHT+IEiCCpqp4BpRPIK04mYZRGvc4wRMeuiJR8i++/Bxk1tfb9TBwsJgDtaeJxDemG8V0/XAqJOLQ==
-X-Received: by 2002:a05:6a20:c6cd:b0:1d4:ea81:b1ed with SMTP id adf61e73a8af0-1d4fa6c82cemr15747605637.27.1727719257244;
-        Mon, 30 Sep 2024 11:00:57 -0700 (PDT)
+        bh=RUV0cdXbjkkkderKYay9dxBu1U/jTzVeigZXhXzokHI=;
+        b=FlSf+BEdJE8pzmvkOwFU5H8EYi5GYa7CjlulgXda3WCmQlwZYC+P3k6wpPlnfLLYaX
+         YeZl6UmsQpeIRYkfQu/YzIN2xjusFVpDLAApCgs3Ray2NicgYE7N0f0ZadUAIb4Jamue
+         yqD7vmhcalkDmpirLOedk8i5UMQEqeLn9MkxR+ZHlw34ASrZOxcjCydadlomHydJdWX4
+         DBN317RgKIeC1Uy0Cqc2HtdkvN3NWlDP7lBJ2942EPLGpWFjl2OGy18D+h96lqrb5795
+         hMJmvv7mPE5NJkwcln3nLnb7zc6QeCmaDiTPg2cmT3nQMGOaGtA52M1f3gToNds0FVkA
+         w1Kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUNlrGkUmUWpMYR2T0+UWZ21sWd2WWyv4pnraGQbuQghqWcyf+6e6ymkArK5xs6dDdROUpWReg7kAffBvc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCtl1B1cAx8qE3fVHSTfeigQeIJ9MdytQSArFkZdHH/+vRtNGL
+	FQ/SqCkr5FpWTdfoHGPuvlQAUnomDwwd/X9KfjqTX4lM5wuZUwh7cK3e8pfM
+X-Google-Smtp-Source: AGHT+IEcgwhtOpx1Oynnb+DLLdS5yPI+qqFyS+sMQ/xuGcZjH4DMqhjo44SIeURueUn5WmZ+71uL7Q==
+X-Received: by 2002:a05:6a21:3414:b0:1cf:2901:2506 with SMTP id adf61e73a8af0-1d4fa663e54mr17152879637.14.1727719258796;
+        Mon, 30 Sep 2024 11:00:58 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26524a56sm6740653b3a.149.2024.09.30.11.00.55
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26524a56sm6740653b3a.149.2024.09.30.11.00.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 11:00:56 -0700 (PDT)
+        Mon, 30 Sep 2024 11:00:58 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCH net-next 11/13] net: ibm: emac: zmii: devm_platform_get_resource
-Date: Mon, 30 Sep 2024 11:00:34 -0700
-Message-ID: <20240930180036.87598-12-rosenp@gmail.com>
+Subject: [PATCH net-next 12/13] net: ibm: emac: mal: use devm for kzalloc
+Date: Mon, 30 Sep 2024 11:00:35 -0700
+Message-ID: <20240930180036.87598-13-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20240930180036.87598-1-rosenp@gmail.com>
 References: <20240930180036.87598-1-rosenp@gmail.com>
@@ -93,75 +93,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simplifies the probe function by a bit and allows removing the _remove
-function such that devm now handles all cleanup.
-
-printk gets converted to dev_err as np is now gone.
+Simplifies the probe function by removing gotos.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/zmii.c | 26 ++++----------------------
- 1 file changed, 4 insertions(+), 22 deletions(-)
+ drivers/net/ethernet/ibm/emac/mal.c | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/zmii.c b/drivers/net/ethernet/ibm/emac/zmii.c
-index c38eb6b3173e..abe14f4a8ea6 100644
---- a/drivers/net/ethernet/ibm/emac/zmii.c
-+++ b/drivers/net/ethernet/ibm/emac/zmii.c
-@@ -232,9 +232,7 @@ void *zmii_dump_regs(struct platform_device *ofdev, void *buf)
+diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
+index a632d3a207d3..70019ced47ff 100644
+--- a/drivers/net/ethernet/ibm/emac/mal.c
++++ b/drivers/net/ethernet/ibm/emac/mal.c
+@@ -524,7 +524,8 @@ static int mal_probe(struct platform_device *ofdev)
+ 	unsigned long irqflags;
+ 	irq_handler_t hdlr_serr, hdlr_txde, hdlr_rxde;
  
- static int zmii_probe(struct platform_device *ofdev)
- {
--	struct device_node *np = ofdev->dev.of_node;
- 	struct zmii_instance *dev;
--	struct resource regs;
+-	mal = kzalloc(sizeof(struct mal_instance), GFP_KERNEL);
++	mal = devm_kzalloc(&ofdev->dev, sizeof(struct mal_instance),
++			   GFP_KERNEL);
+ 	if (!mal)
+ 		return -ENOMEM;
  
- 	dev = devm_kzalloc(&ofdev->dev, sizeof(struct zmii_instance),
- 			   GFP_KERNEL);
-@@ -245,16 +243,10 @@ static int zmii_probe(struct platform_device *ofdev)
- 	dev->ofdev = ofdev;
- 	dev->mode = PHY_INTERFACE_MODE_NA;
+@@ -539,8 +540,7 @@ static int mal_probe(struct platform_device *ofdev)
+ 		printk(KERN_ERR
+ 		       "mal%d: can't find MAL num-tx-chans property!\n",
+ 		       index);
+-		err = -ENODEV;
+-		goto fail;
++		return -ENODEV;
+ 	}
+ 	mal->num_tx_chans = prop[0];
  
--	if (of_address_to_resource(np, 0, &regs)) {
--		printk(KERN_ERR "%pOF: Can't get registers address\n", np);
--		return -ENXIO;
--	}
--
--	dev->base = (struct zmii_regs __iomem *)ioremap(regs.start,
--						sizeof(struct zmii_regs));
--	if (!dev->base) {
--		printk(KERN_ERR "%pOF: Can't map device registers!\n", np);
--		return -ENOMEM;
-+	dev->base = devm_platform_ioremap_resource(ofdev, 0);
-+	if (IS_ERR(dev->base)) {
-+		dev_err(&ofdev->dev, "can't map device registers");
-+		return PTR_ERR(dev->base);
+@@ -549,8 +549,7 @@ static int mal_probe(struct platform_device *ofdev)
+ 		printk(KERN_ERR
+ 		       "mal%d: can't find MAL num-rx-chans property!\n",
+ 		       index);
+-		err = -ENODEV;
+-		goto fail;
++		return -ENODEV;
+ 	}
+ 	mal->num_rx_chans = prop[0];
+ 
+@@ -558,15 +557,13 @@ static int mal_probe(struct platform_device *ofdev)
+ 	if (dcr_base == 0) {
+ 		printk(KERN_ERR
+ 		       "mal%d: can't find DCR resource!\n", index);
+-		err = -ENODEV;
+-		goto fail;
++		return -ENODEV;
+ 	}
+ 	mal->dcr_host = dcr_map(ofdev->dev.of_node, dcr_base, 0x100);
+ 	if (!DCR_MAP_OK(mal->dcr_host)) {
+ 		printk(KERN_ERR
+ 		       "mal%d: failed to map DCRs !\n", index);
+-		err = -ENODEV;
+-		goto fail;
++		return -ENODEV;
  	}
  
- 	/* We may need FER value for autodetection later */
-@@ -270,15 +262,6 @@ static int zmii_probe(struct platform_device *ofdev)
- 	return 0;
+ 	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,mcmal-405ez")) {
+@@ -577,8 +574,7 @@ static int mal_probe(struct platform_device *ofdev)
+ #else
+ 		printk(KERN_ERR "%pOF: Support for 405EZ not enabled!\n",
+ 				ofdev->dev.of_node);
+-		err = -ENODEV;
+-		goto fail;
++		return -ENODEV;
+ #endif
+ 	}
+ 
+@@ -711,9 +707,6 @@ static int mal_probe(struct platform_device *ofdev)
+ 	free_netdev(mal->dummy_dev);
+  fail_unmap:
+ 	dcr_unmap(mal->dcr_host, 0x100);
+- fail:
+-	kfree(mal);
+-
+ 	return err;
  }
  
--static void zmii_remove(struct platform_device *ofdev)
--{
--	struct zmii_instance *dev = platform_get_drvdata(ofdev);
--
--	WARN_ON(dev->users != 0);
--
--	iounmap(dev->base);
--}
--
- static const struct of_device_id zmii_match[] =
- {
- 	{
-@@ -297,7 +280,6 @@ static struct platform_driver zmii_driver = {
- 		.of_match_table = zmii_match,
- 	},
- 	.probe = zmii_probe,
--	.remove_new = zmii_remove,
- };
+@@ -744,10 +737,9 @@ static void mal_remove(struct platform_device *ofdev)
  
- module_platform_driver(zmii_driver);
+ 	dma_free_coherent(&ofdev->dev,
+ 			  sizeof(struct mal_descriptor) *
+-			  (NUM_TX_BUFF * mal->num_tx_chans +
+-			   NUM_RX_BUFF * mal->num_rx_chans), mal->bd_virt,
+-			  mal->bd_dma);
+-	kfree(mal);
++				  (NUM_TX_BUFF * mal->num_tx_chans +
++				   NUM_RX_BUFF * mal->num_rx_chans),
++			  mal->bd_virt, mal->bd_dma);
+ }
+ 
+ static const struct of_device_id mal_platform_match[] =
 -- 
 2.46.2
 
