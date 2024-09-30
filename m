@@ -1,242 +1,205 @@
-Return-Path: <netdev+bounces-130441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542F998A864
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:23:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32DA498A876
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:31:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D82911F2436B
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:23:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C739284934
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FEF1925A4;
-	Mon, 30 Sep 2024 15:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2355198A32;
+	Mon, 30 Sep 2024 15:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hdf83YUN"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c2m0Wgpa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2070.outbound.protection.outlook.com [40.107.95.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF111925AE
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 15:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727709792; cv=none; b=HNhC1PuZbRSqRPtH3jsHzNgfiJY6iETUeAKksdcVi1aw5+iGYAIHbzbaRlZ9YqRBnzqvo2dMRUmAxkeFgwOLmsdO8gYbNwbGLzONbZ/XU+OOgBFhHKl0P8JV4X5SIT3yAZ9oIDeM+9vvzp4yhWTsyP2mcDoasssr+i7hrdLaCf4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727709792; c=relaxed/simple;
-	bh=mzEfKQmt6notCn3epd2JKCPphT7acczRFu8GSBLPEPA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iclZHKbx6ViY/JcsxpEm+7kHWblIPejzWgYdH6YFE0ViFoOCGlRwLLPSScszwh2KeYNwdncq0Kw5e0ORr3HUYOM0MOcd9SqSIbAMG4FlZFdgurxnldN9cRd/lBhMvi21dlpLNlOgRMF606w1Lj8+1nupcMl5p5QX3dTiBD7HwGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hdf83YUN; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2317d1cb7so73439627b3.3
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 08:23:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727709790; x=1728314590; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VadFNHGIKgjBU74RWi+NnOK/5x4U2WIpi7bz2W5MLjA=;
-        b=Hdf83YUNDAm1r5E1qRsGsNVvDi9ghIyje0pENDDNC/DKAogdgoTEFxSWGKtFogJt5P
-         y+N5y+b8tUhrmvYiG/nnGeN5aq79h6F7aCaEcQDtESD1o2dwywiKMD1nBDqfRlZEGz7E
-         48zRvsPHleZH3wKZ6yXxOFEySXQe7aSEVl+ak3ZMsy+68wMzQ9eDTMF14/2Dj1P5MzxO
-         ju9jiSU7R2Z9zWTJO4Q9/3MApcPpcCgissPieqG7fprkwTHiTY3teNftbbB0U8VcM4dH
-         hDm1u+Q+E0UnApToJNQO2SnHZ0SAp4CmFOhU2eMmDWFsdX5YZpjfVYID7vq3fIZPqWdl
-         qhxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727709790; x=1728314590;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VadFNHGIKgjBU74RWi+NnOK/5x4U2WIpi7bz2W5MLjA=;
-        b=oONd824p1vnNexOfF/rFn0WUUOs16rQXd5CuZr98kHrZUNQSmxulaBaiTbrFKM4QtD
-         usOMyMtM4vBdg+wGtOd8r07NrHKjID48cy/PYxMtMI0foltTiDNUZJGsFke13T72Teir
-         7YNFS9q5WE4vg2k57prLHZnhm67obZJV4Xak4kZoPOvZizRfCgi4HnpFBQnz0fPrjC3Y
-         j8ToeWlHEYxGgHkHoNYN6h7rpz2/YViUs+FSoZn1zBLG2dn1NCAmxehzlbxGYS7/0gn9
-         oCCflu8ihF4AKuNTKkLBz7OqB4lFWrEfuc+QgUaa0b9tFnIXnmPK7b6QWuUZz9w161/h
-         B4JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV04S/foNVOBYkipock711ohyVAGwV6ETSfm1SsVNW2gCQUSmoU4QoDH0WqirE1Jvl5HqpJnJQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGiBltHtbV/Ni2bHJEt5w75hRnccrlP9UIYtQT99eYMMixqEm/
-	8NOpdn6Pothle1kmSfEopGuEVKO6WPre9TaX5GMlxx1ttOiBLhnucd5Iyj3COmwy/8qli9SOyu1
-	OiBEuBINX4g==
-X-Google-Smtp-Source: AGHT+IExtZkpHTjYJaA02ecdd8sEOPqncKpmn6DDNrVEzf09vvYxdBwlb8Y1PY3BTc9lT7biIzGHnH/4F7fo4g==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:690c:6303:b0:6e2:1b8c:39bf with SMTP
- id 00721157ae682-6e2474ca383mr623757b3.2.1727709789480; Mon, 30 Sep 2024
- 08:23:09 -0700 (PDT)
-Date: Mon, 30 Sep 2024 15:23:04 +0000
-In-Reply-To: <20240930152304.472767-1-edumazet@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B739198A06
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 15:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727710100; cv=fail; b=S+bzddsDA7iJA0oLXUESlJFFXoVrIv2jVa7zgRTXZnPGJZqCNmw5aVXO1GANhwifAbdIvk/xHelAinsW1snY1rh47a/bLBwfPWrOYHqAxK01EpjFNRtgBZZNiDfdreZdoh3uH2PMFifl9tRS6seiyKVO1ZuvMBKPwnwSn5GuIW0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727710100; c=relaxed/simple;
+	bh=hx/sx7LTavJiQhkRIatCMhqA5egVYtla6tnzry+is4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=InPvSHTxJ68H7Yk+E8OK89UN/2qeZFJ3kOYJztphLUFoAuvWgjOT7W1Q1lyg6qrnZUD5FesfhX6pidLylo7I8gSI9ZFuk9x/sRTYDu8flTw3NP9Ror5yLXUt+oifRZ3qUls1BgQBa+ikFTOYDB3kEpOh1ccMGKWYuulPNqw7wBs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c2m0Wgpa; arc=fail smtp.client-ip=40.107.95.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=P3eHNzN97bisIF72GTnBN12ZeV4SGx2ZF/RcCx5LM9qxuC24rkhed62FJ+3iNUQre2MLowozKKFLYe00GRdELofAh2q7D78/+kqlLvL7MJJnuOGbwzY+rL7zF/9nALstRp67VmOdmz8atuvKL8jC/2ruO3+3CRPOrJ9GwIVaHIb45MHFnS+cEcgUH3RSgVWI4IBRoPQA2Bt/4TtMGall+Oy+xafTePOBbE6Ty55doEXt/VbEoE6PdoNqbwbD0UN0eH+rOM8cj8a9l2kJRd+UqQl26SBOLUe41u0O2lR648371Qmn/1zLA5ZtzuhrDksteqxpktGf8ebBAka6QM2GLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hx/sx7LTavJiQhkRIatCMhqA5egVYtla6tnzry+is4g=;
+ b=V3bNg1r9cOI//chFUPJJv7om036/oOZo11JjWbnjIJSHvaV9Xx9N3lhXXGa6gJty505T6mODk+j+lW+bsCCFU/nZV27YBnDSms1MlEeO5UF88p2D3qOXCNmW2RimsnlBhSTMHyvMUFDnKxMLrm70LEz2SP5fiLez1ZvJhbt18mIbFeX8LVSUZwfte+GsnOXMcOYz/XCorfEySz9MvqQRfv3S6/Hxwc0RO6Zi5qJRZWHh7OtyoDXl4Z9DMy+3GRyZg3uZrrZCfg6YheYzGPfwjSqUFnsSsFECJ4f2uEwOd8B5/74VlICys1IFIuvCb94pjA6kbiksPWi0tCmhXFrP/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hx/sx7LTavJiQhkRIatCMhqA5egVYtla6tnzry+is4g=;
+ b=c2m0WgpabrHxYAsXMgp5uD0+T0oCnZH3swP7GZ/iAB12T6fUl8BuybQ5MURSXneOtVyRJR5b9r9IOnnclXOZq/3+XeEy+2k/x2zmoImlMhRM2EjgLBN08fPEBTP/LQV5xAeucfea/xm6KbFe59314BxsanChy/vOhLY1pqptJfUhFZ2QUgvyePwr/KvNQX94KF6K9UcnO0ilN1vzT3Em9TGVy1UQAsty2GggYolHreuVd60+EI6kB5+OKL7z32E71G0U9YvgSL1wNPO81ov+pZdwRpeAyZN7eC97XIMsZTkhD5onM2AYE/1MR4sDX4b+QaNXXC9pTvp0TJwX0H6T8w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CH3PR12MB8509.namprd12.prod.outlook.com (2603:10b6:610:157::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26; Mon, 30 Sep
+ 2024 15:28:16 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%3]) with mapi id 15.20.8005.026; Mon, 30 Sep 2024
+ 15:28:16 +0000
+Date: Mon, 30 Sep 2024 18:28:05 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
+Cc: gal@nvidia.com, Tariq Toukan <tariqt@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [mlx4] Mellanox ConnectX2 (MHQH29C aka 26428) and module
+ diagnostic support (ethtool -m) issues
+Message-ID: <ZvrDhfaIe-bgOyVd@shredder.mtl.com>
+References: <a7904c43-01c7-4f9c-a1f9-e0a7ce2db532@ans.pl>
+ <ZthZ-GJkLVQZNdA3@shredder.mtl.com>
+ <b0ec22eb-2ae8-409d-9ed3-e96b1b041069@ans.pl>
+ <7ba77c1e-9146-4a58-8f21-5ff5e1445a87@ans.pl>
+ <Ztna8O1ZGUc4kvKJ@shredder.mtl.com>
+ <dabeaf9c-fe6c-464e-a647-815e51ec33ce@ans.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dabeaf9c-fe6c-464e-a647-815e51ec33ce@ans.pl>
+X-ClientProxiedBy: FR0P281CA0173.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b4::20) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240930152304.472767-1-edumazet@google.com>
-X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
-Message-ID: <20240930152304.472767-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] net_sched: sch_fq: add the ability to offload pacing
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemb@google.com>, Jeffrey Ji <jeffreyji@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH3PR12MB8509:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7e871f51-9610-41c4-289f-08dce1648110
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?b29NUmpsMGVPS0JCdUV0aSs0RTc2cWxJemZZelRBRGw2SkYyYWxBRlpRd3JS?=
+ =?utf-8?B?WDVad01zQzh5Y0VoRjZIRnhsQmYyUk14bHpTUmtIK2RHRHJRbzRBeW5HS3F2?=
+ =?utf-8?B?blN3R2Y4TEFyZURzZUtYcDRrUkNLa1gxZDhmbUcweXBKaXQ5VXRNMGpiMEVZ?=
+ =?utf-8?B?Zlpld2VPWVZxbnRSQ1V0OEM4Ui8rd29wTGF6VlZkaTB2RlpIaUdJZVZEcng5?=
+ =?utf-8?B?eWxGUUl6OFlzN0xNd3ZCdDN3N3pIQUFlNXg2R0lGOExqVEVOd1ZkRTh2TGs4?=
+ =?utf-8?B?M1pPVGV6S1JDeEVTM1R1K0FQVDR0d09kdUdqd2NMdlFvT1prVmNPaUpONUtk?=
+ =?utf-8?B?eFdvVy9aMzh2cElwQjl0SGV4a1ZseDQ4WEhZUGJwTE9lMWN2b1Evd2hWMXhM?=
+ =?utf-8?B?OVIrd0xBNEVtOWo3aGlpS1YyYzhJckxTTFBDa0MyR1J3dm1Ca3F3VEhpUXEx?=
+ =?utf-8?B?bi91RWVUVHZLZUF5anVWai9wWXZ3aXdqbCtMZjIrVC9QK2Y2WlN5UVJuelI5?=
+ =?utf-8?B?Vnc2OE0veXBvWFdyOGFnWmZ2WWdUKzlIZmg0b3p5VmJ6RHRmMkpuRWZjNXpG?=
+ =?utf-8?B?cHFaS1o5SkU1QUVXNkVZVWNmUFl0aE13NjBQTC9jM2lZQUxXd1pWTnkwWE51?=
+ =?utf-8?B?aEtkakNaTE9KWHBWdHpsOFkvZkkzWG5PaW9WWXI0SEo1cWdaUmJlV2FJSWNq?=
+ =?utf-8?B?anNKNDhNUHRXaTR4YXZXalVJSU9HR2lwaDZjaVA1RnIrMzVjcW41SG5CRDZw?=
+ =?utf-8?B?NkEzSXB4ODY2SzM0MVUxaTEwS2RuVk9DY3M2ak1iL0w4cytseXVCVlBqVitk?=
+ =?utf-8?B?TS9RNjF6NW5KOFZ0SXhiWFh6TVZTbUdsbEV0eVRSQmZYVnErTVNVc2ExbGR0?=
+ =?utf-8?B?VGUyS3Z2UXRDWDJKVWNnY2hBRzlaSHJoMmFyMXF2YmJZOXgvUHBrMTBwbUND?=
+ =?utf-8?B?UEtnNGtKWHZhS0FRYys2OHFTZVVuOFJRNm1ReWJFanRJMFVZL0ZFNXQzNU5G?=
+ =?utf-8?B?QlJ3UmUzOVRCWGhzUnVhMG14eDVrbWFsdnVtUWN6ZE1CSTYvbjZyN1pHbmtI?=
+ =?utf-8?B?aEtVRnhodTE3c2JUZ2hCbk9VYzd6bGZoVk5LdG8ybER4NVdySDkvMXZBNlNE?=
+ =?utf-8?B?eGtmeTRCWWdqN1RjRVdtOWZ5bVZlWnhrenY5Y1N5eGlGSTlEdEFSODk0TGlZ?=
+ =?utf-8?B?dmxDSlBXdDZGZ2w5TzQ1SStRTnV3V1M5ZWRyYmhsRzB5ajA4NDhDTGZIOFlH?=
+ =?utf-8?B?Qm9XNkxkc042YjZHTGxUZkRndURxelF4NFFQdWExc2E1YUFJV3Q4MFgySDA4?=
+ =?utf-8?B?VnJkSzdxWmVVSUlHOU4vbmdKL2t5djQyWXMwbC9KcTFOUFZKS05QNXpUYTNw?=
+ =?utf-8?B?LzVqdlErL1lJeEhjOFAvNWFjbmF2YzlSQWpRQTdvRitDT3BKLzM5d1htQW4v?=
+ =?utf-8?B?SEdOT1Z3SnFKNGxkZzhvRyt1bFpacEZIR2wyejhFZzFVZ29lN3lJNEdaOTV2?=
+ =?utf-8?B?SEg4M0k1SVpILzU5MXNZUm1aMkJlZTBkSmpEWjdEaXNibzcyN3hDVXUwSmt2?=
+ =?utf-8?B?R1ZtYmY3T2hSNkZLU0V1c0hkbkZqMTJxNDRyMWora05SQXV5VlYwSFp1UjVm?=
+ =?utf-8?B?dWMvUmQyUmFwY25MK043S2dqeU1xNkoyOVNobSt1T3RDRkpqbVNvRzlrNExX?=
+ =?utf-8?B?QS8wZ1NvN1BTTDdMRFBIRjlhY01sNEF1akR0ZDBBRHNVVkhYNG10bEdxY1pj?=
+ =?utf-8?B?cmMyRmZSV2NLcnR3K3AyRjlYZ0RJdk0xaEY1aTBBb0VhMmZNc3lkQ2VsTytG?=
+ =?utf-8?B?OVFrVFpIM0RWNWJXMG1wdz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VmZWVnNwM2FkN2RzdXorQlJ2TG1MWWp1aG1GZktXN3RXY3p4RkxFQnErR3JV?=
+ =?utf-8?B?aG5ZVFpNMGF4Rm9HdU42MmN1cmtMQzY2UFlWNXRZQVJyaVZEVHpCV2NGYVdo?=
+ =?utf-8?B?V2pOQnJ6bTB4M3NKYmZDNXJyRWFVV1NGbWg3QTNPNjVxamJiTjQ1NU56ZFE4?=
+ =?utf-8?B?eTJzOHdsa09DQUNaenBjeG1FQzdmd1Z0Z25TV1ltT2hWZHZseFdyWlpkU0x5?=
+ =?utf-8?B?SXc3ZDRLb0tXYjg0RmVSZExFV2lkdjdWNU9KdDRwaTJ2MkdpWGJ5d25mZVdB?=
+ =?utf-8?B?dEhoT0VEbDU5NkFqUHNkeXBYL0c3WElPWVhoM09CWUN2Uk5UN2RGTHl6RXh0?=
+ =?utf-8?B?eGwramlobmhMb3A3d1I4N0hpbHQ3WVE0NXVCa1B4c2JKUW9RTnJTMExlN1hx?=
+ =?utf-8?B?WXF2VktyUUtZR1FUMXdCMGpBQ284bm85UWkzRzJiYWJTbnFxT2RsVmNKQmVX?=
+ =?utf-8?B?a0lYU2laVmdObHQ2T2VXRVRjcmgzS0U4bjFZMkV3UFlnQXpVaHV6bDgzQXJD?=
+ =?utf-8?B?enRaQmlxYkk3VDllckNkendud2NTYm1oZkVCcVJMNE15aWlGK0tScEszYzR4?=
+ =?utf-8?B?VXhUcS9xdG5MMFdZRFpvN0RHS003L21PVEc2ekViKzNhcDJ0NGJUT1g2c2ho?=
+ =?utf-8?B?TXdSS3RuQ3RzRnNBQlJsMy8xU1I0bncvYnIyUjZ2c3BlRDVlQlJ0MDVnZ0xM?=
+ =?utf-8?B?ZkwwajhOMm5VZVJQd1RpcEJsaGYrdEJRQkRtR1U3TkhiSW5SZjVCVjROdXQr?=
+ =?utf-8?B?ZFpsOU5DbUNleTdSWnJ5cHJHb256enMxZzM0cVdGOWovbVUrejFqTUVhT3hV?=
+ =?utf-8?B?cHJLZlB0QU5VRjZxNlZHdVRzVS80SkdqMmtFa0RaMmIrSEU5RG04NVBtc3RR?=
+ =?utf-8?B?R3d4b1JvdjU3Q2piWGxvYldlREtNUzZCS1BmeTN4Mi8xMmxuejF3WEhGdThE?=
+ =?utf-8?B?amZ5aksvQ3NvMWdNWmdyZDRJVkMyNmpNbkNna040bFRvWnYxM3BEZU4zVXVP?=
+ =?utf-8?B?cXE0cSt1MHozUlg0UmF4cXJFblYweW5FV21oYkxjVXF2LzRwUm5yVy9nLzNF?=
+ =?utf-8?B?VVZNcFJKdFJ3ejFWQzlSdExLaHkxV3ZPeEZGUmoxUjI3ajVjMTVEQ2xNYlpv?=
+ =?utf-8?B?QmtrZ1JQMGRRRTR0NW14YTFjd0ZLTDRMVDBYMUt1cFovcXF1ZEl0cXZlUXNB?=
+ =?utf-8?B?Q0VTVmJVQXo0VWwyNlBQdEErVGtHQ2pHclBTWTdEWTdlR3lodzR5Sm9xczFQ?=
+ =?utf-8?B?VFBkRVd4OTJLV3NIUUZCTVpZK2Uvb0dYTEE3NXlvVXpITkJLYWlnKzd4QTJl?=
+ =?utf-8?B?ekcyamdwazd2elMwYTNWVHl6OGlNbkVWL3lmOGtoT2g5bUg0eUdCVmJaM3o0?=
+ =?utf-8?B?Y3djNmh4UzlaeVo2dkxFNGlnN29YVEhXeEhQQTVUTUt3bitERXJtSVJPbjJ5?=
+ =?utf-8?B?emVxbTEwdVB5aGZoK3F1ZEZjbzk1Z3dyanFScUtycGl5YjV6RUQwUXZWbml1?=
+ =?utf-8?B?cXR0Ymdmd2hoOHR3dnovZ3ZRUUQxRkZHczNxcmM4L3RDVnRvclpwZUc4KzRl?=
+ =?utf-8?B?TWFLNjVxUVVLVE1UcHJJcndOQ1pOV3EwYnpFQkNJM0lhcVh5ZktPdms1NjB4?=
+ =?utf-8?B?b3hRSmhaZGVwM1RNVHBSWWZCR1BVQTVCVVlzU1BiaVFONUh6Z0pYOGxsamI1?=
+ =?utf-8?B?OUVBRHl6bVFDV2JabmFEdmNSd3VHQnkwRCtHdDg1UHZuNm84TUtmZTNHbVk1?=
+ =?utf-8?B?dU5qUFZVMXNmYnd1S3ZKNHNhQ3gxWGFHQXNkeFprMnhlRlRxVEc4VENjdzMz?=
+ =?utf-8?B?YWs0MlhncDB4YUZqQnljU1hyZ0lwQkRaVG5Gd3ZiLzNzVE50c1VpZTZ6Y0tx?=
+ =?utf-8?B?V1FibWxrR2xnYVV2YzhzTEFtcTZrNERtU0JyanBJcUp4QmR3c2x2bnBXbStZ?=
+ =?utf-8?B?dHZLaWUzZTNLUzBoWDNmZ3RIaFpDMlBQUzJhRStkUU84a0ZjaG1Rcml3MW5y?=
+ =?utf-8?B?dHIyMWIzYkhiTlVlc0VjQUNQWHB6MG5sVldBcnh2MEZlcWlSeEpoZThQYy9w?=
+ =?utf-8?B?ZEFBZ2tFaDdjSlZoM01HUG9zMmhFS1pSR0FqbExDK05nbm93MzI3bUJmM0RQ?=
+ =?utf-8?Q?SYwuoySj6eQ/De6rXMkz07ULb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7e871f51-9610-41c4-289f-08dce1648110
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2024 15:28:16.0773
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dZ7KT8OwrQ285Y0F+nTcMA4a8FwQHZJxBgPXAN5+vGeotvOyG4gjqpJeNFhqH0E3xrj05e16NTruw0DafIRRiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8509
 
-From: Jeffrey Ji <jeffreyji@google.com>
+On Wed, Sep 11, 2024 at 11:46:11PM -0700, Krzysztof Olędzki wrote:
+> Sure, I can also try to work on that one. Would mlx5/core/en_ethtool.c
+> be a good example of how this should be implemented?
 
-Some network devices have the ability to offload EDT (Earliest
-Departure Time) which is the model used for TCP pacing and FQ packet
-scheduler.
+Yes. You can also look at mlxsw_env_get_module_eeprom_by_page() which is
+using the same firmware interface as mlx5 (but not mlx4). Basically,
+this operation is very simple as far as the driver is concerned. You get
+a "3D address" (bank + page + offset) from user space and ask the device
+to fetch the required info.
 
-Some of them implement the timing wheel mechanism described in
-https://saeed.github.io/files/carousel-sigcomm17.pdf
-with an associated 'timing wheel horizon'.
+In the case of mlx4 bank is irrelevant so you can always return an error
+for "bank != 0". For the rest of the fields in 'struct
+ethtool_module_eeprom' the mapping to 'struct mlx4_cable_info' is as
+follows (AFAIU):
 
-This patchs adds to FQ packet scheduler TCA_FQ_OFFLOAD_HORIZON
-attribute.
+struct ethtool_module_eeprom::offset -> struct mlx4_cable_info::dev_mem_address
+struct ethtool_module_eeprom::length -> struct mlx4_cable_info::size
+struct ethtool_module_eeprom::page -> struct mlx4_cable_info::page_num
+struct ethtool_module_eeprom::i2c_address -> struct mlx4_cable_info::i2c_addr
 
-Its value is capped by the device max_pacing_offload_horizon,
-added in the prior patch.
-
-It allows FQ to let packets within pacing offload horizon
-to be delivered to the device, which will handle the needed
-delay without host involvement.
-
-Signed-off-by: Jeffrey Ji <jeffreyji@google.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/uapi/linux/pkt_sched.h |  2 ++
- net/sched/sch_fq.c             | 33 +++++++++++++++++++++++++++------
- 2 files changed, 29 insertions(+), 6 deletions(-)
-
-diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
-index a3cd0c2dc9956f8c873f35c7b33b2bcf93feb2f1..25a9a47001cdde59cf052ea658ba1ac26f4c34e8 100644
---- a/include/uapi/linux/pkt_sched.h
-+++ b/include/uapi/linux/pkt_sched.h
-@@ -836,6 +836,8 @@ enum {
- 
- 	TCA_FQ_WEIGHTS,		/* Weights for each band */
- 
-+	TCA_FQ_OFFLOAD_HORIZON, /* dequeue paced packets within this horizon immediately (us units) */
-+
- 	__TCA_FQ_MAX
- };
- 
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index 19a49af5a9e527ed0371a3bb96e0113755375eac..aeabf45c9200c4aea75fb6c63986e37eddfea5f9 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -111,6 +111,7 @@ struct fq_perband_flows {
- struct fq_sched_data {
- /* Read mostly cache line */
- 
-+	u64		offload_horizon;
- 	u32		quantum;
- 	u32		initial_quantum;
- 	u32		flow_refill_delay;
-@@ -299,7 +300,7 @@ static void fq_gc(struct fq_sched_data *q,
- }
- 
- /* Fast path can be used if :
-- * 1) Packet tstamp is in the past.
-+ * 1) Packet tstamp is in the past, or within the pacing offload horizon.
-  * 2) FQ qlen == 0   OR
-  *   (no flow is currently eligible for transmit,
-  *    AND fast path queue has less than 8 packets)
-@@ -314,7 +315,7 @@ static bool fq_fastpath_check(const struct Qdisc *sch, struct sk_buff *skb,
- 	const struct fq_sched_data *q = qdisc_priv(sch);
- 	const struct sock *sk;
- 
--	if (fq_skb_cb(skb)->time_to_send > now)
-+	if (fq_skb_cb(skb)->time_to_send > now + q->offload_horizon)
- 		return false;
- 
- 	if (sch->q.qlen != 0) {
-@@ -595,15 +596,18 @@ static void fq_check_throttled(struct fq_sched_data *q, u64 now)
- 	unsigned long sample;
- 	struct rb_node *p;
- 
--	if (q->time_next_delayed_flow > now)
-+	if (q->time_next_delayed_flow > now + q->offload_horizon)
- 		return;
- 
- 	/* Update unthrottle latency EWMA.
- 	 * This is cheap and can help diagnosing timer/latency problems.
- 	 */
- 	sample = (unsigned long)(now - q->time_next_delayed_flow);
--	q->unthrottle_latency_ns -= q->unthrottle_latency_ns >> 3;
--	q->unthrottle_latency_ns += sample >> 3;
-+	if ((long)sample > 0) {
-+		q->unthrottle_latency_ns -= q->unthrottle_latency_ns >> 3;
-+		q->unthrottle_latency_ns += sample >> 3;
-+	}
-+	now += q->offload_horizon;
- 
- 	q->time_next_delayed_flow = ~0ULL;
- 	while ((p = rb_first(&q->delayed)) != NULL) {
-@@ -687,7 +691,7 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 		u64 time_next_packet = max_t(u64, fq_skb_cb(skb)->time_to_send,
- 					     f->time_next_packet);
- 
--		if (now < time_next_packet) {
-+		if (now + q->offload_horizon < time_next_packet) {
- 			head->first = f->next;
- 			f->time_next_packet = time_next_packet;
- 			fq_flow_set_throttled(q, f);
-@@ -925,6 +929,7 @@ static const struct nla_policy fq_policy[TCA_FQ_MAX + 1] = {
- 	[TCA_FQ_HORIZON_DROP]		= { .type = NLA_U8 },
- 	[TCA_FQ_PRIOMAP]		= NLA_POLICY_EXACT_LEN(sizeof(struct tc_prio_qopt)),
- 	[TCA_FQ_WEIGHTS]		= NLA_POLICY_EXACT_LEN(FQ_BANDS * sizeof(s32)),
-+	[TCA_FQ_OFFLOAD_HORIZON]	= { .type = NLA_U32 },
- };
- 
- /* compress a u8 array with all elems <= 3 to an array of 2-bit fields */
-@@ -1100,6 +1105,17 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 		WRITE_ONCE(q->horizon_drop,
- 			   nla_get_u8(tb[TCA_FQ_HORIZON_DROP]));
- 
-+	if (tb[TCA_FQ_OFFLOAD_HORIZON]) {
-+		u64 offload_horizon = (u64)NSEC_PER_USEC *
-+				      nla_get_u32(tb[TCA_FQ_OFFLOAD_HORIZON]);
-+
-+		if (offload_horizon <= qdisc_dev(sch)->max_pacing_offload_horizon) {
-+			WRITE_ONCE(q->offload_horizon, offload_horizon);
-+		} else {
-+			NL_SET_ERR_MSG_MOD(extack, "invalid offload_horizon");
-+			err = -EINVAL;
-+		}
-+	}
- 	if (!err) {
- 
- 		sch_tree_unlock(sch);
-@@ -1183,6 +1199,7 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- 		.bands = FQ_BANDS,
- 	};
- 	struct nlattr *opts;
-+	u64 offload_horizon;
- 	u64 ce_threshold;
- 	s32 weights[3];
- 	u64 horizon;
-@@ -1199,6 +1216,9 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	horizon = READ_ONCE(q->horizon);
- 	do_div(horizon, NSEC_PER_USEC);
- 
-+	offload_horizon = READ_ONCE(q->offload_horizon);
-+	do_div(offload_horizon, NSEC_PER_USEC);
-+
- 	if (nla_put_u32(skb, TCA_FQ_PLIMIT,
- 			READ_ONCE(sch->limit)) ||
- 	    nla_put_u32(skb, TCA_FQ_FLOW_PLIMIT,
-@@ -1224,6 +1244,7 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	    nla_put_u32(skb, TCA_FQ_TIMER_SLACK,
- 			READ_ONCE(q->timer_slack)) ||
- 	    nla_put_u32(skb, TCA_FQ_HORIZON, (u32)horizon) ||
-+	    nla_put_u32(skb, TCA_FQ_OFFLOAD_HORIZON, (u32)offload_horizon) ||
- 	    nla_put_u8(skb, TCA_FQ_HORIZON_DROP,
- 		       READ_ONCE(q->horizon_drop)))
- 		goto nla_put_failure;
--- 
-2.46.1.824.gd892dcdcdd-goog
-
+Note that mlx4 firmware can only read up to 48 bytes
+(MODULE_INFO_MAX_READ), so you need to implement a loop like the one in
+mlx5e_get_module_eeprom_by_page(). Also note that extack is available so
+try to use it to communicate failures instead of printing to the kernel
+log.
 
