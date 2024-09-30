@@ -1,141 +1,216 @@
-Return-Path: <netdev+bounces-130513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDAAD98AB76
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:57:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C77A98AB77
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:57:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 439F8282F08
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:57:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5625E1C2128C
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 17:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEE91990A7;
-	Mon, 30 Sep 2024 17:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 668EF198E77;
+	Mon, 30 Sep 2024 17:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W0ix6LOl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOQ5pVF2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB238198E96
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B211B192D82;
+	Mon, 30 Sep 2024 17:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727719018; cv=none; b=S6UZRwb9WcRPIILPcB5FFfA+9WIM2wHyhLW1QbldWuKgdXK+BlUe0fM8RA1m+VjNLXfMv0ZuTG9HEWqG2pPVCZNNi+0wqEDrDck+P6ATkJ0fHhXmrhr/CAs1IKrxLOTzQnGCXUiS1IRekuZYmTXKbj/NYnW4iU4sOWR8mBr+85A=
+	t=1727719043; cv=none; b=dYktlFEQgO+g5F/UALi2ehyVTysA3tuBUIwzco6VOxfULPLba+GC9++3cBrcI5pHFnpMXql0utacS6iyzTQIFOg5hppxPsFTlBDVcsGeAG+ARnSVxF/R4UJXnaFHwWcjq5lg7XKzj/b0iSWCwtgoQUqfQIE4hHXEgS0L+4EB/V0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727719018; c=relaxed/simple;
-	bh=eKo/A02EaTF15W6w2BCW6hV0IYdC0sQAiJ0vJbPEeH8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KpWgjsLQ4Ly0ZZ7u4d3K9vsijB/jU8CX8FJ3qaEVFHy3yDEKTIInGZB75qQssDbEUwl996vXh9IT3gxVUfcNQVctaBKf6w6TIYT9gOs7oqC53gOhettsEKNUeNLrqe9UhyX/66vmb20QxVCzuJZDgKK3UR/Mp/6jhrfputbpiRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W0ix6LOl; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48UBeouC025312
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:56:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=D5lY1Z/wx5TWA
-	HnamX6pZiJXQ02Cwt+o3jfInqA3PIQ=; b=W0ix6LOlZIEkwXzmqZp9Owv1vtKe2
-	zRndMnJi9XrQ4JNiu0QKz4G7WJEuknE7Bc3HqPOd2gDEu+kmOWg3KKy5jPuM5cjq
-	w3oRkqiNS79haJZj7jK/IfMnHCRxQQkrZphk9HB+XGqSKEem0TbVoR3u6UX73ygh
-	VmKt1MxEWUHuq90B3PslDwGfbSPS8Bz8usBhRjjTPsfp65SF51pVq848H8JF0mmb
-	HnYT/mIp25cZmzTf0bxBRncsv0dzrFXL3Hlu2AQfLpX+chjhNvwxi1JTAI0XxxN2
-	FfZWZRjuHpNX02Xj04raGG/8FjZ94zvCesNWxSivH3thc2JHHxBzbjKiw==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41x87kk4j1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:56:54 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48UFoqsU002386
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:56:53 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 41xxu0ykw1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:56:53 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48UHupAY29360488
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 30 Sep 2024 17:56:51 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2956F58056;
-	Mon, 30 Sep 2024 17:56:51 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0DD655803F;
-	Mon, 30 Sep 2024 17:56:51 +0000 (GMT)
-Received: from tinkpad.ibmuc.com (unknown [9.61.45.36])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 30 Sep 2024 17:56:51 +0000 (GMT)
-From: Nick Child <nnac123@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: haren@linux.ibm.com, ricklind@us.ibm.com,
-        Nick Child <nnac123@linux.ibm.com>
-Subject: [PATCH net 2/2] ibmvnic: Inspect header requirements before using scrq direct
-Date: Mon, 30 Sep 2024 12:56:35 -0500
-Message-ID: <20240930175635.1670111-2-nnac123@linux.ibm.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240930175635.1670111-1-nnac123@linux.ibm.com>
-References: <20240930175635.1670111-1-nnac123@linux.ibm.com>
+	s=arc-20240116; t=1727719043; c=relaxed/simple;
+	bh=8GKW4Nfaj8ElJ2qX2LqoSjGmFLifYOim+YlwMDmZ504=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GQgTJ6l6bIGtOOvPJ/kFHkbFDsvWLvC9greEcC4V1p/czw/AxIr6cOOSsarq9bnv4/NmCZN1WlMOccOiJPN8xKL9FuZppHnSKPnwicfxulxmEQZ179O2AnwEZVgRsUhE5bZTFz9ZwHtoRy0+lfa9zcRIn9BidJ3KmfV4ZRbyXR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jOQ5pVF2; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a1a3090f93so15543935ab.1;
+        Mon, 30 Sep 2024 10:57:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727719041; x=1728323841; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RkuHB9W+Ul6catLgePR5NySmMtYg4kqu/HJkidxVyGU=;
+        b=jOQ5pVF2pOh65yPGFAcwn54cWRcTSxvrNRzZ1aioLT05dU0YolscLjgQeqe9QijXBN
+         FvUpUMVk5aEkxITMu/r5dXA9f6udeswGdZkI8hCpB/c7n/sH/mwgKxagrePF/SjAU0CV
+         CnIsty0V8abzCyTKYZ4RJZNEeqV/Ve2LEd6okQeii5B0vMDkZuTpDhXBy/L+pVmM1UTW
+         WgAHSh0OcNvYXMMO6Rxk5BvN6yehfHxIUwynyy5aYM0sNsVMhs1rN6m3SKp7OpYjb2gS
+         oZnxwKgRgUJTmjiuFEuKhC8Pg4ZPSKf84ywqBCJCkFgnMa7suFb3DiAmA/cDvStOuwPs
+         Qk+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727719041; x=1728323841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RkuHB9W+Ul6catLgePR5NySmMtYg4kqu/HJkidxVyGU=;
+        b=VMDHqIzFZnIEaJgswDIjMqW+PpxL3Kj/c642DK8hk9FrAgVCoMyXNyr/u8X/Sn+NM9
+         QknzyJKRB3jORQwGfAVe9DObzC3NjmghcEPJs6NTcU0OjAjEpyqppvZFiEjqMv7MdmjU
+         c3izIleWSjh07OnEdVd+kmVTO5CJFacZSF34QRR8ZQ973Pp7NyZdk1MhbSDB3jOPEkAh
+         HzEoxetv5S5bw1XZZyMcESj+jAqwcIkB4EJHwws5W0GA76Fwe03/3lnie3LNGltclCuO
+         cfcx+pVE5YbGDOMwhpZtjiIKGOpSJPzr+9EAhkeN7GBZiXP6HJU5X8cL7Pim4CwBHQe/
+         avnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVk/fIInAVBPRJObJUgbdxR6P8PHNlCY91bsq6XYbBs+Dk6lPS0Pr7u53R9PNydLRLrmaQ6TXO@vger.kernel.org, AJvYcCXe8rgv5gq0Ca0qfyQNH+VU5X+6hdOmTXx3BUddV7ZUnl0hxFNyY/fsC5zOLgBwh+ieth3TkFwhoEfU6DkrT+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlXTymufDTbsLmjfDk+A5CjLd+sWBsaZZ8IquynzGMhQH6i8o6
+	Eyr4qC6/I9zwTJ2VWE03jVs5Mo5ZkB+9A2dPAVQ/iy5LpDjsScEz5e5hpvrCTQLZTlwSYOJOoVa
+	uXPzkPEeZeyS9zMQ3mzvyI0wvSiw=
+X-Google-Smtp-Source: AGHT+IEx/osSQPvLPz+y5Z4cwFS7CZburXSyteSvLZ+udXqK8kBROCx7zRzKyDnMyXlQYOFHdB8oomWqmt0VDmdb+4M=
+X-Received: by 2002:a05:6e02:1a6e:b0:3a0:9ed2:67b8 with SMTP id
+ e9e14a558f8ab-3a34514bbd2mr115485485ab.4.1727719040761; Mon, 30 Sep 2024
+ 10:57:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ox5rk0rLpYA8B1VNPQEXLuGasNTMBJTH
-X-Proofpoint-ORIG-GUID: Ox5rk0rLpYA8B1VNPQEXLuGasNTMBJTH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-09-30_17,2024-09-30_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 lowpriorityscore=0 clxscore=1015 phishscore=0 spamscore=0
- priorityscore=1501 mlxscore=0 mlxlogscore=719 adultscore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409300126
+References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
+ <20240930092416.80830-2-kerneljasonxing@gmail.com> <66fa7fe46392e_17948d294bb@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC+VEs1UusEKKVhutw+e=uyEqoaBhRTUV1G4HakM3JVYQ@mail.gmail.com>
+ <66fa904185c3_17cd892948a@willemb.c.googlers.com.notmuch> <CAL+tcoBMXtQ_TbjKmO5CazL5zu1dDBBB+enckkM9+0ojF3qutQ@mail.gmail.com>
+ <66fadc698746d_187400294a5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66fadc698746d_187400294a5@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 1 Oct 2024 01:56:44 +0800
+Message-ID: <CAL+tcoBm6YmDr_=WaaWDspE_LN2N6-WdT76Yp6U6fn9pDx-aCQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net-timestamp: add strict check when setting
+ tx flags
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org, willemb@google.com, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Previously, the TX header requirement for standard frames was ignored.
-This requirement is a bitstring sent from the VIOS which maps to the
-type of header information needed during TX. If no header information,
-is needed then send subcrq direct can be used (which can be more
-performant).
+On Tue, Oct 1, 2024 at 1:14=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Mon, Sep 30, 2024 at 7:49=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > On Mon, Sep 30, 2024 at 6:39=E2=80=AFPM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Jason Xing wrote:
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > Even though this case is unlikely to happen, we have to avoid s=
+uch
+> > > > > > a case occurring at an earlier point: the sk_rmem_alloc could g=
+et
+> > > > > > increased because of inserting more and more skbs into the errq=
+ueue
+> > > > > > when calling __skb_complete_tx_timestamp(). This bad case would=
+ stop
+> > > > > > the socket transmitting soon.
+> > > > >
+> > > > > It is up to the application to read from the error queue frequent=
+ly
+> > > > > enough and/or increase SO_RCVBUF.
+> > > >
+> > > > Sure thing. If we test it without setting SOF_TIMESTAMPING_SOFTWARE=
+ on
+> > > > the loopback, it will soon stop. That's the reason why I tried to a=
+dd
+> > > > the restriction just in case.
+> > >
+> > > I don't follow at all.
+> > >
+> > > That bit does not affect the core issue: that the application is not
+> > > clearing its error queue quickly enough.
+> > >
+> > > > >
+> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > ---
+> > > > > >  net/core/sock.c | 4 ++++
+> > > > > >  1 file changed, 4 insertions(+)
+> > > > > >
+> > > > > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > > > > index fe87f9bd8f16..4bddd6f62e4f 100644
+> > > > > > --- a/net/core/sock.c
+> > > > > > +++ b/net/core/sock.c
+> > > > > > @@ -905,6 +905,10 @@ int sock_set_timestamping(struct sock *sk,=
+ int optname,
+> > > > > >       if (val & ~SOF_TIMESTAMPING_MASK)
+> > > > > >               return -EINVAL;
+> > > > > >
+> > > > > > +     if (val & SOF_TIMESTAMPING_TX_RECORD_MASK &&
+> > > > > > +         !(val & SOF_TIMESTAMPING_SOFTWARE))
+> > > > > > +             return -EINVAL;
+> > > > > > +
+> > > > >
+> > > > > This breaks hardware timestamping
+> > > >
+> > > > Yes, and sorry about that. I'll fix this.
+> > >
+> > > As is I don't understand the purpose of this patch. Please do not
+> > > just resubmit with a change, but explain the problem and suggested
+> > > solution first.
+> > >
+> >
+> > I will drop this patch because I just tested with my program in the
+> > local machine and found there is one mistake I made about calculating
+> > the diff between those two . Sorry for the noise.
+> >
+> > Well, I only need to send a V2 patch of patch [3/3] in the next few day=
+s.
+> >
+> > BTW, please allow me to ask one question unrelated to this patch
+> > again. I do wonder: if we batch the recv skbs from the errqueue when
+> > calling tcp_recvmsg() -> inet_recv_error(), it could break users,
+> > right?
+>
+> Analogous to __msg_zerocopy_callback with __msg_zerocopy_callback.
+>
+> Only here we cannot return range-based results and thus cannot just
+> expand the range of the one outstanding notification.
+>
+> This would mean in ip(v6)_recv_error calling sock_dequeue_err_skb,
+> sock_recv_timestamp and put_cmsg IP_RECVERR multiple times. And
+> ip_cmsg_recv if needed.
+>
+> Existing applications do not have to expect multiple results per
+> single recvmsg call. So enabling that unconditionally could break
+> them.
 
-This bitstring was previously ignored for standard packets (AKA non LSO,
-non CSO) due to the belief that the bitstring was over-cautionary. It
-turns out that there are some configurations where the backing device
-does need header information for transmission of standard packets. If
-the information is not supplied then this causes continuous "Adapter
-error" transport events. Therefore, this bitstring should be respected
-and observed before considering the use of send subcrq direct.
+Thanks for your explanation! I was unsure because I read some use
+cases in github and txtimestamp.c, they can only handle one err skb at
+one time.
 
-Fixes: 1c33e29245cc ("ibmvnic: Only record tx completed bytes once per handler")
+>
+> Adding this will require a new flag. An sk_tsflag is the obvious
+> approach.
+>
+> Interpreting a MSG_* flag passed to recvmsg would be
+> another option. If there is a bit that can be set with MSG_ERRQUEUE
+> and cannot already be set currently. But I don't think that's the
+> case. We allow all bits and ignore any undefined ones.
 
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
----
- drivers/net/ethernet/ibm/ibmvnic.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Do you feel it is necessary that we can implement this idea to
+optimize it, saving 2 or 3 syscalls at most at one time? IIRC, it's
+you who proposed that we can batch them when applying the tracepoints
+mechanism after I gave a presentation at netconf :) It's really good.
+That inspires me a lot and makes me keep wondering if we can do this
+these days.
 
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 53b309ddc63b..cca2ed6ad289 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -2473,9 +2473,11 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	/* if we are going to send_subcrq_direct this then we need to
- 	 * update the checksum before copying the data into ltb. Essentially
- 	 * these packets force disable CSO so that we can guarantee that
--	 * FW does not need header info and we can send direct.
-+	 * FW does not need header info and we can send direct. Also, vnic
-+	 * server must be able to xmit standard packets without header data
- 	 */
--	if (!skb_is_gso(skb) && !ind_bufp->index && !netdev_xmit_more()) {
-+	if (*hdrs == 0 && !skb_is_gso(skb) &&
-+	    !ind_bufp->index && !netdev_xmit_more()) {
- 		use_scrq_send_direct = true;
- 		if (skb->ip_summed == CHECKSUM_PARTIAL &&
- 		    skb_checksum_help(skb))
--- 
-2.43.5
+Since I've already finished the bpf for timestamping feature locally
+which bypasses receiving skbs from errqueue, I believe it could be
+helpful for those applications that still have tendency to use the
+"traditional way" to trace.
 
+What are your thoughts on this? If you agree, do you want to do this
+on your own or allow me to give it a try?
+
+Thanks,
+Jason
 
