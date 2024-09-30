@@ -1,173 +1,110 @@
-Return-Path: <netdev+bounces-130428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 135CD98A6F4
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:27:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DFD98A707
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 375621C21F23
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:27:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73BDD1C21142
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB44F1917E9;
-	Mon, 30 Sep 2024 14:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6DF1917E7;
+	Mon, 30 Sep 2024 14:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q+YJyeal"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="dqFPEmpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE6E18FDD8
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAA31917E3;
+	Mon, 30 Sep 2024 14:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727706463; cv=none; b=JY0Ybs1F0fDgF+ztQwMDuYjSji6SaomCZyHGvKA79VhTiNlv0S0YbIbr8gt1wMP5aUKHUqFY3sVqMG7dyZFswlzVIJqt69/CAuPXYZPtLloHoEevMvIS/itnSHrP3Hhf4aPc8YxpBgfEOwswMIb+tWJa2XmPb+G5LAGuwGzN9R4=
+	t=1727706608; cv=none; b=h3ICrds4YTLBgtZcVNTIOaKVVPRrJWRkwyk/pY4C9NOFjDn1hrgVosDryMTW/E5/jHmF+9HgYRnF1xdesaMuPNndG/YZOO7isUuo5J3Zr6HXKqDHudbyxzZamiVswrvo0unWObUxzIgzCsaKViOSIxxhehJFtEmJcaYjXytEIkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727706463; c=relaxed/simple;
-	bh=EeYyLF20aDFEbuavaL7j2KagAYQQasGHqOcT6pXxFaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fBJJIjqOojE2fIAYHH1Q7+TMmISGpxk9yZJqfr8Ya+Hf59O77ogpKVM7lgbJjki07zTKbPGNPvSqjhN0LRVw8Zxa8S6GppuUoQepHFPMES+nY6EPMUiS2EcZknANPqoFmgelr/cPB0UXgXsuknrnQif5fUW65xOQzH7H6nQlK6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q+YJyeal; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727706461;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4ytbPBd95cWqX8Nn+fM7i9ZT4U+6yWcLeNhuCcF4JcQ=;
-	b=Q+YJyealfuOlFs5Y2qZZ23YpxmCHLdBf5Y8ZE+DqwvCfi/K3Ka9es6PHoyLpSHjLmv+EqT
-	iFeG1SdL+ivUF9wXFju/Y44vzZ/j44lErkKXgYOBTKxZB7BcxpuTjzYWwUpeFinfn4pin8
-	DPxGf/fYG2Ptkk7bAtXPAMcGY5oaGHY=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-451-iLSKm_0wNo61leSVoM04cA-1; Mon, 30 Sep 2024 10:27:39 -0400
-X-MC-Unique: iLSKm_0wNo61leSVoM04cA-1
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5dc96240f1dso3258001eaf.0
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 07:27:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727706459; x=1728311259;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ytbPBd95cWqX8Nn+fM7i9ZT4U+6yWcLeNhuCcF4JcQ=;
-        b=osUQI7W2GtR3IL9kq8VAFCj7UIrj23Ce7DkbNy5Ps5xUnhLHi1Bgt4QPaIU8smtlF8
-         0p/jBnLJVAmUex1manKHg+tL0DjemKCb1UGmS+d+D3n+zMZgNwC1ItV5db3XShmq8ZP7
-         5YchbJGtCtVIaFgk+3ai3rw/tG064oA/7bngYCPxgvvY6YafyJCW+nEGCaTG3pOp4RP2
-         6deolveff0fbfThPzBaSb880OrbVyKc9yAaOgulLhWgmfxQpJ9VTtNucVQU6V0s7nXUE
-         YozYf3vk22DZSHJqU/C8QYCxkpyPtPr9Sz60QKDiS13tKV2vBLNMgQUjpyMYI1V+UPLk
-         yxHA==
-X-Forwarded-Encrypted: i=1; AJvYcCUoU4wu+6OlAX+cuFYdNhH+qecc0AAHRunR4E6N18BwRTtDucGOpZ9Ukx9FUOe+guPXhnUKSug=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZGJDryh5cUP6gVM02wo0Qy7pb91NF3GsrEHUl6kAzPppq6K7n
-	tCyogBNJ3dHauFIKbA6taS8Y+/0zi/K0JMXRduZODiEuPzOHFeGmrYF4LC47un0bZsF71uwCUoL
-	cS4F6bTgUJsq2p3MJnAkis+HNk6KLDYjyPL9oB7L9gylmBDI2j8OimQ==
-X-Received: by 2002:a05:6358:7201:b0:1af:15b5:7ca0 with SMTP id e5c5f4694b2df-1becbc29d1emr438413555d.6.1727706458914;
-        Mon, 30 Sep 2024 07:27:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIrMRsWhZz29fSWrh8R6+DMZiFE0fzWTDB+zeNZvgXRTdMVS2bFMuus9C1n6IS1/FhZMePYA==
-X-Received: by 2002:a05:6358:7201:b0:1af:15b5:7ca0 with SMTP id e5c5f4694b2df-1becbc29d1emr438410055d.6.1727706458474;
-        Mon, 30 Sep 2024 07:27:38 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b68ec20sm40159986d6.135.2024.09.30.07.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 07:27:37 -0700 (PDT)
-Date: Mon, 30 Sep 2024 16:27:14 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>, 
-	kuba@kernel.org
-Cc: stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+	s=arc-20240116; t=1727706608; c=relaxed/simple;
+	bh=b09YgrVJmvgRvMBhcaVCn7o5eWZqdGkkra9l64YUxvg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LZRiRP3ye8wpZZv1OB0uNN9PuGq/gE1czugHx0DILgnqgDrDES2Oq21qVmZa2prLk2oUY8CfHWHoVmMBf49HF4gT79+jV4FxK2T7exuWCCrA5Naa5FSjvhvEdMBCNU9jV0vBZaiWTB0q9ljYp+Nx3FGZAkd4VbbTrZjJY7fzt7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=dqFPEmpX; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48UCGRJH032600;
+	Mon, 30 Sep 2024 14:29:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	67L6sCzfDHRdsopuyWGssY6DOebG1iMqtYOyqTtRtwA=; b=dqFPEmpXDy5qytvr
+	82tYrmYnshp8ZE2clF0e/7yHufzsq2gFLNY+JMUDJu7aKKQGreJNgbL9femc9XOv
+	ZIFPn2uA95sHOBDST70OXeLW8YmI1BSTt9SvkwXPc2RjN9+tm0k+8VMALy3p7iu5
+	hIbmxDZ0ABdEJwFOtkZ4HsgjNfNzHQ8iQIUO/FsFRxVwTxo0xS6Gv5+khXZ9PTfN
+	wRoxTELxgB6O/WjRmlE755q2uvr43AeaWMv9seRW3LnkfBf0WWhMXEqbO4S+O6cD
+	uXezWMRW4lvQ14xcfw8E71qa+UafOy7UMwZ1Uu1op7XnNJmJ6+Pa7pWqyYqZw4Cz
+	lMFkkA==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41xa12n0k2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Sep 2024 14:29:54 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48UETrCV008012
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 30 Sep 2024 14:29:53 GMT
+Received: from [10.111.183.230] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 30 Sep
+ 2024 07:29:52 -0700
+Message-ID: <6a07392e-b296-4a1b-9444-aa0e2f7eb78c@quicinc.com>
+Date: Mon, 30 Sep 2024 07:29:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 27/35] mac80211: Reorganize kerneldoc parameter names
+To: Julia Lawall <Julia.Lawall@inria.fr>,
+        Johannes Berg
+	<johannes@sipsolutions.net>
+CC: <kernel-janitors@vger.kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+ <20240930112121.95324-28-Julia.Lawall@inria.fr>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <20240930112121.95324-28-Julia.Lawall@inria.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: oam3lfWcCdJQAVnqNPKThWDjszyIyDMS
+X-Proofpoint-GUID: oam3lfWcCdJQAVnqNPKThWDjszyIyDMS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=574
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 malwarescore=0 spamscore=0 clxscore=1015 mlxscore=0
+ adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409300105
 
-On Sun, Sep 29, 2024 at 08:21:03PM GMT, Alexander Mikhalitsyn wrote:
->Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
->
->It is useful because it allows userspace to check if vhost_vsock is there when it is
->configured as a built-in.
->
->This is what we have *without* this change and when vhost_vsock is configured
->as a module and loaded:
->
->$ ls -la /sys/module/vhost_vsock
->total 0
->drwxr-xr-x   5 root root    0 Sep 29 19:00 .
->drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
->-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
->drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
->-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
->-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
->drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
->-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
->drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
->-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
->-r--r--r--   1 root root 4096 Sep 29 20:05 taint
->--w-------   1 root root 4096 Sep 29 19:00 uevent
->
->When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
->And this looks like an inconsistency.
->
->With this change, when vhost_vsock is configured as a built-in we get:
->$ ls -la /sys/module/vhost_vsock/
->total 0
->drwxr-xr-x   2 root root    0 Sep 26 15:59 .
->drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
->--w-------   1 root root 4096 Sep 26 15:59 uevent
->-r--r--r--   1 root root 4096 Sep 26 15:59 version
->
->Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
->---
-> drivers/vhost/vsock.c | 1 +
-> 1 file changed, 1 insertion(+)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 802153e23073..287ea8e480b5 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
->
-> module_init(vhost_vsock_init);
-> module_exit(vhost_vsock_exit);
->+MODULE_VERSION("0.0.1");
-
-I was looking at other commits to see how versioning is handled in order 
-to make sense (e.g. using the same version of the kernel), and I saw 
-many commits that are removing MODULE_VERSION because they say it 
-doesn't make sense in in-tree modules.
-
-In particular the interesting thing is from nfp, where 
-`MODULE_VERSION(UTS_RELEASE);` was added with this commit:
-
-1a5e8e350005 ("nfp: populate MODULE_VERSION")
-
-And then removed completely with this commit:
-
-b4f37219813f ("net/nfp: Update driver to use global kernel version")
-
-CCing Jakub since he was involved, so maybe he can give us some 
-pointers.
-
-Thanks,
-Stefano
-
-> MODULE_LICENSE("GPL v2");
-> MODULE_AUTHOR("Asias He");
-> MODULE_DESCRIPTION("vhost transport for vsock ");
->-- 
->2.34.1
->
+On 9/30/2024 4:21 AM, Julia Lawall wrote:
+> Reorganize kerneldoc parameter names to match the parameter
+> order in the function header.
+> 
+> Problems identified using Coccinelle.
+> 
+> Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
+Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 
 
