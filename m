@@ -1,164 +1,241 @@
-Return-Path: <netdev+bounces-130424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E3998A679
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:00:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 510BE98A697
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:05:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD013281543
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:00:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FB0D2828DB
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B4A1917E7;
-	Mon, 30 Sep 2024 13:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913371917C9;
+	Mon, 30 Sep 2024 14:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="TC23zq9t";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mD2kZMYW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AVTv1xNO"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784271917D6;
-	Mon, 30 Sep 2024 13:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5977818FDB2
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727704646; cv=none; b=ZOy9xbLMRFGbcnsUF4saOz99gXbaufBk43Edcs3hI00QrUb312m37+pPutZdtAylwN/II57nxaEKCPl6hF8Ji2/mTGUiwz6KLOPITTbu97I75+toEkxxmdmAXHcaSsYjmz0W77uHks8uZvUZRKdxRlZgUgjL0gTcfrSvD6719P4=
+	t=1727705120; cv=none; b=tkhgAaL6eOu6poOXYq8YOYmJsHIi/nWz6voZ2KFD15WgFIJrGucvnJSwldFtDsFAoCf+i5k0bBoNlS8ry65peJzaEeVhEH7QyMWmkFoPnQuixKywWZ3WgM9Cy+nXElEZ/bnsGCtEPn/izdQvew2HF3kbWvZW8oHAMFKiPb36q9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727704646; c=relaxed/simple;
-	bh=QCBFPxmVRNOK/b5sAejjKo7owEzuauLEMn65u4OcpX4=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Gg4KXtlcKZeI+hLZF4R7rv0kjdQzkP8JoOGxQML0ygQwj63ATIy3uWinltiPo1rK01g0Ixh7YRC30ddaSPC/CPtoo4TqUnij7SLMokZLQAGu+YXPyUrufrUKdnYA3+s15qOx4UXk2vwCHP9YTPxu69L7YzCfZCAxG4zdhVVoq3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=TC23zq9t; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mD2kZMYW; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 7A1FF114018C;
-	Mon, 30 Sep 2024 09:57:22 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Mon, 30 Sep 2024 09:57:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1727704642;
-	 x=1727791042; bh=NSoee6bnuXvKPKgroQdbhisM+ZgHsKn6G++bqEuUpII=; b=
-	TC23zq9tLXqdZxR06X0WFKYbIy2lR3mJat6QcJZ/MAajqfZXHGuGxe+c1XWI3Pu1
-	tpq+3VPIKbc0BeTM2Ushzya6wy+U8i83bQyMrAoXxM4lozwEzrJWHz1hC0EqunmU
-	qhJVtHiUBJ5dyXvVbC6ZWcIFqklYqDLiJpQ16FExILkQCJw9/3hfkac6ZP/4iORZ
-	cZHT5o6G2fXc8kbnqFIIligMGofkv6iGsmcn7IjSgKZm9UpsRr1G3K90jCo4tGhZ
-	NhZdVke7Xk1WZAKhwU84PKgdWYq7qdm7tc+fRhqJh+wPiTbZzd549kR/z/t6L0Hd
-	0nfVU3YUYhzgXg7RDlYYIQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1727704642; x=
-	1727791042; bh=NSoee6bnuXvKPKgroQdbhisM+ZgHsKn6G++bqEuUpII=; b=m
-	D2kZMYWXZfVGZrOtcv0kDYhn/14fNJ1OzgERlC6nRndDe9BvQdiVsUUGwvQp8i7e
-	KYyRO72YwSJg/8ATl8ra+wzKT505zW1OhQzB9YCPvTWjgUjGdJ33qukTCetPr8Ct
-	zghv9YOXom6UbyH6qhQqEbKJ/tDLjcWXACsmiiHraQ3rXTrvZTAgNCKVF6hmDMud
-	Hrt/xrbwfv4lvttGRW0CZNE+k6tsniYFoZsAe/rKtDVxNx+fnpzNzlxYU6i7YUYz
-	bUh5if0Af19I5z4K41neztAQvG4ch0weCUiyI3W2y+DAPCv30rqU0QDQtqNdAvmC
-	3APCmfz6A5F7bAIy6HlFw==
-X-ME-Sender: <xms:Qq76ZtcMD1VHOm_5tgmyNUUJTYiHejXNafbh_6vC9t2ZZPAVgClcKA>
-    <xme:Qq76ZrO9G01KMxPz2hziRapL4rOTnD3sOKY220otwJf3AMTZM2VdN3ksRbbJdKVjP
-    c8pXNeRnbUDTvnjxyM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdduhedgjedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhepfefhheetffduvdfgieeghfejtedvkeetkeejfeek
-    keelffejteevvdeghffhiefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlh
-    hushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghr
-    nhgusgdruggvpdhnsggprhgtphhtthhopeefvddpmhhouggvpehsmhhtphhouhhtpdhrtg
-    hpthhtohepuggvrhgvkhdrkhhivghrnhgrnhesrghmugdrtghomhdprhgtphhtthhopegu
-    rhgrghgrnhdrtghvvghtihgtsegrmhgurdgtohhmpdhrtghpthhtohephhgvrhhvvgdrtg
-    houghinhgrsegsohhothhlihhnrdgtohhmpdhrtghpthhtoheplhhutggrrdgtvghrvghs
-    ohhlihessghoohhtlhhinhdrtghomhdprhgtphhtthhopehthhhomhgrshdrphgvthgrii
-    iiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghm
-    lhhofhhtrdhnvghtpdhrtghpthhtoheprghnugihrdhshhgvvhgthhgvnhhkohesghhmrg
-    hilhdrtghomhdprhgtphhtthhopegshhgvlhhgrggrshesghhoohhglhgvrdgtohhmpdhr
-    tghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomh
-X-ME-Proxy: <xmx:Qq76ZmjvotPzzy6o4IjTfEWR1Ae1ZZZZ6nNQSKX7qnPLT0IG38l1SA>
-    <xmx:Qq76Zm_LOqj4ciNOWbaMWYb-D0OvO5_n4Ih7TGFh2jhHae1ThBZXCg>
-    <xmx:Qq76ZpscZnyHVWm5vJL_KaNhoZQUCYXtiIgim11BL25IToQMXpkyzQ>
-    <xmx:Qq76ZlEM-P5HUNSqZ7juqxINfjRi5uysuuE6F8FlFVFYe6WkE5UoGA>
-    <xmx:Qq76ZnpXwJQdtwlwl7OqZcRUBrXUnWJ1ApxdtT2tFL4K14X2Po1AFe7b>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id DE1282220071; Mon, 30 Sep 2024 09:57:21 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1727705120; c=relaxed/simple;
+	bh=8BGV6YA2jSXgAI4/qg8vo/il6pLpZ5Aufd6kqqJ600o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AUERbJ1xlrLQCUqr20hCYGCyxIzhNo+KPQyy0DmI7JS98tjmdaTlI8WF38lyvgCtVSFVZZ11j9MjWIY2s+ddUcmq6QZYVvGz9eHMBjK1WutoXH//ZjSW4AEQyFo5UysgM35+yr1wFgFIffh2BEK2JFA5R+pVW+qKmhc/qhK7KpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AVTv1xNO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727705115;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KbhYe2/DTQRFzN+Y7O/uex+Kh54T+vm7XXpc5sSRsSU=;
+	b=AVTv1xNOvKYu4LA/D2IpsmbJhOqNsu5z6kwLjpURZ3QVJ0EEbu4k5A1NKqSRfBq+ezJNfA
+	vO9/RaX3pzjhLtGZJuK6n+OgO+qfFubzlbjwDslBc/6x6GmAnb5vZdvUKob412fT7LapNz
+	pdGfThe1i4CkKZsAywb8DC8qQEgUsJA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-281-8c2O5GUcOJ-lr0dy4KhgcQ-1; Mon, 30 Sep 2024 10:05:14 -0400
+X-MC-Unique: 8c2O5GUcOJ-lr0dy4KhgcQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cdeac2da6so36957455e9.2
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 07:05:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727705113; x=1728309913;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KbhYe2/DTQRFzN+Y7O/uex+Kh54T+vm7XXpc5sSRsSU=;
+        b=QpK+Z2kOmZKYe77QuQ7Ck3w+9SfDiLMxsU6PGvFQjc4SwSGXATTLKcnmiYFCggqOjG
+         xw1+vc+s0ewamAB0+OVylOaZS/qB30jkBRUWgKRK/7XDgK03PNVq2rH0y3KUr23tofEV
+         7VOW8J9KUhoRP+prW5mRdw0p9iPwlgaLMHnlrjbsa4/eHW90bnu+/XsxayWj4KU8KnBy
+         /vo/1Nb3e3y4Gmff5b9Wj9vUlyU7s3yRkuTv5eTTRufDLfnJalBCBx40djTPuvwYLxb4
+         LhjFN+Lkjwg/SudUgA3+/BOMblmRKd0nWJZbpeOMnO5O4bAIcu/yr06+0p5TRH88TqGs
+         kFZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+XzO9dWDUYm24CBXFItyjZ9SGbUAcz0GqXj57/5duNJuH3VCc4OCSEqX9n2AXSrdswTly0/U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywfl+DQjqXwXq7gKeO4l4aPIon6FG3wDsuBW0vFv25p6JNigY1x
+	66+wThqhLnTYePe6mWxKKwGOXkj0l7MkRU6HoLQIuU3fmz5NGLFUFLlo8lHVPqUJL935xmkAADS
+	+u/APxy0/jnOVvM56eLsXrd8hBx4QO/Zv0bUFNaIsGSPuhljijF2+qA==
+X-Received: by 2002:a05:600c:45cb:b0:42c:b905:2bf9 with SMTP id 5b1f17b1804b1-42f5844aaf2mr102046405e9.16.1727705112923;
+        Mon, 30 Sep 2024 07:05:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHedwkuap3eJCT3RHcthIkOqlbt0d6yHOSw0A1Hk3ikUkgu+/CDxR6xGUFVDewLI1wRMZ9G9Q==
+X-Received: by 2002:a05:600c:45cb:b0:42c:b905:2bf9 with SMTP id 5b1f17b1804b1-42f5844aaf2mr102046045e9.16.1727705112494;
+        Mon, 30 Sep 2024 07:05:12 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:55d:ca3b:807c:fdd2:f46d:60e7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a36244sm152852005e9.38.2024.09.30.07.05.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 07:05:11 -0700 (PDT)
+Date: Mon, 30 Sep 2024 10:05:08 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+Message-ID: <20240930100452-mutt-send-email-mst@kernel.org>
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+ <20240929150147-mutt-send-email-mst@kernel.org>
+ <CAEivzxcvokDUPWzj48aJX6a4RU_i+OdMOH=fyLQW+FObjKpZDQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 30 Sep 2024 13:57:01 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herve Codina" <herve.codina@bootlin.com>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>,
- "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>,
- "Lars Povlsen" <lars.povlsen@microchip.com>,
- "Steen Hegelund" <Steen.Hegelund@microchip.com>,
- "Daniel Machon" <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Allan Nielsen" <allan.nielsen@microchip.com>,
- "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
-Message-Id: <d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
-In-Reply-To: <20240930121601.172216-3-herve.codina@bootlin.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
- <20240930121601.172216-3-herve.codina@bootlin.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item when
- cpu-syscon is not present
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEivzxcvokDUPWzj48aJX6a4RU_i+OdMOH=fyLQW+FObjKpZDQ@mail.gmail.com>
 
-On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
-> In the LAN966x PCI device use case, syscon cannot be used as syscon
-> devices do not support removal [1]. A syscon device is a core "system"
-> device and not a device available in some addon boards and so, it is not
-> supposed to be removed.
->
-> In order to remove the syscon usage, use a local mapping of a reg
-> address range when cpu-syscon is not present.
->
-> Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1]
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
+On Mon, Sep 30, 2024 at 02:28:30PM +0200, Aleksandr Mikhalitsyn wrote:
+> On Sun, Sep 29, 2024 at 9:03 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Sun, Sep 29, 2024 at 08:21:03PM +0200, Alexander Mikhalitsyn wrote:
+> > > Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
+> > >
+> > > It is useful because it allows userspace to check if vhost_vsock is there when it is
+> > > configured as a built-in.
+> > >
+> > > This is what we have *without* this change and when vhost_vsock is configured
+> > > as a module and loaded:
+> > >
+> > > $ ls -la /sys/module/vhost_vsock
+> > > total 0
+> > > drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+> > > drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+> > > drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+> > > drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+> > > drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+> > > -r--r--r--   1 root root 4096 Sep 29 20:05 taint
+> > > --w-------   1 root root 4096 Sep 29 19:00 uevent
+> > >
+> > > When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
+> > > And this looks like an inconsistency.
+> >
+> > And that's expected.
+> >
+> > > With this change, when vhost_vsock is configured as a built-in we get:
+> > > $ ls -la /sys/module/vhost_vsock/
+> > > total 0
+> > > drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+> > > drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+> > > --w-------   1 root root 4096 Sep 26 15:59 uevent
+> > > -r--r--r--   1 root root 4096 Sep 26 15:59 version
+> >
+> 
+> Hi Michael,
+> 
+> > Sorry, what I'd like to see is an explanation which userspace
+> > is broken without this change, and whether this patch fixes is.
+> 
+> Ok, let me try to write a proper commit message in this thread. I'll
+> send a v3 once we agree on it (don't want to spam busy
+> kvm developers with my one-liner fix in 10 different revisions :-) ).
+> 
+> ============
+> Add an explicit MODULE_VERSION("0.0.1") specification for the
+> vhost_vsock module.
+> 
+> It is useful because it allows userspace to check if vhost_vsock is
+> there when it is
+> configured as a built-in. We already have userspace consumers [1], [2]
+> who rely on the
+> assumption that if <any_linux_kernel_module> is loaded as a module OR configured
+> as a built-in then /sys/module/<any_linux_kernel_module> exists. While
+> this assumption
+> works well in most cases it is wrong in general. For a built-in module
+> X you get a /sys/module/<X>
+> only if the module declares MODULE_VERSION or if the module has any
+> parameter(s) declared.
+> 
+> Let's just declare MODULE_VERSION("0.0.1") for vhost_vsock to make
+> /sys/module/vhost_vsock
+> to exist in all possible configurations (loadable module or built-in).
+> Version 0.0.1 is chosen to align
+> with all other modules in drivers/vhost.
+> 
+> This is what we have *without* this change and when vhost_vsock is configured
+> as a module and loaded:
+> 
+> $ ls -la /sys/module/vhost_vsock
+> total 0
+> drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+> drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+> -r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+> drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+> -r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+> -r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+> drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+> -r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+> drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+> -r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+> -r--r--r--   1 root root 4096 Sep 29 20:05 taint
+> --w-------   1 root root 4096 Sep 29 19:00 uevent
+> 
+> When vhost_vsock is configured as a built-in there is *no*
+> /sys/module/vhost_vsock directory at all.
+> And this looks like an inconsistency.
+> 
+> With this change, when vhost_vsock is configured as a built-in we get:
+> $ ls -la /sys/module/vhost_vsock/
+> total 0
+> drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+> drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+> --w-------   1 root root 4096 Sep 26 15:59 uevent
+> -r--r--r--   1 root root 4096 Sep 26 15:59 version
+> 
+> Link: https://github.com/canonical/lxd/blob/ef33aea98aec9778499e96302f2605882d8249d7/lxd/instance/drivers/driver_qemu.go#L8568
+> [1]
+> Link: https://github.com/lxc/incus/blob/cbebce1dcd5f15887967058c8f6fec27cf0da2a2/internal/server/instance/drivers/driver_qemu.go#L8723
+> [2]
+> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> ============
+> 
+> Does this sound fair enough?
+> 
+> Kind regards,
+> Alex
 
->>  	err = mchp_sparx5_map_syscon(pdev, "cpu-syscon", &ctx->cpu_ctrl);
-> -	if (err)
-> +	switch (err) {
-> +	case 0:
-> +		break;
-> +	case -ENODEV:
 
-I was expecting a patch that would read the phandle and map the
-syscon node to keep the behavior unchanged, but I guess this one
-works as well.
+Looks good, thanks!
 
-The downside of your approach is that it requires an different
-DT binding, which only works as long as there are no other
-users of the syscon registers.
+> >
+> >
+> >
+> > > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> > > ---
+> > >  drivers/vhost/vsock.c | 1 +
+> > >  1 file changed, 1 insertion(+)
+> > >
+> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > > index 802153e23073..287ea8e480b5 100644
+> > > --- a/drivers/vhost/vsock.c
+> > > +++ b/drivers/vhost/vsock.c
+> > > @@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+> > >
+> > >  module_init(vhost_vsock_init);
+> > >  module_exit(vhost_vsock_exit);
+> > > +MODULE_VERSION("0.0.1");
+> > >  MODULE_LICENSE("GPL v2");
+> > >  MODULE_AUTHOR("Asias He");
+> > >  MODULE_DESCRIPTION("vhost transport for vsock ");
+> > > --
+> > > 2.34.1
+> >
 
-     Arnd
 
