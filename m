@@ -1,189 +1,243 @@
-Return-Path: <netdev+bounces-130530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC9098ABA7
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:08:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE90E98ABAB
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B46B61F21E7F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:08:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5BF283930
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651741990BB;
-	Mon, 30 Sep 2024 18:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F38199234;
+	Mon, 30 Sep 2024 18:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AbIQQmTB"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AnosJ7u4";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PxAZARrR";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AnosJ7u4";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PxAZARrR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B34DE192D7F;
-	Mon, 30 Sep 2024 18:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613EE1990D1
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727719679; cv=none; b=S15qyLlQuiZDU9goRS8BAllnFgACuzr6nz8LLCQmG+RIGnW3S6ngX7CmIib6YPJplOxikb9anWOBgNf1hjk/Ri6VuoZ6pfxJ+W31QtUch7GE8n4yezXlX9B7qxDCSW8S0ttmybJJwt6ngSSvViJI+YafnTVrWpZQV02B6Xvzdmw=
+	t=1727719763; cv=none; b=HtEHZntx8I649lbY7reIeQjhPZx1i411uWP0BANcnE1rZFW1eln7FYLJjZUjG1hZfOjFHyR9Xlt5Sw5aLbQeek37+j6bPM/JqUlBURuIBdtYaEXgnutXmXm7HYQTj7R6AbF/nDyuzJHo+K+KZqb/4ZzHaMRKFmwbGEkldGXPKDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727719679; c=relaxed/simple;
-	bh=2yfjV0n2fQvSlVYlX7wNns3lLhJSYJ3XV83Nw0ib6YI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ti/tq+bg3I6tapCLt+8zCjGRiX3ZSrT8chKLUTTYQdD0emeJj6GPyJa+dhCyQ11SxyhJgpUG8fl+fk87Iiv34+5+T0VUFwFyYJVh7Wdh6ZLLiHR830gavemzFyjAwfMTjp2sYfEn3YgMy6eZGB8VEmlzCb1o5Rtf3Mc0eyx7uFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AbIQQmTB; arc=none smtp.client-ip=209.85.221.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-5094e0c0d71so490466e0c.2;
-        Mon, 30 Sep 2024 11:07:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727719676; x=1728324476; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/wFYcYi1x+ZrQ9uMGVi8n5XM09/Rz/A0sPv6fdkzgVU=;
-        b=AbIQQmTB28EQPewHDGrcccqgJ3qwJAwEo0PEDVPI7u1kaGt10hCvcn+cTAs10FOhmt
-         +AxOSaXsXV2Y1bcT416NjaVkOaHnYtDofs+6O/C0p7MAO/UiZ4/tz7mnvQENv5qw/q2B
-         WAAng6VWdVQPoDaQKE17fNQkPzR/8VYkpRaWXagvAQ73T2IucznpF2npHY/cxznwGNDb
-         cN+rOhNAptBbKBldvc5h88mGLJ2QlgSCVvFbtcGM6esIOQAe6LaqgPytlKcBXal73zij
-         +puMyI0vGL/llj3lx3aLItJFUaJKNEED6x4gIGu5uif0UGk5hAZrO4jn+IjrHdbliArK
-         4Hqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727719676; x=1728324476;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/wFYcYi1x+ZrQ9uMGVi8n5XM09/Rz/A0sPv6fdkzgVU=;
-        b=M78hsBG8dptVUGKbxfKUrxxS7sUtLSbtmPITXxz2viqQIPsDsQ92dZS/uWlSa7sWKl
-         jWeNOpyiyKM5ds722/IgjgRA/qAc1GFxl7270b4fw08zuJxoZmJHYH0pT/OHR+Aeszz4
-         idUjkisLiQhekXGT8pXJ7GU4xv0T0957c0NhaRYncEBaBoSwHY+NvaDgyBkH7+wxGdmQ
-         /OhPr/WCHt0yttdlxMttCMn593hLus4AqojVCy1N7XcTaL2Q3XSH0+0wMbmTWAOOcWqh
-         U3v1EEauUlqOMgqNx+R1NxNs15ZtekgDlgLsRPt/8X88T46Sl6WpZi56NKEM267w6k/J
-         27rA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPL1YyLhmxx+of1ZR4a+c8W8Q2dF5Ol9TDSJyikkA49oAAPawku67OXytXak1Jp5h2qFBK06Y2@vger.kernel.org, AJvYcCXYpXJLPkEBDS9A1lgeZ+wxjdT1rccEiiLvxiRs8lO2Xgbe6agYhprn8Bu6jOOQee1Q5Chqi6LDmpzjDQI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywfs9HaXbvUdBoXBlj4wNZNb8i4FsyfJpMsTn4UkWK5wCwBUvns
-	3IPyCkpBps9Pf1wbaV7CJFdsaQhORKgsDkDTnjs3c+t9guxCDnq3pR7ah/b4BbSeOciXi/sib4M
-	6GES4QHnRIfpHoGq5Sg9d7cXWrTA=
-X-Google-Smtp-Source: AGHT+IGid9mFu2KKC1Y3XaIGaQYrgeekYnr4QMQgDTkuCFH3p3bUX9Q6HEMdA8MtCZWqYP3vGUcd4DX3z+BnDPsymK4=
-X-Received: by 2002:a05:6122:251d:b0:50a:76c9:1bb with SMTP id
- 71dfb90a1353d-50a76d84964mr3076382e0c.11.1727719676533; Mon, 30 Sep 2024
- 11:07:56 -0700 (PDT)
+	s=arc-20240116; t=1727719763; c=relaxed/simple;
+	bh=oy+uSwx4XxhLUIdVHhHRuqQqQRExaoTw9lJviTtJcNY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=OceQaCKeEb6JDklw5SlAwp5bnDFalSkmoYicY4gYRVNwZHMYluHLVQyDQ38lyhRMdMttmeUXMR/IyniYc3+VExfUG9+bchifvUIcIKseuL+Y6ag6JmHTph75MVpp+Z7jgAw8LkSjsSESCIDU1BskDtZh/eKCs34qpZdRIaiNj/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AnosJ7u4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PxAZARrR; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AnosJ7u4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PxAZARrR; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id AA0191F814;
+	Mon, 30 Sep 2024 18:09:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727719757; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=KECiQiOiWGgm1BaGr/GBzJZYiMR4R1jdJFmzdkHUNHw=;
+	b=AnosJ7u4Lrpeaau38Z2dfTX2vbhiJhFkLlgEjaPMT+URMcjp5fo5yA7ZxDhu++8i10a2KX
+	UiNeYzEUwhIpGqX58g9pgNNVIHoLMzeTCS8Fyk3QyLLbrOpgYnXj5v8uq3LuFbGG+Y8Vcp
+	YOSlRKMnBBX6vW4aQVEH2+Y2cVRXpYk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727719757;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=KECiQiOiWGgm1BaGr/GBzJZYiMR4R1jdJFmzdkHUNHw=;
+	b=PxAZARrRBGEBo917BFbAhZZ0QYDLn4nPu0ewZS3KjeyrJLTrHgVayv/W4kiKMqiyC0LO1g
+	w3jJgbE0cUuaKyCQ==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1727719757; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=KECiQiOiWGgm1BaGr/GBzJZYiMR4R1jdJFmzdkHUNHw=;
+	b=AnosJ7u4Lrpeaau38Z2dfTX2vbhiJhFkLlgEjaPMT+URMcjp5fo5yA7ZxDhu++8i10a2KX
+	UiNeYzEUwhIpGqX58g9pgNNVIHoLMzeTCS8Fyk3QyLLbrOpgYnXj5v8uq3LuFbGG+Y8Vcp
+	YOSlRKMnBBX6vW4aQVEH2+Y2cVRXpYk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1727719757;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type;
+	bh=KECiQiOiWGgm1BaGr/GBzJZYiMR4R1jdJFmzdkHUNHw=;
+	b=PxAZARrRBGEBo917BFbAhZZ0QYDLn4nPu0ewZS3KjeyrJLTrHgVayv/W4kiKMqiyC0LO1g
+	w3jJgbE0cUuaKyCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9209113A8B;
+	Mon, 30 Sep 2024 18:09:17 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id QdKbI03p+mZ1UwAAD6G6ig
+	(envelope-from <jwiesner@suse.de>); Mon, 30 Sep 2024 18:09:17 +0000
+Received: by incl.suse.cz (Postfix, from userid 1000)
+	id ABE6AB102B; Mon, 30 Sep 2024 20:09:16 +0200 (CEST)
+Date: Mon, 30 Sep 2024 20:09:16 +0200
+From: Jiri Wiesner <jwiesner@suse.de>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [RFC PATCH] ipv6: route: release reference of dsts cached in sockets
+Message-ID: <20240930180916.GA24637@incl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240926160513.7252-1-kdipendra88@gmail.com> <20240927110236.GK4029621@kernel.org>
- <20240927112958.46unqo3adnxin2in@skbuf> <20240927120037.ji2wlqeagwohlb5d@skbuf>
-In-Reply-To: <20240927120037.ji2wlqeagwohlb5d@skbuf>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Mon, 30 Sep 2024 23:52:45 +0545
-Message-ID: <CAEKBCKP2pGoy=CWpzn+NGq8r4biu=XVnszXQ=7Ruuan8rfxM1Q@mail.gmail.com>
-Subject: Re: [PATCH net v5] net: systemport: Add error pointer checks in
- bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Simon Horman <horms@kernel.org>, florian.fainelli@broadcom.com, 
-	bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	maxime.chevallier@bootlin.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Score: -3.80
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_THREE(0.00)[3];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-Hi Vladimir,
+An unbalanced refcount was reported for the loopback device of a net
+namespace being destroyed:
+unregister_netdevice: waiting for lo to become free. Usage count = 2
 
-On Fri, 27 Sept 2024 at 17:45, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
->
-> On Fri, Sep 27, 2024 at 02:29:58PM +0300, Vladimir Oltean wrote:
-> > > > + dp = dsa_port_from_netdev(slave_dev);
-> > > > + if (IS_ERR(dp))
-> > > > +         return PTR_ERR(dp);
-> >
-> > I don't see an explanation anywhere as for why dsa_port_from_netdev()
-> > could ever return a pointer-encoded error here? hmm? Did you follow the
-> > call path and found a problem?
->
+Analysis revealed that the IPv6 net device corresponding to the loopback
+device did not get destroyed (in6_dev_finish_destroy() was not called).
+The IPv6 loopback device had an unbalaced refcount:
+net dev 73da100 lo refcount 1
+Operation                     Count Balancing Operation     Count
+hold  __ipv6_dev_mc_inc           2 ma_put                      2
+      addrconf_ifdown             1                             0 unbalanced
+hold  fib6_nh_init                2 fib6_nh_init                2
+put   inet6_ifa_finish_destroy    1 ipv6_add_addr               1
+      ip6_dst_destroy            90                             0 unbalanced
+      ip6_dst_ifdown             90                             0 unbalanced
+hold  ip6_route_dev_notify        6 ip6_route_dev_notify        6
+hold  ipv6_add_addr               1 inet6_ifa_finish_destroy    1
+put   ma_put                      2 __ipv6_dev_mc_inc           2
+hold  ndisc_netdev_event          2 ndisc_netdev_event          2
+      rt6_disable_ip              1                             0 unbalanced
 
-Yeah, you are right. I ran smatch to find this and saw there is no
-validation. I did not see any problem as you said. I thought it would
-be better to include this change. If you say there is no point for
-this change, then that's also fine for me. I got the chance to learn
-new things.
+The refcount of addrconf_ifdown() balances the refcount increment in
+ipv6_add_dev(), which had no corresponding trace entry. The
+rt6_disable_ip() and ip6_dst_ifdown() entries were hold operations on the
+looback device, and the ip6_dst_destroy() entries were put operations. One
+refcount decrement in ip6_dst_destroy() was not executed. At this point, a
+hash was implemented in the debug kernel to hold the changes of the
+refcount of dst objects per namespace. The trace for the dst object that
+did not decrement the IPv6 refcount of loopback follows:
 
-> To make my point even clearer. As the code goes:
->
-> bool dsa_user_dev_check(const struct net_device *dev)
-> {
->         // This dereferences "dev" without a NULL pointer check.
->         // If the kernel did not crash, it means that "dev" is not null.
->         return dev->netdev_ops == &dsa_user_netdev_ops;
-> }
->
-> static int bcm_sysport_netdevice_event(struct notifier_block *nb,
->                                        unsigned long event, void *ptr)
-> {
->         ...
->         switch (event) {
->         case NETDEV_CHANGEUPPER:
->                 ...
->                 if (!dsa_user_dev_check(info->upper_dev))
->                         return NOTIFY_DONE;
->
->                 // we know here that dsa_user_dev_check() is true, and
->                 // no one changes dev->netdev_ops at runtime, to suspect
->                 // it could become false after it just returned true.
->                 // Even if it did, we are under rtnl_lock(), and whoever
->                 // did that better also acquired rtnl_lock(). Thus,
->                 // there is enough guarantee that this also remains true
->                 // below.
->                 if (info->linking)
->                         ret = bcm_sysport_map_queues(dev, info->upper_dev);
->                 else
->                         ret = bcm_sysport_unmap_queues(dev, info->upper_dev);
->         }
->         ...
-> }
->
-> struct dsa_port *dsa_port_from_netdev(struct net_device *netdev)
-> {
->         if (!netdev || !dsa_user_dev_check(netdev))
->                 return ERR_PTR(-ENODEV);
->
->         return dsa_user_to_port(netdev);
-> }
->
-> static int bcm_sysport_map_queues(struct net_device *dev,
->                                   struct net_device *slave_dev)
-> {
->         struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
->         ...
-> }
->
-> So, if both conditions for dsa_port_from_netdev() to return ERR_PTR(-ENODEV)
-> can only be false, why would we add an error check? Is it to appease a
-> static analysis tool which doesn't analyze things very far? Or is there
-> an actual problem?
->
-> And why does this have a Fixes: tag and the expectation to be included
-> as a bug fix to stable kernels?
->
-> And why is the author of the blamed patch even CCed only at v5?!
+Function        Parent       Op  Net            Device Dst              Refcount Diff
+ip6_dst_ifdown: dst_dev_put: dst ff404b2f073da100 eth0 ff404af71ffc9c00 1
+ip6_negative_advice: tcp_retransmit_timer: dst_hold ff404b2f073da100 eth0 ff404af71ffc9c00 1
+dst_alloc: ip6_dst_alloc: dst_hold ff404b2f073da100 eth0 ff404af71ffc9c00 1
+ip6_route_output_flags: ip6_dst_lookup_tail: dst_hold ff404b2f073da100 eth0 ff404af71ffc9c00 84
+dst_release: ip6_negative_advice: dst_put ff404b2f073da100 eth0 ff404af71ffc9c00 1
+dst_release: tcp_retransmit_timer: dst_put ff404b2f073da100 eth0 ff404af71ffc9c00 20
+dst_release: inet_sock_destruct: dst_put ff404b2f073da100 eth0 ff404af71ffc9c00 29
+dst_release: __dev_queue_xmit: dst_put ff404b2f073da100 eth0 ff404af71ffc9c00 34
+dst_release: rt6_remove_exception: dst_put ffffffff9c8e2a80 blackhole_dev ff404af71ffc9c00 1
 
-Sorry to know this, I ran the script and there I did not find your name.
+The ip6_dst_ifdown() trace entry was neither a hold nor a put - it merely
+indicates that the net device of the dst object was changed to
+blackhole_dev and the IPv6 refcount was transferred onto the loopback
+device. There was no ip6_dst_destroy() trace entry, which means the dst
+object was not destroyed. There were 86 hold operations but only 85 put
+operations so the dst object was not destroyed because the refcount of the
+dst object was unbalanced.
 
-./scripts/get_maintainer.pl drivers/net/ethernet/broadcom/bcmsysport.c
-Florian Fainelli <florian.fainelli@broadcom.com> (supporter:BROADCOM
-SYSTEMPORT ETHERNET DRIVER)
-Broadcom internal kernel review list
-<bcm-kernel-feedback-list@broadcom.com> (reviewer:BROADCOM SYSTEMPORT
-ETHERNET DRIVER)
-"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
-Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
-Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
-Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
-netdev@vger.kernel.org (open list:BROADCOM SYSTEMPORT ETHERNET DRIVER)
-linux-kernel@vger.kernel.org (open list)
+The problem is that the refcount sums are ambiguous. The most probable
+explanation is this: The dst object was a route for an IPv6 TCP connection
+that kept timing out. Sometimes, the process closed the socket, which
+corresponds to the refcount decrements of the
+dst_release()/inet_sock_destruct() entries. Sometimes, the TCP retransmit
+timer reset the dst of the sockets, which corresponds to the
+dst_release()/tcp_retransmit_timer() entries. I am unsure about the
+dst_release()/__dev_queue_xmit() entries because inet6_csk_xmit() sets
+skb->_skb_refdst with SKB_DST_NOREF.
 
-Thank you so much for your time and effort , special thanks to Simon
-for everything ,thanks Vladimir for the way you explained. and thanks
-Florian for your help.
+The feature that sets the above trace apart from all the other dst traces
+is the execution of ip6_negative_advice() for a cached and also expired
+dst object in the exception table. The cached and expired dst object has
+its refcount set to at least 2 before executing rt6_remove_exception_rt()
+found in ip6_negative_advice(). One decrement happens in
+rt6_remove_exception() after the dst object has been removed from the
+exception table. The other decrement happens in sk_dst_reset() but that
+one is counteracted by a dst_hold() intentionally placed just before the
+sk_dst_reset() in ip6_negative_advice(). The probem is that a socket that
+keeps a reference to a dst in its sk_dst_cache member increments the
+refcount of the dst by 1. This is apparent in the following code paths:
+* When ip6_route_output_flags() finds a dst that is then stored in
+  sk->sk_dst_cache by ip6_dst_store() called from inet6_csk_route_socket().
+* When inet_sock_destruct() calls dst_release() for sk->sk_dst_cache
+Provided the dst is not kept in the sk_dst_cache member of another socket,
+there is no other object tied to the dst (the socket lost its reference
+and the dst is no longer in the exception table) and the dst becomes a
+leaked object after ip6_negative_advice() finishes. This leak then
+precludes the net namespace from being destroyed.
 
-Best regards,
-Dipendra Khadka
+The patch that introduced the dst_hold() in ip6_negative_advice() was
+92f1655aa2b22 ("net: fix __dst_negative_advice() race"). But 92f1655aa2b22
+only refactored the code with regards to the dst refcount so the issue was
+present even before 92f1655aa2b22.
+
+Signed-off-by: Jiri Wiesner <jwiesner@suse.de>
+---
+At the moment, I am sending this as an RFC because I am not able to 
+reproduce the issue in-house. The customer that encountered the issue is 
+currently running tests. For the customer's testing, I fixed the issue 
+with a kprobe module that calls dst_release() right after 
+rt6_remove_exception_rt() returns in ip6_negative_advice(), which is not 
+quite the same as the change proposed below.
+
+ net/ipv6/route.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index b4251915585f..b70267c8d251 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -2780,10 +2780,7 @@ static void ip6_negative_advice(struct sock *sk,
+ 	if (rt->rt6i_flags & RTF_CACHE) {
+ 		rcu_read_lock();
+ 		if (rt6_check_expired(rt)) {
+-			/* counteract the dst_release() in sk_dst_reset() */
+-			dst_hold(dst);
+ 			sk_dst_reset(sk);
+-
+ 			rt6_remove_exception_rt(rt);
+ 		}
+ 		rcu_read_unlock();
+-- 
+2.35.3
+
+
+-- 
+Jiri Wiesner
+SUSE Labs
 
