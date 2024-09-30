@@ -1,117 +1,99 @@
-Return-Path: <netdev+bounces-130572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E8998ADBE
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:09:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868FF98ADC1
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCE311C21D4D
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:09:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AA8BB229BC
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:10:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15E01A00C9;
-	Mon, 30 Sep 2024 20:09:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1AB219F42E;
+	Mon, 30 Sep 2024 20:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f5j1WQ0t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35407131E2D;
-	Mon, 30 Sep 2024 20:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33737131E2D;
+	Mon, 30 Sep 2024 20:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727726951; cv=none; b=DhHViafT9ulIG63IrhtmqjplN4myQB47iBVBAZcZWioZsn+lYLzUlB5lThIf/ARZI/o6RIPOC/a7pKYPEoRYdSEsih9R4p7UVgDA/ql8jHmXs0sRZ7CuhbTMdPRmu97JWqB+8nbaXWot+mNqGfg/D7BJo8htYU7z9wHLHo+KyF0=
+	t=1727727041; cv=none; b=Z/KaizhPHZ6oi427PyW8yEtzf7ViW7tHqXriMHDehbfSay9JUfrTE4CRbMctRV5/N5yPC5MAaiHw4RT8YDh8TZznX7/KE367K3061O5QLG56E+zTC3kEAwJURA2e3x4e1UGdIDEBF17H85YCxHKJgJNVq8/bKydQV5Dvmt9olVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727726951; c=relaxed/simple;
-	bh=xUNSMaAmHVeNdhgOTWqVkl2PygFTznyJ14lxg2/JBUY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JJbgT11JugGBr5FMJRwjA6lt/yNkPohIgXVzmQy0yuE4EK4m2QfQFv1L23R02968JfPDpyNrYYtP9ii/Bh1oxZs32o8DJ7Fjnn+vPEK4BUTASANtkXgbTSs0DLksuBAlOq+PxJJTCzzBf0yI8RvBpiZGdUnVZM+7KHU1IAZG+Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.100] (213.87.154.82) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 30 Sep
- 2024 23:09:00 +0300
-Message-ID: <c71e263c-56a6-4392-9d5e-8437fad913da@omp.ru>
-Date: Mon, 30 Sep 2024 23:08:59 +0300
+	s=arc-20240116; t=1727727041; c=relaxed/simple;
+	bh=IuzDvz6CaFkUTqBqJqXg8TmtAs76PPZXyrDWEuwGADM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYFhYNTVVj8rsZ050Bk2qcQnWzBHTLJ2sZBVRGtV7MG+8xToG2z2gsPErH/B9n0WIwy1+BS45m3H36VaW7iL+NLnBMeFd/fU/Vm/G8oDlcu+AKisVeEJXoJxkf5ujzOVfG7yzLG1x8LQBsy+o/kogBI1v2KskzWUhQw4CM+ZOyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f5j1WQ0t; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Lqu5u7mXkeUogSz5T90Ei4jvVwmcYEQRpgQfkW/EFrQ=; b=f5j1WQ0tTYNWVlZFl2QowmivVH
+	/42hhEaxNSx06PmTUxxfCimKegG5YlJ0W4VJkD4NiApErG8VsZEdwi7KtJx4U/E+QBcX5+sWWoPTf
+	JrUxSG+zhYCsVSlVzp7vChGw6rHR4ZwtZY0aiYGIct8tDyD94fhtz8bvU7Vmvw+WlH4U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1svMiv-008eyS-6g; Mon, 30 Sep 2024 22:10:25 +0200
+Date: Mon, 30 Sep 2024 22:10:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: mdio: switch to scoped
+ device_for_each_child_node()
+Message-ID: <2ebbc75e-6450-464b-8c65-7f8b1f752fbd@lunn.ch>
+References: <20240930-net-device_for_each_child_node_scoped-v1-0-bbdd7f9fd649@gmail.com>
+ <20240930-net-device_for_each_child_node_scoped-v1-1-bbdd7f9fd649@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 10/11] net: ravb: Enable IPv6 TX checksum offload
- for GbEth
-To: Paul Barker <paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-CC: Paul Barker <paul.barker.ct@bp.renesas.com>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
-	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
-	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240930160845.8520-1-paul@pbarker.dev>
- <20240930160845.8520-11-paul@pbarker.dev>
-Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <20240930160845.8520-11-paul@pbarker.dev>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 09/30/2024 19:52:21
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 188103 [Sep 30 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 35 0.3.35
- d90443ea3cdf6e421a9ef5a0a400f1251229ba23
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.154.82 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.82
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/30/2024 19:56:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 9/30/2024 3:37:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240930-net-device_for_each_child_node_scoped-v1-1-bbdd7f9fd649@gmail.com>
 
-On 9/30/24 19:08, Paul Barker wrote:
-
-> From: Paul Barker <paul.barker.ct@bp.renesas.com>
+On Mon, Sep 30, 2024 at 10:03:29PM +0200, Javier Carrasco wrote:
+> There has already been an issue with the handling of early exits from
+> device_for_each_child() in this driver, and it was solved with commit
+> b1de5c78ebe9 ("net: mdio: thunder: Add missing fwnode_handle_put()") by
+> adding a call to fwnode_handle_put() right after the loop.
 > 
-> The GbEth IP supports offloading IPv6 TCP, UDP & ICMPv6 checksums.
+> That solution is valid indeed, but if a new error path with a 'return'
+> is added to the loop, this solution will fail. A more secure approach
+> is using the scoped variant of the macro, which automatically
+> decrements the refcount of the child node when it goes out of scope,
+> removing the need for explicit calls to fwnode_handle_put().
 
-   TX, you mean (and RX in previous patch?
+Hi Javier
 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-[...]
+I know you are going across the whole tree, multiple sub systems, and
+each has its own rules. I think naming patches is however pretty
+uniform across the tree. Do what other patches did:
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+d84fe6dc7377 net: mdio: thunder: Add missing fwnode_handle_put()
+a93a0a15876d net: mdio: thunder: Fix a double free issue in the .remove function
 
-MBR, Sergey
+netdev has some additional documentation you should read:
 
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+The change itself looks O.K, its just the processes which need work.
+
+	Andrew
 
