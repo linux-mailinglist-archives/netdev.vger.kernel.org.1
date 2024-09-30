@@ -1,42 +1,57 @@
-Return-Path: <netdev+bounces-130619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A7E098AEAC
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:49:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C350198AE92
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:40:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77A7281BC1
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:49:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A430B20ED6
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D593B199FAF;
-	Mon, 30 Sep 2024 20:49:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02051174EF0;
+	Mon, 30 Sep 2024 20:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GmeAP3E2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.stoffel.org (mail.stoffel.org [172.104.24.175])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB23192D80;
-	Mon, 30 Sep 2024 20:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=172.104.24.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB9B2C190;
+	Mon, 30 Sep 2024 20:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727729344; cv=none; b=NFHyQAqL+jEfuy13h6enUsyD2ho3aUDim9AO+BP3V88c2laZGOWCHNjEYcup6Q4OEopgkWvDkca6MsYeSw4eNtsb6AmCwHSdI+qimCv6lmDb54sLxzIJxKuGgywV+auHr8/nNWKtxA37y2Mu44aXM6A3O+3kGIzDDQIsKlquUgQ=
+	t=1727728803; cv=none; b=IFK7/rUuO8SoC+6XFfPHRpxPT1/ou1OUoAj0AzFUCdtj2WIuhDcfwg0hYfPtrsTN0CfwACD984p2U0f7xqKF3KnUITcX1WQPDeS3ct0li1rx0tR/o/EUhRkzF6N9SDg7FQWAMhn22AMmQyNiU2ce+2OvobJP8tWU0mzpArrw390=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727729344; c=relaxed/simple;
-	bh=YaHjeiBRe/nFirwisSZ35F2Hti7+Kk06tqfCivehidw=;
-	h=MIME-Version:Content-Type:Message-ID:Date:From:To:Cc:Subject:
-	 In-Reply-To:References; b=fqA652JLBrf2xHQO4PkkF9FSPGTIr+w0d5hiE3Wr1ukgtJl27IKLo6Qxzne0z28brvbI0WM/G5sbuqt2EHyhqgATxdCfx98+4d6v9xJApBATJkMZCbMJ5UMdZz3IrnuTNZxXMa5eRKEJk5nae9Y2jHs/14Fvxq3RRzZdu2wYfiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stoffel.org; spf=pass smtp.mailfrom=stoffel.org; arc=none smtp.client-ip=172.104.24.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=stoffel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=stoffel.org
-Received: from quad.stoffel.org (syn-097-095-183-072.res.spectrum.com [97.95.183.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	by mail.stoffel.org (Postfix) with ESMTPSA id 50FEF1E1AF;
-	Mon, 30 Sep 2024 16:39:06 -0400 (EDT)
-Received: by quad.stoffel.org (Postfix, from userid 1000)
-	id 04FA2A09C4; Mon, 30 Sep 2024 16:39:05 -0400 (EDT)
+	s=arc-20240116; t=1727728803; c=relaxed/simple;
+	bh=bhXfvGZDVJHVgM7xQOfYMGdb7f3NeP19/gm9FEGOc6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iMjnVGsXylc+SHwmByU3IlDAqPVHaRVoPF9Q/QHorW+YANC7qKp1p8PEdDUjckT6ENbZ5XOU0tCxVrpwYxFCEwdvOwy/Unp7U42McAW6sXQvSCx1Nag2rKhOMr3fKxxvEuQdrnXChgnGyFxpZvPH/ThOsZ2pjY7az6lo12dg5hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GmeAP3E2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MCv8uzyJdTNamrWhSOefnlx6mapAKvjaWzNFNqjV9CI=; b=GmeAP3E25pLefMkfEehtbhdRhS
+	sjdre0xUqNjGjJOl/bWxCzAaJYzHqLxrVbR4zmvN1glmZDe6da7mIjgDZxiX6Rwd1+PPZvkCg+ZbM
+	nCEvMrTuUD6BnPOamcs7PVUxSsTCtiGigZtyKCmt53gviGkVSwkeWiFBp1rSOy4bjPv8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1svNBT-008fGy-01; Mon, 30 Sep 2024 22:39:55 +0200
+Date: Mon, 30 Sep 2024 22:39:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net: mv643xx: use
+ devm_platform_ioremap_resource
+Message-ID: <ef667d4c-8158-4fa5-be1a-ed92e1a07534@lunn.ch>
+References: <20240930202951.297737-1-rosenp@gmail.com>
+ <20240930202951.297737-2-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -44,210 +59,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Message-ID: <26363.3177.994264.260348@quad.stoffel.home>
-Date: Mon, 30 Sep 2024 16:39:05 -0400
-From: "John Stoffel" <john@stoffel.org>
-To: Alexander Aring <aahringo@redhat.com>
-Cc: teigland@redhat.com,
-    gfs2@lists.linux.dev,
-    song@kernel.org,
-    yukuai3@huawei.com,
-    agruenba@redhat.com,
-    mark@fasheh.com,
-    jlbec@evilplan.org,
-    joseph.qi@linux.alibaba.com,
-    gregkh@linuxfoundation.org,
-    rafael@kernel.org,
-    akpm@linux-foundation.org,
-    linux-kernel@vger.kernel.org,
-    linux-raid@vger.kernel.org,
-    ocfs2-devel@lists.linux.dev,
-    netdev@vger.kernel.org,
-    vvidic@valentin-vidic.from.hr,
-    heming.zhao@suse.com,
-    lucien.xin@gmail.com,
-    donald.hunter@gmail.com
-Subject: Re: [PATCHv2 dlm/next 00/12] dlm: net-namespace functionality
-In-Reply-To: <20240930201358.2638665-1-aahringo@redhat.com>
-References: <20240930201358.2638665-1-aahringo@redhat.com>
-X-Mailer: VM 8.3.x under 28.2 (x86_64-pc-linux-gnu)
+Content-Disposition: inline
+In-Reply-To: <20240930202951.297737-2-rosenp@gmail.com>
 
->>>>> "Alexander" == Alexander Aring <aahringo@redhat.com> writes:
+On Mon, Sep 30, 2024 at 01:29:50PM -0700, Rosen Penev wrote:
+> This combines multiple steps in one function.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-> Hi,
-> this patch-series is huge but brings a lot of basic "fun" net-namespace
-> functionality to DLM. Currently you need a couple of Linux kernel
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Please spell out TLAs like DLM the first time you use them.  In this
-case I'm suer you mean Distributed Lock Manager, right?  
-
-> instances running in e.g. Virtual Machines. With this patch-series I
-> want to break out of this virtual machine world dealing with multiple
-> kernels need to boot them all individually, etc. Now you can use DLM in
-> only one Linux kernel instance and each "node" (previously represented
-> by a virtual machine) is separate by a net-namespace. Why
-> net-namespaces? It just fits to the DLM design for now, you need to have
-> them anyway because the internal DLM socket handling on a per node
-> basis. What we do additionally is to separate the DLM lockspaces (the
-> lockspace that is being registered) by net-namespaces as this represents
-> a "network entity" (node). There might be reasons to introduce a
-> complete new kind of namespaces (locking namespace?) but I don't want to
-> do this step now and as I said net-namespaces are required anyway for
-> the DLM sockets.
-
-This section needs to be re-written to more clearly explain what
-you're trying to accomplish here, and how this is different or better
-than what went before.  I realize you probably have this knowledge all
-internalized, but spelling it out in a clear and simple manner would
-be helpful to everyone.  
-
-> You need some new user space tooling as a new netlink net-namespace
-> aware UAPI is introduced (but can co-exist with configfs that operates
-> on init_net only). See [0] for more steps, there is a copr repo for the
-> new tooling and can be enabled by:
-
-What the heck is a 'copr'?   
-
-
-> $ dnf copr enable aring/nldlm
-> $ dnf install nldlm
-
-> or compile it yourself.
-
-These steps really entirely ignore the _why_ you would do this.  And
-assume RedHad based systems.
-
-> Then there is currently a very simple script [1] to show a 3 nodes cluster
-
-nit: 3 node cluster
-
-> using gfs2 on a multiple loop block devices on a shared loop block device
-> image (sounds weird but I do something like that). There are currently
-> some user space synchronization issues that I solve by simple sleeps,
-> but they are only user space problems.
-
-Can you give the example on how to do this setup?  Ideally in another
-patch which updates the Documentation/??? file to in the kernel tree.
-
-> To test it I recommend some virtual machine "but only one" and run the
-
-I'm having a hard time parsing this, please be more careful with
-singular or plural usage.  English is hard!  :-)
-
-> [1] script. Afterwards you have in your executed net-namespace the 3
-> mountpoints /cluster/node1, /cluster/node2/ and /cluster/node3. Any vfs
-> operations on those mountpoints acts as a per node entity operation.
-
-Which means what?  So if I write to /cluster/node1/foo, it shows up in
-the other two mount points?  Or do I need to create a filesystem on
-top?   
-
-> We can use it for testing, development and also scale testing to have a
-> large number of nodes joining a lockspace (which seems to be a problem
-> right now). Instead of running 1000 vms, we can run 1000 net-namespaces
-> in a more resource limited environment. For me it seems gfs2 can handle
-> several mounts and still separate the resource according their global
-> variables. Their data structures e.g. glock hash seems to have in their
-> key a separation for that (fsid?). However this is still an experimental
-> feature we might run into issues that requires more separation related
-> to net-namespaces. However basic testing seems to run just fine.
-
-So is this all just to make testing and development easier so you
-don't need 10 or 1000 nodes to do stress testing?  Would anyone use
-this in real life?  
-
-> Limitations
-
-> I disable any functionality for the DLM character device that allow
-> plock handling or do DLM locking from user space. Just don't use any
-> plock locking in gfs2 for now. But basic vfs operations should work. You
-> can even sniff DLM traffic on the created "dlmsw" virtual bridge.
-
-So... what functionality is exposed by this patchset?  And Maybe add
-in an "Advantages" section to explain why this is so good.  
-
-Thanks!
-John
-
-
-> - Alex
-
-> [0] https://gitlab.com/netcoder/nldlm
-> [1] https://gitlab.com/netcoder/gfs2ns-examples/-/blob/main/three_nodes
-
-> changes since v2:
->  - move to ynl and introduce and use netlink yaml spec
->  - put the nldlm.h DLM netlink header under UAPI directory
->  - fix build issues building with CONFIG_NET disabled
->  - fix possible nullpointer deference if lookup of lockspace failed
-
-> Alexander Aring (12):
->   dlm: introduce dlm_find_lockspace_name()
->   dlm: disallow different configs nodeid storages
->   dlm: add struct net to dlm_new_lockspace()
->   dlm: handle port as __be16 network byte order
->   dlm: use dlm_config as only cluster configuration
->   dlm: dlm_config_info config fields to unsigned int
->   dlm: rename config to configfs
->   kobject: add kset_type_create_and_add() helper
->   kobject: export generic helper ops
->   dlm: separate dlm lockspaces per net-namespace
->   dlm: add nldlm net-namespace aware UAPI
->   gfs2: separate mount context by net-namespaces
-
->  Documentation/netlink/specs/nldlm.yaml |  438 ++++++++
->  drivers/md/md-cluster.c                |    3 +-
->  fs/dlm/Makefile                        |    3 +
->  fs/dlm/config.c                        | 1291 +++++++++--------------
->  fs/dlm/config.h                        |  215 +++-
->  fs/dlm/configfs.c                      |  882 ++++++++++++++++
->  fs/dlm/configfs.h                      |   19 +
->  fs/dlm/debug_fs.c                      |   24 +-
->  fs/dlm/dir.c                           |    4 +-
->  fs/dlm/dlm_internal.h                  |   24 +-
->  fs/dlm/lock.c                          |   64 +-
->  fs/dlm/lock.h                          |    3 +-
->  fs/dlm/lockspace.c                     |  220 ++--
->  fs/dlm/lockspace.h                     |   12 +-
->  fs/dlm/lowcomms.c                      |  525 +++++-----
->  fs/dlm/lowcomms.h                      |   29 +-
->  fs/dlm/main.c                          |    5 -
->  fs/dlm/member.c                        |   36 +-
->  fs/dlm/midcomms.c                      |  287 ++---
->  fs/dlm/midcomms.h                      |   31 +-
->  fs/dlm/netlink2.c                      | 1330 ++++++++++++++++++++++++
->  fs/dlm/nldlm-kernel.c                  |  290 ++++++
->  fs/dlm/nldlm-kernel.h                  |   50 +
->  fs/dlm/nldlm.c                         |  847 +++++++++++++++
->  fs/dlm/plock.c                         |    2 +-
->  fs/dlm/rcom.c                          |   16 +-
->  fs/dlm/rcom.h                          |    3 +-
->  fs/dlm/recover.c                       |   17 +-
->  fs/dlm/user.c                          |   63 +-
->  fs/dlm/user.h                          |    2 +-
->  fs/gfs2/glock.c                        |    8 +
->  fs/gfs2/incore.h                       |    2 +
->  fs/gfs2/lock_dlm.c                     |    6 +-
->  fs/gfs2/ops_fstype.c                   |    5 +
->  fs/gfs2/sys.c                          |   35 +-
->  fs/ocfs2/stack_user.c                  |    2 +-
->  include/linux/dlm.h                    |    9 +-
->  include/linux/kobject.h                |   10 +-
->  include/uapi/linux/nldlm.h             |  153 +++
->  lib/kobject.c                          |   65 +-
->  40 files changed, 5566 insertions(+), 1464 deletions(-)
->  create mode 100644 Documentation/netlink/specs/nldlm.yaml
->  create mode 100644 fs/dlm/configfs.c
->  create mode 100644 fs/dlm/configfs.h
->  create mode 100644 fs/dlm/netlink2.c
->  create mode 100644 fs/dlm/nldlm-kernel.c
->  create mode 100644 fs/dlm/nldlm-kernel.h
->  create mode 100644 fs/dlm/nldlm.c
->  create mode 100644 include/uapi/linux/nldlm.h
-
-> -- 
-> 2.43.0
-
-
+    Andrew
 
