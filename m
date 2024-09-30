@@ -1,104 +1,104 @@
-Return-Path: <netdev+bounces-130395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A92798A595
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:41:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D639498A5A9
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31FA61F23E06
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:41:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25424280A0B
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF27190064;
-	Mon, 30 Sep 2024 13:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C8F18FDB2;
+	Mon, 30 Sep 2024 13:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p/PWdgjG"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="msClhyMN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DE718E779;
-	Mon, 30 Sep 2024 13:41:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB115C15E;
+	Mon, 30 Sep 2024 13:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727703693; cv=none; b=VvayUy09+NyKICPScj23lg2ZAqADRkmp0gqA3JXn79zzbpFYD2U+FEuHQmmUdVukCK/LRIPQYxh7zrLjOKnQ11wmGc768XOpeZIMYvSM4b3jl3hD0vKZLAVE9WSPhVWSJuy5jgWjJvdspmBoEXmOrTQgqK6XKENkuWbz/IdWjJU=
+	t=1727703852; cv=none; b=TNlNvBrEXCMo5rM4ahrFtGZk/y/ASEtMLWtU3LNObd1UYpbWBQVpnyRRmSEQhcE70RTSPxDUxXc74bmeE5WW1izUONfJ2xm5yXxaJO4zcLUOBipYnMdB7PFnxCf5DSLWOk9ugannwj8K/96x6B+v5PumYIVRXNeAJh59viMVkv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727703693; c=relaxed/simple;
-	bh=XuIxcWV90Pt6xKt7ogNiIxpo5TOpoq4J541bjNJwqag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HDxYp8YgwzOHRn16aMF1tQL/dHAfm0B2+eKLynVhqOQUyY6JZidzoAI8SSwrIv6Fo8uSOz7EaAguXAEd1kTenP3tyK/do9ChUwX9C1VNbunhOJECV8a3E1EtbzjRxC0kzW/2JeI8r/J7UhsBsj9QSF/LguCEN8IRmNcmPQBTL3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p/PWdgjG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34562C4CECE;
-	Mon, 30 Sep 2024 13:41:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727703693;
-	bh=XuIxcWV90Pt6xKt7ogNiIxpo5TOpoq4J541bjNJwqag=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p/PWdgjGHFmG4a9TeIg92cCR3b53QtlukirDa0WYMdHKixucwR9yo13JHac/Cxbij
-	 tntZ/2FwufIcSYwmBoJBBK4do+bRogXXJFVPI7fImhhJa40MJ3wS951qvfbNMHq/G0
-	 bpqHHiIDY+j0LLwjkuYefn3ToR3bWuAsq3XJ2jqDJ/2uMQ9fYf2SHvvx1G9ibfdnCd
-	 2aJ4M/cAnfW4kAaDgMFhrQ6bap8Rn7qAvvq496T76Z5jDB5pkcYeo7JlVVSSphDX8x
-	 0hJV877W2z/I7VFx6nHWwgAGIHRWUq3xacHJelunGpWo/+NnRpilCa2aOtT3xpmUgR
-	 POJBFfImmhGBQ==
-Date: Mon, 30 Sep 2024 14:41:25 +0100
-From: Conor Dooley <conor@kernel.org>
-To: pierre-henry.moussay@microchip.com
-Cc: Linux4Microchip@microchip.com,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Daire McNamara <daire.mcnamara@microchip.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-riscv@lists.infradead.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [linux][PATCH v2 01/20] dt-bindings: can: mpfs: add PIC64GX CAN
- compatibility
-Message-ID: <20240930-transpose-isolating-5c20f43745b1@spud>
-References: <20240930095449.1813195-1-pierre-henry.moussay@microchip.com>
- <20240930095449.1813195-2-pierre-henry.moussay@microchip.com>
+	s=arc-20240116; t=1727703852; c=relaxed/simple;
+	bh=lezCBWWFHbn8MQ1S1VdxEUGegYb4MopXWakVPWCvzZA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rI96fjdFlzJSxUJxkq3hH9+XeXGi4gfR0UeBa/QDXgdxjmbF9q6a9RWYXzicWBfkpsXQ8JJxdLCgYXI9brX1j8+ahvP6XxhtTEVWPkulle9A+X7l34LK5ji7VZm8IJpRQr+3UW/1+lDVFfefJpq/QW+N/VWz1kl3ozasNbd1a6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=msClhyMN; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=M5BQIoqcpQBFHOofTMEAPSxPpT3+Ax65uySTt2sbYDU=; b=msClhyMNQLO9d0O0
+	QLM0XB9HLaznrEtDCRKYAtkrbggeXpbr5X1r0V8UaKLOZk0pRMkNt/utmZp35PGF71EBymt+c15C9
+	zWgkx9pT7MYTqvrYlU6+ZZagWQuJHje2r72a1gtKL5QC/oJsZTXFUkjeA4cDWa4MMh+OfiUqoyNyv
+	ft5FYVt3YzrETxuriSdI4Ek3ByokU9F7VdMpW1U1p4F7EPmuiMJwjaYRYJOQMis/XQ+Chra0zFRrW
+	oKOyW2z2MUPwxxzFWqJs0Rwlh+/7UVFwbqbmDpqg5/ti3Mbwgtya3e48v7eeeayhuqQP6vAPgO/rV
+	veLYgn0q51e+9eR8jQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1svGh0-007z1U-0f;
+	Mon, 30 Sep 2024 13:44:02 +0000
+From: linux@treblig.org
+To: allison.henderson@oracle.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-rdma@vger.kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Simon Horman <horms@kernel.org>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: [PATCH net-next] net/rds: remove unused struct 'rds_ib_dereg_odp_mr'
+Date: Mon, 30 Sep 2024 14:43:58 +0100
+Message-ID: <20240930134358.48647-1-linux@treblig.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ITDHeWGvw1IVSKQ3"
-Content-Disposition: inline
-In-Reply-To: <20240930095449.1813195-2-pierre-henry.moussay@microchip.com>
+Content-Transfer-Encoding: 8bit
 
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
---ITDHeWGvw1IVSKQ3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+'rds_ib_dereg_odp_mr' has been unused since the original
+commit 2eafa1746f17 ("net/rds: Handle ODP mr
+registration/unregistration").
 
-On Mon, Sep 30, 2024 at 10:54:30AM +0100, pierre-henry.moussay@microchip.co=
-m wrote:
-> From: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
->=20
-> PIC64GX CAN is compatible with the MPFS CAN, only add a fallback
->=20
-> Signed-off-by: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
+Remove it.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+---
+ net/rds/ib_rdma.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
---ITDHeWGvw1IVSKQ3
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/net/rds/ib_rdma.c b/net/rds/ib_rdma.c
+index 8f070ee7e742..d1cfceeff133 100644
+--- a/net/rds/ib_rdma.c
++++ b/net/rds/ib_rdma.c
+@@ -40,10 +40,6 @@
+ #include "rds.h"
+ 
+ struct workqueue_struct *rds_ib_mr_wq;
+-struct rds_ib_dereg_odp_mr {
+-	struct work_struct work;
+-	struct ib_mr *mr;
+-};
+ 
+ static void rds_ib_odp_mr_worker(struct work_struct *work);
+ 
+-- 
+2.46.2
 
------BEGIN PGP SIGNATURE-----
-
-iHQEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZvqqhQAKCRB4tDGHoIJi
-0jNVAP0ZEUhs6p76YEPVv+A3Xa03N4ZG3xl3Y1mmGJW8BNWHuAD4wyvWl7QbHbq/
-Px7FmbCsj+wyZHmXwRcSgEpzuMnuBA==
-=s7yU
------END PGP SIGNATURE-----
-
---ITDHeWGvw1IVSKQ3--
 
