@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-130472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6AB98AA3A
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:49:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A26498AA50
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:52:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B64341C209DB
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:49:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45A821F23CDE
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 16:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39CC195381;
-	Mon, 30 Sep 2024 16:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YJHYfrs9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC541953BA;
+	Mon, 30 Sep 2024 16:52:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D9681946AA;
-	Mon, 30 Sep 2024 16:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326CB194C79
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 16:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727714804; cv=none; b=ik1EqUmQWvcFXq8/m/mn+1syl6nBg0RrWwUJv5KYHq86M5UccLO55ZxVGSDjPaSSSktILhyYNMYVLkCUnJ8JDAhRCPQSUXGk6wTHwbRA6X5AfG2djAyYhiqhi7nh9did/zWUV0oIgC4Jh7N10Svs0ND5XUaKmMIOJzMOm7ZL35g=
+	t=1727715136; cv=none; b=JxR/ZNcCU9YJEh3zK3IMHuRvEhah7C591NDEUTnBLgPcJu85qkJDYN9d6xzfQyGhoHWWVUJQmNDuZicqP/xfUOL4SKOGFafUSw04vpx9XJLtIK+v85mAir+i6BQosoWmPY5zmKHkXnD1cSBH7QIbE3P0u+gNFBnvIimEZavEC3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727714804; c=relaxed/simple;
-	bh=1rGJ3ml+BkufanYBiG4ElBjkODsCW83l25J2SX/Nfmc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZaUPklMNsKYNvD+Mjh4I/wDxnu0iEmmQP00eS6gJ3B8I/VAYDDFspb3GP1Bu7N9nc0m7urHGcn9Z7ZbzgeZDFcUHPncRdaOmtS2Cni4jEb3CQhE3rv8cxO6wWdC8OQgpRhFhzVNGHzFU/2jfIIzo/53seHYuI6KgW2i8AXmE7Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YJHYfrs9; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20ba6b39a78so3168215ad.3;
-        Mon, 30 Sep 2024 09:46:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727714803; x=1728319603; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oFMgdLn7hB0TMtt+qsWxpUh5i8iT0KYc/LM27VmdFOA=;
-        b=YJHYfrs9rpOwz+to2j6Ewri3t9bulRdMja1hdfA+4zSyelhdRwvxLUkdTp82IwFElq
-         BXql3ebOzd+EZ0dI+c/vxh92LxBsv9Uu0qtdFrEU4cdBRdB9vcwMT8j84b2iQr0c/I9A
-         Lk4sv7eUnDmCKfx3B+Zjov7D3gkzu9ix3sdZH0SCEM6ycWlOsEhlpjy3ZMEJcY535nHL
-         YTy+KGU7pGeMAulxfv1eP+Qn1UYOMGlLZQERGvfj3gPXht7XdBVZPUVc+FWh57rV6xFY
-         YtpVY/TNPtuFOqg5RQcoY0VWJdXuriWGMzazx01WzMDFGdPVwV/af2iMJmBFfh1E2LHH
-         nlaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727714803; x=1728319603;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oFMgdLn7hB0TMtt+qsWxpUh5i8iT0KYc/LM27VmdFOA=;
-        b=uwT7KMhsGPy75Myyn0ejoae+y/DdljZCiYXdhyNo1eRQORxrbLAg0zoPc8uukkoMcf
-         lNNI5ZevBVCQeaL5IIJIKkyoyi/HRPVDzr1Ns08t4UZC7lb0iT5/w3Kvs3JDvRRP8VlC
-         7/aHmwbKKV5kkOL/Kv48g59Bh1tvjKqwTDmG3Y88dshYZgk6Vy7u5pU/WVhVFKFHHZRp
-         IbAWtHfJV0CXM62lu2IcWH/bWKJlDghNZOWxutPaoDAbcwGjdKW8njvEYmIj+pZOgx4q
-         e3vfZFUzsl0d928g5ENWK+KsbzJc3Mq2Wb/kpbdbcAxYA7/3cPTZxNRi3hsTpUZgejjA
-         FgAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUurJcBxE+Jf1VdErf8gnsQNhLUa5tet9/FhHqD7rfQRH4uwXWdzJKIbUuj8IAj/dz5Yg1nhGsl1cIX@vger.kernel.org, AJvYcCV3yGyHlJ9hE7W3Y5aXSnhEJgjTMMG+kHRCsHys5Uobv1haaRmLgRyg5fct3ByPWuMBkNchMfy/zOhdXg==@vger.kernel.org, AJvYcCV4sbMorniZ3KfQc0Rih4TZ9ZWlJgcBgpSZqePsWlFe7ubS/caetrCgOeKzGpM0d8Jydpoc50ULZtuwypTt@vger.kernel.org, AJvYcCVb6pIf1TbZjzsiLKYVxRS7TPzolRyG6Vy2elsiHFh45x8RHqahw2Gl3UKV5UDr6j84a3kA+b1Z@vger.kernel.org, AJvYcCXXL5UV8hH0YeVMWh/DvPd0jDv7VgJEHYqfd1T0sQ61PzVZkubiSl1pz9sp+Hg83uPa5nUFH9Su+Qde@vger.kernel.org, AJvYcCXrkyUnt7g+t5QYVU2eJU1ZynbB40QkddROShZ4HQNURiGCf532IpTCrfO3XdxT9LPMgJA72U21Lwu9vQFQrg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJME94YiV0877LQk+iWJrD6qCwVVUJF/LlFnYLHIY6PB22WCxp
-	mO7zjjtLd0Aj4HsCgnFZf1mOTrO71GLznNYhQH0bSZ+s9IXisZiy
-X-Google-Smtp-Source: AGHT+IFZC3EJ0qzaaUHzbstF3Ibe+95zgKik8WWlYGIZbkQX0EKejoD/dNihbdBEqG2pUNucAQRStA==
-X-Received: by 2002:a17:90a:bf03:b0:2e0:a28a:ef88 with SMTP id 98e67ed59e1d1-2e0b8eeebe9mr12068969a91.41.1727714802654;
-        Mon, 30 Sep 2024 09:46:42 -0700 (PDT)
-Received: from [192.168.0.235] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c9d354sm8211290a91.25.2024.09.30.09.46.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 09:46:42 -0700 (PDT)
-Message-ID: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: David Howells <dhowells@redhat.com>, Leon Romanovsky <leon@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>, Manu Bretelle
- <chantr4@gmail.com>,  asmadeus@codewreck.org, ceph-devel@vger.kernel.org,
- christian@brauner.io,  ericvh@kernel.org, hsiangkao@linux.alibaba.com,
- idryomov@gmail.com,  jlayton@kernel.org, linux-afs@lists.infradead.org,
- linux-cifs@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
- linux-fsdevel@vger.kernel.org,  linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-nfs@vger.kernel.org,  marc.dionne@auristor.com,
- netdev@vger.kernel.org, netfs@lists.linux.dev,  pc@manguebit.com,
- smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com, 
- v9fs@lists.linux.dev, willy@infradead.org
-Date: Mon, 30 Sep 2024 09:46:36 -0700
-In-Reply-To: <2969660.1727700717@warthog.procyon.org.uk>
-References: <2968940.1727700270@warthog.procyon.org.uk>
-	 <20240925103118.GE967758@unreal>
-	 <20240923183432.1876750-1-chantr4@gmail.com>
-	 <20240814203850.2240469-20-dhowells@redhat.com>
-	 <1279816.1727220013@warthog.procyon.org.uk>
-	 <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
-	 <2969660.1727700717@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1727715136; c=relaxed/simple;
+	bh=b4jG5jfepBq5kPRJADJMJ4moTQg/F0vilLCvt+kSYsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dEbJW5V9ObJFXuuPvVi3PcDVyfaP4YHzOZDd3m+ACP9lqLyNUt4vBvovp9kReSABqBt7kNM7IEBXI4X3tWCNQm1xyU1j7k7Z2q+eTLNOq/QEng3r8NveGPlqWonGkOG+yOABtKt1moEI1iHc24ZECrdrL1gjfPIqjev+Z+KPszs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1svJck-0000VS-JM; Mon, 30 Sep 2024 18:51:50 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1svJcj-002fuM-J1; Mon, 30 Sep 2024 18:51:49 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 33EB5346E15;
+	Mon, 30 Sep 2024 16:51:49 +0000 (UTC)
+Date: Mon, 30 Sep 2024 18:51:48 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Conor Dooley <conor@kernel.org>
+Cc: pierre-henry.moussay@microchip.com, Linux4Microchip@microchip.com, 
+	Conor Dooley <conor.dooley@microchip.com>, Daire McNamara <daire.mcnamara@microchip.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, linux-riscv@lists.infradead.org, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [linux][PATCH v2 01/20] dt-bindings: can: mpfs: add PIC64GX CAN
+ compatibility
+Message-ID: <20240930-unyielding-hypersonic-marmot-7bf720-mkl@pengutronix.de>
+References: <20240930095449.1813195-1-pierre-henry.moussay@microchip.com>
+ <20240930095449.1813195-2-pierre-henry.moussay@microchip.com>
+ <20240930-voracious-hypersonic-sambar-72a1c5-mkl@pengutronix.de>
+ <20240930-skeletal-bolster-544f3a2b290a@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="zdxv4cgborwrwqlm"
+Content-Disposition: inline
+In-Reply-To: <20240930-skeletal-bolster-544f3a2b290a@spud>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, 2024-09-30 at 13:51 +0100, David Howells wrote:
-> David Howells <dhowells@redhat.com> wrote:
+
+--zdxv4cgborwrwqlm
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 30.09.2024 17:37:22, Conor Dooley wrote:
+> On Mon, Sep 30, 2024 at 06:32:29PM +0200, Marc Kleine-Budde wrote:
+> > On 30.09.2024 10:54:30, pierre-henry.moussay@microchip.com wrote:
+> > > From: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
+> > >=20
+> > > PIC64GX CAN is compatible with the MPFS CAN, only add a fallback
+> > >=20
+> > > Signed-off-by: Pierre-Henry Moussay <pierre-henry.moussay@microchip.c=
+om>
+> >=20
+> > Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> >=20
+> > Who is going to take this patch/series?
 >=20
-> > Okay, let's try something a little more drastic.  See if we can at leas=
-t get
-> > it booting to the point we can read the tracelog.  If you can apply the
-> > attached patch?
->=20
-> It's also on my branch:
->=20
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/lo=
-g/?h=3Dnetfs-fixes
->=20
-> along with another one that clears the folio pointer after unlocking.
+> Ideally you take this patch, and other subsystem maintainers take the
+> ones relevant to their subsystem. And I guess, I take what is left over
+> along with the dts patches.
 
-Hi David,
+Makes sense. Consider it applied to linux-can-next.
 
-dmesg is here:
-https://gist.github.com/eddyz87/3a5f2a7ae9ba6803fc46f06223a501fc
+regards,
+Marc
 
-Used the following commit from your branch:
-ba1659e0f147 ("9p: [DEBUGGING] Don't release pages or folioq structs")
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Still does not boot, unfortunately.
-Are there any hacks possible to printout tracelog before complete boot some=
-how?
+--zdxv4cgborwrwqlm
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Thanks,
-Eduard
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmb61yAACgkQKDiiPnot
+vG8ikQgAlPCBr+HZlUczPrHGyPED8iTqJvYiS+OfZKtoDXIwin93VavN8tobss+8
+m/27veo7QQ13j1ss5NuDAZg+ZcfwSffO7ZwkF8YymyJCNIK8cfBojJCs3To+gWLl
+X12JvSFLUceKWx3fPE7+YPUtOO8uKmSx1tEMAOAjzK9H1ASUfIw1OaQhkY0BF7AC
+oRG9dk+druUBEgQuAtF3mv4ix87m08XlaWd3ceJFqFWLhnubI2mEw7mMSqmxyKEQ
+t+9ncwVF8z15AyhTyp34bVCkz55q7WC4t+qwgSTIgLhj4BZFjJZcKLmNhz0NsiTG
+0jgMQh1QxhdOob6MppRYPfDzWgS3lg==
+=ZzHq
+-----END PGP SIGNATURE-----
+
+--zdxv4cgborwrwqlm--
 
