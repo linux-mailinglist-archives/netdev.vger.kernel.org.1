@@ -1,174 +1,137 @@
-Return-Path: <netdev+bounces-130568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D4C98AD9D
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:58:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A27D98ADB1
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:03:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1402C1C21C73
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:58:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C580E1F234F4
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:03:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312CF19F139;
-	Mon, 30 Sep 2024 19:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6EB1991A5;
+	Mon, 30 Sep 2024 20:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="yRg+imbU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2Fe7oDg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8C91A01DB
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 19:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 146153BB21;
+	Mon, 30 Sep 2024 20:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727726195; cv=none; b=nM5POtMetuD8o9PmgzCM+34HobBqUG+nZhkBlsCyUqM/U/1ZOtOjPZ7GXcoKUxtZllM+Loi9h2ZegG9dCAWoXBjfIP+3JVFFnXtLVU5fIG6MH2WA4oWv5tffgn1WWsbGJNjPEL0i2XsgLrgb3q6TVE1QT9XxO93dOMGnNhVev18=
+	t=1727726617; cv=none; b=LpjE4rVrbaNRI05+/1Cce0SB8M8/jTeqHCT4ynNRkw7h7m+rByYLL1AiGkWCc2fnnueUhIb/3+KdcGNvwb1o3fG7CEqLAVcm/Udz7PK+pZfbLFQDBcKji0BYD2xEaBqFQ4MutA97KnvpFdHot3ReNX38WV/yT6bBA93QdGDdcgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727726195; c=relaxed/simple;
-	bh=UA0m3VMYAwf7VZLj3wNgsyeHamH7xUAmp8+jviHGxUA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hlev4WBxJVxwnQlcjSBzcDWioZf6g8qWbYMKSmq92d3ZXv+Uzc1Wl6xnE3XpkPiBEUbEFYYz9OWR4FyTvUZ8cxVUumd3A7AjGgji1ts6t4T/eJo//wtgFsp6HMK6TEGA+mQ/Y4zVxN4MQQubeoRg2VkFMCRCI4sPwQEkldRmt4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=yRg+imbU; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-718d606726cso3394923b3a.3
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:56:33 -0700 (PDT)
+	s=arc-20240116; t=1727726617; c=relaxed/simple;
+	bh=47I8xfCitENoyApbDJeb8z83ysVQ1fPkC3PWZWQevPk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nACpHYCM2JnvSQ+JiGjlhcxzrQsuJ6XGA5bNpBU6PbHxpRnrQgGrvyP13AO1hU8ZbseQV2fHPVOjQv8p5n1zQtJ3x9ylLEgs5BYbz9BinLXqKYjhSo7Z38sb0IQrtV0GWvOV7o2tJXjsF5aOmjcsRSmpbElmU1XNE/nLCmDjShk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K2Fe7oDg; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cbb08a1a5so43982005e9.3;
+        Mon, 30 Sep 2024 13:03:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727726192; x=1728330992; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lxtv2lrF1kOetNp7xi3WglFSuTqjxy0uNajfsDkNvuU=;
-        b=yRg+imbUi7bGSZneMP0cJqGUe6lYG0H3ejIn3qalyl/5b67WeQk5LWEoPRDfZUkQPC
-         QYauuwVtpF2KelD25JqqmdOM11bzJb++6w4K9vyzkaBY/SnUhywbcDugSD+/El95FBV3
-         RVqciJ63OMQltvkALlxuMvFjGdppsvS69h6iw=
+        d=gmail.com; s=20230601; t=1727726614; x=1728331414; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fI+zx8QsdFx8s2KuJaXhZ3U2Smejzcc3UCHD/eWxk+0=;
+        b=K2Fe7oDg1peK5S0D56OJwfRDRRnBg6W0tnqHIPwnJbXO7pKtMRSCT931lwOWe04YO3
+         QM8DSnisDLHPuWvkptgiB3wCT0Hf9gAGbJgtHopMwipZE0blqJMcosgeqZII7doWM2iS
+         hYr3+afp3gCG2xQVJ5M3jau0jwmd1PFRcPnIOvZpLFNFV4L5v+X8cMZVWvP4qcErAOLZ
+         vcjrzyz2PVeol7eJFHqCXkKi4rUUTy8sT4hB+HRI8/xYfALdzVSCk2MG/a8w2bNISb5a
+         wi4ks+pmD55Z1FZSVmDfSI9W5TrdXdth+etl6aKm2FLzTjgUAzpF8yZ5dgLzOsknzCH9
+         CDfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727726192; x=1728330992;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lxtv2lrF1kOetNp7xi3WglFSuTqjxy0uNajfsDkNvuU=;
-        b=aSWu1FdApWhxzwxoBip/bJppi5jHwjFgNTzEYfYVVKMH8YX4uVSwwMBTAGaxO82NkK
-         EWEkPAq/CCHBcGUmR4SFUhasI3LTcDjZKNdEOSUiHSc+6p6+U9aFKiVuP4HnjscCTJqx
-         h61wzSVCYWwneAe96eDmSkviqNxd28Ch1ye2pB1jNsDkmmr0SqcGYPfoN3Zh3lEgB8H7
-         IVxpkPf8ObCe3OECK1hQAsLcd0pAlmjsGBb1aL1wjjihzmMFVjDebYPZ7+6Y4dpR7RSp
-         6o+POAN7pjluPZxCO3+NbgFpgFmI6ey3lGV16LdkTBgFvrF1jU7Ar2FzVcDP/u1XVL1y
-         aPeg==
-X-Gm-Message-State: AOJu0YwsAomMXhOiRNquinwS3Bd1Jzo5fB0dX+HLCljb317QuBqSYX3+
-	PUdVFfc6xmwkUIDm3UtCIMh/9dZTAI1htmiSXaa0pq4xlxucp5+pdoq3Al16N5NnPx2L7lxkbrK
-	bFEuOwkpQD69NNGpq5qsYYcCC9zz4IqSiZ3tp+vM3h566EfKY2tOsRWM8j6Eeiegw+1PIKfaKiC
-	B7IJnjBCYOE8z91kNrp4iDgoFwcTQ0rB5P/fU=
-X-Google-Smtp-Source: AGHT+IHYMQgS9wxg2iL/t0osMPTamKqFGShjRfad8poeTcxLS0lYKsFnK8dQ6emauZeBXHfOlaTwiQ==
-X-Received: by 2002:a05:6a00:cc4:b0:706:58ef:613 with SMTP id d2e1a72fcca58-71b2607ae1bmr16336872b3a.27.1727726192145;
-        Mon, 30 Sep 2024 12:56:32 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b2649a2cesm6604450b3a.43.2024.09.30.12.56.30
+        d=1e100.net; s=20230601; t=1727726614; x=1728331414;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fI+zx8QsdFx8s2KuJaXhZ3U2Smejzcc3UCHD/eWxk+0=;
+        b=U6YNLGa9Ya7sdb+KFew14GN7ldLssfOUzsWptW/k/PkKPmQVFSx09Y5e8pmYDG44no
+         4u03KllGr+zVoDmEdt/Bzxqf9EqSdJswf/C5j93yVfIB0dz30IWqLTz5DKyAP8cSz8ml
+         lJkeWq2WoqJRW2gv3ug/IDb65xes0r/yRyLeTfELShjGfyBJ2n0fsAmAe4xOOqHZRmo2
+         Pdj4C3hA/D8majm4b57IxKIRx4DH6bKwQED9qCNR+kU26jE8EIDdu+6ySLBBnuTcBHaf
+         dj7ru2NgXqykTrjNn53ExMJzBbvhGgPUbo87i28VHWZzFFief7R+zc3OcVkbJgUVPn/9
+         cyDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPAN3Tcwwcg3SoTiGOWp5yikP6jQZLdmPYtdvfzbU2aGgY05AQJfSDHWn5D9hQgbGqeqdJDO7hsv4953k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA7pZGUjZ11jbcawiWpX2wwTMP2oKrQuu2tHjr3ikiN3sXgQXW
+	HayYPeVZMdEf+qcQ0pspwlGfNHP8kBdiPLKCz9B83Zt+g3SDAKex
+X-Google-Smtp-Source: AGHT+IHnCQnrjvKFLZYwwqwdUTur1D6PH/M5shpmrDIYAZ5w7uc5Og6Wq0leja+bZ7tFe6lANpnqFQ==
+X-Received: by 2002:a05:600c:4ba4:b0:42c:b9c7:f54b with SMTP id 5b1f17b1804b1-42f5b906471mr99196045e9.16.1727726614276;
+        Mon, 30 Sep 2024 13:03:34 -0700 (PDT)
+Received: from [127.0.1.1] (2a02-8389-41cf-e200-91b0-e3db-0523-0d17.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:91b0:e3db:523:d17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a36760sm162591215e9.30.2024.09.30.13.03.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 12:56:31 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kamal Heib <kheib@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [net-next 2/2] ena: Link queues to NAPIs
-Date: Mon, 30 Sep 2024 19:56:13 +0000
-Message-Id: <20240930195617.37369-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240930195617.37369-1-jdamato@fastly.com>
-References: <20240930195617.37369-1-jdamato@fastly.com>
+        Mon, 30 Sep 2024 13:03:32 -0700 (PDT)
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Subject: [PATCH 0/2] net: switch to scoped device_for_each_child_node()
+Date: Mon, 30 Sep 2024 22:03:28 +0200
+Message-Id: <20240930-net-device_for_each_child_node_scoped-v1-0-bbdd7f9fd649@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABAE+2YC/x2NUQrCMBAFr1L220CMwapXEQnt7otZkKQkRYTSu
+ zf4OTDMbNRQFY0ew0YVX21acofzaSBOU37DqHQmZ52394s1GauRLjJCLDVg4hQ46UdCLoLQuCw
+ QgxlXF0fvbn6k3loqov7+n+dr3w+Bc7IgdwAAAA==
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Yisen Zhuang <yisen.zhuang@huawei.com>, 
+ Salil Mehta <salil.mehta@huawei.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1727726610; l=1463;
+ i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
+ bh=47I8xfCitENoyApbDJeb8z83ysVQ1fPkC3PWZWQevPk=;
+ b=dstzo1kf04lTfSLbpTt9N58T8KXqTYaM0Df4obIEGXCd/VsJuN7Jd8PqPpsPt1WBiFURzp6Dt
+ HR11lFMOtpSAc75I/F/KnzDWgM+xqMWLxtaawb8n/AvYlpKe6WuBLjH
+X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
+ pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
 
-Link queues to NAPIs using the netdev-genl API so this information is
-queryable.
+This series switches from the device_for_each_child_node() macro to its
+scoped variant. This makes the code more robust if new early exits are
+added to the loops, because there is no need for explicit calls to
+fwnode_handle_put(), which also simplifies existing code.
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
+The non-scoped macros to walk over nodes turn error-prone as soon as
+the loop contains early exits (break, goto, return), and patches to
+fix them show up regularly, sometimes due to new error paths in an
+existing loop [1].
 
-[{'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'rx'},
- {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'rx'},
- {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'rx'},
- {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'rx'},
- {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'tx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'tx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'tx'},
- {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'tx'},
- {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'tx'},
- {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'tx'},
- {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'tx'}]
+Note that the child node is now declared in the macro, and therefore the
+explicit declaration is no longer required.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
+The general functionality should not be affected by this modification.
+If functional changes are found, please report them back as errors.
+
+Link:
+https://lore.kernel.org/all/20240901160829.709296395@linuxfoundation.org/
+[1]
+
+Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 26 +++++++++++++++++---
- 1 file changed, 22 insertions(+), 4 deletions(-)
+Javier Carrasco (2):
+      net: mdio: switch to scoped device_for_each_child_node()
+      net: hns: switch to scoped device_for_each_child_node()
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index e88de5e426ef..1c59aedaa5d5 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1821,20 +1821,38 @@ static void ena_napi_disable_in_range(struct ena_adapter *adapter,
- 				      int first_index,
- 				      int count)
- {
-+	struct napi_struct *napi;
- 	int i;
- 
--	for (i = first_index; i < first_index + count; i++)
--		napi_disable(&adapter->ena_napi[i].napi);
-+	for (i = first_index; i < first_index + count; i++) {
-+		napi = &adapter->ena_napi[i].napi;
-+		if (!ENA_IS_XDP_INDEX(adapter, i)) {
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_TX, NULL);
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_RX, NULL);
-+		}
-+		napi_disable(napi);
-+	}
- }
- 
- static void ena_napi_enable_in_range(struct ena_adapter *adapter,
- 				     int first_index,
- 				     int count)
- {
-+	struct napi_struct *napi;
- 	int i;
- 
--	for (i = first_index; i < first_index + count; i++)
--		napi_enable(&adapter->ena_napi[i].napi);
-+	for (i = first_index; i < first_index + count; i++) {
-+		napi = &adapter->ena_napi[i].napi;
-+		napi_enable(napi);
-+		if (!ENA_IS_XDP_INDEX(adapter, i)) {
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_RX, napi);
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_TX, napi);
-+		}
-+	}
- }
- 
- /* Configure the Rx forwarding */
+ drivers/net/ethernet/hisilicon/hns/hns_dsaf_mac.c | 10 +++-------
+ drivers/net/mdio/mdio-thunder.c                   |  4 +---
+ 2 files changed, 4 insertions(+), 10 deletions(-)
+---
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+change-id: 20240930-net-device_for_each_child_node_scoped-ebe62f742847
+
+Best regards,
 -- 
-2.43.0
+Javier Carrasco <javier.carrasco.cruz@gmail.com>
 
 
