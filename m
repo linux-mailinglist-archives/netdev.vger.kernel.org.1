@@ -1,132 +1,198 @@
-Return-Path: <netdev+bounces-130626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7010898AEE7
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 23:16:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2809B98AF18
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 23:30:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A248C1C213FC
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:16:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9907282312
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253B7199EB1;
-	Mon, 30 Sep 2024 21:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336061A2C3D;
+	Mon, 30 Sep 2024 21:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AOR+313s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SYxrWxAI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38DBEDE;
-	Mon, 30 Sep 2024 21:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651A71A2C2D
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 21:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727730994; cv=none; b=baSCJC++GzDumVgOmUtTr4arGHXby9J7gwMWXT7WnhbneW0uCiDmRZ173xKZY8KclUbkWFRKjNZnEZtDClod/rPGV6PMHBnU6MHR11R/H6RovEuBgoZ7ZWbjlssAxDvmDJKkQXiYuT/Hbic4gwFyzuZQHLG+qmKeebTbaS1o5+M=
+	t=1727731738; cv=none; b=uXZMZ9VsbcewqKtkijHqSVTErQM5dxXkhGx5HXISnxXePWhVZDZ0T13NvP/O9lHnUlSmTAJWSK7UCFBy8weWcL9aVTJI/HI7x8ikQF9r1Q7QkGnX4skcUUbYg612L0fOjO+6lBZhCPNxqrj5Q/ACysUmJtLKcsLDW9+ZkrV8qXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727730994; c=relaxed/simple;
-	bh=0iT2muv6N8GB59/rnCdOQR9MS9PuQ2IA4RdBJY841+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tEe+ZHcz4xnwqM4+eIkqIOr5S+iXGTdWFrxZ+56O6k1VnbfDlp3uU8OLdbEBHdyCimZRbL/6t7aoUgWuyiRR7QcNuPFM70qyLHIe37qs/C6AeEjCKO/eZJkg5I0H5Y32OvUIHOOaolZZiGCeEp9cf7u5iEseq9T1g25qnzLpX3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AOR+313s; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7198cb6bb02so3519244b3a.3;
-        Mon, 30 Sep 2024 14:16:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727730991; x=1728335791; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gxqgnSClXAm5hKOjKA4L3emBAnz+dj8s/AGR4GTblOk=;
-        b=AOR+313suW3LvGkT3ElzRgAhLz+7IywGlRUY6gfRBvtt9pwAETimQ0zKmwQjTu0blx
-         CxmOTZ5C4pMjhYbThrUDqlmhERss1yOz5ogeTt0g8RwBu0udMHwlYODTM6NV/VKZTvvC
-         wK4+Y0r77Cbg9FpLBnWkuvLPAyYKTTyG/sM7h/SKgyO3AYS5Ye2lU4kyJLI+omHCbOko
-         eS4gCg/G7O2LYBBZuNPWfSrGAsaREQqqoFGbGfh6tPJcf01bVyAKBL7s2WuYwR+dtM9P
-         SyMXGpAs4j8AZELwr7vtF7kC16fRgiLwkxUEfqTP8NedOZwpjhfH87K3gWawfEhs4/PI
-         hvxA==
+	s=arc-20240116; t=1727731738; c=relaxed/simple;
+	bh=+b+b6Tn3OXmS53HCvCZBXW/2EogOIfYrO87RHsFR1PM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kHTH2nTknc4rkEXhxUrhj3CjFbwZVGH2ZKpdyf0q/VsMzyddROjpmgIqXWQk8aD0ZfaFideDH+CnnVwiIBMkv9jwhwqI5I5HxdAC+vRjIJxa/TjgXEhtQZDu81T+GYe+dn2egCWYq/rPwqs0Y5L3TPBOD6CUwfjhD5JYcCYSKps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SYxrWxAI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727731735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EdCk7+j89xI+EsUIjwYJo9MUWrLNgZqOLVqTSfJDRYk=;
+	b=SYxrWxAId9ypvVFKbL1Psq3dgssCvfg54i67jNB0L7Ccd3AvoDze1A6r2+KtUJQdsJ0DNA
+	k/yobqohwaoKv7UJ2YTh2mGzS7JJ/pxtGAxMSaRMw0gg3E1TI0BXRFAM2CfZHOcprcTt/I
+	K1AT9AF9pdf8+xYVccqlCShxCNVLb78=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-440---jF32aTOkuf6Xim-f669Q-1; Mon, 30 Sep 2024 17:28:54 -0400
+X-MC-Unique: --jF32aTOkuf6Xim-f669Q-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-718d6ad6105so6875336b3a.1
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 14:28:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727730991; x=1728335791;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1727731733; x=1728336533;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gxqgnSClXAm5hKOjKA4L3emBAnz+dj8s/AGR4GTblOk=;
-        b=Bg5mgpt+c64p+C8MqpsIvoex+AGY03i952W6afARcxhEt8Znox7AEm4mdEnz+PyeWx
-         qXd3aQahp5mB2zoO/YOIb1eVY47W4saOM3YAaHBfLPHMpQerapS5JkcYh5U2E9HtEzIv
-         vwJkZOXg2y4rfz7TwMyGnSdSK2WUv3k8qv0ECJ8yz5bextPg851EQnxGc2vty20LP0K4
-         vJcuVL0H0YZ4V9u1qCXZq6crdXEpHFDwBY0EiE7gCNnKBJ78AnDNBfBp5K4sZLsihbQT
-         sDzo044j+hYvbkakmhGCfnrfQXUcjsLVs1dnoNuK0iY60cBt7SHlR+9DBipXEFkwUXnK
-         k4gw==
-X-Forwarded-Encrypted: i=1; AJvYcCX6di0ehYdbfhobSbfdc0dkfR+VdTgEmiYSJ9krIo7wG4jbOmgYYSUCkz7sthvbKGrTw4e5GfuYOMYStHU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRj2xWCnIlJTOAcZeMbokbL8trqW3gbZW5zy6LqJbOX+jtcI+x
-	LVdWNAW+AhPGhtGB8C1LoWZ0w44YA2BWWnptCW1HW3PZXYJ6969+lW+CR9wP
-X-Google-Smtp-Source: AGHT+IEadElrdky6O1NFT1uokCFwG4qLH9ZPPD4Tz1X1yTy3jL8r57HyQBpG4vxkl2gimna6LNi5LQ==
-X-Received: by 2002:a05:6a00:2d9b:b0:718:e51e:bd25 with SMTP id d2e1a72fcca58-71b26083144mr18939445b3a.25.1727730990826;
-        Mon, 30 Sep 2024 14:16:30 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b265371dbsm6681387b3a.207.2024.09.30.14.16.29
+        bh=EdCk7+j89xI+EsUIjwYJo9MUWrLNgZqOLVqTSfJDRYk=;
+        b=jsEjKLo3VdnRPZYqGCQLslbnesfImE4r7LmdnhxFr+isvP72Gw8t0vMUL5eQJDkbWL
+         BZIbn1rSsQ3v2jc0QhDlHt5J6V423G5DMUrUmL3e5tydAxTfrlWdFJQci16kwwjlkGKX
+         BmltxsRMDsz/BOU9im3XTCplgJbta++xrzUEjJbnx/y/HlHSqnbhmF7SJY2Jplj++K8M
+         hbkamr8lOi6mijCPkbzx7gjY2jWGcgeWA5JfeUBKhnkbfTZGrejPoSMi4SO5FyuW4Jos
+         X4VKsReBD5AXYW+PT8iHtWnQ+HX82Z666oqXzyod1mgWRGDeph6nTibgPaktdQ1kDASi
+         s8OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWpgsdY8NckBcPGDdGF1XlLUOVGRS53bhCXQnOhbmCMHW36G+3Fp0drz3+6ByzqEq2pR3qMv4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/XD0o2W2K05c9vZjgB44vapdfSJD6Bbii70EwiBMtXFbOrt1D
+	RC0IY9S/1LFGq0WalI3XQbJRsjlDyjKDi1yB/MEjsasa5tlqbHUZvusMpFJqFC9KRbHrKyJFh3k
+	b6gU2YYfQV6TxucDGmx/vBAG+/ZF3a7ZVOJReHor37Xw+KlN0pSO/BwxRZJ54yg==
+X-Received: by 2002:a05:6a21:1743:b0:1cf:6d6d:2e05 with SMTP id adf61e73a8af0-1d4fa6bb354mr21063800637.30.1727731732827;
+        Mon, 30 Sep 2024 14:28:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE8/U8urs1ZyXluufNS0Hap8/qkPT67talEPfm75uE6j9PZ2UYWxKTr1EHp3kzvId+HupepVg==
+X-Received: by 2002:a05:6a21:1743:b0:1cf:6d6d:2e05 with SMTP id adf61e73a8af0-1d4fa6bb354mr21063771637.30.1727731732438;
+        Mon, 30 Sep 2024 14:28:52 -0700 (PDT)
+Received: from x1gen2nano.local ([2600:1700:1ff0:d0e0::40])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26517631sm6708282b3a.111.2024.09.30.14.28.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 14:16:30 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	tobias@waldekranz.com,
-	anna-maria@linutronix.de
-Subject: [PATCH net-next] net: marvell: mvmdio: use clk_get_optional
-Date: Mon, 30 Sep 2024 14:16:28 -0700
-Message-ID: <20240930211628.330703-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.2
+        Mon, 30 Sep 2024 14:28:52 -0700 (PDT)
+From: Andrew Halaney <ahalaney@redhat.com>
+Date: Mon, 30 Sep 2024 16:28:38 -0500
+Subject: [PATCH RFT] of: property: fw_devlink: Add support for the
+ "phy-handle" binding
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240930-phy-handle-fw-devlink-v1-1-4ea46acfcc12@redhat.com>
+X-B4-Tracking: v=1; b=H4sIAAUY+2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDCyNL3YKMSl2gREpOqm5auW5KallOZl62bhJQyszIyMjAIDFVCai3oCg
+ 1LbMCbG60UpBbiFJsbS0AZxa7oGwAAAA=
+To: Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+ Andrew Lunn <andrew@lunn.ch>, Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ Serge Semin <fancer.lancer@gmail.com>, devicetree@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>
+X-Mailer: b4 0.14.1
 
-The code seems to be handling EPROBE_DEFER explicitly and if there's no
-error, enables the clock. clk_get_optional exists for that.
+Add support for parsing the phy-handle binding so that fw_devlink can
+enforce the dependency. This prevents MACs (that use this binding to
+claim they're using the corresponding phy) from probing prior to the
+phy, unless the phy is a child of the MAC (which results in a
+dependency cycle) or similar.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
+For some motivation, imagine a device topology like so:
+
+    &ethernet0 {
+            phy-mode = "sgmii";
+            phy-handle = <&sgmii_phy0>;
+
+            mdio {
+                    compatible = "snps,dwmac-mdio";
+                    sgmii_phy0: phy@8 {
+                            compatible = "ethernet-phy-id0141.0dd4";
+                            reg = <0x8>;
+                            device_type = "ethernet-phy";
+                    };
+
+                    sgmii_phy1: phy@a {
+                            compatible = "ethernet-phy-id0141.0dd4";
+                            reg = <0xa>;
+                            device_type = "ethernet-phy";
+                    };
+            };
+    };
+
+    &ethernet1 {
+            phy-mode = "sgmii";
+            phy-handle = <&sgmii_phy1>;
+    };
+
+Here ethernet1 depends on sgmii_phy1 to function properly. In the below
+link an issue is reported where ethernet1 is probed and used prior to
+sgmii_phy1, resulting in a failure to get things working for ethernet1.
+With this change in place ethernet1 doesn't probe until sgmii_phy1 is
+ready, resulting in ethernet1 functioning properly.
+
+ethernet0 consumes sgmii_phy0, but this dependency isn't enforced
+via the device_links backing fw_devlink since ethernet0 is the parent of
+sgmii_phy0. Here's a log showing that in action:
+
+    [    7.000432] qcom-ethqos 23040000.ethernet: Fixed dependency cycle(s) with /soc@0/ethernet@23040000/mdio/phy@8
+
+With this change in place ethernet1's dependency is properly described,
+and it doesn't probe prior to sgmii_phy1 being available.
+
+Link: https://lore.kernel.org/netdev/7723d4l2kqgrez3yfauvp2ueu6awbizkrq4otqpsqpytzp45q2@rju2nxmqu4ew/
+Suggested-by: Serge Semin <fancer.lancer@gmail.com>
+Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
 ---
- drivers/net/ethernet/marvell/mvmdio.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+I've marked this as an RFT because when looking through old mailing
+list discusssions and kernel tech talks on this subject, I was unable
+to really understand why in the past phy-handle had been left out. There
+were some loose references to circular dependencies (which seem more or
+less handled by fw_devlink to me), and the fact that a lot of behavior
+happens in ndo_open() (but I couldn't quite grok the concern there).
 
-diff --git a/drivers/net/ethernet/marvell/mvmdio.c b/drivers/net/ethernet/marvell/mvmdio.c
-index e1d003fdbc2e..67378e9f538a 100644
---- a/drivers/net/ethernet/marvell/mvmdio.c
-+++ b/drivers/net/ethernet/marvell/mvmdio.c
-@@ -348,13 +348,12 @@ static int orion_mdio_probe(struct platform_device *pdev)
- 		if (type == BUS_TYPE_XSMI)
- 			orion_mdio_xsmi_set_mdc_freq(bus);
- 	} else {
--		dev->clk[0] = clk_get(&pdev->dev, NULL);
--		if (PTR_ERR(dev->clk[0]) == -EPROBE_DEFER) {
--			ret = -EPROBE_DEFER;
-+		dev->clk[0] = clk_get_optional(&pdev->dev, NULL);
-+		if (IS_ERR(dev->clk[0])) {
-+			ret = PTR_ERR(dev->clk[0]);
- 			goto out_clk;
- 		}
--		if (!IS_ERR(dev->clk[0]))
--			clk_prepare_enable(dev->clk[0]);
-+		clk_prepare_enable(dev->clk[0]);
- 	}
- 
- 
-@@ -422,8 +421,6 @@ static void orion_mdio_remove(struct platform_device *pdev)
- 	mdiobus_unregister(bus);
- 
- 	for (i = 0; i < ARRAY_SIZE(dev->clk); i++) {
--		if (IS_ERR(dev->clk[i]))
--			break;
- 		clk_disable_unprepare(dev->clk[i]);
- 		clk_put(dev->clk[i]);
- 	}
+I'd appreciate more testing by others and some feedback from those who
+know this a bit better to indicate whether fw_devlink is ready to handle
+this or not.
+
+At least in my narrow point of view, it's working well for me.
+
+Thanks,
+Andrew
+---
+ drivers/of/property.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/of/property.c b/drivers/of/property.c
+index 11b922fde7af..4a2fca75e1c6 100644
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@ -1220,6 +1220,7 @@ DEFINE_SIMPLE_PROP(hwlocks, "hwlocks", "#hwlock-cells")
+ DEFINE_SIMPLE_PROP(extcon, "extcon", NULL)
+ DEFINE_SIMPLE_PROP(nvmem_cells, "nvmem-cells", "#nvmem-cell-cells")
+ DEFINE_SIMPLE_PROP(phys, "phys", "#phy-cells")
++DEFINE_SIMPLE_PROP(phy_handle, "phy-handle", NULL)
+ DEFINE_SIMPLE_PROP(wakeup_parent, "wakeup-parent", NULL)
+ DEFINE_SIMPLE_PROP(pinctrl0, "pinctrl-0", NULL)
+ DEFINE_SIMPLE_PROP(pinctrl1, "pinctrl-1", NULL)
+@@ -1366,6 +1367,7 @@ static const struct supplier_bindings of_supplier_bindings[] = {
+ 	{ .parse_prop = parse_extcon, },
+ 	{ .parse_prop = parse_nvmem_cells, },
+ 	{ .parse_prop = parse_phys, },
++	{ .parse_prop = parse_phy_handle, },
+ 	{ .parse_prop = parse_wakeup_parent, },
+ 	{ .parse_prop = parse_pinctrl0, },
+ 	{ .parse_prop = parse_pinctrl1, },
+
+---
+base-commit: cea5425829f77e476b03702426f6b3701299b925
+change-id: 20240829-phy-handle-fw-devlink-b829622200ae
+
+Best regards,
 -- 
-2.46.2
+Andrew Halaney <ahalaney@redhat.com>
 
 
