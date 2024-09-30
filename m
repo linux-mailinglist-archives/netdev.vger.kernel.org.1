@@ -1,145 +1,266 @@
-Return-Path: <netdev+bounces-130267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D33989A8D
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 08:36:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ABF0989B30
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 09:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6045CB214E0
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 06:36:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C015283FB8
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 07:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E6F14E2E8;
-	Mon, 30 Sep 2024 06:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F54155A2F;
+	Mon, 30 Sep 2024 07:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="sRG6o+df"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="PsX4i5iU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10011201.me.com (pv50p00im-ztdg10011201.me.com [17.58.6.39])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E32E140E3C
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 06:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E37E45027;
+	Mon, 30 Sep 2024 07:15:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727678160; cv=none; b=LCuPCvkYUgMZdnHX3ZCVbOq5eCxxwPZmANRNgFtpR1s+NZ1mTqte02EefIcNLDKoMQI/SEF1HmF1AUFoDXdxZfpDZ0oaSFvusz826/aVBormQUzeb9rnE4F3nNuswTACuV2sMkM+AWwLZ7TjeVofQFHC104PLnXHm3xFX2d9YB4=
+	t=1727680561; cv=none; b=RaioUj5LImg7GdwMmLFTpjkfwnuOtV1SJkguLxXop9t07MiCewc/uaRZwu6rxgiZbTQLkw5m/SOhKfheuufLHPzz/25KW9ffOW4NebnTysly6FHbsePIpTncdPHaUY/ae6z7UrhhuArjvgMRLPwdh/UMErFX/aOSnEs3VD4oeDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727678160; c=relaxed/simple;
-	bh=A5LErH9xv6FDKEOfjQFXuxh4NmofzV8m2ak+duflbiA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aSt+SsPVScnSwLCL5YukLgmpdFtcww7UnU5LfotQiPf7uqJsc+bh8Wvy7P5gFcl/LMXcZ24M3dcfOlV6IuvqhXtbf2qQq88AFFEPVXrp/3CEg5X1Mw3c+J6kqp7aVnyjZNBAPasvhtRrlegN+OdUgmTS38JP97VR1+QVvQMeus4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=sRG6o+df; arc=none smtp.client-ip=17.58.6.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1727678159;
-	bh=YpNvQndGB93js4nxUO98HA455aZHMvYwZk3y5ssfRE4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=sRG6o+dflKJ+qcAgvo6hpdBjLrjvNrKdyhb6Jby+BnwNOnqmZgQ+snZipc2hOqY35
-	 IAsXdDPLHclRkbpHLczc8EU6u1/A+l6cxSNhR+LRRt5uJcxgwlaeVnxl2IdNM8IVmO
-	 WFS7pqnMLIvhC+lu8VRN4py4SgxddtY0AI7Ota/dx2OU96HtJ6ifhLEISqGHLSUyOT
-	 it4PM26mPbO6Qzsv20rfpg2xFWOzhhFD1fuMTKoojXLHeBT7IeWJZDOXWHKX9Tns3b
-	 Z+H3ZjUpvDTW54/tsBA6aamtyw3RQpx4w2YeKvP4/HXxjdyZOs+dVhSObpWNODek+3
-	 wNOvrWwr1tp9g==
-Received: from ubuntu.. (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011201.me.com (Postfix) with ESMTPSA id EA2C168031C;
-	Mon, 30 Sep 2024 06:35:49 +0000 (UTC)
-From: Kacper Ludwinski <kac.ludwinski@icloud.com>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	vladimir.oltean@nxp.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	petrm@nvidia.com,
-	horms@kernel.org,
-	edumazet@google.com,
-	shuah@kernel.org,
-	Kacper Ludwinski <kac.ludwinski@icloud.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH net v4] selftests: net: no_forwarding: fix VID for $swp2 in one_bridge_two_pvids() test
-Date: Mon, 30 Sep 2024 15:35:43 +0900
-Message-ID: <20240930063543.94247-1-kac.ludwinski@icloud.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1727680561; c=relaxed/simple;
+	bh=woMxg/j4NP6XZd49rIGatAG25hIrZzeXyxPnCn/FYPg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VFbSWjLYUCl6ol1doOjYgP31EQCDvHC2s226vqW4obA5AXxTH50ApodZCQCygD65DId/1WqLEIpBgbvXTaLUS214DIRtyBBHScd2aovon0XVqGC5iprWqRVI6KlhMkUU5MnHWWKO1yHOErPHSiBcWN5b8VWv2R/98EU4ucvuDYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=PsX4i5iU; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1727680550; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=JZL/ku9aK9zw7vcczmtqa5/1hHelV84Np4wXlJZ7rek=;
+	b=PsX4i5iUM0+n2ProvPT6uiNcHZEsP6TcKgCZwiaE298gfOrJbmrO7UYLAGx3fCYNGcUKNxurI3jD8IZ0PJOuFXDJKfIlwmfobBxoR/d8u1eIO+6OqZwQr1tXorquIXg8iMzqTsggn9YSX3/+vRmpDaJkmJND8EsDf5Y/TkxDYGk=
+Received: from 30.221.144.234(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WG-IUOL_1727680548)
+          by smtp.aliyun-inc.com;
+          Mon, 30 Sep 2024 15:15:49 +0800
+Message-ID: <be2685ab-272a-4f10-9322-a0bb0a35e3d4@linux.alibaba.com>
+Date: Mon, 30 Sep 2024 15:15:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v2] net/smc: Introduce a hook to modify
+ syn_smc at runtime
+To: Zhu Yanjun <yanjun.zhu@linux.dev>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+ guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com,
+ bpf@vger.kernel.org
+References: <1727408549-106551-1-git-send-email-alibuda@linux.alibaba.com>
+ <f60061bb-109a-4fa8-b419-07585cbb79e3@linux.dev>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <f60061bb-109a-4fa8-b419-07585cbb79e3@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: BHsBwRKz_xEIlJoQRYXd2gKmIwKOYFrm
-X-Proofpoint-ORIG-GUID: BHsBwRKz_xEIlJoQRYXd2gKmIwKOYFrm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-30_06,2024-09-27_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 mlxscore=0 adultscore=0
- bulkscore=0 mlxlogscore=999 suspectscore=0 phishscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2409300046
-X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-Currently, the second bridge command overwrites the first one.
-Fix this by adding this VID to the interface behind $swp2.
 
-The one_bridge_two_pvids() test intends to check that there is no
-leakage of traffic between bridge ports which have a single VLAN - the
-PVID VLAN.
 
-Because of a typo, port $swp1 is configured with a PVID twice (second
-command overwrites first), and $swp2 isn't configured at all (and since
-the bridge vlan_default_pvid property is set to 0, this port will not
-have a PVID at all, so it will drop all untagged and priority-tagged
-traffic).
+On 9/29/24 7:56 PM, Zhu Yanjun wrote:
+> 在 2024/9/27 11:42, D. Wythe 写道:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> The introduction of IPPROTO_SMC enables eBPF programs to determine
+>> whether to use SMC based on the context of socket creation, such as
+>> network namespaces, PID and comm name, etc.
+>>
+>> As a subsequent enhancement, this patch introduces a new hook for eBPF
+>> programs that allows decisions on whether to use SMC or not at runtime,
+>> including but not limited to local/remote IP address or ports. In
+>> simpler words, this feature allows modifications to syn_smc through eBPF
+>> programs before the TCP three-way handshake got established.
+>>
+>> Thanks to kfunc for making it easier for us to implement this feature in
+>> SMC.
+>>
+>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>>
+>> ---
+>> v1 -> v2:
+>> 1. Fix wrong use of ireq->smc_ok, should be rx_opt->smc_ok.
+>> 2. Fix compile error when CONFIG_IPV6 or CONFIG_BPF_SYSCALL was not set.
+>>
+>> ---
+>>   include/linux/tcp.h  |  4 ++-
+>>   net/ipv4/tcp_input.c |  4 +--
+>>   net/smc/af_smc.c     | 75 ++++++++++++++++++++++++++++++++++++++++++++++------
+>>   3 files changed, 72 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+>> index 6a5e08b..d028d76 100644
+>> --- a/include/linux/tcp.h
+>> +++ b/include/linux/tcp.h
+>> @@ -478,7 +478,9 @@ struct tcp_sock {
+>>   #endif
+>>   #if IS_ENABLED(CONFIG_SMC)
+>>       bool    syn_smc;    /* SYN includes SMC */
+>> -    bool    (*smc_hs_congested)(const struct sock *sk);
+>> +    void    (*smc_openreq_init)(struct request_sock *req,
+>> +                 const struct tcp_options_received *rx_opt,
+>> +                 struct sk_buff *skb, const struct sock *sk);
+>>   #endif
+>>   #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+>> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+>> index 9f314df..99f34f5 100644
+>> --- a/net/ipv4/tcp_input.c
+>> +++ b/net/ipv4/tcp_input.c
+>> @@ -7036,8 +7036,8 @@ static void tcp_openreq_init(struct request_sock *req,
+>>       ireq->ir_num = ntohs(tcp_hdr(skb)->dest);
+>>       ireq->ir_mark = inet_request_mark(sk, skb);
+>>   #if IS_ENABLED(CONFIG_SMC)
+>> -    ireq->smc_ok = rx_opt->smc_ok && !(tcp_sk(sk)->smc_hs_congested &&
+>> -            tcp_sk(sk)->smc_hs_congested(sk));
+>> +    if (rx_opt->smc_ok && tcp_sk(sk)->smc_openreq_init)
+>> +        tcp_sk(sk)->smc_openreq_init(req, rx_opt, skb, sk);
+>>   #endif
+>>   }
+>> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+>> index 0316217..fdac7e2b 100644
+>> --- a/net/smc/af_smc.c
+>> +++ b/net/smc/af_smc.c
+>> @@ -70,6 +70,15 @@
+>>   static void smc_tcp_listen_work(struct work_struct *);
+>>   static void smc_connect_work(struct work_struct *);
+>> +__bpf_hook_start();
+>> +
+>> +__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
+>> +{
+>> +    return 1;
+>> +}
+>> +
+>> +__bpf_hook_end();
+>> +
+>>   int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
+>>   {
+>>       struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
+>> @@ -156,19 +165,43 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+>>       return NULL;
+>>   }
+>> -static bool smc_hs_congested(const struct sock *sk)
+>> +static void smc_openreq_init(struct request_sock *req,
+>> +                 const struct tcp_options_received *rx_opt,
+>> +                 struct sk_buff *skb, const struct sock *sk)
+>>   {
+>> +    struct inet_request_sock *ireq = inet_rsk(req);
+>> +    struct sockaddr_storage rmt_sockaddr = {0};
+> 
+> A trivial problem.
+> 
+> The following should be better?
+> 
+> struct sockaddr_storage rmt_sockaddr = {};
+> 
+> I think, we have discussed this problem in RDMA maillist for several times.
+> 
+> Zhu Yanjun
 
-So, instead of testing the configuration that was intended, we are
-testing a different one, where one port has PVID 2 and the other has
-no PVID. This incorrect version of the test should also pass, but is
-ineffective for its purpose, so fix the typo.
 
-This typo has an impact on results of the test results,
-potentially leading to wrong conclusions regarding
-the functionality of a network device.
+This is truly new information to me. Can you provide me with some discussion links?
+Thanks.
 
-Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
-Signed-off-by: Kacper Ludwinski <kac.ludwinski@icloud.com>
----
- tools/testing/selftests/net/forwarding/no_forwarding.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+D. Wythe
 
-v4:
-	- Add revision history od this patch
-	- Add "Reviewed-by:"
-	- Limit number of characters in commit to 80
-	- Add impact explanation to commit message
-v3:
-	- Edit commit message
-	- Add missing Signed-off-by
-	- Link: https://lore.kernel.org/linux-kselftest/20240927112824.339-1-kac.ludwinski@icloud.com/
-v2:
-	- Add missing CCs
-	- Fix typo in commit message
-	- Add target name
-	- Link: https://lore.kernel.org/linux-kselftest/fQknN_r6POzmrp8UVjyA3cknLnB1HB9I_jfaHoQScvvgHr59VfUNRs9IDo4kQHm1uxEp8_Luym2Vi6_aUGJIec3ZPhjY2qnJ57NgLZGA3K4=@protonmail.com/
-v1:
-	- Link: https://lore.kernel.org/linux-kselftest/20240925050539.1906-1-kacper@ludwinski.dev/
 
-diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
-index 9e677aa64a06..694ece9ba3a7 100755
---- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
-+++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
-@@ -202,7 +202,7 @@ one_bridge_two_pvids()
- 	ip link set $swp2 master br0
- 
- 	bridge vlan add dev $swp1 vid 1 pvid untagged
--	bridge vlan add dev $swp1 vid 2 pvid untagged
-+	bridge vlan add dev $swp2 vid 2 pvid untagged
- 
- 	run_test "Switch ports in VLAN-aware bridge with different PVIDs"
- 
--- 
-2.43.0
+> 
+>>       const struct smc_sock *smc;
+>>       smc = smc_clcsock_user_data(sk);
+>>       if (!smc)
+>> -        return true;
+>> +        return;
+>> -    if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+>> -        return true;
+>> +    if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+>> +        goto out_no_smc;
+>> -    return false;
+>> +    rmt_sockaddr.ss_family = sk->sk_family;
+>> +
+>> +    if (rmt_sockaddr.ss_family == AF_INET) {
+>> +        struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
+>> +
+>> +        rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
+>> +        rmt4_sockaddr->sin_port    = ireq->ir_rmt_port;
+>> +#if IS_ENABLED(CONFIG_IPV6)
+>> +    } else {
+>> +        struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
+>> +
+>> +        rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
+>> +        rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
+>> +#endif /* CONFIG_IPV6 */
+>> +    }
+>> +
+>> +    ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
+>> +    return;
+>> +out_no_smc:
+>> +    ireq->smc_ok = 0;
+>> +    return;
+>>   }
+>>   struct smc_hashinfo smc_v4_hashinfo = {
+>> @@ -1671,7 +1704,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
+>>       }
+>>       smc_copy_sock_settings_to_clc(smc);
+>> -    tcp_sk(smc->clcsock->sk)->syn_smc = 1;
+>> +    tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
+>>       if (smc->connect_nonblock) {
+>>           rc = -EALREADY;
+>>           goto out;
+>> @@ -2650,8 +2683,7 @@ int smc_listen(struct socket *sock, int backlog)
+>>       inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
+>> -    if (smc->limit_smc_hs)
+>> -        tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
+>> +    tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
+>>       rc = kernel_listen(smc->clcsock, backlog);
+>>       if (rc) {
+>> @@ -3475,6 +3507,24 @@ static void __net_exit smc_net_stat_exit(struct net *net)
+>>       .exit = smc_net_stat_exit,
+>>   };
+>> +#if IS_ENABLED(CONFIG_BPF_SYSCALL)
+>> +BTF_SET8_START(bpf_smc_fmodret_ids)
+>> +BTF_ID_FLAGS(func, select_syn_smc)
+>> +BTF_SET8_END(bpf_smc_fmodret_ids)
+>> +
+>> +static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
+>> +    .owner = THIS_MODULE,
+>> +    .set   = &bpf_smc_fmodret_ids,
+>> +};
+>> +
+>> +static int bpf_smc_kfunc_init(void)
+>> +{
+>> +    return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
+>> +}
+>> +#else
+>> +static inline int bpf_smc_kfunc_init(void) { return 0; }
+>> +#endif /* CONFIG_BPF_SYSCALL */
+>> +
+>>   static int __init smc_init(void)
+>>   {
+>>       int rc;
+>> @@ -3574,8 +3624,17 @@ static int __init smc_init(void)
+>>           pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
+>>           goto out_ulp;
+>>       }
+>> +
+>> +    rc = bpf_smc_kfunc_init();
+>> +    if (rc) {
+>> +        pr_err("%s: bpf_smc_kfunc_init fails with %d\n", __func__, rc);
+>> +        goto out_inet;
+>> +    }
+>> +
+>>       static_branch_enable(&tcp_have_smc);
+>>       return 0;
+>> +out_inet:
+>> +    smc_inet_exit();
+>>   out_ulp:
+>>       tcp_unregister_ulp(&smc_ulp_ops);
+>>   out_lo:
 
