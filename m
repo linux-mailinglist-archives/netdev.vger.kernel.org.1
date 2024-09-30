@@ -1,229 +1,202 @@
-Return-Path: <netdev+bounces-130544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B3398AC13
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:28:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B618898AC10
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76B791C22D3B
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:28:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C0291F23AAB
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197FB1990AE;
-	Mon, 30 Sep 2024 18:28:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E00198E93;
+	Mon, 30 Sep 2024 18:27:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H2eZl+tT"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SU6wPL38"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120EC199247
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7442B9A5
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:27:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727720886; cv=none; b=u4cQywDEiYviyN6vpnWsBKKCJE4LP8wpbbtybQ5Ll6x8wJGavc4H7B8hiE7yMw58HKEdNx1UQT7/CxgnMV4BhyBogH9VaVWe2r+ZBZzF7VAK9mUYdG9f/NUTRItuwG1kUDBmRyX+/oFVfWhqIG8H71tgMZq0uaLuJY+5n6KK1KQ=
+	t=1727720878; cv=none; b=lYEoRxHiKLCB6QlCeINGl1GXlTUq29ad46iwygty5f4BKPlCwR71qfYqw9tlK/Npb0POHg8MuDCU/2TT2VWUyhRYRb7XDp+11Bp6MBYtKhK0srEfxOnl4QZtaXbpqnpdSXTeUYigYQepzvxjBmTV/RnRVISN4p6SXJ+HGD1DeZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727720886; c=relaxed/simple;
-	bh=J31iYw2EsL6fME8Jo9sRiFNQanqUmiDy11cY3scqyl4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kH55FM2PYWNbJPQzhl1u07KkvUJNjvHVUxISaWOMjA5jE7ONeltvOgXmgIp1s7RtdWiCIyVyfGHGg95zQcrnZ7KIiUT8DfBGJU+K4gVWeP8+/+s9dnyy1tEUbG0jSCFJLdnnCM6mvN6U4G1ubbiAiKY8xPMq2jkMDhmXNpIwN/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H2eZl+tT; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fad5024b8dso9728071fa.1
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 11:28:03 -0700 (PDT)
+	s=arc-20240116; t=1727720878; c=relaxed/simple;
+	bh=nvwJJ15JmmkZT83aobCZ7FHy1UzocWPcTJVI45aKs+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W9KvF6GsqVadhj441A+KS2VgW7Hf+CbAIw3ynXs/jHNwZDQvcn79Kx62es2/L/xcwVa2LlMdwDv8HFDkVQprL2NSU1jDNpvDUmMFjogap7qIWoLOmC56Y7hqNuVUT17R8UgQzIp0I7ENNKpBevjnsc+ptlwy1yVjzYQUGDqw1xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SU6wPL38; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20b1335e4e4so42797395ad.0
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 11:27:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727720882; x=1728325682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hNMX9i6xizZxd1sDK+DA0ZYLDA/frsIwMVk0c/LHdgk=;
-        b=H2eZl+tT/l7ntkKYpmA1Snbs3ju+rfxJe8qVlyl4wbMcS5RGl7CncVIAuZQYWYCphs
-         l9nPp2xeWKWrhZH/H60QeyS0QzetLzLxQ41AGgqHmuTSbXyOoZxDzXgS5C4qBrtcI1r/
-         gEAUtlqlWEL1Zgis0Fx43b9u2UQs8o6+SpktA+KZPhsdP8jLvGQrpEEMlXnqpEsH7BRO
-         weajnC1rxychVlC8pVPUbJbgOicqDDLGbP5BmQP60Cnd0M5/rJ/RznsObyO8DUCJX7RC
-         uV+sPSIfzW2tgIs/TDZq+3xRgL7aRSxJcJc331HpNt3fRCXZRx+DrhMAVEW0fpt/mD/y
-         Ai+Q==
+        d=purestorage.com; s=google2022; t=1727720876; x=1728325676; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZ8ek2hT/WFDjyeRsPQC6Ye9s+aSlMGsNX4bBi7RmHM=;
+        b=SU6wPL388BuWNeYCPUVMRm3YeOjB7pE7Cn8PMcTj4MLV1y/qxYubgbla2h3CkIPdWE
+         sMY4oCsHrpp4mZirvDA82VFnJLdV6elmGtyNiT20LXCi6zIA3ZNdrrcHIHTbe/dJ0TUJ
+         riz+kZBFG7GN/Nf6JP/3f1bs3uu5mRAwCCUDJBDyxwmQv+CtLcN5i18wfba27mt5+y6j
+         jqX6LptjfLnCyViDwtMKS4BSj1jxl6SodeQXChNvv7ILnwFA/Sfj50J7oWkc84YUDYBt
+         TwFew2Ntz9Ot+ifTxH+7bsGPjKfPD88UHH4v8BIN5gOhJPgobmdXLVxaN7cdXDTG8C7F
+         V8Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727720882; x=1728325682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hNMX9i6xizZxd1sDK+DA0ZYLDA/frsIwMVk0c/LHdgk=;
-        b=fdOToaGgy5b7X6h4EFF9Fdvya+z2h1D+1HslPlsDs23/1tNuzL7qw6Rg8khxQTa+Gl
-         Fh45H8ScudF0OfkbXM9n/3IHkfVy0HKzYeBe0WNw3XZ6f7uVv+vVn6HVFDK7N1AKLdox
-         78QiBpiavyRwZ8htWvQ5RZqewy4mGrrN58OumxEYqXFQZr0mrKxMJuXq2PMoHWlW9Mlx
-         CV6v3CheHRXoRkiWdKSsMyB5FolRhnbOymHMFwtnDFBD8JFpGOdjcIiDWw24CAEoQgTl
-         6P3P3VntxxE6guIFjAYx3m9XsCg9Y7czZgN5s3giV0MIyrr0c6SbWoBN50ctj5kOF7cW
-         S/Tg==
-X-Gm-Message-State: AOJu0YzV0LdRA8BVygwdbf6bbR51IMNalbrHrg69HmAD2141OMQFwUMl
-	F0+tjIJuE0KqJ6AOCJ1TCNhK/WOU4yWJZeGNx+wp2UKMtwE/IT+Yf237tcbmKCggQkNri2zIaVJ
-	w6aMm9oM0JruYuUr9nVN502s9bmNXeAJKZrcbBVz6FFjUy20GbB3n
-X-Google-Smtp-Source: AGHT+IEU+USdR74v6Bl8WAplHOTuuqK1D48GRRV5rqcrAqMGrlwW8HtfzJYX20k/2tOEeZuatwVlUXdhav1t7KTEMH4=
-X-Received: by 2002:a2e:709:0:b0:2ef:21b3:cdef with SMTP id
- 38308e7fff4ca-2f9d3e69d25mr50245751fa.25.1727720881787; Mon, 30 Sep 2024
- 11:28:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727720876; x=1728325676;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YZ8ek2hT/WFDjyeRsPQC6Ye9s+aSlMGsNX4bBi7RmHM=;
+        b=JQZWoplfB5l13uyRxFYIuziNsagv7aZi/VCVVQaTyjAHyB3T/wUYWQG6D+gSs3OjsE
+         ymfOPXnEgXMvxgFE0/nwfn4Jp7R/GS+rIwOQ9O7/ck/F9Cd2oPrO8hTGcUkDIs6Tw3iU
+         kMR8M5i8hLuxD+qIkgQrT+v4A+GCGDxXatzbPVMpTj36N25G0K3m7dlBpc6EVsIV8WUm
+         ZYwb5OyO3ZR1CKdrP+lbP0fVZC7OUSLc1+tOwN/s+j1L63ouYfv5uo4BWwbEuWORdnVV
+         Eke9rjgJp41xgfNBydoLePI6829yzUM8mvGRE3wYpMLjmWNS75WFm2k5ZpH/x8Qov/NC
+         NJsw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/I5LdhrtF1DufRl9RUIlv0VaCPbf7wzM8z33W17BOnPIj7qNZXm14aWapCaBZO3Cfa9BPKA0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhvPkUPFfYkJ/hr91uXHjVZ+xS6Ofea4eaHE+uxiuDQp6LogoO
+	0xvb5rcjlxf6Pvv6pnJmW6nVg7s+OfnXzJgzo89sFtjVPU1aAtm+4IYNUxcq1P0=
+X-Google-Smtp-Source: AGHT+IEPD0M1S4D/tI6Apuz0+SRKRkbBIq0MNt57C/GmcGlxlEEyiQcbKrX6kS3f6EzAtW+NVLq8Kg==
+X-Received: by 2002:a17:902:e547:b0:20b:9034:fb44 with SMTP id d9443c01a7336-20b9034fbdbmr48466935ad.16.1727720875944;
+        Mon, 30 Sep 2024 11:27:55 -0700 (PDT)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20b37d67769sm57209885ad.33.2024.09.30.11.27.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 11:27:55 -0700 (PDT)
+Date: Mon, 30 Sep 2024 11:27:54 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Auke Kok <auke-jan.h.kok@intel.com>,
+	"Zhong, YuanYuan" <yzhong@purestorage.com>,
+	Jeff Garzik <jgarzik@redhat.com>, Ying Hsu <yinghsu@chromium.org>,
+	Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [Intel-wired-lan] [PATCH v2 1/1] igb: Do not bring the device up
+ after non-fatal error
+Message-ID: <Zvrtqt_0bc9rSBX6@apollo.purestorage.com>
+References: <20240924210604.123175-1-mkhalfella@purestorage.com>
+ <20240924210604.123175-2-mkhalfella@purestorage.com>
+ <CYYPR11MB8429494B65C5E9A025BF8F96BD742@CYYPR11MB8429.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930180916.GA24637@incl>
-In-Reply-To: <20240930180916.GA24637@incl>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 30 Sep 2024 20:27:50 +0200
-Message-ID: <CANn89iJQDWEyTC5Xc77PEXyxbbvKjm=exb5jKB0-O3ZzZ=W1Hg@mail.gmail.com>
-Subject: Re: [RFC PATCH] ipv6: route: release reference of dsts cached in sockets
-To: Jiri Wiesner <jwiesner@suse.de>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CYYPR11MB8429494B65C5E9A025BF8F96BD742@CYYPR11MB8429.namprd11.prod.outlook.com>
 
-On Mon, Sep 30, 2024 at 8:09=E2=80=AFPM Jiri Wiesner <jwiesner@suse.de> wro=
-te:
->
-> An unbalanced refcount was reported for the loopback device of a net
-> namespace being destroyed:
-> unregister_netdevice: waiting for lo to become free. Usage count =3D 2
->
-> Analysis revealed that the IPv6 net device corresponding to the loopback
-> device did not get destroyed (in6_dev_finish_destroy() was not called).
-> The IPv6 loopback device had an unbalaced refcount:
-> net dev 73da100 lo refcount 1
-> Operation                     Count Balancing Operation     Count
-> hold  __ipv6_dev_mc_inc           2 ma_put                      2
->       addrconf_ifdown             1                             0 unbalan=
-ced
-> hold  fib6_nh_init                2 fib6_nh_init                2
-> put   inet6_ifa_finish_destroy    1 ipv6_add_addr               1
->       ip6_dst_destroy            90                             0 unbalan=
-ced
->       ip6_dst_ifdown             90                             0 unbalan=
-ced
-> hold  ip6_route_dev_notify        6 ip6_route_dev_notify        6
-> hold  ipv6_add_addr               1 inet6_ifa_finish_destroy    1
-> put   ma_put                      2 __ipv6_dev_mc_inc           2
-> hold  ndisc_netdev_event          2 ndisc_netdev_event          2
->       rt6_disable_ip              1                             0 unbalan=
-ced
->
-> The refcount of addrconf_ifdown() balances the refcount increment in
-> ipv6_add_dev(), which had no corresponding trace entry. The
-> rt6_disable_ip() and ip6_dst_ifdown() entries were hold operations on the
-> looback device, and the ip6_dst_destroy() entries were put operations. On=
-e
-> refcount decrement in ip6_dst_destroy() was not executed. At this point, =
-a
-> hash was implemented in the debug kernel to hold the changes of the
-> refcount of dst objects per namespace. The trace for the dst object that
-> did not decrement the IPv6 refcount of loopback follows:
->
-> Function        Parent       Op  Net            Device Dst              R=
-efcount Diff
-> ip6_dst_ifdown: dst_dev_put: dst ff404b2f073da100 eth0 ff404af71ffc9c00 1
-> ip6_negative_advice: tcp_retransmit_timer: dst_hold ff404b2f073da100 eth0=
- ff404af71ffc9c00 1
-> dst_alloc: ip6_dst_alloc: dst_hold ff404b2f073da100 eth0 ff404af71ffc9c00=
- 1
-> ip6_route_output_flags: ip6_dst_lookup_tail: dst_hold ff404b2f073da100 et=
-h0 ff404af71ffc9c00 84
-> dst_release: ip6_negative_advice: dst_put ff404b2f073da100 eth0 ff404af71=
-ffc9c00 1
-> dst_release: tcp_retransmit_timer: dst_put ff404b2f073da100 eth0 ff404af7=
-1ffc9c00 20
-> dst_release: inet_sock_destruct: dst_put ff404b2f073da100 eth0 ff404af71f=
-fc9c00 29
-> dst_release: __dev_queue_xmit: dst_put ff404b2f073da100 eth0 ff404af71ffc=
-9c00 34
-> dst_release: rt6_remove_exception: dst_put ffffffff9c8e2a80 blackhole_dev=
- ff404af71ffc9c00 1
->
-> The ip6_dst_ifdown() trace entry was neither a hold nor a put - it merely
-> indicates that the net device of the dst object was changed to
-> blackhole_dev and the IPv6 refcount was transferred onto the loopback
-> device. There was no ip6_dst_destroy() trace entry, which means the dst
-> object was not destroyed. There were 86 hold operations but only 85 put
-> operations so the dst object was not destroyed because the refcount of th=
-e
-> dst object was unbalanced.
->
-> The problem is that the refcount sums are ambiguous. The most probable
-> explanation is this: The dst object was a route for an IPv6 TCP connectio=
-n
-> that kept timing out. Sometimes, the process closed the socket, which
-> corresponds to the refcount decrements of the
-> dst_release()/inet_sock_destruct() entries. Sometimes, the TCP retransmit
-> timer reset the dst of the sockets, which corresponds to the
-> dst_release()/tcp_retransmit_timer() entries. I am unsure about the
-> dst_release()/__dev_queue_xmit() entries because inet6_csk_xmit() sets
-> skb->_skb_refdst with SKB_DST_NOREF.
->
-> The feature that sets the above trace apart from all the other dst traces
-> is the execution of ip6_negative_advice() for a cached and also expired
-> dst object in the exception table. The cached and expired dst object has
-> its refcount set to at least 2 before executing rt6_remove_exception_rt()
-> found in ip6_negative_advice(). One decrement happens in
-> rt6_remove_exception() after the dst object has been removed from the
-> exception table. The other decrement happens in sk_dst_reset() but that
-> one is counteracted by a dst_hold() intentionally placed just before the
-> sk_dst_reset() in ip6_negative_advice(). The probem is that a socket that
-> keeps a reference to a dst in its sk_dst_cache member increments the
-> refcount of the dst by 1. This is apparent in the following code paths:
-> * When ip6_route_output_flags() finds a dst that is then stored in
->   sk->sk_dst_cache by ip6_dst_store() called from inet6_csk_route_socket(=
-).
-> * When inet_sock_destruct() calls dst_release() for sk->sk_dst_cache
-> Provided the dst is not kept in the sk_dst_cache member of another socket=
-,
-> there is no other object tied to the dst (the socket lost its reference
-> and the dst is no longer in the exception table) and the dst becomes a
-> leaked object after ip6_negative_advice() finishes. This leak then
-> precludes the net namespace from being destroyed.
->
-> The patch that introduced the dst_hold() in ip6_negative_advice() was
-> 92f1655aa2b22 ("net: fix __dst_negative_advice() race"). But 92f1655aa2b2=
-2
-> only refactored the code with regards to the dst refcount so the issue wa=
-s
-> present even before 92f1655aa2b22.
->
-> Signed-off-by: Jiri Wiesner <jwiesner@suse.de>
-> ---
-> At the moment, I am sending this as an RFC because I am not able to
-> reproduce the issue in-house. The customer that encountered the issue is
-> currently running tests. For the customer's testing, I fixed the issue
-> with a kprobe module that calls dst_release() right after
-> rt6_remove_exception_rt() returns in ip6_negative_advice(), which is not
-> quite the same as the change proposed below.
->
->  net/ipv6/route.c | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index b4251915585f..b70267c8d251 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -2780,10 +2780,7 @@ static void ip6_negative_advice(struct sock *sk,
->         if (rt->rt6i_flags & RTF_CACHE) {
->                 rcu_read_lock();
->                 if (rt6_check_expired(rt)) {
-> -                       /* counteract the dst_release() in sk_dst_reset()=
- */
-> -                       dst_hold(dst);
->                         sk_dst_reset(sk);
-> -
->                         rt6_remove_exception_rt(rt);
->                 }
->                 rcu_read_unlock();
-> --
+On 2024-09-28 14:40:05 +0000, Pucha, HimasekharX Reddy wrote:
+> >-----Original Message-----
+> >From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of Mohamed Khalfella
+> > Sent: Wednesday, September 25, 2024 2:36 AM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Auke Kok <auke-jan.h.kok@intel.com>; Zhong, YuanYuan <yzhong@purestorage.com>; Jeff Garzik <jgarzik@redhat.com>; Mohamed Khalfella <mkhalfella@purestorage.com>; Ying Hsu <yinghsu@chromium.org>; Simon Horman <horms@kernel.org>
+> > Cc: netdev@vger.kernel.org; intel-wired-lan@lists.osuosl.org; linux-kernel@vger.kernel.org
+> > Subject: [Intel-wired-lan] [PATCH v2 1/1] igb: Do not bring the device up after non-fatal error
+> >
+> >Commit 004d25060c78 ("igb: Fix igb_down hung on surprise removal") changed igb_io_error_detected() to ignore non-fatal pcie errors in order to avoid hung task that can happen when igb_down() is called multiple times. This caused an issue when processing transient non-fatal errors.
+> > igb_io_resume(), which is called after igb_io_error_detected(), assumes that device is brought down by igb_io_error_detected() if the interface is up. This resulted in panic with stacktrace below.
+> >
+> > [ T3256] igb 0000:09:00.0 haeth0: igb: haeth0 NIC Link is Down [  T292] pcieport 0000:00:1c.5: AER: Uncorrected (Non-Fatal) error received: 0000:09:00.0 [  T292] igb 0000:09:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
+> > [  T292] igb 0000:09:00.0:   device [8086:1537] error status/mask=00004000/00000000
+> > [  T292] igb 0000:09:00.0:    [14] CmpltTO [  200.105524,009][  T292] igb 0000:09:00.0: AER:   TLP Header: 00000000 00000000 00000000 00000000
+> > [  T292] pcieport 0000:00:1c.5: AER: broadcast error_detected message [  T292] igb 0000:09:00.0: Non-correctable non-fatal error reported.
+> > [  T292] pcieport 0000:00:1c.5: AER: broadcast mmio_enabled message [  T292] pcieport 0000:00:1c.5: AER: broadcast resume message [  T292] ------------[ cut here ]------------ [  T292] kernel BUG at net/core/dev.c:6539!
+> > [  T292] invalid opcode: 0000 [#1] PREEMPT SMP [  T292] RIP: 0010:napi_enable+0x37/0x40 [  T292] Call Trace:
+> > [  T292]  <TASK>
+> > [  T292]  ? die+0x33/0x90
+> > [  T292]  ? do_trap+0xdc/0x110
+> > [  T292]  ? napi_enable+0x37/0x40
+> > [  T292]  ? do_error_trap+0x70/0xb0
+> > [  T292]  ? napi_enable+0x37/0x40
+> > [  T292]  ? napi_enable+0x37/0x40
+> > [  T292]  ? exc_invalid_op+0x4e/0x70
+> > [  T292]  ? napi_enable+0x37/0x40
+> > [  T292]  ? asm_exc_invalid_op+0x16/0x20 [  T292]  ? napi_enable+0x37/0x40 [  T292]  igb_up+0x41/0x150 [  T292]  igb_io_resume+0x25/0x70 [  T292]  report_resume+0x54/0x70 [  T292]  ? report_frozen_detected+0x20/0x20 [  T292]  pci_walk_bus+0x6c/0x90 [  T292]  ? aer_print_port_info+0xa0/0xa0 [  T292]  pcie_do_recovery+0x22f/0x380 [  T292]  aer_process_err_devices+0x110/0x160
+> > [  T292]  aer_isr+0x1c1/0x1e0
+> > [  T292]  ? disable_irq_nosync+0x10/0x10 [  T292]  irq_thread_fn+0x1a/0x60 [  T292]  irq_thread+0xe3/0x1a0 [  T292]  ? irq_set_affinity_notifier+0x120/0x120
+> > [  T292]  ? irq_affinity_notify+0x100/0x100 [  T292]  kthread+0xe2/0x110 [  T292]  ? kthread_complete_and_exit+0x20/0x20
+> > [  T292]  ret_from_fork+0x2d/0x50
+> > [  T292]  ? kthread_complete_and_exit+0x20/0x20
+> > [  T292]  ret_from_fork_asm+0x11/0x20
+> > [  T292]  </TASK>
+> >
+> > To fix this issue igb_io_resume() checks if the interface is running and the device is not down this means igb_io_error_detected() did not bring the device down and there is no need to bring it up.
+> >
+> > Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+> > Reviewed-by: Yuanyuan Zhong<yzhong@purestorage.com>
+> > Fixes: 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+> > ---
+> >  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> 
+> Any reproductions steps for reproduction of these issue?
+> 
 
-Interesting, what kernel version is your customer using ?
+I know of two way to reproduce this kernel panic on a kernel that does
+not have the patch above.
 
-I think that with recent kernels (after 5.18), we do not see issues
-because of the use of blackhole_netdev
-instead of loopback.
+1- Using aer-inject:
+
+  This works on both physical machine and vm. Here are the steps on a
+  virtual machine.
+
+  root@(none):~# lspci -t -v -s 03:00.0
+  -[0000:02]---00.0-[03]----00.0  Intel Corporation 82576 Gigabit Network Connection
+  root@(none):~# cat > /tmp/uncor << EOF
+  > AER
+  > UNCOR_STATUS COMP_ABORT
+  > HEADER_LOG 0 1 2 3
+  > EOF
+  root@(none):~# modprobe aer_inject
+  root@(none):~# /var/tmp/aer-inject --id=0000:03:00.0 /tmp/uncor
+
+  This is the qemu command used to start the vm. You probably do not
+  need all the options related to numa settings and iommu. Only the part
+  related to pci setup should be enough.
+
+  /usr/bin/qemu-system-x86_64 \
+    -kernel $SRCDIR/arch/x86/boot/bzImage \
+    -initrd $INITRAMFSIMG \
+    -append "rdinit=/startup.sh console=ttyS0,115200n8" \
+    -machine q35,accel=kvm,kernel-irqchip=split \
+    -nographic \
+    -chardev socket,id=gdb0,host=0.0.0.0,port=22004,telnet=on,server=on,wait=off \
+    -gdb chardev:gdb0 \
+    $GDB_WAIT \
+    -serial telnet:127.0.0.1:22003,server=on,wait=off \
+    -device pxb-pcie,id=pcie.1,bus_nr=2,bus=pcie.0 \
+    -device ioh3420,id=pcie_port1,bus=pcie.1,chassis=1 \
+    -netdev user,id=net0,hostfwd=tcp:127.0.0.1:22002-:22 \
+    -device igb,netdev=net0,id=net0,mac=52:54:00:b8:9c:58,bus=pcie_port1 \
+    -cpu host \
+    -smp 4 \
+    -m 8G \
+    -object memory-backend-ram,size=7G,id=m0 \
+    -object memory-backend-ram,size=1G,id=m1 \
+    -numa node,nodeid=0,memdev=m0,cpus=0-1 \
+    -numa node,nodeid=1,memdev=m1,cpus=2-3 \
+    -chardev socket,id=charmonitor,host=0.0.0.0,port=10001,telnet=on,server=on,wait=off \
+    -mon chardev=charmonitor,id=monitor \
+    -boot order=c \
+    -device intel-iommu,intremap=on
+
+
+2- Using pcie_aer_inject_error
+
+  Injecting pcie aer error from qemu monitor should be enough to trigger
+  the kernel panic. This is using the qemu command above.
+
+  (qemu) pcie_aer_inject_error pcie_port1 0x00004000
 
