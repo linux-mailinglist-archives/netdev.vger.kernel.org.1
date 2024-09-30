@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-130304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1E898A05B
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:24:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAAC298A06B
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC5ECB251DD
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82F36285E14
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679A31917FE;
-	Mon, 30 Sep 2024 11:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14EBD192D93;
+	Mon, 30 Sep 2024 11:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="lJFK0vOr"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="k/WLK6em"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3979190052;
-	Mon, 30 Sep 2024 11:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4D4191F6F;
+	Mon, 30 Sep 2024 11:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727695308; cv=none; b=tzlw2riSRuIda6JleYz5nGL2P/KFH8ITLVaD84n2yEE0hvXlOAG0/f+K8UkPtZ4Q9GO8XId9cOvMn6qNGIEscAoQ2n9SoQ/dHzHmB28PqrkUT8YtMRgWcrvDQli/q0NkKJgZx49j2C/t/G59TJ7uz9ajZoi8CUggtO/jsbuepNE=
+	t=1727695311; cv=none; b=VmiummY5HelXmBqX1QqupXiK9TiJK8DjMr2+VhLPdKZub3utHP7QDaUT8lFZXWJvnet359j7ue02cFfXdWKE0TvwsnjEaxMqlywcxbYen5rT3mldvtTThURJ1gJhAmydT8exGBwNLl5iL/4AYbtSfoB/G1tEjtP1LbM3Y4OPlEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727695308; c=relaxed/simple;
-	bh=pLq3YOT6+rNHjYOPVLrgKEdscljtkQsbJ2htKr9ITqg=;
+	s=arc-20240116; t=1727695311; c=relaxed/simple;
+	bh=lkksD6NGuXpIY+XpTHVBhF7SHlisT53r+IndpiuzOwY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pcPT++bsgmBctQKn7htTdFsvoxJOR10oJcC9l6MMu0qzpyHaXAoDko4qumgby01hmiG4SDNn8xj5kOmN1As9oLekQT0dNeFXh+t0hpdxccx/zOyn1KjT9aOWYRJ777oz95isvW1JqBrJ2dttt8SFNGqxFLbSL4qUr/l1/WNcpJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=lJFK0vOr; arc=none smtp.client-ip=192.134.164.83
+	 MIME-Version; b=P1IqxbSsDBa4v6NUjtxwODjF0lYor2gwzwOcr2t1OehTTMoWxZmevfXDLG0/BaOqDc0qKuZwYZJGTocOE6cdy0YCL+l/E+Dcho9hdlTbSHGMpkDUSO/s5FWbhalTSwOPOE/Aqp4gcubgyc8OPApSudzgz6pl5+dMpmlwRq3LQXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=k/WLK6em; arc=none smtp.client-ip=192.134.164.83
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=nWSmtARBk2gEHkUFa2bT2tPofkcYuwxfvTcgtvxT/uU=;
-  b=lJFK0vOrS5fbWQcJGzSnI82bsXvhhboUYzhz+27wFj1HndtT1jdW/RKo
-   cudYKM4L4K4LzaoL4iGHMmEBrKkm7m9GkpYOrbZYVBk/H0o6DKRAtN8m2
-   3eOQfpu8wZljBWVMPZwGSGTbDJSQSEsJ3vDUlPEEGBErsEpZKryOfXUu4
-   I=;
+  bh=2XKlhDn6AgGoqTZxo5VdksoOUikd1owa2yhjw2qwHt0=;
+  b=k/WLK6em86nT5+RBYtbTv2INfkmz5Wvk4WVE0xnMflr/XVcrxCQt6b/U
+   dXroARqG7x8nBEoU3LOJhCYDlkFZyaTX4S4eHuLdxJm3ZxSHZNRRaqrke
+   bKckiNeCeD30R1cMAvG+/UuxU0neSY+lKsK2E8ddr03qnWL/BU17EFPae
+   A=;
 Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.11,165,1725314400"; 
-   d="scan'208";a="185956881"
+   d="scan'208";a="185956886"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
   by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:21:26 +0200
 From: Julia Lawall <Julia.Lawall@inria.fr>
-To: "David S. Miller" <davem@davemloft.net>
+To: Jon Maloy <jmaloy@redhat.com>
 Cc: kernel-janitors@vger.kernel.org,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	dccp@vger.kernel.org,
 	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 10/35] dccp: Reorganize kerneldoc parameter names
-Date: Mon, 30 Sep 2024 13:20:56 +0200
-Message-Id: <20240930112121.95324-11-Julia.Lawall@inria.fr>
+Subject: [PATCH 15/35] tipc: Reorganize kerneldoc parameter names
+Date: Mon, 30 Sep 2024 13:21:01 +0200
+Message-Id: <20240930112121.95324-16-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20240930112121.95324-1-Julia.Lawall@inria.fr>
 References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
@@ -76,23 +78,68 @@ Problems identified using Coccinelle.
 Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
 ---
- net/dccp/feat.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/tipc/link.c |   14 +++++++-------
+ net/tipc/msg.c  |    2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/dccp/feat.c b/net/dccp/feat.c
-index 54086bb05c42..90ac50556ee0 100644
---- a/net/dccp/feat.c
-+++ b/net/dccp/feat.c
-@@ -626,9 +626,9 @@ static u8 dccp_feat_sp_list_ok(u8 feat_num, u8 const *sp_list, u8 sp_len)
- 
- /**
-  * dccp_feat_insert_opts  -  Generate FN options from current list state
-- * @skb: next sk_buff to be sent to the peer
-  * @dp: for client during handshake and general negotiation
-  * @dreq: used by the server only (all Changes/Confirms in LISTEN/RESPOND)
-+ * @skb: next sk_buff to be sent to the peer
+diff --git a/net/tipc/link.c b/net/tipc/link.c
+index 5c2088a469ce..55c2ad1d88a2 100644
+--- a/net/tipc/link.c
++++ b/net/tipc/link.c
+@@ -461,15 +461,15 @@ u32 tipc_link_state(struct tipc_link *l)
+  * @min_win: minimal send window to be used by link
+  * @max_win: maximal send window to be used by link
+  * @session: session to be used by link
++ * @self: local unicast link id
+  * @peer: node id of peer node
++ * @peer_id: 128-bit ID of peer
+  * @peer_caps: bitmap describing peer node capabilities
+  * @bc_sndlink: the namespace global link used for broadcast sending
+  * @bc_rcvlink: the peer specific link used for broadcast reception
+  * @inputq: queue to put messages ready for delivery
+  * @namedq: queue to put binding table update messages ready for delivery
+  * @link: return value, pointer to put the created link
+- * @self: local unicast link id
+- * @peer_id: 128-bit ID of peer
+  *
+  * Return: true if link was created, otherwise false
   */
- int dccp_feat_insert_opts(struct dccp_sock *dp, struct dccp_request_sock *dreq,
- 			  struct sk_buff *skb)
+@@ -538,17 +538,17 @@ bool tipc_link_create(struct net *net, char *if_name, int bearer_id,
+ /**
+  * tipc_link_bc_create - create new link to be used for broadcast
+  * @net: pointer to associated network namespace
++ * @ownnode: identity of own node
++ * @peer: node id of peer node
++ * @peer_id: 128-bit ID of peer
+  * @mtu: mtu to be used initially if no peers
+  * @min_win: minimal send window to be used by link
+  * @max_win: maximal send window to be used by link
++ * @peer_caps: bitmap describing peer node capabilities
+  * @inputq: queue to put messages ready for delivery
+  * @namedq: queue to put binding table update messages ready for delivery
+- * @link: return value, pointer to put the created link
+- * @ownnode: identity of own node
+- * @peer: node id of peer node
+- * @peer_id: 128-bit ID of peer
+- * @peer_caps: bitmap describing peer node capabilities
+  * @bc_sndlink: the namespace global link used for broadcast sending
++ * @link: return value, pointer to put the created link
+  *
+  * Return: true if link was created, otherwise false
+  */
+diff --git a/net/tipc/msg.c b/net/tipc/msg.c
+index 76284fc538eb..dc3000c28d43 100644
+--- a/net/tipc/msg.c
++++ b/net/tipc/msg.c
+@@ -196,8 +196,8 @@ int tipc_buf_append(struct sk_buff **headbuf, struct sk_buff **buf)
+  * tipc_msg_append(): Append data to tail of an existing buffer queue
+  * @_hdr: header to be used
+  * @m: the data to be appended
+- * @mss: max allowable size of buffer
+  * @dlen: size of data to be appended
++ * @mss: max allowable size of buffer
+  * @txq: queue to append to
+  *
+  * Return: the number of 1k blocks appended or errno value
 
 
