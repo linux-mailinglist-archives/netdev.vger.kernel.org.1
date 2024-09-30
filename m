@@ -1,90 +1,78 @@
-Return-Path: <netdev+bounces-130406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1150798A654
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:57:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98EFA98A65C
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 15:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CECF1F24728
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:57:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3290B1F247E5
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA26191F8D;
-	Mon, 30 Sep 2024 13:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFDB1922EF;
+	Mon, 30 Sep 2024 13:54:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="EI4nIpIO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VHLpTC7X"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012F2199FD2
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 13:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727704409; cv=fail; b=YC44aKGIauDv44lWXuwSU4SjEXH/j//bXU4SgzKvshDwyQDmPrl9NqKVa6+6+lFldZeqvJ2tF2jd6eWSrq8zwko316hg/Bu8CqR7KBH81dVaz2nR4Ku8E5qSyOmZewpcxcYdLck82fEgubZ9zDDarVvkTnOKrc02AFXmTF5VAqw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727704409; c=relaxed/simple;
-	bh=c8s/UkSYgBeYUP/zUyJ/sGRGMzy+uDkEoHfD4PtSliQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IQSvYq4W6YSsbqg/aE6ii1VV19pNhuBZTgphePYFUCqF6xQUEbGowzDRkguaDrv37oHZ4talQxjfMv1ZKSGISUVmsMB7S9je8Wd1lT1hbeasr1ifcjTaYAQJDPloTaSaBkgF2c4BCC8vHF3v9GSGahC1wtjgVC7M9tr86zaTFpY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=EI4nIpIO; arc=fail smtp.client-ip=40.107.237.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oLauarVuumaarU/661hY140lDHfMWqHKrnK/+y5PQJ/udNAaLSX/u2t/+yQnNMeMsUKCgX7PgesZ9V9hne0Zpp1cBCU1oA5nPF9Q6LIZh3N/1C61RW9c3EIvABAFutbzDF4Gp8xBg2yXBv0WJwhXLXZ8SBDUz3vvv8+nLHVU+gZlZEwIAsON4wvZlY4vGSIuAixrZnrCky7P4IWyHLGP3D3M1X9jcPqGvBohpIBQbmFqYceTfSyYeV4fmYwhwyx4rPCLyoCHd4nz7xIbwerAlG33olo2KYCpxtQiYPLSZVULYel25G7XRJ6Fsx8EG8TCqlEpXOToklkEXkiSZcgVVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X4IYNfrc0R076S/IYR0vqDcrJwEjrHHFjbncDZPA6W4=;
- b=ZUZfbeVqYXsN0uhtaSCqdf9HcgaMKQhZAW3ney9U16XF32hMGWaf6+6ug4c84QfwODNQLjTAOXiFXjuFDCNCt5OZk1TMskCudtBZhWvydDPQmNDXLXWj3uMfMe3a3oPQnvzw7+tnj1GNReJUJnozDafxMDATRbb3iCHmkQWDzWCzEbtw24XzaK5OIvE/3gzSZPoSrGxTkXE1MN5g3EUSa6cdD7WbkfIT4Uc4UCmolm47KrFsagFWirZEXOhzvKNZRomH0hXL1WJSIMxmw9Xez2HRUoIb3DnnBJpKQNq/XEEQnqjd/fKfJkaPFD+WIkp28x1kntwjas7sx7rOf7eMew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X4IYNfrc0R076S/IYR0vqDcrJwEjrHHFjbncDZPA6W4=;
- b=EI4nIpIOp3OHoV5kFDPVgSIYgQw3W2CXAN/SG0jFPvl0Xn3iihxKHPtwBSri0Mq8kFk2G2ZQVP+xCNJcIQa2GDxwDGKfrBXJQ9EozTfEGjeXQguXiWGks5lo2ZVjSR0VPWA66OHXLUBIouOziOZNO2WBpwASRd1QuKKt3M/tbak=
-Received: from MN2PR07CA0005.namprd07.prod.outlook.com (2603:10b6:208:1a0::15)
- by PH0PR12MB5630.namprd12.prod.outlook.com (2603:10b6:510:146::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.22; Mon, 30 Sep
- 2024 13:53:24 +0000
-Received: from BL02EPF0002992E.namprd02.prod.outlook.com
- (2603:10b6:208:1a0:cafe::85) by MN2PR07CA0005.outlook.office365.com
- (2603:10b6:208:1a0::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.27 via Frontend
- Transport; Mon, 30 Sep 2024 13:53:23 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- BL02EPF0002992E.mail.protection.outlook.com (10.167.249.59) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8026.11 via Frontend Transport; Mon, 30 Sep 2024 13:53:23 +0000
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 30 Sep
- 2024 08:53:23 -0500
-Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Mon, 30 Sep 2024 08:53:22 -0500
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
-	<habetsm.xilinx@gmail.com>, <jacob.e.keller@intel.com>
-Subject: [PATCH v4 net-next 7/7] sfc: add per-queue RX bytes stats
-Date: Mon, 30 Sep 2024 14:52:45 +0100
-Message-ID: <49153e93bb07d01e81447be655007e3a8d4da81d.1727703521.git.ecree.xilinx@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1727703521.git.ecree.xilinx@gmail.com>
-References: <cover.1727703521.git.ecree.xilinx@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A75190462
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 13:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727704485; cv=none; b=fpnLG2e15ChAkOg2cAiZGNSMiggC8xQeQxA/SNgx4vk30kHvAfwzna9XZ5HRq2IeBEnSH+rQVvJiDNhx1TzBwzB7/fOEFOM+JYQTqiwQEBNZf2JTuQhuwLJssHbmHc+AYKwK4G4Kl/zaKy2q5yK91co1uLj17s/7HZdpfMNQK3M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727704485; c=relaxed/simple;
+	bh=C+0bmDpAUea+kSD7kPvnlAZbch+2Katccba+yuSM/6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bb/r+BBoln18a4rip/h3F0jQHCOEgyFOeww3n89+Qign5rAxkBFG5OWuzkHQEo/9W8cSKbKYqqyUOYy7bQgNH8bfAYu5N/02vTwHcqLoNKZ/EqJNLFPjtO/Ns49ik6pxFwyL+xXBRSyiMi3ixTZXjeZHttITieZjiarChZvdHWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VHLpTC7X; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727704482;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x8XTqEa8/mNe22b6un2MKhBZ+Eq8SmC0NK0XwtkSL1E=;
+	b=VHLpTC7Xr3JB7pwltHtHT8JTa9NslR4MpN1976xyL8IltrmB0U7v9YlUyaIddM+FeOM/A5
+	f1JcoV79eSRwmYr48BM/Gd3eGB5HSLuF+1EM//cGw0VOO6tdOI8+uwjLOwsziyfD0Aw5ae
+	ssjUCRD9RP+52kTdI87fAfluUEjD8E8=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-695-BDZ_LV_rMLOXWMtWiEmSaw-1; Mon,
+ 30 Sep 2024 09:54:36 -0400
+X-MC-Unique: BDZ_LV_rMLOXWMtWiEmSaw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BF32E1944DDF;
+	Mon, 30 Sep 2024 13:54:34 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.210])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 686091954B0F;
+	Mon, 30 Sep 2024 13:54:28 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	edumazet@google.com,
+	Stanislav Fomichev <stfomichev@gmail.com>
+Subject: [PATCH v8 net-next 00/15] net: introduce TX H/W shaping API
+Date: Mon, 30 Sep 2024 15:53:47 +0200
+Message-ID: <cover.1727704215.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,164 +80,309 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB03.amd.com: edward.cree@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0002992E:EE_|PH0PR12MB5630:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b30580c-6cfc-4b5c-708b-08dce1574061
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iBsURwrr+oDtm6gc4vl/l8LAvyvhGMR1gnt7QjEs8zRCf4IcEEOaGWINgorP?=
- =?us-ascii?Q?bQxQZqwCGopRu+gwSQSeriY9HqoR9cJ48+XBrJLNQTpDwCwPoRki3q8yQ5f6?=
- =?us-ascii?Q?e7pjxX+0iJC796fpDxefljklK2P9u21dh/JFC9M4FNP7imuQddxMUSUxrxa6?=
- =?us-ascii?Q?UUXr2sCe4Fag/vrpB7U10ujF2I8oqHs/cVbGwys0ySDPO9NFbaYhGBXIXE/i?=
- =?us-ascii?Q?SxnkVQIBaucyiyllWO0/ag0+2lBHhmzu4sguCVugRpcGLwvyFRnXuXnGJxLL?=
- =?us-ascii?Q?EaLwmfH9m+RuAkNAfjIA/miitOj/7XixLIYilop4/5y/c1UUmuZbcmxBKwTI?=
- =?us-ascii?Q?p9FfqtmaWSMl2jbhdTvrNNn1635mWXkhLXX71t/5bXPP8AzCljgtMxLQ9G1h?=
- =?us-ascii?Q?AyvHtukBtHmLQHzvbjOhUkH+bbu+ZeG4ocxRwjYOD0ocCbgZVSrl5xBSdT8W?=
- =?us-ascii?Q?FQfS0Gi0uEXBcES9ynAr5jm2ib92/cgeOQU/iUx3g+XyscJm11Q3hYdJmUmh?=
- =?us-ascii?Q?65RSz01ZZIz4TEkNb3XgkE2duUAnERhLOdH7nxlSLWnBBqrS28EBYggLwlpF?=
- =?us-ascii?Q?7/6bdv9Vd6qJ9tStTrFhHHn5Y2fLPM5ljEDV1es0oo/VMbiL1zAZahJWVB7j?=
- =?us-ascii?Q?FsPAY8qUdsKDWkTBWqtVDZFhHTnbaWkNjWBrfE1WVo274/F1FrxeRJTtKCa1?=
- =?us-ascii?Q?H5p+hMkFvNCgLKMA4zmeyUK9vKcmHqAH4KgZTvRdvbbPkBz2bJ/4n8va0t8d?=
- =?us-ascii?Q?gVaN1XnmaK45bj7V5ATCPFRXHP6IhLEZsyTPrF4RdkqWoMzCkkcyYriAP3aD?=
- =?us-ascii?Q?AtCmVcgnRwn0h4CPIc9NhOSbPfu1VSTL99N54sz7e25Y2ktpFzBOG2diA/ik?=
- =?us-ascii?Q?qRXWNC93kEpo9EkVDYhoSMXhMjytC4+o5Q79ED/x1euXRKXo02PPyjT46gt+?=
- =?us-ascii?Q?078Q42Fie+O4Q4PCn1CYvYSGI8wZ23MJrTeoq9mpQi8QpW6/PQ3elRwdlO2p?=
- =?us-ascii?Q?ugXaxhM89OlrOc8L7OJ5cUV/zZGpsMYDoV1k5FyXdytGIY6W0cgF+yB264js?=
- =?us-ascii?Q?JGQ/MSkRNYjkh40lRxc4G9OMoU7oHpj0ALlMUa8mRJs5rOk3yPvKbH/J60Dp?=
- =?us-ascii?Q?ELhN4KE5h9KZW0SeJSi1bMBFubGsIOzoAHI/4I+pgKsaRknoQOC5fn4pHqkG?=
- =?us-ascii?Q?0tRBPLl0Muu0RO+o4YKkc8JmcZL0a/RSIaiZ0rMxD+KhZkz4qHXXT/fZflKk?=
- =?us-ascii?Q?VR5OmAUER+Cd/CQyH5PdiX8UzsU2hRpIdBjVQ54bmJt1DQt3FgnW06Yq4kUX?=
- =?us-ascii?Q?eSOE5tVbJ3N8+nUlw/l/bE57boC7lpW8+sjIUbC+jE/YoMyxx+/v+drexNOK?=
- =?us-ascii?Q?T8PRW9+NGFVZ0pLy0cArQB50VJPFgD5aGx4Pyv9d1ZLbVZQlGFPowqlQFBEQ?=
- =?us-ascii?Q?ncr5OKzBD5BHQcIuJGPSkMmu7ild3cpg?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2024 13:53:23.7674
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b30580c-6cfc-4b5c-708b-08dce1574061
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0002992E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5630
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-From: Edward Cree <ecree.xilinx@gmail.com>
+We have a plurality of shaping-related drivers API, but none flexible
+enough to meet existing demand from vendors[1].
 
-While this does add overhead to the fast path, it should be minimal
- as the cacheline should already be held for write from updating the
- queue's rx_packets stat.
+This series introduces new device APIs to configure in a flexible way
+TX H/W shaping. The new functionalities are exposed via a newly
+defined generic netlink interface and include introspection
+capabilities. Some self-tests are included, on top of a dummy
+netdevsim implementation. Finally a basic implementation for the iavf
+driver is provided.
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+Some usage examples:
+
+* Configure shaping on a given queue:
+
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
+	--do set --json '{"ifindex": '$IFINDEX',
+			  "shaper": {"handle":
+				     {"scope": "queue", "id":'$QUEUEID'},
+			  "bw-max": 2000000}}'
+
+* Container B/W sharing
+
+The orchestration infrastructure wants to group the 
+container-related queues under a RR scheduling and limit the aggregate
+bandwidth:
+
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID2'},
+			   "weight": '$W2'}], 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope":"node"},
+			"bw-max": 10000000}'
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 0}}
+
+Q1 \
+    \
+Q2 -- node 0 -------  netdev
+    / (bw-max: 10M)
+Q3 / 
+
+* Delegation
+
+A containers wants to limit the aggregate B/W bandwidth of 2 of the 3
+queues it owns - the starting configuration is the one from the
+previous point:
+
+SPEC=Documentation/netlink/specs/net_shaper.yaml
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID2'},
+			   "weight": '$W2'}], 
+			"handle": {"scope": "node"},
+			"bw-max": 5000000 }'
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 1}}
+
+Q1 -- node 1 --------\
+    / (bw-max: 5M)    \
+Q2 /                   node 0 -------  netdev
+                      /(bw-max: 10M)
+Q3 ------------------/
+
+In a group operation, when prior to the op itself, the leaves have
+different parents, the user must specify the parent handle for the
+group. I.e., starting from the previous config:
+
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope": "node"},
+			"bw-max": 3000000 }'
+Netlink error: Invalid argument
+nl_len = 96 (80) nl_flags = 0x300 nl_type = 2
+	error: -22
+	extack: {'msg': 'All the leaves shapers must have the same old parent'}
+
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope": "node"},
+			"parent": {"scope": "node", "id": 1},
+			"bw-max": 3000000 }
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 2}}
+
+Q1 -- node 2 ---
+    /(bw-max:3M)\
+Q3 /             \
+         ---- node 1 \
+        / (bw-max: 5M)\
+      Q2              node 0 -------  netdev
+                      (bw-max: 10M)
+
+* Cleanup:
+
+Still starting from config 1To delete a single queue shaper
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID3'}}'
+
+Q1 -- node 2 ---
+     (bw-max:3M)\
+                 \
+         ---- node 1 \
+        / (bw-max: 5M)\
+      Q2              node 0 -------  netdev
+                      (bw-max: 10M)
+
+Deleting a node shaper relinks all its leaves to the node's parent:
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id":2}}'
+
+Q1 ---\
+       \
+        node 1----- \
+       / (bw-max: 5M)\
+Q2----/              node 0 -------  netdev
+                     (bw-max: 10M)
+
+Deleting the last shaper under a node shaper deletes the node, too:
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID1'}}'
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID2'}}'
+./tools/net/ynl/cli.py --spec $SPEC --do get --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id": 1}}'
+Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2
+	extack: {'bad-attr': '.handle'}
+
+Such delete recurses on parents that are left over with no leaves:
+
+./tools/net/ynl/cli.py --spec $SPEC --do get --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id": 0}}'
+Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2
+	extack: {'bad-attr': '.handle'}
+
+[1] https://lore.kernel.org/netdev/20240405102313.GA310894@kernel.org/
 ---
- drivers/net/ethernet/sfc/ef100_rx.c   | 1 +
- drivers/net/ethernet/sfc/efx.c        | 4 ++++
- drivers/net/ethernet/sfc/net_driver.h | 4 ++++
- drivers/net/ethernet/sfc/rx.c         | 1 +
- drivers/net/ethernet/sfc/rx_common.c  | 1 +
- 5 files changed, 11 insertions(+)
+Changes from v7:
+ - fixed uninit error and related ST failures
+ - dev lock cleanup
+ - fixed a bunch of typos
 
-diff --git a/drivers/net/ethernet/sfc/ef100_rx.c b/drivers/net/ethernet/sfc/ef100_rx.c
-index 992151775cb8..44dc75feb162 100644
---- a/drivers/net/ethernet/sfc/ef100_rx.c
-+++ b/drivers/net/ethernet/sfc/ef100_rx.c
-@@ -135,6 +135,7 @@ void __ef100_rx_packet(struct efx_channel *channel)
- 	}
- 
- 	++rx_queue->rx_packets;
-+	rx_queue->rx_bytes += rx_buf->len;
- 
- 	efx_rx_packet_gro(channel, rx_buf, channel->rx_pkt_n_frags, eh, csum);
- 	goto out;
-diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-index 68ddb28d3141..90bb7db15519 100644
---- a/drivers/net/ethernet/sfc/efx.c
-+++ b/drivers/net/ethernet/sfc/efx.c
-@@ -638,6 +638,7 @@ static void efx_get_queue_stats_rx(struct net_device *net_dev, int idx,
- 	rx_queue = efx_channel_get_rx_queue(channel);
- 	/* Count only packets since last time datapath was started */
- 	stats->packets = rx_queue->rx_packets - rx_queue->old_rx_packets;
-+	stats->bytes = rx_queue->rx_bytes - rx_queue->old_rx_bytes;
- 	stats->hw_drops = efx_get_queue_stat_rx_hw_drops(channel) -
- 			  channel->old_n_rx_hw_drops;
- 	stats->hw_drop_overruns = channel->n_rx_nodesc_trunc -
-@@ -682,6 +683,7 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 	struct efx_channel *channel;
- 
- 	rx->packets = 0;
-+	rx->bytes = 0;
- 	rx->hw_drops = 0;
- 	rx->hw_drop_overruns = 0;
- 	tx->packets = 0;
-@@ -696,10 +698,12 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 		rx_queue = efx_channel_get_rx_queue(channel);
- 		if (channel->channel >= net_dev->real_num_rx_queues) {
- 			rx->packets += rx_queue->rx_packets;
-+			rx->bytes += rx_queue->rx_bytes;
- 			rx->hw_drops += efx_get_queue_stat_rx_hw_drops(channel);
- 			rx->hw_drop_overruns += channel->n_rx_nodesc_trunc;
- 		} else {
- 			rx->packets += rx_queue->old_rx_packets;
-+			rx->bytes += rx_queue->old_rx_bytes;
- 			rx->hw_drops += channel->old_n_rx_hw_drops;
- 			rx->hw_drop_overruns += channel->old_n_rx_hw_drop_overruns;
- 		}
-diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-index 4ca48db3e168..b54662d32f55 100644
---- a/drivers/net/ethernet/sfc/net_driver.h
-+++ b/drivers/net/ethernet/sfc/net_driver.h
-@@ -400,7 +400,9 @@ struct efx_rx_page_state {
-  * @slow_fill: Timer used to defer efx_nic_generate_fill_event().
-  * @grant_work: workitem used to grant credits to the MAE if @grant_credits
-  * @rx_packets: Number of packets received since this struct was created
-+ * @rx_bytes: Number of bytes received since this struct was created
-  * @old_rx_packets: Value of @rx_packets as of last efx_init_rx_queue()
-+ * @old_rx_bytes: Value of @rx_bytes as of last efx_init_rx_queue()
-  * @xdp_rxq_info: XDP specific RX queue information.
-  * @xdp_rxq_info_valid: Is xdp_rxq_info valid data?.
-  */
-@@ -437,7 +439,9 @@ struct efx_rx_queue {
- 	struct work_struct grant_work;
- 	/* Statistics to supplement MAC stats */
- 	unsigned long rx_packets;
-+	unsigned long rx_bytes;
- 	unsigned long old_rx_packets;
-+	unsigned long old_rx_bytes;
- 	struct xdp_rxq_info xdp_rxq_info;
- 	bool xdp_rxq_info_valid;
- };
-diff --git a/drivers/net/ethernet/sfc/rx.c b/drivers/net/ethernet/sfc/rx.c
-index f07495582125..ffca82207e47 100644
---- a/drivers/net/ethernet/sfc/rx.c
-+++ b/drivers/net/ethernet/sfc/rx.c
-@@ -393,6 +393,7 @@ void __efx_rx_packet(struct efx_channel *channel)
- 	}
- 
- 	rx_queue->rx_packets++;
-+	rx_queue->rx_bytes += rx_buf->len;
- 
- 	if (!efx_do_xdp(efx, channel, rx_buf, &eh))
- 		goto out;
-diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-index bdb4325a7c2c..ab358fe13e1d 100644
---- a/drivers/net/ethernet/sfc/rx_common.c
-+++ b/drivers/net/ethernet/sfc/rx_common.c
-@@ -242,6 +242,7 @@ void efx_init_rx_queue(struct efx_rx_queue *rx_queue)
- 	rx_queue->page_recycle_full = 0;
- 
- 	rx_queue->old_rx_packets = rx_queue->rx_packets;
-+	rx_queue->old_rx_bytes = rx_queue->rx_bytes;
- 
- 	/* Initialise limit fields */
- 	max_fill = efx->rxq_entries - EFX_RXD_HEAD_ROOM;
+v7: https://lore.kernel.org/netdev/cover.1725919039.git.pabeni@redhat.com/
+
+Changes from v6:
+ - move node attributes in main NL scope for group() op
+ - driver must acquire dev->lock around channels update
+ - implemented queue id checking in the core
+
+v6: https://lore.kernel.org/netdev/cover.1725457317.git.pabeni@redhat.com/
+
+Changes from v5:
+ - handle/shaper unsplit
+ - removed 'binding' from NL api
+ - several helper renames
+ - added rcu protection to shaper pointer
+ - implemented value checking into the core
+ - handle device channels reconf
+ - consolidate NL ctx handling
+ - dropped idr allocator, leverage the existing xarray
+ - caps names shrinking
+ - group() op is optional
+ - cap callback can't fail
+ - more self-tests
+
+v5: https://lore.kernel.org/netdev/cover.1724944116.git.pabeni@redhat.com/
+
+Changes from v4:
+ - ops operate on struct binding
+ - 'root' -> 'node' rename
+ - most core function/helpers operate on 'binding'
+ - use NL_SET_BAD_ATTR where possible
+ - some code deduplication
+
+v4: https://lore.kernel.org/netdev/cover.1724165948.git.pabeni@redhat.com/
+
+Changes from v3:
+ - rename
+ - locking
+ - delete operates on node, too
+
+v3: https://lore.kernel.org/netdev/cover.1722357745.git.pabeni@redhat.com/
+
+Changes from RFC v2:
+ - added patch 1
+ - fixed deprecated API usage
+
+RFC v2: https://lore.kernel.org/netdev/cover.1721851988.git.pabeni@redhat.com/
+
+Changes from RFC v1:
+ - set() and delete() ops operate on a single shaper
+ - added group() op to allow grouping and nesting
+ - split the NL implementation into multiple patches to help reviewing
+
+RFC v1: https://lore.kernel.org/netdev/cover.1719518113.git.pabeni@redhat.com/
+
+Paolo Abeni (11):
+  genetlink: extend info user-storage to match NL cb ctx
+  netlink: spec: add shaper YAML spec
+  net-shapers: implement NL get operation
+  net-shapers: implement NL set and delete operations
+  net-shapers: implement NL group operation
+  net-shapers: implement delete support for NODE scope shaper
+  net-shapers: implement shaper cleanup on queue deletion
+  netlink: spec: add shaper introspection support
+  net: shaper: implement introspection support
+  net-shapers: implement cap validation in the core
+  testing: net-drv: add basic shaper test
+
+Sudheer Mogilappagari (2):
+  iavf: Add net_shaper_ops support
+  iavf: add support to exchange qos capabilities
+
+Wenjun Wu (2):
+  virtchnl: support queue rate limit and quanta size configuration
+  ice: Support VF queue rate limit and quanta size configuration
+
+ Documentation/netlink/specs/net_shaper.yaml   |  363 +++++
+ Documentation/networking/kapi.rst             |    3 +
+ MAINTAINERS                                   |    1 +
+ drivers/net/Kconfig                           |    1 +
+ drivers/net/ethernet/intel/Kconfig            |    1 +
+ drivers/net/ethernet/intel/iavf/iavf.h        |   13 +
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  161 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   |    2 +
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  157 +-
+ drivers/net/ethernet/intel/ice/ice.h          |    2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |   21 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  335 ++++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |   11 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |    6 +
+ drivers/net/netdevsim/ethtool.c               |    2 +
+ drivers/net/netdevsim/netdev.c                |   39 +
+ drivers/net/vxlan/vxlan_mdb.c                 |    2 +-
+ include/linux/avf/virtchnl.h                  |  119 ++
+ include/linux/netdevice.h                     |   21 +
+ include/linux/netlink.h                       |    5 +-
+ include/net/genetlink.h                       |    8 +-
+ include/net/net_shaper.h                      |  120 ++
+ include/uapi/linux/net_shaper.h               |   95 ++
+ net/Kconfig                                   |    3 +
+ net/Makefile                                  |    1 +
+ net/core/dev.c                                |    8 +
+ net/core/dev.h                                |   10 +
+ net/core/netdev-genl.c                        |    2 +-
+ net/core/rtnetlink.c                          |    2 +-
+ net/devlink/devl_internal.h                   |    2 +-
+ net/ethtool/rss.c                             |    2 +-
+ net/netfilter/nf_conntrack_netlink.c          |    2 +-
+ net/netlink/genetlink.c                       |    4 +-
+ net/shaper/Makefile                           |    8 +
+ net/shaper/shaper.c                           | 1438 +++++++++++++++++
+ net/shaper/shaper_nl_gen.c                    |  154 ++
+ net/shaper/shaper_nl_gen.h                    |   44 +
+ tools/testing/selftests/drivers/net/Makefile  |    1 +
+ tools/testing/selftests/drivers/net/shaper.py |  461 ++++++
+ .../testing/selftests/net/lib/py/__init__.py  |    1 +
+ tools/testing/selftests/net/lib/py/ynl.py     |    5 +
+ 46 files changed, 3641 insertions(+), 15 deletions(-)
+ create mode 100644 Documentation/netlink/specs/net_shaper.yaml
+ create mode 100644 include/net/net_shaper.h
+ create mode 100644 include/uapi/linux/net_shaper.h
+ create mode 100644 net/shaper/Makefile
+ create mode 100644 net/shaper/shaper.c
+ create mode 100644 net/shaper/shaper_nl_gen.c
+ create mode 100644 net/shaper/shaper_nl_gen.h
+ create mode 100755 tools/testing/selftests/drivers/net/shaper.py
+
+-- 
+2.45.2
+
 
