@@ -1,111 +1,132 @@
-Return-Path: <netdev+bounces-130353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDF998A233
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:24:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E92698A28C
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50E821C2262F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:24:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFED51F23858
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0955619005E;
-	Mon, 30 Sep 2024 12:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="D6ovWNo2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3562126C07;
+	Mon, 30 Sep 2024 12:33:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail115-171.sinamail.sina.com.cn (mail115-171.sinamail.sina.com.cn [218.30.115.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29F2818E35E;
-	Mon, 30 Sep 2024 12:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C2A1367
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727698720; cv=none; b=BPbEnLC6jt/tr/F9ktXZ57bjlnirYAVrafGs81snBor2L1zW9TU6oFbnHyt5fMkUsHTvTENHm6eOGLaBe0xGwxuDw/VdRZ7O1Rn5M0b421msMwWC65Yu2sXAyvBR55y4yTXaBtUp+eafYpGAni2hhih5iLkpl4Fw8pOLMTem7KQ=
+	t=1727699604; cv=none; b=mi7REmGWJzW7stq3/hvkRFOV1re6bXl7hzV0EgLyxXJmQ/KtNf4hGhmmFI8qRX2sACd9HC/MQDyPehUexUxX4zqnsRbbsa7eSOstXzqprpvyUqKGCioNPvJGuXQitFxhBq+CE0b/5LIF8Ket6guDF2dzitB5rdsiS7OPcqD7jX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727698720; c=relaxed/simple;
-	bh=guHMbWaEEdPVx0Pw4VLIbA5GQWnfmm1gXeQcnd5Z7zY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BrUDbL/++7mcJfhb1x5e8F26ZFHd766fRBmCyw41E0tVe1VjmU0YT2WM5C4VvGBw74t7vwVZIgGnl2vcx+E7B9RjumHpG5H3FGIF7YM+0koCes05Ht2w6UmW6ZpqVnC/js1kAQIh3t8EenVmd6K23evzoKXaflbO7CAu4cN25cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=D6ovWNo2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=06QZSKwqhwLTUNoII8XtuXX1x9Gml0lTnBP3QfC7rd4=; b=D6ovWNo2Yekt8CCyNeE4+XpUJR
-	ScMzyIaQubyccMoVMhYdRyjXlqulw7yrPFkssCHc6Ax6uMkSjlTRX0E42flfHFXxJx3jbpii8gdsz
-	gNiTOWjT99XjIq79qX2SAvZmVLGdjj7UEHj9iC1Y2BnM6SkYv+L4zV+ShTAz/J4KSD4M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svFMA-008cD8-S4; Mon, 30 Sep 2024 14:18:26 +0200
-Date: Mon, 30 Sep 2024 14:18:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	Brad Griffis <bgriffis@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, kernel@quicinc.com
-Subject: Re: [PATCH net v4 2/2] net: phy: aquantia: remove usage of
- phy_set_max_speed
-Message-ID: <262e7702-68aa-40c9-aa2a-60a18b7f747d@lunn.ch>
-References: <20240927010553.3557571-1-quic_abchauha@quicinc.com>
- <20240927010553.3557571-3-quic_abchauha@quicinc.com>
- <20240927183756.16d3c6a3@fedora.home>
- <048bbc09-b7e1-4f49-8eff-a2c6cec28d05@quicinc.com>
- <20240928105242.5fe7f0e1@fedora.home>
- <ZvfQw0adwC/Ldngk@shell.armlinux.org.uk>
+	s=arc-20240116; t=1727699604; c=relaxed/simple;
+	bh=ZmIMd9CxD3goe6qpo6vgQZOjgkRBAsdDm47UnFTSl3Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GjR2ToxMajkNjzs7BemjrO11Y5VR4FYzYJnCCZwjq9REwJke7qVVRAVMd9tBqEFTaPc9Dxf6euZPNUifh3IcZgt8HBcr8gvMUppp24tpp9OoXaviB7yXV7krgeTrTKTrmPoDMSU9LOhCtcLhVZFGWHTfDMkVtCLXxjhn1avT81Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.51.162])
+	by sina.com (10.185.250.24) with ESMTP
+	id 66FA994300002973; Mon, 30 Sep 2024 20:27:51 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 56998710748373
+X-SMAIL-UIID: 6385258744A54465BDD893B3A4B606C9-20240930-202751-1
+From: Hillf Danton <hdanton@sina.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Denis Kirjanov <dkirjanov@suse.de>,
+	syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>,
+	linux-kernel@vger.kernel.org,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+Date: Mon, 30 Sep 2024 20:27:38 +0800
+Message-Id: <20240930122738.1668-1-hdanton@sina.com>
+In-Reply-To: <CANn89iJwe-Q2Ve3O1OP4WTVuD6eawFvV+3eDvuvs4Xk=+j5yBg@mail.gmail.com>
+References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de> <20240928122112.1412-1-hdanton@sina.com> <20240929114601.1584-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvfQw0adwC/Ldngk@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-> I think this is getting overly complex, so let's rewind a bit.
+On Mon, 30 Sep 2024 10:32:32 +0200 Eric Dumazet <edumazet@google.com>
+> On Sun, Sep 29, 2024 at 1:46 PM Hillf Danton <hdanton@sina.com> wrote:
+> > On Sat, 28 Sep 2024 20:21:12 +0800 Hillf Danton <hdanton@sina.com>
+> > > On Mon, 25 Mar 2024 14:08:36 +0100 Eric Dumazet <edumazet@google.com>
+> > > > On Mon, Mar 25, 2024 at 1:10 PM Denis Kirjanov <dkirjanov@suse.de> wrote:
+> > > > >
+> > > > > Hmm, report says that we have a net_device freed even that we have a dev_hold()
+> > > > > before __ethtool_get_link_ksettings()
+> > > >
+> > > > dev_hold(dev) might be done too late, the device is already being dismantled.
+> > > >
+> > > > ib_device_get_netdev() should probably be done under RTNL locking,
+> > > > otherwise the final part is racy :
+> > > >
+> > > > if (res && res->reg_state != NETREG_REGISTERED) {
+> > > >      dev_put(res);
+> > > >      return NULL;
+> > > > }
+> > >
+> > > Given paranoia in netdev_run_todo(),
+> > >
+> > >               /* paranoia */
+> > >               BUG_ON(netdev_refcnt_read(dev) != 1);
+> > >
+> > > the claim that dev_hold(dev) might be done too late could not explain
+> > > the success of checking NETREG_REGISTERED, because of checking
+> > > NETREG_UNREGISTERING after rcu barrier.
+> > >
+> > >       /* Wait for rcu callbacks to finish before next phase */
+> > >       if (!list_empty(&list))
+> > >               rcu_barrier();
+> > >
+> > >       list_for_each_entry_safe(dev, tmp, &list, todo_list) {
+> > >               if (unlikely(dev->reg_state != NETREG_UNREGISTERING)) {
+> > >                       netdev_WARN(dev, "run_todo but not unregistering\n");
+> > >                       list_del(&dev->todo_list);
+> > >                       continue;
+> > >               }
+> > >
+> > As simply bumping kref up could survive the syzbot reproducer [1], Eric's reclaim
+> > is incorrect.
 > 
-> I believe Abhishek mentioned in a previous review what the differences
-> are between what the PHY reports when read, and what it actually
-> supports, and the result was that there was not a single bit in the
-> supported mask that was correct. I was hopeful that maybe Andrew would
-> respond to that, but seems not to, so I'm putting this statement here.
-> More on this below.
+> I have about 50 different syzbot reports all pointing to netdevsim and
+> sysfs buggy interaction.
+> 
+> We will see if you can fix all of them :)
+>
+Looks like something I know
+[1] https://lore.kernel.org/all/20220819220827.1639-1-hdanton@sina.com/
+[2] https://lore.kernel.org/all/20231011211846.1345-1-hdanton@sina.com/
+[3] https://lore.kernel.org/all/20240719112012.1562-1-hdanton@sina.com/
 
-Yes, i did not really realise how wrong Marvell got this. As you point
-out, it is more wrong than right.
+BTW I won the 2020 google OSPB Award (How many cents did you donate that year?).
 
-My thinking with calling the usual feature discovery mechanism and
-then fixing them up, is that we keep extending them. BaseT1 has been
-added etc. If a PHY is mostly getting it right, we might in the future
-get new features implemented for free, if the hardware correctly
-declares them. But in this case, if it cannot get even the basics
-mostly correct, there is little hope it will get more exotic features
-correct.
+And my current target is the Independent Observer at the 2025 Linux Plumbers
+Conference if the LT king thinks observers are welcome.
 
-So, i agree in Russell. Forget about asking the hardware, just hard
-code the correct features.
+Now turn to uaf. As the netdev_hold() in ib_device_set_netdev() matches the
+netdev_put() in free_netdevs(), in combination with the dev_hold() in
+ib_device_get_netdev(), the syz report discovers a valid case where kref fails
+to prevent netdev from being freed under feet, even given the paranoia
+in netdev_run_todo().
 
-Sorry for making you do extra work which you now need to discard.
-
-However, please do keep it as two patches. It makes it easier to deal
-with regressions on the device you cannot test if we can just revert
-one patch.
-
-	Andrew
+Hillf
 
