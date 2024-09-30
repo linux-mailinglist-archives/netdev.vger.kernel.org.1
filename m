@@ -1,175 +1,130 @@
-Return-Path: <netdev+bounces-130309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAA598A09C
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:29:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A1C498A0B3
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83DDBB27AA0
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:29:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 956E71C25684
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B8219CC2B;
-	Mon, 30 Sep 2024 11:22:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8107318DF8A;
+	Mon, 30 Sep 2024 11:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="fI/8/wTg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RK2Sgo9z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C9B19ABA3;
-	Mon, 30 Sep 2024 11:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF5B18DF94;
+	Mon, 30 Sep 2024 11:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727695321; cv=none; b=Ps8Fruo1eOmsnRVm8VL3ssz04y6CXbxvWy1H5mT5BfloMyywuosV4TYojYpvmSfbalSUBoqD2PQEjPUU45Le2edymkKK7+8Kzqb86eikQEIJddGBY6MxE3xmOVcBVH+bRJmXq6RHsSgB9lbG6SdhKfYPSuIqPYNBjKlZNUOnWk4=
+	t=1727695481; cv=none; b=L+LUc3iM7GqlVl/O89U9Wp4Y8lKXS5DvsVzSQr4vooqrm2jQH3tvzi0GDYH1sbiN0pTHMAByGf7r0+qc9F3JN24E6reYgn+TeHSuZFxaUmpQbuGIVe/nqmqk5zWWSyy/Wi0Sm4HMjdmoxTQSlpoyEwKhrCLnMWjA4NmoMj+8i/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727695321; c=relaxed/simple;
-	bh=PmT9O/+7fwVt790lDpgSQowywQ0NFr1wjwDGR8wZGuk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gNSw4GZjN//espLkOl2P9K5LzfAy5jdb4SYJKAEKr8mAS8+1RzpTSXnj1jOh3cjqf9XqPYaKmHfoljBGn2IPDINuZetksRV1xgGVjtPZnHuuiRoILYvCgx3aMl3bdiXA5bC3KsF4/h33vZJBekSOb2mJGtTyV++WbF/emQSKPww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=fI/8/wTg; arc=none smtp.client-ip=192.134.164.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+	s=arc-20240116; t=1727695481; c=relaxed/simple;
+	bh=eoZaZgdErkVB20t5yciUNmtFmCelhEs7R6rJOBirD84=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cL0BzAZE4m5/jYPJZBrTnW8Wb8I3mJCh/ChKuluwxNpcxjHleqXQJIgqm+e4v5abyoTKUQDFkhjzkXDJQhbE4FAXT8BVWuLkuSabqGlpOd5tN5xrk14Dcvm8j2crM2uZxv/3YIC0G50oORbZ5ntTeCHq21RYcKe4lNF90uzwGdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RK2Sgo9z; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a0cad8a0a5so23503235ab.1;
+        Mon, 30 Sep 2024 04:24:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=RF4M5sp1M89dXG5TKYPlc4/p+FQQxzTT+AquUnods1A=;
-  b=fI/8/wTgbpT6vBh1PM5rYudE7uS62YQ4nXCzxZ/NVCKH6UlVWUjRLhd/
-   Bkublc0NZ60/cyxnlT9W0CSfRCb3cGxqKBP883vvCKW56EZWRXJBNPCW4
-   zD4qjLQF8omsa0jpyKF6ldnQaUYgMaCkmO/y/uxSocAqLGd01dy0PVNoJ
-   M=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.11,165,1725314400"; 
-   d="scan'208";a="185956915"
-Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:21:28 +0200
-From: Julia Lawall <Julia.Lawall@inria.fr>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: kernel-janitors@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 33/35] drivers/net/ethernet/intel: Reorganize kerneldoc parameter names
-Date: Mon, 30 Sep 2024 13:21:19 +0200
-Message-Id: <20240930112121.95324-34-Julia.Lawall@inria.fr>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20240930112121.95324-1-Julia.Lawall@inria.fr>
-References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+        d=gmail.com; s=20230601; t=1727695479; x=1728300279; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dEm+5IcrPXHErMOmcibqndoVvsgCS+zTxs5m+nzV+oU=;
+        b=RK2Sgo9zHczR3KbzdOWjw7pdUPNM9734QFUoUez8b2DNwF3hKqyCL1ntQn8M7CnLqZ
+         2JXI6IFYDxc/5YdSLuDShrquzHrP/OrBIq0hsWESR/jRjGUJ6+/n+wGkc3gH5sVD2LWD
+         qVyGyLJPkowi/mVreZx5VxZvKFKR0uBO2q+UT/mm1z9vr0ULe69n+kk/IMG9j3S9BsoD
+         I45hRAi0k1z8GAtsH6LHbvZdzmlwJedI2aLAL9Hl+LZgAuvWMoFuq5PDaO+pbid+/Ns7
+         PG5YTzXY5k1T9s3TI5tuiZ7TnyzqUm6wATwyU75I77pdXnOAkPaCQHRILgCi1idgs60q
+         tFPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727695479; x=1728300279;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dEm+5IcrPXHErMOmcibqndoVvsgCS+zTxs5m+nzV+oU=;
+        b=LcZXWtfbGDSNAmSaXSODTzAY3ueeaD7z7M7dXEN/IDYSktGK5P1aq3+RTfcNLri49g
+         nzV6j2Ss4duiwr8gy65siOn5bwpmipmILKZYlmPcTIXT4kx2VR9dfKcPeLMM/j14ScjG
+         LTmRu9l6QJECYvJkpajpOu4gBXNPjGAPKOxcGVHWjSe5Wni3wFwT0v35gynrFF9ZxTkX
+         EmJo0vYddaCRZfFGXeGTdxIzbNaN55LawRTMj6W5iCzXfep6Pfl/j5HQeGdQoWWecXYO
+         v1w1Ja8I9lt4hMh5xlQOE14VZ5Y/x1WkdZDAvJf50kUFaiNQkYTjksMWLmBIpW5mFBlu
+         5j9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUgI8RoiR6f9gO1SFgEPh8x9HpSKXv1SeTpH3ftAHFgFXKW5vGnyqRupPv/NFc757I84Ks+PBNB@vger.kernel.org, AJvYcCUpvyapOS13iviBGyyy5/WlCcNrsKXcUPgWONp7M1NojuACeIXtYPNpZ4aG0MSHv09vZH5oMhfyESHwSSnEuJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLGrgZkAJqxzL81YU2JIF0iAfGW7/UnoaMt0cskUQySZZm+k0t
+	hd7XF81SlQcKcgLEl72JFhGMe8KNQwnPIra8thSkmUKwCfTWUXxIUEo8XUOZcplAtZrZQxKfZOe
+	Bku1FHoVEFjdOxRHpJFa9p8ZABaE=
+X-Google-Smtp-Source: AGHT+IGWsinEknh7FKS58G5D7DK45bld1NeLf9z57TeDpI9H+YN6Dt0av49Vb6m79z80yi2n6q7A5+QYxbjyiyxfF/c=
+X-Received: by 2002:a05:6e02:20c5:b0:3a0:9b0c:6b2c with SMTP id
+ e9e14a558f8ab-3a3451aadcfmr90164055ab.18.1727695478826; Mon, 30 Sep 2024
+ 04:24:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
+ <20240930092416.80830-2-kerneljasonxing@gmail.com> <79998b2c-0ca7-4180-9d7c-1d6af96dd4cf@linux.dev>
+In-Reply-To: <79998b2c-0ca7-4180-9d7c-1d6af96dd4cf@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 30 Sep 2024 19:24:02 +0800
+Message-ID: <CAL+tcoCc5H4tZ6m+aWUWPJnJUHbYV=upEZLSZ41PvuU9mw0kRQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/3] net-timestamp: add strict check when setting
+ tx flags
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	shuah@kernel.org, willemb@google.com, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reorganize kerneldoc parameter names to match the parameter
-order in the function header.
+On Mon, Sep 30, 2024 at 6:48=E2=80=AFPM Vadim Fedorenko
+<vadim.fedorenko@linux.dev> wrote:
+>
+> On 30/09/2024 10:24, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Even though this case is unlikely to happen, we have to avoid such
+> > a case occurring at an earlier point: the sk_rmem_alloc could get
+> > increased because of inserting more and more skbs into the errqueue
+> > when calling __skb_complete_tx_timestamp(). This bad case would stop
+> > the socket transmitting soon.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >   net/core/sock.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> >
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index fe87f9bd8f16..4bddd6f62e4f 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -905,6 +905,10 @@ int sock_set_timestamping(struct sock *sk, int opt=
+name,
+> >       if (val & ~SOF_TIMESTAMPING_MASK)
+> >               return -EINVAL;
+> >
+> > +     if (val & SOF_TIMESTAMPING_TX_RECORD_MASK &&
+> > +         !(val & SOF_TIMESTAMPING_SOFTWARE))
+> > +             return -EINVAL;
+>
+> SOF_TIMESTAMPING_TX_RECORD_MASK contains SOF_TIMESTAMPING_TX_HARDWARE.
+> That means that there will be no option to enable HW TX timestamping
+> without enabling software timestamping. I believe this is wrong
+> restriction.
 
-Problems identified using Coccinelle.
+Thanks! You are right. I should have realized that. I need to get rid
+of this one.
 
-Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-
----
- drivers/net/ethernet/intel/e1000/e1000_hw.c     |    2 +-
- drivers/net/ethernet/intel/i40e/i40e_common.c   |    7 +++----
- drivers/net/ethernet/intel/ice/ice_common.c     |    2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_common.c |    2 +-
- 4 files changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_hw.c b/drivers/net/ethernet/intel/e1000/e1000_hw.c
-index f9328f2e669f..1b7e78018b8f 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_hw.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_hw.c
-@@ -3839,8 +3839,8 @@ static s32 e1000_spi_eeprom_ready(struct e1000_hw *hw)
-  * e1000_read_eeprom - Reads a 16 bit word from the EEPROM.
-  * @hw: Struct containing variables accessed by shared code
-  * @offset: offset of  word in the EEPROM to read
-- * @data: word read from the EEPROM
-  * @words: number of words to read
-+ * @data: word read from the EEPROM
-  */
- s32 e1000_read_eeprom(struct e1000_hw *hw, u16 offset, u16 words, u16 *data)
- {
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_common.c b/drivers/net/ethernet/intel/i40e/i40e_common.c
-index e8031f1a9b4f..f2d342ffc6d6 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_common.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_common.c
-@@ -1045,9 +1045,9 @@ void i40e_led_set(struct i40e_hw *hw, u32 mode, bool blink)
- /**
-  * i40e_aq_get_phy_capabilities
-  * @hw: pointer to the hw struct
-- * @abilities: structure for PHY capabilities to be filled
-  * @qualified_modules: report Qualified Modules
-  * @report_init: report init capabilities (active are default)
-+ * @abilities: structure for PHY capabilities to be filled
-  * @cmd_details: pointer to command details structure or NULL
-  *
-  * Returns the various PHY abilities supported on the Port.
-@@ -1948,7 +1948,6 @@ int i40e_aq_get_switch_config(struct i40e_hw *hw,
-  * i40e_aq_set_switch_config
-  * @hw: pointer to the hardware structure
-  * @flags: bit flag values to set
-- * @mode: cloud filter mode
-  * @valid_flags: which bit flags to set
-  * @mode: cloud filter mode
-  * @cmd_details: pointer to command details structure or NULL
-@@ -2534,9 +2533,9 @@ int i40e_aq_add_mirrorrule(struct i40e_hw *hw, u16 sw_seid,
-  * @hw: pointer to the hw struct
-  * @sw_seid: Switch SEID (to which rule refers)
-  * @rule_type: Rule Type (ingress/egress/VLAN)
-- * @count: length of the list
-  * @rule_id: Rule ID that is returned in the receive desc as part of
-  *		add_mirrorrule.
-+ * @count: length of the list
-  * @mr_list: list of mirrored VLAN IDs to be removed
-  * @cmd_details: pointer to command details structure or NULL
-  * @rules_used: Number of rules used in internal switch
-@@ -3444,8 +3443,8 @@ int i40e_aq_start_lldp(struct i40e_hw *hw, bool persist,
- /**
-  * i40e_aq_set_dcb_parameters
-  * @hw: pointer to the hw struct
-- * @cmd_details: pointer to command details structure or NULL
-  * @dcb_enable: True if DCB configuration needs to be applied
-+ * @cmd_details: pointer to command details structure or NULL
-  *
-  **/
- int
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 009716a12a26..8a61e13eca1d 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -5301,8 +5301,8 @@ ice_aq_get_output_pin_cfg(struct ice_hw *hw, u8 output_idx, u8 *flags,
-  * @hw: pointer to the HW struct
-  * @dpll_num: DPLL index
-  * @ref_state: Reference clock state
-- * @config: current DPLL config
-  * @dpll_state: current DPLL state
-+ * @config: current DPLL config
-  * @phase_offset: Phase offset in ns
-  * @eec_mode: EEC_mode
-  *
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-index 3be1bfb16498..f6559b1d1433 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-@@ -2635,9 +2635,9 @@ void ixgbe_release_swfw_sync(struct ixgbe_hw *hw, u32 mask)
- /**
-  * prot_autoc_read_generic - Hides MAC differences needed for AUTOC read
-  * @hw: pointer to hardware structure
-- * @reg_val: Value we read from AUTOC
-  * @locked: bool to indicate whether the SW/FW lock should be taken.  Never
-  *	    true in this the generic case.
-+ * @reg_val: Value we read from AUTOC
-  *
-  * The default case requires no protection so just to the register read.
-  **/
-
+Thanks,
+Jason
 
