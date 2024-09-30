@@ -1,98 +1,91 @@
-Return-Path: <netdev+bounces-130534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F267D98ABC3
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:15:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBBBA98ABE6
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC40C2832B3
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:15:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D7FDB23433
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3025C142E86;
-	Mon, 30 Sep 2024 18:15:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E5A19992C;
+	Mon, 30 Sep 2024 18:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TMvIGyMc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWz2HKCt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAFCCA62;
-	Mon, 30 Sep 2024 18:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F7E19047D
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727720146; cv=none; b=ZeDJJIBDtkNWAQZtoUeShpGPGZ/iQ/0BGqo38tl85utYpZv8pX3juQsQEoq2e+5zgVA1DXFl/YcZw8194NonM5jMNxpzf/ptOLVjadobhQTd/etoV93cv3Py4NruQKKLTJP7CZajgbNAkLPwxhQ1AdxwFLUVUcmy6kizQGwAvdI=
+	t=1727720242; cv=none; b=RHEk0evzJ88ctKuZ9a0P9Y2OKbdcSPJJ13O+hevA6QD0u/fEflAFwyP6p2mFtNq1LtAkkquiGDqTpsrjjdTXLSS+moCet/WKai/c0b/2HBl+2fsVpCYNlLrRl9JS7VGJaE3E5D6Uvn92iBUW9RQSqxuQIp4j/4xMvrEXRFrOhnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727720146; c=relaxed/simple;
-	bh=sQCJdYvkkKvAxZHOQLFayOqS8eo8Wu4VT6Qx5YvuF5M=;
+	s=arc-20240116; t=1727720242; c=relaxed/simple;
+	bh=JPUh09REwpJ909FZAqOsykNyHi/w+EwP4k3ak4GSh/0=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=UXkfX1mnbwIwj6hXoe2JP1jAiycP34h3vVKni3J/dxsvNIHK39Q+B9eAXmtVY0SSqaNEno4f5XK0f/Hkt3n5oNpBTCr1MfZkW1GlcsjkEnIcuq0AMyxtUGIrr4cs9hzdWuI8F+KecAAySEQMHwCosxlL+09E8OVJxfJz4UuSbLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TMvIGyMc; arc=none smtp.client-ip=209.85.160.50
+	 Mime-Version:Content-Type; b=t5iuzLa3ZQ2XdIzxT+zU9+v9HW/5w19yi8mqvPtdkzl+nWHIRWDd3SFZghU3kEbmnjxYZDlfQliUJ8VWdnGMiwIjRFZQGhhuTr+9bVhbNrP/Af8ka1njrGTwP2+pERG0/mEicDNN5Q2gE8mJljpFumF0B8iG5N5452KGN2mlqjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWz2HKCt; arc=none smtp.client-ip=209.85.222.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-27c90f1e968so2559184fac.2;
-        Mon, 30 Sep 2024 11:15:44 -0700 (PDT)
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7ac83a98e5eso409258785a.0
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 11:17:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727720143; x=1728324943; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727720239; x=1728325039; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nFvG+aKaWW6dA88h7DRmvjry4mr8SpSc6m60BDv5vFs=;
-        b=TMvIGyMc4/75aEIjn8a185a0leYV35Fc/OpCxLrIZcMvVyX4Ddy+mIf23/3HrCdQNZ
-         4mQ1v0HcUs/ETEph29ZgfpP24zWn1Vv0cBr8b+9ZArUJYUasxE5PxnuFcnS6nLiP9ATO
-         vh08BVSGsCA1fZX9UkIP0TZjaxb75obw74HuG9Fm9P8RE22O50HxlZpZEB9I3UzFVki4
-         JGNua9E+O8ikNz0FFiTc2ByycHCzkX8VQSnDwnI42qOjnPmcUWYMygOajCrgoKJiS0vR
-         QGBEwbeb85iPjO/IcSQKBOeveeipx/s++hVhJnZLGWi+UfpHkaZ3PxWLBXj1cUb1MDRZ
-         FzyA==
+        bh=rlrRCNldOdoCv4Gx/R1j0wzlUpRS2H/491Qtsxdl9yQ=;
+        b=DWz2HKCtgRHDCeOIAGAwmxnE61NSByGbo/tL96FaXvvUtgkkdlw+vmHjTSh7eSHQBW
+         bJFsBCNklXbRfDKC6efrWgL3CiNOBxwRx4IUh7UrlnNDqKvUskpk5EcYT52mn3785ou5
+         niN/NF5EJDodBGz5EmOJgsAuPB6Hr1AI4IDuOmormFXA/fnQ2aLz0zWcdGkjyY5u1lTf
+         tEjfuoRU84mgoCea5f8JJ7bZaFU6UO6EJmvc56yNTtNeN2rUPNlvhmnUj6tIwu5NHOqo
+         NK/kodel7hC1K8iAcOpEi02LmMizw2jcqv5i79owjo+8Goq0muXp/9EYvLR+aFnysynx
+         z/Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727720143; x=1728324943;
+        d=1e100.net; s=20230601; t=1727720239; x=1728325039;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=nFvG+aKaWW6dA88h7DRmvjry4mr8SpSc6m60BDv5vFs=;
-        b=UEdNoQGMbrkC8rE+6UJWiqIBHUImlv37KLmx4vsdzXNtpT6qPrjW90u2uJerNUQi5s
-         eaR7oiK8LCGo4DlgPcx2kym0bgzcEckT2HhXFTi5vbmUgQIn/SJ4eiBYCEbUCTgAtBik
-         lrh7yjUt7v1RrRdSv64BxzQXHmNzwsp08ayvyNp4mHQ0DA9PgmUuJZVHLNK1cbWUJ3U7
-         G2IpKoJeGKFWAClfqfnifTzmZ0URo8hIqWw+SzugVBH1synAdcJb8fYW6G+qSS+ekyeb
-         37t3GlgbIs3e6zdDPLE9rTIRtNFQymD1qyx70xE9vC2c1xPW03c+PicHxt1Xl5o7Z3Gc
-         Tt0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUmenhe63oeNcGFoj/wQXLZwP/bqO+wHRPTKJkwFavavq4xrJp0vg0yzzHiBUrRVb7n2g0ivnOf@vger.kernel.org, AJvYcCW6yyZeGa0HMFLvqQP/k0J/Z0QQV0QTxmwDI+AoV18uJp1rR3ji1UYNoe7Rn2zLqqBuO3nZBreggvCVEcMxjDA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNfCQXhfUpwH+aQ8fVcsnbdB1s3mc38jCzoMWCfjeBopr2TZza
-	vgo3/M+LMfI6ROidryJqCPDsM+aWzDojDYsmyLChPrhC5vdxRqXh
-X-Google-Smtp-Source: AGHT+IFKXUDBUQxZ40OwGVi06FZAmEO9CEOgoW+t4m0RBu1F8SqIRKTcokPfOMoecqEwlnovI9zdpw==
-X-Received: by 2002:a05:6870:c4d:b0:27b:8902:5ac9 with SMTP id 586e51a60fabf-28710c1ed9fmr9432409fac.40.1727720143412;
-        Mon, 30 Sep 2024 11:15:43 -0700 (PDT)
+        bh=rlrRCNldOdoCv4Gx/R1j0wzlUpRS2H/491Qtsxdl9yQ=;
+        b=CJ2oLFVlLpNyTxF5q6i/20vTpXkuL3vJNkwggdF7zoywbXC8Xrpo31KchbQaFofd+K
+         g16lywSlgs1oGxdjOcOo1Kyd/w2nCZof9yVENUoJmxx50XceBRuXaJ85fNNE8WBku07E
+         CbKV/N5uXTB9nrmeki2ZW9aSZXhYfKme2r5VgzH1u02YEc2fJJXgQ7fF4rzTliNydri3
+         8EVd+nLSPNUA/75x7F0amJRgIsZ2CIpTxkFO4lKqQs8gFN4VPp+YMByCbPRGgsP21pQh
+         1Jxm/VSF0Uuo4Tmmkf6IwY0XgBHcGCEsAguqCc8STjA61XSpG5IDoRFjIRdeZEnWovVF
+         gxVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVNUPyXreev2zQ57mB87Lrdk5swrsZWzkjKLurg4jCXgp57qqidCeL36JyDzUJiPfLppfw0Vpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxo5RPhWaLIesXhfXm476d9yJ75dcA/q5b2Qyh2oXOcD/u4i70w
+	Iz3ZxM1GTetYGvvjgD76IDcx3DV6lGG4xzJ0Ax8WmnxHCBJ4UyLH
+X-Google-Smtp-Source: AGHT+IGfhQyCtiwVuY2A6LS8wq9ufw0BbY0vOL67ijDJOMGDM9N0qPZjuFUPIluG8Rhs8/SSMSlAoQ==
+X-Received: by 2002:a05:620a:45a2:b0:7a9:b798:5e29 with SMTP id af79cd13be357-7ae5b842801mr82341285a.30.1727720239594;
+        Mon, 30 Sep 2024 11:17:19 -0700 (PDT)
 Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae377d786asm432444385a.53.2024.09.30.11.15.42
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae377bc78csm436438285a.19.2024.09.30.11.17.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 11:15:42 -0700 (PDT)
-Date: Mon, 30 Sep 2024 14:15:42 -0400
+        Mon, 30 Sep 2024 11:17:19 -0700 (PDT)
+Date: Mon, 30 Sep 2024 14:17:18 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
+To: Eric Dumazet <edumazet@google.com>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org, 
+Cc: "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jeffrey Ji <jeffreyji@google.com>, 
  netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66faeace749e3_18b995294db@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoBm6YmDr_=WaaWDspE_LN2N6-WdT76Yp6U6fn9pDx-aCQ@mail.gmail.com>
-References: <20240930092416.80830-1-kerneljasonxing@gmail.com>
- <20240930092416.80830-2-kerneljasonxing@gmail.com>
- <66fa7fe46392e_17948d294bb@willemb.c.googlers.com.notmuch>
- <CAL+tcoC+VEs1UusEKKVhutw+e=uyEqoaBhRTUV1G4HakM3JVYQ@mail.gmail.com>
- <66fa904185c3_17cd892948a@willemb.c.googlers.com.notmuch>
- <CAL+tcoBMXtQ_TbjKmO5CazL5zu1dDBBB+enckkM9+0ojF3qutQ@mail.gmail.com>
- <66fadc698746d_187400294a5@willemb.c.googlers.com.notmuch>
- <CAL+tcoBm6YmDr_=WaaWDspE_LN2N6-WdT76Yp6U6fn9pDx-aCQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/3] net-timestamp: add strict check when setting
- tx flags
+ eric.dumazet@gmail.com
+Message-ID: <66faeb2ed4866_18b99529496@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CANn89iKdVt7AAh0bcx=zEUz0O+oBneOHvq2EjRbyNifQozEv4A@mail.gmail.com>
+References: <20240930152304.472767-1-edumazet@google.com>
+ <20240930152304.472767-3-edumazet@google.com>
+ <66fae0f1f12f1_187400294c0@willemb.c.googlers.com.notmuch>
+ <CANn89iKdVt7AAh0bcx=zEUz0O+oBneOHvq2EjRbyNifQozEv4A@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] net_sched: sch_fq: add the ability to
+ offload pacing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,146 +96,91 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Jason Xing wrote:
-> On Tue, Oct 1, 2024 at 1:14=E2=80=AFAM Willem de Bruijn
+Eric Dumazet wrote:
+> On Mon, Sep 30, 2024 at 7:33=E2=80=AFPM Willem de Bruijn
 > <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > Jason Xing wrote:
-> > > On Mon, Sep 30, 2024 at 7:49=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Jason Xing wrote:
-> > > > > On Mon, Sep 30, 2024 at 6:39=E2=80=AFPM Willem de Bruijn
-> > > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > > >
-> > > > > > Jason Xing wrote:
-> > > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > > >
-> > > > > > > Even though this case is unlikely to happen, we have to avo=
-id such
-> > > > > > > a case occurring at an earlier point: the sk_rmem_alloc cou=
-ld get
-> > > > > > > increased because of inserting more and more skbs into the =
-errqueue
-> > > > > > > when calling __skb_complete_tx_timestamp(). This bad case w=
-ould stop
-> > > > > > > the socket transmitting soon.
-> > > > > >
-> > > > > > It is up to the application to read from the error queue freq=
-uently
-> > > > > > enough and/or increase SO_RCVBUF.
-> > > > >
-> > > > > Sure thing. If we test it without setting SOF_TIMESTAMPING_SOFT=
-WARE on
-> > > > > the loopback, it will soon stop. That's the reason why I tried =
-to add
-> > > > > the restriction just in case.
-> > > >
-> > > > I don't follow at all.
-> > > >
-> > > > That bit does not affect the core issue: that the application is =
-not
-> > > > clearing its error queue quickly enough.
-> > > >
-> > > > > >
-> > > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > > > ---
-> > > > > > >  net/core/sock.c | 4 ++++
-> > > > > > >  1 file changed, 4 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > > > > > index fe87f9bd8f16..4bddd6f62e4f 100644
-> > > > > > > --- a/net/core/sock.c
-> > > > > > > +++ b/net/core/sock.c
-> > > > > > > @@ -905,6 +905,10 @@ int sock_set_timestamping(struct sock =
-*sk, int optname,
-> > > > > > >       if (val & ~SOF_TIMESTAMPING_MASK)
-> > > > > > >               return -EINVAL;
-> > > > > > >
-> > > > > > > +     if (val & SOF_TIMESTAMPING_TX_RECORD_MASK &&
-> > > > > > > +         !(val & SOF_TIMESTAMPING_SOFTWARE))
-> > > > > > > +             return -EINVAL;
-> > > > > > > +
-> > > > > >
-> > > > > > This breaks hardware timestamping
-> > > > >
-> > > > > Yes, and sorry about that. I'll fix this.
-> > > >
-> > > > As is I don't understand the purpose of this patch. Please do not=
-
-> > > > just resubmit with a change, but explain the problem and suggeste=
-d
-> > > > solution first.
-> > > >
+> > Eric Dumazet wrote:
+> > > From: Jeffrey Ji <jeffreyji@google.com>
 > > >
-> > > I will drop this patch because I just tested with my program in the=
-
-> > > local machine and found there is one mistake I made about calculati=
-ng
-> > > the diff between those two . Sorry for the noise.
+> > > Some network devices have the ability to offload EDT (Earliest
+> > > Departure Time) which is the model used for TCP pacing and FQ packe=
+t
+> > > scheduler.
 > > >
-> > > Well, I only need to send a V2 patch of patch [3/3] in the next few=
- days.
+> > > Some of them implement the timing wheel mechanism described in
+> > > https://saeed.github.io/files/carousel-sigcomm17.pdf
+> > > with an associated 'timing wheel horizon'.
 > > >
-> > > BTW, please allow me to ask one question unrelated to this patch
-> > > again. I do wonder: if we batch the recv skbs from the errqueue whe=
-n
-> > > calling tcp_recvmsg() -> inet_recv_error(), it could break users,
-> > > right?
+> > > This patchs adds to FQ packet scheduler TCA_FQ_OFFLOAD_HORIZON
+> > > attribute.
+> > >
+> > > Its value is capped by the device max_pacing_offload_horizon,
+> > > added in the prior patch.
+> > >
+> > > It allows FQ to let packets within pacing offload horizon
+> > > to be delivered to the device, which will handle the needed
+> > > delay without host involvement.
+> > >
+> > > Signed-off-by: Jeffrey Ji <jeffreyji@google.com>
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
 > >
-> > Analogous to __msg_zerocopy_callback with __msg_zerocopy_callback.
+> > > @@ -1100,6 +1105,17 @@ static int fq_change(struct Qdisc *sch, stru=
+ct nlattr *opt,
+> > >               WRITE_ONCE(q->horizon_drop,
+> > >                          nla_get_u8(tb[TCA_FQ_HORIZON_DROP]));
+> > >
+> > > +     if (tb[TCA_FQ_OFFLOAD_HORIZON]) {
+> > > +             u64 offload_horizon =3D (u64)NSEC_PER_USEC *
+> > > +                                   nla_get_u32(tb[TCA_FQ_OFFLOAD_H=
+ORIZON]);
+> > > +
+> > > +             if (offload_horizon <=3D qdisc_dev(sch)->max_pacing_o=
+ffload_horizon) {
+> > > +                     WRITE_ONCE(q->offload_horizon, offload_horizo=
+n);
 > >
-> > Only here we cannot return range-based results and thus cannot just
-> > expand the range of the one outstanding notification.
-> >
-> > This would mean in ip(v6)_recv_error calling sock_dequeue_err_skb,
-> > sock_recv_timestamp and put_cmsg IP_RECVERR multiple times. And
-> > ip_cmsg_recv if needed.
-> >
-> > Existing applications do not have to expect multiple results per
-> > single recvmsg call. So enabling that unconditionally could break
-> > them.
+> > Do we expect that that an administrator will ever set the offload
+> > horizon different from the device horizon?
 > =
 
-> Thanks for your explanation! I was unsure because I read some use
-> cases in github and txtimestamp.c, they can only handle one err skb at
-> one time.
+> We want to be able to eventually deal with firmware/hardware bugs,
+> like lack of backpressure on the timer wheel, which probably has some
+> kind of capacity limit.
+> =
+
+> I think it is much better to let the admin choose, eventually
+> disabling the whole thing, or enabling it for a small horizon like
+> 2500 ns.
 > =
 
 > >
-> > Adding this will require a new flag. An sk_tsflag is the obvious
-> > approach.
+> > It might be useful to have a wildcard value that means "match
+> > hardware ability"?
+> =
+
+>  "ip link" will show the device max capability.
+> Same story for gso_max_size attribute.
+> We do not automatically set it to dev->tso_max_size
+> =
+
+> I do not think we have a precedent for a qdisc/link attribute where
+> the kernel automatically caps the user
+> choice with the device capability.
+>
 > >
-> > Interpreting a MSG_* flag passed to recvmsg would be
-> > another option. If there is a bit that can be set with MSG_ERRQUEUE
-> > and cannot already be set currently. But I don't think that's the
-> > case. We allow all bits and ignore any undefined ones.
+> > Both here and in the device, realistic values will likely always be
+> > MSEC scale?
 > =
 
-> Do you feel it is necessary that we can implement this idea to
-> optimize it, saving 2 or 3 syscalls at most at one time? IIRC, it's
-> you who proposed that we can batch them when applying the tracepoints
-> mechanism after I gave a presentation at netconf :) It's really good.
-> That inspires me a lot and makes me keep wondering if we can do this
-> these days.
+> msec granularity proved to be not good for TCP stack, we went to us alr=
+eady.
 > =
 
-> Since I've already finished the bpf for timestamping feature locally
-> which bypasses receiving skbs from errqueue,
+> Fast path compares in ns unit, storing the value in ns removes
+> multiplies from it.
 
-That's great!
+Ack on all points. Thanks Eric.
 
-> I believe it could be
-> helpful for those applications that still have tendency to use the
-> "traditional way" to trace.
-> =
 
-> What are your thoughts on this? If you agree, do you want to do this
-> on your own or allow me to give it a try?
-
-I'd focus on the workload that you care about most, which is the
-administrator driven interface, which will use BPF.
-
-This micro optimization would need some benchmarks that show that it
-has a measurable effect.
 
