@@ -1,140 +1,156 @@
-Return-Path: <netdev+bounces-130659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FA8898B079
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 00:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF00B98B0B5
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 01:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC164B24191
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 22:49:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BBF5B20C17
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 23:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE651188CCF;
-	Mon, 30 Sep 2024 22:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B438C188A0C;
+	Mon, 30 Sep 2024 23:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQPXPWgk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l3gXqBca"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CDA1836FA;
-	Mon, 30 Sep 2024 22:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5F95339F
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 23:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727736564; cv=none; b=Jf150J6pCA9+6ftcKNyF0nKl5SphheDeLhdu43SGEWyvocS9B+Cl9Zx9qSgO0QVuFd8IMNoFmpMFZ5oSZI7PQ3GNXswxBMGUiSWfLqWvchy7VpEeUBmQv/RpaT9xIiHvja+9Ib6H7xplMZ1HAbkoO4B3EoEmUaorWHaYI2PcMCM=
+	t=1727738392; cv=none; b=mioCRlCYmMRIXqHFqNQAGxh3NtveAt+VsMJOtjfrgQzwMceBGGGy+ycGLR0ziZBF6gaGFuf4Io7sEhGdrq+4pJoFL4y4Bcs5OOpMilrofp4V5XdIRx9Wk4zWL0t6/NvFT1kkZcPYnTqI/5U43V0rxo/eXfX24cnL9Z2KmnU9VYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727736564; c=relaxed/simple;
-	bh=b1Ub7vjzXG1JxcuY8YrpRapQ3DGfAHgOWzWTrgrHibg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=G64fEcR12DygDJ3i1ZlHV3Xl2SdwhUun64oAu9cxVZI6uUUejRgQLUS84Uv3TUFFPp5zlUb4x76OIShu6jjNzIEw2qTY5rIYWqoM0lgIbqe/JvcZMHN67BMD7KaJB3eNbMJTJvJ2vkHCUfOSeMBayqHI0XQ3DvKqwHzf0Z1shDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQPXPWgk; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2e0b9bca173so2746406a91.0;
-        Mon, 30 Sep 2024 15:49:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727736563; x=1728341363; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jFCtZ4IVA2m1Lj5aqGv3zrCdBL7HWHsE7cae39370r0=;
-        b=UQPXPWgklSk57GaMnaKWq6YLVS/gT7oTtTb9gCLc7d4GxapLxDo4TphR6AfJ0LOiCe
-         NV8Is6salkmxhIThM9WnShKhk9TjEb17UcMdMz4lg2Mwe1vyj6AG5B9+B5XTvtgNXhJG
-         9erERpzjLpsUtTr7t1jq2KKadUbzD/xKnNLwpKBTUXLcWw4Bad3u0P4GDhB3yYIXHnma
-         ATq5kP2acj9JMRBto01JLH9/QAxy2YMrf2bmqJZRuN5CkJOJJaNAbB1fhjawPsGKTqVc
-         bSWmBZs317SeQ80QeyschEKvRauL3ZS/ZClWZT8PFsH8tPT9A04SmqUTx1ULOZ85peZe
-         Gs2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727736563; x=1728341363;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jFCtZ4IVA2m1Lj5aqGv3zrCdBL7HWHsE7cae39370r0=;
-        b=jsJJ3uJWD8NOnc8bwdKIYyhNc3qS+pN18ACV6U69zvZhx2Qw/Hd4vFy2uzXQtExaXL
-         hCMD3rMjwD+NDzqgphA+InuMpN4nk1pmVq3AZsAUbNWEtRueNcpBtppVnKmSkDYLghBy
-         1h1tf3qQs/RrXZO3Ganzg9QKv9E6zGn6MkDQsssDOCXTvIaqm6DMAG36rTI3cCCaTtCT
-         8Et7p6Jnf4crmUbzlPbHOoV33FkjkHXhHuQBLhJpoZ1556+tz+mD0OiudpvT2Qiz6Rqi
-         CdV2ScNYS+9V5TTe7j3a5X9OicjrD5E1ud4gZKQn6naHgMdzmNsXtmW/UkbaYBPhPwsz
-         4VaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEhkT7+Dws/cmK4pLCr96D2KncpGptolEtl+mObgV5W0SnCO9EbMf64bGEUR8WTfP+rlEx+z8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMw+PIkpqITBNFFR2igU2+Xu9q9wHWJjVcGLNZEuG7HMd0qt/P
-	sKvFl4NJWst10sbcOLt70UPDPWP5RzO7mBpxTYJx/jNphmPDO/IwVsfrBRUmWrYzLSUpvYTtteK
-	PYZlLCa1bgZ+vfuH26JjQcCwqC6Iz1Q==
-X-Google-Smtp-Source: AGHT+IFuKB4zY5vTIwV7/54rW47Z9RPjZ6K1HqqDQaTT34pC/m4IY6rxI8TNv6QYbi7VkuUvcLURRq3CofTPSFZQMaI=
-X-Received: by 2002:a17:90a:8c1:b0:2d8:f515:3169 with SMTP id
- 98e67ed59e1d1-2e0b89a437bmr13524338a91.6.1727736562738; Mon, 30 Sep 2024
- 15:49:22 -0700 (PDT)
+	s=arc-20240116; t=1727738392; c=relaxed/simple;
+	bh=YfKWkLw9K4YnutHA+Pt+c2riDF/O8ZWVNI8t3MR74Jc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gO2U8SgTvTCEDp3cJYS5oDqQ9dd9nVRuRdmtPPwKzzpPnWYFMFb1IUmLzSVeDZPqwLaCGXmlmYaKe8ZA8XECvvMzvK79bVPzR6vEwof173ucUQV6jhIXJdvEiquXeVVpRyMmEBUTL5em44jBj14galgR0/Vw1tLe2mWzZ6iYRVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l3gXqBca; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727738391; x=1759274391;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=YfKWkLw9K4YnutHA+Pt+c2riDF/O8ZWVNI8t3MR74Jc=;
+  b=l3gXqBcaNlxc5EOILt6x6zO8ABKvuIVxIEGUwE1zIFpgSuId0mHaJl37
+   MoD39Gh5kP6/hYEPTtnqgF3XLhak3KTkPLmdy3de5hTAHq7HXQgcAJlnJ
+   0A5L1XsbOOhmkxWEXISQjxZURwEADyRg+MhtFgBkgga3rr3Fphvkiec1G
+   xietyNtzoAn/qUyQUZJEbn49J0jdKpV80Sxw9EHHzUO396PC15YDjoIT2
+   68Cztf2hVWWWYkUxQ0jTxIntO4l3jjBSJBDG/eGJYAWN6e1fRyVT4Sz5V
+   ml3Ghod+zLgmdLEHCYwOjeacJIkZ7sKAnQbmET3/qB3LWWaVMv7aCNHcp
+   g==;
+X-CSE-ConnectionGUID: i6I40HtKQQmZbgD7b6kgGA==
+X-CSE-MsgGUID: DmFE818WTXK2juPdsGlJjQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="26660297"
+X-IronPort-AV: E=Sophos;i="6.11,166,1725346800"; 
+   d="scan'208";a="26660297"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 16:19:51 -0700
+X-CSE-ConnectionGUID: jLmyPv71TwK21oR0m3X+Kw==
+X-CSE-MsgGUID: aSPiUCDHTVyxkdP90ne1wg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,166,1725346800"; 
+   d="scan'208";a="73356430"
+Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 16:19:50 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Subject: [PATCH net-next 00/10] packing: various improvements and KUnit
+ tests
+Date: Mon, 30 Sep 2024 16:19:33 -0700
+Message-Id: <20240930-packing-kunit-tests-and-split-pack-unpack-v1-0-94b1f04aca85@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe>
-In-Reply-To: <20240929-libbpf-dup-extern-funcs-v2-0-0cc81de3f79f@hack3r.moe>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 30 Sep 2024 15:49:10 -0700
-Message-ID: <CAEf4BzbRMXmD2K3hku+UJEw61C3nnw1pJr52SySJLtXq5voghg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 0/2] BPF static linker: fix failure when
- encountering duplicate extern functions
-To: i@hack3r.moe
-Cc: bpf@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAYy+2YC/x3NwQrCQAwE0F8pORvY7lZQf0U8LE2soRKXTSqF0
+ n937Wl4DMxsYFyFDW7dBpW/YvLRhv7UwfjKOjEKNUMMcQjXFLDkcRadcF5UHJ3NDbMSWnk3/1t
+ c9IiQegop0vkyELS9Uvkp6/F1B2VH5dXhse8/wAC0q4UAAAA=
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+X-Mailer: b4 0.14.1
 
-On Sun, Sep 29, 2024 at 2:31=E2=80=AFAM Eric Long via B4 Relay
-<devnull+i.hack3r.moe@kernel.org> wrote:
->
-> Currently, if `bpftool gen object` tries to link two objects that
-> contains the same extern function prototype, libbpf will try to get
-> their (non-existent) size by calling bpf__resolve_size like extern
-> variables and fail with:
->
->         libbpf: global 'whatever': failed to resolve size of underlying t=
-ype: -22
->
-> This should not be the case, and this series adds conditions to update
-> size only when the BTF kind is not function.
->
-> Fixes: a46349227cd8 ("libbpf: Add linker extern resolution support for fu=
-nctions and global variables")
-> Signed-off-by: Eric Long <i@hack3r.moe>
-> ---
-> Changes in v2:
-> - Fix compile errors. Oops!
-> - Link to v1: https://lore.kernel.org/r/20240929-libbpf-dup-extern-funcs-=
-v1-0-df15fbd6525b@hack3r.moe
->
-> ---
-> Eric Long (2):
->       libbpf: do not resolve size on duplicate FUNCs
->       selftests/bpf: make sure linking objects with duplicate extern func=
-tions doesn't fail
+This series contains a handful of improvements and fixes for the packing
+library, including the addition of KUnit tests.
 
-please shorten second patch's subject and patch set's owb subject as
-well, they are too long, generally we try to fit them under 80
-characters
+There are two major changes which might be considered bug fixes:
 
+1) The library is updated to handle arbitrary buffer lengths, fixing
+   undefined behavior when operating on buffers which are not a multiple of
+   4 bytes.
 
->
->  tools/lib/bpf/linker.c                             | 23 ++++++++++++----=
-------
->  tools/testing/selftests/bpf/Makefile               |  3 ++-
->  .../selftests/bpf/prog_tests/dup_extern_funcs.c    |  9 +++++++++
->  .../selftests/bpf/progs/dup_extern_funcs1.c        | 20 ++++++++++++++++=
-+++
->  .../selftests/bpf/progs/dup_extern_funcs2.c        | 18 ++++++++++++++++=
-+
->  5 files changed, 62 insertions(+), 11 deletions(-)
-> ---
-> base-commit: 93eeaab4563cc7fc0309bc1c4d301139762bbd60
-> change-id: 20240929-libbpf-dup-extern-funcs-871f4bad2122
->
-> Best regards,
-> --
-> Eric Long <i@hack3r.moe>
->
->
+2) The behavior of QUIRK_MSB_ON_THE_RIGHT is fixed to match the intended
+   behavior when operating on packings that are not byte aligned.
+
+These are not sent to net because no driver currently depends on this
+behavior. For (1), the existing users of the packing API all operate on
+buffers which are multiples of 4-bytes. For (2), no driver currently uses
+QUIRK_MSB_ON_THE_RIGHT. The incorrect behavior was found while writing
+KUnit tests.
+
+This series also includes a handful of minor cleanups from Vladimir, as
+well as a change to introduce a separated pack() and unpack() API. This API
+is not (yet) used by a driver, but is the first step in implementing
+pack_fields() and unpack_fields() which will be used in future changes for
+the ice driver and changes Vladimir has in progress for other drivers using
+the packing API.
+
+This series is part 1 of a 2-part series for implementing use of
+lib/packing in the ice driver. The 2nd part includes a new pack_fields()
+and unpack_fields() implementation inspired by the ice driver's existing
+bit packing code. It is built on top of the split pack() and unpack()
+code. Additionally, the KUnit tests are built on top of pack() and
+unpack(), based on original selftests written by Vladimir.
+
+Fitting the entire library changes and drivers changes into a single series
+exceeded the usual series limits.
+
+Those interested in seeing the full work along with the ice driver
+implementation can find it at:
+
+  https://github.com/jacob-keller/linux/tree/packing/pack-fields-and-ice-implementation
+
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+Jacob Keller (3):
+      lib: packing: add KUnit tests adapted from selftests
+      lib: packing: add additional KUnit tests
+      lib: packing: fix QUIRK_MSB_ON_THE_RIGHT behavior
+
+Vladimir Oltean (7):
+      lib: packing: refuse operating on bit indices which exceed size of buffer
+      lib: packing: adjust definitions and implementation for arbitrary buffer lengths
+      lib: packing: remove kernel-doc from header file
+      lib: packing: add pack() and unpack() wrappers over packing()
+      lib: packing: duplicate pack() and unpack() implementations
+      lib: packing: use BITS_PER_BYTE instead of 8
+      lib: packing: use GENMASK() for box_mask
+
+ include/linux/packing.h            |  32 +--
+ lib/packing.c                      | 400 ++++++++++++++++++++++-------------
+ lib/packing_test.c                 | 412 +++++++++++++++++++++++++++++++++++++
+ Documentation/core-api/packing.rst |  71 +++++++
+ MAINTAINERS                        |   1 +
+ lib/Kconfig                        |  12 ++
+ lib/Makefile                       |   1 +
+ 7 files changed, 761 insertions(+), 168 deletions(-)
+---
+base-commit: c824deb1a89755f70156b5cdaf569fca80698719
+change-id: 20240930-packing-kunit-tests-and-split-pack-unpack-031d032d584d
+
+Best regards,
+-- 
+Jacob Keller <jacob.e.keller@intel.com>
+
 
