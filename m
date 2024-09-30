@@ -1,132 +1,242 @@
-Return-Path: <netdev+bounces-130355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E92698A28C
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5572C98A269
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 14:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFED51F23858
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF3D1C21710
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 12:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3562126C07;
-	Mon, 30 Sep 2024 12:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CE918E36A;
+	Mon, 30 Sep 2024 12:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="DL5jFyXA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-171.sinamail.sina.com.cn (mail115-171.sinamail.sina.com.cn [218.30.115.171])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4C2A1367
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5615618E354
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727699604; cv=none; b=mi7REmGWJzW7stq3/hvkRFOV1re6bXl7hzV0EgLyxXJmQ/KtNf4hGhmmFI8qRX2sACd9HC/MQDyPehUexUxX4zqnsRbbsa7eSOstXzqprpvyUqKGCioNPvJGuXQitFxhBq+CE0b/5LIF8Ket6guDF2dzitB5rdsiS7OPcqD7jX8=
+	t=1727699328; cv=none; b=a512nIrJeIHCeYTPBp3EC19bU/GQvVzf+rRZEvk72C8hC4ZG0P2VJVnHDQeq2fbOThdEvJyEYj6VrbBZpMHwgu7OgIZX+Mr8ITsWBx5hbf0kLEyc3fNLO8JvTULkl/UjSqz25VQJ27xwUUpqK0MwBts9Od3/bI0FKQ24/iibSjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727699604; c=relaxed/simple;
-	bh=ZmIMd9CxD3goe6qpo6vgQZOjgkRBAsdDm47UnFTSl3Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GjR2ToxMajkNjzs7BemjrO11Y5VR4FYzYJnCCZwjq9REwJke7qVVRAVMd9tBqEFTaPc9Dxf6euZPNUifh3IcZgt8HBcr8gvMUppp24tpp9OoXaviB7yXV7krgeTrTKTrmPoDMSU9LOhCtcLhVZFGWHTfDMkVtCLXxjhn1avT81Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.88.51.162])
-	by sina.com (10.185.250.24) with ESMTP
-	id 66FA994300002973; Mon, 30 Sep 2024 20:27:51 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 56998710748373
-X-SMAIL-UIID: 6385258744A54465BDD893B3A4B606C9-20240930-202751-1
-From: Hillf Danton <hdanton@sina.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Denis Kirjanov <dkirjanov@suse.de>,
-	syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>,
-	linux-kernel@vger.kernel.org,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-Date: Mon, 30 Sep 2024 20:27:38 +0800
-Message-Id: <20240930122738.1668-1-hdanton@sina.com>
-In-Reply-To: <CANn89iJwe-Q2Ve3O1OP4WTVuD6eawFvV+3eDvuvs4Xk=+j5yBg@mail.gmail.com>
-References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de> <20240928122112.1412-1-hdanton@sina.com> <20240929114601.1584-1-hdanton@sina.com>
+	s=arc-20240116; t=1727699328; c=relaxed/simple;
+	bh=Qs3Lx77ih1oGuQEQaE5Xr+rDDJ0+tfigyqRV7na0ym8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HihD+BHZrtMpJltrfjix27fa8cmWy268dqGFoQjaswlEsI5uieuqVgElxCTqqs7NdXf2krBFANsQGj22FABTF1dnY6iQ6w24riilQWPp1f2U4Z4BWyfPxSBBxtP8r1ne9os0F3BV+Q4JRVgLpDegoevrim7ha2nqTlvbGijjOHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=DL5jFyXA; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-vk1-f197.google.com (mail-vk1-f197.google.com [209.85.221.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 9C0D83F5E4
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 12:28:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1727699323;
+	bh=ccmCiOQhZeUMRjWEGS0Si8fclp+XCrQMa0zBHhcdvp8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=DL5jFyXA+iEMng/14fyKJXqqRSIoRUQurMRhUFNCZrXnf2sq1FYlK/wUMgzxOrSst
+	 /ZWnddWij2KMELi61CPb0XMgo9dqiwwDDddslIMsvSQvbkJ9R4i1iqFDRwuWvxm1Np
+	 RHKR+8YmOkyYSxYYM45W36r80lN0howG6N0kbFspl+PlglkjiJNAoYu68S9xOyDM9D
+	 LSmbMpq4Yo1efkEak20Qybgq/lrrLSnaqC4T67AbxJ9OEHDP0QS5OVOxOw12BTrnc2
+	 3Cv6etWMc/3J2aF/z4JXkLs6lWxoMyRXevY/gMzzlyCQJacfAoK94vuO1eFrmBd7lQ
+	 GOBMHuSTxLCJw==
+Received: by mail-vk1-f197.google.com with SMTP id 71dfb90a1353d-509ea43af33so221498e0c.1
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 05:28:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727699322; x=1728304122;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ccmCiOQhZeUMRjWEGS0Si8fclp+XCrQMa0zBHhcdvp8=;
+        b=Z+VOut0dEJ2r3yX4YVn72404tDcYZgbFM0x4QRsC+EsYJ+2fakTGxtJZmpGYqZSGEF
+         fLTIM0mpGDpd/WwwGYJcbuBArKvvvZRmEKr1sWWVD6OA/9izVwLCuzkA/fXwA/Rd4PF/
+         XLId159i82hStj/twJquhKSr6IMWPpE4UqGy4p1DLjP0BWY6DIbe4Qxdgm92Q1zEfXj7
+         r3WcWolJrvi2rpakCPZhXjJHGI570Rn5Edjnaq8BaKymNXD3HUI4W9Xwr+mTPRnuCoVH
+         yjfoMt0E4h2iYKGGIyvJLPZN37MTaUBjM3qNmBcXxa5dCJ/AltFvbLd6g8Wk+9sVRfJl
+         TrgA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/dJ02WYcSFiK6tISwUYAdklKUd7whMIhhMlyEk46xm2Bw3+qYv3bZ1er4cp2PiJWg6WKwwsE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiET9FtxakZWa4rl3ONvb63MFmrKfRfFiYOn4P17bKT729EBAu
+	9r1mGXxRC65kBCImLDZlJml+U6Oy8g63Vgqf94XniATrM8+djL8CLmqcqXU1lCrSUYA/aQwFgig
+	oSFHo68AuTWFkHe/1OgfZVm/CWhUa3nCs9PS4YGMePrLkfbU6i4loTsJ9RjqeP50gekCW51VpDy
+	fk+Gxi0QzjWwhVN9XZ5TEz+yolxpheTeb6kZfTR3fdf6Ul
+X-Received: by 2002:a05:6122:c9a:b0:50a:b7b5:30c6 with SMTP id 71dfb90a1353d-50ab7b5345dmr1653706e0c.8.1727699321593;
+        Mon, 30 Sep 2024 05:28:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9iHSL869qB63t3MhxKcid/7j2ONP/nctW+LPfFUOmGxo8rYFIokQ+0UJMT9guM5Zj73BaD99bYvbkHrBiTJA=
+X-Received: by 2002:a05:6122:c9a:b0:50a:b7b5:30c6 with SMTP id
+ 71dfb90a1353d-50ab7b5345dmr1653680e0c.8.1727699321135; Mon, 30 Sep 2024
+ 05:28:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com> <20240929150147-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240929150147-mutt-send-email-mst@kernel.org>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Mon, 30 Sep 2024 14:28:30 +0200
+Message-ID: <CAEivzxcvokDUPWzj48aJX6a4RU_i+OdMOH=fyLQW+FObjKpZDQ@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: stefanha@redhat.com, Stefano Garzarella <sgarzare@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 30 Sep 2024 10:32:32 +0200 Eric Dumazet <edumazet@google.com>
-> On Sun, Sep 29, 2024 at 1:46 PM Hillf Danton <hdanton@sina.com> wrote:
-> > On Sat, 28 Sep 2024 20:21:12 +0800 Hillf Danton <hdanton@sina.com>
-> > > On Mon, 25 Mar 2024 14:08:36 +0100 Eric Dumazet <edumazet@google.com>
-> > > > On Mon, Mar 25, 2024 at 1:10 PM Denis Kirjanov <dkirjanov@suse.de> wrote:
-> > > > >
-> > > > > Hmm, report says that we have a net_device freed even that we have a dev_hold()
-> > > > > before __ethtool_get_link_ksettings()
-> > > >
-> > > > dev_hold(dev) might be done too late, the device is already being dismantled.
-> > > >
-> > > > ib_device_get_netdev() should probably be done under RTNL locking,
-> > > > otherwise the final part is racy :
-> > > >
-> > > > if (res && res->reg_state != NETREG_REGISTERED) {
-> > > >      dev_put(res);
-> > > >      return NULL;
-> > > > }
-> > >
-> > > Given paranoia in netdev_run_todo(),
-> > >
-> > >               /* paranoia */
-> > >               BUG_ON(netdev_refcnt_read(dev) != 1);
-> > >
-> > > the claim that dev_hold(dev) might be done too late could not explain
-> > > the success of checking NETREG_REGISTERED, because of checking
-> > > NETREG_UNREGISTERING after rcu barrier.
-> > >
-> > >       /* Wait for rcu callbacks to finish before next phase */
-> > >       if (!list_empty(&list))
-> > >               rcu_barrier();
-> > >
-> > >       list_for_each_entry_safe(dev, tmp, &list, todo_list) {
-> > >               if (unlikely(dev->reg_state != NETREG_UNREGISTERING)) {
-> > >                       netdev_WARN(dev, "run_todo but not unregistering\n");
-> > >                       list_del(&dev->todo_list);
-> > >                       continue;
-> > >               }
-> > >
-> > As simply bumping kref up could survive the syzbot reproducer [1], Eric's reclaim
-> > is incorrect.
-> 
-> I have about 50 different syzbot reports all pointing to netdevsim and
-> sysfs buggy interaction.
-> 
-> We will see if you can fix all of them :)
+On Sun, Sep 29, 2024 at 9:03=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-Looks like something I know
-[1] https://lore.kernel.org/all/20220819220827.1639-1-hdanton@sina.com/
-[2] https://lore.kernel.org/all/20231011211846.1345-1-hdanton@sina.com/
-[3] https://lore.kernel.org/all/20240719112012.1562-1-hdanton@sina.com/
+> On Sun, Sep 29, 2024 at 08:21:03PM +0200, Alexander Mikhalitsyn wrote:
+> > Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vso=
+ck module.
+> >
+> > It is useful because it allows userspace to check if vhost_vsock is the=
+re when it is
+> > configured as a built-in.
+> >
+> > This is what we have *without* this change and when vhost_vsock is conf=
+igured
+> > as a module and loaded:
+> >
+> > $ ls -la /sys/module/vhost_vsock
+> > total 0
+> > drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+> > drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+> > drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+> > drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+> > drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+> > -r--r--r--   1 root root 4096 Sep 29 20:05 taint
+> > --w-------   1 root root 4096 Sep 29 19:00 uevent
+> >
+> > When vhost_vsock is configured as a built-in there is *no* /sys/module/=
+vhost_vsock directory at all.
+> > And this looks like an inconsistency.
+>
+> And that's expected.
+>
+> > With this change, when vhost_vsock is configured as a built-in we get:
+> > $ ls -la /sys/module/vhost_vsock/
+> > total 0
+> > drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+> > drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+> > --w-------   1 root root 4096 Sep 26 15:59 uevent
+> > -r--r--r--   1 root root 4096 Sep 26 15:59 version
+>
 
-BTW I won the 2020 google OSPB Award (How many cents did you donate that year?).
+Hi Michael,
 
-And my current target is the Independent Observer at the 2025 Linux Plumbers
-Conference if the LT king thinks observers are welcome.
+> Sorry, what I'd like to see is an explanation which userspace
+> is broken without this change, and whether this patch fixes is.
 
-Now turn to uaf. As the netdev_hold() in ib_device_set_netdev() matches the
-netdev_put() in free_netdevs(), in combination with the dev_hold() in
-ib_device_get_netdev(), the syz report discovers a valid case where kref fails
-to prevent netdev from being freed under feet, even given the paranoia
-in netdev_run_todo().
+Ok, let me try to write a proper commit message in this thread. I'll
+send a v3 once we agree on it (don't want to spam busy
+kvm developers with my one-liner fix in 10 different revisions :-) ).
 
-Hillf
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Add an explicit MODULE_VERSION("0.0.1") specification for the
+vhost_vsock module.
+
+It is useful because it allows userspace to check if vhost_vsock is
+there when it is
+configured as a built-in. We already have userspace consumers [1], [2]
+who rely on the
+assumption that if <any_linux_kernel_module> is loaded as a module OR confi=
+gured
+as a built-in then /sys/module/<any_linux_kernel_module> exists. While
+this assumption
+works well in most cases it is wrong in general. For a built-in module
+X you get a /sys/module/<X>
+only if the module declares MODULE_VERSION or if the module has any
+parameter(s) declared.
+
+Let's just declare MODULE_VERSION("0.0.1") for vhost_vsock to make
+/sys/module/vhost_vsock
+to exist in all possible configurations (loadable module or built-in).
+Version 0.0.1 is chosen to align
+with all other modules in drivers/vhost.
+
+This is what we have *without* this change and when vhost_vsock is configur=
+ed
+as a module and loaded:
+
+$ ls -la /sys/module/vhost_vsock
+total 0
+drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+-r--r--r--   1 root root 4096 Sep 29 20:05 taint
+--w-------   1 root root 4096 Sep 29 19:00 uevent
+
+When vhost_vsock is configured as a built-in there is *no*
+/sys/module/vhost_vsock directory at all.
+And this looks like an inconsistency.
+
+With this change, when vhost_vsock is configured as a built-in we get:
+$ ls -la /sys/module/vhost_vsock/
+total 0
+drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+--w-------   1 root root 4096 Sep 26 15:59 uevent
+-r--r--r--   1 root root 4096 Sep 26 15:59 version
+
+Link: https://github.com/canonical/lxd/blob/ef33aea98aec9778499e96302f26058=
+82d8249d7/lxd/instance/drivers/driver_qemu.go#L8568
+[1]
+Link: https://github.com/lxc/incus/blob/cbebce1dcd5f15887967058c8f6fec27cf0=
+da2a2/internal/server/instance/drivers/driver_qemu.go#L8723
+[2]
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Does this sound fair enough?
+
+Kind regards,
+Alex
+
+>
+>
+>
+> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
+om>
+> > ---
+> >  drivers/vhost/vsock.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > index 802153e23073..287ea8e480b5 100644
+> > --- a/drivers/vhost/vsock.c
+> > +++ b/drivers/vhost/vsock.c
+> > @@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+> >
+> >  module_init(vhost_vsock_init);
+> >  module_exit(vhost_vsock_exit);
+> > +MODULE_VERSION("0.0.1");
+> >  MODULE_LICENSE("GPL v2");
+> >  MODULE_AUTHOR("Asias He");
+> >  MODULE_DESCRIPTION("vhost transport for vsock ");
+> > --
+> > 2.34.1
+>
 
