@@ -1,86 +1,164 @@
-Return-Path: <netdev+bounces-130552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31A2698AC81
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:06:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C194698AC88
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 21:11:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F1E9B2451F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:06:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FAF0B24451
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 19:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D934B1991D3;
-	Mon, 30 Sep 2024 19:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oG00S9an"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18EE199254;
+	Mon, 30 Sep 2024 19:11:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A16194C92
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 19:06:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707911991D3;
+	Mon, 30 Sep 2024 19:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727723198; cv=none; b=fzB72IaI4nh6LuSVcbnNOtBrw9dycKzIaPtDfh0xI4vKwZqq4K6Y30lxOSpzQzoRVo2QLz/f6/9Ec7I9Q0JNfZiEYF2OA/erSQtE8Ws777b+bbKhrLUzYqOSqJ2mIg9mtLPwH1zcRtrmOf4HOTKFf5TPc04152+LsLSEBasiIk4=
+	t=1727723494; cv=none; b=kg5+OqKwySpobOF6myYDrPUBoW8jyA0ez6LmGF17X4v8jpfY+20tpNyzvlWK5NTmt53j6889w8oARoEVcsu0FZP4YNG9wrCeA5uCWLv570VSQ64de8jPnJmXb4WGsQwkn11NtyZDyWFBA5v+ON0n63zV/As4K53n8wY6Rsg8sEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727723198; c=relaxed/simple;
-	bh=R6rO7y8uNKUPlo7zKHwxmNFqKP5cep3FaTP4WfQXXZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SK6z5Jcus/nwKDrb3hMQ9IYP9ceBT8ycSFLM2ilX4OgdQv+rHHP+UQWFGLfYUGsbi0W/Oybk47kqiQ99H4OPETNxYwwyZTki+GI97H40x2MV0tjUZKniqH3wEmDMfI1GWV11PVTMiuXov497ng8rqWu/nO32sKxJWjrg79ZvaUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oG00S9an; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xfnpayxvbHckI5Fb2Y/Fma2x8Bi6li2C2F98JErB9oA=; b=oG00S9anb4B/Y+eAgvLpBarUcE
-	jBX8kYNPUYiG+pwbkF6olY3nsudc6v/1QqGfkI6MB6Z3iELQtrjwSJlsMsy/kjdnoQQid7xcvMV5B
-	Qn2P9o7vYjbz0YYJ49injjViejgSeXO+4Nxhr104bPjtEyli2PYbsZtix8eZ1NYUlMPE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svLj4-008ehw-Dg; Mon, 30 Sep 2024 21:06:30 +0200
-Date: Mon, 30 Sep 2024 21:06:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: wojackbb@gmail.com
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Subject: Re: [PATCH] [net,v2] net: wwan: t7xx: add
- PM_AUTOSUSPEND_MS_BY_DW5933E for Dell DW5933e
-Message-ID: <e2f390c7-4d58-47fb-ba86-b1e5ccd6e546@lunn.ch>
-References: <20240930031624.2116592-1-wojackbb@gmail.com>
+	s=arc-20240116; t=1727723494; c=relaxed/simple;
+	bh=nlN3tNCZ6HWT3Bpw4JsI9Ww2HIUiOECQXGJjadRjQlA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rkH5EMF74fSSs9zk0H9lJZIExe7NhCt71mHGPOi1MakZKR5BJ8BaxFJnlhjJxiRnmaeI1h3cvNcIXr4PPpOJ0LKQ1+HoqmD469WykEI2QVk+qedQST6YbwehJqsH1rnMPSv1KAALAgldm4vs/u9/xKKTU5c4NjnCKl0x1RIFYqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.154.82) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 30 Sep
+ 2024 22:11:17 +0300
+Message-ID: <b4707880-2be4-4132-a3e1-8b104b89828c@omp.ru>
+Date: Mon, 30 Sep 2024 22:11:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240930031624.2116592-1-wojackbb@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 05/11] net: ravb: Simplify types in RX csum
+ validation
+To: Paul Barker <paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+CC: Paul Barker <paul.barker.ct@bp.renesas.com>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund+renesas@ragnatech.se>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930160845.8520-1-paul@pbarker.dev>
+ <20240930160845.8520-6-paul@pbarker.dev>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20240930160845.8520-6-paul@pbarker.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 09/30/2024 18:54:28
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188102 [Sep 30 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 35 0.3.35
+ d90443ea3cdf6e421a9ef5a0a400f1251229ba23
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.154.82
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/30/2024 18:58:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/30/2024 3:37:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Mon, Sep 30, 2024 at 11:16:24AM +0800, wojackbb@gmail.com wrote:
-> From: Jack Wu <wojackbb@gmail.com>
+On 9/30/24 19:08, Paul Barker wrote:
+
+> From: Paul Barker <paul.barker.ct@bp.renesas.com>
 > 
-> Because optimizing the power consumption of Dell DW5933e,
-> Add a new auto suspend time for Dell DW5933e.
+> The HW checksum value is used as a 16-bit flag, it is zero when the
 
-Please don't send new versions of a patch within 24 hours.
+   I think I prefer s/HW/hardware/ but there's no hard feelings... :-)
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
+> checksum has been validated and non-zero otherwise. Therefore we don't
+> need to treat this as an actual __wsum type or call csum_unfold(), we
+> can just use a u16 pointer.
+> 
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 1dd2152734b0..9350ca10ab22 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -762,23 +761,22 @@ static void ravb_rx_csum_gbeth(struct sk_buff *skb)
+>  	 * The last 2 bytes are the protocol checksum status which will be zero
+>  	 * if the checksum has been validated.
+>  	 */
+> -	if (unlikely(skb->len < sizeof(__sum16) * 2))
+> +	csum_len = sizeof(*hw_csum) * 2;
 
-You commit message is not very good. What makes this machine special?
-What is wrong with the current code? Do you have any benchmark data to
-show the improvement?
+   Could've been done by an initializer instead?
 
-     Andrew
+> +	if (unlikely(skb->len < csum_len))
+>  		return;
+>  
+>  	if (skb_is_nonlinear(skb)) {
+> -		last_frag = &shinfo->frags[shinfo->nr_frags - 1];
+> -		hw_csum = skb_frag_address(last_frag) +
+> -			  skb_frag_size(last_frag);
+> -		skb_frag_size_sub(last_frag, 2 * sizeof(__sum16));
+> +		skb_frag_t *last_frag = &shinfo->frags[shinfo->nr_frags - 1];
+
+   Could've been done in the previous patch...
+
+> +
+> +		hw_csum = (u16 *)(skb_frag_address(last_frag) +
+> +				  skb_frag_size(last_frag));
+> +		skb_frag_size_sub(last_frag, csum_len);
+>  	} else {
+> -		hw_csum = skb_tail_pointer(skb);
+> -		skb_trim(skb, skb->len - 2 * sizeof(__sum16));
+> +		hw_csum = (u16 *)skb_tail_pointer(skb);
+> +		skb_trim(skb, skb->len - csum_len);
+>  	}
+>  
+> -	hw_csum -= sizeof(__sum16);
+> -	csum_proto = csum_unfold((__force __sum16)get_unaligned_le16(hw_csum));
+> -
+> -	if (!csum_proto)
+> +	if (!*--hw_csum)
+
+   Hm, you lost get_unaligned_le16() here. The checksum can be anywhere,
+unaligned too...
+
+[...]
+
+MBR, Sergey
+
 
