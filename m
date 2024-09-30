@@ -1,61 +1,70 @@
-Return-Path: <netdev+bounces-130305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA9198A064
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:25:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EA8798A07C
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 13:27:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BCBD1C2279F
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:25:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 053741F24AB1
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 11:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CE9192B7A;
-	Mon, 30 Sep 2024 11:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90FF01990D8;
+	Mon, 30 Sep 2024 11:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="s06oSpFg"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="HpmzvhmZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF5A191F8D;
-	Mon, 30 Sep 2024 11:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A5B61957F4;
+	Mon, 30 Sep 2024 11:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727695311; cv=none; b=DvBhEY8XDmSq12GngvebVc087qFtJJHdl3h3bmk0nYU0D6X+qg0bRjFQbhFqfykj3BlaTE5x5vH6URLV55khNZkZgbiRnUiKO817OxHjDralaGAOb/66oAnV11IUnTjPKyyJpMCcK1oqfxx076ofhJGty7Um19TPnmNSxY2RB5A=
+	t=1727695316; cv=none; b=lUpWqlInMUHFDEpbJYhCyBSAZF2xDpGpuD5pUnmq70FcvnS+hxHgJm0XXhNXjy+IVy4hfNMpVIhvibSEkr76h2fgNqcj8P/4hu52S9YOEeIjEyDFGCnOkm49rIJzr2chpumD7xj1jT8EzcsjtAsF2ACXXV+Sy7oeVZRTV+QSpIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727695311; c=relaxed/simple;
-	bh=PgwIMygjWOyNNQQhqkAx39w3297DqiDCBEhTHKUEBpo=;
+	s=arc-20240116; t=1727695316; c=relaxed/simple;
+	bh=cbKZFVxD8vKFKjYfmXBm/w08xlle6y2Pu4DuJ3uL0EA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=A9sq9N9TiyAqsQs8aGzmAGm27PCY5xta4T8d1d/K/v9s9jm/JrFpvm43SanYyQ6IabiKbvJhcmDWHdaJ5F9EfeEvG1bgjcvTbh8JxUnD+fEkjYliUrlOqQGc/NH5v6XnPtyZ5BlXJkRFBHBZk6suRNk8nTSL2FyfrSXbkO8GBFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=s06oSpFg; arc=none smtp.client-ip=192.134.164.83
+	 MIME-Version; b=jlLF8bC3GPESElQ265SMaaHlORsjtNU9CmqxvM6NGoyCmXbZFx8w1OGMv24AxxfFUEY9is4aDO8yR2XxEHUlm1/oUR/lf1lKgy9S0bkmhptTmSlTqPz1ykVZnD5cQtKCb9+WtrYZEJAX/DPO0e20cUr2zUCCb+Qoc05JNjdx2xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=HpmzvhmZ; arc=none smtp.client-ip=192.134.164.83
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tiAMZdHfzRRadEJUpeFbdHkU5NVv6AAREPGmWLFa9N8=;
-  b=s06oSpFgNGj4vEEvBslzvjOKYQsmgjcckUHnAXT0NQdiYMYLFkYqyLKf
-   GIj0BnZ4kI2kL8qj2nuqgVAZUbMdVmTG0ceim4mOrZKYqF/Dvm+x+n11e
-   /1Y0OhDC2c3e2uNvX0jyHlKwa1N6HD6/W9OfIhrQDKI1XoM8vqiZNT4SE
-   c=;
+  bh=k7bOPAFANWhA0Ui7wz343CvWa6yOufJZVnn75o1MDXU=;
+  b=HpmzvhmZWC2nifwxAkGqF5zn2ddWpZTd4Jm6XdJsfTfdDk4Xy54BJ8aA
+   HC095yAgkdAWThCfCejCAoVSe44Av8xZfTRLjbHChvcp11KNRzMMH/Rr3
+   peeeFJwrxfFz+dlCVLg60S2pZK/IDFL433lk0UrHQYzw93SUiA+nuJ9wR
+   U=;
 Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.11,165,1725314400"; 
-   d="scan'208";a="185956887"
+   d="scan'208";a="185956900"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
   by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 13:21:27 +0200
 From: Julia Lawall <Julia.Lawall@inria.fr>
-To: "David S. Miller" <davem@davemloft.net>
+To: Trond Myklebust <trondmy@kernel.org>
 Cc: kernel-janitors@vger.kernel.org,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	linux-nfs@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 16/35] net: Reorganize kerneldoc parameter names
-Date: Mon, 30 Sep 2024 13:21:02 +0200
-Message-Id: <20240930112121.95324-17-Julia.Lawall@inria.fr>
+Subject: [PATCH 23/35] SUNRPC: Reorganize kerneldoc parameter names
+Date: Mon, 30 Sep 2024 13:21:09 +0200
+Message-Id: <20240930112121.95324-24-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20240930112121.95324-1-Julia.Lawall@inria.fr>
 References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
@@ -75,22 +84,22 @@ Problems identified using Coccinelle.
 Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
 
 ---
- net/socket.c |    2 +-
+ net/sunrpc/xprt.c |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/socket.c b/net/socket.c
-index 601ad74930ef..f4ac3939fbb0 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -235,8 +235,8 @@ static const struct net_proto_family __rcu *net_families[NPROTO] __read_mostly;
+diff --git a/net/sunrpc/xprt.c b/net/sunrpc/xprt.c
+index 09f245cda526..59ac26423f2e 100644
+--- a/net/sunrpc/xprt.c
++++ b/net/sunrpc/xprt.c
+@@ -255,8 +255,8 @@ static void xprt_clear_locked(struct rpc_xprt *xprt)
+ 
  /**
-  *	move_addr_to_kernel	-	copy a socket address into kernel space
-  *	@uaddr: Address in user space
-- *	@kaddr: Address in kernel space
-  *	@ulen: Length in user space
-+ *	@kaddr: Address in kernel space
+  * xprt_reserve_xprt - serialize write access to transports
+- * @task: task that is requesting access to the transport
+  * @xprt: pointer to the target transport
++ * @task: task that is requesting access to the transport
   *
-  *	The address is copied into kernel space. If the provided address is
-  *	too long an error code of -EINVAL is returned. If the copy gives
+  * This prevents mixing the payload of separate requests, and prevents
+  * transport connects from colliding with writes.  No congestion control
 
 
