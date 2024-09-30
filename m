@@ -1,101 +1,127 @@
-Return-Path: <netdev+bounces-130545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC7398AC1E
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:35:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C09698AC37
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 20:37:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2767FB2457D
-	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:35:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A51491C2195D
+	for <lists+netdev@lfdr.de>; Mon, 30 Sep 2024 18:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A093C1991B3;
-	Mon, 30 Sep 2024 18:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEF3192D82;
+	Mon, 30 Sep 2024 18:36:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WkQOw5kt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W+KK0Grg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE3F197A87
-	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC9A19AD6C
+	for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 18:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727721320; cv=none; b=d9xUUQqa6EJmsLyR+t8EtFmkb89+SeupBjW5CFryHQwjwi0qdY7/Ikt7+JX9VRaaDdW+HIdjGJr3aHeG4eSx8codzT2BtUK1cIDU42aLU8dR/CKQuIMlKmpCBYzY0nH6BsKVwvIrT30uIlvQYHMOutqzr+dHxouF8gzt4mhP4OA=
+	t=1727721414; cv=none; b=CyjXOVtxDjYl2wo3N6NW0IIQ8i+wb7cvuXdYzuPzm9X6ZTrApoxZuBSN609ny0fzAHLlvOZYWHHx0h2ATUPYfY7jvLdG7L/hy3TVrOCMB7AxOj8mRN/3Rw5pRs7dnJULfd6bmbqvNutlh7WtYyQR/fcSuByegmibIvlmqMZLaRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727721320; c=relaxed/simple;
-	bh=u/r1gsK3d9HgHSLkwy9YD8P0OsrJDIi+1lCKi06YOU0=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=EcrVn74+EGZE2scOx6xZcr7nze3qeGfYb44yyaJKHOTckiX8BWhOwarYD/ua8EnSHH3SaADRay//hULJr39rQoqEhfohd/3bUkM09huOUHQij1GaUQ0pbke5+zW6H/libCZxI/6euiwYMu3XJfVzWuaGQHUvnq8I4sp1mxfcjjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WkQOw5kt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727721318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7X8o4DowsqGONQ/4kasxk3OiTMOAJHVfF5+gN/kqpqg=;
-	b=WkQOw5kt70R/WrIEdj2b5mUT+hMkUkKd1zw3+SQlm684xmNjgEdlKh6YEnR1NcV+AAGQ5a
-	XxgkF0eCyqq9ff6s50XZKg9WFgamqjdUntt18PbzCzGFSJZ2Eztsi1vobHDwXhOfsPZObu
-	JqdLvxAGYhKaNQteBTmxuJ5T7UQoPBw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-453--d_Kp97WPyK6rMA1zpyZig-1; Mon,
- 30 Sep 2024 14:35:14 -0400
-X-MC-Unique: -d_Kp97WPyK6rMA1zpyZig-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 59638196A10F;
-	Mon, 30 Sep 2024 18:35:11 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 10E771944CF6;
-	Mon, 30 Sep 2024 18:35:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com>
-References: <423fbd9101dab18ba772f24db4ab2fecf5de2261.camel@gmail.com> <2968940.1727700270@warthog.procyon.org.uk> <20240925103118.GE967758@unreal> <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <1279816.1727220013@warthog.procyon.org.uk> <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com> <2969660.1727700717@warthog.procyon.org.uk>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: dhowells@redhat.com, Leon Romanovsky <leon@kernel.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
-    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
-    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+	s=arc-20240116; t=1727721414; c=relaxed/simple;
+	bh=Oy0ALxEmUyYWBTbtoXiU53SHPD1lj0MJBkrnL4gUafY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Z6OvoMMxmgJ6v//gO4nTZGz4TYJ0Es/kgYkh2NtoMCh2PP/+9FAU+FdEPdbHbDszgYy5dcWLzbrCJ6V+KLFwCvTayzUaF029TBt8OTIXWdqaFNBsjDb80rpQBqmKaoEVY3tLOzfK1pGe02lnJ7H6N5hCuVBY+jWaUyfTAPuozAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W+KK0Grg; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e25d405f238so3959505276.3
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 11:36:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727721411; x=1728326211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PIUfPOTofXtzMvM18mpE5QXgpk7HTHoVsL+aDE9xMOo=;
+        b=W+KK0Grghx7Il7F6Fu4tjkJ47Q/7Nc3mRYqfrAaWtEz8qM0N7+tW58+DMBCp/XccNO
+         4ZMRUWeOT64eISdvxn23kajAuZW0CLn2L8BrGW7B0xsoGhEhVjURMtVuAcLKJM3R5rfV
+         ME4+80oTJ7PbwkRbqPyaxSU2tqtEKZpcqqiZmJ2d2a3Ykx+xtNpLxK5MZC46/vnYz0EN
+         0pdQhoTBXutru/Xc1pwPma0lM+tQVvHvl8DAit7aTWyad4uv0l0RmF35/qJ5avuOC9mC
+         AfLt0url8YQdW3D80d1GMzLKd0JfisDnSNECJCKLfsJ1roxxy6er/Lt0ZxBd/ykuC95u
+         3DYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727721411; x=1728326211;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PIUfPOTofXtzMvM18mpE5QXgpk7HTHoVsL+aDE9xMOo=;
+        b=jFAxRY7oloO4yWb4pNzay6oP8ZYiKGi4V2HoKMCQhFRREnxjeSdWvSO9Wh4G8lzTiu
+         tjRmfqVfu6fLs5+Cx6n3BiQwMl3Pfm+2QnVgcwjtZVI5wRAVigxVAMsSPYmHR1gHjYIl
+         7mXSPZJYS7aPkfYn7qjs8iE6eMve2kCY5MHsDoaUx70l+qWF2Aj0TiAw8yCSko+t/gcR
+         qLNNU303LhlfOT74/YhirJkuOTBcb0yVIL6ALPyauwpTp+qnZDbsjt1XRl1O3Jiim5Ug
+         YDOVssqIqxAiI8OEhu3oAbmrBa4HG1H341dgBbtwqLpG1nAJ1pIJp8UQVyswwf9fyvqO
+         CgjA==
+X-Forwarded-Encrypted: i=1; AJvYcCWT+tzZnzhkdei5ilPgZ4cLhdDTDxY1mBMHwpqWgPQrMgbXnud1KT8G2KZUgUINvmeat7MNZyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygG6HP2xreo0qCJibHdKsS9s4AlW0svvu5AUVdbkqXb69Fkvzd
+	Jbt3XJ0kssmu0sD/jtmpnKB5YkIToQMTaWnpDb5Cpl7Y+fN2V72P
+X-Google-Smtp-Source: AGHT+IE9ROLXVosW03F6YsTwWq8Ds00Y4XQJT+SgSyRdH3S114xNZbv4IbP+3mLvKD3UCvx41xd1Tw==
+X-Received: by 2002:a05:6902:2b05:b0:e25:cfc9:489d with SMTP id 3f1490d57ef6-e2604b5306bmr10268711276.34.1727721411636;
+        Mon, 30 Sep 2024 11:36:51 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb3b68d808sm42257246d6.130.2024.09.30.11.36.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 11:36:51 -0700 (PDT)
+Date: Mon, 30 Sep 2024 14:36:50 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, 
+ Jeffrey Ji <jeffreyji@google.com>, 
+ netdev@vger.kernel.org, 
+ eric.dumazet@gmail.com, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <66faefc2d2802_18b995294fe@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240930152304.472767-2-edumazet@google.com>
+References: <20240930152304.472767-1-edumazet@google.com>
+ <20240930152304.472767-2-edumazet@google.com>
+Subject: Re: [PATCH net-next 1/2] net: add IFLA_MAX_PACING_OFFLOAD_HORIZON
+ device attribute
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3007427.1727721302.1@warthog.procyon.org.uk>
-Date: Mon, 30 Sep 2024 19:35:02 +0100
-Message-ID: <3007428.1727721302@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Eduard Zingerman <eddyz87@gmail.com> wrote:
+Eric Dumazet wrote:
+> Some network devices have the ability to offload EDT (Earliest
+> Departure Time) which is the model used for TCP pacing and FQ
+> packet scheduler.
+> 
+> Some of them implement the timing wheel mechanism described in
+> https://saeed.github.io/files/carousel-sigcomm17.pdf
+> with an associated 'timing wheel horizon'.
+> 
+> This patch adds dev->max_pacing_offload_horizon expressing
+> this timing wheel horizon in nsec units.
+> 
+> This is a read-only attribute.
+> 
+> Unless a driver sets it, dev->max_pacing_offload_horizon
+> is zero.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-> Are there any hacks possible to printout tracelog before complete boot
-> somehow?
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-You could try setting CONFIG_NETFS_DEBUG=y.  That'll print some stuff to
-dmesg.
+> @@ -2030,6 +2034,7 @@ static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
+>  	[IFLA_ALLMULTI]		= { .type = NLA_REJECT },
+>  	[IFLA_GSO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
+>  	[IFLA_GRO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
+> +	[IFLA_MAX_PACING_OFFLOAD_HORIZON]= { .type = NLA_REJECT },
 
-David
+nit: checkpatch does not like the lack of whitespace before assignment
+in such C99 designated initializers. Probably just stylistic.
 
 
