@@ -1,104 +1,130 @@
-Return-Path: <netdev+bounces-130938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 070EC98C20F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 17:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C91098C21D
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:03:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3EBA1F26500
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0F11C21D86
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351571C8FCE;
-	Tue,  1 Oct 2024 15:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE0F1C242E;
+	Tue,  1 Oct 2024 16:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJW2JKHb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sCPAyHol"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4F61C7B73;
-	Tue,  1 Oct 2024 15:53:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBD447A48
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 16:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727797983; cv=none; b=EkMQlEzu0hFVlLonTw7UzJqfX51XFEOlBrkIWM5EaAG2ZHunwlht2yWS734U89/WDgTkwXmvDeY7rke+rHiKu3n0QRs45fW33FeZRy7PIoSFg/JBpWqDmPD6jz0N+BiH1jyiy914Ek+xq7qkRVIBo9xxVkaNQvXs3Hfrv4kEMxg=
+	t=1727798603; cv=none; b=hqYKgWRXCrccb+bR11M74bJVY46NkptqergmBaBAG4ihthpoEHSI5RbcJMv3YulTecsdKwnokG8yb+qy5Fr8mf+WJZTWarLnS5RkW/J+o012dS2b17+NEDacyB7zKjEvmBLanpruFXgqtZuV5hh1LrDzqSU7fR/8mPUxOePKH0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727797983; c=relaxed/simple;
-	bh=I1EN8WM6WlNYcwlYbJtuQMRVRuc6yhexbmYZ7lgHd3Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rTX440MSTLiSlCPT5mfDP1+lBe9T+9SmJjjEzI/AYKt+PJ7jbLEeOvuzwoyVMsKQHLDwoQlhGB3TjVv3jQgwc5ZmkIL3ZEawzTeW4LCqIF+I74Y1JEfwMqy39kzkbJWo7LSGRqD2PVFdiEUNuS/UGZWc065QlLCDonj8n6Ij/Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KJW2JKHb; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71790698b22so810777b3a.1;
-        Tue, 01 Oct 2024 08:53:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727797981; x=1728402781; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I1EN8WM6WlNYcwlYbJtuQMRVRuc6yhexbmYZ7lgHd3Q=;
-        b=KJW2JKHbS2LAZkfSWiVv5MkdjqDb0rHB5c00MBH8v7GF7xlNzzRsFAM3i0ENNYNTAy
-         0tR0eO5AGKw4TrYlFEjEmEoQd4jpMUfxSb2CL1T4S8gXFAUZrEkMNbaEGoqtPJUTY9tW
-         DYhiXIMVMMEvqvWKlHDeD3E5jqGVpCFsILDFTx1DJVF23EGaIsrjMV0qzfc50YTc/4oM
-         J0shW1x4f8/vTqvWxqUxGEN8qJY2dbo8Q4GfE/MERw2odIEqW7X8THgFI2ceX98wvOkv
-         OzDK9vcjEPcNU27APf+fbXlMZuoMLzRqQhXdaWErOg9U7hflnLyQ4/+IqW48DjQTrUx1
-         dV5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727797981; x=1728402781;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I1EN8WM6WlNYcwlYbJtuQMRVRuc6yhexbmYZ7lgHd3Q=;
-        b=S/YtC0OZ96BRwwaElyZ5m6TBze7+kYMHyY+wzuoanH8HuEceRqfUKuNIZ7CZ4l4LnQ
-         lXY9xILItcGzT7yiyCdPfn9R1QwmKxZVRBfVsCUQjNB2jp+uFoD8WnqegtP6Wi6o4QOC
-         OHZ8VVMHandHZEIjUfNKU8bmEMOpEvJZylfjkP+cZhYB7H6s6FU/zdrGiZ9XfAMGy7Kn
-         QKDropGBJodqMiivQDusJ7vXn61Fw+gGZJT04G0MZKag+poRvixlnO8vk3l/2i+SvGsX
-         8w0xdt+n+so+gD15SprT9M+I5tJ7TI/soyBEEr1+0ubfRwMgjBfwbOIlKyGm8IovO8Yo
-         cbzA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7wU5ZNvJgprN4OmqnounaR0GKbS0qwQ7CltQMicIwVxmxw8RTfH6GvwP9APp4pPNxerGveKladdcreHvtXw==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0Dggp2CkBdu0lPiJFVDgv4EPNIX08Ajdq6lHEn6jhOXeS6ek5
-	qDB04kO0GDIYx1sxVsQCr/ULYLRFKF6UxckvOvFcY7T53zxKU8dT9i7onMz0ciFZCiuK06Sxfvz
-	kpl2//kme3/ysJZdvujXKLdDUhgw=
-X-Google-Smtp-Source: AGHT+IGuVsu+bost0XG2Diz5M1G+dBUjtnnh6zWkPgIrncfRleLFDLGEITo3yTPzeleQVyk+EWXWXe6wcofXaEUhIfk=
-X-Received: by 2002:a05:6a00:138b:b0:714:2051:89ea with SMTP id
- d2e1a72fcca58-71dc5c43365mr102145b3a.1.1727797981013; Tue, 01 Oct 2024
- 08:53:01 -0700 (PDT)
+	s=arc-20240116; t=1727798603; c=relaxed/simple;
+	bh=q1cSO9Bu7RSL+bwzKreXtSWMuMYntCZdOlKdrEMQhUE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=XJNsn6QS1npjKfJqrYuyc4Cw65MlEAiguwbnCgHNw1BEZL8OfbsXHZJP9mygE5XSSRjGFJgHGlW9XBIzDogHcvnK/4ITSnXQ4/Dn2uTcTIybx+TbsGlgPLoneAH4YpfrPT/JIt0lulDBBoO4Kzj9LCYOwzkwSva3wn/HRyPVaZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sCPAyHol; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lxU6m74sMOqbJJJW/j/WEzyJZ3dIO/M0FxXkS3nCyJE=; b=sCPAyHolJvckbrBVmAXO4SD+Lf
+	eP0MHUaLrmdqWKLeEym2qnB98HODvToSjQ4238haMfQQckJwqxkiVAQTe7L6DJMIHBoEdw4+QJpii
+	jySTnRHbqVq4b9ghCQXcXz2iICX+SdSNCf/4p5HndbnLTW++V4bDyBxA7+UhWuI6ujO2JJ0VvM5bN
+	PpsorjefsCHyjYVh4y8RigywgdTUhfVmY8olw/69InE9jU4TpSMqWZABzXRGVa4ugYixjtmD4Knol
+	xy/5V+tcSOdQrI59G4gSttJKxTzQrrXCcWE+v52SaRpp2pbfDbEBTg6G+ZEWD91umXgbXr7kwKndX
+	aDWEFS0Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50108)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1svfKy-00064b-0I;
+	Tue, 01 Oct 2024 17:02:55 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1svfKq-000540-29;
+	Tue, 01 Oct 2024 17:02:48 +0100
+Date: Tue, 1 Oct 2024 17:02:48 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: [PATCH net-next 00/10] net: pcs: xpcs: cleanups batch 1
+Message-ID: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240926121404.242092-1-fujita.tomonori@gmail.com>
-In-Reply-To: <20240926121404.242092-1-fujita.tomonori@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Tue, 1 Oct 2024 17:52:48 +0200
-Message-ID: <CANiq72nLzigkeGRw+cuw3t2v827u0AW8DD3Kw_JECi3p_+UTqQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] net: phy: qt2025: Fix warning: unused import DeviceId
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
-	tmgross@umich.edu, aliceryhl@google.com, hkallweit1@gmail.com, 
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kernel test robot <lkp@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Sep 26, 2024 at 2:16=E2=80=AFPM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> Fix the following warning when the driver is compiled as built-in:
+Hi,
 
-Do you mind if I pick this up so that we keep WERROR builds
-error-free? (I am sending a `rust-fixes` PR in a day or two to Linus).
+First, sorry for the bland series subject - this is the first in a
+number of cleanup series to the XPCS driver. This series has some
+functional changes beyond merely cleanups, notably the first patch.
 
-Or is netdev going to pick it soon? If so:
+This series starts off with a patch that moves the PCS reset from
+the xpcs_create*() family of calls to when phylink first configures
+the PHY. The motivation for this change is to get rid of the
+interface argument to the xpcs_create*() functions, which I see as
+unnecessary complexity. This patch should be tested on Wangxun
+and STMMAC drivers.
 
-Acked-by: Miguel Ojeda <ojeda@kernel.org>
+Patch 2 removes the now unnecessary interface argument from the
+internal xpcs_create() and xpcs_init_iface() functions. With this,
+xpcs_init_iface() becomes a misnamed function, but patch 3 removes
+this function, moving its now meager contents to xpcs_create().
 
-Thanks!
+Patch 4 adds xpcs_destroy_pcs() and xpcs_create_pcs_mdiodev()
+functions which return and take a phylink_pcs, allowing SJA1105
+and Wangxun drivers to be converted to using the phylink_pcs
+structure internally.
 
-Cheers,
-Miguel
+Patches 5 through 8 convert both these drivers to that end.
+
+Patch 9 drops the interface argument from the remaining xpcs_create*()
+functions, addressing the only remaining caller of these functions,
+that being the STMMAC driver.
+
+As patch 7 removed the direct calls to the XPCS config/link-up
+functions, the last patch makes these functions static.
+
+ drivers/net/dsa/sja1105/sja1105.h                 |  2 +-
+ drivers/net/dsa/sja1105/sja1105_main.c            | 85 ++++++++++----------
+ drivers/net/dsa/sja1105/sja1105_mdio.c            | 28 ++++---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c |  7 +-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c    | 18 ++---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_type.h   |  2 +-
+ drivers/net/pcs/pcs-xpcs.c                        | 92 ++++++++++++++---------
+ include/linux/pcs/pcs-xpcs.h                      | 14 ++--
+ 8 files changed, 132 insertions(+), 116 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
