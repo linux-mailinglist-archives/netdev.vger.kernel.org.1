@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-130840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEA498BBB8
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:59:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744D398BBBC
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E863284582
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:59:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C35A51C23729
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 12:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2621C1725;
-	Tue,  1 Oct 2024 11:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342A0188CAD;
+	Tue,  1 Oct 2024 12:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H8ZyezWs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PBSjfFJ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF73E1A0724;
-	Tue,  1 Oct 2024 11:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F1C186607
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 12:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727783975; cv=none; b=usscNr555a5TSbvLzWiEybigX2UBLPtx+AIae4Gi7mFDKiBMTV8UcCi6xEj8ZUXGTvMCWafWsRM0Y4xQUmEFhUOV09vQdPrvmfE90x5oKR6Z/iqweO7Zxq2uk3ZijQkyt52mFWsE/AkPX4Hm6m1UUJ8/W7zANSxKkgIAx3accHs=
+	t=1727784061; cv=none; b=uPEjx8USFIEX8gowlbIt/RrOmORULkmpNhsn478ZxeT697fzT63PGJnHSrAy7uBfX6PPNW6uEVLAFgFOtAxvy9KljbT6Y65apkvYoZcz7ut/6UVoYuiO7gwSREn4q6G90+2lHvW6lDtrWGuNKXLqyuf38sKTZ+DaeTBd2m5Usyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727783975; c=relaxed/simple;
-	bh=yTMWajpsNoMElPZu3B6cSfz8r5p7hAwBRGcxHTfVE0o=;
+	s=arc-20240116; t=1727784061; c=relaxed/simple;
+	bh=IKIVvq/Cyglp1jeBg3AyVeHo+lhJ14utN7qA3vCuOT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qvc94Jy3CBskGWoODBquePuHwNPd89TagiSwj1Rr18ECq7g3SzXJ+iLZGwwNSVMuFPueKknNY+XBr8tt+PXOyxREGUmvIRGBvulw07Py0kyXKfn/PEeMXHke3J1yWRwic/FhfsQfZaGRkhUClnAkuO0a0GLktHDDrncRECKdggs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H8ZyezWs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dF8elWLEz2is1vw+KE3bDeMZw4Jlb7qLCrlZB3mQd3E=; b=H8ZyezWsjdFS94X9/xr1uttRvs
-	b+eW4xgaF4I3k5HTF1d4NcW10cBLgM2sTO/YtaX1gZhEj2DkpJjX/UN77/CrkYEfx+0SKap21s5gf
-	uakF4nNaUVn6rg0EhWdLp+cdN5n+Pt8KdC3Qi7hUjTabiDm/YhTuxQ7ft0TKzqqxbwb87t/IvlH6o
-	hfL2Q2gVMo7uEQ45Gu17x821hK69W6QAha/cVny1QkFsaPeV6umfDDKVqHThk4Mjxsl4rEXfUYLYo
-	mPvmozxmdCYAKlhz35+wbohQwXjRwUwYldfp9KmMFtH3gXIZj7oSyoSv/AGLLd/pW9idVpzHRDW/j
-	g3c5zUoA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44986)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1svbXE-0005jD-1l;
-	Tue, 01 Oct 2024 12:59:20 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1svbX7-0004vN-2t;
-	Tue, 01 Oct 2024 12:59:13 +0100
-Date: Tue, 1 Oct 2024 12:59:13 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=GdtDMUxhjmWifxnTzrjixZGbtZcvkQLqyxzfzadHlTLF/m7jUW+Rctb5j9vDEu8u2mrKEcYbAio7CYnDywvof0hOu+bIEtxFdr/raFB2p0WlIew4DAfZGIp9QjscPo+EVFLMP3iOyfjVPAKtV2b5IzsKdaCRWFjgyf/IYNtkNF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PBSjfFJ+; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727784059; x=1759320059;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=IKIVvq/Cyglp1jeBg3AyVeHo+lhJ14utN7qA3vCuOT8=;
+  b=PBSjfFJ+hr46Ccmi2BP5RSjw4xYoLjcVIzgUNtpYpmAijRYz27BeZPiM
+   gDaNCALaTaq72u4MEne6RynYzxBwVsgTmLhZwmDd0To92YjOoLm65Ra+O
+   zvWvr+Wc2/0YRsSksrG2Or16Hnapu1nJIsJDG2FUZ+koJMEbkObt1tKCC
+   tfiXPMMjXy+4P4cvZ7S1fW2oFgJPsHbqhO6iYSvr87Ew74zi3brMZCmq9
+   D+LG4jOAJTUEENzS3o9BnHRnQnuCFU2OJVGnwcCT0guAtmTySeY5wY5L6
+   yIMiduRhhtPOAwqPpt4aHf3i0W20MRowW68vb6QuKRLUWxYomRprHQGAm
+   Q==;
+X-CSE-ConnectionGUID: E3qt+yc9RmyhQikj8UNEGQ==
+X-CSE-MsgGUID: NjtRysGZRxauuQIXkr0aaA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="26374345"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="26374345"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 05:00:58 -0700
+X-CSE-ConnectionGUID: oC5VCxHaRpKA7s4lLsktzg==
+X-CSE-MsgGUID: B5vfAF7GQJO3zdAjkY+8OQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="73961734"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa010.fm.intel.com with ESMTP; 01 Oct 2024 05:00:14 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1svbY3-000QeH-1c;
+	Tue, 01 Oct 2024 12:00:11 +0000
+Date: Tue, 1 Oct 2024 20:00:09 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andrew Halaney <ahalaney@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	Brad Griffis <bgriffis@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, kernel@quicinc.com
-Subject: Re: [PATCH net v5 1/2] net: phy: aquantia: AQR115c fix up PMA
- capabilities
-Message-ID: <ZvvkEYYljV4IWlJH@shell.armlinux.org.uk>
-References: <20240930223341.3807222-1-quic_abchauha@quicinc.com>
- <20240930223341.3807222-2-quic_abchauha@quicinc.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
+Message-ID: <202410011928.ux2dA2GV-lkp@intel.com>
+References: <20240930202524.59357-2-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,44 +83,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930223341.3807222-2-quic_abchauha@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20240930202524.59357-2-kuniyu@amazon.com>
 
-On Mon, Sep 30, 2024 at 03:33:40PM -0700, Abhishek Chauhan wrote:
-> AQR115c reports incorrect PMA capabilities which includes
-> 10G/5G and also incorrectly disables capabilities like autoneg
-> and 10Mbps support.
-> 
-> AQR115c as per the Marvell databook supports speeds up to 2.5Gbps
-> with autonegotiation.
+Hi Kuniyuki,
 
-Thanks for persisting with this. Just one further item:
+kernel test robot noticed the following build warnings:
 
-> +static int aqr115c_get_features(struct phy_device *phydev)
-> +{
-> +	/* PHY FIXUP */
-> +	/* Phy supports Speeds up to 2.5G with Autoneg though the phy PMA says otherwise */
-> +	linkmode_or(phydev->supported, phydev->supported, phy_gbit_features);
-> +	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, phydev->supported);
+[auto build test WARNING on net-next/main]
 
-I'd still prefer to see:
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/rtnetlink-Add-per-net-RTNL/20241001-043219
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240930202524.59357-2-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
+config: x86_64-kismet-CONFIG_PROVE_LOCKING-CONFIG_DEBUG_NET_SMALL_RTNL-0-0 (https://download.01.org/0day-ci/archive/20241001/202410011928.ux2dA2GV-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241001/202410011928.ux2dA2GV-lkp@intel.com/reproduce)
 
-	unsigned long *supported = phydev->supported;
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410011928.ux2dA2GV-lkp@intel.com/
 
-	/* PHY supports speeds up to 2.5G with autoneg. PMA capabilities
-	 * are not useful.
-	 */
-	linkmode_or(supported, supported, phy_gbit_features);
-	linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, supported);
-
-because that avoids going over column 80, and networking prefers it that
-way.
-
-Other than that, the patch looks the best solution.
-
-Thanks.
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for PROVE_LOCKING when selected by DEBUG_NET_SMALL_RTNL
+   WARNING: unmet direct dependencies detected for PROVE_LOCKING
+     Depends on [n]: DEBUG_KERNEL [=n] && LOCK_DEBUGGING_SUPPORT [=y]
+     Selected by [y]:
+     - DEBUG_NET_SMALL_RTNL [=y]
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
