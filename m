@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-131099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3044398C9AE
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:55:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2868898C9B0
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB0661F24609
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AA6E1C22938
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68541E00A1;
-	Tue,  1 Oct 2024 23:54:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98DA1E203A;
+	Tue,  1 Oct 2024 23:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="vvSlo9Ee"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="EpY8Z0zX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4761E1E0B9A
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 550A71E1A3F
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727826845; cv=none; b=U3aKFdfnSlwFtBlMlvFSymFO7kTfjLee12ns8TaHTohummRdnqXpvHGanJ/5t/fTdYvlCeXx/U5ObVyze0Z46qwIctGTwY/VzSKpM4DFCMr/SeoKk5DIAI179vtJC0sCDYfJILdwroc+yHP2lqlwedM4NTJXrkUGaxxhNQlbOYs=
+	t=1727826847; cv=none; b=BvbRNZA4YX1gmVvfUKaVV49qboxi3Ce37JxggLj/z/jlo/Gz7vgrEpSlAxI9x/vJilkR3re+Rbr1+KEOCKChNs8ZTYVhPH4MYxbXiz+tjrXCUxxzSAgrjLun4VDtTUBK8OpQjTP4Ig0b05HRiZSlOn+Djz2y0zpTtB+oFyKoXJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727826845; c=relaxed/simple;
-	bh=o3D87lP+KNy+Jir/fY7fvLsBvMyy9THUtqA+9zYkCpo=;
+	s=arc-20240116; t=1727826847; c=relaxed/simple;
+	bh=V1cs8PIynlwOrqpZWUDccPgmCikFp/sP5CKLnXd9jKQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IbqTYYdNvolBTwpIBmkXRbnNXZYZDWCKpzf2KfcgdW8axjBl4RfDwbBAx1rZ786RIRmyhYQ1bsxwj/lYz1llU7900s1xOX1cvzJDNBR7x1+xtisITGZHfSh+3KN0bWyKxTqRlc14sPvYzQ8IBDJNEJNZqBUheNoPqKmeNMx4Sxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=vvSlo9Ee; arc=none smtp.client-ip=209.85.216.41
+	 MIME-Version; b=SDeZWen0+/u3SgU7yKaksgFTHk6+qNndEypmRzcijPbyewCCJaM3PEH7dVgUufszm12RZDSBPFT0PZUwbGgZ2dB7ulsVX1xjyuQpcJ5u2gQ7wmGxrk3oUDwjy7XU6b8XeBo8xLkBJXAz5NnwOnQyAtdF4TBx2X8u5FYfEduakYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=EpY8Z0zX; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e109539aedso2675855a91.0
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:54:04 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e07d85e956so5184975a91.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:54:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727826843; x=1728431643; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1727826845; x=1728431645; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PLF63g3UxuFOgNadANGg2+qqv3YqiRQyKEar+/98gi0=;
-        b=vvSlo9Eelee5097/8c3VFUiWk5vJI1GPF+ur0suqFmVXNp4IQa68jwxMIzjarE2L2p
-         /gSLra0OAbxh4K4QH4DPjMiUbE/q0nRGq5uyN5t2DKLzC5vHRNSfc1q0ldj8l6RnfqdY
-         1/DRSiviWHyyHh7JVOO+HeZSZ9lFKBRCu4iBQ=
+        bh=aGBwpUl9kCiLHYdWMLl9DJsonbhtGhnaZmowBhBViU8=;
+        b=EpY8Z0zXPyx4D8vghd4Og9TjmOW7gDpPw2BctIZ0EKOI2CwOyGK6Ypqf/h78/VSyW8
+         PJISXlt5wEkx8bpSNkSSNgY2qtNWuIvZ/wUujvTfeXh1APCzlDLY2JGiRdmFdVojerTq
+         odGryhVp9wz1xmxKWHmWmABLlHdEWs9/flG1w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727826843; x=1728431643;
+        d=1e100.net; s=20230601; t=1727826845; x=1728431645;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PLF63g3UxuFOgNadANGg2+qqv3YqiRQyKEar+/98gi0=;
-        b=W+l7j9TREQqkPnWkZOgh4HLy4hqYWY1/qNiBCTQFaubUWqJyNte6m9vQYda3Nq3+zX
-         to8OMQ8kt/1K/FvQRNbabBbH0f6hwDCoAqHQfSCrtcz63oSbkAdWYNpHGnxrmjBiqN0j
-         6aB8lbo1/PR06dh4Ujn9FKILs4RJJqVaVF6rXlFc7Pkt44nEizcuu6fu3FT/Mqj89+U9
-         6Ba58DycAeGouhZ2YtF27uw0ZtMhylfNeTS6ss/Q8gMdtJLHEOiCTEXvIfq2E3pISoJS
-         MLnyIi+l4kC63oz1ZyJQz4UUJ6t3LeXpd4MEgeqKipomTJ9M1U78wV60WAe/hDYWL85I
-         oFXQ==
-X-Gm-Message-State: AOJu0YxF5TiwHHvu3ZDFfkULGMQGZDtfp8CppVyOkKMCyLc7lqW4AqVW
-	lt34pFmZammOtW58qyUNirLOC3R9fGpTGy3VOVRDJQA/GwCTXWCke964nQCh7YQ7NxhPJZzW272
-	hHKFhamw8/xotyB241UOzCb1fl74BTS044vgPUzxXxn740gtTIfDmfqNedW48DLTPGnMnRfenSG
-	WDqr6X6mRZNlChPBFYgB3J2YsGtfxCkEdqNXs=
-X-Google-Smtp-Source: AGHT+IEziOa7A+MAB9R2Y08fOCLGpcavYwRLkZ94iRWB4+/kdOklKsQcBgrXg0q1p/jteWgh+MwIQQ==
-X-Received: by 2002:a17:90a:1b89:b0:2d8:89ad:a67e with SMTP id 98e67ed59e1d1-2e1845511e2mr1931370a91.1.1727826843241;
-        Tue, 01 Oct 2024 16:54:03 -0700 (PDT)
+        bh=aGBwpUl9kCiLHYdWMLl9DJsonbhtGhnaZmowBhBViU8=;
+        b=qAFKuds4PTCTZZIBh17sy6Yqqc9URcyGmCti9e3w4lOQoIFQ2hJrkRK2HLUpq4IgzU
+         nEgcuJAoKy8DAK3yvRQA/2OuDYrCI0hzhQeeFl4j0TX74W/isZuxUIGPXz9JC0Q6lmTN
+         Mv+c4nHwK8GYJLaxymJXPWTXnUFkY0DOwH1cT7v/qZM64RcxYkuiwUG2pTLFufBTQBET
+         CffDGdDZ/Eabwhmjr+gCcn4/HQEU+pMrg9cODqcHAuQNlwWjTTw0vBhf6vnDo2Wt83c1
+         +h0cjHMVgVe+/y2a0wtS1txMU7F7tgC5AMLUVD0kMYfXg5+PT01ggC+LvR5nhBgtRxmf
+         3idw==
+X-Gm-Message-State: AOJu0YwEM6GWUDRAMVV9NFo6hleTkwqsr8cq5LhQDpKJKZU/zayTZa73
+	MMOltX55HGO6T2Ixfwmu3zd7wrvrkr9nyn2OS422UMk7qTCQWPt0ju3ExyjyD+CvSjqYpq61mw6
+	1YqPUUG+glrY+kIYYYiBwTWzZQRv7O1Dm3Dzul9tn3FSGFRq1ujyPR4oXQ3OHR80KypTwFuvo7s
+	tLHmILbKEHqAhO0I3JaSAGboauCpHOiwBuVQ4=
+X-Google-Smtp-Source: AGHT+IHH0M+tYuCS0vhSmHV9gXbNu6UtuY0Q3nfoA1P+p7ZvG4sPDyAAL0B88yi8W5maqglkVlbXeg==
+X-Received: by 2002:a17:90a:604b:b0:2d3:c638:ec67 with SMTP id 98e67ed59e1d1-2e182ca768fmr1714582a91.0.1727826845207;
+        Tue, 01 Oct 2024 16:54:05 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f89e973sm213130a91.29.2024.10.01.16.54.01
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f89e973sm213130a91.29.2024.10.01.16.54.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 16:54:02 -0700 (PDT)
+        Tue, 01 Oct 2024 16:54:04 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: mkarsten@uwaterloo.ca,
@@ -75,15 +75,18 @@ Cc: mkarsten@uwaterloo.ca,
 	sridhar.samudrala@intel.com,
 	willemdebruijn.kernel@gmail.com,
 	Joe Damato <jdamato@fastly.com>,
-	Michael Chan <michael.chan@broadcom.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver),
 	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net-next v4 7/9] bnxt: Add support for persistent NAPI config
-Date: Tue,  1 Oct 2024 23:52:38 +0000
-Message-Id: <20241001235302.57609-8-jdamato@fastly.com>
+Subject: [RFC net-next v4 8/9] mlx5: Add support for persistent NAPI config
+Date: Tue,  1 Oct 2024 23:52:39 +0000
+Message-Id: <20241001235302.57609-9-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241001235302.57609-1-jdamato@fastly.com>
 References: <20241001235302.57609-1-jdamato@fastly.com>
@@ -100,23 +103,22 @@ initializing NAPIs.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6e422e24750a..f5da2dace982 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10986,7 +10986,8 @@ static void bnxt_init_napi(struct bnxt *bp)
- 		cp_nr_rings--;
- 	for (i = 0; i < cp_nr_rings; i++) {
- 		bnapi = bp->bnapi[i];
--		netif_napi_add(bp->dev, &bnapi->napi, poll_fn);
-+		netif_napi_add_config(bp->dev, &bnapi->napi, poll_fn,
-+				      bnapi->index);
- 	}
- 	if (BNXT_CHIP_TYPE_NITRO_A0(bp)) {
- 		bnapi = bp->bnapi[cp_nr_rings];
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index a5659c0c4236..09ab7ac07c29 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -2697,7 +2697,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	c->aff_mask = irq_get_effective_affinity_mask(irq);
+ 	c->lag_port = mlx5e_enumerate_lag_port(mdev, ix);
+ 
+-	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
++	netif_napi_add_config(netdev, &c->napi, mlx5e_napi_poll, ix);
+ 	netif_napi_set_irq(&c->napi, irq);
+ 
+ 	err = mlx5e_open_queues(c, params, cparam);
 -- 
 2.25.1
 
