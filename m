@@ -1,111 +1,134 @@
-Return-Path: <netdev+bounces-131088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8371B98C95E
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:14:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2793F98C961
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:14:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4871328BDB9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:14:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47D451C20B33
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF32C1CEEB4;
-	Tue,  1 Oct 2024 23:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D091CEE9C;
+	Tue,  1 Oct 2024 23:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z7Sy0FX4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXEQm2oY"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248BC2207A;
-	Tue,  1 Oct 2024 23:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1150D1CF28B
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727824460; cv=none; b=WyhgSwrF2fxx69e/FCCU4nKkrIjqI5urLahBzoc4vseo7t2cLAs0kRFzJ++JdLwpZk5/vhbANjfptK3NalOkwMo0rbotXA5q2uX4AyW3L3c5SakIYUXMTnhmcyeXut7KDSFQqyuqNuYWUGVKqx3HhHkGtKiZo8ZbZfJRAcnskdA=
+	t=1727824490; cv=none; b=srsJ2dHaRhlp+gGlTVFX9jE0IYIJMJ+AREQkPHWnF5IMCEAdksEmm9wLPg6630a1oijZUr0Vv7rPy5KF7VPVuAM01fNHH4oLdxZGQ3syw7TlCkJ4+v2o7PAyxZC6y43HetteRYI4kTfyZlz39NzT7yG190aNKA/zp4tnFdlkqZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727824460; c=relaxed/simple;
-	bh=oDJtK4cNxYxq5AYlpI9jhDIlyab8ODOkgx+r0yGpxa0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nI9G4r6tsKN4oKWZ57El7CO9R0DQFPjB3w690fPQ5TBojlLIfeZhCuJuCE4TpSCTdND/dRm1XcsLheExETdFnVrdARx46rkf1Teczx95y0LFmhOANpesZA/uJ7yDweoUIacA4kx0vUNofLWr5jKTXpSIO4Njay7JJQw7Lfetmhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z7Sy0FX4; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SvmHdDNFN6b59tuW6qBvsEXIyWd5sLKDZWcPZWw7ZPo=; b=Z7Sy0FX4cUkFI8YXYQyqiN8xwP
-	TL8WDMn+iKp/ZhwKYj6vy6/HsO4H/4oTCKvCKth6lL5SPoSJcXyWsbu3Me+5N5SujDl+KmH2xHIr3
-	XAAczyjPdoSdG19IayDqLrbIkDb7rzr6n0G6R+6sBjGlCStGqFmfeWj85ypCzH7I4CHIpCaA8ouqc
-	25709dabQFXEjnGkkM1nMxS/9MdjHJ5gfRaJprKl/AA3OylkE7bKcXRMGVUxQRLJw+DOpCTpXuzXL
-	N/D6hC8X8sUn6VEuuDD8gWHMuozRWGKqW2CUk/25ur/xkRrRGFezkQKm/KzIf6eUk7WAbo3fMpN/G
-	A3/g+duw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59900)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1svm4D-0006Zi-1B;
-	Wed, 02 Oct 2024 00:14:05 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1svm45-0005LU-2n;
-	Wed, 02 Oct 2024 00:13:57 +0100
-Date: Wed, 2 Oct 2024 00:13:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	Brad Griffis <bgriffis@nvidia.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, kernel@quicinc.com
-Subject: Re: [PATCH net v6 0/2] Fix AQR PMA capabilities
-Message-ID: <ZvyCNfDqwbwnjb0X@shell.armlinux.org.uk>
-References: <20241001224626.2400222-1-quic_abchauha@quicinc.com>
+	s=arc-20240116; t=1727824490; c=relaxed/simple;
+	bh=asTZzM567pcKSUn11YDuhEmh5VGtwemnVvE7YgvnZAE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DqiW6xMLFrYKwdxxTn9GdbngnoiV1V7Ut6TiSlLUr9n0Y7RIipmuUzuLw4/aKh9j7kYXjMDd6+CTglHH3nYam5oO9R/515A2IBa8GXeU4msiiFpE7zOT1E+SD3cglv4z6eRezHse8TwLz6oa00DoKP2VNAOTjFaTzkvlgHb0sWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXEQm2oY; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c718bb04a3so7926723a12.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:14:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727824487; x=1728429287; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hXKyvSGYCFtYl7ZCgnYaWtIrO9omUE74W7krvfzgvxI=;
+        b=QXEQm2oYjCRsjVoZfGWjf8LCvOceXQi8duE+jpk/uGBCP/3T0UbvDp9up7PYu9SvfW
+         BcGs/4Zs8p7vp599SL6/1uaIJXGcbux569Tj2wVfhgzNW7sp9/J7ipWukvdkK/nfKqQj
+         /8LJQsDq00/oP+3qd67DAAnU7zzHKnjy0jezcAw/8TVhMyk1JweOCyujDfvbsi6O+Twk
+         gDpGNWemVtm7lSoDXap9MSs1GJLBWbVE908mAj2hzcMR1ihQqK4I7XuCxhHsTgFHvnZf
+         RUHAfaqI6qtMepnPjwpL0YEkSbJwziXkq8uWuJ/6TcbqR30WFOC0irg0Br+66a/xt+af
+         aw/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727824487; x=1728429287;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hXKyvSGYCFtYl7ZCgnYaWtIrO9omUE74W7krvfzgvxI=;
+        b=ei2L9kTZB9w1mUckM0N+i9AulyWrlu3yLTvcHcqUTydzIA1Yd3gDpqoHjs2gGV5HPV
+         7eRsqR/FMzh3rfKRWfhZ8jv5Xk4QMd8m/sBtAuazfOJCr38J1YNl4PyS/aehVyUSmhJm
+         QBG/kYbQKBiapNQa2Bu27Fdd+EXDpKrC0pobqXJb1iOnmbcBW3ku53vK8DsRDxozNHWp
+         6uKOwbmA0mGMwrXq742qBoyD3Sl79EOI5CVwSAzBQ+3Gj4P6db5IH6BqPvSqoJqil8Mu
+         UsT9w7UR4/EiTCIQs/nR5InVKNVFWCixZkA8JspEZxxbrYCj4iY7qB9vdisd/icq9I2l
+         Eh/g==
+X-Forwarded-Encrypted: i=1; AJvYcCV6kMWE4ydywzMbfQN42BS0N1eFbH+L1udooeB3G8gJga5aMGVJQBUXZIysLkNrkcWqZK9PBWw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx78e7ctUfcNJw/GboSXVbbgbXQWDD7YJDE6rxOogUTsLr9sJay
+	M4oicg2004SmxB4bzd9pUjREPtFA9u71z/fSljYyy+w2V3937zypKFy0Dg==
+X-Google-Smtp-Source: AGHT+IF0Ya5dKrGwTmfW9ooJ1b0YUkgsCfgGzZCjjQYxt3+nMrSZIR4L1sk3xwPdha/a2vvBfpzkwA==
+X-Received: by 2002:a05:6402:5002:b0:5c8:8d5e:19b0 with SMTP id 4fb4d7f45d1cf-5c8b1b863ecmr691436a12.30.1727824487161;
+        Tue, 01 Oct 2024 16:14:47 -0700 (PDT)
+Received: from getafix.rd.francetelecom.fr ([193.252.226.10])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c88248aebbsm6679102a12.61.2024.10.01.16.14.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 16:14:46 -0700 (PDT)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+To: edumazet@google.com
+Cc: alexandre.ferrieux@orange.com,
+	nicolas.dichtel@6wind.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2] ipv4: avoid quadratic behavior in FIB insertion of common address
+Date: Wed,  2 Oct 2024 01:14:38 +0200
+Message-Id: <20241001231438.3855035-1-alexandre.ferrieux@orange.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001224626.2400222-1-quic_abchauha@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 01, 2024 at 03:46:24PM -0700, Abhishek Chauhan wrote:
-> Patch 1:- 
-> AQR115c reports incorrect PMA capabilities which includes
-> 10G/5G and also incorrectly disables capabilities like autoneg
-> and 10Mbps support.
-> 
-> AQR115c as per the Marvell databook supports speeds up to 2.5Gbps
-> with autonegotiation.
-> 
-> Patch 2:- 
-> Remove the use of phy_set_max_speed in phy driver as the
-> function is mainly used in MAC driver to set the max
-> speed.
-> 
-> Instead use get_features to fix up Phy PMA capabilities for
-> AQR111, AQR111B0, AQR114C and AQCS109
+Mix netns into all IPv4 FIB hashes to avoid massive collision when
+inserting the same address in many netns.
 
-For both patches:
+Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+---
+ net/ipv4/fib_semantics.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index ba2df3d2ac15..1a847ba40458 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -347,11 +347,10 @@ static unsigned int fib_info_hashfn_1(int init_val, u8 protocol, u8 scope,
+ 	return val;
+ }
+ 
+-static unsigned int fib_info_hashfn_result(unsigned int val)
++static unsigned int fib_info_hashfn_result(const struct net *net,
++					   unsigned int val)
+ {
+-	unsigned int mask = (fib_info_hash_size - 1);
+-
+-	return (val ^ (val >> 7) ^ (val >> 12)) & mask;
++	return hash_32(val ^ net_hash_mix(net), fib_info_hash_bits);
+ }
+ 
+ static inline unsigned int fib_info_hashfn(struct fib_info *fi)
+@@ -370,7 +369,7 @@ static inline unsigned int fib_info_hashfn(struct fib_info *fi)
+ 		} endfor_nexthops(fi)
+ 	}
+ 
+-	return fib_info_hashfn_result(val);
++	return fib_info_hashfn_result(fi->fib_net, val);
+ }
+ 
+ /* no metrics, only nexthop id */
+@@ -385,7 +384,7 @@ static struct fib_info *fib_find_info_nh(struct net *net,
+ 				 cfg->fc_protocol, cfg->fc_scope,
+ 				 (__force u32)cfg->fc_prefsrc,
+ 				 cfg->fc_priority);
+-	hash = fib_info_hashfn_result(hash);
++	hash = fib_info_hashfn_result(net, hash);
+ 	head = &fib_info_hash[hash];
+ 
+ 	hlist_for_each_entry(fi, head, fib_hash) {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
