@@ -1,101 +1,132 @@
-Return-Path: <netdev+bounces-131081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 596C598C851
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:41:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA6A98C857
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19118284D4E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:41:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7FAEB22D67
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74B81CEE85;
-	Tue,  1 Oct 2024 22:41:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6781CEEA4;
+	Tue,  1 Oct 2024 22:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tS8MOpGM"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HmxTsrat"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EFF19CC39;
-	Tue,  1 Oct 2024 22:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD8D1BFE00;
+	Tue,  1 Oct 2024 22:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727822461; cv=none; b=bWL+CEEFslo02djHUnBI0K+ZY30TUEWymrhT4l4oJBSrILjLeolSAeUwf73jla9EntjFa/hexZod7J5UKnzjp4bA2TG8Q0lDcrO5xRaw3Rf9wDn76kn+cDHaxFb4IhFkSWlOmChy1KsbeYqTzy7dHLsyhwyieFA2pb5tHGKFH8c=
+	t=1727822814; cv=none; b=NDmzm+dufAPkUNl+7k+uojZEz7tujAnQMnBzZVnkHFRBNzxvhR2YQ2U4GWEmJRvET1mKIkk514tYQOQr8cKwCCJGKBuFEOcjrLHAIiVmVO2oGvXkw0UY450U/yE9/HQbEOpM/y5lTj7lfK0RlzRFFfBjczfSzf/TDwAndxopCXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727822461; c=relaxed/simple;
-	bh=G35ceyA3I/3jR4DoDBPzvc8A+5LW0y5ljnBt+aOCaCg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RJoYexb2ta570y5zPGw8Q1vqz+HY4bkpTkbxpKDDBBpJJdTmV1zmdothxlhUK3X6Qi2hlqtEA0UnzH20TARKllAtYdCLx8SXeZmOuzPw/mmMcIpIRMOQKbG3iZg31H8xVRGlMGlWw0m6hnxCTqv3+YnVPeL2hYzyK+HQm2bQZ3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tS8MOpGM; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KNLPACdzNQO/8e/1Kcz1HNmYFsucLkPJcpTfmBawZsg=; b=tS8MOpGMWm6ZNfbwLAamiJcDdC
-	U2DmC+hSFSbqqRlDUfAAkiq8o6ACsisE9+Vs/foT6WF32qXPebhFRwRNgEUH9kdjhuVttcB5rAUy4
-	TmTZz/sXLGwT+a2QypAvB7IE9Xsnh649Oz8JUEX0Oma1JQD2HjvlmG6baK7OvKqxIwDk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svlY3-008maQ-J5; Wed, 02 Oct 2024 00:40:51 +0200
-Date: Wed, 2 Oct 2024 00:40:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	olek2@wp.pl, shannon.nelson@amd.com
-Subject: Re: [PATCHv2 net-next 01/10] net: lantiq_etop: use
- netif_receive_skb_list
-Message-ID: <975e614a-f37a-4745-90a2-336266b21310@lunn.ch>
-References: <20241001184607.193461-1-rosenp@gmail.com>
- <20241001184607.193461-2-rosenp@gmail.com>
+	s=arc-20240116; t=1727822814; c=relaxed/simple;
+	bh=ZDslSkulC1sAOhjyNUpHtCXyeuQyFQa5OSChIsUPVwk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TOHTujQtVwyXDV4oYEr4LyQqZpsT2R37ikZVpzACVFwzY1TKPFvXtnv+Jt9vTnUQAeUW2fY2NDlOhHhTqciVejEiSuio2mcC0m08iWPfmG05LPqb7ZhNGDmTtLw1sqVEVVmofR03VDXruhLxGEj8v65aNhqUvJhExYa/uI4PJ0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HmxTsrat; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 491LbhhW032323;
+	Tue, 1 Oct 2024 22:46:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=mg4Z9hX96gITYTKok2FJQoBsdRCEhmnRJQk
+	ltEOy2aM=; b=HmxTsratHIKlgf31a0cKT+PQwxBIYOGzGmJa4Ik13facU+y0cei
+	GbfCQVHiIAd/0HsQVl+cdnjK0IMoGZ00Jr/OgWen5nNpQP1MLiB9NT4mIJYbQit0
+	0pIlUovUShvYdIdhPb8/1f8l0ARQRD8UoTh6X4TnLFLjLXh30FwCJveX6I3zs8gL
+	vhoLrTlJPoSDNKGOzGnWhx4HpP0gdN+2rQIXdESdL0rLIW8gTcY3sQblq5fUI9As
+	MFxsLlCkpUfGJdSUvJHk3B4vAJD4Wbn6nGQFQWazbmf7AIlNZiSfwqd6sjGSlqe+
+	BpCtjPhqJIYQp3a24GhSyt1PXb6QDiyjIXQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41x94hhwe1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Oct 2024 22:46:28 +0000 (GMT)
+Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 491MfwtO014023;
+	Tue, 1 Oct 2024 22:46:26 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 420h1qmc1s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Oct 2024 22:46:26 +0000
+Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 491MiW30016955;
+	Tue, 1 Oct 2024 22:46:26 GMT
+Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
+	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 491MkQtC018812
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 01 Oct 2024 22:46:26 +0000
+Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
+	id 1EEB722EC5; Tue,  1 Oct 2024 15:46:26 -0700 (PDT)
+From: Abhishek Chauhan <quic_abchauha@quicinc.com>
+To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        Brad Griffis <bgriffis@nvidia.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Jon Hunter <jonathanh@nvidia.com>,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: kernel@quicinc.com
+Subject: [PATCH net v6 0/2] Fix AQR PMA capabilities
+Date: Tue,  1 Oct 2024 15:46:24 -0700
+Message-Id: <20241001224626.2400222-1-quic_abchauha@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001184607.193461-2-rosenp@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: Tyn-HQgOKGOXoiasYRd4iclQoIdUCkT3
+X-Proofpoint-ORIG-GUID: Tyn-HQgOKGOXoiasYRd4iclQoIdUCkT3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ mlxscore=0 malwarescore=0 mlxlogscore=954 priorityscore=1501
+ impostorscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0 suspectscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2410010151
 
-On Tue, Oct 01, 2024 at 11:45:58AM -0700, Rosen Penev wrote:
-> Improves cache efficiency by batching rx skb processing. Small
-> performance improvement on RX.
+Patch 1:- 
+AQR115c reports incorrect PMA capabilities which includes
+10G/5G and also incorrectly disables capabilities like autoneg
+and 10Mbps support.
 
-Benchmark numbers would be good.
+AQR115c as per the Marvell databook supports speeds up to 2.5Gbps
+with autonegotiation.
 
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  drivers/net/ethernet/lantiq_etop.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
-> index 3c289bfe0a09..94b37c12f3f7 100644
-> --- a/drivers/net/ethernet/lantiq_etop.c
-> +++ b/drivers/net/ethernet/lantiq_etop.c
-> @@ -122,8 +122,7 @@ ltq_etop_alloc_skb(struct ltq_etop_chan *ch)
->  	return 0;
->  }
->  
-> -static void
-> -ltq_etop_hw_receive(struct ltq_etop_chan *ch)
-> +static void ltq_etop_hw_receive(struct ltq_etop_chan *ch, struct list_head *lh)
+Patch 2:- 
+Remove the use of phy_set_max_speed in phy driver as the
+function is mainly used in MAC driver to set the max
+speed.
 
-Please don't put the return type on the same line. If you look at this
-driver, it is the coding style to always have it on a separate
-line. You broken the coding style.
+Instead use get_features to fix up Phy PMA capabilities for
+AQR111, AQR111B0, AQR114C and AQCS109
 
 
-    Andrew
+Abhishek Chauhan (2):
+  net: phy: aquantia: AQR115c fix up PMA capabilities
+  net: phy: aquantia: remove usage of phy_set_max_speed
 
----
-pw-bot: cr
+ drivers/net/phy/aquantia/aquantia_main.c | 51 +++++++++++++++---------
+ 1 file changed, 33 insertions(+), 18 deletions(-)
+
+-- 
+2.25.1
 
 
