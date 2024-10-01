@@ -1,124 +1,143 @@
-Return-Path: <netdev+bounces-131012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E0398C60D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:32:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45BE398C61A
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:34:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DAEF1F226A0
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:32:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75B441C23A35
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0851CCEFD;
-	Tue,  1 Oct 2024 19:32:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9206C1CCEFD;
+	Tue,  1 Oct 2024 19:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MG/s2VU4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LujJekaG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84DC1CC174
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 19:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167071CB30F;
+	Tue,  1 Oct 2024 19:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727811162; cv=none; b=gf0kM8L8fFhdbfOy00kQw17Rzy8C3MakZGTfUboj0xbaVhE7f32XQzpR0pW6OwqZED8APWJgzx5MfuIL4aR/SJzBm36xKhe+WnobFswwQtZeCb97tE8QBP9coERGt9Jr/PEh6J9ebrTTvZnpkrn5ORDA4TrhkHWHjDPuvFcfOCQ=
+	t=1727811247; cv=none; b=uHEjAOJ4FF3NggqVkFKEN24ScZA28OtRerk+1XrydPRd0cGhq1rOd6fOHxitL/A4E2yeZog8/v2aA/sBkL/F2oJO2q9UxI1Vhj4gVn49qsqmmK06sCx+qH4SffCvFidKb7ideB9FYCDPjumka13pUtxybmK/CJcR7Mn1VPISTWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727811162; c=relaxed/simple;
-	bh=XQphB0fQXyUbHkXTg2+GtyhboKN0s6dA0sD5GcIBfcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lwGNcczGRuTusBL4CmxnwqBEB83IX2TC8Xjzn9wdg0hj27w5KJnrcV73NK53wPzQ+4cnbvHxqbI3LAUG23ZAMULSLrnqkdLztbcVxe4PiXpIxUYsMrPPRBavW5PWB8+2Lox8EvWKPvObkvSIr2GOe7c8nlvkC2DkFwO92ZPXn7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MG/s2VU4; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727811161; x=1759347161;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XQphB0fQXyUbHkXTg2+GtyhboKN0s6dA0sD5GcIBfcI=;
-  b=MG/s2VU4VVYYuW9qEHDNajAZEec4XeFgutxWueS8O1lPLAzy3EHCXx0o
-   CaGY5SQZrnoCjxvGUk0tQ0vorxsmpybqqjTDijBF+cB2Y/jDDqaJhfZll
-   sFbO1yMiaJMR698a0U+WbzgVVwDQO/90D2llOQevLqmd7nIZITJfRH5ia
-   AhgmTh6m8uD2RMrN4T6zpSIr4XP8Wevk7rvkbuHGh4QE4BVDq1H9lsAwe
-   ngpbdCDFptiXo4M2ponBuHHXTzNy/JvWUzaoufibjHxVaRbjZyJZ9bNou
-   Vv8I97KlgN4z4iRK9ut0ws2j4w73FpqH7dKVlnkrzcVLACzsw1Ve/GLDt
-   A==;
-X-CSE-ConnectionGUID: 58p9QSQ3Su+VxIl+exf/sQ==
-X-CSE-MsgGUID: /Vz/rOnwRSW4iNEaZZck3g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="27140487"
-X-IronPort-AV: E=Sophos;i="6.11,169,1725346800"; 
-   d="scan'208";a="27140487"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 12:32:40 -0700
-X-CSE-ConnectionGUID: C4Kq/ybPSmCXJ8T3awZTyQ==
-X-CSE-MsgGUID: 6dogTQ44T2GlId277Cclyg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,169,1725346800"; 
-   d="scan'208";a="73438000"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 01 Oct 2024 12:32:38 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1svibr-000R6D-2X;
-	Tue, 01 Oct 2024 19:32:35 +0000
-Date: Wed, 2 Oct 2024 03:32:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net-next 4/5] ipv4: Retire global IPv4 hash table
- inet_addr_lst.
-Message-ID: <202410020334.VOgHq3VG-lkp@intel.com>
-References: <20241001024837.96425-5-kuniyu@amazon.com>
+	s=arc-20240116; t=1727811247; c=relaxed/simple;
+	bh=0uw9FYsEW60piYVepJps6DlGixYkTxjq3bzeGZMmJOs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WaxMV3/jtPlz1EIDKjFwLKft0rtzNliSL4g+jDHFuME4O7JEFkgKYP1Q24K+5INvTaSLND1s+0eFQBP9pXTlL7Cj5BUSiNUzJvAELuW1XZJRB2Scr1Wzl4/MrDOlzCALSyhLHxuOd2eqg2ThHhgdk622Vn/4J8WVpCBMCORLdfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LujJekaG; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7d4f85766f0so5056244a12.2;
+        Tue, 01 Oct 2024 12:34:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727811245; x=1728416045; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q7eijFBIczXssAvMKHKfugN8TkFnB4cNonrVqNg72BY=;
+        b=LujJekaGBVS1eyyAyiM+hgZvxO4rU9hVCeSnFweDUUvV6E14AFZOl7CzpPoFEPEPSO
+         ccN9YNMNLuM070BBD2wW+qkspkHLBkTJ/7bjyEuViPs1aARBBkNVsj91qX4kipVIAe6g
+         ib66uiH8DEAEZywIY4Wkz+9rUXUf6iKCdbaSvpqFIEgNcn1RB+9bfRbC0Ku0db4x8B/G
+         MtdOjx1gifD7NDTsynVucPnCKmhEEUMaf8WcrazcWb5dSD9h8+oYhOUI5aGtyKFuX1gl
+         Q0VsnxmuKsm++4O08nZaEyqNJWP+t65iBunth6n/O+neqNjkgnWtD+5sqdQtwu0Id1jb
+         OXGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727811245; x=1728416045;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q7eijFBIczXssAvMKHKfugN8TkFnB4cNonrVqNg72BY=;
+        b=sJt30OZItlhXBhWEG+8vJ7LmQ8Q81B0zIpFwXu0K6LXpKlDizZ0JpdFquiUp2jGw6/
+         MKdO2LqkuDmhWmNOEfbF58qSTTlkMh/NE7SobiJGAjV/niRvVPfpUmHa/jqFazTtrrq+
+         LEhQKN3sDcNBJxGmcPnFP1rAYTFNWYX7xcpEMzNYTC2Jgf28QnZ9FUoVV9Yk6fDc07N3
+         nlUJZEGeSsYalUAVHHn5hZeIJurtDWwJy9soA7AT11RFba81Xq+YLTsPxTOoftAa7jn8
+         xaLICS+KhK/IHYHa0/0jGuuaX2817R3e+Fwl1ArJdgTi6yxDV5+DkhH6L4OvdE5nDwj6
+         aQKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWweCB6mmaJFXzMwQ3RsT/dKQR6jhB2b7CH6/LE4//aPRY/gj1B+LwvLQ3+SJXFgfx/Fs/gXQfR2QcV6U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfaGol9aGvsh0Rr+7i/YkONN2cC00iG+pPasZZGYs+ysLeSEjp
+	QUPVtEHOqetlbNc1RuTKU8+U+56SeBgdDdez++h8z40kXW/XfEaT
+X-Google-Smtp-Source: AGHT+IFB3s+WqtB2CcaQF80MzkJeXy/gMvEXx4lmIlesMcsF/dUzKjwqDDr3a+tmHuHjOK0G+6fnPw==
+X-Received: by 2002:a05:6a21:174b:b0:1cf:6953:2872 with SMTP id adf61e73a8af0-1d5e2d2a89fmr1111951637.48.1727811245026;
+        Tue, 01 Oct 2024 12:34:05 -0700 (PDT)
+Received: from mythos-cloud.. ([121.185.170.145])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6db2b391bsm8688976a12.22.2024.10.01.12.34.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 12:34:04 -0700 (PDT)
+From: Moon Yeounsu <yyyynoom@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@weissschuh.net,
+	j.granados@samsung.com,
+	judyhsiao@chromium.org,
+	James.Z.Li@Dell.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Moon Yeounsu <yyyynoom@gmail.com>
+Subject: [PATCH net] net: add inline annotation to fix the build warning
+Date: Wed,  2 Oct 2024 04:33:52 +0900
+Message-ID: <20241001193352.151102-1-yyyynoom@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001024837.96425-5-kuniyu@amazon.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Kuniyuki,
+This patch fixes two `sparse` warnings:
+net/core/neighbour.c:453:9: warning: context imbalance in '__neigh_ifdown' - wrong count at exit
+net/core/neighbour.c:871:9: warning: context imbalance in 'pneigh_ifdown_and_unlock' - unexpected unlock
 
-kernel test robot noticed the following build warnings:
+You can check it by running:
+`make C=1 net/core/neighbour.o`
 
-[auto build test WARNING on net-next/main]
+Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+---
+ net/core/neighbour.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/ipv4-Link-IPv4-address-to-per-net-hash-table/20241001-105607
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241001024837.96425-5-kuniyu%40amazon.com
-patch subject: [PATCH v1 net-next 4/5] ipv4: Retire global IPv4 hash table inet_addr_lst.
-config: x86_64-randconfig-122-20241001 (https://download.01.org/0day-ci/archive/20241002/202410020334.VOgHq3VG-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241002/202410020334.VOgHq3VG-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410020334.VOgHq3VG-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> net/ipv4/devinet.c:124:24: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] val @@     got restricted __be32 [usertype] addr @@
-   net/ipv4/devinet.c:124:24: sparse:     expected unsigned int [usertype] val
-   net/ipv4/devinet.c:124:24: sparse:     got restricted __be32 [usertype] addr
-
-vim +124 net/ipv4/devinet.c
-
-   121	
-   122	static u32 inet_addr_hash(const struct net *net, __be32 addr)
-   123	{
- > 124		return hash_32(addr, IN4_ADDR_HSIZE_SHIFT);
-   125	}
-   126	
-
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 77b819cd995b..6b5ec9a44556 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -441,6 +441,7 @@ EXPORT_SYMBOL(neigh_changeaddr);
+ 
+ static int __neigh_ifdown(struct neigh_table *tbl, struct net_device *dev,
+ 			  bool skip_perm)
++	__acquires(&tbl->lock)
+ {
+ 	write_lock_bh(&tbl->lock);
+ 	neigh_flush_dev(tbl, dev, skip_perm);
+@@ -453,6 +454,7 @@ static int __neigh_ifdown(struct neigh_table *tbl, struct net_device *dev,
+ }
+ 
+ int neigh_carrier_down(struct neigh_table *tbl, struct net_device *dev)
++	__acquires(&tbl->lock)
+ {
+ 	__neigh_ifdown(tbl, dev, true);
+ 	return 0;
+@@ -460,6 +462,7 @@ int neigh_carrier_down(struct neigh_table *tbl, struct net_device *dev)
+ EXPORT_SYMBOL(neigh_carrier_down);
+ 
+ int neigh_ifdown(struct neigh_table *tbl, struct net_device *dev)
++	__acquires(&tbl->lock)
+ {
+ 	__neigh_ifdown(tbl, dev, false);
+ 	return 0;
+@@ -848,6 +851,7 @@ int pneigh_delete(struct neigh_table *tbl, struct net *net, const void *pkey,
+ 
+ static int pneigh_ifdown_and_unlock(struct neigh_table *tbl,
+ 				    struct net_device *dev)
++	__releases(&tbl->lock)
+ {
+ 	struct pneigh_entry *n, **np, *freelist = NULL;
+ 	u32 h;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.46.1
+
 
