@@ -1,239 +1,377 @@
-Return-Path: <netdev+bounces-130745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A6C98B644
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:57:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA7A98B648
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47ABC1F2277C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:57:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D81281F68
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 131DB1BDAAA;
-	Tue,  1 Oct 2024 07:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA6B1BE85B;
+	Tue,  1 Oct 2024 07:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ixsN0XFA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hk1A4nyY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833642BAF1;
-	Tue,  1 Oct 2024 07:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F731BE25C
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727769414; cv=none; b=E++KXc5ZSfYy8sfRVIUTuyF1PiLXA8IZnhxz6uFBwq9XtCk60aTX60tldDulxGtiIWjBK3l1Vm7Pona/I/0IVXgf7Mc6vSZCqLvzluUteubQc07n5fOEXSlRt9qiFJMcaEL2eiMiakx41NGzvpeLC689Q6f0RWb8fy48VA3TyJ0=
+	t=1727769417; cv=none; b=A0TgV/ip+efmIFlfnuWoLPnRu6xJg3oZjyvP/Y3bbkdXouWsQ99RKrY7pNga6CPooisfF5/ZfG0hBizSeieLGlkMHGpBc8NVmHn7DEks3dGa/4n38yG4vIHsMsK1iTNjAshStAqlSlq4onxYMBqkxhPtoviewyE3P+Je58krFUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727769414; c=relaxed/simple;
-	bh=kqtCwrNQyrsCPH14IeF49CkrTD3Sxwt2LYZ89HY0hjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sFxjQ9sinNe+sphtTEdv+idoiP4CdKoQTVdFtdkWnSjat1KS6DhDE1s4GnuDWdCvkJiFeETj5HjhDRrOEZJHSbmOcM5iJo6k6T9DzIbLtyWs2ai13yCNGZ97vO3SPuqLqWDGFrFMPw96i3zmRTdrbXckw8ep4y9rSpYZHfkMNO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ixsN0XFA; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: b47bc4707fca11efb66947d174671e26-20241001
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=TjMavNplUZELeajR9FcsG6MetaDg0Rbfa8IeC3xIwEU=;
-	b=ixsN0XFAJsan5Ev6vc+tKGXpJIGcjVl1HX9AIgoj+lxKnrbYXc6ny+CWdptP/KZUo+YTJdKx2AjVz71BCgkOE360jJOM1VzIj8JAjHytnTY1Nqp2ePMmpK82UbmpnOhd5DoAoAwoCytFOfr+fOvhtu0u28b8JOZp3i6TfD5wZ9I=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:42482f59-f8ee-4621-8c1a-6436a83ad0d4,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6dc6a47,CLOUDID:5b18d79e-8e9a-4ac1-b510-390a86b53c0a,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
-	l,URL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
-X-UUID: b47bc4707fca11efb66947d174671e26-20241001
-Received: from mtkmbs13n1.mediatek.inc [(172.21.101.193)] by mailgw01.mediatek.com
-	(envelope-from <macpaul.lin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 462655724; Tue, 01 Oct 2024 15:56:45 +0800
-Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 1 Oct 2024 15:56:44 +0800
-Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n2.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
- Transport; Tue, 1 Oct 2024 15:56:43 +0800
-Message-ID: <52f8b482-cf53-cace-5942-728dcb50ff13@mediatek.com>
-Date: Tue, 1 Oct 2024 15:56:41 +0800
+	s=arc-20240116; t=1727769417; c=relaxed/simple;
+	bh=D1JTQfrWYlxg+oug+vUqLOQZmsnSJiIy/5H/1jFqavI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dnTfCBbitTRe87HkbsUUdl2onhB+cAHVp/d0Eg07TSp+3OHHv69s7GxSCObkvRn5jwyW/UlwysEq0neqkBGOD4AXj3ma5so2Uo1lBNutGzsIjFgAY9yY7F65yu24EWkf42kU3FFCZgv1RZ0D3fy1oqxMehYNBtkT/nIaOBS5Rjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hk1A4nyY; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2605a8c7e0so5844484276.0
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 00:56:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727769415; x=1728374215; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2YLIpnISBu8vBhPoCOC0VxpYUv2HSm5uj0+OgXD1P1w=;
+        b=hk1A4nyYtoELYYoGP6gVEgMLdRSQmfN9EAFU0RnlmJjvUbPzmpD9P2+9UltciGpJcc
+         HMxNsRNTG4/FBmrOubycwqKyTp6OcqAQr79vDiLhE73Syu5tk8jRZaZDm473Iu/T7mZ6
+         ftt80xX6OlhBY62T+AonMiAAH5GSZpBwUHTNSZT6JKOZUKI/rFlaYfDtkpH799H8ZczI
+         i7LH0fJt36kErwFDBKxGsXs9JDtM+qF8UxxoKieU0YAke/xZ0gjyrz7KzQRX14yRXiE9
+         HOwyYq7te5nLbEWk0geEfp6HcHgqAmaTDZ2CyYNstE2g53jpApxF5ewOlUWfZEB9vi7O
+         SFqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727769415; x=1728374215;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2YLIpnISBu8vBhPoCOC0VxpYUv2HSm5uj0+OgXD1P1w=;
+        b=MyAx1xwLNBLy/36t/oNS6ROU5cITO1uAytuaZYdrPCeirKoDGestcaNWAPHwYvhKy7
+         UbUXTlvHjHlzMVj4di0zEomryxO6e49SuxtAFvwEgCat/+Y2eEDAXu6CF85PYrK78mMn
+         it7GgVo6kmsBV5jVI+McavXDfsN180NJXPrjqngHDl5tOb8JjsARVpkgUd09XHo/MXoh
+         3QtScUanfVfDl03/aNtlnk9aySEIuHmaLO46ksvzgrJ1me1fKQ5QMQuQgMfSUepL2ef6
+         ykSX2p99Wrg1rIGvhK3a56BFGSZpuODmuTGDVQo6u95B4lKGacy5fJXe1yAIoMJVl94b
+         2JFw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+6SA8vxuhPQWxASduc/+bjxEMyfdxuv+dDrRRAO7ziIPnJD5enrXaM4kRlDjMZdY/RNGzxcU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2+P5R5tvQaXx1NymRmqiCzeLI1Z9Vri2NOaFoKOGoJ82YUSxO
+	O/QKOvBbi9bxMfRwocTgJyCNGdIH7eUbjUFMOlvbMa5Aw3+iPIR/lxGCGN8EPGD/Wbk0toWGxQj
+	o7w==
+X-Google-Smtp-Source: AGHT+IGrHwUo0pc+SGt+eG2rbtdwipm7/Eg7KBwJTogtJiz6n0iyNnSjCk9Mp4ukj5ZYb1jp3Gh60YAy+2Q=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a25:9e09:0:b0:e24:96b1:696 with SMTP id
+ 3f1490d57ef6-e2604b0f4f6mr12271276.1.1727769414837; Tue, 01 Oct 2024 00:56:54
+ -0700 (PDT)
+Date: Tue, 1 Oct 2024 09:56:52 +0200
+In-Reply-To: <20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v7 3/3] dt-bindings: mfd: mediatek: mt6397: Convert to DT
- schema format
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
-	<lee@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino
- Del Regno <angelogioacchino.delregno@collabora.com>, Sen Chu
-	<sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
-	<olteanv@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Sebastian Reichel <sre@kernel.org>, Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, <linux-input@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-leds@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-pm@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>,
-	Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
-	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
-	MediaTek Chromebook Upstream
-	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
-	<wenst@chromium.org>
-References: <20240930073311.1486-1-macpaul.lin@mediatek.com>
- <20240930073311.1486-3-macpaul.lin@mediatek.com>
- <psjwbo2vecr54vmz5ib2eurhpcaynpc67rc2nwuj2gtej6gqiu@4ysahn2ghthf>
- <5a29ddaf-cc01-498c-943c-b65736e2899e@kernel.org>
-From: Macpaul Lin <macpaul.lin@mediatek.com>
-In-Reply-To: <5a29ddaf-cc01-498c-943c-b65736e2899e@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZvurRJ4mGsRufmEl@google.com>
+Subject: Re: [RFC PATCH v3 18/19] samples/landlock: Support socket protocol restrictions
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 04, 2024 at 06:48:23PM +0800, Mikhail Ivanov wrote:
+> Add socket protocol control support in sandboxer demo. It's possible
+> to allow a sandboxer to create sockets with specified family and type
+> values. This is controlled with the new LL_SOCKET_CREATE environment
+> variable. Single token in this variable looks like this:
+> 'FAMILY.TYPE', where FAMILY and TYPE are integers corresponding to the
+> number of address family and socket type.
+>=20
+> Add parse_socket_protocol() method to parse socket family and type
+> strings into integers.
+>=20
+> Change LANDLOCK_ABI_LAST to 6.
+>=20
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+> Changes since v2:
+> * Changes representation of socket protocol in LL_SOCKET_CREATE into
+>   pair of integer values.
+> * Changes commit message.
+> * Minor fixes.
+>=20
+> Changes since v1:
+> * Refactors get_socket_protocol(). Rename it to parse_socket_protocol().
+> * Changes LANDLOCK_ABI_LAST to 6 since ioctl patchlist updated it to 5.
+> * Refactors commit message.
+> * Formats with clang-format.
+> * Minor changes.
+> ---
+>  samples/landlock/sandboxer.c | 108 ++++++++++++++++++++++++++++++-----
+>  1 file changed, 95 insertions(+), 13 deletions(-)
+>=20
+> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
+> index d4dba9e4ce89..1669095f9373 100644
+> --- a/samples/landlock/sandboxer.c
+> +++ b/samples/landlock/sandboxer.c
+> @@ -14,6 +14,7 @@
+>  #include <fcntl.h>
+>  #include <linux/landlock.h>
+>  #include <linux/prctl.h>
+> +#include <linux/socket.h>
+>  #include <stddef.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+> @@ -55,8 +56,11 @@ static inline int landlock_restrict_self(const int rul=
+eset_fd,
+>  #define ENV_FS_RW_NAME "LL_FS_RW"
+>  #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
+>  #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
+> +#define ENV_SOCKET_CREATE_NAME "LL_SOCKET_CREATE"
+>  #define ENV_DELIMITER ":"
+> =20
+> +#define ENV_TOKEN_INTERNAL_DELIMITER "."
+> +
+>  static int parse_path(char *env_path, const char ***const path_list)
+>  {
+>  	int i, num_paths =3D 0;
+> @@ -209,6 +213,65 @@ static int populate_ruleset_net(const char *const en=
+v_var, const int ruleset_fd,
+>  	return ret;
+>  }
+> =20
+> +static int populate_ruleset_socket(const char *const env_var,
+> +				   const int ruleset_fd,
+> +				   const __u64 allowed_access)
+> +{
+> +	int ret =3D 1;
+> +	char *env_protocol_name, *strprotocol, *strfamily, *strtype;
+> +	unsigned long long family_ull, type_ull;
+> +	struct landlock_socket_attr protocol =3D {
+> +		.allowed_access =3D allowed_access,
+> +	};
+> +
+> +	env_protocol_name =3D getenv(env_var);
+> +	if (!env_protocol_name)
+> +		return 0;
+> +	env_protocol_name =3D strdup(env_protocol_name);
+> +	unsetenv(env_var);
+> +
+> +	while ((strprotocol =3D strsep(&env_protocol_name, ENV_DELIMITER))) {
+> +		strfamily =3D strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
+> +		strtype =3D strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
+
+This works with strings such as "123:456:foobar", because you are using str=
+sep()
+twice on strprotocol; this looks unintentional?
 
 
-On 10/1/24 14:35, Krzysztof Kozlowski wrote:
-> 	
-> 
-> External email : Please do not click links or open attachments until you 
-> have verified the sender or the content.
-> 
-> On 01/10/2024 08:29, Krzysztof Kozlowski wrote:
->> On Mon, Sep 30, 2024 at 03:33:11PM +0800, Macpaul Lin wrote:
->>> Convert the mfd: mediatek: mt6397 binding to DT schema format.
->>>
->>> MT6323, MT6358, and MT6397 are PMIC devices with multiple function
->>> subdevices. They share a common PMIC design but have variations in
->>> subdevice combinations.
->>>
->>> Key updates in this conversion:
->>>
->>> 1. RTC:
->>>    - Convert rtc-mt6397.txt and merge into parent MT6397 PMIC DT schema.
->>>
->>> 2. Regulators:
->>>    - Align to generic name "regulators".
->>>    - Update references from .txt to .yaml for mt6323, mt6358, and mt6397
->>>      regulators.
->>>    - Simplify regulator name labels in device tree examples.
->>>    - Add a new 'mt6359-regulator' to the compatibles of regulators.
->> 
->> Why?
->> 
->>>      Merge from the other patch [1].
->>>
->>> 3. ADC:
->>>    - Add a new 'adc' property and include a $ref for sub-device node of
->>>      MT6359 PMIC AUXADC: 'mediatek,mt6359-auxadc'.
->>>      Merge from the other patch [1].
->>>
->>> 4. Audio Codec:
->>>    - Simplify Audio Codec part with updating compatible items.
->>>    - Add 'mt6359-codec' to the compatible
->> 
->> Why?
->> .
->>>
->>> 5. Clocks:
->>>    - Align to generic name "clocks" for clockbuffer subdevices.
->>>
->>> 6. LEDs:
->>>    - Convert leds-mt6323.txt and merge into parent MT6397 PMIC DT schema.
->>>    - Update LED binding.
->>>
->>> 7. Keys:
->>>    - Add detailed descriptions for power and home keys.
->>>    - Add compatible: mediatek,mt6358-keys.
->>>
->>> 8. Power Controller:
->>>    - Convert mt6323-poweroff.txt and merge into parent MT6397 PMIC DT
->>>      schema.
->>>    - Add #power-domain-cells property to fix dt-binding check error.
->>>    - Clarify "BBPU" as "Baseband power up".
->>>
->>> 9. Pinctrl:
->>>    - Align to generic name "pinctrl" instead of "pin-controller".
->>>
->>> 10. Compatible:
->>>    - Drop "mediatek,mt6357" since there is a separated DT Schema
->>>      for PMIC MT6357.
->>>
->>> 11. Examples:
->>>    - MT6323: Retain complete examples for this PMIC.
->>>    - MT6358 and MT6397: simplify settings in regulators.
->>>     - Preserve "audio-codec", "clocks", "pinctrl", "rtc", and "keys"
->>>       sections as they contain typical settings for different PMICs.
->>>
->>> Additional updates:
->>> - MAINTAINERS: Add co-maintainers and reference to
->>>   mfd/mediatek,mt6397.yaml for LED and power-controller drivers.
->>> - input/mediatek,pmic-keys.yaml: Update reference to
->>>   mfd/mediatek,mt6397.yaml.
->>>
->>> References:
->>> [1] https://lore.kernel.org/all/20240925171156.9115-1-macpaul.lin@mediatek.com/
->>>
->>> Signed-off-by: Sen Chu <sen.chu@mediatek.com>
->>> Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
->>> ---
->> 
->>> +
->>> +  adc:
->>> +    type: object
->>> +    $ref: /schemas/iio/adc/mediatek,mt6359-auxadc.yaml#
->>> +    unevaluatedProperties: false
->>> +
->>> +  audio-codec:
->>> +    type: object
->>> +    description:
->>> +      Audio codec support with MT6358, MT6359, and MT6397.
->>> +    additionalProperties: true
->> 
->> No, this cannot be true. Schema is incomplete for listed compatibles.
-> 
-> I saw now your patch for ASoC, so this is fine.
-> 
-> All my other questions stay valid - why are you adding new devices in
-> patch which is supposed to be ONLY conversion.
-> 
+> +
+> +		if (!strtype) {
+> +			fprintf(stderr,
+> +				"Failed to extract socket protocol with "
+> +				"unspecified type value\n");
+> +			goto out_free_name;
+> +		}
+> +
+> +		if (str2num(strfamily, &family_ull)) {
+> +			fprintf(stderr,
+> +				"Failed to convert \"%s\" into a number\n",
+> +				strfamily);
+> +			goto out_free_name;
+> +		}
+> +		if (str2num(strtype, &type_ull)) {
+> +			fprintf(stderr,
+> +				"Failed to convert \"%s\" into a number\n",
+> +				strtype);
+> +			goto out_free_name;
+> +		}
+> +		protocol.family =3D (int)family_ull;
+> +		protocol.type =3D (int)type_ull;
+> +
+> +		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> +				      &protocol, 0)) {
+> +			fprintf(stderr,
+> +				"Failed to update the ruleset with "
+> +				"family \"%s\" and type \"%s\": %s\n",
+> +				strfamily, strtype, strerror(errno));
+> +			goto out_free_name;
+> +		}
+> +	}
+> +	ret =3D 0;
+> +
+> +out_free_name:
+> +	free(env_protocol_name);
+> +	return ret;
+> +}
+> +
+>  /* clang-format off */
+> =20
+>  #define ACCESS_FS_ROUGHLY_READ ( \
+> @@ -233,14 +296,14 @@ static int populate_ruleset_net(const char *const e=
+nv_var, const int ruleset_fd,
+> =20
+>  /* clang-format on */
+> =20
+> -#define LANDLOCK_ABI_LAST 5
+> +#define LANDLOCK_ABI_LAST 6
+> =20
+>  int main(const int argc, char *const argv[], char *const *const envp)
+>  {
+>  	const char *cmd_path;
+>  	char *const *cmd_argv;
+>  	int ruleset_fd, abi;
+> -	char *env_port_name;
+> +	char *env_optional_name;
+>  	__u64 access_fs_ro =3D ACCESS_FS_ROUGHLY_READ,
+>  	      access_fs_rw =3D ACCESS_FS_ROUGHLY_READ | ACCESS_FS_ROUGHLY_WRITE=
+;
+> =20
+> @@ -248,18 +311,19 @@ int main(const int argc, char *const argv[], char *=
+const *const envp)
+>  		.handled_access_fs =3D access_fs_rw,
+>  		.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
+>  				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+>  	};
+> =20
+>  	if (argc < 2) {
+>  		fprintf(stderr,
+> -			"usage: %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"...\"%s "
+> +			"usage: %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"..=
+.\"%s "
+>  			"<cmd> [args]...\n\n",
+>  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
+> -			ENV_TCP_CONNECT_NAME, argv[0]);
+> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
+>  		fprintf(stderr,
+>  			"Execute a command in a restricted environment.\n\n");
+>  		fprintf(stderr,
+> -			"Environment variables containing paths and ports "
+> +			"Environment variables containing paths, ports and protocols "
+>  			"each separated by a colon:\n");
+>  		fprintf(stderr,
+>  			"* %s: list of paths allowed to be used in a read-only way.\n",
+> @@ -268,7 +332,7 @@ int main(const int argc, char *const argv[], char *co=
+nst *const envp)
+>  			"* %s: list of paths allowed to be used in a read-write way.\n\n",
+>  			ENV_FS_RW_NAME);
+>  		fprintf(stderr,
+> -			"Environment variables containing ports are optional "
+> +			"Environment variables containing ports or protocols are optional "
+>  			"and could be skipped.\n");
+>  		fprintf(stderr,
+>  			"* %s: list of ports allowed to bind (server).\n",
+> @@ -276,15 +340,19 @@ int main(const int argc, char *const argv[], char *=
+const *const envp)
+>  		fprintf(stderr,
+>  			"* %s: list of ports allowed to connect (client).\n",
+>  			ENV_TCP_CONNECT_NAME);
+> +		fprintf(stderr,
+> +			"* %s: list of socket protocols allowed to be created.\n",
+> +			ENV_SOCKET_CREATE_NAME);
 
-Ok, I'll drop adding new devices from other reviewed patch for this ONLY
-conversion.
-
->> 
->>> +
->>> +    properties:
->>> +      compatible:
->>> +        oneOf:
->>> +          - enum:
->>> +              - mediatek,mt6358-sound
->>> +              - mediatek,mt6359-codec
->> 
->> There was no such compatible.
->> 
->> Why do you add non-existing compatibles during conversion?
->> 
-
-Same here, will drop it in this conversion.
+Might be worth listing some example values for this parameter, e.g. for TCP=
+/IP
+and UDP/IP?  This is also needed to make it clear that these can't be given=
+ by
+name, but only by number.
 
 
-> Best regards,
-> Krzysztof
-> 
-> 
+>  		fprintf(stderr,
+>  			"\nexample:\n"
+>  			"%s=3D\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
+>  			"%s=3D\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
+>  			"%s=3D\"9418\" "
+>  			"%s=3D\"80:443\" "
+> +			"%s=3D\"10.2:1.1\" "
+>  			"%s bash -i\n\n",
+>  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
+> -			ENV_TCP_CONNECT_NAME, argv[0]);
+> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
+>  		fprintf(stderr,
+>  			"This sandboxer can use Landlock features "
+>  			"up to ABI version %d.\n",
+> @@ -351,7 +419,11 @@ int main(const int argc, char *const argv[], char *c=
+onst *const envp)
+>  	case 4:
+>  		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
+>  		ruleset_attr.handled_access_fs &=3D ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
+> -
+> +		__attribute__((fallthrough));
+> +	case 5:
+> +		/* Removes socket support for ABI < 6 */
+> +		ruleset_attr.handled_access_socket &=3D
+> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
+>  		fprintf(stderr,
+>  			"Hint: You should update the running kernel "
+>  			"to leverage Landlock features "
+> @@ -371,18 +443,23 @@ int main(const int argc, char *const argv[], char *=
+const *const envp)
+>  	access_fs_rw &=3D ruleset_attr.handled_access_fs;
+> =20
+>  	/* Removes bind access attribute if not supported by a user. */
+> -	env_port_name =3D getenv(ENV_TCP_BIND_NAME);
+> -	if (!env_port_name) {
+> +	env_optional_name =3D getenv(ENV_TCP_BIND_NAME);
+> +	if (!env_optional_name) {
+>  		ruleset_attr.handled_access_net &=3D
+>  			~LANDLOCK_ACCESS_NET_BIND_TCP;
+>  	}
+>  	/* Removes connect access attribute if not supported by a user. */
+> -	env_port_name =3D getenv(ENV_TCP_CONNECT_NAME);
+> -	if (!env_port_name) {
+> +	env_optional_name =3D getenv(ENV_TCP_CONNECT_NAME);
+> +	if (!env_optional_name) {
+>  		ruleset_attr.handled_access_net &=3D
+>  			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
+>  	}
+> -
+> +	/* Removes socket create access attribute if not supported by a user. *=
+/
 
-Thanks
-Macpaul Lin
+Phrasing nit: I would say "requested by a user"?
+
+(And maybe also in the two cases above)
+
+
+> +	env_optional_name =3D getenv(ENV_SOCKET_CREATE_NAME);
+> +	if (!env_optional_name) {
+> +		ruleset_attr.handled_access_socket &=3D
+> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
+> +	}
+>  	ruleset_fd =3D
+>  		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>  	if (ruleset_fd < 0) {
+> @@ -406,6 +483,11 @@ int main(const int argc, char *const argv[], char *c=
+onst *const envp)
+>  		goto err_close_ruleset;
+>  	}
+> =20
+> +	if (populate_ruleset_socket(ENV_SOCKET_CREATE_NAME, ruleset_fd,
+> +				    LANDLOCK_ACCESS_SOCKET_CREATE)) {
+> +		goto err_close_ruleset;
+> +	}
+> +
+>  	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
+>  		perror("Failed to restrict privileges");
+>  		goto err_close_ruleset;
+> --=20
+> 2.34.1
+>=20
+
+As I also said on the Documentation patch, please remember to double check =
+the
+places where the ABI number is mentioned, after rebasing on Tahera's "scope=
+d"
+patches.
+
+=E2=80=94G=C3=BCnther
 
