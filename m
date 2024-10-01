@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-130780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D87A98B82E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:19:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B0E98B839
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DDA8B248FE
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 535312818A5
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7ADA19DFAE;
-	Tue,  1 Oct 2024 09:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB2B19DF52;
+	Tue,  1 Oct 2024 09:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bniC7btZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUFEUynd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD5319D88B;
-	Tue,  1 Oct 2024 09:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54FC19D07A
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 09:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727774373; cv=none; b=mWromkobNSdDf32R2uEOYOKYL00DD6o1pBLzrT/oCm6KHuJpu8as+dLCIMiuupF6BAzDMBVawGB0B9Ka2lBsP8ZzuTYeN5jT5T+dx/ob0lMYoVPulSATLAYKzqZQRT3X0ajLhpNuZxi2vwQs3tIU8g+fBqE3rPEMMhEiDNflpH4=
+	t=1727774457; cv=none; b=EbsWj/MfsyH4yXDGVvni1Aq7KsKPT0ZFNrVQzSaibUFDgizIDxW1mz3a7byWJVUEKm6wVsD0JcbkA78txHiBNWBYxwYV1ILvHeAhQ5enL/FN1wsvsCdwH0Smcx9a7pod/sbZ+4bP37+W8jWEsr98Q19P+OB7NeDoOc6lRx5HWPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727774373; c=relaxed/simple;
-	bh=0+zqq8I71YD8M7Pz4rGT1nU7HRi8uRpkJ2RPt7fmdjA=;
+	s=arc-20240116; t=1727774457; c=relaxed/simple;
+	bh=52IMNoGjtf99CyRrdB3LZ+pHd2q6WDHjEC/EO7H4MgE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bIaULyBZ5gmdJUrp4CUgl9rHLYYiFsfxkR3zp9wwJJBZmPTrAdz7PYv6DLJR44g9RLDE4EBIzKxZ79A6aiqt+5RCaIKZ5kx+fYK2vtj0ZAjsNSAr01FZ1r9bxWoNKQm1CsElCsCIRQ5VbsBL8iSLaDVT5FJCbmUiFjn4b0kaiAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bniC7btZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2044C4CEC6;
-	Tue,  1 Oct 2024 09:19:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727774372;
-	bh=0+zqq8I71YD8M7Pz4rGT1nU7HRi8uRpkJ2RPt7fmdjA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=bniC7btZlUHkCtMRf0aGPtEX3e8TvkmBGT5ALusS0Qwh4dOskRdfJZJPnZjp1BSIV
-	 NliuEjW1maWMizkE2jmY/C69iEcCz1E1Ii8efDMtofgF4BUBOKWsQpY9PHf1iRoleh
-	 tUDOCRyyDivLcXgp3tmXax3Ii9arnA8kVh1MSmkmzwj7udPvNDm8RdNyo8TcMkT0U0
-	 7+uG1p3OHBjlha52YZQQKigchEIgISHVonylkKz5foit0T/MvtUXD2WfqRjdMmMApV
-	 1d01SoPTlHdyXZIlRoFo1AUqaDWSyvXXS5MMAJvDq+qIXzEExukq9MdCgUdiVZsv3q
-	 hK92KL9EKT+UQ==
-Message-ID: <79204678-166b-4009-b8d2-86d6cb120705@kernel.org>
-Date: Tue, 1 Oct 2024 11:19:18 +0200
+	 In-Reply-To:Content-Type; b=KXyG/qCzE+iSaIgN+TkZOIglkQdMDX+td0V9c/CbMHOeviFLF/j4GujMDPJYSHDU3rWgIymMPEThDoPV3Tp1cwZqcEqUXlCNxMrVZT9E1HJqjcYQBw8AZDPp918253RbdVEoY/uNv69o0f2dcy9C6yNjDwnUihGPmIrgUS+WrV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AUFEUynd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727774454;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2Z6bQqCmFRAYWIokTtq6KZjfUYmd4+jPRAYrukjBoAQ=;
+	b=AUFEUyndFj+em2B0D79/kDVsM+FOYi1DUwJSJF7udOD5/lF8JCvQfIbLV6FYxrNbLAlaz7
+	TlGK6vcCxKnv01KnsL/JBAap4oe2G6CHaMif/LaItSuTqkyHaoGXEN33Y45rnJ6wdn+egd
+	AOIVq8EWUAEh3gCh0AsLWT4lSTCjte0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-222-0Y2WgTn0OrGe07_Qu08u2Q-1; Tue, 01 Oct 2024 05:20:53 -0400
+X-MC-Unique: 0Y2WgTn0OrGe07_Qu08u2Q-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb050acc3so28546665e9.1
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 02:20:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727774452; x=1728379252;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Z6bQqCmFRAYWIokTtq6KZjfUYmd4+jPRAYrukjBoAQ=;
+        b=HyarelFWap7eOTpbkHesrykYW7Sw8n4MOP1I2/nCNyKlLbwUMva/cUbcs7QRJTLNH6
+         qTaSK08LHjSGnG42fLveGZ5iALz9OrLaZvzdiyGMKgYEBd6r0XUzqqsUm4lIg3EV16Lg
+         ZzWaVam1ko4hw0A6XM6zSPEw4h3MCcU1QsbCAgQP6EZtHlm7lyH/ZDOdaKSGY0okiNFf
+         ueqgSDwJPPixsCuY1xGuozM32Ucf5Edg3NQd/IaRzGRgMUF8L9Bp/nPcpOM+bmcJERfc
+         DJSeqXbFrNhD3HmEdHElAFbsfrOmZAQYUmZyLP66k9TItisichPbUbgDcxWzTaA2iQmn
+         DtiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlQis7eAu/yzyneWXlhpnlGKQvVdhLF9CkagKqwoRwN3MzeilvVW4eLCWc043f8UA3LL9eXcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyn4fE7+yWQ5PE8UxqyDcysPW95Eg3ZsO/hccYv3RnC/BA4YAik
+	4vayxejdpJmCTn9eB1hqPUPyg6iQ2/0mpS+gjjIHZl2Gj1tWDwc6tTC9KTDjwLk8yZs2F/LEZON
+	o5I5zJrmripzIVX85UBHJL1VNuLeLK+8nkdru78ywW3KVN3+ex/eYQw==
+X-Received: by 2002:a05:600c:4754:b0:424:a7f1:ba2 with SMTP id 5b1f17b1804b1-42f71385a8dmr13033975e9.17.1727774452493;
+        Tue, 01 Oct 2024 02:20:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHOJV5mOCGH2U7gQYy/ih7+a9WULHZSwtnUxNtta7gzvyhknzvDfxI3Q/tjNxWfZohulqwtaw==
+X-Received: by 2002:a05:600c:4754:b0:424:a7f1:ba2 with SMTP id 5b1f17b1804b1-42f71385a8dmr13033765e9.17.1727774452086;
+        Tue, 01 Oct 2024 02:20:52 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b088:b810:c085:e1b4:9ce7:bb1c? ([2a0d:3341:b088:b810:c085:e1b4:9ce7:bb1c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57d31283sm128091585e9.0.2024.10.01.02.20.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Oct 2024 02:20:51 -0700 (PDT)
+Message-ID: <998a4b7e-8d29-4702-87fb-726117369240@redhat.com>
+Date: Tue, 1 Oct 2024 11:20:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,132 +82,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 2/3] ASoC: dt-bindings: mt6358: Convert to DT Schema
-To: Macpaul Lin <macpaul.lin@mediatek.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>,
- Lee Jones <lee@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Sen Chu <sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sebastian Reichel <sre@kernel.org>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- linux-input@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-leds@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-pm@vger.kernel.org, netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-sound@vger.kernel.org, Alexandre Mergnat <amergnat@baylibre.com>,
- Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
- Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
- MediaTek Chromebook Upstream
- <Project_Global_Chrome_Upstream_Group@mediatek.com>,
- Chen-Yu Tsai <wenst@chromium.org>
-References: <20240930073311.1486-1-macpaul.lin@mediatek.com>
- <20240930073311.1486-2-macpaul.lin@mediatek.com>
- <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
- <42dc4e9a-efcd-e166-b4fd-d4fe0dcd3c77@mediatek.com>
- <c2fb40cc-491f-1c1a-7343-c70a60b3a031@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net 1/2] net: fec: Restart PPS after link state change
+To: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>,
+ Wei Fang <wei.fang@nxp.com>, Frank Li <frank.li@nxp.com>
+Cc: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240924093705.2897329-1-csokas.bence@prolan.hu>
+ <PAXPR04MB8510B574A53DAD7E1256A9E688692@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <6be53466-fd53-44e9-b83a-b714737865dc@prolan.hu>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <c2fb40cc-491f-1c1a-7343-c70a60b3a031@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <6be53466-fd53-44e9-b83a-b714737865dc@prolan.hu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 01/10/2024 09:50, Macpaul Lin wrote:
+On 9/30/24 10:20, Csókás Bence wrote:
+> On 2024. 09. 25. 6:37, Wei Fang wrote:
+>>> +/* Restore PTP functionality after a reset */ void
+>>> +fec_ptp_restore_state(struct fec_enet_private *fep) {
+>>> +	unsigned long flags;
+>>> +
+>>> +	spin_lock_irqsave(&fep->tmreg_lock, flags);
+>>> +
+>>> +	/* Reset turned it off, so adjust our status flag */
+>>> +	fep->pps_enable = 0;
+>>> +
+>>> +	spin_unlock_irqrestore(&fep->tmreg_lock, flags);
+>>> +
+>>> +	/* Restart PPS if needed */
+>>> +	if (fep->ptp_saved_state.pps_enable) {
+>>
+>> It's better to put " fep->pps_enable = 0" here so that it does
+>> not need to be set when PPS is disabled.
 > 
-> 
-> On 10/1/24 15:05, Macpaul Lin wrote:
->> On 10/1/24 14:34, Krzysztof Kozlowski wrote:
->>
->> [snip]
->>
->>>> +description: |
->>>> +  The communication between MT6358 and SoC is through Mediatek PMIC 
->>>> wrapper.
->>>> +  For more detail, please visit Mediatek PMIC wrapper documentation.
->>>> +  Must be a child node of PMIC wrapper.
->>>> +
->>>> +properties:
->>>> +  compatible:
->>>> +    enum:
->>>> +      - mediatek,mt6366-sound
->>>> +      - mediatek,mt6358-sound
->>>> +    const: mediatek,mt6358-sound
->>>
->>> This wasn't ever tested.
->>
->> Hum, I have indeed tested it with linux-next/master branch.
->> Ran dt_binding_check with dtschema trunk with this single file
->> but didn't get any warning or errors.
->> 'make dt_binding_check DT_SCHEMA_FILES=mt6358.yaml'
->>
->> Could you please help to paste the error log for me?
->> If there are new errors, I need to check if there is any
->> environment issue.
-> 
-> I've both tested both of the following format pass dt_binding_check.
-> #1.
-> properties:
->    compatible:
->      items:
->        - enum:
->            - mediatek,mt6366-sound
->            - mediatek,mt6358-sound
->        - const: mediatek,mt6358-sound
+> It doesn't hurt to set it to 0 when it's already 0, and it saves us
+> having to unlock separately in the if {} and else blocks. Plus, after
+> reset, PPS will be turned off unconditionally, since the actual HW gets
+> reset.
 
-I don't understand what you wanted here. neither oneOf nor ietms make
-any sense. Why "mediatek,mt6358-sound", "mediatek,mt6358-sound" is a
-correct compatible?
+I agree with Csókás, the proposed code looks simpler and more readable.
 
-Best regards,
-Krzysztof
+I'm applying this.
+
+Thanks!
+
+Paolo
 
 
