@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-130688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E131D98B298
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 04:53:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 679C498B29D
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 05:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 111821C25EA9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 02:53:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 055251F23EB3
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 03:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4535D915;
-	Tue,  1 Oct 2024 02:51:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4402A1DF;
+	Tue,  1 Oct 2024 03:04:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LNa/3Wzk"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ip4Vo0G3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A87F433A2
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 02:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DB8BA37;
+	Tue,  1 Oct 2024 03:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727751099; cv=none; b=Gt3yCW7xTyaUZu4KUUsMsAjCm43DE3WAY+lZ1x+Dz/ecJdekTIHO3ISd/p9ywgIsmDFF7dHJgmeWuyZi7Tr+HZfuPYOGooPZGNJp6qmgyyygmR+zWmC0JbTL/z1rtvDXzob9E1eOFEL0gc0PPGa80lrHNF7Ly0IKgu+f97xmqGM=
+	t=1727751854; cv=none; b=FDr+JIoiK4GQ6oAtIYz5OjLKFf1ksHdJin+2WyxcY7pzx/NEZzg13U5W6QrQbU7tLnmvLOgOzYJG3Hw20uUA91GOHqN7UxQkOuNAkgVl9g37zWolencZH8a25xek5BkAdT37a8F49rgy5DwUWzZ9ueVjs05bI8VSTv5L9yLu5go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727751099; c=relaxed/simple;
-	bh=f+25mNvpWEGZuResiOiwFm3krJUbIdhlRov4jxhwVS4=;
+	s=arc-20240116; t=1727751854; c=relaxed/simple;
+	bh=3HBKm0szRipJx4TF0Kii6pAIM0b4zlUKu0U+ZxeJMM8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lZYOptHGi3usIb1F/J6+3JQtVBAUdWcuApULpM6h679BR5jMJppjjPLGXgQvuxMukj4y6v6kE+XaT3tt++olfUgkO9tkOGXSTdJv3L46SeX4Pj7L4SUU8+XN2lxbLTZPHWCyVC8ZpADnu86I0Uzzxocwe97jIjXOdLwsaHqk2vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LNa/3Wzk; arc=none smtp.client-ip=99.78.197.219
+	 MIME-Version:Content-Type; b=Gj64tq/qNX+3E5aty7npjwxBFH/InNyRQdoCPiSgxASpZhUS29/hVG48NLYE2Kmw+hQpc9gxJvkz80EBXguEL+KyBCyxE6tVP5ra3DxMbyNNS8twqFOH0ROiiwW93G0/nNCEvk+FeIb2xMGb8OeY1jNMOl+7qSYNIkdKeD4DWQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ip4Vo0G3; arc=none smtp.client-ip=52.95.49.90
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727751097; x=1759287097;
+  t=1727751853; x=1759287853;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=N8NK0DuLa+RBUqX50QSuzr3CBPqdGBNM05YDfGH+Gik=;
-  b=LNa/3WzkJgPb/STATHpBxVNPps7Q5PEkwxozhfzfkM0Cz6vCetDEQsSK
-   9PdWugSrKgLGF34IexEuMB86pw76wT6Y29jj41f06K/68DfpbfIS1fC45
-   IHCL6ziiAG/aJ+3pYEB6Vaq2cdfMjcSqkcJFDz+t7pHdgRtEVI57G22Yo
-   k=;
+  bh=KHc7Jdhr39unMwPsimFxyr4ljpx199unonBSQXjCDcA=;
+  b=ip4Vo0G3bj7wZmLMfQhXcvgHElSCLK/Feh4hR8hivlXSmGeD4hMJJMJy
+   9tqCQbBuS42Yfe2PRxv1q65U0NldWAw3upIpGd6igRPfPI4DV3hnfLECI
+   EyxEqwSkWu6Q3dPIGdKzqzkq3Bm6evEN8/LKCsNI1qDgsDYaREAsf65CD
+   U=;
 X-IronPort-AV: E=Sophos;i="6.11,167,1725321600"; 
-   d="scan'208";a="133234201"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 02:51:37 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:41849]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.107:2525] with esmtp (Farcaster)
- id 889ec91d-6cbc-43ca-b489-8cae9154dfd2; Tue, 1 Oct 2024 02:51:37 +0000 (UTC)
-X-Farcaster-Flow-ID: 889ec91d-6cbc-43ca-b489-8cae9154dfd2
+   d="scan'208";a="437281082"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 03:04:08 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:56907]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.57.100:2525] with esmtp (Farcaster)
+ id f664d073-6eb1-4843-a13b-d57f24137ae8; Tue, 1 Oct 2024 03:04:07 +0000 (UTC)
+X-Farcaster-Flow-ID: f664d073-6eb1-4843-a13b-d57f24137ae8
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 1 Oct 2024 02:51:36 +0000
+ Tue, 1 Oct 2024 03:04:06 +0000
 Received: from 88665a182662.ant.amazon.com (10.1.212.48) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 1 Oct 2024 02:51:28 +0000
+ Tue, 1 Oct 2024 03:03:59 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 5/5] ipv4: Trigger check_lifetime() only when necessary.
-Date: Tue, 1 Oct 2024 05:48:37 +0300
-Message-ID: <20241001024837.96425-6-kuniyu@amazon.com>
+To: <danielyangkang@gmail.com>
+CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<guwen@linux.alibaba.com>, <jaka@linux.ibm.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com>,
+	<tonylu@linux.alibaba.com>, <wenjia@linux.ibm.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH] fixed rtnl deadlock from gtp
+Date: Tue, 1 Oct 2024 06:03:49 +0300
+Message-ID: <20241001030349.97635-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241001024837.96425-1-kuniyu@amazon.com>
-References: <20241001024837.96425-1-kuniyu@amazon.com>
+In-Reply-To: <20241001015555.144669-1-danielyangkang@gmail.com>
+References: <20241001015555.144669-1-danielyangkang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,137 +79,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-DHCP is unlikely to be used in non-root network namespaces, and GC is
-unnecessary in such cases.
+From: Daniel Yang <danielyangkang@gmail.com>
+Date: Mon, 30 Sep 2024 18:55:54 -0700
+> Fixes deadlock described in this bug:
+> https://syzkaller.appspot.com/bug?extid=e953a8f3071f5c0a28fd.
+> Specific crash report here:
+> https://syzkaller.appspot.com/text?tag=CrashReport&x=14670e07980000.
+> 
+> DESCRIPTION OF ISSUE
+> Deadlock: sk_lock-AF_INET --> &smc->clcsock_release_lock --> rtnl_mutex
+> 
+> rtnl_mutex->sk_lock-AF_INET
+> rtnetlink_rcv_msg() acquires rtnl_lock() and calls rtnl_newlink(), which
+> eventually calls gtp_newlink() which calls lock_sock() to attempt to
+> acquire sk_lock.
 
-Let's count the number of non-permanent IPv4 addresses and schedule GC
-only when the count is not zero.
+Is the deadlock real ?
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/netns/ipv4.h |  1 +
- net/ipv4/devinet.c       | 45 +++++++++++++++++++++++++++++++++-------
- 2 files changed, 39 insertions(+), 7 deletions(-)
+From the lockdep splat, the gtp's sk_protocol is verified to be
+IPPROTO_UDP before holding lock_sock(), so it seems just a labeling
+issue.
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/gtp.c?id=9410645520e9b820069761f3450ef6661418e279#n1674
 
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 66a4cffc44ee..e37001572111 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -272,5 +272,6 @@ struct netns_ipv4 {
- 	siphash_key_t	ip_id_key;
- 	struct hlist_head	*inet_addr_lst;
- 	struct delayed_work	addr_chk_work;
-+	unsigned int		addr_non_perm;
- };
- #endif
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index 96fc4aacc539..2510d3ef3291 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -124,18 +124,38 @@ static u32 inet_addr_hash(const struct net *net, __be32 addr)
- 	return hash_32(addr, IN4_ADDR_HSIZE_SHIFT);
- }
- 
-+static bool inet_ifa_has_lifetime(struct in_ifaddr *ifa)
-+{
-+	return !(ifa->ifa_flags & IFA_F_PERMANENT);
-+}
-+
- static void inet_hash_insert(struct net *net, struct in_ifaddr *ifa)
- {
- 	u32 hash = inet_addr_hash(net, ifa->ifa_local);
- 
- 	ASSERT_RTNL();
- 	hlist_add_head_rcu(&ifa->addr_lst, &net->ipv4.inet_addr_lst[hash]);
-+
-+	if (inet_ifa_has_lifetime(ifa)) {
-+		WRITE_ONCE(net->ipv4.addr_non_perm, net->ipv4.addr_non_perm + 1);
-+		cancel_delayed_work(&net->ipv4.addr_chk_work);
-+		queue_delayed_work(system_power_efficient_wq,
-+				   &net->ipv4.addr_chk_work, 0);
-+	}
- }
- 
- static void inet_hash_remove(struct in_ifaddr *ifa)
- {
- 	ASSERT_RTNL();
- 	hlist_del_init_rcu(&ifa->addr_lst);
-+
-+	if (inet_ifa_has_lifetime(ifa)) {
-+		struct net *net = dev_net(ifa->ifa_dev->dev);
-+
-+		WRITE_ONCE(net->ipv4.addr_non_perm, net->ipv4.addr_non_perm - 1);
-+		if (!net->ipv4.addr_non_perm)
-+			cancel_delayed_work(&net->ipv4.addr_chk_work);
-+	}
- }
- 
- /**
-@@ -484,7 +504,6 @@ static int __inet_insert_ifa(struct in_ifaddr *ifa, struct nlmsghdr *nlh,
- {
- 	struct in_ifaddr __rcu **last_primary, **ifap;
- 	struct in_device *in_dev = ifa->ifa_dev;
--	struct net *net = dev_net(in_dev->dev);
- 	struct in_validator_info ivi;
- 	struct in_ifaddr *ifa1;
- 	int ret;
-@@ -553,9 +572,6 @@ static int __inet_insert_ifa(struct in_ifaddr *ifa, struct nlmsghdr *nlh,
- 
- 	inet_hash_insert(dev_net(in_dev->dev), ifa);
- 
--	cancel_delayed_work(&net->ipv4.addr_chk_work);
--	queue_delayed_work(system_power_efficient_wq, &net->ipv4.addr_chk_work, 0);
--
- 	/* Send message first, then call notifier.
- 	   Notifier will trigger FIB update, so that
- 	   listeners of netlink will know about new ifaddr */
-@@ -787,6 +803,9 @@ static void check_lifetime(struct work_struct *work)
- 		rtnl_unlock();
- 	}
- 
-+	if (!READ_ONCE(net->ipv4.addr_non_perm))
-+		return;
-+
- 	next_sec = round_jiffies_up(next);
- 	next_sched = next;
- 
-@@ -979,6 +998,7 @@ static int inet_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	} else {
- 		u32 new_metric = ifa->ifa_rt_priority;
- 		u8 new_proto = ifa->ifa_proto;
-+		int delta = 0;
- 
- 		inet_free_ifa(ifa);
- 
-@@ -996,10 +1016,21 @@ static int inet_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 		ifa->ifa_proto = new_proto;
- 
-+		if (inet_ifa_has_lifetime(ifa))
-+			delta -= 1;
-+
- 		set_ifa_lifetime(ifa, valid_lft, prefered_lft);
--		cancel_delayed_work(&net->ipv4.addr_chk_work);
--		queue_delayed_work(system_power_efficient_wq,
--				   &net->ipv4.addr_chk_work, 0);
-+
-+		if (inet_ifa_has_lifetime(ifa))
-+			delta += 1;
-+
-+		if (delta) {
-+			WRITE_ONCE(net->ipv4.addr_non_perm, net->ipv4.addr_non_perm + delta);
-+			cancel_delayed_work(&net->ipv4.addr_chk_work);
-+			queue_delayed_work(system_power_efficient_wq,
-+					   &net->ipv4.addr_chk_work, 0);
-+		}
-+
- 		rtmsg_ifa(RTM_NEWADDR, ifa, nlh, NETLINK_CB(skb).portid);
- 	}
- 	return 0;
--- 
-2.30.2
 
+> 
+> sk_lock-AF_INET->&smc->clcsock_release_lock
+> smc_sendmsg() calls lock_sock() to acquire sk_lock, then calls
+> smc_switch_to_fallback() which attempts to acquire mutex_lock(&smc->...).
+> 
+> &smc->clcsock_release_lock->rtnl_mutex
+> smc_setsockopt() calls mutex_lock(&smc->...). smc->...->setsockopt() is
+> called, which calls nf_setsockopt() which attempts to acquire
+> rtnl_lock() in some nested call in start_sync_thread() in ip_vs_sync.c.
+> 
+> FIX:
+> In smc_switch_to_fallback(), separate the logic into inline function
+> __smc_switch_to_fallback(). In smc_sendmsg(), lock ordering can be
+> modified and the functionality of smc_switch_to_fallback() is
+> encapsulated in the __smc_switch_to_fallback() function.
 
