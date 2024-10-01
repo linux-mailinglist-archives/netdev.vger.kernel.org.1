@@ -1,150 +1,151 @@
-Return-Path: <netdev+bounces-130722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A97D98B516
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:03:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE3E98B539
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DFEB20E4C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:03:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9E8A1F2157B
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA81BB6B6;
-	Tue,  1 Oct 2024 07:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4AB1BD4E2;
+	Tue,  1 Oct 2024 07:06:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6a9FT6L"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ZauCsIRg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE2C1B86DC
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86261BC9F9;
+	Tue,  1 Oct 2024 07:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727766184; cv=none; b=Tgq9uN6TOhW3pCwHsVtSKcYzP3JygiJUPLGas+oq4LUype1bWPEtRaujeVCcsNczORrjIwLlSgf6yPVECmPBHtmDhxsiAs7hPnjjAvi/9w8Xt9pZ2lLrlPeP0VqGRdqF2GjPzG9eWqbhdOPrTXtMapOPCHWn5znzkbr6BzbR+Y0=
+	t=1727766369; cv=none; b=FpEoGiPUoKx1fQm4+MzTE/5DWSzck0p2C+gzdEcxHx35V6/w3w3E/T8nfgVLpDnDefjlZNKXTy3mNix3OqTtK7gb7Z4fXT4RAuBHycjGKwxfSNo1Y2XGa/MyaeAhqj38/cdRq47ZOpfTwtkUcC2NVNWpdDZPd8zg0l/5+3/VVsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727766184; c=relaxed/simple;
-	bh=5pjTwgYOmqpBB0LjumlV0nwBjHebEZDkgDLmmEgKPQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iStLSv15ZH0eoNfSqsFz85YYPQ0Xljc9RKRQNiSOVPBPR1eOAHTnZxyGOXbrWlHFjc866xS9jrtYPkdXt7JrKYUc3DTwR8PIwZEBYvfajJnpkDGvkYnPzlmzYvr93JpX2nLkktoBfIRaKuMCMHXMDdmoAKuhPcu0Tt8xQFVcc+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6a9FT6L; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727766182; x=1759302182;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5pjTwgYOmqpBB0LjumlV0nwBjHebEZDkgDLmmEgKPQo=;
-  b=n6a9FT6LIttb574O1yG9KbvZHqT96TicZlIokEe14LWyiUVmGYiEn14A
-   EHuYozKlHqKsDPmD9Jj8FWy8jbKsomv38ePvVhr+2ZbU7YZypOAuVUbH5
-   3aTKsmI84FV5HGsjgCA/V6D5Gb4RTEPSd9IhD6FFWLOYOMDJAf5Ip6ZIB
-   4sWDTAlpvt+BZ2G2ju64K/5h5erFwEoEKXquNm69g5qjM4qSNsKOkm1NL
-   AaoW+kmeTmZqs3BQm1kWosh3E3s4xRkT8uk0tJ71HWGE2C+kB8yKyWfXD
-   /4j/0DVx+bT//RRTDR0bGTbsc0caDBxogQE6cLk5/E04b1RDgs/8uDknQ
-   w==;
-X-CSE-ConnectionGUID: AJfGmeZkRPuot39KFHo0Zg==
-X-CSE-MsgGUID: XhFb98qHRSynnPM2x+/8pQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="30582540"
-X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
-   d="scan'208";a="30582540"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 00:03:01 -0700
-X-CSE-ConnectionGUID: Gu0nZ05ESieXFp8v+6G8Ag==
-X-CSE-MsgGUID: 1cefmXJ2Sim6Dt3eE1xM2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
-   d="scan'208";a="78525863"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 01 Oct 2024 00:03:00 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1svWuP-000QMH-08;
-	Tue, 01 Oct 2024 07:02:57 +0000
-Date: Tue, 1 Oct 2024 15:02:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: Re: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
-Message-ID: <202410011447.gX9yfZVj-lkp@intel.com>
-References: <20240930202524.59357-2-kuniyu@amazon.com>
+	s=arc-20240116; t=1727766369; c=relaxed/simple;
+	bh=uzy4br8jBpl8hKCqGAs/5rzn7+NYl8MRI9B594xPtqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DaIVklF4PgfNuTTyvInpe2jOWXIdNktwbCV5TN0c5I+avJtOQ9fklgDAqK+jNiM1hz8qin7oycPfVq675deNB6rWjopKdMSoLsv3cppSdi3d/Qk+LTBgwudmSoeouPwM56RJkk71nF/fgJb2uhLdHek6Ke/B1Gu2emhIc5HnFbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ZauCsIRg; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 9a8dbd687fc311efb66947d174671e26-20241001
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=7maMI3JrfgulMF11preQuttN86aApnHvjFdQ3y6oNrQ=;
+	b=ZauCsIRgzA4zsRHwG61UR1disZQf77l7l/xKgMK+ZqcXv1iKQAaDo6Tgv8Fn7XiPaEgVnRK+d/0+6cbK8A4TcJrrUIl5M8BJtk0v6sgA3g6v/4EE8MykhsvyF2T59oR0F5cYW1p2P1AZXCWXRtVN4JuS0K/Pl4eT/C6lrZOy+qc=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:9732fa5b-b768-470c-9782-e7eef0324e7d,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:f94b0ad1-7921-4900-88a1-3aef019a55ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 9a8dbd687fc311efb66947d174671e26-20241001
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 35394258; Tue, 01 Oct 2024 15:05:56 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 1 Oct 2024 15:05:53 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n1.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
+ Transport; Tue, 1 Oct 2024 15:05:52 +0800
+Message-ID: <42dc4e9a-efcd-e166-b4fd-d4fe0dcd3c77@mediatek.com>
+Date: Tue, 1 Oct 2024 15:05:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240930202524.59357-2-kuniyu@amazon.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v7 2/3] ASoC: dt-bindings: mt6358: Convert to DT Schema
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+	<lee@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	"AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>, Sen
+ Chu <sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn
+	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+	<olteanv@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Sebastian Reichel <sre@kernel.org>, Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, <linux-input@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-leds@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-pm@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>,
+	Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
+	MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+References: <20240930073311.1486-1-macpaul.lin@mediatek.com>
+ <20240930073311.1486-2-macpaul.lin@mediatek.com>
+ <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+In-Reply-To: <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--12.101800-8.000000
+X-TMASE-MatchedRID: VPleTT1nwdQOwH4pD14DsF2036HHwFm/C/ExpXrHizxYJGLp3WXzKpWp
+	knTQ1+q/T+8v17QjdI1rQ015tgQBDTLCC/YZrQrUMN+B8zdlz9FMK/nxnH1Imt9zZd3pUn7Kakq
+	BCNYGwQ2ycWeoQW7ios4k/G1If2CrCLTFoW0rIaq4jAucHcCqnQXXmzqmsIi7yWCL+8tLbvYDkd
+	7WQNL44uLzNWBegCW2RYvisGWbbS8TEC0P9PvYRt0H8LFZNFG7bkV4e2xSge73SwlEUO9gdk5Ph
+	/E0lnHtrz/DYYLZZVaW2ciTighMcL7rweoAIK8o
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--12.101800-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 8213473620506FBC013195E018B92A6C2C331F6E40BA18E9D76B871E9094E6BB2000:8
 
-Hi Kuniyuki,
+On 10/1/24 14:34, Krzysztof Kozlowski wrote:
 
-kernel test robot noticed the following build errors:
+[snip]
 
-[auto build test ERROR on net-next/main]
+>> +description: |
+>> +  The communication between MT6358 and SoC is through Mediatek PMIC wrapper.
+>> +  For more detail, please visit Mediatek PMIC wrapper documentation.
+>> +  Must be a child node of PMIC wrapper.
+>> +
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - mediatek,mt6366-sound
+>> +      - mediatek,mt6358-sound
+>> +    const: mediatek,mt6358-sound
+> 
+> This wasn't ever tested.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/rtnetlink-Add-per-net-RTNL/20241001-043219
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240930202524.59357-2-kuniyu%40amazon.com
-patch subject: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
-config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241001/202410011447.gX9yfZVj-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241001/202410011447.gX9yfZVj-lkp@intel.com/reproduce)
+Hum, I have indeed tested it with linux-next/master branch.
+Ran dt_binding_check with dtschema trunk with this single file
+but didn't get any warning or errors.
+'make dt_binding_check DT_SCHEMA_FILES=mt6358.yaml'
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410011447.gX9yfZVj-lkp@intel.com/
+Could you please help to paste the error log for me?
+If there are new errors, I need to check if there is any
+environment issue.
 
-All errors (new ones prefixed by >>):
-
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
-   In file included from include/linux/spinlock.h:63,
-   from include/linux/sched.h:2140,
-   from arch/m68k/kernel/asm-offsets.c:15:
->> include/linux/lockdep.h:413:52: error: unknown type name 'lock_cmp_fn'
-   413 | void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
-   |                                                    ^~~~~~~~~~~
->> include/linux/lockdep.h:413:65: error: unknown type name 'lock_print_fn'
-   413 | void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
-   |                                                                 ^~~~~~~~~~~~~
-   make[3]: *** [scripts/Makefile.build:102: arch/m68k/kernel/asm-offsets.s] Error 1
-   make[3]: Target 'prepare' not remade because of errors.
-   make[2]: *** [Makefile:1203: prepare0] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:224: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:224: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for PROVE_LOCKING
-   Depends on [n]: DEBUG_KERNEL [=y] && LOCK_DEBUGGING_SUPPORT [=n]
-   Selected by [y]:
-   - DEBUG_NET_SMALL_RTNL [=y]
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
-
-
-vim +/lock_cmp_fn +413 include/linux/lockdep.h
-
-fbb9ce9530fd9b6 Ingo Molnar     2006-07-03  411  
-eb1cfd09f788e39 Kent Overstreet 2023-05-09  412  #ifdef CONFIG_PROVE_LOCKING
-eb1cfd09f788e39 Kent Overstreet 2023-05-09 @413  void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
-eb1cfd09f788e39 Kent Overstreet 2023-05-09  414  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> Do not send untested code, it's a waste of reviewers' time.
+> 
+> Best regards,
+> Krzysztof
+> 
+> 
+Thanks
+Macpaul Lin
 
