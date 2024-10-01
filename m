@@ -1,151 +1,278 @@
-Return-Path: <netdev+bounces-130723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE3E98B539
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:08:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3914298B53F
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9E8A1F2157B
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:08:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9ED3281563
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4AB1BD4E2;
-	Tue,  1 Oct 2024 07:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78CD01BC9F4;
+	Tue,  1 Oct 2024 07:09:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="ZauCsIRg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bk2QhsSH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A86261BC9F9;
-	Tue,  1 Oct 2024 07:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262EA194AD6
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727766369; cv=none; b=FpEoGiPUoKx1fQm4+MzTE/5DWSzck0p2C+gzdEcxHx35V6/w3w3E/T8nfgVLpDnDefjlZNKXTy3mNix3OqTtK7gb7Z4fXT4RAuBHycjGKwxfSNo1Y2XGa/MyaeAhqj38/cdRq47ZOpfTwtkUcC2NVNWpdDZPd8zg0l/5+3/VVsY=
+	t=1727766593; cv=none; b=ioK5adm6kW8XWcm05wiGhOPmQrgLVKXWk6WE3BdIGnXsNhwh/poVMKd8dDenI/BDUVqCZSQxRVFMsIZEAspgQ4ZHXRHsdMfCfGxiXfXeQEq45jwAhK5QiP2VxVI16mPA0sjCcfeP+hM9M1G7HPpX1WmGnSH6W7oGj7rEzsNZseY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727766369; c=relaxed/simple;
-	bh=uzy4br8jBpl8hKCqGAs/5rzn7+NYl8MRI9B594xPtqo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=DaIVklF4PgfNuTTyvInpe2jOWXIdNktwbCV5TN0c5I+avJtOQ9fklgDAqK+jNiM1hz8qin7oycPfVq675deNB6rWjopKdMSoLsv3cppSdi3d/Qk+LTBgwudmSoeouPwM56RJkk71nF/fgJb2uhLdHek6Ke/B1Gu2emhIc5HnFbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=ZauCsIRg; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 9a8dbd687fc311efb66947d174671e26-20241001
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=7maMI3JrfgulMF11preQuttN86aApnHvjFdQ3y6oNrQ=;
-	b=ZauCsIRgzA4zsRHwG61UR1disZQf77l7l/xKgMK+ZqcXv1iKQAaDo6Tgv8Fn7XiPaEgVnRK+d/0+6cbK8A4TcJrrUIl5M8BJtk0v6sgA3g6v/4EE8MykhsvyF2T59oR0F5cYW1p2P1AZXCWXRtVN4JuS0K/Pl4eT/C6lrZOy+qc=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:9732fa5b-b768-470c-9782-e7eef0324e7d,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6dc6a47,CLOUDID:f94b0ad1-7921-4900-88a1-3aef019a55ce,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 9a8dbd687fc311efb66947d174671e26-20241001
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <macpaul.lin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 35394258; Tue, 01 Oct 2024 15:05:56 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 1 Oct 2024 15:05:53 +0800
-Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n1.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
- Transport; Tue, 1 Oct 2024 15:05:52 +0800
-Message-ID: <42dc4e9a-efcd-e166-b4fd-d4fe0dcd3c77@mediatek.com>
-Date: Tue, 1 Oct 2024 15:05:50 +0800
+	s=arc-20240116; t=1727766593; c=relaxed/simple;
+	bh=EEfUkg12zVayrkF97+wBeybXQSiAExWRBd2BS7YcViM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=m85HQQF+RQzPAsbmqL7jKUvnGN5JJZKPTRXc0cuINxCnNbxdDRGtZz238XhPqrAWiNRHZT2MdUtV2UG/uvPSCpk05RdPlouuQoe1BoMHYJv4To/FSxS3YsXghmZJ8EpPsGF3YLO8K6PHrLcVvdd/pAEks69BM4g6N8SAOvwln1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bk2QhsSH; arc=none smtp.client-ip=209.85.218.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-a8a877c1d22so419878866b.1
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 00:09:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727766588; x=1728371388; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G98NvXM62YT0B0WJqga1aEPWf2fMI/P8gKqX00JsaWE=;
+        b=bk2QhsSH38N4UAxhEtUB72e65ixpvjBwARbkieNPWVAY6MIRTaE/RZxoQ9i+ZXtwkW
+         6aMioBa3IuCSh1LxCsz+PArTk0iAcBS1Lb4e5r7D183qW+NkvyPhotyQoRwmTjnSc9am
+         QfL5Vubi85A9ze2RM5c9Gec4D13OsOdY80qe8CoTNP1vh4u+XXuX4lIZyH+4Jc9sE9Oj
+         bFZTN5U2TTfYdM+U4VN9iua2GEthNBOKqDs9VXNBoid3dqgQKZtN3dqVhqKhZS8K4Jme
+         oK/zL141fxftRZTomiuF/jq/uUlY/8KHclR/C6LzV3qMtrnfj1uHwOVZRoEMss06R2Es
+         gjOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727766588; x=1728371388;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=G98NvXM62YT0B0WJqga1aEPWf2fMI/P8gKqX00JsaWE=;
+        b=ivht+G8pknyCSvUKoG7NrmZG7k4H0mvZo/vc1xfVWlXBLmo9NjkogKy5vDy1tr/+zd
+         33g4xksOdP3UmWBkbv3OKliM1Qy3sVLE6V3KUB+1nwNcmBg4n66YVOn9KdYuPpX80pYr
+         vQQh37XfPco3/KS68vNqoq5WEwZMAO4UHs2YNatvzRvAj9wAxylUia5gDpRHZVCZzz7n
+         0K+aMUAYzdZJtNbTtSwH3/IkYBL+1q3fMuXUHJ+8V2erdPIveGR4qpF5TLq1eo/mgm7g
+         OBsAfvYIkCSVj++3x1MtID94XXqlT2Wt2kg+KwbV60pAMG+vKy1wxxd3kqltPmw2oGh1
+         6lZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVhfq/iouMEBVlZGO9zD/KN9GJfCqgZaFix0jseX9YRJMps32Z/A82JFLD4RYMVxpgcol/7Mw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy+7OCkzgRMet2JdDpnJGSKv38CFfzXtJ9eY+Ehw12IIMw42au
+	L+sVkvV/B0yTF356CFTHBknkoV/1IywKxRPel9Pu7RjqPiHzdGH9zYhUdLXlhUW3YaMPdKDAvNz
+	K5A==
+X-Google-Smtp-Source: AGHT+IEFa2kdnyeozPEZpXPOZxvw+akB2zSXUlpMW74Sj1ivjTUlFPXTAwMlPI6ebFhigkPVCITJN5sj1kw=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a17:906:d214:b0:a8a:7d59:346d with SMTP id
+ a640c23a62f3a-a93c4aab81dmr660266b.10.1727766588055; Tue, 01 Oct 2024
+ 00:09:48 -0700 (PDT)
+Date: Tue, 1 Oct 2024 09:09:46 +0200
+In-Reply-To: <20240904104824.1844082-20-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v7 2/3] ASoC: dt-bindings: mt6358: Convert to DT Schema
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
-	<lee@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	"AngeloGioacchino Del Regno" <angelogioacchino.delregno@collabora.com>, Sen
- Chu <sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn
-	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
-	<olteanv@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Sebastian Reichel <sre@kernel.org>, Liam Girdwood
-	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, <linux-input@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-leds@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-pm@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>,
-	Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
-	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
-	MediaTek Chromebook Upstream
-	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
-	<wenst@chromium.org>
-References: <20240930073311.1486-1-macpaul.lin@mediatek.com>
- <20240930073311.1486-2-macpaul.lin@mediatek.com>
- <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
-From: Macpaul Lin <macpaul.lin@mediatek.com>
-In-Reply-To: <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--12.101800-8.000000
-X-TMASE-MatchedRID: VPleTT1nwdQOwH4pD14DsF2036HHwFm/C/ExpXrHizxYJGLp3WXzKpWp
-	knTQ1+q/T+8v17QjdI1rQ015tgQBDTLCC/YZrQrUMN+B8zdlz9FMK/nxnH1Imt9zZd3pUn7Kakq
-	BCNYGwQ2ycWeoQW7ios4k/G1If2CrCLTFoW0rIaq4jAucHcCqnQXXmzqmsIi7yWCL+8tLbvYDkd
-	7WQNL44uLzNWBegCW2RYvisGWbbS8TEC0P9PvYRt0H8LFZNFG7bkV4e2xSge73SwlEUO9gdk5Ph
-	/E0lnHtrz/DYYLZZVaW2ciTighMcL7rweoAIK8o
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--12.101800-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 8213473620506FBC013195E018B92A6C2C331F6E40BA18E9D76B871E9094E6BB2000:8
+Mime-Version: 1.0
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-20-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZvufroAFgLp_vZcF@google.com>
+Subject: Re: [RFC PATCH v3 19/19] landlock: Document socket rule type support
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/1/24 14:34, Krzysztof Kozlowski wrote:
+Hello!
 
-[snip]
+On Wed, Sep 04, 2024 at 06:48:24PM +0800, Mikhail Ivanov wrote:
+> Extend documentation with socket rule type description.
+>
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> ---
+>  Documentation/userspace-api/landlock.rst | 46 ++++++++++++++++++++----
+>  1 file changed, 40 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/Documentation/userspace-api/landlock.rst b/Documentation/use=
+rspace-api/landlock.rst
+> index 37dafce8038b..4bf45064faa1 100644
+> --- a/Documentation/userspace-api/landlock.rst
+> +++ b/Documentation/userspace-api/landlock.rst
+> @@ -33,7 +33,7 @@ A Landlock rule describes an action on an object which =
+the process intends to
+>  perform.  A set of rules is aggregated in a ruleset, which can then rest=
+rict
+>  the thread enforcing it, and its future children.
+> =20
+> -The two existing types of rules are:
+> +The three existing types of rules are:
+> =20
+>  Filesystem rules
+>      For these rules, the object is a file hierarchy,
+> @@ -44,14 +44,19 @@ Network rules (since ABI v4)
+>      For these rules, the object is a TCP port,
+>      and the related actions are defined with `network access rights`.
+> =20
+> +Socket rules (since ABI v6)
+> +    For these rules, the object is a pair of an address family and a soc=
+ket type,
+> +    and the related actions are defined with `socket access rights`.
+> +
+>  Defining and enforcing a security policy
+>  ----------------------------------------
+> =20
+>  We first need to define the ruleset that will contain our rules.
+> =20
+>  For this example, the ruleset will contain rules that only allow filesys=
+tem
+> -read actions and establish a specific TCP connection. Filesystem write
+> -actions and other TCP actions will be denied.
+> +read actions, create TCP sockets and establish a specific TCP connection=
+.
+> +Filesystem write actions, creating non-TCP sockets and other TCP
+> +actions will be denied.
+> =20
+>  The ruleset then needs to handle both these kinds of actions.  This is
+>  required for backward and forward compatibility (i.e. the kernel and use=
+r
+> @@ -81,6 +86,8 @@ to be explicit about the denied-by-default access right=
+s.
+>          .handled_access_net =3D
+>              LANDLOCK_ACCESS_NET_BIND_TCP |
+>              LANDLOCK_ACCESS_NET_CONNECT_TCP,
+> +        .handled_access_socket =3D
+> +            LANDLOCK_ACCESS_SOCKET_CREATE,
+>      };
+> =20
+>  Because we may not know on which kernel version an application will be
+> @@ -119,6 +126,11 @@ version, and only use the available subset of access=
+ rights:
+>      case 4:
+>          /* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
+>          ruleset_attr.handled_access_fs &=3D ~LANDLOCK_ACCESS_FS_IOCTL_DE=
+V;
+> +        __attribute__((fallthrough));
+> +	case 5:
+> +		/* Removes socket support for ABI < 6 */
+> +		ruleset_attr.handled_access_socket &=3D
+> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
 
->> +description: |
->> +  The communication between MT6358 and SoC is through Mediatek PMIC wrapper.
->> +  For more detail, please visit Mediatek PMIC wrapper documentation.
->> +  Must be a child node of PMIC wrapper.
->> +
->> +properties:
->> +  compatible:
->> +    enum:
->> +      - mediatek,mt6366-sound
->> +      - mediatek,mt6358-sound
->> +    const: mediatek,mt6358-sound
-> 
-> This wasn't ever tested.
+When I patched this in, the indentation of this "case" was off, compared to=
+ the
+rest of the code example.  (The code example uses spaces for indentation, n=
+ot
+tabs.)
 
-Hum, I have indeed tested it with linux-next/master branch.
-Ran dt_binding_check with dtschema trunk with this single file
-but didn't get any warning or errors.
-'make dt_binding_check DT_SCHEMA_FILES=mt6358.yaml'
+>      }
+> =20
+>  This enables to create an inclusive ruleset that will contain our rules.
+> @@ -170,6 +182,20 @@ for the ruleset creation, by filtering access rights=
+ according to the Landlock
+>  ABI version.  In this example, this is not required because all of the r=
+equested
+>  ``allowed_access`` rights are already available in ABI 1.
+> =20
+> +For socket access-control, we can add a rule to allow TCP sockets creati=
+on. UNIX,
+> +UDP IP and other protocols will be denied by the ruleset.
+> +
+> +.. code-block:: c
+> +
+> +    struct landlock_net_port_attr tcp_socket =3D {
+> +        .allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> +        .family =3D AF_INET,
+> +        .type =3D SOCK_STREAM,
+> +    };
+> +
+> +    err =3D landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> +                            &tcp_socket, 0);
+> +
 
-Could you please help to paste the error log for me?
-If there are new errors, I need to check if there is any
-environment issue.
+IMHO, the length of the "Defining and enforcing a security policy" section =
+is
+slowly getting out of hand.  This was easier to follow when it was only fil=
+e
+system rules. -- I wonder whether we should split this up in subsections fo=
+r the
+individual steps to give this a more logical outline, e.g.
 
-> Do not send untested code, it's a waste of reviewers' time.
-> 
-> Best regards,
-> Krzysztof
-> 
-> 
-Thanks
-Macpaul Lin
+* Creating a ruleset
+* Adding rules to the ruleset
+  * Adding a file system rule
+  * Adding a network rule
+  * Adding a socket rule
+* Enforcing the ruleset
+
+>  For network access-control, we can add a set of rules that allow to use =
+a port
+>  number for a specific action: HTTPS connections.
+> =20
+> @@ -186,7 +212,8 @@ number for a specific action: HTTPS connections.
+>  The next step is to restrict the current thread from gaining more privil=
+eges
+>  (e.g. through a SUID binary).  We now have a ruleset with the first rule
+>  allowing read access to ``/usr`` while denying all other handled accesse=
+s for
+> -the filesystem, and a second rule allowing HTTPS connections.
+> +the filesystem, a second rule allowing TCP sockets and a third rule allo=
+wing
+> +HTTPS connections.
+> =20
+>  .. code-block:: c
+> =20
+> @@ -404,7 +431,7 @@ Access rights
+>  -------------
+> =20
+>  .. kernel-doc:: include/uapi/linux/landlock.h
+> -    :identifiers: fs_access net_access
+> +    :identifiers: fs_access net_access socket_access
+> =20
+>  Creating a new ruleset
+>  ----------------------
+> @@ -423,7 +450,7 @@ Extending a ruleset
+> =20
+>  .. kernel-doc:: include/uapi/linux/landlock.h
+>      :identifiers: landlock_rule_type landlock_path_beneath_attr
+> -                  landlock_net_port_attr
+> +                  landlock_net_port_attr landlock_socket_attr
+> =20
+>  Enforcing a ruleset
+>  -------------------
+> @@ -541,6 +568,13 @@ earlier ABI.
+>  Starting with the Landlock ABI version 5, it is possible to restrict the=
+ use of
+>  :manpage:`ioctl(2)` using the new ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right=
+.
+> =20
+> +Socket support (ABI < 6)
+> +-------------------------
+> +
+> +Starting with the Landlock ABI version 6, it is now possible to restrict
+> +creation of user space sockets to only a set of allowed protocols thanks
+> +to the new ``LANDLOCK_ACCESS_SOCKET_CREATE`` access right.
+> +
+>  .. _kernel_support:
+> =20
+>  Kernel support
+> --=20
+> 2.34.1
+>=20
+
+There is a section further below called "Network support" that talks about =
+the
+need for CONFIG_INET in order to add a network rule.  Do similar restrictio=
+ns
+apply to the socket rules as well?  Maybe this should be added to the secti=
+on.
+
+Please don't forget -- Tahera Fahimi's "scoped" patches have landed in
+linux-next by now, so we will need to rebase and bump the ABI version one h=
+igher
+than before.
+
+Thanks,
+=E2=80=94G=C3=BCnther
 
