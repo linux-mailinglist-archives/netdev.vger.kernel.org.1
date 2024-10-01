@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-130944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C918A98C237
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:05:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F39F98C238
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:05:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DDE12812B4
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:05:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 836D81C237F3
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9321CB537;
-	Tue,  1 Oct 2024 16:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D173B1CBE89;
+	Tue,  1 Oct 2024 16:04:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EgH33QkH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Fwj0TggN"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266BF1CB511
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 16:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2091E1CB511
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 16:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727798687; cv=none; b=pMFKXiaZ0g4kDeXMeWJDfepgYsT84gUfhyAD6u6vMZkLJsKoNo4lamD3ujWK3+tAIABbmQ5djlQy45ndkl+AMoB478sEI1DJCfbx6cWYPyAfVBc3l5qfxerPXlEnM6GYdS9UoVQ+Y5o4RIb0zWonVcyKavcf+6HzT4N+ZROAhmk=
+	t=1727798691; cv=none; b=SsvSE7fF7bzqPbR8Zd2GfJdCrg4KBsKzcI037FkgsSmj5okNZgLN16AaGsmLFpMAG6O2GYfCzPt03a+VfsdLaKmhiitMWgLJSgnQITnZ7RW+qxFW5rP83SuBNe1VDqTlqMXYrRuopncf49nfqSDKv0fvjKk7mVzefSZM+q47os8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727798687; c=relaxed/simple;
-	bh=fmp6WfoAQd6GwGJXzvkEWv5KgLVufywlKFHJi5t7lPg=;
+	s=arc-20240116; t=1727798691; c=relaxed/simple;
+	bh=8pcLN8pX33PPUmfN78vCblABwmXtoq7T5hFHblrB+hQ=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=I/Qz840OgEGk3fpkoO21EnQE7+89NqPYPHAn3S3E98q1M6MOJuvqMic0rduPSDRrZkKmrpxYz7oYtud+xzQhKsN5NS78wUlu1DRf3fF7iiruwVKVCY3K/CxDsuE3gnjiw7olj1nTG/tN5LSnHgasYKiOtV8KNU9LzCKbhTDtfG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EgH33QkH; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=muCzGsNaKKAXnXticB9/iFm302e0Ca5j8o/R4y1Dg4KQZ+pA9TUdhKGIbweuugbqYUi9Z/2SzsYe7Xo0Rvs8ViGXswi0Y+8YcZ6q8Dy5KHKeiU4qc67283DqmXYlhKfro/dMhqSki7VSJFv/CaOxPn1/94GpiqMcxva5AIJcqbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Fwj0TggN; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kxwhMe4NsG80DGdXhpv3SmTACDemHuSUJShVS/ADG7A=; b=EgH33QkHuhpC91678DmoZAYLCu
-	A0ZAZ9dY4B2sLxq/FXdw0/+vb66d7FzSqWR63WDgKsYCMXzIF6NG4VbpIfUNiR6MwFzFmiO3snvY3
-	m/odOaprkEevli1nSmjKSL1sqBTfMDBx3Qaiaq0OVsmYaWh9D4gmgI7e8+VlE5M4EQEWyxW+8C/gm
-	fgvBLJ/A5G0IZAlFRPvLFgqiHB7pDRrFiX4nw/tVrSm7hFP3DhU4tuzIcAbbbyiiKFylhC6IbLksq
-	sJYmcDSEjg2LXpA7L50jrKIAQQfjq5r7o78oRtcZAFXy4i57eNCn74DIsUqB1M6orOVlmqgE9oDYv
-	WGK2F8hA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54716 helo=rmk-PC.armlinux.org.uk)
+	bh=nuCM934bkjYeY+N9UfjknkM2fOuYtRxtYepAfjE8vyg=; b=Fwj0TggNitCXsSxoIfOtkt5IRM
+	Wn3mC8wCw3pjVtPLhGJ0oUUsQtm6gX3Xtglb//9rTDNe5po6qLKR/QEDPGofnyNgRelW/8CaThEZj
+	/bKnSUv86T1pXa/2BBHhR5dnDooDpKiXM+/gRADlrsA2ngYnaFdJLZwHOPd2gbaEDvbnoTNJddBf9
+	CAJoTCo4fFvdDaBO/njR+/S+R75gosMi5xP+MPPSC30uhtl1yP7xBCTlsxF8rNnCW+4a7hrkbys71
+	K2+MYTbCr91s0PnWAr6AJj7QNKGXmmyWlJ2KpBinJWc7UIVPfFVGkvQn0p6a7HC0uk5yH5CGPLAWm
+	6LcX5A8g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54732 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1svfMX-00066B-1H;
-	Tue, 01 Oct 2024 17:04:32 +0100
+	id 1svfMc-00066S-2g;
+	Tue, 01 Oct 2024 17:04:38 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1svfMV-005ZIR-FE; Tue, 01 Oct 2024 17:04:31 +0100
+	id 1svfMa-005ZIX-If; Tue, 01 Oct 2024 17:04:36 +0100
 In-Reply-To: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
 References: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -72,8 +72,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 05/10] net: wangxun: txgbe: use phylink_pcs
- internally
+Subject: [PATCH net-next 06/10] net: dsa: sja1105: simplify static
+ configuration reload
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,98 +83,157 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1svfMV-005ZIR-FE@rmk-PC.armlinux.org.uk>
+Message-Id: <E1svfMa-005ZIX-If@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 01 Oct 2024 17:04:31 +0100
+Date: Tue, 01 Oct 2024 17:04:36 +0100
 
-Use xpcs_create_pcs_mdiodev() to create the XPCS instance, storing
-and using the phylink_pcs pointer internally, rather than dw_xpcs.
-Use xpcs_destroy_pcs() to destroy the XPCS instance when we've
-finished with it.
+The static configuration reload saves the port speed in the static
+configuration tables by first converting it from the internal
+respresentation to the SPEED_xxx ethtool representation, and then
+converts it back to restore the setting. This is because
+sja1105_adjust_port_config() takes the speed as SPEED_xxx.
+
+However, this is unnecessarily complex. If we split
+sja1105_adjust_port_config() up, we can simply save and restore the
+mac[port].speed member in the static configuration tables.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 18 +++++++++---------
- .../net/ethernet/wangxun/txgbe/txgbe_type.h    |  2 +-
- 2 files changed, 10 insertions(+), 10 deletions(-)
+Changes since rfc:
+ - added () to function name
+ - fixed local variable order
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 67b61afdde96..3dd89dafe7c7 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -122,7 +122,7 @@ static int txgbe_pcs_write(struct mii_bus *bus, int addr, int devnum, int regnum
- static int txgbe_mdio_pcs_init(struct txgbe *txgbe)
+ drivers/net/dsa/sja1105/sja1105_main.c | 65 ++++++++++++++------------
+ 1 file changed, 34 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
+index bc7e50dcb57c..5481ccb921df 100644
+--- a/drivers/net/dsa/sja1105/sja1105_main.c
++++ b/drivers/net/dsa/sja1105/sja1105_main.c
+@@ -1257,29 +1257,11 @@ static int sja1105_parse_dt(struct sja1105_private *priv)
+ 	return rc;
+ }
+ 
+-/* Convert link speed from SJA1105 to ethtool encoding */
+-static int sja1105_port_speed_to_ethtool(struct sja1105_private *priv,
+-					 u64 speed)
+-{
+-	if (speed == priv->info->port_speed[SJA1105_SPEED_10MBPS])
+-		return SPEED_10;
+-	if (speed == priv->info->port_speed[SJA1105_SPEED_100MBPS])
+-		return SPEED_100;
+-	if (speed == priv->info->port_speed[SJA1105_SPEED_1000MBPS])
+-		return SPEED_1000;
+-	if (speed == priv->info->port_speed[SJA1105_SPEED_2500MBPS])
+-		return SPEED_2500;
+-	return SPEED_UNKNOWN;
+-}
+-
+-/* Set link speed in the MAC configuration for a specific port. */
+-static int sja1105_adjust_port_config(struct sja1105_private *priv, int port,
+-				      int speed_mbps)
++static int sja1105_set_port_speed(struct sja1105_private *priv, int port,
++				  int speed_mbps)
  {
- 	struct mii_bus *mii_bus;
--	struct dw_xpcs *xpcs;
-+	struct phylink_pcs *pcs;
- 	struct pci_dev *pdev;
- 	struct wx *wx;
- 	int ret = 0;
-@@ -147,11 +147,11 @@ static int txgbe_mdio_pcs_init(struct txgbe *txgbe)
- 	if (ret)
- 		return ret;
+ 	struct sja1105_mac_config_entry *mac;
+-	struct device *dev = priv->ds->dev;
+ 	u64 speed;
+-	int rc;
  
--	xpcs = xpcs_create_mdiodev(mii_bus, 0, PHY_INTERFACE_MODE_10GBASER);
--	if (IS_ERR(xpcs))
--		return PTR_ERR(xpcs);
-+	pcs = xpcs_create_pcs_mdiodev(mii_bus, 0);
-+	if (IS_ERR(pcs))
-+		return PTR_ERR(pcs);
+ 	/* On P/Q/R/S, one can read from the device via the MAC reconfiguration
+ 	 * tables. On E/T, MAC reconfig tables are not readable, only writable.
+@@ -1313,7 +1295,7 @@ static int sja1105_adjust_port_config(struct sja1105_private *priv, int port,
+ 		speed = priv->info->port_speed[SJA1105_SPEED_2500MBPS];
+ 		break;
+ 	default:
+-		dev_err(dev, "Invalid speed %iMbps\n", speed_mbps);
++		dev_err(priv->ds->dev, "Invalid speed %iMbps\n", speed_mbps);
+ 		return -EINVAL;
+ 	}
  
--	txgbe->xpcs = xpcs;
-+	txgbe->pcs = pcs;
+@@ -1325,11 +1307,31 @@ static int sja1105_adjust_port_config(struct sja1105_private *priv, int port,
+ 	 * we need to configure the PCS only (if even that).
+ 	 */
+ 	if (priv->phy_mode[port] == PHY_INTERFACE_MODE_SGMII)
+-		mac[port].speed = priv->info->port_speed[SJA1105_SPEED_1000MBPS];
++		speed = priv->info->port_speed[SJA1105_SPEED_1000MBPS];
+ 	else if (priv->phy_mode[port] == PHY_INTERFACE_MODE_2500BASEX)
+-		mac[port].speed = priv->info->port_speed[SJA1105_SPEED_2500MBPS];
+-	else
+-		mac[port].speed = speed;
++		speed = priv->info->port_speed[SJA1105_SPEED_2500MBPS];
++
++	mac[port].speed = speed;
++
++	return 0;
++}
++
++/* Write the MAC Configuration Table entry and, if necessary, the CGU settings,
++ * after a link speedchange for this port.
++ */
++static int sja1105_set_port_config(struct sja1105_private *priv, int port)
++{
++	struct sja1105_mac_config_entry *mac;
++	struct device *dev = priv->ds->dev;
++	int rc;
++
++	/* On P/Q/R/S, one can read from the device via the MAC reconfiguration
++	 * tables. On E/T, MAC reconfig tables are not readable, only writable.
++	 * We have to *know* what the MAC looks like.  For the sake of keeping
++	 * the code common, we'll use the static configuration tables as a
++	 * reasonable approximation for both E/T and P/Q/R/S.
++	 */
++	mac = priv->static_config.tables[BLK_IDX_MAC_CONFIG].entries;
  
- 	return 0;
+ 	/* Write to the dynamic reconfiguration tables */
+ 	rc = sja1105_dynamic_config_write(priv, BLK_IDX_MAC_CONFIG, port,
+@@ -1390,7 +1392,8 @@ static void sja1105_mac_link_up(struct phylink_config *config,
+ 	struct sja1105_private *priv = dp->ds->priv;
+ 	int port = dp->index;
+ 
+-	sja1105_adjust_port_config(priv, port, speed);
++	if (!sja1105_set_port_speed(priv, port, speed))
++		sja1105_set_port_config(priv, port);
+ 
+ 	sja1105_inhibit_tx(priv, BIT(port), false);
  }
-@@ -163,7 +163,7 @@ static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *confi
- 	struct txgbe *txgbe = wx->priv;
+@@ -2293,8 +2296,8 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
+ {
+ 	struct ptp_system_timestamp ptp_sts_before;
+ 	struct ptp_system_timestamp ptp_sts_after;
+-	int speed_mbps[SJA1105_MAX_NUM_PORTS];
+ 	u16 bmcr[SJA1105_MAX_NUM_PORTS] = {0};
++	u64 mac_speed[SJA1105_MAX_NUM_PORTS];
+ 	struct sja1105_mac_config_entry *mac;
+ 	struct dsa_switch *ds = priv->ds;
+ 	s64 t1, t2, t3, t4;
+@@ -2307,14 +2310,13 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
  
- 	if (interface == PHY_INTERFACE_MODE_10GBASER)
--		return &txgbe->xpcs->pcs;
-+		return txgbe->pcs;
+ 	mac = priv->static_config.tables[BLK_IDX_MAC_CONFIG].entries;
  
- 	return NULL;
- }
-@@ -302,7 +302,7 @@ irqreturn_t txgbe_link_irq_handler(int irq, void *data)
- 	status = rd32(wx, TXGBE_CFG_PORT_ST);
- 	up = !!(status & TXGBE_CFG_PORT_ST_LINK_UP);
+-	/* Back up the dynamic link speed changed by sja1105_adjust_port_config
++	/* Back up the dynamic link speed changed by sja1105_set_port_speed()
+ 	 * in order to temporarily restore it to SJA1105_SPEED_AUTO - which the
+ 	 * switch wants to see in the static config in order to allow us to
+ 	 * change it through the dynamic interface later.
+ 	 */
+ 	for (i = 0; i < ds->num_ports; i++) {
+-		speed_mbps[i] = sja1105_port_speed_to_ethtool(priv,
+-							      mac[i].speed);
++		mac_speed[i] = mac[i].speed;
+ 		mac[i].speed = priv->info->port_speed[SJA1105_SPEED_AUTO];
  
--	phylink_pcs_change(&txgbe->xpcs->pcs, up);
-+	phylink_pcs_change(txgbe->pcs, up);
+ 		if (priv->xpcs[i])
+@@ -2377,7 +2379,8 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
+ 		struct dw_xpcs *xpcs = priv->xpcs[i];
+ 		unsigned int neg_mode;
  
- 	return IRQ_HANDLED;
- }
-@@ -778,7 +778,7 @@ int txgbe_init_phy(struct txgbe *txgbe)
- err_destroy_phylink:
- 	phylink_destroy(wx->phylink);
- err_destroy_xpcs:
--	xpcs_destroy(txgbe->xpcs);
-+	xpcs_destroy_pcs(txgbe->pcs);
- err_unregister_swnode:
- 	software_node_unregister_node_group(txgbe->nodes.group);
+-		rc = sja1105_adjust_port_config(priv, i, speed_mbps[i]);
++		mac[i].speed = mac_speed[i];
++		rc = sja1105_set_port_config(priv, i);
+ 		if (rc < 0)
+ 			goto out;
  
-@@ -798,6 +798,6 @@ void txgbe_remove_phy(struct txgbe *txgbe)
- 	clkdev_drop(txgbe->clock);
- 	clk_unregister(txgbe->clk);
- 	phylink_destroy(txgbe->wx->phylink);
--	xpcs_destroy(txgbe->xpcs);
-+	xpcs_destroy_pcs(txgbe->pcs);
- 	software_node_unregister_node_group(txgbe->nodes.group);
- }
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 959102c4c379..cc3a7b62fe9e 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -329,7 +329,7 @@ struct txgbe {
- 	struct wx *wx;
- 	struct txgbe_nodes nodes;
- 	struct txgbe_irq misc;
--	struct dw_xpcs *xpcs;
-+	struct phylink_pcs *pcs;
- 	struct platform_device *sfp_dev;
- 	struct platform_device *i2c_dev;
- 	struct clk_lookup *clock;
 -- 
 2.30.2
 
