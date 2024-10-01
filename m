@@ -1,168 +1,176 @@
-Return-Path: <netdev+bounces-131025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D395498C67F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:08:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3045C98C680
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:08:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44D0C1F251F9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:08:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 998E91F251A4
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0631CDFA9;
-	Tue,  1 Oct 2024 20:08:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55921CDFC7;
+	Tue,  1 Oct 2024 20:08:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gMQY4lFS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKR9nH3H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B570F1CBE98
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159D31CBE98
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:08:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727813301; cv=none; b=oe2A3jDdz7L6P3PLSaDBU9Uhi448QLDVim2u1pkuNLQNVhqPTbbhaCew2c/vywZ1BT3DwR/yxsS7r46dHoMurCTgPkohRmKLuodJx8HYfRbA+bCqZs2jCySPMXp7pO2ZodpVXpRANbIfrtdZFOJyUIAwIilw+pqceK+ypQQe/r4=
+	t=1727813318; cv=none; b=s+tEHAU/5+K3pcThz4xwqmu9Oc7wABSdHh7NG9QG0Z5614QaWrAZezVADIBJpGJHbftWgFMMLD6fCv95b+vzWrr5Vy/CSbj36aOAXc48+3s2ldDhr0I7wiaCKjddrC0NFC+gIo+N7DeU6QS8n3g5ARBgz3KM5YgQwfqTLkmNQhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727813301; c=relaxed/simple;
-	bh=3GYCSxujynSYCowFZOQX+JdInLmXxU5vEEvZc/hFaVs=;
+	s=arc-20240116; t=1727813318; c=relaxed/simple;
+	bh=x/BYfN0o3hdOvi6ouH7b1heWPwVtXmW7NgvsyjdBa8I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LJtNkNwgRFuEeyzkbqdvsATXq57loT9G3Bs5jB3NH+y1dJPawor09FmD6SAK3Z/Trq/Ei5rZdirCwX+HBjwaao3vV7st+/YUZ36/68u5ljYCpN6mgURErO+Y2Qt2OYCW0iuND0YEQZVp+B2aRIX7EX6UqKWrsqmNm3lALDZ/9BA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gMQY4lFS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727813298;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=apius4g1CeHdIrpl7QkimkmGSsSx7Zv/3CES3u3Bny4=;
-	b=gMQY4lFS5Wkd5AocU8bxzDHEYeApIVWVI0uk7NNq3bctS+RhdLzqmGpvNQwUYG/hvwnIe6
-	VvR+vFhmhyxIA2Qk4/cccBBcMzRiIxzjT3JyryYMNOJ6J2zbSFE9Cz2r3IKe3WL97sC5kG
-	YZB3D3Jf2uMBfjTsWagpw8l0iVTV8Qg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-hyfjMmVMMGOiBkLBCB2Opw-1; Tue, 01 Oct 2024 16:08:16 -0400
-X-MC-Unique: hyfjMmVMMGOiBkLBCB2Opw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37cd32f9c59so2043281f8f.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:08:16 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QWc7yv6p8vlKl8vkwweC4YA8F8N86JBlwJf1kvA0q5XC7hCWpSMctAAT4Y2rJ7IInQIw7N0dXkYm7O7lOconojFmgs45nB2fBKXDPhotPRFjM0Dt3B6YiaZBp5UWdCmFwUkVLeUMyAjzY7Frx5ooQCvq4hsPxH3F3Ly+hVsPZi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKR9nH3H; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5398cc2fcb7so3971953e87.1
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:08:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727813315; x=1728418115; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3F7/FFtWApLSUXEepnnbis6VSjR+VGvY092OXy/kqpk=;
+        b=nKR9nH3HtHjJFuxL912CmR/D+lTEVp5wGwhTM3Xi69PmXvIHg6VPa3VLzh4dfoIkM8
+         N0tSY5Yn5u4jrE3VVxbQaCKgpdL7JFzSycMYasmgcjaRmYc9jHrF4o4r6NaHQJBGOWfi
+         wDfkJp/qugoIHzBTuBvN6XSUJoys50KuZh5Bc2MqjFU5AHpB2czwWvBaetayvB62JPv9
+         McaXQTCZ9VzZaFaaGWK6a2rDncd25+jTpwLzhL7kTVcn4JpHjOaSdUHYHZOH7QouCvI+
+         v6qijZE0tdpmEqs7g4UZkIZ2MVIEWgKAvkRynRLjZg44fGpi8X26QrlHglbiUO1gBSTA
+         NeRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727813295; x=1728418095;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=apius4g1CeHdIrpl7QkimkmGSsSx7Zv/3CES3u3Bny4=;
-        b=A4UAyJ4cX+W67d59kAU5ONTa/2F9Y6Rto9xzSPIFCmKn+/S5YQI7EvMpe//BngJPsc
-         6dsMOJiFPAmwgF40aytETSXsNE3FdK/u2abFw2YnjElwA/eMSDO3xZWtVl+aMV8eHToc
-         Fjdy/CaLgJU/6m4yQDYXYW8RoXNZ2f7DYZD+9y4kAauPcu0k95lGJO98EhoU2VJcacVj
-         1L16K93IFYwOgpQXS6OUh/r/GiSYT+aGRYEEJg8gQ9C8DPEgtFXwR4SsL3tJzfTRGcFb
-         s8NdFV9U2JPM+0pA9hGEccbS0T7sVXuzdFM1oIeZexgum5sVnVsYVgMoQIG6AVcBkszo
-         ku3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXXR0NbGc8M5HGN41OkKAdin4GRnaiQfWsPhXXfC9FZg2iCNCWRjuQ18qaw/NvZOWDvLci224c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMrU15FcYC6C0KdtB5AaHQkYSGZrEfmGju+ji0eeYHYYmltwM2
-	dxmp/bPGeASgFqCWrEJblTXLH/wIzF5m2FoXHA37OHm6pv/GayzmHKXUkj5ajv8Nb+L+02zafPb
-	KtF+a7f8nCh85BtpZWf2F5T7CEvTWzy52isT1fWlxlO0Wtf4sKfj0Eg==
-X-Received: by 2002:adf:cd84:0:b0:37c:cdb6:6a8e with SMTP id ffacd0b85a97d-37cfb8b63c2mr605959f8f.1.1727813295057;
-        Tue, 01 Oct 2024 13:08:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGjmBk+oacLgMaOQSzyXcC6kpxQ9y9EoovlJ0qQOX/LfrUwb3fxuYWcFS//Cpd7Ndwkdhh/0A==
-X-Received: by 2002:adf:cd84:0:b0:37c:cdb6:6a8e with SMTP id ffacd0b85a97d-37cfb8b63c2mr605943f8f.1.1727813294565;
-        Tue, 01 Oct 2024 13:08:14 -0700 (PDT)
-Received: from debian (2a01cb058d23d60018ec485714c2d3db.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:18ec:4857:14c2:d3db])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cfc262852sm364235f8f.41.2024.10.01.13.08.13
+        d=1e100.net; s=20230601; t=1727813315; x=1728418115;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3F7/FFtWApLSUXEepnnbis6VSjR+VGvY092OXy/kqpk=;
+        b=Gbfd2jvXpEZQFZ6hSGdgg3fuO+EBLFsHTcpe5oKYxoW246Q9Ii3Fh9ubG2TTCai+an
+         5i6oeT99yRl7+Q3MB06KV2IfS1h83pEmMsDCTJgfitaXrMu/EeF338isdZAU3pVlgXAJ
+         HP4dJR0VQyElOSSNB5zEnEQz3t4796MCnKWbDW1lIq3zMw+TMvE8AQuQYCeW+vd4cHLZ
+         UQyRYrEHcPjn1M5ZCyFj2so6dcw+QmtNYwuZNNer2id027xPh+77Jan4zBLdt8BPLsQ5
+         UsjtIXd2ZKo53Bk8o0v8FT60oR/3DPoYWacjAN1uFEGGpx9A6bajA+E5b1XdS+NLEeTb
+         aTXw==
+X-Forwarded-Encrypted: i=1; AJvYcCVU3/qhIQ8yf1kH/liopv0gtk26fKPA+/V5GQDxatDaDuSV7MvD3c35RPH0P1nWnwoKnN1CLyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdXZlTjxBcR5uAWjquC3+aeTd5Xzvc3j1RGjoIKdW7Y8u4Vtw7
+	xKEa9exLbSFPRSJ0v2az84/0lo2u/5bGXRok2AZOfgLWG5qNFhoL
+X-Google-Smtp-Source: AGHT+IFQgGFOsaorJ/fsSrIM5NkGlLHrttg96Z9/+Xv6vqBLdsR83SKhx/SA5x3kSEFm21tU85bkbQ==
+X-Received: by 2002:a05:6512:3b1e:b0:52c:8979:9627 with SMTP id 2adb3069b0e04-539a06589bemr435745e87.3.1727813314834;
+        Tue, 01 Oct 2024 13:08:34 -0700 (PDT)
+Received: from mobilestation ([95.79.225.241])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5398b124577sm1450666e87.158.2024.10.01.13.08.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:08:14 -0700 (PDT)
-Date: Tue, 1 Oct 2024 22:08:12 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: dsahern@kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Subject: Re: [PATCH net-next 0/6] net: fib_rules: Add DSCP selector support
-Message-ID: <ZvxWrJHbXzxpKCFK@debian>
-References: <20240911093748.3662015-1-idosch@nvidia.com>
- <ZuQ5VNo/VUBWbqNl@debian>
- <Zvqrb3HYM3XogzOn@shredder.mtl.com>
+        Tue, 01 Oct 2024 13:08:34 -0700 (PDT)
+Date: Tue, 1 Oct 2024 23:08:31 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, horms@kernel.org, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Ong Boon Leong <boon.leong.ong@intel.com>, Wong Vee Khee <vee.khee.wong@intel.com>, 
+	Chuah Kim Tatt <kim.tatt.chuah@intel.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev, linux-imx@nxp.com, 
+	Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v4 net] net: stmmac: dwmac4: extend timeout for VLAN Tag
+ register busy bit check
+Message-ID: <wltofooowb3nl5gzfygdj3kd22glmd22hji4nlhovwct7ckrvo@j4st55j52awv>
+References: <20240924205424.573913-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Zvqrb3HYM3XogzOn@shredder.mtl.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240924205424.573913-1-shenwei.wang@nxp.com>
 
-On Mon, Sep 30, 2024 at 04:45:19PM +0300, Ido Schimmel wrote:
-> Hi Guillaume,
+On Tue, Sep 24, 2024 at 03:54:24PM GMT, Shenwei Wang wrote:
+> Increase the timeout for checking the busy bit of the VLAN Tag register
+> from 10µs to 500ms. This change is necessary to accommodate scenarios
+> where Energy Efficient Ethernet (EEE) is enabled.
 > 
-> Sorry for the delay. Was OOO / sick. Thanks for reviewing the patches.
+> Overnight testing revealed that when EEE is active, the busy bit can
+> remain set for up to approximately 300ms. The new 500ms timeout provides
+> a safety margin.
 > 
-> On Fri, Sep 13, 2024 at 03:08:36PM +0200, Guillaume Nault wrote:
-> > On Wed, Sep 11, 2024 at 12:37:42PM +0300, Ido Schimmel wrote:
-> [...]
-> > > iproute2 changes can be found here [1].
-> > > 
-> > > [1] https://github.com/idosch/iproute2/tree/submit/dscp_rfc_v1
-> > 
-> > Any reason for always printing numbers in the json output of this
-> > iproute2 RFC? Why can't json users just use the -N parameter?
-> 
-> Because then the JSON output is always printed as a string. Example with
-> the old "tos" keyword:
-> 
-> # ip -6 rule add tos CS1 table 100
-> # ip -6 -j -p rule show tos CS1          
-> [ {
->         "priority": 32765,
->         "src": "all",
->         "tos": "CS1",
->         "table": "100"
->     } ]
-> # ip -6 -j -p -N rule show tos CS1
-> [ {
->         "priority": 32765,
->         "src": "all",
->         "tos": "0x20",
->         "table": "100"
->     } ]
-> 
-> Plus, JSON output should be consumed by scripts and it doesn't make
-> sense to me to use symbolic names there.
+> Fixes: ed64639bc1e0 ("net: stmmac: Add support for VLAN Rx filtering")
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
 
-I guess that's a matter of taste then. I personally wouldn't try to
-imagine what the scripts expectations are, and I'd rather let them
-explicitely tell what kind of output they want. I mean, I agree that
-scripts would generally want to get numbers instead of symbolic names,
-but I can't see why they would _always_ want that. By forcing a numeric
-value, scripts have no possibility to report symbolic names, although
-that could make sense if the output isn't processed further and just
-displayed to the user.
+Looking good now. Thanks!
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-But anyway, if you really prefer the numeric-only approach, I can live
-with it :).
+-Serge(y)
 
-> > I haven't checked all the /etc/iproute2/rt_* aliases, but the general
-> > behaviour seems to print the human readable name for both json and
-> > normal outputs, unles -N is given on the command line.
+> ---
+> Changes in V4:
+>  - fixed the comments and R-b.
 > 
-> dcb is also always using numeric output for JSON:
+> Changes in V3:
+>  - re-org the error-check flow per Serge's review.
 > 
-> # dcb app add dev swp1 dscp-prio CS1:0 CS2:1
-> # dcb -j -p app show dev swp1 dscp-prio
-> {
->     "dscp_prio": [ [ 8,0," " ],[ 16,1," " ] ]
-> }
-> # dcb -j -p -N app show dev swp1 dscp-prio
-> {
->     "dscp_prio": [ [ 8,0," " ],[ 16,1," " ] ]
-> }
+> Changes in v2:
+>  - replace the udelay with readl_poll_timeout per Simon's review.
 > 
-> So there is already inconsistency in iproute2. I chose the approach that
-> seemed correct to me. I don't think much thought went into always
-> printing strings in JSON output other than that it was easy to
-> implement.
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac4_core.c  | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 > 
-> David, what is your preference?
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> index a1858f083eef..e65a65666cc1 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/ethtool.h>
+>  #include <linux/io.h>
+> +#include <linux/iopoll.h>
+>  #include "stmmac.h"
+>  #include "stmmac_pcs.h"
+>  #include "dwmac4.h"
+> @@ -471,7 +472,7 @@ static int dwmac4_write_vlan_filter(struct net_device *dev,
+>  				    u8 index, u32 data)
+>  {
+>  	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+> -	int i, timeout = 10;
+> +	int ret;
+>  	u32 val;
 > 
-
+>  	if (index >= hw->num_vlan)
+> @@ -487,16 +488,15 @@ static int dwmac4_write_vlan_filter(struct net_device *dev,
+> 
+>  	writel(val, ioaddr + GMAC_VLAN_TAG);
+> 
+> -	for (i = 0; i < timeout; i++) {
+> -		val = readl(ioaddr + GMAC_VLAN_TAG);
+> -		if (!(val & GMAC_VLAN_TAG_CTRL_OB))
+> -			return 0;
+> -		udelay(1);
+> +	ret = readl_poll_timeout(ioaddr + GMAC_VLAN_TAG, val,
+> +				 !(val & GMAC_VLAN_TAG_CTRL_OB),
+> +				 1000, 500000);
+> +	if (ret) {
+> +		netdev_err(dev, "Timeout accessing MAC_VLAN_Tag_Filter\n");
+> +		return -EBUSY;
+>  	}
+> 
+> -	netdev_err(dev, "Timeout accessing MAC_VLAN_Tag_Filter\n");
+> -
+> -	return -EBUSY;
+> +	return 0;
+>  }
+> 
+>  static int dwmac4_add_hw_vlan_rx_fltr(struct net_device *dev,
+> --
+> 2.34.1
+> 
 
