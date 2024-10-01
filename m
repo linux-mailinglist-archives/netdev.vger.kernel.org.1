@@ -1,126 +1,99 @@
-Return-Path: <netdev+bounces-130963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5BE498C3F3
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:52:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 111B598C3F5
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C46A1F240B9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:52:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB831F24098
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CD51C9ECE;
-	Tue,  1 Oct 2024 16:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2433A1CB508;
+	Tue,  1 Oct 2024 16:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kacD0SyN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LnDMWlTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CD4646;
-	Tue,  1 Oct 2024 16:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A74C646;
+	Tue,  1 Oct 2024 16:52:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727801546; cv=none; b=ClkslWeR1kHBDAqEgpjZF+pWRxm4+zCrKG9iFD827NceHuk9Uuz8gY3rIJgKKrVnG6u39Z/UELhUBQteVtga5yxUhTdG7pSgdVUoPinWTI8kFKkEKQbV6aeZr/a4U1Q8EobLDOLAo2VoorB7xGVFVmfCy7OaiK1bSnYDTns5gCM=
+	t=1727801569; cv=none; b=eyxY7441cFLKILGteuxGZc+Q24Es8//Mdi+9XvylpEakkz9CMQ41fp2BwilcpXadjIF1sYQjilQS2XgHuxhaYLwrf+RaMRy8RYZ3PhpgCuXYO4DW+U+Gl2oHJJSSyx1I4USbeexI46B9Lbp1J2fuWQMgtC902CfV4Xj95BNR2OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727801546; c=relaxed/simple;
-	bh=O8kM/T6VQqLQbAH1MWMkPU1BLFMr1RVAP4rN0s02mhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HXHrCFRK+dbSZPZQ/J0NoA0wDCrDkeLa002gXjvFq1HvWawEDnXWR4s8uDssER9B5rMO0mnYGDnQS4BYfJwt+FP5bFsVV24hG4SbDm4KpsOnRXqFbVgxnOnAW0OZ3RUIjJ6FsqjSIfbL43vQ6A7A7Vs4eNjHLVQ8+empMREqa8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kacD0SyN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC87EC4CED3;
-	Tue,  1 Oct 2024 16:52:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727801545;
-	bh=O8kM/T6VQqLQbAH1MWMkPU1BLFMr1RVAP4rN0s02mhY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kacD0SyNQ80uIodoXTzcKc2JX5cGyPiCGUzw6s0YxSi2CjAUrOHaktNh5rPZVX2Cf
-	 VLja/2UVw6qoDyVyDNLq8XVmEBDu1RyINYWTiWlFvUZ+4Qkq2yFWaEjo6hcsMZbzY5
-	 Uw1yrpgyoLQXA+SbRMm6dYf/blaC+peDqcEBrskjBKTjq4O3EFNBpvbA1nPJmmbWMc
-	 Ls1TNKKjycwbnTNvTEle44503QULCE4jERtX+tcXY06m7Lf0qFt6q8uDvJTa+9InRJ
-	 v3gc1QQ7n7xfiyMokQZJKOArrJAf9vAbVXVNmUMm2mnOoj+hYoBFr8V62z7YE98F7z
-	 6WeG2kl8ltEvQ==
-Date: Tue, 1 Oct 2024 17:52:19 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, michal.simek@amd.com, abin.joseph@amd.com,
-	u.kleine-koenig@pengutronix.de, elfring@users.sourceforge.net,
-	harini.katakam@amd.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, git@amd.com
-Subject: Re: [PATCH net-next 1/3] dt-bindings: net: emaclite: Add clock
- support
-Message-ID: <20241001-battered-stardom-28d5f28798c2@spud>
-References: <1727726138-2203615-1-git-send-email-radhey.shyam.pandey@amd.com>
- <1727726138-2203615-2-git-send-email-radhey.shyam.pandey@amd.com>
+	s=arc-20240116; t=1727801569; c=relaxed/simple;
+	bh=Z5kdJIZxkpOTDXg8fiU0gAk5yz630imYDW3eaP1oF+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NlelZOE5PUJ+wlw5ZpiMPPHqkSaqn+6jFnHzoM5IqxdPtfOa53DaxsXb3iHN26jaiqygEYkbZFlQgL55/wysKDFrETI83RR7SwtwfdT1rXqNDh6UoxW860xLjnLDrJWeh6UINTIZ73M9NJ6+MOzvdqcld7rsSqPW1ut3shOL65k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LnDMWlTE; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5398f62723eso472481e87.2;
+        Tue, 01 Oct 2024 09:52:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727801565; x=1728406365; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z5kdJIZxkpOTDXg8fiU0gAk5yz630imYDW3eaP1oF+c=;
+        b=LnDMWlTExWwcqml7+XyS/AQQ1PYpuCsVy2Oz7B9fIz1ZNyLCE6gGEoKseR4Jbzk8ev
+         eVXI8D+rePdn5VQaWigcTGXUaqamzvdbIhX36c5XMhhYDqJPxJH/BRobj3xUtiEQwRg4
+         7GP9y/IAcIL+q2k1mj8wQ+sdTngWBZMB9948fg8mMQoxThNb0Tj/WdouPAM0p4K5xRM9
+         ZUuh7hN0s+Jhn1c4qI3gGugvw0+FJILrn56MIDD2AB7YvN0tTQyfbJ7KZohjUwlO4zo3
+         v35cTUrtJ7hR/3Z0PKRxA9T664poEl0Vg54gHAk+AoaTjK2TCTRrHqHFdfaee05PvtrN
+         XvZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727801565; x=1728406365;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z5kdJIZxkpOTDXg8fiU0gAk5yz630imYDW3eaP1oF+c=;
+        b=a9ivjyIjf43lkPFqXLEu8Tno+IF7GqVYgMv6kQd2SdK/YEyIA9yHhaWl+cIJq1rSQC
+         ioAHydgwMs9sZTK4AYVQg9EME+ynGs5zo9fOKKRmYoWIAc38A/RlT3ukvueRJWPaK/6P
+         a5cCxnMS7NrZXlLhwO/bOD9BUAhaDONRuEHLEpTnMv7QmBWrnR1avVYsj/RJLnqj4qGC
+         8n53ntZ4yCubc4ug/eUR4yfB1dmB22BrbVLUVOHkWmKVRmu2+JCoioERn/h401IkusEK
+         P2zDOb75uiD4rUD8MMjbTx5nNqC4qgdNYYyIFonqDDNUlAfROwN+vmaA/JU8EopO34Jj
+         Xmww==
+X-Forwarded-Encrypted: i=1; AJvYcCUT9dkMJCLpA0r286LMtymgWoLETv/o0G/utS3+Hhsg8CyLS+4NK/YaIiiNEjcaqzmnEwXmqwY=@vger.kernel.org, AJvYcCW59gUpLketvvCB3kTYlCucZJJ5VXfs2sIKly6aftW1LXP6O+SO38vKyUogg44ydaTV7489AqJoGnzXCKwrrrg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmZKb089HeWgUbAOVt8CWrgZ1tLJpfFit5PZjJ9zzwGHYOugZR
+	le5e7o9GwtTeHavZXnuM3k2UwUW9oqz8+DfdKdPXMam0ME0s4e/aJdKAzyRbYFTIPfQoLe74FZa
+	0gboA4mQka+yzc6VpAqZq7eXzgC0=
+X-Google-Smtp-Source: AGHT+IGc8XJ1d7dB+/PNLfT88Hr1HD7DANKpeM8JhEpqh+dVkdk32NUV7lNuBSGaWflyr1inrlS9h4aUYGcrI1ycBnA=
+X-Received: by 2002:a2e:be1f:0:b0:2fa:c944:9ad1 with SMTP id
+ 38308e7fff4ca-2fae10b5964mr869251fa.11.1727801565141; Tue, 01 Oct 2024
+ 09:52:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="RQ7Mi1lo08Qqi5sg"
-Content-Disposition: inline
-In-Reply-To: <1727726138-2203615-2-git-send-email-radhey.shyam.pandey@amd.com>
-
-
---RQ7Mi1lo08Qqi5sg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240926121404.242092-1-fujita.tomonori@gmail.com>
+ <CANiq72nLzigkeGRw+cuw3t2v827u0AW8DD3Kw_JECi3p_+UTqQ@mail.gmail.com> <c4a0b7c3-f552-4234-9b7f-fce01f2b115b@lunn.ch>
+In-Reply-To: <c4a0b7c3-f552-4234-9b7f-fce01f2b115b@lunn.ch>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 1 Oct 2024 18:52:30 +0200
+Message-ID: <CANiq72==6J44DsHh7YOMoG_43QYErq64dHdtC++oJcZfbsDeHA@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: phy: qt2025: Fix warning: unused import DeviceId
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu, aliceryhl@google.com, 
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	kernel test robot <lkp@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 01, 2024 at 01:25:36AM +0530, Radhey Shyam Pandey wrote:
-> From: Abin Joseph <abin.joseph@amd.com>
->=20
-> Add s_axi_aclk AXI4 clock support and make clk optional to keep DTB
-> backward compatibility. Define max supported clock constraints.
+On Tue, Oct 1, 2024 at 6:36=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> It was marked for stable, so generally means it will get submitted to
+> Linus in a PR on Thursdays.
 
-Why was the clock not provided before, but is now?
-Was it automatically enabled by firmware and that is no longer done?
-I'm suspicious of the clock being made optional, but the driver doing
-nothing other than enable it. That reeks of actually being required to
-me.
+Thanks Andrew, that sounds perfect.
 
->=20
-> Signed-off-by: Abin Joseph <abin.joseph@amd.com>
-> Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-> ---
->  Documentation/devicetree/bindings/net/xlnx,emaclite.yaml | 3 +++
->  1 file changed, 3 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml b/D=
-ocumentation/devicetree/bindings/net/xlnx,emaclite.yaml
-> index 92d8ade988f6..8fcf0732d713 100644
-> --- a/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml
-> +++ b/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml
-> @@ -29,6 +29,9 @@ properties:
->    interrupts:
->      maxItems: 1
-> =20
-> +  clocks:
-> +    maxItems: 1
-> +
->    phy-handle: true
-> =20
->    local-mac-address: true
-> --=20
-> 2.34.1
->=20
-
---RQ7Mi1lo08Qqi5sg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZvwowwAKCRB4tDGHoIJi
-0vouAP9IqvWh1E3qUt438ZfMnQXb1mwXnrDkP/wXybmQ18nDAwD9FtCI+Njapmt2
-8f69L62OfMnwgP/1HSmAwSMxkZybRwA=
-=QW3P
------END PGP SIGNATURE-----
-
---RQ7Mi1lo08Qqi5sg--
+Cheers,
+Miguel
 
