@@ -1,108 +1,165 @@
-Return-Path: <netdev+bounces-130883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78EA98BDC2
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:32:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB13F98BDC6
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9B3C1C20BA6
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:32:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FD17289402
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362091C5791;
-	Tue,  1 Oct 2024 13:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525401C5783;
+	Tue,  1 Oct 2024 13:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcw8b4MJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GSSiOv69"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EE01C5789;
-	Tue,  1 Oct 2024 13:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E141C3F3F
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 13:32:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727789554; cv=none; b=oAWQQC4rwhFC6/fYDVCO+ECbqf/dkDT+o78p6liGEfC0rYxYs2/yef9RdR3K5cOVt5Kziqms/rTDDEZqUbh3WlYJ+rhEU+lBoeFDN3DF3KP7wgVESJIfXoHyZvlM4zJTl/W8OELyq6eHK8SD5kkOqTBVWsAzXpKYMz47Zf4SRj0=
+	t=1727789564; cv=none; b=HNM34JgW08S9a4Qmjwl+ZSO6YDoN95FQ/dvp5Lfq3VeQBA5+7s6fOBMOEJh20srgrJP6ubhyfrct09Gzuli0PO702eyYqRKGjihtD/dIuM3SllexPeqbhmznxLoclDt7yku2fTYmH+5PvYPMHI2IqHMf7BntXGhUfc205lraN8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727789554; c=relaxed/simple;
-	bh=2NrsjqMj3bFZZKByzA0JtBpTzL+rnZoKtA9F9HPNnbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MMtNA3SamQOetArvh3ntjx8zKITwW787fDprylKhNue38CW8IePq5Q36gJnhHerpQdCmmObNdahQpWGU/REZ1kLhElIV/+bulT/r7YCThYql5SCAQSI/XnZEuiu6skcUdlUad8icXQYei7zgtCD3K8DnyIOWWWgFu3Gb9pW1ZXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcw8b4MJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B198C4CEC6;
-	Tue,  1 Oct 2024 13:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727789553;
-	bh=2NrsjqMj3bFZZKByzA0JtBpTzL+rnZoKtA9F9HPNnbg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pcw8b4MJBja+e0QG2ktGaNnT3DoAe+R0G4Rkif2+HQEvWyzNKIZXBlkGKSHjVmDw1
-	 7Av+4/JVtTAEiyFdgJhlTy6Xq+ulWE1Ot7PK6x+P8RbZlJo7IpkF29uZsDzShr+dsU
-	 hUAKkmV6IxP3J/D7rGJCbgTjRdoOJqfKOD7l7ECfrJ6Ndd/DlLtA2dMndBS5ID+4CX
-	 +NtZILuSxcS8lw7HHUy2lCEnsIviZSmhz8y2dcjisaxlTN9FmTVVITZn10wx3sJ81D
-	 e1loR0kgmdhugHAudRt83qlFK06T85ND2a4Dwk8dqC4cZ0sRJNn15yECmEAajHolMm
-	 g7qI/Vut2ke6A==
-Date: Tue, 1 Oct 2024 14:32:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, jacob.e.keller@intel.com,
-	sd@queasysnail.net, chunkeey@gmail.com
-Subject: Re: [PATCH net-next 13/13] net: ibm: emac: mal: use devm for
- request_irq
-Message-ID: <20241001133229.GR1310185@kernel.org>
-References: <20240930180036.87598-1-rosenp@gmail.com>
- <20240930180036.87598-14-rosenp@gmail.com>
+	s=arc-20240116; t=1727789564; c=relaxed/simple;
+	bh=PKF8ZVEo8AmNwMLcEwYXeCfaLkhMxlQpxXFFSPA6ZXo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SmI5KV8Pu2jCS+XMU5KIJl+JtIFGlzqRDXOgq4EoBD4G/Yh627x3GYqL6Xue/zN/Ejj54gg7B1U1TJbDQv2p9OLjsYKwCAAKnoJEEn1oFykdKNuaBAVEO5+allj5NlMRs0CculDmewCX+C2D2CCRFEKO21uO6bWIAKrCtEKhnZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GSSiOv69; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727789561;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iojT1xfY/iXMYZ4HclXjt5wJyv9eCNn2RMRvon4kbuU=;
+	b=GSSiOv69fNEJVwQ+K86InxXSXuNnKs2jBvWLFV+Ti5gJlurZKFYaUQ/SXfKUgL9gtpi0tx
+	SOo9d1m91pGGgF+6dOwfB9KNX/TWKKkrA6DHWIxMiKGSTxjKO8saZ4vYORC8BbP7kSyIuX
+	e9SbSCkY6I6j8CTCPMrZvnr4ipbfyM4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-410-ePnUoUe8MZimOAtQkX73Hw-1; Tue, 01 Oct 2024 09:32:40 -0400
+X-MC-Unique: ePnUoUe8MZimOAtQkX73Hw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb236ad4aso31483075e9.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 06:32:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727789559; x=1728394359;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iojT1xfY/iXMYZ4HclXjt5wJyv9eCNn2RMRvon4kbuU=;
+        b=pYau9FodYeO5243CYR/8oAl0mYyjZ0d8pmFL4IAfizYfwpebFP1qP0/Nu6yfRuqeRA
+         yLj6lWsUXZEeU37TiASuwJ+wW787F72T5fGLOy3QkpzcvUk26moYCkhVV3jqef8/5sQf
+         mN5kEScoeJ2pOQaUm375Se3erbctC9RYwJ45IuX9hj0WIqX5BuaQPX4i0EP7J0XIZzT6
+         nqSpt4/0EaMVcOaQ8O+VYyS31RuDLx0f9+Yy9ZlI2bB6D6XGdfBDL6SK+wXmrQfrImcr
+         nVcj+365Ol9ciXx77d7HFl1Mn1N7c+Bn29LBNWvW66dkkZQLJkdEL+FKTgXsc+bJjUTZ
+         m5+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWbToTjRw2DHOjqjR0MuErMsObs9vQFByvPE4Mo6VmiNbT2fqJEvJMVjYtogY0oBWkJKwNbA/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFbacB/ob6g8zj2E/IheL3NvVqYv2f8KzSXyifC2YGU86vFZPj
+	7K0f1ObPz8FLsrZKOXS49iotaOSUHqhRKRh1+zrO88BAUcC/QsR14gR/KRUt3Zy++1bmLzwYqKW
+	IlmbB3uLUBB0hrAif35vAothvN7hrm9+UlazbUHDMud7lkyMIFuPBHg==
+X-Received: by 2002:a05:600c:a02:b0:426:66e9:b844 with SMTP id 5b1f17b1804b1-42f584339aemr130160425e9.8.1727789559082;
+        Tue, 01 Oct 2024 06:32:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGDiutjjZjFmvjKmZCcGrKni3t0abnQlYsETvEbcK9G6gugyRexKg3WBxo9lrKH5Dul5fJhqA==
+X-Received: by 2002:a05:600c:a02:b0:426:66e9:b844 with SMTP id 5b1f17b1804b1-42f584339aemr130159935e9.8.1727789558576;
+        Tue, 01 Oct 2024 06:32:38 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b088:b810::f71? ([2a0d:3341:b088:b810::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57e13a1dsm136324005e9.32.2024.10.01.06.32.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Oct 2024 06:32:37 -0700 (PDT)
+Message-ID: <4968c2ec-5584-4a98-9782-143605117315@redhat.com>
+Date: Tue, 1 Oct 2024 15:32:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240930180036.87598-14-rosenp@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+ Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>,
+ Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-mm@kvack.org
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-3-linyunsheng@huawei.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240925075707.3970187-3-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 30, 2024 at 11:00:36AM -0700, Rosen Penev wrote:
-> Avoids manual frees. Also replaced irq_of_parse_and_map with
-> platform_get_irq since it's simpler and does the same thing.
+On 9/25/24 09:57, Yunsheng Lin wrote:
+> Networking driver with page_pool support may hand over page
+> still with dma mapping to network stack and try to reuse that
+> page after network stack is done with it and passes it back
+> to page_pool to avoid the penalty of dma mapping/unmapping.
+> With all the caching in the network stack, some pages may be
+> held in the network stack without returning to the page_pool
+> soon enough, and with VF disable causing the driver unbound,
+> the page_pool does not stop the driver from doing it's
+> unbounding work, instead page_pool uses workqueue to check
+> if there is some pages coming back from the network stack
+> periodically, if there is any, it will do the dma unmmapping
+> related cleanup work.
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/ethernet/ibm/emac/mal.c | 47 ++++++++++++-----------------
->  1 file changed, 19 insertions(+), 28 deletions(-)
+> As mentioned in [1], attempting DMA unmaps after the driver
+> has already unbound may leak resources or at worst corrupt
+> memory. Fundamentally, the page pool code cannot allow DMA
+> mappings to outlive the driver they belong to.
 > 
-> diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-> index 70019ced47ff..449f0abe6e9e 100644
-> --- a/drivers/net/ethernet/ibm/emac/mal.c
-> +++ b/drivers/net/ethernet/ibm/emac/mal.c
-> @@ -578,15 +578,15 @@ static int mal_probe(struct platform_device *ofdev)
->  #endif
->  	}
->  
-> -	mal->txeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
-> -	mal->rxeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 1);
-> -	mal->serr_irq = irq_of_parse_and_map(ofdev->dev.of_node, 2);
-> +	mal->txeob_irq = platform_get_irq(ofdev, 0);
-> +	mal->rxeob_irq = platform_get_irq(ofdev, 1);
-> +	mal->serr_irq = platform_get_irq(ofdev, 2);
->  
->  	if (mal_has_feature(mal, MAL_FTR_COMMON_ERR_INT)) {
->  		mal->txde_irq = mal->rxde_irq = mal->serr_irq;
->  	} else {
-> -		mal->txde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 3);
-> -		mal->rxde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 4);
-> +		mal->txde_irq = platform_get_irq(ofdev, 3);
-> +		mal->rxde_irq = platform_get_irq(ofdev, 4);
->  	}
->  
->  	if (!mal->txeob_irq || !mal->rxeob_irq || !mal->serr_irq ||
+> Currently it seems there are at least two cases that the page
+> is not released fast enough causing dma unmmapping done after
+> driver has already unbound:
+> 1. ipv4 packet defragmentation timeout: this seems to cause
+>     delay up to 30 secs.
+> 2. skb_defer_free_flush(): this may cause infinite delay if
+>     there is no triggering for net_rx_action().
+> 
+> In order not to do the dma unmmapping after driver has already
+> unbound and stall the unloading of the networking driver, add
+> the pool->items array to record all the pages including the ones
+> which are handed over to network stack, so the page_pool can
+> do the dma unmmapping for those pages when page_pool_destroy()
+> is called. As the pool->items need to be large enough to avoid
+> performance degradation, add a 'item_full' stat to indicate the
+> allocation failure due to unavailability of pool->items.
 
-I think this error handing needs to be updated.
-platform_get_irq() returns either a non-zero IRQ number or
-a negative error value. It does not return zero.
+This looks really invasive, with room for potentially large performance 
+regressions or worse. At very least it does not look suitable for net.
 
-Flagged by Smatch.
+Is the problem only tied to VFs drivers? It's a pity all the page_pool 
+users will have to pay a bill for it...
 
-...
+/P
+
 
