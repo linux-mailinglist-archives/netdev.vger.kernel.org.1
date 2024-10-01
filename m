@@ -1,162 +1,168 @@
-Return-Path: <netdev+bounces-130763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8354598B6A5
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 10:20:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E801198B6DB
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 10:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3670B21F1A
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178091C221A4
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE32199FAB;
-	Tue,  1 Oct 2024 08:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3359A19AA5A;
+	Tue,  1 Oct 2024 08:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QMoaTJ9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF80199384
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 08:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77B119AA68;
+	Tue,  1 Oct 2024 08:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727770830; cv=none; b=uhClotBVsOqTKDrZTd91BhZBpw67FRHClx472JQpWPI/t0DCbcNaJdkmmjLHYYCN5dVJK5h6lPwFJYBEmDYxOdjlhp7UeZBRN65Ob45eePFS7cCusXcRsnKTMDxxwWHsg0F5UYIKO9Gzf+Myeeg19ioAddYUqdoRfsT0GvzWXkM=
+	t=1727771107; cv=none; b=aPARmixNbldVqAj5926VEBwBVsf6ETuHoWIirAqM7svJ196jehzWsi6b29UvWUZhTbvAS6Zu6AhgjLPYjiXWd/pxpwue5Qm/ZCdelIKzXul1gFf9aYglw4t/zZ8oXgKDD7ucp0uPqXdR8VM7ErR57KzVQRqZtMVaw6TGC58+4MY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727770830; c=relaxed/simple;
-	bh=6pccea5tGEEMoh3spQvBUQEtEzYzcwqRA6Z/ZGP9RKk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OqppNgEEWwBDsZDnKFNhGnbyYceCxYHtLM8C5xLpMJck1IVjieGmYEKifcbX1cTxrCK3FeLFDbITBcouSiX/iy9vP23M1AXZRChEm4HMjkJo5BjImY8gtC9lcmUYdwPyPUfPQNhhFGiHmxBmmQf3odx9EKalsiueHT9u+gkoaWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a343860e72so47952065ab.0
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 01:20:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727770828; x=1728375628;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XzCgJbhZEo7QF3CkxDHvrR5nHprz6iyBHM/+W9hffDo=;
-        b=cySFQlFLbfMqkJLN9Pxv/UfWjXlwc2UW12MFQa7EPGyxPbm7ORzp2w0pDKJSwZos85
-         8fHoNsXOmD+wYqRAqPeYjyv01hsYynUIKJ6endGuv4iBdQ7/yrv+d5K2VX1mGPnpLRNv
-         mHu6gkNakjBYr0lNCpXZ9M8cNoI5/Ftb6iUdO9s7Zgh/U2t7risACGSNEaqnpfscTxTE
-         1E+i+PpfNVeGfRevzlztOJllixCGHJGGMC4V1b5ZHmbzV0f5x4TDqEulNQcVYLrtJZYE
-         g6xWg0rrQPvDIho/VjWbDbm4tlg4dNONawGN5jt0ReOMdS1jP1ZVMDVJLTwrO5gIEeGJ
-         Yung==
-X-Forwarded-Encrypted: i=1; AJvYcCX+swXS23nBwNrIARMVQuipvjVmutzYfJ4p2aTy6VoiznQF9+bFaJrUlNIQkyDy7KR1V2vL6ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBbL31JVEr/u/e6empAvwGhdRP8vxqSq3hsVh0ds8KCXMJuRr1
-	eFfF6bYMLnWGevmYWYpGHUQqPWmgO4Fo5AVzQGZHhUzQ2mxUQDpG/gsNmUHRzR3ZaDmG86BWc0T
-	TgkQ4UwVQPxnVleaELsXPBbaR9z++LdDuf0dtbQbES/cNxY0bqa4OdSg=
-X-Google-Smtp-Source: AGHT+IH9kLLuspOitkF2xZ/LEoC1u4qY0tmQq+S7KgYremKIr+bAOydQHtSNGEoGPvo3znh4NaRIFhM1MIbgyty9bjIM+sssIfTc
+	s=arc-20240116; t=1727771107; c=relaxed/simple;
+	bh=b+AcDnEGb8LdEXd0c2T2qtZIELfJ7T27ILtRG0/kCLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u7hnjRJUgfQrEAQ+bcTqEkPtvezmGRX2KX1mu7QT+IkMiyU2HtYOr1FrAjMei/g771yke4Zu3DiLKEEnPmUSGs1gZKKprtzdD19u8shf2z4lP6/tQNccBEp89oCOOhIQ1GfJjm6yW0Xm3jVuCygmd0cjueTMpCTdl/PQe0OHZW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QMoaTJ9J; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727771106; x=1759307106;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=b+AcDnEGb8LdEXd0c2T2qtZIELfJ7T27ILtRG0/kCLY=;
+  b=QMoaTJ9J78MjSyZeDfQHUaoU7gY01h88x2c6hSjJNZ1rnkUf8bG7aF0t
+   /YepkoZIBGpcAH2FuWY/w01ZqEzQ/wTJUDk501SsXnOJwn0+ICk94q4FV
+   vIdfR4hkzMrXezvBIIRa4TPNfpSjDVX8K6BJP068mtkdLEyiBkZbagRYt
+   bj2DXbcykCwz1uPjhU2Yi97ofsicuJmgFZ5lLeyU1r/OoMHc1v6DDwWLf
+   +2vLqBTSBo0yzcPVAPFT+/jvvIA3FLRHfoYA36ZmXG0eaIXaLzUNpFLIo
+   Fb9AI9kxbg7qj6DENuKQpRPfxmor0HrVi3ky1tMlQ+uwBMA+DbElP3oc/
+   g==;
+X-CSE-ConnectionGUID: xIE4NqRjR3abZgNJtUlMfg==
+X-CSE-MsgGUID: kdDjTUy6T0WCNeZhJ5MlJA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="26346000"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="26346000"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 01:25:05 -0700
+X-CSE-ConnectionGUID: CmIVYcjpRQS3nt0Myd2/yQ==
+X-CSE-MsgGUID: wnSj9acpSn64b1C21OAnCw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="73995499"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 01 Oct 2024 01:25:02 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1svYBn-000QQd-1b;
+	Tue, 01 Oct 2024 08:24:59 +0000
+Date: Tue, 1 Oct 2024 16:24:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux-kernel@vger.kernel.org, jacob.e.keller@intel.com,
+	horms@kernel.org, sd@queasysnail.net, chunkeey@gmail.com
+Subject: Re: [PATCH net-next 09/13] net: ibm: emac: rgmii:
+ devm_platform_get_resource
+Message-ID: <202410011636.QtBtiUKi-lkp@intel.com>
+References: <20240930180036.87598-10-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fe7:b0:3a2:e9ff:255a with SMTP id
- e9e14a558f8ab-3a3451b4b6emr121435845ab.22.1727770828367; Tue, 01 Oct 2024
- 01:20:28 -0700 (PDT)
-Date: Tue, 01 Oct 2024 01:20:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66fbb0cc.050a0220.6bad9.0054.GAE@google.com>
-Subject: [syzbot] [net?] WARNING in xfrm_state_migrate
-From: syzbot <syzbot+e6afe0936b6cb8fae996@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240930180036.87598-10-rosenp@gmail.com>
 
-Hello,
+Hi Rosen,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    d505d3593b52 net: wwan: qcom_bam_dmux: Fix missing pm_runt..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=168e7e27980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b2d4fdf18a83ec0b
-dashboard link: https://syzkaller.appspot.com/bug?extid=e6afe0936b6cb8fae996
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on net-next/main]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-ibm-emac-remove-custom-init-exit-functions/20241001-020553
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240930180036.87598-10-rosenp%40gmail.com
+patch subject: [PATCH net-next 09/13] net: ibm: emac: rgmii: devm_platform_get_resource
+config: powerpc-fsp2_defconfig (https://download.01.org/0day-ci/archive/20241001/202410011636.QtBtiUKi-lkp@intel.com/config)
+compiler: powerpc-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241001/202410011636.QtBtiUKi-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0286a1cf90df/disk-d505d359.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b573fa96ab33/vmlinux-d505d359.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/cdd9993102ed/bzImage-d505d359.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410011636.QtBtiUKi-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e6afe0936b6cb8fae996@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 10812 at net/xfrm/xfrm_state.c:725 __xfrm_state_destroy net/xfrm/xfrm_state.c:725 [inline]
-WARNING: CPU: 1 PID: 10812 at net/xfrm/xfrm_state.c:725 xfrm_state_put include/net/xfrm.h:854 [inline]
-WARNING: CPU: 1 PID: 10812 at net/xfrm/xfrm_state.c:725 xfrm_state_migrate+0x130e/0x1870 net/xfrm/xfrm_state.c:1899
-Modules linked in:
-CPU: 1 UID: 0 PID: 10812 Comm: syz.3.1647 Not tainted 6.11.0-syzkaller-11503-gd505d3593b52 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__xfrm_state_destroy net/xfrm/xfrm_state.c:725 [inline]
-RIP: 0010:xfrm_state_put include/net/xfrm.h:854 [inline]
-RIP: 0010:xfrm_state_migrate+0x130e/0x1870 net/xfrm/xfrm_state.c:1899
-Code: e8 d7 76 a4 f7 e9 c4 ef ff ff 89 f9 80 e1 07 80 c1 03 38 c1 0f 8c 1f ef ff ff e8 2d 76 a4 f7 e9 15 ef ff ff e8 73 c4 3a f7 90 <0f> 0b 90 e9 cb fd ff ff e8 65 c4 3a f7 e9 ad fe ff ff 89 f9 80 e1
-RSP: 0018:ffffc900044d6db8 EFLAGS: 00010283
-RAX: ffffffff8a59f0cd RBX: 0000000000000001 RCX: 0000000000040000
-RDX: ffffc90009781000 RSI: 000000000000027e RDI: 000000000000027f
-RBP: 0000000000000001 R08: ffffffff8a59ee93 R09: 1ffff1100c09ea89
-R10: dffffc0000000000 R11: ffffed100c09ea8a R12: dffffc0000000000
-R13: ffff8880604f5400 R14: ffffc900044d7236 R15: ffff8880604f5800
-FS:  00007fdba7a3b6c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000100 CR3: 000000001b7c2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- xfrm_migrate+0x102c/0x25e0 net/xfrm/xfrm_policy.c:4623
- xfrm_do_migrate+0x9c8/0xba0 net/xfrm/xfrm_user.c:2979
- xfrm_user_rcv_msg+0x75b/0xa80 net/xfrm/xfrm_user.c:3315
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
- xfrm_netlink_rcv+0x79/0x90 net/xfrm/xfrm_user.c:3337
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2603
- ___sys_sendmsg net/socket.c:2657 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2686
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdba6b7dff9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fdba7a3b038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fdba6d35f80 RCX: 00007fdba6b7dff9
-RDX: 0000000000000000 RSI: 0000000020000100 RDI: 0000000000000005
-RBP: 00007fdba6bf0296 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fdba6d35f80 R15: 00007ffe98336f48
- </TASK>
+   drivers/net/ethernet/ibm/emac/rgmii.c: In function 'rgmii_probe':
+>> drivers/net/ethernet/ibm/emac/rgmii.c:229:21: error: implicit declaration of function 'devm_platform_get_resource'; did you mean 'platform_get_resource'? [-Wimplicit-function-declaration]
+     229 |         dev->base = devm_platform_get_resource(ofdev, 0);
+         |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~
+         |                     platform_get_resource
+>> drivers/net/ethernet/ibm/emac/rgmii.c:229:19: error: assignment to 'struct rgmii_regs *' from 'int' makes pointer from integer without a cast [-Wint-conversion]
+     229 |         dev->base = devm_platform_get_resource(ofdev, 0);
+         |                   ^
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+vim +229 drivers/net/ethernet/ibm/emac/rgmii.c
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+   215	
+   216	
+   217	static int rgmii_probe(struct platform_device *ofdev)
+   218	{
+   219		struct rgmii_instance *dev;
+   220	
+   221		dev = devm_kzalloc(&ofdev->dev, sizeof(struct rgmii_instance),
+   222				   GFP_KERNEL);
+   223		if (!dev)
+   224			return -ENOMEM;
+   225	
+   226		mutex_init(&dev->lock);
+   227		dev->ofdev = ofdev;
+   228	
+ > 229		dev->base = devm_platform_get_resource(ofdev, 0);
+   230		if (IS_ERR(dev->base)) {
+   231			dev_err(&ofdev->dev, "can't map device registers");
+   232			return PTR_ERR(dev->base);
+   233		}
+   234	
+   235		/* Check for RGMII flags */
+   236		if (of_property_read_bool(ofdev->dev.of_node, "has-mdio"))
+   237			dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+   238	
+   239		/* CAB lacks the right properties, fix this up */
+   240		if (of_device_is_compatible(ofdev->dev.of_node, "ibm,rgmii-axon"))
+   241			dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+   242	
+   243		DBG2(dev, " Boot FER = 0x%08x, SSR = 0x%08x\n",
+   244		     in_be32(&dev->base->fer), in_be32(&dev->base->ssr));
+   245	
+   246		/* Disable all inputs by default */
+   247		out_be32(&dev->base->fer, 0);
+   248	
+   249		printk(KERN_INFO
+   250		       "RGMII %pOF initialized with%s MDIO support\n",
+   251		       ofdev->dev.of_node,
+   252		       (dev->flags & EMAC_RGMII_FLAG_HAS_MDIO) ? "" : "out");
+   253	
+   254		wmb();
+   255		platform_set_drvdata(ofdev, dev);
+   256	
+   257		return 0;
+   258	}
+   259	
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
