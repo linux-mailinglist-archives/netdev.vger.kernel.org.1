@@ -1,153 +1,105 @@
-Return-Path: <netdev+bounces-131064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D901F98C74E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:06:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A3498C77D
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0977D1C2433F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:06:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D85F1F24E99
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0D11C9DDC;
-	Tue,  1 Oct 2024 21:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D95C1CDA0D;
+	Tue,  1 Oct 2024 21:22:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOmKvQks"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gw4tYrNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBACE1CBEB0;
-	Tue,  1 Oct 2024 21:06:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4903619C56F;
+	Tue,  1 Oct 2024 21:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727816770; cv=none; b=kgfEt58KVZAFlxnGtxTFM/i6IWN97Iu8mbJLMtwFVVMxksDpJbCnluImFAJCIa+e+Q/Dwmcid3YHGggrWOHVn35dNPsfVaQCXSko8QbH434HZuhpGDQlRF8GEPCi0gNm/eZVk3yOluG/evWTvVLUk8RGdjaiW8NGQ84V4EauoVg=
+	t=1727817728; cv=none; b=S8hCcuuKFYIbxjCBzFuWem++12ZXa5Rp2g/KlxeCk/4HQG+DpBZ4iN33xY+lz2YQsbQiRHw9nGnr+H9/K/IGVrJprlxxJb+jQi9nXRN0O/OazjBHUnVOBWroMVYQOyFKuKeGWh/UYa/n1wCsswhqvAMhXMmwnoXIR12wTCd8rOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727816770; c=relaxed/simple;
-	bh=ygVsFvqfx9mZQXXocJ3O3q1iH348nHEOpHOT4JrSZH4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nuhxegOonfIp7s4LawgNRWUibpYFS2Z8Mt1NrcrCJvpoQv9oVYAiWTR5tqK7KT0Reo74PTzBZqYYO1lsLUV2ShWCgvzy3Gj94Ls+N0LrcWT66nON3hp925MtggDRVZupNqzfkpvy+ptkGo4Z69+gOJwGoeM9xYmcEKKH8WD9Bp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOmKvQks; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1727817728; c=relaxed/simple;
+	bh=Xku+ewVbjAdfP5alpdNBBdLrAkTDbMgUZvHMC8NCgXc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qbf57VnY46Ke24YX0YjXAlogI/nhEBmA9eicgS0FsiCI8qQhCaYem3qm7zJX8vSwKhw5N+ufXYZlNxLruITeFJt70L9SyzmNZ8+/KZRhUiRwLTH3nkQnjMe3GSCWHL7CwB5D6/5lplIKbDO94/8bcbmyRKcwFnyX+4BfHhoWJYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gw4tYrNW; arc=none smtp.client-ip=209.85.215.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e053f42932so4429933a91.0;
-        Tue, 01 Oct 2024 14:06:08 -0700 (PDT)
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db908c9c83so3738244a12.2;
+        Tue, 01 Oct 2024 14:22:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727816768; x=1728421568; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vYzb86+HBfTUQ86IZPlyeCQbROixki8SUAKB5Xx3/rY=;
-        b=kOmKvQks1aXOORn5vCKuplGnTtn2D2mNPfTAsn/gTlSlhpAWyUhUPfomHObmUyVNvI
-         Wzr0+8qVOUE98Xl3zjM2tCqDqBaSjMNBWwiCp8+vCY+4cQhd5FH+ku4M2mEcotEsGhzV
-         iMrwUkYX40KqFIboOSFoqw0mBIsJh08cbF2pCZLLbtXtsWgIfoswUaYBpa9pcCsknh/k
-         9PVSjpRdfbiNNgeAReo4GkfA84zKQS6ynI7rv6YzVp2W9mnf9kKKweTNNdxesH02F5h6
-         ZahqWsVki/8vZunXztN0W5aXkOT+zGADkhrlpso0cqNqsebsq+FpK343905xbhpC0plQ
-         aQmQ==
+        d=gmail.com; s=20230601; t=1727817726; x=1728422526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZnZoVBLEmxHrNT3ELKQrHX/XVKYkXpaEPC6Ll206q2U=;
+        b=gw4tYrNW8srfzp5IDNbwYaarWm2qmofR6wwTEZiPlDYvomowDpYNwRCw27+bFtRggc
+         8DGTLVmteX1QGfNHydQdS9Nm/7Ae/8E2Q1NpcznsJMA5m59MPBgLgQXbt6xBNcqjkCKO
+         v2pmatCmLXS1X+bzb0rwfGkcgQ701hI3Q8XeFs+g+LQvhZ6qy04OMeoDILykzj3C9uNx
+         ddOihitBbC3wBeDBjXZGoTdTeigrzjGwgFjCRxiUrE3E2sm4fDyUwZkxLKRotAvTWQ+g
+         gKhHlJVoXlFdjqwZXQLWZt5R9c5Uixpax1H+GngKHia7tmPCGbIwJON3EII+9T8BX0SK
+         oxsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727816768; x=1728421568;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vYzb86+HBfTUQ86IZPlyeCQbROixki8SUAKB5Xx3/rY=;
-        b=RnwUfzodkfqPniq7WuPMwcjuxkdf8fgka6n6yKFwnQb1SAEMkFPPnG7tHZI1BOJMqb
-         Qac3gn9MjQKOxA/TuzINWcQgR7FcRoCf1u/LqKXm1Ugc2Px73r9STkYSA5iRuCEGHvlp
-         iRbRXiMYvH2BQGKv/H0SEXBdvwcHGhrrmQmy2OeQiuGDjV0y2kqoRDpJicRX2Hk1/B+K
-         odWY5d9CwujK2OyyJ2OZVr+TUsM2PjmVmHVHDh6t6sPoV+BS7pPWyToPYNmi123r5svm
-         JLms8LUfjmpPWj10G9JuJlcTbxzP38Gqa+r0lAe65ERLzBzS8+uQbq+L0SqgOp5pzf0V
-         s9mA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpD2ji8x1Lq3QfCOFbff464Fw7NkN/DYmwRqS0u/9oHFz66I14nMcwAI44PEOw0ZgMx00V+SXYEOFt@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+U+0lO+4E/ktbAzQXX2jN6vWSahALK9YySdHeXz1sUPWxwlFx
-	iL9rt6SaSW8LQnphSjfEbo9gJzztNQyNFPIjcDssKC1CdMPrnXCFF/bHw4uj
-X-Google-Smtp-Source: AGHT+IErW1wC9BZlImxpNZFZ7TsQmK11VWpuCbPmEbdh1elZMGjeMyETyeCAY8fsRXbgoRv2/uz9sg==
-X-Received: by 2002:a17:90b:3145:b0:2c9:6a38:54e4 with SMTP id 98e67ed59e1d1-2e1849d7a1fmr1028051a91.41.1727816768116;
-        Tue, 01 Oct 2024 14:06:08 -0700 (PDT)
-Received: from t14s.localdomain ([177.37.172.224])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18fa05062sm24377a91.42.2024.10.01.14.06.07
+        d=1e100.net; s=20230601; t=1727817726; x=1728422526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZnZoVBLEmxHrNT3ELKQrHX/XVKYkXpaEPC6Ll206q2U=;
+        b=a2WASAtXr6AxnbaW/W+/oHV0NssOluHbHingz9GOk1+a90gYFc6k+ZYbLTP9P/nj6i
+         xVw6fd0Flt91A7iVOqUlRKm4s4tAadzKuUM9YyO4u1jk9/xkQR8AISTTvhx/L99MBn0v
+         z8XBq3DzAb2um4bR1GFjSn4hDDBZx6nQ+9hg9s34MpXxXhBsAKnhaGIpoWCqnfXkd8G/
+         4Zs/AXbdMwXUtQ95gzeDbpaEFdFpeWrRTtUFhAt0aet7i7/nXdmLGwiRYfqt5qwVSyaA
+         x8Jhu0SNQS+5XfKpgEcw6g/MzQrgAphjD0UoaohvSeksB3M3yMLVtywneriZF6/lVgoA
+         rfpA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6iyhFe/wTYA0DJel/KyGRadxSPfjfz8qg5AtweDpYTRitEZeEcunFwWIR7Y7x5H88E7uaIgdQ/CEGtEY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOawVqZQwf4Rv4QmJtewm9Vj7Fp380M5xeW8pjl/Z6VAqvsYVD
+	/022OjvfUYAE19tsQkrTK9xGUkNmbLhXgaO+cEm95b3i2z9j2dlwWh1YU/Tt
+X-Google-Smtp-Source: AGHT+IHZgqukkD73SYwu4XSvqLdRQdSIe013tGvmUN4qe530b2xqW7/sQDDxsomcsBYYcaDBm4t0GA==
+X-Received: by 2002:a17:90a:d502:b0:2e0:7076:8155 with SMTP id 98e67ed59e1d1-2e184531dfamr1234920a91.8.1727817726377;
+        Tue, 01 Oct 2024 14:22:06 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f8a731asm47144a91.34.2024.10.01.14.22.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 14:06:07 -0700 (PDT)
-Received: by t14s.localdomain (Postfix, from userid 1000)
-	id 9D0CCD2D3BE; Tue,  1 Oct 2024 18:06:03 -0300 (-03)
-Date: Tue, 1 Oct 2024 18:06:03 -0300
-From: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] sctp: set sk_state back to CLOSED if autobind fails
- in sctp_listen_start
-Message-ID: <ZvxkO_lg6xfkim1m@t14s.localdomain>
-References: <a93e655b3c153dc8945d7a812e6d8ab0d52b7aa0.1727729391.git.lucien.xin@gmail.com>
- <ZvxKVpfDhuYIyXll@t14s.localdomain>
- <CADvbK_cPTb6YgmSvh=3TpNyYzkZLGP8dv95dHKD5JwpvjxUQhg@mail.gmail.com>
+        Tue, 01 Oct 2024 14:22:06 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	claudiu.manoil@nxp.com
+Subject: [PATCH net-next 0/6] gianfar cleanups
+Date: Tue,  1 Oct 2024 14:21:58 -0700
+Message-ID: <20241001212204.308758-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADvbK_cPTb6YgmSvh=3TpNyYzkZLGP8dv95dHKD5JwpvjxUQhg@mail.gmail.com>
 
-On Tue, Oct 01, 2024 at 03:41:23PM -0400, Xin Long wrote:
-> On Tue, Oct 1, 2024 at 3:15 PM Marcelo Ricardo Leitner
-> <marcelo.leitner@gmail.com> wrote:
-> >
-> > On Mon, Sep 30, 2024 at 04:49:51PM -0400, Xin Long wrote:
-> > > In sctp_listen_start() invoked by sctp_inet_listen(), it should set the
-> > > sk_state back to CLOSED if sctp_autobind() fails due to whatever reason.
-> > >
-> > > Otherwise, next time when calling sctp_inet_listen(), if sctp_sk(sk)->reuse
-> > > is already set via setsockopt(SCTP_REUSE_PORT), sctp_sk(sk)->bind_hash will
-> > > be dereferenced as sk_state is LISTENING, which causes a crash as bind_hash
-> > > is NULL.
-> > >
-> > >   KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> > >   RIP: 0010:sctp_inet_listen+0x7f0/0xa20 net/sctp/socket.c:8617
-> > >   Call Trace:
-> > >    <TASK>
-> > >    __sys_listen_socket net/socket.c:1883 [inline]
-> > >    __sys_listen+0x1b7/0x230 net/socket.c:1894
-> > >    __do_sys_listen net/socket.c:1902 [inline]
-> > >
-> > > Fixes: 5e8f3f703ae4 ("sctp: simplify sctp listening code")
-> > > Reported-by: syzbot+f4e0f821e3a3b7cee51d@syzkaller.appspotmail.com
-> > > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > > ---
-> > >  net/sctp/socket.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> > > index 32f76f1298da..078bcb3858c7 100644
-> > > --- a/net/sctp/socket.c
-> > > +++ b/net/sctp/socket.c
-> > > @@ -8557,8 +8557,10 @@ static int sctp_listen_start(struct sock *sk, int backlog)
-> > >        */
-> > >       inet_sk_set_state(sk, SCTP_SS_LISTENING);
-> > >       if (!ep->base.bind_addr.port) {
-> > > -             if (sctp_autobind(sk))
-> > > +             if (sctp_autobind(sk)) {
-> > > +                     inet_sk_set_state(sk, SCTP_SS_CLOSED);
-> > >                       return -EAGAIN;
-> > > +             }
-> > >       } else {
-> > >               if (sctp_get_port(sk, inet_sk(sk)->inet_num)) {
-> > >                       inet_sk_set_state(sk, SCTP_SS_CLOSED);
-> >
-> > Then AFAICT the end of the function needs a patch as well, because it
-> > returns what could be an error directly, without undoing this:
-> >
-> >         WRITE_ONCE(sk->sk_max_ack_backlog, backlog);
-> >         return sctp_hash_endpoint(ep);
-> > }
-> >
-> Right, but this is another issue and won't cause a crash, and the fix will
-> need a different "Fixes:". I think we should fix it in a separate patch.
+Mostly devm adjustments and bugfixes along the way.
 
-Makes sense. Thx.
+Rosen Penev (6):
+  net: gianfar: use devm_alloc_etherdev_mqs
+  net: gianfar: remove free_gfar_dev
+  net: gianfar: allocate queues with devm
+  net: gianfar: use devm for register_netdev
+  net: gianfar: use devm for request_irq
+  net: gianfar: use devm for of_iomap
 
-Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+ drivers/net/ethernet/freescale/gianfar.c | 158 +++++------------------
+ 1 file changed, 35 insertions(+), 123 deletions(-)
+
+-- 
+2.46.2
+
 
