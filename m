@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-130719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F26FD98B4B9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:43:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4205198B4EA
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55F11F245B2
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:43:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF442B23AA4
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAA91BC085;
-	Tue,  1 Oct 2024 06:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144F21990D7;
+	Tue,  1 Oct 2024 06:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MvD/970v"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ty5VVpuB";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="U/3H1QsN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D52A1BC070;
-	Tue,  1 Oct 2024 06:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4F063D;
+	Tue,  1 Oct 2024 06:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727765008; cv=none; b=f6S1N/WSa/CzY9dl98Z7MUkbBJpfl+Iyik/boYpuCCm20OBmD48j+rpmNJb5Es3gd4DlTpwJECbHgw6KQbrWaeorieMhvDPdJwFs7Fv57lXSVKKFq3DrDf0K9qNycmCjttFc8bT+n4+4HkrcXWT/4ijoS7xssq0E/BoDiS5WXMo=
+	t=1727765561; cv=none; b=nLzRpiQnj9pcqcy26oYDQ6keWIg28zptcaQU9AVvDtYarAZmSd06T6FUCOAvC8z2RzW5veUkL0l0ATOG13Sh7vefN5uSZ+eTUntdruoyusbFfziD9+kHWjaiuL19PP7Fux/IpWnvF1mU3IIHGGRqpKfBrpBNsCI9R0MhNDMsSAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727765008; c=relaxed/simple;
-	bh=Eqh7CxsxMbg7lUiyrHXHF4V+hK92QACWu7JR6SctAD8=;
+	s=arc-20240116; t=1727765561; c=relaxed/simple;
+	bh=Ah2Eb/fQPhPHoG6yxtGmV1GmMXxGOMtQgibGTHc6gXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m0fpUlw1YSXOIEq75oPrctNE2JOHP5FpizeXJUMBxrEA+kants2hx6VeXQL/4W4KrwsmKMq6z9IqISqrUSJq8D9SgtP9Zi/OMi9JwAxu2/TG3Jx1xLF99jcYnPTJtZ+aO2acJ06GuHi9A1m07AIr5E9yO1cxzxayU90rKuouToQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MvD/970v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE9C5C4CEC6;
-	Tue,  1 Oct 2024 06:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727765008;
-	bh=Eqh7CxsxMbg7lUiyrHXHF4V+hK92QACWu7JR6SctAD8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MvD/970vL0gcr+2EgNHBWQ3lL2ODJbQnge8+5weu42T/rJETaaTI84Umy4MKaar3+
-	 qKFLsMxIuoUJVsOXRemnpCLlq8FOADhkFNYiFKOt6g5ARxmKidqJ5oWa0HK1dVpvbC
-	 j1G7VmCF4ktJPGtkGC8P3u9Yw0aj5yzMU0fFsLDkaQtCNocTei+AV9ZOXOGM04/RRJ
-	 VEytpnuvUTnsSnKnb/py5Z51Cl/XOO5vmrbduTIhxZiXKXBI+RHV+KgqWrl3D5HXIO
-	 jSopVzWuxFZYPZH1m4EgkS0dfLyZN1288bJp2rHGv4eLSYLuAXvNhgrVcRxF+RJSNM
-	 6OhnY7kd2ToIg==
-Date: Tue, 1 Oct 2024 08:43:23 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, 
-	Dragan Cvetic <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
-	Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, 
-	Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v6 1/7] dt-bindings: reset: microchip,rst: Allow to
- replace cpu-syscon by an additional reg item
-Message-ID: <emcl3vfclrmy273kknsakpqpzolvo5vohrjnw64ml3op4dwzvu@lwqfgc7jxxzq>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
- <20240930121601.172216-2-herve.codina@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pj3I2JA0QUUMkGTjs50URnnVP9GVvpWfSq3XjM5YO1FmjGa5H/lfza8jDRa69N0eG/OHTwuW9ZKf/NIkF/lj4xJxCoiwhjnfMBv/Ayia3c3tysc1R4VFwcXWX+XNUHmXnQB3Rui18t7mCIVOsK+K3ctL2G1DNVAVKSnmiodIj4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ty5VVpuB; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=U/3H1QsN; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 1 Oct 2024 08:52:35 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1727765557;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mV+B6cZhN3L3FUa1yf53suZCT9wy5aqHL2vlaFhfBPg=;
+	b=Ty5VVpuB1RPEZXpvBVgQQJUwE/Ln3pfcFcP65/N49x+4veKqs3Nkfylsej6JeuDc9/DNpD
+	vdbpN2XULV+BJAAbozuKZF6H0PpmlZm0uPh5hPUmKHardRBkYmAChiFmwR7vNLoWslepG+
+	i3Vt/nB3SB+utwjsfN7bRqYih2nHMK9n18cxwL8MEQT9xrvM+OkeuRq/a96xQMNNS2vyCJ
+	Kl9vivEnfaauLSC0+sXX2lyyvPDcsICJhNusj13TaPuap39SWrW8pACLYBluCUD4DUU+84
+	pLzQPre8oxoX3xb/isMRas+WM6gTa09sdr67gW6/2aOyBycezMdeyl4LKGQVZQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1727765557;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mV+B6cZhN3L3FUa1yf53suZCT9wy5aqHL2vlaFhfBPg=;
+	b=U/3H1QsN8lq4vWXTOTQSNgNh0k4kLo4iVtDAY0nDmjw5h03UdqLGiwPVKZLt0NGwzr6hGA
+	RtfIzlxFf+6lT8BA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+	Brett Creeley <bcreeley@amd.com>
+Subject: Re: [PATCH net] doc: net: napi: Update documentation for
+ napi_schedule_irqoff
+Message-ID: <20241001065235.Ka2p3AtB@linutronix.de>
+References: <20240930153955.971657-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,103 +72,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240930121601.172216-2-herve.codina@bootlin.com>
+In-Reply-To: <20240930153955.971657-1-sean.anderson@linux.dev>
 
-On Mon, Sep 30, 2024 at 02:15:41PM +0200, Herve Codina wrote:
-> In the LAN966x PCI device use case, syscon cannot be used as syscon
-> devices do not support removal [1]. A syscon device is a core "system"
-> device and not a device available in some addon boards and so, it is not
-> supposed to be removed.
-
-That's not accurate. syscon is our own, Linux term which means also
-anything exposing set of registers.
-
-If you need to unload syscons, implement it. syscon is the same resource
-as all others so should be handled same way.
-
+On 2024-09-30 11:39:54 [-0400], Sean Anderson wrote:
+> Since commit 8380c81d5c4f ("net: Treat __napi_schedule_irqoff() as
+> __napi_schedule() on PREEMPT_RT"), napi_schedule_irqoff will do the
+> right thing if IRQs are threaded. Therefore, there is no need to use
+> IRQF_NO_THREAD.
 > 
-> In order to remove the syscon device usage, allow the reset controller
-> to have a direct access to the address range it needs to use.
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 
-So you map same address twice? That's not good, because you have no
-locking over concurrent register accesses.
+Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-> 
-> Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1]
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  .../bindings/reset/microchip,rst.yaml         | 35 ++++++++++++++++++-
->  1 file changed, 34 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/reset/microchip,rst.yaml b/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-> index f2da0693b05a..5164239a372c 100644
-> --- a/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-> +++ b/Documentation/devicetree/bindings/reset/microchip,rst.yaml
-> @@ -25,12 +25,16 @@ properties:
->        - microchip,lan966x-switch-reset
->  
->    reg:
-> +    minItems: 1
->      items:
->        - description: global control block registers
-> +      - description: cpu system block registers
->  
->    reg-names:
-> +    minItems: 1
->      items:
->        - const: gcb
-> +      - const: cpu
->  
->    "#reset-cells":
->      const: 1
-> @@ -39,12 +43,29 @@ properties:
->      $ref: /schemas/types.yaml#/definitions/phandle
->      description: syscon used to access CPU reset
->  
-> +allOf:
-> +  # Allow to use the second reg item instead of cpu-syscon
-> +  - if:
-> +      required:
-> +        - cpu-syscon
-> +    then:
-> +      properties:
-> +        reg:
-> +          maxItems: 1
-> +        reg-names:
-> +          maxItems: 1
-> +    else:
-> +      properties:
-> +        reg:
-> +          minItems: 2
-> +        reg-names:
-> +          minItems: 2
-> +
->  required:
->    - compatible
->    - reg
->    - reg-names
->    - "#reset-cells"
-> -  - cpu-syscon
->  
->  additionalProperties: false
->  
-> @@ -57,3 +78,15 @@ examples:
->          #reset-cells = <1>;
->          cpu-syscon = <&cpu_ctrl>;
->      };
-> +
-> +    /*
-> +     * The following construction can be used if the cpu-syscon device is not
-> +     * present. This is the case when the LAN966x is used as a PCI device.
-> +     */
-> +    reset-controller@22010008 {
-> +        compatible = "microchip,lan966x-switch-reset";
-> +        reg = <0xe200400c 0x4>,
-> +              <0xe00c0000 0xa8>;
+Thanks for docs update.
 
-If you have here CPU address, then syscon device is present...
-
-Best regards,
-Krzysztof
-
+Sebastian
 
