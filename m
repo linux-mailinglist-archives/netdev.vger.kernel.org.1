@@ -1,222 +1,145 @@
-Return-Path: <netdev+bounces-130703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5BE498B3ED
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:54:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED5998B3FB
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:00:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6358A1F23425
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 05:54:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C32B5B22C15
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B7A1BBBD3;
-	Tue,  1 Oct 2024 05:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A561B1422;
+	Tue,  1 Oct 2024 06:00:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ukDHPS0t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OA+RgESP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BAC1BB6BC
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 05:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA10B3201;
+	Tue,  1 Oct 2024 06:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727762077; cv=none; b=DkzEgHqjBRXg9ZsRlvCyoxofXsUtWXGxBBjwd8hF/G6HeMruW5HdhLouozDOgWPwPvh4/kCLXz5RbdbcvULfs9noY9rAc2BMS3I72UrTpp7/9sM6udxFGsDbMrBD3MnmRO9JPQV5ybAlkS2QPDVe4k2vlazOKmlI6Xe+6b5HSRU=
+	t=1727762447; cv=none; b=S3rgmk1NRUYbTK80pJEBHhoJeer/Vy00a1scr6uTYobTo7bvUiRFz3YHqolvjgxWfJTSxLSGZeW0NwEne2+t4hsIHwnFjeU9l8cCc7d3rFzqPnBvDUrj2a5UMmpsdT5okaQwwi+VS3oIznPlI1TVc56DXQu2gol63Ptc+4bCjtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727762077; c=relaxed/simple;
-	bh=jwGSkO56afJU1ZykB3f/IrdDpZ6b9CUjy6ikv5vxw2U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QsXGqUNBFe8KRiW1MFp+ZB98Mtv/X8CYZuXNbm0/stCg4YQnBclP5LcKC7lfeAI9lXsyiixEiml10pBQf2uKE0iluiKZopsSB0LrQHAMLawN7tHHX3hAyVVE7HRAUMPx/w25oX+O5W3EERSdomhU2XK+DLFZKrm6Ut+MTs+fv9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ukDHPS0t; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20b90ab6c19so16200935ad.0
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 22:54:35 -0700 (PDT)
+	s=arc-20240116; t=1727762447; c=relaxed/simple;
+	bh=celzY8OV4GMmy/RwTNyebjUESHinD4fwKxA7pGOfvoU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nJkkX78gKrZP0lkql3lMSejC9OAGYS29ZQ6eugdA6cM76xP2OoVH1RncWT+wWLF5MB9F9qiwgD0N3loLQVTQ5HBz6xPXNSGx09hUybNJXOjtDROWlyy2EvkSaQPv450HjnvgXixSv6hnoOgqk6Gxh3bZcOzsNtr8cllumYXmP9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OA+RgESP; arc=none smtp.client-ip=209.85.214.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-20ba9f3824fso5077795ad.0;
+        Mon, 30 Sep 2024 23:00:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727762075; x=1728366875; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GW6JKIMSJkoy7ESOeaiL6uJ49rRhUcpJss1NlSyIBZo=;
-        b=ukDHPS0tpA5ik3e06H83dlUdD1y9rAadF8h51l8S+cQjflbKasMRqWTYWRCl2a0/kO
-         NQOls3IE2N3+8VKfS3WynlCm7CjcrsbUaTSsx/k1W23z74fDZ/j6PvJw7rn5gVdo9CP4
-         c+vJ5/Nh8O0DIwvoNv+jq5ZDEO2yFlsH+ImmYMWsDWRJRME8+kbUSQ+kneUDCLInal3/
-         O/9rj6dfGAgNZAZtQYtd+zbojcczdi0Ozuo3sS8RaHvkbtV1DsmuEK8OVqrNHQwFHTy+
-         n7EhpWzmOrtKfdkwDlqZLsHh8ESOiCh5dZP45GAtpLavPdvwUcvE2l/3EWtBCOQV4Mgx
-         Mdvg==
+        d=gmail.com; s=20230601; t=1727762445; x=1728367245; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=KYn484j8l4FCD86Dl+kKDGHdgRbar+9TjSd1oUL2FFI=;
+        b=OA+RgESPelSiZUnaRnTHjYdyF2QSeZ1buauOmlg2M9+/8vi7j/gXp7MeorCsU4YUyh
+         jw85mc6gDaxOYX9EXoYFNnodSNJMNQvLBDnEhYo6EdEwVczRe06rjjF5dYpwmttgjwcY
+         39ymBNxeOj86y9VqB/tdqT4qUx93i6vGsItE6O7Iq/6bof7gI28J+KnOralm06udR+kp
+         esmb40QaW9JJwS/uVKIDkEbmTN7e4mfAODNMsNNdMVLgT+EKfX5PWzt0shRJhoP5p9si
+         UJsl9XnUtlizoct0e/U1CFTGHzW2R19wZ5NaqEzT2jx2e6fNoGXo2RaZXVnU4Fa4M/kx
+         BU1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727762075; x=1728366875;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GW6JKIMSJkoy7ESOeaiL6uJ49rRhUcpJss1NlSyIBZo=;
-        b=wxPscytDj0Y73jakGUjEqq2cKpnZqaw1Cr6NSKjmHh0IaVaDN5Yi6oGvlbS2kFJrYU
-         GPV9v+153zrNlEqqcICpzLNRHFDB8d0sBoaEwpuSjXMVVHN4mj3Tgt0CyQ4q6uJnNSBr
-         YyQXpT7hlQV6s+hRYWlJ/nzCRu8QVnTNBOazQ++bqLmVhX0IEIvz/XosMYgU7TZCeG3x
-         07FwIuTcGiLyu0cbuUIGZZz6lpYkbh/BJkZBxiT4nEsNocxS26FdHnNhDlVZaqEqQySw
-         GyQ+mkm4sDzlyuz38j7VfNOZv1cqCFeJ+SmsVaouOKMQ1BUlCS39WO9G+dZ0PmCSaPWC
-         85kA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkFeo0JptjPmnQzl+nPrtSnSRXOb5rJNqQufqHm3FvIzR8oL6mdwXS0TadmuHg3rnqmJzh2ws=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBTF3Fv4zYuIMb+xXDUXMJPtC0RjEHZcOiIuIqEWLHbxDkgbtA
-	j0jsQyxX3UbT4kEXLVbpx0JDpdDTrQMu7+LmhXiRjfdZVzftGwdiYVSR0JfT+lk=
-X-Google-Smtp-Source: AGHT+IFhIsPLEQ/TcepiVOkMJKIDjkaQae3ulnJtI9h3ifP3aAnGkfCXTch2f3Cv0L6+buDt1VANcQ==
-X-Received: by 2002:a17:902:c40b:b0:205:968b:31ab with SMTP id d9443c01a7336-20b37bcacf4mr225656085ad.58.1727762074890;
-        Mon, 30 Sep 2024 22:54:34 -0700 (PDT)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e4efdasm63400305ad.252.2024.09.30.22.54.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2024 22:54:34 -0700 (PDT)
-Message-ID: <f437d2d6-e4a2-4539-bd30-f312bbf0eac8@daynix.com>
-Date: Tue, 1 Oct 2024 14:54:29 +0900
+        d=1e100.net; s=20230601; t=1727762445; x=1728367245;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KYn484j8l4FCD86Dl+kKDGHdgRbar+9TjSd1oUL2FFI=;
+        b=i6ci5fIP4VEOcp1Vk/NRHWrXck6E0VzU8yf74dPzhP/OGoDRL8qz4NGCb/nRv8Owh9
+         g+vLzumweD6FdVK47TSP6WH03UDEbUlGS8hbQw+YgLWamAJWj3+cqhw4clW5VxWb9D68
+         EJSU3K2dGlo14+AS0ibiK23CCwBluOxOZfJ2AAm+dJ6EXghxx+yCK5SGKrr2Sg09ZNqQ
+         tThVdW4wm+Dlowxqn6zTQfAl/XETcU5FkIEvJzvV2cE1jDj3w3pC3h5eRr9c09QSEYI/
+         2I4OkG0iIgAFA1P1eJrkSA0NBFwgxCt0mEQl6x7EbuHB8I+R+FHYuEteACCw7c1kFKD2
+         5vYg==
+X-Forwarded-Encrypted: i=1; AJvYcCVdfhcyirLMk6rrM+fE31XaYzfyvboGlt4YkGkjePqbkqsz1avBhd+zYpKgzF2YopefvIJYgyu6@vger.kernel.org, AJvYcCWQO//L+BacUNrSLzKMqzZII8rG4MAdJOrMb1TEgfaH8diTk9DEglIIHlfEVB8j2ZD/s/4=@vger.kernel.org, AJvYcCWTR1n9T6c4hmRTLPVIHy6FGzpM5vGKxUQV/LEsWxbe/5MB35U0Wow1q9liRwI10fL3a+/k11D+cITzlbNd@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFXM90SX8KuRIpuoC5RCW/GR4YIpM5F7ZqBJM+Jk43/gvt58S5
+	XYnyvqAdpusqgNrnoNnpKXT461E0my9pS8yzfId1YAsGLWTQkyRU
+X-Google-Smtp-Source: AGHT+IH1pKSJeJiEgVfFv68wIuaVvU4tg1Wi7Zm+7o/jsbQlnUC62A5cd4JrjlSUdWHwg83V4X9CWQ==
+X-Received: by 2002:a17:903:947:b0:20b:5ea2:e04 with SMTP id d9443c01a7336-20b5ea21240mr139933675ad.27.1727762444940;
+        Mon, 30 Sep 2024 23:00:44 -0700 (PDT)
+Received: from localhost.localdomain ([43.129.25.208])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c4bc46sm9055950a91.7.2024.09.30.23.00.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2024 23:00:44 -0700 (PDT)
+From: Menglong Dong <menglong8.dong@gmail.com>
+X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
+To: edumazet@google.com,
+	atenart@kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	dongml2@chinatelecom.cn,
+	bigeasy@linutronix.de,
+	toke@redhat.com,
+	idosch@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net-next 0/7] net: ip: add drop reasons to input route
+Date: Tue,  1 Oct 2024 13:59:58 +0800
+Message-Id: <20241001060005.418231-1-dongml2@chinatelecom.cn>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC v4 0/9] tun: Introduce virtio-net hashing feature
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Jason Wang <jasowang@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>, gur.stavi@huawei.com
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
- <CACGkMEvMuBe5=wQxZMns4R-oJtVOWGhKM3sXy8U6wSQX7c=iWQ@mail.gmail.com>
- <c3bc8d58-1f0e-4633-bb01-d646fcd03f54@daynix.com>
- <CACGkMEu3u=_=PWW-=XavJRduiHJuZwv11OrMZbnBNVn1fptRUw@mail.gmail.com>
- <6c101c08-4364-4211-a883-cb206d57303d@daynix.com>
- <CACGkMEtscr17UOufUtyPp1OvALL8LcycpbRp6CyVMF=jYzAjAA@mail.gmail.com>
- <447dca19-58c5-4c01-b60e-cfe5e601961a@daynix.com>
- <20240929083314.02d47d69@hermes.local>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20240929083314.02d47d69@hermes.local>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2024/09/30 0:33, Stephen Hemminger wrote:
-> On Sun, 29 Sep 2024 16:10:47 +0900
-> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
-> 
->> On 2024/09/29 11:07, Jason Wang wrote:
->>> On Fri, Sep 27, 2024 at 3:51 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2024/09/27 13:31, Jason Wang wrote:
->>>>> On Fri, Sep 27, 2024 at 10:11 AM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> On 2024/09/25 12:30, Jason Wang wrote:
->>>>>>> On Tue, Sep 24, 2024 at 5:01 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>>>
->>>>>>>> virtio-net have two usage of hashes: one is RSS and another is hash
->>>>>>>> reporting. Conventionally the hash calculation was done by the VMM.
->>>>>>>> However, computing the hash after the queue was chosen defeats the
->>>>>>>> purpose of RSS.
->>>>>>>>
->>>>>>>> Another approach is to use eBPF steering program. This approach has
->>>>>>>> another downside: it cannot report the calculated hash due to the
->>>>>>>> restrictive nature of eBPF.
->>>>>>>>
->>>>>>>> Introduce the code to compute hashes to the kernel in order to overcome
->>>>>>>> thse challenges.
->>>>>>>>
->>>>>>>> An alternative solution is to extend the eBPF steering program so that it
->>>>>>>> will be able to report to the userspace, but it is based on context
->>>>>>>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
->>>>>>>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
->>>>>>>> and vhost_net).
->>>>>>>>   
->>>>>>>
->>>>>>> I wonder if we could clone the skb and reuse some to store the hash,
->>>>>>> then the steering eBPF program can access these fields without
->>>>>>> introducing full RSS in the kernel?
->>>>>>
->>>>>> I don't get how cloning the skb can solve the issue.
->>>>>>
->>>>>> We can certainly implement Toeplitz function in the kernel or even with
->>>>>> tc-bpf to store a hash value that can be used for eBPF steering program
->>>>>> and virtio hash reporting. However we don't have a means of storing a
->>>>>> hash type, which is specific to virtio hash reporting and lacks a
->>>>>> corresponding skb field.
->>>>>
->>>>> I may miss something but looking at sk_filter_is_valid_access(). It
->>>>> looks to me we can make use of skb->cb[0..4]?
->>>>
->>>> I didn't opt to using cb. Below is the rationale:
->>>>
->>>> cb is for tail call so it means we reuse the field for a different
->>>> purpose. The context rewrite allows adding a field without increasing
->>>> the size of the underlying storage (the real sk_buff) so we should add a
->>>> new field instead of reusing an existing field to avoid confusion.
->>>>
->>>> We are however no longer allowed to add a new field. In my
->>>> understanding, this is because it is an UAPI, and eBPF maintainers found
->>>> it is difficult to maintain its stability.
->>>>
->>>> Reusing cb for hash reporting is a workaround to avoid having a new
->>>> field, but it does not solve the underlying problem (i.e., keeping eBPF
->>>> as stable as UAPI is unreasonably hard). In my opinion, adding an ioctl
->>>> is a reasonable option to keep the API as stable as other virtualization
->>>> UAPIs while respecting the underlying intention of the context rewrite
->>>> feature freeze.
->>>
->>> Fair enough.
->>>
->>> Btw, I remember DPDK implements tuntap RSS via eBPF as well (probably
->>> via cls or other). It might worth to see if anything we miss here.
->>
->> Thanks for the information. I wonder why they used cls instead of
->> steering program. Perhaps it may be due to compatibility with macvtap
->> and ipvtap, which don't steering program.
->>
->> Their RSS implementation looks cleaner so I will improve my RSS
->> implementation accordingly.
->>
-> 
-> DPDK needs to support flow rules. The specific case is where packets
-> are classified by a flow, then RSS is done across a subset of the queues.
-> The support for flow in TUN driver is more academic than useful,
-> I fixed it for current BPF, but doubt anyone is using it really.
-> 
-> A full steering program would be good, but would require much more
-> complexity to take a general set of flow rules then communicate that
-> to the steering program.
-> 
+In this series, we mainly add some skb drop reasons to the input path of
+ip routing.
 
-It reminded me of RSS context and flow filter. Some physical NICs 
-support to use a dedicated RSS context for packets matched with flow 
-filter, and virtio is also gaining corresponding features.
+The function ip_route_input_noref() is used commonly, and its return value
+is used by the caller sometimes. So, it's not easy to make it return skb
+drop reasons. Instead, we add the pointer of the drop reason to the
+function arguments of it. And we do the same things to
+ip_route_input_rcu() and ip_route_input_slow().
 
-RSS context: https://github.com/oasis-tcs/virtio-spec/issues/178
-Flow filter: https://github.com/oasis-tcs/virtio-spec/issues/179
+The errno from fib_validate_source() is -EINVAL or -EXDEV, and -EXDEV is
+used in ip_rcv_finish_core() to increase the LINUX_MIB_IPRPFILTER. For
+this case, we can check it by
+"drop_reason == SKB_DROP_REASON_IP_RPFILTER" instead. Therefore, we can
+make fib_validate_source() return -reason. Meanwhile, we make
+ip_route_input_mc() and ip_mc_validate_source() return drop reason.
 
-I considered about the possibility of supporting these features with tc 
-instead of adding ioctls to tuntap, but it seems not appropriate for 
-virtualization use case.
+Following new skb drop reasons are added:
 
-In a virtualization use case, tuntap is configured according to requests 
-of guests, and the code processing these requests need to have minimal 
-permissions for security. This goal is achieved by passing a file 
-descriptor that represents a tuntap from a privileged process (e.g., 
-libvirt) to the process handling guest requests (e.g., QEMU).
+  SKB_DROP_REASON_IP_LOCAL_SOURCE
+  SKB_DROP_REASON_IP_INVALID_SOURCE
+  SKB_DROP_REASON_IP_INVALID_DEST
+  SKB_DROP_REASON_IP_LOCALNET
 
-However, tc is configured with rtnetlink, which does not seem to have an 
-interface to delegate a permission for one particular device to another 
-process.
+Menglong Dong (7):
+  net: ip: add drop reason to ip_route_input_noref()
+  net: ip: add drop reason to ip_route_input_rcu()
+  net: ip: add drop reason to ip_route_input_slow()
+  net: ip: make fib_validate_source() return drop reason
+  net: ip: make ip_route_input_mc() return drop reason
+  net: ip: make ip_mc_validate_source() return drop reason
+  net: ip: fix typo in the doc of SKB_DROP_REASON_IP_INNOROUTES
 
-For now I'll continue working on the current approach that is based on 
-ioctl and lacks RSS context and flow filter features. Eventually they 
-are also likely to require new ioctls if they are to be supported with 
-vhost_net.
+ drivers/net/ipvlan/ipvlan_l3s.c |   2 +-
+ include/net/dropreason-core.h   |  21 +++++-
+ include/net/route.h             |  12 ++--
+ net/core/lwt_bpf.c              |   2 +-
+ net/ipv4/arp.c                  |   2 +-
+ net/ipv4/fib_frontend.c         |  19 ++++--
+ net/ipv4/ip_fragment.c          |   2 +-
+ net/ipv4/ip_input.c             |  11 ++--
+ net/ipv4/route.c                | 111 +++++++++++++++++++++-----------
+ net/ipv4/xfrm4_input.c          |   2 +-
+ net/ipv4/xfrm4_protocol.c       |   2 +-
+ 11 files changed, 122 insertions(+), 64 deletions(-)
 
-Regards,
-Akihiko Odaki
+-- 
+2.39.5
+
 
