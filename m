@@ -1,72 +1,70 @@
-Return-Path: <netdev+bounces-130991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72AD398C568
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:32:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 856FC98C58F
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 272C928764C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:32:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EE24284D55
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F3B1CF5E4;
-	Tue,  1 Oct 2024 18:29:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C29E1CCEC2;
+	Tue,  1 Oct 2024 18:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HqpwcmN0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iq99070V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1C71CF5CE;
-	Tue,  1 Oct 2024 18:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F90D1C8FB3;
+	Tue,  1 Oct 2024 18:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727807373; cv=none; b=gz5e/tYAcu8OBcuV/xAHUDx7bXdChXcVBEcJJDt+muBuiMbWDYpCFaZ8vv9s2amlDOAWegfEuTCy9aLV3VrH8AiVdmRHb57W00O1RQTLabSp6YBTdBlytk4L4lHs2AchE35Tx6u7PgMfP7hJhaiZiE5TIj/YZaPgrjGRJh1B4eo=
+	t=1727808373; cv=none; b=XcWKqsgbS4tBr5My9JjD3LJsJHxMKy42BiTN4KY/xWI4ErTpa7aMumHIYtzgdIggDjFhYdRrHzTcTJ/CcM007yDbvFbDaITLypHRK5QHXlUO/X8WyOCuwhSzBItTMYF0xxCV7llmXiZJMr9aBgHY2RaTHAGdAebXJk9Bh5MqJWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727807373; c=relaxed/simple;
-	bh=R7pMI3RlR/Q1QL96R7slexlvSamq12LC67dyRYJ+w0s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uxxicCy0aADCVcurysC0WZgLxktl811DpRueNKNoKU6RawiEYVsuNAAE3XXbG/1kSmmqsRSfQB9zll/g9eUmxHEUH5BIvwcjaL0Fjl9sePEe6f+1GaFFkDxaU/phQI/jEdWYpcx8gxMKoj/NigpnWjCniAPZvyTHNMvsJ0deqhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HqpwcmN0; arc=none smtp.client-ip=209.85.210.182
+	s=arc-20240116; t=1727808373; c=relaxed/simple;
+	bh=gQcK9Ay3RbtRXyX15XkGzVq6aLBtG5kfSFAFm0OZfG4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VNjRIGCA0IOcugZGIGaDVwoRDtksldcm/fz/pV7Y90jouoUp50DWdkBqxPDxyp0jJRj4h+KzLz/L7CuQaaIqghRa2z4lbZFDcqp1JYKKdb2a6oslNHlfUYd/Sg9+z3NeEGWXDD5dwez7ATvhaG073coVL6bujOW3YNHaj+qoZTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iq99070V; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-719ba0654f9so4969010b3a.3;
-        Tue, 01 Oct 2024 11:29:31 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20ba733b6faso13838015ad.0;
+        Tue, 01 Oct 2024 11:46:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727807370; x=1728412170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Iw8VwDOz5fOX4AAGu9NDF1NRWlAj+unYZmC2Pjfirnw=;
-        b=HqpwcmN0ZP4pNZJ3uMUJefGtR9ORi1B3GzbGyVg1Wt4fKToln02ErhndgqgKUmG1QG
-         juRWD8RuciLk50zA33/0Oxw+6usVQvUC+lYbPZFEVdOBSbXztddYV9UyXIDzZB6IWZjp
-         OzAYV0p+TRVSmR7C7xD940N6VNbzAdmQu/Ejw7u8W/3oAnmh2cVyaXVachQM84KyDpND
-         jOg1eBj+zPBemH3U+YbK+9YmiKA273hlvBCoiICkLwqisZsyrGtBEuWK4XOCYl7g+k67
-         ZShhpA09KSJDB0uv9kXgBM/eARZ9nLxsQMAL9F+rhmcx2vc4wRevGeNsbeZeQAsoLvuA
-         TeSg==
+        d=gmail.com; s=20230601; t=1727808369; x=1728413169; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gwOVd6Di2C9YvO+Aj2Kvc5LZ0AmnYBL6VVrLYk1OQJ8=;
+        b=Iq99070VwJypERo8BgztvHx78Ye6QkzhoKo0xaXyyxVWmEZzY6puV1fxs662cO3V/7
+         z/D7iZuPN1n5W3EMjymelTkyNWuM040Mds7x8HhdIEF05w+CYypNlc5O1pmq8mxIBqKh
+         KvILkzhoGPHhLAEJ7mraIcVy9XcqKkqgT/SzvxIIW6RlML0fCFEg0PN2Y3CKGKvmt3cj
+         Ny/hCJ0aX0pA41wUctH44IzS0whbGZFKRQQOseJa/+OqDBaTSQvK8ajLqYjL9wVQBVaO
+         f1njOKYtb1bAAdW3epWb2qud2fMnUIQALO/Rb3pnHgMquRc9n/eons9PEtmUG8bMJZVk
+         ekJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727807370; x=1728412170;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Iw8VwDOz5fOX4AAGu9NDF1NRWlAj+unYZmC2Pjfirnw=;
-        b=u/khBob631kB8uBlpkU7cTvTKEjHxErn1hknC1MpsW3QM9zPll0QyXinBfV10OZVM4
-         mw+D659UwqbwEadIrvZoDKnjyNC2HQSBa/V5amEHmDPPUjuv9FV7sIugREu00iGnIX6V
-         gK/idoA+DSbZ0KfoSxQw6llVbO42+NMGo9c3ygdvYyQ5Z6x2r9hsXz1DDJ+Y1/Mf/DKE
-         jU//O5+GZkjNmcVxb5NmP9Kn/+agf8LeW/7+tQVilm/x3+sHroTDqzx1Rv8C7397vJmR
-         P9IIZ3UWnKHYJojC3xi/GYqHUmO8s1FV+xuxePyuApasWDiXOyXq9afGfSPRRHZYutgn
-         zkOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSM7Od3Jsrjw9tk7sbSjEczlKJ1zGQUZIrsUBHzubq4h8lr/qEt7El/nOdgPPdjsHDL7CLyLJiUCqdVd8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvB44t5A3ZdQzzDyrL0doa/ziKNYEcmy5VKlDHMKKjW/6Ol9VL
-	QyxVC8Tdgpwyf1IVzFK81ra5HtCA3+iRuzqDFxJLs/ri9DsALW47hGmaG9fB
-X-Google-Smtp-Source: AGHT+IG9I4dbXDNY9oRlsmnlCgX5xW4nOY/g+16GVSiYV6shXVFS2IczH6pnRmiYXt5yP3NJwt3cwA==
-X-Received: by 2002:a05:6a21:e92:b0:1cc:da34:585e with SMTP id adf61e73a8af0-1d5e2dd9f6dmr801905637.46.1727807370485;
-        Tue, 01 Oct 2024 11:29:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727808369; x=1728413169;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gwOVd6Di2C9YvO+Aj2Kvc5LZ0AmnYBL6VVrLYk1OQJ8=;
+        b=o0pxS5t913awoUyGseCPmSqnLyWm8SxwT4iPK06pA4xd5ppc6B9UWQWMctcRGSWVBx
+         indjQoYwne7XTTH/YzNy0i9g7529FV1flvXFEG4iE/6LJJ4eCfzRf3mr45dNGfYCeYnJ
+         eHL4xBhnpqPT0/lJGnDVAI6eadMfkmj46/whv/irWhcmfWP9Rxeowh2lDhsswmGiaYGH
+         0rt6NVQE9LbIawvc2dm3K23+0SEAqz+tTv+E7TOf1ISLzeSRktQh/6uK8QkmPzi58uQK
+         JtCt4F1reKgKk3nnmQ2xB2/pMH0QSc837hUm8VyFR62yg/f8oHvoj3uwbulFBrDj7hBh
+         11xg==
+X-Forwarded-Encrypted: i=1; AJvYcCVUHl4OltCDJGhvGdMNks3cERvMH8BsrrhBN2LiowNWEXn5arxL57oj0oQzUgmbsrWxGj8+5CwsSPlaBIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkB/GX7KLVpnsJuipzf+rY2quy3yEv7YMltCaIFnJIDmTy9ZEa
+	CY14WEq4B1YmiZrK5Hdo7JLfR00Yv+VDlGmwO8705gv+uMx/79jqnf9t2ciJ
+X-Google-Smtp-Source: AGHT+IEv5Uuxj1nMXpPFe41yJZa6utFylGp4xNyCUSW3fEYnjKuv2qxrK/EyKYQOF2QjE7DhuD/oag==
+X-Received: by 2002:a17:902:ecc9:b0:20b:8bd0:7387 with SMTP id d9443c01a7336-20bc5a876f3mr6831875ad.52.1727808369212;
+        Tue, 01 Oct 2024 11:46:09 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26529d56sm8649467b3a.170.2024.10.01.11.29.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e357absm72278965ad.190.2024.10.01.11.46.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 11:29:29 -0700 (PDT)
+        Tue, 01 Oct 2024 11:46:08 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -75,13 +73,12 @@ Cc: andrew@lunn.ch,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org,
-	steve.glendinning@shawell.net
-Subject: [PATCHv2 net-next 9/9] net: smsc911x: move reset_gpio member down
-Date: Tue,  1 Oct 2024 11:29:16 -0700
-Message-ID: <20241001182916.122259-10-rosenp@gmail.com>
+	olek2@wp.pl,
+	shannon.nelson@amd.com
+Subject: [PATCHv2 net-next 00/10] net: lantiq_etop: some cleanups
+Date: Tue,  1 Oct 2024 11:45:57 -0700
+Message-ID: <20241001184607.193461-1-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241001182916.122259-1-rosenp@gmail.com>
-References: <20241001182916.122259-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,51 +87,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Not needed in struct. It seems to be unused actually.
+Some basic cleanups to increase devm usage.
 
-Add error handling to avoid unused variable errors and to handle
--EPROBE_DEFER, if applicable.
+v2: fix typo in devm_platform_ioremap_resource
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/smsc/smsc911x.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+Rosen Penev (10):
+  net: lantiq_etop: use netif_receive_skb_list
+  net: lantiq_etop: use devm_alloc_etherdev_mqs
+  net: lantiq_etop: use devm for register_netdev
+  net: lantiq_etop: use devm for mdiobus
+  net: lantiq_etop: move phy_disconnect to stop
+  net: lantiq_etop: use devm_err_probe
+  net: lantiq_etop: remove struct resource
+  net: lantiq_etop: use module_platform_driver_probe
+  net: lantiq_etop: no queue stop in remove
+  net: lantiq_etop: return by register_netdev
 
-diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
-index 77a5b766751c..3b2388c1c939 100644
---- a/drivers/net/ethernet/smsc/smsc911x.c
-+++ b/drivers/net/ethernet/smsc/smsc911x.c
-@@ -131,9 +131,6 @@ struct smsc911x_data {
- 
- 	/* register access functions */
- 	const struct smsc911x_ops *ops;
--
--	/* Reset GPIO */
--	struct gpio_desc *reset_gpiod;
- };
- 
- /* Easy access to information */
-@@ -369,14 +366,15 @@ smsc911x_rx_readfifo_shift(struct smsc911x_data *pdata, unsigned int *buf,
- static int smsc911x_request_resources(struct platform_device *pdev)
- {
- 	static const char *const supplies[] = { "vdd33a", "vddvario" };
--	struct net_device *ndev = platform_get_drvdata(pdev);
--	struct smsc911x_data *pdata = netdev_priv(ndev);
-+	struct gpio_desc *reset_gpiod;
- 	struct clk *clk;
- 
- 	/* Request optional RESET GPIO */
--	pdata->reset_gpiod = devm_gpiod_get_optional(&pdev->dev,
--						     "reset",
--						     GPIOD_OUT_LOW);
-+	reset_gpiod =
-+		devm_gpiod_get_optional(&pdev->dev, "reset", GPIOD_OUT_LOW);
-+	if (IS_ERR(reset_gpiod))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(reset_gpiod),
-+				     "GPIO device not found");
- 
- 	/* Request clock */
- 	clk = devm_clk_get_optional(&pdev->dev, NULL);
+ drivers/net/ethernet/lantiq_etop.c | 143 +++++++----------------------
+ 1 file changed, 34 insertions(+), 109 deletions(-)
+
 -- 
 2.46.2
 
