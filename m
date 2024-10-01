@@ -1,70 +1,71 @@
-Return-Path: <netdev+bounces-130682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5FDE98B28F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 04:53:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E40598B292
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 04:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A4761C258DF
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 02:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90B801C25BCC
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 02:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C1F44366;
-	Tue,  1 Oct 2024 02:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CEA4D8B9;
+	Tue,  1 Oct 2024 02:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Tqxdr5Qy"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="c7TVW2s4"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4743D2C6BB;
-	Tue,  1 Oct 2024 02:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7533BB30
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 02:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727750875; cv=none; b=pVkKkF2G4hCqVlDEoWPeam84oJ7NzHVADbEHh6wATnqSu0Hq0qjjCNRVnzI+l6tEemTCLyvGUfRiJjh8DEv/wA1me9/O8sU9q544ESuxhMj5nhyCHxHuRNYFbtLgDrc9J9oAqNkPC3pUJsOEhyuQig///2PXbYzVHJzkKQKQfVw=
+	t=1727750942; cv=none; b=OiiemtJoSVcP0AK9qK90qd1AbBLH847UEv8zbBxdmsa5Gp7Uaup1Duw8UKQq+l+OQK77B01VTnEXa4NKGHaWcKIe/bwKpz2vT3kvBpLjsQMHWQE7LnaM74cgwvhZ1knay1G4h69AMlTPuEMwv1rWIrEVWO9JMcbjXeMPlP5ylhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727750875; c=relaxed/simple;
-	bh=jNSaRlMS0pxpzcklnPIgQ2sMpWB4Ku751X0pvluJBkA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nEIfdNi15IHiqJ+/03gHpkBlePINOAiRb0Q3p7kM/3zZLII1QFbRV3zCasUlX9e0cQ76JeBgE0u10CcV/NKPJ+PoUWjtd1BqsWrboromNDlHoBoyCnSIp3NY3OjACLQAs/wLOkGxjMR4F7qYcAzCWPMsG1BNTCt/AcIhwoekABc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Tqxdr5Qy; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 1674188CBD;
-	Tue,  1 Oct 2024 04:47:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727750871;
-	bh=NhcdDwpsEmYCBndpQt/krb+dCGJNToK5RDdDiG8+SdQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Tqxdr5QyjWQtO/GZKEzyZKmWmh/BY5cNdYxNtHv3X+DJumohPcqf6m/QGzbEUkzl8
-	 bUceATTrzwlIIDYXwYfPzsTz/JkVrWn0AACWZmKpAz0xYsE7Ww1AVlfXJZiOG4zcrM
-	 J08UN4X/9343V42sWX1tbppO4Tip1GLncuR/vjLbZUN9t/RYgeB97qe95ZPpNwmjaa
-	 Mc67RpSRNRJMNEDksvzA1/wTcHm6+zHu0uHoPpYDycnAeYoDmDQgqX5IA0ad4oEAgu
-	 hRchnF+k3YR7y+UUlx1pyKUfsI/VYVPX+kaAmyfwtpAQB8X3uZN2H+ixRQu4Qey4ch
-	 tsO5kdCUxvF3Q==
-From: Marek Vasut <marex@denx.de>
-To: linux-leds@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Christophe Roullier <christophe.roullier@foss.st.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Lee Jones <lee@kernel.org>,
-	Lukasz Majewski <lukma@denx.de>,
-	Pavel Machek <pavel@ucw.cz>,
-	kernel@dh-electronics.com,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org
-Subject: [PATCH] leds: trigger: netdev: Check offload ability on interface up
-Date: Tue,  1 Oct 2024 04:45:23 +0200
-Message-ID: <20241001024731.140069-1-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1727750942; c=relaxed/simple;
+	bh=NHYy8IqOBdiuUbIhWZfIbaqeuDXdyIkDzC6M8IUwppM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=akPO6r4hl0LlhJ6cqZS2jHxMaHr08lkFeK8JT8GMhQyE6Akzw0rYmrR/dT9EbmNlKyZHmQK+tX6RYZdBHaK+iRoPjKScu+Spgk0vgRzAjDMhgFU+TN2PIpg9w3+8JDywUEdT+ODtSLIZS3WyEPwgX7qCWp8xkF9q8tjLBguq7so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=c7TVW2s4; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1727750940; x=1759286940;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P16m3D/uCi1xzRvU5yYpicdPgi+MNSZoqM63IltHPto=;
+  b=c7TVW2s4YB1MItp34Y5QdieWqJA+ebBwnT1ZhstKPKkypQ99ZLowh/N4
+   SL5/uxDlvkhpykeCD/I6qvJUu4vX52KsgokX2TaldPcQtV0x82DUiOxXZ
+   l1P7rTaaw5v6YixCBKtGKSTi4AN1U/5GolL7nak+LDdkN1uch5C46axFV
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.11,167,1725321600"; 
+   d="scan'208";a="133233405"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 02:48:58 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:21530]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.191:2525] with esmtp (Farcaster)
+ id cdf94514-ec86-4848-9cf5-0eba83a3b0a6; Tue, 1 Oct 2024 02:48:58 +0000 (UTC)
+X-Farcaster-Flow-ID: cdf94514-ec86-4848-9cf5-0eba83a3b0a6
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 1 Oct 2024 02:48:57 +0000
+Received: from 88665a182662.ant.amazon.com (10.1.212.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 1 Oct 2024 02:48:51 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/5] ipv4: Namespacify IPv4 address hash table.
+Date: Tue, 1 Oct 2024 05:48:32 +0300
+Message-ID: <20241001024837.96425-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,77 +73,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The trigger_data->hw_control indicates whether the LED is controlled by HW
-offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
-currently called only from netdev_led_attr_store(), i.e. when writing any
-sysfs attribute of the netdev trigger instance associated with a PHY LED.
+This is a prep of per-net RTNL conversion for RTM_(NEW|DEL|SET)ADDR.
 
-The can_hw_control() calls validate_net_dev() which internally calls
-led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
-for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
-is not attached.
+Currently, each IPv4 address is linked to the global hash table, and
+this needs to be protected by another global lock or namespacified to
+support per-net RTNL.
 
-At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
-only when the interface is brought up and is detached again when the
-interface is brought down. In case e.g. udev rules configure the netdev
-LED trigger sysfs attributes before the interface is brought up, then when
-the interface is brought up, the LEDs are not blinking.
+Adding a global lock will cause deadlock in the rtnetlink path and GC,
 
-This is because trigger_data->hw_control = can_hw_control() was called
-when udev wrote the sysfs attribute files, before the interface was up,
-so can_hw_control() resp. validate_net_dev() returned false, and the
-trigger_data->hw_control = can_hw_control() was never called again to
-update the trigger_data->hw_control content and let the offload take
-over the LED blinking.
+  rtnetlink                      check_lifetime
+  |- rtnl_net_lock(net)          |- acquire the global lock
+  |- acquire the global lock     |- check ifa's netns
+  `- put ifa into hash table     `- rtnl_net_lock(net)
 
-Call data->hw_control = can_hw_control() from netdev_trig_notify() to
-update the offload capability of the LED when the UP notification arrives.
-This makes the LEDs blink after the interface is brought up.
+so we need to namespacify the hash table.
 
-On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
-in place, boot the machine with cable plugged in, and the LEDs won't work
-without this patch once the interface is brought up, even if they should:
-"
-ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
-ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
-"
+The IPv6 one is already namespacified, let's follow that.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: Daniel Golle <daniel@makrotopia.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Lee Jones <lee@kernel.org>
-Cc: Lukasz Majewski <lukma@denx.de>
-Cc: Pavel Machek <pavel@ucw.cz>
-Cc: kernel@dh-electronics.com
-Cc: linux-leds@vger.kernel.org
-Cc: linux-stm32@st-md-mailman.stormreply.com
-Cc: netdev@vger.kernel.org
----
- drivers/leds/trigger/ledtrig-netdev.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-index 4b0863db901a9..c15efe3e50780 100644
---- a/drivers/leds/trigger/ledtrig-netdev.c
-+++ b/drivers/leds/trigger/ledtrig-netdev.c
-@@ -605,6 +605,8 @@ static int netdev_trig_notify(struct notifier_block *nb,
- 		trigger_data->net_dev = NULL;
- 		break;
- 	case NETDEV_UP:
-+		trigger_data->hw_control = can_hw_control(trigger_data);
-+		fallthrough;
- 	case NETDEV_CHANGE:
- 		get_device_state(trigger_data);
- 		/* Refresh link_speed visibility */
+Kuniyuki Iwashima (5):
+  ipv4: Link IPv4 address to per-net hash table.
+  ipv4: Use per-net hash table in inet_lookup_ifaddr_rcu().
+  ipv4: Namespacify IPv4 address GC.
+  ipv4: Retire global IPv4 hash table inet_addr_lst.
+  ipv4: Trigger check_lifetime() only when necessary.
+
+ include/linux/inetdevice.h |   2 +-
+ include/net/netns/ipv4.h   |   3 ++
+ net/ipv4/devinet.c         | 106 +++++++++++++++++++++++++------------
+ 3 files changed, 76 insertions(+), 35 deletions(-)
+
 -- 
-2.45.2
+2.30.2
 
 
