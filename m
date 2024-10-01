@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-131044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8B998C711
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:58:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C821698C713
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C3191F249DC
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 831842854E1
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3A21CCEEC;
-	Tue,  1 Oct 2024 20:58:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254811CEABF;
+	Tue,  1 Oct 2024 20:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIlRqlJ4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Htf40M8o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB98E14F9F1;
-	Tue,  1 Oct 2024 20:58:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA741CDA17;
+	Tue,  1 Oct 2024 20:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727816329; cv=none; b=jKRKFzVn6NBPRCzHz1o1b9cYE4urhlVxtspCpwLXXsMJ0JbOeoJ/fjvQTNt6VhUhZ+rqedZXkoJTJNECSvArEAl3uGuYmM5wdmIOC5LpItD2UEFUO/YD5JVLoeM9Hjrdi/rBiJPUG4/cGwnxTYBXlTB2LjJUT4PtI9toQqWhyzY=
+	t=1727816331; cv=none; b=tpK7SsEW6is+rYBdj6Ehp9SF/HOTljzUAME498dhnKP+PyxJFbG+d4KhHRtU88IV3XOjuf/h21nj61n6zbn+qbtqB2hM/RZ41h3xqHBNnsckduZqx2Axj/ru+eLnENajdqClgbFBpOUSh3W7LtVFY+Dac/GVxGgae27xZEifimk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727816329; c=relaxed/simple;
-	bh=ncPRvHN48Uu5k+48+asgjzJmv72Y1PqSg/qY5ouvHJ8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cbbHPHUdU4pyp88kZkZZhcUpXePvJCd1W4euCrboXR61aJs+FZsOWS5gYKgT9C8h7OUNslndPaLJKTwlA1/ePFL4YDEoBXpT5IrsSwoX65062G7N8hvOuyDesrlvSc6kQV59kzMfJEM9bscJZ45kjb5dWNDGccR5h/9qP2BYUp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gIlRqlJ4; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1727816331; c=relaxed/simple;
+	bh=VLHNOJVF2xYI9xFz0sdYpst/JrodikRXh5fZnHMPKUw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Qvz+6kCWdv7hVhzlzx9Oo56KbQDB0B2DDeYUN+MjZILfuLuw6BptLqFWoQUWwNqNVQbzIX6rN6Vk4OOqo+JWl07ONiAhSmOAbnOXL1+OeB+p9H7dnv9ZyUKkjr0imixxLWxMRblHLRU+wauNp/m60r9Uu371h8th1qoCNe85h+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Htf40M8o; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71957eb256bso5428408b3a.3;
-        Tue, 01 Oct 2024 13:58:47 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7e6afa8baeaso5116593a12.3;
+        Tue, 01 Oct 2024 13:58:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727816327; x=1728421127; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UeKWKt2bpiIHq7T6szXkVDIrHT9awv3Xp3odCesEbWs=;
-        b=gIlRqlJ42gCpRF6G1oj7tAmDZ1gb/oAsn1077+ZW1GpSIiVcn93gl8Mi4weafP4fli
-         JBcK9iIXGxAZBhoXT89RWyulcAOVU9Z0MGSSYspUdjuRQLSLmsWAQZK30aoD1t2NSB6W
-         GMGnCZ2x/PKhrMhT6xHw680nPNVR02MCMVr/63T0PS+aMx15LqdMaOHS9izVaUFZpxVE
-         R0jSPcs2u7JB3Tql+N64UBkmF/yJ5zHZka7vDn0WR9X53Ohv5coAIXanqUfdGxHRNqO4
-         ww6HewQdoTt+zEyzeB754iyV279QUBaGIS1ZCfG0Xn9+BR/3TG985NHzxHFmhEnbQX38
-         2M7g==
+        d=gmail.com; s=20230601; t=1727816328; x=1728421128; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nTFOaXTef0G9oTg4z249QNFPMYARm/rD0bt+cP8X3Pw=;
+        b=Htf40M8oGFAo+qIegeI+okWYMtnoukUH64XqE58bODv4s0iGBJ+p1qk4P8iws5aGF7
+         gMOTDL17dQ3Nc1IDavXR09sq7tGViKfzmTGCDbaDNfviWiJwlNvk9wBXAIx7saxXghR2
+         amhzW6o7+CafeDiJXK2CHoexoQXYqqAHYnwkuj7gnSyxQblgmmk0KUxru9J3yK9XGKF1
+         YAAK/nIXLrjnN1PqYMKh7FMc3WL52niXhd4sCjvxg9NKugUkWhDJeV4B8j1VQXwKHbxe
+         ZXj3fjqJLItErCJJ7YAaTsbm/QPSr1AN5fPrWcYleJrJcLVCtcO/d5Xz7ZkXBXut7hl1
+         W8BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727816327; x=1728421127;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UeKWKt2bpiIHq7T6szXkVDIrHT9awv3Xp3odCesEbWs=;
-        b=TWRCJ4TmE9D2A3qihuhlZ0tnzl7xEITJ0VSkxu2RSQsU2vbrC5oIBYtKnc+u1QPZNC
-         /MtnIuo7kBKh1edYuonvlat1iXBtInycMFL5/krtSxsSZjho49Q2l/GxuPfoXg3jhZcU
-         GbHSZCTU8RvyjkHUQ8rVrv0EZ/qisslQTlPIjcySadeKsHcThze1mIA7aOuUKBcmAdol
-         DSSibcK3xbJP3QlF8mNJMKO2rsCthelBELg56Y3j/YiesjlDrDOuQxhTsDTvKl1a5TNr
-         KHvtxwpya4RTYjDLqajs10raNSRhxKXE+iLkznnQkqhToFEAoWWReA5P9iC166zO2Img
-         KogA==
-X-Forwarded-Encrypted: i=1; AJvYcCXDwb7650mlWoteuO4MnDFzRTwgTMF3uWHqO4e/EU9CKgg67f89ax5HUPOPxp147ejZ3g2W3ntP3PRWycA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGLcwFY7J2A2gwBpeYZ50vCjdj5L7ria6vVD/Y4+X+8y6cQMTZ
-	SWkUmgFzgS3WF4hKK3BrB4EvFB+JOr2SBU2LhAN+twjgx3cpovQp8VH9rqZa
-X-Google-Smtp-Source: AGHT+IEH6Madu6We6K2A2bv+LRblE16FAY6PjadrOY4pF/XCF9AC91KlP9+4MAoCr1TnKxA9ALB2sw==
-X-Received: by 2002:a05:6a00:188f:b0:70d:14d1:1bb7 with SMTP id d2e1a72fcca58-71dc5d744a6mr1589224b3a.28.1727816327008;
-        Tue, 01 Oct 2024 13:58:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727816328; x=1728421128;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nTFOaXTef0G9oTg4z249QNFPMYARm/rD0bt+cP8X3Pw=;
+        b=Sr1ZV+K6jIe4/vPa1DKU+mzghKVuyUgne17hPDDkW1bflDaEnJFks4xocU6kVvTcDx
+         20TCKGtEmy0WzX5F+SwzXVh4hboI8auhtBiVWa0beTD3pAF5+3hMPUHlZd4W2wSBklHt
+         sB2CC9DLMvzUrEopczCuzwGRe4nNRNmp74EjS15rWXOIW+UQ839tMYv5L96DOZPUCiYN
+         EG/ioOe7rez0jjb9XSTvrAgkeuuUqNwV5CDAlNKkDxP5zbjN6FSsPa0lETLJdhgY32OW
+         pGPJ6wzZ+pCnFyhuxFXUTZesTKcPd1dJj8a/7B9tctDkonL6DSC5vg+0W16WRRm5cKH3
+         /1FA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFuhciMUSj+tH7V2b87B8U36a+DmqDkrpNSOFaezp2g4rRhiYkIPiNPHmnc4wQmrITpoFMwuCWhHy2eiA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEaaBGX3Wn9g/EuAk8OkYAiN3CeTzdyg6LgPb+VpYLeCEGYlnC
+	IpA3NUBe6xIYeYsxLFZuTV9y67K3TOclnqqtI70DCxrxvKikC+RoeaBvjNvD
+X-Google-Smtp-Source: AGHT+IHfGLsPXHiXEbaLpfGnepkMDG1K7qrayUW9CTQPxL4iXoGX/OBLXciDiH3g+6tERdVhWPHRMw==
+X-Received: by 2002:a05:6a21:1693:b0:1d3:e4e:ff55 with SMTP id adf61e73a8af0-1d5db101999mr1440585637.7.1727816328375;
+        Tue, 01 Oct 2024 13:58:48 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26518a2asm8545765b3a.107.2024.10.01.13.58.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26518a2asm8545765b3a.107.2024.10.01.13.58.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:58:46 -0700 (PDT)
+        Tue, 01 Oct 2024 13:58:48 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -77,10 +79,12 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCHv2 net-next 00/18] ibm: emac: more cleanups
-Date: Tue,  1 Oct 2024 13:58:26 -0700
-Message-ID: <20241001205844.306821-1-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 01/18] net: ibm: emac: use netif_receive_skb_list
+Date: Tue,  1 Oct 2024 13:58:27 -0700
+Message-ID: <20241001205844.306821-2-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241001205844.306821-1-rosenp@gmail.com>
+References: <20241001205844.306821-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,43 +93,124 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Added devm for the submodules and removed custom init/exit functions as
-EPROBE_DEFER is handled now.
+Small rx improvement. Would use napi_gro_receive instead but that's a
+lot more involved than netif_receive_skb_list because of how the
+function is implemented.
 
-v2: fixed build errors. Also added extra commits to clean the driver up
-further.
+Before:
 
-Rosen Penev (18):
-  net: ibm: emac: use netif_receive_skb_list
-  net: ibm: emac: remove custom init/exit functions
-  net: ibm: emac: use module_platform_driver for modules
-  net: ibm: emac: use devm_platform_ioremap_resource
-  net: ibm: emac: use platform_get_irq
-  net: ibm: emac: remove bootlist support
-  net: ibm: emac: tah: use devm for kzalloc
-  net: ibm: emac: tah: devm_platform_get_resources
-  net: ibm: emac: rgmii: use devm for kzalloc
-  net: ibm: emac: rgmii: devm_platform_get_resource
-  net: ibm: emac: zmii: use devm for kzalloc
-  net: ibm: emac: zmii: devm_platform_get_resource
-  net: ibm: emac: mal: use devm for kzalloc
-  net: ibm: emac: mal: use devm for request_irq
-  net: ibm: emac: mal: move irq maps down
-  net: ibm: emac: mal: move alloc_netdev_dummy down
-  net: ibm: emac: add dcr_unmap to _remove
-  net: ibm: emac: mal: move dcr map down
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 51556 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.04 sec   559 MBytes   467 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 48228 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.03 sec   558 MBytes   467 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 47600 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.04 sec   557 MBytes   466 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 37252 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.05 sec   559 MBytes   467 Mbits/sec
 
- drivers/net/ethernet/ibm/emac/core.c  | 175 +++-----------------------
- drivers/net/ethernet/ibm/emac/mal.c   | 139 ++++++++------------
- drivers/net/ethernet/ibm/emac/mal.h   |   4 -
- drivers/net/ethernet/ibm/emac/rgmii.c |  53 ++------
- drivers/net/ethernet/ibm/emac/rgmii.h |   4 -
- drivers/net/ethernet/ibm/emac/tah.c   |  53 ++------
- drivers/net/ethernet/ibm/emac/tah.h   |   4 -
- drivers/net/ethernet/ibm/emac/zmii.c  |  53 ++------
- drivers/net/ethernet/ibm/emac/zmii.h  |   4 -
- 9 files changed, 94 insertions(+), 395 deletions(-)
+After:
 
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 40786 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.05 sec   572 MBytes   478 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 52482 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.04 sec   571 MBytes   477 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 48370 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.04 sec   572 MBytes   478 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 46086 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.05 sec   571 MBytes   476 Mbits/sec
+> iperf -c 192.168.1.1
+------------------------------------------------------------
+Client connecting to 192.168.1.1, TCP port 5001
+TCP window size: 16.0 KByte (default)
+------------------------------------------------------------
+[  1] local 192.168.1.101 port 46062 connected with 192.168.1.1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.00-10.04 sec   572 MBytes   478 Mbits/sec
+
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/ibm/emac/core.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+index dac570f3c110..d476844bae3e 100644
+--- a/drivers/net/ethernet/ibm/emac/core.c
++++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -1727,6 +1727,7 @@ static inline int emac_rx_sg_append(struct emac_instance *dev, int slot)
+ /* NAPI poll context */
+ static int emac_poll_rx(void *param, int budget)
+ {
++	LIST_HEAD(rx_list);
+ 	struct emac_instance *dev = param;
+ 	int slot = dev->rx_slot, received = 0;
+ 
+@@ -1783,8 +1784,7 @@ static int emac_poll_rx(void *param, int budget)
+ 		skb->protocol = eth_type_trans(skb, dev->ndev);
+ 		emac_rx_csum(dev, skb, ctrl);
+ 
+-		if (unlikely(netif_receive_skb(skb) == NET_RX_DROP))
+-			++dev->estats.rx_dropped_stack;
++		list_add_tail(&skb->list, &rx_list);
+ 	next:
+ 		++dev->stats.rx_packets;
+ 	skip:
+@@ -1828,6 +1828,8 @@ static int emac_poll_rx(void *param, int budget)
+ 		goto next;
+ 	}
+ 
++	netif_receive_skb_list(&rx_list);
++
+ 	if (received) {
+ 		DBG2(dev, "rx %d BDs" NL, received);
+ 		dev->rx_slot = slot;
 -- 
 2.46.2
 
