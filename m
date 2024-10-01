@@ -1,155 +1,168 @@
-Return-Path: <netdev+bounces-130743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E5F98B5F9
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:46:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D926E98B620
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7CE81C21675
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:46:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AD562816EF
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3961BBBF4;
-	Tue,  1 Oct 2024 07:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87FA1BDA8C;
+	Tue,  1 Oct 2024 07:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SMLpjOZo"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="qyHtKOEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4122BAF1
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991DD63D;
+	Tue,  1 Oct 2024 07:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727768782; cv=none; b=WsUSXfolNC/tkejPTqhVV1fnpg3rUpVrSW2ugetzc7VrmDcYBVKKc2VJfCSi1FHbFGqyFDDtP4hgSm3xpDIdJenLECfBo1+3bqVWi59cR+EPwCcZfuoywjqugddk87E5Edg377dU/sOg2XWslyW7erLK08gn8MMP6NRKUY329qM=
+	t=1727769025; cv=none; b=ULXbIAQLLrdPJCz3oakoRgr0awQsJBMNgE3/sKlqaxlIfRw4hSnMwPgiRkwcOt2paGsZxbV5SXkKULqY4uucIFoZSdsYUBPXE0TAglHNMkqRu0E/bTNejks21uiYuHgm+y6flMacYDsoUn72dKS4gV5iGE/NJ/LqB8TwpCIl3UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727768782; c=relaxed/simple;
-	bh=75GbCvsDPfTfWT52QVH4Vr8BxS8wf8WVGn2GuLMi+gU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=upldFE122tCl4CTbmzJJW231R6DctQCHcDuldYi3Z5W5zlHjr8asmwXRThk0Uc7nmzVALSdOpuo43/GjDHyY3Kxg8fjdAFLAsY0gt9x6L3+zhZcieNSar0Vab7MKYIYWiTmh3IbgfJ/EXlukWJnQ6CPHUh6rvubElQKOWa+1PaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SMLpjOZo; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2fac63abf63so21709221fa.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 00:46:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727768779; x=1728373579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ynnBOQu5jKcdwW9PqPnVpG86Xh9a0SR19wYZwjvIMCc=;
-        b=SMLpjOZoEVPijk96Sz3d9Xn5QqPXowDrHx7SwUEPJQlf36FHVT2brPX1aMJlLLD7SN
-         4Bgres+UbUqbWCLsTKmEMHZ31oGLqdjgYudaHcZ0R+OYxsmk2ybjIhwJ0sOTmVTqGIPg
-         qwniviVe13sE0VI+YBIvKrxdNpwW11V3kxpSSvZwZKgJiMw+OpVYNKC4Agv/COtiFI2Q
-         4a9RpqoHSma0sG6IfhWOgJ5QlOz/IGNJWeMrzuKBTepMT5Tu5zN58yxeRt3vzlI/6ycE
-         5jLrFhwRLg0HffnntafwM8nw2uiADJjnkjQhuicvz0oYKJhpiMwn7W+LZreO4fdpfdHD
-         t/Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727768779; x=1728373579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ynnBOQu5jKcdwW9PqPnVpG86Xh9a0SR19wYZwjvIMCc=;
-        b=MjMHPuGS1Gq8phb9vz07WH47gq2W5P2j1v+2FuQN+zg2ykY1ffJdz1bIbNvT5vrVsZ
-         T5vOezXBI2X5E3jHr97uBSRu4Tx5Xj9/0ZqqcbU07pWmTT6uIMY/PVOKF3U2rUkOlU5L
-         A582c6HTmjKjXXEP67U73IStYj2igL7VhI6lNgpS9QKMiAb1j4bWMwPYIGZcZa9ejVf1
-         O+DVRPNBmXM9v/2m8dlaIxb7s3q0yCqe12UJNlxRmH/CG4/RcOk/VBX2sM6kagCcvGqM
-         UlpErl7nDQOQzRGfbIyenmTfve+1zfGbb0oQiNstsTBstXlzqoZUh3vXFlkAoeSYwb9Q
-         c6mA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfAyBZ37p3/FmlAKgKcNW8X4CcQ/eqzjMfMw4tTH687SR2Xao73NyZJhTix5ustf8lQJFz8Rs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3dDlG7G3t0Oz6wU3VM2ANLU8g49w4TLbZizH5xwFI1NC91jjQ
-	7T3jyZHCayiQ2iFuo0p8g0Ew1/cprp/EJHWXr34AQ+dj74BSUmS2WL2E6kLIjW8CBhfAUeEAFHt
-	qo5SHpJI+dvVYGfHNTSEQ6e1OWezQVGdaBTj+
-X-Google-Smtp-Source: AGHT+IG717hKYQkWLEUJ9n/QVTFoCBkUqv7RsNeb0V8VYrRgY9IO85RxZxs/Ul3475IlMynefAxO1iDD/72W/ERXM1M=
-X-Received: by 2002:a05:651c:221b:b0:2fa:cb44:7bde with SMTP id
- 38308e7fff4ca-2facb448132mr36476601fa.4.1727768779014; Tue, 01 Oct 2024
- 00:46:19 -0700 (PDT)
+	s=arc-20240116; t=1727769025; c=relaxed/simple;
+	bh=H8GT7CQPQCP0iqDT0akwe9NghW+v/5sAgRRAbcbb5Wo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=YAcLIo74mrIfQAvGzYPqFtJF88U6v3vSmN5ciGW6zaSk4BJSfslUDPpJk1PPTL+VnqfdVmgC+qO4KZplKeGUrZvddBd3F6P9HdmItyWVOheIcKfq6orzqwYYPVJ6fIiDLg/8nKcQowU7buhOdkLXE9WRW4oSI0/KpAhsOzDqwo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=qyHtKOEu; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: ccdfc1c07fc911efb66947d174671e26-20241001
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:CC:To:From:Subject:MIME-Version:Date:Message-ID; bh=FlXzrXpPCzLcSODdsG8c3PiQzj81rbhZ9JEiAPkX18g=;
+	b=qyHtKOEuOk6q6+jzGD1iSnaFQHlFcBrsieaxCfeRvA4W8KDlpk926lBA2sxf4FRJXNE4kxdX+/3t5NZhVbS+EbjFGG7HudBW8762A5ZXLyChg9v78v3HH8Ee+ohLNkbFr3+Z1ICpJ4lePfo5K0vLYoxIKYgRZfm/jXekpou276c=;
+X-CID-CACHE: Type:Local,Time:202410011505+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:f4145b70-66da-4fe0-ad2c-5b0a2bbc4e74,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:f94b0ad1-7921-4900-88a1-3aef019a55ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: ccdfc1c07fc911efb66947d174671e26-20241001
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1105446460; Tue, 01 Oct 2024 15:50:17 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 1 Oct 2024 15:50:16 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n2.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
+ Transport; Tue, 1 Oct 2024 15:50:14 +0800
+Message-ID: <c2fb40cc-491f-1c1a-7343-c70a60b3a031@mediatek.com>
+Date: Tue, 1 Oct 2024 15:50:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001015555.144669-1-danielyangkang@gmail.com>
- <20241001030349.97635-1-kuniyu@amazon.com> <CAGiJo8Rmr2JJ0cCuGDGUeM-fNXdF1L1==bBqJdcCxBkJUTHzuw@mail.gmail.com>
-In-Reply-To: <CAGiJo8Rmr2JJ0cCuGDGUeM-fNXdF1L1==bBqJdcCxBkJUTHzuw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 1 Oct 2024 09:46:04 +0200
-Message-ID: <CANn89iLcxMi=AnhyFTgAoiCznFPCoKdjKVZbHMZMQ9dgK6xXnw@mail.gmail.com>
-Subject: Re: [PATCH] fixed rtnl deadlock from gtp
-To: Daniel Yang <danielyangkang@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	guwen@linux.alibaba.com, jaka@linux.ibm.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v7 2/3] ASoC: dt-bindings: mt6358: Convert to DT Schema
+Content-Language: en-US
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: Dmitry Torokhov <dmitry.torokhov@gmail.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+	<lee@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, AngeloGioacchino
+ Del Regno <angelogioacchino.delregno@collabora.com>, Sen Chu
+	<sen.chu@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn
+	<andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+	<olteanv@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Sebastian Reichel <sre@kernel.org>, Liam Girdwood
+	<lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, <linux-input@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-leds@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-pm@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>,
+	Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
+	MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+References: <20240930073311.1486-1-macpaul.lin@mediatek.com>
+ <20240930073311.1486-2-macpaul.lin@mediatek.com>
+ <6l6hb264yvhd6e6neurd5t4gmv5z5c5gpg27icijif3hq4cuu7@pbhfkdxb2eam>
+ <42dc4e9a-efcd-e166-b4fd-d4fe0dcd3c77@mediatek.com>
+In-Reply-To: <42dc4e9a-efcd-e166-b4fd-d4fe0dcd3c77@mediatek.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 1, 2024 at 6:54=E2=80=AFAM Daniel Yang <danielyangkang@gmail.co=
-m> wrote:
->
-> Ok I see the issue. Yes it does seem to be a false positive. Then do we a=
-lready have lockdep classes and subclasses set up for lock_sock() to preven=
-t other false positives like this one? If not, should I add one then to res=
-olve this?
->
-
-Please  do not top post on linux mailing lists
-
-About your question :
-https://lore.kernel.org/netdev/CANn89iKcWmufo83xy-SwSrXYt6UpL2Pb+5pWuzyYjMv=
-a5F8bBQ@mail.gmail.com/
 
 
-> On Mon, Sep 30, 2024 at 8:04=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.=
-com> wrote:
+On 10/1/24 15:05, Macpaul Lin wrote:
+> On 10/1/24 14:34, Krzysztof Kozlowski wrote:
+> 
+> [snip]
+> 
+>>> +description: |
+>>> +  The communication between MT6358 and SoC is through Mediatek PMIC 
+>>> wrapper.
+>>> +  For more detail, please visit Mediatek PMIC wrapper documentation.
+>>> +  Must be a child node of PMIC wrapper.
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - mediatek,mt6366-sound
+>>> +      - mediatek,mt6358-sound
+>>> +    const: mediatek,mt6358-sound
 >>
->> From: Daniel Yang <danielyangkang@gmail.com>
->> Date: Mon, 30 Sep 2024 18:55:54 -0700
->> > Fixes deadlock described in this bug:
->> > https://syzkaller.appspot.com/bug?extid=3De953a8f3071f5c0a28fd.
->> > Specific crash report here:
->> > https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D14670e0798000=
-0.
->> >
->> > DESCRIPTION OF ISSUE
->> > Deadlock: sk_lock-AF_INET --> &smc->clcsock_release_lock --> rtnl_mute=
-x
->> >
->> > rtnl_mutex->sk_lock-AF_INET
->> > rtnetlink_rcv_msg() acquires rtnl_lock() and calls rtnl_newlink(), whi=
-ch
->> > eventually calls gtp_newlink() which calls lock_sock() to attempt to
->> > acquire sk_lock.
+>> This wasn't ever tested.
+> 
+> Hum, I have indeed tested it with linux-next/master branch.
+> Ran dt_binding_check with dtschema trunk with this single file
+> but didn't get any warning or errors.
+> 'make dt_binding_check DT_SCHEMA_FILES=mt6358.yaml'
+> 
+> Could you please help to paste the error log for me?
+> If there are new errors, I need to check if there is any
+> environment issue.
+
+I've both tested both of the following format pass dt_binding_check.
+#1.
+properties:
+   compatible:
+     items:
+       - enum:
+           - mediatek,mt6366-sound
+           - mediatek,mt6358-sound
+       - const: mediatek,mt6358-sound
+
+#2.
+properties:
+   compatible:
+     enum:
+       - mediatek,mt6366-sound
+       - mediatek,mt6358-sound
+     const: mediatek,mt6358-sound
+
+>> Do not send untested code, it's a waste of reviewers' time.
 >>
->> Is the deadlock real ?
->>
->> From the lockdep splat, the gtp's sk_protocol is verified to be
->> IPPROTO_UDP before holding lock_sock(), so it seems just a labeling
->> issue.
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree=
-/drivers/net/gtp.c?id=3D9410645520e9b820069761f3450ef6661418e279#n1674
+>> Best regards,
+>> Krzysztof
 >>
 >>
->> >
->> > sk_lock-AF_INET->&smc->clcsock_release_lock
->> > smc_sendmsg() calls lock_sock() to acquire sk_lock, then calls
->> > smc_switch_to_fallback() which attempts to acquire mutex_lock(&smc->..=
-.).
->> >
->> > &smc->clcsock_release_lock->rtnl_mutex
->> > smc_setsockopt() calls mutex_lock(&smc->...). smc->...->setsockopt() i=
-s
->> > called, which calls nf_setsockopt() which attempts to acquire
->> > rtnl_lock() in some nested call in start_sync_thread() in ip_vs_sync.c=
-.
->> >
->> > FIX:
->> > In smc_switch_to_fallback(), separate the logic into inline function
->> > __smc_switch_to_fallback(). In smc_sendmsg(), lock ordering can be
->> > modified and the functionality of smc_switch_to_fallback() is
->> > encapsulated in the __smc_switch_to_fallback() function.
+> Thanks
+> Macpaul Lin
+
+Should I update it with format #1?
+
+Thanks
+Macpaul Lin
 
