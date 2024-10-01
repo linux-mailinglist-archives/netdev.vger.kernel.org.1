@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-131040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E132998C6AF
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:21:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1741E98C6E2
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6242F1F23BF7
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2814B1C23256
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AF91CCB58;
-	Tue,  1 Oct 2024 20:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550D814F9F1;
+	Tue,  1 Oct 2024 20:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aC7DVb2w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q71x6/Lz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2E51925B8
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9AE198A16
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727814058; cv=none; b=kId3Z1DbDvLcL+DmYxAYbMGtv7+a6T9JsT/Tv7+fJ3kADYFFCPucSNNqkUD2z+t0JKLzVBzG0+hZfukkG11yZL/qC+JWoPlbR41EdXE5H6U8OBB6lu/VPGmb1FZnxP7SHQ9b8zSu3ouKpFFiTSmT0tvBbDNALkZbpkI8WGJ/718=
+	t=1727814890; cv=none; b=L011oF/JO+XIbIN6WaXAsixzuQyGq8HXj41ZkLaQ+oiLXtPaVUSB6ohXP0s6MxHKAl3+y0m3nRUKrGPqcSYrvITurEkrR718r6jm3WLyXeRk0P5bOmuDLxKuLAckjuH3+vHFSzWnq6uzanzGdhnTwSzfUQn7oSpCx8ulOI5LLBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727814058; c=relaxed/simple;
-	bh=f3uxoRsp0o1ViZrjM9qiuuUpern1A3CXKB9dZm4OPMU=;
+	s=arc-20240116; t=1727814890; c=relaxed/simple;
+	bh=Zm5c81/zpSlbaT3kGan13kqF7lkM6JuGn64ZhvkGMBM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l7EE4DmCQMuS/wK9CQAApO1Z2OPHRh4aoJvUl7YrrJSPDRhLr0ftQxr1DpI/GgjbMnvHJrdpjJzh/fVL2cb3iR1ciECAgXGDgSOASqCwFqKM3PdnmI31kY8ZzrLe3RaocgHfONLcXBI415yp5EV66/KEOECyVVDXHpKlcwgtfyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aC7DVb2w; arc=none smtp.client-ip=209.85.167.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=CAeV+B6c0PD2++V6CXtg6VvMjo1USxrA1XIM1Jy/A34fNPRs0RCWirZI7QP3AJqPb/tvVim+zmR7jXIgCKt+4jMkBPwMlmdZPtq51UkFC/CWT8jrhHHMNq1jaF+Wj4EFWQ93yNHRxGlvce5kaLZ3PzMQyhXWUzh6bd5rf/dTCaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q71x6/Lz; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-537a399e06dso6885772e87.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:20:56 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539973829e7so2592653e87.0
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:34:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727814055; x=1728418855; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pZ73CcQvi1PQ+XEgRkwDCiOtDJhUD8sj5gWpktchgqE=;
-        b=aC7DVb2wj19KWDrBOAHqvCccEeM4sLDZ4fT10puAgV3H3/PBrL+02emGO40e260P9I
-         O0+Bnyr4k8+d7pXHqXxdOo/hx0iLe9I4LlilGfs48DjN/bXfyhi19q4tLVKgXbwX8i2G
-         itjLfIWeJYErcVBc1VJUkPzPVgjC6EVYa47IT9qZlDWdJR49fHuoiGOv5FSCSGkuUL2U
-         0pWhoi8OctNWuQMJrCwyX7Y64ToiAKEuXgP1O2U+Gz6lXtPmm0fX7PyvejwWoo1XJSTE
-         oJXQwuwGfnGaq/Dm2ADHxP8/7+ZvBmGtmQWCRB9eJ8DmgHxsA2ls7DAnUd8dONOVNnfR
-         Ldow==
+        d=gmail.com; s=20230601; t=1727814886; x=1728419686; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FcP+BTuwSK7rNCDgZlLcE24nBTWuhEDFil4qXQSXnZA=;
+        b=Q71x6/LzDLvKh7Ba3WnmY5RywjCeb9mDDZfktB4bmJVSHT/z3uB1XMgE797TnD/N7S
+         46kwdkvPtudJw2tR5ksSewZlh2e97JKIWlywovq9kaeLg0wQWFkKQPwxA0aRV80iRmkj
+         1LfX59kqXfl8WWtwXhDCcpBrQLf6oZHqVdQSjpOhFWH2GkM/f4VX0GSRsRufvxn8ckEj
+         Q2Z1B7IyQISR+Rm9qVET48WhbDg647MHkFCAn9sAEms8GuKA5m5R+hhkATXbSVEjWcNN
+         EpL+MGFrBXaoquZAZ2qlhTOtE9hklkrbNOsLXivS8yMYH5wbeN7hPJtRee2NapPewWHZ
+         jV3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727814055; x=1728418855;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pZ73CcQvi1PQ+XEgRkwDCiOtDJhUD8sj5gWpktchgqE=;
-        b=v13GaFyBKAwQIqL6EnabC2LMAYQjrO6yG5HmMrpNOL7FOYahLpBR9c9hNxAbc16WxA
-         UNnPvFLVWuG90GNkfbw2+ZdWL/Te7ya9D22MTShFJVl8jCrN39wn3S2eBUPGKS8ZpbF6
-         JNMylahL1aa9xAuql517rbIMhYlepcMT9I2BsewLipBy5PBAd/Z0MLxajbkl3ANtllQc
-         TY7lQUQY4SnUudOXTQwC6lP8XbPYz5urSQ8OGvSj868d+dMXjvqIy0UOTJ4rLTcqK2LO
-         cR0UMbiIyrr9v8fU5LpcMGQXvRBep4ASC+ib39u31w+7d/05yHkPnObp1knge7W7V66h
-         wtNg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWXvCJC1ju8ZAtuR5yR7YDX0Yv+IHbMb41oo87Gs32kLq9pCDNq75INiMOZbH+babIepOb/UI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygOSn7nhqEi+SRDPcRtK/uO64TbR2j5N2U/pCW55iR5l4lR8sJ
-	el8DMP5FsTRLFm4H3byvUeMQPJbfGlsDa0W57g3PXESYa+GuwlIF
-X-Google-Smtp-Source: AGHT+IFApS0/WtALkW3Qi+48Aew2ZvtyMeOfMCb8CRdV8LudxHG1ORDpdi8RYFS2Cc/aayUDMXCAQw==
-X-Received: by 2002:a05:6512:68a:b0:535:63a9:9d8c with SMTP id 2adb3069b0e04-539a0664ff6mr399889e87.17.1727814054194;
-        Tue, 01 Oct 2024 13:20:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727814886; x=1728419686;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FcP+BTuwSK7rNCDgZlLcE24nBTWuhEDFil4qXQSXnZA=;
+        b=VSs0boX/yaHrj55bk1hK4Z4yXuh9cGyyHrQa1r9VI5LJY5oicA4/R1io528mmuWoHY
+         Re1EUB8XekgLCifS2Alt6EabJ9TjbVJ0+PEq1DtkDVQtF52hNg7VGfQ/NOPs+2YEQKqX
+         6fQv3EpMAsnn7dt0OXqmkVQWl3xaFmK5LXlNS+6TKhHO9sjhku7OBTP/m0lZR/vQOnlD
+         wd0/gJyMYjEQOLthKjrUaZA50944VbF/aPMSpy4F6g30HM+NQ1cZmjZ0kS1kQXQKiYEh
+         CuKtNal/a0PpF1lW2TG80SNEkmlgUybZ8jVxL0fFbmY51q6w5bKWFb2UMUPR73WC1jmi
+         HRoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXB0CsNHzTEVM4r8yIN/b8GrVEbCImaKtu5c/HaVV12HUHUFfqVNWbTH3bwXr4grlyNyK+gloY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2Sx5cwFlqcUWc9kdY1mOK4pv5BVmsZQU+l/bo3s71Jw6fBY1s
+	TpRx5860+3TZ0mtUIiFRE7GTVz5ToXmtkpJEwgtu5EQMGO/bDB1D
+X-Google-Smtp-Source: AGHT+IFA48wx56YUns069eVpQr+pBcSTNRx2GcE7+SPUGhkO7yw2nwkZuSbiJquNYNPMbt8ujgXFGA==
+X-Received: by 2002:a05:6512:1320:b0:52e:9b92:4990 with SMTP id 2adb3069b0e04-539a06780admr372497e87.32.1727814886071;
+        Tue, 01 Oct 2024 13:34:46 -0700 (PDT)
 Received: from mobilestation ([95.79.225.241])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5398ff6996csm1124907e87.170.2024.10.01.13.20.52
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5398a5aa8d5sm1551039e87.178.2024.10.01.13.34.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:20:53 -0700 (PDT)
-Date: Tue, 1 Oct 2024 23:20:51 +0300
+        Tue, 01 Oct 2024 13:34:44 -0700 (PDT)
+Date: Tue, 1 Oct 2024 23:34:42 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
 	Alexandre Torgue <alexandre.torgue@foss.st.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, 
@@ -77,95 +78,287 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org, 
 	Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH RFC net-next 01/10] net: pcs: xpcs: move PCS reset to
+Subject: Re: [PATCH net-next 01/10] net: pcs: xpcs: move PCS reset to
  .pcs_pre_config()
-Message-ID: <7drrlatwrjf3x77k3fswobcmbquye5luu2thoxwahqmodsm3ur@c6vqwcgtwnot>
-References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
- <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
- <mykeabksgikgk6otbub2i3ksfettbozuhqy3gt5vyezmemvttg@cpjn5bcfiwei>
- <Zvp59w0kId/t8CZs@shell.armlinux.org.uk>
+Message-ID: <fp2h6mc2346egjtcshek4jvykzklu55cbzly3sj3zxhy6sfblj@waakp6lr6u5t>
+References: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
+ <E1svfMA-005ZI3-Va@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="3jzxm2zcn3q6c266"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <E1svfMA-005ZI3-Va@rmk-PC.armlinux.org.uk>
+
+
+--3jzxm2zcn3q6c266
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zvp59w0kId/t8CZs@shell.armlinux.org.uk>
 
-On Mon, Sep 30, 2024 at 11:14:15AM GMT, Russell King (Oracle) wrote:
-> On Mon, Sep 30, 2024 at 01:16:57AM +0300, Serge Semin wrote:
-> > Hi Russell
-> > 
-> > On Mon, Sep 23, 2024 at 03:00:59PM GMT, Russell King (Oracle) wrote:
-> > > +static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
-> > > +{
-> > > +	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
-> > > +	const struct dw_xpcs_compat *compat;
-> > > +	int ret;
-> > > +
-> > > +	if (!xpcs->need_reset)
-> > > +		return;
-> > > +
-> > 
-> > > +	compat = xpcs_find_compat(xpcs->desc, interface);
-> > > +	if (!compat) {
-> > > +		dev_err(&xpcs->mdiodev->dev, "unsupported interface %s\n",
-> > > +			phy_modes(interface));
-> > > +		return;
-> > > +	}
-> > 
-> > Please note, it's better to preserve the xpcs_find_compat() call even
-> > if the need_reset flag is false, since it makes sure that the
-> > PHY-interface is actually supported by the PCS.
->
- 
-> Sorry, but I strongly disagree. xpcs_validate() will already have dealt
-> with that, so we can be sure at this point that the interface is always
-> valid. The NULL check is really only there because it'll stop the
-> "you've forgotten to check for NULL on this function that can return
-> NULL" brigade endlessly submitting patches to add something there -
-> just like xpcs_get_state() and xpcs_do_config().
+Hi Russell
 
-Thanks for the detailed answer. Indeed, I missed the part that the
-pcs_validate() already does the interface check.
-
+On Tue, Oct 01, 2024 at 05:04:10PM GMT, Russell King (Oracle) wrote:
+> Move the PCS reset to .pcs_pre_config() rather than at creation time,
+> which means we call the reset function with the interface that we're
+> actually going to be using to talk to the downstream device.
 > 
-> > > +	bool need_reset;
-> > 
-> > If you still prefer the PCS-reset being done in the pre_config()
-> > function, then what about just directly checking the PMA id in there?
-> > 
-> > 	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
-> > 		return 0;
-> > 
-> > 	return xpcs_soft_reset(xpcs);
-> 
-> I think you've missed what "need_reset" is doing as you seem to
-> think it's just to make it conditional on the PMA ID. That's only
-> part of the story.
-> 
-> In the existing code, the reset only happens _once_ when the create
-> happens, not every time the PCS is configured. I am preserving this
-> behaviour, because I do _NOT_ wish to incorporate multiple functional
-> changes into one patch - and certainly in a cleanup series keep the
-> number of functional changes to a minimum.
+> Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com> # sja1105
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Ok. So the goal is to preserve the semantics. Seems reasonable. But... 
+Continuing the RFC discussion. As I mentioned here:
+https://lore.kernel.org/netdev/mykeabksgikgk6otbub2i3ksfettbozuhqy3gt5vyezmemvttg@cpjn5bcfiwei/
+The PCS-reset procedure actually can be converted to being independent
+from the PHY-interface. Thus you won't need to move the PCS resetting
+to the pre_config() method, and get rid from the pointer to
+dw_xpcs_compat utilization each time the reset is required.
 
-> 
-> So, all in all, I don't see the need to change anything in my patch.
-
-I'll get back to this patch discussion in the v1 series since you have
-already submitted it.
+So why not to merge in my patch to your series as a pre-requisite
+change and then this patch can be converted to just dropping the
+xpcs_find_compat() method call from the xpcs_init_iface() function?
+Alternatively the dropping can be just incorporated into my patch.
 
 -Serge(y)
 
+> ---
+>  drivers/net/pcs/pcs-xpcs.c   | 39 +++++++++++++++++++++++++++---------
+>  include/linux/pcs/pcs-xpcs.h |  1 +
+>  2 files changed, 30 insertions(+), 10 deletions(-)
 > 
-> Thanks for the feedback anyway.
-> 
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 82463f9d50c8..7c6c40ddf722 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -659,6 +659,30 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
+>  }
+>  EXPORT_SYMBOL_GPL(xpcs_config_eee);
+>  
+> +static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
+> +{
+> +	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
+> +	const struct dw_xpcs_compat *compat;
+> +	int ret;
+> +
+> +	if (!xpcs->need_reset)
+> +		return;
+> +
+> +	compat = xpcs_find_compat(xpcs->desc, interface);
+> +	if (!compat) {
+> +		dev_err(&xpcs->mdiodev->dev, "unsupported interface %s\n",
+> +			phy_modes(interface));
+> +		return;
+> +	}
+> +
+> +	ret = xpcs_soft_reset(xpcs, compat);
+> +	if (ret)
+> +		dev_err(&xpcs->mdiodev->dev, "soft reset failed: %pe\n",
+> +			ERR_PTR(ret));
+> +
+> +	xpcs->need_reset = false;
+> +}
+> +
+>  static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
+>  				      unsigned int neg_mode)
+>  {
+> @@ -1365,6 +1389,7 @@ static const struct dw_xpcs_desc xpcs_desc_list[] = {
+>  
+>  static const struct phylink_pcs_ops xpcs_phylink_ops = {
+>  	.pcs_validate = xpcs_validate,
+> +	.pcs_pre_config = xpcs_pre_config,
+>  	.pcs_config = xpcs_config,
+>  	.pcs_get_state = xpcs_get_state,
+>  	.pcs_an_restart = xpcs_an_restart,
+> @@ -1460,18 +1485,12 @@ static int xpcs_init_id(struct dw_xpcs *xpcs)
+>  
+>  static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
+>  {
+> -	const struct dw_xpcs_compat *compat;
+> -
+> -	compat = xpcs_find_compat(xpcs->desc, interface);
+> -	if (!compat)
+> -		return -EINVAL;
+> -
+> -	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+> +	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
+>  		xpcs->pcs.poll = false;
+> -		return 0;
+> -	}
+> +	else
+> +		xpcs->need_reset = true;
+>  
+> -	return xpcs_soft_reset(xpcs, compat);
+> +	return 0;
+>  }
+>  
+>  static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+> diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+> index b4a4eb6c8866..fd75d0605bb6 100644
+> --- a/include/linux/pcs/pcs-xpcs.h
+> +++ b/include/linux/pcs/pcs-xpcs.h
+> @@ -61,6 +61,7 @@ struct dw_xpcs {
+>  	struct clk_bulk_data clks[DW_XPCS_NUM_CLKS];
+>  	struct phylink_pcs pcs;
+>  	phy_interface_t interface;
+> +	bool need_reset;
+>  };
+>  
+>  int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface);
 > -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 2.30.2
+> 
+> 
+
+--3jzxm2zcn3q6c266
+Content-Type: text/x-patch; charset=iso-8859-1
+Content-Disposition: attachment;
+	filename="0001-net-pcs-xpcs-Drop-compat-arg-from-soft-reset-method.patch"
+Content-Transfer-Encoding: 8bit
+
+From 7e36cef5d954cc17586194b8e0b3c58fe0dfe592 Mon Sep 17 00:00:00 2001
+From: Serge Semin <fancer.lancer@gmail.com>
+Date: Tue, 4 Jul 2023 12:39:29 +0300
+Subject: [PATCH] net: pcs: xpcs: Drop compat arg from soft-reset method
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+It's very much inconvenient to have the soft-reset method requiring the
+xpcs_compat structure instance passed. The later one is found based on the
+PHY-interface type which isn't always available. Such design makes an
+ordinary reset-method context depended and unnecessary limits its usage
+area. Indeed based on [1,2] all Soft-RST flags exported by the PMA/PMD,
+PCS, AN or MII MMDs are _shared_. It means it resets all the DWX_xpcs
+internal blocks including CSRs, but except the Management Interface (MDIO,
+MCI, APB). Thus it doesn't really matter which MMDs soft-reset flag is
+set, the result will be the same. So the AN-mode-depended code can be
+freely dropped from the soft-reset method. But depending on the DW XPCS
+device capabilities (basically it depends on the IP-core synthesize
+parameters) it can lack some of the MMDs. In order to solve that
+difficulty the Vendor-Specific 1 MMD can be utilized. It is also called as
+Control MMD and exports some generic device info about the device
+including a list of the available MMDs: PMA/PMD, XS/PCS, AN or MII. This
+MMD persists on all the DW XPCS device [3]. Thus it can be freely utilize
+to cross-platformly determine actual MMD to perform the soft-reset.
+
+[1] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.111.
+[2] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.268.
+[3] DesignWare® Cores Ethernet PCS, Version 3.11b, June 2015, p.269.
+
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+---
+ drivers/net/pcs/pcs-xpcs.c   | 31 ++++++++++++++++---------------
+ drivers/net/pcs/pcs-xpcs.h   |  7 +++++++
+ include/linux/pcs/pcs-xpcs.h |  1 +
+ 3 files changed, 24 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 014ca2b067f4..81c166726636 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -271,24 +271,18 @@ static int xpcs_poll_reset(struct dw_xpcs *xpcs, int dev)
+ 	return (ret & MDIO_CTRL1_RESET) ? -ETIMEDOUT : 0;
+ }
+ 
+-static int xpcs_soft_reset(struct dw_xpcs *xpcs,
+-			   const struct dw_xpcs_compat *compat)
++static int xpcs_soft_reset(struct dw_xpcs *xpcs)
+ {
+ 	int ret, dev;
+ 
+-	switch (compat->an_mode) {
+-	case DW_AN_C73:
+-	case DW_10GBASER:
+-		dev = MDIO_MMD_PCS;
+-		break;
+-	case DW_AN_C37_SGMII:
+-	case DW_2500BASEX:
+-	case DW_AN_C37_1000BASEX:
++	if (xpcs->mmd_ctrl & DW_SR_CTRL_MII_MMD_EN)
+ 		dev = MDIO_MMD_VEND2;
+-		break;
+-	default:
++	else if (xpcs->mmd_ctrl & DW_SR_CTRL_PCS_XS_MMD_EN)
++		dev = MDIO_MMD_PCS;
++	else if (xpcs->mmd_ctrl & DW_SR_CTRL_PMA_MMD_EN)
++		dev = MDIO_MMD_PMAPMD;
++	else
+ 		return -EINVAL;
+-	}
+ 
+ 	ret = xpcs_write(xpcs, dev, MDIO_CTRL1, MDIO_CTRL1_RESET);
+ 	if (ret < 0)
+@@ -935,7 +929,7 @@ static int xpcs_get_state_c73(struct dw_xpcs *xpcs,
+ 	/* ... and then we check the faults. */
+ 	ret = xpcs_read_fault_c73(xpcs, state, pcs_stat1);
+ 	if (ret) {
+-		ret = xpcs_soft_reset(xpcs, compat);
++		ret = xpcs_soft_reset(xpcs);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -1485,17 +1479,24 @@ static int xpcs_init_id(struct dw_xpcs *xpcs)
+ static int xpcs_init_iface(struct dw_xpcs *xpcs, phy_interface_t interface)
+ {
+ 	const struct dw_xpcs_compat *compat;
++	int ret;
+ 
+ 	compat = xpcs_find_compat(xpcs->desc, interface);
+ 	if (!compat)
+ 		return -EINVAL;
+ 
++	ret = xpcs_read(xpcs, MDIO_MMD_VEND1, DW_SR_CTRL_MMD_CTRL);
++	if (ret < 0)
++		return ret;
++
++	xpcs->mmd_ctrl = ret;
++
+ 	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+ 		xpcs->pcs.poll = false;
+ 		return 0;
+ 	}
+ 
+-	return xpcs_soft_reset(xpcs, compat);
++	return xpcs_soft_reset(xpcs);
+ }
+ 
+ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev,
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index fa05adfae220..774b71801cc0 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -52,6 +52,13 @@
+ #define DW_C73_2500KX			BIT(0)
+ #define DW_C73_5000KR			BIT(1)
+ 
++/* VR_CTRL_MMD */
++#define DW_SR_CTRL_MMD_CTRL		0x0009
++#define DW_SR_CTRL_AN_MMD_EN		BIT(0)
++#define DW_SR_CTRL_PCS_XS_MMD_EN	BIT(1)
++#define DW_SR_CTRL_MII_MMD_EN		BIT(2)
++#define DW_SR_CTRL_PMA_MMD_EN		BIT(3)
++
+ /* Clause 37 Defines */
+ /* VR MII MMD registers offsets */
+ #define DW_VR_MII_MMD_CTRL		0x0000
+diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+index b4a4eb6c8866..241a1a959406 100644
+--- a/include/linux/pcs/pcs-xpcs.h
++++ b/include/linux/pcs/pcs-xpcs.h
+@@ -59,6 +59,7 @@ struct dw_xpcs {
+ 	const struct dw_xpcs_desc *desc;
+ 	struct mdio_device *mdiodev;
+ 	struct clk_bulk_data clks[DW_XPCS_NUM_CLKS];
++	u16 mmd_ctrl;
+ 	struct phylink_pcs pcs;
+ 	phy_interface_t interface;
+ };
+-- 
+2.46.1
+
+
+--3jzxm2zcn3q6c266--
 
