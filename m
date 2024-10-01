@@ -1,152 +1,294 @@
-Return-Path: <netdev+bounces-130874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A6C98BD0E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:06:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ABD1C98BD23
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ADA06282509
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:06:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359732826BA
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F17F1E529;
-	Tue,  1 Oct 2024 13:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A1B1C32FC;
+	Tue,  1 Oct 2024 13:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="NiBbRQsX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kfuEKXQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0773E4A06
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 13:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727788010; cv=none; b=l8G1gvNag5MYRe1PTPtoONIsSEqSbaiGh0Zf2oL8OEwcazl1trheNjFpqMbyjvB4mFoEf2pA/Ox/x5K6Zt8KtfmQBO7v/8Vqq61SkFy7hnwlXPQqOO84MjQGZcaq2Ivpq6gXdAbjjzwniVsGr9H976CNVOtFGyzB1xbCIW7A1QE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727788010; c=relaxed/simple;
-	bh=07OOiqbFA9bgzD/GWgardGPbOg7r+AzJS3cEEkG3mgM=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=KH1sz9dsIs2BusRZJB1h+A3ncDlFP86KBZG+vZkK8Na3JAQLV1V5iT4ewBWR+mVHGSG1Q6JQ8Lmh3I3YOAhSa0bQ/stvaTyz7O8OJt3nw6tR/EvkPLpEB4mcpZMvxKekwP1lGE3tlkLtdbb6Oo3uCkxtjHvfLk7YUKf9UUxuPt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=NiBbRQsX; arc=none smtp.client-ip=148.163.129.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 911D0280072
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 13:06:45 +0000 (UTC)
-Received: from [192.168.1.23] (unknown [98.97.40.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 0D42213C2B0
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 06:06:44 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 0D42213C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1727788005;
-	bh=07OOiqbFA9bgzD/GWgardGPbOg7r+AzJS3cEEkG3mgM=;
-	h=Date:To:From:Subject:From;
-	b=NiBbRQsX3/mpwWiIM8/n6XkBlHQpfMtGokrAyQQUOl5cEiARwWDzkYGTFxRqf8u28
-	 N/3kuDzbmqJjgrA/7LA2vQLYFQDCQxZyXoyZbROFpeBCRcUZrDiabAo4xH3ZLrPoBL
-	 VhZZhQqJ9b/+hMS+JtZsCQivqHmY3ioGiDZ5Bmt0=
-Message-ID: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
-Date: Tue, 1 Oct 2024 06:06:44 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C791D1C2330;
+	Tue,  1 Oct 2024 13:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727788460; cv=fail; b=I+hFXqoKGmbYa9pXoIB+PEKkbBRUdWd/MbmIfFPsWWVN6VL3mqhTmN/Qy6KreGMJUJqnjbLRPmgEemEWevqQqKwvmB6tvlMx1/sI28Vlksd6cvoq7go0uQ2D1NRs30FFmHPI5Oypd4jqJFE7usP12R7YFN8LG5KrKFk8iRYrhpo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727788460; c=relaxed/simple;
+	bh=tTq9MT8vhQE/Ynv3U7Ggj8rZXz3QE3865rtWP1HVFL4=;
+	h=Message-ID:Date:Subject:To:References:From:CC:In-Reply-To:
+	 Content-Type:MIME-Version; b=LFUsf132HN743se44fIVY9KbYYJcbwYH5nZjZn7jUeejM78aGQSafHrOqVFJ/VVaLkAErtDqner2AZRJrlLUcS0V6YkOPd/sBiUyQ51GEj5o3Rzzx8QcGV/T00xwq3noBJ7ukuOM1gL69TfO8mH3RubuW3z0mhQSa9jy3vXh3uY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kfuEKXQV; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727788458; x=1759324458;
+  h=message-id:date:subject:to:references:from:cc:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=tTq9MT8vhQE/Ynv3U7Ggj8rZXz3QE3865rtWP1HVFL4=;
+  b=kfuEKXQVWcEA7v37KzniETIj1sPr2Jdx1JxfJWfX0Rmw3Tf4wU8SyVsI
+   iRiFqbcjG7uCGWlc3qAw35zpxOawAiNCOjaDphJ4ZffL6zTzvvat7bALc
+   QSOUW92tG3IdjH6kcdQ9QgcQ/e1q+CU3xTRPbvOCi8MaY/95BbmWRil6/
+   Q4cYcg9W9TVrL3OOBWf7AIj5Bp26hp1cEb8IuWuuriltw5uSSwbDOCiix
+   +O0J2S6zEZfbNmg6JRzfU4Pq1hgtbeAicFpMDuBlTAQ5yn6+4c8idG9JQ
+   sG1vm5QZf7x/uB1u2EUL//nNmi05EX9hjbE2ajXWcWvWmwz2N9ul71yHJ
+   g==;
+X-CSE-ConnectionGUID: a506tWWwTmWSH2ckwSAZjA==
+X-CSE-MsgGUID: kHeHm0ejTzGgjV6fVD/c0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="29804227"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="29804227"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 06:14:18 -0700
+X-CSE-ConnectionGUID: EenqO2ycT06MKRcs/AKGEw==
+X-CSE-MsgGUID: D5gssNTxQaqwalxubos0qA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="73324207"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Oct 2024 06:14:19 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 1 Oct 2024 06:14:17 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 1 Oct 2024 06:14:16 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 1 Oct 2024 06:14:16 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.174)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 1 Oct 2024 06:14:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hRCeZAuz5+meLuS43H4F+QVHAmsn2kIS0nbJeMFG7x1N55NGwh3HDugBwlhE/+DfkCb1/bk690FzjT/0Yqum6o7tr3IZ8yvpNegwDhduR39SHGW23sZUkGBlO5YoexNXMzGJbfrjUtAAuVkiwFMvNNh/wZ7+eIvo71yfdnAIrgEjS1LzlmJbHct42NXDltHUpSUYwDKmv9gn8d6Mu062BEou7gTXOa7aJKtqecmFifsQ5kFODPi5mbvoP/RpLHW5RTpwsz/eAl9K5HQoQ+JxUvHn9yxnIZEQ3/HXrtOvL/mvhmdikt5AmuYoiZ/8vCdzxiMaKEiBlMQ0d9mF0+lSLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DAQbUY2Bd1jT35CzyTH88JiKJVdEsGZPzr2vCqXT4yU=;
+ b=Kka3FgIvfNokSCNbqFD4IA7KIiu7Y4hXP8+HAOqcdb3CLnNjlogRMXs/gpNy4V7Yr3eTY6oai40v2LJ5kPutob8Q629khDjDVVFtOlKKyUoopmbJXFbXp3yM/ly+n22BFGFg9kk7fAwN59YByWYztuChj6/4VfhE/v9O9r05xkBiKi34KrxOnNmRZ9ZKdfxD9iP/cxdBVhQ/hfx38zTK+NI1vinCZpbWDuOl8tY0z5fHGqLqlT1ehyiQuP12veirnYlexemXUOwiqfnQRkyJgpnmBZENwbQ4T9URHBHcv8Jj6BOQMF6c30lrokev7RbskZQg9+t52hCAPGbcpxYUXw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by PH7PR11MB6884.namprd11.prod.outlook.com (2603:10b6:510:203::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26; Tue, 1 Oct
+ 2024 13:14:12 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8026.014; Tue, 1 Oct 2024
+ 13:14:12 +0000
+Message-ID: <a2d7ef07-a3a8-4427-857f-3477eb48af11@intel.com>
+Date: Tue, 1 Oct 2024 15:14:07 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 1/1] idpf: Don't hard code napi_struct size
+To: Joe Damato <jdamato@fastly.com>
+References: <20240925180017.82891-1-jdamato@fastly.com>
+ <20240925180017.82891-2-jdamato@fastly.com>
+ <6a440baa-fd9b-4d00-a15e-1cdbfce52168@intel.com>
+ <c32620a8-2497-432a-8958-b9b59b769498@intel.com>
+ <9f86b27c-8d5c-4df9-8d8c-91edb01b0b79@intel.com>
+ <Zvsjitl-SANM81Mk@LQ3V64L9R2>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+CC: Przemek Kitszel <przemyslaw.kitszel@intel.com>, <netdev@vger.kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "moderated list:INTEL
+ ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
+	<linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
+In-Reply-To: <Zvsjitl-SANM81Mk@LQ3V64L9R2>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0113.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4bb::6) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-MW
-To: netdev <netdev@vger.kernel.org>
-From: Ben Greear <greearb@candelatech.com>
-Subject: nf-nat-core: allocated memory at module unload.
-Organization: Candela Technologies
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MDID: 1727788006-Zcic7C1qReRI
-X-MDID-O:
- us5;ut7;1727788006;Zcic7C1qReRI;<greearb@candelatech.com>;0590461a9946a11a9d6965a08c2b2857
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH7PR11MB6884:EE_
+X-MS-Office365-Filtering-Correlation-Id: d2886b72-3c8c-49e1-539e-08dce21af113
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1p4L1EwSjY3elJOQXNETk9FUGd1T3Blak8yTXVsNVh3UnM3RnhIbGxVVlhL?=
+ =?utf-8?B?MXBzY2MrMms5Z3RNZkY4NlZHU2NYVm5TcFJqTEsreVB2N2REZ2hvWUV6VkJs?=
+ =?utf-8?B?bjN1Rk5mZXdrRWQzdWtaTWlqakJ4ZWtSaStVeDhaLzNrbW1SRXFybkdIVkxG?=
+ =?utf-8?B?VnRObU1nYVhsQUlnZjNHa0VGbFZwaEQ3U0l0NXpMV01kOGlYdWwvZzI0WkJ4?=
+ =?utf-8?B?cWk3TEtNbDFod0tvZFRPOGY2VXpKaGdudXJzQmx4VTdWeVVEZG1uSTJkTmNQ?=
+ =?utf-8?B?aUtyamV4RkxXUVJXWEE2b3hXMlZoL2djREFXck1TTTNYemJSUkF6WExiWnRo?=
+ =?utf-8?B?VTJZY1lFb1M3c1E1QnlQOEQxNkpLU3pWc3cxbUNHMU1wY2lLQWVCaHFoVnpG?=
+ =?utf-8?B?aWdnRlRsTlVHTTNQY2t6L1lEeEpkS0k2MGt3VDlkb3FVbm9sR0djQzFZbWhp?=
+ =?utf-8?B?RW9maTNoWDVEMng3dXJML0hTTkNDNGw5VEVReGNVYmdkZHY0RGNWRDZMZXVP?=
+ =?utf-8?B?dmswT1Z6ZW5EeWpEdG1BUDJjY0lyNUYwanQ2NjJBNHhqN2lBODBRb3VNUVZj?=
+ =?utf-8?B?Z28wWHdFYWdxT0FWTDU5VExvRnd6emZlUXJQTDNLbzRobkxJYnUxZ1lJMlRQ?=
+ =?utf-8?B?RndRLzRtVGhJaFFPOGQwN3hseU1OTGxxYUt6MVFGVUd5QUlocTBrYk12K3lX?=
+ =?utf-8?B?SlVEeGp4SFhkcEtZSy8zc1NzYVMwLzA3cEdTQmNUd0ZabzREbzVWNlo1MjRm?=
+ =?utf-8?B?NE5mclUwWDhqRUFqUTBDdWc1Z0pYNnQ3SXFZSHU2ME80TnlhSzFyYmRpM0tV?=
+ =?utf-8?B?RWVPUm1MTGtVVEFOVThseXVBbkVzOStZbHVQTzloT1dCYWNEZXVRUGxRdXh6?=
+ =?utf-8?B?Zi8xS2laaXJ5TUpiMVdhb0hSQlJLczFwckJ4cTdXNDBUVTZ5bDVwNzFNbUxG?=
+ =?utf-8?B?TlhTUGRsei9BN2tqUUF2MlJ6bDcrVFl5MzRjWkg1R3MrRGFtcXJ4d3VTZ3RB?=
+ =?utf-8?B?U1Y0d1BSN1F2Rko2dVc4d0laRHJYRm54LzIwTHNmUzV1RTdKYUU4UnVQZFVy?=
+ =?utf-8?B?ZWxQcDhpd0hYUWVKaS90WnpUVnY4SUNXMkZtcFFnOGovSG1jT1g0TEE4elFO?=
+ =?utf-8?B?OHFzMGZ3Z2JBTjFNaDJnaW5BaXc1LzFsdW1HYzdscWhCZWpZNXdMRUFoVjRF?=
+ =?utf-8?B?bElMZjFiZWo4emlva3BaQ2NZQXU0TFpUbG04VXdTNW5ZU0xkMVY2MnNIWENw?=
+ =?utf-8?B?cmV4WEoxNk9qZ3BFeGxaRWVrS0NtcW02UGZ2a0g0bFdkN2xQcENZTEpoRXpk?=
+ =?utf-8?B?cU5CM3lFK2tnL0I2T29IMmNKeGVyd1VqUUtmTXRscUJ6ekFHNEVvZVRiMjgw?=
+ =?utf-8?B?VzlUQ3dIbTg0ZXgycEEybldiYzdLZDlzQnMzMDd5U0dVSTJRZ3kwU25XeHVC?=
+ =?utf-8?B?dlFuM3lIK0w4M3FGUmlQQXRGYjBwcW5ZSmc2R2NTc1BwdDJoYWJTU0E0aDVD?=
+ =?utf-8?B?UU51RE5nM0FQN3RiaTgrdzVuRGltRU1tekRUai9oRmo3eDZramo2VFBPdStp?=
+ =?utf-8?B?T0pNMFlmZnRFSWdSUGw1QURRN04rZ29VWHRwcWJmbkR3YmJVTEovWkFrTTBi?=
+ =?utf-8?B?ZXhaUUQ2aFJNWGt2bDBIRVZnWUo1Mm1ncFlvRy9KQjhBdmxJVHNlbDQrUlBZ?=
+ =?utf-8?B?VGtXbytndVBWQTErUkkvUjZxQVlZdUlwai9NYjdldmFXRGhRNjIxb3d3PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dmoreG0vUnBDcXd5UjFpUVRCWXRIT0FjRkR2d1ZtL0dvZm43UnZHVkw0RndW?=
+ =?utf-8?B?TDRIcm05Zlp6bEVZbUFDMHpJdXJ3Q1JBMjg0YWJDMi8vTjhHSGVjS1ZSZjVo?=
+ =?utf-8?B?K0k4eU9tV1c2Y1VnVDBsT3lrdGxYYjR6dWNxU1JYK0lvMHN3azBueVhFdmxP?=
+ =?utf-8?B?cDJNYzZzbGsxNnFTZDJWSk1kRkprSCsxR1VWQ3FCUTVDOFBybjdrS0dhVEFa?=
+ =?utf-8?B?Smp1KzhmM2VFVnRvLzlnR3R0NGZrVkVtVStuR3h5UURzSEl5VXFIMUZUeTk3?=
+ =?utf-8?B?NWJpUndyZldkSFovZHZpN0MwcFhQMTIwc3M0L1RsYmd0WWpyYURoREZpMm9k?=
+ =?utf-8?B?Y0hoeEcxallmNmxwU0cvOFMxMzlFc2toSTBVeEU2UW9abko5ZGxxbktWNzFT?=
+ =?utf-8?B?Z0Q0NXFqV3BUd2lydWpMbFZUVkpJQ210b0ZEK0g4L1ZvZHpSSFBVTGcxSlVl?=
+ =?utf-8?B?KzF6RitWT1dUUWM1SFVIcjJCTGc5c1kzeE5BdkszdGZmeWZUSGh4V1ZWU3Ja?=
+ =?utf-8?B?eFBSc0J0bkhuR0RON3haNVVLa1dKeHJYVEtJVFQ5WFdxMnBkYUhwU0xpM2Vx?=
+ =?utf-8?B?eENiQkNvQnk1OHdQcTNraGlLSUJRdk9IcDlaMFBjb1oydkVxQkpyMG5UVlNV?=
+ =?utf-8?B?d1gybDA3U1FBalhkUDlRNUJDa3VJNFZMdlNXVEs2L2RZU2FxSmFVSUVQSVZr?=
+ =?utf-8?B?NWFPR1RnWkhkd3BEc3NOL2FseXFxK0pZMTU4ZDJTSmZjcURSQjNCcDVpUXhu?=
+ =?utf-8?B?ZXcwVU50a1NZTE1XTEd0RUw2dHVjeVBKUlI5NTl4SGxDVEw5L1J4dlRlZXEy?=
+ =?utf-8?B?MERqamN3eUwzcFZNQ2dIRHdXV0VFbkx5MnhFang0REoxaFNUV2xkSzJWWnZm?=
+ =?utf-8?B?MVJiMlBXYkxOckVuKzdoSkpCZHdDREhRVzVKUFoyZEtrOEcwNGViYVFvdk15?=
+ =?utf-8?B?dVlnM1kyTDNmWCtoQ1FIQThvQTIyZFgvNmoyVnI0b1kyZjZqaFVUcGZ0NGRE?=
+ =?utf-8?B?Sm01aWwwNkdMdEVlajMrUUZlTTdJb1htbWNRZlR3Ymk0VCtwNmpVcG1hWERN?=
+ =?utf-8?B?NUJaY1dQTW1lM1hUY2VZUFRGZFZIdytyQTBodjJ2MUc2RmQwLyt6V2JDcEdD?=
+ =?utf-8?B?Y3QrTm1Dejl4VUxYQjhaZktzUDdOOVJoSW1iWlE1dkxwUUpDbS85RGh3U3BW?=
+ =?utf-8?B?U0JrdzE4WnUwYU9uSUtnS0QzaGVITE9mMUJkQzY1bk1CS3B4OURiU3UvVFJZ?=
+ =?utf-8?B?Um11TTcyRnpaWWVySmx1K1RKVTN5RnBXNzlaUTZmMk5NaWRGMTNPLytpYkdP?=
+ =?utf-8?B?bEpGRUxYanpsVXpKSmh3YVhkcWhjcmFPdmM5a0MwWXV4NFpTUXVyR3BNTGVQ?=
+ =?utf-8?B?NkQzYWx5ZWlWOTVLWUxJc1JkRERCNE1YWmg4eTZyTGJLNlVMRjV2UDE3V1Vo?=
+ =?utf-8?B?MTNBRWoxOWRDdXkxVlJXZjN1SU5HVERBMjZQNkJjelVyTkJlb2srKy9FU0l4?=
+ =?utf-8?B?NzI2b0lpY0h5M05paWtpbUUrMHdGelFqUmJyczlUUGFOK1JyUGV2TUFBQTlK?=
+ =?utf-8?B?V3RWSnFNQ0Zya0ZXbTAwZ2piM2xxYUMvck14WS9jL0Yyc2ZmcFM1alJ6TTNM?=
+ =?utf-8?B?NHVFWjZNZFpyU0ltTWErNzcrbm43ME5MZGhJMWZ3Y2Y2aFppU3ZJcDhPTUll?=
+ =?utf-8?B?aEdpOGI2WW5EZEhPNzNaYUxGUmJrSWJPQW5FVGFlRTVzREErY0tQRCtGRHN5?=
+ =?utf-8?B?R2IvVjhSNUxwU1pSUW9wZkVXVFliK05kSWNJcTRDV0paYzJPaGVLNm9hQldZ?=
+ =?utf-8?B?RTVoNmNNZWNPcU1FT045T3VJY21jK2ZFandzcWJtYUdVMWx5WVFHQ1dhNHZR?=
+ =?utf-8?B?dEgrTUsrbTE5OS9SM20rYVhRbFdrMVp0RG9FWHJzNTdiNkVNMjR4RTlpWTF0?=
+ =?utf-8?B?SWszTFhueFFvM2R4S0ZjK1BtYnk2NmVIcTNFb0ZzcGU5d2krYkJ1U2tCRmVn?=
+ =?utf-8?B?NmtlYjhTMnVZMEdJR1RmcUFvM3NhdHBvUFhCVG9CZ1Vhc1hZWUVqUytqYnZw?=
+ =?utf-8?B?K1NDR3pERzVQNGFVYmJzUWJuWUM2RjJoQ0oxTTgvajB5MmxUNFQ0MjBiMnN5?=
+ =?utf-8?B?RGtmUWQ1WXg0cGwyVU5UVkkwbTh4bHhGQVRvWVQ1S1U0dXY2ZG5oQWJnYy8v?=
+ =?utf-8?B?S3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d2886b72-3c8c-49e1-539e-08dce21af113
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Oct 2024 13:14:12.2581
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /6I5l0qAz05ZU2rhEEx5PxtyOabUlsFCZBloeF4oUXxRyywdRA9l7THen9Ro8KkfLzzv8+dWe9ZUxbk5Mog4+gOSHuXm1UAs2ax4uKhnvXQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6884
+X-OriginatorOrg: intel.com
 
-Hello,
+From: Joe Damato <jdamato@fastly.com>
+Date: Mon, 30 Sep 2024 15:17:46 -0700
 
-I see this splat in 6.11.0 (plus a single patch to fix vrf xmit deadlock).
+> On Mon, Sep 30, 2024 at 03:10:41PM +0200, Przemek Kitszel wrote:
+>> On 9/30/24 14:38, Alexander Lobakin wrote:
+>>> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+>>> Date: Mon, 30 Sep 2024 14:33:45 +0200
+>>>
+>>>> From: Joe Damato <jdamato@fastly.com>
+>>>> Date: Wed, 25 Sep 2024 18:00:17 +0000
+>>
+>>> struct napi_struct doesn't have any such fields and doesn't depend on
+>>> the kernel configuration, that's why it's hardcoded.
+>>> Please don't change that, just adjust the hardcoded values when needed.
+>>
+>> This is the crucial point, and I agree with Olek.
+>>
+>> If you will find it more readable/future proof, feel free to add
+>> comments like /* napi_struct */ near their "400" part in the hardcode.
+>>
+>> Side note: you could just run this as a part of your netdev series,
+>> given you will properly CC.
+> 
+> I've already sent the official patch because I didn't hear back on
+> this RFC.
+> 
+> Sorry, but I respectfully disagree with you both on this; I don't
+> think it makes sense to have code that will break if fields are
+> added to napi_struct thereby requiring anyone who works on the core
+> to update this code over and over again.
+> 
+> I understand that the sizeofs are "meaningless" because of your
+> desire to optimize cachelines, but IMHO and, again, respectfully, it
+> seems strange that any adjustments to core should require a change
+> to this code.
 
-Is this a known issue?  Is it a serious problem?
+But if you change any core API, let's say rename a field used in several
+drivers, you anyway need to adjust the affected drivers.
+It's a common practice that some core changes require touching drivers.
+Moreover, sizeof(struct napi_struct) doesn't get changed often, so I
+don't see any issue in adjusting one line in idpf by just increasing one
+value there by sizeof(your_new_field).
 
-------------[ cut here ]------------
-net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register_fn has 256 allocated at module unload
-WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_unload+0x22b/0x3f0
-Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat msdos fat jfs nls_ucs2_utils xfs nf_conntrack_netlink nf_conntrack nfnetlink nf_defrag_ipv6 
-nf_defrag_ipv4 vrf 8021q garp mrp stp llc macvlan pktgen rpcrdma rdma_cm iw_cm ib_cm ib_core qrtr iwlmvm snd_hda_codec_hdmi snd_hda_codec_realtek 
-snd_hda_codec_generic iTCO_wdt ee1004 snd_hda_scodec_component intel_pmc_bxt intel_rapl_msr iTCO_vendor_support snd_hda_intel snd_intel_dspcfg coretemp 
-intel_rapl_common snd_hda_codec intel_uncore_frequency snd_hda_core intel_uncore_frequency_common mac80211 snd_hwdep snd_seq snd_seq_device snd_pcm iwlwifi 
-intel_tcc_cooling x86_pkg_temp_thermal snd_timer intel_powerclamp intel_wmi_thunderbolt i2c_i801 snd i2c_smbus pcspkr soundcore i2c_mux bfq cfg80211 mei_hdcp 
-mei_pxp intel_pch_thermal intel_pmc_core intel_vsec pmt_telemetry pmt_class acpi_pad sch_fq_codel nfsd auth_rpcgss nfs_acl lockd grace sunrpc zram raid1 dm_raid 
-raid456 libcrc32c async_raid6_recov async_memcpy async_pq async_xor xor async_tx raid6_pq
-  i915 cec rc_core drm_buddy intel_gtt drm_display_helper ixgbe drm_kms_helper igb mdio ttm dca i2c_algo_bit agpgart hwmon drm mei_wdt xhci_pci i2c_core 
-xhci_pci_renesas video wmi fuse [last unloaded: nf_nat]
-CPU: 1 UID: 0 PID: 10421 Comm: rmmod Tainted: G        W          6.11.0+ #2
-Tainted: [W]=WARN
-Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
-RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
-Code: 00 00 00 00 00 fc ff df 49 89 fa 49 c1 ea 03 41 80 3c 02 00 0f 85 28 01 00 00 48 8b 76 18 48 c7 c7 a0 da 48 84 e8 15 7d c1 fe <0f> 0b 45 31 ed e9 6b fe ff 
-ff 41 bd 01 00 00 00 48 b8 00 00 00 00
-RSP: 0018:ffff88813b91fc50 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff88812b30b600 RCX: 0000000000000027
-RDX: 0000000000000027 RSI: 0000000000000004 RDI: ffff88841daab988
-RBP: 1ffff11027723f8f R08: 0000000000000001 R09: ffffed1083b55731
-R10: ffff88841daab98b R11: 0000000000000001 R12: fffffbfff099df23
-R13: 0000000000000001 R14: 00000000000000ff R15: dffffc0000000000
-FS:  00007f4efd62f740(0000) GS:ffff88841da80000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000561ab516c000 CR3: 0000000120f94003 CR4: 00000000003706f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  <TASK>
-  ? __warn+0xc8/0x2d0
-  ? alloc_tag_module_unload+0x22b/0x3f0
-  ? report_bug+0x259/0x2c0
-  ? handle_bug+0x54/0xa0
-  ? exc_invalid_op+0x13/0x40
-  ? asm_exc_invalid_op+0x16/0x20
-  ? alloc_tag_module_unload+0x22b/0x3f0
-  ? idr_get_next_ul+0x189/0x230
-  ? allocinfo_show+0x6d0/0x6d0
-  ? rwsem_down_read_slowpath+0xb10/0xb10
-  codetag_unload_module+0x19b/0x2a0
-  ? codetag_load_module+0x80/0x80
-  ? up_write+0x4f0/0x4f0
-  ? notifier_call_chain+0x95/0x2d0
-  free_module+0x51/0x3e0
-  __do_sys_delete_module.constprop.0+0x39c/0x530
-  ? module_flags+0x300/0x300
-  ? kmem_cache_alloc_bulk_noprof+0x680/0x6a0
-  ? __virt_addr_valid+0x1cb/0x390
-  ? lockdep_hardirqs_on_prepare+0x275/0x3e0
-  do_syscall_64+0x69/0x160
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-RIP: 0033:0x7f4efcf128cb
-Code: 73 01 c3 48 8b 0d 55 55 0e 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 
-48 8b 0d 25 55 0e 00 f7 d8 64 89 01 48
-RSP: 002b:00007ffee03b3338 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
-RAX: ffffffffffffffda RBX: 000055b749cea7b0 RCX: 00007f4efcf128cb
-RDX: 0000000000000000 RSI: 0000000000000800 RDI: 000055b749cea818
-RBP: 0000000000000000 R08: 1999999999999999 R09: 0000000000000000
-R10: 00007f4efcf9dac0 R11: 0000000000000206 R12: 00007ffee03b3590
-R13: 00007ffee03b4963 R14: 000055b749cea2a0 R15: 00007ffee03b3598
-  </TASK>
-irq event stamp: 7895
-hardirqs last  enabled at (7907): [<ffffffff8143a209>] __up_console_sem+0x59/0x60
-hardirqs last disabled at (7918): [<ffffffff8143a1ee>] __up_console_sem+0x3e/0x60
-softirqs last  enabled at (7800): [<ffffffff8129bd51>] __irq_exit_rcu+0x91/0xc0
-softirqs last disabled at (7795): [<ffffffff8129bd51>] __irq_exit_rcu+0x91/0xc0
----[ end trace 0000000000000000 ]---
+If you do that, then:
++ you get notified that you may affect the performance of different
+  drivers (napi_struct is usually embedded into perf-critical
+  structures in drivers);
++ I get notified (Cced) that someone's change will affect idpf, so I'll
+  be aware of it and review the change;
+- you need to adjust one line in idpf.
+
+Is it just me or these '+'s easily outweight that sole '-'?
+
+> 
+> I really do not want to include a patch to change the size of
+> napi_struct in idpf as part of my RFC which is totally unrelated to
+> idpf and will detract from the review of my core changes.
+
+One line won't distract anyone. The kernel tree contains let's say one
+patch from me where I needed to modify around 20 drivers within one
+commit due to core code structure change -- the number of locs I changed
+in the drivers was way bigger than the number of locs I changed in the
+core. And there's a ton of such commits in there. Again, it's a common
+practice.
+
+> 
+> Perhaps my change is unacceptable, but there should be a way to deal
+> with this that doesn't require everyone working on core networking
+> code to update idpf, right?
+
+We can't isolate the core code from the drivers up to the point that you
+wouldn't require to touch the drivers at all when working on the core
+changes, we're not Windows. The drivers and the core are inside one
+tree, so that such changes can be made easily and no code inside the
+whole tree is ABI (excl uAPI).
 
 Thanks,
-Ben
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
+Olek
 
