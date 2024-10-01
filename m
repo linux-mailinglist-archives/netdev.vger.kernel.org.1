@@ -1,112 +1,247 @@
-Return-Path: <netdev+bounces-130923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A7698C140
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 17:12:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 663D398C151
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 17:14:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 507ED1C232C2
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:12:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899651C232F7
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9901C3F01;
-	Tue,  1 Oct 2024 15:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AEBF1C9B71;
+	Tue,  1 Oct 2024 15:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRv5lFjP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJlDNWuV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCC8C2E3;
-	Tue,  1 Oct 2024 15:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A641C5782
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 15:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727795526; cv=none; b=C7oaox81vOnY1Cld9yW+cUsTGxLubsVA+rfsRRrceg2jPmhN/zujxpnBXj/YpCrCp6Ub89wCry53ODLlIt6eug4oprpmPKljA1vh0SWp8jUOjIwx1lPY/jfmD46ZNibC2lb+i1qgu+JdRCf+/xNtiBdmlkKF0iZIXpT6K/GoIFA=
+	t=1727795687; cv=none; b=l7BqRHsVXeVSqkGG3afAPJtJvIesgNZGwjPBFVB3Ni480V6wHwFr5Wnojne12jP5/VnoDfMp6SRbQxOeg0OG/XdDhF7fdV+INKdSajIe/hZ3H1k6PdplT7U62cXZK8bdjOlD4Zr5QviOG9N1uv0xGFKqCjGTEbFaFljXXZe4Fck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727795526; c=relaxed/simple;
-	bh=4CMi0PgrHk5jz6m2lnNq2dvGQCypbYULpmcYcHB5ZgY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q7ROFzU20n1LKSL8k0A+QGQECqZHb9x7Rtr+0y8cU1cnyP0a5tNVnfbNy+1S2rQBUgenh7yLTSc/BO6S5DWA8uv5N8e/xHYJFjtOFQjK/2KB+bUcwMhh8lWmuMtD697pg/WWkBZlPG73XHIk2XCur6bBIxc7QI4jNTzIfQuJ9RQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRv5lFjP; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-508f5ee8f50so1270534e0c.1;
-        Tue, 01 Oct 2024 08:12:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727795524; x=1728400324; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4CMi0PgrHk5jz6m2lnNq2dvGQCypbYULpmcYcHB5ZgY=;
-        b=cRv5lFjPDZwt2h/xYipMuz6NewcJYTkwgAIPvjnwkLDIfSP8OXJoT968zM05ikss/W
-         70ihdzjvIOPVkKDSg9t6jpBCPrMPUtJu6i3KltO29OTNe1ZtZOvmUsmQDrwah6LH0xGB
-         bHw4CjNeh43OFM7LWoBV8PVKfZSED1/JvPS4eurW5fcgIkrr8IVcsi3myeiL09CJGPlt
-         MsvkGIHDs2OcMKdVGa2zQSOXP1Q0uVkDGL5GiCs+gE7Bsv9qD5Uok3Tb0dCG4AWfGvV/
-         fQm7q5420IbHxC4aSh0H8lHfaHWejGavn/AA3MyKKVS0DncM4V2lG3raQsGp005CqSeD
-         pPIA==
+	s=arc-20240116; t=1727795687; c=relaxed/simple;
+	bh=AKyFe2hq/R/RiIepSk+0vF7YQ4DmL5B9lXuonYQXDE4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EQ8+gDeRxXgqLIQx7jD2h72B4yavFxnBpaTNao4fUn9YhdORioLobHI+tCf8TMqIE4ovlQxDJ61kwr1GKtwQe0TewPw4UrWkKUZBjIYeQby8T/W4NwRY6FgzXO1gdZ1sdHiUd3XEygp95P4H2/K69fYIwuIskzk7IfU2pqNVIj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FJlDNWuV; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727795684;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5dTFKu82vESr8yr6vd4vi7LjlIE8ld4GmyUnMyrhfJQ=;
+	b=FJlDNWuVyWrIWKqgH7nnFB1NP9cvTDW2UVpOhMzNDVbPntdgPOCq50HVIL3mr70R4eCmK7
+	3VO93b7M8Ui9kML8VgMLdANyJVYqSNqK0t5DKrzSZhb2Ho0XkKpKrB4z7kGpC3iIcJI04s
+	d2fEtlHDGONoiJXTSIemlQ8pCG2ToDA=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-227-aVPxjwCmOdKr1RZ4mNe1nw-1; Tue, 01 Oct 2024 11:14:43 -0400
+X-MC-Unique: aVPxjwCmOdKr1RZ4mNe1nw-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb830ea86so37309975e9.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 08:14:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727795524; x=1728400324;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4CMi0PgrHk5jz6m2lnNq2dvGQCypbYULpmcYcHB5ZgY=;
-        b=dBe/xTwya8321xv8uNwxjhgqN7AsEiLGotrdTOrQfHbE2cg6C0YRROwWCjBoC3fU+9
-         4ZJelUCunMoR03zdnYGu6EJjGeXRw84BanS3ps0eWRqmGiVrZdhb2H8DpdUv0RJoQ/oI
-         Gc6+M0iQgu32ftRmeM9ZOefM8CzXWastnwThfr31jfjjbHIqfk824fd6+HDmJsy+Y6Uv
-         gNQjcJzkcUo+0V6CbmSy/BtMrlstDyNNTTdgynbVGH4GciRlUZrCBYlxJNfAolSNxEHs
-         No/tFF3hYmjpYdzPkTlkC8yrBHIT6biG5z+3QodeM4tA0FSskG/eLTCpuPzSJKl3h6lM
-         YkkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtERNWUL7t68OtZj7eH56afo5UhYwV8yVQXLFcNxQHI0AdreUcJlX1JDzplXvZdz5e2pUnIgockFE3KFM=@vger.kernel.org, AJvYcCXQTHcJp2+KjCqA9jfgiiqlUfLsQ0TxASoVXZqWoQ0I/mrWpCdzVqFOzzS5BjLE7tLn4cjNemZI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxx5ekjxIWJP9prIEsgV9LP1hGriY25s+3LvkpG9reN01IGKlKm
-	wAcj01dtmLkUaMq8T5pDDvZ6dSVbOHr/DyrV91WpXa8n+a8vNyy4FO6q78Ymrl0Z3Vxh4Nu+26a
-	fclu2bz2/a1/1wlvzpzoxyTfzqjA=
-X-Google-Smtp-Source: AGHT+IFSXFJhdkMnAkiwTP/om0JuBKKxMVYEvfd62ZvRkkLAueVBoD+F9ZJx5kJPFDxHwl70Cyz+G1cdVF92fa7rQaI=
-X-Received: by 2002:a05:6122:794:b0:4f6:b094:80aa with SMTP id
- 71dfb90a1353d-50c5821c445mr125273e0c.9.1727795524237; Tue, 01 Oct 2024
- 08:12:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727795682; x=1728400482;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5dTFKu82vESr8yr6vd4vi7LjlIE8ld4GmyUnMyrhfJQ=;
+        b=a56QH4nPFas/Dn2jqIxFQMpUOWJiEdAeEFtTtDhTB0oAry2ObvFITM+DTl7MhUiBJq
+         AXL3W2VeTjVKtd3BPhQ+oBYIn+dnSWX5na+Z//86F+CbrtskmHeu1ItiXJZBOdEvY3+J
+         Y++VIG2vDjtrZUO/VpbNYpUllX9kE/Lb2IRqHiJyXL5dnqyceRvw4TGuIdURKDi3YgXP
+         x7qgurJqp94jUmPimyDSOM/CJ6QOXqAybmyQ0GPQ/gMs1A4LRDYjuVWWDlqgnOz/0OtB
+         szjqu8DPXYNO1qJUVQlUsqmyeVYNKfpn19CUnAXHOpmdEiuEajY/csjvgwo7ljFFFXGT
+         Odxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUObfKsgNZs5DX1vWDDr5opNNHTFkc/1iXXRUujoATwHV5snDQe3Bdglma7sxQsAKMp+Oxwrqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8RpaD9NEfH53pbEdNdHBvqGSgZVNeUvvtFD0pNOkz+d2nN8C/
+	Jd8eO7QllUoDrU3vm7xJ1o7v29SEt87rGm1b803QQ7KnO6AWb34h80FKZu6pHKxJxq5lqVr9/lF
+	L2Svod5Sdb7e0ZpoKgRbzgW/cVoaWCMBWxt7D4nlhSTFedSZEbYwZJg==
+X-Received: by 2002:a5d:45c7:0:b0:37c:d11f:c591 with SMTP id ffacd0b85a97d-37cd5a87904mr7597253f8f.17.1727795681864;
+        Tue, 01 Oct 2024 08:14:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcXOE3tocH8XOJc5qBA0lGHo9gNU2YLoseuv0UbAszC4jNN0/YfSTwqn7BqZ62Nm2YhPL5iA==
+X-Received: by 2002:a5d:45c7:0:b0:37c:d11f:c591 with SMTP id ffacd0b85a97d-37cd5a87904mr7597230f8f.17.1727795681407;
+        Tue, 01 Oct 2024 08:14:41 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cd565dff6sm12022029f8f.30.2024.10.01.08.14.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 08:14:40 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 045F71580155; Tue, 01 Oct 2024 17:14:40 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, Arthur Fabre <afabre@cloudflare.com>
+Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Jakub Sitnicki <jakub@cloudflare.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, kuba@kernel.org, john.fastabend@gmail.com,
+ edumazet@google.com, pabeni@redhat.com, sdf@fomichev.me,
+ tariqt@nvidia.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+ mst@redhat.com, jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, kernel-team <kernel-team@cloudflare.com>,
+ Yan Zhai <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+In-Reply-To: <ZvwNQqN4gez1Ksfn@lore-desk>
+References: <87ldzkndqk.fsf@toke.dk>
+ <CAOn4ftshf3pyAst27C2haaSj4eR2n34_pcwWBc5o3zHBkwRb3g@mail.gmail.com>
+ <87wmiysi37.fsf@toke.dk> <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
+ <87ldzds8bp.fsf@toke.dk> <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
+ <ZvbKDT-2xqx2unrx@lore-rh-laptop> <871q11s91e.fsf@toke.dk>
+ <ZvqQOpqnK9hBmXNn@lore-desk> <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
+ <ZvwNQqN4gez1Ksfn@lore-desk>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 01 Oct 2024 17:14:39 +0200
+Message-ID: <87zfnnq2hs.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240923113135.4366-1-kdipendra88@gmail.com> <20240924071026.GB4029621@kernel.org>
- <CAEKBCKPw=uwN+MCLenOe6ZkLBYiwSg35eQ_rk_YeNBMOuqvVOw@mail.gmail.com>
- <20240924155812.GR4029621@kernel.org> <CAEKBCKO45g4kLm-YPZHpbcS5AMUaqo6JHoDxo8QobaP_kxQn=w@mail.gmail.com>
- <20240924181458.GT4029621@kernel.org> <CAEKBCKPz=gsLbUWNDinVVHD8t760jW+wt1GtFgJW_5cHCj0XbQ@mail.gmail.com>
- <CAEKBCKOykRKyBGzBA6vC0Z7eM8q5yiND64fa4Xxk5s5vCufXtA@mail.gmail.com>
- <CAEKBCKOLPUYJaXOG9p8Gznve86vq+GxOde+iZAYRCPqdjEAgsw@mail.gmail.com> <20241001134233.GS1310185@kernel.org>
-In-Reply-To: <20241001134233.GS1310185@kernel.org>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Tue, 1 Oct 2024 20:56:53 +0545
-Message-ID: <CAEKBCKNZ0=VjToNvjno=h88o0P2qc97LUdeJ5d9w-JtdneFGOw@mail.gmail.com>
-Subject: Re: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error
- pointer check in otx2_ethtool.c
-To: Simon Horman <horms@kernel.org>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi Simon,
+Lorenzo Bianconi <lorenzo@kernel.org> writes:
 
-On Tue, 1 Oct 2024 at 19:27, Simon Horman <horms@kernel.org> wrote:
+>> On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi wrote:
+>> > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
+>> > > 
+>> > > >> > We could combine such a registration API with your header format, so
+>> > > >> > that the registration just becomes a way of allocating one of the keys
+>> > > >> > from 0-63 (and the registry just becomes a global copy of the header).
+>> > > >> > This would basically amount to moving the "service config file" into the
+>> > > >> > kernel, since that seems to be the only common denominator we can rely
+>> > > >> > on between BPF applications (as all attempts to write a common daemon
+>> > > >> > for BPF management have shown).
+>> > > >> 
+>> > > >> That sounds reasonable. And I guess we'd have set() check the global
+>> > > >> registry to enforce that the key has been registered beforehand?
+>> > > >> 
+>> > > >> >
+>> > > >> > -Toke
+>> > > >> 
+>> > > >> Thanks for all the feedback!
+>> > > >
+>> > > > I like this 'fast' KV approach but I guess we should really evaluate its
+>> > > > impact on performances (especially for xdp) since, based on the kfunc calls
+>> > > > order in the ebpf program, we can have one or multiple memmove/memcpy for
+>> > > > each packet, right?
+>> > > 
+>> > > Yes, with Arthur's scheme, performance will be ordering dependent. Using
+>> > > a global registry for offsets would sidestep this, but have the
+>> > > synchronisation issues we discussed up-thread. So on balance, I think
+>> > > the memmove() suggestion will probably lead to the least pain.
+>> > > 
+>> > > For the HW metadata we could sidestep this by always having a fixed
+>> > > struct for it (but using the same set/get() API with reserved keys). The
+>> > > only drawback of doing that is that we statically reserve a bit of
+>> > > space, but I'm not sure that is such a big issue in practice (at least
+>> > > not until this becomes to popular that the space starts to be contended;
+>> > > but surely 256 bytes ought to be enough for everybody, right? :)).
+>> >
+>> > I am fine with the proposed approach, but I think we need to verify what is the
+>> > impact on performances (in the worst case??)
+>> 
+>> If drivers are responsible for populating the hardware metadata before
+>> XDP, we could make sure drivers set the fields in order to avoid any
+>> memove() (and maybe even provide a helper to ensure this?).
 >
-> On Mon, Sep 30, 2024 at 11:57:02PM +0545, Dipendra Khadka wrote:
->
-> ...
->
-> > Are we accepting any changes related to the error pointer handling for
-> > the driver octeontx2?
->
-> Sorry, I think I'm missing some context.
-> Could you explain in a bit more detail?
+> nope, since the current APIs introduced by Stanislav are consuming NIC
+> metadata in kfuncs (mainly for af_xdp) and, according to my understanding,
+> we want to add a kfunc to store the info for each NIC metadata (e.g rx-hash,
+> timestamping, ..) into the packet (this is what Toke is proposing, right?).
+> In this case kfunc calling order makes a difference.
+> We can think even to add single kfunc to store all the info for all the NIC
+> metadata (maybe via a helping struct) but it seems not scalable to me and we
+> are losing kfunc versatility.
 
-We did not accept the patch where Vladimir replied. So , I thought if
-there is not anything like that there, then only I will send a
-patch-set.
-Hence, I asked this question.
+Yes, I agree we should have separate kfuncs for each metadata field.
+Which means it makes a lot of sense to just use the same setter API that
+we use for the user-registered metadata fields, but using reserved keys.
+So something like:
 
-Best regards,
-Dipendra Khadka
+#define BPF_METADATA_HW_HASH      BIT(60)
+#define BPF_METADATA_HW_TIMESTAMP BIT(61)
+#define BPF_METADATA_HW_VLAN      BIT(62)
+#define BPF_METADATA_RESERVED (0xffff << 48)
+
+bpf_packet_metadata_set(pkt, BPF_METADATA_HW_HASH, hash_value);
+
+
+As for the internal representation, we can just have the kfunc do
+something like:
+
+int bpf_packet_metadata_set(field_id, value) {
+  switch(field_id) {
+    case BPF_METADATA_HW_HASH:
+      pkt->xdp_hw_meta.hash = value;
+      break;
+    [...]
+    default:
+      /* do the key packing thing */
+  }
+}
+
+
+that way the order of setting the HW fields doesn't matter, only the
+user-defined metadata.
+
+>> > > > Moreover, I still think the metadata area in the xdp_frame/xdp_buff is not
+>> > > > so suitable for nic hw metadata since:
+>> > > > - it grows backward 
+>> > > > - it is probably in a different cacheline with respect to xdp_frame
+>> > > > - nic hw metadata will not start at fixed and immutable address, but it depends
+>> > > >   on the running ebpf program
+>> > > >
+>> > > > What about having something like:
+>> > > > - fixed hw nic metadata: just after xdp_frame struct (or if you want at the end
+>> > > >   of the metadata area :)). Here he can reuse the same KV approach if it is fast
+>> > > > - user defined metadata: in the metadata area of the xdp_frame/xdp_buff
+>> > > 
+>> > > AFAIU, none of this will live in the (current) XDP metadata area. It
+>> > > will all live just after the xdp_frame struct (so sharing the space with
+>> > > the metadata area in the sense that adding more metadata kv fields will
+>> > > decrease the amount of space that is usable by the current XDP metadata
+>> > > APIs).
+>> > > 
+>> > > -Toke
+>> > > 
+>> >
+>> > ah, ok. I was thinking the proposed approach was to put them in the current
+>> > metadata field.
+>> 
+>> I've also been thinking of putting this new KV stuff at the start of the
+>> headroom (I think that's what you're saying Toke?). It has a few nice
+>> advantanges:
+>> 
+>> * It coexists nicely with the current XDP / TC metadata support.
+>> Those users won't be able to overwrite / corrupt the KV metadata.
+>> KV users won't need to call xdp_adjust_meta() (which would be awkward -
+>> how would they know how much space the KV implementation needs).
+
+Yes, that was what I was saying; we need this to co-exist with the
+existing xdp_adjust_meta() facility, and moving it back and forth to
+achieve that seems like a non-starter. So definitely at the start of the
+headroom (after xdp_frame).
+
+>> * We don't have to move all the metadata everytime we call
+>> xdp_adjust_head() (or the kernel equivalent).
+>> 
+>> Are there any performance implications of that, e.g. for caching?
+
+Well, putting it at the beginning means that the HW metadata (assuming
+that comes first) will be on the same cache line as the xdp_frame struct
+itself (and thus should be cache-hot). For user-defined metadata it will
+depend on the size, of course, it will probably end up stilling into the
+next cache line (which will affect performance), but I don't think that
+can be helped...
+
+-Toke
+
 
