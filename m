@@ -1,118 +1,139 @@
-Return-Path: <netdev+bounces-130917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4A798C0AC
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:50:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E522B98C0C8
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C0101C24120
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:50:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A50284241
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72F241C8FBC;
-	Tue,  1 Oct 2024 14:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E741C461F;
+	Tue,  1 Oct 2024 14:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="IpF5+HgT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5rD0Ir4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A333A1BF7F8
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 14:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818F3282F7
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 14:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727794219; cv=none; b=HGr8vwkA1SvUolXKDUlOU6Qd1qKxkcLUSxwkx+tdN45URRq2KTYZ+x8VrORa2UNmE6eN9X6cHYEDWkE5z2XtUPQsWGJOmBZJLyZxO0sG4U2Y0T+GHl198HVUyLA5UMOTx9wYo4i14V4nnhj99c8n6RVqqCSsR9yi6//IucExvSg=
+	t=1727794411; cv=none; b=O8BTtX39Cb04XJKCSm6qKzpk8485DfORQhB5sQIl86aOt4hlnTHfZ5dsRdldx/2F4vwmEC9ymzohRNAVx8GZFJx6ozjMY2Q7R9s4DFPffiIi91l099HeXT7+9dNCo0W9oxt99+XiwEFdASOeJpc8c1C4bqG9vfJtR+JFVorac4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727794219; c=relaxed/simple;
-	bh=iD1cUDQCa4lYfSs+5B2cOqVtRkuOH/7Vjicb+whrYBg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=RT900TeUjDZ9uGciDN1uOF5TWlbYrRtB4prydSH2qX7dsnsCDG83YNldj3qssm6Z1LpywXXDDgqoZmwZHoFASF/veCOtanOWNMVrInAweD4PJBUVmBvtUFDI3+WCQ9zcoaI3bd4VQKfb9EtSQBDMULWI6c6wGlZkAAx9xr31PvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=IpF5+HgT; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cb1e3b449so7337495e9.3
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 07:50:17 -0700 (PDT)
+	s=arc-20240116; t=1727794411; c=relaxed/simple;
+	bh=yUtfkfIdDrnhy2KnwV9trAWpHCtsjfnbR7GfFoHnr38=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=YejywBo9qPEiqqVK+uhHZzRHcVMZYvHMCmFS69xVINfZUTencIeP5EOuM8/+0oJ8tKHERq1Thqm2Hu4MgK4AdbtJJ+9kmurhawc+hvrskPDgbYh07ULEyHfGCdi2tsbGz+tve4y872iMQ14NpCLfGhUyMVPCO7NRQWegTaSMjto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5rD0Ir4; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fabe5c8c26so33896811fa.2
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 07:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1727794216; x=1728399016; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=JyFqzGTIL/JydTQM9pGMPWQu+Jd+gnB7gRGMJk2LCAU=;
-        b=IpF5+HgTELZfpKYGLoDZ5QuDezc+bICMUP6ugyYux5QEek8RU21SWJBZnbEj+lOCW0
-         VtxFA8pgp/N7AOWVhtRP5J6hSFsBotxDSL7YkArITq81fhRWRc/yKF17gMcAS6VXCjMu
-         gczOMHgXK4bh/jpclLfZ1BHc6mJZ8cSZPAp+ZA6mMG3M6GYiLHwDA7fN+9KAZV4Y13CJ
-         GoCFmZDhYSlPstQ/HnWKz8D1KpVSwuCA0WuUeXeZ0E/BpUqowgR5hjz1bWVHx/7VBtr9
-         jMvD5oyW/vu460YVgOsw4zGYMymT0tM9LsCcZ9BNNtPYW5NdOckPJI3f0EOjpQflMTT5
-         0+Yw==
+        d=gmail.com; s=20230601; t=1727794407; x=1728399207; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0JqqD+DWVcLzJTK/AZZnNSETc+uwI7/dh+Z1slJhNwI=;
+        b=e5rD0Ir4wa2jrQajPJALLWYqOu2GSFDJoMJHWpwdE0qNH6VGwcU7NobJMawz3vEbOt
+         ypbSo63gjUwg5N2YDPtYmxQYevfE7w/kkIW2oUG06sq5y8biqJbH7vayaHztocLPXu+G
+         OdEN4BTN0WYmnfK46a1vWH3mY5dIeVvy92/yDtjI7edRYgZ0aygrNwpZzZHiaaOt24Ws
+         CZPyxmln+RizHHGE/IVAAIAP5Q6H3ur8qeuu2+ZPPWVQoO1SdJ3YkNm+lQMjrxtkYEx1
+         hF0xkRDZLaf3spLwBTd1ae7z73Mt02S8ZZIZlfqeekbgabbeRKazUlAV+ezixqLonnnn
+         WAYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727794216; x=1728399016;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JyFqzGTIL/JydTQM9pGMPWQu+Jd+gnB7gRGMJk2LCAU=;
-        b=G0O5joerI8RoteCQoaJTVqJZzMgf7Srtt1PzcFX6ZqB0mqGzoJPwLhQyp7MdfsNTOw
-         82RHrpptZ/rK82oS5cPVE4Her3Fvga40heHM90qfn5daL9T3VkjSIxrYbQz0odx9uAZx
-         4+N6aYq5o8/eQgObhxp79y2Ohh3735shEpteo2LpzrMLOpvsyjMovKwIlQRujvD9GfP7
-         q4cZ07b7OtDAlNu8vhUUYl/RWKDA/lwfK4QpFD3mAOnHs3A5hVrKbsjcDNHq/B/bUoWc
-         AV4E2mnbeWO4ffS4H20PDx2fQWVFAQShD9G+/nIbu3tP/s1g5IHJdVpz9GN2O7uZqnl5
-         HLdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLONRMW/jAolreXdiOtnAHkeKM1zqgNFOKuKx1O9aF5cvQlWw9SequN+BB/UyQkidJLx1Z1e8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuSFJLaitHIhaW60whpvX5uhYSioIvfztaaxvKNfo+xGyb/qnv
-	ezHMELyuXQ7mbxXs3ghPdCBfnipTj2JxtgSyCcN+/ydGVX0OPtAE6cIEskNcnNs=
-X-Google-Smtp-Source: AGHT+IEps5crVYH5i9gcfvEcU9NadY2mBtzYP43oONboxOVwHoj0syM/gmmWce359iQUnJVKfRyryg==
-X-Received: by 2002:a05:600c:1d1f:b0:42c:b172:8c53 with SMTP id 5b1f17b1804b1-42f5e3ab824mr42049555e9.5.1727794215953;
-        Tue, 01 Oct 2024 07:50:15 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:aa9d:4d55:f3bb:3405? ([2a01:e0a:b41:c160:aa9d:4d55:f3bb:3405])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57e13a1dsm138081005e9.32.2024.10.01.07.50.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Oct 2024 07:50:15 -0700 (PDT)
-Message-ID: <797edfa5-60f3-4440-9384-bb9037c60c74@6wind.com>
-Date: Tue, 1 Oct 2024 16:50:14 +0200
+        d=1e100.net; s=20230601; t=1727794407; x=1728399207;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0JqqD+DWVcLzJTK/AZZnNSETc+uwI7/dh+Z1slJhNwI=;
+        b=s/EGopIz0UpJdhs6kPCvU9chyHxLRh7qdZg4qkDLyvX8iYa4Kq2yqZIQPiz+fpOOyf
+         uVvnm8xTFSe25OId2qRf6iO2N4wuadQ9cnv/mbux9CKyAJmRXwTaGML0CKDxj6b+Nr79
+         PCxmgRtuR+B+N07C0RzP5ec6VBqLdZK8HjxCGd2ez05atlMnor9BeF/fxjURdsBvFJPF
+         MOvyCGYFwMrtuAoO9Z109XA/GJRvVt/qIkt6XL3TnmshCx+n+1tjzc8AJTfT9PTVzcOS
+         pe7OVW7irwfgpHfkNBPBMu2rL9DGH8fkEp83sgRO25OADJEB2Rj6Kz6OW5KXrszVQchU
+         0ZEw==
+X-Gm-Message-State: AOJu0YysMmczRA3V+ZVb/NIMfoJKK90TybPCu2peDgikpXCBSAyNyeDg
+	wLk6oGqnalkwJU+bVD27PGleDoox3W5IROcbW5TcqegXuK9C6XuseG7Lv+Sl9zNnlTKRQDTP+bN
+	Jt4Ed+PYpTwIR1IXhdeGlYgfIJkZk1SyTBYeRau4=
+X-Google-Smtp-Source: AGHT+IE3p+K200dsUwtiFafHsHXjJTviSNhqzkYBMyQoD/yye1eSA53hFFHtCO/qLWJLdxggiOczwROE9POazvsUZD4=
+X-Received: by 2002:a2e:4a1a:0:b0:2f3:d8dd:a1f6 with SMTP id
+ 38308e7fff4ca-2fae10877bdmr116071fa.40.1727794407001; Tue, 01 Oct 2024
+ 07:53:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: Doc on kernel.org
-To: Jonathan Corbet <corbet@lwn.net>, linux-doc <linux-doc@vger.kernel.org>,
- netdev <netdev@vger.kernel.org>
-References: <4d6edf70-57fb-43a1-bf15-330bd5f6405b@6wind.com>
- <877car7ulg.fsf@trenco.lwn.net>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <877car7ulg.fsf@trenco.lwn.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Budimir Markovic <markovicbudimir@gmail.com>
+Date: Tue, 1 Oct 2024 16:53:15 +0200
+Message-ID: <CALk3=6u+PTcc2xhCx3YgWrx3_SzazpXTk1ndDmik+AOi==oq9Q@mail.gmail.com>
+Subject: Use-after-free from netem/hfsc interaction
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Le 01/10/2024 à 16:42, Jonathan Corbet a écrit :
-> Nicolas Dichtel <nicolas.dichtel@6wind.com> writes:
-> 
->> Hello,
->>
->> I'm not sure to address the right people. I wonder if it's possible to remove
->> some obsolete docs from kernel.org.
->> For example, the ip-sysctl page exists in two versions: txt and rst, but the txt
->> version is obsolete (removed from the kernel tree 4 years ago, in v5.8):
->>
->> https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
->> https://www.kernel.org/doc/Documentation/networking/ip-sysctl.rst
-> 
-> Everything under that URL is somewhat suspect, actually; the best thing
-> to do is to look at https://docs.kernel.org/ instead.
-> 
-> I agree that it would be good to clean up that stuff, I can't do that
-> directly, but I know who to talk to about it.
+There is a bug leading to a use-after-free in an interaction between
+netem_dequeue() and hfsc_enqueue() (I originally sent this to
+security@kernel.org and was told to send it here for further discussion).
 
-Thank you for your quick answer.
-Yes, it would be great to clean this up, it's misleading :)
+If an HFSC RSC class has a netem child qdisc, the peek() in hfsc_enqueue() will
+call netem_dequeue() which may drop the packet. When netem_dequeue() drops
+a packet, it uses qdisc_tree_reduce_backlog() to decrement its ancestor qdisc's
+q.qlens. The problem is that the ancestor qdiscs have not yet accounted for
+the packet at this point.
 
+In this case hfsc_enqueue() still returns NET_XMIT_SUCCESS, so the q.qlens have
+the correct values at the end. However since they are decremented and
+incremented in the wrong order, the ancestor classes may be added to active
+lists after qlen_notify() has tried to remove them, leaving dangling pointers.
 
-Regards,
-Nicolas
+Commit 50612537e9ab ("netem: fix classful handling") added qdisc_enqueue() to
+netem_dequeue(), making it possible for it to drop a packet. Later, commit
+12d0ad3be9c3 ("net/sched/sch_hfsc.c: handle corner cases where head may change
+invalidating calculated deadline") added a call to peek() to hfsc_enqueue().
+
+The QFQ qdisc also calls peek() from qfq_enqueue(). It cannot be used to create
+a dangling pointer in the same way, but may still be exploitable.  I will look
+into it more if the patch for this bug does not address it.
+
+A quick fix is to prevent netem_dequeue() from calling qdisc_enqueue() when it
+is called from an enqueue function.  I believe qdisc_is_running() can be used
+to determine this:
+
+diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+index 39382ee1e..6150a2605 100644
+--- a/net/sched/sch_netem.c
++++ b/net/sched/sch_netem.c
+@@ -698,6 +698,9 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
+        struct netem_sched_data *q = qdisc_priv(sch);
+        struct sk_buff *skb;
+
++       if (q->qdisc && !qdisc_is_running(qdisc_root_b
+h(sch)))
++               return NULL;
++
+ tfifo_dequeue:
+        skb = __qdisc_dequeue_head(&sch->q);
+        if (skb) {
+
+I do not see a better way to fix the bug without larger changes, such as moving
+qdisc_enqueue() out of netem_dequeue() and into netem_enqueue().
+
+Commands to trigger KASAN UaF detection on a drr_class:
+
+ip link set lo up
+tc qdisc add dev lo parent root handle 1: drr
+tc filter add dev lo parent 1: basic classid 1:1
+tc class add dev lo parent 1: classid 1:1 drr
+tc qdisc add dev lo parent 1:1 handle 2: hfsc def 1
+tc class add dev lo parent 2: classid 2:1 hfsc rt m1 8 d 1 m2 0
+tc qdisc add dev lo parent 2:1 handle 3: netem
+tc qdisc add dev lo parent 3: handle 4: drr
+tc filter add dev lo parent 4: basic action drop
+ping -c1 -W0.01 localhost
+tc class del dev lo classid 1:1
+tc class add dev lo parent 1: classid 1:1 drr
+ping -c1 -W0.01 localhost
 
