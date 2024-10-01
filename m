@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-131058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC6298C72D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:03:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0205C98C730
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 272381C21BC7
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:03:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29FE01C213BF
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361721D04B6;
-	Tue,  1 Oct 2024 20:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7051D0940;
+	Tue,  1 Oct 2024 20:59:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZD6fM2XR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZC9NU5Rz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4061D04BE;
-	Tue,  1 Oct 2024 20:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025CE1D0795;
+	Tue,  1 Oct 2024 20:59:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727816349; cv=none; b=UvOw+yZw5K9OMbo3Ew11uubfSEOak9fCmmTiYujbUq3LJKLMlOALSz0ZcKNav9sz3xRRct3iFotYgGQkEggtSYMraa8rM+aAw0Q+lwzDsivgdZ9izrIEGyMT8pkzks8azxLR04GK5RFStHVeVt9BQ7kryamiiql4DhpvahyP6tk=
+	t=1727816350; cv=none; b=YOhkylZKbYfaWdV8zCIkGt91fSpT+quwLY0UQn7RTScla9c2+1xvYjnpXBKNVD5/aP49UZSZZS6JVaKC7i+sfHnsoPkNc3d6lPb3rJeFs5kb8QnYJIjIeD8bzoOc79MMSUHkJZc/K7jDswNGqCMl2mu5iRfKCHJJB550gNgmGr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727816349; c=relaxed/simple;
-	bh=tPMaKKCrP3tEFhfNaUWKZ/JHAt5j/C2Ms8f8SpstWRk=;
+	s=arc-20240116; t=1727816350; c=relaxed/simple;
+	bh=eKiO/LEIBXXwlQ4KH7qVz+fyrkTR0L1Ipshtf4VGCgw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D29bLxqFBd/GT52j3oOX4yWysF7y+I3qyp1O9DqF/RN51U47zmVTkxcx50ZUYl5bEcnsumxlg9VclsNdbpdTDx++2MJ7oWqVvQolYMxu+0q0T0aS382QWh8CCSax4BTpXMosVXhCemZXNdfaVjjc9/ep232M4BxkFuO0z6ThYWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZD6fM2XR; arc=none smtp.client-ip=209.85.210.179
+	 MIME-Version; b=sNtBUF1iaEQVlOazmGDjBbB9cU6ni5CjcNpCLLBBR/E8nGEj7BsdmrRxm838FxyfeLlUDOnWHT98g+5pFjOWZdn04cXB0DXsDvICzS/7GV3+RIJ8zH3gyXijfE6e/fIHqcTavLYxdOVGnhBEVKXONastOMxZt1jM1jrrKWABWfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZC9NU5Rz; arc=none smtp.client-ip=209.85.210.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7193010d386so5144570b3a.1;
-        Tue, 01 Oct 2024 13:59:07 -0700 (PDT)
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71b20ffd809so4528775b3a.0;
+        Tue, 01 Oct 2024 13:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727816347; x=1728421147; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727816348; x=1728421148; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r2CvXoVohK/pulVhxC+r21/PlsTS5FXZz7L5qVXfWFU=;
-        b=ZD6fM2XRLw0PajlHufPELfPGlqQfmACA4v9lLMOiTa1QbAlkdpTBgMWChe31jSKtZi
-         xNX9u0BvuESd/YCCQj+ABsnMVuR+awhKJSBDjBVgXq/lc4nCKMdS3vvXD13DoDwQQvjN
-         Nhf1IHITaB2wk8q4mGemWRULapui3GQD94Fd4OWTNaiiLdqh8IUu5kE1aWKCkqj2Otcn
-         D8SVUoe2T2maLtNwMQewjHVMFhClTbtkcJ6GWwwduB2VSCbSZaazsnhOIcSOOVbPRxB4
-         kd6ctkXvavS9n6WEKepgEMVa0wBEHBEiV3Du3YvF/eYUfPOiAbkt5Nz+I29/pjkSZn2I
-         X+PQ==
+        bh=Dq4R22bB9X5Y2tGuUBetWh4QBzSEUK/HudSJSZz34VU=;
+        b=ZC9NU5Rzy5qyEZIVpJ9tT3lOfsTX4H+dZ/aYYe3AB9eyoagKVSaS8MoZzVBnxCkMtC
+         h3b9+sx/K2oFkBBgdb9brkj4AcJtOjEXPkm94gjMiBdlwllDML1fsocVV+nVNIdhEKPd
+         C4LftyTTw5qErRslT8W3OMmT/pz/NGvMYbwYxBwlMP6R707strFiMbzjgRJXWZYrvSoW
+         W7u1z67pe5dX1VEyXYT7nKdoXkFc47kkZTzF0btaqCG1wlq/QQgLpFUFzy37HKlIaqsk
+         Mzao3sjC86rbM3/Y2EyIJPwRKF19PbOLN5fo3/Ceb2WR+urnNe/oNTtVyBoFawRp9NHX
+         qOQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727816347; x=1728421147;
+        d=1e100.net; s=20230601; t=1727816348; x=1728421148;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r2CvXoVohK/pulVhxC+r21/PlsTS5FXZz7L5qVXfWFU=;
-        b=AwGo0w78w8U8Ei0wIt0sMjzmOuUZNcEXISWc0vvXp3dCgyDZtEF2yoE/WeNp11zIS3
-         sT0OpRSgmijD5bqX8uCuk5BEaKZdFoRxiuEEtTAn8qrtnI1O9RJ4U5MUe2pwlfQIP56e
-         YkMEO4trzAdC8/5/DzR0K4Fy3s0V+21r5SM1G1q3/E/1d0IfbCJCLagDu15KO6bi7gAC
-         xMfuXw2gYIGM/6MF5AUT0vbwrGGcBAwc0budRsuRIuOdSuS6SXlDQhnH2YpGicMYurNT
-         CVu6EEuBBrUjGkXPk9lu3NtEo3nRgwEMSZLxw9z801iqVoYwqqAjRk74fDY60Gju7dlu
-         WwVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqetJxO5Lk7OJfI6mk1YMp6a2iT5jtinVEPmj4q8xJTDv32SKhACqMbSo8VMBU2x+m/DWh+l2ovoKNeiw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6+5bylTDOkIxeCTR90GeSEP/xpesyMr+P9Yjrht/xL3AYlw9a
-	H6sQS+vnCCbqrxtjRvzYvHR1xxs4Mn5pp74yd6DqwlNy2zcBcye+LTcjNOmB
-X-Google-Smtp-Source: AGHT+IExqskSEPlAaAbl03P2c1voIEJdJ164dJl1VdCiwHO8F0nt0h1G2m7qpC6svetf+ya9cFr/Gw==
-X-Received: by 2002:a05:6a00:21ce:b0:710:9d5d:f532 with SMTP id d2e1a72fcca58-71dc5d5c02emr1486774b3a.19.1727816346801;
-        Tue, 01 Oct 2024 13:59:06 -0700 (PDT)
+        bh=Dq4R22bB9X5Y2tGuUBetWh4QBzSEUK/HudSJSZz34VU=;
+        b=IbWs+02U8tr7qC68fzTb4sHlr+nXVJf8jpP+P2Yk6fXkxsqgDXVmiTKDFZ4POh6mrz
+         7eKdu11hkJZdUB8fS21bV5dHnX2Y2oWAsOf/G+Yd/kOJ6XajrOpJmdOlmw+GxC/CUL0X
+         SM5zPuAM8NlW/mfLm82G2PeozX5y8rttN7SHjwph/tp1SltJcIqWKJLgBTQiS+DJJIOf
+         exZgJb19d7wBDt68VjOMJn7E8ZqbKHfuS60C/Hm8cPx7nAHTc972pfpDDuuEkHxxVt6Q
+         CAC0dTwE+jh2QCuGXs+7Mp0DED717HMr1/lcQFB8p6tsqu9vv2tA3FZkqOWv4mxVA6Dd
+         fApA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlYJMYwQkwdGkjUIsLD68CKvIc7NBOYZq0o16VSzfwZk1wojv6ZavvnY6v2bmHYJSUN+tpHq59kkHwaPs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkW6hyXnSu4SpTIE5HXgxbMQEl7d+99XgfT7OsRGf5EU16wsAQ
+	hfNp1LBdvwhokSh0HcMAyL0OEhnPimimfNHBm1uDcZzeo/p+noxdY+CWhLJZ
+X-Google-Smtp-Source: AGHT+IEciGVV/hoMrTmiuBt8dbyqzKLSexLbyVJuiGff+aDP4NS5+mdQCI1Bx+jJ/eCycGK2j6AagQ==
+X-Received: by 2002:a05:6a00:178c:b0:70d:2fb5:f996 with SMTP id d2e1a72fcca58-71dc5c67164mr1214460b3a.11.1727816348240;
+        Tue, 01 Oct 2024 13:59:08 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26518a2asm8545765b3a.107.2024.10.01.13.59.05
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26518a2asm8545765b3a.107.2024.10.01.13.59.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:59:06 -0700 (PDT)
+        Tue, 01 Oct 2024 13:59:07 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCHv2 net-next 14/18] net: ibm: emac: mal: use devm for request_irq
-Date: Tue,  1 Oct 2024 13:58:40 -0700
-Message-ID: <20241001205844.306821-15-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 15/18] net: ibm: emac: mal: move irq maps down
+Date: Tue,  1 Oct 2024 13:58:41 -0700
+Message-ID: <20241001205844.306821-16-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241001205844.306821-1-rosenp@gmail.com>
 References: <20241001205844.306821-1-rosenp@gmail.com>
@@ -93,109 +93,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Avoids manual frees. Also replaced irq_of_parse_and_map with
-platform_get_irq since it's simpler and does the same thing.
+Moves the handling right before they are used and allows merging a
+branch.
+
+Also get rid of the error handling as devm_request_irq can handle that.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/mal.c | 51 ++++++++++++-----------------
- 1 file changed, 21 insertions(+), 30 deletions(-)
+ drivers/net/ethernet/ibm/emac/mal.c | 26 +++++++-------------------
+ 1 file changed, 7 insertions(+), 19 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index 70019ced47ff..b07b2e0ce478 100644
+index b07b2e0ce478..3fae1f0ec020 100644
 --- a/drivers/net/ethernet/ibm/emac/mal.c
 +++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -578,19 +578,19 @@ static int mal_probe(struct platform_device *ofdev)
+@@ -578,25 +578,6 @@ static int mal_probe(struct platform_device *ofdev)
  #endif
  	}
  
--	mal->txeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
--	mal->rxeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 1);
--	mal->serr_irq = irq_of_parse_and_map(ofdev->dev.of_node, 2);
+-	mal->txeob_irq = platform_get_irq(ofdev, 0);
+-	mal->rxeob_irq = platform_get_irq(ofdev, 1);
+-	mal->serr_irq = platform_get_irq(ofdev, 2);
+-
+-	if (mal_has_feature(mal, MAL_FTR_COMMON_ERR_INT)) {
+-		mal->txde_irq = mal->rxde_irq = mal->serr_irq;
+-	} else {
+-		mal->txde_irq = platform_get_irq(ofdev, 3);
+-		mal->rxde_irq = platform_get_irq(ofdev, 4);
+-	}
+-
+-	if (mal->txeob_irq < 0 || mal->rxeob_irq < 0 || mal->serr_irq < 0 ||
+-	    mal->txde_irq < 0 || mal->rxde_irq < 0) {
+-		printk(KERN_ERR
+-		       "mal%d: failed to map interrupts !\n", index);
+-		err = -ENODEV;
+-		goto fail_unmap;
+-	}
+-
+ 	INIT_LIST_HEAD(&mal->poll_list);
+ 	INIT_LIST_HEAD(&mal->list);
+ 	spin_lock_init(&mal->lock);
+@@ -650,10 +631,17 @@ static int mal_probe(struct platform_device *ofdev)
+ 			     sizeof(struct mal_descriptor) *
+ 			     mal_rx_bd_offset(mal, i));
+ 
 +	mal->txeob_irq = platform_get_irq(ofdev, 0);
 +	mal->rxeob_irq = platform_get_irq(ofdev, 1);
 +	mal->serr_irq = platform_get_irq(ofdev, 2);
- 
++
  	if (mal_has_feature(mal, MAL_FTR_COMMON_ERR_INT)) {
- 		mal->txde_irq = mal->rxde_irq = mal->serr_irq;
++		mal->txde_irq = mal->rxde_irq = mal->serr_irq;
+ 		irqflags = IRQF_SHARED;
+ 		hdlr_serr = hdlr_txde = hdlr_rxde = mal_int;
  	} else {
--		mal->txde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 3);
--		mal->rxde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 4);
 +		mal->txde_irq = platform_get_irq(ofdev, 3);
 +		mal->rxde_irq = platform_get_irq(ofdev, 4);
- 	}
- 
--	if (!mal->txeob_irq || !mal->rxeob_irq || !mal->serr_irq ||
--	    !mal->txde_irq  || !mal->rxde_irq) {
-+	if (mal->txeob_irq < 0 || mal->rxeob_irq < 0 || mal->serr_irq < 0 ||
-+	    mal->txde_irq < 0 || mal->rxde_irq < 0) {
- 		printk(KERN_ERR
- 		       "mal%d: failed to map interrupts !\n", index);
- 		err = -ENODEV;
-@@ -660,21 +660,26 @@ static int mal_probe(struct platform_device *ofdev)
- 		hdlr_rxde = mal_rxde;
- 	}
- 
--	err = request_irq(mal->serr_irq, hdlr_serr, irqflags, "MAL SERR", mal);
-+	err = devm_request_irq(&ofdev->dev, mal->serr_irq, hdlr_serr, irqflags,
-+			       "MAL SERR", mal);
- 	if (err)
- 		goto fail2;
--	err = request_irq(mal->txde_irq, hdlr_txde, irqflags, "MAL TX DE", mal);
-+	err = devm_request_irq(&ofdev->dev, mal->txde_irq, hdlr_txde, irqflags,
-+			       "MAL TX DE", mal);
- 	if (err)
--		goto fail3;
--	err = request_irq(mal->txeob_irq, mal_txeob, 0, "MAL TX EOB", mal);
-+		goto fail2;
-+	err = devm_request_irq(&ofdev->dev, mal->txeob_irq, mal_txeob, 0,
-+			       "MAL TX EOB", mal);
- 	if (err)
--		goto fail4;
--	err = request_irq(mal->rxde_irq, hdlr_rxde, irqflags, "MAL RX DE", mal);
-+		goto fail2;
-+	err = devm_request_irq(&ofdev->dev, mal->rxde_irq, hdlr_rxde, irqflags,
-+			       "MAL RX DE", mal);
- 	if (err)
--		goto fail5;
--	err = request_irq(mal->rxeob_irq, mal_rxeob, 0, "MAL RX EOB", mal);
-+		goto fail2;
-+	err = devm_request_irq(&ofdev->dev, mal->rxeob_irq, mal_rxeob, 0,
-+			       "MAL RX EOB", mal);
- 	if (err)
--		goto fail6;
-+		goto fail2;
- 
- 	/* Enable all MAL SERR interrupt sources */
- 	set_mal_dcrn(mal, MAL_IER, MAL_IER_EVENTS);
-@@ -693,14 +698,6 @@ static int mal_probe(struct platform_device *ofdev)
- 
- 	return 0;
- 
-- fail6:
--	free_irq(mal->rxde_irq, mal);
-- fail5:
--	free_irq(mal->txeob_irq, mal);
-- fail4:
--	free_irq(mal->txde_irq, mal);
-- fail3:
--	free_irq(mal->serr_irq, mal);
-  fail2:
- 	dma_free_coherent(&ofdev->dev, bd_size, mal->bd_virt, mal->bd_dma);
-  fail_dummy:
-@@ -725,12 +722,6 @@ static void mal_remove(struct platform_device *ofdev)
- 		       "mal%d: commac list is not empty on remove!\n",
- 		       mal->index);
- 
--	free_irq(mal->serr_irq, mal);
--	free_irq(mal->txde_irq, mal);
--	free_irq(mal->txeob_irq, mal);
--	free_irq(mal->rxde_irq, mal);
--	free_irq(mal->rxeob_irq, mal);
--
- 	mal_reset(mal);
- 
- 	free_netdev(mal->dummy_dev);
+ 		irqflags = 0;
+ 		hdlr_serr = mal_serr;
+ 		hdlr_txde = mal_txde;
 -- 
 2.46.2
 
