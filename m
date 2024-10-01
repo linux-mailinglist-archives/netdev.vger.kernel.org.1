@@ -1,126 +1,87 @@
-Return-Path: <netdev+bounces-130914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E5498C07B
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:42:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE9AD98C086
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:43:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 557B5285A2F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:42:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727941F24C3F
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF561C9B68;
-	Tue,  1 Oct 2024 14:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69B9D1C8FCD;
+	Tue,  1 Oct 2024 14:42:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d57OeVdQ"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="XN6BPNkF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9719E1C8FA5;
-	Tue,  1 Oct 2024 14:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E791C8FD3;
+	Tue,  1 Oct 2024 14:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727793586; cv=none; b=DelInQ7s4X+KkpBVtOAORFA/ccQfuNlLacLWALORjfgoOe/j3yl+JPx0Sj1oKZGdM75ppqty5SBXrABCPHA6pH+S3flJSfAHXvDfjh/dm5i5ES9GjpFnbA5An5cvowEGyLJO/IAIwhwWW7+dPT67KlZMrud92BA9DXkvPK8TnkU=
+	t=1727793772; cv=none; b=N4pr8d5FkRc5MwJZJ6+X2oF18dNLQr36/lKgAHtivcU/qVvuVsAqfoUALalXGVz1j/9JEUT8aTrRVZNQz6Omula88bLSEfpM1FQS66PzLAHsd1LjodgivhKAwrLwlMLNEk75cjJgQL2eUBqSJVtLs5JAliCEN9VxA9WrbSLyB4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727793586; c=relaxed/simple;
-	bh=aZqwMZteR7QMz/wRPTbetbq34SO0/mVD6KSQT2WEIfA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ksusBcgTdfUgbEbc9ydUrJtB7nDa0EKEDKYpRVLYXgC21vTjOAGkmaY9urSxqkmb5Z87BiP5TefkxJaBMk90xRdpE4AXtB2EUISII+TWhLOKufPrn+vrQkvrEE209VZUTOGHJWbOphC4z2M0otr2JFhPzAbPSFn+sfTzJGYQiRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d57OeVdQ; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e25cb262769so4963105276.0;
-        Tue, 01 Oct 2024 07:39:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727793583; x=1728398383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PBuDDJjMTwNoZ/uUYb6Kuh5UQKPFlv1w+SWIV9bVSRs=;
-        b=d57OeVdQ1V9nDZFN/N1RomVzR3tVP+GVe7JNnMdPx6pz1vVgUyKd/hCbX0sfFR/j7R
-         aUE7mhug3/282BXW8P8gW/GYcGPUShMJ55SfiMMB7GC9RU2vyT4K68freEoaoaakGq8Z
-         vvviNJbv45SL0kY9YjYQrKKXv64wVyZbLa32xkBS8jaUS7L9ZeFfNyizNzsP1JCmR7rt
-         2FYftmqiteVp+qHaBMwbnXTaUqEfPOnajXzLPjnccPRAuqOyy4WBNdzDzM0gAvskbAe7
-         0qqLSsA9LKc4iVE8TLKso5dqcQQ37qaRNVRQGP+s8OLB6KgNoVCYwerSrO4Ft5Zae3AT
-         oBIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727793583; x=1728398383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PBuDDJjMTwNoZ/uUYb6Kuh5UQKPFlv1w+SWIV9bVSRs=;
-        b=vLR2ny0cNYZdv25GgVMe6+8VyolTPba+qm3vPn2Vb+9dnuOp6VL1LyIMZU0ItSiXKK
-         UfEvYXMuJt1RHlYeDYbjbBDvoG0dSwf04+Ppu1sv9Z6iZxT0FvCr+x9Rab7Crl1c5TBi
-         YOmMPoiTgev8QwBfkxiQ3ZY4iNBhoEnoN4r/P5ePIgxjZWROrdqzmKIdlWUVoJQnJsKt
-         1a0mk8PitLxbB8dfbxSxDwXJt9q10oXCwTW5RO0FpKOntLv6rrFx9pKWOCQWh6b9kzf9
-         mPVsCHyF8dJLSHryfZL+EMicPUPhn2wqGZZY/eIFY3ZBzW44HQ+oS256j5GMZxuVLNsG
-         4zuw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+k2COZOubrSrTFJsRIu5389ZIf2Ne0+G943a2i1bRjGOm2NHLKbHssDiTlflnZyQ4Pu/ftUvE@vger.kernel.org, AJvYcCVayALC4OG1sVpboxMaojqd68jTKLjYnag5DTWXXW2McLeFni8whLtl4saD/G/pg1m5lmMX7ogjKrWffCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn298BmYYuORoMkwx3Oc4DbNhzEJaaLUH05VpTGrMXySYdQOsD
-	ctDIfkdmfpJXQs8yoDkkel5fjqWhYRsIGkQhnAa2ZFlIzgJEZYz7GxDVMQJW9BTIDToxWTXGRgR
-	6uaW8/cAMqAB9WrOlkkv/PVXGraI=
-X-Google-Smtp-Source: AGHT+IFadEIYV6WtVdOpKuszn9tjbmA+IBXrI6axwjkgwDl1cvy6Olk0OP1vlr4ZhS7TSYBrZ7zo7qoDZpicTLzdUvw=
-X-Received: by 2002:a05:6902:983:b0:e22:60b0:7a73 with SMTP id
- 3f1490d57ef6-e2604b75ba1mr11733299276.44.1727793583644; Tue, 01 Oct 2024
- 07:39:43 -0700 (PDT)
+	s=arc-20240116; t=1727793772; c=relaxed/simple;
+	bh=U4GrEghVoP1WN9uwqwp45RxPINrOjl761dTu1qHdNCc=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=q7YKMcUILuTSCt4Ds8Jjt3haUErycXZKqhkQJ42ndXPPU2H0YNg4doYyoTSx83bcyUkuSYJX00dfmX08c6fjNbYAb56qrGy+oT6olFymk/YqTlznrboeC60CN/dzANBmsdSynFKTWqvnCdjGxUbEVfgR4uX09j1t6Igy9nSWuqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=XN6BPNkF; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 9C76142BFD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1727793764; bh=U4GrEghVoP1WN9uwqwp45RxPINrOjl761dTu1qHdNCc=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=XN6BPNkFADZoRUYhm3gYb9nE4a6jOibDgCxDUgz/w+4Ko/Kxrx9CRPS6gVMzvwAB/
+	 OUlMpj+shX3IyESDPQvmaZCWXD08ZLq0liw4ChG9PxrvHWe8Iq5zPJZ/pn46GgW7IS
+	 bhgiF9bKRgu+OLrmpaNW3byySrFGhGJJUHI6yzt32CkcF58d7ASmLD31LsRcZOOpEl
+	 LohVhStmBOgLN96gs5QbuEpgmghley9GUOJOq6jbDDbKVSfkeBhVQzUN7HeMiLJxfQ
+	 2WNr7DSIfUcfSJ7lvrcq9Xg1K1Q96B3JE4owKtkBPjPGEStg/QIEQ0eEJ6RzW6W0p2
+	 Agzfm1v+op0Jw==
+Received: from localhost (mdns.lwn.net [45.79.72.68])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 9C76142BFD;
+	Tue,  1 Oct 2024 14:42:42 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: nicolas.dichtel@6wind.com, linux-doc <linux-doc@vger.kernel.org>, netdev
+ <netdev@vger.kernel.org>
+Subject: Re: Doc on kernel.org
+In-Reply-To: <4d6edf70-57fb-43a1-bf15-330bd5f6405b@6wind.com>
+References: <4d6edf70-57fb-43a1-bf15-330bd5f6405b@6wind.com>
+Date: Tue, 01 Oct 2024 08:42:35 -0600
+Message-ID: <877car7ulg.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001100119.230711-2-stefan.wiehler@nokia.com>
- <CANn89iJiPHNxpyKyZTsjajnrVjSjhyc518f_e_T4AufOM-SMNw@mail.gmail.com>
- <4e84c550-3328-498d-ad82-8e61b49dc30c@nokia.com> <CANn89iLC5SgSgCEJfu7npgK22h+U3zOJzAd1kv0drEOmF24a3A@mail.gmail.com>
- <68ee33a7-c60e-48b9-b362-c991bdcf675f@nokia.com>
-In-Reply-To: <68ee33a7-c60e-48b9-b362-c991bdcf675f@nokia.com>
-From: ericnetdev dumazet <erdnetdev@gmail.com>
-Date: Tue, 1 Oct 2024 16:39:32 +0200
-Message-ID: <CAHTyZGzSzNXALjdRSK-a=29vRn=rNgKY3VD0pyhsa1pY5M4-KA@mail.gmail.com>
-Subject: Re: [PATCH net v2] ip6mr: Fix lockdep and sparse RCU warnings
-To: Stefan Wiehler <stefan.wiehler@nokia.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Petr Malat <oss@malat.biz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-Le mar. 1 oct. 2024 =C3=A0 16:36, Stefan Wiehler <stefan.wiehler@nokia.com>=
- a =C3=A9crit :
->
-> > This could be a lockdep annotation error then, at least for
-> > RT6_TABLE_DFLT, oh well.
->
-> As you have already explained, we can ignore the ip6mr_vif_seq_start() er=
-ror
-> path, so the issue boils down to ip6mr_get_table() being called without
-> entering a RCU read-side critical section from these 4 functions:
-> ipmr_vif_seq_start(), ip6mr_ioctl(), ip6mr_compat_ioctl() and
-> ip6mr_get_route(). It is my understanding that in none of these four case=
-s the
-> RTNL lock is held either; at least according to the RCU-lockdep splat we
-> clearly see that this is not the case in ip6mr_ioctl()  =E2=80=93 but ple=
-ase correct me
-> if I'm wrong.
->
-> > Note that net/ipv4/ipmr.c would have a similar issue.
->
-> Yes, looks indeed like that :-/
->
-> > Please split your patch in small units, their Fixes: tags are likely
-> > different, and if some code breaks something,
-> > fixing the issue will be easier.
-> >
-> > The changelog seemed to only address the first ip6mr_vif_seq_start() pa=
-rt.
->
-> If you prefer that I can split the change into 4 commits addressing each =
-of the
-> 4 functions mentioned before.
+Nicolas Dichtel <nicolas.dichtel@6wind.com> writes:
 
-Yes please. Extending rcu_read_lock() sections needs inspection,
-because we can not sleep there.
+> Hello,
+>
+> I'm not sure to address the right people. I wonder if it's possible to remove
+> some obsolete docs from kernel.org.
+> For example, the ip-sysctl page exists in two versions: txt and rst, but the txt
+> version is obsolete (removed from the kernel tree 4 years ago, in v5.8):
+>
+> https://www.kernel.org/doc/Documentation/networking/ip-sysctl.txt
+> https://www.kernel.org/doc/Documentation/networking/ip-sysctl.rst
+
+Everything under that URL is somewhat suspect, actually; the best thing
+to do is to look at https://docs.kernel.org/ instead.
+
+I agree that it would be good to clean up that stuff, I can't do that
+directly, but I know who to talk to about it.
+
+Thanks,
+
+jon
 
