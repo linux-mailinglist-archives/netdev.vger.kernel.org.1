@@ -1,377 +1,112 @@
-Return-Path: <netdev+bounces-130746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BA7A98B648
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:57:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A328A98B64D
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:58:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37D81281F68
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:57:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E9031F227A6
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:58:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA6B1BE85B;
-	Tue,  1 Oct 2024 07:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AAF1BDAA3;
+	Tue,  1 Oct 2024 07:58:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hk1A4nyY"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=inguin@gmx.de header.b="q6B0qALA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F731BE25C
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A99E1BBBCA;
+	Tue,  1 Oct 2024 07:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727769417; cv=none; b=A0TgV/ip+efmIFlfnuWoLPnRu6xJg3oZjyvP/Y3bbkdXouWsQ99RKrY7pNga6CPooisfF5/ZfG0hBizSeieLGlkMHGpBc8NVmHn7DEks3dGa/4n38yG4vIHsMsK1iTNjAshStAqlSlq4onxYMBqkxhPtoviewyE3P+Je58krFUI=
+	t=1727769501; cv=none; b=owPAhhR7IXSL9Pu09oaQDGt+faSxnaztB7l/8OgCxwOJ26/uoWcUIR2vDoRKPYlIzOc2UybUdzNqUYRDX+K0bRj1780DbRnhg5jLcUpYSCtBkXv3fF0EkEY4s2dKBK1G7lggM7HYD+PP9u+bOdxoIcXjxy6fHN6QwJkhQofGUzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727769417; c=relaxed/simple;
-	bh=D1JTQfrWYlxg+oug+vUqLOQZmsnSJiIy/5H/1jFqavI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dnTfCBbitTRe87HkbsUUdl2onhB+cAHVp/d0Eg07TSp+3OHHv69s7GxSCObkvRn5jwyW/UlwysEq0neqkBGOD4AXj3ma5so2Uo1lBNutGzsIjFgAY9yY7F65yu24EWkf42kU3FFCZgv1RZ0D3fy1oqxMehYNBtkT/nIaOBS5Rjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hk1A4nyY; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e2605a8c7e0so5844484276.0
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 00:56:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727769415; x=1728374215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2YLIpnISBu8vBhPoCOC0VxpYUv2HSm5uj0+OgXD1P1w=;
-        b=hk1A4nyYtoELYYoGP6gVEgMLdRSQmfN9EAFU0RnlmJjvUbPzmpD9P2+9UltciGpJcc
-         HMxNsRNTG4/FBmrOubycwqKyTp6OcqAQr79vDiLhE73Syu5tk8jRZaZDm473Iu/T7mZ6
-         ftt80xX6OlhBY62T+AonMiAAH5GSZpBwUHTNSZT6JKOZUKI/rFlaYfDtkpH799H8ZczI
-         i7LH0fJt36kErwFDBKxGsXs9JDtM+qF8UxxoKieU0YAke/xZ0gjyrz7KzQRX14yRXiE9
-         HOwyYq7te5nLbEWk0geEfp6HcHgqAmaTDZ2CyYNstE2g53jpApxF5ewOlUWfZEB9vi7O
-         SFqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727769415; x=1728374215;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2YLIpnISBu8vBhPoCOC0VxpYUv2HSm5uj0+OgXD1P1w=;
-        b=MyAx1xwLNBLy/36t/oNS6ROU5cITO1uAytuaZYdrPCeirKoDGestcaNWAPHwYvhKy7
-         UbUXTlvHjHlzMVj4di0zEomryxO6e49SuxtAFvwEgCat/+Y2eEDAXu6CF85PYrK78mMn
-         it7GgVo6kmsBV5jVI+McavXDfsN180NJXPrjqngHDl5tOb8JjsARVpkgUd09XHo/MXoh
-         3QtScUanfVfDl03/aNtlnk9aySEIuHmaLO46ksvzgrJ1me1fKQ5QMQuQgMfSUepL2ef6
-         ykSX2p99Wrg1rIGvhK3a56BFGSZpuODmuTGDVQo6u95B4lKGacy5fJXe1yAIoMJVl94b
-         2JFw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+6SA8vxuhPQWxASduc/+bjxEMyfdxuv+dDrRRAO7ziIPnJD5enrXaM4kRlDjMZdY/RNGzxcU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2+P5R5tvQaXx1NymRmqiCzeLI1Z9Vri2NOaFoKOGoJ82YUSxO
-	O/QKOvBbi9bxMfRwocTgJyCNGdIH7eUbjUFMOlvbMa5Aw3+iPIR/lxGCGN8EPGD/Wbk0toWGxQj
-	o7w==
-X-Google-Smtp-Source: AGHT+IGrHwUo0pc+SGt+eG2rbtdwipm7/Eg7KBwJTogtJiz6n0iyNnSjCk9Mp4ukj5ZYb1jp3Gh60YAy+2Q=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a25:9e09:0:b0:e24:96b1:696 with SMTP id
- 3f1490d57ef6-e2604b0f4f6mr12271276.1.1727769414837; Tue, 01 Oct 2024 00:56:54
- -0700 (PDT)
-Date: Tue, 1 Oct 2024 09:56:52 +0200
-In-Reply-To: <20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1727769501; c=relaxed/simple;
+	bh=pMfk8+HOUrV4upL5IAGrbT4UHJ69CkGVlbCs68wRMs0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WvNMUnPmceGOhEzQ56h58efS5R87h0C8v/ewmJF0jNtSJ2xI/9H68pUnLxbrg30vcnD1+0eAlqxHKtFwQft5rr8ulNtcCExUCr3qXcn5NBb2fq8Obi8DKq40T26Z5hbYT7aJpQSKEJM4pNVQWq5+Ys+ZZ1su6g45Z8+/JuL7+CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=inguin@gmx.de header.b=q6B0qALA; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1727769493; x=1728374293; i=inguin@gmx.de;
+	bh=/5mt1WVT3U9Tvoh5M1UJm7KdQL8Gr6u06WdAplJnPkg=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=q6B0qALAw1nZGYGPdILsoenv3Z7YR0486p9vU+EM4Bmj5R4NkhT1hTosMHG5MMRs
+	 WiwneED35w4Q6woqikXz02IduzkrbS4UqKh8LbI8DSlCLtKCLHP3cYgYZqOR0EYXE
+	 /Cwc7yn8Ap+778ksanN97Q6xkUM1ms19rA6mmbVsam8Xjgftd5Ne4eh5jEU0vz2gS
+	 QkZxumIVUdqWm0XpVkGMoSDcrpRGNoxa7dVuj9JyKscPnpToqSvW2bK2KC7wkeL5O
+	 HeHvfCbjy+Np5j1HFOYRtsahmFH3Nk3YGEsGEXqvftjPFcha+Xs/ejmP/RU00hOFU
+	 wfjk1N7tz30KDfeAlA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from zaphod.peppercon.de ([212.80.250.50]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N6bjy-1rpo0B2Ztm-012GUD; Tue, 01
+ Oct 2024 09:58:13 +0200
+From: Ingo van Lil <inguin@gmx.de>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Dan Murphy <dmurphy@ti.com>,
+	Ingo van Lil <inguin@gmx.de>
+Subject: [PATCH] net: phy: dp83869: fix memory corruption when enabling fiber
+Date: Tue,  1 Oct 2024 09:57:33 +0200
+Message-ID: <20241001075733.10986-1-inguin@gmx.de>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZvurRJ4mGsRufmEl@google.com>
-Subject: Re: [RFC PATCH v3 18/19] samples/landlock: Support socket protocol restrictions
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:hIXkf3Br/eZWUxRH8HgfA7JdSuAyOjwxQhyisSoJy+v4/NNVYHI
+ 1FUy18obP9AFDEzS5GNMrFNNU48SwyvesNC2tjMl8EnnLgQBRJLlHfythv6a8IBx0SMXlTH
+ CcVp9KclStzSCO4PljKymc7YJ4reDgjEfPRNCraSOa7hCDsTIAu72Jfr+Z++yJZeFWAys/I
+ LwPpDvxe15wDkt96qeWsg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:MIpViB/Q/Gs=;bJGMd7H/GnYPuVYZM5jbqS7b7Nw
+ eGfrn5BuYDD1NsMxC7Kd6Xk8SpZE8op0N+8fMECKt9RVMbAI2FSLDXGTYSwlcUaGoWxuOr0D/
+ ao2mXn+Urx6IosGyfQ4pP1Z7bmWyUxJR8NUvA0ZkzgVQXm1XaVeRy19gonPW67A2TkeMSoCew
+ 0kDtq/M0MxUq6z+eKteBtNAvs0SfBX/U3qLysIGxsWzI0560hLGpZA2+mbqPbRAqLMJZU14Xa
+ kGtmxVyDvHR2DxRnQcQTpluBUP45BP1emysy7CM2uCReUmy3v1aDazvLElDWv+3kV+tU1Ch0J
+ rc7IXzU+x2TfCwA1wQLhxKvHYaBcF8xUZMUoOR4OcC5a3TqON/PlngfhHs9zwhCSb/WL5ildt
+ 77MUAjx0kPU/JSyZ5kY5yg1bJcL5/6untNmUh4eysw1WtpuemjDIw21FwFfAcoAmxtrUATCpJ
+ 0MyAOczw4Jj1U1lTDopJM5ka3WDenTwmBoEyHdT7va7sfJmWRLjXCTlm2TB5TsRtt0vi3PgBR
+ dKHOGjmAOifCa+A9f3W+2awDnGJr1NScMXjDZ+6OKzZL04w/f2w1g4lHiW/OFkxZ6JwoKWi0H
+ iMOaMVL69/Tw58xF0pYqb3CKZAPvVwYO2CRt4Cugbe4SR+zpQ2tQ35w4XxjSGXlQn2h8Gsqna
+ y5pRNvNabB+dW3754LQYEKDpiHneREDp6pzG2ji+Wp0ZXtt70TtDN7kw+vXlGcU6ous4VFDo1
+ lmq5QaYqV/J5SdJ93JPijBsqei30osvLXDofww8tA/JJT3WdYHpQ+7FEhDibeEPttTtTj1rDn
+ QhuuDcCOiBUtkhNXDLdCzaRQ==
 
-On Wed, Sep 04, 2024 at 06:48:23PM +0800, Mikhail Ivanov wrote:
-> Add socket protocol control support in sandboxer demo. It's possible
-> to allow a sandboxer to create sockets with specified family and type
-> values. This is controlled with the new LL_SOCKET_CREATE environment
-> variable. Single token in this variable looks like this:
-> 'FAMILY.TYPE', where FAMILY and TYPE are integers corresponding to the
-> number of address family and socket type.
->=20
-> Add parse_socket_protocol() method to parse socket family and type
-> strings into integers.
->=20
-> Change LANDLOCK_ABI_LAST to 6.
->=20
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
-> Changes since v2:
-> * Changes representation of socket protocol in LL_SOCKET_CREATE into
->   pair of integer values.
-> * Changes commit message.
-> * Minor fixes.
->=20
-> Changes since v1:
-> * Refactors get_socket_protocol(). Rename it to parse_socket_protocol().
-> * Changes LANDLOCK_ABI_LAST to 6 since ioctl patchlist updated it to 5.
-> * Refactors commit message.
-> * Formats with clang-format.
-> * Minor changes.
-> ---
->  samples/landlock/sandboxer.c | 108 ++++++++++++++++++++++++++++++-----
->  1 file changed, 95 insertions(+), 13 deletions(-)
->=20
-> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-> index d4dba9e4ce89..1669095f9373 100644
-> --- a/samples/landlock/sandboxer.c
-> +++ b/samples/landlock/sandboxer.c
-> @@ -14,6 +14,7 @@
->  #include <fcntl.h>
->  #include <linux/landlock.h>
->  #include <linux/prctl.h>
-> +#include <linux/socket.h>
->  #include <stddef.h>
->  #include <stdio.h>
->  #include <stdlib.h>
-> @@ -55,8 +56,11 @@ static inline int landlock_restrict_self(const int rul=
-eset_fd,
->  #define ENV_FS_RW_NAME "LL_FS_RW"
->  #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->  #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-> +#define ENV_SOCKET_CREATE_NAME "LL_SOCKET_CREATE"
->  #define ENV_DELIMITER ":"
-> =20
-> +#define ENV_TOKEN_INTERNAL_DELIMITER "."
-> +
->  static int parse_path(char *env_path, const char ***const path_list)
->  {
->  	int i, num_paths =3D 0;
-> @@ -209,6 +213,65 @@ static int populate_ruleset_net(const char *const en=
-v_var, const int ruleset_fd,
->  	return ret;
->  }
-> =20
-> +static int populate_ruleset_socket(const char *const env_var,
-> +				   const int ruleset_fd,
-> +				   const __u64 allowed_access)
-> +{
-> +	int ret =3D 1;
-> +	char *env_protocol_name, *strprotocol, *strfamily, *strtype;
-> +	unsigned long long family_ull, type_ull;
-> +	struct landlock_socket_attr protocol =3D {
-> +		.allowed_access =3D allowed_access,
-> +	};
-> +
-> +	env_protocol_name =3D getenv(env_var);
-> +	if (!env_protocol_name)
-> +		return 0;
-> +	env_protocol_name =3D strdup(env_protocol_name);
-> +	unsetenv(env_var);
-> +
-> +	while ((strprotocol =3D strsep(&env_protocol_name, ENV_DELIMITER))) {
-> +		strfamily =3D strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
-> +		strtype =3D strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
+When configuring the fiber port, the DP83869 PHY driver incorrectly
+calls linkmode_set_bit() with a bit mask (1 << 10) rather than a bit
+number (10). This corrupts some other memory location -- in case of
+arm64 the priv pointer in the same structure.
 
-This works with strings such as "123:456:foobar", because you are using str=
-sep()
-twice on strprotocol; this looks unintentional?
+Signed-off-by: Ingo van Lil <inguin@gmx.de>
+=2D--
+ drivers/net/phy/dp83869.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+index d7aaefb5226b..9c5ac5d6a9fd 100644
+=2D-- a/drivers/net/phy/dp83869.c
++++ b/drivers/net/phy/dp83869.c
+@@ -645,7 +645,7 @@ static int dp83869_configure_fiber(struct phy_device *=
+phydev,
+ 		     phydev->supported);
 
-> +
-> +		if (!strtype) {
-> +			fprintf(stderr,
-> +				"Failed to extract socket protocol with "
-> +				"unspecified type value\n");
-> +			goto out_free_name;
-> +		}
-> +
-> +		if (str2num(strfamily, &family_ull)) {
-> +			fprintf(stderr,
-> +				"Failed to convert \"%s\" into a number\n",
-> +				strfamily);
-> +			goto out_free_name;
-> +		}
-> +		if (str2num(strtype, &type_ull)) {
-> +			fprintf(stderr,
-> +				"Failed to convert \"%s\" into a number\n",
-> +				strtype);
-> +			goto out_free_name;
-> +		}
-> +		protocol.family =3D (int)family_ull;
-> +		protocol.type =3D (int)type_ull;
-> +
-> +		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-> +				      &protocol, 0)) {
-> +			fprintf(stderr,
-> +				"Failed to update the ruleset with "
-> +				"family \"%s\" and type \"%s\": %s\n",
-> +				strfamily, strtype, strerror(errno));
-> +			goto out_free_name;
-> +		}
-> +	}
-> +	ret =3D 0;
-> +
-> +out_free_name:
-> +	free(env_protocol_name);
-> +	return ret;
-> +}
-> +
->  /* clang-format off */
-> =20
->  #define ACCESS_FS_ROUGHLY_READ ( \
-> @@ -233,14 +296,14 @@ static int populate_ruleset_net(const char *const e=
-nv_var, const int ruleset_fd,
-> =20
->  /* clang-format on */
-> =20
-> -#define LANDLOCK_ABI_LAST 5
-> +#define LANDLOCK_ABI_LAST 6
-> =20
->  int main(const int argc, char *const argv[], char *const *const envp)
->  {
->  	const char *cmd_path;
->  	char *const *cmd_argv;
->  	int ruleset_fd, abi;
-> -	char *env_port_name;
-> +	char *env_optional_name;
->  	__u64 access_fs_ro =3D ACCESS_FS_ROUGHLY_READ,
->  	      access_fs_rw =3D ACCESS_FS_ROUGHLY_READ | ACCESS_FS_ROUGHLY_WRITE=
-;
-> =20
-> @@ -248,18 +311,19 @@ int main(const int argc, char *const argv[], char *=
-const *const envp)
->  		.handled_access_fs =3D access_fs_rw,
->  		.handled_access_net =3D LANDLOCK_ACCESS_NET_BIND_TCP |
->  				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
->  	};
-> =20
->  	if (argc < 2) {
->  		fprintf(stderr,
-> -			"usage: %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"...\"%s "
-> +			"usage: %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"...\" %s=3D\"..=
-.\"%s "
->  			"<cmd> [args]...\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
->  		fprintf(stderr,
->  			"Execute a command in a restricted environment.\n\n");
->  		fprintf(stderr,
-> -			"Environment variables containing paths and ports "
-> +			"Environment variables containing paths, ports and protocols "
->  			"each separated by a colon:\n");
->  		fprintf(stderr,
->  			"* %s: list of paths allowed to be used in a read-only way.\n",
-> @@ -268,7 +332,7 @@ int main(const int argc, char *const argv[], char *co=
-nst *const envp)
->  			"* %s: list of paths allowed to be used in a read-write way.\n\n",
->  			ENV_FS_RW_NAME);
->  		fprintf(stderr,
-> -			"Environment variables containing ports are optional "
-> +			"Environment variables containing ports or protocols are optional "
->  			"and could be skipped.\n");
->  		fprintf(stderr,
->  			"* %s: list of ports allowed to bind (server).\n",
-> @@ -276,15 +340,19 @@ int main(const int argc, char *const argv[], char *=
-const *const envp)
->  		fprintf(stderr,
->  			"* %s: list of ports allowed to connect (client).\n",
->  			ENV_TCP_CONNECT_NAME);
-> +		fprintf(stderr,
-> +			"* %s: list of socket protocols allowed to be created.\n",
-> +			ENV_SOCKET_CREATE_NAME);
+ 	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported);
+-	linkmode_set_bit(ADVERTISED_FIBRE, phydev->advertising);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->advertising);
 
-Might be worth listing some example values for this parameter, e.g. for TCP=
-/IP
-and UDP/IP?  This is also needed to make it clear that these can't be given=
- by
-name, but only by number.
+ 	if (dp83869->mode =3D=3D DP83869_RGMII_1000_BASE) {
+ 		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
+=2D-
+2.46.1
 
-
->  		fprintf(stderr,
->  			"\nexample:\n"
->  			"%s=3D\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
->  			"%s=3D\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->  			"%s=3D\"9418\" "
->  			"%s=3D\"80:443\" "
-> +			"%s=3D\"10.2:1.1\" "
->  			"%s bash -i\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
->  		fprintf(stderr,
->  			"This sandboxer can use Landlock features "
->  			"up to ABI version %d.\n",
-> @@ -351,7 +419,11 @@ int main(const int argc, char *const argv[], char *c=
-onst *const envp)
->  	case 4:
->  		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->  		ruleset_attr.handled_access_fs &=3D ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-> -
-> +		__attribute__((fallthrough));
-> +	case 5:
-> +		/* Removes socket support for ABI < 6 */
-> +		ruleset_attr.handled_access_socket &=3D
-> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
->  		fprintf(stderr,
->  			"Hint: You should update the running kernel "
->  			"to leverage Landlock features "
-> @@ -371,18 +443,23 @@ int main(const int argc, char *const argv[], char *=
-const *const envp)
->  	access_fs_rw &=3D ruleset_attr.handled_access_fs;
-> =20
->  	/* Removes bind access attribute if not supported by a user. */
-> -	env_port_name =3D getenv(ENV_TCP_BIND_NAME);
-> -	if (!env_port_name) {
-> +	env_optional_name =3D getenv(ENV_TCP_BIND_NAME);
-> +	if (!env_optional_name) {
->  		ruleset_attr.handled_access_net &=3D
->  			~LANDLOCK_ACCESS_NET_BIND_TCP;
->  	}
->  	/* Removes connect access attribute if not supported by a user. */
-> -	env_port_name =3D getenv(ENV_TCP_CONNECT_NAME);
-> -	if (!env_port_name) {
-> +	env_optional_name =3D getenv(ENV_TCP_CONNECT_NAME);
-> +	if (!env_optional_name) {
->  		ruleset_attr.handled_access_net &=3D
->  			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->  	}
-> -
-> +	/* Removes socket create access attribute if not supported by a user. *=
-/
-
-Phrasing nit: I would say "requested by a user"?
-
-(And maybe also in the two cases above)
-
-
-> +	env_optional_name =3D getenv(ENV_SOCKET_CREATE_NAME);
-> +	if (!env_optional_name) {
-> +		ruleset_attr.handled_access_socket &=3D
-> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
-> +	}
->  	ruleset_fd =3D
->  		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->  	if (ruleset_fd < 0) {
-> @@ -406,6 +483,11 @@ int main(const int argc, char *const argv[], char *c=
-onst *const envp)
->  		goto err_close_ruleset;
->  	}
-> =20
-> +	if (populate_ruleset_socket(ENV_SOCKET_CREATE_NAME, ruleset_fd,
-> +				    LANDLOCK_ACCESS_SOCKET_CREATE)) {
-> +		goto err_close_ruleset;
-> +	}
-> +
->  	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
->  		perror("Failed to restrict privileges");
->  		goto err_close_ruleset;
-> --=20
-> 2.34.1
->=20
-
-As I also said on the Documentation patch, please remember to double check =
-the
-places where the ABI number is mentioned, after rebasing on Tahera's "scope=
-d"
-patches.
-
-=E2=80=94G=C3=BCnther
 
