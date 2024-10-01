@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-131021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BF598C671
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:05:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28A3498C672
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6EDEB22155
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:05:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE5431F25146
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA5E1CDFCF;
-	Tue,  1 Oct 2024 20:05:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A11B1CCEEC;
+	Tue,  1 Oct 2024 20:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bz12xxEe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdkXJ+/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1901CCEF7
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:05:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922981CDFD9
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 20:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727813126; cv=none; b=WK6S4a4B4zPyO57Ni090X8WpPJai1tx3KwDAHV+JRYFCT88Ecu2lI+R9xyFJI59xUq7Rpae/rmizJjN/jB5IvAChPgkJ7w2B9568LRD9nqU3gP+N6YajhWn6/aIT7wL4OuDr8y4wySjLu3FKIkpt238CMYLE4b32Eu4DND8NiRM=
+	t=1727813129; cv=none; b=Qzzn2Ac5kLMoM/Z9UIuuEDyqW3dM4I8v6Qu2+dQ+lTqWUf23N55I98hHI+UN/q2YCSQaFqsed1thcMfehfRqiFukCMBDR16wPO3QEryNapDNao9w7AbYbosWdZflLbNXZM+nSUynZRHGI6LUA0XLmoWyQP6bm9KYd06eoZzAJm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727813126; c=relaxed/simple;
-	bh=MNhUx7+sOcsHoHKCioidpn2CiiHb1wJOEmhTksYx5fM=;
+	s=arc-20240116; t=1727813129; c=relaxed/simple;
+	bh=54uoi+2cFLXhqmfwK+PlsKWY6RtmgqNpGxTh5EzmW2M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=h32lsRuiDJGjJVR0/fHEtGZq239PuhlEa59uqgHGPGLrv/eC/ms6yIsNEQBJvlAOq3Gljr/mR9g71dFy1Vn3RMqpEvzWz9JZZNXRWvtlS612+IwBiKutr47qDEAEy6pVdcDyXlGxtHTw4DKjyNCtsk/7Ydjix9L2PbC/OzrErGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bz12xxEe; arc=none smtp.client-ip=209.85.217.51
+	 MIME-Version; b=Zto4QmDdp6ftPXhIeHx1Cr7+PVK2FAOI//WUDBLzVPVUHMmawJoWWDJDPtjA9LWrn+UFSx9UHAx/DIW/fqcJ2mjRaZjx9fb/JSVOdHnizIg1v4PT7vAe5NDlKRB6djKhdpWH5uHaehsCs/PUlU7e22QbjDAeEfYCDlwhTV9JLjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KdkXJ+/H; arc=none smtp.client-ip=209.85.217.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-4a3b6b00515so75671137.0
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:05:24 -0700 (PDT)
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-4a3b5547b5dso186124137.1
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 13:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727813124; x=1728417924; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727813126; x=1728417926; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=19SXsrz++BxMBPxFEkCWpiQmItk8ImNTEAYXtBuYCms=;
-        b=Bz12xxEeWYiL/iwKt1bmykeLktgowfyrfc1UoaDWQSp/KjH6x46xfCm2a6CC1u+i5l
-         li3MZUSTQtvHcIkp7HJ5YBfKjrCAaBmlFHHKP3orG49ucX55Pp7gsbsIOkIGdOI9+CXO
-         VVxNsNaQ6N/qRGz4uFrQW9hXSpBF+4E+CTy2qZCh/dqLWrk6j/vX2buRr8FDV694w2OT
-         ceoAzKhE9vGQ5pz5G8BpgwLIUCLqSTxwHEEFGQ0cuYDeuTRBkVwSSS9JJrazPSJJgwxX
-         fFd86hCEIrzYC6zoOfcJW6g+dqdrtM/2jLpaVuqZdPy3zwf503SvuebZJkF/NgtjZCp+
-         c4Rg==
+        bh=wmxk7j+3byLItJyf/Z7Lt+wp1NJBL8MowUBgAdHx/dQ=;
+        b=KdkXJ+/HuQXRPjpol0Pz9VLz+KNNuq6t2yS+CcoU77YZ4iCsEQk5a8WfqlNVLHk3QV
+         2OmGwVukbwsxKMoyhiI484e3F+KlBWIgDdbxg7AFbqZxn6FFJuMLphOU1bKSLlx+pJnd
+         idsShvzQTYsmEfCsWeiUyBu0SQfx9o5YQj4uKvOrkyUR88TvDQcKBF1E1IMLQmwgsujk
+         nWB9ZIJIfQ4BbFAPl0BYmDY9kj0+wIrrUJOIxhxUF3wDrg7Q/MawZCE8LEW/PMQ2iQhd
+         iMl31Btsghun2Cgc7v+axQQ9zH3TU6jasSMofgzRWMx5xV7tEdTT7v1ojLgi8rhLV+1B
+         78wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727813124; x=1728417924;
+        d=1e100.net; s=20230601; t=1727813126; x=1728417926;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=19SXsrz++BxMBPxFEkCWpiQmItk8ImNTEAYXtBuYCms=;
-        b=JXtHOiDFN6g1FshW6oI7qvHxUleEGyzrEjYG+Pc2ICh0vLZaxMcaULmTxjVI5+adfP
-         sJhhtRBXfoKyFbbRdMEr1w0ix3XfIM51dZLWdwJkp81kcSVP6zhXmLAu9wY83jANB/hD
-         pp2ur2/mT0t/nrQ1WQW97OawsoIculoh/A+1lmUHGqwx1bl/1mCAtQE3nZhpbFWtTIKR
-         OJDQ1jJzGCwYoQFkf1MayWmf4PsBZ7ghkOBzZeHopMFYUHN+RBMdrtjWGy+Yz4EzYF5E
-         HOK/ffNIyDNWL9Ajh/65UPUxMrIRBriEqOPsWyQ6bhraf/VsjTY8ml7h5AoUpA11nfnD
-         h5WA==
-X-Gm-Message-State: AOJu0YxSP1w2QzL/QooPGgmqN78+Tp7DyrVF+CDiJ75XOl2C1pX34rO0
-	6PpqJlnWH9F3SYaA8okKhUqEIUbyvaai3gxktqXGZ+ke7ySTF6d6yzziv2tQ
-X-Google-Smtp-Source: AGHT+IESfpXLZ1nSsTcqKavfKC8uhSr3M4icROoTaoHgggVt6VaQ9WW4gwqvMKqZGpiiubiCkricfQ==
-X-Received: by 2002:a05:6102:290a:b0:4a3:cebe:9dc7 with SMTP id ada2fe7eead31-4a3e6933a52mr461251137.6.1727813123766;
-        Tue, 01 Oct 2024 13:05:23 -0700 (PDT)
+        bh=wmxk7j+3byLItJyf/Z7Lt+wp1NJBL8MowUBgAdHx/dQ=;
+        b=hoea4wf7G2600APZz5ZfPTA/9PERYVu24UAg4V6M87BIFEFuNfoL6vcA1oTZmhlxaX
+         fE0TLeHXk/mlZH2uGVmbq3l7YPcLUwvfKBkaDkIJDydKUGHcKV3b5MhPIjxepPjmm9Ps
+         5z+/vu9AIFnogdgsVY5eRFlOrnYjb6Fyl4IbqywxuqEUprtb1j86bb4nXzKrF365L+fC
+         qghXFDgDiJGtPLyPjNIq2mGOb/8GZOiK9SCdTNo335JyZ6I7Oh+8G19ox1L8dTVLeLeZ
+         rpzLOxuakqY+psrVfJdsRCfOZkhnRvo/njquA9YNE8KB9m5HZ+/HUu3IXxZW8ThgqA57
+         uP1A==
+X-Gm-Message-State: AOJu0YyiRSliN3S5tY2Za2UyNgdLC4NGvSxrdffD3bmtysYg0ixcsKVz
+	ruu+fTSubNSvOva6IKC1aVg0cZmlxXfmeQXYFG/6FEPpI+KkKNCN
+X-Google-Smtp-Source: AGHT+IH40pxfJ2N8usqwZtlYgkwJMpPNBd11Tfp36vzE5tVzxFyEAIDb1fbHy6bP3JoixMWMTAtfQA==
+X-Received: by 2002:a05:6102:5121:b0:493:cc30:35f3 with SMTP id ada2fe7eead31-4a3e66180c2mr534776137.0.1727813126385;
+        Tue, 01 Oct 2024 13:05:26 -0700 (PDT)
 Received: from ahoy.c.googlers.com.com (182.71.196.35.bc.googleusercontent.com. [35.196.71.182])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-84eb504217bsm1237447241.14.2024.10.01.13.05.22
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-84eb504217bsm1237447241.14.2024.10.01.13.05.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:05:23 -0700 (PDT)
+        Tue, 01 Oct 2024 13:05:25 -0700 (PDT)
 From: Neal Cardwell <ncardwell.sw@gmail.com>
 To: David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Cc: netdev@vger.kernel.org,
 	Neal Cardwell <ncardwell@google.com>,
-	Geumhwan Yu <geumhwan.yu@samsung.com>,
 	Yuchung Cheng <ycheng@google.com>
-Subject: [PATCH net 1/3] tcp: fix to allow timestamp undo if no retransmits were sent
-Date: Tue,  1 Oct 2024 20:05:15 +0000
-Message-ID: <20241001200517.2756803-2-ncardwell.sw@gmail.com>
+Subject: [PATCH net 2/3] tcp: fix tcp_enter_recovery() to zero retrans_stamp when it's safe
+Date: Tue,  1 Oct 2024 20:05:16 +0000
+Message-ID: <20241001200517.2756803-3-ncardwell.sw@gmail.com>
 X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
 In-Reply-To: <20241001200517.2756803-1-ncardwell.sw@gmail.com>
 References: <20241001200517.2756803-1-ncardwell.sw@gmail.com>
@@ -90,87 +89,144 @@ Content-Transfer-Encoding: 8bit
 
 From: Neal Cardwell <ncardwell@google.com>
 
-Fix the TCP loss recovery undo logic in tcp_packet_delayed() so that
-it can trigger undo even if TSQ prevents a fast recovery episode from
-reaching tcp_retransmit_skb().
+Fix tcp_enter_recovery() so that if there are no retransmits out then
+we zero retrans_stamp when entering fast recovery. This is necessary
+to fix two buggy behaviors.
 
-Geumhwan Yu <geumhwan.yu@samsung.com> recently reported that after
-this commit from 2019:
+Currently a non-zero retrans_stamp value can persist across multiple
+back-to-back loss recovery episodes. This is because we generally only
+clears retrans_stamp if we are completely done with loss recoveries,
+and get to tcp_try_to_open() and find !tcp_any_retrans_done(sk). This
+behavior causes two bugs:
 
-commit bc9f38c8328e ("tcp: avoid unconditional congestion window undo
-on SYN retransmit")
+(1) When a loss recovery episode (CA_Loss or CA_Recovery) is followed
+immediately by a new CA_Recovery, the retrans_stamp value can persist
+and can be a time before this new CA_Recovery episode starts. That
+means that timestamp-based undo will be using the wrong retrans_stamp
+(a value that is too old) when comparing incoming TS ecr values to
+retrans_stamp to see if the current fast recovery episode can be
+undone.
 
-...and before this fix we could have buggy scenarios like the
-following:
+(2) If there is a roughly minutes-long sequence of back-to-back fast
+recovery episodes, one after another (e.g. in a shallow-buffered or
+policed bottleneck), where each fast recovery successfully makes
+forward progress and recovers one window of sequence space (but leaves
+at least one retransmit in flight at the end of the recovery),
+followed by several RTOs, then the ETIMEDOUT check may be using the
+wrong retrans_stamp (a value set at the start of the first fast
+recovery in the sequence). This can cause a very premature ETIMEDOUT,
+killing the connection prematurely.
 
-+ Due to reordering, a TCP connection receives some SACKs and enters a
-  spurious fast recovery.
+This commit changes the code to zero retrans_stamp when entering fast
+recovery, when this is known to be safe (no retransmits are out in the
+network). That ensures that when starting a fast recovery episode, and
+it is safe to do so, retrans_stamp is set when we send the fast
+retransmit packet. That addresses both bug (1) and bug (2) by ensuring
+that (if no retransmits are out when we start a fast recovery) we use
+the initial fast retransmit of this fast recovery as the time value
+for undo and ETIMEDOUT calculations.
 
-+ TSQ prevents all invocations of tcp_retransmit_skb(), because many
-  skbs are queued in lower layers of the sending machine's network
-  stack; thus tp->retrans_stamp remains 0.
+This makes intuitive sense, since the start of a new fast recovery
+episode (in a scenario where no lost packets are out in the network)
+means that the connection has made forward progress since the last RTO
+or fast recovery, and we should thus "restart the clock" used for both
+undo and ETIMEDOUT logic.
 
-+ The connection receives a TCP timestamp ECR value echoing a
-  timestamp before the fast recovery, indicating that the fast
-  recovery was spurious.
+Note that if when we start fast recovery there *are* retransmits out
+in the network, there can still be undesirable (1)/(2) issues. For
+example, after this patch we can still have the (1) and (2) problems
+in cases like this:
 
-+ The connection fails to undo the spurious fast recovery because
-  tp->retrans_stamp is 0, and thus tcp_packet_delayed() returns false,
-  due to the new logic in the 2019 commit: commit bc9f38c8328e ("tcp:
-  avoid unconditional congestion window undo on SYN retransmit")
++ round 1: sender sends flight 1
 
-This fix tweaks the logic to be more similar to the
-tcp_packet_delayed() logic before bc9f38c8328e, except that we take
-care not to be fooled by the FLAG_SYN_ACKED code path zeroing out
-tp->retrans_stamp (the bug noted and fixed by Yuchung in
-bc9f38c8328e).
++ round 2: sender receives SACKs and enters fast recovery 1,
+  retransmits some packets in flight 1 and then sends some new data as
+  flight 2
 
-Note that this returns the high-level behavior of tcp_packet_delayed()
-to again match the comment for the function, which says: "Nothing was
-retransmitted or returned timestamp is less than timestamp of the
-first retransmission." Note that this comment is in the original
-2005-04-16 Linux git commit, so this is evidently long-standing
-behavior.
++ round 3: sender receives some SACKs for flight 2, notes losses, and
+  retransmits some packets to fill the holes in flight 2
 
-Fixes: bc9f38c8328e ("tcp: avoid unconditional congestion window undo on SYN retransmit")
-Reported-by: Geumhwan Yu <geumhwan.yu@samsung.com>
-Diagnosed-by: Geumhwan Yu <geumhwan.yu@samsung.com>
++ fast recovery has some lost retransmits in flight 1 and continues
+  for one or more rounds sending retransmits for flight 1 and flight 2
+
++ fast recovery 1 completes when snd_una reaches high_seq at end of
+  flight 1
+
++ there are still holes in the SACK scoreboard in flight 2, so we
+  enter fast recovery 2, but some retransmits in the flight 2 sequence
+  range are still in flight (retrans_out > 0), so we can't execute the
+  new retrans_stamp=0 added here to clear retrans_stamp
+
+It's not yet clear how to fix these remaining (1)/(2) issues in an
+efficient way without breaking undo behavior, given that retrans_stamp
+is currently used for undo and ETIMEDOUT. Perhaps the optimal (but
+expensive) strategy would be to set retrans_stamp to the timestamp of
+the earliest outstanding retransmit when entering fast recovery. But
+at least this commit makes things better.
+
+Note that this does not change the semantics of retrans_stamp; it
+simply makes retrans_stamp accurate in some cases where it was not
+before:
+
+(1) Some loss recovery, followed by an immediate entry into a fast
+recovery, where there are no retransmits out when entering the fast
+recovery.
+
+(2) When a TFO server has a SYNACK retransmit that sets retrans_stamp,
+and then the ACK that completes the 3-way handshake has SACK blocks
+that trigger a fast recovery. In this case when entering fast recovery
+we want to zero out the retrans_stamp from the TFO SYNACK retransmit,
+and set the retrans_stamp based on the timestamp of the fast recovery.
+
+We introduce a tcp_retrans_stamp_cleanup() helper, because this
+two-line sequence already appears in 3 places and is about to appear
+in 2 more as a result of this bug fix patch series. Once this bug fix
+patches series in the net branch makes it into the net-next branch
+we'll update the 3 other call sites to use the new helper.
+
+This is a long-standing issue. The Fixes tag below is chosen to be the
+oldest commit at which the patch will apply cleanly, which is from
+Linux v3.5 in 2012.
+
+Fixes: 1fbc340514fc ("tcp: early retransmit: tcp_enter_recovery()")
 Signed-off-by: Neal Cardwell <ncardwell@google.com>
 Signed-off-by: Yuchung Cheng <ycheng@google.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_input.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ net/ipv4/tcp_input.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 9f314dfa14905..4fba70113e893 100644
+index 4fba70113e893..774fe1de8a922 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -2473,8 +2473,22 @@ static bool tcp_skb_spurious_retrans(const struct tcp_sock *tp,
-  */
- static inline bool tcp_packet_delayed(const struct tcp_sock *tp)
- {
--	return tp->retrans_stamp &&
--	       tcp_tsopt_ecr_before(tp, tp->retrans_stamp);
-+	const struct sock *sk = (const struct sock *)tp;
-+
-+	if (tp->retrans_stamp &&
-+	    tcp_tsopt_ecr_before(tp, tp->retrans_stamp))
-+		return true;  /* got echoed TS before first retransmission */
-+
-+	/* Check if nothing was retransmitted (retrans_stamp==0), which may
-+	 * happen in fast recovery due to TSQ. But we ignore zero retrans_stamp
-+	 * in TCP_SYN_SENT, since when we set FLAG_SYN_ACKED we also clear
-+	 * retrans_stamp even if we had retransmitted the SYN.
-+	 */
-+	if (!tp->retrans_stamp &&	   /* no record of a retransmit/SYN? */
-+	    sk->sk_state != TCP_SYN_SENT)  /* not the FLAG_SYN_ACKED case? */
-+		return true;  /* nothing was retransmitted */
-+
-+	return false;
+@@ -2522,6 +2522,16 @@ static bool tcp_any_retrans_done(const struct sock *sk)
+ 	return false;
  }
  
- /* Undo procedures. */
++/* If loss recovery is finished and there are no retransmits out in the
++ * network, then we clear retrans_stamp so that upon the next loss recovery
++ * retransmits_timed_out() and timestamp-undo are using the correct value.
++ */
++static void tcp_retrans_stamp_cleanup(struct sock *sk)
++{
++	if (!tcp_any_retrans_done(sk))
++		tcp_sk(sk)->retrans_stamp = 0;
++}
++
+ static void DBGUNDO(struct sock *sk, const char *msg)
+ {
+ #if FASTRETRANS_DEBUG > 1
+@@ -2889,6 +2899,9 @@ void tcp_enter_recovery(struct sock *sk, bool ece_ack)
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	int mib_idx;
+ 
++	/* Start the clock with our fast retransmit, for undo and ETIMEDOUT. */
++	tcp_retrans_stamp_cleanup(sk);
++
+ 	if (tcp_is_reno(tp))
+ 		mib_idx = LINUX_MIB_TCPRENORECOVERY;
+ 	else
 -- 
 2.46.1.824.gd892dcdcdd-goog
 
