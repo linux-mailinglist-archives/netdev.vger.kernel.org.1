@@ -1,90 +1,104 @@
-Return-Path: <netdev+bounces-131062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1610398C738
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:04:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E185C98C748
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 483861C23F3B
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:04:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B95283099
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E331D0DCE;
-	Tue,  1 Oct 2024 20:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B931CEE80;
+	Tue,  1 Oct 2024 21:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WR+DWywV"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="JxbUgWs/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6941D0B9B;
-	Tue,  1 Oct 2024 20:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C641CEAD2
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 21:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727816354; cv=none; b=lnufP8+F68jjrlkNB5IdlZHu1+0nVgDtQNuEunIRwI6nqNdaCpZQCVrigX3JVdM4db9D9wiWQqYFCkF08o6GTlmyhxxFtH6mpXwKWI/asXFDvf7RjVR/isZeRAH5Sjjd6kBMQCyxeonaiYh55G78mn6e9J0gbcGchO8CoMEnMCE=
+	t=1727816697; cv=none; b=ZSNSFfBoGmImWVLCNDIGtgax3VN3QehoiEtdzT7tg8pXngUHE3OmcVjosL4hT+dCHNcWqZIvNdnT92nX+8aMWZEfPYyY+yX0Uy5HoYTlXdY/JqaKQtFNiadOOd2LiQfozYjcKfal1B2Quo1/S6F4KUFVGX1R/hmdUj9+wI2qAgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727816354; c=relaxed/simple;
-	bh=kIpYMffnv2Jsrflqi0UBGLS1xlxbxCI2z0viDXyO2ug=;
+	s=arc-20240116; t=1727816697; c=relaxed/simple;
+	bh=qPyDujOFTLNSxbcnmHDSi+KZgC/UzTfXThHY/68Uscw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tnjYsfqEGWC7GtoQ1tyVQ+cWcg1ZdFVoaEYmNTbuBtqpULiCOZVh43n6sQGiPQjvJ+c5hu4hHwE5xVZHzI2WyXKNrtoaLDygW8JQ5CIGbOqp4wtJMuWxYT3+Qbi6uQkNWWimKqvIfBSLBk1fYFHIE7I4oSj7jzcoazdAf9tQBxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WR+DWywV; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71dba8b05cbso1241041b3a.3;
-        Tue, 01 Oct 2024 13:59:13 -0700 (PDT)
+	 MIME-Version; b=A2a7ofXmN5+18g8jouT9jL5uiv6qp40Udd5gBkNKK47w9d0wN217T+OrXkB/F9JtVVqNfB5Q4ewpHvjewmfEPkgHAJFQL5BScEySlPtqOXSilecPqcVc6VXdYWJJ5q/2fKgKnPw/7aLzmn/9QAP2jmStqvHnt5/luflavE4MIXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=JxbUgWs/; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20b7eb9e81eso30127615ad.2
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 14:04:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727816352; x=1728421152; darn=vger.kernel.org;
+        d=purestorage.com; s=google2022; t=1727816696; x=1728421496; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PgLa4BgBe2CooTJVa2laJtRpnBqwaZiL8qbHDW7oMYA=;
-        b=WR+DWywVw07tJUa4AmpHNT+ZDjZ3VmzLMgW8i7qG0mAHpq78tFkXIZVIGQmGy83R8f
-         4/ErweOX7NSa8gY7PG3yrrX9JjNn6z3kI1R7qjpSc2b1wTTOyrf0e6i/vRyooUElsaAi
-         0Dh8a1JevnzGNKtFGM1SJ2rVQhA0tqVhhTF/nfY5SSiFsObgoA687pVvJWBNqYxIW9aX
-         hecVVFekd4sJlFhq6+5V1LYg25tIqSEXAD6gTj+QG8sIZT28OZOFoYp761GeHP0cEgrn
-         qvVCSntQc3H8aTlYH1EDQ1A5ciNyxdKomzWoHzOk8koGBnpuhGMwoMtr7r9vXQsVHURP
-         DINA==
+        bh=qPyDujOFTLNSxbcnmHDSi+KZgC/UzTfXThHY/68Uscw=;
+        b=JxbUgWs/Mrn53vTrW9mJuJLzR4Y1avvysyrxw1FrApHxbQI1QjZIoyr4r8/8SotFTs
+         yv9aZViGghRBaZ0B++k+3Nc+NvOM7qi9DYW2+N66EJ3AjUM8YOZpVlXs4mtoDjAKnmj1
+         YL34V3hlPegyCZkbY45vlcV9n1kifgvvN4MK+5U9WewSxrfIG5yYdH4ABz/md+IIKV4k
+         9y23L5VF6F6HJ6VRM6LbQ6GuCaGOXqZApi6vh5STT79cbL4tK0RzoF3VuBr7y5prUzGu
+         p45qPuL79wRsaesIXzgV6yAG48xPPgG43yA3FJi2YxScNKGGD9Lu5d3uO5msg3rDi5zO
+         1CZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727816352; x=1728421152;
+        d=1e100.net; s=20230601; t=1727816696; x=1728421496;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PgLa4BgBe2CooTJVa2laJtRpnBqwaZiL8qbHDW7oMYA=;
-        b=fSBv01Y/Fw6a6lO1WMgdSTyuvYgDxF0UAQ9zrlBps3kOrB5JyDMiFTJFNdOGFM5PSj
-         OKXoo8EctmK4W5E0MFKzI5XQCSRVOx//xp5qa5uG5zDOGsfPDebYESc5oMQ0vFkYT7p8
-         xvQFE1IBUCrWaFknXMBXyhbpNLDV4xMAlyQPPtvFBfGuqBfLOhzSix8p4NEj+mG/O5J4
-         veXPqgSfp+uNRpVwCaVdMUsPCDZXf9dQgflloPupzZmgiCd4kc7cpA1wZqWNpepUfg7A
-         hbDZWWRreZxtuw3wfpAAGI5KSkd+xhAk/08FBVgGolkYFXdXoKVmqN3LnG4Bn+UKFhSz
-         M9vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDm4x90BRP3VNMjX6vOMUSzCXvR/fvdFJ6cyHldH5MW3qRTVKI2jW9jBwNKqW9W4/OoxJIqy9Ba7zLQCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmPJ917svFXx3RSW4OP1qa6tjm77ArFt05CQClsdNTNJKbKeex
-	x36hb87kr2l3hvadEwGUtL+bdw1oJy6GUJoVdE9CTcoGUJEsdjQJo0oFoRsu
-X-Google-Smtp-Source: AGHT+IEEpCmC4VF8DcR1Mhn4JEwlfphG24IusTTuqQgC6OU/ggYnxNm1+uQpMVsg/LtCAHxajSowHg==
-X-Received: by 2002:a05:6a00:2188:b0:718:d9fb:63e1 with SMTP id d2e1a72fcca58-71dc5c6726dmr1526542b3a.10.1727816352520;
-        Tue, 01 Oct 2024 13:59:12 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26518a2asm8545765b3a.107.2024.10.01.13.59.11
+        bh=qPyDujOFTLNSxbcnmHDSi+KZgC/UzTfXThHY/68Uscw=;
+        b=DdyZ0lWDECmXffGlZ3ysnYGQ3vHb4tiPMaaaAQg4i3rO/TlslukU5tVS2BLfAhzLbD
+         2DMtO21p8ovTSZNcboxR8x2DWTlEIqApqkTMRaAnLDQHliaX/KhiBOIVC7Ee/O23wGUi
+         ul+lkfrIGFugJvjVuCv0vcdb3R0uom3nKncLbuJ0G/vpoN8Ou4+aXt5W0YyQu9Kfw90u
+         KsBbcbl5szp/kpN0bfO9dtvXYVs0+N2ACZQt6RGl2JpSO2xYAqvmJG1wXXbpqbxQnlkO
+         tGY1EoW+Wm/MQqMFIECIZyVRGqepSzhsB99kZM111ohvsqQDu3rl9NtHUCg94VN/Le+E
+         aF7g==
+X-Forwarded-Encrypted: i=1; AJvYcCW5BOrN3KApZKK79y+2I6vr8uu0JHKeBKZjlAoeawT72Y4r4UTxnzUqaVN4Vy0wOFKV2Gh1fYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPH5lmJYd/GA7tpYziWc1AILGjtJC0mhOKwvpVWPAu478gBc1d
+	9hbfp0Dgvg39WKUyZIo9X7XyPFZfwURiVtdtp+9FYZ7E3rjeKov2tQV+nT72lkk=
+X-Google-Smtp-Source: AGHT+IHOCKqwJNquHm6zECkIBJWswhGFdb4YTpGgI9Bdwu0jMqj8A4NHRSk3KDE5XuPFEDX+sBe2ng==
+X-Received: by 2002:a17:902:ec8f:b0:20b:6f02:b4e5 with SMTP id d9443c01a7336-20bc59ae323mr13811435ad.9.1727816695778;
+        Tue, 01 Oct 2024 14:04:55 -0700 (PDT)
+Received: from dev-mattc2.dev.purestorage.com ([208.88.159.129])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20b37e37168sm73412995ad.186.2024.10.01.14.04.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 13:59:12 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
+        Tue, 01 Oct 2024 14:04:55 -0700 (PDT)
+From: Matthew W Carlis <mattc@purestorage.com>
+To: macro@orcam.me.uk
+Cc: alex.williamson@redhat.com,
+	bhelgaas@google.com,
 	davem@davemloft.net,
+	david.abdurachmanov@gmail.com,
 	edumazet@google.com,
+	helgaas@kernel.org,
 	kuba@kernel.org,
-	pabeni@redhat.com,
+	leon@kernel.org,
 	linux-kernel@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	horms@kernel.org,
-	sd@queasysnail.net,
-	chunkeey@gmail.com
-Subject: [PATCHv2 net-next 18/18] net: ibm: emac: mal: move dcr map down
-Date: Tue,  1 Oct 2024 13:58:44 -0700
-Message-ID: <20241001205844.306821-19-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241001205844.306821-1-rosenp@gmail.com>
-References: <20241001205844.306821-1-rosenp@gmail.com>
+	linux-pci@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	lukas@wunner.de,
+	mahesh@linux.ibm.com,
+	mattc@purestorage.com,
+	mika.westerberg@linux.intel.com,
+	netdev@vger.kernel.org,
+	npiggin@gmail.com,
+	oohall@gmail.com,
+	pabeni@redhat.com,
+	pali@kernel.org,
+	saeedm@nvidia.com,
+	sr@denx.de,
+	wilson@tuliptree.org
+Subject: PCI: Work around PCIe link training failures
+Date: Tue,  1 Oct 2024 15:04:46 -0600
+Message-ID: <20241001210446.14547-1-mattc@purestorage.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <alpine.DEB.2.21.2408160312180.59022@angie.orcam.me.uk>
+References: <alpine.DEB.2.21.2408160312180.59022@angie.orcam.me.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,58 +107,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There's actually a bug above where it returns instead of calling goto.
-Instead of calling goto, move dcr_map and friends down as they're used
-right after the spinlock in mal_reset.
+I just wanted to follow up with our testing results for the mentioned
+patches. It took me a while to get them running in our test pool, but
+we just got it going yesterday and the initial results look really good.
+We will continue running them in our testing from now on & if any issues
+come up I'll try to report them, but otherwise I wanted to say thank you
+for entertaining the discussion & reacting so quickly with new patches.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/ibm/emac/mal.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+The patches we pulled into our testing:
 
-diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index 2434673ed00b..259f38950b6a 100644
---- a/drivers/net/ethernet/ibm/emac/mal.c
-+++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -553,6 +553,18 @@ static int mal_probe(struct platform_device *ofdev)
- 	}
- 	mal->num_rx_chans = prop[0];
- 
-+	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,mcmal-405ez")) {
-+#if defined(CONFIG_IBM_EMAC_MAL_CLR_ICINTSTAT) && \
-+		defined(CONFIG_IBM_EMAC_MAL_COMMON_ERR)
-+		mal->features |= (MAL_FTR_CLEAR_ICINTSTAT |
-+				MAL_FTR_COMMON_ERR_INT);
-+#else
-+		printk(KERN_ERR "%pOF: Support for 405EZ not enabled!\n",
-+				ofdev->dev.of_node);
-+		return -ENODEV;
-+#endif
-+	}
-+
- 	dcr_base = dcr_resource_start(ofdev->dev.of_node, 0);
- 	if (dcr_base == 0) {
- 		printk(KERN_ERR
-@@ -566,18 +578,6 @@ static int mal_probe(struct platform_device *ofdev)
- 		return -ENODEV;
- 	}
- 
--	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,mcmal-405ez")) {
--#if defined(CONFIG_IBM_EMAC_MAL_CLR_ICINTSTAT) && \
--		defined(CONFIG_IBM_EMAC_MAL_COMMON_ERR)
--		mal->features |= (MAL_FTR_CLEAR_ICINTSTAT |
--				MAL_FTR_COMMON_ERR_INT);
--#else
--		printk(KERN_ERR "%pOF: Support for 405EZ not enabled!\n",
--				ofdev->dev.of_node);
--		return -ENODEV;
--#endif
--	}
--
- 	INIT_LIST_HEAD(&mal->poll_list);
- 	INIT_LIST_HEAD(&mal->list);
- 	spin_lock_init(&mal->lock);
--- 
-2.46.2
+[PATCH v3 1/4] PCI: Clear the LBMS bit after a link retrain
+[PATCH v3 2/4] PCI: Revert to the original speed after PCIe failed link retraining
 
+- Matt
 
