@@ -1,103 +1,126 @@
-Return-Path: <netdev+bounces-130962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0176098C3DC
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:48:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BE498C3F3
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:52:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32F4A1C23525
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:48:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C46A1F240B9
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB4D1C5782;
-	Tue,  1 Oct 2024 16:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20CD51C9ECE;
+	Tue,  1 Oct 2024 16:52:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kacD0SyN"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5486227448
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 16:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5CD4646;
+	Tue,  1 Oct 2024 16:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727801317; cv=none; b=SLK28K5rSo0Rf0QlXGzC6KMvW6Io6x4DH3AZrM+/xjwLG7u3IE1kJtsUXx5akK9kGy1KzwBuE1yhEu6C0r2l8nv/9FqdsrV+9AWQoQOrS70epcjNwyQ/a4KQs7bz4/uI+GIQGZE8EKKRxcs+7ISTe+IDHgp2p2cTopcuG/micfk=
+	t=1727801546; cv=none; b=ClkslWeR1kHBDAqEgpjZF+pWRxm4+zCrKG9iFD827NceHuk9Uuz8gY3rIJgKKrVnG6u39Z/UELhUBQteVtga5yxUhTdG7pSgdVUoPinWTI8kFKkEKQbV6aeZr/a4U1Q8EobLDOLAo2VoorB7xGVFVmfCy7OaiK1bSnYDTns5gCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727801317; c=relaxed/simple;
-	bh=xZhQBqI4jMIP1JfUHmCSDdWzXthuAjzCu2z6GPzs87Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=E1uEEkcb1SwNxw0Vmy8rMD/TeoFQ7MtWTi4DcQbTndm4sCf1p9yaZ7UySvJfFlf/SkvSsE0/baDmaeXEnO6F1Ei6u4geFsfDF82SXDc7bS2BdMA8laBhS5kqufV4lGjYCtCipRjXBVt1S6IV4jeKCFcTviCrydUm/j1MNMfXA9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3BEE020003;
-	Tue,  1 Oct 2024 16:48:28 +0000 (UTC)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: steffen.klassert@secunet.com,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	syzbot+cc39f136925517aed571@syzkaller.appspotmail.com
-Subject: [PATCH ipsec] xfrm: validate new SA's prefixlen using SA family when sel.family is unset
-Date: Tue,  1 Oct 2024 18:48:14 +0200
-Message-ID: <c8e8f0326a3993792a65125fa200965e8a4580e4.1727795385.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1727801546; c=relaxed/simple;
+	bh=O8kM/T6VQqLQbAH1MWMkPU1BLFMr1RVAP4rN0s02mhY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HXHrCFRK+dbSZPZQ/J0NoA0wDCrDkeLa002gXjvFq1HvWawEDnXWR4s8uDssER9B5rMO0mnYGDnQS4BYfJwt+FP5bFsVV24hG4SbDm4KpsOnRXqFbVgxnOnAW0OZ3RUIjJ6FsqjSIfbL43vQ6A7A7Vs4eNjHLVQ8+empMREqa8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kacD0SyN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC87EC4CED3;
+	Tue,  1 Oct 2024 16:52:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727801545;
+	bh=O8kM/T6VQqLQbAH1MWMkPU1BLFMr1RVAP4rN0s02mhY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kacD0SyNQ80uIodoXTzcKc2JX5cGyPiCGUzw6s0YxSi2CjAUrOHaktNh5rPZVX2Cf
+	 VLja/2UVw6qoDyVyDNLq8XVmEBDu1RyINYWTiWlFvUZ+4Qkq2yFWaEjo6hcsMZbzY5
+	 Uw1yrpgyoLQXA+SbRMm6dYf/blaC+peDqcEBrskjBKTjq4O3EFNBpvbA1nPJmmbWMc
+	 Ls1TNKKjycwbnTNvTEle44503QULCE4jERtX+tcXY06m7Lf0qFt6q8uDvJTa+9InRJ
+	 v3gc1QQ7n7xfiyMokQZJKOArrJAf9vAbVXVNmUMm2mnOoj+hYoBFr8V62z7YE98F7z
+	 6WeG2kl8ltEvQ==
+Date: Tue, 1 Oct 2024 17:52:19 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, michal.simek@amd.com, abin.joseph@amd.com,
+	u.kleine-koenig@pengutronix.de, elfring@users.sourceforge.net,
+	harini.katakam@amd.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, git@amd.com
+Subject: Re: [PATCH net-next 1/3] dt-bindings: net: emaclite: Add clock
+ support
+Message-ID: <20241001-battered-stardom-28d5f28798c2@spud>
+References: <1727726138-2203615-1-git-send-email-radhey.shyam.pandey@amd.com>
+ <1727726138-2203615-2-git-send-email-radhey.shyam.pandey@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: ********************
-X-GND-Spam-Score: 300
-X-GND-Status: SPAM
-X-GND-Sasl: sd@queasysnail.net
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="RQ7Mi1lo08Qqi5sg"
+Content-Disposition: inline
+In-Reply-To: <1727726138-2203615-2-git-send-email-radhey.shyam.pandey@amd.com>
 
-This expands the validation introduced in commit 07bf7908950a ("xfrm:
-Validate address prefix lengths in the xfrm selector.")
 
-syzbot created an SA with
-    usersa.sel.family = AF_UNSPEC
-    usersa.sel.prefixlen_s = 128
-    usersa.family = AF_INET
+--RQ7Mi1lo08Qqi5sg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Because of the AF_UNSPEC selector, verify_newsa_info doesn't put
-limits on prefixlen_{s,d}. But then copy_from_user_state sets
-x->sel.family to usersa.family (AF_INET). Do the same conversion in
-verify_newsa_info before validating prefixlen_{s,d}, since that's how
-prefixlen is going to be used later on.
+On Tue, Oct 01, 2024 at 01:25:36AM +0530, Radhey Shyam Pandey wrote:
+> From: Abin Joseph <abin.joseph@amd.com>
+>=20
+> Add s_axi_aclk AXI4 clock support and make clk optional to keep DTB
+> backward compatibility. Define max supported clock constraints.
 
-Reported-by: syzbot+cc39f136925517aed571@syzkaller.appspotmail.com
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
----
- net/xfrm/xfrm_user.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Why was the clock not provided before, but is now?
+Was it automatically enabled by firmware and that is no longer done?
+I'm suspicious of the clock being made optional, but the driver doing
+nothing other than enable it. That reeks of actually being required to
+me.
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 55f039ec3d59..8d06a37adbd9 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -201,6 +201,7 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- {
- 	int err;
- 	u8 sa_dir = attrs[XFRMA_SA_DIR] ? nla_get_u8(attrs[XFRMA_SA_DIR]) : 0;
-+	u16 family = p->sel.family;
- 
- 	err = -EINVAL;
- 	switch (p->family) {
-@@ -221,7 +222,10 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		goto out;
- 	}
- 
--	switch (p->sel.family) {
-+	if (!family && !(p->flags & XFRM_STATE_AF_UNSPEC))
-+		family = p->family;
-+
-+	switch (family) {
- 	case AF_UNSPEC:
- 		break;
- 
--- 
-2.45.2
+>=20
+> Signed-off-by: Abin Joseph <abin.joseph@amd.com>
+> Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+> ---
+>  Documentation/devicetree/bindings/net/xlnx,emaclite.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml b/D=
+ocumentation/devicetree/bindings/net/xlnx,emaclite.yaml
+> index 92d8ade988f6..8fcf0732d713 100644
+> --- a/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml
+> +++ b/Documentation/devicetree/bindings/net/xlnx,emaclite.yaml
+> @@ -29,6 +29,9 @@ properties:
+>    interrupts:
+>      maxItems: 1
+> =20
+> +  clocks:
+> +    maxItems: 1
+> +
+>    phy-handle: true
+> =20
+>    local-mac-address: true
+> --=20
+> 2.34.1
+>=20
 
+--RQ7Mi1lo08Qqi5sg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZvwowwAKCRB4tDGHoIJi
+0vouAP9IqvWh1E3qUt438ZfMnQXb1mwXnrDkP/wXybmQ18nDAwD9FtCI+Njapmt2
+8f69L62OfMnwgP/1HSmAwSMxkZybRwA=
+=QW3P
+-----END PGP SIGNATURE-----
+
+--RQ7Mi1lo08Qqi5sg--
 
