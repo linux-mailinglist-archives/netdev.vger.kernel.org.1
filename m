@@ -1,159 +1,154 @@
-Return-Path: <netdev+bounces-130818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FFCC98BA8F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:04:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E4B598BA98
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:06:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1CF6281D6D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:04:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FD9A1C20D06
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D927D1BFDE2;
-	Tue,  1 Oct 2024 11:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB73B1BF305;
+	Tue,  1 Oct 2024 11:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGlYWr8n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mGQIf8UA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D1A1BF7FB
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 11:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766BF1BF300;
+	Tue,  1 Oct 2024 11:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727780626; cv=none; b=IvNrp4kRdO8Ev7JWF3Zto8+QcU/+0wGoqecfPz0y341TPNKS68X6vWRFKIWtChxiyNHxHLDZheHO8JbVut/wWwGPbBOljIwdFWEmjJzBVuMwjxqeyNLyAJKCosfFEtHK4A0tHF4WBMlERO0mRaruMb0Hw2aAsppzHBne/C/GicI=
+	t=1727780781; cv=none; b=oKCPB/xai3c2b+M54syvxdFtkTK46tLoAFUcaFaX+CC7OrJWVUprR2Q/BJk/R/VJ84WbnEJOMeJy7D9l8nBJuyAmVqXqVzO1mU6krEmGczHN9BTBAv3w0sb2CHIJIy3P1c7Iw9YQJmVhjX5W0n//FbaD+Mo03foPwT9xmMs7LvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727780626; c=relaxed/simple;
-	bh=jR/bG8z0aKX1C61HPpm+lgjncRIz+l7lDc3JyXKwE9E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nVBD1xlsosSAaopmhKvdqdQCcNaBMWAM/BaBybSWg4SI/hY970Rg5hoFmBEjY4Uxdvh4amGz9fW5vsSDutAbPy9hRQIFB2wW2wCB1TaoNvP0yiHSBawss5pAf4mo8ETuMp2w2r1dWDSHPER1R4U7LnAiEOUhHKw1RpV90eCKHFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eGlYWr8n; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727780624;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ncjckRH7/yyn/ADQFjQxA+df+TjkuJuNYa5mD4g5EJ4=;
-	b=eGlYWr8noXHhz5dGJ557aOEu4laWYYnWSCHfwxZRTM2QiPQ68KTZMGOm3olKyV5lRYwf/d
-	WixDEbGY3HzXlGDKCBGOf1dFWyl/fwSF0AkCw4A/N0fclak2l0CkGjcJqtHPsIn+9iQUWl
-	gA6180bedk2Y7Z5SbCaBdVikuCg0Pb4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-vefsdd82NCKOn7Ve80EtXg-1; Tue, 01 Oct 2024 07:03:42 -0400
-X-MC-Unique: vefsdd82NCKOn7Ve80EtXg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cc4345561so30597115e9.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 04:03:42 -0700 (PDT)
+	s=arc-20240116; t=1727780781; c=relaxed/simple;
+	bh=hHktRGRHnagoMBsEpOOtBADWcTPvrku1pefgGTO8zy8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P+2Nf7cYGmld81FeX8UsAI5CYtdcP6Ti2hZ/MOM9p+Ctgrn1ygSQR62GdyjV2ceFfhIjM3sUVaGk7WshvKUHeRS0syVsU/ilFyM7qw6G/Vu2kOSe6492J8COTozVFiEekghJi6c+yTgO4cyMTvL/sBlBmZiy0MrASFVG4N92C/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mGQIf8UA; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e075ceebdaso4005640a91.2;
+        Tue, 01 Oct 2024 04:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727780780; x=1728385580; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uCOUNshkTAWwEsb1eAJ4f3GEGp7Z7j/QF5oPcgLSMQs=;
+        b=mGQIf8UAjUkGAYbjuYGZUkwK42SzMDIPa+rCPtFHC61BSA+P7BXFQQrHPS8XMXK1Ae
+         JvMGgl79QdsNSSKCk1Dgb0vVgbgnKj54jQ1M24/CMo+NFGj4R4VxBV3RGaNcbskQeXaW
+         xNqa0w2+ikMu1ttsHPY5PbGSYlJwc/hJ6+FI2rWwqv2/N0EG/pG/HNtXDtoE7CueFwkd
+         QIdTy7a/d2mbwmhO3Rz9oH0aPX/mCA7JuAySHxgmefhMPpvYT6w6Q+v9dfmOVl4RhZRU
+         FOTNl/lD2Dnor9JejlQpQmCGHoooQNg1zqSVi66jPG7OwUhIz8JpzQ6SzLxmxXmGNkUh
+         1zOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727780621; x=1728385421;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ncjckRH7/yyn/ADQFjQxA+df+TjkuJuNYa5mD4g5EJ4=;
-        b=L1NXvSzGWuj7HPjNa4n12lOyB99pJXPr5FqoyqeUIxHEZn4Y+1WVdOvza2mUAPjyeM
-         LLDBcHZitHI27ekWcGQFc2SJcJLr4+d0oymwaIJkfk/3YjJQsEfCJrvQXi/iSwNrwA7w
-         BcB+P/668nhYjcj3vkKj3O9piGo/1pwE+dwt/V6zs/pjygbAszUDgvCXDl6AgzE5Zx9n
-         zxuQksxcM73oQ7ypXmaqMZLvz4Y07tlLHy158PynOz6s8SJ6/r823ewRW+cM6DAh/mUc
-         MRfZ5T+KJE9KcnlBVdIyfA12c6U7tAjAypz1u8SIuWgMM9Lo0El6cSLKF3T8GZGbCRSr
-         ZTxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3XDuAFKAbxFcEJWJfIStpvxYMLCNvjzTafKDISua2XyO9LcUii5ZMSclEEoRIGq2sD22giEU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVRzGSUZmJEagvAIWXpIhqvpbITHSRC0gfbtw8KPgA2FHJ4wMj
-	QH9obN9XIpn9O6Xtcw0mPVa4jQWo7WPubXkchkz8NexkRlYGpSyYmKREHRr+LfpndOf2F9ZPiDr
-	RijlgthXYFhI6CfX3HI6wZo0hBTKZQtcR9IhSVC/8L9/MRUzEUqVe9b7EJZ73qRRe
-X-Received: by 2002:a05:600c:1da1:b0:426:6f17:531 with SMTP id 5b1f17b1804b1-42f58434120mr103320425e9.13.1727780620981;
-        Tue, 01 Oct 2024 04:03:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF4qgoYP4ljSTLgN26fJih+mkcB1DvCVdRVlSPQFTYIwAm0cREMFkomMyMkaHsnqYrx1Co8Sw==
-X-Received: by 2002:a05:600c:1da1:b0:426:6f17:531 with SMTP id 5b1f17b1804b1-42f58434120mr103320235e9.13.1727780620588;
-        Tue, 01 Oct 2024 04:03:40 -0700 (PDT)
-Received: from ?IPV6:2a0d:3341:b088:b810:c085:e1b4:9ce7:bb1c? ([2a0d:3341:b088:b810:c085:e1b4:9ce7:bb1c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f57dee0d3sm128334315e9.28.2024.10.01.04.03.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Oct 2024 04:03:40 -0700 (PDT)
-Message-ID: <e73981c3-608f-4ea0-9812-f840a9d0e100@redhat.com>
-Date: Tue, 1 Oct 2024 13:03:37 +0200
+        d=1e100.net; s=20230601; t=1727780780; x=1728385580;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uCOUNshkTAWwEsb1eAJ4f3GEGp7Z7j/QF5oPcgLSMQs=;
+        b=GW+UKUr6QAtgI/zlI8d6jDQExRad4iRwW8UAJnRLtILYz8zZeaW9PRJwvouo9Y6oQN
+         dpQljj8zeDnOBO3CcMcTwbxQhC8G/PDhtfleM7HarFyhpjoga+f8KacOdtiQpaodXnv7
+         yDzamWp1dUiUf0WS7O3bjja0+aB+cRyAxLZom6oc0N3wnM0E/qbJ5er2HJ797/tZjB0g
+         3G6XdK6iQLJUlq8Z6Ih4XMrzH+Fum46YgEs6nxcq+EVRi08l1V0HHwH0pGFVi8iMxWCS
+         e065SJgkn05zRUFr/DOIpyR/YW5iVfQLjQG5jCOkwKwJAyPRRjpmGozocLrl2tcaaldO
+         k8YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVOAw4Pw4MXcxayOrPuWw4jpstCtObSuHg5sjKOiiOm6S5224qOlT0fkWSLPka3F8WAo65rf++G/YfJacc=@vger.kernel.org, AJvYcCVv+iwa0K98d8aB8DQeShuYzo27Amqjx3Lm1RxWaLvpFa44xjLIzpW9L0hzDTupjRHO6hP/iMAw@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkrWB+SCuymtS3X1rjUKRNE/+AvE4SDmg2bwQWDa8FGuljydQN
+	VjhPQWFzUhHAo03u+nspVgJYxLvvAAZeb5/yyxpI8H6V9zv4Dwv5
+X-Google-Smtp-Source: AGHT+IGDCY1l0dVGLxXgTkVV1bVRXnfqinrKZmy7aqXSY4XQ/CRB7cRtJyuAdLdPi5Yz9dn9A1YSmA==
+X-Received: by 2002:a17:90a:39cf:b0:2d1:bf48:e767 with SMTP id 98e67ed59e1d1-2e0b8ea5e7cmr15771437a91.29.1727780779548;
+        Tue, 01 Oct 2024 04:06:19 -0700 (PDT)
+Received: from fedora.. ([106.219.166.49])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c4bc46sm9742276a91.7.2024.10.01.04.06.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 04:06:19 -0700 (PDT)
+From: Riyan Dhiman <riyandhiman14@gmail.com>
+To: sgoutham@marvell.com,
+	lcherian@marvell.com,
+	gakula@marvell.com,
+	jerinj@marvell.com,
+	hkelam@marvell.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: rsaladi2@marvell.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Riyan Dhiman <riyandhiman14@gmail.com>
+Subject: [PATCH net-next v2] octeontx2-af: Change block parameter to const pointer in get_lf_str_list
+Date: Tue,  1 Oct 2024 16:35:43 +0530
+Message-ID: <20241001110542.5404-2-riyandhiman14@gmail.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] ipv4: ip_gre: Fix drops of small packets in
- ipgre_xmit
-To: Anton Danilov <littlesmilingcloud@gmail.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Shigeru Yoshida <syoshida@redhat.com>,
- Suman Ghosh <sumang@marvell.com>, linux-kernel@vger.kernel.org
-References: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/25/24 01:51, Anton Danilov wrote:
-> Regression Description:
-> 
-> Depending on the options specified for the GRE tunnel device, small
-> packets may be dropped. This occurs because the pskb_network_may_pull
-> function fails due to the packet's insufficient length.
-> 
-> For example, if only the okey option is specified for the tunnel device,
-> original (before encapsulation) packets smaller than 28 bytes (including
-> the IPv4 header) will be dropped. This happens because the required
-> length is calculated relative to the network header, not the skb->head.
-> 
-> Here is how the required length is computed and checked:
-> 
-> * The pull_len variable is set to 28 bytes, consisting of:
->    * IPv4 header: 20 bytes
->    * GRE header with Key field: 8 bytes
-> 
-> * The pskb_network_may_pull function adds the network offset, shifting
-> the checkable space further to the beginning of the network header and
-> extending it to the beginning of the packet. As a result, the end of
-> the checkable space occurs beyond the actual end of the packet.
-> 
-> Instead of ensuring that 28 bytes are present in skb->head, the function
-> is requesting these 28 bytes starting from the network header. For small
-> packets, this requested length exceeds the actual packet size, causing
-> the check to fail and the packets to be dropped.
-> 
-> This issue affects both locally originated and forwarded packets in
-> DMVPN-like setups.
-> 
-> How to reproduce (for local originated packets):
-> 
->    ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
->            local <your-ip> remote 0.0.0.0
-> 
->    ip link set mtu 1400 dev gre1
->    ip link set up dev gre1
->    ip address add 192.168.13.1/24 dev gre1
->    ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
->    ping -s 1374 -c 10 192.168.13.2
->    tcpdump -vni gre1
->    tcpdump -vni <your-ext-iface> 'ip proto 47'
->    ip -s -s -d link show dev gre1
-> 
-> Solution:
-> 
-> Use the pskb_may_pull function instead the pskb_network_may_pull.
-> 
-> Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
-> 
-> Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
+Convert struct rvu_block block to const struct rvu_block *block in
+get_lf_str_list() function parameter. This improves efficiency by
+avoiding structure copying and reflects the function's read-only
+access to block.
 
-For future submissions, please note that there should be no empty line 
-in the tag area - i.e. no empty line between 'Fixes' and SoB.
+Signed-off-by: Riyan Dhiman <riyandhiman14@gmail.com>
+---
+v2: change target branch to net-next and remove fix tag.
+Compile tested only
 
-Thanks,
+ .../ethernet/marvell/octeontx2/af/rvu_debugfs.c    | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-Paolo
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+index 87ba77e5026a..8c700ee4a82b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_debugfs.c
+@@ -663,16 +663,16 @@ static ssize_t rvu_dbg_lmtst_map_table_display(struct file *filp,
+ 
+ RVU_DEBUG_FOPS(lmtst_map_table, lmtst_map_table_display, NULL);
+ 
+-static void get_lf_str_list(struct rvu_block block, int pcifunc,
++static void get_lf_str_list(const struct rvu_block *block, int pcifunc,
+ 			    char *lfs)
+ {
+-	int lf = 0, seq = 0, len = 0, prev_lf = block.lf.max;
++	int lf = 0, seq = 0, len = 0, prev_lf = block->lf.max;
+ 
+-	for_each_set_bit(lf, block.lf.bmap, block.lf.max) {
+-		if (lf >= block.lf.max)
++	for_each_set_bit(lf, block->lf.bmap, block->lf.max) {
++		if (lf >= block->lf.max)
+ 			break;
+ 
+-		if (block.fn_map[lf] != pcifunc)
++		if (block->fn_map[lf] != pcifunc)
+ 			continue;
+ 
+ 		if (lf == prev_lf + 1) {
+@@ -719,7 +719,7 @@ static int get_max_column_width(struct rvu *rvu)
+ 				if (!strlen(block.name))
+ 					continue;
+ 
+-				get_lf_str_list(block, pcifunc, buf);
++				get_lf_str_list(&block, pcifunc, buf);
+ 				if (lf_str_size <= strlen(buf))
+ 					lf_str_size = strlen(buf) + 1;
+ 			}
+@@ -803,7 +803,7 @@ static ssize_t rvu_dbg_rsrc_attach_status(struct file *filp,
+ 					continue;
+ 				len = 0;
+ 				lfs[len] = '\0';
+-				get_lf_str_list(block, pcifunc, lfs);
++				get_lf_str_list(&block, pcifunc, lfs);
+ 				if (strlen(lfs))
+ 					flag = 1;
+ 
+-- 
+2.46.1
 
 
