@@ -1,156 +1,120 @@
-Return-Path: <netdev+bounces-130850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520E098BC17
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:31:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C36598BC37
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2A0C1F21E7C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 12:31:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11DBEB21059
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 12:38:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84AB19AD8C;
-	Tue,  1 Oct 2024 12:31:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE1F1C2307;
+	Tue,  1 Oct 2024 12:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="MJdWj5h7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PmSuntD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A023156C6A;
-	Tue,  1 Oct 2024 12:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BE919AD8C;
+	Tue,  1 Oct 2024 12:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727785905; cv=none; b=NbWcbr/aAuILps2hGQLYUsTQZrX0ihskhL62o+Z47Bb3I8Dja7MfEeIUhbpP1YqQKazQrbrqYVkpMWAkw4FrZ025Sbl3/0UQ+cmys2RB5F7AQYRvWHSs1/T7DpbeSE0I6+pGyGwwyi53yEsNW3ZezAALl2rvPxcRCe5wtLxQ92w=
+	t=1727786277; cv=none; b=dM1ocKqKhK5hoYekCTyryMB8J+QI6GTk4bjQsebnnXZD8jCERV99YaTxahcN2uZ1xsLXumP9p5ZOmK7TrjR/x/Ul73zpS56HwpZ+ZnH1mMhDkG6LMycNuLcCMH17+l8sBYdLEw/tVZjYckfLEiYyo5yfByQwvR1XIcpgvlDb8zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727785905; c=relaxed/simple;
-	bh=/51c9MhiWej11bMjED/Rsmf6YhHHO3ghVNUbq20uTvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pjXF6sy+dkaJBMpHqHwvjfPtxou6o6I5nLaPxx/Z5SmIKXlwBT/FwovkoNNCaFH+85C02S1X9UhKbsqI11w+jAe2SFo7vKoxt/trplGZne7MXvRgBRQVYWb326vK8PzlKXiAzN8NJMhZDJYOue+TCBt/SOWW0pCGcfpXLriMQCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=MJdWj5h7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sJxUfQiQyjfwCaDUOeV+iM6wEahc8rD83EY2RTnC5Xg=; b=MJdWj5h7dh/SV6Bj03cW1dyK4r
-	nzgKzuQb53J/WeqP1Fj2OYF3KyDXKhnMqyBOVy3TByQvwFJxHlsC6UjHTwGNP58g+BwLwR7xIJE46
-	e08Ylin7RA94Bja0F5BkWkEtcRS9OHoixZysMmx3zjsk0rdv2EZ3fvX2yoALQ9+urn/E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svc2V-008j6u-Mo; Tue, 01 Oct 2024 14:31:39 +0200
-Date: Tue, 1 Oct 2024 14:31:39 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-Message-ID: <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
- <20241001112512.4861-2-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1727786277; c=relaxed/simple;
+	bh=aLAuXO5v8SKGDgJl25SQO7yyv06k5wTjx6Hn7p9wHoA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TMCM4Ll7k2lUgMv795/LQhxrHj6GmoSeTzyFvVeja67hqZ+pgPsmmhczGCPDeCjonkfTzxincJCJPh1gHWYiVhu753BHUpyNNIBIPJ7wOTUs3B3nCVAn6inorA0NFkaRhZ7sSlTUKVPPe6LPk34ScH6lc+p2F3P7+7NHVs3DDnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PmSuntD5; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1727786275; x=1759322275;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aLAuXO5v8SKGDgJl25SQO7yyv06k5wTjx6Hn7p9wHoA=;
+  b=PmSuntD5I7y6JA5zpHGJ//LIj5x+qV1QRCFSsilsr7iKFPSTHP4uW7R0
+   VRw11bh0aZlv6MOJ6wt/DPu4zqyELyX/swqlJ7rnRSjQdHwgOw5QwMGtk
+   oxeqne+NZEMY5xLvUqfMoS88fgc0VCwDdA/P9uf9OIiturQC3RAWDBoUV
+   xSRddD2z2T0b3E7Riqz95ODoNJOgG9NTzm05zqqmUvEU86cXwdFjtjTuZ
+   lynob0e2//jdP6DvII1PYCeUOCgIqZPcJsyE6QBZPviAPeM37i3zQqEZh
+   5raY5IHmTUL0iFZv9RTD21ezi/RlSQdtZl/ThTbu6BQ73kZ5lt9/pvKeB
+   g==;
+X-CSE-ConnectionGUID: 1P5ioHTFSIe6+Bx3qmhD8Q==
+X-CSE-MsgGUID: 2ief3kCGT4W2ak1kqZ+3yg==
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="35717386"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Oct 2024 05:37:48 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 1 Oct 2024 05:37:45 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 1 Oct 2024 05:37:41 -0700
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ramon.nordin.rodriguez@ferroamp.se>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<Thorsten.Kummermehr@microchip.com>
+Subject: [PATCH net-next v3 0/7] microchip_t1s: Update on Microchip 10BASE-T1S PHY driver
+Date: Tue, 1 Oct 2024 18:07:27 +0530
+Message-ID: <20241001123734.1667581-1-parthiban.veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001112512.4861-2-fujita.tomonori@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Tue, Oct 01, 2024 at 11:25:11AM +0000, FUJITA Tomonori wrote:
-> Add an abstraction for sleep functions in `include/linux/delay.h` for
-> dealing with hardware delays.
-> 
-> The kernel supports several `sleep` functions for handles various
+This patch series contain the below updates:
+- Restructured lan865x_write_cfg_params() and lan865x_read_cfg_params()
+  functions arguments to more generic.
+- Updated new/improved initial settings of LAN865X Rev.B0 from latest
+  AN1760.
+- Added support for LAN865X Rev.B1 from latest AN1760.
+- Moved LAN867X reset handling to a new function for flexibility.
+- Added support for LAN867X Rev.C1/C2 from latest AN1699.
+- Disabled/enabled collision detection based on PLCA setting.
 
-s/for/which
+v2:
+- Fixed indexing issue in the configuration parameter setup.
 
-> lengths of delay. This adds fsleep helper function, internally calls
-> an appropriate sleep function.
-> 
-> This is used by QT2025 PHY driver to wait until a PHY becomes ready.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/bindings/bindings_helper.h |  1 +
->  rust/helpers/delay.c            |  8 ++++++++
->  rust/helpers/helpers.c          |  1 +
->  rust/kernel/delay.rs            | 18 ++++++++++++++++++
->  rust/kernel/lib.rs              |  1 +
->  5 files changed, 29 insertions(+)
->  create mode 100644 rust/helpers/delay.c
->  create mode 100644 rust/kernel/delay.rs
-> 
-> diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-> index ae82e9c941af..29a2f59294ba 100644
-> --- a/rust/bindings/bindings_helper.h
-> +++ b/rust/bindings/bindings_helper.h
-> @@ -10,6 +10,7 @@
->  #include <linux/blk-mq.h>
->  #include <linux/blk_types.h>
->  #include <linux/blkdev.h>
-> +#include <linux/delay.h>
->  #include <linux/errname.h>
->  #include <linux/ethtool.h>
->  #include <linux/firmware.h>
-> diff --git a/rust/helpers/delay.c b/rust/helpers/delay.c
-> new file mode 100644
-> index 000000000000..7ae64ad8141d
-> --- /dev/null
-> +++ b/rust/helpers/delay.c
-> @@ -0,0 +1,8 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +#include <linux/delay.h>
-> +
-> +void rust_helper_fsleep(unsigned long usecs)
-> +{
-> +	fsleep(usecs);
-> +}
-> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
-> index 30f40149f3a9..279ea662ee3b 100644
-> --- a/rust/helpers/helpers.c
-> +++ b/rust/helpers/helpers.c
-> @@ -12,6 +12,7 @@
->  #include "build_assert.c"
->  #include "build_bug.c"
->  #include "err.c"
-> +#include "delay.c"
->  #include "kunit.c"
->  #include "mutex.c"
->  #include "page.c"
-> diff --git a/rust/kernel/delay.rs b/rust/kernel/delay.rs
-> new file mode 100644
-> index 000000000000..79f51a9608b5
-> --- /dev/null
-> +++ b/rust/kernel/delay.rs
-> @@ -0,0 +1,18 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Delay and sleep routines.
-> +//!
-> +//! C headers: [`include/linux/delay.h`](srctree/include/linux/delay.h).
-> +
-> +use core::{ffi::c_ulong, time::Duration};
-> +
-> +/// Sleeps for a given duration.
-> +///
-> +/// Equivalent to the kernel's [`fsleep`] function, internally calls `udelay`,
-> +/// `usleep_range`, or `msleep`.
+v3:
+- Replaced 0x1F with GENMASK(4, 0).
+- Corrected typo.
+- Cover letter updated with proper details.
+- All the patches commit messages changed to imperative mode.
 
-Is it possible to cross reference
-Documentation/timers/timers-howto.rst ?  fsleep() points to it, so it
-would e good if the Rust version also did.
+Parthiban Veerasooran (7):
+  net: phy: microchip_t1s: restructure cfg read/write functions
+    arguments
+  net: phy: microchip_t1s: update new initial settings for LAN865X
+    Rev.B0
+  net: phy: microchip_t1s: add support for Microchip's LAN865X Rev.B1
+  net: phy: microchip_t1s: move LAN867X reset handling to a new function
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C1
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C2
+  net: phy: microchip_t1s: configure collision detection based on PLCA
+    mode
 
-I would also document the units for the parameter. Is it picoseconds
-or centuries?
+ drivers/net/phy/Kconfig         |   4 +-
+ drivers/net/phy/microchip_t1s.c | 299 +++++++++++++++++++++++++-------
+ 2 files changed, 239 insertions(+), 64 deletions(-)
 
-	Andrew
+
+base-commit: c824deb1a89755f70156b5cdaf569fca80698719
+-- 
+2.34.1
+
 
