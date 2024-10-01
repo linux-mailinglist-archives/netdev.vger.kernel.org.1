@@ -1,55 +1,53 @@
-Return-Path: <netdev+bounces-130820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12BCA98BAA5
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:07:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70B6298BAA6
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:08:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99803284FCE
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:07:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A25FB1C20A14
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:08:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C92111BF813;
-	Tue,  1 Oct 2024 11:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DE51BE87B;
+	Tue,  1 Oct 2024 11:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l1is1lxi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EY/zyzGC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D5C1BE86E
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 11:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D75F019D88A
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 11:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727780844; cv=none; b=OKXvtKH+/nB90sbYb3g/rPKiLDhGgOJP/DyVvIapHWLcupU7dtsLxZS6AuBW7sq5fuYrNbePeiIfG7wpj9aEcOKO3Ws1PntXMOxnmU3RcQCEdvPMU/wCiI6PTqTzA9utYluHo4X7M8+1W4UmMk6xHQjmNOHySAanVzJjI9BnUK8=
+	t=1727780924; cv=none; b=lRl/qTx1OjJKVDiAXp7yccUFJ4IOqWta+4IdS/SqKDf0J70fbCadaR6W90J68H6ZceOhM8AduWcDk5l7UK4gVCRSvTTpp575gyj7PdY+v4b4B8hc6Ea95mSg4ji+UMHkLQW+zXvDijJbEeVTwPWEcn/mgblO/ZOrXE04vp/b3UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727780844; c=relaxed/simple;
-	bh=IJUBcrZdjtnNd9It4GJJETk8+bq6AmJ2FZZXOQxhG5M=;
+	s=arc-20240116; t=1727780924; c=relaxed/simple;
+	bh=c/aZKErGt6JLpDaTKTuxlLwNa6VsRlhBE71G8X9NaH0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZSTgCC2aNXgt14IY9tGb9O5/YeewQAH0AAKTbG+t3NGBF/7RIJJZ+UJM59+nJvjwh8s5X3JbZ51Odv/XpJ+TD7MXA0KQNM9xkiZO9GvieX+SEaEJx1oaHjJUoU/qlFP6mzIdi2qGqxLx8QkgWhp/cC7NqBEfKYFdxCR+dnbXbeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l1is1lxi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6136AC4CEC6;
-	Tue,  1 Oct 2024 11:07:23 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOKTBlVGejcfcpq4ftBp62iq+bq9QG7n/Cd/k8OLWysCYEE1WtLyQMutNpLSu439I174REIFpknzILKKzAl2PaZp7qcsPyK+8qQ3W23RTBmghG2zRWQQPRANbDLyWqPkMWyp8RXpxEURcjIeXmJyXFksWl6FbuwFDQFBUuY90yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EY/zyzGC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D77C4CEC6;
+	Tue,  1 Oct 2024 11:08:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727780844;
-	bh=IJUBcrZdjtnNd9It4GJJETk8+bq6AmJ2FZZXOQxhG5M=;
+	s=k20201202; t=1727780924;
+	bh=c/aZKErGt6JLpDaTKTuxlLwNa6VsRlhBE71G8X9NaH0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l1is1lxisFvPcZ/S53DLjD9vRPSOM3Ej0gmvcsiG2W1kNHPHdo56IeKCQODhbtRGY
-	 ZxFYj+2LIoW4NxTFiaLKPrzAIBf5pZcFXDuszB4D5u/QQmkjkNBIQZGCB0bzSvw31h
-	 jpMeBEl/AtvCakM7xZvQZ8Mll2gokLyix9pgzvKp4C/V7IwA+ZEvc3rqU7oLuoFAke
-	 Q1GUvkDkhHuerKgEBWVO/OKdCFbBBZiGV8dUFtJJw7kQuThbRdPlejBgHjSbID8qq5
-	 j3IQ5OGJvQiemuzv19HMkYFIETFVik8/NSZJtxDQQF2BG7XTFex5/1mKQaEVwLeVES
-	 b/YJLgaCU+USQ==
-Date: Tue, 1 Oct 2024 12:07:21 +0100
+	b=EY/zyzGCxfSf0Xp0bHtAQqhBbJDRdk1NM57mhkDBRNuBPLpSqsEQ7hgbZBiGfwrCG
+	 BSbqb6ld60Is0myTSKywJXwyhONWRDfBWsuHFs2YQAAY2AOHF8i1BDPPRAd6mIh2hN
+	 wAbVcf6iMmy/2B/u4oh4c+HydIMYXe1XN4xs0UmcdL4+f/DbxhZPNu0eOQaPNob+Qr
+	 j87nVvOWlxxMVdNZ82AbagdHYDwdVG3iWjqIO98GtD70x6Wt20za96kN+PDbb8uwbY
+	 OlkzShmZH24Ny2zZJ9bEch1zaMj0I3PXNrmD1/jafrJ5UHeoF1FN+YYNIobOazCp/R
+	 vu1htJELj4mbw==
+Date: Tue, 1 Oct 2024 12:08:41 +0100
 From: Simon Horman <horms@kernel.org>
 To: Nick Child <nnac123@linux.ibm.com>
 Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com
-Subject: Re: [PATCH net 2/2] ibmvnic: Inspect header requirements before
- using scrq direct
-Message-ID: <20241001110721.GN1310185@kernel.org>
+Subject: Re: [PATCH net 1/2] ibmvnic: Add stat for tx direct vs tx batched
+Message-ID: <20241001110841.GO1310185@kernel.org>
 References: <20240930175635.1670111-1-nnac123@linux.ibm.com>
- <20240930175635.1670111-2-nnac123@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,32 +56,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930175635.1670111-2-nnac123@linux.ibm.com>
+In-Reply-To: <20240930175635.1670111-1-nnac123@linux.ibm.com>
 
-On Mon, Sep 30, 2024 at 12:56:35PM -0500, Nick Child wrote:
-> Previously, the TX header requirement for standard frames was ignored.
-> This requirement is a bitstring sent from the VIOS which maps to the
-> type of header information needed during TX. If no header information,
-> is needed then send subcrq direct can be used (which can be more
-> performant).
+On Mon, Sep 30, 2024 at 12:56:34PM -0500, Nick Child wrote:
+> Allow tracking of packets sent with send_subcrq direct vs
+> indirect. `ethtool -S <dev>` will now provide a counter
+> of the number of uses of each xmit method. This metric will
+> be useful in performance debugging.
 > 
-> This bitstring was previously ignored for standard packets (AKA non LSO,
-> non CSO) due to the belief that the bitstring was over-cautionary. It
-> turns out that there are some configurations where the backing device
-> does need header information for transmission of standard packets. If
-> the information is not supplied then this causes continuous "Adapter
-> error" transport events. Therefore, this bitstring should be respected
-> and observed before considering the use of send subcrq direct.
-> 
-> Fixes: 1c33e29245cc ("ibmvnic: Only record tx completed bytes once per handler")
-> 
-
-nit: No blank line between Fixes and other tags please.
-
-Slightly more importantly, perhaps naively, I would have thought this
- Fixes: 076ae667be9f ("net: netconsole: do not pass userdata up to the tail")
-
 > Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+
+Hi Nick,
+
+While I see that this patch relates to patch 2/2, and I agree that patch
+2/2 is net material, this patch seems more like an enhancement and
+thus suitable for net-next.
 
 ...
 
