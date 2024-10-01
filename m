@@ -1,110 +1,122 @@
-Return-Path: <netdev+bounces-130881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F7898BD8C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:29:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872BA98BDB8
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 15:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9162B1F23C3F
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:29:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB692B24A51
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5BE1C4617;
-	Tue,  1 Oct 2024 13:29:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DBD1C3F32;
+	Tue,  1 Oct 2024 13:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mc3CRff/"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=inguin@gmx.de header.b="d7METaRW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E2B1C4608
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 13:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D50E4A21;
+	Tue,  1 Oct 2024 13:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727789352; cv=none; b=COGjDGP1LUAnaLpIP4NfGOBuwgqC9WtNwOHaiqkapEeGiUCSHH87ZOcjwhgeBtxSU2h6QARE2e4w+ddfF4oLT6CcOcW18c9Ve8GHeGbQE4Hbgu1QAxaWCuP9yHNXiEh2eCtbNdI6mQZ1UdoeHzqiXbCPtA5M2Q+3RQv2p1+9NCU=
+	t=1727789489; cv=none; b=T3GtbgtiCHtK9bR5LL66XfAgB/Lb6ZBZELE+cY7suxS3B3AveCAa4Sg9ZZlrAxPmFQdhqVF315m7w46ddhKwObzIoqzhscJuhvDpcbadW0aKTt3Y2RzLlGmmoo3R8JhAZ/wr+dt2VdJg2qLrTGgOAFPIm/IBIEL6kXT9Mznp+gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727789352; c=relaxed/simple;
-	bh=3N5Oa4iBwWJMrHwO1iOZ5iDlia5jS2rBTR6Q024+txc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MiqEKXTwyEDiRMc+J53lPcr5M6duPp1pdufiFkDg8VMFbXl/z4HyOBwpuxS3EFf8PyUaLxtDnNhnLFIpBml3N+aRYrPUTOKnUgZGHEYQhkWNtHNOukephNErvcgNIrfgCRQqfST/XoL3SKtTJCs8LoFAomUwpe6LgWFE3SHyazM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mc3CRff/; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5c88d7c8dbaso2274411a12.2
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 06:29:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727789349; x=1728394149; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qLR5rUKxjnbtEIA0BFW4FvjL4OXH+X5CXBSSE//MCSI=;
-        b=mc3CRff/BmHH4Il1Jq8zQCpWYssJHOeDuuWk6h+MCnSuh40j8HVwVzShZMUjCc4Sdv
-         wMiHh+ODBvoLc0UB77pxKL6NmIx8ifPwgdlZcwpSeJTxCazDPL68Xg9WXFl0I8O234N/
-         k26Vz07sJw8Br3S6/hZAMAYWzu8Y7rxwGg7ShcdyH9yclGX/PSfchE4nHeH8qRYxK5wz
-         S8mbzxqrQU/OHKL+bWKSfUmY5iko0NH59risMzFB4m7yRXrmdKGpNyjMwT7n7waXq8de
-         7G8YTvMCmJt8UWtUFG6wvMPbnkIkl31L5O5eNqsnuM/yDcfUOa6Js2+aOVQ2sznh9ULP
-         Plsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727789349; x=1728394149;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qLR5rUKxjnbtEIA0BFW4FvjL4OXH+X5CXBSSE//MCSI=;
-        b=u8O50MU7iFN9vyqFGc6mayja7oWy3PRywvG17x+LRO1UaUsTFKwbBd5Z2CWrL+7LD0
-         FgxcQVTfHLLkMX/XiT0Bglbc8+B5hg0yhmm3AG+OTDW/3n/zuBjPg7iblePyFE0aBlm8
-         zowdv7hRxlOYx2f/Il5Kvag6yRMSAMFAq9cc5Nf6y/Pv/isd6xw4mJipJUL1oV7EfHg6
-         55OxJq2c9SPG7fIDcz9W9Dlqm3Ds6nIjMTsUL06A0YxUT8JqyTTkyW3y4XicFCRtbUUc
-         hHpGXORR5oSvuEpS+u6Fp3Vp32HbNiSxIaTq1H++KcwAY8dme+JBGWRk8KVX49/px33X
-         v3eg==
-X-Gm-Message-State: AOJu0YwXiaF8nj2c8j1s1H9NckbVWfCyS2oL7qlQvDrr//idar/My8xV
-	IcMMK0wf3ieKKvzZO7Z6syYO15ToHdaGUzPUHpjhfXn6sJPjMnZZo46prcBySXGe0nGsXTNZ86P
-	ftJd7xFiRosHWOr9s12jBbfIedTQje368Kupy
-X-Google-Smtp-Source: AGHT+IEMUuCHddG9Vk6YID/f1XHxwlEJTI1pb6l0JQq2CQQDsu5DKwV1+Y7fOfCRHUcILD/kINc6pUMJQz+zJkjsiGY=
-X-Received: by 2002:a05:6402:26c8:b0:5c5:cb49:2f28 with SMTP id
- 4fb4d7f45d1cf-5c8824ccdf2mr22823763a12.4.1727789348992; Tue, 01 Oct 2024
- 06:29:08 -0700 (PDT)
+	s=arc-20240116; t=1727789489; c=relaxed/simple;
+	bh=7HuQYYdyvXcgH3M0Q90Zwel86yuIKti1/jdseqtoPiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rCcU2vPXLWBGKDGONPGGt8ZNAx4StNYrRQp6kpcDGtCjzo72tID+Vu2HcaPHxshudwJ39uqRSADDTkAiuvrentFpmNCjTF5m+j9xk3m52nixxVcffPWni781YuV1k7ICg/vgQVgHW0ylQFB4jTh19RymzuruPoY6LfZk6ZkhqEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=inguin@gmx.de header.b=d7METaRW; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1727789478; x=1728394278; i=inguin@gmx.de;
+	bh=6x31hl+RLOQ0EYJTk9ZHcVFp7cNPSTtuIQI3ws+a1B8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=d7METaRWmZU/JxzRJBAdZAp4D32zJOM32lMAKoSkwopRmDQofCQUzHb83DXc5ra/
+	 Xf3fKTQulTogNd+Q5vTR9qEKT9RKHpVHCemCA/UHZb0B6FbVdhv4UnG2kCndtGUad
+	 cBU1P+coZglmM+GB4ifPMK+j7KpZk4Z6QP/ilARyJa3NQ+56TZy5v/MryKddlGWSK
+	 rENGa2wTwuigIfPIV0A+ioDnwJ00muw74adbJrj6iK0FaPR/ojI98HdghXwudNqQb
+	 lS+xq2X8bTqaBJaU+NXmhGCH+q2UVQvgkEeYPmH9/Z2fj2jYhs66qCjHhWf6Ev1h0
+	 rH5wjD6f+plKWPO9cw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.2.29] ([212.80.250.50]) by mail.gmx.net (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mdeb5-1sM12N12tl-00eTeH; Tue, 01
+ Oct 2024 15:31:18 +0200
+Message-ID: <9e970294-912a-4bc4-8841-3515f789d582@gmx.de>
+Date: Tue, 1 Oct 2024 15:31:13 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001132702.3122709-1-dhowells@redhat.com> <20241001132702.3122709-2-dhowells@redhat.com>
-In-Reply-To: <20241001132702.3122709-2-dhowells@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 1 Oct 2024 15:28:57 +0200
-Message-ID: <CANn89iKp47BVt0uGEbCuhEhYvMDy=6+cpp5PQTNQewPWxr_vyg@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] rxrpc: Fix a race between socket set up and I/O
- thread creation
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	yuxuanzhe@outlook.com, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: phy: dp83869: fix memory corruption when enabling
+ fiber
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "dmurphy@ti.com" <dmurphy@ti.com>
+References: <20241001075733.10986-1-inguin@gmx.de>
+ <c9baa43edbde4a6aab7ec32a25eec4dae7031443.camel@siemens.com>
+Content-Language: en-US
+From: Ingo van Lil <inguin@gmx.de>
+In-Reply-To: <c9baa43edbde4a6aab7ec32a25eec4dae7031443.camel@siemens.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:ZKg5dgyHATBgZ2WG4CLwkg+A+KGjP4ewZgzEuXIh3VOvIMtKAYT
+ 0TNzt/ylFq3AAggGBIyLwPWW+lh7sMmmcr0bukViL6rk6lBDokup9fzzCJoRzWp0040IDKZ
+ +f97pSXFT/TKXpOdZc1hI6yTavL9UL4SAgz3tM6YKg7OusGJ7BCVIcL1AEAYI90RyS9jGoK
+ e+3JohMYkFca20x+hxq4w==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:Kavbk4LpglM=;5jp8SVWtArNZVO5D37F5RD5CyUJ
+ fC1L2HBS1ZuzcSDVmSZgSLtWPGOwqxe+nurNv8xWIKCJaK1mDZzN4OKX5EKFOQgHNMzuETTsa
+ u0VM0LutBVCe1UbQUtRNR3iHRhmyeIqPtBXFrjmUTt0Z62XDOE3TiEOEVrneyUH1WZf+VjR+N
+ niaGfSd/sw8YIh5qC2UZDy9BgOnReB9Lzp1Rzkn0Ltro6CGzvKcoGW8ZlaE4e6OJboEcXmJKI
+ 2SsTHHwjWu9goR0DrrTuEHeva0M0omePvGwjG/uxudp6zOGeAVHamVZy/HM5eQNeMo5T3mtAm
+ yuJLHTJRJlzekShsrdSbW0GbIOybieKNQAb5le23z7DZjNOBZLksSPlMKzGWcj9OAHimqw0I7
+ 93SMh0pp8lm5XKbdegYie+xSBvZXFWzZMI6g9KDivscFvG3tw7u76hH2eV4bjhqVYVcZV5Zha
+ n5JpPSIqNSVHididz+Fr7/jqerayAm0v1H6UhlRQQtj4149Y646m2JqAEXmQhJ+XVgVMC/64u
+ 6Gvc7+X8Eam03dDlKw9rioRMWBG2M8tfGGoHF6sdbuYZ2M1r5BQaKgWcbyENQxcW/0PYX1Of9
+ 1AmB6RsbgCpT99Z/6B0+GDA1okGo1x8Cz0aIa/Lb7MtZD7lN9YkI/2AvpMrXkfUGtRgMrp+xA
+ pcRFpvowOhP7+J+2vWWUyNFRe9b1yy8due2LVxsBSmEfZY5lC+lUG7u9kB2ecpX+FhLeon0hm
+ pTKNQojIo1ft2TtynofEOjkLY1TAc6BmCr1GQZrhNYYwQ9v14FZ6z0yOlo7VOgxAUhZ6qve3V
+ ju1cQjarExOpTaEMl0pM+jPw==
 
-On Tue, Oct 1, 2024 at 3:27=E2=80=AFPM David Howells <dhowells@redhat.com> =
-wrote:
->
-> In rxrpc_open_socket(), it sets up the socket and then sets up the I/O
-> thread that will handle it.  This is a problem, however, as there's a gap
-> between the two phases in which a packet may come into rxrpc_encap_rcv()
-> from the UDP packet but we oops when trying to wake the not-yet created I=
-/O
-> thread.
->
-> As a quick fix, just make rxrpc_encap_rcv() discard the packet if there's
-> no I/O thread yet.
->
-> A better, but more intrusive fix would perhaps be to rearrange things suc=
-h
-> that the socket creation is done by the I/O thread.
->
-> Fixes: a275da62e8c1 ("rxrpc: Create a per-local endpoint receive queue an=
-d I/O thread")
-> Signed-off-by: David Howells <dhowells@redhat.com>
+On 10/1/24 12:40, Sverdlin, Alexander wrote:
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+>> diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+>> index d7aaefb5226b..9c5ac5d6a9fd 100644
+>> --- a/drivers/net/phy/dp83869.c
+>> +++ b/drivers/net/phy/dp83869.c
+>> @@ -645,7 +645,7 @@ static int dp83869_configure_fiber(struct phy_devic=
+e *phydev,
+>>  =C2=A0		=C2=A0=C2=A0=C2=A0=C2=A0 phydev->supported);
+>>
+>>  =C2=A0	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported=
+);
+>> -	linkmode_set_bit(ADVERTISED_FIBRE, phydev->advertising);
+>> +	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->advertising);
+>
+> Are you sure this linkmode_set_bit() is required at all?
+
+You're right, it's probably not required. I just tracked a weird bug
+down to this clear mistake and wanted to change as little as possible.
+
+The logic of the function seems a bit odd to me: At the beginning,
+advertising is ANDed with supported, and at the end it's ORed again.
+Inside the function they are mostly manipulated together.
+
+Couldn't that be replaced with a simple "phydev->advertising =3D
+phydev->supported;" at the end?
+
+Regards,
+Ingo
 
