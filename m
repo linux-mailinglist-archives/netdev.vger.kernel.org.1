@@ -1,102 +1,125 @@
-Return-Path: <netdev+bounces-130834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0CC98BB41
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:35:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D533398BB55
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:37:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A4ED1F21A86
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:35:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DE891F21284
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27011C0DFD;
-	Tue,  1 Oct 2024 11:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A27661BE241;
+	Tue,  1 Oct 2024 11:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Idet+m9h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rI6FGBKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A42C31C0DE1;
-	Tue,  1 Oct 2024 11:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1671C0DCC
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 11:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727782510; cv=none; b=HECXA/DgFvm1fFFvtk5gWJZiNOIxAapd9l4pesAPMSXfcdIqy2RjpL/7vVUb8WVZN7IMTNdePSCkAvBZ0bMUUzSx2JJ23WHTHhP0+nri8B3qR/C0qZo6rzeQ1PWya40krUJY1g2X+RYLaRFZnBTJa90aOg1iMhc9eEZKlvpPvlI=
+	t=1727782618; cv=none; b=qGtqI4cWTNOJJM1Txl9QD726poMIZ3JEI8nssbi+fWeEIIno6ej+TUE0fLcwSbpbioYWyVga/2OIW6vetWZzH80lRi42CDumcZOHG/UQL4hnG5C+6jhZOnoK8HdpFA02/65PT+lVuVIyhrRHiAOoPnp8Le2jNbfX9e9pM1OS8vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727782510; c=relaxed/simple;
-	bh=ejwveurcpiVUAMtfc3MmS1K+nDymKKvZqi9zObr58qA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=r0iMo5PDusQAj127sNRTM29ZbcsbL0bBv7FkQ8HAUv9y/VZV3e5nqfk8m32y4zumQxYQ6n/JBj8z4LLWFuTA4IU8ry+LEjFwo9/ffmyQ0fiDwROcnHJX71EDHyTqEkQPsT7XWa7hLn0VRz9zz7kdXxd5ARLaV4E3FJcUxe4zcW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Idet+m9h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CEABC4CECD;
-	Tue,  1 Oct 2024 11:35:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727782510;
-	bh=ejwveurcpiVUAMtfc3MmS1K+nDymKKvZqi9zObr58qA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Idet+m9hEi7jJ4H+tzI8sgt1F12+rWXx1hzKRoo7R7Vf/Xgvmsut0lmGxVftjGc4w
-	 KAkhiLDqoZFsGDzodrIzAnLMdPPxitEcu0n6U5HgYzxt4L2S6gIwY+fgfhF1k7wxoz
-	 2+FBjBo+hRVPRIZWLB/GKaPvc+9QoClDEjrsbL1+t16nIotas4nqW3sqGCfYA4TNGR
-	 9pY3xePlrMnjdALt+1E5qo/rLXuO3Owi1jAp6pbIHZlwfkw/tU3Xd1WZCCzW4D6drq
-	 loW/aFF2yqMB9IiQJ+EExy6Z/EXu5CKGkmsKZBNhTHsfX66ugaDTc63cZsek8LSRu0
-	 4d8+s1QstP60w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C33380DBF7;
-	Tue,  1 Oct 2024 11:35:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727782618; c=relaxed/simple;
+	bh=dOeIz7dVJrL5Hj6JkVPd8ph2UjBqhmhQj0jSH3MFbhE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vr4+B3Ta67g2mTGJDuYhhE66i39wKO1uKnJzp7P7NCkZ2Snic1pC159PyZXinfBgwekNsu5/OiEFJijlk3yfrtOl4ZWkJ89DvvLX8TzABz8VnSaFEIL35u5OcS4esRzPHeEjMJ50GbbcwVTMNf02U7FVHmpDF0ceVy2twD5v/vU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rI6FGBKR; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37ccc597b96so3470010f8f.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 04:36:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727782614; x=1728387414; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zYdBnDP7QZTIip4//6Zh5tkTuHOxecL4KL4JxgRuAus=;
+        b=rI6FGBKRfHYxJuXTFKOVcKi0t9C3a0ezTxjBpfhk6rNBbTlB97WgpUvhczEIyqlR8C
+         jFaupjnAmNoxvnvUt5cC+PUYwAiODpdvQE9volzlZcSeVrv1Ur16xZG4ob51yUuVFpe9
+         fcGsTc8UdugII8St0+/rio9pis2ZEis+qWGH4WCmTkM4toIoZRwVZbbpAM4/coMJxYnH
+         NHQMKA89hJST8PXrxvXmlS7HDWIvlfniEZDAbym/pzkflxvGlQ15TXYOM4XcVSgJGNZ4
+         qzt+89Xk1FNMJf6dJtHBIZ1z2Jo+HvoHcs2yZNL68WAJWDyTfqiJ7pwlialNm5dhf8Ky
+         i/4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727782614; x=1728387414;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zYdBnDP7QZTIip4//6Zh5tkTuHOxecL4KL4JxgRuAus=;
+        b=RTgyGlacmj/E0lMCkY8ITSiecgLWNqLP5Ifs6zfEPi4ZVpno0A5jjRcnWhYY5ROOjy
+         IowqxBGVBWGfngzz987y9jKGuHo9DcSWYik2LMY/Q5u2ur32GGTGoUXAl2jPfyou96jM
+         tFuJLnbi3+Ly4KzCEEhwWK8OVjuHYo3CugSU1u5AaRfc2Hk+gtuIIjNlFwl2FbHl8QTk
+         O0UAMNg3lr7iFBoZnU+c8Uf0sarHROLpEK/bjJyAp+2Acox3bDD0EHfK/osXSblyEaiP
+         jg6Q8mUeIG+uQWUtvHbgMSGO5K9QgNPNRpaE2sTIEL96MX/e8GThUQtRvICPK/co/H2S
+         Wdiw==
+X-Gm-Message-State: AOJu0YzQhqyPKFByh+qyNWc1x8QCgbLUqtk8/VyGua5k9nHmODAJJ6Xp
+	28Wuz84Y73NGu1cS6Z609tbtN761BFeBsI7icYblWdZtc3CJtwXBisAWJme0tbkcCK9L4UxlFFQ
+	lydl5gHMa6tzcdq26YD+fX+hMSukEb1WdBooA
+X-Google-Smtp-Source: AGHT+IGiOUCFCbJKyNx9oXZW9aK0PJkmokecNoNDgCXC3ibG4deERBcCGTGDAlnaW90/XEH09gI9nKdB+dGZilB/tmA=
+X-Received: by 2002:a5d:494b:0:b0:37c:ce58:5a1b with SMTP id
+ ffacd0b85a97d-37cd5b105a9mr8710458f8f.51.1727782613907; Tue, 01 Oct 2024
+ 04:36:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/7] i2c: designware: Group all DesignWare drivers under a
- single option
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <172778251300.314421.9094418199342099537.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Oct 2024 11:35:13 +0000
-References: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
-In-Reply-To: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
-To: Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Cc: linux-riscv@lists.infradead.org, andi.shyti@kernel.org,
- jarkko.nikula@linux.intel.com, andriy.shevchenko@linux.intel.com,
- mika.westerberg@linux.intel.com, jsd@semihalf.com, linux-i2c@vger.kernel.org,
- linux-kernel@vger.kernel.org, vgupta@kernel.org, linux@armlinux.org.uk,
- dinguyen@kernel.org, catalin.marinas@arm.com, will@kernel.org,
- alexandre.belloni@bootlin.com, tsbogend@alpha.franken.de,
- paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
- jiawenwu@trustnetic.com, mengyuanlou@net-swift.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
- linux-mips@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-snps-arc@lists.infradead.org
+References: <20241001112512.4861-1-fujita.tomonori@gmail.com> <20241001112512.4861-3-fujita.tomonori@gmail.com>
+In-Reply-To: <20241001112512.4861-3-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Tue, 1 Oct 2024 13:36:41 +0200
+Message-ID: <CAH5fLghAC76mZ0WQVg6U9rZxe6Nz0Y=2mgDNzVw9FzwpuXDb2Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 2/2] net: phy: qt2025: wait until PHY becomes ready
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Oct 1, 2024 at 1:27=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Wait until a PHY becomes ready in the probe callback by using a sleep
+> function.
+>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  drivers/net/phy/qt2025.rs | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+> index 28d8981f410b..3a8ef9f73642 100644
+> --- a/drivers/net/phy/qt2025.rs
+> +++ b/drivers/net/phy/qt2025.rs
+> @@ -93,8 +93,15 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+>          // The micro-controller will start running from SRAM.
+>          dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
+>
+> -        // TODO: sleep here until the hw becomes ready.
+> -        Ok(())
+> +        // sleep here until the hw becomes ready.
+> +        for _ in 0..60 {
+> +            kernel::delay::sleep(core::time::Duration::from_millis(50));
+> +            let val =3D dev.read(C45::new(Mmd::PCS, 0xd7fd))?;
+> +            if val !=3D 0x00 && val !=3D 0x10 {
+> +                return Ok(());
+> +            }
 
-This patch was applied to riscv/linux.git (fixes)
-by Andi Shyti <andi.shyti@kernel.org>:
+Why not place the sleep after this check? That way, we don't need to
+sleep if the check succeeds immediately.
 
-On Tue,  3 Sep 2024 17:24:59 +0300 you wrote:
-> Hi guys,
-> 
-> This is a proposal for Kconfig improvement regarding the Synopsys
-> DesignWare I2C adapter driver.
-> 
-> Changes since v1:
-> 
-> [...]
+> +        }
+> +        Err(code::ENODEV)
 
-Here is the summary with links:
-  - [v2,5/7] RISC-V: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
-    https://git.kernel.org/riscv/c/0175b1d3c6df
+This sleeps for up to 3 seconds. Is that the right amount to sleep?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Alice
 
