@@ -1,223 +1,219 @@
-Return-Path: <netdev+bounces-130690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C622398B2A5
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 05:13:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657B698B2AF
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 05:26:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512F61F21C3C
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 03:13:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B211F234EB
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 03:26:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BEA679E5;
-	Tue,  1 Oct 2024 03:13:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8877D188931;
+	Tue,  1 Oct 2024 03:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="V+DHC1BP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0632260B96
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 03:13:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F7A18D644
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 03:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727752415; cv=none; b=Z00/hv/HXVVgU0z3bfGOcUzmktQ8zzrikQv721Ckewaaq1Lyp6IC84+B6AqrZI7Cf3LnmWoGUDKTeSUHYf5G21yESTarHqqRxXawiC/BGxYzOkhML4JnjdgPlSsEsGv6HGzFgwXb1dmnGWUFetPoNbcXsIOXFJXXyMshjy+l52U=
+	t=1727753207; cv=none; b=GA1r5d7hO8R6/uw7cWJzUAAsYiOMXRq/rf43e4YX5CQ8kV6qY+tLDzBgnUc7bibJNgB5JaBYrx5jvZ9Nqj9DrPiX9Nj9rkPL+BDIcPKqNYI9XFZiYpk804GD0letrUwLsBBDprjGGcU6zIMOI57td8d2lukQ28L2NclLydOjZlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727752415; c=relaxed/simple;
-	bh=bvz8z2PiJqgGFzqNIDBqV0PV7K+X34FY74K1pGb88UE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=gq/uy/sAAIq/U253tZLP/fgK3U3yFr+lO+OY+vqCv9jlA3AsFF3QFuryQ9Kt1FMl080hRa2kzIuXRM1Ibd9Ewm9usZpOVGkATQIZ8z50zs9cVVvnWVovc4rJhPGdlxoolWYei9FrBiafa2/op1fkPvjPgbCw0r0XO0UFZbK6Udg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a0cb7141adso75995385ab.1
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 20:13:33 -0700 (PDT)
+	s=arc-20240116; t=1727753207; c=relaxed/simple;
+	bh=jNvGdlbhCzQ/g/tihMj/DofpA9nYdrU+vHQvFqi7dk8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YgrQbOU1bdjMU5ZMCENm01Rbt/tFmouvYzigT9PjWaF9DoFCkSLNqN3dcaU/SXj5G/4jKnliemAzhCZOHICMrJyelF31eUEAu3a8f1HY63Fl6sqOIct0i14SWeqFivgCbUhp6J9sJE60Ctt19KqaLrRZRF9/Iux3V9DxHVmzcN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=V+DHC1BP; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5398f3be400so2380637e87.0
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 20:26:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1727753203; x=1728358003; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=jNvGdlbhCzQ/g/tihMj/DofpA9nYdrU+vHQvFqi7dk8=;
+        b=V+DHC1BPingeYRwDD+9QHmpS3QIIXqMzYhIcA0fZ9fkR6QmHHkKklW30C8mglM6x72
+         XgQhFHEDpEnXJlkpsjnbE3N3qs6feyklGGu7kb/d80rk9VXqcKjX+Xmvz4mIB/ZBLag0
+         /xmXsTzSKqeQN+tQZ6V3uVCOW70xY3YfYrbsA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727752413; x=1728357213;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h38yLC5paz4Y4qT0OC9bp8k14g90QxCOsql6LhWfwSE=;
-        b=ojXKMYsYyAUnktZXO17TAP+C8DtE34LZzg6ydeciEUYBZ7+NmMN/QKvWZMelSUkC2M
-         k3G9tGuJ/9lOLACAakzbOHimg9IfOb2mz5bQcIoG4Zd7vb4lUH7xsiI0ZOFpYIB1eQfL
-         uPSGlMydqTvxSVlXdaHszWlL85esyEU59GXAajDTi5s2l+IYNxZvmwSDFFSr3BHqtOZX
-         DvXQ87nn/wWJpvD8hpapgT8UteZwMYRTnl2sB5SH6JVfbAuxo/Tf+cH1R8Z6DzswQUru
-         ZgxUI4fuGTyhNFMu461jyvaaYCHlccjlrRZyvWheghYQ5GpNrP5QOZqPLfoCABl5Jbrc
-         twuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlwNS9Q4HUusrRM7OzwGR24X/Ts83B21DnaZ6Q4MOjOR7d1Z2lj5lSJUD9X8b85AFDVeyedro=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyXBVkclQzvxRfIhdzyvIjx31Ax1YSUDoa1ifgIKearQPpqP1R
-	RcKol/NfEmk8uc2jEjUEymaFJEvfb/s6tGfQXb6+nOHwapX/SA22hQxHUrVGMovfLDD9MLeLxZ6
-	4AW3s/C4MrIGE2Lb0+Q2pl/kaA3N2aI5Q9jS5KCJKdxMn+MYUWNKdNQI=
-X-Google-Smtp-Source: AGHT+IEAnBjq+RGbWFNfU40Ezad60NjhnHx6h1dNYFfGbEklww1oGc/5rHXvqqUXuqce1rSJ6xVHSynGlCOcNSxMzJA/ohaMUmJ7
+        d=1e100.net; s=20230601; t=1727753203; x=1728358003;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jNvGdlbhCzQ/g/tihMj/DofpA9nYdrU+vHQvFqi7dk8=;
+        b=PVx5YXEUvgUphBrYLlsuQvR+OT4n00LE3q8RN6UwzJGree2SFhHVBdbwOswtgrC0dX
+         mI/4L3B4C3Kzi72uLJsDlrqJCWnt55V4xkmAeKc0+oWknZc3VLJwYDRNSnf85NMnJcuq
+         V2fQCmm50pU30Gl7Nz5osHZ9WclrNbZKOwz7H2Qe+ctsHho0qEJSXpn5waTCESD/FNE8
+         ay9/xe9yh6QzSWb1eIN/jNpdmELTaAMrto/Zb9kpqPwj+I9lpBfwgYDOmFcxs5PqwtPr
+         G4gEhaDXoxwa7e3RIAFoqdkZ+5hTkcBZNWyY6DoUUHcJqHJbVttyFwwluFx3xxesz83h
+         YG7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXN3Df9d3I56k0NnS/Uai3q/KGOk4vyjJRH59GbofWU3l2qgW13itRxwt8dNJ83OJ2uCJVQ6sE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPdzFavzBVBm7q1Qcx0yjlszccrlVs4II7NLJv/UA3XUsuqpOX
+	xD4CaFaTYPusWYjBKu4CtxP+DMtvKD7op0v6Rp8SSdsiRiPv1FWrtkeOzKGL8Eo36iKM/Y3vpwP
+	BQShtYp+pmUjiB/JpNlcKnMMKzKTlpRDlkZTi
+X-Google-Smtp-Source: AGHT+IGPb7MBxKSdWklA8ZLGLRxF+phmFlMDd6aJYIP2o+oVSFu24s48nicURMzUM/QjfJdP3TrmKU7XI66jCVKhSU0=
+X-Received: by 2002:a05:6512:158d:b0:536:545c:bbf6 with SMTP id
+ 2adb3069b0e04-5389fc30e6dmr6875426e87.1.1727753203486; Mon, 30 Sep 2024
+ 20:26:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1e08:b0:3a0:98ab:793e with SMTP id
- e9e14a558f8ab-3a3451c3a50mr123826685ab.23.1727752413042; Mon, 30 Sep 2024
- 20:13:33 -0700 (PDT)
-Date: Mon, 30 Sep 2024 20:13:33 -0700
-In-Reply-To: <66f1293a.050a0220.3eed3.0007.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66fb68dd.050a0220.aab67.003e.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] INFO: task hung in reg_check_chans_work (7)
-From: syzbot <syzbot+a2de4763f84f61499210@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20240930223601.3137464-1-anthony.l.nguyen@intel.com> <20240930223601.3137464-4-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240930223601.3137464-4-anthony.l.nguyen@intel.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Tue, 1 Oct 2024 08:56:31 +0530
+Message-ID: <CAH-L+nP1kQWV9asJNFrw-pdxw64aAL6Mi8MnOgRA2NubfL0iWQ@mail.gmail.com>
+Subject: Re: [PATCH net 03/10] ice: Fix improper handling of refcount in ice_sriov_set_msix_vec_count()
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, 
+	Gui-Dong Han <hanguidong02@outlook.com>, baijiaju1990@gmail.com, stable@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, Rafal Romanowski <rafal.romanowski@intel.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000fb9766062361e3a9"
+
+--000000000000fb9766062361e3a9
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
-
-HEAD commit:    9852d85ec9d4 Linux 6.12-rc1
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1516ddd0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=286b31f2cf1c36b5
-dashboard link: https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14271980580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1358439f980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/da91d5641713/disk-9852d85e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5fc1f1ed3252/vmlinux-9852d85e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5affad2001eb/bzImage-9852d85e.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a2de4763f84f61499210@syzkaller.appspotmail.com
-
-INFO: task kworker/0:0:8 blocked for more than 149 seconds.
-      Not tainted 6.12.0-rc1-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/0:0     state:D stack:21392 pid:8     tgid:8     ppid:2      flags:0x00004000
-Workqueue: events_power_efficient reg_check_chans_work
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- wiphy_lock include/net/cfg80211.h:6014 [inline]
- reg_leave_invalid_chans net/wireless/reg.c:2468 [inline]
- reg_check_chans_work+0x164/0xfd0 net/wireless/reg.c:2483
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by kthreadd/2:
-1 lock held by khungtaskd/30:
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
-3 locks held by kworker/u8:3/52:
-5 locks held by kworker/0:2/937:
-3 locks held by kworker/u8:5/1067:
- #0: ffff8880b863ea98 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:593
- #1: ffff8880b8728948 (&per_cpu_ptr(group->pcpu, cpu)->seq){-.-.}-{0:0}, at: psi_task_switch+0x441/0x770 kernel/sched/psi.c:989
- #2: ffff8880b872a718 (&base->lock){-.-.}-{2:2}, at: lock_timer_base+0x112/0x240 kernel/time/timer.c:1051
-5 locks held by kworker/u8:7/3017:
-2 locks held by syslogd/4667:
-1 lock held by klogd/4674:
-4 locks held by dhcpcd/4899:
-2 locks held by getty/4991:
- #0: ffff888031d9a0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
-5 locks held by syz-executor223/5245:
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
- watchdog+0xff4/0x1040 kernel/hung_task.c:379
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 5245 Comm: syz-executor223 Not tainted 6.12.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__update_freelist_fast mm/slub.c:660 [inline]
-RIP: 0010:slab_update_freelist mm/slub.c:730 [inline]
-RIP: 0010:__slab_free+0x196/0x3d0 mm/slub.c:4432
-Code: ea 48 8b 4c 24 20 4d 89 f8 e8 f6 dc ff ff 89 c3 eb 43 48 8b 5c 24 20 4c 89 f9 48 89 ea 4c 89 e0 48 8b 34 24 f0 48 0f c7 4e 20 <0f> 84 c3 00 00 00 eb 4e e8 5d 7d a9 ff 48 8b 3c 24 4c 89 e6 48 89
-RSP: 0018:ffffc90003c370d0 EFLAGS: 00000242
-RAX: ffff8880352399c0 RBX: ffff888035239a80 RCX: 0000000000400007
-RDX: 0000000000400008 RSI: ffffea0000d48e40 RDI: ffff88801ac41780
-RBP: 0000000000400008 R08: 0000000000000001 R09: ffffffff81fe9dcf
-R10: dffffc0000000000 R11: fffffbfff2858b07 R12: ffff8880352399c0
-R13: 0000000000000000 R14: 0000000000000001 R15: 0000000000400007
-FS:  000055555f9ef480(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055d74c089050 CR3: 0000000078b74000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:247 [inline]
- slab_post_alloc_hook mm/slub.c:4086 [inline]
- slab_alloc_node mm/slub.c:4135 [inline]
- kmem_cache_alloc_noprof+0x135/0x2a0 mm/slub.c:4142
- ptlock_alloc mm/memory.c:6902 [inline]
- ptlock_init include/linux/mm.h:2958 [inline]
- pmd_ptlock_init include/linux/mm.h:3062 [inline]
- pagetable_pmd_ctor include/linux/mm.h:3100 [inline]
- pmd_alloc_one_noprof include/asm-generic/pgalloc.h:141 [inline]
- __pmd_alloc+0x110/0x620 mm/memory.c:6315
- pmd_alloc include/linux/mm.h:2849 [inline]
- copy_pmd_range+0x8135/0x85f0 mm/memory.c:1235
- copy_pud_range mm/memory.c:1292 [inline]
- copy_p4d_range mm/memory.c:1316 [inline]
- copy_page_range+0x99f/0xe90 mm/memory.c:1414
- dup_mmap kernel/fork.c:750 [inline]
- dup_mm kernel/fork.c:1674 [inline]
- copy_mm+0x11fb/0x1f40 kernel/fork.c:1723
- copy_process+0x1845/0x3d50 kernel/fork.c:2375
- kernel_clone+0x226/0x8f0 kernel/fork.c:2787
- __do_sys_clone kernel/fork.c:2930 [inline]
- __se_sys_clone kernel/fork.c:2914 [inline]
- __x64_sys_clone+0x258/0x2a0 kernel/fork.c:2914
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7efde123ccf3
-Code: 1f 84 00 00 00 00 00 64 48 8b 04 25 10 00 00 00 45 31 c0 31 d2 31 f6 bf 11 00 20 01 4c 8d 90 d0 02 00 00 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 89 c2 85 c0 75 2c 64 48 8b 04 25 10 00 00
-RSP: 002b:00007ffda41bff68 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007efde123ccf3
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
-RBP: 0000000000000001 R08: 0000000000000000 R09: 00007ffda41bfe07
-R10: 000055555f9ef750 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffda41c00a0 R14: 00007ffda41c00e0 R15: 0000000000000002
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.825 msecs
+On Tue, Oct 1, 2024 at 4:06=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel.=
+com> wrote:
+>
+> From: Gui-Dong Han <hanguidong02@outlook.com>
+>
+> This patch addresses an issue with improper reference count handling in t=
+he
+> ice_sriov_set_msix_vec_count() function.
+>
+> First, the function calls ice_get_vf_by_id(), which increments the
+> reference count of the vf pointer. If the subsequent call to
+> ice_get_vf_vsi() fails, the function currently returns an error without
+> decrementing the reference count of the vf pointer, leading to a referenc=
+e
+> count leak. The correct behavior, as implemented in this patch, is to
+> decrement the reference count using ice_put_vf(vf) before returning an
+> error when vsi is NULL.
+>
+> Second, the function calls ice_sriov_get_irqs(), which sets
+> vf->first_vector_idx. If this call returns a negative value, indicating a=
+n
+> error, the function returns an error without decrementing the reference
+> count of the vf pointer, resulting in another reference count leak. The
+> patch addresses this by adding a call to ice_put_vf(vf) before returning
+> an error when vf->first_vector_idx < 0.
+>
+> This bug was identified by an experimental static analysis tool developed
+> by our team. The tool specializes in analyzing reference count operations
+> and identifying potential mismanagement of reference counts. In this case=
+,
+> the tool flagged the missing decrement operation as a potential issue,
+> leading to this patch.
+>
+> Fixes: 4035c72dc1ba ("ice: reconfig host after changing MSI-X on VF")
+> Fixes: 4d38cb44bd32 ("ice: manage VFs MSI-X using resource tracking")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Gui-Dong Han <hanguidong02@outlook.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+
+--=20
+Regards,
+Kalesh A P
+
+--000000000000fb9766062361e3a9
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIFzbvnvDmxJvk2GhALdeItGMaRVkiqd+RgaEljJXoftwMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMTAzMjY0M1owaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCwUQsSOq38
+KMRpdcb6E1md6i2bASLJfLDJ655KrFo5XAyHA4Oct36fgV0U4VLWpRdfYiIReF0E39MywhrCA5sS
+SlFxmShbFB6OkIklIhNwhulTEo9DmZQVxXCLmIBLBVY34E9Q2ZlluX2vapnN66n3tycFkzF1XiWY
+TYRoqJIYhMIR7l3e/PF2upKsWhTJ2K2a1YfaovtF71Ar75cvFV+UXeApkqiWiQNGot/dWNPlGzJD
+BWZLD4uGWhPbBJQKuvlWrOvOZxSVKQkp1uRqPdu2iLwHgSRRVC4fTFbGEAIX5VX+tyz6y7v/kPNo
+faNAPPiXIgCxYl9Tjqc1Xc4fImxh
+--000000000000fb9766062361e3a9--
 
