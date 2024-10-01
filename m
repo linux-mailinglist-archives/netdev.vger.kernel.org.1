@@ -1,134 +1,129 @@
-Return-Path: <netdev+bounces-131089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2793F98C961
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:14:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC7898C98D
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:40:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47D451C20B33
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:14:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FBCE1C21DBD
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D091CEE9C;
-	Tue,  1 Oct 2024 23:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308181D4336;
+	Tue,  1 Oct 2024 23:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXEQm2oY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WiktXhOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1150D1CF28B
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949D9154C1E;
+	Tue,  1 Oct 2024 23:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727824490; cv=none; b=srsJ2dHaRhlp+gGlTVFX9jE0IYIJMJ+AREQkPHWnF5IMCEAdksEmm9wLPg6630a1oijZUr0Vv7rPy5KF7VPVuAM01fNHH4oLdxZGQ3syw7TlCkJ4+v2o7PAyxZC6y43HetteRYI4kTfyZlz39NzT7yG190aNKA/zp4tnFdlkqZA=
+	t=1727826020; cv=none; b=a4Z4BrYT6/Vlzuv9Qv6umvq2sKwkz9WWKPl8yA9C6Rnv1UhekhCxkO+CelofMuiK2L9vgDQVQu/9u11M/sl1HQwEac1h/ckfw03f+bs123irLrKkHVST02NscpAaWMr5SVRXKVxKkJwlSzJavBpJeUJUil0W+clVjx5UvtFsgus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727824490; c=relaxed/simple;
-	bh=asTZzM567pcKSUn11YDuhEmh5VGtwemnVvE7YgvnZAE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DqiW6xMLFrYKwdxxTn9GdbngnoiV1V7Ut6TiSlLUr9n0Y7RIipmuUzuLw4/aKh9j7kYXjMDd6+CTglHH3nYam5oO9R/515A2IBa8GXeU4msiiFpE7zOT1E+SD3cglv4z6eRezHse8TwLz6oa00DoKP2VNAOTjFaTzkvlgHb0sWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXEQm2oY; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1727826020; c=relaxed/simple;
+	bh=oc4kNUZ++rknNxqXtF0a2vDuKMODdIXTpIm9ZcHkuzs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZLcYKMZ47tTiv4kmEbpEEpchmTqF0xqHYn4CfylhTQkadIZ8UwgDl6Z+x8fkLF5bJaUHWNOmnIZDmvtNw7MIGJjX3bsaxtNrBQ+4Jx+vDStWgex1e/BWq7GL5qZjuPq9eA1F/AfrSkJ0wb76c1C9iPCfo7S/SAv+iSxPTn7Jf/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WiktXhOL; arc=none smtp.client-ip=209.85.128.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c718bb04a3so7926723a12.3
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:14:48 -0700 (PDT)
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6c3f1939d12so50404457b3.2;
+        Tue, 01 Oct 2024 16:40:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727824487; x=1728429287; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hXKyvSGYCFtYl7ZCgnYaWtIrO9omUE74W7krvfzgvxI=;
-        b=QXEQm2oYjCRsjVoZfGWjf8LCvOceXQi8duE+jpk/uGBCP/3T0UbvDp9up7PYu9SvfW
-         BcGs/4Zs8p7vp599SL6/1uaIJXGcbux569Tj2wVfhgzNW7sp9/J7ipWukvdkK/nfKqQj
-         /8LJQsDq00/oP+3qd67DAAnU7zzHKnjy0jezcAw/8TVhMyk1JweOCyujDfvbsi6O+Twk
-         gDpGNWemVtm7lSoDXap9MSs1GJLBWbVE908mAj2hzcMR1ihQqK4I7XuCxhHsTgFHvnZf
-         RUHAfaqI6qtMepnPjwpL0YEkSbJwziXkq8uWuJ/6TcbqR30WFOC0irg0Br+66a/xt+af
-         aw/w==
+        d=gmail.com; s=20230601; t=1727826017; x=1728430817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u0X80NBZlHnDD0IDxB7pOrLRtZHi6Jy8U5IUp10MYLg=;
+        b=WiktXhOL+RIAzGN06WlLPgZKS4CPlqLOMXMw42JN/tCbNdGd/dOPjq027aELrYbyeQ
+         wcM7C04qbiLoShNZ0+kU8oRMdkauyBcwKjoYg+aFuIQNw0Zn6O8ZGN7eOrF6OO3eNI44
+         R1G4008CVk/8Rt7PzGe5t7QCugec0m8WWleFft2Zl0n91D8MlPfyP5eNC8znRAs7A//3
+         KpwlRn/OWsl6mOmC3inFVTBEGfitggLv0r6T0eg5rKjRSrt1Y304FMrW1xjoOlJPr0K3
+         l76EEinikTE1rJaa4oZciI1AQLEu/9WIBolyV1NE7DTM1tMmJO3qt6nxdVO1uDtDaaMN
+         Ra/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727824487; x=1728429287;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hXKyvSGYCFtYl7ZCgnYaWtIrO9omUE74W7krvfzgvxI=;
-        b=ei2L9kTZB9w1mUckM0N+i9AulyWrlu3yLTvcHcqUTydzIA1Yd3gDpqoHjs2gGV5HPV
-         7eRsqR/FMzh3rfKRWfhZ8jv5Xk4QMd8m/sBtAuazfOJCr38J1YNl4PyS/aehVyUSmhJm
-         QBG/kYbQKBiapNQa2Bu27Fdd+EXDpKrC0pobqXJb1iOnmbcBW3ku53vK8DsRDxozNHWp
-         6uKOwbmA0mGMwrXq742qBoyD3Sl79EOI5CVwSAzBQ+3Gj4P6db5IH6BqPvSqoJqil8Mu
-         UsT9w7UR4/EiTCIQs/nR5InVKNVFWCixZkA8JspEZxxbrYCj4iY7qB9vdisd/icq9I2l
-         Eh/g==
-X-Forwarded-Encrypted: i=1; AJvYcCV6kMWE4ydywzMbfQN42BS0N1eFbH+L1udooeB3G8gJga5aMGVJQBUXZIysLkNrkcWqZK9PBWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx78e7ctUfcNJw/GboSXVbbgbXQWDD7YJDE6rxOogUTsLr9sJay
-	M4oicg2004SmxB4bzd9pUjREPtFA9u71z/fSljYyy+w2V3937zypKFy0Dg==
-X-Google-Smtp-Source: AGHT+IF0Ya5dKrGwTmfW9ooJ1b0YUkgsCfgGzZCjjQYxt3+nMrSZIR4L1sk3xwPdha/a2vvBfpzkwA==
-X-Received: by 2002:a05:6402:5002:b0:5c8:8d5e:19b0 with SMTP id 4fb4d7f45d1cf-5c8b1b863ecmr691436a12.30.1727824487161;
-        Tue, 01 Oct 2024 16:14:47 -0700 (PDT)
-Received: from getafix.rd.francetelecom.fr ([193.252.226.10])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c88248aebbsm6679102a12.61.2024.10.01.16.14.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 16:14:46 -0700 (PDT)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-To: edumazet@google.com
-Cc: alexandre.ferrieux@orange.com,
-	nicolas.dichtel@6wind.com,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] ipv4: avoid quadratic behavior in FIB insertion of common address
-Date: Wed,  2 Oct 2024 01:14:38 +0200
-Message-Id: <20241001231438.3855035-1-alexandre.ferrieux@orange.com>
-X-Mailer: git-send-email 2.30.2
+        d=1e100.net; s=20230601; t=1727826017; x=1728430817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u0X80NBZlHnDD0IDxB7pOrLRtZHi6Jy8U5IUp10MYLg=;
+        b=AHUdoFrX9x4TOP+BNzrd7BAZda+BzXvrlLzDB5ScFZAH4Ykd4WiJsuub2e8Urxd3CY
+         vKGtMeBOzvmnD5X8GELparE4smK4QQelxWJ5BbsywSftMXzYpAEc6kQNBqsGXQspNuL1
+         evsvcwF5d1iMB7cpmEh7vH0iBVvPo+vajjZMe2fAhXTvX6k88fBMUh7P+N32ht1PugeE
+         DLpSvNE4hoc65shDgfQ/Ws4hBO3AX/zG473QE3OBDzXqjQsD9BpYHrGPYzzlZPRIZikT
+         3OkpiBTWlppDXL8A//9DQZ93h1NymPb9j307Ezj3OE0mijuuLKWH5qovV8hYvWW8AEc5
+         08pQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU61rDtnGT99IU2Uoe2hjHU3kRrD8l9TaYL3wHQZ4d9Iiw+lGu1eeeo86BDE+MOSI+KOXTjDZ1PifH2ciA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxlHOlmhpH2W+x7antIx/YBJ3LKcD/njqDBJfss/A0kdpMIqNS
+	+IlsO3QlO3BpfYSINHn/nvF7PKXQW3hUkjNfAjGDvRX/wfnlob743fQR30r/m9nINeMZl8etLTL
+	utySulwNtLRDpg014fjVxm9VCkyA=
+X-Google-Smtp-Source: AGHT+IF5e2/JC22BacACIpQzksx5oEpq4czIcpQOl4BwBE//2qAxlW1B3NyBMtKwH+aIZjvN4MWUCiM8lJynFGSn05c=
+X-Received: by 2002:a05:690c:6d92:b0:6af:fd49:67e0 with SMTP id
+ 00721157ae682-6e2a2e336c2mr14355587b3.46.1727826017587; Tue, 01 Oct 2024
+ 16:40:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241001184607.193461-1-rosenp@gmail.com> <20241001184607.193461-2-rosenp@gmail.com>
+ <975e614a-f37a-4745-90a2-336266b21310@lunn.ch>
+In-Reply-To: <975e614a-f37a-4745-90a2-336266b21310@lunn.ch>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 1 Oct 2024 16:39:52 -0700
+Message-ID: <CAKxU2N-b2SsORrMbXnf-ezqR2TG+pyuMtEx5+wdX7z07oA8iqQ@mail.gmail.com>
+Subject: Re: [PATCHv2 net-next 01/10] net: lantiq_etop: use netif_receive_skb_list
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, olek2@wp.pl, 
+	shannon.nelson@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Mix netns into all IPv4 FIB hashes to avoid massive collision when
-inserting the same address in many netns.
-
-Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
----
- net/ipv4/fib_semantics.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index ba2df3d2ac15..1a847ba40458 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -347,11 +347,10 @@ static unsigned int fib_info_hashfn_1(int init_val, u8 protocol, u8 scope,
- 	return val;
- }
- 
--static unsigned int fib_info_hashfn_result(unsigned int val)
-+static unsigned int fib_info_hashfn_result(const struct net *net,
-+					   unsigned int val)
- {
--	unsigned int mask = (fib_info_hash_size - 1);
--
--	return (val ^ (val >> 7) ^ (val >> 12)) & mask;
-+	return hash_32(val ^ net_hash_mix(net), fib_info_hash_bits);
- }
- 
- static inline unsigned int fib_info_hashfn(struct fib_info *fi)
-@@ -370,7 +369,7 @@ static inline unsigned int fib_info_hashfn(struct fib_info *fi)
- 		} endfor_nexthops(fi)
- 	}
- 
--	return fib_info_hashfn_result(val);
-+	return fib_info_hashfn_result(fi->fib_net, val);
- }
- 
- /* no metrics, only nexthop id */
-@@ -385,7 +384,7 @@ static struct fib_info *fib_find_info_nh(struct net *net,
- 				 cfg->fc_protocol, cfg->fc_scope,
- 				 (__force u32)cfg->fc_prefsrc,
- 				 cfg->fc_priority);
--	hash = fib_info_hashfn_result(hash);
-+	hash = fib_info_hashfn_result(net, hash);
- 	head = &fib_info_hash[hash];
- 
- 	hlist_for_each_entry(fi, head, fib_hash) {
--- 
-2.30.2
-
+On Tue, Oct 1, 2024 at 3:40=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, Oct 01, 2024 at 11:45:58AM -0700, Rosen Penev wrote:
+> > Improves cache efficiency by batching rx skb processing. Small
+> > performance improvement on RX.
+>
+> Benchmark numbers would be good.
+>
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> > ---
+> >  drivers/net/ethernet/lantiq_etop.c | 11 +++++++----
+> >  1 file changed, 7 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/=
+lantiq_etop.c
+> > index 3c289bfe0a09..94b37c12f3f7 100644
+> > --- a/drivers/net/ethernet/lantiq_etop.c
+> > +++ b/drivers/net/ethernet/lantiq_etop.c
+> > @@ -122,8 +122,7 @@ ltq_etop_alloc_skb(struct ltq_etop_chan *ch)
+> >       return 0;
+> >  }
+> >
+> > -static void
+> > -ltq_etop_hw_receive(struct ltq_etop_chan *ch)
+> > +static void ltq_etop_hw_receive(struct ltq_etop_chan *ch, struct list_=
+head *lh)
+>
+> Please don't put the return type on the same line. If you look at this
+> driver, it is the coding style to always have it on a separate
+> line. You broken the coding style.
+I'm using git clang-format HEAD~1 on my commits. Something to improve I gue=
+ss.
+>
+>
+>     Andrew
+>
+> ---
+> pw-bot: cr
+>
 
