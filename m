@@ -1,126 +1,125 @@
-Return-Path: <netdev+bounces-130829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEDC198BB06
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:28:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C59F598BB00
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E998B21992
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 292E7283A51
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CD781BFDE4;
-	Tue,  1 Oct 2024 11:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765411BF801;
+	Tue,  1 Oct 2024 11:27:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yadro.com header.i=@yadro.com header.b="To/dlGCm";
-	dkim=pass (2048-bit key) header.d=yadro.com header.i=@yadro.com header.b="hr25LAVC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdKWp1Ty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-03.yadro.com (mta-03.yadro.com [89.207.88.253])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266C21BE844;
-	Tue,  1 Oct 2024 11:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.207.88.253
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5691BF325;
+	Tue,  1 Oct 2024 11:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727782097; cv=none; b=K9EB/DOxx3Qqn3x3IE3NBf8GmdR4uINNpYMv6tgNDMfqBRRtEP8NI5zeg0TS10lgECNwCVwdypPF+jEezyQmZQL22XVZvwjaLzCZjiZOQNGJ9EKVzq5jLhgwWdRcBhXPei0RXpCkxzjSuBmxiW/vSXXz8meFIUHlWkXq7cLXL3o=
+	t=1727782045; cv=none; b=Kwge3dMq5GduvKKzj8Kj8MB4s9r6+LXqRAMllXzZxNJMFEKIGXEtFx93vEJ+z1FngfwSvYcy9gxmuCibbkIvNK3S0VoWfbKP+FilPzZZCstwrgkDBkgNvoAFwQasDwP5qF0UOnwnolw4daF8drgQge4wdYzm3j/9UKnLlxAUxbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727782097; c=relaxed/simple;
-	bh=bDoNHdGMvOldNnAHOPFZPgGm8ZvgR8+T8X8OFve4coA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gL7C/w2DK1Ye5wFXXuB1Gegzq9sY7sLO7zyuGGPKeIxvaUwPyAUeomkwV0ttYPJbtUoqdnfO8Pk/9nyAaznIzGM94o6/W0lUsLK4y1PhbmNTCFJ8ag3kKwNPo6QIII+RVj1Hf3i6aJ7LdE9yZQXc4k2LpXo4/OZd+E53TRomMy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yadro.com; spf=pass smtp.mailfrom=yadro.com; dkim=pass (2048-bit key) header.d=yadro.com header.i=@yadro.com header.b=To/dlGCm; dkim=pass (2048-bit key) header.d=yadro.com header.i=@yadro.com header.b=hr25LAVC; arc=none smtp.client-ip=89.207.88.253
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yadro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yadro.com
-DKIM-Filter: OpenDKIM Filter v2.11.0 mta-03.yadro.com 4EC53E0005
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yadro.com; s=mta-04;
-	t=1727781537; bh=4WKPhPCzv0PRccHj8E3gU/C6ldhuqZJP/djUeDytt50=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=To/dlGCmRo5I2ueWSJ1TlL1+Q02GxxSMMkKXGbO+DPWVhwfzSKv+pJUJTrzL7ZC87
-	 MqOgXJwRhSlORRv9IuoIJWAQUOkPlTmFaHMFi7Ep4Ym+qF9PpwmU5eYIkPxfcy64wM
-	 l3CS+0jWxjrMlBYtydD8yktCUmH0FRUVhONP+am3OfpaEELrjvuBJmtWaPXffoiISR
-	 bYIkcKTXxO3dLvwt6D4Y0Xr4W8o7q/x2XAT3LpWCPsc69tOW/hT1uYr/BdZ/03bh5v
-	 /+9LcVVxNlZogPK6xKxQMZIRDh6LNuKo+DMOBgNY9Ad94x+KrbGsOBQ6Ti9qkVemAL
-	 /5K8tYKFSpObg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yadro.com; s=mta-03;
-	t=1727781537; bh=4WKPhPCzv0PRccHj8E3gU/C6ldhuqZJP/djUeDytt50=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=hr25LAVCZr/c5S3a4NzhxQBomrO88Gb5mSCc93zY402/hJDBrRJoulcayiknUmXfT
-	 Ap4dDgyvUfGNNM04JCJzt8fdJAXMvAuALFU3POv/ABS5Us6Ig9D1gd3obH9tDKOeaA
-	 AP+rw9MXvT06m4FPJovaOxl1CzryKYPzv2QILz++VOa1yOBuNJD+3bYwkAXASwPcjI
-	 Bb4bsTCycBI9YjByWKTzx0woKhnv+EWc78/O5hofT7uQPt8/HpVDA+/VnffYZKJ3V6
-	 IirP+PoPBsNCGs3Fr5dutuYNHnXJt6QpPM11+LsegTA5kxQsw4z26HJfYSHAkVtoUW
-	 6FcdqDUfqYIpA==
-From: Anastasia Kovaleva <a.kovaleva@yadro.com>
-To: <netdev@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <stable@vger.kernel.org>,
-	<linux@yadro.com>
-Subject: [PATCH net] net: Fix an unsafe loop on the list
-Date: Tue, 1 Oct 2024 14:18:40 +0300
-Message-ID: <20241001111840.24810-1-a.kovaleva@yadro.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1727782045; c=relaxed/simple;
+	bh=9NQ+0TZWjiquXsQOOr1sHMZpc9dpUk2gGrXi/p0eLtQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gPA8BwIHlE6xqBWti/ploNdL7Yj9JvyszvCNogzbkvFC6/cJeWt12avkAeoMao1WMIhDU5DpLlT5UYjjPgeYrERG0cPvBRp6ZsjIpFqvOPlLGL25rSVElmhtnmWgEYu6R/QeBjL17uCdZR52oxtio/FGWrU/1J3SaTTdMUNLOWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdKWp1Ty; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20b93887decso16012065ad.3;
+        Tue, 01 Oct 2024 04:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727782043; x=1728386843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CNaj6hMBwRPew2E8TSTXWkEgqsF9LJOIrV1CoqnoYBA=;
+        b=bdKWp1TyhZ4OP7Np4OkC+/p4eVlfAwpTpv8WVPQZVdun4j3ytUYjvKc8+AShosD3Zu
+         7G/r134ezbdtmCG9J9tsxrIYFlCG01Nk/NBiBJDxxvEjTMt/BFJAf6n+jy13XHSzGfFn
+         dP5uFy1lRyyYPSz7EQVfom0RRf1gLqGNSe8MSXJzsyfz3ul9IUdmQ3Y4Ry37IuT/qfGv
+         z0g6ieIdDKymwSaTHoMraw4+/jIRssXfitGbUlw/Z+cknRQ7x1asRJ6WAQTAZlVQpFX6
+         eDhr9J/NKJMVTR89yre+BQ8P7kFGhOFqEWbrUtcaGJjqb3h7N9GN1ShP9sYMKVpYhPU+
+         wBdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727782043; x=1728386843;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CNaj6hMBwRPew2E8TSTXWkEgqsF9LJOIrV1CoqnoYBA=;
+        b=ZjZivlzwPsiJbZoD9PbZu9/cNbWp+shCiIAT5L0bWEj6Pu6ONroojhU7yR+lc3ZWt6
+         Yh7q+QxxZkIGUR+HALzfEWsuAhdhq8Ba8y72x8wpATh41nibXGNE2mBgwYjajXbxsLlN
+         i/THlqH0QztAXISmAcy2Cb3sLX7jZHlgBvJr7dldYHPwaXv0gwVTJycmwIVF0EgRxaxD
+         09MsOghOVnfo5zGP6lCRqmHN4M6KknunlFeICzuex/5aiHSFC20CX8y2t1MvBwdkGFJn
+         O4jzbHve/krjpHm89iKJzE2tIodfxeP0T2+MQqcxBoQNn1rpmtstMDNKDX0agh6oEDeH
+         ZfHg==
+X-Gm-Message-State: AOJu0Yx2crR4cUPx+QtBnMsnghRzAAu9Je10LcZQ7NPXx5xMwnORm+TX
+	g7CUggzV/zJ7gyRNpsXYXRYX6c+m6qAxgXEEx5QYKFVzNe5VapCT++OmvKHR
+X-Google-Smtp-Source: AGHT+IEPG+Md67DfNbLD6PrRqcsr9T6hA5w7O2SiAchPFUzCZBO8II2nlbi0ualF+/7vBwYsSfz1Cg==
+X-Received: by 2002:a17:903:228f:b0:206:a935:2f8 with SMTP id d9443c01a7336-20b367d00a7mr192716755ad.2.1727782042998;
+        Tue, 01 Oct 2024 04:27:22 -0700 (PDT)
+Received: from mew.. (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e51330sm67893655ad.254.2024.10.01.04.27.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 04:27:22 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	tmgross@umich.edu,
+	ojeda@kernel.org,
+	alex.gaynor@gmail.com,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me,
+	a.hindborg@samsung.com,
+	aliceryhl@google.com
+Subject: [PATCH net-next v1 0/2] add delay abstraction (sleep functions)
+Date: Tue,  1 Oct 2024 11:25:10 +0000
+Message-ID: <20241001112512.4861-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: T-EXCH-08.corp.yadro.com (172.17.11.58) To
- T-EXCH-09.corp.yadro.com (172.17.11.59)
+Content-Transfer-Encoding: 8bit
 
-The kernel may crash when deleting a genetlink family if there are still
-listeners for that family:
-_______________________________________________________________________
-Oops: Kernel access of bad area, sig: 11 [#1]
-  ...
-  NIP [c000000000c080bc] netlink_update_socket_mc+0x3c/0xc0
-  LR [c000000000c0f764] __netlink_clear_multicast_users+0x74/0xc0
-  Call Trace:
-__netlink_clear_multicast_users+0x74/0xc0
-genl_unregister_family+0xd4/0x2d0
-_______________________________________________________________________
+Add an abstraction for sleep functions in `include/linux/delay.h` for
+dealing with hardware delays. `delay.h` supports sleep and delay (busy
+wait). This adds support for sleep functions used by QT2025 PHY driver
+to sleep until a PHY becomes ready.
 
-Change the unsafe loop on the list to a safe one, because inside the
-loop there is an element removal from this list.
+The old rust branch has the delay abstraction which supports msleep()
+with a helper function which rounds a `Duration` up to the nearest
+milliseconds.
 
-Fixes: b8273570f802 ("genetlink: fix netns vs. netlink table locking (2)")
-Signed-off-by: Anastasia Kovaleva <a.kovaleva@yadro.com>
-Reviewed-by: Dmitry Bogdanov <d.bogdanov@yadro.com>
----
- include/net/sock.h       | 2 ++
- net/netlink/af_netlink.c | 3 ++-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+This adds fsleep() support instead of msleep(). fsleep() can handle
+various lengths of delay by internally calling an appropriate sleep
+function including msleep().
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index c58ca8dd561b..eec77a18602a 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -894,6 +894,8 @@ static inline void sk_add_bind_node(struct sock *sk,
- 	hlist_for_each_entry_safe(__sk, tmp, list, sk_node)
- #define sk_for_each_bound(__sk, list) \
- 	hlist_for_each_entry(__sk, list, sk_bind_node)
-+#define sk_for_each_bound_safe(__sk, tmp, list) \
-+        hlist_for_each_entry_safe(__sk, tmp, list, sk_bind_node)
- 
- /**
-  * sk_for_each_entry_offset_rcu - iterate over a list at a given struct offset
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 0b7a89db3ab7..0a9287fadb47 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -2136,8 +2136,9 @@ void __netlink_clear_multicast_users(struct sock *ksk, unsigned int group)
- {
- 	struct sock *sk;
- 	struct netlink_table *tbl = &nl_table[ksk->sk_protocol];
-+	struct hlist_node *tmp;
- 
--	sk_for_each_bound(sk, &tbl->mc_list)
-+	sk_for_each_bound_safe(sk, tmp, &tbl->mc_list)
- 		netlink_update_socket_mc(nlk_sk(sk), group, 0);
- }
- 
+
+FUJITA Tomonori (2):
+  rust: add delay abstraction
+  net: phy: qt2025: wait until PHY becomes ready
+
+ drivers/net/phy/qt2025.rs       | 11 +++++++++--
+ rust/bindings/bindings_helper.h |  1 +
+ rust/helpers/delay.c            |  8 ++++++++
+ rust/helpers/helpers.c          |  1 +
+ rust/kernel/delay.rs            | 18 ++++++++++++++++++
+ rust/kernel/lib.rs              |  1 +
+ 6 files changed, 38 insertions(+), 2 deletions(-)
+ create mode 100644 rust/helpers/delay.c
+ create mode 100644 rust/kernel/delay.rs
+
+
+base-commit: c824deb1a89755f70156b5cdaf569fca80698719
 -- 
-2.40.1
+2.34.1
 
 
