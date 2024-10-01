@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-131080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1C498C83D
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:30:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 596C598C851
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5E0B1F24CD2
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:30:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19118284D4E
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 22:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C231BDABD;
-	Tue,  1 Oct 2024 22:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D74B81CEE85;
+	Tue,  1 Oct 2024 22:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZQu6jqaG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="tS8MOpGM"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9926019CC39;
-	Tue,  1 Oct 2024 22:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EFF19CC39;
+	Tue,  1 Oct 2024 22:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727821844; cv=none; b=KCi3r9SB5TRf0p6bYgyORNYo2QgEbozF+S5tJXwdqc5vQzpEp8DWV5vxezK8b/whH/rYjN4fDvoO5ibltt6DfpMJN/oCLsS/MpiDezwIiep5yChtE0q+VSZpDhUAkFzXuNYA9vF+g990SXwnO2tX4uikN3S5W+swjavT5k13zLg=
+	t=1727822461; cv=none; b=bWL+CEEFslo02djHUnBI0K+ZY30TUEWymrhT4l4oJBSrILjLeolSAeUwf73jla9EntjFa/hexZod7J5UKnzjp4bA2TG8Q0lDcrO5xRaw3Rf9wDn76kn+cDHaxFb4IhFkSWlOmChy1KsbeYqTzy7dHLsyhwyieFA2pb5tHGKFH8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727821844; c=relaxed/simple;
-	bh=mC9GWVkUMROhmPLF905KkEjI/JVFZauOQdwqcQligi4=;
+	s=arc-20240116; t=1727822461; c=relaxed/simple;
+	bh=G35ceyA3I/3jR4DoDBPzvc8A+5LW0y5ljnBt+aOCaCg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l1KsYi2grIAA8cb3HzeNzKj2WNN0QNDIx7V1ZZwhPA0qTzEQikSTM2Ir3b5jBTUMfAif3OnwVjpWX4WODVVRDpooW2Xe6pT4si28XdWVW4kBidw9yE0yHvYOVGFv9Fpjk52kmxmdja3iBO9mj2EC49atsdyb+nL64+1Q1OwjpIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZQu6jqaG; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=RJoYexb2ta570y5zPGw8Q1vqz+HY4bkpTkbxpKDDBBpJJdTmV1zmdothxlhUK3X6Qi2hlqtEA0UnzH20TARKllAtYdCLx8SXeZmOuzPw/mmMcIpIRMOQKbG3iZg31H8xVRGlMGlWw0m6hnxCTqv3+YnVPeL2hYzyK+HQm2bQZ3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=tS8MOpGM; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qt5DasCpkkpHuYfGX3h/I/adOG4EI+BosrPLLAQ+wAs=; b=ZQu6jqaGFhUwgr6XlUAzZ+gjcc
-	WZP6O4oyTzHGIg0L0Hjzf3K/KX2Razd3i0tdurSqKxjNcz3OITna6OY49gXJsteRR7/PxrVl0RQXa
-	nUL15P/8A6OF+yAas8gOAt/G8WJlzIn9rzv1Bbu12vXOc4vBWtOjD1STZkiNYNZSo4S0=;
+	bh=KNLPACdzNQO/8e/1Kcz1HNmYFsucLkPJcpTfmBawZsg=; b=tS8MOpGMWm6ZNfbwLAamiJcDdC
+	U2DmC+hSFSbqqRlDUfAAkiq8o6ACsisE9+Vs/foT6WF32qXPebhFRwRNgEUH9kdjhuVttcB5rAUy4
+	TmTZz/sXLGwT+a2QypAvB7IE9Xsnh649Oz8JUEX0Oma1JQD2HjvlmG6baK7OvKqxIwDk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1svlO8-008mYG-BX; Wed, 02 Oct 2024 00:30:36 +0200
-Date: Wed, 2 Oct 2024 00:30:36 +0200
+	id 1svlY3-008maQ-J5; Wed, 02 Oct 2024 00:40:51 +0200
+Date: Wed, 2 Oct 2024 00:40:51 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Rosen Penev <rosenp@gmail.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	steve.glendinning@shawell.net
-Subject: Re: [PATCHv2 net-next 6/9] net: smsc911x: remove debug stuff from
- _remove
-Message-ID: <aaf64ee0-09e3-4069-bb04-d7f5c41fe8e4@lunn.ch>
-References: <20241001182916.122259-1-rosenp@gmail.com>
- <20241001182916.122259-7-rosenp@gmail.com>
+	olek2@wp.pl, shannon.nelson@amd.com
+Subject: Re: [PATCHv2 net-next 01/10] net: lantiq_etop: use
+ netif_receive_skb_list
+Message-ID: <975e614a-f37a-4745-90a2-336266b21310@lunn.ch>
+References: <20241001184607.193461-1-rosenp@gmail.com>
+ <20241001184607.193461-2-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,14 +61,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241001182916.122259-7-rosenp@gmail.com>
+In-Reply-To: <20241001184607.193461-2-rosenp@gmail.com>
 
-On Tue, Oct 01, 2024 at 11:29:13AM -0700, Rosen Penev wrote:
-> Not needed. Now only contains a single call to pm_runtime_disable.
+On Tue, Oct 01, 2024 at 11:45:58AM -0700, Rosen Penev wrote:
+> Improves cache efficiency by batching rx skb processing. Small
+> performance improvement on RX.
+
+Benchmark numbers would be good.
+
 > 
 > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
+>  drivers/net/ethernet/lantiq_etop.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ethernet/lantiq_etop.c
+> index 3c289bfe0a09..94b37c12f3f7 100644
+> --- a/drivers/net/ethernet/lantiq_etop.c
+> +++ b/drivers/net/ethernet/lantiq_etop.c
+> @@ -122,8 +122,7 @@ ltq_etop_alloc_skb(struct ltq_etop_chan *ch)
+>  	return 0;
+>  }
+>  
+> -static void
+> -ltq_etop_hw_receive(struct ltq_etop_chan *ch)
+> +static void ltq_etop_hw_receive(struct ltq_etop_chan *ch, struct list_head *lh)
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Please don't put the return type on the same line. If you look at this
+driver, it is the coding style to always have it on a separate
+line. You broken the coding style.
+
 
     Andrew
+
+---
+pw-bot: cr
+
 
