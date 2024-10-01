@@ -1,191 +1,150 @@
-Return-Path: <netdev+bounces-130721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ADDC98B506
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:58:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A97D98B516
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:03:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AA5DB21553
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:58:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DFEB20E4C
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 07:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86451BBBCA;
-	Tue,  1 Oct 2024 06:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39EA81BB6B6;
+	Tue,  1 Oct 2024 07:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sgv94+nB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n6a9FT6L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2A363D;
-	Tue,  1 Oct 2024 06:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE2C1B86DC
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 07:03:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727765918; cv=none; b=iFw4sxU669JsMM1Lcv7USo7IkEe5PBUfnHlgbqN/E8Qni2VlCwdgZPFkuOboADtN0tcD55mL3vvDwa1BnyRdHp9CuEPZ0bZkt7XJby2oXkUMgkVratwqOLK8xYtn3zsbcOu6RJy+iClOlsqC27ktytpdaFNN6VTLMYYT9Mnbl9g=
+	t=1727766184; cv=none; b=Tgq9uN6TOhW3pCwHsVtSKcYzP3JygiJUPLGas+oq4LUype1bWPEtRaujeVCcsNczORrjIwLlSgf6yPVECmPBHtmDhxsiAs7hPnjjAvi/9w8Xt9pZ2lLrlPeP0VqGRdqF2GjPzG9eWqbhdOPrTXtMapOPCHWn5znzkbr6BzbR+Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727765918; c=relaxed/simple;
-	bh=O5YTakodNDe1cIRujrnosQhMNdo3PJWvcNMncXtHV5o=;
+	s=arc-20240116; t=1727766184; c=relaxed/simple;
+	bh=5pjTwgYOmqpBB0LjumlV0nwBjHebEZDkgDLmmEgKPQo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CS6XFNbwt2IZuo48B6s00hIgS5YpO5t6+gJcsqD3tSR1GmmiA/rUb8jWEoUmTJlB1kN5GF6dNuieeW8sASAKYZypyriaf3ZNzz0PaSz3tGNWfzdd+M6mvQfI5DGUBm6pRk6NiOkiD3eIoD9LrR2bjLEX9Jvm1tsiw9u6AtYS0wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sgv94+nB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CD7CC4CEC6;
-	Tue,  1 Oct 2024 06:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727765918;
-	bh=O5YTakodNDe1cIRujrnosQhMNdo3PJWvcNMncXtHV5o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sgv94+nBOTvDk85hEJE4nQhK9YttToSyPnz2hvThSEUArrnY/qEP72+oB6nmnIMQS
-	 3vwqWcEvIVhDByq/Z/X45y33LSHPMiRya4nGpzvnS2vqw25iQjs9Q4ONLndw2U0mX0
-	 1LLwlpcQvqrNTh07IR57+ksIj/4s52MesSzeYMNTgDtKEKeialcVja4ODnHKZelX/J
-	 kzcxVN25K9KGngOBGsPnHBGaf/jXL5qVq1ORfku0CxXMouDPH08ROkKCadcKFDHzMz
-	 YOGjVp98JyELCLJX4Tjy4kdv54kwUePbqNsYTAwgEJIYZ3co89lip2f7j2s7dKSXjx
-	 De3TSuulx58/g==
-Date: Tue, 1 Oct 2024 08:58:34 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Drew Fustini <dfustini@tenstorrent.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>, Fu Wei <wefu@redhat.com>, 
-	Conor Dooley <conor@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v3 1/3] dt-bindings: net: Add T-HEAD dwmac support
-Message-ID: <wtknsih2yrbylqzanp6k753kklk4myf6iezjz6swnp4nsqr2hl@7mmm6lxhqemu>
-References: <20240930-th1520-dwmac-v3-0-ae3e03c225ab@tenstorrent.com>
- <20240930-th1520-dwmac-v3-1-ae3e03c225ab@tenstorrent.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iStLSv15ZH0eoNfSqsFz85YYPQ0Xljc9RKRQNiSOVPBPR1eOAHTnZxyGOXbrWlHFjc866xS9jrtYPkdXt7JrKYUc3DTwR8PIwZEBYvfajJnpkDGvkYnPzlmzYvr93JpX2nLkktoBfIRaKuMCMHXMDdmoAKuhPcu0Tt8xQFVcc+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n6a9FT6L; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727766182; x=1759302182;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5pjTwgYOmqpBB0LjumlV0nwBjHebEZDkgDLmmEgKPQo=;
+  b=n6a9FT6LIttb574O1yG9KbvZHqT96TicZlIokEe14LWyiUVmGYiEn14A
+   EHuYozKlHqKsDPmD9Jj8FWy8jbKsomv38ePvVhr+2ZbU7YZypOAuVUbH5
+   3aTKsmI84FV5HGsjgCA/V6D5Gb4RTEPSd9IhD6FFWLOYOMDJAf5Ip6ZIB
+   4sWDTAlpvt+BZ2G2ju64K/5h5erFwEoEKXquNm69g5qjM4qSNsKOkm1NL
+   AaoW+kmeTmZqs3BQm1kWosh3E3s4xRkT8uk0tJ71HWGE2C+kB8yKyWfXD
+   /4j/0DVx+bT//RRTDR0bGTbsc0caDBxogQE6cLk5/E04b1RDgs/8uDknQ
+   w==;
+X-CSE-ConnectionGUID: AJfGmeZkRPuot39KFHo0Zg==
+X-CSE-MsgGUID: XhFb98qHRSynnPM2x+/8pQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="30582540"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="30582540"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 00:03:01 -0700
+X-CSE-ConnectionGUID: Gu0nZ05ESieXFp8v+6G8Ag==
+X-CSE-MsgGUID: 1cefmXJ2Sim6Dt3eE1xM2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="78525863"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 01 Oct 2024 00:03:00 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1svWuP-000QMH-08;
+	Tue, 01 Oct 2024 07:02:57 +0000
+Date: Tue, 1 Oct 2024 15:02:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
+Message-ID: <202410011447.gX9yfZVj-lkp@intel.com>
+References: <20240930202524.59357-2-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240930-th1520-dwmac-v3-1-ae3e03c225ab@tenstorrent.com>
+In-Reply-To: <20240930202524.59357-2-kuniyu@amazon.com>
 
-On Mon, Sep 30, 2024 at 11:23:24PM -0700, Drew Fustini wrote:
-> From: Jisheng Zhang <jszhang@kernel.org>
-> 
-> Add documentation to describe the DesginWare-based GMAC controllers in
-> the T-HEAD TH1520 SoC.
-> 
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> [drew: rename compatible, add apb registers as second reg of gmac node]
-> Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
-> ---
->  .../devicetree/bindings/net/snps,dwmac.yaml        |  1 +
->  .../devicetree/bindings/net/thead,th1520-gmac.yaml | 97 ++++++++++++++++++++++
->  MAINTAINERS                                        |  1 +
->  3 files changed, 99 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 4e2ba1bf788c..474ade185033 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -99,6 +99,7 @@ properties:
->          - snps,dwxgmac-2.10
->          - starfive,jh7100-dwmac
->          - starfive,jh7110-dwmac
-> +        - thead,th1520-gmac
->  
->    reg:
->      minItems: 1
-> diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> new file mode 100644
-> index 000000000000..fef1810b10c4
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
-> @@ -0,0 +1,97 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/thead,th1520-gmac.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: T-HEAD TH1520 GMAC Ethernet controller
-> +
-> +maintainers:
-> +  - Drew Fustini <dfustini@tenstorrent.com>
-> +
-> +description: |
-> +  The TH1520 GMAC is described in the TH1520 Peripheral Interface User Manual
-> +  https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
-> +
-> +  Features include
-> +    - Compliant with IEEE802.3 Specification
-> +    - IEEE 1588-2008 standard for precision networked clock synchronization
-> +    - Supports 10/100/1000Mbps data transfer rate
-> +    - Supports RGMII/MII interface
-> +    - Preamble and start of frame data (SFD) insertion in Transmit path
-> +    - Preamble and SFD deletion in the Receive path
-> +    - Automatic CRC and pad generation options for receive frames
-> +    - MDIO master interface for PHY device configuration and management
-> +
-> +  The GMAC Registers consists of two parts
-> +    - APB registers are used to configure clock frequency/clock enable/clock
-> +      direction/PHY interface type.
-> +    - AHB registers are use to configure GMAC core (DesignWare Core part).
-> +      GMAC core register consists of DMA registers and GMAC registers.
-> +
-> +select:
-> +  properties:
-> +    compatible:
-> +      contains:
-> +        enum:
-> +          - thead,th1520-gmac
-> +  required:
-> +    - compatible
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    items:
-> +      - enum:
-> +          - thead,th1520-gmac
-> +      - const: snps,dwmac-3.70a
-> +
-> +  reg:
-> +    items:
-> +      - description: DesignWare GMAC IP core registers
-> +      - description: GMAC APB registers
-> +
-> +  reg-names:
-> +    items:
-> +      - const: dwmac
-> +      - const: apb
+Hi Kuniyuki,
 
-I don't get why none of snps,dwmac properties are restricted. How many
-interrupts do you have here? How many clocks? resets?
+kernel test robot noticed the following build errors:
 
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +  - clock-names
-> +  - interrupts
+[auto build test ERROR on net-next/main]
 
-Drop
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/rtnetlink-Add-per-net-RTNL/20241001-043219
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240930202524.59357-2-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 1/3] rtnetlink: Add per-net RTNL.
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241001/202410011447.gX9yfZVj-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241001/202410011447.gX9yfZVj-lkp@intel.com/reproduce)
 
-> +  - interrupt-names
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410011447.gX9yfZVj-lkp@intel.com/
 
-Drop
+All errors (new ones prefixed by >>):
 
-> +  - phy-mode
-> +
-> +unevaluatedProperties: false
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
+   In file included from include/linux/spinlock.h:63,
+   from include/linux/sched.h:2140,
+   from arch/m68k/kernel/asm-offsets.c:15:
+>> include/linux/lockdep.h:413:52: error: unknown type name 'lock_cmp_fn'
+   413 | void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
+   |                                                    ^~~~~~~~~~~
+>> include/linux/lockdep.h:413:65: error: unknown type name 'lock_print_fn'
+   413 | void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
+   |                                                                 ^~~~~~~~~~~~~
+   make[3]: *** [scripts/Makefile.build:102: arch/m68k/kernel/asm-offsets.s] Error 1
+   make[3]: Target 'prepare' not remade because of errors.
+   make[2]: *** [Makefile:1203: prepare0] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:224: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:224: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
 
-Best regards,
-Krzysztof
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for PROVE_LOCKING
+   Depends on [n]: DEBUG_KERNEL [=y] && LOCK_DEBUGGING_SUPPORT [=n]
+   Selected by [y]:
+   - DEBUG_NET_SMALL_RTNL [=y]
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
 
+
+vim +/lock_cmp_fn +413 include/linux/lockdep.h
+
+fbb9ce9530fd9b6 Ingo Molnar     2006-07-03  411  
+eb1cfd09f788e39 Kent Overstreet 2023-05-09  412  #ifdef CONFIG_PROVE_LOCKING
+eb1cfd09f788e39 Kent Overstreet 2023-05-09 @413  void lockdep_set_lock_cmp_fn(struct lockdep_map *, lock_cmp_fn, lock_print_fn);
+eb1cfd09f788e39 Kent Overstreet 2023-05-09  414  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
