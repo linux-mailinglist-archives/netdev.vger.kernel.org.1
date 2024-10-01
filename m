@@ -1,96 +1,80 @@
-Return-Path: <netdev+bounces-130822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6A5D98BAAA
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:10:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6153D98BAAD
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 13:12:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68F69282803
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:10:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9246B1C21A17
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BE71BF339;
-	Tue,  1 Oct 2024 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD271BE844;
+	Tue,  1 Oct 2024 11:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oB2jz5rd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="frjVdLIa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5E11BF333;
-	Tue,  1 Oct 2024 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91BC81885A4;
+	Tue,  1 Oct 2024 11:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727781032; cv=none; b=lA5hUu8SrdoduDPKkY06mAYcQGEPQMX1MMNshe8b8cJiMqjvxdJCwN/Jh18E/FqG6JbOxgDnyHfnrBtu0diB1YZ+9P3CsBPrb1JedVEIMqvVmxRra5PLR4KkX5I+JRfUSV4i8Ol982dyo88MOp6hN7ZUhWFcqDyINmZQY2eYVrk=
+	t=1727781128; cv=none; b=ZQttga5LkpUs4vK7ryl/lk8R+SMUq3ajX4FNOF2QRWJQT+km3q2Zb1hVHqrek/JwRho1s5qfB56gvFIqZe0J781WmRhoqki/QpptOoMBvc1x6WUF09/MmayrvWumbx/r6vcYmXh4ARnPWZRw3glvz0+uCnJdc6z4ka40L1oCLhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727781032; c=relaxed/simple;
-	bh=+5/UtwCABVqIXqFPpwfo4yTpYXbi9/kqIYYgKn0CpSc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=g3Em18v/Qum9I4+LZCanlnY96LdFobaa2xRS5yS3YHQfd9ArC68FpAkmPTqL4CFaFgpvucV5ZTeqE2iZkPm3hpaBz4CpdfnV0M9di57TKHM+8rv5fXwXQZcEAu05zS1gQ/M4JgvumRqhvK67PSeo7ouOvDzFOUQcauFS5bmXdwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oB2jz5rd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28395C4CEC6;
-	Tue,  1 Oct 2024 11:10:32 +0000 (UTC)
+	s=arc-20240116; t=1727781128; c=relaxed/simple;
+	bh=bLTNjASZloJNRz+323HD1OnMVcxJtaaEL69n/0QFJiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TuFj6Csn55I3O0FSVnFNZtbD2tbqB/fqcZeuS5Hy91tyzPuKtWJ1zCj9zCE5XnxBSspG8Y00IoFAy6+ISsfDD2kAs6cb5CzkYuTxLveCpZ3omaZd0vljdHAn9+yc7obyNmETg5zfvHI5LRp5KQa5ZGw6o4lywNB9XgJ0kDpMr4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=frjVdLIa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CAB7C4CEC6;
+	Tue,  1 Oct 2024 11:12:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727781032;
-	bh=+5/UtwCABVqIXqFPpwfo4yTpYXbi9/kqIYYgKn0CpSc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oB2jz5rdFm5P/ZyyVdCg664P+qe128AWhH7AIyiLevU1CHnrJW4YX/EH7bIsYil69
-	 3LEbeCLGck9/jRxLPt3Gkqp1zxwVivRo5/8OxaqhR4jlPy5cF33GbnQpvOzq8qhuRh
-	 clVTHlu98ZliLeZCmzt1ENB/Wcucj4AuOmEWFsmIHhmjH0XKm4AsmX0ULatMWS+jOG
-	 OsIvKSr7Yyv3sJH/RwPrhAawsE6wYCCW504Yu+EUjhZ7z0d+kPTCEDrXakvoq8XXwG
-	 xwYocQFnetHIvzHPTKwA48lfeWlI5a1K6SwQULtaOQI+JXND760dTGgFa71otslhrW
-	 vpmVe4jDpi5RQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 719E1380DBF7;
-	Tue,  1 Oct 2024 11:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1727781128;
+	bh=bLTNjASZloJNRz+323HD1OnMVcxJtaaEL69n/0QFJiY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=frjVdLIae+QeEJ+ELUhBKrUQdEl5eWaR7zhkxEL4+nC6n7iQ7L+x8Ekhfa5F3s5md
+	 pmKdlYLFPXvaB7IoqPp20D73g6yvoD8Y9T2OL07YoWPCb0zq147M9r1CWX+BNjxqnE
+	 HCs4+WBtLBFADPIozfuYUt6e/nkN6bnIXlHpg7oS9oEnO5wZHLdznbsND53ZBTvDYb
+	 3MhloR3JcoNNIa4VwiCbTuaLAyUklhzaQxissC8lkM4bsS45FVF56L3yGCa/OsGbFI
+	 ZRET9K/4ML3R1kt+YEc1Qp42DWElqlEeDY6aty0amtkYrBCozoaIYsUJTJAnFVVpGs
+	 hp/7MZYRjxchA==
+Date: Tue, 1 Oct 2024 12:12:04 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH can-next] can: mcan: m_can_open(): simplify condition to
+ call free_irq()
+Message-ID: <20241001111204.GP1310185@kernel.org>
+References: <20240930-m_can-simplify-v1-1-43312571c028@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172778103527.314421.10268831803194238355.git-patchwork-notify@kernel.org>
-Date: Tue, 01 Oct 2024 11:10:35 +0000
-References: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-In-Reply-To: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-To: Anton Danilov <littlesmilingcloud@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, syoshida@redhat.com,
- sumang@marvell.com, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240930-m_can-simplify-v1-1-43312571c028@pengutronix.de>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 25 Sep 2024 02:51:59 +0300 you wrote:
-> Regression Description:
+On Mon, Sep 30, 2024 at 08:03:46PM +0200, Marc Kleine-Budde wrote:
+> The condition to call free_irq() in the error cleanup path of
+> m_can_open() can be simplified. The "is_peripheral" case also has a
+> "dev->irq != 0".
 > 
-> Depending on the options specified for the GRE tunnel device, small
-> packets may be dropped. This occurs because the pskb_network_may_pull
-> function fails due to the packet's insufficient length.
+> Simplify the condition, call free_irq() if "dev->irq != 0", i.e. the
+> device has an interrupt.
 > 
-> For example, if only the okey option is specified for the tunnel device,
-> original (before encapsulation) packets smaller than 28 bytes (including
-> the IPv4 header) will be dropped. This happens because the required
-> length is calculated relative to the network header, not the skb->head.
-> 
-> [...]
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Here is the summary with links:
-  - [net,v3] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-    https://git.kernel.org/netdev/net/c/c4a14f6d9d17
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
