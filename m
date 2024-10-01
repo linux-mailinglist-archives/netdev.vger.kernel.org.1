@@ -1,143 +1,123 @@
-Return-Path: <netdev+bounces-130696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505B398B2E8
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:19:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ECD598B315
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCF10B22923
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 04:19:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B1391F2420D
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 04:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913661B3B30;
-	Tue,  1 Oct 2024 04:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7B31B86D3;
+	Tue,  1 Oct 2024 04:37:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S+0SPQjf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UW+ebHyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D7001B3B2C
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 04:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D281B81D1;
+	Tue,  1 Oct 2024 04:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727756337; cv=none; b=Z/S4I6JNJceF4m+oLf8RUepPzlUJT9VDO7+ODxWWZwa3fwh33oXSACnsd5XoR2mins/yzwScZXL7jNutMPFKljVFXENiPEj8HOkARfQ1p4wcpZBmWW87YBP+njTpW8DYea/mPRQQuxR6ytPPtbPrb6ZUkIq60UKMndQRiPPUY+4=
+	t=1727757452; cv=none; b=X3fhlokNXp6BNI90WE62xKO2LLmoAPa34Ue0ijoWHaqVgT0Bi16LfxATFjyJk24n9c2mL8ljgpkTrzUgX10w7qSOi+cMrK28Ldne6cm8/AV9dj7dyzBoFTYN0GoxzKJfeCWKD9DFWJd/zZ7QczQwN2i4pqAC1+vFBCMU81fRcug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727756337; c=relaxed/simple;
-	bh=0b07S+vLXbusNjh+XL++Cg74xkkU7vzbIsgpE5rpVeE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OiDxXeKUcAOR7iLLrsPTv4IZaxiwHc5V88jZdxRbszWv/UQvZ7T8KH+g9wDaJiL84fgBqoKyS5XTln1UKcfaYIq0BQlCywiRWCR6qIS/I6UN1Z5KxiN8fQqD8XffMSsihEOreYIIhtDtrxmUp1ccWfmoHA/vJ2ZvMfCSRt520/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S+0SPQjf; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727756336; x=1759292336;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0b07S+vLXbusNjh+XL++Cg74xkkU7vzbIsgpE5rpVeE=;
-  b=S+0SPQjfvw6f8t1jkpBX9zbK5cFhrvP+HfbpW0bSCEL26y42TKIro+SO
-   tAT+1sm6xkA4qHP15XTsTRT4FTyUT4dhi9rDgJDCRBCnJwG8W15385lAM
-   Y3ZPYTTLorDgLXFt9ht32/H8pxmf4r2m1VU8w2frcbIC45DiknupuVpw4
-   QPqqThe20zw+Gyp2pYZVqBHwdXkE0QBPWT6fJcoyxsrLN3qQDHUySRUhI
-   K6hkozQsVQZUTAPxyEg9FHBr3cxUIYd/4MrX+QlFQ+GEG+FUyeRaw1U5/
-   qvkZXdeZneSwxVU0GnCNTZeSSaZlCFTNXqQQw8OIUSN7newvV4VhbbAuH
-   A==;
-X-CSE-ConnectionGUID: X5JN1wu/SnCE4fav4xVMaw==
-X-CSE-MsgGUID: 5sc0eJiDR86VGJsT08kSrQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="26676729"
-X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
-   d="scan'208";a="26676729"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2024 21:18:56 -0700
-X-CSE-ConnectionGUID: 7tSiUmT6Rq2viuSqFBLDmw==
-X-CSE-MsgGUID: 8sc6RV3/TO62Vs3ZkofgMw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
-   d="scan'208";a="78483449"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 30 Sep 2024 21:18:53 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1svULa-000QED-1L;
-	Tue, 01 Oct 2024 04:18:50 +0000
-Date: Tue, 1 Oct 2024 12:17:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Shenghao Yang <me@shenghaoyang.info>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Shenghao Yang <me@shenghaoyang.info>,
-	f.fainelli@gmail.com, olteanv@gmail.com, pavana.sharma@digi.com,
-	ashkan.boldaji@digi.com, kabel@kernel.org, andrew@lunn.ch
-Subject: Re: [PATCH net 2/3] net: dsa: mv88e6xxx: read cycle counter period
- from hardware
-Message-ID: <202410011105.XXvEbI6k-lkp@intel.com>
-References: <20240929101949.723658-3-me@shenghaoyang.info>
+	s=arc-20240116; t=1727757452; c=relaxed/simple;
+	bh=LZ5PMqQLlj+hCXJWg51KyuSJnp4YjqkIXXC/3j+wyAI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JOGpwNqGJJXtz8B/SiYmHsgnWjvsk1RMX7rFyisr4Q18nHSvKBZL3C3YYBm8h3rH3ZJpzS/3iqihO8yFQp6U3L6iw4JDAZ0Hs41lYmMyRg3egm1JM2L7opMBNvOSRITolkDaZBjJfYzxGfbBw4mjNd/WXJHQdBPr6fn2IpeyP2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UW+ebHyM; arc=none smtp.client-ip=209.85.222.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-84eb1deaf03so1081360241.3;
+        Mon, 30 Sep 2024 21:37:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727757449; x=1728362249; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=LZ5PMqQLlj+hCXJWg51KyuSJnp4YjqkIXXC/3j+wyAI=;
+        b=UW+ebHyMmianBqOl6Mm0JHDNDI10ClUg5f5P4xoxeb8cyw0gjP/SO2WZoistww236C
+         Rlzfr4/1NM0L9UKJKzJRGgajxOPOrGRTIU9solyaZ5rj2nw4QMOKIMPKobEMVfG0xH5j
+         PxOedCBUj74H06vKoytvcSC+CF8m4XTx3jC6Y7BbU3SnNMcvXcUV+KqqcXPIv7zfimHW
+         8/jwi+35zmuXPxpGNKcV0witWI8NBeWMvP0HnaLb7GC3O4kGDOoJI/fa5u4iodRnMFvn
+         Su7CFLoJsCspA+RagxeiVFjuf5lv7QP9vxY+2eHFajwFFHmadjj5tJBqGyk/nhWjTdTT
+         +D9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727757449; x=1728362249;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LZ5PMqQLlj+hCXJWg51KyuSJnp4YjqkIXXC/3j+wyAI=;
+        b=WNY3GbXs9gEs0eajd91YvfrvAblpv567CQJFc6Ua3zYHgbweMN6O3mewYWzkieK415
+         ij5ETJRCd547n3o1I3iyWpmf8pogczBX/KZ7cstrSexwRGsO9x9jGdndQAGAOZ8ITvJA
+         Camt34fp8zdsF/ZPO8Ck7Mw1Q37LENIszt6GzWU4XCOdeAhP3hxpjsJk/T3Mf1ztXg7t
+         LnCLaXG1/dXB+fAXmlVvBxauhTZqG3mrfJqZrbKgQrNEddkmEIxjBTMqUWnRcoC71/28
+         7WtsVgE31A5NV/ByARVO2OJ13DkdTi+1DIN9HVQmawMWFxt8NkyaD4iv7TpixrsLcFA5
+         la3w==
+X-Forwarded-Encrypted: i=1; AJvYcCVpac+F8CurcyMLi+vWu1laBJuWaors7OOI6ysP99bdlUh7y94JmtD9cf3GeAFuNWqvlgXA1HC7bfrn70c=@vger.kernel.org, AJvYcCXRccDyuUy0+q+SvqWbLTKs3KKujI/31tBIMD37vXwV4sLcxVabp2MtnVrVoJ6X6BUbMCcO2PkD@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2VGgGXzRw2UIJoXZ1xqRBtPnniB24bKXFSw13/D4HbtfKxoLt
+	WfeJy9Syx+CT/MIxrlTLp+2YF/RdzPUAh6S3iB+M3+oBMYM/aZusmqOBI1fqmNCccsk7qIuWTe5
+	XzaMXWDKuErpDvLcxPsH+zeE1i6M=
+X-Google-Smtp-Source: AGHT+IFNtWBr18OXyho9rBy13vllspx0N2cLNm0fW635niXQrBQe6lJbJVEeDFy1D6jM1e32W26/QFaKxUJl9fUltLU=
+X-Received: by 2002:a05:6122:1313:b0:50a:76c9:1b0 with SMTP id
+ 71dfb90a1353d-50a76d84983mr4237622e0c.11.1727757449623; Mon, 30 Sep 2024
+ 21:37:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240929101949.723658-3-me@shenghaoyang.info>
+References: <20240926160513.7252-1-kdipendra88@gmail.com> <20240927110236.GK4029621@kernel.org>
+ <20240927112958.46unqo3adnxin2in@skbuf> <20240927120037.ji2wlqeagwohlb5d@skbuf>
+ <CAEKBCKP2pGoy=CWpzn+NGq8r4biu=XVnszXQ=7Ruuan8rfxM1Q@mail.gmail.com> <20240930203224.v7h6d353umttbqu5@skbuf>
+In-Reply-To: <20240930203224.v7h6d353umttbqu5@skbuf>
+From: Dipendra Khadka <kdipendra88@gmail.com>
+Date: Tue, 1 Oct 2024 10:22:18 +0545
+Message-ID: <CAEKBCKNgG1VK9=q8XhNkhpUA+nKvFfO4AOAqQX=NubqsDu75nA@mail.gmail.com>
+Subject: Re: [PATCH net v5] net: systemport: Add error pointer checks in
+ bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Simon Horman <horms@kernel.org>, florian.fainelli@broadcom.com, 
+	bcm-kernel-feedback-list@broadcom.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	maxime.chevallier@bootlin.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Shenghao,
+Hi,
+On Tue, 1 Oct 2024 at 02:17, Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
+>
+> On Mon, Sep 30, 2024 at 11:52:45PM +0545, Dipendra Khadka wrote:
+> > > And why is the author of the blamed patch even CCed only at v5?!
+> >
+> > Sorry to know this, I ran the script and there I did not find your name.
+> >
+> > ./scripts/get_maintainer.pl drivers/net/ethernet/broadcom/bcmsysport.c
+> > Florian Fainelli <florian.fainelli@broadcom.com> (supporter:BROADCOM SYSTEMPORT ETHERNET DRIVER)
+> > Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com> (reviewer:BROADCOM SYSTEMPORT ETHERNET DRIVER)
+> > "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
+> > Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
+> > Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
+> > Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
+> > netdev@vger.kernel.org (open list:BROADCOM SYSTEMPORT ETHERNET DRIVER)
+> > linux-kernel@vger.kernel.org (open list)
+>
+> It's in the question you ask. Am I a maintainer of bcmsysport? No, and
+> I haven't made significant contributions on it either. But if you run
+> get_maintainer.pl on the _patch_ file that you will run through git
+> send-email, my name will be listed (the "--fixes" option defaults to 1).
+>
 
-kernel test robot noticed the following build warnings:
+Oh, thank you for this. I only used to run get_maintainers.pl on the
+file which got changed. I will run on the patch file as well from now.
 
-[auto build test WARNING on net/main]
+> The netdev CI also runs get_maintainers.pl on the actual patch, and that
+> triggers one of its red flags: "1 blamed authors not CCed: vladimir.oltean@nxp.com"
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240926160513.7252-1-kdipendra88@gmail.com/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Shenghao-Yang/net-dsa-mv88e6xxx-group-cycle-counter-coefficients/20240929-182245
-base:   net/main
-patch link:    https://lore.kernel.org/r/20240929101949.723658-3-me%40shenghaoyang.info
-patch subject: [PATCH net 2/3] net: dsa: mv88e6xxx: read cycle counter period from hardware
-config: sparc64-randconfig-r133-20240930 (https://download.01.org/0day-ci/archive/20241001/202410011105.XXvEbI6k-lkp@intel.com/config)
-compiler: sparc64-linux-gcc (GCC) 14.1.0
-reproduce: (https://download.01.org/0day-ci/archive/20241001/202410011105.XXvEbI6k-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410011105.XXvEbI6k-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/dsa/mv88e6xxx/ptp.c:35:34: sparse: sparse: symbol 'mv88e6xxx_cc_10ns_coeffs' was not declared. Should it be static?
->> drivers/net/dsa/mv88e6xxx/ptp.c:49:34: sparse: sparse: symbol 'mv88e6xxx_cc_8ns_coeffs' was not declared. Should it be static?
-
-vim +/mv88e6xxx_cc_10ns_coeffs +35 drivers/net/dsa/mv88e6xxx/ptp.c
-
-    27	
-    28	/* Family MV88E6250:
-    29	 * Raw timestamps are in units of 10-ns clock periods.
-    30	 *
-    31	 * clkadj = scaled_ppm * 10*2^28 / (10^6 * 2^16)
-    32	 * simplifies to
-    33	 * clkadj = scaled_ppm * 2^7 / 5^5
-    34	 */
-  > 35	const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_10ns_coeffs = {
-    36		.cc_shift = 28,
-    37		.cc_mult = 10 << 28,
-    38		.cc_mult_num = 1 << 7,
-    39		.cc_mult_dem = 3125ULL,
-    40	};
-    41	
-    42	/* Other families:
-    43	 * Raw timestamps are in units of 8-ns clock periods.
-    44	 *
-    45	 * clkadj = scaled_ppm * 8*2^28 / (10^6 * 2^16)
-    46	 * simplifies to
-    47	 * clkadj = scaled_ppm * 2^9 / 5^6
-    48	 */
-  > 49	const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_8ns_coeffs = {
-    50		.cc_shift = 28,
-    51		.cc_mult = 8 << 28,
-    52		.cc_mult_num = 1 << 9,
-    53		.cc_mult_dem = 15625ULL
-    54	};
-    55	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Best regards,
+Dipendra Khadka
 
