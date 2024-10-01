@@ -1,110 +1,167 @@
-Return-Path: <netdev+bounces-130966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F7F598C43B
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:10:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03F9898C44C
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EFDC1F21E99
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 17:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303B41C218D2
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 17:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 097EB1C9EC4;
-	Tue,  1 Oct 2024 17:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5E21CB506;
+	Tue,  1 Oct 2024 17:18:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HaY7fEq6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a41g3W32"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAF161C6F7B;
-	Tue,  1 Oct 2024 17:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103CE1C6F54;
+	Tue,  1 Oct 2024 17:17:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727802626; cv=none; b=QOJvRWiq1jAICkfbeyyIWhxvjOABJpj2B3R9wSNgZdr85Y43dHJIC1ZI/QtwB1qQGxQsGWxY7eVR6PCfNzmQzlQ4xrtRyrBlL+hkzidBtDMlD0gVH1YIWJYoZHmVNr9WLVTfnCAPebBZjeP2Mpk5/bd2aed+FVMkjbNF1HXo2YI=
+	t=1727803080; cv=none; b=ROEbgYpI3iORtMbplG+hIJ+BMU7rOdmbU49HJzpSRoxBZJHFGwAR59DwiNkzNbF9B1KYddVMLHJzg6GTy57dyOAXiEFPT5k0CjcUQBGVZfBeKmWkNOAP+8Hsml8/gkkOLR9NqbLi01K7gPeOzHX22Jqvihe6ePYJXm7U1WOEuyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727802626; c=relaxed/simple;
-	bh=SiGJOCfWx/20ZNw6yG9i8mDJDLn54cMmgbcdMBfdotM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBKgLPYiD8xuixhEhO1nL4D8NwbgWKxCxZcZQAuefGOnlzoDvZoEPMV3Y5JA0ZD6glxJ7VQMQZGI7LaMv/nNmBuZu++ZyH+sqVEXtVZdbhlJe5sAs7U5k/UNHZzCFV9aORV9ubeT58r7E3UABqyqRwMiANXoHcoahfRNYB2byA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HaY7fEq6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBD94C4CEC6;
-	Tue,  1 Oct 2024 17:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727802626;
-	bh=SiGJOCfWx/20ZNw6yG9i8mDJDLn54cMmgbcdMBfdotM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HaY7fEq6xPZExPCIBDaYDgJ2q8g9jHTdjgvahH4/HlQk8iszgTQWybHvik5hEq7zo
-	 Bd/sa+ZHQxCYOQyF6i+6HoFYtaHU8hxvOkPicG304PxYEikeM+0O+Dr/Pe3Uk8PD3G
-	 9OVlSsK7/P9dcaf5tPoRtD9b2pA8z3nRSq4wGyt/D0N2M4tub90lDbNC1qPadrySyA
-	 5jkahfBAwfbUuI+8sxNvM1fUhzNEmFb5wJP/zja/NkyPTBQN7g6OmnawkzGsIvNS9F
-	 TIcrJHuRpm0qqq113jDR7Zt5Tpt644bPNNT9pRSjHTYOsfP5EbDirJNVRvYMqzhCWi
-	 9sB9SHI2npbZg==
-Date: Tue, 1 Oct 2024 18:10:21 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	git@amd.com, Ravikanth Tuniki <ravikanth.tuniki@amd.com>
-Subject: Re: [PATCH net] dt-bindings: net: xlnx,axi-ethernet: Add missing reg
- minItems
-Message-ID: <20241001-confined-sedative-2917499eb5d6@spud>
-References: <1727723615-2109795-1-git-send-email-radhey.shyam.pandey@amd.com>
+	s=arc-20240116; t=1727803080; c=relaxed/simple;
+	bh=lnkQV2K24nseJignN+AR3Y8VuDdcOEW5Th76AN/3fIs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b/CQjx4xb6l9idV9xGBeF4PRlsxccfdoK48teLO69M4WG9p0By60EJpjQIbMO3YhVzQAbYgKG8Cz9JykF6W8Ni5dj5bVKh8OxGAMn3u4PbhYM0OycON3MSakQceIOrDz/lJZgdPaJOliA2RhpGWlwa8BrJzc7LFB8MSWXQBEwYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a41g3W32; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-45821ebb4e6so48661701cf.2;
+        Tue, 01 Oct 2024 10:17:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727803078; x=1728407878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dL2+jAlecroOKNLX5C3sYaHHGi+H+0q2TzNV+QlzKqk=;
+        b=a41g3W32uqGkWYO+V97YOJuogD7R6yfaBGdl0+GeGfvwJT0/bfw1AcBMPlOvjPPjjQ
+         Y8H2IuL4d+nyT2SvcaOpGn+/j4aFJdOflHLf+9GLQUeezGjZLDEVAdrNsk4Zuu7nVOcU
+         k48ljw+OothBjRPKXxu3sKWqO5apuRlNYM1OG3xpakOpVkztSaXtGlng/wOMRV9SxO3M
+         IEP6UxlxuDKHxvgmcH+0DRaAriCT7shq0lusbjPCeys8Ej2VLMsS+CI/c3/mTD9aeq1a
+         FLtTNQFO7znGC4UX01BIiJT586DNnT2fIMAcaxj4BtPTTHy+qrIU/xjJStipO5sIKo73
+         fYYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727803078; x=1728407878;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dL2+jAlecroOKNLX5C3sYaHHGi+H+0q2TzNV+QlzKqk=;
+        b=QM943qgySnCnv5LM37ohfJ0dPxLko8HnTCERd8K5nnbQjTvrWv+D/aaD/aWQe8+Fx9
+         gzoogV9VnPqd+lTSHN0QVJgRZMSEAgPY0nM5z3nJPENUaMG0CsTJP/ewXXeAWuuvkFQs
+         +WwIXG9L9fAS+46WzgkH/AC4KQyoyqzu4GhLz44RBwUpELoPluijRvqBjhLFbXCnOXPr
+         aEix7r+Y1rvC9zCsFeEsNqUN4ZwDMyKqUvPDH4aOqjdVVyW72aZXHW5AehrzO4J+f/SS
+         r3Lhihp4P1VkGBr1zg/8RQdNX7hMdgXkb/uzHwqzAfpwByxfwsWW8rpfqJhkM1gw297K
+         kG3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV6IJJ6UjycSKnQK7HShPzqpUqb7HfXw6MNC8p3RK5U0JRvNbta2XW7wxBo3hlIUdg+EMx4aCU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6ksIQw0AVQK45UAvWp+UiKMZx3UmLCSLZBO79tQq6WRoRVm2C
+	4wTQ7y9TSWvqfqQrdN9oAx1er2tgNCzo4lWyg7K0fnRpPeZTZJBhAQmWtA==
+X-Google-Smtp-Source: AGHT+IHspYBcPYnEwwKA/jY0nLvmGsuUwW/p8mdWZwnL0t18eBZVCPbq+8dq6XAdrDfgIi2PXxLPZA==
+X-Received: by 2002:ac8:580a:0:b0:458:23fc:1473 with SMTP id d75a77b69052e-45d80562129mr5281811cf.56.1727803077763;
+        Tue, 01 Oct 2024 10:17:57 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45c9f2f2264sm47679021cf.56.2024.10.01.10.17.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Oct 2024 10:17:56 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	stable@vger.kernel.org,
+	maze@google.com,
+	shiming.cheng@mediatek.com,
+	daniel@iogearbox.net,
+	lena.wang@mediatek.com,
+	herbert@gondor.apana.org.au,
+	steffen.klassert@secunet.com,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net v2] gso: fix udp gso fraglist segmentation after pull from frag_list
+Date: Tue,  1 Oct 2024 13:17:46 -0400
+Message-ID: <20241001171752.107580-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dq1H5QpMGtBiF6fu"
-Content-Disposition: inline
-In-Reply-To: <1727723615-2109795-1-git-send-email-radhey.shyam.pandey@amd.com>
+Content-Transfer-Encoding: 8bit
 
+From: Willem de Bruijn <willemb@google.com>
 
---dq1H5QpMGtBiF6fu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Detect gso fraglist skbs with corrupted geometry (see below) and
+pass these to skb_segment instead of skb_segment_list, as the first
+can segment them correctly.
 
-On Tue, Oct 01, 2024 at 12:43:35AM +0530, Radhey Shyam Pandey wrote:
-> From: Ravikanth Tuniki <ravikanth.tuniki@amd.com>
->=20
-> Add missing reg minItems as based on current binding document
-> only ethernet MAC IO space is a supported configuration.
->=20
-> There is a bug in schema, current examples contain 64-bit
-> addressing as well as 32-bit addressing. The schema validation
-> does pass incidentally considering one 64-bit reg address as
-> two 32-bit reg address entries. If we change axi_ethernet_eth1
-> example node reg addressing to 32-bit schema validation reports:
->=20
-> Documentation/devicetree/bindings/net/xlnx,axi-ethernet.example.dtb:
-> ethernet@40000000: reg: [[1073741824, 262144]] is too short
->=20
-> To fix it add missing reg minItems constraints and to make things clearer
-> stick to 32-bit addressing in examples.
->=20
-> Fixes: cbb1ca6d5f9a ("dt-bindings: net: xlnx,axi-ethernet: convert bindin=
-gs document to yaml")
-> Signed-off-by: Ravikanth Tuniki <ravikanth.tuniki@amd.com>
-> Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Valid SKB_GSO_FRAGLIST skbs
+- consist of two or more segments
+- the head_skb holds the protocol headers plus first gso_size
+- one or more frag_list skbs hold exactly one segment
+- all but the last must be gso_size
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+modify these skbs, breaking these invariants.
 
---dq1H5QpMGtBiF6fu
-Content-Type: application/pgp-signature; name="signature.asc"
+In extreme cases they pull all data into skb linear. For UDP, this
+causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
+udp_hdr(seg->next)->dest.
 
------BEGIN PGP SIGNATURE-----
+Detect invalid geometry due to pull, by checking head_skb size.
+Don't just drop, as this may blackhole a destination. Convert to be
+able to pass to regular skb_segment.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZvws/QAKCRB4tDGHoIJi
-0swwAQCpnbnTQorO35qE2tHaZ4T/C0u9oX8tMDcWcV/AcTQtEQD/V6ghJjqNo6ok
-Qa5ti5Mr7Pd6p2KfbfqX5BluQ/NZQg4=
-=DZEz
------END PGP SIGNATURE-----
+Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
+Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+Cc: stable@vger.kernel.org
 
---dq1H5QpMGtBiF6fu--
+---
+
+v1->v2
+  - update Fixes tag to point to udp specific patch
+  - reinit uh->check to pseudo csum as required by CHECKSUM_PARTIAL
+---
+ net/ipv4/udp_offload.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index d842303587af..a5be6e4ed326 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -296,8 +296,26 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 		return NULL;
+ 	}
+ 
+-	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+-		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
++	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
++		 /* Detect modified geometry and pass those to skb_segment. */
++		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
++			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
++
++		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
++		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
++		gso_skb->csum_offset = offsetof(struct udphdr, check);
++		gso_skb->ip_summed = CHECKSUM_PARTIAL;
++
++		uh = udp_hdr(gso_skb);
++		if (is_ipv6)
++			uh->check = ~udp_v6_check(gso_skb->len,
++						  &ipv6_hdr(gso_skb)->saddr,
++						  &ipv6_hdr(gso_skb)->daddr, 0);
++		else
++			uh->check = ~udp_v4_check(gso_skb->len,
++						  ip_hdr(gso_skb)->saddr,
++						  ip_hdr(gso_skb)->daddr, 0);
++	}
+ 
+ 	skb_pull(gso_skb, sizeof(*uh));
+ 
+-- 
+2.46.1.824.gd892dcdcdd-goog
+
 
