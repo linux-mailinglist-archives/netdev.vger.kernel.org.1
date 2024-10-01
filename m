@@ -1,147 +1,196 @@
-Return-Path: <netdev+bounces-131017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D7F98C62B
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:41:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C07098C641
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 21:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F087285C3D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:41:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16D00B21208
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 19:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A7E1CDA03;
-	Tue,  1 Oct 2024 19:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8471CDA11;
+	Tue,  1 Oct 2024 19:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cOaYH2EH"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="CpLVVc/y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3CB19FA9D;
-	Tue,  1 Oct 2024 19:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9F718754F;
+	Tue,  1 Oct 2024 19:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727811697; cv=none; b=cY7Ry3RkRlXQv65nb19CJFjpTrahJkgpf4Q8nLUkHA9miPqfKryV/qUQYmMtFnky50MPvu8Abvi1gBql4CURsFK+bMviEKTCiJHoQ8PDzWMPk/CIaBg8tT0kXlHAtGpLw8TCzEKU/txLpjb3bnqylv14Zj/kEQGGIqr6vylYJ6U=
+	t=1727812185; cv=none; b=l78UVFgBCbzxbACb3huh170J3HcZWX8G1V44YJRqpuQBI0pZBXOJzBXMD2XC2Jy1Brzfaw5puHeoZLOSSH8iPiPoQEx08Is6+tJVphzcr5x/nBd/AUCRMOkeq/pBA7+jjta76RbhIcRSM5dUm1NQZ1J+1g9WOJ1oKU2UPm3BbMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727811697; c=relaxed/simple;
-	bh=T16dC4qgiMjhuxjj795kPmIiFGUxRFKQUf8XvLY4pWY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c8y4n5IlFJFOAK3bAx+exRI3owxlTiSoxKOHt98DoYYeEPHa78lqLbvuP5dtLjNMlWL4igi04gPv6zOItG79JosXjt4uVjjAdWZsqRuMg8+HxZfcnfjXdkE03gqehHfOI5YbVD8cyoRAX5H0Y5F0HCxoQnynsGqXWU+64z8gUMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cOaYH2EH; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-82cd872755dso283682739f.1;
-        Tue, 01 Oct 2024 12:41:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727811694; x=1728416494; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eheZ+81CIdm0agzKG85LEBTlX/pbV0fMw4uZzaaH/Ew=;
-        b=cOaYH2EH+2BaVnfBJ1trcH164hgtltdwMFR8zFmc0RHJuO4HTtF7MOv+2FRtnqDXR5
-         edhbHI3uh8ZlR8DkYIEbtiduTxbsRN8Me5wxUlK+TURxZKphVQGkAjE0lsPLyJ6TITq6
-         JpZbaOwPfaO8HADa+lrfFmPiVSlo+GFWYWLV2Ln8hT4txNevvY4OV8sp2Ohkf2dqqfak
-         Mw10f4h+SJUKU+GWH5vKbeuwZKs3fqmguE6DTvbTUZmHMZXL0CDUK/vW6LbSfJDafk4E
-         G4tcPjmXdqCYW3w2e2yeCXQG5hre8/0VN8XgNycHZ0fiztVv1Ej/HjLRpHk3k+HfW+JK
-         dYdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727811694; x=1728416494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eheZ+81CIdm0agzKG85LEBTlX/pbV0fMw4uZzaaH/Ew=;
-        b=SiCpEC/xmI2Ekfi2EEud76GbHJF7Pd+d8g9XTH/fnNidoviqj1V8oY9UY39WU7BiFO
-         T8AsMmGqFAzP3AKuQpEpnTcRXFmTcYOfb8ZWhUW5buIkwocKNjjUxT8xltHcr1fNeDNI
-         BGFnVFsMupz8poQSR4VyZASJsAcokAjwQNfxjopxY2F6RzysSyK3iFBX3gSJiiBMQukF
-         dof3j6gCaYRr6E6U+4CLQCTxa4B9zHjo3jFxxCz/6We+QHgqhOnGZBiSIzHxyOmbzD7K
-         34PThmSF3MHrvPLTYOlnmZ5qTIC6iilj4dsd0J3HcxI+7a0ZDM1fUZO7HDciViRgoVLf
-         /Rqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVN7lf2Lc+KHEjXIlZFs+2sNf5oesTW6WVCNHcj5ua8bJaJTGjlkrvBHhxYQ0emRR/QRyAQN23eW5cD@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVtnogro9uA6nWLugnU1rHVpRal7Tz24TCZx/QfGUHm8DtDX/D
-	j85u/vRv4dn5M59zzluVTQj2kIQZ0eT3/oF5fHnyUaBq0ZSsbV3cqGLqNO/kWA4/a8V94Q1r9s+
-	IEdP+ds824Zd0k8nyyB81YLiJv+A=
-X-Google-Smtp-Source: AGHT+IErX+VcLEtCPGCxUBsgMD/2chditP5dbrtMdqJofM2u5M+j/klz0er312IDo7cFbpgN76Be3AuwUDd9ziDJ600=
-X-Received: by 2002:a05:6e02:1c07:b0:3a0:bc89:612 with SMTP id
- e9e14a558f8ab-3a36591aca8mr7527915ab.8.1727811694607; Tue, 01 Oct 2024
- 12:41:34 -0700 (PDT)
+	s=arc-20240116; t=1727812185; c=relaxed/simple;
+	bh=+zymqhK/RPac6FO790pXe9d4YYX6UL26m15YC0V1Kpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=unKOYPXrIzCdtLI+edSk9WThdTRp3nepz5vbgQrKXwqqtNmTaAsrbzMav+7wgh7vLMFFHgJdtPfqMkAAIzFlU0SyxEBcHd5wXZ1PnY1mDUHMIbj8tTEE/kFqVv7ZijBKSsMdK0diSEpy25utEMRRiUJLbtwgBnqzV6nCfXoU4E8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=CpLVVc/y; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=OMs01vLt7QmHAEmxpjTiJRUumvfPo+lAlhZ15bA0spo=; b=CpLVVc/yX53+kGY+fjWM4YgcYB
+	IHV5WjkhsAbFlFm3Nh0eBbFY+y6SIWkDS4slEs6Dbee48eNW8IchXScNkV1cf2IOajYqbNy+nJih6
+	W83DxmAt7G56UKJt29GjhzDCbxXe/GpjPtN5HdDjvC3Jj3Rw40aXx9pZRsaynhzc4BsCR5NEGvO/5
+	p0IxPe7QENanRxk8VuYISClcVYyZdzd30N23jFxewLyHBI6nYf2p7Hw/mrli7Rf00GeTSPPRz/ZCL
+	36X8fTPZcBMdcYhwO47cabi/j+Om7QM1e6w5w2fX+5hwQteC0d+IwsaHqRCpRu+4eWTNQHRXDulsj
+	YwB4SN9g==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1svisG-0008MT-UR; Tue, 01 Oct 2024 21:49:32 +0200
+Received: from [178.197.249.44] (helo=[192.168.1.114])
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1svisF-0001T3-1b;
+	Tue, 01 Oct 2024 21:49:31 +0200
+Message-ID: <4e04ef28-6c82-4624-ba40-c6072f8875a5@iogearbox.net>
+Date: Tue, 1 Oct 2024 21:49:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <a93e655b3c153dc8945d7a812e6d8ab0d52b7aa0.1727729391.git.lucien.xin@gmail.com>
- <ZvxKVpfDhuYIyXll@t14s.localdomain>
-In-Reply-To: <ZvxKVpfDhuYIyXll@t14s.localdomain>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 1 Oct 2024 15:41:23 -0400
-Message-ID: <CADvbK_cPTb6YgmSvh=3TpNyYzkZLGP8dv95dHKD5JwpvjxUQhg@mail.gmail.com>
-Subject: Re: [PATCH net] sctp: set sk_state back to CLOSED if autobind fails
- in sctp_listen_start
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: network dev <netdev@vger.kernel.org>, linux-sctp@vger.kernel.org, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next] bpf: Make sure internal and UAPI bpf_redirect
+ flags don't overlap
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+ Jesper Dangaard Brouer <brouer@redhat.com>
+Cc: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20240920125625.59465-1-toke@redhat.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20240920125625.59465-1-toke@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27414/Tue Oct  1 10:44:50 2024)
 
-On Tue, Oct 1, 2024 at 3:15=E2=80=AFPM Marcelo Ricardo Leitner
-<marcelo.leitner@gmail.com> wrote:
+On 9/20/24 2:56 PM, Toke Høiland-Jørgensen wrote:
+> The bpf_redirect_info is shared between the SKB and XDP redirect paths,
+> and the two paths use the same numeric flag values in the ri->flags
+> field (specifically, BPF_F_BROADCAST == BPF_F_NEXTHOP). This means that
+> if skb bpf_redirect_neigh() is used with a non-NULL params argument and,
+> subsequently, an XDP redirect is performed using the same
+> bpf_redirect_info struct, the XDP path will get confused and end up
+> crashing, which syzbot managed to trigger.
 >
-> On Mon, Sep 30, 2024 at 04:49:51PM -0400, Xin Long wrote:
-> > In sctp_listen_start() invoked by sctp_inet_listen(), it should set the
-> > sk_state back to CLOSED if sctp_autobind() fails due to whatever reason=
-.
-> >
-> > Otherwise, next time when calling sctp_inet_listen(), if sctp_sk(sk)->r=
-euse
-> > is already set via setsockopt(SCTP_REUSE_PORT), sctp_sk(sk)->bind_hash =
-will
-> > be dereferenced as sk_state is LISTENING, which causes a crash as bind_=
-hash
-> > is NULL.
-> >
-> >   KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007=
-]
-> >   RIP: 0010:sctp_inet_listen+0x7f0/0xa20 net/sctp/socket.c:8617
-> >   Call Trace:
-> >    <TASK>
-> >    __sys_listen_socket net/socket.c:1883 [inline]
-> >    __sys_listen+0x1b7/0x230 net/socket.c:1894
-> >    __do_sys_listen net/socket.c:1902 [inline]
-> >
-> > Fixes: 5e8f3f703ae4 ("sctp: simplify sctp listening code")
-> > Reported-by: syzbot+f4e0f821e3a3b7cee51d@syzkaller.appspotmail.com
-> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > ---
-> >  net/sctp/socket.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-> > index 32f76f1298da..078bcb3858c7 100644
-> > --- a/net/sctp/socket.c
-> > +++ b/net/sctp/socket.c
-> > @@ -8557,8 +8557,10 @@ static int sctp_listen_start(struct sock *sk, in=
-t backlog)
-> >        */
-> >       inet_sk_set_state(sk, SCTP_SS_LISTENING);
-> >       if (!ep->base.bind_addr.port) {
-> > -             if (sctp_autobind(sk))
-> > +             if (sctp_autobind(sk)) {
-> > +                     inet_sk_set_state(sk, SCTP_SS_CLOSED);
-> >                       return -EAGAIN;
-> > +             }
-> >       } else {
-> >               if (sctp_get_port(sk, inet_sk(sk)->inet_num)) {
-> >                       inet_sk_set_state(sk, SCTP_SS_CLOSED);
+> With the stack-allocated bpf_redirect_info, the structure is no longer
+> shared between the SKB and XDP paths, so the crash doesn't happen
+> anymore. However, different code paths using identically-numbered flag
+> values in the same struct field still seems like a bit of a mess, so
+> this patch cleans that up by moving the flag definitions together and
+> redefining the three flags in BPF_F_REDIRECT_INTERNAL to not overlap
+> with the flags used for XDP. It also adds a BUILD_BUG_ON() check to make
+> sure the overlap is not re-introduced by mistake.
 >
-> Then AFAICT the end of the function needs a patch as well, because it
-> returns what could be an error directly, without undoing this:
->
->         WRITE_ONCE(sk->sk_max_ack_backlog, backlog);
->         return sctp_hash_endpoint(ep);
-> }
->
-Right, but this is another issue and won't cause a crash, and the fix will
-need a different "Fixes:". I think we should fix it in a separate patch.
+> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+> Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+> ---
+>   include/uapi/linux/bpf.h | 14 ++++++--------
+>   net/core/filter.c        |  8 +++++---
+>   2 files changed, 11 insertions(+), 11 deletions(-)
+Lgtm, applied, thanks! I also added a tools header sync.I took this into 
+bpf tree, so that stable can pick it up.
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index c3a5728db115..0c6154272ab3 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6047,11 +6047,6 @@ enum {
+>   	BPF_F_MARK_ENFORCE		= (1ULL << 6),
+>   };
+>   
+> -/* BPF_FUNC_clone_redirect and BPF_FUNC_redirect flags. */
+> -enum {
+> -	BPF_F_INGRESS			= (1ULL << 0),
+> -};
+> -
+>   /* BPF_FUNC_skb_set_tunnel_key and BPF_FUNC_skb_get_tunnel_key flags. */
+>   enum {
+>   	BPF_F_TUNINFO_IPV6		= (1ULL << 0),
+> @@ -6198,11 +6193,14 @@ enum {
+>   	BPF_F_BPRM_SECUREEXEC	= (1ULL << 0),
+>   };
+>   
+> -/* Flags for bpf_redirect_map helper */
+> +/* Flags for bpf_redirect and bpf_redirect_map helpers */
+>   enum {
+> -	BPF_F_BROADCAST		= (1ULL << 3),
+> -	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4),
+> +	BPF_F_INGRESS		= (1ULL << 0), /* used for skb path */
+> +	BPF_F_BROADCAST		= (1ULL << 3), /* used for XDP path */
+> +	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4), /* used for XDP path */
+>   };
+> +#define BPF_F_REDIRECT_ALL_FLAGS (BPF_F_INGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
+> +
+>   
+Also fixed up extra newline.
+
+Thanks,
+Daniel
 
