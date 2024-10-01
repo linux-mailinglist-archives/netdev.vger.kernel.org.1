@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-130982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDA7298C553
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:29:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8AC98C555
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 20:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFC0C28744E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:29:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDDB01F2563B
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73DA11CCB30;
-	Tue,  1 Oct 2024 18:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF431CCEC9;
+	Tue,  1 Oct 2024 18:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KC56QCFZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J8VWbwiG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DF9321D;
-	Tue,  1 Oct 2024 18:29:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F6B1CCB37;
+	Tue,  1 Oct 2024 18:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727807361; cv=none; b=Cs9MExExpt+c+QtHWAInsoXCRFIim5OnhKCfE1x+geodKrfWV+i2WElkBuWZmT8m2/sCa5TOv+Y0aiKyP0kZTnr/IjohxY71m5H/G+3HQ6mLaUBvh5xUjney0YWPoq+zunlFb9ZbNMffE4bDsQtdrr9iPnXMZl5aO6H3u3/02z0=
+	t=1727807362; cv=none; b=S+UFTmKG9vgdrNS91urUt/zehBJgSEAyzGMhh21X8LOIGpaW1g2kCRNREoVFqEu+XAeFSFG4Wil6E8hW/S3xfwYnYevfW96yzHsaCoHz/A5qBPTk0U9sToGPkWgGI05gF6d6U3Zx4XgMoo7MCsX1yeOLPLJrOWRIEoAzl2B6+nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727807361; c=relaxed/simple;
-	bh=mKzdtNEIgcCT9P1DB0AuLjnrPoNxWxIEtQkyVpnAFWc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IGI4h6j1NeVlRsMDxhkakaH7XWY5+qWlfhR20JTQB9+OaiFU7Dpo4kPP1sIumid5kb24AJrg5JaOjZUCu8+JBd9DR639Ke40HTUSa95nCbC83rLbX+0fSJTGBi+Pd+EfdIbho5ODBgbXbRa1DRJiysy05eQbQH1k7LBlEKsZzok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KC56QCFZ; arc=none smtp.client-ip=209.85.215.178
+	s=arc-20240116; t=1727807362; c=relaxed/simple;
+	bh=UO1AK6cSFv2YpB5vO4G4kuMpDK6Xz9tYWWRtpYMz804=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bSPzjTHXrgz7idGzMaOPgE+V8Imsr+7QYneA6Tu/EQxhhSMcPOHuTQF86/UFMOdpfAeoMYW9i+RnKxjHvOuypLEsEpcnzV2LY3998gTSgY33c3XCwYgeX9BXeBQE9EZBWgGuAoRfhFrqqypCcn+RaBjOv7l+XZlKgTdHq7o0Z30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J8VWbwiG; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db637d1e4eso4570980a12.2;
-        Tue, 01 Oct 2024 11:29:19 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-717934728adso4575636b3a.2;
+        Tue, 01 Oct 2024 11:29:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727807359; x=1728412159; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4yNMqNPKdQYn0gEa8Zwr032aSRC+n25QcqGjI//D7qw=;
-        b=KC56QCFZYYEsyi2gMx6qOT5WoiS9xImv4LjsCdQAmVqx4kN8ecoXRkSBZeOoWUPTrA
-         Jn+ligj27GoZfce0GY95K7Pzyicorp3G/6pFLIbQnR6A3MdtKIngMsZENK65LJPFCAd4
-         88zG63/2C3znIOyyvZ8E92VXtcY4xOe+Z0ECvxO7ay9bcH1Jvg8dzPwIdV+RjxgZWcBF
-         p56Gj1sBOWUd5BsXg8SHPJOSMUOr9a6gf70gLehBcTrJgnmHMmPCmqUt7ZxPvJAVOKFo
-         UWjLnFQbpgnEPxmNmss+xGZnBJ6lXeqQxMxCVrB9ogB67YQo++jFwI6sgyIK0VeUQCor
-         NQAw==
+        d=gmail.com; s=20230601; t=1727807360; x=1728412160; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BNW0qIQYuJi3K43w+QYrXz5749AOyaUHcAHp+VAUvX8=;
+        b=J8VWbwiGgr66BcE/XzrokDlmiM31NanpjeOXLzismNGhs4s3pI6d3EC4mZphVi8GGX
+         x88p/T+TEMJZscPA+bD6kmqp8P5hgnLRbgVijjJDHQkmlGMYozg13sHhcV0Gm/+hV4RY
+         vsJ3gVM9zC5q3TDDaHEs9bD4jjM0YGoVn7vbYtq1yBsh0OqGjNRiXD/AjIxVsILPClY3
+         rvi27nVD5Qqz2X33A6uAZnCkX5s+05zeQy7gROWohUa1xtzwS0FMO17WkYzeGCMVrk2Z
+         c09iEW3EkeU2aMNxDvj0ELNH0aOCZLhX3wKllBrVUKzZACkQnvSi3RCB6M3MVwrpUnf3
+         Whkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727807359; x=1728412159;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4yNMqNPKdQYn0gEa8Zwr032aSRC+n25QcqGjI//D7qw=;
-        b=e2B6YiVPRQ3rVvhMSrVERGjIkUpOP0nGanvnXfjYCTvg2ep1WiwUmpVWcYSkyaBFXE
-         mQpNjWCKvab0auu5zlIow41LTL6bLDRB4Dg9JlKgt7JYowCKOU/nBDIs9IRil+AriXDt
-         vK6MiWmv0/zLwjyDMUSyX5sQhoWNL0CCnQ7GA862xDW43HGzoOxPNaPIZ8fcATx3+92x
-         hVVheTXL7epo2qVWWFRFbA9ucr5ztYSQMs3vLIR3os7gN1D4aM3FO88N2BQS6Nj0QVGb
-         SqwVk+Xq7IB+6BM2RTmMfeyh/Ws3pzYgzmIBinJtepJQ3GcDS31h956EFByiyNuqPt5/
-         GVEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWjgzacxYhlPDns2lFI6ntKLAfX8+FEXX3GHu/oSsbOriwjlK6F0rGCQGqUjtit75tvc0eNjAmhKhyEjag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAvUwj5AdZnmM+n2nu0h8JByxDaUsSaEUsPwJtakegAZApqpce
-	s0bFRI0G14/KKKEpAsBR/f6EEzEoXE4u8oOWXlUhyYnuAr9mfC/v3p4yTDSL
-X-Google-Smtp-Source: AGHT+IFwhR5ekNYcxPKTkn/38wwnxrSgwvizSpD2YlhM5d+YlO3cU7VLRytLSIN66umHLhAh9T8PAQ==
-X-Received: by 2002:a05:6a21:3983:b0:1d4:fcfe:e1ee with SMTP id adf61e73a8af0-1d5db0cc68bmr876533637.9.1727807359168;
-        Tue, 01 Oct 2024 11:29:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727807360; x=1728412160;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BNW0qIQYuJi3K43w+QYrXz5749AOyaUHcAHp+VAUvX8=;
+        b=HlVmXIzIdczoPSFikppgj/MaKvKlXK6bKLFm8sKbwKSS2284cOqB4noFIfr3gTZPzM
+         zwRLu1Ka5w3jCUVqeZZK1HO3ouHjfDLXpWxN+Ih+F/VVPLDT35O1UCTU5W2SJNbv9J9S
+         NI8RlbUJKUwxCP6iqOOqoyMmXUl1zVUyZn8rB7KMywNiai+2pD1YE75plaDXeZ9uqPCz
+         FKp0tJgscYTRMqBTDNGku3F0xVZ7d49CrlFh2T4p0HxG22TfwT+EsF2IKCO305YxU1MB
+         UwshwKGhIRMyU3Xh9RbVGlpwcMt/7KkBv30k2sGi3YdAPv5RFnT/wkfPJBBJ/VQekxfG
+         RXyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEV4OtqKo6whYQfUCs5wibFyGc1rZDSPJtqUqrPRtB3c/qHQKo/SrBvQ824NrlVagpk9YbjLiexWT4fpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBccfZPnwrZNJyG1mxl9SowciBYP9zKp9JwkQ1wioDrzZwydZ5
+	WYJsMAIz8cbBIA/2B05v+9Kuy9t6rXXdCU/K6ClHn40aisNUwhgEAbhmzYud
+X-Google-Smtp-Source: AGHT+IHCRQkqAgnNFAUzucFB9h5q6M3RzDuijt5RBuntg5OAKKr9hdtc9yUC7qRFq5VrxAFERkSmRA==
+X-Received: by 2002:a05:6a00:2d06:b0:717:d4e3:df21 with SMTP id d2e1a72fcca58-71dc5d8707emr902251b3a.23.1727807360449;
+        Tue, 01 Oct 2024 11:29:20 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26529d56sm8649467b3a.170.2024.10.01.11.29.18
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26529d56sm8649467b3a.170.2024.10.01.11.29.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 11:29:18 -0700 (PDT)
+        Tue, 01 Oct 2024 11:29:20 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -74,10 +76,12 @@ Cc: andrew@lunn.ch,
 	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org,
 	steve.glendinning@shawell.net
-Subject: [PATCHv2 net-next 0/9] clean up with devm
-Date: Tue,  1 Oct 2024 11:29:07 -0700
-Message-ID: <20241001182916.122259-1-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 1/9] net: smsc911x: use devm_platform_ioremap_resource
+Date: Tue,  1 Oct 2024 11:29:08 -0700
+Message-ID: <20241001182916.122259-2-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241001182916.122259-1-rosenp@gmail.com>
+References: <20241001182916.122259-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,24 +90,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It happens to fix missing frees, especially with mdiobus functions.
+Allows removal of a bunch of code relating to grabbing resources.
 
-v2: use reset_gpio variable to handle errors.
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/smsc/smsc911x.c | 47 +++++-----------------------
+ 1 file changed, 7 insertions(+), 40 deletions(-)
 
-Rosen Penev (9):
-  net: smsc911x: use devm_platform_ioremap_resource
-  net: smsc911x: use devm_alloc_etherdev
-  net: smsc911x: use devm for regulators
-  net: smsc911x: use devm for mdiobus functions
-  net: smsc911x: use devm for register_netdev
-  net: smsc911x: remove debug stuff from _remove
-  net: smsc911x: remove pointless NULL checks
-  net: smsc911x: remove enable_resources function
-  net: smsc911x: move reset_gpio member down
-
- drivers/net/ethernet/smsc/smsc911x.c | 231 ++++-----------------------
- 1 file changed, 31 insertions(+), 200 deletions(-)
-
+diff --git a/drivers/net/ethernet/smsc/smsc911x.c b/drivers/net/ethernet/smsc/smsc911x.c
+index 74f1ccc96459..3d4356df0070 100644
+--- a/drivers/net/ethernet/smsc/smsc911x.c
++++ b/drivers/net/ethernet/smsc/smsc911x.c
+@@ -2319,7 +2319,6 @@ static void smsc911x_drv_remove(struct platform_device *pdev)
+ {
+ 	struct net_device *dev;
+ 	struct smsc911x_data *pdata;
+-	struct resource *res;
+ 
+ 	dev = platform_get_drvdata(pdev);
+ 	BUG_ON(!dev);
+@@ -2334,15 +2333,6 @@ static void smsc911x_drv_remove(struct platform_device *pdev)
+ 	mdiobus_unregister(pdata->mii_bus);
+ 	mdiobus_free(pdata->mii_bus);
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-					   "smsc911x-memory");
+-	if (!res)
+-		res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-
+-	release_mem_region(res->start, resource_size(res));
+-
+-	iounmap(pdata->ioaddr);
+-
+ 	(void)smsc911x_disable_resources(pdev);
+ 	smsc911x_free_resources(pdev);
+ 
+@@ -2414,21 +2404,9 @@ static int smsc911x_drv_probe(struct platform_device *pdev)
+ 	struct net_device *dev;
+ 	struct smsc911x_data *pdata;
+ 	struct smsc911x_platform_config *config = dev_get_platdata(&pdev->dev);
+-	struct resource *res;
+-	int res_size, irq;
++	int irq;
+ 	int retval;
+ 
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-					   "smsc911x-memory");
+-	if (!res)
+-		res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		pr_warn("Could not allocate resource\n");
+-		retval = -ENODEV;
+-		goto out_0;
+-	}
+-	res_size = resource_size(res);
+-
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq == -EPROBE_DEFER) {
+ 		retval = -EPROBE_DEFER;
+@@ -2439,24 +2417,17 @@ static int smsc911x_drv_probe(struct platform_device *pdev)
+ 		goto out_0;
+ 	}
+ 
+-	if (!request_mem_region(res->start, res_size, SMSC_CHIPNAME)) {
+-		retval = -EBUSY;
+-		goto out_0;
+-	}
+-
+ 	dev = alloc_etherdev(sizeof(struct smsc911x_data));
+-	if (!dev) {
+-		retval = -ENOMEM;
+-		goto out_release_io_1;
+-	}
++	if (!dev)
++		return -ENOMEM;
+ 
+ 	SET_NETDEV_DEV(dev, &pdev->dev);
+ 
+ 	pdata = netdev_priv(dev);
+ 	dev->irq = irq;
+-	pdata->ioaddr = ioremap(res->start, res_size);
+-	if (!pdata->ioaddr) {
+-		retval = -ENOMEM;
++	pdata->ioaddr = devm_platform_ioremap_resource(pdev, 0);
++	if (IS_ERR(pdata->ioaddr)) {
++		retval = PTR_ERR(pdata->ioaddr);
+ 		goto out_ioremap_fail;
+ 	}
+ 
+@@ -2467,7 +2438,7 @@ static int smsc911x_drv_probe(struct platform_device *pdev)
+ 
+ 	retval = smsc911x_request_resources(pdev);
+ 	if (retval)
+-		goto out_request_resources_fail;
++		goto out_ioremap_fail;
+ 
+ 	retval = smsc911x_enable_resources(pdev);
+ 	if (retval)
+@@ -2564,12 +2535,8 @@ static int smsc911x_drv_probe(struct platform_device *pdev)
+ 	(void)smsc911x_disable_resources(pdev);
+ out_enable_resources_fail:
+ 	smsc911x_free_resources(pdev);
+-out_request_resources_fail:
+-	iounmap(pdata->ioaddr);
+ out_ioremap_fail:
+ 	free_netdev(dev);
+-out_release_io_1:
+-	release_mem_region(res->start, resource_size(res));
+ out_0:
+ 	return retval;
+ }
 -- 
 2.46.2
 
