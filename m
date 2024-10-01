@@ -1,139 +1,230 @@
-Return-Path: <netdev+bounces-130918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E522B98C0C8
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:53:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CDF398C0D6
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6A50284241
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:53:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E219285710
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 14:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E741C461F;
-	Tue,  1 Oct 2024 14:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F414C1C8FD2;
+	Tue,  1 Oct 2024 14:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5rD0Ir4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKaO29f9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818F3282F7
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 14:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C96F11C7B9D;
+	Tue,  1 Oct 2024 14:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727794411; cv=none; b=O8BTtX39Cb04XJKCSm6qKzpk8485DfORQhB5sQIl86aOt4hlnTHfZ5dsRdldx/2F4vwmEC9ymzohRNAVx8GZFJx6ozjMY2Q7R9s4DFPffiIi91l099HeXT7+9dNCo0W9oxt99+XiwEFdASOeJpc8c1C4bqG9vfJtR+JFVorac4A=
+	t=1727794501; cv=none; b=cxKwiiWTXkvrzdQBbbpqJpDU3UhT4hyh5vkxygmIGgQcIcfNDIzAFL8Ww/rniEdTTFxsv9x09rrL66W+ls5Uf4mW197Lxqr5VpsYLcguHa+q3zAnDANsfzmAYA2SAY3CSLLAbco/SomcFhN77ClwqAdkl/MAPYGrzXkw5+BHoIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727794411; c=relaxed/simple;
-	bh=yUtfkfIdDrnhy2KnwV9trAWpHCtsjfnbR7GfFoHnr38=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=YejywBo9qPEiqqVK+uhHZzRHcVMZYvHMCmFS69xVINfZUTencIeP5EOuM8/+0oJ8tKHERq1Thqm2Hu4MgK4AdbtJJ+9kmurhawc+hvrskPDgbYh07ULEyHfGCdi2tsbGz+tve4y872iMQ14NpCLfGhUyMVPCO7NRQWegTaSMjto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5rD0Ir4; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2fabe5c8c26so33896811fa.2
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 07:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727794407; x=1728399207; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0JqqD+DWVcLzJTK/AZZnNSETc+uwI7/dh+Z1slJhNwI=;
-        b=e5rD0Ir4wa2jrQajPJALLWYqOu2GSFDJoMJHWpwdE0qNH6VGwcU7NobJMawz3vEbOt
-         ypbSo63gjUwg5N2YDPtYmxQYevfE7w/kkIW2oUG06sq5y8biqJbH7vayaHztocLPXu+G
-         OdEN4BTN0WYmnfK46a1vWH3mY5dIeVvy92/yDtjI7edRYgZ0aygrNwpZzZHiaaOt24Ws
-         CZPyxmln+RizHHGE/IVAAIAP5Q6H3ur8qeuu2+ZPPWVQoO1SdJ3YkNm+lQMjrxtkYEx1
-         hF0xkRDZLaf3spLwBTd1ae7z73Mt02S8ZZIZlfqeekbgabbeRKazUlAV+ezixqLonnnn
-         WAYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727794407; x=1728399207;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0JqqD+DWVcLzJTK/AZZnNSETc+uwI7/dh+Z1slJhNwI=;
-        b=s/EGopIz0UpJdhs6kPCvU9chyHxLRh7qdZg4qkDLyvX8iYa4Kq2yqZIQPiz+fpOOyf
-         uVvnm8xTFSe25OId2qRf6iO2N4wuadQ9cnv/mbux9CKyAJmRXwTaGML0CKDxj6b+Nr79
-         PCxmgRtuR+B+N07C0RzP5ec6VBqLdZK8HjxCGd2ez05atlMnor9BeF/fxjURdsBvFJPF
-         MOvyCGYFwMrtuAoO9Z109XA/GJRvVt/qIkt6XL3TnmshCx+n+1tjzc8AJTfT9PTVzcOS
-         pe7OVW7irwfgpHfkNBPBMu2rL9DGH8fkEp83sgRO25OADJEB2Rj6Kz6OW5KXrszVQchU
-         0ZEw==
-X-Gm-Message-State: AOJu0YysMmczRA3V+ZVb/NIMfoJKK90TybPCu2peDgikpXCBSAyNyeDg
-	wLk6oGqnalkwJU+bVD27PGleDoox3W5IROcbW5TcqegXuK9C6XuseG7Lv+Sl9zNnlTKRQDTP+bN
-	Jt4Ed+PYpTwIR1IXhdeGlYgfIJkZk1SyTBYeRau4=
-X-Google-Smtp-Source: AGHT+IE3p+K200dsUwtiFafHsHXjJTviSNhqzkYBMyQoD/yye1eSA53hFFHtCO/qLWJLdxggiOczwROE9POazvsUZD4=
-X-Received: by 2002:a2e:4a1a:0:b0:2f3:d8dd:a1f6 with SMTP id
- 38308e7fff4ca-2fae10877bdmr116071fa.40.1727794407001; Tue, 01 Oct 2024
- 07:53:27 -0700 (PDT)
+	s=arc-20240116; t=1727794501; c=relaxed/simple;
+	bh=K73I+jE0VsIHKMTIulu1znEQ33yW3tbXLveEep54EC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WQIMFREYfPES0kEDHsWMwgmqNMbQDzKMTF570n/N8yQkp64FQcqUNcQuj/AdReU6i+1Rm0+acckx8OKpcsE8xc5vS0Eq0SA1sASZe3emIBtkMCBUDjo8fRa1Tl19XBQ+B7+xWlc06UvEddvcGL1P6UT3IoM0DmAwddIcv7pSWLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKaO29f9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFA89C4CEC6;
+	Tue,  1 Oct 2024 14:55:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727794501;
+	bh=K73I+jE0VsIHKMTIulu1znEQ33yW3tbXLveEep54EC4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vKaO29f9wCjbLAMhegO8JcQuaQSybTEVgjIBoAGycugkXnIRGrcBulXlK+OHVHTPp
+	 5YbwlYq8u8oy4aP5qWx/+uWSJcKECxX3ov+uyvWsZ4+gjXInTSkLbu14/eKVRdECq8
+	 SJuz6nUJZNy4uVP+dxZwqy8GScmyQMmybnwxcbuEormjgD3JWUbA+Kx4AM/phdU2vH
+	 PH7vdFox1J6BR/I2GzaQo8yoH5janJmaHo+u722ndB9rxQpWCi448+TuOz92q4zGDl
+	 XpUdkZVed72v5QHcCyFubFR43KUogJIAyQZzV2FVOhb7wlXUUJmqY5X3/H96rUvO27
+	 ZVImFPxfxJrXA==
+Date: Tue, 1 Oct 2024 16:54:58 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Arthur Fabre <afabre@cloudflare.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
+	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
+	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	kernel-team <kernel-team@cloudflare.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+Message-ID: <ZvwNQqN4gez1Ksfn@lore-desk>
+References: <87ldzkndqk.fsf@toke.dk>
+ <CAOn4ftshf3pyAst27C2haaSj4eR2n34_pcwWBc5o3zHBkwRb3g@mail.gmail.com>
+ <87wmiysi37.fsf@toke.dk>
+ <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
+ <87ldzds8bp.fsf@toke.dk>
+ <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
+ <ZvbKDT-2xqx2unrx@lore-rh-laptop>
+ <871q11s91e.fsf@toke.dk>
+ <ZvqQOpqnK9hBmXNn@lore-desk>
+ <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Budimir Markovic <markovicbudimir@gmail.com>
-Date: Tue, 1 Oct 2024 16:53:15 +0200
-Message-ID: <CALk3=6u+PTcc2xhCx3YgWrx3_SzazpXTk1ndDmik+AOi==oq9Q@mail.gmail.com>
-Subject: Use-after-free from netem/hfsc interaction
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QZlN8fZgoeG75Oo9"
+Content-Disposition: inline
+In-Reply-To: <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
 
-There is a bug leading to a use-after-free in an interaction between
-netem_dequeue() and hfsc_enqueue() (I originally sent this to
-security@kernel.org and was told to send it here for further discussion).
 
-If an HFSC RSC class has a netem child qdisc, the peek() in hfsc_enqueue() will
-call netem_dequeue() which may drop the packet. When netem_dequeue() drops
-a packet, it uses qdisc_tree_reduce_backlog() to decrement its ancestor qdisc's
-q.qlens. The problem is that the ancestor qdiscs have not yet accounted for
-the packet at this point.
+--QZlN8fZgoeG75Oo9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In this case hfsc_enqueue() still returns NET_XMIT_SUCCESS, so the q.qlens have
-the correct values at the end. However since they are decremented and
-incremented in the wrong order, the ancestor classes may be added to active
-lists after qlen_notify() has tried to remove them, leaving dangling pointers.
+> On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi wrote:
+> > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
+> > >=20
+> > > >> > We could combine such a registration API with your header format=
+, so
+> > > >> > that the registration just becomes a way of allocating one of th=
+e keys
+> > > >> > from 0-63 (and the registry just becomes a global copy of the he=
+ader).
+> > > >> > This would basically amount to moving the "service config file" =
+into the
+> > > >> > kernel, since that seems to be the only common denominator we ca=
+n rely
+> > > >> > on between BPF applications (as all attempts to write a common d=
+aemon
+> > > >> > for BPF management have shown).
+> > > >>=20
+> > > >> That sounds reasonable. And I guess we'd have set() check the glob=
+al
+> > > >> registry to enforce that the key has been registered beforehand?
+> > > >>=20
+> > > >> >
+> > > >> > -Toke
+> > > >>=20
+> > > >> Thanks for all the feedback!
+> > > >
+> > > > I like this 'fast' KV approach but I guess we should really evaluat=
+e its
+> > > > impact on performances (especially for xdp) since, based on the kfu=
+nc calls
+> > > > order in the ebpf program, we can have one or multiple memmove/memc=
+py for
+> > > > each packet, right?
+> > >=20
+> > > Yes, with Arthur's scheme, performance will be ordering dependent. Us=
+ing
+> > > a global registry for offsets would sidestep this, but have the
+> > > synchronisation issues we discussed up-thread. So on balance, I think
+> > > the memmove() suggestion will probably lead to the least pain.
+> > >=20
+> > > For the HW metadata we could sidestep this by always having a fixed
+> > > struct for it (but using the same set/get() API with reserved keys). =
+The
+> > > only drawback of doing that is that we statically reserve a bit of
+> > > space, but I'm not sure that is such a big issue in practice (at least
+> > > not until this becomes to popular that the space starts to be contend=
+ed;
+> > > but surely 256 bytes ought to be enough for everybody, right? :)).
+> >
+> > I am fine with the proposed approach, but I think we need to verify wha=
+t is the
+> > impact on performances (in the worst case??)
+>=20
+> If drivers are responsible for populating the hardware metadata before
+> XDP, we could make sure drivers set the fields in order to avoid any
+> memove() (and maybe even provide a helper to ensure this?).
 
-Commit 50612537e9ab ("netem: fix classful handling") added qdisc_enqueue() to
-netem_dequeue(), making it possible for it to drop a packet. Later, commit
-12d0ad3be9c3 ("net/sched/sch_hfsc.c: handle corner cases where head may change
-invalidating calculated deadline") added a call to peek() to hfsc_enqueue().
+nope, since the current APIs introduced by Stanislav are consuming NIC
+metadata in kfuncs (mainly for af_xdp) and, according to my understanding,
+we want to add a kfunc to store the info for each NIC metadata (e.g rx-hash,
+timestamping, ..) into the packet (this is what Toke is proposing, right?).
+In this case kfunc calling order makes a difference.
+We can think even to add single kfunc to store all the info for all the NIC
+metadata (maybe via a helping struct) but it seems not scalable to me and we
+are losing kfunc versatility.
 
-The QFQ qdisc also calls peek() from qfq_enqueue(). It cannot be used to create
-a dangling pointer in the same way, but may still be exploitable.  I will look
-into it more if the patch for this bug does not address it.
+Regards,
+Lorenzo
 
-A quick fix is to prevent netem_dequeue() from calling qdisc_enqueue() when it
-is called from an enqueue function.  I believe qdisc_is_running() can be used
-to determine this:
+>=20
+> > > > Moreover, I still think the metadata area in the xdp_frame/xdp_buff=
+ is not
+> > > > so suitable for nic hw metadata since:
+> > > > - it grows backward=20
+> > > > - it is probably in a different cacheline with respect to xdp_frame
+> > > > - nic hw metadata will not start at fixed and immutable address, bu=
+t it depends
+> > > >   on the running ebpf program
+> > > >
+> > > > What about having something like:
+> > > > - fixed hw nic metadata: just after xdp_frame struct (or if you wan=
+t at the end
+> > > >   of the metadata area :)). Here he can reuse the same KV approach =
+if it is fast
+> > > > - user defined metadata: in the metadata area of the xdp_frame/xdp_=
+buff
+> > >=20
+> > > AFAIU, none of this will live in the (current) XDP metadata area. It
+> > > will all live just after the xdp_frame struct (so sharing the space w=
+ith
+> > > the metadata area in the sense that adding more metadata kv fields wi=
+ll
+> > > decrease the amount of space that is usable by the current XDP metada=
+ta
+> > > APIs).
+> > >=20
+> > > -Toke
+> > >=20
+> >
+> > ah, ok. I was thinking the proposed approach was to put them in the cur=
+rent
+> > metadata field.
+>=20
+> I've also been thinking of putting this new KV stuff at the start of the
+> headroom (I think that's what you're saying Toke?). It has a few nice
+> advantanges:
+>=20
+> * It coexists nicely with the current XDP / TC metadata support.
+> Those users won't be able to overwrite / corrupt the KV metadata.
+> KV users won't need to call xdp_adjust_meta() (which would be awkward -
+> how would they know how much space the KV implementation needs).
+>=20
+> * We don't have to move all the metadata everytime we call
+> xdp_adjust_head() (or the kernel equivalent).
+>=20
+> Are there any performance implications of that, e.g. for caching?
+>=20
+> This would also grow "upwards" which is more natural, but I think=20
+> either way the KV API would hide whether it's downwards or upwards from
+> users.
+>=20
+> >
+> > Regards,
+> > Lorenzo
+>=20
 
-diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-index 39382ee1e..6150a2605 100644
---- a/net/sched/sch_netem.c
-+++ b/net/sched/sch_netem.c
-@@ -698,6 +698,9 @@ static struct sk_buff *netem_dequeue(struct Qdisc *sch)
-        struct netem_sched_data *q = qdisc_priv(sch);
-        struct sk_buff *skb;
+--QZlN8fZgoeG75Oo9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-+       if (q->qdisc && !qdisc_is_running(qdisc_root_b
-h(sch)))
-+               return NULL;
-+
- tfifo_dequeue:
-        skb = __qdisc_dequeue_head(&sch->q);
-        if (skb) {
+-----BEGIN PGP SIGNATURE-----
 
-I do not see a better way to fix the bug without larger changes, such as moving
-qdisc_enqueue() out of netem_dequeue() and into netem_enqueue().
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZvwNQgAKCRA6cBh0uS2t
+rPPCAP9NLWLOvwOPJvBCDjraaJ1dXthG/l5SniJouVDlxP1+ZAEA7a8VgC/fcorU
+Vjt+2iF85Ez8TF5ht/npXVtMFFfi2Qk=
+=QR1N
+-----END PGP SIGNATURE-----
 
-Commands to trigger KASAN UaF detection on a drr_class:
-
-ip link set lo up
-tc qdisc add dev lo parent root handle 1: drr
-tc filter add dev lo parent 1: basic classid 1:1
-tc class add dev lo parent 1: classid 1:1 drr
-tc qdisc add dev lo parent 1:1 handle 2: hfsc def 1
-tc class add dev lo parent 2: classid 2:1 hfsc rt m1 8 d 1 m2 0
-tc qdisc add dev lo parent 2:1 handle 3: netem
-tc qdisc add dev lo parent 3: handle 4: drr
-tc filter add dev lo parent 4: basic action drop
-ping -c1 -W0.01 localhost
-tc class del dev lo classid 1:1
-tc class add dev lo parent 1: classid 1:1 drr
-ping -c1 -W0.01 localhost
+--QZlN8fZgoeG75Oo9--
 
