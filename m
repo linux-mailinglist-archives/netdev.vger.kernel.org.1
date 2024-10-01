@@ -1,195 +1,184 @@
-Return-Path: <netdev+bounces-130777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0395198B7E4
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:06:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAFEF98B7ED
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 11:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87F9F1F22919
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:06:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5055AB26269
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 09:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B00919B587;
-	Tue,  1 Oct 2024 09:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E762419D08C;
+	Tue,  1 Oct 2024 09:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="T21ZzR/v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4xOF5sK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA384594C;
-	Tue,  1 Oct 2024 09:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3624F19CC0A;
+	Tue,  1 Oct 2024 09:07:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727773583; cv=none; b=spa2sOO4uHTkcIU7gkRCJAXSxb5mFhboxUXlIsjqd/SJvxg7oFTmkppfweaBupxVTzqMf/cPniW8HHXAW/qYBN13BGwbfowQvFuy8K3mpbHMxVRTB9JvgWGJDG3paksbOi24y90tjTNs+O9fqmSGtxph1VxAuZJqsYQML77r5jc=
+	t=1727773628; cv=none; b=Q2QO01XQxG8N3p9z8y+bvhT9LcyFlmcDlT0LPlYmdNlGnZII9ANj4fkn5Mbvhh92WXyaH6qVkjO30ZbjQ+XE6szZtA5Ur6fJdTH39ob8hvlMUIodwD4H5ZwdJzhTm1aqHrQJ/SeNnbNYCxJEHw2zh/9lWkXOnYZa+KLRnlOnC+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727773583; c=relaxed/simple;
-	bh=oPiIYp4JekqEhzJN+y9M7tkZJZObfmvAT3QnLK9Z5Lc=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TIn/sJYNgKuJMTZhsEsvX0lv4b+L4F7vl/gg0NNvi9Qfo42XdzDGwIH26wz6sG/D10elplYS/CJSk3OC1fzExouIJnU4AGUNaP/ai4Z/0uqKzPv+l6/isRhflGztFh4eaxHglAmdyITxov0DIjndAGGNkTBBZ9pqAhwGL7+NAGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=T21ZzR/v; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727773581; x=1759309581;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=+dogXWhFxVkHe7FI5agVHowCHyKBeUqTNwxtykk12D0=;
-  b=T21ZzR/vtDoUQgIcyA0RLU2QeCxXBgW6r0/3fKwRpHvAdETVh1QkOpRK
-   EWHnhGAN+Aj7RqV9rTn6q/BXzYeK811Rf0o4VNElEAexpvSFZTs+EiU0o
-   y10owRMEoiDQ+GzU8ZBsxG1Can1NXpm5dIvpsahSl9EqfYgc15PyZ+CXQ
-   E=;
-X-IronPort-AV: E=Sophos;i="6.11,167,1725321600"; 
-   d="scan'208";a="133396868"
-Subject: RE: [net-next 2/2] ena: Link queues to NAPIs
-Thread-Topic: [net-next 2/2] ena: Link queues to NAPIs
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 09:06:18 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.17.79:10479]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.12.93:2525] with esmtp (Farcaster)
- id a6769dc4-c9ef-4373-8346-2e39b6b9a470; Tue, 1 Oct 2024 09:06:17 +0000 (UTC)
-X-Farcaster-Flow-ID: a6769dc4-c9ef-4373-8346-2e39b6b9a470
-Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 1 Oct 2024 09:06:16 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 1 Oct 2024 09:06:16 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 1 Oct 2024 09:06:16 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Joe Damato <jdamato@fastly.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "Agroskin, Shay" <shayagr@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bshara, Saeed"
-	<saeedb@amazon.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Kamal Heib <kheib@redhat.com>, open list
-	<linux-kernel@vger.kernel.org>, "Bernstein, Amit" <amitbern@amazon.com>
-Thread-Index: AQHbE3LvonMH5qZYjUqecQ4N60GeD7Jxkpvg
-Date: Tue, 1 Oct 2024 09:06:16 +0000
-Message-ID: <eb828dd9f65847a49eb64763740c84ff@amazon.com>
-References: <20240930195617.37369-1-jdamato@fastly.com>
- <20240930195617.37369-3-jdamato@fastly.com>
-In-Reply-To: <20240930195617.37369-3-jdamato@fastly.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1727773628; c=relaxed/simple;
+	bh=m97NaR/uwM/LoByNr7jk1ak8+1faMfudA3HDDJa1jBQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=akcaOcV28nO9iEQTb/RUIv16kcgq+TSe/Wc1sUoaUP2ue+c1kY8SUggqsJOwX2XTgKEgfr5wuEi8kzWmrJORnwGlAMnpJwiWexmoBxmeh5NHQIdIRQLn5wqaNQo4yCPIACCAwAPOIuZdnRuRwxDrTI3oLfFIAdEr/rLfw2K7Qpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4xOF5sK; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727773627; x=1759309627;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m97NaR/uwM/LoByNr7jk1ak8+1faMfudA3HDDJa1jBQ=;
+  b=i4xOF5sKEcVbFekmdnCSMR+cnRPA4hmKBdS9JZCe6V1tp+wKRs9VI2eO
+   PxeBU/c2Pz9TWdoCc5VO0qocXtkR1Pm9sHTH3q6fF9cRJKLm+nTRdSgcP
+   SuXEkzRg6mU62sLxqk0SCTuoUfZJxyxL8J53iHPWMR3tMCsUojjba4sEt
+   Q6Gxy4d2nbgIPi69O5GAk2npEVgwmYITSuv8zig7ztYuuAD3qjwtuWo06
+   cRw5lmSz7GPA/HOKKp1XSz5ziwmOFvNAOB+E3jlUPYWF8GpbFuLM5gH94
+   rYUYdhe2SG3y5sN+xqWidsfQ+MsPz08Uaj2zvuSjx0vYBIvT9Yb0trWJj
+   A==;
+X-CSE-ConnectionGUID: Jtgvw55ARa6cvlUvdSfq1w==
+X-CSE-MsgGUID: N7RX5xitS9u3byBQpSk4lQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11211"; a="52306003"
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="52306003"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2024 02:07:07 -0700
+X-CSE-ConnectionGUID: ojDeIRRCQy6cXbvKsd4T0g==
+X-CSE-MsgGUID: N/BxBTXLSmyOMZi+tRyimQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,167,1725346800"; 
+   d="scan'208";a="73564062"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 01 Oct 2024 02:07:03 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1svYqT-000QU9-0V;
+	Tue, 01 Oct 2024 09:07:01 +0000
+Date: Tue, 1 Oct 2024 17:06:18 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: Re: [PATCH net-next 09/13] net: ibm: emac: rgmii:
+ devm_platform_get_resource
+Message-ID: <202410011626.D4gEmLU8-lkp@intel.com>
+References: <20240930180036.87598-10-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240930180036.87598-10-rosenp@gmail.com>
 
-> Link queues to NAPIs using the netdev-genl API so this information is
-> queryable.
->=20
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
->=20
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'rx'},
->  {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'rx'},
->  {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'rx'},
->  {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'rx'},
->  {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'tx'},
->  {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'tx'},
->  {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'tx'},
->  {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'tx'},
->  {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'tx'}]
->=20
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_netdev.c | 26
-> +++++++++++++++++---
->  1 file changed, 22 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> index e88de5e426ef..1c59aedaa5d5 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> @@ -1821,20 +1821,38 @@ static void ena_napi_disable_in_range(struct
-> ena_adapter *adapter,
->                                       int first_index,
->                                       int count)  {
-> +       struct napi_struct *napi;
+Hi Rosen,
 
-Is this variable necessary? It has been defined in the enable function beca=
-use
-it is needed in netif_queue_set_napi() API as well as in napi_enable(),
-and it makes sense in order to avoid long lines
-In here, the variable is only used in a call to napi_disable(), can the cod=
-e
-be kept as it is? don't see a need to shorten the napi_disable() call line.
+kernel test robot noticed the following build errors:
 
->         int i;
->=20
-> -       for (i =3D first_index; i < first_index + count; i++)
-> -               napi_disable(&adapter->ena_napi[i].napi);
-> +       for (i =3D first_index; i < first_index + count; i++) {
-> +               napi =3D &adapter->ena_napi[i].napi;
-> +               if (!ENA_IS_XDP_INDEX(adapter, i)) {
-> +                       netif_queue_set_napi(adapter->netdev, i,
-> +                                            NETDEV_QUEUE_TYPE_TX, NULL);
-> +                       netif_queue_set_napi(adapter->netdev, i,
-> +                                            NETDEV_QUEUE_TYPE_RX, NULL);
-> +               }
-> +               napi_disable(napi);
-> +       }
->  }
->=20
->  static void ena_napi_enable_in_range(struct ena_adapter *adapter,
->                                      int first_index,
->                                      int count)  {
-> +       struct napi_struct *napi;
->         int i;
->=20
-> -       for (i =3D first_index; i < first_index + count; i++)
-> -               napi_enable(&adapter->ena_napi[i].napi);
-> +       for (i =3D first_index; i < first_index + count; i++) {
-> +               napi =3D &adapter->ena_napi[i].napi;
-> +               napi_enable(napi);
-> +               if (!ENA_IS_XDP_INDEX(adapter, i)) {
+[auto build test ERROR on net-next/main]
 
-Can you share some info on why you decided to set the queue to napi associa=
-tion
-only in non-xdp case?
-In XDP, there's a napi poll function that's executed and it runs on the TX =
-queue.
-I am assuming that it's because XDP is not yet supported in the framework? =
-If so,
-there's a need to add an explicit comment above if (!ENA_IS_XDP_INDEX(adapt=
-er, i)) {
-explaining this in order to avoid confusion with the rest of the code.
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-ibm-emac-remove-custom-init-exit-functions/20241001-020553
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240930180036.87598-10-rosenp%40gmail.com
+patch subject: [PATCH net-next 09/13] net: ibm: emac: rgmii: devm_platform_get_resource
+config: powerpc-canyonlands_defconfig (https://download.01.org/0day-ci/archive/20241001/202410011626.D4gEmLU8-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 7773243d9916f98ba0ffce0c3a960e4aa9f03e81)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241001/202410011626.D4gEmLU8-lkp@intel.com/reproduce)
 
-> +                       netif_queue_set_napi(adapter->netdev, i,
-> +                                            NETDEV_QUEUE_TYPE_RX, napi);
-> +                       netif_queue_set_napi(adapter->netdev, i,
-> +                                            NETDEV_QUEUE_TYPE_TX, napi);
-> +               }
-> +       }
->  }
->=20
->  /* Configure the Rx forwarding */
-> --
-> 2.43.0
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410011626.D4gEmLU8-lkp@intel.com/
 
-Thank you for uploading this patch.
+All errors (new ones prefixed by >>):
 
+   In file included from drivers/net/ethernet/ibm/emac/rgmii.c:21:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/powerpc/include/asm/cacheflush.h:7:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/net/ethernet/ibm/emac/rgmii.c:229:14: error: call to undeclared function 'devm_platform_get_resource'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     229 |         dev->base = devm_platform_get_resource(ofdev, 0);
+         |                     ^
+   drivers/net/ethernet/ibm/emac/rgmii.c:229:14: note: did you mean 'platform_get_resource'?
+   include/linux/platform_device.h:58:25: note: 'platform_get_resource' declared here
+      58 | extern struct resource *platform_get_resource(struct platform_device *,
+         |                         ^
+>> drivers/net/ethernet/ibm/emac/rgmii.c:229:12: error: incompatible integer to pointer conversion assigning to 'struct rgmii_regs *' from 'int' [-Wint-conversion]
+     229 |         dev->base = devm_platform_get_resource(ofdev, 0);
+         |                   ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   1 warning and 2 errors generated.
+
+
+vim +/devm_platform_get_resource +229 drivers/net/ethernet/ibm/emac/rgmii.c
+
+   215	
+   216	
+   217	static int rgmii_probe(struct platform_device *ofdev)
+   218	{
+   219		struct rgmii_instance *dev;
+   220	
+   221		dev = devm_kzalloc(&ofdev->dev, sizeof(struct rgmii_instance),
+   222				   GFP_KERNEL);
+   223		if (!dev)
+   224			return -ENOMEM;
+   225	
+   226		mutex_init(&dev->lock);
+   227		dev->ofdev = ofdev;
+   228	
+ > 229		dev->base = devm_platform_get_resource(ofdev, 0);
+   230		if (IS_ERR(dev->base)) {
+   231			dev_err(&ofdev->dev, "can't map device registers");
+   232			return PTR_ERR(dev->base);
+   233		}
+   234	
+   235		/* Check for RGMII flags */
+   236		if (of_property_read_bool(ofdev->dev.of_node, "has-mdio"))
+   237			dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+   238	
+   239		/* CAB lacks the right properties, fix this up */
+   240		if (of_device_is_compatible(ofdev->dev.of_node, "ibm,rgmii-axon"))
+   241			dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+   242	
+   243		DBG2(dev, " Boot FER = 0x%08x, SSR = 0x%08x\n",
+   244		     in_be32(&dev->base->fer), in_be32(&dev->base->ssr));
+   245	
+   246		/* Disable all inputs by default */
+   247		out_be32(&dev->base->fer, 0);
+   248	
+   249		printk(KERN_INFO
+   250		       "RGMII %pOF initialized with%s MDIO support\n",
+   251		       ofdev->dev.of_node,
+   252		       (dev->flags & EMAC_RGMII_FLAG_HAS_MDIO) ? "" : "out");
+   253	
+   254		wmb();
+   255		platform_set_drvdata(ofdev, dev);
+   256	
+   257		return 0;
+   258	}
+   259	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
