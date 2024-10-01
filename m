@@ -1,125 +1,176 @@
-Return-Path: <netdev+bounces-130711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA71198B412
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:03:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FA998B436
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 08:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E456528396D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:03:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 169C61F24422
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 06:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889BB1BE22D;
-	Tue,  1 Oct 2024 06:01:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C7D1BC069;
+	Tue,  1 Oct 2024 06:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h583iV8y"
+	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="GJnz73YO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24AC11BBBD9;
-	Tue,  1 Oct 2024 06:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954421BBBC1
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 06:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727762487; cv=none; b=H9rlTTl23VhifmIfMH3wKwEVj1MJHudA0Id71pQXwGpTYrTQNhsHm4GwWKOrj6NG2kl313LGUJdt5PyjX9C6RRWEldZaaFxzxCsetTAw06Ax/2nR6tyrwvWIUSLub1MkAk9PkfDe/IXOrgAMkxmQKeGRzqC3HFqdPqaaC6C3NkY=
+	t=1727763827; cv=none; b=BN7opRYabROnAOKZPpaUNPJJRqzJERG4pxVkSSEfMYWmRh4f7CeKlhBlsmU4Oy3b/VO1dBVJVXscjppeh07ztueg/MGR+PvzBfDzMKyr50p7OyWyEA1eRsXOAUy7HevZaXK7TMVKy2qwmm07nDXrB4X0KCWfIDGd7o5YPixPGn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727762487; c=relaxed/simple;
-	bh=ieuL/O3/265wxoAQ9SYV+ZrakZmm8ntMC/lUQH0jiok=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=B2Iz7baQUr88DngwaRmVD6n528TR0bGft7G1tdu80LVf1pb40oY7Nm1reEMxrnn15loSaNhp4m0MWDm6Gm/yw1Bd5J697XfH/t2H7iYjaCV8XrJr7WeEP9upaLs4uMt1/5UI+ycnmm/NxCMbeYlpE4SIVr84plPbqsnMMq6XbBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h583iV8y; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-20b833f9b35so16508235ad.2;
-        Mon, 30 Sep 2024 23:01:25 -0700 (PDT)
+	s=arc-20240116; t=1727763827; c=relaxed/simple;
+	bh=wJuKxhE+CbOst/5fBpiq+Ys9KTnzHitn8o0kkwpLeSI=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ouJgGGFx75HXqMi4ich12o8903sGZM32m/tF3qZlSs6NI8TreS+InxEMBVdHYdErgEaDofTh1VarPH4F4yQNxi/Y5wGFzQFVSwRz0EmRBM0uxSBBI6ggxmoERF/1OEJhmEuYwTm4QdvIuDXaBDve2NCmEDIymZ4SJTUXk5cNR/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=GJnz73YO; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7e6ba3f93fdso3240001a12.1
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 23:23:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727762485; x=1728367285; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rfr8GHfpAnekQQsJ9DXbNrw9ejSWEOElOr5R5vluBYQ=;
-        b=h583iV8ynLNhuIOaOC5UgUkHL6yiC86V7Tkv+X1DpMBUtGXPJwRCHoqTR77zo3wtpF
-         YT9yOwrIvBLZT4DvCCRdzLQxLR+LIEI2qIXJ1EEl1+kqaDftX1qEZpPvca4ajKqXrq2m
-         LshIEmdJD5FCVslHt2GfgtfIQ22noNPQsa5KT7Vh+8dQVUxQnH9HhEiP1Vp4TPGcNWXR
-         +yHfrzd8/wZCHLGduwYfY4Of01XxB4tyxHbRlGCD8SV9MJz6E1zuBu2j8i1e0jNHr7aH
-         coRujU/Pfwj3IeiNnV4Yzre96cO5Su2SNouxB9oQDurUW7DKDQoGzKf8l2RPSVmH5sZZ
-         7dlQ==
+        d=tenstorrent.com; s=google; t=1727763825; x=1728368625; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W+q1bYkfaGa893H/27+8NsQZ36xTulPFgzj3nN7/MB8=;
+        b=GJnz73YOMUIHcbJaGKFmqYgHpJSoFwhtqCGsQb+ePSrKh5GuATyAgOg6KITt87sROq
+         zfLymsnc9J2PDj9TDTZkCB4CJGbdndkna6z0dSngb+eeJ9WLAj1ovlw4An/ahFhqF3MG
+         VKM1kueSyQvd8KGbqEf80rOHSC7CVXn/xsXNhmN+gVz2eVxxk/JXb17++JUamzXT79WZ
+         v/SvrPhJch/BGD5hhehHqg3+OJYYZ7a25+FRAEjoG72E5NlmWvlDX0O965YEUX5shpn3
+         fm8hr0cGXAoxX3LxSUmgFDqGrqO8g8Pg9sPeKO1F7f/r+eNAguFRiwmSr0NRvVgoFw4h
+         ScHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727762485; x=1728367285;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rfr8GHfpAnekQQsJ9DXbNrw9ejSWEOElOr5R5vluBYQ=;
-        b=kofcji4eDnewwhx1kyxuFonYSgnYbwGlMJrogekikjwXiIkM+oohCgVLMYhNhiAszC
-         8eOm1Q3EqFo/mWkJWg5SsEIJgc+gZ8sBWAU0i9ffRMcNU/H0V4RFDXdCC6EpLSkXnVK1
-         UlvtyJOgsUC3Gp9Jhs30yVDaE75JUgc/1u11k6GHlkaZtWHRlTLYsUHS3mS6Ft/Bxv8R
-         wvqzP0nqBYYk65utHASsaDxXgPkalwa3v+V/dF1z12SmPTloaBkiKQZ4o5UxXs33NP74
-         ZQHwmYI+hzGomC18tXONHA8HR5zfrlD02vdAB8up0/jZPEgUFQLLms5zHNt0ALUuR0Wt
-         PSkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFsm2+mDgFtYs5m60+V7a9bHeQ7h/L69YozkhqM+SBfzIm0WNEYPF9MKWuo82Jr/a+Kwo1T6e/@vger.kernel.org, AJvYcCW0RsXuU+zYn1O+wfTMVKv1a8DnfIIl1wLZBoSXUoYJ6NObjQ8JFfxzFbsNIw1bcsr/alOaFWK9rifk+VC3@vger.kernel.org, AJvYcCXgla/dc3t/iFC9a3gz0mU9Zr3hI/tpob1HKuadoDYUNBy2nSF1nGOdMT5nm+512BRK2ko=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBXf8BxBDMdsyPckBH96G4gusNtxiNFndIPsV4YZtYXWx2DNcW
-	090qK0MEb1x1g9Hfqj2JQ4TTEmEZHUV5jtE417uL+TYinx2tJ8Qm
-X-Google-Smtp-Source: AGHT+IF0pqg6cHdPQNZUnpp0KY3LqcCogvQjVaDIbEAdyFcDi8rMUdKYWPzepWjPauNArtxkGDit+w==
-X-Received: by 2002:a17:903:1208:b0:20b:2eb3:97ac with SMTP id d9443c01a7336-20b36ad2914mr4118545ad.24.1727762485308;
-        Mon, 30 Sep 2024 23:01:25 -0700 (PDT)
-Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e0b6c4bc46sm9055950a91.7.2024.09.30.23.01.19
+        d=1e100.net; s=20230601; t=1727763825; x=1728368625;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W+q1bYkfaGa893H/27+8NsQZ36xTulPFgzj3nN7/MB8=;
+        b=aJXs8Nh1hTHXXo1lPgvXEo7QyufQ2G/ivctbo0BHswrAJkT6hkL4MJ/AQz2o6UDSMI
+         bZO5h3pubEY0EqMK9KzEd154Ix3VwIoeXBG7fbPXyOZwwHOJMgp7Teulxyr/80j1cRVj
+         PNpu5D3lqxRg+omcXzxLM9rYSwDx5odUbxcIxlkC7LsMyVlzpA/g/bbyFaHgD0DVuLV2
+         dhyxTmwbemzkkjcLMDStuXXslNrm5bP9rl5B17UuyjMrry2/4JtILS6GNJf4XElrnAKL
+         OWH3scRD7cR/iSKN0xCyf3B68/LWDm6C3Hs2MT5Cf1itcZ+oigstnCxL775vnvFkMSZw
+         DGHQ==
+X-Gm-Message-State: AOJu0YwUAXUlDR+jCv0GS5EoU14KtNwhzUz+WHJuTr3kyfiCX6BJ8obC
+	7Dc2u6TW63GdyoPX8pl/b82U6fcGsj7/n/lZP0RujtjGJOURb8j4VoKZqxOZ3t0=
+X-Google-Smtp-Source: AGHT+IEkhgSmX+RGtd3vmzudwdHgedS3ETir5Ngx2WIar+CdDO/B+TgTsD/9vvMbqKQfM2/28VijBQ==
+X-Received: by 2002:a05:6a20:9f90:b0:1cf:3885:b9d8 with SMTP id adf61e73a8af0-1d4fa6cfd38mr19206388637.27.1727763824817;
+        Mon, 30 Sep 2024 23:23:44 -0700 (PDT)
+Received: from [127.0.1.1] (71-34-69-82.ptld.qwest.net. [71.34.69.82])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264ba68dsm7267804b3a.57.2024.09.30.23.23.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 23:01:24 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com,
-	atenart@kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	dongml2@chinatelecom.cn,
-	bigeasy@linutronix.de,
-	toke@redhat.com,
-	idosch@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next 7/7] net: ip: fix typo in the doc of SKB_DROP_REASON_IP_INNOROUTES
-Date: Tue,  1 Oct 2024 14:00:05 +0800
-Message-Id: <20241001060005.418231-8-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20241001060005.418231-1-dongml2@chinatelecom.cn>
-References: <20241001060005.418231-1-dongml2@chinatelecom.cn>
+        Mon, 30 Sep 2024 23:23:44 -0700 (PDT)
+From: Drew Fustini <dfustini@tenstorrent.com>
+Subject: [PATCH v3 0/3] Add the dwmac driver support for T-HEAD TH1520 SoC
+Date: Mon, 30 Sep 2024 23:23:23 -0700
+Message-Id: <20240930-th1520-dwmac-v3-0-ae3e03c225ab@tenstorrent.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFuV+2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyjHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDS2MD3ZIMQ1MjA92U8tzEZF1jkzTTlBSD5OTkNAsloJaCotS0zAqwcdG
+ xtbUAVYXE4l4AAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
+ Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>, 
+ Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+ Drew Fustini <dfustini@tenstorrent.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-riscv@lists.infradead.org
+X-Mailer: b4 0.14.1
 
-This is a copy error, and SKB_DROP_REASON_IP_INNOROUTES should correspond
-to IPSTATS_MIB_INADDRERRORS in the comment. Just fix it
+This series is based on 6.12-rc1 and depends on this pinctrl series:
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+ 20240930-th1520-pinctrl-v3-0-32cea2bdbecb@tenstorrent.com
+
+I have a branch with this series and the dependencies:
+
+ https://github.com/pdp7/linux/tree/b4/th1520-dwmac
+
+Regarding clocks, the gmac nodes in th1520.dtsi have the "stmmac_clk"
+clock set to CLK_GMAC_AXI in the AP_SUBSYS clock controller. This
+corresponds to the enable bit for the GMAC axi4_clk gate which is
+handled by the clk-th1520-ap driver. thead_dwmac_fix_speed() does not
+modify anything in the AP_SUBSYS clock controller. It only writes to
+GMAC APB registers. It seems unnecessary to create a new clock driver
+just for the GMAC APB registers. Refer to section 1.6.2 in the TH1520
+Peripheral Interface User Manual [1].
+
+I've removed the properties that I added in v2: thead,rx-internal-delay
+and thead,tx-internal-delay. The units for the delay field in the rgmii
+delay control registers are not documented. Andrew Lunn suggested I
+just hard code the delay field to 0 since I don't know the units and
+the boards work with the hardware reset value of 0.
+
+[1] https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
+
+Changes in v3:
+ - Rebase on v6.12-rc1
+ - Remove thead,rx-internal-delay and thead,tx-internal-delay properties
+ - Remove unneeded call to thead_dwmac_fix_speed() during probe
+ - Fix filename for the yaml file in MAINTAINERS patch
+
+Changes in v2:
+ - Drop the first patch as it is no longer needed due to upstream commit
+   d01e0e98de31 ("dt-bindings: net: dwmac: Validate PBL for all IP-cores")
+ - Rename compatible from "thead,th1520-dwmac" to "thead,th1520-gmac"
+ - Add thead,rx-internal-delay and thead,tx-internal-delay properties
+   and check that it does not exceed the maximum value
+ - Convert from stmmac_dvr_probe() to devm_stmmac_pltfr_probe() and
+   delete the .remove_new hook as it is no longer needed
+ - Handle return value of regmap_write() in case it fails
+ - Add phy reset delay properties to the BeagleV Ahead device tree
+ - Link: https://lore.kernel.org/linux-riscv/20240926-th1520-dwmac-v2-0-f34f28ad1dc9@tenstorrent.com/
+
+Changes in v1:
+ - remove thead,gmacapb that references syscon for APB registers
+ - add a second memory region to gmac nodes for the APB registers
+ - Link: https://lore.kernel.org/all/20240713-thead-dwmac-v1-0-81f04480cd31@tenstorrent.com/
+
 ---
- include/net/dropreason-core.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Emil Renner Berthing (1):
+      riscv: dts: thead: Add TH1520 ethernet nodes
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 3d1b09f70bbd..a68235240f6a 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -366,7 +366,7 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_IP_INADDRERRORS,
- 	/**
- 	 * @SKB_DROP_REASON_IP_INNOROUTES: network unreachable, corresponding to
--	 * IPSTATS_MIB_INADDRERRORS
-+	 * IPSTATS_MIB_INNOROUTES
- 	 */
- 	SKB_DROP_REASON_IP_INNOROUTES,
- 	/** @SKB_DROP_REASON_IP_LOCAL_SOURCE: the source ip is local */
+Jisheng Zhang (2):
+      dt-bindings: net: Add T-HEAD dwmac support
+      net: stmmac: Add glue layer for T-HEAD TH1520 SoC
+
+ .../devicetree/bindings/net/snps,dwmac.yaml        |   1 +
+ .../devicetree/bindings/net/thead,th1520-gmac.yaml |  97 +++++++
+ MAINTAINERS                                        |   2 +
+ arch/riscv/boot/dts/thead/th1520-beaglev-ahead.dts |  91 +++++++
+ .../boot/dts/thead/th1520-lichee-module-4a.dtsi    | 129 +++++++++
+ arch/riscv/boot/dts/thead/th1520.dtsi              |  50 ++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  11 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c  | 291 +++++++++++++++++++++
+ 9 files changed, 673 insertions(+)
+---
+base-commit: 6b16e599500bd0002164d9edcb8bf7652d9888fa
+change-id: 20240930-th1520-dwmac-34f5dd0cccf8
+
+Best regards,
 -- 
-2.39.5
+Drew Fustini <dfustini@tenstorrent.com>
 
 
