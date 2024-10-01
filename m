@@ -1,91 +1,193 @@
-Return-Path: <netdev+bounces-130953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E80198C35E
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:27:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3015998C36E
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 18:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1824928138D
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:27:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 623F91C2438C
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 16:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE13D1C9B84;
-	Tue,  1 Oct 2024 16:26:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0312D1CB33D;
+	Tue,  1 Oct 2024 16:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lQ/jdD+8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KjYYpFsh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D5A19CC3F
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 16:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF25A199FA2;
+	Tue,  1 Oct 2024 16:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727800017; cv=none; b=XDIU7CP5FzHzmO677NZT0YlO9jq2amy5VVcrNa24tErOsTgEUmnYM97ULih6Vu1Xi5s0uCOQN9MDVczYotXsAHoQRlDAgW3zWfKQgM+oFo7IGu0nI1JtdLSUcmP2cWQtUjixSKZOT5q+F5hxJpOjbBls2dQkDyhv3WRksO2KqYM=
+	t=1727800245; cv=none; b=IhsYFu7jIvek+qD0iDB0XtuFnaG1zBbUuLBfv5b1VS1TA29L8p2S1aBeMN289p2cjIFeHPC9AXbLxykE7zzx1Az7FrCSZpqurC4kbWo+wdePN0SqAOnGG/ht8Q/f8Z6Ncwg8wP1Dnq2AgmJCEe0DXqe4pwBEzMcSCge8j+jpxTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727800017; c=relaxed/simple;
-	bh=VrBnfLC+zVG9IFbwmPZHicLTfNZlFBrRSS5dHeuq9lc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T8Dn3XgS+THwaNK74ToqOUlQqNFEfT/NgeYIlXeMeP4aLs6VYi/UY3CE48wggGyvNYxR+MiMXt4rM+SSRnKA5/TgzUb4X5etBmsrCPyXwb6ftIgUxpu7IORQtobcs/q9kGwIDiPQIotC7e7sB8QNjJjrj8D43xulkjfld/Qdf2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lQ/jdD+8; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20b4a090f3eso204585ad.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 09:26:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727800016; x=1728404816; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VrBnfLC+zVG9IFbwmPZHicLTfNZlFBrRSS5dHeuq9lc=;
-        b=lQ/jdD+8AwDRQzwMqcxcYd6wkn2V65gZXTvavuwkX7bUAQYO+TfEESLoocovZhxme1
-         xUjE8oXTxu/6E5wWQxLLqTHVArX5X4oyH0ysDHZHjeRZ+at0dN/l2IzXfCPDRR6oEQ/i
-         Dz18vKEGgeJy/UT6NDznZkHLjEFsVt1hZXyQRA4abiIrRCZthMdpxwTlYKnmpkpKJD+3
-         zxQzefc2qBZYORE8gcBDLC1P1oZtHQNaPQMV0Ay5M1rKJ85HccKWQqI9Nf+ljYWaIQEH
-         j7S2zNxqhcDZsuckgg/Sg+pWyniyLAVErPkD4Etyadm4Pg0hoXxKmLHDAkbv1wB1OAF6
-         hxlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727800016; x=1728404816;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VrBnfLC+zVG9IFbwmPZHicLTfNZlFBrRSS5dHeuq9lc=;
-        b=HPtmrET2BgNkLMx1d3j426wXh3UeqlTKhKt9fIQpQbVt31hHvZoTAKMDpe0C1CparQ
-         U/aW++MzEsBM1LjiaOQ+lqiSXxA4LS0FmKYaUnPzWXPvutQbqzZeLMdk5POQgUR1wc7h
-         Drz+M3p2jRW8ED+yr975kjVjemmnlLGLmL/XX9OfkIKBtpaQ+GLg08BvR4JyvArI/Lhw
-         RpUCXmZDif4yCxj1AGzcJnWN0EgjorJe1WLao02EeGLjXiUafIv2k8QD6fTbFlk1RSsz
-         hPXtJcPq9DU4qHdyolXSWy7uGIMuan8aJSEe+YDBv9XC8YN3S9i6TgSXdZBnp86r8gwk
-         0Q/g==
-X-Forwarded-Encrypted: i=1; AJvYcCX9KRzQl72MW39joiMqe+FoCW2ItBZfIu+3PziLmq453IcfzXW6+4g5KC81HV8VcJdF7NmTpgs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgDLikSPW5rMoZmam/rLMabCABON6K/CS6nqTDUrWoCh3OKNNz
-	SuJn1/u8kgErA0ABb7gGdYapAeHhSPbgfprYwhHucofqtYKMEpBYyZqqdJMsJRMVOaz/Ft/1bhB
-	2OPpjwuD6co4+OAOqJmAb7h7kL8DXmfdTfLpE9UOfIDKqFbATG529qKA=
-X-Google-Smtp-Source: AGHT+IHdrQbAqpejQaNhVvnlIZgEwuDo5VjmqDx/kOgnNdj+gWj66NYWwVdsH2uRpgkV2fh2pLnWhSrh6EUiZbbDSoI=
-X-Received: by 2002:a17:903:228a:b0:20b:a3f7:ca8e with SMTP id
- d9443c01a7336-20bb0804a02mr2571395ad.13.1727800015581; Tue, 01 Oct 2024
- 09:26:55 -0700 (PDT)
+	s=arc-20240116; t=1727800245; c=relaxed/simple;
+	bh=gO2a8NpNvEzPvmNdPJOINMH8UT49BGk59qtCGnLM3aM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ucIvG+HkiOzcKkcnlJI0uBLv7dN6kdZOOTw9BFVBoZKnekNkjxJWRoOPjfy9qjepXNfOWaH7iqZ59ZvduC4B07fQVitDn0GK5rwsStQfF+5PZbtsiGZtMivfV5WRrJCrinjbGCSX5WrtdNw/3lLrFwT0G6Bfg0WN9Iw+DfbrI/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KjYYpFsh; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 409204000C;
+	Tue,  1 Oct 2024 16:30:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727800241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7nmRTjp1SB1MhQFXSfZS6mrJAanty1clfcbgm2V8i0Q=;
+	b=KjYYpFsh5vAeiZ8/qraFTJOl3DzdjMcEdZ06XtJiQ8tRvijNBBmZv8HPe954qKTAimuk6b
+	ccLFmE9YzYEoFZLCM2fs07NOBM31NBwEgCndFX9p4hSdVLnGmapOCw7coPshQpnRbWKRqv
+	cEFfpOnOMdWINObXcvSxP+Ijbyk18g2EwgMNRUWmSRY7PIBAsBLFpN7RkSqw/upxPy1aoq
+	NS6HiPLVhekYZpVMxCMxyV0sZOqnfCDFiYx4bqMbhMtxttmD1b/YDSJoqtPCnv8byj3Syf
+	tF17cZItac0dIKbcuGt6wrVGWv+zE8jaK4Z2Y5RoJRWmIuy9qr8+IL0QsqLMeQ==
+Date: Tue, 1 Oct 2024 18:30:38 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
+ <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
+ <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
+ <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
+ <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item
+ when cpu-syscon is not present
+Message-ID: <20241001183038.1cc77490@bootlin.com>
+In-Reply-To: <20240930162616.2241e46f@bootlin.com>
+References: <20240930121601.172216-1-herve.codina@bootlin.com>
+	<20240930121601.172216-3-herve.codina@bootlin.com>
+	<d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
+	<20240930162616.2241e46f@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240905200551.4099064-1-jrife@google.com>
-In-Reply-To: <20240905200551.4099064-1-jrife@google.com>
-From: Jordan Rife <jrife@google.com>
-Date: Tue, 1 Oct 2024 09:26:44 -0700
-Message-ID: <CADKFtnQGCic1fAQFbwBZVmYsZb2jykaBzPMrOMVuvENxUSZ6bQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] wireguard: allowedips: Add
- WGALLOWEDIP_F_REMOVE_ME flag
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, wireguard@lists.zx2c4.com
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Hi Jason,
+Hi Arnd,
 
-Just reaching out to see if you've had a chance to take a look at this. Thanks!
+On Mon, 30 Sep 2024 16:26:16 +0200
+Herve Codina <herve.codina@bootlin.com> wrote:
 
--Jordan
+> On Mon, 30 Sep 2024 13:57:01 +0000
+> "Arnd Bergmann" <arnd@arndb.de> wrote:
+> 
+> > On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:  
+> > > In the LAN966x PCI device use case, syscon cannot be used as syscon
+> > > devices do not support removal [1]. A syscon device is a core "system"
+> > > device and not a device available in some addon boards and so, it is not
+> > > supposed to be removed.
+> > >
+> > > In order to remove the syscon usage, use a local mapping of a reg
+> > > address range when cpu-syscon is not present.
+> > >
+> > > Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1]
+> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > > ---    
+> >   
+> > >>  	err = mchp_sparx5_map_syscon(pdev, "cpu-syscon", &ctx->cpu_ctrl);    
+> > > -	if (err)
+> > > +	switch (err) {
+> > > +	case 0:
+> > > +		break;
+> > > +	case -ENODEV:    
+> > 
+> > I was expecting a patch that would read the phandle and map the
+> > syscon node to keep the behavior unchanged, but I guess this one
+> > works as well.
+> > 
+> > The downside of your approach is that it requires an different
+> > DT binding, which only works as long as there are no other
+> > users of the syscon registers.  
+> 
+> Yes, I knwow but keeping the binding with the syscon device (i.e. compatible
+> = "...", "syscon";) leads to confusion.
+> Indeed, the syscon API cannot be used because using this API leads issues
+> when the syscon device is removed.
+> That means the you have a "syscon" node (compatible = "syscon") but we cannot
+> use the syscon API (include/linux/mfd/syscon.h) with this node.
+> 
+> Also, in order to share resources between several consumers of the "syscon"
+> registers, we need exactly what is done in syscon. I mean we need to map
+> resources only once, provide this resource throught a regmap an share this
+> regmap between the consumers. Indeed a lock needs to be shared in order to
+> protect against registers RMW accesses done by several consumers.
+> In other word, we need to copy/paste syscon code with support for removal
+> implemented (feature needed in the LAN966x PCI device use case).
+> 
+> So, I found really simpler and less confusing to fully discard the syscon node
+> and handle registers directly in the only one consumer.
+> 
+> With all of these, do you thing my approach can be acceptable ?
+> 
+
+Well, the related binding has been rejected.
+
+In the next iteration, I will keep the syscon node and implement what you
+suggested (i.e. read the phandle and map the syscon node).
+
+This will look like this:
+--- 8< ---
+static const struct regmap_config mchp_lan966x_syscon_regmap_config = {
+       .reg_bits = 32,
+       .val_bits = 32,
+       .reg_stride = 4,
+};
+
+static struct regmap *mchp_lan966x_syscon_to_regmap(struct device *dev,
+       	                                           struct device_node *syscon_np)
+{
+       struct regmap_config regmap_config = mchp_lan966x_syscon_regmap_config;
+       resource_size_t size;
+       void __iomem *base;
+
+       base = devm_of_iomap(dev, syscon_np, 0, &size);
+       if (IS_ERR(base))
+               return ERR_CAST(base);
+
+       regmap_config.max_register = size - 4;
+
+       return devm_regmap_init_mmio(dev, base, &regmap_config);
+}
+--- 8< ---
+
+In mchp_sparx5_map_syscon(), I will call the syscon API or the local
+function based on the device compatible string:
+	--- 8< ---
+	if (of_device_is_compatible(pdev->dev.of_node, "microchip,lan966x-switch-reset"))
+		regmap = mchp_lan966x_syscon_to_regmap(&pdev->dev, syscon_np);
+	else
+		regmap = syscon_node_to_regmap(syscon_np);
+	--- 8< ---
+
+Is this kind of solution you were expecting?
+If you have thought about something different, can you give me some pointers?
+
+Best regards,
+Hervé
+
 
