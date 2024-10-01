@@ -1,287 +1,213 @@
-Return-Path: <netdev+bounces-130672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-130673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8606298B147
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 02:09:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5871698B154
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 02:13:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 141AEB21F68
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 00:09:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBDEDB21FEC
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 00:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD12637;
-	Tue,  1 Oct 2024 00:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C78B173;
+	Tue,  1 Oct 2024 00:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZo/3Rhi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ua3XQ/re"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6371739B
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 00:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D77B36C
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 00:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727741376; cv=none; b=HPv67z874iDogPyqFgOzXZQJ4DyAeoDbXKfO9zMPS+TltRCSnOkTRpoI9xoMP+J9825OzUxiMtFDt/TaTz9ONAYCrffB9OcOLa0KHEXxo/7/WObs0oc5N90gpLy4yC4BK4XjtjPAbY4eD11YYGiZmEmMrgPsnvRs55bR5A48O1A=
+	t=1727741604; cv=none; b=igi/Q53O/nyhvk99VY0qBcIVfTmIu4DK9ZgtxdhCp2fFoXcoFmLMb5u+UY+pH2rRlwuVXa0m3Liu86zHZFUCMOubgvwIOHx7EUHH3fD+U9M3qpIW4454k1XZuxGkvFxvcedWG+sREJMLQvsP8NaGQBQYABjVla1zsGAkf2jsysM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727741376; c=relaxed/simple;
-	bh=WF4UHcsBQQQGtG8XoiJEAw7KXBLW+DJUXSSekfDa2Aw=;
+	s=arc-20240116; t=1727741604; c=relaxed/simple;
+	bh=kq01IeCQb3DsZha9sLfeLizz4Wx0hXe64RVUIbF2His=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZG54lyjqm30dFOUWPgVWnPRGnZ7AIBi6JucO1mox8hoGxBLsGGUF5atAIw5Wd2XaWXzVrwm7mKss8LMLUnHoL4ktyMcl21Knoc4MLKjaG5ttUBha5MRXpi/yLWyoeYnkyK4aNdxgZWcTk+bfAj4sg7Fe268FMiTl5jqiWuY5xDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dZo/3Rhi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727741373;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A1dfu9XorZM4ryDcem8zGUAOayEDNnDp9d6zeR4JweE=;
-	b=dZo/3Rhi8sr94Dh54VoWrSUpy6JpxqE7mpJbnb+oAif4omMT00586Tzt2Dxlg980sQJTcw
-	CZh1USitD9MBXUO7/fhiroi7QjiRNj/ibXy2+ofw6Tvro0mkJvHsMdBRSF0jeQyHZKbokH
-	SwjC4OYQKkW1tUVDx3KHG7ZQsvL+0OY=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-540-8x16NgaAOWe6f0zSILanwg-1; Mon, 30 Sep 2024 20:09:32 -0400
-X-MC-Unique: 8x16NgaAOWe6f0zSILanwg-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2fabc7c9e69so22966541fa.3
-        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:09:31 -0700 (PDT)
+	 To:Cc:Content-Type; b=Ze5Em84YDhsr6+exIEXh0L4nqF5Ha3MX2aF/+4h0UYZi6THB1HsTpnBkHY6Wv251gPXGd/OoZ5At36GZbpITluJ3TVBQ+bHGsOTKQ5juFIFxG2/W1bRrLzH0K9cnBngv3HvYR7xvD1rsVtRwhRrqK+80T4aBlUMFJdL4EFf22Bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ua3XQ/re; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e109539aedso1656750a91.0
+        for <netdev@vger.kernel.org>; Mon, 30 Sep 2024 17:13:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727741603; x=1728346403; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4wGoK8DPKzPFOz5acKTbBRxQf+NMvuIpnjXtWd1AqSs=;
+        b=Ua3XQ/reuRdp13FSoSFyVHVkogkA15dhKr6k5GCeAm5xg6QNyD7Lk96llAzaW0xlcD
+         ywtYcaLkNqAkD+gMnkOT3OifJF9dnP00V3gZ9Azf0Qp2SApcxPWy2IWkQq2o43DAI4m5
+         OySDMH79vg7GjH0iMeIAY0esuTCFtmde6mHxzqCD8QAteQHFszlgwW/s3K0SSlBPSItG
+         8VOZvD1jwEAZ0aqmk7kI65r2y/uNUSvuo4Nu03QKrLLP9JFSH0mcLp6PMzvkO48PG3Ta
+         MRGtfBlL3PxXChn+60N5hZJvbxW6RgjKBDCmEliO9w9H61RgAayhVWPwm9+vMyEqAkyz
+         1kEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727741370; x=1728346170;
+        d=1e100.net; s=20230601; t=1727741603; x=1728346403;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A1dfu9XorZM4ryDcem8zGUAOayEDNnDp9d6zeR4JweE=;
-        b=d8Jj2nS8BVmZcx0PeUSMtkdGs8InzE1WlyYvj+Bp5dLZwWzbLzzpOyTeZF/eeFEcbt
-         UdrR1KhkqeO/7CtmD77JasLir6oh8fkEUiSLoZXggz4EshPvV97MYShat2PBYOGJs0ek
-         rqDVEa2Ga0VprGo6uzCYKLVPTfwWlKvHMueWg8Pq2R+LMZvVYz0jm3xrho7r6Bplz20s
-         JsPDzIZfmkTXt1oQQZ4f1OhINV4k7mXKxRgKsWXdMe2g0RMAE0z+Wv2K96HKY6opamXn
-         DOKpXBbiQrFs2bAotIvWxMF1h0Ei4I9g0c8QKtvJ9mWj8UpNl9TAukBF8b1JzJw//YwC
-         FsIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRSZaN+oTAUoHrx+uCI7EXFpcScYERUK5Zatmdog5oqQLptitnG/owOiuStwCTVqidF+kFDsE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjeh/4Li1xOHzd7ahqzgUu3abhq67kmywVCfIkofVDr8QUZVL5
-	M0EBin32US/iHZp1DXPyx1I5EHIRRN7L12FsghrFy1QdKEl/HCKGprbn/HW1/7bXaYXB2HSCa4w
-	c4GvU3fesr97uWz4HEZBCO+w4RvMoXvvmIE7bYqZHVRTXDD1QHXdUmwaN/ZDOYrY5cUNwhg5Mjz
-	JwfFoI0j3wWHt5OPUqvDoIqTAdm4qw
-X-Received: by 2002:a2e:b8ce:0:b0:2f3:f1ee:2256 with SMTP id 38308e7fff4ca-2f9d41a4eb4mr97165481fa.44.1727741370399;
-        Mon, 30 Sep 2024 17:09:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFAcNC4y6SEhrnCgxe2rflhwoVRt5eNNwUxKVe6lm/QOKjgu/J0xJMsRT/ns1AHeaEbV17+L0+tU8r1y5LOUC8=
-X-Received: by 2002:a2e:b8ce:0:b0:2f3:f1ee:2256 with SMTP id
- 38308e7fff4ca-2f9d41a4eb4mr97165311fa.44.1727741369925; Mon, 30 Sep 2024
- 17:09:29 -0700 (PDT)
+        bh=4wGoK8DPKzPFOz5acKTbBRxQf+NMvuIpnjXtWd1AqSs=;
+        b=um8yQ6DP5AOumEEEKnNe9YmSfd2lwzSw5k0zJ8WEkkl1ZG9IgQ8NIeUoBJlGyTM32T
+         FgSPbaiB2NGhBoyYuj3kNloN7Ahe6P1NL+M0NWGj+idlgRGRhqd7XWctU72YAqpIrPk7
+         Z17DKMml33qUHRcHt1oKAPwtUZMFL0N7Dl9SpJRwR2GocKSCyTTeanXsSvnhuLQVwjjq
+         6HcsHMXfKBSp+B+h5deN61JIQGTfeTGWFbDqavHjoVo/N+6E038tyfoegAmEvOyj+CwI
+         pT0MSjNk0nK6W4hABPNZD3W6X6ygjYMq9OjE6d4bDiG+p5HP1n7KN+Wwj5GUOKHl68wE
+         egbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVW30RGWxPRN5Punhy92oY9ZUSZBN/RBfI0yUE7fwRiIr7tvFRG0KvKQ5LmP0Qe/dGCFiy0YI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuRL/xj4h9Kjpj1LhtLseEVhXytm89n0U2b7Q++Z7iTNzTkvQR
+	Id4y7LUdoI3fo98hMkYRJBbaVTfe2C1FLl+FmInRXMMMBAMPNRjhpuYwViZzY2jhepF0RNq7RK6
+	Dpl5VTaJ/5NE/MGpc1HyGbhFRG8Z+x3GRNV4/
+X-Google-Smtp-Source: AGHT+IG2k46H/ljRgiej2AimW8j4YnqoM4oGz/qGaPPyc0VH5224poWz8Z/NWtOZytPFw9vPWK1PBB2TQEQhPYfTPzM=
+X-Received: by 2002:a17:90a:69e4:b0:2c9:81fd:4c27 with SMTP id
+ 98e67ed59e1d1-2e0b89e218fmr16151470a91.14.1727741602207; Mon, 30 Sep 2024
+ 17:13:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930201358.2638665-1-aahringo@redhat.com> <26363.3177.994264.260348@quad.stoffel.home>
-In-Reply-To: <26363.3177.994264.260348@quad.stoffel.home>
-From: Alexander Aring <aahringo@redhat.com>
-Date: Mon, 30 Sep 2024 20:09:18 -0400
-Message-ID: <CAK-6q+iAp+sXrEyK858qL=HO2Os4=3-3y+iOQt3T1W=QpY6AXw@mail.gmail.com>
-Subject: Re: [PATCHv2 dlm/next 00/12] dlm: net-namespace functionality
-To: John Stoffel <john@stoffel.org>
-Cc: teigland@redhat.com, gfs2@lists.linux.dev, song@kernel.org, 
-	yukuai3@huawei.com, agruenba@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
-	joseph.qi@linux.alibaba.com, gregkh@linuxfoundation.org, rafael@kernel.org, 
-	akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
-	linux-raid@vger.kernel.org, ocfs2-devel@lists.linux.dev, 
-	netdev@vger.kernel.org, vvidic@valentin-vidic.from.hr, heming.zhao@suse.com, 
-	lucien.xin@gmail.com, donald.hunter@gmail.com
+References: <20240930-phy-handle-fw-devlink-v1-1-4ea46acfcc12@redhat.com>
+In-Reply-To: <20240930-phy-handle-fw-devlink-v1-1-4ea46acfcc12@redhat.com>
+From: Saravana Kannan <saravanak@google.com>
+Date: Mon, 30 Sep 2024 17:12:42 -0700
+Message-ID: <CAGETcx-z+Evd95QzhPePOf3=fZ7QUpWC2spA=q_ASyAfVHJD1A@mail.gmail.com>
+Subject: Re: [PATCH RFT] of: property: fw_devlink: Add support for the
+ "phy-handle" binding
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Rob Herring <robh@kernel.org>, "Russell King (Oracle)" <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, 
+	Abhishek Chauhan <quic_abchauha@quicinc.com>, Serge Semin <fancer.lancer@gmail.com>, 
+	devicetree@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Mon, Sep 30, 2024 at 4:49=E2=80=AFPM John Stoffel <john@stoffel.org> wro=
-te:
+On Mon, Sep 30, 2024 at 2:28=E2=80=AFPM Andrew Halaney <ahalaney@redhat.com=
+> wrote:
 >
-> >>>>> "Alexander" =3D=3D Alexander Aring <aahringo@redhat.com> writes:
+> Add support for parsing the phy-handle binding so that fw_devlink can
+> enforce the dependency. This prevents MACs (that use this binding to
+> claim they're using the corresponding phy) from probing prior to the
+> phy, unless the phy is a child of the MAC (which results in a
+> dependency cycle) or similar.
 >
-> > Hi,
-> > this patch-series is huge but brings a lot of basic "fun" net-namespace
-> > functionality to DLM. Currently you need a couple of Linux kernel
+> For some motivation, imagine a device topology like so:
 >
-> Please spell out TLAs like DLM the first time you use them.  In this
-> case I'm suer you mean Distributed Lock Manager, right?
+>     &ethernet0 {
+>             phy-mode =3D "sgmii";
+>             phy-handle =3D <&sgmii_phy0>;
 >
-
-Yes, DLM stands for Distributed Lock Manager that lives currently in "fs/dl=
-m".
-
-> > instances running in e.g. Virtual Machines. With this patch-series I
-> > want to break out of this virtual machine world dealing with multiple
-> > kernels need to boot them all individually, etc. Now you can use DLM in
-> > only one Linux kernel instance and each "node" (previously represented
-> > by a virtual machine) is separate by a net-namespace. Why
-> > net-namespaces? It just fits to the DLM design for now, you need to hav=
-e
-> > them anyway because the internal DLM socket handling on a per node
-> > basis. What we do additionally is to separate the DLM lockspaces (the
-> > lockspace that is being registered) by net-namespaces as this represent=
-s
-> > a "network entity" (node). There might be reasons to introduce a
-> > complete new kind of namespaces (locking namespace?) but I don't want t=
-o
-> > do this step now and as I said net-namespaces are required anyway for
-> > the DLM sockets.
+>             mdio {
+>                     compatible =3D "snps,dwmac-mdio";
+>                     sgmii_phy0: phy@8 {
+>                             compatible =3D "ethernet-phy-id0141.0dd4";
+>                             reg =3D <0x8>;
+>                             device_type =3D "ethernet-phy";
+>                     };
 >
-> This section needs to be re-written to more clearly explain what
-> you're trying to accomplish here, and how this is different or better
-> than what went before.  I realize you probably have this knowledge all
-> internalized, but spelling it out in a clear and simple manner would
-> be helpful to everyone.
+>                     sgmii_phy1: phy@a {
+>                             compatible =3D "ethernet-phy-id0141.0dd4";
+>                             reg =3D <0xa>;
+>                             device_type =3D "ethernet-phy";
+>                     };
+>             };
+>     };
 >
-
-Okay, I'll try my best next time.
-
-Usually lockspaces are separated by a per node instance as a different
-"network entity" with net-namespaces. I separate them instead of
-building a different "network entity" as a virtual machine that runs a
-different Linux kernel instance.
-
-There might be a question if DLM lockspaces should be separated by
-net-namespace or yet another "locking" namespace can be introduced? I
-don't want to go this step yet as lockspaces are separated by a
-"network entity" anyway.
-
-> > You need some new user space tooling as a new netlink net-namespace
-> > aware UAPI is introduced (but can co-exist with configfs that operates
-> > on init_net only). See [0] for more steps, there is a copr repo for the
-> > new tooling and can be enabled by:
+>     &ethernet1 {
+>             phy-mode =3D "sgmii";
+>             phy-handle =3D <&sgmii_phy1>;
+>     };
 >
-> What the heck is a 'copr'?
+> Here ethernet1 depends on sgmii_phy1 to function properly. In the below
+> link an issue is reported where ethernet1 is probed and used prior to
+> sgmii_phy1, resulting in a failure to get things working for ethernet1.
+> With this change in place ethernet1 doesn't probe until sgmii_phy1 is
+> ready, resulting in ethernet1 functioning properly.
 >
+> ethernet0 consumes sgmii_phy0, but this dependency isn't enforced
+> via the device_links backing fw_devlink since ethernet0 is the parent of
+> sgmii_phy0. Here's a log showing that in action:
+>
+>     [    7.000432] qcom-ethqos 23040000.ethernet: Fixed dependency cycle(=
+s) with /soc@0/ethernet@23040000/mdio/phy@8
+>
+> With this change in place ethernet1's dependency is properly described,
+> and it doesn't probe prior to sgmii_phy1 being available.
+>
+> Link: https://lore.kernel.org/netdev/7723d4l2kqgrez3yfauvp2ueu6awbizkrq4o=
+tqpsqpytzp45q2@rju2nxmqu4ew/
+> Suggested-by: Serge Semin <fancer.lancer@gmail.com>
+> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> ---
+> I've marked this as an RFT because when looking through old mailing
+> list discusssions and kernel tech talks on this subject, I was unable
+> to really understand why in the past phy-handle had been left out. There
+> were some loose references to circular dependencies (which seem more or
+> less handled by fw_devlink to me), and the fact that a lot of behavior
+> happens in ndo_open() (but I couldn't quite grok the concern there).
+>
+> I'd appreciate more testing by others and some feedback from those who
+> know this a bit better to indicate whether fw_devlink is ready to handle
+> this or not.
+>
+> At least in my narrow point of view, it's working well for me.
 
-That is just a binary repo for rpm packages. Some users may find it handy.
+I do want this to land and I'm fairly certain it'll break something.
+But it's been so long that I don't remember what it was. I think it
+has to do with the generic phy driver not working well with fw_devlink
+because it doesn't go through the device driver model.
+
+But like you said, it's been a while and fw_devlink has improved since
+then (I think). So please go ahead and give this a shot. If you can
+help fix any issues this highlights, I'd really appreciate it and I'd
+be happy to guide you through what I think needs to happen. But I
+don't think I have the time to fix it myself.
+
+Overly optimistic:
+Acked-by: Saravana Kannan <saravanak@google.com>
+
+-Saravana
 
 >
-> > $ dnf copr enable aring/nldlm
-> > $ dnf install nldlm
+> Thanks,
+> Andrew
+> ---
+>  drivers/of/property.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >
-> > or compile it yourself.
+> diff --git a/drivers/of/property.c b/drivers/of/property.c
+> index 11b922fde7af..4a2fca75e1c6 100644
+> --- a/drivers/of/property.c
+> +++ b/drivers/of/property.c
+> @@ -1220,6 +1220,7 @@ DEFINE_SIMPLE_PROP(hwlocks, "hwlocks", "#hwlock-cel=
+ls")
+>  DEFINE_SIMPLE_PROP(extcon, "extcon", NULL)
+>  DEFINE_SIMPLE_PROP(nvmem_cells, "nvmem-cells", "#nvmem-cell-cells")
+>  DEFINE_SIMPLE_PROP(phys, "phys", "#phy-cells")
+> +DEFINE_SIMPLE_PROP(phy_handle, "phy-handle", NULL)
+>  DEFINE_SIMPLE_PROP(wakeup_parent, "wakeup-parent", NULL)
+>  DEFINE_SIMPLE_PROP(pinctrl0, "pinctrl-0", NULL)
+>  DEFINE_SIMPLE_PROP(pinctrl1, "pinctrl-1", NULL)
+> @@ -1366,6 +1367,7 @@ static const struct supplier_bindings of_supplier_b=
+indings[] =3D {
+>         { .parse_prop =3D parse_extcon, },
+>         { .parse_prop =3D parse_nvmem_cells, },
+>         { .parse_prop =3D parse_phys, },
+> +       { .parse_prop =3D parse_phy_handle, },
+>         { .parse_prop =3D parse_wakeup_parent, },
+>         { .parse_prop =3D parse_pinctrl0, },
+>         { .parse_prop =3D parse_pinctrl1, },
 >
-> These steps really entirely ignore the _why_ you would do this.  And
-> assume RedHad based systems.
+> ---
+> base-commit: cea5425829f77e476b03702426f6b3701299b925
+> change-id: 20240829-phy-handle-fw-devlink-b829622200ae
 >
-
-That is correct. I will mention that those steps are only for those
-specific systems.
-
-> > Then there is currently a very simple script [1] to show a 3 nodes clus=
-ter
+> Best regards,
+> --
+> Andrew Halaney <ahalaney@redhat.com>
 >
-> nit: 3 node cluster
->
-> > using gfs2 on a multiple loop block devices on a shared loop block devi=
-ce
-> > image (sounds weird but I do something like that). There are currently
-> > some user space synchronization issues that I solve by simple sleeps,
-> > but they are only user space problems.
->
-> Can you give the example on how to do this setup?  Ideally in another
-> patch which updates the Documentation/??? file to in the kernel tree.
->
-
-https://gitlab.com/netcoder/gfs2ns-examples/-/blob/main/three_nodes
-
-As I quote with [1]. Okay, I will move them away from my separate
-repository and add them in Documentation/
-
-> > To test it I recommend some virtual machine "but only one" and run the
->
-> I'm having a hard time parsing this, please be more careful with
-> singular or plural usage.  English is hard!  :-)
->
-> > [1] script. Afterwards you have in your executed net-namespace the 3
-> > mountpoints /cluster/node1, /cluster/node2/ and /cluster/node3. Any vfs
-> > operations on those mountpoints acts as a per node entity operation.
->
-> Which means what?  So if I write to /cluster/node1/foo, it shows up in
-> the other two mount points?  Or do I need to create a filesystem on
-> top?
->
-
-Now we are at a point where I think nobody does it in such a way
-before. I create a "fake" shared block device with 3 block devices:
-/dev/loop1, /dev/loop2, /dev/loop3 and they all point to the same
-filesystem image. Then create only once the gfs2 filesystem on it.
-Afterwards you can call mount with each process context in the
-previously mentioned "network entity" for each block device in their
-"imagined" assigned network entity. The example script does a mount
-from each net-namespace in the executed net-namespace and you can
-access each per "network entity" mountpoint per /cluster/node1,
-/cluster/node2, /cluster/node3 on the executed net-namespace context.
-
-Yes when you call touch /cluster/node1/foo it should show up in the
-other mountpoints.
-
-> > We can use it for testing, development and also scale testing to have a
-> > large number of nodes joining a lockspace (which seems to be a problem
-> > right now). Instead of running 1000 vms, we can run 1000 net-namespaces
-> > in a more resource limited environment. For me it seems gfs2 can handle
-> > several mounts and still separate the resource according their global
-> > variables. Their data structures e.g. glock hash seems to have in their
-> > key a separation for that (fsid?). However this is still an experimenta=
-l
-> > feature we might run into issues that requires more separation related
-> > to net-namespaces. However basic testing seems to run just fine.
->
-> So is this all just to make testing and development easier so you
-> don't need 10 or 1000 nodes to do stress testing?  Would anyone use
-> this in real life?
->
-
-Stress testing maybe, development easier for sure. There are scaling
-issues with the recovery handling and handling about ~100 nodes
-related that DLM will stop all lockspace activity when nodes
-join/leave, that is something I want to look at when I hopefully have
-this patch series upstream.
-
-Another example is the DLM lock verifier [0], and I need to be careful
-with the name lock verifier. It verifies that only compatible lock
-modes can be in use at the same time on a per "network entity" basis.
-This is the fundamental mechanism of DLM, if this does not work DLM is
-broken. We can do that now because we know the whole cluster
-information. We can confirm on any payload that DLM works correctly.
-For me, this alone is worth having this feature.
-
-For example, we can introduce a new sort of cluster file system
-xfstests, touch /cluster/node1/foo and check if the file shows up in
-/cluster/node2/foo. That is an easy example, sometimes we need to
-synchronize vfs operations and check them on the other "network
-entity". With this feature we don't need to synchronize our "testing
-script" over the network anymore with other processes running on other
-"network entities".
-
-In real life there is maybe not an example yet. Maybe when people
-start to use DLM for user space locking on a container basis, but this
-requires net-namespace user space locking functionality that is a
-future step.
-
-> > Limitations
->
-> > I disable any functionality for the DLM character device that allow
-> > plock handling or do DLM locking from user space. Just don't use any
-> > plock locking in gfs2 for now. But basic vfs operations should work. Yo=
-u
-> > can even sniff DLM traffic on the created "dlmsw" virtual bridge.
->
-> So... what functionality is exposed by this patchset?  And Maybe add
-> in an "Advantages" section to explain why this is so good.
->
-
-Sure, it is important to mention that this net-namespace functionality
-is experimental. If you use DLM without changing the net-namespace
-process context it should work as before, in this case there are no
-limitations.
-
-- Alex
-
-[0] https://lore.kernel.org/gfs2/20240827180236.316946-1-aahringo@redhat.co=
-m/T/#t
-
 
