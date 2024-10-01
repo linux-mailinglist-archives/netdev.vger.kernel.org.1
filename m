@@ -1,68 +1,70 @@
-Return-Path: <netdev+bounces-131092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DD098C998
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:53:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D7E98C99E
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:53:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88531F23B31
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:53:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 093C1282FBE
+	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935FA1E0089;
-	Tue,  1 Oct 2024 23:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEB21E00BC;
+	Tue,  1 Oct 2024 23:53:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="onLVZo9d"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="V2TSWNFp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBADE1CF5D7
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:53:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BB31E00AF
+	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727826812; cv=none; b=BnvcGAStqIylNaEXF2VH8O5xpX7+5BBz5vYe19JjBOgsPBxFBIGOl6WNYM0IqB38+1KuC6rKWStB7Y4YsVyvnAlbhj2L/xls9OYOeOP3rzh9OPNk5ZZzUKgz8UhZV8m1kbcMHHNWApqA/g8X8CPa3b2P3igSneiLVG5aKk+iA6M=
+	t=1727826817; cv=none; b=ZU5Q/+PYzfo+7DVXTrJcNTZBUy0mx5Hb2nDKL4wr/6ZQZ0255zEN0SYNeAUbbD5jzjRyndRApV5yDtJ6ny1RJS71Wr8ICXZ01h2x6qXwN9bAkZCV7GOdyv5iL2Sxhz6tMM80/NW/jXHlG6mdhCrpzO5f8sjJr16pQdLsyvLd6ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727826812; c=relaxed/simple;
-	bh=v4d+UGl9YNSRPmUiAQL/XOCttKSR+tqAQhjsG7BZ9JU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cejIcFGusbMa8wcoGqzYJCM2IaxfiYlUo/hUVjPDqVfyeCsOJxiuaundo+qvmatuRrMuGcTxUT24/p2orUvL12ftwT8mPdoWczJmePyHidDhUFPyW/dlW+VSgJFDEPW1bVIBvW/7E010+QQdVcTczv+eOMHhFXNe9o8piFWVr4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=onLVZo9d; arc=none smtp.client-ip=209.85.215.178
+	s=arc-20240116; t=1727826817; c=relaxed/simple;
+	bh=NKSjiGMl8HVeQM8T+1w9Wip+oPRlHTP1Per56Ka6OO4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=YBZSuibIix5cVQ7ROYO7gO5H4/4uk9A9RMfJScanaWXmBXayDWUsIqyx0/CF3RigODkV8baO7gmqXVnW7X1JR6irWJo8Sj5ZrghTLGCvpnPUQ8gnykj/H3ezvCyXRA6ROVRRiDWKPTLMfap5v73lVu7SrlE8NiE4CkOxzxUqJII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=V2TSWNFp; arc=none smtp.client-ip=209.85.215.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7e6ba3f93fdso3859110a12.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:53:30 -0700 (PDT)
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-7db4c1a54easo3887649a12.1
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727826810; x=1728431610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=l5b1MjfGcd4AzGnOC54zgkOiQ8aJmBj62vqypQsDHj0=;
-        b=onLVZo9dr+AUIg+xW00kYTYnJhWof81AXVix2gDeweKa5A0FXekLwuxY0Ukn03xNyD
-         rxYJIwGzV70tL4lwiIH03yo+D2MtuQZOT33vAeEs68njPDLEY0DCXiBfJaEJn72iwBZw
-         loIT4Z7XqqRwTMY0dBiW93QMBunVDYy8f/z2A=
+        d=fastly.com; s=google; t=1727826815; x=1728431615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fNxcXSwfx56FZIl6Cm7lpquz7kJ98h6HMSLIQEYkHDY=;
+        b=V2TSWNFpjMKCzXWbOQ2fhlGWG1CoRSycziw8NOfXZFwXMyFXRC/UudQkzvKBQBt5fb
+         AwxhOSekCXt7pjJlaUovQcDZzryQv95gKFs2AjhczgAtG2eLh6qnT7aKUHC7PVT1DAdM
+         W5SzKdO7TGrhEyUBqZep3rRLBTw3UACn+GeTA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727826810; x=1728431610;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l5b1MjfGcd4AzGnOC54zgkOiQ8aJmBj62vqypQsDHj0=;
-        b=oOyqxnKsx1cyC/ji0OuT7vzHmUNdHNGc4epqKrd6rclKDsvEegZuU4CZP4E/eap7tJ
-         swpiY7vqWaXkjXjGFw2LxHgC36wSbccQPQL4+O6nhxuIHewee69nyrv4tyhTgIfuy2wl
-         ZSd0K/WVEypE/0cpAUDAqK/GoUeZHn3YCKdBwi4eiOnq9knP89wZlporH+utWMKyhLu2
-         uHVTrcmHaUzJ61c3Qh5+LfdRPVowUmdMRwiCZUe/kIUWdRuICkRdTax4vIjs/5KvYpcc
-         azTGvIh/RTl3pKkHQdwoimyNr++LPaQE7SWB78WntVeb4o4gG56PFKy9NeIBL8XAdvhU
-         pmaA==
-X-Gm-Message-State: AOJu0YwjHUt+yzGVY5w0cdviOzT+T2qpIoZT3ZJau/fWEWMnATEyYzbZ
-	cD2aSZkUsJSGpdcJnAsGMPgQAvRkxvKjHGKn0uf6gGnbGQ7l86h8Ybgj28L1NL6NXc0+lpXgkzv
-	bMe531PKmGW2WUrEESelF9h3Ip3BGH+MZ61nML1NPAwMr3t6YCtg15+3fHJgzTys2jGqDhet5/C
-	+6wbhSqLpC5NvJvczGITtLJ3/OriRUADzi544=
-X-Google-Smtp-Source: AGHT+IEQAMwrZpWjGQQAXOYO52vF2PdxicVe8qt++Jyzou6vIB2WjqtQirUzcksNEccb8Ff5uAtXNg==
-X-Received: by 2002:a17:90b:33c2:b0:2d8:7a3b:730d with SMTP id 98e67ed59e1d1-2e1846a0525mr1731254a91.21.1727826809507;
-        Tue, 01 Oct 2024 16:53:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727826815; x=1728431615;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fNxcXSwfx56FZIl6Cm7lpquz7kJ98h6HMSLIQEYkHDY=;
+        b=xPFvgGl6gJWXGEEfDmVaBrZ7bF2K1c6QPq0XIjWbT9eaWvzbR5RapdgZyr2VLuG8xk
+         hoWHtNzI8/g7Aa0qFhRTm99q0EIc2gD1ycstFjWjSaE0BvHT69xLPnYzf7iq630mbeR+
+         ND+701mHb0YmHMybP6A6NCjRKl2uzP0c6Wj80QzSKe7edBMk/sHIZi5BdQ0elrMynzBx
+         4lKjMYXyoyhOuu9Ik89lYvfNSoKj6RI7YZZZejx17sOJRbMB+WtAdZSO5x3869i2djBx
+         ELbj9LSf1aQO78CE+xu30ZiYoeIX09n9DH0B3NryzHKpvcUbDI2qPMGEqvP9zARo/grB
+         VFBg==
+X-Gm-Message-State: AOJu0YwjhOLxYZm7l4sqZUP7bLRVVUu9xK+T/gkRDXmcnaCR/KIltV+4
+	twQ5L9acOamykeFvwzXZObgrOSP0B0tZGfM1lqTzoPcQn17UCyEkYJDNJDCtBTQtQykqXESbQ3S
+	h1tUYrk4Qml+L3BD06Yasr8F2722jWr/UkGR4zqxhnRvyKNEhwoD3J2YHKqRLbsKQCSgeOef/sT
+	cYlH5g+OuNExO53UYp+qFDRTcfkEgOKm23IoU=
+X-Google-Smtp-Source: AGHT+IGk/edwwPJhtIujE/fEuThhfDAouuDtB+XD7cDRW7qhVSa/cILWYeRQBLMIALnf0IvrHUAu+w==
+X-Received: by 2002:a17:90a:c383:b0:2da:da85:b705 with SMTP id 98e67ed59e1d1-2e18466e09cmr1620618a91.14.1727826815119;
+        Tue, 01 Oct 2024 16:53:35 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f89e973sm213130a91.29.2024.10.01.16.53.27
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f89e973sm213130a91.29.2024.10.01.16.53.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 16:53:29 -0700 (PDT)
+        Tue, 01 Oct 2024 16:53:34 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: mkarsten@uwaterloo.ca,
@@ -73,38 +75,26 @@ Cc: mkarsten@uwaterloo.ca,
 	sridhar.samudrala@intel.com,
 	willemdebruijn.kernel@gmail.com,
 	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
 	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list),
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver),
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Mina Almasry <almasrymina@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Jiri Pirko <jiri@resnulli.us>,
 	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [RFC net-next v4 0/9] Add support for per-NAPI config via netlink
-Date: Tue,  1 Oct 2024 23:52:31 +0000
-Message-Id: <20241001235302.57609-1-jdamato@fastly.com>
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC net-next v4 1/9] net: napi: Make napi_defer_hard_irqs per-NAPI
+Date: Tue,  1 Oct 2024 23:52:32 +0000
+Message-Id: <20241001235302.57609-2-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20241001235302.57609-1-jdamato@fastly.com>
+References: <20241001235302.57609-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,385 +103,186 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Greetings:
+Add defer_hard_irqs to napi_struct in preparation for per-NAPI
+settings.
 
-Welcome to RFC v4.
+The existing sysfs parameter is respected; writes to sysfs will write to
+all NAPI structs for the device and the net_device defer_hard_irq field.
+Reads from sysfs show the net_device field.
 
-Very important and significant changes have been made since RFC v3 [1],
-please see the changelog below for details.
+The ability to set defer_hard_irqs on specific NAPI instances will be
+added in a later commit, via netdev-genl.
 
-A couple important call outs for this revision for reviewers:
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ .../networking/net_cachelines/net_device.rst  |  2 +-
+ include/linux/netdevice.h                     |  3 +-
+ net/core/dev.c                                | 10 +++---
+ net/core/dev.h                                | 36 +++++++++++++++++++
+ net/core/net-sysfs.c                          |  2 +-
+ 5 files changed, 45 insertions(+), 8 deletions(-)
 
-  1. idpf embeds a napi_struct in an internal data structure and
-     includes an assertion on the size of napi_struct. The maintainers
-     have stated that they think anyone touching napi_struct should update
-     the assertion [2], so I've done this in patch 3. 
-
-     Even though the assertion has been updated, I've given the
-     cacheline placement of napi_struct within idpf's internals no
-     thought or consideration.
-
-     Would appreciate other opinions on this; I think idpf should be
-     fixed. It seems unreasonable to me that anyone changing the size of
-     a struct in the core should need to think about cachelines in idpf.
-
-  2. This revision seems to work (see below for a full walk through). Is
-     this the behavior we want? Am I missing some use case or some
-     behavioral thing other folks need?
-
-  3. Re a previous point made by Stanislav regarding "taking over a NAPI
-     ID" when the channel count changes: mlx5 seems to call napi_disable
-     followed by netif_napi_del for the old queues and then calls
-     napi_enable for the new ones. In this RFC, the NAPI ID generation
-     is deferred to napi_enable. This means we won't end up with two of
-     the same NAPI IDs added to the hash at the same time (I am pretty
-     sure).
-
-     Can we assume all drivers will napi_disable the old queues before
-     napi_enable the new ones? If yes, we might not need to worry about
-     a NAPI ID takeover function.
+diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+index 22b07c814f4a..eeeb7c925ec5 100644
+--- a/Documentation/networking/net_cachelines/net_device.rst
++++ b/Documentation/networking/net_cachelines/net_device.rst
+@@ -99,7 +99,6 @@ unsigned_int                        num_rx_queues
+ unsigned_int                        real_num_rx_queues      -                   read_mostly         get_rps_cpu
+ struct_bpf_prog*                    xdp_prog                -                   read_mostly         netif_elide_gro()
+ unsigned_long                       gro_flush_timeout       -                   read_mostly         napi_complete_done
+-u32                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
+ unsigned_int                        gro_max_size            -                   read_mostly         skb_gro_receive
+ unsigned_int                        gro_ipv4_max_size       -                   read_mostly         skb_gro_receive
+ rx_handler_func_t*                  rx_handler              read_mostly         -                   __netif_receive_skb_core
+@@ -183,3 +182,4 @@ struct_devlink_port*                devlink_port
+ struct_dpll_pin*                    dpll_pin                                                        
+ struct hlist_head                   page_pools
+ struct dim_irq_moder*               irq_moder
++u32                                 napi_defer_hard_irqs
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index e87b5e488325..55764efc5c93 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -377,6 +377,7 @@ struct napi_struct {
+ 	struct list_head	dev_list;
+ 	struct hlist_node	napi_hash_node;
+ 	int			irq;
++	u32			defer_hard_irqs;
+ };
  
-  4. I made the decision to remove the WARN_ON_ONCE that (I think?)
-     Jakub previously suggested in alloc_netdev_mqs (WARN_ON_ONCE(txqs
-     != rxqs);) because this was triggering on every kernel boot with my
-     mlx5 NIC.
-
-  5. I left the "maxqs = max(txqs, rxqs);" in alloc_netdev_mqs despite
-     thinking this is a bit strange. I think it's strange that we might
-     be short some number of NAPI configs, but it seems like most people
-     are in favor of this approach, so I've left it.
-
-I'd appreciate thoughts from reviewers on the above items, if at all
-possible. Once those are addressed, modulo any feedback on the
-code/white space wrapping I still need to do, I think this is close to
-an official submission.
-
-Now, on to the implementation:
-
-This implementation allocates an array of "struct napi_config" in
-net_device and each NAPI instance is assigned an index into the config
-array.
-
-Per-NAPI settings like:
-  - NAPI ID
-  - gro_flush_timeout
-  - defer_hard_irqs
-
-are persisted in napi_config and restored on napi_disable/napi_enable
-respectively.
-
-To help illustrate how this would end up working, I've added patches for
-3 drivers, of which I have access to only 1:
-  - mlx5 which is the basis of the examples below
-  - mlx4 which has TX only NAPIs, just to highlight that case. I have
-    only compile tested this patch; I don't have this hardware.
-  - bnxt which I have only compiled tested. I don't have this
-    hardware.
-
-NOTE: I only tested this on mlx5; I have no access to the other hardware
-for which I provided patches. Hopefully other folks can help test :)
-
-This iteration seems to persist NAPI IDs and settings even when resizing
-queues, see below, so I think maybe this is getting close to where we
-want to land in terms of functionality.
-
-Here's how it works when I test it on my system:
-
-# start with 2 queues
-
-$ ethtool -l eth4 | grep Combined | tail -1
-Combined:	2
-
-First, output the current NAPI settings:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[{'defer-hard-irqs': 0,
-  'gro-flush-timeout': 0,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 0,
-  'gro-flush-timeout': 0,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Now, set the global sysfs parameters:
-
-$ sudo bash -c 'echo 20000 >/sys/class/net/eth4/gro_flush_timeout'
-$ sudo bash -c 'echo 100 >/sys/class/net/eth4/napi_defer_hard_irqs'
-
-Output current NAPI settings again:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[{'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Now set NAPI ID 345, via its NAPI ID to specific values:
-
-$ sudo ./tools/net/ynl/cli.py \
-          --spec Documentation/netlink/specs/netdev.yaml \
-          --do napi-set \
-          --json='{"id": 345,
-                   "defer-hard-irqs": 111,
-                   "gro-flush-timeout": 11111}'
-None
-
-Now output current NAPI settings again to ensure only NAPI ID 345
-changed:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-
-[{'defer-hard-irqs': 111,
-  'gro-flush-timeout': 11111,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Now, increase gro-flush-timeout only:
-
-$ sudo ./tools/net/ynl/cli.py \
-       --spec Documentation/netlink/specs/netdev.yaml \
-       --do napi-set --json='{"id": 345,
-                              "gro-flush-timeout": 44444}'
-None
-
-Now output the current NAPI settings once more:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[{'defer-hard-irqs': 111,
-  'gro-flush-timeout': 44444,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Now set NAPI ID 345 to have gro_flush_timeout of 0:
-
-$ sudo ./tools/net/ynl/cli.py \
-       --spec Documentation/netlink/specs/netdev.yaml \
-       --do napi-set --json='{"id": 345,
-                              "gro-flush-timeout": 0}'
-None
-
-Check that NAPI ID 345 has a value of 0:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-
-[{'defer-hard-irqs': 111,
-  'gro-flush-timeout': 0,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Change the queue count, ensuring that NAPI ID 345 retains its settings:
-
-$ sudo ethtool -L eth4 combined 4
-
-Check that the new queues have the system wide settings but that NAPI ID
-345 remains unchanged:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-
-[{'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 347,
-  'ifindex': 7,
-  'irq': 529},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 346,
-  'ifindex': 7,
-  'irq': 528},
- {'defer-hard-irqs': 111,
-  'gro-flush-timeout': 0,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Now reduce the queue count below where NAPI ID 345 is indexed:
-
-$ sudo ethtool -L eth4 combined 1
-
-Check the output:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[{'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Re-increase the queue count to ensure NAPI ID 345 is re-assigned the same
-values:
-
-$ sudo ethtool -L eth4 combined 2
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[{'defer-hard-irqs': 111,
-  'gro-flush-timeout': 0,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Create new queues to ensure the sysfs globals are used for the new NAPIs
-but that NAPI ID 345 is unchanged:
-
-$ sudo ethtool -L eth4 combined 8
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-[...]
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 346,
-  'ifindex': 7,
-  'irq': 528},
- {'defer-hard-irqs': 111,
-  'gro-flush-timeout': 0,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 100,
-  'gro-flush-timeout': 20000,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Last, but not least, let's try writing the sysfs parameters to ensure
-all NAPIs are rewritten:
-
-$ sudo bash -c 'echo 33333 >/sys/class/net/eth4/gro_flush_timeout'
-$ sudo bash -c 'echo 222 >/sys/class/net/eth4/napi_defer_hard_irqs'
-
-Check that worked:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 7}'
-
-[...]
- {'defer-hard-irqs': 222,
-  'gro-flush-timeout': 33333,
-  'id': 346,
-  'ifindex': 7,
-  'irq': 528},
- {'defer-hard-irqs': 222,
-  'gro-flush-timeout': 33333,
-  'id': 345,
-  'ifindex': 7,
-  'irq': 527},
- {'defer-hard-irqs': 222,
-  'gro-flush-timeout': 33333,
-  'id': 344,
-  'ifindex': 7,
-  'irq': 327}]
-
-Thanks,
-Joe
-
-[1]: https://lore.kernel.org/netdev/20240912100738.16567-1-jdamato@fastly.com/
-[2]: https://lore.kernel.org/netdev/20240925180017.82891-1-jdamato@fastly.com/T/#m56b743bd16304a626848b14f90cecb661f464b74 
-
-rfcv4:
-  - Updated commit messages of most patches
-  - Renamed netif_napi_add_storage to netif_napi_add_config in patch 5
-  - Added a NULL check in netdev_set_defer_hard_irqs and
-    netdev_set_gro_flush_timeout for netdev->napi_config in patch 5
-  - Removed the WARN_ON_ONCE suggested in an earlier revision
-    in alloc_netdev_mqs from patch 5; it triggers every time on my mlx5
-    machine at boot and needlessly spams the log
-  - Added a locking adjustment suggested by Stanislav to patch 6 to
-    protect napi_id in patch 5
-  - Removed napi_hash_del from netif_napi_del in patch 5. netif_napi_del
-    calls __netif_napi_del which itself calls napi_hash_del. The
-    original code thus resulted in two napi_hash_del calls, which is
-    incorrect.
-  - Removed the napi_hash_add from netif_napi_add_weight in patch 5.
-    NAPIs are added to the hash when napi_enable is called, instead.
-  - Moved the napi_restore_config to the top of napi_enable in patch 5.
-  - Simplified the logic in __netif_napi_del and removed napi_hash_del.
-    NAPIs are removed in napi_disable.
-  - Fixed merge conflicts in patch 6 so it applies cleanly
-
-rfcv3:
-  - Renamed napi_storage to napi_config
-  - Reordered patches
-  - Added defer_hard_irqs and gro_flush_timeout to napi_struct
-  - Attempt to save and restore settings on napi_disable/napi_enable
-  - Removed weight as a parameter to netif_napi_add_storage
-  - Updated driver patches to no longer pass in weight
-
-rfcv2:
-  - Almost total rewrite from v1
-
-Joe Damato (9):
-  net: napi: Make napi_defer_hard_irqs per-NAPI
-  netdev-genl: Dump napi_defer_hard_irqs
-  net: napi: Make gro_flush_timeout per-NAPI
-  netdev-genl: Dump gro_flush_timeout
-  net: napi: Add napi_config
-  netdev-genl: Support setting per-NAPI config values
-  bnxt: Add support for persistent NAPI config
-  mlx5: Add support for persistent NAPI config
-  mlx4: Add support for persistent NAPI config to RX CQs
-
- Documentation/netlink/specs/netdev.yaml       | 25 +++++
- .../networking/net_cachelines/net_device.rst  |  5 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  3 +-
- drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  2 +-
- drivers/net/ethernet/mellanox/mlx4/en_cq.c    |  3 +-
- .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 +-
- include/linux/netdevice.h                     | 38 +++++++-
- include/uapi/linux/netdev.h                   |  3 +
- net/core/dev.c                                | 95 ++++++++++++++++---
- net/core/dev.h                                | 90 ++++++++++++++++++
- net/core/net-sysfs.c                          |  4 +-
- net/core/netdev-genl-gen.c                    | 14 +++
- net/core/netdev-genl-gen.h                    |  1 +
- net/core/netdev-genl.c                        | 57 +++++++++++
- tools/include/uapi/linux/netdev.h             |  3 +
- 15 files changed, 320 insertions(+), 25 deletions(-)
-
+ enum {
+@@ -2075,7 +2076,6 @@ struct net_device {
+ 	unsigned int		real_num_rx_queues;
+ 	struct netdev_rx_queue	*_rx;
+ 	unsigned long		gro_flush_timeout;
+-	u32			napi_defer_hard_irqs;
+ 	unsigned int		gro_max_size;
+ 	unsigned int		gro_ipv4_max_size;
+ 	rx_handler_func_t __rcu	*rx_handler;
+@@ -2398,6 +2398,7 @@ struct net_device {
+ 
+ 	/** @irq_moder: dim parameters used if IS_ENABLED(CONFIG_DIMLIB). */
+ 	struct dim_irq_moder	*irq_moder;
++	u32			napi_defer_hard_irqs;
+ 
+ 	u8			priv[] ____cacheline_aligned
+ 				       __counted_by(priv_len);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index cd479f5f22f6..748739958d2a 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6227,7 +6227,7 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+ 	if (work_done) {
+ 		if (n->gro_bitmask)
+ 			timeout = READ_ONCE(n->dev->gro_flush_timeout);
+-		n->defer_hard_irqs_count = READ_ONCE(n->dev->napi_defer_hard_irqs);
++		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
+ 	}
+ 	if (n->defer_hard_irqs_count > 0) {
+ 		n->defer_hard_irqs_count--;
+@@ -6365,7 +6365,7 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
+ 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+ 
+ 	if (flags & NAPI_F_PREFER_BUSY_POLL) {
+-		napi->defer_hard_irqs_count = READ_ONCE(napi->dev->napi_defer_hard_irqs);
++		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
+ 		timeout = READ_ONCE(napi->dev->gro_flush_timeout);
+ 		if (napi->defer_hard_irqs_count && timeout) {
+ 			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
+@@ -6647,6 +6647,7 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+ 	INIT_HLIST_NODE(&napi->napi_hash_node);
+ 	hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
+ 	napi->timer.function = napi_watchdog;
++	napi_set_defer_hard_irqs(napi, READ_ONCE(dev->napi_defer_hard_irqs));
+ 	init_gro_hash(napi);
+ 	napi->skb = NULL;
+ 	INIT_LIST_HEAD(&napi->rx_list);
+@@ -11053,7 +11054,7 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev)
+ 
+ 	if (!IS_ENABLED(CONFIG_PREEMPT_RT)) {
+ 		dev->gro_flush_timeout = 20000;
+-		dev->napi_defer_hard_irqs = 1;
++		netdev_set_defer_hard_irqs(dev, 1);
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(netdev_sw_irq_coalesce_default_on);
+@@ -11991,7 +11992,6 @@ static void __init net_dev_struct_check(void)
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, real_num_rx_queues);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, _rx);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_flush_timeout);
+-	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, napi_defer_hard_irqs);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_max_size);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_ipv4_max_size);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler);
+@@ -12003,7 +12003,7 @@ static void __init net_dev_struct_check(void)
+ #ifdef CONFIG_NET_XGRESS
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
+ #endif
+-	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 104);
++	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 100);
+ }
+ 
+ /*
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 5654325c5b71..b3792219879b 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -138,6 +138,42 @@ static inline void netif_set_gro_ipv4_max_size(struct net_device *dev,
+ 	WRITE_ONCE(dev->gro_ipv4_max_size, size);
+ }
+ 
++/**
++ * napi_get_defer_hard_irqs - get the NAPI's defer_hard_irqs
++ * @n: napi struct to get the defer_hard_irqs field from
++ *
++ * Return: the per-NAPI value of the defar_hard_irqs field.
++ */
++static inline u32 napi_get_defer_hard_irqs(const struct napi_struct *n)
++{
++	return READ_ONCE(n->defer_hard_irqs);
++}
++
++/**
++ * napi_set_defer_hard_irqs - set the defer_hard_irqs for a napi
++ * @n: napi_struct to set the defer_hard_irqs field
++ * @defer: the value the field should be set to
++ */
++static inline void napi_set_defer_hard_irqs(struct napi_struct *n, u32 defer)
++{
++	WRITE_ONCE(n->defer_hard_irqs, defer);
++}
++
++/**
++ * netdev_set_defer_hard_irqs - set defer_hard_irqs for all NAPIs of a netdev
++ * @netdev: the net_device for which all NAPIs will have defer_hard_irqs set
++ * @defer: the defer_hard_irqs value to set
++ */
++static inline void netdev_set_defer_hard_irqs(struct net_device *netdev,
++					      u32 defer)
++{
++	struct napi_struct *napi;
++
++	WRITE_ONCE(netdev->napi_defer_hard_irqs, defer);
++	list_for_each_entry(napi, &netdev->napi_list, dev_list)
++		napi_set_defer_hard_irqs(napi, defer);
++}
++
+ int rps_cpumask_housekeeping(struct cpumask *mask);
+ 
+ #if defined(CONFIG_DEBUG_NET) && defined(CONFIG_BPF_SYSCALL)
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 05cf5347f25e..25125f356a15 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -429,7 +429,7 @@ static int change_napi_defer_hard_irqs(struct net_device *dev, unsigned long val
+ 	if (val > S32_MAX)
+ 		return -ERANGE;
+ 
+-	WRITE_ONCE(dev->napi_defer_hard_irqs, val);
++	netdev_set_defer_hard_irqs(dev, (u32)val);
+ 	return 0;
+ }
+ 
 -- 
 2.25.1
 
