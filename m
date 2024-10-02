@@ -1,149 +1,125 @@
-Return-Path: <netdev+bounces-131178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05BF298D10A
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:20:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDEB298D11D
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8666BB210BB
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 10:20:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 891D81F22EC0
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 10:23:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8B91E500C;
-	Wed,  2 Oct 2024 10:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8481E5031;
+	Wed,  2 Oct 2024 10:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kuVp1nDN"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="S5Pepdfm"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D77194AFE;
-	Wed,  2 Oct 2024 10:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAA41E500C;
+	Wed,  2 Oct 2024 10:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727864408; cv=none; b=rgdNMYjmPVW2q1wqZc+OJG/QmzuDbCM0hx6oPQBK8xSI+r8kjG3juxBz71zLtw/PxiubOWM3O/I9uangnPQNiH0af/+U0LObjfCSvJgOgrOdk1lOGcoVqBu60woD598pmtc2SwCtxXQcYnZbqPWltqKAn77rDX47HKQRQDfs4YM=
+	t=1727864634; cv=none; b=vAowT6yZrWA7/G8e0C7BnpwsVvitgEZ2k3pykXCcRHdcCyHsQpZKd1JZteSbtcdEm6eN9gSLOeLJRXLwkoqEtY2Lb6Bt493PCOi7HfbDx2yV00TMDC0VCstGaguUp+qIpvX5wKngniTEoFN/lkx1m+/npnWEa7rfcb/T7//2u6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727864408; c=relaxed/simple;
-	bh=spporCEuuqaLQHIllwZn/rEyv+ce3d3Uw4ieOTkMQ4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dbsPjhltq28+sAK5UYLqyUfHCEACWaDaI2cdqeNBLlkUOQus3OjpIpz8iPVS8XrCndxSd5R4PSlzUcNNwQaTz6Q2VefC/tGGj+HMbPJnF07f7ajtOUpmX++s4Ne7X227gxdmygYtzt+pldZsoGk7XoqLz4fpC0L9WGeqRlxhysk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kuVp1nDN; arc=none smtp.client-ip=217.70.183.201
+	s=arc-20240116; t=1727864634; c=relaxed/simple;
+	bh=UETMzQ3OoNiJhQdIh6ZaufX7J4Bz2WQvXdr/VFEIA6Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=B1DkRZH9cpsLi3rnVBkYYlUaWOthk2QB85AnWxo7/pEsjGDko1Wsdar8E6I7Y5BgOlLaaBM7n4pz995j80IyBeqHbc2QTXogy/wiNjR2Aic1Mi5hetjknp5LrU9I7Qpgxq8XxUXRG8CT7wmV54fLjcECISyzpINLpIgnhkwyW+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=S5Pepdfm; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 489451BF203;
-	Wed,  2 Oct 2024 10:19:58 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7C8E7E0002;
+	Wed,  2 Oct 2024 10:23:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727864402;
+	t=1727864625;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1YkZWklw874sJSFjl4cJH9cXJK3orr7YNOO08V6uy0E=;
-	b=kuVp1nDNd5O1mXz+J9aoIJJCfxxZUHR2U8mvD0mG0+NuADt8G7pVl0N2hKb5ZV8a0RgR8e
-	ttNEPpX92g5RGfek90DE7wZWueREOem4Qf7bULa/5BPggAMYI9wiopQK+ZoP/nJOb2og46
-	sxRMLxUqYXex3teddVysf8vFX3UpdhC+tTPRdsGUIq7Oh1SqOyKinQa8+qcwB8/9p1iQ1N
-	yvUUSpTmZt4MAeT0duKEkWedm9o/rrEcwQ947rWZziQgnLqhDcrf5S/lFr/jxGdnV5I0OJ
-	Yfp6meHyMqfQi6SfPObkTT2FWQYrjVTZT8SkhOndhJF8WrJzqZGoKOphaP1p6A==
-Date: Wed, 2 Oct 2024 12:19:57 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: "Arnd Bergmann" <arnd@arndb.de>
-Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
- <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
- <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
- <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
- <lars.povlsen@microchip.com>, "Steen Hegelund"
- <Steen.Hegelund@microchip.com>, "Daniel Machon"
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
- <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
- "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
- Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
- <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
- <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item
- when cpu-syscon is not present
-Message-ID: <20241002121957.1f10bf8e@bootlin.com>
-In-Reply-To: <bd40a139-6222-48c5-ab9a-172034ebc0e9@app.fastmail.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
-	<20240930121601.172216-3-herve.codina@bootlin.com>
-	<d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
-	<20240930162616.2241e46f@bootlin.com>
-	<20241001183038.1cc77490@bootlin.com>
-	<bd40a139-6222-48c5-ab9a-172034ebc0e9@app.fastmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KRHxjIX8VwP6K29LEBgziOfkVkHwg5LR9DISQvSAH4A=;
+	b=S5PepdfmdUU+ffyK54VOUCB4Uq2H32JBV4LA3PYXUOm4JF3Mj1eIy/j6bNvw8yxwnDsbAA
+	nv0Qv8Aj6qtpua/8v/57Ymhb0illV1oDr69WCY6FR5qBf61w6FU0i48fUEhFumcN9g3Rvr
+	othGzyM7MnHFyg6zR98dWMNvlHOSy3AXr8DwhpwRCltZC+98RNJwBysNdhetRHXN8+GjEi
+	7CAjLIHP2muE5SmZy7MguDiZax44zVib9giyjj3JPcM4oRkP3xUt7u4DF260KHfG2Y+NW2
+	jP1s+AXcteuAgSoK5hzBzrpOm2/4ylyOVtC6wh7ImQKdUgCUAG9sYDZg6ZRhYA==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "Kory Maincent (Dent Project)" <kory.maincent@bootlin.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Kyle Swenson <kyle.swenson@est.tech>,
+	Simon Horman <horms@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	thomas.petazzoni@bootlin.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net v2] net: pse-pd: tps23881: Fix boolean evaluation for bitmask checks
+Date: Wed,  2 Oct 2024 12:23:40 +0200
+Message-Id: <20241002102340.233424-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hi Arnd,
+Fix incorrect boolean evaluation when checking bitmask values.
+The existing code directly assigned the result of bitwise operations
+to boolean variables. In the case of 4-pair PoE, this led to incorrect
+enabled and delivering status values.
 
-On Wed, 02 Oct 2024 09:29:35 +0000
-"Arnd Bergmann" <arnd@arndb.de> wrote:
+This has been corrected by explicitly converting the bitmask results
+to boolean using the !! operator, ensuring proper evaluation.
 
-> On Tue, Oct 1, 2024, at 16:30, Herve Codina wrote:
-> > On Mon, 30 Sep 2024 16:26:16 +0200
-> > Herve Codina <herve.codina@bootlin.com> wrote:
-> > --- 8< ---
-> >
-> > In mchp_sparx5_map_syscon(), I will call the syscon API or the local
-> > function based on the device compatible string:
-> > 	--- 8< ---
-> > 	if (of_device_is_compatible(pdev->dev.of_node, 
-> > "microchip,lan966x-switch-reset"))
-> > 		regmap = mchp_lan966x_syscon_to_regmap(&pdev->dev, syscon_np);
-> > 	else
-> > 		regmap = syscon_node_to_regmap(syscon_np);
-> > 	--- 8< ---
-> >
-> > Is this kind of solution you were expecting?
-> > If you have thought about something different, can you give me some pointers?  
-> 
-> Hi Hervé,
-> 
-> The way I had imagined this was to not need an if() check
-> at all but unconditionally map the syscon registers in the
-> reset driver.
-> 
-> The most important part here is to have sensible bindings
-> that don't need to describe the difference between PCI
-> and SoC mode. This seems fine for the lan966x case, but
-> I'm not sure why you need to handle sparx5 differently here.
-> Do you expect the syscon to be shared with other drivers
-> on sparx5 but not lan966x?
+Fixes: 20e6d190ffe1 ("net: pse-pd: Add TI TPS23881 PSE controller driver")
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-Thanks for this reply.
+Change in v2:
+- Update commit message to describe the issue.
 
-Exactly, on sparx5 syscon is shared...
-$ git grep 'microchip,sparx5-cpu-syscon'
-...
-arch/arm64/boot/dts/microchip/sparx5.dtsi:                      compatible = "microchip,sparx5-cpu-syscon", "syscon",
-drivers/mmc/host/sdhci-of-sparx5.c:     const char *syscon = "microchip,sparx5-cpu-syscon";
-drivers/power/reset/ocelot-reset.c:     .syscon          = "microchip,sparx5-cpu-syscon",
-drivers/spi/spi-dw-mmio.c:      const char *syscon_name = "microchip,sparx5-cpu-syscon";
-$
+ drivers/net/pse-pd/tps23881.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-> 
-> I don't thinkt this bit matters too much and what you suggest
-> works fine, I just want to be sure I understand what you are
-> doing.
-> 
->       Arnd
+diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+index 5c4e88be46ee..1a57c55f8577 100644
+--- a/drivers/net/pse-pd/tps23881.c
++++ b/drivers/net/pse-pd/tps23881.c
+@@ -139,9 +139,9 @@ static int tps23881_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
+ 
+ 	chan = priv->port[id].chan[0];
+ 	if (chan < 4)
+-		enabled = ret & BIT(chan);
++		enabled = !!(ret & BIT(chan));
+ 	else
+-		enabled = ret & BIT(chan + 4);
++		enabled = !!(ret & BIT(chan + 4));
+ 
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+@@ -172,11 +172,11 @@ static int tps23881_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 
+ 	chan = priv->port[id].chan[0];
+ 	if (chan < 4) {
+-		enabled = ret & BIT(chan);
+-		delivering = ret & BIT(chan + 4);
++		enabled = !!(ret & BIT(chan));
++		delivering = !!(ret & BIT(chan + 4));
+ 	} else {
+-		enabled = ret & BIT(chan + 4);
+-		delivering = ret & BIT(chan + 8);
++		enabled = !!(ret & BIT(chan + 4));
++		delivering = !!(ret & BIT(chan + 8));
+ 	}
+ 
+ 	if (priv->port[id].is_4p) {
+-- 
+2.34.1
 
-Best regards,
-Hervé
 
