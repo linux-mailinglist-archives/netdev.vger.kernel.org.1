@@ -1,175 +1,147 @@
-Return-Path: <netdev+bounces-131173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2B598D024
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:30:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D06DF98D059
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89B8DB223DB
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:30:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30514B22362
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078181C68BB;
-	Wed,  2 Oct 2024 09:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D141E0B61;
+	Wed,  2 Oct 2024 09:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="fgAVgRu/";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B0Jzg89B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KFZpCbPv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E7C1C2DBE;
-	Wed,  2 Oct 2024 09:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A69C1CDFDF
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 09:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727861411; cv=none; b=GFiuDKY0raax611dSgmVYTcJpFp+nsEsiEhrLKc0cxD+Er7PSCEsNBX4OC4nU4rZhJHjrb7U9CV+VmqN3vH8efpcB9/QTWfHejuTH7rL4l/IZt+EQbKExjlETLzVOL9SSGr44MM5sd7IlLJqmdU+RiuegrdgSqNXQ6H1nxisdKI=
+	t=1727861876; cv=none; b=qDkYJS4f6EH/oxgfYNYPNiKbrLAwRQchgZb/Eb5BWjqRlJ/1eocaE6V5NyqRze0vYE+9E3rm42LkElMqZity1TcDs15KWk1tmOAr6jefD4TXKIsLdKH4uxuvVxAFEURRiAvOlWutea0gumryM9clwjBwV5JUCXStxeRbxYV6Uq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727861411; c=relaxed/simple;
-	bh=F4uPivEyvqmkg6qk17zm92vr+Ef3iWGqwQwnGh0igRQ=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=l1BR1iwKx1afh+GQTsJFtLLtwPC0R7xRBoSWgbdnQHvjKIYOgnTKmF0F1ZnX6ILGoGnHz1HqTbmx3hQKp24zZJ9b9J6RqfbZitY9QpiUHv0p6FOP8Jwti0xTxDB4BYIMwP7kvC5PAgRRUkhs5yjjnwYLZmb/iiw1t6TeK73K38w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=fgAVgRu/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B0Jzg89B; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 811A71140206;
-	Wed,  2 Oct 2024 05:30:08 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 02 Oct 2024 05:30:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1727861408;
-	 x=1727947808; bh=6ZaWIYHqvT0trQqwJl3ZdMtJTTyJ1btUIeNi3HbNeug=; b=
-	fgAVgRu/VUQIL4YZtZuzBdiFaeoz3UW6cC7LmRVM8T+OlEbJHGLY1i0CrTo6CJw5
-	TuUWSH8WM2OB1q652bkIDHhhUdo0GLYLEY443Wt+7J8Jmzf1HPlZG0PNRzOdUuto
-	0lMTrJPQR917Z5ln9n0io9ZtkjUgjr+h1Fkk1NG3X9XI2LdSLKR/4c83MpyqhNk6
-	hv6/tuZgHNqeUMZDvsacfU0SwC0W4RXcEU0FMgYRC+lFkcCg+nc2d9q6dofGh5AE
-	7cH1w7Eu3wcAb+39Q65/sZPjDO9TzOLsPMlYelpNuzPRt8At/mVqniE0JbzOWdXo
-	K0zIRzc25TUuf20qEdPTGw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1727861408; x=
-	1727947808; bh=6ZaWIYHqvT0trQqwJl3ZdMtJTTyJ1btUIeNi3HbNeug=; b=B
-	0Jzg89BPUPIBWeZB3g4Ne4Wmf9+BiU59cdYm8JRlfd0EMBr4Bt+EOLgqCu74kr6K
-	x2CVBGXJGdXkIdS44rk6A5T0gPWPE2rmPi9CSCj6Tyl2aQ1cFB6MAg+DJE9ymLfj
-	IEWYZlqqQfS0S4vaEogzhEltfI1Mwp7bPFQ9tO2CfN0Nm2vJ34d9gcrTgwCNjcIN
-	3QV8mL7CM5AhODdrYk58l73LQ1p9oqc40E68seNLfJmZfsvlBQAu9RdtzHclrOdl
-	h4UFl418uBDjLTc5KCdDRryNEvjxAi3pcw74YhZGdQcTSA63kV5nIY5c3OHzuCdq
-	zhIzsN7ABzwlpuDdi4nCw==
-X-ME-Sender: <xms:nxL9ZoT_CgYCUfSRQJsgX-S-8_CGEH4M-pC79GqeoGRRkHGZKENrqA>
-    <xme:nxL9Zlx_5cHSFIIK51Vz7UDLtM24UvdGIBh52r6tzUIeLGaPMF4ML9yO73Ha6lHUm
-    3IvlZ2smgDeWEjviHk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdduledgudegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdeg
-    jedvfeehtdeggeevheefleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepfedv
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguvghrvghkrdhkihgvrhhnrghnse
-    grmhgurdgtohhmpdhrtghpthhtohepughrrghgrghnrdgtvhgvthhitgesrghmugdrtgho
-    mhdprhgtphhtthhopehhvghrvhgvrdgtohguihhnrgessghoohhtlhhinhdrtghomhdprh
-    gtphhtthhopehluhgtrgdrtggvrhgvshholhhisegsohhothhlihhnrdgtohhmpdhrtghp
-    thhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgu
-    hidrshhhvghvtghhvghnkhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepsghhvghlgh
-    grrghssehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhm
-X-ME-Proxy: <xmx:nxL9Zl06VOcrBeoF6pwyXEozUaLhRo5uaN-WsJ-r_zeQd1nvOOc9Yw>
-    <xmx:nxL9ZsDT6-MQasEkI4Gr0_eD215kT0GxDEPm-JXQyGxZdlROfLuMvA>
-    <xmx:nxL9Zhht69zyf2l6upRWSDQlUtb7VYlG5oHIrIyXe85wQtxpBVjYQQ>
-    <xmx:nxL9ZoqfR3cVJRIK4tsYrtczQ7WvNJZ9MkBLXLJQHt9dLuhoVIQUhw>
-    <xmx:oBL9ZsPdlsnGTgWuo_6eKK1tH3TkpfLhEVyZ1nS4p-m9m0BMxVBxUtn->
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 2881B2220071; Wed,  2 Oct 2024 05:30:07 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1727861876; c=relaxed/simple;
+	bh=AJW4LybkDuThd0WZDh6YTwe/YoP8gO38i47n6ueldgA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u+fvQFGo2zQ97IuZXyl70w66f7RA+rVX5iAlVjn2fZhwE+ggB7ejh7o10CviYeHRVDOfsHJD0CIE3d1iz+EkLR2DJbGd8xSb6urn9QmBz6nXHQ4xT3ToAYLpIK6o85fpuqnROYJRqeHDY3sEWKMHOEz+N9M0UGXBR/9SY8ckwZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KFZpCbPv; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7ae50bf69d6so25125585a.2
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 02:37:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727861874; x=1728466674; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DP+VlmsW+1b9k0It6iwoYD1oXAu6XJgpdIVTTeYmXDo=;
+        b=KFZpCbPvT+jqb5UPftMDvtr2OaY25PK0df/T8/LNgEKSr+/nyPJtEEanG+nFTO6Aun
+         9xhu3o4yKzHSdNtPCMnrHlG8yXZEj9vzYG5ypmCw7hUUa4nzdNm3U1A4ne9aDxDl9LAY
+         55cc1xAuL1xHAC/3aB5qjlkf/1/gBJM+O1VLgnU5INFGp6F5bC/HIdSIqDHYav7mFEAg
+         4PnJWCJeTglaTdwMPcTKjbWNhEHh1PPZKbJCd883luR/5eCYPtlwbDJl4FnR1rBOyHrR
+         Ypx7DdQDVu3HnKDc3wJiQWs2uu1UFvWnODWG5AjiU4MumidtOmG+zGKS+8lxzhmNb2W4
+         D5Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727861874; x=1728466674;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DP+VlmsW+1b9k0It6iwoYD1oXAu6XJgpdIVTTeYmXDo=;
+        b=mCVV8VDyKyfuc8aH91e88rPlSUwxqBWx2aGj3PCDhuKw03X5Ki549g0vJLJKg9HAt7
+         WXdSpqrLozDO7Ji9KOH+L4U7MiePBxZNk+rLLv23wz/8XLim79Kcw3aABYBXK3VJZPP3
+         SxvC4jLr3JXYeVUOg9W/pg5nUEzB9cn7ZUoyUYGg5HxRiQeaforx58oq/OQM1muc0Bz7
+         j+EIA1lCXhoG2yHomF0oTSUgkzkMVRxQz75P4Bn0DWNHY0XjcEbf9xuwj23iKc1KF6gt
+         WIwrSy3IkEcOeqG/bQelCcRCGiir+0a8H033V7VpHH45OvfAYV41rTa38CjEt2H7nB+3
+         bYJA==
+X-Gm-Message-State: AOJu0Yxf6kpK2oOzQF5+b38kqjaOHUEOeegZszcodOR6Vw+w7SpksvTn
+	zwuy4fo7way5gDphZ12Fvk1Vy1FtGLTnNzvCy6notWAMiFZTaE1K0jAwxkPkE9Wxgh59pRDqy75
+	nhcpJD+iF3sZtIhJc3P9svNL11eyr
+X-Google-Smtp-Source: AGHT+IG3mgC/BUo2a3LsZE41Vv+kVRfpIPJLV6J2AplNs0Wy0SDfb/5sYLkrnINj5yHQquySwTFm/Po8MCXTLhl6WP4=
+X-Received: by 2002:a05:6214:ace:b0:6cb:6140:f490 with SMTP id
+ 6a1803df08f44-6cb81a93f95mr16464156d6.8.1727861873696; Wed, 02 Oct 2024
+ 02:37:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 02 Oct 2024 09:29:35 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herve Codina" <herve.codina@bootlin.com>
-Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>,
- "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>,
- "Lars Povlsen" <lars.povlsen@microchip.com>,
- "Steen Hegelund" <Steen.Hegelund@microchip.com>,
- "Daniel Machon" <daniel.machon@microchip.com>,
- UNGLinuxDriver@microchip.com, "Rob Herring" <robh@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Allan Nielsen" <allan.nielsen@microchip.com>,
- "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
-Message-Id: <bd40a139-6222-48c5-ab9a-172034ebc0e9@app.fastmail.com>
-In-Reply-To: <20241001183038.1cc77490@bootlin.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
- <20240930121601.172216-3-herve.codina@bootlin.com>
- <d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
- <20240930162616.2241e46f@bootlin.com> <20241001183038.1cc77490@bootlin.com>
-Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item when
- cpu-syscon is not present
-Content-Type: text/plain; charset=utf-8
+References: <1727849643-11648-1-git-send-email-guoxin0309@gmail.com> <CANn89iLq0g=TmL+nABr=j4N2gw45yJgRr6g8YOX+iMdWrM3jOg@mail.gmail.com>
+In-Reply-To: <CANn89iLq0g=TmL+nABr=j4N2gw45yJgRr6g8YOX+iMdWrM3jOg@mail.gmail.com>
+From: Xin Guo <guoxin0309@gmail.com>
+Date: Wed, 2 Oct 2024 17:37:42 +0800
+Message-ID: <CAMaK5_gm=8+-KqXq98VSW9fJJ8Zx9fdv2Mbrx_30NzSUQny5ig@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: remove unnecessary update for tp->write_seq
+ in tcp_connect()
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 1, 2024, at 16:30, Herve Codina wrote:
-> On Mon, 30 Sep 2024 16:26:16 +0200
-> Herve Codina <herve.codina@bootlin.com> wrote:
-> --- 8< ---
+Thanks Eric, I will send v2 for this patch.
+
+On Wed, Oct 2, 2024 at 3:33=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
-> In mchp_sparx5_map_syscon(), I will call the syscon API or the local
-> function based on the device compatible string:
-> 	--- 8< ---
-> 	if (of_device_is_compatible(pdev->dev.of_node,=20
-> "microchip,lan966x-switch-reset"))
-> 		regmap =3D mchp_lan966x_syscon_to_regmap(&pdev->dev, syscon_np);
-> 	else
-> 		regmap =3D syscon_node_to_regmap(syscon_np);
-> 	--- 8< ---
+> On Wed, Oct 2, 2024 at 8:14=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wro=
+te:
+> >
+> > From: "xin.guo" <guoxin0309@gmail.com>
+> >
+> > Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
+> > introduce tcp_connect_queue_skb() and it would overwrite tcp->write_seq=
+,
+> > so it is no need to update tp->write_seq before invoking
+> > tcp_connect_queue_skb()
+> >
+> > Signed-off-by: xin.guo <guoxin0309@gmail.com>
+> > ---
+> >  net/ipv4/tcp_output.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > index 4fd746b..f255c7d 100644
+> > --- a/net/ipv4/tcp_output.c
+> > +++ b/net/ipv4/tcp_output.c
+> > @@ -4134,7 +4134,7 @@ int tcp_connect(struct sock *sk)
+> >         if (unlikely(!buff))
+> >                 return -ENOBUFS;
+> >
+> > -       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
+> > +       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
+> >         tcp_mstamp_refresh(tp);
+> >         tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
+> >         tcp_connect_queue_skb(sk, buff);
+> > --
+> > 1.8.3.1
+> >
 >
-> Is this kind of solution you were expecting?
-> If you have thought about something different, can you give me some po=
-inters?
-
-Hi Herv=C3=A9,
-
-The way I had imagined this was to not need an if() check
-at all but unconditionally map the syscon registers in the
-reset driver.
-
-The most important part here is to have sensible bindings
-that don't need to describe the difference between PCI
-and SoC mode. This seems fine for the lan966x case, but
-I'm not sure why you need to handle sparx5 differently here.
-Do you expect the syscon to be shared with other drivers
-on sparx5 but not lan966x?
-
-I don't thinkt this bit matters too much and what you suggest
-works fine, I just want to be sure I understand what you are
-doing.
-
-      Arnd
+> At line 3616, there is this comment :
+>
+> /* FIN eats a sequence byte, write_seq advanced by tcp_queue_skb(). */
+>
+> I think you need to add a similar one. Future readers will thank you.
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 4fd746bd4d54f621601b20c3821e71370a4a615a..86dea6f022d36cb56ef5678ad=
+d2bd63132eee20f
+> 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -4134,7 +4134,10 @@ int tcp_connect(struct sock *sk)
+>         if (unlikely(!buff))
+>                 return -ENOBUFS;
+>
+> -       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
+> +       /* SYN eats a sequence byte, write_seq updated by
+> +        * tcp_connect_queue_skb()
+> +        */
+> +       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
+>         tcp_mstamp_refresh(tp);
+>         tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
+>         tcp_connect_queue_skb(sk, buff);
 
