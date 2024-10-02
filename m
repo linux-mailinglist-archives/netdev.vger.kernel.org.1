@@ -1,139 +1,98 @@
-Return-Path: <netdev+bounces-131350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1F298E3A1
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:41:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC4998E3A5
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98E5028259B
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:41:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E1501C23A8B
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827D8215F63;
-	Wed,  2 Oct 2024 19:41:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1664216A24;
+	Wed,  2 Oct 2024 19:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U2R9YiRp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="skfYeJxa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA6212CD88;
-	Wed,  2 Oct 2024 19:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B03B215F74
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 19:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727898062; cv=none; b=C71ef4nI1Ultan777gr6T6xncBkMS1Pb5oj3uKxVlgREim/vwuejO1mNDQowiNlPkSQbxbkwkt94STb0X7mS6/9XkMAXIcczaLuCG544LTfo+dwMUj1KNSxniGeiFTr+kqfseBzh+m68CCdXtjlZq0mj7PxfePKfNH+d6br9uV0=
+	t=1727898101; cv=none; b=umZ1oxcDjRZBfkbvwvfQym9punSrsc6c9JRiHlIQjhsFvPteUwR2DYcE/l+KVrvC5+zhkppGmwYioH4ISVb9TH96sZnowMdP3aQ0P/NHRI7Imq/a419q5pCFEA03SO2conzi77Qi78mddvi3OFCB8gBNK2k5QwP3XVV8XQJVFO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727898062; c=relaxed/simple;
-	bh=5b7Q7juvcEC8k3ag237tuIBCrwOT0CGs8G6BlYzYbqM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fddSYT6POn0Mt6gCOkA0krTFuKKVM78ZK/HuRL7znlRkIyPoPvkWFkJ3Mk5J9rm0hQZHCcDt5Bgi/VRYJ1tDDC1EAL3FYlG9vhUH7irtmYl4WKvipyZVqVk1xdaF2QG409loUJxnXlHqIDLKp0sBMFuSmNOdIdk1sWcdU7TMNDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U2R9YiRp; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6dbc9a60480so1733227b3.0;
-        Wed, 02 Oct 2024 12:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727898060; x=1728502860; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZcpOQqdOJ9ajI++q/SRdMyLHgoMEmleJDEkpBz0PTDM=;
-        b=U2R9YiRp4MAVI2Jg+vBt+5FDQLArOl1D1kibJIvz8e8vFkAzMh3ALV2P4sDnJRrF3Q
-         44xesnVgfZa620QTm5g2qJxaOKEGSdJFLD3gtYFTuw8ei5QwY3MKb4PeEgPTONsBpqr1
-         zNZkPnaQ3/QW0+LTYdi+n6i51ArSwvYaPC6I/x6phuaAj5OvESJyeaLuvyGdOhIsMgzU
-         +mc1xwugqlG66g0oCA56KAz5qH73JTnDLO9/WTwjLQSF3TpnzOFC6E7rc9tWORtBsJzP
-         HSy7jzYzhTm5ldhGI312RWR6nWFeva58Gjgal/jLEqryT7lIRC+5p2lq4vWLH+6HxVj7
-         kvMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727898060; x=1728502860;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZcpOQqdOJ9ajI++q/SRdMyLHgoMEmleJDEkpBz0PTDM=;
-        b=G5VT5/nd4eQupUo8KwlvJJwZHtfBVLpaRqdapocjJ72182N59D3pX8FrtFmIYhW7db
-         T2oHk7teA60cC5VEo/9U7T5IfGSWB9kJt396O2hxDDOqyKdTSaUpjx1TSpd8gh/pydJs
-         uLgeZxT5Piw+9NVu2F3REqwl34AT7foH5Z+hq5MNwWVMCKbzVF26rvGXMBxyAB9VZgYO
-         o7UJByWDHsRhGsiCSa/SD8EwmVJh5iBOeg2PsoDfJDdPSMzeWsFriWUCZOzNQx/iXWcT
-         25Lp5cS7tLV/g6nzTdl6tyuo8XS5sIya2HZy1u0JiiVDz8BAYEpDaLsg7CxGfRyVQUqs
-         qryQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSZ7zG6UStGYgLrUedurByDSts2j+YwgjdGFF4sDVHbmYeffpD3FEFn80sN6oy1pJuaHT1uSG+ITsHX7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyNmy4XeZwHO/snncQuP9Xnn0kC2A6P9WG3jdptWOms/LbEzTP
-	ta2irGaij69aaV0WR0+toqxvm1pP42VaqFwjYuvqUpXdVsRVx8tDGx2/NWQKoum8QUwu263NZcr
-	Kzn/3cRxtp2mArG274rGVrxfYQeM=
-X-Google-Smtp-Source: AGHT+IGp5lrcBcraOdcYylO4OzA/eElIMZnBuVIffAoO6Xgi8GWswul9jhOw17zU+QEAC7uxH3PJUmJv/ufW2OYJlAo=
-X-Received: by 2002:a05:690c:10c:b0:6e2:4c7b:e379 with SMTP id
- 00721157ae682-6e2a9e41705mr25100387b3.19.1727898059812; Wed, 02 Oct 2024
- 12:40:59 -0700 (PDT)
+	s=arc-20240116; t=1727898101; c=relaxed/simple;
+	bh=K4JmIVnqL1CdalNvyJGXWIIVFwAaf6QMlDclXTLv4p8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZEC/f4/6HvOrnSrmNhTwWzE+xKGydb0xmspBaybxhRWNl/5vjpzb3zdnU96jrEQqROw56Uk7v6v9jbKJIFT/KC9KixqrEiuxu6LWzKiRR1QW1iVR7XXQKq1gD8sR1NQuH6I+WdxK3f6lvDE7Ge25x9SIRxP5CzY2kuYKJgpmE3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=skfYeJxa; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4aa21712-2643-42e5-a995-d53cf0a53158@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727898097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=52ZTLl/8wUBJJgZayC7fgNR7d1z1uHZK/4jdVO08y2w=;
+	b=skfYeJxa5bEjU4xIECYRj5UtdgItnifcRXuCN5+Y6G/+kA/T0mm/7yLmorPOfdj11ql/gZ
+	3+NBPMNmqmJedj6j3l79LaIumzoClF8VLED6vDYQx2uyiRczcb3dlPgx/Ff2VgSV0QsspK
+	0w655y7gtUcyE+k9wvZm+r7aSQ4o5PQ=
+Date: Wed, 2 Oct 2024 20:41:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001212204.308758-1-rosenp@gmail.com> <20241001212204.308758-5-rosenp@gmail.com>
- <20241002092946.63236b11@fedora.home>
-In-Reply-To: <20241002092946.63236b11@fedora.home>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Wed, 2 Oct 2024 12:40:48 -0700
-Message-ID: <CAKxU2N8jOTyKAGeUm7JGwrsDbQviwtSkGuuonYxj2ZV3ni82Ag@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/6] net: gianfar: use devm for register_netdev
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, claudiu.manoil@nxp.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next 4/6] xsk: carry a copy of xdp_zc_max_segs within
+ xsk_buff_pool
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org
+References: <20241002155441.253956-1-maciej.fijalkowski@intel.com>
+ <20241002155441.253956-5-maciej.fijalkowski@intel.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241002155441.253956-5-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 2, 2024 at 12:29=E2=80=AFAM Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
->
-> Hi,
->
-> On Tue,  1 Oct 2024 14:22:02 -0700
-> Rosen Penev <rosenp@gmail.com> wrote:
->
-> > Avoids manual unregister netdev.
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >  drivers/net/ethernet/freescale/gianfar.c | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/eth=
-ernet/freescale/gianfar.c
-> > index 66818d63cced..07936dccc389 100644
-> > --- a/drivers/net/ethernet/freescale/gianfar.c
-> > +++ b/drivers/net/ethernet/freescale/gianfar.c
-> > @@ -3272,7 +3272,7 @@ static int gfar_probe(struct platform_device *ofd=
-ev)
-> >       /* Carrier starts down, phylib will bring it up */
-> >       netif_carrier_off(dev);
-> >
-> > -     err =3D register_netdev(dev);
-> > +     err =3D devm_register_netdev(&ofdev->dev, dev);
->
-> I wonder if this is not a good opportunity to also move the
-> registration at the end of this function. Here, the netdev is
-> registered but some configuration is still being done afterwards, such
-> as WoL init and internal filter configuration.
->
-> There's the ever so slightly chance that traffic can start flowing
-> before these filters are configured, which could lead to unexpected
-> side effects. We usually register the netdev as a very last step, once
-> all initial configuration is done and the device is ready to be used.
->
-> As you're doing some cleanup on the registration code itself, it seems
-> like a good opportunity to change that.
-There seem to be a bunch of netdev_info calls. I assume those need a
-registered netdev.
+On 02/10/2024 16:54, Maciej Fijalkowski wrote:
+> This so we avoid dereferencing struct net_device within hot path.
+> 
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+> ---
+>   include/net/xsk_buff_pool.h | 1 +
+>   net/xdp/xsk_buff_pool.c     | 1 +
+>   net/xdp/xsk_queue.h         | 2 +-
+>   3 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
+> index 468a23b1b4c5..8223581d95f8 100644
+> --- a/include/net/xsk_buff_pool.h
+> +++ b/include/net/xsk_buff_pool.h
+> @@ -77,6 +77,7 @@ struct xsk_buff_pool {
+>   	u32 chunk_shift;
+>   	u32 frame_len;
+>   	u8 tx_metadata_len; /* inherited from umem */
+> +	u32 xdp_zc_max_segs;
 
-Additionally, the irqs are allocated in _open instead of _probe. I
-assume those would need to be moved.
->
-> Thanks,
->
-> Maxime
->
->
+It's better not to make holes in the struct. And looks like it's better
+to move it closer to free_list_cnt to put it on the same cache line with
+tx_descs which is accessed earlier in xskq_cons_read_desc_batch()
+(though the last point is not strict because both cache lines should be
+hot at the moment)
+
+>   	u8 cached_need_wakeup;
+>   	bool uses_need_wakeup;
+>   	bool unaligned;
+
+
 
