@@ -1,94 +1,204 @@
-Return-Path: <netdev+bounces-131205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7866698D36C
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:38:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86C0798D372
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:41:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C56282563
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:38:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAA911C21527
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:41:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B69F1CFECA;
-	Wed,  2 Oct 2024 12:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3441D0142;
+	Wed,  2 Oct 2024 12:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A7eWEjDK"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cfdNCCY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF0A1CF7CA;
-	Wed,  2 Oct 2024 12:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF9981CF5FB;
+	Wed,  2 Oct 2024 12:41:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727872706; cv=none; b=sq5CldFckGXC7dsUg0HvaBVJYR1QMozvE9DBB1Thx1X/rwaENZq/5mgPapGTyPyaFnVHOjSGTXOTdvBQOfLrr2HcV9v9EzyalxaJhGsP0f8WtJRk0CyzV20W2zexqfmZwryuzQKgrfnsKQXhPZxCbMF6iln0PWvr6wHep6HOCn4=
+	t=1727872890; cv=none; b=flDinvAtsfkWvViEY1yLShX2IL/Z4eoO3AgRO8Og8ZFkwcdgX70F0t0ucFh39Bxer64oCc3OQ5SsoihmxpQPGaN7a7SFzP8hN630SJitN131LyMGJr8mRxn24Fc9W7Mt28ftftDr3JSr4wwvY8hMFfbCmZvWWW6BZzfWUiZSv38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727872706; c=relaxed/simple;
-	bh=bIgYgaDxCRpic7zCnzzXqvFd9B/7m/11LPKFwTY6ET8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZHaIPYSC1x9NNw27DiXiLpuVOYfTqYp1e/HnaNm8Oz4GtuSH8xIkDPPy1TYajIBWcFX17pAQTYx/JphaGdtmd2hYpZib3L6j6IAjuKMrH7GdXr6LASFQAB+icKxKexDq7swtfhWbb/egXrR46LnfF02Ha4TlxGcpgmtmOlRm0xI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A7eWEjDK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PKNG/9X/O/N8D/B78+WZtm8YmH9dOPeVEWznmY//3KU=; b=A7eWEjDKVd8yxjcY823Ca+4yx8
-	cXl/4ccVoQXGtsoYzFKDzderpAiz8iaGQxz/8AzIlZXvU9kXGkv3HSRqbt6HDV5NmHKkrAlBwyaOf
-	SOcVcxKbUp2/5iBWEBtsVN61Cyna1rAuL4ddwJa6HnW3eobk4+3B5XUDOT6RqBCzyd9A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svycV-008r7c-4B; Wed, 02 Oct 2024 14:38:19 +0200
-Date: Wed, 2 Oct 2024 14:38:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	thomas.petazzoni@bootlin.com,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: pse-pd: Fix enabled status mismatch
-Message-ID: <965905ef-cc00-49fa-bee9-2b45d6155108@lunn.ch>
-References: <20241002121706.246143-1-kory.maincent@bootlin.com>
+	s=arc-20240116; t=1727872890; c=relaxed/simple;
+	bh=VIzrkWZqS3BWBbgaONdAD3ExSq1hTIKL7R3IRUDAV+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LOy0Gu3e4kHJusvwyfWQuuMxlueguS94OI4Ka4fF7BywiLSh7W0x1FUaWpEuSK8wAc7b2AYDM+mHrIZK2zCOmYrV7lu9OitjVZOo5/y83cr3qUmVYAND2SF1fCGvPgBI/rk2iFAbKbU8E2FYoyWsJTu9+cAxouClDspnEpHBt4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cfdNCCY5; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 05CB3240005;
+	Wed,  2 Oct 2024 12:41:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727872885;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qYZmngo8Akclg+S7qnBbh5hBasgfuQJ2bFb2p9LdGC4=;
+	b=cfdNCCY5cEy03ATLTYtqzshKCSsOFcXvOwP4LW/qwI+tuYRZ8pvez7eyWrvgLhUwXnIpbq
+	Dxh8CER0uZUfXx035l1XCzawmG7ANRyFDVLT9sI+TpimuiAvBXDJECXzejJYY/Vkaz269k
+	OpM1YNVhttp+UIccvQYtyGojliCLxh4d42is77eKrVC9tGtz0TmK1V58tx3coovrq+/cwy
+	wbk4nl01W709SJPq20fnwIwkpEje3TiPOR9r+0V79QgFEvR30KsoYL3nnP+DFCN7ZAMXZc
+	UrjujYb5CtzDZ+wzyqae1XUu1peLwwrDxKc3AQwzgs1NIu/ULu0fSsHpOiq36A==
+Date: Wed, 2 Oct 2024 14:41:19 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
+ <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
+ <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
+ <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
+ <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 3/7] misc: Add support for LAN966x PCI device
+Message-ID: <20241002144119.45c78aa7@bootlin.com>
+In-Reply-To: <b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
+References: <20240930121601.172216-1-herve.codina@bootlin.com>
+	<20240930121601.172216-4-herve.codina@bootlin.com>
+	<b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002121706.246143-1-kory.maincent@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Wed, Oct 02, 2024 at 02:17:05PM +0200, Kory Maincent wrote:
-> PSE controllers like the TPS23881 can forcefully turn off their
-> configuration state. In such cases, the is_enabled() and get_status()
-> callbacks will report the PSE as disabled, while admin_state_enabled
-> will show it as enabled. This mismatch can lead the user to attempt
-> to enable it, but no action is taken as admin_state_enabled remains set.
+Hi Arnd,
+
+On Wed, 02 Oct 2024 11:08:15 +0000
+"Arnd Bergmann" <arnd@arndb.de> wrote:
+
+> On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
 > 
-> The solution is to disable the PSE before enabling it, ensuring the
-> actual status matches admin_state_enabled.
+> > +			pci-ep-bus@0 {
+> > +				compatible = "simple-bus";
+> > +				#address-cells = <1>;
+> > +				#size-cells = <1>;
+> > +
+> > +				/*
+> > +				 * map @0xe2000000 (32MB) to BAR0 (CPU)
+> > +				 * map @0xe0000000 (16MB) to BAR1 (AMBA)
+> > +				 */
+> > +				ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
+> > +				          0xe0000000 0x01 0x00 0x00 0x1000000>;  
 > 
-> Fixes: d83e13761d5b ("net: pse-pd: Use regulator framework within PSE framework")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+> I was wondering about how this fits into the PCI DT
+> binding, is this a child of the PCI device, or does the
+> "pci-ep-bus" refer to the PCI device itself?
+
+This is a child of the PCI device.
+The overlay is applied at the PCI device node and so, the pci-ep-bus is
+a child of the PCI device node.
+
 > 
-> FYI: Saving the enabled state in the driver is not a viable solution, as a
-> reboot may cause a mismatch between the real and software-saved states.
+> Where do the "0x01 0x00 0x00" and "0x00 0x00 0x00" addresses
+> come from? Shouldn't those be "02000010 0x00 0x00" and
+> "02000014 0x00 0x00" to refer to the first and second
+> relocatable 32-bit memory BAR?
 
-This seems O.K. to me.
+These addresses are built dynamically by the PCI core during the PCI scan.
+  https://elixir.bootlin.com/linux/v6.11/source/drivers/pci/of_property.c#L101
+They are use to reference the BARs.
+0x00 for BAR0, 0x01 for BAR1, ...
 
-I'm assuming the controller has turned the configuration state to off
-to stop the magic smoke escaping? Is there any sort of notification of
-this?  Does it raise an interrupt? Sometime in the future we might
-want to add a netlink notification about this?
+The full DT, once PCI device are present, scanned and the overlay applied,
+looks like the following:
+--- 8< ---
+	pcie@d0070000 {
+		/* Node present on the base device tree */
+		compatible = "marvell,armada-3700-pcie";
+		#address-cells = <0x03>;
+		#size-cells = <0x02>;
+		ranges = <0x82000000 0x00 0xe8000000 0x00 0xe8000000 0x00 0x7f00000
+			  0x81000000 0x00 0x00 0x00 0xefff0000 0x00 0x10000>;
+		device_type = "pci";
+		...
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+		pci@0,0 {
+			/*
+			 * Node created at runtime during the PCI scan
+			 * This node is PCI bridge (class 604)
+			 */
+			#address-cells = <0x03>;
+			#size-cells = <0x02>;
+			device_type = "pci";
+			compatible = "pci11ab,100\0pciclass,060400\0pciclass,0604";
+			ranges = <0x82000000 0x00 0xe8000000 0x82000000 0x00 0xe8000000 0x00 0x4400000>;
+			...
 
-    Andrew
+			dev@0,0 {
+				/*
+				 * Node created at runtime during the
+				 * PCI scan. This is my LAN966x PCI device.
+				 */
+				#address-cells = <0x03>;
+				interrupts = <0x01>;
+				#size-cells = <0x02>;
+				compatible = "pci1055,9660\0pciclass,020000\0pciclass,0200";
+
+				/*
+				 * Ranges items allow to reference BAR0,
+				 * BAR1, ... from children nodes.
+				 * The property is created by the PCI core
+				 * during the PCI bus scan.
+				 */
+				ranges = <0x00 0x00 0x00 0x82010000 0x00 0xe8000000 0x00 0x2000000
+					  0x01 0x00 0x00 0x82010000 0x00 0xea000000 0x00 0x1000000
+					  0x02 0x00 0x00 0x82010000 0x00 0xeb000000 0x00 0x800000
+					  0x03 0x00 0x00 0x82010000 0x00 0xeb800000 0x00 0x800000
+					  0x04 0x00 0x00 0x82010000 0x00 0xec000000 0x00 0x20000
+					  0x05 0x00 0x00 0x82010000 0x00 0xec020000 0x00 0x2000>;
+				...
+
+				pci-ep-bus@0 {
+					/* Node added by the overlay */
+					#address-cells = <0x01>;
+					#size-cells = <0x01>;
+					compatible = "simple-bus";
+
+					/*
+					 * Remap 0xe2000000 to BAR0 and
+					 * 0xe0000000 to BAR1
+					 */
+					ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
+						  0xe0000000 0x01 0x00 0x00 0x1000000>;
+					...
+
+					mdio@e200413c {
+						#address-cells = <0x01>;
+						resets = <0x25 0x00>;
+						#size-cells = <0x00>;
+						compatible = "microchip,lan966x-miim";
+						reg = <0xe200413c 0x24 0xe2010020 0x04>;
+						...
+--- 8< ---
+
+Hope this full picture helped to understand the address translations
+involved.
+
+Best regards,
+Hervé
 
