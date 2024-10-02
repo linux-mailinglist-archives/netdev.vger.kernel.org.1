@@ -1,121 +1,190 @@
-Return-Path: <netdev+bounces-131367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F4998E552
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:34:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B335198E556
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5C48B24F6F
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D751C1C23009
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C122178F4;
-	Wed,  2 Oct 2024 21:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEAD1A257A;
+	Wed,  2 Oct 2024 21:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EuV3hG7T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky9rJ526"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD89C8FE;
-	Wed,  2 Oct 2024 21:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618CE19580A;
+	Wed,  2 Oct 2024 21:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727904751; cv=none; b=Q0nSLAiR5c3/nJ7LYG3w+jJGWoW/IsDtvjCLvlFBTw4cRjdVmkUm24QeLL5vHHRmpiI/qzyG0BiSjvsJcO61erDhexBH47zmasBwYjrZjITAXD96eTBEKjP6M46sTtFdIDEn5mmz9VkSkT3YTbJOcBu1lpWaYRfrfr5arQBFZgY=
+	t=1727904957; cv=none; b=A+Q5XCpce/A9RucUftugR336ZC4md0z9uh8Ltm/KTENTjTZzm8jcWj4OEsFjEasAVMEmWKsb7dVxX+wjLSItqn1Ktb8pAXZWrmER3n06TMwjGxtT07gblamcWDzz4LpCAi8hRQddy9uktYPsG0EoerAksRqaDMjrysmMHJGclYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727904751; c=relaxed/simple;
-	bh=PQ8L5OFMacPSsxZkCvX38gAtDu7vhlvcnzMBekB5ZY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RYja/e664y3mjk2SBkxEERyfq3I0SLQw8oAq9+CLTvr8eg0nUdTN+7NpbzQiz/6CLjBAhetajsJsowDrIhgixQoaFT6Xt1Io3VIR87+Nhqe5785YV8oSi4w80eKdEc7beSbbw7GFHJOIDnugUzosmLjPieaoXBu0II1eutlvFys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EuV3hG7T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=m0HUbrqlt+QK9AMe/0YFpaLPR8XNUc1DWho8TbWZpLQ=; b=Eu
-	V3hG7TzURVPOZ1srFREWKiIaEqSfiRn2IRH2kafRKQZRDggqN4WAy2hakifYXBhnAKEykrKLUTVXT
-	y8UYCpgIRxk0KASSK8FtmNLGThdLABNI9Vk9VoSLmLLs2bu2luoFfTFFV5ex0SfZvzhk5AoyodtbL
-	6vhoAvtXGOe6t1A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sw6xI-008tdW-OM; Wed, 02 Oct 2024 23:32:20 +0200
-Date: Wed, 2 Oct 2024 23:32:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	claudiu.manoil@nxp.com
-Subject: Re: [PATCH net-next 5/6] net: gianfar: use devm for request_irq
-Message-ID: <fecc95be-eec6-4c79-9ae3-438f24f85122@lunn.ch>
-References: <20241001212204.308758-1-rosenp@gmail.com>
- <20241001212204.308758-6-rosenp@gmail.com>
- <20241002093736.43af4008@fedora.home>
- <CAKxU2N8QQFP93Y9=S_vavXHkVwc7-h1aOm0ydupa1=4s9w=XYA@mail.gmail.com>
+	s=arc-20240116; t=1727904957; c=relaxed/simple;
+	bh=BPbiYsLnxpgEFuYkCSBcKTHokotEyfQTGcEEcUl6TnA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=kd+BCpABpp+/cxUfiny44XXBN4DZkkA1xngKu8/eCCv/hwWI6crL7rXh0F8ZfZksKPakD4KQliBkTZZX4Oz2HaZA1O/XY/tKGp2eUDWGirlsTC3/WfXkBDWtxxLZpN9vR1NHRFWXQ8zuS+kj76deMiUesB4H+wfKzXQsfhvOwgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky9rJ526; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A1DC4CEC2;
+	Wed,  2 Oct 2024 21:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727904957;
+	bh=BPbiYsLnxpgEFuYkCSBcKTHokotEyfQTGcEEcUl6TnA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Ky9rJ526vuWUEKhxy0ZbsYN1NC8eXxJWSPkxEq3lgZ5VFPwh9ptDnFGXCjSSBWZim
+	 tF1hXTuihLZi7+qszAKkwJFPylMnmPHtKNONBnJN+YA/+Zl6Uv3dTa8aPy6bJ8UTca
+	 KXKOUJePS0iO95Z1+bdkKeT4EYBa4TUpQtelox+v0BUouSfjdp4i8F3Tf6aOoSsWNS
+	 Uj3YvuFMHGEvvIknyHcOkFnbJ0Ldyg+74hbAKQeN2IaK8OCdgvd0g+MczuRmsShxli
+	 0VIXbDVPzSXnn2QlpgGSFooAP/nRL98XmULO12jSj11ZtTxAPxDmgiOMtVmhO+QYRi
+	 COREpDs2yVytA==
+Date: Wed, 2 Oct 2024 16:35:55 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V7 0/5] TPH and cache direct injection support
+Message-ID: <20241002213555.GA279877@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N8QQFP93Y9=S_vavXHkVwc7-h1aOm0ydupa1=4s9w=XYA@mail.gmail.com>
+In-Reply-To: <20241002165954.128085-1-wei.huang2@amd.com>
 
-On Wed, Oct 02, 2024 at 12:29:04PM -0700, Rosen Penev wrote:
-> On Wed, Oct 2, 2024 at 12:37 AM Maxime Chevallier
-> <maxime.chevallier@bootlin.com> wrote:
-> >
-> > Hi Rosen,
-> >
-> > On Tue,  1 Oct 2024 14:22:03 -0700
-> > Rosen Penev <rosenp@gmail.com> wrote:
-> >
-> > > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > > ---
-> > >  drivers/net/ethernet/freescale/gianfar.c | 67 +++++++-----------------
-> > >  1 file changed, 18 insertions(+), 49 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-> > > index 07936dccc389..78fdab3c6f77 100644
-> > > --- a/drivers/net/ethernet/freescale/gianfar.c
-> > > +++ b/drivers/net/ethernet/freescale/gianfar.c
-> > > @@ -2769,13 +2769,6 @@ static void gfar_netpoll(struct net_device *dev)
-> > >  }
-> > >  #endif
-> > >
-> > > -static void free_grp_irqs(struct gfar_priv_grp *grp)
-> > > -{
-> > > -     free_irq(gfar_irq(grp, TX)->irq, grp);
-> > > -     free_irq(gfar_irq(grp, RX)->irq, grp);
-> > > -     free_irq(gfar_irq(grp, ER)->irq, grp);
-> > > -}
-> > > -
-> > >  static int register_grp_irqs(struct gfar_priv_grp *grp)
-> > >  {
-> > >       struct gfar_private *priv = grp->priv;
-> > > @@ -2789,80 +2782,58 @@ static int register_grp_irqs(struct gfar_priv_grp *grp)
-> > >               /* Install our interrupt handlers for Error,
-> > >                * Transmit, and Receive
-> > >                */
-> > > -             err = request_irq(gfar_irq(grp, ER)->irq, gfar_error, 0,
-> > > -                               gfar_irq(grp, ER)->name, grp);
-> > > +             err = devm_request_irq(priv->dev, gfar_irq(grp, ER)->irq,
-> > > +                                    gfar_error, 0, gfar_irq(grp, ER)->name,
-> > > +                                    grp);
-> >
-> > This is called during open/close, so the lifetime of the irqs
-> > isn't tied to the struct device, devm won't apply here. If you
-> > open/close/re-open the device, you'll request the same irq multiple
-> > times.
-> Good point. Would it make sense to move to probe?
+On Wed, Oct 02, 2024 at 11:59:49AM -0500, Wei Huang wrote:
+> Hi All,
+> 
+> TPH (TLP Processing Hints) is a PCIe feature that allows endpoint
+> devices to provide optimization hints for requests that target memory
+> space. These hints, in a format called steering tag (ST), are provided
+> in the requester's TLP headers and allow the system hardware, including
+> the Root Complex, to optimize the utilization of platform resources
+> for the requests.
+> 
+> Upcoming AMD hardware implement a new Cache Injection feature that
+> leverages TPH. Cache Injection allows PCIe endpoints to inject I/O
+> Coherent DMA writes directly into an L2 within the CCX (core complex)
+> closest to the CPU core that will consume it. This technology is aimed
+> at applications requiring high performance and low latency, such as
+> networking and storage applications.
+> 
+> This series introduces generic TPH support in Linux, allowing STs to be
+> retrieved and used by PCIe endpoint drivers as needed. As a
+> demonstration, it includes an example usage in the Broadcom BNXT driver.
+> When running on Broadcom NICs with the appropriate firmware, it shows
+> substantial memory bandwidth savings and better network bandwidth using
+> real-world benchmarks. This solution is vendor-neutral and implemented
+> based on industry standards (PCIe Spec and PCI FW Spec).
+> 
+> V6->V7:
+>  * Rebase on top of the latest pci/main (6.12-rc1)
+>  * Fix compilation warning/error on clang-18 with w=1 (test robot)
+>  * Revise commit messages for Patch #2, #4, and #5 (Bjorn)
+>  * Add more _DSM method description for reference in Patch #2 (Bjorn)
+>  * Remove "default n" in Kconfig (Lukas)
+> 
+> V5->V6:
+>  * Rebase on top of pci/main (tag: pci-v6.12-changes)
+>  * Fix spellings and FIELD_PREP/bnxt.c compilation errors (Simon)
+>  * Move tph.c to drivers/pci directory (Lukas)
+>  * Remove CONFIG_ACPI dependency (Lukas)
+>  * Slightly re-arrange save/restore sequence (Lukas)
+> 
+> V4->V5:
+>  * Rebase on top of net-next/main tree (Broadcom)
+>  * Remove TPH mode query and TPH enabled checking functions (Bjorn)
+>  * Remove "nostmode" kernel parameter (Bjorn)
+>  * Add "notph" kernel parameter support (Bjorn)
+>  * Add back TPH documentation (Bjorn)
+>  * Change TPH register namings (Bjorn)
+>  * Squash TPH enable/disable/save/restore funcs as a single patch (Bjorn)
+>  * Squash ST get_st/set_st funcs as a single patch (Bjorn)
+>  * Replace nic_open/close with netdev_rx_queue_restart() (Jakub, Broadcom)
+> 
+> V3->V4:
+>  * Rebase on top of the latest pci/next tree (tag: 6.11-rc1)
+>  * Add new API functioins to query/enable/disable TPH support
+>  * Make pcie_tph_set_st() completely independent from pcie_tph_get_cpu_st()
+>  * Rewrite bnxt.c based on new APIs
+>  * Remove documentation for now due to constantly changing API
+>  * Remove pci=notph, but keep pci=nostmode with better flow (Bjorn)
+>  * Lots of code rewrite in tph.c & pci-tph.h with cleaner interface (Bjorn)
+>  * Add TPH save/restore support (Paul Luse and Lukas Wunner)
+> 
+> V2->V3:
+>  * Rebase on top of pci/next tree (tag: pci-v6.11-changes)
+>  * Redefine PCI TPH registers (pci_regs.h) without breaking uapi
+>  * Fix commit subjects/messages for kernel options (Jonathan and Bjorn)
+>  * Break API functions into three individual patches for easy review
+>  * Rewrite lots of code in tph.c/tph.h based (Jonathan and Bjorn)
+> 
+> V1->V2:
+>  * Rebase on top of pci.git/for-linus (6.10-rc1)
+>  * Address mismatched data types reported by Sparse (Sparse check passed)
+>  * Add pcie_tph_intr_vec_supported() for checking IRQ mode support
+>  * Skip bnxt affinity notifier registration if
+>    pcie_tph_intr_vec_supported()=false
+>  * Minor fixes in bnxt driver (i.e. warning messages)
+> 
+> Manoj Panicker (1):
+>   bnxt_en: Add TPH support in BNXT driver
+> 
+> Michael Chan (1):
+>   bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
+> 
+> Wei Huang (3):
+>   PCI: Add TLP Processing Hints (TPH) support
+>   PCI/TPH: Add Steering Tag support
+>   PCI/TPH: Add TPH documentation
+> 
+>  Documentation/PCI/index.rst                   |   1 +
+>  Documentation/PCI/tph.rst                     | 132 +++++
+>  .../admin-guide/kernel-parameters.txt         |   4 +
+>  Documentation/driver-api/pci/pci.rst          |   3 +
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  91 ++-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   7 +
+>  drivers/pci/Kconfig                           |   9 +
+>  drivers/pci/Makefile                          |   1 +
+>  drivers/pci/pci.c                             |   4 +
+>  drivers/pci/pci.h                             |  12 +
+>  drivers/pci/probe.c                           |   1 +
+>  drivers/pci/tph.c                             | 546 ++++++++++++++++++
+>  include/linux/pci-tph.h                       |  44 ++
+>  include/linux/pci.h                           |   7 +
+>  include/uapi/linux/pci_regs.h                 |  37 +-
+>  net/core/netdev_rx_queue.c                    |   1 +
+>  16 files changed, 890 insertions(+), 10 deletions(-)
+>  create mode 100644 Documentation/PCI/tph.rst
+>  create mode 100644 drivers/pci/tph.c
+>  create mode 100644 include/linux/pci-tph.h
 
-Do you have the hardware? Can you test such a change?
+I tentatively applied this on pci/tph for v6.13.
 
-	Andrew
+Not sure what you intend for the bnxt changes, since they depend on
+the PCI core changes.  I'm happy to merge them via PCI, given acks
+from Michael and an overall network maintainer.
+
+Alternatively they could wait another cycle, or I could make an
+immutable branch, although I prefer to preserve the option to update
+or remove things until the merge window.
+
+Thanks very much; this looks like nice work!
+
+Bjorn
 
