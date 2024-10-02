@@ -1,117 +1,91 @@
-Return-Path: <netdev+bounces-131244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058CD98DA24
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:17:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B069798DA6A
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEB801F27D00
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:17:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78E37281860
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2BE1D14E5;
-	Wed,  2 Oct 2024 14:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F831D0F44;
+	Wed,  2 Oct 2024 14:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrlP/vs6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EwWY+ofT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B4D1D0E08;
-	Wed,  2 Oct 2024 14:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72051D0E3A;
+	Wed,  2 Oct 2024 14:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727878436; cv=none; b=B22bwqulaYK53zNUwekm45pveLKdCP5GdpOjwkEKe3r9yhB8e6bKbf4gX+xRqbfnb1xVDJGKVGf97/9REkrlnLVZF5sZkMDCpJgKq+UW1KnM24MSuBYXvB6EowRUImVbdzvFqqDiL4hwpaTdRGO+0lCCC8e9pNZqzV0onj7c+rw=
+	t=1727878563; cv=none; b=YCV1qdVDarpBo7BVeON/r9oJHoSWj68HQ1gaVNFrw3kaaa9nnjvsLMbpl8FkAlvAwCI3kZOC01Y4HnupnA+qMxq2XgXLTk0Xl9avNg3X58GFm1z3Zeun/MzLvOTZChMLeWIQD69ixFwLzmAaet7+EAkABwk0wk5d1D5FH8Nw/Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727878436; c=relaxed/simple;
-	bh=sfsJ4vEHpyoNt3a39EIoxnocUdz5Wg3xnMMYLmWvGnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PRa7irit+xZInFpJWVdmG6SyE5WZJ8jlmigbn+Alji3ubkRjt4EN16QBvUUUw0JfeIKHRTtn1AWbiMzUYaocdExxJv6kNWVUMcVIeeIFHOWdtD/u78PSYsFsX+48yXKFeOKymqbC2RJTcfMgeq6Gz01XPfA6hTyTa7s/RvQL3Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrlP/vs6; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727878433; x=1759414433;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=sfsJ4vEHpyoNt3a39EIoxnocUdz5Wg3xnMMYLmWvGnw=;
-  b=PrlP/vs6r+ESHBehWx3PuhwEdFyVv4Z3/xoNHfaT+lOp0XCqmQv7QKu8
-   bXCjh4n/G/lNU1AUAIxYUoqJ7Qb8CIfFUbPwu6nZEwZF5ylL5MPfWUtEl
-   nPAIZKHub8711FKjpKrHdXvM/hvkCkhgIpFmTDg53+TH8KCukjcgfGr15
-   L8do2j7cGAnPcKTGZfxon9OzszRvyHpuG3JTTG5OCTsUNhx9rj39EkV+D
-   0Eh/6Er+gfPLlaKQKfsFKndlURgVOs2L9zy5kVBUrv7qdaY63+Z2owktU
-   445InKORK3+LnkekQceysBpJf/rP5doXoQD9kmy5cpR3mznBqeG11kz2p
-   w==;
-X-CSE-ConnectionGUID: fZhTbsT2R+ymp0tI6GmwZQ==
-X-CSE-MsgGUID: CCAYQewBTq6MccDhVxTVTw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="37599675"
-X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
-   d="scan'208";a="37599675"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 07:13:52 -0700
-X-CSE-ConnectionGUID: ZS+aio2MTzyyCfXhfUH+sQ==
-X-CSE-MsgGUID: Rwq4Z1yfTdaX/E/2zIwArA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
-   d="scan'208";a="74135327"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 02 Oct 2024 07:13:49 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sw06t-000TDb-1B;
-	Wed, 02 Oct 2024 14:13:47 +0000
-Date: Wed, 2 Oct 2024 22:13:13 +0800
-From: kernel test robot <lkp@intel.com>
-To: Antonio Quartulli <antonio@openvpn.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	sd@queasysnail.net, ryazanov.s.a@gmail.com
-Subject: Re: [PATCH net-next v8 03/24] ovpn: add basic netlink support
-Message-ID: <202410022156.mxbRG3on-lkp@intel.com>
-References: <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
+	s=arc-20240116; t=1727878563; c=relaxed/simple;
+	bh=yT+r31n70xCHi9EJMEKqCQB+IFdPVXH1wU6lHdxyhaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ogxHdMhTT84wJPaGovU94l/nH2soRBbyVKJdFG1+jGT2QZQEdGhLNWV57ABx6ohkzABdiyL6V1OGYcfWoRU6eXfji2AzI3ErrVH3IiH+HUz3zr83dqPocPq7vOCi0vd1Tw2g90xGvV2MXbxRbUYNp9mSkMfVWLH/kJy798RGbCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EwWY+ofT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFEAC4CEC5;
+	Wed,  2 Oct 2024 14:16:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727878563;
+	bh=yT+r31n70xCHi9EJMEKqCQB+IFdPVXH1wU6lHdxyhaY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EwWY+ofTD1RSYoGGOL6Vcvz9EuF+qNPMnvZDH48oUuKzgPank5dJBlTdcWuZQjeQx
+	 RPK7QrHcfjLn4OhDBF1x6E8qByaJqxsXwu5RVXAV238lE2ev/IrSEp7z/kgTWzuwsJ
+	 iBUBL9pao1WJXmUH5P8USJ/xE0zO/Y3pvfFBUItQGXhNEoKN9SwCrSyZHvZKJyVtZ3
+	 aE3JUqnZi4SvXAjlPc/BvFJeMzQA8q9uwImceqlGnxE8Nm8uOg38gvA6aeMwn6h+R+
+	 nKv5rZQ2CPdKemFAu7st/jNezRO0kbukwY0dwNNQFaaFMzxuow6TsqtmQ7f9vN4sgG
+	 B0xvu5FSWOuGw==
+Date: Wed, 2 Oct 2024 07:16:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com, "Michael
+ S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Eugenio
+ =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, mcgrof@kernel.org
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+Message-ID: <20241002071602.793d3e2d@kernel.org>
+In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+	<w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
+	<CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
+	<ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
+	<CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Antonio,
+On Mon, 30 Sep 2024 19:03:52 +0200 Aleksandr Mikhalitsyn wrote:
+> > At this point my question is, should we solve the problem higher and
+> > show all the modules in /sys/modules, either way?  
+> 
+> Probably, yes. We can ask Luis Chamberlain's opinion on this one.
+> 
+> +cc Luis Chamberlain <mcgrof@kernel.org>
+> 
+> >
+> > Your use case makes sense to me, so that we could try something like
+> > that, but obviously it requires more work I think.  
+> 
+> I personally am pretty happy to do more work on the generic side if
+> it's really valuable
+> for other use cases and folks support the idea.
 
-kernel test robot noticed the following build warnings:
+IMHO a generic solution would be much better. I can't help but feel
+like exposing an arbitrary version to get the module to show up in 
+sysfs is a hack.
 
-[auto build test WARNING on 44badc908f2c85711cb18e45e13119c10ad3a05f]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20241002-172734
-base:   44badc908f2c85711cb18e45e13119c10ad3a05f
-patch link:    https://lore.kernel.org/r/20241002-b4-ovpn-v8-3-37ceffcffbde%40openvpn.net
-patch subject: [PATCH net-next v8 03/24] ovpn: add basic netlink support
-reproduce: (https://download.01.org/0day-ci/archive/20241002/202410022156.mxbRG3on-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410022156.mxbRG3on-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
-   Warning: Documentation/hwmon/g762.rst references a file that doesn't exist: Documentation/devicetree/bindings/hwmon/g762.txt
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/reserved-memory/qcom
->> Warning: MAINTAINERS references a file that doesn't exist: Documentation/netlink/spec/ovpn.yaml
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/misc/fsl,qoriq-mc.txt
-   Using alabaster theme
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+IIUC the list of built in modules is available in
+/lib/modules/*/modules.builtin, the user space can't read that?
 
