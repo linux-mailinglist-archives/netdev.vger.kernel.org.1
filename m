@@ -1,92 +1,79 @@
-Return-Path: <netdev+bounces-131238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF65598D74F
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:48:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FC698D855
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B69BD2827FF
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:48:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17F9D1F23960
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:59:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7B21D042F;
-	Wed,  2 Oct 2024 13:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68EC1D0965;
+	Wed,  2 Oct 2024 13:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rpJ4TOSW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i3X0+eKl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6317A29CE7;
-	Wed,  2 Oct 2024 13:48:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7561D04B4;
+	Wed,  2 Oct 2024 13:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727876896; cv=none; b=t2scCJnv2g2PB0TZDjFPn74MnM3sR97aLn0YDR0Cp0NNIQPJ5D8APWFCVa2rt6P0yFXNb+mCYENYohFsucyqVJoxXFPOgeSgDBEIh2Is5Ymli4S59i7crjC/StXhLUCBJtQdho8yAYiAzg4XWwVLyusyH+nPFh0dOF+Dh65MD6M=
+	t=1727877483; cv=none; b=VLngNCvkS+E7kbnClJjuG/CrUKSLkAYKvqfAJicEYCCjun1s31NBXy2pNOGbyksM04VA9hgKi1xchPKnG7LT3QmkOO8WANK/ZWEcK615eSTllqPJ7eiZQmXEwiM1xpNJev/bpMVxPV9xYLlARq1OYfwQpLjvQO73e3vOYVTUrGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727876896; c=relaxed/simple;
-	bh=IsCM6sG+IjFqFUeQDnuBKsarTp7+M7zRzPX2gX5/i18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rOrTFAmwHptOqyldU5HXBf5CqELGKkenOfTD/jsYGbgKdcDhVOVxpIwjnZ/YgK+AUIR0WprfqAuKU+cOn4jL3JxY2cXdORjmXag9xzxXSXji0/3Tb175PFAzYlpXUclnUoK9mMw0uWgi4MMAugmtG67XUc6ZwnF0wkeLRYm0X5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rpJ4TOSW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B429FC4CEC2;
-	Wed,  2 Oct 2024 13:48:13 +0000 (UTC)
+	s=arc-20240116; t=1727877483; c=relaxed/simple;
+	bh=mjanN9GeGC4nh8dJ7hZsfZmAW3eRQ//5yJPpCjN6w6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=psPAnJVSc+orh2qTbHHcV/UZSK8AuROWMzHaDn5h0JhMEqdY7GNbFSss9i1dK8sliYJnV2g9FeJT6z6HnvyY8dhlGvEa7xhuCPpa9acCFOe7+XbNkhx3yb78CJNiXYaLfhd+AgZ7YhW8Tlp1bpVbS3QJTsxiSmOJwK2tQGtghV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i3X0+eKl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC30CC4CEC2;
+	Wed,  2 Oct 2024 13:58:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727876896;
-	bh=IsCM6sG+IjFqFUeQDnuBKsarTp7+M7zRzPX2gX5/i18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rpJ4TOSW6jMhPSxUpINtMng3p5Zo8p+RqoSNdw/oWvO/eQgrYI63DwRYTKWR9UIBb
-	 KrSQSfzlGd++nNTgVzJF6mA/new3mtGXV3J/zhiwUBGjFvl4wyHYx9E0IjQYWgaLr3
-	 A5XeJebJIvPlhZci9/t81svNxJ8913+p8t28qlDStEd65VI22IhbeNrVNt9w4I00SZ
-	 hkVrtmvou4uCiQXodv9bFqpEjLErOvktIuqYVAQsNEuvs6OTCIADr+wSC+a9zs4sY0
-	 hfGzrYfwuvRZgPeqkiAdzTK3tItB6a5jhngIgFgVxC0NalKpaC4DW/bfbAgMbRuLMj
-	 lGHcKnxlT0I0w==
-Date: Wed, 2 Oct 2024 14:48:11 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andrew Kreimer <algonell@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH] net/mlx5: Fix typos
-Message-ID: <20241002134811.GI1310185@kernel.org>
-References: <20240915114225.99680-1-algonell@gmail.com>
+	s=k20201202; t=1727877483;
+	bh=mjanN9GeGC4nh8dJ7hZsfZmAW3eRQ//5yJPpCjN6w6c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i3X0+eKlv6JkUVi2aOcUsN5GoimQJCi89BsLebI4cw4ECXwfJMPL5i6u22XQihBEF
+	 qTlUnCjqiYYtEsbZ7CxHitGBV1ktdaw9vBmBQCYZnf//zlTCdoHjgh3T2lImH/lveM
+	 Qd2nMK0dc88KjwDQTKbkv6ROUJORWtxGK1CmpCj96l7k2VwShFleze5U+CY6lrQVaj
+	 yclegzCFl+Jk6yPKrS8xkuJSUchEkdUfQ+7TLtpKNaK0uVJNoIPEaRIdOveSj+zPx3
+	 2+pdRa5SuaD7mcrLN/r3Xuo2kKRUv4t+qcyzSGfH+cbI9VdIsGGRtjMrSRT0lhLcZT
+	 tAYzvEE4uXFxA==
+Date: Wed, 2 Oct 2024 06:58:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v2] net: stmmac: dwmac4: Add ip payload error
+ statistics
+Message-ID: <20241002065801.595db51a@kernel.org>
+In-Reply-To: <20240930110205.44278-1-minda.chen@starfivetech.com>
+References: <20240930110205.44278-1-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240915114225.99680-1-algonell@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sun, Sep 15, 2024 at 02:42:25PM +0300, Andrew Kreimer wrote:
-> Fix typos in comments.
-> 
-> Reported-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+On Mon, 30 Sep 2024 19:02:05 +0800 Minda Chen wrote:
+> Add dwmac4 ip payload error statistics, and rename discripter bit macro
 
-Hi Andrew,
+descriptor
+        ^
 
-These changes look good to me.
+> because latest version descriptor IPCE bit claims ip checksum error or
+> l4 segment length error.
 
-However, the patch was posted while net-next was closed for the v6.12 merge
-window. And, I assume because of that, it has been marked as deferred in
-Patchwork.
-
-In the meantime, net-next has reopened, so could you consider reposting
-your patch. If you do so please mark it as v2 or repost of something like
-that. And please include the target tree, net-next, in the subject.
-
-  Subject [PATCH net-next repost] ...
-
-For reference, Netdev processes are documented here:
-https://docs.kernel.org/process/maintainer-netdev.html
-
-...
+What is an L4 segment length error on Rx?
+Seems to me that reusing ip_payload_err here will be confusing
+-- 
+pw-bot: cr
 
