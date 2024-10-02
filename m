@@ -1,102 +1,149 @@
-Return-Path: <netdev+bounces-131177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195DA98D0F6
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:14:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05BF298D10A
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE45B22796
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 10:13:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8666BB210BB
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 10:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3EF1CDA20;
-	Wed,  2 Oct 2024 10:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F8B91E500C;
+	Wed,  2 Oct 2024 10:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHSz/GEV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kuVp1nDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19831E5006;
-	Wed,  2 Oct 2024 10:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D77194AFE;
+	Wed,  2 Oct 2024 10:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727864036; cv=none; b=rPEpZvvcnL3NzHWVXrhTPZj7LclnVawaZOLZF9MvMmq4oQ8pc/wkNdRRJhjG3a/iNiBsOrhMBwv0beE3FxrbpoXz1FmvalCSYR3smcFJWSwxB1x/4EksySMO7O3n/2kHGsTU53bGGBwH4UXBhV6HFkDjBs/deBuFC1XYv8ktM/Q=
+	t=1727864408; cv=none; b=rgdNMYjmPVW2q1wqZc+OJG/QmzuDbCM0hx6oPQBK8xSI+r8kjG3juxBz71zLtw/PxiubOWM3O/I9uangnPQNiH0af/+U0LObjfCSvJgOgrOdk1lOGcoVqBu60woD598pmtc2SwCtxXQcYnZbqPWltqKAn77rDX47HKQRQDfs4YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727864036; c=relaxed/simple;
-	bh=M4uZu9021rjynKKxRMidjbaYQH46nr1NwvTOK/b2BGY=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=n5USFBLY52ZTllosLC57M67jCnTrPE5G1XVOQAnGTeEu2Xj9ZAv3EZd6o/kqB9ybu5ZERkuUzwdfv+oYXgGxlBeMv/xU9mK+zwoNR/VBtxX/dwsOx8f8gmiMFF9MLRhn/UfHEEgPufkmZbQ3wCzMqBRGppJsY4Lemwr4b+IO5SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JHSz/GEV; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e0afd945d4so4294684a91.0;
-        Wed, 02 Oct 2024 03:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727864034; x=1728468834; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vFqbrfOiXdh2VkiSfYbXtCaDNcZt2F2tEGKAJtvElZ4=;
-        b=JHSz/GEV2/vtjGHHtf1xzpN+lXfXddfrcvduQy20/OH6uaOC5b4E0vhyKUhHwiVHtk
-         WRXQpoOo7I2GIZKLAertN97G4SbXVNHZUh6m6bRv37QaBmbghTYtFTh5nz3McqasLmZ4
-         VXCgYWFfioygi49hSEJ8MMmDB3ZVy5GsHMsR6xV8qINhwstxOF3hf7hcufSn/z/hRL9f
-         r4iXiT+rGu77Qw73BsG56ZmPNMoZlGS+E29Nv0/eJHRFBAS/O/FsgbTjwM7XStVxvFWy
-         I79YZp8IKT6dFvMW9jFBoibFJkM+IC3M+Wz/nlkH5Z6IIdxSd+ETdk8DpCP61lRh5TJz
-         COMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727864034; x=1728468834;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vFqbrfOiXdh2VkiSfYbXtCaDNcZt2F2tEGKAJtvElZ4=;
-        b=C9rJvoVlAAyjIsW5XJEkNUZs41xrABu28vTnEVoNrSU1XY8+YW0UfYUrvSjhhZLI3G
-         7pzl5kzyTCJh0+w3FKH44/15c5rS36m8kdKWA+jEqioeNO8ibDaJQHuxshzCf6ZkpEYC
-         lhZNd4pJ66zpW0GzqDB01a9jM2IzSf9M4JoLTLlbkh6WnQd079V0oz84qtZsB/gCiQFS
-         D5ChlzlPSnejRxbliBzU87oJpQGgmplRdvxaezxADHCxSG9c2G32UtcIgLImpzsGpWw2
-         9BectGS7BMKD/gdjMJVqAY7YYj/08noKddMNCtbaBtoMA08woz3c0rWHRcbsxxl7A8Ni
-         nNew==
-X-Forwarded-Encrypted: i=1; AJvYcCUYly6Ave6IqJWCEWmD+81Y/+x87VTR/tZ+7z/FIKUI07HqG86+ydhNWn+N50WvUzly4mgw6YeZinYoo2uHugo=@vger.kernel.org, AJvYcCVNOenOb2gYoq1LuvQYkjgX6ilYRq8k9g8cRYhldJQ70pF/c+f/L5wFQDW3WqYBBHnegt8yFlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx++9hQnquV6kHwk8SCgOVcIzLu5FLd4mg5m2i3qCR8/uF98Pkp
-	RXVEfa9doF9XW24XPMh/H9M5IOhWr8/8J5ar0DaWro8GBNnSUmO3
-X-Google-Smtp-Source: AGHT+IEyy/laAs9sAK7C51OkAFOZH+2zCmZaMA/JA4zikLr+7kLrEqqsudugID0IrQs0FZqtjNbSTA==
-X-Received: by 2002:a17:90b:1a92:b0:2d8:f0b4:9acb with SMTP id 98e67ed59e1d1-2e184964970mr3154966a91.34.1727864034115;
-        Wed, 02 Oct 2024 03:13:54 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18fa05087sm1172308a91.39.2024.10.02.03.13.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 03:13:53 -0700 (PDT)
-Date: Wed, 02 Oct 2024 10:13:39 +0000 (UTC)
-Message-Id: <20241002.101339.524991396881946498.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: aliceryhl@google.com, fujita.tomonori@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com
-Subject: Re: [PATCH net-next v1 2/2] net: phy: qt2025: wait until PHY
- becomes ready
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <c8ba40d3-0a18-4fb4-9ca3-d6cee6872712@lunn.ch>
-References: <20241001112512.4861-3-fujita.tomonori@gmail.com>
-	<CAH5fLghAC76mZ0WQVg6U9rZxe6Nz0Y=2mgDNzVw9FzwpuXDb2Q@mail.gmail.com>
-	<c8ba40d3-0a18-4fb4-9ca3-d6cee6872712@lunn.ch>
+	s=arc-20240116; t=1727864408; c=relaxed/simple;
+	bh=spporCEuuqaLQHIllwZn/rEyv+ce3d3Uw4ieOTkMQ4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dbsPjhltq28+sAK5UYLqyUfHCEACWaDaI2cdqeNBLlkUOQus3OjpIpz8iPVS8XrCndxSd5R4PSlzUcNNwQaTz6Q2VefC/tGGj+HMbPJnF07f7ajtOUpmX++s4Ne7X227gxdmygYtzt+pldZsoGk7XoqLz4fpC0L9WGeqRlxhysk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kuVp1nDN; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 489451BF203;
+	Wed,  2 Oct 2024 10:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727864402;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1YkZWklw874sJSFjl4cJH9cXJK3orr7YNOO08V6uy0E=;
+	b=kuVp1nDNd5O1mXz+J9aoIJJCfxxZUHR2U8mvD0mG0+NuADt8G7pVl0N2hKb5ZV8a0RgR8e
+	ttNEPpX92g5RGfek90DE7wZWueREOem4Qf7bULa/5BPggAMYI9wiopQK+ZoP/nJOb2og46
+	sxRMLxUqYXex3teddVysf8vFX3UpdhC+tTPRdsGUIq7Oh1SqOyKinQa8+qcwB8/9p1iQ1N
+	yvUUSpTmZt4MAeT0duKEkWedm9o/rrEcwQ947rWZziQgnLqhDcrf5S/lFr/jxGdnV5I0OJ
+	Yfp6meHyMqfQi6SfPObkTT2FWQYrjVTZT8SkhOndhJF8WrJzqZGoKOphaP1p6A==
+Date: Wed, 2 Oct 2024 12:19:57 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
+ <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
+ <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
+ <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
+ <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 2/7] reset: mchp: sparx5: Use the second reg item
+ when cpu-syscon is not present
+Message-ID: <20241002121957.1f10bf8e@bootlin.com>
+In-Reply-To: <bd40a139-6222-48c5-ab9a-172034ebc0e9@app.fastmail.com>
+References: <20240930121601.172216-1-herve.codina@bootlin.com>
+	<20240930121601.172216-3-herve.codina@bootlin.com>
+	<d244471d-b85e-49e8-8359-60356024ce8a@app.fastmail.com>
+	<20240930162616.2241e46f@bootlin.com>
+	<20241001183038.1cc77490@bootlin.com>
+	<bd40a139-6222-48c5-ab9a-172034ebc0e9@app.fastmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-On Tue, 1 Oct 2024 14:48:06 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hi Arnd,
 
-> I generally point developers at iopoll.h, because developers nearly
-> always get this sort of polling for something to happen wrong. 
+On Wed, 02 Oct 2024 09:29:35 +0000
+"Arnd Bergmann" <arnd@arndb.de> wrote:
 
-Ah, I had forgotten about iopoll.h. Make senses. I'll try implement an
-equivalent in Rust.
+> On Tue, Oct 1, 2024, at 16:30, Herve Codina wrote:
+> > On Mon, 30 Sep 2024 16:26:16 +0200
+> > Herve Codina <herve.codina@bootlin.com> wrote:
+> > --- 8< ---
+> >
+> > In mchp_sparx5_map_syscon(), I will call the syscon API or the local
+> > function based on the device compatible string:
+> > 	--- 8< ---
+> > 	if (of_device_is_compatible(pdev->dev.of_node, 
+> > "microchip,lan966x-switch-reset"))
+> > 		regmap = mchp_lan966x_syscon_to_regmap(&pdev->dev, syscon_np);
+> > 	else
+> > 		regmap = syscon_node_to_regmap(syscon_np);
+> > 	--- 8< ---
+> >
+> > Is this kind of solution you were expecting?
+> > If you have thought about something different, can you give me some pointers?  
+> 
+> Hi Hervé,
+> 
+> The way I had imagined this was to not need an if() check
+> at all but unconditionally map the syscon registers in the
+> reset driver.
+> 
+> The most important part here is to have sensible bindings
+> that don't need to describe the difference between PCI
+> and SoC mode. This seems fine for the lan966x case, but
+> I'm not sure why you need to handle sparx5 differently here.
+> Do you expect the syscon to be shared with other drivers
+> on sparx5 but not lan966x?
+
+Thanks for this reply.
+
+Exactly, on sparx5 syscon is shared...
+$ git grep 'microchip,sparx5-cpu-syscon'
+...
+arch/arm64/boot/dts/microchip/sparx5.dtsi:                      compatible = "microchip,sparx5-cpu-syscon", "syscon",
+drivers/mmc/host/sdhci-of-sparx5.c:     const char *syscon = "microchip,sparx5-cpu-syscon";
+drivers/power/reset/ocelot-reset.c:     .syscon          = "microchip,sparx5-cpu-syscon",
+drivers/spi/spi-dw-mmio.c:      const char *syscon_name = "microchip,sparx5-cpu-syscon";
+$
+
+> 
+> I don't thinkt this bit matters too much and what you suggest
+> works fine, I just want to be sure I understand what you are
+> doing.
+> 
+>       Arnd
+
+Best regards,
+Hervé
 
