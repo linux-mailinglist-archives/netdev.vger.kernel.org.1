@@ -1,94 +1,104 @@
-Return-Path: <netdev+bounces-131301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B11298E096
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:23:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABE5D98E0F8
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C407C1C22CBB
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:23:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD70CB255BE
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A41F1D0E1C;
-	Wed,  2 Oct 2024 16:23:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524AA1D0F57;
+	Wed,  2 Oct 2024 16:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CqMQLteA"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="W1uRpdw/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2965747F;
-	Wed,  2 Oct 2024 16:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5A31D0F59;
+	Wed,  2 Oct 2024 16:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727886202; cv=none; b=EAPYKnvOQNbLcWUVnKJ9Y4wgulTA9kwA/tEOjAopcd+MUbNoavuoDuFhszlBSeDgBE87nJJlqrSPdTpf3TxNePO7N/EccjmnooKFqOuMfWeqe+LHwceZq6oKiq04IeaapZmdVH9nqZDpLXnE4L1h+ohCwcklL3A97HnMuNUyuew=
+	t=1727886934; cv=none; b=mlY47hyDWuuuFvntlf3O3i5TBLGomn+l33AYKYxhC8FmIzywy2WSkZO2ElznLXoU0qoRziXtVWgASQV6elOrpp2n307PFSug7YOwmefqvWJKdCxBKEmF/KYw82W8dsvDnItLvpGZQRBfzfHYemmQNBUvR94hYm3Jh0roaQWN1Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727886202; c=relaxed/simple;
-	bh=drOzvvjccuXSABPkU1Ww1CiI1cBfTf2nRCm8Vom35do=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P0iEIYo4MEJariWNm7m+n68RcZsu4+VvIbaR9wZhJyfc95J0YPIiDvR5YbJdVW/1cC1rfyf+HhxSKsAU5RNWPWC8os/2IZbe0lo3J/KWgNLlK37EDAbccs75iXZtdzT0KCiyXI/jOhaj1knluAQs/GdXAryXVVcl+IXRZ+DiESM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CqMQLteA; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D11501BF203;
-	Wed,  2 Oct 2024 16:23:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727886198;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=drOzvvjccuXSABPkU1Ww1CiI1cBfTf2nRCm8Vom35do=;
-	b=CqMQLteANyQUe4I9+QQFVPJ1BYNLpOOahmVjWeZODqWm49AYJTJxSgrBXcpFuQ5e+Iipxo
-	wGIKfKQGx6/iaBeR3IZZgjUjtmnp7ghFE66+hxMCoRTMkv7muJ2qiPK7Qm3WzPnaIG4W0o
-	60GS3Gw1WsQoWDzVhFY/HIovNVycIcs/Xn0hFgD2S95b3n4NCYKEsQhaeU3x/HDy/ECEpT
-	xEYrrPboGnWp0iDJWghyXXqshuZDgnftlzTB4lL+8vVCkCGhKDh4AOFWEv2DlHPgeRB3Ee
-	RpItcZQCGqSTmHYD5Foxapv9em8yzABQh/GPiH3PGsdG31b64SNRzUJNctDZQw==
-Date: Wed, 2 Oct 2024 18:23:16 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
-Subject: Re: [PATCH 00/12] Add support for PSE port priority
-Message-ID: <20241002182316.22ad7e39@kmaincent-XPS-13-7390>
-In-Reply-To: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
-References: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1727886934; c=relaxed/simple;
+	bh=HKYLYRCqqjk6JgiEePXpC8AOhh1D4taF1WtnlYuBiUo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sLsdJaXiPleOkxgz3H1FxtV4XF+xQT7BJ/rnxwtrJlGfh6E7IOpI/0F3vvIKdGvWHfj+JLAvc1c+dfIoMO5CubOa87I8spE3jtsovviNRn+y5jrbOOOooyxDVbndpQvOSJ6inHEMJatO6+AguAdIZkjy3yvsabW0LftOZxNB8QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=W1uRpdw/; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id DE3F2200C975;
+	Wed,  2 Oct 2024 18:27:51 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be DE3F2200C975
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1727886472;
+	bh=H2H46qCWXcIO0X1QQ00R+gMM1zIRewdimegBl5uBl34=;
+	h=From:To:Cc:Subject:Date:From;
+	b=W1uRpdw/IJEcH0NrmXfL+gdJj/SNLmGWbcuNISX7TtCviZrikNoNAqKkMC7yiHGw+
+	 E3Ng+6pok5F4NBFdNQ+TCjuWbZu2vqsI1jZlZL1CjU+4LlgmqGxqYixZ4XMaaFCn6S
+	 6ixDhlNdfy0pdiP36Oq+VM0GYEtkI8m0bl+KrSEkMlab7k2ej2dEH7HoND0BwvE7yJ
+	 iG9Wfd7apBBQpJCnFI5KxNZoCPu9+bRnO3dx0aR2XN4roUvbKTvL/5j9nU7X4cikwk
+	 2jwbKu8xdnafw3+lyFbjnbv78UPMac0YP2tD8NgT61cCaQlysaYBpAtL6YVIYxZKDu
+	 AabPe7NnSOFVg==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next v2 0/2] selftests: net: ioam: add tunsrc support
+Date: Wed,  2 Oct 2024 18:27:29 +0200
+Message-Id: <20241002162731.19847-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-On Wed, 02 Oct 2024 18:14:11 +0200
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+v2:
+ - v1 missed the merge window, so while we're at it...
+ - split changes into two patches instead of one for readability (#1
+   removes the ioam selftests, #2 adds the updated ioam selftests)
 
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
->=20
-> This series brings support for port priority in the PSE subsystem.
-> PSE controllers can set priorities to decide which ports should be
-> turned off in case of special events like over-current.
->=20
-> This series also adds support for the devm_pse_irq_helper() helper,
-> similarly to devm_regulator_irq_helper(), to report events and errors.
-> Wrappers are used to avoid regulator naming in PSE drivers to prevent
-> confusion.
+TL;DR This patch comes from a discussion we had with Jakub and Paolo on
+aligning the ioam selftests with its new "tunsrc" feature.
 
-pw-bot: cr
+This patch updates the IOAM selftests to support the new "tunsrc"
+feature of IOAM. As a consequence, some changes were required. For
+example, the IPv6 header must be accessed to check some fields (i.e.,
+the source address for the "tunsrc" feature), which is not possible
+AFAIK with IPv6 raw sockets. The latter is currently used with
+IPV6_RECVHOPOPTS and was introduced by commit 187bbb6968af ("selftests:
+ioam: refactoring to align with the fix") to fix an issue. But, we
+really need packet sockets actually... which is one of the changes in
+this patch (see the description of the topology at the top of ioam6.sh
+for explanations). Another change is that all IPv6 addresses used in the
+topology are now based on the documentation prefix (2001:db8::/32).
+Also, the tests have been improved and there are now many more of them.
+Overall, the script is more robust.
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Justin Iurman (2):
+  selftests: net: remove ioam tests
+  selftests: net: add new ioam tests
+
+ tools/testing/selftests/net/ioam6.sh       | 1832 +++++++++++++++-----
+ tools/testing/selftests/net/ioam6_parser.c | 1087 ++++++++----
+ 2 files changed, 2129 insertions(+), 790 deletions(-)
+
+-- 
+2.34.1
+
 
