@@ -1,158 +1,127 @@
-Return-Path: <netdev+bounces-131186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D48D598D208
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:10:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FAAD98D204
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 046C81C2114A
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:10:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9926DB24DEA
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB1A198A1A;
-	Wed,  2 Oct 2024 11:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E14B1E767A;
+	Wed,  2 Oct 2024 11:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="VOHboIuZ";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Hs9n7oVO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cFw3XzrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DADB1940AA;
-	Wed,  2 Oct 2024 11:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264081940AA;
+	Wed,  2 Oct 2024 11:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727867411; cv=none; b=bftpM6MvHqTLyguFN4/GwHeX/hAjiG0uft8I0sXUtMFr5oCH9Yev2prpi9u4CuArbPCW+4Q0Se2NZcFkC9y037cuklLxymb2zi4ZYj/gnV2wXPTIjod2PanRuPvrvg9hWZHQDwMGZVqfl5zgU09zSAQtLAyHmo6HXB7MZg4+14s=
+	t=1727867360; cv=none; b=mLJZrvne6gvirEBjWUv3mXKolp6RTw2sbocJ6Vnm0pFUnmgRMh3HdaWE8Ic+itjARHqhxxZe9tL4E0sPMljTT0fIyjN+ml1NvDNay8pSI/dY57Y27zfTHv69oBb21tNZE6gzU+zubIJvqJw+MB+EVsdXlQ9dwjwHGa62+O2+rJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727867411; c=relaxed/simple;
-	bh=fH4Py6dX9EFpeg8BO/28sQh8LcY7GSxckrg4ObM+8qU=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=JI7lLQNnQY9cF8+yKOiwmyR/ev9ByiIXZnLdCGgwLEmbAxslYROLvyi5GCZEsCsq4MwEsBtg3YVe0vZnUYYu7EEJUxvnNbPyFx1QPEMiKYNNCFtTu8FV1pmz9xArV5vBPhlpXe4nVLXtJDPoRnsDxwyGQuZlops8WljfzsT5jlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=VOHboIuZ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Hs9n7oVO; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id C55E413800DE;
-	Wed,  2 Oct 2024 07:10:08 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 02 Oct 2024 07:10:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1727867408;
-	 x=1727953808; bh=9OZfhbcZE4pwy66sTyp6QwBP/APePgay17V4KJoXaWk=; b=
-	VOHboIuZ+mQJ3u7OXRhPGcFATleC++xxgIm7KQzh8ACERODfjknpqPShyffVDz6R
-	qlKyoQZzQUOUDap1Y5eEv990lfxgEp8/6c0n+F9cEQN1zbvQnrysfHOSk7c+2u+c
-	nHh80Z1zJdQFZeVjtGimZW7+npHtKnKQt65G5RiKCyDk0pl674rR/3xsgfd3eaZW
-	WdoXEq+YkMtoXX9fN9bBQJWn6qKbEIO62/6mK7yVCs9AHMdjAX0jS+A63LFAXbmG
-	G1yxNxziHwFADKFm+zNqjq6oStERK1a7LgMV/FlgWLd0q+orxVMyJaoKWhaEPI9a
-	CtJnvMdkwC/ct/RV2gL8qw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1727867408; x=
-	1727953808; bh=9OZfhbcZE4pwy66sTyp6QwBP/APePgay17V4KJoXaWk=; b=H
-	s9n7oVONv8Me1aWdrwGhlxjQ9+bPM2eqxka41E2k5YALGbiwE4CBEbpBWYqO8U1j
-	GmcyzPbsUT5cpEVG97/sX+gT28SPOCUEFavp8E4oppnlH+NJiM0ZRRgCy4XX09p6
-	OA3rccTWb7BI4ZE3toyskoTYr8Tm4xYaZWYGkJPbhkNW1lrHkhlwZ2NZsPjI41vJ
-	Wm7/AxiXhQei/d55fySrotqUafiRYS3WQXOsM4D1onq25/4wA/8Dby0VwUxrBHpb
-	iGN6glJTYq6/aBMEAIBsbJSLsBmkN0xSw8m1RDE/ockUvBXJNTMq5mz4YpIWNI0J
-	m6GKQxgQCiR3nHy+vMOyg==
-X-ME-Sender: <xms:Dyr9Zl8n8KgOICmyf_D32o8VdyhGCVL-6Gv59G5djmWmxhaDY0yBJA>
-    <xme:Dyr9Zps5KqejcmMpenUtbQefr7Jk2hx7w-CyKm_VHiIJLXm3n77ljVRfUseBenOfN
-    8BbHa5v6_ywxykfHSs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdduledgfeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
-    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepfedv
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguvghrvghkrdhkihgvrhhnrghnse
-    grmhgurdgtohhmpdhrtghpthhtohepughrrghgrghnrdgtvhgvthhitgesrghmugdrtgho
-    mhdprhgtphhtthhopehhvghrvhgvrdgtohguihhnrgessghoohhtlhhinhdrtghomhdprh
-    gtphhtthhopehluhgtrgdrtggvrhgvshholhhisegsohhothhlihhnrdgtohhmpdhrtghp
-    thhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgu
-    hidrshhhvghvtghhvghnkhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepsghhvghlgh
-    grrghssehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhm
-X-ME-Proxy: <xmx:Dyr9ZjAhAJlS38xVtOJCth9satXXyKXlD-LP830u_TLJ6aJt_hfCGw>
-    <xmx:Dyr9ZpetAsCHGW-8c4588GfMxDqPxJmEt5l7L86QXedkxIAHQDUDdg>
-    <xmx:Dyr9ZqNXkV4eHKUi1QQJ3EQsS7s5PsiWCk8UVfPKq3kqvz6v7TwSpA>
-    <xmx:Dyr9ZrleyX1v8PnaKQK2A19e8yEIBdWzfd7Gqt7y120pOvLEKHievg>
-    <xmx:ECr9ZmL8vbGnZ_2_RkCcAtoGVVEO9I2QpqboNxPlhwrV8Jr_4Xg81MQb>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id D8B362220071; Wed,  2 Oct 2024 07:10:07 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1727867360; c=relaxed/simple;
+	bh=HZibFmP+HJLtb/VpknTHlBzQC4E+VI/DkfIx7Ca31YU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AkQiE/7T5XYjKVO/OTTB5HZzWWuq6lEbqW8ZIBoEPT2jYeilOthSqxfucB1AKOhhw+AZFbZoaNJoyZ+kNORPmZZCqsxLbNeiiHTYwku11l/BG5tk46vpZiRdWYKNO0oxWbG4OlWJH8ng7nMbl/ygWqwbM1ioU+0E3SPQ3iYdX2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cFw3XzrW; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727867358; x=1759403358;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=HZibFmP+HJLtb/VpknTHlBzQC4E+VI/DkfIx7Ca31YU=;
+  b=cFw3XzrWWcdxIF7si2ZQrl1ZO3t/d8Wlf0ajr/p1hxgIvxEu0fT+GmGS
+   AUwYPXeoSNxk1XP7uJ9eXsPIWcs1dedDjl9qD/6kxLblQEWlHsBmkJ+Sm
+   ze8dYk4hNVxAK1IfU9rB2NjEKFuDfNcegA3n17liQ+KaFSQYL23euuR8v
+   fMBN+1NnzZDESvkDlTo20dtr1QONs9fZ2hY18AfA5f5Y1MqKaCCJ+MMJq
+   JAYoGQ8HM1xaSCJmgFkx4bqnaUEnqUxcsMipgLRfXOlhdRtiuUY2Bqc2M
+   233D7XTpZuuu5QZzBu9LnLndXAML/9E5a2y21zke/omHuTixpItPzvEEN
+   g==;
+X-CSE-ConnectionGUID: OjZnq9SFQxm/+9sNZhp2mQ==
+X-CSE-MsgGUID: ZS+n0K+pRQuElqxB3RCcTQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="26977539"
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="26977539"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 04:09:17 -0700
+X-CSE-ConnectionGUID: S9UTSiDeTcmTAyymhyhLAA==
+X-CSE-MsgGUID: pqeGrsQBRcqYgWqPhxUtzA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="74774408"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 02 Oct 2024 04:09:14 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1svxEF-000Rxf-0M;
+	Wed, 02 Oct 2024 11:09:11 +0000
+Date: Wed, 2 Oct 2024 19:08:28 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	sd@queasysnail.net, ryazanov.s.a@gmail.com,
+	steffen.klassert@secunet.com, antony.antony@secunet.com
+Subject: Re: [PATCH net-next v8 02/24] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Message-ID: <202410021829.6fqjQrRB-lkp@intel.com>
+References: <20241002-b4-ovpn-v8-2-37ceffcffbde@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 02 Oct 2024 11:08:15 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herve Codina" <herve.codina@bootlin.com>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>,
- "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>,
- "Lars Povlsen" <lars.povlsen@microchip.com>,
- "Steen Hegelund" <Steen.Hegelund@microchip.com>,
- "Daniel Machon" <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com,
- "Rob Herring" <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Allan Nielsen" <allan.nielsen@microchip.com>,
- "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
-Message-Id: <b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
-In-Reply-To: <20240930121601.172216-4-herve.codina@bootlin.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
- <20240930121601.172216-4-herve.codina@bootlin.com>
-Subject: Re: [PATCH v6 3/7] misc: Add support for LAN966x PCI device
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241002-b4-ovpn-v8-2-37ceffcffbde@openvpn.net>
 
-On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
+Hi Antonio,
 
-> +			pci-ep-bus@0 {
-> +				compatible = "simple-bus";
-> +				#address-cells = <1>;
-> +				#size-cells = <1>;
-> +
-> +				/*
-> +				 * map @0xe2000000 (32MB) to BAR0 (CPU)
-> +				 * map @0xe0000000 (16MB) to BAR1 (AMBA)
-> +				 */
-> +				ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
-> +				          0xe0000000 0x01 0x00 0x00 0x1000000>;
+kernel test robot noticed the following build warnings:
 
-I was wondering about how this fits into the PCI DT
-binding, is this a child of the PCI device, or does the
-"pci-ep-bus" refer to the PCI device itself?
+[auto build test WARNING on 44badc908f2c85711cb18e45e13119c10ad3a05f]
 
-Where do the "0x01 0x00 0x00" and "0x00 0x00 0x00" addresses
-come from? Shouldn't those be "02000010 0x00 0x00" and
-"02000014 0x00 0x00" to refer to the first and second
-relocatable 32-bit memory BAR?
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20241002-172734
+base:   44badc908f2c85711cb18e45e13119c10ad3a05f
+patch link:    https://lore.kernel.org/r/20241002-b4-ovpn-v8-2-37ceffcffbde%40openvpn.net
+patch subject: [PATCH net-next v8 02/24] net: introduce OpenVPN Data Channel Offload (ovpn)
+reproduce: (https://download.01.org/0day-ci/archive/20241002/202410021829.6fqjQrRB-lkp@intel.com/reproduce)
 
-     Arnd
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410021829.6fqjQrRB-lkp@intel.com/
+
+versioncheck warnings: (new ones prefixed by >>)
+   INFO PATH=/opt/cross/rustc-1.78.0-bindgen-0.65.1/cargo/bin:/opt/cross/clang-18/bin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+   /usr/bin/timeout -k 100 3h /usr/bin/make KCFLAGS= -Wtautological-compare -Wno-error=return-type -Wreturn-type -Wcast-function-type -funsigned-char -Wundef -fstrict-flex-arrays=3 -Wformat-overflow -Wformat-truncation -Wenum-conversion W=1 --keep-going LLVM=1 -j32 ARCH=x86_64 versioncheck
+   find ./* \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS -o -name .pc -o -name .hg -o -name .git \) -prune -o \
+   	-name '*.[hcS]' -type f -print | sort \
+   	| xargs perl -w ./scripts/checkversion.pl
+>> ./drivers/net/ovpn/main.c: 12 linux/version.h not needed.
+   ./samples/bpf/spintest.bpf.c: 8 linux/version.h not needed.
+   ./tools/lib/bpf/bpf_helpers.h: 423: need linux/version.h
+   ./tools/testing/selftests/bpf/progs/dev_cgroup.c: 9 linux/version.h not needed.
+   ./tools/testing/selftests/bpf/progs/netcnt_prog.c: 3 linux/version.h not needed.
+   ./tools/testing/selftests/bpf/progs/test_map_lock.c: 4 linux/version.h not needed.
+   ./tools/testing/selftests/bpf/progs/test_send_signal_kern.c: 4 linux/version.h not needed.
+   ./tools/testing/selftests/bpf/progs/test_spin_lock.c: 4 linux/version.h not needed.
+   ./tools/testing/selftests/bpf/progs/test_tcp_estats.c: 37 linux/version.h not needed.
+   ./tools/testing/selftests/wireguard/qemu/init.c: 27 linux/version.h not needed.
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
