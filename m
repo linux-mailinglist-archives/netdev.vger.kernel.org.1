@@ -1,119 +1,115 @@
-Return-Path: <netdev+bounces-131188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA1998D23D
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:34:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4F0D98D286
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:53:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 800FA1F2264B
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:34:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08F501C20C4D
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148801EBFE5;
-	Wed,  2 Oct 2024 11:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1DC1EBFF8;
+	Wed,  2 Oct 2024 11:53:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="euiWZPpY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LT+CbkMk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB16912E1EE;
-	Wed,  2 Oct 2024 11:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808DF197A7C
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 11:53:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727868858; cv=none; b=IFVX22yuxdnLgHcq4cYMovPj9miLOi+prfQgPA3MBy4+H6rrHaacbYDB2mjjX4AvlmEx6o2FdPBMg6UH7VCuH5gTvwEF3smMsTY5jSTfCGBvSEyL4+Q63qUEezJ3oB7ij/dGejzop2I6ZdiUf0MdPXmDlzgytnYDtgIxrYe2ZIk=
+	t=1727870000; cv=none; b=AkH9TWADXgZILg0ro18wI0SZW4VNCtYns2dstveChmXEj+HQwl7LT/a+CKjSv4d1Y3jQEf1JExtLf2HEbyyozbH/VyW4y1y8vel3RMe/Yhm0Cpw1KjdILwLeDMMAJnvEk4cIAdymCl+rWaV+IfFBIRucUC92Xoc63smIPcj3Wy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727868858; c=relaxed/simple;
-	bh=xrbL4f0Csau8AQoU70hljc8anDPpL3BNCAFkjP/f4iQ=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=HppcHodMQOuPhwHFVBBpAAUzi7TvHNgJ95ORsFdkNZg5sCMTxDueaJEe9mL3MUh9K7STaCQZ1zJGei+QlIfttatLSxeOXpUPt5zzESps8N3eSIKLx7EK67LkeZNS0P+E8k3Aty+L2I3oWB65he/onmAsBG7CB7C4fljP/0Z7RYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=euiWZPpY; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71957eb256bso5946234b3a.3;
-        Wed, 02 Oct 2024 04:34:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727868856; x=1728473656; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bZbwF2h7bz9vSKjQPPkyuS+APH+Edec4tdIc4cAhkcQ=;
-        b=euiWZPpYd5mSaCJ/8W1C5wHGa9L9mU1sjMWr0DHBz1/e8dl85b4QKscxyyRjLSrbo/
-         YHk8tQIr+V8N2NL5Uvz0sF2pk9lblxxrutIX02rykp6egYiUFaISEdjTClFwqTZbPY0N
-         Pe8gnvw9ZG6vO5+cf+hbfL61Sa+7iQpal81MfFnGhD7PkIN5atm8F/k8rwrZXuA2vcp1
-         xgx4XqeVNNqEbBbtkN6NBSpiVmnvz1YAEopIxNau6EQLv4+ZbshqN5xVw3GNWSOIC7CW
-         g2a8a/wTteRaZpJAu9Bi8nseQFXIbf8TAPCxjVyUgoklezp1s7WjS8uHeG1Ft5FlBrQZ
-         67ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727868856; x=1728473656;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bZbwF2h7bz9vSKjQPPkyuS+APH+Edec4tdIc4cAhkcQ=;
-        b=NMbkP0xKx/XhD/skX1q2e0H8M59OqwmX4bbkQjKJMpXQ6dAhSgTTezIm/CI4RFdEWI
-         7H8dWmBe8FH1hQ2eTRYPieDsbYtDB56hWsTQ2xAK3JP2dUFwz7c/MQBJKru5kTfbjoRl
-         Hv8d31XS9rupb9pbt3JLpaEd4/jU0adQDEYqCin2j5kbd3ygXefrqmSS4cuRqbmgpTtx
-         ooN9sCUxEEqrEU/DJNA6kLaU08IXL4KVwmOOue3SBjc9ZGJIizPDXY3Ern5+IOzppHYK
-         ot9EQsz1kWAMJFTJFlWfjoZYybtaM66E5pyowheL7eHLRhSIuOrJm+EX7wx7vjiO38IV
-         1gIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW5tUJLSBtmPcY/llT/ff5eisi3Fg56bjGcX9UyTTZ2tz911CaAqWAWP5XAxHpfxbqlhJFRkr0=@vger.kernel.org, AJvYcCX+QZ48DRuPteXcBsP8cBYDzVgRBc/Ul1+pYYZDnQj8cCfl0LZ0A1H7nKvD3wgzqYo1assEBTFIp9X/xHDGlHw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsfS9+bDyFkY5CGM9biTKXWmi09VQcbp50AuTNYgFOM4slkzX7
-	jj3Qkpb4w2m/XwDgdWiLfzMbKHt6fEel1vXSUb3WAntx8YQDsw4Z
-X-Google-Smtp-Source: AGHT+IHTi4JN3GPUWmR/KppZrgLXt4FTlkCXFTdwqrUoVxSW4L7SWZupf8dBCpekkwauxz0hnlsaZA==
-X-Received: by 2002:a05:6a00:2ea2:b0:717:87d6:fdd2 with SMTP id d2e1a72fcca58-71dc5c4c31cmr4610939b3a.4.1727868855902;
-        Wed, 02 Oct 2024 04:34:15 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b264b7decsm9567796b3a.47.2024.10.02.04.34.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 04:34:15 -0700 (PDT)
-Date: Wed, 02 Oct 2024 11:34:01 +0000 (UTC)
-Message-Id: <20241002.113401.1308475311422708175.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
- ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
-	<20241001112512.4861-2-fujita.tomonori@gmail.com>
-	<b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
+	s=arc-20240116; t=1727870000; c=relaxed/simple;
+	bh=kcPe5wu23W0KcN/YzSanoOP4+gck7fThbzZePZEyrsQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p4J9vlHA5HoFAOJDuCIOINzmhFxIWqCMJWsMMG/RW96cwGz1q5FtY0Rxzf2hsgPzeTZiawAbzVU3uKtVIQXaIioHNtm3aIn6jYU9UVaY1vF5hbMz5tqpDAxHLvg1O9ue0K1LshyLAR9J5eLZqSqC+wY7YOX6vGf3csud7XpTCUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LT+CbkMk; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727869998; x=1759405998;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kcPe5wu23W0KcN/YzSanoOP4+gck7fThbzZePZEyrsQ=;
+  b=LT+CbkMkOxFQnjyNPW8Ng2WYvTnxgZQ5WQOh+evYFpo6C0yjxwmG2RFF
+   tO4dsi7709GA8v4L9o3PDIxcf3GitWNt0XB/axm1cc1bXbCvXvsj817+V
+   zcnkZbzHgfAofufcPpywnYuCWeIpdDbNDAUU4Z2KmomBPcXWhGooAqlQ4
+   8uwqlC0ooRKjY83ijVJhR7fXoeU8HOw/j8xlMdFlwwk/BfsVGyCS24h7d
+   aReG2vgxcEESlXiH2gfDW3MspgI/PGPWSUSkqDtyAQjRxZ7WHpSpayBL3
+   1r3PTEdFP06oVmIpTrC+4k/rfcygeaTTDbkfSSJciRpb/1pXB/kwmqM6s
+   w==;
+X-CSE-ConnectionGUID: /C+Gv5QjTqe84OZSrE7n5w==
+X-CSE-MsgGUID: ImmygBPhQl2wdoXfkspOjQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="27183842"
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="27183842"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 04:53:18 -0700
+X-CSE-ConnectionGUID: j4tzPV4sQ8auhekKuqpEpA==
+X-CSE-MsgGUID: t9FGusYQQvOl22mERRm8vg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="78396372"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa005.fm.intel.com with ESMTP; 02 Oct 2024 04:53:16 -0700
+Received: from pkitszel-desk.intel.com (unknown [10.245.246.21])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2944927BD5;
+	Wed,  2 Oct 2024 12:53:14 +0100 (IST)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next 0/4] ice: init HW before ice_adapter
+Date: Wed,  2 Oct 2024 13:50:20 +0200
+Message-ID: <20241002115304.15127-6-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue, 1 Oct 2024 14:31:39 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+This series moves ice_init_hw() call to be prior to ice_adapter init.
+To do so we need:
+ (patch 1) move waiting for FW into ice_init_hw();
+ (patch 2) split ice_init_hw() out of ice_init_dev(), so it could be
+           manually called in ice_init(). The change mandates similar
+           split in ice_devlink_reinit_up(). To keep things consistent
+           ice_deinit_hw() is also extracted to be called manually.
 
-> On Tue, Oct 01, 2024 at 11:25:11AM +0000, FUJITA Tomonori wrote:
->> Add an abstraction for sleep functions in `include/linux/delay.h` for
->> dealing with hardware delays.
->> 
->> The kernel supports several `sleep` functions for handles various
-> 
-> s/for/which
+(Patch 4) finally changes the order in ice_probe() to move ice_adapter
+          init past the ice_init_hw() call.
+Patch 3 does minor cleanup after patch 2, to keep diffs more readable.
 
-Oops, thanks.
+The whole motivation is to have ability to act on the number of PFs
+in ice_adapter initialization. This series is not doing that (but I've
+print-tested that such number is correct there).
+Code is also a bit cleaner, so overall it's good to go in an incremental
+fashion IMO.
 
->> +/// Sleeps for a given duration.
->> +///
->> +/// Equivalent to the kernel's [`fsleep`] function, internally calls `udelay`,
->> +/// `usleep_range`, or `msleep`.
-> 
-> Is it possible to cross reference
-> Documentation/timers/timers-howto.rst ?  fsleep() points to it, so it
-> would e good if the Rust version also did.
-> 
-> I would also document the units for the parameter. Is it picoseconds
-> or centuries?
+Przemek Kitszel (4):
+  ice: c827: move wait for FW to ice_init_hw()
+  ice: split ice_init_hw() out from ice_init_dev()
+  ice: minor: rename goto labels from err to unroll
+  ice: ice_probe: init ice_adapter after HW init
 
-Rust's Duration is created from seconds and nanoseconds.
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 -
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  10 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   | 110 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_main.c     |  88 +++++---------
+ 4 files changed, 110 insertions(+), 99 deletions(-)
+
+
+base-commit: c94f1e05dfa83f1a8875111756c52955d721e60f
+-- 
+2.46.0
+
 
