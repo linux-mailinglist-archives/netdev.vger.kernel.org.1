@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-131258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4A798DE85
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:12:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6720398DEC8
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E8251F21E24
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:12:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13B94B26872
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB261D096A;
-	Wed,  2 Oct 2024 15:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 536CD1D0B82;
+	Wed,  2 Oct 2024 15:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kgYfayaw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZfbgZwWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF261D07BF
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 15:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DEE71D0493
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 15:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727881946; cv=none; b=Xpq3oUIih74k1xDGMIIjHD9kufb1uEfyQ5z8l0nPnRljAD73HD7L0bP9sh2e1pY1/mYMXQ3HJna5LkY2l+Fev0o6D3/Bw8WYntvE+F71YMGeWqb38Bn3+snT3ajJlMnmsieUAJ5/iZVixeBKufsjsq2MgGK1kyLVGWiOY6QzkPQ=
+	t=1727881947; cv=none; b=kxfc5IwBldEzHnXORYNROjjys2nm2w+8WTR93DmQFZfgRqSs2GUcWiqyLjtD1ECWWJSRosWI1rhTSNWbnkaM2V2l7cQJAo88f/FD6BHInc9htWIQIBK4MAoX30YgQFxgNhFFFtYiBH2BVqMvjaJQPOrOkM/pFX22yBnFShFYweo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727881946; c=relaxed/simple;
-	bh=S02fnBp2QC8x2lP2HKUSjRaV/xMbzvpWCIa5XOjH0HQ=;
+	s=arc-20240116; t=1727881947; c=relaxed/simple;
+	bh=Pcskt3j+5sE0UXweaCgQZ/hBXpXmK335BrR8UgP4How=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DcXMLqLGD7MfKpVu55yMlE2mGL38zzMbIM0mU4O4REe6my0F4L1Z6ts2gHkAVZtFEVv1sPumI0YlcaR6i/JAX8oEMoDPE7q6kIOEjtY5an5k2i0AUlb7I2BEraq0jRZDHhycizVCfxjgWRHftiLTR+vvKIMk3wxeArrcYVMSYzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kgYfayaw; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=E2RFCC2qI8ndzJ2VvIeHUImmnFTnLd1FbOJ5tBq31bN2UTqT3cX+APBVX3RBWgp+H0AUnmN9/C3jFw7CaYy6JiSLklF1OTWPEhKmpMbm79CC83OSGkKzx1xd7wKfmL0wqNsgGasIUbBUa9UI+OJ80AZo1d7QVMDGDir2qjSfQYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZfbgZwWg; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28694ff555so804272276.2
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 08:12:23 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e29b4f8837so12737687b3.0
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 08:12:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727881943; x=1728486743; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727881944; x=1728486744; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I5OHplBJymcQiJsKljbqkoP5MLiZp3oI1C7UhXAYYc0=;
-        b=kgYfayawIyQfqk9Wz9/Xl8s6Z+tzk4rUh1iJh7xAZG0RCKWbkjQ7TpWyYPlGaUhw+e
-         Z285pu/vzwS2ml/lXgDm5EY3TLREeAo9MXupHm99N6otGj6LAlzwJ9YVypR4RsD/LB+I
-         93mIDDCLsULQdXMzKHqPs5MODnvm5UXbX31c0y/hpo+0D87/oVMRn/65vFVpC4M/8Ga7
-         EYmC8CmfAjUY73pozCd4lZjqpyli8f4g8UlTyzcYevxsNPdp4pJ7jO6edsyLwZ4AfqzL
-         qNMC1zQbcf04xKeq/tQLhc8E8xie1THdZQJBfeK5qdR30B16SxaxeEcy6R1GPoQUnqAz
-         K6gg==
+        bh=Wthnw2CXO6uODVk1u392Wb/KQcxUIsXsWn1/mF750+E=;
+        b=ZfbgZwWgAIQA9c3yzrr4Uq1bmAoZ1f16gR2HLgZ5bpOzSBgyiCoy3PC/8zL9QS0e8z
+         omjpg6fElqS3E4MP1Fnz/Vkht3TPP2e/7fJEz5DwQMdtUcyDNXkywew3JzQWJTtsV6rH
+         n3o4Ymg8Fky23blydmN0rKGN8rvuawa1NjjAybgXLmm3NaTtVtKgfdbzV4dEO86Yh1mf
+         DVFmDHKSm68LCnFU80dT7Yc3uWmK2dOCe84auhiPEG4zOvBMCYRX0Th/s4ZuQspFGiX1
+         DaKWPiXkdn8o9ZB4aLJuPxvAq06Imqmw6ccNdHSir+nSAnTqM4B0dQoWzE100tk26ZZZ
+         MSuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727881943; x=1728486743;
+        d=1e100.net; s=20230601; t=1727881944; x=1728486744;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I5OHplBJymcQiJsKljbqkoP5MLiZp3oI1C7UhXAYYc0=;
-        b=DifUhxvKaWHVU7xcVv4YS6mJV4VPVDetXsrTD6i1qmFJ8dOisKplvKH3NEFncIwU5O
-         a824G1AHY7r6DvhWycADtUDag+fYoLwaDyIATJtGh1E8P9k3sKaNfHfRvH5F/k5Kh2+V
-         tkejQYrqI1wyMMmIhxhU4C992Mw/PWLEbuFHEOeienTcwPkBFPh437C3m+GUxzjKkwAy
-         ng7zkuQzjebIDLMNwxHZdpWEd9V/v01UxqNcEMAqDErAsVz0lodHE8bzx9xwnEpJN0FM
-         +FXVVrO1OAgesv7UOgldiwtN7qq79u/w+PnAw67yovnBcRMCo57Di5FznfxlhyTbY/mI
-         Zl6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXG2KddYJwU61GBmn1bTcs4ik5b/LofQIood8P3SBoEwUxckhxehU7vB+biKfA9axks3XTYfpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiXxVB0a2UZSIiyTg9Vf4b6v8GZueB0UjrkFMqchmCDq2bNSNM
-	rqD319jGhBUyjwT2s7Qe5Dhf4dCgNr6jVwZdC3rv1sYsqqSyC7jiqYxA3Z7sHHIe/aQBXA4QeOB
-	FY5cbsAOYdA==
-X-Google-Smtp-Source: AGHT+IF42wd8QRhwHUUTmnO6SqsRllfqId2XVTOa8ZELOAEm9zAq3XDp8BKPsRU+txvnUGiPko0pEXRtDlqHVA==
+        bh=Wthnw2CXO6uODVk1u392Wb/KQcxUIsXsWn1/mF750+E=;
+        b=iyPZ9k1lqjCABsH//3oNRLNJlwbgKn+KXSvz1PkddDfSnbp0hvu+RFYgDF3X/rHhLu
+         +GFNQnwuxKvOceMZ1Y7Q0klkVQ3yEb5Z6HVifYM5XpuFIkTjrGVHWY3hlj44vladTUcK
+         U0YkUE0QItPVVQ0oUJPlJ7yndRKC3iVmsl6htpsG6LdR7i5/BlVOuxwO9KM2ZQGnCI9/
+         YIUfQFcU2HIFR0K74GQI+nP/NakBIGiFWwG7fmYAKr6teKC2T569mnACGvKPkdBOD890
+         rJXePJ4RzBARv94rDGZkOzBaDhOpbmwxd3jDJgK38IXH0sZbvng6enHE2ghuwC9tM7SB
+         RWfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUh4W1SsDb/0RniP3pX6d3zS9TLav9rERUX+nvg7Er5xaduuYPoOSO3wI9kF9TsIEab6hmmdU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtLrGbKjGEBqQtB90m4u1EtIGu/Se44gXTWLnzbtG8B0I+xXhO
+	dipNUegdspEyNruaHgZ/md9kMiMU3UFgWIiwhDWvAGw0baEABI/Bn464jdyLc5N21O/JSxYWIcd
+	Rdp4olWB5CQ==
+X-Google-Smtp-Source: AGHT+IFXyeKkcBIcwItShVqS24ZuG7z5DpOVzre2mdhUBSyMsSN8qYLck6MifMSr0YBJByqdk/+9zL0hWmZWsQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:910:0:b0:e1c:ed3d:7bb7 with SMTP id
- 3f1490d57ef6-e263837e6camr2483276.1.1727881943060; Wed, 02 Oct 2024 08:12:23
- -0700 (PDT)
-Date: Wed,  2 Oct 2024 15:12:18 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:690c:64c8:b0:6e2:a355:7b5c with SMTP
+ id 00721157ae682-6e2a3557f6fmr764627b3.5.1727881944578; Wed, 02 Oct 2024
+ 08:12:24 -0700 (PDT)
+Date: Wed,  2 Oct 2024 15:12:19 +0000
 In-Reply-To: <20241002151220.349571-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241002151220.349571-1-edumazet@google.com>
 X-Mailer: git-send-email 2.46.1.824.gd892dcdcdd-goog
-Message-ID: <20241002151220.349571-2-edumazet@google.com>
-Subject: [PATCH v2 net-next 1/2] net: add IFLA_MAX_PACING_OFFLOAD_HORIZON
- device attribute
+Message-ID: <20241002151220.349571-3-edumazet@google.com>
+Subject: [PATCH v2 net-next 2/2] net_sched: sch_fq: add the ability to offload pacing
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,119 +83,160 @@ Cc: Willem de Bruijn <willemb@google.com>, Jeffrey Ji <jeffreyji@google.com>, ne
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
+From: Jeffrey Ji <jeffreyji@google.com>
+
 Some network devices have the ability to offload EDT (Earliest
-Departure Time) which is the model used for TCP pacing and FQ
-packet scheduler.
+Departure Time) which is the model used for TCP pacing and FQ packet
+scheduler.
 
 Some of them implement the timing wheel mechanism described in
 https://saeed.github.io/files/carousel-sigcomm17.pdf
 with an associated 'timing wheel horizon'.
 
-This patch adds dev->max_pacing_offload_horizon expressing
-this timing wheel horizon in nsec units.
+This patchs adds to FQ packet scheduler TCA_FQ_OFFLOAD_HORIZON
+attribute.
 
-This is a read-only attribute.
+Its value is capped by the device max_pacing_offload_horizon,
+added in the prior patch.
 
-Unless a driver sets it, dev->max_pacing_offload_horizon
-is zero.
+It allows FQ to let packets within pacing offload horizon
+to be delivered to the device, which will handle the needed
+delay without host involvement.
 
-v2: addressed Jakub feedback
-( https://lore.kernel.org/netdev/20240930152304.472767-2-edumazet@google.com/T/#mf6294d714c41cc459962154cc2580ce3c9693663 )
-
+Signed-off-by: Jeffrey Ji <jeffreyji@google.com>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- Documentation/networking/net_cachelines/net_device.rst | 1 +
- include/linux/netdevice.h                              | 4 ++++
- include/uapi/linux/if_link.h                           | 1 +
- net/core/rtnetlink.c                                   | 4 ++++
- tools/include/uapi/linux/if_link.h                     | 1 +
- 5 files changed, 11 insertions(+)
+ include/uapi/linux/pkt_sched.h |  2 ++
+ net/sched/sch_fq.c             | 33 +++++++++++++++++++++++++++------
+ 2 files changed, 29 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index 22b07c814f4a4575d255fdf472d07c549536e543..49f03cb78c6e25109af969654c86ebeb19d38e12 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -183,3 +183,4 @@ struct_devlink_port*                devlink_port
- struct_dpll_pin*                    dpll_pin                                                        
- struct hlist_head                   page_pools
- struct dim_irq_moder*               irq_moder
-+u64                                 max_pacing_offload_horizon
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e87b5e4883259a0723278ae3f1bee87e940af895..9eb5d9c63630e9a29a8ce2f8bc8042a520ed8398 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2009,6 +2009,8 @@ enum netdev_reg_state {
-  *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
-  *		   where the clock is recovered.
-  *
-+ *	@max_pacing_offload_horizon: max EDT offload horizon in nsec.
-+ *
-  *	FIXME: cleanup struct net_device such that network protocol info
-  *	moves out.
-  */
-@@ -2399,6 +2401,8 @@ struct net_device {
- 	/** @irq_moder: dim parameters used if IS_ENABLED(CONFIG_DIMLIB). */
- 	struct dim_irq_moder	*irq_moder;
+diff --git a/include/uapi/linux/pkt_sched.h b/include/uapi/linux/pkt_sched.h
+index a3cd0c2dc9956f8c873f35c7b33b2bcf93feb2f1..25a9a47001cdde59cf052ea658ba1ac26f4c34e8 100644
+--- a/include/uapi/linux/pkt_sched.h
++++ b/include/uapi/linux/pkt_sched.h
+@@ -836,6 +836,8 @@ enum {
  
-+	u64			max_pacing_offload_horizon;
+ 	TCA_FQ_WEIGHTS,		/* Weights for each band */
+ 
++	TCA_FQ_OFFLOAD_HORIZON, /* dequeue paced packets within this horizon immediately (us units) */
 +
- 	u8			priv[] ____cacheline_aligned
- 				       __counted_by(priv_len);
- } ____cacheline_aligned;
-diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
-index 6dc258993b177093a77317ee5f2deab97fb04674..506ba9c80e83a5039f003c9def8b4fce41f43847 100644
---- a/include/uapi/linux/if_link.h
-+++ b/include/uapi/linux/if_link.h
-@@ -377,6 +377,7 @@ enum {
- 	IFLA_GSO_IPV4_MAX_SIZE,
- 	IFLA_GRO_IPV4_MAX_SIZE,
- 	IFLA_DPLL_PIN,
-+	IFLA_MAX_PACING_OFFLOAD_HORIZON,
- 	__IFLA_MAX
+ 	__TCA_FQ_MAX
  };
  
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index f0a52098708584aa27461b7ee941fa324adcaf20..682d8d3127db1d11a3f04c4526119d08349e2bd6 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -1118,6 +1118,7 @@ static noinline size_t if_nlmsg_size(const struct net_device *dev,
- 	       + nla_total_size(MAX_ADDR_LEN) /* IFLA_PERM_ADDRESS */
- 	       + rtnl_devlink_port_size(dev)
- 	       + rtnl_dpll_pin_size(dev)
-+	       + nla_total_size(8)  /* IFLA_MAX_PACING_OFFLOAD_HORIZON */
- 	       + 0;
+diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+index 19a49af5a9e527ed0371a3bb96e0113755375eac..aeabf45c9200c4aea75fb6c63986e37eddfea5f9 100644
+--- a/net/sched/sch_fq.c
++++ b/net/sched/sch_fq.c
+@@ -111,6 +111,7 @@ struct fq_perband_flows {
+ struct fq_sched_data {
+ /* Read mostly cache line */
+ 
++	u64		offload_horizon;
+ 	u32		quantum;
+ 	u32		initial_quantum;
+ 	u32		flow_refill_delay;
+@@ -299,7 +300,7 @@ static void fq_gc(struct fq_sched_data *q,
  }
  
-@@ -1867,6 +1868,8 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- 			READ_ONCE(dev->tso_max_size)) ||
- 	    nla_put_u32(skb, IFLA_TSO_MAX_SEGS,
- 			READ_ONCE(dev->tso_max_segs)) ||
-+	    nla_put_uint(skb, IFLA_MAX_PACING_OFFLOAD_HORIZON,
-+			 READ_ONCE(dev->max_pacing_offload_horizon)) ||
- #ifdef CONFIG_RPS
- 	    nla_put_u32(skb, IFLA_NUM_RX_QUEUES,
- 			READ_ONCE(dev->num_rx_queues)) ||
-@@ -1975,6 +1978,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- }
+ /* Fast path can be used if :
+- * 1) Packet tstamp is in the past.
++ * 1) Packet tstamp is in the past, or within the pacing offload horizon.
+  * 2) FQ qlen == 0   OR
+  *   (no flow is currently eligible for transmit,
+  *    AND fast path queue has less than 8 packets)
+@@ -314,7 +315,7 @@ static bool fq_fastpath_check(const struct Qdisc *sch, struct sk_buff *skb,
+ 	const struct fq_sched_data *q = qdisc_priv(sch);
+ 	const struct sock *sk;
  
- static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
-+	[IFLA_UNSPEC]		= { .strict_start_type = IFLA_DPLL_PIN },
- 	[IFLA_IFNAME]		= { .type = NLA_STRING, .len = IFNAMSIZ-1 },
- 	[IFLA_ADDRESS]		= { .type = NLA_BINARY, .len = MAX_ADDR_LEN },
- 	[IFLA_BROADCAST]	= { .type = NLA_BINARY, .len = MAX_ADDR_LEN },
-diff --git a/tools/include/uapi/linux/if_link.h b/tools/include/uapi/linux/if_link.h
-index f0d71b2a3f1e1a3d0945bc3a0efe31cd95940f72..96ec2b01e725b304874816af171d2455bc7b495c 100644
---- a/tools/include/uapi/linux/if_link.h
-+++ b/tools/include/uapi/linux/if_link.h
-@@ -377,6 +377,7 @@ enum {
- 	IFLA_GSO_IPV4_MAX_SIZE,
- 	IFLA_GRO_IPV4_MAX_SIZE,
- 	IFLA_DPLL_PIN,
-+	IFLA_MAX_PACING_OFFLOAD_HORIZON,
- 	__IFLA_MAX
+-	if (fq_skb_cb(skb)->time_to_send > now)
++	if (fq_skb_cb(skb)->time_to_send > now + q->offload_horizon)
+ 		return false;
+ 
+ 	if (sch->q.qlen != 0) {
+@@ -595,15 +596,18 @@ static void fq_check_throttled(struct fq_sched_data *q, u64 now)
+ 	unsigned long sample;
+ 	struct rb_node *p;
+ 
+-	if (q->time_next_delayed_flow > now)
++	if (q->time_next_delayed_flow > now + q->offload_horizon)
+ 		return;
+ 
+ 	/* Update unthrottle latency EWMA.
+ 	 * This is cheap and can help diagnosing timer/latency problems.
+ 	 */
+ 	sample = (unsigned long)(now - q->time_next_delayed_flow);
+-	q->unthrottle_latency_ns -= q->unthrottle_latency_ns >> 3;
+-	q->unthrottle_latency_ns += sample >> 3;
++	if ((long)sample > 0) {
++		q->unthrottle_latency_ns -= q->unthrottle_latency_ns >> 3;
++		q->unthrottle_latency_ns += sample >> 3;
++	}
++	now += q->offload_horizon;
+ 
+ 	q->time_next_delayed_flow = ~0ULL;
+ 	while ((p = rb_first(&q->delayed)) != NULL) {
+@@ -687,7 +691,7 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
+ 		u64 time_next_packet = max_t(u64, fq_skb_cb(skb)->time_to_send,
+ 					     f->time_next_packet);
+ 
+-		if (now < time_next_packet) {
++		if (now + q->offload_horizon < time_next_packet) {
+ 			head->first = f->next;
+ 			f->time_next_packet = time_next_packet;
+ 			fq_flow_set_throttled(q, f);
+@@ -925,6 +929,7 @@ static const struct nla_policy fq_policy[TCA_FQ_MAX + 1] = {
+ 	[TCA_FQ_HORIZON_DROP]		= { .type = NLA_U8 },
+ 	[TCA_FQ_PRIOMAP]		= NLA_POLICY_EXACT_LEN(sizeof(struct tc_prio_qopt)),
+ 	[TCA_FQ_WEIGHTS]		= NLA_POLICY_EXACT_LEN(FQ_BANDS * sizeof(s32)),
++	[TCA_FQ_OFFLOAD_HORIZON]	= { .type = NLA_U32 },
  };
  
+ /* compress a u8 array with all elems <= 3 to an array of 2-bit fields */
+@@ -1100,6 +1105,17 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
+ 		WRITE_ONCE(q->horizon_drop,
+ 			   nla_get_u8(tb[TCA_FQ_HORIZON_DROP]));
+ 
++	if (tb[TCA_FQ_OFFLOAD_HORIZON]) {
++		u64 offload_horizon = (u64)NSEC_PER_USEC *
++				      nla_get_u32(tb[TCA_FQ_OFFLOAD_HORIZON]);
++
++		if (offload_horizon <= qdisc_dev(sch)->max_pacing_offload_horizon) {
++			WRITE_ONCE(q->offload_horizon, offload_horizon);
++		} else {
++			NL_SET_ERR_MSG_MOD(extack, "invalid offload_horizon");
++			err = -EINVAL;
++		}
++	}
+ 	if (!err) {
+ 
+ 		sch_tree_unlock(sch);
+@@ -1183,6 +1199,7 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 		.bands = FQ_BANDS,
+ 	};
+ 	struct nlattr *opts;
++	u64 offload_horizon;
+ 	u64 ce_threshold;
+ 	s32 weights[3];
+ 	u64 horizon;
+@@ -1199,6 +1216,9 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	horizon = READ_ONCE(q->horizon);
+ 	do_div(horizon, NSEC_PER_USEC);
+ 
++	offload_horizon = READ_ONCE(q->offload_horizon);
++	do_div(offload_horizon, NSEC_PER_USEC);
++
+ 	if (nla_put_u32(skb, TCA_FQ_PLIMIT,
+ 			READ_ONCE(sch->limit)) ||
+ 	    nla_put_u32(skb, TCA_FQ_FLOW_PLIMIT,
+@@ -1224,6 +1244,7 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	    nla_put_u32(skb, TCA_FQ_TIMER_SLACK,
+ 			READ_ONCE(q->timer_slack)) ||
+ 	    nla_put_u32(skb, TCA_FQ_HORIZON, (u32)horizon) ||
++	    nla_put_u32(skb, TCA_FQ_OFFLOAD_HORIZON, (u32)offload_horizon) ||
+ 	    nla_put_u8(skb, TCA_FQ_HORIZON_DROP,
+ 		       READ_ONCE(q->horizon_drop)))
+ 		goto nla_put_failure;
 -- 
 2.46.1.824.gd892dcdcdd-goog
 
