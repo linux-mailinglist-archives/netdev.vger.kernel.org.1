@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-131192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 259A998D28A
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:53:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2793B98D28F
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 570091C219D8
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:53:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D7C01F2317F
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 11:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD3D200111;
-	Wed,  2 Oct 2024 11:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9294200132;
+	Wed,  2 Oct 2024 11:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mIFjAOE2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ciUImlDI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 946A81EC012
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 11:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B984200112
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 11:53:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727870002; cv=none; b=kMIydAsdD8JFD/vQQ4wB75JHT3csx5AKiddjlsf+Zl2J+T3F2Cq+IC7lZy9aWTGaQWNLZa/3b+C44LbqZUsSbcaB/SYEN1HC380fiUR4IdC1kEzVV8c61E7ajE9uuwFfaFyEFtWiuJ5yzUIglPZS+jS4URx2teMDArTYMLovx9Q=
+	t=1727870003; cv=none; b=kYXYFiJ59to8qzzn84Fz4Mx9OLsNQ45JeRg71n/vKCmEA8ZnpnGtTij+JekQI8etxK2K5F5/YriUw3Kzg98dg4uHUqtnVRPUWIYg1aiVXJOtIneJlWF+doHBUpG73DWZWEd4uRWp0VINjDWXWbEQK8c0gvFT0MI3uiNhYT6qtRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727870002; c=relaxed/simple;
-	bh=Q1yTIsduVqIOGDDgsfBNfMeoNAlnl+VRtH7v9641Hd0=;
+	s=arc-20240116; t=1727870003; c=relaxed/simple;
+	bh=lBVtk9x2YLfOlUE3TMNMHn5v07L1WswRQRfR62EXUtI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rgvX0mZUm5ET65z1vxQmz3pitpzPUANlQGJzd8KSqogfqIqhewHRk8f6hyPDEgxiTkoHBJx51T6wnmqZgE14hwocSMm0rYAaTTVxPeYldz2AjPo0EWtwxW+UinkSgRObT3ZqO+PJAHi7p88TUgOhGJ3GPC+bhJ6kiEbQJiuAVfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mIFjAOE2; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=fAVcBptPrzJ8dAMci8pc3hUHAKcnzuNFrQNRNaUyvYuPxs4DPc0+tBEGbNPJ7JYMjagNkSnmpgYRoQgb3kUjPhpY+PJMNbeSHwbto8eOjyJxCOmo+BGCLQ99cY9TMtX7aiircF6ey79TxryJeNuPxlZ+9N5myeeseKCBTDm693Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ciUImlDI; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727870001; x=1759406001;
+  t=1727870002; x=1759406002;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Q1yTIsduVqIOGDDgsfBNfMeoNAlnl+VRtH7v9641Hd0=;
-  b=mIFjAOE2V8+dZZf5LOK+vI8jL3p6srvWoGsFTSd+VrB4taxB1lbHZMLn
-   wtcMgaAnCeRKcOEEyl0Bw71dhbP7Q0+bgUpR/Oc8BaP727YhpqS1Za2vM
-   0CJA58o3jOp7dZKlSs6HrTszeEhJFsPpKD2ZW/MQ8hox8GqtpsjLoQulX
-   WPxW9XtK53uGd1/NQACHRdSFd8Xn4e+3U/G/cBhIS2v7+xRa4y6o3EwAb
-   RJUzeZ48dncdEY3mNUuR89nRms3lUfXtsxR5+93q3DOEbYkJkGfRgqmNk
-   h0slWvcORW0nFKUa+yz50VIiblURxzta65Kfitqk8AaF1/OmyN5vlAnfc
+  bh=lBVtk9x2YLfOlUE3TMNMHn5v07L1WswRQRfR62EXUtI=;
+  b=ciUImlDIb7iMN3lyq10gf3/yELhzo0gMUjrjZ+O5e1WdJm/1cK4fzUmq
+   vvoO7yS121BrLU+dnskRRQSn8ae9U7+sOOKOE9SO1/zlCDQiRR/vQRt0F
+   JOxH/CpP3XchhvLLLQdFFl8apaN35JCF/iN62jBR87TGm+flgYafQecAr
+   maCFxQMA6/deLK8NcoBAWhAjmpSc7cThwEdDOFrjo+C+1rRKE9ZEwh5iz
+   zFZHT00BMFYxfci1KxNKC3RAWFcRWSP3vWJdMLhS502pdP1LrNSrSMjMW
+   emBGpQCGh/BWXCcnITXZxZ1w1IissBrczmmX+fPgFgOM/bgWHOJJNSGCi
    A==;
-X-CSE-ConnectionGUID: gDWN6zktT6eO5j5Iiy8D+w==
-X-CSE-MsgGUID: NMMmLG2gQr61YiASb23d5w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="27183848"
+X-CSE-ConnectionGUID: LDfQIFzSQ+mEFFUK+R9gtQ==
+X-CSE-MsgGUID: Cw8txJc2SriaKzWzIoW3qg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11212"; a="27183854"
 X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
-   d="scan'208";a="27183848"
+   d="scan'208";a="27183854"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 04:53:20 -0700
-X-CSE-ConnectionGUID: bvAv0O+2QdGaGgneUFgp5g==
-X-CSE-MsgGUID: eses7engRIu4gk5Hvao7yw==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 04:53:21 -0700
+X-CSE-ConnectionGUID: K4Q5q0PxQGiBWcdA7X5ymg==
+X-CSE-MsgGUID: TuvBr/TeSCeEf1bqV11oNA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
-   d="scan'208";a="78396378"
+   d="scan'208";a="78396383"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa005.fm.intel.com with ESMTP; 02 Oct 2024 04:53:19 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 02 Oct 2024 04:53:20 -0700
 Received: from pkitszel-desk.intel.com (unknown [10.245.246.21])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id ADDB428169;
-	Wed,  2 Oct 2024 12:53:17 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id CE5E628195;
+	Wed,  2 Oct 2024 12:53:18 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Tony Nguyen <anthony.l.nguyen@intel.com>
 Cc: netdev@vger.kernel.org,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH iwl-next 3/4] ice: minor: rename goto labels from err to unroll
-Date: Wed,  2 Oct 2024 13:50:23 +0200
-Message-ID: <20241002115304.15127-9-przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next 4/4] ice: ice_probe: init ice_adapter after HW init
+Date: Wed,  2 Oct 2024 13:50:24 +0200
+Message-ID: <20241002115304.15127-10-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20241002115304.15127-6-przemyslaw.kitszel@intel.com>
 References: <20241002115304.15127-6-przemyslaw.kitszel@intel.com>
@@ -81,69 +81,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Clean up goto labels after previous commit, to conform to single naming
-scheme in ice_probe() and ice_init_dev().
+Move ice_adapter initialization to be after HW init, so it could use HW
+capabilities, like number of PFs. This is needed for devlink-resource
+based RSS LUT size management for PF/VF (not in this series).
 
 Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index f0903dddcb16..a043deccf038 100644
+index a043deccf038..2b8db14d99f3 100644
 --- a/drivers/net/ethernet/intel/ice/ice_main.c
 +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4797,7 +4797,7 @@ int ice_init_dev(struct ice_pf *pf)
- 	if (err) {
- 		dev_err(dev, "ice_init_interrupt_scheme failed: %d\n", err);
- 		err = -EIO;
--		goto err_init_interrupt_scheme;
-+		goto unroll_pf_init;
+@@ -5273,13 +5273,7 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
  	}
  
- 	/* In case of MSIX we are going to setup the misc vector right here
-@@ -4808,14 +4808,14 @@ int ice_init_dev(struct ice_pf *pf)
- 	err = ice_req_irq_msix_misc(pf);
+ 	pci_set_master(pdev);
+-
+-	adapter = ice_adapter_get(pdev);
+-	if (IS_ERR(adapter))
+-		return PTR_ERR(adapter);
+-
+ 	pf->pdev = pdev;
+-	pf->adapter = adapter;
+ 	pci_set_drvdata(pdev, pf);
+ 	set_bit(ICE_DOWN, pf->state);
+ 	/* Disable service task until DOWN bit is cleared */
+@@ -5310,12 +5304,19 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ 	err = ice_init_hw(hw);
  	if (err) {
- 		dev_err(dev, "setup of misc vector failed: %d\n", err);
--		goto err_req_irq_msix_misc;
-+		goto unroll_irq_scheme_init;
+ 		dev_err(dev, "ice_init_hw failed: %d\n", err);
+-		goto unroll_adapter;
++		return err;
  	}
  
- 	return 0;
++	adapter = ice_adapter_get(pdev);
++	if (IS_ERR(adapter)) {
++		err = PTR_ERR(adapter);
++		goto unroll_hw_init;
++	}
++	pf->adapter = adapter;
++
+ 	err = ice_init(pf);
+ 	if (err)
+-		goto unroll_hw_init;
++		goto unroll_adapter;
  
--err_req_irq_msix_misc:
-+unroll_irq_scheme_init:
- 	ice_clear_interrupt_scheme(pf);
--err_init_interrupt_scheme:
-+unroll_pf_init:
- 	ice_deinit_pf(pf);
- 	return err;
- }
-@@ -5320,18 +5320,18 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
  	devl_lock(priv_to_devlink(pf));
  	err = ice_load(pf);
- 	if (err)
--		goto err_load;
-+		goto unroll_init;
- 
- 	err = ice_init_devlink(pf);
- 	if (err)
--		goto err_init_devlink;
-+		goto unroll_load;
- 	devl_unlock(priv_to_devlink(pf));
- 
- 	return 0;
- 
--err_init_devlink:
-+unroll_load:
- 	ice_unload(pf);
--err_load:
-+unroll_init:
+@@ -5334,10 +5335,10 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
+ unroll_init:
  	devl_unlock(priv_to_devlink(pf));
  	ice_deinit(pf);
- unroll_hw_init:
+-unroll_hw_init:
+-	ice_deinit_hw(hw);
+ unroll_adapter:
+ 	ice_adapter_put(pdev);
++unroll_hw_init:
++	ice_deinit_hw(hw);
+ 	return err;
+ }
+ 
 -- 
 2.46.0
 
