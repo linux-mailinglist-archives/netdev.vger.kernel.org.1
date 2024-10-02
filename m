@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-131288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C100A98E05F
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:15:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7018D98E068
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:16:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2FA01C22F95
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:15:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98B02B2CC74
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4AB31D12F1;
-	Wed,  2 Oct 2024 16:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 809E31D1507;
+	Wed,  2 Oct 2024 16:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nogv84W1"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="b1ZgqD1b"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95CA1D049B;
-	Wed,  2 Oct 2024 16:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 539701D0E0D;
+	Wed,  2 Oct 2024 16:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727885692; cv=none; b=ArCHkNJUhnxVPwrr6JyvXKeXIt4p8mO3yUlG7+J2jE6cbeTwnbINckfEBuc6kzHfIxMZHaBvzZxROgsQyzwZLM49x5N8lc6T8AKfHaYrZAZaeYl95hzCSynr1/lbPHVDWs5LkAbjy/cECtCdHDRCIWt6p8cqktZ0O/ZhmxB9fFQ=
+	t=1727885693; cv=none; b=Bs/JLS2R9ENfhNseU3Y+bhN1+9ZYXxNvnIlWPZAS5B2oVGVy9PJZZ3sNZK5P/eXQ/84DU42w4LGXEDr+1Ps16e4tuvTrQ/kZySWB105c8d2MG1OwyOTz52H6gt1yImyclpMmxjVtfTGxRer6X0HNizr2OoTH+nj6sY0pAZ3n8Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727885692; c=relaxed/simple;
-	bh=yqdYmWDPi96O6HF7ebbWScHKYpa6AeAvglvLs6cCSDk=;
+	s=arc-20240116; t=1727885693; c=relaxed/simple;
+	bh=FdyIlP5QbAoJSErExFHqxvHzcDD2538/OXE26emypME=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L6aPgK+K99CHLCvfpuxjtJcVYqqBeWpRoSVTIcxJrT2RUI6lM/Y0XFgKxaASkx0f/gIPRve6Z+q1L9NlLokiuzY/P6dFFsq8zOkV+penKQPKUSxDCIsmx8gWWSBktpf34x5PkUJQfnQhFCN78okOHG/2L76tcpRZdiC74AIO2G8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nogv84W1; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=qJmCprp5Rx5PNrHNy+yc9B8MI9jXObJdWJC/fhZXP+MZ1C2yhQUZ7PODuNszQtU6BRgDCAZi9iwkl/F6LkPqNNAZnrgzG+yMZN+5Nm7oTQqRIU7kjL7Z/0NpyYpIDEmHEBpLV3UZJeckkR5nBTDNK5zNcn2uVQptaXkXdsD++fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=b1ZgqD1b; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 28DF8FF80B;
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E28F7FF809;
 	Wed,  2 Oct 2024 16:14:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727885682;
+	t=1727885683;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kmgCX7Kwi/ErDtCadQPfPVZMgNr8nBIPVozcbt2OctU=;
-	b=nogv84W1O4Et/X6/iz/eFTTOnJcOtbNuQ8QmviCUOKZ/E4v+hTULS7+B03BNnYbyAtSCr9
-	Aii56OwTc6+x/z3gvPZVX9m7F1dX01Gz/F4BfRDi5J8MJxbkgzw+a6hr7lO7v/b/DWGWQj
-	LxOKtwjsbzyBM/JTQsky+iH1TCdwvNif0hvQKmpe5lGiDNn7o9Y5JAqQKgj4oqALKzbqmE
-	j3cy9n/d3XSGQdTBYk9baD78BUjL527hkVifBizTKala+85aefoQmU+BpugquXG9T/GVmL
-	CgLFkH7frb5JlstRGRJN5FH6s48faOoRd9Gcv/j/C2A/ZSWBHsfDmQ6bH2UYcA==
+	bh=Ro47lYTPlToHjrMRk1db8NcTTZn4FWYXgojohtwvs0E=;
+	b=b1ZgqD1bU7HymIOpRB1dPPuSfhqk8FMH9T8uAui0s12CZaVmLezgnRfREFAEnMUfytVc5Q
+	C427PJw/AJHqweGjuib9IBap5fcj8yo2rAF3u3yvGYnGru5PomwcmiZfrFadWVYK9lW1Mb
+	BzVtXV7VeY/iOp0JfJyWXqq3isYTv3U/Ikiw7/bUe9OogTchJaBKmRinmf5K71JRu8ERGC
+	WokKtlqqgYEBwKmp6ikysvu2UABln9NYbQKAfjvkS9MJJWFV+ANvYo0+s1Ox3Z9kmPU0Px
+	5cFkW4ldUWNW0AVym5v/TGt64Qk7OZd26ZmFrYEG/tEtoP8mSw10bYf5AzTHVQ==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 02 Oct 2024 18:14:12 +0200
-Subject: [PATCH 01/12] net: pse-pd: Remove unused pse_ethtool_get_pw_limit
- function declaration
+Date: Wed, 02 Oct 2024 18:14:13 +0200
+Subject: [PATCH 02/12] net: pse-pd: tps23881: Correct boolean evaluation
+ for bitmask checks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241002-feature_poe_port_prio-v1-1-eb067b78d6cf@bootlin.com>
+Message-Id: <20241002-feature_poe_port_prio-v1-2-eb067b78d6cf@bootlin.com>
 References: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
 In-Reply-To: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -74,41 +74,50 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Removed the unused pse_ethtool_get_pw_limit() function declaration from
-pse.h. This function was declared but never implemented or used,
-making the declaration unnecessary.
+Update misleading boolean evaluation when checking bitmask values.
+The existing code directly assigned the result of bitwise operations
+to a boolean variable, which is not consistent with later assignments.
+This has been corrected by explicitly converting the bitmask results
+to boolean using the !! operator, ensuring proper code consistency
 
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- include/linux/pse-pd/pse.h | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/net/pse-pd/tps23881.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index 591a53e082e6..85a08c349256 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -184,8 +184,6 @@ int pse_ethtool_set_config(struct pse_control *psec,
- int pse_ethtool_set_pw_limit(struct pse_control *psec,
- 			     struct netlink_ext_ack *extack,
- 			     const unsigned int pw_limit);
--int pse_ethtool_get_pw_limit(struct pse_control *psec,
--			     struct netlink_ext_ack *extack);
+diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+index 5c4e88be46ee..1a57c55f8577 100644
+--- a/drivers/net/pse-pd/tps23881.c
++++ b/drivers/net/pse-pd/tps23881.c
+@@ -139,9 +139,9 @@ static int tps23881_pi_is_enabled(struct pse_controller_dev *pcdev, int id)
  
- bool pse_has_podl(struct pse_control *psec);
- bool pse_has_c33(struct pse_control *psec);
-@@ -222,12 +220,6 @@ static inline int pse_ethtool_set_pw_limit(struct pse_control *psec,
- 	return -EOPNOTSUPP;
- }
+ 	chan = priv->port[id].chan[0];
+ 	if (chan < 4)
+-		enabled = ret & BIT(chan);
++		enabled = !!(ret & BIT(chan));
+ 	else
+-		enabled = ret & BIT(chan + 4);
++		enabled = !!(ret & BIT(chan + 4));
  
--static inline int pse_ethtool_get_pw_limit(struct pse_control *psec,
--					   struct netlink_ext_ack *extack)
--{
--	return -EOPNOTSUPP;
--}
--
- static inline bool pse_has_podl(struct pse_control *psec)
- {
- 	return false;
+ 	if (priv->port[id].is_4p) {
+ 		chan = priv->port[id].chan[1];
+@@ -172,11 +172,11 @@ static int tps23881_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 
+ 	chan = priv->port[id].chan[0];
+ 	if (chan < 4) {
+-		enabled = ret & BIT(chan);
+-		delivering = ret & BIT(chan + 4);
++		enabled = !!(ret & BIT(chan));
++		delivering = !!(ret & BIT(chan + 4));
+ 	} else {
+-		enabled = ret & BIT(chan + 4);
+-		delivering = ret & BIT(chan + 8);
++		enabled = !!(ret & BIT(chan + 4));
++		delivering = !!(ret & BIT(chan + 8));
+ 	}
+ 
+ 	if (priv->port[id].is_4p) {
 
 -- 
 2.34.1
