@@ -1,190 +1,280 @@
-Return-Path: <netdev+bounces-131368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B335198E556
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:36:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F96898E56C
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:44:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D751C1C23009
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B8A91C20DB0
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEAD1A257A;
-	Wed,  2 Oct 2024 21:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D2A21730F;
+	Wed,  2 Oct 2024 21:44:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ky9rJ526"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JDvSLUqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618CE19580A;
-	Wed,  2 Oct 2024 21:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727904957; cv=none; b=A+Q5XCpce/A9RucUftugR336ZC4md0z9uh8Ltm/KTENTjTZzm8jcWj4OEsFjEasAVMEmWKsb7dVxX+wjLSItqn1Ktb8pAXZWrmER3n06TMwjGxtT07gblamcWDzz4LpCAi8hRQddy9uktYPsG0EoerAksRqaDMjrysmMHJGclYU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727904957; c=relaxed/simple;
-	bh=BPbiYsLnxpgEFuYkCSBcKTHokotEyfQTGcEEcUl6TnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=kd+BCpABpp+/cxUfiny44XXBN4DZkkA1xngKu8/eCCv/hwWI6crL7rXh0F8ZfZksKPakD4KQliBkTZZX4Oz2HaZA1O/XY/tKGp2eUDWGirlsTC3/WfXkBDWtxxLZpN9vR1NHRFWXQ8zuS+kj76deMiUesB4H+wfKzXQsfhvOwgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ky9rJ526; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A1DC4CEC2;
-	Wed,  2 Oct 2024 21:35:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727904957;
-	bh=BPbiYsLnxpgEFuYkCSBcKTHokotEyfQTGcEEcUl6TnA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=Ky9rJ526vuWUEKhxy0ZbsYN1NC8eXxJWSPkxEq3lgZ5VFPwh9ptDnFGXCjSSBWZim
-	 tF1hXTuihLZi7+qszAKkwJFPylMnmPHtKNONBnJN+YA/+Zl6Uv3dTa8aPy6bJ8UTca
-	 KXKOUJePS0iO95Z1+bdkKeT4EYBa4TUpQtelox+v0BUouSfjdp4i8F3Tf6aOoSsWNS
-	 Uj3YvuFMHGEvvIknyHcOkFnbJ0Ldyg+74hbAKQeN2IaK8OCdgvd0g+MczuRmsShxli
-	 0VIXbDVPzSXnn2QlpgGSFooAP/nRL98XmULO12jSj11ZtTxAPxDmgiOMtVmhO+QYRi
-	 COREpDs2yVytA==
-Date: Wed, 2 Oct 2024 16:35:55 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
-	jing2.liu@intel.com
-Subject: Re: [PATCH V7 0/5] TPH and cache direct injection support
-Message-ID: <20241002213555.GA279877@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3126A1D131B;
+	Wed,  2 Oct 2024 21:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727905469; cv=fail; b=KXjF5p+JjTo2hVBkB7B1JZ6BxrX54pS31ZoXwVb+6IW1oGI7rjurK2Tcu+OSlvtPtYWi6eHrYWpkm8h3Hs+cFLfKZV3/tbdtd5NDVaYJd3o30XMkAtgi2HAiO3zpYFNarkZjaRAB5c0aPO6Ehg9kO2rKytjxbX0Jw5ySoilNQkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727905469; c=relaxed/simple;
+	bh=QDiKGgSHXkusSq8M6D/MZflk8WidxAP8Nt7jgsEYfNo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=t5ywkuzw3GDrMqJ2bVbb00RDlb4/l2twVywIlF7cXhmJgcH8D/fH6Wp0x2pf+o0f4j3VT4KxvnXyXPkhFIaBz/vc15OeSGuPIbvPbxVE4gFxyXwjYL8/bXNlNhpufesM+vG/W8UakhhmfLnY/wr7rU84lg5PGZvSbFnU/Bz+FdY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JDvSLUqc; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727905467; x=1759441467;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QDiKGgSHXkusSq8M6D/MZflk8WidxAP8Nt7jgsEYfNo=;
+  b=JDvSLUqcFvPHxV47p6SLHwGzf1d/CS6a3DWn9jAcoa+9Jom+423YoL0g
+   A///pQqcIM2hIXLsiiZ4kyYKth69nbEsktgOp9hx4Dc+WNVXwVuSYbx+N
+   V9KtaMkuZB3IWCYDoCqnAW45Qof2VnvaH3i4JJM7kW8s/Cg4A3s54gqnH
+   14QB99YPvUrX1LFPnXwqmk6WzweMzH53fBw/kOXtymKTRfIuEqdoC082w
+   lVnLzFyzyl2aSEhvTAM1hoYc4O4wUPYkWzs7MXEm8JrxdRbATGMYcBeHS
+   0vTp61UFpcRI70qP81ejpSC5DgHhNXqFhmPxpCkwazozkFvXsE5KzWMCa
+   g==;
+X-CSE-ConnectionGUID: I6EGT4B2Q1CSfnS8X5VNkA==
+X-CSE-MsgGUID: l5jALoPTQhyuMCZeOqhN0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="37675702"
+X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
+   d="scan'208";a="37675702"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 14:44:25 -0700
+X-CSE-ConnectionGUID: D6Xz8N66RDyLeRuryI3c3w==
+X-CSE-MsgGUID: d8e59ONtR3+ljSU62H5oGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
+   d="scan'208";a="97475073"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Oct 2024 14:44:24 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 2 Oct 2024 14:44:24 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 2 Oct 2024 14:44:23 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 2 Oct 2024 14:44:23 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.48) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 2 Oct 2024 14:44:23 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=k2RFWnJb2UNGwj4m3bJasLCrjwuBmCWQ96uwM52jfIohfQxT+QAuCBkfcEbXJ/dsevQ4sECZLZaoXwnzNUM/jbGsacsZDz7xI8ECDUdAQ87EuXI92i4bMIuJmrkhK7aRkFyLp6BouHwiVbL8lztXE4ScXxQ5bAsKBjoow87n8p1hiDNePtu8oz+8jF4czix9XMEMyq6xcuXPmYH9I1V2byO0HuQWN+/buidOOZzsK0XBViy4Cd/o68tLdQmwiS6Af8ru3NBH22ErEenyytb0R1FdE2GI9GX8aYPuPYBfevlDqvgWY1VPhVelAuBAOQjjasPn0N4sedACsu3+OKdcLA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B1hhMuodw2cPA5F6DPgZzk8JBTrwmdPLAf3CrV4GW/M=;
+ b=TJkBHQ3I3xG7eT40RPWmprRwQ5G3Qt5qGmDt0BPybacQE3phFeXHFPpiADXICiEAwYNYIiYtzbqwCThUU0Yjrh4an3rUXs/CCfhXp5heRLIDmSN9sNR1dMcuJXBZAwr2d2hsvdG68OVyOOsP4bTLgSvslx8OQBz70J9cyrXSTb/zZqRpEw1TBP3AarA0M+oZ5sjrgvNr8QxIl+ILB7/0cd+UG+xX9Qdka+q6GTWbM6XJIaKtEoqheQAI0/yv2xS+3oNr0d+fY5UlQB4/dQrTcC2dhBv+kTFWyCtHkmVfZhXwLy8gdQTLWKr/8GuNcjCNatSR8ND7eNnZ4ApbjW+QAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB6005.namprd11.prod.outlook.com (2603:10b6:510:1e0::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Wed, 2 Oct
+ 2024 21:44:14 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8026.016; Wed, 2 Oct 2024
+ 21:44:14 +0000
+Message-ID: <63e7cced-5eaf-43ba-bb2c-b7a8609bedd7@intel.com>
+Date: Wed, 2 Oct 2024 14:44:12 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net: sparx5: prepare for lan969x switch
+ driver
+To: Daniel Machon <daniel.machon@microchip.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Lars Povlsen <lars.povlsen@microchip.com>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, <horatiu.vultur@microchip.com>,
+	<jensemil.schulzostergaard@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Richard Cochran <richardcochran@gmail.com>, <horms@kernel.org>,
+	<justinstitt@google.com>, <gal@nvidia.com>, <aakash.r.menon@gmail.com>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241001-b4-sparx5-lan969x-switch-driver-v1-0-8c6896fdce66@microchip.com>
+ <4e89dd84-eadc-4cae-8892-c33688cc051f@intel.com>
+ <20241002074714.uprnmhf5a2f2hyzw@DEN-DL-M70577>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20241002074714.uprnmhf5a2f2hyzw@DEN-DL-M70577>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0245.namprd04.prod.outlook.com
+ (2603:10b6:303:88::10) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002165954.128085-1-wei.huang2@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB6005:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54e9022c-00cc-45d9-233a-08dce32b5b93
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YThrSXRaL3lSVk9uVExsMXkzV20vbjZ2bGJzTGt6cTBDVUZDZG52YXBTcFRJ?=
+ =?utf-8?B?aUQyS1phSkkvbWtsZFZnQTdwYURFcmNnaXFZYktJYnF5R0dPRTQ0WGdBTTNy?=
+ =?utf-8?B?Y3NBcW9EVDVlazFpbzlSYVdiZzJoSTV2QTU0QUhSaGhvamk0aVVuOE5GVHEx?=
+ =?utf-8?B?Rk9DclBGR2ljM25sS0pzSUZsaTlOTjBOM3JpdmV3d214YlZraEdSaDJsZldI?=
+ =?utf-8?B?VWJMdlZ2VUloQUZSNXBaRDdMR2VGcU9HRGpiRWx0Zkw5M3JwbFFsMkN2ZWlB?=
+ =?utf-8?B?aFlRaTV5Z1RmK2t1WTVRZ1NzdzZ0TFUwb2R1UkZIcWFIMTBpOEtSandrMks5?=
+ =?utf-8?B?MkFKRkJUYVN2L21QTE1JZ1MwU0xHZXR5RnVFSDdaS21QNTRFdjdjcnJTeUtR?=
+ =?utf-8?B?UGh6NzViNFdna3ExbWlnQXZ5a1lqY1FSNWpsdm4rZnRuWEZMcElSSFFRTnFW?=
+ =?utf-8?B?RUk2dC9Zd3NEb1JHamx1Wis1YlV4S3V0ak9tYWlYTTlUdFBrbmhPcHpMa29K?=
+ =?utf-8?B?VW0vN0tTK2lqd2FZbTJ1VnJEMVF2ZzBLcGZjNUh3Y2FnYnVUbG4zWDNCWHFK?=
+ =?utf-8?B?VGJmelNmVHd1QjczNG9DSTZHTkoyRTB6K2pZYllXbGViQndjYm04RFYvRTRM?=
+ =?utf-8?B?R2w3TG93K0dGVGp5by9idjNEMlM3WEJzK1FsOVJrcmdZUEI2RjgzdDRpMTdW?=
+ =?utf-8?B?NjhCN2EzTzJLMmlSSFVjQ0VwRVZiR0Q4NDNEZExvdGNic0wrU1M4Ni8xSGtF?=
+ =?utf-8?B?OHhGVUlpL0IyUDBZU3lzQytnY1p6aExvVTRmSDJLK2JKTGRkd3pOY3VHKzFK?=
+ =?utf-8?B?aHo4LzdadnFrSmo0dEFTRitNSFlrb0JmWWxyc1UzeXk5a2JqMldCWklCMnk4?=
+ =?utf-8?B?dGRrelFkOVkvTVdpOGkyWXpHZ1AvaWlhcGgxaVZUbGtSbmtHOE0yRWdLVndv?=
+ =?utf-8?B?L2J1R1ViVlh4VVYrZUN3bGlOK0pMMmJ6WFFTT0xtSDd3bmxPcXY1ZDFnYU9y?=
+ =?utf-8?B?OVZaMzNHN2k3Q3kxcGplM3NOdjRmM25GNFQ1RVArdzhsRnJqRUZBbGpqeVRx?=
+ =?utf-8?B?SzR5blpaSFhqRTJxZnBXYzMvSDNLcEJmYW42L2VLUWdZdXRncUFTWFV0Y1R1?=
+ =?utf-8?B?TmMvQVdSQlExL0lmV092MW1qZjhyRmNjcGhhTmpQbEdmTHpUNklCUWdvaUFa?=
+ =?utf-8?B?Y0JEWmZvcGR3Q1JMT0JYS0dYRjJLR2tCeXo3R0RZa1ZuRlJkRGFmWEVDNDJp?=
+ =?utf-8?B?aVo4VnlZRzZQOTBZWUJkMWNBQVZDVWNEVUJ6N2tLSDNiaEpnSklhbnlJQzJR?=
+ =?utf-8?B?WUxmeHdLSjFSbmtKdGtpZGtSOFRnaWhkTUhpOVFtKzk3WkNickdoY1ZVa3hB?=
+ =?utf-8?B?KzBST1V2Y3pxVDMya1pUYjBnNGFqdVl6REwrcjdQOXM3MFVtVS8yZXV1OXZT?=
+ =?utf-8?B?OGNPMjZ1bjc4QVpCbGlqeVZRL2NEU3BhZmVuclA1Q3RZMURDaDlsRVFxNExz?=
+ =?utf-8?B?Tm1RNnREV21BdFM0aFYwQlJGNTJSYnAxbWlPWjVjT1hRdFpyKyt0amRGWkl0?=
+ =?utf-8?B?enlwTmRSNldtK0xiaytLZndOM2pUWkducW9TanRLYmpVSWh2WGlJRTcxOXhP?=
+ =?utf-8?Q?G94voZOXJOicGwc9XITf0lIQk1gsok+tr5FFvY+o7ArA=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VkxyaW50QWJLQVR5SDdmbnI2VUFmems3NlhWR3ZGamwxRmxPeGd6YnR0U2Mx?=
+ =?utf-8?B?Tmh1VGZ4WEEzaWR1OTkwdDF1MGhrb3IzdDhGTU9ta1JHazBISWhxQldqcnJD?=
+ =?utf-8?B?UXZPSVVNd3JONlpTVDFGaVlJNGNMZS9Vdy81NW9xbWgxSlNTSEtJT3J4K2Rj?=
+ =?utf-8?B?RVZVNjBveDMwSDZzK2ZJazRGNTUzTStmeWNJcG93dDIyOVFXcytGNzZ3cHd4?=
+ =?utf-8?B?TVlMVU82aHlLcDNNc3JaMldNa1ZCMDVVZG5VdURpSHN1cHZyMVBFaEFDeXpL?=
+ =?utf-8?B?UllWUnFDdGtiV003MmZhM3MvYzNnZUdQRjFvWlpJSUdnQmpzc0g4dCtIRkRo?=
+ =?utf-8?B?R2hUVjk5ZlozRzRaUnM1Z3lObEJNS0hSQ0cxc0VRODlKOUthdGUvRmpraXFo?=
+ =?utf-8?B?S1FSNXpnL3U5YmFMK0d2eWpMZGNwZXlkS0FQdTZ2QXZoYndSTkVhTnlHVnhC?=
+ =?utf-8?B?Y2JZdDd0SmkrU1J4aDFwRUVMNU5HeG42S3ZZWi9hR0RCNkRPbEJxR29Cb3hw?=
+ =?utf-8?B?UlVMbDZqZlRrLzJXVU5qTWtaVko4Q3dHS0ZpYVpvbjR5QkFKTUxmaVV1YUdh?=
+ =?utf-8?B?YTFGZW1kK3JDclUzckxLbG1MLzlqTWVuRDlBMVAzcStaOGJWbDY1Wm9Pc1pK?=
+ =?utf-8?B?U0JLbEpoRjR2eGJhRmwvb0RmMVJKOXFOSHVnOWZ6cjJDN3pDRU9VTFNHeTly?=
+ =?utf-8?B?R2p3NW5ROFB3dEM0ZjlyRGtaSVRVYnZCL3NyQjRBL0JWRzRrTTVRL05YQ1JY?=
+ =?utf-8?B?b25PWUZWRXVYYm5CVWxsL2pVM3hTbTFicUZ0VUNQdTg0ZFBoNmI5L29JS0Vh?=
+ =?utf-8?B?MEpFWHZHNVFnZHE2QWdUZVpoQ01UVysrMzlpanl6Tmc1ZmYzU1Z4ZHJxM2Vy?=
+ =?utf-8?B?SXdOTVhxZ0NIZ29Vd1J0ZDJONTB1NGpvNE9UWndLRzZnUW1Md1JaZjJuVU1B?=
+ =?utf-8?B?WnhPREZRMFF1Q1JBYlN5Qk1IK3A0bTFyVE5UL0NBK1drNHoweFU4cG1DR2Vs?=
+ =?utf-8?B?ZUVGdVNPeHp3WnRSTkh5YUI1bnVvb29wRjAzcHUwdkVBeVBxWVBYcTdPcTZs?=
+ =?utf-8?B?Mld4ZzZKaFBlZ2FONnlvV0xvMnFDN0VhV3Y4cVd2bWRmaVBIaDFyQkZocm12?=
+ =?utf-8?B?VmV2KzRNbWhKK3JBZnJsMlpzSzkzYVJOcTc2cjNjVVVGT1ZtMVJSU1d5UFNu?=
+ =?utf-8?B?cDZ2NzhLYlRvU05ySXN5VWVxbEVpWE9zbnBaVUpLK2R2NWxtQVduT3JkbWJU?=
+ =?utf-8?B?SVJoZnBvcUYzWGJmMXhza21aaVZZU2NUaU80TDg4REg4S3piMjBDL1MyVUlk?=
+ =?utf-8?B?eVNYbUd0S2RUdVhxWk44d2RXWFU3R09VbmpDaVY4WExFWkZGY0crc1R2anNE?=
+ =?utf-8?B?YXJjNzRPNUFPVFArZlhkaVUzMHJTRlRwbjJFU0YyZ2xYMHpiNEprYXpFUVlj?=
+ =?utf-8?B?NkMzY3VxQWx1aStyWit4M0N4Smh3cFY0NU0rVjh1dTkwaE1KN1l4bFV1Q0VZ?=
+ =?utf-8?B?MXBMR2dVYjg2RlJyNWJZNkZuMGN0cUR2ZXcwRWx5K2dIOTcxMytjbWE4VHpS?=
+ =?utf-8?B?dXprNzg4Sk44Y3czZGxKR2tZM1llVElNaWZxV0dMVkVvb1hIYkY0L0FOT1p1?=
+ =?utf-8?B?V0w0dGlqRGE1MFdVM0wyNFdMTjFCYTBGbFZzQ3JXVDJYNDh2OTA1OWRObTJY?=
+ =?utf-8?B?RFhJOHRtakJ5YStRQTlsaW5WMzNXK1RuQVRaTkJMVm1vVWlzTnRtQzZwMGVi?=
+ =?utf-8?B?QWN3ek9iRVlqbjZlbzZHdVo4MFBHR0xEakpCUVBjSHdpemxyU0FqYnZFZHZ3?=
+ =?utf-8?B?OURPbktiTWV6Mlk2THpVbnpaRG02TzhKRkhSM1VZdVllb1ErUnlEVXBzVUVC?=
+ =?utf-8?B?THo0TXcvUDNYNUhRQ3g5NnFvR2NqNmtFVExaeUo0dFpGVkVieGFYenZGNXlp?=
+ =?utf-8?B?U2RZeFY4bVVhQmNrcUZqZk9heW9rV2RCQU9scmxVN1R3ZTBRR2x5dXJOeUhY?=
+ =?utf-8?B?R1ZnOUNlYjNSczdOcDUxeGQ0blN4T1JoSFQxM0crQ1M2YTZYZGU1elp2eWE0?=
+ =?utf-8?B?SDIzNG5KSzNBUWZDWmpEM3l6Zkl3clAzeWJiQk5HbS8rNE5FcnFsVUMwcURK?=
+ =?utf-8?B?WGZ6M1BLU0xTcEpDcDRVS3loZEl5dVhZem1yRi9CQzBPSWxEZmk2QklIUjNX?=
+ =?utf-8?B?MFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54e9022c-00cc-45d9-233a-08dce32b5b93
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2024 21:44:13.9873
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dLM4irxur19DX9VY24yfybwiSa+EPNYQoCy34AoSMwT3dKHFgDx+8d+m3CV5YCtMHuVtJGe5DiWhfM/WbXcguj0wHjy5grjTTaRLI9G5Wv4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6005
+X-OriginatorOrg: intel.com
 
-On Wed, Oct 02, 2024 at 11:59:49AM -0500, Wei Huang wrote:
-> Hi All,
-> 
-> TPH (TLP Processing Hints) is a PCIe feature that allows endpoint
-> devices to provide optimization hints for requests that target memory
-> space. These hints, in a format called steering tag (ST), are provided
-> in the requester's TLP headers and allow the system hardware, including
-> the Root Complex, to optimize the utilization of platform resources
-> for the requests.
-> 
-> Upcoming AMD hardware implement a new Cache Injection feature that
-> leverages TPH. Cache Injection allows PCIe endpoints to inject I/O
-> Coherent DMA writes directly into an L2 within the CCX (core complex)
-> closest to the CPU core that will consume it. This technology is aimed
-> at applications requiring high performance and low latency, such as
-> networking and storage applications.
-> 
-> This series introduces generic TPH support in Linux, allowing STs to be
-> retrieved and used by PCIe endpoint drivers as needed. As a
-> demonstration, it includes an example usage in the Broadcom BNXT driver.
-> When running on Broadcom NICs with the appropriate firmware, it shows
-> substantial memory bandwidth savings and better network bandwidth using
-> real-world benchmarks. This solution is vendor-neutral and implemented
-> based on industry standards (PCIe Spec and PCI FW Spec).
-> 
-> V6->V7:
->  * Rebase on top of the latest pci/main (6.12-rc1)
->  * Fix compilation warning/error on clang-18 with w=1 (test robot)
->  * Revise commit messages for Patch #2, #4, and #5 (Bjorn)
->  * Add more _DSM method description for reference in Patch #2 (Bjorn)
->  * Remove "default n" in Kconfig (Lukas)
-> 
-> V5->V6:
->  * Rebase on top of pci/main (tag: pci-v6.12-changes)
->  * Fix spellings and FIELD_PREP/bnxt.c compilation errors (Simon)
->  * Move tph.c to drivers/pci directory (Lukas)
->  * Remove CONFIG_ACPI dependency (Lukas)
->  * Slightly re-arrange save/restore sequence (Lukas)
-> 
-> V4->V5:
->  * Rebase on top of net-next/main tree (Broadcom)
->  * Remove TPH mode query and TPH enabled checking functions (Bjorn)
->  * Remove "nostmode" kernel parameter (Bjorn)
->  * Add "notph" kernel parameter support (Bjorn)
->  * Add back TPH documentation (Bjorn)
->  * Change TPH register namings (Bjorn)
->  * Squash TPH enable/disable/save/restore funcs as a single patch (Bjorn)
->  * Squash ST get_st/set_st funcs as a single patch (Bjorn)
->  * Replace nic_open/close with netdev_rx_queue_restart() (Jakub, Broadcom)
-> 
-> V3->V4:
->  * Rebase on top of the latest pci/next tree (tag: 6.11-rc1)
->  * Add new API functioins to query/enable/disable TPH support
->  * Make pcie_tph_set_st() completely independent from pcie_tph_get_cpu_st()
->  * Rewrite bnxt.c based on new APIs
->  * Remove documentation for now due to constantly changing API
->  * Remove pci=notph, but keep pci=nostmode with better flow (Bjorn)
->  * Lots of code rewrite in tph.c & pci-tph.h with cleaner interface (Bjorn)
->  * Add TPH save/restore support (Paul Luse and Lukas Wunner)
-> 
-> V2->V3:
->  * Rebase on top of pci/next tree (tag: pci-v6.11-changes)
->  * Redefine PCI TPH registers (pci_regs.h) without breaking uapi
->  * Fix commit subjects/messages for kernel options (Jonathan and Bjorn)
->  * Break API functions into three individual patches for easy review
->  * Rewrite lots of code in tph.c/tph.h based (Jonathan and Bjorn)
-> 
-> V1->V2:
->  * Rebase on top of pci.git/for-linus (6.10-rc1)
->  * Address mismatched data types reported by Sparse (Sparse check passed)
->  * Add pcie_tph_intr_vec_supported() for checking IRQ mode support
->  * Skip bnxt affinity notifier registration if
->    pcie_tph_intr_vec_supported()=false
->  * Minor fixes in bnxt driver (i.e. warning messages)
-> 
-> Manoj Panicker (1):
->   bnxt_en: Add TPH support in BNXT driver
-> 
-> Michael Chan (1):
->   bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
-> 
-> Wei Huang (3):
->   PCI: Add TLP Processing Hints (TPH) support
->   PCI/TPH: Add Steering Tag support
->   PCI/TPH: Add TPH documentation
-> 
->  Documentation/PCI/index.rst                   |   1 +
->  Documentation/PCI/tph.rst                     | 132 +++++
->  .../admin-guide/kernel-parameters.txt         |   4 +
->  Documentation/driver-api/pci/pci.rst          |   3 +
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  91 ++-
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   7 +
->  drivers/pci/Kconfig                           |   9 +
->  drivers/pci/Makefile                          |   1 +
->  drivers/pci/pci.c                             |   4 +
->  drivers/pci/pci.h                             |  12 +
->  drivers/pci/probe.c                           |   1 +
->  drivers/pci/tph.c                             | 546 ++++++++++++++++++
->  include/linux/pci-tph.h                       |  44 ++
->  include/linux/pci.h                           |   7 +
->  include/uapi/linux/pci_regs.h                 |  37 +-
->  net/core/netdev_rx_queue.c                    |   1 +
->  16 files changed, 890 insertions(+), 10 deletions(-)
->  create mode 100644 Documentation/PCI/tph.rst
->  create mode 100644 drivers/pci/tph.c
->  create mode 100644 include/linux/pci-tph.h
 
-I tentatively applied this on pci/tph for v6.13.
 
-Not sure what you intend for the bnxt changes, since they depend on
-the PCI core changes.  I'm happy to merge them via PCI, given acks
-from Michael and an overall network maintainer.
+On 10/2/2024 12:47 AM, Daniel Machon wrote:
+> 
+> Hi Jakob,
+> 
+> First off, thank you for your reviews - I really appreciate it.
+> 
+> Let me address your "variable scope" conerns:
+> 
+> I had the feeling that this could pontentially be somewhat contentious.
+> 
+> Basically, this comes down to making the least invasive changes to the
+> existing driver code. With this approach:
+> 
+>     For the SPX5_CONST macro this means shorter lines, and less 80 char
+>     wrapping.
+> 
+>     For the "*regs" variable this means not having to pass in the sparx5
+>     pointer to *all* register macros, which requires changes *all* over
+>     the code.
+> 
+> I thought the solution with an in-scope implicit variable was less
+> invasive (and maybe even more readable?). Just my opinion, given the
+> alternative.
+>
 
-Alternatively they could wait another cycle, or I could make an
-immutable branch, although I prefer to preserve the option to update
-or remove things until the merge window.
+Obviously there is style preference here, and someone working
+day-in/day-out on the code is likely to know which macros have which
+variable dependencies. As an external reviewer, I would not know that,
+so I would find it surprising when looking at some code which passes a
+parameter which is never directly used.
 
-Thanks very much; this looks like nice work!
+> Obviously I did a bit of research on this upfront, and I can point to
+> *many* places where drivers do the exact same (not justifying the use,
+> just pointing that out). Here is an intel driver that does the same [1]
+> (look at the *hw variable)
 
-Bjorn
+Yea, I'm sure a lot of the old Intel drivers have bad examples :D I've
+spent a career trying to improve this.
+
+> 
+> I am willing to come up with something different, if you really think
+> this is a no-go. Let me hear your thoughts. I think this applies to your
+> comments on #2, #3 and #6 as well.
+> 
+
+It seems that Jakub Kicinski wants the entire macro removed, and his
+opinion as maintainer matters more than mine.
+
+Personally, I'm not opposed to a macro itself especially if the direct
+access starts to get very long. However, I think the parameter being
+accessed should be, well, a parameter of the macro.
+
+> /Daniel
+> 
+> [1] https://elixir.bootlin.com/linux/v6.12-rc1/source/drivers/net/ethernet/intel/igb/igb_main.c#L4746
+> 
+> 
+
+As an example of *why* I don't like this practice: It took me a while to
+realize the hw variable was implicit to wr32. And I worked on this driver.
+
+Thanks,
+Jake
 
