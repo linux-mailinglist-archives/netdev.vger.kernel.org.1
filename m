@@ -1,204 +1,138 @@
-Return-Path: <netdev+bounces-131327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D145398E16F
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:03:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98DC198E17E
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CF71F22DDA
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:03:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B1A284DA4
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CA361D0F73;
-	Wed,  2 Oct 2024 17:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3B01D0DC3;
+	Wed,  2 Oct 2024 17:12:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g71HNFdf"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="eJeMYKm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A690E1D0E19;
-	Wed,  2 Oct 2024 17:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E944E16419
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 17:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727888555; cv=none; b=UWp0jKeoUkNb8kNVuBwex+E0UOJ4JpKSPJLexlTUcod1pitIb29A2oHSmNSbaKVzRyOrAZdL4Gdb6zaSY4vSYKKfraBaprIve8v8kNV1kcp4I5H5xPR/H367mJpJUtxsinFI1906hM9c1JOeAwIOUeCocR71dqd8rq6gI7DqvDA=
+	t=1727889170; cv=none; b=L6shfYuvwHXUff1SFJ1zUKmG2ovevBYZmFZzEC91uaYcBPkbk2eW4kXhXGlXFk+iz+87OQZvQV71dqc4HvdXaKDZFyy7+R3jB2s3KLhNH11vpF2tdHEAy/goKT/POjExEkKcz24vefx7wh6QILEUUrqVTcAeEhov0cXTiB8Buv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727888555; c=relaxed/simple;
-	bh=2qnD3gcBe6sh/sUSe/VAfQiEfTQxar5VV5mjmhqjanY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hBcw5Gm/ZAF542V7ox6ScSREt6kNxWSQVJnff+QRmTFor8/kjfT97lUIZF49AuUdVBb/oxVM1LkkvYFeIaoDjhKD5d6CII+twpBs3MWdwUfQ9QehmoBj60R4EiOhCJG8SQ2A9zI6j147BIhnOPc6oHhqciWsJOceI5iII+ZJcDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g71HNFdf; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-718816be6cbso69556b3a.1;
-        Wed, 02 Oct 2024 10:02:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727888553; x=1728493353; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=j3CAetgPIchZCXGcR59D8f6NwNxq3FYMeL7IhO3SN+4=;
-        b=g71HNFdfuv+bBytHj6Kde7USbYcpyUFzoRpcdFQTvBHGWprcmU6aJXsqwDLymAZroT
-         U6rzrlMMc61iSjY/R4L2bI+mEs89eWrYIRW8tVVtvodi/PfkNOFsoDWsX0hq2pcBCeOq
-         XfxNJGpjuyy8i8oYwAlCUJjpdk5F6KQB+EflQnJB0BQUmWVVJTNnTTHlaQwwBxE1RX+R
-         tyJhTnTEfP4CQKPMTkmlNF4AfARZ0NXZzLYSgWwhhU+vS+JuG9RFfyDtKp/ssa2r//hn
-         ARwu4ZUaRrYJTk96A9oUVLdS625mWljYINsTXRD7lZ6XgHzbzUDluurcdwasTQOEz0tr
-         cQIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727888553; x=1728493353;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j3CAetgPIchZCXGcR59D8f6NwNxq3FYMeL7IhO3SN+4=;
-        b=nZsmyhs+joZCoq5rCYz8ZwVUxIQnMezMagqV8PtxYcgVcQZAvDWjFdFgtm7DWfJJpI
-         THCdhupAebHjchKhfec/jNxHRbWlsm7NljMorwYIcB8RpBurgMreUwqT1w+tOKCVLV5J
-         Do1/fPyKN5dTNzhAppNF3Ptb2Gg+okBmzJnNG3XDwZg/HyNhG+5jrZemQQspzoQCgEm8
-         Jl+RzIFSD01l/XuQvADjX+oVDD/uCPSC5A8cD7ppf/foxNl2A3gd8lFgeMJg+JTPhKDl
-         z9h6Em8mx9lxcceb3zOgxi4gRL/S/dLNEb5bNHKfSkMZ1wLd5b7VWEXNxzNLpqanOYGk
-         kR2w==
-X-Forwarded-Encrypted: i=1; AJvYcCW5GOPa6bbWq2smbLignQj6WWPyfFmf0CR5ewEuGUv6fqZrYizc9uYqX+829BcY206NLLPl73YF@vger.kernel.org, AJvYcCXnvY/xCVLX8CVgIjWqAh+VumBU48yYzMimHTw7cbZ4XX38d7M+7OaqDmbMD5aOtY6ec1s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4qD8YTaDkmzmdFAU6XHlZ5LCxPsX8xFSD8gjHizrQWmFf/L7k
-	EJTaxbepbO5D1RSkJf3KwikdR+/z6/b1GsvfI2Up4MTvzUzB0JI=
-X-Google-Smtp-Source: AGHT+IGp5S9qADB+5Pu5rzmzU8tU0hkVADw7MBH03DAjOoup+W+fr8dADId0yHouk9LY1IerDa/fzA==
-X-Received: by 2002:a05:6a00:807:b0:705:a13b:e740 with SMTP id d2e1a72fcca58-71dc5d6a157mr5638461b3a.19.1727888552645;
-        Wed, 02 Oct 2024 10:02:32 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b26498b51sm10383673b3a.14.2024.10.02.10.02.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 10:02:32 -0700 (PDT)
-Date: Wed, 2 Oct 2024 10:02:31 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Arthur Fabre <afabre@cloudflare.com>,
-	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
-	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
-	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
-	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	kernel-team <kernel-team@cloudflare.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-Message-ID: <Zv18pxsiTGTZSTyO@mini-arch>
-References: <87wmiysi37.fsf@toke.dk>
- <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
- <87ldzds8bp.fsf@toke.dk>
- <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
- <ZvbKDT-2xqx2unrx@lore-rh-laptop>
- <871q11s91e.fsf@toke.dk>
- <ZvqQOpqnK9hBmXNn@lore-desk>
- <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
- <ZvwNQqN4gez1Ksfn@lore-desk>
- <87zfnnq2hs.fsf@toke.dk>
+	s=arc-20240116; t=1727889170; c=relaxed/simple;
+	bh=ErONom/Ai9zIX5PSONp+QFKxytgOpuX04ZrmD+dkgEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aAK0HJrRziE3uA+iqsE5uSokzrmpelvHVWI28LaBJgNo964DrJD4woIpk64jcI8Exd0eZSFSA14+B1i41Nh2tAW8/Tbve4oyli/MigK0/feOmku0nfWstC5aQITKtHmGyhkyBP5Wxjbwk++9qdT16nuUKEEVt+gw5/QDV0QHM/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=eJeMYKm7; arc=none smtp.client-ip=185.136.64.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 20241002171233a27a727a77d5ddee8e
+        for <netdev@vger.kernel.org>;
+        Wed, 02 Oct 2024 19:12:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=e7QmFZwkSyc492JijwjT4JHyXfg7s0uXN5hCiPvx5Ts=;
+ b=eJeMYKm7GDjPLn0AaVrIguWEM1f6uIG1Y6ionHMk9Ig/PH4zrm2+o6RJ/kiCVA3p4FHoLy
+ bgMhZQEt3m/cqgVVV69xGv5h2iNUQ+J7AWqU3AZQFmLKHpAg1zwpqPuT0Ru77JMU21zzf6EL
+ NQOHmVuh/wOkzMuB4Wm3Jc/AkYuLOBBrUwQknisNtqdrJi2sRIsgH8/BubIdw2DCUUUIuKZ3
+ UZfSoQxVygBdgrcn9nUN2ix0VhHX10UTLERq1fnDrpqapHIoq8LLhJ+YoqszTnlG/21pufBE
+ cG2AhWm5BMUAYxjeefS8dSqDPxbQUK94Zg51Jwg/qHIcxxV+b7RYjoWw==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+To: netdev@vger.kernel.org
+Cc: Anatolij Gustschin <agust@denx.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Subject: [PATCH net v2] net: dsa: lan9303: ensure chip reset and wait for READY status
+Date: Wed,  2 Oct 2024 19:12:28 +0200
+Message-ID: <20241002171230.1502325-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87zfnnq2hs.fsf@toke.dk>
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-On 10/01, Toke Høiland-Jørgensen wrote:
-> Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> 
-> >> On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi wrote:
-> >> > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> >> > > 
-> >> > > >> > We could combine such a registration API with your header format, so
-> >> > > >> > that the registration just becomes a way of allocating one of the keys
-> >> > > >> > from 0-63 (and the registry just becomes a global copy of the header).
-> >> > > >> > This would basically amount to moving the "service config file" into the
-> >> > > >> > kernel, since that seems to be the only common denominator we can rely
-> >> > > >> > on between BPF applications (as all attempts to write a common daemon
-> >> > > >> > for BPF management have shown).
-> >> > > >> 
-> >> > > >> That sounds reasonable. And I guess we'd have set() check the global
-> >> > > >> registry to enforce that the key has been registered beforehand?
-> >> > > >> 
-> >> > > >> >
-> >> > > >> > -Toke
-> >> > > >> 
-> >> > > >> Thanks for all the feedback!
-> >> > > >
-> >> > > > I like this 'fast' KV approach but I guess we should really evaluate its
-> >> > > > impact on performances (especially for xdp) since, based on the kfunc calls
-> >> > > > order in the ebpf program, we can have one or multiple memmove/memcpy for
-> >> > > > each packet, right?
-> >> > > 
-> >> > > Yes, with Arthur's scheme, performance will be ordering dependent. Using
-> >> > > a global registry for offsets would sidestep this, but have the
-> >> > > synchronisation issues we discussed up-thread. So on balance, I think
-> >> > > the memmove() suggestion will probably lead to the least pain.
-> >> > > 
-> >> > > For the HW metadata we could sidestep this by always having a fixed
-> >> > > struct for it (but using the same set/get() API with reserved keys). The
-> >> > > only drawback of doing that is that we statically reserve a bit of
-> >> > > space, but I'm not sure that is such a big issue in practice (at least
-> >> > > not until this becomes to popular that the space starts to be contended;
-> >> > > but surely 256 bytes ought to be enough for everybody, right? :)).
-> >> >
-> >> > I am fine with the proposed approach, but I think we need to verify what is the
-> >> > impact on performances (in the worst case??)
-> >> 
-> >> If drivers are responsible for populating the hardware metadata before
-> >> XDP, we could make sure drivers set the fields in order to avoid any
-> >> memove() (and maybe even provide a helper to ensure this?).
-> >
-> > nope, since the current APIs introduced by Stanislav are consuming NIC
-> > metadata in kfuncs (mainly for af_xdp) and, according to my understanding,
-> > we want to add a kfunc to store the info for each NIC metadata (e.g rx-hash,
-> > timestamping, ..) into the packet (this is what Toke is proposing, right?).
-> > In this case kfunc calling order makes a difference.
-> > We can think even to add single kfunc to store all the info for all the NIC
-> > metadata (maybe via a helping struct) but it seems not scalable to me and we
-> > are losing kfunc versatility.
-> 
-> Yes, I agree we should have separate kfuncs for each metadata field.
-> Which means it makes a lot of sense to just use the same setter API that
-> we use for the user-registered metadata fields, but using reserved keys.
-> So something like:
-> 
-> #define BPF_METADATA_HW_HASH      BIT(60)
-> #define BPF_METADATA_HW_TIMESTAMP BIT(61)
-> #define BPF_METADATA_HW_VLAN      BIT(62)
-> #define BPF_METADATA_RESERVED (0xffff << 48)
-> 
-> bpf_packet_metadata_set(pkt, BPF_METADATA_HW_HASH, hash_value);
-> 
-> 
-> As for the internal representation, we can just have the kfunc do
-> something like:
-> 
-> int bpf_packet_metadata_set(field_id, value) {
->   switch(field_id) {
->     case BPF_METADATA_HW_HASH:
->       pkt->xdp_hw_meta.hash = value;
->       break;
->     [...]
->     default:
->       /* do the key packing thing */
->   }
-> }
-> 
-> 
-> that way the order of setting the HW fields doesn't matter, only the
-> user-defined metadata.
+From: Anatolij Gustschin <agust@denx.de>
 
-Can you expand on why we need the flexibility of picking the metadata fields
-here? Presumably we are talking about the use-cases where the XDP program
-is doing redirect/pass and it doesn't really know who's the final
-consumer is (might be another xdp program or might be the xdp->skb
-kernel case), so the only sensible option here seems to be store everything?
+Accessing device registers seems to be not reliable, the chip
+revision is sometimes detected wrongly (0 instead of expected 1).
+
+Ensure that the chip reset is performed via reset GPIO and then
+wait for 'Device Ready' status in HW_CFG register before doing
+any register initializations.
+
+Signed-off-by: Anatolij Gustschin <agust@denx.de>
+[alex: reworked using read_poll_timeout()]
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+---
+Changelog:
+v2: use read_poll_timeout()
+
+ drivers/net/dsa/lan9303-core.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+
+diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
+index 268949939636a..3155ec1ab2517 100644
+--- a/drivers/net/dsa/lan9303-core.c
++++ b/drivers/net/dsa/lan9303-core.c
+@@ -6,6 +6,7 @@
+ #include <linux/module.h>
+ #include <linux/gpio/consumer.h>
+ #include <linux/regmap.h>
++#include <linux/iopoll.h>
+ #include <linux/mutex.h>
+ #include <linux/mii.h>
+ #include <linux/of.h>
+@@ -839,6 +840,8 @@ static void lan9303_handle_reset(struct lan9303 *chip)
+ 	if (!chip->reset_gpio)
+ 		return;
+ 
++	gpiod_set_value_cansleep(chip->reset_gpio, 1);
++
+ 	if (chip->reset_duration != 0)
+ 		msleep(chip->reset_duration);
+ 
+@@ -866,6 +869,29 @@ static int lan9303_check_device(struct lan9303 *chip)
+ 	int ret;
+ 	u32 reg;
+ 
++	/*
++	 * In I2C-managed configurations this polling loop will clash with
++	 * switch's reading of EEPROM right after reset and this behaviour is
++	 * not configurable. While lan9303_read() already has quite long retry
++	 * timeout, seems not all cases are being detected as arbitration error.
++	 *
++	 * According to datasheet, EEPROM loader has 30ms timeout (in case of
++	 * missing EEPROM).
++	 *
++	 * Loading of the largest supported EEPROM is expected to take at least
++	 * 5.9s.
++	 */
++	if (read_poll_timeout(lan9303_read, ret, reg & LAN9303_HW_CFG_READY,
++			      20000, 6000000, false,
++			      chip->regmap, LAN9303_HW_CFG, &reg)) {
++		dev_err(chip->dev, "HW_CFG not ready: 0x%08x\n", reg);
++		return -ENODEV;
++	}
++	if (ret) {
++		dev_err(chip->dev, "failed to read HW_CFG reg: %d\n", ret);
++		return ret;
++	}
++
+ 	ret = lan9303_read(chip->regmap, LAN9303_CHIP_REV, &reg);
+ 	if (ret) {
+ 		dev_err(chip->dev, "failed to read chip revision register: %d\n",
+-- 
+2.46.2
+
 
