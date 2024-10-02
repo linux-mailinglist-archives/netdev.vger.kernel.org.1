@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-131138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF9E98CE05
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:48:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF9398CE08
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:48:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E03C2849D9
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 07:48:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD8ECB226A0
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 07:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763FD18E373;
-	Wed,  2 Oct 2024 07:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F46194123;
+	Wed,  2 Oct 2024 07:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="p7TGzV1N"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SB2+H/aU"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9911C6B8;
-	Wed,  2 Oct 2024 07:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B511940BE;
+	Wed,  2 Oct 2024 07:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727855275; cv=none; b=iFhmxzU+MWT2sq3C5C893J/OOIc17Ob3tCTOh74O241OvDRa6dmvAOL5UW2+CR8g4rwNlInthjjYyv+RMasPyJCi68u0RvigidKnAHZIIiFsTOoDGYi35KlvcTqFaEI1KonPIxCh2DxLUnEIsklQJBeBKI3pWQWJOuYSil+XNCg=
+	t=1727855308; cv=none; b=UlP+RtF3mxMulrlyZMUEU5vwbqsR8bS4FadxRDSs/KLpplEaij1oxuu/pATZ3d4PlHN89hEKXc434TQr0BkK2H1YviWvnNt0cjE1LfIVIOabkO/CdkJiT4m0QWk4cq8jwpHeS+YSOhDnuVDS+KVkvXk0xYfA3a92ypPmvWzwcsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727855275; c=relaxed/simple;
-	bh=z0MT3UsYNgbdvoBZaDU1qGk7LBG6sR5i0JyVabGx2pI=;
+	s=arc-20240116; t=1727855308; c=relaxed/simple;
+	bh=yjQbS4juwZPhWck9Qu/CXpBh5RJpxCF34+6/JYPUVGs=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K93sGEsbB7DkCR6fUZsHY0I8uCRixn49O1gzp6EcJ2FPM7PAGRezqdvtxOS+RMuUtOctw44/PACK+HQMaRLaXgufrhaN7VAkIEgI0nRig1Dwfznwbnr2M/AJ1l8eLbp9U1kHEp9G3OS7HI+WHuzroaN86UZXXZ1/Vn0SlZEf3lI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=p7TGzV1N; arc=none smtp.client-ip=68.232.153.233
+	 Content-Type:Content-Disposition:In-Reply-To; b=dY4WsjRfb5jov3M5C4Htt3xCVjX8aPcI8cF+osChE3bZzzk1e11YgWGinpQfbbEdMGKR86Wq8MhgiLGNRETdUKADHDeAbMFhbJn8VrNFbuS9BgcyhmDx6g7D2SDQXNVURDKR2N7eKjmKFQUaYBSCNm3CtbL4Jukevv3xsCvs+RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SB2+H/aU; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1727855274; x=1759391274;
+  t=1727855306; x=1759391306;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=z0MT3UsYNgbdvoBZaDU1qGk7LBG6sR5i0JyVabGx2pI=;
-  b=p7TGzV1NJWdLt8uAt2CspMl8Kvg760vRUuicqpW4kC35kbTAxKp9f3BA
-   cqveG5AIdi5qbloIietuk5I6xdK2yOoJNdziPLUqiM9ZvOHdAO+hQqgDK
-   G3N9uk+VEiFVnY958euWB7pWycnkBq/srtHw7fjpnSD+a7YBwOcfwAZAP
-   dFmO+Yt0dH/67HqDIExnlpBDCfaz0oTpIW6vafcSj+c0s5xqHF7A6Jygx
-   JZlFsEBZlO5G+kzDI6jcR6h9HJTdGLo/3dUwuY7kJKa4/i//BYb7Ii+1Z
-   6zvFnJlhTfRPc1Fs/ZNDkrLGrn416i/yfN+80Ghvxz4OMvFlzZ0lrFF+p
-   A==;
-X-CSE-ConnectionGUID: HKYQm0CWSlePuzvScArC8g==
-X-CSE-MsgGUID: alPX2nTXQBKPZ3NmZb1AtQ==
+  bh=yjQbS4juwZPhWck9Qu/CXpBh5RJpxCF34+6/JYPUVGs=;
+  b=SB2+H/aUhtJxJqDCo2BS3PCTTLL/0JDaUOw1Kt5QmSePOumldqyrV0lO
+   qiwakYv1gx+d0UNwQ34WrPMoI+7ZJq+WlBlwA/Z2/MQ0a8zIxuYMAI4UO
+   a+ZbAff550+w6FKkuJXIb10w+4K0/BwaE9eFdePZAlSEMzY1s5lG8vD3Y
+   tjhV5W0V6600AyW/+mtbr6m84wToVGvwLqqKg8egPfs0UjYnkZ6M4fRt6
+   iWoa697iC8OdI0X0osz5415CQfL5piGSFvxPXklEzHGy7d3NYc+1N9+dP
+   BZX5+5WAvKJLyFDoACjB4BYadfudXnILSQOBbixKDPOsTCLTycLx3rX7l
+   g==;
+X-CSE-ConnectionGUID: ur9xYuViQOazsezB14XXWQ==
+X-CSE-MsgGUID: F2F+WxPPTHC7dIcE4idn5Q==
 X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
-   d="scan'208";a="32498850"
+   d="scan'208";a="199937223"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Oct 2024 00:47:51 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Oct 2024 00:48:20 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 2 Oct 2024 00:47:17 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 2 Oct 2024 00:47:14 -0700
-Date: Wed, 2 Oct 2024 07:47:14 +0000
+ 15.1.2507.35; Wed, 2 Oct 2024 00:48:08 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 2 Oct 2024 00:48:05 -0700
+Date: Wed, 2 Oct 2024 07:48:05 +0000
 From: Daniel Machon <daniel.machon@microchip.com>
 To: Jacob Keller <jacob.e.keller@intel.com>
 CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -70,11 +70,12 @@ CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<justinstitt@google.com>, <gal@nvidia.com>, <aakash.r.menon@gmail.com>,
 	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 00/15] net: sparx5: prepare for lan969x switch
- driver
-Message-ID: <20241002074714.uprnmhf5a2f2hyzw@DEN-DL-M70577>
+Subject: Re: [PATCH net-next 10/15] net: sparx5: ops out chip port to device
+ index/bit functions
+Message-ID: <20241002074805.fcacici2omuimcgd@DEN-DL-M70577>
 References: <20241001-b4-sparx5-lan969x-switch-driver-v1-0-8c6896fdce66@microchip.com>
- <4e89dd84-eadc-4cae-8892-c33688cc051f@intel.com>
+ <20241001-b4-sparx5-lan969x-switch-driver-v1-10-8c6896fdce66@microchip.com>
+ <d3964902-ac02-4fac-a0e8-f820fe56eed1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,116 +84,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <4e89dd84-eadc-4cae-8892-c33688cc051f@intel.com>
+In-Reply-To: <d3964902-ac02-4fac-a0e8-f820fe56eed1@intel.com>
 
-> > == Description:
+> > The chip port device index and mode bit can be obtained using the port
+> > number.  However the mapping of port number to chip device index and
+> > mode bit differs on Sparx5 and lan969x. Therefore ops out the function.
 > >
-> > This series is the first of a multi-part series, that prepares and adds
-> > support for the new lan969x switch driver.
+> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> > ---
+> >  drivers/net/ethernet/microchip/sparx5/sparx5_main.c | 2 ++
+> >  drivers/net/ethernet/microchip/sparx5/sparx5_main.h | 2 ++
+> >  drivers/net/ethernet/microchip/sparx5/sparx5_port.c | 4 +++-
+> >  drivers/net/ethernet/microchip/sparx5/sparx5_port.h | 7 ++++++-
+> >  4 files changed, 13 insertions(+), 2 deletions(-)
 > >
-> > The upstreaming efforts is split into multiple series (might change a
-> > bit as we go along):
-> >
-> >     1) Prepare the Sparx5 driver for lan969x (this series)
-> >     2) Add support lan969x (same basic features as Sparx5 provides +
-> >        RGMII, excl.  FDMA and VCAP)
-> >     3) Add support for lan969x FDMA
-> >     4) Add support for lan969x VCAP
-> >
-> > == Lan969x in short:
-> >
-> > The lan969x Ethernet switch family [1] provides a rich set of
-> > switching features and port configurations (up to 30 ports) from 10Mbps
-> > to 10Gbps, with support for RGMII, SGMII, QSGMII, USGMII, and USXGMII,
-> > ideal for industrial & process automation infrastructure applications,
-> > transport, grid automation, power substation automation, and ring &
-> > intra-ring topologies. The LAN969x family is hardware and software
-> > compatible and scalable supporting 46Gbps to 102Gbps switch bandwidths.
-> >
-> > == Preparing Sparx5 for lan969x:
-> >
-> > The lan969x switch chip reuses many of the IP's of the Sparx5 switch
-> > chip, therefore it has been decided to add support through the existing
-> > Sparx5 driver, in order to avoid a bunch of duplicate code. However, in
-> > order to reuse the Sparx5 switch driver, we have to introduce some
-> > mechanisms to handle the chip differences that are there.  These
-> > mechanisms are:
-> >
-> >     - Platform match data to contain all the differences that needs to
-> >       be handled (constants, ops etc.)
-> >
-> >     - Register macro indirection layer so that we can reuse the existing
-> >       register macros.
-> >
-> >     - Function for branching out on platform type where required.
-> >
-> > In some places we ops out functions and in other places we branch on the
-> > chip type. Exactly when we choose one over the other, is an estimate in
-> > each case.
-> >
-> > After this series is applied, the Sparx5 driver will be prepared for
-> > lan969x and still function exactly as before.
-> >
-> > == Patch breakdown:
-> >
-> > Patch #1     adds private match data
-> >
-> > Patch #2     adds register macro indirection layer
-> >
-> > Patch #3-#5  does some preparation work
-> >
-> > Patch #6-#8  adds chip constants and updates the code to use them
-> >
-> > Patch #9-#14 adds and uses ops for handling functions differently on the
-> >              two platforms.
-> >
-> > Patch #15    adds and uses a macro for branching out on the chip type
-> >
-> > [1] https://www.microchip.com/en-us/product/lan9698
-> >
+> > diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> > index 8b1033c49cfe..8617fc3983cc 100644
+> > --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> > +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+> > @@ -982,6 +982,8 @@ static const struct sparx5_ops sparx5_ops = {
+> >       .is_port_5g              = &sparx5_port_is_5g,
+> >       .is_port_10g             = &sparx5_port_is_10g,
+> >       .is_port_25g             = &sparx5_port_is_25g,
+> > +     .get_port_dev_index      = &sparx5_port_dev_mapping,
+> > +     .get_port_dev_bit        = &sparx5_port_dev_mapping,
 > 
-> The series seems ok to me. I'm not personally a fan of the implicit
-> local variables used by macros. I do not know how common that is, or
-> what others on the list feel about this.
-> 
-> For everything else:
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> So for sparx5, these are identical operations, but for lan969x these
+> will be different? Ok.
+>
 
-Hi Jakob,
-
-First off, thank you for your reviews - I really appreciate it.
-
-Let me address your "variable scope" conerns:
-
-I had the feeling that this could pontentially be somewhat contentious.
-
-Basically, this comes down to making the least invasive changes to the
-existing driver code. With this approach:
-
-    For the SPX5_CONST macro this means shorter lines, and less 80 char
-    wrapping.
-
-    For the "*regs" variable this means not having to pass in the sparx5
-    pointer to *all* register macros, which requires changes *all* over
-    the code.
-
-I thought the solution with an in-scope implicit variable was less
-invasive (and maybe even more readable?). Just my opinion, given the
-alternative.
-
-Obviously I did a bit of research on this upfront, and I can point to
-*many* places where drivers do the exact same (not justifying the use,
-just pointing that out). Here is an intel driver that does the same [1]
-(look at the *hw variable)
-
-I am willing to come up with something different, if you really think
-this is a no-go. Let me hear your thoughts. I think this applies to your
-comments on #2, #3 and #6 as well.
+Exactly :-)
 
 /Daniel
-
-[1] https://elixir.bootlin.com/linux/v6.12-rc1/source/drivers/net/ethernet/intel/igb/igb_main.c#L4746
-
-
 
