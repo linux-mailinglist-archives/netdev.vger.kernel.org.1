@@ -1,91 +1,126 @@
-Return-Path: <netdev+bounces-131363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88EAF98E491
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:04:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABCC498E4D5
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20B9DB2360C
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:04:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72961C2197E
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8B91D0B8F;
-	Wed,  2 Oct 2024 21:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46B5217328;
+	Wed,  2 Oct 2024 21:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXvm6K0K"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F9EBj7y9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16E1F745F4
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 21:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20782141D6;
+	Wed,  2 Oct 2024 21:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727903068; cv=none; b=Wq5DJtRwV47jPmMMAFR06X0zf3Axex3q/kiXM7IQH6gr10gkNbs+dpEl/O5pCtJFI3YsZxpmr8Vdxt7nV9YiMDdAZ4RwjcWRRuVItXRR/pi6xZhRMPu4K2N4bc74buISMH2IXmZeosPZ9cJUKV3WP+eav3jzgcD6gGWL3NR+n18=
+	t=1727904262; cv=none; b=OXmVP3qTZcCiWrur9GPMrbkovUh2pSSOjOyVAytPu8jrw0tDTpIbdTwmUBql1+9hqQ1tmvXYVo0mgYYBftci29bb0SN/gR0lOybDZjnGf7pXaV5i3GOrdFGlkYpX55n+H9HhWI3yhDCP/9HyGSJNuUmAr7A0Njz5xpe2F6Kiy5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727903068; c=relaxed/simple;
-	bh=xL6ra8RCTOy8ZdTZyT4ut6HaIsLNPeE9HqPN6AWHoBE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pNqn7rOM1OOfoQKje+9iAGquNBnojgWfv/g15ZynbB66cD5HcvF0SsT2ip4le2G9V4d7yQkZ5Hcvw4c9vronLdkby4/j2ZjevcsqDNKrDNg1kBwZ9prUZjs5bk7Wt+XGN5XliRAileOtMn/atxt8rYPnvWIg93ZUeQSiPtB7muU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FXvm6K0K; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2fac3f20f1dso2663991fa.3
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 14:04:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727903065; x=1728507865; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xL6ra8RCTOy8ZdTZyT4ut6HaIsLNPeE9HqPN6AWHoBE=;
-        b=FXvm6K0KZ5ysKRfF9OTEIaCd5+IyFm3fqQUlO8WmrhT53vafnzmdVJTbxW09hQBou7
-         Ebt2lAeyvhrQdIQS6JMlExZRKp0N7xVyPyZRC63nnvgb+sS6nloTjzl2MexEdFSg+pHf
-         LG/5LuhLmuaJSZnujSBVk77PTwTx0BUYy8AmxKyeZ4DZJ79isppURZuwittTo3yB1gq3
-         8GUecsSrJeqeD8SKNB4hXrmjjeYqfE/SQbO2RPuIFtWp1rJvVZOpEAmHFBar177YmuYf
-         7Md29vFjxsIOwm44R0X75vRxq5xnnrEFF8GJR3UoxcfYNVkDZ4N+U6C628+14U3QAeP2
-         7H6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727903065; x=1728507865;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xL6ra8RCTOy8ZdTZyT4ut6HaIsLNPeE9HqPN6AWHoBE=;
-        b=XSoitX9tbKQJMAA9ISQS/BGuX/WWZcDJXfTa1nPUeWwI6J5sfkr4vmIdLcrCCd6W5Z
-         mm7SDQe/FKttsj7A6NePEq/Ld0CPzmzTtq7wmaAXMPmt0bYkINSEFbTjJoob59Hcyf7E
-         5dX9W5xOlmkwTXavMLjyksEMBifhTq0XW/ietXkMaVrVAUK0ozuL41vOCwbhjf2uPISx
-         a3k4KfOwaBgoY2yqj4gwZyjZ6eGgNWrGOQsTnlEiBvvPE/HriwpocBGKDCI1dtvOvmWr
-         mSCKBNlzXhOg6r/eWnQ057nTs3AC+aZSrJ/dFoJ6oTzzTtLDE0yN7LW3XiGXgnwitUrT
-         2fuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVKa9nmnr9f08aZ9XVVi4fOtXdHDkpBKDy/z+nmheIkj03CduhABtX2WcxPiGUY20/JCSDMzIA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkUK8++79+vSCRUN0ayJtybKP3A+0rSHNjPKVd3XtcaTuGnmYf
-	FZX93IK+GbnoCjxjGTtUu0ksanwHmDJPamt/FpRLXk7epZ1NsAtMMIB7lx6HQJ+HCuNRwuYudlC
-	XaRE8lSVw/suVNfZjkm09pwDCnYVaHW5qMw==
-X-Google-Smtp-Source: AGHT+IGy9ljUaB19yu8Lh1skRNOWPyDKjSUwN9vTRZ1tno9Ue474cozW+ldsbGwhlJ7b9frteb5d86O4ZlCcLgUsnRw=
-X-Received: by 2002:a2e:4a09:0:b0:2f7:7031:dc31 with SMTP id
- 38308e7fff4ca-2fae102729bmr26728151fa.27.1727903064843; Wed, 02 Oct 2024
- 14:04:24 -0700 (PDT)
+	s=arc-20240116; t=1727904262; c=relaxed/simple;
+	bh=d4U3RojMz/eNE93mws2Q+0pKSf58wykiAO9y5d3i5VE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a0m73Jn0En07wKNXSUcFaXp4k2yi+Loct2XNqSMnLDup6v+JgDBCT0esrIB5IDMD9r07rtpKiFkp9K89v4sAC1IUJFf73JssFXhOL4DRchOpa3J4jz86xCcNOS19Nb+0CUMJQoZqf2IeSU5B/1ry6bR3a8CV6ZK/TZJHNEC2/ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F9EBj7y9; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c4ee29b6-5dfc-44f6-af5c-02d042b42cc0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727904257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dzrFlAl+U9N/Vy9YLPbpe2/5D1bNUacg3gz/EIn3Ehc=;
+	b=F9EBj7y9tzDZaNghtcYY8ER48y+QN4OJ3arZmeBjwomgtm67pOgn4ruOgihm2w3Ye/X/Xk
+	MThy3N76+BM9JYP/tz+ywTp6x4GfLETs4CXG4zbzwLgNtt2K6kQpxN837yhRo88IRKQeUn
+	d1mk7kzQPU556EQqIB6wMrtt/YEqAP0=
+Date: Wed, 2 Oct 2024 14:24:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALk3=6u+PTcc2xhCx3YgWrx3_SzazpXTk1ndDmik+AOi==oq9Q@mail.gmail.com>
- <20241002054320.75caf96b@kernel.org>
-In-Reply-To: <20241002054320.75caf96b@kernel.org>
-From: Budimir Markovic <markovicbudimir@gmail.com>
-Date: Wed, 2 Oct 2024 23:04:13 +0200
-Message-ID: <CALk3=6sKP_iqaW+4WyOL=HPYc-4QidFEfOK6EtTFTzA+SjGehg@mail.gmail.com>
-Subject: Re: Use-after-free from netem/hfsc interaction
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net v4 2/2] bpf: selftests: send packet to devmap redirect
+ XDP
+To: Florian Kauer <florian.kauer@linutronix.de>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jesper Dangaard Brouer <brouer@redhat.com>, linux-kselftest@vger.kernel.org
+References: <20240911-devel-koalo-fix-ingress-ifindex-v4-0-5c643ae10258@linutronix.de>
+ <20240911-devel-koalo-fix-ingress-ifindex-v4-2-5c643ae10258@linutronix.de>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240911-devel-koalo-fix-ingress-ifindex-v4-2-5c643ae10258@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 2, 2024 at 2:43=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
-> Just to be sure - does it repro on latest Linus's tree?
+On 9/11/24 1:41 AM, Florian Kauer wrote:
+> @@ -25,14 +28,11 @@ static void test_xdp_with_devmap_helpers(void)
+>   	if (!ASSERT_OK_PTR(skel, "test_xdp_with_devmap_helpers__open_and_load"))
+>   		return;
+>   
+> -	dm_fd = bpf_program__fd(skel->progs.xdp_redir_prog);
+> -	err = bpf_xdp_attach(IFINDEX_LO, dm_fd, XDP_FLAGS_SKB_MODE, NULL);
+> +	dm_fd_redir = bpf_program__fd(skel->progs.xdp_redir_prog);
+> +	err = bpf_xdp_attach(IFINDEX_LO, dm_fd_redir, XDP_FLAGS_SKB_MODE, NULL);
+>   	if (!ASSERT_OK(err, "Generic attach of program with 8-byte devmap"))
+>   		goto out_close;
+>   
+> -	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
+> -	ASSERT_OK(err, "XDP program detach");
+> -
+>   	dm_fd = bpf_program__fd(skel->progs.xdp_dummy_dm);
+>   	map_fd = bpf_map__fd(skel->maps.dm_ports);
+>   	err = bpf_prog_get_info_by_fd(dm_fd, &info, &len);
+> @@ -47,6 +47,23 @@ static void test_xdp_with_devmap_helpers(void)
+>   	ASSERT_OK(err, "Read devmap entry");
+>   	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to devmap entry prog_id");
+>   
+> +	/* send a packet to trigger any potential bugs in there */
+> +	char data[10] = {};
+> +	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+> +			    .data_in = &data,
+> +			    .data_size_in = 10,
+> +			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
+> +			    .repeat = 1,
+> +		);
+> +	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
 
-Yes
+I am seeing pr_warn on "Driver unsupported XDP return value on prog 
+xdp_redir_prog...". There is an existing bug in xdp_redir_prog(). I fixed it 
+with this:
+
+SEC("xdp")
+int xdp_redir_prog(struct xdp_md *ctx)
+{
+-	return bpf_redirect_map(&dm_ports, 1, 0);
++﻿﻿	return bpf_redirect_map(&dm_ports, 0, 0);
+}
+
+and also wrapped the above "lo" test in its own netns also.
+
+Applied to the bpf tree. Thanks.
+
 
