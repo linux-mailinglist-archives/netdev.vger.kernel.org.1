@@ -1,93 +1,86 @@
-Return-Path: <netdev+bounces-131101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0A298C9B3
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:56:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 630C398CA0E
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 02:34:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 827C61F22278
-	for <lists+netdev@lfdr.de>; Tue,  1 Oct 2024 23:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB161C20A79
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770AE1E4924;
-	Tue,  1 Oct 2024 23:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6BB138E;
+	Wed,  2 Oct 2024 00:34:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="I9CuXGuZ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Qw3XJqDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049841E411C
-	for <netdev@vger.kernel.org>; Tue,  1 Oct 2024 23:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EC8624
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 00:34:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727826849; cv=none; b=VYWG92bsynLlDbUlJAtAcqEuR13coYiy66esjg+T5PYFmy9G3Pn8YNDCsmA00gZdZWmwq78V90Qk0P1JsgZ0BQOt84YqwLkLFn9cRylv2/pkNL82NmzBrb+FIWmaoNMy7Axkde9xVO2Q6X9cjrHQX6GGb1dvY5MGwF6m2DHZGt8=
+	t=1727829251; cv=none; b=PNaOedqw5deHo+mAiwp1jnqtVNHCiMeqruc113kwMpBA1nindbExgbEIcw8z+lPmmq32F9eRUw9bP/WdigHXFPhL/HqiwCBQmZ826QTUkeIzvXr9is7rAypMlSFYoi6tQFHUR5wD7Z8OgcAI9c3qq6yWBwqMAwd0Cuh++kXE4kY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727826849; c=relaxed/simple;
-	bh=acO4k3Tl1873YqlB+9+oRM1/HbYr6wa8DEvdBbXxJoQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BxaFypc+NhPDgYk5D0vvlkprArEiWTJYQJ9xJVxXj73hQ1PNFZbmPZGj4CVWZx1emeIooTPIx43ZsJ2DhmrUkE0edET0OOv/RmPY0c1DE+7/2nWtc8EEgWH2ZfhdMIrk/7hWyqlUJ7yrpUbK8gHbJQ5tEXpNzfbe9yiYWH99csM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=I9CuXGuZ; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1727829251; c=relaxed/simple;
+	bh=2rkNPvJlxqa0CubTyPDpR/tEx4ZA9pbbhUunc9ewgcY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s3dJlAcIheFNUDt9MsqzIQbpZuBHCl80UhV3RjH89plxJqcJUgpXzyTh3/xGOpleSljO990tAtiz2/iJOZMYmdt4MPI6RMtRKzV0All0zunIyChTlEuFo4QrKnclz8hLC3ibgh1l9MOxuguHqh+pB52woUHwoSP8NOawSDj2XMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Qw3XJqDa; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e0a74ce880so5043516a91.2
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 16:54:07 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20b93887decso23453735ad.3
+        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 17:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727826847; x=1728431647; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PGtnVysYWBB+XDp/kZF0mQyFvrv7Ut5AwNUz8on3uqI=;
-        b=I9CuXGuZCTP3ykMhvyDAZ3l2VCzD+7AFe15fY10/SC64P7jfCeMu44RPAapDArvRNa
-         +O9ayxq+2/5owICuq02oO5dZ9kAd00aJK+IsJ5aEuNo3NUOH/CRoN6i7UMAagl24I4Q3
-         aJF29Wq5iOl8V13wSgyVBST713b896eQivgFU=
+        d=fastly.com; s=google; t=1727829249; x=1728434049; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FO5R8cdqVEZ/UYrxFLZyYiizB9jbmk7GftZJO5b/CPY=;
+        b=Qw3XJqDarowQwD4pQgut9Ekvv4pwAEJnzxHJVESkeeAXBEZo0ELckMEXj1bRsc2VDK
+         OfbVawbz3VkFCdqxngeZzk84b9hxFBCZbGodyTFm9fZqZctTg01cN8wKWye3ayHBW7EW
+         qJoh726qc7sY7CihI9wB5/l1wCg56lmQkEEyM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727826847; x=1728431647;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PGtnVysYWBB+XDp/kZF0mQyFvrv7Ut5AwNUz8on3uqI=;
-        b=ARzRRtDh6KEU9RAsWblAmJmxLjQd4N5noH0Yzk2ADuPHkuw+Sm6d5oWqThqPc8l/iQ
-         3kxoMq8aU/MjhT+x2shSfS8PYoRFjWkZ97fpjHbMivXqD9fk93FilW9nrCkmzsa+IhAW
-         GYD4vlknoNV+drCrHqfw518xsXc3kcohtniTdWGPlaHGpnLtLRjcc289Ismfe4DwwRsX
-         rLsWNTUMhQb8kK1ZAApVU+sAc+U/BV4+crROlBFCfX53O86+vZdxrkFxGXZU29jaya0Q
-         ajO3zTMatl9vyi2ULPjSpoRm1ZPr9OYw9VVpneawEyI+Cz+jXkNPfjEnWVRENgmjQkG8
-         E4lQ==
-X-Gm-Message-State: AOJu0YwwiG178joF7QbXDHePElM2/DGWk+ELdancphlCo2ImCTJrhwvE
-	/hsMD0Jnh+LAxKP04MFDavSttilmVdXL47ieHT5OC8wuqlDWcaxQrQeBQODhacMnyxwpyGWMmYF
-	2GWFPcnkJmaYAZwFkQ4okcdGgQ+XLi7kRyS8HjaehaI6CtHPyNA4N0i4f7FRkUqm3G6Y6loxADc
-	5VtIMocu0ipdtL1ZFEx60cOp/A+EGSyUmQP2U=
-X-Google-Smtp-Source: AGHT+IFCgBS+YgTB1iRrCXeD774tHuBkiuRdbbUI5qwujyFtDh9/oA9HeddTZv+rnPbzAgKNnb5EZQ==
-X-Received: by 2002:a17:90a:bd0c:b0:2d8:aa9c:e386 with SMTP id 98e67ed59e1d1-2e18455c8e2mr1759138a91.14.1727826846920;
-        Tue, 01 Oct 2024 16:54:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727829249; x=1728434049;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FO5R8cdqVEZ/UYrxFLZyYiizB9jbmk7GftZJO5b/CPY=;
+        b=k9rnXBMRSDsBx+CDAwli9/2vfqI7LO9IZAELgNjyeCvg22dUGOH+uXqc2x9+aDDKOq
+         yV7ggI5lmwIiQUpNKcM/Nc24GYkD9m/qrwrhT3eSySbgT9LYThbkFHM/ttahH3F9mIBX
+         4moZunzigmZ7TCEGrWv+m83t+oq+xOcmmtDpYbgH3dTXYBOkMBlvYZjjNfTF4FXUu0Jr
+         2c32MAujV6PMsgm1+butFR5UUgau8vkAZvDqEHKt4nLh682cDKFBTd9PQRZoWFkvPuRv
+         la51huqwZwjGumPf4vxtHACrBUgKfJ6vgtQ+fonLn+dqZxb6wLuqB6NlrSWK1yElG9IU
+         Sydw==
+X-Gm-Message-State: AOJu0YxagdcQekeXExxJ4y33/O4DX0PeBcTSBtfjpW1GL67NOjXQP2E9
+	jMj63zE0YDYvc2T1OmykNjzp6k7/NwjbW9A2IuI6Y2uvXE4rvHq8X+xPlytFKXxnV+YC7QDiYE6
+	xPAGPjGzf7J2NrtIEqHDqFqjZthKuyLZhmrdL8JTn7X17i65tmNjpSIGkEOzBEOodxGYmFAhzQx
+	eFVwV4PgsEGy81iApsaCSqaL07V51LSemUSrI=
+X-Google-Smtp-Source: AGHT+IH2HSmZDNrH/knCay8KR3iK7382ru2jqg7iXcmq1FjlvJOm7vkhVKsGQ/ztlc1T1lXd7XDRQA==
+X-Received: by 2002:a17:902:f685:b0:208:d856:dbb7 with SMTP id d9443c01a7336-20bc5a5d0damr20242885ad.39.1727829248624;
+        Tue, 01 Oct 2024 17:34:08 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f89e973sm213130a91.29.2024.10.01.16.54.05
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e5ecc1sm75521295ad.268.2024.10.01.17.34.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 16:54:06 -0700 (PDT)
+        Tue, 01 Oct 2024 17:34:08 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	skhawaja@google.com,
-	sdf@fomichev.me,
-	bjorn@rivosinc.com,
-	amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	willemdebruijn.kernel@gmail.com,
+Cc: darinzon@amazon.com,
 	Joe Damato <jdamato@fastly.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Kamal Heib <kheib@redhat.com>,
+	linux-kernel@vger.kernel.org (open list),
+	Noam Dagan <ndagan@amazon.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net-next v4 9/9] mlx4: Add support for persistent NAPI config to RX CQs
-Date: Tue,  1 Oct 2024 23:52:40 +0000
-Message-Id: <20241001235302.57609-10-jdamato@fastly.com>
+	Saeed Bishara <saeedb@amazon.com>,
+	Shay Agroskin <shayagr@amazon.com>
+Subject: [net-next v2 0/2] ena: Link IRQs, queues, and NAPI instances
+Date: Wed,  2 Oct 2024 00:13:26 +0000
+Message-Id: <20241002001331.65444-1-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241001235302.57609-1-jdamato@fastly.com>
-References: <20241001235302.57609-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,31 +89,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use netif_napi_add_config to assign persistent per-NAPI config when
-initializing RX CQ NAPIs.
+Greetings:
 
-Presently, struct napi_config only has support for two fields used for
-RX, so there is no need to support them with TX CQs, yet.
+Welcome to v2. This includes only cosmetic changes, see changelog below
+and in each patch.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/mellanox/mlx4/en_cq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+This series uses the netdev-genl API to link IRQs and queues to NAPI IDs
+so that this information is queryable by user apps. This is particularly
+useful for epoll-based busy polling apps which rely on having access to
+the NAPI ID.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_cq.c b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-index 461cc2c79c71..0e92956e84cf 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-@@ -156,7 +156,8 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 		break;
- 	case RX:
- 		cq->mcq.comp = mlx4_en_rx_irq;
--		netif_napi_add(cq->dev, &cq->napi, mlx4_en_poll_rx_cq);
-+		netif_napi_add_config(cq->dev, &cq->napi, mlx4_en_poll_rx_cq,
-+				      cq_idx);
- 		netif_napi_set_irq(&cq->napi, irq);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_RX, &cq->napi);
+I've tested these commits on an EC2 instance with an ENA NIC configured
+and have included test output in the commit messages for each patch
+showing how to query the information.
+
+I noted in the implementation that the driver requests an IRQ for
+management purposes which does not have an associated NAPI. I tried to
+take this into account in patch 1, but would appreciate if ENA
+maintainers can verify I did this correctly.
+
+Thanks,
+Joe
+
+v2:
+  - Preserve reverse christmas tree ordering in patch 1
+  - Add comment that the API is for non-XDP queues only to patch 2
+
+v1:
+  - https://lore.kernel.org/all/20240930195617.37369-1-jdamato@fastly.com/
+
+Joe Damato (2):
+  ena: Link IRQs to NAPI instances
+  ena: Link queues to NAPIs
+
+ drivers/net/ethernet/amazon/ena/ena_netdev.c | 40 +++++++++++++++++---
+ 1 file changed, 35 insertions(+), 5 deletions(-)
+
 -- 
 2.25.1
 
