@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-131311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACBD698E0C1
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:31:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F1598E0C2
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D57E81C23CBA
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09CC31F243A9
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7360A1D26F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05FD1D271D;
 	Wed,  2 Oct 2024 16:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lpA3bHFQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jDuvl+Tg"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EEA1D1E7C;
-	Wed,  2 Oct 2024 16:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D282E1D1F4E;
+	Wed,  2 Oct 2024 16:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727886556; cv=none; b=V4C2XTGAmhgy5XxqvRbAT+S/wo2e1Sh4hsfA1TXLgBW8syFLG2JfbIo+imY3HfgZoMybw0XjbUz+aPDD4Iq5TSa0rW3oIKqLWl67EyucX+drQwLB4CdsfkEkbxKPoGHJg3zGqt0l073inzbAZhFgyp62HLLvOWT0g1moj8XQHgY=
+	t=1727886556; cv=none; b=jKWc2l0OIdjPJVKWQC0ZfJpUM0YZRonw8aFaZFeecMTg89P30bBU2juThF/269dLfaBQnF6Q79q1vzgY/RQOgtE7I+grbitC3qewelCBk+h+vzVmcQ+k+lcVS3vTLMlZHCVMWEGwrgDB1wBMHTFQ9nqqaXERGuAHCsASZofwEBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727886556; c=relaxed/simple;
-	bh=m5UVg9uMgWclNQ0ZC+nkcUjkJnAqUFQoCJthQiR5YHE=;
+	bh=6fP4GiSZHpLwe8j151kxCCfVBFZI6rH3qmFV0hsMm8M=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Aq74WJDcwnr30joLXS0xJYnCwi9l1uMUcKNbvSqxBAQHSTO5SOUXcl8IoOFlnQs4fgxiMqZuv1somR31mI8xiZ8Fnl2LkKFL9svbhg2gZDL9mUeAG51NCDUjnefc9/usUmJ+SgVmAMLEN9uBL/QcXlA9S2x16rWZY+yflRQJOoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lpA3bHFQ; arc=none smtp.client-ip=217.70.183.201
+	 In-Reply-To:To:Cc; b=EjUg/ZA7l/EGgQnhRMnHuxn8sQeF9CxcmeBDxAyV9R/T6N1nz2T+59mlZuB9aLwxIIr0mF93OObRq2XlCadbbg0SvFAA4FT5sRRL9uO0pPOECQ+GiyjO4vXB26w4mwfc08M4nt74di1bW0wJ2rcqEPyEhPGRl/WU8NHPJUAgtJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jDuvl+Tg; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D3DE71BF209;
-	Wed,  2 Oct 2024 16:29:11 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 938731BF20C;
+	Wed,  2 Oct 2024 16:29:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727886552;
+	t=1727886553;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=qpBR8isuTmda5r4Ct+oNS3fZY4wF7+uxDTZEDgK+/Ng=;
-	b=lpA3bHFQlmDafRf+NTzsXKa/h3ajO6D+MMX54qfWddn7TymIXi5CUK1NMb9vLv9pMs8aK7
-	9NWuUJhSnhQxzijRF6oaxezjZdyP/5e69TNJuBMVZTk7apk7WwapSVgs/rZ01MWGOGxpPY
-	NZkJavfqmWXcZO+tUvxf2isiD2RkWc43dPQAuZYz0Y4MJMDhsI8bbrrBM+XiwGGgbQoXpv
-	y4peffTbaXkBWs2iq9vF0PRcXmL8Pz36VcKtNm5gG4I1xcIQJAVRXMvd7TtqmFlNp6zye5
-	0BzWbPShKIJ6UwZLeFmaorSXB/G3d1RDfze4LN/V0K9bNedxO7FaeNUlywsVWA==
+	bh=Ul5YyEM+HmobdSv66VP3I6i6ZUMsqXQf70IngMOL9vE=;
+	b=jDuvl+TgD4NNN8Wms5GG43DxZEZ1S1qt9tcuUY8CJFH4uXutsNZ+je2UY0eubxoK3fMSQ/
+	YOWwFfOtTwckdneVJoCpQQaUH4kR+EjKpy/rIYV95lVCPgcHC8q3F0vYCJ6LH6hAZxWJHG
+	Nn9sjuOzydXe/5Wb6N+xwe9nsrs/mTFR8VWNSjbTZWmlPUmlrEpTz2u3WdvjmhTGWJjbau
+	RAKpk+r9pBrC4PykvFxQ8BAXogVyydtLxA8o6uCs5VzrRlUBZLQpWxadHsuEffocR/ffd9
+	IpTfhcUfu7jDl7A6UYNpTZsX0XyPACLbvorZfS2JRzo1/geHdZIrNSIrWx0C4w==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 02 Oct 2024 18:28:05 +0200
-Subject: [PATCH net-next 09/12] net: pse-pd: tps23881: Add support for PSE
- PI priority feature
+Date: Wed, 02 Oct 2024 18:28:06 +0200
+Subject: [PATCH net-next 10/12] net: pse-pd: Register regulator even for
+ undescribed PSE PIs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241002-feature_poe_port_prio-v1-9-787054f74ed5@bootlin.com>
+Message-Id: <20241002-feature_poe_port_prio-v1-10-787054f74ed5@bootlin.com>
 References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
 In-Reply-To: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -74,112 +74,33 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-This patch extends the PSE callbacks by adding support for the newly
-introduced pi_set_prio() callback, enabling the configuration of PSE PI
-priorities. The current port priority is now also included in the status
-information returned to users.
+Ensure that regulators are registered for all PSE PIs, even those not
+explicitly described in the device tree. This change lays the
+groundwork for future support of regulator notifiers. Maintaining
+consistent ordering between the PSE PIs regulator table and the
+regulator notifier table will prevent added complexity in future
+implementations.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/tps23881.c | 57 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 57 insertions(+)
+ drivers/net/pse-pd/pse_core.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index e05b45cdc9f8..ddb44a17218a 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -22,6 +22,7 @@
- #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
- #define TPS23881_REG_DIS_EN	0x13
- #define TPS23881_REG_DET_CLA_EN	0x14
-+#define TPS23881_REG_PW_PRIO	0x15
- #define TPS23881_REG_GEN_MASK	0x17
- #define TPS23881_REG_NBITACC	BIT(5)
- #define TPS23881_REG_PW_EN	0x19
-@@ -408,6 +409,24 @@ static int tps23881_ethtool_get_status(struct pse_controller_dev *pcdev,
- 		return ret;
- 	status->c33_pw_class = ret;
+diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
+index 6b3893a3381c..d365fb7c8a98 100644
+--- a/drivers/net/pse-pd/pse_core.c
++++ b/drivers/net/pse-pd/pse_core.c
+@@ -463,10 +463,6 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
+ 	for (i = 0; i < pcdev->nr_lines; i++) {
+ 		char *reg_name;
  
-+	ret = i2c_smbus_read_word_data(client, TPS23881_REG_PW_PRIO);
-+	if (ret < 0)
-+		return ret;
-+
-+	chan = priv->port[id].chan[0];
-+	if (chan < 4)
-+		status->c33_prio = !!(ret & BIT(chan + 4));
-+	else
-+		status->c33_prio = !!(ret & BIT(chan + 8));
-+
-+	if (priv->port[id].is_4p) {
-+		chan = priv->port[id].chan[1];
-+		if (chan < 4)
-+			status->c33_prio &= !!(ret & BIT(chan + 4));
-+		else
-+			status->c33_prio &= !!(ret & BIT(chan + 8));
-+	}
-+
- 	return 0;
- }
- 
-@@ -925,6 +944,42 @@ static int tps23881_pi_set_current_limit(struct pse_controller_dev *pcdev,
- 	return 0;
- }
- 
-+static int tps23881_pi_set_prio(struct pse_controller_dev *pcdev, int id,
-+				unsigned int prio)
-+{
-+	struct tps23881_priv *priv = to_tps23881_priv(pcdev);
-+	struct i2c_client *client = priv->client;
-+	u8 chan, bit;
-+	u16 val;
-+	int ret;
-+
-+	ret = i2c_smbus_read_word_data(client, TPS23881_REG_PW_PRIO);
-+	if (ret < 0)
-+		return ret;
-+
-+	chan = priv->port[id].chan[0];
-+	if (chan < 4)
-+		bit = chan + 4;
-+	else
-+		bit = chan + 8;
-+
-+	val = (u16)(ret & ~BIT(bit));
-+	val |= prio << (bit);
-+
-+	if (priv->port[id].is_4p) {
-+		chan = priv->port[id].chan[1];
-+		if (chan < 4)
-+			bit = chan + 4;
-+		else
-+			bit = chan + 8;
-+
-+		val &= ~BIT(bit);
-+		val |= prio << (bit);
-+	}
-+
-+	return i2c_smbus_write_word_data(client, TPS23881_REG_PW_PRIO, val);
-+}
-+
- static const struct pse_controller_ops tps23881_ops = {
- 	.setup_pi_matrix = tps23881_setup_pi_matrix,
- 	.pi_enable = tps23881_pi_enable,
-@@ -934,6 +989,7 @@ static const struct pse_controller_ops tps23881_ops = {
- 	.pi_get_voltage = tps23881_pi_get_voltage,
- 	.pi_get_current_limit = tps23881_pi_get_current_limit,
- 	.pi_set_current_limit = tps23881_pi_set_current_limit,
-+	.pi_set_prio = tps23881_pi_set_prio,
- };
- 
- static const char fw_parity_name[] = "ti/tps23881/tps23881-parity-14.bin";
-@@ -1106,6 +1162,7 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- 	priv->pcdev.dev = dev;
- 	priv->pcdev.types = ETHTOOL_PSE_C33;
- 	priv->pcdev.nr_lines = TPS23881_MAX_CHANS;
-+	priv->pcdev.pis_prio_max = 1;
- 	ret = devm_pse_controller_register(dev, &priv->pcdev);
- 	if (ret) {
- 		return dev_err_probe(dev, ret,
+-		/* Do not register regulator for PIs not described */
+-		if (!pcdev->no_of_pse_pi && !pcdev->pi[i].np)
+-			continue;
+-
+ 		reg_name = devm_kzalloc(pcdev->dev, reg_name_len, GFP_KERNEL);
+ 		if (!reg_name)
+ 			return -ENOMEM;
 
 -- 
 2.34.1
