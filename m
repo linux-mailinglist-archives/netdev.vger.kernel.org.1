@@ -1,186 +1,167 @@
-Return-Path: <netdev+bounces-131283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08EE998DFE8
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:56:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA76E98E00A
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:02:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 999561F279A2
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:56:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DB28282617
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 774821D14EB;
-	Wed,  2 Oct 2024 15:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD8F1D0E08;
+	Wed,  2 Oct 2024 16:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LOeRx1gJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Y7ZFDe3Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE19C1D0E02;
-	Wed,  2 Oct 2024 15:54:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81771D0B88;
+	Wed,  2 Oct 2024 16:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727884499; cv=none; b=tkYSlenX2yIH8df1KbB1Nzjpayu8M6hDENjb94rBXM5Md1OkpHjoRHIwsGSOlun3CF8DBroqURzou4ekKyR6EHHveVh/cpigfH9ITe6ec4jrsF42EPWFOP9TLEtX27ZLUHC0u8We/nNjIWo/MK6lIEB+ZFCJ32mH3seHat/pHP8=
+	t=1727884939; cv=none; b=VVoZaVB211qBgfxiS3MidvAI6r/fo7siQlVQO4pDQL+Vp0jqnanUsrOqaOESNnC9F07kgpGrXds6Be+U5Cbc5iR3N1yMty8pqcEsuUKyv0eKJJvCqA2f3i2Loxw6pYmk2dbOEtEZKudY6hY7mw4erv6vhEVS89G85B5viIINBg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727884499; c=relaxed/simple;
-	bh=U7tNzbhI7z63cKaK1ajHEzbuxNm1oQWVdEKIsF+aYdk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aU+3+TulL5bW9pDdLqfKgbP6y/1U0FhzX7veeNwnzRy5zvocxX6ajR4MebZN5uwjirYerBXVd5IphKzmdQHd5Y2z+xcDuWzvQz9YLHfFLT9MUZeOp6ztcmXdsL02VJTHIUeiUKfwljhcWc+OTrnm2P7W0lVuTGAME3+ZBdOeaRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LOeRx1gJ; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727884499; x=1759420499;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=U7tNzbhI7z63cKaK1ajHEzbuxNm1oQWVdEKIsF+aYdk=;
-  b=LOeRx1gJqjesDoS5My8raloUBaTcVwskzx4PxFhQlKMGMFV8uG/TTy/Q
-   HNJ0fHZzUkPjJalEBQqraUEzl5lipPik8NpJps46xQqs6T8ATBXLPLHVJ
-   9cdctkgwr8Aozn2DMrului3spHkDTVmqL/dDMZHR2x12XtdjhD/Oza0mB
-   7soz1zeYJ7pnZN5UnB8cC8wTivX3At2or4C5sVLfH+TJr5t/ftQrfN29t
-   pReo6Qosf3thCUJkTZ2akVXMpQAw2PDTTNEJqVPBrK7/LG/EazBlfzhA2
-   WHEXNBDcqBDuE9Sf+jW5cRG39iM5Amh2083c+V5AEsC/iHt9aTax+zj/d
-   w==;
-X-CSE-ConnectionGUID: 13NMpBgkQA2eyCZWAGCpLQ==
-X-CSE-MsgGUID: iNqNeRkzRVCSYUDsz0+9vg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="30762991"
-X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="30762991"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 08:54:58 -0700
-X-CSE-ConnectionGUID: RFIfentOSj+Ezfut3WZc2Q==
-X-CSE-MsgGUID: rjBVhJSHTcGwJIXFDhWGpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="73628798"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa006.fm.intel.com with ESMTP; 02 Oct 2024 08:54:55 -0700
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: bpf@vger.kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	maciej.fijalkowski@intel.com
-Subject: [PATCH bpf-next 6/6] xsk: use xsk_buff_pool directly for cq functions
-Date: Wed,  2 Oct 2024 17:54:41 +0200
-Message-Id: <20241002155441.253956-7-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20241002155441.253956-1-maciej.fijalkowski@intel.com>
-References: <20241002155441.253956-1-maciej.fijalkowski@intel.com>
+	s=arc-20240116; t=1727884939; c=relaxed/simple;
+	bh=zfvEMiGi3OWlIY/pUBW+RpmzYW8vFnzIKQEPYoIhFng=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JjEYbRpmovcgTtKwnEwOXq2iROkJRX6uxG1XAAxus8eDwmi8c+r86T76RblqdZGT61JzwD1qnV2pRVpS5Nhm3dCPVq/rNsN9xYeFTryMNSXi/9BkwIuvgPZ0Uk69XQIFnD9FgCzhZjTK3MNOFHqd6fKB905qW3e8P5HTXZV+qr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Y7ZFDe3Y; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 283EC20009;
+	Wed,  2 Oct 2024 16:02:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727884933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/tWok2bNeEgvlRS2Fbg5hLuPkTCb5xkbJGALutssM5Y=;
+	b=Y7ZFDe3Yp6ievVkmBjmO+efxu/CRrFYn2knnsPIe8WcPk4uHSdyluYtjBSewabxMDu448n
+	7URRD7Q+geaOvCDFJSY8cPRcwPAejsnubbQNLv6v+uovZrK91Tm6zch5pNrbaEMgSBVcmr
+	1pd87n9sqg6h+IgbmBUKTTNIs4xik65dr6wfKvSgVYN422PUpT9EOI3kn2/zM+RCJWgV1p
+	rVQAJO++rKQAkMcr8meohHFNW6Kx7qQootIiaPV5J6AW9kjRzhbmutBIXpqfjKKLlf13V5
+	ZhdAFXCYsMizEIZIrnpv3HobwATMro1xlIa+YRbZ81m1Wd7QnH+766uS9IHnzQ==
+Date: Wed, 2 Oct 2024 18:02:07 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: "Arnd Bergmann" <arnd@arndb.de>
+Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>, "Andy Shevchenko"
+ <andy.shevchenko@gmail.com>, "Simon Horman" <horms@kernel.org>, "Lee Jones"
+ <lee@kernel.org>, "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>, "Lars Povlsen"
+ <lars.povlsen@microchip.com>, "Steen Hegelund"
+ <Steen.Hegelund@microchip.com>, "Daniel Machon"
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, "Rob Herring"
+ <robh@kernel.org>, "Krzysztof Kozlowski" <krzk+dt@kernel.org>, "Conor
+ Dooley" <conor+dt@kernel.org>, "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>, "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, "Luca Ceresoli"
+ <luca.ceresoli@bootlin.com>, "Thomas Petazzoni"
+ <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v6 3/7] misc: Add support for LAN966x PCI device
+Message-ID: <20241002180207.550e4cbb@bootlin.com>
+In-Reply-To: <3e21a3ba-623e-4b75-959b-3cdf906ee1bd@app.fastmail.com>
+References: <20240930121601.172216-1-herve.codina@bootlin.com>
+	<20240930121601.172216-4-herve.codina@bootlin.com>
+	<b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
+	<20241002144119.45c78aa7@bootlin.com>
+	<3e21a3ba-623e-4b75-959b-3cdf906ee1bd@app.fastmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Currently xsk_cq_{reserve_addr,submit,cancel}_locked() take xdp_sock as
-an input argument but it is only used for pulling out xsk_buff_pool
-pointer from it.
+On Wed, 02 Oct 2024 14:31:13 +0000
+"Arnd Bergmann" <arnd@arndb.de> wrote:
 
-Change mentioned functions to take pool pointer as an input argument to
-avoid unnecessary dereferences.
+> On Wed, Oct 2, 2024, at 12:41, Herve Codina wrote:
+> > On Wed, 02 Oct 2024 11:08:15 +0000
+> > "Arnd Bergmann" <arnd@arndb.de> wrote:  
+> >> On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
+> >>   
+> >> > +			pci-ep-bus@0 {
+> >> > +				compatible = "simple-bus";
+> >> > +				#address-cells = <1>;
+> >> > +				#size-cells = <1>;
+> >> > +
+> >> > +				/*
+> >> > +				 * map @0xe2000000 (32MB) to BAR0 (CPU)
+> >> > +				 * map @0xe0000000 (16MB) to BAR1 (AMBA)
+> >> > +				 */
+> >> > +				ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
+> >> > +				          0xe0000000 0x01 0x00 0x00 0x1000000>;    
+> >> 
+> >> I was wondering about how this fits into the PCI DT
+> >> binding, is this a child of the PCI device, or does the
+> >> "pci-ep-bus" refer to the PCI device itself?  
+> >
+> > This is a child of the PCI device.
+> > The overlay is applied at the PCI device node and so, the pci-ep-bus is
+> > a child of the PCI device node.  
+> 
+> Ok
+> 
+> > 				/*
+> > 				 * Ranges items allow to reference BAR0,
+> > 				 * BAR1, ... from children nodes.
+> > 				 * The property is created by the PCI core
+> > 				 * during the PCI bus scan.
+> > 				 */
+> > 				ranges = <0x00 0x00 0x00 0x82010000 0x00 0xe8000000 0x00 0x2000000
+> > 					  0x01 0x00 0x00 0x82010000 0x00 0xea000000 0x00 0x1000000
+> > 					  0x02 0x00 0x00 0x82010000 0x00 0xeb000000 0x00 0x800000  
+> 
+> >
+> > Hope this full picture helped to understand the address translations
+> > involved.  
+> 
+> Right, that makes a lot of sense now, I wasn't aware of those
+> range properties getting set. Now I have a new question though:
+> 
+> Is this designed to work both on hosts using devicetree and on
+> those not using it? If this is used on devicetree on a board
+> that has a hardwired lan966x, we may want to include the
+> overlay contents in the board dts file itself in order to
+> describe any possible connections between the lan966x chip
+> and other onboard components such as additional GPIOs or
+> ethernet PHY chips, right?
+> 
+>       Arnd
 
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
----
- net/xdp/xsk.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+On host with the base hardware described without device-tree (ACPI on
+x86 for instance), I have a couple of patches not yet sent upstream.
+With those patches, I have a the LAN966x PCI board working on x86.
+I plan to send them as soon as this series is applied.
 
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 6c31c1de1619..7d7e37f53708 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -527,34 +527,34 @@ static int xsk_wakeup(struct xdp_sock *xs, u8 flags)
- 	return dev->netdev_ops->ndo_xsk_wakeup(dev, xs->queue_id, flags);
- }
- 
--static int xsk_cq_reserve_addr_locked(struct xdp_sock *xs, u64 addr)
-+static int xsk_cq_reserve_addr_locked(struct xsk_buff_pool *pool, u64 addr)
- {
- 	unsigned long flags;
- 	int ret;
- 
--	spin_lock_irqsave(&xs->pool->cq_lock, flags);
--	ret = xskq_prod_reserve_addr(xs->pool->cq, addr);
--	spin_unlock_irqrestore(&xs->pool->cq_lock, flags);
-+	spin_lock_irqsave(&pool->cq_lock, flags);
-+	ret = xskq_prod_reserve_addr(pool->cq, addr);
-+	spin_unlock_irqrestore(&pool->cq_lock, flags);
- 
- 	return ret;
- }
- 
--static void xsk_cq_submit_locked(struct xdp_sock *xs, u32 n)
-+static void xsk_cq_submit_locked(struct xsk_buff_pool *pool, u32 n)
- {
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&xs->pool->cq_lock, flags);
--	xskq_prod_submit_n(xs->pool->cq, n);
--	spin_unlock_irqrestore(&xs->pool->cq_lock, flags);
-+	spin_lock_irqsave(&pool->cq_lock, flags);
-+	xskq_prod_submit_n(pool->cq, n);
-+	spin_unlock_irqrestore(&pool->cq_lock, flags);
- }
- 
--static void xsk_cq_cancel_locked(struct xdp_sock *xs, u32 n)
-+static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
- {
- 	unsigned long flags;
- 
--	spin_lock_irqsave(&xs->pool->cq_lock, flags);
--	xskq_prod_cancel_n(xs->pool->cq, n);
--	spin_unlock_irqrestore(&xs->pool->cq_lock, flags);
-+	spin_lock_irqsave(&pool->cq_lock, flags);
-+	xskq_prod_cancel_n(pool->cq, n);
-+	spin_unlock_irqrestore(&pool->cq_lock, flags);
- }
- 
- static u32 xsk_get_num_desc(struct sk_buff *skb)
-@@ -571,7 +571,7 @@ static void xsk_destruct_skb(struct sk_buff *skb)
- 		*compl->tx_timestamp = ktime_get_tai_fast_ns();
- 	}
- 
--	xsk_cq_submit_locked(xdp_sk(skb->sk), xsk_get_num_desc(skb));
-+	xsk_cq_submit_locked(xdp_sk(skb->sk)->pool, xsk_get_num_desc(skb));
- 	sock_wfree(skb);
- }
- 
-@@ -587,7 +587,7 @@ static void xsk_consume_skb(struct sk_buff *skb)
- 	struct xdp_sock *xs = xdp_sk(skb->sk);
- 
- 	skb->destructor = sock_wfree;
--	xsk_cq_cancel_locked(xs, xsk_get_num_desc(skb));
-+	xsk_cq_cancel_locked(xs->pool, xsk_get_num_desc(skb));
- 	/* Free skb without triggering the perf drop trace */
- 	consume_skb(skb);
- 	xs->skb = NULL;
-@@ -765,7 +765,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 		xskq_cons_release(xs->tx);
- 	} else {
- 		/* Let application retry */
--		xsk_cq_cancel_locked(xs, 1);
-+		xsk_cq_cancel_locked(xs->pool, 1);
- 	}
- 
- 	return ERR_PTR(err);
-@@ -802,7 +802,7 @@ static int __xsk_generic_xmit(struct sock *sk)
- 		 * if there is space in it. This avoids having to implement
- 		 * any buffering in the Tx path.
- 		 */
--		if (xsk_cq_reserve_addr_locked(xs, desc.addr))
-+		if (xsk_cq_reserve_addr_locked(xs->pool, desc.addr))
- 			goto out;
- 
- 		skb = xsk_build_skb(xs, &desc);
--- 
-2.34.1
+Rob said that before looking at ACPI, we need to have a working system
+on DT based systems.
+  https://lore.kernel.org/all/CAL_JsqKNC1Qv+fucobnzoXmxUYNockWR=BbGhds2tNAYZWqgOA@mail.gmail.com/
 
+If hardwired on a board, the same LAN966x PCI driver could be used.
+A possible improvement of the driver could be to request the overlay
+from the user-space using request_firmware().
+With that, the overlay can be extended with specific onboard parts the
+LAN966x PCI device is connected to.
+
+This improvement can be done later when the use case appears.
+
+Best regards,
+Hervé
 
