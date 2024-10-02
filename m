@@ -1,109 +1,81 @@
-Return-Path: <netdev+bounces-131339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631E198E273
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 20:28:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C69798E287
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 20:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 163E01F250FF
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:28:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0091E2829CC
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CB11212F1F;
-	Wed,  2 Oct 2024 18:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC791216A12;
+	Wed,  2 Oct 2024 18:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jquWF5f6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oC+49rEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD321D0F58;
-	Wed,  2 Oct 2024 18:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C81A8F5B;
+	Wed,  2 Oct 2024 18:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727893721; cv=none; b=iNj0+Gp1gLzDPmtzpTMjlZxN8SUoJytLMgyDcoBO224a/EzQLYl1TbsXtftFs09MC6wqd908UYiw1ycXPqxcP4l4HeeYutx3yyNBuTYoTpyyBpuH8XsW9nCeH16jtJpjpEK2iH1KqtYfCMwfYzekRsPRQCUPoivuFhM3iLy4+C8=
+	t=1727893856; cv=none; b=bMNTflubLHpBB1kLbFoppADqYOqPex9nFMbsikKyQqszDYu9UN/Kj+aMy9djYO6+2gnQMwDAv13MNLyoU5qL6cx2mbNuzzT72MiwODuhO4Z311CX9bx+Zlk4PggpzRqBe8qpMEJioxoiYzPMmnMPQ1St/0AoGN3nTlcJ+5WmAiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727893721; c=relaxed/simple;
-	bh=TSwf31CgKxEFLmDSaDVU43tksPFTOFFpy1oRWDlDgtU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=syBIlwLzdYOMriJQu2+A5Pm1EEd73p5PFPXpGp4aisnoP3ZBe3++PcCk2qPFnQc4N4pBw4ToUJytuYJF7t04z+9eB3ezaH+GsGhZF2WLlzA6v0o/caZ8SuMZlUC2+ggGSPgvdzEzLovd30BIiHnSYuAWMOeWhzLQxJ640ImSZ7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jquWF5f6; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1727893719; x=1759429719;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TSwf31CgKxEFLmDSaDVU43tksPFTOFFpy1oRWDlDgtU=;
-  b=jquWF5f6LV5tVn6Uz08x9Vrj4VPRoicATMO7LGsNbxO4Kl3Rb6jhzcxc
-   HNnb/3Djs/3arPLLu0o8qeIPQDH8CFwvlbRclxxER2U4ccU3uBQ5gvYNt
-   iDmOmO1RXVxyr3OumP7h/poQhQAdlPkPBOrHY4WA+SFs5JMadWz9y8vMp
-   sbw1JC9mdcR95bTSGWlRK+PAJc/av2+D/5Y0w/f2sDkvlVO1Pdd6SGW7E
-   m7t5zvKyP4HqwEzqZxCXk+WBwr218bdiZo+LpYzgLcWF9O8atnlrI+36P
-   0TMMSR7wz3fZRfKEidYwAylOpoOI//n6ORyI2Erx9IJQ3Ark+0uO+nLU/
-   g==;
-X-CSE-ConnectionGUID: /NlVU3+eSUme1CvNLhzwAA==
-X-CSE-MsgGUID: SCCJ/lFTQpqMomBCtmPsjg==
-X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="263566091"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Oct 2024 11:28:38 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 2 Oct 2024 11:28:03 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 2 Oct 2024 11:28:00 -0700
-Date: Wed, 2 Oct 2024 18:28:00 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	<horatiu.vultur@microchip.com>, <jensemil.schulzostergaard@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, Richard Cochran <richardcochran@gmail.com>,
-	<horms@kernel.org>, <justinstitt@google.com>, <gal@nvidia.com>,
-	<aakash.r.menon@gmail.com>, <jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 06/15] net: sparx5: add constants to match data
-Message-ID: <20241002182800.nzk7qqe7zovhuelf@DEN-DL-M70577>
-References: <20241001-b4-sparx5-lan969x-switch-driver-v1-0-8c6896fdce66@microchip.com>
- <20241001-b4-sparx5-lan969x-switch-driver-v1-6-8c6896fdce66@microchip.com>
- <20241002054750.043ac565@kernel.org>
- <20241002133132.srux64dniwk4iusz@DEN-DL-M70577>
- <20241002073352.43a3afb5@kernel.org>
+	s=arc-20240116; t=1727893856; c=relaxed/simple;
+	bh=gyjFz5oiZLGM+U6TNALGw9KPxxaB4f7AlGkLsH1SlYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kdDHsJgZPgzM+vNMkB4tYQo4XIlpUHOUiH4ekHngddsWDhXiAmk+jhd4Am93r2fl76CxcUH2NPbKJGh9yo6FVuURqe68rfIHotPv9AtKRwASOgpUNwYo250R6BwoxbquJtCx2+TmOgdPuq4kEtXhbPEfGeIlvF5hrEDj/0A4U1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oC+49rEy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44109C4CEC2;
+	Wed,  2 Oct 2024 18:30:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727893856;
+	bh=gyjFz5oiZLGM+U6TNALGw9KPxxaB4f7AlGkLsH1SlYI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oC+49rEygowTcrfNmuXH7iDngPXahBTbTyIFFVP8UPjwtWgItjc2As6uMiel8wpe2
+	 31Fih6y7wtMQIAGhXWCZLbmcMqHIYuqG6huDs/S6PjF0m3poC2tx7zrp7M8lKjYMa5
+	 yqCVnaAWroVR7I3s6JZM9sWSv7Uj9uZ3YQ04tFXlF8ceyVpTJB32ABIiq3j1uNJQ29
+	 GUvkpTbSx+9LFiYM5jgv55CxbYvXALLm8EOPCHKWRtpKy++vNv7HDhmUUu+mWE3Sg8
+	 +auX+Bb49jZeWhR67u/IquWFI/GZsk3uwXhD8cjAsbPo9quLvINcgC2BrbXeyAXvXz
+	 Mss8W7eCkCnTg==
+Date: Wed, 2 Oct 2024 11:30:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Kauer <florian.kauer@linutronix.de>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Toke =?UTF-8?B?SMO4?=
+ =?UTF-8?B?aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Mykola Lysenko
+ <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org, Jesper Dangaard Brouer
+ <brouer@redhat.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net v4 1/2] bpf: devmap: provide rxq after redirect
+Message-ID: <20241002113054.50970a27@kernel.org>
+In-Reply-To: <20240911-devel-koalo-fix-ingress-ifindex-v4-1-5c643ae10258@linutronix.de>
+References: <20240911-devel-koalo-fix-ingress-ifindex-v4-0-5c643ae10258@linutronix.de>
+	<20240911-devel-koalo-fix-ingress-ifindex-v4-1-5c643ae10258@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241002073352.43a3afb5@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > By "type the code out" - are you saying that we should not be using a macro
-> > for accessing the const at all? and rather just:
-> >
-> >     struct sparx5_consts *consts = sparx5->data->consts;
-> >     consts->some_var
-> 
-> This.
-> 
-> > or pass in the sparx5 pointer to the macro too, which was the concert that
-> > Jacob raised.
-> 
-> The implicit arguments are part of the ugliness, and should also go
-> away. But in this case the entire macro should go.
+On Wed, 11 Sep 2024 10:41:18 +0200 Florian Kauer wrote:
+> rxq contains a pointer to the device from where
+> the redirect happened. Currently, the BPF program
+> that was executed after a redirect via BPF_MAP_TYPE_DEVMAP*
+> does not have it set.
 
-Ack.
-
-Will get rid of the macro in v2.
-
-/Daniel
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
