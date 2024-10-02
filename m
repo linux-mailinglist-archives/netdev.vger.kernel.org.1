@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-131286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F78498E059
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:15:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B517298E05B
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 18:15:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C31F1F232B7
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:15:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6E5A1C2304B
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB33B1D0E39;
-	Wed,  2 Oct 2024 16:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A1C1D0F6D;
+	Wed,  2 Oct 2024 16:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DPWomRlT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DJJY7myM"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629A51D014D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EEE11940B0;
 	Wed,  2 Oct 2024 16:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727885691; cv=none; b=fPb7sa5d5rQSZED5rb9j22VqyNkP/63bc9O+Fxfz3FYV07CTtiWzYW6+rMrXb8qKY1ihRygRNbWeX4sAKpRlBKVn1omryRp2GgBmW0s2BHhIPZwuPJEDhinxClkTzJRrfOG0cULw3PI8skQSycePnl/QHXIEIJZVHDd4yeGxXTo=
+	t=1727885692; cv=none; b=VLeSlGq5dRyQVtqRuKpvplT1oo5OwBrfMEr+f05qyLahdG86bq2A3qaQiMnxTXrNUDUngOtjObIsjNvZ9oZTUWiE6hPATFgwwqdVy07DG26LiEM+9GdBeMgDdUtia6hWN0mIMEVuFVRR09qCm/oTaEQvKWq50CWFpr6mhZkmPFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727885691; c=relaxed/simple;
-	bh=rVpijr8Ej3ERIa9M7Wj2D8vGyGBd8oUb+lInsTA0JrA=;
+	s=arc-20240116; t=1727885692; c=relaxed/simple;
+	bh=tSaUcqD7eHSaObZjjijtJrsg0WBYhM+Yr7DGFDUV5w0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CvZ8soXjYP5s++pqpkyJv8YbHL80cEFne11FdjGvbNWFMOOv3g8emd4QLE0WWt0xCh8gjkCJAeR91NWz83mrDnJKzwqAWVP+FTjxqUTpR6fqCbL/WqFSqMIeb5tUw642GBtPiX4VLmjNJDqfUrtvQknX4WoVNNBohphuzHA/b2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DPWomRlT; arc=none smtp.client-ip=217.70.183.199
+	 In-Reply-To:To:Cc; b=JI64+6TYleVzx3YrInJqkg8NsbVyHFtGEM2lyOwq/iREzweLcsjtix46524OOvtXe/Wc69f4deimMiENDspjbeVkxaCRJeLrM4Q8D3/8VZi4BIYRKTnROqFFLZN6aLYobmEvgxJdgnNZ7MBYXsyTqZsyGJcXZsrVZcslrd+UeJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DJJY7myM; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F2A0EFF80E;
-	Wed,  2 Oct 2024 16:14:46 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id CD912FF806;
+	Wed,  2 Oct 2024 16:14:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727885687;
+	t=1727885688;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q42vlEq9SAx89Xute+BoOnfEctMoZLGsOE40ryVf9pw=;
-	b=DPWomRlTMMGSztWOP2fzIuNo2vn4VPCscviVPD7kzV4EH3AD4Zuj+gu2f3DuooRkGv3eRn
-	m1PUpBsZNdg0Ozvba3Ds8ir33vRCwk7Z+Q1d5f2L5pybaZ9jn4ZmiLZLMDQP6g+9q9Y/xT
-	UVxY15Qwzaa9f5qu7EOWLVFwAgMNpyIF5tmdNLRADLu2S7UFVrAMM9FbtmuFJR20C8VBP0
-	Vuu1trp2Viz0WzWuycY5fWBUrOUBMQGycfywDMGyQV2kaDkF2O+xrd8dKNRKuwSi5iWXe4
-	LCmv0avSPeHnCUtDV5qlZM6I31vVkZsPDORGdR6fzZspS3rSFp4TZoLJ5/1V6A==
+	bh=G4biLTBMISLiI3PaOwg9EOAFMZ2vS5JuARGkBYnVsXc=;
+	b=DJJY7myMzwD0eFIM6O5nZZgsiKHs6nmFpJ25Mkh5PgLSrCZnPbsMFef8Z5gmZEwO7Dnx2Z
+	CCK0vu74+h7DMpMF/W2QvExmrsCig/HdAnR/sX0k6yxTBXgCIEoU6C9ilFNF9rHGBFgu2B
+	gO6QAxJI0u7pbA5wXiFQvYCm67846dJmmDmr0fTGGWQqornUGTCb2LPqEuw7Qhk/AUftX2
+	Lr8ae/Ah4VHATEmkUYp/PoQJfyOu2tBxwW+TC6abHb5p3odwFcn1qQnkSrtHJaPOUhgwZr
+	pfMzrs7KDR+qitBSFrVZfCfPEbgORE78ZwzERL+X62lhFNpppGiMnoKha4wibw==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 02 Oct 2024 18:14:18 +0200
-Subject: [PATCH 07/12] netlink: specs: Expand the PSE netlink command with
- C33 prio attributes
+Date: Wed, 02 Oct 2024 18:14:19 +0200
+Subject: [PATCH 08/12] net: pse-pd: pd692x0: Add support for PSE PI
+ priority feature
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241002-feature_poe_port_prio-v1-7-eb067b78d6cf@bootlin.com>
+Message-Id: <20241002-feature_poe_port_prio-v1-8-eb067b78d6cf@bootlin.com>
 References: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
 In-Reply-To: <20241002-feature_poe_port_prio-v1-0-eb067b78d6cf@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -74,70 +74,71 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Expand the c33 PSE attributes with priority and priority max to be able to
-set and get the PSE Power Interface priority.
-
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get
-             --json '{"header":{"dev-name":"eth1"}}'
-{'c33-pse-actual-pw': 1700,
- 'c33-pse-admin-state': 3,
- 'c33-pse-avail-pw-limit': 97500,
- 'c33-pse-prio': 2,
- 'c33-pse-prio-max': 2,
- 'c33-pse-pw-class': 4,
- 'c33-pse-pw-d-status': 4,
- 'c33-pse-pw-limit-ranges': [{'max': 18100, 'min': 15000},
-                             {'max': 38000, 'min': 30000},
-                             {'max': 65000, 'min': 60000},
-                             {'max': 97500, 'min': 90000}],
- 'header': {'dev-index': 5, 'dev-name': 'eth1'}}
-
-./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-set
-             --json '{"header":{"dev-name":"eth1"},
-                      "c33-pse-prio":1}'
-None
+This patch extends the PSE callbacks by adding support for the newly
+introduced pi_set_prio() callback, enabling the configuration of PSE PI
+priorities. The current port priority is now also included in the status
+information returned to users.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- Documentation/netlink/specs/ethtool.yaml | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/net/pse-pd/pd692x0.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 6a050d755b9c..e2967645fbf2 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1020,6 +1020,14 @@ attribute-sets:
-         type: nest
-         multi-attr: true
-         nested-attributes: c33-pse-pw-limit
-+      -
-+        name: c33-pse-prio-max
-+        type: u32
-+        name-prefix: ethtool-a-
-+      -
-+        name: c33-pse-prio
-+        type: u32
-+        name-prefix: ethtool-a-
-   -
-     name: rss
-     attributes:
-@@ -1776,6 +1784,8 @@ operations:
-             - c33-pse-ext-substate
-             - c33-pse-avail-pw-limit
-             - c33-pse-pw-limit-ranges
-+            - c33-pse-prio-max
-+            - c33-pse-prio
-       dump: *pse-get-op
-     -
-       name: pse-set
-@@ -1790,6 +1800,7 @@ operations:
-             - podl-pse-admin-control
-             - c33-pse-admin-control
-             - c33-pse-avail-pw-limit
-+            - c33-pse-prio
-     -
-       name: rss-get
-       doc: Get RSS params.
+diff --git a/drivers/net/pse-pd/pd692x0.c b/drivers/net/pse-pd/pd692x0.c
+index 0af7db80b2f8..3a4a9836d621 100644
+--- a/drivers/net/pse-pd/pd692x0.c
++++ b/drivers/net/pse-pd/pd692x0.c
+@@ -685,6 +685,8 @@ static int pd692x0_ethtool_get_status(struct pse_controller_dev *pcdev,
+ 	if (ret < 0)
+ 		return ret;
+ 	status->c33_avail_pw_limit = ret;
++	/* PSE core priority start at 0 */
++	status->c33_prio = buf.data[2] - 1;
+ 
+ 	memset(&buf, 0, sizeof(buf));
+ 	msg = pd692x0_msg_template_list[PD692X0_MSG_GET_PORT_CLASS];
+@@ -1061,6 +1063,25 @@ static int pd692x0_pi_set_current_limit(struct pse_controller_dev *pcdev,
+ 	return pd692x0_sendrecv_msg(priv, &msg, &buf);
+ }
+ 
++static int pd692x0_pi_set_prio(struct pse_controller_dev *pcdev, int id,
++			       unsigned int prio)
++{
++	struct pd692x0_priv *priv = to_pd692x0_priv(pcdev);
++	struct pd692x0_msg msg, buf = {0};
++	int ret;
++
++	ret = pd692x0_fw_unavailable(priv);
++	if (ret)
++		return ret;
++
++	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
++	msg.sub[2] = id;
++	/* Controller priority from 1 to 3 */
++	msg.data[4] = prio + 1;
++
++	return pd692x0_sendrecv_msg(priv, &msg, &buf);
++}
++
+ static const struct pse_controller_ops pd692x0_ops = {
+ 	.setup_pi_matrix = pd692x0_setup_pi_matrix,
+ 	.ethtool_get_status = pd692x0_ethtool_get_status,
+@@ -1070,6 +1091,7 @@ static const struct pse_controller_ops pd692x0_ops = {
+ 	.pi_get_voltage = pd692x0_pi_get_voltage,
+ 	.pi_get_current_limit = pd692x0_pi_get_current_limit,
+ 	.pi_set_current_limit = pd692x0_pi_set_current_limit,
++	.pi_set_prio = pd692x0_pi_set_prio,
+ };
+ 
+ #define PD692X0_FW_LINE_MAX_SZ 0xff
+@@ -1486,6 +1508,7 @@ static int pd692x0_i2c_probe(struct i2c_client *client)
+ 	priv->pcdev.ops = &pd692x0_ops;
+ 	priv->pcdev.dev = dev;
+ 	priv->pcdev.types = ETHTOOL_PSE_C33;
++	priv->pcdev.pis_prio_max = 2;
+ 	ret = devm_pse_controller_register(dev, &priv->pcdev);
+ 	if (ret)
+ 		return dev_err_probe(dev, ret,
 
 -- 
 2.34.1
