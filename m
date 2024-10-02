@@ -1,108 +1,175 @@
-Return-Path: <netdev+bounces-131118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0772D98CCFE
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 08:14:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA2D498CD2B
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 08:31:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92BF4B22590
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EA6C286B12
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:31:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2736811F1;
-	Wed,  2 Oct 2024 06:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B92E132121;
+	Wed,  2 Oct 2024 06:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aWQgGEfq"
+	dkim=pass (2048-bit key) header.d=ideco.ru header.i=@ideco.ru header.b="eiSBEeNH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.ideco.ru (smtp.ideco.ru [46.36.23.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A25F1F93E
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 06:14:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EAB79CC;
+	Wed,  2 Oct 2024 06:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.36.23.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727849653; cv=none; b=BMyRyItA8UofjuQiIhktgs5XLMSRp4KiQbZFPSAGolZ3D1GKWsn8z3Ye9/yHIHbB2YUyW5lNxvFMhCsNY+zgpv0EbfDkmYMg1MHbDYSLAclraV706emH8N0yHVcPgCesaMraFe8ELoygI/BMZtnSDT93bFsqxy+NUSqj3cY3dWI=
+	t=1727850655; cv=none; b=GNivWM9H5Kqi9RdHEbDBqbnXQ2/OWdzXPGEK+JSg8KMmMpMcD1OAxpx3XAtrTYJyp8plN+kikCCH9N4uvwh1/DrZnw8hXi7u40G78APr1dB0YY2zv+ONyZX/ri33E8vV2DcRF58HFgujF0y1tQnUGnZkfNS4qIXlRCHLX/U3ozk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727849653; c=relaxed/simple;
-	bh=bVzgrEgiLhJbB7RwQoMrX0K0MRe6IV+FtaLfIEjTMTU=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=up+BVdbz5J0TiGPWMnIZFhNOtUATuDkOXDvjrfjE6MCUAVnGgZILolBYSxuZ7Qm/F/AHCpRfxHoKqAENMnn3Tfbcb+VI+iF9ywf4XvV2grdaFKaVX2WS0fr6hdHBS9O2Jepvet+uOiZGBG/vPehWqTcVP4eu6eaW2u7C/KDvjV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aWQgGEfq; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e0a47fda44so964811a91.1
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 23:14:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727849652; x=1728454452; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KZMKJi0ybwQHR4jHcalCgiEDAdpq36VaVWrpv9+wBLE=;
-        b=aWQgGEfq7d6hP8K0ng4KCl2i28lGkS/X8/t4VdK/e0xjyGLk0yeN7dLMC1mP3lPjlB
-         hI7x/Eg3NcdndSL+AXo+QWb1/3uZ3kYS0KWPOK32U3UfplF79Z5od+ny/u1HJKD0C/1m
-         dMsQ+LKKiymCAHuSXYJS1vzrcDUGTb15mjj+wio0jlpLZ0UW0zfCXDFDpHcm0fIRQ8Fc
-         wm9vgNYN8E1I936lWpYvJHwUtSfvAfgNOrhNkBscKtlEnmWr7CohAX/WlBRCYByyYFAn
-         XcVtzkZGXRnzvnBdoEspzzBs5g+hENN+ip118tr14AcJiPwY4Xlhkjmt5IzHS+mZ38pm
-         2Y5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727849652; x=1728454452;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KZMKJi0ybwQHR4jHcalCgiEDAdpq36VaVWrpv9+wBLE=;
-        b=dFjlakGt60csstMux5/7toC0WqW0GPHjEbPmiL1clFXC7fJJGNMe/ywNJPC0oni0vF
-         MjacnWOYQsgAAigsO69gXAeCpOG247jopHgKNFFLFU8e6vTtT9KujkSIvOZPgIO0bTOF
-         m3NGgK1oTZPe0bv8oPG9IwVrcDLrvGXaSOKRwzWmj/tZSqw0Rlqy6CzBKuml32pvXztX
-         Bt8757PIKAOB79MReGXbKHeeSd4RFtFptcIZB3wUg3rdAd7aHWGehLkuRzTRQQBDJ8K7
-         pbtasUPiTn5v5O4YkXANbiDcjb3oGKGBp8bK4Pe84ZBgJzrXNkQZpSo3Gkfe3zIk984n
-         5qcA==
-X-Gm-Message-State: AOJu0YwZUOLHWaY3X1GkZCHJ5x2nS3SPe6H4yPLA4tuCcnhRafDaGYpN
-	3eXHOufB+Y3QhtkceMgsZf+ttHYY6q5jF8d5NGPx6AlL7Tf4wjg=
-X-Google-Smtp-Source: AGHT+IGOaqz/HV80L8uGTOmvsGspbhLz+oiuPKZhTiKTXXYtUEtyPcPderRkzSsgD/91cXv8jLqKUA==
-X-Received: by 2002:a17:90a:fe0d:b0:2e0:8b1c:f3b2 with SMTP id 98e67ed59e1d1-2e1848d7e8bmr1114110a91.4.1727849651607;
-        Tue, 01 Oct 2024 23:14:11 -0700 (PDT)
-Received: from VM-4-3-centos.localdomain ([43.128.101.248])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18257efb1sm895464a91.0.2024.10.01.23.14.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Oct 2024 23:14:11 -0700 (PDT)
-From: "xin.guo" <guoxin0309@gmail.com>
-To: edumazet@google.com
-Cc: netdev@vger.kernel.org,
-	"xin.guo" <guoxin0309@gmail.com>
-Subject: [PATCH net-next] tcp: remove unnecessary update for tp->write_seq in tcp_connect()
-Date: Wed,  2 Oct 2024 14:14:03 +0800
-Message-Id: <1727849643-11648-1-git-send-email-guoxin0309@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1727850655; c=relaxed/simple;
+	bh=0O+mukDwvCX2ok6rLtH5hOl60OcC0SFKy53PWzY9Ldc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nu07jC7cDvsxLkO/jEwkOlxAMsMXMD27g9DPDdMd+ufAATlbg9KxaWTL23geOHiftiqWDGnpqVZGP3Uf2RyACM+rXDYiyWZRJ8pLPjWilg7nx4UUVNLTSz1z/0Xlk3ImpIySINTNeQQ9+/Q36b0PUpIjI1UzmM0x89j8hI+89VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideco.ru; spf=none smtp.mailfrom=ideco.ru; dkim=pass (2048-bit key) header.d=ideco.ru header.i=@ideco.ru header.b=eiSBEeNH; arc=none smtp.client-ip=46.36.23.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideco.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ideco.ru
+Received: from [169.254.254.254] (localhost [127.0.0.1])
+	by smtp.ideco.ru (Postfix) with ESMTP id 8AAC5580239D;
+	Wed,  2 Oct 2024 11:19:08 +0500 (+05)
+Received: from fedora.in.ideco.ru (unknown [46.36.23.99])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.ideco.ru (Postfix) with ESMTPSA id 874F2580226C;
+	Wed,  2 Oct 2024 11:18:52 +0500 (+05)
+DKIM-Filter: OpenDKIM Filter v2.11.0 smtp.ideco.ru 874F2580226C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ideco.ru; s=ics;
+	t=1727849947; bh=QkaDGvQsj6E9bKrlipIozYmBVc2b6T/p5MpgOu6NXjA=;
+	h=From:To:Cc:Subject:Date;
+	b=eiSBEeNHaPb45zvIMEKrx8M+Px5b1llaBOIzbXxoXK6VADet4QA70TCzgjHAegsop
+	 7I4tfJ+42Yb9YiohKgnIrVsmH36i6ENzDU83tJHVi2NNdZEEhNtKNpnZECl7ukTrP+
+	 BPHsLyfKTBt7/prcJ5LEpHEd9KS0SAd1EhYRRFXvGnKohrc7j1/fQNBoDrujGo8etV
+	 VWDKViqgGDmRH85W1k499lSExDGNvJXEBjpKAr63/SMd0rqQAqsib/ZbhMoyVJdOSE
+	 MMr/YK+vGU6ARBk+2sZ27SCY1m0z+CojRqi7NLIEhQ7JqzZFEzzD6u3OjO43Zm3EkN
+	 /urbJY4BKdveA==
+From: Petr Vaganov <p.vaganov@ideco.ru>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Petr Vaganov <p.vaganov@ideco.ru>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Antony Antony <antony.antony@secunet.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org,
+	Boris Tonofa <b.tonofa@ideco.ru>
+Subject: [PATCH net] xfrm: fix one more kernel-infoleak in algo dumping
+Date: Wed,  2 Oct 2024 11:17:24 +0500
+Message-ID: <20241002061726.69114-1-p.vaganov@ideco.ru>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: "xin.guo" <guoxin0309@gmail.com>
+During fuzz testing, the following issue was discovered:
 
-Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
-introduce tcp_connect_queue_skb() and it would overwrite tcp->write_seq,
-so it is no need to update tp->write_seq before invoking
-tcp_connect_queue_skb()
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x598/0x2a30
+ _copy_to_iter+0x598/0x2a30
+ __skb_datagram_iter+0x168/0x1060
+ skb_copy_datagram_iter+0x5b/0x220
+ netlink_recvmsg+0x362/0x1700
+ sock_recvmsg+0x2dc/0x390
+ __sys_recvfrom+0x381/0x6d0
+ __x64_sys_recvfrom+0x130/0x200
+ x64_sys_call+0x32c8/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
 
-Signed-off-by: xin.guo <guoxin0309@gmail.com>
+Uninit was stored to memory at:
+ copy_to_user_state_extra+0xcc1/0x1e00
+ dump_one_state+0x28c/0x5f0
+ xfrm_state_walk+0x548/0x11e0
+ xfrm_dump_sa+0x1e0/0x840
+ netlink_dump+0x943/0x1c40
+ __netlink_dump_start+0x746/0xdb0
+ xfrm_user_rcv_msg+0x429/0xc00
+ netlink_rcv_skb+0x613/0x780
+ xfrm_netlink_rcv+0x77/0xc0
+ netlink_unicast+0xe90/0x1280
+ netlink_sendmsg+0x126d/0x1490
+ __sock_sendmsg+0x332/0x3d0
+ ____sys_sendmsg+0x863/0xc30
+ ___sys_sendmsg+0x285/0x3e0
+ __x64_sys_sendmsg+0x2d6/0x560
+ x64_sys_call+0x1316/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
+
+Uninit was created at:
+ __kmalloc+0x571/0xd30
+ attach_auth+0x106/0x3e0
+ xfrm_add_sa+0x2aa0/0x4230
+ xfrm_user_rcv_msg+0x832/0xc00
+ netlink_rcv_skb+0x613/0x780
+ xfrm_netlink_rcv+0x77/0xc0
+ netlink_unicast+0xe90/0x1280
+ netlink_sendmsg+0x126d/0x1490
+ __sock_sendmsg+0x332/0x3d0
+ ____sys_sendmsg+0x863/0xc30
+ ___sys_sendmsg+0x285/0x3e0
+ __x64_sys_sendmsg+0x2d6/0x560
+ x64_sys_call+0x1316/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
+
+Bytes 328-379 of 732 are uninitialized
+Memory access of size 732 starts at ffff88800e18e000
+Data copied to user address 00007ff30f48aff0
+
+CPU: 2 PID: 18167 Comm: syz-executor.0 Not tainted 6.8.11 #1
+Hardware name: 
+QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+
+Fixes copying of xfrm algorithms where some random
+data of the structure fields can end up in userspace.
+Padding in structures may be filled with random (possibly sensitve)
+data and should never be given directly to user-space.
+
+A similar issue was resolved in the commit
+8222d5910dae ("xfrm: Zero padding when dumping algos and encap")
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: c7a5899eb26e ("xfrm: redact SA secret with lockdown confidentiality")
+Cc: stable@vger.kernel.org
+Co-developed-by: Boris Tonofa <b.tonofa@ideco.ru>
+Signed-off-by: Boris Tonofa <b.tonofa@ideco.ru>
+Signed-off-by: Petr Vaganov <p.vaganov@ideco.ru>
 ---
- net/ipv4/tcp_output.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/xfrm/xfrm_user.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 4fd746b..f255c7d 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4134,7 +4134,7 @@ int tcp_connect(struct sock *sk)
- 	if (unlikely(!buff))
- 		return -ENOBUFS;
- 
--	tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
-+	tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
- 	tcp_mstamp_refresh(tp);
- 	tp->retrans_stamp = tcp_time_stamp_ts(tp);
- 	tcp_connect_queue_skb(sk, buff);
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 55f039ec3d59..97faeb3574ea 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1098,7 +1098,9 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
+ 	if (!nla)
+ 		return -EMSGSIZE;
+ 	ap = nla_data(nla);
+-	memcpy(ap, auth, sizeof(struct xfrm_algo_auth));
++	strscpy_pad(ap->alg_name, auth->alg_name, sizeof(sizeof(ap->alg_name)));
++	ap->alg_key_len = auth->alg_key_len;
++	ap->alg_trunc_len = auth->alg_trunc_len;
+ 	if (redact_secret && auth->alg_key_len)
+ 		memset(ap->alg_key, 0, (auth->alg_key_len + 7) / 8);
+ 	else
 -- 
-1.8.3.1
+2.46.1
 
 
