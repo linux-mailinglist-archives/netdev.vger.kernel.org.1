@@ -1,138 +1,95 @@
-Return-Path: <netdev+bounces-131328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98DC198E17E
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:12:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D33298E182
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 19:17:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B1A284DA4
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:12:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 881301C21E52
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3B01D0DC3;
-	Wed,  2 Oct 2024 17:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5929D1D14EE;
+	Wed,  2 Oct 2024 17:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="eJeMYKm7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzEnYJ9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E944E16419
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 17:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306291C9B91;
+	Wed,  2 Oct 2024 17:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727889170; cv=none; b=L6shfYuvwHXUff1SFJ1zUKmG2ovevBYZmFZzEC91uaYcBPkbk2eW4kXhXGlXFk+iz+87OQZvQV71dqc4HvdXaKDZFyy7+R3jB2s3KLhNH11vpF2tdHEAy/goKT/POjExEkKcz24vefx7wh6QILEUUrqVTcAeEhov0cXTiB8Buv0=
+	t=1727889449; cv=none; b=NV6Vz/wvbTHk3Wm5AyqVircuEJ9wslbwktwSV49OX+1x6wYo2GfwYFe2X/qBUqYjVyYWXQVAIvncHbg/013AEZwjvNsyIp2YwhgOLy9hLwT1H5dqQ3N9MgCnXbq5vpJjU+UfquDUifc7xAqKLvy6mJrfx2kFJgzeYShp3Y65I6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727889170; c=relaxed/simple;
-	bh=ErONom/Ai9zIX5PSONp+QFKxytgOpuX04ZrmD+dkgEw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aAK0HJrRziE3uA+iqsE5uSokzrmpelvHVWI28LaBJgNo964DrJD4woIpk64jcI8Exd0eZSFSA14+B1i41Nh2tAW8/Tbve4oyli/MigK0/feOmku0nfWstC5aQITKtHmGyhkyBP5Wxjbwk++9qdT16nuUKEEVt+gw5/QDV0QHM/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=eJeMYKm7; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 20241002171233a27a727a77d5ddee8e
-        for <netdev@vger.kernel.org>;
-        Wed, 02 Oct 2024 19:12:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=e7QmFZwkSyc492JijwjT4JHyXfg7s0uXN5hCiPvx5Ts=;
- b=eJeMYKm7GDjPLn0AaVrIguWEM1f6uIG1Y6ionHMk9Ig/PH4zrm2+o6RJ/kiCVA3p4FHoLy
- bgMhZQEt3m/cqgVVV69xGv5h2iNUQ+J7AWqU3AZQFmLKHpAg1zwpqPuT0Ru77JMU21zzf6EL
- NQOHmVuh/wOkzMuB4Wm3Jc/AkYuLOBBrUwQknisNtqdrJi2sRIsgH8/BubIdw2DCUUUIuKZ3
- UZfSoQxVygBdgrcn9nUN2ix0VhHX10UTLERq1fnDrpqapHIoq8LLhJ+YoqszTnlG/21pufBE
- cG2AhWm5BMUAYxjeefS8dSqDPxbQUK94Zg51Jwg/qHIcxxV+b7RYjoWw==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Anatolij Gustschin <agust@denx.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Subject: [PATCH net v2] net: dsa: lan9303: ensure chip reset and wait for READY status
-Date: Wed,  2 Oct 2024 19:12:28 +0200
-Message-ID: <20241002171230.1502325-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1727889449; c=relaxed/simple;
+	bh=pfIEXJMb4PrK/x6Ayj1gPI5EQfPIRYz2z5v24LdJmEA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fAt78LLjBk3qRfU7ikCf7Lgk6ECFWs0J62QHvO0GTBNZAKXL6NEasDJwi3KJQWMAIJDGHlAicZeoXrEX5AHuK9NGRjTNeIyHXrHKjPw3XidKP1M7EVqQKAqKH+5Db1TRqEiQ6EEb9I91BBXNxyXzfux5XnPJqMsXgwSjLu/5TJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzEnYJ9C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 576E4C4CEC2;
+	Wed,  2 Oct 2024 17:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727889448;
+	bh=pfIEXJMb4PrK/x6Ayj1gPI5EQfPIRYz2z5v24LdJmEA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qzEnYJ9CkvJ8iZ4ixy2eyCWweBM9CPz5GeO+p2AgtBUNPETZ6/3NISG/9dC2KI1OY
+	 UtwAOkVXxti8ogfSILyF16Jvf/ToKHgA1de0pg7voPLqDgeSkeG77c9u1oVjLXJAk1
+	 DsE2bEBwdFm1/EAo7jhlT/fjOT54ScBLPcmr/RIM0QGWOb2LYpNYLE1lFpV6nBxTAf
+	 nv3gBJiehRQNktWr9HRujEXZiH4Tbq3hPaDt9Z2kdwSWcMtVkmQeg7/ngel3QRVNxG
+	 F6rGxf6gNyw0cVBru74re6uWB2oBF5dHk9+RNEyIN4zzuY6UvONcoOoRf2fbquNsX5
+	 J7Ud/KXCYedCQ==
+Date: Wed, 2 Oct 2024 10:17:27 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>
+Cc: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "moderated
+ list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
+ <linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 1/1] idpf: Don't hard code napi_struct size
+Message-ID: <20241002101727.349fc146@kernel.org>
+In-Reply-To: <ZvwK1PnvREjf_wvK@LQ3V64L9R2>
+References: <20240925180017.82891-1-jdamato@fastly.com>
+	<20240925180017.82891-2-jdamato@fastly.com>
+	<6a440baa-fd9b-4d00-a15e-1cdbfce52168@intel.com>
+	<c32620a8-2497-432a-8958-b9b59b769498@intel.com>
+	<9f86b27c-8d5c-4df9-8d8c-91edb01b0b79@intel.com>
+	<Zvsjitl-SANM81Mk@LQ3V64L9R2>
+	<a2d7ef07-a3a8-4427-857f-3477eb48af11@intel.com>
+	<ZvwK1PnvREjf_wvK@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Anatolij Gustschin <agust@denx.de>
+On Tue, 1 Oct 2024 07:44:36 -0700 Joe Damato wrote:
+> > But if you change any core API, let's say rename a field used in several
+> > drivers, you anyway need to adjust the affected drivers.  
+> 
+> Sorry, but that's a totally different argument.
+> 
+> There are obvious cases where touching certain parts of core would
+> require changes to drivers, yes. I agree on that if I change an API
+> or a struct field name, or remove an enum, then this affects drivers
+> which must be updated.
 
-Accessing device registers seems to be not reliable, the chip
-revision is sometimes detected wrongly (0 instead of expected 1).
++1
 
-Ensure that the chip reset is performed via reset GPIO and then
-wait for 'Device Ready' status in HW_CFG register before doing
-any register initializations.
+I fully agree with Joe. Drivers asserting the size of core structures
+is both undue burden on core changes and pointless.
+The former is subjective, as for the latter: most core structures 
+will contain cold / slow path data, usually at the end. If you care
+about performance of anything that follows a core struct you need
+to align the next field yourself.
 
-Signed-off-by: Anatolij Gustschin <agust@denx.de>
-[alex: reworked using read_poll_timeout()]
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
-Changelog:
-v2: use read_poll_timeout()
-
- drivers/net/dsa/lan9303-core.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
-
-diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-index 268949939636a..3155ec1ab2517 100644
---- a/drivers/net/dsa/lan9303-core.c
-+++ b/drivers/net/dsa/lan9303-core.c
-@@ -6,6 +6,7 @@
- #include <linux/module.h>
- #include <linux/gpio/consumer.h>
- #include <linux/regmap.h>
-+#include <linux/iopoll.h>
- #include <linux/mutex.h>
- #include <linux/mii.h>
- #include <linux/of.h>
-@@ -839,6 +840,8 @@ static void lan9303_handle_reset(struct lan9303 *chip)
- 	if (!chip->reset_gpio)
- 		return;
- 
-+	gpiod_set_value_cansleep(chip->reset_gpio, 1);
-+
- 	if (chip->reset_duration != 0)
- 		msleep(chip->reset_duration);
- 
-@@ -866,6 +869,29 @@ static int lan9303_check_device(struct lan9303 *chip)
- 	int ret;
- 	u32 reg;
- 
-+	/*
-+	 * In I2C-managed configurations this polling loop will clash with
-+	 * switch's reading of EEPROM right after reset and this behaviour is
-+	 * not configurable. While lan9303_read() already has quite long retry
-+	 * timeout, seems not all cases are being detected as arbitration error.
-+	 *
-+	 * According to datasheet, EEPROM loader has 30ms timeout (in case of
-+	 * missing EEPROM).
-+	 *
-+	 * Loading of the largest supported EEPROM is expected to take at least
-+	 * 5.9s.
-+	 */
-+	if (read_poll_timeout(lan9303_read, ret, reg & LAN9303_HW_CFG_READY,
-+			      20000, 6000000, false,
-+			      chip->regmap, LAN9303_HW_CFG, &reg)) {
-+		dev_err(chip->dev, "HW_CFG not ready: 0x%08x\n", reg);
-+		return -ENODEV;
-+	}
-+	if (ret) {
-+		dev_err(chip->dev, "failed to read HW_CFG reg: %d\n", ret);
-+		return ret;
-+	}
-+
- 	ret = lan9303_read(chip->regmap, LAN9303_CHIP_REV, &reg);
- 	if (ret) {
- 		dev_err(chip->dev, "failed to read chip revision register: %d\n",
--- 
-2.46.2
-
+IDK how you want to fit this into your magic macros but complex
+nested types should be neither ro, rw nor cold. They are separate.
 
