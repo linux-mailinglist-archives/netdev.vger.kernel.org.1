@@ -1,146 +1,136 @@
-Return-Path: <netdev+bounces-131352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C4CD98E3E4
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 22:04:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CDAF98E3F1
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 22:09:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBAD21F27032
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 20:04:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D843D1F283A2
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 20:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F61F212F0F;
-	Wed,  2 Oct 2024 20:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0C7216A17;
+	Wed,  2 Oct 2024 20:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sV3cC+Ax";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MacOPU7T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ScOrOzi9"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BEE2114;
-	Wed,  2 Oct 2024 20:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47423216A1D;
+	Wed,  2 Oct 2024 20:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727899445; cv=none; b=RGkWZhtyzq0rzZVc4qhP0IjYQg8JSFH84Pogufph0oixdBerUHwC9xDmOtXv+RGHIbGmZlzmn/e7zH52Ff+uGhrS+NFoxZgZ1njuxG5lI2TCg6DkRTgTSo/xjQTPihJisWkh5AVRM16VkTjahy6mPCsVAg+CP/6ffcap8pLLoWo=
+	t=1727899734; cv=none; b=qQCrlPnLAxqsLp4LXR4rqGaz+H7e9J2EeLAOXDDtkbKiLD0MkgMBg6kLm2tp+ukRVFCNZwUlIx0MFTp7G/ssVdswbaV8kd5kQxi+CdyPxb+dy1HMfQF3jXaU/rX+x7Bht6JqOp6YmqaVjvV4kkK+MgRZq5KMgDHqanXfU6UdiLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727899445; c=relaxed/simple;
-	bh=gPXDQRsFYmCqVGQlQspyPpXZsyzaFvNanZpaovOryow=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=AvA6+FwRRaxgMQVg0Sb27MgzZVAex9o651pHwGeaG4nl9lbH+LUqy3ObrHXBlm4TPtgTRprprAJGCMrwegVwPI+J3N16Y67cTxQ7/048sCGwmDHAWXCwJnpdx6qOCZsYuoLJSHkFA0XMmvdCzOV0dXHzB1HF1j8spsjAtgaq0Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sV3cC+Ax; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MacOPU7T; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1727899440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nkfJtSduQOfmewmI3G2NKeIqKkPDh2egZh+vb/1fPwc=;
-	b=sV3cC+AxQawy+r6vxdzQm4+20ZV5HElgOTVSC6LcRgzdAfgeq4q7HvQTZJKppdfxFOLxRY
-	+a1ZeRibUF+t9T1ANCaZSFez1cmDwdRnUvSMbmwO0ndG+5trM/UgpkJAu3KCa5zggiwtoz
-	FL/EvD5ZRqNtTTSZtENCc1Ve4NBJumpGJpnsfAmfXPVqjP8yKcMBakvRxZk8swunWZXhGZ
-	2r56Fpmsm1bqzmqQD9YPeoet3fE4+AWMUpZ9j3PJ4IbFjr9XTNdSYF80VJSC/LE/pjJRw/
-	QG2Uo8OICUOdmFg+OEDjg/TT3IYG4Acs5xXTf5BK6BzwBnYHjRR1AbqUiqY2hg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1727899440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nkfJtSduQOfmewmI3G2NKeIqKkPDh2egZh+vb/1fPwc=;
-	b=MacOPU7TuOQUMpRdYU4WMpxipoHxtr8womom1DJN1FRBS74WCIjmbRuYDeGgWN03tsLzn1
-	0Gz5Ddil2cd5LQDw==
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
- ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com, Anna-Maria Behnsen <anna-maria@linutronix.de>
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-In-Reply-To: <CANiq72nCeGVFY_eZMhp44dqZGY1UXuEZFaJx-3OLCTk-eG=xng@mail.gmail.com>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
- <20241001112512.4861-2-fujita.tomonori@gmail.com>
- <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
- <20241002.113401.1308475311422708175.fujita.tomonori@gmail.com>
- <e048a4cc-b4e9-4780-83b2-a39ede65f978@lunn.ch>
- <CANiq72mX4nJNw2RbZd9U_FdbGmnNHav3wMPMJyLSRN=PULan8g@mail.gmail.com>
- <3fc44d62-586f-4ed0-88ee-a561bef1fdaf@lunn.ch>
- <CANiq72nCeGVFY_eZMhp44dqZGY1UXuEZFaJx-3OLCTk-eG=xng@mail.gmail.com>
-Date: Wed, 02 Oct 2024 22:04:00 +0200
-Message-ID: <878qv6w9u7.ffs@tglx>
+	s=arc-20240116; t=1727899734; c=relaxed/simple;
+	bh=vz46hAmWpG5YlUYcSCarIwa9teQKaxayVj5G8KNqlRo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HKHZfT9vplG3IYlkWGZnefjbzXaAEIPbUahSfBSkMW3Tk2xB2aRqZ0uNFWPXvZsWxKXvFH7Q2X2/MOwUjwpc0SzshKe2BCJnJElFzQJhl5GRB6Ka7tJi0iOH+Dtsdb1kuKgZlb9FEQ60+jh2iD5JN651XdYEWKp8O3pF8Kv+jNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ScOrOzi9; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42f6bec84b5so1106805e9.1;
+        Wed, 02 Oct 2024 13:08:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727899731; x=1728504531; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hxnZLWasoXEFToT3v/SC94iiLBjMSWRh3PeDY/tsPKQ=;
+        b=ScOrOzi9Mm71ArVJ5/754JFL2TDPN2eyY9tMoqyybRfDEHqhx1n/D41p7Zu2FDG4kZ
+         T2Q9s6PXQlcgTWHXbJDMvJy5VwJABo+fXLhyWYDFJ1nB8iShWqggIaTQl6jGVP/f+pJr
+         GzB49D378Jh8elkZC0W7ymQkh7ienJm6/0d09uZVOxwSFmgTyLaAKTkBffRyPZgWLOkw
+         sLiJPpZM0rhW2ecrtt4TK9IvvZiuhsdjIVT/0Q4dwo2Ukrm7J5aKbXRpCylKodTGbQKf
+         Ck2C2bBsFIssE4wCt9hV66FxyZZYbZNp3S66Vyk2GN2whuQI1rK3+etdQV5qOB7hUi+k
+         +9YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727899731; x=1728504531;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hxnZLWasoXEFToT3v/SC94iiLBjMSWRh3PeDY/tsPKQ=;
+        b=GbdePVZcVyJbu5NTGXj6uGB36RjJROCn+jKyUtkviwkdw5hXtwdDQjGBDgCHb49/KV
+         qEzvFg/XxI3qcWDJTslH4cvKHEKv6cJLSjD30tN4cq5xuqLFuBfl97TMuyU6oYGgrNIk
+         chRF9YCm0/N+fmzb9+3N0vnCdA6ku6nMGYUs9QmwqviQpZAa0f+QRtXkrNMH2xRrG2+z
+         YmdNB8S1APtEDvBvyfOoJbb43btYtEofvFPs9DdqlPa9k9SrZwPOlTj286P+aIqq6Du5
+         rsXw5H4M6mCXo07/sI0foqLCBrbcQMGXdcYBeDz20Uq7wWX9nTyRHQocN7VbcdznJKuI
+         6uoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIvuNsX1/coxv4vA1rv9GikQpJlWc668DqpfwpHHnHpJNhODum7qhbqeyRzPjmK12aQZj0N6gdNmj89A==@vger.kernel.org, AJvYcCV31FC0ElLlJmQjX4d2BtvdybyX/hPVMpN6G8QEDHVaeO018Ft5f1Ge1yzUgNljBVGCTj4uJwpxL9mFPbNC@vger.kernel.org, AJvYcCVHu6jOq7gIFbynP3p5KZeQyt/V8foidrViemI5phXsNEMUSBpjtpPXOmGZ8hbR3YRlH2KIhz8CycHnnSY+SN8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXEVdDzSDtsIseiSpLtTddRJdUlBikb9421K3ls47/gcvRML0x
+	lZ8tPOOY29DYrKI3kS/wSrwy7DnB64j1EnJHXB3xvk7L8Yi5NKOI
+X-Google-Smtp-Source: AGHT+IFgZsIkiwvcQcdxhWGuOwo3EX/o3oFREL30NYWJAmnmWI4NukS+lsvENJabe0gnVRXhfdDW1A==
+X-Received: by 2002:a05:600c:4686:b0:42c:b6e4:e3aa with SMTP id 5b1f17b1804b1-42f777b0c38mr30491615e9.5.1727899731212;
+        Wed, 02 Oct 2024 13:08:51 -0700 (PDT)
+Received: from void.void ([141.226.9.42])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f7a02f174sm27934655e9.44.2024.10.02.13.08.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Oct 2024 13:08:50 -0700 (PDT)
+From: Andrew Kreimer <algonell@gmail.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Kreimer <algonell@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH net-next v2] net/mlx5: Fix typos
+Date: Wed,  2 Oct 2024 23:08:38 +0300
+Message-Id: <20241002200838.7316-1-algonell@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 02 2024 at 15:21, Miguel Ojeda wrote:
-> On Wed, Oct 2, 2024 at 2:51=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->> Maybe this is my background as a C programmer, with its sloppy type
->> system, but i prefer to have this very clear, maybe redundantly
->> stating it in words in addition to the signature.
->
-> The second part of my message was about the signature point you made,
-> i.e. not about the units. So I am not sure if you are asking here to
-> re-state the types of parameters in every function's docs -- what do
-> you gain from that in common cases?
->
-> We also don't repeat every parameter in a bullet list inside the
-> documentation to explain each parameter, unless a parameter needs it
-> for a particular reason. In general, the stronger/stricter your
-> types/signatures are, and the better documented your types are, the
-> less "extra notes" in every function you need.
->
-> For instance, if you see `int` in a signature, then you very likely
-> need documentation to understand how the argument works because `int`
-> is way too general (e.g. it is likely it admits cases you are not
-> supposed to use). However, if you see `Duration`, then you already
-> know the answer to the units question.
->
-> Thus, in a way, we are factoring out documentation to a single place,
-> thus making them simpler/easier/lighter -- so you can see it as a way
-> to scale writing docs! :)
->
-> That is also why carrying as much information in the signature also
-> helps with docs, and not just with having the compiler catch mistakes
-> for us.
+Fix typos in comments.
 
-I completely agree.
+Reported-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+---
+v2:
+  - A repost, there is no range-diff.
+v1: https://lore.kernel.org/netdev/20240915114225.99680-1-algonell@gmail.com/
 
-'delay(Duration d)' does not need explanation for @d unless there is a
-restriction for the valid range of @d. @d is explained in the
-documentation of Duration.
+ drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-That's not any different in C, when the function argument is a pointer
-to a complex struct. Nobody would even think about explaining the struct
-members in the documentation of the function which has that struct
-pointer argument. No, you need to go to the struct declaration to figure
-it out.
-
-Redundant documentation is actually bad, because any changes to the type
-will inevitably lead to stale documentation at the usage site. The
-kernel is full of this.
-
-I havent's seen the actual patches as they were sent to netdev for
-whatever reason. There is a larger rework of delay.h going on:
-
-  https://lore.kernel.org/all/20240911-devel-anna-maria-b4-timers-flseep-v2=
--0-b0d3f33ccfe0@linutronix.de/
-
-V3 will be coming early next week. So please look at V2 if you have any
-constraints vs. the rust implementation.
-
-Thanks,
-
-        tglx
-
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+index 1477db7f5307..4336ac98d85d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+@@ -80,7 +80,7 @@ irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_de
+  * isn't subset of req_mask, so we will skip it. irq1_mask is subset of req_mask,
+  * we don't skip it.
+  * If pool is sf_ctrl_pool, then all IRQs have the same mask, so any IRQ will
+- * fit. And since mask is subset of itself, we will pass the first if bellow.
++ * fit. And since mask is subset of itself, we will pass the first if below.
+  */
+ static struct mlx5_irq *
+ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req_mask)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index 220a9ac75c8b..82911ea10ff8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -1664,7 +1664,7 @@ void mlx5_unload_one(struct mlx5_core_dev *dev, bool suspend)
+ 	devl_unlock(devlink);
+ }
+ 
+-/* In case of light probe, we don't need a full query of hca_caps, but only the bellow caps.
++/* In case of light probe, we don't need a full query of hca_caps, but only the below caps.
+  * A full query of hca_caps will be done when the device will reload.
+  */
+ static int mlx5_query_hca_caps_light(struct mlx5_core_dev *dev)
+-- 
+2.39.5
 
 
