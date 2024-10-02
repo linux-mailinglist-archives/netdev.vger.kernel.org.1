@@ -1,139 +1,113 @@
-Return-Path: <netdev+bounces-131254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E7998DE42
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:02:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D58398DE38
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:02:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DAC2B2BCE2
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFD31C20A34
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DBB12DD90;
-	Wed,  2 Oct 2024 15:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EE31CF7AA;
+	Wed,  2 Oct 2024 15:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="b2Dzfu/6"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ftkGpiO2";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="66EOsvZj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743421D0BB2;
-	Wed,  2 Oct 2024 15:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6FC1EEE6;
+	Wed,  2 Oct 2024 15:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727881258; cv=none; b=AtVioGFu4InCAivBAZLnbRHJiQnQlNisjrYb6jaM5T3qOx9Wj9mO1AyPodZYGJPFDxkcP6T9hVyJkRYx+z9lHAMvBLz0ZEBqA511OT4633KSl4mBEqR37L9KB+Ra1sJLBtGVoqw03YSqBLrynCAVAdali8M2UMEsdISGfNACHNQ=
+	t=1727881324; cv=none; b=eQTD/n1ZfeNUwZPCBktYN9tVRVlGpdlyFt6AXI8ABc0fUxT8ZryxyNDcOjn41+ekgf2IFMwSQXiPfCEYqTGiS31MAmTZXnpk1Iy2ZmanI4C6SnglcooR1wErHN0GnAdiSOiioTRHapZdAr4TSiS0y3+/+m2nU0mTwSDIOK5g4B8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727881258; c=relaxed/simple;
-	bh=fGfUD/WiCJjI2zU5UY02wTes88pCeEuSUW2ARwzNIAc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BBFBggvzPz7wzOC25KVQKNwRKFdracZ19kc4u7NxdbiMDQh8A/j6SiiiW6gRU1/BjiRIvg2fXz0lotyaOTqW9VDUdo76LYYhuLRppm4Pjae/OAajtkT+IBtzo3OdB4Icy2VtjxfQlcH4SbuvoIcX9DUzgcBxLsttNwqiqz/J8lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=b2Dzfu/6; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 49E4420008;
-	Wed,  2 Oct 2024 15:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727881249;
+	s=arc-20240116; t=1727881324; c=relaxed/simple;
+	bh=kHPrgvuXQnFDt4DC9o2RoZFRavHHbItmknfMXeNGOgM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=XTkydji5xL9N1NtlOyoxOTKItNdi44qno+Bz6cmrvkHEMSzYcQQ7fFCAxpXKBssiEcBAmsT7qYzHOSl4XNjtVTzaTeI1Y0hNyGaXQTRG42ut4FdfUeWsU6KQhTawFI75cfx5ozkUp1uTr07dFjuK5TNMYmB819ulgg16USsU5wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ftkGpiO2; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=66EOsvZj; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1727881320;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Q7PB5ODMJCF6fg5RDa64H/CMmhohH0kapUxtnCgLPSg=;
-	b=b2Dzfu/6rZcd85DPtq/QA0YL20r6s5EcwrYAe1EisUoqjsKVnchTKd2XLLH5P+NiHFmLOp
-	yaXsgHdB6Kz/uw2b7+WUk71qMpIF1HDES2Ekfj1PjfksfGnTWozTRCcO37nmUwOCrfljA1
-	e+u7t3GvfzmkGHLz6VVDi/Zf2bd6iO2oOZuvNhdToZRRpNputDu7Nodpr9l8tR3pMuWtnC
-	yg8DJCx0uTExpA2oLLuAcEw2T+8+V1uNASCj5wnEJg9iFFAX3RhKfm7njm/4VLLLOUUZ9j
-	qHdJ6GMxUbB1hpmmDBpnYBQikkFtww+j27nnT2uays52b2OuDMMa6iWxx+9lHg==
-Date: Wed, 2 Oct 2024 17:00:47 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Simon Horman <horms@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, thomas.petazzoni@bootlin.com, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH net v2] net: pse-pd: tps23881: Fix boolean evaluation
- for bitmask checks
-Message-ID: <20241002170047.2b28e740@kmaincent-XPS-13-7390>
-In-Reply-To: <20241002073156.447d06c4@kernel.org>
-References: <20241002102340.233424-1-kory.maincent@bootlin.com>
-	<20241002052431.77df5c0c@kernel.org>
-	<20241002052732.1c0b37eb@kernel.org>
-	<20241002145302.701e74d8@kmaincent-XPS-13-7390>
-	<20241002073156.447d06c4@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=zTt9TS57bBm1l7LQiiCDKRjlEdSZZZ3DNQMytk52ARU=;
+	b=ftkGpiO2tQC3XBHrw0qujIV1hNeH8PfnQMQ9VwuLCIjxOCO4+RIEAn9I80jccRGLuUfOSk
+	qXDh4sI7V1MWbCrSHSvJfBEk8auCJI7R8ToxkbfDQSDW3bm1jTqVibdG24MrR1GkrAzUv7
+	Nglg5c6UKJD0HkpjdmTN43ERgM4RzKphWDH/FzS7rAkB6mBTwRcgr3It2HD85k6P6AksaL
+	TKjMavUpYwVbOYdL7WX09DxO+A6FMPf31BDuSzqfaSYwbj/UxUygslhbSgNLXtVjaN8iVG
+	f8x+SSD8udWBVY6NiUPl5wAkEiUQIWiCAFA2kEwDfY+0UziV4DdNXPHQvjrFJg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1727881320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zTt9TS57bBm1l7LQiiCDKRjlEdSZZZ3DNQMytk52ARU=;
+	b=66EOsvZjXy/H8TUUFSCmjovMyk1OBLtQIimAE8qOVHy7xmFexHyu16tDAVzVdvfGB0RUNK
+	FPjKICAnWvLC8OCQ==
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Frederic Weisbecker
+ <frederic@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Anna-Maria
+ Behnsen <anna-maria@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, "Rafael
+ J. Wysocki" <rafael@kernel.org>, Anna-Maria Behnsen
+ <anna-maria@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>,
+ damon@lists.linux.dev, linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org, Heiner Kallweit
+ <hkallweit1@gmail.com>, "David S. Miller" <davem@davemloft.net>, Andy
+ Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>, Dwaipayan
+ Ray <dwaipayanray1@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>, Mark
+ Brown <broonie@kernel.org>, Andrew Lunn <andrew@lunn.ch>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, netdev@vger.kernel.org,
+ linux-sound@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>, Nathan
+ Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, Mauro
+ Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org
+Subject: Re: [PATCH v2 00/15] timers: Cleanup delay/sleep related mess
+In-Reply-To: <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
+References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
+ <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
+Date: Wed, 02 Oct 2024 17:02:00 +0200
+Message-ID: <87ttduwntj.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 2 Oct 2024 07:31:56 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Mon, Sep 16 2024 at 22:20, Christophe JAILLET wrote:
+> Le 11/09/2024 =C3=A0 07:13, Anna-Maria Behnsen a =C3=A9crit=C2=A0:
+>
+> not directly related to your serie, but some time ago I sent a patch to=20
+> micro-optimize Optimize usleep_range(). (See [1])
+>
+> The idea is that the 2 parameters of usleep_range() are usually=20
+> constants and some code reordering could easily let the compiler compute=
+=20
+> a few things at compilation time.
+>
+> There was consensus on the value of the change (see [2]), but as you are=
+=20
+> touching things here, maybe it makes sense now to save a few cycles at=20
+> runtime and a few bytes of code?
 
-> On Wed, 2 Oct 2024 14:53:02 +0200 Kory Maincent wrote:
-> > On Wed, 2 Oct 2024 05:27:32 -0700
-> > Jakub Kicinski <kuba@kernel.org> wrote:
-> >  =20
-> > > On Wed, 2 Oct 2024 05:24:31 -0700 Jakub Kicinski wrote:   =20
->  [...] =20
->  [...] =20
->  [...] =20
-> > >=20
-> > > Reading the discussion on v1 it seems you're doing this to be safe,
-> > > because there was a problem with x &=3D val & MASK; elsewhere.
-> > > If that's the case, please resend to net-next and make it clear it's
-> > > not a fix.   =20
-> >=20
-> > Indeed it fixes this issue. =20
->=20
-> Is "this" here the &=3D issue or the sentence from the commit message?
->=20
-> > Why do you prefer to have it on net-next instead of a net? We agreed wi=
-th
-> > Oleksij that it's where it should land. Do we have missed something? =20
->=20
-> The patch is a noop, AFAICT. Are you saying it changes how the code
-> behaves?=20
->=20
-> The patch only coverts cases which are=20
->=20
-> 	ena =3D val & MASK;
->=20
-> the automatic type conversion will turn this into:
->=20
-> 	ena =3D bool(val & MASK);
-> which is the same as:
-> 	ena =3D !!(val & MASK);
->=20
-> The problem you were seeing earlier was that:
->=20
-> 	ena &=3D val & MASK;
->=20
-> will be converted to:
->=20
-> 	ena =3D ena & (val & MASK);
->=20
-> and that is:
->=20
-> 	ena =3D bool(int(ena) & (val & MASK));
->                    ^^^
->=20
-> IOW ena gets promoted to int for the & operation.
-> This problem does not occur with simple assignment.
+For the price of yet another ugly interface and pushing the
+multiplication into the non-constant call sites.
 
-Indeed you are totally right! It is a noop! Thanks!
-Should I drop it?
+Seriously usleep() is not a hotpath operation and the multiplication is
+not even measurable except in micro benchmarks.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Thanks,
+
+        tglx
 
