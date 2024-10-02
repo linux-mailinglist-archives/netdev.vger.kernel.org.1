@@ -1,141 +1,115 @@
-Return-Path: <netdev+bounces-131133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19EC98CDC5
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:34:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F28E598CDD3
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 09:37:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30025283749
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 07:34:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D49B1F226DE
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 07:37:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3240E7DA83;
-	Wed,  2 Oct 2024 07:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416C4155735;
+	Wed,  2 Oct 2024 07:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4cExjsRd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A+064Tfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ECE2F2D
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 07:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4612D517;
+	Wed,  2 Oct 2024 07:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727854439; cv=none; b=iTtsr16OeDUkdwcZpexdHEofb1YRrK97/fyieYNTTHtLwBoYiIr9GYtjsYePx327+H0/jq3t+c6hbdCRzoMUo/AP/OOTddQFVUqqZIFOTpRYcGgdQqucaZOwTwBcwcQwvRWQuyd90Ci/GdpU8xxMqksQY+hzPLfh3ZmiEBpyCdU=
+	t=1727854671; cv=none; b=AHul/fz6zW15YsbQBJxndCMcTKQPvgq+a7bUi+byHjd5/P9knoUWiB4+Cdc9F1yte9C8bCTputDpwdugcqbElvdjjm7bs4+UX7SZ1WrIqMN53MnPjBvDSNbqX7Zr4LaPn1J8uDWB+is6nS+wXGMd5eB+sMK/T+zNRcFhPozYDaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727854439; c=relaxed/simple;
-	bh=V4y23rlmqdzfrQZBOAAfrz/M4Z8y6Q4xzmnLAZx4W74=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hCRE0RugCNTbsrOWRwimkQxiSai96DX/H8lj1W0EeZpddg7PWKP4dhxtHxTe1Na6W7biZUBPNLw0jEZIFU1Deb2ozhSPNOhmTzQjNPJQ43BWZnUeUdB6Mwk1rZb+yhTuzoQBuEmzc1ABKspMxLQx/AVqJiVmHjjr/IbQXJteCOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4cExjsRd; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2fabc9bc5dfso49033171fa.0
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 00:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727854435; x=1728459235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NLU3JIjvGcpWz+NugR51TY6PTur7Me/ielLCAHwRqQA=;
-        b=4cExjsRdg19KqKq0TLe1thH7XZR5I0WoE+yf1OQ6e9bHRx97Y037cT9xmzRW6o1lGR
-         uLCUm6XlDj1ZAlI0QKe/EZLiIWIIRpXFKxICv4kU8vWV8chTVKoPxrAt0/qYKpgTkyaw
-         r+qtXVJ945Eki43ImDlq6ctN/L55nH/pkYYYUSn6k7Rh07ERJ7DhuWTjBEawqJ8MWACR
-         MmuOTGgU8XSoiwRO03MD5Pu/AOsQ3L24FVP6c6nh/7JdwxX5OvVz/eFRDN1Ow26Cy8v3
-         gXmI0OYr5ZgyV03At79/HFz712V85O76r6insVTn5EDVUmDSjFrVozDYajTDCKYzkdz3
-         YNlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727854435; x=1728459235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NLU3JIjvGcpWz+NugR51TY6PTur7Me/ielLCAHwRqQA=;
-        b=Kv6ar7T9MJjg+m6HUjZ6SpKG/8tMcBeX1fDEhAVIIHu0Hw/gP8jmNPZs8WcX6gdcli
-         gOngxO2oNkGLDz4W9WRW4of8rm/ImlQQOshvT9vw/bqoqWvw8dLcBYf47JTwKUNWTa3H
-         xXt9P2iy4KaYwpInBgcZQd9hEBVUq4sGLJKF2MONN4+XK8Iti9TQbP9ZgE+Pz0fVw/i6
-         4fMZDFEbuBK9UtggnzVk5SV66zfHCDGxudva1afYHU08eb1LuXMjT8K+0uSzJTiHDgAL
-         8SkYrFDluwBWPXM2Z0TmUEMNJyxlPO4ClpYD6fOvunqRW+FKdM7IQh/AKCc6bapzn4Zh
-         A7bw==
-X-Gm-Message-State: AOJu0Yzldhv4eNShHSwOy44GbLutDqxaNKJ1sAcVFyHlddtUX+42Gb2X
-	ILA91xwwvhsFKGCAMO8zC3m4tFxegl2IAWbxuDzLMfa0atGscEDn350M+fnbT9WWhic1z+twX5Z
-	D47+GyF/CAZ2nfhlksJjmWW0j2oDKIKT5RKD+
-X-Google-Smtp-Source: AGHT+IE3NE4xZ8gZxTyssnkNn9U/3K1cHlKUZhTKzL2n9vlIipnglEJfjK8oBO5MAIw8EwAc1X6invOy/6Q3BYEwn04=
-X-Received: by 2002:a05:651c:2209:b0:2fa:d296:6fbf with SMTP id
- 38308e7fff4ca-2fae0ffcb20mr13607111fa.1.1727854435185; Wed, 02 Oct 2024
- 00:33:55 -0700 (PDT)
+	s=arc-20240116; t=1727854671; c=relaxed/simple;
+	bh=WJDXLihwEt5Fn8KRMQVtpsVtQyCTZzy/CXej5tha83s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=S7jtgxHa7U2Wicr9LuHoWc7MoEE+xKF30g9Ee4WATuk2CBpAuUaGGNCIS9EHSqKQAPfYntLJO7LGvKMBEUaPPSGKBREwna3UnyldX9llIs39ZZaABtJnpc0Ic+EHTrE0T07rXLdEC6HS4qQQzpkomS53ukxHBK7C5oGG2Yw4n7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A+064Tfg; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BCF38E0008;
+	Wed,  2 Oct 2024 07:37:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727854657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lByhxrRqD4ymTprjjNv5qEv5Ejf4B1h8Q4fRhWuLTBI=;
+	b=A+064TfggQbsU27miSn/QxgXl2o5fXk+MvFPWH65hti4emQI6pih+BkIv7YpGfRrqsILiB
+	sgfZvyU1LKc563fTlDSCENgkKTSLHXUe6XhJPuulvQrGo2U75MQviW0cMuMRqlPDIUUNP+
+	K3ycFhjKBkNt5ujFAjfx9bGMrsiaotkbyrETwywe4iqGP/+sfx9Ke4KYGA0dc/Ko9Puu0P
+	Veo5jrUCUnaQjPDNH6ULU7G0YvdRNhtuiiSdT5ARMysxQEV0ANhLpKlyMP+MvVOr9mPnF4
+	qizY03AS0hwYay94OCE1TZr+ExSg0/LSDDDRvQszXESa+e9tI8tBzcSX3qznvQ==
+Date: Wed, 2 Oct 2024 09:37:36 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, claudiu.manoil@nxp.com
+Subject: Re: [PATCH net-next 5/6] net: gianfar: use devm for request_irq
+Message-ID: <20241002093736.43af4008@fedora.home>
+In-Reply-To: <20241001212204.308758-6-rosenp@gmail.com>
+References: <20241001212204.308758-1-rosenp@gmail.com>
+	<20241001212204.308758-6-rosenp@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1727849643-11648-1-git-send-email-guoxin0309@gmail.com>
-In-Reply-To: <1727849643-11648-1-git-send-email-guoxin0309@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Oct 2024 09:33:44 +0200
-Message-ID: <CANn89iLq0g=TmL+nABr=j4N2gw45yJgRr6g8YOX+iMdWrM3jOg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: remove unnecessary update for tp->write_seq
- in tcp_connect()
-To: "xin.guo" <guoxin0309@gmail.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, Oct 2, 2024 at 8:14=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wrote=
-:
->
-> From: "xin.guo" <guoxin0309@gmail.com>
->
-> Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
-> introduce tcp_connect_queue_skb() and it would overwrite tcp->write_seq,
-> so it is no need to update tp->write_seq before invoking
-> tcp_connect_queue_skb()
->
-> Signed-off-by: xin.guo <guoxin0309@gmail.com>
+Hi Rosen,
+
+On Tue,  1 Oct 2024 14:22:03 -0700
+Rosen Penev <rosenp@gmail.com> wrote:
+
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->  net/ipv4/tcp_output.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-> index 4fd746b..f255c7d 100644
-> --- a/net/ipv4/tcp_output.c
-> +++ b/net/ipv4/tcp_output.c
-> @@ -4134,7 +4134,7 @@ int tcp_connect(struct sock *sk)
->         if (unlikely(!buff))
->                 return -ENOBUFS;
->
-> -       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
-> +       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
->         tcp_mstamp_refresh(tp);
->         tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
->         tcp_connect_queue_skb(sk, buff);
-> --
-> 1.8.3.1
->
+>  drivers/net/ethernet/freescale/gianfar.c | 67 +++++++-----------------
+>  1 file changed, 18 insertions(+), 49 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
+> index 07936dccc389..78fdab3c6f77 100644
+> --- a/drivers/net/ethernet/freescale/gianfar.c
+> +++ b/drivers/net/ethernet/freescale/gianfar.c
+> @@ -2769,13 +2769,6 @@ static void gfar_netpoll(struct net_device *dev)
+>  }
+>  #endif
+>  
+> -static void free_grp_irqs(struct gfar_priv_grp *grp)
+> -{
+> -	free_irq(gfar_irq(grp, TX)->irq, grp);
+> -	free_irq(gfar_irq(grp, RX)->irq, grp);
+> -	free_irq(gfar_irq(grp, ER)->irq, grp);
+> -}
+> -
+>  static int register_grp_irqs(struct gfar_priv_grp *grp)
+>  {
+>  	struct gfar_private *priv = grp->priv;
+> @@ -2789,80 +2782,58 @@ static int register_grp_irqs(struct gfar_priv_grp *grp)
+>  		/* Install our interrupt handlers for Error,
+>  		 * Transmit, and Receive
+>  		 */
+> -		err = request_irq(gfar_irq(grp, ER)->irq, gfar_error, 0,
+> -				  gfar_irq(grp, ER)->name, grp);
+> +		err = devm_request_irq(priv->dev, gfar_irq(grp, ER)->irq,
+> +				       gfar_error, 0, gfar_irq(grp, ER)->name,
+> +				       grp);
 
-At line 3616, there is this comment :
+This is called during open/close, so the lifetime of the irqs
+isn't tied to the struct device, devm won't apply here. If you
+open/close/re-open the device, you'll request the same irq multiple
+times.
 
-/* FIN eats a sequence byte, write_seq advanced by tcp_queue_skb(). */
-
-I think you need to add a similar one. Future readers will thank you.
-
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 4fd746bd4d54f621601b20c3821e71370a4a615a..86dea6f022d36cb56ef5678add2=
-bd63132eee20f
-100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -4134,7 +4134,10 @@ int tcp_connect(struct sock *sk)
-        if (unlikely(!buff))
-                return -ENOBUFS;
-
--       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
-+       /* SYN eats a sequence byte, write_seq updated by
-+        * tcp_connect_queue_skb()
-+        */
-+       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
-        tcp_mstamp_refresh(tp);
-        tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
-        tcp_connect_queue_skb(sk, buff);
+Maxime
 
