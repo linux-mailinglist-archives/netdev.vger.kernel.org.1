@@ -1,177 +1,138 @@
-Return-Path: <netdev+bounces-131241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17DA798D8FD
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:07:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86BE98D976
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F0331F24702
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:07:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61CD3B24BB3
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010DA1D150D;
-	Wed,  2 Oct 2024 14:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE241D12FF;
+	Wed,  2 Oct 2024 14:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SY1hFGxR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o/kySAcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE9C1D0955
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 14:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7EC1D07BA
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 14:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727877737; cv=none; b=QUVKJv61QB5cdOBxneYu6Tfpuc1KSZ/cOkbzu4+8fcPQJ0FiXOoCCpS/+NQWL1tln0q9uCwXFsKyK6/7XLdXmsrTtcWSBU9eaoS9cHoKbkUYka501r3HWO6DWdy+7McH6Syu+efFDXbcTzPrtLwbyvEtR/yDOd7e69Rqa2f/X1U=
+	t=1727878013; cv=none; b=SYFV0SD3Klh9f8ZV8F4sa5/9kVKCHbgbUWZ6PAda7qV18B0VLp4IKVE7HHpW1o0liYIfHJCgilX3EHeFhK9CjDGGpVOKDXZXbj21t8+jwtsB9T6rd8V8l0om3+2FgUPdjMUDFfTIsXkwvOQRe5FoDSfpu0QNyMQMic8/mevbg2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727877737; c=relaxed/simple;
-	bh=Frk2jjcDRjJQq7k8VaiE06LgSr0fC3zHmucqxnAwl2s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KoJJIN7HfnAxFru/B6zFZwRcfui3XLzggCCw848zCGsWYYbGGWUvEAF9RN49Z3QMn1/5sl1xGd6WXA6kCgNbyeU+IsMuTHa2LzxgNtsy+WsuLXU3ExWd4+Lfj9jmLavSXDAusbYWjsMzK8cp4nxpXwdwg5ZoTZOOyfpGh3xPerI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SY1hFGxR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727877735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bkyE5n67+2FhEmvlc1Gz1kCYfCQ3DT7+FsW83fvB9to=;
-	b=SY1hFGxREIWmIl2mg9y5fjpUaqHUz5JWrmxax4Ja1SCReZLASpa8BbnfPHVnz7ZsJd0sH1
-	GRKv/eJ/9qE9ppGe4Va5LZHWVD07gYb7FIT6y2Je3PrUzTgSmHA+5f6xevvj7mpPPM70f8
-	09XdeGNUkAcFlvEI1fA2CL1ylDqRCtw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-6Wl6dRpmMkO7PBdsYPVVGQ-1; Wed, 02 Oct 2024 10:02:14 -0400
-X-MC-Unique: 6Wl6dRpmMkO7PBdsYPVVGQ-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a8d13a9cc2cso33055966b.3
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 07:02:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727877733; x=1728482533;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1727878013; c=relaxed/simple;
+	bh=Fh6rKC3S3btJcAWcrNdS0E6/fXhESc85nRi7rge6CEs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ndmHi+3USucZJD4/LOyiaC0ZV9wFSK0X44+nRonENPkrrnBNAP4fp1Cbn4/m+rFIfbrOJ2vyyil8RIgM+ZSjpi6SLDrHED/aShjsXfivNua3IgrN68yy9ZI7XTHImMIjvvZgRP8o481quGkUpt4Kw9Emtp81zcws8Cn4E7CEruw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o/kySAcV; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c88e6926e5so4441965a12.3
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 07:06:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727878010; x=1728482810; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bkyE5n67+2FhEmvlc1Gz1kCYfCQ3DT7+FsW83fvB9to=;
-        b=M6hpMNCdaWtBApr5ts51+ayU3s30OvgxQaK0aYgZ2Tt7jCkNn/WNu0PuNTyYRRpLC2
-         zOnG/oDiCsNWg2g2UYZwKvCc+8r4ttjFubKZPVsqvhLW0b1/8Upqx+J1axJW+sYIOM7q
-         poWvEoZejJESOyHx3g2d6yyY6F9YmsNpS3WINjl86/wFZtrQJE9ZD+312VAPtmqicl02
-         9RkrvfCmKOIbhe98Nrx9Lin0vA1p7d0e3/gp+xuiL4PZtC6eDQDiJ1qxO/V1JTAz4WJ2
-         VlBgQ6Cw9cmfi/LFajK+yuNYRuuT0j4OMc4ZTQH3H5PGJvHTk7NgJH38xWKHfX54NPkK
-         UyHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiZiK2gzZPyU3MQU/jIIZ23LyBM2bh8Zq3QweBP5EurspPeTLy7kQri2B4rOtynls/Jwi+r2s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeuNATN1n25kArRoFI2hFtavETOvkOn9X7DixEzp1dfMHkM1zi
-	mwqYIn2/m8f4fGyYCjSFRP+Fzmi/WaYd38dpurlliP0qhGHIBVbFmENXmSli9NQUjM5iA3oJDT+
-	eBAgH9I29+UTIWJFiYBznA7/8RPg3CEisybkf6PPdo6ACuGEieau4cg==
-X-Received: by 2002:a17:907:7ba1:b0:a7d:e956:ad51 with SMTP id a640c23a62f3a-a98f82450b8mr290197166b.21.1727877732693;
-        Wed, 02 Oct 2024 07:02:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGelE8fxwK/xwgNE2Rv74byuFA2F7hxuFV/ZEUjU6Gi3oxGwmQvv3Bi4arRb61wV4RR9t3zOw==
-X-Received: by 2002:a17:907:7ba1:b0:a7d:e956:ad51 with SMTP id a640c23a62f3a-a98f82450b8mr290190266b.21.1727877731869;
-        Wed, 02 Oct 2024 07:02:11 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93c299aca5sm873146366b.224.2024.10.02.07.02.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 07:02:11 -0700 (PDT)
-Date: Wed, 2 Oct 2024 16:02:06 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Christian Brauner <brauner@kernel.org>, 
-	Luigi Leonardi <luigi.leonardi@outlook.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Marco Pinna <marco.pinn95@gmail.com>, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] vsock/virtio: use GFP_ATOMIC under RCU read lock
-Message-ID: <jfajjomq7wla2gf2cf2zwzyslxmnnrkxn6kvewwkexqwig52b4@fwh5mtjcdile>
-References: <3fbfb6e871f625f89eb578c7228e127437b1975a.1727876449.git.mst@redhat.com>
+        bh=ycWKe7ZnPME1606lWNA1NG3LqqUtV88DDy2wuflUiFQ=;
+        b=o/kySAcVMyjkbhl6kclx1PctU61FU2K0dTLvUaAwkkseImXzGiEIludZKEp2SW07A3
+         Z+elTeIjH17F+zy5VB1lrWQjfTB50x1EwvU75cebtB23DCrMYL2ftaEt7dzOCHV9YCYP
+         7GIB0SUJNCdoSHHTtivn41H+btQJIdN7cSSjypi35Pr58iLtqoWO0+HCtvBmgEA6pkrp
+         GDd+823e31ha9wiu5hRsJopWmcIkoJx95g3bDHujZI7fYkJSdDvEDMyyO3LZVCpN41Jb
+         NJ7YxqHZEjzxOtgb9MfNbAT2QxeyltoKD2A4YuY4oDlREUYHRQT7wYmnz6uiyvyPiMDY
+         nbWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727878010; x=1728482810;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ycWKe7ZnPME1606lWNA1NG3LqqUtV88DDy2wuflUiFQ=;
+        b=d/6bS3i4GmJ3rqFbLQrN0IKUglDxDr7VJJQXGc2Xv91YM5+PC1L1FoKnEtN/vZ4qke
+         vl6XW5ofnBwBJpX4sbOlLKpapBF/kI9zSTHYjy7mjXDwVSLjJgqCVx8rL1dO7LrCRoy9
+         5VEo3A0wV0/Ako+9Kh/H/uerixxjbD93dMTCOylIbnbhW8sJXyGs4nIguFhIa67/IqV4
+         7m7CxtfmdM1oYbQJAPfgwDZbIQzcORoWxF3hBl6dKYITcghBOZjZQFO+wkWIFizzmmFe
+         choPpjBhuBVP+AwP0UjyhuFCECe+QunqYpfsdqQIkPyaSAsN09RDrKb8mIihzosBIFW+
+         6JLg==
+X-Forwarded-Encrypted: i=1; AJvYcCWHgk2OhD5F/klknMrICK/A4mz7HARvqR9CKxkP86UALL6yAvSjfrI9y2kv3tafgvTZSM1Ke9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoFTvLa6Yh3U0lD78m0TFYVNWhBXniE9YO28SVK1CwuHkizx1O
+	On4f8vfkXl5XRCsWMn046rqC9/UmkaKdx5Dl8HTDWl1Y0O375VJ5w/ULlkIqPJ0jt8iqWmvLh0M
+	Mdm8E2kp0Wc4nuy49IfG8p7WlqFfVpD+XAzFu
+X-Google-Smtp-Source: AGHT+IFEpvKEGYAZ5zRXiOzP+idu3sFTlx+kdgSbMC+V3cvGdTVsi51sV4cHBuhSaRQNpTiLm9IKWBTZsSMnaLD5hOY=
+X-Received: by 2002:a05:6402:4409:b0:5c2:8249:b2d3 with SMTP id
+ 4fb4d7f45d1cf-5c8b1b702abmr2672361a12.26.1727878009795; Wed, 02 Oct 2024
+ 07:06:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <3fbfb6e871f625f89eb578c7228e127437b1975a.1727876449.git.mst@redhat.com>
+References: <20240930152304.472767-1-edumazet@google.com> <20240930152304.472767-2-edumazet@google.com>
+ <20241002064735.5b1127ab@kernel.org>
+In-Reply-To: <20241002064735.5b1127ab@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 2 Oct 2024 16:06:36 +0200
+Message-ID: <CANn89iLzR5PY+7s9r_wFTNfS73jYsLvqj=vaT5jYvbRcxCve7g@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: add IFLA_MAX_PACING_OFFLOAD_HORIZON
+ device attribute
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Jeffrey Ji <jeffreyji@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 02, 2024 at 09:41:42AM GMT, Michael S. Tsirkin wrote:
->virtio_transport_send_pkt in now called on transport fast path,
->under RCU read lock. In that case, we have a bug: virtio_add_sgs
->is called with GFP_KERNEL, and might sleep.
+On Wed, Oct 2, 2024 at 3:47=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
->Pass the gfp flags as an argument, and use GFP_ATOMIC on
->the fast path.
+> On Mon, 30 Sep 2024 15:23:03 +0000 Eric Dumazet wrote:
+> > @@ -1867,6 +1868,9 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+> >                       READ_ONCE(dev->tso_max_size)) ||
+> >           nla_put_u32(skb, IFLA_TSO_MAX_SEGS,
+> >                       READ_ONCE(dev->tso_max_segs)) ||
+> > +         nla_put_u64_64bit(skb, IFLA_MAX_PACING_OFFLOAD_HORIZON,
+> > +                           READ_ONCE(dev->max_pacing_offload_horizon),
+> > +                           IFLA_PAD) ||
 >
->Link: https://lore.kernel.org/all/hfcr2aget2zojmqpr4uhlzvnep4vgskblx5b6xf2ddosbsrke7@nt34bxgp7j2x
->Fixes: efcd71af38be ("vsock/virtio: avoid queuing packets when intermediate queue is empty")
->Reported-by: Christian Brauner <brauner@kernel.org>
->Cc: Stefano Garzarella <sgarzare@redhat.com>
->Cc: Luigi Leonardi <luigi.leonardi@outlook.com>
->Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
->---
->
->Lightly tested. Christian, could you pls confirm this fixes the problem
->for you? Stefano, it's a holiday here - could you pls help test!
+> nla_put_uint() ?
 
-Sure, thanks for the quick fix! I was thinking something similar ;-)
+Yes, I can do this. Some backports hassles for us with older kernels.
 
->Thanks!
 >
+> >  #ifdef CONFIG_RPS
+> >           nla_put_u32(skb, IFLA_NUM_RX_QUEUES,
+> >                       READ_ONCE(dev->num_rx_queues)) ||
+> > @@ -2030,6 +2034,7 @@ static const struct nla_policy ifla_policy[IFLA_M=
+AX+1] =3D {
+> >       [IFLA_ALLMULTI]         =3D { .type =3D NLA_REJECT },
+> >       [IFLA_GSO_IPV4_MAX_SIZE]        =3D { .type =3D NLA_U32 },
+> >       [IFLA_GRO_IPV4_MAX_SIZE]        =3D { .type =3D NLA_U32 },
+> > +     [IFLA_MAX_PACING_OFFLOAD_HORIZON]=3D { .type =3D NLA_REJECT },
 >
-> net/vmw_vsock/virtio_transport.c | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+> Let's do this instead ?
 >
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index f992f9a216f0..0cd965f24609 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -96,7 +96,7 @@ static u32 virtio_transport_get_local_cid(void)
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index f0a520987085..a68de5c15b46 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -1975,6 +1975,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
+>  }
 >
-> /* Caller need to hold vsock->tx_lock on vq */
-> static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
->-				     struct virtio_vsock *vsock)
->+				     struct virtio_vsock *vsock, gfp_t gfp)
-> {
-> 	int ret, in_sg = 0, out_sg = 0;
-> 	struct scatterlist **sgs;
->@@ -140,7 +140,7 @@ static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
-> 		}
-> 	}
->
->-	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
->+	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, gfp);
-> 	/* Usually this means that there is no more space available in
-> 	 * the vq
-> 	 */
->@@ -178,7 +178,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
->
-> 		reply = virtio_vsock_skb_reply(skb);
->
->-		ret = virtio_transport_send_skb(skb, vq, vsock);
->+		ret = virtio_transport_send_skb(skb, vq, vsock, GFP_KERNEL);
-> 		if (ret < 0) {
-> 			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
-> 			break;
->@@ -221,7 +221,7 @@ static int virtio_transport_send_skb_fast_path(struct virtio_vsock *vsock, struc
-> 	if (unlikely(ret == 0))
-> 		return -EBUSY;
->
->-	ret = virtio_transport_send_skb(skb, vq, vsock);
+>  static const struct nla_policy ifla_policy[IFLA_MAX+1] =3D {
+> +       [IFLA_UNSPEC]           =3D { .strict_start_type =3D IFLA_DPLL_PI=
+N },
+>         [IFLA_IFNAME]           =3D { .type =3D NLA_STRING, .len =3D IFNA=
+MSIZ-1 },
+>         [IFLA_ADDRESS]          =3D { .type =3D NLA_BINARY, .len =3D MAX_=
+ADDR_LEN },
+>         [IFLA_BROADCAST]        =3D { .type =3D NLA_BINARY, .len =3D MAX_=
+ADDR_LEN },
 
-nit: maybe we can add a comment here:
-         /* GFP_ATOMIC because we are in RCU section, so we can't sleep */
->+	ret = virtio_transport_send_skb(skb, vq, vsock, GFP_ATOMIC);
-> 	if (ret == 0)
-> 		virtqueue_kick(vq);
->
->-- 
->MST
->
++2
 
-I'll run some tests and come back with R-b when it's done.
-
-Thanks,
-Stefano
-
+Thanks.
 
