@@ -1,146 +1,181 @@
-Return-Path: <netdev+bounces-131121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E6A98CD1C
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 08:25:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A9198CD20
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 08:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C02C72849D6
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436961F22A2E
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73E312C470;
-	Wed,  2 Oct 2024 06:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFBF8289E;
+	Wed,  2 Oct 2024 06:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NVLKlXY9"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="hekt9xv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C1B2126BE5;
-	Wed,  2 Oct 2024 06:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306B72C6A3;
+	Wed,  2 Oct 2024 06:27:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727850310; cv=none; b=Wchow5sjJTqAup1yX58yhcNQbNwk8JKjiP7lsep0zL1w15sl5nyWne9AKhCKIE3oR28jxwX10EuslGsFNF3fyRo350UzUWnq0luzDGQ78edbJov+Xbxc/+lyVuDNofAL8UqqY44rsEkXpLxbdbpj9pptNKw1aPXERX91gL44pUc=
+	t=1727850446; cv=none; b=T2ne1SBlookXpG7uZj8n42OT3bwDEx35WkB90Eoj9v7O4O/W0RnxZUIhM8lz15M8jtST+gNEUM8+MGyunluS6w8WZBZN+feWFZp9CcW1AqjhMNXptJDz16FoOzXsOQqMWXie9tEgHBC3idGwrlsH42RPrcWQZVJq8aF56x9vmPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727850310; c=relaxed/simple;
-	bh=CxzhPjjhwSG/Nan8D08Fjfj1sfEsKjnAW/3CCKodaCA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eUXxC+SaYaRXKikbVbAuFFiNhkw4ujzfwsg9vFuLuCbSvToWJORgYBoWi9pzKFicYO4TdDgebEKw2K2NB8CPriE2FqnCprDMwvR1aQzq1qN+BcrYkJEaW27/S/iiS8Sbp597B0fEQ2/PitwPvKN8SC4KdEV3hGdqJ4+7ZwrEsls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NVLKlXY9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 00D13C4CECE;
-	Wed,  2 Oct 2024 06:25:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727850310;
-	bh=CxzhPjjhwSG/Nan8D08Fjfj1sfEsKjnAW/3CCKodaCA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=NVLKlXY9QTsB8XUS2pwqq/oxI3TR52Y6HF5QWP0jgXeBUAPGUlNf7txmJg5SsIk93
-	 FQcTghRZVsPVpAsV8zaUyidBZz+YSVm2i+1R2srYbW8pmAr9ftMsLXQXNE/ExgKEaA
-	 1M5T3TOLFp6v8ddeyJ545Dk+kGXSOVyvigmA60e6DfFKrS1Z9HUKTiPFND6TmkwGrz
-	 8KAhFm3GA9yzJrqKYq+8WZl76FA25L8/3wMM4t2u3no+BKUsN6iqY6o2ZH77PSsG26
-	 cKjnE2EVOfYgfYG2h+XTL45MvCbQb6X7C/mq8waVDIF0qrjPT4feNKAYEoAMfX2WY3
-	 gxq+qZXa0cHwQ==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3932CF319B;
-	Wed,  2 Oct 2024 06:25:09 +0000 (UTC)
-From: Eric Long via B4 Relay <devnull+i.hack3r.moe@kernel.org>
-Date: Wed, 02 Oct 2024 14:25:07 +0800
-Subject: [PATCH bpf-next v4 2/2] selftests/bpf: test linking with duplicate
- extern functions
+	s=arc-20240116; t=1727850446; c=relaxed/simple;
+	bh=cdeNZSlaf4wgajM+wtV5oD8xqOm7kYppKWnwnzsrpl4=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YRl27LXJqO2nkcxY/yxzEXG0cgwk4HN21k7zQDrMChRfampiggH9Bk33c23qITkGcy6npRWGqb/+2Y4WbeJ98cN+C+N1Q3MfuWOnHo8rryKWuv80hSFhAMjIWZKslxLMD9wZ/ZHr0gyh7k7t1GHixuMVE+Y86q0g8AsRfSEmvE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=hekt9xv8; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1727850446; x=1759386446;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=ZjfL4LhqHtNtAkk6mrWHDJeGzAPrJvnjoOFbpLwD/MM=;
+  b=hekt9xv8yQL5flwTP2Zv2vTjFxHjthqo7yqrQd2Ui5/XIfQWh1VTLHwn
+   MMgeN+4obHD1eW6s0DapIjdMKBuMIr0tMo3k+SI9KKm9ATf3zjWsmJ84w
+   hpBElAS6Erd1PT8S2Cz5oSa8vvYW76XVDQbhE7IRZI+WpagOiac+ezgBG
+   0=;
+X-IronPort-AV: E=Sophos;i="6.11,170,1725321600"; 
+   d="scan'208";a="437602994"
+Subject: RE: [net-next v2 1/2] ena: Link IRQs to NAPI instances
+Thread-Topic: [net-next v2 1/2] ena: Link IRQs to NAPI instances
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 06:27:23 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:22670]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.37.171:2525] with esmtp (Farcaster)
+ id 583c4745-b839-4366-b802-54632c3d9f4e; Wed, 2 Oct 2024 06:27:21 +0000 (UTC)
+X-Farcaster-Flow-ID: 583c4745-b839-4366-b802-54632c3d9f4e
+Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 2 Oct 2024 06:27:21 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 2 Oct 2024 06:27:21 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.035; Wed, 2 Oct 2024 06:27:21 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Joe Damato <jdamato@fastly.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Agroskin, Shay" <shayagr@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bshara, Saeed"
+	<saeedb@amazon.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Kamal Heib <kheib@redhat.com>, open list
+	<linux-kernel@vger.kernel.org>
+Thread-Index: AQHbFGLnoHgh9RqFZkiXjxqVx29jBbJy/1bQ
+Date: Wed, 2 Oct 2024 06:27:21 +0000
+Message-ID: <f8d5eb4f7f55418982677c0f247e46ed@amazon.com>
+References: <20241002001331.65444-1-jdamato@fastly.com>
+ <20241002001331.65444-2-jdamato@fastly.com>
+In-Reply-To: <20241002001331.65444-2-jdamato@fastly.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241002-libbpf-dup-extern-funcs-v4-2-560eb460ff90@hack3r.moe>
-References: <20241002-libbpf-dup-extern-funcs-v4-0-560eb460ff90@hack3r.moe>
-In-Reply-To: <20241002-libbpf-dup-extern-funcs-v4-0-560eb460ff90@hack3r.moe>
-To: bpf@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, netdev@vger.kernel.org, 
- Eric Long <i@hack3r.moe>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2354; i=i@hack3r.moe;
- h=from:subject:message-id;
- bh=eZzHlRs/qzyTmhLjl1HP9TOQSbvTRsCUeiiuNq2bdvg=;
- b=kA0DAAoWWD+rQAXGUr4ByyZiAGb850TI71YPK2BMRwLyO0afbgs8EE5nBLBdrC2+CLLgYBfZo
- Ih1BAAWCgAdFiEEtMP8JmAvi7KkC5x3WD+rQAXGUr4FAmb850QACgkQWD+rQAXGUr5JigD9FHEU
- HTOhPt1Ytjv+bQsvzADTfJoBgAADvkzRu5RP7eEBAJtugW6Mg1bqPPjiQetdDE+0pfaigQlQVIe
- +jPILQ1IO
-X-Developer-Key: i=i@hack3r.moe; a=openpgp;
- fpr=3A7A1F5A7257780C45A9A147E1487564916D3DF5
-X-Endpoint-Received: by B4 Relay for i@hack3r.moe/default with auth_id=225
-X-Original-From: Eric Long <i@hack3r.moe>
-Reply-To: i@hack3r.moe
 
-From: Eric Long <i@hack3r.moe>
+> Link IRQs to NAPI instances with netif_napi_set_irq. This information can=
+ be
+> queried with the netdev-genl API. Note that the ENA device appears to
+> allocate an IRQ for management purposes which does not have a NAPI
+> associated with it; this commit takes this into consideration to accurate=
+ly
+> construct a map between IRQs and NAPI instances.
+>=20
+> Compare the output of /proc/interrupts for my ena device with the output
+> of netdev-genl after applying this patch:
+>=20
+> $ cat /proc/interrupts | grep enp55s0 | cut -f1 --delimiter=3D':'
+>  94
+>  95
+>  96
+>  97
+>  98
+>  99
+> 100
+> 101
+>=20
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --dump napi-get --json=3D'{"ifindex": 2}'
+>=20
+> [{'id': 8208, 'ifindex': 2, 'irq': 101},
+>  {'id': 8207, 'ifindex': 2, 'irq': 100},
+>  {'id': 8206, 'ifindex': 2, 'irq': 99},
+>  {'id': 8205, 'ifindex': 2, 'irq': 98},
+>  {'id': 8204, 'ifindex': 2, 'irq': 97},
+>  {'id': 8203, 'ifindex': 2, 'irq': 96},
+>  {'id': 8202, 'ifindex': 2, 'irq': 95},
+>  {'id': 8201, 'ifindex': 2, 'irq': 94}]
+>=20
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>  v2:
+>    - Preserve reverse christmas tree order in ena_request_io_irq
+>    - No functional changes
+>=20
+>  drivers/net/ethernet/amazon/ena/ena_netdev.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> index c5b50cfa935a..74ce9fa45cf8 100644
+> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+> @@ -1677,9 +1677,9 @@ static int ena_request_mgmnt_irq(struct
+> ena_adapter *adapter)  static int ena_request_io_irq(struct ena_adapter
+> *adapter)  {
+>         u32 io_queue_count =3D adapter->num_io_queues + adapter-
+> >xdp_num_queues;
+> +       int rc =3D 0, i, k, irq_idx;
+>         unsigned long flags =3D 0;
+>         struct ena_irq *irq;
+> -       int rc =3D 0, i, k;
+>=20
+>         if (!test_bit(ENA_FLAG_MSIX_ENABLED, &adapter->flags)) {
+>                 netif_err(adapter, ifup, adapter->netdev, @@ -1705,6 +170=
+5,16 @@
+> static int ena_request_io_irq(struct ena_adapter *adapter)
+>                 irq_set_affinity_hint(irq->vector, &irq->affinity_hint_ma=
+sk);
+>         }
+>=20
+> +       /* Now that IO IRQs have been successfully allocated map them to =
+the
+> +        * corresponding IO NAPI instance. Note that the mgmnt IRQ does n=
+ot
+> +        * have a NAPI, so care must be taken to correctly map IRQs to NA=
+PIs.
+> +        */
+> +       for (i =3D 0; i < io_queue_count; i++) {
+> +               irq_idx =3D ENA_IO_IRQ_IDX(i);
+> +               irq =3D &adapter->irq_tbl[irq_idx];
+> +               netif_napi_set_irq(&adapter->ena_napi[i].napi, irq->vecto=
+r);
+> +       }
+> +
+>         return rc;
+>=20
+>  err:
+> --
+> 2.25.1
 
-Previously when multiple BPF object files referencing the same extern
-function (usually kfunc) are statically linked using `bpftool gen
-object`, libbpf tries to get the nonexistent size of BTF_KIND_FUNC_PROTO
-and fails. This test ensures it is fixed.
+LGTM.
 
-Signed-off-by: Eric Long <i@hack3r.moe>
----
- tools/testing/selftests/bpf/progs/linked_funcs1.c | 8 ++++++++
- tools/testing/selftests/bpf/progs/linked_funcs2.c | 8 ++++++++
- 2 files changed, 16 insertions(+)
-
-diff --git a/tools/testing/selftests/bpf/progs/linked_funcs1.c b/tools/testing/selftests/bpf/progs/linked_funcs1.c
-index cc79dddac182c20da69a1a57fa39bc81004184f1..049a1f78de3f835e7658dde6f2d03161b6a5a07f 100644
---- a/tools/testing/selftests/bpf/progs/linked_funcs1.c
-+++ b/tools/testing/selftests/bpf/progs/linked_funcs1.c
-@@ -63,6 +63,8 @@ extern int set_output_val2(int x);
- /* here we'll force set_output_ctx2() to be __hidden in the final obj file */
- __hidden extern void set_output_ctx2(__u64 *ctx);
- 
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
- SEC("?raw_tp/sys_enter")
- int BPF_PROG(handler1, struct pt_regs *regs, long id)
- {
-@@ -86,4 +88,10 @@ int BPF_PROG(handler1, struct pt_regs *regs, long id)
- 	return 0;
- }
- 
-+/* Generate BTF FUNC record and test linking with duplicate extern functions */
-+void kfunc_gen1(void)
-+{
-+	bpf_cast_to_kern_ctx(0);
-+}
-+
- char LICENSE[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/progs/linked_funcs2.c b/tools/testing/selftests/bpf/progs/linked_funcs2.c
-index 942cc5526ddf02004bf82d1f72c74cfba6eaf486..96850759fd8d0074249bbf1f743aab08e20de0fc 100644
---- a/tools/testing/selftests/bpf/progs/linked_funcs2.c
-+++ b/tools/testing/selftests/bpf/progs/linked_funcs2.c
-@@ -63,6 +63,8 @@ extern int set_output_val1(int x);
- /* here we'll force set_output_ctx1() to be __hidden in the final obj file */
- __hidden extern void set_output_ctx1(__u64 *ctx);
- 
-+void *bpf_cast_to_kern_ctx(void *obj) __ksym;
-+
- SEC("?raw_tp/sys_enter")
- int BPF_PROG(handler2, struct pt_regs *regs, long id)
- {
-@@ -86,4 +88,10 @@ int BPF_PROG(handler2, struct pt_regs *regs, long id)
- 	return 0;
- }
- 
-+/* Generate BTF FUNC record and test linking with duplicate extern functions */
-+void kfunc_gen2(void)
-+{
-+	bpf_cast_to_kern_ctx(0);
-+}
-+
- char LICENSE[] SEC("license") = "GPL";
-
--- 
-2.46.2
-
-
+Reviewed-by: David Arinzon <darinzon@amazon.com>
 
