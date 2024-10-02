@@ -1,123 +1,114 @@
-Return-Path: <netdev+bounces-131274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC16698DFCE
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:53:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1277598DFD5
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 17:54:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7438B1F2A343
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6D9A287F95
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D861D0164;
-	Wed,  2 Oct 2024 15:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72E3D1D0DD1;
+	Wed,  2 Oct 2024 15:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BrjRNK2A"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l6M/p1FD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8E11D0487
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 15:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6AB61D04A9;
+	Wed,  2 Oct 2024 15:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727884323; cv=none; b=khp78WLFeOSsOPbAKvsY+ERbTB3EPTKflwVDQHkb5Dhc/JiPSSBfXVnYkbGJpUSDcBf7xPyZ76pVCm+Wusr7blK3u03ykvOzhlBRPATs/NnJ9QxZ0+MJWSZacKhPJCpiO1K8Bd7G85ovquAfOw6dQeP5/p+6AbwpvrJKElIqsNU=
+	t=1727884396; cv=none; b=aIKzEQ2mFDvkiVJKexleO4bX3EEyS9oK2gh8ZraXRlXPygfoeMOH4bL4gQ/6HMoBWQ/sy0VVQVdJsDjIHA15yWP3LBS+5JrGY3ZOtIse/hDqg6XCrC/SWiJq5qsMp6JsZQlSt7gIG5z7chKr4M4Ip3A2ClapXTBHPu34e/P2tn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727884323; c=relaxed/simple;
-	bh=Rqg/XO+Oc8nG+ZJzexxzf1ED/UAbA/S0EUt2nkSxqNQ=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SLDaKAdmgnEk8SpF2s2oy1Nqh7IRantP7xLiYBIBf9/lUcKrMi4TnFzFucaiHOMgWeA6masuSZgPJEM0Pp4OLb+erIs8GpO3PpJ/mvivTh7bVZB4uIUjJ2JhS2G2QvLhvPPPef0X7wcc8YjrQr37u/dn6GNmcB8zk6DS8Ql5plc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BrjRNK2A; arc=none smtp.client-ip=209.85.216.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-2e075ceebdaso5160390a91.2
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 08:52:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727884321; x=1728489121; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Rqg/XO+Oc8nG+ZJzexxzf1ED/UAbA/S0EUt2nkSxqNQ=;
-        b=BrjRNK2Aj6o+hbF6bu1O+ktzysQ+lwzUhy6iISp/oUz6gxcj9M7wN3sTXR8uSP3hzG
-         oiDVAar5Of61DY32pkSWjUWHH9ssziCafLCEd2ci9fjr74mITfxFUHvuzuOk0aARkN3u
-         89ZpAEKs1F9+Yjdf6W+jqerx84QU70i/v62v6eZRea+6eE7vbMtkNntAF9DQ2UqCkCVS
-         0+6WxhEbbXOTcZPYtmWSYC/adc//nAiYlEVxQ58HcB0UVz8kQUd9xmQBss4/ccQ4w2vC
-         a/R04/HcZuAqw+293gCvgwB5hqdhi8zevm56EbnyHPoCeJcU50BAblvmFg4BZUzX6sXN
-         GouA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727884321; x=1728489121;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Rqg/XO+Oc8nG+ZJzexxzf1ED/UAbA/S0EUt2nkSxqNQ=;
-        b=eRe6NbQdAs8XZq2uJcs9tOhJDo3+F0gf/wD8sV369TAvYRzMheGDkN7J8HqJGld/79
-         Qi78LUtM8In4noaj7clxlydVDOjSYpK9+38kXW/4WEauIKj42UkIDBvyaY9TP9F32HXi
-         cCU+xK92QBxXy0C678ZSVFyqhTD0qwmlg5sKTeZhp1JVC3OHqzf/c3jyTSmlizvcmeGd
-         BOBsjmXuPvWekAR/zzW4K9i7GDh07J1hAYzLJf8fc4N+vRehD9HNz33rkwPOYaJUrvcT
-         UaPw+mwNz1P5BQa7JuQWP597kS8SMoiVBJrWOGk12oHQSxx7LFswo3evi5e6cWL8dUcf
-         d5Cg==
-X-Gm-Message-State: AOJu0YxgWTRH+T4C1fFjuBmw2HE05XHH4LXXUF5mEMdcVR7Zm+Y6u2kx
-	tDVcX5olbMt6j4z072Q/FcNKwc/5AFYphTV+xnCYE2quocLQ64G9J86nVhRxE3Zl8hnlrzxOSJL
-	Sgd82ASsZ5mEhvUn6vUDDZKfM4gc=
-X-Google-Smtp-Source: AGHT+IH6LOXn13ipdIpW4SIqlXEyTWMBJaNYITUCqWHcgrMdANI+2pBZexGwAlgpnStWL9UFhgm2LGtNeeGTCEpW+Pg=
-X-Received: by 2002:a17:90a:e38c:b0:2d8:b205:2345 with SMTP id
- 98e67ed59e1d1-2e18481a960mr4368306a91.23.1727884321416; Wed, 02 Oct 2024
- 08:52:01 -0700 (PDT)
+	s=arc-20240116; t=1727884396; c=relaxed/simple;
+	bh=GneNjFyA+rxAprS9HItyMAhmg49Z/BVqZDm+BgBOtTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FJEm4hfgDuGfraaj9gjjaIRgwr6YcKpZ1Z303N3FrNEDG/3NcGSq4K0XKgJn4TxYCkE9uvYCzNB4DPX3n/AVzZKePA7k4ulUHTUj9mNbODxTvnhgeVUZtISggKRAbJlAqqtg7W1kurFornXxePPB89biYJRVsBriXgam0ErMkNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l6M/p1FD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=42dCFtvLbpPDj6zUz654KCaWzorsTLfkaBbV+xZ6gLk=; b=l6
+	M/p1FDzpq2s28NZSAabEaLRbzfZP4Ta9dIW1Edf4J4xAeS7ANB6d2xNTZqPq/df6ESNHGhnly5Q6T
+	j6dQXZ1uuH1syuNFfc9R/fHw0AxJUcfW7SUbvRY8u9DVYI2/ZkJ2pFZSCfBvDLMwkQYHIsid/SVXi
+	jnkVb6nAWzW2avU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sw1f3-008sIm-Tn; Wed, 02 Oct 2024 17:53:09 +0200
+Date: Wed, 2 Oct 2024 17:53:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+Cc: "inguin@gmx.de" <inguin@gmx.de>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dmurphy@ti.com" <dmurphy@ti.com>
+Subject: Re: [PATCH] net: phy: dp83869: fix memory corruption when enabling
+ fiber
+Message-ID: <2ac17718-9bd8-4bc4-8c80-0afff99b1ddc@lunn.ch>
+References: <20241001075733.10986-1-inguin@gmx.de>
+ <c9baa43edbde4a6aab7ec32a25eec4dae7031443.camel@siemens.com>
+ <9e970294-912a-4bc4-8841-3515f789d582@gmx.de>
+ <c26909742e1f2bbe8f96699c1bbd54c2eada42ce.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Zichen Xie <zichenxie0106@gmail.com>
-Date: Wed, 2 Oct 2024 10:51:52 -0500
-Message-ID: <CANdh5G7KBdzVcyrf5dPG2fbXQ5KCzr0LXu_p38H2-Cd4_FNsxw@mail.gmail.com>
-Subject: net/hsr: Question about hsr_port_get_hsr() and possbile null-pointer-dereference
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, lukma@denx.de, 
-	aleksander.lobakin@intel.com, n.zhandarovich@fintech.ru, ricardo@marliere.net, 
-	m-karicheri2@ti.com
-Cc: netdev@vger.kernel.org, Zijie Zhao <zzjas98@gmail.com>, 
-	Chenyuan Yang <chenyuan0y@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c26909742e1f2bbe8f96699c1bbd54c2eada42ce.camel@siemens.com>
 
-Dear Developers for NETWORKING [GENERAL],
+On Tue, Oct 01, 2024 at 01:45:11PM +0000, Sverdlin, Alexander wrote:
+> Hi Ingo!
+> 
+> On Tue, 2024-10-01 at 15:31 +0200, Ingo van Lil wrote:
+> > On 10/1/24 12:40, Sverdlin, Alexander wrote:
+> > 
+> > > > diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+> > > > index d7aaefb5226b..9c5ac5d6a9fd 100644
+> > > > --- a/drivers/net/phy/dp83869.c
+> > > > +++ b/drivers/net/phy/dp83869.c
+> > > > @@ -645,7 +645,7 @@ static int dp83869_configure_fiber(struct phy_device *phydev,
+> > > >    		     phydev->supported);
+> > > > 
+> > > >    	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->supported);
+> > > > -	linkmode_set_bit(ADVERTISED_FIBRE, phydev->advertising);
+> > > > +	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phydev->advertising);
+> > > 
+> > > Are you sure this linkmode_set_bit() is required at all?
+> > 
+> > You're right, it's probably not required. I just tracked a weird bug
+> > down to this clear mistake and wanted to change as little as possible.
+> 
+> As little as possible would be not to add yet another bit set.
+> Obviously it has been working (if it was at all) without a proper write,
+> but dispite the incorrect write.
+> 
+> > The logic of the function seems a bit odd to me: At the beginning,
+> > advertising is ANDed with supported, and at the end it's ORed again.
+> > Inside the function they are mostly manipulated together.
+> > 
+> > Couldn't that be replaced with a simple "phydev->advertising =
+> > phydev->supported;" at the end?
+> 
+> Yes, the function looks strange.
+> But as this is for -stable, maybe complete rework is undesired.
+> IMO, just delete the bogus write.
 
-We are curious about the function hsr_port_get_hsr().
-The function may return NULL when it cannot find a corresponding port.
-But there is no NULL check in hsr_check_carrier_and_operstate() here:
-https://elixir.bootlin.com/linux/v6.12-rc1/source/net/hsr/hsr_device.c#L93
-The relevant code is:
-```
-master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
-/* netif_stacked_transfer_operstate() cannot be used here since
-* it doesn't set IF_OPER_LOWERLAYERDOWN (?)
-*/
-has_carrier = hsr_check_carrier(master);
-hsr_set_operstate(master, has_carrier);
-hsr_check_announce(master->dev);
-```
-There may be possible NULL Pointer Dereference.
-However, in hsr_dev_xmit() the NULL checker exists.
-```
-master = hsr_port_get_hsr(hsr, HSR_PT_MASTER);
-if (master) {
-skb->dev = master->dev;
-skb_reset_mac_header(skb);
-skb_reset_mac_len(skb);
-spin_lock_bh(&hsr->seqnr_lock);
-hsr_forward_skb(skb, master);
-spin_unlock_bh(&hsr->seqnr_lock);
-} else {
-dev_core_stats_tx_dropped_inc(dev);
-dev_kfree_skb_any(skb);
-}
-```
-So we are curious if this NULL check is necessary. The function
-hsr_port_get_hsr() is called several times, but NULL checks seem to
-exist occasionally.
++1 KISS for stable.
 
-Please kindly correct us if we missed any key information. Looking
-forward to your response!
+For net-next, as far as i can see, dp83869->mode is fixed at probe
+time. As a lot of the code here should be moved into .get_features.
 
-Best,
-Zichen
+	Andrew
 
