@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-131379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA3E98E591
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:52:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B717398E592
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0A5C286BE8
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:52:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 697091F225A7
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 21:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270A419CC26;
-	Wed,  2 Oct 2024 21:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B33D19ABD1;
+	Wed,  2 Oct 2024 21:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FX4Z3UQa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FHbpMF26"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B5A119ABD1
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 21:52:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7759199EA3
+	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 21:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727905927; cv=none; b=AlLRyBDHzLPcU1idihk5y9w/XkNuzM0jLtJ9b7nQXqexNOg8T7F2CBpgnC4hSIk8hZ3v5biQUbvFqb4d3I7hf7auHXqhrBE0yOhTEf5EiMu6v/OMwvn81uasOM3/LYv2/kgh8T1OCO6ft/dUi9LsTYEDxrtzoIa4PQjb7ndzhV8=
+	t=1727905928; cv=none; b=ROT79aR1v+0ttn+VDq6BCL5jSWvMBJwkRFpG/UCPoTD+SYVe4yEjK1LxFM4lo6isIRklvmL9Tr9fTCuiBRM0My3/bYRn174YTXYLobm8RhxeELYERohTP4YZuWiZTbZZjwPpDgxIaQWAlddUzTjpdpYrONMy671N34ERNdboZ3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727905927; c=relaxed/simple;
-	bh=xxfE0zIJdsxCAM61V+h/iAbbvPnxOfTiWpWlW4/yhlU=;
+	s=arc-20240116; t=1727905928; c=relaxed/simple;
+	bh=vy++shb5ncL/nVvgUxfjbJiY+nZ1X5a+bZhcxmIEiWs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=u4f9tLXS/u2YJaQwEqZ4jKO/cIUQBxQ2Q3rl7BvZ5bAgL7ToTRPlBfDv0xVdQLmdKrCqg85Ds8xgMTYlTxS3N7HXElCujQhrSIVAr353uXlosM6yrmG9Lxi1XFC0+EaoLTeXnYPm0f3JBD4Vv3Lys/8C0DwEux+9yw8JAg6tRqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FX4Z3UQa; arc=none smtp.client-ip=192.198.163.14
+	 In-Reply-To:To:Cc; b=sPToyGDM7Dz1WOIw+JwaXbGIiodrxg3Ecbh94iDJI66m6DKr4mSl5ca6Y5p1Lkqezwi3s0CKJ8cqrSbAIefGZ+T5oFMCjc6/KStqp/HzbVROkWEYOpAJukFOWrzEfnveXPiGyuh+PqHovhd1E7YTn9YjkJnng+ZRgI6RxSl4kbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FHbpMF26; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727905925; x=1759441925;
+  t=1727905927; x=1759441927;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=xxfE0zIJdsxCAM61V+h/iAbbvPnxOfTiWpWlW4/yhlU=;
-  b=FX4Z3UQa/YPOBT0fPYF70OdWtm2Cu36IslUnGh5JpXlqpRxNBIHo7Imy
-   OlbrKNeUQw/KbCIBSBED39OZRWErj14CC9lkORHINX81xC0xdqgeBxjKu
-   JX8G4J7Rr3eqU7UyjrCnyaagsFdFSXp5yDVEpj9MWIuztPJVG1xRv9FHY
-   tA8WxQvbvbvWfzckrpv9hcDBCTn2UlxK+UDUxtD55/ROU0ltoQ9Ps5nj9
-   BjB42gK23Ju1kYcE8LUmTRSl+i8Q+tUlsJAT6sYwaf8z3eNUhEcpb1dOG
-   idhv7wsXqF3K30d5S9i38c/OYwtLE/yIyg96nz2ePSthocSlX1g5MIp79
-   Q==;
-X-CSE-ConnectionGUID: 3tXYPxYuSc+f3CLgtayo+Q==
-X-CSE-MsgGUID: ARYHiA84TJCUwHvBIWMOdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="27262053"
+  bh=vy++shb5ncL/nVvgUxfjbJiY+nZ1X5a+bZhcxmIEiWs=;
+  b=FHbpMF26g1tAGo7Jrx5fMaYeBuYW5/LuEcRWcvmtWqqZ4yTN9WejLQvA
+   huA8kcxHGkc1YHceWcVefAr2o0y8K6OYRMEpEc3HYOQXQYshCiemLpG1e
+   4rPUjY2woPk5R1+w8Soc5Ok0/3P9+uXv4YhgsUyUPCIfHtiWp2jnR0az+
+   O2Asr1Szj01mGWRIKSDR6uKXCUJdnXPcxt1aQF74bOIcX0mSjjIEtlrsZ
+   sErRW7UpCWUmY37Z8DYpyU89XursemVGY96yotphUoJ2M7/S1kJJJiOBb
+   3hoAydmCUtkV5woqZdGZw2v2PAI8QkN/5AEsIdzfflxenLN04zc+Yimn4
+   A==;
+X-CSE-ConnectionGUID: +KKE3Rn3TmOXfn73xG2rIA==
+X-CSE-MsgGUID: XesqyiTWSW2cHT8TsVdi0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="27262058"
 X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="27262053"
+   d="scan'208";a="27262058"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
   by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 14:52:01 -0700
-X-CSE-ConnectionGUID: 4xJxEhvGTUawHyj7HyvIxg==
-X-CSE-MsgGUID: FuVpan78S0mMsH+lwllvyQ==
+X-CSE-ConnectionGUID: BLVg6rmSTj2nyoR/hsKjng==
+X-CSE-MsgGUID: kIJq2/cgQc28Z/stQELSYA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,172,1725346800"; 
-   d="scan'208";a="78673909"
+   d="scan'208";a="78673915"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 14:52:00 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 02 Oct 2024 14:51:58 -0700
-Subject: [PATCH net-next v2 09/10] lib: packing: use BITS_PER_BYTE instead
- of 8
+Date: Wed, 02 Oct 2024 14:51:59 -0700
+Subject: [PATCH net-next v2 10/10] lib: packing: use GENMASK() for box_mask
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-9-8373e551eae3@intel.com>
+Message-Id: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-10-8373e551eae3@intel.com>
 References: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-0-8373e551eae3@intel.com>
 In-Reply-To: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-0-8373e551eae3@intel.com>
 To: Andrew Morton <akpm@linux-foundation.org>, 
@@ -82,108 +81,37 @@ X-Mailer: b4 0.14.1
 
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-This helps clarify what the 8 is for.
+This is an u8, so using GENMASK_ULL() for unsigned long long is
+unnecessary.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- lib/packing.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ lib/packing.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/lib/packing.c b/lib/packing.c
-index 9efe57d347c7..ac1f36c56a77 100644
+index ac1f36c56a77..793942745e34 100644
 --- a/lib/packing.c
 +++ b/lib/packing.c
-@@ -83,7 +83,7 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
- 	/* startbit is expected to be larger than endbit, and both are
- 	 * expected to be within the logically addressable range of the buffer.
- 	 */
--	if (unlikely(startbit < endbit || startbit >= 8 * pbuflen))
-+	if (unlikely(startbit < endbit || startbit >= BITS_PER_BYTE * pbuflen))
- 		/* Invalid function call */
- 		return -EINVAL;
- 
-@@ -106,8 +106,8 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
- 	 * no quirks, u8 by u8 (aligned at u8 boundaries), from high to low
- 	 * logical bit significance. "box" denotes the current logical u8.
- 	 */
--	plogical_first_u8 = startbit / 8;
--	plogical_last_u8  = endbit / 8;
-+	plogical_first_u8 = startbit / BITS_PER_BYTE;
-+	plogical_last_u8  = endbit / BITS_PER_BYTE;
- 
- 	for (box = plogical_first_u8; box >= plogical_last_u8; box--) {
- 		/* Bit indices into the currently accessed 8-bit box */
-@@ -123,11 +123,11 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
- 		 * input arguments startbit and endbit.
- 		 */
- 		if (box == plogical_first_u8)
--			box_start_bit = startbit % 8;
-+			box_start_bit = startbit % BITS_PER_BYTE;
- 		else
- 			box_start_bit = 7;
- 		if (box == plogical_last_u8)
--			box_end_bit = endbit % 8;
-+			box_end_bit = endbit % BITS_PER_BYTE;
- 		else
- 			box_end_bit = 0;
- 
-@@ -138,8 +138,8 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
- 		 * box is u8, the projection is u64 because it may fall
- 		 * anywhere within the unpacked u64.
- 		 */
--		proj_start_bit = ((box * 8) + box_start_bit) - endbit;
--		proj_end_bit   = ((box * 8) + box_end_bit) - endbit;
-+		proj_start_bit = ((box * BITS_PER_BYTE) + box_start_bit) - endbit;
-+		proj_end_bit = ((box * BITS_PER_BYTE) + box_end_bit) - endbit;
+@@ -141,7 +141,7 @@ int pack(void *pbuf, u64 uval, size_t startbit, size_t endbit, size_t pbuflen,
+ 		proj_start_bit = ((box * BITS_PER_BYTE) + box_start_bit) - endbit;
+ 		proj_end_bit = ((box * BITS_PER_BYTE) + box_end_bit) - endbit;
  		proj_mask = GENMASK_ULL(proj_start_bit, proj_end_bit);
- 		box_mask  = GENMASK_ULL(box_start_bit, box_end_bit);
+-		box_mask  = GENMASK_ULL(box_start_bit, box_end_bit);
++		box_mask = GENMASK(box_start_bit, box_end_bit);
  
-@@ -199,7 +199,7 @@ int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
- 	/* startbit is expected to be larger than endbit, and both are
- 	 * expected to be within the logically addressable range of the buffer.
- 	 */
--	if (unlikely(startbit < endbit || startbit >= 8 * pbuflen))
-+	if (unlikely(startbit < endbit || startbit >= BITS_PER_BYTE * pbuflen))
- 		/* Invalid function call */
- 		return -EINVAL;
- 
-@@ -214,8 +214,8 @@ int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
- 	 * no quirks, u8 by u8 (aligned at u8 boundaries), from high to low
- 	 * logical bit significance. "box" denotes the current logical u8.
- 	 */
--	plogical_first_u8 = startbit / 8;
--	plogical_last_u8  = endbit / 8;
-+	plogical_first_u8 = startbit / BITS_PER_BYTE;
-+	plogical_last_u8  = endbit / BITS_PER_BYTE;
- 
- 	for (box = plogical_first_u8; box >= plogical_last_u8; box--) {
- 		/* Bit indices into the currently accessed 8-bit box */
-@@ -231,11 +231,11 @@ int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
- 		 * input arguments startbit and endbit.
- 		 */
- 		if (box == plogical_first_u8)
--			box_start_bit = startbit % 8;
-+			box_start_bit = startbit % BITS_PER_BYTE;
- 		else
- 			box_start_bit = 7;
- 		if (box == plogical_last_u8)
--			box_end_bit = endbit % 8;
-+			box_end_bit = endbit % BITS_PER_BYTE;
- 		else
- 			box_end_bit = 0;
- 
-@@ -246,8 +246,8 @@ int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
- 		 * box is u8, the projection is u64 because it may fall
- 		 * anywhere within the unpacked u64.
- 		 */
--		proj_start_bit = ((box * 8) + box_start_bit) - endbit;
--		proj_end_bit   = ((box * 8) + box_end_bit) - endbit;
-+		proj_start_bit = ((box * BITS_PER_BYTE) + box_start_bit) - endbit;
-+		proj_end_bit = ((box * BITS_PER_BYTE) + box_end_bit) - endbit;
+ 		/* Determine the offset of the u8 box inside the pbuf,
+ 		 * adjusted for quirks. The adjusted box_addr will be used for
+@@ -249,7 +249,7 @@ int unpack(const void *pbuf, u64 *uval, size_t startbit, size_t endbit,
+ 		proj_start_bit = ((box * BITS_PER_BYTE) + box_start_bit) - endbit;
+ 		proj_end_bit = ((box * BITS_PER_BYTE) + box_end_bit) - endbit;
  		proj_mask = GENMASK_ULL(proj_start_bit, proj_end_bit);
- 		box_mask  = GENMASK_ULL(box_start_bit, box_end_bit);
+-		box_mask  = GENMASK_ULL(box_start_bit, box_end_bit);
++		box_mask = GENMASK(box_start_bit, box_end_bit);
  
+ 		/* Determine the offset of the u8 box inside the pbuf,
+ 		 * adjusted for quirks. The adjusted box_addr will be used for
 
 -- 
 2.46.2.828.g9e56e24342b6
