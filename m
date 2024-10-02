@@ -1,131 +1,190 @@
-Return-Path: <netdev+bounces-131247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192A898DB99
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:32:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D648598DC19
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:38:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41E9E1C21C6D
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:32:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 675861F252A2
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643D61D0F6F;
-	Wed,  2 Oct 2024 14:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30D81D3563;
+	Wed,  2 Oct 2024 14:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K0NdXQnP"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="gHCx2vIV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mv6zbJTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E3F1D0F66
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 14:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91A1D1F4F;
+	Wed,  2 Oct 2024 14:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727879253; cv=none; b=p8avfripfmIcyoGIv3N2LDWkmJwxC8LH16Zqs9y44R1zKztdmTfCvkgvaAncTYN2rAGqlhxHB75Ei8TWijmaCaySAQii06LjWTGu91ADiTkuSTwP4XvqJidOwn/unVucqDcdWNt6DLQiYysSg852hnuv1maULzxBlugFAWy0520=
+	t=1727879498; cv=none; b=VYwSZ+ovkIFbco42OJE57cV2THcOu3wxi1a73MPkJ+aXuMP52GyRPFvwKDonQeADmZToWWNo3nSQ2m74g1mYYhiSa/PHPwmdHJiUnBhGV5TOYqipiEspCLETHWV12ZQKdbGfLFUlIupMKM107wr/JcL0CWi3PpLrm+UrXnOL7NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727879253; c=relaxed/simple;
-	bh=6gZGtwXT0UeHa4PCsRrEyrA1BaUn/tinw6lXWkQk/a0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m0IBYB6tWAcAavlTGdtYXyp3+OZ6fUZz2THRtr5Np3QhYmjKta29zwiZOjWCXaU8Yb+huEmz30MdbSGYJe04j57sIgP2ZkGJcfblqFFdXUJih3QRC7f72KHId174Zk3z4n1IAQnoyucwQGiCFJp4JGMI5WS32o8SA236v262u5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K0NdXQnP; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37cdbcb139cso3922952f8f.1
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 07:27:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727879249; x=1728484049; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8Vome0jBYeRQ880YVIwEIz5cqcUYdUm5aLZDCRbiT54=;
-        b=K0NdXQnPQeVOE/MhbS+419sJN1b5Ak3tpwoFy5r7xYvgE7IKcgJxff8s+dJ7bwOs/y
-         eeM50L9GfHdMFv9sKnUwsnk3G3U2XJ9ix0H8agBk54P9PUHHVBVgSZrBEa7XjlZbDAUv
-         RrDci5eQfxL/6ecHMUDa9+GwfV2StZnSAByEFHaShZDIqREbwNywsbWMeNjKxCA3VpOi
-         hnt22Z5jePS/lv0CdmN2UaQeu7uzvz/JbWR6Zf/1AU+fDgSxui7d2jemDRX6/qcTpa+h
-         OjQM4KbTmHTNjwlp20FnTJ/NTwbkjQkPAoXMR2u4XaN8K7ItyCHjkoi6l59gg0HiRYgy
-         yrZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727879249; x=1728484049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8Vome0jBYeRQ880YVIwEIz5cqcUYdUm5aLZDCRbiT54=;
-        b=wDqYVqpUIl0kN6Od7YsttwueYnulnyJ6LCkqenaK9JTGRgqFtEfSO1Bi0rc6Bs8Ic+
-         MmTwHIFU0k2s7rnLZac6a25qc7kiaKLGuxwC6GUf2DfP/HjqJun1MUAzYoUFMB26sJuC
-         J8yFHuxIvsIw7uD53dm/G4447VZ6gXk4MTVu7T7vbJh1yjrkw+DAlX6o3ORlFmw6JFEp
-         RvCPDmDJwlyvqRKaKkorQ0rHfaF0rBlJYLCxweZuqMIOOEocsl0KB4MOgoB2+nVXvQkP
-         aiHiOAJu5E2Q2lSSlG384mUoEtR0SWntd6IwZMkEs9f4APVofvfE2f0KFN/gLBdj1pdO
-         7wGg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7ofm0qRw3/mnzUjVXR8XC4MtEEEvs6TToW9EWOzzPdslKPFFm/ImpAxr/gWoRKm6+R3OiKLM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8jO98nY3jMFvEm7NVFnWThw3WnSZCyu6kU+eObgsnF+dlCH/y
-	1FbIvdniNQF0M2tivax5xe1HUbnVEliFq2dqC9QnS3hdw2yqtxI1pAxLM9gnvDyput+srTCYkN4
-	VpXl4SE5Kv9x1OklJ24iTPiBgrtNyP/72vVOQ
-X-Google-Smtp-Source: AGHT+IGukuBN9cCJnVsbKBYae7JrAL7IzazwuaA/viB7RcfQC4VkWNFvvdb7cwNkh3i36oLMPb9Gx6/8exNHfYwBlkM=
-X-Received: by 2002:a05:6000:18a1:b0:37c:d569:467e with SMTP id
- ffacd0b85a97d-37cfba20c94mr2763175f8f.59.1727879248680; Wed, 02 Oct 2024
- 07:27:28 -0700 (PDT)
+	s=arc-20240116; t=1727879498; c=relaxed/simple;
+	bh=NCDxRgu1iK1osuKd5Zm+/2EGnP34AlujI1EbScfYr0Y=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=lwdI/GFDF0cmHnsI/wCT3xBANRVGfxB4FlFQywAssSdqKEhfuwiY472lZ4DN2Y+QZXfXvlGpSnRDpk7jGnu2GCu9Wfa1kHOykdW59UOpPYjqIWPEtoOSMVRPSh76EVjQUGC+cCy2IaQwJH012nJHE5IdA1HBKJcbW8PSqiCNUVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=gHCx2vIV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mv6zbJTO; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 874461380231;
+	Wed,  2 Oct 2024 10:31:35 -0400 (EDT)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-10.internal (MEProxy); Wed, 02 Oct 2024 10:31:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1727879495;
+	 x=1727965895; bh=rf8by3v4c6wxG2SAfkG+4QnwQIhprVnUb59Vlto1X6A=; b=
+	gHCx2vIV9QfuNqjkmEElSCZDvXFYgcB4Q5oB+v7a+6I7jPaJFGMbbHCFfpw0sngl
+	7tR7ZVJFoMcCJjHjDpm3WwQBdTxrM4GCxvPikn1tkzMlF7gTmlQINLmJBCjgEuHr
+	OhefoKZOdDRY2y9SdX5sZoErlV6T2B6rmE9cgPWkton46yJ8tZPevghDQyFBKspr
+	9WFFfhIFVGsGSLhLwnjvGwxOQ45gYQyylVrfiSll6nWrPcKLxKfhLQ66JlePoy+b
+	dYFUwLGXgf4bw7wgi4/ZNwHtDHyPGCv+Uev+88bScjrvgxttzmaIc5ih3z2AjUwh
+	2XcGYDzKBl4WSF77heYaXw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1727879495; x=
+	1727965895; bh=rf8by3v4c6wxG2SAfkG+4QnwQIhprVnUb59Vlto1X6A=; b=m
+	v6zbJTOVhP/uBzJEIDY9m4jU+6GBUw37ibxpilkl3q4K7m5rDOz81+/mleqTUnvL
+	/77Bu8kZJ9l3P71fE7fEau+3a4rSIQkebSoJ0ANG0vAG5bGEXuHg10XrchRXzSr7
+	tpByorYv77N9mS5ULxWtWxgaNhH34TPtrcAC6bwwqdJuDM3j6uVf34sUXD1wGeDj
+	bljI0abJwiTlVo6YgIg++r7hSkvUhxzD002J39GiFDljnFW9ShF8TwEcV7zui/zf
+	qDEt3DKcGLQeQbyil5nD1H8UvB24QExWEddCDxRmjuzGWiYr2gEYeSNlg4bmnnDd
+	abcWTB8AVA9ybtcJSjfaQ==
+X-ME-Sender: <xms:Rln9ZtZf5cgQxHmStXMSrLis5BgTaZvCAxiWBXbBP02122_WUHx2qw>
+    <xme:Rln9ZkYuAtMSyLFNl21caHz0kNaKHC1VSd8iEhD1LwxYr-nxs4rek6V-zejnsWV8E
+    0UTql6lclOFEPjeZVE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdduledgjeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
+    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
+    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
+    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepfedv
+    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguvghrvghkrdhkihgvrhhnrghnse
+    grmhgurdgtohhmpdhrtghpthhtohepughrrghgrghnrdgtvhgvthhitgesrghmugdrtgho
+    mhdprhgtphhtthhopehhvghrvhgvrdgtohguihhnrgessghoohhtlhhinhdrtghomhdprh
+    gtphhtthhopehluhgtrgdrtggvrhgvshholhhisegsohhothhlihhnrdgtohhmpdhrtghp
+    thhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtg
+    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgu
+    hidrshhhvghvtghhvghnkhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepsghhvghlgh
+    grrghssehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhm
+X-ME-Proxy: <xmx:Rln9Zv_vaCGx15zWrOqITWuikEoalJdRpR43q_8tYPQh7-mJM-h2rQ>
+    <xmx:Rln9Zrq1RCfB7hFitPHtKz7KzaotC-TvuySs5kpPqKl695t_L1XCZw>
+    <xmx:Rln9ZopAQoMedU_A2RU5bIGodo42JFIWnCLkxKQQPeykRArv0lQOIg>
+    <xmx:Rln9ZhQTUBXwlLKOpmy_cHD2NVBm7QNmCVYD0eQyd2HQ5LHOMJTIPA>
+    <xmx:R1n9Zu0cPaNNipONgtasztfjGETuBHU79SnAInW0Mwo97I1TJGRuSgIk>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id 6899A2220071; Wed,  2 Oct 2024 10:31:34 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002.113401.1308475311422708175.fujita.tomonori@gmail.com>
- <e048a4cc-b4e9-4780-83b2-a39ede65f978@lunn.ch> <CAH5fLgiB_3v6rVEWCNVVma=vPFAse-WvvCzHKrjHKTDBwjPz2Q@mail.gmail.com>
- <20241002.135832.841519218420629933.fujita.tomonori@gmail.com>
-In-Reply-To: <20241002.135832.841519218420629933.fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 2 Oct 2024 16:27:17 +0200
-Message-ID: <CAH5fLgj1y=h38pdnxFd-om5qWt0toN4n10CRUuHSPxwNY5MdQg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: andrew@lunn.ch, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
-	benno.lossin@proton.me, a.hindborg@samsung.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Date: Wed, 02 Oct 2024 14:31:13 +0000
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Herve Codina" <herve.codina@bootlin.com>
+Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Andy Shevchenko" <andy.shevchenko@gmail.com>,
+ "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
+ "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
+ "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+ "Bjorn Helgaas" <bhelgaas@google.com>,
+ "Philipp Zabel" <p.zabel@pengutronix.de>,
+ "Lars Povlsen" <lars.povlsen@microchip.com>,
+ "Steen Hegelund" <Steen.Hegelund@microchip.com>,
+ "Daniel Machon" <daniel.machon@microchip.com>,
+ UNGLinuxDriver@microchip.com, "Rob Herring" <robh@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>,
+ "Saravana Kannan" <saravanak@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Horatiu Vultur" <horatiu.vultur@microchip.com>,
+ "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ "Allan Nielsen" <allan.nielsen@microchip.com>,
+ "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
+ "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
+Message-Id: <3e21a3ba-623e-4b75-959b-3cdf906ee1bd@app.fastmail.com>
+In-Reply-To: <20241002144119.45c78aa7@bootlin.com>
+References: <20240930121601.172216-1-herve.codina@bootlin.com>
+ <20240930121601.172216-4-herve.codina@bootlin.com>
+ <b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
+ <20241002144119.45c78aa7@bootlin.com>
+Subject: Re: [PATCH v6 3/7] misc: Add support for LAN966x PCI device
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 2, 2024 at 3:58=E2=80=AFPM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
+On Wed, Oct 2, 2024, at 12:41, Herve Codina wrote:
+> On Wed, 02 Oct 2024 11:08:15 +0000
+> "Arnd Bergmann" <arnd@arndb.de> wrote:
+>> On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
+>> 
+>> > +			pci-ep-bus@0 {
+>> > +				compatible = "simple-bus";
+>> > +				#address-cells = <1>;
+>> > +				#size-cells = <1>;
+>> > +
+>> > +				/*
+>> > +				 * map @0xe2000000 (32MB) to BAR0 (CPU)
+>> > +				 * map @0xe0000000 (16MB) to BAR1 (AMBA)
+>> > +				 */
+>> > +				ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
+>> > +				          0xe0000000 0x01 0x00 0x00 0x1000000>;  
+>> 
+>> I was wondering about how this fits into the PCI DT
+>> binding, is this a child of the PCI device, or does the
+>> "pci-ep-bus" refer to the PCI device itself?
 >
-> On Wed, 2 Oct 2024 14:37:55 +0200
-> Alice Ryhl <aliceryhl@google.com> wrote:
->
-> > On Wed, Oct 2, 2024 at 2:19=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wro=
-te:
-> >>
-> >> > > I would also document the units for the parameter. Is it picosecon=
-ds
-> >> > > or centuries?
-> >> >
-> >> > Rust's Duration is created from seconds and nanoseconds.
-> >>
-> >> How well know is that? And is there a rust-for-linux wide preference
-> >> to use Duration for time? Are we going to get into a situation that
-> >> some abstractions use Duration, others seconds, some milliseconds,
-> >> etc, just like C code?
-> >>
-> >> Anyway, i would still document the parameter is a Duration, since it
-> >> is different to how C fsleep() works.
-> >
-> > I'm not necessarily convinced we want to use the Rust Duration type.
-> > Similar questions came up when I added the Ktime type. The Rust
-> > Duration type is rather large.
->
-> core::mem::size_of::<core::time::Duration>() says 16 bytes.
->
-> You prefer to add a simpler Duration structure to kernel/time.rs?
-> Something like:
->
-> struct Duration {
->     nanos: u64,
-> }
->
-> u64 in nanoseconds is enough for delay in the kernel, I think.
+> This is a child of the PCI device.
+> The overlay is applied at the PCI device node and so, the pci-ep-bus is
+> a child of the PCI device node.
 
-That type already exists. It's called kernel::time::Ktime.
+Ok
 
-Alice
+> 				/*
+> 				 * Ranges items allow to reference BAR0,
+> 				 * BAR1, ... from children nodes.
+> 				 * The property is created by the PCI core
+> 				 * during the PCI bus scan.
+> 				 */
+> 				ranges = <0x00 0x00 0x00 0x82010000 0x00 0xe8000000 0x00 0x2000000
+> 					  0x01 0x00 0x00 0x82010000 0x00 0xea000000 0x00 0x1000000
+> 					  0x02 0x00 0x00 0x82010000 0x00 0xeb000000 0x00 0x800000
+
+>
+> Hope this full picture helped to understand the address translations
+> involved.
+
+Right, that makes a lot of sense now, I wasn't aware of those
+range properties getting set. Now I have a new question though:
+
+Is this designed to work both on hosts using devicetree and on
+those not using it? If this is used on devicetree on a board
+that has a hardwired lan966x, we may want to include the
+overlay contents in the board dts file itself in order to
+describe any possible connections between the lan966x chip
+and other onboard components such as additional GPIOs or
+ethernet PHY chips, right?
+
+      Arnd
 
