@@ -1,99 +1,92 @@
-Return-Path: <netdev+bounces-131237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2BD98D740
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:47:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF65598D74F
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 638641F2468E
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:47:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B69BD2827FF
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4711CF5FB;
-	Wed,  2 Oct 2024 13:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F7B21D042F;
+	Wed,  2 Oct 2024 13:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FR7DiPCX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rpJ4TOSW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E4329CE7
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 13:47:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6317A29CE7;
+	Wed,  2 Oct 2024 13:48:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727876857; cv=none; b=A9JSbljFsREwEF1q4zaKJZJKeahB3jGtdNzE2dq14Pk7/gsVit6kH2gXjgJEhvx6r82fBEPmNOJHA75xufYUFRAuktuSN2UHOG2sq/iGwa5937i8pyWCLF9LA07/vqWc2enwTB3yrUzNTKYqR3Bf643yIpqvf/2Mec8lREC4SA8=
+	t=1727876896; cv=none; b=t2scCJnv2g2PB0TZDjFPn74MnM3sR97aLn0YDR0Cp0NNIQPJ5D8APWFCVa2rt6P0yFXNb+mCYENYohFsucyqVJoxXFPOgeSgDBEIh2Is5Ymli4S59i7crjC/StXhLUCBJtQdho8yAYiAzg4XWwVLyusyH+nPFh0dOF+Dh65MD6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727876857; c=relaxed/simple;
-	bh=+dWXrkj8wj828iMjni3BKi2k8M40IKLtAPYQkmtZ9cw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ggg21vDnD8EzSD5Jsa8rF/AsTnZ2KUAKvCg717hjk7K10FpkPjh8wKlNXXOv1vLiPZk4aeBe12zX7fWdSeJGE5OT0YQaTb7qAmWawtDTiQ8azg5MixYeM//WaRjFWIkQPhkns0xusQkgzETzF1AxvNd+qaQJTyfPU/OOlJgINAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FR7DiPCX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80679C4CEC2;
-	Wed,  2 Oct 2024 13:47:36 +0000 (UTC)
+	s=arc-20240116; t=1727876896; c=relaxed/simple;
+	bh=IsCM6sG+IjFqFUeQDnuBKsarTp7+M7zRzPX2gX5/i18=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rOrTFAmwHptOqyldU5HXBf5CqELGKkenOfTD/jsYGbgKdcDhVOVxpIwjnZ/YgK+AUIR0WprfqAuKU+cOn4jL3JxY2cXdORjmXag9xzxXSXji0/3Tb175PFAzYlpXUclnUoK9mMw0uWgi4MMAugmtG67XUc6ZwnF0wkeLRYm0X5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rpJ4TOSW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B429FC4CEC2;
+	Wed,  2 Oct 2024 13:48:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727876856;
-	bh=+dWXrkj8wj828iMjni3BKi2k8M40IKLtAPYQkmtZ9cw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FR7DiPCXy7nI2TD83k3CwzAYFQeIAPPmwjQS5pXY9hhwoHuJ5ChgauPnfxXqCq7wb
-	 6UvexysrYRdAVssic/caaUUK88siqMrqL2R0QMQGT96m0TUxT+sQfM0l4QbyTzTyu6
-	 ziTc6QbX9DWc2QRuusX1+RimxYzqADE82wemnDmXfma6VxvOzr7FoxmzamMb3sMN2q
-	 sxmaJXCcvKfdx106gL5FKyhrj9oj2DlJiCoPuWaQRPLlXtMner7L3aZ7yQxDSKZjlt
-	 eTaNLl0HZbRNOsQmwZBOfan2Zgy0+yFQyOyDQfa5SENLtQjQ9cwxLcO2pOWsEnadUO
-	 QX4xN1Zpf3ZLw==
-Date: Wed, 2 Oct 2024 06:47:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>, Jeffrey Ji
- <jeffreyji@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 1/2] net: add IFLA_MAX_PACING_OFFLOAD_HORIZON
- device attribute
-Message-ID: <20241002064735.5b1127ab@kernel.org>
-In-Reply-To: <20240930152304.472767-2-edumazet@google.com>
-References: <20240930152304.472767-1-edumazet@google.com>
-	<20240930152304.472767-2-edumazet@google.com>
+	s=k20201202; t=1727876896;
+	bh=IsCM6sG+IjFqFUeQDnuBKsarTp7+M7zRzPX2gX5/i18=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rpJ4TOSW6jMhPSxUpINtMng3p5Zo8p+RqoSNdw/oWvO/eQgrYI63DwRYTKWR9UIBb
+	 KrSQSfzlGd++nNTgVzJF6mA/new3mtGXV3J/zhiwUBGjFvl4wyHYx9E0IjQYWgaLr3
+	 A5XeJebJIvPlhZci9/t81svNxJ8913+p8t28qlDStEd65VI22IhbeNrVNt9w4I00SZ
+	 hkVrtmvou4uCiQXodv9bFqpEjLErOvktIuqYVAQsNEuvs6OTCIADr+wSC+a9zs4sY0
+	 hfGzrYfwuvRZgPeqkiAdzTK3tItB6a5jhngIgFgVxC0NalKpaC4DW/bfbAgMbRuLMj
+	 lGHcKnxlT0I0w==
+Date: Wed, 2 Oct 2024 14:48:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andrew Kreimer <algonell@gmail.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH] net/mlx5: Fix typos
+Message-ID: <20241002134811.GI1310185@kernel.org>
+References: <20240915114225.99680-1-algonell@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240915114225.99680-1-algonell@gmail.com>
 
-On Mon, 30 Sep 2024 15:23:03 +0000 Eric Dumazet wrote:
-> @@ -1867,6 +1868,9 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
->  			READ_ONCE(dev->tso_max_size)) ||
->  	    nla_put_u32(skb, IFLA_TSO_MAX_SEGS,
->  			READ_ONCE(dev->tso_max_segs)) ||
-> +	    nla_put_u64_64bit(skb, IFLA_MAX_PACING_OFFLOAD_HORIZON,
-> +			      READ_ONCE(dev->max_pacing_offload_horizon),
-> +			      IFLA_PAD) ||
+On Sun, Sep 15, 2024 at 02:42:25PM +0300, Andrew Kreimer wrote:
+> Fix typos in comments.
+> 
+> Reported-by: Matthew Wilcox <willy@infradead.org>
+> Signed-off-by: Andrew Kreimer <algonell@gmail.com>
 
-nla_put_uint() ?
+Hi Andrew,
 
->  #ifdef CONFIG_RPS
->  	    nla_put_u32(skb, IFLA_NUM_RX_QUEUES,
->  			READ_ONCE(dev->num_rx_queues)) ||
-> @@ -2030,6 +2034,7 @@ static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
->  	[IFLA_ALLMULTI]		= { .type = NLA_REJECT },
->  	[IFLA_GSO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
->  	[IFLA_GRO_IPV4_MAX_SIZE]	= { .type = NLA_U32 },
-> +	[IFLA_MAX_PACING_OFFLOAD_HORIZON]= { .type = NLA_REJECT },
+These changes look good to me.
 
-Let's do this instead ?
+However, the patch was posted while net-next was closed for the v6.12 merge
+window. And, I assume because of that, it has been marked as deferred in
+Patchwork.
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index f0a520987085..a68de5c15b46 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -1975,6 +1975,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
- }
- 
- static const struct nla_policy ifla_policy[IFLA_MAX+1] = {
-+       [IFLA_UNSPEC]           = { .strict_start_type = IFLA_DPLL_PIN },
-        [IFLA_IFNAME]           = { .type = NLA_STRING, .len = IFNAMSIZ-1 },
-        [IFLA_ADDRESS]          = { .type = NLA_BINARY, .len = MAX_ADDR_LEN },
-        [IFLA_BROADCAST]        = { .type = NLA_BINARY, .len = MAX_ADDR_LEN },
+In the meantime, net-next has reopened, so could you consider reposting
+your patch. If you do so please mark it as v2 or repost of something like
+that. And please include the target tree, net-next, in the subject.
+
+  Subject [PATCH net-next repost] ...
+
+For reference, Netdev processes are documented here:
+https://docs.kernel.org/process/maintainer-netdev.html
+
+...
 
