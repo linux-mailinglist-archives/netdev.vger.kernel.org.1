@@ -1,87 +1,116 @@
-Return-Path: <netdev+bounces-131222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5B3698D609
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:35:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C24098D620
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 15:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723A2281CC6
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:35:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A86C61F20EE2
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 13:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C9D1D0487;
-	Wed,  2 Oct 2024 13:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B8F1D0418;
+	Wed,  2 Oct 2024 13:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5f3gMzT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItAsTeOf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E058E1D0426;
-	Wed,  2 Oct 2024 13:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50F718DF60;
+	Wed,  2 Oct 2024 13:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727876149; cv=none; b=GX5RD6nS8t/PzKYGpCsJwTTkgyUT60H+wTLoDOn04QGOanY8451Q5CuqbtA4U/9erT2mdZbrpGfO1+Pnx/XzH5DctCPL0aMQl7HutVLOVAZOeBLo8OGKO/+Mp+j7BqMrEAzGqTsdFwcJdipQqDkBITAkqFWu2lvEbySzW0fjfQ0=
+	t=1727876202; cv=none; b=svT64e/au2gQUTGB6lUkAItQGgMHyhef1b/9Fla9HVGEvdYIBYFpi4iVAPhF5XiZIajVU5sHO8zn2x09FPNkyxooMcRCKudlUrOezmCpRifqsukvyCYAi11PIlD6gOW4a64zONIsiD7cF1nOe9sXlxUzbOuILpFpb+XHq2FqvrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727876149; c=relaxed/simple;
-	bh=3qG/9YOqZH45qgm8Ugp2vUhwx3nsBP3Gfv9WA6Js/Uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5MxVjCG7jstjSX+uLTCXkQZ0cHDAWIu5IHkZZWZSzF5uW3oWTAWghHG38P4qXsSjytKHu+L7QFv/Y8Pac+m1QMmtm0svpTASUGcqM12XpzCd0lVM/XUJvbupoLiwZCs7oQblTo75IZgspm91rAYQuqmJVuzwFbMLdvldDyPEAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U5f3gMzT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 807DBC4CECF;
-	Wed,  2 Oct 2024 13:35:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727876148;
-	bh=3qG/9YOqZH45qgm8Ugp2vUhwx3nsBP3Gfv9WA6Js/Uc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=U5f3gMzTpNBlN0srsMIORRzU9gM2Gaea1sy2AXJyYzDEnz+jm6z+4knaIZ2ppp/VT
-	 Y6vQHzSBbjTlHSBPOzlAI2unCE6kK1r32atYrrEUHrFnTEYuYMH4LYBca+tkv633FN
-	 akwJM3OQ5KSOb7dsIUgG2uHvt//aRkgSkYBf7q76Fv0xJJZFELgPndcWa3YodWklWy
-	 Kdcy2vOmxmjkOxmt/tuRqRw55D5OuAis9+8X0qUPkExsPpDYtXgynXzZI7BDD76BbU
-	 Evhv+o0RSvMezMen+6jWSBDwwxF0MjhcwXq4L44UkxT95N6rPy/h6vG4p5sUJ7CFK1
-	 t83TvKaabl/sQ==
-Date: Wed, 2 Oct 2024 14:35:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: idosch@nvidia.com, kuba@kernel.org, aleksander.lobakin@intel.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com,
-	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
-	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 06/12] net: vxlan: make vxlan_snoop() return
- drop reasons
-Message-ID: <20241002133543.GW1310185@kernel.org>
-References: <20241001073225.807419-1-dongml2@chinatelecom.cn>
- <20241001073225.807419-7-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1727876202; c=relaxed/simple;
+	bh=q5ZkCgADhBZHl7oDwalsHIstFb7FyHGt5fNF8Px/R0E=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=kNBP5dyEX38JQw121M+unZRRGaZNA7rqRNuU0it+xlddig0FCHI0LdKVEh/cLvIfHwlt+TRMJ0Ts8ogS2bgdl6iDduTWqFJw8vgFfN+7WZiUyA4zx0GXsWqyMkYNk2pVVpHKhTVwO4uazpacBibBAL8A5ZX0piEtqG8AjMTIAUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItAsTeOf; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2faccccbca7so31411291fa.2;
+        Wed, 02 Oct 2024 06:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727876199; x=1728480999; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wMUkkI59XlnjFeOEzlmttnyMpJecab4sH6mMElSC+Oo=;
+        b=ItAsTeOfwjx1WVdWQ+Q++Lp+FCmJADQsrpqp2lQvMxA4QCvA8Fl1q9RW0NZGSa1yu0
+         xtZJXIJxxggqeULKESaRyAYWgX2tgEKrYh7PLAoxfyCWaIiaR4aDPjnDYVL2BVin7HXT
+         GLuRdAAu47Q1XpI5Yq4VmAeWJvB4HOn5GHjFpKnS2Q5Pp4j5b92nqGJUMyrds/75WG8M
+         ZUGbq1V6VnyDOaG6R0bGSFPwREdFaA6ENZzsIYzJnj8q0S7ZxV3/VLHyJQvyCg+AI1uh
+         NKhizjWd5/RVlrXdzHculpka0f/I35KQvGEIFweq/+4svrZklgRF0KIvL5Lv9y8qA2nW
+         N6Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727876199; x=1728480999;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wMUkkI59XlnjFeOEzlmttnyMpJecab4sH6mMElSC+Oo=;
+        b=gzNZ0rMnqpdNAEOK9SfyMGLkUTvFmvRjgzHsndrBZoB+7gDis6LOGHaynUWX6pjMr4
+         +qvi4wwM82hZAxgPkoDnUpctJ/nt/a+0JCo4tgWrvDxWQuO1/y5JmFqsXdgf4Y9DBUXG
+         id7KbFB1VsOCZXeVbcbymlKYIFMAwWXFrsaPJAh9/fCeUe9BQT2eQOyM0mfcocZogGK4
+         aLc+h+CwU6a0y0W/EJEMC1lr6n7iV90L5DaHvLB96V5si9Ikz4iUZMjIYy82ASilrmFF
+         Ooha5xQmlUg9s1U5xZkjZQPKCMKAJ8fQl/QW1/fwEhM1cEy2UwHWO3cDBqGFbBqlvxiV
+         W/5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVkNphg90ZXy+zTgD0XGCT/aVDRarmLmfwh3N7uKYz8xwnLwNhimkyCUW1JVYBBCNepIko=@vger.kernel.org, AJvYcCW5B1Y8WX+yrbjimW2xMbdZ6rFUuygW73hmXnRXsxfKxiwUmFl9GRSQOvLjRyerefFsN778HRQz@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpFON37UgfuLXJU/OfRUrNbbJKV6vP0KOQvz74YmiAOJ1x+spS
+	ciaWiQT9NBVSlfc/tcKSg5jSXb1lAwRv/JTPpLYx4JQhTByWB3BQ
+X-Google-Smtp-Source: AGHT+IHHkz5Ebi30JV7ibbxjE4ZedXGtGwgY4Rri5mgNFizv+ZYBDL8OqlSEe8L+5FmGQ4DnRoTm1g==
+X-Received: by 2002:a2e:751:0:b0:2fa:dce8:7387 with SMTP id 38308e7fff4ca-2fae107f75bmr16016341fa.32.1727876198578;
+        Wed, 02 Oct 2024 06:36:38 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c882493e54sm7664465a12.80.2024.10.02.06.36.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 02 Oct 2024 06:36:37 -0700 (PDT)
+Subject: Re: [PATCH net] sfc: Don't invoke xdp_do_flush() from netpoll.
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Yury Vostrikov <mon@unformed.ru>
+References: <20241002125837.utOcRo6Y@linutronix.de>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <48bb0155-cc1a-b72c-2d04-98d28adb467b@gmail.com>
+Date: Wed, 2 Oct 2024 14:36:36 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001073225.807419-7-dongml2@chinatelecom.cn>
+In-Reply-To: <20241002125837.utOcRo6Y@linutronix.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 01, 2024 at 03:32:19PM +0800, Menglong Dong wrote:
-> Change the return type of vxlan_snoop() from bool to enum
-> skb_drop_reason. In this commit, two drop reasons are introduced:
+On 02/10/2024 13:58, Sebastian Andrzej Siewior wrote:
+> Yury reported a crash in the sfc driver originated from
+> netpoll_send_udp(). The netconsole sends a message and then netpoll
+> invokes the driver's NAPI function with a budget of zero. It is
+> dedicated to allow driver to free TX resources, that it may have used
+> while sending the packet.
 > 
->   SKB_DROP_REASON_VXLAN_INVALID_SMAC
->   SKB_DROP_REASON_VXLAN_ENTRY_EXISTS
+> In the netpoll case the driver invokes xdp_do_flush() unconditionally,
+> leading to crash because bpf_net_context was never assigned.
 > 
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
-> v4:
-> - rename SKB_DROP_REASON_VXLAN_INVALID_SMAC to
->   SKB_DROP_REASON_MAC_INVALID_SOURCE
+> Invoke xdp_do_flush() only if budget is not zero.
+> 
+> Fixes: 401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+> Reported-by: Yury Vostrikov <mon@unformed.ru>
+> Closes: https://lore.kernel.org/5627f6d1-5491-4462-9d75-bc0612c26a22@app.fastmail.com
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-super-nit: SKB_DROP_REASON_VXLAN_INVALID_SMAC was renamed in the code below
-           but not the patch description above
-
-In any case, this looks good to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
