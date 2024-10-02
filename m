@@ -1,181 +1,154 @@
-Return-Path: <netdev+bounces-131104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3E2A98CA13
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 02:34:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9120E98CAFE
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 03:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A19BB286872
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 00:34:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3D491C2131F
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 01:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74F96B677;
-	Wed,  2 Oct 2024 00:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ED5079F5;
+	Wed,  2 Oct 2024 01:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sLldTGhJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e44DKcTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f196.google.com (mail-pf1-f196.google.com [209.85.210.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7ACB661
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 00:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B62523A;
+	Wed,  2 Oct 2024 01:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727829258; cv=none; b=ZOR11vh4ZL/HXcxNeJyzCzsCvkOFsn9zwNb1Ipx90ghYVXl5LNRQa137X0RyCECavRxNOy1Rh27YTMbVoHSIw1uu1fF5Epd3+BJnUVsv72mNr337INglRoSizXtAZ9gxcKY7lCqL65+QytPh3WmP+V8jylKi2YIN5FWxJpqYLi4=
+	t=1727833981; cv=none; b=hnlMWPEV0GQgkb1Lirue5WyyJyE6o2pK1yJKg5EOZ3n3N8Z+2n+MwtQRswZO2zSA4OaAGDxm9Z7B0342cPvLzUV3TrrNSvh4l/aC/JFpUzT/JjZ1PQqMjLVdqGgts3Q6R2RVukM/LiRoIxMpiYZhi7ZYa89j9z6wqQWn3JcZ0MY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727829258; c=relaxed/simple;
-	bh=yStr/6PJPenHSI7D8HokTLRUj51fig9mf3TfmVYcCLY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aTbFYwcYEzYngYJHkU+g20cQ0Q6qNwl5RuWwpJQJ3QVaV5t1ytc6n8UqdRhELNfM/AGX1fAdDxLHLcWZb66Ev1qeV9iiuRYzjhgvnnOnkyToVqzT+lM2IJ7aOr5kquZiYQSujQuabAVL3epURdKJn5HzAv9P57CIHnJ7lLTr4E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sLldTGhJ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-207115e3056so54266005ad.2
-        for <netdev@vger.kernel.org>; Tue, 01 Oct 2024 17:34:16 -0700 (PDT)
+	s=arc-20240116; t=1727833981; c=relaxed/simple;
+	bh=MnfnAQlh6YMooD+uT61O7iO2RW5mU2uOH8MFgp0WnXc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mK8h7Tvvugm2TXRACXtFdKzSe5S4sT5xoKMW2/E1UGZrkJTrZiWGaNDRdnE5qC+/s8Y1ppSAYr8FRrKaS/pVUl4gj1lUawwOVNTmHyb5FsvHUWjSyg+LF4RLuABq6IId6/X4xo3RMi6qBZiG6pBFv+S/KJjndyrXLhRX7LsWS6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e44DKcTh; arc=none smtp.client-ip=209.85.210.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f196.google.com with SMTP id d2e1a72fcca58-718d6ad6050so5170671b3a.0;
+        Tue, 01 Oct 2024 18:52:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727829255; x=1728434055; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nSZqwRLg8/VfUGa/yJh0BLiOqFcBWWUlHrlyk3W8pCU=;
-        b=sLldTGhJzHsCqhdRcsHu5fpCh2Mo9E9kyNkcK4ycJKIxXVz+A8vZpNthUtQuBRfEPW
-         vWcms+ZXSNcdxphJwdPc4OkVJDZHZzCjmKmElgbpChjmalyIym8JrZkHaQirTExyUPFl
-         /lERu5OR6o2bHL9FEo3XZ4mWJO+VG97uRNkhM=
+        d=gmail.com; s=20230601; t=1727833979; x=1728438779; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=34EgOlt4L/U5Kyo+sNtl1YrYc/zileH6M/6pYZpSzag=;
+        b=e44DKcThDjrqxNnLIeMfgCk8WTrfo59dW0ZElJTbZxQRy2Rg6C7RyF4azvLVxonBBu
+         gmeeIwHC2UA/FlWoxD0/oVPNpkZ90lUx4rV81dG2Xte1GTXyMwBM+Pz/lHeQRDg7rXXH
+         VzbUOy+9H7R+9I/Nokf3fZzefoVuhjOGHMshTUQokAJW7KkWhs7WxrIlkCX6UMWgie+i
+         FYHo5jYlsUVRgNGp76r2p5ji/sCEWSjfnbhkrRvnG6SgD0ZVNNQa2FV65b5f3hJgVu1L
+         lUVnDnUQ7Ves/V4ZHajqZ6+UPwoX2LotupL9/NlZfOvKJ+CF81w10TiCLNtAVUZlzwx+
+         qEPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727829255; x=1728434055;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nSZqwRLg8/VfUGa/yJh0BLiOqFcBWWUlHrlyk3W8pCU=;
-        b=UlbAqOL5SeuLZgK8Fd23pcf2o/BBgbrsUYPoFqslBGaWXvcjyAuSndPAkFBMxwSYRt
-         HI4aV87kSJFp6ZaG7Wr2daTVXTwraQ9FmOC4kmhAy0wqwj1csCU40OgFWmMN01mVeBZY
-         palnxLgc1S2lmR6LT2dEq6ROrvjQNRROby/thRDCKBOikSkUpwBji+ydQTt9ZwHd5WZE
-         +75qvvszoe8l5V1VLUmMa6grQT7eoWsPLHnDFI6nS/LqE8kRQCL9be5oErQFKYqq2c7r
-         iLxcQBfyXTSumEthLFuKojuCqJg2orpXfeYdkbMXQxERJAfi5YRvnzoLa/IovXEJc3YR
-         zMXA==
-X-Gm-Message-State: AOJu0YzYy8g4MlycJpPRcZTFRVoEGsqffFCVfK3LaqRI4DeDPZJsFnG+
-	04VlVStEwueTWJG2B3umjdzkjB6KueH5S/ekWqAcrKb50xUBjGydWHruckVLwUWXyiKjFhsbRDj
-	liG1nMU3uQlMCq/W7asHbhKDaYmx5i3gxU16n3hSheR3Gs4R8BYU0+WQDpljPai0ceJRfgtGu6G
-	PNupOTJ69KrBAzIBZa0xKxXCHltkG7/4F59U4=
-X-Google-Smtp-Source: AGHT+IEqTtOYAZ0xs5mg5rdotEr2lEo3d5tqrafo4yS/vRO6Ol5mizZCFWULpLfJsb7blCc8Mpf/bA==
-X-Received: by 2002:a17:902:e80c:b0:20b:51c2:d789 with SMTP id d9443c01a7336-20bc59e6496mr20807085ad.16.1727829255450;
-        Tue, 01 Oct 2024 17:34:15 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20b37e5ecc1sm75521295ad.268.2024.10.01.17.34.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2024 17:34:14 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: darinzon@amazon.com,
-	Joe Damato <jdamato@fastly.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kamal Heib <kheib@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [net-next v2 2/2] ena: Link queues to NAPIs
-Date: Wed,  2 Oct 2024 00:13:28 +0000
-Message-Id: <20241002001331.65444-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241002001331.65444-1-jdamato@fastly.com>
-References: <20241002001331.65444-1-jdamato@fastly.com>
+        d=1e100.net; s=20230601; t=1727833979; x=1728438779;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=34EgOlt4L/U5Kyo+sNtl1YrYc/zileH6M/6pYZpSzag=;
+        b=K57fIQ0u8qfp+Vwarf2Xif31k2Gbl+qHyLpcJ5zfU4MNP3fjxRvhJ44c0uLTLKQouI
+         h5V663hOMugkdbHFz22hqnDxUUAp0VIInAc9LUGmWCHWp7rJCuB2gfc/7vC+TKR+tNfS
+         gMq0dFXFh2gTGUkF5zeqL8iZ648Z8aDh8yhFm5UsbddNBIL+ngK4Zt9vWRK3/PePro6o
+         vCYZNTNRfH0TMmbkUYzf/SZ0i4x95gsnL9ZHNkq8NkKIxbZb2FWXZyYS5j3L72MbXxJj
+         OYfGPuNwCC4Pi2V6lbfTKSYWKeignqcYNrqOdDMLz57/swLgsVutK0XhegYHhmW1bFm3
+         fCPg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSs/6PfQyLDtClqc4pS4Ulc6ow9jLHdQSnCWVQxuYY414nI5P5D70RsbIekfgJNhlZ7XBThEP3qMMqV7I=@vger.kernel.org, AJvYcCWyhf4vZVw9pRhas2AyvcMO4ooSnJr6E+KAbMZDmkxXb2Wr7raaOoXDFOHTzeOqeRP5NAG9FSOt@vger.kernel.org
+X-Gm-Message-State: AOJu0YzMLfrisydfyaSKic9lv/KNHaLFpDjfltZgx77b/VYgLxU7ZHif
+	JHE9HoNjnKTEeRNyS3ONdOpuUpfUPRjWxOaPSOWvobLEtH207V4G
+X-Google-Smtp-Source: AGHT+IFSmYEzQp2AsN3IXmsjyW2BTnGZUiyvNNzhC7PKYf/ytPs4n7fyYl6ygTRyJJB+URjlQUp2OQ==
+X-Received: by 2002:a05:6a00:3910:b0:706:74be:686e with SMTP id d2e1a72fcca58-71dc5d7255cmr2664135b3a.26.1727833979227;
+        Tue, 01 Oct 2024 18:52:59 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:50d1:daaf:4d8b:70e8? ([2409:8a55:301b:e120:50d1:daaf:4d8b:70e8])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71b2652b50fsm9101870b3a.141.2024.10.01.18.52.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Oct 2024 18:52:58 -0700 (PDT)
+Message-ID: <b071b158-6569-4bda-8886-6058897a7e28@gmail.com>
+Date: Wed, 2 Oct 2024 09:52:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] page_pool: fix timing for checking and
+ disabling napi_local
+To: Paolo Abeni <pabeni@redhat.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ davem@davemloft.net, kuba@kernel.org
+Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-2-linyunsheng@huawei.com>
+ <d123d288-4215-4a8c-9689-bbfe24c24b08@redhat.com>
+Content-Language: en-US
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <d123d288-4215-4a8c-9689-bbfe24c24b08@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Link queues to NAPIs using the netdev-genl API so this information is
-queryable.
+On 10/1/2024 7:30 PM, Paolo Abeni wrote:
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
+...
 
-[{'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'rx'},
- {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'rx'},
- {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'rx'},
- {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'rx'},
- {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 8201, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8202, 'type': 'tx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8203, 'type': 'tx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8204, 'type': 'tx'},
- {'id': 4, 'ifindex': 2, 'napi-id': 8205, 'type': 'tx'},
- {'id': 5, 'ifindex': 2, 'napi-id': 8206, 'type': 'tx'},
- {'id': 6, 'ifindex': 2, 'napi-id': 8207, 'type': 'tx'},
- {'id': 7, 'ifindex': 2, 'napi-id': 8208, 'type': 'tx'}]
+>> @@ -828,6 +837,9 @@ void page_pool_put_unrefed_netmem(struct page_pool 
+>> *pool, netmem_ref netmem,
+>>           recycle_stat_inc(pool, ring_full);
+>>           page_pool_return_page(pool, netmem);
+>>       }
+>> +
+>> +    if (!allow_direct_orig)
+>> +        rcu_read_unlock();
+> 
+> What about always acquiring the rcu lock? would that impact performances 
+> negatively?
+> 
+> If not, I think it's preferable, as it would make static checker happy.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- v2:
-   - Comments added to ena_napi_disable_in_range and
-     ena_napi_enable_in_range
-   - No functional changes
+As mentioned in cover letter, the overhead is about ~2ns
+I guess it is the 'if' checking before rcu_read_unlock that static
+checker is not happy about, there is also a 'if' checking before
+the 'destroy_lock' introduced in patch 2, maybe '__cond_acquires'
+can be used to make static checker happy?
 
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 28 +++++++++++++++++---
- 1 file changed, 24 insertions(+), 4 deletions(-)
+> 
+>>   }
+>>   EXPORT_SYMBOL(page_pool_put_unrefed_netmem);
+> 
+> [...]
+> 
+>> @@ -1121,6 +1140,12 @@ void page_pool_destroy(struct page_pool *pool)
+>>           return;
+>>       page_pool_disable_direct_recycling(pool);
+>> +
+>> +    /* Wait for the freeing side see the disabling direct recycling 
+>> setting
+>> +     * to avoid the concurrent access to the pool->alloc cache.
+>> +     */
+>> +    synchronize_rcu();
+> 
+> When turning on/off a device with a lot of queues, the above could 
+> introduce a lot of long waits under the RTNL lock, right?
+> 
+> What about moving the trailing of this function in a separate helper and 
+> use call_rcu() instead?
 
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 74ce9fa45cf8..96df20854eb9 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1821,20 +1821,40 @@ static void ena_napi_disable_in_range(struct ena_adapter *adapter,
- 				      int first_index,
- 				      int count)
- {
-+	struct napi_struct *napi;
- 	int i;
- 
--	for (i = first_index; i < first_index + count; i++)
--		napi_disable(&adapter->ena_napi[i].napi);
-+	for (i = first_index; i < first_index + count; i++) {
-+		napi = &adapter->ena_napi[i].napi;
-+		if (!ENA_IS_XDP_INDEX(adapter, i)) {
-+			/* This API is supported for non-XDP queues only */
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_TX, NULL);
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_RX, NULL);
-+		}
-+		napi_disable(napi);
-+	}
- }
- 
- static void ena_napi_enable_in_range(struct ena_adapter *adapter,
- 				     int first_index,
- 				     int count)
- {
-+	struct napi_struct *napi;
- 	int i;
- 
--	for (i = first_index; i < first_index + count; i++)
--		napi_enable(&adapter->ena_napi[i].napi);
-+	for (i = first_index; i < first_index + count; i++) {
-+		napi = &adapter->ena_napi[i].napi;
-+		napi_enable(napi);
-+		if (!ENA_IS_XDP_INDEX(adapter, i)) {
-+			/* This API is supported for non-XDP queues only */
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_RX, napi);
-+			netif_queue_set_napi(adapter->netdev, i,
-+					     NETDEV_QUEUE_TYPE_TX, napi);
-+		}
-+	}
- }
- 
- /* Configure the Rx forwarding */
--- 
-2.25.1
+For this patch, yes, it can be done.
+But patch 2 also rely on the rcu lock in this patch to ensure that free
+side is synchronized with the destroy path, and the dma mapping done for
+the inflight pages in page_pool_item_uninit() can not be done in 
+call_rcu(), as the driver might have unbound when RCU callback is
+called, which might defeat the purpose of patch 2.
+
+Maybe an optimization here is to only call synchronize_rcu() when there
+are some inflight pages and pool->dma_map is set.
 
 
