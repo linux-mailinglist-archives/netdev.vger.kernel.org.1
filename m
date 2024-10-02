@@ -1,83 +1,72 @@
-Return-Path: <netdev+bounces-131197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19F5D98D2F0
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:19:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8A598D335
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:27:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C06221F23382
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:19:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4D401F210E6
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 12:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B8D1CF7B4;
-	Wed,  2 Oct 2024 12:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570611D0798;
+	Wed,  2 Oct 2024 12:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="P92+ui/y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dpu+qaLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DD81CF7AE;
-	Wed,  2 Oct 2024 12:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DCDB1CF7AD;
+	Wed,  2 Oct 2024 12:24:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727871537; cv=none; b=NYZ8nrI4NqamP+rp8HDj3kHGFDCCCq/AKWlOXEWV0KL5QwOy7rZiDuHCZZozfs0VlnDRNya5u7QG4Zf6fEA6EA7zSVVRqeLo9QWrDwJLjCX7YyWOQTHWGL3CBnHyMVwe8I/MiFcR0U11dlAsN3V5KYhXM4BmTRBqjU148J1T7yw=
+	t=1727871873; cv=none; b=o/tMXsuaGstWSm3hNs2ZmbB+tuji7gGerEPqFEfk52GRxHaTZFp3nVkCx8MjfZctw629PNYdJC/0eRji0NUZUwlpI4Ci3kuICMCQkfWz2ubNSe6nz8gzcSEFpQ9CZhc8CqiYjOrjS4N+EQ/xiHD9tI7st+4m9rf7OucoRLO9LQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727871537; c=relaxed/simple;
-	bh=PKdoeMcD7lzOM1XvJJb2N/4Ew7wtL3xzZzq75utKfGA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tNBktkm4c1py91+7MwkTNzXMVt6i+/7r5wzJ0VmgqB7FnQXE8Uk/UGrO5ZpfV0qLENI/94/AgMKgiOh/2jErRMmB2v8VltBj+rBLw1TWRIcIVD906u564pvfxts16Ifye0KdXnuj4kNRyClGfsTrv+fjV5qel9e7tNfGAdWATaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=P92+ui/y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ShIcHfuNuoV920IUwp6pQ1cYx2Jhnay0IFUqJdBAWl0=; b=P92+ui/yaACFwJpdfJf9j1yMY0
-	ivVP8wBCk8yC5eX626xbCeDq3wxlD+N2icmUJljfhe9SN+TidXTXlFQD4PulAbjbOO4ynBWAY8ybs
-	pkbbw3y/XWgqENlVAnXcij3oND6qpY08Gbxj0YtgcE669TLtVSvYcgv/nhIjL4hRKDCs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1svyJY-008qxK-OU; Wed, 02 Oct 2024 14:18:44 +0200
-Date: Wed, 2 Oct 2024 14:18:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-Message-ID: <e048a4cc-b4e9-4780-83b2-a39ede65f978@lunn.ch>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
- <20241001112512.4861-2-fujita.tomonori@gmail.com>
- <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
- <20241002.113401.1308475311422708175.fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1727871873; c=relaxed/simple;
+	bh=J4yXn1XWnwW323VdrKw6Nt4cVDOFkgGgpEBsIie+JcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iGflZQTRKlIlF55zTngB6sJoLkjC15bVgW+F2Whx/WuG+VksVK0MTfvYR5rP20xNSa4CADE+pZgFxR7WOJEtSDNDH32UNnex1WWA3ERIh19u3CgBntFl64RS84smG5YxCoHQnAoX8deRWC5JI7JGHmKN4ILDA45fNSUrUbVi0hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dpu+qaLW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39EB7C4CED4;
+	Wed,  2 Oct 2024 12:24:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727871872;
+	bh=J4yXn1XWnwW323VdrKw6Nt4cVDOFkgGgpEBsIie+JcE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Dpu+qaLWoew5rISjCJovC7i4v8D5OdevB9pLALQBOvzHhtt/8nhB+nX7hUdB6ovfB
+	 6v35KO6IoaJ2i1L8nHS98ZqLECDdVWk6cpbJeqt1nhK8JJRZ56n/emJ0MBEct1b7DM
+	 FF+CbrjD94lKqXimwlv5cBQJCgV6oht11TWYRBDT1GPzo8hmA6ABBeIlpn/+LHMQiw
+	 zZGk2XF/8oGvdxaWvzlhRUy4MThmHQcvskntxstfbxmGZu+8Qi56D1dLWB2E2AtukQ
+	 a+YzJGIO+52eb6Kyn5o9LwYSmGS1EQunZGree7jcHdkRMM2NVUDYRsV09rj3St+A0d
+	 7zBG8qvSahhAg==
+Date: Wed, 2 Oct 2024 05:24:31 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Simon Horman <horms@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, thomas.petazzoni@bootlin.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net v2] net: pse-pd: tps23881: Fix boolean evaluation
+ for bitmask checks
+Message-ID: <20241002052431.77df5c0c@kernel.org>
+In-Reply-To: <20241002102340.233424-1-kory.maincent@bootlin.com>
+References: <20241002102340.233424-1-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002.113401.1308475311422708175.fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > I would also document the units for the parameter. Is it picoseconds
-> > or centuries?
-> 
-> Rust's Duration is created from seconds and nanoseconds.
+On Wed,  2 Oct 2024 12:23:40 +0200 Kory Maincent wrote:
+> In the case of 4-pair PoE, this led to incorrect enabled and
+> delivering status values.
 
-How well know is that? And is there a rust-for-linux wide preference
-to use Duration for time? Are we going to get into a situation that
-some abstractions use Duration, others seconds, some milliseconds,
-etc, just like C code?
-
-Anyway, i would still document the parameter is a Duration, since it
-is different to how C fsleep() works.
-
-	Andrew
+Could you elaborate? The patch looks like a noop I must be missing some
+key aspect..
 
