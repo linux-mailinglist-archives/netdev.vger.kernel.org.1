@@ -1,190 +1,121 @@
-Return-Path: <netdev+bounces-131248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D648598DC19
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:38:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEEAA98DC25
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:38:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 675861F252A2
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:38:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A59DB2866D
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:38:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30D81D3563;
-	Wed,  2 Oct 2024 14:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6841D1F53;
+	Wed,  2 Oct 2024 14:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="gHCx2vIV";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mv6zbJTO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r17oRAK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D91A1D1F4F;
-	Wed,  2 Oct 2024 14:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828DB1474BC;
+	Wed,  2 Oct 2024 14:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727879498; cv=none; b=VYwSZ+ovkIFbco42OJE57cV2THcOu3wxi1a73MPkJ+aXuMP52GyRPFvwKDonQeADmZToWWNo3nSQ2m74g1mYYhiSa/PHPwmdHJiUnBhGV5TOYqipiEspCLETHWV12ZQKdbGfLFUlIupMKM107wr/JcL0CWi3PpLrm+UrXnOL7NA=
+	t=1727879517; cv=none; b=t5sYSG08Lhv2tXRczjaXsLMtv8PNoKraSucToJcID06/GolBCdORr42GOUwx7KJFXQEvpvo8pvO3KAfmJDkt2+VOdXImWdeEoD7p2F/uLIRZq/pBXvJFZvIRyFAo2CwKlLyx9AP/OJDrMIIdLawMvWIIiGYjttgPATpUTNuLI8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727879498; c=relaxed/simple;
-	bh=NCDxRgu1iK1osuKd5Zm+/2EGnP34AlujI1EbScfYr0Y=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=lwdI/GFDF0cmHnsI/wCT3xBANRVGfxB4FlFQywAssSdqKEhfuwiY472lZ4DN2Y+QZXfXvlGpSnRDpk7jGnu2GCu9Wfa1kHOykdW59UOpPYjqIWPEtoOSMVRPSh76EVjQUGC+cCy2IaQwJH012nJHE5IdA1HBKJcbW8PSqiCNUVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=gHCx2vIV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mv6zbJTO; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id 874461380231;
-	Wed,  2 Oct 2024 10:31:35 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 02 Oct 2024 10:31:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1727879495;
-	 x=1727965895; bh=rf8by3v4c6wxG2SAfkG+4QnwQIhprVnUb59Vlto1X6A=; b=
-	gHCx2vIV9QfuNqjkmEElSCZDvXFYgcB4Q5oB+v7a+6I7jPaJFGMbbHCFfpw0sngl
-	7tR7ZVJFoMcCJjHjDpm3WwQBdTxrM4GCxvPikn1tkzMlF7gTmlQINLmJBCjgEuHr
-	OhefoKZOdDRY2y9SdX5sZoErlV6T2B6rmE9cgPWkton46yJ8tZPevghDQyFBKspr
-	9WFFfhIFVGsGSLhLwnjvGwxOQ45gYQyylVrfiSll6nWrPcKLxKfhLQ66JlePoy+b
-	dYFUwLGXgf4bw7wgi4/ZNwHtDHyPGCv+Uev+88bScjrvgxttzmaIc5ih3z2AjUwh
-	2XcGYDzKBl4WSF77heYaXw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1727879495; x=
-	1727965895; bh=rf8by3v4c6wxG2SAfkG+4QnwQIhprVnUb59Vlto1X6A=; b=m
-	v6zbJTOVhP/uBzJEIDY9m4jU+6GBUw37ibxpilkl3q4K7m5rDOz81+/mleqTUnvL
-	/77Bu8kZJ9l3P71fE7fEau+3a4rSIQkebSoJ0ANG0vAG5bGEXuHg10XrchRXzSr7
-	tpByorYv77N9mS5ULxWtWxgaNhH34TPtrcAC6bwwqdJuDM3j6uVf34sUXD1wGeDj
-	bljI0abJwiTlVo6YgIg++r7hSkvUhxzD002J39GiFDljnFW9ShF8TwEcV7zui/zf
-	qDEt3DKcGLQeQbyil5nD1H8UvB24QExWEddCDxRmjuzGWiYr2gEYeSNlg4bmnnDd
-	abcWTB8AVA9ybtcJSjfaQ==
-X-ME-Sender: <xms:Rln9ZtZf5cgQxHmStXMSrLis5BgTaZvCAxiWBXbBP02122_WUHx2qw>
-    <xme:Rln9ZkYuAtMSyLFNl21caHz0kNaKHC1VSd8iEhD1LwxYr-nxs4rek6V-zejnsWV8E
-    0UTql6lclOFEPjeZVE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdduledgjeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertdertddt
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhephfdthfdvtdefhedukeetgefggffhjeeggeetfefg
-    gfevudegudevledvkefhvdeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepfedv
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguvghrvghkrdhkihgvrhhnrghnse
-    grmhgurdgtohhmpdhrtghpthhtohepughrrghgrghnrdgtvhgvthhitgesrghmugdrtgho
-    mhdprhgtphhtthhopehhvghrvhgvrdgtohguihhnrgessghoohhtlhhinhdrtghomhdprh
-    gtphhtthhopehluhgtrgdrtggvrhgvshholhhisegsohhothhlihhnrdgtohhmpdhrtghp
-    thhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhmpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgu
-    hidrshhhvghvtghhvghnkhhosehgmhgrihhlrdgtohhmpdhrtghpthhtohepsghhvghlgh
-    grrghssehgohhoghhlvgdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhm
-X-ME-Proxy: <xmx:Rln9Zv_vaCGx15zWrOqITWuikEoalJdRpR43q_8tYPQh7-mJM-h2rQ>
-    <xmx:Rln9Zrq1RCfB7hFitPHtKz7KzaotC-TvuySs5kpPqKl695t_L1XCZw>
-    <xmx:Rln9ZopAQoMedU_A2RU5bIGodo42JFIWnCLkxKQQPeykRArv0lQOIg>
-    <xmx:Rln9ZhQTUBXwlLKOpmy_cHD2NVBm7QNmCVYD0eQyd2HQ5LHOMJTIPA>
-    <xmx:R1n9Zu0cPaNNipONgtasztfjGETuBHU79SnAInW0Mwo97I1TJGRuSgIk>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 6899A2220071; Wed,  2 Oct 2024 10:31:34 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1727879517; c=relaxed/simple;
+	bh=TzXJCdWdRWwVvx33ZcTVl3SwsLMpe/mn3P3Ch+XmJvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j/1i+J2LhUtt/ZuClD7kR97rsJFI9GjFIwc84enXjs6LU7E+fFuZzns4898r1eC17P7tL8RvuUEEzwXF8gYCRCtwXNUGf+GFsTGfIR2gUmxv3xDJU0t+emGY8grGPPLBVELat9lWC9/Ek6k+iEdkSPDvzpcDf160dG9GWhOpoDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r17oRAK1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0A2EC4CEC2;
+	Wed,  2 Oct 2024 14:31:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727879517;
+	bh=TzXJCdWdRWwVvx33ZcTVl3SwsLMpe/mn3P3Ch+XmJvI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r17oRAK1v2El3f/VHzjHBLnkzn/zUWpOcz+H40nO25eIUnFkx7lYgO5PLgmjbqiC9
+	 gJEDVd1ptAMeF0euL4ObietQcVitSm7HPNEWS/YPs7RKRCDHVMMXnlV3u92AZ2sVEq
+	 L+TydGy5d2kZve7BNmFdF5/ZR7zitQAHeJthhWDoYKRnE5EMXdhaSavb1mMz+NuLtH
+	 czCw9r8SjO/u6CIsufxnr+FyK5vD9sbYtVYit/0pWS43HM2n9hG3YonEwfSDEO7Z0+
+	 vajJ5mMacblFfqulP5idB4ROcOmupoGrr/aG1QL2kT97Z0dGKJEbqVjTEHGvjhi8MC
+	 M9kib2u0paCGw==
+Date: Wed, 2 Oct 2024 07:31:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Simon Horman <horms@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, thomas.petazzoni@bootlin.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net v2] net: pse-pd: tps23881: Fix boolean evaluation
+ for bitmask checks
+Message-ID: <20241002073156.447d06c4@kernel.org>
+In-Reply-To: <20241002145302.701e74d8@kmaincent-XPS-13-7390>
+References: <20241002102340.233424-1-kory.maincent@bootlin.com>
+	<20241002052431.77df5c0c@kernel.org>
+	<20241002052732.1c0b37eb@kernel.org>
+	<20241002145302.701e74d8@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 02 Oct 2024 14:31:13 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Herve Codina" <herve.codina@bootlin.com>
-Cc: "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>,
- "Simon Horman" <horms@kernel.org>, "Lee Jones" <lee@kernel.org>,
- "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
- "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- "Philipp Zabel" <p.zabel@pengutronix.de>,
- "Lars Povlsen" <lars.povlsen@microchip.com>,
- "Steen Hegelund" <Steen.Hegelund@microchip.com>,
- "Daniel Machon" <daniel.machon@microchip.com>,
- UNGLinuxDriver@microchip.com, "Rob Herring" <robh@kernel.org>,
- "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
- "Conor Dooley" <conor+dt@kernel.org>,
- "Saravana Kannan" <saravanak@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Horatiu Vultur" <horatiu.vultur@microchip.com>,
- "Andrew Lunn" <andrew@lunn.ch>, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "Allan Nielsen" <allan.nielsen@microchip.com>,
- "Luca Ceresoli" <luca.ceresoli@bootlin.com>,
- "Thomas Petazzoni" <thomas.petazzoni@bootlin.com>
-Message-Id: <3e21a3ba-623e-4b75-959b-3cdf906ee1bd@app.fastmail.com>
-In-Reply-To: <20241002144119.45c78aa7@bootlin.com>
-References: <20240930121601.172216-1-herve.codina@bootlin.com>
- <20240930121601.172216-4-herve.codina@bootlin.com>
- <b4602de6-bf45-4daf-8b52-f06cc6ff67ef@app.fastmail.com>
- <20241002144119.45c78aa7@bootlin.com>
-Subject: Re: [PATCH v6 3/7] misc: Add support for LAN966x PCI device
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 2, 2024, at 12:41, Herve Codina wrote:
-> On Wed, 02 Oct 2024 11:08:15 +0000
-> "Arnd Bergmann" <arnd@arndb.de> wrote:
->> On Mon, Sep 30, 2024, at 12:15, Herve Codina wrote:
->> 
->> > +			pci-ep-bus@0 {
->> > +				compatible = "simple-bus";
->> > +				#address-cells = <1>;
->> > +				#size-cells = <1>;
->> > +
->> > +				/*
->> > +				 * map @0xe2000000 (32MB) to BAR0 (CPU)
->> > +				 * map @0xe0000000 (16MB) to BAR1 (AMBA)
->> > +				 */
->> > +				ranges = <0xe2000000 0x00 0x00 0x00 0x2000000
->> > +				          0xe0000000 0x01 0x00 0x00 0x1000000>;  
->> 
->> I was wondering about how this fits into the PCI DT
->> binding, is this a child of the PCI device, or does the
->> "pci-ep-bus" refer to the PCI device itself?
->
-> This is a child of the PCI device.
-> The overlay is applied at the PCI device node and so, the pci-ep-bus is
-> a child of the PCI device node.
+On Wed, 2 Oct 2024 14:53:02 +0200 Kory Maincent wrote:
+> On Wed, 2 Oct 2024 05:27:32 -0700
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> 
+> > On Wed, 2 Oct 2024 05:24:31 -0700 Jakub Kicinski wrote:  
+> > > On Wed,  2 Oct 2024 12:23:40 +0200 Kory Maincent wrote:    
+> > > > In the case of 4-pair PoE, this led to incorrect enabled and
+> > > > delivering status values.      
+> > > 
+> > > Could you elaborate? The patch looks like a noop I must be missing some
+> > > key aspect..    
+> > 
+> > Reading the discussion on v1 it seems you're doing this to be safe,
+> > because there was a problem with x &= val & MASK; elsewhere.
+> > If that's the case, please resend to net-next and make it clear it's
+> > not a fix.  
+> 
+> Indeed it fixes this issue.
 
-Ok
+Is "this" here the &= issue or the sentence from the commit message?
 
-> 				/*
-> 				 * Ranges items allow to reference BAR0,
-> 				 * BAR1, ... from children nodes.
-> 				 * The property is created by the PCI core
-> 				 * during the PCI bus scan.
-> 				 */
-> 				ranges = <0x00 0x00 0x00 0x82010000 0x00 0xe8000000 0x00 0x2000000
-> 					  0x01 0x00 0x00 0x82010000 0x00 0xea000000 0x00 0x1000000
-> 					  0x02 0x00 0x00 0x82010000 0x00 0xeb000000 0x00 0x800000
+> Why do you prefer to have it on net-next instead of a net? We agreed with
+> Oleksij that it's where it should land. Do we have missed something?
 
->
-> Hope this full picture helped to understand the address translations
-> involved.
+The patch is a noop, AFAICT. Are you saying it changes how the code
+behaves? 
 
-Right, that makes a lot of sense now, I wasn't aware of those
-range properties getting set. Now I have a new question though:
+The patch only coverts cases which are 
 
-Is this designed to work both on hosts using devicetree and on
-those not using it? If this is used on devicetree on a board
-that has a hardwired lan966x, we may want to include the
-overlay contents in the board dts file itself in order to
-describe any possible connections between the lan966x chip
-and other onboard components such as additional GPIOs or
-ethernet PHY chips, right?
+	ena = val & MASK;
 
-      Arnd
+the automatic type conversion will turn this into:
+
+	ena = bool(val & MASK);
+which is the same as:
+	ena = !!(val & MASK);
+
+The problem you were seeing earlier was that:
+
+	ena &= val & MASK;
+
+will be converted to:
+
+	ena = ena & (val & MASK);
+
+and that is:
+
+	ena = bool(int(ena) & (val & MASK));
+                   ^^^
+
+IOW ena gets promoted to int for the & operation.
+This problem does not occur with simple assignment.
 
