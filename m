@@ -1,75 +1,81 @@
-Return-Path: <netdev+bounces-131110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA9CB98CC0C
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:29:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5247298CC25
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 06:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF571C2125B
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 04:29:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB2561F244A0
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 04:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624FA18049;
-	Wed,  2 Oct 2024 04:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7712617741;
+	Wed,  2 Oct 2024 04:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eeVieW0p"
+	dkim=pass (2048-bit key) header.d=de.bosch.com header.i=@de.bosch.com header.b="E3tQFLFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2071.outbound.protection.outlook.com [40.107.20.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29E0E56C;
-	Wed,  2 Oct 2024 04:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727843375; cv=none; b=KNmHQURlxvv8XO4jnrW4WhSP6I4vodKJYGe8J7ZPduBNyl2WBr9zm9VdkV+W4ZpToXCdwg+nzJuxpkyyDUALKx+dfDU7SJbpnZimfl7l/dGz/RXTdKDUhsQuRUE+t4O8Q3cOXgp0KorTM/Yn7h/KcU/C+LC07IpfPryLpMpmfO4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727843375; c=relaxed/simple;
-	bh=3BNmKtj4D4swYXXXHuY5gShlGkJba5UJw39ydnSka7Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f/iF4LJsiADirREzTV79X8DCVqM7KaUk4Ews1UGc5eSyBG8uUL4as2Jq2k7KJqff1ElBMqbheSVYAMVu1E8pGCS7YCRDhc4mSh5xeHvgTiseP/hHetwXPi2ALMd0twb3KAkE5jTFlow/dTvbssxWODlRiK+Mf/TdoPsW5PZKyK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eeVieW0p; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e0b0142bbfso329230a91.1;
-        Tue, 01 Oct 2024 21:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727843373; x=1728448173; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1aqbtvkr7o9HD9T9YGWxyc03LOcKwSp/b8mCVE0XMhw=;
-        b=eeVieW0pIx7zHhCtDjbVQzuayOO8PJbJqcqAnKfhp7Xqd/GkDHhCn//aeR9bDPrnb5
-         OnyjKvLJ5hAJyd+KttGFiK45DEtfcH6URR0qDNccyRBgDxlqURRcWWeINHWqd71w1w46
-         t+YAVFfBOf/FlhpU5GiOPW90zRhNQYE7RVnrimOqzEQQca/oeCobdGfAsh8hdg15XHhC
-         bSDyHi1y2hrn04Yw0SputFp8IK2mitL08blsKwNraxbhlMoeRKEX2M83hAwre+iM2My+
-         FmcLNHfL34YQZwyTk1DkeQy3vlhKGOuoV9TMOapM3Mj9POtwPBhKdMYFxuNKmD4DRrOg
-         fifQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727843373; x=1728448173;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1aqbtvkr7o9HD9T9YGWxyc03LOcKwSp/b8mCVE0XMhw=;
-        b=xEWooXQBEjMpSB0rt/LChogo7qCVhlL3IoAXI0MfIv12fEMQggBJhzahmSjlMOFRyc
-         Cmd8RIDWWiLbMia785RlbwW10nhXz2BZpv51rno3Oin/k5B5OdhPSn+Be7wJ6er/WySH
-         W+RI27sEIAUZsdnLPOmGaboTj/++vb4sSZfq9fDvi7vmv5FCv8aGng2+LxA0Gx909qv5
-         sTTOkP08sop0YdPtSXJxdAwT7gl37qc9eycdRXFZ9jC8oS34ISG/ZgJRQkwn80hxj8Qv
-         uY2LZQD5sBsTqKfNpmwX1yByiNbS6Vn0FV/R5U6+i+XFFmt8jW2D2eIi4UsvwNYHvcbG
-         6Fow==
-X-Forwarded-Encrypted: i=1; AJvYcCWR9b9AbqGEyFbhwf7juOowpNMUARBWab5v5qHhE7nv1SPdLb04VMyL16etaqFwsd7gPPnozi3I@vger.kernel.org, AJvYcCWUdyGd/x/KXkLZTtbIDovN5Lej8YYXbHYsHBmSPFvac3xhqV8xvIMFxEIqfizlkScEOGNvbXDqTS33@vger.kernel.org, AJvYcCX/ZNOoGxaHCTNu/7QtLMxiZ5rnm6704b31SlWkGO/wxD2nEh2cm3/QlB5qCN0TL7Yaa11HL6hsKHmD12Oi@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvIrkaDKCt43JTCu+dAwMm2Wc6p3Rp4J2MPNEzWyP/ef9y6m3w
-	juRUkhdBxIqrV3yijQBX9pjMa0reMSHJYeIT/8bo03ZW4eEhp5Pg
-X-Google-Smtp-Source: AGHT+IFcuOK1+fCsRy8o8dlxNxccaY2uqup3/aALtFnjEzbZozpAlH3V3f7eL7oTFOli+hXpHZyP9A==
-X-Received: by 2002:a17:90b:11cf:b0:2da:88b3:cff8 with SMTP id 98e67ed59e1d1-2e1851c6ec4mr2864194a91.6.1727843372986;
-        Tue, 01 Oct 2024 21:29:32 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e18f74654fsm551159a91.6.2024.10.01.21.29.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 01 Oct 2024 21:29:32 -0700 (PDT)
-Message-ID: <9ef2457d-c882-41ed-aec3-b62adb65f3c8@gmail.com>
-Date: Tue, 1 Oct 2024 21:29:31 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5B61C2E;
+	Wed,  2 Oct 2024 04:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727844019; cv=fail; b=CnIpwSKt0ssAXfLBTPax6SbFWlCOiEKtNZ3bJcfd4x3IIWohXmRc4OPh9LkYY4l57Ii8WRfPIz/f/0/eb2s2Mol9otezOl23lFhGx65fRaSA3vNHhC0q3S2/SLoPWCzVbZtgIUFlBKguqcFFB3/04HqLGcQfuimYRpveKS63VFI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727844019; c=relaxed/simple;
+	bh=nmC0L4Ni39y7qFCuFtTlgBzFMvvj43VCez3uzTC79zM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gFYnf5YDKvv+mU4OeM95sZ+PBzMIFVhQa8qM62GHJA3ufehcFP2KEC39gjT6+AB1YIOs8gUmShS25cpuCNnKcWqyw85SCU/c8e0p3YEx+Wkys9YnzD1DM8H0xvwvyu96Dr0/zHKFSrKLWo478i8CaCxMWuEkMCMkIFTeQyjUTH8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=de.bosch.com; spf=pass smtp.mailfrom=de.bosch.com; dkim=pass (2048-bit key) header.d=de.bosch.com header.i=@de.bosch.com header.b=E3tQFLFu; arc=fail smtp.client-ip=40.107.20.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=de.bosch.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.bosch.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=M08PfxGsUZ2Ms9iGCfY8KXcL15kHhDOu3NPNq99I/9VBM/Tl4diF4oAPwY4vWkVDdIOMTKR+qSKqEgierTb5yJSKJIIVCIpMutESWIbG9tSuSbpfICoj/TtMXgFi2VlP4fdtbMxxKVEQfvj4WBv8GtwBrxUY8aA9a/QePtZFEvDyhd/SxIzDqt6IHx8MUvHMxFt2xeKRfKGpwUfOEj/ywU3TywP2XqGspPAOpP/AF4A/yhFZfauzOlfFG6Gz50zn7xnZOL7QgDcVU+H5xQpwmgATyhQcUL+ReP9qJ0tiKxw7USUNt54dVJn73Ojii0kDcOzgrz8H7dlhpTlE4Usabg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=obYiaakf6AdhISY5rnNwKZrkwp4QoIpfB3KuQdX7Yl8=;
+ b=w75m0X/6rqJm+h/QGkFUogH+mnjnnQlHrQ2VFLEyZdScbhvgBITvG/mYuu2giu7JYeYE/wmSJxe8MEtI9QbKoZIWYdXC/P0Eh6Lime2qJTqGfnwSR5b3x06fB1v5QK8E0zYJ3npVqg771j46qHNA1Js3++BjKOAIpL20z0NX2s3Bo0LM74mMgLPTHrDNLtAZaiuiBo1K4vMQZ8ZeOFPqnFuUYFq2RdnUTBfjOVN6TP9SHgEdEganZAm+C1do7gxYcWjhQd4xDZGQy9WLV2wEhHPFhAbpVTWGLUHcm7fal+4037mEMICstg0tLYXUqS14nkr9gh2GiNZvDDP65xGyMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 139.15.153.205) smtp.rcpttodomain=lunn.ch smtp.mailfrom=de.bosch.com;
+ dmarc=pass (p=reject sp=none pct=100) action=none header.from=de.bosch.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=de.bosch.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=obYiaakf6AdhISY5rnNwKZrkwp4QoIpfB3KuQdX7Yl8=;
+ b=E3tQFLFue5uVGKnTQHaP9uoANiYK6DtlYgqJ8yRdckMQTxp1hXM9l7eJiFXLyljeeMHYk5WjLnsOOqQd9ngampAUtt0ymmLn74r3XITwZdu21uXmA8Pv8CjTfoJlKpsYrZ6sLjgp3wPb06WHshGY25/ku2BEhK/DILHJNOG/q6FQtUxtRRzzrPWf1DJrpHo/g8iMTqV04tOUbA/qKbBYe324EFan+Hay9YsW8abT+uizWhXiwYCWRz28rmBdyIhjgJGC0gqOj8wL7II5OGdoMdd7aQpZGS2zHW73X2Eto6O6JUM5wdapfwjr2CU8C61Vo1dSK5luQSr5xCmtAuhc0Q==
+Received: from DUZP191CA0042.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:4f8::6) by
+ AM0PR10MB3492.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:158::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8005.24; Wed, 2 Oct 2024 04:40:11 +0000
+Received: from DB3PEPF0000885B.eurprd02.prod.outlook.com
+ (2603:10a6:10:4f8:cafe::2e) by DUZP191CA0042.outlook.office365.com
+ (2603:10a6:10:4f8::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16 via Frontend
+ Transport; Wed, 2 Oct 2024 04:40:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 139.15.153.205)
+ smtp.mailfrom=de.bosch.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=de.bosch.com;
+Received-SPF: Pass (protection.outlook.com: domain of de.bosch.com designates
+ 139.15.153.205 as permitted sender) receiver=protection.outlook.com;
+ client-ip=139.15.153.205; helo=eop.bosch-org.com; pr=C
+Received: from eop.bosch-org.com (139.15.153.205) by
+ DB3PEPF0000885B.mail.protection.outlook.com (10.167.242.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8026.11 via Frontend Transport; Wed, 2 Oct 2024 04:40:10 +0000
+Received: from FE-EXCAS2001.de.bosch.com (10.139.217.200) by eop.bosch-org.com
+ (139.15.153.205) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 2 Oct
+ 2024 06:40:10 +0200
+Received: from [10.34.219.93] (10.139.217.196) by FE-EXCAS2001.de.bosch.com
+ (10.139.217.200) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 2 Oct
+ 2024 06:40:09 +0200
+Message-ID: <76d6af29-f401-4031-94d9-f0dd33d44cad@de.bosch.com>
+Date: Wed, 2 Oct 2024 06:39:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,72 +83,155 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/2] net: phy: Add support for PHY timing-role
- configuration via device tree
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>
-Cc: Russell King <rmk+kernel@armlinux.org.uk>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org
-References: <20241001073704.1389952-1-o.rempel@pengutronix.de>
- <20241001073704.1389952-3-o.rempel@pengutronix.de>
+Subject: iopoll abstraction (was: Re: [PATCH net-next v1 2/2] net: phy:
+ qt2025: wait until PHY becomes ready)
+To: Andrew Lunn <andrew@lunn.ch>, Alice Ryhl <aliceryhl@google.com>
+CC: FUJITA Tomonori <fujita.tomonori@gmail.com>, <netdev@vger.kernel.org>,
+	<rust-for-linux@vger.kernel.org>, <hkallweit1@gmail.com>,
+	<tmgross@umich.edu>, <ojeda@kernel.org>, <alex.gaynor@gmail.com>,
+	<gary@garyguo.net>, <bjorn3_gh@protonmail.com>, <benno.lossin@proton.me>,
+	<a.hindborg@samsung.com>
+References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
+ <20241001112512.4861-3-fujita.tomonori@gmail.com>
+ <CAH5fLghAC76mZ0WQVg6U9rZxe6Nz0Y=2mgDNzVw9FzwpuXDb2Q@mail.gmail.com>
+ <c8ba40d3-0a18-4fb4-9ca3-d6cee6872712@lunn.ch>
 Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
- 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20241001073704.1389952-3-o.rempel@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Dirk Behme <dirk.behme@de.bosch.com>
+In-Reply-To: <c8ba40d3-0a18-4fb4-9ca3-d6cee6872712@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB3PEPF0000885B:EE_|AM0PR10MB3492:EE_
+X-MS-Office365-Filtering-Correlation-Id: df46ab95-ab71-4912-34f6-08dce29c4c7d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?YWQvdjVuclJicFlpL1ZKcnd5ZCtYVTl5aVFnellaTVBMQ1l1Uzc2SDAzbWFR?=
+ =?utf-8?B?LzZ2QjFwcGUwUDM0Z0k1RVJzU21IdHZQd1dWWmJ5SFlIenJwZmNsZHEvanR6?=
+ =?utf-8?B?QjRKV2F6R25RUmpBUmNCbDNuL3llUW5IeC9DZk8wci94ZVVBa2FISWV2TFcv?=
+ =?utf-8?B?dllKUVRsR3c0bXd1NEdFd2hxSUI3YjJwYnpBQ1JlVEU0QXYrWExPTXpMaWFH?=
+ =?utf-8?B?N1A4QUJIVTBlSGlZcU5sREVIKzRvcjlEKzhrdEIwT0V0KzdXMzJBcy9tck1N?=
+ =?utf-8?B?VVNUbS9KalAwUjdHejdIZkFhdEpucGpxbU5ldTVJSDNoQXhvRmlCYXllbXJQ?=
+ =?utf-8?B?cFdyNlZTS0NTK3RVOWxueGQxcTJxQTNQTEtnQ1NqSjduMXVUb3B1aytvcmxO?=
+ =?utf-8?B?cFdNY3dKRXo5RFVUOXFTRC9PWnAwRVJhTUl5YStqOGRVNi9xQStFZnZ3Mlpy?=
+ =?utf-8?B?ajE5TktQRlF1dUxaZnY1Q1BTL1lvUnlva1dQZkNFc2dmbm9kSjFmM1l4Q1Qz?=
+ =?utf-8?B?aC80SlVtSEJ4WWhJVUMrV095TytxaTFrdU02SlgxY25SK0ZUVXhEV0tDOVM1?=
+ =?utf-8?B?aFZ4eURyRVN4NWYvcmVlMGlaTEE2eXpscHNJbzNURHUyeUVzSkZqbDFQU1dz?=
+ =?utf-8?B?dW5Kd3dtYkV2aDlwTXYzYTFVR1o5dEZNdEJNZVZkZllOZXZHelJab3NISUpK?=
+ =?utf-8?B?amFLUlBKNnNNRUZ3UXp0bUlGUm0zTkxhNTljVGJzUmVPc2lhTjBNS2NuSWQ1?=
+ =?utf-8?B?c2hVbHgybE5VQjJtd3NoUklGTlVIblpKb2sxUlRDcnZhQVpyaXlka0hHYWdZ?=
+ =?utf-8?B?cDFqVERBanpRUVdiZ3luRktwc2hxMFBnVkNRSWwzRU9OT0JmeHk5dW9KeGlB?=
+ =?utf-8?B?dEhZRW9rT3VLMmh2TFhMWXVrVXNFMDVoQWM2a05OaFV2Um93Smczd1ZHUzB3?=
+ =?utf-8?B?SWFuZFVYQTdJWDIvT3hXb2RMZjJjK0FFSEduVjVkdUJIeVVRRFYwQ3E3Y1pM?=
+ =?utf-8?B?cENqK0EwQ1FkVUs3SktzRzdJT1FvQTJRNUluemcvN1ZRY0RUWFI3UUl2UVlQ?=
+ =?utf-8?B?WG1GRXpCbnRuaEFqNUw3dG1USmErdkJuQTJzUVNQY1NhQ2lQd1BWbjVWMnBk?=
+ =?utf-8?B?K0xrbTBPbmdFR0JyUEtpWTFpQTZ6ZHpuYnUwMXJqRTByTTRnTmVScUFJaGti?=
+ =?utf-8?B?ajJTSjR0R0FaditPT2R0ZzNKeHVqV0o0cUgwbnJsZkx5ZFlXdTl2YWI5dTNR?=
+ =?utf-8?B?dkI5N3JqekhJSmtkdXJWdEFvWHpmUG1YWkVSdDZjZ2R1a3FoNGFjS1RuZTdH?=
+ =?utf-8?B?YVZFb0xLOGk3dVh6TTEzc3FXZXgweUkrVXJ4S2hjWmIxTTZlNVdIUDQ4RHNh?=
+ =?utf-8?B?dm5NcFkvREZQTzk0clNOeWt3T2ZEQTFwcXUxM1FzYWJraTdwbmN0Nnp3Qkhx?=
+ =?utf-8?B?Nm1YaXY4ZzJJM0o0SkZ4WCtWV2dPVXQ0aTB2a1hsMTMxdXB6dW5DUXdSeGV5?=
+ =?utf-8?B?TW9IQVI2dmVCQXRmclFWT2grQ2NBVzltNFFqeDlNS09iZnBJQ2kweXcxSjk3?=
+ =?utf-8?B?WWE4bC9kQjNVZTBSc1h4S1VTcGQwSFRmZHJHYWhidWJxRFVvaG5DUnZXaEc5?=
+ =?utf-8?B?UW9kSHM0Vjc5dFpIZkN5Q24zdGFlSlR0V0NkSDJObVRjNTRBdFRWUFVTUjJD?=
+ =?utf-8?B?UDk3Tk83QWpTMmtkZEFmb1VWZnM0cjJkYVgweGVsUWRhaWhLNUtrNDJtN3Fo?=
+ =?utf-8?B?M1IyV2h3WFZzak1pTkIvNWhMRmFqYlZ0dHMrRGxiSDl2QnJzMzVQbm00SXdi?=
+ =?utf-8?B?cVNLM2pNVHd2M0t1YWpweUNLL2R3RUNydWJSUkV4cDh1eThmdUVSK1ZQWUow?=
+ =?utf-8?Q?jJNYoaWzmQrCS?=
+X-Forefront-Antispam-Report:
+	CIP:139.15.153.205;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:eop.bosch-org.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: de.bosch.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2024 04:40:10.4879
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: df46ab95-ab71-4912-34f6-08dce29c4c7d
+X-MS-Exchange-CrossTenant-Id: 0ae51e19-07c8-4e4b-bb6d-648ee58410f4
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=0ae51e19-07c8-4e4b-bb6d-648ee58410f4;Ip=[139.15.153.205];Helo=[eop.bosch-org.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DB3PEPF0000885B.eurprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR10MB3492
 
-
-
-On 10/1/2024 12:37 AM, Oleksij Rempel wrote:
-> Introduce support for configuring the master/slave role of PHYs based on
-> the `timing-role` property in the device tree. While this functionality
-> is necessary for Single Pair Ethernet (SPE) PHYs (1000/100/10Base-T1)
-> where hardware strap pins may be unavailable or incorrectly set, it
-> works for any PHY type.
+On 01.10.2024 14:48, Andrew Lunn wrote:
+> On Tue, Oct 01, 2024 at 01:36:41PM +0200, Alice Ryhl wrote:
+>> On Tue, Oct 1, 2024 at 1:27 PM FUJITA Tomonori
+>> <fujita.tomonori@gmail.com> wrote:
+>>>
+>>> Wait until a PHY becomes ready in the probe callback by using a sleep
+>>> function.
+>>>
+>>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>>> ---
+>>>   drivers/net/phy/qt2025.rs | 11 +++++++++--
+>>>   1 file changed, 9 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+>>> index 28d8981f410b..3a8ef9f73642 100644
+>>> --- a/drivers/net/phy/qt2025.rs
+>>> +++ b/drivers/net/phy/qt2025.rs
+>>> @@ -93,8 +93,15 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+>>>           // The micro-controller will start running from SRAM.
+>>>           dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
+>>>
+>>> -        // TODO: sleep here until the hw becomes ready.
+>>> -        Ok(())
+>>> +        // sleep here until the hw becomes ready.
+>>> +        for _ in 0..60 {
+>>> +            kernel::delay::sleep(core::time::Duration::from_millis(50));
+>>> +            let val = dev.read(C45::new(Mmd::PCS, 0xd7fd))?;
+>>> +            if val != 0x00 && val != 0x10 {
+>>> +                return Ok(());
+>>> +            }
+>>
+>> Why not place the sleep after this check? That way, we don't need to
+>> sleep if the check succeeds immediately.
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Nice, you just made my point :-)
+> 
+> I generally point developers at iopoll.h, because developers nearly
+> always get this sort of polling for something to happen wrong.
+> 
+> The kernel sleep functions guarantee the minimum sleep time. They say
+> nothing about the maximum sleep time. You can ask it to sleep for 1ms,
+> and in reality, due to something stealing the CPU and not being RT
+> friendly, it actually sleeps for 10ms. This extra long sleep time
+> blows straight past your timeout, if you have a time based timeout.
+> What most developers do is after the sleep() returns they check to see
+> if the timeout has been reached and then exit with -ETIMEDOUT. They
+> don't check the state of the hardware, which given its had a long time
+> to do its thing, probably is now in a good state. But the function
+> returns -ETIMEDOUT.
+> 
+> There should always be a check of the hardware state after the sleep,
+> in order to determine ETIMEDOUT vs 0.
+> 
+> As i said, most C developers get this wrong. So i don't really see why
+> Rust developers also will not get this wrong. So i like to discourage
+> this sort of code, and have Rust implementations of iopoll.h.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+
+Do we talk about some simple Rust wrappers for the macros in iopoll.h? 
+E.g. something like [1]?
+
+Or are we talking about some more complex (safety) dependencies which 
+need some more complex abstraction handling?
+
+Best regards
+
+Dirk
+
+[1]
+
+int rust_helper_readb_poll_timeout(const volatile void * addr,
+                                   u64 val, u64 cond, u64 delay_us,
+                                   u64 timeout_us)
+{
+        return readb_poll_timeout(addr, val, cond, delay_us, timeout_us);
+}
+
+
 
 
