@@ -1,99 +1,117 @@
-Return-Path: <netdev+bounces-131243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DDAA98D9CF
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:15:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058CD98DA24
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 16:17:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5209528994E
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:15:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEB801F27D00
+	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 14:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3EF1D1E9B;
-	Wed,  2 Oct 2024 14:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2BE1D14E5;
+	Wed,  2 Oct 2024 14:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="V1wjnvEq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrlP/vs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C2A1E52C
-	for <netdev@vger.kernel.org>; Wed,  2 Oct 2024 14:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B4D1D0E08;
+	Wed,  2 Oct 2024 14:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727878237; cv=none; b=iVXiEppdyiyj+1ImfW6V/xhMUT5nLEUBkWu1DaqBl5vj62TkTB/gytlWey+0sGOCBZ/8gAEuPfpJOc9TGRS1tBLxDOEo+/pmmIkAxfvJThgZmkGEz2x41VRPNwKc5g7nkzzWSDFj/ooMlRKL9ChfbT5eu7gUi8mZaEIEOT+u9TM=
+	t=1727878436; cv=none; b=B22bwqulaYK53zNUwekm45pveLKdCP5GdpOjwkEKe3r9yhB8e6bKbf4gX+xRqbfnb1xVDJGKVGf97/9REkrlnLVZF5sZkMDCpJgKq+UW1KnM24MSuBYXvB6EowRUImVbdzvFqqDiL4hwpaTdRGO+0lCCC8e9pNZqzV0onj7c+rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727878237; c=relaxed/simple;
-	bh=9qhrF6dWOZt3jTJdJ1xe2SB5GEpDGrJ6qbkp8tIIw6Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PjlxrSIvu9vNtb8ifEz7D0REZMbKJq8rciRi6sjYTHt97Uiw8QmwjLbrOQjtTKQ+Q7DJB3w5Q22Ag8n0YU1gwXUc4z8i1VTeOxk3p+/Xva3xSWNWwXd0dCh2FS0OEi6qzbl/U+wKxVoZ9jdipigieyXuo122hIWiWxaxZNqbcH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=V1wjnvEq; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727878236; x=1759414236;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=06vWo49lJU4SByqgIqPHwQstMjyfCgtKCOG5uo/+WaE=;
-  b=V1wjnvEqzG+p4++nozEx05vYDvQNEYpegVHPKSKWARRzFcFqV2bbK9pk
-   mt/3IBJP5mM2AQhKp8rtP93KoETNkUtTmWgov67+ZpoUoVrYB/0Mcq0QX
-   EwyCRAVxI5r/wuaV/elyJXfh78VtA3kyPqhv0hTxUl6oPwEJBss8L6oZU
-   o=;
-X-IronPort-AV: E=Sophos;i="6.11,171,1725321600"; 
-   d="scan'208";a="236175721"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 14:10:32 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:27755]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.107:2525] with esmtp (Farcaster)
- id dd50d66f-e96d-435b-971a-3bc4a29b722a; Wed, 2 Oct 2024 14:10:32 +0000 (UTC)
-X-Farcaster-Flow-ID: dd50d66f-e96d-435b-971a-3bc4a29b722a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 2 Oct 2024 14:10:31 +0000
-Received: from 88665a182662.ant.amazon.com (10.94.36.92) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 2 Oct 2024 14:10:29 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <alexandre.ferrieux@gmail.com>, <alexandre.ferrieux@orange.com>,
-	<netdev@vger.kernel.org>, <nicolas.dichtel@6wind.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH net-next v2] ipv4: avoid quadratic behavior in FIB insertion of common address
-Date: Wed, 2 Oct 2024 07:10:14 -0700
-Message-ID: <20241002141014.43115-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iKg6J6=MZSLUy6odZSSddJvPyJRSz079pidDxDa1Yu-Uw@mail.gmail.com>
-References: <CANn89iKg6J6=MZSLUy6odZSSddJvPyJRSz079pidDxDa1Yu-Uw@mail.gmail.com>
+	s=arc-20240116; t=1727878436; c=relaxed/simple;
+	bh=sfsJ4vEHpyoNt3a39EIoxnocUdz5Wg3xnMMYLmWvGnw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PRa7irit+xZInFpJWVdmG6SyE5WZJ8jlmigbn+Alji3ubkRjt4EN16QBvUUUw0JfeIKHRTtn1AWbiMzUYaocdExxJv6kNWVUMcVIeeIFHOWdtD/u78PSYsFsX+48yXKFeOKymqbC2RJTcfMgeq6Gz01XPfA6hTyTa7s/RvQL3Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrlP/vs6; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727878433; x=1759414433;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sfsJ4vEHpyoNt3a39EIoxnocUdz5Wg3xnMMYLmWvGnw=;
+  b=PrlP/vs6r+ESHBehWx3PuhwEdFyVv4Z3/xoNHfaT+lOp0XCqmQv7QKu8
+   bXCjh4n/G/lNU1AUAIxYUoqJ7Qb8CIfFUbPwu6nZEwZF5ylL5MPfWUtEl
+   nPAIZKHub8711FKjpKrHdXvM/hvkCkhgIpFmTDg53+TH8KCukjcgfGr15
+   L8do2j7cGAnPcKTGZfxon9OzszRvyHpuG3JTTG5OCTsUNhx9rj39EkV+D
+   0Eh/6Er+gfPLlaKQKfsFKndlURgVOs2L9zy5kVBUrv7qdaY63+Z2owktU
+   445InKORK3+LnkekQceysBpJf/rP5doXoQD9kmy5cpR3mznBqeG11kz2p
+   w==;
+X-CSE-ConnectionGUID: fZhTbsT2R+ymp0tI6GmwZQ==
+X-CSE-MsgGUID: CCAYQewBTq6MccDhVxTVTw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="37599675"
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="37599675"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2024 07:13:52 -0700
+X-CSE-ConnectionGUID: ZS+aio2MTzyyCfXhfUH+sQ==
+X-CSE-MsgGUID: Rwq4Z1yfTdaX/E/2zIwArA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,171,1725346800"; 
+   d="scan'208";a="74135327"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 02 Oct 2024 07:13:49 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sw06t-000TDb-1B;
+	Wed, 02 Oct 2024 14:13:47 +0000
+Date: Wed, 2 Oct 2024 22:13:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	sd@queasysnail.net, ryazanov.s.a@gmail.com
+Subject: Re: [PATCH net-next v8 03/24] ovpn: add basic netlink support
+Message-ID: <202410022156.mxbRG3on-lkp@intel.com>
+References: <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 2 Oct 2024 10:38:11 +0200
-> On Wed, Oct 2, 2024 at 1:14 AM Alexandre Ferrieux
-> <alexandre.ferrieux@gmail.com> wrote:
-> >
-> > Mix netns into all IPv4 FIB hashes to avoid massive collision when
-> > inserting the same address in many netns.
-> >
-> > Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-> > ---
-> 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> 
-> I guess we will have to use per-netns hash tables soon anyway.
+Hi Antonio,
 
-Yes, it's on my stash :)
+kernel test robot noticed the following build warnings:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+[auto build test WARNING on 44badc908f2c85711cb18e45e13119c10ad3a05f]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20241002-172734
+base:   44badc908f2c85711cb18e45e13119c10ad3a05f
+patch link:    https://lore.kernel.org/r/20241002-b4-ovpn-v8-3-37ceffcffbde%40openvpn.net
+patch subject: [PATCH net-next v8 03/24] ovpn: add basic netlink support
+reproduce: (https://download.01.org/0day-ci/archive/20241002/202410022156.mxbRG3on-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410022156.mxbRG3on-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
+   Warning: Documentation/hwmon/g762.rst references a file that doesn't exist: Documentation/devicetree/bindings/hwmon/g762.txt
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/reserved-memory/qcom
+>> Warning: MAINTAINERS references a file that doesn't exist: Documentation/netlink/spec/ovpn.yaml
+   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/misc/fsl,qoriq-mc.txt
+   Using alabaster theme
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
