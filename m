@@ -1,245 +1,245 @@
-Return-Path: <netdev+bounces-131616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC2D98F0A4
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:40:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B0D998F0AC
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:42:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA4961C2176A
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CA891F21493
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BB019F107;
-	Thu,  3 Oct 2024 13:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94B919C56A;
+	Thu,  3 Oct 2024 13:42:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYEkpzsK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdwul2Qj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E2919F112
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 13:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727962764; cv=none; b=iEi2feOTzlvcm3H44QKG2Vto+qhJpiCrliWcFsfTmqqNxjvpFRL0y+k4UfTAMQmzgLdk7KqNwg61m9DZvhuy2E5z4EKnUTacV7ha+7vsqaY/j3eLjRmfSP3pLLou/REM1dkIZL2IhS4KdbsKLZL2HrV3X4Z+VBM5a5iKnkuNWYA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727962764; c=relaxed/simple;
-	bh=dkAlcixsI/EOQjZqix2UpB0Wt/GIgPriEA2EMs54W8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aN+PEmu7OSofW79OCfWGPb7Qe7eHoK28gwmaZifEcFS4Y8N4Aqe1xFIoPim/ItLKK+97B1L1oTyPgKeXtKlV3Tpqm1bUUncPVVvF6D2G4vGdXPD5eyeanBolf3WOrMFyCiokeTnPJuzKKliowCvkuB9k2pFjHwenzIAC3hKp1mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYEkpzsK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727962761;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QK8hm5+Vg9MDEFMOGKSlZYpSx5pMmRJAduOgz0G0iRk=;
-	b=CYEkpzsKM56JRyWSy4eV0iraeVrl013AwsanVqRKsfuESBTrLmjPS8nFZ5BMvtTUpHZWoU
-	SUpiD61o9paet+r37lOX3ty9ahLtbbi+MrztSUefhgK9vb3i4VXX3LkRdpIJKhCPsifdug
-	JcHp5Kzn+r8fJX6OBvZR0Q0NpgE4BXA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-371-y6fSk9KTN7GScbpTmM8ngw-1; Thu, 03 Oct 2024 09:39:20 -0400
-X-MC-Unique: y6fSk9KTN7GScbpTmM8ngw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb08ed3a6so9328035e9.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 06:39:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727962759; x=1728567559;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QK8hm5+Vg9MDEFMOGKSlZYpSx5pMmRJAduOgz0G0iRk=;
-        b=rKqoY8jqRZo/9SB5tkYMkRzfY+SU9GjxXSEELAj+93va3EPLw7JYmqZMstJlKv8+rx
-         SANx54BEYhNYWL2ry72KkQjkStxFW3r04/S7mFZB9jhQEpWckhYTceY45jw4LcxLhyU3
-         2EJaopBpcr+Fhw3yVN+ouiPi7OhCXsRk+ZXMzEl+edYcIh2wWXKMq7RVGRThSB4tfMZs
-         0Powwh2F+DJermi9ao0mPZr5DKLGR+CesE8yzSOF98lWMscfZoDa9q4obZCXUSkyfbmL
-         73jyyIzs74uLho3vMlx0/924UE/0tAusAiZsS2CIwRIVl1WGQN4eVyf18X0Ff+86BRCV
-         73oQ==
-X-Gm-Message-State: AOJu0Yyg8mbr3qpn8f2/h9ZZIw/D2VoHoSQs8j1XNZk2H+EygOijMyK1
-	WI/P5CRWoD2fJj7KdcAtKW/3M1ejVPTHBBSiRYZMqjPkqVyJJSxulxxd7BQo19qRnnvw7Z+vTEW
-	7wkf2Z0az7OG8SfY8k+eoL44VgV1lNon90Ka2BIPqUzXTI0xEyTe3QQ==
-X-Received: by 2002:a5d:614a:0:b0:37c:fbb7:5082 with SMTP id ffacd0b85a97d-37d04a3eac2mr2007337f8f.25.1727962759142;
-        Thu, 03 Oct 2024 06:39:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2kvnFrrY+007ehLYA6J1WbNZw+e6r/KuUDJql4NxTAgg0nSMsQ8fV5b06JpXy6tE6CypFDQ==
-X-Received: by 2002:a5d:614a:0:b0:37c:fbb7:5082 with SMTP id ffacd0b85a97d-37d04a3eac2mr2007313f8f.25.1727962758636;
-        Thu, 03 Oct 2024 06:39:18 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-47-72.dyn.eolo.it. [146.241.47.72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d081f737asm1300421f8f.4.2024.10.03.06.39.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 06:39:18 -0700 (PDT)
-Message-ID: <308126dc-1a5d-480c-b8a2-053f73865f86@redhat.com>
-Date: Thu, 3 Oct 2024 15:39:16 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0356915887C;
+	Thu,  3 Oct 2024 13:42:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727962958; cv=fail; b=fx2mO18snTibrtYQ2xpFs9fwDdminnw4lFJ/q066Nv3pFYaN9F6ShdlqLo+Ks7uWQRXEH2Ck10ZxKOz2E4QneZKwDzGYqtjmSgZeIjPJwYJifdsy/+zqYdCulpQuuWmDfxH9YRN/SIZaqtKUVh/imP/Zs2O8eHC99UtkO28gYEQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727962958; c=relaxed/simple;
+	bh=YKPN28sPQNjJBx0iGfXkXo97ChXE9u95Zzkh4bDs90I=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oRh155HGY5qpRUJoE1Z0RF4x0IyGN0uEmKGJpp88i6S/SsI7Lh5ehy+LJSGJYwekXJs7z3/Ja282gDqpmQa42+B0EhuMlONCmOEGHQl1hcfCTwXZt9dIpVVLHMwOczKpa7ID9OGFAMy28HBtF9+zuo5A8Gh1F+zLXizMxZP0Ias=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdwul2Qj; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727962957; x=1759498957;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YKPN28sPQNjJBx0iGfXkXo97ChXE9u95Zzkh4bDs90I=;
+  b=fdwul2QjrWV5AWNrDMYr6QF+A1TGkut1wwzVC3m6N7I0kj4IZyrtThR0
+   4AcCJO4OhS/a6KlsQbs7Qg1kScMnFhFS0laiVHWkqQMh8IFyDWD1Hw7sg
+   p5vtlBLs0SmrjUUjNWgfDswCS0eCKS426NLvbsas9Buop1RE+txmAKNAl
+   MMLsadJshnMf2enDzssWeUCYhc2mTcOYf0beOg6aO4sOuh6brPWTZD3vz
+   m/vImT4Y8nkCksDtkfGoxojBjA6cBzqb7UD0FYoyi+VmJh8CX0fJP3C63
+   6SDCKKNeDu7t6c835Xr96JVVWWM7IgL/3opTwRnBBxUCZC+4/8DEvSmpo
+   g==;
+X-CSE-ConnectionGUID: WK3athXwSH2Ml0p2YxoaLw==
+X-CSE-MsgGUID: z6u92v5rS9aS0f4LropD8Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="38515595"
+X-IronPort-AV: E=Sophos;i="6.11,174,1725346800"; 
+   d="scan'208";a="38515595"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 06:42:34 -0700
+X-CSE-ConnectionGUID: rF0dF0kkSl+hDO04XsNWAw==
+X-CSE-MsgGUID: MT2WBKQNRXyR6Nc+TKunBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,174,1725346800"; 
+   d="scan'208";a="75144191"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Oct 2024 06:42:31 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 3 Oct 2024 06:42:29 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 3 Oct 2024 06:42:29 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 3 Oct 2024 06:42:29 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zyucsfb3b60lmnDwaERgZlohs82vuAwXf02Ct99gOKMeDZlHlKAaj7v9ogySHyD7HKP7o8sJAM36G0LcBOtAeniSI0k6ac5IGH6TFrPSWSDA925jmiilsCOORhu9FkSOgkkLbQeGlFHyiKuvd1FS3a8ZA84BCijGjD3Q5DfCUlrwM5GCJuhzyBu/kKfzvMWPZMQrK/8i3obQ1ozUNGBoXUIaoH41RZGOMaHPOurAynv7nc/Pvy+gGMCTjr9M6ApBNxg+qjurQgga3AK5yf5bz2sy7hNmLRKTgtfYrAyqewAfEPFjGiQEMDP1dWI7FHwawiwkntiFCx0KGnDbWkcmyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pLPQHBZ+Ur0sGASkVgmKRDiUPZlI7YL4E9hinrG4RbI=;
+ b=HurnbspCkGJc58x7CvGRdmttVt7QtRWb9kLBA/sJzf6vgtLGqSnlSeYGNmoaxs3ybPHcsGcE62lq+vACNlkdACQkp8BYmFmi8s0XslePDHHSK4x/EYrUiqGLrN5rWsYXI/wnurs2OFsyL2Mk0kps0TlL9uJpLvz73ON0lkoF2DBw3skDaKeDBYg7uMRygUkRFTcaE4//9CsO8aPTXADj17Tx5fXJu4sSh7lOl3kyDnj1KXOwHdKLEgyb1CjFo9G1Y0Q271gNIfwrdYln4OiAQOFW0KCN6cDpE0Ad24znLc4ctuEsyDxl8iG3jVHl4prkWAYqmACunP5//w68n7DIgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SA3PR11MB7980.namprd11.prod.outlook.com (2603:10b6:806:2fc::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
+ 2024 13:42:26 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8026.016; Thu, 3 Oct 2024
+ 13:42:26 +0000
+Message-ID: <a2358981-289b-4fee-854b-ca6e9fd8b2e6@intel.com>
+Date: Thu, 3 Oct 2024 15:42:20 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
+ warning
+To: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <amadeuszx.slawinski@linux.intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
+	Markus Elfring <Markus.Elfring@web.de>, Kees Cook <kees@kernel.org>, "Dan
+ Carpenter" <dan.carpenter@linaro.org>, Peter Zijlstra <peterz@infradead.org>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>
+References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
+ <Zv6VccBLviQ2ug6h@google.com>
+Content-Language: en-US
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <Zv6VccBLviQ2ug6h@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA1P291CA0023.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::7) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next RESEND v5] net: qcom/emac: Find sgmii_ops by
- device_for_each_child()
-To: Zijun Hu <quic_zijuhu@quicinc.com>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Zijun Hu <zijun_hu@icloud.com>
-References: <20240930-qcom_emac_fix-v5-1-e59c0ddbc8b4@quicinc.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240930-qcom_emac_fix-v5-1-e59c0ddbc8b4@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SA3PR11MB7980:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7df35093-cb63-4e46-5569-08dce3b13779
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Z0JNSC9MZmpmV2NSci9CM1k5a3Y4UXJ1YXk5Z3R0ZlkyeElBMVdIbHFRWTd1?=
+ =?utf-8?B?aW9JR0NVd1lmNnMxOVk0WCtEN3FOeXN5OUp3emdPNnc1eW50bFRpVE9LTmFY?=
+ =?utf-8?B?aUwycnd5L1NKRHlKTVoxSUdrNFdHYkpqcmg0ZytERDRTR0Rzc2Rsdy8rQWhQ?=
+ =?utf-8?B?NWFMd3FkMHlFVzZsVno1WE1DOUtPL0o5bUZwRVhGbkFmOE9uM0xRVE8yZkRn?=
+ =?utf-8?B?VS81UmlnU3BsYnJMSk9DZ1RWM0tWaGFDOElTUDBwU2hORE9HSEpQL2RZeUpZ?=
+ =?utf-8?B?UW1yNFAwa2MvZHVoL21JT2hpT1hXQ3kyV1VuSlk3NzF4VTd0QW11bHhxREJT?=
+ =?utf-8?B?a0Q2d3dEcG9ueTVaNytCYXd1UlpmcVBmNHlXVWlDZEtXZzhrK3lEUHlVY0N3?=
+ =?utf-8?B?YWh2bkFnWVJkZkhLajFoT2M3RXhFRzFDYVZucklXWjVnTWZNUGV1L1RHWjVq?=
+ =?utf-8?B?VDY0MHNRN0MxVmpGVHVQakRGcXpCckQyUGtLZUcyd2NYbEtvT2xHdE90aVEr?=
+ =?utf-8?B?VThSVVF6dXJRaXIvYXNIY1MrUGhrbWJlTFhZTHgyUFdHaEhtSHQrckFLNWly?=
+ =?utf-8?B?bytLa2hHZkp1bmRCV3VhdDFDSjFzdWE0ZkkyUW1yOTI0QTdmUFY4WGE3c3Bk?=
+ =?utf-8?B?WnQzY0lYWHVFdGpCQ0dneVArKzZSVS94UkhUQVRNajIxT0c0SGxNZEkxK2Vt?=
+ =?utf-8?B?SlRBUHFNQVZtcWFtR2R0UjJaRmUrZnhuWW1UZGlXU1FPQWlsSHM1dSsvSm5y?=
+ =?utf-8?B?Z1pKMmZRVjd0VVNMNTI2aHB5WnlmL0psUHJwU2VBeDBJdFVDTlpkU1ZxTlhh?=
+ =?utf-8?B?Z0IzYlpabDh4c1RGVEcxa0FEWk1kWnE2T1RDOW02RTJSZFFvcnlLVUxoMjR2?=
+ =?utf-8?B?d25PRzc5SDBETitrdzkyRkxpaVhZUGJoV0ZQakl4dnVmdk43S3U0Y3FmQXZY?=
+ =?utf-8?B?TTM4SGt6YWNqb0NCZGppOUNNSEVObC91THI1QjE3ME9ScXoxSmlqU1VTc1pS?=
+ =?utf-8?B?anEyMnIwK2R4MzNLeFUweWxMNVBQTlhScjJhRlR4WHlOeGdOTGVjb2Z5SG9P?=
+ =?utf-8?B?OG5nVnBKSWUxUDBweldwMm92SDh0ODR6b2lBSWlrSTJPcjZSQUJlYkF6WTF6?=
+ =?utf-8?B?cWxEckZXa3Q2SllQdW9GY1lQeTJpc1htY2RaTG81ZnRWRHJaMGlxWUpGdWJK?=
+ =?utf-8?B?WmtreTZ5bEV1bW5veXVCdE4rd0FBd3Z3aUF1TmdGaVFoZFYrRGM0VXZxTnF3?=
+ =?utf-8?B?cTgxL2tzWFZMeXc0Ti9scUtzVys5Y0NUdE9Jd1grN3VQVk01U1k5NnBLeEd2?=
+ =?utf-8?B?WXRGdEFpeXVVRUZBdVovaTY4VjMyR1lVd3FCMjBEMjVmS1hGM1dnYzZUc2tE?=
+ =?utf-8?B?YUROZFRNa1FYUWVMZWkwTGJNcUdRai85WklMNWNvQnVEcnRla2Eya2E0VEhu?=
+ =?utf-8?B?dXMxYVV4NnhvcWpOeFoyTmw3bWlNWTVPVU0rWjVtU21ESG9oVW90KzBPYm1B?=
+ =?utf-8?B?K1lTazZQRzFpa1Nia1AyejkxWldoTXVEOFpucW13SHhEVXRXVm9FNnZITjNk?=
+ =?utf-8?B?ZS9WNTRsR0h1bGx1Y0dQd21jdE8zRGNpZWFqb0cxdURLVU4yNGpOUVltZDVQ?=
+ =?utf-8?B?Z3JLTWp6c0dheWFTSVZoN2N3dGwxS1BRVllDWk5PRDJkbi84dmsrZ3Nxc1cv?=
+ =?utf-8?B?R1BScHR4REhBQUszZFZuZVRjMGlNYVM1cEExR1NiYXJkQ3NHaUlVbEFBPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c2RSU3Rvc0lVd0VGUmFKUGkrZERuWXorS1JHK1dtbnVDV0pMb3gzSWViTGJa?=
+ =?utf-8?B?NEllVnNMUkJrOEQvVFB1NVlid0gyNkRrNll2bGpwb1RSOWJMeVBPV0l2bjdF?=
+ =?utf-8?B?amJ4cUFSS3llOWFHcytQK3hTME42YWxObXVqRjNYN21EcW90YTlsSXJoajdy?=
+ =?utf-8?B?eDBSMTB5N1pxYTJvOUNCYVpwKzgreWtvOHJhWlFJTjE3bllSbkVwN0dHUWZH?=
+ =?utf-8?B?SFg4QW1pY1RVc2FGMVdhWnJ1VDRWMHMxVGdIcW5Ec3lZYWJ4UjdyelByajAw?=
+ =?utf-8?B?QkZZaDBTRlJvOXhLaWRUakxtUGlpRVJ6RTZneCtpLzRYOTBlMXRkWVJPQm9G?=
+ =?utf-8?B?Mk1nRWtWVWl0WGRwN0lBNlpQY05DZkZNeVR0cS8zZ2pzRVdTT2lZRzdhMjBJ?=
+ =?utf-8?B?MUpxRERKS0c1cVZNTXFYNENJZGlRTlpxTnYwUjZjelFZUXQxYVg4Q2xvT3ZX?=
+ =?utf-8?B?OVhKOFdjWFN6RXRLa28vOU5ieXhjdnh1ckxFSHlHU3lZeDJhZTVJMjVTTnU4?=
+ =?utf-8?B?Rmd3Nkp3R3V6em1OMVl5RUFHSis0V0RkSTlZTm9wTUkrWHJTUHV4M1NpS3kw?=
+ =?utf-8?B?VmtvRU0xNjIySEd6Ukd0UllPMDF4SHpmTEtWa0l4dndjNTdpdVZVQ0l1U0c1?=
+ =?utf-8?B?S3hSVXFyRXZJY0tBTFR3MHEzUDZnMUkrcFpQeHR3UXpzbVhWWlhIVEhsOHNp?=
+ =?utf-8?B?WmRBdXplVVF3YkVlZTRGekxrdVV0VlRndEFlNWdidXdQbU81QTh4TVN5NjBv?=
+ =?utf-8?B?Z1RadmlJUUZLOXFnNVhkQThycFVpWmg5ZWlwWmY5NitmdmlNckJ0NGl4WmJU?=
+ =?utf-8?B?T0gyVHhzcHNMM1JBd2ZYZ2pOZHJxUWJNZHNQTkt1dDNEV21IT3FNMHcvcG1P?=
+ =?utf-8?B?bmo3NlJBNVpXUmJuZlRSUUN6aS96RzhCbTlIbk9EbFY3RHV2YVpYL1VXbW1a?=
+ =?utf-8?B?cVp0UTBrdi80OHlHV1A1NDZDTlZKM1B0djEzT2p3UHc5RTdsV0JJYmtSWVdU?=
+ =?utf-8?B?L0ZJTzNEbWh6QkZ1S3NNSThyUWFmNXV5UzFmRVdBenFEUkF3L0k0UEcvWmFz?=
+ =?utf-8?B?VzhSZ2RIUnlhM3EyWHZuMkV0RVNUTENQSWhNQUxsM0w0K3pXZGcyRHd6UE95?=
+ =?utf-8?B?OEo0ekVaLzRITm5FK3hKekhLdThiQ1pvbjBUNlp3RmYzc0pNUityQy9NNHpP?=
+ =?utf-8?B?d0RGT3cxcGE3TmRWYjlYa3ZDTVlQS0NLYU9nVU5iamVKQ0NhSDZYWnBoR25o?=
+ =?utf-8?B?SG1HM1JMNGJRZEVsc20rbVVzUHgxdzZsNGhLazltRjVzalIzVGgzMTlpMCtR?=
+ =?utf-8?B?S3YwaU5tT2QxKytxbTBBbUhxQzRuMVRlYWx4ODZxRHhnUWJjTjF6bUxwRDZQ?=
+ =?utf-8?B?R0ZXUm5VeWd5N2t5SDlpS1RuMFdhZHhzSFNaUDVRV3h1eWR3RWN2RTlsb3pV?=
+ =?utf-8?B?SWhTcldsK3k0MWZRRzJLejdlZUpPcXBwQUxRNHpkWmtSSSsvU3VlYmI4RmNM?=
+ =?utf-8?B?RWI3V3Evei82VFNSeEJjdGhVVkxMMUVPLzR0VUtTV1VjcWpSdG0rYjV5S2cw?=
+ =?utf-8?B?bEMrTzRsQU1zRnJqUTZ6VzBRR3VRcEZpRHpVRXRVQ05qMFRPcFEveldSdWNI?=
+ =?utf-8?B?bG50QnRvYXZFbEw5ZlNGUFRJd0hiZ29rN1Z4N2ludi84cE1sTkF4YU1DcTNC?=
+ =?utf-8?B?TG43Z2RZRDF6Vi9ZanBjYnZhREkxWUVQenhYeGlGWUFRdHFRRlBZZWtMTmkz?=
+ =?utf-8?B?QS9rVkVuV2RRK0dhNFcrNUFOZGJpbnA4dzFKZ0NaWSt2cTNjRjdWTC9xMTFz?=
+ =?utf-8?B?eDA1bVc0MVpnVnRrWTQ2WVRjaG56T0M3Unhma1l1VzJjdERvQU5BTzRNNktw?=
+ =?utf-8?B?U2lOR0hvZ09YOUFjY2hDc3dBSERZNGRFZWpPV1BnYkMyRjI2aGZrM0I3Y3B5?=
+ =?utf-8?B?T3NTR1VuUnk2UzZ0bHR1R0xSdWs0MFhaUWZtTUVGUDZVYnlYVHN1TXN5SnVQ?=
+ =?utf-8?B?RTFVZDE1eXpUYVNUZmFIdjlNMWtvNDRGSEZ6REp2NUhnK25sY3FjTmk1eUpm?=
+ =?utf-8?B?cXFLc1FvK0QvSWo5YUV2bk03blNDdGgvZk9ScnlCbCtZaTZ1VDFDaGhReEZt?=
+ =?utf-8?B?ZFBuaDU3eUx5KzBFcjBraGt2bmtJcjkxVUp1N0Q3dk9xaGFPbzhhTnNNeUZB?=
+ =?utf-8?B?WHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7df35093-cb63-4e46-5569-08dce3b13779
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 13:42:26.1057
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hHaorulSv1w5R74WPV7d2NEm9VPLs6mgvSitVIaK5T7m7+xdJj5bhR86m9+qdxFXucTifswSPtOUpmPM9jSyMMFsikiDK7eTcN87K913BjI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR11MB7980
+X-OriginatorOrg: intel.com
 
-Hi,
+On 10/3/24 15:00, Dmitry Torokhov wrote:
+> Hi Przemek,
+> 
+> On Thu, Oct 03, 2024 at 01:39:06PM +0200, Przemek Kitszel wrote:
+>> @@ -167,14 +172,25 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
+>>   	CLASS(_name, __UNIQUE_ID(guard))
+>>   
+>>   #define __guard_ptr(_name) class_##_name##_lock_ptr
+>> +#define __is_cond_ptr(_name) class_##_name##_is_conditional
+>> +
+>> +#define __scoped_guard_labeled(_label, _name, args...)			\
+>> +	for (CLASS(_name, scope)(args);					\
+>> +	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
+> 
+> It would be great if you added the comment that "!__is_cond_ptr(_name)"
+> condition ensures that the compiler does not believe that it is possible
+> to skip the loop body because it does not realize that
+> "__guard_ptr(_name)(&scope)" will never return 0 for unconditional
+> locks. You have the explanation in the patch description, but I think it
+> is worth to reiterate here as well.
 
-On 9/30/24 13:32, Zijun Hu wrote:
-> To prepare for constifying the following old driver core API:
-> 
-> struct device *device_find_child(struct device *dev, void *data,
-> 		int (*match)(struct device *dev, void *data));
-> to new:
-> struct device *device_find_child(struct device *dev, const void *data,
-> 		int (*match)(struct device *dev, const void *data));
-> 
-> The new API does not allow its match function (*match)() to modify
-> caller's match data @*data, but emac_sgmii_acpi_match(), as the old
-> API's match function, indeed modifies relevant match data, so it is
-> not suitable for the new API any more, solved by implementing the same
-> finding sgmii_ops function by correcting the function and using it
-> as parameter of device_for_each_child() instead of device_find_child().
-> 
-> By the way, this commit does not change any existing logic.
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> This patch is separated from the following patch series:
-> https://lore.kernel.org/all/20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com/
-> 
-> This patch is to prepare for constifying the following driver API:
-> 
-> struct device *device_find_child(struct device *dev, void *data,
-> 		int (*match)(struct device *dev, void *data));
-> to
-> struct device *device_find_child(struct device *dev, const void *data,
-> 		int (*match)(struct device *dev, const void *data));
-> 
-> How to constify the API ?
-> There are total 30 usages of the API in current kernel tree:
-> 
-> For 2/30 usages, the API's match function (*match)() will modify
-> caller's match data @*data, and this patch will clean up one of both.
-> 
-> For remaining 28/30, the following patch series will simply change its
-> relevant parameter type to const void *.
-> https://lore.kernel.org/all/20240811-const_dfc_done-v1-1-9d85e3f943cb@quicinc.com/
-> 
-> Why to constify the API ?
-> 
-> (1) It normally does not make sense, also does not need to, for
-> such device finding operation to modify caller's match data which
-> is mainly used for comparison.
-> 
-> (2) It will make the API's match function and match data parameter
-> have the same type as all other APIs (bus|class|driver)_find_device().
-> 
-> (3) It will give driver author hints about choice between this API and
-> the following one:
-> int device_for_each_child(struct device *dev, void *data,
-> 		int (*fn)(struct device *dev, void *data));
-> ---
-> Changes in v5:
-> - Separate me for the series
-> - Correct commit message and remove the inline comment
-> - Link to v4: https://lore.kernel.org/r/20240905-const_dfc_prepare-v4-2-4180e1d5a244@quicinc.com
-> 
-> Changes in v4:
-> - Correct title and commit message
-> - Link to v3: https://lore.kernel.org/r/20240824-const_dfc_prepare-v3-3-32127ea32bba@quicinc.com
-> 
-> Changes in v3:
-> - Make qcom/emac follow cxl/region solution suggested by Greg
-> - Link to v2: https://lore.kernel.org/r/20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com
-> 
-> Changes in v2:
-> - Give up introducing the API constify_device_find_child_helper()
-> - Implement a driver specific and equivalent one instead of device_find_child()
-> - Correct commit message
-> - Link to v1: https://lore.kernel.org/r/20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com
-> ---
->   drivers/net/ethernet/qualcomm/emac/emac-sgmii.c | 21 ++++++++++++++++-----
->   1 file changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> index e4bc18009d08..e8265761c416 100644
-> --- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> +++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> @@ -293,6 +293,11 @@ static struct sgmii_ops qdf2400_ops = {
->   };
->   #endif
->   
-> +struct emac_match_data {
-> +	struct sgmii_ops **sgmii_ops;
-> +	struct device *target_device;
-> +};
-> +
->   static int emac_sgmii_acpi_match(struct device *dev, void *data)
->   {
->   #ifdef CONFIG_ACPI
-> @@ -303,7 +308,7 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
->   		{}
->   	};
->   	const struct acpi_device_id *id = acpi_match_device(match_table, dev);
-> -	struct sgmii_ops **ops = data;
-> +	struct emac_match_data *match_data = data;
->   
->   	if (id) {
->   		acpi_handle handle = ACPI_HANDLE(dev);
-> @@ -324,10 +329,12 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
->   
->   		switch (hrv) {
->   		case 1:
-> -			*ops = &qdf2432_ops;
-> +			*match_data->sgmii_ops = &qdf2432_ops;
-> +			match_data->target_device = get_device(dev);
->   			return 1;
->   		case 2:
-> -			*ops = &qdf2400_ops;
-> +			*match_data->sgmii_ops = &qdf2400_ops;
-> +			match_data->target_device = get_device(dev);
->   			return 1;
->   		}
->   	}
-> @@ -356,10 +363,14 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
->   	int ret;
->   
->   	if (has_acpi_companion(&pdev->dev)) {
-> +		struct emac_match_data match_data = {
-> +			.sgmii_ops = &phy->sgmii_ops,
-> +			.target_device = NULL,
-> +		};
->   		struct device *dev;
->   
-> -		dev = device_find_child(&pdev->dev, &phy->sgmii_ops,
-> -					emac_sgmii_acpi_match);
-> +		device_for_each_child(&pdev->dev, &match_data, emac_sgmii_acpi_match);
-> +		dev = match_data.target_device;
->   
->   		if (!dev) {
->   			dev_warn(&pdev->dev, "cannot find internal phy node\n");
+thanks, I will add an in-code comment; sometimes it's easy to loose
+outside perspective if you spend too much time on one piece
 
-
-I'm sorry for the late feedback. I agree with Greg, I think it would 
-more clear removing the get_device() from the match function and add it 
-here, after the 'if (!dev) {' statement.
-
-Thanks,
-
-Paolo
+> 
+>> +		     ({ goto _label; }))				\
+>> +		if (0)							\
+>> +		_label:							\
+>> +			break;						\
+>> +		else
+>> +
+> 
+> Reviewed-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> 
+> Thanks.
+> 
 
 
