@@ -1,514 +1,181 @@
-Return-Path: <netdev+bounces-131779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802E198F8DB
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:23:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C8698F8DE
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1212B1F21F26
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:23:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAA921F21837
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91DF61AF4EF;
-	Thu,  3 Oct 2024 21:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12971AC429;
+	Thu,  3 Oct 2024 21:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hOVknHXL"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC62E12EBDB;
-	Thu,  3 Oct 2024 21:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8926A8D2;
+	Thu,  3 Oct 2024 21:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727990582; cv=none; b=nl8RHoDOYTDF/b0AzYxDvp16ZfT0IE+08ehzt7HcUbgxwskyNsu69VgK3DNOfMPJFYGr8Miq2OU1PG6txfNdsn/OwfEu1NqesE5MG+hoIw5rxGlmFLZaJ9NazGE3HNh7vP/9F/Agftue2rSIxTGbx6lxWX+P9jOCBkwu+LfW5aw=
+	t=1727990634; cv=none; b=sDzN0qNKkBtEFZBgh4EGndL/RSlryluOfebMn+k2NMqrgicuUnqXGowJMqltAwai8xZ4zZ7bW4ATw9jIXVWfSKy7/5YGE69+OagiwfkhhZO7k0oxVaOn+Js3crooylm1YHpInnH8g7OjdVJfovrVFop1eOkDxP/APi3z7EXj+js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727990582; c=relaxed/simple;
-	bh=5cQrbILs3b5rTD40igB9rKF+8l8ZOzu66BUcVqeDZrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=oHE+bjxjDh02hYiOWBHaKeq55nKMdJtt2BLydZRpszMTIDDgt/rwFx6dIPrGa54en/P8wsFnsPkUXPEHd7g0KVKztEpLF4ApLXHCV45EfjqZFRW8+imhoBNZqnT3iaBuf7NyiNbOZjesA0gueN5iwiM2KXkO5TyCtnE26g6hLtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XKPk24Tplz1T8BN;
-	Fri,  4 Oct 2024 05:21:14 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id A543F1800D5;
-	Fri,  4 Oct 2024 05:22:50 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 4 Oct 2024 05:22:46 +0800
-Message-ID: <b58680ca-81b2-7222-7287-0ac7f4227c3c@huawei-partners.com>
-Date: Fri, 4 Oct 2024 00:22:42 +0300
+	s=arc-20240116; t=1727990634; c=relaxed/simple;
+	bh=XkPodv5x+4X8rRam3/OSCeg7VfU/gmndd4VUsGSa9xk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nso5hyZOmS0YORXy0poB0SsdLsnUoad2v2gxVe3IIgs2mbCCIyscx4WXo/BfjLHVIePNE9Uu1bGQMumBvLN14pSdY2AVwLT1dBFdfOozvTlnSVcMW9r+lDcYwAP52jMU6NjftGZ2lPS0uqrTi/6P69vLPhkk7uoVL9NQKBeL0+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hOVknHXL; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20ba8d92af9so11156155ad.3;
+        Thu, 03 Oct 2024 14:23:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727990633; x=1728595433; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=OZJebFLhmCbD8vxz1djIvYLFLd1HvoGFeWNCSLBmx+0=;
+        b=hOVknHXLYdTu549rXWZXiOEQi2RWuMvtrnlEbSRBDXRIsRvEPfpLYxJc6/AO8opUUl
+         gxkg7Xbt3SCwYlV3Vwh36SY7b3Mgj9DypbPtefNaa0qV4p9AiYppfDqfsC2dy8I51gwh
+         Vzew0kGcQwA/I5WhEWibV/b6mpU5ychSi5yu3/JbVMXEv7s8d90xY1Et29qxBFZtJNS0
+         xVp0lCnVgt3xT4oa2UM+5rapqIWaMNpOToO7V8+YtdUNLw2lIxJMwXYqw0KqUnxj29BS
+         HxY5oUxn0kLp5X+i2tmIIaq4extVP5j730JO4zgZMifjHF7HQq/+df4bJxcbzPLv/iuG
+         43Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727990633; x=1728595433;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OZJebFLhmCbD8vxz1djIvYLFLd1HvoGFeWNCSLBmx+0=;
+        b=Q9T2eUgwAtLVkL3ZZZtKRhA9jN/b4eRJLA3nvq1x0nPhIgmi4xig4LHr8gCIuNq/nk
+         wdMX0CGDykHd5nUfRjEEVjTNUZNQvXYnNROImnJXnBB/quuaPd77TsoheEmQ4HoSvbve
+         RLL8kTBDWcPR7NcVrFob4AiY6IAKtdxxF6jgeR89d03qc7D3Lsgf4HOOPJeJglMpdnMF
+         wrhmvdhRNJ4nne7ryByoAJPu68id9ZYCtxxVb4Ck7niYHbbcprFlUqikqz7TtxisRmmv
+         lu/1Tm1VwK1mYHpveooyyBl4yGlKUpumKtRl0cW8+7K8uqIJrI/Yxo9ovMqYwMXRIE6F
+         6nqw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6v05RMVhYA2/70u53i0/tjJsfpgDvr3+bA5F1oXQmvFbSNmEZucliXufNz18Fu1XfAtw8ovEsCMnK7po=@vger.kernel.org, AJvYcCX628lg6YZOXLupXnN3qfHYyBSLXJmlGw34Wkb8B3KectsB/H9+9N0RRbVFgK6jqXGIGPtK3y9I@vger.kernel.org
+X-Gm-Message-State: AOJu0YyrFyULEmYrZf1eeYjvci76bJritG++s+oDp/QQeiHvAucwR377
+	T6RiPD6GnwYPWd+s+Uib68hqNb8+hJ5yeexc73Me/t3fUMtHU2nB
+X-Google-Smtp-Source: AGHT+IG3qat9ib2ZYD4jI7+42ZtVBUMBwVsYIF39VxObv3F3h/MnHY1JxztwfCd/tpIGBtPR6nxE3Q==
+X-Received: by 2002:a17:902:ecd1:b0:207:2093:99bb with SMTP id d9443c01a7336-20bfe03529bmr6608385ad.31.1727990632635;
+        Thu, 03 Oct 2024 14:23:52 -0700 (PDT)
+Received: from luna.turtle.lan ([2601:1c2:c184:dc00:b8ac:3fa:437b:85fa])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beead2541sm13271745ad.19.2024.10.03.14.23.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 14:23:52 -0700 (PDT)
+From: Sam Edwards <cfsworks@gmail.com>
+X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Sam Edwards <CFSworks@gmail.com>
+Subject: [PATCH] net: dsa: bcm_sf2: fix crossbar port bitwidth logic
+Date: Thu,  3 Oct 2024 14:23:01 -0700
+Message-ID: <20241003212301.1339647-1-CFSworks@gmail.com>
+X-Mailer: git-send-email 2.44.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 2/2] selftests/landlock: Test non-TCP INET
- connection-based protocols
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
-	<matthieu@buffet.re>
-References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
- <20241003143932.2431249-3-ivanov.mikhail1@huawei-partners.com>
- <20241003.ietiejo3juF9@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241003.ietiejo3juF9@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- kwepemj200016.china.huawei.com (7.202.194.28)
 
+The SF2 crossbar register is a packed bitfield, giving the index of the
+external port selected for each of the internal ports. On BCM4908 (the
+only currently-supported switch family with a crossbar), there are 2
+internal ports and 3 external ports, so there are 2 bits per internal
+port.
 
+The driver currently conflates the "bits per port" and "number of ports"
+concepts, lumping both into the `num_crossbar_int_ports` field. Since it
+is currently only possible for either of these counts to have a value of
+2, there is no behavioral error resulting from this situation for now.
 
-On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
-> On Thu, Oct 03, 2024 at 10:39:32PM +0800, Mikhail Ivanov wrote:
->> Extend protocol fixture with test suits for MPTCP, SCTP and SMC protocols.
->> Add all options required by this protocols in config.
-> 
-> Great coverage!  It's nice to check against SCTP and MPTCP, but as you
-> were wondering, I think you can remove the SMC protocol to simplify
-> tests. MPTCP seems to work similarly as TCP wrt AF_UNSPEC, so it might
-> be worth keeping it, and we might want to control these protocols too
-> one day.
+Make the code more readable (and support the future possibility of
+larger crossbars) by adding a `num_crossbar_ext_bits` field to represent
+the "bits per port" count and relying on this where appropriate instead.
 
-Thanks! I'll remove SMC then.
+Signed-off-by: Sam Edwards <CFSworks@gmail.com>
+---
+ drivers/net/dsa/bcm_sf2.c | 9 ++++++---
+ drivers/net/dsa/bcm_sf2.h | 1 +
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-> 
->>
->> Extend protocol_variant structure with protocol field (Cf. socket(2)).
->>
->> Refactor is_restricted() helper and add few helpers to check struct
->> protocol_variant on specific protocols.
-> 
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   tools/testing/selftests/landlock/common.h   |   1 +
->>   tools/testing/selftests/landlock/config     |   5 +
->>   tools/testing/selftests/landlock/net_test.c | 212 ++++++++++++++++++--
->>   3 files changed, 198 insertions(+), 20 deletions(-)
->>
->> diff --git a/tools/testing/selftests/landlock/common.h b/tools/testing/selftests/landlock/common.h
->> index 61056fa074bb..40a2def50b83 100644
->> --- a/tools/testing/selftests/landlock/common.h
->> +++ b/tools/testing/selftests/landlock/common.h
->> @@ -234,6 +234,7 @@ enforce_ruleset(struct __test_metadata *const _metadata, const int ruleset_fd)
->>   struct protocol_variant {
->>   	int domain;
->>   	int type;
->> +	int protocol;
->>   };
->>   
->>   struct service_fixture {
->> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
->> index 29af19c4e9f9..73b01d7d0881 100644
->> --- a/tools/testing/selftests/landlock/config
->> +++ b/tools/testing/selftests/landlock/config
->> @@ -1,8 +1,12 @@
->>   CONFIG_CGROUPS=y
->>   CONFIG_CGROUP_SCHED=y
->>   CONFIG_INET=y
->> +CONFIG_INFINIBAND=y
-> 
-> Without SMC this infiniband should not be required.
+diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
+index 0e663ec0c12a..3ae794a30ace 100644
+--- a/drivers/net/dsa/bcm_sf2.c
++++ b/drivers/net/dsa/bcm_sf2.c
+@@ -513,12 +513,12 @@ static void bcm_sf2_crossbar_setup(struct bcm_sf2_priv *priv)
+ 	u32 reg;
+ 	int i;
+ 
+-	mask = BIT(priv->num_crossbar_int_ports) - 1;
++	mask = BIT(priv->num_crossbar_ext_bits) - 1;
+ 
+ 	reg = reg_readl(priv, REG_CROSSBAR);
+ 	switch (priv->type) {
+ 	case BCM4908_DEVICE_ID:
+-		shift = CROSSBAR_BCM4908_INT_P7 * priv->num_crossbar_int_ports;
++		shift = CROSSBAR_BCM4908_INT_P7 * priv->num_crossbar_ext_bits;
+ 		reg &= ~(mask << shift);
+ 		if (0) /* FIXME */
+ 			reg |= CROSSBAR_BCM4908_EXT_SERDES << shift;
+@@ -536,7 +536,7 @@ static void bcm_sf2_crossbar_setup(struct bcm_sf2_priv *priv)
+ 
+ 	reg = reg_readl(priv, REG_CROSSBAR);
+ 	for (i = 0; i < priv->num_crossbar_int_ports; i++) {
+-		shift = i * priv->num_crossbar_int_ports;
++		shift = i * priv->num_crossbar_ext_bits;
+ 
+ 		dev_dbg(dev, "crossbar int port #%d - ext port #%d\n", i,
+ 			(reg >> shift) & mask);
+@@ -1260,6 +1260,7 @@ struct bcm_sf2_of_data {
+ 	unsigned int core_reg_align;
+ 	unsigned int num_cfp_rules;
+ 	unsigned int num_crossbar_int_ports;
++	unsigned int num_crossbar_ext_bits;
+ };
+ 
+ static const u16 bcm_sf2_4908_reg_offsets[] = {
+@@ -1288,6 +1289,7 @@ static const struct bcm_sf2_of_data bcm_sf2_4908_data = {
+ 	.reg_offsets	= bcm_sf2_4908_reg_offsets,
+ 	.num_cfp_rules	= 256,
+ 	.num_crossbar_int_ports = 2,
++	.num_crossbar_ext_bits = 2,
+ };
+ 
+ /* Register offsets for the SWITCH_REG_* block */
+@@ -1399,6 +1401,7 @@ static int bcm_sf2_sw_probe(struct platform_device *pdev)
+ 	priv->core_reg_align = data->core_reg_align;
+ 	priv->num_cfp_rules = data->num_cfp_rules;
+ 	priv->num_crossbar_int_ports = data->num_crossbar_int_ports;
++	priv->num_crossbar_ext_bits = data->num_crossbar_ext_bits;
+ 
+ 	priv->rcdev = devm_reset_control_get_optional_exclusive(&pdev->dev,
+ 								"switch");
+diff --git a/drivers/net/dsa/bcm_sf2.h b/drivers/net/dsa/bcm_sf2.h
+index f95f4880b69e..4fda075a3449 100644
+--- a/drivers/net/dsa/bcm_sf2.h
++++ b/drivers/net/dsa/bcm_sf2.h
+@@ -75,6 +75,7 @@ struct bcm_sf2_priv {
+ 	unsigned int			core_reg_align;
+ 	unsigned int			num_cfp_rules;
+ 	unsigned int			num_crossbar_int_ports;
++	unsigned int			num_crossbar_ext_bits;
+ 
+ 	/* spinlock protecting access to the indirect registers */
+ 	spinlock_t			indir_lock;
+-- 
+2.44.2
 
-yeap
-
-> 
->> +CONFIG_IP_SCTP=y
->>   CONFIG_IPV6=y
->>   CONFIG_KEYS=y
->> +CONFIG_MPTCP=y
->> +CONFIG_MPTCP_IPV6=y
->>   CONFIG_NET=y
->>   CONFIG_NET_NS=y
->>   CONFIG_OVERLAY_FS=y
->> @@ -10,6 +14,7 @@ CONFIG_PROC_FS=y
->>   CONFIG_SECURITY=y
->>   CONFIG_SECURITY_LANDLOCK=y
->>   CONFIG_SHMEM=y
->> +CONFIG_SMC=y
->>   CONFIG_SYSFS=y
->>   CONFIG_TMPFS=y
->>   CONFIG_TMPFS_XATTR=y
->> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
->> index 4e0aeb53b225..dbe77d436281 100644
->> --- a/tools/testing/selftests/landlock/net_test.c
->> +++ b/tools/testing/selftests/landlock/net_test.c
->> @@ -36,6 +36,17 @@ enum sandbox_type {
->>   	TCP_SANDBOX,
->>   };
->>   
->> +/* Checks if IPPROTO_SMC is present for compatibility reasons. */
->> +#if !defined(__alpha__) && defined(IPPROTO_SMC)
->> +#define SMC_SUPPORTED 1
->> +#else
->> +#define SMC_SUPPORTED 0
->> +#endif
->> +
->> +#ifndef IPPROTO_SMC
->> +#define IPPROTO_SMC 256
->> +#endif
->> +
->>   static int set_service(struct service_fixture *const srv,
->>   		       const struct protocol_variant prot,
->>   		       const unsigned short index)
->> @@ -85,19 +96,37 @@ static void setup_loopback(struct __test_metadata *const _metadata)
->>   	clear_ambient_cap(_metadata, CAP_NET_ADMIN);
->>   }
->>   
->> +static bool prot_is_inet_stream(const struct protocol_variant *const prot)
->> +{
->> +	return (prot->domain == AF_INET || prot->domain == AF_INET6) &&
->> +	       prot->type == SOCK_STREAM;
->> +}
->> +
->> +static bool prot_is_tcp(const struct protocol_variant *const prot)
->> +{
->> +	return prot_is_inet_stream(prot) &&
->> +	       (prot->protocol == IPPROTO_TCP || prot->protocol == IPPROTO_IP);
-> 
-> Why do we need to check against IPPROTO_IP?
-
-IPPROTO_IP = 0 and can be used as an alias for IPPROTO_TCP (=6) in
-socket(2) (also for IPPROTO_UDP(=17), Cf. inet_create).
-
-Since we create TCP sockets in a common way here (with protocol = 0),
-checking against IPPROTO_TCP is not necessary, but I decided to leave it
-for completeness.
-
-> 
->> +}
->> +
->> +static bool prot_is_sctp(const struct protocol_variant *const prot)
->> +{
->> +	return prot_is_inet_stream(prot) && prot->protocol == IPPROTO_SCTP;
->> +}
->> +
->> +static bool prot_is_smc(const struct protocol_variant *const prot)
->> +{
->> +	return prot_is_inet_stream(prot) && prot->protocol == IPPROTO_SMC;
->> +}
->> +
->> +static bool prot_is_unix_stream(const struct protocol_variant *const prot)
->> +{
->> +	return prot->domain == AF_UNIX && prot->type == SOCK_STREAM;
->> +}
->> +
->>   static bool is_restricted(const struct protocol_variant *const prot,
->>   			  const enum sandbox_type sandbox)
->>   {
->> -	switch (prot->domain) {
->> -	case AF_INET:
->> -	case AF_INET6:
->> -		switch (prot->type) {
->> -		case SOCK_STREAM:
->> -			return sandbox == TCP_SANDBOX;
->> -		}
->> -		break;
->> -	}
->> -	return false;
->> +	return prot_is_tcp(prot) && sandbox == TCP_SANDBOX;
->>   }
->>   
->>   static int socket_variant(const struct service_fixture *const srv)
->> @@ -105,7 +134,7 @@ static int socket_variant(const struct service_fixture *const srv)
->>   	int ret;
->>   
->>   	ret = socket(srv->protocol.domain, srv->protocol.type | SOCK_CLOEXEC,
->> -		     0);
->> +		     srv->protocol.protocol);
->>   	if (ret < 0)
->>   		return -errno;
->>   	return ret;
->> @@ -124,7 +153,7 @@ static socklen_t get_addrlen(const struct service_fixture *const srv,
->>   		return sizeof(srv->ipv4_addr);
->>   
->>   	case AF_INET6:
->> -		if (minimal)
->> +		if (minimal && !prot_is_sctp(&srv->protocol))
-> 
-> Why SCTP requires this exception?
-
-SCTP implementation (possibly incorrectly) checks that address length is
-at least sizeof(struct sockaddr_in6) (Cf. sctp_sockaddr_af() for bind(2)
-and in sctp_connect() for connect(2)).
-
-> 
->>   			return SIN6_LEN_RFC2133;
->>   		return sizeof(srv->ipv6_addr);
->>   
->> @@ -271,6 +300,11 @@ FIXTURE_SETUP(protocol)
->>   		.type = SOCK_STREAM,
->>   	};
->>   
->> +#if !SMC_SUPPORTED
->> +	if (prot_is_smc(&variant->prot))
->> +		SKIP(return, "SMC protocol is not supported.");
->> +#endif
->> +
->>   	disable_caps(_metadata);
->>   
->>   	ASSERT_EQ(0, set_service(&self->srv0, variant->prot, 0));
->> @@ -299,6 +333,39 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_tcp) {
->>   	},
->>   };
->>   
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_mptcp) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_MPTCP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_sctp) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SCTP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_smc) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SMC,
->> +	},
->> +};
->> +
->>   /* clang-format off */
->>   FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp) {
->>   	/* clang-format on */
->> @@ -309,6 +376,39 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp) {
->>   	},
->>   };
->>   
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_mptcp) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_MPTCP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_sctp) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SCTP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_smc) {
->> +	/* clang-format on */
->> +	.sandbox = NO_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SMC,
->> +	},
->> +};
->> +
->>   /* clang-format off */
->>   FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_udp) {
->>   	/* clang-format on */
->> @@ -359,6 +459,39 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_tcp) {
->>   	},
->>   };
->>   
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_mptcp) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_MPTCP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_sctp) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SCTP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_smc) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SMC,
->> +	},
->> +};
->> +
->>   /* clang-format off */
->>   FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp) {
->>   	/* clang-format on */
->> @@ -369,6 +502,39 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp) {
->>   	},
->>   };
->>   
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_mptcp) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_MPTCP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_sctp) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SCTP,
->> +	},
->> +};
->> +
->> +/* clang-format off */
->> +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_smc) {
->> +	/* clang-format on */
->> +	.sandbox = TCP_SANDBOX,
->> +	.prot = {
->> +		.domain = AF_INET6,
->> +		.type = SOCK_STREAM,
->> +		.protocol = IPPROTO_SMC,
->> +	},
->> +};
->> +
->>   /* clang-format off */
->>   FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_udp) {
->>   	/* clang-format on */
->> @@ -663,7 +829,7 @@ TEST_F(protocol, bind_unspec)
->>   
->>   	/* Allowed bind on AF_UNSPEC/INADDR_ANY. */
->>   	ret = bind_variant(bind_fd, &self->unspec_any0);
->> -	if (variant->prot.domain == AF_INET) {
->> +	if (variant->prot.domain == AF_INET && !prot_is_sctp(&variant->prot)) {
->>   		EXPECT_EQ(0, ret)
->>   		{
->>   			TH_LOG("Failed to bind to unspec/any socket: %s",
->> @@ -689,7 +855,7 @@ TEST_F(protocol, bind_unspec)
->>   
->>   	/* Denied bind on AF_UNSPEC/INADDR_ANY. */
->>   	ret = bind_variant(bind_fd, &self->unspec_any0);
->> -	if (variant->prot.domain == AF_INET) {
->> +	if (variant->prot.domain == AF_INET && !prot_is_sctp(&variant->prot)) {
-> 
-> It looks like we need the same exception for the next bind_variant()
-> call.
-
-I ran these tests with active selinux (and few other LSMs) (selinux is 
-set by default for x86_64) and it seems that this check was passed
-correctly due to SCTP errno inconsistency in selinux_socket_bind().
-
-With selinux_socket_bind() disabled, bind_variant() returns -EINVAL as
-it should (Cf. sctp_do_bind).
-
-Such inconsistency happens because sksec->sclass security field can be
-initialized with SECCLASS_SOCKET (Cf. socket_type_to_security_class)
-in SCTP case, and selinux_socket_bind() provides following check:
-
-	/* Note that SCTP services expect -EINVAL, others -EAFNOSUPPORT. */
-	if (sksec->sclass == SECCLASS_SCTP_SOCKET)
-		return -EINVAL;
-	return -EAFNOSUPPORT;
-
-I'll possibly send a fix for this to selinux.
-
-> 
->>   		if (is_restricted(&variant->prot, variant->sandbox)) {
->>   			EXPECT_EQ(-EACCES, ret);
->>   		} else {
->> @@ -727,6 +893,10 @@ TEST_F(protocol, connect_unspec)
->>   	int bind_fd, client_fd, status;
->>   	pid_t child;
->>   
->> +	if (prot_is_smc(&variant->prot))
->> +		SKIP(return, "SMC does not properly handles disconnect "
->> +			     "in the case of fallback to TCP");
->> +
->>   	/* Specific connection tests. */
->>   	bind_fd = socket_variant(&self->srv0);
->>   	ASSERT_LE(0, bind_fd);
->> @@ -769,17 +939,18 @@ TEST_F(protocol, connect_unspec)
->>   
->>   		/* Disconnects already connected socket, or set peer. */
->>   		ret = connect_variant(connect_fd, &self->unspec_any0);
->> -		if (self->srv0.protocol.domain == AF_UNIX &&
->> -		    self->srv0.protocol.type == SOCK_STREAM) {
->> +		if (prot_is_unix_stream(&variant->prot)) {
->>   			EXPECT_EQ(-EINVAL, ret);
->> +		} else if (prot_is_sctp(&variant->prot)) {
->> +			EXPECT_EQ(-EOPNOTSUPP, ret);
->>   		} else {
->>   			EXPECT_EQ(0, ret);
->>   		}
->>   
->>   		/* Tries to reconnect, or set peer. */
->>   		ret = connect_variant(connect_fd, &self->srv0);
->> -		if (self->srv0.protocol.domain == AF_UNIX &&
->> -		    self->srv0.protocol.type == SOCK_STREAM) {
->> +		if (prot_is_unix_stream(&variant->prot) ||
->> +		    prot_is_sctp(&variant->prot)) {
->>   			EXPECT_EQ(-EISCONN, ret);
->>   		} else {
->>   			EXPECT_EQ(0, ret);
->> @@ -796,9 +967,10 @@ TEST_F(protocol, connect_unspec)
->>   		}
->>   
->>   		ret = connect_variant(connect_fd, &self->unspec_any0);
->> -		if (self->srv0.protocol.domain == AF_UNIX &&
->> -		    self->srv0.protocol.type == SOCK_STREAM) {
->> +		if (prot_is_unix_stream(&variant->prot)) {
->>   			EXPECT_EQ(-EINVAL, ret);
->> +		} else if (prot_is_sctp(&variant->prot)) {
->> +			EXPECT_EQ(-EOPNOTSUPP, ret);
->>   		} else {
->>   			/* Always allowed to disconnect. */
->>   			EXPECT_EQ(0, ret);
->> -- 
->> 2.34.1
->>
->>
 
