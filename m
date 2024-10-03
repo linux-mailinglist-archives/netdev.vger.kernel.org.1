@@ -1,125 +1,146 @@
-Return-Path: <netdev+bounces-131662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A0FA98F31C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:47:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A484298F325
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 409FDB23C62
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:47:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C81DD1C21D01
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544001A4F35;
-	Thu,  3 Oct 2024 15:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3421A265E;
+	Thu,  3 Oct 2024 15:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="bH7ch1Uv"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0GCuKNno"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C91FC1A0722
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 15:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F821A073F
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 15:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727970376; cv=none; b=bQB/M2QRdR5IiBZWG2EDNCadolVQOXjRvoonffuzpG4CXuxQjjUnyWrccuZwpFgfMg6nFyFKoH0326d53zt0vpEwIYdQjtzIy98sm820tpHmbdxteBVwMZvlyyCAP1jLiEBK0aVNZFnxlFF+zd1X1HTlRIzH3vEk6e+TXBAfAm8=
+	t=1727970523; cv=none; b=kj3Ji0H64ljUhsp+jK3FdRTM5xpaD+n++y1Udn+NQM2bXeNoBXgc/55IX/JfzQ0VtORDZYpN923CtQdD+ma5H7LbbhA1jV5TRRIYQWOSW/Kk42Edy/Ifn99UMD8TrPs40bs/8dA+qJ4MYQn6L9K/Wp6NMRd4j12PDqm9twJyNPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727970376; c=relaxed/simple;
-	bh=c24CSpB9u0bQiRjmqj4Py3erZup2Nm7AdiMa7TDZqlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iyDNjaf+U0yp5p1b3Y3JWa1Ugx8l71CjoxZdBAForCteMEu1se88ZmWt5xz0mfD+aESR+Ox1gdGNdP+1XyRal14WDP7sqxK4EJgh3b+j0OnZy6T9G+SPfJfVeDwWOFucVJ7b077ETkmLeSvVkSrSWhtJEMDuQ+PwFE3Eu07KbQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=bH7ch1Uv; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20b4a0940e3so10284345ad.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 08:46:14 -0700 (PDT)
+	s=arc-20240116; t=1727970523; c=relaxed/simple;
+	bh=nbEOgFC3s9ck5TkxzHUY8vXD6F8G+GkMfGCvlkFyLUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZbSYWYCjo43jv54mAao01X9hLSf5Izbh0drccsCa7/VQbr2veK/guPB1ks8TrHdP/jbxGROj5VgFj37tln0c4POUYVZ7CrTMnaUhNTHN9fmjTP3B4O5bNLXaQcm2XTGZYs7Js1KpA/8uVTcfBgrKhJLbyAMpq9Akle01GirIPgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0GCuKNno; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-719b17b2da1so895070b3a.0
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 08:48:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727970374; x=1728575174; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vg9O2bmhocfO75+5ltClKdx7MUK6nTYdplQZgbhltGY=;
-        b=bH7ch1UvbPWdf0yI/yx4DtUYaJPGbkMnUJOB00qULLvwiSl4PwbV7YXaXDIT9XFb4s
-         cKsmjLCYzzMVqXLzCOhIrPtv5PgxI3E5ETiqBi9X7PUguxCA9sM/Ma08SkwOFaqm6q70
-         mDtwK+WbmXrTQbTCUgC7ZEz54ENXm1jiPdGjo=
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1727970520; x=1728575320; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GWcf7zt+3dbw6XyFZUCjqYVpAh8NDWskQ4AR46WCv8w=;
+        b=0GCuKNnoaFOPyjwqaEG7ng213Irl+IXLv8lhULirECXo9tgRUUr+lwJyhpl65nX08p
+         HDZyee9vnb9PLeZN1SAFD7t0PjSGc2FtwrilPKcH9vYOnIwlzDs28FJBeE/uPEiLr0kZ
+         FYAVZI2N1fhXB7upO0SfAdpMADoHKSXu9IjHgp80gN+pnOgrgED+HadS0PhlIMO0Ctug
+         dQCEkhDRYC9ZVxaIyD47TsWpRV9QdPdGoY0VHYG7CuedqXTngzKZfRxbdVU/WQRmhfNk
+         7FmMbTKBRoO/3J//wYRXyUpo/cf3FRJ6Ilhq1X7l/gdH263F2kMSgI90lq4SXIZHN6dT
+         RVSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727970374; x=1728575174;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vg9O2bmhocfO75+5ltClKdx7MUK6nTYdplQZgbhltGY=;
-        b=VDanjo76uQGsKE2iy7jIHhyfDPPWnIRYosZehbnqENMVI1t3VrimyU31d3gS9G9JgP
-         oN/Z14+7e+ykkBes8Peee5AFxqp+io7g4DP6EHysu7asnlhpMiot3jx6SpNPLTSyKzfw
-         YmaGboQatxMvxaCtApPMUHhgy2HAWnGJ8HNO/Va8cfDPeIyhTSTr32kQ2Wvgr/uXzBzV
-         wzgxAY7LNnXcCejE+viDuE/7FJaL27aMxHQrm7BY28ZqgYn1v039MEnI8qj6WEQpyNhl
-         w5RbgJWVein4W03uUz/83UHMAXrxhF6qDQaU6ndQPgaeBGEm9rlDIAICZc9hiev01ggn
-         M0yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVxusX6dPSQB2NC52EZTncqGMwgqyb6ArlsS5E7AibMrubnQMvwsPb8Y6cf//xYrjOpFxyVlTI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvhGiLtRbzLml/OQSOPicDdeSMPAq4A5xncDpFaKJztND/HKry
-	2nctnadKVSxhZhH0i2eZ4FEh2skLy0zUNy2cVuS93pNg8q+OuiAxOgYI15hPAkk=
-X-Google-Smtp-Source: AGHT+IHJZ2Cva6weRJymSIYfRl+TvfkC3DsPe7+bV+X6mtLTATN118ZY6+JXSzlo5Pl23BKacVdE6A==
-X-Received: by 2002:a17:902:e84b:b0:20b:937e:ca1e with SMTP id d9443c01a7336-20bc5a0a801mr103188475ad.18.1727970374142;
-        Thu, 03 Oct 2024 08:46:14 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca2256sm10523285ad.91.2024.10.03.08.46.12
+        d=1e100.net; s=20230601; t=1727970520; x=1728575320;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GWcf7zt+3dbw6XyFZUCjqYVpAh8NDWskQ4AR46WCv8w=;
+        b=lhW5Xerl8R5Qq230mfV0YPIcqEEZKBQUfDvLr1YsWOOB+k/acAnf+RPTuNT8WTF1Vw
+         pZ9vu+8Z75utDKxQ0svpZaxkTi/4K4gIblL5mRC49/fKNTDVd3IupWwyng9jrRwPa15V
+         Np7eb/WSyaoisagO+WJ4C/xwudsVGUmOmoxEuVqqNG6/hdkpM1656MTb195Yg0SmJWq2
+         c87Si8m/zA3gyrafX6Si3wqmYubmqQKXq/ixdiaabBgdFjNXw60QZebHlhr/97PudoDV
+         zyxnlGtK3nriFP9Gt3sbet4lnoBwfrEmtu0xR30Z8F1JVvxibBcg+X+dzHBwZDu00rZU
+         nchA==
+X-Forwarded-Encrypted: i=1; AJvYcCV3ok9VUIr47uchhJYQKnOnahT7oNnSN8pxJAIFOgRTf1nJbnF5mdvf9hYTTPY7ERHpRQ/ZBaE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeCxPTrRAUmHMG0ywxZkIXf3u5oGVktDft4+Gr6yOgbQsHKtdM
+	i22doenfVVO+nCmG6YK2cBdYuKLaVHgSGd+gIeImzSC4nuMxAKAcIZFwI3qJ4Fn/FgHL+VUqIh6
+	q
+X-Google-Smtp-Source: AGHT+IGXF/os+Jbd4kMUMUnMTR8RzWyvw5p0drzkab3E15H6sbrW06lt/w3l+0VNhmLYeVWZgRv2Qg==
+X-Received: by 2002:a05:6a21:8cc8:b0:1d2:eb91:c0c1 with SMTP id adf61e73a8af0-1d5ec4952f5mr10009617637.42.1727970520130;
+        Thu, 03 Oct 2024 08:48:40 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9e08422sm1474227b3a.210.2024.10.03.08.48.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 08:46:13 -0700 (PDT)
-Date: Thu, 3 Oct 2024 08:46:11 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 1/1] idpf: Don't hard code napi_struct size
-Message-ID: <Zv68Q4ur4-ZVTmaL@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	Simon Horman <horms@kernel.org>
-References: <20240925180017.82891-1-jdamato@fastly.com>
- <20240925180017.82891-2-jdamato@fastly.com>
- <6a440baa-fd9b-4d00-a15e-1cdbfce52168@intel.com>
- <c32620a8-2497-432a-8958-b9b59b769498@intel.com>
- <9f86b27c-8d5c-4df9-8d8c-91edb01b0b79@intel.com>
- <Zvsjitl-SANM81Mk@LQ3V64L9R2>
- <a2d7ef07-a3a8-4427-857f-3477eb48af11@intel.com>
- <ZvwK1PnvREjf_wvK@LQ3V64L9R2>
- <20241002101727.349fc146@kernel.org>
- <b7228426-1f70-4e36-9622-c9b69bfe5be9@intel.com>
+        Thu, 03 Oct 2024 08:48:39 -0700 (PDT)
+Date: Thu, 3 Oct 2024 08:48:38 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, kys@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, edumazet@google.com, kuba@kernel.org,
+ davem@davemloft.net, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] hv_netvsc: Fix VF namespace also in netvsc_open
+Message-ID: <20241003084838.32c3b03b@hermes.local>
+In-Reply-To: <a96b1e00-70e3-46d8-a918-e4eb2e7443e8@redhat.com>
+References: <1727470464-14327-1-git-send-email-haiyangz@microsoft.com>
+	<a96b1e00-70e3-46d8-a918-e4eb2e7443e8@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7228426-1f70-4e36-9622-c9b69bfe5be9@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 03, 2024 at 03:35:54PM +0200, Alexander Lobakin wrote:
-[...]
-> napi_struct is the only generic struct whichs size is hardcoded in the
-> macros (struct dim is already sizeof()ed, as well as cpumask_var_t), so
-> I'm fine with the change you proposed in your first RFC -- I mean
+On Thu, 3 Oct 2024 11:34:49 +0200
+Paolo Abeni <pabeni@redhat.com> wrote:
+
+> On 9/27/24 22:54, Haiyang Zhang wrote:
+> > The existing code moves VF to the same namespace as the synthetic device
+> > during netvsc_register_vf(). But, if the synthetic device is moved to a
+> > new namespace after the VF registration, the VF won't be moved together.
+> > 
+> > To make the behavior more consistent, add a namespace check to netvsc_open(),
+> > and move the VF if it is not in the same namespace.
+> > 
+> > Cc: stable@vger.kernel.org
+> > Fixes: c0a41b887ce6 ("hv_netvsc: move VF to same namespace as netvsc device")
+> > Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>  
 > 
->  libeth_cacheline_set_assert(struct idpf_q_vector, 112,
-> -			    424 + 2 * sizeof(struct dim),
-> +			    24 + sizeof(struct napi_struct) +
-> +			    2 * sizeof(struct dim),
->  			    8 + sizeof(cpumask_var_t));
+> This looks strange to me. Skimming over the code it looks like that with 
+> VF you really don't mean a Virtual Function...
 
-So you are saying to drop the other #defines I added in the RFC and
-just embed a sizeof? I just want to be clear so that I send a v2
-that'll be correct.
+In Hyper-V/Azure, there is a feature called "Accelerated Networking" where
+a Virtual Function (VF) is associated with the synthetic network interface.
+The VF may be added/removed by hypervisor while network is running and driver
+needs to follow and track that.
+
+> 
+> Looking at the blamed commit, it looks like that having both the 
+> synthetic and the "VF" device in different namespaces is an intended 
+> use-case. This change would make such scenario more difficult and could 
+> possibly break existing use-cases.
+
+That commit was trying to solve the case where a network interface
+was isolated at boot. The VF device shows up after the
+synthetic device has been registered.
+
+
+> Why do you think it will be more consistent? If the user moved the 
+> synthetic device in another netns, possibly/likely the user intended to 
+> keep both devices separated.
+
+Splitting the two across namespaces is not useful. The VF is a secondary
+device and doing anything directly on the VF will not give good results.
+Linux does not have a way to hide or lock out network devices, if it did
+the VF would be so marked.
+
+This patch is trying to handle the case where userspace moves
+the synthetic network device and the VF is left in wrong namespace.
+
+Moving the device when brought up is not the best solution. Probably better to
+do it when the network device is moved to another namespace.
+Which is visible in driver as NETDEV_REGISTER event.
+The driver already handles this (for VF events) in netvsc_netdev_event()
+it would just have to look at events on the netvsc device as well.
+
+
+
 
