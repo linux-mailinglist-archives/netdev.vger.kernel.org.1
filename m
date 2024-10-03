@@ -1,106 +1,156 @@
-Return-Path: <netdev+bounces-131524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D0198EC15
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 11:11:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FF698EC17
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 11:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95C95B21C8A
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:11:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8441F220B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E15B13DBB1;
-	Thu,  3 Oct 2024 09:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OeywwUpG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C702F1422C7;
+	Thu,  3 Oct 2024 09:13:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C801126C13
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 09:11:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A713DBB1;
+	Thu,  3 Oct 2024 09:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727946688; cv=none; b=gRXX2riMN/nTCErHGeCY1H6NpSxRgh2wGRseeiYBpk+uNkou5Tj4xPFjBu/6d5JtP9oZ+Ze81p8DyC0lQW8x2P3mfB/saZboWkjvg8YzPO8yrz7jXBa2/p9oKs9GoRNQj/b4qBk/MBOuuPCnUgyP1e/PWTSVLgv0e6UAa2GPWks=
+	t=1727946814; cv=none; b=BR6J/9kH94aSeYSE6cIezzbQLCmY6dFV76DvA2BR9U4DW1z39IzBs55K4l4TV8FoG+4Pxv/Q8pV2vLkEUISQzIuAvgkjQqG0MTnmP6M9BnwqCkySEH8rUwgmvrqZ3jBa2s9ExlZ06+1rPomXqVjfwNWoex/z7WebNmS3oS42TYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727946688; c=relaxed/simple;
-	bh=hZKUigBw8D+ZpxYLbA8nYtGd16ZA5hPjjzGxA5Cev1s=;
+	s=arc-20240116; t=1727946814; c=relaxed/simple;
+	bh=NXCM33NdXsSEuRRLpBcQcMOtIahHrw3gOJde07MAaq4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GfOLxcGAr1yMBP9gateursONG2ND/AWb4sYCHbUc5Vwk9VnSbqO9wxAz1zX8+gkGLkG89LzcWFX5jOh/E/OAV/FYv2zzLAJy6FeIrov/gPBKuwvmGzEucNg/T6C5U/qdHJzhgVCOteRqZSQQPuQ2dKVRijz5AUIQTDKWSx3v+VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OeywwUpG; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2fac47f0b1aso9388401fa.1
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 02:11:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727946685; x=1728551485; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RTKQxCfHPtSXNiiPYwZQOkZVi3FeeRKHQDCMag4brS0=;
-        b=OeywwUpG1rE8v5s1LtW0Gtydd3UG//D+bdf7VdeWt+1eK8Y7lSaA6mzXxKnvIn+5Za
-         1dlREg2Qup7pZoPGqUDwo2aJe0e5YXnG/9GjV/+akc/uuspsVsrN6zRvxK1NJDrqCx0U
-         rocJ52srFHjXxm7/bU76LQlKXgbREHH/J2TTh0hJfyYI8XyQ2RmELQlZLa5xaQXxqwgL
-         g1cYXmF8dyl97TeITN972ThwlE8x07P7vvSxAaGu0Kif3WUG5d3pJPWxAoG08/Q4kIAc
-         xc3BU1zzJH25qLzSlatiZgR9TcKg8XGv7y2NRpubt87z/Qoe03i+0D65e1yNjnvbyhK4
-         fI/A==
+	 To:Cc:Content-Type; b=YkB1E9vW86R49GTCmyKlPTHMF2XIlgXrgaLcEcBObgPcRDn9qk2dqNV+IozbUygCXxmfYb9uNoY0dMQ/HDynyirC8cUXceNMkXPaW0u3DOF4DbtOfN96yZBoW5iOiMjXc6iE1MySTZNmU6juRJTIcLjQTrKxhdt80vYqheNbzTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6ddfdeed0c9so5664027b3.2;
+        Thu, 03 Oct 2024 02:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727946685; x=1728551485;
+        d=1e100.net; s=20230601; t=1727946811; x=1728551611;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RTKQxCfHPtSXNiiPYwZQOkZVi3FeeRKHQDCMag4brS0=;
-        b=cnatxXYhSvxqS/JLw40k4fPe33NvYuLgKSNsPxgqvlzm2K/xNAz5LB0hRm1jE8sPKK
-         p+uezwA73Sw/NCz/yI000B/RuGsbwFnJtEI7binHnAMMs3jX1fNjbt3PBY20D+B4HMs8
-         aOASTZeUC1l6QFTr1J8WPYbq/wz/obl/jGZJU3sHPuA4WI7i+8CpDdpUHcqkPxNHotpZ
-         joqoTmTWIPI+Q0GAYjsNqQHkLnCM6YnYlzEotIhKGdIXn5c8QRpbAH453/nMZRgXSqgl
-         3EdLyXMPUWzBtrYhgZHAiD8rNQXZpLCeDKxUz5oGgdPPG//izREW+adcYro385QszngY
-         XXDg==
-X-Forwarded-Encrypted: i=1; AJvYcCV+OZaJx/PY56gZeKCaRjhXS+HmYV9E1xlCE8/U7qr9NkbsVlW83YsEs69ycuMlew7sCZj6sVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNnGRXTWUQYIKYy5ynDjKox4geo22E+ty69eFl9Bsk1XYR8aAe
-	d7zWVwv+cFKP27VSedr+Kp/M9dRBJA+QL//L2Q2xO1q/+CbZNdbZ6ATu9CLClW1CoWgtwOymmO5
-	nnPoH/d9OcRBSX814/kMZ7/EZokfQw44YDUum
-X-Google-Smtp-Source: AGHT+IG53nskLEGK05cTljhOvdbby5Aye33/mxPsMCd+/hEpyeH9Lk7FlxqBBCpMdRW16nvmMc6sndab63auL4ue5e4=
-X-Received: by 2002:a05:6512:6cd:b0:530:e323:b1ca with SMTP id
- 2adb3069b0e04-539a0678f14mr3588507e87.25.1727946685329; Thu, 03 Oct 2024
- 02:11:25 -0700 (PDT)
+        bh=c7WgvebXXsaRMnWziPr4x8Pj8uGoCS6EaJvHvtQmBuY=;
+        b=skiEfA82QesGYJog62JU63cMx1yyt7EdfbhvJIsRGZXuzYzhyOJGY9KS+tgsmNkJlE
+         rKVN0/KoKIqFlWIqBsOTsXDCI+YwGOKKKScOQKnZhre2l/P8ML447jnzPLHs7NOl4aZm
+         5RYuQe8EgMJnp5S9d/z71owjSb2FCYdi90833HGsbz2mp++AxHyAh9bPE9NP/4BBmwM+
+         me4Lsc0gX4Yh5X/8TntH5RVuhIBhlEzGoTTPnpOJl5GLiywVEoWreTb5E/oaj6oO9HRx
+         rOgs+q8256or7lEpLATxZrbCe8Xxm0x/ugF4LTsD64HT7j0VdrxxS/P7lJ5nKPDtHOUP
+         19YA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGur2MGfdOCjMsx/AkG1Wmxjbod5bU1S4XQWSSg/ZwQ4HSLlFPGT7xTZuL3T2wDXy0N2ifB944I8ftf6y0@vger.kernel.org, AJvYcCWWzVWB8phuSQkvgVdortL4/uSL8tVcelnb1jwOnf+6z78s719jQInlEN0I/NUp/Xk08YVWQFb3@vger.kernel.org, AJvYcCXRqWRrbB2mkLYysLuNkpzKgQiClx8IvTE33MIAyeAXV7uCMgHl/inQj0HRjMixDq/S6RmjH+sb0yrv@vger.kernel.org, AJvYcCXqLmCLpWR9LYYSGDj/X2bRzdzBlSZ3/RIPhCYveyhPdXbOgF8bc5bgzYdI4Ubd8SGt/3Oex0gmxQe4@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBtPd0ImKYp2kLFnwENb0bhkkdFahehXcFj8MZMeONufcmqnwe
+	0TsxQHYjZrLTF4gf0AO/SsyhfNZ2e2Y3ut7yOT2gW89aaewWbci8hORumuniAYU=
+X-Google-Smtp-Source: AGHT+IGn18KDopn5fANqBk5+McBjmh6uePf8h4ryC2QhJR0RNJaG/0M5ek3KbypWMR3DGEBkmK/ztA==
+X-Received: by 2002:a05:690c:b13:b0:6e2:83d:dfd9 with SMTP id 00721157ae682-6e2a309f315mr62025137b3.44.1727946811113;
+        Thu, 03 Oct 2024 02:13:31 -0700 (PDT)
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com. [209.85.128.180])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e2bc2d1de6sm1334357b3.68.2024.10.03.02.13.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Oct 2024 02:13:29 -0700 (PDT)
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6e232e260c2so6053897b3.0;
+        Thu, 03 Oct 2024 02:13:29 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV+vvUfrvAOYPhCbgy1OcVfwxSR64yz1OIrTbiz7/Ikj4LpElzYKdcB8cC4idfggou8Ki0FVxXSA6iQt3tz@vger.kernel.org, AJvYcCV0jO9Sst1ZcZ4T+SIY2g6UwAtW76oIWHxtA2A/HoGac7fbTGxye45m/YO+/rMKDrXlh5GO16IcJ8C3@vger.kernel.org, AJvYcCWJhotmCwgW8t6hvs1hfVawmel2bVrXfAuHhjfnFWxLwqh4UaWeXQYXemwuJ8wHCOh94lFfXIg3@vger.kernel.org, AJvYcCXF4Ag7lK4fYaqH2jmWHYct9Sfb4wXkrox76ebUdhuYocx7KzgM/+6Jfnwf7UeXOhRIYRlijganGRzo@vger.kernel.org
+X-Received: by 2002:a05:690c:660e:b0:6e2:636:d9ed with SMTP id
+ 00721157ae682-6e2a2b72c98mr51489427b3.3.1727946809298; Thu, 03 Oct 2024
+ 02:13:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002173042.917928-1-edumazet@google.com> <20241002173042.917928-4-edumazet@google.com>
- <CAL+tcoDNTLoOc9yZsCGu-tt7SqgbJf=hdfkaW_isjR7Cntc5AA@mail.gmail.com>
-In-Reply-To: <CAL+tcoDNTLoOc9yZsCGu-tt7SqgbJf=hdfkaW_isjR7Cntc5AA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 3 Oct 2024 11:11:14 +0200
-Message-ID: <CANn89i+8myPgn61bn7DBqcnK5kXX2XvPo2oc2TfzntPUkeqQ6w@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] tcp: add a fast path in tcp_delack_timer()
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+References: <20241003081647.642468-1-herve.codina@bootlin.com> <20241003081647.642468-2-herve.codina@bootlin.com>
+In-Reply-To: <20241003081647.642468-2-herve.codina@bootlin.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 3 Oct 2024 11:13:17 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdU=Huug5Hip+CCma8pzo=AHAeWtzPES8Zu-qCBAJ0Ng2w@mail.gmail.com>
+Message-ID: <CAMuHMdU=Huug5Hip+CCma8pzo=AHAeWtzPES8Zu-qCBAJ0Ng2w@mail.gmail.com>
+Subject: Re: [PATCH v7 1/6] misc: Add support for LAN966x PCI device
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, 
+	Dragan Cvetic <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>, 
+	Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Saravana Kannan <saravanak@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	Allan Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli <luca.ceresoli@bootlin.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 3, 2024 at 1:19=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> Hello Eric,
->
-        !READ_ONCE(tcp_sk(sk)->compressed_ack))
->
-> I wonder what the use of single READ_ONCE() is here without a
-> WRITE_ONCE() pair? It cannot guarantee that the result of reading
-> compressed_ack is accurate. What if we use without this READ_ONCE()
-> here?
+Hi Herv=C3=A9,
 
-Have you read the changelog and comments about this 'accuracy' thing ?
+On Thu, Oct 3, 2024 at 10:17=E2=80=AFAM Herve Codina <herve.codina@bootlin.=
+com> wrote:
+> Add a PCI driver that handles the LAN966x PCI device using a device-tree
+> overlay. This overlay is applied to the PCI device DT node and allows to
+> describe components that are present in the device.
+>
+> The memory from the device-tree is remapped to the BAR memory thanks to
+> "ranges" properties computed at runtime by the PCI core during the PCI
+> enumeration.
+>
+> The PCI device itself acts as an interrupt controller and is used as the
+> parent of the internal LAN966x interrupt controller to route the
+> interrupts to the assigned PCI INTx interrupt.
+>
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-If you do not use the READ_ONCE() here, only concern is KCSAN might
-trigger a splat.
+Thanks for your patch!
 
-The WRITE_ONCE() for a single byte is not needed, no tearing is possible.
+> --- /dev/null
+> +++ b/drivers/misc/lan966x_pci.dtso
+> @@ -0,0 +1,167 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2022 Microchip UNG
+> + */
+> +
+> +#include <dt-bindings/clock/microchip,lan966x.h>
+> +#include <dt-bindings/gpio/gpio.h>
+> +#include <dt-bindings/interrupt-controller/irq.h>
+> +#include <dt-bindings/mfd/atmel-flexcom.h>
+> +#include <dt-bindings/phy/phy-lan966x-serdes.h>
+> +
+> +/dts-v1/;
+> +/plugin/;
+> +
+> +/ {
+> +       fragment@0 {
+> +               target-path=3D"";
+
+Nit: missing spaces around "=3D".
+
+> +               __overlay__ {
+
+Unfortunately we cannot use sugar syntax, as sugar syntax does not
+support empty target paths yet.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
