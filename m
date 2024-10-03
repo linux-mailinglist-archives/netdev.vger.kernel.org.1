@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-131772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6D298F854
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:58:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C639A98F855
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:59:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFB1F28347A
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:58:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40CB9B21FE5
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446C71AC429;
-	Thu,  3 Oct 2024 20:58:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F451A7AF6;
+	Thu,  3 Oct 2024 20:58:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KqWS4gpc"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CejUEVDA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCDA12EBDB
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 20:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84C912EBDB
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 20:58:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727989111; cv=none; b=c+6sNt7KHa+OFUzWldDd0+ooVt+bZ8ZtUsmNOsavyoWvq1vyRZIFPXj1wjdR1c2VT1MK+d/BuHWu3lzRH3Mn3S7KeI9HYBXAU4xkQsWAhx7BfN8+KYLK38ZlN8SgEQ0s8bITRyjVxRQyaVBRWA0oFBaQkyiZpJf0zPNF4kAqguk=
+	t=1727989135; cv=none; b=T8yCGwWaTzWI3F/grhPSPAaSkxjOE6i9rBSmdleSYmOW4RavV2tLpWF3Z+W837KKO0+boGxZfU2nx+cLOKGxMGgtIHhJXMgMYq7L2pIqGVqw+rO8uioek+PdXhXOVtIxNq+quwwOPC5ypXLe/IOMISL7ibA0NSl6jKDGVsOOcgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727989111; c=relaxed/simple;
-	bh=JwKD4MLXbYKTlj9hCp3/ztUZGxhsJ0nwhKG/qnKAVmY=;
+	s=arc-20240116; t=1727989135; c=relaxed/simple;
+	bh=DoYHM5EB6pZkyhbwuxrVTCMFKPSezGGsWKo7i+noN7w=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m/lDn/bYL84NGuzFFBBbCRph1rVT3CxYc4DIBW8Qx0eau2mecZq5ULgBbcIWC4nF9jwhsFywQHGYHBruaajAUODX+gv+24rvjqTOxcQIsSu9egnBnqVzwdfX6JGz3sHNTuxBaOP51kr75M+0EZ/z4ujuqLfgMxha5URZG+9QpPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KqWS4gpc; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=oBsG8bkTRpiF2f3OppOQFOsejwqR9rJGF2OfhkTu+uoXoauzSsv84yOhb5It2RNAimOoSVbwP2vPq/4MgSj0iK8wlX8W6oxvfZO8hd7jkkM8j6UmFW3/WA1OJad9OlXptN3t8BwW40fU/koCMCDXrjGJ/YNBA0zrE9YS7MC0zH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CejUEVDA; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1727989110; x=1759525110;
+  t=1727989134; x=1759525134;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wCi6pBBHAlrcV1EnvzGFqAN+lzQcVPdN/iQ6c8qeAuo=;
-  b=KqWS4gpcAepL1ZXblGFE54WMddyOeDGiki67Pjdz+UJKaM/oMk9vk6jL
-   B8TAn8OxNiajQ4VWypyUctwcmxzouU76XqdtB71xLZpJYjbTAwryOHxoz
-   LGG1HWN5TSDO1H8a2bbMMIvEEoJNFI/XIR7TZZBxjbBaxvmZJclzIHv6T
-   8=;
+  bh=OTB5nJR3EjIJ1YjlFz4A7YqKJObwtjuQmwmzlF/CqxM=;
+  b=CejUEVDAha+f1q63LijDpmHBrfTPL11RBALGkII92oPJ9lwoCuuUcfn7
+   K4LwEgyM0oddfPXBnUa1KmAPflqUNWEAVguG9CCzNtX/SUSbh33yeg5ic
+   KMxHWhmWPjy8NkGhrfmz6dQ0DbE21z+MHpBxntZg4BWyupcEGEKqGgOvh
+   A=;
 X-IronPort-AV: E=Sophos;i="6.11,175,1725321600"; 
-   d="scan'208";a="339351753"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 20:58:27 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:2340]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.198:2525] with esmtp (Farcaster)
- id dfd2eb68-ec5c-4b0f-b526-355348e66b5c; Thu, 3 Oct 2024 20:58:26 +0000 (UTC)
-X-Farcaster-Flow-ID: dfd2eb68-ec5c-4b0f-b526-355348e66b5c
+   d="scan'208";a="236583996"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 20:58:51 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:33522]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.18:2525] with esmtp (Farcaster)
+ id 027bc79e-0094-4707-8a05-0d03ff340685; Thu, 3 Oct 2024 20:58:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 027bc79e-0094-4707-8a05-0d03ff340685
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 3 Oct 2024 20:58:24 +0000
+ Thu, 3 Oct 2024 20:58:48 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 3 Oct 2024 20:58:22 +0000
+ Thu, 3 Oct 2024 20:58:46 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Roopa Prabhu
-	<roopa@nvidia.com>
-Subject: [PATCH v1 net 2/6] vxlan: Handle error of rtnl_register_module().
-Date: Thu, 3 Oct 2024 13:57:21 -0700
-Message-ID: <20241003205725.5612-3-kuniyu@amazon.com>
+	<roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>
+Subject: [PATCH v1 net 3/6] bridge: Handle error of rtnl_register_module().
+Date: Thu, 3 Oct 2024 13:57:22 -0700
+Message-ID: <20241003205725.5612-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20241003205725.5612-1-kuniyu@amazon.com>
 References: <20241003205725.5612-1-kuniyu@amazon.com>
@@ -78,88 +78,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB002.ant.amazon.com (10.13.139.181) To
+X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Since introduced, vxlan_vnifilter_init() has been ignoring the
-returned value of rtnl_register_module(), which could fail.
+Since introduced, br_vlan_rtnl_init() has been ignoring the returned
+value of rtnl_register_module(), which could fail.
 
 Let's handle the errors by rtnl_register_module_many().
 
-Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
+Fixes: 8dcea187088b ("net: bridge: vlan: add rtm definitions and dump support")
+Fixes: f26b296585dc ("net: bridge: vlan: add new rtm message support")
+Fixes: adb3ce9bcb0f ("net: bridge: vlan: add del rtm message support")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
 Cc: Roopa Prabhu <roopa@nvidia.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- drivers/net/vxlan/vxlan_core.c      |  6 +++++-
- drivers/net/vxlan/vxlan_private.h   |  2 +-
- drivers/net/vxlan/vxlan_vnifilter.c | 19 +++++++++----------
- 3 files changed, 15 insertions(+), 12 deletions(-)
+ net/bridge/br_netlink.c |  6 +++++-
+ net/bridge/br_private.h |  5 +++--
+ net/bridge/br_vlan.c    | 19 +++++++++----------
+ 3 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 53dcb9fffc04..6e9a3795846a 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -4913,9 +4913,13 @@ static int __init vxlan_init_module(void)
- 	if (rc)
- 		goto out4;
+diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+index f17dbac7d828..6b97ae47f855 100644
+--- a/net/bridge/br_netlink.c
++++ b/net/bridge/br_netlink.c
+@@ -1920,7 +1920,10 @@ int __init br_netlink_init(void)
+ {
+ 	int err;
  
--	vxlan_vnifilter_init();
-+	rc = vxlan_vnifilter_init();
-+	if (rc)
-+		goto out5;
+-	br_vlan_rtnl_init();
++	err = br_vlan_rtnl_init();
++	if (err)
++		goto out;
++
+ 	rtnl_af_register(&br_af_ops);
  
- 	return 0;
-+out5:
-+	rtnl_link_unregister(&vxlan_link_ops);
- out4:
- 	unregister_switchdev_notifier(&vxlan_switchdev_notifier_block);
- out3:
-diff --git a/drivers/net/vxlan/vxlan_private.h b/drivers/net/vxlan/vxlan_private.h
-index b35d96b78843..76a351a997d5 100644
---- a/drivers/net/vxlan/vxlan_private.h
-+++ b/drivers/net/vxlan/vxlan_private.h
-@@ -202,7 +202,7 @@ int vxlan_vni_in_use(struct net *src_net, struct vxlan_dev *vxlan,
- int vxlan_vnigroup_init(struct vxlan_dev *vxlan);
- void vxlan_vnigroup_uninit(struct vxlan_dev *vxlan);
+ 	err = rtnl_link_register(&br_link_ops);
+@@ -1931,6 +1934,7 @@ int __init br_netlink_init(void)
  
--void vxlan_vnifilter_init(void);
-+int vxlan_vnifilter_init(void);
- void vxlan_vnifilter_uninit(void);
- void vxlan_vnifilter_count(struct vxlan_dev *vxlan, __be32 vni,
- 			   struct vxlan_vni_node *vninode,
-diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
-index 9c59d0bf8c3d..4be5d3060039 100644
---- a/drivers/net/vxlan/vxlan_vnifilter.c
-+++ b/drivers/net/vxlan/vxlan_vnifilter.c
-@@ -992,19 +992,18 @@ static int vxlan_vnifilter_process(struct sk_buff *skb, struct nlmsghdr *nlh,
+ out_af:
+ 	rtnl_af_unregister(&br_af_ops);
++out:
  	return err;
  }
  
--void vxlan_vnifilter_init(void)
-+static struct rtnl_msg_handler vxlan_rtnl_msg_handlers[] = {
-+	{PF_BRIDGE, RTM_GETTUNNEL, NULL, vxlan_vnifilter_dump, 0},
-+	{PF_BRIDGE, RTM_NEWTUNNEL, vxlan_vnifilter_process, NULL, 0},
-+	{PF_BRIDGE, RTM_DELTUNNEL, vxlan_vnifilter_process, NULL, 0},
-+};
-+
-+int vxlan_vnifilter_init(void)
- {
--	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_GETTUNNEL, NULL,
--			     vxlan_vnifilter_dump, 0);
--	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_NEWTUNNEL,
--			     vxlan_vnifilter_process, NULL, 0);
--	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_DELTUNNEL,
--			     vxlan_vnifilter_process, NULL, 0);
-+	return rtnl_register_module_many(vxlan_rtnl_msg_handlers);
+diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
+index d4bedc87b1d8..041f6e571a20 100644
+--- a/net/bridge/br_private.h
++++ b/net/bridge/br_private.h
+@@ -1571,7 +1571,7 @@ void br_vlan_get_stats(const struct net_bridge_vlan *v,
+ void br_vlan_port_event(struct net_bridge_port *p, unsigned long event);
+ int br_vlan_bridge_event(struct net_device *dev, unsigned long event,
+ 			 void *ptr);
+-void br_vlan_rtnl_init(void);
++int br_vlan_rtnl_init(void);
+ void br_vlan_rtnl_uninit(void);
+ void br_vlan_notify(const struct net_bridge *br,
+ 		    const struct net_bridge_port *p,
+@@ -1802,8 +1802,9 @@ static inline int br_vlan_bridge_event(struct net_device *dev,
+ 	return 0;
  }
  
- void vxlan_vnifilter_uninit(void)
+-static inline void br_vlan_rtnl_init(void)
++static inline int br_vlan_rtnl_init(void)
  {
--	rtnl_unregister(PF_BRIDGE, RTM_GETTUNNEL);
--	rtnl_unregister(PF_BRIDGE, RTM_NEWTUNNEL);
--	rtnl_unregister(PF_BRIDGE, RTM_DELTUNNEL);
-+	rtnl_unregister_many(vxlan_rtnl_msg_handlers);
++	return 0;
+ }
+ 
+ static inline void br_vlan_rtnl_uninit(void)
+diff --git a/net/bridge/br_vlan.c b/net/bridge/br_vlan.c
+index 9c2fffb827ab..a9f00d72fe18 100644
+--- a/net/bridge/br_vlan.c
++++ b/net/bridge/br_vlan.c
+@@ -2296,19 +2296,18 @@ static int br_vlan_rtm_process(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	return err;
+ }
+ 
+-void br_vlan_rtnl_init(void)
++static struct rtnl_msg_handler br_vlan_rtnl_msg_handlers[] = {
++	{PF_BRIDGE, RTM_NEWVLAN, br_vlan_rtm_process, NULL, 0},
++	{PF_BRIDGE, RTM_DELVLAN, br_vlan_rtm_process, NULL, 0},
++	{PF_BRIDGE, RTM_GETVLAN, NULL, br_vlan_rtm_dump, 0},
++};
++
++int br_vlan_rtnl_init(void)
+ {
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_GETVLAN, NULL,
+-			     br_vlan_rtm_dump, 0);
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_NEWVLAN,
+-			     br_vlan_rtm_process, NULL, 0);
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_DELVLAN,
+-			     br_vlan_rtm_process, NULL, 0);
++	return rtnl_register_module_many(br_vlan_rtnl_msg_handlers);
+ }
+ 
+ void br_vlan_rtnl_uninit(void)
+ {
+-	rtnl_unregister(PF_BRIDGE, RTM_GETVLAN);
+-	rtnl_unregister(PF_BRIDGE, RTM_NEWVLAN);
+-	rtnl_unregister(PF_BRIDGE, RTM_DELVLAN);
++	rtnl_unregister_many(br_vlan_rtnl_msg_handlers);
  }
 -- 
 2.30.2
