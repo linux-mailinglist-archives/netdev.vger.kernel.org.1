@@ -1,96 +1,106 @@
-Return-Path: <netdev+bounces-131811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B8498FA12
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:50:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F9F598FA15
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CF8C1C21FF6
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:50:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 691D91C2215D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EFA186E3D;
-	Thu,  3 Oct 2024 22:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8301CEAC4;
+	Thu,  3 Oct 2024 22:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eznuAcvl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JEiWLYgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FCB1CCEDC;
-	Thu,  3 Oct 2024 22:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3CD748D;
+	Thu,  3 Oct 2024 22:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727995828; cv=none; b=NOuAWuwAlsyHxUdMRGIvu8xxC2qEI8yO/OrCDVStliweSMndaKnV3cz5MjZY0siLcb2xKKP3xsxpUQsTvhUD+zzlNlf659osD7LR7hMwBe6p5tRMGFhfqc6NtdLFoZTg8Yu2l+jy0hdgezsYMF2CxkX+SzKXfqe7aYbtfo7sOj4=
+	t=1727995857; cv=none; b=OSYLQocEQpEyMg7adWskZAQVdj+0DnRVIZupZM7kUySQbpqnLfBFPG+ACb0aKa6c5lPg/8U/27+dXz2BFzNx1ZjL+nx4opNMSL8zCukQapvVZ/7NmhfXWzbXmxTGp/LzTeW36qXKsCmVSCFlEuXt41PXtG9AVrtytKlImKoSLPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727995828; c=relaxed/simple;
-	bh=N76ffPwh7vhzdVjn6ChswXpK5tc7FNqz8Sg0rAqMMIQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Yz/J8XSCdxgmSFvsS8fOlkSMjmulT3HSfY+N8gcpH72CgPvxlUeReTDpAo5dTs/i5G88V3qNL9TJCjNk/1EL6QXp+K8yI46rn5tJGQJ2u7D9/IpEqhWQzD3gPyRUpOJO34RzSSVcuIlixgpleksE5YpSpTeW/rrHHac5v85uhCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eznuAcvl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0BDC4CEC5;
-	Thu,  3 Oct 2024 22:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727995828;
-	bh=N76ffPwh7vhzdVjn6ChswXpK5tc7FNqz8Sg0rAqMMIQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eznuAcvlRv8W+A/E65+yQt5KNVDUuJKOB/LcpIHoLo0Cw1uFdhhrZZw8czhB6Mkqy
-	 72/L61jHh+dne8YUammEI91zMZExkWFuI1AZNjo3PKMY+cuGU5LOUWmyr1V4BMiYV+
-	 +03FUNbni7T0xp+VOP12ri4YfDWPNveTEjXnXF3cgH6MVPfB78cGnMAajaRdNlaRhi
-	 vQQzL9ob4Mglq0bNLgA9cV0Po63ME8DyeRfD10jWBkjLPfr9lSEqSBLZYuBzAY1xpq
-	 /M8xeeVWPKPPhPrvavQvlk0ChMsgplv76u7WiCGL4I5ZsUjNFoqmMVP/VvuhCb1xet
-	 1IT2E5WD8nF+g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB18F3803263;
-	Thu,  3 Oct 2024 22:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727995857; c=relaxed/simple;
+	bh=jeMAGHJ0dsiRHeik00FYjaL9SF93iaOygrdM/utcmyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RL/zvvW6xT9+Yp6Q2vdzKc+tf0VxmBo0CSyvxKcBR6FyGSTV3+hwP+HdS6bPh/VwRIGqs8cTMdKM1xdHYDPYemWaV23603OaBtFq8Bwj5efoVHkyg2SWIMLglXS3DKbRYrCu6rJvTzKzShvb7JEoe6xnsrhsS/lrQQss0tD4lGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JEiWLYgs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ho4Dkbnr7gS9ICt6dH3nWArm3KWyz3GKBaC/BZym6Do=; b=JEiWLYgs8jEFGcLkf5e2M21B81
+	kGqvbysci0yVOL/ezcxZPqLcY/ZS+BIuJ+oQlvQ59CDkgkJvPa41eIEMBbpfiaoi+PSMWSv825rs3
+	+VGhuZulkHPTZsRg7lrbe9SNO6Rla2UtZzCY386SOqXWd5EQyA4EAw0ktVWTyjQhK9YA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swUed-008zOF-MS; Fri, 04 Oct 2024 00:50:39 +0200
+Date: Fri, 4 Oct 2024 00:50:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
+	stable@vger.kernel.org
+Subject: Re: [net PATCH 2/2] net: phy: Skip PHY LEDs OF registration for
+ Generic PHY driver
+Message-ID: <2dcd127d-ab41-4bf7-aea4-91f175443e62@lunn.ch>
+References: <20241003221006.4568-1-ansuelsmth@gmail.com>
+ <20241003221006.4568-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sfc: Don't invoke xdp_do_flush() from netpoll.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172799583176.2017964.8627494683961349191.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Oct 2024 22:50:31 +0000
-References: <20241002125837.utOcRo6Y@linutronix.de>
-In-Reply-To: <20241002125837.utOcRo6Y@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com, bpf@vger.kernel.org,
- davem@davemloft.net, toke@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- ecree.xilinx@gmail.com, edumazet@google.com, kuba@kernel.org,
- hawk@kernel.org, john.fastabend@gmail.com, habetsm.xilinx@gmail.com,
- pabeni@redhat.com, tglx@linutronix.de, mon@unformed.ru
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003221006.4568-2-ansuelsmth@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 2 Oct 2024 14:58:37 +0200 you wrote:
-> Yury reported a crash in the sfc driver originated from
-> netpoll_send_udp(). The netconsole sends a message and then netpoll
-> invokes the driver's NAPI function with a budget of zero. It is
-> dedicated to allow driver to free TX resources, that it may have used
-> while sending the packet.
+On Fri, Oct 04, 2024 at 12:10:05AM +0200, Christian Marangi wrote:
+> It might happen that a PHY driver fails to probe or is not present in
+> the system as it's a kmod. In such case the Device Tree might have LED
+> entry but the Generic PHY is probed instead.
 > 
-> In the netpoll case the driver invokes xdp_do_flush() unconditionally,
-> leading to crash because bpf_net_context was never assigned.
+> In this scenario, PHY LEDs OF registration should be skipped as
+> controlling the PHY LEDs is not possible.
 > 
-> [...]
+> Tested-by: Daniel Golle <daniel@makrotopia.org>
+> Cc: stable@vger.kernel.org
+> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+>  drivers/net/phy/phy_device.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 499797646580..af088bf00bae 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -3411,6 +3411,11 @@ static int of_phy_leds(struct phy_device *phydev)
+>  	struct device_node *leds;
+>  	int err;
+>  
+> +	/* Skip LED registration if we are Generic PHY */
+> +	if (phy_driver_is_genphy(phydev) ||
+> +	    phy_driver_is_genphy_10g(phydev))
+> +		return 0;
 
-Here is the summary with links:
-  - [net] sfc: Don't invoke xdp_do_flush() from netpoll.
-    https://git.kernel.org/netdev/net/c/55e802468e1d
+Why fix it link this, when what you propose for net-next, that the drv
+ops must also exist, would fix it.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I don't see any need to special case genphy.
 
-
+	Andrew
 
