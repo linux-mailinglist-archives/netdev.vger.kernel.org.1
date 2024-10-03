@@ -1,93 +1,69 @@
-Return-Path: <netdev+bounces-131411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2997A98E786
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:04:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E2F98E78B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88C61F27307
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:04:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A61AB20A33
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACF118D;
-	Thu,  3 Oct 2024 00:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348F438B;
+	Thu,  3 Oct 2024 00:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vnIhUot1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTBp6pVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7591A41
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 00:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B47E8F49;
+	Thu,  3 Oct 2024 00:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727913895; cv=none; b=uWwilGzx+0kW9Q66u71qAMTNOXieRagYEUkmd3bDC9cG1PZUVzB+O93fxxWlaJhv19nbCC4eiKITo6ei4Ps7yqs3LM3+npDPIsnRTKMppTFNA1osAMS01bRR4WCDb0PXDPFXKFztvckeOpCPBUrlOCZUWRNNV5oZYH1RUPTeRB8=
+	t=1727914096; cv=none; b=pHCGPw144ltdcDrByLoEjjNeTbk283On1ZP0hjTg8gAPD8UEaXW60xyAWESR2sR9idRaHBHqk9VH49fMOh/XLtCYOelE+XGLCi7Ini0erqbf6fyEm0BeDqCtevGORXnf8FKyoDgiQHriKJtB3EuUBV7h3z/P6leXvuVuSoITnqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727913895; c=relaxed/simple;
-	bh=7CHLKbmW8z87ufeGcUccZBrwX2HcbC0dCheq/w/zQMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EoDtqjrMzPWMLPT2cWFkaPt4DaTEbAqGOOV9U7aBJp4IR1qruopEOSmb0Og8y4RnSRw6e0pEijLNCPgYmVILWANiCAQV36sRqddP0dR/LpwCJkhPMHobCROoNe8SW8oDu+bRF7pQsZQIa22R044++LYwkxZKd7R8zS7kKQLRpVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vnIhUot1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6gpNUZ2n+ZYIeb9jUgyu8pZsdI3EzueIgoOfHeCJegY=; b=vnIhUot1foD71vkU9UdaNoZiss
-	GRwY5pWGUICSTWparQ9VtqHH7VummnPJB0YhzHFnPLO8WzqPpiaN7lJS3qeSTuq3qQ3seZ6UhicyL
-	wr7HnAJKJmUu4/qtOkqnigXOLBRU6HgHI0P68JyL9FQ3WojDH090LLp3J6NZwNuiFS7A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sw9Ke-008uKm-8h; Thu, 03 Oct 2024 02:04:36 +0200
-Date: Thu, 3 Oct 2024 02:04:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH net-next 01/10] net: pcs: xpcs: move PCS reset to
- .pcs_pre_config()
-Message-ID: <acdc1443-15ca-4a35-aee0-ddf760136efa@lunn.ch>
-References: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
- <E1svfMA-005ZI3-Va@rmk-PC.armlinux.org.uk>
- <fp2h6mc2346egjtcshek4jvykzklu55cbzly3sj3zxhy6sfblj@waakp6lr6u5t>
- <ZvxxJWCTD4PgoMwb@shell.armlinux.org.uk>
- <68bc05c2-6904-4d33-866f-c828dde43dff@lunn.ch>
- <pm7v7x2ttdkjygakcjjbjae764ezagf4jujn26xnk7driykbu3@hfh4lwpfuowk>
- <84c6ed98-a11a-42bf-96c0-9b1e52055d3f@lunn.ch>
- <zghybnunit6o3wq3kpb237onag2lycilwg5abl5elxxkke4myq@c72lnzkozeun>
+	s=arc-20240116; t=1727914096; c=relaxed/simple;
+	bh=c8NRpcoWHJwGjTJoEzawu+ePFiv1Mf3k3RLZQqyah7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZiIyDmciwDrMusggqwWxINnYiEEPQAKCKvhi+u4vLajw26X2Wk7cEITlYreOSmLUWZLE9Zchn2qsE9OoIOJkWAR6X61bTDVEWIkspJMooCX3hdCTbsrNVhyFd10THmX94b48NgHlNnZ5BBloiL7633L91B8K7eClCI3P4VAuxb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTBp6pVQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F5B5C4CEC2;
+	Thu,  3 Oct 2024 00:08:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727914095;
+	bh=c8NRpcoWHJwGjTJoEzawu+ePFiv1Mf3k3RLZQqyah7w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LTBp6pVQovtdnLiST1OOlGGuJqudQBt3PIfAAsSnupBzm8WDvfiBVf9mFqix3p2k6
+	 icCkhqW+Y3VJdyLAAaeKKs0OXPhs3UzYqmv/wawXKZYDFMQ44KfpjG6vmBixG/ldYD
+	 VAa8mixwmHDWhHT/0AcapGjcrJgw6mVEmtVPyUkAJX9ChoyQxYVthL6dvbY4K2HMSk
+	 S66O1fV6slsM5fViWDbFKSXfmohsOa6ELuMlkEJLGWiAFystkk3eT6mC8U4J3xcbqu
+	 aM5/e2FryFG8XOAXy2uzbuFmm7WI9tk4PoLf/pDgykBJ6gDVf59i5kocRgIoNOan6J
+	 Y/t6wW78q7Hqg==
+Date: Wed, 2 Oct 2024 17:08:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2024-09-27
+Message-ID: <20241002170814.0951e6be@kernel.org>
+In-Reply-To: <20240927094351.3865511-1-stefan@datenfreihafen.org>
+References: <20240927094351.3865511-1-stefan@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <zghybnunit6o3wq3kpb237onag2lycilwg5abl5elxxkke4myq@c72lnzkozeun>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Anyway the Russell' patch set in general looks good to me. I have no
-> more comments other than regarding the soft-reset change I described in
-> my previous message.
+On Fri, 27 Sep 2024 11:43:50 +0200 Stefan Schmidt wrote:
+> Jinjie Ruan added the use of IRQF_NO_AUTOEN in the mcr20a driver and fixed and
+> addiotinal build dependency problem while doing so.
+> 
+> Jiawei Ye, ensured a correct RCU handling in mac802154_scan_worker.
 
-Sorry, i've not been keeping track. Have you sent reviewed-by: and
-Tested-by: for them?
-
-	Andrew
+Sorry for the delay, conferences and travel..
 
