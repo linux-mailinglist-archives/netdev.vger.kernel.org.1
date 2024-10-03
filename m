@@ -1,217 +1,267 @@
-Return-Path: <netdev+bounces-131549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5072C98ED28
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:40:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45B3898ED32
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09352283E36
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:40:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 574171F226D9
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCBA513D882;
-	Thu,  3 Oct 2024 10:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E365914D44D;
+	Thu,  3 Oct 2024 10:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/qBHmbR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYDvPl/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DDB14BF9B
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 10:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B681413D882;
+	Thu,  3 Oct 2024 10:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727952043; cv=none; b=QbmN2p51Sbjt50d47k2Kcdo5/89a6FuPATemNxGhE36s+ePOO/s6N32IlM8RyJ1uAuxuNHC3IaBepsv4LSnr1ueiWw0Sml5ATFA757NuP3CHMVb5ifPn+amRa8uVIn1W4macaT2vmrCznr23yDztDXuasiJVHhyN3gCFbAgI4io=
+	t=1727952139; cv=none; b=Fx3LO6QrVdONulBnF+eMdnamMj6wZaVf4maRoiR02f91xK3AdXXG0jSLqLNaoZiBTwoOu8hP/xJmzD806is8xGhVmPLumNquA2L+B1J7AcX4H5UueMCJGgxlHyToQi5yPsvMjlRy4u5mjNdRPjJeh0AVSin3/gTtKnURZqqqYcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727952043; c=relaxed/simple;
-	bh=i7+HgOj7Z8RNZZKx6TudM4UZymaXMep3n7N6qKhLWLw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d11vf99yzt6X6bJvJCKhYZ4cRge6jGMBKULBWfJfRRdjpkTyn1bCKQjgLx85HfeEOwaHuoSTzTWlGWnQYXb8mt3NbOiw0vNJsUaPGW4YmsmidbPnonZp50pUJTS0zw8FbsaYTY+2xi77cByfXaf6tzGeKXirOahiAM/iCUb/UXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N/qBHmbR; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20b7eb9e81eso8414605ad.2
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 03:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727952042; x=1728556842; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KlcNgGKfAEEPB8a3gKL78DgiC4WYfSjDvVQ6ADZAh1Q=;
-        b=N/qBHmbRbZT7wqV7UCZVU1SPws2T26XiZU6VGlw1LubawBjiqk1CP3JH6PuhNjO4IX
-         WxLmbI/qedKjqXxwalBzmkKK45lhPeB02j+/jQpmb5fi885kwfgpPPzUvC8DcI3wMPj/
-         7U1MM2lT+oLEEE9ou6T6x0/7EqZwjyIM5NWu/BaeJGzDvto6hxTzywLZm5m7sKBGv9hU
-         GMR3Mt37ruffrx6fvK0lv+v8QoUIcBQIjHzkBY+LcBbh3Z0+WFapUcjFaNRpTSDyrHNt
-         +2+uw83RF2YxdSVIlPKyrxF2FuIi6vthTW/qezYhgvA/Jow4lPVNC3cX/TDhw3fWkTgl
-         7BrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727952042; x=1728556842;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KlcNgGKfAEEPB8a3gKL78DgiC4WYfSjDvVQ6ADZAh1Q=;
-        b=alSRLfRRLQshrxARUVM2PkmT1Y277+3En9LomYreOED7UFnL+UhUW7GKmnkpHtJE47
-         cIkNQ2v215tx2ljiA9yFZyVxfE6hsoH4UAKkBOacTKWrWHMPzYpp8exLtqv7ZCoAw6lF
-         v737uKvalkjUfuQl0uDzF2L+0iL8dgIP9bGbhSk//6CvFJ/6LDSjcI2kBDcqrcj3ZeOx
-         8cLl4Mik+yH6SY+OIqQ69zZ2BfxyzVvokhdW0IiuIzc+/beyY8ZD0Or1tMKMwuDEnBpE
-         /05ksdPlHKnJNaolgDTnQito7VUuwvA1S9TMk9zfgAt2OjOWtbESWGTCpO+2T99KVu5Z
-         f4Fg==
-X-Gm-Message-State: AOJu0YxDH+spOCQilXm+B+utfzd1Knqbu297KF1rWnHn5dZMXiAqyLWG
-	i+QYUgCwSsKYQlXZ8g+CUSDcg0aCZvbynge1L3E1rHMkdfKyYoKQ
-X-Google-Smtp-Source: AGHT+IGZmjZqn/hUOAqgNVCzkDv9VdOtX+ZmaH86c7wCo7QItYKHYAqC0DkTIg7iMBixvcwmCz0PiA==
-X-Received: by 2002:a17:903:1103:b0:20b:9078:707b with SMTP id d9443c01a7336-20bc5a10233mr90278035ad.30.1727952041597;
-        Thu, 03 Oct 2024 03:40:41 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([103.30.248.19])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca1c9fsm6752635ad.62.2024.10.03.03.40.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 03:40:41 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3] net-timestamp: namespacify the sysctl_tstamp_allow_data
-Date: Thu,  3 Oct 2024 19:40:35 +0900
-Message-Id: <20241003104035.22374-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1727952139; c=relaxed/simple;
+	bh=a9KmoXJsFEjWSCOH7kCcCjD1NTNIR2CLPy5YKmcNJKw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kzTp6VEjI17rUMjMVmDzCVLfu08KVYER4FmEJeHVv4od5QBJz6bHQxUZ3kkFOyLhEE4LfO0q3QzYfLGfpSDYiiguVOwvS8VG5DHeShsu/yACSG3c2SPZ6rXQ4wXuIc/zDHdJiAfRtnatHu+14p4yjHb4xjXGNEl3D0KXDOj9ww0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYDvPl/7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A18AC4CEC7;
+	Thu,  3 Oct 2024 10:42:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727952138;
+	bh=a9KmoXJsFEjWSCOH7kCcCjD1NTNIR2CLPy5YKmcNJKw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FYDvPl/7Y3AD+UT7KDhhmsWI/4AqOIYOSg8ZMLsUb/E0o4IHlkZQgQ7PGS4dIPIap
+	 3t721t1RSCZvOrh5q1v8tlqSwlbU3bbZAzktZLuzWngvAA/437w/8PU6vvDjWoLXFt
+	 Krel1zVBGmMqbMXo73G3cmMQZYNWXbP06pSZfdVJ8E3BOPOdemCjodG29d3rKFa18q
+	 o4F+du1pZjTDiajhO8z1Ovw/O8W6xQoEKhzEm4KXQEBrL9lwhQEvEpIUxCawV7EY8I
+	 GUh2bai96Aps1tWETgz2Thzvof08CSsX4IdYr7Y4VLuLKcAu/RxZFxbujjVktkUBEK
+	 REuiz2tGStUAA==
+Message-ID: <8f0a6e27-df0c-41fb-8714-10fdfbe976ab@kernel.org>
+Date: Thu, 3 Oct 2024 12:42:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: Add T-HEAD dwmac support
+To: Drew Fustini <dfustini@tenstorrent.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Jisheng Zhang <jszhang@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ Drew Fustini <drew@pdp7.com>, Guo Ren <guoren@kernel.org>,
+ Fu Wei <wefu@redhat.com>, Conor Dooley <conor@kernel.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-riscv@lists.infradead.org
+References: <20240930-th1520-dwmac-v3-0-ae3e03c225ab@tenstorrent.com>
+ <20240930-th1520-dwmac-v3-1-ae3e03c225ab@tenstorrent.com>
+ <wtknsih2yrbylqzanp6k753kklk4myf6iezjz6swnp4nsqr2hl@7mmm6lxhqemu>
+ <Zv2aE7jmE2awLwcl@x1>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <Zv2aE7jmE2awLwcl@x1>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kernelxing@tencent.com>
+On 02/10/2024 21:08, Drew Fustini wrote:
+> On Tue, Oct 01, 2024 at 08:58:34AM +0200, Krzysztof Kozlowski wrote:
+>> On Mon, Sep 30, 2024 at 11:23:24PM -0700, Drew Fustini wrote:
+>>> From: Jisheng Zhang <jszhang@kernel.org>
+>>>
+>>> Add documentation to describe the DesginWare-based GMAC controllers in
+>>> the T-HEAD TH1520 SoC.
+>>>
+>>> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+>>> Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+>>> [drew: rename compatible, add apb registers as second reg of gmac node]
+>>> Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
+>>> ---
+>>>  .../devicetree/bindings/net/snps,dwmac.yaml        |  1 +
+>>>  .../devicetree/bindings/net/thead,th1520-gmac.yaml | 97 ++++++++++++++++++++++
+>>>  MAINTAINERS                                        |  1 +
+>>>  3 files changed, 99 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> index 4e2ba1bf788c..474ade185033 100644
+>>> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+>>> @@ -99,6 +99,7 @@ properties:
+>>>          - snps,dwxgmac-2.10
+>>>          - starfive,jh7100-dwmac
+>>>          - starfive,jh7110-dwmac
+>>> +        - thead,th1520-gmac
+>>>  
+>>>    reg:
+>>>      minItems: 1
+>>> diff --git a/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+>>> new file mode 100644
+>>> index 000000000000..fef1810b10c4
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
+>>> @@ -0,0 +1,97 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/thead,th1520-gmac.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: T-HEAD TH1520 GMAC Ethernet controller
+>>> +
+>>> +maintainers:
+>>> +  - Drew Fustini <dfustini@tenstorrent.com>
+>>> +
+>>> +description: |
+>>> +  The TH1520 GMAC is described in the TH1520 Peripheral Interface User Manual
+>>> +  https://git.beagleboard.org/beaglev-ahead/beaglev-ahead/-/tree/main/docs
+>>> +
+>>> +  Features include
+>>> +    - Compliant with IEEE802.3 Specification
+>>> +    - IEEE 1588-2008 standard for precision networked clock synchronization
+>>> +    - Supports 10/100/1000Mbps data transfer rate
+>>> +    - Supports RGMII/MII interface
+>>> +    - Preamble and start of frame data (SFD) insertion in Transmit path
+>>> +    - Preamble and SFD deletion in the Receive path
+>>> +    - Automatic CRC and pad generation options for receive frames
+>>> +    - MDIO master interface for PHY device configuration and management
+>>> +
+>>> +  The GMAC Registers consists of two parts
+>>> +    - APB registers are used to configure clock frequency/clock enable/clock
+>>> +      direction/PHY interface type.
+>>> +    - AHB registers are use to configure GMAC core (DesignWare Core part).
+>>> +      GMAC core register consists of DMA registers and GMAC registers.
+>>> +
+>>> +select:
+>>> +  properties:
+>>> +    compatible:
+>>> +      contains:
+>>> +        enum:
+>>> +          - thead,th1520-gmac
+>>> +  required:
+>>> +    - compatible
+>>> +
+>>> +allOf:
+>>> +  - $ref: snps,dwmac.yaml#
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    items:
+>>> +      - enum:
+>>> +          - thead,th1520-gmac
+>>> +      - const: snps,dwmac-3.70a
+>>> +
+>>> +  reg:
+>>> +    items:
+>>> +      - description: DesignWare GMAC IP core registers
+>>> +      - description: GMAC APB registers
+>>> +
+>>> +  reg-names:
+>>> +    items:
+>>> +      - const: dwmac
+>>> +      - const: apb
+>>
+>> I don't get why none of snps,dwmac properties are restricted. How many
+>> interrupts do you have here? How many clocks? resets?
+> 
+> Thanks for pointing this out. Yes, I forgot to document the clocks,
+> interrupts and resets.
+> 
+> There needs to be 2 clocks (stmmaceth and pclk). There also needs to be
+> 2 resets: each GMAC has a reset plus a seperate reset for the GMAC AXI
+> interface. There is 1 interrupt (macirq) but it is optional. The BeagleV
+> Ahead uses it but the LicheePi 4A does not use the interrupt.
+> 
+> However, I'm uncertain about how to restrict the snps,dwmac properties.
+> 
+> I see that starfive,jh7110-dwmac.yaml has the following logic. Should I
+> be adding something like this to restrict the snps,dwmac properties?
+> 
+> ---------------------------------------------------------------------
+> allOf:
+>   - $ref: snps,dwmac.yaml#
+> 
+>   - if:
+>       properties:
+>         compatible:
+>           contains:
+>             const: starfive,jh7100-dwmac
+>     then:
+>       properties:
+>         interrupts:
+>           minItems: 2
+>           maxItems: 2
+> 
+>         interrupt-names:
+>           minItems: 2
+>           maxItems: 2
+> 
+>         resets:
+>           maxItems: 1
+> 
+>         reset-names:
+>           const: ahb
 
-Let it be tuned in per netns by admins.
+No, that's not necessary. You have one device in this binding, so in
+top-level should define how each such property looks like.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v3
-Link: https://lore.kernel.org/all/CANn89iLVRPHQ0TzWWOs8S1hA5Uwck_j=tPAQquv+qDf8bMkmYQ@mail.gmail.com/
-1. move sysctl_tstamp_allow_data after sysctl_txrehash (Eric)
-
-v2
-Link: https://lore.kernel.org/all/66fa81b2ddf10_17948d294bb@willemb.c.googlers.com.notmuch/
-1. remove the static global from sock.c
-2. reorder the tests
-3. I removed the patch [1/3] because I made one mistake
-4. I also removed the patch [2/3] because Willem soon will propose a
-packetdrill test that is better.
-Now, I only need to write this standalone patch.
----
- include/net/netns/core.h   |  1 +
- include/net/sock.h         |  2 --
- net/core/net_namespace.c   |  1 +
- net/core/skbuff.c          |  2 +-
- net/core/sock.c            |  2 --
- net/core/sysctl_net_core.c | 18 +++++++++---------
- 6 files changed, 12 insertions(+), 14 deletions(-)
-
-diff --git a/include/net/netns/core.h b/include/net/netns/core.h
-index 78214f1b43a2..7a4f9588b1b2 100644
---- a/include/net/netns/core.h
-+++ b/include/net/netns/core.h
-@@ -15,6 +15,7 @@ struct netns_core {
- 	int	sysctl_somaxconn;
- 	int	sysctl_optmem_max;
- 	u8	sysctl_txrehash;
-+	int	sysctl_tstamp_allow_data;
- 
- #ifdef CONFIG_PROC_FS
- 	struct prot_inuse __percpu *prot_inuse;
-diff --git a/include/net/sock.h b/include/net/sock.h
-index c58ca8dd561b..4f31be0fd671 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2808,8 +2808,6 @@ void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
- extern __u32 sysctl_wmem_max;
- extern __u32 sysctl_rmem_max;
- 
--extern int sysctl_tstamp_allow_data;
--
- extern __u32 sysctl_wmem_default;
- extern __u32 sysctl_rmem_default;
- 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index e39479f1c9a4..e78c01912c64 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -317,6 +317,7 @@ static __net_init void preinit_net_sysctl(struct net *net)
- 	 */
- 	net->core.sysctl_optmem_max = 128 * 1024;
- 	net->core.sysctl_txrehash = SOCK_TXREHASH_ENABLED;
-+	net->core.sysctl_tstamp_allow_data = 1;
- }
- 
- /* init code that must occur even if setup_net() is not called. */
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 74149dc4ee31..00afeb90c23a 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5506,7 +5506,7 @@ static bool skb_may_tx_timestamp(struct sock *sk, bool tsonly)
- {
- 	bool ret;
- 
--	if (likely(READ_ONCE(sysctl_tstamp_allow_data) || tsonly))
-+	if (likely(tsonly || READ_ONCE(sock_net(sk)->core.sysctl_tstamp_allow_data)))
- 		return true;
- 
- 	read_lock_bh(&sk->sk_callback_lock);
-diff --git a/net/core/sock.c b/net/core/sock.c
-index fe87f9bd8f16..93b6c1d0317d 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -286,8 +286,6 @@ EXPORT_SYMBOL(sysctl_rmem_max);
- __u32 sysctl_wmem_default __read_mostly = SK_WMEM_MAX;
- __u32 sysctl_rmem_default __read_mostly = SK_RMEM_MAX;
- 
--int sysctl_tstamp_allow_data __read_mostly = 1;
--
- DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
- EXPORT_SYMBOL_GPL(memalloc_socks_key);
- 
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index 86a2476678c4..83622799eb80 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -491,15 +491,6 @@ static struct ctl_table net_core_table[] = {
- 		.mode		= 0644,
- 		.proc_handler	= proc_dointvec,
- 	},
--	{
--		.procname	= "tstamp_allow_data",
--		.data		= &sysctl_tstamp_allow_data,
--		.maxlen		= sizeof(int),
--		.mode		= 0644,
--		.proc_handler	= proc_dointvec_minmax,
--		.extra1		= SYSCTL_ZERO,
--		.extra2		= SYSCTL_ONE
--	},
- #ifdef CONFIG_RPS
- 	{
- 		.procname	= "rps_sock_flow_entries",
-@@ -665,6 +656,15 @@ static struct ctl_table netns_core_table[] = {
- 		.extra2		= SYSCTL_ONE,
- 		.proc_handler	= proc_dou8vec_minmax,
- 	},
-+	{
-+		.procname	= "tstamp_allow_data",
-+		.data		= &init_net.core.sysctl_tstamp_allow_data,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE
-+	},
- 	/* sysctl_core_net_init() will set the values after this
- 	 * to readonly in network namespaces
- 	 */
--- 
-2.37.3
+Best regards,
+Krzysztof
 
 
