@@ -1,100 +1,146 @@
-Return-Path: <netdev+bounces-131809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A865A98FA05
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:45:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC53298FA09
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BE341F2179F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:45:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19B9A1C20C1B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508E31B85C5;
-	Thu,  3 Oct 2024 22:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABB181CDFDF;
+	Thu,  3 Oct 2024 22:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wsOEB1NT"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="F+hSiA03"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8304713A89A;
-	Thu,  3 Oct 2024 22:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 370EB1B85EB;
+	Thu,  3 Oct 2024 22:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727995525; cv=none; b=r1HgppggmRdZk8x9A4K1j9gAylB1RnjbbBPK8xirgB5Nt3TeO5OMvOCxK3E3//cWdo0sM7ixsB7BL93TJgjQ0cZWdZk38MuqI+nFtYj8VLakB9Rc4eUAXTO/xwJUaqQBvlkBXQHn3lhSxFcpR0FDBaBgSZauOe6E29KeJEtPRcQ=
+	t=1727995620; cv=none; b=scdueF/GGf9KgVJGxfQ0kq/JTQSD9ecUHFm324BPMUMCaGIbCJSjDu8OzkmS8nPsekuJZHOENxEVR7QmD5MaeUL7cJhHRbsHPybJZFzerGbQwumOlGV/aH8iNaHTlx/Rdmg069NbAUew3rK415fCMBgikqArN7lfZ7WcliXItYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727995525; c=relaxed/simple;
-	bh=lMgtSMZ2KqjnHCvyM6XBcKxO11FvCQkElxOjlkv/ry0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BWopdTD1RRkAQlGRVTa4FcMqEPN28lkxsbIQ8X0Qcm+SjqNFablIiiA+GxGjg8hfcLZgN4LhrNxbxuBQUkNDEnoT9Noes1qsDf84V712JaN12K6B5DweRreCgC2+kdn9JyGyVW0vyLkQFDPj0bo0Pncqgb9vmvGA90NhgmnHEAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wsOEB1NT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QKXVFJJYcYqOryY7Uh3pAIQGSHvjYipApaiTYye82uc=; b=wsOEB1NTR1B2cbxGBeSLF/MRuu
-	cz+LZ8xyLLmw8VJ3kW5Put4cHyxf+pWw/oIGrkNWPDXCi9btR8fuxL1guq1gddc6qFZv2odidx8rz
-	OwFqKYy36Q88RGLOdjmGWBPEs0f8f/m0kZe3g0yxZmvNWqa9IfwUtvotM4dkxjTKbwHI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swUZK-008zMU-57; Fri, 04 Oct 2024 00:45:10 +0200
-Date: Fri, 4 Oct 2024 00:45:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
-	stable@vger.kernel.org
-Subject: Re: [net PATCH 1/2] net: phy: Remove LED entry from LEDs list on
- unregister
-Message-ID: <f6e1eaf5-4d49-4394-a2e7-d739d7991d2f@lunn.ch>
-References: <20241003221006.4568-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1727995620; c=relaxed/simple;
+	bh=dv9Punkp/ZqOWw0ugPmFkqnBevaVwG5gVzaWeha+N7I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c6qKPb0hoItaNZzR0y/lN8+YnN6fLHv50SgcBYaf8LvERNSEsjBOE/l4MDcegI/zXlnOUPyzrqolm3lO/ykwRy/3y252BH/D+XO7b54pah/BTb2QJVzycMcTw4EKQdxod1vAHKWCsHr9FlF5jQ0F+I7MiwL+13kg3EBs2sHg/k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=F+hSiA03; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=q/5OtJhG8N40Ai8phZfZQYRKyYRO85Hyg1rkEwmSQrY=; b=F+hSiA03UZBzuoC1KWn5xCfyUe
+	wtq47fJE6BoENJIjtEegMfurq1p6VdMFFgxiwmoBVhDRJGUBZhKuusvPnrGBtqeTRSMud7WDxMl2I
+	FJufRk8QmS6Z/3V7mKslg9zX+w4HcdzI5ibqWC4921R2uiL9uWZWNw1whsLNW5HBS26LjCB0yz2dV
+	zoTotbdXHyvk2i2zT96mye9ZuRLkmlX4lWn8y03ITsIY3/Bu4rv0D3AMV3HvVKmbP4bMdvmpaf6Ak
+	yY79PqcPjGvrVH1MzngnHKfmJYsLzerJbwoJMTepA4yf0SszFhqsv44VTYsIPq1K+RBfOUImhx9yC
+	1oJ/UIEg==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1swUb0-000JB9-HL; Fri, 04 Oct 2024 00:46:54 +0200
+Received: from [85.1.206.226] (helo=[192.168.1.114])
+	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1swUaz-0008Ec-2i;
+	Fri, 04 Oct 2024 00:46:53 +0200
+Message-ID: <b5f23507-1be6-4687-9a59-fe458bda0111@iogearbox.net>
+Date: Fri, 4 Oct 2024 00:46:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241003221006.4568-1-ansuelsmth@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 3/4] tools: Sync if_link.h uapi tooling header
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,
+ Nikolay Aleksandrov <razor@blackwall.org>, jrife@google.com,
+ tangchen.1@bytedance.com, bpf <bpf@vger.kernel.org>,
+ Network Development <netdev@vger.kernel.org>
+References: <20241003180320.113002-1-daniel@iogearbox.net>
+ <20241003180320.113002-3-daniel@iogearbox.net>
+ <CAADnVQL1ULq1tHHO7wVJfADiFPnQuTrap3+iQcQs-_y-zgKQeg@mail.gmail.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <CAADnVQL1ULq1tHHO7wVJfADiFPnQuTrap3+iQcQs-_y-zgKQeg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27416/Thu Oct  3 10:37:25 2024)
 
-On Fri, Oct 04, 2024 at 12:10:04AM +0200, Christian Marangi wrote:
-> Commit c938ab4da0eb ("net: phy: Manual remove LEDs to ensure correct
-> ordering") correctly fixed a problem with using devm_ but missed
-> removing the LED entry from the LEDs list.
+On 10/3/24 9:14 PM, Alexei Starovoitov wrote:
+> On Thu, Oct 3, 2024 at 11:04 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+>>
+>> Sync if_link uapi header to the latest version as we need the refresher
+>> in tooling for netkit device. Given it's been a while since the last sync
+>> and the diff is fairly big, it has been done as its own commit.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+>> ---
+>>   tools/include/uapi/linux/if_link.h | 545 ++++++++++++++++++++++++++++-
+>>   1 file changed, 544 insertions(+), 1 deletion(-)
 > 
-> This cause kernel panic on specific scenario where the port for the PHY
-> is torn down and up and the kmod for the PHY is removed.
-> 
-> On setting the port down the first time, the assosiacted LEDs are
-> correctly unregistered. The associated kmod for the PHY is now removed.
-> The kmod is now added again and the port is now put up, the associated LED
-> are registered again.
-> On putting the port down again for the second time after these step, the
-> LED list now have 4 elements. With the first 2 already unregistered
-> previously and the 2 new one registered again.
-> 
-> This cause a kernel panic as the first 2 element should have been
-> removed.
-> 
-> Fix this by correctly removing the element when LED is unregistered.
-> 
-> Reported-by: Daniel Golle <daniel@makrotopia.org>
-> Tested-by: Daniel Golle <daniel@makrotopia.org>
-> Cc: stable@vger.kernel.org
-> Fixes: c938ab4da0eb ("net: phy: Manual remove LEDs to ensure correct ordering")
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> iirc we decided to start using kernel uapi headers for cases like this,
+> so we don't have to copy paste such things all the time.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Ah okay, wasn't aware, fwiw for my local vmtest.sh it would have otherwise
+broken the build. Will check tomorrow if we have something already where
+we don't need the sync anymore.
 
-    Andrew
+Thanks,
+Daniel
 
