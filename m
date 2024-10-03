@@ -1,167 +1,97 @@
-Return-Path: <netdev+bounces-131823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFC898FA6E
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:29:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC2498FA7A
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC7791C22A65
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:29:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D358A1C2209D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D3D1CF7AB;
-	Thu,  3 Oct 2024 23:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB78B1CFED8;
+	Thu,  3 Oct 2024 23:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mARgVRjn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iED0x/0P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C440E1CF2B1;
-	Thu,  3 Oct 2024 23:29:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F4B1CFEC2
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 23:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727998181; cv=none; b=AkQgSsPS71olJfeWxF5t9Q3/FoXgbbXB4lTHElNohb/CSmKazSclRtuy4TIqgop52GNEA1T1DVGmtS0PmHyHLJ4R4GUwW8x16TgUD3lyacluvZN5YbTCyWJAeTIxIUwvfpq3mDiI3uDmBtzLGpkZTj13IYRAOO9Xl3jrgtQNeaQ=
+	t=1727998226; cv=none; b=KbO/8OonPlmALMR8STzquH/16n6iXvve95Ymnor0JNncnxd+aNNqEyprWgjdk0TKzsr4uuvUq4yA1wOvEuigt7Xmg6LYzPOFe4Z5pOcna4jJ99UTr3l7EwikkIutKm1oPc+tp4sVEwulWqda0limWpbB9G0PFxParekPCT+Thv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727998181; c=relaxed/simple;
-	bh=mJtFrfre42Mt9eobC0iG8th1OV5j+wuKcJnSwi//4c8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JIUsN5NgdwnOnb8KjAweitA748075iqaovlCj17WPoSbsI+D6IT7ho+7p9lKY8hiRDXEVNGBINb4AKm8e/rp595JiAszX12i4Y57UJHttfCAoiLiNjhID/Z6dpfC+r0iOrM9s8tGl9q5yb13tAdkrNS0ocCHdj9XOdBSEIks4Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mARgVRjn; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-718d606726cso1195443b3a.3;
-        Thu, 03 Oct 2024 16:29:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727998179; x=1728602979; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJJfYTsJBD1YUpbtaYyu99p9PsYf+XDP7HfTuVlkPL0=;
-        b=mARgVRjnQdmcY/CHUG7um0qjb6S4/8kvc3F8DKMf8ayxTisAm66Zz4NiNdDcxr3BFQ
-         blHZyE0Usz8U6ppFumA9zZ7aSSM/9vdzFhI+uWmswOuterYOoB9j02+osF/VjhAjCNUO
-         OdbKzDxc4CmCatfQimXeXH+vbuddHYJV4ILhSkWSX4rU36SstKlgAv/TcbB6N4sIXT7O
-         hes5X6/wQY5ldm65ZDKEg6na6WUDFAH8riRVfwbOJy9FymwyHZ5aDY8viMrzfnv0La8m
-         ipKrphsO39QZqiJNvoldM9jPUfxWOWmS2jSqXXTv5X9+S+tTf8vEdtlVm7g3qWE425cK
-         8/QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727998179; x=1728602979;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zJJfYTsJBD1YUpbtaYyu99p9PsYf+XDP7HfTuVlkPL0=;
-        b=r0Qx/UEqyX5n4e4J0wQrvJ0kiydzUFuKmahgxt8eaIPFG7lw/tk87q0vT8SsxDj/Fa
-         6dVdvfwAdA17DaKiKLusjMyxVahFuB/Kr1FaBddH5N0rGb1GgpInWL/F0P60yRfQFiqD
-         fRx7jMWHfylWm4IdoLFoJBNgIE8iYJHRNGXHYP9TdJj1U+AxK60gBlZCoE+l9SLaw/wt
-         4d8Dwd97XcI72+DxvUDEcUEz7x3TOZ81HP0R39MurW52t7xqoAdv6WxGe4Im13hCNTP/
-         Ee+CsXY1kVdw50L9cqd1oHPX9V9nCjiyCzHdFNoHfCttyzdKTUigrwyTDkq0r6P0sR9A
-         Ap2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUFSRGdqYjdF/QwHxPhXruNhYUlZlUxdFjy0IW3A9rZO4JdGhxJQTANPyeU8dINeFqqGsjI0LAypW8=@vger.kernel.org, AJvYcCX5JifCwYQBp+YprvnVUWgiysQSS9UOLLPdmfRAEJ2DZHwwUb/MRvzgRM47UXyM8j6lY30iG+JqQ+vl2g==@vger.kernel.org, AJvYcCXcr2TQ6oPlptOreOrPu6yZKgqeP6XUGcjDlh/dh85tRJXtprwjAbOgMaowszcx1y//1mnWEV937LoJZhMj@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRdmZMjb+u19hdvLcsndbmPTTjKhaovr3VUyPPTswRPzPeCeaO
-	F9FJa8J7XGqKbBedZEQxGJSES1z8Ya8zxsczzibGngBpByuerm0=
-X-Google-Smtp-Source: AGHT+IGvaV40ffnh+bcHsRNWNaFU/gWd5N//USCwZyNU/5JM6pBgrlCZqQRe3DPLD2Ps7suX/tnyoA==
-X-Received: by 2002:a05:6a21:3489:b0:1cf:2aaa:9199 with SMTP id adf61e73a8af0-1d6dfa35eb5mr1378179637.15.1727998179000;
-        Thu, 03 Oct 2024 16:29:39 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9e0809bsm1932509b3a.201.2024.10.03.16.29.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 16:29:38 -0700 (PDT)
-Date: Thu, 3 Oct 2024 16:29:37 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:MELLANOX MLX4 core VPI driver" <linux-rdma@vger.kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [RFC net-next v4 0/9] Add support for per-NAPI config via netlink
-Message-ID: <Zv8o4eliTO60odQe@mini-arch>
-References: <20241001235302.57609-1-jdamato@fastly.com>
+	s=arc-20240116; t=1727998226; c=relaxed/simple;
+	bh=lER9vlbGPiVHRuD5h9WqqQGND+Lw0rPtBRuqEsn6BaU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Siw6QJ1GXZ7EKqcCA/tvLROAYg1cecj8Wvx2AKyUUYpU5A6jUsC7z79cEg/DJg/GLTvuoQlwImrHQ11jATX3NZS4G06q+cCFlcpYuhxuPMMVbG55M5Pc8NxwaZw6VCNvpjFn13BGi7a/fjjefSaFhQapS+/d4SGwEAHUg7cpwIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iED0x/0P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF0AC4CEC5;
+	Thu,  3 Oct 2024 23:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727998226;
+	bh=lER9vlbGPiVHRuD5h9WqqQGND+Lw0rPtBRuqEsn6BaU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iED0x/0PIkmgo6JNBVFPlr1plBqbXXRir6Ohyct59triueDysHkaUc2BlucEkxChA
+	 /zlqJWkZcSPNSz4KG2VxTPOXiCbVfAlSFVm7XhuE9glbtWJgJvZ8Vma2ZOHfUID2Lc
+	 FcUZIOIvT6CEHBqonasdsr8/3C+7Ou5NfiaU4ZLf+TDKv7wGrHm0BWYgorFgPFJQNg
+	 i0dPLfbnpYi7QT2+GWyfxmYBde21Of7Zq8IddhY9Q5xf1PDopX3/ErC8f/iV9bZVsB
+	 qewUBozAAEhOQvb1rEL0ncQwUsPifwHqxPKvlpa3aREdCj+QjKJq6aVBDzLCQ0CwyN
+	 e5pnJhekOfakQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE09B3803263;
+	Thu,  3 Oct 2024 23:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241001235302.57609-1-jdamato@fastly.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] tcp: 3 fixes for retrans_stamp and undo logic
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172799822951.2026907.10544992195133480284.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Oct 2024 23:30:29 +0000
+References: <20241001200517.2756803-1-ncardwell.sw@gmail.com>
+In-Reply-To: <20241001200517.2756803-1-ncardwell.sw@gmail.com>
+To: Neal Cardwell <ncardwell.sw@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ netdev@vger.kernel.org, ncardwell@google.com
 
-On 10/01, Joe Damato wrote:
-> Greetings:
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  1 Oct 2024 20:05:14 +0000 you wrote:
+> From: Neal Cardwell <ncardwell@google.com>
 > 
-> Welcome to RFC v4.
+> Geumhwan Yu <geumhwan.yu@samsung.com> recently reported and diagnosed a
+> regression in TCP loss recovery undo logic in the case where a TCP
+> connection enters fast recovery, is unable to retransmit anything due to
+> TSQ, and then receives an ACK allowing forward progress. The sender should
+> be able to undo the spurious loss recovery in this case, but was not doing
+> so. The first patch fixes this regression.
 > 
-> Very important and significant changes have been made since RFC v3 [1],
-> please see the changelog below for details.
-> 
-> A couple important call outs for this revision for reviewers:
-> 
->   1. idpf embeds a napi_struct in an internal data structure and
->      includes an assertion on the size of napi_struct. The maintainers
->      have stated that they think anyone touching napi_struct should update
->      the assertion [2], so I've done this in patch 3. 
-> 
->      Even though the assertion has been updated, I've given the
->      cacheline placement of napi_struct within idpf's internals no
->      thought or consideration.
-> 
->      Would appreciate other opinions on this; I think idpf should be
->      fixed. It seems unreasonable to me that anyone changing the size of
->      a struct in the core should need to think about cachelines in idpf.
+> [...]
 
-[..]
+Here is the summary with links:
+  - [net,1/3] tcp: fix to allow timestamp undo if no retransmits were sent
+    https://git.kernel.org/netdev/net/c/e37ab7373696
+  - [net,2/3] tcp: fix tcp_enter_recovery() to zero retrans_stamp when it's safe
+    https://git.kernel.org/netdev/net/c/b41b4cbd9655
+  - [net,3/3] tcp: fix TFO SYN_RECV to not zero retrans_stamp with retransmits out
+    https://git.kernel.org/netdev/net/c/27c80efcc204
 
->   2. This revision seems to work (see below for a full walk through). Is
->      this the behavior we want? Am I missing some use case or some
->      behavioral thing other folks need?
-
-The walk through looks good!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->   3. Re a previous point made by Stanislav regarding "taking over a NAPI
->      ID" when the channel count changes: mlx5 seems to call napi_disable
->      followed by netif_napi_del for the old queues and then calls
->      napi_enable for the new ones. In this RFC, the NAPI ID generation
->      is deferred to napi_enable. This means we won't end up with two of
->      the same NAPI IDs added to the hash at the same time (I am pretty
->      sure).
-
-
-[..]
-
->      Can we assume all drivers will napi_disable the old queues before
->      napi_enable the new ones? If yes, we might not need to worry about
->      a NAPI ID takeover function.
-
-With the explicit driver opt-in via netif_napi_add_config, this
-shouldn't matter? When somebody gets to converting the drivers that
-don't follow this common pattern they'll have to solve the takeover
-part :-)
 
