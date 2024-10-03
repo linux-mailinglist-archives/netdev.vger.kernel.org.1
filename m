@@ -1,87 +1,86 @@
-Return-Path: <netdev+bounces-131805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8288D98F9DC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:28:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F05398F9EA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DD252865D8
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:28:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 286A7B2201C
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC331CC171;
-	Thu,  3 Oct 2024 22:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218E71CDA0F;
+	Thu,  3 Oct 2024 22:33:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsYkzWlQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6e3AyME"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB87824BD
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 22:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B8F1AC89A;
+	Thu,  3 Oct 2024 22:33:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727994509; cv=none; b=HOVhT4Kna2rXl7/NZgwzV6An+SzGUCXNp+jiAsYxLTpn4cvg2bfiL/2B1F4XNTs8IkxSgONyWjNiVb2oyutySG47tDweBYzr0ARnA9rGqxx2nFosZvpG4m2AvOR6rnGn2BY3Uac3AnWsDqP2Io8oy/BrWMdTfN0tCGW59VMAbrY=
+	t=1727994808; cv=none; b=kZja7wm58H5YrA2MpDzSeuN3vw0LELztk/tyQ7VYzZefg0DqL2+/i1h62KTyrHRLNV9zmN3deYq1CyB2cIfBukxvnwm9a8lLZ9PmG5hVg+6JFGaPPLqOiEcviB3/v6AYhvcR1xKdl28vBcxfhwngVtPhvkiS7cRUbMG6JFGzM2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727994509; c=relaxed/simple;
-	bh=iWacaPHF7gVzqjZTXkzwNi8TfAtkVht7MihIQdn1wBE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sRg2xCebjbMwzg/GE/kw12McevAGt5FPSd4mpuFRns2YDuW7vAt7E2apwlHytktJqAhmKaFvJ4MRiJopQT5AfeaGHPc4EQJK14pYaD++5kxaZ4OIA1WSgjJp76ul3W+8k2DpKH5lZVMo9Iw7CYpXo7RiszGr3GyvHV0bxsR1AXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsYkzWlQ; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1727994808; c=relaxed/simple;
+	bh=9f6ZNoNVumCAL/XMRoIt4C7FdjT9nJmVjTRImrxPJiQ=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h93fyBXeapFAa3JPQH+LkbGDqr9CrpscudfibObwiaRmOThZzsTvPVwg8ijzoWTP8TbkMxuPb6h9KbxlM8g9HPDNEDp76CGsjEkgxpwuJhOn7QKWBcLsPRibLJ2ut9/GdUbxdKIguLE1O7GTmE96huse/MUOffaNNmzQa6w49q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6e3AyME; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c87b2f1913so214607a12.1
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 15:28:27 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42ca4e0299eso13390345e9.2;
+        Thu, 03 Oct 2024 15:33:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727994506; x=1728599306; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JxN5320XIr1tiexxDkM1DtR2ZMgssjjtwZqxx7j44MY=;
-        b=HsYkzWlQ+DQku+iSjSe00ywu5/SU3raHDXBs7Lpp95EbcWzEQZBY8VL4JCDDkw2TeO
-         hEoFqjMIhIOgMZq8qOF/0+4hRchdH83owyCjNCGKXGA8UrIpUSg7q/MRI2M+tyzQcbHZ
-         OhcMFPOzh03eaDGPfVER/tjk2wZVQBApu5xTIFbMMzf3euRb/xGH/THE1+zhIPI9vMeo
-         5DeTfdM+w2mD6D1M289TSWjWazIRzmqeBOGvhpBnZTEyiKpDeOgplnGtS+7REoAuxsOs
-         1VLNenf68L/e+4eF9Pk24NkmV+fDQ4ZayH15tlXavjK8f/lDrvo4vYu4MINwSH+SsLp0
-         T4ww==
+        d=gmail.com; s=20230601; t=1727994805; x=1728599605; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=oxMy/dAhzJddNHKFOdn1RmdxRCixdQKSPWLi6wAB35c=;
+        b=m6e3AyMEoZ2i+2ddWZcqJT4QfIu+RsH6gLGNosqVUcPa8Qlv0uTBSdw6t1H21TgGQl
+         cXdMi0s2pgrn0UJc9QSGafJzYkiImsgVY1wZv3CnLcpJUwvE4ZM7J2fbikF6IWWOaWbv
+         roZk6Ndlml6gr9UggwbvIY2hcrGbve6LbeQ0/X5ZsDlLlKImroutlt42WCyV6m4DWAFS
+         T9GuAaGcyUUvI1J0QN2xd9DWnrag1lxKMqMq/nM3bSS70P5nB2QGcLYwjrG1NPzJVtsc
+         RDO46JDgdW/JwPvBFCfuOg6LF3ixScM3VZOv1dtZjY/vRRXxoHvs7LngBhyqoQmHdQ7H
+         l0MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727994506; x=1728599306;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1727994805; x=1728599605;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JxN5320XIr1tiexxDkM1DtR2ZMgssjjtwZqxx7j44MY=;
-        b=sdPnOrlOYnVh6/eXG5XRk/yYYWzfmfi1FERJYlgOXPnOxmnaOsnChgQV90oWfCmWRb
-         n5cbqceePkDAOAf4sv1yIjqNM3uZm9jCMConuQ7ANUZuBecOtegfdWteqQrrdDUkqrsc
-         6Nk9cRmRkVGmpAy240xvjbZTk03bsZlhrrQdMp25T4lyNp07+6vXPzGnIRXmLVlZOIEW
-         Tm4xXVMcKoOAZWahgjwXLGTdqEPJyJGADnDV687VtsBwW5VEt4A4E2t7Szg9eioxMYyg
-         ef/CI8Pzs/gMJgjzDPk/W/pew/x+zQi+CgRVCmbJve+/QoCO+Y8rXDJIa1EH0EDghuCG
-         V/4g==
-X-Forwarded-Encrypted: i=1; AJvYcCUHcM3+E3jZLwbFRhRr2LsfWKJaI25ybj62eRoeV+o1a2j4WUfzXi667yOwrJzJ8t5KEBbfYt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEbHKeO9VBIT2oXJvqL7tVt9FiBRRKCy/W8VWFWmrUgaxXlOsW
-	IHTgbOiY9wQPMgekTrvOowdHEzU6PpoBheU/vq84aO7noOVRZvVe
-X-Google-Smtp-Source: AGHT+IH0cH2kyMKawuwBVHKDDGmzrBU7oY2OhZJwnQGddYwYE1XGN+cFB+SpZjKr1aR2itmNhbV+ZQ==
-X-Received: by 2002:a17:907:86a8:b0:a91:158d:363 with SMTP id a640c23a62f3a-a991bd8506fmr33013466b.7.1727994505798;
-        Thu, 03 Oct 2024 15:28:25 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99104731a5sm136562066b.180.2024.10.03.15.28.23
+        bh=oxMy/dAhzJddNHKFOdn1RmdxRCixdQKSPWLi6wAB35c=;
+        b=w8kT96Wum/fNHky3x7PcEFHXmN6nrjTjhmfJnqah/XvIbSnTQRnPH5Gn/lcA03gQme
+         kLFbWcSDR3VcOiWhPAfwdbMh9qey8nrbVBdKIEP3mPdkv7zZJOS+gVrJN6QJOrHIfSQi
+         dSNXtX5t/w2y5cXWs0xotDk9BTxb//CyWMs29kvcCzIxeI9hZz2++cITREtzJG2nIJ82
+         Tz25tJempc15Fd4vVPeY3PoLajefCaEWUbTSos9KY2l3fkmLpvSt0oIMG5PgQe4dBLlH
+         PKIIRwSmueGKJI7Z+MrneaLVQQzL6nCxnDj3Y8ErBBubJH2Vw5TdMl4VV/zPQm09ESTn
+         imkg==
+X-Forwarded-Encrypted: i=1; AJvYcCUJO9IV8zvnlmt3Uo0+Tdyq1ahjIxh+WURDH1wbQv9T2a/wTEQZ3lwEaW9l3UE4r9aNrmjAgrPJ@vger.kernel.org, AJvYcCV6ilwf9jIhAMsOaW3ah7LUEuYYnEQKM4WWZcV+a3eYZFEUrJZ4wUaufPCRsCxHOOc6EF/TA1AqWpetqZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3SMYZKF3ZkYGRQl5lyyk8tRbmHa7kLv5ijc4qPGAndmYvtLKi
+	m0N//EpCB3gKdhuESxsfoRam+YarYhyuP/VzkPox7uPpqe7DMKoXpFg5p8Bt
+X-Google-Smtp-Source: AGHT+IEjaQxIWwpaFBPl+TFPF06Iy9E54UI6p1N1Ppm1siih5wOMfTDUVgXEVVq/ol48G/5YZZ6KpA==
+X-Received: by 2002:a05:600c:450f:b0:42b:afe3:e9f4 with SMTP id 5b1f17b1804b1-42f85aa3965mr3542025e9.3.1727994804556;
+        Thu, 03 Oct 2024 15:33:24 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b3a646sm338105e9.46.2024.10.03.15.33.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 15:28:24 -0700 (PDT)
-Date: Fri, 4 Oct 2024 01:28:21 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+        Thu, 03 Oct 2024 15:33:23 -0700 (PDT)
+Message-ID: <66ff1bb3.7b0a0220.135f57.013e@mx.google.com>
+X-Google-Original-Message-ID: <Zv8brSDKmlPvlS5C@Ansuel-XPS.>
+Date: Fri, 4 Oct 2024 00:33:17 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: dsa: remove obsolete phylink dsa_switch
- operations
-Message-ID: <20241003222821.2jngvjyaqbp4ibub@skbuf>
-References: <E1swKNV-0060oN-1b@rmk-PC.armlinux.org.uk>
- <E1swKNV-0060oN-1b@rmk-PC.armlinux.org.uk>
- <20241003145103.i23tx4mpjtg4e6df@skbuf>
- <Zv64OWFyXY5B0B-l@shell.armlinux.org.uk>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] net: phy: Validate PHY LED OPs presence before
+ registering
+References: <20241003221250.5502-1-ansuelsmth@gmail.com>
+ <20241003222400.q46szutlnxivzrup@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,40 +89,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zv64OWFyXY5B0B-l@shell.armlinux.org.uk>
+In-Reply-To: <20241003222400.q46szutlnxivzrup@skbuf>
 
-On Thu, Oct 03, 2024 at 04:28:57PM +0100, Russell King (Oracle) wrote:
-> Yes, that's correct, but let's keep it to this for the moment.
+On Fri, Oct 04, 2024 at 01:24:00AM +0300, Vladimir Oltean wrote:
+> On Fri, Oct 04, 2024 at 12:12:48AM +0200, Christian Marangi wrote:
+> > Validate PHY LED OPs presence before registering and parsing them.
+> > Defining LED nodes for a PHY driver that actually doesn't supports them
+> > is wrong and should be reported.
 > 
-> There's more to do with mac_select_pcs(). When it was introdued, we
-> needed a way to distinguish whether the method was actually implemented
-> or whether the old phylink_set_pcs() function was being used. Those days
-> are long gone, so returning ERR_PTR(-EOPNOTSUPP) no longer makes much
-> sense.
-> 
-> DSA's core code returns this, as does mv88e6xxx when the chip doesn't
-> have any pcs_ops (I'm not sure now why I did the latter now.)
-> 
-> So, I'd like to (a) make mv88e6xxx_mac_select_pcs() return NULL, then
-> kill dsa_port_phylink_mac_select_pcs() and then eliminate:
-> 
->         if (mac_ops->mac_select_pcs &&
->             mac_ops->mac_select_pcs(config, PHY_INTERFACE_MODE_NA) !=
->               ERR_PTR(-EOPNOTSUPP))
->                 using_mac_select_pcs = true;
-> 
-> replacing all other cases of pl->using_mac_select_pcs with a test
-> for pl->mac_ops->mac_select_pcs being non-NULL.
-> 
-> However, that's for later - I think for this patch, it makes sense
-> to keep returning the ERR_PTR() value because that's what it was
-> doing prior to this patch - we're then only removing the members
-> on the dsa_switch_ops and their callsite in this patch.
+> What about the case where a PHY driver gets LED support in the future?
+> Shouldn't the current kernel driver work with future device trees which
+> define LEDs, and just ignore that node, rather than fail to probe?
 
-I was about to write the same thing earlier, except I stopped when I realized
-I also had no idea why mv88e6xxx_mac_select_pcs() returns ERR_PTR(-EOPNOTSUPP).
+Well this just skip leds node parse and return 0, so no fail to probe.
+This just adds an error. Maybe I should use warn instead?
 
-The removal of using_mac_select_pcs is "further work", and deleting
-dsa_port_phylink_mac_select_pcs() altogether, although it can also be
-done now, can be grouped with that.
+(The original idea was to return -EINVAL but it was suggested by Daniel
+that this was too much and a print was much better)
+
+-- 
+	Ansuel
 
