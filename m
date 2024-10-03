@@ -1,75 +1,54 @@
-Return-Path: <netdev+bounces-131581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04BB198EEDE
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:13:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346F998F026
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:16:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352CF1C21117
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:13:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB79A1F21A7A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D64E15E5D3;
-	Thu,  3 Oct 2024 12:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BF318593E;
+	Thu,  3 Oct 2024 13:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="oNdV4DMF"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="lsWdX9r1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE313D245
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 12:13:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22241741D4;
+	Thu,  3 Oct 2024 13:16:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727957614; cv=none; b=lbY4v7xw6eS0UJjQIlDO/xdgbLJ1qD9D7drTam3BDXwek/EvozcGt4BdjTLlBPaNMe1iGboroG9opbJvcvL05oNfQoE7MesG093OgXmXBoLIN0kuBw+Ua1pIwCo93ZGsKSQVcGxsGCOIkfRkOoum2HngopA++vhYzRdWEG0IUBc=
+	t=1727961380; cv=none; b=VLVxj+aTbBrQANhhaAIqc0BodNXxVtZUeM5Hw5ZfHIxCLt3Mm0WMsOcuRrod/Ls1gryOLh1UomvH22hOgBDoG+jhp+7VYLSjcVhEyBGSvIO1O7/pVf86AVODsHVlV44vZNMpQf9OJ5kstGNzqei3SuF+7OcIR/nTDOwVnfe9nhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727957614; c=relaxed/simple;
-	bh=0JRWiIm1wsUzGMnRVIEwuvITvoPDex1LR0Zl3qSdduY=;
+	s=arc-20240116; t=1727961380; c=relaxed/simple;
+	bh=4nxtqFyV76bEZ8LXZ0YjmzB022W4x0MO9bvFq5HdI4I=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J79WH+ceLxLH8LuyUhejvDNOqZ8MEmW4hCMxXdARc2ldd6nfuatN0W7lZbCicbtUyp4fooLljp7Ncml9O9z1I4nXgX2qj8NjZtudXwMRLTt3rIH+YNqidkRokWBYB3UTmir0oE8b9unN50MmIlOIAe/uhr4uOKcQ0RzXUFI+hCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=oNdV4DMF; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fabc9bc5dfso12164911fa.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 05:13:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1727957611; x=1728562411; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=b97+BR5G8ZkUORarwRJeakZJao5ZnHod3R7d7TH968g=;
-        b=oNdV4DMFS5A6LYvvbdmZ1SL+02Nov5rZFGTPCGlcq4qf95P/USLDY0CCmWIqgFkUnP
-         iakep66vRUW1vf2feArkDE3jNtFwYQzDnxl2LMISMoXuz8xew6qygzpmW+HBEe4ODIRS
-         rhQ7meA+f7G1jgkhh8UaX1h+EddYTk9mMDKUzNTanhs0CPISFlvdbIvEB/E69PMe7mMq
-         f6Q6eRbkMZCGqwYOjXw9JvWWpVlfw0KTqcmW4tpg+7dfqgmztedOk5b48xn5u5iaKjyW
-         P+yv+K6DBfMVRDKuPavqfDGSttyPOVsisG8/iat7QJgZn4y9Us/I1NxxAL2o6bA4RC8+
-         l22A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727957611; x=1728562411;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b97+BR5G8ZkUORarwRJeakZJao5ZnHod3R7d7TH968g=;
-        b=JKJIyuN6jWMID3Yg5cju6vjLCddeTDHbgRizZGhy1HcX++RlYDQCpqiwAWNwXGHDU7
-         c135+nw0HLs6hBN6E0TBxRGWS+Z6NlpM20vKGkFA62Us/WHJBiWjOe4Q2+2IogLkaWD1
-         48CXp/7hkFj7+e30Svd/FTHNWfm2DWxROXUWA/Z2JnT6ErO20gnmsTblwQsvCNXjaqPu
-         C8I1ZI/z/X3RkXdwL3CSruaPaxbpAeHlw2XLUcZquSfAh3r0i/zlBtRzsuQOi5hpZm7+
-         APXXDOjqjEnvqmGuN177g0SgaeSSItjudp6aRn9FmtA3AJccvEsvSlUMQTcGTVqoEERF
-         Jl8g==
-X-Forwarded-Encrypted: i=1; AJvYcCXZwnYuftIgif33tbTWBCMU1b8twep2pjJc5F96KpVeLanpdVHSB89aYcZ8j9G2xZtcx7nffLQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdMwMU2dPjWF2dmtWqibAIEvgjslpasAdewwFha/VpUuoLono1
-	2S4Ha8RojRwILWXRw58wqj2eqRpBwtEQm4BWSTXVfJIHK77b/ULaV7XSXQDnXjKAEH0sWTcBwre
-	+
-X-Google-Smtp-Source: AGHT+IFOZQM6odLRrQlPtdJ6oDdY9Rge1x2xyjlrwcLKcNHV6Kz9E8k8/XHrs1r2nWjWt4MRhV8ThQ==
-X-Received: by 2002:a2e:b8cb:0:b0:2fa:ca00:80d2 with SMTP id 38308e7fff4ca-2fae0ffccc3mr46567761fa.2.1727957610717;
-        Thu, 03 Oct 2024 05:13:30 -0700 (PDT)
-Received: from [192.168.1.18] (176.111.185.181.kyiv.nat.volia.net. [176.111.185.181])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2faecc6c18dsm2024991fa.97.2024.10.03.05.13.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 05:13:30 -0700 (PDT)
-Message-ID: <139a3e30-c5c3-4b9e-8e33-ec348fb33197@blackwall.org>
-Date: Thu, 3 Oct 2024 15:13:28 +0300
+	 In-Reply-To:Content-Type; b=FyKEiV0OBY2GTZX/bqqiC/7fk9h50Nt+GMYu/PcsXphzjuZ1YsBr6yl5YAjtWFzpfRnbzCUD9FGVTgzBGlSp/Mm860FL88xGGERsxt730k+xoDfhe5kgkrybm80sWPE9Erz3g5D8HuUV5PIayRB+hwh5qpiBj7YVZ79mw/+kyA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=lsWdX9r1; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id D78B888C78;
+	Thu,  3 Oct 2024 15:16:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1727961375;
+	bh=QNI2Ifkjuw3+hHr7PhkjBjn+usr+32yD+CflAXc2zQA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lsWdX9r1EwinVgs+8Tw893RPggI001Ps85Jh4jNEgd6Y6ZnoKJtvZnS2IO6P2c9iY
+	 t7EIZIXNcktJ5IYhxWStI1rdjkAKxLfzaTb4nbMVt7eurLAl1AGQS7026L/qzuXYJ3
+	 Fvd8TZqFwSFIe+sVCDwlZUxT8bdVtYnCbLgvE5XmS4/UEZL57kEp2+7NQRTTxI4EOg
+	 nHmIURvpzAMYYE1Wanif5Quzvt/xiiNJynQoB55qpJfxg6i2Iy1tFV3jrlNhfuDyAy
+	 qjMcwG4CNWNMV4KuxnYEowAfuwraLeu+HeiYhG1ayGJEImEDlOuJODjNUmfVs0djfh
+	 h1XFUEYH5R9lA==
+Message-ID: <dcad968d-b305-4c0a-b377-1a147d156756@denx.de>
+Date: Thu, 3 Oct 2024 14:15:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,37 +56,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] selftests: add regression test for br_netfilter
- panic
-To: Andy Roulin <aroulin@nvidia.com>, netdev@vger.kernel.org
-Cc: pablo@netfilter.org, kadlec@netfilter.org, roopa@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, idosch@nvidia.com, petrm@nvidia.com
-References: <20241001154400.22787-1-aroulin@nvidia.com>
- <20241001154400.22787-3-aroulin@nvidia.com>
+Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
+ up
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: linux-leds@vger.kernel.org,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Christian Marangi <ansuelsmth@gmail.com>,
+ Christophe Roullier <christophe.roullier@foss.st.com>,
+ Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
+ Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
+ kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
+ netdev@vger.kernel.org
+References: <20241001024731.140069-1-marex@denx.de>
+ <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
+ <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
+ <796d0096-1cf9-4234-9117-440469c4e9d9@lunn.ch>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241001154400.22787-3-aroulin@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <796d0096-1cf9-4234-9117-440469c4e9d9@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 10/1/24 18:44, Andy Roulin wrote:
-> Add a new netfilter selftests to test against br_netfilter panics when
-> VxLAN single-device is used together with untagged traffic and high MTU.
+On 10/3/24 2:05 PM, Andrew Lunn wrote:
+>>> Nice use of udev. I had not thought about using it for this.
 > 
-> Reviewed-by: Petr Machata <petrm@nvidia.com>
-> Signed-off-by: Andy Roulin <aroulin@nvidia.com>
-> ---
->  .../testing/selftests/net/netfilter/Makefile  |   1 +
->  tools/testing/selftests/net/netfilter/config  |   2 +
->  .../selftests/net/netfilter/vxlan_mtu_frag.sh | 121 ++++++++++++++++++
->  3 files changed, 124 insertions(+)
->  create mode 100755 tools/testing/selftests/net/netfilter/vxlan_mtu_frag.sh
+>> Is there some other way to configure the netdev-triggered PHY LEDs ?
+>> I still feel the udev rule is somewhat brittle and fragile, and also not
+>> available early enough for default PHY LED configuration, i.e. the LEDs are
+>> not blinking when I use e.g. ip=/nfsroot= when booting from NFS root until
+>> the userspace started, which is not nice. The only alternative I can imagine
+>> is default configuration in DT, which was already rejected a few years ago.
 > 
+> Device tree is the only early way i can think of, especially for NFS
+> root.
+> 
+> What has clearly been rejected is each vendor having their own DT
+> binding. But i think we might have more success with one generic
+> binding for all MAC/PHY LEDs.
 
-Always happy to see new tests, thanks!
+Right now I have this (for one of the PHY LEDs):
 
-Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+led@0 {
+         reg = <0>;
+         color = <LED_COLOR_ID_GREEN>;
+         function = LED_FUNCTION_WAN;
+         linux,default-trigger = "netdev";
+};
 
+What about be useful is to set the link_10/100/1000 and rx/tx flags here 
+somehow. It cannot be 'function' because that is already used to define 
+the port purpose.
 
+Maybe something like 'led-pattern' property used by 'pattern' trigger 
+would work ? Some sort of "led-netdev-flags = LINK10 | LINK100;" ?
+
+> The way i was thinking about it, was to describe the label on the
+> front panel. That is hardware you are describing, so fits DT.
+> 
+> We are clearly in the grey area for DT, so i can understand some push
+> back on this from the DT Maintainers.
+
+It would be a policy, yes.
 
