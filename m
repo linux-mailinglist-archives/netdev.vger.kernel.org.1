@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-131458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C296F98E8A0
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:09:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0801598E8B2
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A8501F25B89
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:09:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68DEBB260D9
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C0D1BDE6;
-	Thu,  3 Oct 2024 03:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4911DFFB;
+	Thu,  3 Oct 2024 03:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SvL6OPv5"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b5KVqW7S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3CEA199B9
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AA71DFE3
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727924946; cv=none; b=cvvNVOrxS5WIK8OZl8VvqdgGT1qPunZ6l2F56IDG8PErVvMOhKhK5yLbeZWrhHvZ5SpOmPxzwqLLPMTzni5LQs57ule2DeV7XzWwF+JBkhCVCPXHTzToRIY8/F9kMEtH5JN+kvpf/llgA5Lv3fZHhSIEU9doqMvoOQPsjyOaIjk=
+	t=1727925015; cv=none; b=eH8o+yI5+nsN3HBdc+HhGxdClsCwrgtj66RUPlIhGfYgyMYGBIs7TG4ROJ9T2yuZOULNYG56ezKLWhBPM/ufI3uiUGpwfT+O/6mykqco4ZkAsuqSGvOHsdIk8NtfvTR5ayabJ6u974FK99zWoH+nGOnkA6tqpQnvsWHXUz+Ps8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727924946; c=relaxed/simple;
-	bh=wbRntv+KtXBsxBZ8XeHTZ/LgeBP7ptchLtJpbT8tT9A=;
+	s=arc-20240116; t=1727925015; c=relaxed/simple;
+	bh=aVXCeSe8JOZVBlFisKDdDZPfLrPf9c8yHN+E0A7bRaU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FHaR430CaBaOkyJVV06BSAvmz5fg4QQH0S/QMX+cWbKQGDIpX+IOqS7Bh6ahgxwo4BZlVyvjqGuyfhPvoRP3f9Lk+TEWIbPyaQUno1/5e7USFgs8mAm0u4v0bAIxMxyhdLgcyjxMGMHzRYvDZ1nPjcPgplgAUXwMQtFGthokyGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SvL6OPv5; arc=none smtp.client-ip=209.85.167.44
+	 To:Cc:Content-Type; b=P2y4dZSu9RD86NsHhUaKpiLPPOP36V8WrW5hpWA3H0qf2dd++fvWrnPiZD8bZ9nKwO8deRuq1yZ1xbRZzn9bU6fjbALA7bp660/LoFmCZBDlzc9EOvaZ7TRMoa2sudNRqb026ZW+kerqX00jcCbaCAvJP6ng82s73ereRx55eiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b5KVqW7S; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5398ec2f3c3so542817e87.1
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:09:04 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5398d171fa2so448403e87.0
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:10:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1727924943; x=1728529743; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1727925012; x=1728529812; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wbRntv+KtXBsxBZ8XeHTZ/LgeBP7ptchLtJpbT8tT9A=;
-        b=SvL6OPv5SDthqzsMHWDuD+LM+wDyCaExugmqTFRzv/KQprNiJNRImPawTjSr0IXnik
-         eald07Y+awrFgHLs5r5DwEX5uN/kTMjJMC7A3n1KWgPTtE+TwcOqXOGEnoC8ADyeprv7
-         ArBvI6AB3qVm5WuJUW4nzjf7iUCFfPFUmE83w=
+        bh=aVXCeSe8JOZVBlFisKDdDZPfLrPf9c8yHN+E0A7bRaU=;
+        b=b5KVqW7Sc4tBwK/IpJaSuyB+kla8Gv+odpViaiGpxior2OQ+4wOn0jHQjsAbYgTqTg
+         sF280/509jBK/pNxFZYYNXZwe/X7OZ1/yGHFrdPg96Aat8c0eVAZHS9FMDQt3Mg33Wqg
+         shMl1ad4WD9ab/pmf+wrY3ELUZCvVTwl78mv0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727924943; x=1728529743;
+        d=1e100.net; s=20230601; t=1727925012; x=1728529812;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wbRntv+KtXBsxBZ8XeHTZ/LgeBP7ptchLtJpbT8tT9A=;
-        b=tWbjcEzJl/c2d69h/8dJNUAeUla9XSOqzt8pGGrUc6169Sd+aYj3CJwdHvxVfRtvGe
-         mvpf0CSDWNE2vd6KvFh/Zz1q6bU5XXAXteWyOFjxEX5Zu2G/kYRLe6YC1Wa7V/UKp3G1
-         sqlq9yW3pNSm6fPWGU7uyZahnCQmolyTccN4EO1Iz5UrA2ulMEDQUV+BPQ1+Ak1CVQA+
-         We0w7ZcJpW3AJMeipn6dtxJDAWPDOEgNea8PkZGK+XT4erTSFqWzk8PtjxKTCryFCtn/
-         Ii4ncgNRjDMXfXsK4dOw4wlY+mdYuCJXELIRdT6WgkCg5x72syFN+kjRvQ0TsGvFv/X6
-         7Fyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCzHWe9aKHNNSTMKsEiDedkyHuxvx16sDABlXYLfDqESa3j/8e3vwPb2VNO97IlXwd9VTwcgM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTCI7S4upOsW40bPoWlwinBCpdbwMCgYeO9CEmHj9eR399bJGA
-	pQHOteiu/G/XbTzOWQpXnxY0hAvYtwJtBcIqMFgapEqkc0bYHRBlp5F4MnFvuY+z51XdWgryYIs
-	Lo3FjvBpPzB4kdjw7H4O06VeyFWdxkVijauk/
-X-Google-Smtp-Source: AGHT+IHdGMJoy6kBx9OA+29b1djSJFv/PzzE6zlRNRqwA+0I0Ssp1ZZjEkPUh9X6gvYUhDCLtu8YJ6Dh1pdIzww0AUU=
-X-Received: by 2002:a05:6512:694:b0:539:94aa:d512 with SMTP id
- 2adb3069b0e04-539a07a89c0mr3067261e87.53.1727924942929; Wed, 02 Oct 2024
- 20:09:02 -0700 (PDT)
+        bh=aVXCeSe8JOZVBlFisKDdDZPfLrPf9c8yHN+E0A7bRaU=;
+        b=UQCoapSVDaXr9AzWwM9RIU4vOxbDuTvB+468w9MH9OmW/sewdvJHYDZdpxBuqqmkPO
+         XyLfXG+IC5RKPF8LsLdXKe+e/Zi8hIViDpSu/Ys2QUv9INNrb3xDC+q5eKJYh6edjA59
+         hTWffRayF2oSBtp4n9PSviIUj7OeH/S09fo+2QIUl0Fr5rH9mrHWDIHhfTDIxSgvxftw
+         kgkUP29Mc46lxrSa37Q6zyXE/3woraI+7AklUCPeOwWjAu51BswTcWyhmeVm1CjHhg8u
+         mdWFK3Op1/SIUF2/p5HyRAeELp6gXatf81L94LV1A2d0lwh8zJPTq56sZnnNQ1lVzRq4
+         MI0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW/EIk5vh6l3qMFdvAid7xEdiVGCLBrxKXqLxmoi22P1vvWrLyAIuL+jCWsOi7tggUTtc0K+XY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytEFHudK8c9uVTuTxnrYPduI7iye24rSBIda5FKpQm6LbDOeQ8
+	Xz9KKSCkQkTEX/MG+EpnItOuAaOSwBf8mghTeOMibYdrXNF9+xWaakPiO3HE1V275tM/mo7itNE
+	FAQGDIVgvwQg9cykdgRXfJkuh7Xrnyhp86P58
+X-Google-Smtp-Source: AGHT+IHZI1beHSN1dhEkqSQ8rSpzwALRThN30cRkwAw9Gcck0A8SEky8qu/TiFxzdpkFkp5A5fFg+zTDla30B3YbPV8=
+X-Received: by 2002:a05:6512:3d11:b0:535:69a2:5f9e with SMTP id
+ 2adb3069b0e04-539a07a88c4mr3315530e87.51.1727925012028; Wed, 02 Oct 2024
+ 20:10:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001073225.807419-1-dongml2@chinatelecom.cn> <20241001073225.807419-13-dongml2@chinatelecom.cn>
-In-Reply-To: <20241001073225.807419-13-dongml2@chinatelecom.cn>
+References: <20241001073225.807419-1-dongml2@chinatelecom.cn> <20241001073225.807419-6-dongml2@chinatelecom.cn>
+In-Reply-To: <20241001073225.807419-6-dongml2@chinatelecom.cn>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 3 Oct 2024 08:38:50 +0530
-Message-ID: <CAH-L+nPbp1OZ6r1CvizKwbUj8Ry7Tp=MA6jBT086KFYSLcBnaA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 12/12] net: vxlan: use kfree_skb_reason() in encap_bypass_if_local()
+Date: Thu, 3 Oct 2024 08:39:59 +0530
+Message-ID: <CAH-L+nOCP5TiFN_YM_iRJr5m6g1m2fOnDndGBobemizLUxeCOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 05/12] net: vxlan: make vxlan_remcsum() return
+ drop reasons
 To: Menglong Dong <menglong8.dong@gmail.com>
 Cc: idosch@nvidia.com, kuba@kernel.org, aleksander.lobakin@intel.com, 
 	horms@kernel.org, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
@@ -81,29 +82,32 @@ Cc: idosch@nvidia.com, kuba@kernel.org, aleksander.lobakin@intel.com,
 	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org, 
 	netdev@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000072fabd062389e0dd"
+	boundary="0000000000009106e4062389e41f"
 
---00000000000072fabd062389e0dd
+--0000000000009106e4062389e41f
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 1, 2024 at 1:08=E2=80=AFPM Menglong Dong <menglong8.dong@gmail.=
+On Tue, Oct 1, 2024 at 1:06=E2=80=AFPM Menglong Dong <menglong8.dong@gmail.=
 com> wrote:
 >
-> Replace kfree_skb() with kfree_skb_reason() in encap_bypass_if_local, and
-> no new skb drop reason is added in this commit.
+> Make vxlan_remcsum() support skb drop reasons by changing the return
+> value type of it from bool to enum skb_drop_reason.
+>
+> The only drop reason in vxlan_remcsum() comes from pskb_may_pull_reason()=
+,
+> so we just return it.
 >
 > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 
 LGTM,
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-
 --=20
 Regards,
 Kalesh A P
 
---00000000000072fabd062389e0dd
+--0000000000009106e4062389e41f
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -175,14 +179,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIAcMEjDS6CYgSM4JTzossGWYdtXZSQCHN1ceNCRu7XD4MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMDkwM1owaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIC341aoYtQP/0fiOhsNse+8WSs6SlmoUTTvg/Kjmae9dMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMTAxMlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA873RY6C1d
-ktzA+vXZnAhDicgYWyNkjnesklBIi5hReyWFsZjhWhGtwWBX5EP4aZE6V0IldbHHC/932daZuyp7
-RFt69G484lWI02RWbWX/F/1r82gYf2UXHr6D2mcF+AmJ6SawfzujxPlEcPWPtcl8h+mYegeEv1E0
-Ocq/WbHqjm2qWc5XF6QZwMJeHulHf7rPPbPSzwwyCUzVoPlFd3sheV0wgHDSQJb8Q714Y1IXJj44
-DlIHek0LzHexSmsksS4fk6pUi19DtnFNch0Mix9kRu4ULXChh7DzxTbzipvMoPXuXJ2CaN6tTroo
-6y1efvVrjT0f8A10u+5pmUkdqfdY
---00000000000072fabd062389e0dd--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA7POdDEYMg
+LazPItvMCtK9oyKYZTO4P+jwHcSjRDDvQzF13FEui1q3CcV+6JbJv23ZIadmVaiEUgXkBwJuS445
+d8z0G5TqsVnQDXwaFrkSCxTgaNB6+vDeY2FLrXZzJVxZ6DUXrk8hf8+mvxeFWoag2FwYV0GIujIZ
+dg1toqc/qu3yxfIs2zCKAetNpffcIVG9q4MfJb7EXrlT0UGsxwMPhRoX4CQ4uLEvUWhryxRefgBj
+awhGrsP/lXsifx7Aa4t2/leEd7JL3KwqcJ52/d9D1kafR5Psx41CgdN+yvY97a5RSmtHcOREthyM
+yICFRaQTShcMYu7kTFEUWH+T8a1t
+--0000000000009106e4062389e41f--
 
