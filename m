@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-131796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E34298F9A5
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8017798F99C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42AA6B22AB4
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:11:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A230B22C34
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 462811CF2B8;
-	Thu,  3 Oct 2024 22:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0311CCB44;
+	Thu,  3 Oct 2024 22:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T4XqXL0E"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="LDteMsVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868F51CEAD7;
-	Thu,  3 Oct 2024 22:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D304B1CCED6
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 22:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727993444; cv=none; b=FDfVPvXirrVd0IBaj0K3GSjOu7vai4PNu8bJJ6jb/KLIPD4PohciinUSX+Rwu3llYIh2xz29/gttFLagxT12GAfo6ruJS1N4ZeNSW6P1wETHbsoLW8jsVNXuYWSt69x+ngd4RnStjDAEzO1YMQhsYD8/S8kGEiYTktwNgaySbR8=
+	t=1727993424; cv=none; b=LY3Cm0W3QELERV5rnHwsdNMvrnnsDgTHGDckMeZZdLqGY8CXvOpoRjebWJTsNP7CVnQaBFuiZyDV+I01DsauixeWTO5OgATSH7yrSUYwwqj9EPmssmoUrMBsDCj/dMLs3ruLUctZmf7q7WZ1D3gAFn1iAeOXwA+xWNo7uCVbnWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727993444; c=relaxed/simple;
-	bh=GavArUkKww24mgKtAyasen4ZhpDZdFNpOqgfdzNwIdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=icqtrNmfHUu3kjgl6y+1z6ejTzkhSIVT5Pl54NPqV0gkmJQhj9qSaIayfsQnYOeKSB+qfozDYnD63zr4b0aDTxb8ur5zYdazng7B42jpoutEwrL/kHmSEouEIncTF7YbqyhIUt3mBLuWl7nPDXkwZneH6gmlzEDFDF+R0YreTnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T4XqXL0E; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37cd8a5aac9so887610f8f.2;
-        Thu, 03 Oct 2024 15:10:42 -0700 (PDT)
+	s=arc-20240116; t=1727993424; c=relaxed/simple;
+	bh=e+TlRlSxxghzjYRAmtjmxSOmYSUG3vJTKZS++DLzkVc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IQ1WjK3io3P0qkS3kYVxBLS3e82IjyzRTbfUil1HkJtBzYF9Tk7V9w7bv/kgfRfV9+XOu90jawMU5bfLkIQQRbElOH/xe0v1DpfIdKNqzmGTMrgPqS/dG7dRIC2CJonZPJiUXwzIkkQZ152ilgC7nXn7XwMMQhazEt+lxWvxZCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=LDteMsVV; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727993441; x=1728598241; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YtyXZhQOdZSWlMwX/3ym2xo9GQ01udbth4iGbL7BUug=;
-        b=T4XqXL0E6BxaUjcNuzf+8LwNwFeSHV1LaIQhVce6FV2VoKsohGZnlzIj34q6O7/Z3/
-         gqOJJMObAqD7OPmBMHYfjODmHeiwJGwZSmS/xTPosC87rstr1OblyUG0dAYClWZaKiYb
-         6IQqRLWufPraRWTZ74IuwN62JFYJmHCx+vihn08eLOxOVwlVkeibHBlBihDkhWctGYyt
-         RiroY42nEr0hzQWxGOnvJ8C1r1N7O/WSdpi3IBiyRWGy+gpdVp40BRaQnsPDSuZk9NvB
-         iDmh24WKEFJDUp0k0qRyamXt1G079rCy4ByreECPll8hcr4jskybRsVI6Me4MTqK/Xxh
-         m0AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727993441; x=1728598241;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YtyXZhQOdZSWlMwX/3ym2xo9GQ01udbth4iGbL7BUug=;
-        b=axCB9xUwte9p66buF1OQkKXmcIJOoQ004tgrIvkVZ1H8Xzrezz+3sc79li1UFe64Yp
-         +v6yZX9/yV82yiy5aU8tjUyEn/NBaOihNCCMZnpA4XmPsDAwCSGoBVCDa6pRTiEjryF7
-         waMU2ZbdqIFG0eAMroXhEQiHuFcsV4U1N464ydSppCYY+wVhMf3RCqsojiAYf6ti3Dvr
-         dexOlSZBhO5in/K7kUt3QIYRn4glFA+45rGPOf8lZKbH1gCKR8TjaAGsdEuFJ39+syqS
-         TEm4ZbbhDfyQW4Y8iKZzrbqWRLU01570h+WVfor3ak916srWgKH7lO861nIhlfDrfaJ+
-         SN9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU61WmmBM4g6RtaiB9ojIv9onYCqPOBOlS6tMf90lC2X6NQ6NP2InGqxmlzVyIuYMTLymgbYvNd@vger.kernel.org, AJvYcCUq6XqnBqdm24ra88gk56ufkv74qolm3wnbset2Pqe11fJS+Ho4syQEaJeXFRRmEeyPlF2m1Xuw@vger.kernel.org, AJvYcCVSNsagFJr67hjRsyzH/QCT5u4ed5CnQN5IStbJhh6KXH5XsDjIsrhednYA5lfRYyP3FGTAluqrKOBlk0E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHH2oMFL+IRLZoW3ypKz3S+TsoM2NKm0AIAzhgeAabb/NFfb46
-	TlyFSwVVLiSdOVcacQynbe/wx3MIh2zqH1+fUWIk7x0sTDiAePgh
-X-Google-Smtp-Source: AGHT+IGIVO3kNwan/N+L0Eg7udZx2Sx7NC0DNk3w5ImFayGlFUVlPbofnen1833tz6NQFpF+XcWj3w==
-X-Received: by 2002:a05:6000:10e:b0:374:c942:a6b4 with SMTP id ffacd0b85a97d-37d0e6f0e26mr439840f8f.20.1727993440506;
-        Thu, 03 Oct 2024 15:10:40 -0700 (PDT)
-Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37d0822995fsm2079334f8f.38.2024.10.03.15.10.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 15:10:39 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Daniel Golle <daniel@makrotopia.org>,
-	stable@vger.kernel.org
-Subject: [net PATCH 2/2] net: phy: Skip PHY LEDs OF registration for Generic PHY driver
-Date: Fri,  4 Oct 2024 00:10:05 +0200
-Message-ID: <20241003221006.4568-2-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241003221006.4568-1-ansuelsmth@gmail.com>
-References: <20241003221006.4568-1-ansuelsmth@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1727993424; x=1759529424;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Nwv0LK28+JcG0KwPdGlDmCg0tA/98DE1OmArhdo4bes=;
+  b=LDteMsVVmJ/IxMRyOjtcn3ZXF895zaAt0mgVrNEOhS2uGFuh2ytpaqBW
+   lhn34fdG87WTGwH9QR1mERuPY323AMazzvO9U9jz5Godw/qqhw+2vZ8GR
+   fvcD4Dv0JpEvJ2vLOqMkVhMNpEtEt2CTPsvj8JdeP3fAW+bOxy8dX72QW
+   w=;
+X-IronPort-AV: E=Sophos;i="6.11,175,1725321600"; 
+   d="scan'208";a="432407966"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 22:10:20 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:29139]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.41:2525] with esmtp (Farcaster)
+ id 1dc4f7a9-6fb0-40cb-9c5f-6876d4b939d9; Thu, 3 Oct 2024 22:10:18 +0000 (UTC)
+X-Farcaster-Flow-ID: 1dc4f7a9-6fb0-40cb-9c5f-6876d4b939d9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 3 Oct 2024 22:10:17 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 3 Oct 2024 22:10:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kernelxing@tencent.com>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<willemb@google.com>, <willemdebruijn.kernel@gmail.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next v3] net-timestamp: namespacify the sysctl_tstamp_allow_data
+Date: Thu, 3 Oct 2024 15:10:07 -0700
+Message-ID: <20241003221007.12918-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241003104035.22374-1-kerneljasonxing@gmail.com>
+References: <20241003104035.22374-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,39 +75,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-It might happen that a PHY driver fails to probe or is not present in
-the system as it's a kmod. In such case the Device Tree might have LED
-entry but the Generic PHY is probed instead.
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu,  3 Oct 2024 19:40:35 +0900
+> diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+> index 86a2476678c4..83622799eb80 100644
+> --- a/net/core/sysctl_net_core.c
+> +++ b/net/core/sysctl_net_core.c
+> @@ -491,15 +491,6 @@ static struct ctl_table net_core_table[] = {
+>  		.mode		= 0644,
+>  		.proc_handler	= proc_dointvec,
+>  	},
+> -	{
+> -		.procname	= "tstamp_allow_data",
+> -		.data		= &sysctl_tstamp_allow_data,
+> -		.maxlen		= sizeof(int),
+> -		.mode		= 0644,
+> -		.proc_handler	= proc_dointvec_minmax,
+> -		.extra1		= SYSCTL_ZERO,
+> -		.extra2		= SYSCTL_ONE
+> -	},
+>  #ifdef CONFIG_RPS
+>  	{
+>  		.procname	= "rps_sock_flow_entries",
+> @@ -665,6 +656,15 @@ static struct ctl_table netns_core_table[] = {
+>  		.extra2		= SYSCTL_ONE,
+>  		.proc_handler	= proc_dou8vec_minmax,
+>  	},
+> +	{
+> +		.procname	= "tstamp_allow_data",
+> +		.data		= &init_net.core.sysctl_tstamp_allow_data,
+> +		.maxlen		= sizeof(int),
+> +		.mode		= 0644,
+> +		.proc_handler	= proc_dointvec_minmax,
+> +		.extra1		= SYSCTL_ZERO,
+> +		.extra2		= SYSCTL_ONE
 
-In this scenario, PHY LEDs OF registration should be skipped as
-controlling the PHY LEDs is not possible.
+It's already limited to [0, 1], so you can use u8 and save 3 bytes.
 
-Tested-by: Daniel Golle <daniel@makrotopia.org>
-Cc: stable@vger.kernel.org
-Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/phy_device.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 499797646580..af088bf00bae 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3411,6 +3411,11 @@ static int of_phy_leds(struct phy_device *phydev)
- 	struct device_node *leds;
- 	int err;
- 
-+	/* Skip LED registration if we are Generic PHY */
-+	if (phy_driver_is_genphy(phydev) ||
-+	    phy_driver_is_genphy_10g(phydev))
-+		return 0;
-+
- 	if (!IS_ENABLED(CONFIG_OF_MDIO))
- 		return 0;
- 
--- 
-2.45.2
-
+  grep -rnI proc_dou8vec_minmax.
 
