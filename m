@@ -1,116 +1,188 @@
-Return-Path: <netdev+bounces-131681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A16598F3A9
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:11:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F10B98F400
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:16:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E42F1C21643
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:11:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 200CE1F2276D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:16:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8791A704D;
-	Thu,  3 Oct 2024 16:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LFjdn9qr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773671A725E;
+	Thu,  3 Oct 2024 16:14:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1198C1779A5;
-	Thu,  3 Oct 2024 16:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9072C1A706C
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 16:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727971891; cv=none; b=jqp4BWIS5W7PG65EJlJFvq0aVlzPcJOVa/cOcGM2xmYv9OS2w8oWkzVUmgLzYPg8kgzV6cHsSYnN/pNL4UOWbCYg+gbTkJ4C1zmOwYwBoUVKK30GOmDprH+JXCUn+XLYGzLkV/KVfZ09ahBztmak1teCKo7E5v+A9JIPNS078C0=
+	t=1727972069; cv=none; b=Mos33g2ZfNDtFGhwvXYodU04oa1zAayBGszqx/w/yA049q78dEgPkUtl+z+PjyKUs3Ns/Kj2lzka7Sw+5//13eaKRN8p/q+KlaZGEDArZeQo/6YenH/Ca4moUU94AUAC4cHdCKy3EHBQtfWXsYGNH8vXCpjMQjzLfYwrl/72D1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727971891; c=relaxed/simple;
-	bh=RBTkyoqQBQWgJfvXHK3j1LZTf2HaqtLVUqrz+n1nGS8=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=VH6L2oGroPrBnI74eLoVWWTtzxKcmECfn0R3Yfu4eF3ULjJIWhZqaAxDbSAlJLg9/1WkMf48kMUCMiqdbDiiqqv2J3H2hWhw4s/FRpClD+DXAAz71li7urBY1yan9RrZnCYsyvdupfZHXr/yIhoobwT9d/BoKZEskMMXKZaBt20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LFjdn9qr; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a8d51a7d6f5so166751966b.2;
-        Thu, 03 Oct 2024 09:11:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727971888; x=1728576688; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q32JbGi18+OdbRw4TK5uJ1wmgJog0ZexuMhgdGd1U7A=;
-        b=LFjdn9qr90yo7XJZA/xw5CDDwAa8LMLE8ITR6QtIv7B3xAfvJLT7+Y4p/4z0xr7933
-         vwetGXPSTa+cIS+oIeKeVIaKDRcIPxqgiIStue1t7RajGymAClqlnr16Wm8huZefvW3O
-         pry7Z7qXSwu4iJKIskrTkftDxT0DaoGOWA4JaUL4cS6zljCvg5rX/BxZisNUe63wIOia
-         W6xEqrZwKkxaBwoE6OXWd57yu/cUvsrecVlsgA7AnDiAZnyHTuJ3ciBKDkuFRA5kvdwK
-         CbbhEIUytGYDNaWmhwk/7j4Yo8j9K2koW71onqlsvRQR2BuZ81W624uxecRjOMyP7wq/
-         WqGQ==
+	s=arc-20240116; t=1727972069; c=relaxed/simple;
+	bh=efJMc1OXG/1UiXCLpHl8gh/4GJ8hjW9/b5EVvQn/8tQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=LHZH+kELg7ZFuGze0tQcBcr0dui8GnWHaAADTgnFev7AbHLNaf+GJIGpiwBLM9ZzspF9DMQPhAnGah0DxcvRbQ2cO9REsUc6lEKfveE9x7VpCsoCmBgfI+8Ti+MBKfE7s0z8x1l2bLNRc1FChBHSulQHB+XkP1fb5jAilb0OBwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a363981933so13035625ab.1
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 09:14:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727971888; x=1728576688;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q32JbGi18+OdbRw4TK5uJ1wmgJog0ZexuMhgdGd1U7A=;
-        b=fRkznvk5j8zDF/eOvuWNvlFI/ktoh99PjHKQD+ARaD0MhUHrqiTKWVWHubs8DVd9ri
-         SClgeklvhLlCIJlMh+mo/gv5e5ZTVhQatHSWmMuGIqKKlYbTFBE9rPwPpZl4MiOUwELc
-         sdFY2e28du31Ro5ykz5wFgSMxwm8XqLRZapFg/cDOtGyMc8jkWNgsrB0uT4EXrf/7isJ
-         FQJZDPrtE/phGucTZ5zZNASCpe3DBQlx7OOTf3pgzyGnlYRGSwSlTw6NmHTpXJRQO7pF
-         dCiwPVX4/TzIvX2MZEW3yJY9WulUTXv4C+jX4fxqzSEi2c2nmsOIR/RLSRAAyzxr7i2h
-         cr1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUb8lcSeMJjyhl+fL4r9nt/kz07N2yA7slGtsE1KSL7MJKpb65wJuDNRMlY3wckFTP8+o2lhCCt@vger.kernel.org, AJvYcCX+VRBrXJpt0aL0W9ZbhFVS10KZY0FISiH1rfJ0i83bNLbL/OoWqwyC1ynxxszzu4e6FEcAOfnIaK2N7A2m@vger.kernel.org, AJvYcCXBJihinsgpsDI6ZObx5Fcevp5O5OskiuvusL2JhaXvDmYvvqfEnJPkcNqrULSgj83jk8Whu75pcarQB28=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4TRzkfbFr5eHcuQibnvZ4d2p8SBGvWI8s5JNEvivAgn8iK/bH
-	7n2gdUvE3PD3Rf+xk48DKVw773pA745bH7iF+HUJ/yBvyeZviSd/iWDe5g==
-X-Google-Smtp-Source: AGHT+IGVUxJ3Rjm+l2YhrSaIEYLUyEHl58QHM5FDOIe0jd4iDF22k/ljd6Y1nEVy8WHcPBHoFt0avQ==
-X-Received: by 2002:a17:906:4fcc:b0:a7a:af5d:f312 with SMTP id a640c23a62f3a-a98f837d235mr701438966b.46.1727971888087;
-        Thu, 03 Oct 2024 09:11:28 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9910472f96sm104790066b.146.2024.10.03.09.11.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 09:11:27 -0700 (PDT)
-Subject: Re: [PATCH net] net: add inline annotation to fix the build warning
-To: Moon Yeounsu <yyyynoom@gmail.com>, Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- linux@weissschuh.net, j.granados@samsung.com, judyhsiao@chromium.org,
- James.Z.Li@dell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, linux-sparse@vger.kernel.org
-References: <20241001193352.151102-1-yyyynoom@gmail.com>
- <CAAjsZQx1NFdx8HyBmDqDxQbUvcxbaag5y-ft+feWLgQeb1Qfdw@mail.gmail.com>
- <CANn89i+aHZWGqWjCQXacRV4SBGXJvyEVeNcZb7LA0rCwifQH2w@mail.gmail.com>
- <CAAjsZQxEKLZd-fQdRiu68uX6Kg4opW4wsQRaLcKyfnQ+UyO+vw@mail.gmail.com>
- <CANn89i+hNfRjhvpRR+WXqD72ko4_-N+Tj3CqmJTBGyi3SpQ+Og@mail.gmail.com>
- <CAAjsZQxkH8nmHchtFFPm5VouLEaViR5HTRCCnrP0d9jSF2pGAQ@mail.gmail.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <e5cb1a17-72e1-529c-0f46-404dcdb3e5f3@gmail.com>
-Date: Thu, 3 Oct 2024 17:11:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1727972067; x=1728576867;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bm4yCE0DmqPZQLJy4qYy4v3ru7M4Fy778wvdHAENEhA=;
+        b=CR2OZW682fFdQBgfaFHyDQwVE04vcH57+5xJrFQp+Y9GnMYbWQZKan7DsRdT5bpb7m
+         YdkeOU+ltB9GvLU0G48yiIAlzQO3yiX98Oifa9qBt2ZnJj8SzD9E4antOGaxw2DAesOb
+         ASOQxUQiFexzFpHmRMZA0ISnTjECYy1cB63UyjkYuXARTLTA/BJHficvUJt/8IHMjHKU
+         cBiunSkkMi+05lBdtVpj9TMqzo5hfkvDLJyrMYUiOTXXjYIbzUKuHwpWfI9x0lg8/oVx
+         CXdx2cZfib0iMWCTxCyVJsd/CScaAlOh/A9ftrJh8B0naarXzByyQrSpMwVRbm7mPGJs
+         eGTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUU49uArh6Gn9VHmx/hekczelt0Idjq29bchU+mFTDaQD6WINgM0yXDtTdalkO0uciNK8bBGo0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOmuWTTFmJNvPka47yiSjoyVJGdHY85g425/eGXwsq/mDXxbcP
+	1VNXVlQNsOsjC6SQI5zMMTjKkjiTa7ua+9/A0rX8XSTjOAPOJFX3zFe76EIbcYB3vr8Pt8Gek7C
+	d+RWO1wxgYmjBZkrJAqvmMoanjhS8R8TIFmlMDxBJ+IQaFykaR7xPzXU=
+X-Google-Smtp-Source: AGHT+IGGaB5X/JkqzVQCJRWhiiZpClI6/nvtg+oCe+B5yDGbqCEDBI9f6CdaQYcOd7QANrQtDQyXgFhVD2IauY5Ypy6Wrngtx4F8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAjsZQxkH8nmHchtFFPm5VouLEaViR5HTRCCnrP0d9jSF2pGAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1ca1:b0:3a0:a3cd:f239 with SMTP id
+ e9e14a558f8ab-3a36591fa85mr82241185ab.8.1727972066770; Thu, 03 Oct 2024
+ 09:14:26 -0700 (PDT)
+Date: Thu, 03 Oct 2024 09:14:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66fec2e2.050a0220.9ec68.0046.GAE@google.com>
+Subject: [syzbot] [can?] WARNING: refcount bug in sk_skb_reason_drop
+From: syzbot <syzbot+d4e8dc385d9258220c31@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kernel@pengutronix.de, 
+	kuba@kernel.org, leitao@debian.org, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mkl@pengutronix.de, netdev@vger.kernel.org, 
+	o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 03/10/2024 16:33, Moon Yeounsu wrote:
-> On 03/10/2024 15:19, Eric Dumazet wrote:
->> It also does not know about conditional locking, it is quite useless.
-> So... What do you think about who wants to send the patch to silence
-> the Sparse's warning message, nevertheless?
+Hello,
 
-Fwiw, my experience is that if I can't explain the locking to sparse
- that's usually a sign that the code is too complex and needs to be
- rewritten.
-In general I'm in favour of patches to fix sparse warnings.  In this
- case it looks like what's needed is __cond_acquires, but the patch
- to implement that in sparse[1] doesn't seem to have gotten anywhere
- near Luc's tree.  (Yet it's present and occasionally used in the
- kernel...)  CCing the sparse ML to find out why.
+syzbot found the following issue on:
 
--ed
+HEAD commit:    a430d95c5efa Merge tag 'lsm-pr-20240911' of git://git.kern..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=11260ca9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d85e1e571a820894
+dashboard link: https://syzkaller.appspot.com/bug?extid=d4e8dc385d9258220c31
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11903177980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b9a607980000
 
-[1]: https://lore.kernel.org/all/CAHk-=wjZfO9hGqJ2_hGQG3U_XzSh9_XaXze=HgPdvJbgrvASfA@mail.gmail.com/#t
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4faaa939b3a4/disk-a430d95c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/83c722076440/vmlinux-a430d95c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/24c938d49c40/bzImage-a430d95c.xz
+
+The issue was bisected to:
+
+commit c9c0ee5f20c593faf289fa8850c3ed84031dd12a
+Author: Breno Leitao <leitao@debian.org>
+Date:   Mon Jul 29 10:47:40 2024 +0000
+
+    net: skbuff: Skip early return in skb_unref when debugging
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15e6f69f980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17e6f69f980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13e6f69f980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d4e8dc385d9258220c31@syzkaller.appspotmail.com
+Fixes: c9c0ee5f20c5 ("net: skbuff: Skip early return in skb_unref when debugging")
+
+vxcan1: j1939_tp_rxtimer: 0xffff8880326cb400: rx timeout, send abort
+vxcan1: j1939_xtp_rx_abort_one: 0xffff8880326cb400: 0x00000: (3) A timeout occurred and this is the connection abort to close the session.
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 0 PID: 16 at lib/refcount.c:28 refcount_warn_saturate+0x14a/0x210 lib/refcount.c:28
+Modules linked in:
+CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.11.0-syzkaller-02574-ga430d95c5efa #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:refcount_warn_saturate+0x14a/0x210 lib/refcount.c:28
+Code: ff 89 de e8 58 80 04 fd 84 db 0f 85 66 ff ff ff e8 6b 7e 04 fd c6 05 59 3d 7f 0b 01 90 48 c7 c7 00 ba b0 8b e8 67 d1 c6 fc 90 <0f> 0b 90 90 e9 43 ff ff ff e8 48 7e 04 fd 0f b6 1d 34 3d 7f 0b 31
+RSP: 0018:ffffc900001577c8 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff814e2c79
+RDX: ffff88801cadda00 RSI: ffffffff814e2c86 RDI: 0000000000000001
+RBP: ffff88802e405224 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000002
+R13: 0000000000000000 R14: ffff88802e405224 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055772d12ee40 CR3: 000000002853a000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ __refcount_sub_and_test include/linux/refcount.h:275 [inline]
+ __refcount_dec_and_test include/linux/refcount.h:307 [inline]
+ refcount_dec_and_test include/linux/refcount.h:325 [inline]
+ skb_unref include/linux/skbuff.h:1232 [inline]
+ __sk_skb_reason_drop net/core/skbuff.c:1213 [inline]
+ sk_skb_reason_drop+0x183/0x1a0 net/core/skbuff.c:1241
+ kfree_skb_reason include/linux/skbuff.h:1262 [inline]
+ kfree_skb include/linux/skbuff.h:1271 [inline]
+ j1939_session_destroy+0x163/0x460 net/can/j1939/transport.c:282
+ __j1939_session_release net/can/j1939/transport.c:294 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ j1939_session_put net/can/j1939/transport.c:299 [inline]
+ j1939_xtp_rx_abort_one+0x3f9/0x560 net/can/j1939/transport.c:1354
+ j1939_xtp_rx_abort net/can/j1939/transport.c:1362 [inline]
+ j1939_tp_cmd_recv net/can/j1939/transport.c:2128 [inline]
+ j1939_tp_recv+0xcf8/0xf50 net/can/j1939/transport.c:2161
+ j1939_can_recv+0x78f/0xa50 net/can/j1939/main.c:108
+ deliver net/can/af_can.c:572 [inline]
+ can_rcv_filter+0x2ab/0x900 net/can/af_can.c:606
+ can_receive+0x320/0x5c0 net/can/af_can.c:663
+ can_rcv+0x1e2/0x280 net/can/af_can.c:687
+ __netif_receive_skb_one_core+0x1b4/0x1e0 net/core/dev.c:5662
+ __netif_receive_skb+0x1d/0x160 net/core/dev.c:5775
+ process_backlog+0x443/0x15f0 net/core/dev.c:6107
+ __napi_poll.constprop.0+0xba/0x550 net/core/dev.c:6771
+ napi_poll net/core/dev.c:6840 [inline]
+ net_rx_action+0xa92/0x1010 net/core/dev.c:6962
+ handle_softirqs+0x219/0x8f0 kernel/softirq.c:554
+ run_ksoftirqd kernel/softirq.c:928 [inline]
+ run_ksoftirqd+0x3a/0x60 kernel/softirq.c:920
+ smpboot_thread_fn+0x664/0xa10 kernel/smpboot.c:164
+ kthread+0x2c4/0x3a0 kernel/kthread.c:389
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
