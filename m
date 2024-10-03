@@ -1,86 +1,89 @@
-Return-Path: <netdev+bounces-131733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC2F98F5FC
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:26:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5943098F610
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D4961C21812
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:26:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C75F3B2207B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B13DB1AB536;
-	Thu,  3 Oct 2024 18:25:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2A1AB52C;
+	Thu,  3 Oct 2024 18:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iNos4jdp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="knTvzU/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31FEC8BF0
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 18:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6C51AAE11;
+	Thu,  3 Oct 2024 18:28:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727979952; cv=none; b=Jipy+WUv1BkZvp9M1iKiM5gCReBDinQVdbbq/tq6dIZ5FYWNGBo9NbBFZbi/EHCTXhoC/cOEd3KNeQqswePOS5l1Mli1oXrIDWf/hAYKlP6OHdniedOvPYAaZHEVdqR1LgzUt2adQuvsWOp2qvfmjfwWG3nMWSkO3xF56s6PaJU=
+	t=1727980110; cv=none; b=O1V5VByJNWSb7D71Z+oF1mceVhdaHYnWASnhmdRvSmSD0Nad+Tc2NCrmMDH3AWTzV/I/dneeLa+T6wovPnB49s/xBm2ZxpbdPh4u//HEnngUVBAj3LlUygtiRHSYQrGHjDNWh3PC8YeJM1F6d+m8tRd/IqY658GDJsEBCBCTgso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727979952; c=relaxed/simple;
-	bh=VGOjcYz6UybyttbaRRC55EgjhkODZY6QYHHze9Ztxw4=;
+	s=arc-20240116; t=1727980110; c=relaxed/simple;
+	bh=93gHCxkl+5Tkj032Uj3AzSyRM3GNWPMhtlpnWJX5M3k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fp7Hi+uLmtKNQLxA26BdZwg3kOxYhsoEVq4ff7NwnC9O94VF5kmcgOfUXzogognuINlHziG9iW99RJ/u63Qquc3Fj7G/RssswPkblloCMjubYoF3MS/0xckMbVzv4fscuzsBMoKPrlpbPBxgwPi5CJb6xdYyCelt2AHFO7AjO+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iNos4jdp; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4581cec6079so39711cf.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 11:25:50 -0700 (PDT)
+	 To:Cc:Content-Type; b=cwM2N4xNIuz9ukLUfL266EAVKKhD1WEIMH9hnb4itfGpXaDRFU84+ELY9E9AltujC20Mb8rF9MKi5iyvAzWAPktm0UxBQLNwjktyifa07gYL+IsOzH3fB8DvhTKoeq9fXSi8hPJvRnuK9TphmdXxikaU8WkI4aawLJHa/0rqr0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=knTvzU/l; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c881aa669fso1396789a12.0;
+        Thu, 03 Oct 2024 11:28:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727979950; x=1728584750; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727980107; x=1728584907; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VGOjcYz6UybyttbaRRC55EgjhkODZY6QYHHze9Ztxw4=;
-        b=iNos4jdpUvyaRK1GVPOlm3+b6XgmFqrIgo82q/rW7siTZQqKDh35+wB5HbAi0PmeVy
-         cuDO8eOanCdmAMgEz153cVElmjWy5XqijrEmhGtplAsdJVPmK2KGURETRC8cL+535q4C
-         MWQa0GJVrZuU724sZnf2nqBeRHdNqJEWs/MsXIbSKVJbcfHjQWXq4WUQplCXl215pYRl
-         sVz52QFrXYd4QIhKOrvMbGsehiCFfXC38J+wiBdmwgIefG/MCoUzK8Lk6C+XXds94X85
-         jH4Fm+bPnyBgODDkm8Q3ICJori9rof+0/F+rlWsf5yHFKj5jB9evPAJN63UXjXqbHfmv
-         MAMg==
+        bh=93gHCxkl+5Tkj032Uj3AzSyRM3GNWPMhtlpnWJX5M3k=;
+        b=knTvzU/lNC97y7694aZniHD3T6Q0wgpIP7ll21VwF10s7DpcFWcJUGOel5p1ob86mj
+         SBtNLyTs6y32qP6qnirpLIN61A8sV6YVgErz6EsM9Dxz9a9Er+fNVhVY1CQUK+mvhAhf
+         VUjVjvrazRGQS33HwecrLubp+L+A/8CKOcARWs3GCP+2sar/JoD8bpf3waEtt4R4r9TG
+         PsflzBMA3L1v7jD2oM5dnYFT8eA6S15eeGZltdk+TrSF1NIv43Q6eG4errHV6xgGxsgZ
+         D/sAPboRzakZ5vEEPRknCJ+AtNio7u1pSNw/482Bxi2OCXqIJ4Ei9PkhMwPAjQM7fOtE
+         20bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727979950; x=1728584750;
+        d=1e100.net; s=20230601; t=1727980107; x=1728584907;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VGOjcYz6UybyttbaRRC55EgjhkODZY6QYHHze9Ztxw4=;
-        b=rpNkwaqp0OeF9Dc7c9/yLH1qjl5fU0wazNfuLQ4h5E5QNcHFUhie9mfelTYnlyu/Oy
-         AYlGnreOU6pwDMeqLvCzqmTz10XOgXMMV/thD6qxRH5RyF4lLW2SFZRCnXS7mBRtwL0O
-         Jh/l5mGoTEbq8yrGCU3jdi3sb+6iSErK7/9hpfHYnmZtd09W2K9O2f16ZszgIgprgQLn
-         +Yh5Rnlzyje9n7LdYC7qwBANTc1FdX7Zpji9MLwZD+NmIm42W9gzDaPluVjSvdlwDxlt
-         tWWqd0MYG+hSV0eMhFtb/2wen6XHPE0c9yUeMu8SAG75InGsWfH6Q8GekKCnbTtSMX4Q
-         Z/nA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEispIiXyUmJLeHGdQN65MKDt5Ui3Upk38B7XUH8lX9MrzaBDM7ImCYGkhraNRKBHeBWElZlk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrH3p0tOAUzBT7rBqHQy/1wY4NNY3RCUg2dZl7g4N9n+KBIMRd
-	s60HLXDRFzE2/xDj9DXth2bA3cquzGP9ZDrpXnKCqGIQzzFOo3lnNqmihFtccF42OL4M97ni6we
-	eArpJSTTZO81kLWBVdBVAznnWuDfdT0zY6D7o
-X-Google-Smtp-Source: AGHT+IHmhsJ2wZ+FQNs6aKV1vufCR3C4a40ySZnmiOmRXAH3glcWiJ2NA4lT6jUKNG+hnFxR7msOi6nfSNhpKjm+3Wc=
-X-Received: by 2002:a05:622a:2d0d:b0:456:796b:2fe5 with SMTP id
- d75a77b69052e-45d9bbdf1c7mr56261cf.9.1727979949918; Thu, 03 Oct 2024 11:25:49
- -0700 (PDT)
+        bh=93gHCxkl+5Tkj032Uj3AzSyRM3GNWPMhtlpnWJX5M3k=;
+        b=U1HeHmaYC2CqMxnecIBpU/pZxo1jQcDpBosiHskuM9p0qGCQfDQLrYyN/uGPUaTq63
+         yBDinqeorCJtkdG0MDyMoZ6m/sOIKIdpygUbOXYC/OldDlgBy+F3Qde9jDqY7l472Q4i
+         EZmySZPhM0nBfmKfxCZrBmeRpGeFut0/vn1BbptUGFLsYHqcqXEWCDpOZzFWgva4qZUh
+         zGyG6cmP2AbWIeRrlOXJ/wjRbWWVaZiXL4XSu94acseoa4VKLPimzO3d0NLRSvDhie6b
+         pXjDWeOmFZrw09vKpB7EWEFQAZ8HyOsrUcNDkKGc7O3Emmgzb5qpyOGF/t3JV0nnSAx1
+         2YjA==
+X-Forwarded-Encrypted: i=1; AJvYcCWOcbfQEXNGli47eI0VEylGYW5d2Q4AVQ6mK+syKCu8av8QJnJNEREKMZbyadOpsxBTDp/dXdESRHM=@vger.kernel.org, AJvYcCWuzdcRNXL3dGX/g1jPT+Gq77E2ReM/u/zpKu5NkBVLMC2pxeS6RvVlKeZ2zL/0ZkhlsUo9Twcj@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaRrdJdR1/Uk+iXOHRM1ade/ACdoC4yo6k/1q15SiUbOFX9Y3h
+	D8AThGhq5voAT2t7zZ/319T3BiatwqSFcrKCaS2DFUx80CKTrY1nQHS4Sb91Rg3d3DfvpdywK5m
+	kCPiHdAW8hnocIblVrZfttgqjUQs=
+X-Google-Smtp-Source: AGHT+IHLYrDB0pyXjD+bcr+w1znL/3qm3+qdXqnGkAWncTQ5TvMnVAj3QEzAWF8DVCGqT+wsdUDccW20eEFUMFqa1OA=
+X-Received: by 2002:a05:6402:401a:b0:5c8:861c:28c with SMTP id
+ 4fb4d7f45d1cf-5c8d2e736e2mr88997a12.23.1727980107325; Thu, 03 Oct 2024
+ 11:28:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-4-ap420073@gmail.com>
-In-Reply-To: <20241003160620.1521626-4-ap420073@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 3 Oct 2024 11:25:36 -0700
-Message-ID: <CAHS8izM1H-wjNUepcmFzWvpUuTZvt89_Oba=KaDpeReuMURvQw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/7] net: ethtool: add support for configuring tcp-data-split-thresh
-To: Taehee Yoo <ap420073@gmail.com>
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-2-ap420073@gmail.com>
+ <CACKFLi=1h=GBq5bN7L1pq9w8cSiHA16CZz0p8HJoGdO+_5OqFw@mail.gmail.com>
+ <CAMArcTXUjb5XuzvKx03_xGrEcA4OEP6aXW2P0eCpjk9_WaUS8Q@mail.gmail.com> <CACKFLikCqgxTuV1wV4m-kdDvXhiFE7P=G_4Va_FmPsui9v2t4g@mail.gmail.com>
+In-Reply-To: <CACKFLikCqgxTuV1wV4m-kdDvXhiFE7P=G_4Va_FmPsui9v2t4g@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 4 Oct 2024 03:28:15 +0900
+Message-ID: <CAMArcTUG-KaqMfixSDEvkGL7PJ9J40y-T38Gtu0q-ZmCjUk2QA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/7] bnxt_en: add support for rx-copybreak
+ ethtool command
+To: Michael Chan <michael.chan@broadcom.com>
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	edumazet@google.com, almasrymina@google.com, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
 	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
 	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
 	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
@@ -91,19 +94,76 @@ Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
-e:
+On Fri, Oct 4, 2024 at 2:43=E2=80=AFAM Michael Chan <michael.chan@broadcom.=
+com> wrote:
 >
-> The tcp-data-split-thresh option configures the threshold value of
-> the tcp-data-split.
-> If a received packet size is larger than this threshold value, a packet
-> will be split into header and payload.
+> On Thu, Oct 3, 2024 at 10:23=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > On Fri, Oct 4, 2024 at 2:14=E2=80=AFAM Michael Chan <michael.chan@broad=
+com.com> wrote:
+> > >
+> >
+> > Hi Michael,
+> > Thanks a lot for the review!
+> >
+> > > On Thu, Oct 3, 2024 at 9:06=E2=80=AFAM Taehee Yoo <ap420073@gmail.com=
+> wrote:
+> > > >
+> > > > The bnxt_en driver supports rx-copybreak, but it couldn't be set by
+> > > > userspace. Only the default value(256) has worked.
+> > > > This patch makes the bnxt_en driver support following command.
+> > > > `ethtool --set-tunable <devname> rx-copybreak <value> ` and
+> > > > `ethtool --get-tunable <devname> rx-copybreak`.
+> > > >
+> > > > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > > > ---
+> > > >
+> > > > v3:
+> > > > - Update copybreak value before closing nic.
+> > > >
+> > > > v2:
+> > > > - Define max/vim rx_copybreak value.
+> > > >
+> > > > drivers/net/ethernet/broadcom/bnxt/bnxt.c | 24 +++++----
+> > > > drivers/net/ethernet/broadcom/bnxt/bnxt.h | 6 ++-
+> > > > .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 49 ++++++++++++++++=
+++-
+> > > > 3 files changed, 68 insertions(+), 11 deletions(-)
+> > > >
+> > >
+> > > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/ne=
+t/ethernet/broadcom/bnxt/bnxt.h
+> > > > index 69231e85140b..cff031993223 100644
+> > > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > > > @@ -34,6 +34,10 @@
+> > > > #include <linux/firmware/broadcom/tee_bnxt_fw.h>
+> > > > #endif
+> > > >
+> > > > +#define BNXT_DEFAULT_RX_COPYBREAK 256
+> > > > +#define BNXT_MIN_RX_COPYBREAK 65
+> > > > +#define BNXT_MAX_RX_COPYBREAK 1024
+> > > > +
+> > >
+> > > Sorry for the late review. Perhaps we should also support a value of
+> > > zero which means to disable RX copybreak.
+> >
+> > I agree that we need to support disabling rx-copybreak.
+> > What about 0 ~ 64 means to disable rx-copybreak?
+> > Or should only 0 be allowed to disable rx-copybreak?
+> >
+>
+> I think a single value of 0 that means disable RX copybreak is more
+> clear and intuitive. Also, I think we can allow 64 to be a valid
+> value.
+>
+> So, 0 means to disable. 1 to 63 are -EINVAL and 64 to 1024 are valid. Tha=
+nks.
 
-Why do you need this? devmem TCP will always not work with unsplit
-packets. Seems like you always want to set thresh to 0 to support
-something like devmem TCP.
+Thanks for that, It's clear to me.
+I will change it as you suggested.
 
-Why would the user ever want to configure this? I can't think of a
-scenario where the user wouldn't want packets under X bytes to be
-unsplit.
+Thanks a lot!
+Taehee
 
