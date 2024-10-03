@@ -1,108 +1,115 @@
-Return-Path: <netdev+bounces-131740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE5E198F656
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:39:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D09998F65F
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7510DB22ABD
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:39:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F38F282EB0
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA5301AB506;
-	Thu,  3 Oct 2024 18:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E611AB530;
+	Thu,  3 Oct 2024 18:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XNhVgTjL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0OKKxt81"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DCE61A76AB
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 18:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A840319F134;
+	Thu,  3 Oct 2024 18:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727980791; cv=none; b=maaL5GF0AINNrnZND+FjQ7dOSfCbiK1uZqBEBPH7z/jYlKiI5J1OKWyAf32ECb89RoeswJ9Au5SOGifT+0JCzEXJKXISFb7bnTnh4odqcjMutRnCFXhZH/dCW448j6nyNPiFMtw/neAe9kvUYVzG/Y+PEFLEUOe9IqGJfhtfYD0=
+	t=1727980959; cv=none; b=GoD97RnhDqXI/KV7hG6jwbsDlqEr/73j3nUGhuQZ15ieI7hO7ekq0q4k91iDy/mc3AxUZKP6Xn799YW9btkjCrWDxgAWxCG1ckSAaQAx0aOrx15a7iuxWOvPcFqwPZ2o3MXRWb9Tr+gnVWil3jOH6mxEQlJRW3m7I6nOdQrNhQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727980791; c=relaxed/simple;
-	bh=DhOoRBLHjJo6iKb0pokJEyuf1Q43DOLSfMfmpPXYJ6k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XbiBhfuwSlhfcKj38oPTruqO3+CNZx76LQDMr7R6F0U9ftDXpqRFjYiic0dgUIV8Nwept9H3/+3hPz0GRuau2/1J7BPnxgzHF02w0wVOjJVYOG7Yq/GyvxUUv9xFRTUu20GgrNCB/5119zbilb2SZCguJsvjAATlh6B5Lf61Jnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XNhVgTjL; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20ba9f3824fso10764925ad.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 11:39:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1727980789; x=1728585589; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8NOfF+iASIgN1enWQgY9wUU6upF2RxXXkbqZYau3r2Q=;
-        b=XNhVgTjL/MD24AMoimalZIIxSyRbDfj8HXs5w8MVirHEh8EFO6wPMmctsXDYVzzaqF
-         TPAkKml+5QcJGfw9Z+n9Ukvifv8Gu55uG5+0zIOd0pdFDWxQ4QMBdWA0LgNq8ki4Je6w
-         5lLa65sGi6X26LzwfdjEcKYvzuvJDZmvESL4VvL+MUjduzfO3UsDOP5Xy56kas8aP5CG
-         veiStkFRAK3/COF/xr1d3OVaoJw+G+6vRUxQgRPH86ywNEN1Lua4HjlJ1QcYTLdm4gPE
-         ANin45X62pmbx0Lj9o+WsrxoFDVQj8kAAuzGWgd7gkq0Ua+KDv8kAL/tz2bboMI8VCVG
-         xHTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727980789; x=1728585589;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8NOfF+iASIgN1enWQgY9wUU6upF2RxXXkbqZYau3r2Q=;
-        b=PdlkmdcpIjZhoPy9IW7W+9HVUaOjO5yE4g32UXE3q3NwEWQyVUh0dD8rlTPcsT3Loq
-         3Ct9Fy36Sk3QX5W5Q5UJ2f00xo7uRRxy9JKaLyzYm48j7uFxfqBsFvJIvDPUKvnzNxOo
-         V8WX9s9qJT2F4bHkkjEEhuCdwtan4/uZb0SdPa4flo/0w6FxtqIa+tha6KPIZQKOewFO
-         ySLpkqlXPe4l/snHOPlnZIZnyvweJAzzeITaQZtb/xXrVVmFlX8Rs6tXqyfPl5Q+pJQg
-         8i+G0fEWYzsmvqPNZDnJt98w6W9eLE5N+qHxZUsRkxciPwal2dnOfk2mokXcQRM6Z1Ho
-         2oZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXncH0gdHcUULUbFxGINwdgSA+CtAU37XeH5rVrP8CQdKVgFTx+S6oymSlg7htNZGzn66OylPQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRi4y8FyKj0nUdpHT5HPnLCKUbm9tr3F0q/aJr9XmWIPZi3hTb
-	oBKzqzwi22z9/FSDU8ftTvTWOASRU56zIpukPxKx22pAe5w9DAFaX/slaS6jLfeFGRcwD5w273Q
-	LNF0=
-X-Google-Smtp-Source: AGHT+IGIHsGZj7FRyxDSBw/wKYL5XsHu8ck09mUVeMUbnS/YK8RyE1dWDEsQDtAZooeWNUfv2dlAew==
-X-Received: by 2002:a17:902:e881:b0:205:5dfe:7be with SMTP id d9443c01a7336-20bfdfeb5b4mr1953015ad.26.1727980789435;
-        Thu, 03 Oct 2024 11:39:49 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca2256sm12086035ad.91.2024.10.03.11.39.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 11:39:49 -0700 (PDT)
-Date: Thu, 3 Oct 2024 11:39:47 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: Moon Yeounsu <yyyynoom@gmail.com>, Eric Dumazet <edumazet@google.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- linux@weissschuh.net, j.granados@samsung.com, judyhsiao@chromium.org,
- James.Z.Li@dell.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, linux-sparse@vger.kernel.org
-Subject: Re: [PATCH net] net: add inline annotation to fix the build warning
-Message-ID: <20241003113947.6e605b8c@hermes.local>
-In-Reply-To: <e5cb1a17-72e1-529c-0f46-404dcdb3e5f3@gmail.com>
-References: <20241001193352.151102-1-yyyynoom@gmail.com>
-	<CAAjsZQx1NFdx8HyBmDqDxQbUvcxbaag5y-ft+feWLgQeb1Qfdw@mail.gmail.com>
-	<CANn89i+aHZWGqWjCQXacRV4SBGXJvyEVeNcZb7LA0rCwifQH2w@mail.gmail.com>
-	<CAAjsZQxEKLZd-fQdRiu68uX6Kg4opW4wsQRaLcKyfnQ+UyO+vw@mail.gmail.com>
-	<CANn89i+hNfRjhvpRR+WXqD72ko4_-N+Tj3CqmJTBGyi3SpQ+Og@mail.gmail.com>
-	<CAAjsZQxkH8nmHchtFFPm5VouLEaViR5HTRCCnrP0d9jSF2pGAQ@mail.gmail.com>
-	<e5cb1a17-72e1-529c-0f46-404dcdb3e5f3@gmail.com>
+	s=arc-20240116; t=1727980959; c=relaxed/simple;
+	bh=0q5SSCaXUaMZqbCx0JIierHaddgdHVXpOzVy1vt9hIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tWe4hVXxKa1AGyAtKEUzGRgaSAB10GgS7N9SQOnFVAMWmmb54+eATx5CjcJYR3x6gnPaTFtG3/4R0QKIcdKqTJRZA9Sfv9tU5ogdkoJ1BTSYEYVjyNx8/njKjze75phOkVsCub36wnVZLrI2ocRhZ4pPs25zZ6ijbwoXZOW3344=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0OKKxt81; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2RDjJwzjseFZ2RBERk4BN7b4d/RJVlrbdFG7geetqgs=; b=0OKKxt81bC8V4FGa2ByITtAODv
+	FxcvNjNTGZd1DTFR5x+XXPzIV8mpoS6kZW1lGcL6HpOkd31SBgarDSet5Ew+deEPrGgO80gE4Ie6J
+	FIBjrpKVepAKWyx1b+YrZ+WNxHrJsgL2T4D2NFU2Y9+Dwli4pJ8OvoBCQqm15Jce9OH8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swQmP-008yMk-5X; Thu, 03 Oct 2024 20:42:25 +0200
+Date: Thu, 3 Oct 2024 20:42:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: netdev@vger.kernel.org, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
+	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
+	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <febe6776-53dc-454d-83b0-601540e45f78@lunn.ch>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
 
-On Thu, 3 Oct 2024 17:11:26 +0100
-Edward Cree <ecree.xilinx@gmail.com> wrote:
+> Agree that switchdev is the right model for this device. We were
+> planning to enable base Ethernet functionality using regular
+> (non-switchdev) netdevice representation for the ports initially,
+> without offload support. As the next step, L2/VLAN offload support using
+> switchdev will be enabled on top. Hope this phased approach is fine.
 
-> On 03/10/2024 16:33, Moon Yeounsu wrote:
-> > On 03/10/2024 15:19, Eric Dumazet wrote:  
-> >> It also does not know about conditional locking, it is quite useless.  
-> > So... What do you think about who wants to send the patch to silence
-> > the Sparse's warning message, nevertheless?  
+Since it is not a DSA switch, yes, a phased approach should be O.K.
 
-In my experience, conditional locking is often a cause of bugs.
+> >> 3) PCS driver patch series:
+> >>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
+> >>         be enabled in drivers/net/pcs/
+> >> 	Dependent on NSS CC patch series (2).
+> > 
+> > I assume this dependency is pure at runtime? So the code will build
+> > without the NSS CC patch series?
+> 
+> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
+> PCS's MII channels. To represent this in the DTS, the PCS node in the
+> DTS is configured with the MII Rx/Tx clock that it consumes, using
+> macros for clocks which are exported from the NSS CC driver in a header
+> file. So, there will be a compile-time dependency for the dtbindings/DTS
+> on the NSS CC patch series. We will clearly call out this dependency in
+> the cover letter of the PCS driver. Hope that this approach is ok.
+
+Since there is a compile time dependency, you might want to ask for
+the clock patches to be put into a stable branch which can be merged
+into netdev.
+
+Or you need to wait a kernel cycle.
+
+   Andrew
 
