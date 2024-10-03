@@ -1,186 +1,343 @@
-Return-Path: <netdev+bounces-131502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 409ED98EB25
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:14:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC76698EB51
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:18:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06095281EEB
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:14:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64A80280A56
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40E8413AA5D;
-	Thu,  3 Oct 2024 08:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF2F137750;
+	Thu,  3 Oct 2024 08:17:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ge9jAT7J"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fBemfihI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A29E13A888
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 08:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E88710A1E;
+	Thu,  3 Oct 2024 08:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727943238; cv=none; b=pw0qzwRHJNlfhfxa48KUm1F61IkAoIo7RvCRrdreeWZ3087Uh0bUgT1ZkmpuSpu8OGytVJSozOvp9ja7tChan4gxhQN0/t1cV2+w0olj37ma7Zw1q8qLtxewL8Rxi4s5XhNgKH9jdG6Onbiba0awno4OR1K6HSCJrgos/F6LAEU=
+	t=1727943479; cv=none; b=gLKpRHNzfH7mA/msGmeJXwZCtLqPTK93oq4ZCs6P/2i2sLFVtLSWulTjRtXDQ9zU98XxNCfes3Q39pZ0zd8I1wcmyAnih1YBRDKqW0s6/WXO03HpdXBkhgXfE2i3ImPoewk6dmMk926xYJ1Ep9DZ51Wq4/X3hvpt5lZJgcIztiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727943238; c=relaxed/simple;
-	bh=bfKeTxkfQZUYq29IKYgEmdtkBFNk79BSNUFS1yEAS50=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b9WoWh02ssgOFiqa9SZyQDaqx9MNXLUWJyNh27pD0dQAq1ruMbEbxGWHUrtf6V3g/h8X41oZCYSB/vvSPZHYSGkmmfQrQi25v56cqFdu1m+sB3DX41zH7FpaMp771pUH+yJwgvMW2wG3FnzkLfMc/74AkOJLVgKf927pQEv/X8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ge9jAT7J; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2facaa16826so6139181fa.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 01:13:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1727943234; x=1728548034; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bfKeTxkfQZUYq29IKYgEmdtkBFNk79BSNUFS1yEAS50=;
-        b=Ge9jAT7JLVRHOV+WY+PS90OkdFKh1/Z9LzqOos830/d/5hWSiAFqMTmG8IFz8dYlBf
-         RhHquuwhEb8+4rTL6mK1sOObQnHV+KSOXfosdH7N1A0nY9LICn9asMIHp9u+ag0vLdyX
-         nhq5qz+f4LO1zdNlTjYm0P2NfgHo8MehmcgL4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727943234; x=1728548034;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bfKeTxkfQZUYq29IKYgEmdtkBFNk79BSNUFS1yEAS50=;
-        b=KCoztaxcEr+PszwaRI+BaSwRAaCj7UopeCTelHK0O9AjgbKrKEeXl3iIz59d5W0AjX
-         YbsBJSjNiiNds2Bx8Mf0BJnwUIDHTCEYeLCW1WFQzHOUuXMmUc66St/W2NBH5itedai8
-         erRA6qccDu9jzXbCGoY5zD3xgC8hci3rv+z7CB6vZuTGdMcgmTvopGH9GSO7dqQz72m5
-         FRUxTr0azVB91Qd0fqJTR0vCcVeOPY6Nm4gUvXEbAfgfLgJBLJMkI/uL6YOJOyJooxtW
-         PYd8xttt9xV+HV1D2B8Cw0wcQ5ku/1IaCJ9NYV4HNfvF/1+aKvl1gQJm16iIIX+8q1Va
-         Jj1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ365LUtwFYJ9/RksmrWY/VMmAFNOZehtfGWGayN1jq6pVVVMKcgR/SojQPsyI+V8qJ1Ak+ls=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+rhmm/b2DkUhiiMVnsy1OmXRocI47HJnsuBVvJecv7w0aCzPE
-	RQtAWnc70/6JSS0Oa8c5b5CvWAVd9UJSPY2TzAA2gmygcbIQ899YaANmQYadZ0+N2N6wVmHuwj6
-	b/FBnZ7qMTwXBEPyT6FY2rrs/grMhroxj07DL
-X-Google-Smtp-Source: AGHT+IF4yfX1GuUz1c4s+2ZQRbPj/jtK79yigEwQpJ/r9w9Wf7KLJVOGvXgM8gGKcRt8b3kBvKVkQXlw31PyXadETNc=
-X-Received: by 2002:a2e:870a:0:b0:2f7:6519:9a01 with SMTP id
- 38308e7fff4ca-2fae105ca8cmr31756781fa.24.1727943234436; Thu, 03 Oct 2024
- 01:13:54 -0700 (PDT)
+	s=arc-20240116; t=1727943479; c=relaxed/simple;
+	bh=ZXzClI64uZKzurCYKQPW9rVg6HGvMO4FOjxDAyEWI2w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dyKLl5xggYVSw68N5Kq08X3RBPc4l4R7YEFn7x9jW4lRLXO0lb/qJyhamtGHPZ+yEQDZqA0nQrOhrgPwjoRfvxtZnssdOVzvXFlQUwwUITtvxHhOFPxFw/mnS0Dnk52hhlp8OriKN8HpTgni1flem4p8+5wfZ6vKriIiGVA9wDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fBemfihI; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 8F30AE0009;
+	Thu,  3 Oct 2024 08:17:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727943474;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=2UaNmS6xTczFvj5giaUw0inHxG9R/Dlh790DYEo0DRQ=;
+	b=fBemfihIgfkNAnJw5+TxGGLwaNX+Gu+MpIvteQpSsPmYbHnB3DRRx4ZjAEoydZnQ69H7Gq
+	xXlJ04KoB2TVp/OaCtYUUABcX1RlW/zTWxcuZiHZzzGDW8v/x1+4nCsLfe+k1ppRM243NO
+	998RMhFwEEy2YdwampvweILJwdETEu1onouGqqcX5Pb2aqS94STFDV0TpOctp3OD0v9TNI
+	bre8oxALoboETTNcxmtCqky7a3SOo2FomuNuALdqG00MJWIXICKslV0sNJA3g1TlRQw8mO
+	e+KxBYDJGXEQ7YRLCdf2VrGXxSPWoKtqCg6ufNHss2fszvdE+y4pJA6roFSQDg==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Lee Jones <lee@kernel.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Allan Nielsen <allan.nielsen@microchip.com>,
+	Steen Hegelund <steen.hegelund@microchip.com>,
+	Luca Ceresoli <luca.ceresoli@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v7 0/6] Add support for the LAN966x PCI device using a DT overlay
+Date: Thu,  3 Oct 2024 10:16:37 +0200
+Message-ID: <20241003081647.642468-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002200838.7316-1-algonell@gmail.com>
-In-Reply-To: <20241002200838.7316-1-algonell@gmail.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 3 Oct 2024 13:43:41 +0530
-Message-ID: <CAH-L+nN9yF0KTLnappKcrEetQcHT1+UH7ju04V7pPiqA2uZ-jQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net/mlx5: Fix typos
-To: Andrew Kreimer <algonell@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, Matthew Wilcox <willy@infradead.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b4c80006238e225c"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
---000000000000b4c80006238e225c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On Thu, Oct 3, 2024 at 1:39=E2=80=AFAM Andrew Kreimer <algonell@gmail.com> =
-wrote:
->
-> Fix typos in comments.
->
-> Reported-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+This series adds support for the LAN966x chip when used as a PCI
+device.
 
-LGTM,
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+For reference, the LAN996x chip is a System-on-chip that integrates an
+Ethernet switch and a number of other traditional hardware blocks such
+as a GPIO controller, I2C controllers, SPI controllers, etc. The
+LAN996x can be used in two different modes:
 
---=20
-Regards,
-Kalesh A P
+- With Linux running on its Linux built-in ARM cores.
+  This mode is already supported by the upstream Linux kernel, with the
+  LAN996x described as a standard ARM Device Tree in
+  arch/arm/boot/dts/microchip/lan966x.dtsi. Thanks to this support,
+  all hardware blocks in the LAN996x already have drivers in the
+  upstream Linux kernel.
 
---000000000000b4c80006238e225c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+- As a PCI device, thanks to its built-in PCI endpoint controller.
+  In this case, the LAN996x ARM cores are not used, but all peripherals
+  of the LAN996x can be accessed by the PCI host using memory-mapped
+  I/O through the PCI BARs.
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIF3Xpehe2ILfM7awts7LzlNmCSGFOlH7YXeqQVL/aY7PMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzA4MTM1NFowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBkF3sq3+Nt
-gjT+fiKppaQcsYQn9D9n/FGCgeWAp6oiiHU0AAkhy84GDCVCscIaYIP1DL3W6bPl9+HuKOdkDn5B
-7wBIZcO6eHUbDAzK64HBXAhWve/8YbYAnhOPltISTcZzrYVY6fzWVrfF5bI4xpcjScYgSvlnp8Ut
-w9XaF9vYhzuNBgvXrwAvHwqO2Utag1tg3DfOuJrPeph4SrnG7Icoduipvq2NELxuO0d8TPpn9vgr
-ij5v3k31hg3Bia3jknBLIygbp8k2k9IqEeiDaL5Q+GvqqVv9N2kiMu/3zsWsCgIE8iXMYPwxmF8Z
-fb8bEUyBM8h0w8T3QDMp0Ufn3FrU
---000000000000b4c80006238e225c--
+This series aims at supporting this second use-case. As all peripherals
+of the LAN996x already have drivers in the Linux kernel, our goal is to
+reuse them as-is to support this second use-case.
+
+Therefore, this patch series introduces a PCI driver that binds on the
+LAN996x PCI VID/PID, and when probed, instantiates all devices that are
+accessible through the PCI BAR. As the list and characteristics of such
+devices are non-discoverable, this PCI driver loads a Device Tree
+overlay that allows to teach the kernel about which devices are
+available, and allows to probe the relevant drivers in kernel, re-using
+all existing drivers with no change.
+
+This patch series for now adds a Device Tree overlay that describes an
+initial subset of the devices available over PCI in the LAN996x, and
+follow-up patch series will add support for more once this initial
+support has landed.
+
+In order to add this PCI driver, a number changes are needed:
+ - Patches 1 and 2 introduce the LAN996x PCI driver itself, together
+   with its DT overlay and the related MAINTAINER entry.
+
+ - Patch 3 removes the syscon API usage from the reset driver used for
+   the LAN966x.
+
+ - Patches 4 to 7 allow the reset driver used for the LAN996x to be
+   built as a module. Indeed, in the case where Linux runs on the ARM
+   cores, it is common to have the reset driver built-in. However, when
+   the LAN996x is used as a PCI device, it makes sense that all its
+   drivers can be loaded as modules.
+
+Compare to the previous iteration:
+  https://lore.kernel.org/lkml/20240930121601.172216-1-herve.codina@bootlin.com/
+this v7 series mainly:
+  - Remove the patch modifying the reset controller DT binding
+  - Re-order patches
+  - Remove the syscon API usage from the LAN966x reset controller (the
+    only syscon user).
+
+Best regards,
+Hervé
+
+Changes v6 -> v7
+  - Patch 1 (patch 3 in v6)
+    Re-introduce the syscon node in the overlay
+
+  - Patch 2 (patch 4 in v6)
+    No changes
+
+  - Patch 3 (patch 2 in v6)
+    Rework code to map the syscon device locally without using the
+    syscon API in the LAN966x case.
+    Update commit log
+
+  - Patches 4, 5 and 6 (patches 5, 6, and 7 in v6)
+    No changes
+
+  Patch removed in v7
+    - Patch 1 in v6 (reset controller DT binding modification)
+      Rejected
+
+Changes v5 -> v6
+  - Patch 1
+    New patch in v6 relatead to removing syscon usage.
+
+  - Patch 2
+    New patch in v6 related to removing syscon usage.
+
+  - Patch 3 (patch 1 in v5)
+    Add 'Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>'
+    Remove syscon node from the overlay.
+
+  - Patch 4, 5, 6 and 7 (patches 2, 4, 5 and 8 in v5)
+    No changes
+
+  Patches removed in v6
+    - Patch 3 in v5
+      Rejected
+
+    - Patch 6 in v5
+      No more applicable
+
+    - Patch 7 in v5
+      Already applied
+
+Changes v4 -> v5
+  - Patch 1
+    Add missing include files and keep pci_ids.h.
+    Remove IRQ_RETVAL() usage.
+    Use __free().
+    Remove the pdev->irq check.
+    Avoid local variables in devm_pci_dev_remove_intr_ctrl() and
+    lan966x_pci_load_overlay().
+    Use dev_err_probe().
+    Sort header includes in alphabetical order in dtbs file.
+
+  - Patch 3
+    Fix a typo in commit log.
+    Simplify modification done in device_node_get_syscon().
+    Use devm_add_action_or_reset().
+
+  - Patches 4, 5, 6 and 8
+    Add 'Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>'
+
+Changes v3 -> v4
+  - Patch 1 and 2 (v3 patch 6 and 7)
+    Move the driver from drivers/mfd to drivers/misc.
+
+  - Patch 4 and 5 (v3 patch 2)
+    Rework reset driver dependencies and module building support.
+    Split v3 patch into two distinct patches:
+      - patch 4, as suggested by Geert, add a dependency on the
+        LAN966x PCI device
+      - patch 5, allows to build the reset controller driver as a module
+
+  - Other patches
+    Except reordering, no changes
+
+Changes v2 -> v3
+  - Patches 1 and 5
+    No changes
+
+  - Patch 6 (v2 patch 18)
+    Add a blank line in the commit log to split paragraphs
+    Remove unneeded header file inclusion
+    Use IRQ_RETVAL()
+    Remove blank line
+    Use dev_of_node()
+    Use pci_{set,get}_drvdata()
+    Remove unneeded pci_clear_master() call
+    Move { 0, } to { }
+    Remove the unneeded pci_dev member from the lan966x_pci structure
+    Use PCI_VENDOR_ID_EFAR instead of the hardcoded 0x1055 PCI Vendor ID
+    Add a comment related to the of_node check.
+
+  - Patch 7 (v2 patch 19)
+    No changes
+
+  Patches removed in v3
+    - Patches 6 and 7
+      Extracted and sent separately
+      https://lore.kernel.org/lkml/20240620120126.412323-1-herve.codina@bootlin.com/
+
+    - Patches 9
+      Already applied
+
+    - Patches 8, 10 to 12
+      Extracted, reworked and sent separately
+      https://lore.kernel.org/lkml/20240614173232.1184015-1-herve.codina@bootlin.com/
+
+    - Patches 13 to 14
+      Already applied
+
+Changes v1 -> v2
+  - Patch 1
+    Fix a typo in syscon.h (s/intline/inline/)
+
+  - Patches 2..5
+    No changes
+
+  - Patch 6
+    Improve the reset property description
+
+  - Patch 7
+    Fix a wrong reverse x-mass tree declaration
+
+  - Patch 8 removed (sent alone to net)
+    https://lore.kernel.org/lkml/20240513111853.58668-1-herve.codina@bootlin.com/
+
+  - Patch 8 (v1 patch 9)
+    Add 'Reviewed-by: Rob Herring (Arm) <robh@kernel.org>'
+
+  - Patch 9 (v1 patch 10)
+    Rephrase and ident parameters descriptions
+
+  - Patch 10 (v1 patch 11)
+    No changes
+
+  - Patch 11 (v1 patch 12)
+    Fix a missing ret value assignment before a goto in .probe()
+    Limit lines to 80 columns
+    Use indices in register offset definitions
+
+  - Patch 13 and 14 (new patches in v2)
+    Add new test cases for existing of_changeset_add_prop_*()
+
+  - Patch 15 (v1 patch 14)
+    No changes
+
+  - Patch 16 (new patches in v2)
+    Add tests for of_changeset_add_prop_bool()
+
+  - Patch 17 (v1 patch 15)
+    Update commit subject
+    Rewrap a paragraph in commit log
+
+  - Patch 18 (v1 patch 16)
+    Use PCI_IRQ_INTX instead of PCI_IRQ_LEGACY
+
+  - Patch 19 (v1 patch 17)
+    No changes
+
+Clément Léger (2):
+  reset: mchp: sparx5: Allow building as a module
+  reset: mchp: sparx5: set the dev member of the reset controller
+
+Herve Codina (4):
+  misc: Add support for LAN966x PCI device
+  MAINTAINERS: Add the Microchip LAN966x PCI driver entry
+  reset: mchp: sparx5: Map cpu-syscon locally in case of LAN966x
+  reset: mchp: sparx5: Add MCHP_LAN966X_PCI dependency
+
+ MAINTAINERS                            |   6 +
+ drivers/misc/Kconfig                   |  24 +++
+ drivers/misc/Makefile                  |   3 +
+ drivers/misc/lan966x_pci.c             | 215 +++++++++++++++++++++++++
+ drivers/misc/lan966x_pci.dtso          | 167 +++++++++++++++++++
+ drivers/pci/quirks.c                   |   1 +
+ drivers/reset/Kconfig                  |   4 +-
+ drivers/reset/reset-microchip-sparx5.c |  38 ++++-
+ 8 files changed, 455 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/misc/lan966x_pci.c
+ create mode 100644 drivers/misc/lan966x_pci.dtso
+
+-- 
+2.46.1
+
 
