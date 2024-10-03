@@ -1,113 +1,117 @@
-Return-Path: <netdev+bounces-131587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E390898EF4C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:35:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102E098EF5E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 981531F21E72
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:35:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41AC81C20D67
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3A311865F0;
-	Thu,  3 Oct 2024 12:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A00A186E42;
+	Thu,  3 Oct 2024 12:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="hAYLZlAc"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="SaZ1nLzs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E1916BE1C;
-	Thu,  3 Oct 2024 12:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7018D1865E9
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 12:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727958931; cv=none; b=OiKf7YZoQnGFxeRL8mb9a0Z+kFEFKaWyngpRnR7PtBy4dVBlbBivbwgLDx2xQUy5zstz0Rwuy+BhVsOYvbtHNYAxC7ZufNA4w7yJAi2HHvTu6dBFWJ1WO8LK5uu8g5sZFBhdw+9JwbmZ28acMQjIEE6dSr8Anb+HXahxOZLpBCk=
+	t=1727959197; cv=none; b=pMhz9ga+QJvEf6iPP2HXYkleYfSKwGgjmeHfkBQVXGBQ0OF2wOWweWoisCJqtht0blBpoVc5yVSDMlYFRELWRgo5XhqrexUCEEXrij2BU1NMVRHSvsYdv5l0myZqnUxI0eoAUkn2mRv6pwQpNSRgCTkX1moN3l9K3SLKUtddFj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727958931; c=relaxed/simple;
-	bh=dX1lwuTM4JZA3FMlV7WmqyFSLpT7WpN5NQHhwim0jS0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ONW0XfPX/lZTnGxj89HIzyqVd+6YC0UDPxSdWLJq4vWpUA5/EOKt306ByfVlGN+h7nLR8mkm+VMjU5VWf1LyZ4+LFHAPQXWrnQ9O4sMUhSSR/krZZt8k+ii+uwSQ2QNBjRfSfn6HPHyA8mVOjrp/jqDdoxAoH8sgym2hRv7rDDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=hAYLZlAc; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1727958899; x=1728563699; i=markus.elfring@web.de;
-	bh=ohU9x5TH8lUQ31sJJDJLdGFIGYcmJHHEVJBKIgyLxY4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=hAYLZlAc+DTcOatjRclOUCHn+HtQC7o59q+pG4PFrE+MTb48eIV70os56fUEVCeo
-	 OTZUNWC9ugIGRUVe6Y/uSL2FTRfhAqMtOaUT5ZFkyF3eWUM+Dev8bNDsousq4LaIW
-	 uNjHK3lJcA2T1zvwXsZluDRak327TxPH3uNf0WBRockBChyodyLVg18i5E/RVAFOb
-	 4wKIKgwHSc6w4eO64tbMpMgk4idQjSuR1kdJOcJXJegvggyPJ78SuMvsFhI/CeM/7
-	 iTEH7nCunQlbJi6WEUhgLOJ8A6TtJ1AXbZoU4VPbaCJdypMIwp0kOAwtIy2FXaTul
-	 3Zt8U+rm/8YXMdnFQw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N6b8s-1roSdB1ORS-016L6b; Thu, 03
- Oct 2024 14:34:59 +0200
-Message-ID: <63de96f1-bd25-4433-bb7b-80021429af99@web.de>
-Date: Thu, 3 Oct 2024 14:34:57 +0200
+	s=arc-20240116; t=1727959197; c=relaxed/simple;
+	bh=FTmaLXhU+8Yufl6Iz+JDPaPu396pDBEfE8QmtNIgqbU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=spSDWMETi/m8/5LRfvKLpfrPIL85sK+AnG1uNDa1tlBOvl9U9N4F/YegcuoPY+eWuFIh4HkD9mYoJqPj9KiEFpBfCxlq8IFE3ODfm9MAVHNZ4q2XJVvcMy56KlVzTZEI81khDTfYjFtlic3s0FQw0dPj4Xb9BK8v/w4AbbmsfEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=SaZ1nLzs; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4935dIrf001624;
+	Thu, 3 Oct 2024 05:39:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=GJT
+	jbv/pq4fyW8S+o6zE5hFncHsxmhoxJe5ZGo6Wyqs=; b=SaZ1nLzsyM7sSfPcbsh
+	7lSlMi8rO3DMrQs9//8mcTZ/vzd2nCCDqDwcwOtCru/PCTqc71CxTbRijAYAX6DC
+	OO8xmgbQEsLVN8plxF/3i06PX/cmbXz+IHnk8EXnfyCn7QWX+DXpsoLKLqVjtH4v
+	olJ4/NUeFicUaGjEXx1Mxb/2Nb424MqVdlLBTYJTR+APFaRAIu2FvqmEcCpr2bVw
+	OSAleQ2EkFulkkRmD9YRB3WhG6/msrwKEe6r3NJl8sf69yhP9/7tMzK1Tn+a4oMx
+	a4kf1H9YboTQZxBf0+EE2vBxU2HuPB+VUHAkjqaJ1ctNqmWz1KOWeooOHJltqP+P
+	J0g==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 421cet4awu-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Thu, 03 Oct 2024 05:39:41 -0700 (PDT)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
+ 15.2.1544.11; Thu, 3 Oct 2024 12:39:39 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Alexander Duyck
+	<alexanderduyck@fb.com>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
+        "Richard
+ Cochran" <richardcochran@gmail.com>
+Subject: [PATCH net-next v3 0/5] eth: fbnic: add timestamping support
+Date: Thu, 3 Oct 2024 05:39:28 -0700
+Message-ID: <20241003123933.2589036-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
- warning
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- kernel-janitors@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com,
- Andy Shevchenko <andriy.shevchenko@intel.com>,
- =?UTF-8?Q?Amadeusz_S=C5=82awi=C5=84ski?=
- <amadeuszx.slawinski@linux.intel.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Kees Cook <kees@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:trfPFBdDsORavmVVDpe+GGEgbMqWbbj5yZ54NKl24Zf+f68ghe4
- rFG0KKBU1v+UJcDDLM/GxfcoM3Mkmz+GI0zhdTds8aO8pZ8st1m1pOjBYW81ltxcHCCntKH
- t9vPlhCvztcV9fWIpUveKi04d5gV3XHNeGmQA6013ZovurH3l3AkMrLjZZjUNDgBwmXzY1u
- yM8yw1GbozFcLqhwfhjgw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:e9IbK/kx6WI=;0RuvU8aVTjpbufjy28RAWIj5yox
- T1IinAPN41Iwhd5Qfcnc1ow42eWJ8ynPJfJ909PK9HkgUK7iv9+579Zbx4uNXRELS0bdVNzZ8
- eqKlDBbSDtb92RatedC+eZDajd+bl6EoIDayL5MQEF8CoEAb/vBK8AzaKD+1r/BFAkc3jEoIj
- qtaeDCI8zWJnZQnqqFaExHI7m1GzIJeBh8JPiE5RBP3zru65fDTSebpAdwdhY4DktsUJCEN7c
- xnjj12TsfaOcOtke8u+xzlqv3CaQGdturpJ25v/o2DcvM94mdjZ1MRJj8MGLpQ4SlQcNo5FX8
- nLSc8GHUwjQEhWNeuOk0/2Jy86iGHK1V2yWm5gvAF9xwaLgAySAobW1jNG/XBNj8pKKl/vc8M
- t39OyPGidgry7wyCbx+5SBOX7vx8dhDHad3U4yaFD2I15RxUlL8EbAfLkOJmTlkgPzDWupUy2
- rc4kBO0kuIHp0mQdYBbchnPom+BjlG3fRNTVgJEePUeG4sjMWmqI5QmCZL3xEgmZtfcoYsYrn
- Bbtlt8X6o7UqLZ/ilLIsyrfCdSMS0te8Y/gTImE0ApQhimb0s3KbUDuH75REwqUNW274F9koP
- koo2r5i/6QGwLnun7yQLbzOEZEuCb5K5l5akln3On7H+0CBo+C678LwdjY8AQSPW8e6egf/Zi
- YOPjqfxSLH3pkLLVexKIDrjhtLMtIEUtz02Uif5hBA2zaovRmh7sxJTQwL82KxKqgHTN3KZWX
- ryIwtvTpHzVSXQ3ZqkY1Rjlx8GG8nQaOu6LBFdwTH9/oCoDx+F/GqkR4O1IOMGj1RZBXTpQjv
- O2eDACIF5BbxyLyKN/gBgAJg==
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: Nepe22vfmE5bEvRrSv1KRmSOp4RnpeXO
+X-Proofpoint-GUID: Nepe22vfmE5bEvRrSv1KRmSOp4RnpeXO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-03_06,2024-10-03_01,2024-09-30_01
 
-=E2=80=A6
-> PATCH v1:
-> changes thanks to Dmitry Torokhov:
->  better writeup in commit msg;
->  "__" prefix added to internal macros;
-=E2=80=A6
+The series is to add timestamping support for Meta's NIC driver.
 
-Would you get into the mood to reconsider the usage of leading underscores
-any more for selected identifiers?
-https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+or+d=
-efine+a+reserved+identifier
+Changelog:
+v2 -> v3:
+- rebase on top of net-next
+- add doc to describe retur value of fbnic_ts40_to_ns()
+v1 -> v2:
+- adjust comment about using u64 stats locking primitive
+- fix typo in the first patch
+- Cc Richard
 
-Regards,
-Markus
+Vadim Fedorenko (5):
+  eth: fbnic: add software TX timestamping support
+  eth: fbnic: add initial PHC support
+  eth: fbnic: add RX packets timestamping support
+  eth: fbnic: add TX packets timestamping support
+  eth: fbnic: add ethtool timestamping statistics
+
+ drivers/net/ethernet/meta/fbnic/Makefile      |   3 +-
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  11 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  39 +++
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  54 +++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  91 ++++-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  18 +
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   9 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   |  31 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_time.c  | 311 ++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 166 +++++++++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |   3 +
+ 11 files changed, 728 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_time.c
+
+-- 
+2.43.5
 
