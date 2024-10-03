@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-131674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5593C98F390
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:06:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4E2F98F391
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1067528280F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:06:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6386B2827B7
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1527B1A4F3B;
-	Thu,  3 Oct 2024 16:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1451A4F25;
+	Thu,  3 Oct 2024 16:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R41VqN47"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRIRDp74"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B44F1A4F30;
-	Thu,  3 Oct 2024 16:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31130145B1F;
+	Thu,  3 Oct 2024 16:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727971613; cv=none; b=dQLQ6hXfuttgCGochVNanIwEzzrxBzA64t7eLtLH5U1yD1nozg6aegQh1W7ad/Jic0Me/x7SnglyN2icE7KRBDsA4fWoD5DWe+AiMk2umUth3uWBBGKARKZqjiFQyQ5tcdYexbXlwArPQ6clTzQapEDA2NyV1z8T84IJXrJ2oqc=
+	t=1727971622; cv=none; b=Clhst4cV4N7hKmnGBFDsl46BH1jJRzgRx9weVoP9ygHAMBc8zlCgN6R1uZtCrdtZ4KzpJXt7A1eGOBBfi813BTdELUbKozYpFPR+z8Wjg7hWKjmwqKCS4QNkxPudCBq36EknQu5oNSf6uL20uusF19AQG1mUgoUvPsIt7wC6HnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727971613; c=relaxed/simple;
-	bh=jNSUloLXTW7XNo6ZIiysdZCvwrXEXTkS6KjsJozFq6g=;
+	s=arc-20240116; t=1727971622; c=relaxed/simple;
+	bh=TYrrp4+fXsd603T661sXMxk71f8OLHQCKwGfYnBVUgk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YVIPpFxbrAqYJT6vCBaJaku3Og2WCIAx8LVJ+6adpPdqrm43rriSXENXikW3voHHLflG9HA8Gveo7eYmmEAELhugm+zhWjb9dKzFIdiktvf2bbz3YeRQlkZ84F5XYCFsD3its9P1SQL7n1nv8Mp3J1bURz3vR75Ir1R0GBuxEvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R41VqN47; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=XYap1KrETYqEkrzH30yWYSBsFuv0mdUOgpN3e8JNpM61vq3UE2jkIu2bO4U6M/hpbSNIGBOWvzVZ5Ew8QesA9IqNDzIbQsocRlELeZ9dLuOmJN0iSOzUeX0MEVa7rCAFOQYz9yLJtBKZ5ufEGM8086egc6Z+w2PohB2i4zwCwbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRIRDp74; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20b6458ee37so12282735ad.1;
-        Thu, 03 Oct 2024 09:06:51 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b0b5cdb57so16168635ad.1;
+        Thu, 03 Oct 2024 09:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727971611; x=1728576411; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727971618; x=1728576418; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CrdRZ6PxOosogiFJCfq5RDtTFnNKOZUdm2yfBEXM0OI=;
-        b=R41VqN47CGXs8mlADR6fNG9GF9Q0wO5NwbdcCVIiprw10tKg/dDq0emFizMKH4Rxaf
-         bzzUEwXsrYp96YJniY5jftTLDzEfxxXVFg2/OKlVXR437xmBz7qh6e51xd2zr94UCz/Q
-         SfKAxJRG6h+D4nCbCZ54xH5E8iMp+NV+YwiUKQHBexwbSgqMauGXbpkcW30sdTFgIkgn
-         ZUQvmTiIzPpJkP215eGjpEcLq1CFS32EfXfjBrXzhS5jDQI3/8zPLeAQyU/Sn8l7t0/I
-         wMJMi92XyuQ5+juq5TAWqFvGYEghf4NQiUOAu+IZYC5SFrVDNRDYyQAVAk9elxoMwjRS
-         jgxQ==
+        bh=Fq3GJkLw5Uy4hCUSonWNYYQStI5yWMbLaCyxN/9ygUc=;
+        b=RRIRDp743ccD3+iuDzos4UMrAbtGLdAhS7NtmTmpvtRG2yqxyJgzuf/VO2oeIQtGWM
+         oHrL//4OOu1oTUSeLU62EncmhIFXIN6snyh1BEyYPy9F562JCXjnbUJAi8MG4Uxm2p/z
+         sFrrzypJIrweuun7UwTJCwck+V0eRvpEZpCY+5ZlzuL8DJXvBgs3yOIapCx4H0InQJi1
+         ZTlrVYQuDxgL7NrOX1e//gUBvdHBn1WluIP9H61Im515Yi55EB+8JAYtJCQ9uYLVzNX7
+         97vNgHLlmL0jUCJbqL1AlQ+QPKlrkLgui0CjolZiSqy/8meXbjw2J1RXoQ3uEA5+VoIT
+         Eheg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727971611; x=1728576411;
+        d=1e100.net; s=20230601; t=1727971618; x=1728576418;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CrdRZ6PxOosogiFJCfq5RDtTFnNKOZUdm2yfBEXM0OI=;
-        b=GVwbk7bj2/IgA3RIB+ec3JoDQmgMhGrpIWX2t6/Fy94okirEEEpjV2fyFFoGZmSsU0
-         7Y1MCyFW9+aEJMV3hWI7wUrZaf0w/M4W+0qajKSTFXxqoZripC3omQcsyt6amr2ulvHY
-         dU4fVYVZLlpP1JcCsRH4Phk8TeFrOJkZqJMT/ku5qQTq7R0Mn9Qb9zJVXLytxMI+ivd3
-         UwBiw1EcmqzMWWGaglRC/+05tQsHTqcdMHMPuV0N2K48xOaXKwp7iStsYxefxmnd1fQM
-         biGmo/VBADRGAnER8zdiwA+PO1Oi1UK8DcFkVewkMzjyL4FeRjFs/p4wg6Roqo+H44sO
-         vxyA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/KML/4dgY1nh1ONHSvSbouaGnEg3zSZfUoIPIL5cJQFiUC//q+ruQMNgPRv+TcttNrt5jgjti@vger.kernel.org, AJvYcCW6rErzaln+pkurHjm/BiBIG6eyHs+mkSwy3r7tt/qq8Wj17Ak8a8vuXVdw9gsmidw5CxdoxL3/gnc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe2UoX80oCk0knH/YzDncNchNMHW3+TBctPNAjJLbVIeSZziec
-	vQqZFV/dkhI055Dh9RQekpk2fSjH2zT64+cwDQCP49BZIL0kn8XO
-X-Google-Smtp-Source: AGHT+IGK8beT/Um9fHuskDtoU6uwH7Ywmp1rWC395Q/iU2v8bBZutSYeZe5TEQ1WyeHgB/tJLdoRNQ==
-X-Received: by 2002:a17:903:22d2:b0:20b:751f:c9ca with SMTP id d9443c01a7336-20bc59ae37emr105030175ad.5.1727971610624;
-        Thu, 03 Oct 2024 09:06:50 -0700 (PDT)
+        bh=Fq3GJkLw5Uy4hCUSonWNYYQStI5yWMbLaCyxN/9ygUc=;
+        b=LTv2QHpwniPQjWPcuZWhBBqeQHhwI7ThHDFgzGzE58MjeapbKVn8zYmVVhzp6iVY4R
+         Qb2Z1Bs9D7qArZ8KM4bT3ghHTmYaU90JJODzEMtEQ1EY3oIKmL619suCEwY8QF8sn4Io
+         PgO+QkviO2fYmC79/6qANISjBezbH9UYA4U0KMr9rNgqejFb1hUOFPVodRRY4xOwIXfZ
+         Ol6AahvENNSE4cHzcHVXxQAn1YjSQVbgbQc/lv//GKQGVECrOVzJ5cT5E7SfHJLSPsx1
+         vOHHMJrR7v7AMk+fDBzq1/eZ3s24/qUx2OIdO6fEVBbTj52gmsAaQ2uM+AjZym/ON/f1
+         kYPg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1d23ETZO0XEvitj6zdhAAoEHslECQWdBLxzytkp6cUjeMRkwcoMHc3NYHWIvZwK2yZKzYficOf10=@vger.kernel.org, AJvYcCWodnlW6AEoo7AGbpiKTIF2WTRgeNSFNO8jKI1+sV012d/Zut2GgYZeAaSeBZYW+M2MQQHvleLo@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsCv4VAeExEyC9m1o0hOI63qUiHZGkXcT0/jYrmsYwYeEANwGp
+	bxjwJC9YjqYjqhGylO9yAvAfxXdPDxdmr5IEbO44KA05Y/rm7EHw
+X-Google-Smtp-Source: AGHT+IFlMetfCalg1cSjT6oOoUcIoJEoH7BNTou9ObkVeJ4wj8mnMTaANI6c+K4Sf3PADLe700fMaQ==
+X-Received: by 2002:a17:902:da81:b0:20b:a8ad:9b0c with SMTP id d9443c01a7336-20be18c544amr60852385ad.3.1727971618108;
+        Thu, 03 Oct 2024 09:06:58 -0700 (PDT)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20bef7071f1sm10425435ad.292.2024.10.03.09.06.43
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20bef7071f1sm10425435ad.292.2024.10.03.09.06.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 09:06:49 -0700 (PDT)
+        Thu, 03 Oct 2024 09:06:57 -0700 (PDT)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -98,9 +98,9 @@ Cc: kory.maincent@bootlin.com,
 	sridhar.samudrala@intel.com,
 	bcreeley@amd.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v3 2/7] bnxt_en: add support for tcp-data-split ethtool command
-Date: Thu,  3 Oct 2024 16:06:15 +0000
-Message-Id: <20241003160620.1521626-3-ap420073@gmail.com>
+Subject: [PATCH net-next v3 3/7] net: ethtool: add support for configuring tcp-data-split-thresh
+Date: Thu,  3 Oct 2024 16:06:16 +0000
+Message-Id: <20241003160620.1521626-4-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241003160620.1521626-1-ap420073@gmail.com>
 References: <20241003160620.1521626-1-ap420073@gmail.com>
@@ -112,157 +112,343 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-NICs that uses bnxt_en driver supports tcp-data-split feature by the
-name of HDS(header-data-split).
-But there is no implementation for the HDS to enable or disable by
-ethtool.
-Only getting the current HDS status is implemented and The HDS is just
-automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled.
-The hds_threshold follows rx-copybreak value. and it was unchangeable.
+The tcp-data-split-thresh option configures the threshold value of
+the tcp-data-split.
+If a received packet size is larger than this threshold value, a packet
+will be split into header and payload.
+The header indicates TCP header, but it depends on driver spec.
+The bnxt_en driver supports HDS(Header-Data-Split) configuration at
+FW level, affecting TCP and UDP too.
+So, like the tcp-data-split option, If tcp-data-split-thresh is set,
+it affects UDP and TCP packets.
 
-This implements `ethtool -G <interface name> tcp-data-split <value>`
-command option.
-The value can be <on>, <off>, and <auto> but the <auto> will be
-automatically changed to <on>.
+The tcp-data-split-thresh has a dependency, that is tcp-data-split
+option. This threshold value can be get/set only when tcp-data-split
+option is enabled.
 
-HDS feature relies on the aggregation ring.
-So, if HDS is enabled, the bnxt_en driver initializes the aggregation
-ring.
-This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
+Example:
+   # ethtool -G <interface name> tcp-data-split-thresh <value>
+
+   # ethtool -G enp14s0f0np0 tcp-data-split on tcp-data-split-thresh 256
+   # ethtool -g enp14s0f0np0
+   Ring parameters for enp14s0f0np0:
+   Pre-set maximums:
+   ...
+   TCP data split thresh:  256
+   Current hardware settings:
+   ...
+   TCP data split:         on
+   TCP data split thresh:  256
+
+The tcp-data-split is not enabled, the tcp-data-split-thresh will
+not be used and can't be configured.
+
+   # ethtool -G enp14s0f0np0 tcp-data-split off
+   # ethtool -g enp14s0f0np0
+   Ring parameters for enp14s0f0np0:
+   Pre-set maximums:
+   ...
+   TCP data split thresh:  256
+   Current hardware settings:
+   ...
+   TCP data split:         off
+   TCP data split thresh:  n/a
+
+The default/min/max values are not defined in the ethtool so the drivers
+should define themself.
+The 0 value means that all TCP and UDP packets' header and payload
+will be split.
+Users should consider the overhead due to this feature.
 
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v3:
- - No changes.
+ - Fix documentation and ynl
+ - Update error messages
+ - Validate configuration of tcp-data-split and tcp-data-split-thresh
 
 v2:
- - Do not set hds_threshold to 0.
+ - Patch added.
 
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  9 +++----
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 ++--
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 25 +++++++++++++++++--
- 3 files changed, 30 insertions(+), 9 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml     |  8 +++
+ Documentation/networking/ethtool-netlink.rst | 75 ++++++++++++--------
+ include/linux/ethtool.h                      |  4 ++
+ include/uapi/linux/ethtool_netlink.h         |  2 +
+ net/ethtool/netlink.h                        |  2 +-
+ net/ethtool/rings.c                          | 46 ++++++++++--
+ 6 files changed, 102 insertions(+), 35 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 8da211e083a4..f046478dfd2a 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4454,6 +4454,7 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
- static void bnxt_init_ring_params(struct bnxt *bp)
- {
- 	bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
-+	bp->flags |= BNXT_FLAG_HDS;
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 6a050d755b9c..96298fe5ed43 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -215,6 +215,12 @@ attribute-sets:
+       -
+         name: tx-push-buf-len-max
+         type: u32
++      -
++        name: tcp-data-split-thresh
++        type: u32
++      -
++        name: tcp-data-split-thresh-max
++        type: u32
+ 
+   -
+     name: mm-stat
+@@ -1393,6 +1399,8 @@ operations:
+             - rx-push
+             - tx-push-buf-len
+             - tx-push-buf-len-max
++            - tcp-data-split-thresh
++            - tcp-data-split-thresh-max
+       dump: *ring-get-op
+     -
+       name: rings-set
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index 295563e91082..f0cd918dbe7e 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -875,24 +875,32 @@ Request contents:
+ 
+ Kernel response contents:
+ 
+-  =======================================   ======  ===========================
+-  ``ETHTOOL_A_RINGS_HEADER``                nested  reply header
+-  ``ETHTOOL_A_RINGS_RX_MAX``                u32     max size of RX ring
+-  ``ETHTOOL_A_RINGS_RX_MINI_MAX``           u32     max size of RX mini ring
+-  ``ETHTOOL_A_RINGS_RX_JUMBO_MAX``          u32     max size of RX jumbo ring
+-  ``ETHTOOL_A_RINGS_TX_MAX``                u32     max size of TX ring
+-  ``ETHTOOL_A_RINGS_RX``                    u32     size of RX ring
+-  ``ETHTOOL_A_RINGS_RX_MINI``               u32     size of RX mini ring
+-  ``ETHTOOL_A_RINGS_RX_JUMBO``              u32     size of RX jumbo ring
+-  ``ETHTOOL_A_RINGS_TX``                    u32     size of TX ring
+-  ``ETHTOOL_A_RINGS_RX_BUF_LEN``            u32     size of buffers on the ring
+-  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``        u8      TCP header / data split
+-  ``ETHTOOL_A_RINGS_CQE_SIZE``              u32     Size of TX/RX CQE
+-  ``ETHTOOL_A_RINGS_TX_PUSH``               u8      flag of TX Push mode
+-  ``ETHTOOL_A_RINGS_RX_PUSH``               u8      flag of RX Push mode
+-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``       u32     size of TX push buffer
+-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX``   u32     max size of TX push buffer
+-  =======================================   ======  ===========================
++  =============================================  ======  =======================
++  ``ETHTOOL_A_RINGS_HEADER``                     nested  reply header
++  ``ETHTOOL_A_RINGS_RX_MAX``                     u32     max size of RX ring
++  ``ETHTOOL_A_RINGS_RX_MINI_MAX``                u32     max size of RX mini
++                                                         ring
++  ``ETHTOOL_A_RINGS_RX_JUMBO_MAX``               u32     max size of RX jumbo
++                                                         ring
++  ``ETHTOOL_A_RINGS_TX_MAX``                     u32     max size of TX ring
++  ``ETHTOOL_A_RINGS_RX``                         u32     size of RX ring
++  ``ETHTOOL_A_RINGS_RX_MINI``                    u32     size of RX mini ring
++  ``ETHTOOL_A_RINGS_RX_JUMBO``                   u32     size of RX jumbo ring
++  ``ETHTOOL_A_RINGS_TX``                         u32     size of TX ring
++  ``ETHTOOL_A_RINGS_RX_BUF_LEN``                 u32     size of buffers on the
++                                                         ring
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``             u8      TCP header / data split
++  ``ETHTOOL_A_RINGS_CQE_SIZE``                   u32     Size of TX/RX CQE
++  ``ETHTOOL_A_RINGS_TX_PUSH``                    u8      flag of TX Push mode
++  ``ETHTOOL_A_RINGS_RX_PUSH``                    u8      flag of RX Push mode
++  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``            u32     size of TX push buffer
++  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX``        u32     max size of TX push
++                                                         buffer
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH``      u32     threshold of
++                                                         TCP header / data split
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX``  u32     max threshold of
++                                                         TCP header / data split
++  =============================================  ======  =======================
+ 
+ ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT`` indicates whether the device is usable with
+ page-flipping TCP zero-copy receive (``getsockopt(TCP_ZEROCOPY_RECEIVE)``).
+@@ -927,18 +935,21 @@ Sets ring sizes like ``ETHTOOL_SRINGPARAM`` ioctl request.
+ 
+ Request contents:
+ 
+-  ====================================  ======  ===========================
+-  ``ETHTOOL_A_RINGS_HEADER``            nested  reply header
+-  ``ETHTOOL_A_RINGS_RX``                u32     size of RX ring
+-  ``ETHTOOL_A_RINGS_RX_MINI``           u32     size of RX mini ring
+-  ``ETHTOOL_A_RINGS_RX_JUMBO``          u32     size of RX jumbo ring
+-  ``ETHTOOL_A_RINGS_TX``                u32     size of TX ring
+-  ``ETHTOOL_A_RINGS_RX_BUF_LEN``        u32     size of buffers on the ring
+-  ``ETHTOOL_A_RINGS_CQE_SIZE``          u32     Size of TX/RX CQE
+-  ``ETHTOOL_A_RINGS_TX_PUSH``           u8      flag of TX Push mode
+-  ``ETHTOOL_A_RINGS_RX_PUSH``           u8      flag of RX Push mode
+-  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``   u32     size of TX push buffer
+-  ====================================  ======  ===========================
++  =========================================  ======  =======================
++  ``ETHTOOL_A_RINGS_HEADER``                 nested  reply header
++  ``ETHTOOL_A_RINGS_RX``                     u32     size of RX ring
++  ``ETHTOOL_A_RINGS_RX_MINI``                u32     size of RX mini ring
++  ``ETHTOOL_A_RINGS_RX_JUMBO``               u32     size of RX jumbo ring
++  ``ETHTOOL_A_RINGS_TX``                     u32     size of TX ring
++  ``ETHTOOL_A_RINGS_RX_BUF_LEN``             u32     size of buffers on the ring
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT``         u8      TCP header / data split
++  ``ETHTOOL_A_RINGS_CQE_SIZE``               u32     Size of TX/RX CQE
++  ``ETHTOOL_A_RINGS_TX_PUSH``                u8      flag of TX Push mode
++  ``ETHTOOL_A_RINGS_RX_PUSH``                u8      flag of RX Push mode
++  ``ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN``        u32     size of TX push buffer
++  ``ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH``  u32     threshold of
++                                                     TCP header / data split
++  =========================================  ======  =======================
+ 
+ Kernel checks that requested ring sizes do not exceed limits reported by
+ driver. Driver may impose additional constraints and may not support all
+@@ -954,6 +965,10 @@ A bigger CQE can have more receive buffer pointers, and in turn the NIC can
+ transfer a bigger frame from wire. Based on the NIC hardware, the overall
+ completion queue size can be adjusted in the driver if CQE size is modified.
+ 
++``ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH`` specifies the threshold value of
++tcp data split feature. If tcp-data-split is enabled and a received packet
++size is larger than this threshold value, header and data will be split.
++
+ CHANNELS_GET
+ ============
+ 
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index 12f6dc567598..891f55b0f6aa 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -78,6 +78,8 @@ enum {
+  * @cqe_size: Size of TX/RX completion queue event
+  * @tx_push_buf_len: Size of TX push buffer
+  * @tx_push_buf_max_len: Maximum allowed size of TX push buffer
++ * @tcp_data_split_thresh: Threshold value of tcp-data-split
++ * @tcp_data_split_thresh_max: Maximum allowed threshold of tcp-data-split-threshold
+  */
+ struct kernel_ethtool_ringparam {
+ 	u32	rx_buf_len;
+@@ -87,6 +89,8 @@ struct kernel_ethtool_ringparam {
+ 	u32	cqe_size;
+ 	u32	tx_push_buf_len;
+ 	u32	tx_push_buf_max_len;
++	u32	tcp_data_split_thresh;
++	u32	tcp_data_split_thresh_max;
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+index 283305f6b063..20fe6065b7ba 100644
+--- a/include/uapi/linux/ethtool_netlink.h
++++ b/include/uapi/linux/ethtool_netlink.h
+@@ -364,6 +364,8 @@ enum {
+ 	ETHTOOL_A_RINGS_RX_PUSH,			/* u8 */
+ 	ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,		/* u32 */
+ 	ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,		/* u32 */
++	ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH,		/* u32 */
++	ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX,	/* u32 */
+ 
+ 	/* add new constants above here */
+ 	__ETHTOOL_A_RINGS_CNT,
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 203b08eb6c6f..8bea47a26605 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -455,7 +455,7 @@ extern const struct nla_policy ethnl_features_set_policy[ETHTOOL_A_FEATURES_WANT
+ extern const struct nla_policy ethnl_privflags_get_policy[ETHTOOL_A_PRIVFLAGS_HEADER + 1];
+ extern const struct nla_policy ethnl_privflags_set_policy[ETHTOOL_A_PRIVFLAGS_FLAGS + 1];
+ extern const struct nla_policy ethnl_rings_get_policy[ETHTOOL_A_RINGS_HEADER + 1];
+-extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX + 1];
++extern const struct nla_policy ethnl_rings_set_policy[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX + 1];
+ extern const struct nla_policy ethnl_channels_get_policy[ETHTOOL_A_CHANNELS_HEADER + 1];
+ extern const struct nla_policy ethnl_channels_set_policy[ETHTOOL_A_CHANNELS_COMBINED_COUNT + 1];
+ extern const struct nla_policy ethnl_coalesce_get_policy[ETHTOOL_A_COALESCE_HEADER + 1];
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index b7865a14fdf8..c7824515857f 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -61,7 +61,9 @@ static int rings_reply_size(const struct ethnl_req_info *req_base,
+ 	       nla_total_size(sizeof(u8))  +	/* _RINGS_TX_PUSH */
+ 	       nla_total_size(sizeof(u8))) +	/* _RINGS_RX_PUSH */
+ 	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN */
+-	       nla_total_size(sizeof(u32));	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
++	       nla_total_size(sizeof(u32)) +	/* _RINGS_TX_PUSH_BUF_LEN_MAX */
++	       nla_total_size(sizeof(u32)) +	/* _RINGS_TCP_DATA_SPLIT_THRESH */
++	       nla_total_size(sizeof(u32));	/* _RINGS_TCP_DATA_SPLIT_THRESH_MAX */
  }
  
- /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
-@@ -4474,7 +4475,7 @@ void bnxt_set_ring_params(struct bnxt *bp)
- 	bp->rx_agg_ring_size = 0;
- 	bp->rx_agg_nr_pages = 0;
+ static int rings_fill_reply(struct sk_buff *skb,
+@@ -108,7 +110,13 @@ static int rings_fill_reply(struct sk_buff *skb,
+ 	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,
+ 			  kr->tx_push_buf_max_len) ||
+ 	      nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,
+-			  kr->tx_push_buf_len))))
++			  kr->tx_push_buf_len))) ||
++	    (kr->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
++	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH,
++			 kr->tcp_data_split_thresh))) ||
++	    (kr->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
++	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX,
++			 kr->tcp_data_split_thresh_max))))
+ 		return -EMSGSIZE;
  
--	if (bp->flags & BNXT_FLAG_TPA)
-+	if (bp->flags & BNXT_FLAG_TPA || bp->flags & BNXT_FLAG_HDS)
- 		agg_factor = min_t(u32, 4, 65536 / BNXT_RX_PAGE_SIZE);
+ 	return 0;
+@@ -130,6 +138,7 @@ const struct nla_policy ethnl_rings_set_policy[] = {
+ 	[ETHTOOL_A_RINGS_TX_PUSH]		= NLA_POLICY_MAX(NLA_U8, 1),
+ 	[ETHTOOL_A_RINGS_RX_PUSH]		= NLA_POLICY_MAX(NLA_U8, 1),
+ 	[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN]	= { .type = NLA_U32 },
++	[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH]	= { .type = NLA_U32 },
+ };
  
- 	bp->flags &= ~BNXT_FLAG_JUMBO;
-@@ -6421,15 +6422,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- 
- 	req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
- 	req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-+	req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
- 
--	if (BNXT_RX_PAGE_MODE(bp)) {
--		req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
--	} else {
-+	if (bp->flags & BNXT_FLAG_HDS) {
- 		req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
- 					  VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
- 		req->enables |=
- 			cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
--		req->jumbo_thresh = cpu_to_le16(bp->rx_copybreak);
- 		req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
+ static int
+@@ -155,6 +164,14 @@ ethnl_set_rings_validate(struct ethnl_req_info *req_info,
+ 		return -EOPNOTSUPP;
  	}
- 	req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index cff031993223..35601c71dfe9 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2202,8 +2202,6 @@ struct bnxt {
- 	#define BNXT_FLAG_TPA		(BNXT_FLAG_LRO | BNXT_FLAG_GRO)
- 	#define BNXT_FLAG_JUMBO		0x10
- 	#define BNXT_FLAG_STRIP_VLAN	0x20
--	#define BNXT_FLAG_AGG_RINGS	(BNXT_FLAG_JUMBO | BNXT_FLAG_GRO | \
--					 BNXT_FLAG_LRO)
- 	#define BNXT_FLAG_RFS		0x100
- 	#define BNXT_FLAG_SHARED_RINGS	0x200
- 	#define BNXT_FLAG_PORT_STATS	0x400
-@@ -2224,6 +2222,9 @@ struct bnxt {
- 	#define BNXT_FLAG_ROCE_MIRROR_CAP	0x4000000
- 	#define BNXT_FLAG_TX_COAL_CMPL	0x8000000
- 	#define BNXT_FLAG_PORT_STATS_EXT	0x10000000
-+	#define BNXT_FLAG_HDS		0x20000000
-+	#define BNXT_FLAG_AGG_RINGS	(BNXT_FLAG_JUMBO | BNXT_FLAG_GRO | \
-+					 BNXT_FLAG_LRO | BNXT_FLAG_HDS)
  
- 	#define BNXT_FLAG_ALL_CONFIG_FEATS (BNXT_FLAG_TPA |		\
- 					    BNXT_FLAG_RFS |		\
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index fdecdf8894b3..e9ef65dd2e7b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -829,12 +829,16 @@ static void bnxt_get_ringparam(struct net_device *dev,
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS) {
- 		ering->rx_max_pending = BNXT_MAX_RX_DESC_CNT_JUM_ENA;
- 		ering->rx_jumbo_max_pending = BNXT_MAX_RX_JUM_DESC_CNT;
--		kernel_ering->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_ENABLED;
- 	} else {
- 		ering->rx_max_pending = BNXT_MAX_RX_DESC_CNT;
- 		ering->rx_jumbo_max_pending = 0;
--		kernel_ering->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
- 	}
++	if (tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH] &&
++	    !(ops->supported_ring_params & ETHTOOL_RING_USE_TCP_DATA_SPLIT)) {
++		NL_SET_ERR_MSG_ATTR(info->extack,
++				    tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
++				    "setting tcp-data-split-thresh is not supported");
++		return -EOPNOTSUPP;
++	}
 +
-+	if (bp->flags & BNXT_FLAG_HDS)
-+		kernel_ering->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_ENABLED;
-+	else
-+		kernel_ering->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
-+
- 	ering->tx_max_pending = BNXT_MAX_TX_DESC_CNT;
+ 	if (tb[ETHTOOL_A_RINGS_CQE_SIZE] &&
+ 	    !(ops->supported_ring_params & ETHTOOL_RING_USE_CQE_SIZE)) {
+ 		NL_SET_ERR_MSG_ATTR(info->extack,
+@@ -196,9 +213,9 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 	struct kernel_ethtool_ringparam kernel_ringparam = {};
+ 	struct ethtool_ringparam ringparam = {};
+ 	struct net_device *dev = req_info->dev;
++	bool mod = false, thresh_mod = false;
+ 	struct nlattr **tb = info->attrs;
+ 	const struct nlattr *err_attr;
+-	bool mod = false;
+ 	int ret;
  
- 	ering->rx_pending = bp->rx_ring_size;
-@@ -854,9 +858,25 @@ static int bnxt_set_ringparam(struct net_device *dev,
- 	    (ering->tx_pending < BNXT_MIN_TX_DESC_CNT))
- 		return -EINVAL;
+ 	dev->ethtool_ops->get_ringparam(dev, &ringparam,
+@@ -222,9 +239,30 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 			tb[ETHTOOL_A_RINGS_RX_PUSH], &mod);
+ 	ethnl_update_u32(&kernel_ringparam.tx_push_buf_len,
+ 			 tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN], &mod);
+-	if (!mod)
++	ethnl_update_u32(&kernel_ringparam.tcp_data_split_thresh,
++			 tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
++			 &thresh_mod);
++	if (!mod && !thresh_mod)
+ 		return 0;
  
-+	if (kernel_ering->tcp_data_split != ETHTOOL_TCP_DATA_SPLIT_DISABLED &&
-+	    BNXT_RX_PAGE_MODE(bp)) {
-+		NL_SET_ERR_MSG_MOD(extack, "tcp-data-split can not be enabled with XDP");
++	if (kernel_ringparam.tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED &&
++	    thresh_mod) {
++		NL_SET_ERR_MSG_ATTR(info->extack,
++				    tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
++				    "tcp-data-split-thresh can not be updated while tcp-data-split is disabled");
 +		return -EINVAL;
 +	}
 +
- 	if (netif_running(dev))
- 		bnxt_close_nic(bp, false, false);
- 
-+	switch (kernel_ering->tcp_data_split) {
-+	case ETHTOOL_TCP_DATA_SPLIT_UNKNOWN:
-+	case ETHTOOL_TCP_DATA_SPLIT_ENABLED:
-+		bp->flags |= BNXT_FLAG_HDS;
-+		break;
-+	case ETHTOOL_TCP_DATA_SPLIT_DISABLED:
-+		bp->flags &= ~BNXT_FLAG_HDS;
-+		break;
++	if (kernel_ringparam.tcp_data_split_thresh >
++	    kernel_ringparam.tcp_data_split_thresh_max) {
++		NL_SET_ERR_MSG_ATTR_FMT(info->extack,
++					tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX],
++					"Requested tcp-data-split-thresh exceeds the maximum of %u",
++					kernel_ringparam.tcp_data_split_thresh_max);
++
++		return -EINVAL;
 +	}
 +
- 	bp->rx_ring_size = ering->rx_pending;
- 	bp->tx_ring_size = ering->tx_pending;
- 	bnxt_set_ring_params(bp);
-@@ -5346,6 +5366,7 @@ const struct ethtool_ops bnxt_ethtool_ops = {
- 				     ETHTOOL_COALESCE_STATS_BLOCK_USECS |
- 				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
- 				     ETHTOOL_COALESCE_USE_CQE,
-+	.supported_ring_params	= ETHTOOL_RING_USE_TCP_DATA_SPLIT,
- 	.get_link_ksettings	= bnxt_get_link_ksettings,
- 	.set_link_ksettings	= bnxt_set_link_ksettings,
- 	.get_fec_stats		= bnxt_get_fec_stats,
+ 	/* ensure new ring parameters are within limits */
+ 	if (ringparam.rx_pending > ringparam.rx_max_pending)
+ 		err_attr = tb[ETHTOOL_A_RINGS_RX];
 -- 
 2.34.1
 
