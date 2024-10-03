@@ -1,354 +1,178 @@
-Return-Path: <netdev+bounces-131644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9DF98F1E0
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:52:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058EB98F20E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:02:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D01F2B22F16
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:52:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 796601F21B1D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9248C1A073C;
-	Thu,  3 Oct 2024 14:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A79B19CCFB;
+	Thu,  3 Oct 2024 15:02:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mBSQDtpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2075.outbound.protection.outlook.com [40.107.21.75])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601C21A073F;
-	Thu,  3 Oct 2024 14:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727967088; cv=none; b=iUQ0qW+E2zsxyL+l2E7G9MUxo5dFrW6Kpm3Twf89P+fKf4ft0q7gRZxpRGSOmlfJ+x8JXnGIFx4oqdPdBT8HKwn3x6uRvDrrh8KBpJ1LWABdiH9xCuUs34wBDd5mZKfsTZseDw0oZG+F4KjXs8i6YO8Sn8yj5sSoRFsvIn3RLM0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727967088; c=relaxed/simple;
-	bh=mMWHqEzI5RUqImiCiL71OAj2kbPtTR/pYxBwLQaCjM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=j4TAAvpoH5cSeSlcKG63ouQDE9UlNmJGBUHGyIAJYEOQWtxsJwzn9YKjOc82lAqtOfxUXkSRoczkLeY645MVeIrhlgAJi49lvp9moajQnL5seAUhUXwvp6IptVDrzELskL8cnydUIrTHIq3utFkSljur1N6ApygvXvA9SDPGRz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8a7903cb7dso84698866b.3;
-        Thu, 03 Oct 2024 07:51:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727967085; x=1728571885;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tyjUgRSedfTXQK+ZkiMxukYWk3FkDdsMSbIXtv+nlds=;
-        b=n/4xiY7xl7bokCZpOK2KT8dFwx4exHBBRRxaqFq/aRsRo24K9wsvRCOFvVv4tGaG8p
-         rqAPdyKSquyaxe2+kOOSv8oqBjd6JABeHuKvj8yF2wWooNf43hSDwCn2L05nIGSbrKhe
-         8Cr3Xp3haU4NPRlJ2N9BHdpD/iGj0lIoJdKdDiFM8sGc5sPcJTtRCkwzRbkFt/ZmK0Be
-         lb6EtLmt8VSJ+bvhX9tsa0Q6VAq+sa1JRa7fZYljqDaW6zl2ZgX2tInlhr4Gm4eWn3ff
-         jrX8Z40GwWraGRh0SdHeRV/r4NvB2SFMzEbwqK/oxBI9XQxovFw6o4PN2zabETAAgbDq
-         Bysg==
-X-Forwarded-Encrypted: i=1; AJvYcCVt+S6rXX6g9ppT8YXePDvLvRRS3fglc8LaHwBXViHJrwQ78j71+rzNohwHJLL+LxCR2KPCM1B6cLzb+cc=@vger.kernel.org, AJvYcCX6P4esttaVsfqu0VBypUvrxEKr00QF0PxYEHEa3w0/lPSlQ+WF23nxAKeSEqRVhFbtLgU4WQkZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzItyz6iJeO+Tsn26Ub3s7djDXXEceVNXztRxrLhctiOmTSMj8A
-	8nPA/EaYGzUtn4NhBNtydBv0AFn277vhehM4UJzL/5F/Le6t523L
-X-Google-Smtp-Source: AGHT+IEQVfTClPZL1c1oxe0N9X5Tm3XZVs8X5lqvQXhRkvimjjgZBuSFzwXvsoEb4D3Trv7bmEGpWA==
-X-Received: by 2002:a05:6402:26d6:b0:5c4:2d14:c725 with SMTP id 4fb4d7f45d1cf-5c8b18b8cfamr7522586a12.2.1727967084486;
-        Thu, 03 Oct 2024 07:51:24 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8ca3fc877sm787470a12.53.2024.10.03.07.51.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 07:51:24 -0700 (PDT)
-Date: Thu, 3 Oct 2024 07:51:20 -0700
-From: Breno Leitao <leitao@debian.org>
-To: peterz@infradead.org, gregkh@linuxfoundation.org, pmladek@suse.com,
-	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	kuba@kernel.org
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, vschneid@redhat.com, axboe@kernel.dk
-Subject: 6.12-rc1: Lockdep regression bissected (virtio-net/console/scheduler)
-Message-ID: <20241003-savvy-efficient-locust-ae7bbc@leitao>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1171619C54D
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 15:02:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727967766; cv=fail; b=G4XjdhgLAhdoU0d6nbO0du5Bf3kZmmodMWeShsUSceRvj8yUM0eV/Nn5MTdeHugRZiqJ8oNsN4Cb1Ij4z9h4+ESXgdHLj2oyYP5S+mP7AhOcaIiNz9l7ErHWcTslimtWg3D2erzmuXpCNiX2iTdlMW0Jwn3YoMTSJRKpvhRrX/0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727967766; c=relaxed/simple;
+	bh=Bf4WiWFt5q2zie3eNUyLk/JQgV+aSHWQWXsLKKeQQBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=taA8dHcShICrbmqS01mDVcz/9GGJckJXe4MBQaqd0jpmij6pgTpEPz3UUMgi6oD/Owt8h56At7kIqxb7miGRClb+bnGl0/ykEVbPlRGMk3JROVXWSmNJq9o+1/8fQSAhjs69Q7rmmltKEZYv4z/4g0q0zIrVBul1wUQdAyvs6WI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mBSQDtpI; arc=fail smtp.client-ip=40.107.21.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HbIvEBZ+HYX+xL6E4vLZpkh8tV7j+8DUFPiIo1bedGXhpKGu8p66IJSi9sFUUR0Pbl11HFfJOBl1eHr33k1iU/WxcieZ5lOLRoRYdmMjB/qZwQaZxhF+khkqufvLtR0n4Ko9P6lyp7E2qQCQrLWVKY+MPHgni/j67qJohTFfzJ5nbcNuAthHq7QmF5DYTZ6sQQqpOe7jRzquA4vU6zOzlTcGEW8uXi7U3rqXA+S3sCP1Y6kd5eXYkscecf5DwSGU23JLZ4gmuKpi6qUiu38vnwfD2A/jm4Yz2az8XPWqJDpLcOS3YlLD2xATYWY+q4sEl5R0tCrBC5OsA3zrU0PF2Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TWGaIsPEshk/7+WnJt2iH7XHxz18VEwmTrxC/deySe0=;
+ b=XH3LRINNhMWyMhrXR2FHCsBiUBKnm2DtntfNrFNjxfrkUKzoziumJGyCf4DsJemghsT+HduuhLrIRzSMz+EkyJwFjEbbAetKjrwenuh8P0BY7e4pAtxBGatpqZwQKqnIFZkFKkwziZgzGz3RlufDBcQkZpWzzE0VwpM8gEyOCtu8IKOT9LoZEllNKwjFFSogrZfy3n7UY2SaeqMsFBtoOdLMLtHy6ZkMHmHAI+cJo8934MDMoLXF7DLS0vvUN75ib/pze8+bMLOJrVwvXnCeUOvhYsI+9dlmJ8BS25HndiHKxPfJn6o8gIDk8kulNA6MlEBblSd4xneaolpN2inApQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TWGaIsPEshk/7+WnJt2iH7XHxz18VEwmTrxC/deySe0=;
+ b=mBSQDtpIeTM8wpCF6nBFX0E8y3so524nJaap+fbR6lKydI4Ft5lYfoQW6qc7BYVA4x8bginvTE1gt3U4QdfFdVPyUHXxUDiyyk2yR9Tjc3WSscb13nCHiddCIqTy5ahnN311gFBAVb7UxrlagK+kH4BNiWqDUhSWvEjG11yCy2rFy5GJ6LKEb3r/xBEMBJxKGTyef9chHX3MifMckmN3W+dnOzzvRjsvKMFTbCUWEDXksZKGnCHm+h4s0vLpV7Qrzts0pXzLCeIgLkwnTAKAgrCUmS38M2Ur1FkytTUNEEzZuO5FbI2WG0YtZcJj7xzX0CbgtAVUywZqVq5lHp0flA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by VI1PR04MB6831.eurprd04.prod.outlook.com (2603:10a6:803:135::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
+ 2024 15:02:39 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.7982.033; Thu, 3 Oct 2024
+ 15:02:39 +0000
+Date: Thu, 3 Oct 2024 18:02:36 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH net-next v2 01/10] lib: packing: refuse operating on bit
+ indices which exceed size of buffer
+Message-ID: <20241003150236.w4dpvqwfqnyfudhg@skbuf>
+References: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-0-8373e551eae3@intel.com>
+ <20241002-packing-kunit-tests-and-split-pack-unpack-v2-1-8373e551eae3@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-1-8373e551eae3@intel.com>
+X-ClientProxiedBy: VI1PR0202CA0014.eurprd02.prod.outlook.com
+ (2603:10a6:803:14::27) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI1PR04MB6831:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc131fff-23ad-4381-3ee5-08dce3bc6c71
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?UoIrWsp1aL2VyzSQtZos/BvRZ4fsWXOAiv/fzl5rEpBo/2aPirX0qWy4E80t?=
+ =?us-ascii?Q?b1FQoTcieSyiF2t7PCSE6g4UzRv8LH0DFJ0XITnCLSmvcuChpX0zjad6/2EL?=
+ =?us-ascii?Q?V3otCpCd2ZMh+8c3mLD7mohUJHNIILoMNtm0ApB2395B7jrDr9590UlQTGvs?=
+ =?us-ascii?Q?ljbCs33G29t99kaZDDMg4lNdOtH57bXYofNwkuPi/P1WL0W1wHd6NgKcJZX8?=
+ =?us-ascii?Q?xqz8X/sltxeHDz9YVUNAwsz9f/QlKun7rLwh1bnf0/tWbQuq2o4wWWL2Bm+E?=
+ =?us-ascii?Q?JnX1ixB9nvuojdWJBgEUk1vscFpMe6wnMmR0ct3vHNhFnCFn2+9FrhfCuPnK?=
+ =?us-ascii?Q?g2XAkmhyTE6ifDCkyaZjkl0Bh4fT91/HNlM75O4Wu1lTisneFlukmUy7AsxW?=
+ =?us-ascii?Q?H/tvsqhBzDR6yACp+IKFpzfoADRy/e2bS+ZU0Qt6rI/SzEQi4IiXpGlR0FtG?=
+ =?us-ascii?Q?I9PwLmXWJy2bwjqRrjtxCTTkH8JgMQaufH3/WdPVavQwPPNxe7Ue/vVbYer6?=
+ =?us-ascii?Q?QqmpQljAy8Stg1k25VTSmsn/oXNkXpPDf45SxMnjn9AFrWWi6+QMS7ADkcYE?=
+ =?us-ascii?Q?0jcm9SvklrOQu8+YOLOf84f9x85j7mxoSstUuEkfr4GVhRbkwp00chp8/4yV?=
+ =?us-ascii?Q?WroJOI/rfGWViBw4Qn1I6naWK+o1vKONkjD4Eiq/kfLrwcj3TtCMd6M3zAz5?=
+ =?us-ascii?Q?4GrFJd5G7LbQsxu6fLkIRKaFO16XlUPqaFKPw67ImQtTe9zcdxUa3xN/zwUF?=
+ =?us-ascii?Q?WlJVmUDxCkDo/CAFFQXHLd33Iola6LQaMqcLNOQTLTx9cVS69zsyGvmqX+6P?=
+ =?us-ascii?Q?haMWMH55an8LOsOwmJQ+h9z4xXiy1aow1yLpYImxQIupnOEAbwUGyn1mdzl2?=
+ =?us-ascii?Q?ZO8IOOi5QxRaJGc3cZz99Fs2lPlJqGYCXwYv1Qa+8y5MhGTrpWpj2uSl1ryd?=
+ =?us-ascii?Q?NZdi0wmNoZkVj9RioUMgER0+PZC4OqAzUKPfK8IAAtESLjah8k34duAHFH9p?=
+ =?us-ascii?Q?0drZkCVBaV1hJdkx9L8ZIbine/FC28xbSxbq2hJSWmYTvCHsYJ/oEre/LdLl?=
+ =?us-ascii?Q?AoMxUOC0syDwUgMFXp8fWwSvC3HWxx1D+UtBjzkXWE99HPufMxMtP2iiY95o?=
+ =?us-ascii?Q?aEzgSapVULfAW1FDb/BLfxBlJ01h7fwdTMNihLXxVVhOxcmc/mm40FMEuVBD?=
+ =?us-ascii?Q?iQesFOJpZTeWcPfEZ2ePOp3CACB4ex/Nl9VwQpQ4gZlEA+WC5bdWZyVJfspg?=
+ =?us-ascii?Q?Y4FKuDcCU4usmrb/Zv/1m2Hs+PjugLHc03MmMRQfKg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?n7+I8WsQP3WbVel8zxONJ72vbMbNWIwAVPHCLyVkgyZJuhc9bfo0zu74+vIe?=
+ =?us-ascii?Q?Eulpc8kDJGBUWejl+39A6Ou4rOQQ5dVUi002ANKh/g4vdgK84w2SdaTAUbgC?=
+ =?us-ascii?Q?zBx5GIIKhC6oJZkzPycxbMC+FTLnhrQ4Qr/3U0StJ+MPxdBK+MkI0sI1d3Na?=
+ =?us-ascii?Q?JSeKsnqBbvG5Rn60Q3QPen8fEnUONHCO6z/0/0iEyqc9V89p6yidgA2iYKlo?=
+ =?us-ascii?Q?bqPew1Jgm5gDM1kASO3vmTiCkAo101jQ8wL3TBeMQ+2Mnxo2Q4pElVV6zwPJ?=
+ =?us-ascii?Q?n4KsLLnrc1eO1uClCuk6Smcic9/eubH2gMKSqCR4x4pCNHZ4WFYNdKM4yD2P?=
+ =?us-ascii?Q?imKhx7+x0uv0cby6I/qzx4Uw5mmgZDzcYIG0f07cwPU1xYfKATDjtvE6Na3W?=
+ =?us-ascii?Q?B5tK9Crsjnn4ywKz32tTLTlgDvIXnNYcuNOY/GaHai0p3VoKggh8XiGfm6ca?=
+ =?us-ascii?Q?d4V/Ke31CzUHRsddWBzW2UdhIEQ/6DhV9oXzF1Mw0b9BXOeY+r2uAyVJwqb9?=
+ =?us-ascii?Q?llH666HPOQr5pYS8O1yyX+0wjldyRigrk1UXXDfzJ7/g8XO3M5Y7HctKZ7p7?=
+ =?us-ascii?Q?Rnj7i2xK/5vAuLxXGoL6mEXWtyNIMrAdsFtHzH64B48CQSgRtmThNgMej2AP?=
+ =?us-ascii?Q?/c8nWjxo1nBDWKjw4oCFZ2Y8z2Mj9btiYPJysdNQ4a3UEC72AmCi8SRMF5QS?=
+ =?us-ascii?Q?4gRFR+tpb6u3Z+cFOaYfA6Yz5RgSItSIz63L4qQDnj9381aqLJ1tYoEDsNlp?=
+ =?us-ascii?Q?LnL0AX9Pf6qKJFaCbxzqSoIBojPBNfIjoCrrs2727NVGl1zc9MoRCHkgwrpd?=
+ =?us-ascii?Q?uE7F8Oe/TVeWhLWdjLtuW0u6w/OXrugc7vqdcnS+ORm+dqM4eyQ6hSrDh3y2?=
+ =?us-ascii?Q?mv+QmWGWewu/ppdn5owahycD1vy+8VdBF7I65LfZQB0szDSJugs1k1AYldtZ?=
+ =?us-ascii?Q?Vjwlvk0xlP/fJvB6Z7gyPfizk0KhWvCCs5NjZhRoHorrkzhozC3m6XVpgixP?=
+ =?us-ascii?Q?pXQ5FPicyy4g1m5ST6tKBruRGELc/OgyNog7Pc4IWkN2SzIdwOeBfigPt82g?=
+ =?us-ascii?Q?ik7aEQt9xgJFRzd1ULy9PiErhTtR+A5PcTKaF1rgaaYYTz1IPXUexIqDGqyu?=
+ =?us-ascii?Q?CIyl2Bz3tTJIaivZhrot/U1WyRxo3rJDJJVMpERNtyUA3MgJsaXH05oyrSd4?=
+ =?us-ascii?Q?yVE/3TAL/J16efqdjXlIaeA61myfkIes3MED0nU2VdWoT6egUlSUV3y14au7?=
+ =?us-ascii?Q?Ls2oK0YK/VHR376L3dt4BMdQJBHoPOOFQBtmlbbAHMiRQprsZ9ZfYuAHHl8e?=
+ =?us-ascii?Q?75FbAV9vO3lmQquzRJoQ4/CglHa6UHPBrePUSLSv+LDlii6JaijV5wFDOxvd?=
+ =?us-ascii?Q?NBBrau8wULjL/dnAouo7LEpm4/ZF2ILAGSQJE+85+pktADYcRBmFTa7fCCUo?=
+ =?us-ascii?Q?aYQ1NZvz/znNHZootcQpiYXxdrKHjTe2ViS1WDdW+kUs5xFHzQtOH1JXf+C1?=
+ =?us-ascii?Q?np8rS26bko6/C7M0xZ0VoDCZxo9mCmBUi1LKSx3Yd9kkaAvfTg3JIAL2If+3?=
+ =?us-ascii?Q?kHS9viT0ObZgrdE9tKHmB/HyPZEg/15YIP9gfTgnFcHU6P6hd/samQ1Q1uBj?=
+ =?us-ascii?Q?vQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc131fff-23ad-4381-3ee5-08dce3bc6c71
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 15:02:39.4411
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ODdcNS1DBMleV0Y2fpI+Puy59tYEJU6NBdNN3zA/t5yzXtaV10pEtdVawHnniRHDNxvDQ11+FKk+0o9ktLefpg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6831
 
-Upstream kernel (6.12-rc1) has a new lockdep splat, that I am sharing to
-get more visibility:
+On Wed, Oct 02, 2024 at 02:51:50PM -0700, Jacob Keller wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> 
+> While reworking the implementation, it became apparent that this check
+> does not exist.
+> 
+> There is no functional issue yet, because at call sites, "startbit" and
+> "endbit" are always hardcoded to correct values, and never come from the
+> user.
+> 
+> Even with the upcoming support of arbitrary buffer lengths, the
+> "startbit >= 8 * pbuflen" check will remain correct. This is because
+> we intend to always interpret the packed buffer in a way that avoids
+> discontinuities in the available bit indices.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Tested-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> ---
 
-	WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
-
-This is happening because the HARDIRQ-irq-unsafe "_xmit_ETHER#2" lock is
-acquired in virtnet_poll_tx() while holding the HARDIRQ-irq-safe, and
-lockdep doesn't like it much.
-
-I've bisected the problem, and weirdly enough, this problem started to
-show up after a unrelated(?) change in the scheduler:
-
-	52e11f6df293e816a ("sched/fair: Implement delayed dequeue")
-
-At this time, I have the impression that the commit above exposed the
-problem that was there already.
-
-Here is the full log, based on commit 7ec462100ef91 ("Merge tag
-'pull-work.unaligned' of git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs")
-
-	=====================================================
-	WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
-	6.12.0-rc1-kbuilder-00046-g7ec462100ef9-dirty #19 Not tainted
-	-----------------------------------------------------
-	swapper/0/1 [HC0[0]:SC0[0]:HE0:SE1] is trying to acquire:
-	ffff88810497c318 (_xmit_ETHER#2){+.-.}-{3:3}, at: virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-
-	and this task is already holding:
-	ffffffff82a83a88 (console_owner){-...}-{0:0}, at: console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	which would create a new lock dependency:
-	 (console_owner){-...}-{0:0} -> (_xmit_ETHER#2){+.-.}-{3:3}
-
-	but this new dependency connects a HARDIRQ-irq-safe lock:
-	 (console_owner){-...}-{0:0}
-
-	... which became HARDIRQ-irq-safe at:
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	console_flush_all (kernel/printk/printk.c:1905 kernel/printk/printk.c:3086 kernel/printk/printk.c:3180) 
-	console_unlock (kernel/printk/printk.c:3239 kernel/printk/printk.c:3279) 
-	wake_up_klogd_work_func (kernel/printk/printk.c:4466) 
-	irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-	update_process_times (kernel/time/timer.c:2524) 
-	tick_handle_periodic (kernel/time/tick-common.c:120) 
-	__sysvec_apic_timer_interrupt (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./arch/x86/include/asm/trace/irq_vectors.h:41 arch/x86/kernel/apic/apic.c:1044) 
-	sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1037 arch/x86/kernel/apic/apic.c:1037) 
-	asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702) 
-	clear_page_erms (arch/x86/lib/clear_page_64.S:50) 
-	alloc_pages_bulk_noprof (mm/page_alloc.c:? mm/page_alloc.c:4660) 
-	__vmalloc_node_range_noprof (mm/vmalloc.c:? mm/vmalloc.c:3646 mm/vmalloc.c:3828) 
-	dup_task_struct (kernel/fork.c:314 kernel/fork.c:1115) 
-	copy_process (kernel/fork.c:2207) 
-	kernel_clone (kernel/fork.c:2787) 
-	kernel_thread (kernel/fork.c:2849) 
-	kthreadd (kernel/kthread.c:414 kernel/kthread.c:765) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-
-	to a HARDIRQ-irq-unsafe lock:
-	 (_xmit_ETHER#2){+.-.}-{3:3}
-
-	... which became HARDIRQ-irq-unsafe at:
-	...
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	_raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138) 
-	virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4384 drivers/net/virtio_net.c:2768 drivers/net/virtio_net.c:2821) 
-	__napi_poll (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/napi.h:14 net/core/dev.c:6772) 
-	net_rx_action (net/core/dev.c:6842 net/core/dev.c:6962) 
-	handle_softirqs (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:555) 
-	do_softirq (kernel/softirq.c:455) 
-	__local_bh_enable_ip (kernel/softirq.c:?) 
-	virtnet_open (drivers/net/virtio_net.c:2877 drivers/net/virtio_net.c:2925) 
-	__dev_open (net/core/dev.c:1476) 
-	dev_open (net/core/dev.c:1513) 
-	netpoll_setup (net/core/netpoll.c:701) 
-	init_netconsole (drivers/net/netconsole.c:1261 drivers/net/netconsole.c:1312) 
-	do_one_initcall (init/main.c:1269) 
-	do_initcall_level (init/main.c:1330) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-
-	other info that might help us debug this:
-
-	 Possible interrupt unsafe locking scenario:
-
-	       CPU0                    CPU1
-	       ----                    ----
-	  lock(_xmit_ETHER#2);
-				       local_irq_disable();
-				       lock(console_owner);
-				       lock(_xmit_ETHER#2);
-	  <Interrupt>
-	    lock(console_owner);
-
-	 *** DEADLOCK ***
-
-	5 locks held by swapper/0/1:
-	#0: ffffffff82a836b8 (console_mutex){+.+.}-{4:4}, at: register_console (kernel/printk/printk.c:113 kernel/printk/printk.c:3933) 
-	#1: ffffffff82a83ab0 (console_lock){+.+.}-{0:0}, at: _printk (kernel/printk/printk.c:2435) 
-	#2: ffffffff82a836f0 (console_srcu){....}-{0:0}, at: console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	#3: ffffffff82a83a88 (console_owner){-...}-{0:0}, at: console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	#4: ffffffff83183f80 (printk_legacy_map-wait-type-override){....}-{4:4}, at: console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-
-	the dependencies between HARDIRQ-irq-safe lock and the holding lock:
-	-> (console_owner){-...}-{0:0} ops: 2187 {
-	   IN-HARDIRQ-W at:
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	console_flush_all (kernel/printk/printk.c:1905 kernel/printk/printk.c:3086 kernel/printk/printk.c:3180) 
-	console_unlock (kernel/printk/printk.c:3239 kernel/printk/printk.c:3279) 
-	wake_up_klogd_work_func (kernel/printk/printk.c:4466) 
-	irq_work_run_list (kernel/irq_work.c:222 kernel/irq_work.c:252) 
-	update_process_times (kernel/time/timer.c:2524) 
-	tick_handle_periodic (kernel/time/tick-common.c:120) 
-	__sysvec_apic_timer_interrupt (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./arch/x86/include/asm/trace/irq_vectors.h:41 arch/x86/kernel/apic/apic.c:1044) 
-	sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1037 arch/x86/kernel/apic/apic.c:1037) 
-	asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702) 
-	clear_page_erms (arch/x86/lib/clear_page_64.S:50) 
-	alloc_pages_bulk_noprof (mm/page_alloc.c:? mm/page_alloc.c:4660) 
-	__vmalloc_node_range_noprof (mm/vmalloc.c:? mm/vmalloc.c:3646 mm/vmalloc.c:3828) 
-	dup_task_struct (kernel/fork.c:314 kernel/fork.c:1115) 
-	copy_process (kernel/fork.c:2207) 
-	kernel_clone (kernel/fork.c:2787) 
-	kernel_thread (kernel/fork.c:2849) 
-	kthreadd (kernel/kthread.c:414 kernel/kthread.c:765) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-	   INITIAL USE at:
-	 }
-	... key at: console_owner_dep_map+0x0/0x28 
-
-	the dependencies between the lock to be acquired
-	 and HARDIRQ-irq-unsafe lock:
-	-> (_xmit_ETHER#2){+.-.}-{3:3} ops: 5 {
-	   HARDIRQ-ON-W at:
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	_raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138) 
-	virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4384 drivers/net/virtio_net.c:2768 drivers/net/virtio_net.c:2821) 
-	__napi_poll (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/napi.h:14 net/core/dev.c:6772) 
-	net_rx_action (net/core/dev.c:6842 net/core/dev.c:6962) 
-	handle_softirqs (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:555) 
-	do_softirq (kernel/softirq.c:455) 
-	__local_bh_enable_ip (kernel/softirq.c:?) 
-	virtnet_open (drivers/net/virtio_net.c:2877 drivers/net/virtio_net.c:2925) 
-	__dev_open (net/core/dev.c:1476) 
-	dev_open (net/core/dev.c:1513) 
-	netpoll_setup (net/core/netpoll.c:701) 
-	init_netconsole (drivers/net/netconsole.c:1261 drivers/net/netconsole.c:1312) 
-	do_one_initcall (init/main.c:1269) 
-	do_initcall_level (init/main.c:1330) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-	   IN-SOFTIRQ-W at:
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	_raw_spin_lock (./include/linux/spinlock_api_smp.h:133 kernel/locking/spinlock.c:154) 
-	virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	__napi_poll (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/napi.h:14 net/core/dev.c:6772) 
-	net_rx_action (net/core/dev.c:6842 net/core/dev.c:6962) 
-	handle_softirqs (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:555) 
-	do_softirq (kernel/softirq.c:455) 
-	__local_bh_enable_ip (kernel/softirq.c:?) 
-	virtnet_open (drivers/net/virtio_net.c:2919) 
-	__dev_open (net/core/dev.c:1476) 
-	dev_open (net/core/dev.c:1513) 
-	netpoll_setup (net/core/netpoll.c:701) 
-	init_netconsole (drivers/net/netconsole.c:1261 drivers/net/netconsole.c:1312) 
-	do_one_initcall (init/main.c:1269) 
-	do_initcall_level (init/main.c:1330) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-	   INITIAL USE at:
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	_raw_spin_trylock (./include/linux/spinlock_api_smp.h:90 kernel/locking/spinlock.c:138) 
-	virtnet_poll (./include/linux/spinlock.h:? ./include/linux/netdevice.h:4384 drivers/net/virtio_net.c:2768 drivers/net/virtio_net.c:2821) 
-	__napi_poll (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/napi.h:14 net/core/dev.c:6772) 
-	net_rx_action (net/core/dev.c:6842 net/core/dev.c:6962) 
-	handle_softirqs (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:555) 
-	do_softirq (kernel/softirq.c:455) 
-	__local_bh_enable_ip (kernel/softirq.c:?) 
-	virtnet_open (drivers/net/virtio_net.c:2877 drivers/net/virtio_net.c:2925) 
-	__dev_open (net/core/dev.c:1476) 
-	dev_open (net/core/dev.c:1513) 
-	netpoll_setup (net/core/netpoll.c:701) 
-	init_netconsole (drivers/net/netconsole.c:1261 drivers/net/netconsole.c:1312) 
-	do_one_initcall (init/main.c:1269) 
-	do_initcall_level (init/main.c:1330) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-	 }
-	... key at: netdev_xmit_lock_key+0x10/0x390 
-	 ... acquired at:
-	_raw_spin_lock (./include/linux/spinlock_api_smp.h:133 kernel/locking/spinlock.c:154) 
-	virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	netpoll_poll_dev (net/core/netpoll.c:167 net/core/netpoll.c:180 net/core/netpoll.c:210) 
-	netpoll_send_skb (net/core/netpoll.c:360 net/core/netpoll.c:386) 
-	netpoll_send_udp (net/core/netpoll.c:494) 
-	write_ext_msg (drivers/net/netconsole.c:1187) 
-	console_flush_all (kernel/printk/printk.c:3009 kernel/printk/printk.c:3093 kernel/printk/printk.c:3180) 
-	console_unlock (kernel/printk/printk.c:3239 kernel/printk/printk.c:3279) 
-	vprintk_emit (kernel/printk/printk.c:?) 
-	_printk (kernel/printk/printk.c:2435) 
-	register_console (kernel/printk/printk.c:4070) 
-	init_netconsole (drivers/net/netconsole.c:1344) 
-	do_one_initcall (init/main.c:1269) 
-	do_initcall_level (init/main.c:1330) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-
-
-	stack backtrace:
-	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-	Call Trace:
-	 <TASK>
-	dump_stack_lvl (lib/dump_stack.c:123) 
-	__lock_acquire (kernel/locking/lockdep.c:? kernel/locking/lockdep.c:2888 kernel/locking/lockdep.c:3165 kernel/locking/lockdep.c:3280 kernel/locking/lockdep.c:3904 kernel/locking/lockdep.c:5202) 
-	? virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	lock_acquire (kernel/locking/lockdep.c:5825) 
-	? virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	? lock_acquire (kernel/locking/lockdep.c:5825) 
-	? down_trylock (kernel/locking/semaphore.c:?) 
-	_raw_spin_lock (./include/linux/spinlock_api_smp.h:133 kernel/locking/spinlock.c:154) 
-	? virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969) 
-	netpoll_poll_dev (net/core/netpoll.c:167 net/core/netpoll.c:180 net/core/netpoll.c:210) 
-	netpoll_send_skb (net/core/netpoll.c:360 net/core/netpoll.c:386) 
-	netpoll_send_udp (net/core/netpoll.c:494) 
-	? console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	write_ext_msg (drivers/net/netconsole.c:1187) 
-	? console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	? console_flush_all (kernel/printk/printk.c:1905 kernel/printk/printk.c:3086 kernel/printk/printk.c:3180) 
-	? console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	console_flush_all (kernel/printk/printk.c:3009 kernel/printk/printk.c:3093 kernel/printk/printk.c:3180) 
-	? console_flush_all (./include/linux/rcupdate.h:? ./include/linux/srcu.h:267 kernel/printk/printk.c:288 kernel/printk/printk.c:3157) 
-	console_unlock (kernel/printk/printk.c:3239 kernel/printk/printk.c:3279) 
-	vprintk_emit (kernel/printk/printk.c:?) 
-	_printk (kernel/printk/printk.c:2435) 
-	register_console (kernel/printk/printk.c:4070) 
-	init_netconsole (drivers/net/netconsole.c:1344) 
-	? option_setup (drivers/net/netconsole.c:1301) 
-	do_one_initcall (init/main.c:1269) 
-	? __lock_acquire (kernel/locking/lockdep.c:?) 
-	? __lock_acquire (kernel/locking/lockdep.c:?) 
-	? stack_depot_save_flags (lib/stackdepot.c:664) 
-	? stack_depot_save_flags (lib/stackdepot.c:664) 
-	? __create_object (mm/kmemleak.c:763) 
-	? lock_acquire (kernel/locking/lockdep.c:5825) 
-	? __create_object (mm/kmemleak.c:763) 
-	? __create_object (mm/kmemleak.c:766) 
-	? parse_args (kernel/params.c:153 kernel/params.c:186) 
-	do_initcall_level (init/main.c:1330) 
-	? kernel_init (init/main.c:1471) 
-	do_initcalls (init/main.c:1344) 
-	kernel_init_freeable (init/main.c:1584) 
-	? rest_init (init/main.c:1461) 
-	kernel_init (init/main.c:1471) 
-	ret_from_fork (arch/x86/kernel/process.c:153) 
-	? rest_init (init/main.c:1461) 
-	ret_from_fork_asm (arch/x86/entry/entry_64.S:257) 
-	 </TASK>
-	printk: legacy console [netcon0] enabled
-	netconsole: network logging started
-
-PS: I've hacked around and removed the target_list_lock lock
-completely, and I still see the problem, so, that lock doesn't seem to
-be related to the problem.
-
-Thanks,
---breno
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
