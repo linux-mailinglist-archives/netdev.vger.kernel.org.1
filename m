@@ -1,89 +1,178 @@
-Return-Path: <netdev+bounces-131489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A1698EA2C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:12:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B4C298EA33
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:14:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 395B5289DF9
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:12:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA71FB24343
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E153E499;
-	Thu,  3 Oct 2024 07:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA07983CD6;
+	Thu,  3 Oct 2024 07:14:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="gCruPBG0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vQAXQ38L"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5C01C32;
-	Thu,  3 Oct 2024 07:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FEAA839E3
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 07:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727939566; cv=none; b=GuPm0nlVrphRU7BV13AH6KqrOqrU7m75ccl9/LO3QL3E7HAXIyaEf5mDSxcddVVyUvWcVK7ue8V7rTXuay0Wa+vJocNn4yUFDNNoHfPLch7wlrFQ/Xsq7YEDwcg6BL82wlXFKNWapGJoS6Xw9eBuyKrD3P0CYmpYrK7FRox+NZY=
+	t=1727939680; cv=none; b=GROukEYgXmI9RSn06k5FjZItSAn6/C2XgGX9H/pOAol97C8KH+DKglpi/DBA1yD9Zy9xnyGqCp4cC2eSaOJihAIMZNdOsd1cE7KHTT+Qtuhn4OSa3KkiJ1RzSn9LjPyF3d0viyBdDjdCii83ssOOwYcIIZsDhuDn/Pg3lpm1OJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727939566; c=relaxed/simple;
-	bh=AbxBJ8jQbUTVnKA3XMDHmLQwB5GMdgU0fC03kqEvmOI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KlKrIGkLFxwrakbe8vUuwPsQJmKUtSIYjWtNFpV99ohcr0A87j5GvErCeA8B6c7M7cfd1zB6ChTZWEkrA7mkHZVcK2ryTTq/Db0jN7SPKIQHyIcuy5jFEhO0P30iPieqsFyq8zGMI3pcuJw6D3KFax1u/Wf1WeUMEngN/Czh9Gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=gCruPBG0; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from [192.168.2.107] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 1DD0BC044D;
-	Thu,  3 Oct 2024 09:12:34 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1727939554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m0dsqakMl0Qo2qi7ICa5Db++dTZCWUSpG9tmMvl634U=;
-	b=gCruPBG0jyZctBiJQkQaWgoENu8opL5kB2de4gvNujfeEagiTipzy6ykvwAF6b/PMBch7G
-	4ZtPc/XaITXEDdo+O7is8xNQ8VzUJZKILikbw/+oAC0Uyj3JItVoPDwiI4E+gJb9DHvVDM
-	RE1DNI4sR5/8Mh7hwyQ9HFu/3Qp/HXv+PHD2skQqvgPWTPN5e3G2Dsr6uUwSmF35p6VtYN
-	CbmlBqffKENgSI7opKjLNnipSHE/RXDibNO+vo9VbUdN2U5/Fk488D2kzrKQj+BXQw/bp6
-	XtGkHhIE6mGMT0vnSDkWxUHoyCMcVPD9rKNH0hQqTtGjSkeaBv+lPWN2knVupA==
-Message-ID: <2f0f000d-412b-487e-b416-cb10eb04be6a@datenfreihafen.org>
-Date: Thu, 3 Oct 2024 09:12:33 +0200
+	s=arc-20240116; t=1727939680; c=relaxed/simple;
+	bh=jVV8jOhZdzb4iNhy6FgpnRXbN2bvdSfG8IkJGvxsBaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B9XSBUirylc9/U5iSyxzQFN6wdWnSXqB1LcsW2uHUvyG8ZSSRvXG0o13cMqYHfl1kqHqOupeODsRn3/K5aF6pfcxYl/CYK+JEVg5LKCvVmBubuB9vcAbd9XLGFi4PYoQph/I3eN9yHRXsRKE1XeSsz38aJflDxRTweyROk06V/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vQAXQ38L; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4582fa01090so188501cf.0
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 00:14:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727939678; x=1728544478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UT6P3qI8aqfj6sm8kEA9BN2oWMh9ZC2nrd3bGHqEq48=;
+        b=vQAXQ38L+VitBK3KxPrOhvi/CwrxdyD/5lEnAbUUziLDRLmKztnP1mJcWsACIKZWVv
+         cHd6Oi6352GkJ7ar1P9jk1EO0dbfyC1r9BbyOhWgv26sXTiIKIi+eh6XwK2HbfeM5F/q
+         XjKtEKGqLtbYtm/htEzPrK6XMjz/4T6dcPz+gCc/5T0JhqV8qbEfIg36tsXR97+3DUTy
+         f7a1qwZ9bqa6HoFVkm/8NQ9xJP4hrG1+NN0GQ6Mf44zMW/pxSyzlkw4ZXzQht6LdcNRc
+         TrukoEZjTRodgIZRcO1Y+zGmc/uVBAuhwPd0UC6vmVd+fO12P28z1yplirVmwCEhpTM+
+         MRvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727939678; x=1728544478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UT6P3qI8aqfj6sm8kEA9BN2oWMh9ZC2nrd3bGHqEq48=;
+        b=F6qgV1MH6bir5aPq+Hm9eBg56LD7w7jembRnZON3JU6WC3kLBJkbF6BlsTWtB0kjO+
+         SO3ERvJ7/A1hMzmLi0nM2FjLLdX//zVy/paPzYuvIyyPQnjTdd5eWEIxpC0+wohE5HTd
+         9vHx6uOZO+0B/1vjPH7ISMlTSPq5ypJZ519ql3PuGGkQwegH+kCnH2+9KggYmkw2usb8
+         mhRvR9xIjT3qYP9FXLhYlETupEiQse/1cQvPouiv2IAipEY9C8KzTAduq4CMhF3Mt2vo
+         KpREAMDcufaCSlDoe2FLnKyu/cyY6g+qeWxXB90txsc6Hm9PlAhNmrkLmXZnCT+sFufF
+         wb9A==
+X-Gm-Message-State: AOJu0Yya/xvhGEMAEcuih5Ks8mjTAMFt1robhMjd0HbHBTtCjOazGcbV
+	nJqN2hwPBX4z0WhREnCRgVoCY2Paqth53NoQ6NSEAWWlPiD1IaGHYhP3yt8NLFcgFZzYwncDTWL
+	yP85afRQmY6ROKdzE369PWmSHTpr1TasiKcbR
+X-Google-Smtp-Source: AGHT+IE1jwK+fLdh17wchpTZTlyKKjBUmf8cpDI457MyIR4cMbjE2zBpkUOAcmQFiddSFKKZQntYNjRBaRlQ5xGGtdQ=
+X-Received: by 2002:a05:622a:860b:b0:45c:9eab:cce0 with SMTP id
+ d75a77b69052e-45d8fa49632mr1747791cf.15.1727939677626; Thu, 03 Oct 2024
+ 00:14:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: pull-request: ieee802154 for net 2024-09-27
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
-References: <20240927094351.3865511-1-stefan@datenfreihafen.org>
- <20241002170814.0951e6be@kernel.org>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20241002170814.0951e6be@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-10-sdf@fomichev.me>
+In-Reply-To: <20240930171753.2572922-10-sdf@fomichev.me>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 3 Oct 2024 00:14:25 -0700
+Message-ID: <CAHS8izNK+DiQUUkkvnPQvBRJiQ32WRO0Crg=nvOW9vn_4kCE+Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 09/12] selftests: ncdevmem: Remove hard-coded
+ queue numbers
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Jakub,
+On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.m=
+e> wrote:
+>
+> Use single last queue of the device and probe it dynamically.
+>
 
-On 10/3/24 02:08, Jakub Kicinski wrote:
-> On Fri, 27 Sep 2024 11:43:50 +0200 Stefan Schmidt wrote:
->> Jinjie Ruan added the use of IRQF_NO_AUTOEN in the mcr20a driver and fixed and
->> addiotinal build dependency problem while doing so.
->>
->> Jiawei Ye, ensured a correct RCU handling in mac802154_scan_worker.
-> 
-> Sorry for the delay, conferences and travel..
+Sorry I know there was a pending discussion in the last iteration that
+I didn't respond to. Been a rough week with me out sick a bit.
 
-No worries, just wanted to make sure it did not got lost.
+For this, the issue I see is that by default only 1 queue binding will
+be tested, but I feel like test coverage for the multiple queues case
+by default is very nice because I actually ran into some issues making
+multi-queue binding work.
 
-regards
-Stefan Schmidt
+Can we change this so that, by default, it binds to the last rxq_num/2
+queues of the device?
+
+> Cc: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/ncdevmem.c | 40 ++++++++++++++++++++++++--
+>  1 file changed, 38 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
+ests/net/ncdevmem.c
+> index a1fa818c8229..900a661a61af 100644
+> --- a/tools/testing/selftests/net/ncdevmem.c
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -48,8 +48,8 @@ static char *server_ip;
+>  static char *client_ip;
+>  static char *port;
+>  static size_t do_validation;
+> -static int start_queue =3D 8;
+> -static int num_queues =3D 8;
+> +static int start_queue =3D -1;
+> +static int num_queues =3D 1;
+>  static char *ifname;
+>  static unsigned int ifindex;
+>  static unsigned int dmabuf_id;
+> @@ -198,6 +198,33 @@ void validate_buffer(void *line, size_t size)
+>         fprintf(stdout, "Validated buffer\n");
+>  }
+>
+> +static int rxq_num(int ifindex)
+> +{
+> +       struct ethtool_channels_get_req *req;
+> +       struct ethtool_channels_get_rsp *rsp;
+> +       struct ynl_error yerr;
+> +       struct ynl_sock *ys;
+> +       int num =3D -1;
+> +
+> +       ys =3D ynl_sock_create(&ynl_ethtool_family, &yerr);
+> +       if (!ys) {
+> +               fprintf(stderr, "YNL: %s\n", yerr.msg);
+> +               return -1;
+> +       }
+> +
+> +       req =3D ethtool_channels_get_req_alloc();
+> +       ethtool_channels_get_req_set_header_dev_index(req, ifindex);
+> +       rsp =3D ethtool_channels_get(ys, req);
+> +       if (rsp)
+> +               num =3D rsp->rx_count + rsp->combined_count;
+> +       ethtool_channels_get_req_free(req);
+> +       ethtool_channels_get_rsp_free(rsp);
+> +
+> +       ynl_sock_destroy(ys);
+> +
+> +       return num;
+> +}
+> +
+>  #define run_command(cmd, ...)                                           =
+\
+>         ({                                                              \
+>                 char command[256];                                      \
+> @@ -672,6 +699,15 @@ int main(int argc, char *argv[])
+>
+>         ifindex =3D if_nametoindex(ifname);
+>
+> +       if (start_queue < 0) {
+> +               start_queue =3D rxq_num(ifindex) - 1;
+
+I think the only changes needed are:
+
+start_queue =3D rxq_num(ifindex) / 2;
+num_queues =3D rxq_num(ifindex) - start_queue;
+
+(I may have an off-by-1 error somewhere with this math).
+
+
+--=20
+Thanks,
+Mina
 
