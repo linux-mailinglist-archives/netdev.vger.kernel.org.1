@@ -1,190 +1,128 @@
-Return-Path: <netdev+bounces-131754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8465498F6F3
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:20:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0AA98F70A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8ABA1C2251E
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2358C282EB5
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D163C1ABEBB;
-	Thu,  3 Oct 2024 19:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788B81A4F23;
+	Thu,  3 Oct 2024 19:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QlaqJiir"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NAIYuWtg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D7838DE0;
-	Thu,  3 Oct 2024 19:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94951A4F11;
+	Thu,  3 Oct 2024 19:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727983238; cv=none; b=N5ZaViVQiV+fM8cSGN7Gk0/KszI4qxoISQl1ALc23XzJ7M4Rdv9d3nfbS6RPZJZsSJyX9YE/6qg+KeJrKjMI6TAFtG+aK/i4cmh6B9ba3gwumK+izjZ9+0hGKtDqShrEKXFmZAnxQEtJZ0igTKvmVjz0dGDB5MvmHz4Dv3AygCs=
+	t=1727984033; cv=none; b=ZarPmxJH9YJMJkl2KukGb5V093C0lTKx2mhTE6StlxRs3kZ0edZ/uHkrKfSMY78XbYpZEJYqcZ0exrlAkXRlXHa4s2R7tZgf2mBeJna+zPEg+RWF1SYibnwZJzw1jjVurdB6kWXsyathAz4GUxI+CMLUY979uqXQ31MNfqkKURU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727983238; c=relaxed/simple;
-	bh=QcfpdhefRiCULY44xNpETpqBhegGJWDF9Zfep6H9ARQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bH3gQhNNaZ/8Bh1+jfsnwOLtSKyjYcf4agbERGyTQ8Yyi5jBU4QbgPReWT9gkanISh8raTnPf8X2iPskBdsG0zvy47BoM6MLBUqe67GVEvhMyXlH+nIIbIAhyKfab2JA070uih809xNUrAoHAuNogjXwvv+SKif/LxMej0VKLz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QlaqJiir; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 493HxbUI027450;
-	Thu, 3 Oct 2024 19:20:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=jx+Ty2cDthS2j1kWE+LI3v+F
-	3BsTWfmEG1aD2+Ghh8g=; b=QlaqJiir0lOh+GrXjCea/m42d4g8GWdIcJK4doWS
-	7HUWbj0H02X/MT8j9hW5fUmO7ej184A9feROq5AJkSzST4X3oD1+B2O2+BVaPTLs
-	IiG6ZEAf+YisEFw84hBcgTFP8r9wiThHuwR8zBQFDlfsUrIdbVc7SEe9LMSlr2yT
-	RsANc3Miyf8MfiH6Dkxf9bOAsO1k9C3PasVZ5AXifulzNPg/uQLHjQxUhuZrxbrE
-	XdlQW5g2ri2b5Nrb+B6VMe3ALt+OqibkXBvOiC5RdHJcl4W0aJuNJcuJrUYT20AC
-	qwittnw7DZWsQQjOfZOotTmamt4h1Wsvosw7w+iS9/RswQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42205h85yx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Oct 2024 19:20:15 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 493JKEIF028671
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 3 Oct 2024 19:20:14 GMT
-Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 3 Oct 2024 12:20:13 -0700
-Date: Thu, 3 Oct 2024 12:20:12 -0700
-From: Bjorn Andersson <quic_bjorande@quicinc.com>
-To: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
-CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
-        Andy Gross
-	<agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Bhupesh Sharma
-	<bhupesh.sharma@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
-        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
-        <john@phrozen.org>, Luo Jie
-	<quic_luoj@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Suruchi
- Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-        "Lei Wei (QUIC)"
-	<quic_leiwei@quicinc.com>
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-Message-ID: <Zv7ubCFWz2ykztcR@hu-bjorande-lv.qualcomm.com>
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
- <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+	s=arc-20240116; t=1727984033; c=relaxed/simple;
+	bh=uXXiy3CDBHNaH/C3GOZsmW94+Ui2mvqAwft1q99gfGc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DlS0fUBXl2iJBxGl5CXLVHz4kYc7At1nuxuJ68PDfWuRmyfyQtuPDAr9zyUaRZHn6kelVuD4X3I48hkuupZIbu1/dV7KL/Bkc6b6zC9JoKy6Ry1xa0mWzKCsA2EKFE4j0q6411hN0WgZAIe3ybdIffjajcQQ9mIIdyjjq4HFq0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NAIYuWtg; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5398e33155fso1761350e87.3;
+        Thu, 03 Oct 2024 12:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727984030; x=1728588830; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uXXiy3CDBHNaH/C3GOZsmW94+Ui2mvqAwft1q99gfGc=;
+        b=NAIYuWtgwOEsdGuFa24+cOQLtD2KfJqThbSiEHUffjru+p0/tGx+xA5eqn1tuk2yw/
+         Puvlm7HwBldFT92nG48UCkh1e1uw9qKax7EXMd3+/9kBYLdT7Y96pU3eGPjkAKxnJuDK
+         N27IbM6nVXXjfuPDyZYlp2E+qey6X0Ud7MKn4Y4l9YljqrgojAYZfjTZydsGQEP/efhI
+         ur/jgVJFsfcMT5kL1H7EisdnQs8DLNDnyiwi9kSXcnDiBvya4R5IcQWjb3w94XXt4ccf
+         x62zcbQYO0D+hoTz+Xttlpcofk6CAUxvORMZzCTZPgj6rX5AJ8v58cL4mXQyC6jxk3ml
+         u6GQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727984030; x=1728588830;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uXXiy3CDBHNaH/C3GOZsmW94+Ui2mvqAwft1q99gfGc=;
+        b=Qxvv8A1tj9rR3X6m6lzhuZAvjOeE137UmPdw7EYN1dsBKWQNokedULDtqWl3X9EbCz
+         0lHWKcnFOUXv5TKkuH3uv0jeCNavPk/zEDSrCP7avj6l+u2Y5OeRtRO5jB9Odfg2b7Fb
+         hjrqGKkWU/f5lr0PoFZWYObOIIZ4Nb938r/7NQEHUrCe+zAEFosy3DKXxwQ5Hgry1ISw
+         1ZbJ2sZEcOFp/tgnZm6T9VxO55KpXmxEVapQlP+43av8LcD+UuO6O+NQbdFaIb5BcvbC
+         Y5XZmGqIZXs8CmGY/L9ECfunMLAe5Ipuk3v+wkgHvRmpq74M4T8xOHL5Ma6Bi/UCPTqT
+         Cz2g==
+X-Forwarded-Encrypted: i=1; AJvYcCUmPfpAYey1ovnLDaJX0oz8AwF0+L8P86cffbFO5z2SQcBOlO8GLrOtpa+tIvrfN2C0Z2yWq5g2@vger.kernel.org, AJvYcCXV5nOFvr0LscBewFw5vWg7TT7Xw+iEVanjm/BGmrtH/xhqfJp2aNaqiyzKtOkJXPE674F8a7x19IE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkV0E/UZyb9jhL+gX9PW/I6LRWqCqcNcrVhurD5wOAXGPJvwat
+	ICZH22y1Ntbas4wkyc7EaLpKVH5kspIwRF7599JAzKwSzJ+EdZDoVpJyTn6HMPoi0kaO6edWBnw
+	Ky9m9qbdqp4d3LFCTHHNc2C8kbo4=
+X-Google-Smtp-Source: AGHT+IHRtmv0ckL7GXfX+oTsUF4M9NlC/p+f0YiVbxvf1ASoSAnVP9w89lUbQubCgzlUBZ5Yob9qA1DwgCTKgp/XrUw=
+X-Received: by 2002:a05:6512:138b:b0:52f:2ea:499f with SMTP id
+ 2adb3069b0e04-539ab8780cfmr263404e87.24.1727984029684; Thu, 03 Oct 2024
+ 12:33:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: PIjJt4geeiesuDk8JlZI-dtUD6i0DB5Q
-X-Proofpoint-ORIG-GUID: PIjJt4geeiesuDk8JlZI-dtUD6i0DB5Q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- malwarescore=0 clxscore=1011 mlxlogscore=999 phishscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 spamscore=0
- bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410030136
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-4-ap420073@gmail.com>
+ <CAHS8izM1H-wjNUepcmFzWvpUuTZvt89_Oba=KaDpeReuMURvQw@mail.gmail.com>
+In-Reply-To: <CAHS8izM1H-wjNUepcmFzWvpUuTZvt89_Oba=KaDpeReuMURvQw@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 4 Oct 2024 04:33:38 +0900
+Message-ID: <CAMArcTX0sD9T2qhoKEswVp3CNVjOchZyEqypBcjMNtQRHBfk5w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/7] net: ethtool: add support for configuring tcp-data-split-thresh
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
-> On 10/3/2024 2:58 AM, Andrew Lunn wrote:
-> > On Thu, Oct 03, 2024 at 02:07:10AM +0530, Kiran Kumar C.S.K wrote:
-[..]
-> >> 2. List of patch series and dependencies
-> >> ========================================
-> >>
-> >> Clock drivers (currently in review)
-> >> ===================================
-> >> 1) CMN PLL driver patch series:
-> >> 	Currently in review with community.
-> >> 	https://lore.kernel.org/linux-arm-msm/20240827-qcom_ipq_cmnpll-v3-0-8e009cece8b2@quicinc.com/
-> >>
-> >>
-> >> 2) NSS clock controller (NSSCC) driver patch series
-> >> 	Currently in review with community.
-> >> 	https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
-> >>
-> >>
-> >> Networking drivers (to be posted for review next week)
-> >> ======================================================
-> >>
-> >> The following patch series are planned to be pushed for the PPE and PCS
-> >> drivers, to support ethernet function. These patch series are listed
-> >> below in dependency order.
-> >>
-> >> 3) PCS driver patch series:
-> >>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
-> >>         be enabled in drivers/net/pcs/
-> >> 	Dependent on NSS CC patch series (2).
-> > 
-> > I assume this dependency is pure at runtime? So the code will build
-> > without the NSS CC patch series?
-> 
-> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
-> PCS's MII channels. To represent this in the DTS, the PCS node in the
-> DTS is configured with the MII Rx/Tx clock that it consumes, using
-> macros for clocks which are exported from the NSS CC driver in a header
-> file. So, there will be a compile-time dependency for the dtbindings/DTS
-> on the NSS CC patch series. We will clearly call out this dependency in
-> the cover letter of the PCS driver. Hope that this approach is ok.
-> 
+On Fri, Oct 4, 2024 at 3:25=E2=80=AFAM Mina Almasry <almasrymina@google.com=
+> wrote:
+>
+> On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wr=
+ote:
+> >
+> > The tcp-data-split-thresh option configures the threshold value of
+> > the tcp-data-split.
+> > If a received packet size is larger than this threshold value, a packet
+> > will be split into header and payload.
+>
+> Why do you need this? devmem TCP will always not work with unsplit
+> packets. Seems like you always want to set thresh to 0 to support
+> something like devmem TCP.
+>
+> Why would the user ever want to configure this? I can't think of a
+> scenario where the user wouldn't want packets under X bytes to be
+> unsplit.
 
-So you're not going to expose these clocks through the common clock
-framework and use standard DeviceTree properties for consuming the
-clocks?
-
-I expect the bindings for these things to go through respective tree
-(clock and netdev) and then the DeviceTree source (dts) addition to go
-through the qcom tree.
-
-The only remaining dependency I was expecting is the qcom tree depending
-on the clock and netdev trees to have picked up the bindings, and for
-new bindings I do accept dts changes in the same cycle (I validate dts
-against bindings in linux-next).
-
-Regards,
-Bjorn
-
-> > 
-> > This should be a good way to start, PCS drivers are typically nice and
-> > simple.
-> > 
-> 
-> Sure, thanks for the inputs.
-> 
-> > 	Andrew
-> 
-> 
+I totally understand what you mean,
+Yes, tcp-data-split is zerocopy friendly option but as far as I know,
+this option is not only for the zerocopy usecase.
+So, If users enable tcp-data-split, they would assume threshold is 0.
+But there are already NICs that have been supporting tcp-data-split
+enabled by default.
+bnxt_en's default value is 256bytes.
+If we just assume the tcp-data-split-threshold to 0 for all cases,
+it would change the default behavior of bnxt_en driver(maybe other drivers =
+too)
+for the not zerocopy case.
+Jakub pointed out the generic case, not only for zerocopy usecase
+in the v1 and I agree with that opinion.
+https://lore.kernel.org/netdev/20240906183844.2e8226f3@kernel.org/
 
