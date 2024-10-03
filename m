@@ -1,144 +1,126 @@
-Return-Path: <netdev+bounces-131601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8049B98EFDE
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:59:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC45398EFE1
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:00:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18E81C20C6E
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7FF1C20EDD
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:00:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABA4198852;
-	Thu,  3 Oct 2024 12:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 694E7174EFC;
+	Thu,  3 Oct 2024 13:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SaN3Gw8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434DD155314;
-	Thu,  3 Oct 2024 12:59:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E982F12CDA5;
+	Thu,  3 Oct 2024 13:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727960396; cv=none; b=cIoyj/T//xBrrMJ1+Al+iRdSUQQJs+/Lr4SHeCkLfWFlQ7zfrOPZdx0z7KB77FSOYj8AAQRWG4nGeZdVuh+MnTVDbqDJRb/8mCiqEkl/Zmrec52sVmAJ0DCfTqpOB9cJbTfPfd6YVwhl0L60SU51ekWgiA9jjezW2XLG518o8Go=
+	t=1727960439; cv=none; b=YigfKD3avXniMTAe0rEQMugDLn0k4Hp+aQc+Qx7u2DFh55IGzSyB/gu5ImrWW3qriaEenlEvo7gtal/bwhmhPAh7wUok7Qm5F+aqi8Rhpdk+UoNgmmbJKa5l4RVChqTWoyX9z9eLixZ4/WIpRGA2vLGPaClHfMHVC2mQR5/MOpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727960396; c=relaxed/simple;
-	bh=PTNIJBDutOvlmo3BkQFp9X55W62sCcVJ1Q6khxnJeRI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=JUJUY0CuZGA8pFcOL8YfbCRcUAqs169Pq6UCpwLJqqNCj6ziEI+xN64HWC2WxhaXeybqYIJAFZV5HyQTbRDSRZIH75e1uzitYbj4PkG+atXB8MYJeVbNpJnnulWKLpA7RMY/0es/75MTo3xLPPmrAGV1ZCbDhK+I73U1SCqhrCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XKBVv2rFfz1HKSN;
-	Thu,  3 Oct 2024 20:55:51 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id AE6BD140118;
-	Thu,  3 Oct 2024 20:59:50 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Oct 2024 20:59:46 +0800
-Message-ID: <bc7afd55-f560-7439-2806-a1f9e73307a0@huawei-partners.com>
-Date: Thu, 3 Oct 2024 15:59:42 +0300
+	s=arc-20240116; t=1727960439; c=relaxed/simple;
+	bh=lr1LcrlZiAs3pzclK8WLXSAmyjiu/JdtDjy9KqWpOl0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CXdg2EyuWkAcx4RxYl4bIIdpxVU5GuTg4FhZ3p/PJMy2qULNOBVedq4v9e4ztdOKq9DcBXNIUDkk+/iXY8Fg681AgpztbgDdz2wEkI11Ooyrdq96T0SQfL6Oc+MS3wMA9YpRVszK8pMfl/l4RsIvdTDhiYhvNn7DpACPYQslcR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SaN3Gw8e; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7d4fa972cbeso565231a12.2;
+        Thu, 03 Oct 2024 06:00:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727960437; x=1728565237; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kNStZ17uWpYU/jURve9EvXV7ntb2QbEt0z1Hbrg+6RI=;
+        b=SaN3Gw8e/Rq8NH5cLHzJ15/QItzF4WQ7o44Z6zWqhChXzYpPvBC7k1R4Zx0QUIQPb5
+         MnTVEly1UebFTb8XjF513eaSN/b7RJH6MOeo+W149fXVXKvbvCfBlAHv239E5dL5Cf+Y
+         e1LBX0AJnWcBbfLwQbn7ZUDDWM9epieOhV/rGri412QkvrEWcn4srTMUEF/acvHgJene
+         gW7hDm9g8mVAgQkQjtBZRE5iRn+kB2kqWfk89oI/JAXMoA2MDpml9TwmPGmJDfw0L72g
+         TTJBabargbP40Zllqa5LjA4El17UlFbCljdCiuYAvrCRg3hnmC/zHJ3LYWRjKiT51iae
+         9U3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727960437; x=1728565237;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kNStZ17uWpYU/jURve9EvXV7ntb2QbEt0z1Hbrg+6RI=;
+        b=tNsfdQIVLBOXOROu68eHPDiLDV1RZoaKYJ0Ex4FqI7EX+uLMTWQ7WT7wnBn8UsHfCV
+         wRqYM1tsTjs4/qJISsHMRyeVkungQ2wmAGdqx7R240YwIdsPMK7AhWWf0S72BC+SUJr/
+         cTVc9JjV1d/ZHjbShC6ZuILUzAsYzd7cdgxFJKGy4UvDn4kb+FHxFqUi9iTOvJ0DkLTH
+         XkluWOlYtyw2a0szSYsRoDFU0iWNrSwavXReXisHy09uAExC9cFEKSJNF5AjAyluQVdc
+         86YPtQt3L/LfmL4otmmx6ht12lDtLUZ47lFPHLML3evoz/d70V8Y7Jww/zrQe75W0BHE
+         C4tg==
+X-Forwarded-Encrypted: i=1; AJvYcCUD1PT1XS4iLvpkBNlXm4FH2f9rdarsdadaABxeAQixWt5mCpGHS3lS/t9Q6E6EOEMWj8+50Jg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQWHlj8Patplyw4vmK5aueRMniRKuVCMLc3Spv0y2SnM1yhhX0
+	ZW5UBMMM89u/RC88BSmAgZu1SKsT2emkV06EqvpVI37kysSthJ5U
+X-Google-Smtp-Source: AGHT+IHlS4Q8FtWOWYBJbJh3/oZyzRizXMY9jYwFIye5OLUfQgTnyFLvAaRC+XJAItdrwrI59oxp9g==
+X-Received: by 2002:a05:6a20:6f02:b0:1cf:3677:1c4a with SMTP id adf61e73a8af0-1d5dc378445mr9796636637.16.1727960436925;
+        Thu, 03 Oct 2024 06:00:36 -0700 (PDT)
+Received: from google.com ([2620:15c:9d:2:fba0:f631:4ed6:4411])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9ddbaf7sm1245476b3a.136.2024.10.03.06.00.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 06:00:36 -0700 (PDT)
+Date: Thu, 3 Oct 2024 06:00:33 -0700
+From: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: linux-kernel@vger.kernel.org, amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>, Kees Cook <kees@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Andy Shevchenko <andriy.shevchenko@intel.com>
+Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
+ warning
+Message-ID: <Zv6VccBLviQ2ug6h@google.com>
+References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 17/19] samples/landlock: Replace atoi() with
- strtoull() in populate_ruleset_net()
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-18-ivanov.mikhail1@huawei-partners.com>
- <ZvbLcsQVTs_RESx0@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZvbLcsQVTs_RESx0@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
 
-On 9/27/2024 6:12 PM, Günther Noack wrote:
-> On Wed, Sep 04, 2024 at 06:48:22PM +0800, Mikhail Ivanov wrote:
->> Add str2num() helper and replace atoi() with it. atoi() does not provide
->> overflow checks, checks of invalid characters in a string and it is
->> recommended to use strtol-like functions (Cf. atoi() manpage).
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   samples/landlock/sandboxer.c | 27 ++++++++++++++++++++++++++-
->>   1 file changed, 26 insertions(+), 1 deletion(-)
->>
->> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
->> index e8223c3e781a..d4dba9e4ce89 100644
->> --- a/samples/landlock/sandboxer.c
->> +++ b/samples/landlock/sandboxer.c
->> @@ -150,6 +150,26 @@ static int populate_ruleset_fs(const char *const env_var, const int ruleset_fd,
->>   	return ret;
->>   }
->>   
->> +static int str2num(const char *numstr, unsigned long long *num_dst)
->> +{
->> +	char *endptr = NULL;
->> +	int err = 1;
->> +	unsigned long long num;
->> +
->> +	errno = 0;
->> +	num = strtoull(numstr, &endptr, 0);
->> +	if (errno != 0)
->> +		goto out;
->> +
->> +	if (*endptr != '\0')
->> +		goto out;
->> +
->> +	*num_dst = num;
->> +	err = 0;
->> +out:
->> +	return err;
->> +}
-> 
-> I believe if numstr is the empty string, str2num would return success and set
-> num_dst to 0, which looks unintentional to me.
+Hi Przemek,
 
-Yeap.. I'll fix this
+On Thu, Oct 03, 2024 at 01:39:06PM +0200, Przemek Kitszel wrote:
+> @@ -167,14 +172,25 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
+>  	CLASS(_name, __UNIQUE_ID(guard))
+>  
+>  #define __guard_ptr(_name) class_##_name##_lock_ptr
+> +#define __is_cond_ptr(_name) class_##_name##_is_conditional
+> +
+> +#define __scoped_guard_labeled(_label, _name, args...)			\
+> +	for (CLASS(_name, scope)(args);					\
+> +	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
 
-> 
-> Do we not have a better helper for this that we can link from here?
+It would be great if you added the comment that "!__is_cond_ptr(_name)"
+condition ensures that the compiler does not believe that it is possible
+to skip the loop body because it does not realize that
+"__guard_ptr(_name)(&scope)" will never return 0 for unconditional
+locks. You have the explanation in the patch description, but I think it
+is worth to reiterate here as well.
 
-I've checked how such convertion is performed in selftests by another
-subsystems and it seems that most common practise is to implement static
-helper or inline convertion in the needed place (e.g. safe_int() in
-selftests/net/af_unix/scm_pidfd.c).
+> +		     ({ goto _label; }))				\
+> +		if (0)							\
+> +		_label:							\
+> +			break;						\
+> +		else
+> +
 
-> 
->> +
->>   static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>   				const __u64 allowed_access)
->>   {
->> @@ -168,7 +188,12 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>   
->>   	env_port_name_next = env_port_name;
->>   	while ((strport = strsep(&env_port_name_next, ENV_DELIMITER))) {
->> -		net_port.port = atoi(strport);
->> +		if (str2num(strport, &net_port.port)) {
->> +			fprintf(stderr,
->> +				"Failed to convert \"%s\" into a number\n",
->> +				strport);
->> +			goto out_free_name;
->> +		}
->>   		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
->>   				      &net_port, 0)) {
->>   			fprintf(stderr,
->> -- 
->> 2.34.1
->>
+Reviewed-by: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+
+Thanks.
+
+-- 
+Dmitry
 
