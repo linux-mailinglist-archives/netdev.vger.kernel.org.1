@@ -1,93 +1,99 @@
-Return-Path: <netdev+bounces-131461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526B898E8B6
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:13:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F0098E8BC
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:14:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BAAA2880FE
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:13:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B37761F2697F
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AEE1773A;
-	Thu,  3 Oct 2024 03:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4501DFED;
+	Thu,  3 Oct 2024 03:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NXjqBkm9"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YWrwhQTw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80EDD2110E
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43B018054
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727925185; cv=none; b=ihGeDcPE+4zSAJWh5pseAzVltm1sXaoWYLrStoK1dtEzkXTmwkTiq9ps4lGov7ov51tsYA1UJIzlUuHdeJqg7a8dQjrOLPiu+eA8N3Z26Fc5s3bbWjkqNGm8BhTzzOoqPCQA1Aq8lWw00AqfZnygnKFE+y9bTYiekXQbx51NPuQ=
+	t=1727925238; cv=none; b=nRKbL4/bUlvBCPLVpPWiaas1n7fID4C+nbYVa57XRNtOrITz2bj2zqK2sc6/3V2UpiX0LRTfNcPI9T1N2fEm6mGUPiFWu1UP4Uqh6aZ4ddSHjoVz67APs2ajwCW0QIeafXHnmwo+I0PxC3PGh96XZRJ5S346R60yU0JAnrc4AJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727925185; c=relaxed/simple;
-	bh=WNH9m7oSKrJZw54TGS0RBsxtbwg8NG5IpLwClC/rRXU=;
+	s=arc-20240116; t=1727925238; c=relaxed/simple;
+	bh=5+h99kabD+aHpEeObIYxehKcMaIL5s5vAVRxNp76T28=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qHumdZ8qDS4d4bf6ArLtwOT97RvSM/3qDdHvheP1EQEQS18sr0VuomLqH7UVX5Bk899pDllwWAE9U6kFhx8W7fDw12eHZ2BkL5vRxVMMN4zTka7sbLZXPxeklbQc06Ik4rm3nD/MS+X5TyWp9M1LT9jxVFDRDrI3CvFbcbMxj2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NXjqBkm9; arc=none smtp.client-ip=209.85.208.182
+	 To:Cc:Content-Type; b=qgQF4R1x+1QK1feCzo68rmY1sPuy1zbTZ6dYivqzCOuDra/VeDeB89Szjvc3AGBP7zxDxrnUPU1XJ5cvtOu2cwOMQdPzTPRSxl85YAVOL+QJxPhlp6bMDEVUi3oozrfdChOfC7fP0YZ1D7xy4335/2+VLhXOCr3wIDT8Gc+oSdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YWrwhQTw; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fad8337aa4so5934001fa.0
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:13:02 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53959a88668so524609e87.2
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:13:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1727925181; x=1728529981; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1727925235; x=1728530035; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNH9m7oSKrJZw54TGS0RBsxtbwg8NG5IpLwClC/rRXU=;
-        b=NXjqBkm9pBWarfUltPW9NN7uyGiehahIud91huwh3C6kSiY2tPC/Sik5//TUTE13dc
-         i5U2U17qU/vUfSslb+G5IDbkLD2gyhJNeidDPj85EQ5uiTTHvD4jZd809F/bExIVAfsa
-         JYAatIFyIyppF2tKZRtAsS9PHMbJLU2aLxzjM=
+        bh=5+h99kabD+aHpEeObIYxehKcMaIL5s5vAVRxNp76T28=;
+        b=YWrwhQTw4pBcSvp04eOxUW0qPsqIEy31WXI/yucwyE4s0MevUmuZ8Yfue1PqUXDykY
+         bEQHMqbHRTNOne+ILB5rou6PSYuy8qI4CPyP8yxuzMvSi+B8A8GiYiCHDl+kXkFvFV64
+         e2y3anm/Z5+3+KKHCU+y4iNDSBU212sIJ6FPQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727925181; x=1728529981;
+        d=1e100.net; s=20230601; t=1727925235; x=1728530035;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WNH9m7oSKrJZw54TGS0RBsxtbwg8NG5IpLwClC/rRXU=;
-        b=RA+2GXOxXaDE0552Wx6cceMc+nZ5DE13v5/vpUDpu7k+z9R1vvHaGRiqo2oyPvhr35
-         mHIzqvy+CtokPob7+PuAwI2D2YXI3MlryJWiH315AiLnHM/yBdjM6p5IdIW9oi3ODSIl
-         1TfOQDmSrNQo18GICs+s8D/E0kBM5Rs6AF0V1FihQ6G4GznBK2UCZ0NpW6OiXYicXgBg
-         +PXoDPFqpO7nDLaAfbyYLIDgWgLKk41V/BUIBZTVeDGUp2P9oyqquanCeIQ9MI5HhkCx
-         q8UpEGyQoRxHjVS7zvcejn8oAg6mhYfGWI1hSr0Oa9YIU5kIJTvQvpIYW8grsd67PuWL
-         VmuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ213qOlehwQYbTNcKnyqfoMLyx7IoBLc8qkJH0vkSfgjjUXPMGwk91O94rRgc7uO24LWQbbQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6gwUdTjqwnA9GbdwAaaw17VtfyTZuQH8br+fUNPBvEa/YdYWD
-	vwaXaEpNh27oBx4wbAjpthO25TSUJ5g4Sq4s2/XQMbUdsg8x/NoeEScCr2KRnei5hK3XWCInZVv
-	jSPggc5M9f/NhHdbKqRwQGKwPOqshtJBLPgDd
-X-Google-Smtp-Source: AGHT+IGS/f7PEmJxBvVUaKxsuwXZlqo7IOhPhFmxlQ0mvZBLHMY0o4SABbxap95G7qfmRKNtRc+UPY9uykbvHnW8dbo=
-X-Received: by 2002:a05:651c:508:b0:2f6:1d35:1491 with SMTP id
- 38308e7fff4ca-2fae1013f1fmr31409131fa.15.1727925180630; Wed, 02 Oct 2024
- 20:13:00 -0700 (PDT)
+        bh=5+h99kabD+aHpEeObIYxehKcMaIL5s5vAVRxNp76T28=;
+        b=SLPkBZ6MEgtja+8kNR3vpqO+ol3rN0W7XSItQDncKqe0MXzIHN8BuswCA3SRavJ8TX
+         44bLu0ZRu+H27fEVk/QJSMOhOlKirH8nBCsf9/zG9QOF4rlP9eWYDOQd9vv9DX8Y+udm
+         Pk68djVHi1bJgQ2fMqtzfQoq1g8nT6UG4fZqsVyVnXAweRAhF4i0CwDVTZBh5i4v+/Pj
+         RHJadwb841MbzKzNkVCYS0KZbIpNulRuYoZtfvMuQd2kbzZC2nWYTXMsFLCdyl6WrXrq
+         POIOarRHDT+TqUpNMpgmXmmBU3I2bCnV53NhlcN4eOPzkPtxx8D2IQFJKD46RlmZZU8f
+         yaRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVNIu6nuUKZlOz56LN8HGpdRtCIFr/v0q4LfXVMkAvkEQGxGkgjYatItXgEAMBo2E6aK+qEY0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMdnvm6TplTeMu6tar/ue7o/KMyKOOrM8l5jB6fATSB65jUy0n
+	UCi7k+U7pVpMrDJgUHGfmJKg9lYEGtOveuB9cV2RjaQBoHkuhLBrqV7Mfe6ExBRJ7T9FVYe7uKS
+	nmCmo85ctzKU38ioFpUIw0w225w0IskjHBEy6YnfBLsymxS3Nhw==
+X-Google-Smtp-Source: AGHT+IFsDIEa6b1kpLCtg+SjFxqKgeTDehldgZSoZoD/3l3UxDUajBUqRQ+tEZSCotBSJhKoQWkbcYzZDvFD+YQvuUI=
+X-Received: by 2002:a05:6512:694:b0:539:8d46:4746 with SMTP id
+ 2adb3069b0e04-539a07aa3b0mr2590601e87.60.1727925234751; Wed, 02 Oct 2024
+ 20:13:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002115304.15127-6-przemyslaw.kitszel@intel.com> <20241002115304.15127-9-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20241002115304.15127-9-przemyslaw.kitszel@intel.com>
+References: <20241002115304.15127-6-przemyslaw.kitszel@intel.com> <20241002115304.15127-8-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20241002115304.15127-8-przemyslaw.kitszel@intel.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 3 Oct 2024 08:42:48 +0530
-Message-ID: <CAH-L+nMMkbKSdrObGOat+mjfoJUkWj_jOr2emCpDyLmJO98FUw@mail.gmail.com>
-Subject: Re: [PATCH iwl-next 3/4] ice: minor: rename goto labels from err to unroll
+Date: Thu, 3 Oct 2024 08:43:42 +0530
+Message-ID: <CAH-L+nOAu_FCu9HpmaDWnhE+wy2wpc6Q9izBSgv0x_Huco__cQ@mail.gmail.com>
+Subject: Re: [PATCH iwl-next 2/4] ice: split ice_init_hw() out from ice_init_dev()
 To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
 	netdev@vger.kernel.org, Marcin Szycik <marcin.szycik@linux.intel.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009d4268062389eefb"
+	boundary="000000000000d6c8b6062389f173"
 
---0000000000009d4268062389eefb
+--000000000000d6c8b6062389f173
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Oct 2, 2024 at 5:23=E2=80=AFPM Przemek Kitszel
 <przemyslaw.kitszel@intel.com> wrote:
 >
-> Clean up goto labels after previous commit, to conform to single naming
-> scheme in ice_probe() and ice_init_dev().
+> Split ice_init_hw() call out from ice_init_dev(). Such move enables
+> pulling the former to be even earlier on call path, what would enable
+> moving ice_adapter init to be between the two (in subsequent commit).
+> Such move enables ice_adapter to know about number of PFs.
+>
+> Do the same for ice_deinit_hw(), so the init and deinit calls could
+> be easily mirrored.
+> Next commit will rename unrelated goto labels to unroll prefix.
 >
 > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
@@ -100,7 +106,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh A P
 
---0000000000009d4268062389eefb
+--000000000000d6c8b6062389f173
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -172,14 +178,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIBmXkTR2Wzn5k6w9A+WgRNTurC7KmCm6Q2UXqIp6MPJMMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMTMwMVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIFw6UdsE6xjfdYsXsi4HGGk10beNr1vKmC2X52bxfNb1MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMTM1NVowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB+c/Fja1rf
-KTUNNcX/zMSwPBgGQTCTpjdDfIHt+8BKZe1SHHBMv9yXUPEkXB6VMehN/srBVvziK5P5QflwIuiY
-+IQHy0QCERXYZprNoQJddHrqQ7mg3BiFuFwGyIveMXuIAVE3xcAOJYGhRy6k3Qk3HulzOjwtx/J5
-58X8oWhNM5STnmCpx5wE+nmaHs4FgOt6M3EIq19g0MyCgBkWz7PChcfpAJehCZdIZRxZtwGWAx+m
-QvxZVPcTWX+eMNQbJalzqVPGVRIg1j6FB81J/PCeJU/5qdggdJtIK9+E7cGWm6EB3ubhptDYi0OD
-wHLn0WZKK0iOnplAO0K0LQUtBWlG
---0000000000009d4268062389eefb--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA6S/GPxKcU
+KIZ1PCCOrXx83wvjO1YOOhK9WPisdzlZrZYazoVLkJsiVsBZ1uW1S642pOvi+iCRtf9BP4N8XpBf
+JTXIfnSYL1oJBci9Yp1EB2RtN5fzvY6CZTq8qqKsO2qY1SkJSFEjyWyOQ3EtXW1+ImC4lMbvYeyj
+phTuyDk1zDjimglri3g2JsWnZH+kHBg35YbqRYnJpB03klBOeXsvwnXIQqazUfp5+pKBpylTjw6I
+vRgM1IcexvGndE/tN1pC+HQGWUZqNn6VlaYt901TKBARWkk3BplAiKsqtgDU1MDRAWRjOEk+Wq0b
+QOxUKWK+YeSkeaplS61b1mhIgAIp
+--000000000000d6c8b6062389f173--
 
