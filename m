@@ -1,148 +1,120 @@
-Return-Path: <netdev+bounces-131704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31E698F4F1
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:16:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D560898F4F4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 849EF1F22D4D
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133861C220D1
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DEF15573B;
-	Thu,  3 Oct 2024 17:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4F419B3F9;
+	Thu,  3 Oct 2024 17:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OSb5Jy0h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0RaiNPX9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 682AB433C1;
-	Thu,  3 Oct 2024 17:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23E01A706F
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 17:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727975768; cv=none; b=FxjBbjyWlYZvgOXHaB4QeTGh0LwIbeYVrLQWH5Pa8BisLSiJmNwLTsAVPsaSjXvoSrbp9K2TGaAB7GU+AnX6HesrEUD+AmUcTMgr9GHwF8oEPyb9GiR7jciveOfloRQC8D8WLVo0u774w9S9iQXPyRpyTMlxoEBMIEfhU9f2k+I=
+	t=1727975780; cv=none; b=gYGo6fB2Le+sWSIDz41Aie3Vyn7mUgViS1WB64YXJSgiRB6uG11+LG+KL1mWipTwe7AMoHdQ8ZDe/Y/RNJ/P31vhV1e+1qxTuBrxPoQmi8WgBNwKL66H2iih8o3KthfWoBuPKSnR642HspVQOaXfY/uvf7n40pspteIPI76es5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727975768; c=relaxed/simple;
-	bh=CL7Wg3gj21GB9l7D+2NEX51041pZBv1itNXrHcCFX6I=;
+	s=arc-20240116; t=1727975780; c=relaxed/simple;
+	bh=oBWAOxTJg0yaB5zjKAtG0+tumBmdEJ4QO3UVHRcx0hk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KOUHlQddogQLH4HI17gbtp1rHr+aEyXZNdElGEElYDtOmc3KVFh9Slm5mgnshWUhUIUJe5XOxm2DIMwhwqcfHFUfei18UmYGO/Z4h8e3wtTlhUvnHkG/YOZIUIZMSkgghOKDnHL2YsBIStQQDMQcTN2lETSEUmsIW+J2Tc9dNOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OSb5Jy0h; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c8952f7f95so1322433a12.0;
-        Thu, 03 Oct 2024 10:16:06 -0700 (PDT)
+	 To:Cc:Content-Type; b=Xj0OJO4bhsISMntkIXa5Fyuba3syUajE6A9BEE1p+IoumY19YoR10tZOqPluFTaIpOnbTE6ylpm2DIkijWwyN0p+Zvd+lI/Xm8p72ho/CDlQXN79+uD5fFXRBkf8m0sa0vSATRRSHktjRgJ3hFRetHWTGuWQiEhqHPKYyEJQAvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0RaiNPX9; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-45b4e638a9aso11111cf.1
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 10:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727975765; x=1728580565; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727975778; x=1728580578; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CL7Wg3gj21GB9l7D+2NEX51041pZBv1itNXrHcCFX6I=;
-        b=OSb5Jy0hswnltHewFLOeNa2qaY0GaEjubpGKDMYpSPw1JGV0uDqI529TneXMX3++Y1
-         ARFfSvjCN2O+SAWMpYiYQUfIWmRVAl3Rnl3S90NQUrwaeea6pVKdtEBPOIkT66S/M3wA
-         dft4ZGvLbqmdJYxCFxqhY/aLfD99LYCMilC6riqz43+gMyvl6hMwOdGcZ5V19+okhDXr
-         V2lay3VCf2unx9qQASbCbkj1U84q4NjMz4BfebXrfyU96ojM1OKu6HItxYUkNsdnvOjl
-         +eW2fiXlYep5zbM+usMO3DkOGBXi4nBeinWQa6rr+tBWM5lGBJn+AwZl39d9T0jTCIu/
-         cKuQ==
+        bh=oBWAOxTJg0yaB5zjKAtG0+tumBmdEJ4QO3UVHRcx0hk=;
+        b=0RaiNPX9M4YbkDDQp14kMfSrJX7Ai56EzX+6YyEnxWIf+NJTJYBnthSylhCEQ0xqAY
+         n8J2RA7adTy+UAi2COtcl8r4Sx5s5ON72w+0+gAtlrxXQMyZRBNsBtlhiOLswLpQo1on
+         uRCCZTA6ecTPQ1TmdgobgdUsveI0DsP2kJ4eOtAcxBhdQbHpC627Ir4yiuRVY4Nn8GeL
+         RxCpE9W6lf/HFndD+ltLi5W+BK+4NjboPJZ+lv9gNgDbZ8EnibCz8+JJBdrOVwgaFCog
+         l8UMBqCJ8lIlE/+hV3nC0FpWf8+vgVZuYecksWPzrJlWrka5qCS6w45NNQ8eYkY3pvVE
+         Be2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727975765; x=1728580565;
+        d=1e100.net; s=20230601; t=1727975778; x=1728580578;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CL7Wg3gj21GB9l7D+2NEX51041pZBv1itNXrHcCFX6I=;
-        b=iU/CmXbWpmT41genEdKyCC2tdlhQWrRvnMZc3iMzL9/5OxgtQc9xJ8YSZuivrVMkuH
-         KFgqgfqaHFCgAEXfhwrvFQBiqZKFIaj8eCqyQfBvxlHptsIKfcavWApYc4OnoDwD+bUK
-         Q00ceDyKK4pAAVREtzMkixJhS6s0+s7snL7NRMg55bRyCiXZhTGaFnCaroldOVp3q2RZ
-         UC+O0NX7mLbmMMeKNDaNOT2lHG8EQ3VXMXMvt07SoX10zBeUQvCXG3aspbTqDAqBd0a7
-         R+PZKYZkXX47JVSjKyjZRJ5FfGY933c5Ly7Djo1SHbj53AInQuc3NpU3vGfwAySaTZD5
-         cj+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUN1UObaRoV0JZlPpGx4dM/kRXQcvENL5VeBX4deVfKts5unJR1uGmpAtO5IN8auvyaz3ChYMot@vger.kernel.org, AJvYcCXciC1XI1syMOvXDv/COZtQqI331aeYwsEWUxacCUwZ83hroRLO5k7q88kmbNowB1S2bOR0duDI/Pw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPyFDJYVAnXofWRlBZQ52zXaZQYXAPpdOphfv+rySUJzA4ltbi
-	qRT7roiltfdC/yK2An5uDAxtViw3Oyq8qgalnakpKvbKhR3M63I4MvY5qLzQCrEh2ctrDeSAA8e
-	mynpEWdWufYX+jQZlftGqnvfWL9M=
-X-Google-Smtp-Source: AGHT+IHS6kA66HOXbU4wDhLGJelNJW+j2RMuxl07mUHoNTRrHb71zM06yp0hJac2xL2XpOhFx81xyvmo/GtoWpTyfjA=
-X-Received: by 2002:a05:6402:5114:b0:5c7:229a:b49d with SMTP id
- 4fb4d7f45d1cf-5c8b1b828b5mr5712934a12.30.1727975764501; Thu, 03 Oct 2024
- 10:16:04 -0700 (PDT)
+        bh=oBWAOxTJg0yaB5zjKAtG0+tumBmdEJ4QO3UVHRcx0hk=;
+        b=MRT8Blf2tZmg3zObkAgHVJGDOVXaErtEM1Xw/jNUIsPuQJ90bQZoa7MC0Tv3ftEAJ8
+         nkjXo62rKlnuAcKQ/fInrvBsmh34LiQoNkqHfcJ0+GPmD4ntnbLwmfurn0WEAQmQaqsC
+         19f2vh5nAEDJrhEY4WtWGh57Fj7squdcFpSfSYjQ3jYE0mlbXt3Xj3clXO0Bcq5u19kb
+         x+yK9upb/NlH4IYrHKpYs/XDeYJtQr52qhp3cmh5vF1mQV8yesugXgga5Jbcviji+2kk
+         0lM/87xdBV5e0jdAAbeFSilmvumCduwKtFqiZPzyHL5U2AiV8xXba1B7GeRBS5/6mEZU
+         1tZw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7ZIY9f3XuUcek5V+6wToVBnWK8C9i/r4LzwKDXwPSpjCxFGDLId+BhvU5D6wNFqDM+4AP+qQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/vBF2oMSLMIhFP/6bCBfpZbunci1b3vAiFK45HoZcOQLH9j+y
+	6v3LKKjZTW6Jyq5UgobaZKJshL/MWIVAqfGocBXvrBuNeelGvmZlijfYLuj4Q53iMLAdGU3HLCh
+	1Mm8HFTnNvVn4w3EQYQwwVLDYagS7kGGJNGyv
+X-Google-Smtp-Source: AGHT+IERggIh9ieU04M0Hc3tYG++OpoHrXo3ZgF/tzKNG/XWHSRUdsjeyJIACvSyaSCcDy0C9liUjh/YZVVjGfFkKrY=
+X-Received: by 2002:a05:622a:56c8:b0:458:1587:3b79 with SMTP id
+ d75a77b69052e-45d8e2a441amr4128661cf.26.1727975777650; Thu, 03 Oct 2024
+ 10:16:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-2-ap420073@gmail.com>
- <bf51b344-bc52-4383-9218-aab9f5f89c82@amd.com>
-In-Reply-To: <bf51b344-bc52-4383-9218-aab9f5f89c82@amd.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Oct 2024 02:15:52 +0900
-Message-ID: <CAMArcTXV3pR6KH2eP1WWbaeK3f8d7m=6Pi4ze6YtTz-TcrjNow@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/7] bnxt_en: add support for rx-copybreak
- ethtool command
-To: Brett Creeley <bcreeley@amd.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, almasrymina@google.com, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, paul.greenwalt@intel.com, rrameshbabu@nvidia.com, 
-	idosch@nvidia.com, asml.silence@gmail.com, kaiyuanz@google.com, 
-	willemb@google.com, aleksander.lobakin@intel.com, dw@davidwei.uk, 
-	sridhar.samudrala@intel.com
+References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-7-sdf@fomichev.me>
+ <CAHS8izP-Dtvjgq009iXSpijsePb6VOF-52dj=U+r4KjxikHeow@mail.gmail.com> <Zv7KsD3L1AicrjRJ@mini-arch>
+In-Reply-To: <Zv7KsD3L1AicrjRJ@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 3 Oct 2024 10:16:03 -0700
+Message-ID: <CAHS8izObANcJKXQ216xUvrORn3LA1Fzpu2kCOoZ3fRtq=_Oyww@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 06/12] selftests: ncdevmem: Switch to AF_INET6
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 4, 2024 at 1:57=E2=80=AFAM Brett Creeley <bcreeley@amd.com> wro=
-te:
+On Thu, Oct 3, 2024 at 9:47=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
+.com> wrote:
 >
+> On 10/03, Mina Almasry wrote:
+> > On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomich=
+ev.me> wrote:
+> > >
+> > > Use dualstack socket to support both v4 and v6. v4-mapped-v6 address
+> > > can be used to do v4.
+> > >
+> >
+> > The network on test machines I can run ncdevmem on are ipv4 only, and
+> > ipv6 support is not possible for my test setup at all. Probably a mega
+> > noob question, but are these changes going to regress such networks?
+> > Or does the dualstack support handle ipv4 networks seamlessly?
+> >
+> > If such regression is there, maybe we can add a -6 flag that enables
+> > ipv6 support similar to how other binaries like nc do it?
+>
+> As long as your kernel is compiled with IPv6 (which all kernel in the
+> past 10+ years do) and you don't toggle net.ipv6.bindv6only sysctl to 1
+> (which defaults to 0 and afaik, none of the distros change it to 1),
+> AF_INET6 should properly support both v4 and v6 even if you don't have an=
+y
+> v6 environment setup.
 
-Hi Brett,
-Thanks a lot for the review!
+Thank you for the details!
 
-> On 10/3/2024 9:06 AM, Taehee Yoo wrote:
-> > Caution: This message originated from an External Source. Use proper ca=
-ution when opening attachments, clicking links, or responding.
-> >
-> >
-> > The bnxt_en driver supports rx-copybreak, but it couldn't be set by
-> > userspace. Only the default value(256) has worked.
-> > This patch makes the bnxt_en driver support following command.
-> > `ethtool --set-tunable <devname> rx-copybreak <value> ` and
-> > `ethtool --get-tunable <devname> rx-copybreak`.
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v3:
-> > - Update copybreak value before closing nic.
->
-> Nit, but maybe this should say:
->
-> Update copybreak value after closing nic and before opening nic when the
-> device is running.
->
-> Definitely not worth a respin, but if you end up having to do a v4.
->
+Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-Thank you so much for catching this.
-I will fix it if I send a v4 patch.
-
-> >
-> > v2:
-> > - Define max/vim rx_copybreak value.
-> >
-> > drivers/net/ethernet/broadcom/bnxt/bnxt.c | 24 +++++----
-> > drivers/net/ethernet/broadcom/bnxt/bnxt.h | 6 ++-
-> > .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 49 ++++++++++++++++++-
-> > 3 files changed, 68 insertions(+), 11 deletions(-)
->
-> Other than the tiny nit, LGTM.
->
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
->
-> <snip>
-
-Thanks a lot!
-Taehee Yoo
+--=20
+Thanks,
+Mina
 
