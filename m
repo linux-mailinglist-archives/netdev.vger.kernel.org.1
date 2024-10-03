@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-131409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD44998E776
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 01:57:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C773F98E77B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 900CD1F25C8C
-	for <lists+netdev@lfdr.de>; Wed,  2 Oct 2024 23:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 036831C22609
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7512A19F42F;
-	Wed,  2 Oct 2024 23:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B121FB4;
+	Thu,  3 Oct 2024 00:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v6kDv0oc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TgcaeRYq"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D331A14B972;
-	Wed,  2 Oct 2024 23:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30B9139D;
+	Thu,  3 Oct 2024 00:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727913440; cv=none; b=FFge5nq5dt16dWXA6UCvMJp8w+9K3BfaGZgGIqFQ8pmj1oewEAxXJS+06QhJHJp7fDZh4Y2FpuhaVDIu/VFRjO6mRot9BWl5Tc1MInLTAspXSZYPGvCiki1YLr3i2TIPad0hfY3b9kTaS2RI7YH3mJ232QPEWH9gpZ6pk8/j690=
+	t=1727913754; cv=none; b=qwB2mCP2WkaGKvNIs11JuhFG6HOvnMA9x9NKAMIqxxT5+UCAwKQFnj9beJL6cDou4xKDgCwbqwr3cAjeqDJgwhk2/kO6Jxw+ZvKQqf9D9TSB1WUuTsLyivDCz4va2ylqcYgdZcCdJ0b9cfYAC1AAEh5qZhW6MarVKVui6usAZ58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727913440; c=relaxed/simple;
-	bh=MBRHyO+e28D/r9LwjPo9VkTBkix3qJhv26tCz419R/0=;
+	s=arc-20240116; t=1727913754; c=relaxed/simple;
+	bh=qBTjVNuGAf1M5m5V9Cmqu7qfVR8QH38+8l40DBYaQbU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PV7Oup4G7q15egVWrXRLgA0FQ+0WcN8tcyNFCVudUac7diHDMJ+P/ldwEXLbJacTg8Hn31Nypr+cNWpSZCR4/Qqd8nr7D1mWVFuPyqY2U39ciYJppAyMwSRGEi9iP9jPugvMl9pz5+S4O2eXGl51E7wvMIpzFRjC4HT/YJObiBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v6kDv0oc; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=COer7YpC8YMM5Tzrf5BsID3CpSZjXF3ZuUgDjCotuvWmuSnDdVh89rbz57/el0+1bGcnpZNRNTMruG9QPHURmGqo2jhim0vlPCJubum8I/j8+XfXmIVT/H2adXQRfwGqcuSrBkN13AZ7XN3cGIcwgCNeBDYiOCvKOTzcGb1F+NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TgcaeRYq; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5SH4G3BifOy86siuo5EL/MuoIB3QLu7HKrFwz/TS5pY=; b=v6kDv0ocxykXdFFfzSNHMJQkUd
-	kFDbNSO8/Exj0oRygi1uSyf2Xwf3UT235VubsaNunfqfX6kjDtayS+yrGYSJ7joaL9CncPHb0GWEb
-	MFIJn8Tihckr9+E5KXFtfLMKoXChTj0UV76ZaeqruVFfzFN3B2DKf1jIZDh+ZMWLEgeA=;
+	bh=YTXwMsJTLTQ+rbU6hE/qQ+zzO7kOrfrluwkW+Pb0xNE=; b=TgcaeRYq5kxnzUm1A/3ghwVveG
+	zdaELrTzNkAE4vxPqLSzFPrmmgu9VRcza9fLke/i/vlGWNdw4uHB7waQpA3OxndleVoM+KzsI/UeS
+	ShHEUausss1Gae4K1NkH+usncB0hZhg8+pf8qqMfVW5/NerZjarb1hdPrdj0eg3E+6nk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sw9DQ-008uHc-VE; Thu, 03 Oct 2024 01:57:08 +0200
-Date: Thu, 3 Oct 2024 01:57:08 +0200
+	id 1sw9IV-008uJN-BD; Thu, 03 Oct 2024 02:02:23 +0200
+Date: Thu, 3 Oct 2024 02:02:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
@@ -56,11 +56,11 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
 	Dent Project <dentproject@linuxfoundation.org>,
 	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 12/12] net: pse-pd: tps23881: Add support for
- PSE events and interrupts
-Message-ID: <c4b47aaa-3ae6-48cd-906f-cab8a74392ee@lunn.ch>
+Subject: Re: [PATCH net-next 11/12] net: pse-pd: Add support for event
+ reporting using devm_regulator_irq_helper
+Message-ID: <89c56982-690d-4279-af26-ca911251d16f@lunn.ch>
 References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +69,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
+In-Reply-To: <20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
 
-> This patch also adds support for an OSS GPIO line to turn off all low
-> priority ports in case of an over-current event.
+On Wed, Oct 02, 2024 at 06:28:07PM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Add support for devm_pse_irq_helper(), a wrapper for
+> devm_regulator_irq_helper(). This aims to report events such as
+> over-current or over-temperature conditions similarly to how the regulator
+> API handles them. Additionally, this patch introduces several define
+> wrappers to keep regulator naming conventions out of PSE drivers.
 
-Does this need a binding update? Or is the GPIO already listed?
+I'm missing something here, i think.
+
+https://docs.kernel.org/power/regulator/consumer.html#regulator-events
+
+Suggests these are internal events, using a notification chain. How
+does user space get to know about such events?
 
 	Andrew
 
