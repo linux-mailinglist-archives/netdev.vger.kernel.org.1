@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-131485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9F098E9EF
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:59:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F39798EA0A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:04:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5ECCE1C21D38
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 06:59:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E33A283A91
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC617FBC2;
-	Thu,  3 Oct 2024 06:59:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10AF11DFFC;
+	Thu,  3 Oct 2024 07:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CQnljsVo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQZuAnpD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BEA8F64
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 06:59:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0AF80C1C
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 07:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727938781; cv=none; b=rtLM//vQ9dNk1/5J2kQLqx7DO0WyCriggPcqKxiM2No9ijhxIsHyy1qOSxkpntpG9D3L5H6O34BU83mWKQehv2UF36ssoDzgiDzopUUTe/gxIfE6hd1ZDObxpxdimXxdTJF9GcGJ/x6pJ6upBOkq7IIL1dumjudfy3CpBTK6/cs=
+	t=1727938973; cv=none; b=t/OtAzliyiv0IZSvUOCkyhefC/aJ4d7sRIgKGPY/fMmQDHPcMGFjhFn8TY/SXQsAOzeOdV1yvZtQOhhBsLM84Xp1wvW/Te2uEhLVHuv0LaP/aRrQfCRad+jnuFydqYa+AhbIsSJ7nPWlircf/q4prEmNhh1l6lHWCKaeS07aTgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727938781; c=relaxed/simple;
-	bh=zQ1FIFKq8D+RXVIc8bi1fyu4wXv2lWOUoiUXchD4vG8=;
+	s=arc-20240116; t=1727938973; c=relaxed/simple;
+	bh=R80m6FLhuYwBYmhQ9yA6xouo8L6MgDnVELyzJ+9XgvE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a6oq6PusnYBhS8pZ/xeKubsWPp1AP7kqv6ycCkysISVs442ucdYLkdXUoQDxizaxRKhRnqlX15eWYbFNXkqzfr2hZMCkUIYVpTmd29uHzpujfetIJtfabD40F0hlfEwBLF95YiwIPiGuXvI+zs4HFVSQ5EjmIsBhxy1Z9uIUKfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CQnljsVo; arc=none smtp.client-ip=209.85.160.174
+	 To:Cc:Content-Type; b=S9GRuedGg7YWSAA6zRbqqC9Dqa3YFnceqPDldHQp6Gmv/0kR++XIMjP5rsZjnRP1rHKwRMoVelZza8CPDZptbdVUdhP9hV0hJgnMpW96NrBn8BcnAKtuWZOPYv6Pl6ih22NVzXS4h6K/MhkEvf/JbEeTFP1CHD517mAWJuUHoD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eQZuAnpD; arc=none smtp.client-ip=209.85.160.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4582fa01090so184481cf.0
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 23:59:39 -0700 (PDT)
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4582fa01090so185571cf.0
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 00:02:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727938779; x=1728543579; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727938971; x=1728543771; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NM4UKNqMrpKmu1TycMfUZPeK8tMRrFnZOJHBIPtUSAM=;
-        b=CQnljsVoND7D2JAbrz380NJtnFbWrwb57Uy9gD2Oww8gNaeX3JbgzUhSYKumCEMNhV
-         eloX/RfEHR0Zad+9MHVhcuu6RnxcacLGIMyEIDDsiXNQxEn/FKsVzUidZVrzJDIV7ace
-         UXUQz/BFlCpGYadYPfAmqXsCPq3BXNIhs1yenKvQyBcpFJfR67T3fuZTv8nh3KRQ8z9M
-         s+DBtYlAuWy2FZ9SHJk6W7F3UQeDUeXmONyqueKePXtvDA498vmbaNwRsDXFfka46dnD
-         ZPxp5lfOvW0c6q+mSoQDPppLdaqD+YZXxxG/YZ0qvNUsk7EURel28KHZEVhSSRmwswMz
-         uuFw==
+        bh=Kx0AfnRiM+WZN516cXx+TjqRJEo1BlPabKf+kkqEj8I=;
+        b=eQZuAnpDF0ObHax2NPhScYVpTW+VtBzFvxPy4qAMC7OKHmLKa7WnF65Tk1/vrSwx6u
+         v67MZgmEWemxAGKZhugiMBUfXDMQdHmZCPnTvV0eavzZISJhJfqa3l8ApTMbNTxl6CHQ
+         uDDR4UhqTbfS409iODmRfyfNihY1IeAWFBVg7r0Bxol447T9/HiBh5pac8AbZ3YRyOnC
+         avcN5dfFrQwiUozRjtdsyPFS01oRn33IDn0HwtsuvBC9Gax5rkobBKM9VxzqPu3e1PiZ
+         g1CZdXtFPgvVatp5VJ7eOfc9etUoccC98nEAujDcj8K3hK2WsN6Czp0gwXG3fj6+Pcd0
+         3d6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727938779; x=1728543579;
+        d=1e100.net; s=20230601; t=1727938971; x=1728543771;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NM4UKNqMrpKmu1TycMfUZPeK8tMRrFnZOJHBIPtUSAM=;
-        b=TMJmrkmsBKMBi2sgGgZL5rqtdnaH2vwaHa+hSpBt0ofo0HKsaXLJNfN3+w3qfIdwtr
-         iCblPhH9or6efIcS5nrjHNQfPxLSIBK/1jLr2U4EEgTvsz4qqSEv1m6olpoXyY5tXTN1
-         vgm/aHP5PgvePphDRS1uwGQVSaYaqRPggd43k6CRsofhcL8eKtaKveuIJrxMZ8rQh3Pi
-         9L9NqBpmcZlCrYjs2CV1xGqLf4KDeEC0WXW2QYU6UHCKZbY0uP2/xo7j2RSOoY+hCxA+
-         Wm/xWeiGB7gCdpW0ud4eVWxnxTEv6jcnJOzbukHMSqV9AMN0C5pL2fc1sGdwgYQ73WkX
-         AxFw==
-X-Gm-Message-State: AOJu0YytfO8/i0qzsJ5PH4JYZkKLs81VDAAluSg1qJF7oj+V3SX4mf42
-	EYzEK5IEGpqo2dXB1RmuL5fL9mIt36BZujA4+rITl1aGM4yZJ/OEXracEGUIEImSR1tMHAVuZHl
-	0GilgAv++b7yr4qUhBiRkF+iJ8KfkVmTLP6AW
-X-Google-Smtp-Source: AGHT+IFJhlJJ2C03IWhyhm+dHkmCyTJGcEox9qABXEg0w6hkmOQhbng8QE6lheL2DZs7zlqv5h2NuN0XQAI7DUMlbpg=
-X-Received: by 2002:a05:622a:a707:b0:458:403a:4e77 with SMTP id
- d75a77b69052e-45d8e2a2723mr2349821cf.20.1727938778821; Wed, 02 Oct 2024
- 23:59:38 -0700 (PDT)
+        bh=Kx0AfnRiM+WZN516cXx+TjqRJEo1BlPabKf+kkqEj8I=;
+        b=KUoZxZVpipQKRv8YHOQ+1tAgbouTfoGrUgGSli+1w5UWqAuSn34qOhu/IqB3GxDWiH
+         2y8R48qOd3MSXSQuWw/6dZklC9pNjIU+zEHjsVuabfUxdlcM+YiCC4GxgXvA3nDn4nDW
+         /K9EfcdDPJXuWrEKHWjs334jsiKyJzKwX89/zMe3eDUBNwrV0DdHXTcVwCLNfdXX+Xn2
+         FRWw56jjCeTB8LJ9RfHMLlXzrgsz09Or7BWXPE0+rSRPHmxWtQ0JyQKBnPY3J23FijKp
+         tx8AZrQX0xFS4f2Mnf8j6ncEC3gz9jikxTHOKlli9i+D5aBxZsEPDvRgFRrhIVr5lxtE
+         DrZA==
+X-Gm-Message-State: AOJu0YwcKU54GbbA7tyIfoSx+5LwHOuQbHnC1hSTJ0G/16fVoAMVhI38
+	NEd/hQh4Gy9a+3JMTaroQB27kzXp2qDvL4W2vVRIFBZFEgOxP5BGWwJiZn4SooRprmQWE2d11qZ
+	2ZkB6rQjMxSQUJodKWmmsiEeRrAtpwIvD74LqtNsVOjOsBMdX0qCG
+X-Google-Smtp-Source: AGHT+IETuXfhZJ76Q2zowfpoH63cVumcWI5SScC8VOwkBXRypNIRtB7C09iIb442KbAZvXaIHdso9cNoxmyOlXGugI8=
+X-Received: by 2002:a05:622a:7ac7:b0:456:7f71:ca78 with SMTP id
+ d75a77b69052e-45d8e1d1eb1mr2530891cf.4.1727938971016; Thu, 03 Oct 2024
+ 00:02:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-6-sdf@fomichev.me>
-In-Reply-To: <20240930171753.2572922-6-sdf@fomichev.me>
+References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-8-sdf@fomichev.me>
+In-Reply-To: <20240930171753.2572922-8-sdf@fomichev.me>
 From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 2 Oct 2024 23:59:27 -0700
-Message-ID: <CAHS8izPbGa7v9UfcMNXhwLQ6z2dNth92x6MF7zwgUijziK0U-g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 05/12] selftests: ncdevmem: Remove default arguments
+Date: Thu, 3 Oct 2024 00:02:38 -0700
+Message-ID: <CAHS8izO0Z6soYWLeU0c-8EKP5monscFqpnw6gn5OkxoqwTxKbg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/12] selftests: ncdevmem: Properly reset
+ flow steering
 To: Stanislav Fomichev <sdf@fomichev.me>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
 	kuba@kernel.org, pabeni@redhat.com
@@ -85,86 +86,43 @@ Content-Transfer-Encoding: quoted-printable
 On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.m=
 e> wrote:
 >
-> To make it clear what's required and what's not. Also, some of the
-> values don't seem like a good defaults; for example eth1.
+> ntuple off/on might be not enough to do it on all NICs.
+> Add a bunch of shell crap to explicitly remove the rules.
 >
 > Cc: Mina Almasry <almasrymina@google.com>
 > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 > ---
->  tools/testing/selftests/net/ncdevmem.c | 34 +++++++++-----------------
->  1 file changed, 12 insertions(+), 22 deletions(-)
+>  tools/testing/selftests/net/ncdevmem.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
 >
 > diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
 ests/net/ncdevmem.c
-> index 699692fdfd7d..bf446d74a4f0 100644
+> index 47458a13eff5..48cbf057fde7 100644
 > --- a/tools/testing/selftests/net/ncdevmem.c
 > +++ b/tools/testing/selftests/net/ncdevmem.c
-> @@ -42,32 +42,13 @@
->  #define MSG_SOCK_DEVMEM 0x2000000
->  #endif
+> @@ -207,13 +207,12 @@ void validate_buffer(void *line, size_t size)
 >
-> -/*
-> - * tcpdevmem netcat. Works similarly to netcat but does device memory TC=
-P
-> - * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
-> - *
-> - * Usage:
-> - *
-> - *     On server:
-> - *     ncdevmem -s <server IP> -c <client IP> -f eth1 -l -p 5201 -v 7
-> - *
-
-No need to remove this documentation I think. This is useful since we
-don't have a proper docs anywhere.
-
-Please instead update the args in the above line, if they need
-updating, but looks like it's already correct even after this change.
-
-> - *     On client:
-> - *     yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | \
-> - *             tr \\n \\0 | \
-> - *             head -c 5G | \
-> - *             nc <server IP> 5201 -p 5201
-> - *
-> - * Note this is compatible with regular netcat. i.e. the sender or recei=
-ver can
-> - * be replaced with regular netcat to test the RX or TX path in isolatio=
-n.
-> - */
+>  static int reset_flow_steering(void)
+>  {
+> -       int ret =3D 0;
 > -
-> -static char *server_ip =3D "192.168.1.4";
-> +static char *server_ip;
->  static char *client_ip;
-> -static char *port =3D "5201";
-> +static char *port;
->  static size_t do_validation;
->  static int start_queue =3D 8;
->  static int num_queues =3D 8;
-> -static char *ifname =3D "eth1";
-> +static char *ifname;
->  static unsigned int ifindex;
->  static unsigned int dmabuf_id;
->
-> @@ -613,6 +594,15 @@ int main(int argc, char *argv[])
->                 }
->         }
->
-> +       if (!server_ip)
-> +               error(1, 0, "Missing -s argument\n");
-> +
-> +       if (!port)
-> +               error(1, 0, "Missing -p argument\n");
-> +
-> +       if (!ifname)
-> +               error(1, 0, "Missing -f argument\n");
-> +
->         ifindex =3D if_nametoindex(ifname);
->
->         for (; optind < argc; optind++)
-> --
-> 2.46.0
->
+> -       ret =3D run_command("sudo ethtool -K %s ntuple off >&2", ifname);
+> -       if (ret)
+> -               return ret;
+> -
+> -       return run_command("sudo ethtool -K %s ntuple on >&2", ifname);
+> +       run_command("sudo ethtool -K %s ntuple off >&2", ifname);
+> +       run_command("sudo ethtool -K %s ntuple on >&2", ifname);
+> +       run_command(
+> +               "sudo ethtool -n %s | grep 'Filter:' | awk '{print $2}' |=
+ xargs -n1 ethtool -N %s delete >&2",
+> +               ifname, ifname);
+> +       return 0;
 
+Any reason to remove the checking of the return codes? Silent failures
+can waste time if the test fails and someone has to spend time finding
+out its the flow steering reset that failed (it may not be very
+obvious without the checking of the return code.
 
 --=20
 Thanks,
