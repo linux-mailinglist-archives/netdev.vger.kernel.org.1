@@ -1,149 +1,89 @@
-Return-Path: <netdev+bounces-131488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD3998EA27
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:11:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A1698EA2C
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC4528994D
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:11:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 395B5289DF9
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8772883CD2;
-	Thu,  3 Oct 2024 07:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E153E499;
+	Thu,  3 Oct 2024 07:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bXZ21Ly5"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="gCruPBG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0476881741;
-	Thu,  3 Oct 2024 07:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5C01C32;
+	Thu,  3 Oct 2024 07:12:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727939462; cv=none; b=GWTVxwi+Ljdr0+G9lptjcxRhnBRIayEb2/1sBEE9kAHnj4UNkdGZKYRKanRd9r01HvaQg8j3wNmDB69c7vT3WAQGW4YICKZ79zD9TxKI2c0/Ocfpf4XW8xdlU3YUYIHjnRnHuG8MlvJETCFdNdwgCbGZVRWgzTffDlvJHrioHuw=
+	t=1727939566; cv=none; b=GuPm0nlVrphRU7BV13AH6KqrOqrU7m75ccl9/LO3QL3E7HAXIyaEf5mDSxcddVVyUvWcVK7ue8V7rTXuay0Wa+vJocNn4yUFDNNoHfPLch7wlrFQ/Xsq7YEDwcg6BL82wlXFKNWapGJoS6Xw9eBuyKrD3P0CYmpYrK7FRox+NZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727939462; c=relaxed/simple;
-	bh=84lnNA0eqVpackYrBd523yXXCmW6IkDpAA5xeW+IymI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=StLSDQh+BH/JHP5RVc/EBzip7wXa+tHU1zBOSfYqe9sGDpXNEVSZ8Yhmh2nNSKxkuDggcoVQHJ5wd2Klp8efPZvTNNTfeXIvibHKL/N1BW54NBsf385+SUWxWTYSuDR7Hzx+7aZAlm8mMkhOHDl8A3S90h7Dxe89G0h0GHxMaKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bXZ21Ly5; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20b84bfbdfcso11699145ad.0;
-        Thu, 03 Oct 2024 00:11:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727939460; x=1728544260; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4swTbsIyyjGxId3pTtmiwYIu8DgC7aQm9o6kUfsLAtc=;
-        b=bXZ21Ly5tyM7R4AtkCzcCvH/+1riW9efUUYQkdKMNbXypUay2h4vMUUrMcodUHVs2E
-         cV2f7dTvmrJQDXeY8UYFkBSWZu8mi8Zwvubu1rmlm2gjgLlvFEhFvo8SdgVWYhzdhWpi
-         Cm3jXAOZS0LXx7d5E/3MuvPGX4/LuKhRP3VHjlWjpuEFZcFjbQKj8r5jL4FOZgERb+VX
-         Je7I2lbbmECjwZQQnWm5OyB851WnWYVb47xz1ij/H6GXOBPhE3QXnl/gm+qfp20DrEES
-         eBew9lTjm3M0Ztvqf/rizFHR7lGe8IeKqacb6YNxL3vRyrHp8KSWZ59Lny4nnetB0x5S
-         ROhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727939460; x=1728544260;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4swTbsIyyjGxId3pTtmiwYIu8DgC7aQm9o6kUfsLAtc=;
-        b=kTC9DH/TawkMVD+ukRF8bU8HXkJFipsGBYaGB/e/K3XJkbQgfj1n59FVijMe4wl98A
-         emJmlr6teeHOfEv9HfOqBHtXIUHDF1LHy7EuYc/gfzUyW/8wuajmgDpCgoytBn8N7ZAF
-         XXJuof+kYbeQ1iMkSjGQPTtEObq394ujhptRGNr6cN29V2Tf81JMnduuMIF1psZkFHAM
-         EUCEn0h5r2RxF616unzHbFH4k0L4Hrzki3Pm0Jp15iiMpD71VZIcWUsuwb9RLdOLEhSc
-         LqDnzcckdZHfkA92jvZaOQZbjMp01cSKkEqlWIBpyDH8y7nJlbhoLKJL8zVP8u3sWQh5
-         0lzw==
-X-Forwarded-Encrypted: i=1; AJvYcCViau1//Tv0umsu7frRB7ld8jYGTMiyRiouHoiKTjOZXM34jJas6Nz/SI8UvNtvmunliRnzNIr6@vger.kernel.org, AJvYcCWgDIr48ZUXiBFeKU6h+lbJCVGVFRudQZEV/t7gGoekayN9rZRGMqiBPtdIzjjIQt4S4XfaIy7cnfYg6Gw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr6b5iA+Xbk68zz4ZF+4txrLEVw+Zuv0Vf+XJSkXlN8Mbmy9LX
-	wHETrfexcRmSwAxPGvBcxOQwTeraR+a6hk9M1v9RvGqvh09HeFZA
-X-Google-Smtp-Source: AGHT+IFbSIec96E5DlG2psOFYqwDO0BuMCkonLjj1NtHBEeVIm0osDCp4AuUPwImocc9QNJ4jt4gmQ==
-X-Received: by 2002:a17:903:2443:b0:206:aa47:adc0 with SMTP id d9443c01a7336-20be193c440mr29276495ad.24.1727939460266;
-        Thu, 03 Oct 2024 00:11:00 -0700 (PDT)
-Received: from harry-home.bne.opengear.com (122-151-100-51.dyn.ip.vocus.au. [122.151.100.51])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beef8eae0sm3455255ad.150.2024.10.03.00.10.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 00:10:59 -0700 (PDT)
-From: Qingtao Cao <qingtao.cao.au@gmail.com>
-X-Google-Original-From: Qingtao Cao <qingtao.cao@digi.com>
-To: 
-Cc: qingtao.cao.au@gmail.com,
-	Qingtao Cao <qingtao.cao@digi.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 1/1] net: phy: marvell: avoid bringing down fibre link when autoneg is bypassed
-Date: Thu,  3 Oct 2024 17:10:50 +1000
-Message-Id: <20241003071050.376502-1-qingtao.cao@digi.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1727939566; c=relaxed/simple;
+	bh=AbxBJ8jQbUTVnKA3XMDHmLQwB5GMdgU0fC03kqEvmOI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KlKrIGkLFxwrakbe8vUuwPsQJmKUtSIYjWtNFpV99ohcr0A87j5GvErCeA8B6c7M7cfd1zB6ChTZWEkrA7mkHZVcK2ryTTq/Db0jN7SPKIQHyIcuy5jFEhO0P30iPieqsFyq8zGMI3pcuJw6D3KFax1u/Wf1WeUMEngN/Czh9Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=gCruPBG0; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [192.168.2.107] (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 1DD0BC044D;
+	Thu,  3 Oct 2024 09:12:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1727939554;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m0dsqakMl0Qo2qi7ICa5Db++dTZCWUSpG9tmMvl634U=;
+	b=gCruPBG0jyZctBiJQkQaWgoENu8opL5kB2de4gvNujfeEagiTipzy6ykvwAF6b/PMBch7G
+	4ZtPc/XaITXEDdo+O7is8xNQ8VzUJZKILikbw/+oAC0Uyj3JItVoPDwiI4E+gJb9DHvVDM
+	RE1DNI4sR5/8Mh7hwyQ9HFu/3Qp/HXv+PHD2skQqvgPWTPN5e3G2Dsr6uUwSmF35p6VtYN
+	CbmlBqffKENgSI7opKjLNnipSHE/RXDibNO+vo9VbUdN2U5/Fk488D2kzrKQj+BXQw/bp6
+	XtGkHhIE6mGMT0vnSDkWxUHoyCMcVPD9rKNH0hQqTtGjSkeaBv+lPWN2knVupA==
+Message-ID: <2f0f000d-412b-487e-b416-cb10eb04be6a@datenfreihafen.org>
+Date: Thu, 3 Oct 2024 09:12:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: pull-request: ieee802154 for net 2024-09-27
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
+References: <20240927094351.3865511-1-stefan@datenfreihafen.org>
+ <20241002170814.0951e6be@kernel.org>
+Content-Language: en-US
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20241002170814.0951e6be@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 88E151x the SGMII autoneg bypass mode defaults to be enabled. When it is
-activated, the device assumes a link-up status with existing configuration
-in BMCR, avoid bringing down the fibre link in this case
+Hello Jakub,
 
-Test case:
-1. Two 88E151x connected with SFP, both enable autoneg, link is up with
-   speed 1000M
-2. Disable autoneg on one device and explicitly set its speed to 1000M
-3. The fibre link can still up with this change, otherwise not.
+On 10/3/24 02:08, Jakub Kicinski wrote:
+> On Fri, 27 Sep 2024 11:43:50 +0200 Stefan Schmidt wrote:
+>> Jinjie Ruan added the use of IRQF_NO_AUTOEN in the mcr20a driver and fixed and
+>> addiotinal build dependency problem while doing so.
+>>
+>> Jiawei Ye, ensured a correct RCU handling in mac802154_scan_worker.
+> 
+> Sorry for the delay, conferences and travel..
 
-Signed-off-by: Qingtao Cao <qingtao.cao@digi.com>
----
- drivers/net/phy/marvell.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+No worries, just wanted to make sure it did not got lost.
 
-diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-index 9964bf3dea2f..efc4b2317466 100644
---- a/drivers/net/phy/marvell.c
-+++ b/drivers/net/phy/marvell.c
-@@ -195,6 +195,10 @@
- 
- #define MII_88E1510_MSCR_2		0x15
- 
-+#define MII_88E1510_FSCR2		0x1a
-+#define MII_88E1510_FSCR2_BYPASS_ENABLE	BIT(6)
-+#define MII_88E1510_FSCR2_BYPASS_STATUS	BIT(5)
-+
- #define MII_VCT5_TX_RX_MDI0_COUPLING	0x10
- #define MII_VCT5_TX_RX_MDI1_COUPLING	0x11
- #define MII_VCT5_TX_RX_MDI2_COUPLING	0x12
-@@ -1623,11 +1627,21 @@ static void fiber_lpa_mod_linkmode_lpa_t(unsigned long *advertising, u32 lpa)
- static int marvell_read_status_page_an(struct phy_device *phydev,
- 				       int fiber, int status)
- {
-+	int fscr2;
- 	int lpa;
- 	int err;
- 
- 	if (!(status & MII_M1011_PHY_STATUS_RESOLVED)) {
- 		phydev->link = 0;
-+		if (fiber) {
-+			fscr2 = phy_read(phydev, MII_88E1510_FSCR2);
-+			if (fscr2 < 0)
-+				return fscr2;
-+			if ((fscr2 & MII_88E1510_FSCR2_BYPASS_ENABLE) &&
-+			    (fscr2 & MII_88E1510_FSCR2_BYPASS_STATUS) &&
-+			    (genphy_read_status_fixed(phydev) == 0))
-+				phydev->link = 1;
-+		}
- 		return 0;
- 	}
- 
--- 
-2.34.1
-
+regards
+Stefan Schmidt
 
