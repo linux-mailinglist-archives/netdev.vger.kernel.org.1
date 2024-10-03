@@ -1,46 +1,40 @@
-Return-Path: <netdev+bounces-131607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8D298F023
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:16:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 082D898F038
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C18C1C21D3E
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:16:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8F01F21FAE
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AE3199FC2;
-	Thu,  3 Oct 2024 13:15:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA6F19B3EC;
+	Thu,  3 Oct 2024 13:20:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5681487D5;
-	Thu,  3 Oct 2024 13:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7803010A1E;
+	Thu,  3 Oct 2024 13:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727961359; cv=none; b=mWXaUU7xc8+NXMexT3uz/PKm8M/fh/p4E4pZLueZzydb65oNhPNsI+9bXjN6WoE7QdXqtYxrdT/R/HeuwYF++MR7v1b5/QnTL7Ii1Fzk9oOYPH0Af6CxpGSXXPHRblwDvo3vyDtwEfP920rkVaAelMCB8RXuA/YbjNWCB0hQpWY=
+	t=1727961625; cv=none; b=ChnS0+QMGndjnKxe+Y+Yhyb/nRDlFITVBpZEh6OLvCSPhzuGp/blGPqpn8mSvDHkKtCklUASCOvXE7mzGKHo3DSuXopA2kqZgALweQP0MEgaq8B9oYN+/fEgXj4QB3QUcvVzM1jFcNPx31HnqCqfpTsnNazb56Jm2nNYgAdktjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727961359; c=relaxed/simple;
-	bh=Lb/jmmLcdOMfQ3rBwe66UbluL9ta63gDiK7pr28v90Q=;
+	s=arc-20240116; t=1727961625; c=relaxed/simple;
+	bh=c6qomeuKw5BgmzWPNaiQbIe2j5SW6v5hqko7bfAiwXY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=AW6FO0/RqMaWKCikCstdV8QeVdyiZkRrg778mv5Db6EKED4CAFiy89rNET1sCkdjiZj8QMciO+p/m4AjN8uPosyr+s/jWQW0eDcXaIoGJPxkG9nz3wZGXZfglj+QG6W5CK+yrQ9x62FmEw5PBlVIiPCFLr0qBK7lKuKjdK3bR7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XKBwp2D5Xz2Dcyy;
-	Thu,  3 Oct 2024 21:14:50 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0C4A614010C;
-	Thu,  3 Oct 2024 21:15:48 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 3 Oct 2024 21:15:44 +0800
-Message-ID: <1d58533e-f6c4-29bb-800e-0638e9660051@huawei-partners.com>
-Date: Thu, 3 Oct 2024 16:15:39 +0300
+	 In-Reply-To:Content-Type; b=U3xtCZBCtT3NsgRR3MDqq+NAJbjacUefzIRwG4gquzEkfpJj8S6I/494z1QBRl+4TE8g5UAbE+zzYqfANEC+4yagFGyh3KYsT1en7gSoDleffoT8VKQvVuiUPi2IX90tY7iTk4TXO8YFnKB1tcpuum+ebbZYoC86FiAZXM/qU2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.159.233) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 3 Oct
+ 2024 16:20:04 +0300
+Message-ID: <bfb2ebd9-0d96-4ce2-b766-358c7253e065@omp.ru>
+Date: Thu, 3 Oct 2024 16:20:01 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,308 +42,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 18/19] samples/landlock: Support socket protocol
- restrictions
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com>
- <ZvurRJ4mGsRufmEl@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZvurRJ4mGsRufmEl@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Subject: Re: [net-next PATCH 05/11] net: ravb: Simplify types in RX csum
+ validation
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, Paul Barker
+	<paul@pbarker.dev>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Geert Uytterhoeven <geert+renesas@glider.be>,
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Biju Das <biju.das.jz@bp.renesas.com>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240930160845.8520-1-paul@pbarker.dev>
+ <20240930160845.8520-6-paul@pbarker.dev>
+ <b4707880-2be4-4132-a3e1-8b104b89828c@omp.ru>
+ <0a779070-d91a-49df-a606-5fc9428e312c@bp.renesas.com>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <0a779070-d91a-49df-a606-5fc9428e312c@bp.renesas.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/03/2024 12:53:14
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188181 [Oct 03 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 37 0.3.37
+ 76d1f08bc1e1f80c2a3a76a1cc8929a49fe2f262
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.233 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.233 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2;213.87.159.233:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.159.233
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/03/2024 12:57:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/3/2024 10:36:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 10/1/2024 10:56 AM, Günther Noack wrote:
-> On Wed, Sep 04, 2024 at 06:48:23PM +0800, Mikhail Ivanov wrote:
->> Add socket protocol control support in sandboxer demo. It's possible
->> to allow a sandboxer to create sockets with specified family and type
->> values. This is controlled with the new LL_SOCKET_CREATE environment
->> variable. Single token in this variable looks like this:
->> 'FAMILY.TYPE', where FAMILY and TYPE are integers corresponding to the
->> number of address family and socket type.
+On 10/3/24 12:23, Paul Barker wrote:
+[...]
+
+>>> From: Paul Barker <paul.barker.ct@bp.renesas.com>
+>>>
+>>> The HW checksum value is used as a 16-bit flag, it is zero when the
 >>
->> Add parse_socket_protocol() method to parse socket family and type
->> strings into integers.
+>>    I think I prefer s/HW/hardware/ but there's no hard feelings... :-)
 >>
->> Change LANDLOCK_ABI_LAST to 6.
+>>> checksum has been validated and non-zero otherwise. Therefore we don't
+>>> need to treat this as an actual __wsum type or call csum_unfold(), we
+>>> can just use a u16 pointer.
+>>>
+>>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>> [...]
+>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>> index 1dd2152734b0..9350ca10ab22 100644
+>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> [...]
+>>> @@ -762,23 +761,22 @@ static void ravb_rx_csum_gbeth(struct sk_buff *skb)
+>>>  	 * The last 2 bytes are the protocol checksum status which will be zero
+>>>  	 * if the checksum has been validated.
+>>>  	 */
+>>> -	if (unlikely(skb->len < sizeof(__sum16) * 2))
+>>> +	csum_len = sizeof(*hw_csum) * 2;
 >>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->> Changes since v2:
->> * Changes representation of socket protocol in LL_SOCKET_CREATE into
->>    pair of integer values.
->> * Changes commit message.
->> * Minor fixes.
->>
->> Changes since v1:
->> * Refactors get_socket_protocol(). Rename it to parse_socket_protocol().
->> * Changes LANDLOCK_ABI_LAST to 6 since ioctl patchlist updated it to 5.
->> * Refactors commit message.
->> * Formats with clang-format.
->> * Minor changes.
->> ---
->>   samples/landlock/sandboxer.c | 108 ++++++++++++++++++++++++++++++-----
->>   1 file changed, 95 insertions(+), 13 deletions(-)
->>
->> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
->> index d4dba9e4ce89..1669095f9373 100644
->> --- a/samples/landlock/sandboxer.c
->> +++ b/samples/landlock/sandboxer.c
->> @@ -14,6 +14,7 @@
->>   #include <fcntl.h>
->>   #include <linux/landlock.h>
->>   #include <linux/prctl.h>
->> +#include <linux/socket.h>
->>   #include <stddef.h>
->>   #include <stdio.h>
->>   #include <stdlib.h>
->> @@ -55,8 +56,11 @@ static inline int landlock_restrict_self(const int ruleset_fd,
->>   #define ENV_FS_RW_NAME "LL_FS_RW"
->>   #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->>   #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
->> +#define ENV_SOCKET_CREATE_NAME "LL_SOCKET_CREATE"
->>   #define ENV_DELIMITER ":"
->>   
->> +#define ENV_TOKEN_INTERNAL_DELIMITER "."
->> +
->>   static int parse_path(char *env_path, const char ***const path_list)
->>   {
->>   	int i, num_paths = 0;
->> @@ -209,6 +213,65 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>   	return ret;
->>   }
->>   
->> +static int populate_ruleset_socket(const char *const env_var,
->> +				   const int ruleset_fd,
->> +				   const __u64 allowed_access)
->> +{
->> +	int ret = 1;
->> +	char *env_protocol_name, *strprotocol, *strfamily, *strtype;
->> +	unsigned long long family_ull, type_ull;
->> +	struct landlock_socket_attr protocol = {
->> +		.allowed_access = allowed_access,
->> +	};
->> +
->> +	env_protocol_name = getenv(env_var);
->> +	if (!env_protocol_name)
->> +		return 0;
->> +	env_protocol_name = strdup(env_protocol_name);
->> +	unsetenv(env_var);
->> +
->> +	while ((strprotocol = strsep(&env_protocol_name, ENV_DELIMITER))) {
->> +		strfamily = strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
->> +		strtype = strsep(&strprotocol, ENV_TOKEN_INTERNAL_DELIMITER);
+>>    Could've been done by an initializer instead?
 > 
-> This works with strings such as "123:456:foobar", because you are using strsep()
-> twice on strprotocol; this looks unintentional?
+> So, if I move this to the initializers at the start of the function,
+> csum_len must be declared after hw_csum which breaks reverse Christmas
+> tree ordering:
+> 
+>     struct skb_shared_info *shinfo = skb_shinfo(skb);
+>     u16 *hw_csum;
+>     size_t csum_len = sizeof(*hw_csum) * 2;
 
-Thanks, strsep should be called only once.
+   Could use sizeof(u16) instead, but it's OK to ignore me on this
+matter. :-)
 
-> 
-> 
->> +
->> +		if (!strtype) {
->> +			fprintf(stderr,
->> +				"Failed to extract socket protocol with "
->> +				"unspecified type value\n");
->> +			goto out_free_name;
->> +		}
->> +
->> +		if (str2num(strfamily, &family_ull)) {
->> +			fprintf(stderr,
->> +				"Failed to convert \"%s\" into a number\n",
->> +				strfamily);
->> +			goto out_free_name;
->> +		}
->> +		if (str2num(strtype, &type_ull)) {
->> +			fprintf(stderr,
->> +				"Failed to convert \"%s\" into a number\n",
->> +				strtype);
->> +			goto out_free_name;
->> +		}
->> +		protocol.family = (int)family_ull;
->> +		protocol.type = (int)type_ull;
->> +
->> +		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->> +				      &protocol, 0)) {
->> +			fprintf(stderr,
->> +				"Failed to update the ruleset with "
->> +				"family \"%s\" and type \"%s\": %s\n",
->> +				strfamily, strtype, strerror(errno));
->> +			goto out_free_name;
->> +		}
->> +	}
->> +	ret = 0;
->> +
->> +out_free_name:
->> +	free(env_protocol_name);
->> +	return ret;
->> +}
->> +
->>   /* clang-format off */
->>   
->>   #define ACCESS_FS_ROUGHLY_READ ( \
->> @@ -233,14 +296,14 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>   
->>   /* clang-format on */
->>   
->> -#define LANDLOCK_ABI_LAST 5
->> +#define LANDLOCK_ABI_LAST 6
->>   
->>   int main(const int argc, char *const argv[], char *const *const envp)
->>   {
->>   	const char *cmd_path;
->>   	char *const *cmd_argv;
->>   	int ruleset_fd, abi;
->> -	char *env_port_name;
->> +	char *env_optional_name;
->>   	__u64 access_fs_ro = ACCESS_FS_ROUGHLY_READ,
->>   	      access_fs_rw = ACCESS_FS_ROUGHLY_READ | ACCESS_FS_ROUGHLY_WRITE;
->>   
->> @@ -248,18 +311,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   		.handled_access_fs = access_fs_rw,
->>   		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->>   				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->>   	};
->>   
->>   	if (argc < 2) {
->>   		fprintf(stderr,
->> -			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
->> +			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
->>   			"<cmd> [args]...\n\n",
->>   			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
->> -			ENV_TCP_CONNECT_NAME, argv[0]);
->> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
->>   		fprintf(stderr,
->>   			"Execute a command in a restricted environment.\n\n");
->>   		fprintf(stderr,
->> -			"Environment variables containing paths and ports "
->> +			"Environment variables containing paths, ports and protocols "
->>   			"each separated by a colon:\n");
->>   		fprintf(stderr,
->>   			"* %s: list of paths allowed to be used in a read-only way.\n",
->> @@ -268,7 +332,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   			"* %s: list of paths allowed to be used in a read-write way.\n\n",
->>   			ENV_FS_RW_NAME);
->>   		fprintf(stderr,
->> -			"Environment variables containing ports are optional "
->> +			"Environment variables containing ports or protocols are optional "
->>   			"and could be skipped.\n");
->>   		fprintf(stderr,
->>   			"* %s: list of ports allowed to bind (server).\n",
->> @@ -276,15 +340,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   		fprintf(stderr,
->>   			"* %s: list of ports allowed to connect (client).\n",
->>   			ENV_TCP_CONNECT_NAME);
->> +		fprintf(stderr,
->> +			"* %s: list of socket protocols allowed to be created.\n",
->> +			ENV_SOCKET_CREATE_NAME);
-> 
-> Might be worth listing some example values for this parameter, e.g. for TCP/IP
-> and UDP/IP?  This is also needed to make it clear that these can't be given by
-> name, but only by number.
+> Thanks,
 
-Ofc, it would be really useful for the user (since not everyone keeps
-the adress family table in their head :)).
+MBR, Sergey
 
-> 
-> 
->>   		fprintf(stderr,
->>   			"\nexample:\n"
->>   			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
->>   			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->>   			"%s=\"9418\" "
->>   			"%s=\"80:443\" "
->> +			"%s=\"10.2:1.1\" "
->>   			"%s bash -i\n\n",
->>   			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
->> -			ENV_TCP_CONNECT_NAME, argv[0]);
->> +			ENV_TCP_CONNECT_NAME, ENV_SOCKET_CREATE_NAME, argv[0]);
->>   		fprintf(stderr,
->>   			"This sandboxer can use Landlock features "
->>   			"up to ABI version %d.\n",
->> @@ -351,7 +419,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   	case 4:
->>   		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->>   		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
->> -
->> +		__attribute__((fallthrough));
->> +	case 5:
->> +		/* Removes socket support for ABI < 6 */
->> +		ruleset_attr.handled_access_socket &=
->> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
->>   		fprintf(stderr,
->>   			"Hint: You should update the running kernel "
->>   			"to leverage Landlock features "
->> @@ -371,18 +443,23 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   	access_fs_rw &= ruleset_attr.handled_access_fs;
->>   
->>   	/* Removes bind access attribute if not supported by a user. */
->> -	env_port_name = getenv(ENV_TCP_BIND_NAME);
->> -	if (!env_port_name) {
->> +	env_optional_name = getenv(ENV_TCP_BIND_NAME);
->> +	if (!env_optional_name) {
->>   		ruleset_attr.handled_access_net &=
->>   			~LANDLOCK_ACCESS_NET_BIND_TCP;
->>   	}
->>   	/* Removes connect access attribute if not supported by a user. */
->> -	env_port_name = getenv(ENV_TCP_CONNECT_NAME);
->> -	if (!env_port_name) {
->> +	env_optional_name = getenv(ENV_TCP_CONNECT_NAME);
->> +	if (!env_optional_name) {
->>   		ruleset_attr.handled_access_net &=
->>   			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->>   	}
->> -
->> +	/* Removes socket create access attribute if not supported by a user. */
-> 
-> Phrasing nit: I would say "requested by a user"?
-> 
-> (And maybe also in the two cases above)
-
-Yeap, I'll fix this each case.
-
-> 
-> 
->> +	env_optional_name = getenv(ENV_SOCKET_CREATE_NAME);
->> +	if (!env_optional_name) {
->> +		ruleset_attr.handled_access_socket &=
->> +			~LANDLOCK_ACCESS_SOCKET_CREATE;
->> +	}
->>   	ruleset_fd =
->>   		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->>   	if (ruleset_fd < 0) {
->> @@ -406,6 +483,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   		goto err_close_ruleset;
->>   	}
->>   
->> +	if (populate_ruleset_socket(ENV_SOCKET_CREATE_NAME, ruleset_fd,
->> +				    LANDLOCK_ACCESS_SOCKET_CREATE)) {
->> +		goto err_close_ruleset;
->> +	}
->> +
->>   	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
->>   		perror("Failed to restrict privileges");
->>   		goto err_close_ruleset;
->> -- 
->> 2.34.1
->>
-> 
-> As I also said on the Documentation patch, please remember to double check the
-> places where the ABI number is mentioned, after rebasing on Tahera's "scoped"
-> patches.
-
-Ofc, thanks for the reminder!
-
-> 
-> —Günther
 
