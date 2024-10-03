@@ -1,127 +1,112 @@
-Return-Path: <netdev+bounces-131814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E30D98FA32
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:04:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 591E898FA49
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 147A52829F4
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:04:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 027B31F23144
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40F21CC8AC;
-	Thu,  3 Oct 2024 23:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC8C1CEAC4;
+	Thu,  3 Oct 2024 23:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejapJXlH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cIaU8vKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBB11CCED6;
-	Thu,  3 Oct 2024 23:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 165AB186E3D
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 23:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727996643; cv=none; b=QNRE8MD21x9WUqq2XWfMZhz77oJPRzjIdI2gNBzsGp7TCbhQ7Lj9UmBE2FlQeUz6t71TJeftsGlUoqv8aLJ1l6Om0hkLYsX10Tht0DswjeJDmPTwmdTlCG4TcwMsRlkbpeUQWYTIM5DZYoxEeJC8R7RPAjq6+fPcCTZj9jE15hs=
+	t=1727997029; cv=none; b=tCFrVFLqU1yXDq5fTPKhBhafJB0uPrrKOdwSkwRGcdfg5k2/nHX1NsRL8fxzFEzEdJie/tWTB91vBod7+8cHsd+BwgMThoBnj/eznbZ+wCm85zOh/xukLoLz97ruVRp4uy+r/pwx0+s0HVshko/1N7Za0V3MftFFZBbdWCu+6zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727996643; c=relaxed/simple;
-	bh=/ZV1yl+wG7zT1y4IlAG+HSLEM/FBXFaYSgOI1p4BBTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ss+CMt+5KBc3T16fzrhMMTMH8cLSmEmFsLgBpO51TnT+RwBEh20eg3t5HmOWS6zeh8zXkHqLoOt37eTjND+2kkDZY3jwcN5adDf6HhEDrjLx/qrF5RvepIEzltCOaXo3+cenDkF2RbBlIclBAh0MCLeYgfdD13qjtylV4Ui2jtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ejapJXlH; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42cb1e3b449so2121375e9.3;
-        Thu, 03 Oct 2024 16:04:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727996640; x=1728601440; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CyFHmbDf6829/sLt58Su4BESbrgT0QnRcIQ7BcAKpHM=;
-        b=ejapJXlHumpGvN7Q9n4g1zDIfpP6c96j8JpQ2dKIJDtWwwPhIKTtdHMg9vX3UWP5x0
-         LzYQFPvVuqnlZRXVDFI3pmMSE/WAw94yQQh3F6TSjNLt5NuwMVFBzm/eBqMSWz4Z34Nj
-         QGB3hvwPt0+i2ljXRZ6td8uPKCBtuyw1haayeRS7kVhWK1LzjlCpnKTB+T0HyCWrJ/72
-         8UqqJBNcD8ppCBGXMsIlAEUfxUvWJ4R/3TRckB/ochTI0aRRGAV4i2YRlqDE+MrvhYBt
-         2zHliMG74dCQ+lUqIADjXgaA9ccRbeKXeDnmISQn1rEAF0BdDAp3/+g7yrhGdFHl6iT0
-         Zg6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727996640; x=1728601440;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CyFHmbDf6829/sLt58Su4BESbrgT0QnRcIQ7BcAKpHM=;
-        b=R94DuQPjYe+3zn5SQK0PfUNcYmruPJzGpgD2EQZq0MrVrCadVOzsgUBeWK4UTayXPw
-         /05t97dVXOOwPbdp2P0+9mDhqTjMIyhjjULPWKWcs0+p/KzjD55mxvFq1Y0BiL/H+VVh
-         OtO0Tghy5vrylH4fUq32vsNGXLtF+mYaZNDeeCO+f0PLsVOBeU7n5CGxO+TQgrtReNxG
-         fiCaVbV/mBhilZjf1F+/gO69yCxsWVy6SA8+eHzHVL04m1IOwuMbfeDmGQvivxtGwbxP
-         1iQHF1zq00AUqhOUPY/L76Bm+tzaJprdEPA6q1BBrwy/sXiLsug1ke8vcQcDn69Ufqfs
-         hALw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBIjeUbqF0Sdg0mqcTC+HYowBZ3huezEO2ANU1eoE7VgLCKjQgauAGvOleOw+Mow/NGk8FPkKn@vger.kernel.org, AJvYcCVYuQeh/88gtvEuRfrIggpETfqcEsy8dbwCEBQSTu2N9BWgVBijNqH1Eey3QT0/TAr4sjXqp9/+7XtJ5Wc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVt5JKt284EpQOX4hEkgqnkpr3XRsBG4VlXfRuOHqGD5JQrH/u
-	4vtwXihNTQuizvhN9ec4n8r/KrKUZGxNr+fVqskWCWINa5/zteyT
-X-Google-Smtp-Source: AGHT+IHtEg7OmcgdyH960h8MGHeAzll4OqzKkPH5RpqYhOrxBPkznsz8OclQMS37eMFUtwHXXqGsjA==
-X-Received: by 2002:a05:600c:a05:b0:42c:df54:18f6 with SMTP id 5b1f17b1804b1-42f85aab26dmr1777225e9.3.1727996640116;
-        Thu, 03 Oct 2024 16:04:00 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b2c816sm769935e9.39.2024.10.03.16.03.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 16:03:59 -0700 (PDT)
-Date: Fri, 4 Oct 2024 02:03:57 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: phy: Validate PHY LED OPs presence before
- registering
-Message-ID: <20241003230357.z2czrn3pymhuywud@skbuf>
-References: <20241003221250.5502-1-ansuelsmth@gmail.com>
- <20241003222400.q46szutlnxivzrup@skbuf>
- <66ff1bb3.7b0a0220.135f57.013e@mx.google.com>
+	s=arc-20240116; t=1727997029; c=relaxed/simple;
+	bh=sHt3od08IqwOZa8i8InzNHju5aiGgOUVs09R/D0N9o4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RnpQw3UkZjq7p5YwFvmt9ev4rItGOl/EpDVig+GbgqZrdzh9pVxUKFJRclCJDT8XoDdMTNr92q0rvvWAPQ9Oxo2CPs3oTyVZm62UGfSRM6EPsTqcDmyb1GkcO7Cl09BI1GcsgPKveygunCNiiTuPcEOPb8VJu6GnuWO+Bs38/CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cIaU8vKw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 977A3C4CEC5;
+	Thu,  3 Oct 2024 23:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727997028;
+	bh=sHt3od08IqwOZa8i8InzNHju5aiGgOUVs09R/D0N9o4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cIaU8vKw5yGEQlW0hQouUIkzR4no68KGegdkMljQksA9JbDwOoBPh+WyLHJKXxe22
+	 xF/NgBcv3zh85zln/UT1CcUwFagx/Av+o9h+B5Wu0CkvgtZNhGFqXWU2IFojrljfNw
+	 D0L8ccpFwE7bdW83dDkw6q5kltql0LEUkkNgz9ETUB5YCdjG4pPssrxGcvObRj3afT
+	 c5FOZcxv3JnhKXFlSJJPgs/0XD2AuhqA1vmyDTgjijaltpJ0wexaKWycAiDnM5a6QU
+	 58L8FZHEMAIj/MA5EDq+ZXjvVBugXleN/Oj+AxIQ3ak2bAzJe0cP8fpmydwmVVgccB
+	 t43PnjBdCM3Rw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F0D3803263;
+	Thu,  3 Oct 2024 23:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66ff1bb3.7b0a0220.135f57.013e@mx.google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/10] packing: various improvements and KUnit
+ tests
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172799703201.2022430.15712045546993450620.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Oct 2024 23:10:32 +0000
+References: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-0-8373e551eae3@intel.com>
+In-Reply-To: <20241002-packing-kunit-tests-and-split-pack-unpack-v2-0-8373e551eae3@intel.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: akpm@linux-foundation.org, olteanv@gmail.com, davem@davemloft.net,
+ netdev@vger.kernel.org, vladimir.oltean@nxp.com, przemyslaw.kitszel@intel.com
 
-On Fri, Oct 04, 2024 at 12:33:17AM +0200, Christian Marangi wrote:
-> On Fri, Oct 04, 2024 at 01:24:00AM +0300, Vladimir Oltean wrote:
-> > On Fri, Oct 04, 2024 at 12:12:48AM +0200, Christian Marangi wrote:
-> > > Validate PHY LED OPs presence before registering and parsing them.
-> > > Defining LED nodes for a PHY driver that actually doesn't supports them
-> > > is wrong and should be reported.
-> > 
-> > What about the case where a PHY driver gets LED support in the future?
-> > Shouldn't the current kernel driver work with future device trees which
-> > define LEDs, and just ignore that node, rather than fail to probe?
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 02 Oct 2024 14:51:49 -0700 you wrote:
+> This series contains a handful of improvements and fixes for the packing
+> library, including the addition of KUnit tests.
 > 
-> Well this just skip leds node parse and return 0, so no fail to probe.
-> This just adds an error. Maybe I should use warn instead?
+> There are two major changes which might be considered bug fixes:
 > 
-> (The original idea was to return -EINVAL but it was suggested by Daniel
-> that this was too much and a print was much better)
+> 1) The library is updated to handle arbitrary buffer lengths, fixing
+>    undefined behavior when operating on buffers which are not a multiple of
+>    4 bytes.
+> 
+> [...]
 
-Ok, the "exit" label returns 0, not a probe failure, but as you say,
-there's still the warning message printed to dmesg. What's its intended
-value, exactly?
+Here is the summary with links:
+  - [net-next,v2,01/10] lib: packing: refuse operating on bit indices which exceed size of buffer
+    https://git.kernel.org/netdev/net-next/c/8b3e26677bc6
+  - [net-next,v2,02/10] lib: packing: adjust definitions and implementation for arbitrary buffer lengths
+    (no matching commit)
+  - [net-next,v2,03/10] lib: packing: remove kernel-doc from header file
+    https://git.kernel.org/netdev/net-next/c/816ad8f1e498
+  - [net-next,v2,04/10] lib: packing: add pack() and unpack() wrappers over packing()
+    https://git.kernel.org/netdev/net-next/c/7263f64e16d9
+  - [net-next,v2,05/10] lib: packing: duplicate pack() and unpack() implementations
+    https://git.kernel.org/netdev/net-next/c/28aec9ca29f0
+  - [net-next,v2,06/10] lib: packing: add KUnit tests adapted from selftests
+    (no matching commit)
+  - [net-next,v2,07/10] lib: packing: add additional KUnit tests
+    https://git.kernel.org/netdev/net-next/c/fcd6dd91d0e8
+  - [net-next,v2,08/10] lib: packing: fix QUIRK_MSB_ON_THE_RIGHT behavior
+    https://git.kernel.org/netdev/net-next/c/e7fdf5dddce5
+  - [net-next,v2,09/10] lib: packing: use BITS_PER_BYTE instead of 8
+    https://git.kernel.org/netdev/net-next/c/fb02c7c8a577
+  - [net-next,v2,10/10] lib: packing: use GENMASK() for box_mask
+    https://git.kernel.org/netdev/net-next/c/46e784e94b82
 
-What would you do if you were working on a board which wasn't supported
-in mainline but instead you only had the DTB for it, and you had to run
-a git bisect back to when the driver didn't support parsing the PHY LED
-nodes? What would you do, edit the DTB to add/remove the node at each
-bisect step, so that the kernel gets what it understands in the device
-tree and nothing more?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Why would the kernel even act so weird about it and print warnings or
-return errors in the first place? Nobody could possibly develop anything
-new with patches like this, without introducing some sort of mishap in
-past kernels. Is there some larger context around this patch which I'm
-missing?
+
 
