@@ -1,88 +1,78 @@
-Return-Path: <netdev+bounces-131821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37A398FA62
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:21:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D0498FA68
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6E281C21FAA
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:21:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA2F01C213CA
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F0D1CEEB8;
-	Thu,  3 Oct 2024 23:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F95E1D0170;
+	Thu,  3 Oct 2024 23:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b6MI6wry"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aJfMvs4i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30031CC171;
-	Thu,  3 Oct 2024 23:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F3A1CF5CB;
+	Thu,  3 Oct 2024 23:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727997681; cv=none; b=ervAiZNrYxKMk+VFeu4uDPajDLbVoUi+FL3OOPCrbW1doZFqhVwtZcPqFTJ+Yr3L55/L80v1jXtdY7SxC4tDt2KChQlg82v0Cr+xIOPgkK81Wv4tEoU2HEsbh1woIS70n5aGuPjs8HgpZmVyYWW4/FZ8u7VyYUGJ6h149rgRg6Y=
+	t=1727998023; cv=none; b=LYF9uNGtdVbj1Xu3+2q/d1psY37USaQq5D+I16JFBguxyjYtpkEh9UybJU6F5Q3BmsLCiEpFyZvfP1JMN1ECDSBixoapRjSOgxgZrba2qVm9v85b4SxaZGnucizDKBpvpSHKK9v0JV+nqRUr41iFh0jWmVqLb70JmuXFY4lZQ5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727997681; c=relaxed/simple;
-	bh=eVXg8u3XrljKjiiOHqhj35PcopvH9VNwN0nDMPr7NM0=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DU7kMh8juAik7Udp7ploo+pBOHJRiszybo7x4G5sdVIBWScqvI3iEq7Z+r44YDQ5NqU0l31Ie58oJrMyRKLSrYS7jZt7eg8AVxpl5QD+vZhjMLcudI8wBS5HV+KKQKhIdHOrmA2846nqCErB0t3aic9VUB5FmHW/hQeH7kFj2ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b6MI6wry; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-37d00322446so1401080f8f.2;
-        Thu, 03 Oct 2024 16:21:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727997678; x=1728602478; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UqoWLMlr5CIUseH/hnIdpOyZlgW/tBriMEfRLE9+5SE=;
-        b=b6MI6wryyp+A06wYI9Mnk6hhsp3FG4I/RtRbch2IMSQD5bvxoF/Iv7rXaMryRwTw8O
-         5bsNpTWIW8Q6SmGoV5YF6q3SFEgOnLWtdh18PbAkv9KK+CjpTRBSxOZxg5PKCEwlaPbg
-         VFuH8iDk6ebIArHXKicQlVdHka2EFWeV7yK/xcuWWDXENpGaRnJxJe9ZdFpWzQsV3Hr7
-         1jRThpRdgVbTq6DfLzCjidB46gFvJMmXr5NIMo/L0qKb900Vc2TbhkJ9iLdgNqgtMJgm
-         TDdEJRZI+daBGjE79NHj9r5hqvb7uoZ34YRmzLZpgSePUG5L7/U08kIZXBhho/+hgFlh
-         1G9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727997678; x=1728602478;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UqoWLMlr5CIUseH/hnIdpOyZlgW/tBriMEfRLE9+5SE=;
-        b=HWZqBnJ+R5JmRQQR1KGo+Gen6nD0ShoBDYMk7RBsvfvcewLd4psH7ArMDyuLyBBKas
-         zFtkuO+X/YXfayQOeUZ3k3euqa7iFQOsZYgiHynqiZIbMB1PyF9bDmVJ1CN/OmoSkONO
-         4k9komjNY21JxeMucS/cQM6G34Y4HJKJvvIRmU7VZu8qibtT2w8nb2MeSFlGcBB3txS2
-         VNv+Eoeu8qXD8FvhkjTtNzg4ixWhS2W+toZWQUFiWycpnFdO88ymMKPC+i0nJPl9VU4q
-         oeYZEj3ax2Er3wOIYvmtzzgcoefzAzgWy1mrK66F7j5a59O0u3fRoG1rsRdR3K/Jt1Uu
-         J1wg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpgpqXHyWZ5s64ga5/p+qTTMWLbVx+NmOlafTBMQ5j59vCG+K4vetPW05XmCaoZjov4lGNYx8b@vger.kernel.org, AJvYcCW5omCflU6mCldC6+xrri9Y2bcaoYt9lfqo3rOGMzcD9HEubiqvwm9xoNSfx3UkxkW4EvFTqbP6KBOyODE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYeEEu6ncAMyfwBtMfgeiaxRK7SO92utUGLEqmTQvW/IVL3gzt
-	Xggn2936t1Tyy6jaux0REuUmQ8qrR1LsQA/eZkALnHoZHGmpNetK
-X-Google-Smtp-Source: AGHT+IF2STV3AbfwcL5mkbfl8DyA1LgpI73c34VDKr80PTUO/pVFNkPWpV7LETS0blHWAsRcKYXVkw==
-X-Received: by 2002:a5d:538f:0:b0:374:c10c:83b3 with SMTP id ffacd0b85a97d-37d0eae4b45mr492524f8f.54.1727997677987;
-        Thu, 03 Oct 2024 16:21:17 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d082a6992sm2131873f8f.68.2024.10.03.16.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 16:21:16 -0700 (PDT)
-Message-ID: <66ff26ec.5d0a0220.cfdfb.a95d@mx.google.com>
-X-Google-Original-Message-ID: <Zv8m5u0fUNgj9dB0@Ansuel-XPS.>
-Date: Fri, 4 Oct 2024 01:21:10 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: phy: Validate PHY LED OPs presence before
- registering
-References: <20241003221250.5502-1-ansuelsmth@gmail.com>
- <20241003222400.q46szutlnxivzrup@skbuf>
- <66ff1bb3.7b0a0220.135f57.013e@mx.google.com>
- <20241003230357.z2czrn3pymhuywud@skbuf>
+	s=arc-20240116; t=1727998023; c=relaxed/simple;
+	bh=yhI3MmARZz+BlGVKFN3RCDB7jHysNV6yUiatA4NcAcg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pYyDH20M+YgHpBoOsArGGGF8GtUYodmogm+F95MO2PmQdev9FWbaidC+l9KnGzitCu4lBiWVyxEYj8n/shTht7l2s0SsAuVQbzvm7BB33RJE+laBqvVhWQkRGd/TvjlvfvzOtj4U+qgwx55dLC+TBGrJsNwc/zv5kVhPmxw0SlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aJfMvs4i; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727998021; x=1759534021;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=yhI3MmARZz+BlGVKFN3RCDB7jHysNV6yUiatA4NcAcg=;
+  b=aJfMvs4iv0q2dEtYYDf1nzhVwG+Ode4dhvu+BGFPLyJVHKFfgF5LgA19
+   MxhUHk/n6Qisf7acD0AchOdZJZWeWGaIy2XCtbXvi7vrRdyOkOPv424vw
+   XfaNd2ZdgctQGekZHY/qNlXgPHEsKTRSGt9kb6cNWTL8tgfot+cWQZl08
+   udUssft3CYXhu1NIX8b+s0QtURBMgXGfyXhcW1NPSUPMePF+B2sb7lVgK
+   DyO2TpWP2l9tXjG7SFEJTOIsuxD/nFPJD8hpnp17Hn14aSMW3pPw7QzRk
+   PzxGdT9vHA1v82Js41nzldVIpYqK8unqS890yamBNWukro0y6S7f8OY9a
+   g==;
+X-CSE-ConnectionGUID: MBvsdWYSRWeVGinkfKGPCQ==
+X-CSE-MsgGUID: roJCIltqSDa0Abt3ojS+AQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="30093310"
+X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
+   d="scan'208";a="30093310"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 16:26:59 -0700
+X-CSE-ConnectionGUID: xfmXsZR1SZuwSICxFHXxaA==
+X-CSE-MsgGUID: RnjiBoM8RWa3W5Z9uYH07w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
+   d="scan'208";a="79360359"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 03 Oct 2024 16:26:56 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1swVDh-000118-29;
+	Thu, 03 Oct 2024 23:26:53 +0000
+Date: Fri, 4 Oct 2024 07:26:33 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org, olek2@wp.pl,
+	shannon.nelson@amd.com
+Subject: Re: [PATCHv2 net-next 08/10] net: lantiq_etop: use
+ module_platform_driver_probe
+Message-ID: <202410040710.C5horFtF-lkp@intel.com>
+References: <20241001184607.193461-9-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,59 +81,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241003230357.z2czrn3pymhuywud@skbuf>
+In-Reply-To: <20241001184607.193461-9-rosenp@gmail.com>
 
-On Fri, Oct 04, 2024 at 02:03:57AM +0300, Vladimir Oltean wrote:
-> On Fri, Oct 04, 2024 at 12:33:17AM +0200, Christian Marangi wrote:
-> > On Fri, Oct 04, 2024 at 01:24:00AM +0300, Vladimir Oltean wrote:
-> > > On Fri, Oct 04, 2024 at 12:12:48AM +0200, Christian Marangi wrote:
-> > > > Validate PHY LED OPs presence before registering and parsing them.
-> > > > Defining LED nodes for a PHY driver that actually doesn't supports them
-> > > > is wrong and should be reported.
-> > > 
-> > > What about the case where a PHY driver gets LED support in the future?
-> > > Shouldn't the current kernel driver work with future device trees which
-> > > define LEDs, and just ignore that node, rather than fail to probe?
-> > 
-> > Well this just skip leds node parse and return 0, so no fail to probe.
-> > This just adds an error. Maybe I should use warn instead?
-> > 
-> > (The original idea was to return -EINVAL but it was suggested by Daniel
-> > that this was too much and a print was much better)
-> 
-> Ok, the "exit" label returns 0, not a probe failure, but as you say,
-> there's still the warning message printed to dmesg. What's its intended
-> value, exactly?
-> 
-> What would you do if you were working on a board which wasn't supported
-> in mainline but instead you only had the DTB for it, and you had to run
-> a git bisect back to when the driver didn't support parsing the PHY LED
-> nodes? What would you do, edit the DTB to add/remove the node at each
-> bisect step, so that the kernel gets what it understands in the device
-> tree and nothing more?
-> 
-> Why would the kernel even act so weird about it and print warnings or
-> return errors in the first place? Nobody could possibly develop anything
-> new with patches like this, without introducing some sort of mishap in
-> past kernels. Is there some larger context around this patch which I'm
-> missing?
+Hi Rosen,
 
-No larger context. I posted 2 other patch in net that fix some problem
-and found it strange that this change wasn't in place. Looks wrong to
-define leds node for a PHY ID with the driver not having OPs for it.
+kernel test robot noticed the following build errors:
 
-I posted this in net-next detached from the other 2 as I wasn't sure if
-it was that correct, just taste. The problematic part is registering a
-LED that is actually not usable cause as you described I can totally see
-someone proposing downstream DTS with LED in the PHY node and never
-actually care to implement LED support for it. User might get confused
-and think there is some kind of bug in the driver as he would have LED
-present but everything gives errors, while in reality is just the
-feature missing in the driver.
+[auto build test ERROR on net-next/main]
 
-Totally ok to ignore this but aside from the bisec scenario that can
-produce false-warning, the warning might be useful in some situation.
+url:    https://github.com/intel-lab-lkp/linux/commits/Rosen-Penev/net-lantiq_etop-use-netif_receive_skb_list/20241002-025104
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241001184607.193461-9-rosenp%40gmail.com
+patch subject: [PATCHv2 net-next 08/10] net: lantiq_etop: use module_platform_driver_probe
+config: mips-xway_defconfig (https://download.01.org/0day-ci/archive/20241004/202410040710.C5horFtF-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project fef3566a25ff0e34fb87339ba5e13eca17cec00f)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241004/202410040710.C5horFtF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410040710.C5horFtF-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/lantiq_etop.c:14:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/mips/include/asm/cacheflush.h:13:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/net/ethernet/lantiq_etop.c:689:30: error: expected identifier or '('
+     689 | module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+         |                              ^
+>> drivers/net/ethernet/lantiq_etop.c:689:1: error: pasting formed '_&', an invalid preprocessing token
+     689 | module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+         | ^
+   include/linux/platform_device.h:324:3: note: expanded from macro 'module_platform_driver_probe'
+     324 | } \
+         |   ^
+   include/linux/module.h:88:24: note: expanded from macro '\
+   module_init'
+      88 | #define module_init(x)  __initcall(x);
+         |                         ^
+   include/linux/init.h:316:24: note: expanded from macro '__initcall'
+     316 | #define __initcall(fn) device_initcall(fn)
+         |                        ^
+   note: (skipping 3 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/init.h:214:2: note: expanded from macro '__initcall_id'
+     214 |         __PASTE(_, fn))))))
+         |         ^
+   include/linux/compiler_types.h:84:22: note: expanded from macro '__PASTE'
+      84 | #define __PASTE(a,b) ___PASTE(a,b)
+         |                      ^
+   include/linux/compiler_types.h:83:24: note: expanded from macro '___PASTE'
+      83 | #define ___PASTE(a,b) a##b
+         |                        ^
+>> drivers/net/ethernet/lantiq_etop.c:689:30: error: expected ';' after top level declarator
+     689 | module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+         |                              ^
+>> drivers/net/ethernet/lantiq_etop.c:689:30: error: expected identifier or '('
+>> drivers/net/ethernet/lantiq_etop.c:689:1: error: pasting formed '__exitcall_&', an invalid preprocessing token
+     689 | module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+         | ^
+   include/linux/platform_device.h:329:3: note: expanded from macro 'module_platform_driver_probe'
+     329 | } \
+         |   ^
+   include/linux/module.h:100:24: note: expanded from macro '\
+   module_exit'
+     100 | #define module_exit(x)  __exitcall(x);
+         |                         ^
+   include/linux/init.h:319:31: note: expanded from macro '__exitcall'
+     319 |         static exitcall_t __exitcall_##fn __exit_call = fn
+         |                                      ^
+>> drivers/net/ethernet/lantiq_etop.c:689:30: error: expected ';' after top level declarator
+     689 | module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+         |                              ^
+   1 warning and 6 errors generated.
+
+
+vim +689 drivers/net/ethernet/lantiq_etop.c
+
+   688	
+ > 689	module_platform_driver_probe(&ltq_mii_driver, ltq_etop_probe);
+   690	
 
 -- 
-	Ansuel
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
