@@ -1,114 +1,96 @@
-Return-Path: <netdev+bounces-131499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E60398EAE1
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:56:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2ABE98EAF9
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:01:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 294E7B234B2
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:56:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EA001C21B8F
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:01:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0DC130A7D;
-	Thu,  3 Oct 2024 07:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521BB7F48C;
+	Thu,  3 Oct 2024 08:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HOUu0PXv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AAxkc/mx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACCA53363
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 07:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A155E10940;
+	Thu,  3 Oct 2024 08:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727942183; cv=none; b=uVirh5SnJKI9WBCl8/SFj2SwH0EMe4anqLaQqoTooS0GJ+S8TRwSd+5x/fZpZU6i1mgJW1xG0d1tAUoV6oZ/e6jFd1H9PhP91xTZp7hr0Fo3hYX87odMBT1CL01VyV+TY9KjBtlBoEE82KLrNUaEI3W5VgXhT6uP8yknMtzalTI=
+	t=1727942508; cv=none; b=sql9ySH2ACQ4lHG2szKi9hjBnfPiK1c6jfaJJOZinulTkLOaNav/ovHJxIaQvh5YKqpzUGP2J+gEr2FP5Crib2osYWkEZ1bQKYiICmo428PZ1SpmX7iWKOuvL2LUzAJ0480ZNFUdr0O4ZAXeLix7+0jvb82+eVrBu8JV/Jh43yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727942183; c=relaxed/simple;
-	bh=v6ALvc4W24Stl4DcbfKSXH2YeE+6bGWlnQQLPePuZlY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MZgnSwBGtbMO4i6wJDHQaTaMou9aKG3s63NosQX3xrDeJEBKZ2odmz5yHa3CWGX5PxSt6plbXf/LHzVaTdpcCgN3B/Jf61HpM803zNIdVlc9Noor2iU31PAh39PsdGb8Pe3edsLtRwg8I6W68OUcM+OrJmMxS4tBRdWVIJiFhs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HOUu0PXv; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c42e7adbddso650660a12.2
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 00:56:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727942178; x=1728546978; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EKyDwfp4Ml344QHsxkGSl5FGwY5UjFoy6Vbspzij4AE=;
-        b=HOUu0PXvRUlRwG6A3NrFVfEIIqo6NrHkKLYNeqH2kXA8v0EZii/r5T8AOgJB2qcEli
-         VUKchgLrjjSwUbiol/VZiWAFb6gKtSfgIXJboK/kzGdNW0lV9ZiClUp8DBlcR62cLy89
-         dgkpvr1UM1xbhNPW7DfOTnUTQyIholapiKhfjiYljAX6W5+HskqrvaKUhUQdZHmv0AZ8
-         29ZlsUk5RzANWOeBwPfapPv2T8UWzvWti2YSd3qZhJRBSNSsBDrs2kKtoxDPy/21UP15
-         wHJxwo6L3S9bmurt/6oei4n5ztEDqY6hkUzdhn8vQjQemrgc+9KSTmyYxB4g9XOiveeA
-         5a8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727942178; x=1728546978;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EKyDwfp4Ml344QHsxkGSl5FGwY5UjFoy6Vbspzij4AE=;
-        b=G76sv1r/k+n0tLvTZnSvugG1Yk6DEmComBRUGDaWtXbvtG4BP9vQqEEQwI77lQczqY
-         o7b3NCW+gatgKpkCbQfP3wHXP3TnHSGBI56GQ8d9rXDg5jawb3jEwwidKOe01m0BV9c+
-         7aMH1KTbkAFU2q+82nB+AGE347+a4yFsGaAHsezIm8tGjnVAn4RZLMCdXubtD+Z3DIcE
-         qn0DjmY08nbCyhTkL67mlLy5opDpYFISh+NK4okPUK9Bp01QIFlb/u1NnM4MYFVJEUey
-         iuKMCium26HcmIGj+p3z7wCJs7+ZvABnmRsTVcycuZC/moOEBZTFRVJaAm4BcGXmVf66
-         UL3g==
-X-Forwarded-Encrypted: i=1; AJvYcCW3xV2SCPGTqRWGwSAnlmIFNZQltg2VhTZznmKgEKAV3DiOqDiyvFDx59b/NltdgrrtGMtNB6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJmzuaj2EpJNnYjvf/NYR+d07OjhvOck+SD/s2VUOt5bsnaOv5
-	LcuA/ATIpZE+xGNvpvy2hU+qhvLHnlfk0IgL6CkN2dK2DyOPZXq1HjoRDKv+3hK1J7dqJyUMYlB
-	dkuW+eHP2fqXuhVUWqrvtQSUKIRG4BXszco3F
-X-Google-Smtp-Source: AGHT+IE1lXB/OQzfjadu4gqLsX6vwMaut6bPbMqb3wk8B2SU/Xr68rxVVKC73SYNSrAzyFVbSIuwVtACV3a0DRjhV8w=
-X-Received: by 2002:a05:6402:5255:b0:5c8:ad38:165c with SMTP id
- 4fb4d7f45d1cf-5c8b1b77ac0mr3450082a12.23.1727942177451; Thu, 03 Oct 2024
- 00:56:17 -0700 (PDT)
+	s=arc-20240116; t=1727942508; c=relaxed/simple;
+	bh=s8rhgO4icTGT7mesBVisBIN/aFhxQ7Ku3vUQsN8le2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SuhsAuca3AK33G/SIJ1UQ1AmMksdU41qg7HEUZC/pQj0maM0gIQ0DTn/qEFeEnJWLnRdE5OV/03iiWuCqtzWx7RCnKa6Ng4Sh4XSs/YoZXNb+mFeaNSbvwJyTSmRWtwGzn5SX5pX1zW89n1mscdxgWgosyLpNd+Gn4yCv8O7LOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AAxkc/mx; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A2B66FF80B;
+	Thu,  3 Oct 2024 08:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727942503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UtIpPwgDb7sTORjc+DbIwbzuLRI0mwmB7mFQ6yVwpvs=;
+	b=AAxkc/mxZvjZPzcs+E2uLWyyO0WQ1HdDvLaqL3qgbPgugA2ToG0O7Jp9CGlkjc2zLCMmPv
+	vQ1eYu3lI8AVMag14GQ45mh2Uf3QQ+uSSNSDAmhYroVzZkyaOmN/HZEqBwcS+KrTpGfE8S
+	1er89FO4NFbotF0l/of1IVWsP81UXTKbkxVa4BcVqG9EHhroaPcKSFz8ujP3BR3eclhXSY
+	EkZojh1puEv1kptv9GeznjCs7noJ0lZk2VRLlWCUUmStLcKNgntgIPijumx1mfqFsgDoaS
+	Ye40Bb+XRchYqzQZsQTt2XvRO6wWx2w76fJh/SJtXz5aZNs+QDn1dlp5p7VfoA==
+Date: Thu, 3 Oct 2024 10:01:40 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
+ <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
+ kernel@pengutronix.de
+Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for
+ PSE PI priority feature
+Message-ID: <20241003100140.153f660e@kmaincent-XPS-13-7390>
+In-Reply-To: <1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+	<20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
+	<1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002053844.130553-1-danielyangkang@gmail.com>
- <CANn89i+y77-1skcxeq+OAeOVBDXhgZb75yZCq8+NBpHtZGySmw@mail.gmail.com>
- <ff22de41-07a5-4d16-9453-183b0c6a2872@iogearbox.net> <CAGiJo8TaC70QNAtFCziRUAzN1hH9zjnMAuMMToAts0yFcRqPWw@mail.gmail.com>
-In-Reply-To: <CAGiJo8TaC70QNAtFCziRUAzN1hH9zjnMAuMMToAts0yFcRqPWw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 3 Oct 2024 09:56:03 +0200
-Message-ID: <CANn89iK7W1CeQS-VZqakArdZqZY6UQi2kCDcpUmL4dGjAQwbCw@mail.gmail.com>
-Subject: Re: [PATCH] Fix KMSAN infoleak, initialize unused data in pskb_expand_head
-To: Daniel Yang <danielyangkang@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Oct 3, 2024 at 6:42=E2=80=AFAM Daniel Yang <danielyangkang@gmail.co=
-m> wrote:
->
-> I took a look at https://www.spinics.net/lists/netdev/msg982652.html
-> and am a little confused since the patch adds a check instead of
-> initializing the memory segment.
-> Is the general assumption that any packet with uninitialized memory is
-> ill formed and we need to drop? Also is there any documentation for
-> internal macros/function calls for BPF because I was trying to look
-> and couldn't find any.
+On Thu, 3 Oct 2024 01:41:02 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Callers wanting allocated memory to be cleared use __GFP_ZERO
-If we were forcing  __GFP_ZERO all the time, network performance would
-be reduced by 30% at least.
+> > +	msg =3D pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
+> > +	msg.sub[2] =3D id;
+> > +	/* Controller priority from 1 to 3 */
+> > +	msg.data[4] =3D prio + 1; =20
+>=20
+> Does 0 have a meaning? It just seems an odd design if it does not.
 
-You are working around the real bug, just to silence a useful warning.
+PD692x0 has an odd firmware design from the beginning. ;)
+Yes, the priority available are from 1 to 3. Setting it to 0 does nothing.
 
-As I explained earlier, the real bug is that some layers think the
-ethernet header (14 bytes) is present in the packet.
-
-Providing 14 zero bytes (instead of random bytes) would still be a bug.
-
-The real fix is to drop malicious packets when they are too small, like a N=
-IC.
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
