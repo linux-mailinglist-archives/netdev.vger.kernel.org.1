@@ -1,93 +1,125 @@
-Return-Path: <netdev+bounces-131701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9291898F4CF
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:06:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D5298F4FB
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EDB3B208A1
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:06:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 073E51C21756
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0201A7065;
-	Thu,  3 Oct 2024 17:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88E1A1A76AC;
+	Thu,  3 Oct 2024 17:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RaF6r8TN"
+	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="EujAyb4I";
+	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="Xs8qFFej";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="bSATuhCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from fhigh-a1-smtp.messagingengine.com (fhigh-a1-smtp.messagingengine.com [103.168.172.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9049019D081;
-	Thu,  3 Oct 2024 17:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699C91A707B;
+	Thu,  3 Oct 2024 17:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727975174; cv=none; b=YMgi/vx4gTzTkQAywTXkfovsF3cLpUFnQgFmx6o/0FPhs/6Wa06JSAEWbTI9ka7CJ1kT6eDIhomHIYD1FLJ/e1QN65dLxTl6HJR8nRvmtOmeU/F3fBzdAb7JQIKbkHreEB1koidOtOcjtWGchvCIggExxbRUe/Ry4mBIvPFQfNA=
+	t=1727976072; cv=none; b=EfOL8Il2mC5DlddKFAPrrd8prJdc6IUuu3mEc0pFftz7s158WyBkdYP7KS/Mjl8EeVwx70QyF3ZHQuDeeJlP6QmFzrXqHYKgJI7Xm3VZTgDdDoRM7ece4lSwQ2FvVuslAWNSPf/hZaacGAVhLRg/4J5qblH0IG1+TlD53OtsSr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727975174; c=relaxed/simple;
-	bh=8xtl08LIfB+PcgXl6pTyRTIC2AIYH3M6YsJkFy4VQnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IhDk6kdSJADkG2MvzU4H6b/HpoplYI4guLxWSMMtD4KIyaheHITPncAwqb+tlB4xVZ62uMiaGMB147YmkMGaGsWFdoBKBgd3stSuFy/uai9U2gesLX+u1ApqmsylXcjMUvFr91QPf7gOgRVv4hXaHAC1H8c4Drwn3amn7xuUL2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RaF6r8TN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IZz+UidW/Gd8crcEeUt/a34aCAjHwfld1MoV/9qDFVQ=; b=RaF6r8TNzk1WcZ3sDYOrFtHWIj
-	BlhCtOvsrkBR9D7eWePA3x+V6A2OeVbr+/D+dKhei2virOJgG7UREAiwuxZDsYwYbRYVXdGVT8E1z
-	KrnCYxskSHcVDmmI0HJSsst0IfoQekGj/ga62QTH9pi501vVYFCNrZc1C3Nc/15C0qlU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swPH4-008xw9-8n; Thu, 03 Oct 2024 19:05:58 +0200
-Date: Thu, 3 Oct 2024 19:05:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Divya.Koppera@microchip.com, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	f.fainelli@gmail.com, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 1/2] dt-bindings: net: ethernet-phy: Add
- timing-role role property for ethernet PHYs
-Message-ID: <19207165-1708-4717-9883-19d914aea5c3@lunn.ch>
-References: <20241001073704.1389952-1-o.rempel@pengutronix.de>
- <20241001073704.1389952-2-o.rempel@pengutronix.de>
- <CO1PR11MB47715E80B4261E5BDF86153BE2712@CO1PR11MB4771.namprd11.prod.outlook.com>
- <a11860cc-5804-4a15-9603-624406a29dba@lunn.ch>
- <Zv6XOXveg-dU_t8V@pengutronix.de>
+	s=arc-20240116; t=1727976072; c=relaxed/simple;
+	bh=odplaax5nFtzkWYauYzHvoHDaAQI4Qhqdvc+ggoJRD8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QKVkSsRhnHV8pEwx03ftgRqNQI6YU02u+Ot2mOcN+frKE3ug5b1nahcPoktnNTd6xw8jD1VL/iajAogMpypivPKt4vapFhHkjB+1OmRQQsNXTdcjbZwEUjm0W7F3ExYrRIYLgcKT4A/mFM+QTcaKG9Iurk9F7DxC9wH/CBZX668=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=EujAyb4I; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=Xs8qFFej; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=bSATuhCx; arc=none smtp.client-ip=103.168.172.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 961F7114020F;
+	Thu,  3 Oct 2024 13:21:09 -0400 (EDT)
+Received: from phl-frontend-02 ([10.202.2.161])
+  by phl-compute-05.internal (MEProxy); Thu, 03 Oct 2024 13:21:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=2016-12.pbsmtp; t=1727976069; x=1728062469; bh=R33Y15aB7l
+	c+DctiSTThDrHLE2YXh9+A2YLQSAwYl3A=; b=EujAyb4Io7NRFq3hgB8yeWN5Rv
+	lnQhW78cYaK6sr8zCZUeG6J2H5x7Svqhm3glcLVSEF1gzE4e4W6+izhD64ndT17x
+	zkuAcwD5e6DjR3AHN1q2EVVgEnb/HB2p8Mp5sW20KSZVAerqsEXyAg9VrvoD6jGm
+	PqYMc4g8IyK3P8NIE=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1727976069; x=1728062469; bh=R33Y15aB7lc+DctiSTThD
+	rHLE2YXh9+A2YLQSAwYl3A=; b=Xs8qFFejyjWQH44lVNc6Mb6u23G0i8z6CviMw
+	RmPh4HVYq42OZAPs5L3+L0SRfSzJpY6wC3Z7locxnYBLuAeHfzRnzU8F2K3tpXCq
+	2kAdT0SJBNKil/LY8FviwIUbRnchdhUefQ0+LPcOT/cijt+7LTi3woHyRJ8rdO3C
+	UGLkGC6trjEukLi8emy9bRR8jGYQ65ogU/g1yEwupsGVDTaGg+pI4QyNMRenRdf+
+	Jt3FnqFfzfZt+RQTjKcTKp0qimHlBxjW96j9b6gt7HNDQca2T7nyEN4jdJInN621
+	xiP2Q2qe8LMqyPxsL1YBAkIURuUolEiXP4V/iVDGbnJ+wptDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1727976069; x=1728062469; bh=R33Y15aB7lc+DctiSTThDrHLE2YX
+	h9+A2YLQSAwYl3A=; b=bSATuhCxvK1i6OgNRdckAqusjO+xQvmouigGqmzBAhfH
+	w4uQEwwJ3GSZQNszrxzSSAvUzlkdLhWuD9urMHS2H/YUtcCuu8ywqY/ml8gnh9Q2
+	i+7+WdbOROq6ZR9LlO/W0iCX1+gEHDdNnp4gDJQ3yJGDpI8cOlEbXED8kjiQe5Ip
+	U0W67U2xgFDQTRJpyRWSsEUa3JEtfYVDZTBXzUB9xkWK7eSFQtPS+dG6PiR0d/sx
+	kcfU5U3yxMnk1XexyNk+3uZN634JGHff8CcAqMgc6OJtp02/6a6pY2t3fjYNq9QN
+	UzOIZBRimInEnlmijSGZclMovPuJuLZk38fNIHMvVA==
+X-ME-Sender: <xms:hdL-ZpVtF47QmEM2HV-CUrFMy4eSkprXwNv8JI09Coq3FXi3KIT_fA>
+    <xme:hdL-Zpmivw-aHqExKaOPX-Vxuv33pFbPKV7j5MNrI1E68d3b8T3LuifS9TuNsMZ9U
+    xgxZuhJbc9bnsIMaMY>
+X-ME-Received: <xmr:hdL-ZlYJGmuhsA0bvOJbtXSmwGqLAIJbce9_6QWNQNQInQ6cek8pPXZwxrQebPip05Cf020NHCZtKsLXXXnWuwQ7lvIG9VPAyH_Sqp2F9Ra8yjpDBw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvuddgudduudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecu
+    hfhrohhmpefpihgtohhlrghsucfrihhtrhgvuceonhhitghosehflhhugihnihgtrdhnvg
+    htqeenucggtffrrghtthgvrhhnpeduhfdvlefggeeugfejiefgtdekjeehkeevveegiedt
+    ledviefhveefteffieegkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhitghosehflhhu
+    gihnihgtrdhnvghtpdhnsggprhgtphhtthhopeehpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopehnphhithhrvgessggrhihlihgsrhgvrdgtohhmpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehprggsvghnihesrhgvug
+    hhrghtrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrd
+    horhhg
+X-ME-Proxy: <xmx:hdL-ZsWppHJKDi3DzG1gDhQG9puegZBI3ke4bAdy2t99g3aAvV0mHQ>
+    <xmx:hdL-ZjkLg1TIDs6SNnT5X07_wkq8c2H49HV79BbcIFN1D5QMVaixAg>
+    <xmx:hdL-ZpeZU_8a9r3T1CiO-2Ofnl-1fS9rFdV34lfAWv7YQQn-ubSFsg>
+    <xmx:hdL-ZtGgZ87xKJsSazbjWhBNTBYoRucrzBnmuBeuUBG0jOCeG0n5Yg>
+    <xmx:hdL-ZhZiv3XDjWvowVqjLunL3TUbms0LLVNi97S9H7fxKRvYdkbJtWJK>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 3 Oct 2024 13:21:08 -0400 (EDT)
+Received: from xanadu.lan (OpenWrt.lan [192.168.1.1])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id 38172E3B223;
+	Thu,  3 Oct 2024 13:21:08 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Nicolas Pitre <npitre@baylibre.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2 0/2] fix ti-am65-cpsw-nuss module removal
+Date: Thu,  3 Oct 2024 13:07:11 -0400
+Message-ID: <20241003172105.2712027-1-nico@fluxnic.net>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zv6XOXveg-dU_t8V@pengutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 03, 2024 at 03:08:09PM +0200, Oleksij Rempel wrote:
-> On Thu, Oct 03, 2024 at 02:08:00PM +0200, Andrew Lunn wrote:
-> > > > +      - 'force-master': The PHY is forced to operate as a master.
-> > > > +      - 'force-slave': The PHY is forced to operate as a slave.
-> > > > +      - 'prefer-master': Prefer the PHY to be master but allow negotiation.
-> > > > +      - 'prefer-slave': Prefer the PHY to be slave but allow negotiation.
-> > > > +
-> > > 
-> > > I would suggest to use "preferred" instead of "prefer" to be in sync with existing phy library macros.
-> > 
-> > How does 802.3 name it?
-> 
-> 802.3 use "Multiport device" for "preferred master" and "single-port device"
-> for "preferred slave". We decided to use other wording back in the past
-> to avoid confusing and align it with forced master/slave configurations. 
+Fix issues preventing rmmod of ti-am65-cpsw-nuss from working properly.
 
-ethtool is preferred, so it would be more consistent with preferred
+v2:
 
-[Shrug]
+  - conform to netdev patch submission customs
+  - address patch review trivias
 
-	Andrew
+v1: https://lore.kernel.org/netdev/20240927025301.1312590-2-nico@fluxnic.net/T/
 
