@@ -1,92 +1,64 @@
-Return-Path: <netdev+bounces-131759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED12598F729
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:47:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38FDA98F72D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:48:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8CDC283AE5
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:47:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A89CD1F223B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCDC1ABEA0;
-	Thu,  3 Oct 2024 19:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49A41AB6DF;
+	Thu,  3 Oct 2024 19:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="PKQM7yeB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAmI5UPQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2747E84A51
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 19:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9EC1A4F0F;
+	Thu,  3 Oct 2024 19:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727984853; cv=none; b=o7nZ53+jJ5AKcW669E6sCu4Kw8nVK8hCjaa4jtYEaIu+vh5RwCeUbY4gQTAub/piBhK48AeBNsetVtymP8rbTiXNt48TGIg3yoJFVRq1zzAkMInzItmtRID6lItuTLZ7QNish0BjNT4VFNtFyWvNLYv6IZX+pIZA9R4d1DneXYE=
+	t=1727984904; cv=none; b=o+ur7rwP1PHFGXi7PAHlTEzT6GG9r7cX+eaLcKaDARzVi1bWnrEdnJWClAH4zWQz/q8Cp4+KwOCC9grchZS7ELdvdxBiQQno6bNiZFbZ8CDGa+FlP8r5gxpFYr9wZ1yfrDQ40kc9vuukk177n1j0efX4nkpRTHT8LfhtzftuMco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727984853; c=relaxed/simple;
-	bh=f/n1fnuRk2wySinm2hdA0/J+6kWStc5EkQ8GcqSDVjs=;
+	s=arc-20240116; t=1727984904; c=relaxed/simple;
+	bh=qqtwyKHdqGFDaQm8XpSYQcJY1KwB0a1nrS7ZyxA15TY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d4Ge8GU/Ai73rN3o8UT+V3wzpoaseh/7DIqWHA2AY+biLavGEMD6q5gryy/nrYfdopqCkZUF3qKEeY3vbB1XP+l4FcmeqZLnLeeCFTiYzVQIgwG7z68AFtiSs5pDmwsQsiH8lRlDVFcdz6jl+p8x3oEdvwLmJBzevfvFQVYNb/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=PKQM7yeB; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e0a950e2f2so1193892a91.2
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 12:47:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1727984851; x=1728589651; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=E6szT/FpCAfvnqIBQRuc9jFvCTYo4EHgz6+eLgogUoQ=;
-        b=PKQM7yeB9dsVvE7O4oRrZ5kjwWEAKMkZdNgXxGkyemrBKFn1LExQlkaluX9+tuq45p
-         OAEWYcAQ9KtIbbmI0DCB1J7MSy1iVoq0z258Ks013bW5YObwPYsoTp6je1y1AQ6aXA+l
-         A+Q5kGRbaU2Dh9NxFgbpJOU48j72brJP88mR8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727984851; x=1728589651;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E6szT/FpCAfvnqIBQRuc9jFvCTYo4EHgz6+eLgogUoQ=;
-        b=vAER1uc7xe5s80wZGJhv1pKzXE37NJh68wM/GbNVGSVhp1yhS/AeYcqPTzyyNuYHQU
-         PQeBp6NHVe+m+BndUagrxQ7L31K2KCByJDKFbWrAHbjKkj/u2PdYf9mNNrssEZq0G3fl
-         YW1Di0xDXmhl+0U0WbjeK/h15MblQeCHGt83SuJ5oXytAdckO6XvV+fmSsSu8FTQ4L1C
-         6z/fMB+f7/hyuhJGbW5G2dXyIGeACS2pv+UC+bhrxQIq442bHWoO2ov0pZ5qc4Jfv33e
-         Nne1v64yh/BeI9R/nt3G55euyDp2p71MayM4Bch3kyVGnYZR38NDcxfyZBx+AvgwX55P
-         Tfvw==
-X-Gm-Message-State: AOJu0YwKThrIKGLNVBdRiEREvI92ZHcfATM13645gshMhqDjQKbXrUfm
-	txFENBcyPbZPFwLmGnFJ0I5RCLkNAlBFXE0eyHozau4eVsCPFxFrp0tHlUhvYIA=
-X-Google-Smtp-Source: AGHT+IHV2/djWNYS5fw+1rgEidSNS8de6CY94Cyn5UGCw1O7IeO2aCLwXJh1lfVYZNys6q+7KBu9KQ==
-X-Received: by 2002:a17:90a:3487:b0:2c9:81fd:4c27 with SMTP id 98e67ed59e1d1-2e1e6228335mr253720a91.14.1727984851413;
-        Thu, 03 Oct 2024 12:47:31 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1bff5474esm2077328a91.54.2024.10.03.12.47.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 12:47:30 -0700 (PDT)
-Date: Thu, 3 Oct 2024 12:47:28 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: netdev@vger.kernel.org, Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 2/2] tg3: Link queues to NAPIs
-Message-ID: <Zv700Aoyx_XG6QVd@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, netdev@vger.kernel.org,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240925162048.16208-1-jdamato@fastly.com>
- <20240925162048.16208-3-jdamato@fastly.com>
- <ZvXrbylj0Qt1ycio@LQ3V64L9R2>
- <CALs4sv1G1A8Ljfb2WAi7LkBN6oP62TzH6sgWyh5jaQsHw3vOFg@mail.gmail.com>
- <Zv3VhxJtPL-27p5U@LQ3V64L9R2>
- <CALs4sv0-FeMas=rSy8OHy_HLiQxQ+gZwAfZVAdzwhFbG+tTzCg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJA19NNdyGpBXRYS42Vj4XgCl1ObhX6ywZckfjX2RG9FJc+VZyEf7AJjakkbHAHBa3H00u5+IiIO6NNdLmSriovzgqmFDAmZYl99P2Xh9lyMikhQxNr9BDbzRh2eN9LUEBhjluMuQOInFttIJ4Qap5SpP35o14ZQFII+vE73L3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAmI5UPQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C088CC4CEC5;
+	Thu,  3 Oct 2024 19:48:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727984904;
+	bh=qqtwyKHdqGFDaQm8XpSYQcJY1KwB0a1nrS7ZyxA15TY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VAmI5UPQD76BOp3/CbtoGgE9LU5UY72qHe7Uon2iTn7vUs+7cQ3W9oj9xI8qsYbc8
+	 6OTGBA1ps6XoKk9GN18YtDi7q+OuOJfJe/aBvkO+qg74E3mHREZCPi75wxY5NlpU8b
+	 rz4L2xwngxBLhcsFx0tygoBILHedxri66rdoGazleOOSPIgXB6lMK+4sgbfpI3ykkj
+	 OkC9ke0aHEymouPQS8nPlXa099bUhTYRL7dBjFNMm8oRqvwgUMpgkYy+gw4YWWuwxi
+	 OrMwaU6R5HUpSXIU4vcc0zjU7EajPrKjG0ekD2nPC1dyRiR+4Rj1TF4vXmc97LhjSa
+	 Gz2Ca5vdfz4zw==
+Date: Thu, 3 Oct 2024 12:48:22 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Lucas De Marchi <lucas.demarchi@intel.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, kuba@kernel.org,
+	stefanha@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-modules@vger.kernel.org
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+Message-ID: <Zv71BrHKO_YwDhG_@bombadil.infradead.org>
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+ <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
+ <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
+ <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
+ <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,103 +68,127 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALs4sv0-FeMas=rSy8OHy_HLiQxQ+gZwAfZVAdzwhFbG+tTzCg@mail.gmail.com>
+In-Reply-To: <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
 
-On Thu, Oct 03, 2024 at 09:56:40AM +0530, Pavan Chebbi wrote:
-> On Thu, Oct 3, 2024 at 4:51 AM Joe Damato <jdamato@fastly.com> wrote:
++ linux-modules@vger.kernel.org + Lucas
+
+On Mon, Sep 30, 2024 at 07:03:52PM +0200, Aleksandr Mikhalitsyn wrote:
+> On Mon, Sep 30, 2024 at 5:43 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
 > >
+> > Hi Aleksandr,
+> >
+> > On Mon, Sep 30, 2024 at 04:43:36PM GMT, Aleksandr Mikhalitsyn wrote:
+> > >On Mon, Sep 30, 2024 at 4:27 PM Stefano Garzarella
+> > ><sgarzare@redhat.com> wrote:
+> > >>
+> > >> On Sun, Sep 29, 2024 at 08:21:03PM GMT, Alexander Mikhalitsyn wrote:
+> > >> >Add an explicit MODULE_VERSION("0.0.1") specification for the vhost_vsock module.
+> > >> >
+> > >> >It is useful because it allows userspace to check if vhost_vsock is there when it is
+> > >> >configured as a built-in.
+> > >> >
+> > >> >This is what we have *without* this change and when vhost_vsock is
+> > >> >configured
+> > >> >as a module and loaded:
+> > >> >
+> > >> >$ ls -la /sys/module/vhost_vsock
+> > >> >total 0
+> > >> >drwxr-xr-x   5 root root    0 Sep 29 19:00 .
+> > >> >drwxr-xr-x 337 root root    0 Sep 29 18:59 ..
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 coresize
+> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 holders
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 initsize
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 initstate
+> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 notes
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 refcnt
+> > >> >drwxr-xr-x   2 root root    0 Sep 29 20:05 sections
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 srcversion
+> > >> >-r--r--r--   1 root root 4096 Sep 29 20:05 taint
+> > >> >--w-------   1 root root 4096 Sep 29 19:00 uevent
+> > >> >
+> > >> >When vhost_vsock is configured as a built-in there is *no* /sys/module/vhost_vsock directory at all.
+> > >> >And this looks like an inconsistency.
+> > >> >
+> > >> >With this change, when vhost_vsock is configured as a built-in we get:
+> > >> >$ ls -la /sys/module/vhost_vsock/
+> > >> >total 0
+> > >> >drwxr-xr-x   2 root root    0 Sep 26 15:59 .
+> > >> >drwxr-xr-x 100 root root    0 Sep 26 15:59 ..
+> > >> >--w-------   1 root root 4096 Sep 26 15:59 uevent
+> > >> >-r--r--r--   1 root root 4096 Sep 26 15:59 version
+> > >> >
+> > >> >Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+> > >> >---
+> > >> > drivers/vhost/vsock.c | 1 +
+> > >> > 1 file changed, 1 insertion(+)
+> > >> >
+> > >> >diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> > >> >index 802153e23073..287ea8e480b5 100644
+> > >> >--- a/drivers/vhost/vsock.c
+> > >> >+++ b/drivers/vhost/vsock.c
+> > >> >@@ -956,6 +956,7 @@ static void __exit vhost_vsock_exit(void)
+> > >> >
+> > >> > module_init(vhost_vsock_init);
+> > >> > module_exit(vhost_vsock_exit);
+> > >> >+MODULE_VERSION("0.0.1");
+> > >
+> > >Hi Stefano,
+> > >
+> > >>
+> > >> I was looking at other commits to see how versioning is handled in order
+> > >> to make sense (e.g. using the same version of the kernel), and I saw
+> > >> many commits that are removing MODULE_VERSION because they say it
+> > >> doesn't make sense in in-tree modules.
+> > >
+> > >Yeah, I agree absolutely. I guess that's why all vhost modules have
+> > >had version 0.0.1 for years now
+> > >and there is no reason to increment version numbers at all.
+> >
+> > Yeah, I see.
+> >
+> > >
+> > >My proposal is not about version itself, having MODULE_VERSION
+> > >specified is a hack which
+> > >makes a built-in module appear in /sys/modules/ directory.
+> >
+> > Hmm, should we base a kind of UAPI on a hack?
 > 
-> > This is happening because the code in the driver does this:
-> >
-> >   for (i = 0; i < tp->irq_cnt; i++) {
-> >           tnapi = &tp->napi[i];
-> >           napi_enable(&tnapi->napi);
-> >           if (tnapi->tx_buffers)
-> >                 netif_queue_set_napi(tp->dev, i, NETDEV_QUEUE_TYPE_TX,
-> >                                      &tnapi->napi);
-> >
-> > The code I added assumed that i is the txq or rxq index, but it's
-> > not - it's the index into the array of struct tg3_napi.
+> Good question ;-)
 > 
-> Yes, you are right..
 > >
-> > Corrected, the code looks like something like this:
-> >
-> >   int txq_idx = 0, rxq_idx = 0;
-> >   [...]
-> >
-> >   for (i = 0; i < tp->irq_cnt; i++) {
-> >           tnapi = &tp->napi[i];
-> >           napi_enable(&tnapi->napi);
-> >           if (tnapi->tx_buffers) {
-> >                 netif_queue_set_napi(tp->dev, txq_idx, NETDEV_QUEUE_TYPE_TX,
-> >                                      &tnapi->napi);
-> >                 txq_idx++
-> >           } else if (tnapi->rx_rcb) {
-> >                  netif_queue_set_napi(tp->dev, rxq_idx, NETDEV_QUEUE_TYPE_RX,
-> >                                       &tnapi->napi);
-> >                  rxq_idx++;
-> >           [...]
-> >
-> > I tested that and the output looks correct to me. However, what to
-> > do about tg3_napi_disable ?
-> >
-> > Probably something like this (txq only for brevity):
-> >
-> >   int txq_idx = tp->txq_cnt - 1;
-> >   [...]
-> >
-> >   for (i = tp->irq_cnt - 1; i >= 0; i--) {
-> >     [...]
-> >     if (tnapi->tx_buffers) {
-> >         netif_queue_set_napi(tp->dev, txq_idx, NETDEV_QUEUE_TYPE_TX,
-> >                              NULL);
-> >         txq_idx--;
-> >     }
-> >     [...]
-> >
-> > Does that seem correct to you? I wanted to ask before sending
-> > another revision, since I am not a tg3 expert.
-> >
+> > I don't want to block this change, but I just wonder why many modules
+> > are removing MODULE_VERSION and we are adding it instead.
 > 
-> The local counter variable for the ring ids might work because irqs
-> are requested sequentially.
+> Yep, that's a good point. I didn't know that other modules started to
+> remove MODULE_VERSION.
 
-Yea, my proposal relies on the sequential ordering.
+MODULE_VERSION was a stupid idea and there is no real value to it.
+I agree folks should just remove its use and we remove it.
 
-> Thinking out loud, a better way would be to save the tx/rx id inside
-> their struct tg3_napi in the tg3_request_irq() function.
+> > >I spent some time reading the code in kernel/params.c and
+> > >kernel/module/sysfs.c to figure out
+> > >why there is no /sys/module/vhost_vsock directory when vhost_vsock is
+> > >built-in. And figured out the
+> > >precise conditions which must be satisfied to have a module listed in
+> > >/sys/module.
+> > >
+> > >To be more precise, built-in module X appears in /sys/module/X if one
+> > >of two conditions are met:
+> > >- module has MODULE_VERSION declared
+> > >- module has any parameter declared
+> >
+> > At this point my question is, should we solve the problem higher and
+> > show all the modules in /sys/modules, either way?
 
-I think that could work, yes. I wasn't sure if you'd be open to such
-a change.
+Because if you have no attribute to list why would you? The thing you
+are trying to ask is different: "is this a module built-in" and for that we
+have userpsace solution already suggested: /lib/modules/*/modules.builtin
 
-It seems like in that case, though, we'd need to add some state
-somewhere.
+> Probably, yes. We can ask Luis Chamberlain's opinion on this one.
+> 
+> +cc Luis Chamberlain <mcgrof@kernel.org>
 
-It's not super clear to me where the appropriate place for the state
-would be because tg3_request_irq is called in a couple places (like
-tg3_test_interrupt).
+Please use linux-modules in the future as I'm not the only maintainer.
 
-Another option would be to modify tg3_enable_msix and modify:
-
-  for (i = 0; i < tp->irq_max; i++)
-          tp->napi[i].irq_vec = msix_ent[i].vector;
-
-But, all of that is still a bit invasive compared to the running
-rxq_idx txq_idx counters I proposed in my previous message.
-
-I am open to doing whatever you suggest/prefer, though, since it is
-your driver after all :)
-
-> And have a separate new function (I know you did something similar for
-> v1 of irq-napi linking) to link queues and napi.
-> I think it should work, and should help during de-linking also. Let me
-> know what you think.
-
-I think it's possible, it's just disruptive and it's not clear if
-it's worth it? Some other code path might break and it might be fine
-to just rely on the sequential indexing? Not sure.
-
-Let me know what you think; thanks for taking the time to review and
-respond.
+  Luis
 
