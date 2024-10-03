@@ -1,266 +1,700 @@
-Return-Path: <netdev+bounces-131497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B880B98EA94
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:43:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27DEA98EAD7
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC0B91C21559
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:43:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78231B23069
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 07:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E51127B56;
-	Thu,  3 Oct 2024 07:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5370823DF;
+	Thu,  3 Oct 2024 07:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mJzk0WBd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lZDf2yhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DD6126BFC;
-	Thu,  3 Oct 2024 07:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727941380; cv=fail; b=K/rq5vZ80GVXOtzA5R7hGkkV/unHJZ/M7PcmL+QE/KJ91ku1u4NIWuE4P4nEoWCJvijY+se2ELUqqqn/o6EIxVcC1kr4lWnmiN9EQ3G8DJ0rrtvBUyhu4+o5raSkSFg97nQlcNr6bKFGiE+XGvHfLrJfCa4ayLgwwkFTdc+XRXE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727941380; c=relaxed/simple;
-	bh=ssXL7omgwhLaWBdZRUtC87QyCAxT0Zr0lTFtJv46al4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=oTJIFl3r6Tb8X5s3GbmyFrsNLy9yCXqHEo3GHpr8jlAVj/Z6MfLlECFsHH0CcgYy0eqaqYe9Qv3cfrjmQ82aF34+9Ig+CyW8Y0/c2jCOX+nVn2IcTS6DFSdFVaXXHG6AItxvTD9AoBjAmI58Cj2F3datm0RuFjbc2Wh32gFDJQQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mJzk0WBd; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727941379; x=1759477379;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ssXL7omgwhLaWBdZRUtC87QyCAxT0Zr0lTFtJv46al4=;
-  b=mJzk0WBdgXkMguyQ64DCwUTp/IcTnwR+W7xk2Oz64/cLtpqEtdhcWfjr
-   /RgsanuYgA90/3oXWhQ4KWGGZJ8+NRVTR0x9ZWQGcW9X/luQgmEbi36F5
-   zZir0oBdNrSB6DGiMqPc8DjNUjwEEXNcTMX787eCV7zLka+NMkWnZ4TEu
-   9JgJbxh0drXbAszVw3Hqb9RnvLvI3RHWR5uaNJzb4tW+0Ke5QvQcI6cmS
-   NwnBUCTpqZKyYGJ0I65x9ePexARukHsBZtf4M8Yu87chyvKF25aAgUNUu
-   zd2Zm+eEojRqY52kqq9sZF4HuJCPAgFrlHYi6Eqy3j5FBMSItEH8D5JWF
-   A==;
-X-CSE-ConnectionGUID: Q0PtaSJuSc6Y4K3xU+rFtQ==
-X-CSE-MsgGUID: 4AGfTqVyTaqqRKW8DdXVTQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11213"; a="38508594"
-X-IronPort-AV: E=Sophos;i="6.11,173,1725346800"; 
-   d="scan'208";a="38508594"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 00:42:59 -0700
-X-CSE-ConnectionGUID: Pzr5cggWSuidFK42Cm9xkg==
-X-CSE-MsgGUID: WXeYIPBvRheqDj0NUjxtgg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,173,1725346800"; 
-   d="scan'208";a="73855447"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Oct 2024 00:42:58 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 3 Oct 2024 00:42:57 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 3 Oct 2024 00:42:57 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 3 Oct 2024 00:42:57 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=kojEa5pm2+jz0W0EKGGm6r8I4pVXRp4bGg7RjiLvBk922RLbdQ3hxK9E8A/kVVBDKMo+6sJMmvvNQtMBl+d45CVznXvTEYdEPhIuPFfuBxMpGmdVpIYBkGDXjfo9CBOLd/7P9K2uZ/qw1qPT/BlypxLuLeUgfT6pM7Sgq1eDu9/Bg5KPktEAM872WwcRcY15Wd0jfkytwcSphOcnuxXBtUnJGaE/xTVsQIWvVfaeXpLiK3HMSWBvlMAjiQLErsW+jPjEy9iQ/cFgIz2QJ9DdqENPLpwoQ4ZwDsbOhGGy3DnKL7RU52eEmNAtjErpSHOyNxYSykLedLveN8RACswqyg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UFrGIgEG6S/Mxnm2zOeOpLlrdVJ1CngOVdu9u4WUcMs=;
- b=JYjLzzONN491KdOXuE70XbYmfOfqs9gdetyhU3F7qREecBKEnMuAKEmvH3EtuHyQEbvJsN1sj2TQ418Wbmyai0d5VMAdxUuYyNve/b3LMA2YI2cf27Udf9ZqiUVFAqM1rLKQE9pKcfoS5+1I0AKqSOehb8q5MIhhMsimR/tcBL78a7QnpO7+/wu3GGJmeZRMwYGOg5vO1N5Wybs+7zyQWVFf1Pcd+m7QBIHZQPytd/Z8bt6tIbkyhroEdYHt2BHqchdbXCtP9Oyt20oYPMxxnA0tbmksXLWkk+6FomKiOmdrpCMgrs+KvRxU9NZVZkRp+3zrT+NUFVY9d6qANkl84w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
- by DS0PR11MB7383.namprd11.prod.outlook.com (2603:10b6:8:133::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
- 2024 07:42:55 +0000
-Received: from BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
- ([fe80::b8f1:4502:e77d:e2dc%2]) with mapi id 15.20.8026.016; Thu, 3 Oct 2024
- 07:42:55 +0000
-Message-ID: <bfd9406c-4786-43b9-850c-f1b76f9a9ec2@intel.com>
-Date: Thu, 3 Oct 2024 09:42:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 1/1] net: phy: marvell: avoid bringing down
- fibre link when autoneg is bypassed
-To: Qingtao Cao <qingtao.cao.au@gmail.com>
-CC: Qingtao Cao <qingtao.cao@digi.com>, Andrew Lunn <andrew@lunn.ch>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	"Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20241003071050.376502-1-qingtao.cao@digi.com>
-Content-Language: pl
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <20241003071050.376502-1-qingtao.cao@digi.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA0P291CA0002.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1::29) To BL1PR11MB5399.namprd11.prod.outlook.com
- (2603:10b6:208:318::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A49981AB6;
+	Thu,  3 Oct 2024 07:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727942025; cv=none; b=FpJSSDK8VH+bB/yidmpDRKn+XxEevHb3T2Fjcpfw3aLDVFsrdey6Vx2J3RjzFzGYKqM6z2u22RrF2h/Uq86T9NidXo7FcknP9nMEcIrl4kVdIB6xTgF8dpjMq1rsdMv+6RdzhErXQ9hHPteRaG1zdoFcotR279wL8hf/TfSR+wE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727942025; c=relaxed/simple;
+	bh=fJjIwf6vHVPDWb2hGO6ui9S7NubFxA3r0xZK3lZ/Oo8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p50QShffJ4zk8nbN3yG20n8iJ/isRG41k0rzwHrW5PJtMhl35D59DBguulJ0RiCkwpL/KotFYNGzeRSE5Cv4A2nD/KsnPDMX0DH3mIfkaGTXSEb3VcvOjr6fQcKRlOe7lIpZKpPvDwrDhmFPjg2IKANTz8jqcCvey40H4MTNtdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lZDf2yhA; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 339AA240008;
+	Thu,  3 Oct 2024 07:53:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1727942013;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9fVJAb5Wk7Sze5ekWlpALyW16KpSyRTvzi/0vqtATt4=;
+	b=lZDf2yhAhWSTYO5vfdIn+AIFf/DdvUCAJQgZzky9op87BWsnD96Xh6jLE33/ExXIac4Fg6
+	vYZOBLYbrDgnuiv3jRHQg+b7c5OkaAs/Pj7hY6EyZ1f7CYDovZy8AI3iCxFgF9X6yjD4aY
+	F2nCBHPJNCMneiBcPzTabIZK8ifw/zTF+t+2kqfyCPIG3sF6eVfJ6Hg1dBI142kLVs/rVC
+	edbQPP4EjhQA3yb6dBuDFzwHD+6Hy2415c9QH+XAjdy9ULEhmFKTM+aLGE8jXo3nFOf1iE
+	BuBjvDAnNuFyybdsfm3CBBy8lxl5gG2YilqMNprND6LXmMZOzwvblqjVjzoEfQ==
+Date: Thu, 3 Oct 2024 09:53:21 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, Kory
+ Maincent <kory.maincent@bootlin.com>, Lukasz Majewski <lukma@denx.de>,
+ Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Russell King
+ <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: add Twisted
+ Pair Ethernet diagnostics at OSI Layer 1
+Message-ID: <20241003095321.5a3c4e26@fedora.home>
+In-Reply-To: <20241003060602.1008593-1-o.rempel@pengutronix.de>
+References: <20241003060602.1008593-1-o.rempel@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|DS0PR11MB7383:EE_
-X-MS-Office365-Filtering-Correlation-Id: d8b96f38-ce3b-4b27-5d44-08dce37efe6d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bDVkSGpDMzh2UHlWeWsreUR5aEM5c1NtbDdnYTBrLzBab1JUeFhFRkxuVmFS?=
- =?utf-8?B?K2pLWmp0cmpBMHYyNEc4eGgxUW10Y08yN05Bb3dnTDZuRjVMVVFkWjZwZ1BK?=
- =?utf-8?B?blAvWHRIZkJybnB6VDZMOHROSG1LYlZuSklWVGZIcTFza0djOGc4dzErUFJ4?=
- =?utf-8?B?bWVTOUUzWnJDZkRUMnJ5dWp6SDV4dzF1ZGpEb2tiM0pmTitXeFRwbjVtajU4?=
- =?utf-8?B?bldzNzU3NzE3dTNQeklQVDRHK1lUVC9leW1yNU9wQ0VUTDJWWlZLSGZQNU1m?=
- =?utf-8?B?L1Q5dlhqM1NCUW50eXJ2VzJNTnJqbzFBTXV2QWVqWDN4OGt1dGJ5VkcvNU0z?=
- =?utf-8?B?WTZ0MTBKeVFlYlBjNkEwdG9qZUNTSTRUNzZDejVTYW0rS2lraDhWQ3lrVmM5?=
- =?utf-8?B?dStYRHYyWFNxSXVCWmREZmgwQk43MnVFWGdQTVJYekIvWTdWTTRMNlM4YS8y?=
- =?utf-8?B?RldZbzNMM3V0cTg5Z3BuNXF0UHppL28vU3BQbzhQYnpGM3FVc1pxeGYvbklF?=
- =?utf-8?B?STVYektQOWZjV0pEZG9OWWNVUDAzNVJvby9MS2lBZ2ZFUytjZzZ0bERPVGpY?=
- =?utf-8?B?MHExV0psdmVCb3pBMHRMeXNaa3BxNDZNeFA5OTBMbkt2cU5VQjFHRnVza0x3?=
- =?utf-8?B?UTd4UFdEa2RuMXhQRU5pdFpRbDZkSHlEd0EyOUFMK1FVbzFCVlVNb0g2d3lY?=
- =?utf-8?B?VlZoRWJzVW5zT2FVVmpSaVVVZWFLTkFINXJYNW1GTTFibWJGeHNsNThGWHZC?=
- =?utf-8?B?bkdBT0xSMUt6a3BJR1BhcjdleWFFZlZvNTJUZHdocnNTWFlDT055OUNvMGJI?=
- =?utf-8?B?cFVnQ3RVc1pGYjlGQWx1MFhpd1lRSlk1TDY4LzdDQzZWOUZzb3E0SktzRjVX?=
- =?utf-8?B?T2FYTzQ3UGpUcGplemtmOWw0dkE2eU1EOTlHaEJocS9rUERrSmszbWZ0TEJV?=
- =?utf-8?B?WDNSVVUwRlBGV21saFhxTVFiYVFIaHlNRFFMNFo0bTljT0xrZXQ2OUk4aEh4?=
- =?utf-8?B?b2xvY1N1RlQyNm9VbXBBU2ZpZ0ZpaVZWL0RyS1dYaU9vdkx1L200UWJaQVcr?=
- =?utf-8?B?VlQvN0U2NDBJaHJqc0xDMnJUTkErOUYvM2EvSDNIZ2hTd2RqZzFhajdxS3hD?=
- =?utf-8?B?N1U1RUVnMVlWbVpydGRkMFJvbnlMQk5mM0ZYU1VROGF1a0VHYzJUaGgyMmpP?=
- =?utf-8?B?a3VhRHpSMjVJalhJWGdTellRcGQ5cEwzTmJiTTVDNU1qc2ZwM3IwZnFlcHRC?=
- =?utf-8?B?WldueGVzRDFhaGpmWGx5MjVlM21rL21LSzRLd09vM2Y1QkQzaWdDR1ppTDg3?=
- =?utf-8?B?MFB2S1cxRUVuQ2hMcHJ0bzVHeVVFZXIrTlpWeDEyYUlZcENHNFl6N2d6UmI4?=
- =?utf-8?B?NUJYdWdjRGhxcS9jek9aUW1aeTFQWHhKRldQSndQSVRWcFhHWWJSMU90Zm4y?=
- =?utf-8?B?YitSUXhmejR2eWtDZ2pKbDN2NGM0cTMrenNpcUlUamYwLzFjL2RtMmk1MDQ5?=
- =?utf-8?B?OThmY0xVSWFyN0psUmh6NW12M2paNHZPZUdBNUFKV0lOeEE2WlZycTFWL3Nl?=
- =?utf-8?B?MkZ3MXVsMWx3NFBneDh3ejY1QTZXOUZPMjlrMENtQ2Y5SUJqU21FOWJZWGQ5?=
- =?utf-8?B?YURrQzl4RlJpSmtRNlBNOHE0TW1MVDFlY0U5bDFnb0N4NzlmWmMrSHR1aWVO?=
- =?utf-8?B?V21ZcTJRekg3WFVLVUQ4em5GcStuMVVBQlFVUWtGeVNuL0tTSWIxM3F3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S3BlcHRHazg4ek9VLzZyL0ZHRjJQQnBwcG5DaUp1V0hQOFFFK09PbUMwTTln?=
- =?utf-8?B?WHRMU1Uyck9OSytnZ2Z3T2NtcHkvOUErN2gyL1d6QUJNc1BrSFI1b0JVMDNr?=
- =?utf-8?B?a1E1cFBIeEtKdithU3QwdUJETXhRajJSaDdCdTlZbjJqUkF6OTZtRytTQ2tE?=
- =?utf-8?B?NW9hb1VmYjQ0bTMwVHpoNk1Xell5Vmg2YlBmUHJOZ2FHc2lYSkI1cUpHcEFR?=
- =?utf-8?B?cjNHc1hWelNCZTgzWnRHNjhZQjZoSU54ZXJpQ2FzRTdnbWloaWN1d1pLYy9M?=
- =?utf-8?B?SFNXT1UwWlJDaldSdC9uanlsU3BmRHQrcnVCK3VPMU11TVdRR2tzRzg3NkRE?=
- =?utf-8?B?dEZhdDdDQXV6Ykdnck5jK1NOcUhRTndrbkZEbnJlWFN5R2YrNkM1VjdwYWJs?=
- =?utf-8?B?MlVld0hCTEFmaXl3aWF0eXNGWVh0aTRtU0NzbWc3eW5pUXlhVGNTUE4yM1dj?=
- =?utf-8?B?R1gzUnB3VWZWRm9uODRDTEFFWGNNL3R4dkhYeG0zSjZaNXJjdEtIbGxoL25o?=
- =?utf-8?B?QWxRSE9wOWNUaG1iMEllNE1hQWJabFdKU3lFY25UYTBSYXJ5Y3k1V05BNjhW?=
- =?utf-8?B?NTEvd1lucnQzNzlPSUE5RDQraFRFY3Nyb21GZ0ZMN3dGYWxLM0hLK0VUN2Ur?=
- =?utf-8?B?Nmp3ZW5KeitFVGJZbWp6RUhSMytWbmJKUklWYVd3UGpQVnRHcXNwZDNvYVFG?=
- =?utf-8?B?UHlDczB2MW5KQndjalhUV2d2YTk1cVhVcm5jUFZ2dTI0cEJaOHJRdnBxOEx2?=
- =?utf-8?B?YnNFMEZVUXpzN21UM09BNDBsSE9weTdZKzNrdUlHTVQ5MHdHTExybTNIV1F4?=
- =?utf-8?B?UTZUeEdSYWxUdG13bzdqN2xId3gxNkRaVmdjQ2J5dTY2M3lySHdoSzlYRVln?=
- =?utf-8?B?SVY0UU9HTzcyeVY2YjArWVE3MWNiSEIxeVZIYjJJL0VpckozMTRwS2RFaTdr?=
- =?utf-8?B?NThtNXNyeElPaFY3ejBVWWIvaEp5SERuVkhuVi92Ynp0cVNuKzJERVNMZ3dH?=
- =?utf-8?B?YmdVQUhGell2K2orZGcwR3ZFL1RrMDNNVTZ0YXc2ejMxOTVtUE9kYzNMRDBJ?=
- =?utf-8?B?SEF0NDlrcERkTGhtQ3JqTWRneU9DVmFUZGdZVVZXM0g0clZvSlJwdkRidnlG?=
- =?utf-8?B?OUdKcEF0WVB0N3Z3VW1zV1BXREh3elExVis0QUlLclZmSnNVZ2RjRGg0WW1o?=
- =?utf-8?B?Sm9UcWJza3R0RWhHNzYxN1NkK3hIZm82bHlLbm9JZmdTajkwemNYeFkxNE5i?=
- =?utf-8?B?YUpyc1hncG1MK1VwVldrRCt1RTh2TzltSDBidzgvVWhXaTRqTzQ1aXhsMkI4?=
- =?utf-8?B?VjlIYjBad00xZ3Z4SldMQ0ZkTDBUcTU5U01lNWNscnhaVnZsUG9SdS9pOVN3?=
- =?utf-8?B?M1VJbVdidUdpOXQvaGQ2U1QrQVZvWnllVjV6TjR3NXhLUVpkMkc0VG5DSUhz?=
- =?utf-8?B?aTRFYzdIYmRnZHMwdWRXNFhOaVJSMEVkWUFHT2Uya0U1MmRnVzZIaXZSalox?=
- =?utf-8?B?TWFBVE92TmVLdHBIQ2RKejF4Zk90YnNtNGNYbTFjcDg5dStESUI0dnU4cWkz?=
- =?utf-8?B?bnFQNVNOcGJZV09WL001V0VNckh1TzVhTlFhRDlJMkNMVWd5bUkxakhBd1Zz?=
- =?utf-8?B?Tlh4T0RnVGFhYzdpWlFIT3M5SHNoV3h1RTRlS0lqQ3NxWFJwTVVuUHc2bHdk?=
- =?utf-8?B?aTdTcWtmZTJBcmVhQy85M3IxMnFKT09lQUtHY1RsUHpOeHBveng1UW1jdjJq?=
- =?utf-8?B?djN0ZGpJYm0xOUNKdmYyL1lvTjVQWFpFSEpkRFRCK0JCanNoMFhPaE9FK0p0?=
- =?utf-8?B?TlJxNGxFbHZPOCtVRk5Xd29oSTlCdW1vT3RNZGNnajhKODlJMkduYVF6Z0c2?=
- =?utf-8?B?T0JaZFBoZ3lDbUZ2U3d1d3k5TEJMc0V1MUJwUWEvaFI3SlpSa0dzVjd4ZFV4?=
- =?utf-8?B?dGlBMVM3NjRSTldZaW5IUkR0YkYzY04wcTBRMU44UkpEZGRVMUJNL2RXTjBu?=
- =?utf-8?B?bFdTbDNCcjZTYk5manBLdU9RaDFQWWgzNDRub0Z0NytxUUVhSkFPZ1NYNjdG?=
- =?utf-8?B?VGh5SGZwdy9KanExODVUcTB1MDBReDRNejc5emN2eUJ5ellUM2xQMS9jRHBN?=
- =?utf-8?B?R1dYVlNMeTBKWUVoUWRnZ1lmcHZRTnU2dHNyY0w4TEhnWURrSDZHNzE5L2Fu?=
- =?utf-8?B?Smc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d8b96f38-ce3b-4b27-5d44-08dce37efe6d
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 07:42:55.5678
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jSps/hU1yIvDaYyaun/OKSFCH3g5eohzZQoN4Lfh0jg88HIcY/3FzIowXdlcG0pDxpi/IdolYPQiXXtmapm13/+2KiNpcOO2fLtK/k77vbM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7383
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hi Oleksji,
 
+On Thu,  3 Oct 2024 08:06:02 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-On 10/3/2024 9:10 AM, Qingtao Cao wrote:
-> On 88E151x the SGMII autoneg bypass mode defaults to be enabled. When it is
-> activated, the device assumes a link-up status with existing configuration
-> in BMCR, avoid bringing down the fibre link in this case
-> 
-> Test case:
-> 1. Two 88E151x connected with SFP, both enable autoneg, link is up with
->     speed 1000M
-> 2. Disable autoneg on one device and explicitly set its speed to 1000M
-> 3. The fibre link can still up with this change, otherwise not.
-> 
-> Signed-off-by: Qingtao Cao <qingtao.cao@digi.com>
-> ---
->   drivers/net/phy/marvell.c | 14 ++++++++++++++
->   1 file changed, 14 insertions(+)
-> 
-> diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
-> index 9964bf3dea2f..efc4b2317466 100644
-> --- a/drivers/net/phy/marvell.c
-> +++ b/drivers/net/phy/marvell.c
-> @@ -195,6 +195,10 @@
->   
->   #define MII_88E1510_MSCR_2		0x15
->   
-> +#define MII_88E1510_FSCR2		0x1a
-> +#define MII_88E1510_FSCR2_BYPASS_ENABLE	BIT(6)
-> +#define MII_88E1510_FSCR2_BYPASS_STATUS	BIT(5)
+> This patch introduces a diagnostic guide for troubleshooting Twisted
+> Pair  Ethernet variants at OSI Layer 1. It provides detailed steps for
+> detecting  and resolving common link issues, such as incorrect wiring,
+> cable damage,  and power delivery problems. The guide also includes
+> interface verification  steps and PHY-specific diagnostics.
+
+This looks nice ! If I may add some suggestions on the layout (the
+content looks very good to me) :
+
+[ ...]
+
+> +- **Interpreting the ethtool output**:
 > +
->   #define MII_VCT5_TX_RX_MDI0_COUPLING	0x10
->   #define MII_VCT5_TX_RX_MDI1_COUPLING	0x11
->   #define MII_VCT5_TX_RX_MDI2_COUPLING	0x12
-> @@ -1623,11 +1627,21 @@ static void fiber_lpa_mod_linkmode_lpa_t(unsigned long *advertising, u32 lpa)
->   static int marvell_read_status_page_an(struct phy_device *phydev,
->   				       int fiber, int status)
->   {
-> +	int fscr2;
->   	int lpa;
->   	int err;
->   
->   	if (!(status & MII_M1011_PHY_STATUS_RESOLVED)) {
->   		phydev->link = 0;
-> +		if (fiber) {
-> +			fscr2 = phy_read(phydev, MII_88E1510_FSCR2);
-> +			if (fscr2 < 0)
-> +				return fscr2;
-> +			if ((fscr2 & MII_88E1510_FSCR2_BYPASS_ENABLE) &&
-> +			    (fscr2 & MII_88E1510_FSCR2_BYPASS_STATUS) &&
-> +			    (genphy_read_status_fixed(phydev) == 0))
-> +				phydev->link = 1;
-> +		}
->   		return 0;
->   	}
->   
+> +  - **Supported ports**: Specifies the physical connection type, such as
+> +    **Twisted Pair (TP)**.
+> +
+> +  - **Supported link modes**:
+> +
+> +    - For **SPE**: This typically indicates one supported mode.
+> +    - For **MPE**: Multiple link modes are supported, such as **10baseT/=
+Half,
+> +      10baseT/Full, 100baseT/Half, 100baseT/Full**.
+> +
+> +  - **Supported pause frame use**: Not used for layer 1 diagnostic
+> +
+> +  - **Supports auto-negotiation**:
+> +
+> +    - For most **SPE** links (e.g., **100baseT1**), autonegotiation is *=
+*not
+> +      supported**.
+> +
+> +    - For **10BaseT1L** and **MPE** links, autonegotiation is typically
+> +      **Yes**, allowing dynamic negotiation of speed and duplex settings.
+> +
+> +  - **Supported FEC modes**: Forward Error Correction (FEC). Currently n=
+ot
+> +    used on this guide.
+> +
+> +  - **Advertised link modes**:
+> +
+> +    - For **SPE** (except **10BaseT1L**), this field will be **Not
+> +      applicable**, as no link modes can be advertised without autonegot=
+iation.
+> +
+> +    - For **MPE** and **10BaseT1L** links, this will list the link modes=
+ that
+> +      the interface is currently advertising to the link partner.
+> +
+> +  - **Advertised pause frame use**: Not used for layer 1 diagnostic
+> +
+> +  - **Advertised auto-negotiation**:
+> +
+> +    - For **SPE** links (except **10BaseT1L**), this will be **No**.
+> +
+> +    - For **MPE** and **10BaseT1L** links, this will be **Yes** if
+> +      autonegotiation is enabled.
+> +
+> +  - **Link partner advertised link modes**: Relevant for **any device th=
+at
+> +    supports autonegotiation**, such as **MPE** and **10BaseT1L**. This =
+field
+> +    displays the subset  of link modes supported by the link partner and
+> +    recognized by the local PHY. If autonegotiation is disabled, this fi=
+eld is
+> +    not applicable. Some drivers (or may be HW?) do not provide this inf=
+ormation
+> +    even with autonegotiation enabled on both sides - this is considered=
+ as bug
+> +    and should be fixed.
+> +
+> +  - **Link partner advertised pause frame use**: Indicates whether the l=
+ink
+> +    partner is advertising pause frame support. This field is only relev=
+ant
+> +    when autonegotiation is enabled.
+> +
+> +  - **Link partner advertised auto-negotiation**: Displays whether the l=
+ink
+> +    partner is advertising autonegotiation. If the link partner supports
+> +    autonegotiation, this field will show **Yes**. If **No**, this field
+> +    will be probably not visible.
+> +
+> +  - **Speed**: Displays the current operational speed of the interface. =
+This
+> +    field is especially important when **multiple link modes** are suppo=
+rted.
+> +    If **autonegotiation** is enabled, the speed is typically automatica=
+lly
+> +    selected as the **highest common speed** advertised by both link par=
+tners.
+> +
+> +    In cases where the link is in **forced mode** and both sides support
+> +    multiple speeds, it is crucial to verify that **both sides are force=
+d to
+> +    the same speed**. A mismatch in forced speeds between the link partn=
+ers will
+> +    result in link failure.
+> +
+> +  - **Duplex**: Displays the current duplex setting of the interface, wh=
+ich can
+> +    be either **Half** or **Full**. In **Full Duplex**, data can be tran=
+smitted
+> +    and received simultaneously, while in **Half Duplex**, transmission =
+and
+> +    reception occur sequentially. When **autonegotiation** is enabled, t=
+he
+> +    duplex mode is typically negotiated along with the speed.
+> +
+> +    In **forced mode**, it is important to verify that both link partner=
+s are
+> +    configured with the same duplex setting. A **duplex mismatch** (e.g.=
+, one
+> +    side using Full Duplex and the other Half Duplex) usually does not a=
+ffect
+> +    the link stability, but it often results in **lower performance**, w=
+ith
+> +    symptoms such as reduced throughput and possible present packet coll=
+isions.
+> +
+> +  - **Auto-negotiation**: Indicates whether auto-negotiation is enabled =
+on the
+> +    **local interface**. This shows that the interface is set to negotia=
+te
+> +    speed and duplex settings with the link partner. However, even if
+> +    **auto-negotiation** is enabled locally and the link is established,=
+ the
+> +    link partner might not be using auto-negotiation. In such cases, man=
+y PHYs
+> +    are capable of detecting a **forced mode** on the link partner and
+> +    adjusting to the correct speed and duplex.
+> +
+> +    If the link partner is in **forced mode**, the **"Link partner
+> +    advertised"** fields will not be present in the `ethtool` output, as=
+ the
+> +    partner isn't advertising any link modes or capabilities. Additional=
+ly, the
+> +    **"Link partner advertised"** fields may also be missing if the **PHY
+> +    driver** does not support reporting this information, or if the **MAC
+> +    driver** is not utilizing the Linux **PHYlib** framework to retrieve=
+ and
+> +    report the PHY status.
+> +
+> +  - **Master-slave configuration**: Indicates the current configuration =
+of the
+> +    **master-slave role** for the interface. This is relevant for certain
+> +    Ethernet standards, such as **Single-Pair Ethernet (SPE)** and high-=
+speed
+> +    Ethernet configurations like **1000Base-T** and above, where one dev=
+ice
+> +    must act as the **master** and the other as the **slave** for proper=
+ link
+> +    establishment.
+> +
+> +    In **auto-negotiation** mode, the master-slave role is typically neg=
+otiated
+> +    automatically. However, there are options to specify **preferred-mas=
+ter**
+> +    or **preferred-slave** roles. For example, switches often prefer the=
+ master
+> +    role to reduce the time domain crossing delays.
+> +
+> +    In **forced mode**, it is essential to manually configure the master=
+-slave
+> +    roles correctly on both link partners. If both sides are forced to t=
+he same
+> +    role (e.g., both forced to master), the link will fail to establish.
+> +
+> +    A combination of **auto-negotiation** with **forced roles** can lead=
+ to
+> +    unexpected behavior. If one side forces a role while the other side =
+uses
+> +    auto-negotiation, it can result in mismatches, especially if both si=
+des
+> +    force overlapping roles (preferring overlapping roles is usually not=
+ a
+> +    problem). This configuration should be avoided to ensure reliable li=
+nk
+> +    establishment.
+> +
+> +  - **Master-slave status**: Displays the current **master-slave role** =
+of the
+> +    interface, indicating whether the interface is operating as the **ma=
+ster**
+> +    or the **slave**. This field is particularly relevant in **auto-nego=
+tiation
+> +    mode**, where the master-slave role is determined dynamically during=
+ the
+> +    negotiation process.
+> +
+> +    In **auto-negotiation**, the role is chosen based on the configurati=
+on
+> +    preferences of both link partners (e.g., **preferred-master** or
+> +    **preferred-slave**). The **master-slave status** field shows the ou=
+tcome
+> +    of this negotiation.
+> +
+> +    In **forced mode**, the master-slave configuration is manually set, =
+so the
+> +    **status** and **configuration** will always be the same, making thi=
+s field
+> +    less relevant in that case.
+> +
+> +  - **Link detected**: Displays whether the physical link is up and runn=
+ing.
+> +
+> +  - **Link Down Events**: Tracks how many times the link has gone down. =
+A high
+> +    number of **Link Down Events** can indicate a physical issue such as=
+ cable
+> +    problems or instability.
+> +
+> +  - **Signal Quality Indicator (SQI)**: Provides a score for signal stre=
+ngth
+> +    (e.g., **7/7**). A low score indicates potential physical layer
+> +    issues like interference.
+> +
+> +  - **MDI-X**: Indicates the MDI/MDI-X status, typically relevant for **=
+MPE**
+> +    links.
+> +
+> +  - **Supports Wake-on**: Shows whether Wake-on-LAN is supported.
+> +    Not used for layer 1 diagnostic.
+> +
+> +  - **Wake-on**: Displays whether Wake-on-LAN is enabled (e.g., **Wake-o=
+n: d**
+> +    for disabled). Not used for layer 1 diagnostic.
 
-LGTM.
+(sorry for the long scroll down there) This whole section is more of a
+documentation on what ethtool reports rather than a troubleshooting
+guide. I'm all in for getting proper doc for this, but maybe we could
+move this in a dedicated page, that we would cross-link from that guide
+?
 
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+[ ... ]
+
+> +List of Twisted Pair Ethernet Link Modes
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +Twisted pair Ethernet variants utilize copper cabling with pairs of wires
+> +twisted together to reduce electromagnetic interference (EMI). These lin=
+k modes
+> +are widely used in local area networks (LANs) due to their balance of
+> +cost-effectiveness and performance.
+> +
+> +Below is a list of Ethernet link modes that operate over twisted pair co=
+pper
+> +cabling. Half and Full duplex variants are combined where applicable.
+
+This section below looks to be in the same ballpark. We already have a
+documentation on *some* of the MII flavours (SGMII, 1000BaseX, RGMII, etc.),
+maybe we would merge the various linkmodes from the MII side and the
+MDI side in the same document ?
+
+There's sometimes a misunderstanding of the various linkmodes from
+developers themselves, I think this would warrant its own section.
+
+> +- **10baseT Half/Full**:
+> +
+> +  - The original Ethernet standard over twisted pair cabling.
+> +  - Supports both half-duplex and full-duplex modes.
+> +
+> +- **10baseT1L Full**:
+> +
+> +  - Long-reach variant of Ethernet over a single twisted pair.
+> +  - Supports **autonegotiation** and offers two signal amplitude options:
+> +
+> +    - **2.4 Vpp** for distances up to **1000 meters**.
+> +    - **1 Vpp** for distances up to **200 meters** (used in hazardous
+> +      environments).
+> +
+> +  - Primarily used in industrial and building automation environments.
+> +
+> +- **10baseT1S Half/Full**:
+> +
+> +  - Short-reach variant of Ethernet over a single twisted pair.
+> +  - Does not support autonegotiation, targeting **fast link establishmen=
+t within
+> +    ~10 ms**.
+> +  - Primarily designed for compact locations, such as automotive environ=
+ments,
+> +    where sensors and actuators are clustered.
+> +  - Supports **multidrop (point-to-multipoint)** configurations, typical=
+ly used
+> +    to connect clusters of sensors.
+> +
+> +- **100baseT Half/Full**:
+> +
+> +  - Also known as Fast Ethernet.
+> +  - Operates at 100 Mbps over twisted pair cabling.
+> +  - Supports both half-duplex and full-duplex modes.
+> +
+> +- **100baseT1 Full**:
+> +
+> +  - Operates at 100 Mbps over a single twisted pair.
+> +  - Does not support autonegotiation, targeting **fast link creation wit=
+hin
+> +    ~10 ms**.
+> +  - Primarily used in automotive and industrial applications.
+> +
+> +- **1000baseT Full**:
+> +
+> +  - Gigabit Ethernet over twisted pair cabling.
+> +  - Full-duplex mode is standard and widely used.
+> +  - Half-duplex mode is not supported by the IEEE 802.3ab standard but m=
+ay be
+> +    present in some hardware implementations.
+> +
+> +- **1000baseT1 Full**:
+> +
+> +  - Gigabit Ethernet over a single twisted pair.
+> +  - Does not support autonegotiation, targeting **fast link creation wit=
+hin
+> +    ~10 ms**.
+> +  - Primarily targeted for automotive and industrial use cases.
+> +
+> +- **2500baseT and 5000baseT Full**:
+> +
+> +  - Multi-Gigabit Ethernet standards.
+> +  - Designed to provide higher speeds over existing Cat5e/Cat6 cabling.
+> +  - Operate at 2.5 Gbps and 5 Gbps respectively.
+> +
+> +- **10000baseT Full**:
+> +
+> +  - 10 Gigabit Ethernet over twisted pair.
+> +  - Requires Cat6a or better cabling to achieve full distance (up to 100=
+ meters).
+> +
+> +Potential Layer 1 Related Issues
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +OSI Layer 1 issues pertain to the physical aspects of network communicat=
+ion.
+> +Some of these issues are interrelated or subsets of larger problems, imp=
+acting
+> +network performance and connectivity. Below is a structured overview of =
+common
+> +Layer 1 issues, grouped by their relationships:
+> +
+> +Cable Damage and Related Issues
+> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> +
+> +- **Cable Damage**:
+> +
+> +  - **Description**: Physical damage to the Ethernet cable, including cu=
+ts,
+> +    bends, or degradation due to environmental factors such as heat, moi=
+sture,
+> +    or mechanical stress.
+> +  - **Symptoms**: Intermittent connectivity, reduced speed, or no link.
+> +  - **Detection**: Cable testers or PHY diagnostics with time-domain
+> +    reflectometry (TDR) support.
+> +
+> +  - **Subsets of Cable Damage**:
+> +
+> +    - **Open Circuit**:
+> +
+> +      - **Description**: A break or discontinuity in the cable or connec=
+tor
+> +        resulting in no electrical connection.
+> +      - **Symptoms**: No link is detected.
+> +      - **Detection**: PHY diagnostics can report "Open Circuit".
+> +    - **Short Circuit**:
+> +
+> +      - **Description**: An unintended electrical connection between two=
+ wires
+> +        that should be separate.
+> +      - **Symptoms**: The link may not establish, or the link may drop r=
+epeatedly.
+> +      - **Detection**: Cable testers or PoE/PoDL power detection circuit=
+s may
+> +        detect excessive current draw.
+> +    - **Impedance Mismatch**:
+> +
+> +      - **Description**: Poor cable quality or incorrect termination cau=
+ses
+> +        reflections of the signal due to impedance variations.
+> +      - **Symptoms**: Reduced signal quality, intermittent connectivity =
+at
+> +        higher speeds.
+> +      - **Detection**: TDR diagnostics can detect impedance mismatches.
+> +
+> +Wiring Issues
+> +^^^^^^^^^^^^^
+> +
+> +- **Incorrect Wiring or Pinout**:
+> +
+> +  - **Description**: Incorrect pair wiring or non-standard pin assignmen=
+ts can
+> +    cause link failure or degraded performance.
+> +  - **Symptoms**: No link, reduced speed, or high error rates, especiall=
+y in
+> +    multi-pair Ethernet standards (e.g., 1000BASE-T).
+> +  - **Detection**: Modern PHYs may detect and correct some wiring errors
+> +    (e.g., MDI/MDI-X auto-crossover), but cable testers provide the most
+> +    reliable diagnostics.
+> +
+> +  - **Subsets of Incorrect Wiring**:
+> +
+> +    - **Miswired Pairs in Multi-Pair Link Modes**:
+> +
+> +      - **Description**: In multi-pair standards like 10BASE-T, 100BASE-=
+TX, or
+> +        1000BASE-T, miswired pairs can cause link failures.
+> +      - **Symptoms**: Incompatible wiring may work for some speeds (e.g.,
+> +        100BASE-TX) but fail for higher speeds (e.g., 1000BASE-T).
+> +      - **Detection**: Cable testers or PHY diagnostics may identify the=
+ issue.
+> +
+> +    - **Polarity Reversal within Pairs**:
+> +
+> +      - **Description**: The positive and negative wires within a pair a=
+re
+> +        swapped.
+> +      - **Symptoms**: No link or intermittent connection unless modern P=
+HYs with
+> +        automatic polarity correction are in use.
+> +      - **Detection**: Modern PHYs can detect and correct polarity rever=
+sal.
+> +        Some expose polarity status in diagnostic registers.
+> +
+> +    - **Split Pairs**:
+> +
+> +      - **Description**: The two wires of a pair are split across differ=
+ent
+> +        pairs, reducing the effectiveness of signal twisting.
+> +      - **Symptoms**: Increased crosstalk, higher error rates, and inter=
+mittent
+> +        link drops, particularly at higher speeds like 1000BASE-T.
+> +      - **Detection**: Cable testers can detect split pairs, and error c=
+ounters
+> +        in the PHY may provide an indication.
+> +
+> +Environmental and External Factors
+> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> +
+> +- **Electromagnetic Interference (EMI)**:
+> +
+> +  - **Description**: External electromagnetic fields can interfere with =
+Ethernet
+> +    signals, particularly in unshielded twisted pair (UTP) cables.
+> +  - **Symptoms**: Increased transmission errors, reduced speed, or inter=
+mittent
+> +    link drops.
+> +  - **Detection**: Error counters in the PHY or signal quality indicator=
+s (SQI)
+> +    may help diagnose EMI issues.
+> +
+> +- **Environmental Factors**:
+> +
+> +  - **Description**: External environmental conditions such as temperatu=
+re
+> +    extremes, moisture, UV exposure, or mechanical stress can degrade th=
+e cable
+> +    or connectors, leading to signal degradation.
+> +  - **Symptoms**: Increased error rates, intermittent connectivity, or l=
+ink
+> +    failure.
+> +  - **Detection**: Error counters and physical inspection can reveal iss=
+ues
+> +    related to environmental degradation.
+> +
+> +  - **Related Issues**:
+> +
+> +    - **Excessive Cable Length**:
+> +
+> +      - **Description**: Exceeding the maximum allowed cable length for =
+a given
+> +        standard can lead to signal loss and degradation.
+> +      - **Symptoms**: Intermittent connectivity, reduced speed, or no li=
+nk.
+> +      - **Detection**: TDR diagnostics can measure the cable length. Err=
+or
+> +        counters may show performance degradation.
+> +
+> +Cable Quality and Type
+> +^^^^^^^^^^^^^^^^^^^^^^
+> +
+> +- **Use of Incorrect Cable Type**:
+> +
+> +  - **Description**: Using a cable that doesn=E2=80=99t meet the require=
+d standards for
+> +    a specific Ethernet mode (e.g., using CAT5e for 10GBASE-T) or improp=
+er
+> +    shielding.
+> +  - **Symptoms**: Reduced link speed, increased errors, or no link.
+> +  - **Detection**: PHY diagnostics such as SQI and cable testers can hel=
+p detect
+> +    cable quality issues.
+> +
+> +  - **Related Issue**:
+> +
+> +    - **Shielding Problems**: Improper or incomplete attachment of the s=
+hield
+> +      can lead to similar symptoms as EMI issues. Variants include:
+> +
+> +      - **Unattached Shielding**: Shielding present but not connected at=
+ the
+> +        connector.
+> +      - **Unconnected Device Ports**: Even if the shield is attached, th=
+e device
+> +        port may not provide a connection.
+> +
+> +Hardware Issues
+> +^^^^^^^^^^^^^^^
+> +
+> +- **Faulty Network Interface Cards (NICs) or PHYs**:
+> +
+> +  - **Description**: Malfunctioning hardware components such as NICs or =
+PHYs may
+> +    cause link problems.
+> +  - **Symptoms**: Network performance degradation or complete failure.
+> +  - **Detection**: Some PHYs and NICs perform self-tests and may report =
+errors
+> +    in system logs. Swapping hardware may be required to diagnose these =
+issues.
+> +
+> +Pair Assignment Issues in Multi-Pair Link Modes
+> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +
+> +Ethernet standards that use **two or more pairs** of wires - such as
+> +**10BASE-T**, **100BASE-TX**, **1000BASE-T**, and higher - require corre=
+ct pair
+> +assignments for proper operation. Incorrect pair assignments can cause
+> +significant network problems, especially as data rates increase.
+> +
+> +Multi-Pair Link Modes
+> +^^^^^^^^^^^^^^^^^^^^^
+> +
+> +- **Applicable Ethernet Standards**:
+> +
+> +  - **10BASE-T** (10 Mbps Ethernet)
+> +  - **100BASE-TX** (Fast Ethernet)
+> +  - **1000BASE-T** (Gigabit Ethernet)
+> +  - **2.5GBASE-T**, **5GBASE-T**, **10GBASE-T**
+> +
+> +Pin and Pair Naming Conventions
+> +^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> +
+> +In Ethernet troubleshooting, understanding pin, pair, and color-coding
+> +conventions is essential, especially when physical cable repairs are nec=
+essary.
+> +One major challenge arises in the field when a damaged cable pair needs =
+to be
+> +identified and fixed without the ability to replace the entire cable. Wh=
+ile
+> +Linux diagnostics typically only provide pair names (e.g., "Pair A"), th=
+ese
+> +names do not directly map to the color codes commonly used for cable
+> +identification in the field.
+> +
+> +To further complicate the issue, different standards=E2=80=94such as **T=
+IA-568** and
+> +**IEEE 802.3**=E2=80=94use varying conventions for assigning pins to pai=
+rs, and pairs
+> +to color codes. For example, the pair names reported in diagnostics must=
+ be
+> +translated into physical wire colors, which differ between **TIA-568A** =
+and
+> +**TIA-568B** layouts. This translation process is crucial for accurately
+> +identifying and repairing the correct cable pair.
+> +
+> +Although Linux diagnostic tools provide valuable information, their focu=
+s on
+> +pair names can make it challenging to map these names to the physical ca=
+ble
+> +layout, particularly in fieldwork where color-coded wires are the primar=
+y means
+> +of identification. This section aims to highlight this problem and provi=
+de
+> +enough background on pin, pair, and color-coding conventions to assist w=
+ith
+> +analyzing and addressing these issues. While this guide may not fully re=
+solve
+> +the difficulties, it offers important context to help bridge the gap bet=
+ween
+> +diagnostics and physical cable repair.
+> +
+> +TIA-568 Pair and Pin Assignments
+> +""""""""""""""""""""""""""""""""
+
+This section here as well could be in another page (standalone or the
+same as above) ?
+
+My idea would be to make it a bit easier to read through the
+troubleshooting guide, with on one side step-by-step instructions,
+crosslinking to a page containing these detailed descriptions.
+
+
+[ ... ]
+
+> +Linux Kernel Recommendations for Improved Diagnostic Interfaces
+> +---------------------------------------------------------------
+>=20
+> +As of **Linux kernel v6.11**, several improvements could be implemented =
+to
+> +enhance the diagnostic capabilities for Ethernet connections, particular=
+ly for
+> +twisted pair Ethernet variants. These recommendations aim to address gap=
+s in
+> +diagnostics for OSI Layer 1 issues and provide more detailed insights fo=
+r users
+> +and developers.
+> +
+> +This list will evolve with future kernel versions, reflecting new featur=
+es or
+> +refinements. Below are the current suggestions:
+
+I'm not sure this TODO list has its place in this troubleshooting
+guide. I agree with the points you list, but this looks more like a
+roadmap for PHY stuff to improve. I don't really know where this list
+could go and if it's common to maintain this kind of "TODO list" in the
+kernel doc though. Maybe Andrew has an idea ?
+
+Thanks for coming-up with such a detailed guide. I also have some "PHY
+bringup 101" ideas on the common errors faced by developers, and this is
+document would be the ideal place to maintain this crucial information.
+
+Maxime
 
