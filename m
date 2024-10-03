@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-131442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAA3998E841
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 04:12:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E961B98E843
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 04:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59C961F2590A
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:12:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F681C210C4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF163C463;
-	Thu,  3 Oct 2024 02:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDE547F69;
+	Thu,  3 Oct 2024 02:11:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmIpzWKD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8G9k7jW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334BD2110E;
-	Thu,  3 Oct 2024 02:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918DC3AC2B;
+	Thu,  3 Oct 2024 02:11:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727921504; cv=none; b=ZOuXv/nd1DWw49ltcsRWnjApvmjipH03HtaccdIOuS9Yd61/v3t38ANwOaPmH3/imwPEbakuT+j68vSgzEaCUaGMoSGAheMPlIizw9dEMxXQnMs4HjqcpLrRo+C5zEehvSkmPGyX5a6G0NanscHC9NcYiBj5HJj4fQZPjT65zwI=
+	t=1727921506; cv=none; b=rZ9xf0ulS5qqHyVHMvkiNwYzUvpStQNU9h0ItcjARqIrAIyTcJ4DjSeJVxl0RXigCiONxVGg0xaiHCVY2iUmN/CGFYuLPM02b5+RXv45MeF/OSA3Tyo+oLfDh/OmNkfjS4PdJ41hnbsEsMFUfbuxNi8xgUNC+VMSlbIuOFs8uSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727921504; c=relaxed/simple;
-	bh=E2lpnkQkB6alWziSY4dY/baMJyxnTAm4Bw4gm3jpZVg=;
+	s=arc-20240116; t=1727921506; c=relaxed/simple;
+	bh=kk6BZgx6e1aK6qkYUJ4gDXK7X1PwsJgqDQzdqq529+8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Q93zGJysegEzCLPL+k8kmEcADyRTAcNoCNaRcwl8Y7uMidTj+6RVB/GIf6Iq7Jt8VW0m+/ZjD+uppNsBSc4GD3GgwuZxJa1mBQXe4cu86rWIXcZew/kXOiSeZoO6CjqkhN0oxGuE63eKMmIWXgo1A75Jj6vQxDXkCV/6Pjn4f6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OmIpzWKD; arc=none smtp.client-ip=209.85.210.182
+	 MIME-Version; b=bBVFp+Nl+kAoSkMn8CQ2aZuTU8Cunh87wVJaLCEj2KVuEnwl9sRluFWmDtf0rotHHswFuXAm6NKyItw7YxyRxC/GHDXjLRm0GzxvaQtLWXCEEPWHQbViRzK1ijszUWr3/8lSIW9miuNUvNVyKBXBObEOc6CyZYzNw8MG5/vwHKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8G9k7jW; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71979bf5e7aso316863b3a.1;
-        Wed, 02 Oct 2024 19:11:42 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71afb729f24so368203b3a.0;
+        Wed, 02 Oct 2024 19:11:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727921502; x=1728526302; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727921504; x=1728526304; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8u5EqNnoRftoG2NG+EU6QGUJmaRNtnq9ufFREhiUF4c=;
-        b=OmIpzWKDEcfHTuRm7emi/CvfAumVRUYXgUAsm0XqlSLkyqqK1KcH9NLNKro6oeQ76r
-         arSYPjV7RKLz3MMLS2Y4MJ8MK9RklSnwcEYbnaF396gSe6GPLg2mlrmUvcfvpoEuD73s
-         k/ktTzNftnY5t+S/ZR6SlyQkuELVJ8bW4rFOyjPmWMSO+Hbi/B2hFtHNv+HmWMhAGoDg
-         B/Kgg9ZokJfSglN+H7Mbx5I06skaU8ddQTWNS2cK2Wc5m3jYR5c0E41Dr39NK05KW/uf
-         WrKbvgjZPk1G6Y69OD4JvMp6yC3EnD3i6Hf9IR5/9ec1vzT0i2hW4JvM9h+LfvnGXIiK
-         Xe+w==
+        bh=FTdchS1usQhL1WtM0gjI76UYTIDbC6vW1SK3n+i286A=;
+        b=W8G9k7jWOI3Lh3PeBz39au0pnqEfAeIhflFGtq0ZqSKBJlt3Xkbg56zbs/tX1hxi8h
+         dzwllFDy9W7GV07Aj0edfIHXBkn2hPeh+3dfWa9eJMDAsMHsaKBF+yPI7d9F3CBl008d
+         3Pbitz1Ico/H5PaiznBOVb/vCtY+rhSScWj2a3FPHtPigKjZAMn6QwNWvD7rZcAA2rPQ
+         BTo2anKpDNQ7uEu6aQIm+YBlWeNNMNEebAr5z46jcGG0NXKciPoaAdffhprTc8DmB8/8
+         p5idSiCBHM97hsps1doK+4LfGzv1BK5bo5ADL2WK1c7qHGxfyXbCgHbT67ECGKHwZAou
+         V8jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727921502; x=1728526302;
+        d=1e100.net; s=20230601; t=1727921504; x=1728526304;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8u5EqNnoRftoG2NG+EU6QGUJmaRNtnq9ufFREhiUF4c=;
-        b=vRAb7uD0fh+/m77ysIBSF+qgHdWRsSB4VFh/TY04+HfAc1W05gE7ngafocZNSN2pKM
-         Gx0nNugl1IB75wtH+ODueErqgNRjunBb5kez6G39N3Uz+1rNoTtIYLM1iy9NiSAvakQP
-         weerLYuAZH7aZcRZ8PAM7SiZmMNgVS0aPNy5zXDBTSUwZOeHLdsYe4qPIL58+eeJCAvq
-         44WZcJap8sT9tCSLmQrGAJ17AbzQVF5T9OzspJs2a7q+rJeyYYe5P/x7H5oLF0a5pcSu
-         SjhaX5kHT7duk4lwj3sD+KzIGbnZIkAJTeC8pcvhQWegsrguu9dBS0G/jz4wFWXKjzMu
-         J6eA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGLzgdVZWIrgz2WIHWWL5D7ujtzWre/TR//Se30g+prb7m4cqhz/mVYKJmkimm+ZHwb7wyQs7dODeS9QQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpzkHlOprni9l063leX1EulzRHQ6WRA5LBdCszcpfn6+SwRSkC
-	I3lg79uKKRMVsfS38zy+Ux1vjSesIpoQwucoAgjr7LO/nPICoIh5OPksAJv5
-X-Google-Smtp-Source: AGHT+IFTVND3heBNMaHST81acB5w+HKZ/SyyyrDiZYgelESbh6V2H6dKli9j8r1wqkKiu3k+2LA6ZA==
-X-Received: by 2002:aa7:8881:0:b0:718:ebdc:6c81 with SMTP id d2e1a72fcca58-71dc5d6e8demr7611701b3a.26.1727921502261;
-        Wed, 02 Oct 2024 19:11:42 -0700 (PDT)
+        bh=FTdchS1usQhL1WtM0gjI76UYTIDbC6vW1SK3n+i286A=;
+        b=uBj0s2q6hvEbYg6atXiu9hudg9SScdqbl8Cu4fWmt1vZ4JFG07smmv33ExAcOl7FD4
+         E9PL4jeuBDSYAE5de/kUrxE6oZA39aZjN9hIZ7Q5UogiXWBv5guJDq1ClTmr2is09ZxU
+         Jph2yAqTeQAadw5DgD4CgUjBV39LgBu8VHkYVlk1t3+1m1M/3TrNPGHNCQjFHMIXKc33
+         jIDcJ7xPowHpYwzh/o+52JPnBjHZ0yD/pUn5K1SmhUO1A/wNLXUsVri7oN2OpPAM3yMp
+         Rrsa5SR8ABZmk5JPed0Ye1vPnXoRd8sf4wrPMEoXHa1H7P8IetcsN3mX4IuCGsfNSvlZ
+         YVvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWnrqqoKqN6jrBbfQp6SouUn300zCrQD/7yS7jbC0aZoquDH3gylWptt9Wu5rurTca0IsDJrSNgx/Vozg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzTnMMvaDEwtZga34svUhQDX3c4RvIYHZl+/xunq1M11Z4apnV
+	XybggQjWtqaTFswL0bF9wQiN7EK21WknLpEGw0Chh3678w0iGsg0UY9Bpard
+X-Google-Smtp-Source: AGHT+IHkc8P2japkEIzULnRrVy/ChAtOuhgjVE/ESfuxDMJOhPOceWA8y1QAVVhqLI3oq0l6sVzpAw==
+X-Received: by 2002:aa7:9edb:0:b0:718:d516:a02a with SMTP id d2e1a72fcca58-71dc5d5436cmr6121362b3a.19.1727921503657;
+        Wed, 02 Oct 2024 19:11:43 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9ddb3c2sm190176b3a.111.2024.10.02.19.11.41
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9ddb3c2sm190176b3a.111.2024.10.02.19.11.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2024 19:11:41 -0700 (PDT)
+        Wed, 02 Oct 2024 19:11:43 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCH net-next v3 03/17] net: ibm: emac: use module_platform_driver for modules
-Date: Wed,  2 Oct 2024 19:11:21 -0700
-Message-ID: <20241003021135.1952928-4-rosenp@gmail.com>
+Subject: [PATCH net-next v3 04/17] net: ibm: emac: use devm_platform_ioremap_resource
+Date: Wed,  2 Oct 2024 19:11:22 -0700
+Message-ID: <20241003021135.1952928-5-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241003021135.1952928-1-rosenp@gmail.com>
 References: <20241003021135.1952928-1-rosenp@gmail.com>
@@ -93,89 +93,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-These init and exit functions don't do anything special. Just macro it
-away.
+No need to have a struct resource. Gets rid of the TODO.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/mal.c   | 10 +---------
- drivers/net/ethernet/ibm/emac/rgmii.c | 10 +---------
- drivers/net/ethernet/ibm/emac/tah.c   | 10 +---------
- drivers/net/ethernet/ibm/emac/zmii.c  | 10 +---------
- 4 files changed, 4 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index d92dd9c83031..a632d3a207d3 100644
---- a/drivers/net/ethernet/ibm/emac/mal.c
-+++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -779,12 +779,4 @@ static struct platform_driver mal_of_driver = {
- 	.remove_new = mal_remove,
- };
+diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
+index 97ae0b7ccb0d..205ba7aa02d4 100644
+--- a/drivers/net/ethernet/ibm/emac/core.c
++++ b/drivers/net/ethernet/ibm/emac/core.c
+@@ -3050,12 +3050,10 @@ static int emac_probe(struct platform_device *ofdev)
  
--int __init mal_init(void)
--{
--	return platform_driver_register(&mal_of_driver);
--}
--
--void mal_exit(void)
--{
--	platform_driver_unregister(&mal_of_driver);
--}
-+module_platform_driver(mal_of_driver);
-diff --git a/drivers/net/ethernet/ibm/emac/rgmii.c b/drivers/net/ethernet/ibm/emac/rgmii.c
-index e1712fdc3c31..52f080661f87 100644
---- a/drivers/net/ethernet/ibm/emac/rgmii.c
-+++ b/drivers/net/ethernet/ibm/emac/rgmii.c
-@@ -303,12 +303,4 @@ static struct platform_driver rgmii_driver = {
- 	.remove_new = rgmii_remove,
- };
+ 	ndev->irq = dev->emac_irq;
  
--int __init rgmii_init(void)
--{
--	return platform_driver_register(&rgmii_driver);
--}
--
--void rgmii_exit(void)
--{
--	platform_driver_unregister(&rgmii_driver);
--}
-+module_platform_driver(rgmii_driver);
-diff --git a/drivers/net/ethernet/ibm/emac/tah.c b/drivers/net/ethernet/ibm/emac/tah.c
-index fa3488258ca2..8407ff83b1d3 100644
---- a/drivers/net/ethernet/ibm/emac/tah.c
-+++ b/drivers/net/ethernet/ibm/emac/tah.c
-@@ -161,12 +161,4 @@ static struct platform_driver tah_driver = {
- 	.remove_new = tah_remove,
- };
+-	/* Map EMAC regs */
+-	// TODO : platform_get_resource() and devm_ioremap_resource()
+-	dev->emacp = devm_of_iomap(&ofdev->dev, np, 0, NULL);
+-	if (!dev->emacp) {
++	dev->emacp = devm_platform_ioremap_resource(ofdev, 0);
++	if (IS_ERR(dev->emacp)) {
+ 		dev_err(&ofdev->dev, "can't map device registers");
+-		err = -ENOMEM;
++		err = PTR_ERR(dev->emacp);
+ 		goto err_gone;
+ 	}
  
--int __init tah_init(void)
--{
--	return platform_driver_register(&tah_driver);
--}
--
--void tah_exit(void)
--{
--	platform_driver_unregister(&tah_driver);
--}
-+module_platform_driver(tah_driver);
-diff --git a/drivers/net/ethernet/ibm/emac/zmii.c b/drivers/net/ethernet/ibm/emac/zmii.c
-index 26e86cdee2f6..97cea64abe55 100644
---- a/drivers/net/ethernet/ibm/emac/zmii.c
-+++ b/drivers/net/ethernet/ibm/emac/zmii.c
-@@ -309,12 +309,4 @@ static struct platform_driver zmii_driver = {
- 	.remove_new = zmii_remove,
- };
- 
--int __init zmii_init(void)
--{
--	return platform_driver_register(&zmii_driver);
--}
--
--void zmii_exit(void)
--{
--	platform_driver_unregister(&zmii_driver);
--}
-+module_platform_driver(zmii_driver);
 -- 
 2.46.2
 
