@@ -1,159 +1,132 @@
-Return-Path: <netdev+bounces-131797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6418798F9AB
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:12:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 707C898F9AC
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:13:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE6E1F23121
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:12:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F21BFB21749
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB211C7B79;
-	Thu,  3 Oct 2024 22:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99D81C9EBE;
+	Thu,  3 Oct 2024 22:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNSWC2zG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1RmiHvq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9805B824BD
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 22:12:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F59B1AB6FA;
+	Thu,  3 Oct 2024 22:13:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727993561; cv=none; b=PWJWnhoKveDaynmwequSpaUu+wiOUkA2WfMUsqCLCgOqbBvYEen7RL/qTh4jfVrt4RqgTnxtVwvUPPVcXY0UNPESiIbC2Ap+j7O/5Y/24pw0WoHtJNtMfCy4j7ajoAu6EECD304d+/15LGJzMC8K/gbZH3I5HBVyiFlVqMTh5qE=
+	t=1727993612; cv=none; b=CDaST0Dxev/2FMvAvIPKWpFQq8jyY0newR3PHdQarJI1a28MgL6gvED/0xICnGN3g21Y55M8GhUQx+WUuO8GzkT1bFoZvZ4AZNQ4u/krc0SevUw91l/eOQAYbqVOxE92RLJIqkYTha9TsSty6xN60duwL3AVDfyHCVw7R4v2tpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727993561; c=relaxed/simple;
-	bh=FIsTx9gAnAZ4+f9ijd2jCSreHHjrlDIL1EegxEdBNko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BOB1AtgXRKeYoxiS2iX7EijuOSXCuDJPxcTI2ygODkJf+hjk2QD5cULSaZn8Yurq+a5fiiVhUus0FmCsiUHZRCwDwHuCTelUdBuzuV0l5PVnQsF3h9UPoRZ2mydR+TKP2ZIbLaOjase2iF6o1FJsawJwuXU5FWpsqDJsbYwBd64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNSWC2zG; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1727993612; c=relaxed/simple;
+	bh=Ybx7UlCkDy6Xb7CLxdH8pHv4SLszmuIGTqHEPzKKsUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YbdXl1yKgYyMSXLSxNknJ9GyUfk/24M7PpVIcauKEfgVBYZrC9Xi1+i93SiPN2o4ApycNbrDzTaDusMU0JVPV249V0a4PuQVG3WIInlGJlcyv7ZUPkvd5fwzuQKpH6rzU+z8hyH9LnhGJbRQ7ChDnaa/ie48XeJvj/wRKF/dAkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i1RmiHvq; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71dc4451fffso1490863b3a.2
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 15:12:39 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cb1758e41so11849005e9.1;
+        Thu, 03 Oct 2024 15:13:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727993559; x=1728598359; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=i41AgYSqsz8N+S1EwL66geaOVck9qp+/JrG6VOfkcIg=;
-        b=TNSWC2zGSV/oIPxXi0gThtkq8e5l2tWwIkvMnrBJvpM54GWAzikaoYjMZODZcjvZUd
-         /RXXuVaUiDUcBRLQL8CjEVbAyu2RZMZ7C/GX3HBHxEAhazwmTR3laZGYhyGXu0Z49xdr
-         S4SSHIvjH675S5icrh3eoKaYjGvqngtzAfQ0//FhHhRfY/+eumtw+qCnJYG3VE8rAb+6
-         DPiWGAhHaOHLTXErmqxs2+YCr0eQmPDjO9Qn+4U4io9mbOQma4Wd8V/IzmDs/4hF7yJk
-         SIz+DMRfVWGaCa4dDTxFPSG/AUbkaV7MHFguKM6GIWS7ZWBUQ9VwVDmcAwy34QTR0s+w
-         aRzg==
+        d=gmail.com; s=20230601; t=1727993609; x=1728598409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3gjNaonYclvC+eXWWuLusLr6M8V9VR0a8u100joB2gk=;
+        b=i1RmiHvqbH3ZJjEowaW2cEst9QqDn3VqBy+hoDG4SoXJEc3VQwJAGAdrkLzDBn8f9V
+         gMHfutLoU9HuUl/zkvlNe1xQH0bN1ITRVSwGol5yZOk1bfhel7lDcSpunlvtIjmiY+gC
+         4km++hwX8ibthqPw+Y3amodC+OUzoEh2J6Spk4VFYTRPeWL0HBfn8ux4TLWpwoSzfwcp
+         cQYcJLXfo7KO0nKApNOds3SYq32qSPGYSV3WjowOsOKTuabaNwhvIJdW1iUBHtL45LMR
+         JpXafrhYID0zwSS6d3DTeTvtBx1YNHt0TLWRhFqwLRc+5p3AuBgw1lF7AEZvTRCDt1Uy
+         rPOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727993559; x=1728598359;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=i41AgYSqsz8N+S1EwL66geaOVck9qp+/JrG6VOfkcIg=;
-        b=T821yPC6kvO1e3TC74G+kXMxhUz8duv6NpC+jUpJhjr6n+UhXLgw23UlCnP1lljUnH
-         q00e19Nq6IBx4bUVvsFT7p2z91BHTRfHfPvLZGswdgrOUlN1QwpZHDv5oLri3CPwI+ek
-         fW2ATwjc1E/HBxbMsLRRRoMX2LNgDtPwRhupyG/NPAutHJOjirzzOeOo8/t+UXOMN14M
-         wisW8szdHUAPODBeWS32HW+0n7YXICbwAytXbypbUK33BNC2toTj0DJYbqho9STgtUj9
-         QPfHFr23k3hBLs0KMIu3tdLg+7MC433mVN+1Fhyz4/HSTkDxcqgxvv1D+wvmoQ0hyZuE
-         x4DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWznZVVWRA9z5rnsvoGZ1lcBjqj1NVbb0xT80TLosT8YqQJLcVyUwgr8WR+HYPWNSJvjRbox+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8Q7gozcPDRQDjMSxx7Xo/AdETDTOiSWaebCSrJhgBFqb7Z1I5
-	qKvQbPsuWnO/mazIGh7qPFhPJYMkzk6eEX2fANDVwv8fL7o9cno=
-X-Google-Smtp-Source: AGHT+IGrDsBD0+HtpVjdLCedI6A6wqOYkGYXX7NrIC1NxBw1Xg2ftc5sSZkzW+ojsNRtPuy+5FCPZw==
-X-Received: by 2002:a05:6a20:c886:b0:1d5:1252:ebe2 with SMTP id adf61e73a8af0-1d6dfa259damr1166127637.5.1727993558878;
-        Thu, 03 Oct 2024 15:12:38 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9dcb5d85csm1211740a12.84.2024.10.03.15.12.38
+        d=1e100.net; s=20230601; t=1727993609; x=1728598409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3gjNaonYclvC+eXWWuLusLr6M8V9VR0a8u100joB2gk=;
+        b=WefTmcU2hHeRvMUiQfPhe7RsH3ARmY+B9Y50caQz3Ry6+5H41ndBevlwkzCvF58M9H
+         ew9Y6BcJlizp1eDN9W45m4IA4GramtRiU4RMImle9bxOy6B8M22WaUXJ0mC30Cm1okNr
+         t2XfEtmXnXZOXSgmSycW6/cV5ye+NQte2C1VFo5fDZVFh5pOqHT+BrbGOfHL823WgkRU
+         jbIf4sHYK0KT4qFkz6wL0HYPVtJdIfC+1bxEK/1kXPwcKbxHZ2dU1jU/d1HbMZl5W0p7
+         zHwbyiuhSwwHzn4yTbziwW4sbW/ycoMMSTGQSA2bElhZGC7O8Iajkg8ml2zAB3cRQHtR
+         TnPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBeiu2C5BLLwYNafsVjbhsPz8xCMnW5cBnuoC2l/cAKKEHeDKpwcefGmBZJTU56tAp8AlDYk7t21kGZM0=@vger.kernel.org, AJvYcCXC9CNFwfgnl3DxA8TbVgY74QV7A1tzg1yMzgeCO4n8pSV3Yz4Y4q/KekdDfG2g2Yw3LQLdTmPX@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYBJkzHNegX4/9lTb+KQX0CLS3HuPSBnlF4K0MCcf9baNCA69a
+	9aerq+WdpjLfzmlPJMnrVJ6WbUSgvejKhi81Wpb0oDNYgvlDjZCU
+X-Google-Smtp-Source: AGHT+IG4FdRCltDIxfEH1NmF7gWJsow6JMoXGJ6BlR3H6AE6RErB6Kq+oaHGjkcE4P9kUlP89BnCaQ==
+X-Received: by 2002:adf:f209:0:b0:37c:ddab:a625 with SMTP id ffacd0b85a97d-37d0e74d5aamr446438f8f.25.1727993609181;
+        Thu, 03 Oct 2024 15:13:29 -0700 (PDT)
+Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37d0822b571sm2088249f8f.40.2024.10.03.15.13.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 15:12:38 -0700 (PDT)
-Date: Thu, 3 Oct 2024 15:12:37 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 07/12] selftests: ncdevmem: Properly reset
- flow steering
-Message-ID: <Zv8W1dfhsmtsw5oT@mini-arch>
-References: <20240930171753.2572922-1-sdf@fomichev.me>
- <20240930171753.2572922-8-sdf@fomichev.me>
- <CAHS8izO0Z6soYWLeU0c-8EKP5monscFqpnw6gn5OkxoqwTxKbg@mail.gmail.com>
- <Zv7Jbf5yVO9eV8Md@mini-arch>
- <CAHS8izOtNP2DXHWd_NcXTbD=P9s055g-EWWhknv4VkPh2NXKvg@mail.gmail.com>
+        Thu, 03 Oct 2024 15:13:27 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH] net: phy: Validate PHY LED OPs presence before registering
+Date: Fri,  4 Oct 2024 00:12:48 +0200
+Message-ID: <20241003221250.5502-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izOtNP2DXHWd_NcXTbD=P9s055g-EWWhknv4VkPh2NXKvg@mail.gmail.com>
 
-On 10/03, Mina Almasry wrote:
-> On Thu, Oct 3, 2024 at 9:42 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >
-> > On 10/03, Mina Almasry wrote:
-> > > On Mon, Sep 30, 2024 at 10:18 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
-> > > >
-> > > > ntuple off/on might be not enough to do it on all NICs.
-> > > > Add a bunch of shell crap to explicitly remove the rules.
-> > > >
-> > > > Cc: Mina Almasry <almasrymina@google.com>
-> > > > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > > ---
-> > > >  tools/testing/selftests/net/ncdevmem.c | 13 ++++++-------
-> > > >  1 file changed, 6 insertions(+), 7 deletions(-)
-> > > >
-> > > > diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-> > > > index 47458a13eff5..48cbf057fde7 100644
-> > > > --- a/tools/testing/selftests/net/ncdevmem.c
-> > > > +++ b/tools/testing/selftests/net/ncdevmem.c
-> > > > @@ -207,13 +207,12 @@ void validate_buffer(void *line, size_t size)
-> > > >
-> > > >  static int reset_flow_steering(void)
-> > > >  {
-> > > > -       int ret = 0;
-> > > > -
-> > > > -       ret = run_command("sudo ethtool -K %s ntuple off >&2", ifname);
-> > > > -       if (ret)
-> > > > -               return ret;
-> > > > -
-> > > > -       return run_command("sudo ethtool -K %s ntuple on >&2", ifname);
-> > > > +       run_command("sudo ethtool -K %s ntuple off >&2", ifname);
-> > > > +       run_command("sudo ethtool -K %s ntuple on >&2", ifname);
-> > > > +       run_command(
-> > > > +               "sudo ethtool -n %s | grep 'Filter:' | awk '{print $2}' | xargs -n1 ethtool -N %s delete >&2",
-> > > > +               ifname, ifname);
-> > > > +       return 0;
-> > >
-> > > Any reason to remove the checking of the return codes? Silent failures
-> > > can waste time if the test fails and someone has to spend time finding
-> > > out its the flow steering reset that failed (it may not be very
-> > > obvious without the checking of the return code.
-> >
-> > IIRC, for me the 'ntuple off' part fails because the NIC doesn't let me
-> > turn it of. And the new "ethtool .. | grep 'Filter: ' | ..." also fails
-> > when there are no existing filters.
-> >
-> > I will add a comment to clarify..
-> 
-> Ah, understood. Seems this area is fraught with subtleties.
-> 
-> If you have time, maybe to counter these subtleties we can do a get of
-> ntuple filters and confirm they're 0 somehow at the end of the
-> function. That would offset not checking the return code.
-> 
-> But, I don't think it's extremely likely to run into errors here? So,
-> this is probably good and can easily be improved later if we run into
-> issues:
-> 
-> Reviewed-by: Mina Almasry <almasrymina@google.com>
+Validate PHY LED OPs presence before registering and parsing them.
+Defining LED nodes for a PHY driver that actually doesn't supports them
+is wrong and should be reported.
 
-Ack, I'll keep it as is with a comment. Ideally we should do proper
-ethtool netlink/ioctl instead of shelling out, but I don' think
-ntuple API is exposed to netlink and I'm too lazy to dive into how
-the old ioctl-based ntuple API works :-D
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ drivers/net/phy/phy_device.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index af088bf00bae..ce154a54bfa4 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3426,6 +3426,16 @@ static int of_phy_leds(struct phy_device *phydev)
+ 	if (!leds)
+ 		return 0;
+ 
++	/* Check if the PHY driver have at least an OP to
++	 * set the LEDs.
++	 */
++	if (!phydev->drv->led_brightness_set &&
++	    !phydev->drv->led_blink_set &&
++	    !phydev->drv->led_hw_control_set) {
++		phydev_err(phydev, "ignoring leds node defined with no PHY driver support\n");
++		goto exit;
++	}
++
+ 	for_each_available_child_of_node_scoped(leds, led) {
+ 		err = of_phy_led(phydev, led);
+ 		if (err) {
+@@ -3435,6 +3445,7 @@ static int of_phy_leds(struct phy_device *phydev)
+ 		}
+ 	}
+ 
++exit:
+ 	of_node_put(leds);
+ 	return 0;
+ }
+-- 
+2.45.2
+
 
