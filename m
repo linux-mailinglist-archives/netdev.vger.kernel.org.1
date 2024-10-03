@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-131417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B1198E7B1
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:20:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1979E98E7B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A69081F22333
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:20:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3B42835C2
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB7CB4C83;
-	Thu,  3 Oct 2024 00:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1CBBA4A;
+	Thu,  3 Oct 2024 00:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qnLjT6RQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2y+naGH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8373F7E9;
-	Thu,  3 Oct 2024 00:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949EFBA49;
+	Thu,  3 Oct 2024 00:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727914832; cv=none; b=OAGaqCDqtCA9Sn7ohASj7TgpGh7cCQIScnv+lqpGa3sEdCcnVKkpAUeSK04SHSGpUvmSRBQeKEVKL9dxHt5wZ4XduHyLMVQyHOjygulH5nzS+exhVbIrUVKdtyDxjV1CFNyd43x2ttDjEChHzETyj8mQSN4yHbx7iFg8FO5q7Kw=
+	t=1727914834; cv=none; b=SwhrepU9/ruuJYaj9AQ3eYZ7cpSNoyrqCohHC0oVfRCaBQ3KVAOyYDil/UaeyJnwl+EuYJ2/m5nQx+0NTuJduJQNEdSEVi6cu9eXWieSHoGU5IkhOqJwVTdgtAEi0kgW3OIZzyOB82S5CD+fEKkadB93xyNl7Qnu5zC/VkRhGNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727914832; c=relaxed/simple;
-	bh=7DwgjjVFFcBp0lNlSZViftUTrfw18V7xc2GA8oHpbRE=;
+	s=arc-20240116; t=1727914834; c=relaxed/simple;
+	bh=y5Qq5Zmg1rl0OEUIQb6X8iY7i3KmVYyZKymFaB6N02s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m7RuL1R+x57+gRdH+phJgZjM9BLMUEJY/tgYK36l8lCBF4ldMRRw1dHq+o0kq9TFoXcVFlc8ziB5ID4rwP8rsDQhZWer+gT337uYU4O1k558bsYW6gMa/DIwqyT7hvEFo31lTqULB58Fn40H2mgu5gnR5ELoCIf4CH9J6xSUNas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qnLjT6RQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F39EFC4CEC2;
-	Thu,  3 Oct 2024 00:20:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Ol9p4Z3ZM4yD7W2k1idoX8DHYhEqNRG6Ni6Oh/kCeg0EM4cJJy9jq3ITL4Yx0BGqcd0t75bRKEXrI2/bYYNaHgMb5TApq3zNvoQiKx4jTugE/gVJO+/m7reZnPDLZ/lbUzV9lMmMSeJBDmGKGu6U8XK7ErtiQ6cEW+FxjVz/OOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2y+naGH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C4A2C4CEC2;
+	Thu,  3 Oct 2024 00:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727914832;
-	bh=7DwgjjVFFcBp0lNlSZViftUTrfw18V7xc2GA8oHpbRE=;
+	s=k20201202; t=1727914834;
+	bh=y5Qq5Zmg1rl0OEUIQb6X8iY7i3KmVYyZKymFaB6N02s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qnLjT6RQGMVEJ/g7qe5FNRrdO4u/XXGk8FjgCQqTECQSKOz3xlVcH1XN+CJqH9hKA
-	 pmFU4nQ1DHntKTPJZ73FMd0WwgXSmcszjuKDCZaAnXtKbihoesPSQIL7L2jj/NShnw
-	 jYEFlCXjOzNOjWh9f6pVb22loglKt34i+fDSdmCyQYPqoyL5H2YExXE6P3DaBU9Wd9
-	 vQ/JqR+LY/T5aBY5AsTB8QLp2o5M9wwd3Q1by9ZcAu1PFYJJvaXsXy90UyjZxq27SJ
-	 EvT4HJ9A/Hmt3cI+u5aIPR9lrv0pvja0qb/jWS/CSnw/S8RW+UHqW5GT0LKPHf1+tb
-	 PgZ+j/UvlGcew==
+	b=f2y+naGHgczdRTBjlATBH/aDbucPSHigvCZ+EwlSahm3OQv/vn8CPWKl6Z7wmkWqP
+	 ME3JZjyA0PoSuH+PotFsIx8B2u7FSZcYUDQJa3YIRZz9XyGKlQr9MaKP4PrNHjvHhC
+	 QAQwxlpQ/IpNZdY/MXnlXtBw14W4guzR6KtdP8KRUQrKnNek1qeexHH4lar3Y2k4Do
+	 Le4s7k7ZpAy6jO1XPzmbkcG0IslnLCy70ZeT8qe3Pn9/GjKNEPgxpEqsvv7YRFpeDZ
+	 USJxCyh7UKHVC0Z2lkUM2nzBRiItAcWpPthbLwrkMbKnV2uI/YPFhViKsXH3BclxXa
+	 zhQHqYBOkAcPw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7164C380DBD1;
-	Thu,  3 Oct 2024 00:20:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE7E380DBD1;
+	Thu,  3 Oct 2024 00:20:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,15 +52,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-09-27
+Subject: Re: pull-request: ieee802154 for net 2024-09-27
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172791483514.1382939.113708952485182951.git-patchwork-notify@kernel.org>
-Date: Thu, 03 Oct 2024 00:20:35 +0000
-References: <20240927145730.2452175-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240927145730.2452175-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ <172791483728.1382939.3159825793349245389.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Oct 2024 00:20:37 +0000
+References: <20240927094351.3865511-1-stefan@datenfreihafen.org>
+In-Reply-To: <20240927094351.3865511-1-stefan@datenfreihafen.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
  netdev@vger.kernel.org
 
 Hello:
@@ -68,20 +69,19 @@ Hello:
 This pull request was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 27 Sep 2024 10:57:30 -0400 you wrote:
-> The following changes since commit d505d3593b52b6c43507f119572409087416ba28:
+On Fri, 27 Sep 2024 11:43:50 +0200 you wrote:
+> Hello Dave, Jakub, Paolo.
 > 
->   net: wwan: qcom_bam_dmux: Fix missing pm_runtime_disable() (2024-09-27 12:39:02 +0100)
+> An update from ieee802154 for your *net* tree:
 > 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-09-27
+> Jinjie Ruan added the use of IRQF_NO_AUTOEN in the mcr20a driver and fixed and
+> addiotinal build dependency problem while doing so.
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-09-27
-    https://git.kernel.org/netdev/net/c/e5e3f369b123
+  - pull-request: ieee802154 for net 2024-09-27
+    https://git.kernel.org/netdev/net/c/cb3ad11342a2
 
 You are awesome, thank you!
 -- 
