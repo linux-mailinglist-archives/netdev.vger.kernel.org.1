@@ -1,96 +1,100 @@
-Return-Path: <netdev+bounces-131500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ABE98EAF9
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:01:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFAEE98EB03
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EA001C21B8F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:01:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63BEA1F23270
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 521BB7F48C;
-	Thu,  3 Oct 2024 08:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD87612C478;
+	Thu,  3 Oct 2024 08:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AAxkc/mx"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LfocnND2"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A155E10940;
-	Thu,  3 Oct 2024 08:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C49811E2;
+	Thu,  3 Oct 2024 08:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727942508; cv=none; b=sql9ySH2ACQ4lHG2szKi9hjBnfPiK1c6jfaJJOZinulTkLOaNav/ovHJxIaQvh5YKqpzUGP2J+gEr2FP5Crib2osYWkEZ1bQKYiICmo428PZ1SpmX7iWKOuvL2LUzAJ0480ZNFUdr0O4ZAXeLix7+0jvb82+eVrBu8JV/Jh43yg=
+	t=1727942678; cv=none; b=FkeV63zWBrLdbm0DV5CktUdkkm5KSLgdqkkbwUlPtc+hmup5EcuLl04RZFTXNczK8aCzVn8ILOLZ9EZnDdHQtO1pqNq8MwJRPq+KBEQoHRrgNKCw9wd0dt6zls0NGpWY0hd4UrBjB+CCHmlqNF+A9puqENfoHzbr5ELRMOaZ9JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727942508; c=relaxed/simple;
-	bh=s8rhgO4icTGT7mesBVisBIN/aFhxQ7Ku3vUQsN8le2c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SuhsAuca3AK33G/SIJ1UQ1AmMksdU41qg7HEUZC/pQj0maM0gIQ0DTn/qEFeEnJWLnRdE5OV/03iiWuCqtzWx7RCnKa6Ng4Sh4XSs/YoZXNb+mFeaNSbvwJyTSmRWtwGzn5SX5pX1zW89n1mscdxgWgosyLpNd+Gn4yCv8O7LOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AAxkc/mx; arc=none smtp.client-ip=217.70.183.199
+	s=arc-20240116; t=1727942678; c=relaxed/simple;
+	bh=1tae21s3e6QcaNtDUvIDGJ9EWbkfufNZC2HUUZNH7CE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qK8UhK9GK5/eJeqw54Ud1r4DNsnxSRmt9OzZdkvVh9bknvOR6/ZKEe6o9BkKdE2wrlzHoeDylZDvHQ6R7PctX8GNhTHIFqR6Kf81uJp8ouOCl3Mgi9Mz2ko9P01mgpqIRo+8pbcE86HcUPdJMtAuSb9HTjTOX/8k/J3VTFv+c90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LfocnND2; arc=none smtp.client-ip=217.70.183.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A2B66FF80B;
-	Thu,  3 Oct 2024 08:01:42 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AE9C0FF804;
+	Thu,  3 Oct 2024 08:04:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727942503;
+	t=1727942674;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UtIpPwgDb7sTORjc+DbIwbzuLRI0mwmB7mFQ6yVwpvs=;
-	b=AAxkc/mxZvjZPzcs+E2uLWyyO0WQ1HdDvLaqL3qgbPgugA2ToG0O7Jp9CGlkjc2zLCMmPv
-	vQ1eYu3lI8AVMag14GQ45mh2Uf3QQ+uSSNSDAmhYroVzZkyaOmN/HZEqBwcS+KrTpGfE8S
-	1er89FO4NFbotF0l/of1IVWsP81UXTKbkxVa4BcVqG9EHhroaPcKSFz8ujP3BR3eclhXSY
-	EkZojh1puEv1kptv9GeznjCs7noJ0lZk2VRLlWCUUmStLcKNgntgIPijumx1mfqFsgDoaS
-	Ye40Bb+XRchYqzQZsQTt2XvRO6wWx2w76fJh/SJtXz5aZNs+QDn1dlp5p7VfoA==
-Date: Thu, 3 Oct 2024 10:01:40 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de
-Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for
- PSE PI priority feature
-Message-ID: <20241003100140.153f660e@kmaincent-XPS-13-7390>
-In-Reply-To: <1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
-	<20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
-	<1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=qaRvvQziLU6C2Xe7I8nl3yrGndFd7caE/VtEN8AnYx4=;
+	b=LfocnND2/LlhnlobhP3UzyK0PfGnWrlsplWokefGtvgXy06ye7AHzPQdLFf4CU3BOXAKbk
+	exlEz4R3i4CvRocUvhzaisF3HjwQ/ZMQ1LLUg8fH+Wc0QVvP+G6XPnBgwKmwEcCDWPYYNe
+	AZIrCxyoDGsDNCwg6xj+ov88MEXgKG0wo9UG/C2C4syggcjlngPqsIyKT/joekl3q8ZePQ
+	SvOd+oOCY/pTJRzJHixqQ+reF4jGe58Qp9vtmpG3CRsGeuQuUKjU7mnrCOhiurHCJcgB0s
+	ErAyt5eBbNIwbaES94GwUHZI+Te7elwNdj0RIQkXBFmm7i+R0psnkKzW9yICCg==
+Message-ID: <0321fc03-e1ea-4012-82a3-fcdc6f3b18eb@bootlin.com>
+Date: Thu, 3 Oct 2024 10:04:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 2/7] wifi: wilc1000: Fold wilc_get_chipid() into wlan.c
+To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240926195700.2823751-1-marex@denx.de>
+ <20240926195700.2823751-2-marex@denx.de>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20240926195700.2823751-2-marex@denx.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Thu, 3 Oct 2024 01:41:02 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+Hello Marek,
 
-> > +	msg =3D pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
-> > +	msg.sub[2] =3D id;
-> > +	/* Controller priority from 1 to 3 */
-> > +	msg.data[4] =3D prio + 1; =20
->=20
-> Does 0 have a meaning? It just seems an odd design if it does not.
+On 9/26/24 21:55, Marek Vasut wrote:
+> Do not use wilc_get_chipid() outside of wlan.c . Instead, call
+> wilc_get_chipid() right after the SDIO/SPI interface has been
+> initialized to cache the device chipid, and then use the cached
+> chipid throughout the driver. Make wilc_get_chipid() return a
+> proper return value instead of a chipid.
 
-PD692x0 has an odd firmware design from the beginning. ;)
-Yes, the priority available are from 1 to 3. Setting it to 0 does nothing.
+This new update now makes the commit message wrong, wilc_get_chipid is used in
+files other than wlan.c (and this change goal is now rather to get the chip id
+early enough to register wiphy with correct info)
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
+> Signed-off-by: Marek Vasut <marex@denx.de>
+
+With the point above fixed:
+
+Reviewed-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
 https://bootlin.com
 
