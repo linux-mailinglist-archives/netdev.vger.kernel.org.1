@@ -1,71 +1,81 @@
-Return-Path: <netdev+bounces-131688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C6798F43C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:26:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1BCA98F42B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D33B9B23080
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:26:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2D511C20D2D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 687B51A7046;
-	Thu,  3 Oct 2024 16:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4382B19F42F;
+	Thu,  3 Oct 2024 16:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="hRoFIT8v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EYPeSZcL"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4C81A3AB7;
-	Thu,  3 Oct 2024 16:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6637433AD;
+	Thu,  3 Oct 2024 16:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727972799; cv=none; b=kgF129q7cUAyttAnqVAfr7ltBX2WvDQL0PCDVRqLAs60U1arlAIXUzTchL2Z4LusV9qarwG03+gVXBXtw7SdOcAnOrnlCXlgCojsU9FwsuE98DED2eJSq9i7434Uk11FDcUOF888O94Qw/JayPglKAZvCtL1oftJDRKdlbsedMo=
+	t=1727972631; cv=none; b=nZSCc0rKL9ca7hLvJlYpm+TL/fjs4rGPYIw4o4l6N8SwYDJaM0tnfAY80s/350TWdpu9B1730ubSvAIdpsAQKaCabraRidny4a7YqVS4y7QA7LZ6rESnjt6frT4vSFzg+EYmEH9HE/X98CzJlgp1QQ9Ty16+u7yoLr6x3xpUZH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727972799; c=relaxed/simple;
-	bh=+EWm9ovp3FONrNswzRV2ocgiTP0QhZsdLG0Iv6QGQTk=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=G8Tk7dJeOTQEkp25MxDQhC8UHAKPuWMEvJsUgcFRH6icPUCdOna8PNe1zHzSY7ZaVOCQISIS5TJ9HfKXbS/9h3zRe2GBkx4IujHo63BM0hnnVUvEXB00jIWyLuB/0/S5BigfXd6oWuLXcg7BnC4+WXKx42D5uMa5xNQN59Ab5zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=hRoFIT8v; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1727972797; x=1759508797;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+EWm9ovp3FONrNswzRV2ocgiTP0QhZsdLG0Iv6QGQTk=;
-  b=hRoFIT8vO/zWe8GjufeMus8W7UkGjCaYtTV6yv/aIF7yEGk0KW1qgemO
-   DMewxe0Auo8B7mOZPamExRmCTc6DTAhxJuVMVzNTFBjqecXn+enLAwxTa
-   a2YnBJUGn1uEAGh0QExRlXJ1WZHFY8UUROC5TWK9IBv71radkjUr1F0Js
-   D4T7w/5Fi6Rk+yZClloY1+3doaZsYqsKCv5O7kJNfG8E7DA3y5T0lEz3P
-   cEc0Gg0+TMqUIjsZwVoZTtHq5+WldPmFJqIMqptom7xAbtei+3ieWvpaD
-   E8AwrnNu5uJDQnZCSMkd8jeZMNPbfa/79cWNbx09xPN+Lptq6lU/I1c9l
-   g==;
-X-CSE-ConnectionGUID: EJyWgJZ7TvOBIF+vRJDc2A==
-X-CSE-MsgGUID: S8KfLE8gR3OHapzlvornXg==
-X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
-   d="scan'208";a="263610546"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Oct 2024 09:26:31 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 3 Oct 2024 09:26:09 -0700
-Received: from HYD-DK-UNGSW20.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 3 Oct 2024 09:26:06 -0700
-From: Tarun Alle <tarun.alle@microchip.com>
-To: <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v5] net: phy: microchip_t1: SQI support for LAN887x
-Date: Thu, 3 Oct 2024 21:51:18 +0530
-Message-ID: <20241003162118.232123-1-tarun.alle@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1727972631; c=relaxed/simple;
+	bh=O8Vmu7TFQB3fopW1DTEkKfVJeNrb3XgMb8cN6yFuONM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ho3XxFDUD6/fqgd5Ft3dXhEXIMPqA5VhubxrTFf3kTHdM6cU60am3zq5IwSiWGaHccp+ysF67CcjmQS++4AoXcXyTB4Etl1Wb6DYyKG9TcWXv7TZtJFZUv8W2GbCEu2cXypXH1F3BB+bn9xTjK2ydvwhAmFs7sU1/F2XnIZitYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EYPeSZcL; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e262e36df27so1801108276.0;
+        Thu, 03 Oct 2024 09:23:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727972629; x=1728577429; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2A7HVbCYMRJB0wC6HN6kgIW4ax3rl9C50DMlGTp8TQw=;
+        b=EYPeSZcLclU06uP1DsyS8j66o1XHoRrVTietpIhV7h021IQXxoLrK8U83dCX2ciaBs
+         1aGk1TJ8jY1CBzB/Ek9vS2vUOp+ZqT8C0POAQwCClJr2PbNiCMwK6XeYOVpPMo95Vix6
+         ssCTQPQoPMCTC35ObPh+1/nqbRnDvdP9wsaUv87RKjMDWh4fCk1iq+GueZGS4A6E8tuC
+         gzyBdgpaTHhZLG8/XsrrP3lZAFv4TB6ihoSH9wUrbPuKLf7nouIPfCLH9lvd1oStmBN3
+         gSCD2ZScPcox97jnbemHIobxYD6RbBxmnJA5yS6WYLnGhDdHbS4V8ndyzufv6KMVfX3f
+         XdVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727972629; x=1728577429;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2A7HVbCYMRJB0wC6HN6kgIW4ax3rl9C50DMlGTp8TQw=;
+        b=u1NAmcbGckf1BlsRt78cy+r7fQeYYu+mvNQRwYtx7Z10ftrRDyc0Ai597yFMMDfuB4
+         8Pxb5Y6MzMMc+ODqNIM+esQV03DGjKLPhr8juAjBXPj/ZCv4qekYKJb2+EEYYuzidAbB
+         +n+aZgqsaIXmtePR+fPYn2Z+r57ukmx/cRBedY2y8CFL3Sumw2SKI6xrJoFB3iwsUg4u
+         d9W9ysw8GnKTQX53OoKk+ebqd2uC+NvVhSpJQ/UygzzbCuzHWEvIR3kijC+7Zhq9Afdf
+         UPEzrtMyo0aYH6j1kU3/RE311QKkwQa2IKUVLTlOShJCmQu0Tw6f2yDVjgjR/PJwQeus
+         OUDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXICWUAEqJXpYwAhlc5x2n8PkHvp4pcNEz4Kv09Nf3IpDti04e3P9mWGQdleJPwAC6NLYUbDyXkyo+ev7I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw37NF+GY8SlB/9hDUw2Lo4+3uj8XEqqLYgyetJqMC1mAgz32fr
+	SGUSqwk4t+tJwTNuEjsl0TmrB8IFVrKBtbGJOc4WA0QrQzkmpq5k
+X-Google-Smtp-Source: AGHT+IFoKPod/9H6XNAvjsfkxVWc/pBu30GvTKXrHnDKDWyOWAOLLIEQ/DOSeLpmtKWpOwNDXLNUVw==
+X-Received: by 2002:a5b:891:0:b0:e24:9e26:133 with SMTP id 3f1490d57ef6-e286f81947emr3207971276.14.1727972628734;
+        Thu, 03 Oct 2024 09:23:48 -0700 (PDT)
+Received: from localhost (fwdproxy-nha-000.fbsv.net. [2a03:2880:25ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e2885d2ac2asm269232276.16.2024.10.03.09.23.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 09:23:48 -0700 (PDT)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1] ethtool: rss: fix rss key initialization warning
+Date: Thu,  3 Oct 2024 09:23:10 -0700
+Message-ID: <20241003162310.1310576-1-daniel.zahka@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,240 +83,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-From: Tarun Alle <Tarun.Alle@microchip.com>
+This warning is emitted when a driver does not default populate an rss
+key when one is not provided from userspace. Some devices do not
+support individual rss keys per context. For these devices, it is ok
+to leave the key zeroed out in ethtool_rxfh_context. Do not warn on
+zeroed key when ethtool_ops.rxfh_per_ctx_key == 0.
 
-Add support for measuring Signal Quality Index for LAN887x T1 PHY.
-Signal Quality Index (SQI) is measure of Link Channel Quality from
-0 to 7, with 7 as the best. By default, a link loss event shall
-indicate an SQI of 0.
-
-Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
+Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
 ---
-v4 -> v5
-- Renamed and organised the macros of SQI samples.
+ net/ethtool/ioctl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-v3 -> v4
-- Added check to handle invalid samples.
-- Added macro for ARRAY_SIZE(rawtable).
-
-v2 -> v3
-- Replaced hard-coded values with ARRAY_SIZE(rawtable).
-
-v1 -> v2
-- Replaced hard-coded 200 with ARRAY_SIZE(rawtable).
-- Replaced return value -EINVAL with -ENETDOWN.
-- Changed link checks.
----
- drivers/net/phy/microchip_t1.c | 172 +++++++++++++++++++++++++++++++++
- 1 file changed, 172 insertions(+)
-
-diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
-index a5ef8fe50704..69e01692db65 100644
---- a/drivers/net/phy/microchip_t1.c
-+++ b/drivers/net/phy/microchip_t1.c
-@@ -6,6 +6,7 @@
- #include <linux/delay.h>
- #include <linux/mii.h>
- #include <linux/phy.h>
-+#include <linux/sort.h>
- #include <linux/ethtool.h>
- #include <linux/ethtool_netlink.h>
- #include <linux/bitfield.h>
-@@ -226,6 +227,35 @@
- #define MICROCHIP_CABLE_MAX_TIME_DIFF	\
- 	(MICROCHIP_CABLE_MIN_TIME_DIFF + MICROCHIP_CABLE_TIME_MARGIN)
- 
-+#define LAN887X_COEFF_PWR_DN_CONFIG_100		0x0404
-+#define LAN887X_COEFF_PWR_DN_CONFIG_100_V	0x16d6
-+#define LAN887X_SQI_CONFIG_100			0x042e
-+#define LAN887X_SQI_CONFIG_100_V		0x9572
-+#define LAN887X_SQI_MSE_100			0x483
-+
-+#define LAN887X_POKE_PEEK_100			0x040d
-+#define LAN887X_POKE_PEEK_100_EN		BIT(0)
-+
-+#define LAN887X_COEFF_MOD_CONFIG		0x080d
-+#define LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN	BIT(8)
-+
-+#define LAN887X_DCQ_SQI_STATUS			0x08b2
-+
-+/* SQI raw samples count */
-+#define SQI_SAMPLES 200
-+
-+/* Samples percentage considered for SQI calculation */
-+#define SQI_INLINERS_PERCENT 60
-+
-+/* Samples count considered for SQI calculation */
-+#define SQI_INLIERS_NUM (SQI_SAMPLES * SQI_INLINERS_PERCENT / 100)
-+
-+/* Start offset of samples */
-+#define SQI_INLIERS_START ((SQI_SAMPLES - SQI_INLIERS_NUM) / 2)
-+
-+/* End offset of samples */
-+#define SQI_INLIERS_END (SQI_INLIERS_START + SQI_INLIERS_NUM)
-+
- #define DRIVER_AUTHOR	"Nisar Sayed <nisar.sayed@microchip.com>"
- #define DRIVER_DESC	"Microchip LAN87XX/LAN937x/LAN887x T1 PHY driver"
- 
-@@ -1830,6 +1860,146 @@ static int lan887x_cable_test_get_status(struct phy_device *phydev,
- 	return lan887x_cable_test_report(phydev);
- }
- 
-+/* Compare block to sort in ascending order */
-+static int sqi_compare(const void *a, const void *b)
-+{
-+	return  *(u16 *)a - *(u16 *)b;
-+}
-+
-+static int lan887x_get_sqi_100M(struct phy_device *phydev)
-+{
-+	u16 rawtable[SQI_SAMPLES];
-+	u32 sqiavg = 0;
-+	u8 sqinum = 0;
-+	int rc, i;
-+
-+	/* Configuration of SQI 100M */
-+	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-+			   LAN887X_COEFF_PWR_DN_CONFIG_100,
-+			   LAN887X_COEFF_PWR_DN_CONFIG_100_V);
-+	if (rc < 0)
-+		return rc;
-+
-+	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100,
-+			   LAN887X_SQI_CONFIG_100_V);
-+	if (rc < 0)
-+		return rc;
-+
-+	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100);
-+	if (rc != LAN887X_SQI_CONFIG_100_V)
-+		return -EINVAL;
-+
-+	rc = phy_modify_mmd(phydev, MDIO_MMD_VEND1, LAN887X_POKE_PEEK_100,
-+			    LAN887X_POKE_PEEK_100_EN,
-+			    LAN887X_POKE_PEEK_100_EN);
-+	if (rc < 0)
-+		return rc;
-+
-+	/* Required before reading register
-+	 * otherwise it will return high value
-+	 */
-+	msleep(50);
-+
-+	/* Link check before raw readings */
-+	rc = genphy_c45_read_link(phydev);
-+	if (rc < 0)
-+		return rc;
-+
-+	if (!phydev->link)
-+		return -ENETDOWN;
-+
-+	/* Get 200 SQI raw readings */
-+	for (i = 0; i < SQI_SAMPLES; i++) {
-+		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-+				   LAN887X_POKE_PEEK_100,
-+				   LAN887X_POKE_PEEK_100_EN);
-+		if (rc < 0)
-+			return rc;
-+
-+		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
-+				  LAN887X_SQI_MSE_100);
-+		if (rc < 0)
-+			return rc;
-+
-+		rawtable[i] = (u16)rc;
-+	}
-+
-+	/* Link check after raw readings */
-+	rc = genphy_c45_read_link(phydev);
-+	if (rc < 0)
-+		return rc;
-+
-+	if (!phydev->link)
-+		return -ENETDOWN;
-+
-+	/* Sort SQI raw readings in ascending order */
-+	sort(rawtable, SQI_SAMPLES, sizeof(u16), sqi_compare, NULL);
-+
-+	/* Keep inliers and discard outliers */
-+	for (i = SQI_INLIERS_START; i < SQI_INLIERS_END; i++)
-+		sqiavg += rawtable[i];
-+
-+	/* Handle invalid samples */
-+	if (sqiavg != 0) {
-+		/* Get SQI average */
-+		sqiavg /= SQI_INLIERS_NUM;
-+
-+		if (sqiavg < 75)
-+			sqinum = 7;
-+		else if (sqiavg < 94)
-+			sqinum = 6;
-+		else if (sqiavg < 119)
-+			sqinum = 5;
-+		else if (sqiavg < 150)
-+			sqinum = 4;
-+		else if (sqiavg < 189)
-+			sqinum = 3;
-+		else if (sqiavg < 237)
-+			sqinum = 2;
-+		else if (sqiavg < 299)
-+			sqinum = 1;
-+		else
-+			sqinum = 0;
-+	}
-+
-+	return sqinum;
-+}
-+
-+static int lan887x_get_sqi(struct phy_device *phydev)
-+{
-+	int rc, val;
-+
-+	if (phydev->speed != SPEED_1000 &&
-+	    phydev->speed != SPEED_100) {
-+		return -ENETDOWN;
-+	}
-+
-+	if (phydev->speed == SPEED_100)
-+		return lan887x_get_sqi_100M(phydev);
-+
-+	/* Writing DCQ_COEFF_EN to trigger a SQI read */
-+	rc = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
-+			      LAN887X_COEFF_MOD_CONFIG,
-+			      LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN);
-+	if (rc < 0)
-+		return rc;
-+
-+	/* Wait for DCQ done */
-+	rc = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
-+				       LAN887X_COEFF_MOD_CONFIG, val, ((val &
-+				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN) !=
-+				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN),
-+				       10, 200, true);
-+	if (rc < 0)
-+		return rc;
-+
-+	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_DCQ_SQI_STATUS);
-+	if (rc < 0)
-+		return rc;
-+
-+	return FIELD_GET(T1_DCQ_SQI_MSK, rc);
-+}
-+
- static struct phy_driver microchip_t1_phy_driver[] = {
- 	{
- 		PHY_ID_MATCH_MODEL(PHY_ID_LAN87XX),
-@@ -1881,6 +2051,8 @@ static struct phy_driver microchip_t1_phy_driver[] = {
- 		.read_status	= genphy_c45_read_status,
- 		.cable_test_start = lan887x_cable_test_start,
- 		.cable_test_get_status = lan887x_cable_test_get_status,
-+		.get_sqi	= lan887x_get_sqi,
-+		.get_sqi_max	= lan87xx_get_sqi_max,
- 	}
- };
- 
+diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
+index 65cfe76dafbe..04b34dc6b369 100644
+--- a/net/ethtool/ioctl.c
++++ b/net/ethtool/ioctl.c
+@@ -1505,6 +1505,7 @@ static noinline_for_stack int ethtool_set_rxfh(struct net_device *dev,
+ 						       extack);
+ 			/* Make sure driver populates defaults */
+ 			WARN_ON_ONCE(!ret && !rxfh_dev.key &&
++				     ops->rxfh_per_ctx_key &&
+ 				     !memchr_inv(ethtool_rxfh_context_key(ctx),
+ 						 0, ctx->key_size));
+ 		} else if (rxfh_dev.rss_delete) {
 -- 
-2.34.1
+2.43.5
 
 
