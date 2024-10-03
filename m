@@ -1,252 +1,204 @@
-Return-Path: <netdev+bounces-131714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEDC98F50F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:28:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D29198F50C
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:27:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B4A21C21489
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:28:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 509D82839B4
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EFD1A76D0;
-	Thu,  3 Oct 2024 17:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Pc+4zhHT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3578E1A76C8;
+	Thu,  3 Oct 2024 17:27:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC951DFFB;
-	Thu,  3 Oct 2024 17:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4990522F19;
+	Thu,  3 Oct 2024 17:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727976504; cv=none; b=spJLsyoAsuLGoxGOg+UPekmo2GoRGAtPwy+rkv0gmM1M17c2DGvHpm6cutD+OXcJDzzW05hZRsKBIfVtJYVv66axI3UdKR/Kj97eXODZLQ2RBcPWsm1/jw0+Tyf4G4dQahTnxTCFPi3a61c8L1XkXA2Gne9lJTxRRAITzpEDryw=
+	t=1727976465; cv=none; b=XxWwdX3mq6dPKzEsvoS6lm6MR+d+trSn5dyIY9dzJLP1RDgGGKcYv19CLeDxIT7S3YA+LVIdmbIOJaxWjePpdbgTsgdZApK54WatauDTm3xy4/w7o38toLJpXCzU8AenobLR8Wl00pM/486h/X6U0jqA1ZGGXDQPG1yMB2mhvGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727976504; c=relaxed/simple;
-	bh=WPTV571VPwjWgftRlqxtirBVjpT2ypp+B2x4MPUMvgQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=JZGx2LZLv0e3X+Utsj+WyRS5Z85RmsBgiVesNjmnOCOuc2pdTSALR5kA/37LfIC2nA2yUNXexVQE7zDvgdeRcdUGM2CkQp4BCFbuQ/3hipAXC8Vu96cH/2oXKh0ecO4hvYIESwYjSUB0jpqnZhmSTZrsLGcwjE6xulfW10g6+6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Pc+4zhHT; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4939Okp4022918;
-	Thu, 3 Oct 2024 17:28:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=kECYmxAAqQw50rgJr2KLXC
-	490nyP7CVPR+cK9NUrQok=; b=Pc+4zhHTArzLWBigHme/AgD+HPgwdPd2Jpf5Rg
-	pgnHoeAYPj+YDTtlGSt1IA59D7rLBrdY3TRO1irfJYNUy53Xr8dG1ne5JqZx9zs8
-	aHlH6LQcbRGjQnsS+dbqXYvjJ3tLKeXvEgM8NKN3FR9isXNusQn1DKy/PqTkPfcA
-	SNGC2VEcdcLV1J8jLIxFCelofJ1AO4Y9/KW6vSqC99EgjzX6YL1FxeHYTgeu3MpT
-	LtX5ZZtn3wFQQ4wf1+CajBTyx7sPkKlpJa1Hy8ieIVtLt/LBRUv6Rp/+5oL+5MqY
-	IbQlmTIgCCPG+Jx/rDIXNcdN5kXbO7Mu5v7qn2EKysibXgJw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41x7gefb7v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Oct 2024 17:28:06 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 493HS5kh022812
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 3 Oct 2024 17:28:05 GMT
-Received: from hu-zijuhu-lv.qualcomm.com (10.49.16.6) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+	s=arc-20240116; t=1727976465; c=relaxed/simple;
+	bh=/2iaXVnZb/DUK9vNr/IKPO18H2SenOVe3Y9jHmJjMTM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pWyTVTi76lmSOJVNZ8S2Qf1viYqnm8+vJpSdetyo3Lzq5mYNXr6D3RhXjKKOAlwbMwc1yyt8+YTwBaECJx15rOeZH04dAoJRLcJHjLxJQyOm26WPSPOJw3LAHANoGn8ysSdLG0XFcW5R+TOlR3iFn9PAezXoMsKMd6o+7GWw/p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XKJV84HsqzpWHW;
+	Fri,  4 Oct 2024 01:25:36 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8375A18010F;
+	Fri,  4 Oct 2024 01:27:37 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 3 Oct 2024 10:28:04 -0700
-From: Zijun Hu <quic_zijuhu@quicinc.com>
-Date: Thu, 3 Oct 2024 10:27:27 -0700
-Subject: [PATCH net-next v6] net: qcom/emac: Find sgmii_ops by
- device_for_each_child()
+ 15.2.1544.11; Fri, 4 Oct 2024 01:27:33 +0800
+Message-ID: <4a75e311-0e5d-2046-f71a-5535bb2db22b@huawei-partners.com>
+Date: Thu, 3 Oct 2024 20:27:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20241003-qcom_emac_fix-v6-1-0658e3792ca4@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAP7T/mYC/12NTQ6CMBCFr0JmbU2hQKwr72EIaYdRZkGRtjYYw
- t1tcOfy/X1vg0CeKcC12MBT4sCzy6I9FYCjcU8SPGQNlaxqqSslFpynniaD/YNXIY1U2FpNptS
- QNy9P2T54d3AUhaM1QpeTkUOc/ec4Ss2R/5hK/jFTI0pBjUY5DBYvtr4tb0Z2eM416PZ9/wJOZ
- dYatgAAAA==
-To: Timur Tabi <timur@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Zijun Hu
-	<zijun_hu@icloud.com>, Zijun Hu <quic_zijuhu@quicinc.com>
-X-Mailer: b4 0.14.1
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: eOwl1rzZzJ_Ap7dSuLGchSDrcQUkZNxP
-X-Proofpoint-GUID: eOwl1rzZzJ_Ap7dSuLGchSDrcQUkZNxP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- bulkscore=0 mlxlogscore=999 lowpriorityscore=0 spamscore=0
- priorityscore=1501 suspectscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2410030125
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 14/19] selftests/landlock: Test socketpair(2)
+ restriction
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
+	<matthieu@buffet.re>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-15-ivanov.mikhail1@huawei-partners.com>
+ <ZurZ7nuRRl0Zf2iM@google.com>
+ <220a19f6-f73c-54ef-1c4d-ce498942f106@huawei-partners.com>
+ <ZvZ_ZjcKJPm5B3_Z@google.com> <Zvhh3CRj9T7_KIhC@google.com>
+ <20240929.Noovae0izai8@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240929.Noovae0izai8@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-To prepare for constifying the following old driver core API:
+On 9/29/2024 8:31 PM, Mickaël Salaün wrote:
+> On Sat, Sep 28, 2024 at 10:06:52PM +0200, Günther Noack wrote:
+>> On Fri, Sep 27, 2024 at 11:48:22AM +0200, Günther Noack wrote:
+>>> On Mon, Sep 23, 2024 at 03:57:47PM +0300, Mikhail Ivanov wrote:
+>>>> (Btw I think that disassociation control can be really useful. If
+>>>> it were possible to restrict this action for each protocol, we would
+>>>> have stricter control over the protocols used.)
+>>>
+>>> In my understanding, the disassociation support is closely intertwined with the
+>>> transport layer - the last paragraph of DESCRIPTION in connect(2) is listing
+>>> TCP, UDP and Unix Domain sockets in datagram mode. -- The relevant code in in
+>>> net/ipv4/af_inet.c in inet_dgram_connect() and __inet_stream_connect(), where
+>>> AF_UNSPEC is handled.
+>>>
+>>> I would love to find a way to restrict this independent of the specific
+>>> transport protocol as well.
+>>>
+>>> Remark on the side - in af_inet.c in inet_shutdown(), I also found a worrying
+>>> scenario where the same sk->sk_prot->disconnect() function is called and
+>>> sock->state also gets reset to SS_UNCONNECTED.  I have done a naive attempt to
+>>> hit that code path by calling shutdown() on a passive TCP socket, but was not
+>>> able to reuse the socket for new connections afterwards. (Have not debugged it
+>>> further though.)  I wonder whether this is a scnenario that we also need to
+>>> cover?
+>>
+>> FYI, **this does turn out to work** (I just fumbled in my first experiment). --
+>> It is possible to reset a listening socket with shutdown() into a state where it
+>> can be used for at least a new connect(2), and maybe also for new listen(2)s.
+> 
+> Interesting syscall...
+> 
+>>
+>> The same might also be possible if a socket is in the TCP_SYN_SENT state at the
+>> time of shutdown() (although that is a bit trickier to try out).
+>>
+>> So a complete disassociation control for TCP/IP might not only need to have
+>> LANDLOCK_ACCESS_SOCKET_CONNECT_UNSPEC (or however we'd call it), but also
+>> LANDLOCK_ACCESS_SOCKET_PASSIVE_SHUTDOWN and maybe even another one for the
+>> TCP_SYN_SENT case...? *
+> 
+> That would make the Landlock interface too complex, we would need a more
+> generic approach instead e.g. with a single flag.
+> 
+>>
+>> It makes me uneasy to think that I only looked at AF_INET{,6} and TCP so far,
+>> and that other protocols would need a similarly close look.  It will be
+>> difficult to cover all the "disassociation" cases in all the different
+>> protocols, and even more difficult to detect new ones when they pop up.  If we
+>> discover new ones and they'd need new Landlock access rights, it would also
+>> potentially mean that existing Landlock users would have to update their rules
+>> to spell that out.
+>>
+>> It might be easier after all to not rely on "disassociation" control too much
+>> and instead to design the network-related access rights in a way so that we can
+>> provide the desired sandboxing guarantees by restricting the "constructive"
+>> operations (the ones that initiate new network connections or that listen on the
+>> network).
+> 
+> I agree.  So, with the ability to control socket creation and to also
+> control listen/bind/connect (and sendmsg/recvmsg for datagram protocols)
+> we should be good right?
+> 
+>>
+>> Mikhail, in your email I am quoting above, you are saying that "disassociation
+>> control can be really useful"; do you know of any cases where a restriction of
+>> connect/listen is *not* enough and where you'd still want the disassociation
+>> control?
 
-struct device *device_find_child(struct device *dev, void *data,
-		int (*match)(struct device *dev, void *data));
-to new:
-struct device *device_find_child(struct device *dev, const void *data,
-		int (*match)(struct device *dev, const void *data));
+Disassociation is basically about making socket be able to connect or
+listen (again). If these actions are already controlled, disassociation
+should always be permitted (as it's currently implemented for TCP
+connect).
 
-The new API does not allow its match function (*match)() to modify
-caller's match data @*data, but emac_sgmii_acpi_match(), as the old
-API's match function, indeed modifies relevant match data, so it is
-not suitable for the new API any more, solved by implementing the same
-finding sgmii_ops function by correcting the function and using it
-as parameter of device_for_each_child() instead of device_find_child().
+I thought that LANDLOCK_ACCESS_SOCKET_CONNECT_UNSPEC would be useful
+for the protocols that do not have related LANDLOCK_ACCESS_NET_*
+access rights. It would allow to (for example) create listening socket
+of non-TCP(UDP) protocol and fully restrict networking (by restricting
+any disassociation and socket creation).
 
-By the way, this commit does not change any existing logic.
+But since disasossication is implemented in the transport layer there
+is no clear way to control it with socket access. Considering this and
+that previous scenario can be achieved by implementing networking
+control (LANDLOCK_ACCESS_NET_* rights) for a needed protocol, potential
+cost of "disassociation control" implementation is much more than the
+benefits.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
-This patch is separated from the following patch series:
-https://lore.kernel.org/all/20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com/
-
-This patch is to prepare for constifying the following driver API:
-
-struct device *device_find_child(struct device *dev, void *data,
-		int (*match)(struct device *dev, void *data));
-to
-struct device *device_find_child(struct device *dev, const void *data,
-		int (*match)(struct device *dev, const void *data));
-
-How to constify the API ?
-There are total 30 usages of the API in current kernel tree:
-
-For 2/30 usages, the API's match function (*match)() will modify
-caller's match data @*data, and this patch will clean up one of both.
-
-For remaining 28/30, the following patch series will simply change its
-relevant parameter type to const void *.
-https://lore.kernel.org/all/20240811-const_dfc_done-v1-1-9d85e3f943cb@quicinc.com/
-
-Why to constify the API ?
-
-(1) It normally does not make sense, also does not need to, for
-such device finding operation to modify caller's match data which
-is mainly used for comparison.
-
-(2) It will make the API's match function and match data parameter
-have the same type as all other APIs (bus|class|driver)_find_device().
-
-(3) It will give driver author hints about choice between this API and
-the following one:
-int device_for_each_child(struct device *dev, void *data,
-		int (*fn)(struct device *dev, void *data));
----
-Changes in v6:
-- Move get_device() out of emac_sgmii_acpi_match() as suggested by greg.
-- Link to v5: https://lore.kernel.org/r/20240930-qcom_emac_fix-v5-1-e59c0ddbc8b4@quicinc.com
-
-Changes in v5:
-- Separate me for the series
-- Correct commit message and remove the inline comment
-- Link to v4: https://lore.kernel.org/r/20240905-const_dfc_prepare-v4-2-4180e1d5a244@quicinc.com
-
-Changes in v4:
-- Correct title and commit message
-- Link to v3: https://lore.kernel.org/r/20240824-const_dfc_prepare-v3-3-32127ea32bba@quicinc.com
-
-Changes in v3:
-- Make qcom/emac follow cxl/region solution suggested by Greg
-- Link to v2: https://lore.kernel.org/r/20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com
-
-Changes in v2:
-- Give up introducing the API constify_device_find_child_helper()
-- Implement a driver specific and equivalent one instead of device_find_child()
-- Correct commit message
-- Link to v1: https://lore.kernel.org/r/20240811-const_dfc_prepare-v1-0-d67cc416b3d3@quicinc.com
----
- drivers/net/ethernet/qualcomm/emac/emac-sgmii.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-index e4bc18009d08..a508ebc4b206 100644
---- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-+++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-@@ -293,6 +293,11 @@ static struct sgmii_ops qdf2400_ops = {
- };
- #endif
- 
-+struct emac_match_data {
-+	struct sgmii_ops **sgmii_ops;
-+	struct device *target_device;
-+};
-+
- static int emac_sgmii_acpi_match(struct device *dev, void *data)
- {
- #ifdef CONFIG_ACPI
-@@ -303,7 +308,7 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
- 		{}
- 	};
- 	const struct acpi_device_id *id = acpi_match_device(match_table, dev);
--	struct sgmii_ops **ops = data;
-+	struct emac_match_data *match_data = data;
- 
- 	if (id) {
- 		acpi_handle handle = ACPI_HANDLE(dev);
-@@ -324,10 +329,12 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
- 
- 		switch (hrv) {
- 		case 1:
--			*ops = &qdf2432_ops;
-+			*match_data->sgmii_ops = &qdf2432_ops;
-+			match_data->target_device = dev;
- 			return 1;
- 		case 2:
--			*ops = &qdf2400_ops;
-+			*match_data->sgmii_ops = &qdf2400_ops;
-+			match_data->target_device = dev;
- 			return 1;
- 		}
- 	}
-@@ -356,16 +363,21 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
- 	int ret;
- 
- 	if (has_acpi_companion(&pdev->dev)) {
-+		struct emac_match_data match_data = {
-+			.sgmii_ops = &phy->sgmii_ops,
-+			.target_device = NULL,
-+		};
- 		struct device *dev;
- 
--		dev = device_find_child(&pdev->dev, &phy->sgmii_ops,
--					emac_sgmii_acpi_match);
-+		device_for_each_child(&pdev->dev, &match_data, emac_sgmii_acpi_match);
-+		dev = match_data.target_device;
- 
- 		if (!dev) {
- 			dev_warn(&pdev->dev, "cannot find internal phy node\n");
- 			return 0;
- 		}
- 
-+		get_device(dev);
- 		sgmii_pdev = to_platform_device(dev);
- 	} else {
- 		const struct of_device_id *match;
-
----
-base-commit: c30a3f54e661d01df2bf193398336155089dd502
-change-id: 20240923-qcom_emac_fix-0a03c6b9ea19
-
-Best regards,
--- 
-Zijun Hu <quic_zijuhu@quicinc.com>
-
+>>
+>> (In my mind, the disassociation control would have mainly been needed if we had
+>> gone with Mickaël's "Use socket's Landlock domain" RFC [1]?  Mickaël and me have
+>> discussed this patch set at LSS and I am also now coming around to the
+>> realization that this would have introduced more complication.  - It might have
+>> been a more "pure" approach, but comes at the expense of complicating Landlock
+>> usage.)
+> 
+> Indeed, and this RFC will not be continued.  We should not think of a
+> socket as a security object (i.e. a real capability), whereas sockets
+> are kernel objects used to configure and exchange data, a bit like a
+> command multiplexer for network actions that can also be used to
+> identify peers.
+> 
+> Because Landlock is a sandboxing mechanism, the security policy tied to
+> a task may change during its execution, which is not the case for other
+> access control systems such as SELinux.  That's why we should not
+> blindly follow other security models.  In the case of socket control,
+> Landlock uses the calling task's credential to check if the call should
+> be allowed.  In the case of abstract UNIX socket control (with Linux
+> 5.12), the check is done on the domain that created the peer's socket,
+> not the domain that will received the packet.  In this case Landlock can
+> rely on the peer socket's domain because it is a consistent and
+> race-free way to identify a peer, and this peer socket is not the one
+> doing the action.  It's a bit different with non-UNIX sockets because
+> peers may not be local to the system.
+> 
+>>
+>> —Günther
+>>
+>> [1] https://lore.kernel.org/all/20240719150618.197991-1-mic@digikod.net/
+>>
+>> * for later reference, my reasoning in the code is: net/ipv4/af_inet.c
+>>    implements the entry points for connect() and listen() at the address family
+>>    layer.  Both operations require that the sock->state is SS_UNCONNECTED.  So
+>>    the rest is going through the other occurrences of SS_UNCONNECTED in that same
+>>    file to see if there are any places where the socket can get back into that
+>>    state.  The places I found where it is set to that state are:
+>>    
+>>    1. inet_create (right after creation, expected)
+>>    2. __inet_stream_connect in the AF_UNSPEC case (known issue)
+>>    3. __inet_stream_connect in the case of a failed connect (expected)
+>>    4. inet_shutdown in the case of TCP_LISTEN or TCP_SYN_SENT (mentioned above)
+>>
 
