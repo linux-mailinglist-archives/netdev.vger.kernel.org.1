@@ -1,54 +1,46 @@
-Return-Path: <netdev+bounces-131608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346F998F026
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 15:16:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DF4D98EEE1
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB79A1F21A7A
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:16:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59E71B218AC
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BF318593E;
-	Thu,  3 Oct 2024 13:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="lsWdX9r1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05C5126C08;
+	Thu,  3 Oct 2024 12:15:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22241741D4;
-	Thu,  3 Oct 2024 13:16:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0F1824AF;
+	Thu,  3 Oct 2024 12:15:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727961380; cv=none; b=VLVxj+aTbBrQANhhaAIqc0BodNXxVtZUeM5Hw5ZfHIxCLt3Mm0WMsOcuRrod/Ls1gryOLh1UomvH22hOgBDoG+jhp+7VYLSjcVhEyBGSvIO1O7/pVf86AVODsHVlV44vZNMpQf9OJ5kstGNzqei3SuF+7OcIR/nTDOwVnfe9nhg=
+	t=1727957747; cv=none; b=clu0QcllxB7F9XUayy9aw7tVAFWmexqQHiaP8FX+odKuMPqvd4thxXHHyn1twONiXhPFF3XMt9k3wOyFwH0fFj9Sn9Qu9nkirn0v09r8UVeM6818bkE2qmzTVfidW2BbHAIgjvBrZZvfnSCSKF+iSjGDX5QkH3nkhpy/Yzr/tVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727961380; c=relaxed/simple;
-	bh=4nxtqFyV76bEZ8LXZ0YjmzB022W4x0MO9bvFq5HdI4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FyKEiV0OBY2GTZX/bqqiC/7fk9h50Nt+GMYu/PcsXphzjuZ1YsBr6yl5YAjtWFzpfRnbzCUD9FGVTgzBGlSp/Mm860FL88xGGERsxt730k+xoDfhe5kgkrybm80sWPE9Erz3g5D8HuUV5PIayRB+hwh5qpiBj7YVZ79mw/+kyA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=lsWdX9r1; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id D78B888C78;
-	Thu,  3 Oct 2024 15:16:14 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727961375;
-	bh=QNI2Ifkjuw3+hHr7PhkjBjn+usr+32yD+CflAXc2zQA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lsWdX9r1EwinVgs+8Tw893RPggI001Ps85Jh4jNEgd6Y6ZnoKJtvZnS2IO6P2c9iY
-	 t7EIZIXNcktJ5IYhxWStI1rdjkAKxLfzaTb4nbMVt7eurLAl1AGQS7026L/qzuXYJ3
-	 Fvd8TZqFwSFIe+sVCDwlZUxT8bdVtYnCbLgvE5XmS4/UEZL57kEp2+7NQRTTxI4EOg
-	 nHmIURvpzAMYYE1Wanif5Quzvt/xiiNJynQoB55qpJfxg6i2Iy1tFV3jrlNhfuDyAy
-	 qjMcwG4CNWNMV4KuxnYEowAfuwraLeu+HeiYhG1ayGJEImEDlOuJODjNUmfVs0djfh
-	 h1XFUEYH5R9lA==
-Message-ID: <dcad968d-b305-4c0a-b377-1a147d156756@denx.de>
-Date: Thu, 3 Oct 2024 14:15:05 +0200
+	s=arc-20240116; t=1727957747; c=relaxed/simple;
+	bh=eAWxCpuJbqrIU+nlFL+n0ajIMO5A3y476oaILQNkAIk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GpWk2UktTWjq0zAzPW7rvgkB2DvxQ9DvU5FXOHcOp8urkbrOIY2WSTsG03oja71SiYGPZhHUds4WDqA6iD31B9VJVFJ5wE9TN6YhfgGfP38pVeFFw5Ex7/pns5seOJTyQqXUOz5oxaoiPVVmidhMWrbAJ2K/Wt2iJu05CtAv6bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XK9bJ246Yz2QTxt;
+	Thu,  3 Oct 2024 20:14:36 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id C1018140361;
+	Thu,  3 Oct 2024 20:15:33 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 3 Oct 2024 20:15:29 +0800
+Message-ID: <2f2c5e5c-a9aa-233e-e8f9-720c8a6ff1a2@huawei-partners.com>
+Date: Thu, 3 Oct 2024 15:15:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,68 +48,222 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
- up
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-leds@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christian Marangi <ansuelsmth@gmail.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>,
- Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
- Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
- kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
- netdev@vger.kernel.org
-References: <20241001024731.140069-1-marex@denx.de>
- <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
- <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
- <796d0096-1cf9-4234-9117-440469c4e9d9@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <796d0096-1cf9-4234-9117-440469c4e9d9@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Subject: Re: [RFC PATCH v3 15/19] selftests/landlock: Test SCTP peeloff
+ restriction
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-16-ivanov.mikhail1@huawei-partners.com>
+ <ZvbCwtkXDakYDVD_@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZvbCwtkXDakYDVD_@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-On 10/3/24 2:05 PM, Andrew Lunn wrote:
->>> Nice use of udev. I had not thought about using it for this.
+On 9/27/2024 5:35 PM, Günther Noack wrote:
+> On Wed, Sep 04, 2024 at 06:48:20PM +0800, Mikhail Ivanov wrote:
+>> It is possible to branch off an SCTP UDP association into a separate
+>> user space UDP socket. Add test validating that such scenario is not
+>> restricted by Landlock.
+>>
+>> Move setup_loopback() helper from net_test to common.h to use it to
+>> enable connection in this test.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   tools/testing/selftests/landlock/common.h     |  12 +++
+>>   tools/testing/selftests/landlock/net_test.c   |  11 --
+>>   .../testing/selftests/landlock/socket_test.c  | 102 +++++++++++++++++-
+>>   3 files changed, 113 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/landlock/common.h b/tools/testing/selftests/landlock/common.h
+>> index 28df49fa22d5..07d959a8ac7b 100644
+>> --- a/tools/testing/selftests/landlock/common.h
+>> +++ b/tools/testing/selftests/landlock/common.h
+>> @@ -16,6 +16,7 @@
+>>   #include <sys/types.h>
+>>   #include <sys/wait.h>
+>>   #include <unistd.h>
+>> +#include <sched.h>
+>>   
+>>   #include "../kselftest_harness.h"
+>>   
+>> @@ -227,3 +228,14 @@ enforce_ruleset(struct __test_metadata *const _metadata, const int ruleset_fd)
+>>   		TH_LOG("Failed to enforce ruleset: %s", strerror(errno));
+>>   	}
+>>   }
+>> +
+>> +static void setup_loopback(struct __test_metadata *const _metadata)
+>> +{
+>> +	set_cap(_metadata, CAP_SYS_ADMIN);
+>> +	ASSERT_EQ(0, unshare(CLONE_NEWNET));
+>> +	clear_cap(_metadata, CAP_SYS_ADMIN);
+>> +
+>> +	set_ambient_cap(_metadata, CAP_NET_ADMIN);
+>> +	ASSERT_EQ(0, system("ip link set dev lo up"));
+>> +	clear_ambient_cap(_metadata, CAP_NET_ADMIN);
+>> +}
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index f21cfbbc3638..0b8386657c72 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -103,17 +103,6 @@ static int set_service(struct service_fixture *const srv,
+>>   	return 1;
+>>   }
+>>   
+>> -static void setup_loopback(struct __test_metadata *const _metadata)
+>> -{
+>> -	set_cap(_metadata, CAP_SYS_ADMIN);
+>> -	ASSERT_EQ(0, unshare(CLONE_NEWNET));
+>> -	clear_cap(_metadata, CAP_SYS_ADMIN);
+>> -
+>> -	set_ambient_cap(_metadata, CAP_NET_ADMIN);
+>> -	ASSERT_EQ(0, system("ip link set dev lo up"));
+>> -	clear_ambient_cap(_metadata, CAP_NET_ADMIN);
+>> -}
+>> -
+>>   static bool is_restricted(const struct protocol_variant *const prot,
+>>   			  const enum sandbox_type sandbox)
+>>   {
+>> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
+>> index 67db0e1c1121..2ab27196fa3d 100644
+>> --- a/tools/testing/selftests/landlock/socket_test.c
+>> +++ b/tools/testing/selftests/landlock/socket_test.c
+>> @@ -11,8 +11,11 @@
+>>   #include <linux/pfkeyv2.h>
+>>   #include <linux/kcm.h>
+>>   #include <linux/can.h>
+>> -#include <linux/in.h>
+>> +#include <sys/socket.h>
+>> +#include <stdint.h>
+>> +#include <linux/sctp.h>
+>>   #include <sys/prctl.h>
+>> +#include <arpa/inet.h>
+>>   
+>>   #include "common.h"
+>>   
+>> @@ -839,4 +842,101 @@ TEST_F(socket_creation, socketpair)
+>>   	}
+>>   }
+>>   
+>> +static const char loopback_ipv4[] = "127.0.0.1";
+>> +static const int backlog = 10;
+>> +static const int loopback_port = 1024;
+>> +
+>> +TEST_F(socket_creation, sctp_peeloff)
+>> +{
+>> +	int status, ret;
+>> +	pid_t child;
+>> +	struct sockaddr_in addr;
+>> +	int server_fd;
+>> +
+>> +	server_fd =
+>> +		socket(AF_INET, SOCK_SEQPACKET | SOCK_CLOEXEC, IPPROTO_SCTP);
+>> +	ASSERT_LE(0, server_fd);
+>> +
+>> +	addr.sin_family = AF_INET;
+>> +	addr.sin_port = htons(loopback_port);
+>> +	addr.sin_addr.s_addr = inet_addr(loopback_ipv4);
+>> +
+>> +	ASSERT_EQ(0, bind(server_fd, &addr, sizeof(addr)));
+>> +	ASSERT_EQ(0, listen(server_fd, backlog));
+>> +
+>> +	child = fork();
+>> +	ASSERT_LE(0, child);
+>> +	if (child == 0) {
+>> +		int client_fd;
+>> +		sctp_peeloff_flags_arg_t peeloff;
+>> +		socklen_t peeloff_size = sizeof(peeloff);
+>> +		const struct landlock_ruleset_attr ruleset_attr = {
+>> +			.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +		};
+>> +		struct landlock_socket_attr sctp_socket_create = {
+>> +			.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +			.family = AF_INET,
+>> +			.type = SOCK_SEQPACKET,
+>> +		};
+>> +
+>> +		/* Closes listening socket for the child. */
+>> +		ASSERT_EQ(0, close(server_fd));
+>> +
+>> +		client_fd = socket(AF_INET, SOCK_SEQPACKET | SOCK_CLOEXEC,
+>> +				   IPPROTO_SCTP);
+>> +		ASSERT_LE(0, client_fd);
+>> +
+>> +		/*
+>> +		 * Establishes connection between sockets and
+>> +		 * gets SCTP association id.
+>> +		 */
+>> +		ret = setsockopt(client_fd, IPPROTO_SCTP, SCTP_SOCKOPT_CONNECTX,
+>> +				 &addr, sizeof(addr));
+>> +		ASSERT_LE(0, ret);
+>> +
+>> +		if (self->sandboxed) {
+>> +			/* Denies creation of SCTP sockets. */
+>> +			int ruleset_fd = landlock_create_ruleset(
+>> +				&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +			ASSERT_LE(0, ruleset_fd);
+>> +
+>> +			if (self->allowed) {
+>> +				ASSERT_EQ(0, landlock_add_rule(
+>> +						     ruleset_fd,
+>> +						     LANDLOCK_RULE_SOCKET,
+>> +						     &sctp_socket_create, 0));
+>> +			}
+>> +			enforce_ruleset(_metadata, ruleset_fd);
+>> +			ASSERT_EQ(0, close(ruleset_fd));
+>> +		}
+>> +		/*
+>> +		 * Branches off current SCTP association into a separate socket
+>> +		 * and returns it to user space.
+>> +		 */
+>> +		peeloff.p_arg.associd = ret;
+>> +		ret = getsockopt(client_fd, IPPROTO_SCTP, SCTP_SOCKOPT_PEELOFF,
+>> +				 &peeloff, &peeloff_size);
+>> +
+>> +		/*
+>> +		 * Creation of SCTP socket by branching off existing SCTP association
+>> +		 * should not be restricted by Landlock.
+>> +		 */
+>> +		EXPECT_LE(0, ret);
+>> +
+>> +		/* Closes peeloff socket if such was created. */
+>> +		if (!ret) {
+>> +			ASSERT_EQ(0, close(peeloff.p_arg.sd));
+>> +		}
 > 
->> Is there some other way to configure the netdev-triggered PHY LEDs ?
->> I still feel the udev rule is somewhat brittle and fragile, and also not
->> available early enough for default PHY LED configuration, i.e. the LEDs are
->> not blinking when I use e.g. ip=/nfsroot= when booting from NFS root until
->> the userspace started, which is not nice. The only alternative I can imagine
->> is default configuration in DT, which was already rejected a few years ago.
+> Nit: Should this check for (ret >= 0) instead?
+
+Ofc, thank you
+
 > 
-> Device tree is the only early way i can think of, especially for NFS
-> root.
+> I imagine that getsockopt returns -1 on error, normally,
+> and that would make it past the EXPECT_LE (even if it logs a failure).
 > 
-> What has clearly been rejected is each vendor having their own DT
-> binding. But i think we might have more success with one generic
-> binding for all MAC/PHY LEDs.
-
-Right now I have this (for one of the PHY LEDs):
-
-led@0 {
-         reg = <0>;
-         color = <LED_COLOR_ID_GREEN>;
-         function = LED_FUNCTION_WAN;
-         linux,default-trigger = "netdev";
-};
-
-What about be useful is to set the link_10/100/1000 and rx/tx flags here 
-somehow. It cannot be 'function' because that is already used to define 
-the port purpose.
-
-Maybe something like 'led-pattern' property used by 'pattern' trigger 
-would work ? Some sort of "led-netdev-flags = LINK10 | LINK100;" ?
-
-> The way i was thinking about it, was to describe the label on the
-> front panel. That is hardware you are describing, so fits DT.
 > 
-> We are clearly in the grey area for DT, so i can understand some push
-> back on this from the DT Maintainers.
-
-It would be a policy, yes.
+>> +		ASSERT_EQ(0, close(client_fd));
+>> +		_exit(_metadata->exit_code);
+>> +		return;
+>> +	}
+>> +
+>> +	ASSERT_EQ(child, waitpid(child, &status, 0));
+>> +	ASSERT_EQ(1, WIFEXITED(status));
+>> +	ASSERT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+>> +
+>> +	ASSERT_EQ(0, close(server_fd));
+>> +}
+>> +
+>>   TEST_HARNESS_MAIN
+>> -- 
+>> 2.34.1
+>>
+> 
+> Reviewed-by: Günther Noack <gnoack@google.com>
 
