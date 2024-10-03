@@ -1,101 +1,126 @@
-Return-Path: <netdev+bounces-131752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 434E198F6DF
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:14:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9785B98F6E8
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:16:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EABEB282553
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E6D28195F
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:16:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F8E21AAE31;
-	Thu,  3 Oct 2024 19:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2E71AB531;
+	Thu,  3 Oct 2024 19:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JF8jdGKl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WXBhVT07"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E9681AB6DD;
-	Thu,  3 Oct 2024 19:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970671A76CF
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 19:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727982862; cv=none; b=lW9IGnxkEn5oQFR+Kw/uDwUPIVhF9Zhj5C+W9mj+tO35F/L/WtWvMhlQncRE2x7fhg+ZvpSpnx02PC1cux2vPM2ofoqyeDJGueNlHcE/qiNm53CtSaoEw0eymnq8fUjrZVyVn2Uiw8kRyGTLq4uOud1pGv61YytkG5DaMmRPKyc=
+	t=1727982996; cv=none; b=ONebT8UDuMf3FvmIUz6zUSy9shJMIXBO6lUOgKj3fmVk7LYHku02ocfZSNzGxBN2jxL0NUWgNyzu2UMd/IRN3TieAi2ziLSTeiBeqciq3wAjMgkkr9aFNQpzwsiWeR3DmU3FTdakU02cKYFgIxE0lNw7v+zMkXcxmAHtkgIHDnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727982862; c=relaxed/simple;
-	bh=hkek51HZiFyWjMuH339bV7tUDXiEI3ziQgVq8TrvAqU=;
+	s=arc-20240116; t=1727982996; c=relaxed/simple;
+	bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZnsToUTUWoSOmhNcQ38hG8goqsDo4qL/oF2j3daoZP6jrh8uU43DoOQiaCn4KJ3vKgId/t5r7gZJi/DEjOkhwgR+IXrgZnZc6qvY2Jhltc4HS4+atfg9tlrrFOTvASOHNAolgoUPJRjvQGNUfaYm7L2+K0g8XNd/0w8BfyHx8Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JF8jdGKl; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a8d100e9ce0so167381166b.2;
-        Thu, 03 Oct 2024 12:14:20 -0700 (PDT)
+	 To:Cc:Content-Type; b=eYikM5EwJQXYllrG7B5dI+W77uod6WzK4Bqe2ZTPc894LXRJEfaB+JDz2qJ/JyUFZ35C5EzaLKC0g7zPPkFOsUOqJPg9jdNfzQ0xKvPJG+i7h7M244OzpS76ruC8qDGE2OFY/FK9VHv5zVYDUlhUAcJGBdKLT1KuG8oxazggWCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WXBhVT07; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4582fa01090so50891cf.0
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 12:16:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727982859; x=1728587659; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727982993; x=1728587793; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=crbKlFaWCZXIwLHF2Ztk874znYfbQRFp9tVROKFLT2o=;
-        b=JF8jdGKltUI7FvYliXqz6E3YI8uBSNRkZ5iLYimQ64Kwim7pea5HLZ4/cBj5M/VQTN
-         DaESPavU8OXCaTcaVdUyi9QTUrmwQ61/IB9UH1zaXNSMfeYHUriYYAtXXkTm6hp721W/
-         jeu6K9cIx9o2WY3Tpy/DZvvjmhJ4yIWlCeCM6MxPM4snAnzk1yPVkBEtcbNUnT4+kjYx
-         1QAS/lg/mWEcLK0Fch56aBNitETH8oskfCrxGOS/Yro+s8aLjZiItP83Ix7CgCaRekAN
-         rrpKwdmu3tKNCCg0+KrrrEc27j2OSUfGxAvXnlD0rDp555splcqeKQvsOFmw+KWHk8MF
-         j3lA==
+        bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
+        b=WXBhVT07tSscB+2et4mWwAud5nUElfCj0asBiedlRtZhC4tUbtK33ZGaT/mh8K0nvy
+         MsYCO2uITtU5JsP/6uNlQuLTLGz8705PpV+N28BuAzThCJBCbses0igyxPovHm2SPJNg
+         fBRwxNMx/vmuFrHPSN40MItrhK/jqqFEhHIpFlC/FwDKFNHmWg3SKTQz2UhK96bJlx3z
+         aH8H95slP20t2KyH1ysFLybU8Ie/Iw6fTdVLPUsX13kixUaCeHel8FI71Jeofk2GhmmO
+         LS2+UY9bFGriZcQaod4VqMLLfl7nNtRyu6bTOjyYy6Ldqcune5Q+IZ7af9xr3j1Zygff
+         u4Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727982859; x=1728587659;
+        d=1e100.net; s=20230601; t=1727982993; x=1728587793;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=crbKlFaWCZXIwLHF2Ztk874znYfbQRFp9tVROKFLT2o=;
-        b=q8315wZavQ9bBNCE98lRKVqbgdQFPs+Ddc/N32KBn94Wp3Bz1G+vhEP8t9ziIqaM8R
-         ldv3+b3q3CjLwUmijBlRpyWNNsA/3PKBnewEpHktyOdAMsa4iBS1O2gLbRUNGokcJ8+v
-         tbGT7hiIbdjEiTRYC+XXRaVVcSo/+plv6EjuoJ1jner863Z9zRPbY0U4sXC6fdz2V/4A
-         cAZic4WRBUmQFWz0cl2yQ7BPzYWqMkBSN0fbsv6yZFN5FhhbNn5bLGB7TAyWUX7tcerR
-         nYNW+RvBAsbLpzjpmbhA5XfiZkkRKsaZf0dSIYGJImEqtiUdEZ0iwVKoa7YosQl1rf7O
-         /+JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9tdjLknddsSzLlpPF8jf7xF/Be3EkeoZU6H9elv6QjAtEU97JWGVHhWrSK5dTJKfrYGA=@vger.kernel.org, AJvYcCXjsqKHjrxEmqJ/a3MMrVZHrcyjj21kd+bcwx4uXIClHAQ69JIb7oMlg0lvDkiVMR2vyqgkkjp/@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYem02At/xNj7rO4G/qsrFeuTpVsKa+h5+sUHqIGOZetxgfvtY
-	BH7p9I6HRBAjhY0Byw/ErKFEoCcAyB+p4f30zn/i3cj+meRfHUIEG637n1Xvl4ybf+OwNNlkK64
-	OfunKtlL2ymMsx9Es8jD219zmDYB7yw==
-X-Google-Smtp-Source: AGHT+IEWq7oIiILMRmTpsmtonKFza5sucToClW+/lDk3WfPo3k5okik3W//eMMYTGkdEO9um1IWqrLQmTctQUz6fq9s=
-X-Received: by 2002:a17:907:d3c3:b0:a86:a1cd:5a8c with SMTP id
- a640c23a62f3a-a991bd44f67mr34862166b.22.1727982858510; Thu, 03 Oct 2024
- 12:14:18 -0700 (PDT)
+        bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
+        b=jpZjAP1GfJCm+P1ddyWnEBE461Eci5xfy1jAwMZTiPT6//xFkukDWBj3HTmckbuT9r
+         b8+0XkGWjKqiBLX5OzunvoMHWFmFbdM9OFohfgTxuoprKSvA1hL4G1u5v+LhC3f84c59
+         fdRYXkQn8QSrtjbK1hciGR2TJmwyMSH6LQ1rCvfbp3IMzco1CQsE+OP5JqeFTKaa9zY2
+         Fn1VzCB4VmWh3xj3KoMnSHvTvNLnewBp9jIhLI/HWTVOREwxC8crI3UZwtylNo83TGgy
+         5okbAk/L4EjP39mW81SjOsHSWlpqxauveSe9UNXN1WXvfMVSxkqMKOM7sYvuMG4pDkii
+         qa/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWTc933lGJVnOxjSYfSTJXSe/2+JVnsLfMGHxhm32T3DETxLWyfhTMoFse55hE703ccei5aQV4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh+b27xQuFT4YsvZF6WCevwDwIV2B5RHZttsrgWoHFrTpbBmos
+	zYgapwY91IHIUj12lFAlXlPoLHuu47GjAv04FMbhUzZ0vpElHR5VYlO3q6/3LT0+B7o+pRG9sbA
+	7vwK1wAPBZoCh6+2iD+1d3ccwRYwxfKHWRyJp
+X-Google-Smtp-Source: AGHT+IGttVX/T4W/nx91eYNLNpPB6dx1tomc65fLqxgiGgP+3Hmp4QVcuJzkAyqaKx0620/V7y+qM/6ouf/r4bOx+/4=
+X-Received: by 2002:a05:622a:458b:b0:456:7ef1:929d with SMTP id
+ d75a77b69052e-45d9bda1f9fmr151911cf.12.1727982993239; Thu, 03 Oct 2024
+ 12:16:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003180320.113002-1-daniel@iogearbox.net> <20241003180320.113002-3-daniel@iogearbox.net>
-In-Reply-To: <20241003180320.113002-3-daniel@iogearbox.net>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 3 Oct 2024 12:14:07 -0700
-Message-ID: <CAADnVQL1ULq1tHHO7wVJfADiFPnQuTrap3+iQcQs-_y-zgKQeg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 3/4] tools: Sync if_link.h uapi tooling header
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Nikolay Aleksandrov <razor@blackwall.org>, jrife@google.com, 
-	tangchen.1@bytedance.com, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
+References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-12-sdf@fomichev.me>
+ <CAHS8izN6ePwKyRLtn2pdZjZwCQd6gyE_3OU2QvGRg0r9=2z3rw@mail.gmail.com> <Zv7TpwAgpVs2SjyH@mini-arch>
+In-Reply-To: <Zv7TpwAgpVs2SjyH@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 3 Oct 2024 12:16:19 -0700
+Message-ID: <CAHS8izOvRgAoJVH28wj3+7QF2kHPON71vsHOp-1NtBxDnugFHw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 11/12] selftests: ncdevmem: Move ncdevmem
+ under drivers/net/hw
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 3, 2024 at 11:04=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
+On Thu, Oct 3, 2024 at 10:26=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> Sync if_link uapi header to the latest version as we need the refresher
-> in tooling for netkit device. Given it's been a while since the last sync
-> and the diff is fairly big, it has been done as its own commit.
+> On 10/03, Mina Almasry wrote:
+> > On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomich=
+ev.me> wrote:
+> > >
+> > > This is where all the tests that depend on the HW functionality live =
+in
+> > > and this is where the automated test is gonna be added in the next
+> > > patch.
+> > >
+> >
+> > Tbh I don't like this very much. I wanted to take ncdevmem in the
+> > opposite direction: to make at least the control path tests runnable
+> > on netdevsim or something like that and have it not require any HW
+> > support at all.
+> >
+> > But I see in the cover letter that Jakub himself asked for the move,
+> > so if there is some strong reason to make this in hw, sure.
+> >
+> > Does it being under HW preclude future improvements to making it a
+> > non-HW dependent test?
 >
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-> ---
->  tools/include/uapi/linux/if_link.h | 545 ++++++++++++++++++++++++++++-
->  1 file changed, 544 insertions(+), 1 deletion(-)
+> I'm moving it under drivers/net/hw only because I want ncdevmem to end
+> up as a TEST_GEN_FILES dependency (drivers/net/hw is the directory
+> that the vendors will eventually run against their HW so this is
+> where the HW-dependent tests are gonna stay for now).
 
-iirc we decided to start using kernel uapi headers for cases like this,
-so we don't have to copy paste such things all the time.
+Ah, OK. Makes sense then.
+
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+
+Thanks!
+
+--=20
+Thanks,
+Mina
 
