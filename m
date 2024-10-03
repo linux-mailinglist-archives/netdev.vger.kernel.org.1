@@ -1,515 +1,288 @@
-Return-Path: <netdev+bounces-131765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CA998F75C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:53:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB16398F80E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 22:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D4F01F229A0
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:53:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9915E282F45
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8091CC14C;
-	Thu,  3 Oct 2024 19:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF491ABEC5;
+	Thu,  3 Oct 2024 20:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="UZU7Ua9T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fYpGMY/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908691B85CD;
-	Thu,  3 Oct 2024 19:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE6212FB0A;
+	Thu,  3 Oct 2024 20:26:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727985080; cv=none; b=C6zs3eLS3VgEDEvg/Wamo/6/5qEK/gm1+TKc2oF90wuPmdqhKrxZzdAo3YgFs3H0mbJlisfk+u6KuMD4CQEm0ej4ryacX755XB4kdQmK8F5x4PtybAQ8U1Asd7IADogc7l0ILYCJncE1kCJi1IbG5JtHViXI5RMtFC565km3PHE=
+	t=1727987172; cv=none; b=j1T9MrDstJRD2Ju31Gz5xk38htZIxzLq/V5nT0yVVNuFkECRM/jm2czPwEg+CksNrXR/Nt3rIWQkGEyePbydTDwQLfiASh0B0n4IY+0of+iycHlzeryWaqKpbUGT9WNW1BPzOOA9+s2Ue1PkfXEH3b4uAn/mkNlLFjG6G8HTVGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727985080; c=relaxed/simple;
-	bh=btQTL1CwXScnqG+8hxAGtefwCo8AjovT9vkvxIWnQUE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=GqzpglQ9BfP4hYI/ckU+lGAgDnsJcBYUVVspYmLl3G6zgc7oIGZNk6W6D/UsFjSCi9PKQk+qXIXdHWT/5j5UWxDPCftNxlCAo4YErV9nIhyWBKL3IES0wjVWv7I1CnuvEFAP0CsinBjz4EYtE0GfCs+eWAKSSROWTlwhjaeZTBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=UZU7Ua9T; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 7480C20DB362;
-	Thu,  3 Oct 2024 12:51:10 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7480C20DB362
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1727985070;
-	bh=kjAmLLXPZLA9nM0ptEZ4YBcAzeekWKCJ1ye+7nS9LiY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UZU7Ua9ToVi/LsN5CRm/YoIJ1UG3CRa0YVkRMgcLpILwOn8E0WZH/5bV74INCcyJ5
-	 Nm84mVqfMIhILD6ezLKgADSyNpQIUTlzahiOpKdfkE3YR+fBFhLyAW7zxBJIUXn8/B
-	 2MHCHWW/gWuohGMmcKVrVGPlHmTB0GBbv7mwnt+M=
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	iommu@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	catalin.marinas@arm.com,
-	will@kernel.org,
-	luto@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	seanjc@google.com,
-	pbonzini@redhat.com,
-	peterz@infradead.org,
-	daniel.lezcano@linaro.org,
-	joro@8bytes.org,
-	robin.murphy@arm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	lpieralisi@kernel.org,
-	kw@linux.com,
-	robh@kernel.org,
-	bhelgaas@google.com,
-	arnd@arndb.de,
-	sgarzare@redhat.com,
-	jinankjain@linux.microsoft.com,
-	muminulrussell@gmail.com,
-	skinsburskii@linux.microsoft.com,
-	mukeshrathor@microsoft.com
-Subject: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in Hyper-V code
-Date: Thu,  3 Oct 2024 12:51:04 -0700
-Message-Id: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+	s=arc-20240116; t=1727987172; c=relaxed/simple;
+	bh=3IjYU0e1z23lsNDCftVBw8XjRsYBCqxD7Sd7elmTEwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=toAPC+qqgzUvGqXLJlH8YY9u1GFoF7H13yHgGxm6daS9f5SbC5lhFGmYjjMuTkcdU6QZPGDHPd5fiRHKfB0hPw4VOO6CEX8jCyBajnyhs640yd+XcyXxsVTBBIFLBj8gwkafpDL1t1BjM7OfzDjRduMqkdFEW5n5SYUfqAFYci0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fYpGMY/w; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7d4fa972cbeso936571a12.2;
+        Thu, 03 Oct 2024 13:26:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727987170; x=1728591970; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BU1xMELbpkpF4/s4NlC/up6s8YBrxydyalnXVzeU3u0=;
+        b=fYpGMY/wy0zxsfA01rKlmkXYn0kqJV1eulbPFpR2GD4mG7hDtqBd0pB1ijw8gVRXDy
+         NuhV45O7Mqd5f2KzggH+46GBTQV3kNQ4N6B2EWR5asrtOtPWHQVU5/fKuVeBw8xpuEk4
+         4lgWvJIdleaF9jWfhQKy7IRFSJ7yBJrsznNKH0riOB04k02rgU25Dx5V3aSERB5aaDd4
+         gOBx1agBICploZ+Ni2y+V8H4ILLCtZwI5kEWigARltPhrIKoFNjaP7duRsgJTXAgJqhG
+         UAA2nh0WJCPa6yT8rKyqeSawHcVcJB2sB3HCUZxHkAjKUMNvruIKyScN1ESF4fAQY/NW
+         tqZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727987170; x=1728591970;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BU1xMELbpkpF4/s4NlC/up6s8YBrxydyalnXVzeU3u0=;
+        b=hU71qnrwJldnYNXiGJdjrLevsnFimURo0sNG+4rTgd8JUJG5rjvvEBVbfgNQklgNk4
+         7hT+UXN5783gAZBUeSXOMT1A3LVTs5gdEZxKt/WKSwysKz0kgWchW6z0k+IX8ovAOkRJ
+         8g1ZYwluogViCG+sbCbgn14o8lPneC+7KqAlBk4WpQ18AtL08RXJrlqHdQfB/gLOastD
+         omXN0MZ428CqvGgBzRTOi2pPir6aaUrtEZhakTGFGV5kvtcwJ1De7nA/sv9ngAmVwZeI
+         3+YRP9qvB+DTkEAd8L11ly96UqLx7MqK7Hj+Zfbc8XeNax27pppetQjIsoyxTPlr9y/t
+         oK6w==
+X-Forwarded-Encrypted: i=1; AJvYcCV452FPZ68mdnA7cGgwcglDWZZYGPwQqSFX+3oxHzfh9QOCplg6PTHJLGMDbsIdGiSTaT0=@vger.kernel.org, AJvYcCXNFjf4t5hCMNQlorF6e5GYDrFiNsDWd2Xe54iVeEqL7rJa725i0aHpfl/zuLFcXz13Gklu4uGG@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnivsS5nlCAuNdN0TRW43updCi7v6unrSLrR0HeruQbAXe5FT5
+	0qcaNjXhv+bqaJ747xidz+u2+5MKjSIOO+L92MOgeEv7DFrM1Hg=
+X-Google-Smtp-Source: AGHT+IGVx3Mx2r7F+hBq6PGE0rOLOUJ8qyOHgmPWGYQyAJ9p2GUH4RlZ/e4AkGoFa+Zu3Ty2eAGoIA==
+X-Received: by 2002:a05:6a20:9f4e:b0:1cf:44bb:1cc4 with SMTP id adf61e73a8af0-1d6dfabb6admr676679637.40.1727987169527;
+        Thu, 03 Oct 2024 13:26:09 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71dd9df0ae6sm1843167b3a.174.2024.10.03.13.26.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 13:26:08 -0700 (PDT)
+Date: Thu, 3 Oct 2024 13:26:08 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Arthur Fabre <afabre@cloudflare.com>
+Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
+	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
+	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com,
+	kernel-team <kernel-team@cloudflare.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+Message-ID: <Zv794Ot-kOq1pguM@mini-arch>
+References: <ZvbKDT-2xqx2unrx@lore-rh-laptop>
+ <871q11s91e.fsf@toke.dk>
+ <ZvqQOpqnK9hBmXNn@lore-desk>
+ <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
+ <ZvwNQqN4gez1Ksfn@lore-desk>
+ <87zfnnq2hs.fsf@toke.dk>
+ <Zv18pxsiTGTZSTyO@mini-arch>
+ <87ttdunydz.fsf@toke.dk>
+ <Zv3N5G8swr100EXm@mini-arch>
+ <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby>
 
-To move toward importing headers from Hyper-V directly, switch to
-using hvhdk.h in all Hyper-V code. KVM code that uses Hyper-V
-definitions from hyperv-tlfs.h remains untouched.
+On 10/03, Arthur Fabre wrote:
+> On Thu Oct 3, 2024 at 12:49 AM CEST, Stanislav Fomichev wrote:
+> > On 10/02, Toke Høiland-Jørgensen wrote:
+> > > Stanislav Fomichev <stfomichev@gmail.com> writes:
+> > > 
+> > > > On 10/01, Toke Høiland-Jørgensen wrote:
+> > > >> Lorenzo Bianconi <lorenzo@kernel.org> writes:
+> > > >> 
+> > > >> >> On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi wrote:
+> > > >> >> > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
+> > > >> >> > > 
+> > > >> >> > > >> > We could combine such a registration API with your header format, so
+> > > >> >> > > >> > that the registration just becomes a way of allocating one of the keys
+> > > >> >> > > >> > from 0-63 (and the registry just becomes a global copy of the header).
+> > > >> >> > > >> > This would basically amount to moving the "service config file" into the
+> > > >> >> > > >> > kernel, since that seems to be the only common denominator we can rely
+> > > >> >> > > >> > on between BPF applications (as all attempts to write a common daemon
+> > > >> >> > > >> > for BPF management have shown).
+> > > >> >> > > >> 
+> > > >> >> > > >> That sounds reasonable. And I guess we'd have set() check the global
+> > > >> >> > > >> registry to enforce that the key has been registered beforehand?
+> > > >> >> > > >> 
+> > > >> >> > > >> >
+> > > >> >> > > >> > -Toke
+> > > >> >> > > >> 
+> > > >> >> > > >> Thanks for all the feedback!
+> > > >> >> > > >
+> > > >> >> > > > I like this 'fast' KV approach but I guess we should really evaluate its
+> > > >> >> > > > impact on performances (especially for xdp) since, based on the kfunc calls
+> > > >> >> > > > order in the ebpf program, we can have one or multiple memmove/memcpy for
+> > > >> >> > > > each packet, right?
+> > > >> >> > > 
+> > > >> >> > > Yes, with Arthur's scheme, performance will be ordering dependent. Using
+> > > >> >> > > a global registry for offsets would sidestep this, but have the
+> > > >> >> > > synchronisation issues we discussed up-thread. So on balance, I think
+> > > >> >> > > the memmove() suggestion will probably lead to the least pain.
+> > > >> >> > > 
+> > > >> >> > > For the HW metadata we could sidestep this by always having a fixed
+> > > >> >> > > struct for it (but using the same set/get() API with reserved keys). The
+> > > >> >> > > only drawback of doing that is that we statically reserve a bit of
+> > > >> >> > > space, but I'm not sure that is such a big issue in practice (at least
+> > > >> >> > > not until this becomes to popular that the space starts to be contended;
+> > > >> >> > > but surely 256 bytes ought to be enough for everybody, right? :)).
+> > > >> >> >
+> > > >> >> > I am fine with the proposed approach, but I think we need to verify what is the
+> > > >> >> > impact on performances (in the worst case??)
+> > > >> >> 
+> > > >> >> If drivers are responsible for populating the hardware metadata before
+> > > >> >> XDP, we could make sure drivers set the fields in order to avoid any
+> > > >> >> memove() (and maybe even provide a helper to ensure this?).
+> > > >> >
+> > > >> > nope, since the current APIs introduced by Stanislav are consuming NIC
+> > > >> > metadata in kfuncs (mainly for af_xdp) and, according to my understanding,
+> > > >> > we want to add a kfunc to store the info for each NIC metadata (e.g rx-hash,
+> > > >> > timestamping, ..) into the packet (this is what Toke is proposing, right?).
+> > > >> > In this case kfunc calling order makes a difference.
+> > > >> > We can think even to add single kfunc to store all the info for all the NIC
+> > > >> > metadata (maybe via a helping struct) but it seems not scalable to me and we
+> > > >> > are losing kfunc versatility.
+> > > >> 
+> > > >> Yes, I agree we should have separate kfuncs for each metadata field.
+> > > >> Which means it makes a lot of sense to just use the same setter API that
+> > > >> we use for the user-registered metadata fields, but using reserved keys.
+> > > >> So something like:
+> > > >> 
+> > > >> #define BPF_METADATA_HW_HASH      BIT(60)
+> > > >> #define BPF_METADATA_HW_TIMESTAMP BIT(61)
+> > > >> #define BPF_METADATA_HW_VLAN      BIT(62)
+> > > >> #define BPF_METADATA_RESERVED (0xffff << 48)
+> > > >> 
+> > > >> bpf_packet_metadata_set(pkt, BPF_METADATA_HW_HASH, hash_value);
+> > > >> 
+> > > >> 
+> > > >> As for the internal representation, we can just have the kfunc do
+> > > >> something like:
+> > > >> 
+> > > >> int bpf_packet_metadata_set(field_id, value) {
+> > > >>   switch(field_id) {
+> > > >>     case BPF_METADATA_HW_HASH:
+> > > >>       pkt->xdp_hw_meta.hash = value;
+> > > >>       break;
+> > > >>     [...]
+> > > >>     default:
+> > > >>       /* do the key packing thing */
+> > > >>   }
+> > > >> }
+> > > >> 
+> > > >> 
+> > > >> that way the order of setting the HW fields doesn't matter, only the
+> > > >> user-defined metadata.
+> > > >
+> > > > Can you expand on why we need the flexibility of picking the metadata fields
+> > > > here? Presumably we are talking about the use-cases where the XDP program
+> > > > is doing redirect/pass and it doesn't really know who's the final
+> > > > consumer is (might be another xdp program or might be the xdp->skb
+> > > > kernel case), so the only sensible option here seems to be store everything?
+> > > 
+> > > For the same reason that we have separate kfuncs for each metadata field
+> > > when getting it from the driver: XDP programs should have the
+> > > flexibility to decide which pieces of metadata they need, and skip the
+> > > overhead of stuff that is not needed.
+> > > 
+> > > For instance, say an XDP program knows that nothing in the system uses
+> > > timestamps; in that case, it can skip both the getter and the setter
+> > > call for timestamps.
 
-Add HYPERV_NONTLFS_HEADERS everywhere mshyperv.h, asm/svm.h,
-clocksource/hyperv_timer.h is included in Hyper-V code.
+Original RFC is talking about XDP -> XDP_REDIRECT -> skb use-case,
+right? For this we pretty much know what kind of metadata we want to
+preserve, so why not ship it in the existing metadata area and have
+a kfunc that the xdp program will call prior to doing xdp_redirect?
+This kfunc can do exactly what you're suggesting - skip the timestamp
+if we know that the timestamping is off.
 
-Replace hyperv-tlfs.h with hvhdk.h directly in linux/hyperv.h, and
-define HYPERV_NONTLFS_HEADERS there, since it is only used in
-Hyper-V device code.
+Or have we moved to discussing some other use-cases? What am I missing
+about the need for some other new mechanism?
 
-Update a couple of definitions to updated names found in the new
-headers: HV_EXT_MEM_HEAT_HINT, HV_SUBNODE_TYPE_ANY.
+> > But doesn't it put us in the same place? Where the first (native) xdp program
+> > needs to know which metadata the final consumer wants. At this point
+> > why not propagate metadata layout as well?
+> >
+> > (or maybe I'm still missing what exact use-case we are trying to solve)
+> 
+> There are two different use-cases for the metadata:
+> 
+> * "Hardware" metadata (like the hash, rx_timestamp...). There are only a
+>   few well known fields, and only XDP can access them to set them as
+>   metadata, so storing them in a struct somewhere could make sense.
+> 
+> * Arbitrary metadata used by services. Eg a TC filter could set a field
+>   describing which service a packet is for, and that could be reused for
+>   iptables, routing, socket dispatch...
+>   Similarly we could set a "packet_id" field that uniquely identifies a
+>   packet so we can trace it throughout the network stack (through
+>   clones, encap, decap, userspace services...).
+>   The skb->mark, but with more room, and better support for sharing it.
+> 
+> We can only know the layout ahead of time for the first one. And they're
+> similar enough in their requirements (need to be stored somewhere in the
+> SKB, have a way of retrieving each one individually, that it seems to
+> make sense to use a common API).
 
-Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
----
- arch/arm64/hyperv/hv_core.c              | 1 +
- arch/arm64/hyperv/mshyperv.c             | 1 +
- arch/x86/entry/vdso/vma.c                | 1 +
- arch/x86/hyperv/hv_apic.c                | 1 +
- arch/x86/hyperv/hv_init.c                | 1 +
- arch/x86/hyperv/hv_proc.c                | 3 ++-
- arch/x86/hyperv/hv_spinlock.c            | 1 +
- arch/x86/hyperv/hv_vtl.c                 | 1 +
- arch/x86/hyperv/irqdomain.c              | 1 +
- arch/x86/hyperv/ivm.c                    | 1 +
- arch/x86/hyperv/mmu.c                    | 1 +
- arch/x86/hyperv/nested.c                 | 1 +
- arch/x86/include/asm/vdso/gettimeofday.h | 1 +
- arch/x86/kernel/cpu/mshyperv.c           | 1 +
- arch/x86/kernel/cpu/mtrr/generic.c       | 1 +
- drivers/clocksource/hyperv_timer.c       | 1 +
- drivers/hv/channel.c                     | 1 +
- drivers/hv/channel_mgmt.c                | 1 +
- drivers/hv/connection.c                  | 1 +
- drivers/hv/hv.c                          | 1 +
- drivers/hv/hv_balloon.c                  | 3 ++-
- drivers/hv/hv_common.c                   | 1 +
- drivers/hv/hv_util.c                     | 1 +
- drivers/hv/ring_buffer.c                 | 1 +
- drivers/hv/vmbus_drv.c                   | 1 +
- drivers/iommu/hyperv-iommu.c             | 1 +
- drivers/net/hyperv/netvsc.c              | 1 +
- drivers/pci/controller/pci-hyperv.c      | 1 +
- include/linux/hyperv.h                   | 3 ++-
- 29 files changed, 32 insertions(+), 3 deletions(-)
+Why not have the following layout then?
 
-diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
-index 9d1969b875e9..bb7f28f74bf4 100644
---- a/arch/arm64/hyperv/hv_core.c
-+++ b/arch/arm64/hyperv/hv_core.c
-@@ -14,6 +14,7 @@
- #include <linux/arm-smccc.h>
- #include <linux/module.h>
- #include <asm-generic/bug.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- /*
-diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
-index b1a4de4eee29..62b2a270ae65 100644
---- a/arch/arm64/hyperv/mshyperv.c
-+++ b/arch/arm64/hyperv/mshyperv.c
-@@ -15,6 +15,7 @@
- #include <linux/errno.h>
- #include <linux/version.h>
- #include <linux/cpuhotplug.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- static bool hyperv_initialized;
-diff --git a/arch/x86/entry/vdso/vma.c b/arch/x86/entry/vdso/vma.c
-index 6d83ceb7f1ba..5f4053c49658 100644
---- a/arch/x86/entry/vdso/vma.c
-+++ b/arch/x86/entry/vdso/vma.c
-@@ -25,6 +25,7 @@
- #include <asm/page.h>
- #include <asm/desc.h>
- #include <asm/cpufeature.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <clocksource/hyperv_timer.h>
- 
- #undef _ASM_X86_VVAR_H
-diff --git a/arch/x86/hyperv/hv_apic.c b/arch/x86/hyperv/hv_apic.c
-index f022d5f64fb6..4fe3b3b13256 100644
---- a/arch/x86/hyperv/hv_apic.c
-+++ b/arch/x86/hyperv/hv_apic.c
-@@ -26,6 +26,7 @@
- #include <linux/slab.h>
- #include <linux/cpuhotplug.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/apic.h>
- 
-diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-index fc3c3d76c181..680c4abc456e 100644
---- a/arch/x86/hyperv/hv_init.c
-+++ b/arch/x86/hyperv/hv_init.c
-@@ -19,6 +19,7 @@
- #include <asm/sev.h>
- #include <asm/ibt.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/idtentry.h>
- #include <asm/set_memory.h>
-diff --git a/arch/x86/hyperv/hv_proc.c b/arch/x86/hyperv/hv_proc.c
-index b74c06c04ff1..428542134b84 100644
---- a/arch/x86/hyperv/hv_proc.c
-+++ b/arch/x86/hyperv/hv_proc.c
-@@ -7,6 +7,7 @@
- #include <linux/cpuhotplug.h>
- #include <linux/minmax.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/apic.h>
- 
-@@ -176,7 +177,7 @@ int hv_call_create_vp(int node, u64 partition_id, u32 vp_index, u32 flags)
- 		input->partition_id = partition_id;
- 		input->vp_index = vp_index;
- 		input->flags = flags;
--		input->subnode_type = HvSubnodeAny;
-+		input->subnode_type = HV_SUBNODE_ANY;
- 		input->proximity_domain_info = hv_numa_node_to_pxm_info(node);
- 		status = hv_do_hypercall(HVCALL_CREATE_VP, input, NULL);
- 		local_irq_restore(irq_flags);
-diff --git a/arch/x86/hyperv/hv_spinlock.c b/arch/x86/hyperv/hv_spinlock.c
-index 151e851bef09..7e8e2c03f669 100644
---- a/arch/x86/hyperv/hv_spinlock.c
-+++ b/arch/x86/hyperv/hv_spinlock.c
-@@ -12,6 +12,7 @@
- 
- #include <linux/spinlock.h>
- 
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/paravirt.h>
- #include <asm/apic.h>
-diff --git a/arch/x86/hyperv/hv_vtl.c b/arch/x86/hyperv/hv_vtl.c
-index 04775346369c..a8bb6ad7efb6 100644
---- a/arch/x86/hyperv/hv_vtl.c
-+++ b/arch/x86/hyperv/hv_vtl.c
-@@ -10,6 +10,7 @@
- #include <asm/boot.h>
- #include <asm/desc.h>
- #include <asm/i8259.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/realmode.h>
- #include <../kernel/smpboot.h>
-diff --git a/arch/x86/hyperv/irqdomain.c b/arch/x86/hyperv/irqdomain.c
-index 3215a4a07408..977f90d08471 100644
---- a/arch/x86/hyperv/irqdomain.c
-+++ b/arch/x86/hyperv/irqdomain.c
-@@ -10,6 +10,7 @@
- 
- #include <linux/pci.h>
- #include <linux/irq.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- static int hv_map_interrupt(union hv_device_id device_id, bool level,
-diff --git a/arch/x86/hyperv/ivm.c b/arch/x86/hyperv/ivm.c
-index b56d70612734..557a308e8e0a 100644
---- a/arch/x86/hyperv/ivm.c
-+++ b/arch/x86/hyperv/ivm.c
-@@ -9,6 +9,7 @@
- #include <linux/bitfield.h>
- #include <linux/types.h>
- #include <linux/slab.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/svm.h>
- #include <asm/sev.h>
- #include <asm/io.h>
-diff --git a/arch/x86/hyperv/mmu.c b/arch/x86/hyperv/mmu.c
-index cc8c3bd0e7c2..6bf9915611b8 100644
---- a/arch/x86/hyperv/mmu.c
-+++ b/arch/x86/hyperv/mmu.c
-@@ -5,6 +5,7 @@
- #include <linux/types.h>
- 
- #include <asm/fpu/api.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/msr.h>
- #include <asm/tlbflush.h>
-diff --git a/arch/x86/hyperv/nested.c b/arch/x86/hyperv/nested.c
-index ee06d0315c24..03775d72b7f9 100644
---- a/arch/x86/hyperv/nested.c
-+++ b/arch/x86/hyperv/nested.c
-@@ -11,6 +11,7 @@
- 
- 
- #include <linux/types.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/tlbflush.h>
- 
-diff --git a/arch/x86/include/asm/vdso/gettimeofday.h b/arch/x86/include/asm/vdso/gettimeofday.h
-index b2d2df026f6e..528ac66e366b 100644
---- a/arch/x86/include/asm/vdso/gettimeofday.h
-+++ b/arch/x86/include/asm/vdso/gettimeofday.h
-@@ -18,6 +18,7 @@
- #include <asm/unistd.h>
- #include <asm/msr.h>
- #include <asm/pvclock.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <clocksource/hyperv_timer.h>
- 
- #define __vdso_data (VVAR(_vdso_data))
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index 8e8fd23b1439..59bb8ab93dc2 100644
---- a/arch/x86/kernel/cpu/mshyperv.c
-+++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -20,6 +20,7 @@
- #include <linux/random.h>
- #include <asm/processor.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/desc.h>
- #include <asm/idtentry.h>
-diff --git a/arch/x86/kernel/cpu/mtrr/generic.c b/arch/x86/kernel/cpu/mtrr/generic.c
-index 7b29ebda024f..22228f2f550d 100644
---- a/arch/x86/kernel/cpu/mtrr/generic.c
-+++ b/arch/x86/kernel/cpu/mtrr/generic.c
-@@ -13,6 +13,7 @@
- #include <asm/cacheinfo.h>
- #include <asm/cpufeature.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <asm/tlbflush.h>
- #include <asm/mtrr.h>
-diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
-index 1b7de45a7185..ec37476c4e15 100644
---- a/drivers/clocksource/hyperv_timer.c
-+++ b/drivers/clocksource/hyperv_timer.c
-@@ -22,6 +22,7 @@
- #include <linux/irq.h>
- #include <linux/acpi.h>
- #include <linux/hyperv.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <clocksource/hyperv_timer.h>
- #include <asm/mshyperv.h>
- 
-diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
-index fb8cd8469328..76d3c27e961e 100644
---- a/drivers/hv/channel.c
-+++ b/drivers/hv/channel.c
-@@ -19,6 +19,7 @@
- #include <linux/interrupt.h>
- #include <linux/set_memory.h>
- #include <asm/page.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "hyperv_vmbus.h"
-diff --git a/drivers/hv/channel_mgmt.c b/drivers/hv/channel_mgmt.c
-index 3c6011a48dab..e6d56c73175a 100644
---- a/drivers/hv/channel_mgmt.c
-+++ b/drivers/hv/channel_mgmt.c
-@@ -20,6 +20,7 @@
- #include <linux/delay.h>
- #include <linux/cpu.h>
- #include <linux/hyperv.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- #include <linux/sched/isolation.h>
- 
-diff --git a/drivers/hv/connection.c b/drivers/hv/connection.c
-index f001ae880e1d..88546b0c2242 100644
---- a/drivers/hv/connection.c
-+++ b/drivers/hv/connection.c
-@@ -21,6 +21,7 @@
- #include <linux/export.h>
- #include <linux/io.h>
- #include <linux/set_memory.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "hyperv_vmbus.h"
-diff --git a/drivers/hv/hv.c b/drivers/hv/hv.c
-index e0d676c74f14..42f3790656e2 100644
---- a/drivers/hv/hv.c
-+++ b/drivers/hv/hv.c
-@@ -18,6 +18,7 @@
- #include <linux/clockchips.h>
- #include <linux/delay.h>
- #include <linux/interrupt.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <clocksource/hyperv_timer.h>
- #include <asm/mshyperv.h>
- #include <linux/set_memory.h>
-diff --git a/drivers/hv/hv_balloon.c b/drivers/hv/hv_balloon.c
-index a120e9b80ded..6b270ee75747 100644
---- a/drivers/hv/hv_balloon.c
-+++ b/drivers/hv/hv_balloon.c
-@@ -28,6 +28,7 @@
- #include <linux/sizes.h>
- 
- #include <linux/hyperv.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #define CREATE_TRACE_POINTS
-@@ -1583,7 +1584,7 @@ static int hv_free_page_report(struct page_reporting_dev_info *pr_dev_info,
- 		return -ENOSPC;
- 	}
- 
--	hint->type = HV_EXT_MEMORY_HEAT_HINT_TYPE_COLD_DISCARD;
-+	hint->heat_type = HV_EXTMEM_HEAT_HINT_COLD_DISCARD;
- 	hint->reserved = 0;
- 	for_each_sg(sgl, sg, nents, i) {
- 		union hv_gpa_page_range *range;
-diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
-index a5217f837237..2723711868bc 100644
---- a/drivers/hv/hv_common.c
-+++ b/drivers/hv/hv_common.c
-@@ -28,6 +28,7 @@
- #include <linux/slab.h>
- #include <linux/dma-map-ops.h>
- #include <linux/set_memory.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- /*
-diff --git a/drivers/hv/hv_util.c b/drivers/hv/hv_util.c
-index c4f525325790..a17f6e6024a4 100644
---- a/drivers/hv/hv_util.c
-+++ b/drivers/hv/hv_util.c
-@@ -17,6 +17,7 @@
- #include <linux/hyperv.h>
- #include <linux/clockchips.h>
- #include <linux/ptp_clock_kernel.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "hyperv_vmbus.h"
-diff --git a/drivers/hv/ring_buffer.c b/drivers/hv/ring_buffer.c
-index 3c9b02471760..6bfd064b4e65 100644
---- a/drivers/hv/ring_buffer.c
-+++ b/drivers/hv/ring_buffer.c
-@@ -18,6 +18,7 @@
- #include <linux/slab.h>
- #include <linux/prefetch.h>
- #include <linux/io.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "hyperv_vmbus.h"
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 7242c4920427..71745d62e064 100644
---- a/drivers/hv/vmbus_drv.c
-+++ b/drivers/hv/vmbus_drv.c
-@@ -36,6 +36,7 @@
- #include <linux/syscore_ops.h>
- #include <linux/dma-map-ops.h>
- #include <linux/pci.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <clocksource/hyperv_timer.h>
- #include <asm/mshyperv.h>
- #include "hyperv_vmbus.h"
-diff --git a/drivers/iommu/hyperv-iommu.c b/drivers/iommu/hyperv-iommu.c
-index 8a5c17b97310..ade14cc9c071 100644
---- a/drivers/iommu/hyperv-iommu.c
-+++ b/drivers/iommu/hyperv-iommu.c
-@@ -20,6 +20,7 @@
- #include <asm/io_apic.h>
- #include <asm/irq_remapping.h>
- #include <asm/hypervisor.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "irq_remapping.h"
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 2b6ec979a62f..55095c02cc78 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -23,6 +23,7 @@
- #include <linux/filter.h>
- 
- #include <asm/sync_bitops.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- #include "hyperv_net.h"
-diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
-index cdd5be16021d..261ff8b80caa 100644
---- a/drivers/pci/controller/pci-hyperv.c
-+++ b/drivers/pci/controller/pci-hyperv.c
-@@ -50,6 +50,7 @@
- #include <linux/irqdomain.h>
- #include <linux/acpi.h>
- #include <linux/sizes.h>
-+#define HYPERV_NONTLFS_HEADERS
- #include <asm/mshyperv.h>
- 
- /*
-diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
-index d0893ec488ae..64fd385723fc 100644
---- a/include/linux/hyperv.h
-+++ b/include/linux/hyperv.h
-@@ -24,7 +24,8 @@
- #include <linux/mod_devicetable.h>
- #include <linux/interrupt.h>
- #include <linux/reciprocal_div.h>
--#include <asm/hyperv-tlfs.h>
-+#include <hyperv/hvhdk.h>
-+#define HYPERV_NONTLFS_HEADERS
- 
- #define MAX_PAGE_BUFFER_COUNT				32
- #define MAX_MULTIPAGE_BUFFER_COUNT			32 /* 128K */
--- 
-2.34.1
++---------------+-------------------+----------------------------------------+------+
+| more headroom | user-defined meta | hw-meta (potentially fixed skb format) | data |
++---------------+-------------------+----------------------------------------+------+
+                ^                                                            ^
+            data_meta                                                      data
 
+You obviously still have a problem of communicating the layout if you
+have some redirects in between, but you, in theory still have this
+problem with user-defined metadata anyway (unless I'm missing
+something).
+
+> > > I suppose we *could* support just a single call to set the skb meta,
+> > > like:
+> > > 
+> > > bpf_set_skb_meta(struct xdp_md *pkt, struct xdp_hw_meta *data);
+> > > 
+> > > ...but in that case, we'd need to support some fields being unset
+> > > anyway, and the program would have to populate the struct on the stack
+> > > before performing the call. So it seems simpler to just have symmetry
+> > > between the get (from HW) and set side? :)
+> >
+> > Why not simply bpf_set_skb_meta(struct xdp_md *pkt) and let it store
+> > the metadata somewhere in xdp_md directly? (also presumably by
+> > reusing most of the existing kfuncs/xmo_xxx helpers)
+> 
+> If we store it in xdp_md, the metadata won't be available higher up the
+> stack (or am I missing something?). I think one of the goals is to let
+> things other than XDP access it (maybe even the network stack itself?).
+
+IIRC, xdp metadata gets copied to skb metadata, so it does propagate.
+Although, it might have a detrimental effect on the gro, but I'm
+assuming that is something that can be fixed separately.
 
