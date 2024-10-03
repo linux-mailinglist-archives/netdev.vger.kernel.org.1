@@ -1,144 +1,166 @@
-Return-Path: <netdev+bounces-131736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF6F98F624
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:31:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9893198F62A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1892A1C2185C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:31:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8E581C213E1
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:33:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592B46E2BE;
-	Thu,  3 Oct 2024 18:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E1157A15A;
+	Thu,  3 Oct 2024 18:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="ODZymaUY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MRgh6n03"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915FDBA41;
-	Thu,  3 Oct 2024 18:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12556A33F
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 18:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727980295; cv=none; b=s7tJzzscR2Cql3yS5qKuN6zHKc9ZBhTAaT/lWD50loU8esfPcBChOFJkIWvVxBVCOofZxLf82DY6MPZWyQnAcohT/8Bt6EWEnqBHHqYhHQT0cPVY8bzf1LrOb4Gx/zkYOcGCV/RaAsUbrbC1J32bfyRNp/ypu4FjgoqKPQ34TpE=
+	t=1727980390; cv=none; b=LoopgkICysbMdcuJqU6ji8WbT7/LrJRICwiezYIVcoP/DLD7hMDMUx8F9Y/qKrOFsNYvS6rQpHEYHw8LNHZQdbCBTOeAccfDm4IWwTSKsQff1Zxs2rFHTaD3T/uoYFiWiZEldQFtO824QL9S1gyZ5Op0tPXiSr/IF6K+0W4q6Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727980295; c=relaxed/simple;
-	bh=fYj3RyO1TCC1UywFyFsk8unCFvaNs309HO7H33lQWmg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uo1e9rHatdoMe9P/nVXkIcgy4eSVvvNpgqKHo41eHXxE38X210lnoXgE6XdOcoU33AkIwnV5oPLLmkjpdPOGBdSpookqj+m2+blha9BpXZn9Qz+k597S6DDRKsKDKGxUi4sWEtFxZ6D1fJiCZ3jHkdpIOZ3GYz1Aa5zCuTkUCRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=ODZymaUY; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 835CB88EA7;
-	Thu,  3 Oct 2024 20:31:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727980291;
-	bh=urWCAcPRU+WZu8zm+Uk5s33cemx3OGm+bIgFrNOe5yU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ODZymaUYrjwkQe3Y1Yt/wD05BRSM45RrLmdRmMz64X2/xXhBbSz2nKY5UBtAinG2Q
-	 CTbdaXqp2BHjnRjJ+Y1GBhNT0zM/VvuBwhogycyBboXsF/otKnePDdNhwlPyIv2xhD
-	 aOIFxM5MJPkqxROb/04XWeKczk8A0ftd58uaX3cQ59WaekEuC2rU6nce4QWtCgsGmD
-	 XnSCLso/QqdeERAS3tHQy7ftPX23g9Z23eWMfvcmjyQW3+gq2iA3kE5zda1LdcXvb2
-	 Q0wY4nztQh0Ur9+KTq/IzoMO5idCF7e7U2s/u9C+UyNROyx7t7eEpo36SMvrQqybNV
-	 59R8+PgZ8z3NA==
-Message-ID: <2f3bb6ce-50aa-40d9-959f-10c8193acaba@denx.de>
-Date: Thu, 3 Oct 2024 20:31:29 +0200
+	s=arc-20240116; t=1727980390; c=relaxed/simple;
+	bh=ILmjpQ0zKjjTB7A3mdO7etGqfghkzhM57DEwhovcP+s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=usHLcGfAGurZlIUjUTxPou/vu5HAjBrTAoxwb1ap+8odns2K9eFWhiBfgFSb6FoH4Var0/2uqzJZFwROdbejmHQlsDfuMuRzMSELsjJuQ2cyNP9/5UR0JYCwAjp8XTNf9KO+/pXuOlvI9kilHVd4vMmMrrBAI++GOfTo6mMpla4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MRgh6n03; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4582a5b495cso37101cf.1
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 11:33:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727980388; x=1728585188; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TRiDjEDPS+jnQVOWrHXwLNaJ0K9ReTp7hEjVWXINGQg=;
+        b=MRgh6n03jPVxl5BaF7UqiHKJQp0+y1IzbkEheZDMV+B64ye5Ul+JgKCP70AXHLdYQ3
+         K1/md8efVjt9WhuPC4rdC7De8+T3Qz349XfaHmDnsfX2HDC2ql0YP5WbTsEkqa2zc5yq
+         mRjOYzuoXkCV/Bmcthu7pcXp1Nqtgz3Tbh8shDNuHkct0aqg33UixlF2wjAxO0XGBXQ4
+         s4bBtMp/taUlHYTFwaQUpctCwWnBADc4CY5cHlaMJBjiRImn5bBuvWyY0TmGUdyvhOau
+         1OBRGPPwrnyDpMhMQ42Gjiep7wIxVdBUoLtifUtDW76DlCJ8f+MpU8rwZuvxLRw0okhq
+         W3oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727980388; x=1728585188;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TRiDjEDPS+jnQVOWrHXwLNaJ0K9ReTp7hEjVWXINGQg=;
+        b=oVHKL4cElmpLCTTzlbmw6R7W/H7pFyo4EeEnNo3eyT92Jp06/iD92ImjPhmst85eVs
+         LYVKogrnjynVjGCMls9V/7UKgMFIqQR2knGmZKjRn5oisVv0qb7h0F+NBWZPVdTpQGS6
+         VegxxuvJnHrWTNzqtwy75iF9+GY0OkXgJuJCwW0sWogmQwO+wzSSQJEky9RiYlKckie6
+         0AMKvf4Ip2C65KcRRRs4DCWKqii1ICfM0hPh3zRRfzoC1dGOA6+ADCwZKoQiI6Tiwh2D
+         32FVhaWiV8KKVNxvsSgn5vk6rtCocnn3lFTta8OJX6OP5mnqrrXaDsVFy7OtLjVL0wCM
+         RmJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVUoFT6NFvZZMGtXCDIHO6zxjS/ZkUM8jAhQvIQAeK6iolHP9ImqVPbr0RlflQxF8L6UEdWktc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxmuk0S6xUxJTFF/uY7Z15o1uLpi7r/0+H5P54btH/oiyZoHrL5
+	GWmDxKO4HYbe6olGfDN3F3Dj9bbcZgHixPDzFVwqH2GIqz8ys7BglEc26Lbsz2fNHriik5Y+f3Q
+	LNRi4txdi506oH+o88bjgXVLkLCRjFJe+I2yV
+X-Google-Smtp-Source: AGHT+IEpLjV56VsH8YRSLWLesTXb/qFAN2uwb4LZrTY4gOoBFQ2gTLXCRYIB782dZw29z9Gq2z5Yiy5KA0dHRN1YMN4=
+X-Received: by 2002:ac8:6292:0:b0:45c:9e26:ae3 with SMTP id
+ d75a77b69052e-45d9bc827e6mr41981cf.27.1727980387586; Thu, 03 Oct 2024
+ 11:33:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 2/7] wifi: wilc1000: Clean up usage of
- wilc_get_chipid()
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- linux-wireless@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241003111529.41232-1-marex@denx.de>
- <20241003111529.41232-2-marex@denx.de>
- <2d9d4896-a81a-4393-8cf3-8e42b36aaae2@bootlin.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <2d9d4896-a81a-4393-8cf3-8e42b36aaae2@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-7-ap420073@gmail.com>
+In-Reply-To: <20241003160620.1521626-7-ap420073@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 3 Oct 2024 11:32:53 -0700
+Message-ID: <CAHS8izMjxvgMwh5MzwDKDw1wy7b_Eyua=LOrB1Kn6wFhcxE5bg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 6/7] net: ethtool: add ring parameter filtering
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/3/24 7:33 PM, Alexis Lothoré wrote:
-> On 10/3/24 13:14, Marek Vasut wrote:
->> Reduce the use of wilc_get_chipid(), use cached chip ID wherever
->> possible. Remove duplicated partial chip ID read implementations
->> from the driver. Update wilc_get_chipid() to always read the chip
->> ID out of the hardware and update the cached chip ID, and make it
->> return a proper return value instead of a chipid. Call wilc_get_chipid()
->> early to make the cached chip ID available to various sites using
->> is_wilc1000() to access the cached chip ID.
->>
->> Reviewed-by: Alexis Lothoré <alexis.lothore@bootlin.com>
->> Signed-off-by: Marek Vasut <marex@denx.de>
-> 
-> [...]
-> 
->> +int wilc_get_chipid(struct wilc *wilc)
->> +{
->> +	u32 chipid = 0;
->> +	u32 rfrevid = 0;
->> +
->> +	if (wilc->chipid == 0) {
->> +		wilc->hif_func->hif_read_reg(wilc, WILC_CHIPID, &chipid);
->> +		wilc->hif_func->hif_read_reg(wilc, WILC_RF_REVISION_ID,
->> +					     &rfrevid);
->> +		if (!is_wilc1000(chipid)) {
->> +			wilc->chipid = 0;
->> +			return -EINVAL;
->> +		}
->> +		if (chipid == WILC_1000_BASE_ID_2A) { /* 0x1002A0 */
->> +			if (rfrevid != 0x1)
->> +				chipid = WILC_1000_BASE_ID_2A_REV1;
->> +		} else if (chipid == WILC_1000_BASE_ID_2B) { /* 0x1002B0 */
->> +			if (rfrevid == 0x4)
->> +				chipid = WILC_1000_BASE_ID_2B_REV1;
->> +			else if (rfrevid != 0x3)
->> +				chipid = WILC_1000_BASE_ID_2B_REV2;
->> +		}
->> +
->> +		wilc->chipid = chipid;
->> +	}
->> +
->> +	return 0;
->> +}
-> 
-> My bad for not having spotted it in v6, but you are still missing an
-> EXPORT_SYMBOL_GPL(wilc_get_chipid) here, making the build fail if wilc support
-> is built as module:
-> 
-> ERROR: modpost: "wilc_get_chipid"
-> [drivers/net/wireless/microchip/wilc1000/wilc1000-sdio.ko] undefined!
-> ERROR: modpost: "wilc_get_chipid"
-> [drivers/net/wireless/microchip/wilc1000/wilc1000-spi.ko] undefined!
-> make[2]: *** [scripts/Makefile.modpost:145: Module.symvers] Error 1
-> make[1]: *** [/home/alexis/src/microchip/linux/Makefile:1878: modpost] Error 2
-> make: *** [Makefile:224: __sub-make] Error 2
-Fixed in V8, thanks.
+On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wrot=
+e:
+>
+> While the devmem is running, the tcp-data-split and
+> tcp-data-split-thresh configuration should not be changed.
+> If user tries to change tcp-data-split and threshold value while the
+> devmem is running, it fails and shows extack message.
+>
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+>
+> v3:
+>  - Patch added
+>
+>  net/ethtool/common.h |  1 +
+>  net/ethtool/rings.c  | 15 ++++++++++++++-
+>  2 files changed, 15 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+> index d55d5201b085..beebd4db3e10 100644
+> --- a/net/ethtool/common.h
+> +++ b/net/ethtool/common.h
+> @@ -5,6 +5,7 @@
+>
+>  #include <linux/netdevice.h>
+>  #include <linux/ethtool.h>
+> +#include <net/netdev_rx_queue.h>
+>
+>  #define ETHTOOL_DEV_FEATURE_WORDS      DIV_ROUND_UP(NETDEV_FEATURE_COUNT=
+, 32)
+>
+> diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+> index c7824515857f..0afc6b29a229 100644
+> --- a/net/ethtool/rings.c
+> +++ b/net/ethtool/rings.c
+> @@ -216,7 +216,8 @@ ethnl_set_rings(struct ethnl_req_info *req_info, stru=
+ct genl_info *info)
+>         bool mod =3D false, thresh_mod =3D false;
+>         struct nlattr **tb =3D info->attrs;
+>         const struct nlattr *err_attr;
+> -       int ret;
+> +       struct netdev_rx_queue *rxq;
+> +       int ret, i;
+>
+>         dev->ethtool_ops->get_ringparam(dev, &ringparam,
+>                                         &kernel_ringparam, info->extack);
+> @@ -263,6 +264,18 @@ ethnl_set_rings(struct ethnl_req_info *req_info, str=
+uct genl_info *info)
+>                 return -EINVAL;
+>         }
+>
+> +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT_E=
+NABLED ||
+> +           kernel_ringparam.tcp_data_split_thresh) {
+> +               for (i =3D 0; i < dev->real_num_rx_queues; i++) {
+> +                       rxq =3D __netif_get_rx_queue(dev, i);
+> +                       if (rxq->mp_params.mp_priv) {
+> +                               NL_SET_ERR_MSG(info->extack,
+> +                                              "tcp-header-data-split is =
+disabled or threshold is not zero");
+> +                               return -EINVAL;
+> +                       }
 
-Before I send V8, can you have a look at the last two patches in this 
-series? They need some RB/TB.
+Probably worth adding a helper for this. I think the same loop is
+checked in a few places.
 
-Thanks !
+Other than that, yes, this looks good to me.
+
+
+--=20
+Thanks,
+Mina
 
