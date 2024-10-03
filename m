@@ -1,119 +1,115 @@
-Return-Path: <netdev+bounces-131671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1CDC98F369
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:01:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 068F298F368
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7046B282413
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:01:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA7861F22342
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 16:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E78A1A4E78;
-	Thu,  3 Oct 2024 16:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531881A3033;
+	Thu,  3 Oct 2024 16:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="MGtF0T7W"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yk8UWvRF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37A71A4E77;
-	Thu,  3 Oct 2024 16:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EC21552ED;
+	Thu,  3 Oct 2024 16:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727971261; cv=none; b=I7gDF29ExkC1rM/QC/j6vukEBut1jjKG3ofikt/KvYHLNfogEPDrHFzh5N5A5g+YPrJDER9QEJ2OFkepPok+C5vYOznpL773nNxmaObn6kNj2d87QZskPhjfz2QWKEeruhkNuq9+/4400NPbMfC00wkiKZjMa9Lctpm51XVRW5Y=
+	t=1727971246; cv=none; b=PGtHo7bk4XD3FzltKjXA3FcQ2/pATuwraIOyTdwGZKQEMlr9H6aRkCH4PoPZYEPTO2GEuUxH/Pu4ne1SfTJOvota1mtt4gdNZcHQ+lCvzH6ehfJrIWeQTtHH8FNIdSFdAM8mauewrT9ZM3BVKNEnRX64QOshToNcETyGHupJ4Os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727971261; c=relaxed/simple;
-	bh=US268CN7C8u8I8vi+t39s6ixvSRPzyOJbZ9UOyWWhUA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WLuIaNQEobM73kR09Q0nrAlehjg3if8CLoASzbJ2NZcV89vWYJL/m8fXBmk2uEq/q2ZAW4bwY+4UUJ8SMt9VP4nLiqdv673zDPCms+cF10LdM08R8me92lAt5+ejT5nsmyD2TVKxbdIFleYK5G0pxrB1vFph+xS3hOESPL8bxbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=MGtF0T7W; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1727971223; x=1728576023; i=markus.elfring@web.de;
-	bh=mgi1PA9iSNuOGfuY2GvmlRhWbak0YrTiX689gvSw+fo=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=MGtF0T7WLniRYu2vrmZhSVNZLiNqyYqmj+nNdxvf1AjAFzIt2aa6zMHe+GcKa+xj
-	 F247iC+VdeUjaH1LUUpyeOOGuCh0utCcCQvM47zUUIMjITHIhO4mb00QpMVXOxjrD
-	 gbwQiKzpCtO8M4M4P/k0W2AUQApU0bSTPPkWF81/+vwSSZENln/HCuk3oLp/iOd0/
-	 HbjzMXr47RCXMZbi4r0omLK0ygdHdsmsRUdE5ZY6O2ya2UdIVkHTFmkIUDsY01gCs
-	 2U4KBD2MDVDI8y7gHi6WxouWdt9PYOxZgWBUWQrRJTYzQeRlCK1yvnnGXKWu0mK3i
-	 3el0ftrdZKmnLgyigw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.87.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1Myf3v-1ry4KI0tbB-00wE6x; Thu, 03
- Oct 2024 18:00:23 +0200
-Message-ID: <c7844c93-1cc5-4d10-8385-8756a5406c16@web.de>
-Date: Thu, 3 Oct 2024 18:00:21 +0200
+	s=arc-20240116; t=1727971246; c=relaxed/simple;
+	bh=urJUWhWj0/jU6r0elSeILaeKSFqJ6kZ7W1mTMbJBVUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bm5vwrWVPjGbrNVkCiGkasqAMeetUH8pW1NqFLYHZJGu4g+aWcbrOal1LcHbaLmXzPHGarntfha6VyqadE65llrt4IkLj/QEFTCwVEf16TYK4DVe7gAPLRxFaWPJtN6xFUaVCsaDBxjFZm8jT1lUa07JdQUe3usSanSdvHiLWe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Yk8UWvRF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mvGlqjg1Sye+h4uRdo45d9MUGSgM8SSKr87U+EOBzSI=; b=Yk8UWvRF2Osr9e4ObvDYc6Jkk6
+	xVIhjMi3mFuj3coXxxVNEzKsy0c1ws4PUMsAVdcUVG4g/T3xJ1NF5plbyn93xgYugDZHFj34LsGKP
+	23AoZOg5+Gwva3DPEi5P2Lb2YeJgohH9Q48Eq7HkNcdXSf4Jte36oWKR+FUm5i3WoGw0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swOFo-008xcm-Qu; Thu, 03 Oct 2024 18:00:36 +0200
+Date: Thu, 3 Oct 2024 18:00:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, dirk.behme@de.bosch.com,
+	aliceryhl@google.com, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com
+Subject: Re: iopoll abstraction
+Message-ID: <f7906232-c2c7-4fd6-be6b-7e96bbfbbcad@lunn.ch>
+References: <76d6af29-f401-4031-94d9-f0dd33d44cad@de.bosch.com>
+ <20241002.095636.680321517586867502.fujita.tomonori@gmail.com>
+ <Zv6FkGIMoh6PTdKY@boqun-archlinux>
+ <20241003.134518.2205814402977569500.fujita.tomonori@gmail.com>
+ <Zv6pW3Mn6qxHxTGE@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
- warning
-To: Andy Shevchenko <andriy.shevchenko@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- kernel-janitors@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org,
- =?UTF-8?Q?Amadeusz_S=C5=82awi=C5=84ski?=
- <amadeuszx.slawinski@linux.intel.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Kees Cook <kees@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
- <63de96f1-bd25-4433-bb7b-80021429af99@web.de>
- <Zv6RqeKBaeqEWcGO@smile.fi.intel.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <Zv6RqeKBaeqEWcGO@smile.fi.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:S/T1X299wtUxa7pi41Mplw3q1ZNcg+4TUXsquBhiQxPHy/qrgcc
- tPz0bDFKZLZhCLyHxntMWYbCdf6CAXlutSBJLIQ1EFAEmmuqfoilE+FWkSC7Ud1nsTJn9km
- 8wPxqjQ+L/jI746B/lNFQ2FY5mabp7ncctqrJZTmKSS2o1qh+kVzp+Alo1c4Kj93+bUOf2B
- OwogGPo7OL3Ed0y9cqXDg==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:J7MJisWnq58=;MzSjKpS9joyZnLLpnb4Iyi5ZmJy
- k3zs7FxiSw5tTfQcXPK0zoL59OBAjsa5IdKXXfYLQ0vLJIkz7yQGb8IRtLfRZF4biM9nqA6TQ
- NQRI7JkiLN7o4d0wk84veOQXHzBv24Dyx6Yp57CjPbwNotLU+3ewKAsSQvGmqd+dl/EcdXvwN
- XZtcGAZDCI0BtE0WCUzGGr0oxQk3Xlh7mRG8crDp7OedLRRA/FG4exM0I4DUg6M5lVhNmUql6
- RNWqF5W0ltCByVDL8D2uG1nf/PMUkOdHmaSkCp5kwirDa2JrxCWfKBz6Hinp8/XlOICCR7rHg
- 2e4VFr2PP0DFw3T2aw9Uzt2XrS5EKyLptZpEhwXoMyi8RDvdKGeePrRCCf11GuClZvPveapyM
- K/3zNK4LzPk8+yfKUAL/4tQK9LhJ9XlL22HoZnyrAAk/bNRtupiyI4Y+1ldr9bl8khE9Du+TD
- FLln+Q29Aua5xoauZcmyssO8+X4YtoCcOb0aa6gEK40fIguCyrUAJdujxFdxae59NwV8dTqFm
- 0befEyvPyIYWgu2Odxg7ULboNZOyTYcoajjODpWNh2d5NcWVKsSe0bG/hLpe9h6T4MvBGCOq/
- RjQ1TCQeNYtC2LJGaIqR8p9Z2CZd22yjzz8t7AnZVBcOniBZMX4Ca6zrogR/3dXCRxaxjqFOD
- zkoq3Pb8IypWjzyVVQRRgulzaKWZ0V1vo+LaE20Ekva7XM7WRW5ICb4cpitTqpN20eopoTbF7
- 3Z9/4KoEGBdihapjGjHRxN4OGMAD0PGeLzvQU2jvCUIXpF8UsSY9HbdonFTsvlNIJMejs2aw1
- HjoPXeiWekcbRXdMO8GvggBw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zv6pW3Mn6qxHxTGE@boqun-archlinux>
 
-> =E2=80=A6
->
->>>  "__" prefix added to internal macros;
->
-> =E2=80=A6
->
->> Would you get into the mood to reconsider the usage of leading undersco=
-res
->> any more for selected identifiers?
->> https://wiki.sei.cmu.edu/confluence/display/c/DCL37-C.+Do+not+declare+o=
-r+define+a+reserved+identifier
->
-> The mentioned URL doesn't cover the special cases like the kernels of th=
-e
-> operating systems or other quite low level code.
-Can such a view be clarified further according to available information?
+> > fn read_poll_timeout<Op, Cond, T: Copy>(
+> >     mut op: Op,
+> >     cond: Cond,
+> >     sleep: Delta,
+> >     timeout: Delta,
+> > ) -> Result<T>
+> > where
+> >     Op: FnMut() -> Result<T>,
+> >     Cond: Fn(T) -> bool,
+> > {
+> >     let timeout = Ktime::ktime_get() + timeout;
+> >     let ret = loop {
+> >         let val = op()?;
+> >         if cond(val) {
+> >             break Ok(val);
+> >         }
+> >         kernel::delay::sleep(sleep);
+> > 
+> >         if Ktime::ktime_get() > timeout {
+> >             break Err(code::ETIMEDOUT);
+> >         }
+> >     };
+> > 
+> >     ret
+> > }
 
-Regards,
-Markus
+This appears to have the usual bug when people implement it themselves
+and i then point them at iopoll.h, which so far as been bug free.
+
+kernel::delay::sleep(sleep) can sleep for an arbitrary amount of time
+greater than sleep, if the system is busy doing other things. You
+might only get around this loop once, and exit with ETIMEOUT, but
+while you have been sleeping a long time the hardware has completed
+its operation, but you never check.
+
+There must be a call to cond() after the timeout to handle this
+condition.
+
+And this is not theoretical. I had a very reproducible case of this
+during the boot of a device. It is less likely today, with SMP
+systems, and all the RT patches, but if it does happen, it will be
+very hard to track down.
+
+	Andrew
 
