@@ -1,85 +1,203 @@
-Return-Path: <netdev+bounces-131594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6489998EF66
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:40:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D6C998EF6E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:42:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B3C3280F7B
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:40:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33A711F21FB2
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C55219538A;
-	Thu,  3 Oct 2024 12:40:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bvIrtvK5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E52016C453;
+	Thu,  3 Oct 2024 12:42:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0172186E46;
-	Thu,  3 Oct 2024 12:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391B210A1E;
+	Thu,  3 Oct 2024 12:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727959236; cv=none; b=nfSJzzvknGA7IZagc8dOBGg9i74sp9LF2GGg911XoXza3Enyk/0soVxRdf7VarKfAu3WApRxWeqARvaszjn4hfXeXEi45ldXwThxagmOMZvIGManykRxQFQXZQr0C+aCEsDInku9WEljJf2SDFf8huRiVXCAg1gcUQ2b8le6AvA=
+	t=1727959329; cv=none; b=qOrDYhIueecWcrp1m95u/AdSlJXQSt/dWnAJAHMvV2MlJ+v+iEkd9dSPubM9zofwxJhiK1XYphWu7uZWBkuLHbOHeqOiG6zN+XZVQzXcXz7u18j+NTOlb9CpeXAisP/SV6su554Mz0AznFIffRoRWV/dFQfTOlZW402anK1mjHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727959236; c=relaxed/simple;
-	bh=jDcru5H9+Qa+PxjnhWrNRGNCTHk/VKHGXnAFQzMI0lM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m3+JaUPm/2JASrJkJna4v9L1/fKKqAl1nUjx4azyOyoO2hz9FclN/hqraomXpFI+FYlNahmhocFmypy3a/ezmr5vBgT//rppx4p1TYbiTCefvw2gPu1jFR9/p8xmutIYOV5/tELo69Onjbt1CAIIxv3wSYovAAODkfRt6Tqp/4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bvIrtvK5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=cPwDJx00YR3As1/9S202+k1eFQiQLwUHTk7faEAhr3I=; b=bv
-	IrtvK5c2temyYdg2CjgwBpkZ+N1Ho56y2idbrZyiDLsdpbb+IjLcJoRsMa3O0nY3QSH1x1pZkIOU4
-	YFVvLZ+DoLVNImhK9AihVvLaD7bVmRCbJQ3BYmveoKzpV8TPCtCPly3fABOgw8jzW5SY9RxlfVo/a
-	hrViCZi6alUQaoU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swL80-008wgB-Pw; Thu, 03 Oct 2024 14:40:20 +0200
-Date: Thu, 3 Oct 2024 14:40:20 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Qingtao Cao <qingtao.cao.au@gmail.com>
-Cc: Qingtao Cao <qingtao.cao@digi.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/1] net: phy: marvell: avoid bringing down
- fibre link when autoneg is bypassed
-Message-ID: <b4d889ad-2e69-44a1-a01e-e8d7e571ca4b@lunn.ch>
-References: <20241003071050.376502-1-qingtao.cao@digi.com>
+	s=arc-20240116; t=1727959329; c=relaxed/simple;
+	bh=7vpf7dtlkmVcw67xiNILfntdKzVtAewtfIOaoErLmmE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DmG1HJx5r96qBI9x+mSEOneOOxcY5VUIW1hnCYcC7iQ5oPSdpzW6odJWMR1l0lxStRcksAYKlhfMQPYnUsWQ2Yi1Kv1Qgw37cJ88BtWdS5IKxzYkQ9QKsTys8z5hjzFpDsY6pRPabX4TIytJES3h7PD6pB6799ISJ55JztkO6rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XKB9k4mSjz1SCBZ;
+	Thu,  3 Oct 2024 20:40:58 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id EBD191A0188;
+	Thu,  3 Oct 2024 20:41:56 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 3 Oct 2024 20:41:53 +0800
+Message-ID: <cd8064ca-a5cd-15fd-8409-5a6a8d393591@huawei-partners.com>
+Date: Thu, 3 Oct 2024 15:41:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 16/19] selftests/landlock: Test that accept(2) is
+ not restricted
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-17-ivanov.mikhail1@huawei-partners.com>
+ <ZvbG_ym1PKmVY6Ts@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZvbG_ym1PKmVY6Ts@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241003071050.376502-1-qingtao.cao@digi.com>
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-On Thu, Oct 03, 2024 at 05:10:50PM +1000, Qingtao Cao wrote:
-> On 88E151x the SGMII autoneg bypass mode defaults to be enabled. When it is
-> activated, the device assumes a link-up status with existing configuration
-> in BMCR, avoid bringing down the fibre link in this case
+On 9/27/2024 5:53 PM, Günther Noack wrote:
+> On Wed, Sep 04, 2024 at 06:48:21PM +0800, Mikhail Ivanov wrote:
+>> Add test validating that socket creation with accept(2) is not restricted
+>> by Landlock.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   .../testing/selftests/landlock/socket_test.c  | 71 +++++++++++++++++++
+>>   1 file changed, 71 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
+>> index 2ab27196fa3d..052dbe0d1227 100644
+>> --- a/tools/testing/selftests/landlock/socket_test.c
+>> +++ b/tools/testing/selftests/landlock/socket_test.c
+>> @@ -939,4 +939,75 @@ TEST_F(socket_creation, sctp_peeloff)
+>>   	ASSERT_EQ(0, close(server_fd));
+>>   }
+>>   
+>> +TEST_F(socket_creation, accept)
+>> +{
+>> +	int status;
+>> +	pid_t child;
+>> +	struct sockaddr_in addr;
+>> +	int server_fd, client_fd;
+>> +	char buf;
+>> +	const struct landlock_ruleset_attr ruleset_attr = {
+>> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +	};
+>> +	struct landlock_socket_attr tcp_socket_create = {
+>          ^^^^^^
+> 
+> Could be const as well, just like the ruleset_attr?
+> 
+> (I probably overlooked this as well in some of the other tests.)
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+Yeap, I'll fix this for each test.
 
-Please note the bullet point:
+> 
+> 
+>> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +		.family = AF_INET,
+>> +		.type = SOCK_STREAM,
+>> +	};
+>> +
+>> +	server_fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+>> +	ASSERT_LE(0, server_fd);
+>> +
+>> +	addr.sin_family = AF_INET;
+>> +	addr.sin_port = htons(loopback_port);
+>> +	addr.sin_addr.s_addr = inet_addr(loopback_ipv4);
+>> +
+>> +	ASSERT_EQ(0, bind(server_fd, &addr, sizeof(addr)));
+>> +	ASSERT_EQ(0, listen(server_fd, backlog));
+>> +
+>> +	child = fork();
+>> +	ASSERT_LE(0, child);
+>> +	if (child == 0) {
+> 
+> Nit:
+> I feel like the child code would benefit from a higher level comment,
+> like "Connects to the server once and exits." or such.
 
-* don’t repost your patches within one 24h period
+Agreed, I'll add this
 
-It would be good if you read all this document.
+> 
+>> +		/* Closes listening socket for the child. */
+>> +		ASSERT_EQ(0, close(server_fd));
+>> +
+>> +		client_fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+>> +		ASSERT_LE(0, client_fd);
+>> +
+>> +		ASSERT_EQ(0, connect(client_fd, &addr, sizeof(addr)));
+>> +		EXPECT_EQ(1, write(client_fd, ".", 1));
+>> +
+>> +		ASSERT_EQ(0, close(client_fd));
+>> +		_exit(_metadata->exit_code);
+>> +		return;
+>> +	}
+>> +
+>> +	if (self->sandboxed) {
+>> +		int ruleset_fd = landlock_create_ruleset(
+>> +			&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +		ASSERT_LE(0, ruleset_fd);
+>> +		if (self->allowed) {
+>> +			ASSERT_EQ(0, landlock_add_rule(ruleset_fd,
+>> +						       LANDLOCK_RULE_SOCKET,
+>> +						       &tcp_socket_create, 0));
+>> +		}
+>> +		enforce_ruleset(_metadata, ruleset_fd);
+>> +		ASSERT_EQ(0, close(ruleset_fd));
+>> +	}
+>> +
+>> +	client_fd = accept(server_fd, NULL, 0);
+>> +
+>> +	/* accept(2) should not be restricted by Landlock. */
+>> +	EXPECT_LE(0, client_fd);
+> 
+> Should be an ASSERT, IMHO.
+> If this fails, client_fd will be -1,
+> and a lot of the stuff afterwards will fail as well.
 
-	Andrew
+Agreed, thank you!
+
+> 
+>> +
+>> +	EXPECT_EQ(1, read(client_fd, &buf, 1));
+>> +	EXPECT_EQ('.', buf);
+> 
+> I'm torn on whether the "." write and the check for it is very useful in this test.
+> It muddies the test's purpose a bit, and makes it harder to recognize the main use case.
+> Might make the test a bit simpler to drop it.
+
+Agreed, this check is really not that important.
+
+> 
+>> +
+>> +	ASSERT_EQ(child, waitpid(child, &status, 0));
+>> +	ASSERT_EQ(1, WIFEXITED(status));
+>> +	ASSERT_EQ(EXIT_SUCCESS, WEXITSTATUS(status));
+>> +
+>> +	ASSERT_EQ(0, close(server_fd));
+> 
+> You are missing to close client_fd.
+
+will be fixed
+
+> 
+>> +}
+>> +
+>>   TEST_HARNESS_MAIN
+>> -- 
+>> 2.34.1
+>>
 
