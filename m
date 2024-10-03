@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-131749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A854898F6C4
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:07:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0576598F6C9
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:10:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 507E51F21041
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:07:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5B228114E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971A41AAE31;
-	Thu,  3 Oct 2024 19:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242BC1AB6D4;
+	Thu,  3 Oct 2024 19:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PrkC6Pwf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WWpwbukQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EB31A4E8C
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 19:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949A238DD1
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 19:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727982449; cv=none; b=hmJSMdWKBV5KmoDumbdlWzo5388XDkxhcacBsVEAKXBh7w23m83Ss1GyT4D4Uh9Kvs4Oi813YOP+tjeu97kl32llUNL6HNmBe76smKuSRfj8HlHDQJfcnMQ8yopU/fSzKDifnk1aGAkSRGJtI8f+wFPxu5fvmSWtIwa+yQVql/g=
+	t=1727982620; cv=none; b=bazGe7P2DkCT/KzZdgg8jnwuRmEBj+XvQuCvGaMiI/+5LYkYcJeHDfjhfW/+LKglf8JA7GcbaRxwFIj8c73MdIAT0486D9n84ZDQOaxK1Kip+tRvkHTm3nlxl1tHXiy8pa1BDtM5jvDGltL6E86uXyqnxivQlJhPdhSGYoMkPHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727982449; c=relaxed/simple;
-	bh=56+W8I5rf/VRMtxZ0hYiyZDrcwiHGW/bQCHLgD/Onh4=;
+	s=arc-20240116; t=1727982620; c=relaxed/simple;
+	bh=h+9r1lyWAAoHA75sblFF5HtpRJTBhoLTD+qKvD/N5EU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ymx38gbXzKwYKvB7ajzOSaIibEAykuOCB/h8aPjwU0VlWVzB67vLd6sEE0yaym6zMeBOp3Se9m9MuNnIjWkpgzSPSiVGqBlgcVLnu/UW5T+RNrjtwup6uJeQ3taiD7guwewTrulUOhlkbL3Vk33eaujIvWbKvrA2CUB92UkSeYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PrkC6Pwf; arc=none smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=CVw4QBE1txPrLeSDBiYGfyqNeqkv/3bRj2yaix7oSvICqoD+6szPnqmEyJXujusFgEPxxz+pUVHwLfrY6t+hcAm2ulWXzuv606h/6RzDjkM3v/WuzsBFhSIGLlqEu11kSWt/CmEQUJQEC4Ey8H0StvzRxwNbN4tBHNM8XBv7ksM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WWpwbukQ; arc=none smtp.client-ip=209.85.160.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-45b4e638a9aso52721cf.1
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 12:07:27 -0700 (PDT)
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-45b4e638a9aso53921cf.1
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 12:10:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727982447; x=1728587247; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727982616; x=1728587416; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4I3Ez1fkxWMYJUikFpXnxqbNaL6WRzAzJoASsMuh6D4=;
-        b=PrkC6Pwf2zzxkq1LxK8sqri+Yj1X+6aUuJUTC3JBccj4alFoHP01IPy913qKksqDQn
-         RztRTusEv90zC02T3FmqDrwuOel0RPamBRGWIF9vI+bIY15c4u+21C1fLTGpV5TRBEbe
-         21bWzVrbgfV/urtOTTgoWrwlxt3NlvGsKRgh60MWcCWfoiZTsjABkmKdk/sId+JAEjJ4
-         1ozMd+7MqPyE3OCI05DX8u3YOjyIWN02Mf013oH3NBMes13XV7UaIX8JsQ1Qrgql6PAc
-         3dCvhVP4C0Lrj2+9DDRl7f1cMhmNfZt3XzTbqS4X5rn9Vkb9axtny5z95GQEQeXJ9Dbn
-         ciHw==
+        bh=h+9r1lyWAAoHA75sblFF5HtpRJTBhoLTD+qKvD/N5EU=;
+        b=WWpwbukQX+V0zn8SRL7UOi9H2R28qzkS8qs+82DSrt+WuOnDZpI3mx1BY5oM7wDCuo
+         3ajeARabi5lfmMCCPkuCljNL6JvyeuYlYiUbl8xbME5sjkqhsU2ruaMK1zJf8gLhLJAj
+         jT8LKdAnzOYugMJHYMF2/TcnZP+yVTdv6Zv8j8fGWhsaa3IHSBuc3xy286Z6l8/oaW2y
+         srYRYmGHeIWy64i3i8kIrB6V8iURD0b79J5PyfrAcRGT9QfPAa7mjqe9pR/MlHfv24c5
+         qbzQ400CKDa5HEU6AOurZRj8BVMFQXGbrlCyxvAI2CJsqDQ1YRfrJXZ/i9CoYs5FIBIa
+         aH/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727982447; x=1728587247;
+        d=1e100.net; s=20230601; t=1727982616; x=1728587416;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4I3Ez1fkxWMYJUikFpXnxqbNaL6WRzAzJoASsMuh6D4=;
-        b=Jj7qauhQDkesm/DDFreDSnH2p0ySVa10JTcjg57Ra5hD4ENoB8cB0I4Sz5vuT6tRg0
-         oqXHv3R9c3KGpwNeVvU6GeMFH7AZhkmPkkUnYWNO8cnfYryNdit7Q9PHZMECLXkKPMcO
-         ciwdFCOOLkvtCI6q5SakyXE4LoWV6fbbk3gZah3tvQxxpPu6p+ZeJxiuOnzBfsBt4cUh
-         Wvz8M3S/2h9t541iiNAcxBDhmQUrc5fbWS5YvhMWcqIbvZG6UQ19A3GnSb4mVuGgqyKn
-         ReGnD+FI9i/H1zKthr2nqxNKKpN8nUZriQfuZWWQy2vDBA8nLCdn2BvgaoMY1qYjM09h
-         aqPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXgp6WvXZPcpxGaZQp++FtEYPX17RRm/Qj7VbEUc3lVJFl3mfIUipmdBMMCM1INXfrtjDy6qs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcTCUXwCNVTbJ372cm5uAqQkpdZ3CDHJY8HlQh9O1Ohwg5SpeI
-	Wf00aXmAGnlO5F4mDkjfEgX5/n8q7A7WwRYrFAh77LKYr68tGcSXT5mI0kTKSWkmtte6N9ZZu6D
-	UfgFXH5Lel7ipp9bI8RplXH9gIgWVmKWsHvCgocu1d9P3YCaj5w==
-X-Google-Smtp-Source: AGHT+IGzMRpQURueoZCJcRy8QJvZ2wcGZhf1Iw/lbS3ZvjG9aXFEMw/enW89HpX8WC3jO5BJaEmayqbpzIyyL/BOlTU=
-X-Received: by 2002:a05:622a:458b:b0:456:7ef1:929d with SMTP id
- d75a77b69052e-45d9bda1f9fmr105171cf.12.1727982446639; Thu, 03 Oct 2024
- 12:07:26 -0700 (PDT)
+        bh=h+9r1lyWAAoHA75sblFF5HtpRJTBhoLTD+qKvD/N5EU=;
+        b=Yy9pWtviOoybGqk//Wj+nzacGab6CLiuTwpbOMKK4NkCrDwDc4b0gJs5i19vPJGGpM
+         /47XYCKN5iIgGTMDlleKhZ2WgKxmURCdH0gvS5+KnLwaukBp4WsNRY79c967V2v6SBFq
+         UCxQLVK7aeoBfTuTm5RLcSVVw4pVpYZO4hGPVc3tU74zc/mnXljfN8d6Rb1lQzeLi4mT
+         AZ/6WkRo6IJejaqaBU3aPMJMCznt1rUxW3qP+xUw5/rtpSG2txcEWlU87DI1W8qPP+I/
+         tgUMKRxS79Am149NS6vDn9n9AdxY9ObyyAAF5lwfrKRqbKtCTSvgWY637NtJBnvSe/pA
+         diJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXkwY9x0Vj7yKa0hyktE3K0flpoB6tVkSJ8KJhFABSDD/CRtvorn4iGWsQMGnWRiaZN9tA2YM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8+gRlYEcfgWSy72bHwkNBu619MQO3y2PHX6zykyj9OOEDnrYN
+	i0ySpIl/3h566yx/gNAx7A3pNjAWuPCcg5RGMgBIfiRofkSkaQfcuQ82jiXRgWYpWBUrQdU9qd8
+	rPv9N5wfRYWIbe2X8EUhQD7GHPQ4ToHpWEOjh
+X-Google-Smtp-Source: AGHT+IGdcEomv1z5AKFks4Uk6Kk/s9zZOnK6ekNr8n1MtvSE50ZOzRP+CGHm1K54MN6VmhgvSKfUzGo+eK9BuhoJUUc=
+X-Received: by 2002:ac8:64c8:0:b0:45d:840f:7c1d with SMTP id
+ d75a77b69052e-45d9bef9fa8mr60901cf.13.1727982616244; Thu, 03 Oct 2024
+ 12:10:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-10-sdf@fomichev.me>
- <CAHS8izNK+DiQUUkkvnPQvBRJiQ32WRO0Crg=nvOW9vn_4kCE+Q@mail.gmail.com> <Zv7OMcx2yff-QSO9@mini-arch>
-In-Reply-To: <Zv7OMcx2yff-QSO9@mini-arch>
+References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-11-sdf@fomichev.me>
+ <CAHS8izNwYgweZvD+hQgx_k5wjMDG1W5_rscXq_C8oVMdg546Tw@mail.gmail.com> <Zv7R_dRFZ0VGindy@mini-arch>
+In-Reply-To: <Zv7R_dRFZ0VGindy@mini-arch>
 From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 3 Oct 2024 12:07:12 -0700
-Message-ID: <CAHS8izOJaGk5g9m-DgBJE13XDcgdXNAbbBq9MmcjH229cSVoxg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 09/12] selftests: ncdevmem: Remove hard-coded
- queue numbers
+Date: Thu, 3 Oct 2024 12:10:02 -0700
+Message-ID: <CAHS8izM1MGAurmE76nO9vBkura-+kAwJET_Az6UhPsw49a1J7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 10/12] selftests: ncdevmem: Run selftest when
+ none of the -s or -c has been provided
 To: Stanislav Fomichev <stfomichev@gmail.com>
 Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
 	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 3, 2024 at 10:02=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+On Thu, Oct 3, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
 l.com> wrote:
 >
 > On 10/03, Mina Almasry wrote:
 > > On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomich=
 ev.me> wrote:
 > > >
-> > > Use single last queue of the device and probe it dynamically.
-> > >
+> > > This will be used as a 'probe' mode in the selftest to check whether
+> > > the device supports the devmem or not.
 > >
-> > Sorry I know there was a pending discussion in the last iteration that
-> > I didn't respond to. Been a rough week with me out sick a bit.
-> >
-> > For this, the issue I see is that by default only 1 queue binding will
-> > be tested, but I feel like test coverage for the multiple queues case
-> > by default is very nice because I actually ran into some issues making
-> > multi-queue binding work.
-> >
-> > Can we change this so that, by default, it binds to the last rxq_num/2
-> > queues of the device?
+> > It's not really 'probing'. Running ncdevmem with -s or -c does the
+> > data path tests. Running ncdevmem without does all the control path
+> > tests in run_devmem_tests(). It's not just probing driver for support,
+> > it's mean to catch bugs. Maybe rename to 'control path tests' or
+> > 'config tests' instead of probing.
 >
-> I'm probably missing something, but why do you think exercising this from
-> the probe/selftest mode is not enough? It might be confusing for the read=
-ers
-> to understand why we bind to half of the queues and flow steer into them
-> when in reality there is only single tcp flow.
+> Re 'probing' vs 'control path tests': I need something I can call
+> in the python selftest to tell me whether the nic supports devmem
+> or not (to skip the tests on the unsupported nics), so I'm reusing this
+> 'control path tests' mode for this. I do agree that there might be an
+> issue where the nic supports devmem, but has some bug which causes
+> 'control path tests' to fail which leads to skipping the data plane tests=
+...
 >
-> IOW, can we keep these two modes:
-> 1. server / client - use single queue
-> 2. selftest / probe - use more than 1 queue by default (and I'll remove t=
-he
->    checks that enforce the number of queues for this mode to let the
->    users override)
+> We can try to separate these two in the future. (and I'll keep the word
+> 'probing' for now since it's only in the commit message to describe the
+> intent)
 
-Ah, I see. Thanks for the explanation.
+Ah, got it. Thanks for the explanation.
 
-My paranoia here is that we don't notice multi-queue binding
-regressions because the tests are often run in data path mode and we
-don't use or notice failures in the probe mode.
-
-I will concede my paranoia is just that and this is not very likely to
-happen, but also if it is confusing to bind multi-queues and then just
-use one, then we could remedy that with a comment and keep the
-accidental test coverage. It also makes the test simpler to always
-bind the same # of queues rather than special case data and control
-path tests.
-
-But your 2 mode approach sounds fine as well. But to implement that
-you need more than to remove the checks that enforce the number of
-queues, right? In probe mode num_queues should be rxq_num/2, and in
-server mode num_queues should be 1, yes?
+Complete probing should call the binding API and assert that the
+return is EOPNOTSUPP or something like that. Other errors in the
+control path tests should be considered failures and not test skips.
+But probing is necessary to run this test and this is a good way to do
+it for now. We can improve later if necessary. Thanks!
 
 --=20
 Thanks,
