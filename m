@@ -1,131 +1,96 @@
-Return-Path: <netdev+bounces-131433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9ED98E7EC
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:47:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 508B298E7F2
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 02:50:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 189881F25224
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:47:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 825F01C20F80
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 00:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7270C8F7D;
-	Thu,  3 Oct 2024 00:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB6FB672;
+	Thu,  3 Oct 2024 00:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Cb6D0MH5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8pJzvlM"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62668D528;
-	Thu,  3 Oct 2024 00:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73A61DDC1;
+	Thu,  3 Oct 2024 00:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727916474; cv=none; b=m+s11f4e+kGAift6hmqHX3rgUrTfDjm8IIYFCCr9664xwYIbJ/I2yeseoNiVRpZa+iJA6SDJQt7HCAm2qGokuHngffN2isx0D2xrfT6vXluuj0orPWtkD4cjjf7FUe2pmS8TAh19Uo1PQFEgsvqxyr+gtHE0vU4ehuJAoyQFwxU=
+	t=1727916628; cv=none; b=QwauqUmwB3/p0T5OZp1QAbrGyDWpLg1gdj9ZkQYWo3+60yL2CTohAnBeXXJTJTY3Y2++T5Zb0902fXiO6R7hO4fN7nwXxlUkK6iXHI+P8h2i/BC8Xfuw1JVlthJIc4MGS0xKeBl8t9XFDnJ145B9X5x02Vql1at9C6k5L2MTFI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727916474; c=relaxed/simple;
-	bh=NUq2mrCaLF1rdvXmkXui5EFCnbg/FxEgMAtxIQIwzfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iAw2NhF5Vlk88GxL3bD9lSThtx4IFWnZ51Z4HJf0At3sQAwP9VRTxj0mmegLsn5psf8+eADvR8aIHGJvmCV52qAzN0Sac96m/CVrGA2AVYmndWZX7KXYoOlT83i8W6IJf94yJGNHIXn6JLCkb06FFG5+yhi6HCtWLZwX0wDCKcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Cb6D0MH5; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 88D83889C3;
-	Thu,  3 Oct 2024 02:47:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1727916469;
-	bh=kIblb8tGR6fk/1wR5vCritv1LtoFcFNCSySBUU+XPx8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Cb6D0MH5j8MPVSNecFq5+UjcoqBXGD0bI70hb15EmHgLR8mhYuOy+jrqBhSI2d4eh
-	 KezSv347rGjv3JmESwhsV5DRNNomAohAefOPsQRrsp/oQ1vKEF2gDUIAUDxMD4XgNa
-	 /yzyEK+pZXf6sWgxH40GsBu4RRiOXPViHr8Hk+FY0M655pdJ3YW2ZjBFZieEg6gJca
-	 Z9hhANyO7UMJHQaN3NuXubrtGYVUpbZUTBQtZHU56RmyAmAKn/Bphm3mU4hafIHoTU
-	 HOI7sQMdRFVMjGdgU6/JGhgE/SjhYXovEzIIzQQpk+iGEyrLpbasRU5GqGWS1F/K/J
-	 V8pvm9wuq5dww==
-Message-ID: <d0411d89-5c83-47b4-bef9-904b63cbc2c0@denx.de>
-Date: Thu, 3 Oct 2024 02:47:48 +0200
+	s=arc-20240116; t=1727916628; c=relaxed/simple;
+	bh=7CS+8ruNi97vFkvQRg8+CFUgLlqCp4XIqZjTp/7vlu8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=unsXKa6XqDQvCZ/ZA9QwkOO1MXpNYpxNj+Zb3zmYGmARi4QiJ+BxdHpekZ4LhNc0lJMtdVw2t5chngL3qzEck8i50edS1gkfOPPlTommWvHiSaGEYwvcbBxeHe2DgGiEvQD7SDzLrVrSXdmFeWLOdLuMKZWvFIhdybxkg0CjrEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8pJzvlM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F413FC4CEC2;
+	Thu,  3 Oct 2024 00:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727916628;
+	bh=7CS+8ruNi97vFkvQRg8+CFUgLlqCp4XIqZjTp/7vlu8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=N8pJzvlMbEffslMXmdwH4UBrlAjJ3BP5iWVCyLu0BLdokUxRpif2Ik4o3tJJqmvAR
+	 FtzYXY61i8tYSlUHfKo8rQyUaQW3/AlYJ84AqWDK8KN4th2XUfRz8uCINelWP5Bo8L
+	 w6W6PEFa0/m8VPyn8PZQhUKvJyrQ3rNxcVBe/maeqKNCKKdJUGBHsz18fLbjZ8qpsa
+	 7WJ+tyOi/Tngc32QOa+Yr5/Uiid1+zZ/xkkgW0XAgKVW34z52TR3c3WSryPEJDb9Rx
+	 t7RBsv+8RVhgfd28CsOysFdABwWy/5w8E2E6Ax+CxWFBmfm+hhIUWIbLHG/7JjWS4W
+	 ELVFkywqKF5Gw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 718E9380DBD1;
+	Thu,  3 Oct 2024 00:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] leds: trigger: netdev: Check offload ability on interface
- up
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-leds@vger.kernel.org,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Christian Marangi <ansuelsmth@gmail.com>,
- Christophe Roullier <christophe.roullier@foss.st.com>,
- Daniel Golle <daniel@makrotopia.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Lee Jones <lee@kernel.org>,
- Lukasz Majewski <lukma@denx.de>, Pavel Machek <pavel@ucw.cz>,
- kernel@dh-electronics.com, linux-stm32@st-md-mailman.stormreply.com,
- netdev@vger.kernel.org
-References: <20241001024731.140069-1-marex@denx.de>
- <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <1d72f370-3409-4b0f-b971-8f194cf1644b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: phy: qt2025: Fix warning: unused import DeviceId
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172791663128.1389757.14089095197291807474.git-patchwork-notify@kernel.org>
+Date: Thu, 03 Oct 2024 00:50:31 +0000
+References: <20240926121404.242092-1-fujita.tomonori@gmail.com>
+In-Reply-To: <20240926121404.242092-1-fujita.tomonori@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ tmgross@umich.edu, aliceryhl@google.com, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, lkp@intel.com
 
-On 10/3/24 1:21 AM, Andrew Lunn wrote:
-> On Tue, Oct 01, 2024 at 04:45:23AM +0200, Marek Vasut wrote:
->> The trigger_data->hw_control indicates whether the LED is controlled by HW
->> offload, i.e. the PHY. The trigger_data->hw_control = can_hw_control() is
->> currently called only from netdev_led_attr_store(), i.e. when writing any
->> sysfs attribute of the netdev trigger instance associated with a PHY LED.
->>
->> The can_hw_control() calls validate_net_dev() which internally calls
->> led_cdev->hw_control_get_device(), which is phy_led_hw_control_get_device()
->> for PHY LEDs. The phy_led_hw_control_get_device() returns NULL if the PHY
->> is not attached.
->>
->> At least in case of DWMAC (STM32MP, iMX8M, ...), the PHY device is attached
->> only when the interface is brought up and is detached again when the
->> interface is brought down. In case e.g. udev rules configure the netdev
->> LED trigger sysfs attributes before the interface is brought up, then when
->> the interface is brought up, the LEDs are not blinking.
->>
->> This is because trigger_data->hw_control = can_hw_control() was called
->> when udev wrote the sysfs attribute files, before the interface was up,
->> so can_hw_control() resp. validate_net_dev() returned false, and the
->> trigger_data->hw_control = can_hw_control() was never called again to
->> update the trigger_data->hw_control content and let the offload take
->> over the LED blinking.
->>
->> Call data->hw_control = can_hw_control() from netdev_trig_notify() to
->> update the offload capability of the LED when the UP notification arrives.
->> This makes the LEDs blink after the interface is brought up.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 26 Sep 2024 12:14:03 +0000 you wrote:
+> Fix the following warning when the driver is compiled as built-in:
 > 
-> Have you run this code with lockdep enabled? There have been some
-> deadlocks, or potential deadlocks in this area.
-
-Now I did on next 20241002 , no lockdep splat reported .
-
->> On STM32MP13xx with RTL8211F, it is enough to have the following udev rule
->> in place, boot the machine with cable plugged in, and the LEDs won't work
->> without this patch once the interface is brought up, even if they should:
->> "
->> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:green:wan", ATTR{trigger}="netdev", ATTR{link_10}="1", ATTR{link_100}="1", ATTR{link_1000}="1", ATTR{device_name}="end0"
->> ACTION=="add", SUBSYSTEM=="leds", KERNEL=="stmmac-0:01:yellow:wan", ATTR{trigger}="netdev", ATTR{rx}="1", ATTR{tx}="1", ATTR{device_name}="end0"
->> "
+>       warning: unused import: `DeviceId`
+>       --> drivers/net/phy/qt2025.rs:18:5
+>       |
+>    18 |     DeviceId, Driver,
+>       |     ^^^^^^^^
+>       |
+>       = note: `#[warn(unused_imports)]` on by default
 > 
-> Nice use of udev. I had not thought about using it for this.
-Is there some other way to configure the netdev-triggered PHY LEDs ?
-I still feel the udev rule is somewhat brittle and fragile, and also not 
-available early enough for default PHY LED configuration, i.e. the LEDs 
-are not blinking when I use e.g. ip=/nfsroot= when booting from NFS root 
-until the userspace started, which is not nice. The only alternative I 
-can imagine is default configuration in DT, which was already rejected a 
-few years ago.
+> [...]
+
+Here is the summary with links:
+  - [net,v3] net: phy: qt2025: Fix warning: unused import DeviceId
+    https://git.kernel.org/netdev/net/c/fa7dfeae041c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
