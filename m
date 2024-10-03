@@ -1,126 +1,190 @@
-Return-Path: <netdev+bounces-131753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9785B98F6E8
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:16:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8465498F6F3
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:20:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58E6D28195F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:16:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8ABA1C2251E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2E71AB531;
-	Thu,  3 Oct 2024 19:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D163C1ABEBB;
+	Thu,  3 Oct 2024 19:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WXBhVT07"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QlaqJiir"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970671A76CF
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 19:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09D7838DE0;
+	Thu,  3 Oct 2024 19:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727982996; cv=none; b=ONebT8UDuMf3FvmIUz6zUSy9shJMIXBO6lUOgKj3fmVk7LYHku02ocfZSNzGxBN2jxL0NUWgNyzu2UMd/IRN3TieAi2ziLSTeiBeqciq3wAjMgkkr9aFNQpzwsiWeR3DmU3FTdakU02cKYFgIxE0lNw7v+zMkXcxmAHtkgIHDnU=
+	t=1727983238; cv=none; b=N5ZaViVQiV+fM8cSGN7Gk0/KszI4qxoISQl1ALc23XzJ7M4Rdv9d3nfbS6RPZJZsSJyX9YE/6qg+KeJrKjMI6TAFtG+aK/i4cmh6B9ba3gwumK+izjZ9+0hGKtDqShrEKXFmZAnxQEtJZ0igTKvmVjz0dGDB5MvmHz4Dv3AygCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727982996; c=relaxed/simple;
-	bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eYikM5EwJQXYllrG7B5dI+W77uod6WzK4Bqe2ZTPc894LXRJEfaB+JDz2qJ/JyUFZ35C5EzaLKC0g7zPPkFOsUOqJPg9jdNfzQ0xKvPJG+i7h7M244OzpS76ruC8qDGE2OFY/FK9VHv5zVYDUlhUAcJGBdKLT1KuG8oxazggWCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WXBhVT07; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4582fa01090so50891cf.0
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 12:16:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727982993; x=1728587793; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
-        b=WXBhVT07tSscB+2et4mWwAud5nUElfCj0asBiedlRtZhC4tUbtK33ZGaT/mh8K0nvy
-         MsYCO2uITtU5JsP/6uNlQuLTLGz8705PpV+N28BuAzThCJBCbses0igyxPovHm2SPJNg
-         fBRwxNMx/vmuFrHPSN40MItrhK/jqqFEhHIpFlC/FwDKFNHmWg3SKTQz2UhK96bJlx3z
-         aH8H95slP20t2KyH1ysFLybU8Ie/Iw6fTdVLPUsX13kixUaCeHel8FI71Jeofk2GhmmO
-         LS2+UY9bFGriZcQaod4VqMLLfl7nNtRyu6bTOjyYy6Ldqcune5Q+IZ7af9xr3j1Zygff
-         u4Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727982993; x=1728587793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9Dr9FrVCifF+wc9L5JQPmQlw8IjuOSIeGmh0+hJxFoI=;
-        b=jpZjAP1GfJCm+P1ddyWnEBE461Eci5xfy1jAwMZTiPT6//xFkukDWBj3HTmckbuT9r
-         b8+0XkGWjKqiBLX5OzunvoMHWFmFbdM9OFohfgTxuoprKSvA1hL4G1u5v+LhC3f84c59
-         fdRYXkQn8QSrtjbK1hciGR2TJmwyMSH6LQ1rCvfbp3IMzco1CQsE+OP5JqeFTKaa9zY2
-         Fn1VzCB4VmWh3xj3KoMnSHvTvNLnewBp9jIhLI/HWTVOREwxC8crI3UZwtylNo83TGgy
-         5okbAk/L4EjP39mW81SjOsHSWlpqxauveSe9UNXN1WXvfMVSxkqMKOM7sYvuMG4pDkii
-         qa/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWTc933lGJVnOxjSYfSTJXSe/2+JVnsLfMGHxhm32T3DETxLWyfhTMoFse55hE703ccei5aQV4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzh+b27xQuFT4YsvZF6WCevwDwIV2B5RHZttsrgWoHFrTpbBmos
-	zYgapwY91IHIUj12lFAlXlPoLHuu47GjAv04FMbhUzZ0vpElHR5VYlO3q6/3LT0+B7o+pRG9sbA
-	7vwK1wAPBZoCh6+2iD+1d3ccwRYwxfKHWRyJp
-X-Google-Smtp-Source: AGHT+IGttVX/T4W/nx91eYNLNpPB6dx1tomc65fLqxgiGgP+3Hmp4QVcuJzkAyqaKx0620/V7y+qM/6ouf/r4bOx+/4=
-X-Received: by 2002:a05:622a:458b:b0:456:7ef1:929d with SMTP id
- d75a77b69052e-45d9bda1f9fmr151911cf.12.1727982993239; Thu, 03 Oct 2024
- 12:16:33 -0700 (PDT)
+	s=arc-20240116; t=1727983238; c=relaxed/simple;
+	bh=QcfpdhefRiCULY44xNpETpqBhegGJWDF9Zfep6H9ARQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bH3gQhNNaZ/8Bh1+jfsnwOLtSKyjYcf4agbERGyTQ8Yyi5jBU4QbgPReWT9gkanISh8raTnPf8X2iPskBdsG0zvy47BoM6MLBUqe67GVEvhMyXlH+nIIbIAhyKfab2JA070uih809xNUrAoHAuNogjXwvv+SKif/LxMej0VKLz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QlaqJiir; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 493HxbUI027450;
+	Thu, 3 Oct 2024 19:20:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=jx+Ty2cDthS2j1kWE+LI3v+F
+	3BsTWfmEG1aD2+Ghh8g=; b=QlaqJiir0lOh+GrXjCea/m42d4g8GWdIcJK4doWS
+	7HUWbj0H02X/MT8j9hW5fUmO7ej184A9feROq5AJkSzST4X3oD1+B2O2+BVaPTLs
+	IiG6ZEAf+YisEFw84hBcgTFP8r9wiThHuwR8zBQFDlfsUrIdbVc7SEe9LMSlr2yT
+	RsANc3Miyf8MfiH6Dkxf9bOAsO1k9C3PasVZ5AXifulzNPg/uQLHjQxUhuZrxbrE
+	XdlQW5g2ri2b5Nrb+B6VMe3ALt+OqibkXBvOiC5RdHJcl4W0aJuNJcuJrUYT20AC
+	qwittnw7DZWsQQjOfZOotTmamt4h1Wsvosw7w+iS9/RswQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42205h85yx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Oct 2024 19:20:15 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 493JKEIF028671
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 3 Oct 2024 19:20:14 GMT
+Received: from hu-bjorande-lv.qualcomm.com (10.49.16.6) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 3 Oct 2024 12:20:13 -0700
+Date: Thu, 3 Oct 2024 12:20:12 -0700
+From: Bjorn Andersson <quic_bjorande@quicinc.com>
+To: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
+CC: Andrew Lunn <andrew@lunn.ch>, <netdev@vger.kernel.org>,
+        Andy Gross
+	<agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
+        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
+        <john@phrozen.org>, Luo Jie
+	<quic_luoj@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>,
+        "Suruchi
+ Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+        "Lei Wei (QUIC)"
+	<quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <Zv7ubCFWz2ykztcR@hu-bjorande-lv.qualcomm.com>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-12-sdf@fomichev.me>
- <CAHS8izN6ePwKyRLtn2pdZjZwCQd6gyE_3OU2QvGRg0r9=2z3rw@mail.gmail.com> <Zv7TpwAgpVs2SjyH@mini-arch>
-In-Reply-To: <Zv7TpwAgpVs2SjyH@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 3 Oct 2024 12:16:19 -0700
-Message-ID: <CAHS8izOvRgAoJVH28wj3+7QF2kHPON71vsHOp-1NtBxDnugFHw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 11/12] selftests: ncdevmem: Move ncdevmem
- under drivers/net/hw
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: PIjJt4geeiesuDk8JlZI-dtUD6i0DB5Q
+X-Proofpoint-ORIG-GUID: PIjJt4geeiesuDk8JlZI-dtUD6i0DB5Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ malwarescore=0 clxscore=1011 mlxlogscore=999 phishscore=0
+ priorityscore=1501 impostorscore=0 lowpriorityscore=0 spamscore=0
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410030136
 
-On Thu, Oct 3, 2024 at 10:26=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 10/03, Mina Almasry wrote:
-> > On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomich=
-ev.me> wrote:
-> > >
-> > > This is where all the tests that depend on the HW functionality live =
-in
-> > > and this is where the automated test is gonna be added in the next
-> > > patch.
-> > >
-> >
-> > Tbh I don't like this very much. I wanted to take ncdevmem in the
-> > opposite direction: to make at least the control path tests runnable
-> > on netdevsim or something like that and have it not require any HW
-> > support at all.
-> >
-> > But I see in the cover letter that Jakub himself asked for the move,
-> > so if there is some strong reason to make this in hw, sure.
-> >
-> > Does it being under HW preclude future improvements to making it a
-> > non-HW dependent test?
->
-> I'm moving it under drivers/net/hw only because I want ncdevmem to end
-> up as a TEST_GEN_FILES dependency (drivers/net/hw is the directory
-> that the vendors will eventually run against their HW so this is
-> where the HW-dependent tests are gonna stay for now).
+On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
+> On 10/3/2024 2:58 AM, Andrew Lunn wrote:
+> > On Thu, Oct 03, 2024 at 02:07:10AM +0530, Kiran Kumar C.S.K wrote:
+[..]
+> >> 2. List of patch series and dependencies
+> >> ========================================
+> >>
+> >> Clock drivers (currently in review)
+> >> ===================================
+> >> 1) CMN PLL driver patch series:
+> >> 	Currently in review with community.
+> >> 	https://lore.kernel.org/linux-arm-msm/20240827-qcom_ipq_cmnpll-v3-0-8e009cece8b2@quicinc.com/
+> >>
+> >>
+> >> 2) NSS clock controller (NSSCC) driver patch series
+> >> 	Currently in review with community.
+> >> 	https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
+> >>
+> >>
+> >> Networking drivers (to be posted for review next week)
+> >> ======================================================
+> >>
+> >> The following patch series are planned to be pushed for the PPE and PCS
+> >> drivers, to support ethernet function. These patch series are listed
+> >> below in dependency order.
+> >>
+> >> 3) PCS driver patch series:
+> >>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
+> >>         be enabled in drivers/net/pcs/
+> >> 	Dependent on NSS CC patch series (2).
+> > 
+> > I assume this dependency is pure at runtime? So the code will build
+> > without the NSS CC patch series?
+> 
+> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
+> PCS's MII channels. To represent this in the DTS, the PCS node in the
+> DTS is configured with the MII Rx/Tx clock that it consumes, using
+> macros for clocks which are exported from the NSS CC driver in a header
+> file. So, there will be a compile-time dependency for the dtbindings/DTS
+> on the NSS CC patch series. We will clearly call out this dependency in
+> the cover letter of the PCS driver. Hope that this approach is ok.
+> 
 
-Ah, OK. Makes sense then.
+So you're not going to expose these clocks through the common clock
+framework and use standard DeviceTree properties for consuming the
+clocks?
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+I expect the bindings for these things to go through respective tree
+(clock and netdev) and then the DeviceTree source (dts) addition to go
+through the qcom tree.
 
-Thanks!
+The only remaining dependency I was expecting is the qcom tree depending
+on the clock and netdev trees to have picked up the bindings, and for
+new bindings I do accept dts changes in the same cycle (I validate dts
+against bindings in linux-next).
 
---=20
-Thanks,
-Mina
+Regards,
+Bjorn
+
+> > 
+> > This should be a good way to start, PCS drivers are typically nice and
+> > simple.
+> > 
+> 
+> Sure, thanks for the inputs.
+> 
+> > 	Andrew
+> 
+> 
 
