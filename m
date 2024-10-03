@@ -1,120 +1,113 @@
-Return-Path: <netdev+bounces-131521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D872998EBF5
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:58:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEC598EBFD
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 11:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15A4C1C21868
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:58:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89D8D1C2204D
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 09:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB8613E8AE;
-	Thu,  3 Oct 2024 08:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f2a3Mqy1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBC413D509;
+	Thu,  3 Oct 2024 09:02:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F36113DDA7
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 08:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1AE126C13
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 09:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727945931; cv=none; b=ZfNQ/wcsgqerugz1ysue7utDsnqnecs3AFob63nTAnygTxsDIwAdvLG1kJwD1Y0kXxef5BSIy5Sq9dptUcvDeHSxASG7+Npg0LRoDOfc6xSUOpD9iCbjDaJj9jpnCV9+ENTLwwVxALjiE2B8bJ6gWhCW14gNWUx8MwFS9QVamWc=
+	t=1727946145; cv=none; b=fktEntWSf/B3BZFvPD/rEJC7I/xpnDvtvhXxo7MjGOsTSLr5ubSslktNiLBLc/YlSxtOVQwfdwoHdgwO+x2MLht8tgL04KmxEpBr0AemwmlhRHt709eL1MOv8xmSgJDK3EuDvKhU/Ia2xDWiiE9O7blMDw7ZLuDumKBc48N07CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727945931; c=relaxed/simple;
-	bh=yJURDnNDQiZUE90QYDh4jdtUYSpZbO3Ppah3qoVkm50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6MZW1KmNpWUnN7h/dx3/HihWFNJJvFYebwsaAWN7qIP7qfOoh2i365RcYGs7euNIALVeHEuLl24tEUSt8yOpL8fccb6DS1PbnOzrwS/S2cENI+ToI1dTmb8bIzenlmCXGDCxP0B/E9S2ZFvwPf4BjVhqGksvqVCNPPGU0YztI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f2a3Mqy1; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UFLXtPkTLY9YWYZuXI/P16YFfhLwH7LyfPFSOm6FhPE=; b=f2a3Mqy1/UmSRsEMEZEmFw98V1
-	diNLZbOIBVVY8BoDG/fZ8cqJ6SZSuVJMdn8sHRWgiyZ4RMEaRy2Slj56JvXptUHX4GOIxhd5Zv+RC
-	moH2xuEcEti3ftKGrPd+K+8EXFP5m/hRMW4/aeXAH2Xz9IpNXHpLq72hBqQ+YhupXuuXuqAY9PAcn
-	ja4ggHIvFm/b3NXcUPbBZ8dAI2w8ETSLk8eaoion8MzHPh8UokFR35lZqzEkigfHDV+QssbXYKQrf
-	oYXu0nD/paz6vYVqU23/H9TkER5gQ0an6OV1LBEhznG7EhDTUZBz4NJyqyuWkRoubFv5SqaGGY2FP
-	6kqe37bQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48300)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swHf9-0000EN-0r;
-	Thu, 03 Oct 2024 09:58:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swHf1-0008PL-23;
-	Thu, 03 Oct 2024 09:58:11 +0100
-Date: Thu, 3 Oct 2024 09:58:11 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: Re: [PATCH net-next 01/10] net: pcs: xpcs: move PCS reset to
- .pcs_pre_config()
-Message-ID: <Zv5co5giM1AcQxD6@shell.armlinux.org.uk>
-References: <ZvwdKIp3oYSenGdH@shell.armlinux.org.uk>
- <E1svfMA-005ZI3-Va@rmk-PC.armlinux.org.uk>
- <fp2h6mc2346egjtcshek4jvykzklu55cbzly3sj3zxhy6sfblj@waakp6lr6u5t>
- <ZvxxJWCTD4PgoMwb@shell.armlinux.org.uk>
- <68bc05c2-6904-4d33-866f-c828dde43dff@lunn.ch>
- <pm7v7x2ttdkjygakcjjbjae764ezagf4jujn26xnk7driykbu3@hfh4lwpfuowk>
- <84c6ed98-a11a-42bf-96c0-9b1e52055d3f@lunn.ch>
- <zghybnunit6o3wq3kpb237onag2lycilwg5abl5elxxkke4myq@c72lnzkozeun>
- <acdc1443-15ca-4a35-aee0-ddf760136efa@lunn.ch>
+	s=arc-20240116; t=1727946145; c=relaxed/simple;
+	bh=T8RZmIBTG2OwlLxOCYttHUNlzr3vc6lxdcfnyfa1QWU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=o7e3NQqgFhlsACf99D3EqWbZOJADNZ3Qx8VyMx4p8e2g5pQHqJ8R0hqUhZrKQVv94CCPq6SRuZ03VUQ30aXmHnVs7q7JB8HEtowzWi1yB6CfbUBZg4If7xabNJjzO6WawMxKOooEzcUXr/Q1o+xceIhzg0bWx4t4/yaE+85F0S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a0cb7141adso9569385ab.1
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 02:02:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727946143; x=1728550943;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=96/JtGcYs5X55rRgUMx9WctVFVXj15MbvF5pfz7LX0Y=;
+        b=Erzz7rsR5Dsj8xhJc6semAtYS/BW7TvytQ3QU3n//5Aj5Ld5XjAABz8lFg8YNOZFrf
+         LpqwjIWUSR6GE+79j9As+1yFNwdO0oAgPhJrYBYvnw8G9VKRlzS7y+qe9Y1MmC13vLQD
+         rkgfQ/S15/zmD81BgJw+alsaH4hFy3ImNCgfDi3ozW5cm+zS2+Qjnf+/m1WqyBZlwL1i
+         4Dz3SJ2J/JCihxKux+G0WnYLHkyImwBhTt62hsf4s4GRwg790cAmlDBNN0YGDdTEACE+
+         mR9/nyGa4Do5YRli9dPRzJp0dEVBbBJWDDcxR1H1OG2Kty5TXJ6OXfQeb56mizFKyCRm
+         pP4g==
+X-Forwarded-Encrypted: i=1; AJvYcCXB4e/6KBZUpUB+6t19XzIPLBRjIcSsKqCtTZulzNAyCti7usQ89IGlVJnQ5bZQU/HsM/aautM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEW6X7+UNYEk8pr49NVCBzO17oPAlXKJsYZmk1imcXyCfSfeqY
+	21WFj5hVKarKktdukORk8dCj0kCpgiQDijfvgi90nI5jNVyTdVU3EDuJASgRQjTXT4pfHTqOjKe
+	+Dq6l4/5kjfBbiIxawl1lHcPdOzPcRW5/OycTVVlKwyEXdWA73MV5ZiQ=
+X-Google-Smtp-Source: AGHT+IFTDuSIiRy3Lg7bKFADP5fMtd3Gi5LEj2NejCxT2x6PPpEHQP6M8FlKFEvsvD3sc2ctmcc2DhAxcpkrXAn0atiSiF2UeRcM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <acdc1443-15ca-4a35-aee0-ddf760136efa@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6e02:1d09:b0:3a0:c7f9:29e2 with SMTP id
+ e9e14a558f8ab-3a3659440afmr59958735ab.19.1727946143033; Thu, 03 Oct 2024
+ 02:02:23 -0700 (PDT)
+Date: Thu, 03 Oct 2024 02:02:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66fe5d9f.050a0220.28a3b.020e.GAE@google.com>
+Subject: [syzbot] Monthly net report (Oct 2024)
+From: syzbot <syzbot+listfee1254971fd4ce8fc71@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Oct 03, 2024 at 02:04:36AM +0200, Andrew Lunn wrote:
-> > Anyway the Russell' patch set in general looks good to me. I have no
-> > more comments other than regarding the soft-reset change I described in
-> > my previous message.
-> 
-> Sorry, i've not been keeping track. Have you sent reviewed-by: and
-> Tested-by: for them?
+Hello net maintainers/developers,
 
-Of course Serge hasn't. He hasn't even said he's tested them. He's more
-concerned with the soft-reset change to do anything else other than
-whinge about that.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-After the previous debacle over the stmmac PCS cleanup (that I've given
-up with) I decided later in the series of XPCS cleanups I have to touch
-stmmac as little as possible because I don't want to interact with
-Serge anymore. This has now been reinforced further, to the extent that
-I'm now going to ask Serge to _remove_ all usage of phylink from stmmac
-for this very reason - I do not wish to interact further with Serge.
+During the period, 11 new issues were detected and 10 were fixed.
+In total, 115 issues are still open and 1524 have been fixed so far.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  182129  Yes   possible deadlock in team_del_slave (3)
+                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
+<2>  23127   Yes   unregister_netdevice: waiting for DEV to become free (8)
+                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
+<3>  6218    Yes   BUG: workqueue lockup (5)
+                   https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
+<4>  5555    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<5>  3415    Yes   possible deadlock in smc_switch_to_fallback (2)
+                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
+<6>  2547    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
+                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
+<7>  2245    Yes   WARNING in inet_sock_destruct (4)
+                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
+<8>  1744    Yes   WARNING in rcu_check_gp_start_stall
+                   https://syzkaller.appspot.com/bug?extid=111bc509cd9740d7e4aa
+<9>  1408    Yes   possible deadlock in team_port_change_check (2)
+                   https://syzkaller.appspot.com/bug?extid=3c47b5843403a45aef57
+<10> 951     Yes   INFO: task hung in linkwatch_event (4)
+                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
