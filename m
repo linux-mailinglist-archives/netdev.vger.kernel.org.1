@@ -1,181 +1,128 @@
-Return-Path: <netdev+bounces-131780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C8698F8DE
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:23:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11BC898F8ED
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAA921F21837
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9028280E50
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12971AC429;
-	Thu,  3 Oct 2024 21:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hOVknHXL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6691A4F1C;
+	Thu,  3 Oct 2024 21:30:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C8926A8D2;
-	Thu,  3 Oct 2024 21:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F24F12EBDB;
+	Thu,  3 Oct 2024 21:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727990634; cv=none; b=sDzN0qNKkBtEFZBgh4EGndL/RSlryluOfebMn+k2NMqrgicuUnqXGowJMqltAwai8xZ4zZ7bW4ATw9jIXVWfSKy7/5YGE69+OagiwfkhhZO7k0oxVaOn+Js3crooylm1YHpInnH8g7OjdVJfovrVFop1eOkDxP/APi3z7EXj+js=
+	t=1727991016; cv=none; b=IEHXFG2DJMjIe7oa55lejvyv6hLZJ/AdL1kB3hHvixeYd0Ap7lUI6MKEA12h8bZQC08g7BnrInzHFrqnRGQYsdg23VFFHnLr3fyaot/ojv2V5KPQneEZh0UjvU/VCDYzrnlOGk5os8jdiocLKDHiy1lGGYFav80FqMDsW+PC0QU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727990634; c=relaxed/simple;
-	bh=XkPodv5x+4X8rRam3/OSCeg7VfU/gmndd4VUsGSa9xk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nso5hyZOmS0YORXy0poB0SsdLsnUoad2v2gxVe3IIgs2mbCCIyscx4WXo/BfjLHVIePNE9Uu1bGQMumBvLN14pSdY2AVwLT1dBFdfOozvTlnSVcMW9r+lDcYwAP52jMU6NjftGZ2lPS0uqrTi/6P69vLPhkk7uoVL9NQKBeL0+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hOVknHXL; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20ba8d92af9so11156155ad.3;
-        Thu, 03 Oct 2024 14:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727990633; x=1728595433; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OZJebFLhmCbD8vxz1djIvYLFLd1HvoGFeWNCSLBmx+0=;
-        b=hOVknHXLYdTu549rXWZXiOEQi2RWuMvtrnlEbSRBDXRIsRvEPfpLYxJc6/AO8opUUl
-         gxkg7Xbt3SCwYlV3Vwh36SY7b3Mgj9DypbPtefNaa0qV4p9AiYppfDqfsC2dy8I51gwh
-         Vzew0kGcQwA/I5WhEWibV/b6mpU5ychSi5yu3/JbVMXEv7s8d90xY1Et29qxBFZtJNS0
-         xVp0lCnVgt3xT4oa2UM+5rapqIWaMNpOToO7V8+YtdUNLw2lIxJMwXYqw0KqUnxj29BS
-         HxY5oUxn0kLp5X+i2tmIIaq4extVP5j730JO4zgZMifjHF7HQq/+df4bJxcbzPLv/iuG
-         43Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727990633; x=1728595433;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OZJebFLhmCbD8vxz1djIvYLFLd1HvoGFeWNCSLBmx+0=;
-        b=Q9T2eUgwAtLVkL3ZZZtKRhA9jN/b4eRJLA3nvq1x0nPhIgmi4xig4LHr8gCIuNq/nk
-         wdMX0CGDykHd5nUfRjEEVjTNUZNQvXYnNROImnJXnBB/quuaPd77TsoheEmQ4HoSvbve
-         RLL8kTBDWcPR7NcVrFob4AiY6IAKtdxxF6jgeR89d03qc7D3Lsgf4HOOPJeJglMpdnMF
-         wrhmvdhRNJ4nne7ryByoAJPu68id9ZYCtxxVb4Ck7niYHbbcprFlUqikqz7TtxisRmmv
-         lu/1Tm1VwK1mYHpveooyyBl4yGlKUpumKtRl0cW8+7K8uqIJrI/Yxo9ovMqYwMXRIE6F
-         6nqw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6v05RMVhYA2/70u53i0/tjJsfpgDvr3+bA5F1oXQmvFbSNmEZucliXufNz18Fu1XfAtw8ovEsCMnK7po=@vger.kernel.org, AJvYcCX628lg6YZOXLupXnN3qfHYyBSLXJmlGw34Wkb8B3KectsB/H9+9N0RRbVFgK6jqXGIGPtK3y9I@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrFyULEmYrZf1eeYjvci76bJritG++s+oDp/QQeiHvAucwR377
-	T6RiPD6GnwYPWd+s+Uib68hqNb8+hJ5yeexc73Me/t3fUMtHU2nB
-X-Google-Smtp-Source: AGHT+IG3qat9ib2ZYD4jI7+42ZtVBUMBwVsYIF39VxObv3F3h/MnHY1JxztwfCd/tpIGBtPR6nxE3Q==
-X-Received: by 2002:a17:902:ecd1:b0:207:2093:99bb with SMTP id d9443c01a7336-20bfe03529bmr6608385ad.31.1727990632635;
-        Thu, 03 Oct 2024 14:23:52 -0700 (PDT)
-Received: from luna.turtle.lan ([2601:1c2:c184:dc00:b8ac:3fa:437b:85fa])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beead2541sm13271745ad.19.2024.10.03.14.23.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 14:23:52 -0700 (PDT)
-From: Sam Edwards <cfsworks@gmail.com>
-X-Google-Original-From: Sam Edwards <CFSworks@gmail.com>
-To: Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Sam Edwards <CFSworks@gmail.com>
-Subject: [PATCH] net: dsa: bcm_sf2: fix crossbar port bitwidth logic
-Date: Thu,  3 Oct 2024 14:23:01 -0700
-Message-ID: <20241003212301.1339647-1-CFSworks@gmail.com>
-X-Mailer: git-send-email 2.44.2
+	s=arc-20240116; t=1727991016; c=relaxed/simple;
+	bh=oCxUZ57wnVraO3zmW4BR6HiP4N+sk6KMjuzqh6uY5Kc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZBHtf966xq1YL0njbXim9+aj0P3EpBqzny+jyT+LUYj2ytjjXoL00TN9QVKGumtOBcrqeVwpfJGRQCw1uPMCTzkFxTwBvO/XRhra0wcMDrrznSED3jZPkMC5bhvh75b3JBVWgddnNqdN15j8SycIr5p2SZ12fZtVMn3ccCQ4FpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XKPvm23Jpz20pqL;
+	Fri,  4 Oct 2024 05:29:40 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id C36B9140109;
+	Fri,  4 Oct 2024 05:30:10 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 4 Oct 2024 05:30:06 +0800
+Message-ID: <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
+Date: Fri, 4 Oct 2024 00:30:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
+	<matthieu@buffet.re>
+References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
+ <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
+ <20241003.wie1aiphaeCh@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241003.wie1aiphaeCh@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-The SF2 crossbar register is a packed bitfield, giving the index of the
-external port selected for each of the internal ports. On BCM4908 (the
-only currently-supported switch family with a crossbar), there are 2
-internal ports and 3 external ports, so there are 2 bits per internal
-port.
+On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
+> Please also add Matthieu in Cc for the network patch series.
+> 
+> On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
+>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> should not restrict bind(2) and connect(2) for non-TCP protocols
+>> (SCTP, MPTCP, SMC).
+>>
+>> Closes: https://github.com/landlock-lsm/linux/issues/40
+>> Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   security/landlock/net.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/security/landlock/net.c b/security/landlock/net.c
+>> index bc3d943a7118..6f59dd98bb13 100644
+>> --- a/security/landlock/net.c
+>> +++ b/security/landlock/net.c
+>> @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
+>>   		return -EACCES;
+>>   
+>>   	/* Checks if it's a (potential) TCP socket. */
+> 
+> We can extend this comment to explain that we don't use sk_is_tcp()
+> because we need to handle the AF_UNSPEC case.
 
-The driver currently conflates the "bits per port" and "number of ports"
-concepts, lumping both into the `num_crossbar_int_ports` field. Since it
-is currently only possible for either of these counts to have a value of
-2, there is no behavioral error resulting from this situation for now.
+Indeed, I'll do this.
 
-Make the code more readable (and support the future possibility of
-larger crossbars) by adding a `num_crossbar_ext_bits` field to represent
-the "bits per port" count and relying on this where appropriate instead.
+> 
+>> -	if (sock->type != SOCK_STREAM)
+>> +	if (sock->type != SOCK_STREAM || sock->sk->sk_protocol != IPPROTO_TCP)
+> 
+> I think we should check sock->sk->sk_type instead of sock->type (even if
+> it should be the same).  To make it simpler, we should only use sk in
+> current_check_access_socket():
+> struct sock *sk = sock->sk;
 
-Signed-off-by: Sam Edwards <CFSworks@gmail.com>
----
- drivers/net/dsa/bcm_sf2.c | 9 ++++++---
- drivers/net/dsa/bcm_sf2.h | 1 +
- 2 files changed, 7 insertions(+), 3 deletions(-)
+Agreed.
 
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index 0e663ec0c12a..3ae794a30ace 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -513,12 +513,12 @@ static void bcm_sf2_crossbar_setup(struct bcm_sf2_priv *priv)
- 	u32 reg;
- 	int i;
- 
--	mask = BIT(priv->num_crossbar_int_ports) - 1;
-+	mask = BIT(priv->num_crossbar_ext_bits) - 1;
- 
- 	reg = reg_readl(priv, REG_CROSSBAR);
- 	switch (priv->type) {
- 	case BCM4908_DEVICE_ID:
--		shift = CROSSBAR_BCM4908_INT_P7 * priv->num_crossbar_int_ports;
-+		shift = CROSSBAR_BCM4908_INT_P7 * priv->num_crossbar_ext_bits;
- 		reg &= ~(mask << shift);
- 		if (0) /* FIXME */
- 			reg |= CROSSBAR_BCM4908_EXT_SERDES << shift;
-@@ -536,7 +536,7 @@ static void bcm_sf2_crossbar_setup(struct bcm_sf2_priv *priv)
- 
- 	reg = reg_readl(priv, REG_CROSSBAR);
- 	for (i = 0; i < priv->num_crossbar_int_ports; i++) {
--		shift = i * priv->num_crossbar_int_ports;
-+		shift = i * priv->num_crossbar_ext_bits;
- 
- 		dev_dbg(dev, "crossbar int port #%d - ext port #%d\n", i,
- 			(reg >> shift) & mask);
-@@ -1260,6 +1260,7 @@ struct bcm_sf2_of_data {
- 	unsigned int core_reg_align;
- 	unsigned int num_cfp_rules;
- 	unsigned int num_crossbar_int_ports;
-+	unsigned int num_crossbar_ext_bits;
- };
- 
- static const u16 bcm_sf2_4908_reg_offsets[] = {
-@@ -1288,6 +1289,7 @@ static const struct bcm_sf2_of_data bcm_sf2_4908_data = {
- 	.reg_offsets	= bcm_sf2_4908_reg_offsets,
- 	.num_cfp_rules	= 256,
- 	.num_crossbar_int_ports = 2,
-+	.num_crossbar_ext_bits = 2,
- };
- 
- /* Register offsets for the SWITCH_REG_* block */
-@@ -1399,6 +1401,7 @@ static int bcm_sf2_sw_probe(struct platform_device *pdev)
- 	priv->core_reg_align = data->core_reg_align;
- 	priv->num_cfp_rules = data->num_cfp_rules;
- 	priv->num_crossbar_int_ports = data->num_crossbar_int_ports;
-+	priv->num_crossbar_ext_bits = data->num_crossbar_ext_bits;
- 
- 	priv->rcdev = devm_reset_control_get_optional_exclusive(&pdev->dev,
- 								"switch");
-diff --git a/drivers/net/dsa/bcm_sf2.h b/drivers/net/dsa/bcm_sf2.h
-index f95f4880b69e..4fda075a3449 100644
---- a/drivers/net/dsa/bcm_sf2.h
-+++ b/drivers/net/dsa/bcm_sf2.h
-@@ -75,6 +75,7 @@ struct bcm_sf2_priv {
- 	unsigned int			core_reg_align;
- 	unsigned int			num_cfp_rules;
- 	unsigned int			num_crossbar_int_ports;
-+	unsigned int			num_crossbar_ext_bits;
- 
- 	/* spinlock protecting access to the indirect registers */
- 	spinlock_t			indir_lock;
--- 
-2.44.2
+> 
+> Could you please also do s/__sk_common\.skc_/sk_/g ?
 
+Ofc
+
+Btw, there is probably incorrect read of skc_family in this function
+[1]. I'll add READ_ONCE for sk->sk_family.
+
+[1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
+
+> 
+>>   		return 0;
+>>   
+>>   	/* Checks for minimal header length to safely read sa_family. */
+>> -- 
+>> 2.34.1
+>>
+>>
 
