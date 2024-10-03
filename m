@@ -1,150 +1,135 @@
-Return-Path: <netdev+bounces-131517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7918B98EBB0
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:34:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04B6298EBDD
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:47:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB4241C224B4
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:34:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DFAAB2374E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456C413C9A9;
-	Thu,  3 Oct 2024 08:34:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F99B13D8AC;
+	Thu,  3 Oct 2024 08:47:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hP/9M23Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2Q4hm1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1547213A869;
-	Thu,  3 Oct 2024 08:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC30213664E
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 08:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727944488; cv=none; b=BgtBZHW3g4C1C/T4MjBl9DyhvhK7UXR4dJYpcr3SNZ8o6zNzbXUw1t0FidVY0m4Z+L5N1djuxaaHGYSkEq3kZLIArBAtL43rIahFhwP75NDj9mz7eXupMNuPwQZNZe7GJ5ZsWziKxcs549H9AuTqDEIBcdKhAbVkjR9UQCRmD2E=
+	t=1727945227; cv=none; b=ZuBbv9V3L3W0gSrhhzSgdOShdX8yHRG3mY3rn0cR2RlM2B+VgTZz/NmsdZejkUZQiwOZKfcok42YSUE+dt49NNiBZkcTLYQGCQOABBk4CQCXdW2ThDShUGVNBo7ioFIBwFLqZFf/hhQpQj1aWUSE40p/HYr343GcH+12NTgnjko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727944488; c=relaxed/simple;
-	bh=8aTsuHACr2frjXo/0NtlfWhF09Us83P33NSNYLo1kng=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rLIbyj6G5JAYk7JttiLI7nxa3VQw+fF6ZU8N8nIHCtNz8oruCjdJ5iLh1mHkZkO1Q73QYKxAtp1OKFt5RNXD1qJFKtmQWTAZet02Ls8JF9iT823G2C32izXb5dyZeh5UdbmjqW/27aMN+qbf9THMqxSoRq+IqP+QJzRg+6s1Sdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hP/9M23Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0284DC4CEC7;
-	Thu,  3 Oct 2024 08:34:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727944487;
-	bh=8aTsuHACr2frjXo/0NtlfWhF09Us83P33NSNYLo1kng=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hP/9M23QfCL2QJicEtiHlHfYTLSTs7/IV4wJ55lhG3N7VPOYG1CGUpKr9A1nmDE8l
-	 i9Qpf1F7FcLWpy6+g032wuarLiKbIsPglc27m3ZwH6Cb5F1JMZ03RbnsZPMjBB1eOD
-	 s4l/ZZLB41h+yY6usQ39t3w/1MO7oUsefoSLGFZTK7trz1M4mjmrPQiS+ihjOPK266
-	 s5lblsvik4I2nd1MP5vrE4wY0A6yp4eWySCUpU67zryYJOKByDZp1C/0bIOSnbmNsB
-	 pgV5jaMeX2AVXaX4WOh9nWuOvOoB4CJtONTbWc5ss6BD5wOO+IynAXSb0HZqalcaUG
-	 Lc7DXUK5ZXOBQ==
-Date: Thu, 3 Oct 2024 10:34:45 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Charan Pedumuru <charan.pedumuru@microchip.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] dt-bindings: net: can: atmel: Convert to json schema
-Message-ID: <xykmnsibdts7u73yu7b2vn3w55wx7puqo2nwhsji57th7lemym@f4l3ccxpevo4>
-References: <20241003-can-v2-1-85701d3296dd@microchip.com>
+	s=arc-20240116; t=1727945227; c=relaxed/simple;
+	bh=nh3iKVHuIov7eMZfm8q1FUzsC0zhjNRt9MDTrXyNxck=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JvicNswXlE9T7E0spG9LP3ffLSwvxfZqVb5+auWsmcCDGwu/LzcWJpzYeA5A7/4iWn8s8V2Ihv/EYiZTFE4loVhPPLesJNDLb/MI7/IeGfPZTN4Z7ylc7dHf5s4PTyRSXBp8IyowcBdObJO5cWC3AG6oWW3F4Mak4UD6ZDyOiGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2Q4hm1y; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c89e66012aso774013a12.2
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 01:47:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727945224; x=1728550024; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tSiPzrmzoIoMCOJCQ39CROW4s9bHVIocbjOAHp4Gd2o=;
+        b=U2Q4hm1yICJi3tKuj/girfaof7VHiCAygejQ/bLBqYhwc4p/eQVYYjd0q+10U04ytK
+         FvjGvGJhWuXChJuZY0HF4p5MVrTyEfoNXZqg0flrjH/4ubZuP9/5+TV2+rqtLWzS8x2q
+         Lh9bxRADECQBGtTKVhAQdbbIpd/yeQriPCmKc6VPX0HNpbz6rCzfDVrVatw/OINsCmSP
+         dYU6hVnEJxpsWqpwY04CsOMhk5fvg9TvCizhAzBPd8qQj4y9XpJStdvCuArjGW/oHaNE
+         iM+ZF/AeKqm2mO9q5y9UfAOR8z71DlSiWDaGGB6bIFKuXAaoO7/0Q45e6gutvDi9yobf
+         4bgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727945224; x=1728550024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tSiPzrmzoIoMCOJCQ39CROW4s9bHVIocbjOAHp4Gd2o=;
+        b=QTeYogcpR0Tu+WQMKet7OCThoH3lirmJmElROJEFKgYqdTDl4clrjJUViG4Z+nAUDs
+         koXfIY3t1TYUZav6GPXdCr6jhSeK/wgH0Pr8BUGVNqkMgDWeE7DK44o0bh6jQB3+esY+
+         HMX7Z3ytW8bBLhdX9f5jC1WnIWq08Ox8Z2FKbV+Bo/RYZ1Tw86je6iSnS+hJLPXiXpht
+         xg3ii2Rmgq8eLmFS3WptWmxqR7XRQtEc1Q1qFPOPxDkhWE2y5yChdxayYeTIjCxFOk8Z
+         RbDFAL9zskBCn0LKsv0WgR0b7x8zqPge+iJ5Lbz493qi45In4bZj827oWw0XhuqF2ATl
+         VmIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXknGwsVm94nobYq+9ySQRk/FIDgc/SKxRivQu5KPOhg88TYAPMFiQX+dL2D1iRilnRlOVcUTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwefOidJkkpf9+zGzKgzjpapeLMZHGEk+x0qIAIh+uXP7iYPbol
+	ZDBpPXzF4igcP/hy8CRyUh99PYzkMRJMfvtKRyuNzeqhJHlpTEPjJ5Hvi+xj5jR2IYt7PpB4R9l
+	KiAkrh8L7lEyGNAZhiBgPiOaYUABHiM0airey
+X-Google-Smtp-Source: AGHT+IF+GPKQZszYUr0X8NGccGwW03+Jj//xlIgGpJ/U2dxYRVqSMGOJIQZmNewncQEjXeMhAvXtb9pvXPXWEX8CFMg=
+X-Received: by 2002:a05:6402:34c6:b0:5c5:b679:cf29 with SMTP id
+ 4fb4d7f45d1cf-5c8b18eea38mr4612747a12.1.1727945224017; Thu, 03 Oct 2024
+ 01:47:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241003-can-v2-1-85701d3296dd@microchip.com>
+References: <20241003082231.759759-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20241003082231.759759-1-dongml2@chinatelecom.cn>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 3 Oct 2024 10:46:50 +0200
+Message-ID: <CANn89iKfvO1Z8_ntCre-nG+6jrq-Lf0Hym_D=+w68beZps4Atg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: tcp: refresh tcp_mstamp for compressed ack
+ in timer
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Menglong Dong <dongml2@chinatelecom.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 03, 2024 at 10:37:03AM +0530, Charan Pedumuru wrote:
-> Convert atmel-can documentation to yaml format
-> 
-> Signed-off-by: Charan Pedumuru <charan.pedumuru@microchip.com>
+On Thu, Oct 3, 2024 at 10:23=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
+.com> wrote:
+>
+> For now, we refresh the tcp_mstamp for delayed acks and keepalives, but
+> not for the compressed ack in tcp_compressed_ack_kick().
+>
+> I have not found out the effact of the tcp_mstamp when sending ack, but
+> we can still refresh it for the compressed ack to keep consistent.
+
+This was a choice I made for the following reason :
+
+delayed ack timer can happen sometime 40ms later. Thus the
+tcp_mstamp_refresh(tp) was probably welcome.
+
+Compressed ack timer is scheduled for min( 5% of RTT, 1ms). It is
+usually in the 200 usec range.
+
+So sending the prior tsval (for flow using TCP TS) was ok (and right
+most of the time), and not changing PAWS or EDT logic.
+
+Although I do not object to your patch, there is no strong argument
+for it or against it.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+>
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 > ---
-> Changes in v2:
-> - Renamed the title to "Microchip AT91 CAN controller"
-> - Removed the unnecessary labels and add clock properties to examples
-> - Removed if condition statements and made clock properties as default required properties
-> - Link to v1: https://lore.kernel.org/r/20240912-can-v1-1-c5651b1809bb@microchip.com
-> ---
->  .../bindings/net/can/atmel,at91sam9263-can.yaml    | 58 ++++++++++++++++++++++
->  .../devicetree/bindings/net/can/atmel-can.txt      | 15 ------
->  2 files changed, 58 insertions(+), 15 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml
-> new file mode 100644
-> index 000000000000..c818c01a718b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml
-> @@ -0,0 +1,58 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/can/atmel,at91sam9263-can.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Microchip AT91 CAN Controller
-> +
-> +maintainers:
-> +  - Nicolas Ferre <nicolas.ferre@microchip.com>
-> +
-> +allOf:
-> +  - $ref: can-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    oneOf:
-> +      - enum:
-> +          - atmel,at91sam9263-can
-> +          - atmel,at91sam9x5-can
-> +      - items:
-> +          - enum:
-> +              - microchip,sam9x60-can
-> +          - const: atmel,at91sam9x5-can
-
-That is not what old binding said.
-
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    maxItems: 1
-> +
-> +  clock-names:
-> +    items:
-> +      - const: can_clk
-
-These are new...
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - clocks
-> +  - clock-names
-
-Here the same. Each change to the binding should be explained (answer
-to the: why) in commit msg.
-
-> +
-> +unevaluatedProperties: false
-
-Best regards,
-Krzysztof
-
+>  net/ipv4/tcp_timer.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> index 79064580c8c0..1f37a37f9c82 100644
+> --- a/net/ipv4/tcp_timer.c
+> +++ b/net/ipv4/tcp_timer.c
+> @@ -851,6 +851,7 @@ static enum hrtimer_restart tcp_compressed_ack_kick(s=
+truct hrtimer *timer)
+>                          * LINUX_MIB_TCPACKCOMPRESSED accurate.
+>                          */
+>                         tp->compressed_ack--;
+> +                       tcp_mstamp_refresh(tp);
+>                         tcp_send_ack(sk);
+>                 }
+>         } else {
+> --
+> 2.39.5
+>
 
