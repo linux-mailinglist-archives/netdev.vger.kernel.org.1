@@ -1,73 +1,140 @@
-Return-Path: <netdev+bounces-131785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43E698F92B
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:48:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE4898F935
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 23:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D0AB1F22923
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:48:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BABB9282222
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 21:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD521A01BC;
-	Thu,  3 Oct 2024 21:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14EF1AF4EF;
+	Thu,  3 Oct 2024 21:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dZZWbDak"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF2E155314;
-	Thu,  3 Oct 2024 21:48:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D056F6F06A;
+	Thu,  3 Oct 2024 21:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727992117; cv=none; b=DpcSv2rvAIKdWa2ZCEGWNtp7N7eJv2qdl4Xo7mXMGpfPnw++vbU/nOJdGMgb++Hnp8xZuJfalUK/022/pZKAZovE3R83+wiOp+aUcYgxStb1beJBv6bzc8D7LDfEAa+VwroUW0glnrs97LQkvy+T5cVwaMeiajUeo4WEnBRMjXU=
+	t=1727992259; cv=none; b=WxgZbRI8eolK999ZZ2X53pZGncrCdsSr3UJVGUYU+1T3UivknBpNHTCVKq5Tmt+OMI5O497nV4gwwHnBEC142pykIcKg+MF62oRxhtzC0zJnkGPa0HXweowHor8TVUNI3iPxoTOeQSOupUDl2Ook4NH8+IH5Q0PtX9MIoD7GVC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727992117; c=relaxed/simple;
-	bh=qiNJQB0MSFjbWTb96yy2Pf6DKIBWLRQLpb3Groqbn4I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qocgudWSAa0krGrKFaT9sHDPV5vGcBOqgPxKL9IWHtctoHbl04zGBuFwka5++seLsD7UePadiDT796iTkMewNGtLubI7dA10qj501FiAlBkrWqUeCudzNy/iTxsw5QIscB+2bn/pHQCQ2cHo6+h+5fJhbxQvINnZeiqzrW4AWbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XKQDt3WXBz1HKWy;
-	Fri,  4 Oct 2024 05:44:30 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3366F1A0188;
-	Fri,  4 Oct 2024 05:48:30 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 4 Oct 2024 05:48:26 +0800
-Message-ID: <ce9122c6-9dee-67b1-072d-707573c5e774@huawei-partners.com>
-Date: Fri, 4 Oct 2024 00:48:22 +0300
+	s=arc-20240116; t=1727992259; c=relaxed/simple;
+	bh=xDvuuU0Ny5bptRzf1f6XMRSEy3QqAXdPpCjIwoLn+yQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hxCHHWEeoIek1CKkptv73ReFxO4GY5Q2XlryKaGo3PyhMhNeMvmMBNcX/D22SR0u15rB8fgWTHrMgmIWeAnrWaIYhAGBXR5/EKngi+RznBbOiLE5AyJVaDqYMjegFskJT4fL8V1Ab0nmAYjzeyZiny4bsdfw3cvQsh48E5CcdrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dZZWbDak; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1727992256; x=1759528256;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=6rpJeqVSzaRKWSkf7f1FmSyfDmQ9YVfHM+Tdpkcb4O4=;
+  b=dZZWbDakDgEL59R7siHPjCQ7Mf5YgV8x/z67xWS2Ko49nawNxBNrIIVk
+   WqDx9fV8GtxkYvtJJhmUmbuytyYWRJOGJNW3vg8iEYKg8rl/SuqH6pvBB
+   ZHJ3xsGO90nnyd6o36hT12bDL5Y3jcFIZLH0rZE/+VQrkHU97JTbB0n47
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.11,175,1725321600"; 
+   d="scan'208";a="438116422"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 21:50:51 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:22494]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.107:2525] with esmtp (Farcaster)
+ id d6bf4c58-0a1d-4336-a2a1-3bd93f1d09d4; Thu, 3 Oct 2024 21:50:49 +0000 (UTC)
+X-Farcaster-Flow-ID: d6bf4c58-0a1d-4336-a2a1-3bd93f1d09d4
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 3 Oct 2024 21:50:49 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 3 Oct 2024 21:50:46 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <ignat@cloudflare.com>
+CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kernel-team@cloudflare.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <stable@vger.kernel.org>
+Subject: Re: [PATCH] net: explicitly clear the sk pointer, when pf->create fails
+Date: Thu, 3 Oct 2024 14:50:38 -0700
+Message-ID: <20241003215038.11611-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241003170151.69445-1-ignat@cloudflare.com>
+References: <20241003170151.69445-1-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
-	<matthieu@buffet.re>
-References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
- <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
- <20241003.wie1aiphaeCh@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241003.wie1aiphaeCh@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
-> Please also add Matthieu in Cc for the network patch series.
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Thu,  3 Oct 2024 18:01:51 +0100
+> We have recently noticed the exact same KASAN splat as in commit
+> 6cd4a78d962b ("net: do not leave a dangling sk pointer, when socket
+> creation fails"). The problem is that commit did not fully address the
+> problem, as some pf->create implementations do not use sk_common_release
+> in their error paths.
+> 
+> For example, we can use the same reproducer as in the above commit, but
+> changing ping to arping. arping uses AF_PACKET socket and if packet_create
+> fails, it will just sk_free the allocated sk object.
+> 
+> While we could chase all the pf->create implementations and make sure they
+> NULL the freed sk object on error from the socket, we can't guarantee
+> future protocols will not make the same mistake.
+> 
+> So it is easier to just explicitly NULL the sk pointer upon return from
+> pf->create in __sock_create. We do know that pf->create always releases the
+> allocated sk object on error, so if the pointer is not NULL, it is
+> definitely dangling.
 
-Ok
+Sounds good to me.
+
+Let's remove the change by 6cd4a78d962b that should be unnecessary
+with this patch.
+
+
+> 
+> Fixes: 6cd4a78d962b ("net: do not leave a dangling sk pointer, when socket creation fails")
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+> Cc: stable@vger.kernel.org
+> ---
+>  net/socket.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/socket.c b/net/socket.c
+> index 7b046dd3e9a7..19afac3c2de9 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -1575,8 +1575,13 @@ int __sock_create(struct net *net, int family, int type, int protocol,
+>  	rcu_read_unlock();
+>  
+>  	err = pf->create(net, sock, protocol, kern);
+> -	if (err < 0)
+> +	if (err < 0) {
+> +		/* ->create should release the allocated sock->sk object on error
+> +		 * but it may leave the dangling pointer
+> +		 */
+> +		sock->sk = NULL;
+>  		goto out_module_put;
+> +	}
+>  
+>  	/*
+>  	 * Now to bump the refcnt of the [loadable] module that owns this
+> -- 
+> 2.39.5
+> 
 
