@@ -1,274 +1,245 @@
-Return-Path: <netdev+bounces-131539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABB598EC9C
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:02:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF73E98ECA1
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:03:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E3F81C21043
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534D31F215FE
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 10:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE3F1494A6;
-	Thu,  3 Oct 2024 10:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E725D1482F5;
+	Thu,  3 Oct 2024 10:03:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="qFmD3zqm"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mJ6Ot5Dz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2058.outbound.protection.outlook.com [40.107.95.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE4814A604
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 10:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727949705; cv=none; b=BC3AyVTk1hrEttkNYjz+zTRcLdrymcsjc3Iy6Wr55q7uGUa+Jgrui1CINEr2M7X8fced1C/yrhpNUGbcypQtEX4ybz5ETsNwaTq+glheYTRkxMA2jlBVPOwacASDBDG4m/bqH0ZRDY1d9EmFfJWCjWtAltfrUUt6pLwuOOwIn6Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727949705; c=relaxed/simple;
-	bh=g4ytOYyvo4PYrBkqSVRneSzcAZkXG+cl6zY/jR/Wbo8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IoFxevhHayFHH/KXp4NO7nJatktu6TMfHaj7zUeGmrB5phryeCc7dtpWO+B/5lfN1UtRK+DFJsGlDLPHY+KXABQliCMHSWsYBmQfkDXcaHlRYomr8cAC/BYQuMrBTzbOeDS4r64AZtaM+kyH5GmSJodTMjou1ni5DAnPrE39NxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=qFmD3zqm; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-42cbface8d6so9813385e9.3
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 03:01:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727949701; x=1728554501; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=07qYz3vJ3LBs6hljDu1iC7wgJzUjfX/ESzurkb1Cw2o=;
-        b=qFmD3zqmQXOxj/ah/TOZvYtYhDE1Z9H3g6KQ0E/46moLUyMvbB9MY2Zu+OuruNq5Mq
-         LFJOVQTljzhRfWw+m2W66H+ZyB37fJXBHFvtI/22Crb7jVNzsJ/9MBDNbi/li3PYKrk9
-         Qldod4ho3pw4uZhYYIoiQ6Z4MrJ7PDFBF4xPCYGtt+VDmYnpTBAOwDy9dZAxPIWK2xfp
-         iw1/rra7CRoXspL3ezS53lRtsRPQzbJVAkYFbLdItXnGdRZP6E+u5owc0BpU5WqjtKov
-         bOG9npT67fCCvGnfk1uVzj1SUy7CtcGDPROKfHmyca7355OM0LUB2Zqo6EFAa1CAK55b
-         Bfjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727949701; x=1728554501;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=07qYz3vJ3LBs6hljDu1iC7wgJzUjfX/ESzurkb1Cw2o=;
-        b=CwyYXBIEg+ELcMkDpbUD1donjUGJNS2B6xUDQS4p7AOi5U+b5WO4perMQ+f+kOr9Cj
-         lVRyeX+qI1s12A4nBTEC+hHvqklQbbcDvQ6NczRryjfQ6Krr/q8dtlb7CvViixMPGEth
-         OMCpTFc00E4TiZiwMoLVBaU4DnsL71CLSQBKzHNJRugMUUFKirVoWnT7rUaw09tQRrFD
-         BHcZZrnTEA0aE1B4eAlnqUf9qUCFd/IBno9exsFtBt/yvh5HbujPL4otjIbqZMaNBDSx
-         4Znr1VmsgtaUQe4UXE+rYrSHfzarwQ5ttAqsDihCa4kf0iAF8rpfV+1Z6lFB/a4N3xJN
-         RpvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVkKPaF5fhot3a2TFPhiGpoXP/0q9jAYg2hMhxr3OCQ3zt6rlDz3PpHcC6tMq+K+L6ycEV3Cx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwwOoJAeS2ZYae/1vN3d554ntI2VFhoX1UHw9xau8YLCm0/YSP
-	Oc9FXy2F7X2DefbD5X6QwVv3rr3eQ+H16hkF7nn64L0WpTHejkkNHU5ct+RzUgE=
-X-Google-Smtp-Source: AGHT+IFwkCUvkbuz+MHpJSkn0QoNZJZWEG1EoxKplhPunVN0UV5Y+QCkNvIaTF+YedDKZ8xcSecgkw==
-X-Received: by 2002:a5d:67ca:0:b0:37c:c4c0:9b78 with SMTP id ffacd0b85a97d-37cfba18588mr5420136f8f.48.1727949701427;
-        Thu, 03 Oct 2024 03:01:41 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d082e6dfesm910216f8f.117.2024.10.03.03.01.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 03:01:41 -0700 (PDT)
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net: Switch back to struct platform_driver::remove()
-Date: Thu,  3 Oct 2024 12:01:06 +0200
-Message-ID:  <3f7c05c8b7673c0bda3530c34bda5feee4843816.1727949050.git.u.kleine-koenig@baylibre.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1727949050.git.u.kleine-koenig@baylibre.com>
-References: <cover.1727949050.git.u.kleine-koenig@baylibre.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE2784E0D;
+	Thu,  3 Oct 2024 10:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727949810; cv=fail; b=AlqG7w+5AT73mc4DWz33wG7+rKl/zBLNZrbDl89uaALUhlRRKPe6PvgqWTW2yUh3niL4bNeN8MgnLqPHOEj/7HSWj0y2Nj0vCk0o0o2zoutL+q9lQz+/2rN21F0/QalW1S9tB6kYWQI3Z6eFb979xKrOjwUgPqTRKQMNYPZu7ZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727949810; c=relaxed/simple;
+	bh=t0kw5AWMLP9bxDTsgcoi9zkIVsKZR4SimU2YcGKIV18=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kfT+8R/VMuSL7T51Db3reaAtVEH7tc6EnDUmG0NI3yv51wPk855LPKCvDOdsB+TRMCnPwHs/aG/FRXN8tzAnI0v4tSGRkhpULPLPKPU5Slpa8CJ5cuviQGvnJkkz85N9X6U/fZOObIChA1lecIlhHPs3GPgvCFugZOMrnVnxOwA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mJ6Ot5Dz; arc=fail smtp.client-ip=40.107.95.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kBk4++Su6U2o8YTQBtLG+egMrO+vluXy5p99ckuz+kSrTvrFK1eSJazXOY6A6KFcCFHCUoi/eXVs61TEMVF7PUS9NAglmjpJ80Mdw9OdaqVMFZbeTZTERI8/9AJ8fdatjfhrYnYaXUmhvIyFVkp7BRlZunjbBTtQhZwPLWRXzapPkHisRCplZyPcChmelbDv6Mlt7Pk+w+5UkaX6uI6OdwEvqrnVTsgSJqx3v+euYM6eKLd2ZHKiYNWAXsKl0u5t9JrtNFIprZC3c0hFndBZivbJdefKLs8uKRgjNxaJ5s9vXtB/93KlGJOLB5e6zEg7Hb0Y5doQkuI2tOvzrlpn6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TiR/PmkSO945KA7i074R0fwP0ZriXDTIz22znEEVkr8=;
+ b=kqF5zQe900ZvyvH70WsMlPijsIPHzfnjnbsTGvlp/bSeaKT6Dm4wLCfLHTV3mI5sQEwU3+uZP5+KqWI5vFrGerSUKI5PG5rLoRmce2WLYJV8jHZ68ka7+pykUsra3B4p7GcohOzYnTp2Xd3fQyj9I32u1yqIMILGyyGDVZ/Q2CzrOSA2W4UhyqWeeXTb9ynJlNE+suPmd7k7flhCkQqDf/vUZKaJWfPkg7fARjfkKrZ9spG56BwMW1HlWqdLkDISmWRSyT3Tqxu5a2uIe1Y8E6sOUUXOcc16AFcn2e7nYo8av0ErUC8iP1JVOFEqdYe+tjpdwuRHYm6nDeBP940YnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TiR/PmkSO945KA7i074R0fwP0ZriXDTIz22znEEVkr8=;
+ b=mJ6Ot5Dzke1ePzqkaqqYQWTEoAUoiLPHNTF6TKg3q4m166H0LyX5oisx8pNwm/0NgE0IdSsKoTVNn8CyuRTLnIayo5X1ibs5/2R0K3B8vjIxf9+FpGH+/RlhIkkngDT9ll9w5MdH6u1NOrKt09YtWJbSUuBJveV827rpU8T8byg=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by SJ2PR12MB9085.namprd12.prod.outlook.com (2603:10b6:a03:564::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Thu, 3 Oct
+ 2024 10:03:26 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%6]) with mapi id 15.20.8026.016; Thu, 3 Oct 2024
+ 10:03:25 +0000
+Message-ID: <01d8f872-a7bf-2fea-6f00-34fce18498b4@amd.com>
+Date: Thu, 3 Oct 2024 12:03:19 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] vsock/virtio: use GFP_ATOMIC under RCU read lock
+Content-Language: en-US
+To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
+Cc: Christian Brauner <brauner@kernel.org>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Luigi Leonardi <luigi.leonardi@outlook.com>, Jason Wang
+ <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Marco Pinna <marco.pinn95@gmail.com>, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, netdev@vger.kernel.org
+References: <3fbfb6e871f625f89eb578c7228e127437b1975a.1727876449.git.mst@redhat.com>
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <3fbfb6e871f625f89eb578c7228e127437b1975a.1727876449.git.mst@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0044.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:92::18) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6313; i=u.kleine-koenig@baylibre.com; h=from:subject:message-id; bh=g4ytOYyvo4PYrBkqSVRneSzcAZkXG+cl6zY/jR/Wbo8=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBm/mtu36uNzBKdU0ttC1myXEuPlVLVr0JUfKCP0 eFGnRXFe/2JATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZv5rbgAKCRCPgPtYfRL+ TqebB/9K0AGyQRUXCAt2A03ch+Fh5CLOS/6Kw1VEmnRL2HFtVs3iXc4t3nZZXrP6+MGULonILTj wCIqVUND1cIdvolLGbXWsKzhZf11cqgLS3AHsKEJoREe8E13/zVTPoK32rv8AnyrOGrY36lb8HQ 1XDQu9IE1qsxZcfvxKKYKij/vGf0OBMuKUzMQngHpF603qKBoBnKbEJDX5oyjvjbUZ+JW9fT0a8 a6HrtzRLvv1DnhWdyx7KXN91QfZi84flaPWL6a9YqYySt1nHrMS9J67imQDP8KE8uuVGpUHf+q2 RMeHvEFkcRzYWkmQK3j3SYVqZ+1PX8aYF1gGVD5+rccULRcl
-X-Developer-Key: i=u.kleine-koenig@baylibre.com; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|SJ2PR12MB9085:EE_
+X-MS-Office365-Filtering-Correlation-Id: dcca446a-e32a-4d25-e765-08dce3929f43
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aXlSZ25Dei8xZmVEOUVBK0NwMjRGR1ZiSElsM2ZnTXJTMVF3OE5LM0V5S2l2?=
+ =?utf-8?B?NTBQa3l5UVUwNElBYXl5ZlhaTm9LZC9jZFM0WkthYmNEMmJERWhuNmpGRlV1?=
+ =?utf-8?B?YldWZkRPTjVSM2Q1T1RCeXZyNWJCNitpRFgwcjFEM2VQQ1dJNzlocDMwSC9z?=
+ =?utf-8?B?MzBCMlYvSnpVNVlOWnR3aDR6S0tKaWJvT1lGKzBSNXRQUnZqbTJxMFlsSEh6?=
+ =?utf-8?B?VTV6a2RMbXF1ZmRYalNWalFsWlJqSEJLbFR3eU9sdFRndm9YYlF5V0pFR0dt?=
+ =?utf-8?B?VURrQk9uOW9NM2xvSWhaN1U2YS9WTi9JbW41TEdqRTFRZXp6UlIwMHhtSTJS?=
+ =?utf-8?B?SlV0SXFuSXR2cWNhMzB3VW1OL3ZtNlJ6dVZkTC9RQWg3ZFMyZVhXUVJJVE9k?=
+ =?utf-8?B?aFFDUk16UHljbjJWVWlhRGxMS25XRmpOK0hiWFlKUWUvRjF2VVVWZTZOL2F3?=
+ =?utf-8?B?ZWEra1dqWi9FcGpwNmc5S091SXhVd1R2emtyeEIrZVNnSmI1eDI3Ymo1OUMz?=
+ =?utf-8?B?c2Z5VDIwZ2c3QlFmOFVwcUh6TEIxWm8vQTJDUW13dk5XS3hRRld5TXFIdVZ0?=
+ =?utf-8?B?UkhKM3cwKzFVV001eFRtdjVsOFVzQjJnTDhGNlBEaGh3S3hVbkY3MVVDY3da?=
+ =?utf-8?B?eDcxTVA0UlVsZXliOURKMmF6dW05WHFDRFpUcjR2NkRLenA4OVR5WlRVR29K?=
+ =?utf-8?B?WW02THZJdThWajQ3SVZxUXplcGgyTnBmamlCZWVIL3J0aW1pejlKYjNZcUlo?=
+ =?utf-8?B?MTV5QWRqaFpBam9qUko5amFDbjRXYzhyRCtjV21qZkV1OC92bTVXVHhCL1lK?=
+ =?utf-8?B?Q3VSTXdEMEMzVVE4dExsVWhZbGJPdi9Da1NoWnZDQWlCWTlKTU1FNzZxc3lN?=
+ =?utf-8?B?VWRJNUhOZ01xMlpHYk9yb1BYbFExZ1JuSWgrNlpNTFM5czFjekpKcEhMRXRE?=
+ =?utf-8?B?dm4wQ2lqd0FMRVRTOUc4MDJSUjg5WlY2UGhwL3FiMkI4V2xhVDl2V2hoRWtk?=
+ =?utf-8?B?UUU0dnRRMW96RytxY1VUcVJPdUFsRldrTUZscnlTZzFOeDh5UEY4enpWcDhU?=
+ =?utf-8?B?MzJUcEJ1RSs2dytCUTJFU1ZQUTJ1bjJvc3BKbk9VMzNtS0ZzQis3cFc2Y05D?=
+ =?utf-8?B?ZUZKNG1oZGNQaXluUzgyc0l4RW5Kb3Bna2VYQWNvN3RVT1RNVmRRWXUveEhn?=
+ =?utf-8?B?NlpMbm11TnpVcDk3ejV6TUhpSFBRQXVkUExGRGxVTVdia3oyYVdlS1gvNG5C?=
+ =?utf-8?B?Z3NnZTBpK1JHclRQNmN1RnkzVXdLb3cvQUU2VW5wQkhZWUQ3eVc0K0hJMWJa?=
+ =?utf-8?B?OURXVGlLRGRYdmFFK2k2QnJ6SnpxRUtrZ1krTVdsYmtQNGJOREFpa3pJdlh6?=
+ =?utf-8?B?eFhoTDl0azZTUlFNMTdZbkVNb3JyUlFmT3RCcU5rZVRSRzNFRlAyd0lQUUl5?=
+ =?utf-8?B?QS9hVFhYbGFVTUhxVTVkWnY2NDM2d3c4dkhUS2Rsemk2MkNwdWNFNnJJejk0?=
+ =?utf-8?B?VEN3eS9xRjhscHRBa3pLY21SY3ROYlNyaTJDMDZsbGU5aHE5eXNjUVFnMlJn?=
+ =?utf-8?B?cE40d2s4dGE0bng1ZjlWbVdMcVk5TkpCdk1TNFkxcDB2Z1BMTmtUUEVOQjJF?=
+ =?utf-8?B?VFNlL0NRbTVhMjdTMzFsUzR6YlZZU1IzdG53TXRJcmpRT3VKcU5NWnUwSTZx?=
+ =?utf-8?B?c2M2QVIzbVVDcXNFWmxCcXpmNzgwSlhrNGpjOUR0NjlQbEFzSkhGUTFBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cndraTd4TE9lVTltUDV6a01VbEJRU0h2K2pTWk15L0RpNzBGQmQ3TjRPVHUw?=
+ =?utf-8?B?cXNFeVVYNkZ0SW1sdzZMRmtBSldkemtoY1FPREJUME80REJUTzVzN0tWMDg5?=
+ =?utf-8?B?eWF6eXQvU1Zyb1Q5YU9lRm1ua09la2VtOUEzaWVWWVc4U0FWZXJDTmZaVkVJ?=
+ =?utf-8?B?b3ZydHRnTXZOZ1RncnBZNU9TaFlNVmZ4ZFRId1lLR0xUTy9yYUZiY0ErMjVI?=
+ =?utf-8?B?Qlg5Z09JWmVlRWlaN0VjWDdzdDNNZW82UXFEQ0ZpdGMvYWdmRXRMRGRlTTRW?=
+ =?utf-8?B?THExY1pjcko0TlRiOGp4OWZhWXh3NXJ1VmRVRXNDeXJyYWxQNnZxSGpzQklC?=
+ =?utf-8?B?b1A4dnhkOHl6NGxuMk50R3IwbkVVUi9FOFVQWnU0UlNqL3ZKMVVTdGdOTTI1?=
+ =?utf-8?B?a202WE91VXF4NG9nWHBJTW9uaW5HemNReFlocUdRUmFFOE15NXhSRlNKalg2?=
+ =?utf-8?B?YlpjdTFBOURGODJkVW5UZTN5VXJQVkMzbURGUWh0T3FOZk1rWEpHZzVFcWU0?=
+ =?utf-8?B?OFdkbWdRV2swOTJwY2xWWlFxeVJCYjBHZXdxajJ3QTFJUmhabjkwbSs5OTUz?=
+ =?utf-8?B?SmREalZtcWdyRHlXbjJjN1dWVTMrZGZrR0x0WExqTGw2eWdvM29SSzVFbDQr?=
+ =?utf-8?B?Q200czFldi84ZW9FZmp4aittUGY4a3F3Q3E0THRYQzQyQXJDQy9zSG1ONlVp?=
+ =?utf-8?B?TGpLK0dVSkd6R05qVmQ0bTBMU09Vbit4TUQ2ZG5yV2hSTklPRkJVMWkwaExN?=
+ =?utf-8?B?S3JZcVpCVUNvOU51VXF4cnlJajc2cGNWbmNVS1VxNGZDZ08vdXR1SkcyaGpL?=
+ =?utf-8?B?aHhaWmkwQ0c5emFzWlZTOTNVZXZ6d29wdENsVW1FYUQ5c1YvN0tmejBKNHlt?=
+ =?utf-8?B?ZWtDUEZTREYrZG42K1FjdHhzenNvY1Jvc1lsL3JFRW9KUVUzZFBSeVFPWUZk?=
+ =?utf-8?B?eXRLZGpVNDFHZithcGFUYVM4TldjeWFsVmpIM0hFYXpjMFBFaTZvdDVEUTVV?=
+ =?utf-8?B?ZUhhZ2pNdmpXOWx1V1g4R29pRVhyc0hGWTdFSDdjbGNORWZlM2JiMzI4WURC?=
+ =?utf-8?B?bzViT3hTR3c3VlR2TVdvMjNiL2lUWDdIdDZ2cDNiS2NpZ0lTK3p1cjA4OHNF?=
+ =?utf-8?B?RldZVUZ4OU80U25qbythdFJINWYwa0VmZXd3NVNrUjVxdGVXTlJORWJCRUdD?=
+ =?utf-8?B?NDBEUGdTQkVpRkNtYVVHNnRRcWdlYzF6c00xN0tzdTl3M0NkSVF6alRGQkt2?=
+ =?utf-8?B?c0dWaGU0L09oUkt3aXdBVVkwTERBVSszdmtsQTBKUi9idk15eiszL2QxVnI1?=
+ =?utf-8?B?MW53ZlAvYWliNFVqSEtLRWk3TXJ6MTRIOFNiYUlld2VmTDBsbUdieTVwTGJ1?=
+ =?utf-8?B?RXF2bmpac2hWYk9SYktVRTlKUUFOQU55ZVpJN2FidGxPUGhsamwvaU9MNFF1?=
+ =?utf-8?B?dXJ0a2NpK3VZSWRucFd0UTA1VXQ1c2FvUzh0ODdMR2lEU3d5T2t2TStxQzBQ?=
+ =?utf-8?B?TFR1TWdaTFBIdm1Zc0FaS3lhWnBqQ3g5RGxqWXEwQ0toSjA3S0dzaFZsTjNz?=
+ =?utf-8?B?ZUhVV0tHR3I1WnVkd1ZKa0o4WHRUYTU1WllVRGFCTm9kenQ5d3phSjZhUVNa?=
+ =?utf-8?B?U2l4bmZsNlArUWNHL01PWmgrbTJObkhmNDI4MzZtWGVnaDY2dmxuZmdXMU4w?=
+ =?utf-8?B?eGkzMnArWEh5cWRQM0lIM3JmZUFxY1FNd1pNR2pXM3VMSzIxblZJSzZ4d3Zk?=
+ =?utf-8?B?QjJML0htL29Zd29xOEZSL0lQc2V2ZDNJWFByR0NNZzdiRW5TWVZCTDc5RXh4?=
+ =?utf-8?B?N05JQ1RuZ1pLcDcvVkFvVjk1dlRiZzVuNVVPUFQ5QzZEWU9hK20xTW1uNElO?=
+ =?utf-8?B?RUpMK1FNY1Y4eHY3Z2VzTGpaWEpSa3drQm9LTGE5U3BoMDltL0dGQjdJNWJi?=
+ =?utf-8?B?UDdWRTdIaGRvWkk2a3ZycGZ3OE5MZ0Y1ajJMdnZERjVsdU9JcjdNRUo4ZDcz?=
+ =?utf-8?B?R0hweXM1Q2JCRzVhZEswKzRVNjExZEZRS3E0eDZMOE9jeW5PWFA2YU1SU0Ny?=
+ =?utf-8?B?WTBrWndEMlNiUFR6VmpaWnZsbENuN1pnT29oenVWMFRUVjcrQjdYUzVRM2tm?=
+ =?utf-8?Q?LDTaWN9r0KEb0Vs+wDwpbsLdB?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dcca446a-e32a-4d25-e765-08dce3929f43
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 10:03:25.8564
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BKTrUI8AuAeZQI/cb9RbrLv7VuT3UA15m3ynekcQZhacACZE0WdLtURFo7id++l3RVdLUDML8EIDQmXCVUj4Ow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9085
 
-After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
-return void") .remove() is (again) the right callback to implement for
-platform drivers.
+> virtio_transport_send_pkt in now called on transport fast path,
+> under RCU read lock. In that case, we have a bug: virtio_add_sgs
+> is called with GFP_KERNEL, and might sleep.
+> 
+> Pass the gfp flags as an argument, and use GFP_ATOMIC on
+> the fast path.
+> 
+> Link: https://lore.kernel.org/all/hfcr2aget2zojmqpr4uhlzvnep4vgskblx5b6xf2ddosbsrke7@nt34bxgp7j2x
+> Fixes: efcd71af38be ("vsock/virtio: avoid queuing packets when intermediate queue is empty")
+> Reported-by: Christian Brauner <brauner@kernel.org>
+> Cc: Stefano Garzarella <sgarzare@redhat.com>
+> Cc: Luigi Leonardi <luigi.leonardi@outlook.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-Convert all platform drivers below drivers/net after the previous
-conversion commits apart from the wireless drivers to use .remove(),
-with the eventual goal to drop struct platform_driver::remove_new(). As
-.remove() and .remove_new() have the same prototypes, conversion is done
-by just changing the structure member name in the driver initializer.
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
----
- drivers/net/fjes/fjes_main.c             | 2 +-
- drivers/net/ieee802154/fakelb.c          | 2 +-
- drivers/net/ieee802154/mac802154_hwsim.c | 2 +-
- drivers/net/ipa/ipa_main.c               | 2 +-
- drivers/net/pcs/pcs-rzn1-miic.c          | 2 +-
- drivers/net/phy/sfp.c                    | 2 +-
- drivers/net/wan/framer/pef2256/pef2256.c | 2 +-
- drivers/net/wan/fsl_qmc_hdlc.c           | 2 +-
- drivers/net/wan/fsl_ucc_hdlc.c           | 2 +-
- drivers/net/wan/ixp4xx_hss.c             | 2 +-
- drivers/net/wwan/qcom_bam_dmux.c         | 2 +-
- 11 files changed, 11 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/fjes/fjes_main.c b/drivers/net/fjes/fjes_main.c
-index fad5b6564464..4a4ed2ccf72f 100644
---- a/drivers/net/fjes/fjes_main.c
-+++ b/drivers/net/fjes/fjes_main.c
-@@ -1466,7 +1466,7 @@ static struct platform_driver fjes_driver = {
- 		.name = DRV_NAME,
- 	},
- 	.probe = fjes_probe,
--	.remove_new = fjes_remove,
-+	.remove = fjes_remove,
- };
- 
- static acpi_status
-diff --git a/drivers/net/ieee802154/fakelb.c b/drivers/net/ieee802154/fakelb.c
-index 2930141d7dd2..e11d8eda85ea 100644
---- a/drivers/net/ieee802154/fakelb.c
-+++ b/drivers/net/ieee802154/fakelb.c
-@@ -235,7 +235,7 @@ static struct platform_device *ieee802154fake_dev;
- 
- static struct platform_driver ieee802154fake_driver = {
- 	.probe = fakelb_probe,
--	.remove_new = fakelb_remove,
-+	.remove = fakelb_remove,
- 	.driver = {
- 			.name = "ieee802154fakelb",
- 	},
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index 2c2483bbe780..1cab20b5a885 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -1047,7 +1047,7 @@ static void hwsim_remove(struct platform_device *pdev)
- 
- static struct platform_driver mac802154hwsim_driver = {
- 	.probe = hwsim_probe,
--	.remove_new = hwsim_remove,
-+	.remove = hwsim_remove,
- 	.driver = {
- 			.name = "mac802154_hwsim",
- 	},
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 5f3dd5a2dcf4..f25f6e2cf58c 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -1012,7 +1012,7 @@ static const struct attribute_group *ipa_attribute_groups[] = {
- 
- static struct platform_driver ipa_driver = {
- 	.probe		= ipa_probe,
--	.remove_new	= ipa_remove,
-+	.remove		= ipa_remove,
- 	.shutdown	= ipa_remove,
- 	.driver	= {
- 		.name		= "ipa",
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index d0a722d43368..61944574d087 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -552,7 +552,7 @@ static struct platform_driver miic_driver = {
- 		.of_match_table = miic_of_mtable,
- 	},
- 	.probe = miic_probe,
--	.remove_new = miic_remove,
-+	.remove = miic_remove,
- };
- module_platform_driver(miic_driver);
- 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index a5684ef5884b..7851bfad3572 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -3146,7 +3146,7 @@ static void sfp_shutdown(struct platform_device *pdev)
- 
- static struct platform_driver sfp_driver = {
- 	.probe = sfp_probe,
--	.remove_new = sfp_remove,
-+	.remove = sfp_remove,
- 	.shutdown = sfp_shutdown,
- 	.driver = {
- 		.name = "sfp",
-diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-index 413a3c1d15bb..1e4c8e85d598 100644
---- a/drivers/net/wan/framer/pef2256/pef2256.c
-+++ b/drivers/net/wan/framer/pef2256/pef2256.c
-@@ -863,7 +863,7 @@ static struct platform_driver pef2256_driver = {
- 		.of_match_table = pef2256_id_table,
- 	},
- 	.probe = pef2256_probe,
--	.remove_new = pef2256_remove,
-+	.remove = pef2256_remove,
- };
- module_platform_driver(pef2256_driver);
- 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 8fcfbde31a1c..8976dea8e17e 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -799,7 +799,7 @@ static struct platform_driver qmc_hdlc_driver = {
- 		.of_match_table = qmc_hdlc_id_table,
- 	},
- 	.probe = qmc_hdlc_probe,
--	.remove_new = qmc_hdlc_remove,
-+	.remove = qmc_hdlc_remove,
- };
- module_platform_driver(qmc_hdlc_driver);
- 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index 605e70f7baac..f999798a5612 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -1290,7 +1290,7 @@ MODULE_DEVICE_TABLE(of, fsl_ucc_hdlc_of_match);
- 
- static struct platform_driver ucc_hdlc_driver = {
- 	.probe	= ucc_hdlc_probe,
--	.remove_new = ucc_hdlc_remove,
-+	.remove = ucc_hdlc_remove,
- 	.driver	= {
- 		.name		= DRV_NAME,
- 		.pm		= HDLC_PM_OPS,
-diff --git a/drivers/net/wan/ixp4xx_hss.c b/drivers/net/wan/ixp4xx_hss.c
-index 931c5ca79ea5..720c5dc889ea 100644
---- a/drivers/net/wan/ixp4xx_hss.c
-+++ b/drivers/net/wan/ixp4xx_hss.c
-@@ -1534,7 +1534,7 @@ static void ixp4xx_hss_remove(struct platform_device *pdev)
- static struct platform_driver ixp4xx_hss_driver = {
- 	.driver.name	= DRV_NAME,
- 	.probe		= ixp4xx_hss_probe,
--	.remove_new	= ixp4xx_hss_remove,
-+	.remove		= ixp4xx_hss_remove,
- };
- module_platform_driver(ixp4xx_hss_driver);
- 
-diff --git a/drivers/net/wwan/qcom_bam_dmux.c b/drivers/net/wwan/qcom_bam_dmux.c
-index 26ca719fa0de..5a525133956d 100644
---- a/drivers/net/wwan/qcom_bam_dmux.c
-+++ b/drivers/net/wwan/qcom_bam_dmux.c
-@@ -891,7 +891,7 @@ MODULE_DEVICE_TABLE(of, bam_dmux_of_match);
- 
- static struct platform_driver bam_dmux_driver = {
- 	.probe = bam_dmux_probe,
--	.remove_new = bam_dmux_remove,
-+	.remove = bam_dmux_remove,
- 	.driver = {
- 		.name = "bam-dmux",
- 		.pm = &bam_dmux_pm_ops,
--- 
-2.45.2
+> ---
+> 
+> Lightly tested. Christian, could you pls confirm this fixes the problem
+> for you? Stefano, it's a holiday here - could you pls help test!
+> Thanks!
+> 
+> 
+>   net/vmw_vsock/virtio_transport.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+> index f992f9a216f0..0cd965f24609 100644
+> --- a/net/vmw_vsock/virtio_transport.c
+> +++ b/net/vmw_vsock/virtio_transport.c
+> @@ -96,7 +96,7 @@ static u32 virtio_transport_get_local_cid(void)
+>   
+>   /* Caller need to hold vsock->tx_lock on vq */
+>   static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
+> -				     struct virtio_vsock *vsock)
+> +				     struct virtio_vsock *vsock, gfp_t gfp)
+>   {
+>   	int ret, in_sg = 0, out_sg = 0;
+>   	struct scatterlist **sgs;
+> @@ -140,7 +140,7 @@ static int virtio_transport_send_skb(struct sk_buff *skb, struct virtqueue *vq,
+>   		}
+>   	}
+>   
+> -	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, GFP_KERNEL);
+> +	ret = virtqueue_add_sgs(vq, sgs, out_sg, in_sg, skb, gfp);
+>   	/* Usually this means that there is no more space available in
+>   	 * the vq
+>   	 */
+> @@ -178,7 +178,7 @@ virtio_transport_send_pkt_work(struct work_struct *work)
+>   
+>   		reply = virtio_vsock_skb_reply(skb);
+>   
+> -		ret = virtio_transport_send_skb(skb, vq, vsock);
+> +		ret = virtio_transport_send_skb(skb, vq, vsock, GFP_KERNEL);
+>   		if (ret < 0) {
+>   			virtio_vsock_skb_queue_head(&vsock->send_pkt_queue, skb);
+>   			break;
+> @@ -221,7 +221,7 @@ static int virtio_transport_send_skb_fast_path(struct virtio_vsock *vsock, struc
+>   	if (unlikely(ret == 0))
+>   		return -EBUSY;
+>   
+> -	ret = virtio_transport_send_skb(skb, vq, vsock);
+> +	ret = virtio_transport_send_skb(skb, vq, vsock, GFP_ATOMIC);
+>   	if (ret == 0)
+>   		virtqueue_kick(vq);
+>   
 
 
