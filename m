@@ -1,365 +1,305 @@
-Return-Path: <netdev+bounces-131731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEE9398F5CB
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:05:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C74298F5E0
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1A501C21F28
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:05:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4F97B21133
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:13:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1431AAE2B;
-	Thu,  3 Oct 2024 18:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B363D1AAE3A;
+	Thu,  3 Oct 2024 18:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aBljbog8"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jCgpdeuf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2044.outbound.protection.outlook.com [40.107.236.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF361A7040;
-	Thu,  3 Oct 2024 18:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727978723; cv=none; b=QlhdGHNsIge6T+whSzUOD5EmyZroFM6PCUPKhkZLnhat4LGnmXkjpiz95wEZ9pbPhltDKht5ymyQuob7OLjn52rH6H5mltYxogKCbaAuh5/oxd4J4YfZPxpR8+l6SXiPPyqn3RmwJzbiNMtJU6CiJOFpaJxl7mgOke+KaITp1tA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727978723; c=relaxed/simple;
-	bh=nso4VobZVcym9uuf72JSoZHmpyq74ra8SZYn85l2xAg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b0c5TQqT+AUfCfpCIfYOM5JNaXpvnZawmX9XYoz7c34ht8vdyetL2oe+1wUk3uGylRwDdpGlQ2Ev4BjJOTlBGfSKrpDNom07TSYf1d9CnE7SEOEOkkGl47MCojsfbndPzlA/VNo690LNxR4KsYComgTvCUkFViCGy7JYKb6q5wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aBljbog8; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e053f42932so989270a91.0;
-        Thu, 03 Oct 2024 11:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727978721; x=1728583521; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=o92uYrwec6jf8i8PpiNeLzM9ef8AjMR3k4pCwlPLJiI=;
-        b=aBljbog8q1UP6bPO6wGzhtmFKarNstllryDwV0wPAEsobJlPnovglAxpOrdyva82XQ
-         xL85BDE2N07EE86FD/TwRYE81nfd6K3dlsmnc/Q+j6eXvK5pI6tgFoLfTTI2WbjO0dp9
-         qNeSTJJ8l8Hc3dwW6D6EkSxezjmRs38fUBixsA36JXTqT9cwUuwzk5GERAS0G2q0sBGG
-         Xad23HT29YYbi6TtMFZwzEDQIIRW07asw2bB7XcNcyr59yedk6s4BsQYVITNeTWUyyuS
-         8wzmIqK5htmuwcUPI3JXcVjfLwjezr87ai6Ak2tcdA78N+39xmg9fFaCgvh8s7B+jgkc
-         xALw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727978721; x=1728583521;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o92uYrwec6jf8i8PpiNeLzM9ef8AjMR3k4pCwlPLJiI=;
-        b=S0ajTPOJmIfJ5I4QMA3EwAaDvkNksSOUsrwmTVixgXbVc8lz12Xr0gcQlU5eTlt5Cn
-         8kxqsACuRflGkrv0wT51wRsFkIQuDa7ignUjyAe/lyLhXJ6gQ5dU6+F2RpPFRmdQQT+Y
-         A+HrAsANiClEDzQT8+As10FxMQmcEo4GZscpeXdu/Qq3rkqNX/ayjjoxmx+ma2VZlYyH
-         qLaBxU5K+haoa7IZc3Pv1I0hGNCPu8PnB1WBWpMt0lTKhyRvbfwpMYcbNmfX2Vgu3Uz8
-         prNYIkxDyWtL+XehK1v+8HN9jxd6UFUmWWjUyyCoe8UaVie4jGITIHTSdQopkMBYtjd6
-         y6nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVHufSdHjpB5t3lTBJSO9t+OOHJNNswPtPBkWmbDzt/Ld4+V2Q7XmDfFNP8oDh01hdoVeXFA7NagYIKLQ==@vger.kernel.org, AJvYcCWfSPMcGmxYj1JsvoLgxBlT8nxUhxGhQjkW+KFR+O2Blueq5kUmrM/wi42Pln9LyRMtTC4GGAa+@vger.kernel.org
-X-Gm-Message-State: AOJu0YyctcDy3GnZrM4ISg4CgTG3A9yKuuL1tis6Ji8Z9YiXj3GXqFxp
-	VoBnZmkqo0GwN0tWawgQIOMTgNI/6C0yhQZ6+xvb/32ZghzI8NGx
-X-Google-Smtp-Source: AGHT+IF9K2HBCJ/TF2IBchNFbWtwdfZWPfqb2ywqILuL4T3bshkgHupiJOS95MlwH82ssTxq8N5ayQ==
-X-Received: by 2002:a17:90b:3b8c:b0:2d8:8f24:bd88 with SMTP id 98e67ed59e1d1-2e18466dac6mr8548154a91.14.1727978720578;
-        Thu, 03 Oct 2024 11:05:20 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1bfad5df6sm1992628a91.1.2024.10.03.11.05.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Oct 2024 11:05:19 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <a8483822-fa75-4f73-882b-ce7b69a98752@roeck-us.net>
-Date: Thu, 3 Oct 2024 11:05:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4C719F418;
+	Thu,  3 Oct 2024 18:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727979192; cv=fail; b=TnabnSNiUhY4gQcSSZQlBmmW/F+S2nnXG1LudYZTKeapDlnOMcYS/y783Ls1OGFtzVWQyOxFtRki1n6Kv/sQNwL6avEBr941KRmhfZ1rOnMZFzGupu2x+VNcanquveLEPL4XJY7rZx3nfSgkGRqHooxfWdzdkMSB/2x/w2xcGy8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727979192; c=relaxed/simple;
+	bh=dlALyL4qZ+7NH+sp2wutX5HE1kk0uaWYY0+RVWCNi7k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HKQLVxxWKG3IdimA/QcaDa8Y5x+yLblCrZbRrsKD8U6qOja/m6C1m4T7NbPHVah3AMXCHZkqfBMsMx5BGySmc/ypip2LhBe/Sve3i0ZYs04z4MWJFp7fx6P6KM9eiA1T0yMr9F8BjiozlqJR3MMBVwU72KUkW89X4WSvVrXx6Sg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jCgpdeuf; arc=fail smtp.client-ip=40.107.236.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OF3TVmdh7JlOV2ackhUaaii7Hm1Gj2dQVXXQxuyi4VIE0+eDRuH6+zFFUob3o2L31XOdkCwL+Zvqo8C4IIALfdk3c+fFtjr+j1N25GngPiXV91rd5GGhqdRA0cqgFGtUQnv0k/d2dWp1A3YFexsrOz2avlHliiYBOcCFm++pJ+2kPEQke+pnr96+Lrpttjev2J+66Fy2jVQ1QJUc/sTZF6mWDbdCRjU/7UgWjFvnKgBLcD5CQQGZZ3thfZkiYTjtsqD0quEC1TCE1XDO/bA5eE1O+H/PlNPd7fEM+9xTuepvmhaWM43uFDp4g5Ki7jjMeqpuWofHhbr2BLZCforuwA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yloF0qR7HVGJ7MRDRBm+MJ2eTBc0kPLblqZD4JXuoVI=;
+ b=oKKmYYvtOxK3kD2xKluOfvgcmhQpG39I+k06oCsbOTVk81d1J+FIVNRPn9SBPeDzAc5osqKzXDJxDMkV1m0LEuKtxd2CZJaNoSRAMSBRPsAiyRDAwiGf9T6bgT1K/OZJ3AFe0owTjpOHBd5XO38ZCpjd0/xZ7fyaQy4nOCXVCeDJMRNA6vR9t3i+DW1m1n4F9YUv7lWhT3b3T1pdLTsSEYQ9fO/PxyA1F678MLCJYywTWWAz7Y+VQdavfPOrcLpqov77+sNSYWLSgPkykvB/r0L+x6wTyu8Hvz/zlw3uM8J8I4Yu43MfEKipgKB4QhXVqouGB11H9daEqVCUY1Mn7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yloF0qR7HVGJ7MRDRBm+MJ2eTBc0kPLblqZD4JXuoVI=;
+ b=jCgpdeufpTvsV8tR1rdpNF/CFnp6JkAf6VCdj8EToKGv7fQvuQrwlj1Q43/fBNifoGu6pp5pD6lG65YJ5pGMYDGaH/63hBON5DXdZQKjgW6lbkSVhwJ9bDcfNhnOGwZL37aCySD1CmGozGKgJXnM5r8+sbSt70sL2P4jNssJtQc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by MN0PR12MB6199.namprd12.prod.outlook.com (2603:10b6:208:3c4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.26; Thu, 3 Oct
+ 2024 18:13:05 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%3]) with mapi id 15.20.8026.016; Thu, 3 Oct 2024
+ 18:13:05 +0000
+Message-ID: <0913d63c-1df5-407a-a7c0-d5bef0210e8e@amd.com>
+Date: Thu, 3 Oct 2024 11:13:02 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 4/7] bnxt_en: add support for
+ tcp-data-split-thresh ethtool command
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, almasrymina@google.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org, donald.hunter@gmail.com,
+ corbet@lwn.net, michael.chan@broadcom.com
+Cc: kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com,
+ danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
+ asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
+ aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com
+References: <20241003160620.1521626-1-ap420073@gmail.com>
+ <20241003160620.1521626-5-ap420073@gmail.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20241003160620.1521626-5-ap420073@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR03CA0006.namprd03.prod.outlook.com
+ (2603:10b6:a02:a8::19) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] eth: fbnic: Add hardware monitoring support
- via HWMON interface
-To: Sanman Pradhan <sanman.p211993@gmail.com>, netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com, kuba@kernel.org, kernel-team@meta.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- jdelvare@suse.com, horms@kernel.org, mohsin.bashr@gmail.com,
- sanmanpradhan@meta.com, andrew@lunn.ch, linux-hwmon@vger.kernel.org
-References: <20241003173618.2479520-1-sanman.p211993@gmail.com>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <20241003173618.2479520-1-sanman.p211993@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|MN0PR12MB6199:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8df44b6b-9430-45c7-a177-08dce3d706da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|366016|7416014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SDhVTkJTYTl6SW1yVGUzcHBoMTgydDBFTVM3MG03MlNvL1UvODNEZDFJSUtO?=
+ =?utf-8?B?TmtueUpTdkwvbVJiYStnWWlzdXJDSEpFN1Y1aWxNZVVzZ0xOVERJNjZxdURk?=
+ =?utf-8?B?RDNXd05pNFpPUUVZTlRMNmdIN09Dek5RZkxCMjY1NUUwOW1Vd2Z4WG9TdWJO?=
+ =?utf-8?B?bzVOQ3JxV1Q4dE5CbEhRakRTZlp4dVIzdjNBbDZwNDdCUHFJMGJDZHFBT2tK?=
+ =?utf-8?B?bFAyL0ljOTZDQjNoVjlBNmNacW9NL2h2Nm9xYkF4VVdrOWVGeGU0NlhQcENN?=
+ =?utf-8?B?aGZod3JhN255WGZ2VWZXR0NOd1V4bFhlM2x5Y1dSdG94YjlvRmx6ODhYa3lH?=
+ =?utf-8?B?ZmlWNDVHMFAyek9nTHF4RFpDQmpUQ1NOc0VFbHhpUDZaSC8vd2JSMk9qWDRt?=
+ =?utf-8?B?Z3cvQ3JrWi9acTlTQXlPQlNzS29KUHROUUovWUFweFZiOWtyWloyZElCRnUx?=
+ =?utf-8?B?d0tGd2crR2IrWldiRTFmbDdxOGRRaWJVRS9MUVhDSytnZWY5QTczemZVbzAr?=
+ =?utf-8?B?cHJIL2MwQkxVYVNSK0V6WjFhdkRHREloTW1yU2lFSHJINFlQcXM3aGpHMzlm?=
+ =?utf-8?B?N3FxSkwzRlNXUm5LaTh1VTZaV1djck5tRllpd2p6NW1YM3FnSkovTlplcktO?=
+ =?utf-8?B?VXFOQXFVbmwxKzdtc1UwOVNNRmhOR2RzWE0vM1FZN0pJSzR2THBaSnFOSjF2?=
+ =?utf-8?B?S0tSR0M1MmdOSEFodk1KU2NGd0d5VnhOakViMkc4NEduVXd0RHlCWG9tb0hD?=
+ =?utf-8?B?OUVhV3U3Wi9nTWJZcTRLekZyWEd0Umcxazk2VlRCQjY2ZmtqZ1ZtSng1VDAz?=
+ =?utf-8?B?TnNqQ1FOSWJoNDZKbHB1c2V5RVFTMWxDekVQakVDTnNTWGF0QWJmNm1FL0VL?=
+ =?utf-8?B?V1FlckV1YjBJeFR4MFlSV1luMTRkKzFzY0pQeFd2Z1JVVnd2bnFjbG0yL1U3?=
+ =?utf-8?B?YngrSlVRYUtlbFpXZ2I4bTdVNk5kZk1ycUc5cG5ybzJpU2Z2WjhxNTE4NG9Z?=
+ =?utf-8?B?akZXZnJCZEE4OW5OcEFOYUpnYmNrakxianQ3M2FPbzJpUDhBSWZDRG9rZ2sr?=
+ =?utf-8?B?WUxld3Q0ODM3QlE3bmVOdEZDbVRMdzQ5aVVVWndFNm9hbmthbjdHUXZCSm01?=
+ =?utf-8?B?aUhXSTI2QjhUWmtpUkFjY0ZBYVZsZitrdm5QOHVIeDR0YlZIV2FFU1NGMWhK?=
+ =?utf-8?B?ME15VE1MUHJBWEhkSkZLRW4wRkJDY2xmNVV1YmlrUWZWTERMUWJHTkg1Y0Jy?=
+ =?utf-8?B?Mi9OM0dKekczb3BMNElEY3RPMEc4eFl0L2EzNHJOZUdVTytYaTRNZmZ1QjZQ?=
+ =?utf-8?B?Um5XSXR5V1VxbmNPTDNBTytkWklkcUlEQ1JXNkJCSjBUUWswWTNoNkpaaC80?=
+ =?utf-8?B?QzZEbFh2VVBkQk42U0pDOWlxaFY5elNFU0o1cUF5dHg3Rm1reW1uMThOODYy?=
+ =?utf-8?B?Z3RFQjcxbkM0TTRHSmd1RlZLZW13c0hVajNoWmFWbjQ0a21qMmE0Nld2Znhu?=
+ =?utf-8?B?M0VYZWgzQ0Z0YkZCQytZRWpjMmlwZWlBMWIzVkkrTjE3cURUazNaeEFSU0p6?=
+ =?utf-8?B?MlNCMDhZL3VrdGZPNVlVdUxsTTlVSWxVSmdoVGQ2d0I0SnlMMmJzbndBVTBO?=
+ =?utf-8?B?czFTMjdTUTJiR0VVVVY1M1RWZWNPMi82eG8yTmFGalcwRU9BajBXaHQwTWRT?=
+ =?utf-8?B?Vk5Id2gxRWpBMFlrVXNWWUEzYmRKdWpKdmtBcWJQRTkweFBKYllPVzZrVnEy?=
+ =?utf-8?Q?3KjZlgOv8HhtB9oNkGV63AYegym104USpZAcQ4Z?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bW5STVY2bWRVSHptY2ZvOTRHTm1QOHlWcjNrdW43bHFwSDJJNDZvYkM1aW53?=
+ =?utf-8?B?KytrSGh6MGJRSnNHTk9adEJSVnBVRkQ2c05Ta2lTUWRPZndmMW82YjZEdmcy?=
+ =?utf-8?B?SkpGZWkveEU2N0k2WjBZLzFsaGl4aGtJdldSUldZNFJERXh5OEY0dWxZa2pF?=
+ =?utf-8?B?WnBaak1ubzRPT2JPcmplQzRVYXZCSmpDYmNvU2FNbmJyYzZVWGtrT0JGKzRZ?=
+ =?utf-8?B?bzNFTlBWOTQzT09FR3NPMmVvd3NITndGMXIxbllXVkxkUVJVdlBycGt5MHk0?=
+ =?utf-8?B?UUFvWmRSNjlhc09FS3RlTzlTNU1RcktZUWJlVjZCQnV2dmZ6UmFVcXRjeUd4?=
+ =?utf-8?B?TmdtNExjaUo4ZCtlWThZYTRXUUEva0xDc09yN1Fmd2hvMkVhUlhLTVNMUmJZ?=
+ =?utf-8?B?Q0RNWWZDc2tIbVhLU1VvelNHZ1hmTTBjcG0wZEl1NmJiMkdESmloV0xGWWls?=
+ =?utf-8?B?WTZFcHdqR1k5KzNwQ3dLNmJhZ2R1SlFUTlYzU2ovaGZoTDhPbWluOXNZQm5u?=
+ =?utf-8?B?aDdsdHFwNXl6TUtYSzI4K1dTT1VoOUFyNy82dFNYc1lQYm9NVElzdkk1cW0z?=
+ =?utf-8?B?OEZJaFVuM0FOU0xkU1BmTkhyZHc0VzI0dVpsVzR0d0M4VzRkRWFEK2hXQkIz?=
+ =?utf-8?B?WmJFZUpCRjBkSkpXWDBJa0VSUlNnRXFkR0txbk1GRnZibXJNekY0WEFQWlUy?=
+ =?utf-8?B?Z04xcElnQm9ZRC9GZkllTVljcTUrdkF2SWJNWjdsLytIb1M5N0JRYndsOVJZ?=
+ =?utf-8?B?b29IWDVSRzJoN0kwOCtlcXlUUEZsdXFCSW44enRUNFBnZFF2L1BLNjZZK2c3?=
+ =?utf-8?B?ck1nUEpXQm9pTXNRVXV6V3FyM3JmQ3lMejdMcWlrUFdrSmdCSzVBZnMwSndt?=
+ =?utf-8?B?RTZMaStvM1Z1RWpCOFp2L3NERzYwblFVOW1WQjgwVjk1dDlmTHJFRmlRWjlS?=
+ =?utf-8?B?bUp5UzVycU9LQlpHTlQ1WHFCZ2t3UEZNTDBxaVhMNjF4ZU92eTFOM05yMXZ4?=
+ =?utf-8?B?UmdHZWFyT2VqOWIwdnUrKzNjTkl6NkpFQVNNc3lwZmZYOW14ODlnMnZQY2lW?=
+ =?utf-8?B?Wm9wYjAyaU9YT2pSaGJHYkFmRnVSYnhwYldxOGJHUzhFN3ZaMWNENTJ2MmRE?=
+ =?utf-8?B?dU8yMnFzZzZQTGZtcFE3NDlzdVRCSHQrcXphSm5UdndXMDNiM2xEMm0vOUE0?=
+ =?utf-8?B?bFNzZ2paYm0wQUtsejJYQXk2dGNCc0x2ZUlvN1Y1ZktpbWN4RTNCWE1qMmdO?=
+ =?utf-8?B?ckpGN1U4cDR3Uk5wRnVNd3JiR2JBWnJscVhZeEhqaXpJYUlFd3R3SENUa2Q4?=
+ =?utf-8?B?ZG9oRkRMV2R2VG1Wa0xtbXhzeHYxaUZ6UXVpK0ZwaGpqa1BONkptWjlHT0w2?=
+ =?utf-8?B?RlliOUI0QnJtNWJXd2lRd0tLODYvUXdFV3NWVFV5RjRCMHFYL0xybjdaUERn?=
+ =?utf-8?B?NituaEwxZ0RselNrTDRsOS83c0RBZDdXUmJNYXN3OWFIT0pyY0RhS3EwZTlH?=
+ =?utf-8?B?YTBIaE82NXJJb2d0SFVtcXMrU3RDakdaLzZEZytDbXpUM2hUdmQrNUNpTG9t?=
+ =?utf-8?B?aUh1TUNYbjhvS1pRRUl5MXpvQkdqLzVZTWUybDNqQmJWYUF4Q25TQjFpWTBR?=
+ =?utf-8?B?MlBYR2Fvb3kybzlyU3pxUUxsTDk4cVMvb3p4ZUVYUWF1azR4ekYvZXQycGNz?=
+ =?utf-8?B?aVpWSTZYL1N3NWNzaEZOQk80OFJqczU1VHZndVI1WGI0WGhkV1FyQW95YWhR?=
+ =?utf-8?B?WFB1K3pMZ3g0ZG1nVk1rSWdMa0RSSzNYcEsvbkVMNUQzR3pDbzdjNEJYa0FN?=
+ =?utf-8?B?bE5Vdm9jOWZyZG0rZG1iRG1qUG5HZXBmaVFwS081NGsvQTI1VUVzdVI1a1Fq?=
+ =?utf-8?B?cGlGQXBvcldadDRuTWVPVzFXVHlGS2IxRm8vNFhqaHFUL2U1b2Uxcys2bDVt?=
+ =?utf-8?B?SWQvV2NFWGYwUHRLOHlaaGRzUUdjamd1cEV0RStRWkdtYmprYWJ3TzhVejhR?=
+ =?utf-8?B?bVA5YkVuRkZ1eE1ZN29VNWFicWYxekV6eDhBaGNFUE84WnZaZFFZZjhpOTE5?=
+ =?utf-8?B?dlN4dmZqUVd4eHpYUFAwUFIzeUZKbzBpeUxRVlZJRXdBMkM1U2RPOHRvdXFr?=
+ =?utf-8?Q?z35iVJTOoLE+Yd5KvpaMSR1ex?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8df44b6b-9430-45c7-a177-08dce3d706da
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Oct 2024 18:13:05.3839
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MV5JojMS/qKYzfzLZFhEwdzJTIbMH27R64sbH/Sw4+O1FnsRwbtGsOMNbv2tGp1P7rMhOnl/SYRPXbu/cvsnRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6199
 
-On 10/3/24 10:36, Sanman Pradhan wrote:
-> From: Sanman Pradhan <sanmanpradhan@meta.com>
+
+
+On 10/3/2024 9:06 AM, Taehee Yoo wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
-> This patch adds support for hardware monitoring to the fbnic driver,
-> allowing for temperature and voltage sensor data to be exposed to
-> userspace via the HWMON interface. The driver registers a HWMON device
-> and provides callbacks for reading sensor data, enabling system
-> admins to monitor the health and operating conditions of fbnic.
 > 
-> Signed-off-by: Sanman Pradhan <sanmanpradhan@meta.com>
+> The bnxt_en driver has configured the hds_threshold value automatically
+> when TPA is enabled based on the rx-copybreak default value.
+> Now the tcp-data-split-thresh ethtool command is added, so it adds an
+> implementation of tcp-data-split-thresh option.
 > 
+> Configuration of the tcp-data-split-thresh is allowed only when
+> the tcp-data-split is enabled. The default value of
+> tcp-data-split-thresh is 256, which is the default value of rx-copybreak,
+> which used to be the hds_thresh value.
+> 
+>     # Example:
+>     # ethtool -G enp14s0f0np0 tcp-data-split on tcp-data-split-thresh 256
+>     # ethtool -g enp14s0f0np0
+>     Ring parameters for enp14s0f0np0:
+>     Pre-set maximums:
+>     ...
+>     TCP data split thresh:  256
+>     Current hardware settings:
+>     ...
+>     TCP data split:         on
+>     TCP data split thresh:  256
+> 
+> It enables tcp-data-split and sets tcp-data-split-thresh value to 256.
+> 
+>     # ethtool -G enp14s0f0np0 tcp-data-split off
+>     # ethtool -g enp14s0f0np0
+>     Ring parameters for enp14s0f0np0:
+>     Pre-set maximums:
+>     ...
+>     TCP data split thresh:  256
+>     Current hardware settings:
+>     ...
+>     TCP data split:         off
+>     TCP data split thresh:  n/a
+> 
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 > ---
+> 
+> v3:
+>   - Drop validation logic tcp-data-split and tcp-data-split-thresh.
+> 
 > v2:
->    - Refined error handling in hwmon registration
->    - Improve error handling and logging for hwmon device registration failures
+>   - Patch added.
 > 
-> v1: https://lore.kernel.org/netdev/153c5be4-158e-421a-83a5-5632a9263e87@roeck-us.net/T/
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 3 ++-
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.h         | 2 ++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 4 ++++
+>   3 files changed, 8 insertions(+), 1 deletion(-)
 > 
-> ---
->   drivers/net/ethernet/meta/fbnic/Makefile      |  1 +
->   drivers/net/ethernet/meta/fbnic/fbnic.h       |  4 +
->   drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c | 80 +++++++++++++++++++
->   drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  7 ++
->   drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  8 +-
->   5 files changed, 99 insertions(+), 1 deletion(-)
->   create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index f046478dfd2a..872b15842b11 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -4455,6 +4455,7 @@ static void bnxt_init_ring_params(struct bnxt *bp)
+>   {
+>          bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
+>          bp->flags |= BNXT_FLAG_HDS;
+> +       bp->hds_threshold = BNXT_DEFAULT_RX_COPYBREAK;
+>   }
 > 
-> diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-> index ed4533a73c57..41494022792a 100644
-> --- a/drivers/net/ethernet/meta/fbnic/Makefile
-> +++ b/drivers/net/ethernet/meta/fbnic/Makefile
-> @@ -11,6 +11,7 @@ fbnic-y := fbnic_devlink.o \
->   	   fbnic_ethtool.o \
->   	   fbnic_fw.o \
->   	   fbnic_hw_stats.o \
-> +	   fbnic_hwmon.o \
->   	   fbnic_irq.o \
->   	   fbnic_mac.o \
->   	   fbnic_netdev.o \
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-> index 0f9e8d79461c..2d3aa20bc876 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-> @@ -18,6 +18,7 @@
->   struct fbnic_dev {
->   	struct device *dev;
->   	struct net_device *netdev;
-> +	struct device *hwmon;
-> 
->   	u32 __iomem *uc_addr0;
->   	u32 __iomem *uc_addr4;
-> @@ -127,6 +128,9 @@ void fbnic_devlink_unregister(struct fbnic_dev *fbd);
->   int fbnic_fw_enable_mbx(struct fbnic_dev *fbd);
->   void fbnic_fw_disable_mbx(struct fbnic_dev *fbd);
-> 
-> +void fbnic_hwmon_register(struct fbnic_dev *fbd);
-> +void fbnic_hwmon_unregister(struct fbnic_dev *fbd);
-> +
->   int fbnic_pcs_irq_enable(struct fbnic_dev *fbd);
->   void fbnic_pcs_irq_disable(struct fbnic_dev *fbd);
-> 
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c b/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
-> new file mode 100644
-> index 000000000000..0ff9c85f08eb
-> --- /dev/null
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
-> @@ -0,0 +1,80 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-> +
-> +#include <linux/hwmon.h>
-> +
-> +#include "fbnic.h"
-> +#include "fbnic_mac.h"
-> +
-> +static int fbnic_hwmon_sensor_id(enum hwmon_sensor_types type)
-> +{
-> +	if (type == hwmon_temp)
-> +		return FBNIC_SENSOR_TEMP;
-> +	if (type == hwmon_in)
-> +		return FBNIC_SENSOR_VOLTAGE;
-> +
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static umode_t fbnic_hwmon_is_visible(const void *drvdata,
-> +				      enum hwmon_sensor_types type,
-> +				      u32 attr, int channel)
-> +{
-> +	if (type == hwmon_temp && attr == hwmon_temp_input)
-> +		return 0444;
-> +	if (type == hwmon_in && attr == hwmon_in_input)
-> +		return 0444;
-> +
-> +	return 0;
-> +}
-> +
-> +static int fbnic_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
-> +			    u32 attr, int channel, long *val)
-> +{
-> +	struct fbnic_dev *fbd = dev_get_drvdata(dev);
-> +	const struct fbnic_mac *mac = fbd->mac;
-> +	int id;
-> +
-> +	return id < 0 ? id : mac->get_sensor(fbd, id, val);
+>   /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
+> @@ -6429,7 +6430,7 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+>                                            VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
+>                  req->enables |=
+>                          cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
+> -               req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
+> +               req->hds_threshold = cpu_to_le16(bp->hds_threshold);
+>          }
+>          req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
+>          return hwrm_req_send(bp, req);
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index 35601c71dfe9..48f390519c35 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -2311,6 +2311,8 @@ struct bnxt {
+>          int                     rx_agg_nr_pages;
+>          int                     rx_nr_rings;
+>          int                     rsscos_nr_ctxs;
+> +#define BNXT_HDS_THRESHOLD_MAX 256
+> +       u16                     hds_threshold;
 
-How does this work ? Unless I am missing something, "id" is not initialized.
+Putting this here creates a 2 byte hole right after hds_threshold and 
+also puts a 4 byte hole after cp_nr_rings.
 
-Guenter
+Since hds_threshold doesn't seem to be used in the hotpath maybe it 
+would be best to fill a pre-existing hole in struct bnxt to put it?
 
-> +}
-> +
-> +static const struct hwmon_ops fbnic_hwmon_ops = {
-> +	.is_visible = fbnic_hwmon_is_visible,
-> +	.read = fbnic_hwmon_read,
-> +};
-> +
-> +static const struct hwmon_channel_info *fbnic_hwmon_info[] = {
-> +	HWMON_CHANNEL_INFO(temp, HWMON_T_INPUT),
-> +	HWMON_CHANNEL_INFO(in, HWMON_I_INPUT),
-> +	NULL
-> +};
-> +
-> +static const struct hwmon_chip_info fbnic_chip_info = {
-> +	.ops = &fbnic_hwmon_ops,
-> +	.info = fbnic_hwmon_info,
-> +};
-> +
-> +void fbnic_hwmon_register(struct fbnic_dev *fbd)
-> +{
-> +	if (!IS_REACHABLE(CONFIG_HWMON))
-> +		return;
-> +
-> +	fbd->hwmon = hwmon_device_register_with_info(fbd->dev, "fbnic",
-> +						     fbd, &fbnic_chip_info,
-> +						     NULL);
-> +	if (IS_ERR(fbd->hwmon)) {
-> +		dev_notice(fbd->dev,
-> +			   "Failed to register hwmon device %pe\n",
-> +			fbd->hwmon);
-> +		fbd->hwmon = NULL;
-> +	}
-> +}
-> +
-> +void fbnic_hwmon_unregister(struct fbnic_dev *fbd)
-> +{
-> +	if (!IS_REACHABLE(CONFIG_HWMON) || !fbd->hwmon)
-> +		return;
-> +
-> +	hwmon_device_unregister(fbd->hwmon);
-> +	fbd->hwmon = NULL;
-> +}
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-> index 476239a9d381..05a591653e09 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-> @@ -47,6 +47,11 @@ enum {
->   #define FBNIC_LINK_MODE_PAM4	(FBNIC_LINK_50R1)
->   #define FBNIC_LINK_MODE_MASK	(FBNIC_LINK_AUTO - 1)
+Thanks,
+
+Brett
+
 > 
-> +enum fbnic_sensor_id {
-> +	FBNIC_SENSOR_TEMP,		/* Temp in millidegrees Centigrade */
-> +	FBNIC_SENSOR_VOLTAGE,		/* Voltage in millivolts */
-> +};
+>          u32                     tx_ring_size;
+>          u32                     tx_ring_mask;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> index e9ef65dd2e7b..af6ed492f688 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> @@ -839,6 +839,9 @@ static void bnxt_get_ringparam(struct net_device *dev,
+>          else
+>                  kernel_ering->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_DISABLED;
+> 
+> +       kernel_ering->tcp_data_split_thresh = bp->hds_threshold;
+> +       kernel_ering->tcp_data_split_thresh_max = BNXT_HDS_THRESHOLD_MAX;
 > +
->   /* This structure defines the interface hooks for the MAC. The MAC hooks
->    * will be configured as a const struct provided with a set of function
->    * pointers.
-> @@ -83,6 +88,8 @@ struct fbnic_mac {
+>          ering->tx_max_pending = BNXT_MAX_TX_DESC_CNT;
 > 
->   	void (*link_down)(struct fbnic_dev *fbd);
->   	void (*link_up)(struct fbnic_dev *fbd, bool tx_pause, bool rx_pause);
-> +
-> +	int (*get_sensor)(struct fbnic_dev *fbd, int id, long *val);
->   };
-> 
->   int fbnic_mac_init(struct fbnic_dev *fbd);
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-> index a4809fe0fc24..633a9aa39fe2 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-> @@ -289,6 +289,8 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> 
->   	fbnic_devlink_register(fbd);
-> 
-> +	fbnic_hwmon_register(fbd);
-> +
->   	if (!fbd->dsn) {
->   		dev_warn(&pdev->dev, "Reading serial number failed\n");
->   		goto init_failure_mode;
-> @@ -297,7 +299,7 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->   	netdev = fbnic_netdev_alloc(fbd);
->   	if (!netdev) {
->   		dev_err(&pdev->dev, "Netdev allocation failed\n");
-> -		goto init_failure_mode;
-> +		goto ifm_hwmon_unregister;
->   	}
-> 
->   	err = fbnic_netdev_register(netdev);
-> @@ -308,6 +310,8 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
-> 
->   	return 0;
-> 
-> +ifm_hwmon_unregister:
-> +	fbnic_hwmon_unregister(fbd);
->   ifm_free_netdev:
->   	fbnic_netdev_free(fbd);
->   init_failure_mode:
-> @@ -345,6 +349,7 @@ static void fbnic_remove(struct pci_dev *pdev)
->   		fbnic_netdev_free(fbd);
->   	}
-> 
-> +	fbnic_hwmon_unregister(fbd);
->   	fbnic_devlink_unregister(fbd);
->   	fbnic_fw_disable_mbx(fbd);
->   	fbnic_free_irqs(fbd);
-> @@ -428,6 +433,7 @@ static int __fbnic_pm_resume(struct device *dev)
->   	rtnl_unlock();
-> 
->   	return 0;
-> +
->   err_disable_mbx:
->   	rtnl_unlock();
->   	fbnic_fw_disable_mbx(fbd);
+>          ering->rx_pending = bp->rx_ring_size;
+> @@ -871,6 +874,7 @@ static int bnxt_set_ringparam(struct net_device *dev,
+>          case ETHTOOL_TCP_DATA_SPLIT_UNKNOWN:
+>          case ETHTOOL_TCP_DATA_SPLIT_ENABLED:
+>                  bp->flags |= BNXT_FLAG_HDS;
+> +               bp->hds_threshold = (u16)kernel_ering->tcp_data_split_thresh;
+>                  break;
+>          case ETHTOOL_TCP_DATA_SPLIT_DISABLED:
+>                  bp->flags &= ~BNXT_FLAG_HDS;
 > --
-> 2.43.5
-
+> 2.34.1
+> 
 
