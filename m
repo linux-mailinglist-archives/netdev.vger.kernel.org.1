@@ -1,99 +1,144 @@
-Return-Path: <netdev+bounces-131600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12BF398EFCF
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:56:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8049B98EFDE
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 14:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CA7CB24778
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:56:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18E81C20C6E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 12:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA544197A65;
-	Thu,  3 Oct 2024 12:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="chmzQF+u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABA4198852;
+	Thu,  3 Oct 2024 12:59:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB60148823;
-	Thu,  3 Oct 2024 12:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434DD155314;
+	Thu,  3 Oct 2024 12:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727960194; cv=none; b=hL4cMtaKkZw/iqEcc9qp6+YfB5QQVai+5jm+IV3PSL2GV8cB/OcO829IXc9+hKxXUiHSslcUMgKG8GPdrZOUipMQ57uupcx7DTWUyfuPjBxKuzPEqqraO+vjtuYPnCi76LXA2T2rp9pTXb0qScNaJR2Uh0FHYhSILxLV3mna4bc=
+	t=1727960396; cv=none; b=cIoyj/T//xBrrMJ1+Al+iRdSUQQJs+/Lr4SHeCkLfWFlQ7zfrOPZdx0z7KB77FSOYj8AAQRWG4nGeZdVuh+MnTVDbqDJRb/8mCiqEkl/Zmrec52sVmAJ0DCfTqpOB9cJbTfPfd6YVwhl0L60SU51ekWgiA9jjezW2XLG518o8Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727960194; c=relaxed/simple;
-	bh=ELbGgK1SSotfZBZJN05coeserexfapnZur2lQCKI0Zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JqNUqoOOWlkUfM6E74gylT0p2uk9FIoqf5VUrVOr8Gbd7HkKOYzdXHfW+8L8fJYdKDP8S+GzMAZYJjg7l7r7PiuRIkAWyHp7xuvFtDOd47gDCwBDs6t6sR/7ORYDUGyE2oGA3w0JkHMZRSztaU2texc/2aYUZ2dlgekTpSDHbZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=chmzQF+u; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QEN15Fs7xG8c1IcYMNSytb5HdDJacf/jlhNpjv/rApk=; b=chmzQF+uywZf3/gMS8CSot6YUp
-	jNfvb+AOuQnR9tMvMf3wyFJFtZKnASXTcRRJF4tLBbqbHS53RS7pNYFD87oCRJ5NbaWcK8xSsc1Jx
-	GA0bjwb0h+ZGv+KkcO6TPoVjkYpZnNgfMYcpMY8ymcQ+HjlJTlwHK6VaOezNIm6crUUY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swLNV-008wlN-96; Thu, 03 Oct 2024 14:56:21 +0200
-Date: Thu, 3 Oct 2024 14:56:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 11/12] net: pse-pd: Add support for event
- reporting using devm_regulator_irq_helper
-Message-ID: <f97baa90-1f76-4558-815a-ef4f82913c3a@lunn.ch>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
- <f56780af-b2d4-42d7-bc5d-c35b295d7c52@lunn.ch>
- <20241003102806.084367ba@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1727960396; c=relaxed/simple;
+	bh=PTNIJBDutOvlmo3BkQFp9X55W62sCcVJ1Q6khxnJeRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JUJUY0CuZGA8pFcOL8YfbCRcUAqs169Pq6UCpwLJqqNCj6ziEI+xN64HWC2WxhaXeybqYIJAFZV5HyQTbRDSRZIH75e1uzitYbj4PkG+atXB8MYJeVbNpJnnulWKLpA7RMY/0es/75MTo3xLPPmrAGV1ZCbDhK+I73U1SCqhrCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XKBVv2rFfz1HKSN;
+	Thu,  3 Oct 2024 20:55:51 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id AE6BD140118;
+	Thu,  3 Oct 2024 20:59:50 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 3 Oct 2024 20:59:46 +0800
+Message-ID: <bc7afd55-f560-7439-2806-a1f9e73307a0@huawei-partners.com>
+Date: Thu, 3 Oct 2024 15:59:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241003102806.084367ba@kmaincent-XPS-13-7390>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 17/19] samples/landlock: Replace atoi() with
+ strtoull() in populate_ruleset_net()
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-18-ivanov.mikhail1@huawei-partners.com>
+ <ZvbLcsQVTs_RESx0@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZvbLcsQVTs_RESx0@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-> > https://docs.kernel.org/power/regulator/consumer.html#regulator-events
-> > 
-> > Suggests these are internal events, using a notification chain. How
-> > does user space get to know about such events?
+On 9/27/2024 6:12 PM, Günther Noack wrote:
+> On Wed, Sep 04, 2024 at 06:48:22PM +0800, Mikhail Ivanov wrote:
+>> Add str2num() helper and replace atoi() with it. atoi() does not provide
+>> overflow checks, checks of invalid characters in a string and it is
+>> recommended to use strtol-like functions (Cf. atoi() manpage).
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   samples/landlock/sandboxer.c | 27 ++++++++++++++++++++++++++-
+>>   1 file changed, 26 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
+>> index e8223c3e781a..d4dba9e4ce89 100644
+>> --- a/samples/landlock/sandboxer.c
+>> +++ b/samples/landlock/sandboxer.c
+>> @@ -150,6 +150,26 @@ static int populate_ruleset_fs(const char *const env_var, const int ruleset_fd,
+>>   	return ret;
+>>   }
+>>   
+>> +static int str2num(const char *numstr, unsigned long long *num_dst)
+>> +{
+>> +	char *endptr = NULL;
+>> +	int err = 1;
+>> +	unsigned long long num;
+>> +
+>> +	errno = 0;
+>> +	num = strtoull(numstr, &endptr, 0);
+>> +	if (errno != 0)
+>> +		goto out;
+>> +
+>> +	if (*endptr != '\0')
+>> +		goto out;
+>> +
+>> +	*num_dst = num;
+>> +	err = 0;
+>> +out:
+>> +	return err;
+>> +}
 > 
-> When events appears, _notifier_call_chain() is called which can generate netlink
-> messages alongside the internal events:
-> https://elixir.bootlin.com/linux/v6.11.1/source/drivers/regulator/core.c#L4898
+> I believe if numstr is the empty string, str2num would return success and set
+> num_dst to 0, which looks unintentional to me.
 
-Ah, O.K.
+Yeap.. I'll fix this
 
-But is this in the correct 'address space' for the want of a better
-term. Everything else to do with PSE is in the networking domain of
-netlink. ethtool is used to configure PSE. Shouldn't the notification
-also close by to ethtool? When an interface changes state, there is a
-notification sent. Maybe we want to piggyback on that?
+> 
+> Do we not have a better helper for this that we can link from here?
 
-Also, how do regulator events work in combination with network
-namespaces? If you move the interface into a different network
-namespace, do the regulator events get delivered to the root namespace
-or the namespace the interface is in?
+I've checked how such convertion is performed in selftests by another
+subsystems and it seems that most common practise is to implement static
+helper or inline convertion in the needed place (e.g. safe_int() in
+selftests/net/af_unix/scm_pidfd.c).
 
-	Andrew
+> 
+>> +
+>>   static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
+>>   				const __u64 allowed_access)
+>>   {
+>> @@ -168,7 +188,12 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
+>>   
+>>   	env_port_name_next = env_port_name;
+>>   	while ((strport = strsep(&env_port_name_next, ENV_DELIMITER))) {
+>> -		net_port.port = atoi(strport);
+>> +		if (str2num(strport, &net_port.port)) {
+>> +			fprintf(stderr,
+>> +				"Failed to convert \"%s\" into a number\n",
+>> +				strport);
+>> +			goto out_free_name;
+>> +		}
+>>   		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>>   				      &net_port, 0)) {
+>>   			fprintf(stderr,
+>> -- 
+>> 2.34.1
+>>
 
