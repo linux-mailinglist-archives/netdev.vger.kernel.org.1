@@ -1,146 +1,111 @@
-Return-Path: <netdev+bounces-131744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E0D98F682
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:52:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26E898F690
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 20:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99AC51F22C67
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:52:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108051C22C8E
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 18:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81901AAE1D;
-	Thu,  3 Oct 2024 18:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D78B1AC8B9;
+	Thu,  3 Oct 2024 18:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cvPyXDO6"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="RcPTq1p3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from msa.smtpout.orange.fr (smtp-76.smtpout.orange.fr [80.12.242.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471781A726D
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 18:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19351AB536;
+	Thu,  3 Oct 2024 18:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727981534; cv=none; b=giS4hlc5c022rCASPrLVb9AZRKtasRedoInfnyDOwo/GGyBEyag2nD9YzlIX1CEHJV+YKSKJ6CNhprUFZiAdTx59UOsQohVhkxwHPsIZejcFlsrawry6duIZo5eCazZqovDWZ3YXchxtSC+GHAB+e/I7XaW1nwZeyPhgVUDcpjs=
+	t=1727981672; cv=none; b=MTuWHzgSekeMb9w7wmJObLvbNmq9lHs2mV5UDYLEVcQCLcDzBnI4UEegj8oMktj5cQyuJnJE9mP4f3WWxgLkE6PgoCx1mzv3zNQe8tgnZ1VpcXs1EBTdltvaaR2DfZ6cD41R43xaRXI/b6Dy4Jw9HwrT1hGMvx1RHKxa+GEEMNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727981534; c=relaxed/simple;
-	bh=e1NYu7I5qkmnVTCQzfdWFgW/1nATCpDvamcoEXMui70=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T3xENmtNCRhE+sRddRC4a5wZevLFPN2I15bK0MJA9T1QEPHOcSKDcPtx5ALvdLJdCa5AE2b4OXxmJ9E66MnLz1GU3jGkJdoEoDDJEcAXJ0GfiOhdItshygjhDkk8RMNqnxpAtXzjRqGEDdbY8SGYMh7xINUiL7z+8ptw9bcTl+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cvPyXDO6; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-45b4e638a9aso47401cf.1
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 11:52:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727981532; x=1728586332; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aq4aPmlefZj71TTv9ryf0cTAO/gElDk68NnVGBgBEJI=;
-        b=cvPyXDO6vJc+t2zulvpyLOrlpVX7Dg+TitiL6OfiZ256lmfEKSCRsDgxmEB464t7x2
-         ZIjh75jopYqmAYPwVwXcHb7pCoEGZRTRJZws3KnUFJwn6jIY+sEIYvDjkxNWN4KvoYB4
-         twn4oxvl7wJqhhKPfI/MsljsEKKH0SE0dk7/DXFOst6wpncgDm+uHGh+l7C26mQMsCU0
-         leZrazGEhSk/3wMqYqGgcfdnNbOwDgoTswifTFj4IWpRN7PLBeJXUKicx/Z9ZMVeCrd7
-         qlyNCYSXtTkXRjJIZmJQJFfOsJXMtqz2ZL7MblYlGNaBlGxHM6HR6+eyNOV1Xq0o70HF
-         7U6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727981532; x=1728586332;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aq4aPmlefZj71TTv9ryf0cTAO/gElDk68NnVGBgBEJI=;
-        b=nQyo1C/KE8ojRmdYsEjlGzLz78ne16n4OtTP96zGCaQdkkm0HsShajXMrgPy3JGT4c
-         woksz5V+/gP/pTw5fkvaKBZxnTdTgMuyCa00dW2HOE0SH/87Q/SGArEc+kMj6kbDIvSS
-         BmlaaamrSiis3xnJ4xv6aTii3Ez7lGZmyxVufeyGbLKaA3T+c3VdOpB0cQq9Ul4mP7l6
-         TuPt6RNdUfKfOL803yVWYAcyqaKH3iQrdAu6KsoihAWXrR42z69bdUb4VJ/KulM/Kbj8
-         A0kp72D2hu2/lZzwFawr+BUVQkAWRMIfSnCNjEESod5ak2+Dq2NMfoxq1VZ4v5Ws0jCV
-         fXzw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdK0x1tZ0AJo5asl3AE/LRmYmDAmhczVTK2gcm9rBdO5H1JPKRwa5glTOZL0e03ACeM4DD0Q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSjENA2Fm34G2WtHGKB//92V44NeTmAj6GZyf1FcHjbYZC8uiL
-	35f3enNkFlrT+X6lSxh61lJ5xp7tO5ANSZxcbOVOzIiKu3cj3Eh+3y0iq80cIakU1jKV9FeEhCW
-	N3wMCO6DPUKMcTy6IV/TDi7/7nDHnAglH1Zs9
-X-Google-Smtp-Source: AGHT+IEDKI5ur8infGRx7X61AnPXphtUWV6odlnyjGCpYzC/1H0FChihtbivx+/7TH2GKRW1HzfeIZjPNqbx9QFPfBo=
-X-Received: by 2002:a05:622a:a707:b0:45b:10b4:122b with SMTP id
- d75a77b69052e-45d9bda22demr61171cf.6.1727981531833; Thu, 03 Oct 2024 11:52:11
- -0700 (PDT)
+	s=arc-20240116; t=1727981672; c=relaxed/simple;
+	bh=/cj7PUciJXZ34k47vGyZUDVp6egyvPLvBLDTholTqpQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Om22MIkdDI7hDBi4vULhH6DdC7mGdarGTq7WZ1NlTUtqoSMySxRBRGrhgetE5ohtAzk6YVJuLDSzxFPITr8xsYKYvO1xtE/i4rfZE8/4r2sWvnbNXyd57c0Yhaco0kbMM2iIBtHJ84hVGmx9u8YrJbIbUebtrch5JEVBODJh4Fc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=RcPTq1p3; arc=none smtp.client-ip=80.12.242.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from fedora.home ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id wQwxsRi2Zp9C3wQwxsQKiJ; Thu, 03 Oct 2024 20:53:21 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1727981601;
+	bh=xMiEBxIdNs7LudG+UJ24JK1bTvo4wJM890kDuVjvitg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=RcPTq1p3GpocvLc/crHw117+6Mb9NF0DBeFvg5xn2xRT72ihleA1PFcPevMvAdl2p
+	 88JO8aTVMtwndFANKYJd01L7hmJFFKoH7SNfywwG7tMbF/HHAXZWxHlNb01KZuUjGm
+	 hbwdtRZK3Zj1xe2Z5Ec5d6MIwi81lgmzt0Bm3IJEeOBIOZ2KiEG1wzYrjYttAigp7A
+	 p7uJ+hVNSDRsaIuhUK29O/EvhfiJhNt+4ELD2DwNXSoDRHGJGK/zbW7EaI47jxOvIg
+	 6SyQjlKt2wa5BCXlL108EBy/VGSVq4Kjl7xC0k4V+fgWRvWvV4v8neEs5yQEPz+qKZ
+	 qOgi2Zf4TGIyw==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Thu, 03 Oct 2024 20:53:21 +0200
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] net: ethernet: adi: adin1110: Fix some error handling path in adin1110_read_fifo()
+Date: Thu,  3 Oct 2024 20:53:15 +0200
+Message-ID: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930171753.2572922-1-sdf@fomichev.me> <20240930171753.2572922-6-sdf@fomichev.me>
- <CAHS8izPbGa7v9UfcMNXhwLQ6z2dNth92x6MF7zwgUijziK0U-g@mail.gmail.com> <Zv7IFJqBbASyl26L@mini-arch>
-In-Reply-To: <Zv7IFJqBbASyl26L@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 3 Oct 2024 11:51:58 -0700
-Message-ID: <CAHS8izN8KweeMsYOtP7BqB_XaTcgpbZi0aust9ehOqnwrq08DQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 05/12] selftests: ncdevmem: Remove default arguments
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 3, 2024 at 9:36=E2=80=AFAM Stanislav Fomichev <stfomichev@gmail=
-.com> wrote:
->
-> On 10/02, Mina Almasry wrote:
-> > On Mon, Sep 30, 2024 at 10:18=E2=80=AFAM Stanislav Fomichev <sdf@fomich=
-ev.me> wrote:
-> > >
-> > > To make it clear what's required and what's not. Also, some of the
-> > > values don't seem like a good defaults; for example eth1.
-> > >
-> > > Cc: Mina Almasry <almasrymina@google.com>
-> > > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > ---
-> > >  tools/testing/selftests/net/ncdevmem.c | 34 +++++++++---------------=
---
-> > >  1 file changed, 12 insertions(+), 22 deletions(-)
-> > >
-> > > diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/s=
-elftests/net/ncdevmem.c
-> > > index 699692fdfd7d..bf446d74a4f0 100644
-> > > --- a/tools/testing/selftests/net/ncdevmem.c
-> > > +++ b/tools/testing/selftests/net/ncdevmem.c
-> > > @@ -42,32 +42,13 @@
-> > >  #define MSG_SOCK_DEVMEM 0x2000000
-> > >  #endif
-> > >
-> > > -/*
-> > > - * tcpdevmem netcat. Works similarly to netcat but does device memor=
-y TCP
-> > > - * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
-> > > - *
-> > > - * Usage:
-> > > - *
-> > > - *     On server:
-> > > - *     ncdevmem -s <server IP> -c <client IP> -f eth1 -l -p 5201 -v =
-7
-> > > - *
-> >
-> > No need to remove this documentation I think. This is useful since we
-> > don't have a proper docs anywhere.
-> >
-> > Please instead update the args in the above line, if they need
-> > updating, but looks like it's already correct even after this change.
->
-> The client needs '-s' part. That's why I removed it - most likely
-> will tend to go stale and we now have the invocation example in the
-> selftest. But if you want to keep it, how about I move it to the
-> top of the file and cleanup a bit? Will do for the next iteration..
+If 'frame_size' is too small or if 'round_len' is an error code, it is
+likely that an error code should be returned to the caller.
 
-Yeah, the 'docs' will need to be updated for the TX path, but I hope,
-not removed. We don't really have any other clues on how to run this
-thing. The docs will become less important when the kselftest is
-properly up and running because it is self documenting, but just in
-case anyone wants to run ncdevmem manually the docs are nice. Any
-cleanup and movement for clarity is welcome indeed.
+Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
+'success' is returned.
 
---=20
-Thanks,
-Mina
+Return -EINVAL instead.
+
+Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+This patch is speculative.
+If returning 0 is what was intended, then an explicit 0 would be better.
+---
+ drivers/net/ethernet/adi/adin1110.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
+index 3431a7e62b0d..c04036b687dd 100644
+--- a/drivers/net/ethernet/adi/adin1110.c
++++ b/drivers/net/ethernet/adi/adin1110.c
+@@ -318,11 +318,11 @@ static int adin1110_read_fifo(struct adin1110_port_priv *port_priv)
+ 	 * from the  ADIN1110 frame header.
+ 	 */
+ 	if (frame_size < ADIN1110_FRAME_HEADER_LEN + ADIN1110_FEC_LEN)
+-		return ret;
++		return -EINVAL;
+ 
+ 	round_len = adin1110_round_len(frame_size);
+ 	if (round_len < 0)
+-		return ret;
++		return -EINVAL;
+ 
+ 	frame_size_no_fcs = frame_size - ADIN1110_FRAME_HEADER_LEN - ADIN1110_FEC_LEN;
+ 	memset(priv->data, 0, ADIN1110_RD_HEADER_LEN);
+-- 
+2.46.2
+
 
