@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-131479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A2898E9BC
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:35:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7FB98E9CD
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 08:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85801F242A8
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 06:35:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEC7B1F215D0
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 06:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5297F40BF2;
-	Thu,  3 Oct 2024 06:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A367F7DB;
+	Thu,  3 Oct 2024 06:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="gAwS4c57"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IvJmVuLs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456932CA9
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 06:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7360537F8
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 06:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727937314; cv=none; b=OZA2qZImvmr9NTS6d0kCdYD8AeF1kE8wAOscPA0V0JX1/8jI4Kk7P3/mKj9w4o4lndbFD0cFtB8p2uD4Xyz9siAAwjkq3IGZvwXoCj7ofx2tARPrhmgVcGYnBbI1rEmotpsdmRsl8QDJZnrp7ZKb/WwLbLiZa+0ZvG48S65RE8U=
+	t=1727938291; cv=none; b=Z6bEnrcDFIWAwo014UX90Vd0x5U1VT2fMQS67ZgJ5gFp18Vlf6mpMH3wM319YaqG3jhDDR8fAr5OsgeksHZigOonR++STGlO/obMcPQG2dfbWraoMCsJHuAGCGsvoiljih6KoDm9g/hJUtJR1ArDhlMowqK6LhiWQ59+CcCmal8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727937314; c=relaxed/simple;
-	bh=ZgKMQgrTlpqAaciWFAAkm9D5J1TD8UxILiaJDvpjets=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=S4FJydp25OrAHvVOb1hryhBkEQboQto7OgUT0fRnRx+sc9xAJmosAjXtMdFusc5fYWdOoBVfOweaAzTtiStwNrdoR/vDyvpWOyXxFUFeEEvWp2FMvfKWzBdrAqlfvemCYRyBqe/kVIqIgyuzqNzWrqPATCQ2vnbqcL8SufNcrK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=gAwS4c57; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1727938291; c=relaxed/simple;
+	bh=WfFQOlU/FNGjfQVBBdMXE6R4DGDei7d3X3WOszlo3XY=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=NlhukxbKGLhxLA9ABlu7oKyJJX4Hmh+N+Zoh0r7RGi4cjgGGOLu6ExhOnciW0NkyDyaGNyKiPFOcs5D3UDRmiIKssyKNg2pNat1kxkng4+TN0Je9ir0H7tnUPmK7mMbXZfj+BV4p7ZLrkJtP0eUj050zvvMpMYzhRyS5pOb8z9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IvJmVuLs; arc=none smtp.client-ip=209.85.167.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42cbc38a997so3258755e9.1
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 23:35:12 -0700 (PDT)
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539908f238fso623868e87.2
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 23:51:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1727937310; x=1728542110; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=cloudflare.com; s=google09082023; t=1727938288; x=1728543088; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=N4rfjZLoUiX7LpaLbuzZxhQKAqk1hkqOVodJ4+flRDM=;
-        b=gAwS4c57HMtOclcFf3Eu8prN7UrG7IJsSUeImqqjB1MHnVNwEq0egSSzZXDpxbEYoZ
-         E9M+1yZaiTZKxNF+rqD0M+K7Qr7bqc03wUC93O9RxBtnpRo2AeQijPRDK16tPlJMW280
-         rj/k5p0USoF/ZMPggFhIr/+CoTs6xPtdF4930lQEF+cBCI7uCmff+/n2JbMU4kKXuDCf
-         wvZr8cnqrHAW7pjHoAdLcqDAxz488CNbGwZHnebrFOzB6/sNdr7vXm6TVLJyBCT7GEl3
-         Wjx9IvWmUcv5w3jUZlm79VWfXslCOGlm9PoBeiDx3JgbwzUruXBOZkeFyNOh6zR/CTJV
-         Eotg==
+        bh=WfFQOlU/FNGjfQVBBdMXE6R4DGDei7d3X3WOszlo3XY=;
+        b=IvJmVuLsz83pPgToWEj3tm07DeFgmFSKYUG5Vz1Lr1vZn5hmRmuwhTBwxyyMocmkPa
+         w3SsVQgrf0n0h7G5QfuuY1QocXaRCmrE6TzayejTHeuXiSsV0qk/JWLxOu12emTc7/Rb
+         f2whZMq3C3mM+XRzd4vo7soCjseukbJ4S7l2aDeJeqyqAHsfp6znHQyfOHJlKMw8KUIr
+         J+EpqIc4/EQJwWr0fCZavqoDV/4/+lOR3v1kMPVDCeY6bOVTYWmL1pRPv72WZzE2rUAe
+         hDQClxI4ilkdqIpSaJy6SZw6LRyXxMHxTSi0iHLcNGznWjrSCnin2PYXuMsS+XSoiLuV
+         35eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727937310; x=1728542110;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
+        d=1e100.net; s=20230601; t=1727938288; x=1728543088;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=N4rfjZLoUiX7LpaLbuzZxhQKAqk1hkqOVodJ4+flRDM=;
-        b=J0Kj8ImYucfgVEnmbtACiy/v9woJLykzkdKkq8SUzUVJO+r+J/YqE8xzLlACqzuOdp
-         A2CcO2JrPoaKTdAGKoWQ5LiXqxennTq/LSVnM6NOwyjjr4eR8ZvS7CRfBhxTilZ29uGE
-         aGAvZ3qFaXIW9KmafkacMACRbCvvTOg2Na53ulQJy5Ae44amSWxB+8UKuFcKRoRX2LBP
-         78RSNlPffN+qWK2DeurtdOlSLKGU9kwyk/1jCpPFcrN++dOAdA8cPBpi0QMXNANxSV+g
-         mne5Gea1k0UmB2h4KImyRAe5G8YqOCNG19ukr9kg41Shsyb3Qi+PR7K6TNeuRhQbGH8A
-         vyRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWafip2ycTIgtHlyqcULTQByZ9MSsaAUtHtTOkrhpLtZ9K7r+txTtaBPWpaPnNBVobGjpBDBh4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyn+sB8GBdDMt2qo/hHNop0i9VmE2j/ti+EUCgznqNKcePeGB84
-	Z+tN1p6LebiuieyNiR5e6cEkCR1OcsBUZ1sAeCLKOnBDsh+Lc4qJc0KINT98nVc=
-X-Google-Smtp-Source: AGHT+IFppr1P2N6tb8E4QOgYU6oJ/Xj7hkZoH3KFMunREaX7pS4Cha4UmFYK1ubPULDrtl6JNcY6+g==
-X-Received: by 2002:a05:600c:3b1d:b0:42c:b81b:c49c with SMTP id 5b1f17b1804b1-42f7df49b84mr11349435e9.10.1727937310514;
-        Wed, 02 Oct 2024 23:35:10 -0700 (PDT)
+        bh=WfFQOlU/FNGjfQVBBdMXE6R4DGDei7d3X3WOszlo3XY=;
+        b=l6jk4JYW37s2QZGv/ntYB0yOpGZvv549Y6dbu0/BhJ9unCWuum1hUPbXB/82y3PxXd
+         +U0vp9O5o7YnPISlXH5CgFKijyRAATfMx12EQFbNo2it8QpjGEGWu5Wa2Ow/0I4bdwGq
+         hyRTgFXDRU1xpQZb1P5dg3PFi50gB6g5TPguFO/M/+VhxxKUDlATjBDz8JPb+OpE6a3i
+         Vv2gC+tvYSfbsGBxxgTM+2wHTE1ECR2LCelO4udCc1T9ZqGF/1gi/mGN1jII/a4zg/sq
+         B5t9SqsTun/HjiPGnXU4mgAGwuiJHW46lvtp2ujZjuL8T/qHryDy9QbvD+Opq0szxt2x
+         vdoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUX7OdDrH5x5KEebpWyb9KQTc1DGaafweZx4PhITNFKetez+AGBcc266j4qutl4VJ897iCZ90w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws1S5yzIDEo2ePBKbtT9U6BrnyXxaeZubbVksyTCdX8HMFhEuT
+	kpkgxHe/OjX9NAOBNdA9h7VZi0+RvGaJ1fP3dZgGDzR62IN8kSHNAadokRuOQpE=
+X-Google-Smtp-Source: AGHT+IFPzic61mAOdapq2igy/pJOJfz/CFhssuKDfJVb3+2mio6Wf7QJg2yWIWSfpPGTMK9HJ+plaw==
+X-Received: by 2002:a05:6512:b90:b0:534:3cdc:dbfe with SMTP id 2adb3069b0e04-539a067c3demr2912257e87.28.1727938287661;
+        Wed, 02 Oct 2024 23:51:27 -0700 (PDT)
 Received: from localhost ([2a09:bac1:27c0:58::31:92])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d082d2295sm523423f8f.107.2024.10.02.23.35.07
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f802a0195sm7488605e9.38.2024.10.02.23.51.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Oct 2024 23:35:10 -0700 (PDT)
+        Wed, 02 Oct 2024 23:51:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,16 +75,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 03 Oct 2024 08:35:07 +0200
-Message-Id: <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby>
-Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>, "Lorenzo Bianconi"
- <lorenzo.bianconi@redhat.com>, "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Jakub Sitnicki" <jakub@cloudflare.com>, "Alexander Lobakin"
- <aleksander.lobakin@intel.com>, <bpf@vger.kernel.org>,
- <netdev@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <davem@davemloft.net>, <kuba@kernel.org>, <john.fastabend@gmail.com>,
- <edumazet@google.com>, <pabeni@redhat.com>, <sdf@fomichev.me>,
- <tariqt@nvidia.com>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
+Date: Thu, 03 Oct 2024 08:51:25 +0200
+Message-Id: <D4LZ01REEQLV.3M4VOEW5XK5YZ@bobby>
+To: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>, "Jesper Dangaard
+ Brouer" <hawk@kernel.org>, "Jakub Sitnicki" <jakub@cloudflare.com>,
+ "Alexander Lobakin" <aleksander.lobakin@intel.com>, "Lorenzo Bianconi"
+ <lorenzo@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <davem@davemloft.net>,
+ <kuba@kernel.org>, <john.fastabend@gmail.com>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <sdf@fomichev.me>, <tariqt@nvidia.com>,
+ <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
  <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
  <mst@redhat.com>, <jasowang@redhat.com>, <mcoquelin.stm32@gmail.com>,
  <alexandre.torgue@foss.st.com>, "kernel-team" <kernel-team@cloudflare.com>,
@@ -92,200 +93,159 @@ Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>, "Lorenzo Bianconi"
 Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
  XDP_REDIRECT
 From: "Arthur Fabre" <afabre@cloudflare.com>
-To: "Stanislav Fomichev" <stfomichev@gmail.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
 X-Mailer: aerc 0.8.2
-References: <87ldzds8bp.fsf@toke.dk> <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
- <ZvbKDT-2xqx2unrx@lore-rh-laptop> <871q11s91e.fsf@toke.dk>
- <ZvqQOpqnK9hBmXNn@lore-desk> <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby>
- <ZvwNQqN4gez1Ksfn@lore-desk> <87zfnnq2hs.fsf@toke.dk>
- <Zv18pxsiTGTZSTyO@mini-arch> <87ttdunydz.fsf@toke.dk>
- <Zv3N5G8swr100EXm@mini-arch>
-In-Reply-To: <Zv3N5G8swr100EXm@mini-arch>
+References: <cover.1726935917.git.lorenzo@kernel.org>
+ <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+ <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
+ <Zu_gvkXe4RYjJXtq@lore-desk> <87ldzkndqk.fsf@toke.dk>
+ <CAOn4ftshf3pyAst27C2haaSj4eR2n34_pcwWBc5o3zHBkwRb3g@mail.gmail.com>
+ <87wmiysi37.fsf@toke.dk> <D4GBY7CHJNJ6.3O18I5W1FTPKR@bobby>
+ <87ldzds8bp.fsf@toke.dk> <D4H5CAN4O95E.3KF8LAH75FYD4@bobby>
+ <874j5xs9b1.fsf@toke.dk> <D4KIZY73DAJJ.EVUPLH612IV6@bobby>
+ <87wmirq1uk.fsf@toke.dk>
+In-Reply-To: <87wmirq1uk.fsf@toke.dk>
 
-On Thu Oct 3, 2024 at 12:49 AM CEST, Stanislav Fomichev wrote:
-> On 10/02, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > Stanislav Fomichev <stfomichev@gmail.com> writes:
-> >=20
-> > > On 10/01, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > >> Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> > >>=20
-> > >> >> On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi wrote:
-> > >> >> > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> > >> >> > >=20
-> > >> >> > > >> > We could combine such a registration API with your heade=
-r format, so
-> > >> >> > > >> > that the registration just becomes a way of allocating o=
-ne of the keys
-> > >> >> > > >> > from 0-63 (and the registry just becomes a global copy o=
-f the header).
-> > >> >> > > >> > This would basically amount to moving the "service confi=
-g file" into the
-> > >> >> > > >> > kernel, since that seems to be the only common denominat=
-or we can rely
-> > >> >> > > >> > on between BPF applications (as all attempts to write a =
-common daemon
-> > >> >> > > >> > for BPF management have shown).
-> > >> >> > > >>=20
-> > >> >> > > >> That sounds reasonable. And I guess we'd have set() check =
-the global
-> > >> >> > > >> registry to enforce that the key has been registered befor=
-ehand?
-> > >> >> > > >>=20
-> > >> >> > > >> >
-> > >> >> > > >> > -Toke
-> > >> >> > > >>=20
-> > >> >> > > >> Thanks for all the feedback!
-> > >> >> > > >
-> > >> >> > > > I like this 'fast' KV approach but I guess we should really=
- evaluate its
-> > >> >> > > > impact on performances (especially for xdp) since, based on=
- the kfunc calls
-> > >> >> > > > order in the ebpf program, we can have one or multiple memm=
-ove/memcpy for
-> > >> >> > > > each packet, right?
-> > >> >> > >=20
-> > >> >> > > Yes, with Arthur's scheme, performance will be ordering depen=
-dent. Using
-> > >> >> > > a global registry for offsets would sidestep this, but have t=
-he
-> > >> >> > > synchronisation issues we discussed up-thread. So on balance,=
- I think
-> > >> >> > > the memmove() suggestion will probably lead to the least pain=
+On Tue Oct 1, 2024 at 5:28 PM CEST, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> "Arthur Fabre" <afabre@cloudflare.com> writes:
+>
+> > On Mon Sep 30, 2024 at 12:52 PM CEST, Toke H=C3=B8iland-J=C3=B8rgensen =
+wrote:
+> >> > Thinking about it more, my only relectance for a registration API is=
+ how
+> >> > to communicate the ID back to other consumers (our discussion below)=
 .
-> > >> >> > >=20
-> > >> >> > > For the HW metadata we could sidestep this by always having a=
- fixed
-> > >> >> > > struct for it (but using the same set/get() API with reserved=
- keys). The
-> > >> >> > > only drawback of doing that is that we statically reserve a b=
-it of
-> > >> >> > > space, but I'm not sure that is such a big issue in practice =
-(at least
-> > >> >> > > not until this becomes to popular that the space starts to be=
- contended;
-> > >> >> > > but surely 256 bytes ought to be enough for everybody, right?=
- :)).
-> > >> >> >
-> > >> >> > I am fine with the proposed approach, but I think we need to ve=
-rify what is the
-> > >> >> > impact on performances (in the worst case??)
-> > >> >>=20
-> > >> >> If drivers are responsible for populating the hardware metadata b=
-efore
-> > >> >> XDP, we could make sure drivers set the fields in order to avoid =
-any
-> > >> >> memove() (and maybe even provide a helper to ensure this?).
-> > >> >
-> > >> > nope, since the current APIs introduced by Stanislav are consuming=
- NIC
-> > >> > metadata in kfuncs (mainly for af_xdp) and, according to my unders=
-tanding,
-> > >> > we want to add a kfunc to store the info for each NIC metadata (e.=
-g rx-hash,
-> > >> > timestamping, ..) into the packet (this is what Toke is proposing,=
- right?).
-> > >> > In this case kfunc calling order makes a difference.
-> > >> > We can think even to add single kfunc to store all the info for al=
-l the NIC
-> > >> > metadata (maybe via a helping struct) but it seems not scalable to=
- me and we
-> > >> > are losing kfunc versatility.
-> > >>=20
-> > >> Yes, I agree we should have separate kfuncs for each metadata field.
-> > >> Which means it makes a lot of sense to just use the same setter API =
-that
-> > >> we use for the user-registered metadata fields, but using reserved k=
-eys.
-> > >> So something like:
-> > >>=20
-> > >> #define BPF_METADATA_HW_HASH      BIT(60)
-> > >> #define BPF_METADATA_HW_TIMESTAMP BIT(61)
-> > >> #define BPF_METADATA_HW_VLAN      BIT(62)
-> > >> #define BPF_METADATA_RESERVED (0xffff << 48)
-> > >>=20
-> > >> bpf_packet_metadata_set(pkt, BPF_METADATA_HW_HASH, hash_value);
-> > >>=20
-> > >>=20
-> > >> As for the internal representation, we can just have the kfunc do
-> > >> something like:
-> > >>=20
-> > >> int bpf_packet_metadata_set(field_id, value) {
-> > >>   switch(field_id) {
-> > >>     case BPF_METADATA_HW_HASH:
-> > >>       pkt->xdp_hw_meta.hash =3D value;
-> > >>       break;
-> > >>     [...]
-> > >>     default:
-> > >>       /* do the key packing thing */
-> > >>   }
-> > >> }
-> > >>=20
-> > >>=20
-> > >> that way the order of setting the HW fields doesn't matter, only the
-> > >> user-defined metadata.
-> > >
-> > > Can you expand on why we need the flexibility of picking the metadata=
- fields
-> > > here? Presumably we are talking about the use-cases where the XDP pro=
-gram
-> > > is doing redirect/pass and it doesn't really know who's the final
-> > > consumer is (might be another xdp program or might be the xdp->skb
-> > > kernel case), so the only sensible option here seems to be store ever=
-ything?
-> >=20
-> > For the same reason that we have separate kfuncs for each metadata fiel=
+> >> >
+> >> >>
+> >> >> > Dynamically registering fields means you have to share the return=
+ed ID
+> >> >> > with whoever is interested, which sounds tricky.
+> >> >> > If an XDP program sets a field like packet_id, every tracing
+> >> >> > program that looks at it, and userspace service, would need to kn=
+ow what
+> >> >> > the ID of that field is.
+> >> >> > Is there a way to easily share that ID with all of them?
+> >> >>
+> >> >> Right, so I'll admit this was one of the handwavy bits of my origin=
+al
+> >> >> proposal, but I don't think it's unsolvable. You could do something=
+ like
+> >> >> (once, on application initialisation):
+> >> >>
+> >> >> __u64 my_key =3D bpf_register_metadata_field(my_size); /* maybe add=
+ a name for introspection? */
+> >> >> bpf_map_update(&shared_application_config, &my_key_index, &my_key);
+> >> >>
+> >> >> and then just get the key out of that map from all programs that wa=
+nt to
+> >> >> use it?
+> >> >
+> >> > Passing it out of band works (whether it's via a pinned map like you
+> >> > described, or through other means like a unix socket or some other
+> >> > API), it's just more complicated.
+> >> >
+> >> > Every consumer also needs to know about that API. That won't work wi=
+th
+> >> > standard tools. For example if we set a PACKET_ID KV, maybe we could
+> >> > give it to pwru so it could track packets using it?
+> >> > Without registering keys, we could pass it as a cli flag. With
+> >> > registration, we'd have to have some helper to get the KV ID.
+> >> >
+> >> > It also introduces ordering dependencies between the services on
+> >> > startup, eg packet tracing hooks could only be attached once our XDP
+> >> > service has registered a PACKET_ID KV, and they could query it's API=
+.
+> >>
+> >> Yeah, we definitely need a way to make that accessible and not too
+> >> cumbersome.
+> >>
+> >> I suppose what we really need is a way to map an application-specific
+> >> identifier to an ID. And, well, those identifiers could just be (strin=
+g)
+> >> names? That's what we do for CO-RE, after all. So you'd get something
+> >> like:
+> >>
+> >> id =3D bpf_register_metadata_field("packet_id", 8, BPF_CREATE); /* reg=
+ister */
+> >>
+> >> id =3D bpf_register_metadata_field("packet_id", 8, BPF_NO_CREATE); /* =
+resolve */
+> >>
+> >> and we make that idempotent, so that two callers using the same name a=
+nd
+> >> size will just get the same id back; and if called with BPF_NO_CREATE,
+> >> you'll get -ENOENT if it hasn't already been registered by someone els=
+e?
+> >>
+> >> We could even make this a sub-command of the bpf() syscall if we want =
+it
+> >> to be UAPI, but that's not strictly necessary, applications can also
+> >> just call the registration from a syscall program at startup...
+> >
+> > That's a nice API, it makes sharing the IDs much easier.
+> >
+> > We still have to worry about collisions (what if two different things
+> > want to add their own "packet_id" field?). But at least:
+> >
+> > * "Any string" has many more possibilities than 0-64 keys.
+>
+> Yes, and it's easy to namespace (by prefixing, like
+> APPNAME_my_metaname). But sure, if everyone uses very generic names that
+> will be a problem.
+>
+> > * bpf_register_metadata() could return an error if a field is already
+> > registered, instead of silently letting an application overwrite
+> > metadata
+>
+> I don't think we can fundamentally solve the collision problem if we
+> also need to allow sharing keys (on purpose). I.e., we can't distinguish
+> between "these two applications deliberately want to share the packet_id
+> field" and "these two applications accidentally both picked packet_id as
+> their internal key".
+
+Good point. We either have to be happy with sharing the small keys
+space, or sharing the much bigger string space.
+
+> I suppose we could pre-define some extra reserved keys if there turns
+> out to be widely used identifiers that many applications want. But I'm
+> not sure if that should be there from the start, it quickly becomes very
+> speculative(packet_id comes to mind as one that might be generally
+> useful, but I'm really not sure, TBH).
+>
+> > (although arguably we could have add a BPF_NOEXIST style flag
+> > to the KV set() to kind of do the same).
+>
+> A global registry will need locking, so not sure it's a good idea to
+> support inserting into it in the fast path?
+
+(I meant just checking if a KV with that value has been set already or
+not, in the case where we don't have a registration API).
+
+That raises an interesting question: we probably won't be able to
+ensure that the keys passed to set() have been registered ahead of time.
+That would require checking the locked global registry as you point
+out.=20
+
+Misbehaving users could just skip calling register() altogether, and
+directly pick a random key to use.
+
+Maybe we could solve this by having a pair of atomic u64s per thread
+storing the KV header to describe which keys are allowed to be set, and
+what size they'll have? But that's starting to feel complicated.
+
+(Same for the size parameter in register() - we won't be able to enforce
+that that is actually the size then passed to set(). But I think we
+can just drop it - anyways we can't check the size ahead of time because
+we can't know about adjust_head() / expand_head() calls).
+
+>
+> > At least internally, it still feels like we'd maintain a registry of
+> > these string fields and make them configurable for each service to avoi=
 d
-> > when getting it from the driver: XDP programs should have the
-> > flexibility to decide which pieces of metadata they need, and skip the
-> > overhead of stuff that is not needed.
-> >=20
-> > For instance, say an XDP program knows that nothing in the system uses
-> > timestamps; in that case, it can skip both the getter and the setter
-> > call for timestamps.
+> > collisions.
 >
-> But doesn't it put us in the same place? Where the first (native) xdp pro=
-gram
-> needs to know which metadata the final consumer wants. At this point
-> why not propagate metadata layout as well?
+> Yeah, see above. Some kind of coordination (like a registry) is
+> impossible to avoid if you *want* to share data, but not sure how
+> common that is?
 >
-> (or maybe I'm still missing what exact use-case we are trying to solve)
-
-There are two different use-cases for the metadata:
-
-* "Hardware" metadata (like the hash, rx_timestamp...). There are only a
-  few well known fields, and only XDP can access them to set them as
-  metadata, so storing them in a struct somewhere could make sense.
-
-* Arbitrary metadata used by services. Eg a TC filter could set a field
-  describing which service a packet is for, and that could be reused for
-  iptables, routing, socket dispatch...
-  Similarly we could set a "packet_id" field that uniquely identifies a
-  packet so we can trace it throughout the network stack (through
-  clones, encap, decap, userspace services...).
-  The skb->mark, but with more room, and better support for sharing it.
-
-We can only know the layout ahead of time for the first one. And they're
-similar enough in their requirements (need to be stored somewhere in the
-SKB, have a way of retrieving each one individually, that it seems to
-make sense to use a common API).
-
->
-> > I suppose we *could* support just a single call to set the skb meta,
-> > like:
-> >=20
-> > bpf_set_skb_meta(struct xdp_md *pkt, struct xdp_hw_meta *data);
-> >=20
-> > ...but in that case, we'd need to support some fields being unset
-> > anyway, and the program would have to populate the struct on the stack
-> > before performing the call. So it seems simpler to just have symmetry
-> > between the get (from HW) and set side? :)
->
-> Why not simply bpf_set_skb_meta(struct xdp_md *pkt) and let it store
-> the metadata somewhere in xdp_md directly? (also presumably by
-> reusing most of the existing kfuncs/xmo_xxx helpers)
-
-If we store it in xdp_md, the metadata won't be available higher up the
-stack (or am I missing something?). I think one of the goals is to let
-things other than XDP access it (maybe even the network stack itself?).
+> -Toke
 
