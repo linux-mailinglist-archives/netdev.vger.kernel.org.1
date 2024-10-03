@@ -1,155 +1,217 @@
-Return-Path: <netdev+bounces-131721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E562498F588
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B50A298F58A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F69DB2099F
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:48:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D89A21C22414
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4CA1A7250;
-	Thu,  3 Oct 2024 17:47:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D876A1AB51A;
+	Thu,  3 Oct 2024 17:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eDSvoWF3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Grq4eTeT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B81836126;
-	Thu,  3 Oct 2024 17:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5821AAE38
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 17:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727977675; cv=none; b=f/qo7oZjZE3M/b8pk0kfJEGu5Gk9yc+WvKIPMwimvTxqZWwGEWwtwr2470mJ1AtgENb2SwYJKulkdoL9JhoSFv/PLXAf7WPOwcWjSIuBIUnf2O9Pbd7FJ611PKeN2DHnfVY7Ofgnk7nDJ4fEX3Il72kw5GYBnalq919jx7io87o=
+	t=1727977678; cv=none; b=ul4s7xweZgXnAaTziYjDbXD+MSiTh1C08ZYi/dDDBH5n87tFoRwWbWUaUI8ryS9P1jZC2LIXB5KsUqfICvZR5nPDV7IST+S32XAqD+KOduYc/RQmeTFUfUA9SqCAgJsLc/jGYVWDmiWh1Vk9P/sD/tZI4FfblcG7lPNU6GAORAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727977675; c=relaxed/simple;
-	bh=BBAlqBhSnPMozlYFdbQWCelgUwjNdy//bRfOuSlblps=;
+	s=arc-20240116; t=1727977678; c=relaxed/simple;
+	bh=+3pikV7kaVDyoY+HBVSSh7p3gOEaKlDDt2nucdRUg+0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=muSe3QT8VIYOdp4oJoUebH0HzLxQI4Losu4/nbVSlHaHgov2Sdyc1xL2j7yvxVJF20xb5uygdZcoVOrT5r4cAs63H852jyiPca4/e3ksirL04SCv2n3fp+Ah0+snOSOMbkRNPGeIreuMQI2eADLDdxyfG5M83r4mLn6s+j5T+3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eDSvoWF3; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727977674; x=1759513674;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BBAlqBhSnPMozlYFdbQWCelgUwjNdy//bRfOuSlblps=;
-  b=eDSvoWF3zrN2r17QGdbdeXILzEgG0Mp91S/yMUeuh+rmb4dh5REvn40m
-   mTT3n6tXXeVKJrPxGM8y72OtovPBsu1CjHGtunTRVBrKqQvH5ra2Mw720
-   woI58FGwbNOzgu+eAsGrRnjNJg/CEZT0kd9cI+/HXkSFPGqFSjn+pdo8U
-   MpnxhAG1iYAC5azUWgzxWSBaL2WRgJMZpvAU2C4GptzhWSGfzDSXMh446
-   mQS7RBramdc7FA/LabDZnERxhMo8pD8SW78ryUtXwRhNi5sxjYKmNI1mi
-   tUt+9ibyRKyIE/qu5WJ0YHLKkIdq26qcDlyuzHBb+4LSFFVcpHVUc1vqg
-   Q==;
-X-CSE-ConnectionGUID: p2E5qJ+zQ2+iyHiG4VFnlQ==
-X-CSE-MsgGUID: STEEWqP1S0mqMiZDqcc0EQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="49714925"
-X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
-   d="scan'208";a="49714925"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 10:47:53 -0700
-X-CSE-ConnectionGUID: Qsfl+iIVTfaDD2DBt1JJTQ==
-X-CSE-MsgGUID: g+hoeYPwSquySlq834lcpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
-   d="scan'208";a="97748898"
-Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.154])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 10:47:50 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1swPvX-0000000GFE7-2gmU;
-	Thu, 03 Oct 2024 20:47:47 +0300
-Date: Thu, 3 Oct 2024 20:47:47 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: linux-kernel@vger.kernel.org, amadeuszx.slawinski@linux.intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	Markus Elfring <Markus.Elfring@web.de>, Kees Cook <kees@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
- warning
-Message-ID: <Zv7Yw1iJehLW73Fq@smile.fi.intel.com>
-References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
- <Zv6RZS3bjfNcwh-B@smile.fi.intel.com>
- <Zv6SIHeN_nOWSH41@smile.fi.intel.com>
- <e242741e-2f9f-4404-93f9-83e8971ace7a@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mdv+ZJRSsMQ2IQl9pqfS8hOP1BNKDDn+h6ZMv0ccaxPsrjbIpDyAM2D3JxwlxvbU12UI073gZ9afYS5HqJ0GAuDIzymeWaw4OreP78FnVAAXt3o1358+kDPGy367a4z08ZzKiBBD2WgQaHzEwsO6EEd0uCQ2a+4594oL22tV1vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Grq4eTeT; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20ba8d92af9so9521145ad.3
+        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 10:47:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727977676; x=1728582476; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TBeMbE1kW6T/3/3DXuZsfzLFqECbYlvzq9rx8UPnf3g=;
+        b=Grq4eTeTKgEXSExdEuY1dAuxllgYDZRci/DB5RU82gaGOuSOsx0jNQ97FvCiZqDFiI
+         p1ZlXk9+6SFsvZuK7/VXA5iULwt+Y+RUB+DevWYrwG71MGLGuSYqpPhcLWulOx0lgLo6
+         8zix4ag8/fXSkIXFayZgUKW4pcKiSBhHjKiMuWQ5MthAcTAmGxE/ITyNxdmk1dayDz6s
+         X8XLcFDe0gvm6SUBfdjJu23ccpOFXLmiv1nuKc6iRrmHHBECM8Y11loN37lJcLPwFAEr
+         OHsdE0H2j7mbmUehSu0jB6mlUHpbYV6P7MChVHu0nA2VZgatsv3bmx8cquKTCXhpkp9d
+         gq9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727977676; x=1728582476;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TBeMbE1kW6T/3/3DXuZsfzLFqECbYlvzq9rx8UPnf3g=;
+        b=jJGkO63pTxEm1p3BKwJZY2sGWONvMf0fplyDZuiKC5emqz6UlPYBXREf5PTRykzVaA
+         JNHiwMmaobcWeQrZR1/mdQxrE37KIE9IzQEd9RPk6Fm3vYnppao84IGdPHHPApkWjKoX
+         mw0SCXNiPsl65xoJ4wv0GNSIEXx894Kdxf7qK9s6NcsTZu2i2ijfplYDe78wV8YtINr2
+         3MVRHzouQ8brqDMBC4kBsQOG+SEZLCsZnixavvT6MxJwjbm/2LwlgfIpwnNYK9PmiNEu
+         eYbIFYTiH7JPTYyvo3hVPxXz34vzB8OxFo1ji6abCewqc54wnz9HZZyz530iRrgP5O+8
+         OcIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFzzAhNJ8cIC6c/emkiEaak02alGVvoi8qwKNdIHG3IcEWXV0oDgDY52ubfL7W4RRzgdY4tFM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOF9h/s3XpqZ/LAjmpepIPHAp4F+26tckOWe2PqsqfIdPyc95z
+	BmeSS5K4IFRKDSiZfo7Z0loFfHe/THQ0ZHytTUktmYPHBUqPRZw=
+X-Google-Smtp-Source: AGHT+IH9M+COzpEH9JtqER8HpdlKYAIMU1q1JcrOmpIJszrqXnxHg99yYmO0kQFZEKtQXvqRVQmrEg==
+X-Received: by 2002:a17:902:e885:b0:205:2a59:a28c with SMTP id d9443c01a7336-20bfde555b8mr193305ad.1.1727977675848;
+        Thu, 03 Oct 2024 10:47:55 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beead1e91sm11586535ad.28.2024.10.03.10.47.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 10:47:55 -0700 (PDT)
+Date: Thu, 3 Oct 2024 10:47:54 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2 12/12] selftests: ncdevmem: Add automated test
+Message-ID: <Zv7Yyh8OHqZ8lAPw@mini-arch>
+References: <20240930171753.2572922-1-sdf@fomichev.me>
+ <20240930171753.2572922-13-sdf@fomichev.me>
+ <CAHS8izMNHUkufZS_nMD7uTmzSfAqWYqfAiZiuH1OOVDw7WGhQA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e242741e-2f9f-4404-93f9-83e8971ace7a@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izMNHUkufZS_nMD7uTmzSfAqWYqfAiZiuH1OOVDw7WGhQA@mail.gmail.com>
 
-On Thu, Oct 03, 2024 at 03:38:45PM +0200, Przemek Kitszel wrote:
-> On 10/3/24 14:46, Andy Shevchenko wrote:
-> > On Thu, Oct 03, 2024 at 03:43:17PM +0300, Andy Shevchenko wrote:
-> > > On Thu, Oct 03, 2024 at 01:39:06PM +0200, Przemek Kitszel wrote:
-
-...
-
-> > > > +#define __scoped_guard_labeled(_label, _name, args...)			\
-> > > > +	for (CLASS(_name, scope)(args);					\
-> > > > +	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
-> > > > +		     ({ goto _label; }))				\
-> > > > +		if (0)							\
-> > > > +		_label:							\
-> > > > +			break;						\
-> > > > +		else
-> > > 
-> > > I believe the following will folow more the style we use in the kernel:
-> > > 
-> > > #define __scoped_guard_labeled(_label, _name, args...)			\
-> > > 	for (CLASS(_name, scope)(args);					\
-> > > 	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
-> > > 		     ({ goto _label; }))				\
-> > > 		if (0) {						\
-> > > _label:									\
-> > > 			break;						\
-> > > 		} else
-> > > 
-> > > ...
-> > > 
-> > > > -	     *done = NULL; !done; done = (void *)1) \
-> > > > +	     *done = NULL; !done; done = (void *)1 +  	\
-> > > 
-> > > You have TABs/spaces mix in this line now.
-> > 
-> > And FWIW:
-> > 1) still NAKed;
+On 10/03, Mina Almasry wrote:
+> On Mon, Sep 30, 2024 at 10:18 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
+> >
+> > Only RX side for now and small message to test the setup.
+> > In the future, we can extend it to TX side and to testing
+> > both sides with a couple of megs of data.
+> >
 > 
-> I guess you are now opposed to just part of the patch, should I add:
-> # for enabling "scoped_guard(...) return ...;" shortcut
-> or keep it unqualified?
-
-As you put a reference to the whole list the detailed elaboration
-is not needed.
-
-> > 2) interestingly you haven't mentioned that meanwhile I also helped you to
-> > improve this version of the patch. Is it because I NAKed it?
+> This is really awesome. Thank you.
 > 
-> 0/1 vs false/true and whitespaces, especially for RFC, are not big deal
+> >   make \
+> >         -C tools/testing/selftests \
+> >         TARGETS="drivers/hw/net" \
+> >         install INSTALL_PATH=~/tmp/ksft
+> >
+> >   scp ~/tmp/ksft ${HOST}:
+> >   scp ~/tmp/ksft ${PEER}:
+> >
+> >   cfg+="NETIF=${DEV}\n"
+> >   cfg+="LOCAL_V6=${HOST_IP}\n"
+> >   cfg+="REMOTE_V6=${PEER_IP}\n"
+> 
+> Not a review comment but noob question: does NIPA not support ipv4? Or
+> is ipv6 preferred here?
 
-+ the above now.
+Yes, absolutely, you can pass it LOCAL/REMOTE_V4 but you'll have to make
+some changes to the selftest itself to use the v4 addresses. Things like
+'-s {cfg.v6}' will have to be changed to '-s ::ffff:{cfg.v4}'.
 
-I assume every contribution should be credited, no?
-Otherwise it sounds like a bit of disrespect.
+I wonder whether it might be a good idea to have some new config method that
+falls back to v4-mapped-v6 (::ffff:{cfg.v4}) to support both v4 and v6
+transparently for the selftests that don't care about particular transport?
 
-> anyway, I will reword v2 to give you credits for your valuable
-> contribution during internal review :)
+I'll leave it for you to explore...
 
--- 
-With Best Regards,
-Andy Shevchenko
+> >   cfg+="REMOTE_TYPE=ssh\n"
+> >   cfg+="REMOTE_ARGS=root@${PEER}\n"
+> >
+> >   echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
+> >   ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
+> >
+> > Cc: Mina Almasry <almasrymina@google.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> > ---
+> >  .../testing/selftests/drivers/net/hw/Makefile |  1 +
+> >  .../selftests/drivers/net/hw/devmem.py        | 46 +++++++++++++++++++
+> >  2 files changed, 47 insertions(+)
+> >  create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
+> >
+> > diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> > index 7bce46817953..a582b1bb3ae1 100644
+> > --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> > +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> > @@ -3,6 +3,7 @@
+> >  TEST_PROGS = \
+> >         csum.py \
+> >         devlink_port_split.py \
+> > +       devmem.py \
+> >         ethtool.sh \
+> >         ethtool_extended_state.sh \
+> >         ethtool_mm.sh \
+> > diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+> > new file mode 100755
+> > index 000000000000..29085591616b
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+> > @@ -0,0 +1,46 @@
+> > +#!/usr/bin/env python3
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +import errno
+> > +from lib.py import ksft_run, ksft_exit
+> > +from lib.py import ksft_eq, KsftSkipEx
+> > +from lib.py import NetDrvEpEnv
+> > +from lib.py import bkg, cmd, rand_port, wait_port_listen
+> > +from lib.py import ksft_disruptive
+> > +
+> > +
+> > +def require_devmem(cfg):
+> > +    if not hasattr(cfg, "_devmem_probed"):
+> > +        port = rand_port()
+> > +        probe_command = f"./ncdevmem -f {cfg.ifname}"
+> > +        cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
+> > +        cfg._devmem_probed = True
+> > +
+> > +    if not cfg._devmem_supported:
+> > +        raise KsftSkipEx("Test requires devmem support")
+> > +
+> > +
+> > +@ksft_disruptive
+> > +def check_rx(cfg) -> None:
+> > +    cfg.require_v6()
+> > +    require_devmem(cfg)
+> > +
+> > +    port = rand_port()
+> > +    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
+> 
+> So AFAICT adding validation to this test is simple. What you would do
+> is change the above line to:
+> 
+> listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port} -v 7"
+> 
+> then, below...
+> 
+> > +
+> > +    with bkg(listen_cmd) as nc:
+> > +        wait_port_listen(port)
+> > +        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=cfg.remote, shell=True)
+> > +
+> 
+> ...change this to the equivalent of 'yes $(echo -e
+> \\x01\\x02\\x03\\x04\\x05\\x06) | tr \\n \\0 | head -c 1G"
+> 
+> > +    ksft_eq(nc.stdout.strip(), "hello\nworld")
+> > +
+> 
+> ...then remove this ksft_eq().
+> 
+> But this is just a suggestion, I think you were leaving this to future
+> work for me, which is fine.
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-
+Let me try. Worst case I leave it as is and you'll follow up with
+the conversion once you get the TX side going..
 
