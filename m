@@ -1,97 +1,104 @@
-Return-Path: <netdev+bounces-131463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0112098E8C2
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:16:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D906198E8CC
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 05:25:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DBD2860A1
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:16:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F41CCB24AA2
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 03:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F8D1DFFB;
-	Thu,  3 Oct 2024 03:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FC91EF1D;
+	Thu,  3 Oct 2024 03:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hufwDj+s"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="McHsnXxs"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C623417C77
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E551E864
+	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 03:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727925372; cv=none; b=ebvMf4mkmKBsTD2cHLCZFEZPblrRvZUcPeUHEMlTtazGUTgWjtQFfQTUGB615hKFMChccDOwAa33WRzIMldpOEpAausDNRNlkgzYv2WFyhNQC4TqpVc7nKMoMHcTZDstwEBoJsy6DfUy4Kp2xJdl1dW9ZFZASCuCEkWw0lHMEvY=
+	t=1727925944; cv=none; b=h2UgViwOj35ol9f6FdJof2maf6HBbKXICsHGE9Kie5p8+5niH7yXBvyxQuJhwxmxaYk2xuhcqLnRVs3xQC+yHHZE9KxjxDO9NkhLUdRd6Us+puGE3Ag0qI2bPtZY4wh8OAC6/l6fMa+nDctzyWtwLbNDMQtjd7XNVdyjdrItgJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727925372; c=relaxed/simple;
-	bh=h7hRIgM04U6u7rgeSSYvqrdrjaxB9r373pnz7nf4GSk=;
+	s=arc-20240116; t=1727925944; c=relaxed/simple;
+	bh=JG9qJiK+yT5UWVPlMvxRlbGAu8/QTfRsjfRrQh2VRfg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sOwbV2xNARd8kcM57ctolhs5E5PKvzH0VZR1oLrbgyk+O3fe4u9cJleg3GIW4WH0p4tB0O6Tc7FVRqsIcGYaKKrDWnYwKnoeLUKGvY04mlnaB0s2o7Lo6EPuITK72sqZr6sMjoUOQoWx+WN1aObqU3jEbaQ5JVvHfWuTN5kBebw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hufwDj+s; arc=none smtp.client-ip=209.85.167.42
+	 To:Cc:Content-Type; b=fI0v7veAEs6j5+37nWnOcioKySBbG1bTsRhImW71j2op2mm8pj+Uzr1shPq0Bh/3mIX6hN8uBuTkDnYcF7R7PJOzLpVlw7NQSJ45ngNM+aqvPuIjjN3Y7Y/jYGd1GHPzoKPG5jrX/hSV8n9YIUNAtVDUTpt0Oo6VewY5FSGoRhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=McHsnXxs; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5398a26b64fso385404e87.3
-        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:16:10 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53997328633so592585e87.3
+        for <netdev@vger.kernel.org>; Wed, 02 Oct 2024 20:25:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1727925369; x=1728530169; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1727925941; x=1728530741; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7hRIgM04U6u7rgeSSYvqrdrjaxB9r373pnz7nf4GSk=;
-        b=hufwDj+sRgKXfbAP0Hd8glyyJM+dTZY4iMUsF3U4jP0KtzrMbeC+VptILxciXIQMdK
-         2dHgrWGlJDbYC+PMcUqu4mTjFvkDLguMMW0o88AYRCLiX28yLKlQYR7nEyXfVTNTozUX
-         1w6Lgd/1U1JVtNPvdeJTO3qGTcrMuNPZXFT9c=
+        bh=JG9qJiK+yT5UWVPlMvxRlbGAu8/QTfRsjfRrQh2VRfg=;
+        b=McHsnXxsANavQzWv5pmOsq5ONfVcYCjdy2yV7jbJOsHc0aXnlPETjFVABxw5+PkWB6
+         vqczR6RaSa/9Fo8t4Jc9cr5xfOoaCUM9pA9B9vI4Jhy61wrZDtZ78SB688JMnlucTtwZ
+         7hRyglqEmg2yxtqDTd+BISW2cFcQALwtFkBFw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727925369; x=1728530169;
+        d=1e100.net; s=20230601; t=1727925941; x=1728530741;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=h7hRIgM04U6u7rgeSSYvqrdrjaxB9r373pnz7nf4GSk=;
-        b=Lpqphrn1/cNqYDE4V5pryLCuwq9PxpwmqfIakbflWh+g29HmHyJoWvZzeHpoo11bDj
-         hpAkw1BeYUQjc0g038c/Dcje1/58H30pN2bPfoYy2TKyBCFFpFi/dGXhH9hCpGuFUJFS
-         I93apUSjTfdSxDgV9MnfrRbUxiPP7bpHX9DXlypg1TAdph/r38lMrpMx81UUh4LtFcqF
-         v3ZS9bpFteLCL1kCX+liNcnJs9mp2WlxemYki2CPWGruuRb0goZ7KilXeiLbfTQpyzxA
-         VNPPK53msgl8lNgPZE4BCqezWeTaRwlx/TMFnEfMFE1efYpRjAxKch4TTI81bEhaf1M+
-         k2ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUpOcmjhbvPM2U0PberIfBps2nmNQ24bcF/gdBY4GBe7hC3WYoIS+uwE5pzpdOgz30CKQB8fMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+3yUHRxGLQk0HiBSQw205vsdlUAgavJFCdoBr3iL8Gum5YK7N
-	Bj5tRt15D6ckOCQSNW+HRC29gcJLwS6X9KkPVCrY+YJYTRAohnLeqFWitiRvrzlDl6Mm70L7Rcg
-	qK0hF6oRSuv2j2Jj1JWsbieYdFy81yNVZqF8AzqyIm41k/6keHQ==
-X-Google-Smtp-Source: AGHT+IGNw0inkUzPNBHGJgwWYa9d40t9oWi6kFAsAZhocToJlEg27ljTUD8AkJ5cAgGZtbMJHel9BeFFINp8PDVTNhw=
-X-Received: by 2002:a05:6512:1189:b0:536:54fd:275b with SMTP id
- 2adb3069b0e04-539a07a8ccdmr2927468e87.54.1727925368853; Wed, 02 Oct 2024
- 20:16:08 -0700 (PDT)
+        bh=JG9qJiK+yT5UWVPlMvxRlbGAu8/QTfRsjfRrQh2VRfg=;
+        b=G+mlzlTIBJieMZ7hO+2ePl89iGBm/mHuTfrJOSxclgiNIXg9O/9D//1vYIM6jBtIkt
+         g2THD4gjNBoImHGHioniFc9g0/LM7KH2PlJntYQi4btOoUjfwbytDe4gIQ2HGGPgJrNQ
+         ZE6KQuZdabsm3gZBhbGDKeeSSBttwEnJfewWhKN3moJAEUBZ3n3t9cpIJ8MihUpeQcQo
+         tDLa2ahDRjbPg7gPqKbtYJM+t7qUn/kxXULqX5I06L35SHa4hFToZh9+XrDbNoJH7ggI
+         XOXfZIskQWrYGBHOW9KwchjtAtUQRJEB9AJcVfKytgq5oFodxVWbQcXk6v7eMXiW1LMi
+         5yjw==
+X-Forwarded-Encrypted: i=1; AJvYcCUvUVC2keGl8qObsoOSi2NaGw1RdxRpAmfEvysnSLsdvNBCzs1vTpmJGClf2+28fz1InHj0ai4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLoQwny89QhWaJfu/SBZujSYti4NKQsWbmIumu915vc98Avjgq
+	PsZI/K22Y22cBwwuerSrx3LlgBpm9U4uc9AxrHWz8JxFtM73J8dIuaiTaGxUvvL8KxIwxYUnBPi
+	cUJNiUXDl32ptITfrs3rVWa1pfYMAkvDjZF7E
+X-Google-Smtp-Source: AGHT+IGycS7WK/03fDcRcPwsEQLqnFUVO2tjSz0xgi1q1NQCGnT+yZNrmHfT6cCmCEMtFIqktY5bE+1yxZGpOo/O1Fg=
+X-Received: by 2002:a05:6512:3511:b0:539:a353:279b with SMTP id
+ 2adb3069b0e04-539a35329cemr2931810e87.9.1727925940735; Wed, 02 Oct 2024
+ 20:25:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002115304.15127-6-przemyslaw.kitszel@intel.com> <20241002115304.15127-10-przemyslaw.kitszel@intel.com>
-In-Reply-To: <20241002115304.15127-10-przemyslaw.kitszel@intel.com>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com> <20241002-feature_poe_port_prio-v1-1-787054f74ed5@bootlin.com>
+In-Reply-To: <20241002-feature_poe_port_prio-v1-1-787054f74ed5@bootlin.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Thu, 3 Oct 2024 08:45:56 +0530
-Message-ID: <CAH-L+nN2b8ubs5UFZUiVttc-a4+JgnWK2Qenej2v0VWB_1Hv4w@mail.gmail.com>
-Subject: Re: [PATCH iwl-next 4/4] ice: ice_probe: init ice_adapter after HW init
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	netdev@vger.kernel.org, Marcin Szycik <marcin.szycik@linux.intel.com>
+Date: Thu, 3 Oct 2024 08:55:28 +0530
+Message-ID: <CAH-L+nMBstSFBjc-EajsWqp97k58dq2woJ7W-qDYQy3oRGpsvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/12] net: pse-pd: Remove unused
+ pse_ethtool_get_pw_limit function declaration
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Kyle Swenson <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>, 
+	kernel@pengutronix.de
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d5d8ae062389f94d"
+	boundary="000000000000ec747506238a1be5"
 
---000000000000d5d8ae062389f94d
+--000000000000ec747506238a1be5
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 2, 2024 at 5:23=E2=80=AFPM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
+On Wed, Oct 2, 2024 at 9:59=E2=80=AFPM Kory Maincent <kory.maincent@bootlin=
+.com> wrote:
 >
-> Move ice_adapter initialization to be after HW init, so it could use HW
-> capabilities, like number of PFs. This is needed for devlink-resource
-> based RSS LUT size management for PF/VF (not in this series).
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 >
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Removed the unused pse_ethtool_get_pw_limit() function declaration from
+> pse.h. This function was declared but never implemented or used,
+> making the declaration unnecessary.
+>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
 LGTM,
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
@@ -101,7 +108,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh A P
 
---000000000000d5d8ae062389f94d
+--000000000000ec747506238a1be5
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -173,14 +180,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIMZNQldWPN5HeHxvDSyZMbhSjXSuXuDB8l2G76Vc3oe/MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMTYwOVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIKYbriEV/+L5WZVGDL/cFGh5+KrzYVPweLwnXxbqzv1uMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwMzAzMjU0MVowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBdFUdhK2jO
-i8frwslki2qGkqHuyP/ESG0J/GygtJ5AoAE9HDU9Wf/HKb0vwi+u9cUjDL64CMEWifG1/YTDlJQH
-h7KpqZ/xvhPSFhEj3Zun6hZUNnur8N91SLH56OznmW544QwH1iE6fKMfNepWliLehioS20Y2VwrO
-D8hI86e75pqQb/1VQvlKvjOBfbceJ/1FvjN3RCKBONFuI1QTs4/G4ZH0Qiiwyd7v5yJLDeSPQmAj
-qfuxlXRpPYwGaA0ZAIGfTD3YnP0kDs57kjXKT6zwrSeYBvHKvTMpdO8f2VJON4Vx5RpB8PQDVIW1
-RUoDzDuVExxf4I3esAPpMW3lhLu3
---000000000000d5d8ae062389f94d--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBjk9XwPU9w
+sjzDRadNKrPrg8vzFUzAOPWZzcbbH3uQhMpUTtepVBFvWIG+m3q0tSqGCJcMB85AF7LthH7WgC8Y
+d2Xwtq1XJdBpFqkXo+60L2hZEB09tHsHY2q8O9V9DM949lppJntbk3/KYNzzzEklVz0MjdWMEEjA
+m+OHfY77qOKEmGTtzlEaMzxUM4z6OnVCqiN05arp4KVwhBd+n+3zrRhegq30MJJd/WTyUmPOxFH7
+FjHt3RKGvDMG34QLG8tH8qlF+HHnEg4LPctGxQsItxqyA/7W8GMJnGOS6vx3KbR8S+APZcdXquFq
+iTrFvAt6lkwvOcUuBFFVFG3G+mZh
+--000000000000ec747506238a1be5--
 
