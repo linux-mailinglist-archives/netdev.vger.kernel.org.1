@@ -1,216 +1,235 @@
-Return-Path: <netdev+bounces-131572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B1C98EE86
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:52:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A884B98EE8B
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 13:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 787FDB2181D
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 11:52:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66D96281F49
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 11:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215B0154458;
-	Thu,  3 Oct 2024 11:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50541154458;
+	Thu,  3 Oct 2024 11:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xMu2y/C5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ltZNEix7"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E675726AD4
-	for <netdev@vger.kernel.org>; Thu,  3 Oct 2024 11:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B149726AD4;
+	Thu,  3 Oct 2024 11:53:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727956351; cv=none; b=NmKGdb2QgALQAMlnEiEfvr2g3Ry1cof/eFzcLR7CZY8QgOcCsNotzrY5ISr6sebVg5wOemU9YCO4N1fr4JiXvBUyr8T0otI5ubokUczv3Dx9ccCJPhyDgNY53ShhzMNErEjKIP89dcj5aLqW3f0nRNe1d+ZDqaUP9QYNEYY5+sk=
+	t=1727956439; cv=none; b=fUl+4VEwkMdbjaW7E4tWysBAZrvhucMaNc2OEZ7Z1530n1USZu3eklZI+uui51i4szZhLCAV9umAm2xOIWzperAzoC4nJRIwgR6Aj0YyARM6OsNQFxLh11K4yO491cUKky/mnQ5QGqP3RDpRsUNclUCUDY1skqD9+0CKfW8qBXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727956351; c=relaxed/simple;
-	bh=aVMwpwzol0Bd/timJkeQDgEriCTzyeDfGWi3/UcXhhE=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=baWooEqrfgqzr7huyNb3nvIuuL+fnk8+UuuTsxXbCd4yznlFaIpL4+HYB9EgBBR3dy+1xltPJJMBFadXw2IIzyAIj4XzJPb9qP0SYgQGyllczH0pjzWkOP376W94LeLKe1NXWHwmqPF+SKJszqrNa0utSNJncYgQeD4YY5tAGCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xMu2y/C5; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lMMFRYeHvljkDLOpbdf6JtFgZ6rzmOa9NzWKqDOm4JE=; b=xMu2y/C5bfRxPbD/3UbZamShe5
-	Vm08kyT5Ow1CVIHr08qddJkwW4HlLv3AnbUUYb1Hmc4gI5z2Nt2CrKIOXsDJeA/S/zvHBVV/7H0n6
-	W9JJgW0tJZtu/lKeHClP2CL3dGBGq0yvQwZBsEw8uqEZhgmfsUyd2Gc7n7Y/NReXqg5ff8N5FsdWy
-	WDBzShxN+LIZyNXhC4pTq9tarLJiMf1+Mxs+ItjYXohBo9UMZy/epon1oLWnnY5bwBMYbKVgKUsay
-	MH43aHB3hLjffS0PBwSNpm1nupxAJeACxRYa8krZYn5Wege5Dvqw46Dz7aRWf8Sz5CnltmC/r0mdk
-	5snFg7uA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:40302 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1swKNW-0000Pk-1r;
-	Thu, 03 Oct 2024 12:52:18 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1swKNV-0060oN-1b; Thu, 03 Oct 2024 12:52:17 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] net: dsa: remove obsolete phylink dsa_switch
- operations
+	s=arc-20240116; t=1727956439; c=relaxed/simple;
+	bh=TGFkB0ZU1084qqYwIZPU+rqqdVN4fxP/5S7teQIuw9E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FrBysT9D4jJRQpG6rJGPgKBDh4BD3KZqMcsAYfFiFC+o8UrmAbGuerj/78izpM0F+LVNyXEga67kRKAOiL5YB+BaewQlEab525kUqAHTaJKQP4gjaJhQ9sYO7dFYV3+L/dVqLzjAPCLm1JctYrvk0OprxH1pojIas2EaIcaK2TM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ltZNEix7; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a9b3cd75e5so88911285a.0;
+        Thu, 03 Oct 2024 04:53:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727956436; x=1728561236; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SBbY3/3NZlklc4+wp5IevCmEX3q1+eNI0S2tK1cSF+4=;
+        b=ltZNEix7D2dS+8NjkZfYuvGLs6dM7LNxBGSbo50nEThDHCABrOenSnJWX53oHsiodt
+         huMi9J1QHcVHZtdgZOVwa4eaiJNVZaniORjikgHzhrjmhe8uY8+Iob0lfbPJQtlCfxcg
+         OlLffdvJgkpsh9YC8sNFLknmJHMfdLQKzwo4PaP4cBbs6dgUcF6RFTOR08bYxPLWTnlc
+         vFYXCwtuA480auTw9Wn37FYeH/3ReQHK1mjKPc5zxo2T0Y1j9PD9LE2yb/+EazO0/GGC
+         m8B7l//15Dqhgch5A6mIL4FHRGiqHZMjTe0DS7IlC3W8JJnzIRhgpCnmR3oXzQ5At6kn
+         blCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727956436; x=1728561236;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SBbY3/3NZlklc4+wp5IevCmEX3q1+eNI0S2tK1cSF+4=;
+        b=K7HRH9wHf+kitUWIJnQqEd/XLhkh1o6+1oe1xinL9ZptuMxE5OGoQAqzY9p2wwtZZv
+         9xiU+n3Ia+KQBN59UCUDDJIwP8QtXj1Ry2vXPXbo96NoSg5moegFMfYupfioq3oQk7br
+         veWM9CoW/GOGH/qbBt4q1eT3ub7ZycFhdwx790cK1ypTE++odCw6vxtSKtswy8wj6gfe
+         YP62XLWXEpr6+1upbLVe+89mxJdDZmCXe06Cm3I/YZ0MaOphBG9oXmW+qvhvtGj+MBYd
+         IZgK94nj8CXcCoEXxXKgk0tI5jhzH7N5NQ7aBJI9ZEUlFkkeIXFgyXZ68kiAZSFppPkb
+         dllQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMMSBOgnQCQzPm06SSIzYwKN6bMKXwErIf+eOhRHf4vFWSvhMaqgHAdDLz45nDmgyTm885esQ=@vger.kernel.org, AJvYcCVNH6NCJvRO7AIcrvNWS2fTThnmunWq/4l0CaTuCZVCP8kvul1OdcGff1PJom9eITZtM0wFBap+dbyQSX3bUp4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA3msn7VCkZa/Kt1E460GjyqkOn9kSxnY8oGrr2tg08+hFTLsS
+	Mme8djQkB9dZbkpEngAPlQcIvWpKM7Nx5ONbsu6tJicT7+vAWAKO
+X-Google-Smtp-Source: AGHT+IGX0ojD/sD7RWnSU8gUdjbCkDbb+mJzZ8qrpRDvD+bi+2CS1Fu4xPi+HoxmeC6YrsWKtCwyQw==
+X-Received: by 2002:a05:6214:5782:b0:6cb:45e3:11b0 with SMTP id 6a1803df08f44-6cb81cc5401mr109929536d6.47.1727956436443;
+        Thu, 03 Oct 2024 04:53:56 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb935a6fdfsm5831186d6.12.2024.10.03.04.53.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Oct 2024 04:53:55 -0700 (PDT)
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 5EB361200068;
+	Thu,  3 Oct 2024 07:53:55 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Thu, 03 Oct 2024 07:53:55 -0400
+X-ME-Sender: <xms:04X-ZtoKwiCwJkbO__2QbKQtGjqnw7bY4uepMBo9sxa-alib08nZfA>
+    <xme:04X-ZvqWTJ2I_GPj3M0sH7oWntMM13mvErljCZx4L9le5bhHeF4Ec0bBJ9wG4NmeG
+    lWzv1AkvfIWPFrEKg>
+X-ME-Received: <xmr:04X-ZqM8GbvhlrdOXhc3fOJG5Zn9uzuRU91cmRRHESBMBvfdvje7_6v-6aSPnw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvuddggeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleei
+    vedtgeeuhfegueevieduffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhi
+    thihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmh
+    grihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepudehpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhisehgmh
+    grihhlrdgtohhmpdhrtghpthhtohepughirhhkrdgsvghhmhgvseguvgdrsghoshgthhdr
+    tghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegrlh
+    hitggvrhihhhhlsehgohhoghhlvgdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhg
+    vghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhinhhugi
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhkhgrlhhlfigvihhtudes
+    ghhmrghilhdrtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupd
+    hrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:04X-Zo6vYNt76VafX9Cwy18bh97EuxXpEv82zjN_chjwwO9-gIIFUA>
+    <xmx:04X-Zs4XEH2jNOnzN55WOuCDzptXjNdzEAqQ3TEF-oOA6D6BEMa3-w>
+    <xmx:04X-ZgjTC8xSzFOQaYs5TUwVJzkXHdpkP-W0QHWZ2neu7KIk91e0LA>
+    <xmx:04X-Zu6bn24CwqbXo1Nl_GkdTaEcv8btf2IheoYRx3ujC9pPxx_sqw>
+    <xmx:04X-ZjIFJqy9PmBLzuTfv5J0t2ICMF7aUdTq4TXAb0g6WO-2qAijKdVl>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 3 Oct 2024 07:53:54 -0400 (EDT)
+Date: Thu, 3 Oct 2024 04:52:48 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: dirk.behme@de.bosch.com, andrew@lunn.ch, aliceryhl@google.com,
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me, a.hindborg@samsung.com
+Subject: Re: iopoll abstraction
+Message-ID: <Zv6FkGIMoh6PTdKY@boqun-archlinux>
+References: <CAH5fLghAC76mZ0WQVg6U9rZxe6Nz0Y=2mgDNzVw9FzwpuXDb2Q@mail.gmail.com>
+ <c8ba40d3-0a18-4fb4-9ca3-d6cee6872712@lunn.ch>
+ <76d6af29-f401-4031-94d9-f0dd33d44cad@de.bosch.com>
+ <20241002.095636.680321517586867502.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1swKNV-0060oN-1b@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 03 Oct 2024 12:52:17 +0100
+In-Reply-To: <20241002.095636.680321517586867502.fujita.tomonori@gmail.com>
 
-No driver now uses the DSA switch phylink members, so we can now remove
-the method pointers, but we need to leave empty shim functions to allow
-those drivers that do not provide phylink MAC operations structure to
-continue functioning.
+On Wed, Oct 02, 2024 at 09:56:36AM +0000, FUJITA Tomonori wrote:
+> On Wed, 2 Oct 2024 06:39:48 +0200
+> Dirk Behme <dirk.behme@de.bosch.com> wrote:
+> 
+> >> I generally point developers at iopoll.h, because developers nearly
+> >> always get this sort of polling for something to happen wrong.
+> >> The kernel sleep functions guarantee the minimum sleep time. They say
+> >> nothing about the maximum sleep time. You can ask it to sleep for 1ms,
+> >> and in reality, due to something stealing the CPU and not being RT
+> >> friendly, it actually sleeps for 10ms. This extra long sleep time
+> >> blows straight past your timeout, if you have a time based timeout.
+> >> What most developers do is after the sleep() returns they check to see
+> >> if the timeout has been reached and then exit with -ETIMEDOUT. They
+> >> don't check the state of the hardware, which given its had a long time
+> >> to do its thing, probably is now in a good state. But the function
+> >> returns -ETIMEDOUT.
+> >> There should always be a check of the hardware state after the sleep,
+> >> in order to determine ETIMEDOUT vs 0.
+> >> As i said, most C developers get this wrong. So i don't really see why
+> >> Rust developers also will not get this wrong. So i like to discourage
+> >> this sort of code, and have Rust implementations of iopoll.h.
+> > 
+> > 
+> > Do we talk about some simple Rust wrappers for the macros in iopoll.h?
+> > E.g. something like [1]?
+> > 
+> > Or are we talking about some more complex (safety) dependencies which
+> > need some more complex abstraction handling?
+> 
+> (snip)
+> 
+> > int rust_helper_readb_poll_timeout(const volatile void * addr,
+> >                                   u64 val, u64 cond, u64 delay_us,
+> >                                   u64 timeout_us)
+> > {
+> >        return readb_poll_timeout(addr, val, cond, delay_us, timeout_us);
+> > }
+> 
+> I'm not sure a simple wrapper for iopoll.h works. We need to pass a
+> function. I'm testing a macro like the following (not added ktime
+> timeout yet):
 
-Signed-off-by: Russell King (oracle) <rmk+kernel@armlinux.org.uk>
----
-Changes since v1 (a while ago):
- - don't remove the shim functions and ops structure which will break
-   some DSA drivers that do not provide a phylink_mac_ops struct as
-   pointed out by Vladimir (thanks.)
+You could use closure as a parameter to avoid macro interface, something
+like:
 
- include/net/dsa.h | 15 ---------------
- net/dsa/dsa.c     |  8 --------
- net/dsa/port.c    | 34 +---------------------------------
- 3 files changed, 1 insertion(+), 56 deletions(-)
+	fn read_poll_timeout<Op, Cond, T>(
+	    op: Op,
+	    cond: Cond,
+	    sleep: Delta,
+	    timeout: Delta,
+	) -> Result<T> where
+	    Op: Fn() -> T,
+	    cond: Fn() -> bool {
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index d7a6c2930277..72ae65e7246a 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -885,21 +885,6 @@ struct dsa_switch_ops {
- 	 */
- 	void	(*phylink_get_caps)(struct dsa_switch *ds, int port,
- 				    struct phylink_config *config);
--	struct phylink_pcs *(*phylink_mac_select_pcs)(struct dsa_switch *ds,
--						      int port,
--						      phy_interface_t iface);
--	void	(*phylink_mac_config)(struct dsa_switch *ds, int port,
--				      unsigned int mode,
--				      const struct phylink_link_state *state);
--	void	(*phylink_mac_link_down)(struct dsa_switch *ds, int port,
--					 unsigned int mode,
--					 phy_interface_t interface);
--	void	(*phylink_mac_link_up)(struct dsa_switch *ds, int port,
--				       unsigned int mode,
--				       phy_interface_t interface,
--				       struct phy_device *phydev,
--				       int speed, int duplex,
--				       bool tx_pause, bool rx_pause);
- 	void	(*phylink_fixed_state)(struct dsa_switch *ds, int port,
- 				       struct phylink_link_state *state);
- 	/*
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 668c729946ea..09d2f5d4b3dd 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1505,14 +1505,6 @@ static int dsa_switch_probe(struct dsa_switch *ds)
- 	if (!ds->num_ports)
- 		return -EINVAL;
- 
--	if (ds->phylink_mac_ops) {
--		if (ds->ops->phylink_mac_select_pcs ||
--		    ds->ops->phylink_mac_config ||
--		    ds->ops->phylink_mac_link_down ||
--		    ds->ops->phylink_mac_link_up)
--			return -EINVAL;
--	}
--
- 	if (np) {
- 		err = dsa_switch_parse_of(ds, np);
- 		if (err)
-diff --git a/net/dsa/port.c b/net/dsa/port.c
-index 25258b33e59e..f1e96706a701 100644
---- a/net/dsa/port.c
-+++ b/net/dsa/port.c
-@@ -1579,40 +1579,19 @@ static struct phylink_pcs *
- dsa_port_phylink_mac_select_pcs(struct phylink_config *config,
- 				phy_interface_t interface)
- {
--	struct dsa_port *dp = dsa_phylink_to_port(config);
--	struct phylink_pcs *pcs = ERR_PTR(-EOPNOTSUPP);
--	struct dsa_switch *ds = dp->ds;
--
--	if (ds->ops->phylink_mac_select_pcs)
--		pcs = ds->ops->phylink_mac_select_pcs(ds, dp->index, interface);
--
--	return pcs;
-+	return ERR_PTR(-EOPNOTSUPP);
- }
- 
- static void dsa_port_phylink_mac_config(struct phylink_config *config,
- 					unsigned int mode,
- 					const struct phylink_link_state *state)
- {
--	struct dsa_port *dp = dsa_phylink_to_port(config);
--	struct dsa_switch *ds = dp->ds;
--
--	if (!ds->ops->phylink_mac_config)
--		return;
--
--	ds->ops->phylink_mac_config(ds, dp->index, mode, state);
- }
- 
- static void dsa_port_phylink_mac_link_down(struct phylink_config *config,
- 					   unsigned int mode,
- 					   phy_interface_t interface)
- {
--	struct dsa_port *dp = dsa_phylink_to_port(config);
--	struct dsa_switch *ds = dp->ds;
--
--	if (!ds->ops->phylink_mac_link_down)
--		return;
--
--	ds->ops->phylink_mac_link_down(ds, dp->index, mode, interface);
- }
- 
- static void dsa_port_phylink_mac_link_up(struct phylink_config *config,
-@@ -1622,14 +1601,6 @@ static void dsa_port_phylink_mac_link_up(struct phylink_config *config,
- 					 int speed, int duplex,
- 					 bool tx_pause, bool rx_pause)
- {
--	struct dsa_port *dp = dsa_phylink_to_port(config);
--	struct dsa_switch *ds = dp->ds;
--
--	if (!ds->ops->phylink_mac_link_up)
--		return;
--
--	ds->ops->phylink_mac_link_up(ds, dp->index, mode, interface, phydev,
--				     speed, duplex, tx_pause, rx_pause);
- }
- 
- static const struct phylink_mac_ops dsa_port_phylink_mac_ops = {
-@@ -1871,9 +1842,6 @@ static void dsa_shared_port_link_down(struct dsa_port *dp)
- 	if (ds->phylink_mac_ops && ds->phylink_mac_ops->mac_link_down)
- 		ds->phylink_mac_ops->mac_link_down(&dp->pl_config, MLO_AN_FIXED,
- 						   PHY_INTERFACE_MODE_NA);
--	else if (ds->ops->phylink_mac_link_down)
--		ds->ops->phylink_mac_link_down(ds, dp->index, MLO_AN_FIXED,
--					       PHY_INTERFACE_MODE_NA);
- }
- 
- int dsa_shared_port_link_register_of(struct dsa_port *dp)
--- 
-2.30.2
+	    let __timeout = kernel::Ktime::ktime_get() + timeout;
 
+	    let val = loop {
+		let val = op();
+		if cond() {
+		    break Some(val);
+		}
+		kernel::delay::sleep(sleep);
+
+		if __timeout.after(kernel::Ktime::ktime_get()) {
+		    break None;
+		}
+	    };
+
+	    if cond() {
+		val
+	    } else {
+		Err(kernel::error::code::ETIMEDOUT)
+	    }
+	}
+
+note that you don't need the args part, because `op` is a closure that
+can capature value, so for example, if in C code you need to call foo(a,
+b), with closure, you can do:
+
+	<a and b are defined in the caller>
+	read_poll_timeout(|| { foo(a, b) }, ...);
+
+with above API.
+
+Regards,
+Boqun
+
+> 
+> macro_rules! read_poll_timeout {
+>     ($op:expr, $val:expr, $cond:expr, $sleep:expr, $timeout:expr, $($args:expr),*) => {{
+>         let _ = $val;
+>         loop {
+>             $val = $op($($args),*);
+>             if $cond {
+>                 break;
+>             }
+>             kernel::delay::sleep($sleep);
+>         }
+>         if $cond {
+>             Ok(())
+>         } else {
+>             Err(kernel::error::code::ETIMEDOUT)
+>         }
+>     }};
+> }
+> 
 
