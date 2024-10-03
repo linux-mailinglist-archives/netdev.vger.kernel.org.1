@@ -1,271 +1,161 @@
-Return-Path: <netdev+bounces-131723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB5BA98F594
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:51:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7FF798F597
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 19:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A6D3B22B84
-	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:51:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2539D1C21A8A
+	for <lists+netdev@lfdr.de>; Thu,  3 Oct 2024 17:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C981A7AE8;
-	Thu,  3 Oct 2024 17:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C771AAE00;
+	Thu,  3 Oct 2024 17:51:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ku2IpwA9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lhjvbEFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3755038DD1;
-	Thu,  3 Oct 2024 17:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C66F219F418;
+	Thu,  3 Oct 2024 17:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727977856; cv=none; b=SVVG0Tm5ky+3RNZ2JO/NVeHYe11AOfExfRYbNLeJZDlXeiYDoXw5Z5PpS/JRtY7HJ/dewoiNoKxEIIfq6lEWc7OkhkHMV/cbL8WbZV/ngnPI9Y2djOgxWNVU7/r9C1MKuHwCVbQtzzHkT9l9zIhgIcv1cWCpaAhdLnibyp9+zUs=
+	t=1727977914; cv=none; b=HJdKUU3GLBefixUzdEuhAVxaIdt2nPoeSpn70T6LO0nIL491z33XhdlQdUlKmtbgo0g4I151mnv6uuu3ge5ObulaBuaka4QKDGxkFHoMq+dohHT+K+wwfg4ZdHWupiEBL2NWyr7Is4Ke59CAMa4TfLXKjxzyo5V841QJLclHphU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727977856; c=relaxed/simple;
-	bh=iBjBdCHs/bUGkLTkj1v6dw8uVbnsQmaNTfp+18EilCk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=kNpXMG2YS+ba+tKLuLntCbWLBQpgY/VvIimyxRUlMiROqEua8kbsuTcNCmStKqr4pb7UlyEbhrKKYWCjDXu89LQGY4QOC0vrfhLsmbJ4SLMIUnlS5FAnpaTib7nViiATK1XDnRvuelYhEavW8X1tRiebxs0g1ZNhdlrnvdR7FGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ku2IpwA9; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4939P9QU027121;
-	Thu, 3 Oct 2024 17:50:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	6/m6ITiyDI+jHHJWGVWTFNKipC/rPlkCVT9+CxXpVPY=; b=ku2IpwA9X5S5jJMi
-	EIMaxL/Ngultpxf6OXwBNpZxvdq/ARTAUlPJan9LW4One+a1kkjxUeXupPd2E+u+
-	Cz0RQene8yfqaCstcViPSlyPoTpENuEMHHMKGU4ekWw1EKI36ZGou4I6Yh6zMe0M
-	q9pyWhkM6TEAb+KpTOI4091q7EdxDz43OKuRHDyQDU+wInpW5m3mExebln4sflE7
-	OJL1Z7WiQwSfGU0PIs+EgY3KYi+hz8vcw7IKbW560Tps6ZaB1qJX+ntUOWS+Vc03
-	Y8oIwzxTnpm2OQeq1yOgV4X4BtP8P4CHXjmU8RG76teUgjF7780Rx38U6n52tVRW
-	H9Si1A==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41x9vuf6m1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 03 Oct 2024 17:50:18 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 493HoHv2003035
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 3 Oct 2024 17:50:17 GMT
-Received: from [10.216.62.135] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 3 Oct 2024
- 10:50:07 -0700
-Message-ID: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
-Date: Thu, 3 Oct 2024 23:20:03 +0530
+	s=arc-20240116; t=1727977914; c=relaxed/simple;
+	bh=YQb/Jf5Vu5sbohGAQtFYGn7Gk1YkMnWyUEDhMWp80Oo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLU8rjoj0C1j2UuDT1WiwzSv/+nf3kR653yiuYg2oneNc+IUWNE1wa91SWqXaUUrEtT2dzpW23uSCl0Uh96G1jQs1nSyrzqAn6oY9+HLNFKMS6uYzh1KaZi3Z0eOvlAfS6gJ4cs8jslc49Cr2Du69+9rEElvbaev0DRpULXuoXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lhjvbEFo; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727977913; x=1759513913;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YQb/Jf5Vu5sbohGAQtFYGn7Gk1YkMnWyUEDhMWp80Oo=;
+  b=lhjvbEFoRtFl3HrL8ePaTUrXWJYrsfryeFlWkd8iY0wV4FMHhwRryDhE
+   tobVfXTETHAhObZbXcbSKVF9iFSEbmlt8RxKz0AtL9cvZPItJvoijWiAq
+   YA/8ICSQWEDHlJ2pHtI/BlLe2/0tUqW7sgqT2zI59y/vyrMlqmM91GpWY
+   Jz/xzVqlT+2C7JXgmTG/Tcl8jkjJ4pOkaZl7An3VdzTFfYoxu4n/50BET
+   NJiGb7X1JHdSz9xBP/JDtG7kE5JEaerNXXBvXfSZkJQffHpjYznUiGpcz
+   +MDndkj+BqlUv+l4a9TmyAQ2XAbLmtSuc8JLEKil3CR4W5b2QwmNIgL+s
+   Q==;
+X-CSE-ConnectionGUID: 8D1cJ3eMR3OhrMllKWYZ0Q==
+X-CSE-MsgGUID: Tk3AhTnuTkacoFZtCDKZ+A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="49715396"
+X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
+   d="scan'208";a="49715396"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 10:51:52 -0700
+X-CSE-ConnectionGUID: PO068jjwQa+3pAle2fxC4g==
+X-CSE-MsgGUID: eHBkL0gWR7COUt9pm6xpqA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,175,1725346800"; 
+   d="scan'208";a="79397954"
+Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.154])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 10:51:50 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@intel.com>)
+	id 1swPzO-0000000GFJL-3MX1;
+	Thu, 03 Oct 2024 20:51:46 +0300
+Date: Thu, 3 Oct 2024 20:51:46 +0300
+From: Andy Shevchenko <andriy.shevchenko@intel.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	linux-kernel@vger.kernel.org, amadeuszx.slawinski@linux.intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	Markus Elfring <Markus.Elfring@web.de>, Kees Cook <kees@kernel.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
+ warning
+Message-ID: <Zv7ZsieITDle2lgl@smile.fi.intel.com>
+References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
+ <Zv6RZS3bjfNcwh-B@smile.fi.intel.com>
+ <Zv6SIHeN_nOWSH41@smile.fi.intel.com>
+ <20241003141221.GT5594@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Bhupesh Sharma
-	<bhupesh.sharma@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
-        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
-        <john@phrozen.org>, Luo Jie
-	<quic_luoj@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Suruchi
- Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-        "Lei Wei (QUIC)"
-	<quic_leiwei@quicinc.com>
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
-Content-Language: en-US
-In-Reply-To: <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: m22k9veSjcq9AoPsDcDpcIC8gQp9KhwG
-X-Proofpoint-ORIG-GUID: m22k9veSjcq9AoPsDcDpcIC8gQp9KhwG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- lowpriorityscore=0 clxscore=1015 spamscore=0 suspectscore=0 phishscore=0
- priorityscore=1501 malwarescore=0 adultscore=0 mlxscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2410030127
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003141221.GT5594@noisy.programming.kicks-ass.net>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
+On Thu, Oct 03, 2024 at 04:12:21PM +0200, Peter Zijlstra wrote:
+> On Thu, Oct 03, 2024 at 03:46:24PM +0300, Andy Shevchenko wrote:
+> > On Thu, Oct 03, 2024 at 03:43:17PM +0300, Andy Shevchenko wrote:
+> > > On Thu, Oct 03, 2024 at 01:39:06PM +0200, Przemek Kitszel wrote:
 
+...
 
-On 10/3/2024 2:58 AM, Andrew Lunn wrote:
-> On Thu, Oct 03, 2024 at 02:07:10AM +0530, Kiran Kumar C.S.K wrote:
->> Hello netdev,
->>
->> We are planning to publish driver patches for adding Ethernet support
->> for Qualcomm's IPQ9574 SoC, and looking for some advice on the approach
->> to follow. There are two new drivers (described below) split across four
->> patch series, totaling to 40 patches. These two drivers depend on a
->> couple of clock controller drivers which are currently in review with
->> the community.
->>
->> Support is currently being added only for IPQ9574 SoC. However the
->> drivers are written for the Qualcomm PPE (packet process engine)
->> architecture, and are easily extendable for additional IPQ SoC (Ex:
->> IPQ5332) that belong to the same network architecture family.
->>
->> Given the number of patches for IPQ9574, we were wondering whether it is
->> preferred to publish the four series together, since having all the code
->> available could help clarify the inter-workings of the code. Or whether
->> it is preferred to publish the patches sequentially, depending on the
->> review progress?
+> > > > +#define __scoped_guard_labeled(_label, _name, args...)			\
+> > > > +	for (CLASS(_name, scope)(args);					\
+> > > > +	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
+> > > > +		     ({ goto _label; }))				\
+> > > > +		if (0)							\
+> > > > +		_label:							\
+> > > > +			break;						\
+> > > > +		else
+> > > 
+> > > I believe the following will folow more the style we use in the kernel:
+> > > 
+> > > #define __scoped_guard_labeled(_label, _name, args...)			\
+> > > 	for (CLASS(_name, scope)(args);					\
+> > > 	     __guard_ptr(_name)(&scope) || !__is_cond_ptr(_name);	\
+> > > 		     ({ goto _label; }))				\
+> > > 		if (0) {						\
+> > > _label:									\
+> > > 			break;						\
+> > > 		} else
+> > > 
 > 
-> Sequentially. You are likely to learn about working with mainline code
-> from the first patch series, which will allow you to improve the
-> following series before posting them.
+> Yeah, needs braces like that. I'm not super opposed to this, however, 
 > 
-
-OK, thanks.
-
->>          +---------+
->>          |  48MHZ  |
->>          +----+----+
->>               |(clock)
->>               v
->>          +----+----+
->>   +------| CMN PLL |
->>   |      +----+----+
->>   |           |(clock)
->>   |           v
->>   |      +----+----+           +----+----+  clock   +----+----+
->>   |  +---|  NSSCC  |           |   GCC   |--------->|   MDIO  |
->>   |  |   +----+----+           +----+----+          +----+----+
->>   |  |        |(clock & reset)      |(clock & reset)
->>   |  |        v                     v
->>   |  |   +-----------------------------+----------+----------+---------+
->>   |  |   |       +-----+               |EDMA FIFO |          | EIP FIFO|
->>   |  |   |       | SCH |               +----------+          +---------+
->>   |  |   |       +-----+                      |               |        |
->>   |  |   |  +------+   +------+            +-------------------+       |
->>   |  |   |  |  BM  |   |  QM  |            | L2/L3 Switch Core |       |
->>   |  |   |  +------+   +------+            +-------------------+       |
->>   |  |   |                                   |                         |
->>   |  |   | +-------+ +-------+ +-------+ +-------+ +-------+ +-------+ |
->>   |  |   | |  MAC0 | |  MAC1 | |  MAC2 | |  MAC3 | | XGMAC4| |XGMAC5 | |
->>   |  |   | +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ |
->>   |  |   |     |         |         |         |         |         |     |
->>   |  |   +-----+---------+---------+---------+---------+---------+-----+
->>   |  |         |         |         |         |         |         |
->>   |  |     +---+---------+---------+---------+---+ +---+---+ +---+---+
->>   +--+---->|             PCS0                    | |  PCS1 | | PCS2  |
->>   | clock  +---+---------+---------+---------+---+ +---+---+ +---+---+
->>   |            |         |         |         |         |         |
->>   |        +---+---------+---------+---------+---+ +---+---+ +---+---+
->>   | clock  +----------------+                    | |       | |       |
->>   +------->|Clock Controller|   4-port Eth PHY   | | PHY4  | | PHY5  |
->>            +----------------+--------------------+ +-------+ +-------+
->>
->>
->> 1.1 PPE: Internal blocks overview
->> =================================
->>
->> The Switch core
->> ---------------
->> It has maximum 8 ports, comprising 6 GMAC ports and two DMA interfaces
->> (for Ethernet DMA and EIP security processor) on the IPQ9574.
+> > And FWIW:
+> > 1) still NAKed;
 > 
-> How are packets from the host directed to a specific egress port? Is
-> there bits in the DMA descriptor of the EDMA? Or is there an
-> additional header in the fields? This will determine if you are
-> writing a DSA switch driver, or a pure switchdev driver. 
+> I would really like to understand why you don't like this; care to
+> elaborate Andy?
 
-The DMA descriptor carries the information on the destination port.
-There is no additional header required in the packet.
+To me the idea of
 
-> 
->> GMAC/xGMAC
->> ----------
->> There are 6 GMAC and 6 XGMAC in IPQ9574. Depending on the board ethernet
->> configuration, either GMAC or XGMAC is selected by the PPE driver to
->> interface with the PCS. The PPE driver initializes and manages these
->> GMACs, and registers one netdevice per GMAC.
-> 
-> That suggests you are doing a pure switchdev driver.
-> 
+int my_foo(...)
+{
+	NOT_my_foo_macro(...)
+		return X;
+}
 
-Agree that switchdev is the right model for this device. We were
-planning to enable base Ethernet functionality using regular
-(non-switchdev) netdevice representation for the ports initially,
-without offload support. As the next step, L2/VLAN offload support using
-switchdev will be enabled on top. Hope this phased approach is fine.
+is counter intuitive from C programming. Without knowing the magic behind the
+scenes of NOT_my_foo_macro() I would eager to ask for adding a dead code like
 
->> 2. List of patch series and dependencies
->> ========================================
->>
->> Clock drivers (currently in review)
->> ===================================
->> 1) CMN PLL driver patch series:
->> 	Currently in review with community.
->> 	https://lore.kernel.org/linux-arm-msm/20240827-qcom_ipq_cmnpll-v3-0-8e009cece8b2@quicinc.com/
->>
->>
->> 2) NSS clock controller (NSSCC) driver patch series
->> 	Currently in review with community.
->> 	https://lore.kernel.org/linux-arm-msm/20240626143302.810632-1-quic_devipriy@quicinc.com/
->>
->>
->> Networking drivers (to be posted for review next week)
->> ======================================================
->>
->> The following patch series are planned to be pushed for the PPE and PCS
->> drivers, to support ethernet function. These patch series are listed
->> below in dependency order.
->>
->> 3) PCS driver patch series:
->>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
->>         be enabled in drivers/net/pcs/
->> 	Dependent on NSS CC patch series (2).
-> 
-> I assume this dependency is pure at runtime? So the code will build
-> without the NSS CC patch series?
+int my_foo(...)
+{
+	NOT_my_foo_macro(...)
+		return X;
+	return 0;
+}
 
-The MII Rx/Tx clocks are supplied from the NSS clock controller to the
-PCS's MII channels. To represent this in the DTS, the PCS node in the
-DTS is configured with the MII Rx/Tx clock that it consumes, using
-macros for clocks which are exported from the NSS CC driver in a header
-file. So, there will be a compile-time dependency for the dtbindings/DTS
-on the NSS CC patch series. We will clearly call out this dependency in
-the cover letter of the PCS driver. Hope that this approach is ok.
+What I would agree on is
 
-> 
-> This should be a good way to start, PCS drivers are typically nice and
-> simple.
-> 
+int my_foo(...)
+{
+	return NOT_my_foo_macro(..., X);
+}
 
-Sure, thanks for the inputs.
+Or just using guard()().
 
-> 	Andrew
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
