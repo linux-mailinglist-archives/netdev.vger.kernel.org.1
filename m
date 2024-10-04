@@ -1,132 +1,106 @@
-Return-Path: <netdev+bounces-132023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F6F5990273
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:48:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCFDF99027A
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09FD61F23E58
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:48:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E2F9281EEC
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C67172BAE;
-	Fri,  4 Oct 2024 11:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0A615B13B;
+	Fri,  4 Oct 2024 11:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UvMtY0W1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MCwVMQf1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332B6172BA8
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC7E15B111;
+	Fri,  4 Oct 2024 11:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728042451; cv=none; b=Ms5GozOEfReeJHWzdWm0wNJaXuIm/uoGBM1U2ZDxAQ7M7NXkvsE3OGgJ2JwjlYT8hhJzZowGQJV7oLq1bxTgljpOBwEK3DWpgfG/cY6+AGtA/B4aMXtTfcPVobt/g4iHzoS/rnog7SPT0BxiYsp1CuVvkwQjhu6QljQgkZQjBYo=
+	t=1728042500; cv=none; b=GbeLldHact/Oe0KusS5MJsX6NaGUgyLfiZF8EzemMj8k0Tqs6pqh9+J0w+W18KMndvdyj7Ah33uYhnyzJtoJLoKRW+/kSt4fTVc3em3iewsFvEmwHyzNP87YesKgQMohbuWlvkOsP+vDqEDzwbyDZ76iBVKSI2aaXe7fSYGA8TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728042451; c=relaxed/simple;
-	bh=9Bftv/ViHvya+hAel1EI0cggVPhQ0jLcj2WxYo+AdIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDwWRuN2oz5bpH9VbYEl+kba6WHTjngyr3ISOsfGFCR19Tx8DSf6UxhtBs5ARDpTH9HlkFNZOJuJU/GYLfoZF7BY57gPXLhIJcP1K6A80PKxKemo/bXWUfobh1rwWySoKHRy4eigrUxCz5rSTkhc5ZT+K1g7+K8j6gNbGI1m+As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UvMtY0W1; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-37cce5b140bso1383733f8f.3
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 04:47:29 -0700 (PDT)
+	s=arc-20240116; t=1728042500; c=relaxed/simple;
+	bh=ktOLvR4Iqgs8PtW6U5YcW5q2wtfztJu1AKzJuRJ5VeQ=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=rG9p9Orz5kB0hyczyhFTcb0a7Hwa/X9qi4jcQ2b1J35KAPah+JofhK1vTFv7Tra23jhmL0zQFGKyuEQ7QzE8Q+66vizWIZXPFnNU4MEPX0ghWxvVhwqxHgwTMwsG0cZWtPUgTii4GxH6Y1V4XtKR83hfD7LvQyfbFwFZZ7svcRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MCwVMQf1; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20b7259be6fso21789765ad.0;
+        Fri, 04 Oct 2024 04:48:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728042448; x=1728647248; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DeDKJXnQ2GOHAMqg9c7Xaq3R7hTT7ZgpuGbhp8lo2vI=;
-        b=UvMtY0W1J6LuUmC8RuOFydnLjFTvgs/6Bc3+PG3csmCRyN+TMQIVSFyhoWR12vTnus
-         izKjiWFtN0niuCU0h4E4H1yD+zb61jEpJ6BXqcrI1zQ+RRjayza/GCnyghXxJXwFt4p8
-         4rQ2DTM/J9oRuiumKiZN05OPCFGiuMredcmrQrsulcQ8qvVmq8FEkpf0/tp178Xm1KVc
-         +eQC4iqZfRjQ8wk89GkNMDt8s6dLBTwZ9m0K5nmogysGlEvVmFhCHw4WhryKXUBf27iD
-         mf0P6SiZu4AFcaN9sTiW6BZISWpwyteJ+uQ2kGB5hfsN/J1TN8UiLQz+YQrgfQ4yt3PX
-         8m6w==
+        d=gmail.com; s=20230601; t=1728042498; x=1728647298; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8Si3+f6l0lHQXgBRS4ewhvkkqYUKZZULAPxMJAAUGVA=;
+        b=MCwVMQf1bzlAPddfTFmgwHJbmXnLmPnPANmOcJ0ZBG41kX4P+TtmGAPnK7v3guAsng
+         c4/trFq9fOhjPsnUA5VVH2RazXLlq4JG6aNParzhIEHF0l6F5py97R05+2WAFNz5pLMC
+         z8DqDmnwYRToqnqDSiXrQarlc4i3z8gb9szVsMY1RTVEDAyffFbWF1ihwacR/gMoHoED
+         c50zVJtuItejMp+2Ii6B5cY9T+Nnqmx/e2yaZJwqWnPovdWTVROLEpW84motZPQBYp9x
+         HtRMGIfoBxMYJ+5ZsnCVBRGQK8KzgLyO/3vhTgFlEsIHmhjQL6esjvP1witywaxEeLAv
+         /zog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728042448; x=1728647248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DeDKJXnQ2GOHAMqg9c7Xaq3R7hTT7ZgpuGbhp8lo2vI=;
-        b=qC1eJmUjMGYHqwzvOZ1+jRrQAYqC18JwYR+vbKdRrjgWPjI97LzXaKgJd+kKQWM9QL
-         PuY1vmCRlFphxxGOVmsmXjDAAxVpu0s8tqBq+G7RJL0+y7BNDRdmLTJbMK79KXpS7NYU
-         OiSRBeXR8I5JvHXkSw/ip59hd6PJF582HmAmGevqEL7v7r2YGWEk10yoJa+tj9cZtM9k
-         yU6L4cy9XuFm9v1sUmm5cAFM7gIQKsWsuXaGSbMKSdGTaGrvmt+hevScxZYlGmDzUnmN
-         YBRXUIaToccrc3NtdGVhuUhNquqOY1Ok8UQtvYQLPk8y/0xJ0tKKmEtWt+DThf7PAbeG
-         nVxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVx7VDUswYo7vf5GMEha6huZXMW59wjBf9H7m3MBVC/X0cHrwhcSwquAXTDEVYpo++oXOV68U8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZYvVU+XiFyFh4xS7KQY5rMwXVWVRozuIqEqxyEwaazfudBkSO
-	/EYQnVVipgAJUR+yCBiVMO1BjyAmf9yVqaiJAJbwPPz5WBeGfYqIcpIZPZblJMo=
-X-Google-Smtp-Source: AGHT+IG2dPHDnsTK9NmP0VSAoPEMolEgwVq80QcHsxaDBbtih2FVohfyldaIM7Y5wPIrqGUshgyIbQ==
-X-Received: by 2002:a5d:59a1:0:b0:367:9d05:cf1f with SMTP id ffacd0b85a97d-37d0e7374acmr2312722f8f.14.1728042448380;
-        Fri, 04 Oct 2024 04:47:28 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f869a39adsm13960695e9.0.2024.10.04.04.47.25
+        d=1e100.net; s=20230601; t=1728042498; x=1728647298;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8Si3+f6l0lHQXgBRS4ewhvkkqYUKZZULAPxMJAAUGVA=;
+        b=pc3b3lX9MlXgmHlGaKySc+BNd2aZOIFEynXhxgeH/YY8T4qpBvGMy5E4d3blmQaSyV
+         VB3DgaCB2rZuH0ShEyQLoAN+E81K8bhLTNObtVuT5cpJ2tm0mPhpxqR0qFwjODK4W7yg
+         izHn98nrbWcaYO5hltoroXxHwOh9yyq9PQNwn6unTw8pWRhw8c8C047QC0ihfM5gnvQc
+         FbCKvMRBq2GQ0wOz5fjcqJmKFUw5GqGYTMpv3WKb5wGJyKp9Dgd5LQOChcieC2B0v25s
+         q7ShRahoKIgQKnK2a0NR90jJgh5Y20y2YM4A+99zsOPDuI7suQg6g/XohJiUtA05seTJ
+         eHeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYvpXhOCzfOWiA8s2wzk0W/aRKSn8r4HJqhWxvyGuA39Ga9hNlXKGd69SmFuwZOGzO4Y+iOkAWa2Fk3DW2VtM=@vger.kernel.org, AJvYcCV54jCHFICZZrmuP2jA4s6F5hFkTMGnQfdPO1TjwP97VqL7SEw0sN3uoslUDORLgXQpzn0VgjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnVTxShU3IN9QEPTC6LO4ItPtZent0tLKSEvnrZJRnBN9sJAl/
+	gJLy58WeQP5GmoNu88jl2Q9do8Edi8Ukm8ZS390oiMmaFsIW25BK
+X-Google-Smtp-Source: AGHT+IFVc7BBKDLVa9eWzUVKOdhKvCJvaVU7e4VBSbw4EssJralX3008mahfGHXEuAEDpq04QbBR/Q==
+X-Received: by 2002:a17:902:e809:b0:20b:9547:9b3b with SMTP id d9443c01a7336-20bfee319f8mr25048305ad.47.1728042498405;
+        Fri, 04 Oct 2024 04:48:18 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beef9128bsm22511635ad.128.2024.10.04.04.48.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 04:47:26 -0700 (PDT)
-Date: Fri, 4 Oct 2024 14:47:22 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lennart Franzen <lennart@lfdomain.com>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error
- handling path in adin1110_read_fifo()
-Message-ID: <63dbd539-2f94-4b68-ab4e-c49e7b9d2ddd@stanley.mountain>
-References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
+        Fri, 04 Oct 2024 04:48:18 -0700 (PDT)
+Date: Fri, 04 Oct 2024 20:48:03 +0900 (JST)
+Message-Id: <20241004.204803.2223000488444244418.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: boqun.feng@gmail.com, fujita.tomonori@gmail.com,
+ dirk.behme@de.bosch.com, aliceryhl@google.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
+ ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com
+Subject: Re: iopoll abstraction
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <203e2439-4bba-4a0a-911b-79c81646a714@lunn.ch>
+References: <20241003.134518.2205814402977569500.fujita.tomonori@gmail.com>
+	<Zv6pW3Mn6qxHxTGE@boqun-archlinux>
+	<203e2439-4bba-4a0a-911b-79c81646a714@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 03, 2024 at 08:53:15PM +0200, Christophe JAILLET wrote:
-> If 'frame_size' is too small or if 'round_len' is an error code, it is
-> likely that an error code should be returned to the caller.
+On Thu, 3 Oct 2024 18:09:15 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> We probably also want a comment that this helper cannot be used in
+> atomic context.
+
+Yeah, I'll add such.
+
+> Do we have a Rust equivalent of might_sleep()?
 > 
-> Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
-> 'success' is returned.
-> 
-> Return -EINVAL instead.
-> 
-> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> This patch is speculative.
-> If returning 0 is what was intended, then an explicit 0 would be better.
+> https://elixir.bootlin.com/linux/v6.12-rc1/source/include/linux/kernel.h#L93
 
-I have an unpublished Smatch warning for these:
-
-drivers/net/ethernet/adi/adin1110.c:321 adin1110_read_fifo() info: returning a literal zero is cleaner
-drivers/net/ethernet/adi/adin1110.c:325 adin1110_read_fifo() info: returning a literal zero is cleaner
-
-It's a pity that deliberately doing a "return ret;" when ret is zero is so
-common.  Someone explained to me that it was "done deliberately to express that
-we were propagating the success from frob_whatever()".  No no no!
-
-I don't review these warnings unless I'm fixing a bug in the driver because
-they're too common.  The only ones I review are:
-
-	ret = frob();
-	if (!ret)
-		return ret;
-
-Maybe 20% of the time those warnings indicate a reversed if statement.
-
-Your heuristic here is very clever and I'll try steal it to create a new more
-specific warning.
-
-regards,
-dan carpenter
-
+No. I'll add bindings for might_sleep() and cpu_relax().
 
