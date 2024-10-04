@@ -1,134 +1,97 @@
-Return-Path: <netdev+bounces-131848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0998198FB65
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:05:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF65198FB6A
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87C09B2143F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:05:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 562081F236E3
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54CD2819;
-	Fri,  4 Oct 2024 00:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D99A1870;
+	Fri,  4 Oct 2024 00:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CY893EPW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5v4guce"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22D09360;
-	Fri,  4 Oct 2024 00:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E831F1849;
+	Fri,  4 Oct 2024 00:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728000321; cv=none; b=Vu/ePtfKAtKCOhDJaEmuVpTjR02AiJ4x3xoPXbWR2MQ7wYYi3260GvHk5r72PfEKT77tCD5anlR9fgvNjebNrWtJfH8kqN/bAbxI750dz6jZFyzbYV7VoJIJGOUBzqjvCyp2Fxesov8CySWIOsNfW8T8JUMGYg/LAUesuffTKd8=
+	t=1728000629; cv=none; b=u5N2dxP/81Mgxiy9w3xsAJrZiZgOy9aoaS1IM6o/TEHDTQ9FKG26Xc3m9MhtkRPvlr46P278+yF2+u8LJNlU6at9vpMPJ7gz7PA3QX3RS79MqLBMTNjDtEq2Lyw/nYurukikQPr8H0T57RXHX+2kyg3ctA+dwrqKkblnAbTAFXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728000321; c=relaxed/simple;
-	bh=+yEM14FSzR8BArfH6Kuafdug5D83cp/1opspSQcsrX4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rZrJ33M64g4q1d+ehMBeLY83NNx/yPpzOoWmc+7+K/CV9d5ZyISR8ABesb9DsRWqVH3VtrYLHkTkOSFtmBIGaC9JjU9saOW47mar3qoWzeInpr9w7/Ma9fWNSZHlH8d23sNVbKqH4BwZt3S+DSiY7PezvYJn/0D0Nu1aCdkUs64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CY893EPW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC0EAC4CEC5;
-	Fri,  4 Oct 2024 00:05:19 +0000 (UTC)
+	s=arc-20240116; t=1728000629; c=relaxed/simple;
+	bh=7l1gmmc/IGZjYE9QCDSMMar+bgB/Tz/DmU2vvKW4gjU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Zl6JUgmEKDAZIgCnEsDZElzqe9Gd9nCBrAMc9SqOxK1Jc7hZDvzQnXIE/+CSsRwpIeOGPLFjecNwwpY5yi+MpYDLuk5WuIPxoE1vztrqAmWLrvXm/ffrFjmvpnyFZv95rNkDcAp67OKq0z8FGES5QEa3BGB8SPG1kxkkoBy1txg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5v4guce; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9110EC4CEC5;
+	Fri,  4 Oct 2024 00:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728000320;
-	bh=+yEM14FSzR8BArfH6Kuafdug5D83cp/1opspSQcsrX4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CY893EPWDDJFX7gRRCgurlWrALdvA4Mtc4eJfpJ5HyEH6GGX2DXzES2LtveQ3r6rC
-	 EOQxewztjNAXN5EkEi7iQfyGtUVYbSny/KkPX2xBJFtRZ1PtCQMa9+lGJB9v04tYb3
-	 PAHiZw3Utu7RYDpYhwFGmVXDgVOrNAX1rzQ/oA/6nRTdaHoyDRkfsYgi117bIPRNk6
-	 pHvlvfDwJy4FOon9+qg08wZv8Qw3Osu5PvcH++KFV6cTMwvw16xtXSxpys5v/DeDgL
-	 8HrsfCHclLw5lZOGcBRLNOlpuzDtR06W1Y/XaAg3CO663vkhlalvDU2yDgCFV5+Bbo
-	 d08K5fcsjntRQ==
-Date: Thu, 3 Oct 2024 17:05:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Simon Horman
- <horms@kernel.org>, Konstantin Taranov <kotaranov@microsoft.com>, Souradeep
- Chakrabarti <schakrabarti@linux.microsoft.com>, Erick Archer
- <erick.archer@outlook.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, Colin Ian King <colin.i.king@gmail.com>,
- Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Enable debugfs files for MANA
- device
-Message-ID: <20241003170518.11cd9e20@kernel.org>
-In-Reply-To: <1727754041-26291-1-git-send-email-shradhagupta@linux.microsoft.com>
-References: <1727754041-26291-1-git-send-email-shradhagupta@linux.microsoft.com>
+	s=k20201202; t=1728000628;
+	bh=7l1gmmc/IGZjYE9QCDSMMar+bgB/Tz/DmU2vvKW4gjU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G5v4gucemcwOyZ1Se+C18+t1KIjN4jmEA2aPyjXXsZksl2SgoCc3yNVXaPt3S80T1
+	 RApXELc2ecMfRnmx+qO/pfobu3tNh6VK23a3ncHPOaScPF7RuQjvGdVB5NPGg74ddG
+	 koN/C8hRSg2ToYpSno6EJxhL7uGfI3b3+FB/zLtXi2KvsbhpmwCMGCX0uIqPt1kiKH
+	 0OORAvxKlttinnEO0/pX9GQ7EEsF7IO6YTJnDsY39TKZTf0ebWfciXX0/O2GZiQcMh
+	 qgJ1gIaCll4/GyuLTuDyFX0BylzkDMyNS9ZG+LJU3MUMn2gV7NJVXi/lkSfvxlRtAa
+	 qnQ48VYdm3Gbg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34D2C3803263;
+	Fri,  4 Oct 2024 00:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next v2 0/2] gve: Link IRQs, queues, and NAPI instances
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172800063204.2038698.8514793410721572832.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 00:10:32 +0000
+References: <20240930210731.1629-1-jdamato@fastly.com>
+In-Reply-To: <20240930210731.1629-1-jdamato@fastly.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, pkaligineedi@google.com, horms@kernel.org,
+ davem@davemloft.net, edumazet@google.com, hramamurthy@google.com,
+ kuba@kernel.org, jeroendb@google.com, pabeni@redhat.com, shailend@google.com,
+ willemb@google.com, ziweixiao@google.com, linux-kernel@vger.kernel.org
 
-On Mon, 30 Sep 2024 20:40:41 -0700 Shradha Gupta wrote:
-> @@ -1516,6 +1519,13 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	gc->bar0_va = bar0_va;
->  	gc->dev = &pdev->dev;
->  
-> +	if (gc->is_pf) {
-> +		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
-> +	} else {
-> +		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
-> +							  mana_debugfs_root);
-> +	}
+Hello:
 
-no need for brackets around single statements
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
+On Mon, 30 Sep 2024 21:07:06 +0000 you wrote:
+> Greetings:
+> 
+> Welcome to v2. The previous revision was an RFC [1].
+> 
+> This series uses the netdev-genl API to link IRQs and queues to NAPI IDs
+> so that this information is queryable by user apps. This is particularly
+> useful for epoll-based busy polling apps which rely on having access to
+> the NAPI ID.
+> 
+> [...]
 
-> @@ -1619,7 +1640,29 @@ static struct pci_driver mana_driver = {
->  	.shutdown	= mana_gd_shutdown,
->  };
->  
-> -module_pci_driver(mana_driver);
-> +static int __init mana_driver_init(void)
-> +{
-> +	int err;
-> +
-> +	mana_debugfs_root = debugfs_create_dir("mana", NULL);
-> +
-> +	err = pci_register_driver(&mana_driver);
-> +
+Here is the summary with links:
+  - [net-next,v2,1/2] gve: Map IRQs to NAPI instances
+    https://git.kernel.org/netdev/net-next/c/3017238b60d3
+  - [net-next,v2,2/2] gve: Map NAPI instances to queues
+    https://git.kernel.org/netdev/net-next/c/021f9e671e4a
 
-no need for empty lines between function call and its error check
-
-> +	if (err)
-> +		debugfs_remove(mana_debugfs_root);
-> +
-> +	return err;
-> +}
-> +
-> +static void __exit mana_driver_exit(void)
-> +{
-> +	debugfs_remove(mana_debugfs_root);
-> +
-> +	pci_unregister_driver(&mana_driver);
-> +}
-> +
-> +module_init(mana_driver_init);
-> +module_exit(mana_driver_exit);
->  
->  MODULE_DEVICE_TABLE(pci, mana_id_table);
->  
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index c47266d1c7c2..255f3189f6fa 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -9,6 +9,7 @@
->  #include <linux/filter.h>
->  #include <linux/mm.h>
->  #include <linux/pci.h>
-> +#include <linux/debugfs.h>
-
-looks like the headers were previously alphabetically sorted.
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
