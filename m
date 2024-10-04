@@ -1,103 +1,78 @@
-Return-Path: <netdev+bounces-132159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE7D9909A6
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 526A39909A8
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:46:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94F581F21E22
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:46:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0580A1F22099
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC4C1C3037;
-	Fri,  4 Oct 2024 16:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE3D1D9A52;
+	Fri,  4 Oct 2024 16:46:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdgYVM5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568F41E3789
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 16:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA93728DD1;
+	Fri,  4 Oct 2024 16:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728060389; cv=none; b=mAuBVCX0CsZT03EFwQfIdu9bwxyCmSOd9ZVFqN5QFAA6/p+2e0OB3ikILybpPByb9XvhjFL3SLOiJZyrKusjUUWzDVu5jJaqsJSk6MXK2gDcxKC6R1cb4Vuy1TdA9cMvdFaqv6gzOHXClBcpzLsu4op6ajIYUamY0cDjmRYoR+o=
+	t=1728060394; cv=none; b=lJ9n2cU/JAoKwFiodm1j/goTfAlCJPYZ7chZBneJN+NT25yNofYkCFOF/fizt2wnVO/x/dG8MB3gK+QPazCBTL+iQ1XDZr4D8Fk5R2r5SpldK5lc+KkK9KSVXbV0eIy1R5QR+DMwVctLHCc6XhZey38iP2ONzUB11SWrmUe7Xb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728060389; c=relaxed/simple;
-	bh=ylnnfKvetf93g2DUN//euZqD3scWcX/30/I9+Vkfp5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P1Qo8K9TnZeMAqM4Yo4QAVYmWSscIwUQW0fUVpu3FZ4QNTdueIwx/ZTQCWaXynqGdpdMzN4xa0GP00u+9q+OXefDWkNy+HKake3rvGKYLSn6EqNNWjMpIRn2qjVy6WwMOj8KkJrVCwQ0UUuFi1uO9+gH+K82vi+f2z8ItOYkpsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swlRf-0000as-FV; Fri, 04 Oct 2024 18:46:23 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swlRc-003daH-BK; Fri, 04 Oct 2024 18:46:20 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swlRc-00AkA7-0n;
-	Fri, 04 Oct 2024 18:46:20 +0200
-Date: Fri, 4 Oct 2024 18:46:20 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH net-next v2 3/9] net: phy: Allow PHY drivers to report
- isolation support
-Message-ID: <ZwAb3DNWYl0ykRBl@pengutronix.de>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
- <20241004161601.2932901-4-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1728060394; c=relaxed/simple;
+	bh=T3m5jdz2S+xKL18B7DRLszJy20kHNGtH15Uwibzhszs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mJVsEOpJMDTL3jbvPD8Q4+MYmdAifb/KEYvJZUh5OtNk5RsrndtI/bGiLiLNIWJmGxdkE2ecbY7XTrrn5Nb7GNUuZm5KOMmgXA82W/HR0zoSEgddWpgrvIncUh+jf5+ZmS+uwm6hnQ5teMVurgTcBml5zVUgEf0QiljL3d2nKqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdgYVM5T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF570C4CEC6;
+	Fri,  4 Oct 2024 16:46:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728060391;
+	bh=T3m5jdz2S+xKL18B7DRLszJy20kHNGtH15Uwibzhszs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SdgYVM5TJMBnNcjhykW71Ou9Dv2m/ms7aoOVDS/6iNPqUF2UwoCGinrJcsImOOfBu
+	 ntgHvo0+p9MxGJjNG7bDyOQFzZoD/rLr3S4xUpRmktGsnjMsKv+kzEiuDBq9MkYeaU
+	 bv1BngRYNzCXcHAyluSVAnt6xkHJD4mfNRFFJE+aLPb4RW++tEsJ7FbEvgedpNSvXQ
+	 UFQMKc3arGcaZPKlDZHAJsPYMLWGV/diur7bIkZjnqUL4F1laWqZEU7edteL8h6jbr
+	 N2x8LVE3EvvuTtFI2dWt6uiGflq5h0SvH8olUmU0wLmZ5ylTrSfRJGBMiNQJlG1eY0
+	 nPYLY+XxtWgQA==
+Date: Fri, 4 Oct 2024 09:46:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: idosch@nvidia.com, aleksander.lobakin@intel.com, horms@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com,
+ gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
+ razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 07/12] net: vxlan: make vxlan_set_mac()
+ return drop reasons
+Message-ID: <20241004094630.129b900f@kernel.org>
+In-Reply-To: <20241001073225.807419-8-dongml2@chinatelecom.cn>
+References: <20241001073225.807419-1-dongml2@chinatelecom.cn>
+	<20241001073225.807419-8-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241004161601.2932901-4-maxime.chevallier@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 06:15:53PM +0200, Maxime Chevallier wrote:
-> Some PHYs have malfunctionning isolation modes, where the MII lines
-> aren't correctly set in high-impedance, potentially interfering with the
-> MII bus in unexpected ways. Some other PHYs simply don't support it.
+On Tue,  1 Oct 2024 15:32:20 +0800 Menglong Dong wrote:
+> +	 * @SKB_DROP_REASON_LOCAL_MAC: the source mac address is equal to
 
-Do we have in this case multiple isolation variants like high-impedance
-and "the other one"? :)  Do the "the other one" is still usable for some
-cases like Wake on LAN without shared xMII?
+capital letters: MAC
 
-I'm just curios.
+> +	 * the mac of the local netdev.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+mac -> MAC address
+
+MAC is a layer.
 
