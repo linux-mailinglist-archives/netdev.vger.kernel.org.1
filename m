@@ -1,145 +1,180 @@
-Return-Path: <netdev+bounces-131863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F361B98FC04
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:47:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 269B598FC25
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88726B218A1
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:47:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87A41F21EF7
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E3933FD;
-	Fri,  4 Oct 2024 01:47:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D761D512;
+	Fri,  4 Oct 2024 02:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WVIEgTfl"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gDIte+0R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED77917547
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 01:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D061CF83;
+	Fri,  4 Oct 2024 02:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728006436; cv=none; b=smSFtO+zBfM9l894ENkiYds5zkiG0jtzGCF3ZK8UrYxF25+TWLRoKEayqsz5pp5QRcu4hZYlq1SLfhnEMY50ZbUIv+GJaOrHOAvRlYt3WuuV4b6bDMZ4BaW+OnuBaVGYN7zUDn4f7RH/dr2mMZmz0x6/rmqHJAAp7ZNwO19mt2U=
+	t=1728007394; cv=none; b=fdRcw3tRPaozYbBqdGmHwf+7W47RHGHhe9Cisz7PO8d3kCJFomUjXc5qYCA9EUkvzumbe3ClNKcBlgeQK8rDucMy20O3RXdk1hXVeLsB38wBB71f05h9WSUUvlGO8ZFfbC4cQT9DhKLsTpBJerKYSPt/bEKJ8cUtFFIiA/aIX9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728006436; c=relaxed/simple;
-	bh=jWhLiPBW41FdTIfWkftjHB5EDEXKmY/wjby+BrMqkTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dyS08kWyeqRb6BYtWvVwxD3NC+But1CdEYTazI//CxwOs7HJCJCUrkYdtAR/QGYc/FOS9YK1gxjtyJ6UYLHtq+tkZfl071R8un/v6/61Bv6piTf1onM82xsqzl7yYKJwei6S+pdVWnWxYmOIMEmjiY/PPBY03z9T0PQgno0q4uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WVIEgTfl; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4582a5b495cso78181cf.1
-        for <netdev@vger.kernel.org>; Thu, 03 Oct 2024 18:47:14 -0700 (PDT)
+	s=arc-20240116; t=1728007394; c=relaxed/simple;
+	bh=xBy5xxPttXpoKmeS5htAuuM3CAVAm9iT5jJyKNF+eIw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZrKMzX3BlD8faOljrwB5r5CMpT+2Wj7J7KM5j4qWi9nwqA3OGiFOEF+wwWwAXm5Q92z988bLY1kKZXC57ubEWwmbF+4ZGbgyqZ4Cq7pJrW+1caSyY623HhqTYF+oxlIc4q2vehZiHn1qdyeSDj2Ao3gJtlPQRzeMXlrFO2sdoGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gDIte+0R; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728006434; x=1728611234; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jWhLiPBW41FdTIfWkftjHB5EDEXKmY/wjby+BrMqkTI=;
-        b=WVIEgTflKv/W5Cb89cp/2jRNuP4dTgjd+1YoK2dk0+RQDtfqeKePNZqrDj+7biaRr7
-         3edysfHwH5Xz6lfGQjiskAiw3yFhqHvR2WIBAQBFAoMBNCjKqtXbRWvfQpUKCF9m+JKD
-         0EhZk7k9SzfjoBnoARh6sob2nlDlkO8r2eOjQ2VW9HBTRrUf8WOav6PzRU2Gtv5bRp2X
-         lsFmb/iKicp7WwsvtyGCYdJhFmzEomz5IOuV+4fpykPtN/eDfmvi80xfUdQzuKDqEGIk
-         wmSuVMzdm1ct9LlXNmqRiJTVhvAJ8aMzxLH+XZn9INs/meCPEiuYHsmYOT4DWM/+zlYl
-         uIvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728006434; x=1728611234;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jWhLiPBW41FdTIfWkftjHB5EDEXKmY/wjby+BrMqkTI=;
-        b=uuvo9kvB8L/Xr2AYNaEhk6XNQJm8KWgpes13tEvAw/fKwZHTzIqT3FWEBVpUwVFwHi
-         R1Ti70MjihXCFqC0eWEw07fv/8UXNQ1oZKHzCvrPz4ZdViVbwQBw1ocidrkCMWweXhpF
-         5mB6vxdVDaqtMtve9caPUiOKsKiUJNGYzfxEnGVEl5CAbH/kxO8vpMS0bY2fnAp3EF3F
-         YW2r8FtrtQczMa/aFQGJ6gPgKRfn3BujcPkyx63fn/r5J83spO6OhJXqRonWbmSTdjff
-         I3g/BZLxIgyLJvCn1fBJSFIlEMvAZvJmDXpLdQCrK68g5g40KiNNaoO9rWuaEMcv2d8S
-         cCHg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLUMCV4q8wHa4BR5UybdGjM+fDNWFmIFPuUQlgwZ1qGb+n3DecdtKgvjUHDsYCdgADSh8ifrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwI5kKYUqdX6y55huZ+8ADTkmT4kxrKw9Ku1oU8fTmHQumgPGwp
-	Nsvw0+DLk7HnBKGyWGJWlWNGH7dyX+Zwk2Gu38mDkNIVfPKLdJlFbE37pFreeC9nso/yB1jh1yx
-	qs8w1c5/rjRk71M4x4NXLx07wtstDAQitx8Rw
-X-Google-Smtp-Source: AGHT+IHNVzTHa1hLn+uSohipdrPbr5/3CxPcsBTKfk5TdgjkC0eYfb1LL/AtFiG51Yko8eompIIi+wSlL99GI2oHS4M=
-X-Received: by 2002:ac8:64c8:0:b0:456:7513:44ba with SMTP id
- d75a77b69052e-45d9bdaaabbmr1463221cf.4.1728006433660; Thu, 03 Oct 2024
- 18:47:13 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728007393; x=1759543393;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OrYxuOVIwtDd8EHnuqgfiuqojqhzTcf+aidN+5Z+j9o=;
+  b=gDIte+0R7+7PPEAF684Lh8lNr1G1vb2jFD9bMRmVZVmJXNp89WKyxQQH
+   PSccgd14TZK1SlAHw/h84R9zzDh9GkeDeCDdWFtlEyMOHFkvnXbqOns1Q
+   h/wyUCgKHNoEbuy2w96oz/7o5wW282fN23K0Rge+YjEcNj9C0NbI926m0
+   g=;
+X-IronPort-AV: E=Sophos;i="6.11,176,1725321600"; 
+   d="scan'208";a="372738814"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 02:03:07 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:11290]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.107:2525] with esmtp (Farcaster)
+ id c43e4caf-259b-484f-a33b-b822dee6cf3c; Fri, 4 Oct 2024 02:03:06 +0000 (UTC)
+X-Farcaster-Flow-ID: c43e4caf-259b-484f-a33b-b822dee6cf3c
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 02:03:05 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 4 Oct 2024 02:03:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <martin.lau@linux.dev>
+CC: <bpf@vger.kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [Question]: A non NULL req->sk in tcp_rtx_synack. Not a fastopen connection.
+Date: Thu, 3 Oct 2024 19:02:55 -0700
+Message-ID: <20241004020255.36532-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev>
+References: <eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-4-ap420073@gmail.com>
- <CAHS8izM1H-wjNUepcmFzWvpUuTZvt89_Oba=KaDpeReuMURvQw@mail.gmail.com> <CAMArcTX0sD9T2qhoKEswVp3CNVjOchZyEqypBcjMNtQRHBfk5w@mail.gmail.com>
-In-Reply-To: <CAMArcTX0sD9T2qhoKEswVp3CNVjOchZyEqypBcjMNtQRHBfk5w@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 3 Oct 2024 18:47:01 -0700
-Message-ID: <CAHS8izNZhr6=82Piv74V1HuVT1X+OEEyxUXs-VU46KJt3Fu5mA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 3/7] net: ethtool: add support for configuring tcp-data-split-thresh
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D043UWA003.ant.amazon.com (10.13.139.31) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Oct 3, 2024 at 12:33=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> On Fri, Oct 4, 2024 at 3:25=E2=80=AFAM Mina Almasry <almasrymina@google.c=
-om> wrote:
-> >
-> > On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> =
-wrote:
-> > >
-> > > The tcp-data-split-thresh option configures the threshold value of
-> > > the tcp-data-split.
-> > > If a received packet size is larger than this threshold value, a pack=
-et
-> > > will be split into header and payload.
-> >
-> > Why do you need this? devmem TCP will always not work with unsplit
-> > packets. Seems like you always want to set thresh to 0 to support
-> > something like devmem TCP.
-> >
-> > Why would the user ever want to configure this? I can't think of a
-> > scenario where the user wouldn't want packets under X bytes to be
-> > unsplit.
->
-> I totally understand what you mean,
-> Yes, tcp-data-split is zerocopy friendly option but as far as I know,
-> this option is not only for the zerocopy usecase.
-> So, If users enable tcp-data-split, they would assume threshold is 0.
-> But there are already NICs that have been supporting tcp-data-split
-> enabled by default.
-> bnxt_en's default value is 256bytes.
-> If we just assume the tcp-data-split-threshold to 0 for all cases,
-> it would change the default behavior of bnxt_en driver(maybe other driver=
-s too)
-> for the not zerocopy case.
-> Jakub pointed out the generic case, not only for zerocopy usecase
-> in the v1 and I agree with that opinion.
-> https://lore.kernel.org/netdev/20240906183844.2e8226f3@kernel.org/
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Date: Thu, 3 Oct 2024 18:14:09 -0700
+> Hi,
+> 
+> We are seeing a use-after-free from a bpf prog attached to 
+> trace_tcp_retransmit_synack. The program passes the req->sk to the 
+> bpf_sk_storage_get_tracing kernel helper which does check for null before using it.
+> 
+> fastopen is not used.
+> 
+> We got a kfence report on use-after-free (pasted at the end). It is running with 
+> an older 6.4 kernel and we hardly hit this in production.
+> 
+>  From the upstream code, del_timer_sync() should have been done by 
+> inet_csk_reqsk_queue_drop() before "req->sk = child;" is assigned in 
+> inet_csk_reqsk_queue_add(). My understanding is the req->rsk_timer should have 
+> been stopped before the "req->sk = child;" assignment.
 
-I see, thanks. The ability to tune the threshold to save some pcie
-bandwidth is interesting. Not sure how much it would matter in
-practice. I guess if you're receiving _lots_ of small packets then it
-could be critical.
+There seems to be a small race window in reqsk_queue_unlink().
 
-Sounds good then, please consider adding Jakub's reasoning for why
-tuning this could be valuable to the commit message for future
-userspace readers that wonder why to set this.
+expire_timers() first calls detach_timer(, true), which marks the timer
+as not pending, and then calls reqsk_timer_handler().
 
---=20
-Thanks,
-Mina
+If reqsk_queue_unlink() calls timer_pending() just before expire_timers()
+calls reqsk_timer_handler(), reqsk_queue_unlink() could miss
+del_timer_sync() ?
+
+---8<---
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 2c5632d4fddb..4ba47ee6c9da 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -1045,7 +1045,7 @@ static bool reqsk_queue_unlink(struct request_sock *req)
+ 		found = __sk_nulls_del_node_init_rcu(sk);
+ 		spin_unlock(lock);
+ 	}
+-	if (timer_pending(&req->rsk_timer) && del_timer_sync(&req->rsk_timer))
++	if (del_timer_sync(&req->rsk_timer))
+ 		reqsk_put(req);
+ 	return found;
+ }
+---8<---
+
+
+> 
+> or there are cases that req->sk is not NULL in the reqsk_timer_handler()?
+> 
+> BUG: KFENCE: use-after-free read in bpf_sk_storage_get_tracing+0x2e/0x1b0
+> 
+> Use-after-free read at 0x00000000a891fb3a (in kfence-#1):
+> bpf_sk_storage_get_tracing+0x2e/0x1b0
+> bpf_prog_5ea3e95db6da0438_tcp_retransmit_synack+0x1d20/0x1dda
+> bpf_trace_run2+0x4c/0xc0
+> tcp_rtx_synack+0xf9/0x100
+> reqsk_timer_handler+0xda/0x3d0
+> run_timer_softirq+0x292/0x8a0
+> irq_exit_rcu+0xf5/0x320
+> sysvec_apic_timer_interrupt+0x6d/0x80
+> asm_sysvec_apic_timer_interrupt+0x16/0x20
+> intel_idle_irq+0x5a/0xa0
+> cpuidle_enter_state+0x94/0x273
+> cpu_startup_entry+0x15e/0x260
+> start_secondary+0x8a/0x90
+> secondary_startup_64_no_verify+0xfa/0xfb
+> 
+> kfence-#1: 0x00000000a72cc7b6-0x00000000d97616d9, size=2376, cache=TCPv6
+> 
+> allocated by task 0 on cpu 9 at 260507.901592s:
+> sk_prot_alloc+0x35/0x140
+> sk_clone_lock+0x1f/0x3f0
+> inet_csk_clone_lock+0x15/0x160
+> tcp_create_openreq_child+0x1f/0x410
+> tcp_v6_syn_recv_sock+0x1da/0x700
+> tcp_check_req+0x1fb/0x510
+> tcp_v6_rcv+0x98b/0x1420
+> ipv6_list_rcv+0x2258/0x26e0
+> napi_complete_done+0x5b1/0x2990
+> mlx5e_napi_poll+0x2ae/0x8d0
+> net_rx_action+0x13e/0x590
+> irq_exit_rcu+0xf5/0x320
+> common_interrupt+0x80/0x90
+> asm_common_interrupt+0x22/0x40
+> cpuidle_enter_state+0xfb/0x273
+> cpu_startup_entry+0x15e/0x260
+> start_secondary+0x8a/0x90
+> secondary_startup_64_no_verify+0xfa/0xfb
+> 
+> freed by task 0 on cpu 9 at 260507.927527s:
+> rcu_core_si+0x4ff/0xf10
+> irq_exit_rcu+0xf5/0x320
+> sysvec_apic_timer_interrupt+0x6d/0x80
+> asm_sysvec_apic_timer_interrupt+0x16/0x20
+> cpuidle_enter_state+0xfb/0x273
+> cpu_startup_entry+0x15e/0x260
+> start_secondary+0x8a/0x90
+> secondary_startup_64_no_verify+0xfa/0xfb
+> 
+> Thanks,
+> Martin
 
