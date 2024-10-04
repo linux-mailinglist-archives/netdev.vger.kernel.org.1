@@ -1,571 +1,239 @@
-Return-Path: <netdev+bounces-131988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80ACB99016B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:35:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA2D1990170
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96EAA1C22CC9
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:35:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40DED1F21628
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294131369BB;
-	Fri,  4 Oct 2024 10:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09CF7146017;
+	Fri,  4 Oct 2024 10:36:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bO1Sqlk7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hRyDBbBE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7DD14659B;
-	Fri,  4 Oct 2024 10:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728038102; cv=none; b=j4BfNYC/L7VDJdhVx2ErA1baxtJDjMRhVowRqcqfypvl/TcCNVgH5nFL9agyinwTVkN3DC7lgc0V3XqNzTi1kg2ZlhVlPqfT1EIetD4wC1rkOk9WjTTPEBFcnoMpSYY213IZB9Wf9mYabYUq5dW5yt7aFbVWZ4SZrnhqiEJZxWM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728038102; c=relaxed/simple;
-	bh=Y2dUVf18ivPKX1jPG3HWfTAZHT6Ny0PqmcbKUFN0MSU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hl+r629KI52xc29a1NBmF2nWpVAqvI71xxUPV5EeH9y0NCAyMTLqLqtdROVl4S/aQX1lR2hvsoSY479gDD0r2hrMb2N1CGMRv7Rb4OVmX1+SGC9eM1li8SQmlulo7Wl7+WoASx+u0kQrDK/OQxL0UnyglZv5Gfs0hTkXF5Ld9JM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bO1Sqlk7; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c87853df28so2484899a12.3;
-        Fri, 04 Oct 2024 03:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728038098; x=1728642898; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OMfPUDX2Tq86HT+auD60RLgWxfd+JGXE5xKQEK7BbsY=;
-        b=bO1Sqlk7+4lvfvwUOLF6QAN6NOMhumtXRd/iB3oR3BRsg4xd5xFi4JAKLQA++lTTgP
-         v0I1MmI0RGcsYM4lrZ7swBch8TwvvBOBM3PlYM3bR/XxlGnsOVES4Q28K3QCiCKpRCJp
-         sl3PozxZdE38ImHCD6Yr74sMRl2fNdbDG1REpaavHUTRSULDEp+sLgsBMWt+6OvkBnXN
-         LcMe4pSe7YHzlt/l/eITFxk087VCDCNkznsTQI1sUnuv4Ee2O7DGn8tv1nJTXM76UUkp
-         LtjmT7svR5NbvqEPMPKM6Yaam7uEhvcr1HUg+gfR23GtIuV+aRD25t+6sMl0uUyjB5+w
-         OvvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728038098; x=1728642898;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OMfPUDX2Tq86HT+auD60RLgWxfd+JGXE5xKQEK7BbsY=;
-        b=SRKnEoJVmPTmnu784TxNYA+5MrN2M26AqNQcQAkZffZlhmeV67s7G6XyeE9wHtU7Cx
-         IT7SrI30qR3CUUqHxXvgGqVyCdomfI+2/Uh6AEN4P/RUHRnqthkwZg+th8ZL/JapbGgI
-         EGWHXWRd/iBjXSii8J3xzIoZ9ezoY10ehZ2LcE6o/kweRtXXtz23G6wIuoRQVQvusDNj
-         BYXDWp1uHw/ZbkxyLv7JJwC6iGGil7A7Y8BK9ItAxGLud8jWoe0WlB4BoIapEGIrC5G/
-         bkbNqc7OluFgx4iaDVE9+J7+QmDBGopAZRh23+enyerWwyIF2R22l39dWBrGKjRncwp+
-         f3og==
-X-Forwarded-Encrypted: i=1; AJvYcCVQLgGE/LlIR2cVvCJ0fIZBQmG0yTGaJXRJlxjeEBuILZCaMNWAb8f31l6W0ORfgpTh7TUclE3q26U=@vger.kernel.org, AJvYcCX7eCVA7UQD7s+d/0fQnHaO4Ku/Qc8dWDu3IRTSJMa9Sh9Kk1wIUHxfr1Jh36VPd6v8+ytVKPBS@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbJGaJJrmfKaK7M+kSR/yH0rjAtCdJ3QZ/9CsdHACz3Tp4qO8Z
-	lxwzR0sPkz6ORDwxBjFImuPM+NI0nOXItdQJqGXqOchZWi/oDzVW6Jxbajvybc66lTRCRdGjf+A
-	WyFCVrH3zHv9owb62fMvaF1KZn3k=
-X-Google-Smtp-Source: AGHT+IEVkRJfW9CFu970hX3g+ZlYLAbqCw0jV+aaCaltmgyyVtaw43KyvJ5DEXGsFy/KXkVyh2ilrE6TfYDC+ZsdpFQ=
-X-Received: by 2002:a05:6402:350e:b0:5c5:c4e9:c8a2 with SMTP id
- 4fb4d7f45d1cf-5c8d2d01036mr1736803a12.3.1728038097465; Fri, 04 Oct 2024
- 03:34:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D9F1369BB
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728038184; cv=fail; b=L6uVGnsXJjhReXX9jm8kbdIR/Bj47coAKcSGyEO+eo/YFD4Y/Kx6U+5AsvOQ+5B2DMq1CiW7vimIus2stZegM6ahO6riJifBhE19ePg0XWCDpF9pfb3K4e7BmrmDZoBTkvNx+xDDtWU4Sk1COUqUEXrmS+OWf1YJqAm3SS63+fY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728038184; c=relaxed/simple;
+	bh=eSPWzjyMW87so0cTreLLy4DxY1+MIc2OnSCecvzphYM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JFSyqXlE7hR4xrnh/88sFCYYX/eucCVeJunb0IvHlJms+1IvTz258Q6V616wxmJsVPu3AxSZqNndoe30TdeK+w3MfYCBG2g38IizMiKNRNm2GhYENN2z9ggonLL99b2CGZrSp58K/IC+NnZT0TssXVcnxm0kOR27eD3stAytD0s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hRyDBbBE; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728038183; x=1759574183;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=eSPWzjyMW87so0cTreLLy4DxY1+MIc2OnSCecvzphYM=;
+  b=hRyDBbBEXu45CJeTIKTo70IkaL4e8xS+hobVoiMDGxAuheN45y9d3xRp
+   4nqHKyQLYHbjLYx0dzJV/cROGZSp7zbE17efHuwdcQb1V+ng8fHKBKIrv
+   ziYdRVC2G+mhrW7YKaHuTylKwBz3jTRqX6YyWi+vqZtTkMKbhRe/qqqsl
+   wbs8ZixCdxIFAERJ+pO/0X1bi7YjVUVZhz5tlkniqDpAKh4FfRNl9Q0YJ
+   UJDpigMmKRYKpR3+pBeYTgR4ViRQsMSLih3oo3lKKtAlPj+xi1Pqiu3ba
+   sE36Sd17xoOeYaVLqR39nbbaU+3LLdDeGzfkyYikUR1ijA29ztYUhbB73
+   A==;
+X-CSE-ConnectionGUID: ZZIwrCizSHaFEjKK2POGGQ==
+X-CSE-MsgGUID: XqoG+36CS5+ahDFPq/1s6w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="38615252"
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="38615252"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 03:36:23 -0700
+X-CSE-ConnectionGUID: UREviDu+TPecTZ7XBkFq3A==
+X-CSE-MsgGUID: 3OGuxXvsQCmQCjyLFho/og==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="105504892"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Oct 2024 03:36:22 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 4 Oct 2024 03:36:21 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 4 Oct 2024 03:36:21 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.45) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 4 Oct 2024 03:36:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Jlcg8czBPaWS8EeXQj7sZQkty94oWrc+2BGSZm5W8EGWHGlShNzH3o45gNoSNTZ3Co21cxmopYREuzfsQUUQNufIBgOM6yiAow78beyPxIwVfDxj6CMIFD6xa1bWHaUk1G2In55WNEpb9RJcNXSMIwIAw5scPc65b34WL7fOwok1pxFPN9F8VKooiRPCraTJ8pYrV11Gz4ccElmruAcsnJCMecoxQ0PgTPRcgj1DyT92e0trJLejIKZfCcTnY85eODZrT/pZhxO4/Cq0e082dJtT63n+LMv9XOn7Hq2a2QrmYEgOnedPhatUSFEQUuoQQf8MIY+c4IK8qfgbMcPWPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NTaqmwRJ9Npy1TbdoeQYJAyC+tDQQfYezTkjXkfG8UI=;
+ b=KbZsfD1Oqi+kEZk1uuqy4UduQLvCfhHhRAbvPHBgnIG/ReiNlmMg7ImxwdDQmJ0Mm4saemIUn489X0ZiEPIi+bo0Agglv8rCuaJYEAenpqSgEG2isS98WKOb6Ym1O33xaAwkzY589MqBCsHbhiwWmkVMhso8ZO7XZDCJdyMEua1hpT4IxtUzudlCnEOJf4CFu5mvuV3XrldYnqdMviGPksS6T0m++N+x9Nm+s93Cncsr89RwAwznmdGPEjCxMQgTROegQOWPlR3yeci9DPz874jnGvCiUcZmKCUDdAhV1Mv2evyY5ccH9HkX8o3t/rg8zDodMK9dk1hYt42PWZ6TUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by MW4PR11MB8268.namprd11.prod.outlook.com (2603:10b6:303:1ef::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.18; Fri, 4 Oct
+ 2024 10:36:19 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::1c54:1589:8882:d22b%3]) with mapi id 15.20.8026.017; Fri, 4 Oct 2024
+ 10:36:19 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: "Drewek, Wojciech" <wojciech.drewek@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"marcin.szycik@linux.intel.com" <marcin.szycik@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"horms@kernel.org" <horms@kernel.org>, "michal.swiatkowski@linux.intel.com"
+	<michal.swiatkowski@linux.intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2] ice: Flush FDB entries
+ before reset
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2] ice: Flush FDB entries
+ before reset
+Thread-Index: AQHbENqXUsKaTPTLEU2j5xF0xGccd7J2cLkw
+Date: Fri, 4 Oct 2024 10:36:19 +0000
+Message-ID: <PH0PR11MB50133484C056891F57F38F6A96722@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20240927123801.14853-1-wojciech.drewek@intel.com>
+In-Reply-To: <20240927123801.14853-1-wojciech.drewek@intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|MW4PR11MB8268:EE_
+x-ms-office365-filtering-correlation-id: 8b885204-df03-4ff9-e058-08dce4606224
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?j/sVOYILohCyJRqRjVayYcMHx1Xoo0ikVzKlAlfsuGDMapb9vKLoyB16tNML?=
+ =?us-ascii?Q?kJLM+iC/FKaFqN1+y72KGpo37BZV5rRLX/ikc6WJJuzDxDNuas5zY3WXEXtw?=
+ =?us-ascii?Q?63UejTIez3pq85pYoJGb6idMvoeKE2s3p/3BcIXjX7qtzZl51yy04oZ00/2Q?=
+ =?us-ascii?Q?d8SEzOlLRm1iNZ5pAxuFA7YEupfwbhaSH+N9rgyIqaiwmmH57Oc6EHmQ13oZ?=
+ =?us-ascii?Q?X4WVen7LiQvAcT050+ggT1zZEHHEYkIkJjjk1Qzt4zc67eovy5/ASosuxIf/?=
+ =?us-ascii?Q?nviheDfMUtc4fTKqKxaAZc1ui7XpFaQPey5mnKzHcngvbf7/IWNKMejThLYE?=
+ =?us-ascii?Q?YDCPoO+z8qauEfesCrLEHBbKAGpeDczMn1H3j6j3lwk+b1v817phtZJ1NorJ?=
+ =?us-ascii?Q?YOs1r4OgBEBToetrmfzffnpDUz3W8/EbfSh+hquc9ujRC3I1/3OTBCRvk1dV?=
+ =?us-ascii?Q?SeXgp4PQnOTQlcxALTD2GWDgWWLvLFPJKuIaCI0wC2nRSOpfAteEX5LuG4kO?=
+ =?us-ascii?Q?mjY4QsyjnMhfpYZj8XhQp5ii9+QI7thpJADqzKHIO23GuAp7PHoaJkXEbA4L?=
+ =?us-ascii?Q?HHp1z2Ovbb1/Hw7T0SSUJxO2jDM4J30gRsCSw4nvIYCUEyG0ZEFFnweXUVMR?=
+ =?us-ascii?Q?yUTfpGfDws445tAyTXLYmb2p9vjlK6bWOPzzP718ATjceHpaZBhEet0+WHMl?=
+ =?us-ascii?Q?UxByZe91DKPZpsLkh5E2YIQzwH1tYdP91a4RzgRjnb1hzeuugnlJIZCJv5tt?=
+ =?us-ascii?Q?o4gbkWMFZc3mb3Gh13YTiLhaZ4JaPOChs0qpnAV3RHo9x7IXxmVtwLdXS76G?=
+ =?us-ascii?Q?iO8e/Cg0oo/JM7qQCMrIBTsDhi5hud7nOFjXmWb+lRkIoiq2kdSo2xL/Njfw?=
+ =?us-ascii?Q?3FeGjYdR5sa+M6dWiRVlwjeKPb7IWDYi8i2PlprkU0spXH3RTr8KLVS5oh86?=
+ =?us-ascii?Q?VPjKtuL1L2ws8GvgxPTOsw4CkCdeUGhrYU0ApBidXpO3O36VETI2XSvolOg2?=
+ =?us-ascii?Q?Zst1+b4zV+QFeUCbY0JV9LHqAB/LgotjdqRoX2kMuSt+mo3MJR3i0mpHWaUF?=
+ =?us-ascii?Q?4epes6x6UCpXvS75sob0iLEj5Ag1s9ZtCYPjKSulUxdvHKYHcE6aoRYJJfrr?=
+ =?us-ascii?Q?ExVEZpum3lGOrEVUF1UEZD2Y3WW0ENUgAkERX6Bd1d088EV5OQxJWHHaXxZw?=
+ =?us-ascii?Q?/QKUG4FV+TCR5c5JSEAIrIAaYfDcoE5euOcMihZTW2s0clh7OFWiH1tIt8/1?=
+ =?us-ascii?Q?1nSZ8Xc1UbO4nGgO38MXlyw0ppicc75cZyQAUnI0nROia03eqhG/WWaQPKw+?=
+ =?us-ascii?Q?WqGrM9Ixn42P1Irno38D/7NwbQkkYdsA05aKSZuQibwT0w=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?RwrdlvOmopFxFnCwAqd0/Kj0xzu0/p/gYaXpsl7v+DIBvTfmfwit3KuIPyzs?=
+ =?us-ascii?Q?ELE1o42nRY7JtLSokljMuixU3GhQHr2W2o1O3mvimrKNuXgeT7ZJe4IrIjvw?=
+ =?us-ascii?Q?b78TXQBkwdhbIJOFBtWvWVpfUeM88WfVsRPFixlExkstW3VefWu+tvytPrxU?=
+ =?us-ascii?Q?4pAgdxt4eaE7T1/KKara4qJYYu7/PsPBx82D2kH8SdRtIiHbjxes/P0ggm21?=
+ =?us-ascii?Q?klCVfiPIYxdwfKqht0a+on+Uc8j6DpWhW9C0xnXmrvxsKjH/fSq7AGECET7i?=
+ =?us-ascii?Q?aZc+03egRTy9mxi6i1eTTFf3MTuvR5ROvbt9YM2iv1pRe/z0qeOuXCML2caA?=
+ =?us-ascii?Q?tO+jy8AJW14/ntmot/o4pRMDUMLSRI8uBJx9mmBRNDi4ZwCfL1KpVuyWwhKK?=
+ =?us-ascii?Q?LkLiGy3kYhTAoy75ZX2VxxlHVDVDl5PoFvQo7So+3OYPDdzVpbxz/sDLIdNH?=
+ =?us-ascii?Q?xjvtzi2bwwLhHB8LE3AlK6V0P9C0r/IN94w/AMDM5uJjPdp/nju1SCRPynyM?=
+ =?us-ascii?Q?18p9JXyuNx+knM3MwsKBCeGDoklhRmoZcMjuFSe2FWduo5XFey/w6aNBqzTN?=
+ =?us-ascii?Q?5KXE2jg+oq8d6F708fyYFMGb18dDQU3XkHkfJDi0xNYZtAFDsYs36Zp6egSu?=
+ =?us-ascii?Q?PlxQ4yHmrFpeLPKgQX7120kybsql5hdj/djyOKBa4taL9WGBOxy9qz/LZqEx?=
+ =?us-ascii?Q?5mgLjqYR+OSbAv8s9Hkk1jXetgaZ+NbvPTIVyzlTAGyDizgFCXnIhYSyN6Qa?=
+ =?us-ascii?Q?O0Xs0LZ1qK0SgaOJSIAAJaiF+eYbzEAx6HYMXKiKeSoMw5T8eXqisjTpfhHg?=
+ =?us-ascii?Q?rczieYYhqhgRhGZdplwfhXebtXepRvvGsFRqw6fKq+TlQ2++LDjbq0WxBiOF?=
+ =?us-ascii?Q?o1A/n8Rg5/E/VjEb4TdNT7dSP6X1X3m3MvSf3+rhr96y+dSzKXs69C1h2guW?=
+ =?us-ascii?Q?sRsTfRVboBAmAQu9EQOQxLIIqcClj8bOhy8Zlc3haU2hqZzSH1XgXm46kA4Y?=
+ =?us-ascii?Q?JIr64m0UyNIGPdYdVOSJC0Ap0v+XLKAT4PvcJ9Af/MlJEs2e0AM7M9LXfRE7?=
+ =?us-ascii?Q?O3F6R41lLT/kEosDsWzB/1e7cBvk5dQ4kJaVU1VQJaCY5IWWY9/OTYenzKK+?=
+ =?us-ascii?Q?d3lC0Pv64VkksNTT+8vMoWqyBrPP6EKd1WHMo+CzV66YxVPJ0gdhjmXEN6Jr?=
+ =?us-ascii?Q?HebvtTtCJEFl+YfcjSNMGJYULawQM7DgdGv0O4oOVUWFVVkfcgEqm+287WvC?=
+ =?us-ascii?Q?agjJI1te0+pEJuU+Kcb781s3UC9h2zmmLcN3N+F5lOi25X6Mm7DLXxXzE62w?=
+ =?us-ascii?Q?CUGBcIWQ8uJ9nPBfh8QWeMBhWa8/DxEBbVc5TRUskH4R44GIKpTqFhB86+Co?=
+ =?us-ascii?Q?rmqd3g1hu15JMEd0XS0lyEWtpnf+rqNJgZLaajYLm8w/C2zrkbITK3nNjMLP?=
+ =?us-ascii?Q?aTXnX4jRccpQ1ybt4hwoPq6pgPQ+DIw6QHYB2fdgoClNNNW15zafHOkcFksB?=
+ =?us-ascii?Q?4QJbD1q1ZOacQn33hLKCkbWlCCy16bNwPF3J6sdCUukBRM4Grl+L2HAAyAMT?=
+ =?us-ascii?Q?DagrcqY42/eFjCSiGPWBULx7aYIBixHFPRpQuFc7oZ23OtujmFD7Vykv8o5R?=
+ =?us-ascii?Q?4w=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-8-ap420073@gmail.com>
- <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
-In-Reply-To: <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Oct 2024 19:34:45 +0900
-Message-ID: <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b885204-df03-4ff9-e058-08dce4606224
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2024 10:36:19.3941
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IIJWy/cWeYI3pJkCITBcZ8fzkrKIzy9kbQ0GGcfwr52NrqE+W3tS5NczzcpPgBiH8EcMws+N58jbqE/0J3GK/IG7Ni+jOlmvjvfpP3prV6M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB8268
+X-OriginatorOrg: intel.com
 
-On Fri, Oct 4, 2024 at 3:43=E2=80=AFAM Mina Almasry <almasrymina@google.com=
-> wrote:
->
-
-Hi Mina,
-Thanks a lot for your review!
-
-> On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wr=
-ote:
-> >
-> > Currently, bnxt_en driver satisfies the requirements of Device memory
-> > TCP, which is tcp-data-split.
-> > So, it implements Device memory TCP for bnxt_en driver.
-> >
-> > From now on, the aggregation ring handles netmem_ref instead of page
-> > regardless of the on/off of netmem.
-> > So, for the aggregation ring, memory will be handled with the netmem
-> > page_pool API instead of generic page_pool API.
-> >
-> > If Devmem is enabled, netmem_ref is used as-is and if Devmem is not
-> > enabled, netmem_ref will be converted to page and that is used.
-> >
-> > Driver recognizes whether the devmem is set or unset based on the
-> > mp_params.mp_priv is not NULL.
-> > Only if devmem is set, it passes PP_FLAG_ALLOW_UNREADABLE_NETMEM.
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v3:
-> >  - Patch added
-> >
-> >  drivers/net/ethernet/broadcom/Kconfig     |  1 +
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 98 +++++++++++++++--------
-> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h |  2 +-
-> >  3 files changed, 66 insertions(+), 35 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/Kconfig b/drivers/net/ethern=
-et/broadcom/Kconfig
-> > index 75ca3ddda1f5..f37ff12d4746 100644
-> > --- a/drivers/net/ethernet/broadcom/Kconfig
-> > +++ b/drivers/net/ethernet/broadcom/Kconfig
-> > @@ -211,6 +211,7 @@ config BNXT
-> >         select FW_LOADER
-> >         select LIBCRC32C
-> >         select NET_DEVLINK
-> > +       select NET_DEVMEM
-> >         select PAGE_POOL
-> >         select DIMLIB
-> >         select AUXILIARY_BUS
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.c
-> > index 872b15842b11..64e07d247f97 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > @@ -55,6 +55,7 @@
-> >  #include <net/page_pool/helpers.h>
-> >  #include <linux/align.h>
-> >  #include <net/netdev_queues.h>
-> > +#include <net/netdev_rx_queue.h>
-> >
-> >  #include "bnxt_hsi.h"
-> >  #include "bnxt.h"
-> > @@ -863,6 +864,22 @@ static void bnxt_tx_int(struct bnxt *bp, struct bn=
-xt_napi *bnapi, int budget)
-> >                 bnapi->events &=3D ~BNXT_TX_CMP_EVENT;
-> >  }
-> >
-> > +static netmem_ref __bnxt_alloc_rx_netmem(struct bnxt *bp, dma_addr_t *=
-mapping,
-> > +                                        struct bnxt_rx_ring_info *rxr,
-> > +                                        unsigned int *offset,
-> > +                                        gfp_t gfp)
-> > +{
-> > +       netmem_ref netmem;
-> > +
-> > +       netmem =3D page_pool_alloc_netmem(rxr->page_pool, GFP_ATOMIC);
-> > +       if (!netmem)
-> > +               return 0;
-> > +       *offset =3D 0;
-> > +
-> > +       *mapping =3D page_pool_get_dma_addr_netmem(netmem) + *offset;
-> > +       return netmem;
-> > +}
-> > +
-> >  static struct page *__bnxt_alloc_rx_page(struct bnxt *bp, dma_addr_t *=
-mapping,
-> >                                          struct bnxt_rx_ring_info *rxr,
-> >                                          unsigned int *offset,
-> > @@ -972,21 +989,21 @@ static inline u16 bnxt_find_next_agg_idx(struct b=
-nxt_rx_ring_info *rxr, u16 idx)
-> >         return next;
-> >  }
-> >
-> > -static inline int bnxt_alloc_rx_page(struct bnxt *bp,
-> > -                                    struct bnxt_rx_ring_info *rxr,
-> > -                                    u16 prod, gfp_t gfp)
-> > +static inline int bnxt_alloc_rx_netmem(struct bnxt *bp,
-> > +                                      struct bnxt_rx_ring_info *rxr,
-> > +                                      u16 prod, gfp_t gfp)
-> >  {
-> >         struct rx_bd *rxbd =3D
-> >                 &rxr->rx_agg_desc_ring[RX_AGG_RING(bp, prod)][RX_IDX(pr=
-od)];
-> >         struct bnxt_sw_rx_agg_bd *rx_agg_buf;
-> > -       struct page *page;
-> > +       netmem_ref netmem;
-> >         dma_addr_t mapping;
-> >         u16 sw_prod =3D rxr->rx_sw_agg_prod;
-> >         unsigned int offset =3D 0;
-> >
-> > -       page =3D __bnxt_alloc_rx_page(bp, &mapping, rxr, &offset, gfp);
-> > +       netmem =3D __bnxt_alloc_rx_netmem(bp, &mapping, rxr, &offset, g=
-fp);
->
-> Does __bnxt_alloc_rx_page become dead code after this change? Or is it
-> still used for something?
-
-__bnxt_alloc_rx_page() is still used.
-
->
-> >
-> > -       if (!page)
-> > +       if (!netmem)
-> >                 return -ENOMEM;
-> >
-> >         if (unlikely(test_bit(sw_prod, rxr->rx_agg_bmap)))
-> > @@ -996,7 +1013,7 @@ static inline int bnxt_alloc_rx_page(struct bnxt *=
-bp,
-> >         rx_agg_buf =3D &rxr->rx_agg_ring[sw_prod];
-> >         rxr->rx_sw_agg_prod =3D RING_RX_AGG(bp, NEXT_RX_AGG(sw_prod));
-> >
-> > -       rx_agg_buf->page =3D page;
-> > +       rx_agg_buf->netmem =3D netmem;
-> >         rx_agg_buf->offset =3D offset;
-> >         rx_agg_buf->mapping =3D mapping;
-> >         rxbd->rx_bd_haddr =3D cpu_to_le64(mapping);
-> > @@ -1044,7 +1061,7 @@ static void bnxt_reuse_rx_agg_bufs(struct bnxt_cp=
-_ring_info *cpr, u16 idx,
-> >                 struct rx_agg_cmp *agg;
-> >                 struct bnxt_sw_rx_agg_bd *cons_rx_buf, *prod_rx_buf;
-> >                 struct rx_bd *prod_bd;
-> > -               struct page *page;
-> > +               netmem_ref netmem;
-> >
-> >                 if (p5_tpa)
-> >                         agg =3D bnxt_get_tpa_agg_p5(bp, rxr, idx, start=
- + i);
-> > @@ -1061,11 +1078,11 @@ static void bnxt_reuse_rx_agg_bufs(struct bnxt_=
-cp_ring_info *cpr, u16 idx,
-> >                 cons_rx_buf =3D &rxr->rx_agg_ring[cons];
-> >
-> >                 /* It is possible for sw_prod to be equal to cons, so
-> > -                * set cons_rx_buf->page to NULL first.If I misundersta=
-nd about
-> > +                * set cons_rx_buf->netmem to 0 first.
-> >                  */
-> > -               page =3D cons_rx_buf->page;
-> > -               cons_rx_buf->page =3D NULL;
-> > -               prod_rx_buf->page =3D page;
-> > +               netmem =3D cons_rx_buf->netmem;
-> > +               cons_rx_buf->netmem =3D 0;
-> > +               prod_rx_buf->netmem =3D netmem;
-> >                 prod_rx_buf->offset =3D cons_rx_buf->offset;
-> >
-> >                 prod_rx_buf->mapping =3D cons_rx_buf->mapping;
-> > @@ -1192,6 +1209,7 @@ static struct sk_buff *bnxt_rx_skb(struct bnxt *b=
-p,
-> >
-> >  static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
-> >                                struct bnxt_cp_ring_info *cpr,
-> > +                              struct sk_buff *skb,
-> >                                struct skb_shared_info *shinfo,
-> >                                u16 idx, u32 agg_bufs, bool tpa,
-> >                                struct xdp_buff *xdp)
-> > @@ -1211,7 +1229,7 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
-> >                 u16 cons, frag_len;
-> >                 struct rx_agg_cmp *agg;
-> >                 struct bnxt_sw_rx_agg_bd *cons_rx_buf;
-> > -               struct page *page;
-> > +               netmem_ref netmem;
-> >                 dma_addr_t mapping;
-> >
-> >                 if (p5_tpa)
-> > @@ -1223,9 +1241,15 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
-> >                             RX_AGG_CMP_LEN) >> RX_AGG_CMP_LEN_SHIFT;
-> >
-> >                 cons_rx_buf =3D &rxr->rx_agg_ring[cons];
-> > -               skb_frag_fill_page_desc(frag, cons_rx_buf->page,
-> > -                                       cons_rx_buf->offset, frag_len);
-> > -               shinfo->nr_frags =3D i + 1;
-> > +               if (skb) {
-> > +                       skb_add_rx_frag_netmem(skb, i, cons_rx_buf->net=
-mem,
-> > +                                              cons_rx_buf->offset, fra=
-g_len,
-> > +                                              BNXT_RX_PAGE_SIZE);
-> > +               } else {
-> > +                       skb_frag_fill_page_desc(frag, netmem_to_page(co=
-ns_rx_buf->netmem),
-> > +                                               cons_rx_buf->offset, fr=
-ag_len);
->
-> Our intention with the whole netmem design is that drivers should
-> never have to call netmem_to_page(). I.e. the driver should use netmem
-> unaware of whether it's page or non-page underneath, to minimize
-> complexity driver needs to handle.
->
-> This netmem_to_page() call can be removed by using
-> skb_frag_fill_netmem_desc() instead of the page variant. But, more
-> improtantly, why did the code change here? The code before calls
-> skb_frag_fill_page_desc, but the new code sometimes will
-> skb_frag_fill_netmem_desc() and sometimes will skb_add_rx_frag_netmem.
-> I'm not sure why that logic changed.
-
-The reason why skb_add_rx_frag_netmem() is used here is to set
-skb->unreadable flag. the skb_frag_fill_netmem_desc() doesn't set
-skb->unreadable because it doesn't handle skb, it only handles frag.
-As far as I know, skb->unreadable should be set to true for devmem
-TCP, am I misunderstood?
-I tested that don't using skb_add_rx_frag_netmem() here, and it
-immediately fails.
-
-The "if (skb)" branch will be hit only when devmem TCP path.
-Normal packet and XDP path will hit "else" branch.
-
-I will use skb_frag_fill_netmem_desc() instead of
-skb_frag_fill_page_desc() in the "else" branch.
-With this change, as you said, there is no netmem_to_page() in bnxt_en
-driver, Thanks!
-
->
-> > +                       shinfo->nr_frags =3D i + 1;
-> > +               }
-> >                 __clear_bit(cons, rxr->rx_agg_bmap);
-> >
-> >                 /* It is possible for bnxt_alloc_rx_page() to allocate
-> > @@ -1233,15 +1257,15 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
-> >                  * need to clear the cons entry now.
-> >                  */
-> >                 mapping =3D cons_rx_buf->mapping;
-> > -               page =3D cons_rx_buf->page;
-> > -               cons_rx_buf->page =3D NULL;
-> > +               netmem =3D cons_rx_buf->netmem;
-> > +               cons_rx_buf->netmem =3D 0;
-> >
-> > -               if (xdp && page_is_pfmemalloc(page))
-> > +               if (xdp && page_is_pfmemalloc(netmem_to_page(netmem)))
->
-> Similarly, add netmem_is_pfmemalloc to netmem.h, instead of doing a
-> netmem_to_page() call here I think.
-
-Thanks, I will add netmem_is_pfmemalloc() to netmem.h in a v4 patch.
-
->
-> >                         xdp_buff_set_frag_pfmemalloc(xdp);
-> >
-> > -               if (bnxt_alloc_rx_page(bp, rxr, prod, GFP_ATOMIC) !=3D =
-0) {
-> > +               if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_ATOMIC) !=
-=3D 0) {
-> >                         --shinfo->nr_frags;
-> > -                       cons_rx_buf->page =3D page;
-> > +                       cons_rx_buf->netmem =3D netmem;
-> >
-> >                         /* Update prod since possibly some pages have b=
-een
-> >                          * allocated already.
-> > @@ -1269,7 +1293,7 @@ static struct sk_buff *bnxt_rx_agg_pages_skb(stru=
-ct bnxt *bp,
-> >         struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> >         u32 total_frag_len =3D 0;
-> >
-> > -       total_frag_len =3D __bnxt_rx_agg_pages(bp, cpr, shinfo, idx,
-> > +       total_frag_len =3D __bnxt_rx_agg_pages(bp, cpr, skb, shinfo, id=
-x,
-> >                                              agg_bufs, tpa, NULL);
-> >         if (!total_frag_len) {
-> >                 skb_mark_for_recycle(skb);
-> > @@ -1277,9 +1301,6 @@ static struct sk_buff *bnxt_rx_agg_pages_skb(stru=
-ct bnxt *bp,
-> >                 return NULL;
-> >         }
-> >
-> > -       skb->data_len +=3D total_frag_len;
-> > -       skb->len +=3D total_frag_len;
-> > -       skb->truesize +=3D BNXT_RX_PAGE_SIZE * agg_bufs;
-> >         return skb;
-> >  }
-> >
-> > @@ -1294,7 +1315,7 @@ static u32 bnxt_rx_agg_pages_xdp(struct bnxt *bp,
-> >         if (!xdp_buff_has_frags(xdp))
-> >                 shinfo->nr_frags =3D 0;
-> >
-> > -       total_frag_len =3D __bnxt_rx_agg_pages(bp, cpr, shinfo,
-> > +       total_frag_len =3D __bnxt_rx_agg_pages(bp, cpr, NULL, shinfo,
-> >                                              idx, agg_bufs, tpa, xdp);
-> >         if (total_frag_len) {
-> >                 xdp_buff_set_frags_flag(xdp);
-> > @@ -3342,15 +3363,15 @@ static void bnxt_free_one_rx_agg_ring(struct bn=
-xt *bp, struct bnxt_rx_ring_info
-> >
-> >         for (i =3D 0; i < max_idx; i++) {
-> >                 struct bnxt_sw_rx_agg_bd *rx_agg_buf =3D &rxr->rx_agg_r=
-ing[i];
-> > -               struct page *page =3D rx_agg_buf->page;
-> > +               netmem_ref netmem =3D rx_agg_buf->netmem;
-> >
-> > -               if (!page)
-> > +               if (!netmem)
-> >                         continue;
-> >
-> > -               rx_agg_buf->page =3D NULL;
-> > +               rx_agg_buf->netmem =3D 0;
-> >                 __clear_bit(i, rxr->rx_agg_bmap);
-> >
-> > -               page_pool_recycle_direct(rxr->page_pool, page);
-> > +               page_pool_put_full_netmem(rxr->page_pool, netmem, true)=
-;
-> >         }
-> >  }
-> >
-> > @@ -3608,9 +3629,11 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
-> >
-> >  static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
-> >                                    struct bnxt_rx_ring_info *rxr,
-> > +                                  int queue_idx,
-> >                                    int numa_node)
-> >  {
-> >         struct page_pool_params pp =3D { 0 };
-> > +       struct netdev_rx_queue *rxq;
-> >
-> >         pp.pool_size =3D bp->rx_agg_ring_size;
-> >         if (BNXT_RX_PAGE_MODE(bp))
-> > @@ -3621,8 +3644,15 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *=
-bp,
-> >         pp.dev =3D &bp->pdev->dev;
-> >         pp.dma_dir =3D bp->rx_dir;
-> >         pp.max_len =3D PAGE_SIZE;
-> > -       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-> > +       pp.order =3D 0;
-> > +
-> > +       rxq =3D __netif_get_rx_queue(bp->dev, queue_idx);
-> > +       if (rxq->mp_params.mp_priv)
-> > +               pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_ALLOW_UNREADABLE=
-_NETMEM;
->
-> This is not the intended use of PP_FLAG_ALLOW_UNREADABLE_NETMEM.
->
-> The driver should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when it's able
-> to handle unreadable netmem, it should not worry about whether
-> rxq->mp_params.mp_priv is set or not.
->
-> You should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when HDS is enabled.
-> Let core figure out if mp_params.mp_priv is enabled. All the driver
-> needs to report is whether it's configured to be able to handle
-> unreadable netmem (which practically means HDS is enabled).
-
-The reason why the branch exists here is the PP_FLAG_ALLOW_UNREADABLE_NETME=
-M
-flag can't be used with PP_FLAG_DMA_SYNC_DEV.
-
- 228         if (pool->slow.flags & PP_FLAG_DMA_SYNC_DEV) {
- 229                 /* In order to request DMA-sync-for-device the page
- 230                  * needs to be mapped
- 231                  */
- 232                 if (!(pool->slow.flags & PP_FLAG_DMA_MAP))
- 233                         return -EINVAL;
- 234
- 235                 if (!pool->p.max_len)
- 236                         return -EINVAL;
- 237
- 238                 pool->dma_sync =3D true;                //here
- 239
- 240                 /* pool->p.offset has to be set according to the addre=
-ss
- 241                  * offset used by the DMA engine to start copying rx d=
-ata
- 242                  */
- 243         }
-
-If PP_FLAG_DMA_SYNC_DEV is set, page->dma_sync is set to true.
-
-347 int mp_dmabuf_devmem_init(struct page_pool *pool)
-348 {
-349         struct net_devmem_dmabuf_binding *binding =3D pool->mp_priv;
-350
-351         if (!binding)
-352                 return -EINVAL;
-353
-354         if (!pool->dma_map)
-355                 return -EOPNOTSUPP;
-356
-357         if (pool->dma_sync)                      //here
-358                 return -EOPNOTSUPP;
-359
-360         if (pool->p.order !=3D 0)
-361                 return -E2BIG;
-362
-363         net_devmem_dmabuf_binding_get(binding);
-364         return 0;
-365 }
-
-In the mp_dmabuf_devmem_init(), it fails when pool->dma_sync is true.
-
-tcp-data-split can be used for normal cases, not only devmem TCP case.
-If we enable tcp-data-split and disable devmem TCP, page_pool doesn't
-have PP_FLAG_DMA_SYNC_DEV.
-So I think mp_params.mp_priv is still useful.
-
-Thanks a lot,
-Taehee Yoo
-
->
-> > +       else
-> > +               pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-> >
-> > +       pp.queue_idx =3D queue_idx;
-> >         rxr->page_pool =3D page_pool_create(&pp);
-> >         if (IS_ERR(rxr->page_pool)) {
-> >                 int err =3D PTR_ERR(rxr->page_pool);
-> > @@ -3655,7 +3685,7 @@ static int bnxt_alloc_rx_rings(struct bnxt *bp)
-> >                 cpu_node =3D cpu_to_node(cpu);
-> >                 netdev_dbg(bp->dev, "Allocating page pool for rx_ring[%=
-d] on numa_node: %d\n",
-> >                            i, cpu_node);
-> > -               rc =3D bnxt_alloc_rx_page_pool(bp, rxr, cpu_node);
-> > +               rc =3D bnxt_alloc_rx_page_pool(bp, rxr, i, cpu_node);
-> >                 if (rc)
-> >                         return rc;
-> >
-> > @@ -4154,7 +4184,7 @@ static void bnxt_alloc_one_rx_ring_page(struct bn=
-xt *bp,
-> >
-> >         prod =3D rxr->rx_agg_prod;
-> >         for (i =3D 0; i < bp->rx_agg_ring_size; i++) {
-> > -               if (bnxt_alloc_rx_page(bp, rxr, prod, GFP_KERNEL)) {
-> > +               if (bnxt_alloc_rx_netmem(bp, rxr, prod, GFP_KERNEL)) {
-> >                         netdev_warn(bp->dev, "init'ed rx ring %d with %=
-d/%d pages only\n",
-> >                                     ring_nr, i, bp->rx_ring_size);
-> >                         break;
-> > @@ -15063,7 +15093,7 @@ static int bnxt_queue_mem_alloc(struct net_devi=
-ce *dev, void *qmem, int idx)
-> >         clone->rx_sw_agg_prod =3D 0;
-> >         clone->rx_next_cons =3D 0;
-> >
-> > -       rc =3D bnxt_alloc_rx_page_pool(bp, clone, rxr->page_pool->p.nid=
-);
-> > +       rc =3D bnxt_alloc_rx_page_pool(bp, clone, idx, rxr->page_pool->=
-p.nid);
-> >         if (rc)
-> >                 return rc;
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/et=
-hernet/broadcom/bnxt/bnxt.h
-> > index 48f390519c35..3cf57a3c7664 100644
-> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-> > @@ -895,7 +895,7 @@ struct bnxt_sw_rx_bd {
-> >  };
-> >
-> >  struct bnxt_sw_rx_agg_bd {
-> > -       struct page             *page;
-> > +       netmem_ref              netmem;
-> >         unsigned int            offset;
-> >         dma_addr_t              mapping;
-> >  };
-> > --
-> > 2.34.1
-> >
->
->
-> --
-> Thanks,
-> Mina
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Wojciech Drewek
+> Sent: Friday, September 27, 2024 6:08 PM
+> To: netdev@vger.kernel.org
+> Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
+> marcin.szycik@linux.intel.com; intel-wired-lan@lists.osuosl.org;
+> horms@kernel.org; michal.swiatkowski@linux.intel.com
+> Subject: [Intel-wired-lan] [PATCH iwl-net v2] ice: Flush FDB entries befo=
+re
+> reset
+>=20
+> Triggering the reset while in switchdev mode causes errors[1]. Rules are
+> already removed by this time because switch content is flushed in case of=
+ the
+> reset.
+> This means that rules were deleted from HW but SW still thinks they exist=
+ so
+> when we get SWITCHDEV_FDB_DEL_TO_DEVICE notification we try to delete
+> not existing rule.
+>=20
+> We can avoid these errors by clearing the rules early in the reset flow b=
+efore
+> they are removed from HW.
+> Switchdev API will get notified that the rule was removed so we won't get
+> SWITCHDEV_FDB_DEL_TO_DEVICE notification.
+> Remove unnecessary ice_clear_sw_switch_recipes.
+>=20
+> [1]
+> ice 0000:01:00.0: Failed to delete FDB forward rule, err: -2 ice 0000:01:=
+00.0:
+> Failed to delete FDB guard rule, err: -2
+>=20
+> Fixes: 7c945a1a8e5f ("ice: Switchdev FDB events support")
+> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> ---
+> v2: extend commit msg, add NULL pointer check
+> ---
+>  .../net/ethernet/intel/ice/ice_eswitch_br.c   |  5 +++-
+>  .../net/ethernet/intel/ice/ice_eswitch_br.h   |  1 +
+>  drivers/net/ethernet/intel/ice/ice_main.c     | 24 +++----------------
+>  3 files changed, 8 insertions(+), 22 deletions(-)
+>=20
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
