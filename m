@@ -1,112 +1,144 @@
-Return-Path: <netdev+bounces-131932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0964298FF7C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:20:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804FB98FFAD
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69480282067
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:20:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2783C1F23C7C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185E213D244;
-	Fri,  4 Oct 2024 09:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453CD145341;
+	Fri,  4 Oct 2024 09:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="cYshD9CN"
 X-Original-To: netdev@vger.kernel.org
-Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24EBE146A68
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 09:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758EB146588;
+	Fri,  4 Oct 2024 09:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728033600; cv=none; b=FkKgXmqBGoGdQoFQI1Mbm9kjLaH8jELTk/mLr2vZ5Q8humkhFjqmkBaR/R+ynZbasDATcCps2sD/g8P0UtChhZ2YdFiZg4WlUmIRJgNBKvqfeMc6wwWnV+Jy4/qiD84O14FUkcktiK9pWTsMclUQSTb7zuKC2OgKrgUZd6+zF5Y=
+	t=1728033907; cv=none; b=KO7JK9gzoWaEfHoDfLUDX8gqB3Nob9fZZUwKb8wr7qwuHNHI76jq8VAfJanmVbI+2CQ5R80MtvBABEesGAPWHbaPlRYJPcOg+N+eOYY2bBsHvwOugBYCk2D31rjDWzOtUQyHXZFcTBltQZgezwPDyw9+QY1nv6yPVQqJOIgQLqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728033600; c=relaxed/simple;
-	bh=lIOIUD/Hh94tGgsFr1gNc65qT7EslmF1axiWhJ3Jv30=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eU9KZgL6C45nmN/FZCtQNzIH9kZQMfxize7HD4F0da/JWc3TYCY3XOaSkxZKRe+XKwpiYWkVMRqwPZW/wa6fFt0ZESRlk6sHAU32f2jzmacGaJ/vx5/uXIktNSKZOOIz7+n7+Q9R84824iVT7bKNF0MIfkRAGMVTOPNgnboYAcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
-Received: from [178.197.223.28] (helo=alea.q.nox.tf)
-	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <equinox@diac24.net>)
-	id 1sweS5-00000000d8S-35UO;
-	Fri, 04 Oct 2024 11:18:22 +0200
-Received: from equinox by alea.q.nox.tf with local (Exim 4.98)
-	(envelope-from <equinox@diac24.net>)
-	id 1sweRh-00000000G1q-46cP;
-	Fri, 04 Oct 2024 11:17:58 +0200
-From: David Lamparter <equinox@diac24.net>
-To: David Ahern <dsahern@gmail.com>
-Cc: netdev@vger.kernel.org,
-	David Lamparter <equinox@diac24.net>
-Subject: [PATCH iproute2-next] rt_names: read `rt_addrprotos.d` directory
-Date: Fri,  4 Oct 2024 11:16:38 +0200
-Message-ID: <20241004091724.61344-1-equinox@diac24.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1728033907; c=relaxed/simple;
+	bh=BN8MX3HcQI82ZW2bcT1uCsVoGOui//RRk5SnEGS5p24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hGl3PA4sQu0ueasRojlcI/U0sS/VEJ2B5tXZr/v6FukBL0W9uliyat30F/kXAYg02tN5A4XwPulRKiCB+x98fy9p207pm/Vq5rRo5LWVagAp7Z7ne26dAJ1Es0sm4e3j6NosxSy2TqCMJr2lH67LHR0dBMH1RD0ONuvTZlXEUUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=cYshD9CN; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=x5miP13tKDloBxCXgOk/e/P9U33xANkcRHp9fe+m1jA=; b=cYshD9CNN0Fbls8qiOoPQUl7Pb
+	u6HkjGkBqkOeCTfWn2RBXC+QQ4aIZMajO0ZvBHyt2LxDbcfrnpeKQTztam3R/VxRmURrkKyDRySLL
+	DNF2oKaRjLsq4v++R+gHI6Wkc+DWmndqsyq3gNjs6ArKShHj2yAwYzELAJY1P1AIoPg7qdlff01sY
+	atdqI83iHb41MBhfzto2DqvBxuXzGRxjJOeG8k1nDA+rQxk4021frOeEM4icvcvsDuhybE4lZIdeM
+	/4z6kkH/iA5Bm+a5Qp5HpNexsYaOpcqcWnAp2Ws3kRGXsVRP5NnpjQTLI0ieJSxZT+0w+JHLPhuki
+	pw+1n/Rw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sweYW-0004Hw-Uu; Fri, 04 Oct 2024 11:25:00 +0200
+Received: from [85.1.206.226] (helo=[192.168.1.114])
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1sweYW-000HLq-0j;
+	Fri, 04 Oct 2024 11:25:00 +0200
+Message-ID: <2231b74a-8a90-4a83-8530-4a9bba26ce54@iogearbox.net>
+Date: Fri, 4 Oct 2024 11:24:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 1/4] netkit: Add option for scrubbing skb meta
+ data
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: martin.lau@linux.dev, razor@blackwall.org, jrife@google.com,
+ tangchen.1@bytedance.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20241003180320.113002-1-daniel@iogearbox.net>
+ <20241003151601.2404a28c@kernel.org>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20241003151601.2404a28c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27416/Thu Oct  3 10:37:25 2024)
 
-`rt_addrprotos` doesn't currently use the `.d` directory thing - add it.
+On 10/4/24 12:16 AM, Jakub Kicinski wrote:
+> On Thu,  3 Oct 2024 20:03:17 +0200 Daniel Borkmann wrote:
+>> +static int netkit_check_scrub(int scrub, struct nlattr *tb,
+>> +			      struct netlink_ext_ack *extack)
+>> +{
+>> +	switch (scrub) {
+>> +	case NETKIT_SCRUB_DEFAULT:
+>> +	case NETKIT_SCRUB_NONE:
+>> +		return 0;
+>> +	default:
+>> +		NL_SET_ERR_MSG_ATTR(extack, tb,
+>> +				    "Provided device scrub setting can only be default/none");
+>> +		return -EINVAL;
+>> +	}
+>> +}
+> 
+> Set the parsing policy to NLA_POLICY_MAX(NLA_U32, NETKIT_SCRUB_NONE)
+> and delete this open coded checking, please.
 
-My magic 8-ball predicts we might be grabbing a value or two for use in
-FRRouting at some point in the future.  Let's make it so we can ship
-those in a separate file when it's time.
-
-Signed-off-by: David Lamparter <equinox@diac24.net>
----
- etc/iproute2/rt_addrprotos.d/README | 2 ++
- lib/rt_names.c                      | 3 +++
- man/man8/ip-address.8.in            | 5 ++++-
- 3 files changed, 9 insertions(+), 1 deletion(-)
- create mode 100644 etc/iproute2/rt_addrprotos.d/README
-
-diff --git a/etc/iproute2/rt_addrprotos.d/README b/etc/iproute2/rt_addrprotos.d/README
-new file mode 100644
-index 000000000000..092115b12423
---- /dev/null
-+++ b/etc/iproute2/rt_addrprotos.d/README
-@@ -0,0 +1,2 @@
-+Each file in this directory is an rt_addrprotos configuration file. iproute2
-+commands scan this directory processing all files that end in '.conf'.
-diff --git a/lib/rt_names.c b/lib/rt_names.c
-index e967e0cac5b4..f44b1e4ba34e 100644
---- a/lib/rt_names.c
-+++ b/lib/rt_names.c
-@@ -315,6 +315,9 @@ static void rtnl_addrprot_initialize(void)
- 		ret = rtnl_tab_initialize(CONF_USR_DIR "/rt_addrprotos",
- 					  rtnl_addrprot_tab,
- 					  ARRAY_SIZE(rtnl_addrprot_tab));
-+
-+	rtnl_tab_initialize_dir("rt_addrprotos.d", rtnl_addrprot_tab,
-+				ARRAY_SIZE(rtnl_addrprot_tab));
- }
- 
- const char *rtnl_addrprot_n2a(__u8 id, char *buf, int len)
-diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
-index d37dddb7b1a9..6c3f07f1173a 100644
---- a/man/man8/ip-address.8.in
-+++ b/man/man8/ip-address.8.in
-@@ -303,7 +303,10 @@ receive multicast traffic.
- the protocol identifier of this route.
- .I ADDRPROTO
- may be a number or a string from the file
--.BR "/etc/iproute2/rt_addrprotos" .
-+.BR @SYSCONF_USR_DIR@/rt_addrprotos " or " @SYSCONF_ETC_DIR@/rt_addrprotos
-+(has precedence if exists).  A directory named
-+.BR rt_addrprotos.d
-+is also scanned in either location.
- If the protocol ID is not given,
- 
- .B ip assumes protocol 0. Several protocol
--- 
-2.45.2
-
+Ok, if this is preferred I can also convert the IFLA_NETKIT_MODE over
+to use NLA_POLICY_MAX() instead of open-coding.
 
