@@ -1,63 +1,55 @@
-Return-Path: <netdev+bounces-132038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F12BC99038D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:08:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 887D89903AF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 142091C21AFF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:08:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49661282497
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEAE212F07;
-	Fri,  4 Oct 2024 13:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B7320FAA7;
+	Fri,  4 Oct 2024 13:16:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YLRrfz6q"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dIDy1U+L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA94212EF7;
-	Fri,  4 Oct 2024 13:07:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA871581E0;
+	Fri,  4 Oct 2024 13:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728047265; cv=none; b=dwNFog7mjTExiS0RlrqE8o5p3/6lY8g3gF49RW7GqavSEOxNOP26XkR5f02YQLbASURF8Hev3WchnVRYbAF9Oke+QU+XxLt2CdfTsCfo88LebsKHI8SIF2D7AKGrDgbuLB3itCNzfp7UnP3nvVo5UBAXtO8DBoIzWtHowvBWIk4=
+	t=1728047818; cv=none; b=dKmbRnvON9iun3wW3aHw0KdOFubbbLED0WzFXOgDalfi5/XNL5uHEjHpNP5GpzIN8Xk/zOZz8k/OsG23q9v3y4CmQyA+eBHqN/jO1gLmWpZSOVP6Wxexot7D6Cz2Tc12SpUinBV1gu8IABcpcTaSbiMPO0vVAC2KlQBOmhtpO2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728047265; c=relaxed/simple;
-	bh=bPu5SGvS9XtlUq9rH2JjvJOk4vEDv0CFKtmqfKKByTc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=BH895/7WAADGW1NG7Xizu4zqbq5QXEywvf+B54YTJAbJvr1PT+t3nx4HqqUuljJV3clj8KtQoq6kNviD98b1P8QpYaOnxXaTgzMmemIpK7GOGd0tOfN4Ur2JyfcbOX+TlXLsPmJpDYLTeNvMYZpDTrhpF2wjBPKk+EFdviKYc40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YLRrfz6q; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 494ACDAn021335;
-	Fri, 4 Oct 2024 13:07:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Mb3Asfdk0E60FJXI/xdUUy1rmt1HGeVOOZpP7vUIcb0=; b=YLRrfz6qTpubOMyL
-	pjug6nKYmQC4Sy46gBE2Jz4oJ6z9ePRn7COw8/skXljwPjUSywbtHwTXgW4H2knb
-	H/6aljcIPXLnaQhwgOeQmSB4VHhGKUqs/i4tfotmS6POYevv/D6pbteyWPk5EogC
-	Z2qpUpDKUl4Hr6+HCX5cINrzTVhb+nWsirlWsMp3M1ggcOLt3TBDbjZa/fPuYi3I
-	lkW3hx3KJxVHHfHPAKTMmkAeYJJKiwgGV9xK23uctbsdLJWdtHANcarNCMZ2ifkJ
-	lkc1oMjPNL1MggaHRq9ZF6KAdxewhsnsvW6oiPh5A59bQ34+mgYjDhSzqkqFawQP
-	gjPzJw==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42205pa6bj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 04 Oct 2024 13:07:19 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 494D7HX5021541
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 4 Oct 2024 13:07:17 GMT
-Received: from [10.216.10.52] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 4 Oct 2024
- 06:07:08 -0700
-Message-ID: <6c0118b9-f883-4fb5-9e69-a9095869d37f@quicinc.com>
-Date: Fri, 4 Oct 2024 18:36:59 +0530
+	s=arc-20240116; t=1728047818; c=relaxed/simple;
+	bh=8PSo2DIypTXDb/TKuaNwWxyZQeUAK6b2eKsf8YBpur8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DIjJOO1zM7DvnPl/2WrKm89vVWWs/hWB7ldHQabbnbA5Gg2C8Wbr3ASgX+2Mn25vh9jl1Y5KC+uLqP48TbXXexd9Zar3BHzLSbDMiUfpwZdz8NRiYzqwiVXInHMHMMr30U8Yj66fsHNC4qXdpQ9j6cj3uZ02BRriC04YlWpwgbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=dIDy1U+L; arc=none smtp.client-ip=80.12.242.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id wi9ksLfHdWgzbwi9kshUS6; Fri, 04 Oct 2024 15:15:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1728047741;
+	bh=nRWH9XpiDQTzL94CS1nb47ffVIXOhin5jmNHlLBiMic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=dIDy1U+L/vYne/XH2vKiOD1wJhQ4KCqzffTGciZsdwVuTqjFxzzPHq+q6boDldrIc
+	 JGQcLctsMbQqJod7l/hN3Lhns43PuEQTS9NqUoGMjui6VoEgWWUYRjDXT6uzWzer8E
+	 SzH5NZrNOt8a5hBnYPi0Vu+RZq+XQqVFLiAfPERTq1Mkt5e5POm61rvTcMX/YY7ykf
+	 ZB+fP0C+2qCUtZUCTu22dJgA1TmEV+/pYWPLPxUEbE6HOjDMcZwiQQJ26fFn6Am/Ur
+	 5qqz2YP3ooG2XQZcmvRudtfYGoJxx2XTgEqk5o1FcKinpL/Iv0cXaILcSGpmg7gvpC
+	 tUBM4tmCjIsCA==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Fri, 04 Oct 2024 15:15:41 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <2669052d-752f-416a-9d5e-a03848f30904@wanadoo.fr>
+Date: Fri, 4 Oct 2024 15:15:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,104 +57,184 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <netdev@vger.kernel.org>, Andy Gross <agross@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>,
-        Russell King <linux@armlinux.org.uk>,
-        Jacob Keller <jacob.e.keller@intel.com>,
-        Bhupesh Sharma
-	<bhupesh.sharma@linaro.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
-        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
-        <john@phrozen.org>, Luo Jie
-	<quic_luoj@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>,
-        "Suruchi
- Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-        "Lei Wei (QUIC)"
-	<quic_leiwei@quicinc.com>
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
- <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
- <febe6776-53dc-454d-83b0-601540e45f78@lunn.ch>
-Content-Language: en-US
-From: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
-In-Reply-To: <febe6776-53dc-454d-83b0-601540e45f78@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: XFWGmAu-Zw8ktg_9Gr-qHbmlV4FKyvV7
-X-Proofpoint-ORIG-GUID: XFWGmAu-Zw8ktg_9Gr-qHbmlV4FKyvV7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- impostorscore=0 adultscore=0 lowpriorityscore=0 phishscore=0
- malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410040094
+Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error handling
+ path in adin1110_read_fifo()
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Lennart Franzen <lennart@lfdomain.com>,
+ Alexandru Tachici <alexandru.tachici@analog.com>,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
+ <20241004113735.GF1310185@kernel.org>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20241004113735.GF1310185@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-
-
-On 10/4/2024 12:12 AM, Andrew Lunn wrote:
->> Agree that switchdev is the right model for this device. We were
->> planning to enable base Ethernet functionality using regular
->> (non-switchdev) netdevice representation for the ports initially,
->> without offload support. As the next step, L2/VLAN offload support using
->> switchdev will be enabled on top. Hope this phased approach is fine.
-> 
-> Since it is not a DSA switch, yes, a phased approach should be O.K.
-> 
-
-Ok.
-
->>>> 3) PCS driver patch series:
->>>>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
->>>>         be enabled in drivers/net/pcs/
->>>> 	Dependent on NSS CC patch series (2).
->>>
->>> I assume this dependency is pure at runtime? So the code will build
->>> without the NSS CC patch series?
+Le 04/10/2024 à 13:37, Simon Horman a écrit :
+> On Thu, Oct 03, 2024 at 08:53:15PM +0200, Christophe JAILLET wrote:
+>> If 'frame_size' is too small or if 'round_len' is an error code, it is
+>> likely that an error code should be returned to the caller.
 >>
->> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
->> PCS's MII channels. To represent this in the DTS, the PCS node in the
->> DTS is configured with the MII Rx/Tx clock that it consumes, using
->> macros for clocks which are exported from the NSS CC driver in a header
->> file. So, there will be a compile-time dependency for the dtbindings/DTS
->> on the NSS CC patch series. We will clearly call out this dependency in
->> the cover letter of the PCS driver. Hope that this approach is ok.
+>> Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
+>> 'success' is returned.
 > 
-> Since there is a compile time dependency, you might want to ask for
-> the clock patches to be put into a stable branch which can be merged
-> into netdev.
+> Hi Christophe,
+> 
+> I think we can say "'ret' will be 0".
+
+Agreed.
+
+	ret = adin1110_read_reg()
+	--> spi_sync_transfer()
+	--> spi_sync()
+
+which explicitly documents "zero on success, else a negative error code."
+
+> At least that is what my brief investigation tells me.
+> 
+>>
+>> Return -EINVAL instead.
 > 
 
-Sure. We will request for such a stable branch merge once the NSS CC
-patches are accepted by the reviewers. Could the 'net' tree be one such
-stable branch option to merge the NSS CC driver?
+If the patch is considered as correct, can you confirm that -EINVAL is 
+the correct error code to use? If not, which one would be preferred?
 
 
-> Or you need to wait a kernel cycle.>
-Understand.
+> Please include some information on how this was found and tested.
+> e.g.
+> 
+> Found by inspection / Found using widget-ng.
 
->    Andrew
+I would say: found by luck! :)
+
+The explanation below will be of no help in the commit message and won't 
+be added. I just give you all the gory details because you asked for it ;-)
+
+(and after reading bellow, you can call me crazy!)
+
+
+
+I was looking at functions that propagate error codes as their last 
+argument. The idea came after submitting [1].
+
+I read cci_read() and wondered if functions with such a semantic could 
+use an un-initialized last argument. In such a case, this function could 
+not behave as expected if the initial value of "err" was not 0.
+
+So I wrote the following coccinelle script and several other variations.
+
+
+// Options: --include-headers
+
+@ok@
+identifier fct, err;
+type T;
+@@
+
+	int fct(..., T *err)
+	{
+		...
+	}
+
+@test depends on ok@
+identifier x, fct = ok.fct;
+expression res;
+type T = ok.T;
+@@
+
+*	T x;
+	...
+(
+	fct(..., &x);
+|
+	res = fct(..., &x);
+)
+
+(For the record, I have not found any issue with it...)
+
+
+BUT, adin1110_read_fifo() was spotted because of the prototype of 
+adin1110_read_reg().
+
+When I reviewed the code, I quickly saw that it was a false positive and 
+that using "type T" in my script was not that logical...
+
+Anyway, when reviewing the code, I saw:
+
+	if (ret < 0)
+		return ret;
+
+	/* The read frame size includes the extra 2 bytes
+	 * from the  ADIN1110 frame header.
+	 */
+	if (frame_size < ADIN1110_FRAME_HEADER_LEN + ADIN1110_FEC_LEN)
+		return ret;
+
+	round_len = adin1110_round_len(frame_size);
+	if (round_len < 0)
+		return ret;
+
+which looks really strange and likely broken...
+
+Then I sent the patch we are talking about!
+
+
+(yes some real people really search such things and write such 
+coccinelle scripts, and now you can call me crazy)
+
+
+[1]: 
+https://lore.kernel.org/all/666ac169157f0af1c2e1d47926b68870cb39d587.1727977974.git.christophe.jaillet@wanadoo.fr/
+
+> Compile tested only.
+
+As a "speculative" patch, it was only compile tested, you are correct.
+
+> 
+>>
+>> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>> This patch is speculative.
+>> If returning 0 is what was intended, then an explicit 0 would be better.
+> 
+> In my brief investigation I see that adin1110_read_fifo()
+> is only called by adin1110_read_frames(), like this:
+> 
+> 	while (budget) {
+> 		...
+> 
+> 		ret = adin1110_read_fifo(port_priv);
+> 		if (ret < 0)
+> 			return;
+> 
+> 		budget--;
+> 	}
+> 
+> So the question becomes, should a failure in reading the fifo,
+> because of an invalid frame size, be treated as an error
+> and terminate reading frames.
+> 
+> Like you, I speculate the answer is yes.
+> But I think we need a bit more certainty to take this patch.
+
+I won't be of any help here.
+
+I can just say that "it looks strange" and is "certainly" bogus, but 
+won't be able the prove it nor test it.
+
+
+I'll wait a bit before sending a v2. If confirming this point is a 
+requirement for accepting the patch, there is no need to urge for a v2 
+if no-one cares about answering your point.
+
+CJ
+
+
+> 
+
 
