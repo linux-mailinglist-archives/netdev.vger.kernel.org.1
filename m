@@ -1,91 +1,74 @@
-Return-Path: <netdev+bounces-131856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5651B98FBA6
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:40:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19E698FBA7
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 203A0282A5A
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:40:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D05641C2236D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23061D5AC9;
-	Fri,  4 Oct 2024 00:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7894317FE;
+	Fri,  4 Oct 2024 00:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CHVdF0MY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJrlB7ow"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE711748D
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 00:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3B517C9;
+	Fri,  4 Oct 2024 00:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728002432; cv=none; b=etf78aji99+KK5mrs0KFZqjd0oxDf8F1eI6zJEQXjy9OOTdhw+lITI1TLwBNWxtEr9TKP/Oc9WxsgPQKXE3WYimEth2SbDPTa6+va18tui3UTRLguGvQvXMrKOwvfRTGsNxoxUnrl1MmqHY3O3P5jptmvCp61oRqFEq/0XMIoZE=
+	t=1728002442; cv=none; b=BSQ6gWGsTpZnaQc7uigRcxzSmPncjAj6GAlP//ItCl8fEvS7b4R/Qb5tTiKXyJjfcQAyBsN8MYAgzLfR9jbUWJWJfCOG3DGMjr/WqtHKWLfENZeusk9dEqDBgUHv9GyVrD6emnNX2HqdfDOveOeTFalxbP4XRIeBCoHUXU9GUUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728002432; c=relaxed/simple;
-	bh=E6jPJVue1SnkDZ+LMvjW0uI5pWsm0zsOhY3/NK23Grc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AHxvTThSebs3bZGc8jgiHDjNDd2n52nlNFyVkZIrp/1iA/cyY/aGzhK+ey+LFfZq8+aYRC4dXP72RCfOdpPdGXydsbEnQdpZRYOSG3ZJFDWurDeJLPV/GEZKVCGaocIPpHH6ibtSm7mrv3fgvpnDl3CjcSSiyVLjJUjIGdIJI4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CHVdF0MY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A6E8C4CEC5;
-	Fri,  4 Oct 2024 00:40:32 +0000 (UTC)
+	s=arc-20240116; t=1728002442; c=relaxed/simple;
+	bh=9uRLFxdti3g7bCIL+0m4CwFKM+d5QyiiCmoorhDKUOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OFt4PnGxemzH+O2ydsnG8HK2KvWBkMBxI/ns18uF7LOonS+q/EoiHd9f9OqIVuGquUlEzIauCZXsUSU8ah6f5w3Ovfpt2FvMquhOATIIQtTQFWfbDqSo9LLwMSCB45PyxJQML4szgGBoiCykMuqReOcHYWd3KpbW047YpfvPS7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJrlB7ow; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83418C4CEC5;
+	Fri,  4 Oct 2024 00:40:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728002432;
-	bh=E6jPJVue1SnkDZ+LMvjW0uI5pWsm0zsOhY3/NK23Grc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CHVdF0MYrT+utZjH1RFXLslIYI3FAfrhj60urf+4TTJpUuRaB42bB+uF5CRDI+oOw
-	 G1aTjDfWAI3QXyjZ33XA3+Nzkj/5jkPgIqkJTP6A0CzoEOlGgflwPt79dWc8hIKvPA
-	 l4wDCjGJKkGMEmNE52GtzxtXKPsI9TlmpUKpm4LBFRSE/Uk1opW7tR78ZyocnO6edb
-	 JS/c+GpcxDD4WfjAnxYAIN4j3tyb1q5U0FtHFFqD2pRLCZo8MjZ4PL+6o/CUeGxFt1
-	 5ZaUaia+mgjIsnBH9Kc3Xly7iOIjZifglZPJuU+CIppCHyuy/6yujd58nN/VuvbjbI
-	 814X+x2k4sY8w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBDB73803263;
-	Fri,  4 Oct 2024 00:40:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728002441;
+	bh=9uRLFxdti3g7bCIL+0m4CwFKM+d5QyiiCmoorhDKUOk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bJrlB7owk9ChK4ILf28pCw56/V4cCPyiwpBNbJIooTnQYvHD3FPWGnR6b18aNC11B
+	 nlKkqVmPokfCcSsz3KcWLiShqzIFBZPscO/e26uROBoU6/LpgQMZ+hLJUrHa1rIrz/
+	 K6GVo0qSMLWwMxtNSuiZOipqqqNGcj9Ifi/giGfgp1r3cf9RdjEjCh1KgMhpCcUJ/6
+	 gu2Wrn5GTkYO5MJIuVsCBZc3XgyOYt963nWdKDZWKLBembRrxD7Iq4vUXg2me0JE8m
+	 P6OmlEJR0FKKiYwBjCTxWmBtAt3O8JkIua+RIspkLeHO6wQ4Rw3R8XAO++/oVG66hL
+	 3R7KWD+IJv/4A==
+Date: Thu, 3 Oct 2024 17:40:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Nicolas Pitre <npitre@baylibre.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 2/2] net: ethernet: ti: am65-cpsw: avoid
+ devm_alloc_etherdev, fix module removal
+Message-ID: <20241003174040.5987bb4a@kernel.org>
+In-Reply-To: <20241003172105.2712027-3-nico@fluxnic.net>
+References: <20241003172105.2712027-1-nico@fluxnic.net>
+	<20241003172105.2712027-3-nico@fluxnic.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] ibmvnic: Add stat for tx direct vs tx batched
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172800243574.2046214.4717626173748399581.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 00:40:35 +0000
-References: <20241001163531.1803152-1-nnac123@linux.ibm.com>
-In-Reply-To: <20241001163531.1803152-1-nnac123@linux.ibm.com>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, haren@linux.ibm.com,
- ricklind@us.ibm.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu,  3 Oct 2024 13:07:13 -0400 Nicolas Pitre wrote:
+> Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  1 Oct 2024 11:35:31 -0500 you wrote:
-> Allow tracking of packets sent with send_subcrq direct vs
-> indirect. `ethtool -S <dev>` will now provide a counter
-> of the number of uses of each xmit method. This metric will
-> be useful in performance debugging.
-> 
-> Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] ibmvnic: Add stat for tx direct vs tx batched
-    https://git.kernel.org/netdev/net-next/c/2ee73c54a615
-
-You are awesome, thank you!
+Please make sure you CC the people involved in the blamed commit.
+Run get_maintainers.pl on the patch not the file path.
+Please put your SoB after the Fixes tag (last).
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
