@@ -1,202 +1,136 @@
-Return-Path: <netdev+bounces-131872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D48C98FC9D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:01:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F28898FCAD
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:12:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E841A1F23542
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:01:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD3A5284178
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED642AD11;
-	Fri,  4 Oct 2024 04:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8874D59F;
+	Fri,  4 Oct 2024 04:12:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlyWunj1"
+	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="qhUT4hT9";
+	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="cce474iX";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="CABU1mJh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94879C8FF;
-	Fri,  4 Oct 2024 04:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3CC7711F;
+	Fri,  4 Oct 2024 04:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728014493; cv=none; b=A3YCMKjVA43EhT12uJCMS610vSt/o3pW+Slm/elNBGL8GX0KE6um0jhrV3BKe3YfE68SRGs8XiB1F3EsiKruCevPNYrN38cPCoT0GYvTN/UO4ABzAS6bo+snxp8u6LgyykFdicJdHTdm7ob2zD8mSx8NWQsO4clKBAqloIkn74w=
+	t=1728015148; cv=none; b=VuR/jUXnyNRHsc9kzuEwvmBjubSDKjK0+qBU7PyPygLj6Itk7WKkbsb5bG/qk3bzvHbhHpsauzeUfeZD22XBS33moFKLP60fZl4e8ZSttPpR5Hm8hXkyYFB0O56kySEdOio9UXiI3Vds5QnrEb24DnL6nXiwZRH7BIfGZeviIQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728014493; c=relaxed/simple;
-	bh=l5S4zSgk39/1vFvakpqrurpzGlXpS1OMzzY3Qu0SpNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YmkSJ/fuOJyWj1W3Rj6htBb7dHvWdb5XxdzX8/pYvgjNKxc+GcSGeqlY6M8opp8GtLhm5SK0iNkY322RHVLXtdTFX2cbd5QjHsmScQaSuesmJ6NoLP7J99TWcpsZM9rFllfW/57N4NvI8UjIXl9etD4UfH5ZhrOpPLgSUCroB1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlyWunj1; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c87853df28so2070892a12.3;
-        Thu, 03 Oct 2024 21:01:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728014490; x=1728619290; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CtWaB7/+pqgSIbs6QCNNW9clMyGfcjBIDYBUKvysBTA=;
-        b=XlyWunj1i/jXiJJhec7g9977fbKM0qdoxvTbL+Znb1Z36ixAvZCqOLK6+HmBoxJw5J
-         KwRlAf/sjt24i/KYkBPG1EquG1bJU/qTXz9CMjvdGxmtkn9c3TjvLXZjXOqHzt6Vd06D
-         iM1a0jXNOifqt169sET0IdoNO1/Bh3DWcz91mayKfeX88dDmpKeInlcTkgCZ2eFDNXzU
-         85Prncba3X2uf6+nut8Cl3zh+U18//2g4t1MUzfm1IzBoXAs+LB2cKaCuPOekXndXvZs
-         eZumUanWid7BABQjRSHoMYPlitXQLjQEoaXu+FxcBhRwkmgWMZ7a3mdIKi6hR+E70UpG
-         oOGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728014490; x=1728619290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CtWaB7/+pqgSIbs6QCNNW9clMyGfcjBIDYBUKvysBTA=;
-        b=UauRSWw4rAYD26LTcY/v4RnUUTSXcgnd8ll+IK1rtaeMk8BBQ/75EZLF82u/vbFtjY
-         7Kyl/t9PHuYSf4AkLyWYFTsVDoCBdwBaII15fzdEHT4sRiLjorJK9VQwlohVoNn/lGkT
-         9GYvVjeVDj1FweCQg78+x4Tm1AiJ999b/Nlvvlr943r8W6CAjcMKkJ0w7SaeNzUbj6vR
-         /6OiQTIKtLMWn1dqs/vgDKX/MT/kBvUOkklX/UjijJJpIS9yF/q7JB6xq2wV8DXc/gDH
-         QcHyvW2lNyr8CyOBbAJz5qyM+EGzsV/txAwSKUM2A6GbGmXrrkmHVPLKx1elOXD78iao
-         6JUw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBFTZxHAcV0Bv8rD7crOvT2Mj2xZNtpb2g7pcCO0QW06wZGfqgDtqGUb/Bo6G2lncQ0IfKP1be@vger.kernel.org, AJvYcCWN3sYHGOSG1Um3zV4x4e3SAhWl/dYgpPy72fNNGZQbpVEB6naItbM8p1X/mgxtI1A8uo1MVwZ7XNk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpJq2aB/y+DbM71zRDmus51RppMebGjuZdKpJfJzg57gzv7SGL
-	MvBs0T6oxaWJI0HN6co2nV1HU7+Zi/O07wdG1Zu9L0nux+uqtAuItdihhXu4NELvZQ+MWKFw1uA
-	G9ZlSgogWxqzdFYLK+DZpI6P8FDE=
-X-Google-Smtp-Source: AGHT+IGUS9+BtlWQHPBUAIwkiyHrg8GBSbYlO2wrTjMmJV4zOOmSlVldyvtvZ/VwCgj6NoXODIWU/Q/le4FT9SpETEk=
-X-Received: by 2002:a05:6402:321b:b0:5c7:2122:50d with SMTP id
- 4fb4d7f45d1cf-5c8d2e989a1mr941349a12.35.1728014489529; Thu, 03 Oct 2024
- 21:01:29 -0700 (PDT)
+	s=arc-20240116; t=1728015148; c=relaxed/simple;
+	bh=dpmI0Hl7UUgNdEPFbeJni0IibizIDPd2GnahdWQSAjs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ePT7tepTWvvtNETA/akemPYfJfbesPOTosnte8FMgiIWVS0Pww5/bJL81n6p+wVX3ZPsd5mCdiP/ZfcJloHGQiyipOmCeMg7e8R4uNNdUwjHYHYDPWu7ALiQxAHYR/jYGsPz38GLukoEdcqVEyxgvgLRSOWfVc5jCkrGzESqiqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=qhUT4hT9; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=cce474iX; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=CABU1mJh; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 9ABB413801CC;
+	Fri,  4 Oct 2024 00:12:25 -0400 (EDT)
+Received: from phl-frontend-01 ([10.202.2.160])
+  by phl-compute-11.internal (MEProxy); Fri, 04 Oct 2024 00:12:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=2016-12.pbsmtp; t=1728015145; x=1728101545; bh=Zt4u6nvRmr
+	fpmFFoauivpQsKnENIj0tVMTWtbcgE2jc=; b=qhUT4hT9AQZrvAsmQYW2BAOu/q
+	Y+Xcjb/kKrBrzqb+/2nku4t6GU9cckK50k6t4Rc80sie3qrco3z5fJmxJYe7M5TW
+	wfFYCx7lhXOIiHD9kt7MS/G0pE80gpLsp5ntX/0HXvzwJrYoEm5e3GINffRhBVMu
+	tjCUMAzuX5B4TfPLI=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1728015145; x=1728101545; bh=Zt4u6nvRmrfpmFFoauivp
+	QsKnENIj0tVMTWtbcgE2jc=; b=cce474iXWlhMz9Y3FxrW4Nh6zg+BxPm4SJ1r8
+	x7bSQel30kZwpzHLti+MRyYZZHKQ0BShZhKpo6UNvA6WPOBcFrmLXLROTgvBoeQX
+	0uAc59+BL3m8amxLdNtpC1iY06ys2Gz8c7xxme8S31OOiotdtEsZPbsnHEPoZX6c
+	BDCFB5wWzMM/sgiRAB3Nqsdc5dGkTnwqQagmGRzUUN5dsO02YowgC73gJWhD4t/Q
+	6KaN5M/7BuZUGyMqF74u4dgS+YQ6RC0NawI4OnMIRTFv6Kzu/KCpIaImIL+KIzOf
+	l0RViCjeML77cTSEOmQm8uydvA501I5GCwXlHi7DZ4rore+3Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728015145; x=1728101545; bh=Zt4u6nvRmrfpmFFoauivpQsKnENI
+	j0tVMTWtbcgE2jc=; b=CABU1mJhxDbWmAi4RRSnF9l6dV2WkGFW3PMbzz3ofh+l
+	A12X3M96dNmJDqKh7mQwjxa+wo3ySuLdwEebo+VzkToCIMwIewiyweXbSzMwpVQq
+	x1AJi4tsCKI8VKsyMMHmNy6N7JqH6M1HMdT1SQpPsAH4xjRo//OSyIpL8Ux/TIOy
+	vrMfCTGt/CRQLOLe/YQJIL52xGtvtcGZull4QdSinwiekO4uZYsi0wVizGW3GIXI
+	O1r/ilyjCyeHPrXf9xODSHlPWnCkNPrNK7lyqOhfE2+Lkreb4mZdgSS38ewTE1DQ
+	pd4YcpwkRPC7ysS83fXrph2BnUU9PaLfuyJ1Y/iTdw==
+X-ME-Sender: <xms:KGv_ZrzRhr40HMJ88iAiObu4iMK_sjD1LDvetMZitMh5Vbh9yuUlSg>
+    <xme:KGv_ZjRRHOnp7ul2Zu0hIJ3Rph8-na2d_wWcQTUqd6Clco7PJd6LwxRtiFMxbkmOC
+    6a4TOzqLR6xg39wg5A>
+X-ME-Received: <xmr:KGv_ZlWjU52YC8C0qWtW5Brw9f8xCfJoYwG4ghW3W1jhUAnqoaR7rNUkf4jRm2ReaDGcdqcfbnz6SPS5HrEKixv9mayojW9gi1r5uHcJ-NbFi-luWQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvvddgkedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfh
+    rhhomheppfhitgholhgrshcurfhithhrvgcuoehnihgtohesfhhluhignhhitgdrnhgvth
+    eqnecuggftrfgrthhtvghrnhepudfhvdelgfeguefgjeeigfdtkeejheekveevgeeitdel
+    vdeihfevfeetffeigeeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihgtohesfhhluhig
+    nhhitgdrnhgvthdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhmthhpohhuthdprh
+    gtphhtthhopehnphhithhrvgessggrhihlihgsrhgvrdgtohhmpdhrtghpthhtohepuggr
+    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesgh
+    hoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehrohhgvghrqheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnh
+    hisehrvgguhhgrthdrtghomhdprhgtphhtthhopehgrhihghhorhhiihdrshhtrhgrshhh
+    khhosehtihdrtghomhdprhgtphhtthhopehvihhgnhgvshhhrhesthhirdgtohhmpdhrtg
+    hpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:KWv_ZlhVmq4DMi5t6j6-MdZqlTApRJNdiGciyq4eW3TFG7JQ3l_PcA>
+    <xmx:KWv_ZtAqxzntfJwAY1Zv0tBBVhGOWYbbWwpqnB8xCS6rFyIsGm6zTA>
+    <xmx:KWv_ZuK26uJRNDoXBOjpH_aUgTy-q_-VspGZGdiZ7x34d5_1fvPDeQ>
+    <xmx:KWv_ZsB7NIUtUZoQAEwvqsbq6gMpFkmLf2R-Gtq4UFUaqxerDfdYKw>
+    <xmx:KWv_ZiJGBFBX-cJMMj64h8-MjZ0TNcNsKGzrd6bmo7z-HoHSFakrc02A>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Oct 2024 00:12:24 -0400 (EDT)
+Received: from xanadu.lan (OpenWrt.lan [192.168.1.1])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id 0FC6EE3D83B;
+	Fri,  4 Oct 2024 00:12:24 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>
+Cc: Nicolas Pitre <npitre@baylibre.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v3 0/2] fix ti-am65-cpsw-nuss module removal
+Date: Fri,  4 Oct 2024 00:10:32 -0400
+Message-ID: <20241004041218.2809774-1-nico@fluxnic.net>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-6-ap420073@gmail.com>
- <70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com>
-In-Reply-To: <70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Oct 2024 13:01:17 +0900
-Message-ID: <CAMArcTX+j4patttqm+F8zLAE55DDn1mpBuXQoWpf3NCHo96cYw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/7] net: devmem: add ring parameter filtering
-To: Brett Creeley <bcreeley@amd.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, almasrymina@google.com, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, paul.greenwalt@intel.com, rrameshbabu@nvidia.com, 
-	idosch@nvidia.com, asml.silence@gmail.com, kaiyuanz@google.com, 
-	willemb@google.com, aleksander.lobakin@intel.com, dw@davidwei.uk, 
-	sridhar.samudrala@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 4, 2024 at 3:35=E2=80=AFAM Brett Creeley <bcreeley@amd.com> wro=
-te:
->
+Fix issues preventing rmmod of ti-am65-cpsw-nuss from working properly.
 
-Hi Brett,
-Thanks a lot for your review!
+v3:
 
->
->
-> On 10/3/2024 9:06 AM, Taehee Yoo wrote:
-> > Caution: This message originated from an External Source. Use proper ca=
-ution when opening attachments, clicking links, or responding.
-> >
-> >
-> > If driver doesn't support ring parameter or tcp-data-split configuratio=
-n
-> > is not sufficient, the devmem should not be set up.
-> > Before setup the devmem, tcp-data-split should be ON and
-> > tcp-data-split-thresh value should be 0.
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v3:
-> >   - Patch added.
-> >
-> >   net/core/devmem.c | 18 ++++++++++++++++++
-> >   1 file changed, 18 insertions(+)
-> >
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index 11b91c12ee11..a9e9b15028e0 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -8,6 +8,8 @@
-> >    */
-> >
-> >   #include <linux/dma-buf.h>
-> > +#include <linux/ethtool.h>
-> > +#include <linux/ethtool_netlink.h>
-> >   #include <linux/genalloc.h>
-> >   #include <linux/mm.h>
-> >   #include <linux/netdevice.h>
-> > @@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devi=
-ce *dev, u32 rxq_idx,
-> >                                      struct net_devmem_dmabuf_binding *=
-binding,
-> >                                      struct netlink_ext_ack *extack)
-> >   {
-> > +       struct kernel_ethtool_ringparam kernel_ringparam =3D {};
-> > +       struct ethtool_ringparam ringparam =3D {};
-> >          struct netdev_rx_queue *rxq;
-> >          u32 xa_idx;
-> >          int err;
-> > @@ -146,6 +150,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_dev=
-ice *dev, u32 rxq_idx,
-> >                  return -EEXIST;
-> >          }
-> >
-> > +       if (!dev->ethtool_ops->get_ringparam) {
-> > +               NL_SET_ERR_MSG(extack, "can't get ringparam");
-> > +               return -EINVAL;
-> > +       }
->
-> Is EINVAL the correct return value here? I think it makes more sense as
-> EOPNOTSUPP.
+  - more patch submission minutiae
 
-Yes, Thanks for catching this.
+v2: https://lore.kernel.org/netdev/20241003172105.2712027-2-nico@fluxnic.net/T/
 
->
-> > +
-> > +       dev->ethtool_ops->get_ringparam(dev, &ringparam,
-> > +                                       &kernel_ringparam, extack);
-> > +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT=
-_ENABLED ||
-> > +           kernel_ringparam.tcp_data_split_thresh) {
-> > +               NL_SET_ERR_MSG(extack,
-> > +                              "tcp-header-data-split is disabled or th=
-reshold is not zero");
-> > +               return -EINVAL;
-> > +       }
-> > +
-> Maybe just my personal opinion, but IMHO these checks should be separate
-> so the error message can be more concise/clear.
+  - conform to netdev patch submission customs
+  - address patch review trivias
 
-I agree, the error message is not clear, it contains two conditions.
-
->
-> Also, a small nit, but I think both of these checks should be before
-> getting the rxq via __netif_get_rx_queue().
->
-
-I will drop this patch in a v4 patch.
-
-Thanks a lot!
-Taehee Yoo
-
->
-> Thanks,
->
-> Brett
-> >   #ifdef CONFIG_XDP_SOCKETS
-> >          if (rxq->pool) {
-> >                  NL_SET_ERR_MSG(extack, "designated queue already in us=
-e by AF_XDP");
-> > --
-> > 2.34.1
-> >
+v1: https://lore.kernel.org/netdev/20240927025301.1312590-2-nico@fluxnic.net/T/
 
