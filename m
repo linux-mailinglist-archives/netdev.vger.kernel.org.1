@@ -1,126 +1,127 @@
-Return-Path: <netdev+bounces-132026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6FF099028D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:52:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DC2D99028F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:54:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E53D1F2110C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:52:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 136B12814BF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC90115A85A;
-	Fri,  4 Oct 2024 11:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC12157A55;
+	Fri,  4 Oct 2024 11:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V27NLFGp"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E481E15CD58
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95EE1D5AD8;
+	Fri,  4 Oct 2024 11:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728042743; cv=none; b=fq1z4guvzCj81s070ZNcjOVdf/ItvLn+QM9+slvnpYsOvlVvq5xIT6Rlviz3RNzxig+A7BgVPr20vS9yehBYaIBNsTn3xkVtTruxrmu2sUBwloV25T4De1EvMSJNndCi7TAet1IAabiHoh0SVSHlAg8dIWtDc8E0/976TIh1uLY=
+	t=1728042880; cv=none; b=Fe4p1bD1e5ihmWUWS4WcsbVcoGWAMZBNtt/4rAQDti/3pppcZNOMoskv/d+1o/tZeM/Cf54j7+qQtU8p7ha3IbApw0l4cnydD+V66DdLnCBQboj9/z4kuB6xn57lb1ckP9h1SHA9PhGT/+ftZf1E7sKtGsWbrXD0iQHfchYsi24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728042743; c=relaxed/simple;
-	bh=a/b8KhS76Lypgn0Qhi6M+ScxkMKXG55iD2Gk38iXy54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2Ln/Wx3mAPelc9JgdTUsa15eAAPsC/L0teUs//eTLSNAwysMQ4KDeGw1GwvRT+Fozj4k/glkr5Q15xWYM0c6tJib+A9Po9ZJefGIsTeZ1Um20qwpTIAdFP318HUYc0kxipDp4gc//aCKmu3NNttdAkzPCxKRx1H87Qz4jLX/Tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgqt-0006vI-Ca; Fri, 04 Oct 2024 13:52:07 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgqr-003Yt5-Ku; Fri, 04 Oct 2024 13:52:05 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgqr-00AgEW-1i;
-	Fri, 04 Oct 2024 13:52:05 +0200
-Date: Fri, 4 Oct 2024 13:52:05 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Lukasz Majewski <lukma@denx.de>, Jonathan Corbet <corbet@lwn.net>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: add Twisted
- Pair Ethernet diagnostics at OSI Layer 1
-Message-ID: <Zv_W5VDlTahegOZc@pengutronix.de>
-References: <20241003060602.1008593-1-o.rempel@pengutronix.de>
- <20241003095321.5a3c4e26@fedora.home>
+	s=arc-20240116; t=1728042880; c=relaxed/simple;
+	bh=sHRBsB/oGW5le7rUFRUXFj8GboC8+t8iEiU/5DXhNQo=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=JULbC3KLjmlOtys0AA/0gLVQQvbdObf51IAMePQCli6K/if/CHHvJr+6gaUOU96ezccaL6meDTt1rWn1LUzkvHHkQXnKbdlfPob5xnwe34bgRywYcha2sS8vug5sJhLHyTwUXLWCM/4A0Bapuh1Ljh9FtFcjKszEcrpoRQEbMVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V27NLFGp; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b7463dd89so22310865ad.2;
+        Fri, 04 Oct 2024 04:54:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728042877; x=1728647677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yho47xxpxZXj0wsbEKv5wRr2EKRrQWlShug60WMwDfk=;
+        b=V27NLFGppT3mREb89M6F4eOzsKKqPwfyJxaJHFlcRzkpsko+ZLPVvCZ3sZW89fKAJB
+         J30+8Yrhbvc6JAq51T9N3carDiMelqrAf0Spzp1Us/1Ll/JSyRdvCPBhRI7DKtDAISdi
+         G/zwhLm/EOLlofIaXp42iTu48dBQIdAt5ri90KOH4l3EnF3q9EA8rvKXJuHvKeB1SsE3
+         ZbBlIbMYHRTvezff7ayUwdAiiUVw8uNQk1wwlappXLYuM2JWzO8+0+nz7vFBEDHRtWSf
+         b0MAYSO+rk4LLq6lF9RrJzaZewHTIxPnameiaAURyD6AqOb7weHVPXCPg0HZaBtgf0FF
+         jf+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728042877; x=1728647677;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yho47xxpxZXj0wsbEKv5wRr2EKRrQWlShug60WMwDfk=;
+        b=DrcT/qumrmUXynEEfkIwU/xKnvWnUurhUs4ajRtreauThL1+MXTCcLoA3/29CC+7El
+         rjl4CZz9wNmG0gcePuiYh37Fk/UuF13d8yKpd8dKb+X+tw2a5FVMahalNGw4lEYcXxXv
+         +IiqHRTn6FChfun1qlUK7Kb4tpDmxbdpT6bM/79BmitMID/cpvzxE3/Mh8dgaWTXjdQz
+         vkwhsyoB+OHipNcrvsYvvi2XeSyj9E4lZOYlverXFZ68VN69fbEyCxc/miluoGHTHf+j
+         mGmESrNdIv0kA4kCMTZxV26rjEfF1HHqC0arngnWGzj5223LcdxeJL2vE7bOdhvyLHg8
+         J7Wg==
+X-Forwarded-Encrypted: i=1; AJvYcCU7GAoe4WIyJGatVBkPiIhMKgIS5Wc+5pUx/NbdxiocZdBiEK2xnfDtcEjsNLBf/MNVLWcfJJE=@vger.kernel.org, AJvYcCWz7vaPiLmuG/mJCCTyG6OO03FVs5++w4qPolzbEWYfV92dFjpvNHoD7a3kaDgG186PBF30oHbtGtQN5WhxMks=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyToQGh8Kem+cfzE6yl65giOZAnqh167cHB0wHdJ4fBnWXJpLSy
+	CNE+ctTmWrr4eBCQVlPLx3baYignSfIY5ox6NnxtxLXaR6Lch1m1
+X-Google-Smtp-Source: AGHT+IGqj9IvqddoSchmXjdsu7q8P+IPa8Ewwtu+bxs5JF8TY+DmWxjgris3C4B96SjO795h5qSXdA==
+X-Received: by 2002:a17:902:d483:b0:20b:93be:a2b5 with SMTP id d9443c01a7336-20bfe04ffa5mr35278165ad.32.1728042877036;
+        Fri, 04 Oct 2024 04:54:37 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beead499csm23031245ad.57.2024.10.04.04.54.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 04:54:36 -0700 (PDT)
+Date: Fri, 04 Oct 2024 20:54:22 +0900 (JST)
+Message-Id: <20241004.205422.282358302534878118.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: boqun.feng@gmail.com, fujita.tomonori@gmail.com,
+ dirk.behme@de.bosch.com, aliceryhl@google.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
+ ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com
+Subject: Re: iopoll abstraction
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <f7906232-c2c7-4fd6-be6b-7e96bbfbbcad@lunn.ch>
+References: <20241003.134518.2205814402977569500.fujita.tomonori@gmail.com>
+	<Zv6pW3Mn6qxHxTGE@boqun-archlinux>
+	<f7906232-c2c7-4fd6-be6b-7e96bbfbbcad@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241003095321.5a3c4e26@fedora.home>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Hi Maxime,
+On Thu, 3 Oct 2024 18:00:36 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On Thu, Oct 03, 2024 at 09:53:21AM +0200, Maxime Chevallier wrote:
-...
-> > +  - **Wake-on**: Displays whether Wake-on-LAN is enabled (e.g., **Wake-on: d**
-> > +    for disabled). Not used for layer 1 diagnostic.
+>> > fn read_poll_timeout<Op, Cond, T: Copy>(
+>> >     mut op: Op,
+>> >     cond: Cond,
+>> >     sleep: Delta,
+>> >     timeout: Delta,
+>> > ) -> Result<T>
+>> > where
+>> >     Op: FnMut() -> Result<T>,
+>> >     Cond: Fn(T) -> bool,
+>> > {
+>> >     let timeout = Ktime::ktime_get() + timeout;
+>> >     let ret = loop {
+>> >         let val = op()?;
+>> >         if cond(val) {
+>> >             break Ok(val);
+>> >         }
+>> >         kernel::delay::sleep(sleep);
+>> > 
+>> >         if Ktime::ktime_get() > timeout {
+>> >             break Err(code::ETIMEDOUT);
+>> >         }
+>> >     };
+>> > 
+>> >     ret
+>> > }
 > 
-> (sorry for the long scroll down there) This whole section is more of a
-> documentation on what ethtool reports rather than a troubleshooting
-> guide. I'm all in for getting proper doc for this, but maybe we could
-> move this in a dedicated page, that we would cross-link from that guide
-> ?
+> This appears to have the usual bug when people implement it themselves
+> and i then point them at iopoll.h, which so far as been bug free.
 
-Ack, I was not sure where to put it. I'll try to come up with ethtool
-manual patches and drop for now everything no directly related with the
-diagnostic.
-
-> > +This list will evolve with future kernel versions, reflecting new features or
-> > +refinements. Below are the current suggestions:
-> 
-> I'm not sure this TODO list has its place in this troubleshooting
-> guide. I agree with the points you list, but this looks more like a
-> roadmap for PHY stuff to improve. I don't really know where this list
-> could go and if it's common to maintain this kind of "TODO list" in the
-> kernel doc though. Maybe Andrew has an idea ?
-
-Yea,  may be it will be enough to send it as separate mail for
-discussion.
-
-> Thanks for coming-up with such a detailed guide. I also have some "PHY
-> bringup 101" ideas on the common errors faced by developers, and this is
-> document would be the ideal place to maintain this crucial information.
-
-Good idea. It will be good to have a list or guide on what options are expected
-form from PHY driver and how to test them.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Ah, in the next submission, I'll try to ensure that the Rust version
+works the same way as the C version.
 
