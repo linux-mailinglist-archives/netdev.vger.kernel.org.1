@@ -1,99 +1,135 @@
-Return-Path: <netdev+bounces-131949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BE1F990097
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:11:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74A79900A9
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:14:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6871B25E43
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:11:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12F351C2335F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56C014AD24;
-	Fri,  4 Oct 2024 10:11:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39BD914BF87;
+	Fri,  4 Oct 2024 10:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="bdKx133V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42ae.mail.infomaniak.ch (smtp-42ae.mail.infomaniak.ch [84.16.66.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A6514A4EB
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 049F214EC4B
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728036686; cv=none; b=G7EJMMiCfm/RY/5qMIat3ymZcdkqAOc7ELzZT69xzEOa3wJa4RPwC6dsiweWi1+sFwpw+UthObr0lvVzTSCHuwBLhpLWebum3IvoMCMM8Rs2THdSyqLEms3DAdoSoJndzXlCZT/eg1x7WTWS7g04R4vS0QRh1JRMeNnbm/Yu6qI=
+	t=1728036825; cv=none; b=GR0kwRYZ9+Gpkh9RCvGvNYGdNGHP6/tSz1OAMdDichvooaAgZxYdFNAb6UOnXFHgFxoYjoXDbZGyEv2pHfh6p+9dJ36J9Y25i/6lA/2R402FC9wS8clwVehDzw9ksPo60o6qfxGES/ewR3uaRV9K7w7LzfSdYoDB0/jPRxH5380=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728036686; c=relaxed/simple;
-	bh=x2O7TS00RicfPt6G+WI0X138zcI334CP9Dx2o5AECSg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aIyBa7N2VtfTUZ5PYYgeEHjE0YuN90p+4okWD/qTUGVfJk/diXfuoJhxM8fWH5XKpy5RaDhP+/77pL4S/6dylLqIOQIpp+RmP0nI5GBdUOCIzB7aD97GmB65ZS/S+fWSv4dF8uYz+siNUdr44O/2xceOv/OwPUkmCWhb4XDL+JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82ce3316d51so174149339f.1
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 03:11:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728036684; x=1728641484;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vgrEqgbT4gTBIvHYHiHmpH8MQDGJqj6FO+l00kf1JG4=;
-        b=k12nvEPxDfQpGeqr42hiPrPixg068kBzmmlpXLTnjJlyPthCOVEEc8CaB5Q3UFzmkF
-         Hz845KYjNLccBWgqh5YtGQTVkzbBGdmGRAD0puGxTprGNmhV4BJ/S8at01uPoN4g7EYX
-         YJRleimyVVtWkvJ572eu4hGmVTQtDFJgdsLXeEkQh2x8jMhml/xE07ICDErVCVpF4ETx
-         RESZBzuRU2LNXuOXF6dSMOq5EScbT7crNwv1CY7uGUW4RL0twRD5fV4Pq+SX3/6zRi7S
-         fGbCiZL6ccZu5c1z2MKZG0MYdAKm45+PptvLYQ+fR8BE+N4SkJlsjHOMrUZZAIVENLMg
-         Pv3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWfjS71tZZYFlVfq2RPlPAuPxmleYvAW6W2uHuCaOCz+sL7Iuf3uoRjyO07TDOnOqgrA7BCp7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmWneRxMECuu1wFyKRKZtGXwmne2yn0HSF4KvF/rTcoRGQoZbH
-	XcNIhpOpYRSyr86HLTg/5vkLFQCANoXae9225oratSiWyfui5r/LVeVrXua92fi0oB9doh2lHQ0
-	A+XG+puTy1zUQvK/6mo0c79WGmqP46kZ40+yj3KJnP+Lz6Q0t2fLg4Xo=
-X-Google-Smtp-Source: AGHT+IEgF5qLKJShXi+y0+519ebwQbROqt63ZqpT+BMHXJSu3IlAa1Ve+1roHFw52YWzrTjljzxhlo4344nJtZBgasj5o0CIA5MH
+	s=arc-20240116; t=1728036825; c=relaxed/simple;
+	bh=bUFKWpGhuHRDtfCZqSYM/ze1RxFi/q9nGlZp5xS3B50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MgVo54bwkANnJkmAWigeE7bWrMWNt3czPc8N1LSQfKtReGJHIDu8MmvDJQlCf2eJ0JBGB5VOZ3uQ5VnvIYwyjze7gU7kA46JampwNvL+7mGswLIn+Av6SnKcVarO+cBD8mcCIUY6M44by0saglGRJ2NJD7Q1A5MO12s5qIgP9aY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=bdKx133V; arc=none smtp.client-ip=84.16.66.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XKks740lFzJkK;
+	Fri,  4 Oct 2024 12:13:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1728036811;
+	bh=cqBQ9GK30wBQ0mr0f5EWQqndSVgF06uTkPIX5PaNsLs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bdKx133Vy6xqJ40PSAv+hx1dx30i9BPFY3RphqDoJPa4e9HYgxHHpc4GUz0cvXHKU
+	 I2HFhO08WqOavyPqNVcvjGdk0PHvXLOiP16v6en3RrPbZy7gyjIJvWm7lPQUOtAdbO
+	 Dt2n7HZx9XZ5weBPl0jKAm1LXV6+D7wZ6wZreG70=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XKks66FGyzf58;
+	Fri,  4 Oct 2024 12:13:30 +0200 (CEST)
+Date: Fri, 4 Oct 2024 12:13:26 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	Matthieu Buffet <matthieu@buffet.re>
+Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
+Message-ID: <20241004.rel9ja7IeDo4@digikod.net>
+References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
+ <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
+ <20241003.wie1aiphaeCh@digikod.net>
+ <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c8b:b0:3a0:8d2f:2914 with SMTP id
- e9e14a558f8ab-3a375bd4f33mr21615385ab.23.1728036684412; Fri, 04 Oct 2024
- 03:11:24 -0700 (PDT)
-Date: Fri, 04 Oct 2024 03:11:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66ffbf4c.050a0220.49194.0485.GAE@google.com>
-Subject: [syzbot] Monthly can report (Oct 2024)
-From: syzbot <syzbot+list142a88e98c5a6a6358e7@syzkaller.appspotmail.com>
-To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-Hello can maintainers/developers,
+On Fri, Oct 04, 2024 at 12:30:02AM +0300, Mikhail Ivanov wrote:
+> On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
+> > Please also add Matthieu in Cc for the network patch series.
+> > 
+> > On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
+> > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+> > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+> > > should not restrict bind(2) and connect(2) for non-TCP protocols
+> > > (SCTP, MPTCP, SMC).
+> > > 
+> > > Closes: https://github.com/landlock-lsm/linux/issues/40
+> > > Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
+> > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> > > ---
+> > >   security/landlock/net.c | 2 +-
+> > >   1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/security/landlock/net.c b/security/landlock/net.c
+> > > index bc3d943a7118..6f59dd98bb13 100644
+> > > --- a/security/landlock/net.c
+> > > +++ b/security/landlock/net.c
+> > > @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
+> > >   		return -EACCES;
+> > >   	/* Checks if it's a (potential) TCP socket. */
+> > 
+> > We can extend this comment to explain that we don't use sk_is_tcp()
+> > because we need to handle the AF_UNSPEC case.
+> 
+> Indeed, I'll do this.
+> 
+> > 
+> > > -	if (sock->type != SOCK_STREAM)
+> > > +	if (sock->type != SOCK_STREAM || sock->sk->sk_protocol != IPPROTO_TCP)
+> > 
+> > I think we should check sock->sk->sk_type instead of sock->type (even if
+> > it should be the same).  To make it simpler, we should only use sk in
+> > current_check_access_socket():
+> > struct sock *sk = sock->sk;
+> 
+> Agreed.
+> 
+> > 
+> > Could you please also do s/__sk_common\.skc_/sk_/g ?
+> 
+> Ofc
+> 
+> Btw, there is probably incorrect read of skc_family in this function
+> [1]. I'll add READ_ONCE for sk->sk_family.
+> 
+> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
 
-This is a 31-day syzbot report for the can subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/can
+I think it should not be a bug with the current code (IPv6 -> IPV4, and
+socket vs. sock) but we should indeed use READ_ONCE() (and add this link
+to the commit message).
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 5 issues are still open and 53 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 4408    Yes   WARNING: refcount bug in j1939_session_put
-                  https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
-<2> 2347    Yes   WARNING: refcount bug in j1939_xtp_rx_cts
-                  https://syzkaller.appspot.com/bug?extid=5a1281566cc25c9881e0
-<3> 2184    Yes   WARNING: refcount bug in sk_skb_reason_drop
-                  https://syzkaller.appspot.com/bug?extid=d4e8dc385d9258220c31
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+> 
+> > 
+> > >   		return 0;
+> > >   	/* Checks for minimal header length to safely read sa_family. */
+> > > -- 
+> > > 2.34.1
+> > > 
+> > > 
+> 
 
