@@ -1,176 +1,96 @@
-Return-Path: <netdev+bounces-132147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E89A9908EA
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:20:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F8F79908EE
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7311C216CF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:20:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E01282465
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEF41C7617;
-	Fri,  4 Oct 2024 16:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70631C3028;
+	Fri,  4 Oct 2024 16:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="nPY9yl9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BF515B0FF;
-	Fri,  4 Oct 2024 16:18:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C52F1E3783
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 16:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728058706; cv=none; b=SmdqjtKVxlIZjLv9i1Ppz1Uw/0w8x3g8T43w3x+ljoSF5VgESvsAt8ZVkQCCVaD4/b8Ka34c6uEeBFam8UQDnmYwoPfn7NPlWHLCcIyYRrp347NMh/XS33YNbn9CND4uwkvhB4NWOTerSEBMjZ83ra/KJ2Ojnk3PqwMcicx9CPQ=
+	t=1728058784; cv=none; b=H6pjknuPHkJoB4JA5RjNKYhFB2Uq8vjEAPnDLBGXyqRzlRDWEuSvyNY0uh53oXRRokyUCGiuX1OPi2ZprL3LSLetFOHqZWK37HgBoAihl3KTFxMNVMlxfYj5UxCII+tlGekFw1NKu8eyJ1sky8+GEsipJouzhUkgRnW7ogV4hSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728058706; c=relaxed/simple;
-	bh=PpHYk2KaX/9Gc97XfWCiL7TotuqilTQ5H0gfnF0vKPs=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rgW3d9UVstLzfa+i6EU9VX6xkiVCvyZ2MCDhh4y6gs0Hs0Zwe/f4uDNBt4N8qc5VGrwUWnpA0N1/zCBgiw8eUyT97ux7fB388vcXm0bkUO0yYq1W1UzNo0hdOclKZqJixVE3NUD+8WXhgyIdkSX5sj0AlSuXKifvtHwTAM0xa0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1swl0V-000000008Sy-3KfO;
-	Fri, 04 Oct 2024 16:18:19 +0000
-Date: Fri, 4 Oct 2024 17:18:16 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Robert Marko <robimarko@gmail.com>,
-	=?utf-8?B?UGF3ZcWC?= Owoc <frut3k7@gmail.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] net: phy: aquantia: allow forcing order of
- MDI pairs
-Message-ID: <9ed760ff87d5fc456f31e407ead548bbb754497d.1728058550.git.daniel@makrotopia.org>
-References: <7ccf25d6d7859f1ce9983c81a2051cfdfb0e0a99.1728058550.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1728058784; c=relaxed/simple;
+	bh=pEV/MxMbuiBE8kfjwjbyHWDCwn0HO/vnXJb/zzOhWIo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nIl661S5GcqBuiQb96Pjp+3kRiG8UEu1KfdUPjv4C0ChZAdPOh5wNBtqrLSdNURe+/aIRQ0n2d+1qyU7TRtCf8VDOVlAWIc4wQsOlJuoH34BRrC/EGYCG7tNkQ4hWpEVFaImMjyBFGreAwpvT2KfbcalStvg9KTNqX32jCvW4Kw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=nPY9yl9o; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=1VRZhIoDkswjtSyTAiqATwQQKbDLVvc16+cgZRRY02g=; b=nPY9yl9oQyhgWDnMPbeh9Ii5bM
+	4/49wyK/bcpeIIei5jWB7x1aDtcy6VeiMbu6lURpwvfoS84ILecNbaeDsvNVHAIrsCQcOusEzVffh
+	esS1ay8DBrMbD+IG0GQqQVgBp3FNHrKgIpgkpbFtnqkp0D31INuHczKsOnzNeXXqlLIu4AtjjobUW
+	QFk6JtBEs2WYyHbcrj1vMHjgnyinG7T3dYq/Y+6jxFJu2GPF28/tc6oUFEHhoFZC1QftYD5pQkeKZ
+	eAyio6iIcx/z/rm8bp/0mWB3MDBbyyLC5DYNiFGIUonhpsCCme6IkT/zHZu/gp/29pPgcvLKdKkOU
+	WTRoJuKg==;
+Received: from 47.249.197.178.dynamic.cust.swisscom.net ([178.197.249.47] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1swl1i-000DH1-Qw; Fri, 04 Oct 2024 18:19:34 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: kuba@kernel.org
+Cc: edumazet@google.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] wireguard: Wire-up big tcp support
+Date: Fri,  4 Oct 2024 18:19:33 +0200
+Message-Id: <20241004161933.120219-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7ccf25d6d7859f1ce9983c81a2051cfdfb0e0a99.1728058550.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27417/Fri Oct  4 10:53:24 2024)
 
-Despite supporting Auto MDI-X, it looks like Aquantia only supports
-swapping pair (1,2) with pair (3,6) like it used to be for MDI-X on
-100MBit/s networks.
+Advertise GSO_MAX_SIZE as TSO max size in order support BIG TCP for wireguard.
+This helps to improve wireguard performance a bit when enabled as it allows
+wireguard to aggregate larger skbs in wg_packet_consume_data_done() via
+napi_gro_receive(), but also allows the stack to build larger skbs on xmit
+where the driver then segments them before encryption inside wg_xmit().
 
-When all 4 pairs are in use (for 1000MBit/s or faster) the link does not
-come up with pair order is not configured correctly, either using
-MDI_CFG pin or using the "PMA Receive Reserved Vendor Provisioning 1"
-register.
-
-Normally, the order of MDI pairs being either ABCD or DCBA is configured
-by pulling the MDI_CFG pin.
-
-However, some hardware designs require overriding the value configured
-by that bootstrap pin. The PHY allows doing that by setting a bit in
-"PMA Receive Reserved Vendor Provisioning 1" register which allows
-ignoring the state of the MDI_CFG pin and another bit configuring
-whether the order of MDI pairs should be normal (ABCD) or reverse
-(DCBA). Pair polarity is not affected and remains identical in both
-settings.
-
-Introduce property "marvell,mdi-cfg-order" which allows forcing either
-normal or reverse order of the MDI pairs from DT.
-
-If the property isn't present, the behavior is unchanged and MDI pair
-order configuration is untouched (ie. either the result of MDI_CFG pin
-pull-up/pull-down, or pair order override already configured by the
-bootloader before Linux is started).
-
-Forcing normal pair order is required on the Adtran SDG-8733A Wi-Fi 7
-residential gateway.
-
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
+Cc: Anton Protopopov <aspsk@isovalent.com>
+Cc: Martynas Pumputis <m@lambda.lt>
 ---
-v3: use u32 'marvell,mdi-cfg-order' instead of two mutually exclusive
-    properties as suggested
-v2: add missing 'static' keyword, improve commit description
+ drivers/net/wireguard/device.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/net/phy/aquantia/aquantia_main.c | 33 ++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
-
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 4d156d406bab..dcad3fa1ddc3 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/delay.h>
- #include <linux/bitfield.h>
-+#include <linux/of.h>
- #include <linux/phy.h>
+diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
+index 45e9b908dbfb..79be517b2216 100644
+--- a/drivers/net/wireguard/device.c
++++ b/drivers/net/wireguard/device.c
+@@ -301,6 +301,7 @@ static void wg_setup(struct net_device *dev)
  
- #include "aquantia.h"
-@@ -71,6 +72,11 @@
- #define MDIO_AN_TX_VEND_INT_MASK2		0xd401
- #define MDIO_AN_TX_VEND_INT_MASK2_LINK		BIT(0)
+ 	/* We need to keep the dst around in case of icmp replies. */
+ 	netif_keep_dst(dev);
++	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
  
-+#define PMAPMD_RSVD_VEND_PROV			0xe400
-+#define PMAPMD_RSVD_VEND_PROV_MDI_CONF		GENMASK(1, 0)
-+#define PMAPMD_RSVD_VEND_PROV_MDI_REVERSE	BIT(0)
-+#define PMAPMD_RSVD_VEND_PROV_MDI_FORCE		BIT(1)
-+
- #define MDIO_AN_RX_LP_STAT1			0xe820
- #define MDIO_AN_RX_LP_STAT1_1000BASET_FULL	BIT(15)
- #define MDIO_AN_RX_LP_STAT1_1000BASET_HALF	BIT(14)
-@@ -485,6 +491,29 @@ static void aqr107_chip_info(struct phy_device *phydev)
- 		   fw_major, fw_minor, build_id, prov_id);
- }
- 
-+static int aqr107_config_mdi(struct phy_device *phydev)
-+{
-+	struct device_node *np = phydev->mdio.dev.of_node;
-+	u32 mdi_conf;
-+	int ret;
-+
-+	ret = of_property_read_u32(np, "marvell,mdi-cfg-order", &mdi_conf);
-+
-+	/* Do nothing in case property "marvell,mdi-cfg-order" is not present */
-+	if (ret == -ENOENT)
-+		return 0;
-+
-+	if (ret)
-+		return ret;
-+
-+	if (mdi_conf & ~PMAPMD_RSVD_VEND_PROV_MDI_REVERSE)
-+		return -EINVAL;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
-+			      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
-+			      mdi_conf | PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
-+}
-+
- static int aqr107_config_init(struct phy_device *phydev)
- {
- 	struct aqr107_priv *priv = phydev->priv;
-@@ -514,6 +543,10 @@ static int aqr107_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = aqr107_config_mdi(phydev);
-+	if (ret)
-+		return ret;
-+
- 	/* Restore LED polarity state after reset */
- 	for_each_set_bit(led_active_low, &priv->leds_active_low, AQR_MAX_LEDS) {
- 		ret = aqr_phy_led_active_low_set(phydev, led_active_low, true);
+ 	memset(wg, 0, sizeof(*wg));
+ 	wg->dev = dev;
 -- 
-2.46.2
+2.43.0
+
 
