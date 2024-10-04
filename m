@@ -1,127 +1,107 @@
-Return-Path: <netdev+bounces-132102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B90999066A
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:41:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E23A69906DB
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08D77B23BA5
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:41:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BDB528AE8C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:57:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11FE2178EF;
-	Fri,  4 Oct 2024 14:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D5E1217903;
+	Fri,  4 Oct 2024 14:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BWLPWWSm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="y/ZfHfUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34153212EFD;
-	Fri,  4 Oct 2024 14:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD41C2141A2;
+	Fri,  4 Oct 2024 14:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728052890; cv=none; b=h+O28+C0nZAiMtU2VTByPcuWYXrvJrm4eMyjKWV5+b620ZHoNeZVmTW8YR0zabxqtOKX6Gu9/o5tjKaAY2QqauwwU3MxxszYkY3sS7D2q6ycqUJo7kJ3EGQqmOg3Sr4Zxb+bN3KLcnX1G5ENeN5nNKCVIfdoS5xBF2vW8mSz19M=
+	t=1728053427; cv=none; b=XW2oz3C05HgIVniV2gz+lAUFThpxYebSjUneguaeZKrABvX0K304NEOXgss5lv2ZFaHl3kRXGz0bUGiHXd/jS06E+qTGwLwqGzmCpVvnld6O7UblmWW/HgY48kGLMNpGKAdJOC4/D76Jd7TSkNdlou3CsYqSEurbsmDrWyYe9Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728052890; c=relaxed/simple;
-	bh=6vZ9ZZ2+8UkQgXbyVgwYaztAjeD8tlbGKHEGBkwI3R4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SoHns1Rg9eQbgvl7IQiaoIsPnKmrTwniXMEz1gq7WZROaEsNeIclp5rqy+qMnXT3d0A0PfQ1qXhSZz6tf+0aQmNDOScWx9KmYYMTWCeAYKWpgpMfgDBBOcEcYGhVNSyARxAkru10fDcFF8w0R84d3GlazVZPg3JvztfLi+AnAlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BWLPWWSm; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2877d7ae431so1179780fac.0;
-        Fri, 04 Oct 2024 07:41:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728052888; x=1728657688; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WpwvhreYRuWCJg/9GLsajWKdBRP2ezNYkowaWEKQfpQ=;
-        b=BWLPWWSmU+V10ELkaXZENURLNWQbfEEG4wgVDuYOGF741EKtwCumXJqMzmY9RDhe3v
-         rHUT6UmLxb7vAA0jFt4FHeL7zDdCmfzR75tKoAEu1/kku1Kl+zd4+QglWaxEp3d4ym0N
-         5Fg4vuA3wEBVXwW2d4oiH8nvPLn9anNp+8XylF6mskfWqgFqKOZw5GXh6BTxdDhG9w99
-         Ol6LqiwUw4ukfhL1UqAOylJmNginfFwyrjB1PVldlyAESLqE3EbaXKF/4XLy504kz70+
-         ZrSHR6l7s9G723jramMMQSD3+sSVqk/sKxnaVmcThZGbC7UpYqN6e2yYXkBBFvtWPy1E
-         ptnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728052888; x=1728657688;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WpwvhreYRuWCJg/9GLsajWKdBRP2ezNYkowaWEKQfpQ=;
-        b=nsloinMa4Ivwuf7D05pveeJK5lwvc6vsOkGt8fbFjnkAJk1eK4ne4gMsDdE2E7DFui
-         04u7g0ogdgSf4z2gc6FHvfJtkeHnll4YoZhLP3Ad6SKblGxFsDGakm3Wh44qWxpl1mqA
-         hxkFSgyJ+vhEIMa9GV+I8mJN8BHVP6NPwbatLk5jOV836UOoESQ017riSrLEUKVx+krT
-         f/OCYaTizi2QNVIbKXKL221YR1jm0L8pSOD3hmb11hWkVtliFIydXQ5gYadr7x2ly9py
-         i7Y4Bgb/ntpQMMlMsHQ/lMBbugQzgLNLP/2kvB3qC1XuxhIhAoEK7wCsogCSkdd5Q+vl
-         393w==
-X-Forwarded-Encrypted: i=1; AJvYcCWBfJBDDS19+KVQjh4nuOEZdxHhn7ZvSPBK18Lk6x8C7wSavAFie43INpuUwhj3dvcUomF0y0TlETdsRQ1+DGX4@vger.kernel.org, AJvYcCWs/+Uj9s5Dvuk6T7bEMo4hfxixlnOWSEHOjvnN4NNxesQ8juy5sNJJpkDcGfmrtJxybidzzf5z@vger.kernel.org, AJvYcCXaWeNnXOwkfiK2+gcSclfgHuLST0PynVx2erikNBFVDUuLUTYUhJR1h3zrr5N2Y/VDCOQYX6/FR4fIsuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyN+ywtchGOUgChvPIhPkgynT2rrNTYy0lE4Ft2h++wbWHSrxri
-	n9waUxEUg2/7b58zQCFJFof50y7hHmimn3SVpPzHOvOiZJcJROz6HqYyjk5nzhlY5mo/f56umvj
-	uqRBIAz7xWMVcEDRvzCL4iHW4QBg=
-X-Google-Smtp-Source: AGHT+IH5NERFZsDJilgPCrkzxJYp3AF3EavawqcoLwXWFg9KBsUJL305SG7pAygMndGuG5VqmupLa4rp6BmP8XW6Msc=
-X-Received: by 2002:a05:6870:1490:b0:25e:1382:864d with SMTP id
- 586e51a60fabf-287c229144amr2109346fac.30.1728052888218; Fri, 04 Oct 2024
- 07:41:28 -0700 (PDT)
+	s=arc-20240116; t=1728053427; c=relaxed/simple;
+	bh=jrI4QlmUIOZtU2+vT3cnGSIxeka4ceUwjqasJSUfzAA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZrkgxOETux7vCp2/x164uU1veW/3aBqxmvzwyM0a1dmQoTJBOvNRV+ZXwKXGfidOD1WbYcnzNb3snuXnDmcxeLxswvwy6W6r/sIHg0hTii26sQUAVHuyi0KCsVbSjZUxU4c0mH9egDd3SELOpN3f2stdYXRCk7InySWocVum0HE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=y/ZfHfUh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8esOpvwhEAMg9FOrIHhtovLDXASj97AUVvZ8pGi+W44=; b=y/ZfHfUheaDUZgFmYnraZxdIUy
+	FZHLsDhrZcdPaM/JoSKzUjVwd9HMvIgJk53ZuxAux3LxwSCzbY/nkBeJGNwQFXW+UKT05RkhC04yJ
+	NLo7svj22cERP2UkRlgAJ65XaxDrlatTSoJ/+TLqC3HvkMsyp4xSKLHOAQS73GkYypck=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swjdB-0093gB-CL; Fri, 04 Oct 2024 16:50:09 +0200
+Date: Fri, 4 Oct 2024 16:50:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: Bjorn Andersson <quic_bjorande@quicinc.com>, netdev@vger.kernel.org,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Russell King <linux@armlinux.org.uk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
+	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
+	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <ac4b5546-366b-437a-a05b-52a53c3bd8a8@lunn.ch>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <Zv7ubCFWz2ykztcR@hu-bjorande-lv.qualcomm.com>
+ <7f413748-905d-4250-ad57-fc83969aad28@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
- <20241002-b4-ovpn-v8-1-37ceffcffbde@openvpn.net> <m2msjkf2jn.fsf@gmail.com> <20241004063855.1a693dd1@kernel.org>
-In-Reply-To: <20241004063855.1a693dd1@kernel.org>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Fri, 4 Oct 2024 15:41:16 +0100
-Message-ID: <CAD4GDZxR5LzEo0ksFd3FbhVpeoeEMSWg2dL_RNyFRfB2bx052g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 01/24] netlink: add NLA_POLICY_MAX_LEN macro
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Antonio Quartulli <antonio@openvpn.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	sd@queasysnail.net, ryazanov.s.a@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f413748-905d-4250-ad57-fc83969aad28@quicinc.com>
 
-On Fri, 4 Oct 2024 at 14:38, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri, 04 Oct 2024 13:58:04 +0100 Donald Hunter wrote:
-> > > @@ -466,6 +466,8 @@ class TypeBinary(Type):
-> > >      def _attr_policy(self, policy):
-> > >          if 'exact-len' in self.checks:
-> > >              mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
-> > > +        elif 'max-len' in self.checks:
-> > > +            mem = 'NLA_POLICY_MAX_LEN(' + str(self.get_limit('max-len')) + ')'
-> >
-> > This takes precedence over min-length. What if both are set? The logic
-> > should probably check and use NLA_POLICY_RANGE
->
-> Or we could check if len(self.checks) <= 1 early and throw our hands up
-> if there is more, for now?
->
-> > >          else:
-> > >              mem = '{ '
-> > >              if len(self.checks) == 1 and 'min-len' in self.checks:
-> >
-> > Perhaps this should use NLA_POLICY_MIN_LEN ? In fact the current code
-> > looks broken to me because the NLA_BINARY len check in validate_nla() is
-> > a max length check, right?
-> >
-> > https://elixir.bootlin.com/linux/v6.11.1/source/lib/nlattr.c#L499
-> >
-> > The alternative is you emit an explicit initializer that includes the
-> > correct NLA_VALIDATE_* type and sets type, min and/or max.
->
-> Yeah, this code leads to endless confusion. We use NLA_UNSPEC (0)
-> if min-len is set (IOW we don't set .type to NLA_BINARY). NLA_UNSPEC
-> has different semantics for len.
+> The only compile-time dependency from PCS driver to NSS CC driver is
+> with the example section in PCS driver's dtbindings file. The PCS DTS
+> node example definitions include a header file exported by the NSS CC
+> driver, to access certain macros for referring to the MII Rx/Tx clocks.
 
-Oh, I see it now. So it's dropping through to here:
+> So, although there is no dependency in the driver code, a successful
+> dtbindings check will require the NSS CC driver to be available.
 
-https://elixir.bootlin.com/linux/v6.11.1/source/lib/nlattr.c#L555
+You are doing something wrong. A clock is just a phandle. The
+dtbindings check does not care where the phandle points to, just that
+it looks like a phandle. You can hard code the instance to 42 and all
+is good.
 
-> Agreed that we should probably clean this up, but no bug AFAICT.
+And this is all just basic getting SoC stuff merged, nothing
+special. So why do you not know this? Have you not been subscribed to
+arm-soc for the last six months and watched other drivers get merged?
+I also really hope you have been on the netdev list for the last few
+months and have watched other pcs and ethernet drivers get merged.
 
-Yeah, it's definitely surprising that the meaning of .len varies.
+	Andrew
 
