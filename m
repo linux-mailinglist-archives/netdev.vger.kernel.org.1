@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-132152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A543E990930
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:30:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58365990931
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 678CC281E6D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:30:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE50A1F22EA4
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3311A1C879C;
-	Fri,  4 Oct 2024 16:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 747071CACE0;
+	Fri,  4 Oct 2024 16:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KXGMWvdt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YYj1WNH4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C01D1C3032;
-	Fri,  4 Oct 2024 16:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA031CACD4
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 16:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728059432; cv=none; b=ufP9bMvmbGvRB9godGpcNEOozKG7Parsa/ZLIuK0WK+3FCW3NqilS70hU4oGyO0tyyaI34crP4b2BrocKffwSCeOVVHbVYqhfFREJg3+GTbqZCLUCh7zKjX+W7dTTHco30OwyTU4jUhHOz/xrcbl7BfUVTCZDj4GPtI9OZ+bPdk=
+	t=1728059433; cv=none; b=cQHVq0ABFZTHuoOrF/CfvLwL+JX/IGBF+ujs92MrJrSeOQIKYI5xjJABekPtWd2h2GZQp9+v5cMajp7YOwvkQ1s40/o8N2L++t0lfeRfEyaRE1V8237bFfC3AyRiVZRqjgR/7vwvgq9zraWdJtEsMCsL4qjezZvoN3sBGPWbr/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728059432; c=relaxed/simple;
-	bh=5Qwq29/Tpt7XpPao6O9Mk+gWqokrH6w2WkFH5q1ROKo=;
+	s=arc-20240116; t=1728059433; c=relaxed/simple;
+	bh=RBPGO1WIplFlVhFxV3nlIsh4d+fSLVhShl85yJ/ym3Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VYIu2NmCE+bA9T8KvId7q3+jHdHHNAsjwfyosrYsJ3tKsZgBbk+InzCfzyxbv9bKAyCeDgh5oiIVL7fif1O1QnDYMSdfcZIjrA3xboEnEQp2BVZovvQBQ0a9rW8Lpi7x/PpoG8g0tJdAt+WT6aGv8vh9LS77moITUMWhkR+cl/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KXGMWvdt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1927C4CEC6;
-	Fri,  4 Oct 2024 16:30:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=HMhirOi0gd1e/g5Z5izhRJC94NRMIluGstiX+DWS6YULyr5zTnV6FLi5a7DDBsjTMEO/yOwQsBvE1gNEkycXlracKLquLNI9+nb/Dc6nqJ3gvq1eLlIPM7yFoJcgwfyiw+iI7UtFGefaQQbzIbxhBPJeQnbPZs87dyRvSMIuzhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YYj1WNH4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E9AC4AF09;
+	Fri,  4 Oct 2024 16:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728059431;
-	bh=5Qwq29/Tpt7XpPao6O9Mk+gWqokrH6w2WkFH5q1ROKo=;
+	s=k20201202; t=1728059433;
+	bh=RBPGO1WIplFlVhFxV3nlIsh4d+fSLVhShl85yJ/ym3Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KXGMWvdtDDYw2YDeh0384zonfYoah5rfauOkJTBe1uR2UzVkIRdHoFfVeAqcEPqsv
-	 J6GM3GBa7/Go6jBK8gX4QpIxdEPiSFfRE3Ks1dX6u49nA8RHR1g2uU/MJYHO3vIONp
-	 IpU/5N7S9/WLpX5Tam90wMqHnoj8kyaICvpWT7sSw19yOnMkfwKR8J1lLgFgCuWvHA
-	 th5+5YPZRCcvVLh2bBI/j7eCuSzCUSb0/Ew9x3g9ppNRvwD7yUsTH/hIm66kYAwlWo
-	 BMYPPlsFKPuc+0MI2apDhbibAIRKXZ3KnLvz4b2PiMhd8kjvchCnnTFjVwE4OZXtS+
-	 K7BAETTwA4T6g==
+	b=YYj1WNH42wavD5ZI4cLUSUR7DmQA2eSUdIGd20fxnqT1WzseTV3dOTpHZZ+eOLy1u
+	 Wdx4lT/1dHNren/syDsTfwp1xDCi0QxEzmXONKjdSpfxU8yNl+3hb7wK556jATtk5f
+	 i+k3zV3fkooNKE4VBBkTo+X6vwaDpD5y+vXNAEwvw/UAkL6AjgBr7W0ZgSATfspcv4
+	 l9SAJPc0vHHTsoZdxixOpm7GRb79J5Nig5pbBJEvmbj9xxU33yFajbgP3o9yYEP1Zn
+	 MvKkvbzdmmsxjk9N63QM2TdJdM6zht4qZ7NZIrJ+qXbI9T4LcklkB7bM4GTxEAgyzL
+	 Oa7ww5t+FoJXA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE38239F76FF;
-	Fri,  4 Oct 2024 16:30:36 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB20639F76FF;
+	Fri,  4 Oct 2024 16:30:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] net: mv643xx: devm fixes
+Subject: Re: [PATCH net-next 0/4] qed: 'ethtool -d' faster, less latency
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172805943552.2652527.15210046375542424890.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 16:30:35 +0000
-References: <20240930202951.297737-1-rosenp@gmail.com>
-In-Reply-To: <20240930202951.297737-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org
+ <172805943675.2652527.6575043288015766563.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 16:30:36 +0000
+References: <20240930201307.330692-1-mschmidt@redhat.com>
+In-Reply-To: <20240930201307.330692-1-mschmidt@redhat.com>
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: manishc@marvell.com, netdev@vger.kernel.org, csander@purestorage.com,
+ palok@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 30 Sep 2024 13:29:49 -0700 you wrote:
-> Small simplification and a fix for a seemingly wrong function usage.
+On Mon, 30 Sep 2024 22:13:03 +0200 you wrote:
+> Here is a patch to make 'ethtool -d' on a qede network device a lot
+> faster and 3 patches to make it cause less latency for other tasks on
+> non-preemptible kernels.
 > 
-> Rosen Penev (2):
->   net: mv643xx: use devm_platform_ioremap_resource
->   net: mv643xx: fix wrong devm_clk_get usage
+> Michal Schmidt (4):
+>   qed: make 'ethtool -d' 10 times faster
+>   qed: put cond_resched() in qed_grc_dump_ctx_data()
+>   qed: allow the callee of qed_mcp_nvm_read() to sleep
+>   qed: put cond_resched() in qed_dmae_operation_wait()
 > 
->  drivers/net/ethernet/marvell/mv643xx_eth.c | 28 ++++++----------------
->  1 file changed, 7 insertions(+), 21 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net: mv643xx: use devm_platform_ioremap_resource
-    https://git.kernel.org/netdev/net-next/c/4d77e88ab42f
-  - [net-next,2/2] net: mv643xx: fix wrong devm_clk_get usage
-    https://git.kernel.org/netdev/net-next/c/50c3a7fbaa10
+  - [net-next,1/4] qed: make 'ethtool -d' 10 times faster
+    https://git.kernel.org/netdev/net-next/c/b8db67d4df00
+  - [net-next,2/4] qed: put cond_resched() in qed_grc_dump_ctx_data()
+    https://git.kernel.org/netdev/net-next/c/6cd695706f8b
+  - [net-next,3/4] qed: allow the callee of qed_mcp_nvm_read() to sleep
+    https://git.kernel.org/netdev/net-next/c/cf54ae6b5920
+  - [net-next,4/4] qed: put cond_resched() in qed_dmae_operation_wait()
+    https://git.kernel.org/netdev/net-next/c/2efeaf1d2a13
 
 You are awesome, thank you!
 -- 
