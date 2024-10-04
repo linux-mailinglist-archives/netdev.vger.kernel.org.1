@@ -1,281 +1,184 @@
-Return-Path: <netdev+bounces-131907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A3B98FEA3
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:09:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CB0D98FEAB
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:12:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7241A1F256ED
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:09:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B99D1F2579D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7F8613BC1E;
-	Fri,  4 Oct 2024 08:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1039A13790B;
+	Fri,  4 Oct 2024 08:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lv2RMRLX"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JgxC6idA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B411E8120C
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 08:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658D317758
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 08:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728029338; cv=none; b=DvGYSF20JMhI3CN8ED9k3+dYR9NClG5HniE5tkiXnEgmLJ7sEDeQSVZBSVZ8HETv4Ye8sq9u9XIh6PedGGQQSq6qjT5Ez8edpuiKkTu+ejKzVEJosGXfDYikXaFUVIgIpo4puZ4uzSLKxYXTamDw0+7wEErKBhtgX+DMyN1wrtI=
+	t=1728029537; cv=none; b=U34J5G0kDrz6/CeI3eKuRPSpWW9D50Hv+ygU0LGIKrdntRwYbUjBqc0B8Wan5c8XPtfNHl5+sNRPNHMjcSTZ+HqVbBYK2fw0oXPqvyjBQap6ViDwelGK3TRs6a79XtTtjJjq2NPDQJyYqJYpqWKc4AWMuSb1BPakg3F+GswE4wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728029338; c=relaxed/simple;
-	bh=7xoDIx4XuNoY1uZ9PXp0eWKAcuu/mlxTKzPDB8kSZjI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=W1fM2+s/B348TyyWU96dJu4FYGKmZ2w5OK/Cmpea9EZwVmh+ergbb73XoqUElHN676cNhVNXBsdSxEPni1ugf+LP0Dh+mNj9cSDcjBWgHV0vkabnf4RUzAncugLlzoYzjCfegMP/22vNIUdGue9iDA2NYjW3kjxkpstBNN/ocVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lv2RMRLX; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c8844f0ccaso2279214a12.0
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 01:08:56 -0700 (PDT)
+	s=arc-20240116; t=1728029537; c=relaxed/simple;
+	bh=8U+LWse2nc2JaLE1//Yx5ORiFDfOCqVAtYFOFVw3Cpo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tC6YWBC9bierPCeZNA0Gd/Y9rvuKhcdRzGHhy64Cqoiu0OSfahtqp2rgQB5hyURylQy1TjZ/3dcie18A2qsaYNwEkqXfO0End/SCXUuAGsz8komVVt4FJRxINYoJx0asCHp7RG1MRXiroYeC7R968HI4T+k5jv/+/zxpFWi993I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JgxC6idA; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-53993c115cfso2410167e87.2
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 01:12:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728029335; x=1728634135; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=a0ItRyPkw3RtC0lSHNVDwNzhe/I7oWN44mlp1bu6JAY=;
-        b=lv2RMRLXnuYd3bZybYL+TgvTfXMTKQUDdWC+rXd+1RqnTx5k51VrVJHsXahoMfNnU9
-         EY0IUEA9xNsIBQ2c8KfgM5ZXw4eIFl8d2BQv0v6JTt2xFUTQcaGr3h5QtyepxMwU5vTc
-         cPhiie8gDM/t1jG7cHCwy7+Nen14XGmBXKAsXm/5eEmmppAHT0UtG42/NXUJXzYru858
-         Fs6QBE85Oeonflb02SnV09P7588DI59xEeipBgaATdNq4/BGMIsApcV0TXVBH1O50poE
-         AoOyT3oPwxV5qrk81vYm8tzYJpn/rkZ3xGC8FaA9ZXgPT1g7CvJyBLG8sjG8tKcF/j7p
-         qnAg==
+        d=broadcom.com; s=google; t=1728029533; x=1728634333; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=8U+LWse2nc2JaLE1//Yx5ORiFDfOCqVAtYFOFVw3Cpo=;
+        b=JgxC6idAVM+gXmeTjF7hpREtdSA6XlNVdZ9QAVAPhmwPvjqLio+NQIbCV3KsW9z3pA
+         fh+f/7b5s8BLMJVKibpMKKAurJIdN8cUJB1TLTWJLvZPgLOqlpq7ml7bxEiblvQ9sdCr
+         adZxeY/4JWHhR/cwIrQqDFA0Ue70XJ0YYLCXw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728029335; x=1728634135;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1728029533; x=1728634333;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=a0ItRyPkw3RtC0lSHNVDwNzhe/I7oWN44mlp1bu6JAY=;
-        b=wVBgDnWUDgIrZHuEUIvp2qqSXHMgl8ytF06up7CnqfWconrAhSt7YgfWkXlaNcloUS
-         NUbAVbeCXojSvPdR1AhJ8QwyaPKS5YST5weLC9qwm0Vw8IXtgzi3L0jFN0rdQ0mGIU4f
-         hYWHpr44POMlPzWEG1lgcEEWAXOIGKevSthJcrQR6ZXOKIGRSYYqdFrkdrKVjXASIXwz
-         xkgCvppVhZrwuVm3bXgMsZj61hR4+6nlMFAeCnJ9pzmAPdRztGNvH6lBy7UuUGVthRw7
-         64+Z38Q/XIWs7tTdUf1KqegjHfbheb3Wb+bavcWAQFxM7E5xtsYrIwZMklg3DXRPuDFH
-         WcBA==
-X-Gm-Message-State: AOJu0YxKZn8MWVZzkrP7Kwn3cEpE/f3TC2mTeBBJ2bi3p1IszrbejVVj
-	j2CZ19LQJiKR3t+zAxyTy9im8/1BAUaFT1qzCdazM8ZIn7YUUpo7v5Y8+u8KeEc=
-X-Google-Smtp-Source: AGHT+IEzdJmHXWVlDxj15H3eMX3/swAX2rbbEMWO0ZW4CXbVp1zQ2rJDw1p5g2NPjWiXBazjXGu3jg==
-X-Received: by 2002:a17:906:dc93:b0:a99:bb:737b with SMTP id a640c23a62f3a-a991c077e09mr211318066b.55.1728029334855;
-        Fri, 04 Oct 2024 01:08:54 -0700 (PDT)
-Received: from lino.lan ([85.235.12.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99102a625asm189895266b.87.2024.10.04.01.08.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 01:08:54 -0700 (PDT)
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 04 Oct 2024 10:08:50 +0200
-Subject: [PATCH net-next v2] dt-bindings: net: realtek: Use proper node
- names
+        bh=8U+LWse2nc2JaLE1//Yx5ORiFDfOCqVAtYFOFVw3Cpo=;
+        b=GD3UT80MntICqwQ4ibB1ZYLo0s8/UuXqv1ONemPgKaX7Mo2DacgeDdEVPzO8XxhOfK
+         VQ1qqEevgvwsQtkkjpwGMgUefnmF61edKFUcgx4QBgxLWd5h6fB3686j8lrzDRCJS0bm
+         7sKWrcA9KgCGt/G3nhsNDrhsOC5RYzj1NaCeRy1c/QKjeCX7CTL2AxF9xSiiP93i2yzZ
+         0is+1nAlGO6M9PI+B3JTvw52B4PYBeeMyCiBRlFyGBaK7In9awg9WgrgNX8jPtDppwot
+         ndW3aa7diAaWlIF/hBe6Ye0t4G1VFGV27oWhAwWR7Fa1uWPJcOAKnKoQLWrSWBmdVBzG
+         RkcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUgEfiTwCqbYsBZlMzICmy8dLTcqIT+F5fgSIoJd9FO1KIq7gpICrdsxA51YtDNArKfwZ6hgZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4xqGwvP8Nq4URxqgiWgmYP3d9Uu2VeA4Tn78+FsjZGx6zXIjf
+	BAwHAjJvdo9uek5QGGvoREKFj6kCEZkE89jHGTrqUJsvtnuDopePgA4Gfh9e6fb0pvA1k3Zf+sK
+	VE0ch8Kykjz/xr/9ZDcZdtGoXfN9KYxeld5Kr
+X-Google-Smtp-Source: AGHT+IGbOjVIdL+2yEohbtFM6UCWP5x9Uax9xbY3fJqnFxUaRKRjM1WoSpsk/SZOMkqmQO9c7OrKsFf8QTzH2Lw0zJM=
+X-Received: by 2002:a05:6512:2210:b0:539:9ff9:5c9d with SMTP id
+ 2adb3069b0e04-539ab9ec57bmr1157746e87.52.1728029533278; Fri, 04 Oct 2024
+ 01:12:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241004-realtek-bindings-fixup-v2-1-667afa08d184@linaro.org>
-X-B4-Tracking: v=1; b=H4sIAJGi/2YC/4WNQQqDMBBFryKz7hQTCmpXvUdxkZiJDpVEJlEs4
- t0bvECXj8d//4BEwpTgWR0gtHHiGAroWwXDZMJIyK4w6Fo/al23KGTmTB+0HByHMaHnfV1QuZa
- s8apz1kAZL0JFXOE3BMoYaM/QFzNxylG+1+OmLv8vvilUaNXgG99QR+ReMwcj8R5lhP48zx9ND
- CgExwAAAA==
-To: =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh+dt@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Linus Walleij <linus.walleij@linaro.org>
-X-Mailer: b4 0.14.0
+References: <20241004065526.7306-1-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20241004065526.7306-1-michal.swiatkowski@linux.intel.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Fri, 4 Oct 2024 13:42:00 +0530
+Message-ID: <CAH-L+nP1FHbjN_OuDjj4tszo5DmVgV7HfVv5z16TTiWGj7VEUw@mail.gmail.com>
+Subject: Re: [iwl-net v1] ice: block SF port creation in legacy mode
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	przemyslaw.kitszel@intel.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000008645ed0623a23a7d"
 
-We eventually want to get to a place where we fix all DTS files
-so that we can simply disallow switch/port/ports without the
-ethernet-* prefix so the DTS files are more readable.
+--0000000000008645ed0623a23a7d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Replace:
-- switch with ethernet-switch
-- ports with ethernet-ports
-- port with ethernet-port
+On Fri, Oct 4, 2024 at 12:25=E2=80=AFPM Michal Swiatkowski
+<michal.swiatkowski@linux.intel.com> wrote:
+>
+> There is no support for SF in legacy mode. Reflect it in the code.
+>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Fixes: eda69d654c7e ("ice: add basic devlink subfunctions support")
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
----
-Changes in v2:
-- Rebased on v6.12-rc1
-- Updated committ message.
-- Link to v1: https://lore.kernel.org/r/20240208-realtek-bindings-fixup-v1-1-b1cf7f7e9eed@linaro.org
----
- .../devicetree/bindings/net/dsa/realtek.yaml       | 46 +++++++++++-----------
- 1 file changed, 23 insertions(+), 23 deletions(-)
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
-diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-index 70b6bda3cf98..f348e66fb515 100644
---- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-@@ -147,7 +147,7 @@ examples:
-     #include <dt-bindings/interrupt-controller/irq.h>
- 
-     platform {
--            switch {
-+            ethernet-switch {
-                     compatible = "realtek,rtl8366rb";
-                     /* 22 = MDIO (has input reads), 21 = MDC (clock, output only) */
-                     mdc-gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
-@@ -163,35 +163,35 @@ examples:
-                             #interrupt-cells = <1>;
-                     };
- 
--                    ports {
-+                    ethernet-ports {
-                             #address-cells = <1>;
-                             #size-cells = <0>;
--                            port@0 {
-+                            ethernet-port@0 {
-                                     reg = <0>;
-                                     label = "lan0";
-                                     phy-handle = <&phy0>;
-                             };
--                            port@1 {
-+                            ethernet-port@1 {
-                                     reg = <1>;
-                                     label = "lan1";
-                                     phy-handle = <&phy1>;
-                             };
--                            port@2 {
-+                            ethernet-port@2 {
-                                     reg = <2>;
-                                     label = "lan2";
-                                     phy-handle = <&phy2>;
-                             };
--                            port@3 {
-+                            ethernet-port@3 {
-                                     reg = <3>;
-                                     label = "lan3";
-                                     phy-handle = <&phy3>;
-                             };
--                            port@4 {
-+                            ethernet-port@4 {
-                                     reg = <4>;
-                                     label = "wan";
-                                     phy-handle = <&phy4>;
-                             };
--                            port@5 {
-+                            ethernet-port@5 {
-                                     reg = <5>;
-                                     ethernet = <&gmac0>;
-                                     phy-mode = "rgmii";
-@@ -241,7 +241,7 @@ examples:
-     #include <dt-bindings/interrupt-controller/irq.h>
- 
-     platform {
--            switch {
-+            ethernet-switch {
-                     compatible = "realtek,rtl8365mb";
-                     mdc-gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
-                     mdio-gpios = <&gpio1 17 GPIO_ACTIVE_HIGH>;
-@@ -255,30 +255,30 @@ examples:
-                             #interrupt-cells = <1>;
-                     };
- 
--                    ports {
-+                    ethernet-ports {
-                             #address-cells = <1>;
-                             #size-cells = <0>;
--                            port@0 {
-+                            ethernet-port@0 {
-                                     reg = <0>;
-                                     label = "swp0";
-                                     phy-handle = <&ethphy0>;
-                             };
--                            port@1 {
-+                            ethernet-port@1 {
-                                     reg = <1>;
-                                     label = "swp1";
-                                     phy-handle = <&ethphy1>;
-                             };
--                            port@2 {
-+                            ethernet-port@2 {
-                                     reg = <2>;
-                                     label = "swp2";
-                                     phy-handle = <&ethphy2>;
-                             };
--                            port@3 {
-+                            ethernet-port@3 {
-                                     reg = <3>;
-                                     label = "swp3";
-                                     phy-handle = <&ethphy3>;
-                             };
--                            port@6 {
-+                            ethernet-port@6 {
-                                     reg = <6>;
-                                     ethernet = <&fec1>;
-                                     phy-mode = "rgmii";
-@@ -330,7 +330,7 @@ examples:
-             #address-cells = <1>;
-             #size-cells = <0>;
- 
--            switch@29 {
-+            ethernet-switch@29 {
-                     compatible = "realtek,rtl8365mb";
-                     reg = <29>;
- 
-@@ -344,36 +344,36 @@ examples:
-                             #interrupt-cells = <1>;
-                     };
- 
--                    ports {
-+                    ethernet-ports {
-                             #address-cells = <1>;
-                             #size-cells = <0>;
- 
--                            port@0 {
-+                            ethernet-port@0 {
-                                     reg = <0>;
-                                     label = "lan4";
-                             };
- 
--                            port@1 {
-+                            ethernet-port@1 {
-                                     reg = <1>;
-                                     label = "lan3";
-                             };
- 
--                            port@2 {
-+                            ethernet-port@2 {
-                                     reg = <2>;
-                                     label = "lan2";
-                             };
- 
--                            port@3 {
-+                            ethernet-port@3 {
-                                     reg = <3>;
-                                     label = "lan1";
-                             };
- 
--                            port@4 {
-+                            ethernet-port@4 {
-                                     reg = <4>;
-                                     label = "wan";
-                             };
- 
--                            port@7 {
-+                            ethernet-port@7 {
-                                     reg = <7>;
-                                     ethernet = <&ethernet>;
-                                     phy-mode = "rgmii";
+--=20
+Regards,
+Kalesh A P
 
----
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-change-id: 20240208-realtek-bindings-fixup-1d8ebaf19dba
+--0000000000008645ed0623a23a7d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Best regards,
--- 
-Linus Walleij <linus.walleij@linaro.org>
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIIaoNNxqqcQfbRa7rLdZfOP2g9sWOraGCef8JJFyNNrPMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwNDA4MTIxM1owaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQA4vtF49ELs
+EibbB/Kca8ZLyugxnZCwDsleqHbPjFltl6tWHART5mf+lfDMywYfq1uhR1TvCpFgcUgRAFtiC898
+24T4MngpSOhveF/oJDBOU4tJORsLVGGVN6eZrvwDo8DgQfbu2+V+S1Jm8rClHE/oAf1JIy9MXl3y
+NaHi2F8PEnV0rkllRWYCKdaAQmMe6cHQkFq9L5Pa+N/az84D/qNp8S8S/jRKKC4zU9VmsAJtrKdg
+3CNh+w4W0bbJs3weQ0J8KBGShFtMp8QOWBkhAQ7Y2TNz/8JBdbKyIr34V85eRMjHOBIVQht2u1hb
+zXh7E4KjZXaWuH3y0Eovu8MMgMnN
+--0000000000008645ed0623a23a7d--
 
