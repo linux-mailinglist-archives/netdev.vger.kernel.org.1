@@ -1,227 +1,88 @@
-Return-Path: <netdev+bounces-132094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A2E990613
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:29:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 417BC990615
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:30:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBC051F20F48
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:29:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3E65B21C80
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4A421733E;
-	Fri,  4 Oct 2024 14:29:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29549217337;
+	Fri,  4 Oct 2024 14:30:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ReclbQ19"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qPzjWtYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ED6217326
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 14:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0271A2178EE;
+	Fri,  4 Oct 2024 14:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728052169; cv=none; b=D1NpL4mAExSIa2DAy+am3SqJviMv5s1ieUD0yOY7LwcVztMe721tAPBR2ZTpHmRYY+VRLjNYfFg49+W63nUa4G3j7V1s/PBWXtsAB0jqRXt7Cbg3pv5wldptWnrWmWXo4VytYgVFqXo1+E0P23xo6k1DHbXols+V/kP3hEPuiRA=
+	t=1728052204; cv=none; b=iuN6OWd2CplIthIrPVFmLr/jf34UuX2X2ovbdwD7Z3A1ubkdDqu42G/16m7k/Sti0yx5LOv6I1XZURoUzhF/zbhd2HJFvLVoFot90kNA4SeWcZxMDqz5utj6oJZdL57ODOwks+Upmw25c07guQre+zFzkrtOgPHhfoa/BjjSD60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728052169; c=relaxed/simple;
-	bh=mE3LWvhRzbJY5LUB/JwX/iB8jrOFlrAg7Z2RWvjpBX4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=mL1++SiyPBUzVeftwGY0f7yj8oCmM1gS9DR7z/ZPEb6OgHB8Ihi1PKVSQpg6VtWXKbZHs+TN24G2PJm6yqrcjF3l1t5aMl+G3ADzKTZa8QkH3AEOnezYocw/vyiVTE9LNNgxmBNmkm1t3YLozEEbqzFuMAzvNaT7l7LSelg9Anw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ReclbQ19; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37cc810ce73so1329472f8f.1
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 07:29:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728052166; x=1728656966; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rYRKMpJ4OBC0LQYCHSn1P6nBU6dgmdu8HhUM6MMa+jE=;
-        b=ReclbQ19DXJBAujsnuXejP7nRdtuC+UMY/UUfYsxpizRmg2uqLUzEZyhGaIh9bAlaa
-         +vkISBMVRcw2F9uo8kBtEZvazFEEUKRHw90M2X294Ui7HQj1Z83AJayfFc8Y3aToBOoJ
-         jm5I5TO10ckFDqPcAATqYMFPW0vmDrNxVLr20zGgMEBAQpt4jY1vRxUhNjVeFOMOAivp
-         jjyPbYlu/C0SDQOguuDLZIruE8Bn8uoCNfAV6Ub/LBOxi9Mb5u95ytBhknQ6RgjisRrd
-         3+8K31zFXzzm82OwjGPHADglm9M0lvQyVKurSgiYBQn15H5xBpcw6c4KY9GzDBrQLra9
-         Cdzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728052166; x=1728656966;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rYRKMpJ4OBC0LQYCHSn1P6nBU6dgmdu8HhUM6MMa+jE=;
-        b=NXl9L7x7lieCSzkEkxHV1iMSb2DAVqrJ3gRnXmHMTBLuMaWiqvqk1a3xf/N+TUT3YC
-         wEdoAWeqsSyzqptcFcMe6nYwm/vgjXuJdmBq7iQhRigEyIRkUcmFKYJdatG8VBFldN52
-         KpGoGDMlCrcXTk9PeDid6tLSxBh6hGg0+BnoKqitLWHtdpsBoyi6OqRg4tffCKJA3HoP
-         xJKpqJB3I4tHekE6/fvV+x3wN3i4UyHChGK0j3WQCbMX+KgyQM82xlLAFbuDpmE/qLeB
-         3tfyK+fOrdRBF/ga1Hfj8cLbr84Jg2O8XgV0fneAaZO5tL91mz2FUBwnVo9ylah22sV6
-         /oUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVq1HCIFGKBW7UHgEDNclbwTqwz2/JHBAa0Iq3HRnUTZprNue4vzn+ZfLRHdrHoK8FAs5CcZsc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyJXcxffrsq2Cd4Bv66oVz5OFzsHNfbsv7laPNd+YGv0s55EOo
-	zGOi8+bEk7KxmMYSuJmdK2pDrjE/k8lp8AfJSOe7JB8nG0UPObyX5eU57rAK6Xo=
-X-Google-Smtp-Source: AGHT+IGfwB1d0G2mnqATVG3785KhqOhSttTikbEtmWl9Q33QYeDl/m5n3wD4HEhVBVCt8hb+z5i61A==
-X-Received: by 2002:a05:6000:1866:b0:37c:c870:b454 with SMTP id ffacd0b85a97d-37d0e8f708fmr2201971f8f.49.1728052165950;
-        Fri, 04 Oct 2024 07:29:25 -0700 (PDT)
-Received: from localhost ([2a09:bac1:27c0:58::31:92])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86a1f42esm17045225e9.4.2024.10.04.07.29.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2024 07:29:25 -0700 (PDT)
+	s=arc-20240116; t=1728052204; c=relaxed/simple;
+	bh=bLKoNb2uB+6OkPrBQ+aR+U5ps5C4/rC8ma63QKADX8o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uD90cQnaIMlDZqK9lsmIUt+srogWTayW7Y9ELH9TTxk+Lg3GQOxI52U2epn5s3no4plGudNY/yBBGdS62CpmHRrlfTOjWYDyvpvaULR8av7YK1OUdRKCnxH4tg+JslcXZEpOf2RtSLpYV1y+lmlbNVy0vliMnXvmZnxJmU4FwxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qPzjWtYa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CE74C4CEC6;
+	Fri,  4 Oct 2024 14:30:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728052202;
+	bh=bLKoNb2uB+6OkPrBQ+aR+U5ps5C4/rC8ma63QKADX8o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qPzjWtYa0SbKSDt3Aq5nATKbFB/82O4p2EVbIc+/dfslN2Vbm1baj3uMfcxoQdjee
+	 vMW8Iuf8YRtaJmZDEkLZCk3EL6/aGbiZy4E8bLGdEwuPsFf28Ik8UgvkebXhKISQ4R
+	 FxqUCEKT4e50771v/McZii9bFVp7zIJJMsJKQ2FOmYWjc6vdqjfiUSIL5HIl5N0Q77
+	 TjTKepGqCdxDYcdNhrpY+1ZTmWwJqEGCMTBN09lRHIyrP1dsFojuj8Q7OrzgAiG6SJ
+	 cjdFxVjiwF6ViRbj58jhulNzhItvRO1hSHn8UFxS4pF7Zb3b0Hz6cuorWO3HrhSTVa
+	 c5KSQENx3XsSQ==
+Date: Fri, 4 Oct 2024 07:30:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ thepacketgeek@gmail.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davej@codemonkey.org.uk, max@kutsevol.com
+Subject: Re: [PATCH net-next v4 00/10] net: netconsole refactoring and
+ warning fix
+Message-ID: <20241004073001.1316717d@kernel.org>
+In-Reply-To: <20241004-shaggy-spectacular-moose-1b3bd6@leitao>
+References: <20240930131214.3771313-1-leitao@debian.org>
+	<20241003172950.65f507b8@kernel.org>
+	<20241004-shaggy-spectacular-moose-1b3bd6@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 04 Oct 2024 16:29:23 +0200
-Message-Id: <D4N3D8N0MUJE.2X8G8YM8UMA3N@bobby>
-From: "Arthur Fabre" <afabre@cloudflare.com>
-To: "Lorenzo Bianconi" <lorenzo@kernel.org>, "Jesper Dangaard Brouer"
- <hawk@kernel.org>
-Cc: "Daniel Xu" <dxu@dxuuu.xyz>, "Stanislav Fomichev"
- <stfomichev@gmail.com>, =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@redhat.com>, "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>, "Jakub
- Sitnicki" <jakub@cloudflare.com>, "Alexander Lobakin"
- <aleksander.lobakin@intel.com>, <bpf@vger.kernel.org>,
- <netdev@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <davem@davemloft.net>, <kuba@kernel.org>, <john.fastabend@gmail.com>,
- <edumazet@google.com>, <pabeni@redhat.com>, <sdf@fomichev.me>,
- <tariqt@nvidia.com>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
- <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
- <mst@redhat.com>, <jasowang@redhat.com>, <mcoquelin.stm32@gmail.com>,
- <alexandre.torgue@foss.st.com>, "kernel-team" <kernel-team@cloudflare.com>,
- "Yan Zhai" <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-X-Mailer: aerc 0.8.2
-References: <87zfnnq2hs.fsf@toke.dk> <Zv18pxsiTGTZSTyO@mini-arch>
- <87ttdunydz.fsf@toke.dk> <Zv3N5G8swr100EXm@mini-arch>
- <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby> <Zv794Ot-kOq1pguM@mini-arch>
- <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
- <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
- <D4N2N1YKKI54.1WAGONIYZH0Y4@bobby>
- <75fb1dd3-fe14-426c-bc59-9a582c4b0e8d@kernel.org>
- <Zv_5KdpkaYY-6z1f@lore-desk>
-In-Reply-To: <Zv_5KdpkaYY-6z1f@lore-desk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri Oct 4, 2024 at 4:18 PM CEST, Lorenzo Bianconi wrote:
-> On Oct 04, Jesper Dangaard Brouer wrote:
-> > On 04/10/2024 15.55, Arthur Fabre wrote:
-> > > On Fri Oct 4, 2024 at 12:38 PM CEST, Jesper Dangaard Brouer wrote:
-> > > > [...]
-> > > > > > > There are two different use-cases for the metadata:
-> > > > > > >=20
-> > > > > > > * "Hardware" metadata (like the hash, rx_timestamp...). There=
- are only a
-> > > > > > >     few well known fields, and only XDP can access them to se=
-t them as
-> > > > > > >     metadata, so storing them in a struct somewhere could mak=
-e sense.
-> > > > > > >=20
-> > > > > > > * Arbitrary metadata used by services. Eg a TC filter could s=
-et a field
-> > > > > > >     describing which service a packet is for, and that could =
-be reused for
-> > > > > > >     iptables, routing, socket dispatch...
-> > > > > > >     Similarly we could set a "packet_id" field that uniquely =
-identifies a
-> > > > > > >     packet so we can trace it throughout the network stack (t=
-hrough
-> > > > > > >     clones, encap, decap, userspace services...).
-> > > > > > >     The skb->mark, but with more room, and better support for=
- sharing it.
-> > > > > > >=20
-> > > > > > > We can only know the layout ahead of time for the first one. =
-And they're
-> > > > > > > similar enough in their requirements (need to be stored somew=
-here in the
-> > > > > > > SKB, have a way of retrieving each one individually, that it =
-seems to
-> > > > > > > make sense to use a common API).
-> > > > > >=20
-> > > > > > Why not have the following layout then?
-> > > > > >=20
-> > > > > > +---------------+-------------------+--------------------------=
---------------+------+
-> > > > > > | more headroom | user-defined meta | hw-meta (potentially fixe=
-d skb format) | data |
-> > > > > > +---------------+-------------------+--------------------------=
---------------+------+
-> > > > > >                   ^                                            =
-                ^
-> > > > > >               data_meta                                        =
-              data
-> > > > > >=20
-> > > > > > You obviously still have a problem of communicating the layout =
-if you
-> > > > > > have some redirects in between, but you, in theory still have t=
-his
-> > > > > > problem with user-defined metadata anyway (unless I'm missing
-> > > > > > something).
-> > > > > >=20
-> > > >=20
-> > > > Hmm, I think you are missing something... As far as I'm concerned w=
-e are
-> > > > discussing placing the KV data after the xdp_frame, and not in the =
-XDP
-> > > > data_meta area (as your drawing suggests).  The xdp_frame is stored=
- at
-> > > > the very top of the headroom.  Lorenzo's patchset is extending stru=
-ct
-> > > > xdp_frame and now we are discussing to we can make a more flexible =
-API
-> > > > for extending this. I understand that Toke confirmed this here [3].=
-  Let
-> > > > me know if I missed something :-)
-> > > >=20
-> > > >    [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
-> > > >=20
-> > > > As part of designing this flexible API, we/Toke are trying hard not=
- to
-> > > > tie this to a specific data area.  This is a good API design, keepi=
-ng it
-> > > > flexible enough that we can move things around should the need aris=
-e.
-> > >=20
-> > > +1. And if we have an API for doing this for user-defined metadata, i=
-t
-> > > seems like we might as well use it for hardware metadata too.
-> > >=20
-> > > With something roughly like:
-> > >=20
-> > >      *val get(id)
-> > >=20
-> > >      set(id, *val)
-> > >=20
-> > > with pre-defined ids for hardware metadata, consumers don't need to k=
-now
-> > > the layout, or where / how the data is stored.
-> > >=20
-> > > Under the hood we can implement it however we want, and change it in =
-the
-> > > future.
-> > >=20
-> > > I was initially thinking we could store hardware metadata the same wa=
-y
-> > > as user defined metadata, but Toke and Lorenzo seem to prefer storing=
- it
-> > > in a fixed struct.
-> >=20
-> > If the API hide the actual location then we can always move things
-> > around, later.  If your popcnt approach is fast enough, then IMO we
-> > don't need a fixed struct for hardware metadata.
->
-> +1. I am fine with the KV approach for nic metadata as well if it is fast=
- enough.
+On Fri, 4 Oct 2024 01:50:13 -0700 Breno Leitao wrote:
+> > Makes sense in general, but why isn't the fix sent to net first, 
+> > and then once the trees converge (follow Thursday) we can apply 
+> > the refactoring and improvements on top?
+> > 
+> > The false positive warning went into 6.9 if I'm checking correctly.  
+> 
+> Correct. I probably should have separated the fix from the refactor.
+> 
+> For context, I was pursuing the warning, and the code was hard to read,
+> so, I was refactoring the code while narrowing down the warning.
+> 
+> But you are correct, the warning is in 6.9+ kernels. But, keep in mind
+> that the warning is very hard to trigger, basically the length of userdata
+> and the message needs to be certain size to trigger it.
 
-Great! That's simpler. I should have something for Jesper to benchmark
-on Monday.
+Understood, and to be honest it's a bit of an efficiency thing on
+maintainer side - we try to avoid shades of gray as much as possible
+because debates on what is and isn't a fix can consume a ton of time.
 
-> If you want I can modify my series to use kfunc sto store data after xdp_=
-frame
-> and then you can plug the KV encoding. What do you think? Up to you.
-
-Thanks for the offer! That works for me :)
+So in networking we push people to send the fixes for net, even if
+triggering the problem isn't very likely.
 
