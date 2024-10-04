@@ -1,94 +1,98 @@
-Return-Path: <netdev+bounces-132061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B45C3990491
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:38:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61DDE990498
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37FAF285BDB
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:38:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07F841F227B6
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24EAA20FAB8;
-	Fri,  4 Oct 2024 13:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79F621018D;
+	Fri,  4 Oct 2024 13:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PptLQ4kE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lj0tX4Fa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E7915B97E;
-	Fri,  4 Oct 2024 13:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFED15B97E;
+	Fri,  4 Oct 2024 13:38:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728049084; cv=none; b=rDs/DwNqyufasd54d9A6J9LcdWDGSg9Hbq1RDZoCUHLa85InCq+yeeQSIGOWapvi4IQtVZ24DGSSLLoZT/APc68tO99AtkZ0fUAFxRYiGoIz41Z10uhn6Aa5SJg4DK5q9cJ7bzjFd/a26o0hS+/6HrVn42+RrNAXz2KoxYh8h20=
+	t=1728049136; cv=none; b=qjI4UrZylYwyjp+IWTXvu0iH2arKUWQAI5gqmptgmmkXZs55dlY8c81JcaYFRRaPnsGKUJfK8N03gS4jnWQ6s0LVTxA5bS4yWNN5pJVxQu5WRzwV+IG4eF1cM+9g4djvQF28fBwBaMo1hB4GlocR9kGQ70Bg/gUxb7Xham6FtJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728049084; c=relaxed/simple;
-	bh=SAv6tE5uobJ/ari3PuahIRMNPmjDcarA8K3D8CHdFh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ITEIOgHPnaZacqm/2tLUyJoT/Z7jlU9L9Kcvbv3kG4/LLYsMG3uFWKWw7kvvCkS2w98bBGKZp0oXQxmt9TYlbFuUff+9qjEdHm3VpVID9SN/4Qf18eFKf4IZhQ015iJYskpwiL352RtWQ6bTKeO/+G18WV/lIlLWuljzsQE4IYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PptLQ4kE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WfuOri6Xulcam+GOkQMwfbcVmN85Q+p2dGxMABOyHw4=; b=PptLQ4kE594fyVPFXXQ6CHrs2p
-	x1leUj0XMb/Fo1Poh1k4zCPWCpmE84pkaMUh5Gg3P7HIZ2FY+jyzkrncKIds9e9LRR6yzLOfH6GCU
-	SH7T3enaeCohiDygwNx1H/CVbHnLxxnPEqtxn9iZRJjBCv1bd66/7kfPtfin8AVROyKI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swiVJ-00935M-Dr; Fri, 04 Oct 2024 15:37:57 +0200
-Date: Fri, 4 Oct 2024 15:37:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: boqun.feng@gmail.com, dirk.behme@de.bosch.com, aliceryhl@google.com,
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com
-Subject: Re: iopoll abstraction
-Message-ID: <d2351ed1-c77c-4a2c-a0ed-d23d9bcc388a@lunn.ch>
-References: <20241003.134518.2205814402977569500.fujita.tomonori@gmail.com>
- <Zv6pW3Mn6qxHxTGE@boqun-archlinux>
- <203e2439-4bba-4a0a-911b-79c81646a714@lunn.ch>
- <20241004.204803.2223000488444244418.fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1728049136; c=relaxed/simple;
+	bh=MbwCBbQfVBOEVxdvZYeuqOkCdxo6nLHQpcZl976M6o0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FVJwiiSkXl3ITyGNmclhoxPkuB1u2eGrakaKvzjIthZmRQ9cWty3I1KealgJEjEfmusBpl5tGf/q8a9aAgulGPSFTbB0DdPRjfuEwUyKOKRVOjYYg2+MOpTTW6MvM71JLU+jTefxdJXhdyXOpc/H87yxQ7Al/PD0GRtYJcJANag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lj0tX4Fa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E01DAC4CEC6;
+	Fri,  4 Oct 2024 13:38:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728049136;
+	bh=MbwCBbQfVBOEVxdvZYeuqOkCdxo6nLHQpcZl976M6o0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lj0tX4FaMuRJS1fv4v7zpxIlE0o/Za6sIyhw/UD2qmRYqLiPx0rtogMqJg+995uV3
+	 sIs4vTIJC5UPeDaOijmMTNyG1Tqe56y4NFTE4tGfbY9opoXVl8anZciVlRfYCDUei4
+	 gWcIOdvjlMkHMLNi+R8yWt+qAc6meUCa0nv83nmqd6n6wAnxg/EuLxqQNTdxiz6jHk
+	 TEbZd1oCh1es3pn0vdxrAkxZaoBg+0n41vjSTpU82HxxJqvz/9zFBslJp+FVS43JTV
+	 GyLD1VUCfI/ZZI0Bc3DsE1m2Yqgb5HkjP43E4deW14wK7p6uRiWHyXtUMWaWdyYmQ4
+	 oib+OzhqAku+w==
+Date: Fri, 4 Oct 2024 06:38:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Antonio Quartulli <antonio@openvpn.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, sd@queasysnail.net, ryazanov.s.a@gmail.com
+Subject: Re: [PATCH net-next v8 01/24] netlink: add NLA_POLICY_MAX_LEN macro
+Message-ID: <20241004063855.1a693dd1@kernel.org>
+In-Reply-To: <m2msjkf2jn.fsf@gmail.com>
+References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
+	<20241002-b4-ovpn-v8-1-37ceffcffbde@openvpn.net>
+	<m2msjkf2jn.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004.204803.2223000488444244418.fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 08:48:03PM +0900, FUJITA Tomonori wrote:
-> On Thu, 3 Oct 2024 18:09:15 +0200
-> Andrew Lunn <andrew@lunn.ch> wrote:
+On Fri, 04 Oct 2024 13:58:04 +0100 Donald Hunter wrote:
+> > @@ -466,6 +466,8 @@ class TypeBinary(Type):
+> >      def _attr_policy(self, policy):
+> >          if 'exact-len' in self.checks:
+> >              mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
+> > +        elif 'max-len' in self.checks:
+> > +            mem = 'NLA_POLICY_MAX_LEN(' + str(self.get_limit('max-len')) + ')'  
 > 
-> > We probably also want a comment that this helper cannot be used in
-> > atomic context.
-> 
-> Yeah, I'll add such.
-> 
-> > Do we have a Rust equivalent of might_sleep()?
-> > 
-> > https://elixir.bootlin.com/linux/v6.12-rc1/source/include/linux/kernel.h#L93
-> 
-> No. I'll add bindings for might_sleep() and cpu_relax().
+> This takes precedence over min-length. What if both are set? The logic
+> should probably check and use NLA_POLICY_RANGE
 
-Please make sure you involve the scheduler people. This is now well
-outside of networking, same as the discussion around time has little
-to do with networking.
+Or we could check if len(self.checks) <= 1 early and throw our hands up
+if there is more, for now?
 
-The might_sleep() is not a strong requirement for iopoll, so you might
-want to get the basic functionality merged first, and then once
-might_sleep() is agreed on, add it to iopoll. It is just a debug
-feature.
+> >          else:
+> >              mem = '{ '
+> >              if len(self.checks) == 1 and 'min-len' in self.checks:  
+> 
+> Perhaps this should use NLA_POLICY_MIN_LEN ? In fact the current code
+> looks broken to me because the NLA_BINARY len check in validate_nla() is
+> a max length check, right?
+> 
+> https://elixir.bootlin.com/linux/v6.11.1/source/lib/nlattr.c#L499
+> 
+> The alternative is you emit an explicit initializer that includes the
+> correct NLA_VALIDATE_* type and sets type, min and/or max.
 
-	Andrew
+Yeah, this code leads to endless confusion. We use NLA_UNSPEC (0) 
+if min-len is set (IOW we don't set .type to NLA_BINARY). NLA_UNSPEC 
+has different semantics for len.
+
+Agreed that we should probably clean this up, but no bug AFAICT.
 
