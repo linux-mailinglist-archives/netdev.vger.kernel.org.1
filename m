@@ -1,199 +1,180 @@
-Return-Path: <netdev+bounces-131870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D818398FC97
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 05:58:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF6D98FC9B
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AA29283C29
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC7032822B5
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D62543D982;
-	Fri,  4 Oct 2024 03:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0148F3D982;
+	Fri,  4 Oct 2024 04:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUmrGfaU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NlSWV+zG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088FC1876;
-	Fri,  4 Oct 2024 03:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A799475
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 04:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728014285; cv=none; b=FM4FQLCfJQpiXm+6SL1CD4e7QxseRXB9Sc+5srq/1O/9vKmjK6aPjYCyA+/1XBRPbVY4Ix0Zpd/2hQGkkTNrm56jgif1x6OYrI8qYRscw78sGvYCt/KqCa4JARElsdhfPzgRaPonfOjmVLwBjlhw1bhq2ZeylHuE6ocRPDs+Mq8=
+	t=1728014432; cv=none; b=FsWetqCnKepDooncDv7IHHkvN3bqWycoCNr1zSgk5KbXl+gcvmk0RE3GYcCG1QWtLIMrdcQe825fHj/VPL5qM3l+eDP5DPZWZQAVUWlafrLaX8GFzRBtfBv8wAcdNIlXWWnEU/7rAv1WqZGksblmVK9rmSOhtGj7GJb2AsDZ3tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728014285; c=relaxed/simple;
-	bh=AwSGznrR3WC2D1TsXQBXBds+683tpB7Pik4CHBLfs2M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X9pYSkf9JXHTiZCWZQ6o0KzmRTxSPYnPSS4w43pO4UReObyTuvEfnJ1i6tMOZhlYeXHW2t32+JQCw1qVAQD3fGGD64NQjiNZLeB9nqr487yQLfhyLj6r56RBqzE10xpYtzfMeQZmB7WxfQKobDGiaEUiGg44icTV9f46jAXmQK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUmrGfaU; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c88e45f467so2794899a12.1;
-        Thu, 03 Oct 2024 20:58:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728014282; x=1728619082; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sBl4ky6od+/pL5FKy6uBonSrJk3T+eK4daQjsHg2Fwc=;
-        b=QUmrGfaUWDQSWUtq5b1GPe+bS+PWUbgBuYFDAobpjELDyQmiK4b5q7uw+Ev322oQ8r
-         uUjrdYcy/hFJC2LvKyiV+6/+hUYyP7im3Q4CQgYA6uHBFlSARvwMjv85WjgGHaCNT+hx
-         oHkg1r1SNuVZcbyz4rO7bAqa7uBRkOJ5D+3TKM35ZxPMaIVa2XBQYZuPDnu2vTGxN4mt
-         5vc6UV7TAO4pxwZPNJpaPPo0DQVr/j7diQ6G48HcJccyzHM+Xy8loDjS0tFO9CDEGwty
-         KezcaPO9kzOsSpA27cAy20McujgFOG+KDiXmRkZsPYBe7FvrFMFKyJzHUWXnamu4nAaU
-         hmmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728014282; x=1728619082;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sBl4ky6od+/pL5FKy6uBonSrJk3T+eK4daQjsHg2Fwc=;
-        b=FloY8HC2YOq3SmnMJV//qNs0NxtSw6DFzAxH/RYFPUSea6mYFZBnkcp4piQ9Ilz6nO
-         kl3I264SAbFJrJRGnxGAX81wDrlyE6+1gXCWgvqsmUK/Thzhrl9d5CSspwREskPjKvHJ
-         VgAcpaSouV+qHpGQAh75xbJaW2ClipPkapbuGTgxVw1roANpymLSc/zmfsA2sL7PMAZd
-         qLGx8MAc1XW3lNg1lS/npNQbcd7DJnasry75TueGnrcu8j3eSA5vJutN8cuIQa4+99Oh
-         FZE1Yj8QsDoK0e1NCXdbd8sAXOFh+/Z2zNC+t2TV4EoBtFMN6Zmv0ejHaJGfcIPFkTVi
-         WGGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEMQEsbBVO2OqTv6dkRVv5xyHP+XrgjB3DW0q7xcKK2bWQhz7TmQoAQjkQiELvgwGYo4cBnNL3@vger.kernel.org, AJvYcCXgKSKl684NVVmEeRKPthH7opImuXiHfdP78nBDv2/TCkZHfLWDK2eJtV8GBrIHpXU15yVKq9vtU5o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOOXBNLnLGJ+a1erczZ861xAS6upWXplikbqATnYpH6leUboTp
-	k+aon1v7ie+w1ezZZlQN4BKKb0LLhQheDo26ghDATE2ywaecB/toJ6/DxGYMeRsEq4901AwJgCM
-	rnScZld34JE0mKTbZZEUaUonXD30=
-X-Google-Smtp-Source: AGHT+IHciwcWEFRS2qe2KxhQISTUJvfOitpn4Zr4fd5jigXxJ4Bts/6yrlkhTIkQK4wTp1NeFq8dWWnqlh59wCxdiFI=
-X-Received: by 2002:a05:6402:13cb:b0:5c4:1c0c:cc6d with SMTP id
- 4fb4d7f45d1cf-5c8c08d3e64mr5843321a12.0.1728014281879; Thu, 03 Oct 2024
- 20:58:01 -0700 (PDT)
+	s=arc-20240116; t=1728014432; c=relaxed/simple;
+	bh=3Z7c/wBfN2zeA3acuNBiKHtvX5WGERkpd4FWQk2H9BQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CXco+L3Euro/L3QP5O0GLUqjkLOXWYk49wf+HL4/XKoWnEzHV+bijSY8fDadjW0cQmmLzfw7m7eMnEvZ3jIu9jj0CMx8UcvinKHsBrmBtPrxcLbPSFBJvIp8gT3PwbywdYIYL0KTpTKpS18YE7Gk5+/lhb6f9l09lZ9MqIN7FGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NlSWV+zG; arc=none smtp.client-ip=91.218.175.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <341af7e1-7817-4aca-97dc-8f2813a086df@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728014428;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZNQRCxMBz5ZWdzX3UDIe7nauhj263vm6VCZvYNip50E=;
+	b=NlSWV+zGCTyP4Pqc7/XWPASsNMjkm4WkxEKNmbiLzgDsVBcrzRA0suPyrZ50sCDpSVqPFn
+	xJZI38QpnkLr7er5lhWFgTFhg5Xe+GBVzq+cy5OdcVnvmYnFHpzQpOb6aieKVs/w0xCOeZ
+	s/jGVGgMHbCXF1BqQI7Dpc5id3JrNsQ=
+Date: Thu, 3 Oct 2024 21:00:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-6-ap420073@gmail.com>
- <CAHS8izNwnBnZf6P0WtAcg+MjmaxXDZ++kYit8_Ac8r6y=cDMAQ@mail.gmail.com>
-In-Reply-To: <CAHS8izNwnBnZf6P0WtAcg+MjmaxXDZ++kYit8_Ac8r6y=cDMAQ@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Fri, 4 Oct 2024 12:57:50 +0900
-Message-ID: <CAMArcTWP8KNWiYt7xf=yj=e45fJuqg8ENi8CowtfBLy0DEMUYQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/7] net: devmem: add ring parameter filtering
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Question]: A non NULL req->sk in tcp_rtx_synack. Not a fastopen
+ connection.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: bpf@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org
+References: <eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev>
+ <20241004020255.36532-1-kuniyu@amazon.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241004020255.36532-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Oct 4, 2024 at 3:29=E2=80=AFAM Mina Almasry <almasrymina@google.com=
-> wrote:
->
+On 10/3/24 7:02 PM, Kuniyuki Iwashima wrote:
+> From: Martin KaFai Lau <martin.lau@linux.dev>
+> Date: Thu, 3 Oct 2024 18:14:09 -0700
+>> Hi,
+>>
+>> We are seeing a use-after-free from a bpf prog attached to
+>> trace_tcp_retransmit_synack. The program passes the req->sk to the
+>> bpf_sk_storage_get_tracing kernel helper which does check for null before using it.
+>>
+>> fastopen is not used.
+>>
+>> We got a kfence report on use-after-free (pasted at the end). It is running with
+>> an older 6.4 kernel and we hardly hit this in production.
+>>
+>>   From the upstream code, del_timer_sync() should have been done by
+>> inet_csk_reqsk_queue_drop() before "req->sk = child;" is assigned in
+>> inet_csk_reqsk_queue_add(). My understanding is the req->rsk_timer should have
+>> been stopped before the "req->sk = child;" assignment.
+> 
+> There seems to be a small race window in reqsk_queue_unlink().
+> 
+> expire_timers() first calls detach_timer(, true), which marks the timer
+> as not pending, and then calls reqsk_timer_handler().
+> 
+> If reqsk_queue_unlink() calls timer_pending() just before expire_timers()
+> calls reqsk_timer_handler(), reqsk_queue_unlink() could miss
+> del_timer_sync() ?
 
-Hi Mina,
-Thanks a lot for the review!
+This seems to explain it. :)
 
-> On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wr=
-ote:
-> >
-> > If driver doesn't support ring parameter or tcp-data-split configuratio=
-n
-> > is not sufficient, the devmem should not be set up.
-> > Before setup the devmem, tcp-data-split should be ON and
-> > tcp-data-split-thresh value should be 0.
-> >
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v3:
-> >  - Patch added.
-> >
-> >  net/core/devmem.c | 18 ++++++++++++++++++
-> >  1 file changed, 18 insertions(+)
-> >
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index 11b91c12ee11..a9e9b15028e0 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -8,6 +8,8 @@
-> >   */
-> >
-> >  #include <linux/dma-buf.h>
-> > +#include <linux/ethtool.h>
-> > +#include <linux/ethtool_netlink.h>
-> >  #include <linux/genalloc.h>
-> >  #include <linux/mm.h>
-> >  #include <linux/netdevice.h>
-> > @@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devi=
-ce *dev, u32 rxq_idx,
-> >                                     struct net_devmem_dmabuf_binding *b=
-inding,
-> >                                     struct netlink_ext_ack *extack)
-> >  {
-> > +       struct kernel_ethtool_ringparam kernel_ringparam =3D {};
-> > +       struct ethtool_ringparam ringparam =3D {};
-> >         struct netdev_rx_queue *rxq;
-> >         u32 xa_idx;
-> >         int err;
-> > @@ -146,6 +150,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_dev=
-ice *dev, u32 rxq_idx,
-> >                 return -EEXIST;
-> >         }
-> >
-> > +       if (!dev->ethtool_ops->get_ringparam) {
-> > +               NL_SET_ERR_MSG(extack, "can't get ringparam");
-> > +               return -EINVAL;
-> > +       }
-> > +
-> > +       dev->ethtool_ops->get_ringparam(dev, &ringparam,
-> > +                                       &kernel_ringparam, extack);
-> > +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT=
-_ENABLED ||
->
-> The way I had set this up is that the driver checks whether header
-> split is enabled, and only sets PP_FLAG_ALLOW_UNREADABLE_NETMEM if it
-> is. Then core detects that the driver did not allow unreadable netmem
-> and it fails that way.
->
-> This check is redundant with that. I'm not 100% opposed to redundant
-> checks. Maybe they will add some reliability, but also maybe they will
-> be confusing to check the same thing essentially in 2 places.
->
-> Is the PP_FLAG_ALLOW_UNREADABLE_NETMEM trick not sufficient for you?
+Does it mean there is a chance that the reqsk_timer_handler() may rearm the 
+timer again and I guess only a few more synack will be sent in this case and 
+should be no harm?
 
-Ah okay, I understand.
-It looks like it's already validated enough based on
-PP_FLAG_ALLOW_UNREADABLE_NETMEM.
-I tested how you guided it, and it works as you intended.
-It's a duplicated validation indeed, so I will drop this patch in a v4.
+> 
+> ---8<---
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+> index 2c5632d4fddb..4ba47ee6c9da 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -1045,7 +1045,7 @@ static bool reqsk_queue_unlink(struct request_sock *req)
+>   		found = __sk_nulls_del_node_init_rcu(sk);
+>   		spin_unlock(lock);
+>   	}
+> -	if (timer_pending(&req->rsk_timer) && del_timer_sync(&req->rsk_timer))
+> +	if (del_timer_sync(&req->rsk_timer))
 
-Thanks a lot!
-Taehee Yoo
+It seems the reqsk_timer_handler() will also call reqsk_queue_unlink() through 
+inet_csk_reqsk_queue_drop_and_put(). Not sure if the reqsk_timer_handler() can 
+del_timer_sync() itself.
 
->
-> > +           kernel_ringparam.tcp_data_split_thresh) {
-> > +               NL_SET_ERR_MSG(extack,
-> > +                              "tcp-header-data-split is disabled or th=
-reshold is not zero");
-> > +               return -EINVAL;
-> > +       }
-> > +
-> >  #ifdef CONFIG_XDP_SOCKETS
-> >         if (rxq->pool) {
-> >                 NL_SET_ERR_MSG(extack, "designated queue already in use=
- by AF_XDP");
-> > --
-> > 2.34.1
-> >
->
->
-> --
-> Thanks,
-> Mina
+>   		reqsk_put(req);
+>   	return found;
+>   }
+> ---8<---
+> 
+> 
+>>
+>> or there are cases that req->sk is not NULL in the reqsk_timer_handler()?
+>>
+>> BUG: KFENCE: use-after-free read in bpf_sk_storage_get_tracing+0x2e/0x1b0
+>>
+>> Use-after-free read at 0x00000000a891fb3a (in kfence-#1):
+>> bpf_sk_storage_get_tracing+0x2e/0x1b0
+>> bpf_prog_5ea3e95db6da0438_tcp_retransmit_synack+0x1d20/0x1dda
+>> bpf_trace_run2+0x4c/0xc0
+>> tcp_rtx_synack+0xf9/0x100
+>> reqsk_timer_handler+0xda/0x3d0
+>> run_timer_softirq+0x292/0x8a0
+>> irq_exit_rcu+0xf5/0x320
+>> sysvec_apic_timer_interrupt+0x6d/0x80
+>> asm_sysvec_apic_timer_interrupt+0x16/0x20
+>> intel_idle_irq+0x5a/0xa0
+>> cpuidle_enter_state+0x94/0x273
+>> cpu_startup_entry+0x15e/0x260
+>> start_secondary+0x8a/0x90
+>> secondary_startup_64_no_verify+0xfa/0xfb
+>>
+>> kfence-#1: 0x00000000a72cc7b6-0x00000000d97616d9, size=2376, cache=TCPv6
+>>
+>> allocated by task 0 on cpu 9 at 260507.901592s:
+>> sk_prot_alloc+0x35/0x140
+>> sk_clone_lock+0x1f/0x3f0
+>> inet_csk_clone_lock+0x15/0x160
+>> tcp_create_openreq_child+0x1f/0x410
+>> tcp_v6_syn_recv_sock+0x1da/0x700
+>> tcp_check_req+0x1fb/0x510
+>> tcp_v6_rcv+0x98b/0x1420
+>> ipv6_list_rcv+0x2258/0x26e0
+>> napi_complete_done+0x5b1/0x2990
+>> mlx5e_napi_poll+0x2ae/0x8d0
+>> net_rx_action+0x13e/0x590
+>> irq_exit_rcu+0xf5/0x320
+>> common_interrupt+0x80/0x90
+>> asm_common_interrupt+0x22/0x40
+>> cpuidle_enter_state+0xfb/0x273
+>> cpu_startup_entry+0x15e/0x260
+>> start_secondary+0x8a/0x90
+>> secondary_startup_64_no_verify+0xfa/0xfb
+>>
+>> freed by task 0 on cpu 9 at 260507.927527s:
+>> rcu_core_si+0x4ff/0xf10
+>> irq_exit_rcu+0xf5/0x320
+>> sysvec_apic_timer_interrupt+0x6d/0x80
+>> asm_sysvec_apic_timer_interrupt+0x16/0x20
+>> cpuidle_enter_state+0xfb/0x273
+>> cpu_startup_entry+0x15e/0x260
+>> start_secondary+0x8a/0x90
+>> secondary_startup_64_no_verify+0xfa/0xfb
+>>
+>> Thanks,
+>> Martin
+
 
