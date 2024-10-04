@@ -1,109 +1,135 @@
-Return-Path: <netdev+bounces-132031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B937A9902B2
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:08:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17EFC9902B3
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8EFE1C211EE
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:08:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95F5EB2368B
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818DE15CD64;
-	Fri,  4 Oct 2024 12:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC2715C120;
+	Fri,  4 Oct 2024 12:08:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwVW/OSO"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="C0VDbTky"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1690315C121;
-	Fri,  4 Oct 2024 12:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4793C15B99E;
+	Fri,  4 Oct 2024 12:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728043716; cv=none; b=iYzPPUeECVmmLsJ0l0IUtjBso9jMJx4nCMCYCdy+eqHq3N/eDJHxY61bsK21sP3FSd4sj/LSl1RRrSGlMtOlkUM0tFFyRBvMeUC+1S+p3YWe5JMPQNEqBxogH+EyPLzr5cxSBhdjUeqKQwRObQaqa4zpjS0WtCl6JtHhSi6P7Ck=
+	t=1728043728; cv=none; b=uJGAHMDePVIYVa1b9KcB7Q/u/fAGzgx6U70ezzecYR2dba5LoZ1WYR7f/FO1Zh/drV5aE9iBDNAaY1LgKqBLwiJDxpp27h9gW3xMigjGITNDWFlVfbqVQ+OCh6ldfnLot6D2VqJXs+0o/ZEfVJIgjubT6lEK1E622vWW5uJwSVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728043716; c=relaxed/simple;
-	bh=JPed9/QJevwfntRlcIkPect3/WkrDR9pOyxYyQZkKgQ=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=r3aPf8IGXjZTZqYVcKVzzD52UloPRdVuGzjNYDbA1NHtcFgvx6xieSU1Wtn5R2sFFpv6oGeFGV6VzCa43sP2LjespfnhA5plcRVWsWJh6ngFzgrUDntgYIHqDXGZt3rumBsuIhZrnjUeEWDS65/eXm6WE9KO7ZTQT5VlwR2yP6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MwVW/OSO; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20b78ee6298so12688715ad.2;
-        Fri, 04 Oct 2024 05:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728043714; x=1728648514; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p4uHfljjdM6prAXR1fYXZLisMASJ67uOgKvibzFyhcU=;
-        b=MwVW/OSOz57nwjNQrPP7Mid9xGDGVWDoH0lm4OKHQW/6srHMoHdJk+z4U7jjSZLsWg
-         7vLqvZ900RONcTy+x3R6PX/SapEUYIk9v77GnXRof8ws6bOGlf+TD2ASp7fBJ0uJe/uu
-         aNvxhReX56nRVlYaRGOk0YQzEZGElILo/MXiXn3TM940r7aOCepHE+SXFUzU6jOYl505
-         /zaYl01l3+TFHanfJpvkvH7OP7itEXK/fT/WxD0hgOWxM0diwZC8Dc+xYkebtwkCc5Rd
-         4sTGpLbILdMlubAlIWXEUaF0eVq1XXZEfiQLW/LZ9HGT9go8UXSywhNJtclcmXlXrN4b
-         VzkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728043714; x=1728648514;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=p4uHfljjdM6prAXR1fYXZLisMASJ67uOgKvibzFyhcU=;
-        b=YS9e2AuBVSW1QmlKPCBasBaMPYuphE4/Wq+GCIAyAhx5vjLVgRXOQtXOOt8JTDtYYy
-         UwoTLUrpaqQXyBdU0uRyFwfl8Lks7avtxVp9phNnmF7C4AgoiKv5QR7FejmfzLr0YOiM
-         Yt+Fgoq7mfsnJs3a7JpgROuZExaDfV/OhFMhHQZEXDgKqv5YxD5TEk7GB1T74Dz8zjRs
-         dj/6/VghkTDNZxDS6xAjUpcHnQmrX5qJOzMCr22erqbR7jHay29VWna/xwhc8BXCLC0K
-         L1l63P1HZvtuA+ZnsVk4G9gFLUbAFjBuUkk4TMMUbAYYSWixW/XG4M7Xd/v+zxAnc418
-         SJqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWEflk0lgPfhLc0rqDsYGeNQ66Zt0sE25Ar5jAJGUhrcxFT3RZ1H+z+nvuBAzovuwN9KyNtmejY9KaXekbJnfk=@vger.kernel.org, AJvYcCWTu3zX8hqbcreJl9J/FEUF7CU76Op00zfzy9hMKXhNy/Xi4Eh6A43b0MJpW5QJjInAdqCH0NU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8kK6p1ArCph25wptB/DShWZpCuJeRc2JT2Nd4MLU208vEo9Cs
-	oyMm9SjxxxC7fqjnyh1aqbGHoJ01xK9MVW7HyTqcLZWghauwDJFT
-X-Google-Smtp-Source: AGHT+IFSM38c/Z2OOdcMail1JBfLJF75MEi8Yd45SG/8JBtGN9H25DwWSYyYLy737kBpO8Je+KgYYg==
-X-Received: by 2002:a17:902:ecc9:b0:20b:4f95:9325 with SMTP id d9443c01a7336-20bfdfb4cdbmr40154915ad.17.1728043714009;
-        Fri, 04 Oct 2024 05:08:34 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20bef707035sm22821125ad.275.2024.10.04.05.08.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 05:08:33 -0700 (PDT)
-Date: Fri, 04 Oct 2024 21:08:19 +0900 (JST)
-Message-Id: <20241004.210819.1707532374343509254.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
- ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
-	<20241001112512.4861-2-fujita.tomonori@gmail.com>
-	<b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
+	s=arc-20240116; t=1728043728; c=relaxed/simple;
+	bh=PNoRABAxxGHN+gWreU+upS1oZMnOjX2mtQk2A4lRsD8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZuNMYEPVo34nWZF0zgtlTWUMNfkYw+ZjEdtUwcFd1r2HBDkGyxEwiFLuEvn3yQ/ABj7/xSuOPhrNsBN0n6KaywucUFjCLjZ8pzXQGhYTth+Ng8ThcxzKpPDTBFkvRGk6L6JPUylXAN7RqHC+3TZTPsxEUs7GfYR1dRBkA7GT8L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=C0VDbTky; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=44Xt4YN/Xf2l//UJjhes9TdlgKq7DvXnQRjPRVK23fE=; b=C0VDbTkyC3Qyc8wWZHo0nlWTzN
+	z6EAIzHkCehHZWkLfF2xMYzhMRHWoPy7AJvxflhWG3aeVf0R/39XnWVlFotxfKYnNk3DlhA0U+wKZ
+	7O6IgNkhkAaMy/YGC4RHzPpu7PDcQf8AuB3vaV5lbhRceQTF3J7rhQAle0ppS9z/f+rLrCW7FwQ9e
+	hkV+C+BeMK+J+pfW3A4OhYiPhh9SUvcsjPS7FKGvi8KoV0XTgVSe+1SMcx1iWfXT9yEQqRl2iav6w
+	sVs9Yw/42PqixwDXAl8GyZw7l4VdCJEUAhmaZe9b2kRov/KYozNaV1IKl1AE6iuR0PVWCu2/msqVK
+	tBkK3dRw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1swh6t-0002tz-76; Fri, 04 Oct 2024 14:08:39 +0200
+Received: from [178.197.249.47] (helo=[192.168.1.114])
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1swh6s-000HTD-1f;
+	Fri, 04 Oct 2024 14:08:38 +0200
+Message-ID: <51371534-5813-480f-b797-f073c31df5de@iogearbox.net>
+Date: Fri, 4 Oct 2024 14:08:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 1/6] xsk: get rid of xdp_buff_xsk::xskb_list_node
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ ast@kernel.org, andrii@kernel.org
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org
+References: <20241002155441.253956-1-maciej.fijalkowski@intel.com>
+ <20241002155441.253956-2-maciej.fijalkowski@intel.com>
+Content-Language: en-US
+From: Daniel Borkmann <daniel@iogearbox.net>
+Autocrypt: addr=daniel@iogearbox.net; keydata=
+ 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
+In-Reply-To: <20241002155441.253956-2-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27417/Fri Oct  4 10:53:24 2024)
 
-On Tue, 1 Oct 2024 14:31:39 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
->> +/// Sleeps for a given duration.
->> +///
->> +/// Equivalent to the kernel's [`fsleep`] function, internally calls `udelay`,
->> +/// `usleep_range`, or `msleep`.
+On 10/2/24 5:54 PM, Maciej Fijalkowski wrote:
+> Let's bring xdp_buff_xsk back to occupying 2 cachelines by removing
+> xskb_list_node - for the purpose of gathering the xskb frags
+> free_list_node can be used, head of the list (xsk_buff_pool::xskb_list)
+> stays as-is, just reuse the node ptr.
 > 
-> Is it possible to cross reference
-> Documentation/timers/timers-howto.rst ?  fsleep() points to it, so it
-> would e good if the Rust version also did.
+> It is safe to do as a single xdp_buff_xsk can never reside in two
+> pool's lists simultaneously.
+> 
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 
-Looks like the pointer to Documentation/timers/timers-howto.rst in
-fsleep will be removed soon.
-
-https://lore.kernel.org/all/20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de/
+Given you send v2 anyway, pls also double check the clang errors from netdev CI:
+https://netdev.bots.linux.dev/static/nipa/894909/13820003/build_clang/summary
 
