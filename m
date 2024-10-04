@@ -1,160 +1,100 @@
-Return-Path: <netdev+bounces-132203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 527F0990F87
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:01:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF35C990F8A
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76FDA1C231BF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:01:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0B7D1C20AC8
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:02:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6276E1FA24F;
-	Fri,  4 Oct 2024 19:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE5761FB3C0;
+	Fri,  4 Oct 2024 19:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmHB+6+y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBrAXMps"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1EE1F9ABD;
-	Fri,  4 Oct 2024 19:04:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7BB71F891F
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728068680; cv=none; b=ElaLe8W4GR9YRIJ+YdCidlJdPFAOjC6dvtq9csBvwlm1bg0KUkgxN54huXchnmJjTdSyU2k6ByFnZ+FTSVXvjlYMRypN8kfj1TRtvHiedh5mbeZL/T1mXbId7f+MUm7tXVwPfin0+QQ6/ffWR2W8TfPmAgJ8sshFPVUUKOGf8nw=
+	t=1728069031; cv=none; b=M/UqQh3wOy8ZcMgQXBTQqLxqEPUbGbBv8ZP2+2O2xqh53WZLjHwyszAoFOzWXVtWaSUcUUXg9TqPUL8+FmR3SmQPpowz9b6LvKTfBcldPXgAgIbljKhDzv9RyDvij2ocxhlY5ZelsFxk0J0foo+dRrgvFfsMTccx6f+JGjDNJfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728068680; c=relaxed/simple;
-	bh=dg2TEPNt6m3xvH7rSPBqehMHHHswR0bUQaAIRYJds+0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FWSQoyMZkYA2vwYsM1H+eOK8EUBZEJ6myBYM8vBjVkZAmXfynGTZx5ux+uBw0RU3VIWvb8ZB9omQv6l7r6WomrhWfJvaz3ndgJTERdsA1G/EAP9hxOeZfcDBcyiwJkk2QN1Fki/7Rg12BqXtnQr03bUg9OBg7V8Dkph5+QeQwvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LmHB+6+y; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6de14e0f050so20180547b3.0;
-        Fri, 04 Oct 2024 12:04:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728068677; x=1728673477; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B5HfbdgHbABODTaTjHs2WrlvZ31IfcWLv08zvorE0ME=;
-        b=LmHB+6+y5me57h2Jk+M7zorgLBLfmL4lbkatp2t3LUeC3pVz7J+H4dpKFDKHcJSSaz
-         EekHA4TmlvuNo3y55Bsli43rvvFYgUoUx2dgLsH0fM/OV19h02yPoQexGrNgafiwE3jL
-         J6yfPeZnoyGbn6ll2KteKWQtNiapYdXz+AwKFy02aKQr3G7jgl30IT8T5qQbbJi7kUND
-         Ddt5Lko8xuZ5okuD0yMfozBlMQym7So+zqr2r4IAu83IOWHNYQ8TMMnk+LJFuRhDcQac
-         LJNfRPjw+cRPL3jpbAe1NoxCpcTBQWkj+ogTqr6uwXvwaAA2oeBd85p53hqOzVH+gT5R
-         aR5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728068677; x=1728673477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B5HfbdgHbABODTaTjHs2WrlvZ31IfcWLv08zvorE0ME=;
-        b=CEVNcRkRYm1dadIdoZMW/UZJl4mDZRcxBeLmZK0+1nyRa2Js5aGT3lLg1ePwD/qGN0
-         n60p5Z6YpT6LwpRW4IhwxJXb4lH8VKhP8vaAgzKTsg2zP3ak2Xio4Y1OBQaLr38UyEa8
-         rdEywqEQigUBAekFfS8meRlec+QoUiBS3efBTsYymA7r64ZRmEFhRebGDbQ4B/sbA5fa
-         tToR3jJmDRx/9O9KSI/fQmmByrlKWkwtAxhwGeed+lixwGvAxAqVrWuCfGVprlphRaB3
-         1HLh2YT0zkJu/Y0Bdy/hGZNa6hmE2Z77t++pABAf/l+/W81uW03Dg9c0kFqitZ/g16Fy
-         vk3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbLlQKH0pBe53j9sM2WJf9nGM2xgwDdohp5nRpn8QmEz6JhBQiu7KY9riY5WGY15jEsoHMSVMBjRGf5Tcy@vger.kernel.org, AJvYcCVYfE4tKprEzFA9Ew9X6oplWIYkdajE6anDvdKzqwnsyLTpnUuZRxQ7VdrQ6EVuw6E2kmZ7Hh1B@vger.kernel.org, AJvYcCXeIhL2Rru3MGaykU/nSFE8m0nYHsxfP/HOttpaAOa8oqQB2TbI7qOI25IHLXnp+OBkw2UX+THO4XiYNy2u@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoB0PzttdmvOADSle2f/BSOvYnn0apuEn1oqI3QSd5o3ZUIXVp
-	OhybWp5XLjWLZQIx2/qD3hjErPbwPkQL2g4fzP918qbMDjVcm+hWsHvzVZmcK7h41TeoTI09FA6
-	iqeZbj6lKniW7ulc/pBYvFXloyVI=
-X-Google-Smtp-Source: AGHT+IH9scQLWNqJQHayBVbx3/oOvir8TuLyhF6I1u9sp0NdVUUfeeiiIOFw8tGmDwqe/ZpBUA1tc6SRGklljrBAiUA=
-X-Received: by 2002:a05:690c:6813:b0:6e2:2600:ed86 with SMTP id
- 00721157ae682-6e2c72f779cmr34932837b3.45.1728068677613; Fri, 04 Oct 2024
- 12:04:37 -0700 (PDT)
+	s=arc-20240116; t=1728069031; c=relaxed/simple;
+	bh=AHYc2Hj4Z5WWj24HgcIGA2REpPMq1/XBTP3pc2FZ/EY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=S91eK9tVVcfPgxfopgREzEvg8FuUTgzJ4dNXWKMuG8iI0b6YRlJ2eZxo+/xwlC2g2SOg/ywotEr+Tb0qf5yGJLoU5c05+e3r3q/ZwpDJ1gPMUceipPHtJ51TVRXE38gIkREbkGdY2w+jFjJ0jxbFYYNm1ef6I/Yij+lQJVEgjR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBrAXMps; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65A4FC4CEC6;
+	Fri,  4 Oct 2024 19:10:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728069031;
+	bh=AHYc2Hj4Z5WWj24HgcIGA2REpPMq1/XBTP3pc2FZ/EY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kBrAXMpsnhSsbFKXn9nfO4TkvzO0c2uaWxv985llI51G6mFUafCvVYb+hE1rhbp0D
+	 8ut/bpivC/xjK1wE1sPA7rptf3EAdoPW7ZWOn1LrG/hV8oqqP+k0Ity6HqEfQ9CGJl
+	 S9pQavNoyxE0SRvC1dP0gpUotXAITc6HMZSANWkghVnZvTmIk7HY7vUBB2qiBOP/dn
+	 suzZwoLFOn3mcHptfOtMnCXFo+Y0QV3W05i3kJ560L3eh/3ICUMOUvZN1a5SGKaTdr
+	 By6Uk8YNc0Q0WsUxyM9w+NsFpyEqE4r644kUyqarse/nP0a0WVaPKLHHErLQvj+iQ0
+	 V4K865mIOKkgQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BE039F76FF;
+	Fri,  4 Oct 2024 19:10:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241004000015.544297-1-rosenp@gmail.com> <20241004000015.544297-6-rosenp@gmail.com>
- <39dcfa4b-1a22-4296-b190-ac39480d034a@kernel.org>
-In-Reply-To: <39dcfa4b-1a22-4296-b190-ac39480d034a@kernel.org>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Fri, 4 Oct 2024 12:04:26 -0700
-Message-ID: <CAKxU2N9-DxfsANMfT8DZ-LuKJ3bqjckyfd=+Lg_qtRn985BuoQ@mail.gmail.com>
-Subject: Re: [PATCHv2 5/5] documentation: use nvmem-layout in examples
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: devicetree@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, 
-	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
-	William Zhang <william.zhang@broadcom.com>, Anand Gore <anand.gore@broadcom.com>, 
-	Kursad Oney <kursad.oney@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Gregory Clement <gregory.clement@bootlin.com>, 
-	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Christian Marangi <ansuelsmth@gmail.com>, 
-	"open list:MEMORY TECHNOLOGY DEVICES (MTD)" <linux-mtd@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	"open list:ARM/QUALCOMM MAILING LIST" <linux-arm-msm@vger.kernel.org>, 
-	"moderated list:BROADCOM BCMBCA ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
-	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] netfilter: br_netfilter: fix panic with metadata_dst
+ skb
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172806903489.2708740.1274785740623551771.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 19:10:34 +0000
+References: <20241001154400.22787-1-aroulin@nvidia.com>
+In-Reply-To: <20241001154400.22787-1-aroulin@nvidia.com>
+To: Andy Roulin <aroulin@nvidia.com>
+Cc: netdev@vger.kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+ roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ idosch@nvidia.com, petrm@nvidia.com
 
-On Thu, Oct 3, 2024 at 11:25=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On 04/10/2024 02:00, Rosen Penev wrote:
-> > nvmem-cells are deprecated and replaced with nvmem-layout. For these
-> > examples, replace. They're not relevant to the main point of the
-> > document anyway.
->
-> Please use subject prefixes matching the subsystem. You can get them for
-> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-> your patch is touching. For bindings, the preferred subjects are
-> explained here:
-> https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-pat=
-ches.html#i-for-patch-submitters
->
->
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > ---
-> >  .../mtd/partitions/qcom,smem-part.yaml        | 19 +++++++++++--------
-> >  .../bindings/net/marvell,aquantia.yaml        | 13 ++++++++-----
-> >  2 files changed, 19 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/Documentation/devicetree/bindings/mtd/partitions/qcom,smem=
--part.yaml b/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-par=
-t.yaml
-> > index 1c2b4e780ca9..8ae149534b23 100644
-> > --- a/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-part.y=
-aml
-> > +++ b/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-part.y=
-aml
-> > @@ -45,17 +45,20 @@ examples:
-> >              compatible =3D "qcom,smem-part";
-> >
-> >              partition-art {
-> > -                compatible =3D "nvmem-cells";
-> > -                #address-cells =3D <1>;
-> > -                #size-cells =3D <1>;
-> >                  label =3D "0:art";
-> >
-> > -                macaddr_art_0: macaddr@0 {
-> > -                    reg =3D <0x0 0x6>;
-> > -                };
-> > +                nvmem-layout {
-> > +                    compatible =3D "fixed-layout";
->
-> This does not look right - the binding still expects nvmem-cells. I
-> wonder how does the nvmem-cells.yaml work if the compatible is being
-> removed so it is not being selected.
-Not sure I follow here. You mean replace nvmem-cells.yaml with
-nvmem-layout.yaml ?
->
->
-> Best regards,
-> Krzysztof
->
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 1 Oct 2024 08:43:58 -0700 you wrote:
+> There's a kernel panic possible in the br_netfilter module when sending
+> untagged traffic via a VxLAN device. Traceback is included below.
+> This happens during the check for fragmentation in br_nf_dev_queue_xmit
+> if the MTU on the VxLAN device is not big enough.
+> 
+> It is dependent on:
+> 1) the br_netfilter module being loaded;
+> 2) net.bridge.bridge-nf-call-iptables set to 1;
+> 3) a bridge with a VxLAN (single-vxlan-device) netdevice as a bridge port;
+> 4) untagged frames with size higher than the VxLAN MTU forwarded/flooded
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] netfilter: br_netfilter: fix panic with metadata_dst skb
+    https://git.kernel.org/netdev/net/c/f9ff7665cd12
+  - [net,2/2] selftests: add regression test for br_netfilter panic
+    https://git.kernel.org/netdev/net/c/bc4d22b72a2d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
