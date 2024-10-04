@@ -1,269 +1,269 @@
-Return-Path: <netdev+bounces-132104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 096C7990713
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:04:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B662990716
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2973E1C20A5C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:04:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2545228C717
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3CA5158534;
-	Fri,  4 Oct 2024 15:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194451D9A60;
+	Fri,  4 Oct 2024 15:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XEXvz92t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G2OtLtML"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8faa.mail.infomaniak.ch (smtp-8faa.mail.infomaniak.ch [83.166.143.170])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8565C1D9A4F;
-	Fri,  4 Oct 2024 15:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728054275; cv=none; b=U2fnmY1qvEgi76MRzeiDnyNdaWwLTtgj3HB0z08keKcMmz8g6vBMxVMJf+fr28EJWqnDNQlS96UzlA6gSeKLmIVyPzSPmWnyLEjJQ0osvSh+jEHyDkyLm98fUZ35ArEcOd4GvQpBvOiAi3UglBkuw+sl3l5cIRcSNpwulk9ioqQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728054275; c=relaxed/simple;
-	bh=lT0XRAqjOTPeWuN8bb0XCVgCD/rTTCENAWcimJ8sjxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CSMxSu3XZZhyVRIauV53GyE54XzzHEW5+UHio6zNBB3+Mr+q+kqZ2HqY/zdnydlHGyDZHuHRzpTRzyFqAk7wtbGqII9nQdo1cVlgFnoVSylRyO26+c7LxvGGi/CC/fJKef7KluK4K/jcvoMUhOjh9+L9DhLPendtvkQIFlV+GsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XEXvz92t; arc=none smtp.client-ip=83.166.143.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246c])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XKsJr2VQgzC1c;
-	Fri,  4 Oct 2024 17:04:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1728054268;
-	bh=iSe7t8jGuIY2A3QPYUnH1aJ3yZ/co8bw8960T0QeURI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XEXvz92t+oY93jUSeepGVYDlD/holMGvGGDjbGDW5VZv+z9SAYrcBpTC3rYL+th5w
-	 X/ugZKUtvxpYnwtguwP3ZXObApgh7o2ItwX0zxet5GQkmSQ1cr2nhw1py3NjnfjebZ
-	 OlvMuX3OfyebkK6f0qhT2MaGxffbfYuPod+4PNwk=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XKsJp6q1hz630;
-	Fri,  4 Oct 2024 17:04:26 +0200 (CEST)
-Date: Fri, 4 Oct 2024 17:04:23 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Matthieu Buffet <matthieu@buffet.re>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Subject: Re: [RFC PATCH v1 5/7] samples/landlock: Add sandboxer UDP access
- control
-Message-ID: <20241004.ohc2aeYei1oo@digikod.net>
-References: <20240916122230.114800-1-matthieu@buffet.re>
- <20240916122230.114800-6-matthieu@buffet.re>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C58A1D9A47
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 15:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728054307; cv=fail; b=tcciDz66z8Hz8qXPx4ryp2HZ1UmwsoypCVZ/jlAw/RLAloAsw6WcqC5Fh1osckUrYAsUt97SeksF5oqlgzLAXsDKl/n6OgQB2TahOcY1SO7ZL+0oyvWvUqaTDtXvCDN80i0QRJtEVcQAYryiS6khfc2ChoAT/kUrJr+oPviPbQQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728054307; c=relaxed/simple;
+	bh=7kHWXH6KvBR9JjaVNZNbetYisrKWwHj12511kV8uquQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cqbsOf7YZnV1bnSw48nfBhb5LuJnNX5VhLk3zWKKAbmlwCRkFPN1YCJ9mMnIvXd5jXtwnUj9gHjl+8A7QH+8kzVVloYpkr2Ph7y0HPNcf/Vie3X98/eFTzIyNsf50SzESS5jtjeUxsImV492OKMn34QRxjVjecrCS8M+tYXdroU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G2OtLtML; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728054307; x=1759590307;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=7kHWXH6KvBR9JjaVNZNbetYisrKWwHj12511kV8uquQ=;
+  b=G2OtLtMLSGkI12Eut7vcz6+3nLAPWhHL2cFY795FaCO6eMaauYqut3h1
+   /m2XhYtSuXsAbouXm/Yt7hGsP/GacnOoFd9aqgD4ADLLqPrek/5SPvVFy
+   ErYSGXfFAAzH5h4EZdcM6rckCRNZNM3hFM1JLfgtfUXNvbQTMh6vvDsaK
+   LcAAvf/mk8bEm1wILojjN4gw+a1TEyUiOXcnWV0W9on14hgqAWNWxWMvJ
+   RzW3VSmYZZg0stEEqKoICG3YCyOng6L1SkIGvnT/rDJz8vNf8rK3IQ2tL
+   Hf6NcwqtJ/GGm9U9A3JRSmM6N2D26Os3p39snRs+4t/Cyd7jCULRw06I8
+   Q==;
+X-CSE-ConnectionGUID: TANlxPs4SwyTb45beZsWXw==
+X-CSE-MsgGUID: wqumvvX6RIuBmk164qrZzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="27369968"
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="27369968"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 08:04:59 -0700
+X-CSE-ConnectionGUID: kHiOruz7S4SML0u3AldM+w==
+X-CSE-MsgGUID: LwUD3fCPTlCA1KPJ0v5plA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="79302775"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Oct 2024 08:04:51 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 4 Oct 2024 08:04:48 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 4 Oct 2024 08:04:48 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 4 Oct 2024 08:04:48 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 4 Oct 2024 08:04:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=B7iI07xusgOBOxRYc+jNNUIfV/mR1Ydryuc504X6YU6KiD6SprxaOQEfYwpjhwJeul9Ypo37glvL3aR8V9WeQGsZd4Wtm8Z9aNigrlRomsqnVAX4uNiCiLwz3CfL7plcun3R3ecNHSEVoTc7oXpn3BAwOGAAck+gcQZQ6lZoTliUHLuH4YK9BEAdX21cVr+gtcIbMUcHHGrTbMb1Z6zKgO5DnXeSqR2PnWuKakRhQUXQtaALXx1pLxHrxkHEtfY/hNHmCe+BdrD2wGynRv/8JQmFxYLB7w9TYY0+8FqG2qbcOXphvHJt0oZ1NJpxf7wzPxBRR6gQctKPEdxU2nYnAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TJjgXfI8GbEKL2ozJpVa4hgzPzqKeP9vQ3DorNZ4a1k=;
+ b=pETw/DjpfHqfMFhNeJqi/bSLAUFZT6ZMvjePamLEh8o17Z29JWLQW5EjzkGgiqqJ8WhpbYn/Ywx1dSVSzmT1CSJkQCa1O8T5GDjpKsak4KfNGGAQbHaQ85ewcNTD35xxxpSzdqfljMNJlpST8nSz5FSUMpDnpSuq0qaIet+7mDrK53rFlarwS3KxUGaTBkZyxEeRqGlyct6dZZ6OvBaMEvVKbxeQjl4VkqoAxgYMCquL7I4w5ltbXHSQlre+U60xJ6fB1q8UGNEkpMgM1lPJ/L4XSw268XFFXeZQCC54tzK6/C6hm2gLLypjJYh5358KdZWC/jzhts/5FsdKncAWew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by LV8PR11MB8771.namprd11.prod.outlook.com (2603:10b6:408:206::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.18; Fri, 4 Oct
+ 2024 15:04:44 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%5]) with mapi id 15.20.8026.017; Fri, 4 Oct 2024
+ 15:04:43 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "Greenwalt, Paul" <paul.greenwalt@intel.com>, Michal Michalik
+	<michal.michalik@intel.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Frederic Weisbecker <frederic@kernel.org>,
+	"Kolacinski, Karol" <karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Keller, Jacob E" <jacob.e.keller@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>, Anna-Maria Behnsen
+	<anna-maria@linutronix.de>, "Olech, Milena" <milena.olech@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v12 iwl-next 7/7] ice: Implement PTP
+ support for E830 devices
+Thread-Topic: [Intel-wired-lan] [PATCH v12 iwl-next 7/7] ice: Implement PTP
+ support for E830 devices
+Thread-Index: AQHbEzK4XSxjBZsos0ujhixi94gWY7J2tlcw
+Date: Fri, 4 Oct 2024 15:04:43 +0000
+Message-ID: <CYYPR11MB842919C5C3BAE3EE4751DCC1BD722@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240930121610.679430-9-karol.kolacinski@intel.com>
+ <20240930121610.679430-16-karol.kolacinski@intel.com>
+In-Reply-To: <20240930121610.679430-16-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|LV8PR11MB8771:EE_
+x-ms-office365-filtering-correlation-id: 71b6b382-09e7-4f17-42f4-08dce485e128
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?hk7hzIKpnxoAGAXXo37xmygk/Ns2Pqla1v9GmB1T1GiM8D9Up39Qz1+qcPib?=
+ =?us-ascii?Q?pkK3DJe4tme/oWFSbwb0/+M9CIVcbuCz9MVEaUJIZkz0C3yWmZXHj/J/BONz?=
+ =?us-ascii?Q?Y55/+fWCyee6Eg91TXMvP1aa/Vocium4viBsXjScpJIQSnlBJ9N7yeV4APuR?=
+ =?us-ascii?Q?Kvs9OQ3UpZkdQi4GUfEF3PMMUTCTO6rXKjIDrcbSjF4Bf7Zl37NDgKZS3xBj?=
+ =?us-ascii?Q?lSFX+IVsybt2/RVqjv6RjMWvhvqrk7IALI8id2bY4G4Eq9OPlqJaq7AMV8Kb?=
+ =?us-ascii?Q?SRH3eMSvKmXDEKIhbC3hkd0eIb6kEbWqSzPYPF2lSMqzZENL1DinJcx1z//Y?=
+ =?us-ascii?Q?PZeDB7TflOLEaVyv9V2rnp8NkxX7X1YdaxNgFLTXAYEZtHQUcs4usMrpMz39?=
+ =?us-ascii?Q?M7VInQ1J37S4DCBEfWoUBynBt+6lGhc9fUCSWZm08N7cXGXHKkUBX6fAPnM2?=
+ =?us-ascii?Q?KhrjjxRDLJ0v8TgL2QhZlzuyj1pc32sh6fa6VnB/VCzdGsIxx5h1nVwsMXRn?=
+ =?us-ascii?Q?HJtlQwldvsIpOQFNElgn6+Ia3952KayTtXSFbq6TLzZTbsy+t+tHVSf2Llwa?=
+ =?us-ascii?Q?Mbxv7mqtPMQ/U8XoMSTJQjvqWOEBQBkNBrsUbAlYVXATRPHrkZbI77TKIIV3?=
+ =?us-ascii?Q?rMg1iyOphYIbpPV8a9qn51YFZQw0mCrXKOKRLWGDpB4pADrAkGyGlNWHvbaG?=
+ =?us-ascii?Q?Of2JyGmFtWwd4g5kFu50tDYK/trOBX+xk8ZvsA/8U8deBMBplEFD0UW5ldVF?=
+ =?us-ascii?Q?AcioocAMO/gzsEjTOFgQJ6qCoWkvWekfaEWRDwJFYGfgvPfmAKz16qulOo8Q?=
+ =?us-ascii?Q?N3NUVmBSFA4Awh/ahvXnD6PJdYmrt32tWFEO9CV5cp2OkZ49+Kg15qV/+dHO?=
+ =?us-ascii?Q?wf0GwAIQXmNpXXhiHYs2paBN91WX6H9p/3/jw67PObBITbKG4CKA8+hCqNr8?=
+ =?us-ascii?Q?jGYZNk/PCQ0s/owHdsAectADeoVcOHUriDFaaA8xJX6YefKKS9CRznnqQJfR?=
+ =?us-ascii?Q?GYcsODs/BC9gktjSv4TqXKNlS+/FUmgEXUenG3Eo1LlOi8KOGy6oeKNlnP5o?=
+ =?us-ascii?Q?QBbA1Xx1Mz/0M+zY7zBcJflHc03m7N9WvVM5zLsPyErWCu2gAwAZVlVb97Lt?=
+ =?us-ascii?Q?Tlxh1d4s07IX6XAXC2Ii2usJ+vpokzmicGA6GRS/GFWScBRK/HPba0bzDuYN?=
+ =?us-ascii?Q?FdztbLK6330hziFEoBpC/lCrcPdkPcxvXOzdJCbrGGoyHX7X0VUPQiTg03kH?=
+ =?us-ascii?Q?Jl8fjThv0ZupwUQhC6N4QvMfopxMCm4GBE4zwYe8BY23mL/hhchLvqksj61j?=
+ =?us-ascii?Q?ovJIH2rSJdRzCciFDg0r0rSBP4dexztAPmiHk9FTOTlFlQ=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?jYsow7pHQW2T3fxVRVDrKDzC88JFi2nS19sGuIArv55CuMe2l+dBF/6cS2kh?=
+ =?us-ascii?Q?aHvzwmXxG/J7I75zR8eYo/21cOusw8CvwBu2jK3AjZ8SVTWTB5pvhvn8iV7A?=
+ =?us-ascii?Q?PDUQ4H7RkFW5KDpG+x2jlGEUXH2EcVxO/v328nIBHIdcTWbmCaSkSihnoX8H?=
+ =?us-ascii?Q?iNv4vcR27u4Iz62mmimbyttWs8L5EX87tcqD0DVI7KjHNzPe2wn5VqlL4mRy?=
+ =?us-ascii?Q?/cBDdVJYRPEdReT8wqqW2FhyiGC9iOhv+rOD9VmySG4yJ4idD1WeYV9uRI08?=
+ =?us-ascii?Q?Jsti1X7/oAx+lFN6mwBltyJTHRaZijMu4oxDwKA97Be+Fxmjm/ClBccyfA7v?=
+ =?us-ascii?Q?jsSZ5gKjPmCeoOrqNcoMOsH7UPk7srlm/Gwkiv8bU2dEhF8iNmIKyDBj4Zby?=
+ =?us-ascii?Q?yHZWkCyO6NOwH0Jz0eyFCHFPpPRA9nc5BpNqHEHzpogjSONmWq/84IwDlQTi?=
+ =?us-ascii?Q?hcDPaz54WpunJIkuREkcGYFuPAMpFAqy2P78ZnHqpilSxWD0IqPg3Z/oZjC4?=
+ =?us-ascii?Q?hDS1RYxJdBt0H8xUNFxdU4FJfA/cUw+qL6Ud7Xy/14HnI1qJJPwRUtPKRfS9?=
+ =?us-ascii?Q?LpiVVfeMRNkzyFI/XVLjm+f40fT8t3K0UzZudvIFi5NKgjZ501yA5KESoV43?=
+ =?us-ascii?Q?tGOI4FIKiaWMhpy3XAc9VUXjU0b8wLhhvhIzEEVoKtGfcyRNpRRLIH1AceyL?=
+ =?us-ascii?Q?PA2eO3v+wWF/DC+T2jqDEpdZORG74sXy7exLG16NvZQ3iq/aWiH8i5az9enq?=
+ =?us-ascii?Q?NeISUake3/QHB+OVQdi+sjW8EsAP1xskn7PzKqSySbV6DGUmeZnwrv3FkVgx?=
+ =?us-ascii?Q?JG0FCSo021X1UFCZQJUtqnHU0CQ0C2ibUe7FDmO0X4/SM4CyoU6Cp+xwn0Ve?=
+ =?us-ascii?Q?h0uvW3v5naZukYl2NSmKkegn/H6Q9EJwho7TRPLHHodqKMFll6UYIiUo3thL?=
+ =?us-ascii?Q?PAGsq9y8AXVg3kJIa9ZvCaYXZskpQSVDWDWAAsTAVyFVRQyWztngFvwl1sY5?=
+ =?us-ascii?Q?IOEXRykhXIricuON2URzAtCyCRCCFkSxGQxDKyKeVQhkDSgBhTGuZ8jOICkj?=
+ =?us-ascii?Q?MoiaNmJSSXfMCXFpCGyrBrx30dl9kBRJ2azLPbrIK0NRLv72c5OSyfoTVUvi?=
+ =?us-ascii?Q?ye62QWvQPsvV7N68ecIroMzMAtp3TsolV9AanTtOYHDnPf0Kx0MiYa+EuEiL?=
+ =?us-ascii?Q?fI1UXDEg/P0CnUUKInZr6VR6NphtNA0g8lnDrTpTx9kBJGM+D/Cq/nkbhddR?=
+ =?us-ascii?Q?kWRvpmc7UkuyZPdZB0ewBoV5+6iBMbYpoLCBdZSIw7TGiMyzm6nSdArGzAl8?=
+ =?us-ascii?Q?jdfrjz9evP2kfm3LRwL+ahZme8Q5HSOW934lXBImNTc4K5cSwLZ2kZN2i9gT?=
+ =?us-ascii?Q?1kX2dmJcy1ntvzP/4bcrDK2a4wUst+9WJbkVRJEj+v7a58PE4wQ3n6tiVGJH?=
+ =?us-ascii?Q?t7SGKtzu3DRfEkTbGnz6aOx0Lr4NE7KZbg++oK0B9LKobsEs8DUzuq1wad+E?=
+ =?us-ascii?Q?OnZBhJKWB9Fg19oEv7YbtE7HfBdRuUQLA75LZFqWygnCGTioHB7/Mkgy9aX9?=
+ =?us-ascii?Q?SjfDH4YsyyW+LwwJbA7iVm909RYju0PMdSy0L9fo8uSgj3qc5WFFl1BW7xcd?=
+ =?us-ascii?Q?gg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240916122230.114800-6-matthieu@buffet.re>
-X-Infomaniak-Routing: alpha
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71b6b382-09e7-4f17-42f4-08dce485e128
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2024 15:04:43.9042
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EDNZI/p5ly86AHJLRID8/egf2Wkt8WmthuVSfndcrabLZHL6qHrF7Trg5LWgScPYAxEQf47MpYfrqun9mb/ceg3D4xe2C6F+hluPdA5SHlM3IEDvgAvTj0l2EgLqCT5Z
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8771
+X-OriginatorOrg: intel.com
 
-On Mon, Sep 16, 2024 at 02:22:28PM +0200, Matthieu Buffet wrote:
-> Add environment variables to control associated access rights:
-> (each one takes a list of ports separated by colons, like other
-> list options)
-> 
-> - LL_UDP_BIND
-> - LL_UDP_CONNECT
-> - LL_UDP_RECVMSG
-> - LL_UDP_SENDMSG
-> 
-> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Monday, September 30, 2024 5:43 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: Greenwalt, Paul <paul.greenwalt@intel.com>; Michal Michalik <michal.m=
+ichalik@intel.com>; netdev@vger.kernel.org; Frederic Weisbecker <frederic@k=
+ernel.org>; Kolacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony=
+ L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@in=
+tel.com>; Keller, Jacob E <jacob.e.keller@intel.com>; Thomas Gleixner <tglx=
+@linutronix.de>; Anna-Maria Behnsen <anna-maria@linutronix.de>; Olech, Mile=
+na <milena.olech@intel.com>
+> Subject: [Intel-wired-lan] [PATCH v12 iwl-next 7/7] ice: Implement PTP su=
+pport for E830 devices
+>
+> From: Michal Michalik <michal.michalik@intel.com>
+>
+> Add specific functions and definitions for E830 devices to enable PTP sup=
+port.
+>
+> E830 devices support direct write to GLTSYN_ registers without shadow reg=
+isters and 64 bit read of PHC time.
+>
+> Enable PTM for E830 device, which is required for cross timestamp and and=
+ dependency on PCIE_PTM for ICE_HWTS.
+>
+> Check X86_FEATURE_ART for E830 as it may not be present in the CPU.
+>
+> Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> Cc: Frederic Weisbecker <frederic@kernel.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Co-developed-by: Milena Olech <milena.olech@intel.com>
+> Signed-off-by: Milena Olech <milena.olech@intel.com>
+> Co-developed-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+> Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 > ---
->  samples/landlock/sandboxer.c | 88 ++++++++++++++++++++++++++++++++----
->  1 file changed, 80 insertions(+), 8 deletions(-)
-> 
-> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-> index 08704504dc51..dadd30dad712 100644
-> --- a/samples/landlock/sandboxer.c
-> +++ b/samples/landlock/sandboxer.c
-> @@ -55,6 +55,10 @@ static inline int landlock_restrict_self(const int ruleset_fd,
->  #define ENV_FS_RW_NAME "LL_FS_RW"
->  #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->  #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-> +#define ENV_UDP_BIND_NAME "LL_UDP_BIND"
-> +#define ENV_UDP_CONNECT_NAME "LL_UDP_CONNECT"
-> +#define ENV_UDP_RECVMSG_NAME "LL_UDP_RECVMSG"
-> +#define ENV_UDP_SENDMSG_NAME "LL_UDP_SENDMSG"
->  #define ENV_DELIMITER ":"
->  
->  static int parse_path(char *env_path, const char ***const path_list)
-> @@ -219,7 +223,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->  
->  /* clang-format on */
->  
-> -#define LANDLOCK_ABI_LAST 5
-> +#define LANDLOCK_ABI_LAST 6
->  
->  static void print_help(const char *prog)
->  {
-> @@ -247,11 +251,25 @@ static void print_help(const char *prog)
->  		"to allow nothing, e.g. %s=\"\"):\n",
->  		ENV_TCP_BIND_NAME);
->  	fprintf(stderr,
-> -		"* %s: list of ports allowed to bind (server).\n",
-> +		"* %s: list of TCP ports allowed to bind (server)\n",
->  		ENV_TCP_BIND_NAME);
->  	fprintf(stderr,
-> -		"* %s: list of ports allowed to connect (client).\n",
-> +		"* %s: list of TCP ports allowed to connect (client)\n",
->  		ENV_TCP_CONNECT_NAME);
-> +	fprintf(stderr,
-> +		"* %s: list of UDP ports allowed to bind (client: set as "
-> +		"source port/server: listen on port)\n",
-> +		ENV_UDP_BIND_NAME);
-> +	fprintf(stderr,
-> +		"* %s: list of UDP ports allowed to connect (client: set as "
-> +		"destination port/server: only receive from one client)\n",
-> +		ENV_UDP_CONNECT_NAME);
-> +	fprintf(stderr,
-> +		"* %s: list of UDP ports allowed to send to (client/server)\n",
-> +		ENV_UDP_SENDMSG_NAME);
-> +	fprintf(stderr,
-> +		"* %s: list of UDP ports allowed to recv from (client/server)\n",
-> +		ENV_UDP_RECVMSG_NAME);
->  	fprintf(stderr,
->  		"\n"
->  		"Example:\n"
-> @@ -259,9 +277,12 @@ static void print_help(const char *prog)
->  		"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->  		"%s=\"9418\" "
->  		"%s=\"80:443\" "
-> +		"%s=\"0\" "
-> +		"%s=\"53\" "
->  		"%s bash -i\n\n",
->  		ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -		ENV_TCP_CONNECT_NAME, prog);
-> +		ENV_TCP_CONNECT_NAME, ENV_UDP_RECVMSG_NAME,
-> +		ENV_UDP_SENDMSG_NAME, prog);
->  	fprintf(stderr,
->  		"This sandboxer can use Landlock features "
->  		"up to ABI version %d.\n",
-> @@ -280,7 +301,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	struct landlock_ruleset_attr ruleset_attr = {
->  		.handled_access_fs = access_fs_rw,
->  		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
-> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +				      LANDLOCK_ACCESS_NET_CONNECT_TCP |
-> +				      LANDLOCK_ACCESS_NET_BIND_UDP |
-> +				      LANDLOCK_ACCESS_NET_CONNECT_UDP |
-> +				      LANDLOCK_ACCESS_NET_RECVMSG_UDP |
-> +				      LANDLOCK_ACCESS_NET_SENDMSG_UDP,
->  	};
->  
->  	if (argc < 2) {
-> @@ -354,6 +379,14 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  			"provided by ABI version %d (instead of %d).\n",
->  			LANDLOCK_ABI_LAST, abi);
->  		__attribute__((fallthrough));
+> V11 -> V12: Fixed missing E830 case in ice_get_base_incval()
+> V10 -> V11: Fixed adjustments not working on E830
+> V9 -> V10: Removed ICE_FLAG_PTP_SUPPORTED check for E830, which was disab=
+ling
+>            PTP only for E830
+> V7 -> V8: Moved E830 parts of other patches to this patch
+> V6 -> V7: Fixed timestamp acquisition
+> V4 -> V5: Edited return values
+> V3 -> V4: Fixed kdoc for other ice_is_e***() and other _e830() functions =
+in
+>           ice_ptp_hw.c
+> V2 -> V3: Fixed kdoc for ice_is_e***() and ice_ptp_init_phy_e830()
+> V1 -> V2: Fixed compilation issue with GENMASK bits higher than 32
+>
+>  drivers/net/ethernet/intel/Kconfig            |   2 +-
+>  .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 ++
+>  drivers/net/ethernet/intel/ice/ice_main.c     |   9 +-
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      |  71 +++++++-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 167 +++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   8 +
+>  6 files changed, 262 insertions(+), 7 deletions(-)
+>
 
-> +	case 5:
-> +		/* Removes UDP support for ABI < 6 */
-> +		ruleset_attr.handled_access_net &=
-> +			~(LANDLOCK_ACCESS_NET_BIND_UDP |
-> +			  LANDLOCK_ACCESS_NET_CONNECT_UDP |
-> +			  LANDLOCK_ACCESS_NET_RECVMSG_UDP |
-> +			  LANDLOCK_ACCESS_NET_SENDMSG_UDP);
-> +		__attribute__((fallthrough));
-
-This hunk should go just after the "scoped" field cleanup and before the
-hint.  This way the hint is always printed if the current ABI is not the
-last (known) one.  This hunk should then start with a fullthrough
-attribute.
-
->  	case LANDLOCK_ABI_LAST:
->  		break;
->  	default:
-> @@ -366,18 +399,42 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	access_fs_ro &= ruleset_attr.handled_access_fs;
->  	access_fs_rw &= ruleset_attr.handled_access_fs;
->  
-> -	/* Removes bind access attribute if not supported by a user. */
-> +	/* Removes TCP bind access attribute if not supported by a user. */
-
-You can send a separate patch with these comment fixes.
-
->  	env_port_name = getenv(ENV_TCP_BIND_NAME);
->  	if (!env_port_name) {
->  		ruleset_attr.handled_access_net &=
->  			~LANDLOCK_ACCESS_NET_BIND_TCP;
->  	}
-> -	/* Removes connect access attribute if not supported by a user. */
-> +	/* Removes TCP connect access attribute if not supported by a user. */
->  	env_port_name = getenv(ENV_TCP_CONNECT_NAME);
->  	if (!env_port_name) {
->  		ruleset_attr.handled_access_net &=
->  			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->  	}
-> +	/* Removes UDP bind access attribute if not supported by a user. */
-> +	env_port_name = getenv(ENV_UDP_BIND_NAME);
-> +	if (!env_port_name) {
-> +		ruleset_attr.handled_access_net &=
-> +			~LANDLOCK_ACCESS_NET_BIND_UDP;
-> +	}
-> +	/* Removes UDP bind access attribute if not supported by a user. */
-> +	env_port_name = getenv(ENV_UDP_CONNECT_NAME);
-> +	if (!env_port_name) {
-> +		ruleset_attr.handled_access_net &=
-> +			~LANDLOCK_ACCESS_NET_CONNECT_UDP;
-> +	}
-> +	/* Removes UDP recv access attribute if not supported by a user. */
-> +	env_port_name = getenv(ENV_UDP_RECVMSG_NAME);
-> +	if (!env_port_name) {
-> +		ruleset_attr.handled_access_net &=
-> +			~LANDLOCK_ACCESS_NET_RECVMSG_UDP;
-> +	}
-> +	/* Removes UDP send access attribute if not supported by a user. */
-> +	env_port_name = getenv(ENV_UDP_SENDMSG_NAME);
-> +	if (!env_port_name) {
-> +		ruleset_attr.handled_access_net &=
-> +			~LANDLOCK_ACCESS_NET_SENDMSG_UDP;
-> +	}
->  
->  	ruleset_fd =
->  		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> @@ -392,7 +449,6 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	if (populate_ruleset_fs(ENV_FS_RW_NAME, ruleset_fd, access_fs_rw)) {
->  		goto err_close_ruleset;
->  	}
-> -
->  	if (populate_ruleset_net(ENV_TCP_BIND_NAME, ruleset_fd,
->  				 LANDLOCK_ACCESS_NET_BIND_TCP)) {
->  		goto err_close_ruleset;
-> @@ -401,6 +457,22 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  				 LANDLOCK_ACCESS_NET_CONNECT_TCP)) {
->  		goto err_close_ruleset;
->  	}
-> +	if (populate_ruleset_net(ENV_UDP_BIND_NAME, ruleset_fd,
-> +				 LANDLOCK_ACCESS_NET_BIND_UDP)) {
-> +		goto err_close_ruleset;
-> +	}
-> +	if (populate_ruleset_net(ENV_UDP_CONNECT_NAME, ruleset_fd,
-> +				 LANDLOCK_ACCESS_NET_CONNECT_UDP)) {
-> +		goto err_close_ruleset;
-> +	}
-> +	if (populate_ruleset_net(ENV_UDP_RECVMSG_NAME, ruleset_fd,
-> +				 LANDLOCK_ACCESS_NET_RECVMSG_UDP)) {
-> +		goto err_close_ruleset;
-> +	}
-> +	if (populate_ruleset_net(ENV_UDP_SENDMSG_NAME, ruleset_fd,
-> +				 LANDLOCK_ACCESS_NET_SENDMSG_UDP)) {
-> +		goto err_close_ruleset;
-> +	}
->  
->  	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
->  		perror("Failed to restrict privileges");
-> -- 
-> 2.39.5
-> 
-> 
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
