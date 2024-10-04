@@ -1,181 +1,186 @@
-Return-Path: <netdev+bounces-132072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A34BE9904DA
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:52:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 135E29904EE
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6328E281D7D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:52:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB20F2837D7
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:55:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE74212EE8;
-	Fri,  4 Oct 2024 13:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA41A2139B6;
+	Fri,  4 Oct 2024 13:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TvfG7u9+"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="adLdOpJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6422101B0;
-	Fri,  4 Oct 2024 13:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC662139B1
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 13:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728049933; cv=none; b=fsc+IlF3W5b4XnO4WHEnGjbrcRrkMC1kbYQCLoMjwnzo9thS41GfDv/DUobjK5xBGZyt85S9su5vwoDW4SvoaRiH4vcQbPbnzYCNuotQBuxITe/Qzeorwb2ZeINfq60REIIFA2QvtOEct3XZcXDomus8yx8y2i5pNTV/0jqXdxE=
+	t=1728050117; cv=none; b=mVDaNhQP1cd9apP4VxcodqVHMO0vPzESY++XD9nIH1YHIydHxXtxjpz5Xx7tJsBFjHG06nU2qMlEbOh5lgrdGqOWOad+1WZF9VCDwFGcI0IffTicI1jIQTD7wLwfXTjRd+JzgTLdAOqDE9yrJ4BIzW9aS6I+crhQE1y0z99aeH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728049933; c=relaxed/simple;
-	bh=aEtq4osjabaRUs7y50Bxwj5wtp8wTPVFs2pegUenVxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tyvcB9Kckkftc896giPq2nUB/rLlzy/0q+aAjmVOp2zV/S+3WPIws2rWOsxLpmWtWKvUfaaXHCjzd8T8v/sTLyUNP0qHmPgaPxWX1Tda4aiBEZzytql7QDlQocoF4oN1X0S76CYRHd91ux/dgQjyp35UW1UFUogOfI2qhlNGLSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TvfG7u9+; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728049932; x=1759585932;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aEtq4osjabaRUs7y50Bxwj5wtp8wTPVFs2pegUenVxQ=;
-  b=TvfG7u9+fqh+Zjh86yQzGeiJY64/j4R2n8QKquY9YK3vkIraue5xPL8E
-   4c/6adgOIAoF5BcRNX/u4E5GMqNy7f7xQBSa2nX+f7lhru6ulhV1Py28U
-   u8z9zy7Rq59emAozBK6OvnSBDDPK9jiqOfgRWj+bNGkmlxiIl6vtE2UFT
-   tIsbb+ykCEsvzGEI+9bT/K44QvDdXfhhSXs91lEsbMXn6qUKkt5omyXXD
-   vUVvLW5z5QTqUrh12g2YnsN1ysn4/ftBBNnVpIB7HYqDpVhoegBroDjg2
-   gt5lAe/og39eMzrhHrXQwrVLRtT6HgDfcpQ94m/l6pa0fIGEz8olveaxa
-   Q==;
-X-CSE-ConnectionGUID: jArmUhy7QteDyioZDiAgWQ==
-X-CSE-MsgGUID: 7mCNYxVzSdSKRSsVdM/GcA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="52676772"
-X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
-   d="scan'208";a="52676772"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 06:52:12 -0700
-X-CSE-ConnectionGUID: MQUDCC1WTz2K9lDVCQJN9w==
-X-CSE-MsgGUID: +tjWUo/HS9qhyUNxPmi/jA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
-   d="scan'208";a="105452813"
-Received: from unknown (HELO smile.fi.intel.com) ([10.237.72.154])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 06:52:10 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1swij0-0000000GaKE-1Dpv;
-	Fri, 04 Oct 2024 16:52:06 +0300
-Date: Fri, 4 Oct 2024 16:52:06 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	linux-kernel@vger.kernel.org, amadeuszx.slawinski@linux.intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	Markus Elfring <Markus.Elfring@web.de>, Kees Cook <kees@kernel.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH v1] cleanup: adjust scoped_guard() to avoid potential
- warning
-Message-ID: <Zv_zBvkq4jsvOVdY@smile.fi.intel.com>
-References: <20241003113906.750116-1-przemyslaw.kitszel@intel.com>
- <Zv6RZS3bjfNcwh-B@smile.fi.intel.com>
- <Zv6SIHeN_nOWSH41@smile.fi.intel.com>
- <20241003141221.GT5594@noisy.programming.kicks-ass.net>
- <Zv7ZsieITDle2lgl@smile.fi.intel.com>
- <20241004093308.GI18071@noisy.programming.kicks-ass.net>
+	s=arc-20240116; t=1728050117; c=relaxed/simple;
+	bh=bV6wW+1YqGCb0bkNHMmxaFIf2QsQFcLf/TlDWuoTGLc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=m92KuLPkBe0Ed/6yjvERUNbImj0RQzNiWirBKFHZ+LDYsnOA2hrmCmid02PVvSlGXWKXHbPWfuOPzUnKL9Z/l7wZwDYvpoiJswrjU41ZbOXroL0mwV0/KxIhYzIn1SNmtULu6ahMhzZk4R6c258TBl5UGNGt3NRqnzKWCz8UUjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=adLdOpJA; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-37cd0b5515fso1363801f8f.2
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 06:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728050114; x=1728654914; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WNYZH5yk5RBPis3PkfiwxOzrh/DxAti5Ed/4hlA/rxo=;
+        b=adLdOpJA+xe/bIIDjXQBni7a0qQ3Fij9VA/FjzKYyoTbO5+8YIYKmTGD9l59Sn84OL
+         ByZb/Gppii+0JEYq2xWh7AiKVy1YT5LQKQ866XFzhTUV5edXR4l+HGdT8XG4/iFfddoO
+         wo+AEtewgLbM/34JM6QvSM2h5kBr8SL/5FpPxhfqekcnv52Ym3iyAddTF9Pp2BHzvqjr
+         vf3+PF2pdaptuAXmaOIE16JPdjKJayopWVEUsHShBJW5nxZF2mAvL8LrGBBdgBooRvih
+         Ob6YL5emMc58/T4R+VePxv+1rl0IM56QAX49YeOWPOFcv+DZqcEkPSNE+SjDo4RMVDiC
+         Eaaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728050114; x=1728654914;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WNYZH5yk5RBPis3PkfiwxOzrh/DxAti5Ed/4hlA/rxo=;
+        b=ad2BeuZmMN7X9qFnchjiuxNTW11pS115hPho/E2e+S8LNpPB2Cro7xqSbSRMkPf/Z5
+         DsDSewtXCvNV2zSLMSAIPHvaPvAeYQrPR6eWxov7MdmBWePNl74W3j7E9dCzmogvUovr
+         uj+nML9WqPgX/YaikzrRmuioij/Z93vdayiIFyYgNFNQpgR4fmtqfX4bFw1M+7EDVqiv
+         TM74ONGhcUQxa4JhSUeaDQJU+7apTI72FToiuKVNTFqXtbA7GsaUPmUGwN95mRmya8oL
+         I2g/F2TREQnGzZImL2BiOT+TvrWegWOhiuh3rtZQOwA9hnCn4xGmbh4LwceLPhNbEddM
+         OAAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLtYXrye8Vw6s/t9moL/g+EbkpEM3HidtEoYdeCLpOFpuXMXW54UlTfWws94GLy8I+vX+iLiE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ9+C5Udxr2n9i4+h/P6J15+Js7SIG++UbjSlJNkjpUyHlnStF
+	aSu6/aPvQp8owNBTUHD6S2c4W598kIsMrc2bCMnGCvNy4teQE/Wu/U0SX7nXryc=
+X-Google-Smtp-Source: AGHT+IFtu5umZBfH6/IiaE3XVq2bAaE74f7neCyeNg9pQd9XAeJmoVZo9hWEaKWhLH3oyXhtOF7g9Q==
+X-Received: by 2002:adf:e50d:0:b0:37c:d121:e841 with SMTP id ffacd0b85a97d-37d0e8e03f0mr1813504f8f.40.1728050114034;
+        Fri, 04 Oct 2024 06:55:14 -0700 (PDT)
+Received: from localhost ([2a09:bac1:27c0:58::31:92])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d081f7035sm3280815f8f.23.2024.10.04.06.55.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 06:55:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004093308.GI18071@noisy.programming.kicks-ass.net>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 04 Oct 2024 15:55:11 +0200
+Message-Id: <D4N2N1YKKI54.1WAGONIYZH0Y4@bobby>
+To: "Jesper Dangaard Brouer" <hawk@kernel.org>, "Daniel Xu" <dxu@dxuuu.xyz>,
+ "Stanislav Fomichev" <stfomichev@gmail.com>
+Cc: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, "Lorenzo
+ Bianconi" <lorenzo@kernel.org>, "Lorenzo Bianconi"
+ <lorenzo.bianconi@redhat.com>, "Jakub Sitnicki" <jakub@cloudflare.com>,
+ "Alexander Lobakin" <aleksander.lobakin@intel.com>, <bpf@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+ <davem@davemloft.net>, <kuba@kernel.org>, <john.fastabend@gmail.com>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+ <tariqt@nvidia.com>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
+ <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+ <mst@redhat.com>, <jasowang@redhat.com>, <mcoquelin.stm32@gmail.com>,
+ <alexandre.torgue@foss.st.com>, "kernel-team" <kernel-team@cloudflare.com>,
+ "Yan Zhai" <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+From: "Arthur Fabre" <afabre@cloudflare.com>
+X-Mailer: aerc 0.8.2
+References: <871q11s91e.fsf@toke.dk> <ZvqQOpqnK9hBmXNn@lore-desk>
+ <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby> <ZvwNQqN4gez1Ksfn@lore-desk>
+ <87zfnnq2hs.fsf@toke.dk> <Zv18pxsiTGTZSTyO@mini-arch>
+ <87ttdunydz.fsf@toke.dk> <Zv3N5G8swr100EXm@mini-arch>
+ <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby> <Zv794Ot-kOq1pguM@mini-arch>
+ <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
+ <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
+In-Reply-To: <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
 
-On Fri, Oct 04, 2024 at 11:33:08AM +0200, Peter Zijlstra wrote:
-> On Thu, Oct 03, 2024 at 08:51:46PM +0300, Andy Shevchenko wrote:
-> > > I would really like to understand why you don't like this; care to
-> > > elaborate Andy?
-> > 
-> > To me the idea of
-> > 
-> > int my_foo(...)
-> > {
-> > 	NOT_my_foo_macro(...)
-> > 		return X;
-> > }
-> > 
-> > is counter intuitive from C programming. Without knowing the magic behind the
-> > scenes of NOT_my_foo_macro() I would eager to ask for adding a dead code like
-> > 
-> > int my_foo(...)
-> > {
-> > 	NOT_my_foo_macro(...)
-> > 		return X;
-> > 	return 0;
-> > }
-> 
-> Well, this is kernel coding, we don't really do (std) C anymore, and
-> using *anything* without knowing the magic behind it is asking for fail.
+On Fri Oct 4, 2024 at 12:38 PM CEST, Jesper Dangaard Brouer wrote:
+> [...]
+> >>> There are two different use-cases for the metadata:
+> >>>
+> >>> * "Hardware" metadata (like the hash, rx_timestamp...). There are onl=
+y a
+> >>>    few well known fields, and only XDP can access them to set them as
+> >>>    metadata, so storing them in a struct somewhere could make sense.
+> >>>
+> >>> * Arbitrary metadata used by services. Eg a TC filter could set a fie=
+ld
+> >>>    describing which service a packet is for, and that could be reused=
+ for
+> >>>    iptables, routing, socket dispatch...
+> >>>    Similarly we could set a "packet_id" field that uniquely identifie=
+s a
+> >>>    packet so we can trace it throughout the network stack (through
+> >>>    clones, encap, decap, userspace services...).
+> >>>    The skb->mark, but with more room, and better support for sharing =
+it.
+> >>>
+> >>> We can only know the layout ahead of time for the first one. And they=
+'re
+> >>> similar enough in their requirements (need to be stored somewhere in =
+the
+> >>> SKB, have a way of retrieving each one individually, that it seems to
+> >>> make sense to use a common API).
+> >>
+> >> Why not have the following layout then?
+> >>
+> >> +---------------+-------------------+---------------------------------=
+-------+------+
+> >> | more headroom | user-defined meta | hw-meta (potentially fixed skb f=
+ormat) | data |
+> >> +---------------+-------------------+---------------------------------=
+-------+------+
+> >>                  ^                                                    =
+        ^
+> >>              data_meta                                                =
+      data
+> >>
+> >> You obviously still have a problem of communicating the layout if you
+> >> have some redirects in between, but you, in theory still have this
+> >> problem with user-defined metadata anyway (unless I'm missing
+> >> something).
+> >>
+>
+> Hmm, I think you are missing something... As far as I'm concerned we are
+> discussing placing the KV data after the xdp_frame, and not in the XDP
+> data_meta area (as your drawing suggests).  The xdp_frame is stored at
+> the very top of the headroom.  Lorenzo's patchset is extending struct
+> xdp_frame and now we are discussing to we can make a more flexible API
+> for extending this. I understand that Toke confirmed this here [3].  Let
+> me know if I missed something :-)
+>
+>   [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
+>
+> As part of designing this flexible API, we/Toke are trying hard not to
+> tie this to a specific data area.  This is a good API design, keeping it
+> flexible enough that we can move things around should the need arise.
 
-True in many cases, mostly for macros themselves, but in the functions
-I would prefer to stay away from magic as possible.
++1. And if we have an API for doing this for user-defined metadata, it
+seems like we might as well use it for hardware metadata too.
 
-> Also, something like:
-> 
-> int my_foo()
-> {
-> 	for (;;)
-> 		return X;
-> }
-> 
-> or
-> 
-> int my_foo()
-> {
-> 	do {
-> 		return X;
-> 	} while (0);
-> }
-> 
-> is perfectly valid C that no compiler should be complaining about. Yes
-> its a wee bit daft, but if you want to write it, that's fine.
+With something roughly like:
 
-Yes, the difference is that it's not hidden from the reader.
-The code behind the macro is magic for the reader by default.
+    *val get(id)
 
-> The point being that the compiler can determine there is no path not
-> hitting that return.
-> 
-> Apparently the current for loop is defeating the compiler, I see no
-> reason not to change it in such a way that the compiler is able to
-> determine wtf happens -- that can only help.
-> 
-> > What I would agree on is
-> > 
-> > int my_foo(...)
-> > {
-> > 	return NOT_my_foo_macro(..., X);
-> > }
-> 
-> That just really won't work with things as they are ofcourse.
-> 
-> > Or just using guard()().
+    set(id, *val)
 
-Okay, thanks for sharing your view on this. Since you are the author
-of the original code and seems fine with a change, I can't help myself
-from withdrawing my NACK. OTOH, I am not going to give an Ack either.
+with pre-defined ids for hardware metadata, consumers don't need to know=20
+the layout, or where / how the data is stored.
 
-> That's always an option. You don't *have* to use the -- to you -- weird
-> form.
+Under the hood we can implement it however we want, and change it in the
+future.
 
-Yes, I am not convinced that using scoped_guard() (or any other macro)
-in a described way is okay. Definitely, *I am* not going to do a such
-until I understand the real benefit of it.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+I was initially thinking we could store hardware metadata the same way
+as user defined metadata, but Toke and Lorenzo seem to prefer storing it
+in a fixed struct.
 
