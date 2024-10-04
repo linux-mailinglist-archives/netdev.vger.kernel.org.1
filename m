@@ -1,83 +1,103 @@
-Return-Path: <netdev+bounces-131858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A2C98FBAA
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:41:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627C698FBC9
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E8E51F22995
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 00:41:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ECFF282079
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABC9617C9;
-	Fri,  4 Oct 2024 00:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE951D5AB3;
+	Fri,  4 Oct 2024 01:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JiXv+n1D"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MYMD4QOA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6C217BA7;
-	Fri,  4 Oct 2024 00:41:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364D71862
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 01:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728002504; cv=none; b=DjtsZ4ZKKRyrV1CGz2qqSQDl32vH25JFv9TQUrpwrnU1Ki0USt8tFi5q4+lozsKTj6CshAq9sz8emXcCrstsJ9rPQ+hzLf5/a7vo/rTB7e0fh5QYlpd/1AVIKc+ovJHWNmUAZkcv9j8SxGTtAiUSbbaQ7XwyTWB79S4SdR0i0V0=
+	t=1728003662; cv=none; b=i+v/dFsRqDPD0e76JW7V/8/MlROIWIjkaeKSRKCbrwLEfg3mbACqd82arbMU2qc4qkkvOJYGelEA11I6PoAGHA3WmKhlDer5aibKES/uuA1/mQuLfSoSQ2VRJHBzzc5L/sJYSwYuixtAlfTCmSZXTmbEuSPM21EHB+86jRAll40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728002504; c=relaxed/simple;
-	bh=Pj7/4JkZKTEjFnWPuyqp8I9QcPbg+NwjUmF6x3+YM0c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i+2tlo0+koHuCHIPp+++lVAkcHm3vDZFuC760J0en0ttHDDqBvURt+RYclCX57LH14BNMXmld2hSg/bu/JmCJ45nFW496gSzPb/kHSUhUYAs+VV+4WEeSw8GXnJ6urk5TiKz4MQEjTyuwyyfXAzlLiS+w0MrHyWhwFPfJCTDJH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JiXv+n1D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50EE1C4CEC5;
-	Fri,  4 Oct 2024 00:41:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728002504;
-	bh=Pj7/4JkZKTEjFnWPuyqp8I9QcPbg+NwjUmF6x3+YM0c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JiXv+n1DEbkU8Z50yZLhQtEtgdr/jj7N+8a2xfWp2jaeiVZ2480PT/vvAt7hGU2j2
-	 4w9UeeaXT6dJ5iPrJQGSELnAFdg3YJGt9AfGom6y0Qi4gujs/AlGIwvUSa7Z0TB027
-	 a9+JsYlHhdKTNqv241tqJ9rCUrG1itLI1S3IJ+h7dREIy2jR6Jao2NA3agEzK9bZ6R
-	 4TUEkWNuunTHXcSqZiyEn1sXF2nULPkeGOAKtzcEDfBupQ4IDbAG78lkzONbnsJehf
-	 e3LYa3xI+/dF7V53LbRK2DFyxAslOR73C+SClsJMw5u3c9Qrv2Cibch4ae+Kk+EOOk
-	 KpkFJOU7A3xCQ==
-Date: Thu, 3 Oct 2024 17:41:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
- <diogo.ivo@siemens.com>, <andrew@lunn.ch>, <pabeni@redhat.com>,
- <edumazet@google.com>, <davem@davemloft.net>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
- <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix race condition for VLAN
- table access
-Message-ID: <20241003174142.384e51ad@kernel.org>
-In-Reply-To: <20241003105940.533921-1-danishanwar@ti.com>
-References: <20241003105940.533921-1-danishanwar@ti.com>
+	s=arc-20240116; t=1728003662; c=relaxed/simple;
+	bh=EYP8pSgM8E/aGc55smk0namPehCl8IaAj/HXUD/J7Aw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=dJ7D6aBZvve9CclzP5VcJXrkTum5zA4TToI0tBcohbZG/Iq/hFDVnX43vdxnC2TogzlZy/GhbOw4scejnjxqnaNTE0YlfYNejFAEAw0S+OBBTAZPOeMf3Kd9B1D+e9G96SuX+aMbLKZYkGN7D6HB3e2s9/te4XQ9oWt9BdwC5Qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MYMD4QOA; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728003662; x=1759539662;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=8vGMHm8S6n4bA0GeGT28M8Dr9U9LgqX6K0GMDsxw8hs=;
+  b=MYMD4QOA/2eCgnF/oUU8MVmJiYzTV435PLidYuabfALbmsW/Uw9FiSJI
+   adLrVqjtTTzjdF/8EF3pNiG4miJLyq8N8G1fXqgvck0zhRsccVUNdyUxs
+   cH7lkym7O2p0Hwgt/VjF0VDMU8nvB5vc4DbPNJ3DFefo9e/4E6CHT/Cbq
+   8=;
+X-IronPort-AV: E=Sophos;i="6.11,176,1725321600"; 
+   d="scan'208";a="339430159"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 01:01:00 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:60347]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.239:2525] with esmtp (Farcaster)
+ id 1ab0cb2e-af65-47ec-8df1-2f723b07ef24; Fri, 4 Oct 2024 01:00:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 1ab0cb2e-af65-47ec-8df1-2f723b07ef24
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 01:00:58 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 4 Oct 2024 01:00:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <jk@codeconstruct.com.au>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <matt@codeconstruct.com.au>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net 4/6] mctp: Handle error of rtnl_register_module().
+Date: Thu, 3 Oct 2024 18:00:48 -0700
+Message-ID: <20241004010048.30542-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241003173928.55b74641@kernel.org>
+References: <20241003173928.55b74641@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, 3 Oct 2024 16:29:40 +0530 MD Danish Anwar wrote:
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> index bba6da2e6bd8..9a33e9ed2976 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-> @@ -296,6 +296,7 @@ struct prueth {
->  	bool is_switchmode_supported;
->  	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
->  	int default_vlan;
-> +	spinlock_t vtbl_lock; /* Lock for vtbl in shared memory */
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 3 Oct 2024 17:39:28 -0700
+> On Thu, 3 Oct 2024 13:57:23 -0700 Kuniyuki Iwashima wrote:
+> > Since introduced, mctp has been ignoring the returned value
+> > of rtnl_register_module(), which could fail.
+> > 
+> > Let's handle the errors by rtnl_register_module_many().
+> > 
+> > Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
+> > Fixes: 831119f88781 ("mctp: Add neighbour netlink interface")
+> > Fixes: 06d2f4c583a7 ("mctp: Add netlink route management")
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> Build's unhappy about the section markings:
+> 
+> WARNING: modpost: vmlinux: section mismatch in reference: mctp_init+0xb7 (section: .init.text) -> mctp_neigh_exit (section: .exit.text)
 
-This needs to be kdoc, otherwise:
+Thanks for catching, will remove __exit from mctp_neigh_exit().
 
-drivers/net/ethernet/ti/icssg/icssg_prueth.h:301: warning: Function parameter or struct member 'vtbl_lock' not described in 'prueth'
--- 
-pw-bot: cr
+BTW what option is needed to reproduce it ?
+I tried W=1 C=1 but didn't see that warning.
 
