@@ -1,319 +1,549 @@
-Return-Path: <netdev+bounces-131953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D339900A4
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:14:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5A89900AA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2943A285A2F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:14:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C89B285AB7
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C181537CB;
-	Fri,  4 Oct 2024 10:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6542514A4FB;
+	Fri,  4 Oct 2024 10:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="lJQQnOyE"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="NgrFkqx6"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp-bc0b.mail.infomaniak.ch (smtp-bc0b.mail.infomaniak.ch [45.157.188.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4210A14B07A;
-	Fri,  4 Oct 2024 10:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E786C13E02E;
+	Fri,  4 Oct 2024 10:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728036822; cv=none; b=H0m3In9zVYvdDZbNCAFq6faSsYduQP8+ggsrKyA/AGEMFoV6W1jjSQ29VGdjuFdedByZ5LvMqGGJMMucdxqYOSTNMYhEEITYa18jkEr5Uws7vM/j5OgQnd2HKlc/eBCzZn+D2gAs1lvblbRw8wsXMbyMPOn6PYWB2ju8omk/IKU=
+	t=1728036864; cv=none; b=AbQ+iqar3jsPqyokZTyYgxXBXELVZtO0250Kmrlx055Bc/dMM4jeB0dRdNbGippAsQLwySKhur6IDKjg+aviMUSe6LeyyzIy7S99TcGCpw2tV2R4yMN6LSZXnrwDlUxEyqdaMP7kSQN5svx5wA/8pyXeStIKQ8tdJeoDZjTVDzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728036822; c=relaxed/simple;
-	bh=LWXrW7sFGONFBCBALWIIjFjQXonk6RDTNi55zighhVk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bcbEs6wOFbK/mEk9ZDHPGo2APSZZ02LORPuwI4l7lCfbWPYwIds49FC9WnbLYtjMytRTwDMIZ1HvadR4l7ql76riTn0RSVNYiuAJTHVVkUZASxlIrtahgyDhCx+Kj/0hc+RsMz8nNh5B1GfAQVuSrvtzZ+PYEE7sVPyT27PprIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=lJQQnOyE; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=yfll2XTk4oOaKMmMdk+yvyvMGnugJ4UHyWcKofG4prI=; b=lJQQnOyEN21W8aDDftal2we98R
-	P5m1TKs1wHWcUbleuVwm5unFaAZWewiEQiJ7PSSMh8IHFL0SBvPlnmUCW/Vlx6nfP8zUgbhB/Iphg
-	MZxbgir4dH0KWQR4bdAYnXHGYvCMfSn3ESl9N5+5iqViqKhzwfGFun1XAUSOedLnw8spHy6DeRVKl
-	wV9/OPshBJKhIubiJlp1vlJRZ/0SI84tZYqPJf6/gvoRawxMz+pWM8keAX/Ori0bYfptYCYO3QGSa
-	OrkLtMAE4qihRsvm00pJR3zNYfx5Z7uR8l7r65geTZsaZ+e72VCGwO3LFUdDDK4SkCdpxfaJhCxWX
-	QItOoKSg==;
-Received: from 226.206.1.85.dynamic.cust.swisscom.net ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1swfJa-000BVe-K5; Fri, 04 Oct 2024 12:13:38 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: martin.lau@linux.dev
-Cc: razor@blackwall.org,
-	kuba@kernel.org,
-	jrife@google.com,
-	tangchen.1@bytedance.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next v2 5/5] selftests/bpf: Extend netkit tests to validate skb meta data
-Date: Fri,  4 Oct 2024 12:13:35 +0200
-Message-Id: <20241004101335.117711-5-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241004101335.117711-1-daniel@iogearbox.net>
-References: <20241004101335.117711-1-daniel@iogearbox.net>
+	s=arc-20240116; t=1728036864; c=relaxed/simple;
+	bh=9jWiIpX05LSSZp8Ogukw1p0Wz4ZMz/wTpU5oVh8C7m8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=MvUdiui0r2lvSui3yLXprYGLmsne4TB//Df2hk+lAAuJayBkaUlvuX35SuUIWIeqCaa9fay8gVkBIvrWyGbYqftey1+VHHZdl8e3ofY5OA4VD8r7mytcXQj+YxBQ/SnHGZYWgIqZy9I0kffARKathlZpdfQV//Il+LV7hyWTXrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=NgrFkqx6; arc=none smtp.client-ip=45.157.188.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10:40ca:feff:fe05:1])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XKkt16YbNzPHt;
+	Fri,  4 Oct 2024 12:14:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1728036857;
+	bh=WdKCD0/gPr8kNHaTWIOqAKe3foWfd3Ja4b9zE52EEf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=NgrFkqx6jckHZNTzcPDgMB8JX9sz3zoh5K0kyuO93NYdchU1/9OOO0os7TF8N+Xee
+	 1ZiEksrjkx8FZpMkXM/H8uHHFz2oQ+gvsMjKYWjdw6weS+sBVYubyv/vpJDiwTg/7G
+	 zuo2CT2AH6/Y45kU89miABa76ocX21pfM+B+nGv0=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XKkt053xYzJ2T;
+	Fri,  4 Oct 2024 12:14:16 +0200 (CEST)
+Date: Fri, 4 Oct 2024 12:14:14 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
+	Eric Dumazet <edumazet@google.com>, Vlad Yasevich <vyasevich@gmail.com>, 
+	Neil Horman <nhorman@tuxdriver.com>, "David S. Miller" <davem@davemloft.net>
+Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, 
+	Paul Moore <paul@paul-moore.com>, Alexey Kodanev <alexey.kodanev@oracle.com>, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
+	Matthieu Buffet <matthieu@buffet.re>
+Subject: Re: [RFC PATCH v1 2/2] selftests/landlock: Test non-TCP INET
+ connection-based protocols
+Message-ID: <20241004.Hohpheipieh2@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27417/Fri Oct  4 10:53:24 2024)
+In-Reply-To: <b58680ca-81b2-7222-7287-0ac7f4227c3c@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
-Add a small netkit test to validate skb mark and priority under the
-default scrubbing as well as with mark and priority scrubbing off.
+Eric, Vlad, Neil, and David, there might be a bug in the SCTP
+implementation:
 
-  # ./vmtest.sh -- ./test_progs -t netkit
-  [...]
-  ./test_progs -t netkit
-  [    1.419662] tsc: Refined TSC clocksource calibration: 3407.993 MHz
-  [    1.420151] clocksource: tsc: mask: 0xffffffffffffffff max_cycles: 0x311fcd52370, max_idle_ns: 440795242006 ns
-  [    1.420897] clocksource: Switched to clocksource tsc
-  [    1.447996] bpf_testmod: loading out-of-tree module taints kernel.
-  [    1.448447] bpf_testmod: module verification failed: signature and/or required key missing - tainting kernel
-  #357     tc_netkit_basic:OK
-  #358     tc_netkit_device:OK
-  #359     tc_netkit_multi_links:OK
-  #360     tc_netkit_multi_opts:OK
-  #361     tc_netkit_neigh_links:OK
-  #362     tc_netkit_pkt_type:OK
-  #363     tc_netkit_scrub:OK
-  Summary: 7/0 PASSED, 0 SKIPPED, 0 FAILED
+Paul, Alexey, there is a bug in the SELinux hooks for SCTP:
 
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Nikolay Aleksandrov <razor@blackwall.org>
----
- .../selftests/bpf/prog_tests/tc_netkit.c      | 94 +++++++++++++++++--
- .../selftests/bpf/progs/test_tc_link.c        | 12 +++
- 2 files changed, 97 insertions(+), 9 deletions(-)
+On Fri, Oct 04, 2024 at 12:22:42AM +0300, Mikhail Ivanov wrote:
+> 
+> 
+> On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
+> > On Thu, Oct 03, 2024 at 10:39:32PM +0800, Mikhail Ivanov wrote:
+> > > Extend protocol fixture with test suits for MPTCP, SCTP and SMC protocols.
+> > > Add all options required by this protocols in config.
+> > 
+> > Great coverage!  It's nice to check against SCTP and MPTCP, but as you
+> > were wondering, I think you can remove the SMC protocol to simplify
+> > tests. MPTCP seems to work similarly as TCP wrt AF_UNSPEC, so it might
+> > be worth keeping it, and we might want to control these protocols too
+> > one day.
+> 
+> Thanks! I'll remove SMC then.
+> 
+> > 
+> > > 
+> > > Extend protocol_variant structure with protocol field (Cf. socket(2)).
+> > > 
+> > > Refactor is_restricted() helper and add few helpers to check struct
+> > > protocol_variant on specific protocols.
+> > 
+> > > 
+> > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> > > ---
+> > >   tools/testing/selftests/landlock/common.h   |   1 +
+> > >   tools/testing/selftests/landlock/config     |   5 +
+> > >   tools/testing/selftests/landlock/net_test.c | 212 ++++++++++++++++++--
+> > >   3 files changed, 198 insertions(+), 20 deletions(-)
+> > > 
+> > > diff --git a/tools/testing/selftests/landlock/common.h b/tools/testing/selftests/landlock/common.h
+> > > index 61056fa074bb..40a2def50b83 100644
+> > > --- a/tools/testing/selftests/landlock/common.h
+> > > +++ b/tools/testing/selftests/landlock/common.h
+> > > @@ -234,6 +234,7 @@ enforce_ruleset(struct __test_metadata *const _metadata, const int ruleset_fd)
+> > >   struct protocol_variant {
+> > >   	int domain;
+> > >   	int type;
+> > > +	int protocol;
+> > >   };
+> > >   struct service_fixture {
+> > > diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
+> > > index 29af19c4e9f9..73b01d7d0881 100644
+> > > --- a/tools/testing/selftests/landlock/config
+> > > +++ b/tools/testing/selftests/landlock/config
+> > > @@ -1,8 +1,12 @@
+> > >   CONFIG_CGROUPS=y
+> > >   CONFIG_CGROUP_SCHED=y
+> > >   CONFIG_INET=y
+> > > +CONFIG_INFINIBAND=y
+> > 
+> > Without SMC this infiniband should not be required.
+> 
+> yeap
+> 
+> > 
+> > > +CONFIG_IP_SCTP=y
+> > >   CONFIG_IPV6=y
+> > >   CONFIG_KEYS=y
+> > > +CONFIG_MPTCP=y
+> > > +CONFIG_MPTCP_IPV6=y
+> > >   CONFIG_NET=y
+> > >   CONFIG_NET_NS=y
+> > >   CONFIG_OVERLAY_FS=y
+> > > @@ -10,6 +14,7 @@ CONFIG_PROC_FS=y
+> > >   CONFIG_SECURITY=y
+> > >   CONFIG_SECURITY_LANDLOCK=y
+> > >   CONFIG_SHMEM=y
+> > > +CONFIG_SMC=y
+> > >   CONFIG_SYSFS=y
+> > >   CONFIG_TMPFS=y
+> > >   CONFIG_TMPFS_XATTR=y
+> > > diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+> > > index 4e0aeb53b225..dbe77d436281 100644
+> > > --- a/tools/testing/selftests/landlock/net_test.c
+> > > +++ b/tools/testing/selftests/landlock/net_test.c
+> > > @@ -36,6 +36,17 @@ enum sandbox_type {
+> > >   	TCP_SANDBOX,
+> > >   };
+> > > +/* Checks if IPPROTO_SMC is present for compatibility reasons. */
+> > > +#if !defined(__alpha__) && defined(IPPROTO_SMC)
+> > > +#define SMC_SUPPORTED 1
+> > > +#else
+> > > +#define SMC_SUPPORTED 0
+> > > +#endif
+> > > +
+> > > +#ifndef IPPROTO_SMC
+> > > +#define IPPROTO_SMC 256
+> > > +#endif
+> > > +
+> > >   static int set_service(struct service_fixture *const srv,
+> > >   		       const struct protocol_variant prot,
+> > >   		       const unsigned short index)
+> > > @@ -85,19 +96,37 @@ static void setup_loopback(struct __test_metadata *const _metadata)
+> > >   	clear_ambient_cap(_metadata, CAP_NET_ADMIN);
+> > >   }
+> > > +static bool prot_is_inet_stream(const struct protocol_variant *const prot)
+> > > +{
+> > > +	return (prot->domain == AF_INET || prot->domain == AF_INET6) &&
+> > > +	       prot->type == SOCK_STREAM;
+> > > +}
+> > > +
+> > > +static bool prot_is_tcp(const struct protocol_variant *const prot)
+> > > +{
+> > > +	return prot_is_inet_stream(prot) &&
+> > > +	       (prot->protocol == IPPROTO_TCP || prot->protocol == IPPROTO_IP);
+> > 
+> > Why do we need to check against IPPROTO_IP?
+> 
+> IPPROTO_IP = 0 and can be used as an alias for IPPROTO_TCP (=6) in
+> socket(2) (also for IPPROTO_UDP(=17), Cf. inet_create).
+> 
+> Since we create TCP sockets in a common way here (with protocol = 0),
+> checking against IPPROTO_TCP is not necessary, but I decided to leave it
+> for completeness.
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/tc_netkit.c b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-index b9135720024c..6c49b67155b1 100644
---- a/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-+++ b/tools/testing/selftests/bpf/prog_tests/tc_netkit.c
-@@ -14,7 +14,9 @@
- #include "netlink_helpers.h"
- #include "tc_helpers.h"
- 
--#define ICMP_ECHO 8
-+#define MARK		42
-+#define PRIO		0xeb9f
-+#define ICMP_ECHO	8
- 
- struct icmphdr {
- 	__u8		type;
-@@ -33,7 +35,7 @@ struct iplink_req {
- };
- 
- static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
--			 bool same_netns)
-+			 bool same_netns, int scrub, int peer_scrub)
- {
- 	struct rtnl_handle rth = { .fd = -1 };
- 	struct iplink_req req = {};
-@@ -58,6 +60,8 @@ static int create_netkit(int mode, int policy, int peer_policy, int *ifindex,
- 	data = addattr_nest(&req.n, sizeof(req), IFLA_INFO_DATA);
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_POLICY, policy);
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_PEER_POLICY, peer_policy);
-+	addattr32(&req.n, sizeof(req), IFLA_NETKIT_SCRUB, scrub);
-+	addattr32(&req.n, sizeof(req), IFLA_NETKIT_PEER_SCRUB, peer_scrub);
- 	addattr32(&req.n, sizeof(req), IFLA_NETKIT_MODE, mode);
- 	addattr_nest_end(&req.n, data);
- 	addattr_nest_end(&req.n, linkinfo);
-@@ -118,9 +122,9 @@ static void destroy_netkit(void)
- 
- static int __send_icmp(__u32 dest)
- {
-+	int sock, ret, mark = MARK, prio = PRIO;
- 	struct sockaddr_in addr;
- 	struct icmphdr icmp;
--	int sock, ret;
- 
- 	ret = write_sysctl("/proc/sys/net/ipv4/ping_group_range", "0 0");
- 	if (!ASSERT_OK(ret, "write_sysctl(net.ipv4.ping_group_range)"))
-@@ -135,6 +139,15 @@ static int __send_icmp(__u32 dest)
- 	if (!ASSERT_OK(ret, "setsockopt(SO_BINDTODEVICE)"))
- 		goto out;
- 
-+	ret = setsockopt(sock, SOL_SOCKET, SO_MARK, &mark, sizeof(mark));
-+	if (!ASSERT_OK(ret, "setsockopt(SO_MARK)"))
-+		goto out;
-+
-+	ret = setsockopt(sock, SOL_SOCKET, SO_PRIORITY,
-+			 &prio, sizeof(prio));
-+	if (!ASSERT_OK(ret, "setsockopt(SO_PRIORITY)"))
-+		goto out;
-+
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sin_family = AF_INET;
- 	addr.sin_addr.s_addr = htonl(dest);
-@@ -171,7 +184,8 @@ void serial_test_tc_netkit_basic(void)
- 	int err, ifindex;
- 
- 	err = create_netkit(NETKIT_L2, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false);
-+			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -285,7 +299,8 @@ static void serial_test_tc_netkit_multi_links_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false);
-+			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -413,7 +428,8 @@ static void serial_test_tc_netkit_multi_opts_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false);
-+			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -527,7 +543,8 @@ void serial_test_tc_netkit_device(void)
- 	int err, ifindex, ifindex2;
- 
- 	err = create_netkit(NETKIT_L3, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, true);
-+			    &ifindex, true, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -638,7 +655,8 @@ static void serial_test_tc_netkit_neigh_links_target(int mode, int target)
- 	int err, ifindex;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, false);
-+			    &ifindex, false, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -715,7 +733,8 @@ static void serial_test_tc_netkit_pkt_type_mode(int mode)
- 	struct bpf_link *link;
- 
- 	err = create_netkit(mode, NETKIT_PASS, NETKIT_PASS,
--			    &ifindex, true);
-+			    &ifindex, true, NETKIT_SCRUB_DEFAULT,
-+			    NETKIT_SCRUB_DEFAULT);
- 	if (err)
- 		return;
- 
-@@ -779,3 +798,60 @@ void serial_test_tc_netkit_pkt_type(void)
- 	serial_test_tc_netkit_pkt_type_mode(NETKIT_L2);
- 	serial_test_tc_netkit_pkt_type_mode(NETKIT_L3);
- }
-+
-+void serial_test_tc_netkit_scrub_type(int scrub)
-+{
-+	LIBBPF_OPTS(bpf_netkit_opts, optl);
-+	struct test_tc_link *skel;
-+	struct bpf_link *link;
-+	int err, ifindex;
-+
-+	err = create_netkit(NETKIT_L2, NETKIT_PASS, NETKIT_PASS,
-+			    &ifindex, false, scrub, scrub);
-+	if (err)
-+		return;
-+
-+	skel = test_tc_link__open();
-+	if (!ASSERT_OK_PTR(skel, "skel_open"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(bpf_program__set_expected_attach_type(skel->progs.tc8,
-+		  BPF_NETKIT_PRIMARY), 0, "tc8_attach_type");
-+
-+	err = test_tc_link__load(skel);
-+	if (!ASSERT_OK(err, "skel_load"))
-+		goto cleanup;
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	ASSERT_EQ(skel->bss->seen_tc8, false, "seen_tc8");
-+
-+	link = bpf_program__attach_netkit(skel->progs.tc8, ifindex, &optl);
-+	if (!ASSERT_OK_PTR(link, "link_attach"))
-+		goto cleanup;
-+
-+	skel->links.tc8 = link;
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 1);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+
-+	tc_skel_reset_all_seen(skel);
-+	ASSERT_EQ(send_icmp(), 0, "icmp_pkt");
-+
-+	ASSERT_EQ(skel->bss->seen_tc8, true, "seen_tc8");
-+	ASSERT_EQ(skel->bss->mark, scrub == NETKIT_SCRUB_NONE ? MARK : 0, "mark");
-+	ASSERT_EQ(skel->bss->prio, scrub == NETKIT_SCRUB_NONE ? PRIO : 0, "prio");
-+cleanup:
-+	test_tc_link__destroy(skel);
-+
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PRIMARY, 0);
-+	assert_mprog_count_ifindex(ifindex, BPF_NETKIT_PEER, 0);
-+	destroy_netkit();
-+}
-+
-+void serial_test_tc_netkit_scrub(void)
-+{
-+	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_DEFAULT);
-+	serial_test_tc_netkit_scrub_type(NETKIT_SCRUB_NONE);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/test_tc_link.c b/tools/testing/selftests/bpf/progs/test_tc_link.c
-index ab3eae3d6af8..10d825928499 100644
---- a/tools/testing/selftests/bpf/progs/test_tc_link.c
-+++ b/tools/testing/selftests/bpf/progs/test_tc_link.c
-@@ -18,6 +18,7 @@ bool seen_tc4;
- bool seen_tc5;
- bool seen_tc6;
- bool seen_tc7;
-+bool seen_tc8;
- 
- bool set_type;
- 
-@@ -25,6 +26,8 @@ bool seen_eth;
- bool seen_host;
- bool seen_mcast;
- 
-+int mark, prio;
-+
- SEC("tc/ingress")
- int tc1(struct __sk_buff *skb)
- {
-@@ -100,3 +103,12 @@ int tc7(struct __sk_buff *skb)
- 	seen_tc7 = true;
- 	return TCX_PASS;
- }
-+
-+SEC("tc/egress")
-+int tc8(struct __sk_buff *skb)
-+{
-+	seen_tc8 = true;
-+	mark = skb->mark;
-+	prio = skb->priority;
-+	return TCX_PASS;
-+}
--- 
-2.43.0
+Sound good, but we should then also add variants with IPPROTO_TCP for
+sandboxed and not-sandboxed tests:
 
+/* clang-format off */
+FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_tcp1) {
+	/* clang-format on */
+	.sandbox = NO_SANDBOX,
+	.prot = {
+		.domain = AF_INET,
+		.type = SOCK_STREAM,
+		/* IPPROTO_IP == 0 */
+		.protocol = IPPROTO_IP,
+	},
+};
+
+
+/* clang-format off */
+FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_tcp2) {
+	/* clang-format on */
+	.sandbox = NO_SANDBOX,
+	.prot = {
+		.domain = AF_INET,
+		.type = SOCK_STREAM,
+		.protocol = IPPROTO_TCP,
+	},
+};
+
+> 
+> > 
+> > > +}
+> > > +
+> > > +static bool prot_is_sctp(const struct protocol_variant *const prot)
+> > > +{
+> > > +	return prot_is_inet_stream(prot) && prot->protocol == IPPROTO_SCTP;
+> > > +}
+> > > +
+> > > +static bool prot_is_smc(const struct protocol_variant *const prot)
+> > > +{
+> > > +	return prot_is_inet_stream(prot) && prot->protocol == IPPROTO_SMC;
+> > > +}
+> > > +
+> > > +static bool prot_is_unix_stream(const struct protocol_variant *const prot)
+> > > +{
+> > > +	return prot->domain == AF_UNIX && prot->type == SOCK_STREAM;
+> > > +}
+> > > +
+> > >   static bool is_restricted(const struct protocol_variant *const prot,
+> > >   			  const enum sandbox_type sandbox)
+> > >   {
+> > > -	switch (prot->domain) {
+> > > -	case AF_INET:
+> > > -	case AF_INET6:
+> > > -		switch (prot->type) {
+> > > -		case SOCK_STREAM:
+> > > -			return sandbox == TCP_SANDBOX;
+> > > -		}
+> > > -		break;
+> > > -	}
+> > > -	return false;
+> > > +	return prot_is_tcp(prot) && sandbox == TCP_SANDBOX;
+> > >   }
+> > >   static int socket_variant(const struct service_fixture *const srv)
+> > > @@ -105,7 +134,7 @@ static int socket_variant(const struct service_fixture *const srv)
+> > >   	int ret;
+> > >   	ret = socket(srv->protocol.domain, srv->protocol.type | SOCK_CLOEXEC,
+> > > -		     0);
+> > > +		     srv->protocol.protocol);
+> > >   	if (ret < 0)
+> > >   		return -errno;
+> > >   	return ret;
+> > > @@ -124,7 +153,7 @@ static socklen_t get_addrlen(const struct service_fixture *const srv,
+> > >   		return sizeof(srv->ipv4_addr);
+> > >   	case AF_INET6:
+> > > -		if (minimal)
+> > > +		if (minimal && !prot_is_sctp(&srv->protocol))
+> > 
+> > Why SCTP requires this exception?
+> 
+> SCTP implementation (possibly incorrectly) checks that address length is
+> at least sizeof(struct sockaddr_in6) (Cf. sctp_sockaddr_af() for bind(2)
+> and in sctp_connect() for connect(2)).
+
+sctp_sockaddr_af() checks for len < SIN6_LEN_RFC2133, but also for
+len < af->sockaddr_len, which refers to sctp_af_inet6.sockaddr_len =
+sizeof(struct sockaddr_in6).
+
+I think this is a bug in the SCTP implementation and it would be a fix
+of 81e98370293a ("sctp: sctp_sockaddr_af must check minimal addr length
+for AF_INET6"), which fixes all versions of Linux.
+
+> 
+> > 
+> > >   			return SIN6_LEN_RFC2133;
+> > >   		return sizeof(srv->ipv6_addr);
+> > > @@ -271,6 +300,11 @@ FIXTURE_SETUP(protocol)
+> > >   		.type = SOCK_STREAM,
+> > >   	};
+> > > +#if !SMC_SUPPORTED
+> > > +	if (prot_is_smc(&variant->prot))
+> > > +		SKIP(return, "SMC protocol is not supported.");
+> > > +#endif
+> > > +
+> > >   	disable_caps(_metadata);
+> > >   	ASSERT_EQ(0, set_service(&self->srv0, variant->prot, 0));
+> > > @@ -299,6 +333,39 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_tcp) {
+> > >   	},
+> > >   };
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_mptcp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_MPTCP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_sctp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SCTP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_smc) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SMC,
+> > > +	},
+> > > +};
+> > > +
+> > >   /* clang-format off */
+> > >   FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp) {
+> > >   	/* clang-format on */
+> > > @@ -309,6 +376,39 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp) {
+> > >   	},
+> > >   };
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_mptcp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_MPTCP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_sctp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SCTP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_smc) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = NO_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SMC,
+> > > +	},
+> > > +};
+> > > +
+> > >   /* clang-format off */
+> > >   FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_udp) {
+> > >   	/* clang-format on */
+> > > @@ -359,6 +459,39 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_tcp) {
+> > >   	},
+> > >   };
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_mptcp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_MPTCP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_sctp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SCTP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_smc) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SMC,
+> > > +	},
+> > > +};
+> > > +
+> > >   /* clang-format off */
+> > >   FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp) {
+> > >   	/* clang-format on */
+> > > @@ -369,6 +502,39 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp) {
+> > >   	},
+> > >   };
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_mptcp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_MPTCP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_sctp) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SCTP,
+> > > +	},
+> > > +};
+> > > +
+> > > +/* clang-format off */
+> > > +FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_smc) {
+> > > +	/* clang-format on */
+> > > +	.sandbox = TCP_SANDBOX,
+> > > +	.prot = {
+> > > +		.domain = AF_INET6,
+> > > +		.type = SOCK_STREAM,
+> > > +		.protocol = IPPROTO_SMC,
+> > > +	},
+> > > +};
+> > > +
+> > >   /* clang-format off */
+> > >   FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_udp) {
+> > >   	/* clang-format on */
+> > > @@ -663,7 +829,7 @@ TEST_F(protocol, bind_unspec)
+> > >   	/* Allowed bind on AF_UNSPEC/INADDR_ANY. */
+> > >   	ret = bind_variant(bind_fd, &self->unspec_any0);
+> > > -	if (variant->prot.domain == AF_INET) {
+> > > +	if (variant->prot.domain == AF_INET && !prot_is_sctp(&variant->prot)) {
+> > >   		EXPECT_EQ(0, ret)
+> > >   		{
+> > >   			TH_LOG("Failed to bind to unspec/any socket: %s",
+> > > @@ -689,7 +855,7 @@ TEST_F(protocol, bind_unspec)
+> > >   	/* Denied bind on AF_UNSPEC/INADDR_ANY. */
+> > >   	ret = bind_variant(bind_fd, &self->unspec_any0);
+> > > -	if (variant->prot.domain == AF_INET) {
+> > > +	if (variant->prot.domain == AF_INET && !prot_is_sctp(&variant->prot)) {
+> > 
+> > It looks like we need the same exception for the next bind_variant()
+> > call.
+> 
+> I ran these tests with active selinux (and few other LSMs) (selinux is set
+> by default for x86_64) and it seems that this check was passed
+> correctly due to SCTP errno inconsistency in selinux_socket_bind().
+> 
+> With selinux_socket_bind() disabled, bind_variant() returns -EINVAL as
+> it should (Cf. sctp_do_bind).
+> 
+> Such inconsistency happens because sksec->sclass security field can be
+> initialized with SECCLASS_SOCKET (Cf. socket_type_to_security_class)
+> in SCTP case, and selinux_socket_bind() provides following check:
+> 
+> 	/* Note that SCTP services expect -EINVAL, others -EAFNOSUPPORT. */
+> 	if (sksec->sclass == SECCLASS_SCTP_SOCKET)
+> 		return -EINVAL;
+> 	return -EAFNOSUPPORT;
+> 
+> I'll possibly send a fix for this to selinux.
+
+Yes please, and it would be handy to split this patch with the first
+providing MPTCP coverage and the second SCTP coverage.  This way I'll
+quickly merge the MPTCP tests and wait for the SCTP fixes.
+
+The SELinux issue might have been introduced with commit 0f8db8cc73df
+("selinux: add AF_UNSPEC and INADDR_ANY checks to
+selinux_socket_bind()").
+
+> 
+> > 
+> > >   		if (is_restricted(&variant->prot, variant->sandbox)) {
+> > >   			EXPECT_EQ(-EACCES, ret);
+> > >   		} else {
+> > > @@ -727,6 +893,10 @@ TEST_F(protocol, connect_unspec)
+> > >   	int bind_fd, client_fd, status;
+> > >   	pid_t child;
+> > > +	if (prot_is_smc(&variant->prot))
+> > > +		SKIP(return, "SMC does not properly handles disconnect "
+> > > +			     "in the case of fallback to TCP");
+> > > +
+> > >   	/* Specific connection tests. */
+> > >   	bind_fd = socket_variant(&self->srv0);
+> > >   	ASSERT_LE(0, bind_fd);
+> > > @@ -769,17 +939,18 @@ TEST_F(protocol, connect_unspec)
+> > >   		/* Disconnects already connected socket, or set peer. */
+> > >   		ret = connect_variant(connect_fd, &self->unspec_any0);
+> > > -		if (self->srv0.protocol.domain == AF_UNIX &&
+> > > -		    self->srv0.protocol.type == SOCK_STREAM) {
+> > > +		if (prot_is_unix_stream(&variant->prot)) {
+> > >   			EXPECT_EQ(-EINVAL, ret);
+> > > +		} else if (prot_is_sctp(&variant->prot)) {
+> > > +			EXPECT_EQ(-EOPNOTSUPP, ret);
+> > >   		} else {
+> > >   			EXPECT_EQ(0, ret);
+> > >   		}
+> > >   		/* Tries to reconnect, or set peer. */
+> > >   		ret = connect_variant(connect_fd, &self->srv0);
+> > > -		if (self->srv0.protocol.domain == AF_UNIX &&
+> > > -		    self->srv0.protocol.type == SOCK_STREAM) {
+> > > +		if (prot_is_unix_stream(&variant->prot) ||
+> > > +		    prot_is_sctp(&variant->prot)) {
+> > >   			EXPECT_EQ(-EISCONN, ret);
+> > >   		} else {
+> > >   			EXPECT_EQ(0, ret);
+> > > @@ -796,9 +967,10 @@ TEST_F(protocol, connect_unspec)
+> > >   		}
+> > >   		ret = connect_variant(connect_fd, &self->unspec_any0);
+> > > -		if (self->srv0.protocol.domain == AF_UNIX &&
+> > > -		    self->srv0.protocol.type == SOCK_STREAM) {
+> > > +		if (prot_is_unix_stream(&variant->prot)) {
+> > >   			EXPECT_EQ(-EINVAL, ret);
+> > > +		} else if (prot_is_sctp(&variant->prot)) {
+> > > +			EXPECT_EQ(-EOPNOTSUPP, ret);
+> > >   		} else {
+> > >   			/* Always allowed to disconnect. */
+> > >   			EXPECT_EQ(0, ret);
+> > > -- 
+> > > 2.34.1
+> > > 
+> > > 
+> 
 
