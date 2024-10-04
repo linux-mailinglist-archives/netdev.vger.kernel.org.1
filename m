@@ -1,114 +1,164 @@
-Return-Path: <netdev+bounces-132238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB3099110B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:01:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0625D991135
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89447B2130B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:01:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3E101F21A75
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263CB231CA4;
-	Fri,  4 Oct 2024 21:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329D5335D3;
+	Fri,  4 Oct 2024 21:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PaB+0pOK"
+	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="bxEB6WVo";
+	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="qAtdZn4F";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hVErRAXS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAD0231C87;
-	Fri,  4 Oct 2024 21:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91FA748D;
+	Fri,  4 Oct 2024 21:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728075691; cv=none; b=athSAm0fIZr1UmvMX4QwvKnzrZRXCHyZ+jhvGNVEmYIov4PmepDv0lVXJoCoFQTtRlbdsfP3OR9odplAFMAf7Flt1QKnSFcRxIQW0KYRWSOAEPn1iKHjjRLx+8yTF6N3s9ieeXxgmd7+wbzyCva3Ws6AyeOYiUyPfW21nlfFfQY=
+	t=1728076638; cv=none; b=aKA4oQkr3tzymTz4/Kd9pQ76fWAZ4t6nwRiiZcg2vUrcglaaDA0vvc/UpQ3X5J7Wl49RcHNAtvV9h49HC8TVcLdATTEZlC+k+Cxefpf7IyIaTXdNeAValyp74PMPjzsWyYTx7a5ognBXdgj6U/BuG2K9uVUBmSSa6/W5ZGMDqlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728075691; c=relaxed/simple;
-	bh=IiXT8R+PZu6D57wZCq1PVL4exdlKrRgjlOaFLW93W4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D6oaOE+E8xttyPfP/iP/u/38QF8wdKjXnN1I75zqjqoaWXZOUsBi5yloUx4k7jyyCCRlTzogISTSxAcfMVKdX/pbMVyLbRBC5/IO/1m9DPRgX7ZlcoN+npwAUQEBxAw/y4eh+DA5VraZ0Z+PNLMSLJRlrymXBbZvFPsQ9wrMtk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PaB+0pOK; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4a3c6bc4cecso710511137.0;
-        Fri, 04 Oct 2024 14:01:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728075688; x=1728680488; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eCAwr3wWq1gW9iEkujpHE5/UksXg5caVVj+cmaQRza8=;
-        b=PaB+0pOKJbjwhFwrEnp8lfE8/rrWxoJSwfvN33G5d/1kxVNd/hAFekZdjcLVqheX1k
-         ayZGyJRBNX12PgJtbSOmeXr/+kTQejlZOpme8NMEBqo4Cp+52rFYXGr2rGy8zauM0Md7
-         az2iCM/rc8KRQL4urmZoOssauIYceIJixpHfrKO+NloOOBxPAKF1xqaMlGDIGOEypeRf
-         /v+3h0eZnh7sf2NBbsDVr0oVIH6RSV2cQ9JUYSF2CAASw3U/2Epso/tNe0P3cLXwfpKY
-         HCJBLcKLAjWmimeJ5p7wPNVUZSrC2TPiNyupm16HGeHYe9/orRhGtGCvUsxX2NHYplFM
-         ZSPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728075688; x=1728680488;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eCAwr3wWq1gW9iEkujpHE5/UksXg5caVVj+cmaQRza8=;
-        b=b3wHpnHTHs/Om3jGwgN6rd9gnthtYo6tV6h4YhatGfyvV2et6yXGEVMtEUtsl4yhO0
-         ROFOhWcoiRIhHcVfUDC515wT/EIGm5E5xhZLfm5l01fjtkJ7YhpJuvq5u3YeQKgdJyNc
-         gqIsBYfjzKW5DNibE+uQtHH4WPaD4tkQu1hu3DL629VYmb6nDXU9y8Hxw+viNp/oKhJu
-         KKsNySTB5kHb5dtV8GMCb8zBVdjV2CtewMVnmHWBlbqKK/vUzLJA2T91g0n9Z/vuSGLv
-         bhTmAdUjbjcffSXJdXjxMcySsGB2yJiqJKY9WqyP7jxL6IPS1JMXBmy8YgpIgpw4QfAP
-         bmUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXR8Yc1R/af0Jql9Ze3DqzjjDZEgkd0AQ+kLni8+Qj98HObDaTZk8yteLirisPd+4AN1u27l5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzvPVsKeh8vXwlD72z1WTJt+RCX2Ldb/KlLs965LsSf9cgl/MV
-	9PUOZ0Zcs6//GK801KFuSswd2UsKU68VSEodwz04v37H33gP9l0qwNE7Dg==
-X-Google-Smtp-Source: AGHT+IFDgQXt6BE0vslO+PL31Pp1JZlQ3KT8WG2EfLa77Km88t5+msWn4a4Tfn5M1LU67rcOYuWgVw==
-X-Received: by 2002:a05:6102:290e:b0:4a3:cb2b:9748 with SMTP id ada2fe7eead31-4a4058ee453mr3181653137.24.1728075688450;
-        Fri, 04 Oct 2024 14:01:28 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-84f5c78c78csm103860241.13.2024.10.04.14.01.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 14:01:26 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-10-04
-Date: Fri,  4 Oct 2024 17:01:24 -0400
-Message-ID: <20241004210124.4010321-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.46.1
+	s=arc-20240116; t=1728076638; c=relaxed/simple;
+	bh=RpoEDeqlxbuppRWdpLnZslav63s3dmblrVDw6McgZSc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=iq9CiNGdWznNfpg6w4sq4K9CQYtUxefhQhAPA0+RoIiM2EBBbUhwfMoQkLOr1zusDw80KwNahmBdLkQICh8QPNmpDTH/a8In4o+B2bUThevM2UIdPQdgPGn8HXNqAvb8xhIGQqx1o3ugiUOa8PZEsOCEbbdy9csHHPGl/J+1Mg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=bxEB6WVo; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=qAtdZn4F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hVErRAXS; arc=none smtp.client-ip=103.168.172.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id E5F021140186;
+	Fri,  4 Oct 2024 17:17:14 -0400 (EDT)
+Received: from phl-frontend-02 ([10.202.2.161])
+  by phl-compute-03.internal (MEProxy); Fri, 04 Oct 2024 17:17:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=2016-12.pbsmtp; t=1728076634; x=1728163034;
+	 bh=sJiGPvaGT9+liNHplnBnzyAkSDZcQrT4sSVBTwtxIFI=; b=bxEB6WVocmY+
+	cBk85Al+a4K0vWknGE++XjdRFC8XVtJqkkdhcOAIJWPY0fJufFrbUyv2V7jNpB+r
+	WJy2QWTuha26l35WQHloZLh1vMkwVnEyp63XJbNHhyEgw4o7UMEBffcZc2fo7MkT
+	1WqXSmBPoNBMglUt1rPwWuWXXNzu09Y=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1728076634; x=1728163034; bh=sJiGPvaGT9
+	+liNHplnBnzyAkSDZcQrT4sSVBTwtxIFI=; b=qAtdZn4FgJWmrFhHhM3Y0xlNxK
+	Fco0wPlnSR3rgxjzujCKG6gCtxU7S2EOBlH7TF6kMeGlMbK+3zOMHqVgoMyq5x1u
+	E0ZFSjFWSUQfKKTTuVRDsCUK0azCC3WBf7qG55GCtc1Slh0vkYYNGWfWD2HemWSa
+	i0/qwD6toTExIETQtDjyOnb82yUhY3RmlvO9JLOvuiRaNSeBzXca3/MK2Fnb9Cpj
+	kRMqtieI7mAB0KA441wZrfcdgb4JE7YmKByPI1zBcCcol9iZjTpyAOi6CPsLuJXj
+	NQZdrCupuu8bKYKhDZOx5UuH3IL/quUq46XukoG4XyZtFbTPRmfsvqwgk0FA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728076634; x=1728163034; bh=sJiGPvaGT9+liNHplnBnzyAkSDZc
+	QrT4sSVBTwtxIFI=; b=hVErRAXSm5dH1JzcgCEXAcuoZY37hg8ROnTM2jsWrXo1
+	eGiD3n7ZFQjIkt4ZhcIj5epRMGH4IZ6GCRFaPYroEfWlwfqpkP0jw5ZyTivw6ovt
+	pz74HFgIIDoaleVcXTU+vLWWcBvnkXHFbtb9+TikgRMDRCt3GZeEFohYKaWTiSo4
+	RgMqMhLLr7kkMm2kepiTlR9UJ7JK0Ccp7DdjvWFK9fgeyrkw+SYTLE4GmtjzGLqV
+	wIYd6VtsqS7ngfNwqeqkvERNqV/Wwcmj/gs1tSEnsvLiBhcBKHgC4qgICICH/F+3
+	rHYfZlZVbm6DYmuO2CiIbWctNvSnLPO3VkHcIMcqGw==
+X-ME-Sender: <xms:WlsAZzFmNpeEryzlppeqDGaz08uzAGB2Qg8BAdwrKiJnseUvxEcUKw>
+    <xme:WlsAZwWlGz39C-CtULVtBGblnaqhxuZdGk_24ElKAvK5fvETsQWEMyxobYUrJskgA
+    MEYlHMxLha-ZX9zyEA>
+X-ME-Received: <xmr:WlsAZ1IZBEnokP48tbutmeNzEmC0zQic-pYQE1URCvPpMfgYIvlL5ODWfQXvObOm34j5eVOfy2DO2KqcXbxLEJ4y8nermqS6js--yhz8v1HWW3AdnQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvfedgudehlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefujgfkfhggtgesthdtredttddtvden
+    ucfhrhhomheppfhitgholhgrshcurfhithhrvgcuoehnihgtohesfhhluhignhhitgdrnh
+    gvtheqnecuggftrfgrthhtvghrnhepgfevvdfhfeeujeeggffgfefhleffieeiuddvheff
+    udehudffkeekhfegfffhfeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepnhhitghosehflhhugihnihgtrdhnvghtpdhnsggprhgtphhtthho
+    peelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
+    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhoghgvrh
+    hqsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgt
+    ohhmpdhrtghpthhtohepghhrhihgohhrihhirdhsthhrrghshhhkohesthhirdgtohhmpd
+    hrtghpthhtohepvhhighhnvghshhhrsehtihdrtghomhdprhgtphhtthhopehlihhnuhig
+    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtug
+    gvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:WlsAZxHg-X36rmzdpGlpADMfdJg0NCuYECu_LR4tVlGw1zJ2j5kESg>
+    <xmx:WlsAZ5Vxo6xAkuxfOTzZYPfsobE7p9SBKepDwxVgj2SsAPEroYJ1EA>
+    <xmx:WlsAZ8PW5cWrUUrVPC54UuEF6ky0x2iyvrAPesGxfnz6gGGl77rb6Q>
+    <xmx:WlsAZ400MUqH322TMaAR_Uh5nxTUdCCxc1LFva4aMtov3CFtbwjthw>
+    <xmx:WlsAZyOTTQTJvOqRx7kTglG9jVexxnXjLn0LBBbJiFiDIn1aHVmFiWDy>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Oct 2024 17:17:14 -0400 (EDT)
+Received: from xanadu (unknown [IPv6:fd17:d3d3:663b:0:9696:df8a:e3:af35])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id C4024E427B9;
+	Fri,  4 Oct 2024 17:17:13 -0400 (EDT)
+Date: Fri, 4 Oct 2024 17:17:13 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: Roger Quadros <rogerq@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, 
+    Grygorii Strashko <grygorii.strashko@ti.com>, 
+    Vignesh Raghavendra <vigneshr@ti.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 2/2] net: ethernet: ti: am65-cpsw: avoid
+ devm_alloc_etherdev, fix module removal
+In-Reply-To: <f41f65bd-104c-44de-82a2-73be59802d96@kernel.org>
+Message-ID: <6s1952p2-7rs5-06nn-19on-5170q4720852@syhkavp.arg>
+References: <20241004041218.2809774-1-nico@fluxnic.net> <20241004041218.2809774-3-nico@fluxnic.net> <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org> <s5000qsr-8nps-87os-np52-oqq6643o35o2@syhkavp.arg> <f41f65bd-104c-44de-82a2-73be59802d96@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 
-The following changes since commit 500257db81d067c1ad5a202501a085a8ffea10f1:
+On Fri, 4 Oct 2024, Roger Quadros wrote:
 
-  Merge branch 'ibmvnic-fix-for-send-scrq-direct' (2024-10-04 12:04:12 -0700)
+> 
+> 
+> On 04/10/2024 18:37, Nicolas Pitre wrote:
+> >>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> >>> index f6bc8a4dc6..e95457c988 100644
+> >>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> >>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> >>> @@ -2744,10 +2744,9 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
+> >>>  		return 0;
+> >>>  
+> >>>  	/* alloc netdev */
+> >>> -	port->ndev = devm_alloc_etherdev_mqs(common->dev,
+> >>> -					     sizeof(struct am65_cpsw_ndev_priv),
+> >>> -					     AM65_CPSW_MAX_QUEUES,
+> >>> -					     AM65_CPSW_MAX_QUEUES);
+> >>> +	port->ndev = alloc_etherdev_mqs(sizeof(struct am65_cpsw_ndev_priv),
+> >>> +					AM65_CPSW_MAX_QUEUES,
+> >>> +					AM65_CPSW_MAX_QUEUES);
+> >>
+> >> Can we solve this issue without doing this change as
+> >> there are many error cases relying on devm managed freeing of netdev.
+> > 
+> > If you know of a way to do this differently I'm all ears.
+> 
+> I sent another approach already. please check.
 
-are available in the Git repository at:
+Slowly being built.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-04
+> > About the many error cases needing the freeing of net devices, as far as 
+> > I know they're all covered with this patch.
+> 
+> No they are not. you now have to explicitly call free_netdev() in error paths of am65_cpsw_nuss_init_port_ndev().
 
-for you to fetch changes up to 610712298b11b2914be00b35abe9326b5dbb62c8:
+And it does. If am65_cpsw_nuss_init_ndevs() fails then it frees them 
+all. Same as with am65_cpsw_nuss_phylink_cleanup().
 
-  Bluetooth: btusb: Don't fail external suspend requests (2024-10-04 16:54:25 -0400)
 
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
- - hci_conn: Fix UAF in hci_enhanced_setup_sync
- - btusb: Don't fail external suspend requests
-
-----------------------------------------------------------------
-Luiz Augusto von Dentz (3):
-      Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_state_change
-      Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync
-      Bluetooth: btusb: Don't fail external suspend requests
-
- drivers/bluetooth/btusb.c   | 20 ++++++++++++++++++--
- net/bluetooth/hci_conn.c    |  3 +++
- net/bluetooth/rfcomm/sock.c |  2 --
- 3 files changed, 21 insertions(+), 4 deletions(-)
+Nicolas
 
