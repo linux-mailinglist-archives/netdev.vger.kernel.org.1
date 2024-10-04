@@ -1,83 +1,105 @@
-Return-Path: <netdev+bounces-132003-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 422299901E4
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:15:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6B29901FA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:19:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BCF1C227E3
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C290281B28
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E0915747D;
-	Fri,  4 Oct 2024 11:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3589A155C98;
+	Fri,  4 Oct 2024 11:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qh7bkzjy"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D0A13DDD3;
-	Fri,  4 Oct 2024 11:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8596213AD03
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728040502; cv=none; b=DeoXB1rNkjYKYFF/I2ChepplcCJ9/Jw8Nf5Niy1Evg+s+BnP4QhBwd2ZbjJ70UMJVNtqlv/qfrOLPQzpd/cg2fZGVkFb7Sd1lXBO/tHIAT1Emb1Hnxm2M++86Z+lut8VwFZiFBaV3EBL5PfuBnAhtOMSl/g0ZRmkit8/jaEam0Q=
+	t=1728040789; cv=none; b=vDJhbqlTvuJ6KoGPj3Z05LlfIaWLQhAHMg0Kj5T2FgH0kpz+7IMWgYyrWP2wr60Hy68syUD9nzRXi51zZJVmcJ+o27Olv827qjIOCBWPGyI1yYpVEg/8/mlvbyJ4nNAWb986mLFIaUccF7kWB/gj3u/vjZM17E/bOnK/3bAoOt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728040502; c=relaxed/simple;
-	bh=LW23ndT1CxeC4h6uYTBagZ3oCm4WR+VrDPZOUEWaIBI=;
+	s=arc-20240116; t=1728040789; c=relaxed/simple;
+	bh=OybRsfH6iKf+HDwwj9pBXwKaxVvvPcR7LIt9eGmKgn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mwd6jSgXxOqPglwuUugYZ1MLBm6f+U+Oa3QTDbRUVA+/FfOSk+wZzZLCUb4XvFVJXGQVNA6DMacJf/aINee/rte6nuWf9v0vaibdNyDxbL+BF4dTH9qDTKCvAn0YlBFegZe2oIIgUyJa6QOe6t+fFYC2tLOgYVI/jowKXFKXdH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=54078 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1swgGt-00FAWP-Bk; Fri, 04 Oct 2024 13:14:57 +0200
-Date: Fri, 4 Oct 2024 13:14:54 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Justin Stitt <justinstitt@google.com>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbHK2JBzmqtwX+NNpi83ziFHC0Ie7b7xuAcTtNoipc8naIkOHPM0h7cfKGpv17PmRYFj/yjLyjBZBeBYPLQGZCmjXkMibQMCVCAF05W7gvVJ0vHjddpWZkWU2IbCB5BG4WLnnkEnfL5R5vF8B3yhdt0jJNjvg7MFE3KnK0js2Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qh7bkzjy; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a966de2f4d3so29296566b.2
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 04:19:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728040785; x=1728645585; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=21/ANHQaVAmEnIKVWasnSHMY8ie5sYhBEQjQDCw2+OI=;
+        b=Qh7bkzjydjPF7q+N0ZJndlorBpXEAnisbD6W/E1TIuToGrj/IEJq6Sp9s1yL8zFvcM
+         E1YwV+GkEXr83egu07wzlYtMAIy3P4xQv7RYEib/vKGb/e34X1y4rg2dSXp3Ctf+JPoJ
+         Dol1rJCfQBcnrG45j1MCl3kCcSqYbAzmXCZjAM4qff9XwpVzq/YbRqyLoDCl0RYMIorh
+         tSVLnDwCiKZ5sc5OASuAo9OBvRxgF1SVK1TaNk5AIINSp9e0tWGPdI9ACFSw126sa7fG
+         /v5QvAbRVq3qoQV5ZBEbwbSw8HUD8R6aUzzorsYfVjorjKjAxdCoc13EKxiODPHCFs9g
+         kwCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728040785; x=1728645585;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=21/ANHQaVAmEnIKVWasnSHMY8ie5sYhBEQjQDCw2+OI=;
+        b=r4ze3QtqIUz7RxKF33AkpfrOqNa+K8Z/+cDtCBY6EKgtD6/9ULrB1Rn8an9oZpMih3
+         HqG60Pr00YMmR2T53gsRQChuQZDdA1LWjhLzlCH4I164i1JQsBVuZHx8VKmNULsdf+0G
+         VrYDB40V4Y/iivxMx3ROewUtr7VMlBSWBCo1y4YseHupW07nfzBZMq2wmj+S8t2wSpvm
+         w2hHQwrNrIC4Tldfx+ra+KYPdnRtbkZ+3334zPDxP9pFNyMeFjit3exr//jeQKag7DqF
+         TWtPCAm4SyVTCAzhQxcsvWsIGY+k0uIiv4vUJ6//29dqLJTbzD2hKQBK70Q0yJO5mFKK
+         5YLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU8xOVecXitmrmSaMxNwcfPv303XoQbIhECcha7KLfZL/YQbB5BShM6UUOH2Lm95g+r/wgJqAQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY3IiJuQWyQ+HH9p9zjTQqQMMrENgWPj2kCRz/kpasOSQnL4rB
+	iDcKZbmwiXXcXDIlDYYr0p3GnRp/9Y84zoGOeRzMb8nLCZU5SvBC
+X-Google-Smtp-Source: AGHT+IFPKLUaC6w5boja1xHVBGVElwe3dN447ckuLj8ZW8kJK8aoR+nYtgFWEIxSqzAexPpQpvcpJw==
+X-Received: by 2002:a17:906:7310:b0:a8d:2624:1a84 with SMTP id a640c23a62f3a-a991bed1a26mr110366866b.11.1728040784216;
+        Fri, 04 Oct 2024 04:19:44 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9910473155sm212364466b.151.2024.10.04.04.19.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 04:19:43 -0700 (PDT)
+Date: Fri, 4 Oct 2024 14:19:40 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
-	Kees Cook <kees@kernel.org>
-Subject: Re: [PATCH] netfilter: nf_tables: replace deprecated strncpy with
- strscpy_pad
-Message-ID: <Zv_OLpeDYCPiPH19@calendula>
-References: <20240909-strncpy-net-bridge-netfilter-nft_meta_bridge-c-v1-1-946180aa7909@google.com>
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 00/13] net: pcs: xpcs: cleanups batch 2
+Message-ID: <20241004111940.xbtssgeggp5mcprl@skbuf>
+References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240909-strncpy-net-bridge-netfilter-nft_meta_bridge-c-v1-1-946180aa7909@google.com>
-X-Spam-Score: -1.8 (-)
+In-Reply-To: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
 
-On Mon, Sep 09, 2024 at 03:48:39PM -0700, Justin Stitt wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings [1] and
-> as such we should prefer more robust and less ambiguous string interfaces.
-> 
-> In this particular instance, the usage of strncpy() is fine and works as
-> expected. However, towards the goal of [2], we should consider replacing
-> it with an alternative as many instances of strncpy() are bug-prone. Its
-> removal from the kernel promotes better long term health for the
-> codebase.
-> 
-> The current usage of strncpy() likely just wants the NUL-padding
-> behavior offered by strncpy() and doesn't care about the
-> NUL-termination. Since the compiler doesn't know the size of @dest, we
-> can't use strtomem_pad(). Instead, use strscpy_pad() which behaves
-> functionally the same as strncpy() in this context -- as we expect
-> br_dev->name to be NUL-terminated itself.
+On Fri, Oct 04, 2024 at 11:19:57AM +0100, Russell King (Oracle) wrote:
+>  drivers/net/pcs/pcs-xpcs-nxp.c                    |  24 +-
 
-Applied to nf-next
+I want to test this on the SJA1110, but every XPCS cleanup series day is
+a new unpacking day. I have to take the board out of a box and make sure
+it still works. It might take a while.
 
