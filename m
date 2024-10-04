@@ -1,213 +1,131 @@
-Return-Path: <netdev+bounces-132087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7339905CF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:18:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E04919905D5
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:19:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CD481F22579
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:18:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764691F2265C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FCF2141DF;
-	Fri,  4 Oct 2024 14:18:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6949C215F48;
+	Fri,  4 Oct 2024 14:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARk+eqzg"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="NYXJ1CQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB119381AF;
-	Fri,  4 Oct 2024 14:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFDC2139DA;
+	Fri,  4 Oct 2024 14:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051500; cv=none; b=R6uBnUWPSzGULizZVhofayGiWmh1jPeB4mQCCkjlaju5Mvyh4okwVi5dxz8ZpJmnWO1mz2g2IAnq8blASbmtQXG5sIl6f49FGNccs74podhSDQTkzXDZOKQlLmu1WhV9hwszcykaWojbId5G1IUHfN5ELd1mEbq3CkgT8okVDoE=
+	t=1728051569; cv=none; b=EQKFi08Tp9BGDknDzTSESYofLrRlfXwdxg/6l/hORJ5gleZ/pBy0usWjIZ5c+xKhGp2/NfSoaCz8ybWtZhrOF5HvClUGod5UDfr1JTh/IZuLUu1mYUZuA00QjCJtFXHwhjHWPLC8Wkt291iIkrfrZMak9N8yBIsAu6OCrFZiYBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051500; c=relaxed/simple;
-	bh=4kvEOwxD0KmLhLBIGFcwqKxiF4pucCN8YvTgTZKsDI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWaLJztfQMDZ9KxQSmB4wm+WOkIETIcdH1irWrFqAqhTVjHx6ebnNQJOaMXb6iMPaY3jLrPkhiZE5+0u7JMm0JrRf8yeoJwxIlKNEpSeY1JLL+smVmgMnO4ScW6xpx8yGMKKZcdFH6en9/+6gQDdtuH4+ZMS0/mDyAyEQdwttPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARk+eqzg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E46E9C4CEC7;
-	Fri,  4 Oct 2024 14:18:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728051499;
-	bh=4kvEOwxD0KmLhLBIGFcwqKxiF4pucCN8YvTgTZKsDI8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ARk+eqzgybEFCfVHWaZ6qsXg76DeOz71DtgJenZKfH6b5n6jpJg6xJzQFdIZbz4I5
-	 wpBWv946XypX9e7sWnA6R86JpqACnBrmRg6R8PNW7SAdfbcB7mSpsECNInSPZLjz/m
-	 KaDxVspmPFt70vU3GsiYzfHYxhTUE/GS5+5W8DZbnoDLMAYx6iwGx4ySOLqnzjoWTH
-	 TURLJGUGIPM8hA+yQQNOl8MQo4H3d6DgnmnQmzkkl/W/CdwNeMkD0pMdI/lB38Az1i
-	 uyD+5+vSdlT45l1H0uTGkeq3i+q27J587ayxa0F4m3PtFBR5XUN4/mWuh1zW7PGXbL
-	 TlCCaH3LcQIyQ==
-Date: Fri, 4 Oct 2024 16:18:17 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Arthur Fabre <afabre@cloudflare.com>, Daniel Xu <dxu@dxuuu.xyz>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	Lorenzo Bianconi <lorenzo.bianconi@redhat.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
-	john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
-	sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, mst@redhat.com,
-	jasowang@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	kernel-team <kernel-team@cloudflare.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-Message-ID: <Zv_5KdpkaYY-6z1f@lore-desk>
-References: <87zfnnq2hs.fsf@toke.dk>
- <Zv18pxsiTGTZSTyO@mini-arch>
- <87ttdunydz.fsf@toke.dk>
- <Zv3N5G8swr100EXm@mini-arch>
- <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby>
- <Zv794Ot-kOq1pguM@mini-arch>
- <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
- <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
- <D4N2N1YKKI54.1WAGONIYZH0Y4@bobby>
- <75fb1dd3-fe14-426c-bc59-9a582c4b0e8d@kernel.org>
+	s=arc-20240116; t=1728051569; c=relaxed/simple;
+	bh=2BLWGkCi9IuXDLYDzEKfW7ieDXxkrD9eyPr/svUeaL4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=nzCqEbPMy9wnjGYHH5loNeVHRrCvWA7v04L9HQgPD/v4qzEKTZ0yU8N4VDgMShPjbX476Bv0lhlZbo4U9n0y49bCL1584VGhKgJM50VoztRzknosa+KEwvhozHTmNRSPPQleaqu7xjdzNHH2bfCjeE59F2b4pG/Na1R8x8ou5oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=NYXJ1CQU; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1728051567; x=1759587567;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=2BLWGkCi9IuXDLYDzEKfW7ieDXxkrD9eyPr/svUeaL4=;
+  b=NYXJ1CQUeZDU3bmeoPXRXpH4wXSUC8X99arGiXJf+KuX5n+Z2sD4h4vP
+   TUlIajcdAxtaadOzT/WqI/cb1sjnldjeh2avnhQSrw8Eel5nlMehbkx7h
+   kTjWnNDqA6M28eve1v2IAOyTmHlqHzeLEvfCayMkvHc1yR9TxC5/L/CBr
+   yoNGmpoYGZj3Xuc9Q4ftBHPoMc4E7CMm3qVqUqitvdr5tfjsdJkJc37tT
+   aMRAPqo5IJC8UYMQC7mWvjZSjguShhuIAcrUXqlit4UdVaEe/Mh+wGwk/
+   d17CC4El9K/ds271qVSSQg7mr9pndz1Gb0Sl/QriD3We08DWxxYzp5Y/i
+   A==;
+X-CSE-ConnectionGUID: gI4jLvESQWmk89b6me/PGQ==
+X-CSE-MsgGUID: NwJtQ0+/RNGly4b7rAsyww==
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="35905329"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2024 07:19:26 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 4 Oct 2024 07:19:03 -0700
+Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 4 Oct 2024 07:19:01 -0700
+Message-ID: <1cba974d-492e-49f0-8d43-1a75672861d0@microchip.com>
+Date: Fri, 4 Oct 2024 16:19:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="sMZhZyVlOLBRigTk"
-Content-Disposition: inline
-In-Reply-To: <75fb1dd3-fe14-426c-bc59-9a582c4b0e8d@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: macb: Adding support for Jumbo Frames up to
+ 10240 Bytes in SAMA5D2
+Content-Language: en-US, fr-FR
+To: Aleksander Jan Bajkowski <olek2@wp.pl>, <claudiu.beznea@tuxon.dev>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, linux-arm-kernel
+	<linux-arm-kernel@lists.infradead.org>
+References: <20241003171941.8814-1-olek2@wp.pl>
+From: Nicolas Ferre <nicolas.ferre@microchip.com>
+Organization: microchip
+In-Reply-To: <20241003171941.8814-1-olek2@wp.pl>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 03/10/2024 at 19:19, Aleksander Jan Bajkowski wrote:
+> As per the SAMA5D2 device specification it supports Jumbo frames.
+> But the suggested flag and length of bytes it supports was not updated
+> in this driver config_structure.
+> The maximum jumbo frames the device supports:
+> 10240 bytes as per the device spec.
+> 
+> While changing the MTU value greater than 1500, it threw error:
+> sudo ifconfig eth1 mtu 9000
+> SIOCSIFMTU: Invalid argument
+> 
+> Add this support to driver so that it works as expected and designed.
+> 
+> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
 
---sMZhZyVlOLBRigTk
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Looks good indeed:
+Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
 
-On Oct 04, Jesper Dangaard Brouer wrote:
->=20
->=20
-> On 04/10/2024 15.55, Arthur Fabre wrote:
-> > On Fri Oct 4, 2024 at 12:38 PM CEST, Jesper Dangaard Brouer wrote:
-> > > [...]
-> > > > > > There are two different use-cases for the metadata:
-> > > > > >=20
-> > > > > > * "Hardware" metadata (like the hash, rx_timestamp...). There a=
-re only a
-> > > > > >     few well known fields, and only XDP can access them to set =
-them as
-> > > > > >     metadata, so storing them in a struct somewhere could make =
-sense.
-> > > > > >=20
-> > > > > > * Arbitrary metadata used by services. Eg a TC filter could set=
- a field
-> > > > > >     describing which service a packet is for, and that could be=
- reused for
-> > > > > >     iptables, routing, socket dispatch...
-> > > > > >     Similarly we could set a "packet_id" field that uniquely id=
-entifies a
-> > > > > >     packet so we can trace it throughout the network stack (thr=
-ough
-> > > > > >     clones, encap, decap, userspace services...).
-> > > > > >     The skb->mark, but with more room, and better support for s=
-haring it.
-> > > > > >=20
-> > > > > > We can only know the layout ahead of time for the first one. An=
-d they're
-> > > > > > similar enough in their requirements (need to be stored somewhe=
-re in the
-> > > > > > SKB, have a way of retrieving each one individually, that it se=
-ems to
-> > > > > > make sense to use a common API).
-> > > > >=20
-> > > > > Why not have the following layout then?
-> > > > >=20
-> > > > > +---------------+-------------------+----------------------------=
-------------+------+
-> > > > > | more headroom | user-defined meta | hw-meta (potentially fixed =
-skb format) | data |
-> > > > > +---------------+-------------------+----------------------------=
-------------+------+
-> > > > >                   ^                                              =
-              ^
-> > > > >               data_meta                                          =
-            data
-> > > > >=20
-> > > > > You obviously still have a problem of communicating the layout if=
- you
-> > > > > have some redirects in between, but you, in theory still have this
-> > > > > problem with user-defined metadata anyway (unless I'm missing
-> > > > > something).
-> > > > >=20
-> > >=20
-> > > Hmm, I think you are missing something... As far as I'm concerned we =
-are
-> > > discussing placing the KV data after the xdp_frame, and not in the XDP
-> > > data_meta area (as your drawing suggests).  The xdp_frame is stored at
-> > > the very top of the headroom.  Lorenzo's patchset is extending struct
-> > > xdp_frame and now we are discussing to we can make a more flexible API
-> > > for extending this. I understand that Toke confirmed this here [3].  =
-Let
-> > > me know if I missed something :-)
-> > >=20
-> > >    [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
-> > >=20
-> > > As part of designing this flexible API, we/Toke are trying hard not to
-> > > tie this to a specific data area.  This is a good API design, keeping=
- it
-> > > flexible enough that we can move things around should the need arise.
-> >=20
-> > +1. And if we have an API for doing this for user-defined metadata, it
-> > seems like we might as well use it for hardware metadata too.
-> >=20
-> > With something roughly like:
-> >=20
-> >      *val get(id)
-> >=20
-> >      set(id, *val)
-> >=20
-> > with pre-defined ids for hardware metadata, consumers don't need to know
-> > the layout, or where / how the data is stored.
-> >=20
-> > Under the hood we can implement it however we want, and change it in the
-> > future.
-> >=20
-> > I was initially thinking we could store hardware metadata the same way
-> > as user defined metadata, but Toke and Lorenzo seem to prefer storing it
-> > in a fixed struct.
->=20
-> If the API hide the actual location then we can always move things
-> around, later.  If your popcnt approach is fast enough, then IMO we
-> don't need a fixed struct for hardware metadata.
+Thanks, best regards,
+   Nicolas
 
-+1. I am fine with the KV approach for nic metadata as well if it is fast e=
-nough.
-If you want I can modify my series to use kfunc sto store data after xdp_fr=
-ame
-and then you can plug the KV encoding. What do you think? Up to you.
+> ---
+>   drivers/net/ethernet/cadence/macb_main.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index f06babec04a0..9fda16557509 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -4841,10 +4841,11 @@ static const struct macb_config pc302gem_config = {
+>   };
+> 
+>   static const struct macb_config sama5d2_config = {
+> -       .caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
+> +       .caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
+>          .dma_burst_length = 16,
+>          .clk_init = macb_clk_init,
+>          .init = macb_init,
+> +       .jumbo_max_len = 10240,
+>          .usrio = &macb_default_usrio,
+>   };
+> 
+> --
+> 2.39.5
+> 
 
-Regards,
-Lorenzo
-
->=20
-> --Jesper
-
---sMZhZyVlOLBRigTk
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZv/5KQAKCRA6cBh0uS2t
-rK2oAQDNbiLhK1nE9+UoEM0jzz+0frq4p/JrgIjOzg5/mzElBwD6AxE86bij0lLW
-fseZvIVZ8CKu08MMvL0UTI928vc0aAk=
-=JprQ
------END PGP SIGNATURE-----
-
---sMZhZyVlOLBRigTk--
 
