@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-131961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F749900C3
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:21:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2589B9900C5
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D4C1C23212
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A00281F03
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E23014BF92;
-	Fri,  4 Oct 2024 10:21:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6138714A609;
+	Fri,  4 Oct 2024 10:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DHxs7l+w"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KM+zpqnK"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1A714BF8A
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B749137903
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728037265; cv=none; b=ehVrEsnIfSCaAmshUMViU7urV+uiCq7LNRyH6Tch9T4Q4fSJcjMKg7PAnAzl9X6gzE9vBo4f86XAN2qgSgGhCVgvbOBvd4hs2fJ6E6Wq8wLEeV+DCUiPR+sxFpZrOlzbgpwTg/SuS2wuW5z1aJaEbwJrE2J53L8jgFU6mR7XIcs=
+	t=1728037273; cv=none; b=LhIFb0yiWLAWaLBUm+RreL/rYMMb41BcXlJbn7lBOMDl15X3uGV3oADhrr3oosXykUkegaWgMhg2gZuB2Q6DGABVKA6n3ZREDcIB52ooiGKbHpWcrMtlGWxKWSeVjUvr8g/RvRoftHE7xvMcR+0VfSIuq6ImrAQAgArgr08i6UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728037265; c=relaxed/simple;
-	bh=r9gH5HFS3nS6dE2Q/KSVxdqKX6IplyGiovL0leuyy5g=;
+	s=arc-20240116; t=1728037273; c=relaxed/simple;
+	bh=SuqeHeEHJKu5IRY/ceQktJtlxMo9n8wbbuJjhjTGHAQ=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=VMD7R/9uf8MN7pYw/ygBTGUU6CHn/TeX6ka7SCQ/WhCpWNoX0IWiqG80q1kKjZzqgg8sS6Vt3k4ruPuvNGNKHL8a0vivTDBq6QTx7lE/P2y2RKEr9h3hEmcFt6hW9Ghs0P3OgknEsqX1M6hLgsnpftQAHA9+Vh4EQ9lTbnEzlfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DHxs7l+w; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=lN6lgJnsd3TBW7SFg+aGV6ikGPEqVb7ezLYOdg/Qi4LXKFZTNCR4/CYoNG19neiTc2bPQp4jFS/IQNINCk4J+SzVGyjtkYFxtlf8f0QqXsh0cg6kYGaBDb3mr4WAFU0o3BgUiijITovry1ZGEwth7qKw4uWRlGlBTgl/ukoGDXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KM+zpqnK; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=l6dlWEsk1ObWrFwXZPlj5B3/mrN4qmVi0PI+FW2JyhM=; b=DHxs7l+wQL8DtRyYC+T4D1lyxb
-	QtWrTw0p+6KueJ5XVJQBSHghFWTgXM1frypSgBKdvxt4SaD0M1qYd1J5j5tYGEoZrqJkh0X1knU3L
-	A8xp3iLoQniiaf0JNk63fpXs71jb4lqz0k6AcQC8p76l/YOBOnVa18wdvNlRMfLU096Y0+UY3+VfE
-	4eSrYs4PP7fQN48ARAJm0a5JBUwXDOpHSG3dOA7+sKwOyVp/qJZQx1JPA5PiI0je+tw+fMPdEkvqw
-	ngMZJ5ksyQACdJXMCvtxmPWkxkKl/saQLjY51JNztUqWTSudt2s4zGsjalHh0F5TnKUAin7p9a2in
-	8ts51DAQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42510 helo=rmk-PC.armlinux.org.uk)
+	bh=/I8skTevCz4rK9Ac2m0VAGBuriJ9uLhXWtfDx8BDQpI=; b=KM+zpqnK2Qcf0rSxfhICvD6CiA
+	VW8olwrcyukt+LYKjzRxm7kLJCxlJ6yldF6sumLyK97V9VH8l5L9Hwm0GNJef1iiqF4pbA4c9SSNY
+	li/tlpvVXVhPweHa2Kqpyq8sSUxdbCSuhSts37Z2OwGeAxTWs7TydEdVl0Rke+ufeGmnb9C/ff/2N
+	rY9KcJGEADYBTeQ9519W4DMrWtD5QVXWihQwJ6Fr+4n7PaCva4bd8tyxLxCTb32XJ+ti5kb+u0BSj
+	qMqNbHgfsddeqq5Gk9AO//7YVonPZK8IHC64U16M7UZ6w3GC6pAuuhp9fohJt9SSOHlflsR9r5/RF
+	oYj2mvuA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:39944 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1swfQW-0001g8-0B;
-	Fri, 04 Oct 2024 11:20:47 +0100
+	id 1swfQc-0001gM-03;
+	Fri, 04 Oct 2024 11:20:54 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1swfQU-006Df2-EF; Fri, 04 Oct 2024 11:20:46 +0100
+	id 1swfQZ-006Df8-JR; Fri, 04 Oct 2024 11:20:51 +0100
 In-Reply-To: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
 References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -72,7 +72,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 02/13] net: pcs: xpcs: don't use array for interface
+Subject: [PATCH net-next 03/13] net: pcs: xpcs: pass xpcs instead of xpcs->id
+ to xpcs_find_compat()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,170 +83,83 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1swfQU-006Df2-EF@rmk-PC.armlinux.org.uk>
+Message-Id: <E1swfQZ-006Df8-JR@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 04 Oct 2024 11:20:46 +0100
+Date: Fri, 04 Oct 2024 11:20:51 +0100
 
-Currently, xpcs uses an array of interfaces that each "compat" entry
-supports. When looking up the compat entry for an interface, we
-iterate over the compat entries and then over each interface.
-
-Since each compat entry only has a single interface in its interfaces
-array, replace the array with a single member in the compat structure.
+xpcs_find_compat() is now always passed xpcs->id. Rather than always
+dereferencing this in the caller, move it into xpcs_find_compat(),
+thus making this function consistent with most of the other xpcs
+functions in taking an xpcs pointer.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/pcs/pcs-xpcs.c | 71 ++++++++------------------------------
- 1 file changed, 14 insertions(+), 57 deletions(-)
+ drivers/net/pcs/pcs-xpcs.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index e1f264039c91..4fbf7c816ed5 100644
+index 4fbf7c816ed5..8bde87ab971f 100644
 --- a/drivers/net/pcs/pcs-xpcs.c
 +++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -107,38 +107,9 @@ static const int xpcs_2500basex_features[] = {
- 	__ETHTOOL_LINK_MODE_MASK_NBITS,
+@@ -121,11 +121,11 @@ struct dw_xpcs_desc {
  };
  
--static const phy_interface_t xpcs_usxgmii_interfaces[] = {
--	PHY_INTERFACE_MODE_USXGMII,
--};
--
--static const phy_interface_t xpcs_10gkr_interfaces[] = {
--	PHY_INTERFACE_MODE_10GKR,
--};
--
--static const phy_interface_t xpcs_xlgmii_interfaces[] = {
--	PHY_INTERFACE_MODE_XLGMII,
--};
--
--static const phy_interface_t xpcs_10gbaser_interfaces[] = {
--	PHY_INTERFACE_MODE_10GBASER,
--};
--
--static const phy_interface_t xpcs_sgmii_interfaces[] = {
--	PHY_INTERFACE_MODE_SGMII,
--};
--
--static const phy_interface_t xpcs_1000basex_interfaces[] = {
--	PHY_INTERFACE_MODE_1000BASEX,
--};
--
--static const phy_interface_t xpcs_2500basex_interfaces[] = {
--	PHY_INTERFACE_MODE_2500BASEX,
--};
--
- struct dw_xpcs_compat {
-+	phy_interface_t interface;
- 	const int *supported;
--	const phy_interface_t *interface;
--	int num_interfaces;
- 	int an_mode;
- 	int (*pma_config)(struct dw_xpcs *xpcs);
- };
-@@ -153,12 +124,10 @@ static const struct dw_xpcs_compat *
- xpcs_find_compat(const struct dw_xpcs_desc *desc, phy_interface_t interface)
+ static const struct dw_xpcs_compat *
+-xpcs_find_compat(const struct dw_xpcs_desc *desc, phy_interface_t interface)
++xpcs_find_compat(struct dw_xpcs *xpcs, phy_interface_t interface)
  {
  	const struct dw_xpcs_compat *compat;
--	int j;
  
- 	for (compat = desc->compat; compat->supported; compat++)
--		for (j = 0; j < compat->num_interfaces; j++)
--			if (compat->interface[j] == interface)
--				return compat;
-+		if (compat->interface == interface)
-+			return compat;
+-	for (compat = desc->compat; compat->supported; compat++)
++	for (compat = xpcs->desc->compat; compat->supported; compat++)
+ 		if (compat->interface == interface)
+ 			return compat;
  
- 	return NULL;
- }
-@@ -598,11 +567,9 @@ static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
- void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces)
+@@ -136,7 +136,7 @@ int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface)
  {
  	const struct dw_xpcs_compat *compat;
--	int j;
  
- 	for (compat = xpcs->desc->compat; compat->supported; compat++)
--		for (j = 0; j < compat->num_interfaces; j++)
--			__set_bit(compat->interface[j], interfaces);
-+		__set_bit(compat->interface, interfaces);
- }
- EXPORT_SYMBOL_GPL(xpcs_get_interfaces);
+-	compat = xpcs_find_compat(xpcs->desc, interface);
++	compat = xpcs_find_compat(xpcs, interface);
+ 	if (!compat)
+ 		return -ENODEV;
  
-@@ -1285,39 +1252,32 @@ static int xpcs_get_id(struct dw_xpcs *xpcs)
+@@ -548,7 +548,7 @@ static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
+ 	int i;
  
- static const struct dw_xpcs_compat synopsys_xpcs_compat[] = {
- 	{
-+		.interface = PHY_INTERFACE_MODE_USXGMII,
- 		.supported = xpcs_usxgmii_features,
--		.interface = xpcs_usxgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_usxgmii_interfaces),
- 		.an_mode = DW_AN_C73,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_10GKR,
- 		.supported = xpcs_10gkr_features,
--		.interface = xpcs_10gkr_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_10gkr_interfaces),
- 		.an_mode = DW_AN_C73,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_XLGMII,
- 		.supported = xpcs_xlgmii_features,
--		.interface = xpcs_xlgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_xlgmii_interfaces),
- 		.an_mode = DW_AN_C73,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_10GBASER,
- 		.supported = xpcs_10gbaser_features,
--		.interface = xpcs_10gbaser_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_10gbaser_interfaces),
- 		.an_mode = DW_10GBASER,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_SGMII,
- 		.supported = xpcs_sgmii_features,
--		.interface = xpcs_sgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
- 		.an_mode = DW_AN_C37_SGMII,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_1000BASEX,
- 		.supported = xpcs_1000basex_features,
--		.interface = xpcs_1000basex_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_1000basex_interfaces),
- 		.an_mode = DW_AN_C37_1000BASEX,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_2500BASEX,
- 		.supported = xpcs_2500basex_features,
--		.interface = xpcs_2500basex_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_2500basex_interfaces),
- 		.an_mode = DW_2500BASEX,
- 	}, {
- 	}
-@@ -1325,9 +1285,8 @@ static const struct dw_xpcs_compat synopsys_xpcs_compat[] = {
+ 	xpcs = phylink_pcs_to_xpcs(pcs);
+-	compat = xpcs_find_compat(xpcs->desc, state->interface);
++	compat = xpcs_find_compat(xpcs, state->interface);
+ 	if (!compat)
+ 		return -EINVAL;
  
- static const struct dw_xpcs_compat nxp_sja1105_xpcs_compat[] = {
- 	{
-+		.interface = PHY_INTERFACE_MODE_SGMII,
- 		.supported = xpcs_sgmii_features,
--		.interface = xpcs_sgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
- 		.an_mode = DW_AN_C37_SGMII,
- 		.pma_config = nxp_sja1105_sgmii_pma_config,
- 	}, {
-@@ -1336,15 +1295,13 @@ static const struct dw_xpcs_compat nxp_sja1105_xpcs_compat[] = {
+@@ -620,7 +620,7 @@ static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
+ 	if (!xpcs->need_reset)
+ 		return;
  
- static const struct dw_xpcs_compat nxp_sja1110_xpcs_compat[] = {
- 	{
-+		.interface = PHY_INTERFACE_MODE_SGMII,
- 		.supported = xpcs_sgmii_features,
--		.interface = xpcs_sgmii_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
- 		.an_mode = DW_AN_C37_SGMII,
- 		.pma_config = nxp_sja1110_sgmii_pma_config,
- 	}, {
-+		.interface = PHY_INTERFACE_MODE_2500BASEX,
- 		.supported = xpcs_2500basex_features,
--		.interface = xpcs_2500basex_interfaces,
--		.num_interfaces = ARRAY_SIZE(xpcs_2500basex_interfaces),
- 		.an_mode = DW_2500BASEX,
- 		.pma_config = nxp_sja1110_2500basex_pma_config,
- 	}, {
+-	compat = xpcs_find_compat(xpcs->desc, interface);
++	compat = xpcs_find_compat(xpcs, interface);
+ 	if (!compat) {
+ 		dev_err(&xpcs->mdiodev->dev, "unsupported interface %s\n",
+ 			phy_modes(interface));
+@@ -810,7 +810,7 @@ static int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 	const struct dw_xpcs_compat *compat;
+ 	int ret;
+ 
+-	compat = xpcs_find_compat(xpcs->desc, interface);
++	compat = xpcs_find_compat(xpcs, interface);
+ 	if (!compat)
+ 		return -ENODEV;
+ 
+@@ -1074,7 +1074,7 @@ static void xpcs_get_state(struct phylink_pcs *pcs,
+ 	const struct dw_xpcs_compat *compat;
+ 	int ret;
+ 
+-	compat = xpcs_find_compat(xpcs->desc, state->interface);
++	compat = xpcs_find_compat(xpcs, state->interface);
+ 	if (!compat)
+ 		return;
+ 
 -- 
 2.30.2
 
