@@ -1,164 +1,102 @@
-Return-Path: <netdev+bounces-132239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0625D991135
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:17:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5360991138
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3E101F21A75
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:17:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22B021C23412
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:17:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329D5335D3;
-	Fri,  4 Oct 2024 21:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0237335A5;
+	Fri,  4 Oct 2024 21:17:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="bxEB6WVo";
-	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="qAtdZn4F";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hVErRAXS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="R9djrknF"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a2-smtp.messagingengine.com (fhigh-a2-smtp.messagingengine.com [103.168.172.153])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91FA748D;
-	Fri,  4 Oct 2024 21:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6716183CC7;
+	Fri,  4 Oct 2024 21:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728076638; cv=none; b=aKA4oQkr3tzymTz4/Kd9pQ76fWAZ4t6nwRiiZcg2vUrcglaaDA0vvc/UpQ3X5J7Wl49RcHNAtvV9h49HC8TVcLdATTEZlC+k+Cxefpf7IyIaTXdNeAValyp74PMPjzsWyYTx7a5ognBXdgj6U/BuG2K9uVUBmSSa6/W5ZGMDqlQ=
+	t=1728076665; cv=none; b=TAJwdx5AWcLVMGORCpCourOfroa1+Ev5OszUavtwK5lnk7NPDxibxL/30XmUqTDmCzCs1BZU1ygy8zyebi8jMASCvWRJkUOuzor1UJ19T67+XtjsYSjUfYd0u1WDo0LDbadYM082Er06JgXtwaD79hzUf++CGou+L+LogzzzohM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728076638; c=relaxed/simple;
-	bh=RpoEDeqlxbuppRWdpLnZslav63s3dmblrVDw6McgZSc=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=iq9CiNGdWznNfpg6w4sq4K9CQYtUxefhQhAPA0+RoIiM2EBBbUhwfMoQkLOr1zusDw80KwNahmBdLkQICh8QPNmpDTH/a8In4o+B2bUThevM2UIdPQdgPGn8HXNqAvb8xhIGQqx1o3ugiUOa8PZEsOCEbbdy9csHHPGl/J+1Mg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=bxEB6WVo; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=qAtdZn4F; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hVErRAXS; arc=none smtp.client-ip=103.168.172.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id E5F021140186;
-	Fri,  4 Oct 2024 17:17:14 -0400 (EDT)
-Received: from phl-frontend-02 ([10.202.2.161])
-  by phl-compute-03.internal (MEProxy); Fri, 04 Oct 2024 17:17:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
-	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=2016-12.pbsmtp; t=1728076634; x=1728163034;
-	 bh=sJiGPvaGT9+liNHplnBnzyAkSDZcQrT4sSVBTwtxIFI=; b=bxEB6WVocmY+
-	cBk85Al+a4K0vWknGE++XjdRFC8XVtJqkkdhcOAIJWPY0fJufFrbUyv2V7jNpB+r
-	WJy2QWTuha26l35WQHloZLh1vMkwVnEyp63XJbNHhyEgw4o7UMEBffcZc2fo7MkT
-	1WqXSmBPoNBMglUt1rPwWuWXXNzu09Y=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm1; t=1728076634; x=1728163034; bh=sJiGPvaGT9
-	+liNHplnBnzyAkSDZcQrT4sSVBTwtxIFI=; b=qAtdZn4FgJWmrFhHhM3Y0xlNxK
-	Fco0wPlnSR3rgxjzujCKG6gCtxU7S2EOBlH7TF6kMeGlMbK+3zOMHqVgoMyq5x1u
-	E0ZFSjFWSUQfKKTTuVRDsCUK0azCC3WBf7qG55GCtc1Slh0vkYYNGWfWD2HemWSa
-	i0/qwD6toTExIETQtDjyOnb82yUhY3RmlvO9JLOvuiRaNSeBzXca3/MK2Fnb9Cpj
-	kRMqtieI7mAB0KA441wZrfcdgb4JE7YmKByPI1zBcCcol9iZjTpyAOi6CPsLuJXj
-	NQZdrCupuu8bKYKhDZOx5UuH3IL/quUq46XukoG4XyZtFbTPRmfsvqwgk0FA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1728076634; x=1728163034; bh=sJiGPvaGT9+liNHplnBnzyAkSDZc
-	QrT4sSVBTwtxIFI=; b=hVErRAXSm5dH1JzcgCEXAcuoZY37hg8ROnTM2jsWrXo1
-	eGiD3n7ZFQjIkt4ZhcIj5epRMGH4IZ6GCRFaPYroEfWlwfqpkP0jw5ZyTivw6ovt
-	pz74HFgIIDoaleVcXTU+vLWWcBvnkXHFbtb9+TikgRMDRCt3GZeEFohYKaWTiSo4
-	RgMqMhLLr7kkMm2kepiTlR9UJ7JK0Ccp7DdjvWFK9fgeyrkw+SYTLE4GmtjzGLqV
-	wIYd6VtsqS7ngfNwqeqkvERNqV/Wwcmj/gs1tSEnsvLiBhcBKHgC4qgICICH/F+3
-	rHYfZlZVbm6DYmuO2CiIbWctNvSnLPO3VkHcIMcqGw==
-X-ME-Sender: <xms:WlsAZzFmNpeEryzlppeqDGaz08uzAGB2Qg8BAdwrKiJnseUvxEcUKw>
-    <xme:WlsAZwWlGz39C-CtULVtBGblnaqhxuZdGk_24ElKAvK5fvETsQWEMyxobYUrJskgA
-    MEYlHMxLha-ZX9zyEA>
-X-ME-Received: <xmr:WlsAZ1IZBEnokP48tbutmeNzEmC0zQic-pYQE1URCvPpMfgYIvlL5ODWfQXvObOm34j5eVOfy2DO2KqcXbxLEJ4y8nermqS6js--yhz8v1HWW3AdnQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvfedgudehlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefujgfkfhggtgesthdtredttddtvden
-    ucfhrhhomheppfhitgholhgrshcurfhithhrvgcuoehnihgtohesfhhluhignhhitgdrnh
-    gvtheqnecuggftrfgrthhtvghrnhepgfevvdfhfeeujeeggffgfefhleffieeiuddvheff
-    udehudffkeekhfegfffhfeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomhepnhhitghosehflhhugihnihgtrdhnvghtpdhnsggprhgtphhtthho
-    peelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
-    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
-    rhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhoghgvrh
-    hqsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgt
-    ohhmpdhrtghpthhtohepghhrhihgohhrihhirdhsthhrrghshhhkohesthhirdgtohhmpd
-    hrtghpthhtohepvhhighhnvghshhhrsehtihdrtghomhdprhgtphhtthhopehlihhnuhig
-    qdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtug
-    gvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:WlsAZxHg-X36rmzdpGlpADMfdJg0NCuYECu_LR4tVlGw1zJ2j5kESg>
-    <xmx:WlsAZ5Vxo6xAkuxfOTzZYPfsobE7p9SBKepDwxVgj2SsAPEroYJ1EA>
-    <xmx:WlsAZ8PW5cWrUUrVPC54UuEF6ky0x2iyvrAPesGxfnz6gGGl77rb6Q>
-    <xmx:WlsAZ400MUqH322TMaAR_Uh5nxTUdCCxc1LFva4aMtov3CFtbwjthw>
-    <xmx:WlsAZyOTTQTJvOqRx7kTglG9jVexxnXjLn0LBBbJiFiDIn1aHVmFiWDy>
-Feedback-ID: i58514971:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 4 Oct 2024 17:17:14 -0400 (EDT)
-Received: from xanadu (unknown [IPv6:fd17:d3d3:663b:0:9696:df8a:e3:af35])
-	by yoda.fluxnic.net (Postfix) with ESMTPSA id C4024E427B9;
-	Fri,  4 Oct 2024 17:17:13 -0400 (EDT)
-Date: Fri, 4 Oct 2024 17:17:13 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-To: Roger Quadros <rogerq@kernel.org>
-cc: "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, 
-    Grygorii Strashko <grygorii.strashko@ti.com>, 
-    Vignesh Raghavendra <vigneshr@ti.com>, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3 2/2] net: ethernet: ti: am65-cpsw: avoid
- devm_alloc_etherdev, fix module removal
-In-Reply-To: <f41f65bd-104c-44de-82a2-73be59802d96@kernel.org>
-Message-ID: <6s1952p2-7rs5-06nn-19on-5170q4720852@syhkavp.arg>
-References: <20241004041218.2809774-1-nico@fluxnic.net> <20241004041218.2809774-3-nico@fluxnic.net> <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org> <s5000qsr-8nps-87os-np52-oqq6643o35o2@syhkavp.arg> <f41f65bd-104c-44de-82a2-73be59802d96@kernel.org>
+	s=arc-20240116; t=1728076665; c=relaxed/simple;
+	bh=jOTbCsBnp/G8HTaYmkg+mD5ft23aOvMRKZFH0rAk+JQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lZy25jyiGICAR5D683yx54kZbX44JVzgabsRzl41i9HNZvsFowdLBganA13DzWFu0Eay0KkxDpgU+ncEmfwQVcHW+YAr51l8nYIpRuRX/Z3CToh16gXFc/E6ZCqO51VNAl/t0bHAVw/+S4JmAQXZwO9T3WkXKGA1GyGXmPllFQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=R9djrknF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bEhtIzrPp9DZunn4IGOjtsc6C2T2hBD0JumElPsQGM8=; b=R9djrknF/b49gGcCBtHX6p2/KZ
+	STwDrDYvxi46fCEKARwB+VpM2fQflpjRRn6K8FcQAZYJ1PBzkeO5ysFjX2WV5p4aPukvrCtRtBZwN
+	PKjM5ZzaeVfLtuUuULa4SXR6GssfyKSCJWD0KzctvbHN3NuZoH27nQ2YTfkE0u5ARh3g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swpg0-0095s2-A2; Fri, 04 Oct 2024 23:17:28 +0200
+Date: Fri, 4 Oct 2024 23:17:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
+ link-partner advertisement
+Message-ID: <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
+References: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
 
-On Fri, 4 Oct 2024, Roger Quadros wrote:
-
+On Fri, Oct 04, 2024 at 04:50:36PM +0100, Daniel Golle wrote:
+> Only use link-partner advertisement bits for 10GbE modes if they are
+> actually valid. Check LOCALOK and REMOTEOK bits and clear 10GbE modes
+> unless both of them are set.
+> This prevents misinterpreting the stale 2500M link-partner advertisement
+> bit in case a subsequent linkpartner doesn't do any NBase-T
+> advertisement at all.
 > 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/net/phy/realtek.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> On 04/10/2024 18:37, Nicolas Pitre wrote:
-> >>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> >>> index f6bc8a4dc6..e95457c988 100644
-> >>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> >>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> >>> @@ -2744,10 +2744,9 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
-> >>>  		return 0;
-> >>>  
-> >>>  	/* alloc netdev */
-> >>> -	port->ndev = devm_alloc_etherdev_mqs(common->dev,
-> >>> -					     sizeof(struct am65_cpsw_ndev_priv),
-> >>> -					     AM65_CPSW_MAX_QUEUES,
-> >>> -					     AM65_CPSW_MAX_QUEUES);
-> >>> +	port->ndev = alloc_etherdev_mqs(sizeof(struct am65_cpsw_ndev_priv),
-> >>> +					AM65_CPSW_MAX_QUEUES,
-> >>> +					AM65_CPSW_MAX_QUEUES);
-> >>
-> >> Can we solve this issue without doing this change as
-> >> there are many error cases relying on devm managed freeing of netdev.
-> > 
-> > If you know of a way to do this differently I'm all ears.
-> 
-> I sent another approach already. please check.
+> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> index c4d0d93523ad..d276477cf511 100644
+> --- a/drivers/net/phy/realtek.c
+> +++ b/drivers/net/phy/realtek.c
+> @@ -927,6 +927,10 @@ static int rtl822x_read_status(struct phy_device *phydev)
+>  		if (lpadv < 0)
+>  			return lpadv;
+>  
+> +		if (!(lpadv & MDIO_AN_10GBT_STAT_REMOK) ||
+> +		    !(lpadv & MDIO_AN_10GBT_STAT_LOCOK))
+> +			lpadv = 0;
+> +
+>  		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
+>  						  lpadv);
 
-Slowly being built.
+I know lpadv is coming from a vendor register, but does
+MDIO_AN_10GBT_STAT_LOCOK and MDIO_AN_10GBT_STAT_REMOK apply if it was
+also from the register defined in 802.3? I'm just wondering if this
+test should be inside mii_10gbt_stat_mod_linkmode_lpa_t()?
 
-> > About the many error cases needing the freeing of net devices, as far as 
-> > I know they're all covered with this patch.
-> 
-> No they are not. you now have to explicitly call free_netdev() in error paths of am65_cpsw_nuss_init_port_ndev().
-
-And it does. If am65_cpsw_nuss_init_ndevs() fails then it frees them 
-all. Same as with am65_cpsw_nuss_phylink_cleanup().
-
-
-Nicolas
+	Andrew
 
