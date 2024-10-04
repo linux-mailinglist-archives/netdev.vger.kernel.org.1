@@ -1,285 +1,132 @@
-Return-Path: <netdev+bounces-132012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098C599022F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:40:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81363990269
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8515A1F2203F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2C061C20F0D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF25A15A842;
-	Fri,  4 Oct 2024 11:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64888156238;
+	Fri,  4 Oct 2024 11:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="MnpeEdhu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2C128E8
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A119615855D;
+	Fri,  4 Oct 2024 11:47:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728042026; cv=none; b=Zx2wipMO4Oz5t0o7Hz8QNrJerYX6kIBXdSI8G0vB5E+W5FsLpv/UiR16xrILqf850RumQXWCdBLRVFFwhoyXCprsKKqBjEfVLulRbNvlJwohIrKb14h2u+GNOpu2pqhpGImL2Jju2Noi25gXV2O2GzUALKVK0VpjhsgGAh5nT80=
+	t=1728042422; cv=none; b=u+4b+Yl1C+vM/fIwqNbZVum0nyuHxCoyWTkYOHnwbkLhFb7eksFdDWcju/BYUJMvsvHtbJo+Awz+hR5Nj+p7R7JpTLs7j+IXq2sI3OQJr2TiEm5zmcm0HaVK5B9SQFy6xYf6SSrI+nU1F+2W+D5X0ef4XORWqnACZ5c5MqHDseg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728042026; c=relaxed/simple;
-	bh=lStMSKeFZnRbEIqJpj9x5Y6AdrxkvIhM9oeN1BkdSoI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nqqYHAMlV7gmKWVGw/8Wue7AOssI9DqK+oE6GV4cfMoxFMG8z0FuvlhCZj1OkE2dgDX0wOedkDSVhWjCJnfm0q7rgTmFf2VtIgRGmmeyilOK+JUQJQxU5rFGk6RnzSFnzwGpKnbBCCB7h02yiLj8UYdmpeGcXRMpRoxizgWd8wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a364ab1eedso17412545ab.0
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 04:40:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728042024; x=1728646824;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RH7XhbMlUbLbawgAsaJ/+d3DvzsgIfhNKAXRoNm7PyQ=;
-        b=ZeR6JjJ5MsxIhabVKt9CxJfbJ2/llODddA4jYHwfXIISIWh44l0fiBnbrzHI4MFtxq
-         b50HiZs2r1Sjv9cBjBI2DkEGu4jldnHxFCo9eA0l6f5KuCpuAo9Mh9RKHS1YX7Vl9p6V
-         A90Xejr5AHsKH+xSw8wwod9+qkgpRAcwaq2LiT3pQPHMgDxmNLORcoFjRYTqpYDiM0TK
-         BzDuwJ+IGdFRYUyDOnUFUiw7qCvvPdaiuAPST5S26ARbkao8qO2xvfedIqPrbAXCeSHE
-         EaINLDl21Q0uWsyQOczuMPGTbulFan1LBvlwRA28cOA6PKTHf6ct4rmxMYr1gtAXc117
-         GHyA==
-X-Forwarded-Encrypted: i=1; AJvYcCUjkzlXxvyAYijF0xrgF0oAwoXL7C3gUIGlXIkkE2kxrt43Bq0mObw7l/oKtGkhetOVYa6wMaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypsT+mxpFTuAbpVelHu1JMas7vSg2+0O5YrpiKUHQBG3n6IFVu
-	tamHAsEN/VUwzFPCmhpl+lNYxq3xHd+JiKBPGDF6n9ELXnpMHqz6J+l1KYAcxrgqzSwnsWuoZyh
-	muPIXh97YyM0w58Tw3gocNJD3HxkfOHszeE5+Y9bI22uoDjomw83LcTI=
-X-Google-Smtp-Source: AGHT+IEXFY+p3aUX9Vdx4VsnV85b0tMFwKajA+xSKAUnK0VdlM7DhrzqLKFlD3rJ2s2PCsXgBXt1ZW6c0FU9FBagm1mG+ec34J8b
+	s=arc-20240116; t=1728042422; c=relaxed/simple;
+	bh=MSrUt/mGFaTwIV2b751mjmEOT8brtJc/5Xrq29BCg7g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g+68IQWOTP9mmbwfT0m/2+b9mC8FJQZg33zPc2QPikNOsPF1p8bmGvVSes2Cbqc7e4XlyFaMrPORh8ZYZbtLxb4rOtuK316kfuNollz4Mfd0SPv7waBloU51AVWVQOjTj+omQNEo97VwwLOEopo6BjuoDpcswag3dfOk7Q/i7Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=MnpeEdhu; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id B91E5889E9;
+	Fri,  4 Oct 2024 13:46:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1728042419;
+	bh=H92uGph6TcS5Bfo2Az9GC/5kRSDeOxI/7YOKCr5ZL6k=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MnpeEdhuRXMRyLDjFxisASYDB8KW3lJWjbC7kCn6x3ThX0lUTa7uYOCKSF7PEbA53
+	 tnba7CSOXEYXgN+3uRmzDFyeDby02K5+Xdhhar2m7jp5Yb34QQLrwPJOenHtrOdX5o
+	 +m2mTIVhP5O5vjDmPeYWc8TeyVpNRtnbkL1Nh9stEFykColKqtVTSU0bkXGUevdZD5
+	 Y3gspxqivB6TgEeYsNxpAGlAIA6mDzL8iNaRYHg0gLuEuNxPtKQtzSOJgX23QveNAT
+	 kmROjcBU50ppWQMygiShjLaal0wO2mWqOF4I9GeMRfgaGLCpWzji/hr4bdZ231Zo3R
+	 wzZDvo4izJJqA==
+Message-ID: <75d92369-e987-4c8c-a7d0-be3e9d5b1157@denx.de>
+Date: Fri, 4 Oct 2024 13:41:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1fc8:b0:3a0:aa15:3497 with SMTP id
- e9e14a558f8ab-3a375976e55mr21453585ab.1.1728042024133; Fri, 04 Oct 2024
- 04:40:24 -0700 (PDT)
-Date: Fri, 04 Oct 2024 04:40:24 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66ffd428.050a0220.49194.048a.GAE@google.com>
-Subject: [syzbot] [bpf?] possible deadlock in __put_partials
-From: syzbot <syzbot+5a878c984150fad34185@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 6/7] wifi: wilc1000: Register wiphy after reading out
+ chipid
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241003111529.41232-1-marex@denx.de>
+ <20241003111529.41232-6-marex@denx.de>
+ <4912f382-5228-44ee-bf87-201f0ad28bf6@bootlin.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <4912f382-5228-44ee-bf87-201f0ad28bf6@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Hello,
+On 10/4/24 10:39 AM, Alexis Lothoré wrote:
+> Hello Marek,
 
-syzbot found the following issue on:
+Hi,
 
-HEAD commit:    99a648c951ba selftests/bpf: Verify that sync_linked_regs p..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=1668bd07980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d3e39725ec0dfcbc
-dashboard link: https://syzkaller.appspot.com/bug?extid=5a878c984150fad34185
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e45f24c2d262/disk-99a648c9.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/48ad218fc65c/vmlinux-99a648c9.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/691b40913107/bzImage-99a648c9.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5a878c984150fad34185@syzkaller.appspotmail.com
-
-tun0: tun_chr_ioctl cmd 1074025681
-======================================================
-WARNING: possible circular locking dependency detected
-6.11.0-syzkaller-10550-g99a648c951ba #0 Not tainted
-------------------------------------------------------
-syz.0.924/9009 is trying to acquire lock:
-ffff8881404006d8 (&n->list_lock){-.-.}-{2:2}, at: __put_partials+0x61/0x130 mm/slub.c:3126
-
-but task is already holding lock:
-ffff8880758dda00 (&trie->lock){-.-.}-{2:2}, at: trie_update_elem+0xc8/0xc00 kernel/bpf/lpm_trie.c:333
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&trie->lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5822
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       trie_delete_elem+0x96/0x6a0 kernel/bpf/lpm_trie.c:462
-       0xffffffffa00021b3
-       bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
-       __bpf_prog_run include/linux/filter.h:701 [inline]
-       bpf_prog_run include/linux/filter.h:708 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2318 [inline]
-       bpf_trace_run2+0x2ec/0x540 kernel/trace/bpf_trace.c:2359
-       trace_contention_end+0x114/0x140 include/trace/events/lock.h:122
-       __pv_queued_spin_lock_slowpath+0xb7e/0xdb0 kernel/locking/qspinlock.c:557
-       pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
-       queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
-       queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
-       do_raw_spin_lock+0x272/0x370 kernel/locking/spinlock_debug.c:116
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
-       _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
-       __put_partials+0x61/0x130 mm/slub.c:3126
-       put_cpu_partial+0x17c/0x250 mm/slub.c:3221
-       __slab_free+0x2ea/0x3d0 mm/slub.c:4450
-       qlink_free mm/kasan/quarantine.c:163 [inline]
-       qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
-       kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
-       __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:329
-       kasan_slab_alloc include/linux/kasan.h:247 [inline]
-       slab_post_alloc_hook mm/slub.c:4086 [inline]
-       slab_alloc_node mm/slub.c:4135 [inline]
-       kmem_cache_alloc_node_noprof+0x16b/0x320 mm/slub.c:4187
-       perf_event_alloc+0x166/0x2310 kernel/events/core.c:12147
-       __do_sys_perf_event_open kernel/events/core.c:12767 [inline]
-       __se_sys_perf_event_open+0xb1f/0x3870 kernel/events/core.c:12658
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (&n->list_lock){-.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3158 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3277 [inline]
-       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3901
-       __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5199
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5822
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       __put_partials+0x61/0x130 mm/slub.c:3126
-       ___slab_alloc+0x4f7/0x14b0 mm/slub.c:3776
-       __slab_alloc+0x58/0xa0 mm/slub.c:3909
-       __slab_alloc_node mm/slub.c:3962 [inline]
-       slab_alloc_node mm/slub.c:4123 [inline]
-       __do_kmalloc_node mm/slub.c:4264 [inline]
-       __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4271
-       kmalloc_array_node_noprof include/linux/slab.h:995 [inline]
-       alloc_slab_obj_exts mm/slub.c:1969 [inline]
-       account_slab mm/slub.c:2542 [inline]
-       allocate_slab+0xb6/0x2f0 mm/slub.c:2597
-       new_slab mm/slub.c:2632 [inline]
-       ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3819
-       __slab_alloc+0x58/0xa0 mm/slub.c:3909
-       __slab_alloc_node mm/slub.c:3962 [inline]
-       slab_alloc_node mm/slub.c:4123 [inline]
-       __do_kmalloc_node mm/slub.c:4264 [inline]
-       __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4271
-       kmalloc_node_noprof include/linux/slab.h:905 [inline]
-       bpf_map_kmalloc_node+0xd3/0x1c0 kernel/bpf/syscall.c:422
-       lpm_trie_node_alloc kernel/bpf/lpm_trie.c:299 [inline]
-       trie_update_elem+0x1cd/0xc00 kernel/bpf/lpm_trie.c:342
-       bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
-       generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1849
-       bpf_map_do_batch+0x39a/0x660 kernel/bpf/syscall.c:5143
-       __sys_bpf+0x377/0x810
-       __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&trie->lock);
-                               lock(&n->list_lock);
-                               lock(&trie->lock);
-  lock(&n->list_lock);
-
- *** DEADLOCK ***
-
-2 locks held by syz.0.924/9009:
- #0: ffffffff8e937ee0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937ee0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e937ee0 (rcu_read_lock){....}-{1:2}, at: bpf_map_update_value+0x3c4/0x540 kernel/bpf/syscall.c:202
- #1: ffff8880758dda00 (&trie->lock){-.-.}-{2:2}, at: trie_update_elem+0xc8/0xc00 kernel/bpf/lpm_trie.c:333
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 9009 Comm: syz.0.924 Not tainted 6.11.0-syzkaller-10550-g99a648c951ba #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2203
- check_prev_add kernel/locking/lockdep.c:3158 [inline]
- check_prevs_add kernel/locking/lockdep.c:3277 [inline]
- validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3901
- __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5199
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5822
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- __put_partials+0x61/0x130 mm/slub.c:3126
- ___slab_alloc+0x4f7/0x14b0 mm/slub.c:3776
- __slab_alloc+0x58/0xa0 mm/slub.c:3909
- __slab_alloc_node mm/slub.c:3962 [inline]
- slab_alloc_node mm/slub.c:4123 [inline]
- __do_kmalloc_node mm/slub.c:4264 [inline]
- __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4271
- kmalloc_array_node_noprof include/linux/slab.h:995 [inline]
- alloc_slab_obj_exts mm/slub.c:1969 [inline]
- account_slab mm/slub.c:2542 [inline]
- allocate_slab+0xb6/0x2f0 mm/slub.c:2597
- new_slab mm/slub.c:2632 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3819
- __slab_alloc+0x58/0xa0 mm/slub.c:3909
- __slab_alloc_node mm/slub.c:3962 [inline]
- slab_alloc_node mm/slub.c:4123 [inline]
- __do_kmalloc_node mm/slub.c:4264 [inline]
- __kmalloc_node_noprof+0x286/0x440 mm/slub.c:4271
- kmalloc_node_noprof include/linux/slab.h:905 [inline]
- bpf_map_kmalloc_node+0xd3/0x1c0 kernel/bpf/syscall.c:422
- lpm_trie_node_alloc kernel/bpf/lpm_trie.c:299 [inline]
- trie_update_elem+0x1cd/0xc00 kernel/bpf/lpm_trie.c:342
- bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
- generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1849
- bpf_map_do_batch+0x39a/0x660 kernel/bpf/syscall.c:5143
- __sys_bpf+0x377/0x810
- __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fea6a97dff9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fea6b756038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007fea6ab35f80 RCX: 00007fea6a97dff9
-RDX: 0000000000000038 RSI: 0000000020000480 RDI: 000000000000001a
-RBP: 00007fea6a9f0296 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fea6ab35f80 R15: 00007ffd21039768
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> On 10/3/24 13:14, Marek Vasut wrote:
+>> Register wiphy after reading out chipid, so the chipid can be
+>> used to determine chip features and not advertise WPA3/SAE
+>> support to userspace on WILC3000. Note that wilc_netdev_cleanup()
+>> will deregister the wiphy in fail path.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+> 
+> [...]
+> 
+>> diff --git a/drivers/net/wireless/microchip/wilc1000/cfg80211.c b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
+>> index 11e0f8a473467..30015c5920467 100644
+>> --- a/drivers/net/wireless/microchip/wilc1000/cfg80211.c
+>> +++ b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
+>> @@ -1761,7 +1761,6 @@ static struct wilc *wilc_create_wiphy(struct device *dev)
+>>   {
+>>   	struct wiphy *wiphy;
+>>   	struct wilc *wl;
+>> -	int ret;
+>>   
+>>   	wiphy = wiphy_new(&wilc_cfg80211_ops, sizeof(*wl));
+>>   	if (!wiphy)
+>> @@ -1804,14 +1803,8 @@ static struct wilc *wilc_create_wiphy(struct device *dev)
+>>   				BIT(NL80211_IFTYPE_P2P_GO) |
+>>   				BIT(NL80211_IFTYPE_P2P_CLIENT);
+>>   	wiphy->flags |= WIPHY_FLAG_HAS_REMAIN_ON_CHANNEL;
+>> -	wiphy->features |= NL80211_FEATURE_SAE;
+>>   	set_wiphy_dev(wiphy, dev);
+>>   	wl->wiphy = wiphy;
+>> -	ret = wiphy_register(wiphy);
+> 
+> I think you did not address one of my comment in v5 about this change: in
+> wilc_cfg80211_init (wilc_create_wiphy's caller), there is still a
+> wiphy_unregister in the failure path, which does not make sense anymore since
+> this function does not register wiphy anymore.
+> 
+> Once fixed: with this patch iw phy shows correctly on my platform that wilc3000
+> does not support SAE authenticate command while wilc1000 does. And wilc1000
+> still works correctly, even with wpa3.
+> 
+> Tested-by: Alexis Lothoré <alexis.lothore@bootlin.com>
+> Tested-on: WILC1000SD 07 SDIO WILC_WIFI_FW_REL_16_1_2
+> Tested-on: WILC3000 A SDIO WILC_WIFI_FW_REL_16_1_1
+Fixed in V8, thank you.
 
