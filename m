@@ -1,171 +1,227 @@
-Return-Path: <netdev+bounces-132093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FE569905F1
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:24:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A2E990613
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:29:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BD81C20D3B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:24:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBC051F20F48
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BA0217300;
-	Fri,  4 Oct 2024 14:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4A421733E;
+	Fri,  4 Oct 2024 14:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QetrKEKQ"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ReclbQ19"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B945212EEA;
-	Fri,  4 Oct 2024 14:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ED6217326
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 14:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051877; cv=none; b=cmkSpvimQC9fkzUdhHPK4AO6Yo+S1PXdiqV+fTGLBqM4yvZwNv6h4jXKIFW2muaklrPEqT+x0kwJleTSeVsdWMRQSpv2kOZOE2jzPPTg655mBG3/IgN+4jFEMUwwrO0lsYkKszbxYuYJgaEPXef6hLOlWYFeZv4fLeTmylB84L8=
+	t=1728052169; cv=none; b=D1NpL4mAExSIa2DAy+am3SqJviMv5s1ieUD0yOY7LwcVztMe721tAPBR2ZTpHmRYY+VRLjNYfFg49+W63nUa4G3j7V1s/PBWXtsAB0jqRXt7Cbg3pv5wldptWnrWmWXo4VytYgVFqXo1+E0P23xo6k1DHbXols+V/kP3hEPuiRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051877; c=relaxed/simple;
-	bh=k2Z8ShT2r7R8KmgI+SKVyfuHijsDXcJj/b/kQ+6RNpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ME4AiviWUPOYmdfLF/iyIDOvvwtaOC4n/7O3u5cIO++jZ3Z68ZgJLqiJlhYWTwJFn3yKY2TlH9Kw553+rYdB78KF8F/XJtBlRqMRGFMmRpA4Km5HWRYS/o/irZpa1lr+5pUYaxMlY14QVFRDB2bNwgMG3JJXEhfJDIBq1EFH3oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QetrKEKQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=C6gDhg5uZqEI92mtooZVl3bYs4A2EKsq3515ZSfhgMM=; b=QetrKEKQfmTAf7eNdumMK32yJT
-	lCznHpHmqOh21Kh9kf2THI1Ed+QeADXiV+OANcknL0D4GE6dwe9hTMuKZ5xvKU4C4PH2UHVkwoEwP
-	62RQl8uR5EEfeIs8Vn37LefY0JhVRfVoRwet6yNckxjg6Tw3t0qtYTiG1BAjAjxcH0OHy5fVLsm6R
-	VtbfoxwYs5CT6PYOPoY55zVfc937tt4inBgi9n0fhDJbxoq1MDwo0tFd5vRwg/ZvZg1pJjXe4h6pD
-	oTuebIVrT4BTAV5s1SBygxaOJHjk6xYCH5Cq3SZ/NbeiLZSOCHkYHAJ83VoYLcD+UrFi0mZlSwFEP
-	jg5IQjUA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54974)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swjEM-00026c-0K;
-	Fri, 04 Oct 2024 15:24:29 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swjEH-0001FE-13;
-	Fri, 04 Oct 2024 15:24:25 +0100
-Date: Fri, 4 Oct 2024 15:24:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
-	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
-	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
-	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
-Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
-Message-ID: <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
-References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
- <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
- <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
- <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+	s=arc-20240116; t=1728052169; c=relaxed/simple;
+	bh=mE3LWvhRzbJY5LUB/JwX/iB8jrOFlrAg7Z2RWvjpBX4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=mL1++SiyPBUzVeftwGY0f7yj8oCmM1gS9DR7z/ZPEb6OgHB8Ihi1PKVSQpg6VtWXKbZHs+TN24G2PJm6yqrcjF3l1t5aMl+G3ADzKTZa8QkH3AEOnezYocw/vyiVTE9LNNgxmBNmkm1t3YLozEEbqzFuMAzvNaT7l7LSelg9Anw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ReclbQ19; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37cc810ce73so1329472f8f.1
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 07:29:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728052166; x=1728656966; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rYRKMpJ4OBC0LQYCHSn1P6nBU6dgmdu8HhUM6MMa+jE=;
+        b=ReclbQ19DXJBAujsnuXejP7nRdtuC+UMY/UUfYsxpizRmg2uqLUzEZyhGaIh9bAlaa
+         +vkISBMVRcw2F9uo8kBtEZvazFEEUKRHw90M2X294Ui7HQj1Z83AJayfFc8Y3aToBOoJ
+         jm5I5TO10ckFDqPcAATqYMFPW0vmDrNxVLr20zGgMEBAQpt4jY1vRxUhNjVeFOMOAivp
+         jjyPbYlu/C0SDQOguuDLZIruE8Bn8uoCNfAV6Ub/LBOxi9Mb5u95ytBhknQ6RgjisRrd
+         3+8K31zFXzzm82OwjGPHADglm9M0lvQyVKurSgiYBQn15H5xBpcw6c4KY9GzDBrQLra9
+         Cdzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728052166; x=1728656966;
+        h=in-reply-to:references:subject:cc:to:from:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rYRKMpJ4OBC0LQYCHSn1P6nBU6dgmdu8HhUM6MMa+jE=;
+        b=NXl9L7x7lieCSzkEkxHV1iMSb2DAVqrJ3gRnXmHMTBLuMaWiqvqk1a3xf/N+TUT3YC
+         wEdoAWeqsSyzqptcFcMe6nYwm/vgjXuJdmBq7iQhRigEyIRkUcmFKYJdatG8VBFldN52
+         KpGoGDMlCrcXTk9PeDid6tLSxBh6hGg0+BnoKqitLWHtdpsBoyi6OqRg4tffCKJA3HoP
+         xJKpqJB3I4tHekE6/fvV+x3wN3i4UyHChGK0j3WQCbMX+KgyQM82xlLAFbuDpmE/qLeB
+         3tfyK+fOrdRBF/ga1Hfj8cLbr84Jg2O8XgV0fneAaZO5tL91mz2FUBwnVo9ylah22sV6
+         /oUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVq1HCIFGKBW7UHgEDNclbwTqwz2/JHBAa0Iq3HRnUTZprNue4vzn+ZfLRHdrHoK8FAs5CcZsc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyJXcxffrsq2Cd4Bv66oVz5OFzsHNfbsv7laPNd+YGv0s55EOo
+	zGOi8+bEk7KxmMYSuJmdK2pDrjE/k8lp8AfJSOe7JB8nG0UPObyX5eU57rAK6Xo=
+X-Google-Smtp-Source: AGHT+IGfwB1d0G2mnqATVG3785KhqOhSttTikbEtmWl9Q33QYeDl/m5n3wD4HEhVBVCt8hb+z5i61A==
+X-Received: by 2002:a05:6000:1866:b0:37c:c870:b454 with SMTP id ffacd0b85a97d-37d0e8f708fmr2201971f8f.49.1728052165950;
+        Fri, 04 Oct 2024 07:29:25 -0700 (PDT)
+Received: from localhost ([2a09:bac1:27c0:58::31:92])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86a1f42esm17045225e9.4.2024.10.04.07.29.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 07:29:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 04 Oct 2024 16:29:23 +0200
+Message-Id: <D4N3D8N0MUJE.2X8G8YM8UMA3N@bobby>
+From: "Arthur Fabre" <afabre@cloudflare.com>
+To: "Lorenzo Bianconi" <lorenzo@kernel.org>, "Jesper Dangaard Brouer"
+ <hawk@kernel.org>
+Cc: "Daniel Xu" <dxu@dxuuu.xyz>, "Stanislav Fomichev"
+ <stfomichev@gmail.com>, =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@redhat.com>, "Lorenzo Bianconi" <lorenzo.bianconi@redhat.com>, "Jakub
+ Sitnicki" <jakub@cloudflare.com>, "Alexander Lobakin"
+ <aleksander.lobakin@intel.com>, <bpf@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+ <davem@davemloft.net>, <kuba@kernel.org>, <john.fastabend@gmail.com>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+ <tariqt@nvidia.com>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
+ <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
+ <mst@redhat.com>, <jasowang@redhat.com>, <mcoquelin.stm32@gmail.com>,
+ <alexandre.torgue@foss.st.com>, "kernel-team" <kernel-team@cloudflare.com>,
+ "Yan Zhai" <yan@cloudflare.com>
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+X-Mailer: aerc 0.8.2
+References: <87zfnnq2hs.fsf@toke.dk> <Zv18pxsiTGTZSTyO@mini-arch>
+ <87ttdunydz.fsf@toke.dk> <Zv3N5G8swr100EXm@mini-arch>
+ <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby> <Zv794Ot-kOq1pguM@mini-arch>
+ <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
+ <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
+ <D4N2N1YKKI54.1WAGONIYZH0Y4@bobby>
+ <75fb1dd3-fe14-426c-bc59-9a582c4b0e8d@kernel.org>
+ <Zv_5KdpkaYY-6z1f@lore-desk>
+In-Reply-To: <Zv_5KdpkaYY-6z1f@lore-desk>
 
-On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
-> >>          +---------+
-> >>          |  48MHZ  |
-> >>          +----+----+
-> >>               |(clock)
-> >>               v
-> >>          +----+----+
-> >>   +------| CMN PLL |
-> >>   |      +----+----+
-> >>   |           |(clock)
-> >>   |           v
-> >>   |      +----+----+           +----+----+  clock   +----+----+
-> >>   |  +---|  NSSCC  |           |   GCC   |--------->|   MDIO  |
-> >>   |  |   +----+----+           +----+----+          +----+----+
-> >>   |  |        |(clock & reset)      |(clock & reset)
-> >>   |  |        v                     v
-> >>   |  |   +-----------------------------+----------+----------+---------+
-> >>   |  |   |       +-----+               |EDMA FIFO |          | EIP FIFO|
-> >>   |  |   |       | SCH |               +----------+          +---------+
-> >>   |  |   |       +-----+                      |               |        |
-> >>   |  |   |  +------+   +------+            +-------------------+       |
-> >>   |  |   |  |  BM  |   |  QM  |            | L2/L3 Switch Core |       |
-> >>   |  |   |  +------+   +------+            +-------------------+       |
-> >>   |  |   |                                   |                         |
-> >>   |  |   | +-------+ +-------+ +-------+ +-------+ +-------+ +-------+ |
-> >>   |  |   | |  MAC0 | |  MAC1 | |  MAC2 | |  MAC3 | | XGMAC4| |XGMAC5 | |
-> >>   |  |   | +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ |
-> >>   |  |   |     |         |         |         |         |         |     |
-> >>   |  |   +-----+---------+---------+---------+---------+---------+-----+
-> >>   |  |         |         |         |         |         |         |
-> >>   |  |     +---+---------+---------+---------+---+ +---+---+ +---+---+
-> >>   +--+---->|             PCS0                    | |  PCS1 | | PCS2  |
-> >>   | clock  +---+---------+---------+---------+---+ +---+---+ +---+---+
-> >>   |            |         |         |         |         |         |
-> >>   |        +---+---------+---------+---------+---+ +---+---+ +---+---+
-> >>   | clock  +----------------+                    | |       | |       |
-> >>   +------->|Clock Controller|   4-port Eth PHY   | | PHY4  | | PHY5  |
-> >>            +----------------+--------------------+ +-------+ +-------+
-...
-> >> 3) PCS driver patch series:
-> >>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
-> >>         be enabled in drivers/net/pcs/
-> >> 	Dependent on NSS CC patch series (2).
-> > 
-> > I assume this dependency is pure at runtime? So the code will build
-> > without the NSS CC patch series?
-> 
-> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
-> PCS's MII channels. To represent this in the DTS, the PCS node in the
-> DTS is configured with the MII Rx/Tx clock that it consumes, using
-> macros for clocks which are exported from the NSS CC driver in a header
-> file. So, there will be a compile-time dependency for the dtbindings/DTS
-> on the NSS CC patch series. We will clearly call out this dependency in
-> the cover letter of the PCS driver. Hope that this approach is ok.
+On Fri Oct 4, 2024 at 4:18 PM CEST, Lorenzo Bianconi wrote:
+> On Oct 04, Jesper Dangaard Brouer wrote:
+> > On 04/10/2024 15.55, Arthur Fabre wrote:
+> > > On Fri Oct 4, 2024 at 12:38 PM CEST, Jesper Dangaard Brouer wrote:
+> > > > [...]
+> > > > > > > There are two different use-cases for the metadata:
+> > > > > > >=20
+> > > > > > > * "Hardware" metadata (like the hash, rx_timestamp...). There=
+ are only a
+> > > > > > >     few well known fields, and only XDP can access them to se=
+t them as
+> > > > > > >     metadata, so storing them in a struct somewhere could mak=
+e sense.
+> > > > > > >=20
+> > > > > > > * Arbitrary metadata used by services. Eg a TC filter could s=
+et a field
+> > > > > > >     describing which service a packet is for, and that could =
+be reused for
+> > > > > > >     iptables, routing, socket dispatch...
+> > > > > > >     Similarly we could set a "packet_id" field that uniquely =
+identifies a
+> > > > > > >     packet so we can trace it throughout the network stack (t=
+hrough
+> > > > > > >     clones, encap, decap, userspace services...).
+> > > > > > >     The skb->mark, but with more room, and better support for=
+ sharing it.
+> > > > > > >=20
+> > > > > > > We can only know the layout ahead of time for the first one. =
+And they're
+> > > > > > > similar enough in their requirements (need to be stored somew=
+here in the
+> > > > > > > SKB, have a way of retrieving each one individually, that it =
+seems to
+> > > > > > > make sense to use a common API).
+> > > > > >=20
+> > > > > > Why not have the following layout then?
+> > > > > >=20
+> > > > > > +---------------+-------------------+--------------------------=
+--------------+------+
+> > > > > > | more headroom | user-defined meta | hw-meta (potentially fixe=
+d skb format) | data |
+> > > > > > +---------------+-------------------+--------------------------=
+--------------+------+
+> > > > > >                   ^                                            =
+                ^
+> > > > > >               data_meta                                        =
+              data
+> > > > > >=20
+> > > > > > You obviously still have a problem of communicating the layout =
+if you
+> > > > > > have some redirects in between, but you, in theory still have t=
+his
+> > > > > > problem with user-defined metadata anyway (unless I'm missing
+> > > > > > something).
+> > > > > >=20
+> > > >=20
+> > > > Hmm, I think you are missing something... As far as I'm concerned w=
+e are
+> > > > discussing placing the KV data after the xdp_frame, and not in the =
+XDP
+> > > > data_meta area (as your drawing suggests).  The xdp_frame is stored=
+ at
+> > > > the very top of the headroom.  Lorenzo's patchset is extending stru=
+ct
+> > > > xdp_frame and now we are discussing to we can make a more flexible =
+API
+> > > > for extending this. I understand that Toke confirmed this here [3].=
+  Let
+> > > > me know if I missed something :-)
+> > > >=20
+> > > >    [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
+> > > >=20
+> > > > As part of designing this flexible API, we/Toke are trying hard not=
+ to
+> > > > tie this to a specific data area.  This is a good API design, keepi=
+ng it
+> > > > flexible enough that we can move things around should the need aris=
+e.
+> > >=20
+> > > +1. And if we have an API for doing this for user-defined metadata, i=
+t
+> > > seems like we might as well use it for hardware metadata too.
+> > >=20
+> > > With something roughly like:
+> > >=20
+> > >      *val get(id)
+> > >=20
+> > >      set(id, *val)
+> > >=20
+> > > with pre-defined ids for hardware metadata, consumers don't need to k=
+now
+> > > the layout, or where / how the data is stored.
+> > >=20
+> > > Under the hood we can implement it however we want, and change it in =
+the
+> > > future.
+> > >=20
+> > > I was initially thinking we could store hardware metadata the same wa=
+y
+> > > as user defined metadata, but Toke and Lorenzo seem to prefer storing=
+ it
+> > > in a fixed struct.
+> >=20
+> > If the API hide the actual location then we can always move things
+> > around, later.  If your popcnt approach is fast enough, then IMO we
+> > don't need a fixed struct for hardware metadata.
+>
+> +1. I am fine with the KV approach for nic metadata as well if it is fast=
+ enough.
 
-Please distinguish between the clocks that are part of the connection
-between the PCS and PHY and additional clocks.
+Great! That's simpler. I should have something for Jesper to benchmark
+on Monday.
 
-For example, RGMII has its own clocks that are part of the RGMII
-interface. Despite DT having a way to describe clocks, these clocks
-are fundamental to the RGMII interface and are outside of the scope
-of DT to describe. Their description is implicit in the relationship
-between the PHY and network driver.
+> If you want I can modify my series to use kfunc sto store data after xdp_=
+frame
+> and then you can plug the KV encoding. What do you think? Up to you.
 
-Also, the PCS itself is a subset of the network driver, and we do
-not (as far as I know) ever describe any kind of connection between
-a PCS and PHY. That would be madness when we have situations where
-the PHY can change its serdes mode, causing the MAC to switch
-between several PCS - which PCS would one associate the PHY with in
-DT when the "mux" is embedded in the ethernet driver and may be
-effectively transparent?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks for the offer! That works for me :)
 
