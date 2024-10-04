@@ -1,240 +1,254 @@
-Return-Path: <netdev+bounces-132039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 887D89903AF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:17:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD969903EA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49661282497
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:17:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0BD1C20EBA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B7320FAA7;
-	Fri,  4 Oct 2024 13:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA562141D2;
+	Fri,  4 Oct 2024 13:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="dIDy1U+L"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kE2d4ug5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-30.smtpout.orange.fr [80.12.242.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDA871581E0;
-	Fri,  4 Oct 2024 13:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467EC2141A0;
+	Fri,  4 Oct 2024 13:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728047818; cv=none; b=dKmbRnvON9iun3wW3aHw0KdOFubbbLED0WzFXOgDalfi5/XNL5uHEjHpNP5GpzIN8Xk/zOZz8k/OsG23q9v3y4CmQyA+eBHqN/jO1gLmWpZSOVP6Wxexot7D6Cz2Tc12SpUinBV1gu8IABcpcTaSbiMPO0vVAC2KlQBOmhtpO2E=
+	t=1728048036; cv=none; b=eU8tQyrY9jBBcq9gX2HX+gOxUdDw9KoHeBFpIkXIH/y1wbiEEJLd1eBJAg7sN76TidOjPppa2zbImXy2bUjFXnB2iL7cSThEoqt32VHiGzJ0ps4PO08tURhvv6BXzFsDYEEmXYx7RiF61Pyj+pr+ixIwJXmvwmJ7fsL1UceI+kg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728047818; c=relaxed/simple;
-	bh=8PSo2DIypTXDb/TKuaNwWxyZQeUAK6b2eKsf8YBpur8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DIjJOO1zM7DvnPl/2WrKm89vVWWs/hWB7ldHQabbnbA5Gg2C8Wbr3ASgX+2Mn25vh9jl1Y5KC+uLqP48TbXXexd9Zar3BHzLSbDMiUfpwZdz8NRiYzqwiVXInHMHMMr30U8Yj66fsHNC4qXdpQ9j6cj3uZ02BRriC04YlWpwgbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=dIDy1U+L; arc=none smtp.client-ip=80.12.242.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id wi9ksLfHdWgzbwi9kshUS6; Fri, 04 Oct 2024 15:15:41 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1728047741;
-	bh=nRWH9XpiDQTzL94CS1nb47ffVIXOhin5jmNHlLBiMic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=dIDy1U+L/vYne/XH2vKiOD1wJhQ4KCqzffTGciZsdwVuTqjFxzzPHq+q6boDldrIc
-	 JGQcLctsMbQqJod7l/hN3Lhns43PuEQTS9NqUoGMjui6VoEgWWUYRjDXT6uzWzer8E
-	 SzH5NZrNOt8a5hBnYPi0Vu+RZq+XQqVFLiAfPERTq1Mkt5e5POm61rvTcMX/YY7ykf
-	 ZB+fP0C+2qCUtZUCTu22dJgA1TmEV+/pYWPLPxUEbE6HOjDMcZwiQQJ26fFn6Am/Ur
-	 5qqz2YP3ooG2XQZcmvRudtfYGoJxx2XTgEqk5o1FcKinpL/Iv0cXaILcSGpmg7gvpC
-	 tUBM4tmCjIsCA==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Fri, 04 Oct 2024 15:15:41 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <2669052d-752f-416a-9d5e-a03848f30904@wanadoo.fr>
-Date: Fri, 4 Oct 2024 15:15:39 +0200
+	s=arc-20240116; t=1728048036; c=relaxed/simple;
+	bh=dMlQpXZxmtYu9oYAJGj42LF3x9VRU4K35wpBuxaERJs=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=Plb5uZwq8raDgMbxaIUyFbrNn06xbGXAM3DxrDds/EI+UeEzbCr2s1uyneG+IYlZ4sj0213OwR2Blm36F74RgSiWX7/1xG0T2YEyGEvxkyVP0tU3JdHXsdU0BMimgTd7FU0/YInB7JIFObql2Baux802a9iU3T1Xm7Cp/rXRmck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kE2d4ug5; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1728048034; x=1759584034;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=dMlQpXZxmtYu9oYAJGj42LF3x9VRU4K35wpBuxaERJs=;
+  b=kE2d4ug5WubR9EQBs9m8W78BJKXTdvQXzmMGa83ppC9aSOjZWIOS0lfO
+   VSe7XFdcrRojIMttz+G86yhxqYfQTpmP7F0+xHagN82VvUcdyhw2YOO4B
+   u/sDEFgQ7rs/Rm+S1VReoCKkujj3yyeGfWCd7u5bZgWAvzmIt5y21VXby
+   8V0bltJ+ylDmHob0ZZ0mwKM16rRsbPEByanaRXzSqIBcbriRyPjQUut7s
+   ZB+1mAKklo+uyGMgau5Vb8I6K+Qp5t78JHQQ0Nd2CrXZsqJpQmZNPQHd+
+   G9R2p8pccCWbwDcSl6ukWruPNruwUBFxMU7gGnm50J5PqU4O1SV4bqnfo
+   A==;
+X-CSE-ConnectionGUID: wYEhTCIITtS2MLde76jJ4w==
+X-CSE-MsgGUID: M/y/7YsLSOiN6GF6kCG5Sg==
+X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
+   d="scan'208";a="32602241"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2024 06:20:33 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 4 Oct 2024 06:20:02 -0700
+Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Fri, 4 Oct 2024 06:19:59 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next v2 00/15] net: sparx5: prepare for lan969x switch
+ driver
+Date: Fri, 4 Oct 2024 15:19:26 +0200
+Message-ID: <20241004-b4-sparx5-lan969x-switch-driver-v2-0-d3290f581663@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error handling
- path in adin1110_read_fifo()
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Lennart Franzen <lennart@lfdomain.com>,
- Alexandru Tachici <alexandru.tachici@analog.com>,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
-References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
- <20241004113735.GF1310185@kernel.org>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241004113735.GF1310185@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAF7r/2YC/4WOQQ6CMBBFr2Jm7ZjSaBFX3sOwKNPBTiKFTAliD
+ HcXuIDLn5/33/9CZhXOcDt8QXmSLH1agz0egKJPT0YJawZr7NlUtsTmjHnwOl/w5VPlqhnzW0a
+ KGFQmVgwthYsty9aXBtaVQbmVeTc8IPGIiecR6rVpfGZs1CeKm6HzkjYgSh57/eyPpmLHNnlhT
+ PFXPhVo8EruWrk2EDt374S0pyjDifoO6mVZfmxaO6nzAAAA
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Lars Povlsen <lars.povlsen@microchip.com>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, <horatiu.vultur@microchip.com>,
+	<jensemil.schulzostergaard@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Richard Cochran <richardcochran@gmail.com>, <horms@kernel.org>,
+	<justinstitt@google.com>, <gal@nvidia.com>, <aakash.r.menon@gmail.com>,
+	<jacob.e.keller@intel.com>, <ast@fiberby.net>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>
+X-Mailer: b4 0.14-dev
 
-Le 04/10/2024 à 13:37, Simon Horman a écrit :
-> On Thu, Oct 03, 2024 at 08:53:15PM +0200, Christophe JAILLET wrote:
->> If 'frame_size' is too small or if 'round_len' is an error code, it is
->> likely that an error code should be returned to the caller.
->>
->> Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
->> 'success' is returned.
-> 
-> Hi Christophe,
-> 
-> I think we can say "'ret' will be 0".
+== Description:
 
-Agreed.
+This series is the first of a multi-part series, that prepares and adds
+support for the new lan969x switch driver.
 
-	ret = adin1110_read_reg()
-	--> spi_sync_transfer()
-	--> spi_sync()
+The upstreaming efforts is split into multiple series (might change a
+bit as we go along):
 
-which explicitly documents "zero on success, else a negative error code."
+    1) Prepare the Sparx5 driver for lan969x (this series)
+    2) Add support lan969x (same basic features as Sparx5 provides +
+       RGMII, excl.  FDMA and VCAP)
+    3) Add support for lan969x FDMA
+    4) Add support for lan969x VCAP
 
-> At least that is what my brief investigation tells me.
-> 
->>
->> Return -EINVAL instead.
-> 
+== Lan969x in short:
 
-If the patch is considered as correct, can you confirm that -EINVAL is 
-the correct error code to use? If not, which one would be preferred?
+The lan969x Ethernet switch family [1] provides a rich set of
+switching features and port configurations (up to 30 ports) from 10Mbps
+to 10Gbps, with support for RGMII, SGMII, QSGMII, USGMII, and USXGMII,
+ideal for industrial & process automation infrastructure applications,
+transport, grid automation, power substation automation, and ring &
+intra-ring topologies. The LAN969x family is hardware and software
+compatible and scalable supporting 46Gbps to 102Gbps switch bandwidths.
 
+== Preparing Sparx5 for lan969x:
 
-> Please include some information on how this was found and tested.
-> e.g.
-> 
-> Found by inspection / Found using widget-ng.
+The lan969x switch chip reuses many of the IP's of the Sparx5 switch
+chip, therefore it has been decided to add support through the existing
+Sparx5 driver, in order to avoid a bunch of duplicate code. However, in
+order to reuse the Sparx5 switch driver, we have to introduce some
+mechanisms to handle the chip differences that are there.  These
+mechanisms are:
 
-I would say: found by luck! :)
+    - Platform match data to contain all the differences that needs to
+      be handled (constants, ops etc.)
 
-The explanation below will be of no help in the commit message and won't 
-be added. I just give you all the gory details because you asked for it ;-)
+    - Register macro indirection layer so that we can reuse the existing
+      register macros.
 
-(and after reading bellow, you can call me crazy!)
+    - Function for branching out on platform type where required.
 
+In some places we ops out functions and in other places we branch on the
+chip type. Exactly when we choose one over the other, is an estimate in
+each case.
 
+After this series is applied, the Sparx5 driver will be prepared for
+lan969x and still function exactly as before.
 
-I was looking at functions that propagate error codes as their last 
-argument. The idea came after submitting [1].
+== Patch breakdown:
 
-I read cci_read() and wondered if functions with such a semantic could 
-use an un-initialized last argument. In such a case, this function could 
-not behave as expected if the initial value of "err" was not 0.
+Patch #1        adds private match data
 
-So I wrote the following coccinelle script and several other variations.
+Patch #2        adds register macro indirection layer
 
+Patch #3-#4     does some preparation work
 
-// Options: --include-headers
+Patch #5-#7     adds chip constants and updates the code to use them
 
-@ok@
-identifier fct, err;
-type T;
-@@
+Patch #8-#13    adds and uses ops for handling functions differently on the
+                two platforms.
 
-	int fct(..., T *err)
-	{
-		...
-	}
+Patch #14       adds and uses a macro for branching out on the chip type.
 
-@test depends on ok@
-identifier x, fct = ok.fct;
-expression res;
-type T = ok.T;
-@@
+Patch #15 (NEW) redefines macros for internal ports and PGID's.
 
-*	T x;
-	...
-(
-	fct(..., &x);
-|
-	res = fct(..., &x);
-)
+[1] https://www.microchip.com/en-us/product/lan9698
 
-(For the record, I have not found any issue with it...)
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Lars Povlsen <lars.povlsen@microchip.com>
+To: Steen Hegelund <Steen.Hegelund@microchip.com>
+To: horatiu.vultur@microchip.com
+To: jensemil.schulzostergaard@microchip.com
+To: UNGLinuxDriver@microchip.com
+To: Richard Cochran <richardcochran@gmail.com>
+To: horms@kernel.org
+To: justinstitt@google.com
+To: gal@nvidia.com
+To: aakash.r.menon@gmail.com
+To: jacob.e.keller@intel.com
+To: ast@fiberby.net
+Cc: netdev@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
 
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Changes in v2:
 
-BUT, adin1110_read_fifo() was spotted because of the prototype of 
-adin1110_read_reg().
+  Version 2 primarily handles the dropped SPX5_CONST() macro. Now
+  functions access the constants directly using the sparx5->data->consts
+  variable. This has the side-effect of dropping one patch, which is no
+  longer required (#3 in v1), and adding a new patch that handles internal ports
+  and PGID's (patch #15 in v2).
 
-When I reviewed the code, I quickly saw that it was a false positive and 
-that using "type T" in my script was not that logical...
+- Removed the SPX5_CONST macro and the use of it from patches #6, #7 and
+  #8 in v1.
 
-Anyway, when reviewing the code, I saw:
+- Removed GADDR(), GSIZE() etc. macros from sparx5_main_regs.h. Instead
+  the macros access the regs variable directly.
 
-	if (ret < 0)
-		return ret;
+- Patch #3 in v1 is dropped (no need to rename spx5 to sparx5 anymore)
 
-	/* The read frame size includes the extra 2 bytes
-	 * from the  ADIN1110 frame header.
-	 */
-	if (frame_size < ADIN1110_FRAME_HEADER_LEN + ADIN1110_FEC_LEN)
-		return ret;
+- Added patch #15 in v2. This patch changes the internal port and PGID
+  values to be offsets and adds helpers to get them.
 
-	round_len = adin1110_round_len(frame_size);
-	if (round_len < 0)
-		return ret;
+- Added the Reviewed-by tag of Jacob Keller to certain patches.
 
-which looks really strange and likely broken...
+- Link to v1: https://lore.kernel.org/r/20241001-b4-sparx5-lan969x-switch-driver-v1-0-8c6896fdce66@microchip.com
 
-Then I sent the patch we are talking about!
+---
+Daniel Machon (15):
+      net: sparx5: add support for private match data
+      net: sparx5: add indirection layer to register macros
+      net: sparx5: modify SPX5_PORTS_ALL macro
+      net: sparx5: add *sparx5 argument to a few functions
+      net: sparx5: add constants to match data
+      net: sparx5: use SPX5_CONST for constants which already have a symbol
+      net: sparx5: use SPX5_CONST for constants which do not have a symbol
+      net: sparx5: add ops to match data
+      net: sparx5: ops out chip port to device index/bit functions
+      net: sparx5: ops out functions for getting certain array values
+      net: sparx5: ops out function for setting the port mux
+      net: sparx5: ops out PTP IRQ handler
+      net: sparx5: ops out function for DSM calendar calculation
+      net: sparx5: add is_sparx5 macro and use it throughout
+      net: sparx5: redefine internal ports and PGID's as offsets
 
+ drivers/net/ethernet/microchip/sparx5/Makefile     |    2 +-
+ .../ethernet/microchip/sparx5/sparx5_calendar.c    |   56 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_dcb.c |    5 +-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |   34 +-
+ .../net/ethernet/microchip/sparx5/sparx5_fdma.c    |   10 +-
+ .../ethernet/microchip/sparx5/sparx5_mactable.c    |   10 +-
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    |  228 +-
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |  130 +-
+ .../ethernet/microchip/sparx5/sparx5_main_regs.h   | 4469 +++++++++++---------
+ .../net/ethernet/microchip/sparx5/sparx5_netdev.c  |   15 +-
+ .../net/ethernet/microchip/sparx5/sparx5_packet.c  |    8 +-
+ .../net/ethernet/microchip/sparx5/sparx5_pgid.c    |   15 +-
+ .../net/ethernet/microchip/sparx5/sparx5_police.c  |    3 +-
+ .../net/ethernet/microchip/sparx5/sparx5_port.c    |   76 +-
+ .../net/ethernet/microchip/sparx5/sparx5_port.h    |   23 +-
+ .../net/ethernet/microchip/sparx5/sparx5_psfp.c    |   49 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_ptp.c |   44 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_qos.c |    8 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_qos.h |    2 +
+ .../net/ethernet/microchip/sparx5/sparx5_regs.c    |  219 +
+ .../net/ethernet/microchip/sparx5/sparx5_regs.h    |  244 ++
+ .../net/ethernet/microchip/sparx5/sparx5_sdlb.c    |   15 +-
+ .../ethernet/microchip/sparx5/sparx5_switchdev.c   |   33 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_tc.c  |    8 +-
+ .../ethernet/microchip/sparx5/sparx5_tc_flower.c   |    4 +-
+ .../net/ethernet/microchip/sparx5/sparx5_vlan.c    |   47 +-
+ 26 files changed, 3531 insertions(+), 2226 deletions(-)
+---
+base-commit: 3a39d672e7f48b8d6b91a09afa4b55352773b4b5
+change-id: 20240927-b4-sparx5-lan969x-switch-driver-dfcd5277fa70
 
-(yes some real people really search such things and write such 
-coccinelle scripts, and now you can call me crazy)
-
-
-[1]: 
-https://lore.kernel.org/all/666ac169157f0af1c2e1d47926b68870cb39d587.1727977974.git.christophe.jaillet@wanadoo.fr/
-
-> Compile tested only.
-
-As a "speculative" patch, it was only compile tested, you are correct.
-
-> 
->>
->> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
->> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
->> ---
->> This patch is speculative.
->> If returning 0 is what was intended, then an explicit 0 would be better.
-> 
-> In my brief investigation I see that adin1110_read_fifo()
-> is only called by adin1110_read_frames(), like this:
-> 
-> 	while (budget) {
-> 		...
-> 
-> 		ret = adin1110_read_fifo(port_priv);
-> 		if (ret < 0)
-> 			return;
-> 
-> 		budget--;
-> 	}
-> 
-> So the question becomes, should a failure in reading the fifo,
-> because of an invalid frame size, be treated as an error
-> and terminate reading frames.
-> 
-> Like you, I speculate the answer is yes.
-> But I think we need a bit more certainty to take this patch.
-
-I won't be of any help here.
-
-I can just say that "it looks strange" and is "certainly" bogus, but 
-won't be able the prove it nor test it.
-
-
-I'll wait a bit before sending a v2. If confirming this point is a 
-requirement for accepting the patch, there is no need to urge for a v2 
-if no-one cares about answering your point.
-
-CJ
-
-
-> 
+Best regards,
+-- 
+Daniel Machon <daniel.machon@microchip.com>
 
 
