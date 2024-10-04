@@ -1,160 +1,202 @@
-Return-Path: <netdev+bounces-132076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C36D990530
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:02:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A798990535
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:03:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDC4028516D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:02:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5974B1C22A64
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B122C2141D0;
-	Fri,  4 Oct 2024 14:02:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9949A2141B0;
+	Fri,  4 Oct 2024 14:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rkz73g/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F254D2139DD
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 14:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A8915748E
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 14:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728050549; cv=none; b=aKtlaOUkNgLHipfab8wNpL3J3lxVGMrRtbH8wQzcMS1nFsJvjxTa8ujfAF8KVkXJai/2/4Itu7XrLBn4yHFOaxTerpXvlB7Oxp4Rnp2otjpAczgYxp8FrsqhaaYetm+etM937aFBbqmJck91PJTLkX4ScYd6SDprvFvGlQPYsg4=
+	t=1728050584; cv=none; b=ZME+0QxsUrX/ktK47mprp/FDgvXiaUOIUS1X1r3RSZT3H2uvqi/F1OayQ8C6gieQE9iFoKzDGNWJPR7uoOBKX/QgM4xQNkSRDv7T8KWlpKSecJdzts57iyZRTRQJabFckcXmpX0pnwrdOvrENgBhMb0pSpV1l/8yChOp85fIUKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728050549; c=relaxed/simple;
-	bh=m+EuFRP4yJCBryc6cpYw/Y6cYfUZ04WOCx4r0St2QmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLu0SV9y8DE7hQA7+TKtt/8reF4sKZeK7ItHyJItUgO5RRcxiye57+DMko1IZ1bwlSQREtUOk0r962k5OijOGUat9znSaYWsTAMh9IG/SHknBTP3AwHttQxZR4fn/6AZ+RxovGgaU+JHm6murCFIB4PiLDlUIrRM6tVtcX+Tc8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swisr-0006f4-HM; Fri, 04 Oct 2024 16:02:17 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swisp-003abZ-Kf; Fri, 04 Oct 2024 16:02:15 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swisp-00AhcU-1j;
-	Fri, 04 Oct 2024 16:02:15 +0200
-Date: Fri, 4 Oct 2024 16:02:15 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 11/12] net: pse-pd: Add support for event
- reporting using devm_regulator_irq_helper
-Message-ID: <Zv_1ZzwQJ-P36mt6@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
- <f56780af-b2d4-42d7-bc5d-c35b295d7c52@lunn.ch>
- <20241003102806.084367ba@kmaincent-XPS-13-7390>
- <f97baa90-1f76-4558-815a-ef4f82913c3a@lunn.ch>
- <20241003153303.7cc6dba8@kmaincent-XPS-13-7390>
- <4b9d1adf-e9bd-47c0-ac69-5da77fcf8d0b@lunn.ch>
- <Zv_0ESPJgHKhFIwk@pengutronix.de>
+	s=arc-20240116; t=1728050584; c=relaxed/simple;
+	bh=8Z5LddFwZKIemlr/TdgLpEWQcSrNFAmlrDgUkTpKh24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fCk4e2RQbKBga8aflZbbb3ZxzTCuuUpbU7FyEeGWJAY3lU5wDeS7AleLxXIKl0CIIU3LR+yE8P05zl0UZagwQprOeGT9IIACJJ4UPOsdd3U3wUb+6JZT2FOL1/DvG8VfKOGKUHBZgEuFnzUWfE2KdhYUWLegHa225srN/+m/924=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Rkz73g/f; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cae563348so3462375e9.0
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 07:03:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1728050581; x=1728655381; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=i+W0UPcMEUofL0GGlPfd7SpsVs7uF/Pb41LRoiyF420=;
+        b=Rkz73g/fIH5cVMvXPi+Q38zQU+brBVZz6nVVVV7KYzRFRHZPglNPqPDM/T/1i5GeAc
+         vVPfcJr2Vo93c5yckk4lLsNNRhXFIrSt1LQwdIV8K6yAw8DlXcBLRmAhG1TI31/8Aqd1
+         xpz8PxkfrHIkgsE5RhGBSRXisa5S7OBM9IvYoBn6+cpVRthO8VBqrzHJhgmF68AzQS6x
+         CpzamKEaQaHj/gqjLXCe9c6htBbXjjvhP+PxbbTcUhnYXYqdrGL1WyY0wD36iwJogzDC
+         GakGjYgqQOT2g6gcA0kTO29WiVD5aNrxY4HgAnsqEDhz7iA3vede/C1x1NIOOAdtnVHZ
+         tQKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728050581; x=1728655381;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i+W0UPcMEUofL0GGlPfd7SpsVs7uF/Pb41LRoiyF420=;
+        b=mp03zvOyN1WPCPFq2W+Q87YFYax6aKF1nYUH0H3CfMm5tfHmnZkeneFNtLbXSreukv
+         IwghAx5hXalI35qo/DlqfX5VlejxKKL+Cn4U3T2LpngZrWGI7ENHt5SZT8YG6OmGnnzH
+         cOcAXoNP/oU5WApCjktp5U7odLbNGx1GRS72hsogF2r5WOjUnCrhJIm86f7vEBKnjhTH
+         xLxM1IKsFshtgYrTW9oY51RUJik75rOGUsCG0vkDYdsFTtGovkdFXO/GfHzzzRoo8I4y
+         YCJjM2ZTRQsNynRNVrffmd8WvRt8FHUA2K32UlhzKzM4hSvlaN4w5FlZZgyakMbmmSBW
+         pC9Q==
+X-Gm-Message-State: AOJu0Yzs/y3SAdje3R6Wf8CoU73izESVLM3mx11ROsEp32dPmmMGSwBn
+	2LmtNzU7eKK3rEVOanPhC8BHDF9wJ67TLWQB4ZMEnlgRWLX9brkaUnfQ7f6+VYI=
+X-Google-Smtp-Source: AGHT+IHMYtl2nBgLbFLufrWZfLcFV65YNtkPQLP5BGhMO6MK5Y7lAZPaJbtx2Uha/T4JpCR6JEPpSA==
+X-Received: by 2002:a05:600c:4fc8:b0:42c:baba:13cb with SMTP id 5b1f17b1804b1-42f85aa360fmr10305185e9.2.1728050580906;
+        Fri, 04 Oct 2024 07:03:00 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.211.167])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86a1f74fsm16530345e9.2.2024.10.04.07.02.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 07:02:57 -0700 (PDT)
+Message-ID: <9e744cc1-9c27-4172-aacc-8599079f5570@linaro.org>
+Date: Fri, 4 Oct 2024 16:02:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zv_0ESPJgHKhFIwk@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+To: Andrew Lunn <andrew@lunn.ch>,
+ "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: netdev@vger.kernel.org, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Russell King <linux@armlinux.org.uk>, Jacob Keller
+ <jacob.e.keller@intel.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+ linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
+ arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com, john@phrozen.org,
+ Luo Jie <quic_luoj@quicinc.com>, Pavithra R <quic_pavir@quicinc.com>,
+ "Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+ "Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <febe6776-53dc-454d-83b0-601540e45f78@lunn.ch>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <febe6776-53dc-454d-83b0-601540e45f78@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 03:56:33PM +0200, Oleksij Rempel wrote:
-> On Thu, Oct 03, 2024 at 05:22:58PM +0200, Andrew Lunn wrote:
-> > > Indeed, but regulator API already provide such events, which will even be sent
-> > > when we enable or disable the PSE. Should we write a second event management.
-> > > Using regulator event API allows to report over current internal events to the
-> > > parents regulator the power supply of the PSE which could also do something to
-> > > avoid smoke.
-> > > 
-> > > Or maybe we should add another wrapper which will send PSE ethtool netlink
-> > > notification alongside the regulator notifications supported by this patch.
-> > > 
-> > > > Also, how do regulator events work in combination with network
-> > > > namespaces? If you move the interface into a different network
-> > > > namespace, do the regulator events get delivered to the root namespace
-> > > > or the namespace the interface is in?
-> > > 
-> > > regulator events are sent in root namespace.
-> > 
-> > I think we will need two event, the base regulator event, and a
-> > networking event. Since it is a regulator, sending a normal regulator
-> > event makes a lot of sense. But mapping that regulator event to a
-> > netns:ifnam is going to be hard. Anything wanting to take an action is
-> > probably going to want to use ethtool, and so needs to be in the
-> > correct netns, etc. But it does get messy if there is some sort of
-> > software driven prioritisation going on, some daemon needs to pick a
-> > victim to reduce power to, and the interfaces are spread over multiple
-> > network namespaces.
-> > 
-> > What i don't know is if we can use an existing event, or we should add
-> > a new one. Often rtnetlink_event() is used:
-> > 
-> > https://elixir.bootlin.com/linux/v6.12-rc1/source/net/core/rtnetlink.c#L6679
-> > 
-> > but without some PSE information in it, it would be hard to know why
-> > it was sent. So we probably either want a generic ethtool event, or a
-> > PSE event.
+On 03/10/2024 20:42, Andrew Lunn wrote:
+>> Agree that switchdev is the right model for this device. We were
+>> planning to enable base Ethernet functionality using regular
+>> (non-switchdev) netdevice representation for the ports initially,
+>> without offload support. As the next step, L2/VLAN offload support using
+>> switchdev will be enabled on top. Hope this phased approach is fine.
 > 
-> Hm... assuming we have following scenario:
+> Since it is not a DSA switch, yes, a phased approach should be O.K.
 > 
->                                   .---------   PI 1
->                                  / .---------  PI 2
->                    .========= PSE /----------( PI 3 ) NNS red
->                   //              \----------( PI 4 ) NNS blue
-> Main supply      //                `---------( PI 5 ) NNS blue
-> o================´--- System, CPU
-> 
-> In this case we seems to have a new challenge:
-> 
-> On one side, a system wide power manager should see and mange all ports.
-> On other side, withing a name space, we should be able to play in a
-> isolated sand box. There is a reason why it is isolated. So, we should
-> be able to sandbox power delivery and port prios too. Means, by creating
-> network names space, we will need a power names space. 
-> 
-> I can even imagine a use case: an admin limited access to a switch for
-> developer. A developer name space is created with PSE budget and max
-> prios available for this name space. This will prevent users from DoSing
-> system critical ports.
-> 
-> At this point, creating a power name space will an overkill for this
-> patch set, so it should be enough to allow controlling prios over
-> ethtool per port and isolation support if needed.
+>>>> 3) PCS driver patch series:
+>>>>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
+>>>>         be enabled in drivers/net/pcs/
+>>>> 	Dependent on NSS CC patch series (2).
+>>>
+>>> I assume this dependency is pure at runtime? So the code will build
+>>> without the NSS CC patch series?
+>>
+>> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
+>> PCS's MII channels. To represent this in the DTS, the PCS node in the
+>> DTS is configured with the MII Rx/Tx clock that it consumes, using
+>> macros for clocks which are exported from the NSS CC driver in a header
 
-Oh, sorry, i'm too tired. Too many words are missing in my answer ...
+Huh? How is this anyhow related to the point discussed here? That's DTS.
+You *CANNOT* send DTS to net-next/net.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>> file. So, there will be a compile-time dependency for the dtbindings/DTS
+>> on the NSS CC patch series. We will clearly call out this dependency in
+>> the cover letter of the PCS driver. Hope that this approach is ok.
+> 
+> Since there is a compile time dependency, you might want to ask for
+> the clock patches to be put into a stable branch which can be merged
+> into netdev.
+> 
+> Or you need to wait a kernel cycle.
+
+Sorry guys, but this is not accurate. There is no such dependency, but
+what's more: there cannot be such dependency.
+
+If there is such dependency and above cross-tree merging is needed, then
+it is a clear NAK from me, because patchset is utterly broken.
+
+Upstreaming SoCs have clear rules, already documented in the kernel, in
+various emails and in Qualcomm internal guideline (I think, if it is not
+in your internal guideline, then please update because we keep repeating
+it once per month to you guys).
+
+Best regards,
+Krzysztof
+
 
