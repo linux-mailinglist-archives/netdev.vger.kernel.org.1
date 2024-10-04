@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-132157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A79990991
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:43:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2AF19909A3
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:45:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415501F21413
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:43:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 758FA1F21E91
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A20E1CACD9;
-	Fri,  4 Oct 2024 16:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C47E25570;
+	Fri,  4 Oct 2024 16:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfvSajmq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E9P4w2WV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411AE1E3798;
-	Fri,  4 Oct 2024 16:43:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136971E3789;
+	Fri,  4 Oct 2024 16:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728060196; cv=none; b=jtZX0u8mty7aE2cWI7MwsITpnui7YYJNJwn8KI+TUzno8r+dBXfNBN8vR9T9a84YVuNUOINRlgTcwNKoJ8yWzuJxK5Fkg07DdTR1Ur3ENk74r7m+XVRUGLZgBvQbpBxjUAMUYN13AqH7mCwIyp9anZ5xIBNNfZKYTQ6Ds6dJqG4=
+	t=1728060349; cv=none; b=V23PYd24jw7B/iqNBg5O1QVIS50XHQjaiLpkxWGrX3A8AblM0CG66LrTncpMAIXaT1aXc7mEElhDcUIuiy7DFeHUFeclwfX6b2+v7UEpJA+RulS1BsNcj9Ylriu09QQGjdVul1NERYX3lFRYTHLnzIjrA2Gpvl7Exmxo/IAexbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728060196; c=relaxed/simple;
-	bh=bslI7aYrHHJa8ElMwroQ8QfyHxy5X8O4+eVvZQS74F4=;
+	s=arc-20240116; t=1728060349; c=relaxed/simple;
+	bh=o2hFNAT1FRUwAXpqAp6jv5zEwdXxNZGDEAiFVabBLu0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=feGOog5sEIBRsMvTz12RPbd4+cRim54oTSGxF0Zg22fWKyCBT6ytoeQabiyp9qtKZpchucUvdFE1c5/PzB9biS4XfCErrbSS7Nc92NNjpY0/WZ5Xz4Tqngmo9LVBgZZnzIBHCzN8VQOkyUNPAUVzvnRjFgNk/HONdgUzhY2F8EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfvSajmq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30B76C4CEC6;
-	Fri,  4 Oct 2024 16:43:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Z2/1MsV9zFrrdrfFhQWDHhvT8YpJm8tdj8YeSpiE/lI+TT/ezhuzLRhEOab1p+sHTiRL2EaGXyxZdsHfGBBbvDGkJkcPuPgrLBHwXQKiZHByEoGELA8MaR05InMDrSBURBbHJbBqFspyamxGLZPbN8I1M4yellmf3iZ7ovCMteg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E9P4w2WV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE874C4CEC6;
+	Fri,  4 Oct 2024 16:45:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728060195;
-	bh=bslI7aYrHHJa8ElMwroQ8QfyHxy5X8O4+eVvZQS74F4=;
+	s=k20201202; t=1728060348;
+	bh=o2hFNAT1FRUwAXpqAp6jv5zEwdXxNZGDEAiFVabBLu0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CfvSajmqeTSFIiSU0753vgdvAgQKAsaJHk/CQx8jpEcYqR1mxR5xk03D+Qy/S3CLK
-	 6ynJ5j7OUiEo17Ilthyg//noj8Za4wskJb/ojjoADmwDFzAWO7EWut21qaiJgG3bk+
-	 9o7lLhZeS9/F20sINYztLr1tz1hTofGV3OJyuQnc58zif89rVqyxAh5y5w9Fo5sop5
-	 4gPI/3r3tyxv9W6BwCw05PiI+B3KhRvRzfnJ526d3cVId3GdDZhFtQcb6oKbpLy+t2
-	 0MvATDgxvvWq1x5OXMtHS7qDahWQmE4BAJOh77Q5i2LW50urOkos/nzqskw46rFBLP
-	 zDx1I6+feeu1g==
-Date: Fri, 4 Oct 2024 09:43:14 -0700
+	b=E9P4w2WVPPiZxukJ5L02l7dYP0pdRDKtObgOE0bzmkV6HdHM5AiSrrHfoQ2R9rmPU
+	 2iRSwSC8RJWCoVK+mPVxjroIuBaTCfx5Oxll2/22TVYaFJcoqCg5aW9xi8CpwOiX3M
+	 fpxNTO1kWnJ+r9Xmc2RT7VyJBnsOm0qB1o0n6Z8TNFWtR+rU2uo3vgsV7jIF4VPdhR
+	 00m08VlDbypiYxfMcMgcSxkk4In5Odu+qrxwSo5AHjf7tpfzt2DPUAD3lCE/qhKoce
+	 +gFBN5+784h5LS2b7PlFIX2yknmQv9sapV+eV8xnZA/YRnwK2g5s1vaH5Ao7HScW4h
+	 wDMMIKJWA26VA==
+Date: Fri, 4 Oct 2024 09:45:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Menglong Dong <menglong8.dong@gmail.com>
 Cc: idosch@nvidia.com, aleksander.lobakin@intel.com, horms@kernel.org,
@@ -50,12 +50,12 @@ Cc: idosch@nvidia.com, aleksander.lobakin@intel.com, horms@kernel.org,
  gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
  razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 03/12] net: tunnel: add
- skb_vlan_inet_prepare_reason() helper
-Message-ID: <20241004094314.735bb69c@kernel.org>
-In-Reply-To: <20241001073225.807419-4-dongml2@chinatelecom.cn>
+Subject: Re: [PATCH net-next v4 08/12] net: vxlan: use kfree_skb_reason() in
+ vxlan_xmit()
+Message-ID: <20241004094547.44ba5dc2@kernel.org>
+In-Reply-To: <20241001073225.807419-9-dongml2@chinatelecom.cn>
 References: <20241001073225.807419-1-dongml2@chinatelecom.cn>
-	<20241001073225.807419-4-dongml2@chinatelecom.cn>
+	<20241001073225.807419-9-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,14 +65,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  1 Oct 2024 15:32:16 +0800 Menglong Dong wrote:
-> -static inline bool skb_vlan_inet_prepare(struct sk_buff *skb,
-> -					 bool inner_proto_inherit)
-> +static inline enum skb_drop_reason
-> +skb_vlan_inet_prepare_reason(struct sk_buff *skb, bool inner_proto_inherit)
+On Tue,  1 Oct 2024 15:32:21 +0800 Menglong Dong wrote:
+> +	/** @SKB_DROP_REASON_TUNNEL_TXINFO: tx info for tunnel is missed */
 
-this only has 5 callers, please convert them to expect a drop
-reason to be returned instead of adding a compatibility wrapper
--- 
-pw-bot: cr
+Doc is not great, how about:
+
+[...]: packet without necessary metatdata reached a device is in
+"eternal" mode
+
+?
 
