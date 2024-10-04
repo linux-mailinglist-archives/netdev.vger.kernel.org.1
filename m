@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-132217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C55CA9910A2
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:33:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC98B990FDF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3FBAB24587
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 831521F23262
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A8C1DB357;
-	Fri,  4 Oct 2024 19:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A29C1DF96E;
+	Fri,  4 Oct 2024 19:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iKs7X6U+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRtIjbT9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D3211D89F8
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE5F1DF971
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728069628; cv=none; b=twlLG+RQoLX35TzJkFip8XaXM26GL8yzGRYlc/uC+EPZJCqwjxarncE4yxN62aCt2Xu6CPN9WZcAR8AVZkYxgkzrlCBtbN3ulfxxKI1ljVgczYdojTM2RD9IfjfifgEdFtGH9Gcr5ZtevYzxJlcFwQ4FXmr4pjz7iXeDQlhE1KE=
+	t=1728070829; cv=none; b=fM7ezuJGciI7wsDIj0pqKjfSu5YlbtiytzQY7XHSknN0tffEkb/nqL8iTjkQv2m2cGxnjww7OzV4bCk687kZ4dN/te4+hU8fngS0A7QrUrzkv5jfint7Gn20xpceb6BPgXR+NE37muDvlUgQlDavPVyyblZzj5lLK9ONAVgrPI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728069628; c=relaxed/simple;
-	bh=9DTQ7htQM/UY1VkQg+81LVY8BarPunBDB6UdWOk9MJw=;
+	s=arc-20240116; t=1728070829; c=relaxed/simple;
+	bh=h3lyfASBxgKqHzc5PijqKO3f/7W9rXYv3WYu7fbI5eo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nwn3O1DjH4XXzuUw7GeihAkqVRpfjdPVR86/5FUFEadOV4aW64fywtUKlGNB+ZiaZmKzZEqkLKZ+5ryiSU8bPoTCj2x29kGjK2w+zhB40eG4+XWgrnv+VHgWvgUALOnX+SFg5e486xmb5b/d91CWcw1d7rkDkA238nyop7Jx4T4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iKs7X6U+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B20C4CEC6;
-	Fri,  4 Oct 2024 19:20:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ffCv/+v4DvFJ9d/m5MlgCkJKBsBwYKporY9lgXLNwUj/MFKClDNxh8Gow0eh1Al9D+VrAlnhMtz9ZpayCvXWmtFXnRYCn2RlJk/N4SEQhnq42m8iKOoMpUqI+YWqEvyi/1KKFbsLndt6+KW0L115V0IOEnNPJ1SxPy71be4bvd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRtIjbT9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A534AC4CEC6;
+	Fri,  4 Oct 2024 19:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728069628;
-	bh=9DTQ7htQM/UY1VkQg+81LVY8BarPunBDB6UdWOk9MJw=;
+	s=k20201202; t=1728070829;
+	bh=h3lyfASBxgKqHzc5PijqKO3f/7W9rXYv3WYu7fbI5eo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iKs7X6U+/eCjcRkPJVgYaCUeAKY6vfSRt/k/6cJ3zk4pyLtIDL+aDO6RNEkK3r01v
-	 2dFybGcZIAMOIkaHtW64P+GeFljKnUVUEw+NneAq9Ap5aZGxTGyfNlwZoI5gZBg0Z/
-	 TzkOHap4T7CVlE94Ln/k1pU/a/1haYZK2ArJPCRtgiKVE2MMT5X5azAdIBUB/kC5rq
-	 e1mXZt//inkNzTKHqVX92pT5kCwBbYcZX6CmYyG9Jz8obuQB0Lbn75mhxpKZM+U4si
-	 mJ+1qOU6uBmDr5e3mSAQqnqNpaVkUnjyjJoF/CR16X5fodHVGPV8i58g5PQ3Hok2EW
-	 GopSGnF8IQBqA==
+	b=WRtIjbT9AP6WSa2bH5GsEcZ7bNv2BnY4Ry/i8lzCXk7ncEB0tEv1XFe6I+EyRJorg
+	 G6VFB6AvnAw4J2WPR3wCrjwDExmqgOlRjkQmtzmfXjDB5p9Sql0BrBbKY4C+qWafex
+	 RGNuVS7luALUJb+zAyZSVkri56O/8fJshQ26YI5BcUgEOhbLVRbjWa2vPgu3fHsZ+c
+	 IeVRHbko5pW12cu4SRuaX9CQOHPBm79+nP6Z/mfTVhU9v22T655YRK0/HNbZ/QirpW
+	 z2RVxfcl2tYToBfxZS1KzMB/xNpT6jrO+294OSEsoB4NmitNOM+pBIT6AhoZcXTHTM
+	 sz/ulq6KHRFhw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF3A39F76FF;
-	Fri,  4 Oct 2024 19:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714E639F76FF;
+	Fri,  4 Oct 2024 19:40:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/3] Add option to provide OPT_ID value via cmsg
+Subject: Re: [PATCH net-next 00/12][pull request] Intel Wired LAN Driver Updates
+ 2024-10-01 (ice)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172806963180.2712736.12630737288556684107.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 19:20:31 +0000
-References: <20241001125716.2832769-1-vadfed@meta.com>
-In-Reply-To: <20241001125716.2832769-1-vadfed@meta.com>
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: vadim.fedorenko@linux.dev, willemb@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, kerneljasonxing@gmail.com,
- horms@kernel.org, netdev@vger.kernel.org
+ <172807083327.2719163.11548124456389587908.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 19:40:33 +0000
+References: <20241001201702.3252954-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20241001201702.3252954-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, richardcochran@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Tue, 1 Oct 2024 05:57:13 -0700 you wrote:
-> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
-> timestamps and packets sent via socket. Unfortunately, there is no way
-> to reliably predict socket timestamp ID value in case of error returned
-> by sendmsg. For UDP sockets it's impossible because of lockless
-> nature of UDP transmit, several threads may send packets in parallel. In
-> case of RAW sockets MSG_MORE option makes things complicated. More
-> details are in the conversation [1].
-> This patch adds new control message type to give user-space
-> software an opportunity to control the mapping between packets and
-> values by providing ID with each sendmsg.
+On Tue,  1 Oct 2024 13:16:47 -0700 you wrote:
+> This series contains updates to ice driver only.
+> 
+> Karol cleans up current PTP GPIO pin handling, fixes minor bugs,
+> refactors implementation for all products, introduces SDP (Software
+> Definable Pins) for E825C and implements reading SDP section from NVM
+> for E810 products.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v6,1/3] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
-    https://git.kernel.org/netdev/net-next/c/4aecca4c7680
-  - [net-next,v6,2/3] net_tstamp: add SCM_TS_OPT_ID for RAW sockets
-    https://git.kernel.org/netdev/net-next/c/822b5bc6db55
-  - [net-next,v6,3/3] selftests: txtimestamp: add SCM_TS_OPT_ID test
-    https://git.kernel.org/netdev/net-next/c/a89568e9be75
+  - [net-next,01/12] ice: Implement ice_ptp_pin_desc
+    https://git.kernel.org/netdev/net-next/c/26017cff6890
+  - [net-next,02/12] ice: Add SDPs support for E825C
+    https://git.kernel.org/netdev/net-next/c/1d86cca479d7
+  - [net-next,03/12] ice: Align E810T GPIO to other products
+    https://git.kernel.org/netdev/net-next/c/e4291b64e118
+  - [net-next,04/12] ice: Cache perout/extts requests and check flags
+    https://git.kernel.org/netdev/net-next/c/d755a7e129a5
+  - [net-next,05/12] ice: Disable shared pin on E810 on setfunc
+    https://git.kernel.org/netdev/net-next/c/df0b394f1ca7
+  - [net-next,06/12] ice: Read SDP section from NVM for pin definitions
+    https://git.kernel.org/netdev/net-next/c/ebb2693f8fbd
+  - [net-next,07/12] ice: Enable 1PPS out from CGU for E825C products
+    https://git.kernel.org/netdev/net-next/c/5a4f45c435fa
+  - [net-next,08/12] ice: Introduce ice_get_phy_model() wrapper
+    https://git.kernel.org/netdev/net-next/c/5e0776451d89
+  - [net-next,09/12] ice: Add ice_get_ctrl_ptp() wrapper to simplify the code
+    https://git.kernel.org/netdev/net-next/c/97ed20a01f5b
+  - [net-next,10/12] ice: Initial support for E825C hardware in ice_adapter
+    https://git.kernel.org/netdev/net-next/c/fdb7f54700b1
+  - [net-next,11/12] ice: Use ice_adapter for PTP shared data instead of auxdev
+    https://git.kernel.org/netdev/net-next/c/e800654e85b5
+  - [net-next,12/12] ice: Drop auxbus use for PTP to finalize ice_adapter move
+    https://git.kernel.org/netdev/net-next/c/0333c82fc6b7
 
 You are awesome, thank you!
 -- 
