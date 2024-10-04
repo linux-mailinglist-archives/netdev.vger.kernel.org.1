@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-132297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09BA09912EA
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 01:20:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD0ED9912EC
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 01:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 974DAB230D0
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:20:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91E771F21F85
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1AA154BFC;
-	Fri,  4 Oct 2024 23:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD7715572E;
+	Fri,  4 Oct 2024 23:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="om3FG4NA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hTv44E1A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D917B14EC71;
-	Fri,  4 Oct 2024 23:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14476155336;
+	Fri,  4 Oct 2024 23:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728084035; cv=none; b=bzAzoJIjZtIL8LUSFlPgZ96talfG6oSKGNIPE+o28FXWHsWWzarYuE7tSCt3sZnDfRVoOa/wOKEZOXCwByJZfFd3jQqzpIH4X1NDVeH4V0458Kc9VkDJxgh4+r7QVVbKs3fOWUPqf0FN6tpA9wThAMUxdHbFZD7bSIPQlcE6IXI=
+	t=1728084037; cv=none; b=Y8ViPQp+qsIgSGuyD8PbvsW5WhZ+xDTRgD2Aa9cT1wMX8I48eaeg7qLpFYmZWKMZMk/AJbnQ3gFQt5nVX4woL9S8V3FWo54kmylP74DTcEdvIfIDyJEyFkGTCeQcT2SaqT5zoyjsuYfw0irJISFUUhSNdqE8Z41EJQopPjXl2d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728084035; c=relaxed/simple;
-	bh=kkACx0BM3cqn1S9bMKRcoczAv/BLyjqb14slhs8Cf/E=;
+	s=arc-20240116; t=1728084037; c=relaxed/simple;
+	bh=tUSjkrEkMrf5s8z6akQfZLUkZn95MYz8cS63A/wVL0A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W8OEtYL9H4voMIriClPGfyCRIH7C5adoskrlrFNX8YuAODZ2XfTBwau+rSTxkUMmoBeS7nezHYvlcAAVwovHfh6PhLGfXIJ6CNVzSByOV2S4g3PhvjkoIb8Ltm4jMxOUK9lGnE1EX8AxL31YVyPRM75dzkHxaUFp4hExs3XCQ3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=om3FG4NA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C0B0C4CEC6;
-	Fri,  4 Oct 2024 23:20:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=A31gtJygddX8mH/rFNyCtmd0EUq8PLdEjloe2yRTRh97dkbo7WJg6korTZK3JXTHeJ9oTywSBqT5DgwLorzwr4IFLe1E01077Gyg8gHXZitFeBcXF24PIaJZW/9hnkQCTzJV+aBUsfCpKzrSlKzpWX5vxrvvQ1o1dFwfVzAC1M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hTv44E1A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96FEDC4CED0;
+	Fri,  4 Oct 2024 23:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728084035;
-	bh=kkACx0BM3cqn1S9bMKRcoczAv/BLyjqb14slhs8Cf/E=;
+	s=k20201202; t=1728084036;
+	bh=tUSjkrEkMrf5s8z6akQfZLUkZn95MYz8cS63A/wVL0A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=om3FG4NAm38c1bETXOnGvTnAxWPl1zIpcYkThneZm62wIN36uK3gPFEy1dLoHt4fS
-	 5VyBawAjFOGe+NXlHCPzi+RAAKt7TXj6kgZT9r1ybczo2BqlK8WjwvJhGzEBl3fVbS
-	 Q2MkBq9NotJhllnMywlDg9vujPRVBQn1jjrMrL0eCQFVCbDvu7k2WLKSqADq81Ef3o
-	 Q2t73yHohJy9YIl/w4zXH40nFS3kf/CKP1HeLdOgMBXk0QmX/T6o/yRs3l41TuK6vV
-	 R7BF/Xs1b9kHT8imQHsKeUIyN54Zl+FMSq8aOdmifhJFnmIYFsL086poJ2h4Kwa7Lc
-	 FcaCfsN+blzRQ==
+	b=hTv44E1ApOhjo14ODIMYqzRrpN4wyAY2id5SJpD4nZhfGrI5Z1VTGod+jC3yYAWOf
+	 FkDYSI76ve0LSMKBuDbCnfbGE+BmG+zZeH99ULB8z0lGyCJ9D3kQVyGETo2/y8QWGa
+	 DveDy6J2XV/wf37fsljxF6Fhh5T36/rch94p1BuztBKsW1Qua+LFXNEXj3yA0zaOdv
+	 WI7RSVaDFpTXXr6+cp2oQZfrJRzX3ztM2qpB2dknyncc+qqkGEsru3DyQN89omGhwv
+	 0QRnHhmXbiwm3rbd3XEneypjY+K9n2Zq7b/mo6bJ4dD30u0IzTCXT4nsDzOLlHkyq6
+	 RoAGsUAKYdJrA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DB639F76FF;
-	Fri,  4 Oct 2024 23:20:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BCD39F76FF;
+	Fri,  4 Oct 2024 23:20:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftest/ptp: update ptp selftest to exercise the
- gettimex options
+Subject: Re: [PATCH 0/5] hyper-v: Don't assume cpu_possible_mask is dense
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172808403874.2772330.8746190595919420418.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 23:20:38 +0000
-References: <20241003101506.769418-1-maheshb@google.com>
-In-Reply-To: <20241003101506.769418-1-maheshb@google.com>
-To: Mahesh Bandewar <maheshb@google.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- mahesh@bandewar.net, shuah@kernel.org, richardcochran@gmail.com,
- davem@davemloft.net, kuba@kernel.org
+ <172808404024.2772330.2975585273609596688.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 23:20:40 +0000
+References: <20241003035333.49261-1-mhklinux@outlook.com>
+In-Reply-To: <20241003035333.49261-1-mhklinux@outlook.com>
+To: Michael Kelley <mhkelley58@gmail.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, joro@8bytes.org,
+ will@kernel.org, robin.murphy@arm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ James.Bottomley@HansenPartnership.com, martin.petersen@oracle.com,
+ iommu@lists.linux.dev, netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  3 Oct 2024 03:15:06 -0700 you wrote:
-> With the inclusion of commit c259acab839e ("ptp/ioctl: support
-> MONOTONIC{,_RAW} timestamps for PTP_SYS_OFFSET_EXTENDED") clock_gettime()
-> now allows retrieval of pre/post timestamps for CLOCK_MONOTONIC and
-> CLOCK_MONOTONIC_RAW timebases along with the previously supported
-> CLOCK_REALTIME.
+On Wed,  2 Oct 2024 20:53:28 -0700 you wrote:
+> From: Michael Kelley <mhklinux@outlook.com>
 > 
-> This patch adds a command line option 'y' to the testptp program to
-> choose one of the allowed timebases [realtime aka system, monotonic,
-> and monotonic-raw).
+> Code specific to Hyper-V guests currently assumes the cpu_possible_mask
+> is "dense" -- i.e., all bit positions 0 thru (nr_cpu_ids - 1) are set,
+> with no "holes". Therefore, num_possible_cpus() is assumed to be equal
+> to nr_cpu_ids.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftest/ptp: update ptp selftest to exercise the gettimex options
-    https://git.kernel.org/netdev/net-next/c/3d07b691ee70
+  - [1/5] x86/hyperv: Don't assume cpu_possible_mask is dense
+    (no matching commit)
+  - [2/5] Drivers: hv: Don't assume cpu_possible_mask is dense
+    (no matching commit)
+  - [3/5] iommu/hyper-v: Don't assume cpu_possible_mask is dense
+    (no matching commit)
+  - [4/5] scsi: storvsc: Don't assume cpu_possible_mask is dense
+    (no matching commit)
+  - [net-next,5/5] hv_netvsc: Don't assume cpu_possible_mask is dense
+    https://git.kernel.org/netdev/net-next/c/c86ab60b92d1
 
 You are awesome, thank you!
 -- 
