@@ -1,116 +1,108 @@
-Return-Path: <netdev+bounces-131886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D490D98FDED
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:38:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73F6898FE03
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 762DE2844DF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 07:38:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CE721C21C68
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 07:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EC813B2B6;
-	Fri,  4 Oct 2024 07:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78DC136E30;
+	Fri,  4 Oct 2024 07:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="k/jjFWPV"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Y932Q8Wc"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AD8130499
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 07:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D5B1BDC8;
+	Fri,  4 Oct 2024 07:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728027518; cv=none; b=BxxYc/pYnu8WYIazU0AUd/azpj7FP5IxirjrkCXJ6qktb4OCrMQ49/l0M6bRbeAaaRk0xlOM16WpyU5BtsqNOk1BT6Ni4ifnaeHNOJvOPrEc+3f5Px6yGMsoF22/AlPH9yaC1YeeuHZ6qRjlT8usBPViYDCvl6xgn8t1oc2uP4Q=
+	t=1728028058; cv=none; b=q0rOWmZWp0WHmc+wNOdjb7KjvnXDcnr75Vmk6bfuafLM/CSbEnBgv3Se9ybdj2FFCpq9tPQdBe1pQlh6NsPq2GBRcb4ZTCB/yQnAfArxQ6QTc7vfeTBIN8N0UkfVPkNQnQ1VpK9FiI+/VzbUSaZAe5y5BmjsqRS3orxu6YKG7mA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728027518; c=relaxed/simple;
-	bh=s+8GRiHCzafdVxYEuYTniPFWHKOrejSe2cOamq+uGFA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nr8gacT3V1BXSoyB2jat6BO8rUG7nCzNaOKoSErEvvtdwpnU5gNdgwIp7d2ZPDOhf6t4NHgF9YdnJrk24zprvCDG9SBOkAAGHSB5/GAMr7DLLnGhu7fNpsiUN8ryW89SjXy/pt+O0PfFaczTymwFpG8jE1XuXejqtI56seAxBDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=k/jjFWPV; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from [192.168.2.107] (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@datenfreihafen.org)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 8DB17C0A0C;
-	Fri,  4 Oct 2024 09:38:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-	s=2021; t=1728027505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+n3cksAqz8bxRfKVQU8ul77+AxYu4EE3u3pFx6NdhHM=;
-	b=k/jjFWPVCWmN+ZMHn33Yjf5frKNU26dB5M8YQO28bLtF1XAuj8HmECDxCljok1vqSarrHU
-	LXtlAWMKxe3Nsk1V/DIK3PP+73u7BSbz8z+bHN93zG41cS4Dg80L+hNmrimGKaCJtsexEQ
-	rF1OwpWzXHMaM6JhPFTwZnsfZpWrApDo7RX9jgJHiFHM3m+2PozddaJy1yyh41p6ckQ9do
-	wfiHyMJ6PaNszK3pmWsA1RKW6czNhTEyMoWf+Mrm0q1xwPXjkz/D8yCNzMr8PvzNGsKPiU
-	ShfzgiJt6dGwkDzrRxuFEoWEqMEFBZuhlJFXWhi/hxJgpynKIk8vjMptEMpEXw==
-Message-ID: <c0133261-8931-4e8f-a645-ab38412e3ca4@datenfreihafen.org>
-Date: Fri, 4 Oct 2024 09:38:22 +0200
+	s=arc-20240116; t=1728028058; c=relaxed/simple;
+	bh=++/KKWzs7prm4yllVHBOfXPL6NRiEkY/fuSjlIooHF4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r5J1PUJ+kziTEINFjIbd+mEmRVY0fLQT7NVXAPDGe+G9tGqBixslnRr4ur1jAxR4j6eaJtdtsvYBp331TyMmBk924IO20lw/BUR8z0dnxrBaq+uovy4RXqmyeATUbJHEzaRtSR3Mkpwy3vWN2WHxOuHbJ6WIHJ+PyZ95sOTudu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Y932Q8Wc; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4947lIPi094496;
+	Fri, 4 Oct 2024 02:47:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1728028038;
+	bh=QzkOuFZig08kdm9e97Q1gLZzLJHtWQJG6ARYQos6Ntg=;
+	h=From:To:CC:Subject:Date;
+	b=Y932Q8Wcugj0PAU9s+NEiL+9467Agncq1qj6XHoUMa/rs14wN0sdi2MsQULOr6S4+
+	 WrdGf2JJ8AIxq7uTT3on/QAr890/Y/91It4VjagyNOt8TzCLMFQBCJvttKvR3y6Yi7
+	 I00tHOTAZ6QST3wwsFcfXZsf4Mozs457+NW6LmO4=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4947lIG4005511
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 4 Oct 2024 02:47:18 -0500
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
+ Oct 2024 02:47:17 -0500
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 4 Oct 2024 02:47:17 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4947lHQC031559;
+	Fri, 4 Oct 2024 02:47:17 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4947lGMa025130;
+	Fri, 4 Oct 2024 02:47:16 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: <jiri@resnulli.us>, <aleksander.lobakin@intel.com>, <lukma@denx.de>,
+        <horms@kernel.org>, <robh@kernel.org>, <jan.kiszka@siemens.com>,
+        <dan.carpenter@linaro.org>, <diogo.ivo@siemens.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+        <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next 0/3] Introduce VLAN support in HSR
+Date: Fri, 4 Oct 2024 13:17:12 +0530
+Message-ID: <20241004074715.791191-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 4/4] net: Switch back to struct
- platform_driver::remove()
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexander Aring <alex.aring@gmail.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Loic Poulain <loic.poulain@linaro.org>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>, Simon Horman <horms@kernel.org>
-Cc: Russell King <linux@armlinux.org.uk>,
- Johannes Berg <johannes@sipsolutions.net>, netdev@vger.kernel.org
-References: <cover.1727949050.git.u.kleine-koenig@baylibre.com>
- <3f7c05c8b7673c0bda3530c34bda5feee4843816.1727949050.git.u.kleine-koenig@baylibre.com>
-Content-Language: en-US
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <3f7c05c8b7673c0bda3530c34bda5feee4843816.1727949050.git.u.kleine-koenig@baylibre.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hello
+This series adds VLAN support to HSR framework.
+This series also adds VLAN support to HSR mode of ICSSG Ethernet driver.
 
-On 10/3/24 12:01, Uwe Kleine-König wrote:
-> After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
-> return void") .remove() is (again) the right callback to implement for
-> platform drivers.
-> 
-> Convert all platform drivers below drivers/net after the previous
-> conversion commits apart from the wireless drivers to use .remove(),
-> with the eventual goal to drop struct platform_driver::remove_new(). As
-> .remove() and .remove_new() have the same prototypes, conversion is done
-> by just changing the structure member name in the driver initializer.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
-> ---
->   drivers/net/fjes/fjes_main.c             | 2 +-
->   drivers/net/ieee802154/fakelb.c          | 2 +-
->   drivers/net/ieee802154/mac802154_hwsim.c | 2 +-
->   drivers/net/ipa/ipa_main.c               | 2 +-
->   drivers/net/pcs/pcs-rzn1-miic.c          | 2 +-
->   drivers/net/phy/sfp.c                    | 2 +-
->   drivers/net/wan/framer/pef2256/pef2256.c | 2 +-
->   drivers/net/wan/fsl_qmc_hdlc.c           | 2 +-
->   drivers/net/wan/fsl_ucc_hdlc.c           | 2 +-
->   drivers/net/wan/ixp4xx_hss.c             | 2 +-
->   drivers/net/wwan/qcom_bam_dmux.c         | 2 +-
->   11 files changed, 11 insertions(+), 11 deletions(-)
+Murali Karicheri (1):
+  net: hsr: Add VLAN CTAG filter support
 
-For ieee802154:
+Ravi Gunasekaran (1):
+  net: ti: icssg-prueth: Add VLAN support for HSR mode
 
-Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+WingMan Kwok (1):
+  net: hsr: Add VLAN support
 
-regards
-Stefan Schmidt
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 45 +++++++++++-
+ net/hsr/hsr_device.c                         | 76 ++++++++++++++++++--
+ net/hsr/hsr_forward.c                        | 19 +++--
+ 3 files changed, 128 insertions(+), 12 deletions(-)
+
+
+base-commit: 6b67e098c9c95bdccb6b0cd2d63d4db9f5b64fbd
+-- 
+2.34.1
+
 
