@@ -1,109 +1,147 @@
-Return-Path: <netdev+bounces-132251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBBF99121F
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:06:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFCED991227
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 168F01F241CB
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:06:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8A3283260
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA5C1B4F1D;
-	Fri,  4 Oct 2024 22:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2348A14A4C6;
+	Fri,  4 Oct 2024 22:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="P32zm1v8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997AF1AE017;
-	Fri,  4 Oct 2024 22:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F54A231CAD
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 22:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728079569; cv=none; b=EqZipSOG0V2CtTg54sosAdmrvbMSzjMPp4vwn0bjyge/H+zcrIxx7lTMjvWF6zR8nruDVEmNLRPrwlnea3w9MAz+4vLvXZ7SITpmPnc2csg48sYxNet1xWO/Z6ruv4vUa3oKPLDnkNZ6P+NuPGNCk4jjFn9A1dHggd7UZMdtyBU=
+	t=1728079849; cv=none; b=nbpqxafs7ppIwVvQxBRBsvPBt28g+Le2CqTNLOw8hYYTK76lnoCL24kuPEz+4sujvzoBLoUa90bf9tw8hOyCs7hNns+tmOqmlx1wy2ZOz6CP6dFaMb+ntuWA7ICukul8JfxvsbzQ3rTmvTTuy32yXPIQuwLdfUbLsP3uX5qju5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728079569; c=relaxed/simple;
-	bh=qd49Qej99zqexoyuCFGz3xulXnwr+xJBGPIXiKsLPlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RKHdR9UuYuB4SoiorkuvflXASgdhkZMhEwQwyfXx3qp7FeFXDpmmBByxHb+130EgXOqRoh8zQ+vcGCG7TFiwKm9jqbjUBRwUPrmTbJfWrMHwRE5k+xAqfXDMScvjsINllO69+o5g1mQmn6UWL/0TMdvj4gyynSLMf4k3Unoxp4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1swqR1-000000001Ks-3uEP;
-	Fri, 04 Oct 2024 22:06:04 +0000
-Date: Fri, 4 Oct 2024 23:06:01 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
- link-partner advertisement
-Message-ID: <ZwBmycWDB6ui4Y7j@makrotopia.org>
-References: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
- <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
+	s=arc-20240116; t=1728079849; c=relaxed/simple;
+	bh=MajqsNGsvlFQbn8e1faVBun7M+ONZHkGHvB984ioMBk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A6aCjvSa974cvZrAjWPfcd/M/0fbV4JLk+J+ekfKa4+1m943uPXo9cKFDr1VuH6oS8i1SYIScg85RNSC0gU1Df+TYZqGoBhhPqZeAnod/ZuIjQnToRsmyNzfNGMnq57tqx7Ga6Mxhn5YY6+ID8T+wJBk/zPA/vETQQoZC2+F+oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=P32zm1v8; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728079847; x=1759615847;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8RDFwMb8q3aRURiR3p9BXd6sS7v7H2RzaQjADdx2rS4=;
+  b=P32zm1v8+klgi+2+6Vxj1SsUMrq7wMSIEluUQsl9SRHvK2j0cfaNJsMX
+   aYvu3uotUD4wHC5M+E+2qgnTPS7sMOJRHwnv4B31iq+QAAGHRpoKmL4oG
+   JWULeHjGvCPD4DWnRQumg+Oj+tBMIZPXR+zgR2/G/W7U6G0Xgr2cojkp3
+   o=;
+X-IronPort-AV: E=Sophos;i="6.11,178,1725321600"; 
+   d="scan'208";a="685228051"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 22:10:44 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:33415]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.199:2525] with esmtp (Farcaster)
+ id ff8a1626-33d3-4143-93ae-bc5712bf91b9; Fri, 4 Oct 2024 22:10:43 +0000 (UTC)
+X-Farcaster-Flow-ID: ff8a1626-33d3-4143-93ae-bc5712bf91b9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 22:10:42 +0000
+Received: from 88665a182662.ant.amazon.com (10.88.184.239) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 4 Oct 2024 22:10:40 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/4] rtnetlink: Per-netns RTNL.
+Date: Fri, 4 Oct 2024 15:10:27 -0700
+Message-ID: <20241004221031.77743-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Oct 04, 2024 at 11:17:28PM +0200, Andrew Lunn wrote:
-> On Fri, Oct 04, 2024 at 04:50:36PM +0100, Daniel Golle wrote:
-> > Only use link-partner advertisement bits for 10GbE modes if they are
-> > actually valid. Check LOCALOK and REMOTEOK bits and clear 10GbE modes
-> > unless both of them are set.
-> > This prevents misinterpreting the stale 2500M link-partner advertisement
-> > bit in case a subsequent linkpartner doesn't do any NBase-T
-> > advertisement at all.
-> > 
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> >  drivers/net/phy/realtek.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> > 
-> > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > index c4d0d93523ad..d276477cf511 100644
-> > --- a/drivers/net/phy/realtek.c
-> > +++ b/drivers/net/phy/realtek.c
-> > @@ -927,6 +927,10 @@ static int rtl822x_read_status(struct phy_device *phydev)
-> >  		if (lpadv < 0)
-> >  			return lpadv;
-> >  
-> > +		if (!(lpadv & MDIO_AN_10GBT_STAT_REMOK) ||
-> > +		    !(lpadv & MDIO_AN_10GBT_STAT_LOCOK))
-> > +			lpadv = 0;
-> > +
-> >  		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
-> >  						  lpadv);
-> 
-> I know lpadv is coming from a vendor register, but does
-> MDIO_AN_10GBT_STAT_LOCOK and MDIO_AN_10GBT_STAT_REMOK apply if it was
-> also from the register defined in 802.3? I'm just wondering if this
-> test should be inside mii_10gbt_stat_mod_linkmode_lpa_t()?
+rtnl_lock() is a "Big Kernel Lock" in the networking slow path and
+serialised all rtnetlink requests until 4.13.
 
-Yes, it does apply and I thought the same, but as
-mii_10gbt_stat_mod_linkmode_lpa_t is used in various places without
-checking those two bits we may break other PHYs which may not use
-them (and apparently this is mostly a problem on RealTek PHYs where
-all the other bits in the register persist in case of a non-NBase-T-
-capable subsequent link-partner after initially being connected to
-an NBase-T-capable one).
+Since RTNL_FLAG_DOIT_UNLOCKED and RTNL_FLAG_DUMP_UNLOCKED have been
+introduced in 4.14 and 6.9, respectively, rtnetlink message handlers
+are ready to be converted to RTNL-less/free.
 
-Maybe we could introduce a new function
-mii_10gbt_stat_mod_linkmode_lpa_validate_t()
-which calls mii_10gbt_stat_mod_linkmode_lpa_t() but checks LOCOK and
-REMOK as a precondition?
+15 out of 44 dumpit()s have been converted to RCU so far, and the
+progress is pretty good.  We can now dump various major network
+resources without RTNL.
+
+12 out of 87 doit()s have been converted, but most of the converted
+doit()s are also on the reader side of RTNL; their message types are
+RTM_GET*.
+
+So, most of RTM_(NEW|DEL|SET)* operations are still serialised by RTNL.
+
+For example, one of our services creates 2K netns and a small number
+of network interfaces in each netns that require too many writer-side
+rtnetlink requests, and setting up a single host takes 10+ minutes.
+
+RTNL is still a huge pain for network configuration paths, and we need
+more granular locking, given converting all doit()s would be unfeasible.
+
+Actually, most RTNL users do not need to freeze multiple netns, and such
+users can be protected by per-netns RTNL mutex.  The exceptions would be
+RTM_NEWLINK, RTM_DELLINK, and RTM_SETLINK.  (See [0] and [1])
+
+This series is the first step of the per-netns RTNL conversion that
+gradually replaces rtnl_lock() with rtnl_net_lock(net) under
+CONFIG_DEBUG_NET_SMALL_RTNL.
+
+[0]: https://netdev.bots.linux.dev/netconf/2024/index.html
+[1]: https://lpc.events/event/18/contributions/1959/
+
+
+Changes:
+  v3:
+    * Patch 1 & 4 : Add Eric's tags
+    * Patch 2 & 3 : Always evaludate net w/o CONFIG_DEBUG_NET_SMALL_RTNL
+
+  v2: https://lore.kernel.org/netdev/20241002151240.49813-1-kuniyu@amazon.com/
+    * Add revert of 464eb03c4a7c
+    * Fix Kconfig dependency for arch with no lockdep support
+
+  v1: https://lore.kernel.org/netdev/20240930202524.59357-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (4):
+  Revert "rtnetlink: add guard for RTNL"
+  rtnetlink: Add per-netns RTNL.
+  rtnetlink: Add assertion helpers for per-netns RTNL.
+  rtnetlink: Add ASSERT_RTNL_NET() placeholder for netdev notifier.
+
+ include/linux/rtnetlink.h   |  69 +++++++++++++++++--
+ include/net/net_namespace.h |   4 ++
+ net/Kconfig.debug           |  15 +++++
+ net/core/Makefile           |   1 +
+ net/core/net_namespace.c    |   6 ++
+ net/core/rtnetlink.c        |  70 +++++++++++++++++++
+ net/core/rtnl_net_debug.c   | 131 ++++++++++++++++++++++++++++++++++++
+ 7 files changed, 289 insertions(+), 7 deletions(-)
+ create mode 100644 net/core/rtnl_net_debug.c
+
+-- 
+2.30.2
 
 
