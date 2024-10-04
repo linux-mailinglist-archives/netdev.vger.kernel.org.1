@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-132200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4480C990F98
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:03:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 120E5990F6F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F171EB30BDC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:56:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446FC1C230AD
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E91B4F34;
-	Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9405C1F706E;
+	Fri,  4 Oct 2024 19:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FqHqaNcI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gmM1uMf3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B5A1B4F39
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7331DACA0;
+	Fri,  4 Oct 2024 19:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728067829; cv=none; b=Bx6M0ylHeanshr6EOvydK2AKlvN0bHA9/XOgB8YNtKE2FuRpo1u4tlCudtiJZwfYbxtuik4w8H6Na8bpRDrzwwRkzj9Lf6pnXmSu1DzyH5CZT9wU6Br0ePPfI1KELYQIcgIO+RLA4d3NKkXGV6QNOBH7/mi/wRNdGXl0ymvfBaU=
+	t=1728068429; cv=none; b=bsQnZvDRds18wlQRPbFQN2oG8ZhFysxCNeWPhQSoUU3JIhkK6xQ5Fyq9+nmBZCazTcqyapgpGbKegtccp9BLVQvjrk+CN1wASHoKDHCNAQ/MyN7juydl0Vbin6sT2UCIXkcaP0Uh8fN4kStWhn8JdgGQzav06RW4aZFaKJRS+zY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728067829; c=relaxed/simple;
-	bh=CdOK7sOFcbmsj4RzPLtzaOkwxekgzEb+16cLHurEIxI=;
+	s=arc-20240116; t=1728068429; c=relaxed/simple;
+	bh=N/ZatbjZOH0Y9cs2ghz2vcC4f5g1kAKnYaJxLjbL1dQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Wy8Zb3Vl2GZJHzXXMUef1EyoR1jciNnvwFh5L1NADyncA2/NnxRNkLg+cjXzrnILSUY/cmy5YX/tiNc2Mr4Af2wKVIbqLL7mH26e4o8uQVwsagkiVR/TaNamPubF74GEBjViL5wd6wWXTeYQfOb4fB1UOc0YzYXK/1URkSSLxGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FqHqaNcI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA50C4CEC6;
-	Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=p8giTpt8AIikzL+ic7wwEA9OFnYLAtMCVfQo+1GIgiC+UKPXpjniHtZQupqR74Sr+rJgGrD9Xw39sqJ8xgZo4nz7OojSIAhV/Mlq+2bZAz2mVlt7cWbG5mKNcS8BD5PwMjgmfYw3G/XhlBHdoq2D+OZ3tYEODm/DsmtpcBjosYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gmM1uMf3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7CAC4CECC;
+	Fri,  4 Oct 2024 19:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728067829;
-	bh=CdOK7sOFcbmsj4RzPLtzaOkwxekgzEb+16cLHurEIxI=;
+	s=k20201202; t=1728068428;
+	bh=N/ZatbjZOH0Y9cs2ghz2vcC4f5g1kAKnYaJxLjbL1dQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FqHqaNcIzyJObTuqx3ivm72dmIZSqADJi3vwpWw+QlINZrBatJ9YGmtfJozODkxs+
-	 CFS4yBRGluXiMh3/fa3O+eW4JCl04laSzT4eZMLmV0Q6C+Kkbh1OQjQh/ZT5Q/SThj
-	 7UZKArhUE1FTs3c664YW2Ds7bdvn9q/pRT3enVsv/D4BqVqUqnfmtFROWENKwp2gCd
-	 heKy92NH+OqbH7qASOqTbIdH9vnugV8NeLxBhNXrK4JFlvQjoK31+bSJjh9hMw7+Nm
-	 d5Lg3dE6oTLL9Fpp6twW/PwO9nzYtsDeYeiOdfKJFLpdPkQK+BTUrEEi/YBkDznsfJ
-	 M7dPQlB1T/+nQ==
+	b=gmM1uMf3YYQT8wg8OjqI3NwDPQvCzSVkaRka9B8pZvqAf6XsEuBqDvtdVH9MV2x/l
+	 Q8ymqOQh4uqQFtdFjNhArZtOR6TwkzpqI8AcUdDIBSga0klNDk48UY5NtZF/xJELMp
+	 a4ZH4S8ARgZAJRPbryk0uUjyUgXGniyYNRCXhToTe8xOXj2ZlSmsFqrtowbIW5odoY
+	 FlKSBwYfdQEejHK/MJZY9jYzrLNcMjAMk7ObC2188JqoF3BvuEHfSBjr27N9gYOyNE
+	 3aXI4Ux7h+K6vx1M46aAnCTkto9X70d4YviYGK46/PgcT9uMtzylyyOBrSzResHLoA
+	 lxyKIuuLfnwKA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB58339F76FF;
-	Fri,  4 Oct 2024 18:50:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE35F39F76FF;
+	Fri,  4 Oct 2024 19:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V2 0/6] net/mlx5: hw counters refactor
+Subject: Re: [PATCH net] net: dsa: sja1105: fix reception from VLAN-unaware
+ bridges
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172806783278.2702115.5875013842003790101.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 18:50:32 +0000
-References: <20241001103709.58127-1-tariqt@nvidia.com>
-In-Reply-To: <20241001103709.58127-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, horms@kernel.org
+ <172806843252.2704625.9394573592680839438.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 19:00:32 +0000
+References: <20241001140206.50933-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20241001140206.50933-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 1 Oct 2024 13:37:03 +0300 you wrote:
-> This is a patchset re-post, see:
-> https://lore.kernel.org/netdev/20240815054656.2210494-7-tariqt@nvidia.com/T/
+On Tue,  1 Oct 2024 17:02:06 +0300 you wrote:
+> The blamed commit introduced an unexpected regression in the sja1105
+> driver. Packets from VLAN-unaware bridge ports get received correctly,
+> but the protocol stack can't seem to decode them properly.
 > 
-> In this patchset, Cosmin refactors hw counters and solves perf scaling
-> issue.
-> 
-> Series generated against:
-> commit c824deb1a897 ("cxgb4: clip_tbl: Fix spelling mistake "wont" -> "won't"")
+> For ds->untag_bridge_pvid users (thus also sja1105), the blamed commit
+> did introduce a functional change: dsa_switch_rcv() used to call
+> dsa_untag_bridge_pvid(), which looked like this:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,V2,1/6] net/mlx5: hw counters: Make fc_stats & fc_pool private
-    https://git.kernel.org/netdev/net-next/c/5acd957a986c
-  - [net-next,V2,2/6] net/mlx5: hw counters: Use kvmalloc for bulk query buffer
-    https://git.kernel.org/netdev/net-next/c/10cd92df833c
-  - [net-next,V2,3/6] net/mlx5: hw counters: Replace IDR+lists with xarray
-    https://git.kernel.org/netdev/net-next/c/918af0219a4d
-  - [net-next,V2,4/6] net/mlx5: hw counters: Drop unneeded cacheline alignment
-    https://git.kernel.org/netdev/net-next/c/d95f77f1196a
-  - [net-next,V2,5/6] net/mlx5: hw counters: Don't maintain a counter count
-    https://git.kernel.org/netdev/net-next/c/4a67ebf85f38
-  - [net-next,V2,6/6] net/mlx5: hw counters: Remove mlx5_fc_create_ex
-    https://git.kernel.org/netdev/net-next/c/d1c9cffe4b01
+  - [net] net: dsa: sja1105: fix reception from VLAN-unaware bridges
+    https://git.kernel.org/netdev/net/c/1f9fc48fd302
 
 You are awesome, thank you!
 -- 
