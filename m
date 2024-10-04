@@ -1,85 +1,171 @@
-Return-Path: <netdev+bounces-132092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 986F99905EF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:24:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE569905F1
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:24:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F59B282F59
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:24:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BD81C20D3B
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7ED02178E8;
-	Fri,  4 Oct 2024 14:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BA0217300;
+	Fri,  4 Oct 2024 14:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EW5tXoz/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QetrKEKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9338217338;
-	Fri,  4 Oct 2024 14:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B945212EEA;
+	Fri,  4 Oct 2024 14:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051838; cv=none; b=K2gQ85pXHTeQs3UvsTtGDrwdmkHG7+MTRPek2pZNRc2tMHSxgPLDyEkLp71yUit8XsOTDNNgNsZnfUrHkkg81Zl8hfdbp180mMdBm29gy+sl11w7b+QxSpzPJIbl1NN6+rJUd/04VH8F7u+gXwhT12/RlEPTSe5vdca2bSsp5Eg=
+	t=1728051877; cv=none; b=cmkSpvimQC9fkzUdhHPK4AO6Yo+S1PXdiqV+fTGLBqM4yvZwNv6h4jXKIFW2muaklrPEqT+x0kwJleTSeVsdWMRQSpv2kOZOE2jzPPTg655mBG3/IgN+4jFEMUwwrO0lsYkKszbxYuYJgaEPXef6hLOlWYFeZv4fLeTmylB84L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051838; c=relaxed/simple;
-	bh=XlcQ35UDL4Ddq3O7GDIWM1FWw0FdIbvAByQr3gyc5YQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hBu8RR/UIFcMJivqRVK4sKLqk3ymBD43k0784FDM7LglBtTrh/6Nx/rvqSAEqGxoPk51eOcjTs/UluiLSZN1hNvreoRDt1jr08v0pzfQttf67hLxue/+sZ+Jn/oKpNQKLrwS7cjlVNDQ2MF+6W23DYXHn0FkPgF/ol56AoDFYXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EW5tXoz/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA08C4CEC6;
-	Fri,  4 Oct 2024 14:23:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728051838;
-	bh=XlcQ35UDL4Ddq3O7GDIWM1FWw0FdIbvAByQr3gyc5YQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EW5tXoz/DI26Mb4DC6u+NEA1D5nJPnJnxF6+HUeQ9K0vfPfcsM5L1PwlCt7RTWXId
-	 8FZAsjYKIIG3FQ6T2f56dQ4lMsrKcbA6EM0lZW5NEaHYxQkaqVckP2D6H0oNly5pDH
-	 tPgaYC71CTZicKhci8PS+pYOEwVPmhfNLipOtKvlRKyB6OcomxMwGNhMQuiEoFQ7K/
-	 BWbJMmMhi+BO/Jfv/imHy7pXZ7nbW+ZPB4lk7m5zer/FKy5K364OozDnZ75fpTvJeI
-	 Cl6MFlCcot0YzCQ5e6hrhoMD6zKm1nm5fnXJTobHxjf9PSA7RMPGahIsjuBmbPOjkq
-	 /76XwOVwcD6+A==
-Date: Fri, 4 Oct 2024 07:23:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shenwei Wang <shenwei.wang@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, horms@kernel.org, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Ong Boon
- Leong <boon.leong.ong@intel.com>, Wong Vee Khee <vee.khee.wong@intel.com>,
- Chuah Kim Tatt <kim.tatt.chuah@intel.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev,
- linux-imx@nxp.com, Serge Semin <fancer.lancer@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [PATCH v4 net] net: stmmac: dwmac4: extend timeout for VLAN Tag
- register busy bit check
-Message-ID: <20241004072356.5905e684@kernel.org>
-In-Reply-To: <20240924205424.573913-1-shenwei.wang@nxp.com>
-References: <20240924205424.573913-1-shenwei.wang@nxp.com>
+	s=arc-20240116; t=1728051877; c=relaxed/simple;
+	bh=k2Z8ShT2r7R8KmgI+SKVyfuHijsDXcJj/b/kQ+6RNpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ME4AiviWUPOYmdfLF/iyIDOvvwtaOC4n/7O3u5cIO++jZ3Z68ZgJLqiJlhYWTwJFn3yKY2TlH9Kw553+rYdB78KF8F/XJtBlRqMRGFMmRpA4Km5HWRYS/o/irZpa1lr+5pUYaxMlY14QVFRDB2bNwgMG3JJXEhfJDIBq1EFH3oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QetrKEKQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=C6gDhg5uZqEI92mtooZVl3bYs4A2EKsq3515ZSfhgMM=; b=QetrKEKQfmTAf7eNdumMK32yJT
+	lCznHpHmqOh21Kh9kf2THI1Ed+QeADXiV+OANcknL0D4GE6dwe9hTMuKZ5xvKU4C4PH2UHVkwoEwP
+	62RQl8uR5EEfeIs8Vn37LefY0JhVRfVoRwet6yNckxjg6Tw3t0qtYTiG1BAjAjxcH0OHy5fVLsm6R
+	VtbfoxwYs5CT6PYOPoY55zVfc937tt4inBgi9n0fhDJbxoq1MDwo0tFd5vRwg/ZvZg1pJjXe4h6pD
+	oTuebIVrT4BTAV5s1SBygxaOJHjk6xYCH5Cq3SZ/NbeiLZSOCHkYHAJ83VoYLcD+UrFi0mZlSwFEP
+	jg5IQjUA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54974)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1swjEM-00026c-0K;
+	Fri, 04 Oct 2024 15:24:29 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1swjEH-0001FE-13;
+	Fri, 04 Oct 2024 15:24:25 +0100
+Date: Fri, 4 Oct 2024 15:24:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vsmuthu@qti.qualcomm.com,
+	arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com,
+	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	"Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <Zv_6mf3uYcqtHC2j@shell.armlinux.org.uk>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 24 Sep 2024 15:54:24 -0500 Shenwei Wang wrote:
-> Increase the timeout for checking the busy bit of the VLAN Tag register
-> from 10=C2=B5s to 500ms. This change is necessary to accommodate scenarios
-> where Energy Efficient Ethernet (EEE) is enabled.
->=20
-> Overnight testing revealed that when EEE is active, the busy bit can
-> remain set for up to approximately 300ms. The new 500ms timeout provides
-> a safety margin.
->=20
-> Fixes: ed64639bc1e0 ("net: stmmac: Add support for VLAN Rx filtering")
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
+> >>          +---------+
+> >>          |  48MHZ  |
+> >>          +----+----+
+> >>               |(clock)
+> >>               v
+> >>          +----+----+
+> >>   +------| CMN PLL |
+> >>   |      +----+----+
+> >>   |           |(clock)
+> >>   |           v
+> >>   |      +----+----+           +----+----+  clock   +----+----+
+> >>   |  +---|  NSSCC  |           |   GCC   |--------->|   MDIO  |
+> >>   |  |   +----+----+           +----+----+          +----+----+
+> >>   |  |        |(clock & reset)      |(clock & reset)
+> >>   |  |        v                     v
+> >>   |  |   +-----------------------------+----------+----------+---------+
+> >>   |  |   |       +-----+               |EDMA FIFO |          | EIP FIFO|
+> >>   |  |   |       | SCH |               +----------+          +---------+
+> >>   |  |   |       +-----+                      |               |        |
+> >>   |  |   |  +------+   +------+            +-------------------+       |
+> >>   |  |   |  |  BM  |   |  QM  |            | L2/L3 Switch Core |       |
+> >>   |  |   |  +------+   +------+            +-------------------+       |
+> >>   |  |   |                                   |                         |
+> >>   |  |   | +-------+ +-------+ +-------+ +-------+ +-------+ +-------+ |
+> >>   |  |   | |  MAC0 | |  MAC1 | |  MAC2 | |  MAC3 | | XGMAC4| |XGMAC5 | |
+> >>   |  |   | +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ +---+---+ |
+> >>   |  |   |     |         |         |         |         |         |     |
+> >>   |  |   +-----+---------+---------+---------+---------+---------+-----+
+> >>   |  |         |         |         |         |         |         |
+> >>   |  |     +---+---------+---------+---------+---+ +---+---+ +---+---+
+> >>   +--+---->|             PCS0                    | |  PCS1 | | PCS2  |
+> >>   | clock  +---+---------+---------+---------+---+ +---+---+ +---+---+
+> >>   |            |         |         |         |         |         |
+> >>   |        +---+---------+---------+---------+---+ +---+---+ +---+---+
+> >>   | clock  +----------------+                    | |       | |       |
+> >>   +------->|Clock Controller|   4-port Eth PHY   | | PHY4  | | PHY5  |
+> >>            +----------------+--------------------+ +-------+ +-------+
+...
+> >> 3) PCS driver patch series:
+> >>         Driver for the PCS block in IPQ9574. New IPQ PCS driver will
+> >>         be enabled in drivers/net/pcs/
+> >> 	Dependent on NSS CC patch series (2).
+> > 
+> > I assume this dependency is pure at runtime? So the code will build
+> > without the NSS CC patch series?
+> 
+> The MII Rx/Tx clocks are supplied from the NSS clock controller to the
+> PCS's MII channels. To represent this in the DTS, the PCS node in the
+> DTS is configured with the MII Rx/Tx clock that it consumes, using
+> macros for clocks which are exported from the NSS CC driver in a header
+> file. So, there will be a compile-time dependency for the dtbindings/DTS
+> on the NSS CC patch series. We will clearly call out this dependency in
+> the cover letter of the PCS driver. Hope that this approach is ok.
 
-FTR this was merged to net as commit 4c1b56671b6.
+Please distinguish between the clocks that are part of the connection
+between the PCS and PHY and additional clocks.
+
+For example, RGMII has its own clocks that are part of the RGMII
+interface. Despite DT having a way to describe clocks, these clocks
+are fundamental to the RGMII interface and are outside of the scope
+of DT to describe. Their description is implicit in the relationship
+between the PHY and network driver.
+
+Also, the PCS itself is a subset of the network driver, and we do
+not (as far as I know) ever describe any kind of connection between
+a PCS and PHY. That would be madness when we have situations where
+the PHY can change its serdes mode, causing the MAC to switch
+between several PCS - which PCS would one associate the PHY with in
+DT when the "mux" is embedded in the ethernet driver and may be
+effectively transparent?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
