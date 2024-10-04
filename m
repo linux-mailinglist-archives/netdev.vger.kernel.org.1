@@ -1,140 +1,104 @@
-Return-Path: <netdev+bounces-132063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C5E9904AC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:42:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA2C89904B1
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:44:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8B681C20FB2
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:42:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E943282ABE
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5A02101AA;
-	Fri,  4 Oct 2024 13:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06482101BF;
+	Fri,  4 Oct 2024 13:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pvQQkBaL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RdYf4yZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A2F210199;
-	Fri,  4 Oct 2024 13:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBE521019A;
+	Fri,  4 Oct 2024 13:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728049357; cv=none; b=Fxp2J5d2X3ScRpYr9rWVSIyiPFkNd1/xtKAcSc0cuh12t0qJgO3/CsyuL/vHlKnxkX7LpXFoZqleTakiXx1+/D5zfM6mBSC/q8ol3+RrBE/SBhGGCIOpVtrLi8K7gz/pmH3f1j8aleO7ipZ96lTtcPzAHrre8KAOd9pas6bfn0c=
+	t=1728049484; cv=none; b=khLBIuMgNaAjKinAsAt2OW8fXmx4Fm3BsBQPdWeb6vjLvA6JBVW7ITUm38m/0hb4rlbIYhYc5LxyIyuotqnqRgATcyR/cnOyWeoGF/r/ZOjQ83MZhniqMgTsM0rxx/x87IfSsRN4ANMDNWtZ46yWbOuPn9Bizb2kPnVlo31AD3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728049357; c=relaxed/simple;
-	bh=ccBU33sHPnb4JeeVDSYQAYn63MPtYlDxAbGq1Jf0w0s=;
+	s=arc-20240116; t=1728049484; c=relaxed/simple;
+	bh=nFkpUBaSkOjroiOgtmi/s2NOYwCeHe9+t0TpqsxGNP8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MWPrjU5zJevO18B64REwOBfNtYPbANwwqjXZ/Nv3003Sw2UHb9q0yoqX0xP0lxPArmED7yDcF1s9BdHsSloahvfXPLHVlOpW+h1SSKO54kYk4Nj+67YCXwGxcIcPWl111yUnrHP/bScQkqwKz/hzx4ndQ7Jc1WiydALm9M2G8q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pvQQkBaL; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=h4ZU7oedXEjsJ9UJ2oFvfz5XShfONeTd6y1jhVMzQis=; b=pvQQkBaLUGIT/ongx6MBFtMwRM
-	N7LuSA9V3oqaC1IRj3imazjro51DFe1b5pKj0f4jbB0X5lk90qiwhE7/ZjzomTQ4mDHY+WfS4FhZy
-	d/qxelTLUbXCXYMULJDKUrFi/T5D8dPHk7q4HlgDezyoFTKbGH1rru1QFnJBFO8ZipO5qN3IntZtb
-	F1lruX2yxiH9jcUHUlADtABL0cMIMdBYZBTIdjH/LWh94aNr/BWC0w+CiKIzgg1UUxnKW4sWB4hqS
-	J8yCgYsjA1pkPpWdL3V6ktgR+pDUUrZ1FHJlddTQyc8GBpd7eNjanaJtjJ23DjaVkVsCJesY2q2iN
-	varE6Dog==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33976)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swiZe-00021X-2r;
-	Fri, 04 Oct 2024 14:42:26 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swiZb-0001E9-2v;
-	Fri, 04 Oct 2024 14:42:23 +0100
-Date: Fri, 4 Oct 2024 14:42:23 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Qingtao Cao <qingtao.cao.au@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DW3TbVoGzfcsb+47EWNexoFG7HvU2NxbSDQOkzn45+LvQLY7N6fslqyzhERSuulIfA1YB9S1WtzJ0osNnvncNvYYbMPWsupaVaY/AHXryoB6Iawy22L4GZSRU7eLDAoiAcLXgAbM1ZevTK44Djr6meEBPCMM1JxvFaYQaXafdq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RdYf4yZF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j4MR7MK6UIoUL6xo7ckBr43ZKx+btlvoJgILcC51T50=; b=RdYf4yZFwPCSEdhvCuQoBha7Wo
+	4L876ajhLK0PqZvjEg3Skh0Fdo44uiLebbLdWVEVOmOGTJM8MgUID4vj07yzB2L06aCp6VqgNcnDG
+	c5JEk9nWNKpRez3GxRRfUF29DaZmEVwJ/ClVQFvl5sQyjYSLbsNyhjr1GDFDu0Im5WOU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swibh-00938d-7f; Fri, 04 Oct 2024 15:44:33 +0200
+Date: Fri, 4 Oct 2024 15:44:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] net: phy: marvell: avoid bringing down fibre link
- when autoneg is bypassed
-Message-ID: <Zv_wv67TGIUz5IZy@shell.armlinux.org.uk>
-References: <20241003022512.370600-1-qingtao.cao@digi.com>
- <30f9c0d0-499c-47d6-bdf2-a86b6d300dbf@lunn.ch>
- <CAPcThSHa82QDT6sSrqcGMf7Zx4J15P7KpgfnD-LjJQi0DFh7FA@mail.gmail.com>
- <927d5266-503c-499f-877c-5350108334dc@lunn.ch>
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
+	stable@vger.kernel.org
+Subject: Re: [net PATCH 2/2] net: phy: Skip PHY LEDs OF registration for
+ Generic PHY driver
+Message-ID: <a463ca8c-ebd7-4fd4-98a9-bc869a92548c@lunn.ch>
+References: <20241003221006.4568-1-ansuelsmth@gmail.com>
+ <20241003221006.4568-2-ansuelsmth@gmail.com>
+ <2dcd127d-ab41-4bf7-aea4-91f175443e62@lunn.ch>
+ <66ffb1c2.df0a0220.1b4c87.ce13@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <927d5266-503c-499f-877c-5350108334dc@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <66ffb1c2.df0a0220.1b4c87.ce13@mx.google.com>
 
-On Fri, Oct 04, 2024 at 03:26:33PM +0200, Andrew Lunn wrote:
-> On Fri, Oct 04, 2024 at 11:35:30AM +1000, Qingtao Cao wrote:
-> > Hi Andrew,
-> > 
-> > Please see my inline replies.
-> > 
-> > On Fri, Oct 4, 2024 at 12:30 AM Andrew Lunn <andrew@lunn.ch> wrote:
-> > 
-> >     On Thu, Oct 03, 2024 at 12:25:12PM +1000, Qingtao Cao wrote:
-> >     > On 88E151x the SGMII autoneg bypass mode defaults to be enabled. When it
-> >     is
-> >     > activated, the device assumes a link-up status with existing
-> >     configuration
-> >     > in BMCR, avoid bringing down the fibre link in this case
-> >     >
-> >     > Test case:
-> >     > 1. Two 88E151x connected with SFP, both enable autoneg, link is up with
-> >     speed
-> >     >    1000M
-> >     > 2. Disable autoneg on one device and explicitly set its speed to 1000M
-> >     > 3. The fibre link can still up with this change, otherwise not.
-> > 
-> >     What is actually wrong here?
-> > 
-> >     If both ends are performing auto-neg, i would expect a link at the
-> >     highest speeds both link peers support.
-> > 
-> >     If one peer is doing autoneg, the other not, i expect link down, this
-> >     is not a valid configuration, since one peer is going to fail to
-> >     auto-neg.
-> > 
-> > 
-> > Well, technically speaking, thanks to the 88E151X's bypass mode, in such case
-> > with one end using autoneg but the other is using 1000M explicitly, the link
-> > could still be up, but not with the current code.
+> While the patch in net-next fix a broken condition (PHY driver exist but
+> doesn't have LEDs OPs), this account a much possible scenario.
 > 
-> So we can make an invalid configuration work. Question is, should we?
+> It's totally ok if the PHY driver is not loaded and we fallback to the
+> Generic PHY and there are LEDs node.
 > 
-> Are we teaching users they can wrongly configure their system and
-> expect it to work? They then think it is actually a valid
-> configuration and try the same on some other board with other PHYs,
-> and find it does not work?
+> This is the case with something like
+> ip link set eth0 down
+> rmmod air_en8811h
+> ip link set eth0 up
 > 
-> Does Marvell document why this bypass mode exists? When it should be
-> used? What do they see as its use cases?
+> On this up, the Generic PHY is loaded and LEDs will wrongly be
+> registered. We should not add the LED to the phydev LEDs list.
+> 
+> Do you think this logic is wrong and we should print a warning also in
+> this case? Or should we bite it and just return 0 with no warning at
+> all? (again my concern is the additional LEDs entry in sysfs that won't
+> be actually usable as everything will be rejected)
 
-The paragraph about it is couched in terms of "if the MAC or the PHY
-implements the auto-negotiation function and the other end does not".
+We should not add LEDs which we cannot drive. That much is clear to
+me.
 
-That seems to point towards a MAC <-> PHY link rather than across a
-media. So I tend to agree with you that we should not be enabling
-bypass mode on a media side link.
+I would also agree that LEDs in DT which we cannot drive is not
+fatal. So the return value should be 0.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The only really open point is phydev_err(), phydev_warn() or
+phydev_dbg(). Since it is not fatal, phydev_err() is wrong. I would
+probably go with phydev_dbg(), to aid somebody debugging why the LEDs
+don't appear in some conditions.
+
+	Andrew
 
