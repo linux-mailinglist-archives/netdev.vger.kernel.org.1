@@ -1,130 +1,135 @@
-Return-Path: <netdev+bounces-131868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED59098FC6B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:49:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E7A98FC73
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 05:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 906A71F21E81
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 02:49:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FAC61F22BD9
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2081C69C;
-	Fri,  4 Oct 2024 02:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D3422097;
+	Fri,  4 Oct 2024 03:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/fCf7IW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDfLljWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0421EB44;
-	Fri,  4 Oct 2024 02:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2CCDDA1;
+	Fri,  4 Oct 2024 03:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728010193; cv=none; b=RNQedDvtLrd2xrlsWQlYsR8AXwo+b11/fqBqQ97WzwYuxwWSGDa8nkhgBbGTlEDsnIKcH0iUGpfc+vRvMSWyApR0QNQog0e7s4xzklhpTvigwB6BrPLyP12mJDKQFWS8i9/snJc3nLp6RLCw5OaSPmjSNn72zF/NntGdfKGx1iY=
+	t=1728010854; cv=none; b=LL6/tH9BtRuTrUyOn5A5WVb/vgcEPc+X94jAt+I6Nsx9TUZO7u3e0wXbHImgEzIICWGh/H6iSVE2liiuClF8oX7P9njuloeiDM/OnhayYpmULtzbtOfjZJ4kSf+a2YCc+Xi46uFc8qmgvs0i8SdhjqKkaH3dQg/DI6z7D1kvTTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728010193; c=relaxed/simple;
-	bh=bgcDZmpyp9Go7ne5lzKI7a7C9x9YMiRxlygQUNOFTGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QmKwNacGt9CdH5oXTlrqXz/q9U3f2MO0Vs1w5+aUKYWclMxS+PxsFey0EcWJjMoWrkYh119FSOcdCwDhLHBqOjKghHI7YtumaamWcEdrxKEGegRgEMyiWmLDUPkBjjclGjB1sj0vPSRiLY4Fx+RaG6JwR6A4kqkvFaoFWfW2WoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k/fCf7IW; arc=none smtp.client-ip=209.85.214.179
+	s=arc-20240116; t=1728010854; c=relaxed/simple;
+	bh=08eO4rVSuL5Itu06fqQ6rH+zvRpYJ/V9/51Uuh/gTrg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RMunz/68uwM7ZGZ/cmWJfKNzmX8Q0EiMEfe8EupGKfEgsUDyIKjmCZ1G3RCMpjOw1yqz70JzwG6eGqaoDrihfT5BAVPYIFRu8cj6W0V6HmZChYzX9iWjczOApopPBrroYmaFzPKUAPdHFcM2VSu9f+sBQOg4+JQUu+sEvztY18Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TDfLljWl; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20ba9f3824fso13045375ad.0;
-        Thu, 03 Oct 2024 19:49:51 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42cbface8d6so20764345e9.3;
+        Thu, 03 Oct 2024 20:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728010191; x=1728614991; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zlfa2WaHR53QQXl7QrIq/1KUxfn3b8pT0dVl+ObCnHQ=;
-        b=k/fCf7IWdSD+RjIfwDqY9XxdperGkN9BFKaHQ265x0SmfUkjJzNOkfDvA2SqcwjiOC
-         LIvj570U+lyLdKuA9U6Rd6sObKHUCmC0PCrikIOPTukP0romPXD9wmwLpiOUxKgznoVf
-         us0+wOql9bXIL4AjeA1nZNsi/Q/9o2QMs8gEL1nNxdX+9g1UklWlnUfmah1Mo8LGIEd2
-         vfJT4hoWGwwkkR13GQ28OR4JLh5LZ7s68cLAqi6/9rbCFbDUBlp68n8JW+5bDE+CuYDG
-         TbZAlxEcnveQb1osvUXps4HUfhn2WBUgx2FPSzaFgekPIuGfnFrlb87TwAyVuudON5AS
-         +lQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728010191; x=1728614991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728010851; x=1728615651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zlfa2WaHR53QQXl7QrIq/1KUxfn3b8pT0dVl+ObCnHQ=;
-        b=KrubtvXs6tEn8o9Ep8EFZQnXyEEW4y1/ETgrkNFP28cVDc/pJdg3JsgDK2+DsvH7Zu
-         JEXYk+2ynGUBTxEE/4KyffDZVuBC9nWSjZT+NMWAYGHKgD0W7/e/aGGBoCwi35FGRG9m
-         wZ+ZxMEDAfrmbpXWCRE4HRE9hBUxyEedF9owzbsIaExVuFiG3zQxcBkPIdokthDmz5Of
-         MyitZJqaB3W7bUb4upl4MrDnxE56jjR2JQ2CU2y2u7tsvO6WUJ9S66C2roO+oA1Jk+pR
-         wKCLbvrFRCMqXofLayx+qPh3aueAUqxQMP/b5xm2BTAJu/ltjUYVNXS+cJBPc50no5hh
-         arcg==
-X-Forwarded-Encrypted: i=1; AJvYcCW51OApvspC9Q8VUhTwSyPgcooza6EWhV4Guo9Nb9j23UUHlTEKYs/H2YdzGGLmgliE8JjcnbcHBXY=@vger.kernel.org, AJvYcCXqDsRdAF9FnvpAA4qnnRMopEFPgmUX90tRn2q5vUqY0CWaUtjerNN4Ftk8xbGxY5iyXQ3zOv1I@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQFWNP6wyssQ3w+wsx1SCxjVUDQXiOHySeBl7zT/Vd4V4DxrDs
-	0QkdiKxvP0OkU/slLOdpfbSGYj+wKprjqsWpuuEz8j/IIigJdyRi
-X-Google-Smtp-Source: AGHT+IGOFiXKuExLzw6w1Mo/rQf2IO5b3/T2DttYfDhG4a/r2dPJ3ORuf7DrutuJaGbJl7gxEW/x9g==
-X-Received: by 2002:a17:902:d2cf:b0:20b:502f:8c2e with SMTP id d9443c01a7336-20bfee333acmr18577485ad.51.1728010191094;
-        Thu, 03 Oct 2024 19:49:51 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20beeca2331sm15476505ad.67.2024.10.03.19.49.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Oct 2024 19:49:50 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 2100845D3292; Fri, 04 Oct 2024 09:49:47 +0700 (WIB)
-Date: Fri, 4 Oct 2024 09:49:46 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Cc: donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1] doc: net: Fix .rst rendering of
- net_cachelines pages
-Message-ID: <Zv9XyuQ9-76EqoUQ@archie.me>
-References: <20241003205248.61445-1-donald.hunter@gmail.com>
+        bh=cbp1AkhesU9hhRzgbyEVW16AAfvZIjNwVq3OXYiQd6Q=;
+        b=TDfLljWlhwB3gXHhg3swg4LJp5pOOIfnIss1XpBKbheZpDDCwIT1/M+q/BP5VgeQR4
+         CRgwcAcQs1lXndmoO9vCbR7xMueYt3X9LsqWoOn6nvwWvaw68/udxwT3fq5Lod5Q6naW
+         P0stYtBuJ/U5uLIzpxlXzFPbM5ZHnb6tXzqjbDKVc0FJCe/6B0bc6qbn88uBb3X1ioSR
+         I36nh81cYoEt5HM2h4zGTCvM+rz4U5v0lFmZQhAoYs9Zu+j+LLiDR+aTTWYHbnAPftb4
+         +SgBUWCFj7HBTiJuFo63tEImSA9M75SGg34lvOJHKfgYXcrUNpa8e7Gb815m9kBK7bnZ
+         WNCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728010851; x=1728615651;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cbp1AkhesU9hhRzgbyEVW16AAfvZIjNwVq3OXYiQd6Q=;
+        b=tvErVka4nOUSjfRXQUbgfNAc/uhIRH3hb+dqNVGdFDJw9JINbfrC88WE62gZJvqq26
+         rwSuNOelcdC3CAhbzxuJbvHxRxZ03JvaiU06D2e364au7G2xnZYzFrhishtR/UEf3kox
+         Bwytz50JtgPHXRfX3ufFuvCzHLsSLKyIZyZBEg1S7PoikCIoj3bKHeJhuVDno2Civj5p
+         bOKrhxadvK5sD2Z2Ck5lgQRNTnRT1eRGtEkZylyH6ZULxfXfAAJePAo09SzhURwFIB4t
+         QfiWnsR20xgEgPOugqAeOHQAFvdZIzuAt9kYBRs5JOSE1CdNF+ctF+vokT5m+GWY5TSv
+         6IrA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWU3TYtn7w0fjBn68/Edx9n6ihk8i5UnisiSqu2hDT/LpVc2cxfKR/wmjkVg+5AHdN8L7QTUZ8@vger.kernel.org, AJvYcCXQBDqdetpZa9zUhntWc8EY60G5V7Zhf2VEEmOwQckWGOgZGv+gV6+lQtXsU6yvYid4+3HBC9xm1nqOthk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx61kZmsqoKJA7H4jun7NyrznM7t1o3ZmP5T3rHsppHCjayi8qV
+	6ne522BT+DhACavxbLwNN+x7acYpL4ITsMOw8uSLMc/An31fRqptilY/fkQVEIAL9cwPAgNMq3o
+	3oKMsyXwg4MmnhQ7a99qUcwnTaec=
+X-Google-Smtp-Source: AGHT+IEDGQvwmpIEDJ3EyYSzUAgad1wQGBiJYudeCLaHHvxeP0wsMi1NMM2pdsOlj8ZjOFDg+USt7JIsjjJHusb800Q=
+X-Received: by 2002:adf:f58c:0:b0:37c:d507:aacd with SMTP id
+ ffacd0b85a97d-37d0e724b97mr1056615f8f.14.1728010851339; Thu, 03 Oct 2024
+ 20:00:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="FEqjA/q8SI6OQyDd"
-Content-Disposition: inline
-In-Reply-To: <20241003205248.61445-1-donald.hunter@gmail.com>
-
-
---FEqjA/q8SI6OQyDd
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20241001075858.48936-1-linyunsheng@huawei.com> <20241001075858.48936-10-linyunsheng@huawei.com>
+In-Reply-To: <20241001075858.48936-10-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 3 Oct 2024 20:00:14 -0700
+Message-ID: <CAKgT0UeSbXTXoOuTZS918pZQcCVZBXiTseN-NUBTGt71ctQ2Vw@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 09/14] net: rename skb_copy_to_page_nocache() helper
+To: Yunsheng Lin <yunshenglin0825@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Eric Dumazet <edumazet@google.com>, 
+	David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 03, 2024 at 09:52:48PM +0100, Donald Hunter wrote:
-> The doc pages under /networking/net_cachelines are unreadable because
-> they lack .rst formatting for the tabular text.
->=20
-> Add simple table markup and tidy up the table contents:
->=20
-> - remove dashes that represent empty cells because they render
->   as bullets and are not needed
-> - replace 'struct_*' with 'struct *' in the first column so that
->   sphinx can render links for any structs that appear in the docs
+On Tue, Oct 1, 2024 at 12:59=E2=80=AFAM Yunsheng Lin <yunshenglin0825@gmail=
+.com> wrote:
+>
+> Rename skb_copy_to_page_nocache() to skb_copy_to_va_nocache()
+> to avoid calling virt_to_page() as we are about to pass virtual
+> address directly.
+>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/net/sock.h | 10 ++++------
+>  net/ipv4/tcp.c     |  7 +++----
+>  net/kcm/kcmsock.c  |  7 +++----
+>  3 files changed, 10 insertions(+), 14 deletions(-)
+>
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index c58ca8dd561b..7d0b606d6251 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2185,15 +2185,13 @@ static inline int skb_add_data_nocache(struct soc=
+k *sk, struct sk_buff *skb,
+>         return err;
+>  }
+>
+> -static inline int skb_copy_to_page_nocache(struct sock *sk, struct iov_i=
+ter *from,
+> -                                          struct sk_buff *skb,
+> -                                          struct page *page,
+> -                                          int off, int copy)
+> +static inline int skb_copy_to_va_nocache(struct sock *sk, struct iov_ite=
+r *from,
+> +                                        struct sk_buff *skb, char *va,
+> +                                        int copy)
+>  {
 
-LGTM, thanks!
+This new naming is kind of confusing. Currently the only other
+"skb_copy_to" functions are skb_copy_to_linear_data and
+skb_copy_to_linear_data_offset. The naming before basically indicated
+which part of the skb the data was being copied into. So before we
+were copying into the "page" frags. With the new naming this function
+is much less clear as technically the linear data can also be a
+virtual address.
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---FEqjA/q8SI6OQyDd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZv9XxgAKCRD2uYlJVVFO
-ox4iAQDyB8edaFY79GfVyTWLrflzqzWETIJbWkESwXyJSHGj+AEA16Ls7aZYDE11
-gRBBXBo9XJdmTBak2Hm4hfRhDsQ+WgE=
-=s7uc
------END PGP SIGNATURE-----
-
---FEqjA/q8SI6OQyDd--
+I would recommend maybe replacing "va" with "frag", "page_frag" or
+maybe "pfrag" as what we are doing is copying the data to one of the
+pages in the paged frags section of the skb before they are added to
+the skb itself.
 
