@@ -1,218 +1,189 @@
-Return-Path: <netdev+bounces-132119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BF689907D6
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:45:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2412B9907E6
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:47:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4BCC28233A
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:45:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D44FA289B2F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64691C3023;
-	Fri,  4 Oct 2024 15:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606471C3046;
+	Fri,  4 Oct 2024 15:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NYoVm8lb"
+	dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="rR+cqQ2v";
+	dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b="btYKZf6a";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="isw0Fe7c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a2-smtp.messagingengine.com (fout-a2-smtp.messagingengine.com [103.168.172.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3127F1E3DF5
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 15:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3701C3040;
+	Fri,  4 Oct 2024 15:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728056052; cv=none; b=Q7bMXA7RXZTyS3hvsSS6O66IhMJ0MZggj+TZ4mO1+qfit3CBLc8gGFvPSkVOLMvxVNo4HoO53bj2/7pXoXGNYqb3zdAL5b2ttMrrVFZCrRQV3zAE+80mNAxj6Qm3ps5la4p82uDAbioe8FucQMsLuuypPvZCWbCyIv9LtHH5WmA=
+	t=1728056245; cv=none; b=n3pVQkvC9829KA1yI5YNne++0kcMhn8Y1fCiCdW91r5SD/QUli94FvpENA5I6ozzfDQxvijA9JiZsPybyL+ZOLDCV2W2UlW2i+7pVkEWKDW4GmCNTgHCpFfJGuP9P9PrCyyJnueaUbPxz078pY5qa3skWBnqiA8EgGl+K3pNY2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728056052; c=relaxed/simple;
-	bh=Y1ynW6pThWLlOoYV2/r/f78bkRzxHOWzqDY0eCxGb8U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=muzInJJIjSW8PRADdRu0/gq95inZKIGAtRcJG+t0rn7l9PADz8UvJwL+ad40wPhsiDuiaAaRN4sbwGX//6YTYP8RjEzvkbUj9GWiMxod30BYuPiXiaTzVJSpsrf4cLRbztk/i0Jj4PzuS6iIsiVTiw175kjNhDCh1T/RR4p52Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NYoVm8lb; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2e0a5088777so1805346a91.2
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 08:34:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728056050; x=1728660850; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2bzdD1xAX1XMuoOw4BSl5totOVCpRfgbZXfWaZis/9A=;
-        b=NYoVm8lbgl3v6WOwuk5/jSYNNqmH6JNDGdr7kUJUu+2OSgwOgaSHhnFGAdxMFyOqAy
-         5ICfNkchTAiGh8Q93IDU9ffeCN2Jr0MvDCX5lz/u80WMhr0ZXZQ2mJclv0NFfs1wFoC+
-         himEOfTmz+nabFhp1q+IbQzV7G3Faz/fIhtD0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728056050; x=1728660850;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bzdD1xAX1XMuoOw4BSl5totOVCpRfgbZXfWaZis/9A=;
-        b=wlHqiL7vSK+9oe6W/qY/JBrwo0t5nvCJ/DST4S/mLJlbUNcwOsnBnxm72ngFMRLVBU
-         lnE/DuKTIc+XUP+uG4dxmgCgigb+OAgfgFBO3UHZt+vzuYT8VeWwJyY05gNhwfwisSyJ
-         WAjDm0Sy0wAnV/Ipvzl2tAc3dbMgXRZnXjRSKg2B6wg/oSYs7C57P/h6ql4026DjB10c
-         PSmYLrnmrJGeL20XnYAU0nULToRd0V+jl235wV0rXcT8cm8HIwZvuSPJZkfL9TVnZOXr
-         S/D7mX4/Rud52IHL3m8W1caQJf93MtDJ/vyNZIDdEIcpV/aemL4/desrJj2shPMVrAr1
-         ZkcA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/WEFpftfP8suzVe7V2PycyVgo3Tn757edbQXsL8MdrmSmgEwISSYuueUU5x2071Mxa7hpNfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBZesmp85Ao3ihqAIJdh4d6yCh53BPSmMbD5/kkTycAUWGL6eT
-	/XeQi7bKH8/a2IKLy2ODo62g2J6Jb0DNNPgiD0n2P6GxZBKpCAGteenHuRk0Kw+Wyr6Uu2OyuSK
-	/3mGGC6Fa3UcfkgNtpbi8kFRcVNRhFgNJb98gD4DpR8dmCPzktg==
-X-Google-Smtp-Source: AGHT+IHuhuF858xSQbIX7dz3Swh7impcIcQ82cdu3JlhX2oxs6EhHnlMKb+8b+pVnXvKUo/jIHETBsL4SAdvCfyCxf4=
-X-Received: by 2002:a17:90b:360f:b0:2d8:8175:38c9 with SMTP id
- 98e67ed59e1d1-2e1e626c076mr3832597a91.20.1728056050433; Fri, 04 Oct 2024
- 08:34:10 -0700 (PDT)
+	s=arc-20240116; t=1728056245; c=relaxed/simple;
+	bh=nHG9gnm6cdb1wDhLh+FQhgucGmNZFslJCdnpG6HHYxk=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=PzCqYoZmKOXhTY/T6eoN5X0P2or3CnCm7EMRFwDLclKrmbA6B+qxvWtIqEmwy79WxPTZBXrhM94Ln89sgMacAmoYCgEakoLvLj4BZuidVYwUTnT5w9nggwshRgChc1LG9+C2tyongZvMjUsYFYvE9QAQMdReK/uReoaPGdPitCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net; spf=pass smtp.mailfrom=fluxnic.net; dkim=pass (1024-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b=rR+cqQ2v; dkim=pass (2048-bit key) header.d=pobox.com header.i=@pobox.com header.b=btYKZf6a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=isw0Fe7c; arc=none smtp.client-ip=103.168.172.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fluxnic.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fluxnic.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 4A3A7138029C;
+	Fri,  4 Oct 2024 11:37:22 -0400 (EDT)
+Received: from phl-frontend-01 ([10.202.2.160])
+  by phl-compute-11.internal (MEProxy); Fri, 04 Oct 2024 11:37:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fluxnic.net; h=
+	cc:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=2016-12.pbsmtp; t=1728056242; x=1728142642;
+	 bh=CBJMi8bQ9zvV3RcYivlREIe8Ph0havqqFVaXoFjviLw=; b=rR+cqQ2vW7uS
+	WVXm502epS12qnCGmXBk98L5y+LsKXpROzBzpV0DC47Nds+Ir2C3zts0WIWVVkKD
+	1MIhImWoQh8vDa0PkOUpkTQJpGLJQjPykvDOCsl6mF54nyf/6uxVReXOxWTkAHWo
+	47Qew4Os6am6dg+NdNEloBRi2jWPNP8=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pobox.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm1; t=1728056242; x=1728142642; bh=CBJMi8bQ9z
+	vV3RcYivlREIe8Ph0havqqFVaXoFjviLw=; b=btYKZf6ar67CPN+MQTwDRYMw+2
+	1Yb6ZZ6ePhLl2y2BTxG7ArBtRWUzlZs3eQvbt8po8QOwLyo1XmVB+dCKVzIaWGdh
+	ZcVD0vsJvQSPFZaiFI1sQz+Z+0BOzebO91QV3XjWmkrSJkypgOLnYcpHBB43vxZh
+	VUneGfXbILDRQKVufNl7qgVDbCpRRi8S+LIALcA3/zptSVNh9GyvJq7wjKbtCwIm
+	URnEVGXDhL7qe6oq4gqQeQKNlUGmrgar8MLJdQO37jzVwvz6We20Jt5bIRYLyyzF
+	D2OB9mTKsyWGmstakfHdfStgGO7dMgLmnrGOCY4SMCRPE/CNKbidB3q1Bzog==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728056242; x=1728142642; bh=CBJMi8bQ9zvV3RcYivlREIe8Ph0h
+	avqqFVaXoFjviLw=; b=isw0Fe7c4/BTuur98whXmusP5pV/+JG4ZIt78r89sJDu
+	wJXUd1nD5/1BxswxBoGb9/slwZheix39mBGPAa7UJVeAIg8F1HJozmwSzPj2YVO0
+	/caG/aaKxpr7iYUpQW2OFsWR5dEiK9QHtD6F7R/Mw1qWT20cMF+dsUXOnKSIDTP2
+	bkqh+Z4M2ncXF12RqKsCqCbvSSfcIzPngEVhsb5HOk7oYKj0gs2bmQcV/KdI/2qR
+	8fGFhmGn2it4V3crKB5G0v0+Fc4FHtJRfNUn7WqitilI6htOYZThYl9XFGyIoaaZ
+	3BKWmBCNGZ3GSMX57mKnlJwGQgbJriRDRjUe5TiuNg==
+X-ME-Sender: <xms:sQsAZ2FjpYGRLnBswRDbY9aNALxsXms26EOe4kM-Y2ZuVXE20lGOkw>
+    <xme:sQsAZ3WSFs58hjZo0jwDSKr1WqYvxOJ7Mhnhhz2Fuih0xGZ2vB0hSS1VrJlI8vAdR
+    Yru-XnNQ0MhmzlLdes>
+X-ME-Received: <xmr:sQsAZwLSbXjjj9meps0eWbwpYqzEo2iGiut3EDl3FQLJBfpCldV6GpXCG2bZXz5l-cf2t_KmsSozOZ2Kf9Y3XDQn_Zw44j6cykOwQkkDwXqWYaaycg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvfedgledtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevufgjkfhfgggtsehttdertddttddvnecu
+    hfhrohhmpefpihgtohhlrghsucfrihhtrhgvuceonhhitghosehflhhugihnihgtrdhnvg
+    htqeenucggtffrrghtthgvrhhnpefgvedvhfefueejgefggfefhfelffeiieduvdehffdu
+    heduffekkefhgeffhfefveenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehnihgtohesfhhluhignhhitgdrnhgvthdpnhgspghrtghpthhtohep
+    ledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhloh
+    hfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhr
+    tghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrohhgvghrqh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtgho
+    mhdprhgtphhtthhopehgrhihghhorhhiihdrshhtrhgrshhhkhhosehtihdrtghomhdprh
+    gtphhtthhopehvihhgnhgvshhhrhesthhirdgtohhmpdhrtghpthhtoheplhhinhhugidq
+    khgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvg
+    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:sQsAZwGjK4yaCfse1CicNVVrrHoC4y_kE74QOyd-FuA1JqmMnNY-_Q>
+    <xmx:sQsAZ8URN0Iip1ysmzi2yQ6kcILGh7-5aj2rmINxq2MndX5JJDQBTg>
+    <xmx:sQsAZzMr7GNxpE-SKC7audR8e_vSGVBNqijbT-Pcb8j7cK3Sp_6Xpg>
+    <xmx:sQsAZz3I_zm3bCC7LpOUzgBVxI0zieC6NPbx96Rg6dA_GAbSmKsgcA>
+    <xmx:sgsAZ1OfybtDHEBeg1xuaIRNgVPUrp1_VO-uSVU-pFHDx-XP_SusOJQe>
+Feedback-ID: i58514971:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 4 Oct 2024 11:37:21 -0400 (EDT)
+Received: from xanadu (unknown [IPv6:fd17:d3d3:663b:0:9696:df8a:e3:af35])
+	by yoda.fluxnic.net (Postfix) with ESMTPSA id 14E95E408A8;
+	Fri,  4 Oct 2024 11:37:21 -0400 (EDT)
+Date: Fri, 4 Oct 2024 11:37:20 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+To: Roger Quadros <rogerq@kernel.org>
+cc: "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, 
+    Grygorii Strashko <grygorii.strashko@ti.com>, 
+    Vignesh Raghavendra <vigneshr@ti.com>, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 2/2] net: ethernet: ti: am65-cpsw: avoid
+ devm_alloc_etherdev, fix module removal
+In-Reply-To: <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org>
+Message-ID: <s5000qsr-8nps-87os-np52-oqq6643o35o2@syhkavp.arg>
+References: <20241004041218.2809774-1-nico@fluxnic.net> <20241004041218.2809774-3-nico@fluxnic.net> <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240925162048.16208-1-jdamato@fastly.com> <20240925162048.16208-3-jdamato@fastly.com>
- <ZvXrbylj0Qt1ycio@LQ3V64L9R2> <CALs4sv1G1A8Ljfb2WAi7LkBN6oP62TzH6sgWyh5jaQsHw3vOFg@mail.gmail.com>
- <Zv3VhxJtPL-27p5U@LQ3V64L9R2> <CALs4sv0-FeMas=rSy8OHy_HLiQxQ+gZwAfZVAdzwhFbG+tTzCg@mail.gmail.com>
- <Zv700Aoyx_XG6QVd@LQ3V64L9R2>
-In-Reply-To: <Zv700Aoyx_XG6QVd@LQ3V64L9R2>
-From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Fri, 4 Oct 2024 21:03:58 +0530
-Message-ID: <CALs4sv1Ea1ke2CHOZ0U75JVY84uY=NNyaJrW8wVwcytON2ofog@mail.gmail.com>
-Subject: Re: [RFC net-next v2 2/2] tg3: Link queues to NAPIs
-To: Joe Damato <jdamato@fastly.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	netdev@vger.kernel.org, Michael Chan <mchan@broadcom.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000010655b0623a867ca"
+Content-Type: text/plain; charset=US-ASCII
 
---00000000000010655b0623a867ca
-Content-Type: text/plain; charset="UTF-8"
+On Fri, 4 Oct 2024, Roger Quadros wrote:
 
-> > The local counter variable for the ring ids might work because irqs
-> > are requested sequentially.
->
-> Yea, my proposal relies on the sequential ordering.
->
-> > Thinking out loud, a better way would be to save the tx/rx id inside
-> > their struct tg3_napi in the tg3_request_irq() function.
->
-> I think that could work, yes. I wasn't sure if you'd be open to such
-> a change.
->
-> It seems like in that case, though, we'd need to add some state
-> somewhere.
->
-> It's not super clear to me where the appropriate place for the state
-> would be because tg3_request_irq is called in a couple places (like
-> tg3_test_interrupt).
->
-> Another option would be to modify tg3_enable_msix and modify:
->
->   for (i = 0; i < tp->irq_max; i++)
->           tp->napi[i].irq_vec = msix_ent[i].vector;
-Hi Joe, not in favor of this change.
->
-> But, all of that is still a bit invasive compared to the running
-> rxq_idx txq_idx counters I proposed in my previous message.
->
-> I am open to doing whatever you suggest/prefer, though, since it is
-> your driver after all :)
->
-> > And have a separate new function (I know you did something similar for
-> > v1 of irq-napi linking) to link queues and napi.
-> > I think it should work, and should help during de-linking also. Let me
-> > know what you think.
->
-> I think it's possible, it's just disruptive and it's not clear if
-> it's worth it? Some other code path might break and it might be fine
-> to just rely on the sequential indexing? Not sure.
->
-I don't have strong opposition to your proposal of using local counters.
-Just that an alternate solution like what I suggested may look less
-arbitrary, imo.
-So if you want to use the local counters you may go ahead unless
-Michael has any other suggestions.
+> Hi Nicolas,
+> 
+> On 04/10/2024 07:10, Nicolas Pitre wrote:
+> > From: Nicolas Pitre <npitre@baylibre.com>
+> > 
+> > Usage of devm_alloc_etherdev_mqs() conflicts with
+> > am65_cpsw_nuss_cleanup_ndev() as the same struct net_device instances
+> > get unregistered twice. Switch to alloc_etherdev_mqs() and make sure
+> 
+> Do we know why the same net device gets unregistered twice?
 
-> Let me know what you think; thanks for taking the time to review and
-> respond.
+When using devm_alloc_etherdev_mqs() every successful allocation is put 
+in a resource list tied to the device. When the driver is removed, 
+there's a net device unregister from am65_cpsw_nuss_cleanup_ndev() and 
+another one from devm_free_netdev().
 
---00000000000010655b0623a867ca
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+We established in patch #1 that net devices must be unregistered before 
+devlink_port_unregister() is invoked, meaning we can't rely on the 
+implicit devm_free_netdev() as it happens too late, hence the explicit 
+am65_cpsw_nuss_cleanup_ndev().
 
-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
-OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
-dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
-fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
-9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
-pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
-25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
-Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMysZK6K6NhNWzEuy7em59vBREYmr6ge
-2QLD5z2hrTNdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAw
-NDE1MzQxMFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAImTCYZZMJz2lJ/JO6eBaO4jNMkvZCoevuvt0ID7Q9PixXw4gb
-tJMjWFFhI0YW36qARTA9Grelic14VrMNfoneZNnBPhGp0vEHVA2pOeZHGnkiA1Y9deZ5xOtGiOhl
-vqZ6aqW+MAEDf+KFdw+fGI1MZYoCzUj7dsrJG4DNfgEOdIcZ4g5sgg67b6IinlAKlyeHmW3+3NuR
-gWE5HYq6FN3aTOPTkF+d2uTV2zv4dwYa+MZgcx/AeFYh8BkjD6mAy3qpP8gidmql76RKXbAQjSJH
-QWw70eN3UDILBEFzg+8GM4+ItMVeButYpE7wPmTvxHeip/d+WL97zYUzOODzW/0Y
---00000000000010655b0623a867ca--
+> > am65_cpsw_nuss_cleanup_ndev() unregisters and frees those net_device
+> > instances properly.
+> > 
+> > With this, it is finally possible to rmmod the driver without oopsing
+> > the kernel.
+> > 
+> > Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+> > Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+> > ---
+> >  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 20 ++++++++++++--------
+> >  1 file changed, 12 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > index f6bc8a4dc6..e95457c988 100644
+> > --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> > @@ -2744,10 +2744,9 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
+> >  		return 0;
+> >  
+> >  	/* alloc netdev */
+> > -	port->ndev = devm_alloc_etherdev_mqs(common->dev,
+> > -					     sizeof(struct am65_cpsw_ndev_priv),
+> > -					     AM65_CPSW_MAX_QUEUES,
+> > -					     AM65_CPSW_MAX_QUEUES);
+> > +	port->ndev = alloc_etherdev_mqs(sizeof(struct am65_cpsw_ndev_priv),
+> > +					AM65_CPSW_MAX_QUEUES,
+> > +					AM65_CPSW_MAX_QUEUES);
+> 
+> Can we solve this issue without doing this change as
+> there are many error cases relying on devm managed freeing of netdev.
+
+If you know of a way to do this differently I'm all ears.
+
+About the many error cases needing the freeing of net devices, as far as 
+I know they're all covered with this patch.
+
+> I still can't see what we are doing wrong in existing code.
+
+Did you try to rmmod this driver lately?
+
+
+Nicolas
 
