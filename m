@@ -1,124 +1,80 @@
-Return-Path: <netdev+bounces-132250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A1D991217
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:03:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF437991215
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:03:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B238B20399
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:03:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A2071C23324
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6771B4F2F;
-	Fri,  4 Oct 2024 22:02:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lkRMApVR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF73147C86;
+	Fri,  4 Oct 2024 22:02:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357781B4F10;
-	Fri,  4 Oct 2024 22:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F143140E50;
+	Fri,  4 Oct 2024 22:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728079357; cv=none; b=YUyErEWsFZzJEHA0MCQUIqOknbkLq14qgWt4qT6bJUifBFC8SYpn6qMdYk/wg3fjpLFuUXyY+7dZQ5U+rvVEB6tJ3uI6uxkl1BFE7KaIxDy8kZE50XgyMFPnPFKmS18T5/Xkrg+ykfpmLle+CWX3pAw39WF9tm7JKKl76+EH1C0=
+	t=1728079347; cv=none; b=CxNx6tawfd4l/FWwHxvHPRoFgmp9ExKjbYhLUI0HNKKgpEm+gbArHfHEnx/2/fH/2OOG0GzmFAL9zxnI7DLBlG0OGsj6rzyE8gbADk8panQYIcm8dzjUD/dlLNe4ecI0LPGtnlSmtD81/7qYuCFRb3PFOD++neyc/5FOsPRUjxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728079357; c=relaxed/simple;
-	bh=9NEI04r9pk8boDaYvXCembqpldoBVVZtbkdO8qRVlM0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bXea+BlcQV7fhLrXhn/qXZsXDXsKQAPG+UHGlFu8aP3ilIn6wJmPP+GOEEVLk16ZdE0w0r5f/MyWrOEnHnwtE14YpGPQrkNLva9BOxlY5qUgbHH8PhZEznXcx/fGNzMNuc0f2CT1SIe5DNTGkb7cIrcAT5j+v78W4GmeB1aqnRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lkRMApVR; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20b86298710so22684495ad.1;
-        Fri, 04 Oct 2024 15:02:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728079355; x=1728684155; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7LQPL2dp8286H1r4DQT1emsDyU52+A7xIUGZ0lQE+Y=;
-        b=lkRMApVRjo5qEgTs6+Xi2BPfY+o2BolGLbsWvtKJHFp4r+Nsg68+D/ngfY50C1Ixvm
-         17Sr8I5u7igr8OWlXWCepZWpigdH0+ZUdkq9R3jguLkOW7Sr7Brm6SZx8h7KJrPfmSJb
-         UjUDoFt/J5yEQf1LS3xDhJpUCKtqs3msWFD0jup4yQ6AJpfmDwAoOQNtrqJft26TOsbb
-         o0W46N9IwCsnmhiIzmPuCJnwdpWZDIdPoB3nOkrJqLqhnVzIwlgx6sedAvpgcRerMpth
-         Bt8VO3DQJMHG5pD9/PQzAT6DAMc7SHvVWfvO0rlwU1L1WYcB7aN+uFiDMlhkLGikfBSa
-         mAqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728079355; x=1728684155;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o7LQPL2dp8286H1r4DQT1emsDyU52+A7xIUGZ0lQE+Y=;
-        b=kbXm2Z7ty0blDKJs3/UgZnjkGd7A8+Ilt44bA++Me2tfXs0qx02MzP78z7DTNy3Bzr
-         I5W5nfzOu8uGs69QVCC8CdTnj/gp49AzNMrXk/qIWZU0mVvgvsROmeOHO7OvyUWSuJBi
-         b0cmPMLmIRWP7lZRcMf7B2QGxPWIIlVw0p8ud+KniZM2urJOh32YUHHxBTpqvSwZPjEy
-         X/wFOXJoyPSJ6jsThaKtZ+m44qxUV462qNJWtuYg0OB6IMSmw+XnfnjxqxR5Bp8cdMaZ
-         DYa/xYoHST+k0fgqEVeCxl1b5MpLJTdxaBQtCpIaUC2MobqtejcBrXPcksel85iWscfk
-         fvVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Fworl1yv/pqfTjFEOCTHJ+MIIvJ3i0bmXYGn9CzcEr9DrmjENUWrIK7NHNCmJOqw2oQCPg1w92UoBIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPrxXQ+k6VIAjAA1dUIodL367KiYNfgjKXeY1wiMvY7zTIJhaC
-	yAn4orJqxBqPH1cR+jRzbsV9wuUyI9V1V2qnIrChRDrSAu7VIwslm/AuqYm7
-X-Google-Smtp-Source: AGHT+IHOBlqK4t0Ugk1DYhbg8qvWKMMjeYMRSHbROPVg7LgukuY2HwwNWTs9c2+uLUryf/d0ZanPQg==
-X-Received: by 2002:a17:902:e806:b0:20b:7ed8:3990 with SMTP id d9443c01a7336-20bfdf81003mr59860875ad.12.1728079354324;
-        Fri, 04 Oct 2024 15:02:34 -0700 (PDT)
-Received: from archlinux.. ([2405:201:e00c:517f:5e87:9cff:fe63:6000])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-20c13968b54sm3045795ad.207.2024.10.04.15.02.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 15:02:33 -0700 (PDT)
-From: Mohammed Anees <pvmohammedanees2003@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1728079347; c=relaxed/simple;
+	bh=Y5Zp0NtxDlZ8LvFkxIEgQFAHbtGPzd9WZpF7R8Wkx+o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oUujPAcXuj7Kd3rwhpC4/lRncL/f2Pni4vLS3cpUMRhz8TKJHfubkaxERjjSRVBQ9Q5jtR82RHRKnIS2eHgxyKpqtU1y5978c6IjXrYdX5TIqGcCW87lKFQZhBRmeQy1m1KquO1jOtWPgH9EuNE+j7ov/VGtPf0mgmbwM/8Smgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1swqNN-000000001Je-2SSR;
+	Fri, 04 Oct 2024 22:02:17 +0000
+Date: Fri, 4 Oct 2024 23:02:13 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
-	Mohammed Anees <pvmohammedanees2003@gmail.com>
-Subject: [PATCH] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
-Date: Sat,  5 Oct 2024 03:32:06 +0530
-Message-ID: <20241004220206.7576-1-pvmohammedanees2003@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: realtek: make sure paged read is
+ protected by mutex
+Message-ID: <ZwBl5XBPGRS_eL9Y@makrotopia.org>
+References: <792b8c0d1fc194e2b53cb09d45a234bc668e34c6.1728057091.git.daniel@makrotopia.org>
+ <398aed77-2c9c-4a43-b73a-459b415d439b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <398aed77-2c9c-4a43-b73a-459b415d439b@lunn.ch>
 
-The WOL configuration now checks if the DSA switch supports setting WOL
-before attempting to apply settings via phylink. This prevents
-unnecessary calls to phylink_ethtool_set_wol when WOL is not supported.
+On Fri, Oct 04, 2024 at 11:25:29PM +0200, Andrew Lunn wrote:
+> On Fri, Oct 04, 2024 at 04:52:04PM +0100, Daniel Golle wrote:
+> > As we cannot rely on phy_read_paged function before the PHY is
+> > identified, the paged read in rtlgen_supports_2_5gbps needs to be open
+> > coded as it is being called by the match_phy_device function, ie. before
+> > .read_page and .write_page have been populated.
+> > 
+> > Make sure it is also protected by the MDIO bus mutex and use
+> > rtl821x_write_page instead of 3 individually locked MDIO bus operations.
+> 
+> match_phy_device() as far as i know, is only used during bus probe,
+> when trying to match a driver to a device. What are you trying to lock
+> against during probe?
 
-Signed-off-by: Mohammed Anees <pvmohammedanees2003@gmail.com>
----
- net/dsa/user.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index 74eda9b30608..c685ccea9ddf 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1217,10 +1217,12 @@ static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
- 	struct dsa_switch *ds = dp->ds;
- 	int ret = -EOPNOTSUPP;
- 
--	phylink_ethtool_set_wol(dp->pl, w);
--
--	if (ds->ops->set_wol)
-+	if (ds->ops->set_wol) {
- 		ret = ds->ops->set_wol(ds, dp->index, w);
-+		if (ret)
-+			return ret;
-+		phylink_ethtool_set_wol(dp->pl, w);
-+	}
- 
- 	return ret;
- }
--- 
-2.46.0
-
+The idea is to reduce the amount of unnecessary lock/unlock cycles (1 vs
+3). Of course, we could just omit locking entirely here, but that seemed
+a bit wild to me, and even if it would work in that specific case, it
+just serve as a bad example.
 
