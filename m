@@ -1,127 +1,102 @@
-Return-Path: <netdev+bounces-132142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C47B9908D9
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:17:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 696119908E8
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 459382839B6
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 941321C21E3F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA421C82F3;
-	Fri,  4 Oct 2024 16:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KI9IOlr3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9FE1C75E4;
+	Fri,  4 Oct 2024 16:18:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EE61C7274;
-	Fri,  4 Oct 2024 16:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738761C3035;
+	Fri,  4 Oct 2024 16:18:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728058578; cv=none; b=FYccUhKQl/9grOdkD2suDMfz//r2HDmx0brcXAnYmFWr0p67fET63GL/Cc2oOM/DNoz4+2TuXyBZtMuNHwKCF1BBgTvwFkX6BKRKadY7o67k5vjoJW5PNLFUu7zmkC08aW88wJYKoC67y3IZCrthFXYQ7C0crHTyvknMBY+HjEc=
+	t=1728058698; cv=none; b=hBHhgqPuK++RpxJymbPT7FOWXl0e9cF8ZK05uwC2KpzvAuY1rkwctT5Gs7fQ4lGXq0GZKdmLu78D/u4lVnX6BkXm7+oKpLhr1cpMcMiluRCmzjKywmCWPTP/EqGjRPnjzev5/QTySMLwbeU9oVV74j23jce4f7w6zNYPaVBY0jM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728058578; c=relaxed/simple;
-	bh=rAWpMtyvcBRdtxRlnUDXb/bpryEr0mMERltzyczUZ6A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UBS4+3eRQmyQG/VjQIp02tAN1DWq8Jps1PoSnRRfnfVnQoA7hWoWTKuI8YCwppsWDlDTGqZaLrXyc/qxCybHueNBdoam5G5++R9UX5fG7Id5HW+f0tos04Rhr35Z3x2B7wM95Ltt26viggwBjUKltPm0r/XsZQoaDOjCjN9CmMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KI9IOlr3; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8D2DD20012;
-	Fri,  4 Oct 2024 16:16:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728058574;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DWhLd3vDKecLf43Ct4Q5pvEcdnHZ2BjA0Ud7Z6NbNnY=;
-	b=KI9IOlr3ZroGDVJwZBUxGDphPPHWXrZwULxfsezS+povC9iBvwUoZjmZ0Obgo0odGHbo/u
-	IhddPguuILaFebua7zyi0/sAs0Cj6R36MpBNFJOVXIwYZAPNgQiZSXr0BMyRiKuUhOpKRX
-	PBqX9r3vSdWeFMocvIZli5mQy4qgrMwt6I3DTlv+HOGUNd312KOIvh4iYXpq5uR7y4oWw/
-	/I5CykLaBMdhOorpUQYhcdrfNrZQkwkMqDEX5QO8n2w8Qu/UzJ8BOgho+vjQfEN2cdg1LC
-	CoohEvXumtsoqRrYn6mRXg22E/iGlT/vdq64DyZqBPdeLUD6jD5p4hD2A5PYIg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+	s=arc-20240116; t=1728058698; c=relaxed/simple;
+	bh=tg54zVJkCpaGH9QDsrjwnfhNzcDAbD9Y4IGZQT8vNBY=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Q4/+JCkfvbiwWhtHbtEFyYGgOXZn74vF/8qr1j2xld+YKsvf3mc8wiHvZ2W0x0NOXM4CSNitb3j3M0hOmKbGsOh8MdzfVf0s7V5OwYsWdnGP9mQGriwWwvswnremofWYPv+xSRSoliYwMFt1zMnVFxiUfaqp1qsr0cC0WxG+7+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1swl0L-000000008ST-19Cy;
+	Fri, 04 Oct 2024 16:18:09 +0000
+Date: Fri, 4 Oct 2024 17:18:05 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH net-next v2 9/9] netlink: specs: introduce phy-set command along with configurable attributes
-Date: Fri,  4 Oct 2024 18:15:59 +0200
-Message-ID: <20241004161601.2932901-10-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.46.1
-In-Reply-To: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Robert Marko <robimarko@gmail.com>,
+	=?utf-8?B?UGF3ZcWC?= Owoc <frut3k7@gmail.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 1/2] dt-bindings: net: marvell,aquantia: add
+ property to override MDI_CFG
+Message-ID: <7ccf25d6d7859f1ce9983c81a2051cfdfb0e0a99.1728058550.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Update the ethnl specification to include the newly introduced isolated
-attribute, and describe the newly introduced ETHTOOL_PHY_SET command.
+Usually the MDI pair order reversal configuration is defined by
+bootstrap pin MDI_CFG. Some designs, however, require overriding the MDI
+pair order and force either normal or reverse order.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Add property 'marvell,mdi-cfg-order' to allow forcing either normal or
+reverse order of the MDI pairs.
+
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-V2 : Dropped loopback mode
+v3: use integer enum instead of two properties as suggested
+v2: enforce mutually exclusive relationship of the two new properties in
+    dt-schema.
 
- Documentation/netlink/specs/ethtool.yaml | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ Documentation/devicetree/bindings/net/marvell,aquantia.yaml | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 6a050d755b9c..6f5cdb3af64d 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -1132,6 +1132,9 @@ attribute-sets:
-       -
-         name: downstream-sfp-name
-         type: string
-+      -
-+        name: isolate
-+        type: u8
+diff --git a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+index 9854fab4c4db..f269615126d8 100644
+--- a/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
++++ b/Documentation/devicetree/bindings/net/marvell,aquantia.yaml
+@@ -48,6 +48,12 @@ properties:
+   firmware-name:
+     description: specify the name of PHY firmware to load
  
- operations:
-   enum-model: directional
-@@ -1950,4 +1953,16 @@ operations:
-             - upstream-index
-             - upstream-sfp-name
-             - downstream-sfp-name
-+            - isolate
-       dump: *phy-get-op
-+    -
-+      name: phy-set
-+      doc: Set configuration attributes for attached PHY devices
++  marvell,mdi-cfg-order:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    enum: [0, 1]
++    description:
++      force normal (0) or reverse (1) order of MDI pairs, overriding MDI_CFG bootstrap pin.
 +
-+      attribute-set: phy
-+
-+      do:
-+        request:
-+          attributes:
-+            - header
-+            - isolate
+   nvmem-cells:
+     description: phandle to the firmware nvmem cell
+     maxItems: 1
 -- 
-2.46.1
-
+2.46.2
 
