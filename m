@@ -1,110 +1,140 @@
-Return-Path: <netdev+bounces-132007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D1C99020D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:29:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E32990210
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F94D1F2378F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:29:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4928A1C210FE
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B447D1586F2;
-	Fri,  4 Oct 2024 11:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8526155733;
+	Fri,  4 Oct 2024 11:30:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="iCKV5yLS"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D87155C96
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B30D2AD18;
+	Fri,  4 Oct 2024 11:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728041331; cv=none; b=SwR5LvLm8VNb5tONlmvlV6c//S3QC/Eh1bu8040InwQPkFVFqKui+JZdXxNJWzOjDZYC6K72/kfwPb1tEeMVg6qY+gGlJfLj+G2nILTPTM/BBMWvEdAlBCb3A1hvC2VEbmEwpNypFEteTSTjOZS32FOBkWWFbKOhZum9jtpAsmY=
+	t=1728041439; cv=none; b=njQEuc7FldZXwQCm/ABclTT8XaBB48XZq3JfgxG9wmYZSSndcdLPXCDrPZiHW5av8X9UoCN6Oi/ALxx2b0c5l5zAjn/7uDNJpqIPwAcFURMyGifUiBZmbbm7P24ptdVsbeRj6oCS+ZRfOmNFdrjkZ6mZAiTJy6c6+umuxufawDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728041331; c=relaxed/simple;
-	bh=TMCTua+WSh+xta2fTLxp7TAvOG3Qg5iX+WemrbYBX/4=;
+	s=arc-20240116; t=1728041439; c=relaxed/simple;
+	bh=X4Qp5mtEyhaiPFth6wO6wY8La16ABC5rN6ihpdlqSXQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uAhg9NTTx4Ln/MVtKlKpBwGjbsCyUHpvDBgf8qR4XLXKhpKbobxLM0kzRULuAsMujYlOeC/lyzo373f46naQ3UHhEH5PCdL2WCOZcmKOTYRpPAzq+zW7tWYcNG+08EAi6LKGXa5CMIZyk+MFT5rZEW4cWQDZDhKkfmaMwZSwf1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgU2-0005Pf-UB; Fri, 04 Oct 2024 13:28:30 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgU0-003YgO-WE; Fri, 04 Oct 2024 13:28:29 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swgU0-00Ag87-2r;
-	Fri, 04 Oct 2024 13:28:28 +0200
-Date: Fri, 4 Oct 2024 13:28:28 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Divya.Koppera@microchip.com
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	robh@kernel.org, krzk+dt@kernel.org, f.fainelli@gmail.com,
-	maxime.chevallier@bootlin.com, kory.maincent@bootlin.com,
-	lukma@denx.de, corbet@lwn.net, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk
-Subject: Re: [PATCH net-next v2 1/1] Documentation: networking: add Twisted
- Pair Ethernet diagnostics at OSI Layer 1
-Message-ID: <Zv_RXMRn83Tshf0H@pengutronix.de>
-References: <20241003060602.1008593-1-o.rempel@pengutronix.de>
- <CO1PR11MB477100FB112A842674009A1AE2712@CO1PR11MB4771.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZbRrnxBhqhZkjPLOX/c9aHpUntMZEiTzG2iQvicddaQvo+jvSAApOScSKveazocwcDjeOVwvQoBqgYzdGKLzdDi2ekS/GVaETPOlL86yrivjM0xTbNwg5DwAhLWCAv8YVMswRWJ3vx9JbbQ0D7qN7UoW+iLcJDMoUQisFdupjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=iCKV5yLS; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id EF2CC20C6494; Fri,  4 Oct 2024 04:30:37 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com EF2CC20C6494
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1728041437;
+	bh=tG6C+FIVgM7dhsze/chEuSWLVSm53oBFmsuBI5COF2w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iCKV5yLSBap00xcS/CQybhJEZg3Vo18tEqBn3VldQp0Pvt/78aNPKdUTKVksXLW/R
+	 Ctm5iYf+RUlWiRmKPa5fc6ggp7dDhLhq/KS9/Lchyuq7tTA9DN2h+p+KFwGSLc12Wa
+	 CaMzKAdVM4vcYqKih743AvRCNrrqebbOZ3PlvzBU=
+Date: Fri, 4 Oct 2024 04:30:37 -0700
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>, Simon Horman <horms@kernel.org>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Colin Ian King <colin.i.king@gmail.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH net-next] net: mana: Enable debugfs files for MANA device
+Message-ID: <20241004113037.GA8416@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1727754041-26291-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20241003170518.11cd9e20@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CO1PR11MB477100FB112A842674009A1AE2712@CO1PR11MB4771.namprd11.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241003170518.11cd9e20@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hi Divya,
-
-On Thu, Oct 03, 2024 at 10:00:21AM +0000, Divya.Koppera@microchip.com wrote:
-> Hi @Oleksij Rempel<mailto:o.rempel@pengutronix.de>,
+On Thu, Oct 03, 2024 at 05:05:18PM -0700, Jakub Kicinski wrote:
+> On Mon, 30 Sep 2024 20:40:41 -0700 Shradha Gupta wrote:
+> > @@ -1516,6 +1519,13 @@ static int mana_gd_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+> >  	gc->bar0_va = bar0_va;
+> >  	gc->dev = &pdev->dev;
+> >  
+> > +	if (gc->is_pf) {
+> > +		gc->mana_pci_debugfs = debugfs_create_dir("0", mana_debugfs_root);
+> > +	} else {
+> > +		gc->mana_pci_debugfs = debugfs_create_dir(pci_slot_name(pdev->slot),
+> > +							  mana_debugfs_root);
+> > +	}
+> 
+> no need for brackets around single statements
 > 
 > 
-....
-> 
-> > +  - **Advertised auto-negotiation**:
-> 
+> > @@ -1619,7 +1640,29 @@ static struct pci_driver mana_driver = {
+> >  	.shutdown	= mana_gd_shutdown,
+> >  };
+> >  
+> > -module_pci_driver(mana_driver);
+> > +static int __init mana_driver_init(void)
+> > +{
+> > +	int err;
+> > +
+> > +	mana_debugfs_root = debugfs_create_dir("mana", NULL);
+> > +
+> > +	err = pci_register_driver(&mana_driver);
 > > +
 > 
-> > +    - For **SPE** links (except **10BaseT1L**), this will be **No**.
+> no need for empty lines between function call and its error check
 > 
+> > +	if (err)
+> > +		debugfs_remove(mana_debugfs_root);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static void __exit mana_driver_exit(void)
+> > +{
+> > +	debugfs_remove(mana_debugfs_root);
+> > +
+> > +	pci_unregister_driver(&mana_driver);
+> > +}
+> > +
+> > +module_init(mana_driver_init);
+> > +module_exit(mana_driver_exit);
+> >  
+> >  MODULE_DEVICE_TABLE(pci, mana_id_table);
+> >  
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index c47266d1c7c2..255f3189f6fa 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -9,6 +9,7 @@
+> >  #include <linux/filter.h>
+> >  #include <linux/mm.h>
+> >  #include <linux/pci.h>
+> > +#include <linux/debugfs.h>
 > 
-> 
-> May be to generalize statement for T1 phys, I would suggest it should be referred as "Yes" in case of auto-negotiation is enabled, "No" if auto-negotiation is disabled.
-> 
-> 
-> 
-> We are submitting patches for lan887x(100/1000BaseT1) and soon we will add support for auto-negotiation as well.
+> looks like the headers were previously alphabetically sorted.
+> -- 
+> pw-bot: cr
 
-Ah, I see. Thank you!
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Thanks Jakub. I will get these in a newer version
 
