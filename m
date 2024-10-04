@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-132080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E993990566
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:09:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCD9990568
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:09:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 051341F22DBF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:09:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EE8B1F22EE3
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B7D216A17;
-	Fri,  4 Oct 2024 14:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D7C217338;
+	Fri,  4 Oct 2024 14:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="o2gytmUW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tV50QnDt"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321DB217330;
-	Fri,  4 Oct 2024 14:08:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C70EA215F43;
+	Fri,  4 Oct 2024 14:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728050925; cv=none; b=cTX7GGILcgw2ANQbaZHVQ8b7xsJbG6UXEFOJ87B30YmU6AWG3XQQJS/GCb9279eEwk8eUJYTVu1x8g3PiHmWtIdNMlvlh1GGA3ZxAU0xMXt1cAK5lN9tneaR/B0ZBj1QXl9K63k4JGf7g+fjLsG3WF9EEskhc7DEZJ7d0z1ypUE=
+	t=1728050928; cv=none; b=IrqmmCVhzmJ61K6CYwGV6aBkTLZMGp3JfNFp276HdpTECCc95dlkPF7eou7tl0k9Pf2MTydBTTIKEmP19dRf8L1otXsBHmTrYtopk5uvghMPXq579+bvAYpCPlZsLCdK7BgxJ6pTAUKyj46t+S12pK+zAa6c4L6FvZmK3m4oPvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728050925; c=relaxed/simple;
-	bh=U7BUQogmfsMjFigsPg+8A9a5e640pTLMXpZg/OyxEuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOxTst4KtvyMpzsgD34I8++3faejQG4qILHz6DUzmjQf9qnyzGsp/JVBj4Ih1/6chskPkVjkhSaW252XTK5L+3j3w/0rF41DOa8lXyr8D0u7G/4DR1bnmopKQJV8FjgjI5qUjD1Q32fsAnZDeTtGUZ9kZCqdbdwxFTLUWt1zS/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=o2gytmUW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=G3PLQYP5REX3puY1XA/8DApG8sWPavvbMNP15YqbO4k=; b=o2gytmUWMn4XHhQ3buhr1lfP9a
-	BTuBMi9rFRmR9CcSVF0s+Mehw0/pFyOEMOKdjg4BjVsAxwMnD4YehaxriZeocbvFGFxkbSJmBSEiJ
-	MiTWL1JisvnUHZljPi/V0L/NGm6W2lR20ibz0S8MCgR09qG8LzyLcPNpFuUKo5//7JuA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1swiz2-0093N4-RC; Fri, 04 Oct 2024 16:08:40 +0200
-Date: Fri, 4 Oct 2024 16:08:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com
-Subject: Re: [PATCH net-next v1 1/2] rust: add delay abstraction
-Message-ID: <9e55ccea-0c0b-4008-bc02-963701a38832@lunn.ch>
-References: <20241001112512.4861-1-fujita.tomonori@gmail.com>
- <20241001112512.4861-2-fujita.tomonori@gmail.com>
- <b47f8509-97c6-4513-8d22-fb4e43735213@lunn.ch>
- <20241004.210819.1707532374343509254.fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1728050928; c=relaxed/simple;
+	bh=RqtN0IiayrMqwFC0YAGSB1NwED1SqgkSMsUtIuQEZxQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iEdWrFCMvL+HKdnkhUeok++JMY5WL6HzkU/QeqxqMLGNgCO7xbaLkzXm2t+DOpOwaAQicgktgwtTFXTz1beR1lKF64QuN5BEJf1ziKy5coWCAUgzlDo3raZ+VMft4GED6tyk9iujMXH6UzbuSN5iZhDBeeJJ16hlFHAVCZnsE3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tV50QnDt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AD08C4CEC6;
+	Fri,  4 Oct 2024 14:08:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728050928;
+	bh=RqtN0IiayrMqwFC0YAGSB1NwED1SqgkSMsUtIuQEZxQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tV50QnDtI0FPg/I2E+nUTsQhaqinxg4bvX6OxXRmtL3IM1ZB7+EhSfuy1+bpm1LHG
+	 rSenjrHbD51tCh/cJhmLWlyu4tdQNnT+gVYNd13Dn3zo8SfsNnd9UIU8YxqHda6NfR
+	 y1w5zzh2I7BlMTk3gAYFj1eEsezPrFI8tkzH9l8cnVMATQbweZ/Hx7e1pMfwVHYOIa
+	 ZCjfq+KRaB+Sz7LJUk1+sGIKm+8z+h7zibo7MTR5ZECCFXD2NVOcLChzmqUGX+DbvB
+	 D7B5sUPm/xA2nS5qVKGkKhG78osuWbhJq/9T1LkowVHDQgVRsVZYVAomYXz5cmPl3h
+	 9qKbBHUnLzJdg==
+Date: Fri, 4 Oct 2024 07:08:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Furong Xu <0x1207@gmail.com>, Ong Boon Leong <boon.leong.ong@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+ regressions@lists.linux.dev, Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH net v2] net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if
+ XDP is enabled
+Message-ID: <20241004070846.2502e9ea@kernel.org>
+In-Reply-To: <28f05bbe-78f6-408a-ae53-c40f6a86eed9@nvidia.com>
+References: <20240919121028.1348023-1-0x1207@gmail.com>
+	<28f05bbe-78f6-408a-ae53-c40f6a86eed9@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004.210819.1707532374343509254.fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 09:08:19PM +0900, FUJITA Tomonori wrote:
-> On Tue, 1 Oct 2024 14:31:39 +0200
-> Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, 1 Oct 2024 11:22:32 +0100 Jon Hunter wrote:
+> We have noticed a boot regression in both -next and mainline v6.12-rc1. 
+> Bisect is pointing to this commit. Reverting this commit fixes the problem.
 > 
-> >> +/// Sleeps for a given duration.
-> >> +///
-> >> +/// Equivalent to the kernel's [`fsleep`] function, internally calls `udelay`,
-> >> +/// `usleep_range`, or `msleep`.
-> > 
-> > Is it possible to cross reference
-> > Documentation/timers/timers-howto.rst ?  fsleep() points to it, so it
-> > would e good if the Rust version also did.
+> This boot regression is seen on our Tegra234 Jetson AGX Orin platform 
+> that uses the drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c driver. 
+> We are booting with NFS and although the network interface does come up, 
+> we fail to mount the rootfs via NFS.
 > 
-> Looks like the pointer to Documentation/timers/timers-howto.rst in
-> fsleep will be removed soon.
-> 
-> https://lore.kernel.org/all/20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de/
+> So it would appear that we need to set this flag for this device. Any 
+> thoughts?
 
-It would be more accurate to say it gets replaced with a new document:
-
-Documentation/timers/delay_sleep_functions.rst
-
-So please reference that.
-
-	Andrew
+This patch doesn't make sense to me. I'll send a revert shortly.
 
