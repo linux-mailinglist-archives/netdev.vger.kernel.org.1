@@ -1,174 +1,107 @@
-Return-Path: <netdev+bounces-132167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CAC89909DC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:03:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9849909E0
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF0C6B25004
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:03:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7385B2467D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C441D9A71;
-	Fri,  4 Oct 2024 17:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B4381CACD5;
+	Fri,  4 Oct 2024 17:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="daUGP8qd"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="e3bF5s5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA441D9A63;
-	Fri,  4 Oct 2024 17:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8401AA7BA;
+	Fri,  4 Oct 2024 17:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728061370; cv=none; b=WLm+nTR+AOx4tR2xBgF4nyDVNemwvkt0ZDnPKEM+XnCKUGHfIk0t3h16Tv/VdfEwxzGTtjoUZnYC7j0gs/vRn38qFPetTmy0wdOgBM0neufOrLvp5ZwnZj2US/BQ/h4ppr+MYgV4TI1OH4q+89NHqO8fANRWGnNlhLwAoypsGSM=
+	t=1728061425; cv=none; b=Pe07pyqrS/Rf8rNE7H83WzJSIeT24VtAPdoOzQhgr8IRNBekikNUmCrLK3XRsxNFng24dhHlhHH33mxmEOYi3Q+i9gbvqp0ghy5fXa2HbnYamv7cb001bjT8KCvuCgtQt1WF8ggqVxFejNSSMtZTEZoD0jE0oc/ot+7GpgyJh84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728061370; c=relaxed/simple;
-	bh=JI8YuQMaqBM0wtwdfwTzVoM+Mq7BIGqawvEHDXOhYFw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N1iTBL3ho4IfIAadmtMZV7f7touu12jZcnNzMRjdaskeeSZRqAur/6NpsPtF2/RrdsA1L4s0VnmMeFBuZXsTnC+LOblCh+qrppFRPOg66dM64gSx3LBIP0Y5aSUWlDOlggBTG52AD/jRvb2r7iGCpy4NqqNG6pQGxZ6nWiguK5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=daUGP8qd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=r7K5K/qZvjgIES+9JYIIHa7wXSVw+xS1RUWhZQdScQs=; b=daUGP8qdLRq371XdEShyVcnIgH
-	Pf2bscR0Nb6nXVatopZRGBuDWqlPpqwDO9/Nb4kviP+OqEPYGIKYz/FgXrOqJ2s3y8dq4LYpK1qHc
-	mNzujeLtirLaws3pks6IL9xlZ10Vq3OsN2LQD7ZQu9yn5cZNJsWlnZvzVdxQHJRxcNnGLvC+m37xQ
-	g/E++jKdUytUTl8V7mH+rNcioumMiLaJDnLO/PYYiFnCe7njDPffwk3wOl6W+ds+OsxkAuHW0JUjV
-	1GMZIyfw1oj4Ouw6Mrj7MpTIMJegnXLnbE0lII6gCqBoJ9p3jnFXIeWZlrM6Yss/F9V8wSzdHmqd8
-	FuS/39jA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51482)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swlhK-0002K5-25;
-	Fri, 04 Oct 2024 18:02:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swlhB-0001KJ-33;
-	Fri, 04 Oct 2024 18:02:26 +0100
-Date: Fri, 4 Oct 2024 18:02:25 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 0/9] Allow isolating PHY devices
-Message-ID: <ZwAfoeHUGOnDz1Y1@shell.armlinux.org.uk>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1728061425; c=relaxed/simple;
+	bh=ojT71JeCOkm2cujKgA99HgLFAxry+kQTbscoJT3AMFE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=euTIal7fIehG0Yyy6skUI7KDkS7j1oOLC9qNmcL25zjZINoYmHMUsbJ/yRIri2WxFGsVZTcwXuSzOUmLbgdYpMuSLvFjy+SMrG9vkYPqkWfGOPjElh6F3a1yCLO1SbWGyv8a656xEBKp4gckLfDfXds+UVMdGFjdl1/rPVEbXMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=e3bF5s5F; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 494Gfr9q024728;
+	Fri, 4 Oct 2024 17:03:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=corp-2023-11-20; bh=mLpGajwr/fVaNM
+	PK3CcJGTfM792ZV3Tl1fXux5mdpfQ=; b=e3bF5s5FGdz7sqMpo7kC+g1xZsyxcd
+	grxJavVPonNjgkcZ9W7fSXdEIZzdEcjSo2M8EkHTi8vKUggC0R5mNDBlq9ZvZtQf
+	TTvBl2EWEV5Gg+cM3y0JbkJhIBwtyXoU9DQapREJfEx/WSG5K/g0K3e0VCOOs2+n
+	D/j8lvKpGklYptbpKB1hyBO6IMJsJHqxt6DPDDN+W86swm1ZIgn2mj6E9ftl3d/1
+	Te6nlXOUGesCMxGKc6W62tJj9WACfJp1cp1oIlhmlIG0VD7/zjZeqvLbAw+NH4RC
+	PSHQD6wAt31fhFwq1Hv23VQJLYuq8JsmtD2CFQn3w8OMT3xV1Hm0P2+g==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 422048a39b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 04 Oct 2024 17:03:32 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 494FHVY9005957;
+	Fri, 4 Oct 2024 17:03:32 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 422056tdww-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 04 Oct 2024 17:03:31 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 494GxlJk035743;
+	Fri, 4 Oct 2024 17:03:31 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 422056tdvr-1;
+	Fri, 04 Oct 2024 17:03:31 +0000
+From: Sherry Yang <sherry.yang@oracle.com>
+To: stable@vger.kernel.org
+Cc: sashal@kernel.org, kuba@kernel.org, gregkh@linuxfoundation.org,
+        roopa@nvidia.com, nikolay@nvidia.com, davem@davemloft.net,
+        bridge@lists.linux-foundation.org, netdev@vger.kernel.org,
+        sherry.yang@oracle.com
+Subject: [PATCH 5.15.y 0/2] Backport fix for CVE-2024-38538
+Date: Fri,  4 Oct 2024 10:03:26 -0700
+Message-ID: <20241004170328.10819-1-sherry.yang@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-04_14,2024-10-04_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
+ suspectscore=0 adultscore=0 bulkscore=0 mlxscore=0 mlxlogscore=594
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2409260000 definitions=main-2410040118
+X-Proofpoint-ORIG-GUID: _VhB2sSjv2Lr1pbBk2SDSo8XZOxFZJNv
+X-Proofpoint-GUID: _VhB2sSjv2Lr1pbBk2SDSo8XZOxFZJNv
 
-I'm going to ask a very basic question concerning this.
+The 2nd patch fixes CVE-2024-38538, but it requires the helper function
+pskb_may_pull_reason which is defined in the 1st patch. Backport both
+together.
 
-Isolation was present in PHYs early on when speeds were low, and thus
-electrical reflections weren't too much of a problem, and thus star
-topologies didn't have too much of an effect. A star topology is
-multi-drop. Even if the PCB tracks go from MAC to PHY1 and then onto
-PHY2, if PHY2 is isolated, there are two paths that the signal will
-take, one to MAC and the other to PHY2. If there's no impediance match
-at PHY2 (e.g. because it's in high-impedance mode) then that
-transmission line is unterminated, and thus will reflect back towards
-the MAC.
 
-As speeds get faster, then reflections from unterminated ends become
-more of an issue.
+Eric Dumazet (1):
+  net: add pskb_may_pull_reason() helper
 
-I suspect the reason why e.g. 88x3310, 88E1111 etc do not support
-isolate mode is because of this - especially when being used in
-serdes mode, the topology is essentially point-to-point and any
-side branches can end up causing data corruption.
+Nikolay Aleksandrov (1):
+  net: bridge: xmit: make sure we have at least eth header len bytes
 
-So my questions would be, is adding support for isolation mode in
-PHYs given todays network speeds something that is realistic, and
-do we have actual hardware out there where there is more than one
-PHY in the bus. If there is, it may be useful to include details
-of that (such as PHY interface type) in the patch series description.
-
-On Fri, Oct 04, 2024 at 06:15:50PM +0200, Maxime Chevallier wrote:
-> Hello,
-> 
-> This is the V2 of a series to add isolation support for PHY devices.
-> 
-> As a remainder, this mode allows a PHY to set its MII lines in
-> high-impedance mode to avoid interferences on this bus.
-> 
-> So far, I've identified that :
-> 
->  - Marvell 88e1512 isolation works fine
->  - LXT973 claims to support isolation, but it's actually broken
->  - Marvell 88x3310 doesn't support isolation, by design
->  - Marvell 88e1111 claims to support isolation in GMII, RGMII, TBI
->    (untested) but doesn't in SGMII (tested).
-> 
-> Changes in V2 :
-> 
->  - Removed the loopback mode that was included in the first iteration
->  - Added phy_shutdown, to make sure we de-isolate the PHY when rebooting
->  - Changes the "PHY_NO_ISOLATE" flag to a phy driver ops. Testing showed
->    that some PHYs may or may not support isolation based on the
->    interface that's being used.
->  - Added isolation support reporting for the Marvell 88e1111 PHY.
-> 
-> V1 : https://lore.kernel.org/netdev/20240911212713.2178943-1-maxime.chevallier@bootlin.com/
-> 
-> Maxime Chevallier (9):
->   net: phy: allow isolating PHY devices
->   net: phy: Introduce phy_shutdown for device quiescence.
->   net: phy: Allow PHY drivers to report isolation support
->   net: phy: lxt: Mark LXT973 PHYs as having a broken isolate mode
->   net: phy: marvell10g: 88x3310 and 88x3340 don't support isolate mode
->   net: phy: marvell: mv88e1111 doesn't support isolate in SGMII mode
->   net: phy: introduce ethtool_phy_ops to get and set phy configuration
->   net: ethtool: phy: allow reporting and setting the phy isolate status
->   netlink: specs: introduce phy-set command along with configurable
->     attributes
-> 
->  Documentation/netlink/specs/ethtool.yaml     |  15 +++
->  Documentation/networking/ethtool-netlink.rst |   1 +
->  drivers/net/phy/lxt.c                        |   2 +
->  drivers/net/phy/marvell.c                    |   9 ++
->  drivers/net/phy/marvell10g.c                 |   2 +
->  drivers/net/phy/phy.c                        |  44 ++++++++
->  drivers/net/phy/phy_device.c                 | 101 +++++++++++++++++--
->  include/linux/ethtool.h                      |   8 ++
->  include/linux/phy.h                          |  42 ++++++++
->  include/uapi/linux/ethtool_netlink.h         |   2 +
->  net/ethtool/netlink.c                        |   8 ++
->  net/ethtool/netlink.h                        |   1 +
->  net/ethtool/phy.c                            |  68 +++++++++++++
->  13 files changed, 297 insertions(+), 6 deletions(-)
-> 
-> -- 
-> 2.46.1
-> 
-> 
+ include/linux/skbuff.h | 19 +++++++++++++++----
+ net/bridge/br_device.c |  6 ++++++
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.46.0
+
 
