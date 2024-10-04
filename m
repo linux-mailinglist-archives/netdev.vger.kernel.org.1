@@ -1,90 +1,98 @@
-Return-Path: <netdev+bounces-132269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26CEC991256
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:31:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C366991258
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:32:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2D2B283DDB
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 356131F239BB
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4722E13FD86;
-	Fri,  4 Oct 2024 22:31:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12D314659A;
+	Fri,  4 Oct 2024 22:32:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kHGmrNV2"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NeSJBxX0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBF2231C9F;
-	Fri,  4 Oct 2024 22:31:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2284A13B59A
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 22:32:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728081078; cv=none; b=vFRwqEnbGcJfuAjz/QLsTOynvDaCPbtS0iIyfUEXG4Pr/v/SqD/ZzrjtpsBXhG6FwqZHwczABB6SEI29CKOxNRaM3TYNcNloTjvfnsDScICGhnqQhblPU9Rrv/ZlcFyqdJRJY1AK2Pz+JpJUlSJDg68wGTQ2e2gVnPqnxvUJeLc=
+	t=1728081160; cv=none; b=TNRZ0lTICcDJfb7+cN6s8OjynQPMG2zARJ3RbmBzGz4UFUXwkSn0/OCkWt79/jyzCehbg9RuhJrLsdS/fWAOx3TU/MO7o31AfkycFx5QinAUp1iFOAZuBHJqctLcbz8H1AjlwkS4+JM/x0JS5aeg2KjeaJNVoD3wlxSpZF7g7OY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728081078; c=relaxed/simple;
-	bh=UB/cQVsJIlvrYmc6cW2Jq3pbEGYqY1uD7VDav9QN0KE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tnOYNQkQKrhbxP3vxIlcYthFgR92WzeSD9yvtFjrz6h2kTNO5bgX6LH1RTtVKxwQacT3iZTjK/3FDPSdWdGoq4+DxUGPM5pUp3xFl1c/Ub1jjjYesdLXmOV8CZ2qfmDg08jbacUZm0/VXFzDJ4PPEJjebkR0sSw5EqWVmvJhofA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kHGmrNV2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364A8C4CECC;
-	Fri,  4 Oct 2024 22:31:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728081077;
-	bh=UB/cQVsJIlvrYmc6cW2Jq3pbEGYqY1uD7VDav9QN0KE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kHGmrNV2V4b9ze6jPV0fHCgdwcEA26c0OBBF7aIWeFl6oN1Mk16oc4SZ0Me4DeptJ
-	 YVqu3rgw7M4BOqViL40jRYB9aLZXijnxXwYsvm7wvoQL+v8N1eT4DgNTtRn0nvrY2q
-	 HcZUPg0F2TXN/Zdpd0ZNBC1zFRjIdpiLAFCdzaH/cgqHGvV2grsoz3qOxieaMFGZkC
-	 SaoIZlvsXZzd7c1QZCWi18+gqz5CiASrxRuP5Vyh7DyheIK7LFqzQnHzVEPHjf27t4
-	 3e10/aeJND/VruTT2TQubHFjK9IQbpA/szYjBG994fLE15B18mF0iMnVsWqE1XKVW+
-	 Yi+CxAVyKbrxA==
-Date: Fri, 4 Oct 2024 15:31:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Florian Fainelli
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>, Tim
- Harvey <tharvey@gateworks.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4] net: dsa: mv88e6xxx: Support LED control
-Message-ID: <20241004153116.448c66ac@kernel.org>
-In-Reply-To: <54922259-818f-425f-af47-cfa594a288e3@lunn.ch>
-References: <20241001-mv88e6xxx-leds-v4-1-cc11c4f49b18@linaro.org>
-	<20241004095403.1ce4e3b3@kernel.org>
-	<54922259-818f-425f-af47-cfa594a288e3@lunn.ch>
+	s=arc-20240116; t=1728081160; c=relaxed/simple;
+	bh=VSAsbxDvxYsPDcIVxb7coa8991kkx/AMAqEou1kWbAA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qu61Au4sZTtn5vA4cu5uHqYps4z3Bo6PTMcPOPibycvA5pdDPiHSCk7JCVef6RQZaccbOdcpZYSAsPd47k9EmQ2Hkr6++T+wk83MuMrThZ3tYiV1q6V4KMdSsoh15bbTA3Tai/nLd5xxDjZdIYWUF3O4zb4HW2OSVw/xvXJU3Jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NeSJBxX0; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728081160; x=1759617160;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=xdhEA9ZT+f7zF6MV2ptJP9SbichfddEnth530Zg4noU=;
+  b=NeSJBxX0ERouchg/k8Eqv2dZppVqAOpIjfnlEr80lf4NYfyNbTY2UHRq
+   OWefnPR9NYMZNEhdDIV/+YBYCTN1cO2WU4H1hnC47mnqanwPc1v1Qi3E1
+   HNqqXMYI+nw9fE7XZMn7oMO2bN5YjfYFS7DkAYOuw/q60YtERThY7i5bE
+   s=;
+X-IronPort-AV: E=Sophos;i="6.11,178,1725321600"; 
+   d="scan'208";a="30768216"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 22:32:38 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:58359]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.158:2525] with esmtp (Farcaster)
+ id b274c8c2-566a-4d12-9618-8401cf088a75; Fri, 4 Oct 2024 22:32:36 +0000 (UTC)
+X-Farcaster-Flow-ID: b274c8c2-566a-4d12-9618-8401cf088a75
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 4 Oct 2024 22:32:36 +0000
+Received: from 88665a182662.ant.amazon.com (10.88.184.239) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 4 Oct 2024 22:32:33 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <alexandre.ferrieux@orange.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <eric.dumazet@gmail.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/4] ipv4: remove fib_devindex_hashfn()
+Date: Fri, 4 Oct 2024 15:32:24 -0700
+Message-ID: <20241004223224.81122-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241004134720.579244-2-edumazet@google.com>
+References: <20241004134720.579244-2-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB003.ant.amazon.com (10.13.139.174) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, 4 Oct 2024 22:35:26 +0200 Andrew Lunn wrote:
-> On Fri, Oct 04, 2024 at 09:54:03AM -0700, Jakub Kicinski wrote:
-> > On Tue, 01 Oct 2024 11:27:21 +0200 Linus Walleij wrote:  
-> > > This adds control over the hardware LEDs in the Marvell
-> > > MV88E6xxx DSA switch and enables it for MV88E6352.  
-> > 
-> > Hi Andrew, looks good now?  
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri,  4 Oct 2024 13:47:17 +0000
+> fib_devindex_hashfn() converts a 32bit ifindex value to a 8bit hash.
 > 
-> Sorry, drowning in patches.
-
-I know the feeling.. Let's see if we can get the patchwork queue
-below 150 patches today.. :(
-
-While I have you, any further thoughts on
-https://lore.kernel.org/all/20241001124150.1637835-1-danieller@nvidia.com/
-?
-
-> I just purged pretty much everything from Rosen Penev.
+> It makes no sense doing this from fib_info_hashfn() and
+> fib_find_info_nh().
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> It is better to keep as many bits as possible to let
+> fib_info_hashfn_result() have better spread.
+> 
+> Only fib_info_devhash_bucket() needs to make this operation,
+> we can 'inline' trivial fib_devindex_hashfn() in it.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Thanks!
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
