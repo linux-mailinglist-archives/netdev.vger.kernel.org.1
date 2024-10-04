@@ -1,117 +1,94 @@
-Return-Path: <netdev+bounces-131943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B54B99004D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:53:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B632990072
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AB911F24854
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:53:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40AAB1C23149
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77DB14A08E;
-	Fri,  4 Oct 2024 09:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78748148FF5;
+	Fri,  4 Oct 2024 10:03:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PEx5vMqQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyi9nyqg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A2D1482E7;
-	Fri,  4 Oct 2024 09:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C140146A72;
+	Fri,  4 Oct 2024 10:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728035596; cv=none; b=ULtpfaMA+2okSHXwB5RVdPBX5w16wbnXdHaxg6Z//ZMCOFtgIoTeyhECLSiwF2Kt/HiXi5YHrO4zTgXyFxe7dYLuVtrgbUcx7Yw1U9h0TppAJeA7NW7qrBm2bRNqvjAMK9KAYvxQUnqECc0afPNGM+GSBflEZt9GQ2ntwiqBtlw=
+	t=1728036209; cv=none; b=dC8n8eNOxHyQ5fWIf426joT4qOr+HCgq3x2bSBPnG7fiIBeAfVe7mmxNEY/zl+9jmgOl1LoAbzArP8JR5w3idIxti07vAXv86uTfElEvWaXChDR6tyk4p7onU47zb1p4E9dJ/GgZ/aW/izJpzMNgKepwXebopFIIePFRrPJVVG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728035596; c=relaxed/simple;
-	bh=GvA50aypOKeES5b88ZtKz66IY5eKMzeUwOBuz7Ro7XQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=KUvN/vPugRieyzezeki/wnMvDjyNnXK2moN6MWo6lhuIAf4cHcpFtdyuyQ2NxuWP5cq4HUP/wCKlnHg+mZZs/7b3fZAFIuWGPAKkxuX9hlqVHyXHPsGw4Pud1aucc1gSHj0CxUThdstSZLtlBw3uZ2gzA+W9xTSlOodV7R1V7w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PEx5vMqQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 493Hxpb5025555;
-	Fri, 4 Oct 2024 09:52:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	vzdWHLICmCO4FTlS/c50c7Ra96E1mMn63rdysJ+zNO4=; b=PEx5vMqQds95zx8b
-	5zY7bB3O/ste4l59Cl3eRXAAEz6jdj+jUMVEDmwYrXaLkz5mafiHnlujARElisB/
-	jJeOLhBqM4eo6HNgxTivDF3sdmwrFsfuSY9rr1ou9Q1Y5fj8K8d8L6Li98OhuCK2
-	kj5xsAnbeEFjlVg5J/ia7R3yBVmx45fpXeiwGc3i8brCSXKdgjexVcFKCyjLfL6a
-	AqpIl8jXyPBxEDnsA/gEnSjqqmveQhhYBWWRzTV9n85RlMh9nIVO4EWZH1NdOJ9x
-	ZVhCDRu0ZRScNsHrzvgy+y8tRQ+l/kSU17wbH6nGOUCwf8+H9PBrMlOq8EeOuPIO
-	D/n1GQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42205khpct-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 04 Oct 2024 09:52:56 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4949qsHF032461
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 4 Oct 2024 09:52:54 GMT
-Received: from [10.50.18.17] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 4 Oct 2024
- 02:52:46 -0700
-Message-ID: <ab449231-29b1-4ced-8ab1-178b71b1b53b@quicinc.com>
-Date: Fri, 4 Oct 2024 15:22:43 +0530
+	s=arc-20240116; t=1728036209; c=relaxed/simple;
+	bh=w8bWlQBTvkReQC5vkKIau+hsj+b10X/1li97V1B6tvo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mtgxUxxJ3DiYS8196dxTF5enYNeu1iprEQmUg881+5WoqQU0W5YfdMwHI4PwPabV737ECQflkz5UyqNDQygfQP9UtZHW1FgI49LVUBsbMztpfdDedcfDRbdrlf7nkUh0XiyV6eUBjuL1HLlYzf/wAZhxwJ7iyol6qlJJyQ6FM+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyi9nyqg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F8C3C4CEC6;
+	Fri,  4 Oct 2024 10:03:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728036208;
+	bh=w8bWlQBTvkReQC5vkKIau+hsj+b10X/1li97V1B6tvo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=gyi9nyqg+EMzDl2tNtN1yhFefNYCo6HbhJr2mjZJcUBgwZ0fTp4UE45YpId12nblT
+	 A4Kk30NGKLqdJyeLC0C/fTJt8ocRpAEotRbNAFH+n9W3QC7Wx4DJsUsrqW3nRS2X0u
+	 lhUA1FdDNAD9BfLox31troxtqVGeyfElsjpqzNVUtAw8uDA+86J39ufm2X0oUV9sFZ
+	 vtsGhQwSBk0BYXmK77By4i2hkuPkJyfy0uUNL2WzbEeaTmE7y8UuNZYUY5rtbZkx3c
+	 tZSQZSNG00bb/GaYuJNucJEcNaqOpw+m8t4W+R8OJhvfX46tHi39oj4UWfYq9Jgu8A
+	 rfwIBJqQXku4A==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH RFC net 0/2] MAINTAINERS: Networking file coverage updates
+Date: Fri, 04 Oct 2024 11:03:20 +0100
+Message-Id: <20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 0/7] Add NSS clock controller support for IPQ9574
-To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
-        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
-        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
-        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
-        <neil.armstrong@linaro.org>, <arnd@arndb.de>,
-        <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
-References: <20241004080332.853503-1-quic_mmanikan@quicinc.com>
-Content-Language: en-US
-From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-In-Reply-To: <20241004080332.853503-1-quic_mmanikan@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 1zwEqbC4Q7-Q2kaqquI5G2IxwA3f8GFX
-X-Proofpoint-GUID: 1zwEqbC4Q7-Q2kaqquI5G2IxwA3f8GFX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- adultscore=0 lowpriorityscore=0 mlxscore=0 priorityscore=1501 phishscore=0
- bulkscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=884
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410040071
+X-B4-Tracking: v=1; b=H4sIAGi9/2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDAwMT3dzEzLwS3bzUEt2MlKJi3TQLU4uUJDPLVGNLYyWgpoKi1LTMCrC
+ B0UpBbs4KQJVKsbW1AMwe/RFpAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
+Hi,
 
+The aim of this proposal is to make the handling of some files,
+related to Networking and Wireless, more consistently. It does so by:
 
-On 10/4/2024 1:33 PM, Manikanta Mylavarapu wrote:
-> Add bindings, driver and devicetree node for networking sub system clock 
-> controller on IPQ9574. Also add support for NSS Huayra type alpha PLL
-> and add support for gpll0_out_aux clock which serves as the parent for 
-> some nss clocks.
-> 
-> Changes in V6:
-> 	- Detailed change logs are added to the respective patches.
-> 
+1. Adding some more headers to the UDP section, making it consistent
+   with the TCP section.
 
-I missed to update few things. I will post V7, please ignore V6.
+2. Excluding some files relating to Wireless from NETWORKING [GENERAL],
+   making their handling consistent with other files related to
+   Wireless.
 
-Thanks & Regards,
-Manikanta.
+The aim of this is to make things more consistent.  And for MAINTAINERS
+to better reflect the situation on the ground.  I am more than happy to
+be told that the current state of affairs is fine. Or for other ideas to
+be discussed.
+
+---
+Simon Horman (2):
+      MAINTAINERS: consistently exclude wireless files from NETWORKING [GENERAL]
+      MAINTAINERS: Add headers and mailing list to UDP section
+
+ MAINTAINERS | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+base-commit: 096c0fa42afa92b6ffa4e441c4c72a2f805c5a88
+
 
