@@ -1,99 +1,78 @@
-Return-Path: <netdev+bounces-132156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C17699097F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:40:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A79990991
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A13B8B213BA
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 415501F21413
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340771CACC4;
-	Fri,  4 Oct 2024 16:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A20E1CACD9;
+	Fri,  4 Oct 2024 16:43:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t/AfnJ2t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CfvSajmq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA9B1E3798;
-	Fri,  4 Oct 2024 16:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411AE1E3798;
+	Fri,  4 Oct 2024 16:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728060033; cv=none; b=qu6OXAo84A7Pf34i1VaHBH+9M0ONxyDhvGHLuTKxbFI+/9uaM/tmWT03l4twzfJZv0WcIckEoTNoIdQJLVyjZdvmh98Ah0mT4O/O8/sxWnPUrmoUzXeFMEICeAuPqrZYx/+NXdfX2cP/9RUJKKSEjed8wWaLXigyt8NO4/4ycB4=
+	t=1728060196; cv=none; b=jtZX0u8mty7aE2cWI7MwsITpnui7YYJNJwn8KI+TUzno8r+dBXfNBN8vR9T9a84YVuNUOINRlgTcwNKoJ8yWzuJxK5Fkg07DdTR1Ur3ENk74r7m+XVRUGLZgBvQbpBxjUAMUYN13AqH7mCwIyp9anZ5xIBNNfZKYTQ6Ds6dJqG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728060033; c=relaxed/simple;
-	bh=89c8uJ7qobwnqhIgahiWtibBBubafSb7CFkoalE6ni0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fkt/yjQHRJY3tyFQk4dbsW+TZpaKJxlgClnRWPkTPsH/ene4tQC6PzDg23hwvvpldwtC+KkslzkWuFx+G8w7e8oedA4zXjjjQQf09aGfD0suVOJGozBQa04jPy01J76bakrpU7C7rkdMCn4y9T2KclZOAra1j46PhNwBsk57Nno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t/AfnJ2t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82FC8C4CED3;
-	Fri,  4 Oct 2024 16:40:32 +0000 (UTC)
+	s=arc-20240116; t=1728060196; c=relaxed/simple;
+	bh=bslI7aYrHHJa8ElMwroQ8QfyHxy5X8O4+eVvZQS74F4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=feGOog5sEIBRsMvTz12RPbd4+cRim54oTSGxF0Zg22fWKyCBT6ytoeQabiyp9qtKZpchucUvdFE1c5/PzB9biS4XfCErrbSS7Nc92NNjpY0/WZ5Xz4Tqngmo9LVBgZZnzIBHCzN8VQOkyUNPAUVzvnRjFgNk/HONdgUzhY2F8EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CfvSajmq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30B76C4CEC6;
+	Fri,  4 Oct 2024 16:43:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728060032;
-	bh=89c8uJ7qobwnqhIgahiWtibBBubafSb7CFkoalE6ni0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t/AfnJ2t+cK/GxTDBuNwCwMG4OKZuMPyvnj/l+28T4FpvJwRUnI9VO9mt7By24Auu
-	 pqQ/f7y1OaAbGuFw6+l47Mh+qQ5LsrLV8s7rRulkhwZBF4r6OMAzDPrDJGpGp8Pom+
-	 eLXtlWsH0/DQxfm+WSpXdqgAbA2UCPi6MOiu4rFxd3dqb6b4xc6oIcpjEOHmeEhBpX
-	 dmCetSIj5nn+/SYbqCyuyAvG6jci9wtXtVTuZZDOEYdB0HXuYXbRa9ZDHm5Lmp01Wn
-	 r5iubS/x8CdxvannDKURLydegp32wTXgLzADxP6x8FisLpnmJ5M9EU3KsRogCcL05s
-	 wo5ejLnbbj5rg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 38FF839F76FF;
-	Fri,  4 Oct 2024 16:40:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728060195;
+	bh=bslI7aYrHHJa8ElMwroQ8QfyHxy5X8O4+eVvZQS74F4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CfvSajmqeTSFIiSU0753vgdvAgQKAsaJHk/CQx8jpEcYqR1mxR5xk03D+Qy/S3CLK
+	 6ynJ5j7OUiEo17Ilthyg//noj8Za4wskJb/ojjoADmwDFzAWO7EWut21qaiJgG3bk+
+	 9o7lLhZeS9/F20sINYztLr1tz1hTofGV3OJyuQnc58zif89rVqyxAh5y5w9Fo5sop5
+	 4gPI/3r3tyxv9W6BwCw05PiI+B3KhRvRzfnJ526d3cVId3GdDZhFtQcb6oKbpLy+t2
+	 0MvATDgxvvWq1x5OXMtHS7qDahWQmE4BAJOh77Q5i2LW50urOkos/nzqskw46rFBLP
+	 zDx1I6+feeu1g==
+Date: Fri, 4 Oct 2024 09:43:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: idosch@nvidia.com, aleksander.lobakin@intel.com, horms@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com,
+ gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
+ razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 03/12] net: tunnel: add
+ skb_vlan_inet_prepare_reason() helper
+Message-ID: <20241004094314.735bb69c@kernel.org>
+In-Reply-To: <20241001073225.807419-4-dongml2@chinatelecom.cn>
+References: <20241001073225.807419-1-dongml2@chinatelecom.cn>
+	<20241001073225.807419-4-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] net: switch to scoped
- device_for_each_child_node()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172806003601.2655854.2615122625428001113.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 16:40:36 +0000
-References: <20240930-net-device_for_each_child_node_scoped-v2-0-35f09333c1d7@gmail.com>
-In-Reply-To: <20240930-net-device_for_each_child_node_scoped-v2-0-35f09333c1d7@gmail.com>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- yisen.zhuang@huawei.com, salil.mehta@huawei.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue,  1 Oct 2024 15:32:16 +0800 Menglong Dong wrote:
+> -static inline bool skb_vlan_inet_prepare(struct sk_buff *skb,
+> -					 bool inner_proto_inherit)
+> +static inline enum skb_drop_reason
+> +skb_vlan_inet_prepare_reason(struct sk_buff *skb, bool inner_proto_inherit)
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 30 Sep 2024 22:38:24 +0200 you wrote:
-> This series switches from the device_for_each_child_node() macro to its
-> scoped variant. This makes the code more robust if new early exits are
-> added to the loops, because there is no need for explicit calls to
-> fwnode_handle_put(), which also simplifies existing code.
-> 
-> The non-scoped macros to walk over nodes turn error-prone as soon as
-> the loop contains early exits (break, goto, return), and patches to
-> fix them show up regularly, sometimes due to new error paths in an
-> existing loop [1].
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/2] net: mdio: thunder: switch to scoped device_for_each_child_node()
-    https://git.kernel.org/netdev/net-next/c/1d39d02a1535
-  - [net-next,v2,2/2] net: hns: hisilicon: hns_dsaf_mac: switch to scoped device_for_each_child_node()
-    https://git.kernel.org/netdev/net-next/c/e97dccd3e976
-
-You are awesome, thank you!
+this only has 5 callers, please convert them to expect a drop
+reason to be returned instead of adding a compatibility wrapper
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
