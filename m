@@ -1,151 +1,84 @@
-Return-Path: <netdev+bounces-132082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489CB990586
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:11:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4403099058C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E29BF1F2138F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:11:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD67C1F218D4
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174F1217300;
-	Fri,  4 Oct 2024 14:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CDBD216A1C;
+	Fri,  4 Oct 2024 14:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="buTDvLSk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DUZ4AC6b"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9B1E2141B2;
-	Fri,  4 Oct 2024 14:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1E4216A12;
+	Fri,  4 Oct 2024 14:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051049; cv=none; b=RtvNfiCtsw5uUZY7vSYyRuqoVb6qzY03gBoj+9Sab/jp/qnUzyvLADi0Sgirhwct9QCSIBE6pyOx5Ld7+kwuLDAI+2VZpSB2nSjZU8u4BtLeAH0APM7Y6Iz7qfih6Hrp9L3zQFWKVoGMfnpSSHVmBPf8w5fzWtOuievhthoDtxc=
+	t=1728051093; cv=none; b=IgWc/esvlYDpPUpRvBlxiq0z4zUfPbTRuWL1l3romzy1boUSlJ4XB/FZQDbEPqqMXCJ3DC4P/VyW86JUcDmqXldZwTYdbIPArgXY1v5Ql9uG530+GYf+SFp60KUdpYFhQnG06nCYCgUGzCniYA+MEZbbgeiH0KaPQgBoIVc6y98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051049; c=relaxed/simple;
-	bh=j5AlOQD2VWaaQ/2ZWxDwdHfV7PX7fB/Ru+TjZs8F8dQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DJPkqkX/wNZ1yh/z7tvL+GLz8b6auqtjhsGIkrk8PIfMfeg1jrg2w4U3GatbrUaSnkcP81viG3yKdXQP8F2wMOGgl2IuM4Hoku/GbpZVAVfu5zc5bAffnqJPIyr6Wac+rWxiLwtVxPmS7J4zh/3y1zubvYIlRGASMWiPkXyU7H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=buTDvLSk; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A4FD4240003;
-	Fri,  4 Oct 2024 14:10:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728051044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g3tL/ZAiQMNHzQXs84jjIGk7DdTJl4yNqKkW6ctCqjY=;
-	b=buTDvLSkl6l2LUhH7KKOwsGBDyKeuuuHDq0f4wO6l2o2hSDMVsUdFPVzSTmhHkh3Tl1bpV
-	0lDqrrk7QNSGkxxDA+FadIyKbTG8lZvgN49TstG1YkaRzYvQyq9YXRlG2jcEUmJDFqESoX
-	fuVTDF7J3Y3OzZ7u8RcNTID4ztzkGV6JL9nIHmPMcfAbYFzcezH4FIROdSL4aKosS8wEVB
-	5y3XKgjChfQY89xJbawS5uo8fsBLX6dIpoN4+xZqDstLYHANpO/p8O2O2y8mQb2QnyMsJf
-	xFWIbHDGwzcKlgb4ljYn53Io8ZB7Dd2YU6JGpm/7ryGbb9QZ/OaCaVQ7DpQZfw==
-Date: Fri, 4 Oct 2024 16:10:41 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 11/12] net: pse-pd: Add support for event
- reporting using devm_regulator_irq_helper
-Message-ID: <20241004161041.0eb3aad6@kmaincent-XPS-13-7390>
-In-Reply-To: <Zv_1ZzwQJ-P36mt6@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
-	<20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
-	<f56780af-b2d4-42d7-bc5d-c35b295d7c52@lunn.ch>
-	<20241003102806.084367ba@kmaincent-XPS-13-7390>
-	<f97baa90-1f76-4558-815a-ef4f82913c3a@lunn.ch>
-	<20241003153303.7cc6dba8@kmaincent-XPS-13-7390>
-	<4b9d1adf-e9bd-47c0-ac69-5da77fcf8d0b@lunn.ch>
-	<Zv_0ESPJgHKhFIwk@pengutronix.de>
-	<Zv_1ZzwQJ-P36mt6@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728051093; c=relaxed/simple;
+	bh=ArixIeJNDLPVCxRDxf27xxYe+gw/fjNd0rIJJG7+YT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HhpLRWoxuqFgEPw8r0i5XqeVIU4H/bViovYfKuk8rosNvNt/Jpi3+fyqEZNajgxLaw7XtQzWy1Cexl7jHSd7bamYWwvB5mwvcnv1QVVaopTZ/h8qoeNMCSvOagHhq+WaF4j0vK1dlllFsFdXatmInUNA8xZwiV9PATyWqCjXiQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DUZ4AC6b; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wtDLpt+mqO8smZV50WHaGdAClLGroyh7/DD4NF2nJN8=; b=DUZ4AC6biOzFlHzoRllc4EIRyF
+	0buHdCErToxxXOnMK5/aNk5ShMWbwmVlL0xLDEbqPuTZYcOpqcTcRFLE7bBTSV8nMjhN8aBlrgzAu
+	Mo/BUL4NoAlVOh9ZCNOKD6cFM14/V3usJ72DRFN1LrklUaCWUdmT3EX6IG8uiJD59XT0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swj1e-0093OX-1D; Fri, 04 Oct 2024 16:11:22 +0200
+Date: Fri, 4 Oct 2024 16:11:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Daniel Golle <daniel@makrotopia.org>,
+	stable@vger.kernel.org
+Subject: Re: [net PATCH 2/2] net: phy: Skip PHY LEDs OF registration for
+ Generic PHY driver
+Message-ID: <ce1feaa5-b9e0-4245-8e64-6e90bcf528eb@lunn.ch>
+References: <20241003221006.4568-1-ansuelsmth@gmail.com>
+ <20241003221006.4568-2-ansuelsmth@gmail.com>
+ <2dcd127d-ab41-4bf7-aea4-91f175443e62@lunn.ch>
+ <66ffb1c2.df0a0220.1b4c87.ce13@mx.google.com>
+ <a463ca8c-ebd7-4fd4-98a9-bc869a92548c@lunn.ch>
+ <66fff1c0.050a0220.f97fa.fec2@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66fff1c0.050a0220.f97fa.fec2@mx.google.com>
 
-On Fri, 4 Oct 2024 16:02:15 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> Ok I will squash this and the net-next patch and change to dbg.
+> 
+> Do you think it's still "net" content? I'm more tempted to post in
+> net-next since I have to drop the Generic PHY condition.
 
-> On Fri, Oct 04, 2024 at 03:56:33PM +0200, Oleksij Rempel wrote:
-> > On Thu, Oct 03, 2024 at 05:22:58PM +0200, Andrew Lunn wrote: =20
->  [...] =20
->  [...] =20
->  [...] =20
-> > >=20
-> > > I think we will need two event, the base regulator event, and a
-> > > networking event. Since it is a regulator, sending a normal regulator
-> > > event makes a lot of sense. But mapping that regulator event to a
-> > > netns:ifnam is going to be hard. Anything wanting to take an action is
-> > > probably going to want to use ethtool, and so needs to be in the
-> > > correct netns, etc. But it does get messy if there is some sort of
-> > > software driven prioritisation going on, some daemon needs to pick a
-> > > victim to reduce power to, and the interfaces are spread over multiple
-> > > network namespaces.
-> > >=20
-> > > What i don't know is if we can use an existing event, or we should add
-> > > a new one. Often rtnetlink_event() is used:
-> > >=20
-> > > https://elixir.bootlin.com/linux/v6.12-rc1/source/net/core/rtnetlink.=
-c#L6679
-> > >=20
-> > > but without some PSE information in it, it would be hard to know why
-> > > it was sent. So we probably either want a generic ethtool event, or a
-> > > PSE event. =20
-> >=20
-> > Hm... assuming we have following scenario:
-> >=20
-> >                                   .---------   PI 1
-> >                                  / .---------  PI 2
-> >                    .=3D=3D=3D=3D=3D=3D=3D=3D=3D PSE /----------( PI 3 )=
- NNS red
-> >                   //              \----------( PI 4 ) NNS blue
-> > Main supply      //                `---------( PI 5 ) NNS blue
-> > o=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=C2=B4--- System, CPU
-> >=20
-> > In this case we seems to have a new challenge:
-> >=20
-> > On one side, a system wide power manager should see and mange all ports.
-> > On other side, withing a name space, we should be able to play in a
-> > isolated sand box. There is a reason why it is isolated. So, we should
-> > be able to sandbox power delivery and port prios too. Means, by creating
-> > network names space, we will need a power names space.=20
-> >=20
-> > I can even imagine a use case: an admin limited access to a switch for
-> > developer. A developer name space is created with PSE budget and max
-> > prios available for this name space. This will prevent users from DoSing
-> > system critical ports.
-> >=20
-> > At this point, creating a power name space will an overkill for this
-> > patch set, so it should be enough to allow controlling prios over
-> > ethtool per port and isolation support if needed.=20
+Does it cause real problems for users? That is the requirement for
+stable.
 
-Yes, I will add simple ethtool notification for now to report events on each
-interfaces.
-
-> Oh, sorry, i'm too tired. Too many words are missing in my answer ...
-
-Nearly the weekend!! Rest well!
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+	Andrew
 
