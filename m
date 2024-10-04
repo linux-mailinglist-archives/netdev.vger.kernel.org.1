@@ -1,85 +1,83 @@
-Return-Path: <netdev+bounces-132229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B6499107B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:28:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0ED9910B0
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09A28282DC7
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21B271C22C85
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F771D89E6;
-	Fri,  4 Oct 2024 20:21:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71EC9231CB3;
+	Fri,  4 Oct 2024 20:35:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMQrydxu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2TDrwIBa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424901ADFEE
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 20:21:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18261231CA4;
+	Fri,  4 Oct 2024 20:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728073307; cv=none; b=XZt40/+SoTEGe+/3Kn6mFKnfjAh7LqQ0lUgvq/Hoxa2pWR4kwGui1FEB6bTA+bOlpIvKYyAOUD9gzxr+P0XDEdPbQKsCQKMGakfjVUK1WJnX0brYbnxMB/fLrzwW/Y71xfzwnrbi9PyJGarl4RJ8aReWA7qchf/h4MnzEMn76Tg=
+	t=1728074142; cv=none; b=Rh78xMnSxEOGodvwgIFfujpGO1ZdmCYggxiGIdlC8d/nkCyi3Uq/2HkyH0MCmHz1tTbS1S6NE6F1A0YRhmwIIqESZWWv+pRAYd6RjjsEwCXrZurb3OtZcOTtnmQup3leM6G9o1Ok51mNsnqL6OkgNZKPiOn4IpzbUHhwrsAPLxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728073307; c=relaxed/simple;
-	bh=CvTE9ISyfN8FGRxPvET32LdoFai78JMFlJAgZjx2CgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d3akRsk/wsMl6jVn8mDJ0Hvur5TMV49Xuimi84Hu+S/8RPMdaSzo+J4x9T/Y9R9oPsN4eq0TtAf+8hIAX0adANUTQab5qQFIhUfAR5RUbPh/3cPWDhSTfuWLQaHVPRmQse7kawgja7mwv3KFvw5o5EIOHcJVk0kg1QlsFu/BC+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMQrydxu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97FF5C4CEC6;
-	Fri,  4 Oct 2024 20:21:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728073306;
-	bh=CvTE9ISyfN8FGRxPvET32LdoFai78JMFlJAgZjx2CgU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FMQrydxuDDjPUPOgHnVHgX96F547jrutsG01zEVzwUtKsY46sn0IcMDmDEsV6DOHY
-	 zRozSd1x8syLIpkVlKKxsUrAennN7eBQJKNUeAehl8IZjlthZ7eotuuEIrn2KcUZg0
-	 gaF8Hxz82TK1GcJULelXreoA/Lif81Rrg9nYqTXiIKy6nwDhNl5Dq49f6UC0oo5sq2
-	 McuCzxem+HM5yF2aU/iWQmovMYDGlZHDkfn24KoGpPZfUTCYAVaBdltXEZ8SWIGVhn
-	 6lRtI3aOaKSO/WTGkavr/gzr/WENX1FX4Ay0LikZZ1EEVFY/c6OWZCKP3HN/xkV2Ki
-	 Cf6iKYptVEHBA==
-Date: Fri, 4 Oct 2024 13:21:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima
- <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 2/4] rtnetlink: Add per-netns RTNL.
-Message-ID: <20241004132145.7fd208e9@kernel.org>
-In-Reply-To: <20241002151240.49813-3-kuniyu@amazon.com>
-References: <20241002151240.49813-1-kuniyu@amazon.com>
-	<20241002151240.49813-3-kuniyu@amazon.com>
+	s=arc-20240116; t=1728074142; c=relaxed/simple;
+	bh=zGyBiRvoI71SsyL4uRGBiOT0mitVvV1IyrXM1hDl5YQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fPPmabiuPhVRalhkGAE1YGspG/Io1WWDD/bbdMQTlUkpR1GfEPzBmSl1025wL5NhOd28S1zQd8G7S0bPpnLoCyAQgupKttfUtnmGyYRrTXFRiB4kZ2YSEOrG+4f5Tm+O0gjcXhrFf2Xp9F6C6NpIAgSZXcMyRcaXeX2CJ9pE89I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2TDrwIBa; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v8Uq0AZE02RUmMAFTffegI1kLGdXyVjcV3kRxhMmnGg=; b=2TDrwIBa2YLQZYrPOTJA/oi8lN
+	f6qx2+vkOOG+NZ+yt1LHb6IbMpzYmxZjyN7MCiz1HVrgHPvzXLoURZhDYckfIuSFUSeoxjIp/2EIf
+	euSMfs1we5b7rO6/t9pVNYmJX+0TuAZaRikuD8EVP7RYWltHkqFU8NRQFGRzj/Iv6gDE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swp1K-0095gj-7V; Fri, 04 Oct 2024 22:35:26 +0200
+Date: Fri, 4 Oct 2024 22:35:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Tim Harvey <tharvey@gateworks.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4] net: dsa: mv88e6xxx: Support LED control
+Message-ID: <54922259-818f-425f-af47-cfa594a288e3@lunn.ch>
+References: <20241001-mv88e6xxx-leds-v4-1-cc11c4f49b18@linaro.org>
+ <20241004095403.1ce4e3b3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241004095403.1ce4e3b3@kernel.org>
 
-On Wed, 2 Oct 2024 08:12:38 -0700 Kuniyuki Iwashima wrote:
-> +#ifdef CONFIG_DEBUG_NET_SMALL_RTNL
-> +void __rtnl_net_lock(struct net *net);
-> +void __rtnl_net_unlock(struct net *net);
-> +void rtnl_net_lock(struct net *net);
-> +void rtnl_net_unlock(struct net *net);
-> +int rtnl_net_lock_cmp_fn(const struct lockdep_map *a, const struct lockdep_map *b);
-> +#else
-> +#define __rtnl_net_lock(net)
-> +#define __rtnl_net_unlock(net)
-> +#define rtnl_net_lock(net) rtnl_lock()
-> +#define rtnl_net_unlock(net) rtnl_unlock()
+On Fri, Oct 04, 2024 at 09:54:03AM -0700, Jakub Kicinski wrote:
+> On Tue, 01 Oct 2024 11:27:21 +0200 Linus Walleij wrote:
+> > This adds control over the hardware LEDs in the Marvell
+> > MV88E6xxx DSA switch and enables it for MV88E6352.
+> 
+> Hi Andrew, looks good now?
 
-Let's make sure net is always evaluated?
-At the very least make sure the preprocessor doesn't eat it completely
-otherwise we may end up with config-dependent "unused variable"
-warnings down the line.
+Sorry, drowning in patches. I just purged pretty much everything from
+Rosen Penev.
 
-> +#endif
--- 
-pw-bot: cr
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
