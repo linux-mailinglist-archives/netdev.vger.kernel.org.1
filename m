@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-131889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CCE298FE07
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:48:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B4098FE08
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:48:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2908280F01
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 07:48:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59D4281A77
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 07:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AC513D25E;
-	Fri,  4 Oct 2024 07:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BA313D50C;
+	Fri,  4 Oct 2024 07:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mHxfTecu"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dOSBo2JO"
 X-Original-To: netdev@vger.kernel.org
 Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B62F13BAC3;
-	Fri,  4 Oct 2024 07:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F5D13C67E;
+	Fri,  4 Oct 2024 07:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728028061; cv=none; b=tTlH6dVuZUz5zpCEQjWY9MUWgLpQj+FMnazHLXvPMMe5QzMeNiU+2AKlkwx6c5HoL/CGJkgYj0C2HoEePFzMhNXHfmIffV9MCAIhiDVn+WZs7zjzIhT5K3OUu6RGaiITgdR5xfTKlXteXgC351fC+nZEp18sn7Shd6veKfkHWEA=
+	t=1728028062; cv=none; b=rCXH2vu4gmD27UqQUO/GH2vWktME9msW1Z5LIFmmmMJ7dcC6XOmYJ5kS0LkopPVwhmOYMG/yAhs87wrcUKrOqAvoZXwKPvIZ9M+NZ85AHmaD6ejqCOw0eiv+hLKunp2zQWrjkgKweCDtgJ7jllzAovdSWUyfpCgZ74P50nvHQug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728028061; c=relaxed/simple;
-	bh=1e9EMzbOkCe8QeLgo321fC6JIOrshzvFhDmjxlTYQHU=;
+	s=arc-20240116; t=1728028062; c=relaxed/simple;
+	bh=ogfnyn8aVbdggxX75dDOrXpLj11g/IYarkUdcl1wQhI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JwbiMjDg8fTDbMGtu/zIx5+y2eUTPLaE/asq+187VGAlElVydpA9s2kvpD3/qGelZdHSbpS00DQlu8pl4+2hPC0Auwujm3riRmzUTHBtvHRI4PcZBDBta0YeQ2FPe0t4w7Cxk2CfXOe+NMpreYdVEpCm1y03AeTdp+1RVDy+Bo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=mHxfTecu; arc=none smtp.client-ip=198.47.23.249
+	 MIME-Version:Content-Type; b=A8lW6H6AqRFG8GGzZQXM0L0xNUpMBSZVQtv0ww+WBr4W29oboDtE0gkXCM3VnyKGipchb56kNOT6o74kCtv0+x8LVMe7o0PFQtxw++rkH+3wWf76IcjzzaKmqPXAbh8q5L7rRRM0ZL1vkKjdlygCQL2AWBCScPm/jznI7uFOSSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=dOSBo2JO; arc=none smtp.client-ip=198.47.23.249
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4947lLAC029262;
-	Fri, 4 Oct 2024 02:47:21 -0500
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4947lNMB029268;
+	Fri, 4 Oct 2024 02:47:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1728028041;
-	bh=F0r9YfXt8Uj1SHwj4YtWmhPuFbfRsQj+MfokUz9rqAs=;
+	s=ti-com-17Q1; t=1728028043;
+	bh=woTUeDDLgwnt6UPisVy+wckTDC3lNRN7L3Z6YUqS/fI=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=mHxfTecuZKLg9yI7YutXqdjxwCwToPVeUOOS1sViuPHtmk9wi900F5fWPniHxYki0
-	 4yaPSB1mJjI0bIYwzNo2jke7cd/7Daj9zYCDdtD36agU/FpNoXfGYcjaP46GASligO
-	 MVTZJPV9FtJFxTndGQChbSCdvPe+Qrjoe1+LxD0I=
-Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4947lLha035331
+	b=dOSBo2JOWMiDNbEnPuzEsSXqSiXIoTYjc/A3Pw9MTNNhi+CQLPK9d/A/CRq5xMRFd
+	 Uqbtl5esZAmU4/yI29mza00AFbhr65JV6cJX0oxfRjnJPc1HVctaR9l1GJT16RjfH2
+	 wXN0KfR3aah7oKgfEG7sbJ+olvr0N7fut0CTE3Ow=
+Received: from DLEE111.ent.ti.com (dlee111.ent.ti.com [157.170.170.22])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4947lNUI005545
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 4 Oct 2024 02:47:21 -0500
-Received: from DFLE110.ent.ti.com (10.64.6.31) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+	Fri, 4 Oct 2024 02:47:23 -0500
+Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 4
- Oct 2024 02:47:21 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ Oct 2024 02:47:23 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 4 Oct 2024 02:47:21 -0500
+ Frontend Transport; Fri, 4 Oct 2024 02:47:23 -0500
 Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4947lLI8071986;
-	Fri, 4 Oct 2024 02:47:21 -0500
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4947lN77010961;
+	Fri, 4 Oct 2024 02:47:23 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4947lKxV025142;
-	Fri, 4 Oct 2024 02:47:21 -0500
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4947lMIC025148;
+	Fri, 4 Oct 2024 02:47:22 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: <jiri@resnulli.us>, <aleksander.lobakin@intel.com>, <lukma@denx.de>,
         <horms@kernel.org>, <robh@kernel.org>, <jan.kiszka@siemens.com>,
@@ -70,9 +70,9 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>,
         Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next 2/3] net: hsr: Add VLAN CTAG filter support
-Date: Fri, 4 Oct 2024 13:17:14 +0530
-Message-ID: <20241004074715.791191-3-danishanwar@ti.com>
+Subject: [PATCH net-next 3/3] net: ti: icssg-prueth: Add VLAN support for HSR mode
+Date: Fri, 4 Oct 2024 13:17:15 +0530
+Message-ID: <20241004074715.791191-4-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241004074715.791191-1-danishanwar@ti.com>
 References: <20241004074715.791191-1-danishanwar@ti.com>
@@ -86,126 +86,89 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-From: Murali Karicheri <m-karicheri2@ti.com>
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
 
-This patch adds support for VLAN ctag based filtering at slave devices.
-The slave ethernet device may be capable of filtering ethernet packets
-based on VLAN ID. This requires that when the VLAN interface is created
-over an HSR/PRP interface, it passes the VID information to the
-associated slave ethernet devices so that it updates the hardware
-filters to filter ethernet frames based on VID. This patch adds the
-required functions to propagate the vid information to the slave
-devices.
+Add support for VLAN addition/deletion in HSR mode.
+In HSR mode, even if the host port is not a member of
+the VLAN domain, the slave ports should simply forward the
+frames. So allow forwarding of all VLAN frames in HSR mode.
 
-Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- net/hsr/hsr_device.c | 71 +++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 70 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 45 +++++++++++++++++++-
+ 1 file changed, 44 insertions(+), 1 deletion(-)
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index 0ca47ebb01d3..ff586bdc2bde 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -515,6 +515,68 @@ static void hsr_change_rx_flags(struct net_device *dev, int change)
- 	}
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+index 5fd9902ab181..a740ce084e21 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+@@ -808,6 +808,47 @@ static netdev_features_t emac_ndo_fix_features(struct net_device *ndev,
+ 	return features;
  }
  
-+static int hsr_ndo_vlan_rx_add_vid(struct net_device *dev,
-+				   __be16 proto, u16 vid)
-+{
-+	struct hsr_port *port;
-+	struct hsr_priv *hsr;
-+	int ret = 0;
-+
-+	hsr = netdev_priv(dev);
-+
-+	hsr_for_each_port(hsr, port) {
-+		if (port->type == HSR_PT_MASTER)
-+			continue;
-+
-+		ret = vlan_vid_add(port->dev, proto, vid);
-+		switch (port->type) {
-+		case HSR_PT_SLAVE_A:
-+			if (ret) {
-+				netdev_err(dev, "add vid failed for Slave-A\n");
-+				return ret;
-+			}
-+			break;
-+
-+		case HSR_PT_SLAVE_B:
-+			if (ret) {
-+				/* clean up Slave-A */
-+				netdev_err(dev, "add vid failed for Slave-B\n");
-+				vlan_vid_del(port->dev, proto, vid);
-+				return ret;
-+			}
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int hsr_ndo_vlan_rx_kill_vid(struct net_device *dev,
++static int emac_ndo_vlan_rx_add_vid(struct net_device *ndev,
 +				    __be16 proto, u16 vid)
 +{
-+	struct hsr_port *port;
-+	struct hsr_priv *hsr;
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
++	int untag_mask = 0;
++	int port_mask;
 +
-+	hsr = netdev_priv(dev);
++	if (prueth->is_hsr_offload_mode) {
++		port_mask = BIT(PRUETH_PORT_HOST) | BIT(emac->port_id);
++		untag_mask = 0;
 +
-+	hsr_for_each_port(hsr, port) {
-+		if (port->type == HSR_PT_MASTER)
-+			continue;
-+		switch (port->type) {
-+		case HSR_PT_SLAVE_A:
-+		case HSR_PT_SLAVE_B:
-+			vlan_vid_del(port->dev, proto, vid);
-+			break;
-+		default:
-+			break;
-+		}
++		netdev_dbg(emac->ndev, "VID add vid:%u port_mask:%X untag_mask %X\n",
++			   vid, port_mask, untag_mask);
++
++		icssg_vtbl_modify(emac, vid, port_mask, untag_mask, true);
++		icssg_set_pvid(emac->prueth, vid, emac->port_id);
 +	}
-+
 +	return 0;
 +}
 +
- static const struct net_device_ops hsr_device_ops = {
- 	.ndo_change_mtu = hsr_dev_change_mtu,
- 	.ndo_open = hsr_dev_open,
-@@ -523,6 +585,8 @@ static const struct net_device_ops hsr_device_ops = {
- 	.ndo_change_rx_flags = hsr_change_rx_flags,
- 	.ndo_fix_features = hsr_fix_features,
- 	.ndo_set_rx_mode = hsr_set_rx_mode,
-+	.ndo_vlan_rx_add_vid = hsr_ndo_vlan_rx_add_vid,
-+	.ndo_vlan_rx_kill_vid = hsr_ndo_vlan_rx_kill_vid,
++static int emac_ndo_vlan_rx_del_vid(struct net_device *ndev,
++				    __be16 proto, u16 vid)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
++	int untag_mask = 0;
++	int port_mask;
++
++	if (prueth->is_hsr_offload_mode) {
++		port_mask = BIT(PRUETH_PORT_HOST);
++		untag_mask = 0;
++
++		netdev_dbg(emac->ndev, "VID del vid:%u port_mask:%X untag_mask  %X\n",
++			   vid, port_mask, untag_mask);
++
++		icssg_vtbl_modify(emac, vid, port_mask, untag_mask, false);
++	}
++	return 0;
++}
++
+ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_open = emac_ndo_open,
+ 	.ndo_stop = emac_ndo_stop,
+@@ -820,6 +861,8 @@ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_get_stats64 = icssg_ndo_get_stats64,
+ 	.ndo_get_phys_port_name = icssg_ndo_get_phys_port_name,
+ 	.ndo_fix_features = emac_ndo_fix_features,
++	.ndo_vlan_rx_add_vid = emac_ndo_vlan_rx_add_vid,
++	.ndo_vlan_rx_kill_vid = emac_ndo_vlan_rx_del_vid,
  };
  
- static const struct device_type hsr_type = {
-@@ -569,7 +633,8 @@ void hsr_dev_setup(struct net_device *dev)
+ static int prueth_netdev_init(struct prueth *prueth,
+@@ -947,7 +990,7 @@ static int prueth_netdev_init(struct prueth *prueth,
+ 	ndev->netdev_ops = &emac_netdev_ops;
+ 	ndev->ethtool_ops = &icssg_ethtool_ops;
+ 	ndev->hw_features = NETIF_F_SG;
+-	ndev->features = ndev->hw_features;
++	ndev->features = ndev->hw_features | NETIF_F_HW_VLAN_CTAG_FILTER;
+ 	ndev->hw_features |= NETIF_PRUETH_HSR_OFFLOAD_FEATURES;
  
- 	dev->hw_features = NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HIGHDMA |
- 			   NETIF_F_GSO_MASK | NETIF_F_HW_CSUM |
--			   NETIF_F_HW_VLAN_CTAG_TX;
-+			   NETIF_F_HW_VLAN_CTAG_TX |
-+			   NETIF_F_HW_VLAN_CTAG_FILTER;
- 
- 	dev->features = dev->hw_features;
- }
-@@ -647,6 +712,10 @@ int hsr_dev_finalize(struct net_device *hsr_dev, struct net_device *slave[2],
- 	    (slave[1]->features & NETIF_F_HW_HSR_FWD))
- 		hsr->fwd_offloaded = true;
- 
-+	if ((slave[0]->features & NETIF_F_HW_VLAN_CTAG_FILTER) &&
-+	    (slave[1]->features & NETIF_F_HW_VLAN_CTAG_FILTER))
-+		hsr_dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
-+
- 	res = register_netdevice(hsr_dev);
- 	if (res)
- 		goto err_unregister;
+ 	netif_napi_add(ndev, &emac->napi_rx, icssg_napi_rx_poll);
 -- 
 2.34.1
 
