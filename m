@@ -1,78 +1,116 @@
-Return-Path: <netdev+bounces-132208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8724D990F97
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:03:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F7E8990F9E
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DF141F23047
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:03:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 409731C231EF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0BE1FBC80;
-	Fri,  4 Oct 2024 19:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF861D89F5;
+	Fri,  4 Oct 2024 19:16:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yst10O6w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lSNGHh4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE5F1ADFE1
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C481D89F9
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728069161; cv=none; b=IjnhUwUuToM+Ge5f60+WGzPHULm62WGahzuHDpcf4Xp6okwO4JZ3ra2V5DDbBvZ9w2k8q+nKgoaNaDxbRTnWXtgaV97Y44NFnYA9uWC/RBzV+mCpO6siPQ+AGaw+RDs0uYa15oGZhz9qMQZeqWjH7HMj3Z53sbbyfDvi9MusioQ=
+	t=1728069410; cv=none; b=Jzmuxjj28ue3dX0Ud9v40wh/on9xZ9tUZn4CZkK7opVjD1qUR39ciyBSl8zRvv21EzuigT/SZaMFuVBM+DZ5sJuCO22t6Pmr9+FVyMf/yEfwT4LeMjSuqBfAgA2brbjxivYITGQAHR4Ch8PZrU43HHK8qeiX/2WekLFk82/3Jt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728069161; c=relaxed/simple;
-	bh=WUtroShpx6IrK5IAoAcOFA5uuQ4g+v14bm9L8455ysw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lA3vC3qnbVfw2zbORQDJv4vn+rowTx6Jt7PG2CNV7JmTIxmOl9fAiLJdIOJT4UUCvS3pNHn9ALtcZWgdbksxseXBRffuflJ9lLhZcA59XHI6pkT0EieJt+TWBixpET5JoBS5OMA0b8z1PtqdoAsGYDwWnq2uHVkgGnb+koUUFjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yst10O6w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 686B4C4CEC6;
-	Fri,  4 Oct 2024 19:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728069161;
-	bh=WUtroShpx6IrK5IAoAcOFA5uuQ4g+v14bm9L8455ysw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yst10O6wDa1hlwv2aUScoPZ9Fl05jHplIpWfSZ4uHpNiMQMDYtTsxH4UOhxLIPPhB
-	 65hpRR4KnJc89wdNOIcgMM38jaSBow6JoLHwVzqGE9WX4Syi4/eMOLh6joyu4SZ7zO
-	 qMktvs6WTOjWgA0vDLThGjwwPcuUe4hRPm5bqI4mjsJZQoywGdfL5LlPRqhY05P43h
-	 8l0CCvywirnjuG5cdj4rJOkB1js97T2zbTzcmkiCJuEvpFjZWh2d21DdLIBxa4g50q
-	 t4LEjHBvMNOChE09CAzpD52pfBkt8fQf2y8vNFJga5hdrkN1LfGveAMndxk0Bh1Md3
-	 sUjvZkZuIeY3w==
-Date: Fri, 4 Oct 2024 12:12:40 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [TEST] forwarding: bridge_mld.sh flaky after the merge window
-Message-ID: <20241004121240.45358881@kernel.org>
-In-Reply-To: <20241004121116.1b9a2e5e@kernel.org>
-References: <20241004121116.1b9a2e5e@kernel.org>
+	s=arc-20240116; t=1728069410; c=relaxed/simple;
+	bh=tdaFK6Eccgum7vZ0jMS/79cdK4OfsNgqF5k7/DVC4BM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=kXLrGc4QSNQrGdsinYzdNld2mNkY0yPS0+wqW5c2rX0FrlkoeZ5gyXx3AiIty8UKtinDFXEFtUBFEh2n+4+EybR5myjUWDNVwxSGkhRiKPY++RIMBziaAr08d4qgMZwZXXK/o2+Bk0ryZf6R0OsyF6V7GyPHin+aYnrs32mHc0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lSNGHh4R; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6cb37b45f24so44949856d6.1
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 12:16:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728069408; x=1728674208; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=SwIu71OIlv6gaaL1ktIj4cy1/r5IUv8UVF++6I05wEQ=;
+        b=lSNGHh4RXBf0UML1O3iOkw63khUrzTn7xHTnDeYTr4mP0SJGt6C6Ir56jvit8VsHuD
+         hu/J9L4msBv8OBoHf9GpkyPS9tpQWtUzDdDQioRD+AUaKSRQs25gTC1p79BvPFfjTX2R
+         SveydybbQ5gl2Vh19JigX//slrsMm9+Td8C/GMUnOyRGl3esIYu50omO0DSMrWHDQAhU
+         9MeGf3p3wmC4u3id7mbPInT0MKqjVTVNqN8/T2Ns0WaUvKLHswHgvuVkA2lLT3Rs4cXt
+         qsMTPkxGvyYwhM+aJpOcBDOWVsluUtOMlW2Hbf0HWIRFoITkcqv5Fsv3TWdF6lzuSlPl
+         ylMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728069408; x=1728674208;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SwIu71OIlv6gaaL1ktIj4cy1/r5IUv8UVF++6I05wEQ=;
+        b=YgWEVUlKXvHQAYmkrFQYa5sa2JngiCqQxX62pd1u1vo51bPH13HzUFx6h2YUH+FHs4
+         9iXc/g4dGlHxQPtXF42Axpp3s4cHyAtz2zkhaYaeTBY7h9uuTZCf7fp1mCCPy2d42JvM
+         XPVJKU4PpvqTkH6m5BJQd6DU0GNXPuHEIr3zGcSo1Uw4tgSlVXZSrMyJ7Utb+cIzQ3s9
+         Bm5aDj2R0g/f6C84He9o7qIShsQA0+b4GA751Z5B8SRBHMfP66PcHSTbmNg5KYSw/Efv
+         PE/YDGC3SU/o6ZT8D8GMTsptiKkn9Vm/s+MqTskIYWWx/M9lg0ikXCSDy7ansi6yMUgb
+         8/ZA==
+X-Gm-Message-State: AOJu0Yz/LTQS3TPzPGUWWD2ZsLCVqezCSvjrCwvhHcWO26auPLNSG4Im
+	Oqw2RXU9m8GNaffdgm6MpUJgz7RwFDuJSSaVP1GEBFPil5pBU9Wa8QXhCcU2pq3Imi4x+uUL9F/
+	rdpioVKd2CA==
+X-Google-Smtp-Source: AGHT+IER84K4dDVZ19+UPcpLUvkt6zdpY1UiN8HGE5/jEztmWOcTwabK6wuyCrUwyP4+fY9POkMvwgbkcja7zA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:6214:5007:b0:6c5:88bf:b257 with SMTP
+ id 6a1803df08f44-6cb9af3dbe9mr739566d6.5.1728069407793; Fri, 04 Oct 2024
+ 12:16:47 -0700 (PDT)
+Date: Fri,  4 Oct 2024 19:16:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241004191644.1687638-1-edumazet@google.com>
+Subject: [PATCH net-next 0/5] tcp: add skb->sk to more control packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 4 Oct 2024 12:11:16 -0700 Jakub Kicinski wrote:
-> Hi Nik!
-> 
-> Looks like bridge_mld.sh got a little bit flaky after we pulled the
-> 6.12 merge window material (I'm just guessing it's the merge window
-> because it seems to have started last Thu after forwarding our trees):
-> 
-> # 240.89 [+21.95] TEST: MLDv2 group ff02::cc exclude timeout                          [FAIL]
-> # 240.89 [+0.00] Entry 2001:db8:1::2 has zero timer succeeded, but should have failed
-> 
-> https://netdev.bots.linux.dev/flakes.html?min-flip=0&tn-needle=bridge-mld-sh
-> https://netdev.bots.linux.dev/contest.html?executor=vmksft-forwarding-dbg&test=bridge-mld-sh
+Currently, TCP can set skb->sk for a variety of transmit packets.
 
-Hm, maybe the merge window is a coincidence, the IGMP test had been
-flaking in a similar way for a while:
+However, packets sent on behalf of a TIME_WAIT sockets do not
+have an attached socket.
 
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-forwarding-dbg&test=bridge-igmp-sh
+Same issue for RST packets.
+
+We want to change this, in order to increase eBPF program
+capabilities.
+
+This is slightly risky, because various layers could
+be confused by TIME_WAIT sockets showing up in skb->sk.
+
+Eric Dumazet (5):
+  net: add TIME_WAIT logic to sk_to_full_sk()
+  net_sched: sch_fq: prepare for TIME_WAIT sockets
+  net: add skb_set_owner_edemux() helper
+  ipv6: tcp: give socket pointer to control skbs
+  ipv4: tcp: give socket pointer to control skbs
+
+ include/net/inet_sock.h |  4 +++-
+ include/net/ip.h        |  3 ++-
+ include/net/sock.h      | 19 +++++++++++++++++++
+ net/core/sock.c         |  9 +++------
+ net/ipv4/ip_output.c    |  5 ++++-
+ net/ipv4/tcp_ipv4.c     |  4 ++--
+ net/ipv4/tcp_output.c   |  2 +-
+ net/ipv6/tcp_ipv6.c     |  3 +++
+ net/sched/sch_fq.c      |  3 ++-
+ 9 files changed, 39 insertions(+), 13 deletions(-)
+
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
+
 
