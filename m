@@ -1,182 +1,153 @@
-Return-Path: <netdev+bounces-132178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B93990B26
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:23:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE52990AD4
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13604284F40
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:23:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799991F20F0A
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE2321D2C4;
-	Fri,  4 Oct 2024 18:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVLy3iyJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBC5615B0FF;
+	Fri,  4 Oct 2024 18:17:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380321D2D0;
-	Fri,  4 Oct 2024 18:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8836B1E377A;
+	Fri,  4 Oct 2024 18:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728065944; cv=none; b=baQ7BU9ulflmX7wW1tCqjJ4xfa3G9wYnPTbM7z8EX7lbB5uhvLUqc5ftRGoYvF2lEs8/Jw6HPCL24tV8hFQ8QEQls1dWXEHxyvV/I9rMRfhAIfTbGJ5ZfCvoVBT3osuVO4Xt8CHNFzA14+RapagtkWuH/d+3qJhe4vW5ZmpN/ZE=
+	t=1728065836; cv=none; b=W+joByGUxkLmnvPROyBP8+sSjfIZ9Puw9zZlKPLQSp8S6NLCnrFvLQIPRsomOW+gzBm9Zd9YaTUMb4ABx6VO5OwJhJi7EoxFJM3S02+43dS2VR7e6r5PKCvzVGlEjHaE8254DUN9gBmS41drn8XBiGJGGzf/XhceT9IZXEWjvRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728065944; c=relaxed/simple;
-	bh=JYoz5QyUR2nx87bkEGYll65BNDFwgH7DXFukJfA4Qcw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=geznulhWh8IOR04oX7B5Re+4oTZ2Gd/spPsvZQMrw63F3W8mdMEZRvdA/hkyHyzedQ+/X3VnLhnnKN5ArK7MKU85Hhhuc1KoFAkkclTSoayhnwczMDR2StXWOkCAL2EcyYg9tzI1biJo+ePejO0HzcDjdfB11RQC3QklaEfGTLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVLy3iyJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 558E1C4CECC;
-	Fri,  4 Oct 2024 18:19:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728065944;
-	bh=JYoz5QyUR2nx87bkEGYll65BNDFwgH7DXFukJfA4Qcw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UVLy3iyJ+EN3NrCesaIgOf9WarhalOM+tTZwUx+6E7VDleP83fEokcIZ9oATx9Cgj
-	 /U+zQKQV9w1u5AHsD/IQ/QNpSkDIrIF3E3PuJOA5gZhZxPM0xJgXYXQ6x1IaO4uCcF
-	 ToTzYnSSc54aq3Ztb7Ifbacv9wctVETMKD0Vm2/yZzO49niqPm50h/L7LwA6C0WdCY
-	 1zD6Y7xzq8qbjHfXKFOuPqBeJ+k9tpWBHpPrT7blsifZ3z57PsnCD+4ySJHvzVnA5t
-	 D2FsRjFtYujAswBZnofACWV46YiJYPojRYVSqu3Hyu79i4zp1bDVJKPCRpyTw01MLp
-	 Y3IMibQVBvXmQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Xu Kuohai <xukuohai@huawei.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 20/76] bpf: Prevent tail call between progs attached to different hooks
-Date: Fri,  4 Oct 2024 14:16:37 -0400
-Message-ID: <20241004181828.3669209-20-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241004181828.3669209-1-sashal@kernel.org>
-References: <20241004181828.3669209-1-sashal@kernel.org>
+	s=arc-20240116; t=1728065836; c=relaxed/simple;
+	bh=+0QIs1lN858F6dyCNvNENg78JbK9LWa9tkRBTY11Skw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=R1uyiv/qyQvb9VQD//UeVNMVc5S+xVtyTzTAQVC0gnnfZTB6A+cPj1RJaPraLT0otvtJ+re68WqeeeHMqd3ZOqDkDhABh48l0krlIVjZwn4tfcYA9BoIOjDWfbFbWSw54GDQeDCcShKric0zAZJBLUwi2CWyazwVRFuWRm+puQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XKxYj5Gv2zySgr;
+	Sat,  5 Oct 2024 02:15:53 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id E8A4618007C;
+	Sat,  5 Oct 2024 02:17:04 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 5 Oct 2024 02:17:01 +0800
+Message-ID: <0774e9f1-994f-1131-17f9-7dd8eb96738f@huawei-partners.com>
+Date: Fri, 4 Oct 2024 21:16:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
+	<matthieu@buffet.re>
+References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
+ <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
+ <20241003.wie1aiphaeCh@digikod.net>
+ <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
+ <20241004.rel9ja7IeDo4@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241004.rel9ja7IeDo4@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-From: Xu Kuohai <xukuohai@huawei.com>
+On 10/4/2024 1:13 PM, Mickaël Salaün wrote:
+> On Fri, Oct 04, 2024 at 12:30:02AM +0300, Mikhail Ivanov wrote:
+>> On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
+>>> Please also add Matthieu in Cc for the network patch series.
+>>>
+>>> On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
+>>>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
+>>>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
+>>>> should not restrict bind(2) and connect(2) for non-TCP protocols
+>>>> (SCTP, MPTCP, SMC).
+>>>>
+>>>> Closes: https://github.com/landlock-lsm/linux/issues/40
+>>>> Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
+>>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>>>> ---
+>>>>    security/landlock/net.c | 2 +-
+>>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/security/landlock/net.c b/security/landlock/net.c
+>>>> index bc3d943a7118..6f59dd98bb13 100644
+>>>> --- a/security/landlock/net.c
+>>>> +++ b/security/landlock/net.c
+>>>> @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
+>>>>    		return -EACCES;
+>>>>    	/* Checks if it's a (potential) TCP socket. */
+>>>
+>>> We can extend this comment to explain that we don't use sk_is_tcp()
+>>> because we need to handle the AF_UNSPEC case.
+>>
+>> Indeed, I'll do this.
 
-[ Upstream commit 28ead3eaabc16ecc907cfb71876da028080f6356 ]
+I've noticed that we still should check sk->sk_family = AF_INET{,6}
+here (so sk_is_tcp() is suitable). AF_UNSPEC can be only related to
+addresses and we should not provide any checks (for address) if socket
+is unrestrictable (i.e. it's not TCP). It's not useful and might lead to
+error incosistency for non-TCP sockets.
 
-bpf progs can be attached to kernel functions, and the attached functions
-can take different parameters or return different return values. If
-prog attached to one kernel function tail calls prog attached to another
-kernel function, the ctx access or return value verification could be
-bypassed.
+Btw, I suppose we can improve error consistency by bringing more checks
+from INET/TCP stack. For example it may be useful to return EISCONN
+instead of EACCES while connect(2) is called on a connected socket.
 
-For example, if prog1 is attached to func1 which takes only 1 parameter
-and prog2 is attached to func2 which takes two parameters. Since verifier
-assumes the bpf ctx passed to prog2 is constructed based on func2's
-prototype, verifier allows prog2 to access the second parameter from
-the bpf ctx passed to it. The problem is that verifier does not prevent
-prog1 from passing its bpf ctx to prog2 via tail call. In this case,
-the bpf ctx passed to prog2 is constructed from func1 instead of func2,
-that is, the assumption for ctx access verification is bypassed.
+This should be done really carefully and only for some useful cases.
+Anyway it's not related to the current patch (since it's not a bug).
 
-Another example, if BPF LSM prog1 is attached to hook file_alloc_security,
-and BPF LSM prog2 is attached to hook bpf_lsm_audit_rule_known. Verifier
-knows the return value rules for these two hooks, e.g. it is legal for
-bpf_lsm_audit_rule_known to return positive number 1, and it is illegal
-for file_alloc_security to return positive number. So verifier allows
-prog2 to return positive number 1, but does not allow prog1 to return
-positive number. The problem is that verifier does not prevent prog1
-from calling prog2 via tail call. In this case, prog2's return value 1
-will be used as the return value for prog1's hook file_alloc_security.
-That is, the return value rule is bypassed.
+>>
+>>>
+>>>> -	if (sock->type != SOCK_STREAM)
+>>>> +	if (sock->type != SOCK_STREAM || sock->sk->sk_protocol != IPPROTO_TCP)
+>>>
+>>> I think we should check sock->sk->sk_type instead of sock->type (even if
+>>> it should be the same).  To make it simpler, we should only use sk in
+>>> current_check_access_socket():
+>>> struct sock *sk = sock->sk;
+>>
+>> Agreed.
+>>
+>>>
+>>> Could you please also do s/__sk_common\.skc_/sk_/g ?
+>>
+>> Ofc
+>>
+>> Btw, there is probably incorrect read of skc_family in this function
+>> [1]. I'll add READ_ONCE for sk->sk_family.
+>>
+>> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
+> 
+> I think it should not be a bug with the current code (IPv6 -> IPV4, and
+> socket vs. sock) but we should indeed use READ_ONCE() (and add this link
+> to the commit message).
 
-This patch adds restriction for tail call to prevent such bypasses.
+ok
 
-Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-Link: https://lore.kernel.org/r/20240719110059.797546-4-xukuohai@huaweicloud.com
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- include/linux/bpf.h |  1 +
- kernel/bpf/core.c   | 21 ++++++++++++++++++---
- 2 files changed, 19 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 3b94ec161e8cc..46873d9d86494 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -294,6 +294,7 @@ struct bpf_map {
- 	 * same prog type, JITed flag and xdp_has_frags flag.
- 	 */
- 	struct {
-+		const struct btf_type *attach_func_proto;
- 		spinlock_t lock;
- 		enum bpf_prog_type type;
- 		bool jited;
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index 7ee62e38faf0e..4e07cc057d6f2 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -2302,6 +2302,7 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
- {
- 	enum bpf_prog_type prog_type = resolve_prog_type(fp);
- 	bool ret;
-+	struct bpf_prog_aux *aux = fp->aux;
- 
- 	if (fp->kprobe_override)
- 		return false;
-@@ -2311,7 +2312,7 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
- 	 * in the case of devmap and cpumap). Until device checks
- 	 * are implemented, prohibit adding dev-bound programs to program maps.
- 	 */
--	if (bpf_prog_is_dev_bound(fp->aux))
-+	if (bpf_prog_is_dev_bound(aux))
- 		return false;
- 
- 	spin_lock(&map->owner.lock);
-@@ -2321,12 +2322,26 @@ bool bpf_prog_map_compatible(struct bpf_map *map,
- 		 */
- 		map->owner.type  = prog_type;
- 		map->owner.jited = fp->jited;
--		map->owner.xdp_has_frags = fp->aux->xdp_has_frags;
-+		map->owner.xdp_has_frags = aux->xdp_has_frags;
-+		map->owner.attach_func_proto = aux->attach_func_proto;
- 		ret = true;
- 	} else {
- 		ret = map->owner.type  == prog_type &&
- 		      map->owner.jited == fp->jited &&
--		      map->owner.xdp_has_frags == fp->aux->xdp_has_frags;
-+		      map->owner.xdp_has_frags == aux->xdp_has_frags;
-+		if (ret &&
-+		    map->owner.attach_func_proto != aux->attach_func_proto) {
-+			switch (prog_type) {
-+			case BPF_PROG_TYPE_TRACING:
-+			case BPF_PROG_TYPE_LSM:
-+			case BPF_PROG_TYPE_EXT:
-+			case BPF_PROG_TYPE_STRUCT_OPS:
-+				ret = false;
-+				break;
-+			default:
-+				break;
-+			}
-+		}
- 	}
- 	spin_unlock(&map->owner.lock);
- 
--- 
-2.43.0
-
+> 
+>>
+>>>
+>>>>    		return 0;
+>>>>    	/* Checks for minimal header length to safely read sa_family. */
+>>>> -- 
+>>>> 2.34.1
+>>>>
+>>>>
+>>
 
