@@ -1,103 +1,132 @@
-Return-Path: <netdev+bounces-131859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627C698FBC9
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:01:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71C0698FBE5
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 03:16:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ECFF282079
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:01:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C921F22CC9
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 01:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE951D5AB3;
-	Fri,  4 Oct 2024 01:01:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4520C17FE;
+	Fri,  4 Oct 2024 01:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MYMD4QOA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BWVnt93N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364D71862
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 01:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C6A1870;
+	Fri,  4 Oct 2024 01:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728003662; cv=none; b=i+v/dFsRqDPD0e76JW7V/8/MlROIWIjkaeKSRKCbrwLEfg3mbACqd82arbMU2qc4qkkvOJYGelEA11I6PoAGHA3WmKhlDer5aibKES/uuA1/mQuLfSoSQ2VRJHBzzc5L/sJYSwYuixtAlfTCmSZXTmbEuSPM21EHB+86jRAll40=
+	t=1728004463; cv=none; b=aRFf+MetZ78fody3tiaSI4AcYxf4QW2qz23gpQv5dZ3/YlpSiil93nEfXelTj3aF7rWgoeoCfEl13U3nQHTya6QImlvWYvGaWFbxKDf0qKi8y+mR4QvWaArfleOgBYnyd4xYno14ssgeFdwtPawQVEyRNfiFOjtWAemeDyUwiLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728003662; c=relaxed/simple;
-	bh=EYP8pSgM8E/aGc55smk0namPehCl8IaAj/HXUD/J7Aw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dJ7D6aBZvve9CclzP5VcJXrkTum5zA4TToI0tBcohbZG/Iq/hFDVnX43vdxnC2TogzlZy/GhbOw4scejnjxqnaNTE0YlfYNejFAEAw0S+OBBTAZPOeMf3Kd9B1D+e9G96SuX+aMbLKZYkGN7D6HB3e2s9/te4XQ9oWt9BdwC5Qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MYMD4QOA; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728003662; x=1759539662;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8vGMHm8S6n4bA0GeGT28M8Dr9U9LgqX6K0GMDsxw8hs=;
-  b=MYMD4QOA/2eCgnF/oUU8MVmJiYzTV435PLidYuabfALbmsW/Uw9FiSJI
-   adLrVqjtTTzjdF/8EF3pNiG4miJLyq8N8G1fXqgvck0zhRsccVUNdyUxs
-   cH7lkym7O2p0Hwgt/VjF0VDMU8nvB5vc4DbPNJ3DFefo9e/4E6CHT/Cbq
-   8=;
-X-IronPort-AV: E=Sophos;i="6.11,176,1725321600"; 
-   d="scan'208";a="339430159"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 01:01:00 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:60347]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.239:2525] with esmtp (Farcaster)
- id 1ab0cb2e-af65-47ec-8df1-2f723b07ef24; Fri, 4 Oct 2024 01:00:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 1ab0cb2e-af65-47ec-8df1-2f723b07ef24
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 4 Oct 2024 01:00:58 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.32) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 4 Oct 2024 01:00:56 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <jk@codeconstruct.com.au>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <matt@codeconstruct.com.au>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 4/6] mctp: Handle error of rtnl_register_module().
-Date: Thu, 3 Oct 2024 18:00:48 -0700
-Message-ID: <20241004010048.30542-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241003173928.55b74641@kernel.org>
-References: <20241003173928.55b74641@kernel.org>
+	s=arc-20240116; t=1728004463; c=relaxed/simple;
+	bh=m7Oas5tvrHfupQwzAwy/sYVnzVi8o8tPjsW++fKGZL0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=E7/DI2JpyldVY7Qx+vDyaKKixej33AgNajnBmcpYEIwHx9ETp1GqZVvwKkOZ4e21uZHZ6WgtzXRb48L/ri/ywYgufVpXMAXDWUBNnDOv4UgsujtU3xaexMJgGzUjDWdMOzevCV9pPuh9jjVNKMxSBwhHODv/HIWkz1KRpetpeeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BWVnt93N; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728004458;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=X2Ow6n9yG7Zu5N96hb8gmL3PUFGycoog6CmimF35atI=;
+	b=BWVnt93N3EPPLiO1TlE05Wy0X2IhGKF7RMvy6pif6m+Ioo6lW/EisEsNtDJWVhV6+7gR8H
+	1hpdM5bIAdBOpcelh6LrXjO7OiSaiPvtLaO6ZdNq/YV6ixg4zfH9PMSHFwKN3slH7P+N2l
+	FLbNSSyEM9WMLuvLmbDFam5Y1PfCJJ8=
+Date: Thu, 3 Oct 2024 18:14:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Subject: [Question]: A non NULL req->sk in tcp_rtx_synack. Not a fastopen
+ connection.
+To: Network Development <netdev@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, bpf <bpf@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 3 Oct 2024 17:39:28 -0700
-> On Thu, 3 Oct 2024 13:57:23 -0700 Kuniyuki Iwashima wrote:
-> > Since introduced, mctp has been ignoring the returned value
-> > of rtnl_register_module(), which could fail.
-> > 
-> > Let's handle the errors by rtnl_register_module_many().
-> > 
-> > Fixes: 583be982d934 ("mctp: Add device handling and netlink interface")
-> > Fixes: 831119f88781 ("mctp: Add neighbour netlink interface")
-> > Fixes: 06d2f4c583a7 ("mctp: Add netlink route management")
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-> Build's unhappy about the section markings:
-> 
-> WARNING: modpost: vmlinux: section mismatch in reference: mctp_init+0xb7 (section: .init.text) -> mctp_neigh_exit (section: .exit.text)
+Hi,
 
-Thanks for catching, will remove __exit from mctp_neigh_exit().
+We are seeing a use-after-free from a bpf prog attached to 
+trace_tcp_retransmit_synack. The program passes the req->sk to the 
+bpf_sk_storage_get_tracing kernel helper which does check for null before using it.
 
-BTW what option is needed to reproduce it ?
-I tried W=1 C=1 but didn't see that warning.
+fastopen is not used.
+
+We got a kfence report on use-after-free (pasted at the end). It is running with 
+an older 6.4 kernel and we hardly hit this in production.
+
+ From the upstream code, del_timer_sync() should have been done by 
+inet_csk_reqsk_queue_drop() before "req->sk = child;" is assigned in 
+inet_csk_reqsk_queue_add(). My understanding is the req->rsk_timer should have 
+been stopped before the "req->sk = child;" assignment.
+
+or there are cases that req->sk is not NULL in the reqsk_timer_handler()?
+
+BUG: KFENCE: use-after-free read in bpf_sk_storage_get_tracing+0x2e/0x1b0
+
+Use-after-free read at 0x00000000a891fb3a (in kfence-#1):
+bpf_sk_storage_get_tracing+0x2e/0x1b0
+bpf_prog_5ea3e95db6da0438_tcp_retransmit_synack+0x1d20/0x1dda
+bpf_trace_run2+0x4c/0xc0
+tcp_rtx_synack+0xf9/0x100
+reqsk_timer_handler+0xda/0x3d0
+run_timer_softirq+0x292/0x8a0
+irq_exit_rcu+0xf5/0x320
+sysvec_apic_timer_interrupt+0x6d/0x80
+asm_sysvec_apic_timer_interrupt+0x16/0x20
+intel_idle_irq+0x5a/0xa0
+cpuidle_enter_state+0x94/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+kfence-#1: 0x00000000a72cc7b6-0x00000000d97616d9, size=2376, cache=TCPv6
+
+allocated by task 0 on cpu 9 at 260507.901592s:
+sk_prot_alloc+0x35/0x140
+sk_clone_lock+0x1f/0x3f0
+inet_csk_clone_lock+0x15/0x160
+tcp_create_openreq_child+0x1f/0x410
+tcp_v6_syn_recv_sock+0x1da/0x700
+tcp_check_req+0x1fb/0x510
+tcp_v6_rcv+0x98b/0x1420
+ipv6_list_rcv+0x2258/0x26e0
+napi_complete_done+0x5b1/0x2990
+mlx5e_napi_poll+0x2ae/0x8d0
+net_rx_action+0x13e/0x590
+irq_exit_rcu+0xf5/0x320
+common_interrupt+0x80/0x90
+asm_common_interrupt+0x22/0x40
+cpuidle_enter_state+0xfb/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+freed by task 0 on cpu 9 at 260507.927527s:
+rcu_core_si+0x4ff/0xf10
+irq_exit_rcu+0xf5/0x320
+sysvec_apic_timer_interrupt+0x6d/0x80
+asm_sysvec_apic_timer_interrupt+0x16/0x20
+cpuidle_enter_state+0xfb/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+Thanks,
+Martin
 
