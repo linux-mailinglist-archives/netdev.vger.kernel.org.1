@@ -1,145 +1,118 @@
-Return-Path: <netdev+bounces-132011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6E499022C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:38:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DB0990229
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D794A1F23519
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:38:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 116121F242E7
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47911155733;
-	Fri,  4 Oct 2024 11:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC2E156C76;
+	Fri,  4 Oct 2024 11:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="WHKsleH9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HM5K76zq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-226.siemens.flowmailer.net (mta-65-226.siemens.flowmailer.net [185.136.65.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687B91EB2E
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 11:38:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA111EB2E;
+	Fri,  4 Oct 2024 11:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728041909; cv=none; b=GuPvYdGb4mOdPy/aEfNgVvLzYfvYNgw86YIArZ+uJQ+RWloIdE9HePaHYbxc/hN67BuiZ44ckomBWfn6l30s72m4cR7+IaBDqqPwlaVfeIYVIRQJQjlyc91wgql7xqljT+xg7rENLUtC5cwUl+F95+Ep9pG4rfQ75qKtFD5YWIc=
+	t=1728041859; cv=none; b=DFqdQMEkYddiAZMq5m5/pcYYpMbPpXvJ0lTo7OjsGgRqAr2s0YJ6n43tH9tPHORiaUGXGsjV8c8ASRaVl6OQX5zzQI42rZbbgQIXlMVhGXcGN19pe2KSWOqBSxWcsTm1t3Wsvu6ZXaf+e/4NHzUMlE0Wq2HrxkjBzyU0x69nA7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728041909; c=relaxed/simple;
-	bh=XYK+rw8xKpvXeMHQF1dKZ4ZWLocOBTDTEhfFjxONxGs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=K6R/e+8A0e6bq+o4HHZaeyGXcKY5qRL6H9ujGq663K+3EwT/gnPAwzIyB9myB7nOiOEsS+D3JictKUZbF6/no/H3PJ6lIq5VUKyNsjhM9k/ByiT5AgF/Sbtjw7otlEcLKv0LOhfZhaOp6qlEXgIZU6PuSYOib9dqtBUl2kaINAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=WHKsleH9; arc=none smtp.client-ip=185.136.65.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-226.siemens.flowmailer.net with ESMTPSA id 20241004113811d45e5f832dd3692756
-        for <netdev@vger.kernel.org>;
-        Fri, 04 Oct 2024 13:38:11 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=p+hfBwLXx/KXLHLVUc0TTdbArPb9R37LaZPFd1Db5Bw=;
- b=WHKsleH9xhLG3EFBw3hLLc7r5EM6tLFqMEp/EyuFuBgPIhM2+Zgbe4K5IB7JcULsBZJ8jg
- m1uWXySfXUWvP3qxiIdfMzc80H/iKIcV5y1wf0ZxSddRsDB0uvS7SwSX8fbUpG/th+l+KK3c
- AEBZO76REwZDbTTNpcgcpSrZrrEhETtTRwAigAWMOgxsuS/tMpUyd1JchSjngCmpSZPpPwz+
- luClHvrRNyZtHThQc5QmAK/6qYG91YkFw+kIrZuAZvJkeZDU/QoHO9HjMUsgF4y47mzNG0cT
- PLLUeNih9TqxjZEqL3wKPiIOTh26xt4Q5u4ZPPp71McAxkumQ7WkT5nA==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Anatolij Gustschin <agust@denx.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Subject: [PATCH net v4] net: dsa: lan9303: ensure chip reset and wait for READY status
-Date: Fri,  4 Oct 2024 13:36:54 +0200
-Message-ID: <20241004113655.3436296-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1728041859; c=relaxed/simple;
+	bh=rk740CcH2b030qs1gmhkNSFoyMfDASvIeoiLscAFh+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p5ZA/4Y3iyDj6c5CL9VqiZTZ5zkNVJdoZQ26tUmyQDwPNONgQQLaaxsmjnGY/x0INnxQuD8nTxDHcEruRkpenNE9vlVk8RipXiwcE/D7/qqvoqphR2FoxpLMFc2HhKxXkOWWd4OAYAODk3HZRqRekL2flyqGNC+yt71L7lpk8uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HM5K76zq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DA29C4CEC6;
+	Fri,  4 Oct 2024 11:37:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728041859;
+	bh=rk740CcH2b030qs1gmhkNSFoyMfDASvIeoiLscAFh+g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HM5K76zqjBvsXjjsqyi1So7XPf7ovHaCKZorvsUtyJu+zm5ll+KpKgtiwi9/k2FMJ
+	 R/b9R31CTBlxV8/Q7pfI1Wm3Lk3TO5tuYvgrRw5bpGVQyAvbyt+gaUm9D/OkMmasDK
+	 cdkxK1BO4RP+ns2bli9i/GDx6TQAIB/nZ7qwhjWMX6gLli1viK1MmwOGGYGEXQN13X
+	 1yvzsrAymMOoKrOTeb3yB/NL5w3MX2RMewrJ53tHP2szfuLKtzKXzZdOu20VN4Bpzz
+	 W/j0CJ6OHbBGH2lAzWX2W+A4Zqy1befXtj3wYT2VTvqlngYvCZxG1yRLObYxZOZKKT
+	 XwGqQOE5p2Yvg==
+Date: Fri, 4 Oct 2024 12:37:35 +0100
+From: Simon Horman <horms@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error
+ handling path in adin1110_read_fifo()
+Message-ID: <20241004113735.GF1310185@kernel.org>
+References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
 
-From: Anatolij Gustschin <agust@denx.de>
+On Thu, Oct 03, 2024 at 08:53:15PM +0200, Christophe JAILLET wrote:
+> If 'frame_size' is too small or if 'round_len' is an error code, it is
+> likely that an error code should be returned to the caller.
+> 
+> Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
+> 'success' is returned.
 
-Accessing device registers seems to be not reliable, the chip
-revision is sometimes detected wrongly (0 instead of expected 1).
+Hi Christophe,
 
-Ensure that the chip reset is performed via reset GPIO and then
-wait for 'Device Ready' status in HW_CFG register before doing
-any register initializations.
+I think we can say "'ret' will be 0".
+At least that is what my brief investigation tells me.
 
-Signed-off-by: Anatolij Gustschin <agust@denx.de>
-[alex: reworked using read_poll_timeout()]
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
-Changelog:
-v4: return read_poll_timeout() error unmodified
-v3: comment style, use "!ret" in stop condition, user-readable error code
-v2: use read_poll_timeout()
+> 
+> Return -EINVAL instead.
 
- drivers/net/dsa/lan9303-core.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+Please include some information on how this was found and tested.
+e.g.
 
-diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-index 268949939636a..d246f95d57ecf 100644
---- a/drivers/net/dsa/lan9303-core.c
-+++ b/drivers/net/dsa/lan9303-core.c
-@@ -6,6 +6,7 @@
- #include <linux/module.h>
- #include <linux/gpio/consumer.h>
- #include <linux/regmap.h>
-+#include <linux/iopoll.h>
- #include <linux/mutex.h>
- #include <linux/mii.h>
- #include <linux/of.h>
-@@ -839,6 +840,8 @@ static void lan9303_handle_reset(struct lan9303 *chip)
- 	if (!chip->reset_gpio)
- 		return;
- 
-+	gpiod_set_value_cansleep(chip->reset_gpio, 1);
-+
- 	if (chip->reset_duration != 0)
- 		msleep(chip->reset_duration);
- 
-@@ -864,8 +867,34 @@ static int lan9303_disable_processing(struct lan9303 *chip)
- static int lan9303_check_device(struct lan9303 *chip)
- {
- 	int ret;
-+	int err;
- 	u32 reg;
- 
-+	/* In I2C-managed configurations this polling loop will clash with
-+	 * switch's reading of EEPROM right after reset and this behaviour is
-+	 * not configurable. While lan9303_read() already has quite long retry
-+	 * timeout, seems not all cases are being detected as arbitration error.
-+	 *
-+	 * According to datasheet, EEPROM loader has 30ms timeout (in case of
-+	 * missing EEPROM).
-+	 *
-+	 * Loading of the largest supported EEPROM is expected to take at least
-+	 * 5.9s.
-+	 */
-+	err = read_poll_timeout(lan9303_read, ret,
-+				!ret && reg & LAN9303_HW_CFG_READY,
-+				20000, 6000000, false,
-+				chip->regmap, LAN9303_HW_CFG, &reg);
-+	if (ret) {
-+		dev_err(chip->dev, "failed to read HW_CFG reg: %pe\n",
-+			ERR_PTR(ret));
-+		return ret;
-+	}
-+	if (err) {
-+		dev_err(chip->dev, "HW_CFG not ready: 0x%08x\n", reg);
-+		return err;
-+	}
-+
- 	ret = lan9303_read(chip->regmap, LAN9303_CHIP_REV, &reg);
- 	if (ret) {
- 		dev_err(chip->dev, "failed to read chip revision register: %d\n",
+Found by inspection / Found using widget-ng.
+Compile tested only.
+
+> 
+> Fixes: bc93e19d088b ("net: ethernet: adi: Add ADIN1110 support")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> This patch is speculative.
+> If returning 0 is what was intended, then an explicit 0 would be better.
+
+In my brief investigation I see that adin1110_read_fifo()
+is only called by adin1110_read_frames(), like this:
+
+	while (budget) {
+		...
+
+		ret = adin1110_read_fifo(port_priv);
+		if (ret < 0)
+			return;
+
+		budget--;
+	}
+
+So the question becomes, should a failure in reading the fifo,
+because of an invalid frame size, be treated as an error
+and terminate reading frames.
+
+Like you, I speculate the answer is yes.
+But I think we need a bit more certainty to take this patch.
+
 -- 
-2.46.2
-
+pw-bot: under-review
 
