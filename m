@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-132138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287B79908CF
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:16:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFAEA9908D8
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:17:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 994741F21807
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:16:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1EB21F210CC
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891DD1C3056;
-	Fri,  4 Oct 2024 16:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61771C761D;
+	Fri,  4 Oct 2024 16:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Aj03KI7d"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f5qpaduI"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320411C302A;
-	Fri,  4 Oct 2024 16:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04BB1C305B;
+	Fri,  4 Oct 2024 16:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728058575; cv=none; b=lDtJliUhM7HJFMB3UqsZZOx736xylIBtMuQiUdSdo+eqUB21GJ8ouW4uiJtvPhHm5SaUZywkXpp2AoBvT+kvahzI4qwJQLTdsdRCoeU7Stcw1Jn16vh36YZEVVzt/vvMUiVJ+OG/LTUOBqogIG9Cbwm2tbpjIPnTehSJwdyqNWs=
+	t=1728058577; cv=none; b=e1pspe7+jTSkZdXpAoB+vmvuhK0BKHJJDXZ3n1Q+qOjHfrYNLFKEMTfKcEb+U0SeDizOBQByePV193IHTVH4M1jfb0PaJC8GbyJJ2aiztVjSRsUaFg6GlkTFkwxEHl42Cn2lomBeQeGNCq0okrvEUdIxdAY5FCR3lklIyl/B3O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728058575; c=relaxed/simple;
-	bh=cWiP3Kjqz/izcUhaTbZyZSDrw3J4YdbAhVr9h4xaE1g=;
+	s=arc-20240116; t=1728058577; c=relaxed/simple;
+	bh=FLiOKMSX1qX5t7E4RC3TaYm7ih/eICsTBamSnxEWTgw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d/jCyJ9anttXT7MqLEhS3xYIeF8dq4VUOXiINiFQ2XidCUt2szLx+6jEbRJ3ug0LiUfEX5qS/ItT+astjOVLFd9oy08saHBlToHdXNew+Jo/OvbLpOmYW1W7gYw4ral4w3uQpQGHptRU3jUTvk9uyGbKEbCwpZtYf8cVCw3yG14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Aj03KI7d; arc=none smtp.client-ip=217.70.183.200
+	 MIME-Version; b=tA8c/esoxFhX63g6kUExjef5htS0I0HCdhobg3RfBp4C3xP2elLFZdA7LYgO98R+UOz3RY+UOm40JdmH5qrFPbExtDNTryMthP8aSWxbdEWeQ3iamQKOD3Ws3mkxMLeXbbo1XQSrOn3j7EaFCoP+ma1yDRI92aKhfo8x7Lcth2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f5qpaduI; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8FB7320007;
-	Fri,  4 Oct 2024 16:16:05 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9E3C820005;
+	Fri,  4 Oct 2024 16:16:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728058566;
+	t=1728058567;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S1PpGNdeGt7JU4mNt5Ls+bwThFLcxi58wb3XDdywdCU=;
-	b=Aj03KI7dOrnnOhsIil95hZvWSRtFywE/A+1VNYi+kSo+khvYzUGUre4UCC5X6lmTSIH75w
-	n7G5wEb+VmwVnmGYBWnuvkmvaMYGUlM/lvdiYiMJXj0J3fC+M70tPAZ9rTRNSjt77XFDEu
-	JfAq2nOZNMcRJvghouT97Qss2WGkdHPBE7PAyWI4zGEiAw7KinuLn/cFb5wGcb6vtk6aQ0
-	kp0zV2cIBiRhTn9COyGVkcjXlMShYEn33x1Isb2oipWeZi69W9sYD4T/CZEu2aXHwpnqcI
-	oKL2lTWESARGKEnOmezOlI2VzAQISevE6ZI3/ojarFVsVRwJUozZaYr6oG+cSg==
+	bh=9/f6q5Qizdcop8Nrj7jLWs03QirLpkKjlSjLKs9Yhpc=;
+	b=f5qpaduI01vlyF6v0hnvsY7WPF8ShonKgNmMqew+TfsDwF9f+n7+hbTSBKMUZqYAgLi/aQ
+	UvqG/TyT7i7LWmG/E5W+gqpKCnRRy8cx7CIdlig2dVyUIwqtti2w8n5R76/5ce9l4HYJGP
+	EPpJKV9VKXsYQHP4WRxKC62HCojjcPhMRm5u8gohDq+6evu0E8mvvzzuFefY2gmZqKs9TG
+	w/0SGODav1K4neVE+bNqkk9dhlwozsqje/MKatUSngcjAi1StT9q/P7qTL2OTgL0aiHHJJ
+	gAgi02P3xXtlIaDDRDJxa7viWopiG5/AhzYDNLLYLyblLjuMTj+0a/rwyTiaiQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -64,10 +64,11 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH net-next v2 1/9] net: phy: allow isolating PHY devices
-Date: Fri,  4 Oct 2024 18:15:51 +0200
-Message-ID: <20241004161601.2932901-2-maxime.chevallier@bootlin.com>
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: [PATCH net-next v2 2/9] net: phy: Introduce phy_shutdown for device quiescence.
+Date: Fri,  4 Oct 2024 18:15:52 +0200
+Message-ID: <20241004161601.2932901-3-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.46.1
 In-Reply-To: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
 References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
@@ -80,211 +81,53 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The 802.3 specifications describes the isolation mode as setting the
-PHY's MII interface in high-impedance mode, thus isolating the PHY from
-that bus. This effectively breaks the link between the MAC and the PHY,
-but without necessarily disrupting the link between the PHY and the LP.
+When the hardware platform goes down for reboot, there's always the
+chance that the PHY device doesn't get reset, or fully reconfigured by
+the bootloader, which could rely on strap settings.
 
-This mode can be useful for testing purposes, but also when there are
-multiple PHYs on the same MII bus (a case that the 802.3 specification
-refers to).
+Therefore, when special modes from the PHY are being used, which could
+make it non-functional at reboot, introduce a phy_shutdown helper to
+pull the PHY out of the non-functional mode it is currently in.
 
-In Isolation mode, the PHY will still continue to respond to MDIO
-commands.
+Currently, this applies to the isolation mode.
 
-Introduce a helper to set the phy in an isolated mode.
-
+Suggested-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-V2 : No change
+V2 : New patch
 
- drivers/net/phy/phy_device.c | 76 +++++++++++++++++++++++++++++++++---
- include/linux/phy.h          |  4 ++
- 2 files changed, 74 insertions(+), 6 deletions(-)
+ drivers/net/phy/phy_device.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 560e338b307a..c468e72bef4b 100644
+index c468e72bef4b..a0d8ff995024 100644
 --- a/drivers/net/phy/phy_device.c
 +++ b/drivers/net/phy/phy_device.c
-@@ -2127,6 +2127,38 @@ int phy_loopback(struct phy_device *phydev, bool enable)
+@@ -3733,6 +3733,17 @@ static int phy_remove(struct device *dev)
+ 	return 0;
  }
- EXPORT_SYMBOL(phy_loopback);
  
-+int phy_isolate(struct phy_device *phydev, bool enable)
++static void phy_shutdown(struct device *dev)
 +{
-+	int ret = 0;
++	struct phy_device *phydev = to_phy_device(dev);
 +
-+	if (!phydev->drv)
-+		return -EIO;
-+
-+	mutex_lock(&phydev->lock);
-+
-+	if (enable && phydev->isolated) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	if (!enable && !phydev->isolated) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	ret = genphy_isolate(phydev, enable);
-+
-+	if (ret)
-+		goto out;
-+
-+	phydev->isolated = enable;
-+
-+out:
-+	mutex_unlock(&phydev->lock);
-+	return ret;
-+}
-+EXPORT_SYMBOL(phy_isolate);
-+
- /**
-  * phy_reset_after_clk_enable - perform a PHY reset if needed
-  * @phydev: target phy_device struct
-@@ -2280,7 +2312,7 @@ int genphy_setup_forced(struct phy_device *phydev)
- 	ctl = mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
- 
- 	return phy_modify(phydev, MII_BMCR,
--			  ~(BMCR_LOOPBACK | BMCR_ISOLATE | BMCR_PDOWN), ctl);
-+			  ~(BMCR_LOOPBACK | BMCR_PDOWN), ctl);
- }
- EXPORT_SYMBOL(genphy_setup_forced);
- 
-@@ -2369,8 +2401,11 @@ EXPORT_SYMBOL(genphy_read_master_slave);
-  */
- int genphy_restart_aneg(struct phy_device *phydev)
- {
--	/* Don't isolate the PHY if we're negotiating */
--	return phy_modify(phydev, MII_BMCR, BMCR_ISOLATE,
-+	u16 mask = phydev->isolated ? 0 : BMCR_ISOLATE;
-+	/* Don't isolate the PHY if we're negotiating, unless the PHY is
-+	 * explicitly isolated
++	/* If the PHY isn't reset and reconfigured by the bootloader, the PHY
++	 * will stay isolated. Make sure to un-isolate PHYs during shutdown.
 +	 */
-+	return phy_modify(phydev, MII_BMCR, mask,
- 			  BMCR_ANENABLE | BMCR_ANRESTART);
- }
- EXPORT_SYMBOL(genphy_restart_aneg);
-@@ -2394,7 +2429,8 @@ int genphy_check_and_restart_aneg(struct phy_device *phydev, bool restart)
- 		if (ret < 0)
- 			return ret;
- 
--		if (!(ret & BMCR_ANENABLE) || (ret & BMCR_ISOLATE))
-+		if (!(ret & BMCR_ANENABLE) ||
-+		    ((ret & BMCR_ISOLATE) && !phydev->isolated))
- 			restart = true;
- 	}
- 
-@@ -2495,7 +2531,8 @@ int genphy_c37_config_aneg(struct phy_device *phydev)
- 		if (ctl < 0)
- 			return ctl;
- 
--		if (!(ctl & BMCR_ANENABLE) || (ctl & BMCR_ISOLATE))
-+		if (!(ctl & BMCR_ANENABLE) ||
-+		    ((ctl & BMCR_ISOLATE) && !phydev->isolated))
- 			changed = 1; /* do restart aneg */
- 	}
- 
-@@ -2782,12 +2819,18 @@ EXPORT_SYMBOL(genphy_c37_read_status);
- int genphy_soft_reset(struct phy_device *phydev)
- {
- 	u16 res = BMCR_RESET;
-+	u16 mask = 0;
- 	int ret;
- 
- 	if (phydev->autoneg == AUTONEG_ENABLE)
- 		res |= BMCR_ANRESTART;
- 
--	ret = phy_modify(phydev, MII_BMCR, BMCR_ISOLATE, res);
 +	if (phydev->isolated)
-+		res |= BMCR_ISOLATE;
-+	else
-+		mask |= BMCR_ISOLATE;
-+
-+	ret = phy_modify(phydev, MII_BMCR, mask, res);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -2912,6 +2955,12 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
- 		u16 ctl = BMCR_LOOPBACK;
- 		int ret, val;
- 
-+		/* Isolating and looping-back the MII interface doesn't really
-+		 * make sense
-+		 */
-+		if (phydev->isolated)
-+			return -EINVAL;
-+
- 		ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
- 
- 		phy_modify(phydev, MII_BMCR, ~0, ctl);
-@@ -2924,6 +2973,8 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
- 	} else {
- 		phy_modify(phydev, MII_BMCR, BMCR_LOOPBACK, 0);
- 
-+		genphy_isolate(phydev, phydev->isolated);
-+
- 		phy_config_aneg(phydev);
- 	}
- 
-@@ -2931,6 +2982,19 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
- }
- EXPORT_SYMBOL(genphy_loopback);
- 
-+int genphy_isolate(struct phy_device *phydev, bool enable)
-+{
-+	u16 val = 0;
-+
-+	if (enable)
-+		val = BMCR_ISOLATE;
-+
-+	phy_modify(phydev, MII_BMCR, BMCR_ISOLATE, val);
-+
-+	return 0;
++		phy_isolate(phydev, false);
 +}
-+EXPORT_SYMBOL(genphy_isolate);
 +
  /**
-  * phy_remove_link_mode - Remove a supported link mode
-  * @phydev: phy_device structure to remove link mode from
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index a98bc91a0cde..ae33919aa0f5 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -573,6 +573,7 @@ struct macsec_ops;
-  * @mac_managed_pm: Set true if MAC driver takes of suspending/resuming PHY
-  * @wol_enabled: Set to true if the PHY or the attached MAC have Wake-on-LAN
-  * 		 enabled.
-+ * @isolated: Set to true if the PHY's MII has been isolated.
-  * @state: State of the PHY for management purposes
-  * @dev_flags: Device-specific flags used by the PHY driver.
-  *
-@@ -676,6 +677,7 @@ struct phy_device {
- 	unsigned is_on_sfp_module:1;
- 	unsigned mac_managed_pm:1;
- 	unsigned wol_enabled:1;
-+	unsigned isolated:1;
- 
- 	unsigned autoneg:1;
- 	/* The most recently read link state */
-@@ -1781,6 +1783,7 @@ int phy_suspend(struct phy_device *phydev);
- int phy_resume(struct phy_device *phydev);
- int __phy_resume(struct phy_device *phydev);
- int phy_loopback(struct phy_device *phydev, bool enable);
-+int phy_isolate(struct phy_device *phydev, bool enable);
- int phy_sfp_connect_phy(void *upstream, struct phy_device *phy);
- void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy);
- void phy_sfp_attach(void *upstream, struct sfp_bus *bus);
-@@ -1894,6 +1897,7 @@ int genphy_read_master_slave(struct phy_device *phydev);
- int genphy_suspend(struct phy_device *phydev);
- int genphy_resume(struct phy_device *phydev);
- int genphy_loopback(struct phy_device *phydev, bool enable);
-+int genphy_isolate(struct phy_device *phydev, bool enable);
- int genphy_soft_reset(struct phy_device *phydev);
- irqreturn_t genphy_handle_interrupt_no_ack(struct phy_device *phydev);
+  * phy_driver_register - register a phy_driver with the PHY layer
+  * @new_driver: new phy_driver to register
+@@ -3766,6 +3777,7 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
+ 	new_driver->mdiodrv.driver.bus = &mdio_bus_type;
+ 	new_driver->mdiodrv.driver.probe = phy_probe;
+ 	new_driver->mdiodrv.driver.remove = phy_remove;
++	new_driver->mdiodrv.driver.shutdown = phy_shutdown;
+ 	new_driver->mdiodrv.driver.owner = owner;
+ 	new_driver->mdiodrv.driver.probe_type = PROBE_FORCE_SYNCHRONOUS;
  
 -- 
 2.46.1
