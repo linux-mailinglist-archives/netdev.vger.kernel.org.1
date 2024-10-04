@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-132053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0644A990400
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:24:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07814990403
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2633E1C21FCD
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:24:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76C491F21544
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1FF21C17E;
-	Fri,  4 Oct 2024 13:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E7C2101BA;
+	Fri,  4 Oct 2024 13:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="laFo4JFi"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="dKqS/i6H"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED4D21948C;
-	Fri,  4 Oct 2024 13:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA13314B945;
+	Fri,  4 Oct 2024 13:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728048055; cv=none; b=JkgvZtzk0zTNPGDLlv37vVqWGAb9qLRvSRlhvbH6Xtwe/6n1YslV0ceEDp24l15nkpDJv+nbMxCerZJfvGFGtoGhSqTVcNUikbKGNQWftnenYPiXcPRDNPN5zAyvVtDvSjaRo3fKuroMlQ7+0dTFafxPbeHv2hcQYUB2UtwBpu4=
+	t=1728048083; cv=none; b=sGNpCiUsk+G5DEkA9NaDB9pzfEgo30JBfodrM5iHCIdOIJGt0eMZHfGW5MGgQU/QpK8M2j3A9DKhkin1XyYpneXKP17thukZ/GWX/ZkYYIdFRpLxI7JW2vnYRleuhzW4wAY9WNrptWuFRjhel6w0P2aiyUl1w0sPbmKFdGvBr68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728048055; c=relaxed/simple;
-	bh=7epCyCON/J3CUTA7QCN6jtv9rPCISXlwzHXvhgOq1q4=;
+	s=arc-20240116; t=1728048083; c=relaxed/simple;
+	bh=Pr2BVLxEaVeeRh1/VGWvln9oL7138T7rDQAIv3bh7Pw=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=Q5GtNGtxfPnQPoMmsdjbiMt6sfhrCL8XFFyLYQ7Iijvzc9LlZRevqwVuEkA2+y8LjxhLklmrF+iga5P0EJ7Vv2zMglnDpwSdRtq3JaWBiS2sRc1js5X6cHLjGXGqXdJjpqxA9zl7hHcjH0N8296XoIQe4l7YB9E/f1XgbEfcVCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=laFo4JFi; arc=none smtp.client-ip=68.232.153.233
+	 In-Reply-To:To:CC; b=p0doTreZXEhcchGUuCZtzsFDoLSx94zPChgmPg0o1M8Nz30ZcK7dsGHiH/K6liEU1zNaaKR7tsoWXrngoWo1NA3eF9SyURD0vNoi8MnOe1/XiBNvExyQOuvmU/DaM1dyUtpJLxFbmYBawyxB4WDjtld/z8JafRDAXITdD34Vmq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=dKqS/i6H; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1728048054; x=1759584054;
+  t=1728048081; x=1759584081;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=7epCyCON/J3CUTA7QCN6jtv9rPCISXlwzHXvhgOq1q4=;
-  b=laFo4JFi/rt+oj5JQvSvl0+NDiVNreKuAE4Ko1ncCD6zAvT/QPiiT8g+
-   tlO9PIyJNwgQwS8oSC+Digv3MGPfYp/BkbKf+s8tJQqBxk1cI7ePePTYO
-   RKIMox+Lyi+6GoLObOJo5jXXQgoo1TGKbJvCL45m/OWDzpYrfeQ7ts/jg
-   58NOu86Ko049x4xSFQAzBmHxoRtJd3PmR81O6h138aIdSDFTpJAZyZTAw
-   wo4zdM5ntcU/d0GXrphA2cnqtu+689LDvgxKWOsbIjpqiBgcYvsibgrIA
-   97O26C3s4fHH/w0mHFuGrH25FFYMpS065ZQdAM3seuiFJW1TaStM8DnBg
-   w==;
-X-CSE-ConnectionGUID: ijig+GXpR1+FjNkYwRnQGA==
-X-CSE-MsgGUID: TyAPDVAnR+eW0hv7+T4shA==
+  bh=Pr2BVLxEaVeeRh1/VGWvln9oL7138T7rDQAIv3bh7Pw=;
+  b=dKqS/i6HvgzUtqyCaLoo5ibvDrMqcEOSia7w43maifK19p8K0V5KN7Sq
+   jh6xsms2JbsErV22bDyC+ulJrR3V6LRdKw9zOY29WVQljkOahnHttRfPb
+   50fIiLFPolbgrfGIJnKbRQbikfIwJvd0ibGySc2uSjFJ2KA0Mo4Q4wUiX
+   zT5OSauT+rgDqct4o8ZDaD9Qc0NCdCNQZHLFh3e+JxEfnZl3nMkspa7hb
+   9GsiiglJ0V6NUHXxetIRKpxG1/8J+kgbtenwHXPpww8cKCTv2STW6BRzH
+   OsVdAhN9xj+IXmRhYJMUHkYt9A49iYICtb4niI1kopTTelRihgaG96V9Q
+   g==;
+X-CSE-ConnectionGUID: tl4kxetcSMSl+/bXMkMidw==
+X-CSE-MsgGUID: B8e5Hpb9T9eTkTpYVPs6KA==
 X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
-   d="scan'208";a="32602260"
+   d="scan'208";a="200042226"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2024 06:20:52 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2024 06:21:20 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 4 Oct 2024 06:20:47 -0700
+ 15.1.2507.35; Fri, 4 Oct 2024 06:20:50 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 4 Oct 2024 06:20:44 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 4 Oct 2024 06:20:47 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Fri, 4 Oct 2024 15:19:39 +0200
-Subject: [PATCH net-next v2 13/15] net: sparx5: ops out function for DSM
- calendar calculation
+Date: Fri, 4 Oct 2024 15:19:40 +0200
+Subject: [PATCH net-next v2 14/15] net: sparx5: add is_sparx5 macro and use
+ it throughout
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20241004-b4-sparx5-lan969x-switch-driver-v2-13-d3290f581663@microchip.com>
+Message-ID: <20241004-b4-sparx5-lan969x-switch-driver-v2-14-d3290f581663@microchip.com>
 References: <20241004-b4-sparx5-lan969x-switch-driver-v2-0-d3290f581663@microchip.com>
 In-Reply-To: <20241004-b4-sparx5-lan969x-switch-driver-v2-0-d3290f581663@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -85,142 +85,277 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-The DSM (Disassembler) calendar grants each port access to internal
-busses. The configuration of the calendar is done differently on Sparx5
-and lan969x. Therefore ops out the function that calculates the
-calendar.
+We dont want to ops out each time a function needs to do some platform
+specifics. In particular we have a few places, where it would be
+convenient to just branch out on the platform type. Add the function
+is_sparx5() and, initially, use it for:
+
+    - register writes that should only be done on Sparx5 (QSYS_CAL_CTRL,
+      CLKGEN_LCPLL1_CORE_CLK).
+
+    - function calls that should only be done on Sparx5
+      (ethtool_op_get_ts_info())
+
+    - register writes that are chip-exclusive (MASK_CFG1/2, PGID_CFG1/2,
+      these are replicated for n_ports >32 on Sparx5).
+
+The is_sparx5() function simply checks the target chip type, to
+determine if this is a Sparx5 SKU or not.
 
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
- .../ethernet/microchip/sparx5/sparx5_calendar.c    | 22 ++++------------------
- .../net/ethernet/microchip/sparx5/sparx5_main.c    |  1 +
- .../net/ethernet/microchip/sparx5/sparx5_main.h    | 21 +++++++++++++++++++++
- 3 files changed, 26 insertions(+), 18 deletions(-)
+ .../ethernet/microchip/sparx5/sparx5_calendar.c    |  7 +-
+ .../net/ethernet/microchip/sparx5/sparx5_ethtool.c |  2 +-
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    | 88 +++++++++++++---------
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |  3 +
+ .../net/ethernet/microchip/sparx5/sparx5_vlan.c    | 42 +++++++----
+ 5 files changed, 90 insertions(+), 52 deletions(-)
 
 diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
-index 9b54d952e91a..6b9565e0fd7b 100644
+index 6b9565e0fd7b..63f6c5484fdb 100644
 --- a/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
 +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_calendar.c
-@@ -15,9 +15,7 @@
- #define SPX5_CALBITS_PER_PORT          3   /* Bit per port in calendar register */
+@@ -194,9 +194,10 @@ int sparx5_config_auto_calendar(struct sparx5 *sparx5)
+ 	}
  
- /* DSM calendar information */
--#define SPX5_DSM_CAL_LEN               64
- #define SPX5_DSM_CAL_EMPTY             0xFFFF
--#define SPX5_DSM_CAL_MAX_DEVS_PER_TAXI 13
- #define SPX5_DSM_CAL_TAXIS             8
- #define SPX5_DSM_CAL_BW_LOSS           553
+ 	/* Halt the calendar while changing it */
+-	spx5_rmw(QSYS_CAL_CTRL_CAL_MODE_SET(10),
+-		 QSYS_CAL_CTRL_CAL_MODE,
+-		 sparx5, QSYS_CAL_CTRL);
++	if (is_sparx5(sparx5))
++		spx5_rmw(QSYS_CAL_CTRL_CAL_MODE_SET(10),
++			 QSYS_CAL_CTRL_CAL_MODE,
++			 sparx5, QSYS_CAL_CTRL);
  
-@@ -37,19 +35,6 @@ static u32 sparx5_taxi_ports[SPX5_DSM_CAL_TAXIS][SPX5_DSM_CAL_MAX_DEVS_PER_TAXI]
- 	{64, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99, 99},
- };
+ 	/* Assign port bandwidth to auto calendar */
+ 	for (idx = 0; idx < consts->n_auto_cals; idx++)
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_ethtool.c b/drivers/net/ethernet/microchip/sparx5/sparx5_ethtool.c
+index 4c6375872f82..832f4ae57c83 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_ethtool.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_ethtool.c
+@@ -1189,7 +1189,7 @@ static int sparx5_get_ts_info(struct net_device *dev,
+ 	struct sparx5 *sparx5 = port->sparx5;
+ 	struct sparx5_phc *phc;
  
--struct sparx5_calendar_data {
--	u32 schedule[SPX5_DSM_CAL_LEN];
--	u32 avg_dist[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
--	u32 taxi_ports[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
--	u32 taxi_speeds[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
--	u32 dev_slots[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
--	u32 new_slots[SPX5_DSM_CAL_LEN];
--	u32 temp_sched[SPX5_DSM_CAL_LEN];
--	u32 indices[SPX5_DSM_CAL_LEN];
--	u32 short_list[SPX5_DSM_CAL_LEN];
--	u32 long_list[SPX5_DSM_CAL_LEN];
--};
--
- static u32 sparx5_target_bandwidth(struct sparx5 *sparx5)
- {
- 	switch (sparx5->target_ct) {
-@@ -279,8 +264,8 @@ static u32 sparx5_dsm_cp_cal(u32 *sched)
- 	return SPX5_DSM_CAL_EMPTY;
- }
+-	if (!sparx5->ptp)
++	if (!sparx5->ptp && is_sparx5(sparx5))
+ 		return ethtool_op_get_ts_info(dev, info);
  
--static int sparx5_dsm_calendar_calc(struct sparx5 *sparx5, u32 taxi,
--				    struct sparx5_calendar_data *data)
-+int sparx5_dsm_calendar_calc(struct sparx5 *sparx5, u32 taxi,
-+			     struct sparx5_calendar_data *data)
- {
- 	bool slow_mode;
- 	u32 gcd, idx, sum, min, factor;
-@@ -566,6 +551,7 @@ static int sparx5_dsm_calendar_update(struct sparx5 *sparx5, u32 taxi,
- /* Configure the DSM calendar based on port configuration */
- int sparx5_config_dsm_calendar(struct sparx5 *sparx5)
- {
-+	const struct sparx5_ops *ops = sparx5->data->ops;
- 	int taxi;
- 	struct sparx5_calendar_data *data;
- 	int err = 0;
-@@ -575,7 +561,7 @@ int sparx5_config_dsm_calendar(struct sparx5 *sparx5)
- 		return -ENOMEM;
- 
- 	for (taxi = 0; taxi < sparx5->data->consts->n_dsm_cal_taxis; ++taxi) {
--		err = sparx5_dsm_calendar_calc(sparx5, taxi, data);
-+		err = ops->dsm_calendar_calc(sparx5, taxi, data);
- 		if (err) {
- 			dev_err(sparx5->dev, "DSM calendar calculation failed\n");
- 			goto cal_out;
+ 	phc = &sparx5->phc[SPARX5_PHC_PORT];
 diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-index 393ee5116004..78791c7a9849 100644
+index 78791c7a9849..74b9b2b0a9cb 100644
 --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
 +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
-@@ -995,6 +995,7 @@ static const struct sparx5_ops sparx5_ops = {
- 	.get_sdlb_group          = &sparx5_get_sdlb_group,
- 	.set_port_mux            = &sparx5_port_mux_set,
- 	.ptp_irq_handler         = &sparx5_ptp_irq_handler,
-+	.dsm_calendar_calc       = &sparx5_dsm_calendar_calc,
+@@ -208,6 +208,25 @@ static const struct sparx5_main_io_resource sparx5_main_iomap[] =  {
+ 	{ TARGET_VOP,                0x11a00000, 2 }, /* 0x611a00000 */
  };
  
- static const struct sparx5_match_data sparx5_desc = {
++bool is_sparx5(struct sparx5 *sparx5)
++{
++	switch (sparx5->target_ct) {
++	case SPX5_TARGET_CT_7546:
++	case SPX5_TARGET_CT_7549:
++	case SPX5_TARGET_CT_7552:
++	case SPX5_TARGET_CT_7556:
++	case SPX5_TARGET_CT_7558:
++	case SPX5_TARGET_CT_7546TSN:
++	case SPX5_TARGET_CT_7549TSN:
++	case SPX5_TARGET_CT_7552TSN:
++	case SPX5_TARGET_CT_7556TSN:
++	case SPX5_TARGET_CT_7558TSN:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static int sparx5_create_targets(struct sparx5 *sparx5)
+ {
+ 	const struct sparx5_main_io_resource *iomap = sparx5->data->iomap;
+@@ -462,44 +481,45 @@ static int sparx5_init_coreclock(struct sparx5 *sparx5)
+ 		return -ENODEV;
+ 	}
+ 
+-	switch (freq) {
+-	case SPX5_CORE_CLOCK_250MHZ:
+-		clk_div = 10;
+-		pol_upd_int = 312;
+-		break;
+-	case SPX5_CORE_CLOCK_500MHZ:
+-		clk_div = 5;
+-		pol_upd_int = 624;
+-		break;
+-	case SPX5_CORE_CLOCK_625MHZ:
+-		clk_div = 4;
+-		pol_upd_int = 780;
+-		break;
+-	default:
+-		dev_err(sparx5->dev, "%d coreclock not supported on (%#04x)\n",
+-			sparx5->coreclock, sparx5->target_ct);
+-		return -EINVAL;
++	if (is_sparx5(sparx5)) {
++		switch (freq) {
++		case SPX5_CORE_CLOCK_250MHZ:
++			clk_div = 10;
++			pol_upd_int = 312;
++			break;
++		case SPX5_CORE_CLOCK_500MHZ:
++			clk_div = 5;
++			pol_upd_int = 624;
++			break;
++		case SPX5_CORE_CLOCK_625MHZ:
++			clk_div = 4;
++			pol_upd_int = 780;
++			break;
++		default:
++			dev_err(sparx5->dev,
++				"%d coreclock not supported on (%#04x)\n",
++				sparx5->coreclock, sparx5->target_ct);
++			return -EINVAL;
++		}
++
++		/* Configure the LCPLL */
++		spx5_rmw(CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_DIV_SET(clk_div) |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_PRE_DIV_SET(0) |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_DIR_SET(0) |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_SEL_SET(0) |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_ENA_SET(0) |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_ENA_SET(1),
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_DIV |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_PRE_DIV |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_DIR |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_SEL |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_ENA |
++			 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_ENA,
++			 sparx5, CLKGEN_LCPLL1_CORE_CLK_CFG);
+ 	}
+ 
+ 	/* Update state with chosen frequency */
+ 	sparx5->coreclock = freq;
+-
+-	/* Configure the LCPLL */
+-	spx5_rmw(CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_DIV_SET(clk_div) |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_PRE_DIV_SET(0) |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_DIR_SET(0) |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_SEL_SET(0) |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_ENA_SET(0) |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_ENA_SET(1),
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_DIV |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_PRE_DIV |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_DIR |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_SEL |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_ROT_ENA |
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG_CORE_CLK_ENA,
+-		 sparx5,
+-		 CLKGEN_LCPLL1_CORE_CLK_CFG);
+-
+ 	clk_period = sparx5_clk_period(freq);
+ 
+ 	spx5_rmw(HSCH_SYS_CLK_PER_100PS_SET(clk_period / 100),
 diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-index cc8ab91d9805..f21ec878b9a8 100644
+index f21ec878b9a8..fb179088588a 100644
 --- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
 +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.h
-@@ -101,8 +101,24 @@ enum sparx5_vlan_port_type {
- #define IFH_PDU_TYPE_IPV4_UDP_PTP	0x6
- #define IFH_PDU_TYPE_IPV6_UDP_PTP	0x7
- 
-+#define SPX5_DSM_CAL_LEN               64
-+#define SPX5_DSM_CAL_MAX_DEVS_PER_TAXI 13
-+
- struct sparx5;
- 
-+struct sparx5_calendar_data {
-+	u32 schedule[SPX5_DSM_CAL_LEN];
-+	u32 avg_dist[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
-+	u32 taxi_ports[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
-+	u32 taxi_speeds[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
-+	u32 dev_slots[SPX5_DSM_CAL_MAX_DEVS_PER_TAXI];
-+	u32 new_slots[SPX5_DSM_CAL_LEN];
-+	u32 temp_sched[SPX5_DSM_CAL_LEN];
-+	u32 indices[SPX5_DSM_CAL_LEN];
-+	u32 short_list[SPX5_DSM_CAL_LEN];
-+	u32 long_list[SPX5_DSM_CAL_LEN];
-+};
-+
- /* Frame DMA receive state:
-  * For each DB, there is a SKB, and the skb data pointer is mapped in
-  * the DB. Once a frame is received the skb is given to the upper layers
-@@ -271,6 +287,8 @@ struct sparx5_ops {
- 			    struct sparx5_port_config *conf);
- 
- 	irqreturn_t (*ptp_irq_handler)(int irq, void *args);
-+	int (*dsm_calendar_calc)(struct sparx5 *sparx5, u32 taxi,
-+				 struct sparx5_calendar_data *data);
+@@ -376,6 +376,9 @@ struct sparx5 {
+ 	const struct sparx5_match_data *data;
  };
  
- struct sparx5_main_io_resource {
-@@ -418,6 +436,9 @@ void sparx5_vlan_port_apply(struct sparx5 *sparx5, struct sparx5_port *port);
- /* sparx5_calendar.c */
- int sparx5_config_auto_calendar(struct sparx5 *sparx5);
- int sparx5_config_dsm_calendar(struct sparx5 *sparx5);
-+int sparx5_dsm_calendar_calc(struct sparx5 *sparx5, u32 taxi,
-+			     struct sparx5_calendar_data *data);
++/* sparx5_main.c */
++bool is_sparx5(struct sparx5 *sparx5);
 +
+ /* sparx5_switchdev.c */
+ int sparx5_register_notifier_blocks(struct sparx5 *sparx5);
+ void sparx5_unregister_notifier_blocks(struct sparx5 *sparx5);
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
+index f5708f4f17c8..80d2d3e8f458 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vlan.c
+@@ -16,8 +16,10 @@ static int sparx5_vlant_set_mask(struct sparx5 *sparx5, u16 vid)
  
- /* sparx5_ethtool.c */
- void sparx5_get_stats64(struct net_device *ndev, struct rtnl_link_stats64 *stats);
+ 	/* Output mask to respective registers */
+ 	spx5_wr(mask[0], sparx5, ANA_L3_VLAN_MASK_CFG(vid));
+-	spx5_wr(mask[1], sparx5, ANA_L3_VLAN_MASK_CFG1(vid));
+-	spx5_wr(mask[2], sparx5, ANA_L3_VLAN_MASK_CFG2(vid));
++	if (is_sparx5(sparx5)) {
++		spx5_wr(mask[1], sparx5, ANA_L3_VLAN_MASK_CFG1(vid));
++		spx5_wr(mask[2], sparx5, ANA_L3_VLAN_MASK_CFG2(vid));
++	}
+ 
+ 	return 0;
+ }
+@@ -141,15 +143,19 @@ void sparx5_pgid_update_mask(struct sparx5_port *port, int pgid, bool enable)
+ void sparx5_pgid_clear(struct sparx5 *spx5, int pgid)
+ {
+ 	spx5_wr(0, spx5, ANA_AC_PGID_CFG(pgid));
+-	spx5_wr(0, spx5, ANA_AC_PGID_CFG1(pgid));
+-	spx5_wr(0, spx5, ANA_AC_PGID_CFG2(pgid));
++	if (is_sparx5(spx5)) {
++		spx5_wr(0, spx5, ANA_AC_PGID_CFG1(pgid));
++		spx5_wr(0, spx5, ANA_AC_PGID_CFG2(pgid));
++	}
+ }
+ 
+ void sparx5_pgid_read_mask(struct sparx5 *spx5, int pgid, u32 portmask[3])
+ {
+ 	portmask[0] = spx5_rd(spx5, ANA_AC_PGID_CFG(pgid));
+-	portmask[1] = spx5_rd(spx5, ANA_AC_PGID_CFG1(pgid));
+-	portmask[2] = spx5_rd(spx5, ANA_AC_PGID_CFG2(pgid));
++	if (is_sparx5(spx5)) {
++		portmask[1] = spx5_rd(spx5, ANA_AC_PGID_CFG1(pgid));
++		portmask[2] = spx5_rd(spx5, ANA_AC_PGID_CFG2(pgid));
++	}
+ }
+ 
+ void sparx5_update_fwd(struct sparx5 *sparx5)
+@@ -164,8 +170,10 @@ void sparx5_update_fwd(struct sparx5 *sparx5)
+ 	/* Update flood masks */
+ 	for (port = PGID_UC_FLOOD; port <= PGID_BCAST; port++) {
+ 		spx5_wr(mask[0], sparx5, ANA_AC_PGID_CFG(port));
+-		spx5_wr(mask[1], sparx5, ANA_AC_PGID_CFG1(port));
+-		spx5_wr(mask[2], sparx5, ANA_AC_PGID_CFG2(port));
++		if (is_sparx5(sparx5)) {
++			spx5_wr(mask[1], sparx5, ANA_AC_PGID_CFG1(port));
++			spx5_wr(mask[2], sparx5, ANA_AC_PGID_CFG2(port));
++		}
+ 	}
+ 
+ 	/* Update SRC masks */
+@@ -176,12 +184,16 @@ void sparx5_update_fwd(struct sparx5 *sparx5)
+ 			clear_bit(port, workmask);
+ 			bitmap_to_arr32(mask, workmask, SPX5_PORTS);
+ 			spx5_wr(mask[0], sparx5, ANA_AC_SRC_CFG(port));
+-			spx5_wr(mask[1], sparx5, ANA_AC_SRC_CFG1(port));
+-			spx5_wr(mask[2], sparx5, ANA_AC_SRC_CFG2(port));
++			if (is_sparx5(sparx5)) {
++				spx5_wr(mask[1], sparx5, ANA_AC_SRC_CFG1(port));
++				spx5_wr(mask[2], sparx5, ANA_AC_SRC_CFG2(port));
++			}
+ 		} else {
+ 			spx5_wr(0, sparx5, ANA_AC_SRC_CFG(port));
+-			spx5_wr(0, sparx5, ANA_AC_SRC_CFG1(port));
+-			spx5_wr(0, sparx5, ANA_AC_SRC_CFG2(port));
++			if (is_sparx5(sparx5)) {
++				spx5_wr(0, sparx5, ANA_AC_SRC_CFG1(port));
++				spx5_wr(0, sparx5, ANA_AC_SRC_CFG2(port));
++			}
+ 		}
+ 	}
+ 
+@@ -192,8 +204,10 @@ void sparx5_update_fwd(struct sparx5 *sparx5)
+ 
+ 	/* Apply learning mask */
+ 	spx5_wr(mask[0], sparx5, ANA_L2_AUTO_LRN_CFG);
+-	spx5_wr(mask[1], sparx5, ANA_L2_AUTO_LRN_CFG1);
+-	spx5_wr(mask[2], sparx5, ANA_L2_AUTO_LRN_CFG2);
++	if (is_sparx5(sparx5)) {
++		spx5_wr(mask[1], sparx5, ANA_L2_AUTO_LRN_CFG1);
++		spx5_wr(mask[2], sparx5, ANA_L2_AUTO_LRN_CFG2);
++	}
+ }
+ 
+ void sparx5_vlan_port_apply(struct sparx5 *sparx5,
 
 -- 
 2.34.1
