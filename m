@@ -1,68 +1,70 @@
-Return-Path: <netdev+bounces-132181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA3FF990BB8
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:34:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46EF6990C43
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12CEB1C21B37
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:34:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7B63B2685D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:41:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94DC1E5FEB;
-	Fri,  4 Oct 2024 18:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9165A1F130C;
+	Fri,  4 Oct 2024 18:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyKln5vy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VyZNayPI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1731E32CD;
-	Fri,  4 Oct 2024 18:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675D31F1309;
+	Fri,  4 Oct 2024 18:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728066023; cv=none; b=UqbwZjNytnnoxFxCBF4epJ61SFPXOZXtdIuAQe1oZeA4vL+hmLSFdJIsPmZVEJGKCrZegIXOTFOhTDiLIp6NO3vAVzzwD3Q0rm7z5830Ti4Twrso3szgI32jSEkALo2RieoN9shLJPHaFvjAtDO8PuMt6wPnfNV1DlICSIcxIps=
+	t=1728066141; cv=none; b=F6l9Xm1TGTNNCy3AgXAO1mj6pZUhIFcSrpJdVe2IM7TQm1DnzeTrsqatTSZ84PcfwpznCZB/ltX1qNtag2T4To0L62Pw9VBOXYB+XsDg7cYxUN+WMmc/bALKuc6qvq5Oi6oweCAWabbmyT2+nA9n2NQbjDcEydD0Sg0CKHqy2xU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728066023; c=relaxed/simple;
-	bh=EzVBYaCHBX8DZNJXTY8R/ao9hbVSq/400hzx71wVHY4=;
+	s=arc-20240116; t=1728066141; c=relaxed/simple;
+	bh=c/I1e/oenEjIOjtOnK2z27DpfhYeD9Wd3lrdk2fjvTo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tCcTuHjSHjpf62CPri0V//MhsSDtqnmNoW8/FGgEekCUiXkHxTNDoh8nj/anhntmBur+FDvxKh7rfwNyGMBubJlngtvYJJSvcfWjrbPBWDFWc61o2jX23+C46SESUq5SQGM4sJzT1CzQVzQymqsYAw0HNU5C3mUKFKkUr1S89G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyKln5vy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03751C4CEC6;
-	Fri,  4 Oct 2024 18:20:21 +0000 (UTC)
+	 MIME-Version; b=UTSxE9bzT3xMIjag45Kw8yfCLC9IRy82RsZhDmMfPoKRnkEKbAiDOtwSDxEGUHQUR59Zv6bNV9v2ENbtNMEZienG0D2GjIMjUb98e1SeHVKdV0zq0ye1oABmnutNL3Y0LGPHZYH+L3Sl99ULqnOeAANpGPso57tfaFFIdGxziAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VyZNayPI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A29CC4CEC6;
+	Fri,  4 Oct 2024 18:22:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728066023;
-	bh=EzVBYaCHBX8DZNJXTY8R/ao9hbVSq/400hzx71wVHY4=;
+	s=k20201202; t=1728066141;
+	bh=c/I1e/oenEjIOjtOnK2z27DpfhYeD9Wd3lrdk2fjvTo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gyKln5vyHsyEvf4gEv1UAI7EEPsje43NrkjdtUQcQiwlntReYRNCJeUyh2lXYyxO/
-	 UIhXwc0cStk/Zgo2BR4T3l75lAh0oMr+9AQ2/Ri8q91naSDOEYDAP+r7m0WvhTRdlG
-	 HaiE0tFlOwPlhR+Ho6FVh/k/sJ4dqikT9OJWohO/W1NihhKlVxyKs/EoMaF+IyaYmI
-	 Oy/7PuktiSQZUmNojgNxyq15Y+pswF3IANn8KwSBzBKd6iI7GoWv2JKCZqPnSK56Hf
-	 wKwKiPN5RxJIbFimH5ic1+M1iBSL5/olCNINCY7/QbhfUpkT/URfGamEJcKvxgUr7R
-	 j+4+aNT9XQZgw==
+	b=VyZNayPIGblYRBrwuAv1GEwl9AF2ccsRt1bIr4Kfg3DCi5yP26FsuDMU+xt2UwRMb
+	 JhZpPqrmTQsRVjbaEDd6rkh8Ol7LcgTPe/2KTo8iwdUZNkX8k2fGBsk+FSPcx9eslP
+	 lDcA9P6XrkKmSv5BW24DcClZofgh+Ouw90pZb5bEdOtO3wZawdFf60r5opKPfe8p4N
+	 /JlN2uz9wtHmkmQ62UBXtcRtJeL/Q3D8Y5uD/yYCRaiCdDImQ5uaV/bArDmDZTBO5p
+	 pqvQJgzJmXmHeSqcsyabnYreaHgtH3m1hO7Z2T4oCd1hGfOrS00ma2sOqRBQo8r2jY
+	 lptqNXOjJu5Yw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
+Cc: Yonghong Song <yonghong.song@linux.dev>,
+	Daniel Hodges <hodgesd@meta.com>,
+	Alexei Starovoitov <ast@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	kadlec@netfilter.org,
 	davem@davemloft.net,
 	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 60/76] netfilter: nf_reject: Fix build warning when CONFIG_BRIDGE_NETFILTER=n
-Date: Fri,  4 Oct 2024 14:17:17 -0400
-Message-ID: <20241004181828.3669209-60-sashal@kernel.org>
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 10/70] bpf, x64: Fix a jit convergence issue
+Date: Fri,  4 Oct 2024 14:20:08 -0400
+Message-ID: <20241004182200.3670903-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241004181828.3669209-1-sashal@kernel.org>
-References: <20241004181828.3669209-1-sashal@kernel.org>
+In-Reply-To: <20241004182200.3670903-1-sashal@kernel.org>
+References: <20241004182200.3670903-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,115 +73,187 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11.2
+X-stable-base: Linux 6.10.13
 Content-Transfer-Encoding: 8bit
 
-From: Simon Horman <horms@kernel.org>
+From: Yonghong Song <yonghong.song@linux.dev>
 
-[ Upstream commit fc56878ca1c288e49b5cbb43860a5938e3463654 ]
+[ Upstream commit c8831bdbfbab672c006a18006d36932a494b2fd6 ]
 
-If CONFIG_BRIDGE_NETFILTER is not enabled, which is the case for x86_64
-defconfig, then building nf_reject_ipv4.c and nf_reject_ipv6.c with W=1
-using gcc-14 results in the following warnings, which are treated as
-errors:
+Daniel Hodges reported a jit error when playing with a sched-ext program.
+The error message is:
+  unexpected jmp_cond padding: -4 bytes
 
-net/ipv4/netfilter/nf_reject_ipv4.c: In function 'nf_send_reset':
-net/ipv4/netfilter/nf_reject_ipv4.c:243:23: error: variable 'niph' set but not used [-Werror=unused-but-set-variable]
-  243 |         struct iphdr *niph;
-      |                       ^~~~
-cc1: all warnings being treated as errors
-net/ipv6/netfilter/nf_reject_ipv6.c: In function 'nf_send_reset6':
-net/ipv6/netfilter/nf_reject_ipv6.c:286:25: error: variable 'ip6h' set but not used [-Werror=unused-but-set-variable]
-  286 |         struct ipv6hdr *ip6h;
-      |                         ^~~~
-cc1: all warnings being treated as errors
+But further investigation shows the error is actual due to failed
+convergence. The following are some analysis:
 
-Address this by reducing the scope of these local variables to where
-they are used, which is code only compiled when CONFIG_BRIDGE_NETFILTER
-enabled.
+  ...
+  pass4, final_proglen=4391:
+    ...
+    20e:    48 85 ff                test   rdi,rdi
+    211:    74 7d                   je     0x290
+    213:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
+    ...
+    289:    48 85 ff                test   rdi,rdi
+    28c:    74 17                   je     0x2a5
+    28e:    e9 7f ff ff ff          jmp    0x212
+    293:    bf 03 00 00 00          mov    edi,0x3
 
-Compile tested and run through netfilter selftests.
+Note that insn at 0x211 is 2-byte cond jump insn for offset 0x7d (-125)
+and insn at 0x28e is 5-byte jmp insn with offset -129.
 
-Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Closes: https://lore.kernel.org/netfilter-devel/20240906145513.567781-1-andriy.shevchenko@linux.intel.com/
-Signed-off-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+  pass5, final_proglen=4392:
+    ...
+    20e:    48 85 ff                test   rdi,rdi
+    211:    0f 84 80 00 00 00       je     0x297
+    217:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
+    ...
+    28d:    48 85 ff                test   rdi,rdi
+    290:    74 1a                   je     0x2ac
+    292:    eb 84                   jmp    0x218
+    294:    bf 03 00 00 00          mov    edi,0x3
+
+Note that insn at 0x211 is 6-byte cond jump insn now since its offset
+becomes 0x80 based on previous round (0x293 - 0x213 = 0x80). At the same
+time, insn at 0x292 is a 2-byte insn since its offset is -124.
+
+pass6 will repeat the same code as in pass4. pass7 will repeat the same
+code as in pass5, and so on. This will prevent eventual convergence.
+
+Passes 1-14 are with padding = 0. At pass15, padding is 1 and related
+insn looks like:
+
+    211:    0f 84 80 00 00 00       je     0x297
+    217:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
+    ...
+    24d:    48 85 d2                test   rdx,rdx
+
+The similar code in pass14:
+    211:    74 7d                   je     0x290
+    213:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
+    ...
+    249:    48 85 d2                test   rdx,rdx
+    24c:    74 21                   je     0x26f
+    24e:    48 01 f7                add    rdi,rsi
+    ...
+
+Before generating the following insn,
+  250:    74 21                   je     0x273
+"padding = 1" enables some checking to ensure nops is either 0 or 4
+where
+  #define INSN_SZ_DIFF (((addrs[i] - addrs[i - 1]) - (prog - temp)))
+  nops = INSN_SZ_DIFF - 2
+
+In this specific case,
+  addrs[i] = 0x24e // from pass14
+  addrs[i-1] = 0x24d // from pass15
+  prog - temp = 3 // from 'test rdx,rdx' in pass15
+so
+  nops = -4
+and this triggers the failure.
+
+To fix the issue, we need to break cycles of je <-> jmp. For example,
+in the above case, we have
+  211:    74 7d                   je     0x290
+the offset is 0x7d. If 2-byte je insn is generated only if
+the offset is less than 0x7d (<= 0x7c), the cycle can be
+break and we can achieve the convergence.
+
+I did some study on other cases like je <-> je, jmp <-> je and
+jmp <-> jmp which may cause cycles. Those cases are not from actual
+reproducible cases since it is pretty hard to construct a test case
+for them. the results show that the offset <= 0x7b (0x7b = 123) should
+be enough to cover all cases. This patch added a new helper to generate 8-bit
+cond/uncond jmp insns only if the offset range is [-128, 123].
+
+Reported-by: Daniel Hodges <hodgesd@meta.com>
+Signed-off-by: Yonghong Song <yonghong.song@linux.dev>
+Link: https://lore.kernel.org/r/20240904221251.37109-1-yonghong.song@linux.dev
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/ipv4/netfilter/nf_reject_ipv4.c | 10 ++++------
- net/ipv6/netfilter/nf_reject_ipv6.c |  5 ++---
- 2 files changed, 6 insertions(+), 9 deletions(-)
+ arch/x86/net/bpf_jit_comp.c | 54 +++++++++++++++++++++++++++++++++++--
+ 1 file changed, 52 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index 04504b2b51df5..87fd945a0d27a 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
- void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 		   int hook)
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index 5159c7a229229..dd60500497ead 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -64,6 +64,56 @@ static bool is_imm8(int value)
+ 	return value <= 127 && value >= -128;
+ }
+ 
++/*
++ * Let us limit the positive offset to be <= 123.
++ * This is to ensure eventual jit convergence For the following patterns:
++ * ...
++ * pass4, final_proglen=4391:
++ *   ...
++ *   20e:    48 85 ff                test   rdi,rdi
++ *   211:    74 7d                   je     0x290
++ *   213:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
++ *   ...
++ *   289:    48 85 ff                test   rdi,rdi
++ *   28c:    74 17                   je     0x2a5
++ *   28e:    e9 7f ff ff ff          jmp    0x212
++ *   293:    bf 03 00 00 00          mov    edi,0x3
++ * Note that insn at 0x211 is 2-byte cond jump insn for offset 0x7d (-125)
++ * and insn at 0x28e is 5-byte jmp insn with offset -129.
++ *
++ * pass5, final_proglen=4392:
++ *   ...
++ *   20e:    48 85 ff                test   rdi,rdi
++ *   211:    0f 84 80 00 00 00       je     0x297
++ *   217:    48 8b 77 00             mov    rsi,QWORD PTR [rdi+0x0]
++ *   ...
++ *   28d:    48 85 ff                test   rdi,rdi
++ *   290:    74 1a                   je     0x2ac
++ *   292:    eb 84                   jmp    0x218
++ *   294:    bf 03 00 00 00          mov    edi,0x3
++ * Note that insn at 0x211 is 6-byte cond jump insn now since its offset
++ * becomes 0x80 based on previous round (0x293 - 0x213 = 0x80).
++ * At the same time, insn at 0x292 is a 2-byte insn since its offset is
++ * -124.
++ *
++ * pass6 will repeat the same code as in pass4 and this will prevent
++ * eventual convergence.
++ *
++ * To fix this issue, we need to break je (2->6 bytes) <-> jmp (5->2 bytes)
++ * cycle in the above. In the above example je offset <= 0x7c should work.
++ *
++ * For other cases, je <-> je needs offset <= 0x7b to avoid no convergence
++ * issue. For jmp <-> je and jmp <-> jmp cases, jmp offset <= 0x7c should
++ * avoid no convergence issue.
++ *
++ * Overall, let us limit the positive offset for 8bit cond/uncond jmp insn
++ * to maximum 123 (0x7b). This way, the jit pass can eventually converge.
++ */
++static bool is_imm8_jmp_offset(int value)
++{
++	return value <= 123 && value >= -128;
++}
++
+ static bool is_simm32(s64 value)
  {
--	struct sk_buff *nskb;
--	struct iphdr *niph;
- 	const struct tcphdr *oth;
-+	struct sk_buff *nskb;
- 	struct tcphdr _oth;
- 
- 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
-@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
- 
- 	skb_reserve(nskb, LL_MAX_HEADER);
--	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
--				   ip4_dst_hoplimit(skb_dst(nskb)));
-+	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
-+			    ip4_dst_hoplimit(skb_dst(nskb)));
- 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
- 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
- 		goto free_nskb;
- 
--	niph = ip_hdr(nskb);
--
- 	/* "Never happens" */
- 	if (nskb->len > dst_mtu(skb_dst(nskb)))
- 		goto free_nskb;
-@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct iphdr *niph = ip_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index dedee264b8f6c..69a78550261fb 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -283,7 +283,6 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	const struct tcphdr *otcph;
- 	unsigned int otcplen, hh_len;
- 	const struct ipv6hdr *oip6h = ipv6_hdr(oldskb);
--	struct ipv6hdr *ip6h;
- 	struct dst_entry *dst = NULL;
- 	struct flowi6 fl6;
- 
-@@ -339,8 +338,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = fl6.flowi6_mark;
- 
- 	skb_reserve(nskb, hh_len + dst->header_len);
--	ip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP,
--				    ip6_dst_hoplimit(dst));
-+	nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP, ip6_dst_hoplimit(dst));
- 	nf_reject_ip6_tcphdr_put(nskb, oldskb, otcph, otcplen);
- 
- 	nf_ct_attach(nskb, oldskb);
-@@ -355,6 +353,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct ipv6hdr *ip6h = ipv6_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
+ 	return value == (s64)(s32)value;
+@@ -2191,7 +2241,7 @@ st:			if (is_imm8(insn->off))
+ 				return -EFAULT;
+ 			}
+ 			jmp_offset = addrs[i + insn->off] - addrs[i];
+-			if (is_imm8(jmp_offset)) {
++			if (is_imm8_jmp_offset(jmp_offset)) {
+ 				if (jmp_padding) {
+ 					/* To keep the jmp_offset valid, the extra bytes are
+ 					 * padded before the jump insn, so we subtract the
+@@ -2273,7 +2323,7 @@ st:			if (is_imm8(insn->off))
+ 				break;
+ 			}
+ emit_jmp:
+-			if (is_imm8(jmp_offset)) {
++			if (is_imm8_jmp_offset(jmp_offset)) {
+ 				if (jmp_padding) {
+ 					/* To avoid breaking jmp_offset, the extra bytes
+ 					 * are padded before the actual jmp insn, so
 -- 
 2.43.0
 
