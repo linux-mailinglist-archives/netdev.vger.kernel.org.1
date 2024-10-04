@@ -1,88 +1,112 @@
-Return-Path: <netdev+bounces-131931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8592F98FF72
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:15:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0964298FF7C
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A85F2821D0
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:15:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69480282067
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2561465B3;
-	Fri,  4 Oct 2024 09:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XN5QeAqC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185E213D244;
+	Fri,  4 Oct 2024 09:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2D513F43B;
-	Fri,  4 Oct 2024 09:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24EBE146A68
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 09:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728033309; cv=none; b=OacgObVKIBaeNP1TB99ziSXAaFeiurhhGJj8xgCt1LB6ZlxmXkFQ3pqO23N4g5ayZD5kHNli0uxb27T4edKk8ejHv2/OU/tXkl/ub2XU60noqkDwkmprQchu8zvyK0VqzG2x5EyVb1sQoPJ4uAzjpldDdTMjCyvxzSKnj+5tM1k=
+	t=1728033600; cv=none; b=FkKgXmqBGoGdQoFQI1Mbm9kjLaH8jELTk/mLr2vZ5Q8humkhFjqmkBaR/R+ynZbasDATcCps2sD/g8P0UtChhZ2YdFiZg4WlUmIRJgNBKvqfeMc6wwWnV+Jy4/qiD84O14FUkcktiK9pWTsMclUQSTb7zuKC2OgKrgUZd6+zF5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728033309; c=relaxed/simple;
-	bh=tm+1zIioYKE3BIjVPiXN0fmqWViNiymIUgwTepl5wiE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NJzHYFi5G5nr6KMT84M+lUT2Tv/0U84El1saVOaBHHSKEB1uoCCr1KzaPqWXkAoVy1BGnmzLtjf96DNGWT+2q+ER6/XiMBJ3m3/XPLpqHrCFeZKzRUU4Hj8U9/WC0OiaxZyZbkSAi9s08B/Pkq4clTTjQpy1bXHU4yIPLo/JBwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XN5QeAqC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA51C4CEC6;
-	Fri,  4 Oct 2024 09:15:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728033308;
-	bh=tm+1zIioYKE3BIjVPiXN0fmqWViNiymIUgwTepl5wiE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XN5QeAqCxV1mem1qDfcSupaxpwYUt5z39In+C0rcLYS/H4xfD9/XnONFFYdQs/zAt
-	 3gNzciJHMWFIMeq4zXmC0mKrI7mMsGthApi4/9ctn0Fi4fZs2qELw5mIyYenzeWTjF
-	 JIT1aR7Dxpg2Bl1hA5pFnB4RcsZ/jKSbkCeXhvG4sArqcx2kuVJJ1BJH0pMPmDrqEU
-	 ydl1cef7ruxIWm00nD/tvAENPARcmqRxbBoHZkyknHoCS2dNrpdK1XjW/Dt/+MFjId
-	 O8U54DFWakrn6+wKgH8bBE6ji5sL5gd+a8xL1bWHWJ8gvnkp558IMOmIoXPtcuq5pc
-	 PDgMTKWMdPc9g==
-Date: Fri, 4 Oct 2024 10:15:04 +0100
-From: Simon Horman <horms@kernel.org>
-To: Liel Harel <liel.harel@gmail.com>
-Cc: Steve Glendinning <steve.glendinning@shawell.net>,
-	UNGLinuxDriver@microchip.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mailing-list-name@vger.kernel.org
-Subject: Re: [PATCH] smsc95xx: Fix some coding style issues
-Message-ID: <20241004091504.GB1310185@kernel.org>
-References: <20241003161610.58050-1-liel.harel@gmail.com>
+	s=arc-20240116; t=1728033600; c=relaxed/simple;
+	bh=lIOIUD/Hh94tGgsFr1gNc65qT7EslmF1axiWhJ3Jv30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eU9KZgL6C45nmN/FZCtQNzIH9kZQMfxize7HD4F0da/JWc3TYCY3XOaSkxZKRe+XKwpiYWkVMRqwPZW/wa6fFt0ZESRlk6sHAU32f2jzmacGaJ/vx5/uXIktNSKZOOIz7+n7+Q9R84824iVT7bKNF0MIfkRAGMVTOPNgnboYAcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
+Received: from [178.197.223.28] (helo=alea.q.nox.tf)
+	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <equinox@diac24.net>)
+	id 1sweS5-00000000d8S-35UO;
+	Fri, 04 Oct 2024 11:18:22 +0200
+Received: from equinox by alea.q.nox.tf with local (Exim 4.98)
+	(envelope-from <equinox@diac24.net>)
+	id 1sweRh-00000000G1q-46cP;
+	Fri, 04 Oct 2024 11:17:58 +0200
+From: David Lamparter <equinox@diac24.net>
+To: David Ahern <dsahern@gmail.com>
+Cc: netdev@vger.kernel.org,
+	David Lamparter <equinox@diac24.net>
+Subject: [PATCH iproute2-next] rt_names: read `rt_addrprotos.d` directory
+Date: Fri,  4 Oct 2024 11:16:38 +0200
+Message-ID: <20241004091724.61344-1-equinox@diac24.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241003161610.58050-1-liel.harel@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 03, 2024 at 07:16:10PM +0300, Liel Harel wrote:
-> Fix some coding style issues in drivers/net/usb/smsc95xx.c that
-> checkpatch.pl script reported.
-> 
-> Signed-off-by: Liel Harel <liel.harel@gmail.com>
+`rt_addrprotos` doesn't currently use the `.d` directory thing - add it.
 
-Hi Liel,
+My magic 8-ball predicts we might be grabbing a value or two for use in
+FRRouting at some point in the future.  Let's make it so we can ship
+those in a separate file when it's time.
 
-Thanks for your patch.
+Signed-off-by: David Lamparter <equinox@diac24.net>
+---
+ etc/iproute2/rt_addrprotos.d/README | 2 ++
+ lib/rt_names.c                      | 3 +++
+ man/man8/ip-address.8.in            | 5 ++++-
+ 3 files changed, 9 insertions(+), 1 deletion(-)
+ create mode 100644 etc/iproute2/rt_addrprotos.d/README
 
-Unfortunately stand-alone cleanup patches of this nature are not
-taken into upstream for Networking code.
-
-Also, if you plan to send more Networking patches in future, please read
-the process document, and understanding of which should help with a smooth
-review process.
-
-https://docs.kernel.org/process/maintainer-netdev.html
-
+diff --git a/etc/iproute2/rt_addrprotos.d/README b/etc/iproute2/rt_addrprotos.d/README
+new file mode 100644
+index 000000000000..092115b12423
+--- /dev/null
++++ b/etc/iproute2/rt_addrprotos.d/README
+@@ -0,0 +1,2 @@
++Each file in this directory is an rt_addrprotos configuration file. iproute2
++commands scan this directory processing all files that end in '.conf'.
+diff --git a/lib/rt_names.c b/lib/rt_names.c
+index e967e0cac5b4..f44b1e4ba34e 100644
+--- a/lib/rt_names.c
++++ b/lib/rt_names.c
+@@ -315,6 +315,9 @@ static void rtnl_addrprot_initialize(void)
+ 		ret = rtnl_tab_initialize(CONF_USR_DIR "/rt_addrprotos",
+ 					  rtnl_addrprot_tab,
+ 					  ARRAY_SIZE(rtnl_addrprot_tab));
++
++	rtnl_tab_initialize_dir("rt_addrprotos.d", rtnl_addrprot_tab,
++				ARRAY_SIZE(rtnl_addrprot_tab));
+ }
+ 
+ const char *rtnl_addrprot_n2a(__u8 id, char *buf, int len)
+diff --git a/man/man8/ip-address.8.in b/man/man8/ip-address.8.in
+index d37dddb7b1a9..6c3f07f1173a 100644
+--- a/man/man8/ip-address.8.in
++++ b/man/man8/ip-address.8.in
+@@ -303,7 +303,10 @@ receive multicast traffic.
+ the protocol identifier of this route.
+ .I ADDRPROTO
+ may be a number or a string from the file
+-.BR "/etc/iproute2/rt_addrprotos" .
++.BR @SYSCONF_USR_DIR@/rt_addrprotos " or " @SYSCONF_ETC_DIR@/rt_addrprotos
++(has precedence if exists).  A directory named
++.BR rt_addrprotos.d
++is also scanned in either location.
+ If the protocol ID is not given,
+ 
+ .B ip assumes protocol 0. Several protocol
 -- 
-pw-bot: rejected
+2.45.2
+
 
