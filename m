@@ -1,192 +1,144 @@
-Return-Path: <netdev+bounces-132037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD5F990361
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:58:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4872990451
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B871C21930
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:58:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40EB1B22FEA
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3F720FA97;
-	Fri,  4 Oct 2024 12:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A262141A1;
+	Fri,  4 Oct 2024 13:27:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IL86bj9e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vq3C08dL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4412729422;
-	Fri,  4 Oct 2024 12:58:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303EC2139B1;
+	Fri,  4 Oct 2024 13:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728046681; cv=none; b=nSwBUSXR7XOr+3nb/KUGeD5Wq+d4Atvo2wIj59DO3DgXXva5OSF8kSD8KD32KLk4RvHxkHyspz0DSumweV6xM32YGKGNTJsHVqkGzSU7s5aHngsJqYmoqsdpqZCwFIXC9H6CTLBNt9kDWAdOdupfh+N08C4fpSqMyG77rk+IPaY=
+	t=1728048454; cv=none; b=Lr83v7qWffO1sZzkrdit6Q5KNAz9fzyVxkgQK7e2CPtpikoJb+e4Six68Z0JPwj6oRI+WVceAHkuFaG7cHyr6WzQ08mxxEj57BJmaqw6IjWCYmHlnhSTmuiLXEz/C+6Ii0WZe7fn0hpJitpWcNQRUkvBkJuB7Xshlrk6UxOnZS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728046681; c=relaxed/simple;
-	bh=IQWZQOqTYVCvQ41NIG4ctEVO5J5XfUuQxXugPiSaJew=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=tQUD7MBsDvyG/8msdgWKoFTMAPwG7UYbX5i9M9ORjXUgMZgPcdAFYTsXIFXLWjJkHnIP0MVS5WluMgFkG32eBCOHqyxDs1tRgSv3iwOAY9EjzxR8UhhIzLtyptXYs5GgPDe4Qplemd3ZDlWzSf6nuRkoCzsyf+1W2E3bgpgNSf4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IL86bj9e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2E31C4CEC6;
-	Fri,  4 Oct 2024 12:57:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728046680;
-	bh=IQWZQOqTYVCvQ41NIG4ctEVO5J5XfUuQxXugPiSaJew=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=IL86bj9eYEbSMI6f5JG4QqoQq6YWVR5oK10/4jMYG+hMKkaARADj0j5qWvTb1AxZ7
-	 fgbxdyEa/wldb72pPjzIHB68xhDZ9zk5erFpGWldfjNHs/YbAW1blDHuyLzdje4nhj
-	 uKMBP78Yr35AvASdtc8Kzb+8D5HlitSj4R4NmwxTQIgENolAlmF611H8f9/YDimETp
-	 kDpNXb+TpGbuL+0amCBRDSoSrbSa6N2UZOixZPpkmEpM/P9LxT8dxUbjItkvwVN/MU
-	 PmViY0bAySQhYpvxpXphefLwrR6Kn02MCVWfXipmPXxGkQUs6UN8EUSFtOm15j3Pmd
-	 f74hKykhHgW2g==
-Message-ID: <67c9ede4-9751-4255-b752-27dd60495ff3@kernel.org>
-Date: Fri, 4 Oct 2024 15:57:55 +0300
+	s=arc-20240116; t=1728048454; c=relaxed/simple;
+	bh=wcg9NfwkZy7+ePoluepbaDrhRVrYMrqO3WU8+R2Sdjo=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=qhNAmWiBfr+IdYVKf6qB2Wu2bEWG8HBKMIrFb7aIaB2LpLth2bQF9CoLoZxibinDIgEwmORYcLUNoQUywqnVpO3vhIV8w09Dw6GVAxRi+6iOfF2fSIaDhXpZ3KbxrE6eD2FofeRqCchSEmo2UuRhoiRXud2p759x0zgtTHN5lnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vq3C08dL; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cbc22e1c4so17144325e9.2;
+        Fri, 04 Oct 2024 06:27:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728048450; x=1728653250; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pPs9699qh78nUh7Ck+Zku3WQCWqQe2zlzey+/CEixmM=;
+        b=Vq3C08dLkcjZKhN1lszEaZNgjjVQSyqQaRcLYWdqrsW92OWYqzHXzm5x/QkW+vXELE
+         MCRcZvLIgnqcrAklaKLoxsqE09y47e2QA9Lj+TiQ/mxlPeC8Opfk5/gAAfGytrDMtt/g
+         2v7Ivr/k8TgQvLhZ+xHPpXOgUoClszUZTl+9oKmnSwOhc5dUkzTYtn05Dl4JFdl7L6oN
+         pscTi+bX5DCjEnfS8pAdQHeuRLrJC8+Vb2oxCJMM1PMFJCpiGEZIEoIEg/xSXG0V3nyQ
+         BF0SJy1VpBq/hZPOajEqAtgVdTtQY4ekPnbmvxO2zJXfgrtf92LCXztc3Y41DO2E/sc2
+         kGYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728048450; x=1728653250;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pPs9699qh78nUh7Ck+Zku3WQCWqQe2zlzey+/CEixmM=;
+        b=pTm6s3G/rKHTD+TRErc8CqT6lViqE023DMy+sv+SYmPxjRSV4BW2wJ87uBYI48GpzC
+         /MlwjEafO+yJlDPQh2Y8g4PzS1CCeV+YCIKjRWOFd81DP5jK5Jt4dXvB9PBBkgOe4Vdj
+         +7S3THArM8s1WbJn6WwKbBDbIMuqe9h1YyELgKIADCt0dDAPGPROb0DBrj+g5VVuqwE1
+         Dr2hxXFY33BvloNcbBrgIeKU34BfazlfLlz6uLnPlVvLiD2m+8K88n/dn01dwtm5E9h6
+         1CXWZ91Ao/BxNPeVNAdbod19MKfprMnXylasnUdMXzrawe1xah5qHi97vQ7T/17xFqxq
+         gK0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUY1yj8up7dl/KoRmmSwYMlFsD2JcaeURzzahkfFXfNvnlbLD6TDVkJDZrOzYw2PM7Q8/DZSOfUYWcSjl0=@vger.kernel.org, AJvYcCWIsY3ErXIFXRmaEUykEvGP3/jUmS04P+714UT6PPg0ffW0VgIblI19//H7QHTGWzL5KBxM6SHR66FTnye8khld@vger.kernel.org, AJvYcCX+iAY7pzf47G/u2nlYab5DXemEP38FxNXhOKMx6pNs3Pnls1PF6AKyDt0bwF/YP1bGRrvRFkc6@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhXwaUVvnXvoyhBW3dyOzYlNJ4utb59MY/pN2GJJ+MsIF+ZOvR
+	+ytTpAA4RuBDceO+BXQ90RaU6emHXoinaG4kyHP5OjjAvqS9/uzp
+X-Google-Smtp-Source: AGHT+IHkTjRLCXy9DjHO9CfeCffvqDeVVM2xUdtxUAAf2e/y3hOMv6kLqLuJ+2bAFdJRO5VpoQPmtg==
+X-Received: by 2002:a05:6000:dcc:b0:37c:d0f9:58c with SMTP id ffacd0b85a97d-37d0e7843e7mr1782737f8f.35.1728048449696;
+        Fri, 04 Oct 2024 06:27:29 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:395e:c10e:1999:d9f1])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d081f736esm3257450f8f.18.2024.10.04.06.27.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 06:27:29 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
+  Paolo Abeni <pabeni@redhat.com>,  Shuah Khan <shuah@kernel.org>,
+  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org,
+  linux-kselftest@vger.kernel.org,  sd@queasysnail.net,
+  ryazanov.s.a@gmail.com
+Subject: Re: [PATCH net-next v8 01/24] netlink: add NLA_POLICY_MAX_LEN macro
+In-Reply-To: <20241002-b4-ovpn-v8-1-37ceffcffbde@openvpn.net> (Antonio
+	Quartulli's message of "Wed, 02 Oct 2024 11:02:15 +0200")
+Date: Fri, 04 Oct 2024 13:58:04 +0100
+Message-ID: <m2msjkf2jn.fsf@gmail.com>
+References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
+	<20241002-b4-ovpn-v8-1-37ceffcffbde@openvpn.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 2/2] net: ethernet: ti: am65-cpsw: avoid
- devm_alloc_etherdev, fix module removal
-From: Roger Quadros <rogerq@kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>,
- Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Nicolas Pitre <npitre@baylibre.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Govindarajan, Sriramakrishnan" <srk@ti.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>,
- Md Danish Anwar <danishanwar@ti.com>
-References: <20241004041218.2809774-1-nico@fluxnic.net>
- <20241004041218.2809774-3-nico@fluxnic.net>
- <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org>
-Content-Language: en-US
-In-Reply-To: <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Hi Nicolas,
+Antonio Quartulli <antonio@openvpn.net> writes:
 
-On 04/10/2024 12:09, Roger Quadros wrote:
-> Hi Nicolas,
-> 
-> On 04/10/2024 07:10, Nicolas Pitre wrote:
->> From: Nicolas Pitre <npitre@baylibre.com>
->>
->> Usage of devm_alloc_etherdev_mqs() conflicts with
->> am65_cpsw_nuss_cleanup_ndev() as the same struct net_device instances
->> get unregistered twice. Switch to alloc_etherdev_mqs() and make sure
-> 
-> Do we know why the same net device gets unregistered twice?
+> Similarly to NLA_POLICY_MIN_LEN, NLA_POLICY_MAX_LEN defines a policy
+> with a maximum length value.
+>
+> The netlink generator for YAML specs has been extended accordingly.
+>
+> Cc: donald.hunter@gmail.com
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  include/net/netlink.h      | 1 +
+>  tools/net/ynl/ynl-gen-c.py | 2 ++
+>  2 files changed, 3 insertions(+)
+>
+> diff --git a/include/net/netlink.h b/include/net/netlink.h
+> index db6af207287c839408c58cb28b82408e0548eaca..2dc671c977ff3297975269d236264907009703d3 100644
+> --- a/include/net/netlink.h
+> +++ b/include/net/netlink.h
+> @@ -469,6 +469,7 @@ struct nla_policy {
+>  	.max = _len						\
+>  }
+>  #define NLA_POLICY_MIN_LEN(_len)	NLA_POLICY_MIN(NLA_BINARY, _len)
+> +#define NLA_POLICY_MAX_LEN(_len)	NLA_POLICY_MAX(NLA_BINARY, _len)
+>  
+>  /**
+>   * struct nl_info - netlink source information
+> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+> index 717530bc9c52e7cfa897814870b4583c88618a27..3ccbb301be87f80bbcf03da63d60f58c4fedc1c8 100755
+> --- a/tools/net/ynl/ynl-gen-c.py
+> +++ b/tools/net/ynl/ynl-gen-c.py
+> @@ -466,6 +466,8 @@ class TypeBinary(Type):
+>      def _attr_policy(self, policy):
+>          if 'exact-len' in self.checks:
+>              mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
+> +        elif 'max-len' in self.checks:
+> +            mem = 'NLA_POLICY_MAX_LEN(' + str(self.get_limit('max-len')) + ')'
 
-On some boards there are 2 net devices per CPSW. so those those 2
-getting unregistered?
+This takes precedence over min-length. What if both are set? The logic
+should probably check and use NLA_POLICY_RANGE
 
-On some investigation I found that the issue has to do with napi_list.
-I don't exactly know why but it oopes in free_netdev() at napi_list
-iterations
-        list_for_each_entry_safe(p, n, &dev->napi_list, dev_list)
-                netif_napi_del(p);
+>          else:
+>              mem = '{ '
+>              if len(self.checks) == 1 and 'min-len' in self.checks:
 
-If we cleanup the napi list at remove then I don't see the oops anymore.
+Perhaps this should use NLA_POLICY_MIN_LEN ? In fact the current code
+looks broken to me because the NLA_BINARY len check in validate_nla() is
+a max length check, right?
 
-> 
->> am65_cpsw_nuss_cleanup_ndev() unregisters and frees those net_device
->> instances properly.
->>
->> With this, it is finally possible to rmmod the driver without oopsing
->> the kernel.
->>
->> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
->> Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
->> ---
+https://elixir.bootlin.com/linux/v6.11.1/source/lib/nlattr.c#L499
 
-Can you please try the below patch instead?
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index f6bc8a4dc687..e214547aeba7 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2206,14 +2206,11 @@ static void am65_cpsw_nuss_free_tx_chns(void *data)
- 	}
- }
- 
--static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
-+static void am65_cpsw_nuss_cleanup_tx_napi(struct am65_cpsw_common *common)
- {
- 	struct device *dev = common->dev;
- 	int i;
- 
--	devm_remove_action(dev, am65_cpsw_nuss_free_tx_chns, common);
--
--	common->tx_ch_rate_msk = 0;
- 	for (i = 0; i < common->tx_ch_num; i++) {
- 		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
- 
-@@ -2222,7 +2219,15 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
- 
- 		netif_napi_del(&tx_chn->napi_tx);
- 	}
-+}
-+
-+static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
-+{
-+	struct device *dev = common->dev;
- 
-+	devm_remove_action(dev, am65_cpsw_nuss_free_tx_chns, common);
-+	common->tx_ch_rate_msk = 0;
-+	am65_cpsw_nuss_cleanup_tx_napi(common);
- 	am65_cpsw_nuss_free_tx_chns(common);
- }
- 
-@@ -2355,25 +2360,27 @@ static void am65_cpsw_nuss_free_rx_chns(void *data)
- 		k3_udma_glue_release_rx_chn(rx_chn->rx_chn);
- }
- 
--static void am65_cpsw_nuss_remove_rx_chns(struct am65_cpsw_common *common)
-+static void am65_cpsw_nuss_cleanup_rx_napi(struct am65_cpsw_common *common)
- {
- 	struct device *dev = common->dev;
--	struct am65_cpsw_rx_chn *rx_chn;
- 	struct am65_cpsw_rx_flow *flows;
- 	int i;
- 
--	rx_chn = &common->rx_chns;
--	flows = rx_chn->flows;
--	devm_remove_action(dev, am65_cpsw_nuss_free_rx_chns, common);
--
-+	flows = common->rx_chns.flows;
- 	for (i = 0; i < common->rx_ch_num_flows; i++) {
- 		if (!(flows[i].irq < 0))
- 			devm_free_irq(dev, flows[i].irq, &flows[i]);
- 		netif_napi_del(&flows[i].napi_rx);
- 	}
-+}
- 
--	am65_cpsw_nuss_free_rx_chns(common);
-+static void am65_cpsw_nuss_remove_rx_chns(struct am65_cpsw_common *common)
-+{
-+	struct device *dev = common->dev;
- 
-+	devm_remove_action(dev, am65_cpsw_nuss_free_rx_chns, common);
-+	am65_cpsw_nuss_cleanup_rx_napi(common);
-+	am65_cpsw_nuss_free_rx_chns(common);
- 	common->rx_flow_id_base = -1;
- }
- 
-@@ -2871,6 +2878,9 @@ static void am65_cpsw_nuss_cleanup_ndev(struct am65_cpsw_common *common)
- 		if (port->ndev && port->ndev->reg_state == NETREG_REGISTERED)
- 			unregister_netdev(port->ndev);
- 	}
-+
-+	am65_cpsw_nuss_cleanup_rx_napi(common);
-+	am65_cpsw_nuss_cleanup_tx_napi(common);
- }
- 
- static void am65_cpsw_port_offload_fwd_mark_update(struct am65_cpsw_common *common)
+The alternative is you emit an explicit initializer that includes the
+correct NLA_VALIDATE_* type and sets type, min and/or max.
 
