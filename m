@@ -1,194 +1,379 @@
-Return-Path: <netdev+bounces-131881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB8A98FD5B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:31:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3A4798FD7E
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 922951F2322D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:31:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 133101C20896
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B8813699A;
-	Fri,  4 Oct 2024 06:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7C91311B5;
+	Fri,  4 Oct 2024 06:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CTLjRYL0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HC8gspR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013065.outbound.protection.outlook.com [52.101.67.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A582D132114;
-	Fri,  4 Oct 2024 06:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728023468; cv=fail; b=WLJQpHovVx96LVt4HZwLHuHZ92tKnbQhTx8FtUsQZETu3HTkoS+/W9E7N2f6ETRTEuxwhyn9USzGF4WWjWOb6WaBU0JxhotIVL0owkmH/EV8F1aEeapeaL6Wrb3IJXaMFt8q2/JakoIvAKddy/0Uhy0daOao1NlCgfL6tyJXIyk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728023468; c=relaxed/simple;
-	bh=JekaVa2nPkTPq2rSEz94Ez//qaAVSf/pZwZfdlZOLSw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DtwP7nfmPPTNWHAhzAHxPGGcmm8gEtOGtGDDgW44Ex9WeCt9X7hJUTH9t2mCm4BRmbVwGNnRXeoiljwCzpPXodD+RyAtRgwebYxn+qRqRBDa0caSXJKz/FwGqYqAf1tXDkzpj2gS26cEfYdyxUh9xsGUxBJcX5OgDVpDxbabxz4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CTLjRYL0; arc=fail smtp.client-ip=52.101.67.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mTzobGlhUe+t4jnetUtnW/gwml+6lLvtU9s288t7uW284JJdLSDEgt7RmoRuZVqqSMgO/65dO05JxM9wqU4or09+b+KkelBptOGYjohq+zhZkukglJLG4KWz7urEpZrZSTtJ1MEvWG16K58BLXmJKzXA9WibT6DuNEywu788j+4m5FmK8lAN4S6NKcKpY0TRuUs1wgA5zYyy5mOrzvDVS0DBYRcCTiGMdkf3HNerciNr5wK5Dlc+dbfCWFYwVU60lX5+yrZpf9J7DECMzTsriUDOw7XnL5tGnD5MG1f7LTylDYI12jE82oi82Dqu+lFBFHIqbfTN60XbwWjT3n8mhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6ES442RDiph+RRzPBhDKfbVrQ9Rr3mKr/ZvnCWB8WcM=;
- b=QFEZTtKlhwVDmuBNtiKbxR3QK2NBclttsm9tJ6pSO4QlkiDW8xWT8mLegws9a3ypMQjUwjY3TCdzBiQpPXEIaeg2hoB+V90Of8oidTgaSP7/Ka0UrDSKI3pLmY/fS73j9eGaJk9tcXpEdo/LyZ7+M8s2hQXvT/58W+7kbEtL9ho17Y6sROEBlPJa9QE21JSd2qBlyIoqymmJtW4pp0Gn7prlIvW0CW/kFbrwVcGeiLtWFp8y8SvkROpyqzKn20T5QBXU17xvIDbf7xZ72cP6EzE684/iBNAaFpQDnXrhcdhEPJ9/B51YSf+DiHNzl7NW0tUozaezX7RfBJI4VMRe7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6ES442RDiph+RRzPBhDKfbVrQ9Rr3mKr/ZvnCWB8WcM=;
- b=CTLjRYL0WUA5/NFzkHrtDVmJ19mq68CLtSUEERuiIY/vK+FV17gi5KgAuTCB7vQr0afp5aaaD5e73o7lKvv3R6ffyrd6ar8mp34d7Nf8mdfQQPaUlBpGvMBsKypu+aBfZCpA832rGdTHXhyREGqlmjTdrvAmfu63Od65tkFhYQC+oYyBsvUCPzWSgy7bLkfvWvC62AhsK3CwINgw0D/QrYNY928omOuwhhGtlQZk5YHXwVpenlPo9QOiQ8WgWOsMpgMI6s+tXYOwxktftaUJB1oYzNf8OZer253uPehmgGz4U07Q71x6FsJG6qWwAM2baIcxiDYJH9xov4Ds19dffg==
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com (2603:10a6:20b:42c::17)
- by VI1PR04MB7054.eurprd04.prod.outlook.com (2603:10a6:800:12d::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.18; Fri, 4 Oct
- 2024 06:31:03 +0000
-Received: from AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684]) by AS8PR04MB8849.eurprd04.prod.outlook.com
- ([fe80::d8e2:1fd7:2395:b684%6]) with mapi id 15.20.8026.014; Fri, 4 Oct 2024
- 06:31:03 +0000
-From: Claudiu Manoil <claudiu.manoil@nxp.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, Rosen Penev
-	<rosenp@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "andrew@lunn.ch"
-	<andrew@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next 3/6] net: gianfar: allocate queues with devm
-Thread-Topic: [PATCH net-next 3/6] net: gianfar: allocate queues with devm
-Thread-Index: AQHbFEf7FIuFJpZBukehd4Yqk11GkLJzD9uAgAMQjZA=
-Date: Fri, 4 Oct 2024 06:31:03 +0000
-Message-ID:
- <AS8PR04MB8849B58CD8CC440E7A9F6EAB96722@AS8PR04MB8849.eurprd04.prod.outlook.com>
-References: <20241001212204.308758-1-rosenp@gmail.com>
-	<20241001212204.308758-4-rosenp@gmail.com>
- <20241002092509.1b56b470@fedora.home>
-In-Reply-To: <20241002092509.1b56b470@fedora.home>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS8PR04MB8849:EE_|VI1PR04MB7054:EE_
-x-ms-office365-filtering-correlation-id: a843bf66-d8ed-4106-0336-08dce43e1e90
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?baL6arrBk9VrvH1nz7SqvP/Am13tnIPui4PVG9SWayCrSki+dlmmveVQts58?=
- =?us-ascii?Q?hK2gUx6D6b6FS144tGHjL4qEzHy36bKsokhguVAy01U15hTMywkSCRlajPxG?=
- =?us-ascii?Q?GT+c5zqeSlwW4fQainPeDbUauf5dnaJIf9zULOxcU7YSW+hek4O+kjLq+Rnq?=
- =?us-ascii?Q?eSfXT2StUD5VR0ofgC7DUbow+S4IG6a+WRqpX36MLcZTyx4I4Q7jUSlbmgLX?=
- =?us-ascii?Q?yVVfFtfzuyquZc/zJqK584lNnVojfTF6iFWU7YZchZ3IRMuAzFydBv4siSUY?=
- =?us-ascii?Q?GkSmP8sxNGnE1wCwztxNvXjEpHUUU7sTrvARkbH0vdl4VREI2xGmUgWW0mCK?=
- =?us-ascii?Q?W6wAD1j/1f3fhg4mnIcUcQqFO5fDC/XptN2/DMOOkKdXoybMDlBAbZ1fV5sl?=
- =?us-ascii?Q?6C31Cf2uwKSY7QRp/ZlhDVYxKXrgpyLnvINUH4Dcko4Wm/js47I+jqB7wCH2?=
- =?us-ascii?Q?brvG17qMOi25w1JolI/oX8Ek4zPXVN71HzukxJC6N9xv0i4lY87O2fZyttth?=
- =?us-ascii?Q?BnFVWtbZ1ENN4alrq/f95EFEKf0/ewkhhy6y1fZnMQkyUszBoWe2y4Ly2K4i?=
- =?us-ascii?Q?8sQdBvy0apzbQ7yitq84oeb761MBiREKHYr8M6UtQG8b0k99phWlYNwz8sik?=
- =?us-ascii?Q?DbRWCjgzpYJLqSoMFhtpwQfrrlm8QPz43zIRnGanqEGwPIII1oqXMRCZ8/xK?=
- =?us-ascii?Q?9T+lMS+tBi0J2bOCio7zcvF3CWfap/gmyns5RmK0cTlr0yuY7Qmf8/p6rA9X?=
- =?us-ascii?Q?IgBgG8NzTzQqaDta8phnMqwDps3QWdYda2wn59sv1jtAlL8oLoyPgIobddNI?=
- =?us-ascii?Q?ys36t8aT9UkMSYgOPFELBTsC8uCUE0lbSLg73WVvNJewGX9F8i965zAN4dXy?=
- =?us-ascii?Q?i+NEEJ3XbQOcniQkvessgWeAPHqVuM7BjMsAYgy9QBhKcDx5hyYI+g/Ahx8Y?=
- =?us-ascii?Q?aT1tDHW2GsLxWhftnOVgVdrD5aLzxd+M/62ay6dQMrG8pe66Fo775IVdar90?=
- =?us-ascii?Q?4ZbSGceYMSqDXM1yDVjJm2RU207a1g9+yxLxXpMAoTzGJaMSiW1Eu0NeWUbm?=
- =?us-ascii?Q?i/9HVkhTcdKhpuYEgmtiUYFQVcKxkTKRno3fJPmJpARGY6YbXGneZV22bk7Z?=
- =?us-ascii?Q?WzTkzGyvaB5KKxqbIvToEb/lFJcIEoDTfBrbpNwS7danjOSSnGTKqde27XLb?=
- =?us-ascii?Q?emtQzWBfiQy59OKJm2/iTjmoMX2fVdJ8cJRzaMuVG1vc1JJDOUmZUpM6X3H7?=
- =?us-ascii?Q?zsGZZYm2w/L1QM74a7jwg4Ij0LglTAjNwJIb0wJ4UdFLQFzFrM35zhSBNL9d?=
- =?us-ascii?Q?djzWnUp1YmOGCiUDzg+bvHX57Fjwetpuk04O5/VzrmGCQg=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8849.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?XwjMjYALsq2frmIN+ry8F9metESzxEahrUG2TJx2e24fL2O/W2MFCd0LoPQN?=
- =?us-ascii?Q?k8v7CPjspi9wd1PxPElo62Ciq0/HjFEFCyhdoPNl9DHc9vcBWsV//hWyRfVv?=
- =?us-ascii?Q?cCobPcEEIE/HCSQ6U7nMc+7K38o38eSjdNDxmy+2n8dxHT3QEhQXyUxkJuy5?=
- =?us-ascii?Q?NGdDGcu4nC4yDUDfpY5TscNCuia4wXo6p/sl3xXSTEYtA1iIxhKbHN7Xb6QH?=
- =?us-ascii?Q?78PFeJvZCIgFBk35I4BUZJoDIGSHPHH7P+NYWTbCQMP5tL5DCO1AxWf0IW3T?=
- =?us-ascii?Q?5ipVSWyIYUrXCaV+TB1pyes0FpFQuJAbN6MMPWEJ9VC+oTbO0ZfY1PjN7EUd?=
- =?us-ascii?Q?tiUsbPnyCPEbaEfBltcY0/oSRK2ldnD1lBZ/AVtXTU8pkzgkaATGXBYO3d9/?=
- =?us-ascii?Q?et3WemTIzgpaAEIeBHZHa7SUGz1ItcX9alpdzrP6z1bkzb44Tt3QjgNipEZ+?=
- =?us-ascii?Q?AdhJ6zwgoMxA+43A6ex7MD3MvwNfJeVDph16DXZzcpaJAtmD23KfBjnpBja1?=
- =?us-ascii?Q?Yqbqzy9rjx/exyUp1NXaEL55Svpvq9zu65KlzjY52WnoqMSC7n8XeHRY3XwY?=
- =?us-ascii?Q?bbgVTZosCHl2nd7DHR8Aqucaa0PDLpEqWo5FjZ1QofPP9aw8z1F0fbqss8jd?=
- =?us-ascii?Q?Rr3EjBG+s4QoTDJiuKgXnFvOwsO8tqRlIfkhZDomDHPzxoF5hHmmr3nAanPi?=
- =?us-ascii?Q?2vm8bPWm0t/N+ziyE4ka/USBl3ys22qzDYZYDB1/T6LLfkAU5BsZQfmqCJIS?=
- =?us-ascii?Q?Xolhy3U+Io+WfAeoaqVBCoz7CwsMOK743/ftN5LaN3033WRCJWkVTQjktb5U?=
- =?us-ascii?Q?EzDAQRAPwxghQ46pj3UQLWtHmfoiIcqr8+atZ09vv8xvWAGtHByGTfRF99rc?=
- =?us-ascii?Q?NhyAppb09tST2CKM0lpR4nIENFabXGVhiGEaaQK9Cb0Ln3cZ2ldy1g1w/1Rx?=
- =?us-ascii?Q?i5Ir92QQBHKX5AjY95fVW9R91TuFs41TZHYXo5b80SGB9lsQnCnk9U7Jw5A6?=
- =?us-ascii?Q?8IgbmVqADUIZSbkmOe0rcHbemraSwhc+OMR5FnZj++3CluqjXKI1NyYPBtgb?=
- =?us-ascii?Q?jtfNqxG4EuXbzLCB1ZfLojFTSsIt8gW4RAT47x7pFlTxYCDodO73djsh2lqM?=
- =?us-ascii?Q?vByd8poUi3e5C8dGvUcC13lES65G0FCH0haHr5gh8fhSxxNUhYUwCm/fa5RX?=
- =?us-ascii?Q?/Qha8ZCaNnwD0DV00kPMzDNTn7OEObUaPRqrrfYugH2Wh8gCqVnZ8+C734/r?=
- =?us-ascii?Q?V6YZRXDkX/fo1NEp1gQOlfNerTQabJaqSwJsy5FnHKb1MFwCkqWcu7cbggIM?=
- =?us-ascii?Q?/uqmseNaKhjyHuORcYRxb8txhQKZbdL0eOBC1uOaS/6QEaiWOe0/PvnOmYQr?=
- =?us-ascii?Q?HozPJr9FUzBknvi2snmWrtrnrG5dsHmoC+90ty6KE923v0JiP/LKaEVPPvMB?=
- =?us-ascii?Q?XIckgrtQSGbzvp8LhXCFaiuSbPwnKu4U6kHrGbBROVkaNhkw9mv1m/nkUrU/?=
- =?us-ascii?Q?5sTh49T2wbA1uS+0HClybUw7H9VGH2slf30d0uPf7hOpsoZAD6+p6Aye9g00?=
- =?us-ascii?Q?e0IbAi/odRPMR+37zlABHinIqRdXgYBBShlXCzWz?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1FA33D97F
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 06:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728024461; cv=none; b=gos445TRLeUa3Rp8xeixibFhwLkE9B/w0qDccbnjIcV2lG200ASXdPCulm+rh/ziUllCPQ8bCychVvd06A0FvoesHeIOx+1qijZ5hzTWiN8MDI+9dJ54AAhJ662RFbs4EHy34EyN/13XxrfCbE01IvTVDJo4QTprkfgWtXo9lRk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728024461; c=relaxed/simple;
+	bh=Dh3siMHgpSTTHvkm1VGIPd6OdI+6vQIsrrQKKp0ru4M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D3A3PZsHnYXvnMgsT0DzqSNWI6++W2daT8Rp0GverdxkatxYV1iR/Lom/DM2ml11TlquHqGIaX6dBjmnXpZDT7d1azhPMGClpMJQaR2IA/VtCL+XQxekXTnDB89nu1wh4tqRxWIVZriuoz2nw+dBnz4pZyJWkyQ8mL4eBhpEcMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HC8gspR4; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728024458; x=1759560458;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Dh3siMHgpSTTHvkm1VGIPd6OdI+6vQIsrrQKKp0ru4M=;
+  b=HC8gspR4RTwU+xBnAjKd4VvD7uPKt6YznyVPSbJbxJbHrtQEBv70QEKT
+   ToLJMzSA/txc40aeZDYdus2LiOVQPX0f0u/Lz/xGg6NDAdx2zpwih0exd
+   btsRC+pUvARjnZ+kP0H+NC7+RLXyRI+7lUP+CIY9qPmWhZrsIPsyqW6uS
+   mqxQ89HKZOovFGfFARCcuxvvnoHVH+uJaCXsOwuiiOVpkzB0nxrDuZ9kU
+   rCRe01Z37OqSFbZslGOelYHIY/76WuZ0i2LxEcEYihc8B+29yujYXN46P
+   YrFlvtYFv+ESKxQDPW3iKmvE78PgVd6HVBzWyT3ngshkIMT31b9IYp3sp
+   A==;
+X-CSE-ConnectionGUID: k+WZ3jzISYW7lZj29KP1EA==
+X-CSE-MsgGUID: ErNvp/hkQYqS02NSKBToRg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11214"; a="44703435"
+X-IronPort-AV: E=Sophos;i="6.11,176,1725346800"; 
+   d="scan'208";a="44703435"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Oct 2024 23:47:38 -0700
+X-CSE-ConnectionGUID: IHvKJOMaSIqqFTqIZJqtBA==
+X-CSE-MsgGUID: Yd9JiF1aT+CgLJE9o3F+7g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,176,1725346800"; 
+   d="scan'208";a="78611188"
+Received: from kkolacin-desk1.ger.corp.intel.com (HELO kkolacin-desk1.igk.intel.com) ([10.217.160.108])
+  by fmviesa003.fm.intel.com with ESMTP; 03 Oct 2024 23:47:37 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH iwl-next] ice: Add in/out PTP pin delays
+Date: Fri,  4 Oct 2024 08:47:13 +0200
+Message-ID: <20241004064733.1362850-2-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8849.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a843bf66-d8ed-4106-0336-08dce43e1e90
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Oct 2024 06:31:03.1270
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lVci3n/Xrd0T2u7v7JVu9m0XjMdFJYz6f23zEQVgecqoP+UId8p4hWKg/bCaPPdXV3snOPJf/8drii84BMmK5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7054
+Content-Transfer-Encoding: 8bit
 
-> -----Original Message-----
-> From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Sent: Wednesday, October 2, 2024 10:25 AM
-[...]
->=20
-> On Tue,  1 Oct 2024 14:22:01 -0700
-> Rosen Penev <rosenp@gmail.com> wrote:
->=20
-> > There seems to be a mistake here where free_tx_queue is called on
-> > failure. Just let devm deal with it.
->=20
-> Good catch, this looks good to me.
->=20
+HW can have different input/output delays for each of the pins.
+Add a field in ice_ptp_pin_desc structure to reflect that.
 
-I like your enthusiasm, but there's nothing to catch here.
-kfree() does nothing to NULL objects, however the 'constructor' allocates a=
-n
-array of objects so free_tx_queues() has to iterate over all objects, to fr=
-ee those
-allocated before failure.
+Implement external timestamp delay compensation.
 
-I don't have a strong opinion regarding the usage of devm_*() API to alloca=
-te resources
-at device probing time, it saves some lines of code. However I see this as =
-bringing limited
-benefits for simple cases like device probe()/remove(), especially when con=
-verting old drivers
-like this one. And there's also the risk of falling into the trap of thinki=
-ng that devm_*() takes
-care of everything.
+Remove existing definitions and wrappers for periodic output propagation
+delays.
 
--Claudiu
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 81 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  2 +
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   | 12 ---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   | 24 ------
+ 4 files changed, 49 insertions(+), 70 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 9bc22620f838..f5f51af33716 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -16,28 +16,28 @@ static const char ice_pin_names[][64] = {
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e82x[] = {
+-	/* name,        gpio */
+-	{  TIME_SYNC, {  4, -1 }},
+-	{  ONE_PPS,   { -1,  5 }},
++	/* name,        gpio,       delay */
++	{  TIME_SYNC, {  4, -1 }, { 0,  0 }},
++	{  ONE_PPS,   { -1,  5 }, { 0, 11 }},
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e825c[] = {
+-	/* name,        gpio */
+-	{  SDP0,      {  0,  0 }},
+-	{  SDP1,      {  1,  1 }},
+-	{  SDP2,      {  2,  2 }},
+-	{  SDP3,      {  3,  3 }},
+-	{  TIME_SYNC, {  4, -1 }},
+-	{  ONE_PPS,   { -1,  5 }},
++	/* name,        gpio,       delay */
++	{  SDP0,      {  0,  0 }, { 15, 14 }},
++	{  SDP1,      {  1,  1 }, { 15, 14 }},
++	{  SDP2,      {  2,  2 }, { 15, 14 }},
++	{  SDP3,      {  3,  3 }, { 15, 14 }},
++	{  TIME_SYNC, {  4, -1 }, { 11,  0 }},
++	{  ONE_PPS,   { -1,  5 }, {  0,  9 }},
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e810[] = {
+-	/* name,      gpio */
+-	{  SDP0,    {  0, 0 }},
+-	{  SDP1,    {  1, 1 }},
+-	{  SDP2,    {  2, 2 }},
+-	{  SDP3,    {  3, 3 }},
+-	{  ONE_PPS, { -1, 5 }},
++	/* name,        gpio,       delay */
++	{  SDP0,      {  0,  0 }, { 0, 1 }},
++	{  SDP1,      {  1,  1 }, { 0, 1 }},
++	{  SDP2,      {  2,  2 }, { 0, 1 }},
++	{  SDP3,      {  3,  3 }, { 0, 1 }},
++	{  ONE_PPS,   { -1,  5 }, { 0, 1 }},
+ };
+ 
+ static const char ice_pin_names_nvm[][64] = {
+@@ -49,12 +49,12 @@ static const char ice_pin_names_nvm[][64] = {
+ };
+ 
+ static const struct ice_ptp_pin_desc ice_pin_desc_e810_sma[] = {
+-	/* name,   gpio */
+-	{  GNSS, {  1, -1 }},
+-	{  SMA1, {  1,  0 }},
+-	{  UFL1, { -1,  0 }},
+-	{  SMA2, {  3,  2 }},
+-	{  UFL2, {  3, -1 }},
++	/* name,   gpio,       delay */
++	{  GNSS, {  1, -1 }, { 0, 0 }},
++	{  SMA1, {  1,  0 }, { 0, 1 }},
++	{  UFL1, { -1,  0 }, { 0, 1 }},
++	{  SMA2, {  3,  2 }, { 0, 1 }},
++	{  UFL2, {  3, -1 }, { 0, 0 }},
+ };
+ 
+ static struct ice_pf *ice_get_ctrl_pf(struct ice_pf *pf)
+@@ -1561,18 +1561,29 @@ void ice_ptp_extts_event(struct ice_pf *pf)
+ 	 * Event is defined in GLTSYN_EVNT_0 register
+ 	 */
+ 	for (chan = 0; chan < GLTSYN_EVNT_H_IDX_MAX; chan++) {
++		int pin_desc_idx;
++
+ 		/* Check if channel is enabled */
+-		if (pf->ptp.ext_ts_irq & (1 << chan)) {
+-			lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
+-			hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
+-			event.timestamp = (((u64)hi) << 32) | lo;
+-			event.type = PTP_CLOCK_EXTTS;
+-			event.index = chan;
+-
+-			/* Fire event */
+-			ptp_clock_event(pf->ptp.clock, &event);
+-			pf->ptp.ext_ts_irq &= ~(1 << chan);
++		if (!(pf->ptp.ext_ts_irq & (1 << chan)))
++			continue;
++
++		lo = rd32(hw, GLTSYN_EVNT_L(chan, tmr_idx));
++		hi = rd32(hw, GLTSYN_EVNT_H(chan, tmr_idx));
++		event.timestamp = (u64)hi << 32 | lo;
++
++		/* Add delay compensation */
++		pin_desc_idx = ice_ptp_find_pin_idx(pf, PTP_PF_EXTTS, chan);
++		if (pin_desc_idx >= 0) {
++			const struct ice_ptp_pin_desc *desc;
++
++			desc = &pf->ptp.ice_pin_desc[pin_desc_idx];
++			event.timestamp -= desc->delay[0];
+ 		}
++
++		event.type = PTP_CLOCK_EXTTS;
++		event.index = chan;
++		pf->ptp.ext_ts_irq &= ~(1 << chan);
++		ptp_clock_event(pf->ptp.clock, &event);
+ 	}
+ }
+ 
+@@ -1767,6 +1778,7 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
+ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 			      int on)
+ {
++	unsigned int gpio_pin, prop_delay;
+ 	u64 clk, period, start, phase;
+ 	struct ice_hw *hw = &pf->hw;
+ 	unsigned int gpio_pin;
+@@ -1780,6 +1792,7 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 		return -EIO;
+ 
+ 	gpio_pin = pf->ptp.ice_pin_desc[pin_desc_idx].gpio[1];
++	prop_delay = pf->ptp.ice_pin_desc[pin_desc_idx].delay[1];
+ 	period = rq->period.sec * NSEC_PER_SEC + rq->period.nsec;
+ 
+ 	/* If we're disabling the output or period is 0, clear out CLKO and TGT
+@@ -1811,11 +1824,11 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
+ 	 * at the next multiple of period, maintaining phase.
+ 	 */
+ 	clk = ice_ptp_read_src_clk_reg(pf, NULL);
+-	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - ice_prop_delay(hw))
++	if (rq->flags & PTP_PEROUT_PHASE || start <= clk - prop_delay)
+ 		start = div64_u64(clk + period - 1, period) * period + phase;
+ 
+ 	/* Compensate for propagation delay from the generator to the pin. */
+-	start -= ice_prop_delay(hw);
++	start -= prop_delay;
+ 
+ 	return ice_ptp_write_perout(hw, rq->index, gpio_pin, start, period);
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 5af474285780..23cd7878bcc8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -210,6 +210,7 @@ enum ice_ptp_pin_nvm {
+  * struct ice_ptp_pin_desc - hardware pin description data
+  * @name_idx: index of the name of pin in ice_pin_names
+  * @gpio: the associated GPIO input and output pins
++ * @delay: input and output signal delays in nanoseconds
+  *
+  * Structure describing a PTP-capable GPIO pin that extends ptp_pin_desc array
+  * for the device. Device families have separate sets of available pins with
+@@ -218,6 +219,7 @@ enum ice_ptp_pin_nvm {
+ struct ice_ptp_pin_desc {
+ 	int name_idx;
+ 	int gpio[2];
++	unsigned int delay[2];
+ };
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+index 585ce200c60f..c3e9b78087a8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+@@ -341,8 +341,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		823437500, /* 823.4375 MHz PLL */
+ 		/* nominal_incval */
+ 		0x136e44fabULL,
+-		/* pps_delay */
+-		11,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_122_880 -> 122.88 MHz */
+@@ -351,8 +349,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		783360000, /* 783.36 MHz */
+ 		/* nominal_incval */
+ 		0x146cc2177ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_125_000 -> 125 MHz */
+@@ -361,8 +357,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		796875000, /* 796.875 MHz */
+ 		/* nominal_incval */
+ 		0x141414141ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_153_600 -> 153.6 MHz */
+@@ -371,8 +365,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		816000000, /* 816 MHz */
+ 		/* nominal_incval */
+ 		0x139b9b9baULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_156_250 -> 156.25 MHz */
+@@ -381,8 +373,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		830078125, /* 830.78125 MHz */
+ 		/* nominal_incval */
+ 		0x134679aceULL,
+-		/* pps_delay */
+-		11,
+ 	},
+ 
+ 	/* ICE_TIME_REF_FREQ_245_760 -> 245.76 MHz */
+@@ -391,8 +381,6 @@ const struct ice_time_ref_info_e82x e82x_time_ref[NUM_ICE_TIME_REF_FREQ] = {
+ 		783360000, /* 783.36 MHz */
+ 		/* nominal_incval */
+ 		0x146cc2177ULL,
+-		/* pps_delay */
+-		12,
+ 	},
+ };
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index f81e2e9b0200..790534a6a905 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -80,7 +80,6 @@ struct ice_phy_reg_info_eth56g {
+  * struct ice_time_ref_info_e82x
+  * @pll_freq: Frequency of PLL that drives timer ticks in Hz
+  * @nominal_incval: increment to generate nanoseconds in GLTSYN_TIME_L
+- * @pps_delay: propagation delay of the PPS output signal
+  *
+  * Characteristic information for the various TIME_REF sources possible in the
+  * E822 devices
+@@ -88,7 +87,6 @@ struct ice_phy_reg_info_eth56g {
+ struct ice_time_ref_info_e82x {
+ 	u64 pll_freq;
+ 	u64 nominal_incval;
+-	u8 pps_delay;
+ };
+ 
+ /**
+@@ -326,9 +324,6 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
+  */
+ #define ICE_E810_PLL_FREQ		812500000
+ #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
+-#define ICE_E810_OUT_PROP_DELAY_NS	1
+-#define ICE_E810_E830_SYNC_DELAY	0
+-#define ICE_E825C_OUT_PROP_DELAY_NS	11
+ 
+ /* Device agnostic functions */
+ u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
+@@ -390,11 +385,6 @@ static inline u64 ice_e82x_nominal_incval(enum ice_time_ref_freq time_ref)
+ 	return e82x_time_ref[time_ref].nominal_incval;
+ }
+ 
+-static inline u64 ice_e82x_pps_delay(enum ice_time_ref_freq time_ref)
+-{
+-	return e82x_time_ref[time_ref].pps_delay;
+-}
+-
+ /* E822 Vernier calibration functions */
+ int ice_stop_phy_timer_e82x(struct ice_hw *hw, u8 port, bool soft_reset);
+ int ice_start_phy_timer_e82x(struct ice_hw *hw, u8 port);
+@@ -431,20 +421,6 @@ int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
+ #define ICE_ETH56G_NOMINAL_THRESH4	0x7777
+ #define ICE_ETH56G_NOMINAL_TX_THRESH	0x6
+ 
+-static inline u64 ice_prop_delay(const struct ice_hw *hw)
+-{
+-	switch (hw->mac_type) {
+-	case ICE_MAC_E810:
+-		return ICE_E810_OUT_PROP_DELAY_NS;
+-	case ICE_MAC_GENERIC:
+-		return ice_e82x_pps_delay(ice_e82x_time_ref(hw));
+-	case ICE_MAC_GENERIC_3K_E825:
+-		return ICE_E825C_OUT_PROP_DELAY_NS;
+-	default:
+-		return 0;
+-	}
+-}
+-
+ /**
+  * ice_get_base_incval - Get base clock increment value
+  * @hw: pointer to the HW struct
+
+base-commit: f2589ad16e14b7102f1411e3385a2abf07076406
+-- 
+2.46.2
+
 
