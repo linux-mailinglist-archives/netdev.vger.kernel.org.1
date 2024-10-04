@@ -1,79 +1,71 @@
-Return-Path: <netdev+bounces-132171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEED59909F8
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:07:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15655990A3F
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92A1E1F247E7
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:07:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D16E9281AA0
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 17:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82AAC1CACF1;
-	Fri,  4 Oct 2024 17:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="10BfuADd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8581D9A5E;
+	Fri,  4 Oct 2024 17:38:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27411C831A
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 17:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE8050A63;
+	Fri,  4 Oct 2024 17:37:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728061648; cv=none; b=gnkLKf/bvKZF29IVzDd5f/sQMbZpO7rt8wdyUNowKlAcwfkayuO3SPICmVFhoRJtHuLwqUadKYos7JXpm/9JkjmGlngj7mdOqOus0jy8vbQs4+ymNENKy9T7liTwYaLEnNjTiyhZCxSFJBRDTPVZALyl1J49JNLxwKG3E+JK/wI=
+	t=1728063481; cv=none; b=L5LZHOYs4lDHu16xpy/ooDuV4M15g4s00qfww7X+IQz5B2HZuGnwkbWQnJv+haHT0LPLvfgMgJXlYklT4Uw4omfPFth0xHKqAvKmEVgVobu9PRX8A4GwWdQz1bMtox+vXKUYbhm21CxpINSc7jXXUH0RupQowWlZt+yQ29hrry0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728061648; c=relaxed/simple;
-	bh=otmozzONu41sGvqzklOoi8vd3iy6hvVCXx0QRD/oCbM=;
+	s=arc-20240116; t=1728063481; c=relaxed/simple;
+	bh=r6h6ivAteGGBHkj5NscHtHXFd57HJ1AIrm66cRntSVo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q6lyNK13rmuiCgtzfZRC4S+d+7Hz3A75Uk0qFlM3+mLy1YgbPAOumfCARBjshJjKPt3QlQ7CVCR7o9jXdixqj98rsaczKc8GZllIvp4wyX/ohhYo6wXSGfXPT0sqALOGBEsvymHc2ah6/LJbdZ4YNlQvUWMzzU3dWK9e08rfCbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=10BfuADd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eUrKQlJ9GoNgsouFhKisvL8cCNUjhZWHkUqj1luPv0k=; b=10BfuADdrTE40KbDRPsbAYzSOP
-	PMZKWKf/RlunKhpplrrK4F7nCnK+wGCFV9rf/WL3AOA3bOseBmAvikuCX4N14wKV3Mh/gHWiHs3+7
-	aXlvycwEU4b3yAQ+hvxEI10lAMRmVSg9G93bnDb7UpswOUJMnK9d0XNw95+gA2FH19VyOnqbcM+BL
-	zGY6M1XBKOccsqFqfhryncFnBNo7hk7olRv/XoGIgcRzjWIe743f+cYq+VuDs7aRHIQrhK6nk2D+g
-	CADbICk/HrNFBE90qvzoz6AI7UtjmKhAJs6mOYTxD1jde0oK6FN9i8geeqD4n/cmhbAImyILHWS7+
-	Zht+57SA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33080)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swlll-0002Kb-2O;
-	Fri, 04 Oct 2024 18:07:09 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swllg-0001KS-0J;
-	Fri, 04 Oct 2024 18:07:04 +0100
-Date: Fri, 4 Oct 2024 18:07:03 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ma9LFmaKDm9hAWcjJIf8BwGJWlfz+0e7Re81bkrGlzb6cmDBHpNxknnoXw7eoL2PYksFGrD4kWIjwEXYEYGqFU4uHszroX575OfzF7H17jeLj4t2JKl6UPi5Dbfq3wvjzWy5BcRj5f12ISTIwKOR/9AnaQ9qyYH4EdIVfFhtZfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a93b2070e0cso267946866b.3;
+        Fri, 04 Oct 2024 10:37:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728063478; x=1728668278;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FhtiUJLGqKylZjIhkXCBoyOQK1CEukwM7WvnraRscHc=;
+        b=E/phjZqdTpcBvq0tmY+bOXaYaI6TCn0E/v4mH1KFfT+3HR6fs8ifqbB7LDxGAjK2g6
+         4UOFwV9JKcQEWiVHhighgSMLT7u/0+2LBF7KHNub7zizsdN3cceGSPpGRtO7FIERwTT0
+         fXn87PfCqok48YrDvFhQioSJZzUeoMcJI7yUFTyMel+YoWRzGOFIEgqdcxk8KaCM4fUi
+         YPOSJXsE+40uyNFYhH+F4xiDLXqe9bIK1N6iCrgPsRiBaztkHioA7hreAHgVrDbbafbw
+         Mc+8KjiVp6gDIvP9V+ydVoRzxwrfdDnqGHqhxf6vaGUxJejagU0oGK5V+nHbKKiDqEEo
+         YReQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9BY+n4ursCIr957ijtU+81RkQJjD5fPf66ExzBpmhu4tcGeFA7rbu/BTuOU0prVMrAGiWof4fLaFRlFs=@vger.kernel.org, AJvYcCWPfYMdEroKrsi3EfPplzYUH6h9Sv9tiPpDA3rveUSy+saOV4PzLqVljDewm2wy+sHrK/771KQV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz50WBFlYK08xuiCLbhTI+/LfMcTvkMdkHgf9k+didUSQlgyL5s
+	v9lA/BGPdYNAoA42gPJN2wzAzIeQnzNsjE5lqDqW/5EF1zJRgr9t
+X-Google-Smtp-Source: AGHT+IGM43/t6Op9V+aFOXXOJkw2sD8OmTLFOZsdFt6lqMnE9b04AjNAFM955nCwxHjG8NNKw1ttfw==
+X-Received: by 2002:a17:907:9304:b0:a8d:7b7d:8c39 with SMTP id a640c23a62f3a-a991c03145bmr375006066b.43.1728063478123;
+        Fri, 04 Oct 2024 10:37:58 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-112.fbsv.net. [2a03:2880:30ff:70::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a992e7c46e3sm20031066b.180.2024.10.04.10.37.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 10:37:57 -0700 (PDT)
+Date: Fri, 4 Oct 2024 10:37:52 -0700
+From: Breno Leitao <leitao@debian.org>
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 00/13] net: pcs: xpcs: cleanups batch 2
-Message-ID: <ZwAgtwKKD8rsBL-_@shell.armlinux.org.uk>
-References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
- <20241004111940.xbtssgeggp5mcprl@skbuf>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rmikey@meta.com, kernel-team@meta.com, horms@kernel.org,
+	"open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: Optimize IPv6 path in ip_neigh_for_gw()
+Message-ID: <20241004-straight-prompt-auk-ada09a@leitao>
+References: <20241004162720.66649-1-leitao@debian.org>
+ <2234f445-848b-4edc-9d6d-9216af9f93a3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,22 +74,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004111940.xbtssgeggp5mcprl@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <2234f445-848b-4edc-9d6d-9216af9f93a3@kernel.org>
 
-On Fri, Oct 04, 2024 at 02:19:40PM +0300, Vladimir Oltean wrote:
-> On Fri, Oct 04, 2024 at 11:19:57AM +0100, Russell King (Oracle) wrote:
-> >  drivers/net/pcs/pcs-xpcs-nxp.c                    |  24 +-
+Hello David,
+
+On Fri, Oct 04, 2024 at 11:01:29AM -0600, David Ahern wrote:
+> On 10/4/24 10:27 AM, Breno Leitao wrote:
+> > Branch annotation traces from approximately 200 IPv6-enabled hosts
+> > revealed that the 'likely' branch in ip_neigh_for_gw() was consistently
+> > mispredicted. Given the increasing prevalence of IPv6 in modern networks,
+> > this commit adjusts the function to favor the IPv6 path.
+> > 
+> > Swap the order of the conditional statements and move the 'likely'
+> > annotation to the IPv6 case. This change aims to improve performance in
+> > IPv6-dominant environments by reducing branch mispredictions.
+> > 
+> > This optimization aligns with the trend of IPv6 becoming the default IP
+> > version in many deployments, and should benefit modern network
+> > configurations.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  include/net/route.h | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/net/route.h b/include/net/route.h
+> > index 1789f1e6640b..b90b7b1effb8 100644
+> > --- a/include/net/route.h
+> > +++ b/include/net/route.h
+> > @@ -389,11 +389,11 @@ static inline struct neighbour *ip_neigh_for_gw(struct rtable *rt,
+> >  	struct net_device *dev = rt->dst.dev;
+> >  	struct neighbour *neigh;
+> >  
+> > -	if (likely(rt->rt_gw_family == AF_INET)) {
+> > -		neigh = ip_neigh_gw4(dev, rt->rt_gw4);
+> > -	} else if (rt->rt_gw_family == AF_INET6) {
+> > +	if (likely(rt->rt_gw_family == AF_INET6)) {
+> >  		neigh = ip_neigh_gw6(dev, &rt->rt_gw6);
+> >  		*is_v6gw = true;
+> > +	} else if (rt->rt_gw_family == AF_INET) {
+> > +		neigh = ip_neigh_gw4(dev, rt->rt_gw4);
+> >  	} else {
+> >  		neigh = ip_neigh_gw4(dev, ip_hdr(skb)->daddr);
+> >  	}
 > 
-> I want to test this on the SJA1110, but every XPCS cleanup series day is
-> a new unpacking day. I have to take the board out of a box and make sure
-> it still works. It might take a while.
+> This is an IPv4 function allowing support for IPv6 addresses as a
+> nexthop. It is appropriate for IPv4 family checks to be first.
 
-Sorry about that - if netdev didn't have the "15 patches max" then I
-would've posted it as one series which would've saved you the
-additional work.
+Right. In which case is this called on IPv6 only systems?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On my IPv6-only 200 systems, the annotated branch predictor is showing
+it is mispredicted 100% of the time.
+
+Thanks for the review
+--breno
+
 
