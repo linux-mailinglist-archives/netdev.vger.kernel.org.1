@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-132137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2670F9908CC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:16:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 287B79908CF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 18:16:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C59C51F2125D
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:16:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 994741F21807
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:16:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A971C3049;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891DD1C3056;
 	Fri,  4 Oct 2024 16:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="AoPWYq1c"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Aj03KI7d"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 228551E376A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320411C302A;
 	Fri,  4 Oct 2024 16:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728058575; cv=none; b=lckG/ChMjz7zKkBufbJ7asHPdRWPkWHB0nwRIV4K2aTO8pgeYQ4bYG2Ko5abX0sFewIVIt6trRiaQERiUbeXhfBeaxIoIyBkDh0+GNKKB9WnsCR2IE9Lq0eWUEofpdT3FEhrdYQf+5adwMWVsRXmxgPzhllvOiq7UhMeUJ6098E=
+	t=1728058575; cv=none; b=lDtJliUhM7HJFMB3UqsZZOx736xylIBtMuQiUdSdo+eqUB21GJ8ouW4uiJtvPhHm5SaUZywkXpp2AoBvT+kvahzI4qwJQLTdsdRCoeU7Stcw1Jn16vh36YZEVVzt/vvMUiVJ+OG/LTUOBqogIG9Cbwm2tbpjIPnTehSJwdyqNWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728058575; c=relaxed/simple;
-	bh=ejn1GFPR9W2TdEKB5c75qRHxLwfHpl+FmEBD4TY8kBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AStxCSwb9GIeOLeQeKmepruynzZ4EX4OJzLbb7msGxVarW8dVyHlTdb3mzl9u/C2VkBFVWyvLLWZ5bduSnUkkV8khelMZR+vK3yExA/4NJu56jkJGu8CUCT1SLoqN+ZNSBwWBZ8eg4xuLalrvTU9hXF0IrSopAKjkgLJbR4B43w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=AoPWYq1c; arc=none smtp.client-ip=217.70.183.200
+	bh=cWiP3Kjqz/izcUhaTbZyZSDrw3J4YdbAhVr9h4xaE1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=d/jCyJ9anttXT7MqLEhS3xYIeF8dq4VUOXiINiFQ2XidCUt2szLx+6jEbRJ3ug0LiUfEX5qS/ItT+astjOVLFd9oy08saHBlToHdXNew+Jo/OvbLpOmYW1W7gYw4ral4w3uQpQGHptRU3jUTvk9uyGbKEbCwpZtYf8cVCw3yG14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Aj03KI7d; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B271720002;
-	Fri,  4 Oct 2024 16:16:02 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8FB7320007;
+	Fri,  4 Oct 2024 16:16:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728058565;
+	t=1728058566;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fSauzY14BbY+ha02xCBSKfLVVZxWv4ZQivu2DAFFQho=;
-	b=AoPWYq1coI1dPPv7LOHsQpWy/qOiZeIDAjusnCcyjRbpP+s1KsbGZbnZX20u/LH9YRH4kJ
-	4f6U2QhZuu86MtyVLNbY5nSl4sPhX2OXssC9mE9nnVToc3alwhuFIL7BZ1Wdw58TGirBjB
-	x4jJLcBg6qq70hG+fcYfKkn1C7V1WyvUQ70gsio2pZyFmqsX7fZ1RvFBb2oXpzOnKDtDLJ
-	MEvLj0nqQTwsNU9bxq6dGRMqrQLYdlxpHDZg1l8oUVby4RZ1kh4XICk6+QP7aSKOLZ98VU
-	IPAS5M/hhZd5FgW60u7BBf85+BnRFUqYeJwHdvCZitcXjVMRZ0tW9ek9fIipvg==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S1PpGNdeGt7JU4mNt5Ls+bwThFLcxi58wb3XDdywdCU=;
+	b=Aj03KI7dOrnnOhsIil95hZvWSRtFywE/A+1VNYi+kSo+khvYzUGUre4UCC5X6lmTSIH75w
+	n7G5wEb+VmwVnmGYBWnuvkmvaMYGUlM/lvdiYiMJXj0J3fC+M70tPAZ9rTRNSjt77XFDEu
+	JfAq2nOZNMcRJvghouT97Qss2WGkdHPBE7PAyWI4zGEiAw7KinuLn/cFb5wGcb6vtk6aQ0
+	kp0zV2cIBiRhTn9COyGVkcjXlMShYEn33x1Isb2oipWeZi69W9sYD4T/CZEu2aXHwpnqcI
+	oKL2lTWESARGKEnOmezOlI2VzAQISevE6ZI3/ojarFVsVRwJUozZaYr6oG+cSg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -63,10 +65,12 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH net-next v2 0/9] Allow isolating PHY devices
-Date: Fri,  4 Oct 2024 18:15:50 +0200
-Message-ID: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next v2 1/9] net: phy: allow isolating PHY devices
+Date: Fri,  4 Oct 2024 18:15:51 +0200
+Message-ID: <20241004161601.2932901-2-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.46.1
+In-Reply-To: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,59 +80,212 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello,
+The 802.3 specifications describes the isolation mode as setting the
+PHY's MII interface in high-impedance mode, thus isolating the PHY from
+that bus. This effectively breaks the link between the MAC and the PHY,
+but without necessarily disrupting the link between the PHY and the LP.
 
-This is the V2 of a series to add isolation support for PHY devices.
+This mode can be useful for testing purposes, but also when there are
+multiple PHYs on the same MII bus (a case that the 802.3 specification
+refers to).
 
-As a remainder, this mode allows a PHY to set its MII lines in
-high-impedance mode to avoid interferences on this bus.
+In Isolation mode, the PHY will still continue to respond to MDIO
+commands.
 
-So far, I've identified that :
+Introduce a helper to set the phy in an isolated mode.
 
- - Marvell 88e1512 isolation works fine
- - LXT973 claims to support isolation, but it's actually broken
- - Marvell 88x3310 doesn't support isolation, by design
- - Marvell 88e1111 claims to support isolation in GMII, RGMII, TBI
-   (untested) but doesn't in SGMII (tested).
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+V2 : No change
 
-Changes in V2 :
+ drivers/net/phy/phy_device.c | 76 +++++++++++++++++++++++++++++++++---
+ include/linux/phy.h          |  4 ++
+ 2 files changed, 74 insertions(+), 6 deletions(-)
 
- - Removed the loopback mode that was included in the first iteration
- - Added phy_shutdown, to make sure we de-isolate the PHY when rebooting
- - Changes the "PHY_NO_ISOLATE" flag to a phy driver ops. Testing showed
-   that some PHYs may or may not support isolation based on the
-   interface that's being used.
- - Added isolation support reporting for the Marvell 88e1111 PHY.
-
-V1 : https://lore.kernel.org/netdev/20240911212713.2178943-1-maxime.chevallier@bootlin.com/
-
-Maxime Chevallier (9):
-  net: phy: allow isolating PHY devices
-  net: phy: Introduce phy_shutdown for device quiescence.
-  net: phy: Allow PHY drivers to report isolation support
-  net: phy: lxt: Mark LXT973 PHYs as having a broken isolate mode
-  net: phy: marvell10g: 88x3310 and 88x3340 don't support isolate mode
-  net: phy: marvell: mv88e1111 doesn't support isolate in SGMII mode
-  net: phy: introduce ethtool_phy_ops to get and set phy configuration
-  net: ethtool: phy: allow reporting and setting the phy isolate status
-  netlink: specs: introduce phy-set command along with configurable
-    attributes
-
- Documentation/netlink/specs/ethtool.yaml     |  15 +++
- Documentation/networking/ethtool-netlink.rst |   1 +
- drivers/net/phy/lxt.c                        |   2 +
- drivers/net/phy/marvell.c                    |   9 ++
- drivers/net/phy/marvell10g.c                 |   2 +
- drivers/net/phy/phy.c                        |  44 ++++++++
- drivers/net/phy/phy_device.c                 | 101 +++++++++++++++++--
- include/linux/ethtool.h                      |   8 ++
- include/linux/phy.h                          |  42 ++++++++
- include/uapi/linux/ethtool_netlink.h         |   2 +
- net/ethtool/netlink.c                        |   8 ++
- net/ethtool/netlink.h                        |   1 +
- net/ethtool/phy.c                            |  68 +++++++++++++
- 13 files changed, 297 insertions(+), 6 deletions(-)
-
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 560e338b307a..c468e72bef4b 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2127,6 +2127,38 @@ int phy_loopback(struct phy_device *phydev, bool enable)
+ }
+ EXPORT_SYMBOL(phy_loopback);
+ 
++int phy_isolate(struct phy_device *phydev, bool enable)
++{
++	int ret = 0;
++
++	if (!phydev->drv)
++		return -EIO;
++
++	mutex_lock(&phydev->lock);
++
++	if (enable && phydev->isolated) {
++		ret = -EBUSY;
++		goto out;
++	}
++
++	if (!enable && !phydev->isolated) {
++		ret = -EINVAL;
++		goto out;
++	}
++
++	ret = genphy_isolate(phydev, enable);
++
++	if (ret)
++		goto out;
++
++	phydev->isolated = enable;
++
++out:
++	mutex_unlock(&phydev->lock);
++	return ret;
++}
++EXPORT_SYMBOL(phy_isolate);
++
+ /**
+  * phy_reset_after_clk_enable - perform a PHY reset if needed
+  * @phydev: target phy_device struct
+@@ -2280,7 +2312,7 @@ int genphy_setup_forced(struct phy_device *phydev)
+ 	ctl = mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+ 
+ 	return phy_modify(phydev, MII_BMCR,
+-			  ~(BMCR_LOOPBACK | BMCR_ISOLATE | BMCR_PDOWN), ctl);
++			  ~(BMCR_LOOPBACK | BMCR_PDOWN), ctl);
+ }
+ EXPORT_SYMBOL(genphy_setup_forced);
+ 
+@@ -2369,8 +2401,11 @@ EXPORT_SYMBOL(genphy_read_master_slave);
+  */
+ int genphy_restart_aneg(struct phy_device *phydev)
+ {
+-	/* Don't isolate the PHY if we're negotiating */
+-	return phy_modify(phydev, MII_BMCR, BMCR_ISOLATE,
++	u16 mask = phydev->isolated ? 0 : BMCR_ISOLATE;
++	/* Don't isolate the PHY if we're negotiating, unless the PHY is
++	 * explicitly isolated
++	 */
++	return phy_modify(phydev, MII_BMCR, mask,
+ 			  BMCR_ANENABLE | BMCR_ANRESTART);
+ }
+ EXPORT_SYMBOL(genphy_restart_aneg);
+@@ -2394,7 +2429,8 @@ int genphy_check_and_restart_aneg(struct phy_device *phydev, bool restart)
+ 		if (ret < 0)
+ 			return ret;
+ 
+-		if (!(ret & BMCR_ANENABLE) || (ret & BMCR_ISOLATE))
++		if (!(ret & BMCR_ANENABLE) ||
++		    ((ret & BMCR_ISOLATE) && !phydev->isolated))
+ 			restart = true;
+ 	}
+ 
+@@ -2495,7 +2531,8 @@ int genphy_c37_config_aneg(struct phy_device *phydev)
+ 		if (ctl < 0)
+ 			return ctl;
+ 
+-		if (!(ctl & BMCR_ANENABLE) || (ctl & BMCR_ISOLATE))
++		if (!(ctl & BMCR_ANENABLE) ||
++		    ((ctl & BMCR_ISOLATE) && !phydev->isolated))
+ 			changed = 1; /* do restart aneg */
+ 	}
+ 
+@@ -2782,12 +2819,18 @@ EXPORT_SYMBOL(genphy_c37_read_status);
+ int genphy_soft_reset(struct phy_device *phydev)
+ {
+ 	u16 res = BMCR_RESET;
++	u16 mask = 0;
+ 	int ret;
+ 
+ 	if (phydev->autoneg == AUTONEG_ENABLE)
+ 		res |= BMCR_ANRESTART;
+ 
+-	ret = phy_modify(phydev, MII_BMCR, BMCR_ISOLATE, res);
++	if (phydev->isolated)
++		res |= BMCR_ISOLATE;
++	else
++		mask |= BMCR_ISOLATE;
++
++	ret = phy_modify(phydev, MII_BMCR, mask, res);
+ 	if (ret < 0)
+ 		return ret;
+ 
+@@ -2912,6 +2955,12 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
+ 		u16 ctl = BMCR_LOOPBACK;
+ 		int ret, val;
+ 
++		/* Isolating and looping-back the MII interface doesn't really
++		 * make sense
++		 */
++		if (phydev->isolated)
++			return -EINVAL;
++
+ 		ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+ 
+ 		phy_modify(phydev, MII_BMCR, ~0, ctl);
+@@ -2924,6 +2973,8 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
+ 	} else {
+ 		phy_modify(phydev, MII_BMCR, BMCR_LOOPBACK, 0);
+ 
++		genphy_isolate(phydev, phydev->isolated);
++
+ 		phy_config_aneg(phydev);
+ 	}
+ 
+@@ -2931,6 +2982,19 @@ int genphy_loopback(struct phy_device *phydev, bool enable)
+ }
+ EXPORT_SYMBOL(genphy_loopback);
+ 
++int genphy_isolate(struct phy_device *phydev, bool enable)
++{
++	u16 val = 0;
++
++	if (enable)
++		val = BMCR_ISOLATE;
++
++	phy_modify(phydev, MII_BMCR, BMCR_ISOLATE, val);
++
++	return 0;
++}
++EXPORT_SYMBOL(genphy_isolate);
++
+ /**
+  * phy_remove_link_mode - Remove a supported link mode
+  * @phydev: phy_device structure to remove link mode from
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index a98bc91a0cde..ae33919aa0f5 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -573,6 +573,7 @@ struct macsec_ops;
+  * @mac_managed_pm: Set true if MAC driver takes of suspending/resuming PHY
+  * @wol_enabled: Set to true if the PHY or the attached MAC have Wake-on-LAN
+  * 		 enabled.
++ * @isolated: Set to true if the PHY's MII has been isolated.
+  * @state: State of the PHY for management purposes
+  * @dev_flags: Device-specific flags used by the PHY driver.
+  *
+@@ -676,6 +677,7 @@ struct phy_device {
+ 	unsigned is_on_sfp_module:1;
+ 	unsigned mac_managed_pm:1;
+ 	unsigned wol_enabled:1;
++	unsigned isolated:1;
+ 
+ 	unsigned autoneg:1;
+ 	/* The most recently read link state */
+@@ -1781,6 +1783,7 @@ int phy_suspend(struct phy_device *phydev);
+ int phy_resume(struct phy_device *phydev);
+ int __phy_resume(struct phy_device *phydev);
+ int phy_loopback(struct phy_device *phydev, bool enable);
++int phy_isolate(struct phy_device *phydev, bool enable);
+ int phy_sfp_connect_phy(void *upstream, struct phy_device *phy);
+ void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy);
+ void phy_sfp_attach(void *upstream, struct sfp_bus *bus);
+@@ -1894,6 +1897,7 @@ int genphy_read_master_slave(struct phy_device *phydev);
+ int genphy_suspend(struct phy_device *phydev);
+ int genphy_resume(struct phy_device *phydev);
+ int genphy_loopback(struct phy_device *phydev, bool enable);
++int genphy_isolate(struct phy_device *phydev, bool enable);
+ int genphy_soft_reset(struct phy_device *phydev);
+ irqreturn_t genphy_handle_interrupt_no_ack(struct phy_device *phydev);
+ 
 -- 
 2.46.1
 
