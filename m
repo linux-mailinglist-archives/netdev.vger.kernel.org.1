@@ -1,141 +1,160 @@
-Return-Path: <netdev+bounces-132202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12998990F72
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:59:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 527F0990F87
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40F471C230B4
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:59:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76FDA1C231BF
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A1F1DD893;
-	Fri,  4 Oct 2024 19:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6276E1FA24F;
+	Fri,  4 Oct 2024 19:04:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YGrzVP+8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmHB+6+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12600136657;
-	Fri,  4 Oct 2024 19:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1EE1F9ABD;
+	Fri,  4 Oct 2024 19:04:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728068539; cv=none; b=k6ULdTLgZgKW27GZ9SduL98hz/pRq52QW0QI4Fe/WQqKuhIThTEIoEcMDry5NrVrhwcsGgt90uzimiw+MzFqskO7UNruTSjsbNcfhAffdFcvaWPtyjVk50SA9UeFYzUMQ+JBfHXNekcgjqqx7VB/3bl+f7Kbfcy0IQ07oE115ak=
+	t=1728068680; cv=none; b=ElaLe8W4GR9YRIJ+YdCidlJdPFAOjC6dvtq9csBvwlm1bg0KUkgxN54huXchnmJjTdSyU2k6ByFnZ+FTSVXvjlYMRypN8kfj1TRtvHiedh5mbeZL/T1mXbId7f+MUm7tXVwPfin0+QQ6/ffWR2W8TfPmAgJ8sshFPVUUKOGf8nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728068539; c=relaxed/simple;
-	bh=7a31GCJJ4EI6f8qcjaAEHHqOYmESiFgilCyUnQHJGnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5i6ke4E4u5zGuP3xPJNm8YNXp5PVXA4vN84pHdAhW/vxRxKvV/5QCoVUBUNL+3JwRCa8LwcAdHX5CcKh31+IJOf2tr9hfkQtNCz/iOBOuX15q6Fwm+WOj8qdSPnA8ErP5WAVqDw3I92lrX6XkizRCa6kw8mD1L0DWOPVQzsjDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YGrzVP+8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LUJZilgqaYxyl2cKJ0toBOmC6GOF/ktiyVJOdIywIxo=; b=YGrzVP+85uGEvI8mFy8QFV94Ji
-	0eGsA8DcZXpk3IERbh52eXU7BuqbgoFkPBUVh0mYXcjlti/SMDaBMNl+L3i3HchBkcdxm85SZDHJy
-	qU185f9QfB+0+yP4denXtr0kQg17ElOgaP8X25DEc3VJcXRmjOEMDSPaMLAC6LSQhUVmwMmz8sgk9
-	MprXS/39x2796zTQruklCKo1/UFocwZIXGYeiGaJSAYE/yAU3DwajKSm+daz4ldg3+N5LkNZApCeq
-	87X6F08ARWjwNc2+Hzy9KEnDEWr9IDBK9UnYzenGPk78rkrAmvZTPRXuIwf0ynWJRzdUBXk66rCTJ
-	9Pl8Gb4w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38292)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swnZ4-0002ar-2v;
-	Fri, 04 Oct 2024 20:02:10 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swnYz-0001Ox-13;
-	Fri, 04 Oct 2024 20:02:05 +0100
-Date: Fri, 4 Oct 2024 20:02:05 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
- get and set phy configuration
-Message-ID: <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
- <20241004161601.2932901-8-maxime.chevallier@bootlin.com>
- <4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
+	s=arc-20240116; t=1728068680; c=relaxed/simple;
+	bh=dg2TEPNt6m3xvH7rSPBqehMHHHswR0bUQaAIRYJds+0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FWSQoyMZkYA2vwYsM1H+eOK8EUBZEJ6myBYM8vBjVkZAmXfynGTZx5ux+uBw0RU3VIWvb8ZB9omQv6l7r6WomrhWfJvaz3ndgJTERdsA1G/EAP9hxOeZfcDBcyiwJkk2QN1Fki/7Rg12BqXtnQr03bUg9OBg7V8Dkph5+QeQwvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LmHB+6+y; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6de14e0f050so20180547b3.0;
+        Fri, 04 Oct 2024 12:04:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728068677; x=1728673477; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B5HfbdgHbABODTaTjHs2WrlvZ31IfcWLv08zvorE0ME=;
+        b=LmHB+6+y5me57h2Jk+M7zorgLBLfmL4lbkatp2t3LUeC3pVz7J+H4dpKFDKHcJSSaz
+         EekHA4TmlvuNo3y55Bsli43rvvFYgUoUx2dgLsH0fM/OV19h02yPoQexGrNgafiwE3jL
+         J6yfPeZnoyGbn6ll2KteKWQtNiapYdXz+AwKFy02aKQr3G7jgl30IT8T5qQbbJi7kUND
+         Ddt5Lko8xuZ5okuD0yMfozBlMQym7So+zqr2r4IAu83IOWHNYQ8TMMnk+LJFuRhDcQac
+         LJNfRPjw+cRPL3jpbAe1NoxCpcTBQWkj+ogTqr6uwXvwaAA2oeBd85p53hqOzVH+gT5R
+         aR5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728068677; x=1728673477;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B5HfbdgHbABODTaTjHs2WrlvZ31IfcWLv08zvorE0ME=;
+        b=CEVNcRkRYm1dadIdoZMW/UZJl4mDZRcxBeLmZK0+1nyRa2Js5aGT3lLg1ePwD/qGN0
+         n60p5Z6YpT6LwpRW4IhwxJXb4lH8VKhP8vaAgzKTsg2zP3ak2Xio4Y1OBQaLr38UyEa8
+         rdEywqEQigUBAekFfS8meRlec+QoUiBS3efBTsYymA7r64ZRmEFhRebGDbQ4B/sbA5fa
+         tToR3jJmDRx/9O9KSI/fQmmByrlKWkwtAxhwGeed+lixwGvAxAqVrWuCfGVprlphRaB3
+         1HLh2YT0zkJu/Y0Bdy/hGZNa6hmE2Z77t++pABAf/l+/W81uW03Dg9c0kFqitZ/g16Fy
+         vk3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUbLlQKH0pBe53j9sM2WJf9nGM2xgwDdohp5nRpn8QmEz6JhBQiu7KY9riY5WGY15jEsoHMSVMBjRGf5Tcy@vger.kernel.org, AJvYcCVYfE4tKprEzFA9Ew9X6oplWIYkdajE6anDvdKzqwnsyLTpnUuZRxQ7VdrQ6EVuw6E2kmZ7Hh1B@vger.kernel.org, AJvYcCXeIhL2Rru3MGaykU/nSFE8m0nYHsxfP/HOttpaAOa8oqQB2TbI7qOI25IHLXnp+OBkw2UX+THO4XiYNy2u@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoB0PzttdmvOADSle2f/BSOvYnn0apuEn1oqI3QSd5o3ZUIXVp
+	OhybWp5XLjWLZQIx2/qD3hjErPbwPkQL2g4fzP918qbMDjVcm+hWsHvzVZmcK7h41TeoTI09FA6
+	iqeZbj6lKniW7ulc/pBYvFXloyVI=
+X-Google-Smtp-Source: AGHT+IH9scQLWNqJQHayBVbx3/oOvir8TuLyhF6I1u9sp0NdVUUfeeiiIOFw8tGmDwqe/ZpBUA1tc6SRGklljrBAiUA=
+X-Received: by 2002:a05:690c:6813:b0:6e2:2600:ed86 with SMTP id
+ 00721157ae682-6e2c72f779cmr34932837b3.45.1728068677613; Fri, 04 Oct 2024
+ 12:04:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20241004000015.544297-1-rosenp@gmail.com> <20241004000015.544297-6-rosenp@gmail.com>
+ <39dcfa4b-1a22-4296-b190-ac39480d034a@kernel.org>
+In-Reply-To: <39dcfa4b-1a22-4296-b190-ac39480d034a@kernel.org>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Fri, 4 Oct 2024 12:04:26 -0700
+Message-ID: <CAKxU2N9-DxfsANMfT8DZ-LuKJ3bqjckyfd=+Lg_qtRn985BuoQ@mail.gmail.com>
+Subject: Re: [PATCHv2 5/5] documentation: use nvmem-layout in examples
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: devicetree@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	William Zhang <william.zhang@broadcom.com>, Anand Gore <anand.gore@broadcom.com>, 
+	Kursad Oney <kursad.oney@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Gregory Clement <gregory.clement@bootlin.com>, 
+	Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Christian Marangi <ansuelsmth@gmail.com>, 
+	"open list:MEMORY TECHNOLOGY DEVICES (MTD)" <linux-mtd@lists.infradead.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
+	"open list:ARM/QUALCOMM MAILING LIST" <linux-arm-msm@vger.kernel.org>, 
+	"moderated list:BROADCOM BCMBCA ARM ARCHITECTURE" <linux-arm-kernel@lists.infradead.org>, 
+	"moderated list:ARM/Mediatek SoC support" <linux-mediatek@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 04, 2024 at 08:42:42PM +0200, Andrew Lunn wrote:
-> > +int phy_set_config(struct phy_device *phydev,
-> > +		   const struct phy_device_config *phy_cfg,
-> > +		   struct netlink_ext_ack *extack)
-> > +{
-> > +	bool isolate_change;
-> > +	int ret;
-> > +
-> > +	mutex_lock(&phydev->lock);
-> > +	isolate_change = (phy_cfg->isolate != phydev->isolated);
-> > +	mutex_unlock(&phydev->lock);
-> > +
-> > +	if (!isolate_change)
-> > +		return 0;
-> > +
-> > +	ret = phy_isolate(phydev, phy_cfg->isolate);
-> > +	if (ret)
-> > +		NL_SET_ERR_MSG(extack, "Error while configuring PHY isolation");
-> 
-> This seems overly simplistic to me. Don't you need to iterate over all
-> the other PHYs attached to this MAC and ensure they are isolated? Only
-> one can be unisolated at once.
-> 
-> It is also not clear to me how this is going to work from a MAC
-> perspective. Does the MAC call phy_connect() multiple times? How does
-> ndev->phydev work? Who is responsible for the initial configuration,
-> such that all but one PHY is isolated?
-> 
-> I assume you have a real board that needs this. So i think we need to
-> see a bit more of the complete solution, including the MAC changes and
-> the device tree for the board, so we can see the big picture.
-
-Also what the ethernet driver looks like too!
-
-One way around the ndev->phydev problem, assuming that we decide that
-isolate is a good idea, would be to isolate the current PHY, disconnect
-it from the net_device, connect the new PHY, and then clear the isolate
-on the new PHY. Essentially, ndev->phydev becomes the currently-active
-PHY.
-
-However, I still want to hear whether multiple PHYs can be on the same
-MII bus from a functional electrical perspective.
-
-I know that on the Macchiatobin, where the 10G serdes signals go to the
-88X3310 on doubleshot boards and to the SFP cage on singleshot boards,
-this is controlled by the placement of zero ohm resistors to route the
-serdes signals to the appropriate device, thus minimising the unused
-stub lengths.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+On Thu, Oct 3, 2024 at 11:25=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On 04/10/2024 02:00, Rosen Penev wrote:
+> > nvmem-cells are deprecated and replaced with nvmem-layout. For these
+> > examples, replace. They're not relevant to the main point of the
+> > document anyway.
+>
+> Please use subject prefixes matching the subsystem. You can get them for
+> example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+> your patch is touching. For bindings, the preferred subjects are
+> explained here:
+> https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-pat=
+ches.html#i-for-patch-submitters
+>
+>
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+> >  .../mtd/partitions/qcom,smem-part.yaml        | 19 +++++++++++--------
+> >  .../bindings/net/marvell,aquantia.yaml        | 13 ++++++++-----
+> >  2 files changed, 19 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/Documentation/devicetree/bindings/mtd/partitions/qcom,smem=
+-part.yaml b/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-par=
+t.yaml
+> > index 1c2b4e780ca9..8ae149534b23 100644
+> > --- a/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-part.y=
+aml
+> > +++ b/Documentation/devicetree/bindings/mtd/partitions/qcom,smem-part.y=
+aml
+> > @@ -45,17 +45,20 @@ examples:
+> >              compatible =3D "qcom,smem-part";
+> >
+> >              partition-art {
+> > -                compatible =3D "nvmem-cells";
+> > -                #address-cells =3D <1>;
+> > -                #size-cells =3D <1>;
+> >                  label =3D "0:art";
+> >
+> > -                macaddr_art_0: macaddr@0 {
+> > -                    reg =3D <0x0 0x6>;
+> > -                };
+> > +                nvmem-layout {
+> > +                    compatible =3D "fixed-layout";
+>
+> This does not look right - the binding still expects nvmem-cells. I
+> wonder how does the nvmem-cells.yaml work if the compatible is being
+> removed so it is not being selected.
+Not sure I follow here. You mean replace nvmem-cells.yaml with
+nvmem-layout.yaml ?
+>
+>
+> Best regards,
+> Krzysztof
+>
 
