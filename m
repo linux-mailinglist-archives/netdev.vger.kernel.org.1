@@ -1,180 +1,148 @@
-Return-Path: <netdev+bounces-131957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FE679900B7
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:18:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 064B79900B9
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:19:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD4591F216B0
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:18:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1B3D1F2203D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FC841494AD;
-	Fri,  4 Oct 2024 10:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8287814A0B3;
+	Fri,  4 Oct 2024 10:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROgm9ACY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2BGGZMmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6447A137903
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4E11494CF
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728037118; cv=none; b=KlQHPVy3eSb8S4z6Uz0DWDJGlpym/3Tmj5XDJUI/hfj0lP8aD1pTAvChbbeXxoidjYCO+Fd8nJWrMr5RNtfvouqYk67I1YAJwv7voy3FOfiA7zZk56MZyOci77xgce+gBGJXKcgKndkHBDjaxC/rqw0T9zkbLLFKPJPsPeXSmys=
+	t=1728037178; cv=none; b=S8WWLE3a01Udp7vfTQ+DOzPf1eXvI2X7Hky4jDbNx4y7Hg7YwkJaO89Ns2WAwGAva4qez0/NPHXspMDYHEYtpOnjuxgniLuQKlqTluiHo7U4Mve1aGdOMMvgDZUV3L5ISpQXaD8giMK4v3kqZeZr0ot2H06QbEnrP0IKJ99sjNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728037118; c=relaxed/simple;
-	bh=5P0qWKZiFQG8GAkwKy/5mflbAiOOnZMLETWWEmHwh9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9IS0UU1grDwRfUDJeNbjCQCUX9bFMY+WKWFg40FwmRNZsbryakCdeGaWEG5pJVS5VlkyPzY4ZsBug013IxMQLRVDWMpTc2W58LvNck2K7hGJ7dDdaZmtJKCEHFPI6bpT/E9WbIJgtkL5LDVYrrHKYrgZZiBzE0KMfusJDROEZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ROgm9ACY; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cacd90ee4so2968985e9.3
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 03:18:36 -0700 (PDT)
+	s=arc-20240116; t=1728037178; c=relaxed/simple;
+	bh=ABL3wmDqqTNBkhLkQetuoOuvCA417zI/wRviczcrQXE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W7EYJzjQLKs3V+BkaVLnvQ84yIvYpgC94nLbZe62k0GItX/ipz3JO3ic5TkUcKcD03W5Katj+5qR4tH1vtNJi/saNlfv1iq63xTIa4YKAuBsdYDM5iRu7q1nm5aiRRKrZktoQm88gnz72czVknkPInsiohWY2m1l8nwBGC6zvoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2BGGZMmN; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c88e45f467so3243355a12.1
+        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 03:19:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728037115; x=1728641915; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fksya9RrVRE6jf5/3hM46ocX2Dai6/5RMjtjvRrt0LE=;
-        b=ROgm9ACYZyPL6UeE/PtRqusxSgSmjMiWqFx8TKB7MDy9XHt7nVStz9Unoyn/Nst91P
-         oGDbQAHGSsLlqeY0r9Or56TeoQOklGtfZcwKiGoeZLlYida4UYpDjDeMU3ONF5LiQQzp
-         9ruEj2vtSUqOBKSty6as9bZRvu+lu3jTVwlkhIAR1yiB7jJdB8ClzzTdZHkjZsOfYQaN
-         /A8wm7XQJmjgbqpyzGDDW3KIIeKGie8t8uB76Vr20SLSjRn2OvoICGViQ7FtONfYVfI8
-         /IswTAMdkucAcJKy/jzjt+FrvRWlLjt+9G2FGqRTHV4ZDt1u8CWFST70w13WhOepaTRf
-         IVEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728037115; x=1728641915;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1728037175; x=1728641975; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fksya9RrVRE6jf5/3hM46ocX2Dai6/5RMjtjvRrt0LE=;
-        b=bD8d6T5QmPW8mps7OF1c8zxtIk8BCzTVZAtPr5MyQB1hzufJbKyCPHUjOAiUDt8Toz
-         yQi67dzQUBlrYxB959SVDexynJQSuyWXsz9xnxh5h2uR9hWJQEmdc1PhM9VcpTaYPAsW
-         K6GWnuZ7uudqTYU/RtnyMlymH8SCihsftaiHf48FvC/ok3M00bjxztaHcyet/vRgS9Ev
-         VTNfd2wQrWhVkG5GccHGMyo1yNfwqdYrAJVPpIj9IwMuu40bdgrCwOobg8pE6F+2oNXr
-         +wCr+mLtfq2sbO+SibJE+tYFUTtSBFnGw1XHW4EMMBZHsJTIJys52COQnhcNZ4Fppxho
-         H1Yg==
-X-Gm-Message-State: AOJu0Yx6In3SHjs9jWTqX5dllGoTWWG9erVwaurYCQjEH4TD3sgUqVZM
-	Oru3TRRlPkqUpiCicc/CA63hRBOlYSCE+VBStxmBc+Ev54rPosKC
-X-Google-Smtp-Source: AGHT+IEOerGszXM39XAf6rchuCXnSPb+eTYh4vPZoyIPJm7hOLW0RIShgBofINvaXhbhoAyus3CqTw==
-X-Received: by 2002:a05:600c:4f11:b0:42c:aeee:e605 with SMTP id 5b1f17b1804b1-42f85af63f3mr7087255e9.9.1728037114264;
-        Fri, 04 Oct 2024 03:18:34 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b4a38bsm11965615e9.39.2024.10.04.03.18.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 03:18:33 -0700 (PDT)
-Date: Fri, 4 Oct 2024 13:18:30 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-Cc: netdev@vger.kernel.org, Anatolij Gustschin <agust@denx.de>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH net v3] net: dsa: lan9303: ensure chip reset and wait for
- READY status
-Message-ID: <20241004101830.4z3lhux6i5nki62o@skbuf>
-References: <20241004090332.3252564-1-alexander.sverdlin@siemens.com>
+        bh=N/rcmFBYidoCiljefYKdEWXPO8lL88kIKj0tKbLJLyY=;
+        b=2BGGZMmNtp0UofABcZ8f4t6myddTEFkcXdvPqKvJ5LbDJxZcTU7EzRYCdZ5sOE+4I+
+         IMUEPioqReuLnOmSGKMQCaYaZ+DAXTzn5lEbglknhfgli4kh3mtfk2w8Ce/rSJ3nfiti
+         AS6ganj6A+FpHBiKEmMkxMOktiEgzr4pfFKfxFcwezex8veIOMhxMamuE3UxZReaugtG
+         QJGLOg8Z76B0b0r9fTRtzxnjwm+KKaQi/x6qXLaZ4RnfcdMROxJ5YeN6vPm9+w9fPdag
+         ObRQJ163M0p0ZS83kgMm0aCKjcdZKP5IqBKqfb+UNXD2CLdFZP8qZaH0PFZXREJrE6aL
+         YDuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728037175; x=1728641975;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N/rcmFBYidoCiljefYKdEWXPO8lL88kIKj0tKbLJLyY=;
+        b=mLpfDmHdKzIn35VKUC+9L6HaCaMsnlNTd3HEtsujX7vfRf5PBBMtGu4IzXNhccZ02l
+         FFd0xBwRoG0EO2As/F4X63OdFp8alv4xm91KdmYaDB9zGtNMYq1nN2Sm3qPIJrwsPViC
+         gqcZtj2G805l9An9HN4mdAUCOKZuhtkM7HLH6S7lEY+LajnTe7Ng6UEuldOXNBZAIHDc
+         5tiI1ALfNceey3gYq5dgKuuOtJsjv0Y92vFcTyXI9kfUWvdctBjQC/W1HXb0WtTAQbbo
+         ySfIo1ORdRckJZadNtH2QhEwKVe8C+pe8wc7kHZEKq/41xCSYCQkuBhE/87PQcdtUBXy
+         Ylqg==
+X-Forwarded-Encrypted: i=1; AJvYcCVgwQmXqx+AFE/C9BvmNOjiZE9XPEitL2acsvL7HgcvLQdRMHxraSPeCZJNUMnYJto1eBXWaSQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYK3hTxvezkGw3U+ZwO8aE0/j04ysOiT2xYGmhwRg9MG4D8WvI
+	OwbmDdS4hVpXwFs/QzdDzWCVZtOPCiYpTTeJ/XrlO7SKrtNwXLEELEY9FZtfKHxmBhY5IKABr9t
+	2p4nalb2GDCrts0jpkx0zGBNWVjv7ah5Gc+zh
+X-Google-Smtp-Source: AGHT+IG2ylqDlHlpj6CludCqdF4jAiPwztB1MV/DHQjdD8kLzIL2saD55CdWhKN78Hfp28hLSalNMkp00XhcQDxqEsc=
+X-Received: by 2002:a05:6402:5250:b0:5c5:c444:4e3a with SMTP id
+ 4fb4d7f45d1cf-5c8d2e5523bmr2145135a12.0.1728037174770; Fri, 04 Oct 2024
+ 03:19:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241004090332.3252564-1-alexander.sverdlin@siemens.com>
+References: <20241003170151.69445-1-ignat@cloudflare.com> <20241003215038.11611-1-kuniyu@amazon.com>
+ <CANn89iKtKOx47OW90f-uUWcuF-kcEZ-WBvuPszc5eoU-aC6Z0w@mail.gmail.com> <CALrw=nEV5KXwU6yyPgHBouF1pDxXBVZA0hMEGY3S6bOE_5U_dg@mail.gmail.com>
+In-Reply-To: <CALrw=nEV5KXwU6yyPgHBouF1pDxXBVZA0hMEGY3S6bOE_5U_dg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 4 Oct 2024 12:19:20 +0200
+Message-ID: <CANn89i+BNfpKY_qCRLFyGSgtzNeVGuPKudw2nWTF7=r0+P9jUg@mail.gmail.com>
+Subject: Re: [PATCH] net: explicitly clear the sk pointer, when pf->create fails
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alibuda@linux.alibaba.com, davem@davemloft.net, 
+	kernel-team@cloudflare.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 04, 2024 at 11:03:31AM +0200, A. Sverdlin wrote:
-> From: Anatolij Gustschin <agust@denx.de>
-> 
-> Accessing device registers seems to be not reliable, the chip
-> revision is sometimes detected wrongly (0 instead of expected 1).
-> 
-> Ensure that the chip reset is performed via reset GPIO and then
-> wait for 'Device Ready' status in HW_CFG register before doing
-> any register initializations.
-> 
-> Signed-off-by: Anatolij Gustschin <agust@denx.de>
-> [alex: reworked using read_poll_timeout()]
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> ---
-> Changelog:
-> v3: comment style, use "!ret" in stop condition, user-readable error code
-> v2: use read_poll_timeout()
-> 
->  drivers/net/dsa/lan9303-core.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
-> 
-> diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-> index 268949939636a..f478b55d4d297 100644
-> --- a/drivers/net/dsa/lan9303-core.c
-> +++ b/drivers/net/dsa/lan9303-core.c
-> @@ -6,6 +6,7 @@
->  #include <linux/module.h>
->  #include <linux/gpio/consumer.h>
->  #include <linux/regmap.h>
-> +#include <linux/iopoll.h>
->  #include <linux/mutex.h>
->  #include <linux/mii.h>
->  #include <linux/of.h>
-> @@ -839,6 +840,8 @@ static void lan9303_handle_reset(struct lan9303 *chip)
->  	if (!chip->reset_gpio)
->  		return;
->  
-> +	gpiod_set_value_cansleep(chip->reset_gpio, 1);
-> +
->  	if (chip->reset_duration != 0)
->  		msleep(chip->reset_duration);
->  
-> @@ -866,6 +869,30 @@ static int lan9303_check_device(struct lan9303 *chip)
->  	int ret;
->  	u32 reg;
->  
-> +	/* In I2C-managed configurations this polling loop will clash with
-> +	 * switch's reading of EEPROM right after reset and this behaviour is
-> +	 * not configurable. While lan9303_read() already has quite long retry
-> +	 * timeout, seems not all cases are being detected as arbitration error.
-> +	 *
-> +	 * According to datasheet, EEPROM loader has 30ms timeout (in case of
-> +	 * missing EEPROM).
-> +	 *
-> +	 * Loading of the largest supported EEPROM is expected to take at least
-> +	 * 5.9s.
-> +	 */
-> +	if (read_poll_timeout(lan9303_read, ret,
-> +			      !ret && reg & LAN9303_HW_CFG_READY,
-> +			      20000, 6000000, false,
-> +			      chip->regmap, LAN9303_HW_CFG, &reg)) {
-> +		dev_err(chip->dev, "HW_CFG not ready: 0x%08x\n", reg);
-> +		return -ETIMEDOUT;
+On Fri, Oct 4, 2024 at 12:05=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
+om> wrote:
+>
+> On Fri, Oct 4, 2024 at 9:55=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Thu, Oct 3, 2024 at 11:50=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazo=
+n.com> wrote:
+> > >
+> > > From: Ignat Korchagin <ignat@cloudflare.com>
+> > > Date: Thu,  3 Oct 2024 18:01:51 +0100
+> > > > We have recently noticed the exact same KASAN splat as in commit
+> > > > 6cd4a78d962b ("net: do not leave a dangling sk pointer, when socket
+> > > > creation fails"). The problem is that commit did not fully address =
+the
+> > > > problem, as some pf->create implementations do not use sk_common_re=
+lease
+> > > > in their error paths.
+> > > >
+> > > > For example, we can use the same reproducer as in the above commit,=
+ but
+> > > > changing ping to arping. arping uses AF_PACKET socket and if packet=
+_create
+> > > > fails, it will just sk_free the allocated sk object.
+> > > >
+> > > > While we could chase all the pf->create implementations and make su=
+re they
+> > > > NULL the freed sk object on error from the socket, we can't guarant=
+ee
+> > > > future protocols will not make the same mistake.
+> > > >
+> > > > So it is easier to just explicitly NULL the sk pointer upon return =
+from
+> > > > pf->create in __sock_create. We do know that pf->create always rele=
+ases the
+> > > > allocated sk object on error, so if the pointer is not NULL, it is
+> > > > definitely dangling.
+> > >
+> > > Sounds good to me.
+> > >
+> > > Let's remove the change by 6cd4a78d962b that should be unnecessary
+> > > with this patch.
+> > >
+> >
+> > Reviewed-by: Eric Dumazet <edumazet@google.com>
+> >
+> > Even if not strictly needed we also could fix af_packet to avoid a
+> > dangling pointer.
+>
+> af_packet was just one example - I reviewed every pf->create function
+> and there are others. It would not be fair to fix this, but not the
+> others, right?
 
-Please:
+I have not said your patch was not correct, I gave a +2 on it.
 
-	int ret, err;
+In general, leaving pointers to a freed piece of memory (and possibly reuse=
+d)
+can confuse things like kmemleak.
 
-	err = read_poll_timeout();
-	if (err)
-		ret = err;
-	if (ret) {
-		dev_err(chip->dev, "failed to read HW_CFG reg: %pe\n",
-			ERR_PTR(ret));
-		return ret;
-	}
-
-No hardcoding of -ETIMEDOUT either.
-
-> +	}
-> +	if (ret) {
-> +		dev_err(chip->dev, "failed to read HW_CFG reg: %pe\n",
-> +			ERR_PTR(ret));
-> +		return ret;
-> +	}
-> +
->  	ret = lan9303_read(chip->regmap, LAN9303_CHIP_REV, &reg);
->  	if (ret) {
->  		dev_err(chip->dev, "failed to read chip revision register: %d\n",
-> -- 
-> 2.46.2
-> 
+I have not said _you_ had to review all pf->create() functions.
 
