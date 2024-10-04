@@ -1,160 +1,104 @@
-Return-Path: <netdev+bounces-131975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CC6699011F
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:28:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0FB990127
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E40C281C12
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:28:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A984A1F213D5
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240FD156F42;
-	Fri,  4 Oct 2024 10:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4211714D3;
+	Fri,  4 Oct 2024 10:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Gwkobuia"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="w3tx4/ZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 788B5156F34
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE82B15852E
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:25:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728037530; cv=none; b=H/K7V9PtMpLIOOeiGmvIfJynAZ1uF9wtZtnSuBGkYy7eyOEtvexGqTizVhqwn552Hj3pXfQr30AuZnDqwXDFZiig+W2CI7r90UKTQiLh8DzDVrP2DL0C4Mq2UUERrvUKwcuXSzvwKOG82ON0N6Nb6q2D3SNDWpyYR6Pkw9W+SC8=
+	t=1728037548; cv=none; b=WGrS+3dzkCHZZ3W7sryjapIW+0kShHpUJaFvuZDRUiznQn+a3KsKIyEdkCOrXQ0RcTaWH0RTPRgiene/e4lnTZMBKN0SbwYQX+0UEYu54FPxbKNUY2mBhZVkvY6XeqZySD3TQycvugmsSsBhqJFp3VTsO6xsfXUB5GIOVM9qLtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728037530; c=relaxed/simple;
-	bh=IgqML/A0RI8EV0Mka9xfk/zX4S8CY878POOjVe4o6IQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QoGeTnWtgYc8CYqszk+j8inGN0JZfEg/gCqw19nHRpA2QsZA5Bg0wIiURtrLL1YpRQ1LUSFjjJainyRkpa9J6FdCvD+uMM0zQsInRLt1JC7AMHVGNYacy0NtcmnFv4aBGTYb3EchIXp4OsOV070tcKBve0OZZbqo6JLE6rXtMxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Gwkobuia; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7e6bb2aa758so842403a12.2
-        for <netdev@vger.kernel.org>; Fri, 04 Oct 2024 03:25:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728037528; x=1728642328; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KtzZwDcCBRIJWjG1SeILMCRqnIAOjaXwt0dR2Z/fZRk=;
-        b=GwkobuiaHhhmofWljIeGUiMWNCZlFqZhtquwRcQHBHxoyPBZQtVagU9MIHLGX/euQA
-         sm+/3m2PSQ/DEaRi6F0OFuMsfsjtga9W1uHlsTqVcVJB15OYoBJClCBQCGs+Y5WFnOY6
-         Z2NsW3a7Nz1GJEr8QfZKGs0hRZtJn5I6VBfsXlSPdFMgIZw6AFvR2826y7L1SE/Enxx1
-         Hl36ZjZata69dXdg5diReAsZlWRV5m/a0XaSNPDtPDuK6w7SmGuB8ZVzo6r0QRkVGMJ8
-         8ykNkO0/9uvyJua2eV4uhjp2ISbAK59x/0LXhfNHIAY2SDcO0seXmbRBWJ7kF2A2Mxu9
-         D7og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728037528; x=1728642328;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KtzZwDcCBRIJWjG1SeILMCRqnIAOjaXwt0dR2Z/fZRk=;
-        b=b2g8gEwFcp0DDqhk6XlfYEPVL+Kx9uy7V6HOqsU2026DGGOXjCcTZ4oKkQ4eKHmRW/
-         /paXFBFM6jiScIX8unthsCiyAM98w9KWFN/Q6UwdborJ7FKf1/zX/mLvY2dJuuNPj5xv
-         mU5sJeoCSqIpVL+/Fsl+D0zXNUn272xOfKXxhgOdPp/NklPwu9UipP4uIspDecKF2vfc
-         u8hB/PlLTKdh843Uzmz68INIRCFeVFBjR90Jhk63G+KzyDLRiEiMSN7u3iSWrbRhnc6o
-         AHILmTi5cv+8yi9e3gVZLpAzvlHKgXAMkB9m3OYxWa0hvsfKCYNRfyJoJSdHnkFCqYBu
-         oZLw==
-X-Forwarded-Encrypted: i=1; AJvYcCV/8c3/DKo7vNFPyqo9E/8LLE9B8sL2IYqN+GAqhD1JvAjsJRTToL4JS6udewLo6Mx+HF+kb1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjeQeriRgBaTJM9sMfLhR22sp35knfwBm6HKl0LiKJJzbclV2b
-	KFzXl0A6EJOZTJ2bx19o8972To2wOdKEh/YBc+yipsIRd9rHkrJ625c65W7P+JQcsZD6wFiRdi3
-	SFtSaR7oq0OO+si8Q9M3vsDRTvhbJYEWPncWr8tcbbkelhZiv/n0=
-X-Google-Smtp-Source: AGHT+IFQmp/uoREOZGCDkiFRh/G647ifTQRZp8Ru0lVVF+cqOU1Q+I3rZsb+Yb41N45SjjCiX7atyhctfo6wH9YIlmw=
-X-Received: by 2002:a05:6a20:1e45:b0:1d6:e22e:1571 with SMTP id
- adf61e73a8af0-1d6e22e15d7mr1225656637.1.1728037527803; Fri, 04 Oct 2024
- 03:25:27 -0700 (PDT)
+	s=arc-20240116; t=1728037548; c=relaxed/simple;
+	bh=6tARbvL632yLhx2RP/UocP0fBpvKjdEv5WTAR37JkwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QrCS2MXaDCmcnvNWLDKZnmog9YxmhdXOurWWIkzz3hu8uvTSlRpEoQMy+UUCJ/oP5Mf0Hj0CbYMFsoJbZqyiPArVQ+i2chQXdYr5H/ZdPvzq90JrmBfeShyC8NgTn2bqVF1qsTY0yKYCxcTwgbPV/ch4YqwHX5I6tkML7ipx78c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=w3tx4/ZF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Bkxq8btcV1/bsy5w1n0JN+FGpo5w1ifQL3Os5BhEG98=; b=w3tx4/ZFSUVRbrNh2+uesLqFOC
+	nQLGWh6y4ICuHSZirHqFNsbVpPfrLyEgcMMpCDo4QCmkDNEPjlqctafNvTevKSfdf0f/WMFw4Em5M
+	Mw0tBB3bTt//RM32BU7fZ1WWP/bkdZx1dKW6+n1tn2JfTKDPY9C96F6Ju85E/RjygINjSZGTo9Zdd
+	7GhEEdyCPjZv/2dsGj8PXzgpKKOpqre1TWwJPnRaDH8spcN/YElwyM9F76eIVL7DM7mzHYoWwsqMI
+	ytNQrRF0HD8YPuVQQu3xVKu9sb6hQp3KVkG8Gfv9P0yOQ8OqG3R+qYdmlLhJC42RPvxWGSwHb6xBD
+	dY5l8M+Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56868)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1swfV5-0001kl-1i;
+	Fri, 04 Oct 2024 11:25:31 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1swfV1-00016c-38;
+	Fri, 04 Oct 2024 11:25:28 +0100
+Date: Fri, 4 Oct 2024 11:25:27 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH net-next 00/13] net: pcs: xpcs: cleanups batch 2
+Message-ID: <Zv_Cl-FhF6bU7_Wr@shell.armlinux.org.uk>
+References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003170151.69445-1-ignat@cloudflare.com> <20241003215038.11611-1-kuniyu@amazon.com>
- <CANn89iKtKOx47OW90f-uUWcuF-kcEZ-WBvuPszc5eoU-aC6Z0w@mail.gmail.com>
- <CALrw=nEV5KXwU6yyPgHBouF1pDxXBVZA0hMEGY3S6bOE_5U_dg@mail.gmail.com> <CANn89i+BNfpKY_qCRLFyGSgtzNeVGuPKudw2nWTF7=r0+P9jUg@mail.gmail.com>
-In-Reply-To: <CANn89i+BNfpKY_qCRLFyGSgtzNeVGuPKudw2nWTF7=r0+P9jUg@mail.gmail.com>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Fri, 4 Oct 2024 11:25:15 +0100
-Message-ID: <CALrw=nEZ=0bP7FPqmT9-cE_ZeT9Wz4-19xrFfE=6BK4nSHuUeg@mail.gmail.com>
-Subject: Re: [PATCH] net: explicitly clear the sk pointer, when pf->create fails
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	kernel-team@cloudflare.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Oct 4, 2024 at 11:19=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Oct 4, 2024 at 12:05=E2=80=AFPM Ignat Korchagin <ignat@cloudflare=
-.com> wrote:
-> >
-> > On Fri, Oct 4, 2024 at 9:55=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > On Thu, Oct 3, 2024 at 11:50=E2=80=AFPM Kuniyuki Iwashima <kuniyu@ama=
-zon.com> wrote:
-> > > >
-> > > > From: Ignat Korchagin <ignat@cloudflare.com>
-> > > > Date: Thu,  3 Oct 2024 18:01:51 +0100
-> > > > > We have recently noticed the exact same KASAN splat as in commit
-> > > > > 6cd4a78d962b ("net: do not leave a dangling sk pointer, when sock=
-et
-> > > > > creation fails"). The problem is that commit did not fully addres=
-s the
-> > > > > problem, as some pf->create implementations do not use sk_common_=
-release
-> > > > > in their error paths.
-> > > > >
-> > > > > For example, we can use the same reproducer as in the above commi=
-t, but
-> > > > > changing ping to arping. arping uses AF_PACKET socket and if pack=
-et_create
-> > > > > fails, it will just sk_free the allocated sk object.
-> > > > >
-> > > > > While we could chase all the pf->create implementations and make =
-sure they
-> > > > > NULL the freed sk object on error from the socket, we can't guara=
-ntee
-> > > > > future protocols will not make the same mistake.
-> > > > >
-> > > > > So it is easier to just explicitly NULL the sk pointer upon retur=
-n from
-> > > > > pf->create in __sock_create. We do know that pf->create always re=
-leases the
-> > > > > allocated sk object on error, so if the pointer is not NULL, it i=
-s
-> > > > > definitely dangling.
-> > > >
-> > > > Sounds good to me.
-> > > >
-> > > > Let's remove the change by 6cd4a78d962b that should be unnecessary
-> > > > with this patch.
-> > > >
-> > >
-> > > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> > >
-> > > Even if not strictly needed we also could fix af_packet to avoid a
-> > > dangling pointer.
-> >
-> > af_packet was just one example - I reviewed every pf->create function
-> > and there are others. It would not be fair to fix this, but not the
-> > others, right?
->
-> I have not said your patch was not correct, I gave a +2 on it.
->
-> In general, leaving pointers to a freed piece of memory (and possibly reu=
-sed)
-> can confuse things like kmemleak.
+On Fri, Oct 04, 2024 at 11:19:57AM +0100, Russell King (Oracle) wrote:
+> This is the second cleanup series for XPCS.
 
-That's a good point actually.
+As an additional note for Vladimir, the outstanding patches now are:
 
-> I have not said _you_ had to review all pf->create() functions.
+net: pcs: xpcs: convert to use linkmode_adv_to_c73()
+net: pcs: xpcs: add xpcs_linkmode_supported()
+net: mdio: add linkmode_adv_to_c73()
 
-Ah, NP. I reviewed them before your comment, before submitting the
-patch - basically to decide whether I should go with the current
-approach or just go and fix them.
+which based on your recent comment about c73 stuff, I'm not intending
+to submit due to the 2500base-[K]X issue. The second patch may be of
+some use however. I'll send that separately once this series has been
+reviewed.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
