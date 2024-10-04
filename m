@@ -1,89 +1,104 @@
-Return-Path: <netdev+bounces-132199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F6E990F57
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:56:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4480C990F98
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87CF91F2041C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:56:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F171EB30BDC
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FE61F12EF;
-	Fri,  4 Oct 2024 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68E91B4F34;
+	Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LB3h5YCY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FqHqaNcI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0861B4F01;
-	Fri,  4 Oct 2024 18:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B5A1B4F39
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728067808; cv=none; b=onN32hshsRjAIoct/7be5whg/sBVEEpUAQ1gmR1rTptDa3VfIgYvkzpZWuOeOrSaIQFdLwLQUmBVDc5KDsog4zyeHrQj3kZfwwE160zrq5KhD6woawm+ZHXuo4Wqntn0cyEw3Rn5/qdxAZyAXeWN7B7A0A+lACoFZc8vrOnbJXo=
+	t=1728067829; cv=none; b=Bx6M0ylHeanshr6EOvydK2AKlvN0bHA9/XOgB8YNtKE2FuRpo1u4tlCudtiJZwfYbxtuik4w8H6Na8bpRDrzwwRkzj9Lf6pnXmSu1DzyH5CZT9wU6Br0ePPfI1KELYQIcgIO+RLA4d3NKkXGV6QNOBH7/mi/wRNdGXl0ymvfBaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728067808; c=relaxed/simple;
-	bh=pQXvHBk79PFMnwPgLPjz5lxr0ATrcQdMzpCo6/c830A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EwGOtp9LVMlU1FY3liv7KchbQ5paBKHCkvFGkw8znjLrtxDGbaVPuqwQyv3qVtxPpdCVttcs52kkz4TOmJUhqWqCm2ZVLzYZyFowGHjgW7qJEK9IiSPn8oEXcBUXQy1rRW1BNBir+yTcDyLKPiOiNYYxD8t7cgpkGn3i0i41mPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LB3h5YCY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9784FC4CEC6;
-	Fri,  4 Oct 2024 18:50:07 +0000 (UTC)
+	s=arc-20240116; t=1728067829; c=relaxed/simple;
+	bh=CdOK7sOFcbmsj4RzPLtzaOkwxekgzEb+16cLHurEIxI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Wy8Zb3Vl2GZJHzXXMUef1EyoR1jciNnvwFh5L1NADyncA2/NnxRNkLg+cjXzrnILSUY/cmy5YX/tiNc2Mr4Af2wKVIbqLL7mH26e4o8uQVwsagkiVR/TaNamPubF74GEBjViL5wd6wWXTeYQfOb4fB1UOc0YzYXK/1URkSSLxGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FqHqaNcI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EA50C4CEC6;
+	Fri,  4 Oct 2024 18:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728067808;
-	bh=pQXvHBk79PFMnwPgLPjz5lxr0ATrcQdMzpCo6/c830A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LB3h5YCYxsrhdnwQx06B/2bf73BxW7CvdQ9/JSycq+2gAlfYwyiMWtm3fc1yTyINd
-	 j8xoK0O4UP/PDiavo806+FgvASW7ri4iFNEtN+JDutH9h+sJgjLDkfcuLXfBBIinfQ
-	 Uday7JjQi7WBi2yHnkbpQKM5HZg8O8Wi4BL3T1U4ZqeUkGyLlAXX+kR1Tt6ahl9+Ln
-	 FzO21RgfktoyPzPOH15+cyDay7NN29PnRwIPybssXIhUUrUA9VUOc0Mq1Q9M9+fihL
-	 oPfvMsTZhmL3kQ0ypZqwaiStgcpONzZyFbrTocW4Qz2A3RVwnMzF0apVLmJMTanVP8
-	 8fVzI9jMeNeNQ==
-Date: Fri, 4 Oct 2024 11:50:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <ramon.nordin.rodriguez@ferroamp.se>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
- <Thorsten.Kummermehr@microchip.com>
-Subject: Re: [PATCH net-next v3 2/7] net: phy: microchip_t1s: update new
- initial settings for LAN865X Rev.B0
-Message-ID: <20241004115006.4876eed1@kernel.org>
-In-Reply-To: <20241001123734.1667581-3-parthiban.veerasooran@microchip.com>
-References: <20241001123734.1667581-1-parthiban.veerasooran@microchip.com>
-	<20241001123734.1667581-3-parthiban.veerasooran@microchip.com>
+	s=k20201202; t=1728067829;
+	bh=CdOK7sOFcbmsj4RzPLtzaOkwxekgzEb+16cLHurEIxI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FqHqaNcIzyJObTuqx3ivm72dmIZSqADJi3vwpWw+QlINZrBatJ9YGmtfJozODkxs+
+	 CFS4yBRGluXiMh3/fa3O+eW4JCl04laSzT4eZMLmV0Q6C+Kkbh1OQjQh/ZT5Q/SThj
+	 7UZKArhUE1FTs3c664YW2Ds7bdvn9q/pRT3enVsv/D4BqVqUqnfmtFROWENKwp2gCd
+	 heKy92NH+OqbH7qASOqTbIdH9vnugV8NeLxBhNXrK4JFlvQjoK31+bSJjh9hMw7+Nm
+	 d5Lg3dE6oTLL9Fpp6twW/PwO9nzYtsDeYeiOdfKJFLpdPkQK+BTUrEEi/YBkDznsfJ
+	 M7dPQlB1T/+nQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB58339F76FF;
+	Fri,  4 Oct 2024 18:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V2 0/6] net/mlx5: hw counters refactor
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172806783278.2702115.5875013842003790101.git-patchwork-notify@kernel.org>
+Date: Fri, 04 Oct 2024 18:50:32 +0000
+References: <20241001103709.58127-1-tariqt@nvidia.com>
+In-Reply-To: <20241001103709.58127-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com, horms@kernel.org
 
-On Tue, 1 Oct 2024 18:07:29 +0530 Parthiban Veerasooran wrote:
-> +	cfg_results[0] = FIELD_PREP(GENMASK(15, 10), (9 + offsets[0]) & 0x3F) |
-> +			 FIELD_PREP(GENMASK(15, 4), (14 + offsets[0]) & 0x3F) |
-> +			 0x03;
-> +	cfg_results[1] = FIELD_PREP(GENMASK(15, 10), (40 + offsets[1]) & 0x3F);
+Hello:
 
-It's really strange to OR together FIELD_PREP()s with overlapping
-fields. What's going on here? 15:10 and 15:4 ranges overlap, then
-there is 0x3 hardcoded, with no fields size definition.
-Could you clarify and preferably name as many of the constants 
-as possible?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Also why are you masking the result of the sum with 0x3f?
-Can the result not fit? Is that safe or should we error out?
+On Tue, 1 Oct 2024 13:37:03 +0300 you wrote:
+> This is a patchset re-post, see:
+> https://lore.kernel.org/netdev/20240815054656.2210494-7-tariqt@nvidia.com/T/
+> 
+> In this patchset, Cosmin refactors hw counters and solves perf scaling
+> issue.
+> 
+> Series generated against:
+> commit c824deb1a897 ("cxgb4: clip_tbl: Fix spelling mistake "wont" -> "won't"")
+> 
+> [...]
 
-> +		ret &= GENMASK(4, 0);
-? 		if (ret & BIT(4))
+Here is the summary with links:
+  - [net-next,V2,1/6] net/mlx5: hw counters: Make fc_stats & fc_pool private
+    https://git.kernel.org/netdev/net-next/c/5acd957a986c
+  - [net-next,V2,2/6] net/mlx5: hw counters: Use kvmalloc for bulk query buffer
+    https://git.kernel.org/netdev/net-next/c/10cd92df833c
+  - [net-next,V2,3/6] net/mlx5: hw counters: Replace IDR+lists with xarray
+    https://git.kernel.org/netdev/net-next/c/918af0219a4d
+  - [net-next,V2,4/6] net/mlx5: hw counters: Drop unneeded cacheline alignment
+    https://git.kernel.org/netdev/net-next/c/d95f77f1196a
+  - [net-next,V2,5/6] net/mlx5: hw counters: Don't maintain a counter count
+    https://git.kernel.org/netdev/net-next/c/4a67ebf85f38
+  - [net-next,V2,6/6] net/mlx5: hw counters: Remove mlx5_fc_create_ex
+    https://git.kernel.org/netdev/net-next/c/d1c9cffe4b01
 
-GENMASK() is nice but naming the fields would be even nicer..
-What's 3:0, what's 4:4 ?
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
