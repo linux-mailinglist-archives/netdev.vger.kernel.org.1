@@ -1,72 +1,70 @@
-Return-Path: <netdev+bounces-132074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E5F99050A
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 15:59:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7BF99052E
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:02:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8A971F23F50
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 13:59:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3C881F21372
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A533A21B44C;
-	Fri,  4 Oct 2024 13:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5E9212EF8;
+	Fri,  4 Oct 2024 14:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vGDjZQ0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5272139B2
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 13:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4BB15748E;
+	Fri,  4 Oct 2024 14:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728050214; cv=none; b=TtbUXPsixaXOMB/FrZvKatDvsccJNYCTO1rs6IFkf/gTjKmqhdBpCRCrAGjpyoNgBJR5F226C1dzs8W8KLWynmC+adz0+V8FZP2NcPGgWf32sbe5Gphdd8zoMgXkv6gYlnb8zPEL58Z9CHbIwfKipbk7+wd/RQ5gk9qOiWdeSaE=
+	t=1728050543; cv=none; b=ah+gc/bW0T5KtoG/iBjAD2uCmFLkmURXvBHABT56u21B6j9L6/wTTrs1MGUdysCoTy/IJdt4sDlSpD4vK2vDg6XPVaCk4BS6qy8hgP9NVRN0WgCQ1LvXXGtjDICefZ/1CunIquyIg9kSvXjc5RdpU31eboYrPqW41U7QzmkRkns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728050214; c=relaxed/simple;
-	bh=N1C818eBlvE4sv6He9cJ9ekrXjXZ4zgfAiLcULwa9Xc=;
+	s=arc-20240116; t=1728050543; c=relaxed/simple;
+	bh=QW0C9c3/EVKwVlM57ULE+y2nHs7/G/DlCmIwV5GuFm0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lddWzPAbarZAFSkI/WbU9qxKjxPG1wyLouiBgS/vO3bW7ES62VnCOfI8XAwjj28gKXqiY3cd9Oohh5ImM+Oc9OKJ8XWgv5v13OHu4YNUIRBQ3VWD4HE2dzkkKROsfuuJ8LN73n/v4RUBIwhJKbUa0uSHY0MC8tFXAxfrAWN0Btc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swinL-0005ji-1g; Fri, 04 Oct 2024 15:56:35 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swinJ-003aES-87; Fri, 04 Oct 2024 15:56:33 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swinJ-00AhVa-0T;
-	Fri, 04 Oct 2024 15:56:33 +0200
-Date: Fri, 4 Oct 2024 15:56:33 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 11/12] net: pse-pd: Add support for event
- reporting using devm_regulator_irq_helper
-Message-ID: <Zv_0ESPJgHKhFIwk@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-11-787054f74ed5@bootlin.com>
- <f56780af-b2d4-42d7-bc5d-c35b295d7c52@lunn.ch>
- <20241003102806.084367ba@kmaincent-XPS-13-7390>
- <f97baa90-1f76-4558-815a-ef4f82913c3a@lunn.ch>
- <20241003153303.7cc6dba8@kmaincent-XPS-13-7390>
- <4b9d1adf-e9bd-47c0-ac69-5da77fcf8d0b@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gu5RflgWuXoOjGiGjZjW3sy/V0egx2b+HJ5ydjWM0D7cjDYX7n8RpdV7OjEik3tdZd8J2ZAPhR2owofd7S51OnUzb8JiGt44w2ldDETQdGqCjw+2/WfnObXEt5OpGgjrp2QP59f5r4HWlQdoKRgQ4KvGb3Hozs6td8cjwz10eVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vGDjZQ0Z; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=fu3VaCt1xTWMku+JYWxGDTg9qgPJOaVq3TcXvd2ZQk0=; b=vG
+	DjZQ0Z6kq+zCzKgcW5p0z5r/rfnsOF4L0viMGGQkKkh3IyoHMaplUQgf/gEKCcdUv69jL7InwOmt8
+	EqWV6vC1fJA07as/7eE2OthCZbCAbBCKynUK/CVI1slEiIr0i5nCOlpVB7EyYRYgR2GYQTG/v85KD
+	Kt/cztepW5f4grs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1swisa-0093HV-S5; Fri, 04 Oct 2024 16:02:00 +0200
+Date: Fri, 4 Oct 2024 16:02:00 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+Cc: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, konrad.dybcio@linaro.org,
+	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
+	richardcochran@gmail.com, geert+renesas@glider.be,
+	dmitry.baryshkov@linaro.org, neil.armstrong@linaro.org,
+	arnd@arndb.de, m.szyprowski@samsung.com, nfraprado@collabora.com,
+	u-kumar1@ti.com, linux-arm-msm@vger.kernel.org,
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V4 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+Message-ID: <6a431336-621d-4284-a0ca-b68921de22eb@lunn.ch>
+References: <20240625070536.3043630-1-quic_devipriy@quicinc.com>
+ <20240625070536.3043630-6-quic_devipriy@quicinc.com>
+ <f9d3f263-8559-4357-a1c6-8d4b5fa20b8c@lunn.ch>
+ <302298ef-7827-49e1-8b0f-04467cb38ad7@quicinc.com>
+ <29b84acf-2c57-4b0e-81f0-82eb6c1e5b18@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,83 +74,96 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4b9d1adf-e9bd-47c0-ac69-5da77fcf8d0b@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <29b84acf-2c57-4b0e-81f0-82eb6c1e5b18@quicinc.com>
 
-On Thu, Oct 03, 2024 at 05:22:58PM +0200, Andrew Lunn wrote:
-> > Indeed, but regulator API already provide such events, which will even be sent
-> > when we enable or disable the PSE. Should we write a second event management.
-> > Using regulator event API allows to report over current internal events to the
-> > parents regulator the power supply of the PSE which could also do something to
-> > avoid smoke.
+On Fri, Oct 04, 2024 at 01:25:52PM +0530, Manikanta Mylavarapu wrote:
+> 
+> 
+> On 6/26/2024 8:09 PM, Devi Priya wrote:
 > > 
-> > Or maybe we should add another wrapper which will send PSE ethtool netlink
-> > notification alongside the regulator notifications supported by this patch.
 > > 
-> > > Also, how do regulator events work in combination with network
-> > > namespaces? If you move the interface into a different network
-> > > namespace, do the regulator events get delivered to the root namespace
-> > > or the namespace the interface is in?
+> > On 6/25/2024 8:09 PM, Andrew Lunn wrote:
+> >>> +static struct clk_alpha_pll ubi32_pll_main = {
+> >>> +    .offset = 0x28000,
+> >>> +    .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
+> >>> +    .flags = SUPPORTS_DYNAMIC_UPDATE,
+> >>> +    .clkr = {
+> >>> +        .hw.init = &(const struct clk_init_data) {
+> >>> +            .name = "ubi32_pll_main",
+> >>> +            .parent_data = &(const struct clk_parent_data) {
+> >>> +                .index = DT_XO,
+> >>> +            },
+> >>> +            .num_parents = 1,
+> >>> +            .ops = &clk_alpha_pll_huayra_ops,
+> >>> +        },
+> >>> +    },
+> >>> +};
+> >>> +
+> >>> +static struct clk_alpha_pll_postdiv ubi32_pll = {
+> >>> +    .offset = 0x28000,
+> >>> +    .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
+> >>> +    .width = 2,
+> >>> +    .clkr.hw.init = &(const struct clk_init_data) {
+> >>> +        .name = "ubi32_pll",
+> >>> +        .parent_hws = (const struct clk_hw *[]) {
+> >>> +            &ubi32_pll_main.clkr.hw
+> >>> +        },
+> >>> +        .num_parents = 1,
+> >>> +        .ops = &clk_alpha_pll_postdiv_ro_ops,
+> >>> +        .flags = CLK_SET_RATE_PARENT,
+> >>> +    },
+> >>> +};
+> >>
+> >> Can these structures be made const? You have quite a few different
+> >> structures in this driver, some of which are const, and some which are
+> >> not.
+> >>
+> > Sure, will check and update this in V6
 > > 
-> > regulator events are sent in root namespace.
+> > Thanks,
+> > Devi Priya
+> >>     Andrew
+> >>
 > 
-> I think we will need two event, the base regulator event, and a
-> networking event. Since it is a regulator, sending a normal regulator
-> event makes a lot of sense. But mapping that regulator event to a
-> netns:ifnam is going to be hard. Anything wanting to take an action is
-> probably going to want to use ethtool, and so needs to be in the
-> correct netns, etc. But it does get messy if there is some sort of
-> software driven prioritisation going on, some daemon needs to pick a
-> victim to reduce power to, and the interfaces are spread over multiple
-> network namespaces.
+> Hi Andrew,
 > 
-> What i don't know is if we can use an existing event, or we should add
-> a new one. Often rtnetlink_event() is used:
+> Sorry for the delayed response.
 > 
-> https://elixir.bootlin.com/linux/v6.12-rc1/source/net/core/rtnetlink.c#L6679
+> The ubi32_pll_main structure should be passed to clk_alpha_pll_configure() API to configure UBI32 PLL. clk_alpha_pll_configure() API expects a non-const structure. Declaring it as const will result in the following compilation warning
 > 
-> but without some PSE information in it, it would be hard to know why
-> it was sent. So we probably either want a generic ethtool event, or a
-> PSE event.
+> drivers/clk/qcom/nsscc-ipq9574.c:3067:26: warning: passing argument 1 of ‘clk_alpha_pll_configure’ discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+>   clk_alpha_pll_configure(&ubi32_pll_main, regmap, &ubi32_pll_config);
+>                           ^
+> In file included from drivers/clk/qcom/nsscc-ipq9574.c:22:0:
+> drivers/clk/qcom/clk-alpha-pll.h:200:6: note: expected ‘struct clk_alpha_pll *’ but argument is of type ‘const struct clk_alpha_pll *’
+>  void clk_alpha_pll_configure(struct clk_alpha_pll *pll, struct regmap *regmap,
+>       ^~~~~~~~~~~~~~~~~~~~~~~
 
-Hm... assuming we have following scenario:
+As far as i can see, clk_alpha_pll_configure() does not modify pll.
 
-                                  .---------   PI 1
-                                 / .---------  PI 2
-                   .========= PSE /----------( PI 3 ) NNS red
-                  //              \----------( PI 4 ) NNS blue
-Main supply      //                `---------( PI 5 ) NNS blue
-o================´--- System, CPU
+https://elixir.bootlin.com/linux/v6.12-rc1/source/drivers/clk/qcom/clk-alpha-pll.c#L391
 
-In this case we seems to have a new challenge:
+So you can add a const there as well.
 
-On one side, a system wide power manager should see and mange all ports.
-On other side, withing a name space, we should be able to play in a
-isolated sand box. There is a reason why it is isolated. So, we should
-be able to sandbox power delivery and port prios too. Means, by creating
-network names space, we will need a power names space. 
+> The ubi32_pll is the source for nss_cc_ubi0_clk_src, nss_cc_ubi1_clk_src, nss_cc_ubi2_clk_src, nss_cc_ubi3_clk_src. Therefore, to register ubi32_pll with clock framework, it should be assigned to UBI32_PLL index of nss_cc_ipq9574_clocks array. This assignment will result in the following compilation warning if the ubi32_pll structure is declared as const.
+> 
+> drivers/clk/qcom/nsscc-ipq9574.c:2893:16: warning: initialization discards ‘const’ qualifier from pointer target type [-Wdiscarded-qualifiers]
+>   [UBI32_PLL] = &ubi32_pll.clkr,
 
-I can even imagine a use case: an admin limited access to a switch for
-developer. A developer name space is created with PSE budget and max
-prios available for this name space. This will prevent users from DoSing
-system critical ports.
+Which suggests you are missing a const somewhere else.
 
-At this point, creating a power name space will an overkill for this
-patch set, so it should be enough to allow controlling prios over
-ethtool per port and isolation support if needed.
+Getting these structures const correct has a few benefits. It makes
+you code smaller, since at the moment at load time it needs to copy
+these structures in to the BSS so they are writable, rather than
+keeping them in the .rodata segment. Also, by making them const, you
+avoid a few security issues, they cannot be overwritten, the MMU will
+protect them. The compiler can also make some optimisations, since it
+knows the values cannot change.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Now, it could be getting this all const correct needs lots of patches,
+because it has knock-on effects in other places. If so, then don't
+bother. But if it is simple to do, please spend a little time to get
+this right.
+
+	Andrew
 
