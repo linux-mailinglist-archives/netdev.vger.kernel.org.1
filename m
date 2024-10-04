@@ -1,180 +1,202 @@
-Return-Path: <netdev+bounces-131871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BF6D98FC9B
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:00:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D48C98FC9D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC7032822B5
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E841A1F23542
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0148F3D982;
-	Fri,  4 Oct 2024 04:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED642AD11;
+	Fri,  4 Oct 2024 04:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NlSWV+zG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XlyWunj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A799475
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 04:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94879C8FF;
+	Fri,  4 Oct 2024 04:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728014432; cv=none; b=FsWetqCnKepDooncDv7IHHkvN3bqWycoCNr1zSgk5KbXl+gcvmk0RE3GYcCG1QWtLIMrdcQe825fHj/VPL5qM3l+eDP5DPZWZQAVUWlafrLaX8GFzRBtfBv8wAcdNIlXWWnEU/7rAv1WqZGksblmVK9rmSOhtGj7GJb2AsDZ3tE=
+	t=1728014493; cv=none; b=A3YCMKjVA43EhT12uJCMS610vSt/o3pW+Slm/elNBGL8GX0KE6um0jhrV3BKe3YfE68SRGs8XiB1F3EsiKruCevPNYrN38cPCoT0GYvTN/UO4ABzAS6bo+snxp8u6LgyykFdicJdHTdm7ob2zD8mSx8NWQsO4clKBAqloIkn74w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728014432; c=relaxed/simple;
-	bh=3Z7c/wBfN2zeA3acuNBiKHtvX5WGERkpd4FWQk2H9BQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CXco+L3Euro/L3QP5O0GLUqjkLOXWYk49wf+HL4/XKoWnEzHV+bijSY8fDadjW0cQmmLzfw7m7eMnEvZ3jIu9jj0CMx8UcvinKHsBrmBtPrxcLbPSFBJvIp8gT3PwbywdYIYL0KTpTKpS18YE7Gk5+/lhb6f9l09lZ9MqIN7FGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NlSWV+zG; arc=none smtp.client-ip=91.218.175.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <341af7e1-7817-4aca-97dc-8f2813a086df@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728014428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNQRCxMBz5ZWdzX3UDIe7nauhj263vm6VCZvYNip50E=;
-	b=NlSWV+zGCTyP4Pqc7/XWPASsNMjkm4WkxEKNmbiLzgDsVBcrzRA0suPyrZ50sCDpSVqPFn
-	xJZI38QpnkLr7er5lhWFgTFhg5Xe+GBVzq+cy5OdcVnvmYnFHpzQpOb6aieKVs/w0xCOeZ
-	s/jGVGgMHbCXF1BqQI7Dpc5id3JrNsQ=
-Date: Thu, 3 Oct 2024 21:00:20 -0700
+	s=arc-20240116; t=1728014493; c=relaxed/simple;
+	bh=l5S4zSgk39/1vFvakpqrurpzGlXpS1OMzzY3Qu0SpNg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YmkSJ/fuOJyWj1W3Rj6htBb7dHvWdb5XxdzX8/pYvgjNKxc+GcSGeqlY6M8opp8GtLhm5SK0iNkY322RHVLXtdTFX2cbd5QjHsmScQaSuesmJ6NoLP7J99TWcpsZM9rFllfW/57N4NvI8UjIXl9etD4UfH5ZhrOpPLgSUCroB1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XlyWunj1; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c87853df28so2070892a12.3;
+        Thu, 03 Oct 2024 21:01:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728014490; x=1728619290; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CtWaB7/+pqgSIbs6QCNNW9clMyGfcjBIDYBUKvysBTA=;
+        b=XlyWunj1i/jXiJJhec7g9977fbKM0qdoxvTbL+Znb1Z36ixAvZCqOLK6+HmBoxJw5J
+         KwRlAf/sjt24i/KYkBPG1EquG1bJU/qTXz9CMjvdGxmtkn9c3TjvLXZjXOqHzt6Vd06D
+         iM1a0jXNOifqt169sET0IdoNO1/Bh3DWcz91mayKfeX88dDmpKeInlcTkgCZ2eFDNXzU
+         85Prncba3X2uf6+nut8Cl3zh+U18//2g4t1MUzfm1IzBoXAs+LB2cKaCuPOekXndXvZs
+         eZumUanWid7BABQjRSHoMYPlitXQLjQEoaXu+FxcBhRwkmgWMZ7a3mdIKi6hR+E70UpG
+         oOGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728014490; x=1728619290;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CtWaB7/+pqgSIbs6QCNNW9clMyGfcjBIDYBUKvysBTA=;
+        b=UauRSWw4rAYD26LTcY/v4RnUUTSXcgnd8ll+IK1rtaeMk8BBQ/75EZLF82u/vbFtjY
+         7Kyl/t9PHuYSf4AkLyWYFTsVDoCBdwBaII15fzdEHT4sRiLjorJK9VQwlohVoNn/lGkT
+         9GYvVjeVDj1FweCQg78+x4Tm1AiJ999b/Nlvvlr943r8W6CAjcMKkJ0w7SaeNzUbj6vR
+         /6OiQTIKtLMWn1dqs/vgDKX/MT/kBvUOkklX/UjijJJpIS9yF/q7JB6xq2wV8DXc/gDH
+         QcHyvW2lNyr8CyOBbAJz5qyM+EGzsV/txAwSKUM2A6GbGmXrrkmHVPLKx1elOXD78iao
+         6JUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUBFTZxHAcV0Bv8rD7crOvT2Mj2xZNtpb2g7pcCO0QW06wZGfqgDtqGUb/Bo6G2lncQ0IfKP1be@vger.kernel.org, AJvYcCWN3sYHGOSG1Um3zV4x4e3SAhWl/dYgpPy72fNNGZQbpVEB6naItbM8p1X/mgxtI1A8uo1MVwZ7XNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpJq2aB/y+DbM71zRDmus51RppMebGjuZdKpJfJzg57gzv7SGL
+	MvBs0T6oxaWJI0HN6co2nV1HU7+Zi/O07wdG1Zu9L0nux+uqtAuItdihhXu4NELvZQ+MWKFw1uA
+	G9ZlSgogWxqzdFYLK+DZpI6P8FDE=
+X-Google-Smtp-Source: AGHT+IGUS9+BtlWQHPBUAIwkiyHrg8GBSbYlO2wrTjMmJV4zOOmSlVldyvtvZ/VwCgj6NoXODIWU/Q/le4FT9SpETEk=
+X-Received: by 2002:a05:6402:321b:b0:5c7:2122:50d with SMTP id
+ 4fb4d7f45d1cf-5c8d2e989a1mr941349a12.35.1728014489529; Thu, 03 Oct 2024
+ 21:01:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Question]: A non NULL req->sk in tcp_rtx_synack. Not a fastopen
- connection.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: bpf@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org
-References: <eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev>
- <20241004020255.36532-1-kuniyu@amazon.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241004020255.36532-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-6-ap420073@gmail.com>
+ <70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com>
+In-Reply-To: <70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Fri, 4 Oct 2024 13:01:17 +0900
+Message-ID: <CAMArcTX+j4patttqm+F8zLAE55DDn1mpBuXQoWpf3NCHo96cYw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/7] net: devmem: add ring parameter filtering
+To: Brett Creeley <bcreeley@amd.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, almasrymina@google.com, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, paul.greenwalt@intel.com, rrameshbabu@nvidia.com, 
+	idosch@nvidia.com, asml.silence@gmail.com, kaiyuanz@google.com, 
+	willemb@google.com, aleksander.lobakin@intel.com, dw@davidwei.uk, 
+	sridhar.samudrala@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/3/24 7:02 PM, Kuniyuki Iwashima wrote:
-> From: Martin KaFai Lau <martin.lau@linux.dev>
-> Date: Thu, 3 Oct 2024 18:14:09 -0700
->> Hi,
->>
->> We are seeing a use-after-free from a bpf prog attached to
->> trace_tcp_retransmit_synack. The program passes the req->sk to the
->> bpf_sk_storage_get_tracing kernel helper which does check for null before using it.
->>
->> fastopen is not used.
->>
->> We got a kfence report on use-after-free (pasted at the end). It is running with
->> an older 6.4 kernel and we hardly hit this in production.
->>
->>   From the upstream code, del_timer_sync() should have been done by
->> inet_csk_reqsk_queue_drop() before "req->sk = child;" is assigned in
->> inet_csk_reqsk_queue_add(). My understanding is the req->rsk_timer should have
->> been stopped before the "req->sk = child;" assignment.
-> 
-> There seems to be a small race window in reqsk_queue_unlink().
-> 
-> expire_timers() first calls detach_timer(, true), which marks the timer
-> as not pending, and then calls reqsk_timer_handler().
-> 
-> If reqsk_queue_unlink() calls timer_pending() just before expire_timers()
-> calls reqsk_timer_handler(), reqsk_queue_unlink() could miss
-> del_timer_sync() ?
+On Fri, Oct 4, 2024 at 3:35=E2=80=AFAM Brett Creeley <bcreeley@amd.com> wro=
+te:
+>
 
-This seems to explain it. :)
+Hi Brett,
+Thanks a lot for your review!
 
-Does it mean there is a chance that the reqsk_timer_handler() may rearm the 
-timer again and I guess only a few more synack will be sent in this case and 
-should be no harm?
+>
+>
+> On 10/3/2024 9:06 AM, Taehee Yoo wrote:
+> > Caution: This message originated from an External Source. Use proper ca=
+ution when opening attachments, clicking links, or responding.
+> >
+> >
+> > If driver doesn't support ring parameter or tcp-data-split configuratio=
+n
+> > is not sufficient, the devmem should not be set up.
+> > Before setup the devmem, tcp-data-split should be ON and
+> > tcp-data-split-thresh value should be 0.
+> >
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >
+> > v3:
+> >   - Patch added.
+> >
+> >   net/core/devmem.c | 18 ++++++++++++++++++
+> >   1 file changed, 18 insertions(+)
+> >
+> > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > index 11b91c12ee11..a9e9b15028e0 100644
+> > --- a/net/core/devmem.c
+> > +++ b/net/core/devmem.c
+> > @@ -8,6 +8,8 @@
+> >    */
+> >
+> >   #include <linux/dma-buf.h>
+> > +#include <linux/ethtool.h>
+> > +#include <linux/ethtool_netlink.h>
+> >   #include <linux/genalloc.h>
+> >   #include <linux/mm.h>
+> >   #include <linux/netdevice.h>
+> > @@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devi=
+ce *dev, u32 rxq_idx,
+> >                                      struct net_devmem_dmabuf_binding *=
+binding,
+> >                                      struct netlink_ext_ack *extack)
+> >   {
+> > +       struct kernel_ethtool_ringparam kernel_ringparam =3D {};
+> > +       struct ethtool_ringparam ringparam =3D {};
+> >          struct netdev_rx_queue *rxq;
+> >          u32 xa_idx;
+> >          int err;
+> > @@ -146,6 +150,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_dev=
+ice *dev, u32 rxq_idx,
+> >                  return -EEXIST;
+> >          }
+> >
+> > +       if (!dev->ethtool_ops->get_ringparam) {
+> > +               NL_SET_ERR_MSG(extack, "can't get ringparam");
+> > +               return -EINVAL;
+> > +       }
+>
+> Is EINVAL the correct return value here? I think it makes more sense as
+> EOPNOTSUPP.
 
-> 
-> ---8<---
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-> index 2c5632d4fddb..4ba47ee6c9da 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -1045,7 +1045,7 @@ static bool reqsk_queue_unlink(struct request_sock *req)
->   		found = __sk_nulls_del_node_init_rcu(sk);
->   		spin_unlock(lock);
->   	}
-> -	if (timer_pending(&req->rsk_timer) && del_timer_sync(&req->rsk_timer))
-> +	if (del_timer_sync(&req->rsk_timer))
+Yes, Thanks for catching this.
 
-It seems the reqsk_timer_handler() will also call reqsk_queue_unlink() through 
-inet_csk_reqsk_queue_drop_and_put(). Not sure if the reqsk_timer_handler() can 
-del_timer_sync() itself.
+>
+> > +
+> > +       dev->ethtool_ops->get_ringparam(dev, &ringparam,
+> > +                                       &kernel_ringparam, extack);
+> > +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT=
+_ENABLED ||
+> > +           kernel_ringparam.tcp_data_split_thresh) {
+> > +               NL_SET_ERR_MSG(extack,
+> > +                              "tcp-header-data-split is disabled or th=
+reshold is not zero");
+> > +               return -EINVAL;
+> > +       }
+> > +
+> Maybe just my personal opinion, but IMHO these checks should be separate
+> so the error message can be more concise/clear.
 
->   		reqsk_put(req);
->   	return found;
->   }
-> ---8<---
-> 
-> 
->>
->> or there are cases that req->sk is not NULL in the reqsk_timer_handler()?
->>
->> BUG: KFENCE: use-after-free read in bpf_sk_storage_get_tracing+0x2e/0x1b0
->>
->> Use-after-free read at 0x00000000a891fb3a (in kfence-#1):
->> bpf_sk_storage_get_tracing+0x2e/0x1b0
->> bpf_prog_5ea3e95db6da0438_tcp_retransmit_synack+0x1d20/0x1dda
->> bpf_trace_run2+0x4c/0xc0
->> tcp_rtx_synack+0xf9/0x100
->> reqsk_timer_handler+0xda/0x3d0
->> run_timer_softirq+0x292/0x8a0
->> irq_exit_rcu+0xf5/0x320
->> sysvec_apic_timer_interrupt+0x6d/0x80
->> asm_sysvec_apic_timer_interrupt+0x16/0x20
->> intel_idle_irq+0x5a/0xa0
->> cpuidle_enter_state+0x94/0x273
->> cpu_startup_entry+0x15e/0x260
->> start_secondary+0x8a/0x90
->> secondary_startup_64_no_verify+0xfa/0xfb
->>
->> kfence-#1: 0x00000000a72cc7b6-0x00000000d97616d9, size=2376, cache=TCPv6
->>
->> allocated by task 0 on cpu 9 at 260507.901592s:
->> sk_prot_alloc+0x35/0x140
->> sk_clone_lock+0x1f/0x3f0
->> inet_csk_clone_lock+0x15/0x160
->> tcp_create_openreq_child+0x1f/0x410
->> tcp_v6_syn_recv_sock+0x1da/0x700
->> tcp_check_req+0x1fb/0x510
->> tcp_v6_rcv+0x98b/0x1420
->> ipv6_list_rcv+0x2258/0x26e0
->> napi_complete_done+0x5b1/0x2990
->> mlx5e_napi_poll+0x2ae/0x8d0
->> net_rx_action+0x13e/0x590
->> irq_exit_rcu+0xf5/0x320
->> common_interrupt+0x80/0x90
->> asm_common_interrupt+0x22/0x40
->> cpuidle_enter_state+0xfb/0x273
->> cpu_startup_entry+0x15e/0x260
->> start_secondary+0x8a/0x90
->> secondary_startup_64_no_verify+0xfa/0xfb
->>
->> freed by task 0 on cpu 9 at 260507.927527s:
->> rcu_core_si+0x4ff/0xf10
->> irq_exit_rcu+0xf5/0x320
->> sysvec_apic_timer_interrupt+0x6d/0x80
->> asm_sysvec_apic_timer_interrupt+0x16/0x20
->> cpuidle_enter_state+0xfb/0x273
->> cpu_startup_entry+0x15e/0x260
->> start_secondary+0x8a/0x90
->> secondary_startup_64_no_verify+0xfa/0xfb
->>
->> Thanks,
->> Martin
+I agree, the error message is not clear, it contains two conditions.
 
+>
+> Also, a small nit, but I think both of these checks should be before
+> getting the rxq via __netif_get_rx_queue().
+>
+
+I will drop this patch in a v4 patch.
+
+Thanks a lot!
+Taehee Yoo
+
+>
+> Thanks,
+>
+> Brett
+> >   #ifdef CONFIG_XDP_SOCKETS
+> >          if (rxq->pool) {
+> >                  NL_SET_ERR_MSG(extack, "designated queue already in us=
+e by AF_XDP");
+> > --
+> > 2.34.1
+> >
 
