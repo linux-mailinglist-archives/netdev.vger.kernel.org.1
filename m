@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-131914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0160D98FF03
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4C7998FF04
 	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA621C22031
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE49B282F32
 	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A87413D2A9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4866013D61B;
 	Fri,  4 Oct 2024 08:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RHQ1QOFf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W5TLBgmZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AAC179BB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A578A12D75C;
 	Fri,  4 Oct 2024 08:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728031644; cv=none; b=JT5CwJYMUJvcBBTBNFb/A0vywoCY3/b8oAGqZk9dYfqJnfyFg3R8N6Zjy7HDazJxkQIGs9Bg2kZ3EkuoYgbm+knmK3E3YG1qrABNHfENAT/XvLApcSH5EhWMo2HkeNBqZUXHQ5DGtu3nS+uEhHxPqpsh3JrbB/TLnEq2cJe9XFk=
+	t=1728031644; cv=none; b=miUIZFRk2Vcu6I1Eg7Ze67TFmM4N2yTTr4zHG9YG5UCnt5GcpXuuhNzwEPM6kh7oDPIXt4j1GAmBQj2SbQqEt48a5+dDkVr9Wit30rwd3BhsjaROxpk/BTBwmWs5+2usFJ1+Q0fe3RsYBSoQK/owZk7f+lANj9h9d8osTgpELG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728031644; c=relaxed/simple;
-	bh=S/mtysJ+SnAvkGVSn7jpeG6A4WkS4GStEEJvAXH7Us4=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=qzzxOcEYCraa6VX3nqjjWAg5hNDT5Dhj1gWh/kI87iPDNT8IfpGunrZt5UGbNJeQWMtQszl15A5JCEFnLjR+dBjn67ct20J+qYEe+kcg2tXzvn7AOD3udHxWjvfrjBkvXOe8XVoIRjIjjnC9fmb7DnUQeX26jcjvFhRiYhHI3dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RHQ1QOFf; arc=none smtp.client-ip=209.85.208.169
+	bh=j0XtbA1YPMsOZS43bikeDwYQnZjDGrbXyo6RiT0DM+4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=gUHOxdQ6MEvFkdVMFBrljkTQ9M/nDQs03yn0ZKbcD53VXdjQrpBoqfVjR/atvJntpb/d7t7Xc4hEiGEujNeT5R7wbEIhcfJJS5W32hDpz4jI2g3sn3LIMb1mncYCBl/kXUHCU0IIVBdi51yz+H2Fxs9cOOCAg7ORzkcXiz5w6Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W5TLBgmZ; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2facf48157dso20769891fa.2;
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9909dff33dso282358066b.2;
         Fri, 04 Oct 2024 01:47:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1728031641; x=1728636441; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q/gMAqx3YAfBdraUdRz64TKXx5/XCsIKjgPgTol4xoE=;
-        b=RHQ1QOFfcktGq7rA0tVL36qFeaLeie0pZjqMcxI3nychLGpiXlXOt3jxqCh7A4QGB6
-         5Onzpef7XCmD6tQGyp3GoqY4fC15y41v2bUhu8idN2jWfSkfSc52eHXeYnzXMVv0X4rS
-         /lcupZsykqoIvxhbmS2nGYKT7ewX5Rd2v8IBAfvozbmlO70HMIWZsI5XOUp3L9mJFrO1
-         2DXZrSTfa/xdJKnOuZ+/6+8hUZ5U5bP91nVdTa0vGQwqKidn8BfPDr0te3YYAdiHr4Pl
-         MUEew9yEfGBeAiscxzoEkW3aMvbN7LpDOE9bmInK2LNiE7WRrA++y+LD9154sktfz230
-         UjQA==
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=C+uHz6Z0oZxs3e/gFjzrIcQSJKe/mqrd8qVDDtx+4IY=;
+        b=W5TLBgmZWeUSTSwqvaEttSt5wkpOei9wAQ21yVRc9MWDKgHPimCLmqCB9RsnIsYAej
+         JYIV01mSrg3K4dvFsfot/pcTxGeUtUSJTbkUHdB5Wapiwb3vA3elT2PNci+434sLa+h4
+         f6AEnz5vWV5y5wZBMGfrdSugq2fT4p/6/hC8VfHgVckfbsJzW0cMrZhnPbeqk604xR2c
+         tL8z5r6Bsi5uG5FsJX8r0G/wM/dbCv+uz70+Bh6nF2KChFyGZktnj0/E1EEcormmIBve
+         ArlHO3mao5+JbjQrw+UFE1O2SkHFEClOyTAgn/KLOYL3JmFB3LuFist66iyRrdxe66LE
+         Mjuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1728031641; x=1728636441;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q/gMAqx3YAfBdraUdRz64TKXx5/XCsIKjgPgTol4xoE=;
-        b=GAYOT2MQfNgUmivT9lxIDAUlp0JPn8xwCuWmnSVN9ed+V2zNZl6xsjSaJ/t9t4BIh5
-         UEibLx9xb0mei7qXqiz6N4aDItBSEPqPT5bbNd0bzaxqEnaA7RvN5oqGfGipea0cU44p
-         liulseYcX9GuXGd/m13ioNpanS1duZh6YDk8lzHyegISQGUXSi8fF8xvPTvrSX3zrzcH
-         gmr/TA0RDg9W+xD5eP6Hf7Oicpoc+0ZqtE5OpGlMVGJJxUBBvBwJ6JUjRe57VqDwJ+3+
-         D72+primxnOgSg5DgrdnH+RcAEj1jdl8yWlI8E3NM7jErjLNlfH4lGjd0FCT9oyrGrAF
-         nVmg==
-X-Forwarded-Encrypted: i=1; AJvYcCU3AXRTuMjqf81PRoFyDG51/zRj2I9eJxwRV+/gom0BMQuiebqTvVdVymrXiY7SGGEn0t2mAtCkPYRb0XM=@vger.kernel.org, AJvYcCX7U4OBe9vgJY0Ok+insJ3UjTluEzrHKHinzHpEX5W74iOKKEkl7AUjSuMh41FFxRMvGXZHTT/j@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEN+u/dF5X59i56CoJh1lKziMkftqLVhk5DyTKuMOQuW6q+lFV
-	r1bYMMg7XSg1KUd3zHLA6EG0eSARdofdvhjcjMQvwi04Jd/e+6x6
-X-Google-Smtp-Source: AGHT+IEQ78jEiDdrT9fKfs+ZsduDzr4bWmCtUq8cpX+7tpOQHuNmFPY2rU9EorfvSH0VGm2CgI6iLQ==
-X-Received: by 2002:a2e:241a:0:b0:2fa:dd6a:924a with SMTP id 38308e7fff4ca-2faf3c1c9dbmr7996591fa.24.1728031639524;
-        Fri, 04 Oct 2024 01:47:19 -0700 (PDT)
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C+uHz6Z0oZxs3e/gFjzrIcQSJKe/mqrd8qVDDtx+4IY=;
+        b=Y/yrOF3EoS3ZvhQuGE2xhko8fnnUkgJcQRburYciimd8QzBEeQsRAZoPAG7hFUuD4/
+         m2CeLzyhhULNmuCvY1YDU966HgEvgxwPE/G0ypqlyz+D57QHBiqboAOH8oAP/lJ7DeQF
+         U3NExpqlfLwjGSmUTuRIpqkinWKLA1nKfZS6YgLs8ZazRBW/dpGtLhTgd0UAnl38RtD1
+         smhdSE/XpCzS0ikQG3rY/1Hwhq4nDcTrH/Pe27d3M+YAISgZnqYdg58oYZ/uqT96lNlE
+         4eecuLsryT5Zop+iUF5hIo1tm+LUL/t9ECIBEKACFFTCb6rCStS0+hqh7CfobBmg88fZ
+         p8Fw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/HS72tEJ5zPMm4c/Q5+VZems5XOKb4MvHXDtoBwZXyb3suVTPPV+bW7xm7jDzoU2t3krS6/G08VZhUB0=@vger.kernel.org, AJvYcCXtO2+vS5uOQurp/AzhULKrivrFsavKqTSjbM4oCwEDNtN44oLi+8aB8ebvdL6A9yscFMpivxfX@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHcq1B3l/xxN4OpLU8caV3Gm0g3mXrdabEMXjmOlpCBHurYKXU
+	4AhTfIlIl0RKh8gIFxkoAjck4+PupOGwHaFzST72ArGxsIvgAjXZ
+X-Google-Smtp-Source: AGHT+IEl46L4EWrS8Bnqee5NjXf1xRSgBbnQtkszPPy2a+EUIAhdJea96nr4iYmvC8DoZjBnMmGhXA==
+X-Received: by 2002:a17:906:bc11:b0:a8d:446a:ded8 with SMTP id a640c23a62f3a-a991bd0b7ffmr190330966b.22.1728031640619;
+        Fri, 04 Oct 2024 01:47:20 -0700 (PDT)
 Received: from localhost (dslb-002-200-173-220.002.200.pools.vodafone-ip.de. [2.200.173.220])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8ca3fce32sm1606973a12.57.2024.10.04.01.47.18
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a99100a3200sm197443266b.4.2024.10.04.01.47.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 01:47:19 -0700 (PDT)
+        Fri, 04 Oct 2024 01:47:20 -0700 (PDT)
 From: Jonas Gorski <jonas.gorski@gmail.com>
-Subject: [PATCH 0/5] net: dsa: b53: assorted jumbo frame fixes
-Date: Fri, 04 Oct 2024 10:47:16 +0200
-Message-Id: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
+Date: Fri, 04 Oct 2024 10:47:17 +0200
+Subject: [PATCH 1/5] net: dsa: b53: fix jumbo frame mtu check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,10 +78,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJSr/2YC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIxNDAwNj3SRT4/is0tyk/Pi0zIrUYl1L07Q0M0uDJMMUy1QloK6ColSwBFB
- TdGxtLQD6frDUYQAAAA==
-X-Change-ID: 20241003-b53_jumbo_fixes-95ff690b1d9e
+Message-Id: <20241004-b53_jumbo_fixes-v1-1-ce1e54aa7b3c@gmail.com>
+References: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
+In-Reply-To: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>, 
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -92,34 +92,42 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
  linux-kernel@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-While investigating the capabilities of BCM63XX's integrated switch and
-its DMA engine, I noticed a few issues in b53's jumbo frame code.
+JMS_MIN_SIZE is the full ethernet frame length, while mtu is just the
+data payload size. Comparing these two meant that mtus between 1500 and
+1518 did not trigger enabling jumbo frames.
 
-Mostly a confusion of MTU vs frame length, but also a few missing cases
-for 100M switches.
+So instead compare the set mtu ETH_DATA_LEN, which is equal to
+JMS_MIN_SIZE - ETH_HLEN - ETH_FCS_LEN;
 
-Tested on BCM63XX and BCM53115 with intel 1G and realtek 1G NICs,
-which support MTUs of 9000 or slightly above, but significantly less
-than the 9716/9720 supported by BCM53115, so I couldn't verify the
-actual maximum frame length.
+Also do a check that the requested mtu is actually greater than the
+minimum length, else we do not need to enable jumbo frames.
 
+In practice this only introduced a very small range of mtus that did not
+work properly. Newer chips allow 2000 byte large frames by default, and
+older chips allow 1536 bytes long, which is equivalent to an mtu of
+1514. So effectivly only mtus of 1515~1517 were broken.
+
+Fixes: 6ae5834b983a ("net: dsa: b53: add MTU configuration support")
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
-Jonas Gorski (5):
-      net: dsa: b53: fix jumbo frame mtu check
-      net: dsa: b53: fix max MTU for 1g switches
-      net: dsa: b53: fix max MTU for BCM5325/BCM5365
-      net: dsa: b53: allow lower MTUs on BCM5325/5365
-      net: dsa: b53: fix jumbo frames on 10/100 ports
+ drivers/net/dsa/b53/b53_common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/net/dsa/b53/b53_common.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
----
-base-commit: 8beee4d8dee76b67c75dc91fd8185d91e845c160
-change-id: 20241003-b53_jumbo_fixes-95ff690b1d9e
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 0783fc121bbbf979abe6c9985b10cf4379bf2a9b..57df00ad9dd4cedfe9e959ea779d48e3f8f36142 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -2259,7 +2259,7 @@ static int b53_change_mtu(struct dsa_switch *ds, int port, int mtu)
+ 	if (!dsa_is_cpu_port(ds, port))
+ 		return 0;
+ 
+-	enable_jumbo = (mtu >= JMS_MIN_SIZE);
++	enable_jumbo = (mtu > ETH_DATA_LEN);
+ 	allow_10_100 = (dev->chip_id == BCM583XX_DEVICE_ID);
+ 
+ 	return b53_set_jumbo(dev, enable_jumbo, allow_10_100);
 
-Best regards,
 -- 
-Jonas Gorski <jonas.gorski@gmail.com>
+2.43.0
 
 
