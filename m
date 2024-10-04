@@ -1,121 +1,130 @@
-Return-Path: <netdev+bounces-131876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D5098FCC4
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:45:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E48398FCDD
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 06:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0BB528173E
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:45:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 488ED283B14
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 04:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D43B53E23;
-	Fri,  4 Oct 2024 04:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A9A4963C;
+	Fri,  4 Oct 2024 04:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cif02BMw"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="qWIOmHqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E694E328DB
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 04:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F1F9475;
+	Fri,  4 Oct 2024 04:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728017111; cv=none; b=CWKrgdTYEDbzE5824ldJun2xLVkULKHfXKuI6Kw+Z9CO0bXJOL53oE35mutt6b8EuHL5l6tz461YlDQa7zORx+DVE5yBCXiBWbB5SewE3gdglnzhPmDRwuMyc1AAzwIgoSlkyQOEt+3z9UItWvsNcN8Tz/dO4j0t6uBZ4lcoNKA=
+	t=1728017738; cv=none; b=runTMNRWsdnJYV4Br97DuBrrIv083pYy6q9a0bpYpVMbiWhagx+KL/AEaWUYv86Q52H2Xz8p2ARIt72LpLiMABDVJOzSUxwWDdeWiLGEN8U/4tlpoDMV4f2CPn3M9b1yKZtCHeuJsJJKmo3eKBYnTMEjrf6Evj1X5kFvZRU1jBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728017111; c=relaxed/simple;
-	bh=VmwvU0W4CbtoHjdtRtYbUa1zfcrUwdOCsDV5l+mX1gQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=MqvurnnD2XGkMk8kVu1LFt1ZDjgvjLqYHxMdg3zOwgWW4tFtJJ5Jwq8aoZ83e5yOv19ryz9rb99l5+ZpOnk7xmJ/SaVHdgxkwRvyRzEv9j91rrsqS/3nWbXMiUUQifEYlQAlS4GKrCawlhFTI1NVk/JR67VYyunt6e+gBPsf9hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cif02BMw; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6d23b607-b6d6-4074-8778-c50bf3bd0b91@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728017103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ytssWJLKmXIWXSrDg9ABlNpbkQhbsJOWwycT6PoQRhQ=;
-	b=cif02BMw0GzdjzhEZDwFVDFEIppcN7DFA9RB7RJTWvYL/k1JyQxwrtdZ3o/ht160Nnev2+
-	MjCoa0xOwItozXfUK1vw63f/lurOBt0ZK2wv8UaJ7r97F1YtJeztgwwIFJKN+I4FgTXwUS
-	D5qe/rCsFpIY8ITEVkZkD1Gqg0UU6Go=
-Date: Thu, 3 Oct 2024 21:44:52 -0700
+	s=arc-20240116; t=1728017738; c=relaxed/simple;
+	bh=L7Q+mf6JwQ/AmjPQNKn3MG5bhhrV5QRdvkQIx8gQxR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QJzkAwQm9EHhtACakawPr8ZE78gLXaRZxAXj5FQ+G/DiEDPQ9FZjaqWwO/p3H9lfIrEXb2bMgqHM2N1HsBNeV7ltLufZePCZv+gtRns6BFCL7s1hY7Au5uyO9zI/zOsE7DWzN+F8vwIIT+4W9FE/tTJKaAxFXoj9hHOeod9tPNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=qWIOmHqI; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4944tBJH053214;
+	Thu, 3 Oct 2024 23:55:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1728017712;
+	bh=mk2XnGhyxjzW1kvZsCKYtwP9v+8FF4LBDGigBPr3R+U=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=qWIOmHqI9Mb7s2y2H80644C7xpQmXYDGkbxclfZWRbXQzAAl084AT5WHE/bC2x6fk
+	 9HwCFntr+/E9onpvdkklulUdr95+Gma90k5ycjl/wtFlJFrbC9W21U5uzOZ8OQWGfv
+	 lLxBvLU1Zu/gfn/aVIopQswkOUW8uF0SWh8ggLB4=
+Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4944tBaF023474
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 3 Oct 2024 23:55:11 -0500
+Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 3
+ Oct 2024 23:55:11 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 3 Oct 2024 23:55:11 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4944t5HT125485;
+	Thu, 3 Oct 2024 23:55:06 -0500
+Message-ID: <4f1f0d20-6411-49c8-9891-f7843a504e9c@ti.com>
+Date: Fri, 4 Oct 2024 10:25:05 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
- to test_progs
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jakub Kicinski <kuba@kernel.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
- <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev> <ZuVWmxoqXFI3qvVI@lore-desk>
- <20240914063828.7bd73c5e@kernel.org>
- <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
- <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Fix race condition for VLAN
+ table access
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
+        <diogo.ivo@siemens.com>, <andrew@lunn.ch>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>
+References: <20241003105940.533921-1-danishanwar@ti.com>
+ <20241003174142.384e51ad@kernel.org>
 Content-Language: en-US
-In-Reply-To: <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20241003174142.384e51ad@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 9/24/24 6:37 PM, Martin KaFai Lau wrote:
-> There are other .sh tests that could better use the test_progs migration. In 
-> particular the ones without existing test coverage. For non XDP related, 
-> test_tcp_check_syncookie.sh, test_flow_dissector.sh, and test_tc_edt.sh should 
-> be the good ones.
 
-I just took a closer look at the test_tc_edt.* for another reason. It seems 
-doing some bandwidth test which may not be a good fit (e.g. too flaky) for 
-test_progs. I would leave it to the bottom of the todo list for now.
 
+On 04/10/24 6:11 am, Jakub Kicinski wrote:
+> On Thu, 3 Oct 2024 16:29:40 +0530 MD Danish Anwar wrote:
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index bba6da2e6bd8..9a33e9ed2976 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -296,6 +296,7 @@ struct prueth {
+>>  	bool is_switchmode_supported;
+>>  	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
+>>  	int default_vlan;
+>> +	spinlock_t vtbl_lock; /* Lock for vtbl in shared memory */
 > 
-> For XDP, test_xdp_meta.sh should be useful also. You may also want to check the 
-> test_xdp_redirect_*.sh.
+> This needs to be kdoc, otherwise:
 > 
->> processes and tcp/udp channels involved), but if keeping the standalone version
->> is really needed, I can give a try. Does it sound reasonable ?
->> - one part of my overall goal is to clean up the tools/testing/selftests/bpf
->> directory from anything that is not tested automatically. What should we do with
->> the wrapping shell script (test_xdp_features.sh) ? Since test_progs will
->> automate the test with veths, I guess it is still ok to just remove it ?
->>
->>> No preference but just to raise awareness - drivers/net's NetDrvEpEnv
->>> class provides the setup for running tests with an endpoint.
->>> XDP tests intended for HW would fit there pretty well.
->>
->> Thanks for the hint. If we want to keep some tooling for real hw xdp features
->> testing, maybe we could add a small part in tools/testing/selftests/drivers/net
->> and make it use this NetDrvEpEnv ? Or it is a bigger hint that the whole test
->> about xdp features could be moved there (and then tested by net kselftests
->> rather than by ebpf ci specifically) ? @Lorenzo and eBPF tests maintainers, any
->> opinion ?
->>
->> Thanks,
->>
->> Alexis
->>
-> 
-> 
+> drivers/net/ethernet/ti/icssg/icssg_prueth.h:301: warning: Function parameter or struct member 'vtbl_lock' not described in 'prueth'
 
+Hi Jakub,
+
+Removing the documentation from here and keeping it in kdoc results in
+below checkpatch,
+
+CHECK: spinlock_t definition without comment
+#69: FILE: drivers/net/ethernet/ti/icssg/icssg_prueth.h:300:
++	spinlock_t vtbl_lock;
+
+
+What should be done here? Should I,
+
+1. Move the documentation to kdoc - This is will result in checkpatch
+2. Keep the documentation in kdoc as well as inline - This will result
+in no warnings but duplicate documentation which I don't think is good.
+
+I was not sure which one takes more precedence check patch or kdoc, thus
+put it inline thinking fixing checkpatch might have more weightage.
+
+Let me know what should be done here.
+
+-- 
+Thanks and Regards,
+Danish
 
