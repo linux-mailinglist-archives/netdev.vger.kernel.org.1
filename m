@@ -1,171 +1,113 @@
-Return-Path: <netdev+bounces-131923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4D098FF27
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:58:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC5B798FF31
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 11:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AADBDB21B78
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 08:58:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CF7B281EAB
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 09:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7C314373F;
-	Fri,  4 Oct 2024 08:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZX/EtesE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC970146D65;
+	Fri,  4 Oct 2024 09:01:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF331411DE
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 08:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA75144D0A
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 09:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728032328; cv=none; b=M8pIUcpJoEMvZsLcA8r7v9c63TGfK3o/x3/8IX9XKkCE4wBl6ZtAIJPddUXqI8UF9D2TCUgPPJuOKEqmfqsGxJQhps8wEM8iDKVcozXv0um/48H9MJN711blFXcES0DVM2JKuX9VtvwtTJBp/3mmLZ6zGgk70HfNy6e6o7KZOvs=
+	t=1728032487; cv=none; b=ZqFILoS4YG6ctWnkOYv7dzVFPuXNZZq/Olnw35o269ol140BuZ78hAlm1Lb9WmGPByt5HYWDGIBPWpZl4kPSMsFW/HPyHDKo7tzBn6wOVM9m7LzFSavDG6TF5Bx+UXLo8N91i87yggIqhNB2Maod2dHpcS/uP09C1btOVTokxuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728032328; c=relaxed/simple;
-	bh=UGUMZS56XnEZ/WzX+1Eq6zTe8RSNwKLkE+NmX0YMinE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rzrHhyxeMqQ5nD4P8wbqBlmxKbNb/P6099UIIhEXQerhL7gMDxezYyuqZhSfdXF2iuOjW9GbS3zOp1eywVGM7rkOAGYkm33txohFLUEeayf6x8V5y4/nm5ssrPphHP41vPWpdWN2m79MR+bRTRsZPbJXVKLH9npYPjD5943TLpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZX/EtesE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFB89C4CEC6;
-	Fri,  4 Oct 2024 08:58:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728032328;
-	bh=UGUMZS56XnEZ/WzX+1Eq6zTe8RSNwKLkE+NmX0YMinE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZX/EtesEpbIUCS/zC4cX/UhsP846optAl4PAFgppUoJKIa4vEsJqDo8otWbDcDv/n
-	 Vllgc37Nu7YTMfiDqQ5iYPhguW8AA+UfVGEsGDXoEvbOPtAshOPr/DDn5XgwsJKmyu
-	 F4Eo4JeiBkPwDgtnUtBk01ZVpdpfLp97vDmgnIM8Hp6fIxtfux0I7XJwsXdHpkI1i9
-	 PsuNVK0fuiPsiCytkUV73d4YJi8ab5l9Vx795DOHpvMSXGGiDKr4Lt6JdddrhHEiE5
-	 Cxi2vp7sQVLV9yG19zXmAbdoCKzfYkfW9RY5YURGw3I3sV43FuG0m9Dlf/n1Wjt5zs
-	 HpwI5pFgry6PQ==
-Date: Fri, 4 Oct 2024 09:58:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next V2 3/6] net/mlx5: hw counters: Replace IDR+lists
- with xarray
-Message-ID: <20241004085844.GA1310185@kernel.org>
-References: <20241001103709.58127-1-tariqt@nvidia.com>
- <20241001103709.58127-4-tariqt@nvidia.com>
+	s=arc-20240116; t=1728032487; c=relaxed/simple;
+	bh=WJZI5f7afmQeyKcBF75Gok4Nh3/Flinw7pR96fnP/yQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LGtYdipor7KmaBig4V7eB59Xbkqoz8wIAJgByepyq56u9XuBiZ6R9HPT0P8Q/bQkU4rsFnSkKlIy3KWCZr1oKqXWoVnqIrDpA7FD5myfHloEgPwJRpZ1HtmVcSGFRTYvYv963b3gbmHlloV7byUDnW2jWIdBO8xZMs9zEFxp5LM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sweBK-0004Yo-QF; Fri, 04 Oct 2024 11:01:02 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sweBJ-003X8H-4B; Fri, 04 Oct 2024 11:01:01 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sweBJ-006wNU-0B;
+	Fri, 04 Oct 2024 11:01:01 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org,
+	Divya.Koppera@microchip.com
+Subject: [PATCH net-next v5 0/2] net: phy: Support master-slave config via device tree
+Date: Fri,  4 Oct 2024 11:00:58 +0200
+Message-Id: <20241004090100.1654353-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001103709.58127-4-tariqt@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Oct 01, 2024 at 01:37:06PM +0300, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+This patch series adds support for configuring the master/slave role of
+PHYs via the device tree. A new `master-slave` property is introduced in
+the device tree bindings, allowing PHYs to be forced into either master
+or slave mode. This is particularly necessary for Single Pair Ethernet
+(SPE) PHYs (1000/100/10Base-T1), where hardware strap pins may not be
+available or correctly configured, but it is applicable to all PHY
+types.
 
-...
+changes v5:
+- sync DT options with ethtool nameing.
 
-> +/* Synchronization notes
-> + *
-> + * Access to counter array:
-> + * - create - mlx5_fc_create() (user context)
-> + *   - inserts the counter into the xarray.
-> + *
-> + * - destroy - mlx5_fc_destroy() (user context)
-> + *   - erases the counter from the xarray and releases it.
-> + *
-> + * - query mlx5_fc_query(), mlx5_fc_query_cached{,_raw}() (user context)
-> + *   - user should not access a counter after destroy.
-> + *
-> + * - bulk query (single thread workqueue context)
-> + *   - create: query relies on 'lastuse' to avoid updating counters added
-> + *             around the same time as the current bulk cmd.
-> + *   - destroy: destroyed counters will not be accessed, even if they are
-> + *              destroyed during a bulk query command.
-> + */
-> +static void mlx5_fc_stats_query_all_counters(struct mlx5_core_dev *dev)
->  {
->  	struct mlx5_fc_stats *fc_stats = dev->priv.fc_stats;
-> -	bool query_more_counters = (first->id <= last_id);
-> -	int cur_bulk_len = fc_stats->bulk_query_len;
-> +	u32 bulk_len = fc_stats->bulk_query_len;
-> +	XA_STATE(xas, &fc_stats->counters, 0);
->  	u32 *data = fc_stats->bulk_query_out;
-> -	struct mlx5_fc *counter = first;
-> +	struct mlx5_fc *counter;
-> +	u32 last_bulk_id = 0;
-> +	u64 bulk_query_time;
->  	u32 bulk_base_id;
-> -	int bulk_len;
->  	int err;
->  
-> -	while (query_more_counters) {
-> -		/* first id must be aligned to 4 when using bulk query */
-> -		bulk_base_id = counter->id & ~0x3;
-> -
-> -		/* number of counters to query inc. the last counter */
-> -		bulk_len = min_t(int, cur_bulk_len,
-> -				 ALIGN(last_id - bulk_base_id + 1, 4));
-> -
-> -		err = mlx5_cmd_fc_bulk_query(dev, bulk_base_id, bulk_len,
-> -					     data);
-> -		if (err) {
-> -			mlx5_core_err(dev, "Error doing bulk query: %d\n", err);
-> -			return;
-> -		}
-> -		query_more_counters = false;
-> -
-> -		list_for_each_entry_from(counter, &fc_stats->counters, list) {
-> -			int counter_index = counter->id - bulk_base_id;
-> -			struct mlx5_fc_cache *cache = &counter->cache;
-> -
-> -			if (counter->id >= bulk_base_id + bulk_len) {
-> -				query_more_counters = true;
-> -				break;
-> +	xas_lock(&xas);
-> +	xas_for_each(&xas, counter, U32_MAX) {
-> +		if (xas_retry(&xas, counter))
-> +			continue;
-> +		if (unlikely(counter->id >= last_bulk_id)) {
-> +			/* Start new bulk query. */
-> +			/* First id must be aligned to 4 when using bulk query. */
-> +			bulk_base_id = counter->id & ~0x3;
-> +			last_bulk_id = bulk_base_id + bulk_len;
-> +			/* The lock is released while querying the hw and reacquired after. */
-> +			xas_unlock(&xas);
-> +			/* The same id needs to be processed again in the next loop iteration. */
-> +			xas_reset(&xas);
-> +			bulk_query_time = jiffies;
-> +			err = mlx5_cmd_fc_bulk_query(dev, bulk_base_id, bulk_len, data);
-> +			if (err) {
-> +				mlx5_core_err(dev, "Error doing bulk query: %d\n", err);
-> +				return;
->  			}
-> -
-> -			update_counter_cache(counter_index, data, cache);
-> +			xas_lock(&xas);
-> +			continue;
->  		}
-> +		/* Do not update counters added after bulk query was started. */
+changes v4:
+- add Reviewed-by
+- rebase against latest net-next
 
-Hi Cosmin and Tariq,
+changes v3:
+- rename  master-slave to timing-role
+- add prefer-master/slave support
 
-I'm sorry if it is obvious, but I'm wondering if you could explain further
-the relationship between the if block above, where bulk_query_time (and
-bulk_base_id) is initialised and if block below, which is conditional on
-bulk_query_time.
+Oleksij Rempel (2):
+  dt-bindings: net: ethernet-phy: Add timing-role role property for
+    ethernet PHYs
+  net: phy: Add support for PHY timing-role configuration via device
+    tree
 
-> +		if (time_after64(bulk_query_time, counter->cache.lastuse))
-> +			update_counter_cache(counter->id - bulk_base_id, data,
-> +					     &counter->cache);
->  	}
-> +	xas_unlock(&xas);
->  }
+ .../devicetree/bindings/net/ethernet-phy.yaml | 21 ++++++++++++
+ drivers/net/phy/phy-core.c                    | 33 +++++++++++++++++++
+ drivers/net/phy/phy_device.c                  |  3 ++
+ include/linux/phy.h                           |  1 +
+ 4 files changed, 58 insertions(+)
 
-...
+--
+2.39.5
+
 
