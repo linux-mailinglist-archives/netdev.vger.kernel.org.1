@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-131959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-131960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BB7E9900BD
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:20:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3BDB9900C2
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 12:21:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EEA81C232CD
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:20:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F0801F2203D
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 10:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A081494CF;
-	Fri,  4 Oct 2024 10:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A545714A4D0;
+	Fri,  4 Oct 2024 10:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IHsg0vzE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iPW484Qu"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5E7137903
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3436914A4FB
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 10:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728037228; cv=none; b=rsfnXSjpzXmq0wey2lJbDOYsn5TUlYKxBXHx48e3Qf4MA6+HKAb9f8vz3jJ2zF2FnHBx2pE161fyx+S764ME0gnplXnapQG54KBJTP88Aog466E4CedaYDK1F2y0Ue1UU+LCbYiv9ZJqPEzQfXBNt7OI+yoNsj+PYVBaJSt9X5E=
+	t=1728037260; cv=none; b=s0SAEddJl3uvSU87iQHIa1ZNTWicuIcBL0RrhBm2u0vyoww9ob2oGnbcCdIMqxNKBhoI14/yTI5NruDqXYpybAnCPR6WS4DCP9f/STtl3JnSiLt2t7vOuqstuO8zFKQ/Lq1I3fwWPoQtIJPXLXdvvRNHH/jG4UP0JWVmseQfsvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728037228; c=relaxed/simple;
-	bh=ofjQSUc0h77WX1o2ephmMiUGWI4mR07fot68T4gefkI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kpiWYoX7MJCzDyPlKG0pjtnGo60I3RKSa5pR9X9LgduxJbLQVi0EAdSuvPqB/8k6SuARScKXQZ+tvBz4w0H6ekuuls10Xdda1WB92kzqzTePNG6BT4Scyj13yryywnPxQK4EyBHfnFw4bhVAxR8KqEeLlXrmqr6YQfJFdQ8+oUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IHsg0vzE; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1728037260; c=relaxed/simple;
+	bh=AqpoCbGBBdUd4c+LnycnuudExQE6iUc346vBXoAPB48=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=rleSRnRB1v15l/cDqsJGvG2VwoAOcJ1JR8MlSPgVNhprKnHpdv4G90jrb5NvyjlJlIimoOu1WKLs25AGfA82Fe6t6EfzspGHS6cq2sYLHejrXa4pv5BLoMFQWFjVO78lRonjtfH2dSMovqxgq2sXCPPN3z7NmAMBuhrAEWOwbk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=iPW484Qu; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=g5gMsMlOt6+uUT+iqof24T3eZesuF6qztprcqRPdYLE=; b=IHsg0vzEv5qz9GOw5lXDVzbEzv
-	ZnTWNB3bY4TryT+DXC5e6vRKWDBrs9idERQ/4nTStu3sOOLkCdzzZUMAqWuiGTzge5JMxqAvizPOl
-	8OPG9J4g6iC4ZRPghgepHAl4nD76uJnBfHJvmVxVDLFNciVljJ6aiFO9wJQgXg3p44BojTTrrg/Of
-	lI4SlghrghkX/tIv23vfVkpVppmhUiwmjQmt+XhJjmqRkuZdsPKucrA7ILwtOaov1QvVRDcwk30yc
-	U71meNoT0bamu6Qu8BfYPLZobG+xqUq6yyBxUDj53qQllXNUZSriY6hXYYXoaWCbypI/R6GPrsauw
-	pvZuJ5Mg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43032)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EDl8iDdO8g6Enhpce8/jrTV+161F1T+Rpc4/Yni614k=; b=iPW484QuVOqO7JLXJBvQ5heXcf
+	hXcRtzmtJOCl1Xvxl+sImZtPBUXFyXt5Ojy+076w09FOkU1w4OB/u45zNTNukpHhNvm+hFRrmKmXe
+	RL/zwi5nV4qpV5Tj150tQkyJrVCKQjaS5WQNWDbxbAgRCILj5qSvpzs+vT8ygtmXcn68JkEWiJjUl
+	1xROWlBpIxfauEYk8K4MvxHrqXgXf1eoijE0/UE8EUOukmcXaf9t2Rg45EP6dI1kW+xip8Zhf8xv5
+	JjtXCpUqNrzpbHnqID3eGD32B52+6SwBqhNqvRjsWEJYqQk4X41h14q40uAvjMQHLFTxEA4mOfZLI
+	TYrFXXLA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42496 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1swfPp-0001fb-3D;
-	Fri, 04 Oct 2024 11:20:05 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1swfPi-00016R-0C;
-	Fri, 04 Oct 2024 11:19:58 +0100
-Date: Fri, 4 Oct 2024 11:19:57 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1swfQQ-0001fx-2e;
+	Fri, 04 Oct 2024 11:20:42 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1swfQP-006Dew-5e; Fri, 04 Oct 2024 11:20:41 +0100
+In-Reply-To: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -67,77 +68,193 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 00/13] net: pcs: xpcs: cleanups batch 2
-Message-ID: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+Subject: [PATCH net-next 01/13] net: pcs: xpcs: remove dw_xpcs_compat enum
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1swfQP-006Dew-5e@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 04 Oct 2024 11:20:41 +0100
 
-This is the second cleanup series for XPCS.
+There is no reason for the struct dw_xpcs_compat arrays to be a fixed
+size other than the way we iterate over them. The index into the array
+isn't used for anything, and having them fixed size needlessly wastes
+space.
 
-Patch 1 removes the enum indexing the dw_xpcs_compat array. The index is
-never used except to place entries in the array and to size the array.
+Remove the enum that defines their size, and instead use an empty
+array entry (with NULL ->supported) to mark the end of the array.
 
-Patch 2 removes the interface arrays - each of which only contain one
-interface.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/pcs/pcs-xpcs.c | 69 ++++++++++++++------------------------
+ 1 file changed, 25 insertions(+), 44 deletions(-)
 
-Patch 3 makes xpcs_find_compat() take the xpcs structure rather than the
-ID - the previous series removed the reason for xpcs_find_compat needing
-to take the ID.
-
-Patch 4 provides a helper to convert xpcs structure to a regular
-phylink_pcs structure, which leads to patch 5.
-
-Patch 5 moves the definition of struct dw_xpcs to the private xpcs
-header - with patch 4 in place, nothing outside of the xpcs driver
-accesses the contents of the dw_xpcs structure.
-
-Patch 6 renames xpcs_get_id() to xpcs_read_id() since it's reading the
-ID, rather than doing anything further with it. (Prior versions of this
-series renamed it to xpcs_read_phys_id() since that more accurately
-described that it was reading the physical ID registers.)
-
-Patch 7 moves the searching of the ID list out of line as this is a
-separate functional block.
-
-Patch 8 converts xpcs to use the bitmap macros, which eliminates the
-need for _SHIFT definitions.
-
-Patch 9 adds and uses _modify() accessors as there are a large amount
-of read-modify-write operations in this driver. This conversion found
-a bug in xpcs-wx code that has been reported and already fixed.
-
-Patch 10 converts xpcs to use read_poll_timeout() rather than open
-coding that.
-
-Patch 11 converts all printed messages to use the dev_*() functions so
-the driver and devie name are always printed.
-
-Patch 12 moves DW_VR_MII_DIG_CTRL1_2G5_EN to the correct place in the
-header file, rather than amongst another register's definitions.
-
-Patch 13 moves the Wangxun workaround to a common location rather than
-duplicating it in two places. We also reformat this to fit within
-80 columns.
-
- drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c |   2 +-
- drivers/net/pcs/pcs-xpcs-nxp.c                    |  24 +-
- drivers/net/pcs/pcs-xpcs-wx.c                     |  56 ++-
- drivers/net/pcs/pcs-xpcs.c                        | 445 +++++++++-------------
- drivers/net/pcs/pcs-xpcs.h                        |  26 +-
- include/linux/pcs/pcs-xpcs.h                      |  19 +-
- 6 files changed, 237 insertions(+), 335 deletions(-)
-
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 0a01c552f591..e1f264039c91 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -135,17 +135,6 @@ static const phy_interface_t xpcs_2500basex_interfaces[] = {
+ 	PHY_INTERFACE_MODE_2500BASEX,
+ };
+ 
+-enum {
+-	DW_XPCS_USXGMII,
+-	DW_XPCS_10GKR,
+-	DW_XPCS_XLGMII,
+-	DW_XPCS_10GBASER,
+-	DW_XPCS_SGMII,
+-	DW_XPCS_1000BASEX,
+-	DW_XPCS_2500BASEX,
+-	DW_XPCS_INTERFACE_MAX,
+-};
+-
+ struct dw_xpcs_compat {
+ 	const int *supported;
+ 	const phy_interface_t *interface;
+@@ -163,15 +152,13 @@ struct dw_xpcs_desc {
+ static const struct dw_xpcs_compat *
+ xpcs_find_compat(const struct dw_xpcs_desc *desc, phy_interface_t interface)
+ {
+-	int i, j;
+-
+-	for (i = 0; i < DW_XPCS_INTERFACE_MAX; i++) {
+-		const struct dw_xpcs_compat *compat = &desc->compat[i];
++	const struct dw_xpcs_compat *compat;
++	int j;
+ 
++	for (compat = desc->compat; compat->supported; compat++)
+ 		for (j = 0; j < compat->num_interfaces; j++)
+ 			if (compat->interface[j] == interface)
+ 				return compat;
+-	}
+ 
+ 	return NULL;
+ }
+@@ -610,14 +597,12 @@ static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
+ 
+ void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces)
+ {
+-	int i, j;
+-
+-	for (i = 0; i < DW_XPCS_INTERFACE_MAX; i++) {
+-		const struct dw_xpcs_compat *compat = &xpcs->desc->compat[i];
++	const struct dw_xpcs_compat *compat;
++	int j;
+ 
++	for (compat = xpcs->desc->compat; compat->supported; compat++)
+ 		for (j = 0; j < compat->num_interfaces; j++)
+ 			__set_bit(compat->interface[j], interfaces);
+-	}
+ }
+ EXPORT_SYMBOL_GPL(xpcs_get_interfaces);
+ 
+@@ -1298,76 +1283,72 @@ static int xpcs_get_id(struct dw_xpcs *xpcs)
+ 	return 0;
+ }
+ 
+-static const struct dw_xpcs_compat synopsys_xpcs_compat[DW_XPCS_INTERFACE_MAX] = {
+-	[DW_XPCS_USXGMII] = {
++static const struct dw_xpcs_compat synopsys_xpcs_compat[] = {
++	{
+ 		.supported = xpcs_usxgmii_features,
+ 		.interface = xpcs_usxgmii_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_usxgmii_interfaces),
+ 		.an_mode = DW_AN_C73,
+-	},
+-	[DW_XPCS_10GKR] = {
++	}, {
+ 		.supported = xpcs_10gkr_features,
+ 		.interface = xpcs_10gkr_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_10gkr_interfaces),
+ 		.an_mode = DW_AN_C73,
+-	},
+-	[DW_XPCS_XLGMII] = {
++	}, {
+ 		.supported = xpcs_xlgmii_features,
+ 		.interface = xpcs_xlgmii_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_xlgmii_interfaces),
+ 		.an_mode = DW_AN_C73,
+-	},
+-	[DW_XPCS_10GBASER] = {
++	}, {
+ 		.supported = xpcs_10gbaser_features,
+ 		.interface = xpcs_10gbaser_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_10gbaser_interfaces),
+ 		.an_mode = DW_10GBASER,
+-	},
+-	[DW_XPCS_SGMII] = {
++	}, {
+ 		.supported = xpcs_sgmii_features,
+ 		.interface = xpcs_sgmii_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
+ 		.an_mode = DW_AN_C37_SGMII,
+-	},
+-	[DW_XPCS_1000BASEX] = {
++	}, {
+ 		.supported = xpcs_1000basex_features,
+ 		.interface = xpcs_1000basex_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_1000basex_interfaces),
+ 		.an_mode = DW_AN_C37_1000BASEX,
+-	},
+-	[DW_XPCS_2500BASEX] = {
++	}, {
+ 		.supported = xpcs_2500basex_features,
+ 		.interface = xpcs_2500basex_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_2500basex_interfaces),
+ 		.an_mode = DW_2500BASEX,
+-	},
++	}, {
++	}
+ };
+ 
+-static const struct dw_xpcs_compat nxp_sja1105_xpcs_compat[DW_XPCS_INTERFACE_MAX] = {
+-	[DW_XPCS_SGMII] = {
++static const struct dw_xpcs_compat nxp_sja1105_xpcs_compat[] = {
++	{
+ 		.supported = xpcs_sgmii_features,
+ 		.interface = xpcs_sgmii_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
+ 		.an_mode = DW_AN_C37_SGMII,
+ 		.pma_config = nxp_sja1105_sgmii_pma_config,
+-	},
++	}, {
++	}
+ };
+ 
+-static const struct dw_xpcs_compat nxp_sja1110_xpcs_compat[DW_XPCS_INTERFACE_MAX] = {
+-	[DW_XPCS_SGMII] = {
++static const struct dw_xpcs_compat nxp_sja1110_xpcs_compat[] = {
++	{
+ 		.supported = xpcs_sgmii_features,
+ 		.interface = xpcs_sgmii_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_sgmii_interfaces),
+ 		.an_mode = DW_AN_C37_SGMII,
+ 		.pma_config = nxp_sja1110_sgmii_pma_config,
+-	},
+-	[DW_XPCS_2500BASEX] = {
++	}, {
+ 		.supported = xpcs_2500basex_features,
+ 		.interface = xpcs_2500basex_interfaces,
+ 		.num_interfaces = ARRAY_SIZE(xpcs_2500basex_interfaces),
+ 		.an_mode = DW_2500BASEX,
+ 		.pma_config = nxp_sja1110_2500basex_pma_config,
+-	},
++	}, {
++	}
+ };
+ 
+ static const struct dw_xpcs_desc xpcs_desc_list[] = {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
