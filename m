@@ -1,94 +1,170 @@
-Return-Path: <netdev+bounces-132219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DEA0991006
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:15:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD8C9991008
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 22:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35521281BC5
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:15:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 648AA1F2714B
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 20:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FBF41E0E1B;
-	Fri,  4 Oct 2024 19:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E466231C94;
+	Fri,  4 Oct 2024 19:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MwSabDE8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6RWkwW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10F1A1E0E0D
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 19:50:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738D3231C93;
+	Fri,  4 Oct 2024 19:50:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728071406; cv=none; b=Mbuv9FC7ix/9t1k1A1RHY54P4vYTAlODg66zznGqcGeNkU/CiUSYP8yV6l9hWoSBznX1u+LlgpLkCyFDwHtoiull/9Y0uXldZiYzZm9GKn/grx+3fJkeJA3FzsvAbsGIkXpIqvPXw3ZmvmwnV1Nm9FK4f0DgttBOVLYMGueQTHM=
+	t=1728071445; cv=none; b=P+BHIktevKmfqpsP9t26BNs3OX6jVN2Ih59cDj/fsVRzURu2elChPCrFcRUtokhOjr2grHFea5TQGiMi4mf6cPdJybAWpmLH9Q4u/vw6t1Qe/RoB7hWr4lBw30fYwX+bb0Xuk29sg8f3fe4hopTddjQHmI+Nys0NDmm3VVnSrxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728071406; c=relaxed/simple;
-	bh=eQ8qSH5pC6YPCKLHRoga4/WtOvfifhAW9DKiT5a4HjY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eczC4XsJOHjTsPqRj+hCUFsMazTmrvJzMcqP8G4w8QsP7GN2yPz2PrmZLEeRLnh/E9+NQ68qER49+kw8mxa2Iy+hWmHcR0JePtDnYpQ9+hS3qc03Jrg99lQJEZ1RyxZJ9u/jpEeaRNOYEEwTzW8WBs9KRfkvrLDiURe2Qakl28o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MwSabDE8; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728071405; x=1759607405;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=qMi1LWrWymPz2BDO+9GqZMu78pC6KEnki7BNzfQa51E=;
-  b=MwSabDE8U8BRfGWs4jIpYhGO1RHSXhp3EgZCkAzjA18vO3QY7uk+RQAD
-   DUIADvS6uyJWZqw/Q60BsU/aD9p2kJW8HbdCBTfYxVLJOiOK42Yl1wFwE
-   4CDfAOhgCxDEXTs3U48fEQ3RjOMgRZ0EV+Z86cV2KKxL6mkKnHN12+xJo
-   A=;
-X-IronPort-AV: E=Sophos;i="6.11,178,1725321600"; 
-   d="scan'208";a="339857342"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 19:50:03 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:16984]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.199:2525] with esmtp (Farcaster)
- id 6f05aaeb-6203-482c-b912-20007d7b305b; Fri, 4 Oct 2024 19:50:02 +0000 (UTC)
-X-Farcaster-Flow-ID: 6f05aaeb-6203-482c-b912-20007d7b305b
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 4 Oct 2024 19:50:01 +0000
-Received: from 88665a182662.ant.amazon.com (10.88.184.239) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 4 Oct 2024 19:49:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <jk@codeconstruct.com.au>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <matt@codeconstruct.com.au>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net 4/6] mctp: Handle error of rtnl_register_module().
-Date: Fri, 4 Oct 2024 12:49:51 -0700
-Message-ID: <20241004194951.63498-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241004090608.50f9f765@kernel.org>
-References: <20241004090608.50f9f765@kernel.org>
+	s=arc-20240116; t=1728071445; c=relaxed/simple;
+	bh=SvQmEK73Iauaibm9H5yENY81Kh+90v+wpP0MuGa3eHI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XRqOUbLe7wBtyB43/bE6dYHOUJ5mXN+qxL6HSmX0ChDJo1sSwuTtZjhhLx3nLqHm0simXB8tmANep0dDoTpQRlsMc+Nkx/Cq0rhlStPI194YajXjV6G5ejjtCPe6iKVRqVbw9oI4k6KKNMydsEqbUtlKkA/m6zfNsWxxxDbAapY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6RWkwW+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0921C4CEC6;
+	Fri,  4 Oct 2024 19:50:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728071445;
+	bh=SvQmEK73Iauaibm9H5yENY81Kh+90v+wpP0MuGa3eHI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=k6RWkwW+joiajpbMGmrG9Cp1DLrQk1fKbmuMQBZkZg3LLQJor2ZwZxBA98m5IqwB0
+	 /zZ1fF19XXE8G91PuIOzPdNeJKlb1AvYAyHLFYrTuCb8eILS9Y9nuy8eBxeCiJ6DLD
+	 LMgoo8lZQGYkdGfkq5maYsSN/YjNUtVuqjhoypLDeLO9k9zvry/Fy7PIEKXsN4bb8e
+	 k1Dqn6IziERplqlPy7IoupfLjtX57yo66C7EgLe2U87fvfkhfOour6NmGqfyG6LztU
+	 dxgIhXFG7ypQ0GYLX+jxUJP5Jw+6x9SUfTae6URYdDXEDMh2REZ4WrIQ2wwDrJ36Mh
+	 9FythXHgmn97A==
+Message-ID: <f41f65bd-104c-44de-82a2-73be59802d96@kernel.org>
+Date: Fri, 4 Oct 2024 22:50:40 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 2/2] net: ethernet: ti: am65-cpsw: avoid
+ devm_alloc_etherdev, fix module removal
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Grygorii Strashko
+ <grygorii.strashko@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241004041218.2809774-1-nico@fluxnic.net>
+ <20241004041218.2809774-3-nico@fluxnic.net>
+ <b055cea5-6f03-4c73-aae4-09b5d2290c29@kernel.org>
+ <s5000qsr-8nps-87os-np52-oqq6643o35o2@syhkavp.arg>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <s5000qsr-8nps-87os-np52-oqq6643o35o2@syhkavp.arg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Fri, 4 Oct 2024 09:06:08 -0700
-> On Thu, 3 Oct 2024 18:00:48 -0700 Kuniyuki Iwashima wrote:
-> > BTW what option is needed to reproduce it ?
-> > I tried W=1 C=1 but didn't see that warning.
+
+
+On 04/10/2024 18:37, Nicolas Pitre wrote:
+> On Fri, 4 Oct 2024, Roger Quadros wrote:
 > 
-> Are you doing allmodconfig?
-> I think it may be a Kconfig option. DEBUG_SECTION_MISMATCH ?
+>> Hi Nicolas,
+>>
+>> On 04/10/2024 07:10, Nicolas Pitre wrote:
+>>> From: Nicolas Pitre <npitre@baylibre.com>
+>>>
+>>> Usage of devm_alloc_etherdev_mqs() conflicts with
+>>> am65_cpsw_nuss_cleanup_ndev() as the same struct net_device instances
+>>> get unregistered twice. Switch to alloc_etherdev_mqs() and make sure
+>>
+>> Do we know why the same net device gets unregistered twice?
+> 
+> When using devm_alloc_etherdev_mqs() every successful allocation is put 
+> in a resource list tied to the device. When the driver is removed, 
+> there's a net device unregister from am65_cpsw_nuss_cleanup_ndev() and 
+> another one from devm_free_netdev().
 
-TIL DEBUG_SECTION_MISMATCH :)
+I couldn't find out where devm_free_netdev() calls unregister_netdev().
+Also we didn't use devm_register_netdev() so resource manager will not
+call unregister_netdev().
 
-now I see the warning, thanks !
+> 
+> We established in patch #1 that net devices must be unregistered before 
+> devlink_port_unregister() is invoked, meaning we can't rely on the 
+> implicit devm_free_netdev() as it happens too late, hence the explicit 
+> am65_cpsw_nuss_cleanup_ndev().
+> 
+>>> am65_cpsw_nuss_cleanup_ndev() unregisters and frees those net_device
+>>> instances properly.
+>>>
+>>> With this, it is finally possible to rmmod the driver without oopsing
+>>> the kernel.
+>>>
+>>> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+>>> Signed-off-by: Nicolas Pitre <npitre@baylibre.com>
+>>> ---
+>>>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 20 ++++++++++++--------
+>>>  1 file changed, 12 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>>> index f6bc8a4dc6..e95457c988 100644
+>>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>>> @@ -2744,10 +2744,9 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
+>>>  		return 0;
+>>>  
+>>>  	/* alloc netdev */
+>>> -	port->ndev = devm_alloc_etherdev_mqs(common->dev,
+>>> -					     sizeof(struct am65_cpsw_ndev_priv),
+>>> -					     AM65_CPSW_MAX_QUEUES,
+>>> -					     AM65_CPSW_MAX_QUEUES);
+>>> +	port->ndev = alloc_etherdev_mqs(sizeof(struct am65_cpsw_ndev_priv),
+>>> +					AM65_CPSW_MAX_QUEUES,
+>>> +					AM65_CPSW_MAX_QUEUES);
+>>
+>> Can we solve this issue without doing this change as
+>> there are many error cases relying on devm managed freeing of netdev.
+> 
+> If you know of a way to do this differently I'm all ears.
+
+I sent another approach already. please check.
+https://lore.kernel.org/all/67c9ede4-9751-4255-b752-27dd60495ff3@kernel.org/
+
+> 
+> About the many error cases needing the freeing of net devices, as far as 
+> I know they're all covered with this patch.
+
+No they are not. you now have to explicitly call free_netdev() in error paths of am65_cpsw_nuss_init_port_ndev().
+I see 3 places directly returning error code.
+i.e.
+        default:
+                dev_err(dev, "selected phy-mode is not supported\n");
+                return -EOPNOTSUPP;
+        }
+...
+        if (IS_ERR(phylink))
+                return PTR_ERR(phylink);
+...
+        ndev_priv->stats = netdev_alloc_pcpu_stats(struct am65_cpsw_ndev_stats);
+        if (!ndev_priv->stats)
+                return -ENOMEM;
+
+> 
+>> I still can't see what we are doing wrong in existing code.
+> 
+> Did you try to rmmod this driver lately?
+
+Yes and it throws an oops, so we do need a fix.
+> 
+> 
+> Nicolas
+
+-- 
+cheers,
+-roger
 
