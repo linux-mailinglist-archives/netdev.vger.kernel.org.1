@@ -1,186 +1,148 @@
-Return-Path: <netdev+bounces-132192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FE8990DDC
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:21:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E585990DF6
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 21:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 703A61C2232C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:21:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9DB21C227DB
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 19:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57AF81D9691;
-	Fri,  4 Oct 2024 18:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 009DA218D76;
+	Fri,  4 Oct 2024 18:28:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="em8JRunR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QvbecYG4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2897F1D9686;
-	Fri,  4 Oct 2024 18:28:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DAEE1E283D;
+	Fri,  4 Oct 2024 18:28:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728066498; cv=none; b=MHdK+SYPeYWpIvcnbG3siWdMCN251HT3oyTeol05YQ3e1N61cVEyuEzk+ZnUI6eG4/0zyepIOCQip5PCOm1Pk+luXjJEA43nvJO3FQ/Zma8BGtL4rMSREsHzLB8Wp8GphLKMFxkMqXnywZMEVf57CyarAN3ZMZ6i+M0IKbkQ/Go=
+	t=1728066519; cv=none; b=ZBB3pEQhOt+6H+xQoKTx8y56VAkwlXcDAP0kLYw77/wm7J7DglU4C9Lv5ZNrIhKfC/5qD7BeV/ddB8JB7G8pVSfCGvh5l7UyTGR02y9tcmQ8jzXJHUufFccXaAW5A8IOhUIUnlvS/EUBpoS0zRkAkdplkVrh/N6PsUkeoPxPu8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728066498; c=relaxed/simple;
-	bh=NrzXJZDx0dptT72YikNWgimxGvTxxOJTbTzoheB5UfA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FJ6J2lZVnKHaSiWfzFMr+xG2Fds539k4umXSGKpjjcsrbqy/C0MG+rDW8cy2IFNXZcx/31JOO01Bo4XCW8eAyc2hYyLD7W2SShr77KRgtQBOXosqHSTp1AQVC9ztXzd9x6RzPtKzkN/LkloHvbRIhZy8ZCWixROl26VmwSOzyTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=em8JRunR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75585C4CECE;
-	Fri,  4 Oct 2024 18:28:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728066498;
-	bh=NrzXJZDx0dptT72YikNWgimxGvTxxOJTbTzoheB5UfA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=em8JRunRYTQHOstMmuOt5M7fQBkoMX63efcN3pWi2iQTY75xzf1M+EukHCi/06qIQ
-	 JbgL9fG2N1oWeM1WspsdgLKm2Q2qFarEweu/Uc5RJaV7bS8scHHjECOTtyG7nq8/P9
-	 NpYxS4MN7VyxfV3sNdUYVxSNNhVrl9f4qIRt9ccF9cM9abEpSyH/C2Wv/JjG9mCIti
-	 tMdK4aF7CTfeuX10BiLRsVS2fovsU1bXiuoa+88boVFm/IP2Fx3vsjLajdeKATridu
-	 kY5wPgVas5LFU03zaQkKFUXqHG+QBhio+USBJ8aRdi/pnWHgrCE4S2/1K4fgFJfu08
-	 5eV7TY5qEk55A==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1728066519; c=relaxed/simple;
+	bh=R6ujciq4JJRrnvovbSEAsC5ALp4y99Jk0QndgasHk3Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u+Rq2nwHEwLNupfwiQGKb2MZL+2yQs+8rYIp8nwqxIa/D3whbwY3QmYbjzRO03PKw1T2wkq1L1d82pSwsVXoOjPNR2WYiLgtJn4G5udmx40h2pOB7fxrGk/jVzkn4vuj9iHd5NIBxLTOepNmgXBCw8oV+4MIRdSTknDiWVTW5r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QvbecYG4; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42cb7a2e4d6so24771885e9.0;
+        Fri, 04 Oct 2024 11:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728066516; x=1728671316; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dxeYKpM2Q4pY2mSFZGOr8Df4aSHhLK/ZPcDMOZ4Tm6E=;
+        b=QvbecYG4DmQYQnWjDDRrOoAKWYdud5AlRuztiDpBOpwGfcV4cYRrC14awfL8XQOkXv
+         fSs0HEhekA5cwm+hBJ3yOfEUYJGbzfzikmLmP5IOYcyG9IEcHqWIRybhQI3dTOwTKoqi
+         gB0X2+YaVAHFJrzS16n0AS1hSbfsdGl1Ha/tpQWp4A5ScF3Ge4B23w8PUzts6wTC7L2O
+         m/4OhEpiHQ72VBAhXZqihdeXZ9vhhoHIJ77Vk/hcbbD8b74AlqSzohJZnwyPNmzCr/aO
+         /DZnl6OXddA6JMTnTwDLgwhX7UtLtlE7LbRZq0UxRJMHafkAWsIrJcaXN6niCP4R7jpu
+         uVsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728066516; x=1728671316;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dxeYKpM2Q4pY2mSFZGOr8Df4aSHhLK/ZPcDMOZ4Tm6E=;
+        b=k0IEDT28BDSGT4Nnhr718Pa4k+Gi2vOONAWhXjVqeWzXIi/lsj4SStQZPwLQisTzpr
+         pEY+2C7w4vGdsZFuhMWG66oVP2Nd+gnxMf6YR9+Tc7ullUK4uNB5cCZnQIredIFDkddu
+         WcHdeBzcr0QY4r5aobW/B6BMjI7xlKlXnDq01zFNnTNAunbFKjFCJkOMIZe06agP0li1
+         HSFRKrYrJi290jt+5gxZVUrtUcD3N8kYM+E0yUoS+hYdIwhWVKnpUp95IffKlJa2TqA1
+         Ay2+XJOicC8DAbwe7u0mchUqPU4UIFV1/IOa57t1p8942yweZZJTk0dq9aB6XKv1sMzP
+         9rng==
+X-Forwarded-Encrypted: i=1; AJvYcCV/12S8F7dwSaqxKYMqT1uYcR0MUgFXgjSUu8q5ZcsJYHiARFcIR4PaDnhqCwfXqqz7Q+2RsE+h@vger.kernel.org, AJvYcCWW9LfVF+siVBJIm1jq0NPi90UlnDaetfY4r8ZSBIKdsaZjL9VdiQs85oTNB1Sti447Por0Qucy@vger.kernel.org, AJvYcCWpUOwSOAms1EfNQvEeWHQLcwiHjlXi7JpUFUvXnTIgKCFLGEtwchZu0aaXsUGogRx+NQEJwAVq+qIvvGc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxdm/mF1wdPR9zk6j3oBpmDygF8DuEhNzIEwD/Hu7Ym1Z9iFJUe
+	JTPR9YRRH32BfT+sMTezJeHoN1BrC3QrT7KtSXy5Bmoi74YSDAbw
+X-Google-Smtp-Source: AGHT+IEsNCrEJP0r79niDXfZvRYF98O1t43V5c+NOEbYu2embuYhfU8nbZ9thVuDal+36S6NguwWFg==
+X-Received: by 2002:a05:600c:548a:b0:42c:a905:9384 with SMTP id 5b1f17b1804b1-42f85ab9ffcmr27814045e9.20.1728066514265;
+        Fri, 04 Oct 2024 11:28:34 -0700 (PDT)
+Received: from localhost.localdomain (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37d1690f34asm202748f8f.3.2024.10.04.11.28.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 11:28:33 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>,
 	stable@vger.kernel.org
-Cc: Simon Horman <horms@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Sasha Levin <sashal@kernel.org>,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 33/42] netfilter: nf_reject: Fix build warning when CONFIG_BRIDGE_NETFILTER=n
-Date: Fri,  4 Oct 2024 14:26:44 -0400
-Message-ID: <20241004182718.3673735-33-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241004182718.3673735-1-sashal@kernel.org>
-References: <20241004182718.3673735-1-sashal@kernel.org>
+Subject: [net PATCH v2] net: phy: Remove LED entry from LEDs list on unregister
+Date: Fri,  4 Oct 2024 20:27:58 +0200
+Message-ID: <20241004182759.14032-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.112
 Content-Transfer-Encoding: 8bit
 
-From: Simon Horman <horms@kernel.org>
+Commit c938ab4da0eb ("net: phy: Manual remove LEDs to ensure correct
+ordering") correctly fixed a problem with using devm_ but missed
+removing the LED entry from the LEDs list.
 
-[ Upstream commit fc56878ca1c288e49b5cbb43860a5938e3463654 ]
+This cause kernel panic on specific scenario where the port for the PHY
+is torn down and up and the kmod for the PHY is removed.
 
-If CONFIG_BRIDGE_NETFILTER is not enabled, which is the case for x86_64
-defconfig, then building nf_reject_ipv4.c and nf_reject_ipv6.c with W=1
-using gcc-14 results in the following warnings, which are treated as
-errors:
+On setting the port down the first time, the assosiacted LEDs are
+correctly unregistered. The associated kmod for the PHY is now removed.
+The kmod is now added again and the port is now put up, the associated LED
+are registered again.
+On putting the port down again for the second time after these step, the
+LED list now have 4 elements. With the first 2 already unregistered
+previously and the 2 new one registered again.
 
-net/ipv4/netfilter/nf_reject_ipv4.c: In function 'nf_send_reset':
-net/ipv4/netfilter/nf_reject_ipv4.c:243:23: error: variable 'niph' set but not used [-Werror=unused-but-set-variable]
-  243 |         struct iphdr *niph;
-      |                       ^~~~
-cc1: all warnings being treated as errors
-net/ipv6/netfilter/nf_reject_ipv6.c: In function 'nf_send_reset6':
-net/ipv6/netfilter/nf_reject_ipv6.c:286:25: error: variable 'ip6h' set but not used [-Werror=unused-but-set-variable]
-  286 |         struct ipv6hdr *ip6h;
-      |                         ^~~~
-cc1: all warnings being treated as errors
+This cause a kernel panic as the first 2 element should have been
+removed.
 
-Address this by reducing the scope of these local variables to where
-they are used, which is code only compiled when CONFIG_BRIDGE_NETFILTER
-enabled.
+Fix this by correctly removing the element when LED is unregistered.
 
-Compile tested and run through netfilter selftests.
-
-Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Closes: https://lore.kernel.org/netfilter-devel/20240906145513.567781-1-andriy.shevchenko@linux.intel.com/
-Signed-off-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Reported-by: Daniel Golle <daniel@makrotopia.org>
+Tested-by: Daniel Golle <daniel@makrotopia.org>
+Cc: stable@vger.kernel.org
+Fixes: c938ab4da0eb ("net: phy: Manual remove LEDs to ensure correct ordering")
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- net/ipv4/netfilter/nf_reject_ipv4.c | 10 ++++------
- net/ipv6/netfilter/nf_reject_ipv6.c |  5 ++---
- 2 files changed, 6 insertions(+), 9 deletions(-)
+Changes v2:
+- Drop second patch
+- Add Reviewed-by tag
 
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index fc761915c5f6f..675b5bbed638e 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
- void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 		   int hook)
+ drivers/net/phy/phy_device.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 560e338b307a..499797646580 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3326,10 +3326,11 @@ static __maybe_unused int phy_led_hw_is_supported(struct led_classdev *led_cdev,
+ 
+ static void phy_leds_unregister(struct phy_device *phydev)
  {
--	struct sk_buff *nskb;
--	struct iphdr *niph;
- 	const struct tcphdr *oth;
-+	struct sk_buff *nskb;
- 	struct tcphdr _oth;
+-	struct phy_led *phyled;
++	struct phy_led *phyled, *tmp;
  
- 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
-@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
+-	list_for_each_entry(phyled, &phydev->leds, list) {
++	list_for_each_entry_safe(phyled, tmp, &phydev->leds, list) {
+ 		led_classdev_unregister(&phyled->led_cdev);
++		list_del(&phyled->list);
+ 	}
+ }
  
- 	skb_reserve(nskb, LL_MAX_HEADER);
--	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
--				   ip4_dst_hoplimit(skb_dst(nskb)));
-+	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
-+			    ip4_dst_hoplimit(skb_dst(nskb)));
- 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
- 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
- 		goto free_nskb;
- 
--	niph = ip_hdr(nskb);
--
- 	/* "Never happens" */
- 	if (nskb->len > dst_mtu(skb_dst(nskb)))
- 		goto free_nskb;
-@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct iphdr *niph = ip_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index 71d692728230e..c8f5196d752e6 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -283,7 +283,6 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	const struct tcphdr *otcph;
- 	unsigned int otcplen, hh_len;
- 	const struct ipv6hdr *oip6h = ipv6_hdr(oldskb);
--	struct ipv6hdr *ip6h;
- 	struct dst_entry *dst = NULL;
- 	struct flowi6 fl6;
- 
-@@ -339,8 +338,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = fl6.flowi6_mark;
- 
- 	skb_reserve(nskb, hh_len + dst->header_len);
--	ip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP,
--				    ip6_dst_hoplimit(dst));
-+	nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP, ip6_dst_hoplimit(dst));
- 	nf_reject_ip6_tcphdr_put(nskb, oldskb, otcph, otcplen);
- 
- 	nf_ct_attach(nskb, oldskb);
-@@ -355,6 +353,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct ipv6hdr *ip6h = ipv6_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
 -- 
-2.43.0
+2.45.2
 
 
