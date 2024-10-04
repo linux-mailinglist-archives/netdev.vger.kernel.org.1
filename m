@@ -1,131 +1,104 @@
-Return-Path: <netdev+bounces-132089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E04919905D5
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:19:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 342129905DE
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 16:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 764691F2265C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5EF2844EC
+	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 14:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6949C215F48;
-	Fri,  4 Oct 2024 14:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BC2215F47;
+	Fri,  4 Oct 2024 14:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="NYXJ1CQU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJ2dS/Mt"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFDC2139DA;
-	Fri,  4 Oct 2024 14:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEAC210188
+	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 14:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728051569; cv=none; b=EQKFi08Tp9BGDknDzTSESYofLrRlfXwdxg/6l/hORJ5gleZ/pBy0usWjIZ5c+xKhGp2/NfSoaCz8ybWtZhrOF5HvClUGod5UDfr1JTh/IZuLUu1mYUZuA00QjCJtFXHwhjHWPLC8Wkt291iIkrfrZMak9N8yBIsAu6OCrFZiYBQ=
+	t=1728051681; cv=none; b=Ccyb7yxek61ipW0h3+8zyK0RyLGOC24LTYMEWSnR24ge88UxJxOKIPre0aAR18lJLX6y1YTWpFw18wOD779TMXsVDloUdoKWZ5kWnmiX3kosUxs0rbSV1O3uiBZFlN6pG/h68jfDsKRAgd9matWDl+O0TydnQWw4gZFZ6JEeBzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728051569; c=relaxed/simple;
-	bh=2BLWGkCi9IuXDLYDzEKfW7ieDXxkrD9eyPr/svUeaL4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nzCqEbPMy9wnjGYHH5loNeVHRrCvWA7v04L9HQgPD/v4qzEKTZ0yU8N4VDgMShPjbX476Bv0lhlZbo4U9n0y49bCL1584VGhKgJM50VoztRzknosa+KEwvhozHTmNRSPPQleaqu7xjdzNHH2bfCjeE59F2b4pG/Na1R8x8ou5oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=NYXJ1CQU; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1728051567; x=1759587567;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=2BLWGkCi9IuXDLYDzEKfW7ieDXxkrD9eyPr/svUeaL4=;
-  b=NYXJ1CQUeZDU3bmeoPXRXpH4wXSUC8X99arGiXJf+KuX5n+Z2sD4h4vP
-   TUlIajcdAxtaadOzT/WqI/cb1sjnldjeh2avnhQSrw8Eel5nlMehbkx7h
-   kTjWnNDqA6M28eve1v2IAOyTmHlqHzeLEvfCayMkvHc1yR9TxC5/L/CBr
-   yoNGmpoYGZj3Xuc9Q4ftBHPoMc4E7CMm3qVqUqitvdr5tfjsdJkJc37tT
-   aMRAPqo5IJC8UYMQC7mWvjZSjguShhuIAcrUXqlit4UdVaEe/Mh+wGwk/
-   d17CC4El9K/ds271qVSSQg7mr9pndz1Gb0Sl/QriD3We08DWxxYzp5Y/i
-   A==;
-X-CSE-ConnectionGUID: gI4jLvESQWmk89b6me/PGQ==
-X-CSE-MsgGUID: NwJtQ0+/RNGly4b7rAsyww==
-X-IronPort-AV: E=Sophos;i="6.11,177,1725346800"; 
-   d="scan'208";a="35905329"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Oct 2024 07:19:26 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 4 Oct 2024 07:19:03 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 4 Oct 2024 07:19:01 -0700
-Message-ID: <1cba974d-492e-49f0-8d43-1a75672861d0@microchip.com>
-Date: Fri, 4 Oct 2024 16:19:15 +0200
+	s=arc-20240116; t=1728051681; c=relaxed/simple;
+	bh=LfA1gSgY/oocyM4ckjZyuAird29y8yMw5sve/T8isKk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KuENtL5jMVcml3H8UbO3w6YQ+K4SDYR6F8PWCrsMDRi5LDLuYv5fSVgA+JcmPDnu+AUawTA8pfEmV5tz11zxHPV8ezWw63UCeFzjy250/QeUoVA+nPJjLHixKRvTZwWRtL4rq+3Anhxtj+G5gby/z27ej+rCOv3FZJEW5W5NFCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJ2dS/Mt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 359B6C4CEC6;
+	Fri,  4 Oct 2024 14:21:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728051678;
+	bh=LfA1gSgY/oocyM4ckjZyuAird29y8yMw5sve/T8isKk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YJ2dS/Mt7UEa9UeJ35ZIyIu5n9z/lrGD6YRdHV4oVuU+0zn69BT6d6swxaQFkcHHR
+	 gVq4RAu2JUlwo1V/DUrlmVXvvERWBJEQ9Htq6CRlolwppoklOqHAdpRoYuRpn7BLwW
+	 sSz4hBE+S08Y5JnSBAbthfDeJIuDltUmSMpt6plSQ4N3BcCsIHQtLKlWe8BdnMtHPC
+	 Z9y7cN1aRuyQMDXiFgEmi5O6HjhvvHhoQ2FK25QsCWaf7clIPEUglpj71KmcN+lJFx
+	 +j4R0SlyLg0jDO7bmzioS2fYtc/3BjH/f2H05O2f5NJHskfSC6jKNvusoI3S3n8Nyg
+	 xQk4EiZpBcmBw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com,
+	hawk@kernel.org,
+	0x1207@gmail.com
+Subject: [PATCH net] Revert "net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if XDP is enabled"
+Date: Fri,  4 Oct 2024 07:21:15 -0700
+Message-ID: <20241004142115.910876-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: macb: Adding support for Jumbo Frames up to
- 10240 Bytes in SAMA5D2
-Content-Language: en-US, fr-FR
-To: Aleksander Jan Bajkowski <olek2@wp.pl>, <claudiu.beznea@tuxon.dev>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, linux-arm-kernel
-	<linux-arm-kernel@lists.infradead.org>
-References: <20241003171941.8814-1-olek2@wp.pl>
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <20241003171941.8814-1-olek2@wp.pl>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03/10/2024 at 19:19, Aleksander Jan Bajkowski wrote:
-> As per the SAMA5D2 device specification it supports Jumbo frames.
-> But the suggested flag and length of bytes it supports was not updated
-> in this driver config_structure.
-> The maximum jumbo frames the device supports:
-> 10240 bytes as per the device spec.
-> 
-> While changing the MTU value greater than 1500, it threw error:
-> sudo ifconfig eth1 mtu 9000
-> SIOCSIFMTU: Invalid argument
-> 
-> Add this support to driver so that it works as expected and designed.
-> 
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+This reverts commit b514c47ebf41a6536551ed28a05758036e6eca7c.
 
-Looks good indeed:
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+The commit describes that we don't have to sync the page when
+recycling, and it tries to optimize that case. But we do need
+to sync after allocation. Recycling side should be changed to
+pass the right sync size instead.
 
-Thanks, best regards,
-   Nicolas
+Fixes: b514c47ebf41 ("net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if XDP is enabled")
+Reported-by: Jon Hunter <jonathanh@nvidia.com>
+Link: https://lore.kernel.org/20241004070846.2502e9ea@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: alexandre.torgue@foss.st.com
+CC: joabreu@synopsys.com
+CC: mcoquelin.stm32@gmail.com
+CC: hawk@kernel.org
+CC: 0x1207@gmail.com
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->   drivers/net/ethernet/cadence/macb_main.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index f06babec04a0..9fda16557509 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -4841,10 +4841,11 @@ static const struct macb_config pc302gem_config = {
->   };
-> 
->   static const struct macb_config sama5d2_config = {
-> -       .caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII,
-> +       .caps = MACB_CAPS_USRIO_DEFAULT_IS_MII_GMII | MACB_CAPS_JUMBO,
->          .dma_burst_length = 16,
->          .clk_init = macb_clk_init,
->          .init = macb_init,
-> +       .jumbo_max_len = 10240,
->          .usrio = &macb_default_usrio,
->   };
-> 
-> --
-> 2.39.5
-> 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index e2140482270a..d3895d7eecfc 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2035,7 +2035,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
+ 	rx_q->queue_index = queue;
+ 	rx_q->priv_data = priv;
+ 
+-	pp_params.flags = PP_FLAG_DMA_MAP | (xdp_prog ? PP_FLAG_DMA_SYNC_DEV : 0);
++	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+ 	pp_params.pool_size = dma_conf->dma_rx_size;
+ 	num_pages = DIV_ROUND_UP(dma_conf->dma_buf_sz, PAGE_SIZE);
+ 	pp_params.order = ilog2(num_pages);
+-- 
+2.46.2
 
 
