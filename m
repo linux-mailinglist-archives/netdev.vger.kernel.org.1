@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-132329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E4B99141B
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:38:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F89399141D
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:39:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 027721C21F75
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:38:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73D7C1C21F70
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311B31C6B2;
-	Sat,  5 Oct 2024 03:38:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF5B1CF96;
+	Sat,  5 Oct 2024 03:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROzGbtY9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TrEKchw+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB1D748D;
-	Sat,  5 Oct 2024 03:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACEB231C96;
+	Sat,  5 Oct 2024 03:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728099534; cv=none; b=HDDpD8MgViKo5IInZknifAO/8qaFCz+BYM+HIDK2BbH99jpdjCw7Fb/sBRWkfhYekVfcAk7qduCzcdJSuvDHK5TOF1Crei5ApICGvJcVQm1B9rvHG/SF24AyeMjVCGUT84QlZ+nifqzAH7+Rb2/wKZ+UegpMmtLO5D/jRHCylNU=
+	t=1728099550; cv=none; b=mZ9v8stazCHAsD03rhrb99mmA16ShLxohPDF3lBRTaxbp4UWZxIww8jtrwjSufpCg/ccIO0qclOoZe6Ks3BEbXT7FBtMuJn6ZEx73hPP/4BSpC35BPVO+o3XgShGZLX/OYMwKmHhz2nmU9DX2rZPw9kyUYQ5+do8zjieoxM9fNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728099534; c=relaxed/simple;
-	bh=QZJijsDQVPjwJ8y+vgFhiIm44X7e/5KmJUXfyfIz6MU=;
+	s=arc-20240116; t=1728099550; c=relaxed/simple;
+	bh=pvkCD9iWnEkAGChK6GuaJzQ8FaFiYh3PsLGQkrVj4I4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KMA4bW14N+ritPqqI3nCpqA8grxNyACIQTqLplwfBNEzE+rThxVavMo79YdU0JiJBb1XyEavLGf1MfE5klMqgblt8gq332qXx/LNOMYlb4PLr3ppTbbRhojS6f5aDw9dZ+azZfVleoSKjTviWPSIqVV3ApstdqGHTfmeHj3zK3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ROzGbtY9; arc=none smtp.client-ip=209.85.214.173
+	 In-Reply-To:Content-Type; b=L50XHY1dqw6IjavzB8sdxvBPlkFaFipD+bJ7q009+Vpt8sIlbWffD0yg8gMoc7aAes1v42yEWaNH4Z9YEfTtQxSOn/b85HIQdsfEVFZoVymkPGjB4gcYsxhHBxXGME/PfoHgENJ1UD12+slwlzWMuyqfM1PS9NLgzZzkd40cC5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TrEKchw+; arc=none smtp.client-ip=209.85.216.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20b84bfbdfcso25601805ad.0;
-        Fri, 04 Oct 2024 20:38:52 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e0be1afa85so2377677a91.1;
+        Fri, 04 Oct 2024 20:39:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728099532; x=1728704332; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728099548; x=1728704348; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ny51calOTNKcuKK/tM93jmDyw6S/M8DKGQJ/zq/PkIY=;
-        b=ROzGbtY9+n/fv+W+H564zvcLLkWvm7vR8vii2bCRQgFtvI9osJfDpP4CS899Y7ti5B
-         KG1018GLMFYIKp4S/CNMlpbCY0IpOqbvwu7zeZzVmToWCkxVeipm9r4DBgSBPQ1XJ4gl
-         PprweupOedu9Jt19YxhoK4G0yBfyqkjRglTD1Ft77UzihLmiYYqnnyzb6SBS08JpjRaS
-         yaJ66Mpa5HQQzSeCX4pYQbh5OSTAgcaFMSTb/O6uGU16GAdCki7DxN6IBsogeRDaIHTk
-         S5wxmRmk3atEEMtX0BLPkri0e5fSDVKets5Cf2vkvuHF6Z1kW9DfiEnKnLHVJpxX9Sos
-         M8Ag==
+        bh=vbzHf6gUanNTvNz9KNy650clgBnTdNK8QyMOO1v8aDo=;
+        b=TrEKchw+SmizOhm+geuq6P8sp8aHETdgipuIlDd8T1PbZFQKgyshfNe6wUQAkH2Iqk
+         yK/ympl84zURNEi+Q+vTDMar8wsTMrm6xj++55vsAGF0vDeyr0i2Uh0L+lmYjir18TJJ
+         UQwF1ObitBOiaJMkL92NMP431L9QhNwUV9/Yob7A+9PObRy+qMxh9BG00h3D5G1J2XFt
+         rc/fkmF2w8OMhyDXvJWgu+u/wOrw6rAcOHCXma1wXAZu2aa4eo4d13nR3CUhIevI265g
+         kuAIJ0T8e/oYK1ZtYSgkJArfLKHy7cxW11PY5JOvCjPiDo9VZmR4oij3d2tq/geyhm3k
+         MbgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728099532; x=1728704332;
+        d=1e100.net; s=20230601; t=1728099548; x=1728704348;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ny51calOTNKcuKK/tM93jmDyw6S/M8DKGQJ/zq/PkIY=;
-        b=YMw06neuGLSOGD83AUuH1tCZPKqmwFHa2LrSOleZPx7pnyWEc+NOHJtTKgSKQXOEO/
-         iMfNS8vD+oFBTSGLO0saqmSmFu53dLA0Mp1/X7mOVuZffgJdlfNAkaMuUg2enl2mz/uk
-         gFyE1ZEXgvl71n5A3uNrDAPWJpylfbxk0ybF95QCSwbglhQMGx5lchpLRiYcl0EHTioK
-         AHXAEM19ulZJ6/oSmE3XdeU51HbkUgT/+5XrXyNBU8+BS7DjkhoNUXd2QX8tVkdZmJo/
-         FOOznD8uUIpcTtrhvcI8QQeVODMqUgSNH+dBIQLn0LzbP8UNKuy5hon/wyVj8bLD4LBx
-         pWPA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVavUD7GDx+PPB8OnoIEhkMZSXbXwxKfiR7KqCo3xqZUVHef5S7StZBFawn6ixNjiais+NCAJM@vger.kernel.org, AJvYcCXqtKSLek3qEeotDtqHUxnc0gqUAwdMVcgVlGJUjrPrWULxNI/4mraMQlGtFfpJPRYx34jkW6ZmEvfFsi4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ4kvfIplGNGPkRPaX1xos+ExbtEt/GMBlo1AcEFrMryOMKP1P
-	weyUTF1wrFSm+EpK4vvYH1Kc70NL0oJctHYD0L+o6mw3yRdYGtLk
-X-Google-Smtp-Source: AGHT+IGxlbwfhIRf0gczlJw5ONFO5bQWsf5Cn8z+MDiqFcwOM6Awfsa8pBi5Ak0xRxHSYJa//FDV6A==
-X-Received: by 2002:a17:902:d512:b0:20b:831f:e8f7 with SMTP id d9443c01a7336-20be1898a91mr137349275ad.11.1728099532015;
-        Fri, 04 Oct 2024 20:38:52 -0700 (PDT)
+        bh=vbzHf6gUanNTvNz9KNy650clgBnTdNK8QyMOO1v8aDo=;
+        b=uWgSYCIgTtlQX24SF9uUu3ln6SCXSvaJbqUxhpKeJpKSv+NyXwpheRGb8NUzFZozWB
+         0sJ7Xx1MoN9f7VJP15uvyH4SZxqgeKEItem9AT1q+8SHNFWYWmYt+1zi9/KmWz8QQ4vM
+         MSrIe158O9cGEbE4VWEVeYtCzFFu9FWL+AjOHNehQrwSdxcyA6/RFMAPUk45Ml7qXODg
+         2zzOb35s3VEpjJspHCFrUEb7ALW6rF/yyeaJlyZ/uaB9zTBOOpWuXkH8MNdbiBFV6E5c
+         ccAXYi5iKHNPoigvfsBeyidS3scbZmr2xFS4XQ7P8d1Rtfl95WyaULAF25OG8Pw55Ezf
+         yACA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTOC4cBjNYc5H3nZUQTEdan7haI2ivTR6KPoRu/Ju1jF8fzPSq1p7gOU/o7jZX8ru31X2EmUhI@vger.kernel.org, AJvYcCWzhZGi0KEkI7oyNNISODSpVKjjNZpzTyouwPE0/Z5e967tyLAGrWKGd8L94dWetyyHOSq/MgGu10xQRQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0V16g05T/914zUblPUO7fIfsWFvM4jZfRxcV79yeAkBFjRQN4
+	pSbEw7IDdzogRHi9cO0erDitLHqv1lM/fPu09LLbmGIDFUZLwmKR
+X-Google-Smtp-Source: AGHT+IEz2Oy9lWRL33m9iwpaPb0IY60UZZ8sB1N/i9Pg807+1LUke36vBJ6Dr+74rklRLDU0juHwBQ==
+X-Received: by 2002:a17:90a:e593:b0:2c8:6bfa:bbf1 with SMTP id 98e67ed59e1d1-2e1e626bbd4mr6574861a91.23.1728099547990;
+        Fri, 04 Oct 2024 20:39:07 -0700 (PDT)
 Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f6c37515sm628714a12.75.2024.10.04.20.38.49
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20af3f74fsm778290a91.25.2024.10.04.20.39.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2024 20:38:50 -0700 (PDT)
-Message-ID: <1ca99004-c194-4d60-b328-40916b685ffa@gmail.com>
-Date: Fri, 4 Oct 2024 20:38:49 -0700
+        Fri, 04 Oct 2024 20:39:07 -0700 (PDT)
+Message-ID: <b6467db1-d5d2-4c3b-92bf-b24c5d43afbc@gmail.com>
+Date: Fri, 4 Oct 2024 20:39:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,7 +77,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] net: dsa: b53: fix max MTU for 1g switches
+Subject: Re: [PATCH 3/5] net: dsa: b53: fix max MTU for BCM5325/BCM5365
 To: Jonas Gorski <jonas.gorski@gmail.com>,
  Florian Fainelli <florian.fainelli@broadcom.com>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
@@ -88,7 +88,7 @@ To: Jonas Gorski <jonas.gorski@gmail.com>,
 Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
- <20241004-b53_jumbo_fixes-v1-2-ce1e54aa7b3c@gmail.com>
+ <20241004-b53_jumbo_fixes-v1-3-ce1e54aa7b3c@gmail.com>
 Content-Language: en-US
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
@@ -124,24 +124,16 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20241004-b53_jumbo_fixes-v1-2-ce1e54aa7b3c@gmail.com>
+In-Reply-To: <20241004-b53_jumbo_fixes-v1-3-ce1e54aa7b3c@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 10/4/2024 1:47 AM, Jonas Gorski wrote:
-> JMS_MAX_SIZE is the ethernet frame length, not the MTU, which is payload
-> without ethernet headers.
-> 
-> According to the datasheets maximum supported frame length for most
-> gigabyte swithes is 9720 bytes, so convert that to the expected MTU when
-> using VLAN tagged frames.
-
-Only if you need to resubmit:
-
-s/gigabyte swithes/gigabit switches/g
-
+> BCM5325/BCM5365 do not support jumbo frames, so we should not report a
+> jumbo frame mtu for them. But they do support so called "oversized"
+> frames up to 1536 bytes long by default, so report an appropriate MTU.
 > 
 > Fixes: 6ae5834b983a ("net: dsa: b53: add MTU configuration support")
 > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
