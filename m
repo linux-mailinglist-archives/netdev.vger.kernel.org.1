@@ -1,149 +1,124 @@
-Return-Path: <netdev+bounces-132332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1DBF991421
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:40:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F1599142C
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:49:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203D11C22010
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:40:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD4C1F24457
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:49:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8591C687;
-	Sat,  5 Oct 2024 03:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0E6208A5;
+	Sat,  5 Oct 2024 03:49:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRHIBbAJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gp4FccHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04E41CF96;
-	Sat,  5 Oct 2024 03:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D1717C8D;
+	Sat,  5 Oct 2024 03:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728099605; cv=none; b=cQBPjJkAKymshO/dlVdrAUytPEnL+AG+T2IHQwUVqYvnJX1RGlVBVCDYjBcyUFPXWUWRlT6WvCtMeQ9s/zeXonyhiKIVPqeeaNX1s/G1Ql1HNZkhCu95lsPml0vA6Cs6ykIvolLD3MSWJgENxjBguEOkFc9i6NVisGuQOY67pj8=
+	t=1728100144; cv=none; b=tbITmAkOYugyaZ2C9EHu/kgHvH/r07trqCUGq79dL9aLCkKR8OQXM12y/Tve1f4gkffaRfmp6/Oqg1+nK3nzYymI/7CXFclnQrDv7dYjAmydGZ7TihUkma4ZHivifcf3NaFCMOTfZ+to79g83aTWxAkKI398nzGNAhbKsD3Nry0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728099605; c=relaxed/simple;
-	bh=W/AxWDdVdu3PuPkGjP18PC1LDVs6lDtOrGrao1IOIXA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oB1Aff8er+oFw1mlVs7vh+GGj/0Ro+TqETdHJ5g9YgQTzhgGpzyJD7mcIj/Iw5RWnMytzPbcYErZeIKAiPpROLPmcWL6W37si3ZOYFpQeANmKsJGESsnGKg7UxF5Z9Ba2Ec64JBrXT28CsC5MYR5iK2glmG/mcJfwjvhq/b7hCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cRHIBbAJ; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7db238d07b3so2238374a12.2;
-        Fri, 04 Oct 2024 20:40:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728099603; x=1728704403; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pk8JsieFA5fhfGm6unKmwwNDAcDANR4pe1DK+IwW6y4=;
-        b=cRHIBbAJvYb8m9DoIUBk5On0S4ga8lYJrc/RsfzRrjt4K6vOBloVXULPWgDWP4L1UL
-         2AsBQyRDKSptzynLM3up7rmcmXgDgHTh29WwruJPujF8qLbMc82+xcG9MqOqpxure0tq
-         GjbKx1NrnVAt1QItCfdXjYKkrnYufJrsmRyunBnHh+S3Dh/mra8jjY3Qd2Jbzb1M0cko
-         wTkyttTXKZFkw+/tAvoov0mYXpUmPsp7Y7MdUQQrhVEEzMARo4k2kzykjiOdEqHNwB7c
-         NaJVOvUy8pelE7BvNjk1ssfWcqObXTnaTS0cF99w7ZFqWptf9cP2YCkim7DaBHEvohWa
-         HrZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728099603; x=1728704403;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pk8JsieFA5fhfGm6unKmwwNDAcDANR4pe1DK+IwW6y4=;
-        b=iRJJVesEZR7ihTbIHCzbOpVxtwc4DfNVsLuNL5kLixdLcpOGU+5yz4WWwOCnAjKrCT
-         x9K3cX1KkI+24ql+Bo0U5Z5OoVC/4GD235NYHAdruWSCdZ2Ee66VJxjOzD8L+NkrnG63
-         ZBlhskhGELY8oM9c1jXhJGaRSHDSmfLb9RZtyX9piNdlSjz1ONRAdJG7elPrtAWe/IWb
-         mnJlcsI38LidEdS304LBKFDjo2BvuHc/BxJenoUSc9WhESADNgk/kbzq315CCTKcaDPI
-         hhhPtD9O2I89qDMSbl+Q76g77iAZGfM1K8aMbbJkEdVJDIt/98GmfDGsuktK9X4/oiI6
-         5MTA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3ac6GKo6QbFft4OtDp9ZtTUz85MjCCfi+KzNP7zTmNcrVq988TeQHjshsSafvt6oQvJLwAZ9N+ysacoU=@vger.kernel.org, AJvYcCWCrz0eNqAxdKbaVB3snOyt7JM4JoSauelIPSiaB/dU8g5fM/5gBQFIDLGhZNzGML/BByap7rlf@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO+GH5ca69AOi2+xoAs99EantR7YOrh5m81pez5zFjEoQYVO2l
-	tJeW9nZGLpxQ1lxaqhkGZgV9Xc7LKKhkgEnbHXBtu+nbb7o4tr80
-X-Google-Smtp-Source: AGHT+IHAF3FuhJX/MpkPhmhTSsCpsxQra7gntYdrWJ86sTlVFIqzvK0Cv9SU8Wsnaj5j6tW7Ar42AA==
-X-Received: by 2002:a05:6a21:328b:b0:1d6:e765:4d48 with SMTP id adf61e73a8af0-1d6e7654e1dmr3521104637.34.1728099603227;
-        Fri, 04 Oct 2024 20:40:03 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f68393desm634051a12.53.2024.10.04.20.40.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Oct 2024 20:40:02 -0700 (PDT)
-Message-ID: <22d78c1d-8490-461d-b1e7-dbfa02a1218d@gmail.com>
-Date: Fri, 4 Oct 2024 20:40:01 -0700
+	s=arc-20240116; t=1728100144; c=relaxed/simple;
+	bh=Rl9H/4uXicjr8Khdfjhs8QAZ6pUx+IOd9fPowrw0QrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUsqOrD1o8JCuaYGmQCDyLRbNQtUH3aGxtsxonXtw460XKFdKGtp+lzcB0Md4utrh1jBE2UO1pRurcr9VMIHUEgf3yOmzJV8trr83e8FlLC6QU/tTvLGR52VagrrCHSfDUjaYamUxJE8tsFN9roHH9eubdEOPtc/YbgHCoZk/40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gp4FccHo; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728100142; x=1759636142;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Rl9H/4uXicjr8Khdfjhs8QAZ6pUx+IOd9fPowrw0QrA=;
+  b=Gp4FccHoNkYNd+DcqeAxy+/ZtMHmx7H858LVBRxs+lCMPRvktxUz8+8p
+   gpxOCI4mEKL8EWv43RXAoTp8b8wLlmm0QM2k09Cyb4ozDiwDS70rsgKS/
+   L8tlS2Jm8XvvDDPdpETZn/nH1acz84e4OZ+LxOVaMuPDB1Rn53DXNiR0W
+   6OHyE9kE/cT0Y1L201sFxBYZYsbhKTIBBXNwjPEzC+cNykTJipFW1pWJY
+   +ZL7fWg7roz6a9IZrmcQGKE8fqri4hWbiYI83+fNNlSWyPGEKalPQgESs
+   HjvMczfWZ6pZYBxZqEMs++zgzBL9CFUesOhxUMzeAbSru8huYPb3TMLdK
+   g==;
+X-CSE-ConnectionGUID: sUXtrZJAQdSdkb/KeQ/ZMA==
+X-CSE-MsgGUID: Y/mKqH4XRvKiP2QcndNYlg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="37931938"
+X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
+   d="scan'208";a="37931938"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 20:49:01 -0700
+X-CSE-ConnectionGUID: oNZme5hgRGCPYSwWigtLLA==
+X-CSE-MsgGUID: OEqRuqUwSuiL8fs0xhePMg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
+   d="scan'208";a="75719530"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 04 Oct 2024 20:48:53 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1swvml-0002X3-1T;
+	Sat, 05 Oct 2024 03:48:51 +0000
+Date: Sat, 5 Oct 2024 11:48:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com
+Cc: Paul Gazzillo <paul@pgazz.com>,
+	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
+	oe-kbuild-all@lists.linux.dev, kory.maincent@bootlin.com,
+	andrew@lunn.ch, maxime.chevallier@bootlin.com, danieller@nvidia.com,
+	hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com,
+	ahmed.zaki@intel.com, paul.greenwalt@intel.com,
+	rrameshbabu@nvidia.com, idosch@nvidia.com, asml.silence@gmail.com,
+	kaiyuanz@google.com, willemb@google.com,
+	aleksander.lobakin@intel.com, dw@davidwei.uk,
+	sridhar.samudrala@intel.com, bcreeley@amd.com, ap420073@gmail.com
+Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory
+ tcp
+Message-ID: <202410051156.r68SYo4V-lkp@intel.com>
+References: <20241003160620.1521626-8-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] net: dsa: b53: fix jumbo frames on 10/100 ports
-To: Jonas Gorski <jonas.gorski@gmail.com>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Murali Krishna Policharla <murali.policharla@broadcom.com>,
- Russell King <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
- <20241004-b53_jumbo_fixes-v1-5-ce1e54aa7b3c@gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20241004-b53_jumbo_fixes-v1-5-ce1e54aa7b3c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003160620.1521626-8-ap420073@gmail.com>
 
+Hi Taehee,
 
+kernel test robot noticed the following build warnings:
 
-On 10/4/2024 1:47 AM, Jonas Gorski wrote:
-> All modern chips support and need the 10_100 bit set for supporting jumbo
-> frames on 10/100 ports, so instead of enabling it only for 583XX enable
-> it for everything except bcm63xx, where the bit is writeable, but does
-> nothing.
-> 
-> Tested on BCM53115, where jumbo frames were dropped at 10/100 speeds
-> without the bit set.
-> 
-> Fixes: 6ae5834b983a ("net: dsa: b53: add MTU configuration support")
- > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+[auto build test WARNING on net-next/main]
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+url:    https://github.com/intel-lab-lkp/linux/commits/Taehee-Yoo/bnxt_en-add-support-for-rx-copybreak-ethtool-command/20241004-000934
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241003160620.1521626-8-ap420073%40gmail.com
+patch subject: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
+config: x86_64-kismet-CONFIG_NET_DEVMEM-CONFIG_BNXT-0-0 (https://download.01.org/0day-ci/archive/20241005/202410051156.r68SYo4V-lkp@intel.com/config)
+reproduce: (https://download.01.org/0day-ci/archive/20241005/202410051156.r68SYo4V-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410051156.r68SYo4V-lkp@intel.com/
+
+kismet warnings: (new ones prefixed by >>)
+>> kismet: WARNING: unmet direct dependencies detected for NET_DEVMEM when selected by BNXT
+   WARNING: unmet direct dependencies detected for NET_DEVMEM
+     Depends on [n]: NET [=y] && DMA_SHARED_BUFFER [=n] && GENERIC_ALLOCATOR [=y] && PAGE_POOL [=y]
+     Selected by [y]:
+     - BNXT [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_BROADCOM [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
+
 -- 
-Florian
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
