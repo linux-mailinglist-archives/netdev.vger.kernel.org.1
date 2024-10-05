@@ -1,194 +1,133 @@
-Return-Path: <netdev+bounces-132343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA4E9914DB
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:27:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42AE69914E2
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:30:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12FEA283454
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:27:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 533361C219B5
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ADFC36B17;
-	Sat,  5 Oct 2024 06:26:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C4E54F95;
+	Sat,  5 Oct 2024 06:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUGXn7LX"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A0625777
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 06:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF6C53389;
+	Sat,  5 Oct 2024 06:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728109619; cv=none; b=TYHlG0uTWoC0ph9ZnlO+ORABCg5uhPDReP54i7o3WtZzDSUBwW/d1qMjbqOiwVdLJvi9kQGjOomMHLP+O0XKfikcj03MkWVVOj1GPFp31fxL7ZOD1qVDKXvWnKehjoWNOfUdc7CZEiw7m89lcOqkdKotj+YiheePpuB9BfgMFug=
+	t=1728109809; cv=none; b=myrx1mDGTrNb1GDhnO8qLyB5OmFozJCVvWBqiiQuOsx5Pn6DUzXpQsBwfS44cuwgdq61etNcz2OMS5JsuLQezQ/PmlOhNYqW7Xd9DJ8YX9xuLshFaOyTHRQ5rAelyngNr6tKyCjPRsJzkhj9gGQx4wNO/vkm7VpTrFvdXrlHM9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728109619; c=relaxed/simple;
-	bh=iXfbEm5iLcmVFW+aGb9NJHK2R5M98gGi6Ft+W8I4V1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnic+//S/5BANL1+GbE1gAnTbFTmfYvfFDj180yObPqJMD06DBg7PSQTeUdU0wiFbGyBk3ggaaPaEEW1I2HhYtyA6XozvqEYzX7kP+3xzaVAwKEgLS5GxcjlxPz0pv76+DgVoNhPgbuU+Ekpm9Bu4uYIEVBEoQ/b6m5QQOw8Suc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swyFX-0006Ph-Ny; Sat, 05 Oct 2024 08:26:43 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swyFQ-003lmn-Qr; Sat, 05 Oct 2024 08:26:36 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1swyFQ-00CVQz-2K;
-	Sat, 05 Oct 2024 08:26:36 +0200
-Date: Sat, 5 Oct 2024 08:26:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 06/12] net: ethtool: Add PSE new port priority
- support feature
-Message-ID: <ZwDcHCr1aXeGWXIh@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
+	s=arc-20240116; t=1728109809; c=relaxed/simple;
+	bh=kM8YnYYl1uMNrQthL/ao2/qiluaruUXBJz4zY1CP1lI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ka4U9wiVGvnK+gt5VHysWVl7gP/DSmmpaHQU9asoxxVUdTQIkF7bbOk4VezagvWZzrJ4h6dKTdux+hyfcoEOfPag0tojQyFfCjSX4zhGE4/3+u5U10sOsLQVHDkYaW6tEW+v2Au2/62laHoDquUuH2Fv60janmu08sIYGFCKpkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jUGXn7LX; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so5657065a12.0;
+        Fri, 04 Oct 2024 23:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728109806; x=1728714606; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vBoMftGa/McsjubC4gQDLAonai8KexTRljE+MZCD93U=;
+        b=jUGXn7LXWyHPqaYCPq70OUwdFvrGZfyTR8/53jO2nMB0qk3J/nwMfg/P2l4ndn5JAO
+         EyCsOJEKkjwDvXH3X18atypiUXmodEUyTynru7Rnsw8gBEOBX+7Nk5hZJ3vqUYy2seWI
+         B7owzKioxW9j6al6Af43D4PVTl+qxXeMrF1f53ZFEqQELYtuDY22KkL3qMD/qL3r83hm
+         8vZ1ohSb9a8yNnctSi26KT/ppvPSy04O0WlD4nV4cEuVHWnuTuET53fpUnjPX+vcDtEk
+         Z1Y7ulJ4w4JCgRgM3N/LOLXH5GXYiPWPgizL5CiXROfRb3xkZjRkwEMvZ+ZnbevMGPni
+         wIBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728109806; x=1728714606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vBoMftGa/McsjubC4gQDLAonai8KexTRljE+MZCD93U=;
+        b=uViWzyM5mjykV7enfiNJmiYrqCAnP0MgBP8FsGHgI63zs3UfAWrnFg3b9tgaULVVyO
+         mR4oTQixphRRUi/k9+AToJiNoNTp9gaDGv/X1oxaZTTTgZ9d4+oLeNKT/zwc8HgJrJ1d
+         2WpUKcC+FKS+WgW+03ljhK+/c7jO3exn7X6w0E0Y/qhWSmqSCD93jlSsbEIBkTISN88e
+         N5vOQ9H5ETvlY5mkqMuvLqIsyD2GOg4hxcB+Cd3Chb5cRRG499ySMvD1YG2FOyZSYyLa
+         Nk9OMLcimqylFNoKGrwsYo6a3Cq0le8AtTNHq4Q9/hbEZj0lrLLesQi3GD6uAtBCrWkR
+         wXFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU76q+zkNRzgmfrBMbuyoPmrj/Y/XrSKCk578FHW+w4zb7lGn0/giuDVkn4gmJLbhdUPGvcX1EwGGY=@vger.kernel.org, AJvYcCXKgytyztCUSwpS6qNApeOBcdfzmC5MMVD6hc4MVkXtnnua4PXAcoIsAXMOOwXkw4q6pP2cS0Mb@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywi94NIQc60/L6Sm9TYFs8cEngxu3ySHTgvE7NnqMbxEcupvr9x
+	JfgKDfvrdx+08NZ4hcWb7UjK0qkdN8dFIIUgAMN/FS0Gv6CfjaACY9GmhikDsQC4DdY22DiDPZd
+	PmVR5rwSI89vM3oDyar7O1wCYN6c=
+X-Google-Smtp-Source: AGHT+IHQaSDG7cwF2wPsX24tcApW4tk+ISWIahcBMpke2LmDGMnPF0xGZ1OStGr8+fXjtwqp/pc6xOur1x9/n/0rbH8=
+X-Received: by 2002:a05:6402:5384:b0:5c8:a01c:e9b2 with SMTP id
+ 4fb4d7f45d1cf-5c8d2fa30aamr4676760a12.17.1728109805957; Fri, 04 Oct 2024
+ 23:30:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-2-ap420073@gmail.com>
+ <CACKFLi=1h=GBq5bN7L1pq9w8cSiHA16CZz0p8HJoGdO+_5OqFw@mail.gmail.com>
+ <CAMArcTXUjb5XuzvKx03_xGrEcA4OEP6aXW2P0eCpjk9_WaUS8Q@mail.gmail.com>
+ <CACKFLikCqgxTuV1wV4m-kdDvXhiFE7P=G_4Va_FmPsui9v2t4g@mail.gmail.com> <a3bd0038-60e0-4ffc-a925-9ac7bd5c30ae@lunn.ch>
+In-Reply-To: <a3bd0038-60e0-4ffc-a925-9ac7bd5c30ae@lunn.ch>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 5 Oct 2024 15:29:54 +0900
+Message-ID: <CAMArcTUgDLawxxvFKsfavJiBs0yrEBD3rZOUcicYOAWYr+XYyQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/7] bnxt_en: add support for rx-copybreak
+ ethtool command
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com, 
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org, donald.hunter@gmail.com, 
+	corbet@lwn.net, kory.maincent@bootlin.com, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 02, 2024 at 06:28:02PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> This patch expands the status information provided by ethtool for PSE c33
-> with current port priority and max port priority. It also adds a call to
-> pse_ethtool_set_prio() to configure the PSE port priority.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->  Documentation/networking/ethtool-netlink.rst | 16 ++++++++++++++++
->  include/uapi/linux/ethtool_netlink.h         |  2 ++
->  net/ethtool/pse-pd.c                         | 18 ++++++++++++++++++
->  3 files changed, 36 insertions(+)
-> 
-> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-> index 295563e91082..15208429a973 100644
-> --- a/Documentation/networking/ethtool-netlink.rst
-> +++ b/Documentation/networking/ethtool-netlink.rst
-> @@ -1763,6 +1763,10 @@ Kernel response contents:
->                                                        limit of the PoE PSE.
->    ``ETHTOOL_A_C33_PSE_PW_LIMIT_RANGES``       nested  Supported power limit
->                                                        configuration ranges.
-> +  ``ETHTOOL_A_C33_PSE_PRIO_MAX``                 u32  priority maximum configurable
-> +                                                      on the PoE PSE
-> +  ``ETHTOOL_A_C33_PSE_PRIO``                     u32  priority of the PoE PSE
-> +                                                      currently configured
->    ==========================================  ======  =============================
->  
->  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
-> @@ -1836,6 +1840,12 @@ identifies the C33 PSE power limit ranges through
->  If the controller works with fixed classes, the min and max values will be
->  equal.
->  
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO_MAX`` attribute identifies
-> +the C33 PSE maximum priority value.
-> +
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO`` attributes is used to
-> +identifies the currently configured C33 PSE priority.
-> +
->  PSE_SET
->  =======
->  
-> @@ -1849,6 +1859,8 @@ Request contents:
->    ``ETHTOOL_A_C33_PSE_ADMIN_CONTROL``        u32  Control PSE Admin state
->    ``ETHTOOL_A_C33_PSE_AVAIL_PWR_LIMIT``      u32  Control PoE PSE available
->                                                    power limit
-> +  ``ETHTOOL_A_C33_PSE_PRIO``                 u32  Control priority of the
-> +                                                  PoE PSE
->    ======================================  ======  =============================
->  
->  When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
-> @@ -1871,6 +1883,10 @@ various existing products that document power consumption in watts rather than
->  classes. If power limit configuration based on classes is needed, the
->  conversion can be done in user space, for example by ethtool.
->  
-> +When set, the optional ``ETHTOOL_A_C33_PSE_PRIO`` attributes is used to
-> +control the C33 PSE priority. Allowed priority value are between zero
-> +and the value of ``ETHTOOL_A_C33_PSE_PRIO_MAX`` attribute.
- 
-We need to introduce a new attribute to effectively manage PSE priorities. With
-the addition of the `ETHTOOL_A_C33_PSE_PRIO` attribute for setting priorities,
-it's important to know which PSE controller or domain each port belongs to.
+On Fri, Oct 4, 2024 at 1:41=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
 
-Initially, we might consider using a PSE controller index, such as
-`ETHTOOL_A_PSE_CONTROLLER_ID`, to identify the specific PSE controller
-associated with each port.
+Hi Andew,
+Thanks a lot for the review!
 
-However, using just the PSE controller index is too limiting. Here's why:
+> > > I agree that we need to support disabling rx-copybreak.
+> > > What about 0 ~ 64 means to disable rx-copybreak?
+> > > Or should only 0 be allowed to disable rx-copybreak?
+> > >
+> >
+> > I think a single value of 0 that means disable RX copybreak is more
+> > clear and intuitive.  Also, I think we can allow 64 to be a valid
+> > value.
+> >
+> > So, 0 means to disable.  1 to 63 are -EINVAL and 64 to 1024 are valid. =
+ Thanks.
+>
+> Please spend a little time and see what other drivers do. Ideally we
+> want one consistent behaviour for all drivers that allow copybreak to
+> be disabled.
 
-- Typical PSE controllers handle priorities only within themselves. They
-usually can't manage prioritization across different controllers unless they
-are part of the same power domain. In systems where multiple PSE controllers
-cooperate—either directly or through software mechanisms like the regulator
-framework—controllers might share power domains or manage priorities together.
-This means priorities are not confined to individual controllers but are
-relevant within shared power domains.
+There is no specific disable value in other drivers.
+But some other drivers have min/max rx-copybreak value.
+If rx-copybreak is low enough, it will not be worked.
+So, min value has been working as a disable value actually.
 
-- As systems become more complex, with controllers that can work together,
-relying solely on a controller index won't accommodate these cooperative
-scenarios.
+I think Andrew's point makes sense.
+So I would like to change min value from 65 to 64, not add a disable value.
 
-To address these issues, we should use a power domain identifier instead. I
-suggest introducing a new attribute called `ETHTOOL_A_PSE_POWER_DOMAIN_ID`.
+Thanks a lot!
+Taehee Yoo
 
-- It specifies the power domain to which each port belongs, ensuring that
-priorities are managed correctly within that domain.
-
-- It accommodates systems where controllers cooperate and share power
-resources, allowing for proper coordination of priorities across controllers
-within the same power domain.
-
-- It provides flexibility for future developments where controllers might work
-together in new ways, preventing limitations that would arise from using a
-strict controller index.
-
-However, to provide comprehensive information, it would be beneficial to use
-both attributes:
-
-- `ETHTOOL_A_PSE_CONTROLLER_ID` to identify the specific PSE controller
-associated with each port.
-
-- `ETHTOOL_A_PSE_POWER_DOMAIN_ID` to specify the power domain to which each
-port belongs.
-
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>
+>         Andrew
 
