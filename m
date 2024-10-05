@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-132382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9597A991744
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:18:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5FBD991748
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12DE8B20D52
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:18:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52ED41F220D2
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71A3B14C5B3;
-	Sat,  5 Oct 2024 14:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C994155336;
+	Sat,  5 Oct 2024 14:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6CEPA5Nw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zTDGIfcQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4104C91;
-	Sat,  5 Oct 2024 14:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C0215530C;
+	Sat,  5 Oct 2024 14:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728137902; cv=none; b=K4R1g0Bv4srchpL7RGqgwCV5vpG+bnBc3skg4dv7FlUxBCR7E7HQh2Hr7PZyIHOTjQD1BsKzEI6Tbz1P0/dqCgITtuF+gIL7M0BZAhXjVbbfLA70QcTKHvWA+YlNpaqvH4SizPjkBhgp5n+Tv9E5bUjV7WaxFXT15Tz/apYxTEA=
+	t=1728138020; cv=none; b=fbGPWjtljwmeGJtRU/JGsdkWSv0agBVLy+SyMbBpDQwsBPljLVCoN+kYB5zYDKZbJFLIdb6dcUsHNKr5kULgFvQFyDHuZhL6z1AOexMvMmmKmxC7r1aSrK0O11EbWFzORoCN1NU5XmER/9YxADZZeDs4YGBFmiQxxyeeUM7G1gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728137902; c=relaxed/simple;
-	bh=z58kpIA08q0lrTS6s+7kuYpJFc0TBY9+yvA2ox/CNnI=;
+	s=arc-20240116; t=1728138020; c=relaxed/simple;
+	bh=wtRp8FAmaK/EorQIVlbahu7UK5Unh1c2NFD5CFB2Hmo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T/3SMt/6jzdufyzm0pz6HvNr6/xtGzVIvfa/y53FkI4fzCEMspe1gy/vvWNNUkxgy7ED8mHsyfzosMmev8q95by52i8tZ33rMzgsA9KVjGI1xdsJ0kSo7m738XLKUYYZmNTubhxAL+5CeEMRav3XNBdR2qatC2e5hkqEYPOOZok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6CEPA5Nw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=cX0keIkUy2o2RBEie6lzH3wRIDnX0ScxjlCNvc9A3fna/HGsOyU88Ysp+wjUZudjok+wMFwDen966jbvTMYRe/f6g/shbHyyPH3eEiEbqJs899IXReeVu/j3B3vrz+eJ2MDj3j9dUxhtR6F2dSqVC+lbmjURgJOcrHAU4DVa1h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zTDGIfcQ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vcbOwEVJYOqCfpF0JItusw+gpp8QZNqOFErMOMAbH7k=; b=6CEPA5NwwzioM78mp1GeRtObnL
-	G+7DA35ALE/dDgW3ty7jTEyuOBG9ERd22XKQDJ1AUIt3qiHcrVbJsArRIw/4sSnlw1/14C0ANLGfG
-	JxY/NqijiL1jnkHwSmK+fA8InXAfibe+bHj3z/7KJZVNub2P+Rt5BxShehNsYOP4dEXM=;
+	bh=Fw1wJBjPYy1YfB/jCXAr3PQ7u4GuIXzZMqKoHSbpCL4=; b=zTDGIfcQ9828u6S5SFDjkcv5mw
+	QETPdkL1fcxUGvGPhAtiSyckVF61O59wECOQlpDcHgqEBSEqmf1wpcAiuC8p7hAHWFrr65HNHr78m
+	HSD0sLf26dUnm5JPHZfAd9S2Q+ypw/nCsT73bgFH6I1yUe1BBqJOOm23tteMxuGN6O70=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sx5bY-0098SB-Sx; Sat, 05 Oct 2024 16:17:56 +0200
-Date: Sat, 5 Oct 2024 16:17:56 +0200
+	id 1sx5df-0098T1-On; Sat, 05 Oct 2024 16:20:07 +0200
+Date: Sat, 5 Oct 2024 16:20:07 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -50,14 +50,13 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next] net: phy: always set polarity_modes if op
- is supported
-Message-ID: <e288f85c-2e5e-457f-b0d7-665c6410ccb4@lunn.ch>
-References: <473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org>
- <5c821b2d-17eb-4078-942f-3c1317b025ff@lunn.ch>
- <ZwBn-GJq3BovSJd4@makrotopia.org>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: realtek: make sure paged read is
+ protected by mutex
+Message-ID: <32c342ef-62e8-4d85-8451-cfbb6024d869@lunn.ch>
+References: <792b8c0d1fc194e2b53cb09d45a234bc668e34c6.1728057091.git.daniel@makrotopia.org>
+ <398aed77-2c9c-4a43-b73a-459b415d439b@lunn.ch>
+ <ZwBl5XBPGRS_eL9Y@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,17 +65,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZwBn-GJq3BovSJd4@makrotopia.org>
+In-Reply-To: <ZwBl5XBPGRS_eL9Y@makrotopia.org>
 
-> I'll add "active-high" as an additional property then, as I found out
-> that both, Aquantia and Intel/MaxLinear are technically speaking
-> active-low by default (ie. after reset) and what we need to set is a
-> property setting the LED to be driven active-high (ie. driving VDD
-> rather than GND) instead. I hope it's not too late to make this change
-> also for the Aquantia driver.
+On Fri, Oct 04, 2024 at 11:02:13PM +0100, Daniel Golle wrote:
+> On Fri, Oct 04, 2024 at 11:25:29PM +0200, Andrew Lunn wrote:
+> > On Fri, Oct 04, 2024 at 04:52:04PM +0100, Daniel Golle wrote:
+> > > As we cannot rely on phy_read_paged function before the PHY is
+> > > identified, the paged read in rtlgen_supports_2_5gbps needs to be open
+> > > coded as it is being called by the match_phy_device function, ie. before
+> > > .read_page and .write_page have been populated.
+> > > 
+> > > Make sure it is also protected by the MDIO bus mutex and use
+> > > rtl821x_write_page instead of 3 individually locked MDIO bus operations.
+> > 
+> > match_phy_device() as far as i know, is only used during bus probe,
+> > when trying to match a driver to a device. What are you trying to lock
+> > against during probe?
+> 
+> The idea is to reduce the amount of unnecessary lock/unlock cycles (1 vs
+> 3). Of course, we could just omit locking entirely here, but that seemed
+> a bit wild to me, and even if it would work in that specific case, it
+> just serve as a bad example.
 
-Adding a new property should not affect backwards compatibility, so it
-should be safe to merge at any time.
+I would just comment the requirement that it can only be used during
+probe, and remove all the locks.
 
 	Andrew
 
