@@ -1,116 +1,134 @@
-Return-Path: <netdev+bounces-132426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C916A991B04
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 23:56:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13250991B29
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 00:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E7FBB21A0A
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 21:56:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D9BE1C21498
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 22:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30755166F1B;
-	Sat,  5 Oct 2024 21:56:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90E7158861;
+	Sat,  5 Oct 2024 22:05:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lfGD5exN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4urILfD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A040F165F16
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 21:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0D52B9A6
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 22:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728165366; cv=none; b=Z4tLdgu76wMgsu9rzjrTrIxeUQXohMMG5zTkKGmtXfluMTgmH6NClEYeU0hGmdiMz6PSZJEunULyY9yVzIYFOQVUOLA0drFqstVPZno5l108kuyUjH2TAtbaawJ10k3bl724yNWRYPENbV2cvv3VABxemDUVX1cYCH12uhrjv0M=
+	t=1728165906; cv=none; b=YKMB0N08Pfe0vDQqhZHPeD6/se62kZ6GTPWXSvrFARzmQTHE6jKlu/ZFwRqr2BxGLJRRnzGnNuGd9wRKRlKjzpBA2PS+1Wil9ArvgVFceJvmHnvEIOLJojrEMEfTbkeAc4fgTk2mlrBkFjI3ZzM+POR9hKDVxGHJ5RsXp5mSoqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728165366; c=relaxed/simple;
-	bh=Kv3tGeYVEvki+TLXFk7nQI92L8KqidN/GBFVcVcLd+s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FncxuOdPUNFf5ChYR6f4aXtFP7ZuFJ5vegu1AglRzVK3Wzs//rSJKm+XxiUo816gqxGJZ9WoP9Ug2QVEICd14Sb1ukWl5lKeIKdmay9SA+dG+nJMedUG7Rd5S1u9q+hMc/Rhcm/HchU909ANJzeMZBypqOxrsedz0huQJhxf6oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lfGD5exN; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2d1860a62so24284527b3.0
-        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 14:56:04 -0700 (PDT)
+	s=arc-20240116; t=1728165906; c=relaxed/simple;
+	bh=uluPxiT8ajTcK7AvwbozLFhg10X43nIleEVyovq14y4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uZskpVmBhnPo6lU/HZPl9DWtxNjyybmAVeqXpJ+w/LOBVwWfQsbxu520TpMi6y7iGbblcx9Ro3zAQQ/Cs/GDu910ZF7pnuO4p8ljDw6dZw1swgRIU4Dg3Qes3weayp+FIHhPBwmRuhO5FgOlBaQvHZJFiJTXC3ZnFtw0G0UwEGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4urILfD; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a377534e00so6233125ab.3
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 15:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728165363; x=1728770163; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UjrRZf+/scm4ik6V8Y3O+VVxMpeJ9ouK1fJjBIa+BxA=;
-        b=lfGD5exNlaJ3N8q909yLbyjvmTVwnLaWDJBWjyuYPD1H715L/ULegSOQs39jDrM5Pv
-         0bLUpIoxXoxiLHvcuK0IhzquL6/YPHckuqOvFf31sY+grAPx/ylHZ35qgTXWUNq0nS63
-         VAqTBRzoYyMKQTFyU4EO9NFUSHeiFlUktU5Oigr8uRgYK4Kyjn8bNhOdtyfi6RPCirye
-         iEj2RXOrXn+FY3u1QM6olAhlVA0UkdCxyAfUUKLG0LeaAfUuXP8WjOHwhcICskY7ufV4
-         ExDl8nZc99/OwRG3Hi4iLrXG5RQxjA0WE1LmMtsqPJ3sutyS9rHHjD/tMZheBPv4+FwR
-         NOvg==
+        d=gmail.com; s=20230601; t=1728165904; x=1728770704; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SNN9CRgD/KjOQR8JjEHMP5AsiBIotNmYxefMRjK0/mk=;
+        b=I4urILfDE1gQLofw1eZtyRt2lZI4ZttNrU6Sqcuvt+TO+4WJ2Rgx5h0eLJJGupGFGA
+         YD5FABrpZ+txtPbaaZEg/WNqJyEa+iUFHMDUTofwoNEg/bnYl0cAHyMyio5FMw96wSgv
+         HYYJjHixqnL5ZydwwkTObNCWS1cTz4vQyH1xpvL/PMtLkddLbbVGD46cnZ+43w9JOZ12
+         gthv2ryn7Pk4Yz+4k4F1aP29NhnnWVWByKg0qGdHZNeZto5PZ4ZVs0xVzowUL5dBMBgO
+         34fnV//wd0hTNh7/fUQLoKJyeSh1S3X/KWrNTOmroi02jbhnn6Xt9qo4GBiJkfOMrzaR
+         hX+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728165363; x=1728770163;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UjrRZf+/scm4ik6V8Y3O+VVxMpeJ9ouK1fJjBIa+BxA=;
-        b=pJDSN0Syo1drAkQmNIab3Tv0lnR/pQyz1JOfflFZMQHGWWvA46p6EVKOB9vZBr4jVm
-         288i0HtvqjukB9kBqlVCpZkfEFPw5eXUesRVJXBn7Qbo3PQ02lTmSSIs5AJSlU8WkjgJ
-         tGxk4K6CMEO+DEbEuQGOFaZmyC57OYHdZYviaM7YGubvlVSWGMU4TaHFJl8xXhos45a+
-         LBE8cT7pXf1++bxb33/6yv8yZNn5eOdyMyIms6yc+6214yfAGP2f5Lan0JRMoiMFHunn
-         iUedbhB6MMnHOavZXdhh3eL+CW8EKs9P8ZfQmjqdOtj3p/B9CLtU5YG8d1GD59eKFo7h
-         gPyw==
-X-Gm-Message-State: AOJu0YxTtT9lVMgCpEpEoz1pswjRaMmOBowsxYW5I5fYrawRDho977tG
-	7j/K7DGbvBUWh9nWX8pskBlkccWD4L/9ijFCpTIuGsXufr7kksaepGZh639Um2Ooi43vjKtFrto
-	50V5MBw==
-X-Google-Smtp-Source: AGHT+IHWpc6AdTIJHoH8hPk5oe2zVGLycQ2hBiOKJKUuhmS+kKN3bJkizgngYFJ0CrJraC8hT/t8k3PUgXO9
-X-Received: from gthelen-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:2c:2b44:ac13:f9ac])
- (user=gthelen job=sendgmr) by 2002:a25:8b89:0:b0:e25:cea9:b0e with SMTP id
- 3f1490d57ef6-e2893939abemr5252276.9.1728165363498; Sat, 05 Oct 2024 14:56:03
- -0700 (PDT)
-Date: Sat,  5 Oct 2024 14:56:00 -0700
+        d=1e100.net; s=20230601; t=1728165904; x=1728770704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SNN9CRgD/KjOQR8JjEHMP5AsiBIotNmYxefMRjK0/mk=;
+        b=A86A6cLHDMh1LUSD4itNSt2Q6qLJ/9H7KwknIXmB+aq2rbtWYwXXkh+vbOf3JYuOZu
+         lTlqljleNesoUxozBfSczPiidmvsn6txZE10cTO4xbxZyGd1Tg1cKh/ob0MxoTb47krx
+         HlPj/948qkNwxlAUJ+Z2nnoIsQGNwLm/PT4Mz8tuEWkcBGDM1diwlHemnmXnnCzDyPMe
+         ReafrPPMfDI82NiHaWBb3UaaKrKAof7N71FKvQdL/1Nd2HSFEKELLokFCY0e3nzpfGmg
+         ZmMbLsWxAkFAOA4VCmY/qcHdlxH4pPnhM9Op85kLhdkF4VZxJ6jndRg9ruNbrQxkzOYF
+         2PIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWliuy9y/lr+YoxphHy8bsz0gcu4nRaw/sZvZo+t64NiO53vMlaQSaztIog73vfdMerjrN01gM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPfLFMprCkkXE3PZ6zyQ53LvlXG0qIrMyx52U8IEbm5QkjBFk+
+	Hnt90etBVnaAq0lRMwwC3FjehCohmdCy1BmthyGN0XOPLMED3JkOT5Ax6bCHznqSQdsto/ldDnF
+	A/qN1XjYaFERMSy+rFeZ31ywYPks=
+X-Google-Smtp-Source: AGHT+IGpe33rzdmHE/dlJYNR7X1FSc5cAukdiYGkPeEDv09RN/gz9QXDolPfL9NJjEFCiznw2wYH/PV1QIvjTvvv46g=
+X-Received: by 2002:a05:6e02:16c6:b0:3a0:9f1a:7908 with SMTP id
+ e9e14a558f8ab-3a375a9bd55mr68969115ab.11.1728165904189; Sat, 05 Oct 2024
+ 15:05:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241005215600.852260-1-gthelen@google.com>
-Subject: [PATCH] selftests: make kselftest-clean remove libynl outputs
-From: Greg Thelen <gthelen@google.com>
-To: Shuah Khan <shuah@kernel.org>, Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Greg Thelen <gthelen@google.com>
+MIME-Version: 1.0
+References: <20241003104035.22374-1-kerneljasonxing@gmail.com> <20241003221007.12918-1-kuniyu@amazon.com>
+In-Reply-To: <20241003221007.12918-1-kuniyu@amazon.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 6 Oct 2024 07:04:25 +0900
+Message-ID: <CAL+tcoBxZB-OmOyA4NDOnRgj8S7x3nnssdYdLdU+5fGU8EY6iA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] net-timestamp: namespacify the sysctl_tstamp_allow_data
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kernelxing@tencent.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	willemb@google.com, willemdebruijn.kernel@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Starting with 6.12 commit 85585b4bc8d8 ("selftests: add ncdevmem, netcat
-for devmem TCP") kselftest-all creates additional outputs that
-kselftest-clean does not cleanup:
-  $ make defconfig
-  $ make kselftest-all
-  $ make kselftest-clean
-  $ git clean -ndxf | grep tools/net
-  Would remove tools/net/ynl/lib/__pycache__/
-  Would remove tools/net/ynl/lib/ynl.a
-  Would remove tools/net/ynl/lib/ynl.d
-  Would remove tools/net/ynl/lib/ynl.o
+On Fri, Oct 4, 2024 at 7:10=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Jason Xing <kerneljasonxing@gmail.com>
+> Date: Thu,  3 Oct 2024 19:40:35 +0900
+> > diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+> > index 86a2476678c4..83622799eb80 100644
+> > --- a/net/core/sysctl_net_core.c
+> > +++ b/net/core/sysctl_net_core.c
+> > @@ -491,15 +491,6 @@ static struct ctl_table net_core_table[] =3D {
+> >               .mode           =3D 0644,
+> >               .proc_handler   =3D proc_dointvec,
+> >       },
+> > -     {
+> > -             .procname       =3D "tstamp_allow_data",
+> > -             .data           =3D &sysctl_tstamp_allow_data,
+> > -             .maxlen         =3D sizeof(int),
+> > -             .mode           =3D 0644,
+> > -             .proc_handler   =3D proc_dointvec_minmax,
+> > -             .extra1         =3D SYSCTL_ZERO,
+> > -             .extra2         =3D SYSCTL_ONE
+> > -     },
+> >  #ifdef CONFIG_RPS
+> >       {
+> >               .procname       =3D "rps_sock_flow_entries",
+> > @@ -665,6 +656,15 @@ static struct ctl_table netns_core_table[] =3D {
+> >               .extra2         =3D SYSCTL_ONE,
+> >               .proc_handler   =3D proc_dou8vec_minmax,
+> >       },
+> > +     {
+> > +             .procname       =3D "tstamp_allow_data",
+> > +             .data           =3D &init_net.core.sysctl_tstamp_allow_da=
+ta,
+> > +             .maxlen         =3D sizeof(int),
+> > +             .mode           =3D 0644,
+> > +             .proc_handler   =3D proc_dointvec_minmax,
+> > +             .extra1         =3D SYSCTL_ZERO,
+> > +             .extra2         =3D SYSCTL_ONE
+>
+> It's already limited to [0, 1], so you can use u8 and save 3 bytes.
+>
+>   grep -rnI proc_dou8vec_minmax.
 
-Make kselftest-clean remove the newly added net/ynl outputs.
+Thanks for your advice. I will update it soon.
 
-Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
-Signed-off-by: Greg Thelen <gthelen@google.com>
----
- tools/testing/selftests/net/ynl.mk | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
-index 59cb26cf3f73..1ef24119def0 100644
---- a/tools/testing/selftests/net/ynl.mk
-+++ b/tools/testing/selftests/net/ynl.mk
-@@ -19,3 +19,7 @@ $(YNL_OUTPUTS): CFLAGS += \
- $(OUTPUT)/libynl.a:
- 	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
- 	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
-+
-+EXTRA_CLEAN += \
-+	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
-+	$(top_srcdir)/tools/net/ynl/lib/*.[ado]
--- 
-2.47.0.rc0.187.ge670bccf7e-goog
-
+Thanks,
+Jason
 
