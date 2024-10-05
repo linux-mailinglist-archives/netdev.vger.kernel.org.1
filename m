@@ -1,125 +1,166 @@
-Return-Path: <netdev+bounces-132335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05158991454
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:39:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8F799145B
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9255A1F244E1
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 04:39:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 130A31C21D18
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 04:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A93B25761;
-	Sat,  5 Oct 2024 04:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8506727473;
+	Sat,  5 Oct 2024 04:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLZBw+Pv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cq9N/2pr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C89945C14;
-	Sat,  5 Oct 2024 04:39:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0769128FC;
+	Sat,  5 Oct 2024 04:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728103153; cv=none; b=NCCsAmzG0cu/ve9OKceGQ2ZXjSXIJ+3SyJV3HNPbm5qk540YZ/CR/1II7F/DBVyWN+U3Xybj31euus3rLTj6cdP9TcrhAOIppwuvH2/GQy7WRsmRFt3eckE2aXL2HsOaMfmtEFb9eSiv3nc7MxWlYcwrtNqPKBoSthvsPJSJEEc=
+	t=1728104057; cv=none; b=O2QH0WLQ+/AiedJ+szvyu5aPfaUyDdc+Fm03OxQlprr3YgixWWn8aJE2FPCMZcJg8wokR/M/K5nhcvhibYviZTsZkfrUBqGPa35Vd9DIrpYaRY8VOAZZAm/tuIOrN5iouKOY5biMw1jbF43/p594aXQrwV6krc74bE7PgB5S1tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728103153; c=relaxed/simple;
-	bh=EnAa6NGA4V2q6WOYAXC4Cb73ghzqqRX04lsYm/I/9go=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KhOHA7xWKoXcdBMe4yR5EVXKUwV1rvf5OmNdpjvlNlc0oofpXwZsUZN4p2jHQqoYyUoDVrHbUJg45mH4cAKgk7IlX4Z6Qca9/LBGzNPV7YDi4YS0hklk1fBRXlQQK0sC14jOovye32bQTFlRcQJmRq4XtU47AQ6mfoY+fwAv23Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mLZBw+Pv; arc=none smtp.client-ip=209.85.219.44
+	s=arc-20240116; t=1728104057; c=relaxed/simple;
+	bh=zhNGqSxKgr9PeHUz1E8XxbOiIm7jV7ByNNqLcrQWLk0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SvtYVVgW4/x6RdNWVKo/iEnDFA3Po76vsdm+91JFTVl8bPOjO/DiMo/N0kO7HA/2G2Stkn1VCgDOXWnQiDcEVGcT+Kjwo8qHnxFR+ubmk3GK/4sHw49sQSQNnCx/OMAjhOcV/Ybg9soVc9/h6SPxsVrBpmwuZZOSRsOh5DrGB4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cq9N/2pr; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6cb2f272f8bso23665536d6.0;
-        Fri, 04 Oct 2024 21:39:11 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71df2de4ed4so181629b3a.0;
+        Fri, 04 Oct 2024 21:54:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728103151; x=1728707951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ly0zwz6jtcDwv/YYeb/3GBI3NjGskGr2bWS4kP26DnU=;
-        b=mLZBw+Pv2FurwyqyNXQAkU/KcboTr9Ah+RMkxXTJoOk1HOEywmGSFW3BsNBN9B9abG
-         f65h9SqOFGBnDk9ZoRGIe91tnHwtA/E2UdgfoOrqeRt+Sla23AMl9xSXSy3/T4+m706y
-         pa6x1dusShZhrQNLxmbFytThvILn0ms/5XMhsj1fR7q/rSO/lzfbbCTolRBuvgxjbdS9
-         1fSsGSvtwODM2fdDyH7qbGUcLWTGdMOi6ApcqypAdMXx8l+4q03/xR2WIbXnwWgi291f
-         lOv9tlAQVzrxKfmkEagBrljl1kIOrOLtdnhe17U/2T7a/Fag9df4XemqzFBRXwvUNUeV
-         zE4w==
+        d=gmail.com; s=20230601; t=1728104055; x=1728708855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MoaHxIZrPXR0fYxmImQQSsEgYcwtCagFeohHoy4fC18=;
+        b=Cq9N/2pr5G0SLbizZPUTFseY9lXnVCp7+e93ZE9k1/zRYOWjC9efx2TyQJD3ap+Igf
+         hkdmIU6NugKUV03OlRn0l1CaJd+4BcV6NE9W/brB1BTMeCJJ//qmBn7+hX6cWNq5z/fh
+         72ejKagSPLsmB9j7B8nXezm7tgZWbzTnjKG2AygbBnv1DjmKUkp0hhqPSwkw8qO2SBCK
+         6X9M5vLUnKJosbbtZWjmVi+6Br3AOb6lBWBsYt/tRmzUTrT7JO76sxgSC9g8HqVLiCre
+         nLmM3x3j92eYK5UOuAfPqkYyaqxl6SoFASiZI9NHAYu9PN6TXWtdDy1NZW/ssIRE517w
+         11MQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728103151; x=1728707951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ly0zwz6jtcDwv/YYeb/3GBI3NjGskGr2bWS4kP26DnU=;
-        b=C7qhG54hQqLgf/oPrcwrgWgGcQjM7yooEqpbbmKCUT45Y7+kAads6AM4MKkN9m4UVl
-         RTkd/FiMO6VubpCJucEcadHDNMTb4kmrV4wlkVFsySJxgpSxErhQqa5f6zmtXzrmOzQ+
-         aVbqBE0XEbbJyRA/0POe5rVPE7ZeYvkR3O7Hm8maLkNnKYOwlCdq0a8TkF5v7o+FU9/U
-         ZAH18e2NiJTbDukDMW4rWQZsFJYEX2uMynnkI9WMAlzql1l78Twg1XHiGcoxyAmXTGHQ
-         hLiVNcu3QJvGBio10X/ujpPGd06xmx7jmkKEpDXXAU7wopd3J2/1B1VGSPtqp42tDMhC
-         wb9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUC7X6cy67Z2n0OHx6nJxpa5hiiE1iCEeZ3fOXXTTdJE6B2fh/qIMYGHY3CnSttkkbI4QqEXupcJ44=@vger.kernel.org, AJvYcCUL65EaWFwZm3aoyJUjHHs+vfevhWC73vGevWjK5CyrT0bYa5XijDRweWakuCfy6eYBSbWO756R@vger.kernel.org, AJvYcCWSq63U/9sD9HDVUdg4h3abQiTUHeWOVuk0MEjlLPbxbh9Cz+derJcjuil/rC0LrCa/LXru0Ia2aP3Q0qw3@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7orjDRRMvQgOnVGaYPc+7YcpZuMyFyGTeiZZFHgim6TVt4WtY
-	Mh1eVbOPIMrOMXn/VR3l2cLwd62Z8g3DRLhTErTFuJrqdy00iKizuV7rFgSQlyzyddbGjPhtoF6
-	nEPNX6dxetsdK/dGkHUdeBdIuTWE=
-X-Google-Smtp-Source: AGHT+IEQ4aOefgbRPtK7gQetfNSpu6UVZHXpVAWr8zIMcdq424mAljO19O57h8QNx0l+jPomY0NkKg75rk/NmoDt1tg=
-X-Received: by 2002:a05:6214:5904:b0:6cb:3cbb:6031 with SMTP id
- 6a1803df08f44-6cb9a1ef79fmr79083876d6.7.1728103150810; Fri, 04 Oct 2024
- 21:39:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728104055; x=1728708855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MoaHxIZrPXR0fYxmImQQSsEgYcwtCagFeohHoy4fC18=;
+        b=ptp/nHQqGMSqfydoF5EZu+IFE5Rs7m8j3BX35xroagVTGNvk2D12U49s03bwVshsQw
+         nIAqkOe4vtjl+2KZHizCA2eoXX9m19PQeFJhnL/NYmleSjj0xfUUkSkWUqRIntqhEG9Y
+         xtJ7c6OBWYvZI//hIzfyA3sk0DRwHubQ3JC/saBdheUksM4N61qPOVh6+Y931jd1DQKI
+         okhYCuZy3Zf4EYPu48ZIbLKO3iCn/F52GEdqCCEA/jjv755je2IxmaGkjT/v7pLyttiN
+         tvnQqfpVu4MRHfiiZbyLRuWxCXc24b+A6R4UOW3Ajhy5zipZ+LqSXFGAx23qmvHvjw6d
+         TCUA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnZG1/rAoUCCIt9EI5C2FmzKwib+36y0cW1FGsMCGmtt6skK3dg6UCgun8klibJ4yJimE4gv0In0DL7JA=@vger.kernel.org, AJvYcCUsJC+F/4A7meys74M3aEP9v6SfiJCS/+Se3uRDazrO13XYEhbY8yRL/tgCYi4vKwBA4qvlkpIxwzMvrQ==@vger.kernel.org, AJvYcCWvQ08ZVaRV5FUJTJQWzjXcPBrz7l3tO+g9wDFsmkebbbM3wtklaXyN39nj6c4AvlACC1GFMOOZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YysTiI5ie7MwhbUtGSVAS7Kf0rxFZNhWTNDkb4pyk4MbB6f3vgf
+	P87TTh/0tOEUqRtYXON3YnZ7A2I5FahLBVPM3Ye/hZTR2784cEUa
+X-Google-Smtp-Source: AGHT+IFPtY8qTHhV9UGEE+W9HaneFyGmt4IsZYQIdNsmPDudVVrx7Tc0pkUigBfcJfCcC7usu9yPfA==
+X-Received: by 2002:aa7:8a16:0:b0:71d:f033:a772 with SMTP id d2e1a72fcca58-71df033a853mr2867097b3a.12.1728104055205;
+        Fri, 04 Oct 2024 21:54:15 -0700 (PDT)
+Received: from debian.resnet.ucla.edu (s-169-232-97-87.resnet.ucla.edu. [169.232.97.87])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7e9f6833cdcsm876583a12.49.2024.10.04.21.54.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 21:54:14 -0700 (PDT)
+From: Daniel Yang <danielyangkang@gmail.com>
+To: Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: danielyangkang@gmail.com,
+	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+Subject: [PATCH v2] resolve gtp possible deadlock warning
+Date: Fri,  4 Oct 2024 21:54:11 -0700
+Message-Id: <20241005045411.118720-1-danielyangkang@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241002113316.2527669-1-leitao@debian.org>
-In-Reply-To: <20241002113316.2527669-1-leitao@debian.org>
-From: Akinobu Mita <akinobu.mita@gmail.com>
-Date: Sat, 5 Oct 2024 13:38:59 +0900
-Message-ID: <CAC5umyjkmkY4111CG_ODK6s=rcxT_HHAQisOiwRp5de0KJkzBA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Implement fault injection forcing skb reallocation
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, Jonathan Corbet <corbet@lwn.net>, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Mina Almasry <almasrymina@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-2024=E5=B9=B410=E6=9C=882=E6=97=A5(=E6=B0=B4) 20:37 Breno Leitao <leitao@de=
-bian.org>:
->
-> Introduce a fault injection mechanism to force skb reallocation. The
-> primary goal is to catch bugs related to pointer invalidation after
-> potential skb reallocation.
->
-> The fault injection mechanism aims to identify scenarios where callers
-> retain pointers to various headers in the skb but fail to reload these
-> pointers after calling a function that may reallocate the data. This
-> type of bug can lead to memory corruption or crashes if the old,
-> now-invalid pointers are used.
->
-> By forcing reallocation through fault injection, we can stress-test code
-> paths and ensure proper pointer management after potential skb
-> reallocations.
->
-> Add a hook for fault injection in the following functions:
->
->  * pskb_trim_rcsum()
->  * pskb_may_pull_reason()
->  * pskb_trim()
->
-> As the other fault injection mechanism, protect it under a debug Kconfig
-> called CONFIG_FAIL_SKB_FORCE_REALLOC.
->
-> This patch was *heavily* inspired by Jakub's proposal from:
-> https://lore.kernel.org/all/20240719174140.47a868e6@kernel.org/
->
-> CC: Akinobu Mita <akinobu.mita@gmail.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes deadlock described in this bug:
+https://syzkaller.appspot.com/bug?extid=e953a8f3071f5c0a28fd.
+Specific crash report here:
+https://syzkaller.appspot.com/text?tag=CrashReport&x=14670e07980000.
 
-This new addition seems sensible.  It might be more useful to have a filter
-that allows you to specify things like protocol family.
+This bug is a false positive lockdep warning since gtp and smc use
+completely different socket protocols.
+
+Lockdep thinks that lock_sock() in smc will deadlock with gtp's
+lock_sock() acquisition. Adding a function that initializes lockdep
+labels for smc socks resolved the false positives in lockdep upon
+testing. Since smc uses AF_SMC and SOCKSTREAM, two labels are created to
+distinguish between proper smc socks and non smc socks incorrectly
+input into the function.
+
+Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
+Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+---
+v1->v2: Add lockdep annotations instead of changing locking order
+ net/smc/af_smc.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 0316217b7..4de70bfd5 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -16,6 +16,8 @@
+  *              based on prototype from Frank Blaschka
+  */
+ 
++#include "linux/lockdep_types.h"
++#include "linux/socket.h"
+ #define KMSG_COMPONENT "smc"
+ #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+ 
+@@ -2755,6 +2757,24 @@ int smc_getname(struct socket *sock, struct sockaddr *addr,
+ 	return smc->clcsock->ops->getname(smc->clcsock, addr, peer);
+ }
+ 
++static struct lock_class_key smc_slock_key[2];
++static struct lock_class_key smc_key[2];
++
++static inline void smc_sock_lock_init(struct sock *sk)
++{
++	bool is_smc = (sk->sk_family == AF_SMC) && sk_is_tcp(sk);
++
++	sock_lock_init_class_and_name(sk,
++				      is_smc ?
++				      "smc_lock-AF_SMC_SOCKSTREAM" :
++				      "smc_lock-INVALID",
++				      &smc_slock_key[is_smc],
++				      is_smc ?
++				      "smc_sk_lock-AF_SMC_SOCKSTREAM" :
++				      "smc_sk_lock-INVALID",
++				      &smc_key[is_smc]);
++}
++
+ int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ {
+ 	struct sock *sk = sock->sk;
+@@ -2762,6 +2782,7 @@ int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
+ 	int rc;
+ 
+ 	smc = smc_sk(sk);
++	smc_sock_lock_init(sk);
+ 	lock_sock(sk);
+ 
+ 	/* SMC does not support connect with fastopen */
+-- 
+2.39.2
+
 
