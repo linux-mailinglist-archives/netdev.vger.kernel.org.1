@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-132365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BA3A9916BE
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:27:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0AE9916C0
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:27:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E12481F22DCF
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:27:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C3C2842E7
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6918F15532A;
-	Sat,  5 Oct 2024 12:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1865C156676;
+	Sat,  5 Oct 2024 12:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FS0lBMEo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IyDXU+L/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE9A1552EB;
-	Sat,  5 Oct 2024 12:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC8E14F9D5;
+	Sat,  5 Oct 2024 12:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728131185; cv=none; b=VCWI+6n5Xz2VEFZu7+kyr3VrfOZnecNAALeY+mTVYN3pH2sP6wFFypOvZ+w6O67YUda7OzYNNaBVzpEFQIL1IH997qu9inav0oQc8yZUPFEkWYnIwxYYWeRxYgZZRBvMP2Qo3efrQsmEGUMRSRhYbwMT23NJvoEYU8OR8lS8vEI=
+	t=1728131189; cv=none; b=rI3uTEfKlgymzsJAlZWRrCDr7QxQSupRZE0vIPIakEQL0yBG9EoTCKNm4zXeKRsjr/AGfwOJMEF9S2Z1emdUcDWcLec2/fKwoyZ+h4kJapvEbC17ep8kiprT5xOog/gpS+j6oxGmZiStlcPEyxPVGxkQU8uX9KaRhZ4wBBAFynY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728131185; c=relaxed/simple;
-	bh=JNqDJ7f9UtL2t6PrWNiRsLuZ8p//mFWPbl9Ykus8zqo=;
+	s=arc-20240116; t=1728131189; c=relaxed/simple;
+	bh=KcAeSONx/DiMxyfcnJRledcFg4LXf3lzROgvJ3YPsZo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XvvndRojryn5Hf3iaWbik7d/WKm1LVtZ29+2/0K8l0j5pdk3GR52RWzU8nPcW1WOyLd9eiQIEdUMW0SlbmAcaCRJQc4OcoWtvG66bwKtV5rHK20D+qnv9Zj+MiVoijawhPTP7iVkXeaY2KS8OF7T5QN5Y9uOlyARZerYG0u7yCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FS0lBMEo; arc=none smtp.client-ip=209.85.210.172
+	 MIME-Version; b=mEzgnwt9lys8lqVhWufsPprqj0gy5ODUcQZ7RK8oevJoXk9I0hadO9vyhCRGWra1jgji3yUWd4kCQN6ctt3kXb0LYEBA1SzX25yu20adp/Oav2/HmvRhfgkBW7pr0yyhihx16FAGZXy6t5TqnN2UdGY4FjgseSHOy6GJLCjSBnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IyDXU+L/; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7179069d029so2305377b3a.2;
-        Sat, 05 Oct 2024 05:26:23 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71dea49e808so1254928b3a.1;
+        Sat, 05 Oct 2024 05:26:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728131183; x=1728735983; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728131187; x=1728735987; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tvk/vZ/FBEf3YBO7h5QV1zQaPOZaXxyH6QMku/LV1UE=;
-        b=FS0lBMEomQpxXYdMMJxmn81uDVaG2XIMKYlFCDOQ3XwvYKC/oBO7JOu+he3SKQ9SAQ
-         VH73tvd5LxVYylzCJB6gBDJTjk91o0JXyJMX5k00ViI+G3JpUq6RBxLrIT51FxsT+IkC
-         KfmnOkgiIxJp06k7qqcjQOVH0hrwl9knhJZY9uZVmpLDfWl9sfxLEbf7HcpwkHJqwFT+
-         kPbLpbwBZMrsqiM6I8iu5zv0aIR9/tFp94n7i7ILc4YawJpi6kDnTNiknvtAOZCm4t+O
-         3qNHbk8uX0+aSAnZC7uJuLYS6cEDIWDKPj1zsis5L9mdvDugnN0WBK8ON4NTGdxv2trp
-         j8NQ==
+        bh=kR/9kqLqTs0B22yZKmgz+3pmNIwgLpkKQm87ew+rvAs=;
+        b=IyDXU+L/7wrr3/mCEFiK1ikS/aR8PSoF0Zp6iNS6Zvqnw3uvxysvGDSeUG9QAfjZdY
+         bPHddtvmwd7cyl4OGWlJeuk5a/Qk51BVCwgHG+GTkngUSq4/53Eq2dH2ZxIIHFZc8T81
+         KBmMqkS51gvMlgkLHyUqNgIW+iqKskGZRVt60sSBO4+xmHbfei8tYCiixgo26s8ZlBiP
+         XUyhhfJYh1o+ITY9w6y/UkN4Q9/tsGAiPWpVBoiRqP63cf1bMRgg7MDaZaSMAsDxy1xY
+         lj+2TUEXk5wDnq0nw5nfRSeDeaKWT1ndeAJd+2b3MDgYuWwPuNX7vDzVY9mDu5/oKjCT
+         63yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728131183; x=1728735983;
+        d=1e100.net; s=20230601; t=1728131187; x=1728735987;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Tvk/vZ/FBEf3YBO7h5QV1zQaPOZaXxyH6QMku/LV1UE=;
-        b=XOxfx2bS2I05TpoXiR1Rzpp1L418/WFpb2/lzdU1v/okGeVXVAYFEO3gCBYhwLSsfy
-         yX06DlnCD+Q6jQE/49H89+dlBYFlbEGVlNvhHuoSC3Epe9ZyxxKjAimMeGVMMyumDOkm
-         KGMUDW+ZiKJVUx4RgQ8LIS+e3ey0KQ43RyGMPpuhuDcAUYzcMTK9h3PfTUEQffVLxWg9
-         qTTOmmNMSF7kPAP/ihL6SDRUnSw6qFpdXp79zcuVZQutG8NjChD+v9UDGtxdXt5jv+nL
-         kBI2ApdZ+7yLbnfno8j8L9HFXqhUAqNBlCPK2LLRjksWnECn06lAfpTJ3/vkhPmB+K9n
-         zW5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVCviQNsIIaKwfdx/QH0KmM2hQf4DQXC9JLJF7hepL4d0vL2TEVmLW/ut8XgzAUBzeDaXdkSYqg1hQyt1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJMmYK/D0HkRcbaXiZ0h3JvfbV/gkOxNSUF1SBX/O5/8YUesYH
-	rPRsJZG/kho7G4bDfywoJT1rJDohMIJNz5kiUdtMRWB7uJA7vWHpuSOoV/Yc
-X-Google-Smtp-Source: AGHT+IFVQJR9Cm7+64FWR6kRSvxRdFLHQ+iNTReOqxqohFrFYjZvpqPNfuGQmV2v9HjjgzYxo/GMXQ==
-X-Received: by 2002:a05:6a00:178e:b0:714:173f:7e6b with SMTP id d2e1a72fcca58-71de23a691dmr8474920b3a.2.1728131182885;
-        Sat, 05 Oct 2024 05:26:22 -0700 (PDT)
+        bh=kR/9kqLqTs0B22yZKmgz+3pmNIwgLpkKQm87ew+rvAs=;
+        b=jwOdKu3BKCghxFBAqKvm9U29N+pk5rjKuWgJKB1G6JLP1+BLHpAwK1pS9j2KieHoQx
+         aCA5oJnX9wnL6Zn/GbXQdW2FZrN0Degu/YBEHgTrXbK6K3goNR9DOz6oI6FQfxsWc4Gb
+         vdvbleeTplhegIhdWt07bk4WaAtoxLHInVv4mfNxD6bO+hJBEIys+lkCz3Ya3Iu6TVlM
+         QJq3pIMqxcgdMATKMTf+m7VzY32L/3o92anx+7GE8hVm+DiEI2jIV4zEJTzCkDn4+gdI
+         g56K0ztMNWCjCt57Hamx16lHMlGNkcgji/rlBWF4b+dIZ4A5HLpnZSF9BU8XTX0SRON8
+         carQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3bcenvdqfWDBpeB6imI/LYukMsw+26nkRnFmTNsA8lspVnswUAk9asgdyERKANzjkYphoeLJipCWnKTE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt7GepTKoSEzMvfxFJmAWZRTmjyuezmCLdEdoYUnV1Cv3bKteb
+	wZRFI0R1r/FGzOo9GXE7MJ3xUbbUmZW9b3xSdMDTPesWiIA/iQwJfZUVpq6f
+X-Google-Smtp-Source: AGHT+IGM/R6UCUnLz5gHhmt80Zj8TRtxwkmL0KFhW4UUxT4flbS3jpdytc4Y6DzO6Z9LcUNf2SW8Kg==
+X-Received: by 2002:a05:6a00:2e27:b0:717:87d6:fdd2 with SMTP id d2e1a72fcca58-71de23a89damr10684913b3a.4.1728131186738;
+        Sat, 05 Oct 2024 05:26:26 -0700 (PDT)
 Received: from mew.. (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cd08besm1397878b3a.79.2024.10.05.05.26.19
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cd08besm1397878b3a.79.2024.10.05.05.26.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 05:26:22 -0700 (PDT)
+        Sat, 05 Oct 2024 05:26:26 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: rust-for-linux@vger.kernel.org,
@@ -85,9 +85,9 @@ Cc: rust-for-linux@vger.kernel.org,
 	tglx@linutronix.de,
 	arnd@arndb.de,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/6] rust: time: Introduce Delta type
-Date: Sat,  5 Oct 2024 21:25:27 +0900
-Message-ID: <20241005122531.20298-3-fujita.tomonori@gmail.com>
+Subject: [PATCH net-next v2 3/6] rust: time: Implement addition of Ktime and Delta
+Date: Sat,  5 Oct 2024 21:25:28 +0900
+Message-ID: <20241005122531.20298-4-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241005122531.20298-1-fujita.tomonori@gmail.com>
 References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
@@ -99,98 +99,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a type representing a span of time. Define our own type
-because `core::time::Duration` is large and could panic during
-creation.
+Implement Add<Delta> for Ktime to support the operation:
 
-We could use time::Ktime for time duration but timestamp and timedelta
-are different so better to use a new type.
+Ktime = Ktime + Delta
+
+This is used to calculate the future time when the timeout will occur.
 
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- rust/kernel/time.rs | 64 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ rust/helpers/time.c |  5 +++++
+ rust/kernel/time.rs | 11 +++++++++++
+ 2 files changed, 16 insertions(+)
 
+diff --git a/rust/helpers/time.c b/rust/helpers/time.c
+index d6f61affb2c3..60dee69f4efc 100644
+--- a/rust/helpers/time.c
++++ b/rust/helpers/time.c
+@@ -2,6 +2,11 @@
+ 
+ #include <linux/ktime.h>
+ 
++ktime_t rust_helper_ktime_add_ns(const ktime_t kt, const u64 nsec)
++{
++	return ktime_add_ns(kt, nsec);
++}
++
+ int rust_helper_ktime_compare(const ktime_t cmp1, const ktime_t cmp2)
+ {
+ 	return ktime_compare(cmp1, cmp2);
 diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-index c40105941a2c..6c5a1c50c5f1 100644
+index 6c5a1c50c5f1..3e00ad22ed89 100644
 --- a/rust/kernel/time.rs
 +++ b/rust/kernel/time.rs
-@@ -8,9 +8,15 @@
- //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
- //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
- 
-+/// The number of nanoseconds per microsecond.
-+pub const NSEC_PER_USEC: i64 = bindings::NSEC_PER_USEC as i64;
-+
- /// The number of nanoseconds per millisecond.
- pub const NSEC_PER_MSEC: i64 = bindings::NSEC_PER_MSEC as i64;
- 
-+/// The number of nanoseconds per second.
-+pub const NSEC_PER_SEC: i64 = bindings::NSEC_PER_SEC as i64;
-+
- /// The time unit of Linux kernel. One jiffy equals (1/HZ) second.
- pub type Jiffies = core::ffi::c_ulong;
- 
-@@ -103,3 +109,61 @@ fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
-         }
+@@ -167,3 +167,14 @@ pub fn as_micros(self) -> i64 {
+         self.nanos / NSEC_PER_USEC
      }
  }
 +
-+/// A span of time.
-+#[derive(Copy, Clone)]
-+pub struct Delta {
-+    nanos: i64,
-+}
++impl core::ops::Add<Delta> for Ktime {
++    type Output = Ktime;
 +
-+impl Delta {
-+    /// Create a new `Delta` from a number of nanoseconds.
 +    #[inline]
-+    pub fn from_nanos(nanos: u16) -> Self {
-+        Self {
-+            nanos: nanos.into(),
-+        }
-+    }
-+
-+    /// Create a new `Delta` from a number of microseconds.
-+    #[inline]
-+    pub fn from_micros(micros: u16) -> Self {
-+        Self {
-+            nanos: micros as i64 * NSEC_PER_USEC,
-+        }
-+    }
-+
-+    /// Create a new `Delta` from a number of milliseconds.
-+    #[inline]
-+    pub fn from_millis(millis: u16) -> Self {
-+        Self {
-+            nanos: millis as i64 * NSEC_PER_MSEC,
-+        }
-+    }
-+
-+    /// Create a new `Delta` from a number of seconds.
-+    #[inline]
-+    pub fn from_secs(secs: u16) -> Self {
-+        Self {
-+            nanos: secs as i64 * NSEC_PER_SEC,
-+        }
-+    }
-+
-+    /// Return `true` if the `Detla` spans no time.
-+    #[inline]
-+    pub fn is_zero(self) -> bool {
-+        self.nanos == 0
-+    }
-+
-+    /// Return the number of nanoseconds in the `Delta`.
-+    #[inline]
-+    pub fn as_nanos(self) -> i64 {
-+        self.nanos
-+    }
-+
-+    /// Return the number of microseconds in the `Delta`.
-+    #[inline]
-+    pub fn as_micros(self) -> i64 {
-+        self.nanos / NSEC_PER_USEC
++    fn add(self, delta: Delta) -> Ktime {
++        // SAFETY: FFI call.
++        let t = unsafe { bindings::ktime_add_ns(self.inner, delta.as_nanos() as u64) };
++        Ktime::from_raw(t)
 +    }
 +}
 -- 
