@@ -1,221 +1,156 @@
-Return-Path: <netdev+bounces-132327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C69069913D9
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:55:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06BB991419
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1AC71C21B25
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 01:55:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A674284031
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B7EF17BD3;
-	Sat,  5 Oct 2024 01:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CBE21C28E;
+	Sat,  5 Oct 2024 03:38:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ao9Py+r1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eT9NEKFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2799D322B;
-	Sat,  5 Oct 2024 01:54:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2141BF24;
+	Sat,  5 Oct 2024 03:38:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728093300; cv=none; b=Kyf2Kz+0c6mjJmSZcCLeWL+zoe0Aj+wx0thBtSt2jz+HN4dOzvC5ZjH6V841r86M13+wnhOqVZHn+8BaoXiAIb9EGvurZkK5Uk0FIit8Hi4yyCPz52IsOrNmv4eFu+CYYFhUS9BTyekxIAKOPMikAorF53rZts74gUIvgI9LbXE=
+	t=1728099487; cv=none; b=NB6dEQEaG8iuJOjY6iL8VpUhg1hDyZehh1bJUgONPIHnRUB3dcAq2GfWQDwCCKbpJcrDJWPD7rXsPLzMdEqmnEfPuEnqAgBOUlvZZbn3dqmnK9Y19CKkVZ6yYw+lYgtCMhN9RtnD7xgceyRhQFbh0pakeIMeVC0bRef/9jlk8A4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728093300; c=relaxed/simple;
-	bh=uXRVWVG114f3/9yWUkqrx/Xg92Pkui3oaEXL/RgQMY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AT5vbHRdk5aMLReESBncPhzpJISpE0mK83YWlV2C/Kn4jtQBRmhvjhu6rHrd1Rd6KVUF7S7ia+ueRzLAuzwoS9GTTw3x2KYtq37PLrU3WyX6P7AMsoNmaAs3lKqNJweHrIdP8wd/sr/5kwTCI5EfXOn43Nv2zQr9t5FtcWMuRU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ao9Py+r1; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728093297; x=1759629297;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uXRVWVG114f3/9yWUkqrx/Xg92Pkui3oaEXL/RgQMY0=;
-  b=Ao9Py+r1zsvQ36BTg4jeQNu1LdJdPrT9tLQw0sa09Nx2hfY9SfFXFztf
-   3lnpkUGczFQWXuV6b7zUfAR5Q8nmp+1IzGnKfaSLKYhB0Q3YWY9wi3uK9
-   7/9EFM6xvBKZVspMXIQVTdg2gXbvZvYKaUpPpqe9UDLKSDH6k9qM1XesU
-   cW0B888mANCNAOVxkuOwZajP7AHlMYKUHVyUPXKo8uuJUjRn3xepwxhbr
-   oiJl0S/C1QJsqZn8PxfRylVFnGKiWuU1Hg+zVR2ApXRuZxE1KlOYmfzBD
-   cDgT3tfjBDKbuRBGqfnU/IaVIHi+vY9jQf29WIb2myVLO5cI+YBuFIc4d
-   w==;
-X-CSE-ConnectionGUID: pT5H4Li2S6eMNXxq3wAOxA==
-X-CSE-MsgGUID: ymvFZxSAQiWyx9sk6lW+kQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="30209802"
-X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
-   d="scan'208";a="30209802"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Oct 2024 18:54:56 -0700
-X-CSE-ConnectionGUID: dq26sFVKRNOHr4dJL9jIYA==
-X-CSE-MsgGUID: pHBLfBJjQk2TiDi2g3fVEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
-   d="scan'208";a="75214238"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 04 Oct 2024 18:54:49 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1swu0N-0002RI-13;
-	Sat, 05 Oct 2024 01:54:47 +0000
-Date: Sat, 5 Oct 2024 09:54:36 +0800
-From: kernel test robot <lkp@intel.com>
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
-	linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	iommu@lists.linux.dev, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, kys@microsoft.com,
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
-	catalin.marinas@arm.com, will@kernel.org, luto@kernel.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
-	daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
-	davem@davemloft.net, edumazet@google.com
-Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
- Hyper-V code
-Message-ID: <202410050921.0o9FH5Ai-lkp@intel.com>
-References: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
+	s=arc-20240116; t=1728099487; c=relaxed/simple;
+	bh=dY82aLvdM0jERSvuZtssnWC+B0o57gibWBgnrkeX40o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jFIjZZTA8fRvkj7069kwLd3FhXuSd0eRFs+xajXS3VwT7Z/ME9V6D+mDVmTuooQrM7OtRE/TQlTgFkmV02RQevIVfjxpRJjW8DXUUG/VH75sxVgKYDaYYq9qSWJV10sKh9AqcGthzY/fUMQnJ8AxWrApyLetDJ7ideIQhiLqHOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eT9NEKFo; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71df4620966so171333b3a.0;
+        Fri, 04 Oct 2024 20:38:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728099485; x=1728704285; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WGENPhpaAI3BKTNIryNaQ12AO4VJdVOncvlsk3tM3EY=;
+        b=eT9NEKFoJu9CPlYOD7tAbmKtFTHdHghyoF2CZCOiuMxcJjozQc5YwIQ+SguFa8WSOI
+         YDAnSqnBF3zqAwMtJgoDlXWz+rEQP3STYLgnWD6u9uMz46XwTgakwbqAVE38hRECTDDy
+         RJDVyCMV374tVuVUBb1WK1PVE6kg2Gabn5wARBBYkcjpe7PsFa0rIgjEg57r+sJy/LVV
+         EVEq2Ka1GiQOaq2MWFN+oWh/LbMoX0toUjNb2x0ZCvIiX7HRQk9Jym1ZK5dvkKLmhyCf
+         mVWnqDuksoAmiKR00uFxaDwi9cH14v05eqhNjoY8qQGEQIWtvhtPKA8pdyExCN4N8Vft
+         YOIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728099485; x=1728704285;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WGENPhpaAI3BKTNIryNaQ12AO4VJdVOncvlsk3tM3EY=;
+        b=rAyZ+SVkv1iF39TtshJ+DSqe137JqvnxKali1A3Yo70ao/ZbAaiNJ/zXmGXgOAcstx
+         Xg4wMKZVpCZQKmsOEJx4TYdR9+AdPdEZwQUpCBl6d4SZtXZeRbTXxOuh3uRyx/Oe3IEA
+         5XI+Qky2Vu/z8ezgiIbrFclIEyT0LRY1w65mW6OlDMCoYoo8eDMKNmZlh0hsHON7v0xx
+         p5Fr6f8bfB5HJVPa68HmfJYnfqmcluwu5L3+osVwjpmzMJ5y3gPyye3mgnOkCDRSDiGQ
+         DGV+p6NOmvewSEUcleQf1ZyR50D/s5LTlF/q0N9TeKhfeZQ1DFCiHpNGd1h4zeeMmBHr
+         prqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUc22tXeIVmRQBleX7EuYTnMziUZwBHOaQtByQEh/DkQuzSiNpHAOIGION+stuX6snZZUUL4cEVEeCyYCo=@vger.kernel.org, AJvYcCX2Esi5mWttoKaOm+5hWs3Z4nNvOFevpASCj0mFusetSc4rZd0Vl7Oox8WAQpWKPq1pOD7uchsb@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEIuje4///Pk216szGF6yjSJSrdCjKlVWndJabZCA+pEaFGAy7
+	K/guh+gOWFxdtt6cQ82oeeik2KTHDHwZMGVQzD8WwPEfMmc7BqAI
+X-Google-Smtp-Source: AGHT+IHfErkzPbkakmCZAx7rQthiS4xhMvCq2iu0olgPuvKFrUipudMee6ftaWytYJHN+FvtZFdpIw==
+X-Received: by 2002:a05:6a21:1190:b0:1cf:506a:cdcc with SMTP id adf61e73a8af0-1d6dfae3173mr6672922637.43.1728099484842;
+        Fri, 04 Oct 2024 20:38:04 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0ccd156sm636497b3a.57.2024.10.04.20.38.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2024 20:38:04 -0700 (PDT)
+Message-ID: <eb2ab419-733d-404f-b419-3aae6944d860@gmail.com>
+Date: Fri, 4 Oct 2024 20:38:02 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
-
-Hi Nuno,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on tip/x86/core]
-[also build test ERROR on arm64/for-next/core kvm/queue linus/master v6.12-rc1 next-20241004]
-[cannot apply to kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Nuno-Das-Neves/hyperv-Move-hv_connection_id-to-hyperv-tlfs-h/20241004-035418
-base:   tip/x86/core
-patch link:    https://lore.kernel.org/r/1727985064-18362-6-git-send-email-nunodasneves%40linux.microsoft.com
-patch subject: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in Hyper-V code
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20241005/202410050921.0o9FH5Ai-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project fef3566a25ff0e34fb87339ba5e13eca17cec00f)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241005/202410050921.0o9FH5Ai-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410050921.0o9FH5Ai-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/hyperv/mshyperv.c:13:
-   In file included from include/linux/acpi.h:39:
-   In file included from include/acpi/acpi_io.h:7:
-   In file included from arch/arm64/include/asm/acpi.h:14:
-   In file included from include/linux/memblock.h:12:
-   In file included from include/linux/mm.h:2228:
-   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     501 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     508 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     520 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     529 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> arch/arm64/hyperv/mshyperv.c:53:19: error: use of undeclared identifier 'HV_REGISTER_FEATURES'; did you mean 'HV_REGISTER_FEATURES_INFO'?
-      53 |         hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
-         |                          ^~~~~~~~~~~~~~~~~~~~
-         |                          HV_REGISTER_FEATURES_INFO
-   include/hyperv/hvgdk_mini.h:807:2: note: 'HV_REGISTER_FEATURES_INFO' declared here
-     807 |         HV_REGISTER_FEATURES_INFO                               = 0x00000201,
-         |         ^
->> arch/arm64/hyperv/mshyperv.c:58:19: error: use of undeclared identifier 'HV_REGISTER_ENLIGHTENMENTS'
-      58 |         hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
-         |                          ^
-   5 warnings and 2 errors generated.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/5] net: dsa: b53: fix jumbo frame mtu check
+To: Jonas Gorski <jonas.gorski@gmail.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Murali Krishna Policharla <murali.policharla@broadcom.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241004-b53_jumbo_fixes-v1-0-ce1e54aa7b3c@gmail.com>
+ <20241004-b53_jumbo_fixes-v1-1-ce1e54aa7b3c@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20241004-b53_jumbo_fixes-v1-1-ce1e54aa7b3c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-vim +53 arch/arm64/hyperv/mshyperv.c
 
-410779d8d81fcf Nuno Das Neves 2024-03-07  30  
-9bbb888824e38c Michael Kelley 2021-08-04  31  static int __init hyperv_init(void)
-9bbb888824e38c Michael Kelley 2021-08-04  32  {
-9bbb888824e38c Michael Kelley 2021-08-04  33  	struct hv_get_vp_registers_output	result;
-9bbb888824e38c Michael Kelley 2021-08-04  34  	u64	guest_id;
-9bbb888824e38c Michael Kelley 2021-08-04  35  	int	ret;
-9bbb888824e38c Michael Kelley 2021-08-04  36  
-9bbb888824e38c Michael Kelley 2021-08-04  37  	/*
-9bbb888824e38c Michael Kelley 2021-08-04  38  	 * Allow for a kernel built with CONFIG_HYPERV to be running in
-9bbb888824e38c Michael Kelley 2021-08-04  39  	 * a non-Hyper-V environment, including on DT instead of ACPI.
-9bbb888824e38c Michael Kelley 2021-08-04  40  	 * In such cases, do nothing and return success.
-9bbb888824e38c Michael Kelley 2021-08-04  41  	 */
-9bbb888824e38c Michael Kelley 2021-08-04  42  	if (acpi_disabled)
-9bbb888824e38c Michael Kelley 2021-08-04  43  		return 0;
-9bbb888824e38c Michael Kelley 2021-08-04  44  
-9bbb888824e38c Michael Kelley 2021-08-04  45  	if (strncmp((char *)&acpi_gbl_FADT.hypervisor_id, "MsHyperV", 8))
-9bbb888824e38c Michael Kelley 2021-08-04  46  		return 0;
-9bbb888824e38c Michael Kelley 2021-08-04  47  
-9bbb888824e38c Michael Kelley 2021-08-04  48  	/* Setup the guest ID */
-d5ebde1e2b4615 Li kunyu       2022-09-28  49  	guest_id = hv_generate_guest_id(LINUX_VERSION_CODE);
-b967df6293510b Nuno Das Neves 2024-03-12  50  	hv_set_vpreg(HV_REGISTER_GUEST_OS_ID, guest_id);
-9bbb888824e38c Michael Kelley 2021-08-04  51  
-9bbb888824e38c Michael Kelley 2021-08-04  52  	/* Get the features and hints from Hyper-V */
-9bbb888824e38c Michael Kelley 2021-08-04 @53  	hv_get_vpreg_128(HV_REGISTER_FEATURES, &result);
-9bbb888824e38c Michael Kelley 2021-08-04  54  	ms_hyperv.features = result.as32.a;
-9bbb888824e38c Michael Kelley 2021-08-04  55  	ms_hyperv.priv_high = result.as32.b;
-9bbb888824e38c Michael Kelley 2021-08-04  56  	ms_hyperv.misc_features = result.as32.c;
-9bbb888824e38c Michael Kelley 2021-08-04  57  
-9bbb888824e38c Michael Kelley 2021-08-04 @58  	hv_get_vpreg_128(HV_REGISTER_ENLIGHTENMENTS, &result);
-9bbb888824e38c Michael Kelley 2021-08-04  59  	ms_hyperv.hints = result.as32.a;
-9bbb888824e38c Michael Kelley 2021-08-04  60  
-9bbb888824e38c Michael Kelley 2021-08-04  61  	pr_info("Hyper-V: privilege flags low 0x%x, high 0x%x, hints 0x%x, misc 0x%x\n",
-9bbb888824e38c Michael Kelley 2021-08-04  62  		ms_hyperv.features, ms_hyperv.priv_high, ms_hyperv.hints,
-9bbb888824e38c Michael Kelley 2021-08-04  63  		ms_hyperv.misc_features);
-9bbb888824e38c Michael Kelley 2021-08-04  64  
-9bbb888824e38c Michael Kelley 2021-08-04  65  	ret = hv_common_init();
-9bbb888824e38c Michael Kelley 2021-08-04  66  	if (ret)
-9bbb888824e38c Michael Kelley 2021-08-04  67  		return ret;
-9bbb888824e38c Michael Kelley 2021-08-04  68  
-52ae076c3a9b36 Michael Kelley 2023-05-23  69  	ret = cpuhp_setup_state(CPUHP_AP_HYPERV_ONLINE, "arm64/hyperv_init:online",
-9bbb888824e38c Michael Kelley 2021-08-04  70  				hv_common_cpu_init, hv_common_cpu_die);
-9bbb888824e38c Michael Kelley 2021-08-04  71  	if (ret < 0) {
-9bbb888824e38c Michael Kelley 2021-08-04  72  		hv_common_free();
-9bbb888824e38c Michael Kelley 2021-08-04  73  		return ret;
-9bbb888824e38c Michael Kelley 2021-08-04  74  	}
-9bbb888824e38c Michael Kelley 2021-08-04  75  
-f2580a907e5c0e Michael Kelley 2024-03-18  76  	ms_hyperv_late_init();
-f2580a907e5c0e Michael Kelley 2024-03-18  77  
-9bbb888824e38c Michael Kelley 2021-08-04  78  	hyperv_initialized = true;
-9bbb888824e38c Michael Kelley 2021-08-04  79  	return 0;
-9bbb888824e38c Michael Kelley 2021-08-04  80  }
-9bbb888824e38c Michael Kelley 2021-08-04  81  
+On 10/4/2024 1:47 AM, Jonas Gorski wrote:
+> JMS_MIN_SIZE is the full ethernet frame length, while mtu is just the
+> data payload size. Comparing these two meant that mtus between 1500 and
+> 1518 did not trigger enabling jumbo frames.
+> 
+> So instead compare the set mtu ETH_DATA_LEN, which is equal to
+> JMS_MIN_SIZE - ETH_HLEN - ETH_FCS_LEN;
+> 
+> Also do a check that the requested mtu is actually greater than the
+> minimum length, else we do not need to enable jumbo frames.
+> 
+> In practice this only introduced a very small range of mtus that did not
+> work properly. Newer chips allow 2000 byte large frames by default, and
+> older chips allow 1536 bytes long, which is equivalent to an mtu of
+> 1514. So effectivly only mtus of 1515~1517 were broken.
+> 
+> Fixes: 6ae5834b983a ("net: dsa: b53: add MTU configuration support")
+> Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Florian
+
 
