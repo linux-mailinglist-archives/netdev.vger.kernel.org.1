@@ -1,180 +1,213 @@
-Return-Path: <netdev+bounces-132348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17FAF991521
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 09:46:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC19D991529
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 09:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C0841F235B8
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:46:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC651C21C66
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873D78615A;
-	Sat,  5 Oct 2024 07:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1RbpHHJL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAmBCXOT";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1RbpHHJL";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAmBCXOT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268151369BB;
+	Sat,  5 Oct 2024 07:56:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA3D535D8
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 07:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7BD12F5B1
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 07:56:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728114394; cv=none; b=NWs22z5X4CSRMdFMLHEyS/qIHwGku/Pb7hwuw8981g2Du/odD8/NLYYWwVDPOGVQww00d1oayg9HkkHhBg0lvHM3o98iMMprkvtdZ4le4Nh160o+euO2jIKLvqvFeG12fFQyxlDqOMWkZzq0kJasfaLPl67QqwTSfwkwDTo96sU=
+	t=1728114982; cv=none; b=p3xEvYqYfxx5HnkECMxNDeu1FPP/kjA3iDgVRJt1QngXYuZj+ex7WssoQraKj1PMVA+6e0dKl3rKkWwqRAzDtGB/a2j7vFhFXveRzh+/Z8jRM0TL4hc64VqdtrhUgppBuJLusdpJ8ON+LNnXv9iqb5LCaOUE8EfOgMtE4uWrR5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728114394; c=relaxed/simple;
-	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXKsfC8Yy7q48J8yrFACsJJA97gSdexTnsbXz6UUaqg3g90AnGg6UwBk728YKdUN01mXDVnl8nEc33PthbSN05RyKH6Nez4iUF2K2E/j3bpWgd3p/1dEU8nPzm0QUULrN16fH+kOMB3NQOYdUSkEa2phlwuTRmHs6hlwIuPvwzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1RbpHHJL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAmBCXOT; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1RbpHHJL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAmBCXOT; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E1DD41FE45;
-	Sat,  5 Oct 2024 07:46:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1728114389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
-	b=1RbpHHJLzoQg22Y9hTMok/AeUasaESQpa3Ay8GFKZyjmYv6RL8g/88HuNU4CWybizspO4f
-	3nU2xWzrafS2v4lXD4c/84D9Pz2AzKJ9ZC9TRV+jwZINi65Z7wqBYDXSPlqssBkk2WSvct
-	b/gWeNvpHA4FAHRlPcUlIxfGVFliE5A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1728114389;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
-	b=gAmBCXOTkzgom+4PyMk6bfYN6Iknorlr/c1cz4BH8XYH4bsAaBx4JJY6GlCZZz8rjWCdwo
-	SwQfoohw/C/EVlAA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1728114389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
-	b=1RbpHHJLzoQg22Y9hTMok/AeUasaESQpa3Ay8GFKZyjmYv6RL8g/88HuNU4CWybizspO4f
-	3nU2xWzrafS2v4lXD4c/84D9Pz2AzKJ9ZC9TRV+jwZINi65Z7wqBYDXSPlqssBkk2WSvct
-	b/gWeNvpHA4FAHRlPcUlIxfGVFliE5A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1728114389;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
-	b=gAmBCXOTkzgom+4PyMk6bfYN6Iknorlr/c1cz4BH8XYH4bsAaBx4JJY6GlCZZz8rjWCdwo
-	SwQfoohw/C/EVlAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C58C713A8F;
-	Sat,  5 Oct 2024 07:46:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id XHcwL9XuAGdKGAAAD6G6ig
-	(envelope-from <mkubecek@suse.cz>); Sat, 05 Oct 2024 07:46:29 +0000
-Date: Sat, 5 Oct 2024 09:46:22 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	"Mogilappagari, Sudheer" <sudheer.mogilappagari@intel.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH ethtool] netlink: rss: retrieve ring count using
- ETHTOOL_GRXRINGS ioctl
-Message-ID: <lxkqtnik6q6xjpjhgmy4kwbbsgtxwa7mszz7gcv3i2aafhkx4n@tdudjcsuxg7z>
-References: <20240913093828.2549217-1-vladimir.oltean@nxp.com>
- <IA1PR11MB6266964963DBC6242C5CC6DEE4652@IA1PR11MB6266.namprd11.prod.outlook.com>
- <20240913224858.foaciiwpxudljyxn@skbuf>
- <IA1PR11MB62661EF398124FC523CC3C03E4652@IA1PR11MB6266.namprd11.prod.outlook.com>
- <45327ee6-e57c-4fec-bf43-86bd1338f5fb@intel.com>
- <20241003091810.2zbbvod4jqq246lq@skbuf>
- <dcdnyuvjksvebfgcavogszlcoro3gwinzc6fzfjjtijadyg3km@7spc2j4v2ci6>
- <20241003134916.q6m7i3qkancqjnvr@skbuf>
- <tctt7svco2xfmp7qr2rrgrpx6kzyvlaia2lxfqlunrdlgjny3h@77gxzrjooolu>
- <CO1PR11MB5089C7F00BCDDCBB678AF260D6722@CO1PR11MB5089.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1728114982; c=relaxed/simple;
+	bh=z2bFvLo+GFZM89ZYC+AtdG8B1aJLyj8pt68bcJKPH5o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=DzKXiSFRJfttkwa5G06fwbIiaz35eWWqb1/C3iAT53ybCcnAk4jtjT+UOY84NTc/UMne3oiZeZv/OvokBqJfLj9lopvxKG/WkVFTBBKCp0E0Kmdrn3MgxgAAmgFOK8BaXybe6LBVF69putW8i5IteZHk6nNv/H2SvKiKvbJexVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a34eef9ec9so31158005ab.0
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 00:56:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728114979; x=1728719779;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z/w9tB55nUaOYadIWJ08slDlEGe2WJjvuC6OCwtHkxI=;
+        b=acF7om10SdiUJUYJf+FJkEIkHfYBoxNdrB23AbSXFyDYwl6zUWA1nFV7kDFQRzanPg
+         P04368r7GKLx/rrEKih28CWOiKtD9mnPAxdqIDQUjFWSTTolrddVOfxlVlaPchgKCpDq
+         Ro7xfQWMP49TXHsGoUmB3aYbXX5LsnwQnTfy5z2b5bDpZB2JS+/cOnFcIJ1nnvdol67l
+         t95Oi+1WemxlL3lRmNNKzO6h/EAn+RA4LjCdd90/Dd3k5GiB/X/i+FcuDYd0q7v+67b4
+         p/wyRcjgLE+n/DWsv3vahjKdHn0Ox+kvAQJY4Q9F1MwdffFDL69QnSxB11yPlMkzxtOQ
+         eYoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWyJTkOcOZLryDrZnC0bejAytNmGBET0+uJI+/CFeJn5aN5WNKQSyMhfVU9hGV741yQHDizVHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8It0V4ITSX46n9CJXIOCDeblaeZEwX5T6eoyqGz86WuTmKV3N
+	ymD2TYG2dTmxyVXkC7uN00OD3BAJoWJbjQS7AUG6gLd9nc1Bpydr23XzpFb2Yes+NltCjmfVysV
+	rDJCLTc/phghRmpoMPY1riStBR3CddZET5IALl2Tu9tlLM5Gg+Ei3am4=
+X-Google-Smtp-Source: AGHT+IGyIMB5w+1FHfclmeKJk0ZAq4C6cLWrUWDucl/v1tfND5hVxxBqjLbkVcPuuqLy5rSLmFz3XrsKTgTrSPRmGozvZJVIasth
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qvqquxe2qllzzhp4"
-Content-Disposition: inline
-In-Reply-To: <CO1PR11MB5089C7F00BCDDCBB678AF260D6722@CO1PR11MB5089.namprd11.prod.outlook.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.991];
-	RCVD_TLS_ALL(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_FIVE(0.00)[5]
-X-Spam-Score: -5.90
-X-Spam-Flag: NO
+X-Received: by 2002:a05:6e02:17c8:b0:39d:25f4:bed3 with SMTP id
+ e9e14a558f8ab-3a37597d61bmr50375185ab.5.1728114979411; Sat, 05 Oct 2024
+ 00:56:19 -0700 (PDT)
+Date: Sat, 05 Oct 2024 00:56:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6700f123.050a0220.49194.04b5.GAE@google.com>
+Subject: [syzbot] [bpf?] [net?] KFENCE: memory corruption in pskb_expand_head
+From: syzbot <syzbot+80b36e60457a005e0530@syzkaller.appspotmail.com>
+To: 42.hyeyoo@gmail.com, akpm@linux-foundation.org, andrii@kernel.org, 
+	ast@kernel.org, bpf@vger.kernel.org, cl@linux.com, daniel@iogearbox.net, 
+	davem@davemloft.net, eddyz87@gmail.com, edumazet@google.com, 
+	feng.tang@intel.com, haoluo@google.com, iamjoonsoo.kim@lge.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
+	martin.lau@linux.dev, netdev@vger.kernel.org, pabeni@redhat.com, 
+	penberg@kernel.org, rientjes@google.com, roman.gushchin@linux.dev, 
+	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	vbabka@suse.cz, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    c02d24a5af66 Add linux-next specific files for 20241003
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1404ab9f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=94f9caf16c0af42d
+dashboard link: https://syzkaller.appspot.com/bug?extid=80b36e60457a005e0530
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f633d0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1204ab9f980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/641e642c9432/disk-c02d24a5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/98aaf20c29e0/vmlinux-c02d24a5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c23099f2d86b/bzImage-c02d24a5.xz
+
+The issue was bisected to:
+
+commit d0a38fad51cc70ab3dd3c59b54d8079ac19220b9
+Author: Feng Tang <feng.tang@intel.com>
+Date:   Wed Sep 11 06:45:34 2024 +0000
+
+    mm/slub: Improve redzone check and zeroing for krealloc()
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16da4d27980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15da4d27980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11da4d27980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+80b36e60457a005e0530@syzkaller.appspotmail.com
+Fixes: d0a38fad51cc ("mm/slub: Improve redzone check and zeroing for krealloc()")
+
+==================================================================
+BUG: KFENCE: memory corruption in skb_kfree_head net/core/skbuff.c:1086 [inline]
+BUG: KFENCE: memory corruption in skb_free_head net/core/skbuff.c:1098 [inline]
+BUG: KFENCE: memory corruption in pskb_expand_head+0x4fc/0x1380 net/core/skbuff.c:2307
+
+Corrupted memory at 0xffff88823be221c0 [ 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 ] (in kfence-#16):
+ skb_kfree_head net/core/skbuff.c:1086 [inline]
+ skb_free_head net/core/skbuff.c:1098 [inline]
+ pskb_expand_head+0x4fc/0x1380 net/core/skbuff.c:2307
+ __skb_cow include/linux/skbuff.h:3702 [inline]
+ skb_cow_head include/linux/skbuff.h:3736 [inline]
+ __vlan_insert_inner_tag include/linux/if_vlan.h:354 [inline]
+ __vlan_insert_tag include/linux/if_vlan.h:400 [inline]
+ skb_vlan_push+0x319/0x8d0 net/core/skbuff.c:6324
+ ____bpf_skb_vlan_push net/core/filter.c:3193 [inline]
+ bpf_skb_vlan_push+0x215/0x8e0 net/core/filter.c:3183
+ bpf_prog_73b0c961a278ad0e+0x5b/0x60
+ bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
+ __bpf_prog_run include/linux/filter.h:701 [inline]
+ bpf_prog_run include/linux/filter.h:708 [inline]
+ bpf_test_run+0x4f0/0xa90 net/bpf/test_run.c:433
+ bpf_prog_test_run_skb+0xc97/0x1820 net/bpf/test_run.c:1094
+ bpf_prog_test_run+0x2e4/0x360 kernel/bpf/syscall.c:4247
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5652
+ __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+kfence-#16: 0xffff88823be22000-0xffff88823be221bf, size=448, cache=kmalloc-512
+
+allocated by task 5407 on cpu 0 at 90.755534s (0.100574s ago):
+ kmalloc_noprof include/linux/slab.h:882 [inline]
+ kzalloc_noprof include/linux/slab.h:1014 [inline]
+ bpf_test_init+0xe1/0x180 net/bpf/test_run.c:669
+ bpf_prog_test_run_skb+0x2bb/0x1820 net/bpf/test_run.c:1000
+ bpf_prog_test_run+0x2e4/0x360 kernel/bpf/syscall.c:4247
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5652
+ __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+freed by task 5407 on cpu 0 at 90.755621s (0.144394s ago):
+ skb_kfree_head net/core/skbuff.c:1086 [inline]
+ skb_free_head net/core/skbuff.c:1098 [inline]
+ pskb_expand_head+0x4fc/0x1380 net/core/skbuff.c:2307
+ __skb_cow include/linux/skbuff.h:3702 [inline]
+ skb_cow_head include/linux/skbuff.h:3736 [inline]
+ __vlan_insert_inner_tag include/linux/if_vlan.h:354 [inline]
+ __vlan_insert_tag include/linux/if_vlan.h:400 [inline]
+ skb_vlan_push+0x319/0x8d0 net/core/skbuff.c:6324
+ ____bpf_skb_vlan_push net/core/filter.c:3193 [inline]
+ bpf_skb_vlan_push+0x215/0x8e0 net/core/filter.c:3183
+ bpf_prog_73b0c961a278ad0e+0x5b/0x60
+ bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
+ __bpf_prog_run include/linux/filter.h:701 [inline]
+ bpf_prog_run include/linux/filter.h:708 [inline]
+ bpf_test_run+0x4f0/0xa90 net/bpf/test_run.c:433
+ bpf_prog_test_run_skb+0xc97/0x1820 net/bpf/test_run.c:1094
+ bpf_prog_test_run+0x2e4/0x360 kernel/bpf/syscall.c:4247
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5652
+ __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5407 Comm: syz-executor182 Not tainted 6.12.0-rc1-next-20241003-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+==================================================================
 
 
---qvqquxe2qllzzhp4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On Fri, Oct 04, 2024 at 07:19:24PM +0000, Keller, Jacob E wrote:
-> I have no objection to your patch, I think its correct to do now. My
-> suggestion was that we can improve the netlink interface for the
-> future, and I believe we can make ethtool continue to use the existing
-> ioctl interface on older kernels, but use the netlink interface once
-> its available.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-This is not the problem. It's what we have been doing since netlink
-interface was introduced and it's what we are going to be doing for
-quite long.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-What I'm unhappy about is the mix of netlink and ioctl where we use
-netlink request for RSS but also an ioctl request to get the ring count.
-I can't help wondering if it wouldn't make more sense to fallback to
-ioctl fully unless we can retrieve full information via netlink.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-Michal
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
---qvqquxe2qllzzhp4
-Content-Type: application/pgp-signature; name="signature.asc"
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmcA7skACgkQ538sG/LR
-dpVliwf+Lcmiq82XZztnVs66DnEKQ6CPnLBf2wl0AEJo5Xa2Q/BZTXUDwwSlOlEM
-HhyL7IEarFmZkFg8W1m5z9CqqGYNkv6i4Qd4uuXTaL4JcFuYVpqYqEFU0z3bs2u0
-KvQCzOmd/tze8lnj9Hbbtrb2Y10hitoJcc7k1d1McHYL02WMZ4/japRERUtpfkGg
-fbmzT5Ja1oyK4XbCBsoL02jkI1DiYhxKESciXI6cVmB2b+4ve7TZs5gCDysRtiAB
-UKc7ZFuAqfpZ2MFDHdnY0IZgfMX5WcItYS/NKOVNP5+wn1ApyazVmgqp189FMC39
-0OgjolwgCrNjsONmnz7nGWQWDRqWYw==
-=gGEu
------END PGP SIGNATURE-----
-
---qvqquxe2qllzzhp4--
+If you want to undo deduplication, reply with:
+#syz undup
 
