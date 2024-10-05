@@ -1,130 +1,136 @@
-Return-Path: <netdev+bounces-132408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B907799189D
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:59:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A77799918DA
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 19:30:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9CAD1C21101
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:59:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90D21C2103E
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0CB1586CB;
-	Sat,  5 Oct 2024 16:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E6E1E489;
+	Sat,  5 Oct 2024 17:29:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD9215531A;
-	Sat,  5 Oct 2024 16:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA85158D81;
+	Sat,  5 Oct 2024 17:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728147561; cv=none; b=rZ65oT6Ua1c33+85GAlGkgj2JHOFd0Bc5+sTkrNr+PpaHtL+kd/5zm/gULRiSiMx9XxPbATz4TIaJKmlpJ0ZEhRxwp3WRhWWBZOP9Cdj321E2PZLz6tlB1PSVeQvhPm35C6EdWOOT1MDXOlCOICFC3X1U6eIh5oHpUBWWSepqok=
+	t=1728149394; cv=none; b=NaBBr2IyCqetDm09E6B8M5I+KQj2aPTGhGzj3GuZWX4mlo6P5xQdkqUl2poqF0srOEfnsvEztShRboDql3TlgTTPHRbSF5Jx5XsXNt8999pySBf5QZZ+YeHupraN5mYbC3QHCSl/9U1ooOQSdN5tbgLtflSL7og2JApfCitLMh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728147561; c=relaxed/simple;
-	bh=K+d+p5QqIfVdqp85SspcQuxl+jVmdiqeQ1RiL0GZcAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H48FAWb5hPgKAN2lMuhlAL9WnHNtq62MObtjrV6fkFDggbDoyzOgwiPg4VAc25A/yeO7kqjzOCjEuTwwPTIapHFVhUlTiys2X7km7RMsmXwePt0cDpc4/U3KspEBy5L48mg9GGuNXpcgbj4amFhZvoQsNfsJB/IyicTm2kab488=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sx87c-000000004DW-3Qqy;
-	Sat, 05 Oct 2024 16:59:12 +0000
-Date: Sat, 5 Oct 2024 17:59:08 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next] net: phy: always set polarity_modes if op
- is supported
-Message-ID: <ZwFwXBbMFeIZNntQ@makrotopia.org>
-References: <473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org>
- <5c821b2d-17eb-4078-942f-3c1317b025ff@lunn.ch>
- <ZwBn-GJq3BovSJd4@makrotopia.org>
- <e288f85c-2e5e-457f-b0d7-665c6410ccb4@lunn.ch>
- <ZwFggnUO-vAXr2v_@makrotopia.org>
- <2b6f2938-12de-4ebb-9750-084de5d2af0b@lunn.ch>
+	s=arc-20240116; t=1728149394; c=relaxed/simple;
+	bh=yKuWImx5CLK6/jQfJwcJD4qFxtkCxjuZ5fJ1Vg6VeiU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qhZPb2b4ZyT9oW/LozkBWobKbj1cAG5UxYSbUqjMBZXrNBwRpZ7auSutY8t2TyhJnE1FeUlBjXIKfDxzHI5NlHTjtZtUQcP0FzSIkFRwklR1YdnDZs+AvFqtIvWt+eb5vBOnDiGhPS2Gti70zJUUHFLmCfowjwhPbCuJWHu62rg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XLXS35t4Nz1T8Bb;
+	Sun,  6 Oct 2024 01:28:03 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4393D180113;
+	Sun,  6 Oct 2024 01:29:42 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 6 Oct 2024 01:29:38 +0800
+Message-ID: <70ae6422-4e8c-465f-9bbf-5ff4df52a057@huawei-partners.com>
+Date: Sat, 5 Oct 2024 20:29:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2b6f2938-12de-4ebb-9750-084de5d2af0b@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 8/9] selftests/landlock: Test changing socket
+ backlog with listen(2)
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
+ <20240814030151.2380280-9-ivanov.mikhail1@huawei-partners.com>
+ <20241005.c0501f9d61a8@gnoack.org>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241005.c0501f9d61a8@gnoack.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-On Sat, Oct 05, 2024 at 06:35:58PM +0200, Andrew Lunn wrote:
-> On Sat, Oct 05, 2024 at 04:51:30PM +0100, Daniel Golle wrote:
-> > On Sat, Oct 05, 2024 at 04:17:56PM +0200, Andrew Lunn wrote:
-> > > > I'll add "active-high" as an additional property then, as I found out
-> > > > that both, Aquantia and Intel/MaxLinear are technically speaking
-> > > > active-low by default (ie. after reset) and what we need to set is a
-> > > > property setting the LED to be driven active-high (ie. driving VDD
-> > > > rather than GND) instead. I hope it's not too late to make this change
-> > > > also for the Aquantia driver.
-> > > 
-> > > Adding a new property should not affect backwards compatibility, so it
-> > > should be safe to merge at any time.
-> > 
-> > Ok, I will proceed in that direction then and post a patch shortly.
-> > My intial assumption that absence of 'active-low' would always imply
-> > the LED being driven active-high was due to the commit description of
-> > the introduction of the active-low property:
-> > 
-> > commit c94d1783136eb66f2a464a6891a32eeb55eaeacc
-> > Author: Christian Marangi <ansuelsmth@gmail.com>
-> > Date:   Thu Jan 25 21:36:57 2024 +0100
-> > 
-> >     dt-bindings: net: phy: Make LED active-low property common
-> > 
-> >     Move LED active-low property to common.yaml. This property is currently
-> >     defined multiple times by bcm LEDs. This property will now be supported
-> >     in a generic way for PHY LEDs with the use of a generic function.
-> > 
-> >     With active-low bool property not defined, active-high is always
-> >     assumed.
+On 10/5/2024 7:57 PM, Günther Noack wrote:
+> On Wed, Aug 14, 2024 at 11:01:50AM +0800, Mikhail Ivanov wrote:
+>> listen(2) can be used to change length of the pending connections queue
+>> of the listening socket. Such scenario shouldn't be restricted by Landlock
+>> since socket doesn't change its state.
 > 
-> So we have a difference between the commit message and what the
-> binding actually says. I would go by what the binding says.
+> Yes, this behavior makes sense to me as well. 👍 __inet_listen_sk()
+> only changes sk->sk_max_ack_backlog when listen() gets called a second
+> time.
+> 
+>> * Implement test that validates this case.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   tools/testing/selftests/landlock/net_test.c | 26 +++++++++++++++++++++
+>>   1 file changed, 26 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
+>> index 6831d8a2e9aa..dafc433a0068 100644
+>> --- a/tools/testing/selftests/landlock/net_test.c
+>> +++ b/tools/testing/selftests/landlock/net_test.c
+>> @@ -1768,6 +1768,32 @@ TEST_F(ipv4_tcp, with_fs)
+>>   	EXPECT_EQ(-EACCES, bind_variant(bind_fd, &self->srv1));
+>>   }
+>>   
+>> +TEST_F(ipv4_tcp, double_listen)
+>> +{
+>> +	const struct landlock_ruleset_attr ruleset_attr = {
+>> +		.handled_access_net = LANDLOCK_ACCESS_NET_LISTEN_TCP,
+>> +	};
+>> +	int ruleset_fd;
+>> +	int listen_fd;
+>> +
+>> +	listen_fd = socket_variant(&self->srv0);
+>> +	ASSERT_LE(0, listen_fd);
+>> +
+>> +	EXPECT_EQ(0, bind_variant(listen_fd, &self->srv0));
+>> +	EXPECT_EQ(0, listen_variant(listen_fd, backlog));
+>> +
+>> +	ruleset_fd =
+>> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +	ASSERT_LE(0, ruleset_fd);
+>> +
+>> +	/* Denies listen. */
+>> +	enforce_ruleset(_metadata, ruleset_fd);
+>> +	EXPECT_EQ(0, close(ruleset_fd));
+>> +
+>> +	/* Tries to change backlog value of listening socket. */
+>> +	EXPECT_EQ(0, listen_variant(listen_fd, backlog + 1));
+> 
+> For test clarity: Without reading the commit message, I believe it
+> might not be obvious to the reader *why* the second listen() is
+> supposed to work.  This might be worth a comment.
 
-+1
+Ofc, thanks!
 
 > 
-> However, what about the actual implementations? Do any do what the
-> commit message says?
-
-The current implementation for PHY LEDs:
- - 'active-low' property is present: Change LED polarity (in many cases
-   wrongly from initially being active-low to active-high).
- - 'active-low' property is not set: Don't touch polarity settings.
-
-See drivers/net/phy/phy_device.c, from line 3360:
-        if (of_property_read_bool(led, "active-low"))
-                set_bit(PHY_LED_ACTIVE_LOW, &modes);
-        if (of_property_read_bool(led, "inactive-high-impedance"))
-                set_bit(PHY_LED_INACTIVE_HIGH_IMPEDANCE, &modes);
- 
-        if (modes) {
-                /* Return error if asked to set polarity modes but not supported */
-                if (!phydev->drv->led_polarity_set)
-                        return -EINVAL;
- 
-                err = phydev->drv->led_polarity_set(phydev, index, modes);
-                if (err)
-                        return err;
-        }
-
-led_polarity_set() is not called if neither 'active-low' nor
-'inactive-high-impedance' are set.
+>> +}
+>> +
+>>   FIXTURE(port_specific)
+>>   {
+>>   	struct service_fixture srv0;
+>> -- 
+>> 2.34.1
+>>
+> 
+> Reviewed-by: Günther Noack <gnoack3000@gmail.com>
 
