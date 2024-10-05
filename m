@@ -1,197 +1,139 @@
-Return-Path: <netdev+bounces-132410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E0C49918DE
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 19:31:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 647CB9918F3
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 19:40:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF4192828D6
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:31:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25257282156
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:40:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0134614D29B;
-	Sat,  5 Oct 2024 17:31:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49EAF1586F2;
+	Sat,  5 Oct 2024 17:40:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wg40cB10"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F241262A8;
-	Sat,  5 Oct 2024 17:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06691547FF
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 17:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728149465; cv=none; b=i+g9HpNjqj9exLYXoUtDj5gFfH5mVsBe6NmovZEtOHKtsv05YUjMGSbDQz+pprg6SM+CKA2Ei2AtKyxCp2lpWC36Z7dz7jdg9beVVkiZLuTmpq+VhEb8b3Vuv/gyJ/X6amsLuWuK/pM2DK4t5D5URq2o8dJN+Wx3zHMklDrIyno=
+	t=1728150038; cv=none; b=biWLqtofi/EEED6h4rUUSB2tGj4XAEevBH9TmweKW8mwdSpMhBnP0846pvPVwwKRZwZpMVM/eHc5t0ZYZAxp88+0PcY+JSBstkH1xsjOHg2D79KKpp06JMPKZsWhIBK4gv9B4BmxdJ/WvZo0wPp6ST4/TC4mzvRa9cQLOQWtUPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728149465; c=relaxed/simple;
-	bh=6YYMhnVCMMJkPNBpD3IKwss3tmQ+77STIzbsK4klpzY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VbCJPyl4n4+4w5VgnDxl+XXdmKNDmcuf7QkkU+RQZ7WdzDJQTQsPYWK8bxii99WvL/p6DDG4No/vOYnqF9bNCpsOn2eHf2P5TzClw40PdILhsblcvBbyqtQadfOFyrAeix3WjSbfr+0zpNrCssNVpyeXH23E6+hiC+svflwxVwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XLXTY55qxz10Myp;
-	Sun,  6 Oct 2024 01:29:21 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 70CA5140393;
-	Sun,  6 Oct 2024 01:31:00 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sun, 6 Oct 2024 01:30:56 +0800
-Message-ID: <e29d8958-f272-420c-d3db-16c7a4109db2@huawei-partners.com>
-Date: Sat, 5 Oct 2024 20:30:56 +0300
+	s=arc-20240116; t=1728150038; c=relaxed/simple;
+	bh=PGnTBDWbIyTGnMBJuIQhYv7ATyZ4prJcYMmQ7F0iJNE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RAETkDWAO3M60xMT3TAevFUc8bZTRg6NsHj4jvL/igXRNLUmyrDFM87N3EnO0VijhQu5hT3+8Z1qldIpUBDpeswSn8A7GWufThnM49cJxSqdv85KpdJo92m3yx5mLlYDVIwHRRrL1H8N27jDBJdl26x1ZGnfBcK0zJKkxaLRMj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wg40cB10; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-45b4e638a9aso148631cf.1
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 10:40:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728150035; x=1728754835; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=48tLhLYG80n5mrSyoUAhafcN25jedGVvVkmtAVmsXB0=;
+        b=wg40cB10s7vg2ShpY3V6V6Yk9X+TnPd50t/847QD2lptNvRO+NMGMXjka84r5QspZh
+         czPCWIjz+vlsbX66hTUJ95TXHKHQeYKqFJTLyplc+Y9gRDS+63aiMlW9paLYo+BNG4mK
+         I/qdf8zA9X1Lrj5dUjPjjjKKy2AHe+BdWrlInu35C0BLqCHlsTg6XIOA9MqgKQlVD/OO
+         ckpVC+GmCFvZJX3bhh5J4yT0JW4Dms1WlTrRV0iNe/sFC9Rs+71K4srwv85kBi02Mfu2
+         xvfNZE2BlJbL3EmvtXhtQnHHvg8X2P2Uggnu6OxyG04HMP/yc/71GswoadMjTjhIwaNa
+         CJHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728150035; x=1728754835;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=48tLhLYG80n5mrSyoUAhafcN25jedGVvVkmtAVmsXB0=;
+        b=ox6yJFLvXcu+kAJ37ZRj2M5aPRE+sSwwSgGQuSNat7GHXu8sBvqDYLLYTBsilljvIE
+         GQr04jztnDS+DIFv5pmJ5Jx/d3qSkO5agAv01PO9GoJl/SNipPnBLUFBkbLFUtPzzwc8
+         PcRNZDuuEk9spxGAOZKsmrgfYHka59hxkhFoF/5TA2i9v1Gla4Eb3l65JHrok+UMeugq
+         UQyT7up+1OUexU+KlfyKytFmc1hdv0JWJ9j9E0geGRfizhvU84ErIatF8d4o991Va1J9
+         HpSnN31lFCK7oF070IcuMfOt8V2H07NHwhWWAZWSL1hHE3slyJCivtrzu3todJMDyQdH
+         ydwA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0HD79AOFXjyArYYE8uR6pDavoKjQclgfcG4udIijugt2QhsY9ZBEBb1t6Hz/mDq8Rv/FUjvY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaRspw+JHi7KmnCLhdWuM5K5yE0HC8RMfYQpWQyV3eDg1l4Z98
+	1V0cABZnUuTsXi9HQukFA0kdaC9jsjIJWH1KMarHU3BbOql4unpN3PlZWMqOQiNxI4lgnu/8hNV
+	XL0dy8P4Mz8l/5Am0CKvPCQspRqYXaByARDOg
+X-Google-Smtp-Source: AGHT+IGu1s9u+qn6n58wrABZvtmcGprgtxxbss4TNy6cX4jcG8wwYVlcREq/FTVqTXuKNsG68l2SQJCd+Jz9ApAFbyU=
+X-Received: by 2002:a05:622a:458d:b0:45c:9c02:2721 with SMTP id
+ d75a77b69052e-45da986eb44mr1801131cf.19.1728150035350; Sat, 05 Oct 2024
+ 10:40:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 9/9] samples/landlock: Support
- LANDLOCK_ACCESS_NET_LISTEN
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-10-ivanov.mikhail1@huawei-partners.com>
- <20241005.92cff495291f@gnoack.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241005.92cff495291f@gnoack.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+References: <1728143915-7777-1-git-send-email-guoxin0309@gmail.com>
+In-Reply-To: <1728143915-7777-1-git-send-email-guoxin0309@gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Sat, 5 Oct 2024 13:40:15 -0400
+Message-ID: <CADVnQymUCp1nocPYUCXx1QmN4Y8ABJMd0urJeB5_J=TL8b7_Yg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] tcp: remove unnecessary update for
+ tp->write_seq in tcp_connect()
+To: "xin.guo" <guoxin0309@gmail.com>
+Cc: edumazet@google.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/5/2024 7:57 PM, Günther Noack wrote:
-> On Wed, Aug 14, 2024 at 11:01:51AM +0800, Mikhail Ivanov wrote:
->> Extend sample with TCP listen control logic.
->>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   samples/landlock/sandboxer.c | 31 ++++++++++++++++++++++++++-----
->>   1 file changed, 26 insertions(+), 5 deletions(-)
->>
->> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
->> index e8223c3e781a..3f50cb3f8039 100644
->> --- a/samples/landlock/sandboxer.c
->> +++ b/samples/landlock/sandboxer.c
->> @@ -55,6 +55,7 @@ static inline int landlock_restrict_self(const int ruleset_fd,
->>   #define ENV_FS_RW_NAME "LL_FS_RW"
->>   #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->>   #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
->> +#define ENV_TCP_LISTEN_NAME "LL_TCP_LISTEN"
->>   #define ENV_DELIMITER ":"
->>   
->>   static int parse_path(char *env_path, const char ***const path_list)
->> @@ -208,7 +209,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>   
->>   /* clang-format on */
->>   
->> -#define LANDLOCK_ABI_LAST 5
->> +#define LANDLOCK_ABI_LAST 6
->>   
->>   int main(const int argc, char *const argv[], char *const *const envp)
->>   {
->> @@ -222,15 +223,16 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   	struct landlock_ruleset_attr ruleset_attr = {
->>   		.handled_access_fs = access_fs_rw,
->>   		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
->> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
->> +				      LANDLOCK_ACCESS_NET_CONNECT_TCP |
->> +				      LANDLOCK_ACCESS_NET_LISTEN_TCP,
->>   	};
->>   
->>   	if (argc < 2) {
->>   		fprintf(stderr,
->> -			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
->> +			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
->>   			"<cmd> [args]...\n\n",
->>   			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
->> -			ENV_TCP_CONNECT_NAME, argv[0]);
->> +			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
->>   		fprintf(stderr,
->>   			"Execute a command in a restricted environment.\n\n");
->>   		fprintf(stderr,
->> @@ -251,15 +253,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   		fprintf(stderr,
->>   			"* %s: list of ports allowed to connect (client).\n",
->>   			ENV_TCP_CONNECT_NAME);
->> +		fprintf(stderr,
->> +			"* %s: list of ports allowed to listen (server).\n",
->> +			ENV_TCP_LISTEN_NAME);
->>   		fprintf(stderr,
->>   			"\nexample:\n"
->>   			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
->>   			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->>   			"%s=\"9418\" "
->>   			"%s=\"80:443\" "
->> +			"%s=\"9418\" "
->>   			"%s bash -i\n\n",
->>   			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
->> -			ENV_TCP_CONNECT_NAME, argv[0]);
->> +			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
->>   		fprintf(stderr,
->>   			"This sandboxer can use Landlock features "
->>   			"up to ABI version %d.\n",
->> @@ -326,6 +332,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   	case 4:
->>   		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->>   		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
->> +		__attribute__((fallthrough));
->> +	case 5:
->> +		/* Removes LANDLOCK_ACCESS_NET_LISTEN support for ABI < 6 */
->> +		ruleset_attr.handled_access_net &=
->> +			~(LANDLOCK_ACCESS_NET_LISTEN_TCP);
-> 
-> (same remark as on other patch set)
-> 
-> ABI version has shifted by one in the meantime.
+On Sat, Oct 5, 2024 at 11:58=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wrot=
+e:
+>
+> From: "xin.guo" <guoxin0309@gmail.com>
+>
+> Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
 
-Thanks, I'll update it for the next version.
+To match Linux commit message style, please insert a space between the
+SHA1 and the patch title, like so:
 
-> 
->>   
->>   		fprintf(stderr,
->>   			"Hint: You should update the running kernel "
->> @@ -357,6 +368,12 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   		ruleset_attr.handled_access_net &=
->>   			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->>   	}
->> +	/* Removes listen access attribute if not supported by a user. */
-> 
-> (also same remark as on other patch set)
-> 
-> Please s/supported/requested/, for consistency.
+Commit 783237e8daf13 ("net-tcp: Fast Open client - sending SYN-data")
 
-Ok, thanks!
+> introduces tcp_connect_queue_skb() and it would overwrite tcp->write_seq,
+> so it is no need to update tp->write_seq before invoking
+> tcp_connect_queue_skb()
+>
+> Signed-off-by: xin.guo <guoxin0309@gmail.com>
+> ---
+>  net/ipv4/tcp_output.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 4fd746b..ee8ab9a 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -4134,7 +4134,10 @@ int tcp_connect(struct sock *sk)
+>         if (unlikely(!buff))
+>                 return -ENOBUFS;
+>
+> -       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
+> +       /*SYN eats a sequence byte, write_seq updated by
+> +        *tcp_connect_queue_skb().
+> +        */
+> +       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
+>         tcp_mstamp_refresh(tp);
+>         tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
+>         tcp_connect_queue_skb(sk, buff);
+> --
 
-> 
->> +	env_port_name = getenv(ENV_TCP_LISTEN_NAME);
->> +	if (!env_port_name) {
->> +		ruleset_attr.handled_access_net &=
->> +			~LANDLOCK_ACCESS_NET_LISTEN_TCP;
->> +	}
->>   
->>   	ruleset_fd =
->>   		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->> @@ -380,6 +397,10 @@ int main(const int argc, char *const argv[], char *const *const envp)
->>   				 LANDLOCK_ACCESS_NET_CONNECT_TCP)) {
->>   		goto err_close_ruleset;
->>   	}
->> +	if (populate_ruleset_net(ENV_TCP_LISTEN_NAME, ruleset_fd,
->> +				 LANDLOCK_ACCESS_NET_LISTEN_TCP)) {
->> +		goto err_close_ruleset;
->> +	}
->>   
->>   	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
->>   		perror("Failed to restrict privileges");
->> -- 
->> 2.34.1
->>
-> 
-> Reviewed-by: Günther Noack <gnoack3000@gmail.com>
+As in the example provided by Eric, please use Linux kernel C comment
+style, which places a space character between the * and the first
+character of the comment text on each line. For example:
+
+/* SYN eats a sequence byte, write_seq is updated by
+ * tcp_connect_queue_skb().
+ */
+
+For more information, see:
+
+https://www.kernel.org/doc/html/v6.11/process/coding-style.html#commenting
+
+thanks,
+neal
 
