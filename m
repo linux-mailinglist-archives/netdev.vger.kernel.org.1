@@ -1,124 +1,129 @@
-Return-Path: <netdev+bounces-132321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E36E0991361
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 02:08:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73E8E991369
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 02:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8E0284C87
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:08:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CC48281DB9
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F2E10F4;
-	Sat,  5 Oct 2024 00:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751FF7F6;
+	Sat,  5 Oct 2024 00:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QwXm5TQI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgAndE0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC64C9F;
-	Sat,  5 Oct 2024 00:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5DD182;
+	Sat,  5 Oct 2024 00:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728086880; cv=none; b=RFwVyn2+p2RSv3lZ/+NiQ7AKwKMnYoytW9G46KnB9jCdDbNTrSRq1ZemoM+LxP5a/FKr+kyOWHJML9s0MVu4oFDM6jIHQfGs91alfHQwbyS2f/LTGSDcLT2h766z5SmsCP4zuD9Qxb+qErqoMmNX4DkxFrcCD1he//KJ7/8OXP8=
+	t=1728087016; cv=none; b=Ucn7rOBZQRPDRoGPCKDadARpaO0YYD41rF4hlImoCYgXdoxF3N8VWTQoAiXqqaJ0CWPzeFNz09IeJJBikb7Kcc5MnlJY/VZX+aKpziNvMnpvPj9iVT6ZM2IYcGfCloxOsQ2o/uSkpLqLmQZXs6TOpoWkgjvNmKOUiXxHzPFozyo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728086880; c=relaxed/simple;
-	bh=+MfI7OYcWAd2dMDXZEx5YG70J88IUHYEYwpDpb4OTfw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jOUs5mkGm58iKzfJ322IAndukiF9r2Dgvg/1GJcvuzRq30r5onNK2jH0Vq7O9MqWTH15ed1IrWlT5UsRq7QWLM0UKp3SmoSm3DRWQLaHKTTzBMLwElmXUhqoBSw8AqVqVral3ujQO0UJ51kATM05QGc6lvmoYAEKdp0uE8mJHik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QwXm5TQI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 6066F20DB37A;
-	Fri,  4 Oct 2024 17:07:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6066F20DB37A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1728086878;
-	bh=LBnzr8OIIg6knuVrAj3ZPsyJbh5bMJgu1ZuS7jAuHyU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QwXm5TQI+PpevcOJwLiQCmf2iHFL2kqrYd0jPp70SOf4xm+OCFOAqJbgR3wBT8CJp
-	 R/gJF6q6xzALLspZdmutH4Q3khZWgia3ohn/0g5Qh3Q/lC0UNfd1K1IdM1Y6f4Suuk
-	 LDBu/TrXOY7jsq6vFSeig5g6GL1r0TQ5r0DbxDSU=
-Message-ID: <3b2e7170-1229-4981-8905-02b16bd2a85d@linux.microsoft.com>
-Date: Fri, 4 Oct 2024 17:07:53 -0700
+	s=arc-20240116; t=1728087016; c=relaxed/simple;
+	bh=Oysw3GmSjkXliwqin77coeu5Qk3hCFPcA5qwfGC571s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SXe4oqBoN7ZM2IwYqhyKlj+gP0vlsXBkj/EmAZGG2iOLBiT7fafVd6nVSogpAjWYeU6tTjOSQZmUFYRuX/ptJRxaM0vVeSc/e7ClJFPl3mg43b0PXK417gM/G/f/lRI+nNgLZm1J62uFWS8QWkqrC5ghjfcdw8AJyzlZZHFHX/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KgAndE0s; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-6e29c50ccbaso24794637b3.2;
+        Fri, 04 Oct 2024 17:10:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728087014; x=1728691814; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wm/s3gxkoXKwNy8dfoUH0qEU6KVqpLJ4tNBszctqB7c=;
+        b=KgAndE0sS9L2qqG2js7lSzMROt9TaO0tNouJWJQ4c02VXaasQ6tmPpaqZ8VYoTqfbW
+         R+t9Jgorf4Hi3idDfy0cdozq+wAUvIXAKRc7ckWXXJ2c3lHGaaxVCrh+E9JIFKZ3zLfb
+         px9E/Exkz24XhToUFKOqZVVhgOPGBtIVELqvtjjqcRiLhPqKSbZO+0y1unCERJA3TwuK
+         6NXIRLf8+VLpzeVgq6ZVjU0cMNE0hlbf7hpat0BfOWCe1eRNjAzKYGfuFvJek5dXgmrY
+         hYKWS79obTrPVwpV5UBSm/aaSQIaUPCAyO2aamQszZeYMlV1205LebOgCLSXDoHBanEW
+         gz0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728087014; x=1728691814;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Wm/s3gxkoXKwNy8dfoUH0qEU6KVqpLJ4tNBszctqB7c=;
+        b=mn+XKdlH0bCrBmpEUYhDr+TrfUFUs2CBukbHXCOq6rF6dK+rY4tMPzukrHdtvO7RJW
+         n+8jysYi0giXezyAeGjK3dCN2RsD7RVb6RzKcuLCKYBnWjexiTDEXQdhUbVOgTqnEZu2
+         aGv/A9vo9IpNu4rr1wHG/owEYmoPdWy16rKljet4LjnnASQDRolYtNw0mC4RpeaeZDRo
+         /opPjvVvUS1rcY0fk33boYFBz4w7wsZlUzjlleZuFytl3ouZCSf8ENJlhBMi7PK8dTDN
+         FQg9XOmD/hB0LjUMNxvAxYWClTLm93843KB2gaDe2fsx8mTQoh56NyTPIz+w7bRGI8yQ
+         yeWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcp4BJhuDv8LYkyNu4l19qw/e0Euuu0u8PWqdLv8IocarecfPOL26rhe5st8yZevrDgSU6TrwZi9Mda+E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHiPYneC+aPOY/Rt7P7TdRCDTfWe5J2SDOKjsvEbyqcWWV/2UD
+	ifhKeF9nyNEJolOVqwSgQFSyBHa1QVsD0vaXC4z1ibF4auW/KlDSHG3mgtiKwFEdl3Ud1KP5V30
+	TwBkqfvf4jHYz1/bLiXPS+bpyP/I=
+X-Google-Smtp-Source: AGHT+IH2GjzGfx+GBi1ipTVYrpLH6UYzc9FzIVcbPgsCTJwGem434ZRPPptXsE4vsyyWByosX8s6hi9WVuuoztdp1qE=
+X-Received: by 2002:a05:690c:dcc:b0:6e2:636:d9ee with SMTP id
+ 00721157ae682-6e2c724118emr49131117b3.9.1728087014016; Fri, 04 Oct 2024
+ 17:10:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
- Hyper-V code
-To: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
-Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
- kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
- luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
- daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
- bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
- jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
- mukeshrathor@microsoft.com
-References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
- <20241004155810.GA15304@skinsburskii.>
-Content-Language: en-US
-From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-In-Reply-To: <20241004155810.GA15304@skinsburskii.>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241003021135.1952928-1-rosenp@gmail.com> <20241003021135.1952928-4-rosenp@gmail.com>
+ <20241004163213.2d275995@kernel.org>
+In-Reply-To: <20241004163213.2d275995@kernel.org>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Fri, 4 Oct 2024 17:10:03 -0700
+Message-ID: <CAKxU2N9sFq-4fBVkePERTjKGCNOK3KsfziwShzHqtbszXH8omg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 03/17] net: ibm: emac: use module_platform_driver
+ for modules
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
+	jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net, 
+	chunkeey@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/4/2024 8:58 AM, Stanislav Kinsburskii wrote:
-> Hi Nuno,
-> 
-> On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
->> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
->> index 9d1969b875e9..bb7f28f74bf4 100644
->> --- a/arch/arm64/hyperv/hv_core.c
->> +++ b/arch/arm64/hyperv/hv_core.c
->> @@ -14,6 +14,7 @@
->>  #include <linux/arm-smccc.h>
->>  #include <linux/module.h>
->>  #include <asm-generic/bug.h>
->> +#define HYPERV_NONTLFS_HEADERS
->>  #include <asm/mshyperv.h>
->>  
-> 
-> Perhaps it would be cleaner to introduce a new header file to be
-> included, containing the new define and including <asm/mshyperv.h> instead.
-> 
-> Stas
-
-If I understand correctly, you're suggesting adding another stub named e.g.
-"hv_mshyperv.h", containing:
-
-#define HYPERV_NONTLFS_HEADERS
-#include<asm/mshyperv.h>
-
-Then in the roughly 24 places in this patch where we have:
-
-+#define HYPERV_NONTLFS_HEADERS
-
-Instead, we'd have:
-
--#include <asm/mshyperv.h>
-+#include <hyperv/hv_mshyperv.h>
-
-I suppose the current version is a bit opaque - it's not immediately clear
-why HYPERV_NONTLFs_HEADERS is defined, and that it must be defined before
-including asm/mshyperv.h - someone reading the code would have to go find
-hv_defs.h to puzzle that out.
-
-This improves the situation slightly by associating the #define with
-asm/mshyperv.h. I'll consider it for v2, thanks!
-
-Nuno
+On Fri, Oct 4, 2024 at 4:32=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Wed,  2 Oct 2024 19:11:21 -0700 Rosen Penev wrote:
+> > These init and exit functions don't do anything special. Just macro it
+> > away.
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > ---
+> >  drivers/net/ethernet/ibm/emac/mal.c   | 10 +---------
+> >  drivers/net/ethernet/ibm/emac/rgmii.c | 10 +---------
+> >  drivers/net/ethernet/ibm/emac/tah.c   | 10 +---------
+> >  drivers/net/ethernet/ibm/emac/zmii.c  | 10 +---------
+> >  4 files changed, 4 insertions(+), 36 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet=
+/ibm/emac/mal.c
+> > index d92dd9c83031..a632d3a207d3 100644
+> > --- a/drivers/net/ethernet/ibm/emac/mal.c
+> > +++ b/drivers/net/ethernet/ibm/emac/mal.c
+> > @@ -779,12 +779,4 @@ static struct platform_driver mal_of_driver =3D {
+> >       .remove_new =3D mal_remove,
+> >  };
+> >
+> > -int __init mal_init(void)
+> > -{
+> > -     return platform_driver_register(&mal_of_driver);
+> > -}
+> > -
+> > -void mal_exit(void)
+> > -{
+> > -     platform_driver_unregister(&mal_of_driver);
+> > -}
+> > +module_platform_driver(mal_of_driver);
+>
+> This is not 1:1, right? We're now implicitly adding module_init()
+> module_exit() annotations which weren't there before. Needs to be
+> at least mentioned in the commit msg.
+Sure. The prior commit removes direct usage by core.c of these functions.
 
