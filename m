@@ -1,149 +1,173 @@
-Return-Path: <netdev+bounces-132369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C819916C6
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:28:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 355679916D7
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36B141C21A5F
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:28:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C26FB22A33
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3D1158D79;
-	Sat,  5 Oct 2024 12:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3971531F9;
+	Sat,  5 Oct 2024 12:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mPCTYc7D"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PMs35McN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00757158A1F;
-	Sat,  5 Oct 2024 12:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982C814AD19;
+	Sat,  5 Oct 2024 12:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728131200; cv=none; b=Id/WQaf81HBUnoZux11zl8WFL2QGS/C+cWao8Ynvf4P5pjHDinRTqhNxrS5h2xb7AGv8qE5y+uKYuvnP3ADcIVkMvVeYv+RM8FvMf56TZy4vOmVajjn1fPmOdTPMKq9AQHdSIf/3mmWjipKVBGFCFXOEBHb+K2vuPxMPRSGAoko=
+	t=1728131952; cv=none; b=EGmyP0PvxhYREN5PCTFySf4mxnYslir6XbC/iO6SwJdYzy7/+VFWYmiknIBsxkbKtMVO4NrA/Lc09rkg9+UK+776fOHgN5TaVTB7XX4LCaHNu4CR1lfdtCU0ECeRZg3jSA7KltajMok1ml0ef9jshY8eLWtlQYApITWQk20MinQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728131200; c=relaxed/simple;
-	bh=fqFACiSqMZBgnX0/lu/Hs1iRXNUzcVy+wdWJ8PqhZLU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OdZcdnjpgyhnrhRYuWsFs6sslrbAMQL0S58bUkApsZ+XgXqeqbMfB11hf10AxlAi2plNEZbRD2dszHZURBh9J6OKGDH+CXzVRSgAIVLzFMv6nnVmlJyQoyNkvP8nDdBxX8+WAejRLLyLjwk8irfjVZFQ1b17FDwrgjB/0p9sIV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mPCTYc7D; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1728131952; c=relaxed/simple;
+	bh=YNm3x+D/+uR/yV1OSOY9lGo7cThaljvjLDn81E+MKfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lPuvinjrVOwvi6lNfVsAKiUi4CZKoVFUQ2uiUwCsSgqHv7uxfEhCi4jd4iSA1TKuVdow4GJYC7YZQBJ1BaBmAreoScjrosYC+MF67QpEno1WGdvCluAYM+BI5HSWkA9UkAYcQgWLkIKHDLWbyUkubEnE3uUu4aA3knm6+7Y8nPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PMs35McN; arc=none smtp.client-ip=209.85.210.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71de93c918cso1103068b3a.0;
-        Sat, 05 Oct 2024 05:26:38 -0700 (PDT)
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-7179069d029so2310698b3a.2;
+        Sat, 05 Oct 2024 05:39:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728131198; x=1728735998; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XdkX6wuCkXTawGfq5yedKZKwPh+awCwS1ZCSgtCWaZg=;
-        b=mPCTYc7DPzBBAFJgGqZmI5y5b4f1Us9EJkNuZPb8hAdK23zBTPfC2/U/QYBAo7LeeI
-         hgounnmrLHkZ3WRLySuBFtUasLRAJIR6ZeLQcd6OCJXpJLK0J3fzd1ium+ZMwpeFSROf
-         B8GMFTmD2l+Np8MgZeGQFg7DPGowPADcvvWXDdlHgx0GUcxTMWdLfy7az2SIJohal5x6
-         UioFC5DBJTDuEf1q2rO0YqiieLOCD0U10nPKTMZktFYu9FALRyQRKmKA5w/qktrHnCq4
-         jVOoamKewe9bz0ACllT8BPNrJr6T6a0IURSujlczPqVjFxEG6LAFqduLuwsTgXZzp0KI
-         la3A==
+        d=gmail.com; s=20230601; t=1728131950; x=1728736750; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YbmQWqwf8KLWBh53BpLjJjepp8M5DqLAMepSsUrr8/A=;
+        b=PMs35McNWB15k7nicCSjjbeVhDSdcypBjCHkHQHnx2UOwG+/xBcGjLgjuX/4+Ty4zL
+         h4zetdTGjh+NLa2Un6mS4lwD57nS7XOC2RNnmpTLax4y9jRcd3AjsUhHaiAeQNjWAvef
+         1iuolrKGxvfZRQVoDsk8bRgupkmHcsCY9Vq7EolgnaTkDoiRc9Hldh2k0UunJm377tkQ
+         GJny1GpMRBDO3/cafD5NEBc6Iy6MFSVTDfbqoAIm5YVroWM37ylLjwapMDCmD0xO/Luy
+         AUW/K+3K+XpH0peCFGJOvexBZnGb+0Tp7BEi2BUs74HoSUg0N1pU++oxD49vzHkVmwwB
+         v0VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728131198; x=1728735998;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XdkX6wuCkXTawGfq5yedKZKwPh+awCwS1ZCSgtCWaZg=;
-        b=XXY3ENjv1NGlcuLXOYkINO1nl74YwCYcbVUPzJ3ipZtWov7nOBeFSnCMGAr2kl+AfC
-         6AyGLDM3RjJxhf2ou7gm9ZH//SYV5aDrzOqfoPykgkM5RBgdKp/taDGbsFlcUCHbjdwt
-         Kjc9zkV9T0cwInjS+S7VjuK/XsfTJeMrHZtkia95/pJjKcjgiZTPQ0aefQrikiopavE5
-         ZqTDN6CHm7U607l2R25YVTOils1jw+8B0U1XZ1gxUFtmNVYZI15glBDH6qoCEHTynSA7
-         8trIlaBdwpuCiXxcwmOkpH4vwtkiwgQ5pVXEzp0pcLpD2otPAeCWWuKirSG0Yv7vfqp1
-         +AyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUf38y+m/bA2Useul6qCZoD9laeCk72N7uFpqsJvgZED7ueywFGF4/WqF869VU5DR8RT882mjUdw3syiag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKrnNXXRmiYIOYGz6y08/EW44tNghOFmlYu0xCh2TcUk7T+oGg
-	CEiJefPYhQxKPtVS+xIyev6LESPIiipGKajuByuv7ukoo9Fd+BVF7TUzzgnJ
-X-Google-Smtp-Source: AGHT+IFZZxrOV3jNdJQFi3xVOSpRCRDXWy+64wpkzTQY+OA+CMx4Xc/JuC5z4UHhSJ6BHkfOpK/VtA==
-X-Received: by 2002:a05:6a20:c70b:b0:1cf:e5e4:a24e with SMTP id adf61e73a8af0-1d6e03732e2mr7755425637.16.1728131198157;
-        Sat, 05 Oct 2024 05:26:38 -0700 (PDT)
-Received: from mew.. (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cd08besm1397878b3a.79.2024.10.05.05.26.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 05:26:37 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: netdev@vger.kernel.org
-Cc: rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	tmgross@umich.edu,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me,
-	a.hindborg@samsung.com,
-	aliceryhl@google.com,
-	anna-maria@linutronix.de,
-	frederic@kernel.org,
-	tglx@linutronix.de,
-	arnd@arndb.de,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 6/6] net: phy: qt2025: wait until PHY becomes ready
-Date: Sat,  5 Oct 2024 21:25:31 +0900
-Message-ID: <20241005122531.20298-7-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241005122531.20298-1-fujita.tomonori@gmail.com>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+        d=1e100.net; s=20230601; t=1728131950; x=1728736750;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YbmQWqwf8KLWBh53BpLjJjepp8M5DqLAMepSsUrr8/A=;
+        b=UbvxvuxZa0qsJ7Rxgkxriv65PQHnSSUkQXygfhvzHEoopJvgpWnOrv9QuqUTewCXId
+         sCUvIPpTwLLGmGU7iPtOthjor6U7aOx7l+R+TzvtHkQiym0qnTXpXtCHjBvoyNb0vgeD
+         Ob702YK+UBHVIPTKhcySaQrz7JpkApHjYVIg36X28SPaSK9scUUjzIQvrmO5wXzrTG2h
+         S+b/QDv0MGAqR308Iu6fvJS6SMd62XSUxlmWU3Ei2Jtb/IB+gSnxlCGB8t1A+Q5KgWCE
+         cb+FKp5GoxP48ox0CF/ZnkMpgWB7QScwyaUU5yE2kR8n4zinYxMlAZSaAOjwh/qWhxxy
+         OVQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIUht/2HdDXFoRe1cBfgjuUg4xD1tXRCQCLePozHDClZ9FR+C2/jXhurhhzZK9/TumSGChXSoR@vger.kernel.org, AJvYcCUppHcAPkCJ5LDL3dPO7SOTmoHrCQOO5Z7pWqbc6BJZpUUVyfGMSSF2ZvqesFShQXPwA88=@vger.kernel.org, AJvYcCVRM77xwL7GJ/2X39fLG9EwrwPU8ZPFAfnGUfzPrsjdZSp4ct+0HybxXBUTqf1uI5lJpHPFeSD2ceZjSg==@vger.kernel.org, AJvYcCWEMcljify8xelvcV36k/QbrQ/2vR8ZUCJ95sxJOg0K9yeHb9ZXAExO9/+nCoyQJH4uK/M28uAoGu17mmKYJBI=@vger.kernel.org, AJvYcCXKt/WP1EDjEsOIiGJPsb5IzwgUTdfAVDkD/TTZeignWw1wJPChsAw4PucIQkOBklqBPZx6tan8k5m10kx0@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGLJauWuWbHekKar0Ear4vjKKbtcC4ZW5j1xrP/rVhFYKD2WNc
+	LGT+ajau8xji7+yNPAFrrCCxWoXe2vzz6JpjYKt8V2FHQbW5Owif
+X-Google-Smtp-Source: AGHT+IH7TZfPKkqMhF7jhMgZXtf7Pauw1fuqlg17S6ZMnwvz+3KYrvO5e1eqHcfYjc/CJowJUAwQhQ==
+X-Received: by 2002:a05:6a00:9a1:b0:70d:3337:7820 with SMTP id d2e1a72fcca58-71de23c72ecmr10006756b3a.8.1728131949813;
+        Sat, 05 Oct 2024 05:39:09 -0700 (PDT)
+Received: from ?IPV6:2409:8a55:301b:e120:3c3f:d401:ec20:dbc7? ([2409:8a55:301b:e120:3c3f:d401:ec20:dbc7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cd3983sm1408702b3a.87.2024.10.05.05.38.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 05 Oct 2024 05:39:09 -0700 (PDT)
+Message-ID: <6cb0a740-f597-4a13-8fe5-43f94d222c70@gmail.com>
+Date: Sat, 5 Oct 2024 20:38:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Paolo Abeni <pabeni@redhat.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: liuyonglong@huawei.com, fanghaiqing@huawei.com, zhangkun09@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+ Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>,
+ Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
+ Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Andrew Morton <akpm@linux-foundation.org>, imx@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-mm@kvack.org, davem@davemloft.net, kuba@kernel.org
+References: <20240925075707.3970187-1-linyunsheng@huawei.com>
+ <20240925075707.3970187-3-linyunsheng@huawei.com>
+ <4968c2ec-5584-4a98-9782-143605117315@redhat.com>
+ <33f23809-abec-4d39-ab80-839dc525a2e6@gmail.com>
+ <4316fa2d-8dd8-44f2-b211-4b2ef3200d75@redhat.com>
+Content-Language: en-US
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <4316fa2d-8dd8-44f2-b211-4b2ef3200d75@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Wait until a PHY becomes ready in the probe callback by
-using read_poll_timeout function.
+On 10/2/2024 3:37 PM, Paolo Abeni wrote:
+> Hi,
+> 
+> On 10/2/24 04:34, Yunsheng Lin wrote:
+>> On 10/1/2024 9:32 PM, Paolo Abeni wrote:
+>>> Is the problem only tied to VFs drivers? It's a pity all the page_pool
+>>> users will have to pay a bill for it...
+>>
+>> I am afraid it is not only tied to VFs drivers, as:
+>> attempting DMA unmaps after the driver has already unbound may leak
+>> resources or at worst corrupt memory.
+>>
+>> Unloading PFs driver might cause the above problems too, I guess the
+>> probability of crashing is low for the PF as PF can not be disable
+>> unless it can be hot-unplug'ed, but the probability of leaking resources
+>> behind the dma mapping might be similar.
+> 
+> Out of sheer ignorance, why/how the refcount acquired by the page pool 
+> on the device does not prevent unloading?
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- drivers/net/phy/qt2025.rs | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+I am not sure if I understand the reasoning behind that, but it seems
+the driver unloading does not check on the refcount of the device from
+the implementation of __device_release_driver().
 
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 1ab065798175..b5925ff9f637 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -12,6 +12,7 @@
- use kernel::c_str;
- use kernel::error::code;
- use kernel::firmware::Firmware;
-+use kernel::io::poll::read_poll_timeout;
- use kernel::net::phy::{
-     self,
-     reg::{Mmd, C45},
-@@ -19,6 +20,7 @@
- };
- use kernel::prelude::*;
- use kernel::sizes::{SZ_16K, SZ_8K};
-+use kernel::time::Delta;
- 
- kernel::module_phy_driver! {
-     drivers: [PhyQT2025],
-@@ -93,7 +95,14 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
-         // The micro-controller will start running from SRAM.
-         dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
- 
--        // TODO: sleep here until the hw becomes ready.
-+        read_poll_timeout(
-+            || dev.read(C45::new(Mmd::PCS, 0xd7fd)),
-+            |val| val != 0x00 && val != 0x10,
-+            Delta::from_millis(50),
-+            Delta::from_secs(3),
-+            false,
-+        )?;
-+
-         Ok(())
-     }
- 
--- 
-2.34.1
+> 
+> I fear the performance impact could be very high: AFICS, if the item 
+> array become fragmented, insertion will take linar time, with the quite 
+> large item_count/pool size. If so, it looks like a no-go.
+
+The last checked index is recorded in pool->item_idx, so the insertion
+mostly will not take linear, unless pool->items is almost full and the
+old item came back to page_pool is just checked. The thought is that if
+it comes to this point, the page_pool is likely not the bottleneck
+anymore, and adding infinite pool->items might not make any difference.
+
+If the insertion does turn out to be a bottleneck, 'struct llist_head'
+can be used to records the old items lockless for the freeing side, and
+llist_del_all() can be used to refill the old items for the allocing
+side from freeing side, which is kind of like the pool->ring and
+pool->alloc used currently in page_pool. As this patchset is already
+complicated, doing this makes it more complicated, I am not sure it is
+worth the effort right now as benefit does not seem obvious yet.
+
+> 
+> I fear we should consider blocking the device removal until all the 
+> pages are returned/unmapped ?!? (I hope that could be easier/faster)
+
+As Ilias pointed out, blocking the device removal until all the pages
+are returned/unmapped might cause infinite delay in our testing:
+
+https://lore.kernel.org/netdev/d50ac1a9-f1e2-49ee-b89b-05dac9bc6ee1@huawei.com/
+
+> 
+> /P
+> 
 
 
