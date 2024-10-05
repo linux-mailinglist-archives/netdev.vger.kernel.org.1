@@ -1,172 +1,180 @@
-Return-Path: <netdev+bounces-132347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAD05991510
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 09:25:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FAF991521
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 09:46:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49C5E1F2385E
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:25:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C0841F235B8
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CC713213E;
-	Sat,  5 Oct 2024 07:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873D78615A;
+	Sat,  5 Oct 2024 07:46:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DnmyLUAS"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1RbpHHJL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAmBCXOT";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="1RbpHHJL";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gAmBCXOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805F634CC4
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 07:25:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA3D535D8
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 07:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728113105; cv=none; b=SFufHcA4rvNa2lZ3v4VI86UjfhzCxJN+HGBGlVJQh2eqEVqAAdJ1fS3uxPoCAgsjj9EKSZJnQyM6TNJmLKEckLo2zYLyS2O6zirNq14AwvahjXvX8QrjGgxaTodVPrtWzZZAyRlHzIAYqTeTjrwPk0+S5cnWDJHQFfbN28zS8Es=
+	t=1728114394; cv=none; b=NWs22z5X4CSRMdFMLHEyS/qIHwGku/Pb7hwuw8981g2Du/odD8/NLYYWwVDPOGVQww00d1oayg9HkkHhBg0lvHM3o98iMMprkvtdZ4le4Nh160o+euO2jIKLvqvFeG12fFQyxlDqOMWkZzq0kJasfaLPl67QqwTSfwkwDTo96sU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728113105; c=relaxed/simple;
-	bh=LZP3cKWhrMtVWggYSaZ5lPkhhsFQoozJYP5JsxhK/ZY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VFIntU+NckrkAtiMRhJug2+goY6HsZ9wqTxOn0oJnHA5bGcJmByu1tGt5DOi3Mquyd9605mZyzn1a1AhyTKH+fpXo1UKaYQUCOjxjIkJ6qtSdU+iKawyE6g1ZFn2y/89vlcX+wdwdNY7DWO9BFCBP6zC6mfDCH0mSeEFoQhr5WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DnmyLUAS; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c718bb04a3so3600488a12.3
-        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 00:25:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728113101; x=1728717901; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2ikQ40FBna1IlLDCWeyjwiV3mN+L8sM+RPl/YRXKiU4=;
-        b=DnmyLUASRzRM6rexYpA9uyCS0zu/1aPGh1ko27H+2ilt0HqKhxIjhUMqI2cim0vPY9
-         UoJjxcykt9BT6K9EzU+29pN4blumIpn3qyKFsBQk+4qx52bYPn8rVfos0k0I8qPBz5mR
-         uYRBAaDuLdUHVjin5djtoVpeLwfMyrnqCinJpXf5ACCigSb1/BQzCv8sopGwilUi25bN
-         SlqqyCiYFm3VLeewM9tKXPh7WLlv7FXPeqEEe3MlUXePGrYQ5zRniqwXsALPXimiB5JK
-         sRh/jeP2evnPMM1IxVuDhDa+c9C2JLCIZneLR5iUKGzOe/JbH3u01By/UDhUccBdzCqV
-         Eq/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728113101; x=1728717901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2ikQ40FBna1IlLDCWeyjwiV3mN+L8sM+RPl/YRXKiU4=;
-        b=L8Zre6fLJrlKf1gOKTWB0hSDlGAe5KlJ+DDMOWSmpM0fvsq59C3y1FpVVMamRzz0jp
-         ZuUrHWIjrTqs8Vj3cPG6Wvcj3UrLW/tNgjqJYoyFafFgdxLyXYFotuqshEj7Eo/V+ASk
-         4kG1SRt/sYbEpErIdqVgYkZ4uni0xhC+MLhQ1fiYlCuVVUuZXQyv3MCkT93apfQGL+Aq
-         lyh+NUdOeUPEudGOPN7Xz+M0LBfLB7uBR2aCxpzaIEWaMJJ/rrw0pX84QqnSh6Axd31r
-         wQZlxRmzOCUVulPmGelt72ibFLxqP5EfY8Jyx535H0A+7+edBjmjYy6/dgq+odbmyVFI
-         EbjA==
-X-Forwarded-Encrypted: i=1; AJvYcCW7Ig87DGIEkF8HsrefKZQllj4wWXyBlrcI47w2LIiUlKRtOmKtlhLg0Fc+sbViaeBaEogvoFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywcc6c8C2F1xGEQ7+tV2/8VdikRFOtePnOThzyDHNWvV0Yogi9L
-	0zGAqm3yoWIELX1zMQFdNz7LKLyfDGfLU9d0sEn0Pdxpu91r0jbq4qeuJlZ4FT75tju+EnJD3eX
-	qIQAarC5e1NhuuZq1IJCOCY7Y1rgRpO3jNrzz
-X-Google-Smtp-Source: AGHT+IEQKa1JryxdMCVct2cTTMuXcaAPe8j51D5Dn7yAGDshcgihBva2hIqdYPSyOKDbek9Apj+LguKnUJFkN2NS0PE=
-X-Received: by 2002:a05:6402:4486:b0:5c8:79fa:2e4f with SMTP id
- 4fb4d7f45d1cf-5c8d2e9e7bdmr4262712a12.32.1728113100579; Sat, 05 Oct 2024
- 00:25:00 -0700 (PDT)
+	s=arc-20240116; t=1728114394; c=relaxed/simple;
+	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXKsfC8Yy7q48J8yrFACsJJA97gSdexTnsbXz6UUaqg3g90AnGg6UwBk728YKdUN01mXDVnl8nEc33PthbSN05RyKH6Nez4iUF2K2E/j3bpWgd3p/1dEU8nPzm0QUULrN16fH+kOMB3NQOYdUSkEa2phlwuTRmHs6hlwIuPvwzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1RbpHHJL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAmBCXOT; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=1RbpHHJL; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gAmBCXOT; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E1DD41FE45;
+	Sat,  5 Oct 2024 07:46:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1728114389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
+	b=1RbpHHJLzoQg22Y9hTMok/AeUasaESQpa3Ay8GFKZyjmYv6RL8g/88HuNU4CWybizspO4f
+	3nU2xWzrafS2v4lXD4c/84D9Pz2AzKJ9ZC9TRV+jwZINi65Z7wqBYDXSPlqssBkk2WSvct
+	b/gWeNvpHA4FAHRlPcUlIxfGVFliE5A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1728114389;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
+	b=gAmBCXOTkzgom+4PyMk6bfYN6Iknorlr/c1cz4BH8XYH4bsAaBx4JJY6GlCZZz8rjWCdwo
+	SwQfoohw/C/EVlAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1728114389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
+	b=1RbpHHJLzoQg22Y9hTMok/AeUasaESQpa3Ay8GFKZyjmYv6RL8g/88HuNU4CWybizspO4f
+	3nU2xWzrafS2v4lXD4c/84D9Pz2AzKJ9ZC9TRV+jwZINi65Z7wqBYDXSPlqssBkk2WSvct
+	b/gWeNvpHA4FAHRlPcUlIxfGVFliE5A=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1728114389;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kF4PS3LZjE+vxKJ03I01bzMFEJyYurQgropPZ5p/q4w=;
+	b=gAmBCXOTkzgom+4PyMk6bfYN6Iknorlr/c1cz4BH8XYH4bsAaBx4JJY6GlCZZz8rjWCdwo
+	SwQfoohw/C/EVlAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C58C713A8F;
+	Sat,  5 Oct 2024 07:46:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id XHcwL9XuAGdKGAAAD6G6ig
+	(envelope-from <mkubecek@suse.cz>); Sat, 05 Oct 2024 07:46:29 +0000
+Date: Sat, 5 Oct 2024 09:46:22 +0200
+From: Michal Kubecek <mkubecek@suse.cz>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	"Mogilappagari, Sudheer" <sudheer.mogilappagari@intel.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH ethtool] netlink: rss: retrieve ring count using
+ ETHTOOL_GRXRINGS ioctl
+Message-ID: <lxkqtnik6q6xjpjhgmy4kwbbsgtxwa7mszz7gcv3i2aafhkx4n@tdudjcsuxg7z>
+References: <20240913093828.2549217-1-vladimir.oltean@nxp.com>
+ <IA1PR11MB6266964963DBC6242C5CC6DEE4652@IA1PR11MB6266.namprd11.prod.outlook.com>
+ <20240913224858.foaciiwpxudljyxn@skbuf>
+ <IA1PR11MB62661EF398124FC523CC3C03E4652@IA1PR11MB6266.namprd11.prod.outlook.com>
+ <45327ee6-e57c-4fec-bf43-86bd1338f5fb@intel.com>
+ <20241003091810.2zbbvod4jqq246lq@skbuf>
+ <dcdnyuvjksvebfgcavogszlcoro3gwinzc6fzfjjtijadyg3km@7spc2j4v2ci6>
+ <20241003134916.q6m7i3qkancqjnvr@skbuf>
+ <tctt7svco2xfmp7qr2rrgrpx6kzyvlaia2lxfqlunrdlgjny3h@77gxzrjooolu>
+ <CO1PR11MB5089C7F00BCDDCBB678AF260D6722@CO1PR11MB5089.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005045411.118720-1-danielyangkang@gmail.com>
-In-Reply-To: <20241005045411.118720-1-danielyangkang@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 5 Oct 2024 09:24:48 +0200
-Message-ID: <CANn89iKk8TOvzD4cAanACtD0-x2pciEoSJbk9mF97wxNzxmUCg@mail.gmail.com>
-Subject: Re: [PATCH v2] resolve gtp possible deadlock warning
-To: Daniel Yang <danielyangkang@gmail.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
-	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qvqquxe2qllzzhp4"
+Content-Disposition: inline
+In-Reply-To: <CO1PR11MB5089C7F00BCDDCBB678AF260D6722@CO1PR11MB5089.namprd11.prod.outlook.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.90 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.991];
+	RCVD_TLS_ALL(0.00)[];
+	TO_DN_EQ_ADDR_SOME(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	RCPT_COUNT_FIVE(0.00)[5]
+X-Spam-Score: -5.90
+X-Spam-Flag: NO
 
-On Sat, Oct 5, 2024 at 6:54=E2=80=AFAM Daniel Yang <danielyangkang@gmail.co=
-m> wrote:
->
-> Fixes deadlock described in this bug:
-> https://syzkaller.appspot.com/bug?extid=3De953a8f3071f5c0a28fd.
-> Specific crash report here:
-> https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D14670e07980000.
->
-> This bug is a false positive lockdep warning since gtp and smc use
-> completely different socket protocols.
->
-> Lockdep thinks that lock_sock() in smc will deadlock with gtp's
-> lock_sock() acquisition. Adding a function that initializes lockdep
-> labels for smc socks resolved the false positives in lockdep upon
-> testing. Since smc uses AF_SMC and SOCKSTREAM, two labels are created to
-> distinguish between proper smc socks and non smc socks incorrectly
-> input into the function.
->
-> Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
-> Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-> ---
-> v1->v2: Add lockdep annotations instead of changing locking order
->  net/smc/af_smc.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
->
-> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-> index 0316217b7..4de70bfd5 100644
-> --- a/net/smc/af_smc.c
-> +++ b/net/smc/af_smc.c
-> @@ -16,6 +16,8 @@
->   *              based on prototype from Frank Blaschka
->   */
->
-> +#include "linux/lockdep_types.h"
-> +#include "linux/socket.h"
->  #define KMSG_COMPONENT "smc"
->  #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
->
-> @@ -2755,6 +2757,24 @@ int smc_getname(struct socket *sock, struct sockad=
-dr *addr,
->         return smc->clcsock->ops->getname(smc->clcsock, addr, peer);
->  }
->
-> +static struct lock_class_key smc_slock_key[2];
-> +static struct lock_class_key smc_key[2];
-> +
-> +static inline void smc_sock_lock_init(struct sock *sk)
-> +{
-> +       bool is_smc =3D (sk->sk_family =3D=3D AF_SMC) && sk_is_tcp(sk);
-> +
-> +       sock_lock_init_class_and_name(sk,
-> +                                     is_smc ?
-> +                                     "smc_lock-AF_SMC_SOCKSTREAM" :
-> +                                     "smc_lock-INVALID",
-> +                                     &smc_slock_key[is_smc],
-> +                                     is_smc ?
-> +                                     "smc_sk_lock-AF_SMC_SOCKSTREAM" :
-> +                                     "smc_sk_lock-INVALID",
-> +                                     &smc_key[is_smc]);
-> +}
-> +
->  int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
->  {
->         struct sock *sk =3D sock->sk;
-> @@ -2762,6 +2782,7 @@ int smc_sendmsg(struct socket *sock, struct msghdr =
-*msg, size_t len)
->         int rc;
->
->         smc =3D smc_sk(sk);
-> +       smc_sock_lock_init(sk);
->         lock_sock(sk);
->
->         /* SMC does not support connect with fastopen */
-> --
-> 2.39.2
->
 
-sock_lock_init_class_and_name() is not meant to be repeatedly called,
-from sendmsg()
+--qvqquxe2qllzzhp4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Find a way to do this once, perhaps in smc_create_clcsk(), but I will
-let SMC experts chime in.
+On Fri, Oct 04, 2024 at 07:19:24PM +0000, Keller, Jacob E wrote:
+> I have no objection to your patch, I think its correct to do now. My
+> suggestion was that we can improve the netlink interface for the
+> future, and I believe we can make ethtool continue to use the existing
+> ioctl interface on older kernels, but use the netlink interface once
+> its available.
+
+This is not the problem. It's what we have been doing since netlink
+interface was introduced and it's what we are going to be doing for
+quite long.
+
+What I'm unhappy about is the mix of netlink and ioctl where we use
+netlink request for RSS but also an ioctl request to get the ring count.
+I can't help wondering if it wouldn't make more sense to fallback to
+ioctl fully unless we can retrieve full information via netlink.
+
+Michal
+
+--qvqquxe2qllzzhp4
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmcA7skACgkQ538sG/LR
+dpVliwf+Lcmiq82XZztnVs66DnEKQ6CPnLBf2wl0AEJo5Xa2Q/BZTXUDwwSlOlEM
+HhyL7IEarFmZkFg8W1m5z9CqqGYNkv6i4Qd4uuXTaL4JcFuYVpqYqEFU0z3bs2u0
+KvQCzOmd/tze8lnj9Hbbtrb2Y10hitoJcc7k1d1McHYL02WMZ4/japRERUtpfkGg
+fbmzT5Ja1oyK4XbCBsoL02jkI1DiYhxKESciXI6cVmB2b+4ve7TZs5gCDysRtiAB
+UKc7ZFuAqfpZ2MFDHdnY0IZgfMX5WcItYS/NKOVNP5+wn1ApyazVmgqp189FMC39
+0OgjolwgCrNjsONmnz7nGWQWDRqWYw==
+=gGEu
+-----END PGP SIGNATURE-----
+
+--qvqquxe2qllzzhp4--
 
