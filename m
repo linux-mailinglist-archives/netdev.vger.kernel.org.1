@@ -1,214 +1,130 @@
-Return-Path: <netdev+bounces-132407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8900C991894
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:57:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B907799189D
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:59:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1496F1F227F5
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:57:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9CAD1C21101
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91AD1586FE;
-	Sat,  5 Oct 2024 16:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jDjC2eJM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0CB1586CB;
+	Sat,  5 Oct 2024 16:59:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9241581E1;
-	Sat,  5 Oct 2024 16:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD9215531A;
+	Sat,  5 Oct 2024 16:59:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728147448; cv=none; b=QL5x+Zx+FLNrpQh/XFRYRQOpFHvwVfa1gNA8m2/SW9P7Tu90WbUSb2wYl2nGCwheNT5h/yED6GoK93ZXxSpLoqnfRHeoyhKpZ+J9EQJkUkdyEGAChiinkbu1pD69h2teEE+AH04thGeKjyHBARoTSNtz3xKH4Ah98K4W3svEGLA=
+	t=1728147561; cv=none; b=rZ65oT6Ua1c33+85GAlGkgj2JHOFd0Bc5+sTkrNr+PpaHtL+kd/5zm/gULRiSiMx9XxPbATz4TIaJKmlpJ0ZEhRxwp3WRhWWBZOP9Cdj321E2PZLz6tlB1PSVeQvhPm35C6EdWOOT1MDXOlCOICFC3X1U6eIh5oHpUBWWSepqok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728147448; c=relaxed/simple;
-	bh=wlcdioYOW2Kr4D89kdl4eY+lEskCFiz3bWWyUXcxslg=;
+	s=arc-20240116; t=1728147561; c=relaxed/simple;
+	bh=K+d+p5QqIfVdqp85SspcQuxl+jVmdiqeQ1RiL0GZcAQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbMMZy40SKtcyBsAfDhkRNIapgkNPKxv7tJMZRWJGgjA3mLRNuLI6jsybEcyj2WYanT0iF1UF8YPq8816NtvKl9Eu7mtSHGghcBjodgmR+2ccMmuZcha4lP+Gqn2gZ6yIRbjVbwSDNETepN3YGm0MnqVGWlgu5XLWqqzQsk01Sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jDjC2eJM; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a98f6f777f1so411451966b.2;
-        Sat, 05 Oct 2024 09:57:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728147445; x=1728752245; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MSeTJd9jkaOjgipXSkW43JYFmtYMXXveHmjg3KNv1DY=;
-        b=jDjC2eJMupfuQbTBydTJ5++iuXvSsejNYw52rsAXNdjCZU8hWkxDqNJtkZHDIgThio
-         zoxoYvdPr4n43bFM7h+8WX/Wju6x+8qjr2sS6Qldla+tVt9G1rQyjyiO4m5XvhaR7fKy
-         KMxUBQ8ZOhhWWRZFeewu9gFJY5iI3An1bZTaQgkeRktf2HyzmWKX1WpIXwXqcwFg9j2J
-         o+3TCgMuA5dZA+MUB5+4XaVtplZOBAmpL5AbS6GSzavP762VykxP/mtWXc4AddsZWlg4
-         GAse68YL8pHUPTvEI/m9Jn57xKE10cGQCYIOt9qbrEWL6g2FVvbO4t6Ec37W4FlbIpTw
-         7g8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728147445; x=1728752245;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MSeTJd9jkaOjgipXSkW43JYFmtYMXXveHmjg3KNv1DY=;
-        b=fmOvBalxh67sDT9QXC+iGb1NidtURBZEIR68eEJJG8492CmAJuoRQoPeY01ZeMvIxc
-         IurABy7eDPiOPlmNtuhbSdBvxdmk3Dx8FiHFLOccxym+QyrKdqR3i8IZ/WcIvgX/P0r9
-         pzHOXbJw0YIZnMAWLd1MMvme3zo5Ya84CXdVhcGBebORMHHwWBwPoGEk4OmB0+wkSWdD
-         qkqC0ErENZ62R+IdsJKqW6x03Owk/JCezV10WvfldncP4wYq1p/cdC0OaS/4FDYPfsWJ
-         I4EYm0VpDlScIICKZdJP+D+KVWdJsBDN+gkJVTJOVvAj102yZWzcNTNI9FwcTkc3WLFQ
-         HIAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWXSF0CM7kM5l3tPiGYC085Kr1yAbsyCSuYJShIpupO4vvFkbnINNokefip2H9EPjXjPOAm/fs6S18hCGuGqtB@vger.kernel.org, AJvYcCVQsndj46xcYMwR3aQEg8fksnyWmm7be7r18hK1KLEutyb4gxjH7nmYS76VKrw2HLcub/DFe5lW@vger.kernel.org, AJvYcCWjvFJWrVAhwtYkclwjgGvjs1z2U7POsJpI1HUkbGdDDzbS6j++DXau03YKDQWBrBvjzhCtXqsADp3cMoo2noGwEglQi70=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk3VBQRe5QynqOmR39MSiGnlKKa0CLwo8eEH5WeveUtSbChk+J
-	HPSdJXe8z1EBmA5Q4y33XgLVWRcwagwTiJwQQTzhxExkKaHt59Mt
-X-Google-Smtp-Source: AGHT+IHSRdtSkX09+NIKnLFVTlBJ8EfB5bPMeacHe3SGg6lgAWnNOTlZunGTLAhyTEa/r5ZHE6wbDg==
-X-Received: by 2002:a17:907:608a:b0:a7d:a00a:aa02 with SMTP id a640c23a62f3a-a991bd05705mr655075966b.1.1728147445371;
-        Sat, 05 Oct 2024 09:57:25 -0700 (PDT)
-Received: from localhost ([2a02:168:59f0:1:b0ab:dd5e:5c82:86b0])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9937e58499sm114014266b.38.2024.10.05.09.57.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 09:57:25 -0700 (PDT)
-Date: Sat, 5 Oct 2024 18:57:24 +0200
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v2 9/9] samples/landlock: Support
- LANDLOCK_ACCESS_NET_LISTEN
-Message-ID: <20241005.92cff495291f@gnoack.org>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-10-ivanov.mikhail1@huawei-partners.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H48FAWb5hPgKAN2lMuhlAL9WnHNtq62MObtjrV6fkFDggbDoyzOgwiPg4VAc25A/yeO7kqjzOCjEuTwwPTIapHFVhUlTiys2X7km7RMsmXwePt0cDpc4/U3KspEBy5L48mg9GGuNXpcgbj4amFhZvoQsNfsJB/IyicTm2kab488=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sx87c-000000004DW-3Qqy;
+	Sat, 05 Oct 2024 16:59:12 +0000
+Date: Sat, 5 Oct 2024 17:59:08 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: phy: always set polarity_modes if op
+ is supported
+Message-ID: <ZwFwXBbMFeIZNntQ@makrotopia.org>
+References: <473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org>
+ <5c821b2d-17eb-4078-942f-3c1317b025ff@lunn.ch>
+ <ZwBn-GJq3BovSJd4@makrotopia.org>
+ <e288f85c-2e5e-457f-b0d7-665c6410ccb4@lunn.ch>
+ <ZwFggnUO-vAXr2v_@makrotopia.org>
+ <2b6f2938-12de-4ebb-9750-084de5d2af0b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240814030151.2380280-10-ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <2b6f2938-12de-4ebb-9750-084de5d2af0b@lunn.ch>
 
-On Wed, Aug 14, 2024 at 11:01:51AM +0800, Mikhail Ivanov wrote:
-> Extend sample with TCP listen control logic.
+On Sat, Oct 05, 2024 at 06:35:58PM +0200, Andrew Lunn wrote:
+> On Sat, Oct 05, 2024 at 04:51:30PM +0100, Daniel Golle wrote:
+> > On Sat, Oct 05, 2024 at 04:17:56PM +0200, Andrew Lunn wrote:
+> > > > I'll add "active-high" as an additional property then, as I found out
+> > > > that both, Aquantia and Intel/MaxLinear are technically speaking
+> > > > active-low by default (ie. after reset) and what we need to set is a
+> > > > property setting the LED to be driven active-high (ie. driving VDD
+> > > > rather than GND) instead. I hope it's not too late to make this change
+> > > > also for the Aquantia driver.
+> > > 
+> > > Adding a new property should not affect backwards compatibility, so it
+> > > should be safe to merge at any time.
+> > 
+> > Ok, I will proceed in that direction then and post a patch shortly.
+> > My intial assumption that absence of 'active-low' would always imply
+> > the LED being driven active-high was due to the commit description of
+> > the introduction of the active-low property:
+> > 
+> > commit c94d1783136eb66f2a464a6891a32eeb55eaeacc
+> > Author: Christian Marangi <ansuelsmth@gmail.com>
+> > Date:   Thu Jan 25 21:36:57 2024 +0100
+> > 
+> >     dt-bindings: net: phy: Make LED active-low property common
+> > 
+> >     Move LED active-low property to common.yaml. This property is currently
+> >     defined multiple times by bcm LEDs. This property will now be supported
+> >     in a generic way for PHY LEDs with the use of a generic function.
+> > 
+> >     With active-low bool property not defined, active-high is always
+> >     assumed.
 > 
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
->  samples/landlock/sandboxer.c | 31 ++++++++++++++++++++++++++-----
->  1 file changed, 26 insertions(+), 5 deletions(-)
+> So we have a difference between the commit message and what the
+> binding actually says. I would go by what the binding says.
+
++1
+
 > 
-> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-> index e8223c3e781a..3f50cb3f8039 100644
-> --- a/samples/landlock/sandboxer.c
-> +++ b/samples/landlock/sandboxer.c
-> @@ -55,6 +55,7 @@ static inline int landlock_restrict_self(const int ruleset_fd,
->  #define ENV_FS_RW_NAME "LL_FS_RW"
->  #define ENV_TCP_BIND_NAME "LL_TCP_BIND"
->  #define ENV_TCP_CONNECT_NAME "LL_TCP_CONNECT"
-> +#define ENV_TCP_LISTEN_NAME "LL_TCP_LISTEN"
->  #define ENV_DELIMITER ":"
->  
->  static int parse_path(char *env_path, const char ***const path_list)
-> @@ -208,7 +209,7 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->  
->  /* clang-format on */
->  
-> -#define LANDLOCK_ABI_LAST 5
-> +#define LANDLOCK_ABI_LAST 6
->  
->  int main(const int argc, char *const argv[], char *const *const envp)
->  {
-> @@ -222,15 +223,16 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	struct landlock_ruleset_attr ruleset_attr = {
->  		.handled_access_fs = access_fs_rw,
->  		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
-> -				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
-> +				      LANDLOCK_ACCESS_NET_CONNECT_TCP |
-> +				      LANDLOCK_ACCESS_NET_LISTEN_TCP,
->  	};
->  
->  	if (argc < 2) {
->  		fprintf(stderr,
-> -			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
-> +			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
->  			"<cmd> [args]...\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
->  		fprintf(stderr,
->  			"Execute a command in a restricted environment.\n\n");
->  		fprintf(stderr,
-> @@ -251,15 +253,19 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  		fprintf(stderr,
->  			"* %s: list of ports allowed to connect (client).\n",
->  			ENV_TCP_CONNECT_NAME);
-> +		fprintf(stderr,
-> +			"* %s: list of ports allowed to listen (server).\n",
-> +			ENV_TCP_LISTEN_NAME);
->  		fprintf(stderr,
->  			"\nexample:\n"
->  			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
->  			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
->  			"%s=\"9418\" "
->  			"%s=\"80:443\" "
-> +			"%s=\"9418\" "
->  			"%s bash -i\n\n",
->  			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
-> -			ENV_TCP_CONNECT_NAME, argv[0]);
-> +			ENV_TCP_CONNECT_NAME, ENV_TCP_LISTEN_NAME, argv[0]);
->  		fprintf(stderr,
->  			"This sandboxer can use Landlock features "
->  			"up to ABI version %d.\n",
-> @@ -326,6 +332,11 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  	case 4:
->  		/* Removes LANDLOCK_ACCESS_FS_IOCTL_DEV for ABI < 5 */
->  		ruleset_attr.handled_access_fs &= ~LANDLOCK_ACCESS_FS_IOCTL_DEV;
-> +		__attribute__((fallthrough));
-> +	case 5:
-> +		/* Removes LANDLOCK_ACCESS_NET_LISTEN support for ABI < 6 */
-> +		ruleset_attr.handled_access_net &=
-> +			~(LANDLOCK_ACCESS_NET_LISTEN_TCP);
+> However, what about the actual implementations? Do any do what the
+> commit message says?
 
-(same remark as on other patch set)
+The current implementation for PHY LEDs:
+ - 'active-low' property is present: Change LED polarity (in many cases
+   wrongly from initially being active-low to active-high).
+ - 'active-low' property is not set: Don't touch polarity settings.
 
-ABI version has shifted by one in the meantime.
+See drivers/net/phy/phy_device.c, from line 3360:
+        if (of_property_read_bool(led, "active-low"))
+                set_bit(PHY_LED_ACTIVE_LOW, &modes);
+        if (of_property_read_bool(led, "inactive-high-impedance"))
+                set_bit(PHY_LED_INACTIVE_HIGH_IMPEDANCE, &modes);
+ 
+        if (modes) {
+                /* Return error if asked to set polarity modes but not supported */
+                if (!phydev->drv->led_polarity_set)
+                        return -EINVAL;
+ 
+                err = phydev->drv->led_polarity_set(phydev, index, modes);
+                if (err)
+                        return err;
+        }
 
->  
->  		fprintf(stderr,
->  			"Hint: You should update the running kernel "
-> @@ -357,6 +368,12 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  		ruleset_attr.handled_access_net &=
->  			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->  	}
-> +	/* Removes listen access attribute if not supported by a user. */
-
-(also same remark as on other patch set)
-
-Please s/supported/requested/, for consistency.
-
-> +	env_port_name = getenv(ENV_TCP_LISTEN_NAME);
-> +	if (!env_port_name) {
-> +		ruleset_attr.handled_access_net &=
-> +			~LANDLOCK_ACCESS_NET_LISTEN_TCP;
-> +	}
->  
->  	ruleset_fd =
->  		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> @@ -380,6 +397,10 @@ int main(const int argc, char *const argv[], char *const *const envp)
->  				 LANDLOCK_ACCESS_NET_CONNECT_TCP)) {
->  		goto err_close_ruleset;
->  	}
-> +	if (populate_ruleset_net(ENV_TCP_LISTEN_NAME, ruleset_fd,
-> +				 LANDLOCK_ACCESS_NET_LISTEN_TCP)) {
-> +		goto err_close_ruleset;
-> +	}
->  
->  	if (prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0)) {
->  		perror("Failed to restrict privileges");
-> -- 
-> 2.34.1
-> 
-
-Reviewed-by: Günther Noack <gnoack3000@gmail.com>
+led_polarity_set() is not called if neither 'active-low' nor
+'inactive-high-impedance' are set.
 
