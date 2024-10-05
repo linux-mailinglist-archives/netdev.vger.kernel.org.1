@@ -1,153 +1,159 @@
-Return-Path: <netdev+bounces-132352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5FF991545
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 10:25:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85FD79915F1
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08BA11C20B97
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:25:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E9E01C21723
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 10:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C597F130A73;
-	Sat,  5 Oct 2024 08:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EB7132139;
+	Sat,  5 Oct 2024 10:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HnVfoOKI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzWxAMeQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9932F5B
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 08:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020F8F70
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 10:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728116735; cv=none; b=edt7RigsQpdmQUmFvl+aUD1vW+dpy5nIjwj+OavTJzy72Ot6orXDVJFN4fYqLe/S5j+0nwmOnhH/on6QzGJVSDWj6KY/r2AON7csNv10b6G1oYEY/rVueouAZU8y/zQYE87d7s59qGy/L/+xdNGqJCbG/QpE92O47K3KuRrUmcE=
+	t=1728123888; cv=none; b=IKuPL7y6BcCVqclBfBPtCcL1IbhKP6LfxBweMIx6wq9e24p3uZwtxFYVdfJekASysDinRDHJT10kJAVvyWc/g/mA39S1BWbqzNzji8bXtr+uP33q9UdqMZzRf0LHDnIAyJGgzGp5FD/G3ryOrh0voLhl7r3AIbjm4BBZuVuUCLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728116735; c=relaxed/simple;
-	bh=ORqGMlT2X5U0gpBmv/cfQXpjbLeT37i06j2XDh2tkkc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mh+ojLcxUdh6H+O4fx1/huV9Yel3FVa8QLEtYgpIKrrFpPcKVoc0M1SMbHXAj1UxSAny64Yj3WIlrOsz/XgI3lmTa34yjUGvgj3Z34TNpGAqxezrSIH/KuQYjyCHXOh7nsTMQ+dDOxRw3UmMqFHVTORiTjpaqxMXw4rbSxzLcQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HnVfoOKI; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a993f6916daso23893666b.1
-        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 01:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728116732; x=1728721532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o5XetfSqmsT0FoqAMypYpHKFZI7ysc4QJ+C1htKml54=;
-        b=HnVfoOKIrdlS5vqluzfoy2NmJWpMKvzyzIDzAPP61YS3lT56jjQyO2QIiIdtxArjnF
-         8jWsc17G+Doemyz+XaTSnXDM1ZD22u6eg264Oqo3JfgmQKcijWbEm2iFSEm1TYCEBgZa
-         PwycnWiiFmkmMtuWT/XylbldR9x2j7njdSacNKc+P0hDwgjh07T6WJkJNqfLNtweESfy
-         L7REO8+bjsXGj/hdoFDtUqjryPUChEqLjBrousshxj01gI/USHPnH3l5YXD1trj0uHBK
-         gSyE7swF2UJ6iPR1kCdj76ZdipyIZ98WuMMBNKlwDG1+mnC2v257W5f2Q7xq4YhP6RXS
-         kr9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728116732; x=1728721532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o5XetfSqmsT0FoqAMypYpHKFZI7ysc4QJ+C1htKml54=;
-        b=Ls5tdSokGYwgViBwMoq8wAgKx+qQkwd6jb6uoXSviSj9mt8ARC37ZKrZfUCWqCWiKP
-         0qTDoScxSy9QyATnHZcp7jThkY7pIsqyB8hrpTAQuZPyHNs7scynkTJPJvRKVpxvMMfn
-         EWbEh3nN661ve6nLlwFRxxgAXW8XVbcf1BxlqcpGNUIPZ8Xv6A/1TfrnDF424abYByT4
-         d/jH1K0P9zzIsrTqe///afbWLrErTxpKYlFQ0SSLpxlC2SlYtlECxV0TxJEtg5fnz/8S
-         /zukS9f9gG9uReYY4bXXMatCYXP5dKpe2IBIK42rxCYlvrklBQn9bZdIUL6MqrDn1NTt
-         eerA==
-X-Forwarded-Encrypted: i=1; AJvYcCXemfPx6gx6Hz7PwvGxogRvcuu+iy2dUgqNGpMyK/bvYiLzex1k9KJk/kAXF+jaqCHAqRWBMCE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu0rZd+BSNKl51uuTUG/rcIFPawjxfgSxXtm93/EuiDNDiWK3R
-	3F1pETr2W6GIne4XC7XUYe/vB72IDSturHB15HyznAnqe5izqk3EFNqx3n8Idw8bbU+/fRY29Ui
-	EA1XiF1V8vjVEtrBmbA2bHLjzL1HBqz6k1JyT
-X-Google-Smtp-Source: AGHT+IE8bC4pa+mAyos14itoLD7At0JnMwZmO1Yx7CXi6SNTvg/aWwSHAekJkLf6vdHIjSA0PQB+kiT2XONeeiXsMik=
-X-Received: by 2002:a17:907:980a:b0:a99:4152:1cb4 with SMTP id
- a640c23a62f3a-a99415220a5mr48917566b.42.1728116732008; Sat, 05 Oct 2024
- 01:25:32 -0700 (PDT)
+	s=arc-20240116; t=1728123888; c=relaxed/simple;
+	bh=VSkUhuEZREzVaWXtWS+SMpiGA9jxfyNvXOGjetZNpPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R8PR4uXOsBLqDXCbaMga/F7SVSs6QCAK306MBL6PGyASBYFvwISnH6sC8L7wB/y8tqvgH6NczX8k7E2sRWo2mtQnFHqnEYqERcZOcbCxj94iD5Y6kYxjJDjaKAb2hn6fDWq4z21LH1N53fGffUwdTksiBxOST9oBoeT/17KBMZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzWxAMeQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4CF8C4CEC2;
+	Sat,  5 Oct 2024 10:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728123887;
+	bh=VSkUhuEZREzVaWXtWS+SMpiGA9jxfyNvXOGjetZNpPA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OzWxAMeQjIQtJyh4emAWIbjZEEYZdHkQcfbP54FNlXJbq69VeMRdHXKxrVkwzReiU
+	 BLQSA9EEVJumWqxvLl98I5xuPfOG3j/zCoV/lWq20a+nyszvmQUfPAlBgh7XLq2sMD
+	 6qoC/JCl8OMqmw215qP5eL2xKEAmhUaaT2AERVN7BWgXRytAi8Pozpnx8OqkKNErBM
+	 YaniEHEIyQDGfsWYzRpjYeGeqg4UeeDPkmcvA7LtGRz0rC5tpeaF8NK/2jd1dnVQiw
+	 RXLhXrePhAHq2p/mUIce7zPYpfpLvuykWQCJOIMjNqReg+5w7MdsOA7JZ4Sj7DGY4N
+	 AmoTKaSBYkvWA==
+Date: Sat, 5 Oct 2024 12:24:44 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Fix EGRESS_RATE_METER_EN_MASK
+ definition
+Message-ID: <ZwET7MzCGVoDjIqt@lore-desk>
+References: <20241004-airoha-fixes-v1-1-2b7a01efc727@kernel.org>
+ <e4574a97-8e34-49be-9ec6-bb787104e6db@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241004222358.79129-1-kuniyu@amazon.com> <20241004222358.79129-2-kuniyu@amazon.com>
-In-Reply-To: <20241004222358.79129-2-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 5 Oct 2024 10:25:20 +0200
-Message-ID: <CANn89iKEaY22wrYoi9NbZ3CN+fwXqmLnM_P+zgucv_Unna64UQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net 1/6] rtnetlink: Add bulk registration helpers for
- rtnetlink message handlers.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="In29TbajZU6IMjK1"
+Content-Disposition: inline
+In-Reply-To: <e4574a97-8e34-49be-9ec6-bb787104e6db@intel.com>
+
+
+--In29TbajZU6IMjK1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 5, 2024 at 12:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> Before commit addf9b90de22 ("net: rtnetlink: use rcu to free rtnl message
-> handlers"), once rtnl_msg_handlers[protocol] was allocated, the following
-> rtnl_register_module() for the same protocol never failed.
->
-> However, after the commit, rtnl_msg_handler[protocol][msgtype] needs to
-> be allocated in each rtnl_register_module(), so each call could fail.
->
-> Many callers of rtnl_register_module() do not handle the returned error,
-> and we need to add many error handlings.
->
-> To handle that easily, let's add wrapper functions for bulk registration
-> of rtnetlink message handlers.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->  include/net/rtnetlink.h | 19 +++++++++++++++++++
->  net/core/rtnetlink.c    | 30 ++++++++++++++++++++++++++++++
->  2 files changed, 49 insertions(+)
->
-> diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
-> index b45d57b5968a..b6b91898dc13 100644
-> --- a/include/net/rtnetlink.h
-> +++ b/include/net/rtnetlink.h
-> @@ -29,6 +29,14 @@ static inline enum rtnl_kinds rtnl_msgtype_kind(int ms=
-gtype)
->         return msgtype & RTNL_KIND_MASK;
->  }
->
-> +struct rtnl_msg_handler {
+>=20
+>=20
+> On 10/4/2024 2:51 PM, Lorenzo Bianconi wrote:
+> > Fix typo in EGRESS_RATE_METER_EN_MASK mask definition. This bus was not
+> > introducing any user visible problem.
+> >=20
+>=20
+> I'm not sure I follow. This bit is used by airoha_qdma_init_qos which
+> sets the REG_EGRESS_RATE_METER_CFG register?
+>=20
+> How does this not provide any user visible issues? It seems like an
+> incorrect enable bit likely means that QOS is not enabled? I'm guessing
+> bit 29 is reserved?
 
-Since we add a structure, we could stick here a
+Hi Jacob,
 
-            struct module *owner;
+even if we are setting EGRESS_RATE_METER_EN_MASK bit (with a wrong value) in
+REG_EGRESS_RATE_METER_CFG register, egress QoS metering will not be support=
+ed
+yet since we are missing some other configuration (token bucket rate, token
+bucket size. Airoha folks please correct me if I am wrong). This is why I do
+not think it is important to backport this patch and I did not added any Fi=
+xes
+tag.
+QoS hw ingress/egress metering is in my ToDo list. Here I have ported the b=
+asic
+qos configuration I found in the vendor sdk. I will add more info in the co=
+mmit
+log in v2. Sorry for the confusion.
 
-> +       int protocol;
-> +       int msgtype;
-> +       rtnl_doit_func doit;
-> +       rtnl_dumpit_func dumpit;
-> +       int flags;
-> +};
-> +
->  void rtnl_register(int protocol, int msgtype,
->                    rtnl_doit_func, rtnl_dumpit_func, unsigned int flags);
->  int rtnl_register_module(struct module *owner, int protocol, int msgtype=
-,
-> @@ -36,6 +44,17 @@ int rtnl_register_module(struct module *owner, int pro=
-tocol, int msgtype,
->  int rtnl_unregister(int protocol, int msgtype);
->  void rtnl_unregister_all(int protocol);
->
-> +int __rtnl_register_many(struct module *owner,
-> +                        struct rtnl_msg_handler *handlers, int n);
-> +void __rtnl_unregister_many(struct rtnl_msg_handler *handlers, int n);
-> +
-> +#define rtnl_register_many(handlers)                                    =
-       \
-> +       __rtnl_register_many(NULL, handlers, ARRAY_SIZE(handlers))
-> +#define rtnl_register_module_many(handlers)                             =
-       \
-> +       __rtnl_register_many(THIS_MODULE, handlers, ARRAY_SIZE(handlers))
+Regards,
+Lorenzo
 
+>=20
+> It would be good to understand why this is not considered a fix?  The
+> offending commit is in the net branch already.
+>=20
+> > Introduced by commit 23020f049327 ("net: airoha: Introduce ethernet sup=
+port
+> > for EN7581 SoC")
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  drivers/net/ethernet/mediatek/airoha_eth.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/e=
+thernet/mediatek/airoha_eth.c
+> > index 2e01abc70c170f32f4206b34e116b441c14c628e..a1cfdc146a41610a3a6b060=
+bfdc6e1d9aad97d5d 100644
+> > --- a/drivers/net/ethernet/mediatek/airoha_eth.c
+> > +++ b/drivers/net/ethernet/mediatek/airoha_eth.c
+> > @@ -554,7 +554,7 @@
+> >  #define FWD_DSCP_LOW_THR_MASK		GENMASK(17, 0)
+> > =20
+> >  #define REG_EGRESS_RATE_METER_CFG		0x100c
+> > -#define EGRESS_RATE_METER_EN_MASK		BIT(29)
+> > +#define EGRESS_RATE_METER_EN_MASK		BIT(31)
+> >  #define EGRESS_RATE_METER_EQ_RATE_EN_MASK	BIT(17)
+> >  #define EGRESS_RATE_METER_WINDOW_SZ_MASK	GENMASK(16, 12)
+> >  #define EGRESS_RATE_METER_TIMESLICE_MASK	GENMASK(10, 0)
+> >=20
+> > ---
+> > base-commit: c55ff46aeebed1704a9a6861777b799f15ce594d
+> > change-id: 20241004-airoha-fixes-8aaa8177b234
+> >=20
+> > Best regards,
+>=20
 
-This would allow a simpler api, no need for rtnl_register_module_many()
+--In29TbajZU6IMjK1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZwET7AAKCRA6cBh0uS2t
+rNNyAP9uDDos8SDJ2XegHnssVx4dyQpUj5EHw09nl48HbC9uQgD/fVCCfhSiR0ps
+qxVMUSjlIMCF114O3DrDR89LdwBSgwg=
+=TQox
+-----END PGP SIGNATURE-----
+
+--In29TbajZU6IMjK1--
 
