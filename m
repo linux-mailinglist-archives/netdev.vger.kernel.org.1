@@ -1,179 +1,104 @@
-Return-Path: <netdev+bounces-132388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D2F9917F0
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:50:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D866A9917F3
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7D5B1F22728
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:50:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15CC11C21294
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059F015572E;
-	Sat,  5 Oct 2024 15:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FE115444E;
+	Sat,  5 Oct 2024 15:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="ZGY3aoZ2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NF9P1d52"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204B514B08E
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 15:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A8A155756;
+	Sat,  5 Oct 2024 15:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728143412; cv=none; b=t36HGSCUC1pbbmHPvZGrx7y+dQZReP+0s4mSR1Q/sBN94+0mxpU7szZ+fxY+XOYZgHSCfdHTzZg9JXgakwI3NEznxUT8ylZM4ZLtVtFCc8+HUn+5glvfZzGNcST5NqdHSnT7O2kutcSkZRmaFYQZJv3I+x8E+yS0BaHofjHNNeM=
+	t=1728143439; cv=none; b=KnJRMGJ9BiSij7ydNc/BCoH7CNHeNm/NHc6bJyzWb8zZ06xyy0c31X+10p5k2OZbUoWw74UjbGubiuZAfL2kvo0ZYKoUgN9bzFVf0jXhD8w+Nb6a/DoyEmPRaWqv++IebLTLqK61NhT85nTsqT2NdGguuqk92pyAifUbWEi9q2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728143412; c=relaxed/simple;
-	bh=pFKcRB9zxsPWbtFDjflB/H+lmvRDsZY8/fzMq5a8meA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nR0O8QpP+M/8oQYCaTYEmVAgrZmKdLEs7iF00XBpwiu6KckwQKd62N2ILah+a1H/LzihNa8kpMuQgomCTV3iGJzJAYY3D2HFmPCu3SkhSB8t0x6KQQLEl7ivtjinOjbQ2JNO0y/pBraVhQNn5QultwFT7RDfFh/1i95XNM3rnHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=ZGY3aoZ2; arc=none smtp.client-ip=84.16.66.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XLVGw54vlzKgG;
-	Sat,  5 Oct 2024 17:50:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1728143400;
-	bh=fEvnRaFE9+q3pKxb6HraPtzHUWsyP46VVEjoPYI/r24=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZGY3aoZ2si2zzo9W8u0Cwl2O1H/GLlW2K9JsKmKtijHygTUvRUVzZyfMHzQsRVZX4
-	 oc64L0BvDHAY7gT0uNWhsHDRPSKan/EM3b/aXkqlM4J9CdCDvoO7UkTGhJKo7u5Gfn
-	 ESMghYiRTVo/4+dYZEyMYlayL8lM8C0XC9EdvnvM=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XLVGv6xb5znb9;
-	Sat,  5 Oct 2024 17:49:59 +0200 (CEST)
-Date: Sat, 5 Oct 2024 17:49:57 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	Paul Moore <paul@paul-moore.com>
-Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
-Message-ID: <20241005.eeKoiweiwe8a@digikod.net>
-References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
- <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
- <20241003.wie1aiphaeCh@digikod.net>
- <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
- <20241004.rel9ja7IeDo4@digikod.net>
- <0774e9f1-994f-1131-17f9-7dd8eb96738f@huawei-partners.com>
+	s=arc-20240116; t=1728143439; c=relaxed/simple;
+	bh=gVufgi5ieEUb7c+F0xqwV/AYZvlXBZANCJxzJMrFhr4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P6DCCZOfPvo1fVtQ8sJupoZSBc1smo32x7U7uIjavRWFBBkLDjNDBdn38u7SJEdurFwMMF3TB3NHAV0Xph3WN24/Pi5PHCNlJgArpINQj8Wks7cRz8/FuKoyqhViKvJ4WtnobZVft6XpQmP3Kz+TMeLMtCE4FzX+MfHm2Uy8ayg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NF9P1d52; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5e77c6ed92bso1891300eaf.0;
+        Sat, 05 Oct 2024 08:50:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728143436; x=1728748236; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=REtgKggo44ri5JobvZ/IoAC5pGx/FtllU5izUlzT7yA=;
+        b=NF9P1d5285GfvLygSY58Ic05bodxjevDiCDyjoonw5P35dy/j/nsaOCOVo35N9srrK
+         E0bOQL0kCRqkZ0FkxZ5uM+L8EcLDfcoOjQPmP4SkfZ8SYE3TGcl0t9Eu5D4d3iphwTwE
+         6rtVHx7vCZ4eds+5EwDFUD5cER4BYgHhGrRVZanG2DAM0TBPPIWAcjP89RncG7stpxC/
+         1N2NkI59glVG23sUTUa7EpxSTFLFVSYVMzrLfbMMfuOf9xCf2TQ8B9ah6byGST23Wh/E
+         Dl1Oxv5w0DwPavZ52mROTCVpSuP4wBS6rXo6C/9mmQKiZqVrbVhPCii/Lextb+LU5M7m
+         Sptg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728143436; x=1728748236;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=REtgKggo44ri5JobvZ/IoAC5pGx/FtllU5izUlzT7yA=;
+        b=uMcJNAxKwJLcf7mG21X22gMicJTq3fm4c0gRBtJy9SXljV7ZluWOPHIYrFZ7Tv1yGS
+         2PSiCHkFIoM13xCSBMHMogTdllS+wfRwAt1MArC1Pf/sy7YxsePomxLLQpam6VoP0laS
+         K6uh6BeYIdmEklaO9+SNlvy2EGj9noB5S0N4sILxrVgIKIn7cWcIFEkY+9nqd2NV5fhP
+         L65WtPDAlf+qadRynq0qFFQD5rNxj0c77sUfFlG0ppWcSGa3gfAR8AQItLO0hw4M8blN
+         IaUbyP14w+M5G8vJVMWGwKLXuscBFSlQdzY+r/0bD9WoP6lKGxSn9sNJMDUdX0JZcvsA
+         qg2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV4LTIlp3LO3fmxN8JpElMYndtY42XenlAeOimLOdnu6moWY7nSjutfLgKxoC3bFk74TvMndvVUkwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZEjYHM46ZwsPJHySG0e142IMVMX6qjyxiqXHFF2U97G9HK0uX
+	9i4h/n5aNRRm5Qbtf8VwRS+E/KOCegLMGC8cGKPuomSThiWPkrYSw8dtR+EfCK+M3pgdTT3euaP
+	7Yflx7gguO8QrSjClkBR8rMWRzX/ZirtJ
+X-Google-Smtp-Source: AGHT+IFVdEhPRpqhXaq+Jz2/oKykkRmjg3r7SqCiHnq26reG5Z7DbQmKRM/05Ce6J5JJLF1ROlpjtpFii1UCztcUkSY=
+X-Received: by 2002:a05:6871:2b24:b0:27b:583b:bfa8 with SMTP id
+ 586e51a60fabf-287c1daff03mr4219815fac.17.1728143436540; Sat, 05 Oct 2024
+ 08:50:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0774e9f1-994f-1131-17f9-7dd8eb96738f@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+References: <20241005105646.7378-1-donald.hunter@gmail.com>
+In-Reply-To: <20241005105646.7378-1-donald.hunter@gmail.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Sat, 5 Oct 2024 16:50:25 +0100
+Message-ID: <CAD4GDZwOD+=EdSUv9zYcLKvFxiUhOkr=Jxcv4UZU1-2GDRXg_g@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] doc: net: Fix .rst rendering of
+ net_cachelines pages
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-doc@vger.kernel.org, 
+	Jonathan Corbet <corbet@lwn.net>
+Cc: donald.hunter@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Oct 04, 2024 at 09:16:56PM +0300, Mikhail Ivanov wrote:
-> On 10/4/2024 1:13 PM, Mickaël Salaün wrote:
-> > On Fri, Oct 04, 2024 at 12:30:02AM +0300, Mikhail Ivanov wrote:
-> > > On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
-> > > > Please also add Matthieu in Cc for the network patch series.
-> > > > 
-> > > > On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
-> > > > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
-> > > > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > > > > should not restrict bind(2) and connect(2) for non-TCP protocols
-> > > > > (SCTP, MPTCP, SMC).
-> > > > > 
-> > > > > Closes: https://github.com/landlock-lsm/linux/issues/40
-> > > > > Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
-> > > > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> > > > > ---
-> > > > >    security/landlock/net.c | 2 +-
-> > > > >    1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > 
-> > > > > diff --git a/security/landlock/net.c b/security/landlock/net.c
-> > > > > index bc3d943a7118..6f59dd98bb13 100644
-> > > > > --- a/security/landlock/net.c
-> > > > > +++ b/security/landlock/net.c
-> > > > > @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
-> > > > >    		return -EACCES;
-> > > > >    	/* Checks if it's a (potential) TCP socket. */
-> > > > 
-> > > > We can extend this comment to explain that we don't use sk_is_tcp()
-> > > > because we need to handle the AF_UNSPEC case.
-> > > 
-> > > Indeed, I'll do this.
-> 
-> I've noticed that we still should check sk->sk_family = AF_INET{,6}
-> here (so sk_is_tcp() is suitable). AF_UNSPEC can be only related to
-> addresses and we should not provide any checks (for address) if socket
-> is unrestrictable (i.e. it's not TCP). It's not useful and might lead to
-> error incosistency for non-TCP sockets.
+On Sat, 5 Oct 2024 at 11:57, Donald Hunter <donald.hunter@gmail.com> wrote:
+>
+> The doc pages under /networking/net_cachelines are unreadable because
+> they lack .rst formatting for the tabular text.
+>
+> Add simple table markup and tidy up the table contents:
+>
+> - remove dashes that represent empty cells because they render
+>   as bullets and are not needed
+> - replace 'struct_*' with 'struct *' in the first column so that
+>   sphinx can render links for any structs that appear in the docs
+>
+> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> ---
+> Changes: v2 is just a rebase on net-next
 
-Good catch, let's use sk_is_tcp().
-
-> 
-> Btw, I suppose we can improve error consistency by bringing more checks
-> from INET/TCP stack. For example it may be useful to return EISCONN
-> instead of EACCES while connect(2) is called on a connected socket.
-
-Yes, that would be nice (with the related tests).
-
-> 
-> This should be done really carefully and only for some useful cases.
-> Anyway it's not related to the current patch (since it's not a bug).
-
-Sure.
-
-The following patch series could probably be extended for all LSM to
-benefit from these fixes:
-https://lore.kernel.org/all/20240327120036.233641-1-mic@digikod.net/
-
-Mikhail, according to your SCTP tests with SELinux, it looks like this
-patch series should be updated, but that should be simple.
-
-Paul, what is the status of this LSM patch series?  Could Mikhail
-integrate this LSM patch (with the SCTP fix) as part of the current
-Landlock patch series?  This would help fixing the Landlock tests (which
-check SCTP error consistency) when run with SELinux.
-
-> 
-> > > 
-> > > > 
-> > > > > -	if (sock->type != SOCK_STREAM)
-> > > > > +	if (sock->type != SOCK_STREAM || sock->sk->sk_protocol != IPPROTO_TCP)
-> > > > 
-> > > > I think we should check sock->sk->sk_type instead of sock->type (even if
-> > > > it should be the same).  To make it simpler, we should only use sk in
-> > > > current_check_access_socket():
-> > > > struct sock *sk = sock->sk;
-> > > 
-> > > Agreed.
-> > > 
-> > > > 
-> > > > Could you please also do s/__sk_common\.skc_/sk_/g ?
-> > > 
-> > > Ofc
-> > > 
-> > > Btw, there is probably incorrect read of skc_family in this function
-> > > [1]. I'll add READ_ONCE for sk->sk_family.
-> > > 
-> > > [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
-> > 
-> > I think it should not be a bug with the current code (IPv6 -> IPV4, and
-> > socket vs. sock) but we should indeed use READ_ONCE() (and add this link
-> > to the commit message).
-> 
-> ok
-> 
-> > 
-> > > 
-> > > > 
-> > > > >    		return 0;
-> > > > >    	/* Checks for minimal header length to safely read sa_family. */
-> > > > > -- 
-> > > > > 2.34.1
-> > > > > 
-> > > > > 
-> > > 
-> 
+Apologies, formatting is broken. I'll spin a v3 tomorrow.
 
