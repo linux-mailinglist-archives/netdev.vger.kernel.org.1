@@ -1,104 +1,104 @@
-Return-Path: <netdev+bounces-132389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D866A9917F3
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:50:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6E99917F4
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15CC11C21294
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:50:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1BB91F2276A
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FE115444E;
-	Sat,  5 Oct 2024 15:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NF9P1d52"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4524A155732;
+	Sat,  5 Oct 2024 15:51:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A8A155756;
-	Sat,  5 Oct 2024 15:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3DED2FA;
+	Sat,  5 Oct 2024 15:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728143439; cv=none; b=KnJRMGJ9BiSij7ydNc/BCoH7CNHeNm/NHc6bJyzWb8zZ06xyy0c31X+10p5k2OZbUoWw74UjbGubiuZAfL2kvo0ZYKoUgN9bzFVf0jXhD8w+Nb6a/DoyEmPRaWqv++IebLTLqK61NhT85nTsqT2NdGguuqk92pyAifUbWEi9q2g=
+	t=1728143513; cv=none; b=ua7BDF2Z23R+9TTBWjYdBTru5C2QhDnFILWmx8t5qkJacORrNgWqoA5GXgbie2OfjRIb2kTxc3jI1Yhe9gw4Zac9g+ndtueTq5lz9D7b4NFhBMNWB2q5NwPHtyGkfeE+cRoGtXnY6T3TF2g9cHmxd3JgJ+J4LjQ5AmpPt/vp1IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728143439; c=relaxed/simple;
-	bh=gVufgi5ieEUb7c+F0xqwV/AYZvlXBZANCJxzJMrFhr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P6DCCZOfPvo1fVtQ8sJupoZSBc1smo32x7U7uIjavRWFBBkLDjNDBdn38u7SJEdurFwMMF3TB3NHAV0Xph3WN24/Pi5PHCNlJgArpINQj8Wks7cRz8/FuKoyqhViKvJ4WtnobZVft6XpQmP3Kz+TMeLMtCE4FzX+MfHm2Uy8ayg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NF9P1d52; arc=none smtp.client-ip=209.85.161.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5e77c6ed92bso1891300eaf.0;
-        Sat, 05 Oct 2024 08:50:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728143436; x=1728748236; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=REtgKggo44ri5JobvZ/IoAC5pGx/FtllU5izUlzT7yA=;
-        b=NF9P1d5285GfvLygSY58Ic05bodxjevDiCDyjoonw5P35dy/j/nsaOCOVo35N9srrK
-         E0bOQL0kCRqkZ0FkxZ5uM+L8EcLDfcoOjQPmP4SkfZ8SYE3TGcl0t9Eu5D4d3iphwTwE
-         6rtVHx7vCZ4eds+5EwDFUD5cER4BYgHhGrRVZanG2DAM0TBPPIWAcjP89RncG7stpxC/
-         1N2NkI59glVG23sUTUa7EpxSTFLFVSYVMzrLfbMMfuOf9xCf2TQ8B9ah6byGST23Wh/E
-         Dl1Oxv5w0DwPavZ52mROTCVpSuP4wBS6rXo6C/9mmQKiZqVrbVhPCii/Lextb+LU5M7m
-         Sptg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728143436; x=1728748236;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=REtgKggo44ri5JobvZ/IoAC5pGx/FtllU5izUlzT7yA=;
-        b=uMcJNAxKwJLcf7mG21X22gMicJTq3fm4c0gRBtJy9SXljV7ZluWOPHIYrFZ7Tv1yGS
-         2PSiCHkFIoM13xCSBMHMogTdllS+wfRwAt1MArC1Pf/sy7YxsePomxLLQpam6VoP0laS
-         K6uh6BeYIdmEklaO9+SNlvy2EGj9noB5S0N4sILxrVgIKIn7cWcIFEkY+9nqd2NV5fhP
-         L65WtPDAlf+qadRynq0qFFQD5rNxj0c77sUfFlG0ppWcSGa3gfAR8AQItLO0hw4M8blN
-         IaUbyP14w+M5G8vJVMWGwKLXuscBFSlQdzY+r/0bD9WoP6lKGxSn9sNJMDUdX0JZcvsA
-         qg2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV4LTIlp3LO3fmxN8JpElMYndtY42XenlAeOimLOdnu6moWY7nSjutfLgKxoC3bFk74TvMndvVUkwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZEjYHM46ZwsPJHySG0e142IMVMX6qjyxiqXHFF2U97G9HK0uX
-	9i4h/n5aNRRm5Qbtf8VwRS+E/KOCegLMGC8cGKPuomSThiWPkrYSw8dtR+EfCK+M3pgdTT3euaP
-	7Yflx7gguO8QrSjClkBR8rMWRzX/ZirtJ
-X-Google-Smtp-Source: AGHT+IFVdEhPRpqhXaq+Jz2/oKykkRmjg3r7SqCiHnq26reG5Z7DbQmKRM/05Ce6J5JJLF1ROlpjtpFii1UCztcUkSY=
-X-Received: by 2002:a05:6871:2b24:b0:27b:583b:bfa8 with SMTP id
- 586e51a60fabf-287c1daff03mr4219815fac.17.1728143436540; Sat, 05 Oct 2024
- 08:50:36 -0700 (PDT)
+	s=arc-20240116; t=1728143513; c=relaxed/simple;
+	bh=4pUIQXeeHVXu6q2/fEA3SjZjq6uP/PFkQfcTqylbTEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D7DX81QavAtEBELwDDqvGNslPcgo+BzmSO4Nj6z2XEyzHiaNY6Xz1ZhJGJ5eDRebtqFh0G/OcvY14RpWepvbbe/4XCJ2mHgBGFJdzJOW+bghgga+UyH5nDkJSneOLKI1uBGsT9aOt8uVq4IU9K7u2ImqBuU1wg6/IYWNUgpfGJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sx74C-000000003yl-3bOT;
+	Sat, 05 Oct 2024 15:51:36 +0000
+Date: Sat, 5 Oct 2024 16:51:30 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: phy: always set polarity_modes if op
+ is supported
+Message-ID: <ZwFggnUO-vAXr2v_@makrotopia.org>
+References: <473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org>
+ <5c821b2d-17eb-4078-942f-3c1317b025ff@lunn.ch>
+ <ZwBn-GJq3BovSJd4@makrotopia.org>
+ <e288f85c-2e5e-457f-b0d7-665c6410ccb4@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005105646.7378-1-donald.hunter@gmail.com>
-In-Reply-To: <20241005105646.7378-1-donald.hunter@gmail.com>
-From: Donald Hunter <donald.hunter@gmail.com>
-Date: Sat, 5 Oct 2024 16:50:25 +0100
-Message-ID: <CAD4GDZwOD+=EdSUv9zYcLKvFxiUhOkr=Jxcv4UZU1-2GDRXg_g@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] doc: net: Fix .rst rendering of
- net_cachelines pages
-To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-doc@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>
-Cc: donald.hunter@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e288f85c-2e5e-457f-b0d7-665c6410ccb4@lunn.ch>
 
-On Sat, 5 Oct 2024 at 11:57, Donald Hunter <donald.hunter@gmail.com> wrote:
->
-> The doc pages under /networking/net_cachelines are unreadable because
-> they lack .rst formatting for the tabular text.
->
-> Add simple table markup and tidy up the table contents:
->
-> - remove dashes that represent empty cells because they render
->   as bullets and are not needed
-> - replace 'struct_*' with 'struct *' in the first column so that
->   sphinx can render links for any structs that appear in the docs
->
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-> ---
-> Changes: v2 is just a rebase on net-next
+On Sat, Oct 05, 2024 at 04:17:56PM +0200, Andrew Lunn wrote:
+> > I'll add "active-high" as an additional property then, as I found out
+> > that both, Aquantia and Intel/MaxLinear are technically speaking
+> > active-low by default (ie. after reset) and what we need to set is a
+> > property setting the LED to be driven active-high (ie. driving VDD
+> > rather than GND) instead. I hope it's not too late to make this change
+> > also for the Aquantia driver.
+> 
+> Adding a new property should not affect backwards compatibility, so it
+> should be safe to merge at any time.
 
-Apologies, formatting is broken. I'll spin a v3 tomorrow.
+Ok, I will proceed in that direction then and post a patch shortly.
+My intial assumption that absence of 'active-low' would always imply
+the LED being driven active-high was due to the commit description of
+the introduction of the active-low property:
+
+commit c94d1783136eb66f2a464a6891a32eeb55eaeacc
+Author: Christian Marangi <ansuelsmth@gmail.com>
+Date:   Thu Jan 25 21:36:57 2024 +0100
+
+    dt-bindings: net: phy: Make LED active-low property common
+
+    Move LED active-low property to common.yaml. This property is currently
+    defined multiple times by bcm LEDs. This property will now be supported
+    in a generic way for PHY LEDs with the use of a generic function.
+
+    With active-low bool property not defined, active-high is always
+    assumed.
+
+    Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+    Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+    Acked-by: Lee Jones <lee@kernel.org>
+    Reviewed-by: Rob Herring <robh@kernel.org>
+    Link: https://lore.kernel.org/r/20240125203702.4552-2-ansuelsmth@gmail.com
+    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+
+However, that's not what the code did in the end, it would be either
+"set active-low" or "don't touch".
 
