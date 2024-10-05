@@ -1,140 +1,116 @@
-Return-Path: <netdev+bounces-132425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B5CF991AC8
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 23:10:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C916A991B04
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 23:56:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829AB283C1C
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 21:10:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E7FBB21A0A
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 21:56:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E924615A86B;
-	Sat,  5 Oct 2024 21:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30755166F1B;
+	Sat,  5 Oct 2024 21:56:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IwNWICaP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lfGD5exN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3416D10A18;
-	Sat,  5 Oct 2024 21:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A040F165F16
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 21:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728162611; cv=none; b=Y0c5l9Bn4FnqLVzYqqP+x/MdyV1FP7z3C8ZY7sEBOg2nZy1v+eUuQ/fX3ESJZVxcIZv2VXsd2kC9csXG/t/fySQcnk6CMrhxE3LfBYfgHgjrDEbxwhxFY5Sy2n/8ibTLF9RjTBjD5o0w4OS8FhKV3u4Erz/ACmvYhROiY920VGg=
+	t=1728165366; cv=none; b=Z4tLdgu76wMgsu9rzjrTrIxeUQXohMMG5zTkKGmtXfluMTgmH6NClEYeU0hGmdiMz6PSZJEunULyY9yVzIYFOQVUOLA0drFqstVPZno5l108kuyUjH2TAtbaawJ10k3bl724yNWRYPENbV2cvv3VABxemDUVX1cYCH12uhrjv0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728162611; c=relaxed/simple;
-	bh=XNJ6j+NmfhQiOjzAkAYnWd6ZaNw4OuVy2Tk2vKusXHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KE/xKU1/Bt2sXp1VHx5td4eDQKpedgwnnaas3AAMBoL0RkZd1OcOdur0adN3qsn8W6ugTObw2UOTy8pJtlOmqCl8cQ2tFQlBaV6oGkMLYA6o4BC/MU2HgupVjldfvsq3qSmMnjqSOd+MThJoW078HeLnCQOxSrCcvvO0rfNrrqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IwNWICaP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=H6P87KlwUnyJtmGe5pYUTRscMy05gLwFR8H+OXIgxPE=; b=IwNWICaP+QO9NvNnf+PkL0GogY
-	rwTllAmqKgaUWWmF9HAzUB4GCXLCbgJVxyituuINywYY5hGfW1NUyAUs2o+kryug/yv1ASV6NvWJZ
-	juDUR2kPUXLGT07fEQ2mSG8D0d759RJteSbK5OYl9/D4XS9hLZFPlA3B13IDREMoxCA4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sxC28-0099YB-FM; Sat, 05 Oct 2024 23:09:48 +0200
-Date: Sat, 5 Oct 2024 23:09:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me, a.hindborg@samsung.com,
-	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
-	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/6] rust: time: Introduce Delta type
-Message-ID: <7e6e0f84-1eef-4c7c-872a-3852a9a80034@lunn.ch>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-3-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1728165366; c=relaxed/simple;
+	bh=Kv3tGeYVEvki+TLXFk7nQI92L8KqidN/GBFVcVcLd+s=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=FncxuOdPUNFf5ChYR6f4aXtFP7ZuFJ5vegu1AglRzVK3Wzs//rSJKm+XxiUo816gqxGJZ9WoP9Ug2QVEICd14Sb1ukWl5lKeIKdmay9SA+dG+nJMedUG7Rd5S1u9q+hMc/Rhcm/HchU909ANJzeMZBypqOxrsedz0huQJhxf6oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lfGD5exN; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gthelen.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e2d1860a62so24284527b3.0
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 14:56:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728165363; x=1728770163; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UjrRZf+/scm4ik6V8Y3O+VVxMpeJ9ouK1fJjBIa+BxA=;
+        b=lfGD5exNlaJ3N8q909yLbyjvmTVwnLaWDJBWjyuYPD1H715L/ULegSOQs39jDrM5Pv
+         0bLUpIoxXoxiLHvcuK0IhzquL6/YPHckuqOvFf31sY+grAPx/ylHZ35qgTXWUNq0nS63
+         VAqTBRzoYyMKQTFyU4EO9NFUSHeiFlUktU5Oigr8uRgYK4Kyjn8bNhOdtyfi6RPCirye
+         iEj2RXOrXn+FY3u1QM6olAhlVA0UkdCxyAfUUKLG0LeaAfUuXP8WjOHwhcICskY7ufV4
+         ExDl8nZc99/OwRG3Hi4iLrXG5RQxjA0WE1LmMtsqPJ3sutyS9rHHjD/tMZheBPv4+FwR
+         NOvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728165363; x=1728770163;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UjrRZf+/scm4ik6V8Y3O+VVxMpeJ9ouK1fJjBIa+BxA=;
+        b=pJDSN0Syo1drAkQmNIab3Tv0lnR/pQyz1JOfflFZMQHGWWvA46p6EVKOB9vZBr4jVm
+         288i0HtvqjukB9kBqlVCpZkfEFPw5eXUesRVJXBn7Qbo3PQ02lTmSSIs5AJSlU8WkjgJ
+         tGxk4K6CMEO+DEbEuQGOFaZmyC57OYHdZYviaM7YGubvlVSWGMU4TaHFJl8xXhos45a+
+         LBE8cT7pXf1++bxb33/6yv8yZNn5eOdyMyIms6yc+6214yfAGP2f5Lan0JRMoiMFHunn
+         iUedbhB6MMnHOavZXdhh3eL+CW8EKs9P8ZfQmjqdOtj3p/B9CLtU5YG8d1GD59eKFo7h
+         gPyw==
+X-Gm-Message-State: AOJu0YxTtT9lVMgCpEpEoz1pswjRaMmOBowsxYW5I5fYrawRDho977tG
+	7j/K7DGbvBUWh9nWX8pskBlkccWD4L/9ijFCpTIuGsXufr7kksaepGZh639Um2Ooi43vjKtFrto
+	50V5MBw==
+X-Google-Smtp-Source: AGHT+IHWpc6AdTIJHoH8hPk5oe2zVGLycQ2hBiOKJKUuhmS+kKN3bJkizgngYFJ0CrJraC8hT/t8k3PUgXO9
+X-Received: from gthelen-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:2c:2b44:ac13:f9ac])
+ (user=gthelen job=sendgmr) by 2002:a25:8b89:0:b0:e25:cea9:b0e with SMTP id
+ 3f1490d57ef6-e2893939abemr5252276.9.1728165363498; Sat, 05 Oct 2024 14:56:03
+ -0700 (PDT)
+Date: Sat,  5 Oct 2024 14:56:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241005122531.20298-3-fujita.tomonori@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241005215600.852260-1-gthelen@google.com>
+Subject: [PATCH] selftests: make kselftest-clean remove libynl outputs
+From: Greg Thelen <gthelen@google.com>
+To: Shuah Khan <shuah@kernel.org>, Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Greg Thelen <gthelen@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Oct 05, 2024 at 09:25:27PM +0900, FUJITA Tomonori wrote:
-> Introduce a type representing a span of time. Define our own type
-> because `core::time::Duration` is large and could panic during
-> creation.
-> 
-> We could use time::Ktime for time duration but timestamp and timedelta
-> are different so better to use a new type.
-> 
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  rust/kernel/time.rs | 64 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 64 insertions(+)
-> 
-> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> index c40105941a2c..6c5a1c50c5f1 100644
-> --- a/rust/kernel/time.rs
-> +++ b/rust/kernel/time.rs
-> @@ -8,9 +8,15 @@
->  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
->  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
->  
-> +/// The number of nanoseconds per microsecond.
-> +pub const NSEC_PER_USEC: i64 = bindings::NSEC_PER_USEC as i64;
-> +
->  /// The number of nanoseconds per millisecond.
->  pub const NSEC_PER_MSEC: i64 = bindings::NSEC_PER_MSEC as i64;
->  
-> +/// The number of nanoseconds per second.
-> +pub const NSEC_PER_SEC: i64 = bindings::NSEC_PER_SEC as i64;
-> +
->  /// The time unit of Linux kernel. One jiffy equals (1/HZ) second.
->  pub type Jiffies = core::ffi::c_ulong;
->  
-> @@ -103,3 +109,61 @@ fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
->          }
->      }
->  }
-> +
-> +/// A span of time.
-> +#[derive(Copy, Clone)]
-> +pub struct Delta {
-> +    nanos: i64,
-> +}
-> +
-> +impl Delta {
-> +    /// Create a new `Delta` from a number of nanoseconds.
-> +    #[inline]
-> +    pub fn from_nanos(nanos: u16) -> Self {
-> +        Self {
-> +            nanos: nanos.into(),
-> +        }
-> +    }
+Starting with 6.12 commit 85585b4bc8d8 ("selftests: add ncdevmem, netcat
+for devmem TCP") kselftest-all creates additional outputs that
+kselftest-clean does not cleanup:
+  $ make defconfig
+  $ make kselftest-all
+  $ make kselftest-clean
+  $ git clean -ndxf | grep tools/net
+  Would remove tools/net/ynl/lib/__pycache__/
+  Would remove tools/net/ynl/lib/ynl.a
+  Would remove tools/net/ynl/lib/ynl.d
+  Would remove tools/net/ynl/lib/ynl.o
 
-Just throwing out an idea:
+Make kselftest-clean remove the newly added net/ynl outputs.
 
-How about we clamp delay to ~1 year, with a pr_warn() if it needs to
-actually clamp. All the APIs take or return a u64.
+Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
+Signed-off-by: Greg Thelen <gthelen@google.com>
+---
+ tools/testing/selftests/net/ynl.mk | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> +    /// Return the number of microseconds in the `Delta`.
-> +    #[inline]
-> +    pub fn as_micros(self) -> i64 {
-> +        self.nanos / NSEC_PER_USEC
-> +    }
+diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
+index 59cb26cf3f73..1ef24119def0 100644
+--- a/tools/testing/selftests/net/ynl.mk
++++ b/tools/testing/selftests/net/ynl.mk
+@@ -19,3 +19,7 @@ $(YNL_OUTPUTS): CFLAGS += \
+ $(OUTPUT)/libynl.a:
+ 	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
+ 	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
++
++EXTRA_CLEAN += \
++	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
++	$(top_srcdir)/tools/net/ynl/lib/*.[ado]
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
 
-Another dumb rust question. How does the Rust compiler implement 64
-bit division on 32 bit systems? GCC with C calls out to a library to
-do it, and the kernel does not have that library. So you need to use
-the kernel div_u64() function.
-
-Did you compiler this code for a 32 bit system?
-
-	Andrew
 
