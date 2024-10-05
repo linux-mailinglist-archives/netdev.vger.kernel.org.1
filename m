@@ -1,103 +1,124 @@
-Return-Path: <netdev+bounces-132320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 046C799134B
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 01:50:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36E0991361
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 02:08:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFC321F23A3C
-	for <lists+netdev@lfdr.de>; Fri,  4 Oct 2024 23:50:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8E0284C87
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA2A153820;
-	Fri,  4 Oct 2024 23:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33F2E10F4;
+	Sat,  5 Oct 2024 00:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mzo+d8hy"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QwXm5TQI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C986114D6E1
-	for <netdev@vger.kernel.org>; Fri,  4 Oct 2024 23:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC64C9F;
+	Sat,  5 Oct 2024 00:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728085829; cv=none; b=FP1/zoAqBlBtN00yT6swVVnd8U/Q8fvtqFYj9sBu3JS7i0AIqhNTrjyZpwegGHtOGbHSuH244UDdGlP5TYd/b6AHvNfzrtg3JTjTO8njl61fBkdmgqUAjM30JlqY4ZWBAc34lxKn234W+CItkHdjQxQ62O69Eq7FC6pcbR/FGkM=
+	t=1728086880; cv=none; b=RFwVyn2+p2RSv3lZ/+NiQ7AKwKMnYoytW9G46KnB9jCdDbNTrSRq1ZemoM+LxP5a/FKr+kyOWHJML9s0MVu4oFDM6jIHQfGs91alfHQwbyS2f/LTGSDcLT2h766z5SmsCP4zuD9Qxb+qErqoMmNX4DkxFrcCD1he//KJ7/8OXP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728085829; c=relaxed/simple;
-	bh=7HjXIYI7Y+ZRLOpLfX8EcQxgrHIubHFITh2mmETYGwU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bw+pcBRR+a3M+qKMvCZNLRuMn2UiOA9jdlTHb++JDEW9Tv0+IHUNIQbo2Ifm84jVIJfvmR3DLwm+rSotz9neEkcNTQKFrDHtoA3tjlq9XZq85y3cWKTDYQXDmFFrwcKkXYf+itHYxog+YI+229kCeO5lGKl+zKAlRvLj+Jl1nx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mzo+d8hy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57590C4CEC6;
-	Fri,  4 Oct 2024 23:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728085829;
-	bh=7HjXIYI7Y+ZRLOpLfX8EcQxgrHIubHFITh2mmETYGwU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Mzo+d8hyoLvmaYsmWJb7SYlH++P5Sb6hX4Ujy4JAXooZfpZhAF1N2hAIqZVpjYs3D
-	 JZnJHV8NybMdSfECGTAs9eTvPq+zYhMFFco8eRgSOSMJE/uZXXrBFceG2vRD4UTZsM
-	 p7BY7Xh0lSekDSCsDM4kTYyvPICSKDyOLBtBYzxf0MJIgjx6LphgSeouZGtd1tp4Fx
-	 xj7WryqzhsipW0JN+9knkD+YOGKfQxGej478ybehn4u0evHyJUmu/7TdQaU/NqNaqr
-	 AspIBn0PM7FZE0j/o8QQ4dMu+bA3zjiaPBzvmSEM/2CF/cEaQIom8WODAjuJYGfyWs
-	 SalNJRXZT46Cw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3453C39F76FF;
-	Fri,  4 Oct 2024 23:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1728086880; c=relaxed/simple;
+	bh=+MfI7OYcWAd2dMDXZEx5YG70J88IUHYEYwpDpb4OTfw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jOUs5mkGm58iKzfJ322IAndukiF9r2Dgvg/1GJcvuzRq30r5onNK2jH0Vq7O9MqWTH15ed1IrWlT5UsRq7QWLM0UKp3SmoSm3DRWQLaHKTTzBMLwElmXUhqoBSw8AqVqVral3ujQO0UJ51kATM05QGc6lvmoYAEKdp0uE8mJHik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QwXm5TQI; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.0.0.114] (c-67-182-156-199.hsd1.wa.comcast.net [67.182.156.199])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 6066F20DB37A;
+	Fri,  4 Oct 2024 17:07:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6066F20DB37A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1728086878;
+	bh=LBnzr8OIIg6knuVrAj3ZPsyJbh5bMJgu1ZuS7jAuHyU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QwXm5TQI+PpevcOJwLiQCmf2iHFL2kqrYd0jPp70SOf4xm+OCFOAqJbgR3wBT8CJp
+	 R/gJF6q6xzALLspZdmutH4Q3khZWgia3ohn/0g5Qh3Q/lC0UNfd1K1IdM1Y6f4Suuk
+	 LDBu/TrXOY7jsq6vFSeig5g6GL1r0TQ5r0DbxDSU=
+Message-ID: <3b2e7170-1229-4981-8905-02b16bd2a85d@linux.microsoft.com>
+Date: Fri, 4 Oct 2024 17:07:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] net: Switch back to struct
- platform_driver::remove()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172808583304.2779846.4851485814308939382.git-patchwork-notify@kernel.org>
-Date: Fri, 04 Oct 2024 23:50:33 +0000
-References: <cover.1727949050.git.u.kleine-koenig@baylibre.com>
-In-Reply-To: <cover.1727949050.git.u.kleine-koenig@baylibre.com>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40baylibre=2Ecom=3E?=@codeaurora.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, olteanv@gmail.com, hkallweit1@gmail.com,
- alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
- loic.poulain@linaro.org, ryazanov.s.a@gmail.com, horms@kernel.org,
- netdev@vger.kernel.org, linux@armlinux.org.uk, johannes@sipsolutions.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 5/5] hyperv: Use hvhdk.h instead of hyperv-tlfs.h in
+ Hyper-V code
+To: Stanislav Kinsburskii <skinsburskii@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, virtualization@lists.linux.dev,
+ kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, catalin.marinas@arm.com, will@kernel.org,
+ luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
+ daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
+ bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
+ jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
+ mukeshrathor@microsoft.com
+References: <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+ <1727985064-18362-6-git-send-email-nunodasneves@linux.microsoft.com>
+ <20241004155810.GA15304@skinsburskii.>
+Content-Language: en-US
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+In-Reply-To: <20241004155810.GA15304@skinsburskii.>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  3 Oct 2024 12:01:02 +0200 you wrote:
-> Hello,
+On 10/4/2024 8:58 AM, Stanislav Kinsburskii wrote:
+> Hi Nuno,
 > 
-> I already sent a patch last week that is very similar to patch #1 of
-> this series. However the previous submission was based on plain next. I
-> was asked to resend based on net-next once the merge window closed, so
-> here comes this v2.  The additional patches address drivers/net/dsa,
-> drivers/net/mdio and the rest of drivers/net apart from wireless which
-> has its own tree and will addressed separately at a later point in time.
+> On Thu, Oct 03, 2024 at 12:51:04PM -0700, Nuno Das Neves wrote:
+>> diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
+>> index 9d1969b875e9..bb7f28f74bf4 100644
+>> --- a/arch/arm64/hyperv/hv_core.c
+>> +++ b/arch/arm64/hyperv/hv_core.c
+>> @@ -14,6 +14,7 @@
+>>  #include <linux/arm-smccc.h>
+>>  #include <linux/module.h>
+>>  #include <asm-generic/bug.h>
+>> +#define HYPERV_NONTLFS_HEADERS
+>>  #include <asm/mshyperv.h>
+>>  
 > 
-> [...]
+> Perhaps it would be cleaner to introduce a new header file to be
+> included, containing the new define and including <asm/mshyperv.h> instead.
+> 
+> Stas
 
-Here is the summary with links:
-  - [net-next,v2,1/4] net: ethernet: Switch back to struct platform_driver::remove()
-    (no matching commit)
-  - [net-next,v2,2/4] net: dsa: Switch back to struct platform_driver::remove()
-    https://git.kernel.org/netdev/net-next/c/4818016ded1c
-  - [net-next,v2,3/4] net: mdio: Switch back to struct platform_driver::remove()
-    https://git.kernel.org/netdev/net-next/c/a208a39ed01f
-  - [net-next,v2,4/4] net: Switch back to struct platform_driver::remove()
-    https://git.kernel.org/netdev/net-next/c/46e338bbd719
+If I understand correctly, you're suggesting adding another stub named e.g.
+"hv_mshyperv.h", containing:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+#define HYPERV_NONTLFS_HEADERS
+#include<asm/mshyperv.h>
 
+Then in the roughly 24 places in this patch where we have:
 
++#define HYPERV_NONTLFS_HEADERS
+
+Instead, we'd have:
+
+-#include <asm/mshyperv.h>
++#include <hyperv/hv_mshyperv.h>
+
+I suppose the current version is a bit opaque - it's not immediately clear
+why HYPERV_NONTLFs_HEADERS is defined, and that it must be defined before
+including asm/mshyperv.h - someone reading the code would have to go find
+hv_defs.h to puzzle that out.
+
+This improves the situation slightly by associating the #define with
+asm/mshyperv.h. I'll consider it for v2, thanks!
+
+Nuno
 
