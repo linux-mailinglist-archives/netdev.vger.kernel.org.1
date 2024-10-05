@@ -1,236 +1,153 @@
-Return-Path: <netdev+bounces-132351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DFD991540
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 10:21:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA5FF991545
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 10:25:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BB48B225AF
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08BA11C20B97
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B007113B5B3;
-	Sat,  5 Oct 2024 08:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C597F130A73;
+	Sat,  5 Oct 2024 08:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oG522Lqp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HnVfoOKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C2271F95C;
-	Sat,  5 Oct 2024 08:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728116482; cv=fail; b=MsXYkFWrSSgt9ZwzgwTRj6X7aYIkYfQoiQJSshvIV/1N9qEgq2fTMaqyi3rPfcqjOQxxb6QAEJv1wN27GjxMRm6ZcND4GhJkginSm4vM/RqymCqIRJWaI6xBqpMujsrNhmaxX2fH83hKFhHuOOeRoU1T4ImWWjIrykV4/dpQzzU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728116482; c=relaxed/simple;
-	bh=Tgp0rMP//3V8MkBwW7Z2l4xOjPXkqlDFJ00ES4ipfEk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=lcJ13F1AF9ZA5eF7+Fk5iL90/bwm6Y1mx+Eoo8VTIE6rwWDnkdmIQEnRtt7eswSsWHPEDHKlysqyO1pjQ2DC63t6959nFrTaHfE6nbGxSuz0l7mOvBlg2q6zJ5Wpv96Hn3oDlvkLv7/O0CNIZOuntnCc8mg+//GgzYV+gA6DQH8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oG522Lqp; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728116481; x=1759652481;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Tgp0rMP//3V8MkBwW7Z2l4xOjPXkqlDFJ00ES4ipfEk=;
-  b=oG522LqpyNlFXo4I9nq+ow6jqH8p2wQq0yUS6uSlfMasjkcbqBvKk1V4
-   n4HBrrHb6remWVeARUuZpZV54f3V3Two9Shf76tOOku/ai8aM1cNG0Ue1
-   AYhjzZ5G8vtgPlAWQ7paRm/L8auAlDhXLSdyd3dNnG/08B1i+2TfGLLUM
-   W6ZtoEtAdBzSLZTvJouPienYmB6pqISZ7sUYva7MsLK6zRep/OmZjzZlS
-   Lr1CvJnioo7nDUTngllWegF6REXq+U21SEoM0tebF663TQyyYWoPeu5r0
-   AMRstlrqa2gtjoNNRrWXZmX9/1h+YCbnE9HoC+SANEr4h5ZDN+UXK2gEz
-   Q==;
-X-CSE-ConnectionGUID: oTrEldYVRw+zWj0z+9r8Mg==
-X-CSE-MsgGUID: 46CrffK0QrySxPaXkpWSMw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11215"; a="31128878"
-X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
-   d="scan'208";a="31128878"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2024 01:21:20 -0700
-X-CSE-ConnectionGUID: LAosS42CTmqpy+aiUg8TVg==
-X-CSE-MsgGUID: wDY822X/SBaZ6Rq+M9eQGw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,179,1725346800"; 
-   d="scan'208";a="74763447"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Oct 2024 01:21:20 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 5 Oct 2024 01:21:19 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 5 Oct 2024 01:21:19 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sat, 5 Oct 2024 01:21:19 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.48) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 5 Oct 2024 01:21:19 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=soD3PMjLRKgHFie/rT9dbL0/JDX961TlN9CvU3J+pblBGni/iW3cXtESUxTNuSEa8TBkuYPx8Rk/AUFxP8hz5OY1ZFSGHeoUSfsENhvvSRUkg34U6JF5OWjig3D6JWWbJg4ir5oggx9fNf04bjmCHRb67bSW86Eq4zWh6S5QHPTHbiO9CcN7AMIk4Gas/3TObBjkseFqb5P3p2WRitxCm8Orno2pozB3rfOZSwXZzC1PR6IakDaLOfhiUYdGpmCG3ILAaF52ZHSQhSEuOUcqNxzmDbeYFQ5JEwRNbu5Dlm2Lcv3w8kHYpyeVEdMDurQEnCNptfEm3o+temW5u3afXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fHMm0QehgU1H6DCumJSfB/cdQvxESDfJFiFPQDDAUiE=;
- b=mwBgnAMg18z6oU6hnNO1eUFbffCkhE5G5ZAF1t2Ps71IsibSvn1ar5qQleno8j71N0DSKfxII8Lm5SJlXFufv0xqkd+EdiDDafsRSi08K33PlDMjE48C3F94tKvioTjBHmqsllwPGuFYFt8X2sC5OKv/Ione/ZNNymouymn3Ibc1t30xT7qPJ7w3NLwEweeX1n38RayugRgjOuPiMCVSYP8pCbTGr7wh68DIWGxxf+NLzqneJ8q+BoJ8VtjbwZ2YLJveQ7liSsQlCpFRQUFKxKfnXHNP4Hn0D4nnN9baFeGMJjxvcL2Ma4z65F/4faZsXiSrVZffHVVndmZHUSVSjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN0PR11MB6304.namprd11.prod.outlook.com (2603:10b6:208:3c0::7)
- by PH8PR11MB6659.namprd11.prod.outlook.com (2603:10b6:510:1c2::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.18; Sat, 5 Oct
- 2024 08:21:16 +0000
-Received: from MN0PR11MB6304.namprd11.prod.outlook.com
- ([fe80::7f88:f3b1:22ec:f508]) by MN0PR11MB6304.namprd11.prod.outlook.com
- ([fe80::7f88:f3b1:22ec:f508%4]) with mapi id 15.20.8026.019; Sat, 5 Oct 2024
- 08:21:15 +0000
-Date: Sat, 5 Oct 2024 16:20:59 +0800
-From: Feng Tang <feng.tang@intel.com>
-To: syzbot <syzbot+80b36e60457a005e0530@syzkaller.appspotmail.com>,
-	<vbabka@suse.cz>
-CC: <42.hyeyoo@gmail.com>, <akpm@linux-foundation.org>, <andrii@kernel.org>,
-	<ast@kernel.org>, <bpf@vger.kernel.org>, <cl@linux.com>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <eddyz87@gmail.com>,
-	<edumazet@google.com>, <haoluo@google.com>, <iamjoonsoo.kim@lge.com>,
-	<john.fastabend@gmail.com>, <jolsa@kernel.org>, <kpsingh@kernel.org>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<martin.lau@linux.dev>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<penberg@kernel.org>, <rientjes@google.com>, <roman.gushchin@linux.dev>,
-	<sdf@fomichev.me>, <song@kernel.org>, <syzkaller-bugs@googlegroups.com>,
-	<vbabka@suse.cz>, <yonghong.song@linux.dev>
-Subject: Re: [syzbot] [bpf?] [net?] KFENCE: memory corruption in
- pskb_expand_head
-Message-ID: <ZwD268XX+eEoeNGo@feng-clx.sh.intel.com>
-References: <6700f123.050a0220.49194.04b5.GAE@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <6700f123.050a0220.49194.04b5.GAE@google.com>
-X-ClientProxiedBy: SI2PR02CA0019.apcprd02.prod.outlook.com
- (2603:1096:4:195::13) To MN0PR11MB6304.namprd11.prod.outlook.com
- (2603:10b6:208:3c0::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9932F5B
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 08:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728116735; cv=none; b=edt7RigsQpdmQUmFvl+aUD1vW+dpy5nIjwj+OavTJzy72Ot6orXDVJFN4fYqLe/S5j+0nwmOnhH/on6QzGJVSDWj6KY/r2AON7csNv10b6G1oYEY/rVueouAZU8y/zQYE87d7s59qGy/L/+xdNGqJCbG/QpE92O47K3KuRrUmcE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728116735; c=relaxed/simple;
+	bh=ORqGMlT2X5U0gpBmv/cfQXpjbLeT37i06j2XDh2tkkc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Mh+ojLcxUdh6H+O4fx1/huV9Yel3FVa8QLEtYgpIKrrFpPcKVoc0M1SMbHXAj1UxSAny64Yj3WIlrOsz/XgI3lmTa34yjUGvgj3Z34TNpGAqxezrSIH/KuQYjyCHXOh7nsTMQ+dDOxRw3UmMqFHVTORiTjpaqxMXw4rbSxzLcQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HnVfoOKI; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a993f6916daso23893666b.1
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 01:25:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728116732; x=1728721532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o5XetfSqmsT0FoqAMypYpHKFZI7ysc4QJ+C1htKml54=;
+        b=HnVfoOKIrdlS5vqluzfoy2NmJWpMKvzyzIDzAPP61YS3lT56jjQyO2QIiIdtxArjnF
+         8jWsc17G+Doemyz+XaTSnXDM1ZD22u6eg264Oqo3JfgmQKcijWbEm2iFSEm1TYCEBgZa
+         PwycnWiiFmkmMtuWT/XylbldR9x2j7njdSacNKc+P0hDwgjh07T6WJkJNqfLNtweESfy
+         L7REO8+bjsXGj/hdoFDtUqjryPUChEqLjBrousshxj01gI/USHPnH3l5YXD1trj0uHBK
+         gSyE7swF2UJ6iPR1kCdj76ZdipyIZ98WuMMBNKlwDG1+mnC2v257W5f2Q7xq4YhP6RXS
+         kr9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728116732; x=1728721532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o5XetfSqmsT0FoqAMypYpHKFZI7ysc4QJ+C1htKml54=;
+        b=Ls5tdSokGYwgViBwMoq8wAgKx+qQkwd6jb6uoXSviSj9mt8ARC37ZKrZfUCWqCWiKP
+         0qTDoScxSy9QyATnHZcp7jThkY7pIsqyB8hrpTAQuZPyHNs7scynkTJPJvRKVpxvMMfn
+         EWbEh3nN661ve6nLlwFRxxgAXW8XVbcf1BxlqcpGNUIPZ8Xv6A/1TfrnDF424abYByT4
+         d/jH1K0P9zzIsrTqe///afbWLrErTxpKYlFQ0SSLpxlC2SlYtlECxV0TxJEtg5fnz/8S
+         /zukS9f9gG9uReYY4bXXMatCYXP5dKpe2IBIK42rxCYlvrklBQn9bZdIUL6MqrDn1NTt
+         eerA==
+X-Forwarded-Encrypted: i=1; AJvYcCXemfPx6gx6Hz7PwvGxogRvcuu+iy2dUgqNGpMyK/bvYiLzex1k9KJk/kAXF+jaqCHAqRWBMCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxu0rZd+BSNKl51uuTUG/rcIFPawjxfgSxXtm93/EuiDNDiWK3R
+	3F1pETr2W6GIne4XC7XUYe/vB72IDSturHB15HyznAnqe5izqk3EFNqx3n8Idw8bbU+/fRY29Ui
+	EA1XiF1V8vjVEtrBmbA2bHLjzL1HBqz6k1JyT
+X-Google-Smtp-Source: AGHT+IE8bC4pa+mAyos14itoLD7At0JnMwZmO1Yx7CXi6SNTvg/aWwSHAekJkLf6vdHIjSA0PQB+kiT2XONeeiXsMik=
+X-Received: by 2002:a17:907:980a:b0:a99:4152:1cb4 with SMTP id
+ a640c23a62f3a-a99415220a5mr48917566b.42.1728116732008; Sat, 05 Oct 2024
+ 01:25:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR11MB6304:EE_|PH8PR11MB6659:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4acdd079-5fa8-42de-bbbc-08dce516ae27
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?JDn8LyvzyCWlrLARaAlmK+uCdFofo4pcSAe5LLYO3FOnc0MPcadzTZuT63hB?=
- =?us-ascii?Q?CW3mDpJfz5KWdU1/06rJLBe1DOiBGbccFqNYLX70tLmCzL5AxmRtqXQkKKM2?=
- =?us-ascii?Q?sVdjDu4Jm1wzNV+e1Yj9zV/oEXZXyCoOrgSDNqgWC7sJ2F6XCH9OAKbel1sX?=
- =?us-ascii?Q?SE1Z/aGB3v3xLCVAoqaJSftsET2GO3E+MGwNAg4dcuAqfHnelYNEkGZ5OYT5?=
- =?us-ascii?Q?43+ggGd44R8WxIqUQ+FUlBRnaY0W2OuOAmyr2aI7grzKw3u57Dyv2yeYPD8X?=
- =?us-ascii?Q?rRkZRvvSNaYUFuXmAwwsOa4d2qbq8i1JUU5xRZXVJ2w1JYA60mf3f2lJvqDi?=
- =?us-ascii?Q?zARgPDlbb7oHITux7bwVtEFahki3uEolbiBm2C3x0G6d0kWde1jH7DRIkSXx?=
- =?us-ascii?Q?jVuQJZqbMBtCYDJ11Y5AvMLUuMatcHW0ev4DhMQ6yt9gFvSARBCKAc5Qj3cV?=
- =?us-ascii?Q?rGQu7weiSwXleAkDNQRM0EJDz2x+EeQZ9pcukyZTEbTer87mjk9LpJjyVLT7?=
- =?us-ascii?Q?hK87117LLgtdUoX8Ip9SBFRKr+ly072pPsEJtAS7H7VTNw9c6nNQXRxZDee5?=
- =?us-ascii?Q?kfZD8D/Q1FSW0w+1EB98/wMZUJOx8jtJUWAY3Zi1POqisVYkVRgt+oxlcYHb?=
- =?us-ascii?Q?iqUyu24vW/udIaExOPzpdMzq9DNfuCqiLuMrZ7N8gnM5WK0ZfSu1PX6l2/Qq?=
- =?us-ascii?Q?SP7vehys0HXTW7hp1mL09pDfuTNgO8nWuB6L+OHqrh471p5ebhMFGn2OXg3u?=
- =?us-ascii?Q?SEx8HKExH7zF76D4CXnOs/Hq4PWTovlGunfXyDSTT60J/FDSQIhP251I1u6m?=
- =?us-ascii?Q?WRIBvuiCJWcw3XHm3fEC3rmdItbjP5cLrjNKPqyFJ6OFpoAu02V9jvI83G5Z?=
- =?us-ascii?Q?9Lgai4fQFbvwfOJTHSe1zyvDbPswioz/wqHDXgUspps9UINSgUVxgHuPmX15?=
- =?us-ascii?Q?YStmUnmmG91iWbO4ek+BOEN4YkuwsKNLtB0f0LKQ9AwX4hDIAgLzxbuvEUFL?=
- =?us-ascii?Q?xgNI5ehSsaOO50e9cYK5dknKk/1BpiNilGoXzEW3t3CXR103apDYFnalJlCY?=
- =?us-ascii?Q?kvVIwmPNSLIrTCI13boRofaNu5v/zbDxFU68yRQMdh4xE3yZhFUt27TF88Wm?=
- =?us-ascii?Q?C1ET9ts0WLVXQGUqLi4LU33UNtYnYkn62i9+DQZPbSLcLtSyn0H8m/SGfbAj?=
- =?us-ascii?Q?XuW06QwNePkEQScFD11TF9TRpp6V4j78m0pz1cGSmvzYyF16tohXwSETMTA?=
- =?us-ascii?Q?=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6304.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C/YZWTJEfkdvarFyUlHAgzhG8fuM7USJiJbEDfz5GBBTwJhy0rpdsNTFXs/E?=
- =?us-ascii?Q?wfniQx18zZUyWClsG4YKBSFAwt2oO8njiKzroJQyJcmTpgjcUVDCbcIdFsdR?=
- =?us-ascii?Q?O184Dijuap4vx86eZUQQhzx8RgFX9RJUDU0NfZ0yai5Xbk7elmVCFGFLxTX3?=
- =?us-ascii?Q?tqdmytTKXl712YBCqK/jRrNRb3YxiGM/53LB3J5BJbxAcqNQGy/VsnZaVpnV?=
- =?us-ascii?Q?OXEx/CJhTP556CTO2SmyGyMirQfNrLXPINaJp09z+GTPEcnop/GqpyjdP4Vu?=
- =?us-ascii?Q?9ublnb0UNSYRkjeZT6j/SbBP3un2YthDB5x8OfFSSbRGi7VgdURgkvL69TsQ?=
- =?us-ascii?Q?ZHpko2EDiboaEyD/iFK6nCWVResWlylTvd7djLIjQlOJvnAcPVce35cj7uiE?=
- =?us-ascii?Q?hf4ZU6JB3aWZofZl+d6gXEEMeOsO6LHwLd8Rkt9mOFsWMAVJSQVALPALQZcN?=
- =?us-ascii?Q?8uOOifF4iVPNHf4EU9OE3YA7SO7CLieVN4jy56rD8Rw8DsnbCqGP0TzKl3P7?=
- =?us-ascii?Q?O6n9OKKU5SonSxLvd38KDnY0nXzAq11epMAoQAhaHgXsdWuEDO/I7kjAlrfQ?=
- =?us-ascii?Q?397ycSfeP6XSEO2lvRxuIda2pMX9s60SgKpoJsk6bPgl3mB99ZljVC7/sWIQ?=
- =?us-ascii?Q?IiVXaldTBG6TUbfE0pLXeAeQy25kwjrH4J3/z2Qsb6ljkijzgd0PanjisU+D?=
- =?us-ascii?Q?hlQyzDaREX3YQGIUtJUhZTMcIu0DXWLSWO8RkVD6JyBAubjKnHVoA170kblu?=
- =?us-ascii?Q?L3FR19VkLrt/2vMAWB9ROjnXmA9hUIBJhNpXldjNeg22sw/8SpTDcymYln6S?=
- =?us-ascii?Q?g3kcQ4B7v6kqS3vEiniJdHV0WPMKSq0ru2Bcdw5tKBTJKfSGGvvvCoEblElD?=
- =?us-ascii?Q?TLxdZU1flVTfS7WwWIw50AjAfNPDI0jUtF4LjGtl9SAMlKX4i0oWG0LlwQPO?=
- =?us-ascii?Q?UTgjAXRXEDJQjqZuF0XaOwU1gHOnVZh+1f/x9QmGTzNuIwIaK0W/CfLYVf+8?=
- =?us-ascii?Q?MLWpPuZH0k56Bj3LsTWca6h6OGdw7SRb+QXRHsj00LlxK5eyds/68GSSvoGO?=
- =?us-ascii?Q?o1eHA6fnUXSYiC9actRgC1VATbJyFS2kO2iS7+7iNL4khguu8+75dvUwWsx/?=
- =?us-ascii?Q?p0uKc7J9fgkj0zoST59oT/HPcQcafxl2xXkKV+qQ4552Ci1uFbdVGaN3Ndye?=
- =?us-ascii?Q?RwxrnxngmCBxzhPrmSpITNRaV402m7dNB5g44ioHW4O9Jj0IIiPB5FQvOeKl?=
- =?us-ascii?Q?Szx+pcPkalTdzAn/ZGPrMvu11aVS1emJ5XXpim9VdO3j0M6pa0/Xxlkj+SsZ?=
- =?us-ascii?Q?P81VBnyXvsGoPov2fq1THjxynLRVUhyyrXbpmGbaQAIEB1JjOkEfiQPx1qJO?=
- =?us-ascii?Q?orjPmb8D0MNqNIdiSqDqcl4lKdK40xfmbQyWxhE/Ai5wMwAoVQaVEvgu/wbH?=
- =?us-ascii?Q?kS+BptUJf82+8jDRzYtO7cugWhhydPQK24JbxIuk4lvCK9dVWuKnaUM73jMQ?=
- =?us-ascii?Q?ClampkJ6q+XQftfVTKY0zDf3kP6SogUp8gl31Ko+sEUR9sf7Z6gRMdE8xE89?=
- =?us-ascii?Q?cTtO1/9iUzbFwB1AzNRRpROaCbwVUxVjWGBOcTip?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4acdd079-5fa8-42de-bbbc-08dce516ae27
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6304.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Oct 2024 08:21:15.4609
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n9A579uO8HcBty2V304z0a8Q69ybbr4cznMxa1uJ4UkOEXVQjEq9OS2s5MKkH2RsSQM3txVBNsbpt/5EHqgjAA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6659
-X-OriginatorOrg: intel.com
+References: <20241004222358.79129-1-kuniyu@amazon.com> <20241004222358.79129-2-kuniyu@amazon.com>
+In-Reply-To: <20241004222358.79129-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 5 Oct 2024 10:25:20 +0200
+Message-ID: <CANn89iKEaY22wrYoi9NbZ3CN+fwXqmLnM_P+zgucv_Unna64UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net 1/6] rtnetlink: Add bulk registration helpers for
+ rtnetlink message handlers.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Oct 05, 2024 at 12:56:19AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    c02d24a5af66 Add linux-next specific files for 20241003
-> git tree:       linux-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1404ab9f980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=94f9caf16c0af42d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=80b36e60457a005e0530
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f633d0580000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1204ab9f980000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/641e642c9432/disk-c02d24a5.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/98aaf20c29e0/vmlinux-c02d24a5.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/c23099f2d86b/bzImage-c02d24a5.xz
-> 
-> The issue was bisected to:
-> 
-> commit d0a38fad51cc70ab3dd3c59b54d8079ac19220b9
-> Author: Feng Tang <feng.tang@intel.com>
-> Date:   Wed Sep 11 06:45:34 2024 +0000
-> 
->     mm/slub: Improve redzone check and zeroing for krealloc()
+On Sat, Oct 5, 2024 at 12:24=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> Before commit addf9b90de22 ("net: rtnetlink: use rcu to free rtnl message
+> handlers"), once rtnl_msg_handlers[protocol] was allocated, the following
+> rtnl_register_module() for the same protocol never failed.
+>
+> However, after the commit, rtnl_msg_handler[protocol][msgtype] needs to
+> be allocated in each rtnl_register_module(), so each call could fail.
+>
+> Many callers of rtnl_register_module() do not handle the returned error,
+> and we need to add many error handlings.
+>
+> To handle that easily, let's add wrapper functions for bulk registration
+> of rtnetlink message handlers.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/net/rtnetlink.h | 19 +++++++++++++++++++
+>  net/core/rtnetlink.c    | 30 ++++++++++++++++++++++++++++++
+>  2 files changed, 49 insertions(+)
+>
+> diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
+> index b45d57b5968a..b6b91898dc13 100644
+> --- a/include/net/rtnetlink.h
+> +++ b/include/net/rtnetlink.h
+> @@ -29,6 +29,14 @@ static inline enum rtnl_kinds rtnl_msgtype_kind(int ms=
+gtype)
+>         return msgtype & RTNL_KIND_MASK;
+>  }
+>
+> +struct rtnl_msg_handler {
 
-Thanks for the report!
+Since we add a structure, we could stick here a
 
-Marco Elver also reported similar issue [1]. We agreed to revert the patch
-and work on a new version, and Vlastimil did zapped the patchset from his
-'for-next' branch. I just rechecked and seems the pachset also sits on
-another branch 'for-6.13/fixes' of slab tree.
+            struct module *owner;
 
-Vlastimil, pls help to zap it from that branch also, thanks!
+> +       int protocol;
+> +       int msgtype;
+> +       rtnl_doit_func doit;
+> +       rtnl_dumpit_func dumpit;
+> +       int flags;
+> +};
+> +
+>  void rtnl_register(int protocol, int msgtype,
+>                    rtnl_doit_func, rtnl_dumpit_func, unsigned int flags);
+>  int rtnl_register_module(struct module *owner, int protocol, int msgtype=
+,
+> @@ -36,6 +44,17 @@ int rtnl_register_module(struct module *owner, int pro=
+tocol, int msgtype,
+>  int rtnl_unregister(int protocol, int msgtype);
+>  void rtnl_unregister_all(int protocol);
+>
+> +int __rtnl_register_many(struct module *owner,
+> +                        struct rtnl_msg_handler *handlers, int n);
+> +void __rtnl_unregister_many(struct rtnl_msg_handler *handlers, int n);
+> +
+> +#define rtnl_register_many(handlers)                                    =
+       \
+> +       __rtnl_register_many(NULL, handlers, ARRAY_SIZE(handlers))
+> +#define rtnl_register_module_many(handlers)                             =
+       \
+> +       __rtnl_register_many(THIS_MODULE, handlers, ARRAY_SIZE(handlers))
 
-[1]. https://lore.kernel.org/all/CANpmjNM5XjwwSc8WrDE9=FGmSScftYrbsvC+db+82GaMPiQqvQ@mail.gmail.com/
 
-- Feng
+This would allow a simpler api, no need for rtnl_register_module_many()
 
