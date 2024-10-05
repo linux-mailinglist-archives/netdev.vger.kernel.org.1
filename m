@@ -1,135 +1,110 @@
-Return-Path: <netdev+bounces-132416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD528991962
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 20:23:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31EF991981
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 20:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB5AF1C21215
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A452281AA5
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3A015958D;
-	Sat,  5 Oct 2024 18:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF03415AACA;
+	Sat,  5 Oct 2024 18:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PYgexb6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="seYOJHbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298B51798C;
-	Sat,  5 Oct 2024 18:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE24115A851;
+	Sat,  5 Oct 2024 18:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728152582; cv=none; b=d8vTS8MOOXokS18nOahTJu/7mbE1iSIMqDB9RW0feLvY4LrzUJKZJkhA7ldvinc24EUXTnRGRm5nk2rRQ7xhTxKcQo6tu4tU+QNGavf1pS/2wsnJN0srxr4+8rlL4QMt3P7nDsPsXrb5SF0JBcV5vhKnGPAIad/Yia2m3RJwcU0=
+	t=1728153025; cv=none; b=WtAJYQyzJqR3oNevVH0cUk/ArT05sYRbqp07xZHdSmpV4HHE9WIbJXwIzEGJG2q5GRsT9wExN3TH16QlL9zsI1pYCSQcol4UUr4GXeRRoqE6jxGH+Trr4/Cub3b6rSMIAEzc8XpT97p8JTgvNjUoV11ko0q7kW1DSX061JsRiY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728152582; c=relaxed/simple;
-	bh=2vC7ZGx6N4XTlI98Fc4pDJ4we1lj8z+fyLZnvj/jHKU=;
+	s=arc-20240116; t=1728153025; c=relaxed/simple;
+	bh=C/3NzZqOTorLtRkgrjsjoBs+OeubveVBpbXcNsYIa/k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EDvbeiwntsIoeuKrR0lYxKbHnUnzbekoko9ULXrN2LkQbkt5sj9pjB+rhJ2TMFyScBkdcU7csB6GO6CK1b/rPW+wa/acog2ySgAFR6LD+8qx56u5RUg7s7tjlJVOMHZKz5WzY3r3cCq5vM6HeOfq8J5wLx4bvV7dSddhCHXMW4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PYgexb6c; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c8af23a4fcso3762966a12.0;
-        Sat, 05 Oct 2024 11:23:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728152579; x=1728757379; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Fg2B5McyqQ1FvD0AsheeXltyP/0qxdRQE36MLXD3lfs=;
-        b=PYgexb6cS0w0gRYfCzx6cA0kjTKYGpEFp5z60M1wqCDUc5KAPQlp/QT+Bz4qsc/A+U
-         iG8ToRz4IVICUIWdb5Bjv9dZhUlLUKtfUZEIFn+gKJ8vAbKS+iRYEkzBpPMf7SqcuAXb
-         pgocRjqy/X4Aoro2bIwIwjG+8YAe6wFYSfdTijporA9escyLYcd+KgGBY2fRYGupAKd3
-         yxwq0ROrgTnyXjWz1lt6rNJNGW8WmRbxRA4y6YyZF0qL6LbzEn1vmcLTIGnNJ1fkS4BK
-         4+V97jjOC9GVAfY7T98xweYDNlGa6dIqkZceriC/TZ3+MvXssjEBc7OIg52PeNdzHXM9
-         KRKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728152579; x=1728757379;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fg2B5McyqQ1FvD0AsheeXltyP/0qxdRQE36MLXD3lfs=;
-        b=KraAmFgsQFA9RSetNF8A5nQ4Q01nejmquYJOQ64Rn1DNsaD3RCgqxuS/sK47WMsQRE
-         mwD1suTZBE9WjkEJ0wsMsuhpolEQqy54SH1BD6WcHBUJaXD5J0ET5OuMfVT/bWpiwNk1
-         /KPR4xRzlk8PyBP3HydLPdUhf+PwdMSvX3+C+Mt3k6DT1RRElB1PbjXmXQ3pOb2j70Gf
-         FGVyDm+V11Qj3MpadydZkx4vkAZNWaYOAzBbAvKt9rf5ByOcn5NoohspW7B63/7PTASh
-         5Y8/2i+9P8+gq9+y6xu6vdCstn+k4tVJd0jioCajQz19HjqfcLjkJz8OVdsn117WNTzE
-         v5VA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEPOJDplTZs656cA5/W5e+pyrLfWHglELDqLdIM5qFTn7B55R4OzrjpzQbsbjh+qOdgTIOa3SwYGJ4GSAvhqza@vger.kernel.org, AJvYcCUKbZ50n/yMCl7A1xXzjBXTEFVRS9z0RHEfbo3WqzWu5yFdJadKFSPb4wjnHsYLn7tRI2n/jn6v@vger.kernel.org, AJvYcCVRtuT8P0j7Ael3o7q5bZE9hvrfuh4mAodS0SAp2f89fj/jnsjDFdhTx0I4mT9o1q8VB5nWVXpMLJWiyg3+wiheib4PXzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydTg9fGPKq2NfDifXthMaj7FRoJ5Y8gNF4JrALfxMRM4NWCgVl
-	vQh1beQtSGDs8Xp+EWmU96mEgMHIO/etJg5D7Sz2HiY/tWj6kPPk
-X-Google-Smtp-Source: AGHT+IEbHEnpL+z00inE3UhZTdLEnCAOL3r3r6w2MDp27aZmerm+HYqUtVcDnQIBbt5MnEAUB/Ho+A==
-X-Received: by 2002:a17:906:c10f:b0:a99:4162:4e42 with SMTP id a640c23a62f3a-a994162606bmr167179366b.37.1728152579060;
-        Sat, 05 Oct 2024 11:22:59 -0700 (PDT)
-Received: from localhost ([2a02:168:59f0:1:b0ab:dd5e:5c82:86b0])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a993fd777e6sm85186766b.79.2024.10.05.11.22.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 11:22:58 -0700 (PDT)
-Date: Sat, 5 Oct 2024 20:22:54 +0200
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v2 2/9] landlock: Support TCP listen access-control
-Message-ID: <20241005.e820f4fae74e@gnoack.org>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-3-ivanov.mikhail1@huawei-partners.com>
- <20241005.bd6123d170b4@gnoack.org>
- <47ff2457-59e2-b08e-0bb4-5d7c70be2ad1@huawei-partners.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4AyyERF1ybCLsILkxHj849UrfEpeTp8KQl06vATHOj7eCp/gYSFJsuTwsxQfdYZP6LkfitmHr/spWsc7YJ8/7M2zZcL4ql4schxd+i5QZRmEUQxigekKLXYGqrpMLT5uBfE6WJ3ywNnO/9dN86OCHQIG7mVSTDfd7qH6+7zBXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=seYOJHbq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5788EC4CECC;
+	Sat,  5 Oct 2024 18:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728153025;
+	bh=C/3NzZqOTorLtRkgrjsjoBs+OeubveVBpbXcNsYIa/k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=seYOJHbqiQO2n9QALzYbR2pYgc/1Z0XG4+JXADF8U5CPNjhy+ZCZClLfRADlrqH5i
+	 kygu0PIV31eDkvF/LwpXZ6s1eI6jHZketkDowriQPQcCBiVArQ4Di60xCJcv6fBjSp
+	 L69qdh7mw1wgnyPnT0emLsiV6ToEMFSwqQ0cZWVXHI7wENNw2JBFkvc23ZiwATHUHf
+	 e82Yu4iKmx2CcFlnBr1zOOYYZT8/Xye/pSrEFBt2gqcXAuZvcaIt97n4NBSAo3XtmS
+	 07XJXiEIem5HGp4lMSAP8GBti4CjcewZcJ1lYKt8cv88ZRUaYN+bTZgUsmFFgNaE64
+	 gGh90994kAmvQ==
+Date: Sat, 5 Oct 2024 13:30:21 -0500
+From: Bjorn Andersson <andersson@kernel.org>
+To: "Kiran Kumar C.S.K" <quic_kkumarcs@quicinc.com>
+Cc: Bjorn Andersson <quic_bjorande@quicinc.com>, 
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, Andy Gross <agross@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Russell King <linux@armlinux.org.uk>, 
+	Jacob Keller <jacob.e.keller@intel.com>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	vsmuthu@qti.qualcomm.com, arastogi@qti.qualcomm.com, linchen@qti.qualcomm.com, 
+	john@phrozen.org, Luo Jie <quic_luoj@quicinc.com>, 
+	Pavithra R <quic_pavir@quicinc.com>, "Suruchi Agarwal (QUIC)" <quic_suruchia@quicinc.com>, 
+	"Lei Wei (QUIC)" <quic_leiwei@quicinc.com>
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+Message-ID: <zz7m5v5bqx76fk5pfjppnkl6toui6cz6vxavctqztcyyjb645l@67joksb6rfcz>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <Zv7ubCFWz2ykztcR@hu-bjorande-lv.qualcomm.com>
+ <7f413748-905d-4250-ad57-fc83969aad28@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <47ff2457-59e2-b08e-0bb4-5d7c70be2ad1@huawei-partners.com>
+In-Reply-To: <7f413748-905d-4250-ad57-fc83969aad28@quicinc.com>
 
-On Sat, Oct 05, 2024 at 08:53:55PM +0300, Mikhail Ivanov wrote:
-> On 10/5/2024 7:56 PM, Günther Noack wrote:
-> > On Wed, Aug 14, 2024 at 11:01:44AM +0800, Mikhail Ivanov wrote:
-> > > +	port = htons(inet_sk(sk)->inet_num);
-> > > +	release_sock(sk);
-> > > +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
-> > 
-> > Nit: The last two lines could just be
-> > 
-> >    err = check_access_socket(...);
-> > 
-> > and then you would only need the release_sock(sk) call in one place.
-> > (And maybe rename the goto label accordingly.)
-> This split was done in order to not hold socket lock while doing some
-> Landlock-specific logic. It might be identical in performance to
-> your suggestion, but I thought that (1) security module should have as
-> little impact on network stack as possible and (2) it is more
-> clear that locking is performed only for a few socket state checks which
-> are not related to the access control.
+On Fri, Oct 04, 2024 at 07:47:15PM GMT, Kiran Kumar C.S.K wrote:
 > 
-> I'll add this explanation with a comment if you agree that everything is
-> correct.
+> 
+> On 10/4/2024 12:50 AM, Bjorn Andersson wrote:
+> > On Thu, Oct 03, 2024 at 11:20:03PM +0530, Kiran Kumar C.S.K wrote:
+> >> On 10/3/2024 2:58 AM, Andrew Lunn wrote:
+> >>> On Thu, Oct 03, 2024 at 02:07:10AM +0530, Kiran Kumar C.S.K wrote:
+[..]
+> > The only remaining dependency I was expecting is the qcom tree depending
+> > on the clock and netdev trees to have picked up the bindings, and for
+> > new bindings I do accept dts changes in the same cycle (I validate dts
+> > against bindings in linux-next).
+> > 
+> 
+> The only compile-time dependency from PCS driver to NSS CC driver is
+> with the example section in PCS driver's dtbindings file. The PCS DTS
+> node example definitions include a header file exported by the NSS CC
+> driver, to access certain macros for referring to the MII Rx/Tx clocks.
+> So, although there is no dependency in the driver code, a successful
+> dtbindings check will require the NSS CC driver to be available. Could
+> you suggest how such dependencies can be worked around? Would it be
+> acceptable to defer enabling the example node for dtbindings compilation
+> using its 'status' property, until the NSS CC driver is merged?
+> 
 
+You can avoid this dependency by making the example...an example.
 
-IMHO, when you grab a lock in this function, it is clear that you'd
-unconditionally want to release it before you return from the
-function, and that in C, the normal way to guarantee unconditional
-cleanup work would be to apply the "single exit point" rule.
+By using just descriptive phandles you can present an example of the
+client device without creating a dependency on the specific provider.
 
-That being said, the scenario is simple enough here that it's not a
-big issue in my eyes.  It was more of a minor nit about having more
-than one place where the lock has to be released.  Either way is fine
-(and also should not require excessive comments :)).
-
-> > > +
-> > > +release_nocheck:
-> > > +	release_sock(sk);
-> > > +	return err;
-> > > +}
-
-–Günther
+Regards,
+Bjorn
 
