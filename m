@@ -1,136 +1,121 @@
-Return-Path: <netdev+bounces-132325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EFE099139B
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 02:46:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 726C09913CF
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 03:45:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06677B21094
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 00:46:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32709283C31
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 01:45:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7075C1A29A;
-	Sat,  5 Oct 2024 00:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0B6F9DA;
+	Sat,  5 Oct 2024 01:45:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKARuMy0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CGlW5TxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F5B17BD3;
-	Sat,  5 Oct 2024 00:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9B1BE4F;
+	Sat,  5 Oct 2024 01:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728089150; cv=none; b=oACCkoc+UScyZ5rHluDrzg2SVbdPLfY0cIPM2uGYyBhjIvXRbtAo2AC+j7ozilln6TtKT+6DWOiu5UoXmVovrTh1ipWIWTLbxi9maILfiEzboPhcPKs/VrA+puIPjrkyyvw1BZ3rTsbj2/FVr+xCYb1C4iIuzvZq5RWYqQJJ/+0=
+	t=1728092743; cv=none; b=ZljWBbQMYVoedZpPSkG/b/zFO744qnQmRnLHKM2gmCw/Cja1Az4IP5cb3jwRvwRS25sFV/ZMjyT1DRrhXBnWa+R/FezNuHxmRKCCgYbFAe4uj8/ZBo/3s2CkMn6SF/xYIz8lSD4fykQ9mxKrap/Bg5P3NKZsTQ2HJm/fy1yYH2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728089150; c=relaxed/simple;
-	bh=D8THuL/WtjamRz9W5coZAbJh0EtstxtlVs5yWnjdESk=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=AE/uKEgZ5K8jBCEDyk5DXjHO8fXt6TwJzZPWZ6b3WRfH7JyAisxdt99Dp7Eq8JXCS6Y+JZLD/oZR+tkH2qv5DxjAvFCJTsYP1IFaDpRTFRTXjZC3uabnGV+xccFz4SZYxTiZMMh+lItQXDHt1Cbqb4ug0BHyfkOwGTpq5VLdb74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKARuMy0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D340C4CEC6;
-	Sat,  5 Oct 2024 00:45:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728089149;
-	bh=D8THuL/WtjamRz9W5coZAbJh0EtstxtlVs5yWnjdESk=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=uKARuMy09Q0qxfk2hLo/lsJCQT/NM+khzdhiyM6w+mtS8zviqo4UBbJDBF98P8Wwd
-	 jsTTIfqaD90nJcc+qR03NlkSHw7l29eLm/0q6TqZD/ZwlPZIpO5EGP5kmQqnqYQBdG
-	 j7Yjr4ZrDUOPy2kf5PoSISmH2ZA0MMMK/BBbrlteWeZ4oshlKFDkL6rGBYxrEhSihJ
-	 0ixbLATSjwhFXnIqvgS3rtAHPGRdHJktsqYpKpfvMOHaVMNR9N+97Ku/7a4wP26AaH
-	 pDx17AqmbqfoC0qFh2JEgrGMHAY04nPlFnfTsbwEfn1/FgrpbRuVejpUdjbQZVVriL
-	 OMVHSO67n5Bhw==
-Date: Fri, 04 Oct 2024 19:45:47 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1728092743; c=relaxed/simple;
+	bh=fWG1fXg3ZYf7iX4DUU6mCyArA8Rxuz0fZncrjcXHktw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NEyfVIi/SvzPTX1LHccVHAc4ETe6o9KD7A1fF0tcw0Gmd7GIgLRgQJ14rYW4wtG9gFiBwmZFDQfd8z6VqxPmm+PIk7SMRW+OATw8pLtCZ4DGI1hKPfuJJ50NJOx18DuyCfpdW4JqZAOkgH3h2sgQQkwFg0Gzmpg+FriWcO4j5M8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CGlW5TxZ; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71dbdb7afe7so2235524b3a.0;
+        Fri, 04 Oct 2024 18:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728092741; x=1728697541; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eQLjV0HPL7dlV32BWe8r/nHswhCY6g8/wd5k2qXOZT8=;
+        b=CGlW5TxZpmElJ3nlbDE1EkFAnNxmbjTOYfzCCkZ70CcYk1uQBfpX1TLTWioPPc6Lte
+         XrNHm23I0+CcYW6pXki8+bw82P6Dm7/pPUcsyd6MuAR4N+5+7eGA6hTN5hpO3tt5WxjQ
+         XgMqBA5vWIVtu0HXtpUnGL0m8awvJg3GSH+VEmKWwdvMuz3y8InRat4SUWWwNhrICSt2
+         1AwA0PAaIEWSSw0X6ECTY2N2MQz4F4KT8MeDNl9kr0qu4DzLZGOryTkHxgd/tPLEoUjQ
+         +aCCRenNN/T0mnbn0TpOqn207q4EmpJivwu6IYfrZSBzV1yBg0OTjCxoHLdPx5KJeAyM
+         05uQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728092741; x=1728697541;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eQLjV0HPL7dlV32BWe8r/nHswhCY6g8/wd5k2qXOZT8=;
+        b=UiNFDJqWhyvgUY4hhE749MBkW3a/rPLjngrUG7QkrwgXAclpnL5x7KmYZ/yBFDV06a
+         3+S/2pid/a1XE9Iubo1N221AsMt5cKKau/wO+/qXmdPIQVnbrsZvlbp0yczRit/hMSVE
+         1tAqE7SpyPfZjSE6+WFieSz8qBDXsGDDLO71VIuj5IFYomkg0kILYbSeEF4gzhcJd2hA
+         Jdj9RL/ixaFNiyzWFTNNVyvRXwQ5pDZrvqB7a/KsHPTTWJ5bT1Iw2lCAmie3VQOfk7Gr
+         3CD6t8sgQuCyLQM8DZ7MkomHQOpxlAye5SCXnyUSb5v+QDh3mM5Iqh9XZxcwSL8kUP0X
+         SNNA==
+X-Forwarded-Encrypted: i=1; AJvYcCURyRAWa5v2Jy2wbGsdz1Aw5Ae630zaVrBCUJ3YvZzbjRBXS+Lul7WRC2rkaOXAMJEpJw/rOI/h@vger.kernel.org, AJvYcCW2q7jvysYL4lp6+iQn+ax8JxzK2+FgaM7mVYELKqBE8P0cgXtOMrGg6bgLXyuH+C8VIyQ6jevt1OLvgbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrshAwWYOQZksCNzuiD+4EsGpDxsm9ZGq0yU8fmVrzxkaDp/cs
+	XrEixTva2cnC98rrXfW4Iw/kOU0ux9sVpp0kIyxo8Zc5GLRegF65iCWWm7f7
+X-Google-Smtp-Source: AGHT+IGJsV3Wzf12hiFh9qTy7TwrEkm3ZPpXOQBfy7+FwWwQTYzpJDpgeJfXNnVTdHrULFkeDogufg==
+X-Received: by 2002:a05:6a21:670f:b0:1d2:e90a:f847 with SMTP id adf61e73a8af0-1d6dfacac9amr7393998637.37.1728092741414;
+        Fri, 04 Oct 2024 18:45:41 -0700 (PDT)
+Received: from elite.lan ([2601:645:8800:2e43::abb])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71df0d695cdsm530175b3a.183.2024.10.04.18.45.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Oct 2024 18:45:40 -0700 (PDT)
+From: Amedeo Baragiola <ingamedeo@gmail.com>
+To: 
+Cc: Amedeo Baragiola <ingamedeo@gmail.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] bridge: use promisc arg instead of skb flags
+Date: Fri,  4 Oct 2024 18:44:58 -0700
+Message-ID: <20241005014514.1541240-1-ingamedeo@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: devicetree@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Christian Marangi <ansuelsmth@gmail.com>, 
- =?utf-8?q?Rafa=C5=82_Mi=C5=82ecki?= <rafal@milecki.pl>, 
- "David S. Miller" <davem@davemloft.net>, Conor Dooley <conor+dt@kernel.org>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- linux-mediatek@lists.infradead.org, 
- Sebastian Hesselbarth <sebastian.hesselbarth@gmail.com>, 
- linux-arm-kernel@lists.infradead.org, 
- Bjorn Andersson <andersson@kernel.org>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, netdev@vger.kernel.org, 
- Andrew Lunn <andrew@lunn.ch>, Vignesh Raghavendra <vigneshr@ti.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Gregory Clement <gregory.clement@bootlin.com>, 
- Anand Gore <anand.gore@broadcom.com>, 
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Jakub Kicinski <kuba@kernel.org>, linux-mtd@lists.infradead.org, 
- Richard Weinberger <richard@nod.at>, 
- William Zhang <william.zhang@broadcom.com>, linux-arm-msm@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
- Konrad Dybcio <konradybcio@kernel.org>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Kursad Oney <kursad.oney@broadcom.com>
-In-Reply-To: <20241004000015.544297-1-rosenp@gmail.com>
-References: <20241004000015.544297-1-rosenp@gmail.com>
-Message-Id: <172808887889.121631.5291340274404319375.robh@kernel.org>
-Subject: Re: [PATCHv2 0/5] devicetree: move nvmem-cells users to
- nvmem-layout
+Content-Transfer-Encoding: 8bit
 
+Since commit 751de2012eaf ("netfilter: br_netfilter: skip conntrack input hook for promisc packets")
+a second argument (promisc) has been added to br_pass_frame_up which
+represents whether the interface is in promiscuous mode. However,
+internally - in one remaining case - br_pass_frame_up checks the device
+flags derived from skb instead of the argument being passed in.
+This one-line changes addresses this inconsistency.
 
-On Thu, 03 Oct 2024 17:00:10 -0700, Rosen Penev wrote:
-> The former has been soft deprecated by the latter. Move all users to the
-> latter to avoid having nvmem-cells as an example.
-> 
-> v2: add missing semicolon to fix dt_binding_check
-> 
-> Rosen Penev (5):
->   ARM: dts: qcom: ipq4019: use nvmem-layout
->   arm64: dts: bcm4908: nvmem-layout conversion
->   arm64: dts: armada-3720-gl-mv1000: use nvmem-layout
->   arm64: dts: mediatek: 7886cax: use nvmem-layout
->   documentation: use nvmem-layout in examples
-> 
->  .../mtd/partitions/qcom,smem-part.yaml        | 19 +++++++-----
->  .../bindings/net/marvell,aquantia.yaml        | 13 ++++----
->  .../boot/dts/qcom/qcom-ipq4018-ap120c-ac.dtsi | 19 +++++++-----
->  .../bcmbca/bcm4906-netgear-r8000p.dts         | 14 +++++----
->  .../dts/marvell/armada-3720-gl-mv1000.dts     | 30 +++++++++----------
->  .../mediatek/mt7986a-acelink-ew-7886cax.dts   |  1 -
->  6 files changed, 53 insertions(+), 43 deletions(-)
-> 
-> --
-> 2.46.2
-> 
-> 
-> 
+Signed-off-by: Amedeo Baragiola <ingamedeo@gmail.com>
+---
+ net/bridge/br_input.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
-
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-New warnings running 'make CHECK_DTBS=y broadcom/bcmbca/bcm4906-netgear-r8000p.dtb marvell/armada-3720-gl-mv1000.dtb mediatek/mt7986a-acelink-ew-7886cax.dtb' for 20241004000015.544297-1-rosenp@gmail.com:
-
-arch/arm64/boot/dts/broadcom/bcmbca/bcm4906-netgear-r8000p.dts:149.4-30: Warning (ranges_format): /bus@ff800000/nand-controller@1800/nand@0/partitions/partition@0:ranges: "ranges" property has invalid length (12 bytes) (parent #address-cells == 1, child #address-cells == 2, #size-cells == 1)
-
-
-
-
+diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+index ceaa5a89b947..156c18f42fa3 100644
+--- a/net/bridge/br_input.c
++++ b/net/bridge/br_input.c
+@@ -50,8 +50,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
+ 	 * packet is allowed except in promisc mode when someone
+ 	 * may be running packet capture.
+ 	 */
+-	if (!(brdev->flags & IFF_PROMISC) &&
+-	    !br_allowed_egress(vg, skb)) {
++	if (!promisc && !br_allowed_egress(vg, skb)) {
+ 		kfree_skb(skb);
+ 		return NET_RX_DROP;
+ 	}
+-- 
+2.46.2
 
 
