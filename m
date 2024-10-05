@@ -1,121 +1,156 @@
-Return-Path: <netdev+bounces-132341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AC2991484
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:30:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C4BC9914D2
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 08:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9413BB20D38
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:30:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89E551F22A43
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:11:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A37A139597;
-	Sat,  5 Oct 2024 05:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E073F9D5;
+	Sat,  5 Oct 2024 06:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YF5RZ/35"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1gVVH64"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EB782D91;
-	Sat,  5 Oct 2024 05:29:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 401C025761;
+	Sat,  5 Oct 2024 06:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728106194; cv=none; b=KqI9FMjpSO3RBaTmpDMlHT7pZeaM9bFGmQZYy63UCRRmpQc14nKt6Mr9Dgjn0QFufCGPaibhoVn8D7LJM+nZ87icauSY9aDABpacu5vB2nNgYIXJouS4xCYclcmzcQ41n5fM5V5Mc8ZgFMbm5doK0EHJfr93du1HoupwCbHGDzY=
+	t=1728108699; cv=none; b=iVW8ZGxgc0IWUeI/g3fPhMOIOOHk6ouT38v+A5E53dNGXdADpOTFFv1KNiEID/PxfjLJ+VXe2zF2QPJA1F0dTcPYKwS+NWG1js/qEgupT0vEXzn8L4LQXO60xerVfQbgUo+veTX5F2vsd4vfcPI/zMt56r9PkSuV4s76Qk2Jir0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728106194; c=relaxed/simple;
-	bh=hI2BPsKn6Fb7xDapPbHxt54KAin5kF1lKUkbh087EgQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=n9bk0c8DdKgVjCM1qc2k1dNFZ8N7vHNu3wlmyZKz04ctUijiBdbzzPIa5COKZvDZ1H9vBfUUUkY7ZKALImakaMPUCMWFEwtG+vnvZCOEGNoWqTA9S3ZXBioYy2IQrXY/0i+FQfDLMhes3To8V4SWq5XeNcJQMwN7Xqlf9a+RjBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YF5RZ/35; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1728108699; c=relaxed/simple;
+	bh=ATt7P8kWar3VOe/NiggIMKAMgRS+W4H0CAGY6Ui03Ek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pD1QP3FB27lQ2ho7QOp9LVUDs+8WdfIIRv5WA0xS5BWcBQP3nPRCOC4hU9igepq9G6Hwrr0QdB4h6fednGNn6qnDS7CeGautMs1qQ0UH3p3YLoqCNlYdN6hZ5D5Mgb6iAKj7iDMnYYj4xcteqzaSva6o91pFgcZ1V0T3zT3G+QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1gVVH64; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cb7a2e4d6so28326345e9.0;
-        Fri, 04 Oct 2024 22:29:52 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a8a837cec81so200024166b.2;
+        Fri, 04 Oct 2024 23:11:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728106191; x=1728710991; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0kNhACyHju1qZ/sENCdrWjPN9bm5n5NCjJOZx++DT6c=;
-        b=YF5RZ/35aZ2BtHafx70/DXl7Lx9IfseXr29AHE4X/OUnEzJM2RNgxz2OCkWHIq1m6A
-         v4ofAONRmvViWiNep0tHlJspDmygY4zZcYgi5iovTQWguCe90dsgPVj1nPHe9QuPMHoQ
-         HatpvIVRw8KVbJ+4NnXlJRc62Wu38a8x4TJtkHCXsmUdIJGGbE6nNsJ/OeKg0csx4vAp
-         ND0abJrS+oj5XFZ5GM6G22BXlF3FO+JMcAkIYZenp8X5ZuxsHFzTOnQmFP2TvrA23loF
-         Bf7fvXrMbjJ+gXybK9yTcTWAyrAkY/MwXuAVspNqcvcOYyDuVchpGZ+rh9jpfVWQKOSX
-         oZkg==
+        d=gmail.com; s=20230601; t=1728108696; x=1728713496; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ATt7P8kWar3VOe/NiggIMKAMgRS+W4H0CAGY6Ui03Ek=;
+        b=a1gVVH64kf4eisp/AkljUpwoy+PjYirJ1zxzEGXYIiAc3pUzgGzB8axw9/nTH3Ap2G
+         Vwgy1u/v+9gZxWk+HbDd6Q9huOxhB/cFAYbszJjJXsglWLYXUYH9FNbPvLWoXfWLIneq
+         dL+s4J0L8IGI9RHaPP2P7+Kx2KIsTiAspGH08apdQxrB5FWtWD/bxGPYe5VA3KJijgST
+         t30jMMzGelTldKDUnEx7uXILS4o83fDfdsyhCd0sKr3HtDSCaOAk8PaLS4+9xb3P25IA
+         vBS0Y9MJ3GcVmdDxUyv/ZNo+emdjK8barDowgFTVoRAknxVZtv9c24FqWX/6oGOwvkMs
+         QUnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728106191; x=1728710991;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728108696; x=1728713496;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0kNhACyHju1qZ/sENCdrWjPN9bm5n5NCjJOZx++DT6c=;
-        b=HL5VztSq/BErtmACn1TuaVKd/G6MROddVy/ELZ2UyT3WteMASh4Tmj666YBw6X3ku7
-         +EOlynNKdBl4cLLwnOlSy0b+jdGvC1/AVo4yPlCSY8HHY0FKspx7NdGTVwiHzbGElSLp
-         8W6FDvn1P7aniqjCjC6Qjnd/glpHebbYfIQuJIs8AV7q+qSwqUZ6gwWIRHASCcDvqmEu
-         LaRuxOz1Bnjpvfpi++tH9Q3zDSmy4NHH0iJEaSevStXNlZ4BPTC4ECO+FWL+xHFZqGXS
-         8Vvc7W3jtMi08HW7iEFO37KDXkTXeovWIVdabQ9POORQ0y/6WBPVKLq0WkIFPtrGt+8c
-         TT8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVGSCyc5QlUyOu+XxLnRYqip3dXTVpyexEM5k/RStYwy8u9g8b0wB54H7HVtE7nZCsO8UT/CN21JnEURqU4oiFt@vger.kernel.org, AJvYcCWJyyHEednwb6no2ecObbgBRsGba60yMe78OCH8bzuSv10sxegYXQk1lVE2blOugpU3MRBi+9Zd7rvpkuU=@vger.kernel.org, AJvYcCWz8SmyxAGydtJGT6GbdcqL1/ONnDcjnQbvVQIShHx0yWwaJdPEOfTnFC9ovu3Tz3T9hiJSJCI9XFH9Dg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxLpzrsCsMA0rgdHsHrvA2gPKVKjA0TLrwLyIdVp26Q2zofhag
-	3DJPcLbNZMv3MtDPGhc9W5XqVtcf8yC/iWKC+sopVrk/ipKrN+WF
-X-Google-Smtp-Source: AGHT+IFbHEahtJM/4oQLiQWsE0/yXl9jJTCY/tUAnYEbQXtKGctZkwnf9pKoj9zbsCmehWVFi23MXw==
-X-Received: by 2002:a05:600c:350c:b0:42c:ac9f:b505 with SMTP id 5b1f17b1804b1-42f85af0486mr40560545e9.31.1728106190858;
-        Fri, 04 Oct 2024 22:29:50 -0700 (PDT)
-Received: from [127.0.1.1] (ip5f5ac341.dynamic.kabel-deutschland.de. [95.90.195.65])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89ed952asm13103105e9.45.2024.10.04.22.29.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 22:29:50 -0700 (PDT)
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Date: Sat, 05 Oct 2024 07:29:42 +0200
-Subject: [PATCH net v2 3/3] selftests: net: rds: add gitignore file for
- include.sh
+        bh=ATt7P8kWar3VOe/NiggIMKAMgRS+W4H0CAGY6Ui03Ek=;
+        b=Kd8B4XZfcOEgmXG/NKZgpVq6h8EuHZlbpwceIUzPtDqLjNAWnaNFUWQrVoN+ZD17Uw
+         zz/0fCqiqyfgxXjgknf0N4N9SIkdenzSkrMmLv/3h3/DsVo8zPKci1A/LpHd/wRqokJI
+         YqPJ1zbUgjdUjhJe719TT2mUueWBvSo3QvaD1dxDN0yDYsoPuimZ/8iJ10uIOhyUXDsQ
+         tBeyW6GKR8LnhYCzn9Sx2z3OZCVRs4hsQ9mgaQpyCkgwCNdw/kH/weyVGTpRZssUEhnr
+         ZE0bFictQzQ0QVXvw+WMF3dLPhrzT962CUOuuePedyFJV054p0TMuKNUlCmKHWfONy/p
+         3aQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVyPGjPtS25v1W3mzFtqOsSrqk4obL2J+9mORU+p5n4GZE2j2toN5/NHz+bUTTRMZP64rUE7fgK@vger.kernel.org, AJvYcCXVhWLepDjV/JLosIZM6BPtJ2CJUPJWC4fb/IcFYPNb7FjB3wUghWl3WOh4SDEQfIIhCXS1Bty2wRk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5iKTatL4oF05VJJU2PvojQwp9SmQ3e91ktsV8Z34+OBZhI6WO
+	lIJnykcchKkbpZRc8aHO7QDZnCkja6U694fP9Qw8uEjnt8y1XHHEZMmLNUqkOXDD2CTNKTLPZqs
+	963sm5GKpbRbMf+z7yoCM5TDACcw=
+X-Google-Smtp-Source: AGHT+IEimMdyQn202h3hCNekjvakythlnkkM28AoIlAUtbAaV5+2aaPSdQLT0PAB0WI5LqfYjdomMmj4YjdiTsv3AJ8=
+X-Received: by 2002:a05:6402:5210:b0:5c8:967d:cf47 with SMTP id
+ 4fb4d7f45d1cf-5c8d2e4754emr4815442a12.19.1728108696196; Fri, 04 Oct 2024
+ 23:11:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241005-net-selftests-gitignore-v2-3-3a0b2876394a@gmail.com>
-References: <20241005-net-selftests-gitignore-v2-0-3a0b2876394a@gmail.com>
-In-Reply-To: <20241005-net-selftests-gitignore-v2-0-3a0b2876394a@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Allison Henderson <allison.henderson@oracle.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
- rds-devel@oss.oracle.com, Javier Carrasco <javier.carrasco.cruz@gmail.com>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1728106184; l=593;
- i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
- bh=hI2BPsKn6Fb7xDapPbHxt54KAin5kF1lKUkbh087EgQ=;
- b=pT+6E328HKIjUdbdkDAosTr3J+V7wFYwJi5z2eGK/67vVTaV605PDzzxzT1dA/BPxh5lFR3JA
- 8dQJ+dvVQLIDeoOJ7OKMijmF70kazaCgZzSYvmf3K020dp4Ho7G7EKn
-X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
- pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-4-ap420073@gmail.com>
+ <CAHS8izM1H-wjNUepcmFzWvpUuTZvt89_Oba=KaDpeReuMURvQw@mail.gmail.com>
+ <CAMArcTX0sD9T2qhoKEswVp3CNVjOchZyEqypBcjMNtQRHBfk5w@mail.gmail.com> <CAHS8izNZhr6=82Piv74V1HuVT1X+OEEyxUXs-VU46KJt3Fu5mA@mail.gmail.com>
+In-Reply-To: <CAHS8izNZhr6=82Piv74V1HuVT1X+OEEyxUXs-VU46KJt3Fu5mA@mail.gmail.com>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 5 Oct 2024 15:11:24 +0900
+Message-ID: <CAMArcTUDDw5+AmydzmERpxWofWKPhF5mw2Ch9T0g3a6E9LgYUg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 3/7] net: ethtool: add support for configuring tcp-data-split-thresh
+To: Mina Almasry <almasrymina@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The generated include.sh should be ignored by git. Create a new
-gitignore and add the file to the list.
+On Fri, Oct 4, 2024 at 10:47=E2=80=AFAM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> On Thu, Oct 3, 2024 at 12:33=E2=80=AFPM Taehee Yoo <ap420073@gmail.com> w=
+rote:
+> >
+> > On Fri, Oct 4, 2024 at 3:25=E2=80=AFAM Mina Almasry <almasrymina@google=
+.com> wrote:
+> > >
+> > > On Thu, Oct 3, 2024 at 9:07=E2=80=AFAM Taehee Yoo <ap420073@gmail.com=
+> wrote:
+> > > >
+> > > > The tcp-data-split-thresh option configures the threshold value of
+> > > > the tcp-data-split.
+> > > > If a received packet size is larger than this threshold value, a pa=
+cket
+> > > > will be split into header and payload.
+> > >
+> > > Why do you need this? devmem TCP will always not work with unsplit
+> > > packets. Seems like you always want to set thresh to 0 to support
+> > > something like devmem TCP.
+> > >
+> > > Why would the user ever want to configure this? I can't think of a
+> > > scenario where the user wouldn't want packets under X bytes to be
+> > > unsplit.
+> >
+> > I totally understand what you mean,
+> > Yes, tcp-data-split is zerocopy friendly option but as far as I know,
+> > this option is not only for the zerocopy usecase.
+> > So, If users enable tcp-data-split, they would assume threshold is 0.
+> > But there are already NICs that have been supporting tcp-data-split
+> > enabled by default.
+> > bnxt_en's default value is 256bytes.
+> > If we just assume the tcp-data-split-threshold to 0 for all cases,
+> > it would change the default behavior of bnxt_en driver(maybe other driv=
+ers too)
+> > for the not zerocopy case.
+> > Jakub pointed out the generic case, not only for zerocopy usecase
+> > in the v1 and I agree with that opinion.
+> > https://lore.kernel.org/netdev/20240906183844.2e8226f3@kernel.org/
+>
+> I see, thanks. The ability to tune the threshold to save some pcie
+> bandwidth is interesting. Not sure how much it would matter in
+> practice. I guess if you're receiving _lots_ of small packets then it
+> could be critical.
+>
+> Sounds good then, please consider adding Jakub's reasoning for why
+> tuning this could be valuable to the commit message for future
+> userspace readers that wonder why to set this.
 
-Reviewed-by: Allison Henderson <allison.henderson@oracle.com>
-Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
----
- tools/testing/selftests/net/rds/.gitignore | 1 +
- 1 file changed, 1 insertion(+)
+Okay, I will add an explanation of this feature to commit message in v4 pat=
+ch.
 
-diff --git a/tools/testing/selftests/net/rds/.gitignore b/tools/testing/selftests/net/rds/.gitignore
-new file mode 100644
-index 000000000000..1c6f04e2aa11
---- /dev/null
-+++ b/tools/testing/selftests/net/rds/.gitignore
-@@ -0,0 +1 @@
-+include.sh
+Thanks a lot!
+Taehee Yoo
 
--- 
-2.43.0
-
+>
+> --
+> Thanks,
+> Mina
 
