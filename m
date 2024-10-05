@@ -1,94 +1,129 @@
-Return-Path: <netdev+bounces-132383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5FBD991748
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:20:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED0A99178B
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52ED41F220D2
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C2C1C21240
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C994155336;
-	Sat,  5 Oct 2024 14:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6434C156677;
+	Sat,  5 Oct 2024 14:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zTDGIfcQ"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ROVrgp8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C0215530C;
-	Sat,  5 Oct 2024 14:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1893155C96
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 14:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728138020; cv=none; b=fbGPWjtljwmeGJtRU/JGsdkWSv0agBVLy+SyMbBpDQwsBPljLVCoN+kYB5zYDKZbJFLIdb6dcUsHNKr5kULgFvQFyDHuZhL6z1AOexMvMmmKmxC7r1aSrK0O11EbWFzORoCN1NU5XmER/9YxADZZeDs4YGBFmiQxxyeeUM7G1gA=
+	t=1728140248; cv=none; b=h+oBJmzivwd9PtxJ3JGnR6XP1veeHeUIFIW4qecvQk0WF3D3k0FFy5KME4Cu5ZYnfh2D3QbNTIKbm5sQJCogDnlGFQ5xFZXEzcR4W5HMGA3YgCW78ynyWVXiPPsbNTnRsC/WKQbFggGJiB+Z/+1SdRp+iMQfG5dRcvVJnjDygUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728138020; c=relaxed/simple;
-	bh=wtRp8FAmaK/EorQIVlbahu7UK5Unh1c2NFD5CFB2Hmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cX0keIkUy2o2RBEie6lzH3wRIDnX0ScxjlCNvc9A3fna/HGsOyU88Ysp+wjUZudjok+wMFwDen966jbvTMYRe/f6g/shbHyyPH3eEiEbqJs899IXReeVu/j3B3vrz+eJ2MDj3j9dUxhtR6F2dSqVC+lbmjURgJOcrHAU4DVa1h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zTDGIfcQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Fw1wJBjPYy1YfB/jCXAr3PQ7u4GuIXzZMqKoHSbpCL4=; b=zTDGIfcQ9828u6S5SFDjkcv5mw
-	QETPdkL1fcxUGvGPhAtiSyckVF61O59wECOQlpDcHgqEBSEqmf1wpcAiuC8p7hAHWFrr65HNHr78m
-	HSD0sLf26dUnm5JPHZfAd9S2Q+ypw/nCsT73bgFH6I1yUe1BBqJOOm23tteMxuGN6O70=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sx5df-0098T1-On; Sat, 05 Oct 2024 16:20:07 +0200
-Date: Sat, 5 Oct 2024 16:20:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1728140248; c=relaxed/simple;
+	bh=PNERBdSoYABjvLBTjHWqRLR9V7HfLgDklh4IEG5OIkU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pYlHnBfYnprn1kqN0e8Uw5Qn02tZhADe7R0wzSgfZv+gXGmsuNIfZPTijRGlHNtqm8yN2EH1D11707l33UAXR2+AFF5lqR15CxMG/VdVctTuFhqvgN3BCVhKJOjNWL8X5EDgwsc2BVxeKcmQRLDnplS6NWU6oVNXkZOdUB0/PDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ROVrgp8u; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71dbdb7afe7so2492974b3a.0
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 07:57:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1728140246; x=1728745046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+9/J2RU6WiD/517i9NiTRedzi9Vk/ZZ6IN2HUrhWISE=;
+        b=ROVrgp8uq+D3couLWZ4BLhvUITiri9EV5UnQMipfy0EweQplae6mtKvusel9dDpAd+
+         FhVJsj+E2CC0B55XhAEmi69SqHsVHhhKVF+yd/5EIYwftLjRbeoiJ7x2gATWbB9d93SU
+         gN0m3TDzZI7sGQUQNQIe/eRU1odU0fOiXUs2w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728140246; x=1728745046;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+9/J2RU6WiD/517i9NiTRedzi9Vk/ZZ6IN2HUrhWISE=;
+        b=HclqSma4ODceq1HahQDLiRKap7zlqPLN6sLbsaGkaF+6iCFbLhjetC107LkDKOzPyz
+         tQOt9CCioyc0Wgq6JLogpuM8npCQ7lo2aJ+8sC/CJ88faKnM8fslmXB9XdQU4usqP8uJ
+         GIkg4gT+x6Ts5fW/ROn9uazRNJbmFZrtSzVCKHRI0yTB0dku/BlkZDRampZoLsKGP0uo
+         Y5v2ag6xcAY9B87DNyC6XlT/EtLsFMG7xf6peDs+/JXazZfXWTYk7EsIoSwloa17wfi7
+         MseDHHPFo6cYygj3jqRvBmwNADAH4Si4qx5+7W2JTXIa7Cgcyj/5nWvnmNUY3u2JJIzT
+         iY5g==
+X-Gm-Message-State: AOJu0YwQfwdLec0aKfAD6xvn3bZxd4N5ZRupa1OpngRsMIk9oMj9D1XU
+	EcDugRaKRfEUFnCH8hZCPCdPiXfjbbB/jQaAaz6xNu1odlK3JI20eZBj2wdob5SqDD3jjLK424s
+	SZiVYR8+IERTUgLiOgTGNtviapAc/7JvXV3XnnHIDEF3VoUecFhn4Wfmg5roL4gxq9rdYLucxtY
+	w1kxU1VXo9WnORIwiJ/jLlGT4oBU5V+OkL4Bk=
+X-Google-Smtp-Source: AGHT+IHBMDkW+v8Umw8Y1Iya1lux5xLD3qQMPWmOAH45zNaHnH9OUT2lHSTSdO1X0qTeK3Uot7V5Tw==
+X-Received: by 2002:a05:6a00:3e1e:b0:71d:f2e3:a878 with SMTP id d2e1a72fcca58-71df2e3ab16mr3342278b3a.5.1728140245687;
+        Sat, 05 Oct 2024 07:57:25 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d7d3b5sm1569273b3a.215.2024.10.05.07.57.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Oct 2024 07:57:25 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: Joe Damato <jdamato@fastly.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: realtek: make sure paged read is
- protected by mutex
-Message-ID: <32c342ef-62e8-4d85-8451-cfbb6024d869@lunn.ch>
-References: <792b8c0d1fc194e2b53cb09d45a234bc668e34c6.1728057091.git.daniel@makrotopia.org>
- <398aed77-2c9c-4a43-b73a-459b415d439b@lunn.ch>
- <ZwBl5XBPGRS_eL9Y@makrotopia.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org (open list),
+	Michael Chan <mchan@broadcom.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>
+Subject: [RFC net-next v2 0/2] tg3: Link IRQs, NAPIs, and queues
+Date: Sat,  5 Oct 2024 14:57:15 +0000
+Message-Id: <20241005145717.302575-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwBl5XBPGRS_eL9Y@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 04, 2024 at 11:02:13PM +0100, Daniel Golle wrote:
-> On Fri, Oct 04, 2024 at 11:25:29PM +0200, Andrew Lunn wrote:
-> > On Fri, Oct 04, 2024 at 04:52:04PM +0100, Daniel Golle wrote:
-> > > As we cannot rely on phy_read_paged function before the PHY is
-> > > identified, the paged read in rtlgen_supports_2_5gbps needs to be open
-> > > coded as it is being called by the match_phy_device function, ie. before
-> > > .read_page and .write_page have been populated.
-> > > 
-> > > Make sure it is also protected by the MDIO bus mutex and use
-> > > rtl821x_write_page instead of 3 individually locked MDIO bus operations.
-> > 
-> > match_phy_device() as far as i know, is only used during bus probe,
-> > when trying to match a driver to a device. What are you trying to lock
-> > against during probe?
-> 
-> The idea is to reduce the amount of unnecessary lock/unlock cycles (1 vs
-> 3). Of course, we could just omit locking entirely here, but that seemed
-> a bit wild to me, and even if it would work in that specific case, it
-> just serve as a bad example.
+Greetings:
 
-I would just comment the requirement that it can only be used during
-probe, and remove all the locks.
+This RFC v3 follows from a previous RFC [1] submission which I noticed
+had an issue in patch 2.
 
-	Andrew
+Patch 1 is changed to wrap a long line at 80 characters. No functional
+changes. As such, I retained Pavan Chebbi's Reviewed-by.
+
+Patch 2 in RFC v2 had an issue where it used the index into tp->irq_cnt
+as the rxq or txq index; this is incorrect. It does not need seem that
+tg3 assigns explicit queue index to struct tg3_napi, so the least
+invasive change I could think of included two running counters in
+tg3_napi_enable and tg3_napi_disable.
+
+This is required because netif_queue_set_napi expected the queue index
+(0 to real_num_[rt]x_queues) to be passed in to associate queues IDs
+with NAPI IDs. tg2_napi_disable is modified in the reverse order;
+counting down queue indices.
+
+I am open to other suggestions on implementation from broadcom, but
+thought that this was the least disruptive change.
+
+I've tested this change on my tg3 hardware and it seems to work, see
+commit message for examples of how to test.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20240925162048.16208-1-jdamato@fastly.com/
+
+
+Joe Damato (2):
+  tg3: Link IRQs to NAPI instances
+  tg3: Link queues to NAPIs
+
+ drivers/net/ethernet/broadcom/tg3.c | 45 ++++++++++++++++++++++++-----
+ 1 file changed, 38 insertions(+), 7 deletions(-)
+
+-- 
+2.25.1
+
 
