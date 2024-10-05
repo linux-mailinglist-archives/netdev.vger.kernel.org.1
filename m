@@ -1,166 +1,120 @@
-Return-Path: <netdev+bounces-132336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8F799145B
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 06:54:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB35699145F
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 07:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 130A31C21D18
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 04:54:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99C4F1F22D56
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 05:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8506727473;
-	Sat,  5 Oct 2024 04:54:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2228B3A8F0;
+	Sat,  5 Oct 2024 05:00:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cq9N/2pr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKbmcDjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0769128FC;
-	Sat,  5 Oct 2024 04:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E4D482DD;
+	Sat,  5 Oct 2024 04:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728104057; cv=none; b=O2QH0WLQ+/AiedJ+szvyu5aPfaUyDdc+Fm03OxQlprr3YgixWWn8aJE2FPCMZcJg8wokR/M/K5nhcvhibYviZTsZkfrUBqGPa35Vd9DIrpYaRY8VOAZZAm/tuIOrN5iouKOY5biMw1jbF43/p594aXQrwV6krc74bE7PgB5S1tk=
+	t=1728104403; cv=none; b=Jh/utUL8EbkWtaVQOQUTEt3NqzW/XtkdrNMxDG7v5uHH3oDlpAsY0HW63QDgD3obqCAnq01kK/Z3rZU7EYr6ufrEd+UuDBpiNTGNi9uATjXxSt29By1Wdnm6tFsn53N4UmrC3QPsDqL23Wi2esUrJihVR5Qcyz3dQ+p6gtfb+fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728104057; c=relaxed/simple;
-	bh=zhNGqSxKgr9PeHUz1E8XxbOiIm7jV7ByNNqLcrQWLk0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=SvtYVVgW4/x6RdNWVKo/iEnDFA3Po76vsdm+91JFTVl8bPOjO/DiMo/N0kO7HA/2G2Stkn1VCgDOXWnQiDcEVGcT+Kjwo8qHnxFR+ubmk3GK/4sHw49sQSQNnCx/OMAjhOcV/Ybg9soVc9/h6SPxsVrBpmwuZZOSRsOh5DrGB4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cq9N/2pr; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1728104403; c=relaxed/simple;
+	bh=lIOE/yRfQp/Rn8/qsEKgHzqsUbQ0OcTNR8yMD3zE2b4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LLeoxKSfltwupiOzaGfdLJMfPZS1HK5u0Bdm7IdimloZydQYsVgaiYj4m0q54fmmcxq/p/6VuaI9o6g1jeCcQcv2MD3NvRcKa1UmloIpgeXhO1jYG7NL2WNFuZeiPY0SKhul0SnD5tDQXv8aWSCZgKHs7k+xL6KsWphavHvYd6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKbmcDjY; arc=none smtp.client-ip=209.85.128.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71df2de4ed4so181629b3a.0;
-        Fri, 04 Oct 2024 21:54:15 -0700 (PDT)
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6e232e260c2so24019997b3.0;
+        Fri, 04 Oct 2024 21:59:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728104055; x=1728708855; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MoaHxIZrPXR0fYxmImQQSsEgYcwtCagFeohHoy4fC18=;
-        b=Cq9N/2pr5G0SLbizZPUTFseY9lXnVCp7+e93ZE9k1/zRYOWjC9efx2TyQJD3ap+Igf
-         hkdmIU6NugKUV03OlRn0l1CaJd+4BcV6NE9W/brB1BTMeCJJ//qmBn7+hX6cWNq5z/fh
-         72ejKagSPLsmB9j7B8nXezm7tgZWbzTnjKG2AygbBnv1DjmKUkp0hhqPSwkw8qO2SBCK
-         6X9M5vLUnKJosbbtZWjmVi+6Br3AOb6lBWBsYt/tRmzUTrT7JO76sxgSC9g8HqVLiCre
-         nLmM3x3j92eYK5UOuAfPqkYyaqxl6SoFASiZI9NHAYu9PN6TXWtdDy1NZW/ssIRE517w
-         11MQ==
+        d=gmail.com; s=20230601; t=1728104399; x=1728709199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QMpsL1cnzxmXFIA6ll85qqVqaSDBnUMH2E0nz8ladkE=;
+        b=EKbmcDjY74kS8eRl7WegNyUTllCagDLppeDogaX/ANp0qk9KPa1vEgwgkE24xXNM1D
+         +ARz8/fw/9qIqhSniAWLM1yTQzcpb3tmT1b+XWW5GkkCxP7Z9Mdy68bQrjwf6JJPeJaC
+         dHe5NGnVcPTvrLe7HcDsxW9EJBhSG8jS0J9V5nyvW71gW6Hibwkchd6+oCBJpQ3rUvO8
+         06YDBC7tApYYi4jc1LwplAlXVSq4w5rah0G4WNfCqvkXZhEBDPP1ZLkNKE0KxIMcQJGT
+         2cIcW5n4iYpIFnFXTX8HTYLbvMRk2CiIdHZ5mrM0pPuCZ8IzJSvs5A/+Ud7Wqu9528B3
+         MJug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728104055; x=1728708855;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MoaHxIZrPXR0fYxmImQQSsEgYcwtCagFeohHoy4fC18=;
-        b=ptp/nHQqGMSqfydoF5EZu+IFE5Rs7m8j3BX35xroagVTGNvk2D12U49s03bwVshsQw
-         nIAqkOe4vtjl+2KZHizCA2eoXX9m19PQeFJhnL/NYmleSjj0xfUUkSkWUqRIntqhEG9Y
-         xtJ7c6OBWYvZI//hIzfyA3sk0DRwHubQ3JC/saBdheUksM4N61qPOVh6+Y931jd1DQKI
-         okhYCuZy3Zf4EYPu48ZIbLKO3iCn/F52GEdqCCEA/jjv755je2IxmaGkjT/v7pLyttiN
-         tvnQqfpVu4MRHfiiZbyLRuWxCXc24b+A6R4UOW3Ajhy5zipZ+LqSXFGAx23qmvHvjw6d
-         TCUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnZG1/rAoUCCIt9EI5C2FmzKwib+36y0cW1FGsMCGmtt6skK3dg6UCgun8klibJ4yJimE4gv0In0DL7JA=@vger.kernel.org, AJvYcCUsJC+F/4A7meys74M3aEP9v6SfiJCS/+Se3uRDazrO13XYEhbY8yRL/tgCYi4vKwBA4qvlkpIxwzMvrQ==@vger.kernel.org, AJvYcCWvQ08ZVaRV5FUJTJQWzjXcPBrz7l3tO+g9wDFsmkebbbM3wtklaXyN39nj6c4AvlACC1GFMOOZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YysTiI5ie7MwhbUtGSVAS7Kf0rxFZNhWTNDkb4pyk4MbB6f3vgf
-	P87TTh/0tOEUqRtYXON3YnZ7A2I5FahLBVPM3Ye/hZTR2784cEUa
-X-Google-Smtp-Source: AGHT+IFPtY8qTHhV9UGEE+W9HaneFyGmt4IsZYQIdNsmPDudVVrx7Tc0pkUigBfcJfCcC7usu9yPfA==
-X-Received: by 2002:aa7:8a16:0:b0:71d:f033:a772 with SMTP id d2e1a72fcca58-71df033a853mr2867097b3a.12.1728104055205;
-        Fri, 04 Oct 2024 21:54:15 -0700 (PDT)
-Received: from debian.resnet.ucla.edu (s-169-232-97-87.resnet.ucla.edu. [169.232.97.87])
-        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7e9f6833cdcsm876583a12.49.2024.10.04.21.54.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2024 21:54:14 -0700 (PDT)
-From: Daniel Yang <danielyangkang@gmail.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: danielyangkang@gmail.com,
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-Subject: [PATCH v2] resolve gtp possible deadlock warning
-Date: Fri,  4 Oct 2024 21:54:11 -0700
-Message-Id: <20241005045411.118720-1-danielyangkang@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        d=1e100.net; s=20230601; t=1728104399; x=1728709199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QMpsL1cnzxmXFIA6ll85qqVqaSDBnUMH2E0nz8ladkE=;
+        b=AaCNfbpZYHQiSbbf12GhD01JswAMFZ5dv4I+Mj0GRLQWmeSH+9Z0LnzXI0b8KkDOqb
+         146jEUSeUFDxzuoJDogymHS0UrgvxyE+2EDEnl/L+H0WVig/ZxN44OTWSckwEhEi9/Oj
+         tmQ/ImDSBXnwCrsbfoHS+NuLKDG9RJiICf2zOwufMy/uggX0+Tl6lh/mnbnHL0TvFlpm
+         VbDQObOnDTa4iZztD9heTKKyCby/QRywNrrVP/RGUrpqRWJOdXYN1kHoVscGnddbwdcd
+         0cg8tetjdAeeBjS1/CkkhK57O+mob4H4Ff8DzysO9/1eORuubAVWnAdkuPOmJTmxpq1J
+         18AQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbbBfq2DsMVsUZJRrvA8EkgGrItZMtBHbyrXOJbWW7sKjf/C3tPIeww9mYnDt3Ubss1q7K8tI2@vger.kernel.org, AJvYcCXepO0q86jD64RGUr4IiSnn0PuYX121MRCUWR5SR9koELxjSSpTh2UEp3d1sFUbm75nUFxvwbKkImxkTrY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0gDWbhFsgq55tw97kfc5tjhHMTL18p17ooqY8OBipyV40/5mv
+	G238br6fdPOD1L9pk1oerk8feimnQfwXs6+a9UGsD41N1XZ/+u2iL3EYr2eQ9LBN3CDU9yyb2tY
+	ILcT2DrJVtqouJwm6s51a7i87+FY=
+X-Google-Smtp-Source: AGHT+IG+K1H6MIwPFK23MPAWTkPxiLXXn6+MP1Q9aaSR1Fn20scv3QHwNqJLgnIOdQYc/xAZ2S5Ymx9CkFSZQv4MI94=
+X-Received: by 2002:a05:690c:fc2:b0:6e2:1864:cf14 with SMTP id
+ 00721157ae682-6e2c6fc6828mr50272027b3.8.1728104398939; Fri, 04 Oct 2024
+ 21:59:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241002053844.130553-1-danielyangkang@gmail.com>
+ <CANn89i+y77-1skcxeq+OAeOVBDXhgZb75yZCq8+NBpHtZGySmw@mail.gmail.com>
+ <ff22de41-07a5-4d16-9453-183b0c6a2872@iogearbox.net> <CAGiJo8TaC70QNAtFCziRUAzN1hH9zjnMAuMMToAts0yFcRqPWw@mail.gmail.com>
+ <CANn89iK7W1CeQS-VZqakArdZqZY6UQi2kCDcpUmL4dGjAQwbCw@mail.gmail.com>
+In-Reply-To: <CANn89iK7W1CeQS-VZqakArdZqZY6UQi2kCDcpUmL4dGjAQwbCw@mail.gmail.com>
+From: Daniel Yang <danielyangkang@gmail.com>
+Date: Fri, 4 Oct 2024 21:59:23 -0700
+Message-ID: <CAGiJo8QU81+oLG+s-c2dUsQ_+4csaKEv6xmt=yJrA2gZ22ZWXw@mail.gmail.com>
+Subject: Re: [PATCH] Fix KMSAN infoleak, initialize unused data in pskb_expand_head
+To: Eric Dumazet <edumazet@google.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, 
+	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fixes deadlock described in this bug:
-https://syzkaller.appspot.com/bug?extid=e953a8f3071f5c0a28fd.
-Specific crash report here:
-https://syzkaller.appspot.com/text?tag=CrashReport&x=14670e07980000.
+On Thu, Oct 3, 2024 at 12:56=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Oct 3, 2024 at 6:42=E2=80=AFAM Daniel Yang <danielyangkang@gmail.=
+com> wrote:
+> >
+> > I took a look at https://www.spinics.net/lists/netdev/msg982652.html
+> > and am a little confused since the patch adds a check instead of
+> > initializing the memory segment.
+> > Is the general assumption that any packet with uninitialized memory is
+> > ill formed and we need to drop? Also is there any documentation for
+> > internal macros/function calls for BPF because I was trying to look
+> > and couldn't find any.
+>
+> Callers wanting allocated memory to be cleared use __GFP_ZERO
+> If we were forcing  __GFP_ZERO all the time, network performance would
+> be reduced by 30% at least.
+>
+> You are working around the real bug, just to silence a useful warning.
+>
+> As I explained earlier, the real bug is that some layers think the
+> ethernet header (14 bytes) is present in the packet.
+>
+> Providing 14 zero bytes (instead of random bytes) would still be a bug.
+>
+> The real fix is to drop malicious packets when they are too small, like a=
+ NIC.
 
-This bug is a false positive lockdep warning since gtp and smc use
-completely different socket protocols.
-
-Lockdep thinks that lock_sock() in smc will deadlock with gtp's
-lock_sock() acquisition. Adding a function that initializes lockdep
-labels for smc socks resolved the false positives in lockdep upon
-testing. Since smc uses AF_SMC and SOCKSTREAM, two labels are created to
-distinguish between proper smc socks and non smc socks incorrectly
-input into the function.
-
-Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
-Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
----
-v1->v2: Add lockdep annotations instead of changing locking order
- net/smc/af_smc.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 0316217b7..4de70bfd5 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -16,6 +16,8 @@
-  *              based on prototype from Frank Blaschka
-  */
- 
-+#include "linux/lockdep_types.h"
-+#include "linux/socket.h"
- #define KMSG_COMPONENT "smc"
- #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
- 
-@@ -2755,6 +2757,24 @@ int smc_getname(struct socket *sock, struct sockaddr *addr,
- 	return smc->clcsock->ops->getname(smc->clcsock, addr, peer);
- }
- 
-+static struct lock_class_key smc_slock_key[2];
-+static struct lock_class_key smc_key[2];
-+
-+static inline void smc_sock_lock_init(struct sock *sk)
-+{
-+	bool is_smc = (sk->sk_family == AF_SMC) && sk_is_tcp(sk);
-+
-+	sock_lock_init_class_and_name(sk,
-+				      is_smc ?
-+				      "smc_lock-AF_SMC_SOCKSTREAM" :
-+				      "smc_lock-INVALID",
-+				      &smc_slock_key[is_smc],
-+				      is_smc ?
-+				      "smc_sk_lock-AF_SMC_SOCKSTREAM" :
-+				      "smc_sk_lock-INVALID",
-+				      &smc_key[is_smc]);
-+}
-+
- int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- {
- 	struct sock *sk = sock->sk;
-@@ -2762,6 +2782,7 @@ int smc_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
- 	int rc;
- 
- 	smc = smc_sk(sk);
-+	smc_sock_lock_init(sk);
- 	lock_sock(sk);
- 
- 	/* SMC does not support connect with fastopen */
--- 
-2.39.2
-
+Interesting. Thank you for the clarification.
 
