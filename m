@@ -1,181 +1,222 @@
-Return-Path: <netdev+bounces-132428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CCE991B32
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 00:23:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2888991B37
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 00:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEAC71F220ED
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 22:23:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79001283416
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 22:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31110158861;
-	Sat,  5 Oct 2024 22:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C589A1662F4;
+	Sat,  5 Oct 2024 22:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="deIiRLU+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XKdiZtMP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A479F38DFC;
-	Sat,  5 Oct 2024 22:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41060231C8F
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 22:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728167021; cv=none; b=Fa/NZPxrykM0Jd3Cr/grvArUdPh4xndvwNVYglklFkKA+n5BcK+rkEhfYsI3AitIJjz2w9FW+OzEqDhDUsbvW9bzoIAHHFiescsuNVjn65arEkzBj3paP9OOU2GkuNu4iS1M5CEcLD26fitv+yvr1KW5VuTQMO/HiIDCXfl6cxk=
+	t=1728167181; cv=none; b=AHVcE2SkPeSI0FmqpCqkp7oTNuvkMo+yZkzKERXmLw3XgxTdKOzoJReV+5tXUBmokeYO9Mt6cdwJKEfWwwvD+N8+UjePLSl7Hmr5zs1gg+BFM0/8hsh3+D2tFVTH7z4doeeuY/hmYPYrSPKiSMVSe9npDqyjfFhh5Dgb4wCmTZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728167021; c=relaxed/simple;
-	bh=CDvMvKR5NsUghTucs0NBnB58VWXxSpQWiGJa60PhaJM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BX8WYIEyeXPdmQ+l29z5gDg5xijodwdyWDxpGPafwCeP21IKQ7SKmGnWBAJ9tioQVDksYiMcmvu1wEWfwEf3svg0b2lHbcnYKojsP7M+viUtwRpSbc22hzvarpUsB9HFYdyYaVn4rcnB+51Jnmyc60UZqCTHZmNwLj33Ptmnqwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=deIiRLU+; arc=none smtp.client-ip=209.85.219.47
+	s=arc-20240116; t=1728167181; c=relaxed/simple;
+	bh=YFB8KjUSfUdBBdFf75PUfS5XqwtXi5ctE611v01rqNM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=NMDx6Y95/J+BipI9SWk5V2brWKq26PttAPsI09XDdsMn0nOX9nbiKErGrTxnoisk+zrATN1ogYcz7YW84YJxsNnYnM+asJ3szOs8JDdYmW5L4DUWlpMNYbV7ijDwMPFoZs1b3nGVSmou9WxGnkUNrVnJbeqXPGxVk1pT4eG4E0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XKdiZtMP; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6cb3cbc28deso32754476d6.3;
-        Sat, 05 Oct 2024 15:23:39 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e109539aedso2775772a91.0
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 15:26:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728167018; x=1728771818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGEe+NY0fZ7idRHJ0JNrhCo327we1HY1LNfPxzR5fWM=;
-        b=deIiRLU+4b06M4BX3f3WlN/UmGUKW0XiTs3o+WAwmPRB0/DyUuxYcQBtXG0jDFptRi
-         HyE2qOnwtdjtqGvrnGQ8icc5ZleUprbetutQ9vIeheWLYTCDmPS8BZtyf+ixFT1Br0tv
-         ERY9Pa12aghj9JoBibOVIyXSVjCEsS2uCDrIbRZ6R7YG/ylVINS/jy+eY2WNCatEcKSE
-         DqX11R1qDTPC+as4ixm3vYnQCTCj9KCy/XiSaSJGF6rorZy4IqqUncXis0TgNoRjFoeS
-         fsxwdHOLY1XLnCZEV7SfLSCXebID3pfvsQEdOmVOcZSTlGup/1/wkA7WEYqyq1KRMELz
-         h5cg==
+        d=gmail.com; s=20230601; t=1728167179; x=1728771979; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sZajQrQR4yR7nGn4bgSkD3D9Fp7/ivUS8OLj9sv9mJU=;
+        b=XKdiZtMPRDc29IgWmhjmZmcsCJBYDkiyOaW+/oA6MdWYpOPEqxY+h5cw3EYlgcUbJa
+         vdwQr1Kq79LoCjb9le51nRTjs7L2EqKVaRaDJoTnFTgk6BIXMkZ1HVv2arfHIj2gerXL
+         piIGZHj84owm+ZG78qP/KmJSWbH/j6WqRfesFg9fjuY/i+fO2zz2LL9JaAQTnx9rEUTg
+         wBF152tiI7mMPwlW7UK3mDlkT0erqFoGX3bjnv0ljOfSko4o5Dhhxk13ovzKzH4x+AyV
+         Csxac78Bm20+1rTPDjNhJCr28DNAPPQzqyzWqEdXeCoiuaafJWvZYJAG/Sc6XhcIS4wu
+         hPvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728167018; x=1728771818;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NGEe+NY0fZ7idRHJ0JNrhCo327we1HY1LNfPxzR5fWM=;
-        b=vqcWTNtu8yF56FeJCeVOkYG7+uyWRVR/EHAkjc6zxyyf11A+O/cVv64GKEw5tmX14S
-         CxPv7T28QgYrVjtw8YJBrPdqR6SoFY7sN3gkr3bUL6IWS3IzZydki2BE1esDkcF6ssnH
-         BNpdbhVYd2/D/ZbbkNm/ARh3/xBvwHKJfvVjetzFaVYE907VJW453AlCyorlT4VwVhra
-         EYQxQU7aIZedsLATMGwn2Of2bJXyLF7RaHgp5QacXNZhLT+nQ8KM5Mn4hLxc9chNWLuQ
-         F+S4q4BBVbmTkZMsbW8k5xIB0LMJYXhq25HXGXof2k95fehZ5hBM99WdCNiyls7mw0ax
-         JPAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHoqhWKvnR14t/secYNcNyehcXpSHO5Prx0Cow3/v5d7YKYgfBkb26VTVPJptJSXdrsSacvHCay+5OQ8A=@vger.kernel.org, AJvYcCVFvr8gsjdE8Cr2Z1KQjn9b3tnhBjgH/s0onBfBfiFBju0cNa1LvVYG7G77JYlFDb4+w9Cy2WjxtOiy1kFwvWQ=@vger.kernel.org, AJvYcCVrjPIprkHj12iRZbngiuhgjSvWgqXTQBJTaHKpwuoMOVaWDc6dbjXD82mv8f4Nt4veW9fdKuuw@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtgfE8os/sx6b7Ei+wdds8m3yBI3hshotbeMv/1B0aH/deHuCg
-	j7u2Hy96YSxNrT/bDt3bpWswrrRh3FN2pKigIfhBV2hYhE707Igs
-X-Google-Smtp-Source: AGHT+IHXqzcftAv6HNxk9EWOvJ3PsD03Y3I8+jeVWm2EtHfv5hdgWZbBXlnwjHk2Wi/sSmvCLlV1Yw==
-X-Received: by 2002:a05:6214:3ca1:b0:6c7:c650:90dc with SMTP id 6a1803df08f44-6cb9a466299mr113243116d6.34.1728167018406;
-        Sat, 05 Oct 2024 15:23:38 -0700 (PDT)
-Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cba47535a2sm11826496d6.77.2024.10.05.15.23.37
+        d=1e100.net; s=20230601; t=1728167179; x=1728771979;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sZajQrQR4yR7nGn4bgSkD3D9Fp7/ivUS8OLj9sv9mJU=;
+        b=w2DxkgXu6bzDrz2rZNo32+BlDUxtRP1eHox6fDk10SLIkW1o837PvYE7P3ACuRQjWY
+         CAS4yYKIxB576b4hYZRXlnsd9m4CjNgTmwzfj+iQ4XDGALDfEBP6mFgxg7Ln+upHb4tx
+         Fnip1xNGBoGOkMrxoLiJAX82/q+a+rZGVbad40G7rHhaw4wewAFCCjphKjp2DbR/NdbT
+         ZxbiCj4VgM0ix8Tb0xglFAmRy8qR4YpdmiHl/8unWSCsHG42z8eBCUjY5No+D6zUjupK
+         mF+zHgZyJSJcXjrOCqvI+GoCHsJOkmLorLLKE9QZaRS6imAczPnRoe9NO3DwW0kX/9FE
+         wZpw==
+X-Gm-Message-State: AOJu0YwGc0Nzf9X1V3a/5uDWQwQOFEy6+c411HHM/GsaEXBJsl6yZDOW
+	zLAbn8jGyvLTPo2GHieuX0/zWuB1lVZPW/llAOl0xANjr/76g4gJ
+X-Google-Smtp-Source: AGHT+IG0l7CWMoBODII2rsi9SMqxC6sJCPkT1pfgQKN5oc9PsBFpUd0kaokM/oXGoqIWO/A95aHhcg==
+X-Received: by 2002:a17:90b:17c4:b0:2e0:9d3e:bc2a with SMTP id 98e67ed59e1d1-2e1e636f96fmr8190045a91.32.1728167179517;
+        Sat, 05 Oct 2024 15:26:19 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([103.30.248.19])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20ae7169esm2373536a91.10.2024.10.05.15.26.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 15:23:38 -0700 (PDT)
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 582721200068;
-	Sat,  5 Oct 2024 18:23:37 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Sat, 05 Oct 2024 18:23:37 -0400
-X-ME-Sender: <xms:abwBZxfhv0rF4XN7f_JUER2SMObmqaWp3-lYJXgC8bAHFcPTsnHAOA>
-    <xme:abwBZ_OcF_MNXhQuRNADZ1ChJioa6VbUeaSfovNu5fowFJuL9ZSKRqQoZ1A_jyyGc
-    4tpd2lEYgiCHaF8oA>
-X-ME-Received: <xmr:abwBZ6h9dBmA3fFMujYhekFHK10_UsIE4fsMuPiUtrznWPKmJ3ZER6P3mnqc1w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddviedguddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpeejiefhtdeuvdegvddtudffgfegfeehgfdtiedv
-    veevleevhfekhefftdekieehvdenucffohhmrghinheprhhushhtqdhlrghnghdrohhrgh
-    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhq
-    uhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqud
-    ejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgv
-    rdhnrghmvgdpnhgspghrtghpthhtohepudelpdhmohguvgepshhmthhpohhuthdprhgtph
-    htthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehfuhhjihhtrgdrthho
-    mhhonhhorhhisehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrh
-    drkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehv
-    ghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhkrghllhifvghithdusehgmh
-    grihhlrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuhhmihgthhdrvgguuhdprhgt
-    phhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrgh
-    grhihnohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepghgrrhihsehgrghrhihguhho
-    rdhnvght
-X-ME-Proxy: <xmx:abwBZ6_cQUvWNYW-3gWznvHBbHf44X9Qo35imeVmsxqUpjnM-S5ftQ>
-    <xmx:abwBZ9v056bWfnPXc861yaJUXMm2r5WCDeJfPb-nxOILqY3dqqhPUg>
-    <xmx:abwBZ5GfipvItzhcyTp3Ofyh8I3A5yIpFqYdD0uBfKr2jPTZzzVAhg>
-    <xmx:abwBZ0PIqw8nlV-g64PUpA3FMu9DjYd_ri52Wtmbr-chJZ0GK8xufA>
-    <xmx:abwBZ2NDhcIjzyiT9Xf2wUYR_Jsing4BiLuvboNmsqZfWnZzwODWLoua>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 5 Oct 2024 18:23:36 -0400 (EDT)
-Date: Sat, 5 Oct 2024 15:22:23 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com,
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	arnd@arndb.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <ZwG8H7u3ddYH6gRx@boqun-archlinux>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com>
- <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+        Sat, 05 Oct 2024 15:26:19 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	willemb@google.com,
+	kuniyu@amazon.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v4] net-timestamp: namespacify the sysctl_tstamp_allow_data
+Date: Sun,  6 Oct 2024 07:26:09 +0900
+Message-Id: <20241005222609.94980-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 05, 2024 at 08:32:01PM +0200, Andrew Lunn wrote:
-> > might_sleep() is called via a wrapper so the __FILE__ and __LINE__
-> > debug info with CONFIG_DEBUG_ATOMIC_SLEEP enabled isn't what we
-> > expect; the wrapper instead of the caller.
-> 
-> So not very useful. All we know is that somewhere in Rust something is
-> sleeping in atomic context. Is it possible to do better? Does __FILE__
-> and __LINE__ exist in Rust?
-> 
+From: Jason Xing <kernelxing@tencent.com>
 
-Sure, you can use: 
+Let it be tuned in per netns by admins.
 
-	https://doc.rust-lang.org/core/macro.line.html
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+v4
+Link: https://lore.kernel.org/all/20241003104035.22374-1-kerneljasonxing@gmail.com/
+1. use u8 instead of int to save more bytes (Kuniyuki)
 
-> > +    if sleep {
-> > +        // SAFETY: FFI call.
-> > +        unsafe { bindings::might_sleep() }
-> > +    }
-> 
-> What is actually unsafe about might_sleep()? It is a void foo(void)
+v3
+Link: https://lore.kernel.org/all/CANn89iLVRPHQ0TzWWOs8S1hA5Uwck_j=tPAQquv+qDf8bMkmYQ@mail.gmail.com/
+1. move sysctl_tstamp_allow_data after sysctl_txrehash (Eric)
 
-Every extern "C" function is by default unsafe, because C doesn't have
-the concept of safe/unsafe. If you want to avoid unsafe, you could
-introduce a Rust's might_sleep() which calls into
-`bindings::might_sleep()`:
+v2
+Link: https://lore.kernel.org/all/66fa81b2ddf10_17948d294bb@willemb.c.googlers.com.notmuch/
+1. remove the static global from sock.c
+2. reorder the tests
+3. I removed the patch [1/3] because I made one mistake
+4. I also removed the patch [2/3] because Willem soon will propose a
+packetdrill test that is better.
+Now, I only need to write this standalone patch.
+---
+ include/net/netns/core.h   |  1 +
+ include/net/sock.h         |  2 --
+ net/core/net_namespace.c   |  1 +
+ net/core/skbuff.c          |  2 +-
+ net/core/sock.c            |  2 --
+ net/core/sysctl_net_core.c | 18 +++++++++---------
+ 6 files changed, 12 insertions(+), 14 deletions(-)
 
-	pub fn might_sleep() {
-	    // SAFETY: ??
-	    unsafe { bindings::might_sleep() }
-	}
+diff --git a/include/net/netns/core.h b/include/net/netns/core.h
+index 78214f1b43a2..9b36f0ff0c20 100644
+--- a/include/net/netns/core.h
++++ b/include/net/netns/core.h
+@@ -15,6 +15,7 @@ struct netns_core {
+ 	int	sysctl_somaxconn;
+ 	int	sysctl_optmem_max;
+ 	u8	sysctl_txrehash;
++	u8	sysctl_tstamp_allow_data;
+ 
+ #ifdef CONFIG_PROC_FS
+ 	struct prot_inuse __percpu *prot_inuse;
+diff --git a/include/net/sock.h b/include/net/sock.h
+index c58ca8dd561b..4f31be0fd671 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2808,8 +2808,6 @@ void sk_get_meminfo(const struct sock *sk, u32 *meminfo);
+ extern __u32 sysctl_wmem_max;
+ extern __u32 sysctl_rmem_max;
+ 
+-extern int sysctl_tstamp_allow_data;
+-
+ extern __u32 sysctl_wmem_default;
+ extern __u32 sysctl_rmem_default;
+ 
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index e39479f1c9a4..e78c01912c64 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -317,6 +317,7 @@ static __net_init void preinit_net_sysctl(struct net *net)
+ 	 */
+ 	net->core.sysctl_optmem_max = 128 * 1024;
+ 	net->core.sysctl_txrehash = SOCK_TXREHASH_ENABLED;
++	net->core.sysctl_tstamp_allow_data = 1;
+ }
+ 
+ /* init code that must occur even if setup_net() is not called. */
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 74149dc4ee31..00afeb90c23a 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -5506,7 +5506,7 @@ static bool skb_may_tx_timestamp(struct sock *sk, bool tsonly)
+ {
+ 	bool ret;
+ 
+-	if (likely(READ_ONCE(sysctl_tstamp_allow_data) || tsonly))
++	if (likely(tsonly || READ_ONCE(sock_net(sk)->core.sysctl_tstamp_allow_data)))
+ 		return true;
+ 
+ 	read_lock_bh(&sk->sk_callback_lock);
+diff --git a/net/core/sock.c b/net/core/sock.c
+index fe87f9bd8f16..93b6c1d0317d 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -286,8 +286,6 @@ EXPORT_SYMBOL(sysctl_rmem_max);
+ __u32 sysctl_wmem_default __read_mostly = SK_WMEM_MAX;
+ __u32 sysctl_rmem_default __read_mostly = SK_RMEM_MAX;
+ 
+-int sysctl_tstamp_allow_data __read_mostly = 1;
+-
+ DEFINE_STATIC_KEY_FALSE(memalloc_socks_key);
+ EXPORT_SYMBOL_GPL(memalloc_socks_key);
+ 
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index 86a2476678c4..b60fac380cec 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -491,15 +491,6 @@ static struct ctl_table net_core_table[] = {
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_dointvec,
+ 	},
+-	{
+-		.procname	= "tstamp_allow_data",
+-		.data		= &sysctl_tstamp_allow_data,
+-		.maxlen		= sizeof(int),
+-		.mode		= 0644,
+-		.proc_handler	= proc_dointvec_minmax,
+-		.extra1		= SYSCTL_ZERO,
+-		.extra2		= SYSCTL_ONE
+-	},
+ #ifdef CONFIG_RPS
+ 	{
+ 		.procname	= "rps_sock_flow_entries",
+@@ -665,6 +656,15 @@ static struct ctl_table netns_core_table[] = {
+ 		.extra2		= SYSCTL_ONE,
+ 		.proc_handler	= proc_dou8vec_minmax,
+ 	},
++	{
++		.procname	= "tstamp_allow_data",
++		.data		= &init_net.core.sysctl_tstamp_allow_data,
++		.maxlen		= sizeof(u8),
++		.mode		= 0644,
++		.proc_handler	= proc_dou8vec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE
++	},
+ 	/* sysctl_core_net_init() will set the values after this
+ 	 * to readonly in network namespaces
+ 	 */
+-- 
+2.37.3
 
-however, if you call a might_sleep() in a preemption disabled context
-when CONFIG_DEBUG_ATOMIC_SLEEP=n and PREEMPT=VOLUNTERY, it could means
-an unexpected RCU quiescent state, which results an early RCU grace
-period, and that may mean a use-after-free. So it's not that safe as you
-may expected.
-
-Regards,
-Boqun
-
-> function, so takes no parameters, returns no results. It cannot affect
-> anything which Rust is managing.
-> 
-> > +        // SAFETY: FFI call.
-> > +        unsafe { bindings::cpu_relax() }
-> 
-> Same here.
-> 
-> 	Andrew
-> 
 
