@@ -1,176 +1,146 @@
-Return-Path: <netdev+bounces-132362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6D2B9916AE
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:14:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D728F9916BA
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AAFB1F22593
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:14:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F6E284380
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 12:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E377E14AD20;
-	Sat,  5 Oct 2024 12:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4E514830A;
+	Sat,  5 Oct 2024 12:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="KOEL0f3i";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XGzaskth"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4wRYy7c"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5986B82D91;
-	Sat,  5 Oct 2024 12:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E01F14884C;
+	Sat,  5 Oct 2024 12:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728130486; cv=none; b=O81vfwxO2u/ygKYtZlmlRI6Kn0y/f9MUlH4GX0J3Ft/1YEBlWdC9VlsWqwmN8L945KWbnBBCBMnCMbKSUriJEM61TY3V7CFEwl88oVOmylal4DFXCOs8K+UEFbTOHqtFozuFA2CN+eqw4v6BfSHOByf9BO4sWzRCh+q2CDMO+4E=
+	t=1728131179; cv=none; b=e3hLXT1nhKig9vPjN4408kM7HBqM3m2yaO6kC2tGFk19olNRXL2JhBr+8bWa41oc87RjuB4ZX3cuAZ4AJiISI64DS+0lHTQ1yhI8CjbffiKICeZqJSN8612EbZiL8nQyWptvNa5O8GbwdRJBMMkxDAeEjDxDk2MUKHS1+fpaCeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728130486; c=relaxed/simple;
-	bh=15rpesOcgvReI7DlF8CwMLuBf2Oy95zftQgLhJ9YqCA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lGujuhXk/iVKxOMySymGeZur2pi5oQ/oTDUzfxssPiLQ/qBVbBhiMdOyxkFGrrOLuY3Gc7sRLFgBMu91p5anFdHpaOmvkuLfp4pQTtwySzGHkKwj68bk0foAWZR/5r1uxCGxjI3WaXNS5xUpfSSwpTuCfiH8ilEiAmUXshU2nDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=KOEL0f3i; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XGzaskth; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id BAC70114009B;
-	Sat,  5 Oct 2024 08:14:40 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Sat, 05 Oct 2024 08:14:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:message-id:mime-version:reply-to
-	:subject:subject:to:to; s=fm1; t=1728130480; x=1728216880; bh=t5
-	9E6EE7ArB6eFoiXHmIEDwNFICy/voPCMzqbP1P1y0=; b=KOEL0f3iz2QIj1sPjC
-	42IYxxTVpky5u/nZNE0812terRCFj4m3CrQF+x/zdzxEy6h6t9oee3CVd6+YPxq0
-	0Z8qKbEpFscOLHAGHM3ItkZp5NRYo92qRcber4Tjk6UU9kW6uVqg6ZhMlJLrSgNN
-	XoQvAYALcE5lxWNszTu+qKj+HV0mxf6DHSOo5lLbvu2Gm+emOMZ02FLh6JvELDY5
-	WOnCrmSDrIp4kpJgMcAD+D3UNOwm2aQepzhKFBn2TLkMWDSCz+NssqxA95wbphoJ
-	GJDR0rZU28XGhBg6azdwKPxtdLhS4lG2XLu0DdWlBUqWbNbTe7q6kpNfrV6Rcg8R
-	QqeA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1728130480; x=1728216880; bh=t59E6EE7ArB6e
-	FoiXHmIEDwNFICy/voPCMzqbP1P1y0=; b=XGzaskthhy3cgzaVpFqGttCYlfkbR
-	4T93FSpuelChSKg2JKHe0yQ1t10tCcq3hW8ZaiMFAm0UNoeNPtitgOUZTsmg63FW
-	qQ6h4lp8jvWD7N5wv7f4xfpwlqX+tWh5+2D6QU4U7trhJe43EY7rt5QvKlgQrg+R
-	onAOx8RwTr/EKCz26FYJ82QPBpaw9eWLijMZAyAKTA4ScG4Ewh+MhjjyouWabA6b
-	65IrJy3jGQJiXdcgOkqgu7fennh+oJytoKZfuXuj9VhxovKmQBZWvL5PG/tNSIzE
-	aFqlOrANA9gwpfypTqD05z2RjgPMulJsqz+yvc41rWMzp/WJT+cG6alWQ==
-X-ME-Sender: <xms:ri0BZ256FAaQW9hKQoqXqR4bvYDqCbQpb-b4JNOILGNZ-PBIEuJLTQ>
-    <xme:ri0BZ_4QFYahEUal-Nn6FnVhaGLw_HqcPsyEgvTnLKDfUBJtGAq983Jyrq1nu9-0i
-    uupPLR7rByJK1YWHyU>
-X-ME-Received: <xmr:ri0BZ1fIxOkjpkDD54cpBRD737wOTK5zievd5RFpwO6rgx7yUFC3Nw5DXtB9XeTSH7SrZKnXWgMUriqlgtmyO1EZMQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvhedghedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhephffvvefufffkofggtgfgsehtkeertdertdejnecu
-    hfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrh
-    hluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgv
-    rhhnpeehudelteetkefgffefudefuedvjeeivdekhfevieefgeffheeltddvvefhfeetge
-    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhk
-    lhgrshdrshhouggvrhhluhhnugesrhgrghhnrghtvggthhdrshgvpdhnsggprhgtphhtth
-    hopeduvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepshdrshhhthihlhihohhv
-    sehomhhprdhruhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
-    drtghomhdprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgdruhhjsegsphdrrhgv
-    nhgvshgrshdrtghomhdprhgtphhtthhopehprghulhdrsggrrhhkvghrrdgtthessghprd
-    hrvghnvghsrghsrdgtohhmpdhrtghpthhtohepsghijhhurdgurghsrdhjiiessghprdhr
-    vghnvghsrghsrdgtohhmpdhrtghpthhtohepphhrrggshhgrkhgrrhdrmhgrhhgruggvvh
-    dqlhgrugdrrhhjsegsphdrrhgvnhgvshgrshdrtghomh
-X-ME-Proxy: <xmx:ri0BZzLj3rt-gL4i5pNsTPvKWk0byFa0CkOZx-MGl25_BXt2LttbZQ>
-    <xmx:ri0BZ6JsYUiYfljQsPcNWsRHDB-wurSpC2djxoI0a-Pa0mh_yPlI-w>
-    <xmx:ri0BZ0xpU3smcDBFXpyDEP_APFctxvqZJnpnq3hTXmo92riQ7TmGKg>
-    <xmx:ri0BZ-Kuy99w7IZMIYkokstvFva0RIS2NoSpccejpXUomMANgCgzjQ>
-    <xmx:sC0BZ8ArKQ94W-jX1F3qg3K34E84I1XcjS5x5ZndoA94d9SJF3MJ8jGL>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sat,
- 5 Oct 2024 08:14:38 -0400 (EDT)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	netdev@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [net-next] net: ravb: Only advertise Rx/Tx timestamps if hardware supports it
-Date: Sat,  5 Oct 2024 14:14:11 +0200
-Message-ID: <20241005121411.583121-1-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728131179; c=relaxed/simple;
+	bh=AI88GXG1Ky7KLJg1RLwowYwwiDKqBzc7ni+NOn77VY4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iMcMkA9lQCwodOVhCytv6Tzd4BQrQ7fDwuQKckuN1NprWAFju0rDHiIvi0ivFxpibmSUwec2XarivHd5euNN6Sykvm7OsvhlD5mZDqFGPCdK63YkaLZrORDGY+N0KEzMfjSE6NIvuv3BNMQXArZyU53Wrzh1BvvGZM1/Hal3gmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G4wRYy7c; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7e6cbf6cd1dso2029124a12.3;
+        Sat, 05 Oct 2024 05:26:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728131175; x=1728735975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bgG34/A+4YzDfDMw6C+N7buhN2H/pmUs0F1NK/affXo=;
+        b=G4wRYy7c5LOi7mIgrHfw28PZoAXW4fW++s1PWFz8bNOhQcLtJ+nFvEqK5br7zM25Bg
+         UMoyD3htqJWtLZHQuvDwTCCEwPCUTnS3hILuqsWZ8bg9LTAfk7rQQkXnuRvt24B690ic
+         ixVvAdGif/BMeMy8pVfKI/nGu9tSImVShSNTAbcpQslYmdxXSWh5pw3dA5OraozVWcDb
+         OMNIsor8oM0V//xcPQL5JEE822rCLKd77LAgu6im1vu55f4TN3tYjK2e5sL6CviAMSMW
+         3mjpjzgWLbpEEzXk5aK5B2MetGhJT92rNzSTvCv4dZUIPnmETT0Rg3e+xh7sWyKIRQPz
+         2avw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728131175; x=1728735975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bgG34/A+4YzDfDMw6C+N7buhN2H/pmUs0F1NK/affXo=;
+        b=TgE/JiWzvZQjbNfzpdcfbaPAmK2HB5Xr2x/dqGd2J+vTiDJbToGiXUcv38lbCr/6eK
+         6TuE2hKWIeUOpE9TVSekxj+1/om3Lhe/7S/QVGFs5G2XTp18x828KLMCyqOESnG9wnmR
+         Jw4WljlZMHGIaRrAp5RdAYCAEpad+jhsNV9SyCDn1HZhps3wXXzOHILEd0YpWVc992ii
+         iHoBCEqKP5G483sUye/5Op7/ggOqLUiOnVQ2asB3eoT8wNFzmRepqCmgeCPSLxLuAihu
+         WHpxnC6ln8wijojwyShKa/ayl3yoqP3E10u7izqdIJwsvd32tPrLCq3y20ua9iQQnAQf
+         0XNg==
+X-Forwarded-Encrypted: i=1; AJvYcCXU/rxwywCjVei9lUNAiFbr5DkGM/f1a0+UlRYyMyyxgRTPzhWmyRB/hrgOHi3m5wbIXWinL7eUTsn7BWk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9RrulcEXWF09DTiGrRvIOQ54e9UUb3G2qbkodsBKz40p4L1O6
+	d1lB52IjcMiDkaG0+VUmgAeutmlLDk8hN6EGpytIlI4a9EctTFbUYwctJh3q
+X-Google-Smtp-Source: AGHT+IEUXGB996LMyK/77m6HUJmjzyHYUWZ59BgENzeV99/x2SzX3Ca+7Kn0GAOBIEW7Zi+H7IZaEQ==
+X-Received: by 2002:a05:6a21:4d8a:b0:1d0:3a32:c3f8 with SMTP id adf61e73a8af0-1d6dfabc77amr9210900637.39.1728131175200;
+        Sat, 05 Oct 2024 05:26:15 -0700 (PDT)
+Received: from mew.. (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cd08besm1397878b3a.79.2024.10.05.05.26.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Oct 2024 05:26:14 -0700 (PDT)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: netdev@vger.kernel.org
+Cc: rust-for-linux@vger.kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	tmgross@umich.edu,
+	ojeda@kernel.org,
+	alex.gaynor@gmail.com,
+	gary@garyguo.net,
+	bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me,
+	a.hindborg@samsung.com,
+	aliceryhl@google.com,
+	anna-maria@linutronix.de,
+	frederic@kernel.org,
+	tglx@linutronix.de,
+	arnd@arndb.de,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/6] rust: Add IO polling
+Date: Sat,  5 Oct 2024 21:25:25 +0900
+Message-ID: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Recent work moving the reporting of Rx software timestamps to the core
-[1] highlighted an issue where hardware time stamping where advertised
-for the platforms where it is not supported.
+Add Rust version of read_poll_timeout (include/linux/iopoll.h), which
+polls periodically until a condition is met or a timeout is reached.
+By using the function, the 6th patch fixes QT2025 PHY driver to sleep
+until the hardware becomes ready.
 
-Fix this by covering advertising support for hardware timestamps only if
-the hardware supports it. Due to the Tx implementation in RAVB software
-Tx timestamping is also only considered if the hardware supports
-hardware timestamps. This should be addressed in future, but this fix
-only reflects what the driver currently implements.
+As a result of the past discussion, this introduces a new type
+representing a span of time instead of using core::time::Duration or
+time::Ktime.
 
-1. Commit 277901ee3a26 ("ravb: Remove setting of RX software timestamp")
+Unlike the old rust branch, This adds a wrapper for fsleep() instead
+of msleep(). fsleep() automatically chooses the best sleep method
+based on a duration.
 
-Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
----
- drivers/net/ethernet/renesas/ravb_main.c | 25 ++++++++++++------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
+v2:
+- Introduce time::Delta instead of core::time::Duration
+- Add some trait to Ktime for calculating timeout
+- Use read_poll_timeout in QT2025 driver instead of using fsleep directly
+v1: https://lore.kernel.org/netdev/20241001112512.4861-1-fujita.tomonori@gmail.com/
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index d2a6518532f3..907af4651c55 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1750,20 +1750,19 @@ static int ravb_get_ts_info(struct net_device *ndev,
- 	struct ravb_private *priv = netdev_priv(ndev);
- 	const struct ravb_hw_info *hw_info = priv->info;
- 
--	info->so_timestamping =
--		SOF_TIMESTAMPING_TX_SOFTWARE |
--		SOF_TIMESTAMPING_TX_HARDWARE |
--		SOF_TIMESTAMPING_RX_HARDWARE |
--		SOF_TIMESTAMPING_RAW_HARDWARE;
--	info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
--	info->rx_filters =
--		(1 << HWTSTAMP_FILTER_NONE) |
--		(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
--		(1 << HWTSTAMP_FILTER_ALL);
--	if (hw_info->gptp || hw_info->ccc_gac)
-+	if (hw_info->gptp || hw_info->ccc_gac) {
-+		info->so_timestamping =
-+			SOF_TIMESTAMPING_TX_SOFTWARE |
-+			SOF_TIMESTAMPING_TX_HARDWARE |
-+			SOF_TIMESTAMPING_RX_HARDWARE |
-+			SOF_TIMESTAMPING_RAW_HARDWARE;
-+		info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
-+		info->rx_filters =
-+			(1 << HWTSTAMP_FILTER_NONE) |
-+			(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
-+			(1 << HWTSTAMP_FILTER_ALL);
- 		info->phc_index = ptp_clock_index(priv->ptp.clock);
--	else
--		info->phc_index = 0;
-+	}
- 
- 	return 0;
- }
+
+FUJITA Tomonori (6):
+  rust: time: Implement PartialEq and PartialOrd for Ktime
+  rust: time: Introduce Delta type
+  rust: time: Implement addition of Ktime and Delta
+  rust: time: add wrapper for fsleep function
+  rust: Add read_poll_timeout function
+  net: phy: qt2025: wait until PHY becomes ready
+
+ drivers/net/phy/qt2025.rs |  11 +++-
+ rust/helpers/helpers.c    |   2 +
+ rust/helpers/kernel.c     |  13 +++++
+ rust/helpers/time.c       |  19 +++++++
+ rust/kernel/error.rs      |   1 +
+ rust/kernel/io.rs         |   5 ++
+ rust/kernel/io/poll.rs    |  70 +++++++++++++++++++++++
+ rust/kernel/lib.rs        |   1 +
+ rust/kernel/time.rs       | 113 ++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 234 insertions(+), 1 deletion(-)
+ create mode 100644 rust/helpers/kernel.c
+ create mode 100644 rust/helpers/time.c
+ create mode 100644 rust/kernel/io.rs
+ create mode 100644 rust/kernel/io/poll.rs
+
+
+base-commit: d521db38f339709ccd23c5deb7663904e626c3a6
 -- 
-2.46.2
+2.34.1
 
 
