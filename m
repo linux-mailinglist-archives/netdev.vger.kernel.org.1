@@ -1,144 +1,111 @@
-Return-Path: <netdev+bounces-132391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475D3991800
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:56:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06390991806
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 17:58:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E0E11C21111
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:55:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFABB1F2238D
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCA1156243;
-	Sat,  5 Oct 2024 15:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE95815444E;
+	Sat,  5 Oct 2024 15:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="WilejgDt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YSV0eDl2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D692154BEC
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 15:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6A7156968
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 15:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728143755; cv=none; b=ogApjVj9C8QQb+jgvXG9OImIYA09A2wLkYJUElApgyvMunbJtk83GzHb35y8MHsybJ8xaPzDvVEx1UpjG3oqbgCzcRD09wCYHkAiqWBAHmYW+ew1OOj/suDQlT1VxBx/Ct8mEpzpvHAmigQTF8uNDoD2iN5EoqKIzDI29+76FAc=
+	t=1728143922; cv=none; b=uFmNnjV1gEjBCcdlL4iSlrdtEVYVULaAZ4xX3rvmkCUzKYdm0uOmP/kiUR9UdLpGxqSwCVDFUTR2KR/FFsHJD4V0CjGghzmX2Mmqty5eVH5rDan3l8L9lUQHKRC8sukD34gPezBXT6wSnaiY9YOHwZ8E8Dvd+UqOosBPVRItEQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728143755; c=relaxed/simple;
-	bh=PsI1i55xxq5NXGe1VRhjorrHVr5sgM10otIN5FpD+aI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f2pF14l+qBVDQfERSsZHuDzqdjxBRqsY/8rxlh3jR2fKJY3P0YMLwM3sNkwgYFv9dHrmsx0N38m51oMEYjyh+mbt6Vn64hO55faMEyxP3dEeh+aFw7aSywxZZ7B0yqhTj1gDW1L0vWLTJiXaaLPgVMoY5YnnfkV1lmbH41ESCuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=WilejgDt; arc=none smtp.client-ip=185.125.25.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XLVPf01bczLft;
-	Sat,  5 Oct 2024 17:55:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1728143749;
-	bh=OncNKFRqgpIYOceJ3VWT6OV3/Mchqpkty3WikccZb1Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WilejgDtp45DsXl5AnmOm26bjPi7Uf4m9jG3d1a/ziWrGB7Lr5UI3SNjzcMgn5IL9
-	 f18wa3utf+QoD4jFaQauPgUWj1AxnegOXCecMfo2LE7tg9hf9EGo7KIx+SzJJJblxA
-	 BGnOo2VYLBBQjEh/F39HPZ+CGXpTBxTUrQEtbrag=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XLVPd2y29zq1F;
-	Sat,  5 Oct 2024 17:55:49 +0200 (CEST)
-Date: Sat, 5 Oct 2024 17:55:47 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, 
-	Paul Moore <paul@paul-moore.com>
-Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
-Message-ID: <20241005.ooQuae7EHae9@digikod.net>
-References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
- <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
- <20241003.wie1aiphaeCh@digikod.net>
- <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
- <20241004.rel9ja7IeDo4@digikod.net>
- <0774e9f1-994f-1131-17f9-7dd8eb96738f@huawei-partners.com>
- <20241005.eeKoiweiwe8a@digikod.net>
+	s=arc-20240116; t=1728143922; c=relaxed/simple;
+	bh=9wZrlBjwzBnSopm/5FVerG5f/UYRy3auzddK6HrEJdM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Wu6KkxkhwU+rN1b6Qtk2UfJ9KnzMplu64WLaJNz7wKJfdFEFV5gFRrLXG+lCvN+pYX8tH/FLgCOatUri2exSAjcI6RlYuFZgNyHN8q2T0GI9VMPEbc7q7DjArV4XAiBlJTXX9N65oEd4S7ucY77Y9RCL0IO7KWAEOId8BL//5r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YSV0eDl2; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71de91427d5so262600b3a.2
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 08:58:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728143921; x=1728748721; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aYy5H5I/SXU91R9MPNHHy0EVbR43i8laYmKfAg3by1g=;
+        b=YSV0eDl2MrFn3jjA0ajQSSG464Vn2bk/AX7d2QJfSwj1WZaF4QB8QBjHMeEYtMkxBV
+         bTOT9nZjI7hzYpknRtBl4g3QLZRKpDsmN5r9RIVh7MmdRRqr+NqpAlwRqgKyz7TANIWS
+         4nyD1vjWP1UJvfWSHLPAXbZUrGVjwKmIOv/gRZquACluKu0ywb9sKvJPJXQ9yz++BrW5
+         3kVJzCfWPC114dOb5zqvnBJMLrGUmj3WuJIw9792YDgIvB2JuPy8oLAh+MhHfljD4tgA
+         RxLjl3wTZZX9E1r/lQ4yDOgS5Dhor5g8eS0eFoSYm4SE0eydgWYIdWLa6KRKMtVhHzEt
+         9T2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728143921; x=1728748721;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aYy5H5I/SXU91R9MPNHHy0EVbR43i8laYmKfAg3by1g=;
+        b=MsIZ5JvhLRkL7e9hjdwp9Coo6g+iIB8FZrcw2Mx1FZFvkr/hiFb1kgQCwRW9U7y9SD
+         fN7Fef6JM0GjD+MhyLN8Jw85ga9MhN3HFp5MgcVBCE7QwtBPbtJZ2drpfimmtq4rZo8r
+         RnjSuarP43tC0BvumXoCoSf6Wow3rs8witmbltn9LR6XFIoTtsThhVqZ1PnwKxWiEt9+
+         hSq/eu8dQTp93PFH6/L2NzgFZK0ee+lsu85uwqdkkKR88zobFxnG7yJIqPIu+Dn4NPdd
+         p/iL4iwtBdZoGfj8jEfH5AaJ4iFw6DmOVkSHf2R5JMlvCcimEwKouMpebeZs/L1HXdLf
+         qkzA==
+X-Gm-Message-State: AOJu0Ywh+BChp5M3vPFI6a9I7gokxRoF74hawwXiS03BLF/9s/lWk8lM
+	jLMvBBj/wJT5wUY3Qben0LMqudEHnePQwbzMaZ3cSbacuDlrlHFBYx8yAow=
+X-Google-Smtp-Source: AGHT+IGg0pWy6kejnQKZti4urc5wnuebPbVWiEK82AFyzueuAa7ckvfQCP+ioWuSCMxKN11YpP10Tw==
+X-Received: by 2002:a05:6a20:158a:b0:1cf:4212:4bd6 with SMTP id adf61e73a8af0-1d6dfabb7camr4653149637.7.1728143920630;
+        Sat, 05 Oct 2024 08:58:40 -0700 (PDT)
+Received: from VM-4-3-centos.localdomain ([43.128.101.248])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d7d02asm1625248b3a.197.2024.10.05.08.58.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 05 Oct 2024 08:58:40 -0700 (PDT)
+From: "xin.guo" <guoxin0309@gmail.com>
+To: edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	"xin.guo" <guoxin0309@gmail.com>
+Subject: [PATCH net-next v2] tcp: remove unnecessary update for tp->write_seq in tcp_connect()
+Date: Sat,  5 Oct 2024 23:58:35 +0800
+Message-Id: <1728143915-7777-1-git-send-email-guoxin0309@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241005.eeKoiweiwe8a@digikod.net>
-X-Infomaniak-Routing: alpha
 
-On Sat, Oct 05, 2024 at 05:49:59PM +0200, Mickaël Salaün wrote:
-> On Fri, Oct 04, 2024 at 09:16:56PM +0300, Mikhail Ivanov wrote:
-> > On 10/4/2024 1:13 PM, Mickaël Salaün wrote:
-> > > On Fri, Oct 04, 2024 at 12:30:02AM +0300, Mikhail Ivanov wrote:
-> > > > On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
-> > > > > Please also add Matthieu in Cc for the network patch series.
-> > > > > 
-> > > > > On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
-> > > > > > Do not check TCP access right if socket protocol is not IPPROTO_TCP.
-> > > > > > LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
-> > > > > > should not restrict bind(2) and connect(2) for non-TCP protocols
-> > > > > > (SCTP, MPTCP, SMC).
-> > > > > > 
-> > > > > > Closes: https://github.com/landlock-lsm/linux/issues/40
-> > > > > > Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
-> > > > > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> > > > > > ---
-> > > > > >    security/landlock/net.c | 2 +-
-> > > > > >    1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > > 
-> > > > > > diff --git a/security/landlock/net.c b/security/landlock/net.c
-> > > > > > index bc3d943a7118..6f59dd98bb13 100644
-> > > > > > --- a/security/landlock/net.c
-> > > > > > +++ b/security/landlock/net.c
-> > > > > > @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
-> > > > > >    		return -EACCES;
-> > > > > >    	/* Checks if it's a (potential) TCP socket. */
-> > > > > 
-> > > > > We can extend this comment to explain that we don't use sk_is_tcp()
-> > > > > because we need to handle the AF_UNSPEC case.
-> > > > 
-> > > > Indeed, I'll do this.
-> > 
-> > I've noticed that we still should check sk->sk_family = AF_INET{,6}
-> > here (so sk_is_tcp() is suitable). AF_UNSPEC can be only related to
-> > addresses and we should not provide any checks (for address) if socket
-> > is unrestrictable (i.e. it's not TCP). It's not useful and might lead to
-> > error incosistency for non-TCP sockets.
-> 
-> Good catch, let's use sk_is_tcp().
-> 
-> > 
-> > Btw, I suppose we can improve error consistency by bringing more checks
-> > from INET/TCP stack. For example it may be useful to return EISCONN
-> > instead of EACCES while connect(2) is called on a connected socket.
-> 
-> Yes, that would be nice (with the related tests).
-> 
-> > 
-> > This should be done really carefully and only for some useful cases.
-> > Anyway it's not related to the current patch (since it's not a bug).
-> 
-> Sure.
-> 
-> The following patch series could probably be extended for all LSM to
-> benefit from these fixes:
-> https://lore.kernel.org/all/20240327120036.233641-1-mic@digikod.net/
-> 
-> Mikhail, according to your SCTP tests with SELinux, it looks like this
-> patch series should be updated, but that should be simple.
-> 
-> Paul, what is the status of this LSM patch series?  Could Mikhail
-> integrate this LSM patch (with the SCTP fix) as part of the current
-> Landlock patch series?  This would help fixing the Landlock tests (which
-> check SCTP error consistency) when run with SELinux.
+From: "xin.guo" <guoxin0309@gmail.com>
 
-Well, this whole LSM network check should probably be part of another
-patch series.  For now, let's just fix SELinux (and check that other
-LSMs don't return wrong error codes).
+Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
+introduces tcp_connect_queue_skb() and it would overwrite tcp->write_seq,
+so it is no need to update tp->write_seq before invoking
+tcp_connect_queue_skb()
+
+Signed-off-by: xin.guo <guoxin0309@gmail.com>
+---
+ net/ipv4/tcp_output.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 4fd746b..ee8ab9a 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -4134,7 +4134,10 @@ int tcp_connect(struct sock *sk)
+ 	if (unlikely(!buff))
+ 		return -ENOBUFS;
+ 
+-	tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
++	/*SYN eats a sequence byte, write_seq updated by
++	 *tcp_connect_queue_skb().
++	 */
++	tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
+ 	tcp_mstamp_refresh(tp);
+ 	tp->retrans_stamp = tcp_time_stamp_ts(tp);
+ 	tcp_connect_queue_skb(sk, buff);
+-- 
+1.8.3.1
+
 
