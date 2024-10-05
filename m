@@ -1,118 +1,91 @@
-Return-Path: <netdev+bounces-132418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F42991985
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 20:32:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CEA3991987
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 20:32:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D335B20C38
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:32:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4023F282B0A
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 18:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D67015B14D;
-	Sat,  5 Oct 2024 18:32:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B202A15B96E;
+	Sat,  5 Oct 2024 18:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3WE5XFed"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BAFB15B122;
-	Sat,  5 Oct 2024 18:32:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E73D15B12A;
+	Sat,  5 Oct 2024 18:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728153141; cv=none; b=jIOdkYgpjS3WIXXc3ex+iaZ+T68C5SuCidfO229juhEBHk2b+RKngUp5biHEN/kPMJbtcyHCSv+F+qZleMWtvwAubHz1SajJX9LFl0QwPZSzVDbUUxlvsUtLVpKReD4zolSp/d+yK1LmB0Go8FI2/4tVaHItQ6z/eWEi4KMMfwg=
+	t=1728153142; cv=none; b=R2YBrbrD/jhPxb3gwYYo0YEkG8X+b5w6j50FaXcPrZDh628c7LWIlkTECJBVRyES6kaLVURAdmnSc7JTtsmervBXA2xmoBT86VZwacCh9/TaMLVm5HxWV8tfGBOMOT0M0H1P+N1P1cIsAuaPqCzJiNhzkqnb/fFgI+ohuhsIbWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728153141; c=relaxed/simple;
-	bh=4TgtMzQ2frjKLCe7JvlupUDfeuKbwFeVOZauDhWDRrY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HlSVPe17RCXinTayxG+OWoM9vRc0ksot085oVU8X+8tKFN0aijyKRGPkU8t3NL6Xj5aeDv267rAUNtGXtVbCSv+R0vsg0zX/rBGlaNQii5lqvBmt5OrS845emfN5IltuvUNzhhKsGshNx3ul1k9k14njnSEe/inMXxZvn2UF+Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XLYt50JPKz1ymlj;
-	Sun,  6 Oct 2024 02:32:13 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5097714022D;
-	Sun,  6 Oct 2024 02:32:09 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sun, 6 Oct 2024 02:32:05 +0800
-Message-ID: <fd3760b7-7e66-e426-22fe-24170cf43f33@huawei-partners.com>
-Date: Sat, 5 Oct 2024 21:32:01 +0300
+	s=arc-20240116; t=1728153142; c=relaxed/simple;
+	bh=k4aywGo3+ToqSVGKHrkQjtdm4PA72EIji3yAB8KyJZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WjhellfmgUPPL1puI43RRLanJ6kcUyCoSznu4pcjAJ4nIxGPqb6UC7xBZXOWIG0xn5gSN2Tcq7SMDAOUlPFs/jxJ8b0B3l+847aIVy7kZR90SqMQCssKGSKfS1Fy8ink2hMHkHI4MEQHs7k186xJjf/a7kkrpGkhPCEJEn20zUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3WE5XFed; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IAwWbAtE+ZVi4JeitYeaVZGm5lyxXx2jtcW2zxUCW0M=; b=3WE5XFedqEDH5SMg7QSldZIoHU
+	HDfEns6uK/KH/7786GG4MYN9xvNcLAEjwxb5npv22ffwzC3lnVbwy27Y/UyqAu55KFm0o0qn3iwgp
+	pdqmjtfLIEhtyBTRS8WtwApC/PTTwKxhDED6K3rxFojWRQymD6aBTVznqNFUc8H7xd6Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sx9ZR-0099Bm-6f; Sat, 05 Oct 2024 20:32:01 +0200
+Date: Sat, 5 Oct 2024 20:32:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+	benno.lossin@proton.me, a.hindborg@samsung.com,
+	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+	tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
+Message-ID: <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+ <20241005122531.20298-6-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 2/9] landlock: Support TCP listen access-control
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-3-ivanov.mikhail1@huawei-partners.com>
- <20241005.bd6123d170b4@gnoack.org>
- <47ff2457-59e2-b08e-0bb4-5d7c70be2ad1@huawei-partners.com>
- <20241005.e820f4fae74e@gnoack.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241005.e820f4fae74e@gnoack.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500005.china.huawei.com (7.191.163.240) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241005122531.20298-6-fujita.tomonori@gmail.com>
 
-On 10/5/2024 9:22 PM, Günther Noack wrote:
-> On Sat, Oct 05, 2024 at 08:53:55PM +0300, Mikhail Ivanov wrote:
->> On 10/5/2024 7:56 PM, Günther Noack wrote:
->>> On Wed, Aug 14, 2024 at 11:01:44AM +0800, Mikhail Ivanov wrote:
->>>> +	port = htons(inet_sk(sk)->inet_num);
->>>> +	release_sock(sk);
->>>> +	return check_access_socket(dom, port, LANDLOCK_ACCESS_NET_LISTEN_TCP);
->>>
->>> Nit: The last two lines could just be
->>>
->>>     err = check_access_socket(...);
->>>
->>> and then you would only need the release_sock(sk) call in one place.
->>> (And maybe rename the goto label accordingly.)
->> This split was done in order to not hold socket lock while doing some
->> Landlock-specific logic. It might be identical in performance to
->> your suggestion, but I thought that (1) security module should have as
->> little impact on network stack as possible and (2) it is more
->> clear that locking is performed only for a few socket state checks which
->> are not related to the access control.
->>
->> I'll add this explanation with a comment if you agree that everything is
->> correct.
-> 
-> 
-> IMHO, when you grab a lock in this function, it is clear that you'd
-> unconditionally want to release it before you return from the
-> function, and that in C, the normal way to guarantee unconditional
-> cleanup work would be to apply the "single exit point" rule.
+> might_sleep() is called via a wrapper so the __FILE__ and __LINE__
+> debug info with CONFIG_DEBUG_ATOMIC_SLEEP enabled isn't what we
+> expect; the wrapper instead of the caller.
 
-Yes, these 2 release_lock()s can really raise questions when reading.
+So not very useful. All we know is that somewhere in Rust something is
+sleeping in atomic context. Is it possible to do better? Does __FILE__
+and __LINE__ exist in Rust?
 
-> 
-> That being said, the scenario is simple enough here that it's not a
-> big issue in my eyes.  It was more of a minor nit about having more
-> than one place where the lock has to be released.  Either way is fine
-> (and also should not require excessive comments :)).
+> +    if sleep {
+> +        // SAFETY: FFI call.
+> +        unsafe { bindings::might_sleep() }
+> +    }
 
-Ok
+What is actually unsafe about might_sleep()? It is a void foo(void)
+function, so takes no parameters, returns no results. It cannot affect
+anything which Rust is managing.
 
-> 
->>>> +
->>>> +release_nocheck:
->>>> +	release_sock(sk);
->>>> +	return err;
->>>> +}
-> 
-> –Günther
+> +        // SAFETY: FFI call.
+> +        unsafe { bindings::cpu_relax() }
+
+Same here.
+
+	Andrew
 
