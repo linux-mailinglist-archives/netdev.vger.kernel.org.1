@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-132377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C4999170D
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 15:44:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12284991732
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 16:07:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F3901F2225B
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 13:44:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC8841F21685
+	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 14:07:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53625149E09;
-	Sat,  5 Oct 2024 13:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176291DFEF;
+	Sat,  5 Oct 2024 14:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ady644DQ"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="XMXsH7UB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f195.google.com (mail-pg1-f195.google.com [209.85.215.195])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D24231C95;
-	Sat,  5 Oct 2024 13:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7481B960
+	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 14:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728135882; cv=none; b=Xd+1AXBDKuDbJl6zcd6PhR79cwNmzKXPJM/vl9F//J8daSzi8YGHF9zFUvwD86aLO2AGJhTzP8FGu9suwSlGN3dAbdzXgbXlyewytRnoby+nuzpUc4pWOec6IWcXwMqMkHUtZ/hH2YVS/aqYL5wuCrHuBn7vdqN2T3xEQyDCS9Y=
+	t=1728137221; cv=none; b=Q0lv2zi+9fa3yA6KJKTOkBsi6pp50waHNhQpZsCZMKWOZKId2rVVIPjMiacwqfNa7WDkzyLCW1WCsKzr4ICo4Rt4j+FCq4t/ZTClipNXhvGFCQASccpEOGSPJRqmyu9mDe4DCX/0OERcbmDyN78GkPUYp//rMaXHsennXj7l2co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728135882; c=relaxed/simple;
-	bh=OCqLnu3FOYh2BYZ/k3XElebh9F3QXzEQhB43B85DKkM=;
+	s=arc-20240116; t=1728137221; c=relaxed/simple;
+	bh=w7hv67Bv4jGJL1OIuMDm5zDOxYIxf51jzM1/fXgu7r8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BlVBYXHRk52u0NB7ZM335A8DCBaFzMRRfekZEeeoJT8zTw/caucmXDUBn0FMIfKCxuIjEGjRgMabH8KKAjpfl+BATUOFdm65PnCfNKX1YdJVWGboHMSb6+ZSzmTC10hhnCOwUeQZNdxGGdgHSxZmmPXcNpOW6ejoGNcbUMp9uw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ady644DQ; arc=none smtp.client-ip=209.85.215.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f195.google.com with SMTP id 41be03b00d2f7-7e6d04f74faso2557714a12.1;
-        Sat, 05 Oct 2024 06:44:40 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=flSLFoHjOi5YBgWU6fbVv+JGraVgBVfrGA/QdRiS2goZNjobVZWZx5/Q4zLG45WBctvMnnG3YTsyQ7t5irVylPKOfa1MNzTwwhacwyMcr+KEWnhSwJ0Jcx6zrF3f7k0Pp0PoMz8yvdTEl+Z7B3XPHtsAnSJKsfuxwwcXwtpEGig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=XMXsH7UB; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42e82f7f36aso25527135e9.0
+        for <netdev@vger.kernel.org>; Sat, 05 Oct 2024 07:06:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728135880; x=1728740680; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1728137218; x=1728742018; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vk0lcaHAU8ayzUn9Owq/N1n4bRzRycGQWXSMMukOCCY=;
-        b=Ady644DQaVb7xEBkLJJ1GcXmWH6qSEKnqgrUGovZc7kXmGItpOY4YxdnrqZmiBdD0j
-         be1XgA4QUpYX3mzK7LMZgZvl1gAuH8Amc5YO6+cDgFN5AoCdfqdNpJn01sm4pvaxQxBE
-         ew1n8fVS2t0pbSJN9yzlC9+M5KbQO5P/JT4q1pnqMiPlx3gYwV0bEImtGW3OMRPVP0/w
-         q3UIKFQH9FL3jKKc5RQQBn3T7VzuYPGNqxUM3hP/4VjEgPK5DETXRl6t0h/JS8tNnPlf
-         IgFUm8DF3CxGhiMJi/xAbrVmtv3hNmqcPfoT16+fAASKwT6ej/xoWRe9HpTimTMe+giq
-         WFTw==
+        bh=73RXbNvNBQEszJaut+1wcFfhljNaK/Kf2dgm13KEtRw=;
+        b=XMXsH7UByCws1GjGhVTsm4xVSbrtuARNZNX+4XQnnWbHxxcjXhgITx3qX6+FltINkU
+         jj8q1x2enmHTZXVkTEnjXQjAol43OjXUvWWU1zCb8urywlqWljA6JS1k4U50K5I4aVv5
+         DvbRNwvsZ5Kmyocb2iktmfGem6EhNYa93ARFmPSXQG6z56BxELrMTGBjgtpoxyUNzi6o
+         +P2Y0Hd/pxWM3L+3kVxYy8MozCnFXS4Z1KcZPTpu+XOY63IUWuF2WNRPi4WEJAXPAJE2
+         TNATzig3ocfvOGFVpsVfwZEKxcrq/Rdkz2djJmFQRtukaL2kz772z/EH898InaB5WA3J
+         ZlMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728135880; x=1728740680;
+        d=1e100.net; s=20230601; t=1728137218; x=1728742018;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vk0lcaHAU8ayzUn9Owq/N1n4bRzRycGQWXSMMukOCCY=;
-        b=lSAQLyypE1Ky615BZ2+w83uPi3KxXgJZH03VTgB5KXWLaqij8jiMUcOEkWbwCG+799
-         iEisiyV/9qiMjJpu8p5azJmFsivYdTsIQq+Jh8m4oacGVJ9OgZHm7k+tL4WAD9CIYG14
-         Pt89fXD4/joysnqyqR4BDc2CqHFEqWZIosw7JnQa6C77XxnX9y0F816GPpzN6I4gPLz1
-         xURE5IA1IW2Yz5nqZegYvtvPmwF7bxsGhVukBfuvZC+3BWZ1qtwPiPmblnrRoBTL+WJn
-         +RfS0RiLoAYhQdJNYAG5kZqFKj4MOlT4Vht0mRl+sMbGYfrfQToSQ+VtfYiSLn/qyb0j
-         COIw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLMeWV1U5kYjhLf3Z4zCqeBpYBvh1D3gW52XNsDVZk0obDkRnEu06+KGkfVwIKv69KJUjnBdfsuNtOWq4=@vger.kernel.org, AJvYcCXeMmvFRbfVqObsPw679yiBPAnxA9fRKpLiLHjinpto1F3S9+JRX65eGSx3nOgIolYyXyb44bcd@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVwf65LxZM8cXOuU5w+omKWiqMFdTaYqnBW8tr8L+YaEm7iko1
-	zxPN1bIyC67PuyqinV7wF1FC0ocIKV6PCNVqeXDESkJiT1zjV0a1
-X-Google-Smtp-Source: AGHT+IE38rSN5FwwRg9a5f0P9ymdYfCJ4Qh1cT/tuSWC/KxzzN+IZeGm4rseorbhwbVgoU1XAV7epA==
-X-Received: by 2002:a17:90b:109:b0:2e0:89f2:f60c with SMTP id 98e67ed59e1d1-2e1e5d63376mr8974088a91.11.1728135879828;
-        Sat, 05 Oct 2024 06:44:39 -0700 (PDT)
-Received: from ?IPV6:2409:8a55:301b:e120:3c3f:d401:ec20:dbc7? ([2409:8a55:301b:e120:3c3f:d401:ec20:dbc7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20b0f9053sm1824890a91.41.2024.10.05.06.44.36
+        bh=73RXbNvNBQEszJaut+1wcFfhljNaK/Kf2dgm13KEtRw=;
+        b=Tf7adfRSVJ18oD3yKijsIodVPGxL3Fmx0x4Df5i6tv3EfPu2d7j1W03YCTKOOhc432
+         J/RY+Ag0JA0KEiQ6jyi0+3qZcWWvsrgqqEAilXnjMeDtpYE2y0U4EWJd0dNLHbQptQxU
+         Siew44lgw+G5R1QwLvMvN0/KsLrxfKiN0gepCHXNSK62KPeDsJKFyC7qlgk48hYW6mdm
+         8sMeV7efp17Jf/NM71JJ2N3piDDrxCuf54qMlysWtw0XxnDRFLuJNvL4yd5EnABTqxGG
+         SE0VdGVJ9tWRJL0RhX01/qMpc9xMqBSOIxdnt5wfgN6sqKBLCPQzaAi+YGL4DrT637ZI
+         aIQg==
+X-Forwarded-Encrypted: i=1; AJvYcCXM/danr6CBE1Zel2HT9ZbQ/Vb2Feql9hT0RgSuatMhT+i7G2XyQOH7/QQdOTR3CtALXbkr5Cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUiyU64MZzNTj2KfcMorDpalj0Tl3e1ZGHWCxvqHTBFIzjWd8t
+	RReu3eaHAtyL0GzjSX1j/gQgvUdrYNVOeXWSw8oQZ6/73ds2aA7VGxA0UuNPpVU=
+X-Google-Smtp-Source: AGHT+IEop7QV/LQ0/ci7yuPRtnBcGOvevIn7tuDVlQ8/zdMwhtTaLfoE32mNc8E+fIIZYTUwqHvxHg==
+X-Received: by 2002:a5d:510e:0:b0:374:af19:7992 with SMTP id ffacd0b85a97d-37d0e6f361bmr3281936f8f.7.1728137217667;
+        Sat, 05 Oct 2024 07:06:57 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d16920cc7sm1838947f8f.61.2024.10.05.07.06.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 05 Oct 2024 06:44:39 -0700 (PDT)
-Message-ID: <c9860411-fa9c-4e1b-bca2-a10e6737f9b0@gmail.com>
-Date: Sat, 5 Oct 2024 21:44:31 +0800
+        Sat, 05 Oct 2024 07:06:57 -0700 (PDT)
+Message-ID: <c06d9227-dcac-4131-9c2d-83dace086a5d@blackwall.org>
+Date: Sat, 5 Oct 2024 17:06:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,87 +76,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v19 09/14] net: rename skb_copy_to_page_nocache()
- helper
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+Subject: Re: [PATCH] bridge: use promisc arg instead of skb flags
+To: Amedeo Baragiola <ingamedeo@gmail.com>
+Cc: Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, bridge@lists.linux.dev,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yunsheng Lin <linyunsheng@huawei.com>, Eric Dumazet <edumazet@google.com>,
- David Ahern <dsahern@kernel.org>
-References: <20241001075858.48936-1-linyunsheng@huawei.com>
- <20241001075858.48936-10-linyunsheng@huawei.com>
- <CAKgT0UeSbXTXoOuTZS918pZQcCVZBXiTseN-NUBTGt71ctQ2Vw@mail.gmail.com>
+ Pablo Neira Ayuso <pablo@netfilter.org>
+References: <20241005014514.1541240-1-ingamedeo@gmail.com>
 Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <CAKgT0UeSbXTXoOuTZS918pZQcCVZBXiTseN-NUBTGt71ctQ2Vw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241005014514.1541240-1-ingamedeo@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/4/2024 11:00 AM, Alexander Duyck wrote:
-> On Tue, Oct 1, 2024 at 12:59 AM Yunsheng Lin <yunshenglin0825@gmail.com> wrote:
->>
->> Rename skb_copy_to_page_nocache() to skb_copy_to_va_nocache()
->> to avoid calling virt_to_page() as we are about to pass virtual
->> address directly.
->>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> ---
->>   include/net/sock.h | 10 ++++------
->>   net/ipv4/tcp.c     |  7 +++----
->>   net/kcm/kcmsock.c  |  7 +++----
->>   3 files changed, 10 insertions(+), 14 deletions(-)
->>
->> diff --git a/include/net/sock.h b/include/net/sock.h
->> index c58ca8dd561b..7d0b606d6251 100644
->> --- a/include/net/sock.h
->> +++ b/include/net/sock.h
->> @@ -2185,15 +2185,13 @@ static inline int skb_add_data_nocache(struct sock *sk, struct sk_buff *skb,
->>          return err;
->>   }
->>
->> -static inline int skb_copy_to_page_nocache(struct sock *sk, struct iov_iter *from,
->> -                                          struct sk_buff *skb,
->> -                                          struct page *page,
->> -                                          int off, int copy)
->> +static inline int skb_copy_to_va_nocache(struct sock *sk, struct iov_iter *from,
->> +                                        struct sk_buff *skb, char *va,
->> +                                        int copy)
->>   {
+On 05/10/2024 04:44, Amedeo Baragiola wrote:
+> Since commit 751de2012eaf ("netfilter: br_netfilter: skip conntrack input hook for promisc packets")
+> a second argument (promisc) has been added to br_pass_frame_up which
+> represents whether the interface is in promiscuous mode. However,
+> internally - in one remaining case - br_pass_frame_up checks the device
+> flags derived from skb instead of the argument being passed in.
+> This one-line changes addresses this inconsistency.
 > 
-> This new naming is kind of confusing. Currently the only other
-> "skb_copy_to" functions are skb_copy_to_linear_data and
-> skb_copy_to_linear_data_offset. The naming before basically indicated
-
-I am not sure if the above "skb_copy_to" functions are really related
-here, as they are in include/linux/skbuff.h and don't take '*sk' as
-first input param.
-
-As "skb_copy_to" function in include/net/sock.h does take '*sk' as first
-input param, perhaps the "skb_copy_to" functions in include/net/sock.h
-can be renamed to "sk_skb_copy_to" in the future as most of functions
-do in include/net/sock.h
-
-> which part of the skb the data was being copied into. So before we
-> were copying into the "page" frags. With the new naming this function
-> is much less clear as technically the linear data can also be a
-> virtual address.
-
-I guess it is ok to use it for linear data if there is a need, why
-invent another function for the linear data when both linear data and
-non-linear data can be used as a virtual address?
-
+> Signed-off-by: Amedeo Baragiola <ingamedeo@gmail.com>
+> ---
+>  net/bridge/br_input.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> I would recommend maybe replacing "va" with "frag", "page_frag" or
-> maybe "pfrag" as what we are doing is copying the data to one of the
-> pages in the paged frags section of the skb before they are added to
-> the skb itself.
+> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> index ceaa5a89b947..156c18f42fa3 100644
+> --- a/net/bridge/br_input.c
+> +++ b/net/bridge/br_input.c
+> @@ -50,8 +50,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
+>  	 * packet is allowed except in promisc mode when someone
+>  	 * may be running packet capture.
+>  	 */
+> -	if (!(brdev->flags & IFF_PROMISC) &&
+> -	    !br_allowed_egress(vg, skb)) {
+> +	if (!promisc && !br_allowed_egress(vg, skb)) {
+>  		kfree_skb(skb);
+>  		return NET_RX_DROP;
+>  	}
 
-Don't "frag", "page_frag" or "pfrag" also seem confusing enough that
-it does not take any 'frag' as the input param?
+This is subtle, but it does change behaviour when a BR_FDB_LOCAL dst
+is found it will always drop the traffic after this patch (w/ promisc) if it
+doesn't pass br_allowed_egress(). It would've been allowed before, but current
+situation does make the patch promisc bit inconsistent, i.e. we get
+there because of BR_FDB_LOCAL regardless of the promisc flag. 
 
-Does skb_copy_data() make more sense here as it can work on both
-linear and non-linear data, as skb_do_copy_data_nocache() and
-skb_copy_to_page_nocache() in the same header file seem to have a
-similar style?
+Because we can have a BR_FDB_LOCAL dst and still pass up such skb because of
+the flag instead of local_rcv (see br_br_handle_frame_finish()).
+
+CCing also Pablo for a second pair of eyes and as the original patch
+author. :)
+
+Pablo WDYT?
+
+Just FYI we definitely want to see all traffic if promisc is set, so
+this patch is a no-go.
+
+Cheers,
+ Nik
 
