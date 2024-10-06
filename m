@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-132457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6337E991C1E
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:32:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ACCF4991C1C
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:31:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94CFD1C212F4
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:32:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3FB01C21303
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B3517BEDB;
-	Sun,  6 Oct 2024 02:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED44317BB26;
+	Sun,  6 Oct 2024 02:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hHWi+FxO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kN1JrioP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D42F0178367;
-	Sun,  6 Oct 2024 02:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3FF17B400;
+	Sun,  6 Oct 2024 02:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728181747; cv=none; b=X5qnVkg7oHzNfW3NUSUyINwFHutPrlYsaPBj6NC5MDnF4zff7bUycE1wTLXbnzn6H7AKoKtAfZk2v/MuZb1WE4jSZNdgB/7zBJaw6Ysz0+fa52a4k2SpXcP5RGxFXfBhvJ2YDR9/n4K6HlGcwpakKWZd9+ogZeFO2/6bPeqF+Bo=
+	t=1728181744; cv=none; b=dS+8em442JkbGOcUjBloLwWOCNVerGWH8F6tKPdK3AqNzQSfvkvIEdxVltXC3sNI94QAy9nBu3qk03A9EoBmEEmVY690CNcHpzHkqeK3jLT3tOd9XgM3RO34RAmPGNRuyoJHyJ5h6A3asy7fqeEzE/A8FHjbjngX1iXefLQMLTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728181747; c=relaxed/simple;
-	bh=kih75HuZ1ZXc3JQHkzwuj//sPN9nSONeRe7im09vADU=;
+	s=arc-20240116; t=1728181744; c=relaxed/simple;
+	bh=tPMaKKCrP3tEFhfNaUWKZ/JHAt5j/C2Ms8f8SpstWRk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d1MVt7ATJL7LMt2mPWeAuuILXjxZIxSw2Fl3FTXRiCFfJUSzgWLDM2hng5rAwKNxFpbiwd7rFZ28gk46jB4KyGvl5DKRu3Se8wpreQN0yvE5ixbHUPhC0oVUZU1g6p6fgVqYNM3OR08FoJ46fWhfDGPbSufYCm+MlLFqvOVzvKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hHWi+FxO; arc=none smtp.client-ip=209.85.215.172
+	 MIME-Version; b=foV9g1vOovyb2bBUpFX2iIEusYbaWWqDs6TnWf0U9CVktWK0guenFH3wx0bP4j5EgXTaXBmB81yWiIhauJaJlga0wIqwsL14fWEQgod6WXhnYZLTD9sj7sUlMFM+cTvg8QPPHO16AmTnNbdny2BpwizO0Taq7v4hT0yrs9616ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kN1JrioP; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7d916b6a73aso1980973a12.1;
-        Sat, 05 Oct 2024 19:29:01 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71dfc1124cdso258706b3a.1;
+        Sat, 05 Oct 2024 19:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728181741; x=1728786541; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728181742; x=1728786542; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RUV0cdXbjkkkderKYay9dxBu1U/jTzVeigZXhXzokHI=;
-        b=hHWi+FxOWtRfgjMkMjVWnfIBPuzqfRt8sfcBaL5Yuw0l71a4XBSCfmFR0CnKmNFLqg
-         /aG7y7ifTmplNP+AHAmhztDwtncn4W+Ga2uy14I6sUCLD23SUPzix+qdw5+6KAR3TjRl
-         bEmiFvMwig6o6NCs9i0Hc+nCvsMfiRlCsQttFnRnEqYA6NCjiJGPfnCE4wbL25JUf+M2
-         rx3pn9gh0Skg2yoWOke+gLEP/9GGM5SvnuZnrtY8swwlsC630vxkTjQUh/vihBxWRWCA
-         YA0wUzqtrfKQ5xKpY0Yyu0in6al1wSzCHV+9+J7k7mMwaKRXIzVnM0NpHq65hzGgK6hp
-         ZZFA==
+        bh=r2CvXoVohK/pulVhxC+r21/PlsTS5FXZz7L5qVXfWFU=;
+        b=kN1JrioPgajEn6xS1KHQ9zM+XR6JKfmt8aABw0uuETjKYUeI5xb47GFV7HDBc+2Mn4
+         z/ZEOrIGFbgf1E81G1emZeqtpQliX0BIqzYGwiBWBXEIN/G7k11aQIiNykmLjT/Uwdo3
+         v7ET3Bx429jdQvSZsZKKOYKmiy0N9scOUluXrBEpFrR5eITBvci/6Mx8a/wfBdxUAgy/
+         dqLkP8ef9Bft3FE7p++jZ2DtR/iocwBzE7ytnE9inPN+MerIS+QcBSJYZyT6djaD9axN
+         LiwhejrWjpl0REN3nuf1tIrl53NZN6Ir3ydW5KLHTfuVllLoKaDhvsebRJxodZBSJY7B
+         S2Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728181741; x=1728786541;
+        d=1e100.net; s=20230601; t=1728181742; x=1728786542;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RUV0cdXbjkkkderKYay9dxBu1U/jTzVeigZXhXzokHI=;
-        b=KsrTiaJyKnkJYbB8PB5RTxpN/k/loUD2eG4HqPnzjDeqYAO+/t23kCJadY5c/72BJQ
-         i/IrK8v1lblJWgxteJa5X0+NeVkSy6qUx/CPcCFVSOKnM3c9bBXozktdc3/rAQ3HAzlo
-         BPTfkzTRTwZV9f4GeysYy5XwUzZGwCjgrYkxyHr+Nos7onpo2egYPUu6Lmy9Wr7X21ef
-         vdxoHoEeL268piwsJ9cLNzim8INc0BipLgWIxNjk4GZnusYKK+flRBvOAuqjLGlaxySz
-         si+mpHpmn3z2BwsjjvSSasGTJMajIgsuba3YMyzPTdDveiOXenVbt6dRgEl1XkfWvbHO
-         WjdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV3foyv5jQA3gXlZAHFAXHjmV1L4V604u3jfhpguWTxJNHqyfVg6J/Hzq3uYGzfqDw+gg2vnb3Z9wuAwpk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKKtsTRZ9+KlPqmSzlDrp5ZevG/Y5wlo1MLtOHcufjvZkgtlTF
-	4ojinLkVLDBnv+Ay87QATGlP22vgyX1+BJSRy5DKT6r2kHluRwQdgaeuxw==
-X-Google-Smtp-Source: AGHT+IFPhKR7GQ4wNJbmoCs4peccILPfqn3lvDXQNeHck0E5mQFV8LUK8UUUYryb77T++LXf10K7tQ==
-X-Received: by 2002:a05:6a21:3318:b0:1cf:3838:1ed9 with SMTP id adf61e73a8af0-1d6dfae3320mr9240858637.50.1728181741141;
-        Sat, 05 Oct 2024 19:29:01 -0700 (PDT)
+        bh=r2CvXoVohK/pulVhxC+r21/PlsTS5FXZz7L5qVXfWFU=;
+        b=XoandSTubV9/5Zbk+bqemu1S+SLPaKnWypfYZG9AjfDMai9NVsHS1weTlhASpDGEdY
+         eC6xGv0ZguWNVVuqmQ94DcZBaoea/ZM1kNrkjmRdVT6bpUGQ1xoSBTRLc+yioSiimvwf
+         lNhzQ2yCljkE7oaUyYyikdOJO9baRYPPzfvVTOs11AaqzNCnA/6njo5bm5nSuu3lz4jj
+         Ov66LyJgLAI/TLUskxg+X33GegLocD4+ach5M2B1OiPRLaNcIEjguRlrZ0KnAcGTAXyT
+         rLuIYZBhAlgZeydOQt8p0+HfYc903yjMQDrzlnwkrj/MQXP6ZoLG3DCaGcXKDfkwAwlr
+         VVvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1le9u/EAELiGtXeUttMV40XrUCTb+mvFhowMe7nj0NLg/EenQWfPa6xD1N3R0RAr5g4vpUOqhEpXrfQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8f5Glt9UgIJb0j2DibYBh7fEU3auyDBsZ26195vZeHnAWl8jJ
+	zq2Uw3I1NCX6HyMF4CI2at2XTXs6fi/cQ6U2BJEmhQcDpjJf3ITTeOHSQg==
+X-Google-Smtp-Source: AGHT+IHhcBDPHI6ZJiG4LrmxLbAs88LeuLCqJItCY+6yYrX51yIrGagTM9+9KDleQrCLiK9RVoC8XA==
+X-Received: by 2002:a05:6a00:914d:b0:71d:f2e1:f02b with SMTP id d2e1a72fcca58-71df2e1f068mr5495391b3a.2.1728181742525;
+        Sat, 05 Oct 2024 19:29:02 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbb9bcsm2103550b3a.6.2024.10.05.19.28.59
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbb9bcsm2103550b3a.6.2024.10.05.19.29.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 19:29:00 -0700 (PDT)
+        Sat, 05 Oct 2024 19:29:02 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCH net-next 10/14] net: ibm: emac: mal: use devm for kzalloc
-Date: Sat,  5 Oct 2024 19:28:40 -0700
-Message-ID: <20241006022844.1041039-11-rosenp@gmail.com>
+Subject: [PATCH net-next 11/14] net: ibm: emac: mal: use devm for request_irq
+Date: Sat,  5 Oct 2024 19:28:41 -0700
+Message-ID: <20241006022844.1041039-12-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241006022844.1041039-1-rosenp@gmail.com>
 References: <20241006022844.1041039-1-rosenp@gmail.com>
@@ -93,99 +93,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simplifies the probe function by removing gotos.
+Avoids manual frees. Also replaced irq_of_parse_and_map with
+platform_get_irq since it's simpler and does the same thing.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/mal.c | 28 ++++++++++------------------
- 1 file changed, 10 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/ibm/emac/mal.c | 51 ++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-index a632d3a207d3..70019ced47ff 100644
+index 70019ced47ff..b07b2e0ce478 100644
 --- a/drivers/net/ethernet/ibm/emac/mal.c
 +++ b/drivers/net/ethernet/ibm/emac/mal.c
-@@ -524,7 +524,8 @@ static int mal_probe(struct platform_device *ofdev)
- 	unsigned long irqflags;
- 	irq_handler_t hdlr_serr, hdlr_txde, hdlr_rxde;
- 
--	mal = kzalloc(sizeof(struct mal_instance), GFP_KERNEL);
-+	mal = devm_kzalloc(&ofdev->dev, sizeof(struct mal_instance),
-+			   GFP_KERNEL);
- 	if (!mal)
- 		return -ENOMEM;
- 
-@@ -539,8 +540,7 @@ static int mal_probe(struct platform_device *ofdev)
- 		printk(KERN_ERR
- 		       "mal%d: can't find MAL num-tx-chans property!\n",
- 		       index);
--		err = -ENODEV;
--		goto fail;
-+		return -ENODEV;
- 	}
- 	mal->num_tx_chans = prop[0];
- 
-@@ -549,8 +549,7 @@ static int mal_probe(struct platform_device *ofdev)
- 		printk(KERN_ERR
- 		       "mal%d: can't find MAL num-rx-chans property!\n",
- 		       index);
--		err = -ENODEV;
--		goto fail;
-+		return -ENODEV;
- 	}
- 	mal->num_rx_chans = prop[0];
- 
-@@ -558,15 +557,13 @@ static int mal_probe(struct platform_device *ofdev)
- 	if (dcr_base == 0) {
- 		printk(KERN_ERR
- 		       "mal%d: can't find DCR resource!\n", index);
--		err = -ENODEV;
--		goto fail;
-+		return -ENODEV;
- 	}
- 	mal->dcr_host = dcr_map(ofdev->dev.of_node, dcr_base, 0x100);
- 	if (!DCR_MAP_OK(mal->dcr_host)) {
- 		printk(KERN_ERR
- 		       "mal%d: failed to map DCRs !\n", index);
--		err = -ENODEV;
--		goto fail;
-+		return -ENODEV;
- 	}
- 
- 	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,mcmal-405ez")) {
-@@ -577,8 +574,7 @@ static int mal_probe(struct platform_device *ofdev)
- #else
- 		printk(KERN_ERR "%pOF: Support for 405EZ not enabled!\n",
- 				ofdev->dev.of_node);
--		err = -ENODEV;
--		goto fail;
-+		return -ENODEV;
+@@ -578,19 +578,19 @@ static int mal_probe(struct platform_device *ofdev)
  #endif
  	}
  
-@@ -711,9 +707,6 @@ static int mal_probe(struct platform_device *ofdev)
- 	free_netdev(mal->dummy_dev);
-  fail_unmap:
- 	dcr_unmap(mal->dcr_host, 0x100);
-- fail:
--	kfree(mal);
+-	mal->txeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 0);
+-	mal->rxeob_irq = irq_of_parse_and_map(ofdev->dev.of_node, 1);
+-	mal->serr_irq = irq_of_parse_and_map(ofdev->dev.of_node, 2);
++	mal->txeob_irq = platform_get_irq(ofdev, 0);
++	mal->rxeob_irq = platform_get_irq(ofdev, 1);
++	mal->serr_irq = platform_get_irq(ofdev, 2);
+ 
+ 	if (mal_has_feature(mal, MAL_FTR_COMMON_ERR_INT)) {
+ 		mal->txde_irq = mal->rxde_irq = mal->serr_irq;
+ 	} else {
+-		mal->txde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 3);
+-		mal->rxde_irq = irq_of_parse_and_map(ofdev->dev.of_node, 4);
++		mal->txde_irq = platform_get_irq(ofdev, 3);
++		mal->rxde_irq = platform_get_irq(ofdev, 4);
+ 	}
+ 
+-	if (!mal->txeob_irq || !mal->rxeob_irq || !mal->serr_irq ||
+-	    !mal->txde_irq  || !mal->rxde_irq) {
++	if (mal->txeob_irq < 0 || mal->rxeob_irq < 0 || mal->serr_irq < 0 ||
++	    mal->txde_irq < 0 || mal->rxde_irq < 0) {
+ 		printk(KERN_ERR
+ 		       "mal%d: failed to map interrupts !\n", index);
+ 		err = -ENODEV;
+@@ -660,21 +660,26 @@ static int mal_probe(struct platform_device *ofdev)
+ 		hdlr_rxde = mal_rxde;
+ 	}
+ 
+-	err = request_irq(mal->serr_irq, hdlr_serr, irqflags, "MAL SERR", mal);
++	err = devm_request_irq(&ofdev->dev, mal->serr_irq, hdlr_serr, irqflags,
++			       "MAL SERR", mal);
+ 	if (err)
+ 		goto fail2;
+-	err = request_irq(mal->txde_irq, hdlr_txde, irqflags, "MAL TX DE", mal);
++	err = devm_request_irq(&ofdev->dev, mal->txde_irq, hdlr_txde, irqflags,
++			       "MAL TX DE", mal);
+ 	if (err)
+-		goto fail3;
+-	err = request_irq(mal->txeob_irq, mal_txeob, 0, "MAL TX EOB", mal);
++		goto fail2;
++	err = devm_request_irq(&ofdev->dev, mal->txeob_irq, mal_txeob, 0,
++			       "MAL TX EOB", mal);
+ 	if (err)
+-		goto fail4;
+-	err = request_irq(mal->rxde_irq, hdlr_rxde, irqflags, "MAL RX DE", mal);
++		goto fail2;
++	err = devm_request_irq(&ofdev->dev, mal->rxde_irq, hdlr_rxde, irqflags,
++			       "MAL RX DE", mal);
+ 	if (err)
+-		goto fail5;
+-	err = request_irq(mal->rxeob_irq, mal_rxeob, 0, "MAL RX EOB", mal);
++		goto fail2;
++	err = devm_request_irq(&ofdev->dev, mal->rxeob_irq, mal_rxeob, 0,
++			       "MAL RX EOB", mal);
+ 	if (err)
+-		goto fail6;
++		goto fail2;
+ 
+ 	/* Enable all MAL SERR interrupt sources */
+ 	set_mal_dcrn(mal, MAL_IER, MAL_IER_EVENTS);
+@@ -693,14 +698,6 @@ static int mal_probe(struct platform_device *ofdev)
+ 
+ 	return 0;
+ 
+- fail6:
+-	free_irq(mal->rxde_irq, mal);
+- fail5:
+-	free_irq(mal->txeob_irq, mal);
+- fail4:
+-	free_irq(mal->txde_irq, mal);
+- fail3:
+-	free_irq(mal->serr_irq, mal);
+  fail2:
+ 	dma_free_coherent(&ofdev->dev, bd_size, mal->bd_virt, mal->bd_dma);
+  fail_dummy:
+@@ -725,12 +722,6 @@ static void mal_remove(struct platform_device *ofdev)
+ 		       "mal%d: commac list is not empty on remove!\n",
+ 		       mal->index);
+ 
+-	free_irq(mal->serr_irq, mal);
+-	free_irq(mal->txde_irq, mal);
+-	free_irq(mal->txeob_irq, mal);
+-	free_irq(mal->rxde_irq, mal);
+-	free_irq(mal->rxeob_irq, mal);
 -
- 	return err;
- }
+ 	mal_reset(mal);
  
-@@ -744,10 +737,9 @@ static void mal_remove(struct platform_device *ofdev)
- 
- 	dma_free_coherent(&ofdev->dev,
- 			  sizeof(struct mal_descriptor) *
--			  (NUM_TX_BUFF * mal->num_tx_chans +
--			   NUM_RX_BUFF * mal->num_rx_chans), mal->bd_virt,
--			  mal->bd_dma);
--	kfree(mal);
-+				  (NUM_TX_BUFF * mal->num_tx_chans +
-+				   NUM_RX_BUFF * mal->num_rx_chans),
-+			  mal->bd_virt, mal->bd_dma);
- }
- 
- static const struct of_device_id mal_platform_match[] =
+ 	free_netdev(mal->dummy_dev);
 -- 
 2.46.2
 
