@@ -1,98 +1,116 @@
-Return-Path: <netdev+bounces-132565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CF0D99221C
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 00:41:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AD8C99221F
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 00:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 421431C209CD
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 22:41:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC8F21F2150B
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 22:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E3C18A6BA;
-	Sun,  6 Oct 2024 22:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3678172777;
+	Sun,  6 Oct 2024 22:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XvPrl+Kl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="I/Z3XDJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D0CF1C6B2;
-	Sun,  6 Oct 2024 22:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6828136E3F;
+	Sun,  6 Oct 2024 22:48:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728254485; cv=none; b=EgafaEs/Dt98PenJf7Cw6w8vU9wYD6VBpZAZvJkm5Ab0xO9AqWlNBU2eGMpd1kvbphGRt3A7eyXmW6A/gqhV12QMWPinLC0UCk3FtlsQkdje/njosI4ztnjkjH5mKChZUa71XFJg3BxQYpmnzHOgxuCCOzM4ANB5ZieqLA2G3aI=
+	t=1728254916; cv=none; b=P5p8NClScGsJcYHPNlwltzVaOQL74GaX3hjF/pFZZlm/rmSuavo0UatpQ1vnQaOAHbJkYVXEhNmAKpIDK5acPfo972lAA8um+HBMeqd9QtWZfOhDVxdcTwgPViUARiP8jAgkJ9LqyJiKmfZwpEOrjAlCw5ucfWCFKhRBHkYCKHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728254485; c=relaxed/simple;
-	bh=8fN6dHkL3m6k0pWOYMgr5qyQhdl6pyBbfGsGla+fxX8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NH8lCXWyymxFCDm355st+wotymZdmUGP6cqFxIEhV3JYPvgDLZy2CzeTTv3tKgnrWVpwWolCQtKrceoFBhJL+WwY9OZFFCBTBRBZ7hKgpXDGsMp5YLXTdfUUZAogAwrljdPPmU8G1XSTWgB9W6RAf7GqvMe+V4lx0tFq3kbF0N4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XvPrl+Kl; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-656d8b346d2so2352126a12.2;
-        Sun, 06 Oct 2024 15:41:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728254479; x=1728859279; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8fN6dHkL3m6k0pWOYMgr5qyQhdl6pyBbfGsGla+fxX8=;
-        b=XvPrl+KldU1xhhI+iLUR0v7GGpiPZsOaCsa0g1GVyfvZANgjWKC85MKsGmPQ2fXwkF
-         j1EvV6pTyy9eZwEXcLJaRT6fwdBiXD9RV3Rm0GbJakaA11yscmH5rnkiMqTnp+eMTlKX
-         eizz+tXWqlqnlMr5VHaUSKVo7Eqx3IAfbi3c10DYvPg1na29UXZpdkMiYdNRq23gPrGK
-         vtssBQEwQeWic7t13NldkWrhbHDCDs2teMzWbsG99GfCbrQVQKpxuEAscsyyKwIfVYj5
-         lGZf9gilTQZ5VlCtyWB7qde6ATsoqC0/469L2UdjIMtb1h8hPS+Zpo1FbsdcbKrhtVX6
-         G1Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728254479; x=1728859279;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8fN6dHkL3m6k0pWOYMgr5qyQhdl6pyBbfGsGla+fxX8=;
-        b=Cy0VAGYdD33lp6a3ANyn+2WnbdhQbWCeWsfB3lUTGj5qpqPlVjQWsLk1kB+5vwiFQ+
-         uHz3USdeOdELAJnxnWGj+9a8YFwmDxXfP3xM8+bVw0p819Vrqb3QPQZYMvsYBrFhPVpD
-         BpPJbW7T++O89ZotTDUbHMpWyguZ/x+EvwJi7vkxpUaXzAtNjRgw1jHJtfRQl+4U7v+C
-         EimYVkdeKxIc8omAPksnXzMNDqq0xEIfvk0tYELVis6ZnB3E6QZeYsc2jPcTneb6dZCs
-         kYSpqyYNnaPpEy2KOkNkSCeOLiKboakBD2UEy9HPIdD0qE/yP5bN4/tkEDBUtJ7zSWgD
-         fjww==
-X-Forwarded-Encrypted: i=1; AJvYcCVo7tKwwAqZAOhZ342uzAH9JhdKJFQjoY1OXXiiLs5KVAwtatDDIsU83Bp9fElXE3o0B81/aPGO@vger.kernel.org, AJvYcCXATn923GKXp8agKH5nBJP2IsU1nFvd5sa4jR/XsL03e3p7XGWMEnScUOYqia+7MJ+LFoHHsDmyvdk5z6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxup8fuAE27HrZapT200p3JYhJeSisQ6qaUF9e8KEwl2KGtl6Kd
-	9oWaiU1zAEhQ0gb7mXIr2ExxFqLIPdOVXTl9RJALgWc1xsKHT7Mv
-X-Google-Smtp-Source: AGHT+IF0NeX/oWIC70KxaZWdaz7pfDMjInUKQm+ZZFHke41fOW+mwThTMAp7SqARXofvlZ5Ty56ypg==
-X-Received: by 2002:a05:6a20:cd8f:b0:1cf:7123:86a6 with SMTP id adf61e73a8af0-1d6dfaef19emr14828042637.49.1728254479372;
-        Sun, 06 Oct 2024 15:41:19 -0700 (PDT)
-Received: from archlinux.. ([2405:201:e00c:517f:5e87:9cff:fe63:6000])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71df0d452b7sm3221655b3a.108.2024.10.06.15.41.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Oct 2024 15:41:18 -0700 (PDT)
-From: Mohammed Anees <pvmohammedanees2003@gmail.com>
-To: andrew@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	olteanv@gmail.com,
-	pabeni@redhat.com,
-	pvmohammedanees2003@gmail.com
-Subject: Re: [PATCH] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
-Date: Mon,  7 Oct 2024 04:11:09 +0530
-Message-ID: <20241006224109.2416-1-pvmohammedanees2003@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <32b408a4-8b2d-4425-9757-0f8cbfddf21c@lunn.ch>
-References: <32b408a4-8b2d-4425-9757-0f8cbfddf21c@lunn.ch>
+	s=arc-20240116; t=1728254916; c=relaxed/simple;
+	bh=y3h8isw+sZMArpTg2oGtcAYeewD1Io5xAzOKFkDScRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jMGhMzsSBniJij3gTdxQefIOFFHRsn42lyBBC+UEV643pHgzmrP0jFNVo+ll2HrSMhLMHAsOWE206DWhrvibtJtp+lXb2sby7nue4XcncAc6YDXqjGLDc1OLkyBzb49TkixrzU/bRqRGGAlqxs8JULkh1mq5LskZrDCLwAdoVzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=I/Z3XDJV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=aEJPDCwTzsVRuDwSb7DoMTUdU0b4I0cCDfPqI9ISxjQ=; b=I/Z3XDJVA4SbIIZKnBvsmXhjJO
+	tqdykfk6TYww4px+t06rxGPQs6fD3NlPqq18ZCcJ23DYtpnRliSIdDwfscQly6dqTnkQzwDMOiwQX
+	DleNPM+Mg+Pf8rf0MTHfzedT+85ZvTfYzt4od8CZsEy7YDWSXPX3EKKkkPiLYGk5UFEo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sxa36-009DIR-I5; Mon, 07 Oct 2024 00:48:24 +0200
+Date: Mon, 7 Oct 2024 00:48:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ivan Safonov <insafonov@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: fix register_netdev description
+Message-ID: <a230dbf8-2390-4cbc-9aa6-ef3cd052dcc6@lunn.ch>
+References: <20241006175718.17889-3-insafonov@gmail.com>
+ <844f8c95-634c-4153-bfab-d6a032677854@lunn.ch>
+ <1ebce461-e4eb-4f10-9de8-19240193b262@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ebce461-e4eb-4f10-9de8-19240193b262@gmail.com>
 
-I shall apply these changes and send a new v2 patch,
-thanks!
+On Mon, Oct 07, 2024 at 01:00:19AM +0300, Ivan Safonov wrote:
+> 
+> 
+> On 10/7/24 00:16, Andrew Lunn wrote:
+> > On Sun, Oct 06, 2024 at 08:57:20PM +0300, Ivan Safonov wrote:
+> > > register_netdev() does not expands the device name.
+> > 
+> > Please could you explain what makes you think it will not expand the
+> > device name.
+> > 
+> > 	Andrew
+> 
+> It is the register_netdev implementation:
+> 
+> > int register_netdev(struct net_device *dev)
+> > {
+> > 	int err;
+> > 
+> > 	if (rtnl_lock_killable())
+> > 		return -EINTR;
+> > 	err = register_netdevice(dev);
+> > 	rtnl_unlock();
+> > 	return err;
+> > }
+> 
+> There is no device name expansion, rtnl lock and register_netdevice call
+> only. The register_netdevice expands device name using dev_get_valid_name().
+
+ *	Take a completed network device structure and add it to the kernel
+ *	interfaces. A %NETDEV_REGISTER message is sent to the netdev notifier
+ *	chain. 0 is returned on success. A negative errno code is returned
+ *	on a failure to set up the device, or if the name is a duplicate.
+ *
+ *	This is a wrapper around register_netdevice that takes the rtnl semaphore
+ *	and expands the device name if you passed a format string to
+ *	alloc_netdev.
+
+So you are taking this comment to mean the wrapper. Then yes, the
+wrapper does not expand the device nice. So please move the text about
+expanding the name earlier. It is an important part of registering a
+netdev, so should be mentioned.
+
+    Andrew
+
+---
+pw-bot: cr
 
