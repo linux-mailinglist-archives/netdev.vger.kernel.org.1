@@ -1,169 +1,121 @@
-Return-Path: <netdev+bounces-132500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B26A991F37
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:00:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB11991F38
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:01:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F3F8B21965
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A73A1C214F1
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B498F13635D;
-	Sun,  6 Oct 2024 15:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2679345BEC;
+	Sun,  6 Oct 2024 15:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="X66MvOd5"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lcjVIQWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AF71F5F6
-	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 15:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9971B5AA
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 15:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728226836; cv=none; b=NcR7G88nrFTDcYTKR1cpPOHpGcCCc8dVBY7UV7QfH6ilFkAJ7QhDu2qdkGpwF3qvV42kiW3kcThCycuijYr+YFyb10cj4fXJXlFFKm/u1B5WQVkAXqx4POBOMvphmH5Zj910/ynqrj+cdzhuxbYkjRBzYIXRk3kab34wyADS+O4=
+	t=1728226863; cv=none; b=MgAuxA3niYPvnyNUpLrvcVn34ocuk4wWdeQpCmiBGHHXyBbD+gtP2uxxbcboeYYnA6Wb2MBrgQ57xuptl0uySW+92smAP41xFvP899INzFUbCZIEXSe1+bTO5aVRIKRsdu1ocfPd36zULxvJj0+4SkAVPVtHxgyjiuGbcahFf1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728226836; c=relaxed/simple;
-	bh=riK9FOolz1RE6hRQeW2Qv8d000EjlAHgMt/D8KJsaZw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IMisF194XcaUGINLtu6GFBtPMx2KN0wRgdJzQ8Di0/tVI1EkdsqDvvvcGWq2G7GpG4ORmnAB4dEoqBB1/Kxn7wyh3xsRTe2a9TLte8Ku81bCEiYcrK3dMmvUXOce8GhSPih3GlenRWM7/yZojC1atnbGBnwlQeyvYOrh5u4GDPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=X66MvOd5; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shenghaoyang.info
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7e9f8714b9bso99153a12.3
-        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 08:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shenghaoyang.info; s=google; t=1728226834; x=1728831634; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3HG943iTePzKfgDFq3MIKdj5dZkExEASCzhHW9hy/Kw=;
-        b=X66MvOd5M1NdVmgw+tHlzM0XG2LE6PmyhbbVWkFMsOUthgDFlWE7gCa39gd6dZiXlD
-         3Y2slI0JQaNIyzcrvqB/ZuFsmhgJ6IR+20Z2vqPngjMrm/w2ExWXc1g5z4c1ufxWA9Q8
-         Nb4dyR2pJR04UY4O8RvtDkpeOdCp7uuQHWdaA8WMSAyTjoUwc1rXpkT2RJvYEXYcjfRn
-         /29YFy+f0EZGSjU6UnzuCSSdtB2N2u1gMUIT39rHQTIR0EoshzR3R6vmBvpeZi2+2G2t
-         iTQo+8YdCaH/QaBigF19dRmqBvuy7Hppn7f3L9IlbRjQaq9SwE7kLkWd0YhJVC1fkE8D
-         uWzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728226834; x=1728831634;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3HG943iTePzKfgDFq3MIKdj5dZkExEASCzhHW9hy/Kw=;
-        b=piQ5dFCSzKw4kteBjGS+TIzxfW2IlvY+O7T7wZAeilVf7BXU69tWrlVnMMbOEipDFc
-         jRSJBuIw8ok913wtglVTJ2Y+X1MqCQ6euRKSPhe2q5bt4Ix3dboIg+M3kQShYjtOHjox
-         6U5xjqwoKSnVgDYG0SpR+cjcyyu2q2oVXOhFnpEzhiOIcxUoQDMPUCmxygtF+DQDOg4a
-         6j/mjCsb8ax9ZP+sAQYo+SpEHwqc/DZbTRWQ0qh4Bl91DS816HryNrUKMUiqnL1Qe5w5
-         GPFLQHQpzmJVegdf2eJlofD/48/+7lbOtiztK7YyGl98sGXlk1Jp2gnfi9mpwus9GlPi
-         DhoQ==
-X-Gm-Message-State: AOJu0Yyq/G1mIIwqC7Ro0yCS9ZP3Hhb3lHdGbLTdgMAG8ZdPMjpidqPq
-	rxFScciOhLw+7AoBwEtz3CfyPuTAGX1Lnk6mTsruAXVtHVI5zR2Qo0kd9OfQL4lifaRZAEgThZu
-	Ryl/doA==
-X-Google-Smtp-Source: AGHT+IFMPbKItnKFhWE1/IENn5IkrRk66SNE8x/c4MKJPSb+0wjC5t3YywAXG822M5q5aNQUvDQexQ==
-X-Received: by 2002:a17:902:e882:b0:20b:9822:66fe with SMTP id d9443c01a7336-20bfe01e37bmr57437775ad.1.1728226834131;
-        Sun, 06 Oct 2024 08:00:34 -0700 (PDT)
-Received: from localhost ([132.147.84.99])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-20c138afc71sm26202155ad.47.2024.10.06.08.00.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Oct 2024 08:00:33 -0700 (PDT)
-From: Shenghao Yang <me@shenghaoyang.info>
-To: netdev@vger.kernel.org
-Cc: Shenghao Yang <me@shenghaoyang.info>,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	pavana.sharma@digi.com,
-	ashkan.boldaji@digi.com,
-	kabel@kernel.org,
-	andrew@lunn.ch
-Subject: [PATCH net v2 3/3] net: dsa: mv88e6xxx: support 4000ps cycle counter period
-Date: Sun,  6 Oct 2024 22:59:47 +0800
-Message-ID: <20241006145951.719162-4-me@shenghaoyang.info>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241006145951.719162-1-me@shenghaoyang.info>
-References: <20241006145951.719162-1-me@shenghaoyang.info>
+	s=arc-20240116; t=1728226863; c=relaxed/simple;
+	bh=IVVn+aHPlgPWC2L7iy3TGGjfMiEf/Gi+4txVULwb9gI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4ALTwnDZ8AU/24InHqntbBdGF4I34ykmW93G/wL6GfOgJbArW+G2H2jcNnvAaifhVY1bgazbIpaDTFivfr4HETCQiqIRqpeOLjYsYXUED+iczh/RlrKepl06rmDeFlO+q0p8hC2TRAgA25xttpiPI0tmuBhymIJtcj5xxepcCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lcjVIQWF; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 080D1114013A;
+	Sun,  6 Oct 2024 11:01:00 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Sun, 06 Oct 2024 11:01:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1728226860; x=1728313260; bh=st2FgEJTGcKxSx4GfbpM2pSbbAFF
+	gnKn0Q7Ni33qC0M=; b=lcjVIQWFMZaK2d25RDKHBcbEFEbUas3AZt3rHJ/eF4mO
+	VYA9oWsmSdAzT6f0w5cI/OUgIQNO4ryQCDW7BmVaUtxCAFjBa87drp8wu89gBPJ/
+	A6nGzzE1R9UQVWyeNO1A49R1CRbqGuEpZrjjZjlbFF3tU5sVSEUry15dohe+3dvO
+	wEaOyoWx6hukKRmUGMsP6vk0xxPiZ1oFE0M1EdipMzSp/uCinyi+kB0g13ZrAotl
+	RHkTKm6ZaYI+k6wqXOwmS4cSqFnuUSbViY9KRxfFP6SwjseAQZBOf5k+WtlMW2ZR
+	9DParHxxiO1BebJcTWyg8dPBHxZYQBU3fUMUlJuk3A==
+X-ME-Sender: <xms:K6YCZxWEQHClK0aja278EZliMmmWKpWNTrw3zhC56LPdBtW_ckAyAA>
+    <xme:K6YCZxk3dQNKTYyR4eLPIAP-7sXtOfv3xOTcXCwM2xCDrrdZeQKcuTE6AhSttjRx_
+    x4OQCzO6SW50iA>
+X-ME-Received: <xmr:K6YCZ9ZD1TiVzndwj3OkNbFzLEkXSQ8c8qTUjPs_GbViPMfXTHTsgh8dMW3S>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvjedgkeegucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdroh
+    hrgheqnecuggftrfgrthhtvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieef
+    gfelkeehgeelgeejjeeggefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
+    hmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthht
+    ohepvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhihrghnrhgrhiesuhhmih
+    gthhdrvgguuhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
+    gh
+X-ME-Proxy: <xmx:K6YCZ0WS6y9JUfm3gn-44KyErCb_sOU78XR0NHedGSlvZXusBwcZHw>
+    <xmx:K6YCZ7kJl_bQg3Re_IGXj58GHmXpFedpM8bXhBE58ttXpjz5D2rX3w>
+    <xmx:K6YCZxf2fZbJXuvUhTfweFFrxzV4ooo2p9uDODZx63lRCTY2O1v1Jg>
+    <xmx:K6YCZ1EDjIByaaSh34g7wRTALwWddvXczV75oBuIIqtX64V6RBw3_g>
+    <xmx:LKYCZzvBhpeXYwzvPx61trOfgC0GKl6kmKzZvpJHp7MjDOofvqMjg80J>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 6 Oct 2024 11:00:59 -0400 (EDT)
+Date: Sun, 6 Oct 2024 18:00:56 +0300
+From: Ido Schimmel <idosch@idosch.org>
+To: Ryan Raymond <ryanray@umich.edu>
+Cc: netdev@vger.kernel.org
+Subject: Re: IP Forward src address cannot match network interface address
+ Inbox
+Message-ID: <ZwKmKDUXfSdqIhM_@shredder.mtl.com>
+References: <CAFd0U8WBDCzoKrV1FR-tqpXF6bFhMK+5oxC=tVuaBfKg7EmE4Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFd0U8WBDCzoKrV1FR-tqpXF6bFhMK+5oxC=tVuaBfKg7EmE4Q@mail.gmail.com>
 
-The MV88E6393X family of devices can run its cycle counter off
-an internal 250MHz clock instead of an external 125MHz one.
+On Fri, Oct 04, 2024 at 11:57:00AM -0400, Ryan Raymond wrote:
+> Hello, all
+> 
+> I am working on a Linux networking project. I have two interfaces:
+> 
+> tun0: Address 10.1.0.1
+> eth0: Address 141.14.41.4
+> 
+> I want to write to tun0 (from userspace) so that packets are
+> transmitted through my virtual network and out eth0 onto the internet.
+> I can do that easily if I say that the source address is something
+> random, like 1.2.3.4, but if the source address matches any interface
+> (e.g. 10.1.0.1, 141.14.41.4) the packets are not transmitted.
+> I think this is a routing issue with RTNETLINK, since you can also
+> test this with route:
+> 
+> $ ip route get 1.1.1.1
+> 1.1.1.1 via 141.14.41.4 dev eth0 src 141.14.41.4 uid 1000
+>    cache
+> $ ip route get 1.1.1.1 from 1.2.3.4 iif eth0
+> 1.1.1.1 from 1.2.3.4 via 141.14.41.4 dev eth0
+>    cache iif eth0
+> $ ip route get 1.1.1.1 from 10.1.0.1 iif eth0
+> RTNETLINK answers: Invalid argument
+> $
+> Does anyone know what to do about this?
 
-Add support for this cycle counter period by adding another set
-of coefficients and lowering the periodic cycle counter read interval
-to compensate for faster overflows at the increased frequency.
-
-Otherwise, the PHC runs at 2x real time in userspace and cannot be
-synchronized.
-
-Fixes: de776d0d316f ("net: dsa: mv88e6xxx: add support for mv88e6393x family")
-Signed-off-by: Shenghao Yang <me@shenghaoyang.info>
----
- drivers/net/dsa/mv88e6xxx/ptp.c | 23 ++++++++++++++++++++---
- 1 file changed, 20 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/ptp.c b/drivers/net/dsa/mv88e6xxx/ptp.c
-index a409b8661fad..aed4a4b07f34 100644
---- a/drivers/net/dsa/mv88e6xxx/ptp.c
-+++ b/drivers/net/dsa/mv88e6xxx/ptp.c
-@@ -40,7 +40,7 @@ static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_10ns_coeffs = {
- 	.cc_mult_dem = 3125ULL,
- };
- 
--/* Other families:
-+/* Other families except MV88E6393X in internal clock mode:
-  * Raw timestamps are in units of 8-ns clock periods.
-  *
-  * clkadj = scaled_ppm * 8*2^28 / (10^6 * 2^16)
-@@ -55,6 +55,21 @@ static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_8ns_coeffs = {
- 	.cc_mult_dem = 15625ULL
- };
- 
-+/* Family MV88E6393X using internal clock:
-+ * Raw timestamps are in units of 4-ns clock periods.
-+ *
-+ * clkadj = scaled_ppm * 4*2^28 / (10^6 * 2^16)
-+ * simplifies to
-+ * clkadj = scaled_ppm * 2^8 / 5^6
-+ */
-+#define MV88E6XXX_CC_4NS_SHIFT 28
-+static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_4ns_coeffs = {
-+	.cc_shift = MV88E6XXX_CC_4NS_SHIFT,
-+	.cc_mult = 4 << MV88E6XXX_CC_4NS_SHIFT,
-+	.cc_mult_num = 1 << 8,
-+	.cc_mult_dem = 15625ULL
-+};
-+
- #define TAI_EVENT_WORK_INTERVAL msecs_to_jiffies(100)
- 
- #define cc_to_chip(cc) container_of(cc, struct mv88e6xxx_chip, tstamp_cc)
-@@ -110,6 +125,8 @@ mv88e6xxx_cc_coeff_get(struct mv88e6xxx_chip *chip)
- 	}
- 
- 	switch (period_ps) {
-+	case 4000:
-+		return &mv88e6xxx_cc_4ns_coeffs;
- 	case 8000:
- 		return &mv88e6xxx_cc_8ns_coeffs;
- 	case 10000:
-@@ -483,10 +500,10 @@ static u64 mv88e6xxx_ptp_clock_read(const struct cyclecounter *cc)
- 	return 0;
- }
- 
--/* With a 125MHz input clock, the 32-bit timestamp counter overflows in ~34.3
-+/* With a 250MHz input clock, the 32-bit timestamp counter overflows in ~17.2
-  * seconds; this task forces periodic reads so that we don't miss any.
-  */
--#define MV88E6XXX_TAI_OVERFLOW_PERIOD (HZ * 16)
-+#define MV88E6XXX_TAI_OVERFLOW_PERIOD (HZ * 8)
- static void mv88e6xxx_ptp_overflow_check(struct work_struct *work)
- {
- 	struct delayed_work *dw = to_delayed_work(work);
--- 
-2.46.2
-
+Try checking accept_local and rp_filter in
+Documentation/networking/ip-sysctl.rst
 
