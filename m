@@ -1,127 +1,121 @@
-Return-Path: <netdev+bounces-132445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E472991C03
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:08:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E37991C0C
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011821F222D5
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:08:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B711C20FDD
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:29:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E057167D80;
-	Sun,  6 Oct 2024 02:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD06F16DC0E;
+	Sun,  6 Oct 2024 02:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kv8VRefE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLjWVY1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150AE1662E7;
-	Sun,  6 Oct 2024 02:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866BAF4F1;
+	Sun,  6 Oct 2024 02:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728180455; cv=none; b=FrzsYfhWFosDN+FLhBPqof5GHhfjm8k/FhdpBVJqfLWFK4bh/SVxoe2tNYym5UmRB59EnueEGUDmAPoSn/q4sfvcscmyygF4mZCoILFtXJUPeEQ1ez5FlqYpiow6mYbBWcZpHDszxErCpArNXC82NWVJuK3H04DsqY6bSEFVd5U=
+	t=1728181732; cv=none; b=tNXxm5UMO/y2+/+Nt9dkghC3/rbATONxekvCGkBToStNQnpcUYAbfZKj0pu5q6U+ta+74dt50ic6wtqOXNjZ/uF9MuCsmt2XtoXj3rCLCXIhWdylItZACMtH/ZoMSZo8kF92c14l2UiAEeKTTy3FzkHXdtDa97vUXtefwQ2YMtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728180455; c=relaxed/simple;
-	bh=DfHKlyGMMDSIEpyOpChzXkyr7d0SUJeFnkxyBlqeeUk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dZ5DTX7G3QQhDaBdzLrsCa3lAFrW2uwOfXbM0fKHRkR88qV2M+RP4ocv+dFQlv2TsxWgL4Nx5Qd76wbUA2QT1rL4bG787B3bwHaPawH0ELYH2peTJV7dsHydaYMG3BgNUEPHcYoo2m9j/V6dSeEhbrkY7TfUhEDPnxbywKfo3zg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kv8VRefE; arc=none smtp.client-ip=209.85.128.181
+	s=arc-20240116; t=1728181732; c=relaxed/simple;
+	bh=lCh5CXqspTJHc6tMFpUfxpdV0kFfI9PM8erAFghW+jE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H5PAFE1CjekBAMtzDZz2z5bM4msUtkH6+QbXgjW0B5Sn1VJxwsfrRZHNI4t8KuyxDoNPBbRAnZLH7oXMJAkRdRDfp+ICX44gqeYRjGVDXTQQVeAHA2AkVS3onzeBMCFMGSqx/C48RZiqtFRsO9gOMnDfZpAOTMUqAXTgtQXu2KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLjWVY1P; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6e2c4ffa006so18791217b3.3;
-        Sat, 05 Oct 2024 19:07:29 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71df2de4ed4so508010b3a.0;
+        Sat, 05 Oct 2024 19:28:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728180449; x=1728785249; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mHfnHiUzEI/UKshaDa/FSlqT+xIZ/SlWDTUeS6ow6HU=;
-        b=Kv8VRefEnrA02rEy+6uMj0cxyZ1RUGpE1X/i0SjjFv7onfZOogfv32RUmuCoySrFr8
-         ZDGpv6/EdfeZ4yRL5BRaK2OraTLTvtOwKIH5RxlcYnQ/hEmis6nahfogEAKf+g8f/TrY
-         EArJgioqQ0HATFcs9gBOs3R22BxP0Az9Aswzdfc+ap/+g8o5riV/nGXuJTM+5XdVQRVf
-         WBUHJ9wfqu/1SgMcsYpDCpWhQZ4W2nlMP2iiIlnaf+HPVbe0kZoyEnzTSUJX6cTEP7Cm
-         7FY9WSBlN0bT4qTimm4Ui65gSvOK4Lhg2kXhG8WuMvvPjSCAOsYRRC8gBiJvHyHrkYOS
-         KRfQ==
+        d=gmail.com; s=20230601; t=1728181727; x=1728786527; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xnx/jTUrppaejL5NvesEO2y/0bRFcOzPWh1DuJoDJtM=;
+        b=XLjWVY1Ptr0TB4NjfespGLABBFSU5lIMKcn+vW9hUqKfpnS6G0r+l4Fn8T/RMyis6t
+         Fdotg+qVNkQeBdmD0srO8WztvkzNvo2fP+Pj3XSR4kT0+kicpvEXLjO8Oz6C8LcwkT63
+         E7d99WtAWPdawmRdjNR7/U6mubJ9L/EJyYi0VyJ++W3zhS1vF+BUd49mlD8NHtfF2F52
+         61dhWgOX6vm+KvaOVy56WTOebhYei5ET6Hmkb9XkinCXXnfcHCJmjA6V/1p4gzBFQW/X
+         vzQAIYAN9eJb4hlnB/hXPHqBoPgO/cRWcUmfnidwj4pfyZ30E2et4gHREknKG4P9Gta9
+         4ASQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728180449; x=1728785249;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mHfnHiUzEI/UKshaDa/FSlqT+xIZ/SlWDTUeS6ow6HU=;
-        b=cwX2Ibu+SkCtH0jY1RzAyln890xTF+mpQ9kJLuw4vocz9Bc+JnAUS/9qSbGcWnoe29
-         5C+3HYa/2GfDqO8E3MNaW3DOfBjgj3QfzZJNUjsE2m8W7FYZJ3YXBE9pO/YIMdhNUHwx
-         7/KfRtj53/Idf1jUFm9Yz7dRhcBycwD22FCCg6SWY+S/+jB6KfVdgThBegW9GuOM/SBm
-         0unLDY9Jy/f2ojY56yGoaLKy7msIRs/9F4nQDggKk/ebU4Zj9iih8szJB7OB8qEUjXjz
-         Xa2OMV6Mycrj0Q2nA8B27wV1A5Jcsg9gPPPm/o2rKkBIJtAmEkIASm7hSYjN3OAfnS1A
-         8oMA==
-X-Forwarded-Encrypted: i=1; AJvYcCX7nGNZyWM+fZ4hZegHmQ2moriIcEED7TSvNuUoKwH1PjOS4jtFB8fCQg+qQ3YCxIkK1Naf5zITg3lUmzk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqatF2hyvW3NMUuxtTMR52dBq3YcGuIPD9A9PthzKwkjmNGy4s
-	nBFEhjYDiL0EqTE0ua3B9SemdOCDWKu4eYiSz7MFTWusiRG+tGfEal1EoQHyFiq10wal1bPM9lt
-	0mAp8peNFXbO1avVfp7W1jk6OaLG3jA==
-X-Google-Smtp-Source: AGHT+IFJy+LgYQwq0nrgUHUwCAaoG2734k2vmpWFgGbVp6AkBTn2+tbxiFboZZB217Qqd6X6KcF27o7YDv5hX5H8pH8=
-X-Received: by 2002:a05:690c:dd1:b0:643:92a8:ba00 with SMTP id
- 00721157ae682-6e2c6e8b44amr68894507b3.0.1728180448829; Sat, 05 Oct 2024
- 19:07:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728181727; x=1728786527;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xnx/jTUrppaejL5NvesEO2y/0bRFcOzPWh1DuJoDJtM=;
+        b=hBH8/mpT124yAeLhqouxwdxPhZgX7n/NV8CjfnWpc27kAo3fH5gOD6NURxo/IRU4ZV
+         z1gMMZ9fYd5XW5xfqd4Tuyn9a0tDEsAnOLlaJEwZVsvwPOcNDlQW8+yp5J0L9R0AojPQ
+         +VDOW5htphnlsFsyzb7Zn/roBhciv+nmsVlQ1yylF4OC0/DzEYJmAJMKNh+16Cf5XsyV
+         wdx2V06Tov9Nbfe+KsFkaJkAo3WYTTGeRvNtahEJSzD24a59i0GbSUVdZoowenndH0jS
+         nX1ZNte9JfYUaVoUwR/872HClvUFw3NZUleiY6BwtnS+Ue3f4MXxCf2107EKUL5ITC6e
+         6vwg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLdV1dU/ap9LIrUFjDujtrfyps96DodwCbXxio7NtZY/7UL/oXlKSeK47Cp+qB5iRx5eXBmlJdnGv4cYs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYM02g6qooaw1toYAiIsHALHPrrlzA6OiB8CYccxrqXBmoPBFB
+	xK9Onx4bkIT2P1AgSAns5G5jomdFHhpDn5RjJNrtlZebIaeEGuuqvm+R1Q==
+X-Google-Smtp-Source: AGHT+IEG53HS5UgJUfwEmmqcivrDI0MzFEEtd0mkURmUZ4fl+NAgwf5/LGrEGyaTWEgvtxiIktghWQ==
+X-Received: by 2002:a05:6a00:1485:b0:717:9340:a9d0 with SMTP id d2e1a72fcca58-71dd5af2697mr20404033b3a.6.1728181726680;
+        Sat, 05 Oct 2024 19:28:46 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbb9bcsm2103550b3a.6.2024.10.05.19.28.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 05 Oct 2024 19:28:46 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCH net-next 00/14] ibm: emac: cleanup modules
+Date: Sat,  5 Oct 2024 19:28:30 -0700
+Message-ID: <20241006022844.1041039-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241006013937.948364-1-rosenp@gmail.com>
-In-Reply-To: <20241006013937.948364-1-rosenp@gmail.com>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Sat, 5 Oct 2024 19:07:17 -0700
-Message-ID: <CAKxU2N9JGcU58Di5C9Ga_Xd91ywEyoZ1kC=kp8+R3kggx4vw2w@mail.gmail.com>
-Subject: Re: [PATCH] net: bgmac: use devm for register_netdev
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Oct 5, 2024 at 6:39=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrote=
-:
->
-> Removes need to unregister in _remove.
->
-> Tested on ASUS RT-N16. No change in behavior.
->
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-yikes. I wanted this in net-next.
-> ---
->  drivers/net/ethernet/broadcom/bgmac.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet=
-/broadcom/bgmac.c
-> index 6ffdc4229407..2599ffe46e27 100644
-> --- a/drivers/net/ethernet/broadcom/bgmac.c
-> +++ b/drivers/net/ethernet/broadcom/bgmac.c
-> @@ -1546,7 +1546,7 @@ int bgmac_enet_probe(struct bgmac *bgmac)
->
->         bgmac->in_init =3D false;
->
-> -       err =3D register_netdev(bgmac->net_dev);
-> +       err =3D devm_register_netdev(bgmac->dev, bgmac->net_dev);
->         if (err) {
->                 dev_err(bgmac->dev, "Cannot register net device\n");
->                 goto err_phy_disconnect;
-> @@ -1568,7 +1568,6 @@ EXPORT_SYMBOL_GPL(bgmac_enet_probe);
->
->  void bgmac_enet_remove(struct bgmac *bgmac)
->  {
-> -       unregister_netdev(bgmac->net_dev);
->         phy_disconnect(bgmac->net_dev->phydev);
->         netif_napi_del(&bgmac->napi);
->         bgmac_dma_free(bgmac);
-> --
-> 2.46.2
->
+The modules are fairly old and as such can benefit from devm management.
+
+All except ZMII tested on a Cisco MX60W. No problems found.
+
+Rosen Penev (14):
+  net: ibm: emac: tah: use devm for kzalloc
+  net: ibm: emac: tah: use devm for mutex_init
+  net: ibm: emac: tah: devm_platform_get_resources
+  net: ibm: emac: rgmii: use devm for kzalloc
+  net: ibm: emac: rgmii: use devm for mutex_init
+  net: ibm: emac: rgmii: devm_platform_get_resource
+  net: ibm: emac: zmii: use devm for kzalloc
+  net: ibm: emac: zmii: use devm for mutex_init
+  net: ibm: emac: zmii: devm_platform_get_resource
+  net: ibm: emac: mal: use devm for kzalloc
+  net: ibm: emac: mal: use devm for request_irq
+  net: ibm: emac: mal: move irq maps down
+  net: ibm: emac: mal: add dcr_unmap to _remove
+  net: ibm: emac: mal: move dcr map down
+
+ drivers/net/ethernet/ibm/emac/mal.c   | 107 ++++++++++----------------
+ drivers/net/ethernet/ibm/emac/rgmii.c |  49 ++++--------
+ drivers/net/ethernet/ibm/emac/tah.c   |  49 ++++--------
+ drivers/net/ethernet/ibm/emac/zmii.c  |  49 ++++--------
+ 4 files changed, 79 insertions(+), 175 deletions(-)
+
+-- 
+2.46.2
+
 
