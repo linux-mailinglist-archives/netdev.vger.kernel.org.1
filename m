@@ -1,252 +1,146 @@
-Return-Path: <netdev+bounces-132485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B12AE991DD3
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 12:28:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7990B991DD8
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 12:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E2581F220BB
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 10:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D3B91C2180E
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 10:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71771173357;
-	Sun,  6 Oct 2024 10:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC0017333D;
+	Sun,  6 Oct 2024 10:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sp6PKHFa"
+	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="RK6j4W02"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FA217921D
-	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 10:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007BB16A382;
+	Sun,  6 Oct 2024 10:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728210477; cv=none; b=IAt3EySR+co+U1h1ZfrQW/5SylzUV1FjMQMFYmiMXLtzP6gze8bE2lARApIIsgkWYgIjbTG3lj7gcQzqc+O4r9gAgumKuSR0UiIYbj8um3MsguqrvhYjUFEImuCXt8MzVjITsEtl5cUCzPAXuPiumtTZ7OB9E40THOVYry0gzPM=
+	t=1728210546; cv=none; b=oAWKwqH93MVBVLJjw699xzFhDEKF59PHnNpwc0utYZ+a7vaquqo26BSFQHbHjEQTpK4r2wd7y8zXDnGZdskTUB7qL/UtkrKmsu0YbHO/KJQ6qyMG2r996+e7//4Jg8jQWMlTovD7dPS0JZmB8wOlqLmIJlW+a6Juih7V50bsZmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728210477; c=relaxed/simple;
-	bh=pdUf/hLC7Lo8dxr0wLdHiL49Uzb6SdVg73Dg4DheOPI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PUcZQXnLMxd8XpCVf3aEzqNsKJ8rNG3sVFgsPhIHulDuPWPyO550Ep+kOzFkMZ7B05dgcKPfbZBlFOGVqVbk60Odt7glovQd9HR5YTX0djK7Oi6yYu83jzZZHbdLuVTm4GL2RmujXOHfhI2vUSbNKS4hOcfHMKsBBh4pKIVqPbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sp6PKHFa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728210474;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XVAZl5VnbHOVnvJqx8bbWhlDxEgk2cc1gRj8x2Sbqjg=;
-	b=Sp6PKHFaOSE7+6Zue3KeNJEU0FHAC1b+owq87+MkchLJieQsJvLA3LEB3GXGXuIxLgNBLG
-	2+n1yO0TAsANdcDWItroW/c3kmcmskeoW9P67i9OTghAltjS+ejZJMO0xpT8rCmrle4msu
-	VT7LKaX9xWF2xxvnIkmsyZYTLdrBWvA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-457-cmiRnq-UMISThbPArqFyWg-1; Sun, 06 Oct 2024 06:27:53 -0400
-X-MC-Unique: cmiRnq-UMISThbPArqFyWg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37ccc57613eso1381225f8f.1
-        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 03:27:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728210472; x=1728815272;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XVAZl5VnbHOVnvJqx8bbWhlDxEgk2cc1gRj8x2Sbqjg=;
-        b=VzJW55lMRYADMJlJ7/nOe5fyih0+2VikrmE18qH9cwEgpoCpz5u6oOllPDiqnLOC6k
-         tiq7MTqrlHVALrEQIsBqhLI1s22qG6Qi66AXVFgQfob2B3L0LeLCcEuVk/c8Sa5YlLni
-         QxWjdUcCAmXwXKySLK7ALeHc5Yx/TADEfXQw9bsB82CKfT9+gEFUfERSjmsOyRUay3yR
-         r/Dy3IcA1s78HUexyYtqtuIbOAK7dBR+xfIcqnbOtICxlJTZUkOgJ+xTIuYgWFSrDTo4
-         COYQPHRNg+MCgX83sd6zvstvXJ6SzvQONs2kVOYbZphJ2q3ZeU6cyjWa071gDWYRk9vG
-         cykg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiZpW2SXh8aleDXsRMhCEb31ZeOkdxSYFfqML57WSDAlZyYu/bFjU/Lwugmnn48eCLVOdSJDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/NNVqC4Xt7KXO7N38bqJFQB0hxyEW2wVz+x2e4ocRVdH6s4e0
-	cGEWEGCVOX24qGK4K2tzsVICYtPn2U9KADj/Hp1QnkaOiSWlBeCazfENix65vsZz78v9/5J+D2n
-	4rxYGv9J/05uG39+IFv6KKnGj0fW3lw6/VxnnBGezPK7MHwFG20vBAQ==
-X-Received: by 2002:adf:a31a:0:b0:37c:cfa8:a6b3 with SMTP id ffacd0b85a97d-37d0e6bbcd0mr4507499f8f.3.1728210471825;
-        Sun, 06 Oct 2024 03:27:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6qk3pGSWh3Zpopbs1lFqrQC8wz61+RnAEMorGwbSBnz1kbEzfNV6nRuULWqiuppvReXLLRw==
-X-Received: by 2002:adf:a31a:0:b0:37c:cfa8:a6b3 with SMTP id ffacd0b85a97d-37d0e6bbcd0mr4507480f8f.3.1728210471294;
-        Sun, 06 Oct 2024 03:27:51 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691b5ddsm3399541f8f.47.2024.10.06.03.27.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Oct 2024 03:27:50 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 54C981580A31; Sun, 06 Oct 2024 12:27:48 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Arthur Fabre <afabre@cloudflare.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Lorenzo Bianconi
- <lorenzo.bianconi@redhat.com>, Jakub Sitnicki <jakub@cloudflare.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, john.fastabend@gmail.com,
- edumazet@google.com, pabeni@redhat.com, sdf@fomichev.me,
- tariqt@nvidia.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
- mst@redhat.com, jasowang@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, kernel-team <kernel-team@cloudflare.com>,
- Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-In-Reply-To: <ZwArrsqrYx7IM5tq@mini-arch>
-References: <D4KJ7DUXJQC5.2UFST9L3CUOH7@bobby> <ZvwNQqN4gez1Ksfn@lore-desk>
- <87zfnnq2hs.fsf@toke.dk> <Zv18pxsiTGTZSTyO@mini-arch>
- <87ttdunydz.fsf@toke.dk> <Zv3N5G8swr100EXm@mini-arch>
- <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby> <Zv794Ot-kOq1pguM@mini-arch>
- <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
- <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
- <ZwArrsqrYx7IM5tq@mini-arch>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Sun, 06 Oct 2024 12:27:48 +0200
-Message-ID: <87ldz1edaz.fsf@toke.dk>
+	s=arc-20240116; t=1728210546; c=relaxed/simple;
+	bh=clcboj/GbGUloJWwp8O582U00IpGJyOBX41Ha9a7szU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aZDzTVuBg2cb4+5jlDTSTYngk5PPEeYnVLZ1p7qIgKcC+xhKXFyzgHD8HPVKPGBCFihxCOanDSWg8H+n85VgvXcbuY3ILn7YPhOWGVePoRmCM2duPIyD9nf4Qglu5Lipq2wcWl9iDFaB/EGisHV2yStRGx9PHIyDSK3BWKrth7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=RK6j4W02; arc=none smtp.client-ip=49.12.72.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
+From: Fiona Behrens <finn@kloenk.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
+	t=1728210540; bh=ziC4zCQbxWnUPd91VeFNp/X/tZGtA6ExmUPFunWTlS0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=RK6j4W02GfgtVMJtKUzSssjbiyEZavENeJXX6xSg+mZktrCaSLnnu85niyaVUZrVA
+	 sXSTMrLe6t3PxBO8CEpvpQDezsmb6SGCW9GuMX1nMI6D4oLsME87AGaWVjCMCYeHrs
+	 aWGKcGZBv+85uXrpHgHD9QY4oPR/PgnXKyM3Q29U=
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com,
+ anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+ arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/6] rust: time: Implement PartialEq and
+ PartialOrd for Ktime
+Date: Sun, 06 Oct 2024 12:28:59 +0200
+Message-ID: <3D24A2BA-E6CC-4B82-95EF-DE341C7C665B@kloenk.dev>
+In-Reply-To: <20241005122531.20298-2-fujita.tomonori@gmail.com>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+ <20241005122531.20298-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain
 Content-Transfer-Encoding: quoted-printable
 
-Stanislav Fomichev <stfomichev@gmail.com> writes:
 
-> On 10/04, Jesper Dangaard Brouer wrote:
->>=20
->>=20
->> On 04/10/2024 04.13, Daniel Xu wrote:
->> > On Thu, Oct 03, 2024 at 01:26:08PM GMT, Stanislav Fomichev wrote:
->> > > On 10/03, Arthur Fabre wrote:
->> > > > On Thu Oct 3, 2024 at 12:49 AM CEST, Stanislav Fomichev wrote:
->> > > > > On 10/02, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> > > > > > Stanislav Fomichev <stfomichev@gmail.com> writes:
->> > > > > >=20
->> > > > > > > On 10/01, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> > > > > > > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
->> > > > > > > >=20
->> > > > > > > > > > On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianconi =
-wrote:
->> > > > > > > > > > > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
->> > > > > > > > > > > >=20
->> [...]
->> > > > > > > > > > > > >=20
->> > > > > > > > > > > > > I like this 'fast' KV approach but I guess we sh=
-ould really evaluate its
->> > > > > > > > > > > > > impact on performances (especially for xdp) sinc=
-e, based on the kfunc calls
->> > > > > > > > > > > > > order in the ebpf program, we can have one or mu=
-ltiple memmove/memcpy for
->> > > > > > > > > > > > > each packet, right?
->> > > > > > > > > > > >=20
->> > > > > > > > > > > > Yes, with Arthur's scheme, performance will be ord=
-ering dependent. Using
->>=20
->> I really like the *compact* Key-Value (KV) store idea from Arthur.
->>  - The question is it is fast enough?
->>=20
->> I've promised Arthur to XDP micro-benchmark this, if he codes this up to
->> be usable in the XDP code path.  Listening to the LPC recording I heard
->> that Alexei also saw potential and other use-case for this kind of
->> fast-and-compact KV approach.
->>=20
->> I have high hopes for the performance, as Arthur uses POPCNT instruction
->> which is *very* fast[1]. I checked[2] AMD Zen 3 and 4 have Ops/Latency=
-=3D1
->> and Reciprocal throughput 0.25.
->>=20
->>  [1] https://www.agner.org/optimize/blog/read.php?i=3D853#848
->>  [2] https://www.agner.org/optimize/instruction_tables.pdf
->>=20
->> [...]
->> > > > There are two different use-cases for the metadata:
->> > > >=20
->> > > > * "Hardware" metadata (like the hash, rx_timestamp...). There are =
-only a
->> > > >    few well known fields, and only XDP can access them to set them=
- as
->> > > >    metadata, so storing them in a struct somewhere could make sens=
-e.
->> > > >=20
->> > > > * Arbitrary metadata used by services. Eg a TC filter could set a =
-field
->> > > >    describing which service a packet is for, and that could be reu=
-sed for
->> > > >    iptables, routing, socket dispatch...
->> > > >    Similarly we could set a "packet_id" field that uniquely identi=
-fies a
->> > > >    packet so we can trace it throughout the network stack (through
->> > > >    clones, encap, decap, userspace services...).
->> > > >    The skb->mark, but with more room, and better support for shari=
-ng it.
->> > > >=20
->> > > > We can only know the layout ahead of time for the first one. And t=
-hey're
->> > > > similar enough in their requirements (need to be stored somewhere =
-in the
->> > > > SKB, have a way of retrieving each one individually, that it seems=
- to
->> > > > make sense to use a common API).
->> > >=20
->> > > Why not have the following layout then?
->> > >=20
->> > > +---------------+-------------------+-------------------------------=
----------+------+
->> > > | more headroom | user-defined meta | hw-meta (potentially fixed skb=
- format) | data |
->> > > +---------------+-------------------+-------------------------------=
----------+------+
->> > >                  ^                                                  =
-          ^
->> > >              data_meta                                              =
-        data
->> > >=20
->> > > You obviously still have a problem of communicating the layout if you
->> > > have some redirects in between, but you, in theory still have this
->> > > problem with user-defined metadata anyway (unless I'm missing
->> > > something).
->> > >=20
->>=20
->> Hmm, I think you are missing something... As far as I'm concerned we are
->> discussing placing the KV data after the xdp_frame, and not in the XDP
->> data_meta area (as your drawing suggests).  The xdp_frame is stored at
->> the very top of the headroom.  Lorenzo's patchset is extending struct
->> xdp_frame and now we are discussing to we can make a more flexible API
->> for extending this. I understand that Toke confirmed this here [3].  Let
->> me know if I missed something :-)
->>=20
->>  [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
->>
->> As part of designing this flexible API, we/Toke are trying hard not to
->> tie this to a specific data area.  This is a good API design, keeping it
->> flexible enough that we can move things around should the need arise.
->>=20
->> I don't think it is viable to store this KV data in XDP data_meta area,
->> because existing BPF-prog's already have direct memory (write) access
->> and can change size of area, which creates too much headache with
->> (existing) BPF-progs creating unintentional breakage for the KV store,
->> which would then need extensive checks to handle random corruptions
->> (slowing down KV-store code).
+
+On 5 Oct 2024, at 14:25, FUJITA Tomonori wrote:
+
+> Implement PartialEq and PartialOrd trait for Ktime by using C's
+> ktime_compare function so two Ktime instances can be compared to
+> determine whether a timeout is met or not.
+
+Why is this only PartialEq/PartialOrd? Could we either document why or im=
+plement Eq/Ord as well?
+
 >
-> Yes, I'm definitely missing the bigger picture. If we want to have a glob=
-al
-> metadata registry in the kernel, why can't it be built on top of the exis=
-ting
-> area?
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/helpers/helpers.c |  1 +
+>  rust/helpers/time.c    |  8 ++++++++
+>  rust/kernel/time.rs    | 22 ++++++++++++++++++++++
+>  3 files changed, 31 insertions(+)
+>  create mode 100644 rust/helpers/time.c
+>
+> diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+> index 30f40149f3a9..c274546bcf78 100644
+> --- a/rust/helpers/helpers.c
+> +++ b/rust/helpers/helpers.c
+> @@ -21,6 +21,7 @@
+>  #include "slab.c"
+>  #include "spinlock.c"
+>  #include "task.c"
+> +#include "time.c"
+>  #include "uaccess.c"
+>  #include "wait.c"
+>  #include "workqueue.c"
+> diff --git a/rust/helpers/time.c b/rust/helpers/time.c
+> new file mode 100644
+> index 000000000000..d6f61affb2c3
+> --- /dev/null
+> +++ b/rust/helpers/time.c
+> @@ -0,0 +1,8 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/ktime.h>
+> +
+> +int rust_helper_ktime_compare(const ktime_t cmp1, const ktime_t cmp2)
+> +{
+> +	return ktime_compare(cmp1, cmp2);
+> +}
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index e3bb5e89f88d..c40105941a2c 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -81,3 +81,25 @@ fn sub(self, other: Ktime) -> Ktime {
+>          }
+>      }
+>  }
+> +
+> +impl PartialEq for Ktime {
+> +    #[inline]
+> +    fn eq(&self, other: &Self) -> bool {
+> +        // SAFETY: FFI call.
+> +        let ret =3D unsafe { bindings::ktime_compare(self.inner, other=
+=2Einner) };
+> +        ret =3D=3D 0
+> +    }
+> +}
+> +
+> +impl PartialOrd for Ktime {
+> +    #[inline]
+> +    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering>=
+ {
+> +        // SAFETY: FFI call.
+> +        let ret =3D unsafe { bindings::ktime_compare(self.inner, other=
+=2Einner) };
+> +        match ret {
+> +            0 =3D> Some(core::cmp::Ordering::Equal),
+> +            x if x < 0 =3D> Some(core::cmp::Ordering::Less),
+> +            _ =3D> Some(core::cmp::Ordering::Greater),
+> +        }
+> +    }
+> +}
+> -- =
 
-Because we have no way of preventing existing XDP programs from
-overwriting (corrupting) the area using the xdp_adjust_meta() API and
-data_meta field.
-
-But in a sense the *memory area* is shared between the two APIs, in the
-sense that they both use the headroom before the packet data, just from
-opposite ends. So if you store lots of data using the new KV API, that
-space will no longer be available for xdp_adjust_{head,meta}. But the
-kernel can enforce this so we don't get programs corrupting the KV
-format.
-
--Toke
-
+> 2.34.1
 
