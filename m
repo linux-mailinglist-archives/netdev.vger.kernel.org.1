@@ -1,123 +1,147 @@
-Return-Path: <netdev+bounces-132494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0F9991E67
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:08:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D6A9991EE8
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 16:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18D62281FB2
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 13:08:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D3CFB2131F
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 14:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB3F176ABB;
-	Sun,  6 Oct 2024 13:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1A51CD31;
+	Sun,  6 Oct 2024 14:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ieYJAmpI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3/ZMZAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54563D520;
-	Sun,  6 Oct 2024 13:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252CBAD55
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 14:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728220119; cv=none; b=P3OpdLaGNsEvrjkcBBunqF9pv1RMl3OR/U7eyBRDmCH74aNcsrRxs1/IHB+UBfoG3EJIxuvOPZhexWy+yOcLreJOLGoOL5v2yxUXi3ojXon/F4qMJVZaTck2ZSk8xBKaYjImWnq2AxvexIQTl3gSGRDYkdNwugVyEXYJ/ALSbKY=
+	t=1728225086; cv=none; b=Z09wxZdCQBkBFwHAowDMyhs9I7bJ8R9I4OAYJnt4EkTffcB8kSOSrT3qtq7bcSWY/CF5ppKrXb6XnXzINeR2I9cWRqb2bmgSgXX7JS3MMY49jud46mMZJ2ZnpYcCsoxESKqYRE0BWB4prkP5+4Oyb6ffn0xQdvOazVMXvls5T9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728220119; c=relaxed/simple;
-	bh=xv6qdNSiQ8gOa1nlcDtSV32bn17n4tkidPNGmzeQCzg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EHrPnVe6xfckQBIY4CZlZPoS4Pv/WqvH/zPqPgGtIGAoU2qgGRlpFiT+aTXsZtcRzExlfVZQ6wtz41YkicbBd6YNYyYq2FzvOy1+VbXTbRAlcxP2Y/l0i+/4yfE4KnghgHO2B0Q1HZnihdimQ5gVVSea2GOkvNunHl9DDa5nOAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ieYJAmpI; arc=none smtp.client-ip=209.85.128.45
+	s=arc-20240116; t=1728225086; c=relaxed/simple;
+	bh=4ZGZT4MMqAaWYL/ciNFnqa1WpgiaShL682CJk0bNAfU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=teYhj5i1OVAtbSBn1u3DltiuIFib6DA53ooYChDTYaFLS5t2lw4BDou/C+YUeinVB4Rx1NSkCOqU07VteOA3McJvOt5SbB64FqFlF2Qls4L4eCDbIBf27To9/Unshxh59pxEEP91J3+xyp7RuQ8n0kwJID8Vs0T9DE6nFAWRl3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F3/ZMZAL; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42f56ad2afaso46400755e9.1;
-        Sun, 06 Oct 2024 06:08:36 -0700 (PDT)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6cb33996b79so4812866d6.0
+        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 07:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728220115; x=1728824915; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dmx2sBdekqi6blVgKnA1R+7bIKWb4LbSOPTUFdSrnhw=;
-        b=ieYJAmpIVmTSLl2GC3dbDDwUgdGjN8XKyh2uSo2z9zqFPtDAT8/ZP425xZ62hmuYOA
-         PGDFmx0VRVzqorCtCcbqzK37u8LIgvk4JtvgS0Qprzo/dbupGwqUbfB70ii7ZQFpBu+1
-         PL4icl6QByWtBiC5WXo/+2lEe3dBlfAYMJgxs6yquOOHXYAMAABJ5GwqvdSuMyCkVLT6
-         Hv9kgRk2q1brJCFefqfcBjF45J3rDScQjHxMVPju170a1r35ab6i4lsLGFcpVBP/nk1H
-         qU9rcZdz4Yzj9lqeZrdLvwEQ3RYXsTAak495zhNAgbq7jYo1dDrNRI/q62EMDwDZTWFB
-         j6+w==
+        d=gmail.com; s=20230601; t=1728225084; x=1728829884; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gw0P7V+qzzyqDMnqGzM4CxAJl6n6mMsxzoMLjOlN4Gc=;
+        b=F3/ZMZALt9OkI8a8UuiGq1YFTkVwMwreOrxq25B8yRqjKCcP9fNxLh/WUdUJpdmt7l
+         OnEd/fv1KUqrW6w2Jim/Sc2jSPxumgmaV1hXTq3YK6RhLjXn2kQbNsLyEWNTkDaBsbTf
+         A0SHufNds05YTfnYiv9ujpcSoB+XZvAnt4k3mqX0kG1BVXaY3CRNewPVuBnTj7HNUDvY
+         P/zOraVP0dGSP84XcluorgDLCx7COKB2dPQ0/oS+F20j508je2qgNnqWeu3Oi9zBMRkO
+         KReWcELpLRzXoziRdiHfvJwYEwbtkYo7UQOkoKqfoBhUahapvlOlAPBKrM9rJYPsl96u
+         zWCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728220115; x=1728824915;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dmx2sBdekqi6blVgKnA1R+7bIKWb4LbSOPTUFdSrnhw=;
-        b=mUH250opmMDjHMg1Sf2lvEdn4btk/8ZAqHrSQYUXTa0mUawUCbxUHBQNbY5c/DKk0Y
-         HkQmKUI/e1R57mMRU8EUw/c6GVX3Mu6izVeV1mtyKs7R74p/ODxSwSytI0MhKx22IsPG
-         Gc2AkaVHtx1a7fh3ZHjlW6XXQkgNLR19/G+ZDAEczZkeP6IeEDYwAHNMR6WdiImnw1fy
-         fZEbd6QczY4C56zX6Vyzi28hlepWwj7kJC8zh+Dz7XSgIHZ+UX+mrmGV0HD80zKGLu9z
-         hQ/tn2OCl95vCstlBh8QGJc9/dIFZh5lQhaxLLhj09Q0P4W6MdgptTtdrHBVQVrClk/m
-         W2dg==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ1N0fRtsbkSgNsYkzqDD1YC0bnCgsylwuFw/A3jWq7kfh0FC04OprdWv0+ffE0OHjuApndv5Gm0qM9HT8@vger.kernel.org, AJvYcCVoHBfTxBV4EveD61xWI3F5hLEKSTBCqlr57kYo5DQ0ZyQ5hh6BTtEaxnKymC60e3XxDDBpbE4V07s2wDCYAFY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh/ILFXDHHvQ7IscBeTXrW47FDCxNjh+wiB7ftAkPJO98WxqbM
-	V1NMI8yKuebKC3CWWxcdk7zmVn2QitOsfdRxdG0NltwwC4QToBjT
-X-Google-Smtp-Source: AGHT+IGwxivZnuEN5XKlBpvTGO230c6u4ynVhRjTSIWMFNkQWoNst0fALCWQawxL/pOCNzrlmqH8bg==
-X-Received: by 2002:a05:600c:35c9:b0:42e:8d0d:bc95 with SMTP id 5b1f17b1804b1-42f85a6e147mr74444355e9.6.1728220115311;
-        Sun, 06 Oct 2024 06:08:35 -0700 (PDT)
-Received: from void.void ([141.226.12.238])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89ed952asm46201535e9.45.2024.10.06.06.08.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Oct 2024 06:08:34 -0700 (PDT)
-From: Andrew Kreimer <algonell@gmail.com>
-To: Madalin Bucur <madalin.bucur@nxp.com>,
-	Sean Anderson <sean.anderson@seco.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Andrew Kreimer <algonell@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH net-next v2] fsl/fman: Fix a typo
-Date: Sun,  6 Oct 2024 16:08:29 +0300
-Message-Id: <20241006130829.13967-1-algonell@gmail.com>
-X-Mailer: git-send-email 2.39.5
+        d=1e100.net; s=20230601; t=1728225084; x=1728829884;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gw0P7V+qzzyqDMnqGzM4CxAJl6n6mMsxzoMLjOlN4Gc=;
+        b=mFmOxeSbTycwFVyue1fIolvboteeY5CjDW5mYDJ3KQKpOP64beq2V65Ao2rEXPmBMs
+         iLuIEcSzNeh3W6nR7H3E+GDPY3WIcVmA0Zpm83HUrMegQRbiPBc9ZhnEO7z9fJxRG0Rw
+         1fh1jJyDLM/QJv8Aiw6eU3MiTYbv3KZC1S1JW8JVU280N5sy+uz3nGSoKxdKlIglZrE2
+         N/29Cc8DsYfwiIQ1j/QutsGWsvr4zk4CF8KL9GAXVFndpM/E8ajVSUj/VFsxu4Bo/or1
+         7OV4C/jpghYi+pT3CNegswsIBfuPBbqY0v+kUdklBMWwAThCIYnmnxYeUbF3FqVLx9BB
+         mYUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWli65q7kDuga36pGtB23ec83lCDaj80g5ERDSzbVVgJm4/R3/4A8Xy3RkaHZNjijO7h1S46VM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6zb5VWlDNk2+mRhYVXaT98E+Hcd6eweeZa2oNoh+ObahxTlnx
+	SV1eTBy+pq+l+KnQQiqTNDTMVhvR7FzzEzekiIX2ANK2BleJS3/1TJnwYcns8T337UYMnywrHow
+	cOfPkeCT3LpsQOfeup4u587bTcg==
+X-Google-Smtp-Source: AGHT+IEk/DcpyxjYYfGAxEHKe6123YNPwi783T0AHzGS2+e/VMSEUCNwXS6NB5Q5hqi3CwsOVT8tdlEehOaTa74/cAU=
+X-Received: by 2002:a05:6214:5007:b0:6cb:6006:c98b with SMTP id
+ 6a1803df08f44-6cb9a2f5ba2mr63712986d6.5.1728225083992; Sun, 06 Oct 2024
+ 07:31:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1728143915-7777-1-git-send-email-guoxin0309@gmail.com> <CADVnQymUCp1nocPYUCXx1QmN4Y8ABJMd0urJeB5_J=TL8b7_Yg@mail.gmail.com>
+In-Reply-To: <CADVnQymUCp1nocPYUCXx1QmN4Y8ABJMd0urJeB5_J=TL8b7_Yg@mail.gmail.com>
+From: Xin Guo <guoxin0309@gmail.com>
+Date: Sun, 6 Oct 2024 22:31:12 +0800
+Message-ID: <CAMaK5_hKpZcO89ej-nJWHnF=1nM=rYSLA6n-gY4WK0Hzg-sPdA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] tcp: remove unnecessary update for
+ tp->write_seq in tcp_connect()
+To: Neal Cardwell <ncardwell@google.com>
+Cc: edumazet@google.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix a typo in comments: bellow -> below.
+Thanks neal, my bad,
+I will read the document and post v3 for this patch
 
-Reported-by: Matthew Wilcox <willy@infradead.org>
-Signed-off-by: Andrew Kreimer <algonell@gmail.com>
----
-v2:
-  - A repost, there is no range-diff.
-  - Elaborate on the change.
-
-v1:
-  - https://lore.kernel.org/all/20240915121655.103316-1-algonell@gmail.com/
-
- drivers/net/ethernet/freescale/fman/fman_port.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fman/fman_port.c b/drivers/net/ethernet/freescale/fman/fman_port.c
-index f17a4e511510..e977389f7088 100644
---- a/drivers/net/ethernet/freescale/fman/fman_port.c
-+++ b/drivers/net/ethernet/freescale/fman/fman_port.c
-@@ -987,7 +987,7 @@ static int init_low_level_driver(struct fman_port *port)
- 		return -ENODEV;
- 	}
- 
--	/* The code bellow is a trick so the FM will not release the buffer
-+	/* The code below is a trick so the FM will not release the buffer
- 	 * to BM nor will try to enqueue the frame to QM
- 	 */
- 	if (port->port_type == FMAN_PORT_TYPE_TX) {
--- 
-2.39.5
-
+On Sun, Oct 6, 2024 at 1:40=E2=80=AFAM Neal Cardwell <ncardwell@google.com>=
+ wrote:
+>
+> On Sat, Oct 5, 2024 at 11:58=E2=80=AFAM xin.guo <guoxin0309@gmail.com> wr=
+ote:
+> >
+> > From: "xin.guo" <guoxin0309@gmail.com>
+> >
+> > Commit 783237e8daf13("net-tcp: Fast Open client - sending SYN-data")
+>
+> To match Linux commit message style, please insert a space between the
+> SHA1 and the patch title, like so:
+>
+> Commit 783237e8daf13 ("net-tcp: Fast Open client - sending SYN-data")
+>
+> > introduces tcp_connect_queue_skb() and it would overwrite tcp->write_se=
+q,
+> > so it is no need to update tp->write_seq before invoking
+> > tcp_connect_queue_skb()
+> >
+> > Signed-off-by: xin.guo <guoxin0309@gmail.com>
+> > ---
+> >  net/ipv4/tcp_output.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> > index 4fd746b..ee8ab9a 100644
+> > --- a/net/ipv4/tcp_output.c
+> > +++ b/net/ipv4/tcp_output.c
+> > @@ -4134,7 +4134,10 @@ int tcp_connect(struct sock *sk)
+> >         if (unlikely(!buff))
+> >                 return -ENOBUFS;
+> >
+> > -       tcp_init_nondata_skb(buff, tp->write_seq++, TCPHDR_SYN);
+> > +       /*SYN eats a sequence byte, write_seq updated by
+> > +        *tcp_connect_queue_skb().
+> > +        */
+> > +       tcp_init_nondata_skb(buff, tp->write_seq, TCPHDR_SYN);
+> >         tcp_mstamp_refresh(tp);
+> >         tp->retrans_stamp =3D tcp_time_stamp_ts(tp);
+> >         tcp_connect_queue_skb(sk, buff);
+> > --
+>
+> As in the example provided by Eric, please use Linux kernel C comment
+> style, which places a space character between the * and the first
+> character of the comment text on each line. For example:
+>
+> /* SYN eats a sequence byte, write_seq is updated by
+>  * tcp_connect_queue_skb().
+>  */
+>
+> For more information, see:
+>
+> https://www.kernel.org/doc/html/v6.11/process/coding-style.html#commentin=
+g
+>
+> thanks,
+> neal
 
