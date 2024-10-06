@@ -1,65 +1,86 @@
-Return-Path: <netdev+bounces-132568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C685992226
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 00:53:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627B999223A
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 01:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A8D28184F
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 22:53:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A0E228183B
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 23:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F65518C017;
-	Sun,  6 Oct 2024 22:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04DD18BB93;
+	Sun,  6 Oct 2024 23:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="CKhc6S5M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rim3lu5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF3417335C;
-	Sun,  6 Oct 2024 22:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D3228377;
+	Sun,  6 Oct 2024 23:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728255200; cv=none; b=L7asYnQW4eGYUsNl0vjyKBWQ8YBqGg7fnof/hlPFmydWzYAV/BWpRTibWe57j1CsPUPhnMK50AzclJ6Y5Q9uxerS1kMpbny4uH5gNvyTyFB5cjfNfTUwPkY+ABU168wr0za7H9aDTuDhv24Qehx7wTcbK0DalS0sVVwhTDyqx1Q=
+	t=1728256825; cv=none; b=feD+dfqt4UBTGJG6typyQtVY15s/8YdaHrv1ez7d4/uYDl6NqZhKMEg64RMYu6EJNHS5xI0PWvfjc/oo23+uIp3qdXGrW0yt1LNudy4JKE8Wci7uQ5nN91tCx1loieARUuh4qgWlrBDw5XxhOewP73YbUgIkl5tn5ovdlbIiXi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728255200; c=relaxed/simple;
-	bh=Of3ewFYPAsAI1H+tkSL99SC2LLS2QQ9DuiAiKAP1EGk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iContvtZ14bndEb4PMO+pWsijrcJztlm9usArjXyzCPBtk4RjT8OstdCU6pZeta3pVCEmDvrtJuNT35npq7VtuaOY4ldvT4OkcbPQo2mlU3JHci7clHwAVcMdsDK3T8FioCFK1OaM74RIKo2OM0dQ21Ym1//xSW+7OSOocW0gfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=CKhc6S5M; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=1Po/4b5GDhTFckPAtrsG1PuoF6Q+mG7FncT9Bby/ovc=; b=CKhc6S5MF2n2CsK1
-	NRQIEaOWUiyhAo3oM8Bw5hIk4IDdyXPaShoBBYReeL8DhqrxzMSmhdeNdx7uSw4oBeMXfXxCkiPzC
-	ag42UqeZLRQcO+enMhqWOwBDhaFtG8J6RAEewZXR6C6PZVW89xTo4IGxRKp6a3fr6kvzEzjcz9pZy
-	NZNlEfqsoqUqoILLQlxJ6ad+yYM2ICTQMFTf1bo1iz7TM2wwGxax/f5j1lOMH2uNAkGnGj/SjU4sl
-	j48Wl0xdnLbSvfzmOtCJrHg+X8HjXhGdAYNGmC9zm0AqataYBymxv2IiuuYA7xnUoWXFq12RB3F0Z
-	pmY2mVsBdZmaQFNWbg==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1sxa7d-009LcO-26;
-	Sun, 06 Oct 2024 22:53:05 +0000
-From: linux@treblig.org
-To: johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH 2/2] cfg80211: Remove unused cfg80211_vendor_ functions
-Date: Sun,  6 Oct 2024 23:53:03 +0100
-Message-ID: <20241006225303.121445-3-linux@treblig.org>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241006225303.121445-1-linux@treblig.org>
-References: <20241006225303.121445-1-linux@treblig.org>
+	s=arc-20240116; t=1728256825; c=relaxed/simple;
+	bh=OGZP2oouUX5Uqhoa9giSrckDbuLWI9cEQEkxfUKW67M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KwXl9hIms4Huk+QA/DcremZYuNQFiQVUvypryjVsheaxNeVWKsnUr3wpro+C1X5lEcSGMvQI0GkXA9jeRjMtaYBfMAQRmmXzhgNgfsXREA22wbC7+o1IuDYjXDlOvq8ZQoR6Jj9FCs3ONcIS4pOo05SKdwgujeE1sDPTZ6PFH60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rim3lu5j; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e221a7e7baso614594a91.0;
+        Sun, 06 Oct 2024 16:20:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728256823; x=1728861623; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oWD2zMKfINKte2YJYP7FEhQFS1joaH2BoggACO48Gts=;
+        b=Rim3lu5jJWAXumn2BUHsPgUgvN5rAk+eviaJDpPAxd0Ig62mGpfwim6yHyt5ZB4i8P
+         e7uwzwMEEbmLM160woVTmD6xzAEWvI2lP4SAvFcvQ3mEbiuoTz7uxw62E3RpReFgEtS8
+         XbdPsHIO7Q7ziJfvsnN1l/Q/5y3QUjOD4KRWLyAp1YKAyC1HEgJJIEGpuJVKEhcqcv5Z
+         58m5u2BkNtyoZ936wUDRbR4FFdZsIlL8ES61lE+Or7PciI3jbrxhCnuFM7GM6yQ5T7Du
+         lV4Ram9wYx7rOj6RPG3dV92BjzJ231DnZbxbQOdQglctGSKCrKMBty2AfVwzpMFx7PGH
+         4BsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728256823; x=1728861623;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oWD2zMKfINKte2YJYP7FEhQFS1joaH2BoggACO48Gts=;
+        b=GJcIu19DC8szX4K+k8BuBRAAk7LArFZwWg1yoMw730vxPaIreDr2LsNtAPJw7TGmra
+         +zCL3BpgP80rox4M2b/Ij2G3EtFQgdk5MPqVTeUbISkb/Jbbmam+dQYZm2F8jTFmAXn5
+         GFhI+ahCqq1pcqP4ciFYh07AXwnzVHV0th2vTZh55b9jN9ilpNx1FITbM5Io3ua5vSMb
+         7b+sweYPshRltkErEjI8xuW5DOXZiymL+HARCY06kXDLKnlE2Izwwf4airqYiOlETNpj
+         5ZqGSWX57VDwK5la1IRtXOyNBjoxzg4di1VlU4ew07aqV4KLBPQLXre7f9umtdPR0mOU
+         QUEw==
+X-Forwarded-Encrypted: i=1; AJvYcCUb73yjvDir9lpNXmj/2hS/O4TLaTctvca3y8NAGtvW7Tak5BafuuCjAm/T9Oj02uovqPUFkflImr611nw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDqfEuy5BpWH0IW3DS3o6g6sjPYm3Z92ds3zfoDi97MIa5VPmK
+	KEsFucojj3J2kfEPhg+LunUcHkUo654/IfMSette60UnJOaByyMaaG33A/fa
+X-Google-Smtp-Source: AGHT+IHV/eEl5E756pvrEfJu7ysX/xPubqsDRVeaU+qhtx3erBueetlIITrBRGxY4BzMRaiVJQQFAw==
+X-Received: by 2002:a17:90a:ca16:b0:2e0:5748:6ea1 with SMTP id 98e67ed59e1d1-2e1e63c000dmr14338452a91.37.1728256822828;
+        Sun, 06 Oct 2024 16:20:22 -0700 (PDT)
+Received: from archlinux.. ([2405:201:e00c:517f:5e87:9cff:fe63:6000])
+        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2e20b0f6467sm3886800a91.45.2024.10.06.16.20.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Oct 2024 16:20:22 -0700 (PDT)
+From: Mohammed Anees <pvmohammedanees2003@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Mohammed Anees <pvmohammedanees2003@gmail.com>
+Subject: [PATCH v2] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
+Date: Mon,  7 Oct 2024 04:49:38 +0530
+Message-ID: <20241006231938.4382-1-pvmohammedanees2003@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,108 +89,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+In the original implementation of dsa_user_set_wol(), the return
+value of phylink_ethtool_set_wol() was not checked, which could
+lead to errors being ignored. This wouldn't matter if it returned
+-EOPNOTSUPP, since that indicates the PHY layer doesn't support
+the option, but if any other value is returned, it is problematic
+and must be checked. The solution is to check the return value of
+phylink_ethtool_set_wol(), and if it returns anything other than
+-EOPNOTSUPP, immediately return the error. Only if it returns
+-EOPNOTSUPP should the function proceed to check whether WoL can
+be set by ds->ops->set_wol().
 
-cfg80211_vendor_cmd_get_sender() and cfg80211_vendor_event_alloc_ucast()
-were added in 2019 by commit
-55c1fdf0d6c5 ("cfg80211: allow sending vendor events unicast")
-
-but never used.
-
-Remove them.
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Fixes: 57719771a244 ("Merge tag 'sound-6.11' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound")
+Signed-off-by: Mohammed Anees <pvmohammedanees2003@gmail.com>
 ---
- include/net/cfg80211.h | 45 ------------------------------------------
- net/wireless/nl80211.c | 11 -----------
- 2 files changed, 56 deletions(-)
+v2:
+- Added error checking for phylink_ethtool_set_wol(), ensuring correct
+handling compared to v1.
+___
+ net/dsa/user.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-index fd843a519329..cd3ed718efe2 100644
---- a/include/net/cfg80211.h
-+++ b/include/net/cfg80211.h
-@@ -7806,16 +7806,6 @@ cfg80211_vendor_cmd_alloc_reply_skb(struct wiphy *wiphy, int approxlen)
-  */
- int cfg80211_vendor_cmd_reply(struct sk_buff *skb);
- 
--/**
-- * cfg80211_vendor_cmd_get_sender - get the current sender netlink ID
-- * @wiphy: the wiphy
-- *
-- * Return: the current netlink port ID in a vendor command handler.
-- *
-- * Context: May only be called from a vendor command handler
-- */
--unsigned int cfg80211_vendor_cmd_get_sender(struct wiphy *wiphy);
--
- /**
-  * cfg80211_vendor_event_alloc - allocate vendor-specific event skb
-  * @wiphy: the wiphy
-@@ -7846,41 +7836,6 @@ cfg80211_vendor_event_alloc(struct wiphy *wiphy, struct wireless_dev *wdev,
- 					  0, event_idx, approxlen, gfp);
- }
- 
--/**
-- * cfg80211_vendor_event_alloc_ucast - alloc unicast vendor-specific event skb
-- * @wiphy: the wiphy
-- * @wdev: the wireless device
-- * @event_idx: index of the vendor event in the wiphy's vendor_events
-- * @portid: port ID of the receiver
-- * @approxlen: an upper bound of the length of the data that will
-- *	be put into the skb
-- * @gfp: allocation flags
-- *
-- * This function allocates and pre-fills an skb for an event to send to
-- * a specific (userland) socket. This socket would previously have been
-- * obtained by cfg80211_vendor_cmd_get_sender(), and the caller MUST take
-- * care to register a netlink notifier to see when the socket closes.
-- *
-- * If wdev != NULL, both the ifindex and identifier of the specified
-- * wireless device are added to the event message before the vendor data
-- * attribute.
-- *
-- * When done filling the skb, call cfg80211_vendor_event() with the
-- * skb to send the event.
-- *
-- * Return: An allocated and pre-filled skb. %NULL if any errors happen.
-- */
--static inline struct sk_buff *
--cfg80211_vendor_event_alloc_ucast(struct wiphy *wiphy,
--				  struct wireless_dev *wdev,
--				  unsigned int portid, int approxlen,
--				  int event_idx, gfp_t gfp)
--{
--	return __cfg80211_alloc_event_skb(wiphy, wdev, NL80211_CMD_VENDOR,
--					  NL80211_ATTR_VENDOR_DATA,
--					  portid, event_idx, approxlen, gfp);
--}
--
- /**
-  * cfg80211_vendor_event - send the event
-  * @skb: The skb, must have been allocated with cfg80211_vendor_event_alloc()
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index 9ab777e0bd4d..674ab5fa6da0 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -15416,17 +15416,6 @@ int cfg80211_vendor_cmd_reply(struct sk_buff *skb)
- }
- EXPORT_SYMBOL_GPL(cfg80211_vendor_cmd_reply);
- 
--unsigned int cfg80211_vendor_cmd_get_sender(struct wiphy *wiphy)
--{
--	struct cfg80211_registered_device *rdev = wiphy_to_rdev(wiphy);
--
--	if (WARN_ON(!rdev->cur_cmd_info))
--		return 0;
--
--	return rdev->cur_cmd_info->snd_portid;
--}
--EXPORT_SYMBOL_GPL(cfg80211_vendor_cmd_get_sender);
--
- static int nl80211_set_qos_map(struct sk_buff *skb,
- 			       struct genl_info *info)
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index 74eda9b30608..bae5ed22db91 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -1215,14 +1215,17 @@ static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
  {
+ 	struct dsa_port *dp = dsa_user_to_port(dev);
+ 	struct dsa_switch *ds = dp->ds;
+-	int ret = -EOPNOTSUPP;
+-
+-	phylink_ethtool_set_wol(dp->pl, w);
+-
++	int ret;
++
++	ret = phylink_ethtool_get_wol(dp->pl, w);
++
++	if (ret != -EOPNOTSUPP)
++		return ret;
++
+ 	if (ds->ops->set_wol)
+-		ret = ds->ops->set_wol(ds, dp->index, w);
++		return ds->ops->set_wol(ds, dp->index, w);
+ 
+-	return ret;
++	return -EOPNOTSUPP;
+ }
+ 
+ static int dsa_user_set_eee(struct net_device *dev, struct ethtool_keee *e)
 -- 
-2.46.2
+2.46.0
 
 
