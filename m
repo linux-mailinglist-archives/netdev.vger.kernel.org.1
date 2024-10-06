@@ -1,161 +1,115 @@
-Return-Path: <netdev+bounces-132520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1F98991FE1
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 19:24:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 595FC99200A
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 19:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C88E71C20AD2
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:24:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8DCBB20E9E
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E629E17CA1F;
-	Sun,  6 Oct 2024 17:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5076E189B8B;
+	Sun,  6 Oct 2024 17:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nmQNYOXK"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b="LLYYgAb6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A42F9E4;
-	Sun,  6 Oct 2024 17:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728235487; cv=none; b=QaVruFD2jZIKmRTFZr8jQiMUq4gdqSou8+uMSwkWmEOD4CPIjFeTgiL4OfZ3F5qW6kwjT3v1SisBeeVz5er5Zb4LkkvfT28iB2Au5nQtUV9hkUq+vRW4SA8YGpjNWLTYl31WTqMh82KJlUeIJlNSslcbdvdHevdgH5b8v7Kp1xQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728235487; c=relaxed/simple;
-	bh=2fGz3KDCfRGPhSy/5QFDgAdl2Tf/XHGIHJZ5BSKta64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CWg84jblvpg/LSv4Tv7GbgY01ktJOpwixNBnY4sFyCTHm7WwYDRtCIo4EjJ0pZl2sosGj/2dAS44+8qXv6hcbVMq+YgHTFeEootuYcAn8u3YOy5solHJjn3MjXIu1h2AKOPIw/5bno8QD6esg39RV8NKHJO6P9Uahuzh92bQ9FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nmQNYOXK; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ea06275ef2so267283a12.0;
-        Sun, 06 Oct 2024 10:24:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728235486; x=1728840286; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xbYAwkvWDSG9D9+tHniJsFSvQn8xIlp1Sld5HghW6Ws=;
-        b=nmQNYOXKuNZKNjZ8iAVZlPJg0l+7MWWVwnaGWMhLS8/iKN71wFOldD39YyEQ7jz6ww
-         0DCOA5rdbR3UAxwhfqEsB0RfQjCChgG8Tqp/9Ao30mPzlA2Z6fImmdyZEWZjRrYSYwOC
-         SA4jRDWLo1D2urkeh1pALxVuFyGhjJ6oGFD8DcUcCWlVTxijf90opVlFKu45ZIF2Apb/
-         KVhPuNBNOV05tUiZsZh26Ugc5QAt4kTpegs6wblVF33uuQDShI50fYQKS6kPunV5EPBh
-         jZ9gi+h5XJ0cdRXluL1tsSQ6uTBKkT6I8YQTbDpwr/zPuwWwxMrRME8vDyX74jaKAS58
-         yyJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728235486; x=1728840286;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xbYAwkvWDSG9D9+tHniJsFSvQn8xIlp1Sld5HghW6Ws=;
-        b=cdHcPPC5dLDm/mJdzhUoTn7HSj4xeNv/r0eZ4kxm0/WOdB3VCRVFV46tdZTrGlPdNh
-         dbJORMAH8odDNphcw66MlbKCXhkD6WUFUhMvCJvBa3G/MTrtv5TYmHv0HzenbWtKSfFU
-         cEyklDvzoWkQKkfzJjWGRmn0dIGOmTlaOc38YC+CJxMh9vF2Ujycv5cZ0nHx/B6FSjeb
-         hvuVXBqiPmUvVBz09jS7ZQT2JTj+3fXl+euD+tyS/yQpsLxbpGAxkDQ5Kk80ZnTOgyVM
-         f5wrcpDUMMR1nVnYUvryev69hoWNlgocYidIwt5Rjg0ayVd78AfC0wiy9vj4lB64yhvt
-         X+LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBxyJrHvCBoNPX/Sd2qOt7FvKcITgGzMPzxyt3gBlrB0zFeMXKxQ+6y/N8Mg5o+KZIM6jhp+c4@vger.kernel.org, AJvYcCX0WSzGpplf77rqigoTHTvmfEwhA2nMRhmWQ6qOC1492bgy9aNwITWoPeTi3iT5kpkzH3M2ZeH5VfTHK30=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk+m5kN9pLBZR+kP9iC0w7L1BXG8Lcr6Z2JrOmT/7E9jZ1ukEb
-	y+98Oa9cOf1+KWy1PRfoULhugpKMdkdr/SoskJ6khcGhHf2Atr14Fbw1bzhYU1677DUM82Xtsk3
-	Lnc/Oz4XmD2o/3vJcFCkeYojWphk=
-X-Google-Smtp-Source: AGHT+IEKWiJBjLKDIaFaOkfEDPUqRHlD/TfcUp548Ta0mblv55/mAWH4xtREyw4zmdXVZiry7Yu1PYw8VwIpPFTooZw=
-X-Received: by 2002:a17:90a:bc92:b0:2e0:9147:7db5 with SMTP id
- 98e67ed59e1d1-2e1e63bf552mr10986428a91.38.1728235485708; Sun, 06 Oct 2024
- 10:24:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81540101F2;
+	Sun,  6 Oct 2024 17:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728236506; cv=pass; b=PWMOdZ6qaplUETHMP2my2hgVXFyyvpDLEI/MCmxeEavWDHwe1j2v7xYihK9d4Aef/2r9IhPqV3dL2rXbmHWuSWEMpZSq5YaTA9Jj3owSKs1LUSV9LLSiA/Cn5TLClkzYIxWUlJVMjvpjTsbnl4hWlsK4XodMlmapZZCtyDxSUEM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728236506; c=relaxed/simple;
+	bh=NfD0HbTfp//JIl3ypk3BzpOdEf/T6/7fF9EVkCyTsnM=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dlU2/lzdi4xqQZ7xcoGJWk+/8+ZenXgeUKibj6sl3EbcfusCLx7Xq1PCoMN7TGfcR5t6KVSW7btB82gnNQWV5lzi4EZziqb4VWdLNGB0wTt4W9hd3uZLvGXKyYDCLyfI64GvrDL1eytMAN3pJWz/qRdA2yAia1ubUNLTc0gF7SA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b=LLYYgAb6; arc=pass smtp.client-ip=136.143.188.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1728236493; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=NWQpjLGFLbw8okY/q/XtJcm5NV+AViso+qLvHF42efxumiAu9WvOZhBu3LeH8114qGgG4EHhWxwJ1BctKM4JwDBJ+MQwdndU+ZkWd/qmBpqZt/5xBkj097vYx8OzdB0K0h7ZyUL+jqFXfTzIgdMVLfWCBVe0xypM/G1DM5TAHZ4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1728236493; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=A93CjsQnNr0qnT7z0z35aXHoaaCLMjNKIH0I4wSZV+0=; 
+	b=d88aQQae7BG2VetwDg8JlZUiCbc6xkUCAwShyGbh+312eOst15NhEarxdUEbA165eZ/+cCrqaHE+Jkykdh1aQJ38DWlDSnq8YggOiMPDc9Qd3zFkFXZ7WQ5G5NaawsWMbxDWnFi308FyGkDdLYNuNBmzYwaWxEG15wbG/r7pbRE=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=Usama.Anjum@collabora.com;
+	dmarc=pass header.from=<Usama.Anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1728236493;
+	s=zohomail; d=collabora.com; i=Usama.Anjum@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Cc:Cc:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=A93CjsQnNr0qnT7z0z35aXHoaaCLMjNKIH0I4wSZV+0=;
+	b=LLYYgAb6cfH6mcii90Asz5ctF2nLLG3A/1wpEfp4+D389C4fdxAc6Mq034GhNdZq
+	hd7cKqxG2ae5Mzz2krQ7wC8Reg62sRlGuJvjAuP23Ny/eEHw8m9jODAU/CHW8M81bE4
+	Nu+cJJfLQuRZ2ISmYBR6l8r8ZnuIRDEWKwUGlB5g=
+Received: by mx.zohomail.com with SMTPS id 1728236491654656.430969093571;
+	Sun, 6 Oct 2024 10:41:31 -0700 (PDT)
+Message-ID: <bc607fd0-41c8-4603-9f50-4d912dbec6e5@collabora.com>
+Date: Sun, 6 Oct 2024 22:41:22 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005014514.1541240-1-ingamedeo@gmail.com> <c06d9227-dcac-4131-9c2d-83dace086a5d@blackwall.org>
-In-Reply-To: <c06d9227-dcac-4131-9c2d-83dace086a5d@blackwall.org>
-From: Amedeo Baragiola <ingamedeo@gmail.com>
-Date: Sun, 6 Oct 2024 10:24:34 -0700
-Message-ID: <CAK_HC7bOe2KhVnDiG4Z3tpkodiCkewEct7r2gXanjGBC8WwFsQ@mail.gmail.com>
-Subject: Re: [PATCH] bridge: use promisc arg instead of skb flags
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: Usama.Anjum@collabora.com, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: make kselftest-clean remove libynl outputs
+To: Greg Thelen <gthelen@google.com>, Shuah Khan <shuah@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20241005215600.852260-1-gthelen@google.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <Usama.Anjum@collabora.com>
+In-Reply-To: <20241005215600.852260-1-gthelen@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-I agree, just patch actually changes the behaviour when a BR_FDB_LOCAL
-dst is found and drops the traffic because promisc is *always* set to
-false when a BR_FDB_LOCAL dst is found in br_handle_frame_finish().
-I guess the problem I was trying to solve was that since the
-introduction of the promisc flag we still use brdev->flags &
-IFF_PROMISC in br_pass_frame_up() which is essentially the value of
-promisc (except in the BR_FDB_LOCAL case above) instead of promisc
-itself.
+On 10/6/24 2:56 AM, Greg Thelen wrote:
+> Starting with 6.12 commit 85585b4bc8d8 ("selftests: add ncdevmem, netcat
+> for devmem TCP") kselftest-all creates additional outputs that
+> kselftest-clean does not cleanup:
+>   $ make defconfig
+>   $ make kselftest-all
+>   $ make kselftest-clean
+>   $ git clean -ndxf | grep tools/net
+>   Would remove tools/net/ynl/lib/__pycache__/
+>   Would remove tools/net/ynl/lib/ynl.a
+>   Would remove tools/net/ynl/lib/ynl.d
+>   Would remove tools/net/ynl/lib/ynl.o
+> 
+> Make kselftest-clean remove the newly added net/ynl outputs.
+> 
+> Fixes: 85585b4bc8d8 ("selftests: add ncdevmem, netcat for devmem TCP")
+> Signed-off-by: Greg Thelen <gthelen@google.com>
+> ---
+>  tools/testing/selftests/net/ynl.mk | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
+> index 59cb26cf3f73..1ef24119def0 100644
+> --- a/tools/testing/selftests/net/ynl.mk
+> +++ b/tools/testing/selftests/net/ynl.mk
+> @@ -19,3 +19,7 @@ $(YNL_OUTPUTS): CFLAGS += \
+>  $(OUTPUT)/libynl.a:
+>  	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
+>  	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
+> +
+> +EXTRA_CLEAN += \
+> +	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
+> +	$(top_srcdir)/tools/net/ynl/lib/*.[ado]
+Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 
-Amedeo
+-- 
+BR,
+Muhammad Usama Anjum
 
-
-On Sat, Oct 5, 2024 at 7:06=E2=80=AFAM Nikolay Aleksandrov <razor@blackwall=
-.org> wrote:
->
-> On 05/10/2024 04:44, Amedeo Baragiola wrote:
-> > Since commit 751de2012eaf ("netfilter: br_netfilter: skip conntrack inp=
-ut hook for promisc packets")
-> > a second argument (promisc) has been added to br_pass_frame_up which
-> > represents whether the interface is in promiscuous mode. However,
-> > internally - in one remaining case - br_pass_frame_up checks the device
-> > flags derived from skb instead of the argument being passed in.
-> > This one-line changes addresses this inconsistency.
-> >
-> > Signed-off-by: Amedeo Baragiola <ingamedeo@gmail.com>
-> > ---
-> >  net/bridge/br_input.c | 3 +--
-> >  1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-> > index ceaa5a89b947..156c18f42fa3 100644
-> > --- a/net/bridge/br_input.c
-> > +++ b/net/bridge/br_input.c
-> > @@ -50,8 +50,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool=
- promisc)
-> >        * packet is allowed except in promisc mode when someone
-> >        * may be running packet capture.
-> >        */
-> > -     if (!(brdev->flags & IFF_PROMISC) &&
-> > -         !br_allowed_egress(vg, skb)) {
-> > +     if (!promisc && !br_allowed_egress(vg, skb)) {
-> >               kfree_skb(skb);
-> >               return NET_RX_DROP;
-> >       }
->
-> This is subtle, but it does change behaviour when a BR_FDB_LOCAL dst
-> is found it will always drop the traffic after this patch (w/ promisc) if=
- it
-> doesn't pass br_allowed_egress(). It would've been allowed before, but cu=
-rrent
-> situation does make the patch promisc bit inconsistent, i.e. we get
-> there because of BR_FDB_LOCAL regardless of the promisc flag.
->
-> Because we can have a BR_FDB_LOCAL dst and still pass up such skb because=
- of
-> the flag instead of local_rcv (see br_br_handle_frame_finish()).
->
-> CCing also Pablo for a second pair of eyes and as the original patch
-> author. :)
->
-> Pablo WDYT?
->
-> Just FYI we definitely want to see all traffic if promisc is set, so
-> this patch is a no-go.
->
-> Cheers,
->  Nik
-
-
-
---=20
-Thanks,
-Amedeo
 
