@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-132566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AD8C99221F
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 00:48:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF2F992224
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 00:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC8F21F2150B
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 22:48:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2A1EB2114D
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 22:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3678172777;
-	Sun,  6 Oct 2024 22:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE0E18A94E;
+	Sun,  6 Oct 2024 22:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="I/Z3XDJV"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="XZCtBEbu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6828136E3F;
-	Sun,  6 Oct 2024 22:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83E7416F858;
+	Sun,  6 Oct 2024 22:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728254916; cv=none; b=P5p8NClScGsJcYHPNlwltzVaOQL74GaX3hjF/pFZZlm/rmSuavo0UatpQ1vnQaOAHbJkYVXEhNmAKpIDK5acPfo972lAA8um+HBMeqd9QtWZfOhDVxdcTwgPViUARiP8jAgkJ9LqyJiKmfZwpEOrjAlCw5ucfWCFKhRBHkYCKHM=
+	t=1728255195; cv=none; b=OFrLPVS79wzZasWf6r7bpOMSr9CT4bBPwwZaDtULqBuBalKpGmufWnMBt8pGxFD9VaDOiRia0VJirTt3z0g7uWODsvYfKUAtg+M/7qQgvtkGLuNifGTIU69d5+il26/IJNoVHDriRbNgrFz2CGWUfBTPyo22aAPLR3pJ5uAEVPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728254916; c=relaxed/simple;
-	bh=y3h8isw+sZMArpTg2oGtcAYeewD1Io5xAzOKFkDScRw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jMGhMzsSBniJij3gTdxQefIOFFHRsn42lyBBC+UEV643pHgzmrP0jFNVo+ll2HrSMhLMHAsOWE206DWhrvibtJtp+lXb2sby7nue4XcncAc6YDXqjGLDc1OLkyBzb49TkixrzU/bRqRGGAlqxs8JULkh1mq5LskZrDCLwAdoVzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=I/Z3XDJV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=aEJPDCwTzsVRuDwSb7DoMTUdU0b4I0cCDfPqI9ISxjQ=; b=I/Z3XDJVA4SbIIZKnBvsmXhjJO
-	tqdykfk6TYww4px+t06rxGPQs6fD3NlPqq18ZCcJ23DYtpnRliSIdDwfscQly6dqTnkQzwDMOiwQX
-	DleNPM+Mg+Pf8rf0MTHfzedT+85ZvTfYzt4od8CZsEy7YDWSXPX3EKKkkPiLYGk5UFEo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sxa36-009DIR-I5; Mon, 07 Oct 2024 00:48:24 +0200
-Date: Mon, 7 Oct 2024 00:48:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ivan Safonov <insafonov@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: fix register_netdev description
-Message-ID: <a230dbf8-2390-4cbc-9aa6-ef3cd052dcc6@lunn.ch>
-References: <20241006175718.17889-3-insafonov@gmail.com>
- <844f8c95-634c-4153-bfab-d6a032677854@lunn.ch>
- <1ebce461-e4eb-4f10-9de8-19240193b262@gmail.com>
+	s=arc-20240116; t=1728255195; c=relaxed/simple;
+	bh=XFwrI8XxWICjlpwEBKdFcifZFMs4l9GCb+DOXufcVlc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=I0KwUfwFe6I/uXL+RSAbIomWcfqMSi24G3Y3edQu1U3Pl3yY5os1whv+6s0vnnqSD52z1FFLIlmfaXgJo2W0mn5ybosokfy6bz7ZR8BnBl7QnRtnZlfCgLqadWHhKzwLuDyknyf2Lms/Tb1n8aRwNovZhMGcRPDx0lgQDeg47UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=XZCtBEbu; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=jtiWoE34WuUUJ7TunblVC2arXjPBgbgFmdliX7DTq48=; b=XZCtBEbuqKLO/flo
+	P62AVQSVYAwNymaVnAdSKnU1f+bej6YOob6JOBpy1j84mlvjqdbiC8t7owHIs+sDmqQP4+wr5MrMh
+	v7WG8+GE5yVzg2xW5yk/I5h6XVoQfwHyC11z4fKEXQ2peWcEJVRW4WUVskmM0em8uXuWVnzDuUt8Y
+	Wz9rhkIhNu0+LogtuvetRUIuZV3YO8/zR9OnbijUxfx/haiijrc2Objd8Ai1k9/uZr5s+UPTLYA5w
+	2RR/Fdvg6IEFfqtf3gVpWvngq6U3VWFbWZRiEin1C5DshIRoYFp8LhhOdy4Gulqqj2mQ5PRMO3R+h
+	yeKWNKKtT726VTNLhg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1sxa7c-009LcO-1f;
+	Sun, 06 Oct 2024 22:53:04 +0000
+From: linux@treblig.org
+To: johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH 0/2] Some cfg80211 deadcode removal
+Date: Sun,  6 Oct 2024 23:53:01 +0100
+Message-ID: <20241006225303.121445-1-linux@treblig.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1ebce461-e4eb-4f10-9de8-19240193b262@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 07, 2024 at 01:00:19AM +0300, Ivan Safonov wrote:
-> 
-> 
-> On 10/7/24 00:16, Andrew Lunn wrote:
-> > On Sun, Oct 06, 2024 at 08:57:20PM +0300, Ivan Safonov wrote:
-> > > register_netdev() does not expands the device name.
-> > 
-> > Please could you explain what makes you think it will not expand the
-> > device name.
-> > 
-> > 	Andrew
-> 
-> It is the register_netdev implementation:
-> 
-> > int register_netdev(struct net_device *dev)
-> > {
-> > 	int err;
-> > 
-> > 	if (rtnl_lock_killable())
-> > 		return -EINTR;
-> > 	err = register_netdevice(dev);
-> > 	rtnl_unlock();
-> > 	return err;
-> > }
-> 
-> There is no device name expansion, rtnl lock and register_netdevice call
-> only. The register_netdevice expands device name using dev_get_valid_name().
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
- *	Take a completed network device structure and add it to the kernel
- *	interfaces. A %NETDEV_REGISTER message is sent to the netdev notifier
- *	chain. 0 is returned on success. A negative errno code is returned
- *	on a failure to set up the device, or if the name is a duplicate.
- *
- *	This is a wrapper around register_netdevice that takes the rtnl semaphore
- *	and expands the device name if you passed a format string to
- *	alloc_netdev.
+Hi,
+  These are a few unused functions a script of mine
+found.  They've been unused for a few years.
 
-So you are taking this comment to mean the wrapper. Then yes, the
-wrapper does not expand the device nice. So please move the text about
-expanding the name earlier. It is an important part of registering a
-netdev, so should be mentioned.
+Dave
 
-    Andrew
+Dr. David Alan Gilbert (2):
+  cfg80211: Remove unused cfg80211_background_cac_abort
+  cfg80211: Remove unused cfg80211_vendor_ functions
 
----
-pw-bot: cr
+ include/net/cfg80211.h | 54 ------------------------------------------
+ net/wireless/mlme.c    |  8 -------
+ net/wireless/nl80211.c | 11 ---------
+ 3 files changed, 73 deletions(-)
+
+-- 
+2.46.2
+
 
