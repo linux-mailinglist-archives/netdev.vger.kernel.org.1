@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-132448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92E37991C0C
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:29:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F933991C08
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:28:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B711C20FDD
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4501C20E95
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD06F16DC0E;
-	Sun,  6 Oct 2024 02:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6963B15383A;
+	Sun,  6 Oct 2024 02:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XLjWVY1P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CqcYtR1H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 866BAF4F1;
-	Sun,  6 Oct 2024 02:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB9F341C79;
+	Sun,  6 Oct 2024 02:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728181732; cv=none; b=tNXxm5UMO/y2+/+Nt9dkghC3/rbATONxekvCGkBToStNQnpcUYAbfZKj0pu5q6U+ta+74dt50ic6wtqOXNjZ/uF9MuCsmt2XtoXj3rCLCXIhWdylItZACMtH/ZoMSZo8kF92c14l2UiAEeKTTy3FzkHXdtDa97vUXtefwQ2YMtk=
+	t=1728181730; cv=none; b=ofrIFKn2fddBhTsLNHbV5GIJ7FnJWLRWYeSo07V+fH7KtfR47CYjVclKFfjLdi/0/Yg6NyPZhBYycxaDX8VxNy2cts4kpNJ5V52Gs9hz6QiFTQ7KoBvxTEfAgWZHG2TkIx6kjp6rxWfrFrdn4Hkn6Om2gOGLPJVKSKCHg88AEwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728181732; c=relaxed/simple;
-	bh=lCh5CXqspTJHc6tMFpUfxpdV0kFfI9PM8erAFghW+jE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H5PAFE1CjekBAMtzDZz2z5bM4msUtkH6+QbXgjW0B5Sn1VJxwsfrRZHNI4t8KuyxDoNPBbRAnZLH7oXMJAkRdRDfp+ICX44gqeYRjGVDXTQQVeAHA2AkVS3onzeBMCFMGSqx/C48RZiqtFRsO9gOMnDfZpAOTMUqAXTgtQXu2KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XLjWVY1P; arc=none smtp.client-ip=209.85.210.179
+	s=arc-20240116; t=1728181730; c=relaxed/simple;
+	bh=R3/zEAcwhIv1vvXu5eqLy8v9T/QO1blsvg8rxiWDF6o=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=hzUI9aDGlTo5uTb+87SIPKGKzMu+huga2a5d/tZd1VBh+7hZCYWe9Tt58Cs+vZAswi0oY7BAVR59JSx/DuxZPKGNSkJgrsJyWyneIj1ZBFgJrZ0dZ/i8KFeT+PZNP7vdTKS6xAKqrBDrz1Yx76VsNaYTXubDMj0hcxaJgdYh+O8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CqcYtR1H; arc=none smtp.client-ip=209.85.210.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71df2de4ed4so508010b3a.0;
-        Sat, 05 Oct 2024 19:28:47 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71df468496fso820431b3a.1;
+        Sat, 05 Oct 2024 19:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728181727; x=1728786527; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xnx/jTUrppaejL5NvesEO2y/0bRFcOzPWh1DuJoDJtM=;
-        b=XLjWVY1Ptr0TB4NjfespGLABBFSU5lIMKcn+vW9hUqKfpnS6G0r+l4Fn8T/RMyis6t
-         Fdotg+qVNkQeBdmD0srO8WztvkzNvo2fP+Pj3XSR4kT0+kicpvEXLjO8Oz6C8LcwkT63
-         E7d99WtAWPdawmRdjNR7/U6mubJ9L/EJyYi0VyJ++W3zhS1vF+BUd49mlD8NHtfF2F52
-         61dhWgOX6vm+KvaOVy56WTOebhYei5ET6Hmkb9XkinCXXnfcHCJmjA6V/1p4gzBFQW/X
-         vzQAIYAN9eJb4hlnB/hXPHqBoPgO/cRWcUmfnidwj4pfyZ30E2et4gHREknKG4P9Gta9
-         4ASQ==
+        d=gmail.com; s=20230601; t=1728181728; x=1728786528; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DoSnKsCafEyqo0X8z8XwraZSkcHXlpNQF2EXgefwFyU=;
+        b=CqcYtR1HnQK1mCuGKe1eSl5CbwOlOrs0WTuTM2joHB/JYIP0OoYKECFmOM3MLSVUNj
+         fe0ZppqpeSJyovYRNAAVKcyZMyDFR4DtOpagM3/XVquXASNwsmuvTB25NLcaWz3L3Ucj
+         0LN6xQ9ndwnaBGM+sk3pYUfdfOtXc5KgxT3cqRxk2OUBQOh1SU1FCEA7ec8VcAKYhjlQ
+         TpAEskefgg5xmC8f90h6tOYs4iNzQFsMyH/TZjSk134bgvFDcQ6sBCXTAoZF3znkpObz
+         zclEuugs+nDXk2Zz9B3R4SOrWYKccZD+h0sFl1xlcY7a2v8qFI6fnSFcdaOONl/2lBsA
+         gvUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728181727; x=1728786527;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xnx/jTUrppaejL5NvesEO2y/0bRFcOzPWh1DuJoDJtM=;
-        b=hBH8/mpT124yAeLhqouxwdxPhZgX7n/NV8CjfnWpc27kAo3fH5gOD6NURxo/IRU4ZV
-         z1gMMZ9fYd5XW5xfqd4Tuyn9a0tDEsAnOLlaJEwZVsvwPOcNDlQW8+yp5J0L9R0AojPQ
-         +VDOW5htphnlsFsyzb7Zn/roBhciv+nmsVlQ1yylF4OC0/DzEYJmAJMKNh+16Cf5XsyV
-         wdx2V06Tov9Nbfe+KsFkaJkAo3WYTTGeRvNtahEJSzD24a59i0GbSUVdZoowenndH0jS
-         nX1ZNte9JfYUaVoUwR/872HClvUFw3NZUleiY6BwtnS+Ue3f4MXxCf2107EKUL5ITC6e
-         6vwg==
-X-Forwarded-Encrypted: i=1; AJvYcCWLdV1dU/ap9LIrUFjDujtrfyps96DodwCbXxio7NtZY/7UL/oXlKSeK47Cp+qB5iRx5eXBmlJdnGv4cYs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYM02g6qooaw1toYAiIsHALHPrrlzA6OiB8CYccxrqXBmoPBFB
-	xK9Onx4bkIT2P1AgSAns5G5jomdFHhpDn5RjJNrtlZebIaeEGuuqvm+R1Q==
-X-Google-Smtp-Source: AGHT+IEG53HS5UgJUfwEmmqcivrDI0MzFEEtd0mkURmUZ4fl+NAgwf5/LGrEGyaTWEgvtxiIktghWQ==
-X-Received: by 2002:a05:6a00:1485:b0:717:9340:a9d0 with SMTP id d2e1a72fcca58-71dd5af2697mr20404033b3a.6.1728181726680;
-        Sat, 05 Oct 2024 19:28:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728181728; x=1728786528;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DoSnKsCafEyqo0X8z8XwraZSkcHXlpNQF2EXgefwFyU=;
+        b=VTdpgMKvNqFBMVX3BPIrzzVJiqisdR6/nyUDhSWXac7wHM/IIh3/U+RvxXdkzGv2y9
+         Haeiu7qDXieKU6n+1Qu8bf48CgO5UW7f//WmjiSw8DP1e5wSAyMroqRNdKJXa0Dp3W5f
+         040K1JQCeWwCtV3b7+z5nQpODyQJ8heTeFZzETChybr6EvkegDRmmBVaVwH4YOyhxHKk
+         IC6hgqWgNWnkCoAIfDmL+KQ+4oUwWXUGBU+6wlVq2klr+v7QVauYtZXQbPZ4R0a/lNrF
+         4/M23VNOglgTAjCkQcESvSXKi5AilTNWX/3f8Bvsa8b6vSkC/6l64PquTixx8Bhofd7s
+         YGeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUVsEZA66l4AbRRWynrf/vu2s2lBBxx+CDkzCXt+gKc8lCmpSl4hubYSNfT2LF2h+OUv72dl6Te7HqvDVY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw62sDVeDF6/+lZR2EAFW6ZmTyxeeOwqcVSDZUSP2YdFD/EkEgc
+	+pq4d0+9IlCbved7gXEMYHVYETy+y3LhZDDxISqPIvziL6cPReLzaN/hmQ==
+X-Google-Smtp-Source: AGHT+IFFynocdacD6Ln/TQul555D5kfu/nf14dPUR5eC+l/2etYoBBtuFiNT46qlQyy/Fwfd421c9g==
+X-Received: by 2002:a05:6a00:1906:b0:70d:2621:5808 with SMTP id d2e1a72fcca58-71de23c6976mr11999143b3a.9.1728181728059;
+        Sat, 05 Oct 2024 19:28:48 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbb9bcsm2103550b3a.6.2024.10.05.19.28.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbb9bcsm2103550b3a.6.2024.10.05.19.28.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 19:28:46 -0700 (PDT)
+        Sat, 05 Oct 2024 19:28:47 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -77,10 +79,12 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCH net-next 00/14] ibm: emac: cleanup modules
-Date: Sat,  5 Oct 2024 19:28:30 -0700
-Message-ID: <20241006022844.1041039-1-rosenp@gmail.com>
+Subject: [PATCH net-next 01/14] net: ibm: emac: tah: use devm for kzalloc
+Date: Sat,  5 Oct 2024 19:28:31 -0700
+Message-ID: <20241006022844.1041039-2-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241006022844.1041039-1-rosenp@gmail.com>
+References: <20241006022844.1041039-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,32 +93,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The modules are fairly old and as such can benefit from devm management.
+Simplifies the probe function by removing gotos.
 
-All except ZMII tested on a Cisco MX60W. No problems found.
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/ibm/emac/tah.c | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
 
-Rosen Penev (14):
-  net: ibm: emac: tah: use devm for kzalloc
-  net: ibm: emac: tah: use devm for mutex_init
-  net: ibm: emac: tah: devm_platform_get_resources
-  net: ibm: emac: rgmii: use devm for kzalloc
-  net: ibm: emac: rgmii: use devm for mutex_init
-  net: ibm: emac: rgmii: devm_platform_get_resource
-  net: ibm: emac: zmii: use devm for kzalloc
-  net: ibm: emac: zmii: use devm for mutex_init
-  net: ibm: emac: zmii: devm_platform_get_resource
-  net: ibm: emac: mal: use devm for kzalloc
-  net: ibm: emac: mal: use devm for request_irq
-  net: ibm: emac: mal: move irq maps down
-  net: ibm: emac: mal: add dcr_unmap to _remove
-  net: ibm: emac: mal: move dcr map down
-
- drivers/net/ethernet/ibm/emac/mal.c   | 107 ++++++++++----------------
- drivers/net/ethernet/ibm/emac/rgmii.c |  49 ++++--------
- drivers/net/ethernet/ibm/emac/tah.c   |  49 ++++--------
- drivers/net/ethernet/ibm/emac/zmii.c  |  49 ++++--------
- 4 files changed, 79 insertions(+), 175 deletions(-)
-
+diff --git a/drivers/net/ethernet/ibm/emac/tah.c b/drivers/net/ethernet/ibm/emac/tah.c
+index 8407ff83b1d3..03e0a4445569 100644
+--- a/drivers/net/ethernet/ibm/emac/tah.c
++++ b/drivers/net/ethernet/ibm/emac/tah.c
+@@ -90,28 +90,25 @@ static int tah_probe(struct platform_device *ofdev)
+ 	struct device_node *np = ofdev->dev.of_node;
+ 	struct tah_instance *dev;
+ 	struct resource regs;
+-	int rc;
+ 
+-	rc = -ENOMEM;
+-	dev = kzalloc(sizeof(struct tah_instance), GFP_KERNEL);
+-	if (dev == NULL)
+-		goto err_gone;
++	dev = devm_kzalloc(&ofdev->dev, sizeof(struct tah_instance),
++			   GFP_KERNEL);
++	if (!dev)
++		return -ENOMEM;
+ 
+ 	mutex_init(&dev->lock);
+ 	dev->ofdev = ofdev;
+ 
+-	rc = -ENXIO;
+ 	if (of_address_to_resource(np, 0, &regs)) {
+ 		printk(KERN_ERR "%pOF: Can't get registers address\n", np);
+-		goto err_free;
++		return -ENXIO;
+ 	}
+ 
+-	rc = -ENOMEM;
+ 	dev->base = (struct tah_regs __iomem *)ioremap(regs.start,
+ 					       sizeof(struct tah_regs));
+ 	if (dev->base == NULL) {
+ 		printk(KERN_ERR "%pOF: Can't map device registers!\n", np);
+-		goto err_free;
++		return -ENOMEM;
+ 	}
+ 
+ 	platform_set_drvdata(ofdev, dev);
+@@ -123,11 +120,6 @@ static int tah_probe(struct platform_device *ofdev)
+ 	wmb();
+ 
+ 	return 0;
+-
+- err_free:
+-	kfree(dev);
+- err_gone:
+-	return rc;
+ }
+ 
+ static void tah_remove(struct platform_device *ofdev)
+@@ -137,7 +129,6 @@ static void tah_remove(struct platform_device *ofdev)
+ 	WARN_ON(dev->users != 0);
+ 
+ 	iounmap(dev->base);
+-	kfree(dev);
+ }
+ 
+ static const struct of_device_id tah_match[] =
 -- 
 2.46.2
 
