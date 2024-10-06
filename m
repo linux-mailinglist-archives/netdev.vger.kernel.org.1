@@ -1,150 +1,97 @@
-Return-Path: <netdev+bounces-132527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B56F99206D
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 20:26:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7758399207D
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 20:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B94ABB218D3
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 18:26:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28B141F2164D
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 18:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C04C189912;
-	Sun,  6 Oct 2024 18:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B4D189F50;
+	Sun,  6 Oct 2024 18:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q91aauTT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gsMtp4pc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E249C155C8C
-	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 18:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32E717DFE4
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 18:54:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728239138; cv=none; b=ZAUCUVE4OXKd41kflfd3k4BitpIMVh96vUK1P33FwRtqspE6oX8fvmuFWkBxBxLkG/ElJeCdIYye6+zj9BsTHc2w2YPwnqOtwmzKp8kCnhsF7zf80rU+mjFaUBBLoPrXFbHfu8UbLsVbx+4c4AYNVZB+ZaIZtsYEavwQ+babziY=
+	t=1728240877; cv=none; b=dfWgLZZBklP2cYkVV5iILW9ko9yF7PTI7+1QqRuOMIQtTtOwCdZ6+hwxmacZA6WVnNVzfXXT7qvj76Wn3JAlJ5Ymd5WM8jVqMpk6IFZLpLcl7uooEVg/F3wkxQHnmoENb2wJwgKbW74do5+I7xbPYWA3LRUlVqbLGrKBxsFyzBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728239138; c=relaxed/simple;
-	bh=GOXuA667/KvfNcTRufrKjU1HrvuRDedhckFL/ph6J2s=;
+	s=arc-20240116; t=1728240877; c=relaxed/simple;
+	bh=eqLBEMAQSf+btZDJrl8RaAfXHa4b4S2cpfJaSx0Q28U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UHnbuAzATbGygNXj6ZfIFGe13juGNFDQTeQWIuGdqlfbSKZpwLRxJT+1aoOAl5oQvcfFjOOI95D/iKBA7rPIRMX1iehQf/V+pOAsOcpzrIdIq0rmaO2haBHSeROj9K8jjuDOW7kmGNI7dzwLaLViygExYiQrNWqen7Oh8YVzXnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q91aauTT; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-83493f2dda4so153935239f.1
-        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 11:25:36 -0700 (PDT)
+	 To:Cc:Content-Type; b=h9nehE9RTvcMd0qE4SkLHxKJ5W7jVuulf83PkMHQcC+i/dRzrkk8L0XPPAZCBiCcsrl2FnMdqOJs2torEBiocrW078ff650iK2CeYa1wWznYkcuEboqrx/OvDKbsA6mSicjRCsez4Juua7VBFOdpfIyPZ7ZkluNjTfihcppLtNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gsMtp4pc; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cb7a2e4d6so36695045e9.0
+        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 11:54:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728239136; x=1728843936; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728240874; x=1728845674; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EOZ/WTGAoOT4W2R2w6YskYNJvK7COpKZCbaU7/u/Lis=;
-        b=Q91aauTTqYrdbmcQd7sX8S3KVyqik+B3yCRMF43qOYgDGER0Ebc7LcoLrFE70dL/if
-         +jdxGGTexylwfKYPQIg9NM+deYMgfrpDjDagjTrvjhx1worrRtkWw0XMbIXhLF8s8FJ4
-         zF+gNEwQ4357qrDi1csTKjLTYj3xylggAiFIY7DwB26hRH2+KW3/tE5ZduHF4sc2Qx9z
-         f7gH0Uj+GTVtBzF5FJF/rqSH6928WNAkjYjeNCldGL7Kt72ETgSjC023ql0vx3M74A4g
-         BBYjCB7XC3aD58JvcYEBzWykvizhA8TOs/p6odeSf8fveh4WW+D9xrY8YC1FZlR2+w9j
-         LLdA==
+        bh=eqLBEMAQSf+btZDJrl8RaAfXHa4b4S2cpfJaSx0Q28U=;
+        b=gsMtp4pcdMjLL4Y88BD9N0HokvxK+Fu4pwRphnrCfnHO0GHqwo0kSvdVGG1DJndi7a
+         snikzzMahY2YSpA8S5RUVlcm6IerfAOAWJXM8jMckPW3i85IIJm1ik2f/yaduFO0augX
+         dKROfIQzrigBJhpTrbO/fdaKN2T4yHOAaOxWW7pAXS6x5UR+ZPNf5VCq4Np0nzXt+NP7
+         SsN1dGCtk6GMeDJ3tyhmLCL7MckmV3V0VQxSQIImqr9AWnetvAQzgWwMlobI/WMzlGie
+         lvdTVZD+9m5MIiMp/sZICmjIUJvOQ1zcc9D9LkZiHP8FPWoUWsZtnQxrSvcNIRRKDMzu
+         5FkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728239136; x=1728843936;
+        d=1e100.net; s=20230601; t=1728240874; x=1728845674;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EOZ/WTGAoOT4W2R2w6YskYNJvK7COpKZCbaU7/u/Lis=;
-        b=jl/UAj/mPVRLfwj+ZDRCnkCUww06IMD9ge77DjNIZBUDlHYUgQyobMpaFdbBrd9z+D
-         qDHmT8y/RqLqUbKO3KQLqHyuxys3QA1wLUa53SoCD3HHttM9W3rMkmLuKEtgdcAFGFT+
-         OFeLEptfGw53SubQl/oi80J5TGJkkn7V+Gb4ZTNcT+yfvcxWpdBgCAcHAbNWH9+xJEDr
-         eRiI32QCWete/QetTuHCe2fZdxNKy0sh2cFWGuDuTnuGKDfKr5uBjAmXRAszpYd23EYg
-         hPzq20Gwh9ew5sf3sXVBSRZVGPQEDUM5we3HdlsClN7QzmHmxtB+CDXD9jLdBih/E9z6
-         J07g==
-X-Forwarded-Encrypted: i=1; AJvYcCWmcDM0ziZixefejI62nJF6dIbXwxAxwTGxUChAuZpWPxPldoMYDi0uMctNE9w/A/l5C964WVE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZCtqc1F33Kg7Kc4XNPdMQHwoNW9ETMujML8y236NVwzuuRIAe
-	z1EZ1T1i/tn5I/gen4UNLyIEmKwVv96KeoHNsNXegEeW9h7vtSS7qb7+aILXeSqnrlcz7DFHpKj
-	iQK5e+JA3YwDTMzCHXAmOf2/pq6g=
-X-Google-Smtp-Source: AGHT+IEINzYP1FuOFzBoJpNRmt/M9CzfUbSf02E/HgWVgKnCgerNVT10nHARx2Jfmk32fshAM8xS/IwDLBkuH+Xy9ZU=
-X-Received: by 2002:a05:6e02:148b:b0:395:e85e:f2fa with SMTP id
- e9e14a558f8ab-3a375c3a577mr72028535ab.1.1728239135981; Sun, 06 Oct 2024
- 11:25:35 -0700 (PDT)
+        bh=eqLBEMAQSf+btZDJrl8RaAfXHa4b4S2cpfJaSx0Q28U=;
+        b=KX/QgXsWf5NzGJMKOCFvX+AfK1W/5BlbKoo3PL/XThT76MGqjGJwrhDZJh+NhJ816L
+         jhFQ9ewIWLo4rgdEbHDs9ppV5R6FmC6yoYCBvUrvxjZDm0xetyoPX1n2kH3QCthWz8k3
+         1OftqS4mjgXslPq0ZwJ8+oExt2Tj+p6uqq5UkUIADaSB5Bne9W4yxR6kJUJqeHaBzSbM
+         0W/WXcGsxJ/Y3hrUdjl6CXVMCF91UJvoBjU2k0iv9OvC2HlU7Ggr/htEoVKQaPMNF0kZ
+         jNi5lZWyer9X/WSDcEZNnTI0gHrBqWVeAb6uizhpxdxsh1toLux3e5zabRDGLEvhwrFF
+         X2PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQyJKanDLieZWvWzW03XV74cbdcZ1951HOdvATsYL7GVx62bZQ4dvvmOWhF/wFHl63cH97YIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGKCTamaNUPvUSkKWK7pSLFqNF7bR08QjLhc7XPXYl0F5eLFkk
+	juJwm1iH8LC0nm11o7H6c3en7TfbDShwlGi5l4JHKsWNbVG15u8Wc0JP+k80XE9LaS1fvN86c+2
+	lQuNiL1j5m+lUqtto7dHEdq79FXXD2dSFqHqr
+X-Google-Smtp-Source: AGHT+IEBiO/p3rx2bqlm2dNlsaStD3PfVO0kyL833nSsNH/LU86Lec0Czjjz9Pufcg5yfRoHyp+1MEUcGei7MBMxt+0=
+X-Received: by 2002:a5d:5604:0:b0:37c:c5c2:c692 with SMTP id
+ ffacd0b85a97d-37d0e4f8a06mr4736312f8f.0.1728240873781; Sun, 06 Oct 2024
+ 11:54:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930180916.GA24637@incl> <CANn89iJQDWEyTC5Xc77PEXyxbbvKjm=exb5jKB0-O3ZzZ=W1Hg@mail.gmail.com>
- <20241001152609.GA24007@incl> <CADvbK_cmi_ppJyPwmh77dHgkm=Lh52vtEWddwSAFNhZpmmev6Q@mail.gmail.com>
- <20241003170126.GA20362@incl>
-In-Reply-To: <20241003170126.GA20362@incl>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Sun, 6 Oct 2024 14:25:25 -0400
-Message-ID: <CADvbK_e_Etot3nzMC=FEt-cqoWfnER4SVOC5dOm6aH43iME1iA@mail.gmail.com>
-Subject: Re: [RFC PATCH] ipv6: route: release reference of dsts cached in sockets
-To: Jiri Wiesner <jwiesner@suse.de>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>
+References: <20241005222609.94980-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20241005222609.94980-1-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 6 Oct 2024 20:54:20 +0200
+Message-ID: <CANn89iKQhxEPRVKmxDZp4SR8x+SaOZyWQv1dvW37PtietpBPKg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4] net-timestamp: namespacify the sysctl_tstamp_allow_data
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	willemdebruijn.kernel@gmail.com, willemb@google.com, kuniyu@amazon.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Oct 3, 2024 at 1:01=E2=80=AFPM Jiri Wiesner <jwiesner@suse.de> wrot=
-e:
+On Sun, Oct 6, 2024 at 12:26=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> On Wed, Oct 02, 2024 at 04:27:55PM -0400, Xin Long wrote:
-> > On Tue, Oct 1, 2024 at 11:26=E2=80=AFAM Jiri Wiesner <jwiesner@suse.de>=
- wrote:
-> > > I am afraid this patch is misguided. I would still like to find the s=
-ource of the dst leak but I am also running out of time which the customer =
-is willing to invest into investigating this issue.
-> > Is your kernel including this commit?
-> >
-> > commit 28044fc1d4953b07acec0da4d2fc4784c57ea6fb
-> > Author: Joanne Koong <joannelkoong@gmail.com>
-> > Date:   Mon Aug 22 11:10:21 2022 -0700
-> >
-> >     net: Add a bhash2 table hashed by port and address
-> >
-> > After this commit, it seems in tcp_v6_connect(), the 'goto failure'
-> > may cause a dst leak.:
-> >
-> >         dst =3D ip6_dst_lookup_flow(net, sk, &fl6, final_p);
-> >         ...
-> >         if (!saddr) {
-> >                 saddr =3D &fl6.saddr;
-> >
-> >                 err =3D inet_bhash2_update_saddr(sk, saddr, AF_INET6);
-> >                 if (err)
-> >                         goto failure; <---
-> >         }
-> >         ...
-> >         ip6_dst_store(sk, dst, NULL, NULL);
+> From: Jason Xing <kernelxing@tencent.com>
 >
-> Thanks for pointing this out. 28044fc1d495 seems to be an interesting com=
-mit as far as the number of Fixes is concerned. The commit was not backport=
-ed to the 5.14-based SLES kernels, for which the unbalaced refcount bug was=
- reported. The commit is part of the 6.4-based SLES kernels so I will have =
-to see if all the patches with Fixes tags have been backported.
-> J.
-Hi, Jiri,
+> Let it be tuned in per netns by admins.
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-We recently also encountered this
-
-  'unregister_netdevice: waiting for lo to become free. Usage count =3D X'
-
-problem on our customer env after backporting
-
-  Commit 92f1655aa2b22 ("net: fix __dst_negative_advice() race"). [1]
-
-The commit looks correct to me, so I guess it may uncover some existing
-issues.
-
-As it took a very long time to get reproduced on our customer env, which
-made it impossible to debug. Also the issue existed even after
-disabling IPv6.
-
-It seems much easier to reproduce it on your customer env. So I'm wondering
-
-- Was the testing on your customer env related to IPv6 ?
-- Does the issue still exist after reverting the commit [1] ?
-
-Thanks.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
