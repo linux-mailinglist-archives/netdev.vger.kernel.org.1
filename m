@@ -1,122 +1,127 @@
-Return-Path: <netdev+bounces-132434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD830991BC5
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 03:39:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F31C991BD9
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 03:56:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD834B21ACE
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 01:39:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B972E1F21AEC
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 01:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BC015383A;
-	Sun,  6 Oct 2024 01:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6417C16EB55;
+	Sun,  6 Oct 2024 01:55:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="etxYSCv+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bHJhnSlc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65BA14A0A4;
-	Sun,  6 Oct 2024 01:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6F879CD;
+	Sun,  6 Oct 2024 01:55:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728178783; cv=none; b=gKy5IRYxFimwkDSZs7N0giMogPQ1U88N6j2wX/PtCtObiZz/RsQLQKpdMlM6C+C+2QDRux8a72D5V86lLazyTa9JS0cCEct2aEBL6mRr/WiLPFvFq7B8W6icmDGeMoW+ukz7dLJ/i6fLPQbyiFc1xKtioD6dmT/LQMIi2ilOvT0=
+	t=1728179746; cv=none; b=LP318No42i0OaqiwKWZMISmKiFXkbwrQCUbJs1F8sfV9Mal+phTOyTebVl2hYn2rvyMB4tpP0RYJAM6NCMNKeuwZovG3k46+qD4Rz9eMVExPMSx1ONhvSx3lXcsDygfv4T7L2wxuQYM9in9YX63v960FPHoizN6I3ePzcuc4QuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728178783; c=relaxed/simple;
-	bh=pYSc6OiU9q1iKa1xX0rwZ0lR9e6LiTxKsuskqYnE4HU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BqrnVUV1w8NfBAyxGgNhr6cHJJn0Nc4+NJcKY8Gh/dNHMSjtDGnIVzVGHxsPtBZvcEGKpSvkk9CEsjtpYTQ46ogVQtRUeHvoS1lUTUhYvjd8k18SdbPHXdosWzPyErHm4eKUQ0LrVKDAf9prVJvHVDdgkuL7sSdc8yd18/cXMJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=etxYSCv+; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2e1bfa9ddb3so2511104a91.0;
-        Sat, 05 Oct 2024 18:39:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728178781; x=1728783581; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kNE28Sv8c9PciX0+hCX7nPdBUet0b7HWalzU8LzDp1c=;
-        b=etxYSCv+D3g4/EjcV0kszYeiMz4S1brRgMdrlSqDJETnuqanJcBcJPgqzE5n18d/P0
-         mZQrVmNVrBV7tR3+n9fziM0CL8WDRSf8su7aBrPDFPb66WmPwOCGtvRK8LsIyeMneG1y
-         MmSxI5w13YRZZl3Nc/zTixsei6bP+tPy9nD07X6qtVXnDfTLnGEOrQ4TkXXUJkLsj6UW
-         chQ+AmoJ7TLTwO5JEVe5qi5jIxqS2DUGBy0WtbZsr0JSQoRP1p8BLY+ttARL7W5fYKom
-         jtWXo9ttRwil8RobkzsKaLk8X7wBzxZjU5AnAnoIaOqupD288XEBbzu1Kk43I+ByYPKr
-         fp4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728178781; x=1728783581;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kNE28Sv8c9PciX0+hCX7nPdBUet0b7HWalzU8LzDp1c=;
-        b=wjld677w66kr13YPnGyUO/8gN3UPLyTU+ME95kM2JWsQcZqPRPRhtOpjGc6bxd/mPa
-         M4xJYB4DfmPZEuQnhiwX3e1KKW0oN53o5kIKvcolEous/AhEekHbNjwqZrdNOEndr8W6
-         eUSgKEYyHYw2Mw3xBZz2x30I6mkXMB1ldvp2Cm2z9NAKk7ZJwVC+yKS8shP2DVP/qKUN
-         ptQycZW/EynF70LSSMbBJfi5Ub9RKF6dWaHFujB4QHNb5wdsvYTbK7Jg3MNKNG1rQnVt
-         KLBnOQw0AHGIHZiy4xNiEXngue59dItMf7Ies+XF9WXh2dhy4LKsB2qmI/LbO9vhgRU6
-         mSYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVhi9F07hfRpBKgyC6aiMmpi1beKmMeAPGlipqHYRgjOaeoIDBLW7aXevuMHogJEP7PkuNkxBPSugrSr6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzogGGrwFwZKAbhNWlsbkGf/srMry9fMwSv6IZ8hxPWvcME6okT
-	FYeV7UrJScDOMnZkVj7E5/TvRmC/Bz8icCRo4xSuQrx2w3IdDSV0Ce16gA==
-X-Google-Smtp-Source: AGHT+IG8Oe7ycEcoa/ELyN1z6vBugxKaa+tkUCsDG2fj6jGmblMGDfHiuimp+BiRrGbqF4NWOigU7w==
-X-Received: by 2002:a17:90b:3890:b0:2e1:e280:3d59 with SMTP id 98e67ed59e1d1-2e1e639f23amr8600486a91.33.1728178780749;
-        Sat, 05 Oct 2024 18:39:40 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1e83cab42sm4311359a91.2.2024.10.05.18.39.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 18:39:39 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] net: bgmac: use devm for register_netdev
-Date: Sat,  5 Oct 2024 18:39:37 -0700
-Message-ID: <20241006013937.948364-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728179746; c=relaxed/simple;
+	bh=/4L+Waftv30hJTd8pHAaY7MDs2ik61gNjRPrwI78SK4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rs7lWhEgKgtboQkS2yenDkRykYlGFQt5/01n7rhw//hm4PIJrYSZUlKwMb+vZeNZDTa3js21Fwb/g+uKo35QzwZLlbztusZr4Vraiqu8FlrJYeYh115nJjXRIkJ9wQXj6ANLcLYLRoU7HWqQHDlzJ0N7RuTLao5d6zNmxNH+oyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bHJhnSlc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 442DCC4CEC2;
+	Sun,  6 Oct 2024 01:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728179745;
+	bh=/4L+Waftv30hJTd8pHAaY7MDs2ik61gNjRPrwI78SK4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=bHJhnSlcDypCxKXc9/0e8sSwcsPUcNs5OrzLmNK372VoYuGepvQT+MeJe7gZxz24S
+	 Td8OetlGIX6VQqxeo+oLpBwCwYCr2xh0kr7HWG2dWxJwS9C9I5+F0Ozm3XgnvgOi6R
+	 eyo7cMIiqgZ5im6lRwsEC9egd6IBXTkhxhVOAfSeJ6SqQ1OAUWk36taYJoiLw9dpJ9
+	 1TD2kMI24gaTyunNoaEycYfyV8WJ6EL2ZaaiP5SsbbYsVWCcKHV7TrlwKb7lUEYqTY
+	 l48kzmdHzTLb/dBfgaSN3gUHXAeR3ENezjiB4lZZ+5JAICFVxSM/ycZNnlcwg/pUoP
+	 0Njb/XOnUh7ew==
+From: Bjorn Andersson <andersson@kernel.org>
+To: linux-gpio@vger.kernel.org,
+	Julia Lawall <Julia.Lawall@inria.fr>
+Cc: kernel-janitors@vger.kernel.org,
+	audit@vger.kernel.org,
+	linux-mtd@lists.infradead.org,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	linux-arm-msm@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linux-usb@vger.kernel.org,
+	linux-mm@kvack.org,
+	maple-tree@lists.infradead.org,
+	alsa-devel@alsa-project.org,
+	Sanyog Kale <sanyog.r.kale@intel.com>,
+	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+	dccp@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	Jan Kara <jack@suse.cz>,
+	drbd-dev@lists.linbit.com,
+	linux-sound@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	nvdimm@lists.linux.dev,
+	linux-leds@vger.kernel.org,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	linuxppc-dev@lists.ozlabs.org,
+	tipc-discussion@lists.sourceforge.net,
+	Robin Murphy <robin.murphy@arm.com>,
+	iommu@lists.linux.dev,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	linux-trace-kernel@vger.kernel.org,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	linux-nfs@vger.kernel.org,
+	amd-gfx@lists.freedesktop.org,
+	linux-wireless@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: (subset) [PATCH 00/35] Reorganize kerneldoc parameter names
+Date: Sat,  5 Oct 2024 20:55:35 -0500
+Message-ID: <172817973322.398361.12931602917664759173.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240930112121.95324-1-Julia.Lawall@inria.fr>
+References: <20240930112121.95324-1-Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Removes need to unregister in _remove.
 
-Tested on ASUS RT-N16. No change in behavior.
+On Mon, 30 Sep 2024 13:20:46 +0200, Julia Lawall wrote:
+> Reorganize kerneldoc parameter names to match the parameter
+> order in the function header.
+> 
+> The misordered cases were identified using the following
+> Coccinelle semantic patch:
+> 
+> // <smpl>
+> @initialize:ocaml@
+> @@
+> 
+> [...]
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/broadcom/bgmac.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Applied, thanks!
 
-diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
-index 6ffdc4229407..2599ffe46e27 100644
---- a/drivers/net/ethernet/broadcom/bgmac.c
-+++ b/drivers/net/ethernet/broadcom/bgmac.c
-@@ -1546,7 +1546,7 @@ int bgmac_enet_probe(struct bgmac *bgmac)
- 
- 	bgmac->in_init = false;
- 
--	err = register_netdev(bgmac->net_dev);
-+	err = devm_register_netdev(bgmac->dev, bgmac->net_dev);
- 	if (err) {
- 		dev_err(bgmac->dev, "Cannot register net device\n");
- 		goto err_phy_disconnect;
-@@ -1568,7 +1568,6 @@ EXPORT_SYMBOL_GPL(bgmac_enet_probe);
- 
- void bgmac_enet_remove(struct bgmac *bgmac)
- {
--	unregister_netdev(bgmac->net_dev);
- 	phy_disconnect(bgmac->net_dev->phydev);
- 	netif_napi_del(&bgmac->napi);
- 	bgmac_dma_free(bgmac);
+[24/35] soc: qcom: qmi: Reorganize kerneldoc parameter names
+        commit: eea73fa08e69fec9cdc915592022bec6a9ac8ad7
+
+Best regards,
 -- 
-2.46.2
-
+Bjorn Andersson <andersson@kernel.org>
 
