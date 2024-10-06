@@ -1,102 +1,254 @@
-Return-Path: <netdev+bounces-132487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE290991DEB
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 12:45:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F185991E11
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 13:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEE7A1C20E92
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 10:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC1801C20FA7
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 11:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EB71741F0;
-	Sun,  6 Oct 2024 10:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA7D175D3E;
+	Sun,  6 Oct 2024 11:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="dq8y0TQ0"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KMPf2RQ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 919952F2E;
-	Sun,  6 Oct 2024 10:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B49171099
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 11:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728211513; cv=none; b=fRIpXCDKex74ySwBtoYBOy8hZXG+6Nc5o4fpqQrihUTYXIf/pb7KjRUnHsXE6o41i5AbzULGVVewuvm2Wet2dqJ5SmrdE5AXfMCQHtlgML2t4PXS0XDZNXkt/A9npf7gMiVkUAS1Lz+kch/eef8zK3Ud3TtCCDBjA67zWH9gUzg=
+	t=1728213639; cv=none; b=GbsvJKy1R2zquAjBpTjddLkv8Yb/YSFDIjCTuy274kPgUARLJDpiYBMqtUULihHBmNVX7jo54S7+ebEQ3GNsGOUdwJ3OKpKHTcMGMSKIj6ERXVJdECeI7xi0tguK9v4gCK9Dzl3+WGKFVbeFcRW065Tg1P7Y0ZfBFGUrBbLKOQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728211513; c=relaxed/simple;
-	bh=CPhsJDr1Y8WXIZybKLVZDghsipg79KfwwGX3fuXsAZA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QT4wHCEK8z+ErniDwKwnXIG7VfcXftkVi6gNXzNW7ChIVu9HlVsblqQtu4NIUQQ9tW4hWL568aOBhlsedVExs9+1CzoV5bRRtHTh3tTfNDoe1W8OQlcQIEr59nlMzRfJ41NZy66g1yBScLf8xBcfHMvLjUIK7kLuFAo024vpZkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=dq8y0TQ0; arc=none smtp.client-ip=49.12.72.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
-From: Fiona Behrens <me@kloenk.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
-	t=1728211507; bh=x4bc5/MtmtxPmd8Avrd5pQhLXoVlTs3I+eKRvlangz4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=dq8y0TQ0ZhAjglJ0eWWsvZNxDSR/1P1QD859vD9H/koF/h27qzKjqVTOQxwOcyQdA
-	 95dHY76TMK4X8K472BeYXJ6Hr4AIMDFaOwubKs1cl/1G9vUBCaDLoRZdHeXijXesLW
-	 7xRVsevhh+67sH64lKF3tGzE5tYQezeDyeQ11aYI=
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
- ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/6] rust: time: Implement addition of Ktime
- and Delta
-Date: Sun, 06 Oct 2024 12:45:06 +0200
-Message-ID: <A3581250-0876-42FC-9B3F-67F437CC16AC@kloenk.dev>
-In-Reply-To: <e540d2cd-2c47-4057-9000-8d403247abf6@lunn.ch>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-4-fujita.tomonori@gmail.com>
- <e540d2cd-2c47-4057-9000-8d403247abf6@lunn.ch>
+	s=arc-20240116; t=1728213639; c=relaxed/simple;
+	bh=xwtqRkymQbWLyrHFQs3l8k1xM6HJQbYROF9P9jVE/4Q=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOqsvua/I9K4kPMtiufduxj2pny5jJJYBmX0d+gp3vvDaKi4+lz0hoWP7qsxcxtjMqWDUCOIrJozlWm2xbBG76aV+AcZT/zlyXcljTiQMU0DXEQyhB8zz5EDajgmyqWjz6a3NMMLmJFwFy+yBQTq/LxDLZuZ1K7YMlyv54lhGqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KMPf2RQ2; arc=none smtp.client-ip=209.85.218.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-a8d51a7d6f5so545208166b.2
+        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 04:20:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1728213636; x=1728818436; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rPsiLERRYU7D4j4sUXncuZrtdOCgoc8Hb9DOFm6I+ts=;
+        b=KMPf2RQ2S80PWikuJAszy5ChAGaZ3wfgUaxRHVPphN2a4+mzYYDhJyskVxY63NEli+
+         fKc+45p+rrDk3Uj2IVirwYWG3HB0VYaB5ez10VsEfKW0CH/D9FqenB63qpYmHPC9p7X8
+         q7S+Ok+nPWKcklc+PRAmch99W4iIskS/24qg4OIDxK9+7A0zH8lnTLH/mDf62amT/5bm
+         nxQnC3xStf3uZwvd2urCAGgWZGNSSOfu1RzOOaZ1jNVCRvhhsFIOKfzdQNEq4K2syw7R
+         zKQ8WuSpdgSRSwdwkgtDDp37upC4bsrdSNh9m4niu/+3j6Yyc3oqRP8ZgEOcDTrDiWd7
+         WExw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728213636; x=1728818436;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rPsiLERRYU7D4j4sUXncuZrtdOCgoc8Hb9DOFm6I+ts=;
+        b=FxjoGVr8o0kpa5kk6o4go7HbTJozKEfUHBBTvWVohUYKNV9Gzia7W8oRDE/CUO13g9
+         EqHHsgmMl53wFan7VZlCUdgvMs1l97FsePBhNFdAQSRqbvMc8hHmnJKZBA/6EcclE0F0
+         3ONKdKKqki19si7WI+MTgKN1BGhebv62hub9C/L2iiAv7ibixyKFyxsXbIci0GWQ43V8
+         98fCZzh40dnzQwVXlOIUQTPSeMKQRgY75uXV5qaJjSbxLthZKEzi6dkGnbalj/VW++Zk
+         JvOmuSwF/b7DiGr9JszqhmudUeDy4nsZUn0EYwzGj1As0cczzMYSBU0rS8nRLlnOAIFl
+         fhYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNKNlplQ5fq9yFneokOv2k7PMqLomOIUQf1gaQFanOZ1CpyJuUlnAIxSECaHw/lJiRGsI3tdI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvSyR2uQ76BLBXoRPnZmlrNwmE/8Kolg7Z22UHRC3Ds+KmaXWF
+	hbT7os40LaFYxhl9t5UDv0JgIWtlurRYyvB5MRPWlmE4uSQQtq4m0telBPPFtvc=
+X-Google-Smtp-Source: AGHT+IG48id+lRY4xtL1ujqx4VpcR8QxySGV9q44wlS56hapCTBDQPNEacp1RsUNT7MPHUN2ohWifQ==
+X-Received: by 2002:a17:907:7f89:b0:a99:435c:89f2 with SMTP id a640c23a62f3a-a99435c8ce0mr357354766b.63.1728213635990;
+        Sun, 06 Oct 2024 04:20:35 -0700 (PDT)
+Received: from localhost (host-79-32-222-228.retail.telecomitalia.it. [79.32.222.228])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a993d92ed5dsm185689766b.63.2024.10.06.04.20.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Oct 2024 04:20:35 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Sun, 6 Oct 2024 13:20:51 +0200
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>, Lizhi Hou <lizhi.hou@amd.com>
+Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
+ parsed from DT
+Message-ID: <ZwJyk9XouLfd24VG@apocalypse>
+References: <ZvZVPA6ov5XgScpz@apocalypse>
+ <20240928201717.GA99402@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240928201717.GA99402@bhelgaas>
 
+Hi Bjorn,
 
+On 15:17 Sat 28 Sep     , Bjorn Helgaas wrote:
+...
+> From your earlier email
+> (https://lore.kernel.org/r/Zszcps6bnCcdFa54@apocalypse):
+> 
+> > Without this patch the range translation chain is broken, like this:
+> 
+> > pcie@120000: <0x2000000 0x00 0x00    0x1f 0x00                0x00 0xfffffffc>;
+> > ~~~ chain breaks here ~~~
+> > pci@0      : <0x82000000 0x1f 0x00   0x82000000 0x1f 0x00     0x00 0x600000>;
+> > dev@0,0    : <0x01 0x00 0x00         0x82010000 0x1f 0x00     0x00 0x400000>;
+> > rp1@0      : <0xc0 0x40000000        0x01 0x00 0x00           0x00 0x400000>;
+> 
+> The cover letter said "RP1 is an MFD chipset that acts as a
+> south-bridge PCIe endpoint .. the RP1 as an endpoint itself is
+> discoverable via usual PCI enumeration".
+> 
+> I assume pcie@120000 is the PCI host bridge and is already in the
+> original DT describing the platform.  I assume pci@0 is a Root Port
+> and dev@0,0 is the RP1 Endpoint, and the existing code already adds
+> them as they are enumerated when pci_bus_add_device() calls
+> of_pci_make_dev_node(), and I think this series adds the rp1@0
+> description.
 
-On 5 Oct 2024, at 20:07, Andrew Lunn wrote:
+Correct.
 
-> On Sat, Oct 05, 2024 at 09:25:28PM +0900, FUJITA Tomonori wrote:
->> Implement Add<Delta> for Ktime to support the operation:
->>
->> Ktime =3D Ktime + Delta
->>
->> This is used to calculate the future time when the timeout will occur.=
+> 
+> And the "ranges" properties are built when of_pci_make_dev_node()
+> eventually calls of_pci_prop_ranges().  With reference to sec 2.2.1.1
+> of https://www.devicetree.org/open-firmware/bindings/pci/pci2_1.pdf
+> and
+> https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#ranges,
+> I *think* your example says:
+> 
+> pcie@120000 has:
+>   child phys.hi	      0x02000000    n=0 p=0 t=0 ss=10b
+>   child phys.mid,lo   0x00000000_00000000
+>   parent phys.hi,lo   0x0000001f_00000000
+>   length hi,lo        0x00000000_fffffffc
+> 
+> which would make it a bridge where the child (PCI) address space is
+> relocatable non-prefetchable 32-bit memory space at
+> 0x00000000-0xfffffffc, and the corresponding parent address space is
+> 0x1f_00000000-0x1f_fffffffc.  That means the host bridge applies an
+> address translation of "child_addr = parent_addr - 0x1f_00000000".
+> 
+> pci@0 has:
+>   child phys.hi	      0x82000000    n=1 p=0 t=0 ss=10b
+>   child phys.mid,lo   0x0000001f_00000000
+>   parent phys.hi      0x82000000    n=1 p=0 t=0 ss=10b
+>   parent phys.mid,lo  0x0000001f_00000000
+>   length hi,lo        0x00000000_00600000
+> 
+> which would make it a PCI-to-PCI bridge (I assume a PCIe Root Port),
+> where the child (secondary bus) address space is the non-relocatable
+> non-prefetchable 32-bit memory space 0x1f_00000000-0x1f_005fffff and
+> the parent (primary bus) address space is also non-relocatable
+> non-prefetchable 32-bit memory space at 0x1f_00000000-0x1f_005fffff.
+> 
+> This looks wrong to me because the pci@0 parent address space
+> (0x1f_00000000-0x1f_005fffff) should be inside the pcie@120000 child
+> address space (0x00000000-0xfffffffc), but it's not.
 
->
-> Since Delta can be negative, it could also be a passed time. For a
-> timeout, that does not make much sense.
->
+Exactly, that example refers to the 'uncorrected' case, i.e. without the
+patch applied.
 
-Are there more usecases than Delta? Would it make sense in that case to a=
-lso implement Sub as well?
+> 
+> IIUC, this patch clears the upper 32 bits in the pci@0 parent address
+> space.  That would make things work correctly in this case because
+> that happens to be the exact translation of pcie@120000, so it results
+> in pci@0 parent address space of 0x00000000-0x005fffff.
 
-Thanks,
-Fiona
+Right. I think we sould split it into two issues:
 
->> +impl core::ops::Add<Delta> for Ktime {
->> +    type Output =3D Ktime;
->> +
->> +    #[inline]
->> +    fn add(self, delta: Delta) -> Ktime {
->> +        // SAFETY: FFI call.
->> +        let t =3D unsafe { bindings::ktime_add_ns(self.inner, delta.a=
-s_nanos() as u64) };
->
-> So you are throwing away the sign bit. What does Rust in the kernel do
-> if it was a negative delta?
->
-> I think the types being used here need more consideration.
->
->     Andrew
+[1] RP1 acknowledges a 32 bit BAR address from its config space while the
+device must be accessed using a 64 bit address (that is cpu address
+0x1f_00000000), which sounds strange to me but I guess that is how
+the hw interconnect has been designed, so we need to cope with it.
+
+[2] I still think that the of_pci_set_address() function should be amended
+to avoid generating invalid 64 address when 32 bit flag is set.
+
+As you noted, fixing [2] will incidentally also let [1] work: I think
+we can try to solve [1] the proper way and maybe defer [2] for a separate
+patch.
+To solve [1] I've dropped this patch and tried to solve it from devicetree,
+modifying the following mapping:
+
+pcie@120000: <0x3000000 0x1f 0x00    0x1f 0x00                0x00 0xfffffffc>;
+
+so we now have a 1:1 64 bit mapping from 0x1f_00000000 to 0x1f_00000000.
+I thought it would result in something like this:
+
+pcie@120000: <0x3000000 0x1f 0x00    0x1f 0x00                0x00 0xfffffffc>;
+pci@0      : <0x82000000 0x1f 0x00   0x82000000 0x1f 0x00     0x00 0x600000>;
+dev@0,0    : <0x01 0x00 0x00         0x82010000 0x1f 0x00     0x00 0x400000>;
+rp1@0      : <0xc0 0x40000000        0x01 0x00 0x00           0x00 0x400000>;
+
+but it fails instead (err: "can't assign; no space") in pci_assign_resource()
+function trying to match the size using pci_clip_resource_to_region(). It turned
+out that the clipping is done against 32 bit memory region 'pci_32_bit',and
+this is failing because the original region addresses to be clipped wxxiereas 64
+bit wide. The 'culprit' seems to be the function devm_of_pci_get_host_bridge_resources()
+dropping IORESOURCE_MEM_64 on any memory resource, which seems to be a change
+somewhat specific to a RK3399 case (see commit 3bd6b8271ee66), but I'm not sure
+whether it can be considered generic.
+
+So, I'm actually at an empasse here.
+
+Also, while taking a look at the resulting devicetree, I'm a bit confused by the
+fact that the parent address generated by of_pci_prop_ranges() for the pci@0,0
+bridge seems to be taken from the parent address of the pcie@120000 node. Shouldn't
+it be taken from the child address of pcie@120000, instead?
+
+> 
+> But I don't think it works in general because there's no requirement
+> that the host bridge address translation be that simple.  For example,
+> if we have two host bridges, and we want each to have 2GB of 32-bit
+> PCI address space starting at 0x0, it might look like this:
+> 
+>   0x00000002_00000000 -> PCI 0x00000000 (subtract 0x00000002_00000000)
+>   0x00000002_80000000 -> PCI 0x00000000 (subtract 0x00000002_80000000)
+> 
+> In this case simply ignoring the high 32 bits of the CPU address isn't
+> the correct translation for the second host bridge.  I think we should
+> look at each host bridge's "ranges", find the difference between its
+> parent and child addresses, and apply the same difference to
+> everything below that bridge.
+
+Not sure I've got this scenario straight: can you please provide the topology
+and the bit setting (32/64 bit) for those ranges? Also, is this scenario coming
+from a real use case or is it hypothetical?
+
+Many thanks,
+Andrea
+
+...
 
