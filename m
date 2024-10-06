@@ -1,90 +1,95 @@
-Return-Path: <netdev+bounces-132430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC3D991B4D
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 01:10:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9AEB991B91
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:28:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA6BF1F21E8C
-	for <lists+netdev@lfdr.de>; Sat,  5 Oct 2024 23:10:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B3DA1C20EB9
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 00:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC4D415F308;
-	Sat,  5 Oct 2024 23:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA3D442F;
+	Sun,  6 Oct 2024 00:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RG1WAV8g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p36XlHIn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C529E13699A
-	for <netdev@vger.kernel.org>; Sat,  5 Oct 2024 23:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A6C749C;
+	Sun,  6 Oct 2024 00:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728169825; cv=none; b=TRTaXLbt0+X3RMfd5yaHAepUbxphE4mepzcW0lZt3ugtkhVCMTpvaAZMMFDP0C/O2c5TUw0SGsQcKcakmMeIlhmLeFi6JPdN1LBgyTa5Qah79T532EWNFGxWekO60QrJp0ckYBakQjxpCeU7gHdgkOYtFwvBXItz0htNH+mP1RY=
+	t=1728174517; cv=none; b=TByYBtsrC0yqq0GmwWkJzgXhYEgbe0KJ29lMAjGro7eJVFr2qzmKua28RcyZqkOKItVNW75eDCJOJ0cXRknRhow3DfoJyXaNSAsIjjdMlufq0bzmxAgteFGwPjhFUTZVR3ung3Ff52for16EHjdq9TnsWnbvyhpe40ksXXLr050=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728169825; c=relaxed/simple;
-	bh=XQirlrJI2VTceuWTIHe4cmQ3HUOz/OZAEb7cWqDILSQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nyckkaiNNHLdeKOR6QXsKJ6wsWMITp0NGro6MceiQaAe1yMy8q6nOdVlYWterZJqITDoh0bCwZhJvjsqy5kbmQDwKBMRM7RidPFer9r4OZHQN6Z/la/JGrBXMuNrCv8iKOSevO4V4j4Y1oxUdd3jX69p9d6XuaozMUM5OMHBafs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RG1WAV8g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BCADC4CEC2;
-	Sat,  5 Oct 2024 23:10:25 +0000 (UTC)
+	s=arc-20240116; t=1728174517; c=relaxed/simple;
+	bh=msK4PyFxyLJqk2iRjq18icdvb7lMwHkPOHByGpZdx1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQlirKVRxP49xwNGhq4cyR4S6nrI77mHYwCp3X8Yhd0I2BGwfCtE342k++B8eSxCGD6XHdubnQPguJbVfyB3fD2hf0I86jsWQsXg7JuG3YlAQsVvC/EdMABWKktQpZ+XSypuKXKofB5LSfWx4EEURjc7veba/Vwq9mnnfpqouX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p36XlHIn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5A7C4CEC2;
+	Sun,  6 Oct 2024 00:28:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728169825;
-	bh=XQirlrJI2VTceuWTIHe4cmQ3HUOz/OZAEb7cWqDILSQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RG1WAV8gDEBSI6mqiCS7B33kaFQsV0jqLLp0Uzj2ofP3xf99m0oPLOaBhtxnOXugE
-	 vN7To1jK0lKimgd5CyvuNVGGiu2dCloy8X8w4oltbrOdWGs3SYeiffqXXoXyB1vgn1
-	 GcEykkm8U9nWfyGgqELoBSsbnu2towUV77dVXaXKexJwanbp8Eyt5+445vCB8GqR2+
-	 3wpmc6eqbXyuW6oKeY6uqIt3GeW1OyL34QalPaf/DeacszZ/ybwxIz3p0w0d8HGGRT
-	 v/VxM7AQDTLCwzlfhqnu3Gy3u475s9X+5W0wCStgqjZPYkDKEOwM5PuTXUGTZZTElO
-	 WPTl+pcyBzQ/A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343BE3806656;
-	Sat,  5 Oct 2024 23:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728174517;
+	bh=msK4PyFxyLJqk2iRjq18icdvb7lMwHkPOHByGpZdx1Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p36XlHInlhsHeolBwaUesQ4VHvJ3t7BgLR0g5NiujmQ1kOi3ceRQkiJYduAQ0XaIU
+	 6M02Xon6HSZDx6u9zll9EJ/9fHBy6EzETCnpHrGJgUA0EYCDc+p2Ki4hnvSkV51g0m
+	 7URgkiUhxQSYJ20lVLXp219jDSpNclpkIz3HPLRRCkhULwIziDf6CCGvYc0bT1uHMG
+	 KaU5PPxO7EsQXpaPfwDYsVakyjDXkVmTX9T/ujbJ4jjrjo0iv2YhPPjm6+Sz6n1j3y
+	 Xc8E6pVzYpiy5bHe0XIqfJINAqm+zIESYIHgdUelaMC4ZT2Frp6GqnftX9efOvUnA8
+	 t1rXPaXu+ohag==
+Date: Sat, 5 Oct 2024 20:28:35 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.11 049/244] netfilter: nf_tables: don't
+ initialize registers in nft_do_chain()
+Message-ID: <ZwHZs99aQl9FP7v-@sashalap>
+References: <20240925113641.1297102-1-sashal@kernel.org>
+ <20240925113641.1297102-49-sashal@kernel.org>
+ <ZvP6-utbwqWmP5_0@calendula>
+ <20240925122041.GA8444@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next] lib: utils: move over `print_num` from ip/
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172816982902.3199940.2972633167958480509.git-patchwork-notify@kernel.org>
-Date: Sat, 05 Oct 2024 23:10:29 +0000
-References: <20241004093050.64306-1-equinox@diac24.net>
-In-Reply-To: <20241004093050.64306-1-equinox@diac24.net>
-To: David Lamparter <equinox@diac24.net>
-Cc: dsahern@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240925122041.GA8444@breakpoint.cc>
 
-Hello:
+On Wed, Sep 25, 2024 at 02:20:41PM +0200, Florian Westphal wrote:
+>Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+>> Hi Sasha,
+>>
+>> This commit requires:
+>>
+>> commit 14fb07130c7ddd257e30079b87499b3f89097b09
+>> Author: Florian Westphal <fw@strlen.de>
+>> Date:   Tue Aug 20 11:56:13 2024 +0200
+>>
+>>     netfilter: nf_tables: allow loads only when register is initialized
+>>
+>> so either drop it or pull-in this dependency for 6.11
+>
+>It should be dropped, its crazy to pull the dependency into
+>stable.
+>
+>Is there a way to indicate 'stable: never' in changelogs?
 
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+There is a way to indicate we shouldn't pick something up with our
+regular flows. See
+https://docs.kernel.org/process/stable-kernel-rules.html#option-1.
 
-On Fri,  4 Oct 2024 11:30:14 +0200 you wrote:
-> `print_num()` was born in `ip/ipaddress.c` but considering it has
-> nothing to do with IP addresses it should really live in `lib/utils.c`.
-> 
-> (I've had reason to call it from bridge/* on some random hackery.)
-> 
-> Signed-off-by: David Lamparter <equinox@diac24.net>
-> 
-> [...]
-
-Here is the summary with links:
-  - [iproute2-next] lib: utils: move over `print_num` from ip/
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=031922c8a302
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Sasha
 
