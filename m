@@ -1,152 +1,152 @@
-Return-Path: <netdev+bounces-132515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA521991FA8
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 18:43:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20C3991FAD
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 18:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51AFAB212F4
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 16:43:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1203C1C20F48
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 16:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 211C7189BA5;
-	Sun,  6 Oct 2024 16:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D74189BB3;
+	Sun,  6 Oct 2024 16:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kOD32BJ6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tKmgojI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8B1189B8B;
-	Sun,  6 Oct 2024 16:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E461818991B
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 16:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728233013; cv=none; b=EJe+ODV2q5qnywej5xCtpTvqRnR1PmKROH2fJketpUy5w0NOG1F1X4t9HsorU7+c3tlh/G1/GZ++1FoHKT9Rcl/xyzlpqWUMgD8WS/qxpgC9tK3HBHQRXZPz0fUvTiPCMl2Q8+VFI9+USXA4oJebeT5UXO6hN/TcdTAjc/22ZKQ=
+	t=1728233024; cv=none; b=Edl0yYwNUWS9A5n7Aov/9xu2IaVTKuvHR+wYHfQMIpXx4isu2bDGbaAwShiPQjJI1TSHfvbFTB3r1Wze6KjQoaC/yAP85utD0/NB1fDt4UU0N63DHzNEo1favFqOFXhKSEJCnor+cm/pn+1D7sv3T1KkEZuxwaxOusswKOTtV8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728233013; c=relaxed/simple;
-	bh=Q8g3holWCmt4KRRwSk6tBXgvpK13/hoLyqz5wayyThE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oardLcE4pdwnvuylnbRvd5vGCZ8BmHQKnbhTta6VW+RDaL7c1tziwI0DzWylipNQ5JpHNhjG+hTco4OJTmVA11NQRc28mHuE+2yvGehMymWf3vJtfr9ITwnzqT2TiJlBADw6cZGE+nKPxrDht6J5sitwcukdSWyrObYix/teq7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kOD32BJ6; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b1335e4e4so36636665ad.0;
-        Sun, 06 Oct 2024 09:43:30 -0700 (PDT)
+	s=arc-20240116; t=1728233024; c=relaxed/simple;
+	bh=X2QicB5JKojBLxLuiGUnfmkH6CHqmqFhe0FMVJ7ec7g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oRch6ss5UJrvbh52/yY8xmKIGinYlvJvksOIO27u2Qw40D5Vl0V0EVvhFeYcbhn6dZw/pFwb9WbnQob9qvVHoxfNPh8sW+IFKqYlJzttnNB0+S5JrdcIZ/N1zBUAO9bHcRi/VXmBjjG0k0SgW+6jo4P8dZk9BKHqBy1J8f2kmMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tKmgojI0; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5398996acbeso3902737e87.1
+        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 09:43:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728233010; x=1728837810; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NcTqkghSEH/q4hS2U1EtYqhdI2AKRpEW4xQ96+uRbkA=;
-        b=kOD32BJ60+2rYkzdb/6/pT/hTynktYDdXyOdojcxJWW4sFH8EZyEnBDpMuZtHCDJ3/
-         aQBf/ymAayK22jpZbhUsfIxgPFwjL7e5DWOfKcz00m4p3enDvQJvYdU1kV5EixSDfNqZ
-         6218pUcTXzuhdtJh2mP7ZjGzNMcxtsP0qS9/+cpv8BcDmMckQGrmWx0y8xQw2Coodbc0
-         xSfLSsHKvveYBsdWD8SRKuOlDnriS4E+6DaWJe8GitkaJdayhuU/W6zQL/W9o1CjU+WY
-         odJgNQ1BVJ363nIA0FPZx6yZyLirGAr0I/i8n3zZeCv1EWHYc6HOe5Lr0+KO0ppd7wgI
-         nLug==
+        d=linaro.org; s=google; t=1728233020; x=1728837820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kh9CwlS+b9fL9VrGPBN9hhS0uogpqTqVNmBCzDS2xGE=;
+        b=tKmgojI0Od/BvA5zlvih9KQSJhO9V5T2VmTJM4WfvaJzl4sGmM7F/679QMjfuZ8pg2
+         1MdyjWk2CtYYZCL+PU8keiB8tRwoFcO1eMj2e5ZlB3LYvG7U0DrkJ7PSOdtiTuhzvLAt
+         0QOTJf4YUl78WqqGf8WsL3SU4p9dPa1tD8dxhpwZUU+SERBsKDEHBUU0jxoR0POcrpcl
+         aWGjaw9lGk3otZt5GYnDGCuSH6HBMlEkIPnPKrVqaY7pisRP9rxl4hiI4g7yw4a/nzsZ
+         m0hC6S0FxxTq+vskHTVjJVhOBYLANYDyrqVTv2GhfY7QC59v19WArdXwriU6Sk8Nh/KF
+         J7Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728233010; x=1728837810;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NcTqkghSEH/q4hS2U1EtYqhdI2AKRpEW4xQ96+uRbkA=;
-        b=pUYWMoLZUatYMd/MRj7DC4xrUsYJLNIm3JF2XbtxR3063IMI/xxuQxnQj1r45jHRW1
-         yugYOgFEOzbeQr8zZweOTKiCMORYMppRJRfAyVNITNLRiVifmwl13DFJP+jFuVUpBa8d
-         xTBy2ywolt+iVF2ylYoUNbPLExL9nmL43OYXhDgSf0LV5eV0+QZrHVhA/GGggeqLpRm6
-         okslTncYFpB3m5eKZuUOR8rW3pLLN0tFsoZ2Vf6VykxDCeBbSVhScrMsAwsdx2bv6/qb
-         v3QEZeAR6VZcLeEQSJRSsKr+ON1Pw86ti9/0g4F9RAxWnTcKm66vp3J8+Qae4tw7K3RD
-         DKgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW4TRHxMv8b43J6Wx44MdK0zCY1FqkyCg2Eg9LSxiiz4sEqhF/o4nSUP9bH6qJ4B7ZqsZ1OAwe2@vger.kernel.org, AJvYcCXPT+fr7qSAH1yN5Fj+cn6d/sbAZFF3sfGXqmpNfZ1+DreEnDiJd+s8lZNITTH8suN9e5Gg6e3IwmCRYXk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2mV2ogF7+iUo+9hND0npkjs9zMMJV2ydWRFd7wzEsV0RkrNg3
-	jeffzBdHfVd2DxaCAPQK+LjS7EZTi4iH92UAZxW5gAiIgA9zhmXO
-X-Google-Smtp-Source: AGHT+IE+oXMDeSfi7ThB0cWJtlPa+K/pDk7A51QXl7QpMbzhMpnq3SMwAmcNpjioJe1vcpG+iXW/Iw==
-X-Received: by 2002:a17:902:d483:b0:20b:6208:b869 with SMTP id d9443c01a7336-20bfe01dbedmr130055505ad.24.1728233009847;
-        Sun, 06 Oct 2024 09:43:29 -0700 (PDT)
-Received: from ubuntu.. ([27.34.65.246])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138af935sm26880845ad.54.2024.10.06.09.43.25
+        d=1e100.net; s=20230601; t=1728233020; x=1728837820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kh9CwlS+b9fL9VrGPBN9hhS0uogpqTqVNmBCzDS2xGE=;
+        b=VMKNdobvSKb2NFloOqojeinPIcB8Jjye3Ft1ijPLmiQFtZ6nKuzgJ4AbVzqwDfDqb1
+         V3ryg0mmEr1mMxfJ0WlsUy1r326/V1PzCdblezRVVN2IVxeaMkV7uLi5BBQhcHbShHLv
+         3yMuN61CVQbUZeI/YsP2w/XtEwwmiW+BCXakSqnsEbBVZhLDQVxK1WanEdDtMCFO2XWY
+         a4Y9fKqCS0GUkPNOj39aVhe/CtxsX52b1nPYBdvdSlcAvoGPj/hfESefqTIZJ4HMfKZj
+         1Fxqr8ZTjPHsAhbpGs43QdU95t4Hj+pMfs+KN7RBouTIma9kB47sGI7tCcvaQUWl4kU0
+         +6zg==
+X-Forwarded-Encrypted: i=1; AJvYcCVR4c+ffgQW2W9gT279d7D//G3MI9ZX+hG/djhZOQt50chvwg/+j4JI763w9OCsSndpkDJMGgQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjOExIdw9cLhY/EVWf9cY1/8zTgKjQoXUu+dn+MMNxe9KngnwN
+	ag5Az2Vccf5kTnzCXQLtQSKUdBkGNzYlyctCe5hI4Dqbbvtp9Lnirbi89WsIsG0=
+X-Google-Smtp-Source: AGHT+IGKg7FQt+7HzFqdUiy4jPHItuGi1FK8LAhA4VTlyyoJYgn23VgEi2Q1FundwmZErQazke+jdg==
+X-Received: by 2002:a05:6512:1245:b0:536:55cc:9641 with SMTP id 2adb3069b0e04-539ab86649fmr4626478e87.16.1728233020083;
+        Sun, 06 Oct 2024 09:43:40 -0700 (PDT)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00-89ea-67f6-92cd-b49.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:89ea:67f6:92cd:b49])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-539aff1d1e7sm557447e87.151.2024.10.06.09.43.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Oct 2024 09:43:29 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
-	maxime.chevallier@bootlin.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3 3/6] octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_flows.c
-Date: Sun,  6 Oct 2024 16:43:21 +0000
-Message-ID: <20241006164322.2015-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Sun, 06 Oct 2024 09:43:38 -0700 (PDT)
+Date: Sun, 6 Oct 2024 19:43:36 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+Cc: Devi Priya <quic_devipriy@quicinc.com>, andersson@kernel.org, 
+	mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, konrad.dybcio@linaro.org, catalin.marinas@arm.com, 
+	will@kernel.org, p.zabel@pengutronix.de, richardcochran@gmail.com, 
+	geert+renesas@glider.be, neil.armstrong@linaro.org, arnd@arndb.de, 
+	m.szyprowski@samsung.com, nfraprado@collabora.com, u-kumar1@ti.com, 
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH V5 7/7] arm64: defconfig: Build NSS Clock Controller
+ driver for IPQ9574
+Message-ID: <kfmn6pixbrhaagll56z3ug7bfqrp6f47rd4m6qo6bidu3dfcew@r26q6aabut54>
+References: <20240626143302.810632-1-quic_devipriy@quicinc.com>
+ <20240626143302.810632-8-quic_devipriy@quicinc.com>
+ <rlqrgopsormclb7indayxgv54cnb3ukitfoed62rep3r6dn6qh@cllnbscbcidx>
+ <134665ba-8516-4bca-9a56-9a5bbfa71705@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <134665ba-8516-4bca-9a56-9a5bbfa71705@quicinc.com>
 
-Adding error pointer check after calling otx2_mbox_get_rsp().
+On Fri, Oct 04, 2024 at 01:26:27PM GMT, Manikanta Mylavarapu wrote:
+> 
+> 
+> On 6/26/2024 11:44 PM, Dmitry Baryshkov wrote:
+> > On Wed, Jun 26, 2024 at 08:03:02PM GMT, Devi Priya wrote:
+> >> NSSCC driver is needed to enable the ethernet interfaces and not
+> >> necessary for the bootup of the SoC, hence build it as a module.
+> > 
+> > It is used on this-and-that device.
+> > 
+> 
+> Hi Dmitry,
+> 
+> Sorry for the delayed response.
+> 
+> NSSCC driver is needed to enable the ethernet interfaces present
+> in RDP433 based on IPQ9574. Since this is not necessary for bootup
+> enabling it as a module.
 
-Fixes: 9917060fc30a ("octeontx2-pf: Cleanup flow rule management")
-Fixes: f0a1913f8a6f ("octeontx2-pf: Add support for ethtool ntuple filters")
-Fixes: 674b3e164238 ("octeontx2-pf: Add additional checks while configuring ucast/bcast/mcast rules")
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
----
-v3:
- - Included in the patch set
- - Changed patch subject
- - Added Fixes: tag
-v2: https://lore.kernel.org/all/20240923063323.1935-1-kdipendra88@gmail.com/
- - Changed the subject to net
- - Changed the typo of the vairable from bfvp to pfvf
-v1: https://lore.kernel.org/all/20240922185235.50413-1-kdipendra88@gmail.com/
- .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c  | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Commit message, please.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 98c31a16c70b..c96f115995f8 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -119,6 +119,10 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
+> 
+> Thanks & Regards,
+> Manikanta.
+> 
+> >>
+> >> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> >> ---
+> >>  Changes in V5:
+> >> 	- No change
+> >>
+> >>  arch/arm64/configs/defconfig | 1 +
+> >>  1 file changed, 1 insertion(+)
+> >>
+> >> diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
+> >> index dfaec2d4052c..40a5ea212518 100644
+> >> --- a/arch/arm64/configs/defconfig
+> >> +++ b/arch/arm64/configs/defconfig
+> >> @@ -1300,6 +1300,7 @@ CONFIG_IPQ_GCC_5332=y
+> >>  CONFIG_IPQ_GCC_6018=y
+> >>  CONFIG_IPQ_GCC_8074=y
+> >>  CONFIG_IPQ_GCC_9574=y
+> >> +CONFIG_IPQ_NSSCC_9574=m
+> >>  CONFIG_MSM_GCC_8916=y
+> >>  CONFIG_MSM_MMCC_8994=m
+> >>  CONFIG_MSM_GCC_8994=y
+> >> -- 
+> >> 2.34.1
+> >>
+> > 
+> 
 
- 		rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
- 			(&pfvf->mbox.mbox, 0, &req->hdr);
-+		if (IS_ERR(rsp)) {
-+			allocated = PTR_ERR(rsp);
-+			goto exit;
-+		}
-
- 		for (ent = 0; ent < rsp->count; ent++)
- 			flow_cfg->flow_ent[ent + allocated] = rsp->entry_list[ent];
-@@ -197,6 +201,10 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
-
- 	rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
- 	       (&pfvf->mbox.mbox, 0, &req->hdr);
-+	if (IS_ERR(rsp)) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return PTR_ERR(rsp);
-+	}
-
- 	if (rsp->count != req->count) {
- 		netdev_info(pfvf->netdev,
-@@ -232,6 +240,10 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
-
- 	frsp = (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
- 	       (&pfvf->mbox.mbox, 0, &freq->hdr);
-+	if (IS_ERR(frsp)) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return PTR_ERR(frsp);
-+	}
-
- 	if (frsp->enable) {
- 		pfvf->flags |= OTX2_FLAG_RX_VLAN_SUPPORT;
---
-2.43.0
-
+-- 
+With best wishes
+Dmitry
 
