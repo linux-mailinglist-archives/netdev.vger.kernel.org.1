@@ -1,138 +1,127 @@
-Return-Path: <netdev+bounces-132444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCFB991C01
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:08:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E472991C03
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 04:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63F2E283510
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:08:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 011821F222D5
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 02:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718801684A8;
-	Sun,  6 Oct 2024 02:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E057167D80;
+	Sun,  6 Oct 2024 02:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcy44svx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kv8VRefE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4517317622F;
-	Sun,  6 Oct 2024 02:06:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150AE1662E7;
+	Sun,  6 Oct 2024 02:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728180397; cv=none; b=XmraNj1mFnR4y/JuiGPnkyeQnO1S7r1tmQEKILVpx5ICRtChC1xLLPOt0bu1iE1KF5ULd0OFhS5FdBioECztI2NgwdceqbcOH284YR9TRI9W/EnWUuXlBS40LIqeSjjdQYXtk0M3J0VreCpAYArxdOJoRgYyn0ws7uP790Oytgc=
+	t=1728180455; cv=none; b=FrzsYfhWFosDN+FLhBPqof5GHhfjm8k/FhdpBVJqfLWFK4bh/SVxoe2tNYym5UmRB59EnueEGUDmAPoSn/q4sfvcscmyygF4mZCoILFtXJUPeEQ1ez5FlqYpiow6mYbBWcZpHDszxErCpArNXC82NWVJuK3H04DsqY6bSEFVd5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728180397; c=relaxed/simple;
-	bh=XpD5MBQNCdNE3E6DcHQM/wLKwiuZxSq0ZeTsC+ryFQs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=szKkE+v7qvcetcxGO8ZMZT6t8Ayx92ruNXvkMvEXBqUEHpnzD/v2K1DJf+zDsFJK7IhuMdXO1adQW+5ZHjhsQkvhmFfuJ3zUQ+y48wXv+w2bLUuAIMZh3wxyc5rM1cmjTn7WNsDCndf4DSmmXPAJubipagvW0qoE0yIL3LIyhqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcy44svx; arc=none smtp.client-ip=209.85.215.170
+	s=arc-20240116; t=1728180455; c=relaxed/simple;
+	bh=DfHKlyGMMDSIEpyOpChzXkyr7d0SUJeFnkxyBlqeeUk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dZ5DTX7G3QQhDaBdzLrsCa3lAFrW2uwOfXbM0fKHRkR88qV2M+RP4ocv+dFQlv2TsxWgL4Nx5Qd76wbUA2QT1rL4bG787B3bwHaPawH0ELYH2peTJV7dsHydaYMG3BgNUEPHcYoo2m9j/V6dSeEhbrkY7TfUhEDPnxbywKfo3zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kv8VRefE; arc=none smtp.client-ip=209.85.128.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ea07610762so34853a12.0;
-        Sat, 05 Oct 2024 19:06:32 -0700 (PDT)
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6e2c4ffa006so18791217b3.3;
+        Sat, 05 Oct 2024 19:07:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728180391; x=1728785191; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728180449; x=1728785249; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OGZsdm5qLKZIv0DQdpgKSNQfTpwe6/VrtKx9+RL1Io4=;
-        b=bcy44svxNDCEZJG0aw8OuRlq6KaUF9dnT5EyIKY8e1O+KF1NbVsASgga1UC9sjwx2W
-         Cr6MSKT8dzZQi9yPBjQ29b84HVHGhjZMuWqsIpRTVzo/bCIVH34lDF8VIRdhRjcuurEH
-         2TH2IsTkzQHSMkPJ+6dVeJJN7zi26TQ45zp405ue6aX7ZOKI5217N/h8GsqGOZTUyh/a
-         V0gXt8YVZQEOEwZGywT5HWYZMj8sGNzyQ0ZeQHSr96cKZQ3M4YBStnbk4CnTguXgcQIt
-         N3yAOMDXJrZV0vC9FXu4zL9fJ+ob403fWMrkDsWEz1j2/63YT17lkgea5jHXyVkXJHPD
-         8n6A==
+        bh=mHfnHiUzEI/UKshaDa/FSlqT+xIZ/SlWDTUeS6ow6HU=;
+        b=Kv8VRefEnrA02rEy+6uMj0cxyZ1RUGpE1X/i0SjjFv7onfZOogfv32RUmuCoySrFr8
+         ZDGpv6/EdfeZ4yRL5BRaK2OraTLTvtOwKIH5RxlcYnQ/hEmis6nahfogEAKf+g8f/TrY
+         EArJgioqQ0HATFcs9gBOs3R22BxP0Az9Aswzdfc+ap/+g8o5riV/nGXuJTM+5XdVQRVf
+         WBUHJ9wfqu/1SgMcsYpDCpWhQZ4W2nlMP2iiIlnaf+HPVbe0kZoyEnzTSUJX6cTEP7Cm
+         7FY9WSBlN0bT4qTimm4Ui65gSvOK4Lhg2kXhG8WuMvvPjSCAOsYRRC8gBiJvHyHrkYOS
+         KRfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728180391; x=1728785191;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728180449; x=1728785249;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OGZsdm5qLKZIv0DQdpgKSNQfTpwe6/VrtKx9+RL1Io4=;
-        b=gOdj1usSI76dCf26ih5DMloWLzZwlkxYBbp+CjfoSiN6Wel1AHsvf4Xh73BF6/hm/E
-         8dhMvXmZm1jFaYlUf3nu9zS3WIwgoJ5KhuHWPdnyG+MUMN58r4z7aF1G+3anrGkvEFeq
-         bxOB90LQJO2LkBwjEgKJ1h8p7UH+3Zt4qIhEbdLcKF0JikB7cXdH8guKIQb41RzYDJBC
-         diY3ERJi9Xs4veCH2gZrGLtr8BKNRvW4Y34uI8sjowYyWCKvRV6ZhbfLDL0JzQxI0M4X
-         O21tx79FWArHrdRABV7mRLvaARYQgoOXYf6udTrmieP3npyetjMmV5rqq58BKOYiqXzr
-         vp7A==
-X-Forwarded-Encrypted: i=1; AJvYcCX41ZXh4kP+KrBnhkft7JmX0pfFKKKHkwvF51WJfOn9bxR+V/LI/1iaCF0ZeSskP0t7S+NPSFUchWZ9t1A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBmlDN9xypgpHW86/d72hEChtakF5vERFci/fvreDNZnQPmBqh
-	OntA96qiqgUsKax9Fu/PbfSfc0KyNu2JLp5gQzNKb0jtVRp9bzkocnGx/g==
-X-Google-Smtp-Source: AGHT+IFEqVdWdibs/SLVYCm/jAh9OWwcs/OuFTMgRkRZ2AqBUaKP3HjWo2kqAb1P6DVdwKUMizXHdA==
-X-Received: by 2002:a05:6a21:1706:b0:1d3:294e:6c8d with SMTP id adf61e73a8af0-1d6dfa3fccfmr11089992637.21.1728180391463;
-        Sat, 05 Oct 2024 19:06:31 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f683153asm2034212a12.50.2024.10.05.19.06.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Oct 2024 19:06:31 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	jacob.e.keller@intel.com,
-	horms@kernel.org,
-	sd@queasysnail.net,
-	chunkeey@gmail.com
-Subject: [PATCHv4 net-next 8/8] net: ibm: emac: use of_find_matching_node
-Date: Sat,  5 Oct 2024 19:06:16 -0700
-Message-ID: <20241006020616.951543-9-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241006020616.951543-1-rosenp@gmail.com>
-References: <20241006020616.951543-1-rosenp@gmail.com>
+        bh=mHfnHiUzEI/UKshaDa/FSlqT+xIZ/SlWDTUeS6ow6HU=;
+        b=cwX2Ibu+SkCtH0jY1RzAyln890xTF+mpQ9kJLuw4vocz9Bc+JnAUS/9qSbGcWnoe29
+         5C+3HYa/2GfDqO8E3MNaW3DOfBjgj3QfzZJNUjsE2m8W7FYZJ3YXBE9pO/YIMdhNUHwx
+         7/KfRtj53/Idf1jUFm9Yz7dRhcBycwD22FCCg6SWY+S/+jB6KfVdgThBegW9GuOM/SBm
+         0unLDY9Jy/f2ojY56yGoaLKy7msIRs/9F4nQDggKk/ebU4Zj9iih8szJB7OB8qEUjXjz
+         Xa2OMV6Mycrj0Q2nA8B27wV1A5Jcsg9gPPPm/o2rKkBIJtAmEkIASm7hSYjN3OAfnS1A
+         8oMA==
+X-Forwarded-Encrypted: i=1; AJvYcCX7nGNZyWM+fZ4hZegHmQ2moriIcEED7TSvNuUoKwH1PjOS4jtFB8fCQg+qQ3YCxIkK1Naf5zITg3lUmzk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqatF2hyvW3NMUuxtTMR52dBq3YcGuIPD9A9PthzKwkjmNGy4s
+	nBFEhjYDiL0EqTE0ua3B9SemdOCDWKu4eYiSz7MFTWusiRG+tGfEal1EoQHyFiq10wal1bPM9lt
+	0mAp8peNFXbO1avVfp7W1jk6OaLG3jA==
+X-Google-Smtp-Source: AGHT+IFJy+LgYQwq0nrgUHUwCAaoG2734k2vmpWFgGbVp6AkBTn2+tbxiFboZZB217Qqd6X6KcF27o7YDv5hX5H8pH8=
+X-Received: by 2002:a05:690c:dd1:b0:643:92a8:ba00 with SMTP id
+ 00721157ae682-6e2c6e8b44amr68894507b3.0.1728180448829; Sat, 05 Oct 2024
+ 19:07:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241006013937.948364-1-rosenp@gmail.com>
+In-Reply-To: <20241006013937.948364-1-rosenp@gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Sat, 5 Oct 2024 19:07:17 -0700
+Message-ID: <CAKxU2N9JGcU58Di5C9Ga_Xd91ywEyoZ1kC=kp8+R3kggx4vw2w@mail.gmail.com>
+Subject: Re: [PATCH] net: bgmac: use devm for register_netdev
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Cleaner than using of_find_all_nodes and then of_match_node.
-
-Also modified EMAC_BOOT_LIST_SIZE check to run before of_node_get to
-avoid having to call of_node_put on failure.
-
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/ibm/emac/core.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 4b21bf2d3267..bc92cc35d8d5 100644
---- a/drivers/net/ethernet/ibm/emac/core.c
-+++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -3253,21 +3253,17 @@ static void __init emac_make_bootlist(void)
- 	int cell_indices[EMAC_BOOT_LIST_SIZE];
- 
- 	/* Collect EMACs */
--	while((np = of_find_all_nodes(np)) != NULL) {
-+	while ((np = of_find_matching_node(np, emac_match))) {
- 		u32 idx;
- 
--		if (of_match_node(emac_match, np) == NULL)
--			continue;
- 		if (of_property_read_bool(np, "unused"))
- 			continue;
- 		if (of_property_read_u32(np, "cell-index", &idx))
- 			continue;
- 		cell_indices[i] = idx;
--		emac_boot_list[i++] = of_node_get(np);
--		if (i >= EMAC_BOOT_LIST_SIZE) {
--			of_node_put(np);
-+		if (i >= EMAC_BOOT_LIST_SIZE)
- 			break;
--		}
-+		emac_boot_list[i++] = of_node_get(np);
- 	}
- 	max = i;
- 
--- 
-2.46.2
-
+On Sat, Oct 5, 2024 at 6:39=E2=80=AFPM Rosen Penev <rosenp@gmail.com> wrote=
+:
+>
+> Removes need to unregister in _remove.
+>
+> Tested on ASUS RT-N16. No change in behavior.
+>
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+yikes. I wanted this in net-next.
+> ---
+>  drivers/net/ethernet/broadcom/bgmac.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet=
+/broadcom/bgmac.c
+> index 6ffdc4229407..2599ffe46e27 100644
+> --- a/drivers/net/ethernet/broadcom/bgmac.c
+> +++ b/drivers/net/ethernet/broadcom/bgmac.c
+> @@ -1546,7 +1546,7 @@ int bgmac_enet_probe(struct bgmac *bgmac)
+>
+>         bgmac->in_init =3D false;
+>
+> -       err =3D register_netdev(bgmac->net_dev);
+> +       err =3D devm_register_netdev(bgmac->dev, bgmac->net_dev);
+>         if (err) {
+>                 dev_err(bgmac->dev, "Cannot register net device\n");
+>                 goto err_phy_disconnect;
+> @@ -1568,7 +1568,6 @@ EXPORT_SYMBOL_GPL(bgmac_enet_probe);
+>
+>  void bgmac_enet_remove(struct bgmac *bgmac)
+>  {
+> -       unregister_netdev(bgmac->net_dev);
+>         phy_disconnect(bgmac->net_dev->phydev);
+>         netif_napi_del(&bgmac->napi);
+>         bgmac_dma_free(bgmac);
+> --
+> 2.46.2
+>
 
