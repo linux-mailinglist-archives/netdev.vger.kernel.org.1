@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-132499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA37991F36
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:00:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B26A991F37
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D19DA2829D6
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:00:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F3F8B21965
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA2B136672;
-	Sun,  6 Oct 2024 15:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B498F13635D;
+	Sun,  6 Oct 2024 15:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="ZbhO5RzE"
+	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="X66MvOd5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05882482EF
-	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 15:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35AF71F5F6
+	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 15:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728226830; cv=none; b=CRys5f3EjedJ06Qa6yXEhTZE6TUFlcJGRZk1tzMsM50mINBONpLgZkk9Tq5JTkSCj8Cl5J8Y5BzQ99rwuAp3AShdshDPx6a6lH1ntTx3k7SHgC7PAICYVy+S0fLM54tPqIx8rbJTcYlZzoAt1xMMCJA0jo3xTOEPNtmJma7StY4=
+	t=1728226836; cv=none; b=NcR7G88nrFTDcYTKR1cpPOHpGcCCc8dVBY7UV7QfH6ilFkAJ7QhDu2qdkGpwF3qvV42kiW3kcThCycuijYr+YFyb10cj4fXJXlFFKm/u1B5WQVkAXqx4POBOMvphmH5Zj910/ynqrj+cdzhuxbYkjRBzYIXRk3kab34wyADS+O4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728226830; c=relaxed/simple;
-	bh=n+yeDmQjSX5mGH3d/n7Wj1sP49IccgXphZJzEdRgJ2E=;
+	s=arc-20240116; t=1728226836; c=relaxed/simple;
+	bh=riK9FOolz1RE6hRQeW2Qv8d000EjlAHgMt/D8KJsaZw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tabXo+EZx+b0GomB0jJw0eKRjG9BuyRpihjqNCEwy2fxxCc3LLlWovK2Kwl5lv5IC/u4/8wFhuLjbmZBphfMQExhkn4pd5cVEQ6vIqk8bGnSaBhZrdQ739XV0jejjjLOReVLW6z/tLeicr7Wf1CNo+04QWbfxlzoIG4zTmYPph4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=ZbhO5RzE; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=IMisF194XcaUGINLtu6GFBtPMx2KN0wRgdJzQ8Di0/tVI1EkdsqDvvvcGWq2G7GpG4ORmnAB4dEoqBB1/Kxn7wyh3xsRTe2a9TLte8Ku81bCEiYcrK3dMmvUXOce8GhSPih3GlenRWM7/yZojC1atnbGBnwlQeyvYOrh5u4GDPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=X66MvOd5; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shenghaoyang.info
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7e9f8714b9bso99133a12.3
-        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 08:00:28 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7e9f8714b9bso99153a12.3
+        for <netdev@vger.kernel.org>; Sun, 06 Oct 2024 08:00:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shenghaoyang.info; s=google; t=1728226828; x=1728831628; darn=vger.kernel.org;
+        d=shenghaoyang.info; s=google; t=1728226834; x=1728831634; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z4w60b7/GOYUxjBDyS6fctkzP4h/Je4fWr1JC8x965U=;
-        b=ZbhO5RzETSpDp6kxxdh5rqqVD21rIxL1SNqErYAqmlnAbWyfDzRz9Qqpbmbm2IzOkx
-         JTB0TfDPxQW28BTmkozex+QtENlfc4Wah/Q12uAyWZKikl02oKO0ji6buYWCFZgbeDC3
-         Ni1T9fxlD0MUVJoYmIMyeaZ1J6BjI+Vk49VUJiT+fOqoa+3UgpmVkC6gR/pHTKe02pwz
-         vNhQgVoBKM8OoY0L/3O+02jeuJCKDghZuAI7d1xkwlMv0TbA/4eaWYMyDeSCaOIwTnMA
-         tKR11jPNN5sPE4Wo6Rz6at7xDfL/lSMOgaarxo1ckMn5aS96U+IQYGsffjFrPmCr6X9F
-         vdGA==
+        bh=3HG943iTePzKfgDFq3MIKdj5dZkExEASCzhHW9hy/Kw=;
+        b=X66MvOd5M1NdVmgw+tHlzM0XG2LE6PmyhbbVWkFMsOUthgDFlWE7gCa39gd6dZiXlD
+         3Y2slI0JQaNIyzcrvqB/ZuFsmhgJ6IR+20Z2vqPngjMrm/w2ExWXc1g5z4c1ufxWA9Q8
+         Nb4dyR2pJR04UY4O8RvtDkpeOdCp7uuQHWdaA8WMSAyTjoUwc1rXpkT2RJvYEXYcjfRn
+         /29YFy+f0EZGSjU6UnzuCSSdtB2N2u1gMUIT39rHQTIR0EoshzR3R6vmBvpeZi2+2G2t
+         iTQo+8YdCaH/QaBigF19dRmqBvuy7Hppn7f3L9IlbRjQaq9SwE7kLkWd0YhJVC1fkE8D
+         uWzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728226828; x=1728831628;
+        d=1e100.net; s=20230601; t=1728226834; x=1728831634;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z4w60b7/GOYUxjBDyS6fctkzP4h/Je4fWr1JC8x965U=;
-        b=JHCoFDTyWS5/EwL1zZz6rBk3yKs4zmy13pezSlF8h6LXyMNgzkGj7dxAZsj49fh7Bl
-         BFtqVBFkvFBeg1yAjKVheK67N5gr6M4HLGexXIgn1KlqXB9hVLTd86x5JRmMAV/Td5Qd
-         uVluBoarIWr7c9p3Z2aAwrD3/86ii0h8mqQkNvEhrCTVH8t0W1NjoENRBQiXxYvSLXAV
-         fYB3QMUBzl5LUaG/6xffI6jvFXQmGGQ/G7SsdYnqnJxCHTgwguOJwGO+x8YVnNlK2tT+
-         JMKk2Tn3ua4HFnwEpjs/71l2kvQ3KeWzy+Go44fi/7oMsvqLbEEw4moUr+sRR7I8Zoa2
-         4/ow==
-X-Gm-Message-State: AOJu0YyflE4f5tDH7jfumGzal9QE5fw1xgOV2RHByRvqueY+YmLwcNC5
-	u4+YbeDyPuntD2dLxgx8F/3caKeFwA4eZcOcWqx2YCQG3KXKS1RDkay3+XQhHO2cWvRwRn5e1Cc
-	ggKci2g==
-X-Google-Smtp-Source: AGHT+IFf9lKbWrvCvbqkbQHjI6qNKs4tHwPOKb9Wg5dN9nm0QT+DAr8C/OenH+eIe1SVWHKlattCZA==
-X-Received: by 2002:a17:902:e882:b0:20b:9822:66fe with SMTP id d9443c01a7336-20bfe01e37bmr57435785ad.1.1728226827712;
-        Sun, 06 Oct 2024 08:00:27 -0700 (PDT)
+        bh=3HG943iTePzKfgDFq3MIKdj5dZkExEASCzhHW9hy/Kw=;
+        b=piQ5dFCSzKw4kteBjGS+TIzxfW2IlvY+O7T7wZAeilVf7BXU69tWrlVnMMbOEipDFc
+         jRSJBuIw8ok913wtglVTJ2Y+X1MqCQ6euRKSPhe2q5bt4Ix3dboIg+M3kQShYjtOHjox
+         6U5xjqwoKSnVgDYG0SpR+cjcyyu2q2oVXOhFnpEzhiOIcxUoQDMPUCmxygtF+DQDOg4a
+         6j/mjCsb8ax9ZP+sAQYo+SpEHwqc/DZbTRWQ0qh4Bl91DS816HryNrUKMUiqnL1Qe5w5
+         GPFLQHQpzmJVegdf2eJlofD/48/+7lbOtiztK7YyGl98sGXlk1Jp2gnfi9mpwus9GlPi
+         DhoQ==
+X-Gm-Message-State: AOJu0Yyq/G1mIIwqC7Ro0yCS9ZP3Hhb3lHdGbLTdgMAG8ZdPMjpidqPq
+	rxFScciOhLw+7AoBwEtz3CfyPuTAGX1Lnk6mTsruAXVtHVI5zR2Qo0kd9OfQL4lifaRZAEgThZu
+	Ryl/doA==
+X-Google-Smtp-Source: AGHT+IFMPbKItnKFhWE1/IENn5IkrRk66SNE8x/c4MKJPSb+0wjC5t3YywAXG822M5q5aNQUvDQexQ==
+X-Received: by 2002:a17:902:e882:b0:20b:9822:66fe with SMTP id d9443c01a7336-20bfe01e37bmr57437775ad.1.1728226834131;
+        Sun, 06 Oct 2024 08:00:34 -0700 (PDT)
 Received: from localhost ([132.147.84.99])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-20c13934817sm26050435ad.158.2024.10.06.08.00.25
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-20c138afc71sm26202155ad.47.2024.10.06.08.00.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Oct 2024 08:00:27 -0700 (PDT)
+        Sun, 06 Oct 2024 08:00:33 -0700 (PDT)
 From: Shenghao Yang <me@shenghaoyang.info>
 To: netdev@vger.kernel.org
 Cc: Shenghao Yang <me@shenghaoyang.info>,
@@ -76,9 +76,9 @@ Cc: Shenghao Yang <me@shenghaoyang.info>,
 	ashkan.boldaji@digi.com,
 	kabel@kernel.org,
 	andrew@lunn.ch
-Subject: [PATCH net v2 2/3] net: dsa: mv88e6xxx: read cycle counter period from hardware
-Date: Sun,  6 Oct 2024 22:59:46 +0800
-Message-ID: <20241006145951.719162-3-me@shenghaoyang.info>
+Subject: [PATCH net v2 3/3] net: dsa: mv88e6xxx: support 4000ps cycle counter period
+Date: Sun,  6 Oct 2024 22:59:47 +0800
+Message-ID: <20241006145951.719162-4-me@shenghaoyang.info>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241006145951.719162-1-me@shenghaoyang.info>
 References: <20241006145951.719162-1-me@shenghaoyang.info>
@@ -90,196 +90,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of relying on a fixed mapping of hardware family to cycle
-counter frequency, pull this information from the
-MV88E6XXX_TAI_CLOCK_PERIOD register.
+The MV88E6393X family of devices can run its cycle counter off
+an internal 250MHz clock instead of an external 125MHz one.
 
-This lets us support switches whose cycle counter frequencies depend on
-board design.
+Add support for this cycle counter period by adding another set
+of coefficients and lowering the periodic cycle counter read interval
+to compensate for faster overflows at the increased frequency.
+
+Otherwise, the PHC runs at 2x real time in userspace and cannot be
+synchronized.
 
 Fixes: de776d0d316f ("net: dsa: mv88e6xxx: add support for mv88e6393x family")
-Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Shenghao Yang <me@shenghaoyang.info>
----	
- drivers/net/dsa/mv88e6xxx/chip.h |  5 ++-
- drivers/net/dsa/mv88e6xxx/ptp.c  | 60 ++++++++++++++++++++++----------
- 2 files changed, 44 insertions(+), 21 deletions(-)
+---
+ drivers/net/dsa/mv88e6xxx/ptp.c | 23 ++++++++++++++++++++---
+ 1 file changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index bd66189a593f..a54682240839 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -206,6 +206,7 @@ struct mv88e6xxx_gpio_ops;
- struct mv88e6xxx_avb_ops;
- struct mv88e6xxx_ptp_ops;
- struct mv88e6xxx_pcs_ops;
-+struct mv88e6xxx_cc_coeffs;
- 
- struct mv88e6xxx_irq {
- 	u16 masked;
-@@ -408,6 +409,7 @@ struct mv88e6xxx_chip {
- 	struct cyclecounter	tstamp_cc;
- 	struct timecounter	tstamp_tc;
- 	struct delayed_work	overflow_work;
-+	const struct mv88e6xxx_cc_coeffs *cc_coeffs;
- 
- 	struct ptp_clock	*ptp_clock;
- 	struct ptp_clock_info	ptp_clock_info;
-@@ -714,8 +716,6 @@ struct mv88e6xxx_avb_ops {
- 	int (*tai_write)(struct mv88e6xxx_chip *chip, int addr, u16 data);
- };
- 
--struct mv88e6xxx_cc_coeffs;
--
- struct mv88e6xxx_ptp_ops {
- 	u64 (*clock_read)(const struct cyclecounter *cc);
- 	int (*ptp_enable)(struct ptp_clock_info *ptp,
-@@ -733,7 +733,6 @@ struct mv88e6xxx_ptp_ops {
- 	int arr1_sts_reg;
- 	int dep_sts_reg;
- 	u32 rx_filters;
--	const struct mv88e6xxx_cc_coeffs *cc_coeffs;
- };
- 
- struct mv88e6xxx_pcs_ops {
 diff --git a/drivers/net/dsa/mv88e6xxx/ptp.c b/drivers/net/dsa/mv88e6xxx/ptp.c
-index 641af44e00af..a409b8661fad 100644
+index a409b8661fad..aed4a4b07f34 100644
 --- a/drivers/net/dsa/mv88e6xxx/ptp.c
 +++ b/drivers/net/dsa/mv88e6xxx/ptp.c
-@@ -32,10 +32,10 @@ struct mv88e6xxx_cc_coeffs {
-  * simplifies to
-  * clkadj = scaled_ppm * 2^7 / 5^5
-  */
--#define MV88E6250_CC_SHIFT 28
--static const struct mv88e6xxx_cc_coeffs mv88e6250_cc_coeffs = {
--	.cc_shift = MV88E6250_CC_SHIFT,
--	.cc_mult = 10 << MV88E6250_CC_SHIFT,
-+#define MV88E6XXX_CC_10NS_SHIFT 28
-+static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_10ns_coeffs = {
-+	.cc_shift = MV88E6XXX_CC_10NS_SHIFT,
-+	.cc_mult = 10 << MV88E6XXX_CC_10NS_SHIFT,
- 	.cc_mult_num = 1 << 7,
+@@ -40,7 +40,7 @@ static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_10ns_coeffs = {
  	.cc_mult_dem = 3125ULL,
  };
-@@ -47,10 +47,10 @@ static const struct mv88e6xxx_cc_coeffs mv88e6250_cc_coeffs = {
-  * simplifies to
-  * clkadj = scaled_ppm * 2^9 / 5^6
-  */
--#define MV88E6XXX_CC_SHIFT 28
--static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_coeffs = {
--	.cc_shift = MV88E6XXX_CC_SHIFT,
--	.cc_mult = 8 << MV88E6XXX_CC_SHIFT,
-+#define MV88E6XXX_CC_8NS_SHIFT 28
-+static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_8ns_coeffs = {
-+	.cc_shift = MV88E6XXX_CC_8NS_SHIFT,
-+	.cc_mult = 8 << MV88E6XXX_CC_8NS_SHIFT,
- 	.cc_mult_num = 1 << 9,
+ 
+-/* Other families:
++/* Other families except MV88E6393X in internal clock mode:
+  * Raw timestamps are in units of 8-ns clock periods.
+  *
+  * clkadj = scaled_ppm * 8*2^28 / (10^6 * 2^16)
+@@ -55,6 +55,21 @@ static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_8ns_coeffs = {
  	.cc_mult_dem = 15625ULL
  };
-@@ -96,6 +96,31 @@ static int mv88e6352_set_gpio_func(struct mv88e6xxx_chip *chip, int pin,
- 	return chip->info->ops->gpio_ops->set_pctl(chip, pin, func);
- }
  
-+static const struct mv88e6xxx_cc_coeffs *
-+mv88e6xxx_cc_coeff_get(struct mv88e6xxx_chip *chip)
-+{
-+	u16 period_ps;
-+	int err;
++/* Family MV88E6393X using internal clock:
++ * Raw timestamps are in units of 4-ns clock periods.
++ *
++ * clkadj = scaled_ppm * 4*2^28 / (10^6 * 2^16)
++ * simplifies to
++ * clkadj = scaled_ppm * 2^8 / 5^6
++ */
++#define MV88E6XXX_CC_4NS_SHIFT 28
++static const struct mv88e6xxx_cc_coeffs mv88e6xxx_cc_4ns_coeffs = {
++	.cc_shift = MV88E6XXX_CC_4NS_SHIFT,
++	.cc_mult = 4 << MV88E6XXX_CC_4NS_SHIFT,
++	.cc_mult_num = 1 << 8,
++	.cc_mult_dem = 15625ULL
++};
 +
-+	err = mv88e6xxx_tai_read(chip, MV88E6XXX_TAI_CLOCK_PERIOD, &period_ps, 1);
-+	if (err) {
-+		dev_err(chip->dev, "failed to read cycle counter period: %d\n",
-+			err);
-+		return ERR_PTR(err);
-+	}
-+
-+	switch (period_ps) {
-+	case 8000:
-+		return &mv88e6xxx_cc_8ns_coeffs;
-+	case 10000:
-+		return &mv88e6xxx_cc_10ns_coeffs;
-+	default:
-+		dev_err(chip->dev, "unexpected cycle counter period of %u ps\n",
-+			period_ps);
-+		return ERR_PTR(-ENODEV);
-+	}
-+}
-+
- static u64 mv88e6352_ptp_clock_read(const struct cyclecounter *cc)
- {
- 	struct mv88e6xxx_chip *chip = cc_to_chip(cc);
-@@ -217,7 +242,6 @@ static void mv88e6352_tai_event_work(struct work_struct *ugly)
- static int mv88e6xxx_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- {
- 	struct mv88e6xxx_chip *chip = ptp_to_chip(ptp);
--	const struct mv88e6xxx_ptp_ops *ptp_ops = chip->info->ops->ptp_ops;
- 	int neg_adj = 0;
- 	u32 diff, mult;
- 	u64 adj;
-@@ -227,10 +251,10 @@ static int mv88e6xxx_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- 		scaled_ppm = -scaled_ppm;
+ #define TAI_EVENT_WORK_INTERVAL msecs_to_jiffies(100)
+ 
+ #define cc_to_chip(cc) container_of(cc, struct mv88e6xxx_chip, tstamp_cc)
+@@ -110,6 +125,8 @@ mv88e6xxx_cc_coeff_get(struct mv88e6xxx_chip *chip)
  	}
  
--	mult = ptp_ops->cc_coeffs->cc_mult;
--	adj = ptp_ops->cc_coeffs->cc_mult_num;
-+	mult = chip->cc_coeffs->cc_mult;
-+	adj = chip->cc_coeffs->cc_mult_num;
- 	adj *= scaled_ppm;
--	diff = div_u64(adj, ptp_ops->cc_coeffs->cc_mult_dem);
-+	diff = div_u64(adj, chip->cc_coeffs->cc_mult_dem);
+ 	switch (period_ps) {
++	case 4000:
++		return &mv88e6xxx_cc_4ns_coeffs;
+ 	case 8000:
+ 		return &mv88e6xxx_cc_8ns_coeffs;
+ 	case 10000:
+@@ -483,10 +500,10 @@ static u64 mv88e6xxx_ptp_clock_read(const struct cyclecounter *cc)
+ 	return 0;
+ }
  
- 	mv88e6xxx_reg_lock(chip);
- 
-@@ -377,7 +401,6 @@ const struct mv88e6xxx_ptp_ops mv88e6165_ptp_ops = {
- 		(1 << HWTSTAMP_FILTER_PTP_V2_EVENT) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_SYNC) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_DELAY_REQ),
--	.cc_coeffs = &mv88e6xxx_cc_coeffs
- };
- 
- const struct mv88e6xxx_ptp_ops mv88e6250_ptp_ops = {
-@@ -401,7 +424,6 @@ const struct mv88e6xxx_ptp_ops mv88e6250_ptp_ops = {
- 		(1 << HWTSTAMP_FILTER_PTP_V2_EVENT) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_SYNC) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_DELAY_REQ),
--	.cc_coeffs = &mv88e6250_cc_coeffs,
- };
- 
- const struct mv88e6xxx_ptp_ops mv88e6352_ptp_ops = {
-@@ -425,7 +447,6 @@ const struct mv88e6xxx_ptp_ops mv88e6352_ptp_ops = {
- 		(1 << HWTSTAMP_FILTER_PTP_V2_EVENT) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_SYNC) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_DELAY_REQ),
--	.cc_coeffs = &mv88e6xxx_cc_coeffs,
- };
- 
- const struct mv88e6xxx_ptp_ops mv88e6390_ptp_ops = {
-@@ -450,7 +471,6 @@ const struct mv88e6xxx_ptp_ops mv88e6390_ptp_ops = {
- 		(1 << HWTSTAMP_FILTER_PTP_V2_EVENT) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_SYNC) |
- 		(1 << HWTSTAMP_FILTER_PTP_V2_DELAY_REQ),
--	.cc_coeffs = &mv88e6xxx_cc_coeffs,
- };
- 
- static u64 mv88e6xxx_ptp_clock_read(const struct cyclecounter *cc)
-@@ -485,11 +505,15 @@ int mv88e6xxx_ptp_setup(struct mv88e6xxx_chip *chip)
- 	int i;
- 
- 	/* Set up the cycle counter */
-+	chip->cc_coeffs = mv88e6xxx_cc_coeff_get(chip);
-+	if (IS_ERR(chip->cc_coeffs))
-+		return PTR_ERR(chip->cc_coeffs);
-+
- 	memset(&chip->tstamp_cc, 0, sizeof(chip->tstamp_cc));
- 	chip->tstamp_cc.read	= mv88e6xxx_ptp_clock_read;
- 	chip->tstamp_cc.mask	= CYCLECOUNTER_MASK(32);
--	chip->tstamp_cc.mult	= ptp_ops->cc_coeffs->cc_mult;
--	chip->tstamp_cc.shift	= ptp_ops->cc_coeffs->cc_shift;
-+	chip->tstamp_cc.mult	= chip->cc_coeffs->cc_mult;
-+	chip->tstamp_cc.shift	= chip->cc_coeffs->cc_shift;
- 
- 	timecounter_init(&chip->tstamp_tc, &chip->tstamp_cc,
- 			 ktime_to_ns(ktime_get_real()));
+-/* With a 125MHz input clock, the 32-bit timestamp counter overflows in ~34.3
++/* With a 250MHz input clock, the 32-bit timestamp counter overflows in ~17.2
+  * seconds; this task forces periodic reads so that we don't miss any.
+  */
+-#define MV88E6XXX_TAI_OVERFLOW_PERIOD (HZ * 16)
++#define MV88E6XXX_TAI_OVERFLOW_PERIOD (HZ * 8)
+ static void mv88e6xxx_ptp_overflow_check(struct work_struct *work)
+ {
+ 	struct delayed_work *dw = to_delayed_work(work);
 -- 
 2.46.2
 
