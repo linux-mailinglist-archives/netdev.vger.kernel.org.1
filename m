@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-132504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E4C3991F5E
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:30:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E047991F60
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 17:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFC391C21573
-	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:30:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13DE4B20331
+	for <lists+netdev@lfdr.de>; Sun,  6 Oct 2024 15:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE0D33A1A8;
-	Sun,  6 Oct 2024 15:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2822C13A896;
+	Sun,  6 Oct 2024 15:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KasCQxuW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFMJtHOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244C4154C14
-	for <netdev@vger.kernel.org>; Sun,  6 Oct 2024 15:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3926D520;
+	Sun,  6 Oct 2024 15:30:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728228618; cv=none; b=C8r4aow3FblsT+dRHt4yFgCUULgCslRHQcjZW8UHcnb6cCINvJRnru6AIfmAlXGNGf0yI10YYSqvyiWOmH/T9uzhwZpO/pOjII0eY4Gf1Q8C+nnK0OU/HbEx4uNhQV5/OkaablO2hiYDG/CTvQeTgy2ocjhHxVaZco+VZ1d4iKM=
+	t=1728228623; cv=none; b=JmhR+mmFCkp5+XTiILPUdFyMPuRH/TZWVV0XzhaVH7UWJMN0xIjwKPRtaqCbcAMBoonnzo3z+2vBPleYWdubfWQbzoktTmUvg0AcVv/t02mc0a9DIwDtQ2CIlCTZILKC9kLWpz0FJosOxnb9rbux8fMtsl1lJEraT3aC3CsX7x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728228618; c=relaxed/simple;
-	bh=yqLNmQqQ2UTGzTeTFsCtJV2tnUOW+xaFEIYFi1sn+m0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t0CNXWldvpUAa1k1W5lJggSYG8tTzDatWuK2VH+cZd9/IqxSh0CvcUtnu+BG3Gh8fMfjGcF9x0S6XmA1ql98QjLfaMnj8K7yqzZUmjDieKa+d2fvNS2aV6eb3DnXUqgNeHBiIfU6uW8znzgAlqzGqCJ749bq8dhbaaL0OkDON/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KasCQxuW; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728228617; x=1759764617;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JYZykGSkhtQOFNvY9Bx/VjSd4orrKyCCbbjFn7vbq4A=;
-  b=KasCQxuWZdJruhC7wRZDbU50NcD7fgZGMYzPwYtaPB5TUt4Q8Vph17Vs
-   uohnQXm3JLaxi6BixX6Y/sKeOjdjlTtcgxUu8bHcuGEmHhpTKW85LJYzu
-   pbihxY9ygdrYBk8rkFwavQSjwZSviffxS14BMh16zLnb2mDq5U+6hBQAB
-   I=;
-X-IronPort-AV: E=Sophos;i="6.11,182,1725321600"; 
-   d="scan'208";a="432934907"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2024 15:30:14 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:9468]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.41:2525] with esmtp (Farcaster)
- id ebf57cd5-b3c1-4e5e-8802-1934f02006e3; Sun, 6 Oct 2024 15:30:13 +0000 (UTC)
-X-Farcaster-Flow-ID: ebf57cd5-b3c1-4e5e-8802-1934f02006e3
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sun, 6 Oct 2024 15:30:13 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.11) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Sun, 6 Oct 2024 15:30:10 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kernelxing@tencent.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <willemb@google.com>, <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v4] net-timestamp: namespacify the sysctl_tstamp_allow_data
-Date: Sun, 6 Oct 2024 08:30:01 -0700
-Message-ID: <20241006153001.56027-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241005222609.94980-1-kerneljasonxing@gmail.com>
-References: <20241005222609.94980-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1728228623; c=relaxed/simple;
+	bh=7osjnz3x6fGyCNgfs1x2wSRnEILY1nEWjh37pv0qYKA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m3FuRozO7jW0kHG87bCJ7jF7UE+LkQ+FIt3pBBxE2NMXM0j4oT03QnpnPbjS7tDZHVmEuhC0TfHSBwU1Gc7i6AaA4/BkUgIMlPS10NQprKabh5huLgJJXrXvFL+Xd7zjpYqj6pjgxRqZkB7W1zROdJZbtGFUzIkUQr36uTkPOgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFMJtHOI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD0E3C4CEC5;
+	Sun,  6 Oct 2024 15:30:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728228622;
+	bh=7osjnz3x6fGyCNgfs1x2wSRnEILY1nEWjh37pv0qYKA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WFMJtHOIwKzV5n+t3NhKWiKCZLNH5PaeXi6gq4r9QgCHV7Uy9EBGTDZEbXdOozWBY
+	 fpnxHpjEH/rZkuAMuSHqdpQeUD24Ez5lt/kYfRPqne8q9k+SkCTWpqhiu1unw5lAAG
+	 hxkUoa+jAWLu5rQPNUMTNzqKHJM52QxqbZHjwTq//wPwEO5LEMXsRNHAAx+sRCrLwj
+	 mjTKzZ/5BxDSpAn7kvCnV1sAbE8bHmnqveOkQbhSn8T/ZVQ8l+rzc8K/ZyD/IBMiDt
+	 p+ybpDrPgEeE/dkPu5MA1ilaBKXAHhoc0o32XdsxTAZt9eRtpSmK89ThjxkfcdXYPC
+	 dWXbdfRf3urrw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3ED3806656;
+	Sun,  6 Oct 2024 15:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,17 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [net-next v2 0/1] hyperv: Link queues to NAPIs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172822862677.3446944.3843359587147988770.git-patchwork-notify@kernel.org>
+Date: Sun, 06 Oct 2024 15:30:26 +0000
+References: <20240930172709.57417-1-jdamato@fastly.com>
+In-Reply-To: <20240930172709.57417-1-jdamato@fastly.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, haiyangz@microsoft.com,
+ shradhagupta@linux.microsoft.com, horms@kernel.org, davem@davemloft.net,
+ kys@microsoft.com, decui@microsoft.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, wei.liu@kernel.org, linux-hyperv@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun,  6 Oct 2024 07:26:09 +0900
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Let it be tuned in per netns by admins.
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+Hello:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon, 30 Sep 2024 17:27:08 +0000 you wrote:
+> Greetings:
+> 
+> Welcome to v2.
+> 
+> This was previously an RFC [1], see changelog below.
+> 
+> I've only compile tested this series; I don't have the software for testing
+> this so I am hoping some one from Microsoft can review and test this
+> following the instructions below :)
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/1] hv_netvsc: Link queues to NAPIs
+    https://git.kernel.org/netdev/net-next/c/8b641b5e4c78
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
