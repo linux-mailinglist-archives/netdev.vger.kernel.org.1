@@ -1,148 +1,198 @@
-Return-Path: <netdev+bounces-132628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB6199288A
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:58:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1503C99288B
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50C731F23E70
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 09:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EEE21C22DEF
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 09:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B4BD1BBBD2;
-	Mon,  7 Oct 2024 09:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D701AB514;
+	Mon,  7 Oct 2024 09:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="j72V6fRe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gZ6uzqqN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD0A1BA862
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 09:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92E119F417
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 09:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728295015; cv=none; b=GN+5ZnOA3Qnc5qNWou020ild1dzjJA2B3FZgVtPbHBwqwt1ddYxWW+6wpG8BdgNMkXlVvcsyiqe/R2wMnAEFPiXkT9Z1N4nyQk7vt1rclC57V3k7u+XY50BhfvLx/UR74R0PFdM7Bl/45AwYqhqW2S+FuYq5Nw1Iaiz1OtUUSu4=
+	t=1728295056; cv=none; b=CPX3UM53JHSB27OE5UwdOoUbadrRhICh7vaPhurGVyV+FyS4VAvaiHx9kL0OpcAmCbIMfwwFVFreJnExRYrU8NCdJnejvK4wbOYLd9ivNxBIoJuyxlzsmJlDNe4NUrX3Fexr9cEZ9W96AzvVZ+wsJgF0PPaauZqxLhqZeX2IEBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728295015; c=relaxed/simple;
-	bh=bGXPJNPZ9bbivmMFlovfROrjazfAe8iawaLYrNfE2k4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u+nAZyvE4NrNbWEYCTmzebpSzCvg2I1v7wtezqck/xdZaE4ZwLcBAGTJ/icOvuj/CwJjyqNgwiAyyo+v2jyXu1aIrTb8XnWokFjpH0YvLt5Pb5E5SL2LHiYvsLtZHbYKvJ+CmGPcZTxdROHWrvhBVb4H0UJQF8ktPxgxIg9HgXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=j72V6fRe; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ac195016-a05a-4757-9876-94d076937af7@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728295009;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6slEjR74uKJlOpAJ51VDLSo02Voe1Vq0sLlNh4SQ+4Y=;
-	b=j72V6fReEyOZKN53Er3c/nhLT7Dz7CZi7Qm2Fk8M44gxZgeZLDCvpEVKMWt1dPuxxqBn3A
-	K0PFedaBWtEdFvfOe/cbl0Dqw3npkBev+cajXrsHthsAMydOoMzKgRe3m7vFDuVTLSIaKp
-	a9MiA33E4QJj+TGZUDRPaC9oN9qZgI0=
-Date: Mon, 7 Oct 2024 10:56:43 +0100
+	s=arc-20240116; t=1728295056; c=relaxed/simple;
+	bh=DoCyKmcLzygqXthrjLyQ3D+J0Er5uE4bdMVLDhUg3fQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=i0sgHfxnnv66JbwzLcTd3a+K1v2QIB7+dcOvshSpSPiGnrg0Df/hqomKKLfGv0HK43VipF9Ftu8L+l8C2ruE4yHrUFLE1de7LplBPXQRMJrO9VhJlzymUSJK9ijGCwrwgweRVjNJjtbf3E221kSm9gD6CwWvQyd/D/ac8HTOfNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gZ6uzqqN; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c88c9e45c2so9116511a12.0
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 02:57:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728295053; x=1728899853; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jlbXF7wEKp+P+efVL/ZgZfWHmvR+8HrfBf9QPEMYFlw=;
+        b=gZ6uzqqNqagmYistEeYEqjS1IzC1pdtJQYY5oIrNez8JG/knAXgHqsBB2unOMuiLG1
+         WlFTU5UxkQ3t/okGnSNsCWOOipaf9OOFzEUMrGhtY1bgLUpXWHRQzpeO5Sf8cTL5hFgi
+         vs5xpWVL9jHIo2GER471WDPCYQRJu42JWUjvU26mQUCafSTXnxj723FQUinpK47LQBdP
+         zbhjWHcQPvzxunXfH/uD4U8u3oBOmExRIE/QtYTgyme3r6J6tnxGE1T6vRHHBxj/FKmh
+         EdXmUeeiQOIdg+qNFLw6PejU704WkSQeAC4rOk32UmeAf/jKXX3m9+vjb1bNkYilpgmZ
+         ESeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728295053; x=1728899853;
+        h=content-transfer-encoding:cc:to:autocrypt:subject:from
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jlbXF7wEKp+P+efVL/ZgZfWHmvR+8HrfBf9QPEMYFlw=;
+        b=BVhBmiumWei8c4zeFBt/xGG4YePrgCyEgGtfIIuVYVZu9Aass8sudgUqaoDF0iMHah
+         TaeNRCCTpOMLvfCVCeDQoJaFC3T/8kFbV/UNRWKa+hhOmOXUUdWKh4raPm+1rBjRdxWS
+         GBRX80plINbRofsfmV4m31FCImbiLDgHfAAiDGwuWnd+hxNaJzkKQyjvQ8XvN0og/7Pl
+         5O8r8mdFYE4/AgUnudnD8iDM7CJm13cOarIJ5l7vcUU+a1rX/X4bAeXRNnR4rI1PjyM9
+         +uD649SOsIdvRxQ5HXlrgAcWpbGelwi+0C+q54jytor5LmOaX9cMDC7LCk9hyQXDrGIo
+         YRCw==
+X-Gm-Message-State: AOJu0YxawooeqLrR/4kVI/kJvv8aBNPOEECczyYwuUVAihrtShIMPXpo
+	SEIvgM96QXzGrbbpUtVjpzldcXx/o+8mX/N9lmupXkd5sJm2Yz6g0AuSKQ==
+X-Google-Smtp-Source: AGHT+IGq5QtM4+1U0v6hyKGxaCWzU5MZ7kMdrh0GnaUNToiLCbs2qx2D+OhAjE5Kv9mGvl57m871Kg==
+X-Received: by 2002:a17:907:1a4a:b0:a99:2af6:bdcf with SMTP id a640c23a62f3a-a992af6d409mr491008266b.32.1728295052783;
+        Mon, 07 Oct 2024 02:57:32 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:a12d:4f00:8871:a49a:3cb3:6563? (dynamic-2a02-3100-a12d-4f00-8871-a49a-3cb3-6563.310.pool.telefonica.de. [2a02:3100:a12d:4f00:8871:a49a:3cb3:6563])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a992e7856dbsm354673366b.122.2024.10.07.02.57.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2024 02:57:32 -0700 (PDT)
+Message-ID: <431c3bdc-d493-46b9-889a-4db3363275ff@gmail.com>
+Date: Mon, 7 Oct 2024 11:57:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 1/5] eth: fbnic: add software TX timestamping
- support
-To: Jacob Keller <jacob.e.keller@intel.com>, Vadim Fedorenko
- <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
- David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Alexander Duyck <alexanderduyck@fb.com>
-Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
-References: <20241003123933.2589036-1-vadfed@meta.com>
- <20241003123933.2589036-2-vadfed@meta.com>
- <57d913bb-a320-4885-9477-a2e287f3f027@intel.com>
+User-Agent: Mozilla Thunderbird
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <57d913bb-a320-4885-9477-a2e287f3f027@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] net: phy: realtek: Fix MMD access on RTL8126A-integrated
+ PHY
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+To: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 04/10/2024 23:55, Jacob Keller wrote:
-> 
-> 
-> On 10/3/2024 5:39 AM, Vadim Fedorenko wrote:
->> Add software TX timestamping support. RX software timestamping is
->> implemented in the core and there is no need to provide special flag
->> in the driver anymore.
->>
->> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->> ---
->>   drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c | 11 +++++++++++
->>   drivers/net/ethernet/meta/fbnic/fbnic_txrx.c    |  3 +++
->>   2 files changed, 14 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
->> index 5d980e178941..ffc773014e0f 100644
->> --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
->> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
->> @@ -6,6 +6,16 @@
->>   #include "fbnic_netdev.h"
->>   #include "fbnic_tlv.h"
->>   
->> +static int
->> +fbnic_get_ts_info(struct net_device *netdev,
->> +		  struct kernel_ethtool_ts_info *tsinfo)
->> +{
->> +	tsinfo->so_timestamping =
->> +		SOF_TIMESTAMPING_TX_SOFTWARE;
->> +
->> +	return 0;
->> +}
->> +
-> 
-> You could use ethtool_op_get_ts_info(), but I imagine future patches
-> will update this for hardware timestamping, so I don't think thats a big
-> deal.
-> 
-> I think you *do* still want to report SOF_TIMESTAMPING_RX_SOFTWARE and
-> SOF_TIMESTAMPING_SOFTWARE to get the API correct... Perhaps that could
-> be improved in the core stack though.... Or did that already get changed
-> recently?
+All MMD reads return 0 for the RTL8126A-integrated PHY. Therefore phylib
+assumes it doesn't support EEE, what results in higher power consumption,
+and a significantly higher chip temperature in my case.
+To fix this split out the PHY driver for the RTL8126A-integrated PHY
+and set the read_mmd/write_mmd callbacks to read from vendor-specific
+registers.
 
-Yeah, as you found in the next mail, software RX timestamping was moved
-to the core recently.
+Fixes: 5befa3728b85 ("net: phy: realtek: add support for RTL8126A-integrated 5Gbps PHY")
+Cc: stable@vger.kernel.org
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/realtek.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-> You should also set phc_index to -1 until you have a PTP clock device.
-
-That's definitely missing, thanks! I'll add it to the next version.
-
-> 
->>   static void
->>   fbnic_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
->>   {
->> @@ -66,6 +76,7 @@ fbnic_get_eth_mac_stats(struct net_device *netdev,
->>   
->>   static const struct ethtool_ops fbnic_ethtool_ops = {
->>   	.get_drvinfo		= fbnic_get_drvinfo,
->> +	.get_ts_info		= fbnic_get_ts_info,
->>   	.get_eth_mac_stats	= fbnic_get_eth_mac_stats,
->>   };
->>   
->> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
->> index 6a6d7e22f1a7..8337d49bad0b 100644
->> --- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
->> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
->> @@ -205,6 +205,9 @@ fbnic_tx_map(struct fbnic_ring *ring, struct sk_buff *skb, __le64 *meta)
->>   
->>   	ring->tail = tail;
->>   
->> +	/* Record SW timestamp */
->> +	skb_tx_timestamp(skb);
->> +
->>   	/* Verify there is room for another packet */
->>   	fbnic_maybe_stop_tx(skb->dev, ring, FBNIC_MAX_SKB_DESC);
->>   
-> 
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 25e5bfbb6..c07e16df0 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -1078,6 +1078,16 @@ static int rtl8221b_vn_cg_c45_match_phy_device(struct phy_device *phydev)
+ 	return rtlgen_is_c45_match(phydev, RTL_8221B_VN_CG, true);
+ }
+ 
++static int rtl8251b_c22_match_phy_device(struct phy_device *phydev)
++{
++	return rtlgen_is_c45_match(phydev, RTL_8251B, false);
++}
++
++static int rtl8251b_c45_match_phy_device(struct phy_device *phydev)
++{
++	return rtlgen_is_c45_match(phydev, RTL_8251B, true);
++}
++
+ static int rtlgen_resume(struct phy_device *phydev)
+ {
+ 	int ret = genphy_resume(phydev);
+@@ -1415,7 +1425,7 @@ static struct phy_driver realtek_drvs[] = {
+ 		.suspend        = genphy_c45_pma_suspend,
+ 		.resume         = rtlgen_c45_resume,
+ 	}, {
+-		PHY_ID_MATCH_EXACT(0x001cc862),
++		.match_phy_device = rtl8251b_c45_match_phy_device,
+ 		.name           = "RTL8251B 5Gbps PHY",
+ 		.get_features   = rtl822x_get_features,
+ 		.config_aneg    = rtl822x_config_aneg,
+@@ -1424,6 +1434,18 @@ static struct phy_driver realtek_drvs[] = {
+ 		.resume         = rtlgen_resume,
+ 		.read_page      = rtl821x_read_page,
+ 		.write_page     = rtl821x_write_page,
++	}, {
++		.match_phy_device = rtl8251b_c22_match_phy_device,
++		.name           = "RTL8126A-internal 5Gbps PHY",
++		.get_features   = rtl822x_get_features,
++		.config_aneg    = rtl822x_config_aneg,
++		.read_status    = rtl822x_read_status,
++		.suspend        = genphy_suspend,
++		.resume         = rtlgen_resume,
++		.read_page      = rtl821x_read_page,
++		.write_page     = rtl821x_write_page,
++		.read_mmd	= rtl822x_read_mmd,
++		.write_mmd	= rtl822x_write_mmd,
+ 	}, {
+ 		PHY_ID_MATCH_EXACT(0x001ccad0),
+ 		.name		= "RTL8224 2.5Gbps PHY",
+-- 
+2.46.2
 
 
