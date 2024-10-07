@@ -1,146 +1,135 @@
-Return-Path: <netdev+bounces-132687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68D9992C5B
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:48:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E8E992C5D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E6721F23BE4
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:48:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 244191C229B9
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51A31D2F70;
-	Mon,  7 Oct 2024 12:47:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EC61D2785;
+	Mon,  7 Oct 2024 12:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MUeH+siT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XS3xWXlD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7851D2785
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 12:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3AC1BB6B8;
+	Mon,  7 Oct 2024 12:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728305262; cv=none; b=EBIdSRywjQqgigu3rBX3tKp2ff71jYTynuYa9N+cR+gY9hYpmZYwX82HJcVPy5ITManIvOzDKKq+24HQpaYi3GQ2wMxcfyjPaQZVhRONVv2PBViII3XPa+JF8kjHrq3YXgfQudzqxYjCYtlrZvvotI72SK+ymQpwLxpWOR9+g3s=
+	t=1728305335; cv=none; b=m/8fD/To49r9ClfzA1O9c7eB3zNTINL25qdisd+4tw2LAetdLTZNLD8ZxVgi8NwovKCShQz3pNfkyxf8KuWf1RvCYxc15v7zocLJCLg9ncyXmDG58UleUPLODklWF+gQY+OnOF+OTBuHP6DkUmmaffSe0l15EwUdqraES+Ag8TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728305262; c=relaxed/simple;
-	bh=oYxEIsaP3WL2MRzRxLlA5XF+Ejl3KsZ2c6rDs+Dkq0Q=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=koLFsl4jQ9XnbnOoXeFZenxvdJEER4oenToyep5MZXI26O/gnF706h0Hnsf134J1R0h+Nc+9aKBP50HIdEQO1ShJMU0SsYXN7djV8qjDa181bxkn7r4TnAB5QKvT/zLZrO4ABHOiagNpf7apj1rTHghy+DtzhFLW/8rjH8g+epQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MUeH+siT; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728305261; x=1759841261;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JUpVPW4P+4HVDp3hOfSUT6RRPyzbBGDILckMJXGmhPY=;
-  b=MUeH+siT83ST4xivVnataOEqpgRIk4KrWSac1CJpYwqKMRKnI0ZXKr1M
-   T2tfQGUrx/du+ajVfN1P/MO/AZqyaQBpINB/gKdFk88PAaJljY8l2gRL/
-   +8zyueKTYeJConzNtUosYO5nBB8rL0WWl4/VP0NoXy9gIxr1bmyDWWa5y
-   c=;
-X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
-   d="scan'208";a="136165856"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 12:47:39 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:30501]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.198:2525] with esmtp (Farcaster)
- id f701fa0d-651a-460b-8276-10b243331aa5; Mon, 7 Oct 2024 12:47:38 +0000 (UTC)
-X-Farcaster-Flow-ID: f701fa0d-651a-460b-8276-10b243331aa5
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 12:47:38 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.221.239) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 7 Oct 2024 12:47:35 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	=?UTF-8?q?R=C3=A9mi=20Denis-Courmont?= <courmisch@gmail.com>, "Florian
- Westphal" <fw@strlen.de>
-Subject: [PATCH v3 net 6/6] phonet: Handle error of rtnl_register_module().
-Date: Mon, 7 Oct 2024 05:44:59 -0700
-Message-ID: <20241007124459.5727-7-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241007124459.5727-1-kuniyu@amazon.com>
-References: <20241007124459.5727-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1728305335; c=relaxed/simple;
+	bh=XWgabam3fhc3PvpjHHnnru1mmimtxFrWT467mkfuww0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rqDr3G8mAdijQibrGSab4TuiN4ezcvtV8RAgR5WXAaO7i6milAHYNpizfLFbccGtggcvoO70BLxLeg4KUfLGpDGFzGch2DAyBxeFPwx40cjQQsUWc5e2L86c7YFDFXSuwO4fCd01Ld3tBgEWsWOWL0OeeNZlG7qn7hHjbSXwGMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XS3xWXlD; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728305335; x=1759841335;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=XWgabam3fhc3PvpjHHnnru1mmimtxFrWT467mkfuww0=;
+  b=XS3xWXlDE9ZlxLVMeGD7SEIq+Kqd1lIUIZXM0S995f4n9RxjZRiSLFdp
+   MGxtkUo/qX1yqTOacf2lSD8uaQ/buL15eWzzBrnxt8VbeBRMIMchIpW7k
+   /3rSYQ5LzGsbAp+kh79d4XVwOO3HhqBeaMu3fKPxHAE7M5tFFWnBeT2EH
+   GPu75DMSHpoF0UQWsJTmHGfgZKkACsSF75C6tBe6CN3agjheZCzmmvKmM
+   pg0KV1PTW/RqcdcvH9ZsAfg0kjEljAqP8hPL4gjLFNB4r3Bw0x83cVWT3
+   ULkL2SrYAzY+KiMUzw4ty7lUNFKhbeXyyM7hlcTSW453iOSDUBV/SfyFl
+   w==;
+X-CSE-ConnectionGUID: rnGGckzESDWIRRiffUPziQ==
+X-CSE-MsgGUID: E6/UXZ0LTMujkUF3fMLS5w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="31152294"
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="31152294"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 05:48:54 -0700
+X-CSE-ConnectionGUID: bP6fMKj0RnyrWoAmPTX4GQ==
+X-CSE-MsgGUID: rdegqp39TlWWvVoSaAoULg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="80055132"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 07 Oct 2024 05:48:50 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sxnAO-0004z2-0K;
+	Mon, 07 Oct 2024 12:48:48 +0000
+Date: Mon, 7 Oct 2024 20:48:42 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Yang <danielyangkang@gmail.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, danielyangkang@gmail.com,
+	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] resolve gtp possible deadlock warning
+Message-ID: <202410072002.hT2D7135-lkp@intel.com>
+References: <20241005045411.118720-1-danielyangkang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241005045411.118720-1-danielyangkang@gmail.com>
 
-Before commit addf9b90de22 ("net: rtnetlink: use rcu to free rtnl
-message handlers"), once the first rtnl_register_module() allocated
-rtnl_msg_handlers[PF_PHONET], the following calls never failed.
+Hi Daniel,
 
-However, after the commit, rtnl_register_module() could fail to allocate
-rtnl_msg_handlers[PF_PHONET][msgtype] and requires error handling for
-each call.
+kernel test robot noticed the following build warnings:
 
-Let's use rtnl_register_many() to handle the errors easily.
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.12-rc2 next-20241004]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Fixes: addf9b90de22 ("net: rtnetlink: use rcu to free rtnl message handlers")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Acked-by: Rémi Denis-Courmont <courmisch@gmail.com>
----
-Cc: Florian Westphal <fw@strlen.de>
----
- net/phonet/pn_netlink.c | 28 +++++++++++-----------------
- 1 file changed, 11 insertions(+), 17 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Yang/resolve-gtp-possible-deadlock-warning/20241005-125510
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20241005045411.118720-1-danielyangkang%40gmail.com
+patch subject: [PATCH v2] resolve gtp possible deadlock warning
+config: x86_64-buildonly-randconfig-005-20241007 (https://download.01.org/0day-ci/archive/20241007/202410072002.hT2D7135-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241007/202410072002.hT2D7135-lkp@intel.com/reproduce)
 
-diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-index 7008d402499d..894e5c72d6bf 100644
---- a/net/phonet/pn_netlink.c
-+++ b/net/phonet/pn_netlink.c
-@@ -285,23 +285,17 @@ static int route_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	return err;
- }
- 
-+static const struct rtnl_msg_handler phonet_rtnl_msg_handlers[] __initdata_or_module = {
-+	{THIS_MODULE, PF_PHONET, RTM_NEWADDR, addr_doit, NULL, 0},
-+	{THIS_MODULE, PF_PHONET, RTM_DELADDR, addr_doit, NULL, 0},
-+	{THIS_MODULE, PF_PHONET, RTM_GETADDR, NULL, getaddr_dumpit, 0},
-+	{THIS_MODULE, PF_PHONET, RTM_NEWROUTE, route_doit, NULL, 0},
-+	{THIS_MODULE, PF_PHONET, RTM_DELROUTE, route_doit, NULL, 0},
-+	{THIS_MODULE, PF_PHONET, RTM_GETROUTE, NULL, route_dumpit,
-+	 RTNL_FLAG_DUMP_UNLOCKED},
-+};
-+
- int __init phonet_netlink_register(void)
- {
--	int err = rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_NEWADDR,
--				       addr_doit, NULL, 0);
--	if (err)
--		return err;
--
--	/* Further rtnl_register_module() cannot fail */
--	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_DELADDR,
--			     addr_doit, NULL, 0);
--	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_GETADDR,
--			     NULL, getaddr_dumpit, 0);
--	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_NEWROUTE,
--			     route_doit, NULL, 0);
--	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_DELROUTE,
--			     route_doit, NULL, 0);
--	rtnl_register_module(THIS_MODULE, PF_PHONET, RTM_GETROUTE,
--			     NULL, route_dumpit, RTNL_FLAG_DUMP_UNLOCKED);
--	return 0;
-+	return rtnl_register_many(phonet_rtnl_msg_handlers);
- }
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410072002.hT2D7135-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/smc/af_smc.c:22:9: warning: 'pr_fmt' macro redefined [-Wmacro-redefined]
+      22 | #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+         |         ^
+   include/linux/printk.h:380:9: note: previous definition is here
+     380 | #define pr_fmt(fmt) fmt
+         |         ^
+   1 warning generated.
+
+
+vim +/pr_fmt +22 net/smc/af_smc.c
+
+ac7138746e1413 Ursula Braun 2017-01-09 @22  #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+ac7138746e1413 Ursula Braun 2017-01-09  23  
+
 -- 
-2.30.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
