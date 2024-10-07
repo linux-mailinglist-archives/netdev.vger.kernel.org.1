@@ -1,162 +1,122 @@
-Return-Path: <netdev+bounces-132818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6EF993501
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:28:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F4699350A
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:30:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 407A4B216CD
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:28:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A89541F24F07
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138781DD55D;
-	Mon,  7 Oct 2024 17:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1D9B1DD87A;
+	Mon,  7 Oct 2024 17:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AELZbK/4"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="GYPAHP7k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980EF1DD55F
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 17:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F37E17740;
+	Mon,  7 Oct 2024 17:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728322127; cv=none; b=MglpShJh3KFkBNi2m8Hxl+0BWUJMRqu7YyC8EvInb8LWLheBVxLQHLANGpIWWqwjZGKQ6t1SiXgP/mYbW4hHQQP6H+dq4pj/othL/Z8c1jxEMJ/L7CX/06y394SWEU/Cz9SFgMx66Xjxz6aZCvTaDembf05xdu0AZVrmsPcQAM0=
+	t=1728322211; cv=none; b=geZB3FScdYr2dmlbl/l76kDAHol81a1TXuPwD2GJDVaibwNOyhQuBnFMX65PCnAsctuM5WxdvEYomfm+MZk0V2QdZWZIpUTKFU7RQbgYnZ5vPBr+Sva5rYTrt2VTT4jSoPFhLDyLmQ2I2mAyjwWvjW5LRTW5ksRQyfZjqBPXDzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728322127; c=relaxed/simple;
-	bh=3CJvxuJ6KqxdJiUfgEGSn5hJJ5U9bsLjc3awc4rHEQ0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Ck83kz/eEzygA25XeYG9/o8aokdr9Bo0lGicJBJ5olodFHuuesApHRUw6919AARCmZ0JsHkb5KoIGTVRHy9zMEfqU5MJam8XO0fsOYOa3wcwnfT1tII+LPkDipQdKk3IV6Xs5gBywh7TwNf6y34r+IpcvZ/QdK0OMiqslpXUFNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AELZbK/4; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20b5fb2e89dso35882405ad.1
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 10:28:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728322125; x=1728926925; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=/MVLiebyBqKMOWwjWUN1n0h3eMZlRkRs9MYlwTgHAG4=;
-        b=AELZbK/4OykyUSFWryuMSIIDjy6pL9YHY9oWF8YJWIlEzAE7d+w/SyLcO959XH3TNS
-         pQ9cmsTlEQRJ8O/BATfXmE34yq5ZH8Gi8hS/TojyVas6BtAKLCz99k+qVHqksUAj+IKZ
-         6fjXgFh2LesCEVqLqyTqwvfU5IBe4Qde74sKlYu4GlJ0IK4RiQos3JI8wcKERa0Kflt/
-         1m58KJYUXCnqO35lB8j3TVmQ8zjTIJONWR5D9xgcTLJ9AbN27sCfe11AVQet69LtTYzQ
-         EgH4r7MAYNN9kQiGhjgki7ghkCxI04lnVkLkKM5Bv9bMbGp9IgLR0k5KzaSHRukRvCos
-         MdGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728322125; x=1728926925;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/MVLiebyBqKMOWwjWUN1n0h3eMZlRkRs9MYlwTgHAG4=;
-        b=uiDoKs9o30OWXlc+aAStnuSFAQPixBbyR+Gx+UMeX2eNp0vQaslSAC5oGd3BPF13yt
-         Q8zVgjxiGS4UFti/WhuNKifg47EU2VJ7ptNoauJhFs+i+CqrSxxm7khWmzg6EYOTLJ/T
-         dYPALhJgt6soiFoeDOkA7WFjNY1xUKewzFkb5dJJ+pfaivcmHyY0LSfz0TWgJepEsdCd
-         E2Wvkmyb3Q/Yb8LvHtnldCHZKaQwD3vjOoyATVxtzEt7Puh1FggTSQNXaSuUuqPWQePE
-         jto3kgTiigHWFqyGoZvnFb684p8q0CJhpJ0aSGiigNLuFVV1SBzk8n5KqDNUWJifSbwq
-         tczg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlQos4RC+wYsT01tRJv9XjE0vNbeDdrXJFW31LApBWN1/Ger5mhyA4Imy65sAAjRZBxsfEVps=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxR+sDLnMzYRvG1V1yXqr19YPqDsgbb17ca0smYehJ+oRUAc7d3
-	v47MgCRtNExvIeu1hJJQ0dQ/knoKwFLGWLr2NIAvA+FzJPT1DzXOqO4/AQ==
-X-Google-Smtp-Source: AGHT+IFl6aswS+BLrAFwmuBr2dE4rUQ+o+CuIIUiE56uQwCtH9lgg7PURlUEh7Lidrh1xWpgNIMc4g==
-X-Received: by 2002:a17:90a:77c4:b0:2e1:ce67:5d29 with SMTP id 98e67ed59e1d1-2e1e62a197dmr15321552a91.21.1728322124748;
-        Mon, 07 Oct 2024 10:28:44 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1e83ca284sm7433538a91.11.2024.10.07.10.28.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Oct 2024 10:28:44 -0700 (PDT)
-Message-ID: <c572529e-78c4-42d5-a799-1027fd5fca29@gmail.com>
-Date: Mon, 7 Oct 2024 10:28:43 -0700
+	s=arc-20240116; t=1728322211; c=relaxed/simple;
+	bh=KExhS6quS1V4EUyu0mZRHKERFsQ/vsL1TLj4EjRdFGI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=St8CIDXhftnlBODZHXiErNArYB61XiacAZfOdAHTi66UtDglQE+H8QcxuDAYZ6zllNVRVzaRh9YF8MQcAHLlt+vbIVuYNb/UfagRIzANFA9pE8m9h6AX5wTluCBMeqj04OR47S/LHyRLh++fP5/6nSBn5X78ELkbpy93jK00IN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=GYPAHP7k; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=DZ5PBbvmh600KyglS3wsWLHfo8lfLmkNDgy5pOUZEGs=;
+	t=1728322210; x=1729531810; b=GYPAHP7kuM5HFqo4lAxSvdmHBy8h/qd9eQG3b63T9lw68JW
+	K17Pn34NxbySmKSKOQw0xzVKkcfMXGLrTAAgJeMz5Rz4FHTwwknGWg1+R0MsHSnwgye34YKP9do6G
+	6OpVWK4043MqZtJOwQQ0tEwved213LvJzVX+CDkdLG7XEgPIL6/TKdclW9MKnHWLlml/CzBOTUuUJ
+	ZicUlEDj019Ob0r+w0sLW1VUwDu85pCAQSEtXyjRP7sDl6y7+TfTAwydE6WhFU9maKCX6Ek9ajdz3
+	Yry2+gjoAG9XW4zj3wcilj7b7LoPA5bE4GM4oMCqOeKBoYj2CviL2gvq0yS0aoZw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1sxrYZ-00000003Soc-2SRY;
+	Mon, 07 Oct 2024 19:30:03 +0200
+Message-ID: <bad9e220ad3d2625d23b3d7230d6876aa726dd78.camel@sipsolutions.net>
+Subject: Re: [PATCH RFC net 1/2] MAINTAINERS: consistently exclude wireless
+ files from NETWORKING [GENERAL]
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Simon Horman <horms@kernel.org>, Kalle Valo <kvalo@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ linux-kernel@vger.kernel.org,  linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org
+Date: Mon, 07 Oct 2024 19:30:02 +0200
+In-Reply-To: <20241007141305.GD32733@kernel.org>
+References: <20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org>
+	 <20241004-maint-net-hdrs-v1-1-41fd555aacc5@kernel.org>
+	 <87setb7us5.fsf@kernel.org> <20241007141305.GD32733@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Linux network PHY initial configuration for ports not 'up'
-To: Tim Harvey <tharvey@gateworks.com>, netdev <netdev@vger.kernel.org>
-References: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
- xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
- X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
- AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
- ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
- SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
- nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
- qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
- YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
- FgIDAQIeAQIXgAUCZtdNBQUJMNWh3gAKCRBhV5kVtWN2DhBgAJ9D8p3pChCfpxunOzIK7lyt
- +uv8dQCgrNubjaY9TotNykglHlGg2NB0iOLOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
- WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
- pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
- hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
- OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
- Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
- oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
- 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
- BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
- +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
- FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
- 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
- vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
- WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
- HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
- HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
- Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
- kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
- aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
- y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
- X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-On 10/7/24 09:48, Tim Harvey wrote:
-> Greetings,
-> 
-> What is the policy for configuration of network PHY's for ports that
-> are not brought 'up'?
-> 
-> I work with boards with several PHY's that have invalid link
-> configuration which does not get fixed until the port is brought up.
-> One could argue that this is fine because the port isn't up but in the
-> case of LED misconfiguration people wonder why the LED's are not
-> configured properly until the port is brought up (or they wonder why
-> LEDs are ilumnated at all for a port that isn't up). Another example
-> would be a PHY with EEE errata where EEE should be disabled but this
-> doesn't happen utnil the port is brought up yet while the port is
-> 'down' a link with EEE is still established at the PHY level with a
-> link partner. One could also point out that power is being used to
-> link PHY's that should not even be linked.
-> 
-> In other words, should a MAC driver somehow trigger a PHY to get
-> initialized (as in fixups and allowing a physical link) even if the
-> MAC port is not up? If so, how is this done currently?
+On Mon, 2024-10-07 at 15:13 +0100, Simon Horman wrote:
+> On Fri, Oct 04, 2024 at 06:27:38PM +0300, Kalle Valo wrote:
+> > Simon Horman <horms@kernel.org> writes:
+> >=20
+> > > We already exclude wireless drivers from the netdev@ traffic, to
+> > > delegate it to linux-wireless@, and avoid overwhelming netdev@.
+> > >=20
+> > > Many of the following wireless-related sections MAINTAINERS
+> > > are already not included in the NETWORKING [GENERAL] section.
+> > > For consistency, exclude those that are.
+> > >=20
+> > > * 802.11 (including CFG80211/NL80211)
+> > > * MAC80211
+> > > * RFKILL
+> > >=20
+> > > Signed-off-by: Simon Horman <horms@kernel.org>
+> > > ---
+> > >  MAINTAINERS | 11 +++++++++++
+> > >  1 file changed, 11 insertions(+)
+> > >=20
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index c27f3190737f..ea3ea2c0d3fa 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -16197,8 +16197,19 @@ F:	lib/random32.c
+> > >  F:	net/
+> > >  F:	tools/net/
+> > >  F:	tools/testing/selftests/net/
+> > > +X:	Documentation/networking/mac80211-injection.rst
+> > > +X:	Documentation/networking/mac80211_hwsim/
+> > > +X:	Documentation/networking/regulatory.rst
+> > > +X:	include/net/cfg80211.h
+> > > +X:	include/net/ieee80211_radiotap.h
+> > > +X:	include/net/iw_handler.h
+> > > +X:	include/net/mac80211.h
+> > > +X:	include/net/wext.h
+> >=20
+> > Should we add also lib80211.h?
+>=20
+> Thanks, I missed that one. Perhaps it should have:
+>=20
+> * An F: entry in the MAC80211
 
-There are drivers that have historically brought up Ethernet PHYs in the 
-MAC's probe routine. This is fine in premise, and you get a bit of speed 
-up because by the time the network interface is opened by user-space you 
-have usually finished auto-negotiation. This does mean that usually the 
-PHY is already in the UP state.
+I suppose it should rather be in the 802.11 entry rather than the
+MAC80211 one. I don't like the code anyway, but it's there for now :)
 
-The caveat with that approach is that it does not conserve power, and it 
-assumes that the network device will end-up being used shortly 
-thereafter, which is not a given.
-
-For LEDs, I would argue that if you care about having some sensible 
-feedback, the place where this belongs is the boot loader, because you 
-can address any kernel short comings there: lack of a kernel driver for 
-said PHY/MAC, network never being brought up, etc.
-
-For errata like EEE, it seems fine to address that at link up time.
--- 
-Florian
+johannes
 
