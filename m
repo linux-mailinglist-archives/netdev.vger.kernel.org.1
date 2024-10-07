@@ -1,158 +1,200 @@
-Return-Path: <netdev+bounces-132668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D87992BBC
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:28:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B526992BBF
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2AE81F20FC0
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:28:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 295FB280FA0
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 894DA1D27AF;
-	Mon,  7 Oct 2024 12:28:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B4E1D26E8;
+	Mon,  7 Oct 2024 12:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="E4Ve4PfV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZ0poWZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBC51D2794
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 12:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF8118BC03;
+	Mon,  7 Oct 2024 12:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728304120; cv=none; b=E+61cBgvHk4CtriIgr62Uatd6AlriYdL5/Tl9ZeA63nRukEoIIlbkIiq/pjDisPY4cPFNue61yuaB3/7oSmmF4XfYHlOpSq81lU75NvseHfnQj6mY7qxk4/gU274bv2qVMJiDU0jdKWr/dq87z8THR5bCtQlK6VWKasRMXOI0lI=
+	t=1728304190; cv=none; b=HjwKkOjZmYPKTnIm6pqxXMkrVnBUX8fb9mzZlNi1r0C/PzLLgEsVLzA9SMVw263T+mwnWMnV/KErgUjvJoLj8ZGMlFH13/LzN++GMEyhnkFRZJlNDbePv1WJo3qRGxjLeFzao07AEa0AhMQtVIn4xdsH0EDEnX81FVAlFf0/TGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728304120; c=relaxed/simple;
-	bh=HJ9m1TkqNBRzb8HYpzfsA3WB1FXid62/fo1RseEX7XQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YhudDbZ7HCbVDOi56lJzf5GUtVADSgd3Dhwb2aDy/BOwzV6I6ApUXR7XuoT5qWM0RjDjfILDtrNORwOgZVbESdWKs2afeBYL6wiq2KPvw4CLSOuGX54LO7pGV3mEyF15AK7rmU4hyYBncWU2hQ5L5+Y9ygq0VRI/qDAw7noKtg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=E4Ve4PfV; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1728304190; c=relaxed/simple;
+	bh=S0PmYZ88hEZrLiL/PiuJ/v9Q7mo3hEoRYd3HOJjCjwk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GOzHeWLrwDAlzvnQkdVuK1V404xxjfznPRVYyVNs/WClG016EZEnHj7fW0uI4L4mUs6i+H2M62ZVSPpMHw2TIStv6vJvudTV2AhDy2LH+kb8TfiwAYa9clAr7zSKoIsYQewUVmgk6OMxse/tib4AIL/6Rh4wQk4wc7KH2nsHtBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MZ0poWZ5; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cb2e5d0104so32241926d6.3;
+        Mon, 07 Oct 2024 05:29:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728304119; x=1759840119;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kzhgAe7fJlkMqkTuRRVi7dirI26Z6hZB18k4pORLUN8=;
-  b=E4Ve4PfVRyGAKBPNuusVBWPuL62rdU6Gjmy+wH8YcVgygLkTNJlJcWwT
-   ktNKDrK2ZH4J4JCwroNzVES6VUlDcHzHWENkcaCCta74BkCYHwp9k6qN5
-   eund2T+bjka08ywTmTEHbZoyyXhdg9R7kORgWcEp5YElxDGWbFbk5c7Yi
-   M=;
-X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
-   d="scan'208";a="237304535"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 12:28:36 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:53584]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
- id e4b8c53d-3eb4-48c9-96bb-76a285629504; Mon, 7 Oct 2024 12:28:35 +0000 (UTC)
-X-Farcaster-Flow-ID: e4b8c53d-3eb4-48c9-96bb-76a285629504
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 12:28:34 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.221.239) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 7 Oct 2024 12:28:32 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jk@codeconstruct.com.au>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <matt@codeconstruct.com.au>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net 4/6] mctp: Handle error of rtnl_register_module().
-Date: Mon, 7 Oct 2024 05:28:24 -0700
-Message-ID: <20241007122824.4398-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <dcaa0489e90f7c294f6b5e4858b98210766383dc.camel@codeconstruct.com.au>
-References: <dcaa0489e90f7c294f6b5e4858b98210766383dc.camel@codeconstruct.com.au>
+        d=gmail.com; s=20230601; t=1728304188; x=1728908988; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XoM4lIRKq6wt6tvordN282TXwd9yd9Pg0kZvSLGS/L4=;
+        b=MZ0poWZ5d5nJ8DnSHDuTfwunvHD/Ot2zNoAxAEdurWdzMyk6xpK+k4/an6fWdPuQYh
+         eJMKckL7VNKBOljCCC4G46kD42ltFGoBtCP9Ngw7RrIisN7GfVhFvpjNTDHxPhyvQDSE
+         l13z991WtY3HlFr7LPIlRsQOG/EkFGpWnQlVSfx6CKLtUPFW52sNQCUdwEAyT7TLnZBD
+         qQKc/eWNLQcZiezlmZQAfue5w8/JvY+pj/0+TZQNvACk1IzHpqWSOYC8j58aAwPrnfA8
+         2BK8vCDlMr0Ox1pCRRvLaaglVCUPzrzjgLZaOYItEOuwQDotis8vzZrqOU5KOPaR7hyL
+         3yeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728304188; x=1728908988;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XoM4lIRKq6wt6tvordN282TXwd9yd9Pg0kZvSLGS/L4=;
+        b=uD5erVJH4AG9AxFioCGZNZBRJwHT6NskCqebl0GKqj+EraWaMNCaqxIRSYSEd8kdie
+         P46LKBT2g7qQxpzNt2AARQ0F4n/ixk0MAXdqhCYUtVeec5VuoIR1ZV7M2H41Ujutzyht
+         dOCASHzTQlZGYo3aUo8usEgoDc3SRXvlCN6lg9pGXNwC8JbxqzNTR49z097veaQWCdgJ
+         XT93Yhy2QB4PgEEPp2lSeqqyUo4dT+fij4YLq6CY880/9ssGsfaYwtZQIT7slYnxJlpD
+         5ext59OUfJ4wLIXpdIN1whsWwtHuH085BDUoiFqxfP1m+CF8fZlWHEVSImB0Er+tFpOj
+         WDUg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXgCHRV8gZN9qlAuHa+kRjbLC5I+SV1rSRtmYghBxX3I0CzpN8MKqsM5YWXTuHViW/hvpJvwuUHwh6wzm0dhM=@vger.kernel.org, AJvYcCWfEuvXd04f9p3mPP7x63rlLfzm3v8AYtFrrzahAQW+X0F4UB0rOdUQSTmjZKpuxUzFpyGAIGWT@vger.kernel.org, AJvYcCXKxeBDKOrZDAW26V7jzf13sdTgKUVq+dGrhCWAdpdBrWy4lZhP+L7pyW/xoBQ3h5Dqtte9QbfOpcetazQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8Qa8YmGkxrhrJ/rrg+BhiFpFX62wqZMpJGxjYJC4gBzFke4Ko
+	y9KmAaG3I71paqiAi9MrIx50LUe3M8c2E4/xJD4fmU7IKuZubOkd
+X-Google-Smtp-Source: AGHT+IGEyeCqIjlSUSKGI4oWYd+KNlZgB0SFN8Z4gxmCPqUzAoWZwMhyG/fWX8kWZY3LWknsznciFQ==
+X-Received: by 2002:a05:6214:5684:b0:6cb:3b9b:1673 with SMTP id 6a1803df08f44-6cb9a4fbdd5mr176978746d6.49.1728304188014;
+        Mon, 07 Oct 2024 05:29:48 -0700 (PDT)
+Received: from fauth-a1-smtp.messagingengine.com (fauth-a1-smtp.messagingengine.com. [103.168.172.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cba46efeddsm25227246d6.71.2024.10.07.05.29.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 05:29:47 -0700 (PDT)
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfauth.phl.internal (Postfix) with ESMTP id CBF3E120006B;
+	Mon,  7 Oct 2024 08:29:46 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Mon, 07 Oct 2024 08:29:46 -0400
+X-ME-Sender: <xms:OtQDZyCv97xoN1FWH6QL8w2dK5iLh5iuZS8I8EVp8ViJx6PZ8Tov-g>
+    <xme:OtQDZ8hsQnanpkzGQcdV9to7iarQBkrGzTWXszY7oqP-J2cKx87_qAtWWwaKn0p1e
+    7raZFAGRARza2laUw>
+X-ME-Received: <xmr:OtQDZ1lZxLcebLFYxul1fFCnIxWareSXd3moacpuzTMH9ZkhdbsnhdtoqD92Ig>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvledghedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpeeigeethfejvdfhudegtdevtefhleelffegteev
+    tdelgfeugefhhffhteegiefhheenucffohhmrghinheplhifnhdrnhgvthenucevlhhush
+    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghs
+    mhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhe
+    dvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvgdp
+    nhgspghrtghpthhtohepudelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnh
+    gurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhi
+    sehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvg
+    hlrdhorhhgpdhrtghpthhtoheprhhushhtqdhfohhrqdhlihhnuhigsehvghgvrhdrkhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohephhhkrghllhifvghithdusehgmhgrihhlrdgtoh
+    hmpdhrtghpthhtohepthhmghhrohhsshesuhhmihgthhdrvgguuhdprhgtphhtthhopeho
+    jhgvuggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrlhgvgidrghgrhihnohhrse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepghgrrhihsehgrghrhihguhhordhnvght
+X-ME-Proxy: <xmx:OtQDZwxtz3fxqqg9zam0wKbkTd52nmytCjdrRCXtIHG_aFQDmoAQ7g>
+    <xmx:OtQDZ3T6nYowzw0MAuXho6wIjZY1C8GacVyWYyZ8xXzkIPcLZsDndg>
+    <xmx:OtQDZ7Z3HvDpMPnE47YoCfmx3UGzaA7RsU8AANTb47l_jkskvhRpiQ>
+    <xmx:OtQDZwQO7D6aAYnO1IxRPH62lNc73hiDuBNxZ9xpwHQf1M0gxmDGIQ>
+    <xmx:OtQDZ5Bcekv_zvj5qcQ2luZ4a8Q5kNVioYZYrr83jZNS7EJzAWzPbKpV>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 7 Oct 2024 08:29:46 -0400 (EDT)
+Date: Mon, 7 Oct 2024 05:28:28 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
+Message-ID: <ZwPT7HZvG1aYONkQ@boqun-archlinux>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+ <20241005122531.20298-6-fujita.tomonori@gmail.com>
+ <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+ <ZwG8H7u3ddYH6gRx@boqun-archlinux>
+ <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
 
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Mon, 07 Oct 2024 18:09:59 +0800
-> Hi Kuniyuki,
-> 
-> > Since introduced, mctp has been ignoring the returned value
-> > of rtnl_register_module(), which could fail.
+On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
+[...]
+> > > > +    if sleep {
+> > > > +        // SAFETY: FFI call.
+> > > > +        unsafe { bindings::might_sleep() }
+> > > > +    }
+> > > 
+> > > What is actually unsafe about might_sleep()? It is a void foo(void)
 > > 
-> > Let's handle the errors by rtnl_register_module_many().
+> > Every extern "C" function is by default unsafe, because C doesn't have
+> > the concept of safe/unsafe. If you want to avoid unsafe, you could
+> > introduce a Rust's might_sleep() which calls into
+> > `bindings::might_sleep()`:
+> > 
+> > 	pub fn might_sleep() {
+> > 	    // SAFETY: ??
+> > 	    unsafe { bindings::might_sleep() }
+> > 	}
+> > 
+> > however, if you call a might_sleep() in a preemption disabled context
+> > when CONFIG_DEBUG_ATOMIC_SLEEP=n and PREEMPT=VOLUNTERY, it could means
+> > an unexpected RCU quiescent state, which results an early RCU grace
+> > period, and that may mean a use-after-free. So it's not that safe as you
+> > may expected.
 > 
-> Sounds good!
-> 
-> Just a couple of minor things inline, but regardless:
-> 
-> Reviewed-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> 
-> > diff --git a/net/mctp/device.c b/net/mctp/device.c
-> > index acb97b257428..d70e688ac886 100644
-> > --- a/net/mctp/device.c
-> > +++ b/net/mctp/device.c
-> > @@ -524,25 +524,31 @@ static struct notifier_block mctp_dev_nb = {
-> >         .priority = ADDRCONF_NOTIFY_PRIORITY,
-> >  };
-> >  
-> > -void __init mctp_device_init(void)
-> > +static struct rtnl_msg_handler mctp_device_rtnl_msg_handlers[] = {
-> > +       {PF_MCTP, RTM_NEWADDR, mctp_rtm_newaddr, NULL, 0},
-> > +       {PF_MCTP, RTM_DELADDR, mctp_rtm_deladdr, NULL, 0},
-> > +       {PF_MCTP, RTM_GETADDR, NULL, mctp_dump_addrinfo, 0},
-> > +};
-> 
-> Can this (and the other handler arrays) be const? And consequently, the
-> pointer argument that you pass to rtnl_register_module_many() from 1/6?
+> If you call might_sleep() in a preemption disabled context you code is
+> already unsafe, since that is the whole point of it, to find bugs
 
-Nice, will do.
+Well, in Rust, the rule is: any type-checked (compiled successfully)
+code that only calls safe Rust functions cannot be unsafe. So the fact
+that calling might_sleep() in a preemption disabled context is unsafe
+means that something has to be unsafe.
 
+This eventually can turn into a "blaming game" in the design space: we
+can either design the preemption disable function as unsafe or the
+might_sleep() function as unsafe. But one of them has to be unsafe
+function, otherwise we are breaking the safe code guarantee.
+
+However, this is actually a special case: currently we want to use klint
+[1] to detect all context mis-matches at compile time. So the above rule
+extends for kernel: any type-checked *and klint-checked* code that only
+calls safe Rust functions cannot be unsafe. I.e. we add additional
+compile time checking for unsafe code. So if might_sleep() has the
+proper klint annotation, and we actually enable klint for kernel code,
+then we can make it safe (along with preemption disable functions being
+safe).
+
+> where you use a sleeping function in atomic context. Depending on why
+> you are in atomic context, it might appear to work, until it does not
+> actually work, and bad things happen. So it is not might_sleep() which
+> is unsafe, it is the Rust code calling it.
+
+The whole point of unsafe functions is that calling it may result into
+unsafe code, so that's why all extern "C" functions are unsafe, so are
+might_sleep() (without klint in the picture).
+
+
+[1]: https://lwn.net/Articles/951550/
+
+Regards,
+Boqun
 
 > 
-> >  int __init mctp_routes_init(void)
-> >  {
-> > +       int err;
-> > +
-> >         dev_add_pack(&mctp_packet_type);
-> >  
-> > -       rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_GETROUTE,
-> > -                            NULL, mctp_dump_rtinfo, 0);
-> > -       rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_NEWROUTE,
-> > -                            mctp_newroute, NULL, 0);
-> > -       rtnl_register_module(THIS_MODULE, PF_MCTP, RTM_DELROUTE,
-> > -                            mctp_delroute, NULL, 0);
-> > +       err = register_pernet_subsys(&mctp_net_ops);
-> > +       if (err)
-> > +               goto fail_pernet;
-> > +
-> > +       err = rtnl_register_module_many(mctp_route_rtnl_msg_handlers);
-> > +       if (err)
-> > +               goto fail_rtnl;
-> >  
-> > -       return register_pernet_subsys(&mctp_net_ops);
-> > +out:
-> > +       return err;
-> > +
-> > +fail_rtnl:
-> > +       unregister_pernet_subsys(&mctp_net_ops);
-> > +fail_pernet:
-> > +       dev_remove_pack(&mctp_packet_type);
-> > +       goto out;
-> >  }
+> 	Andrew
 > 
-> Just `return err;` here - no need for the backwards goto to the return.
 > 
-> And only if you end up re-rolling the patch: can these labels be err_*,
-> so that we're consistent with the rest of the file?
-
-Sure, will change the labels.
-
-Thanks!
+> 
+> 
 
