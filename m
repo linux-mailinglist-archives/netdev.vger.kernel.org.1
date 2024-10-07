@@ -1,85 +1,72 @@
-Return-Path: <netdev+bounces-132688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E8E992C5D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:49:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B523992C62
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:50:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 244191C229B9
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:49:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE3881C224E4
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:50:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EC61D2785;
-	Mon,  7 Oct 2024 12:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA061CC159;
+	Mon,  7 Oct 2024 12:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XS3xWXlD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zAwhPfL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3AC1BB6B8;
-	Mon,  7 Oct 2024 12:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD2F1547D4;
+	Mon,  7 Oct 2024 12:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728305335; cv=none; b=m/8fD/To49r9ClfzA1O9c7eB3zNTINL25qdisd+4tw2LAetdLTZNLD8ZxVgi8NwovKCShQz3pNfkyxf8KuWf1RvCYxc15v7zocLJCLg9ncyXmDG58UleUPLODklWF+gQY+OnOF+OTBuHP6DkUmmaffSe0l15EwUdqraES+Ag8TA=
+	t=1728305453; cv=none; b=ei+ZHqHJLDiLCtuMbM9iEv8pq5Wc9rdkr13YuUl99C4UUmm12aZ7ZIUXMENoU8r33DOSqhKRbjuEdyNq4XHguTOT038JFMi9khsX3bjQqWpyxkmv23C1HiRGerX9Ew0+C5w9Ji7XkqiYF9hpltF+SQSn6Y70mSf8ydhSpoEErB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728305335; c=relaxed/simple;
-	bh=XWgabam3fhc3PvpjHHnnru1mmimtxFrWT467mkfuww0=;
+	s=arc-20240116; t=1728305453; c=relaxed/simple;
+	bh=phQQ4ZGTzke66auKBb0y2BKd5o3IZGSSHyNJc1hI+BI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rqDr3G8mAdijQibrGSab4TuiN4ezcvtV8RAgR5WXAaO7i6milAHYNpizfLFbccGtggcvoO70BLxLeg4KUfLGpDGFzGch2DAyBxeFPwx40cjQQsUWc5e2L86c7YFDFXSuwO4fCd01Ld3tBgEWsWOWL0OeeNZlG7qn7hHjbSXwGMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XS3xWXlD; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728305335; x=1759841335;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=XWgabam3fhc3PvpjHHnnru1mmimtxFrWT467mkfuww0=;
-  b=XS3xWXlDE9ZlxLVMeGD7SEIq+Kqd1lIUIZXM0S995f4n9RxjZRiSLFdp
-   MGxtkUo/qX1yqTOacf2lSD8uaQ/buL15eWzzBrnxt8VbeBRMIMchIpW7k
-   /3rSYQ5LzGsbAp+kh79d4XVwOO3HhqBeaMu3fKPxHAE7M5tFFWnBeT2EH
-   GPu75DMSHpoF0UQWsJTmHGfgZKkACsSF75C6tBe6CN3agjheZCzmmvKmM
-   pg0KV1PTW/RqcdcvH9ZsAfg0kjEljAqP8hPL4gjLFNB4r3Bw0x83cVWT3
-   ULkL2SrYAzY+KiMUzw4ty7lUNFKhbeXyyM7hlcTSW453iOSDUBV/SfyFl
-   w==;
-X-CSE-ConnectionGUID: rnGGckzESDWIRRiffUPziQ==
-X-CSE-MsgGUID: E6/UXZ0LTMujkUF3fMLS5w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="31152294"
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="31152294"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 05:48:54 -0700
-X-CSE-ConnectionGUID: bP6fMKj0RnyrWoAmPTX4GQ==
-X-CSE-MsgGUID: rdegqp39TlWWvVoSaAoULg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="80055132"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 07 Oct 2024 05:48:50 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sxnAO-0004z2-0K;
-	Mon, 07 Oct 2024 12:48:48 +0000
-Date: Mon, 7 Oct 2024 20:48:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Yang <danielyangkang@gmail.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, danielyangkang@gmail.com,
-	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-Subject: Re: [PATCH v2] resolve gtp possible deadlock warning
-Message-ID: <202410072002.hT2D7135-lkp@intel.com>
-References: <20241005045411.118720-1-danielyangkang@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NX5vBn/wCLtI6ObztfdzXxGpAfaVxF72J2IsE0oTYyXg6DB1A/CPzWcDobjMzRaWf30iKXZfIV9ZAJ9G5stR3mWhVhuQuSg4q9G8Tkx9tNPVDFEZmQB72gMzIeQWU4Nk1FmmAov8wfdWA1y4gOeMtxYca8y/q8X8XdNR5CBWJgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zAwhPfL1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9AUrARcn8p6Bu/y9sftMEvfU8DX72hnzGfPHJbkJ2Hs=; b=zAwhPfL1bdg6M2CC7uA2PI9pjW
+	2utS/URZj81kVRJl01CClUKFBSySBcVYE+IVP77u5/e4zLHUPV2s0ndSUzeZzoEaAAQEzQAP9qk1E
+	L5Ugt92TlofY3Rn5rchVv9a5NRihLUhFbn1rKc5l0gdkNUOsaSP6frSZIazyeV2dXs0Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sxnC8-009GFh-Bk; Mon, 07 Oct 2024 14:50:36 +0200
+Date: Mon, 7 Oct 2024 14:50:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
+Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"dqfext@gmail.com" <dqfext@gmail.com>,
+	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"daniel@makrotopia.org" <daniel@makrotopia.org>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Subject: Re: [PATCH net-next 3/9] net: phy: mediatek: Move LED helper
+ functions into mtk phy lib
+Message-ID: <de510d94-2f30-4418-a21a-76e8139e583f@lunn.ch>
+References: <20241004102413.5838-1-SkyLake.Huang@mediatek.com>
+ <20241004102413.5838-4-SkyLake.Huang@mediatek.com>
+ <afd441fc-7712-4905-83e2-e35e613df64a@lunn.ch>
+ <3f1c73ec57aefa2803df0c32c78dcdc41fed4126.camel@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,48 +75,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241005045411.118720-1-danielyangkang@gmail.com>
+In-Reply-To: <3f1c73ec57aefa2803df0c32c78dcdc41fed4126.camel@mediatek.com>
 
-Hi Daniel,
+> Although this is just "moving code", we need this priv to do some
+> modification for mt798x_phy_hw_led_blink_set() so that we can move it
+> to mtk-phy-lib properly.
 
-kernel test robot noticed the following build warnings:
+The helper is passed phydev, so it is not clear to me why the helper
+cannot do:
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.12-rc2 next-20241004]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+struct mtk_socphy_priv *priv = phydev->priv;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Yang/resolve-gtp-possible-deadlock-warning/20241005-125510
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20241005045411.118720-1-danielyangkang%40gmail.com
-patch subject: [PATCH v2] resolve gtp possible deadlock warning
-config: x86_64-buildonly-randconfig-005-20241007 (https://download.01.org/0day-ci/archive/20241007/202410072002.hT2D7135-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241007/202410072002.hT2D7135-lkp@intel.com/reproduce)
+same as the old code. Maybe you want a patch first which renames
+mtk_socphy_priv to mtk_phy_priv, just to keep with the naming?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410072002.hT2D7135-lkp@intel.com/
+Or do you see the need for different PHYs to need different priv
+structures?
 
-All warnings (new ones prefixed by >>):
-
->> net/smc/af_smc.c:22:9: warning: 'pr_fmt' macro redefined [-Wmacro-redefined]
-      22 | #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
-         |         ^
-   include/linux/printk.h:380:9: note: previous definition is here
-     380 | #define pr_fmt(fmt) fmt
-         |         ^
-   1 warning generated.
-
-
-vim +/pr_fmt +22 net/smc/af_smc.c
-
-ac7138746e1413 Ursula Braun 2017-01-09 @22  #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
-ac7138746e1413 Ursula Braun 2017-01-09  23  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+	Andrew
 
