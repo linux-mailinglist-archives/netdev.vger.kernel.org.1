@@ -1,154 +1,112 @@
-Return-Path: <netdev+bounces-132734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A7E5992EC6
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:18:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B9FE992ECD
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:19:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC652B22717
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:18:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04DF51F247FC
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:19:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3261D90BD;
-	Mon,  7 Oct 2024 14:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fcPqXvXc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB7141D88B8;
+	Mon,  7 Oct 2024 14:17:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAA61D798C
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC2D1D433B
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728310622; cv=none; b=leIQB0IQxBCV75IegjYyCkbFnTPOP/Q5HEFli/tFOyUIR/e0HbcS6F5o8H6FXs4+ZFzjiFHXup2VSJHVtVeVLkkQe62WZvlUP0EUSSZhVnp1QBbZ9AqZ4g3AhW/IVTFugoKnqdRyTj3+LLnXxXBjhfElFvorLBut2iGmJ498Cz0=
+	t=1728310654; cv=none; b=COOFzBlxM1fnFhI52ORJVJsWxjWSSE85tvo2ZGtF3vncgu1Q9FC0BWydMU7f1h7J0WpE5mhgk5OJwCnkkyrfRDqIXPtJ1X8BLyNzWrOAokaxGLge24/ussqd+B+yk1R4VUUyHTcTjvRyl2Ln654x4MpF1Q/+sxyhnK9NU7B1zQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728310622; c=relaxed/simple;
-	bh=376HqnvNhc5ZE0HBO6XE8aIeQfBue1EBUdnGFKgW028=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mvUXCh/gdxISXlJpsuJzssV2+P0qll+jWzcrKb+UX1d7YjgI+W0HhjHzdfQwQNlV2DGSoLXejpFgM/xSot4ehE6AgJOhe4cfh4CJ0rHrlVJhqTJhOLbIeDLrnIWup1yNqbmisSQ2e1yhoqUuoI2gFEYSPf/2WbhZcjemZ3b0YLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fcPqXvXc; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71dec1cf48fso2458298b3a.0
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 07:17:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728310620; x=1728915420; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YZotRyJfqUBQUUh0GdjsSXNxbz4lowqfUZ4/U9osmyA=;
-        b=fcPqXvXcxEMkgbz11ctygKKwnEzhK4OL6i+PhJxnCrinRC0LpMtkgD474UtFJ8nzk6
-         1gPNyUmT3eq+xh6i33Ku1F623wDtyk7LwLwF8VWRHpKlSZnOcIZ7pNmGvwAu5CMFhwmF
-         nURwmfU7OJhF5IQHAS8jPhxl3JZoULmxqDhzHpCkdE8UlPD3Zs5rJpKJbFeDBfPf4aHZ
-         uMIgGQICxCjO8CTGyfTYIqpmsj2PborSN3a7N5EksxSfUN0tXpCPrdfCdikpRrsCBu7+
-         9F1Qz0JRV22GyCSgw3l4nmlfGdZYClqA+29rhA2l3CAa/zEi6qVRHzMwzx3p1nPqi5VR
-         Om2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728310620; x=1728915420;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YZotRyJfqUBQUUh0GdjsSXNxbz4lowqfUZ4/U9osmyA=;
-        b=DtZUIf/kzYiXFjReoB0Xi/M1nRSfVqUAkEZch6M26Xe/cySExfHU9GaFTAdJInVy6Z
-         MGuzj7bytZ35V5UHe3H5x2S+vreIiXkUfmuju5lp/uHtZgRn8SPcvNg1iXDF8cOKDapU
-         Ode6x6qcRaZ49XUqJiCONOAk5aP23kphX2u0ADjqOKYpw0wSgR4C9c7vNX7znFo0KZ5U
-         bHn1RhDwyJI9tvxet7IHnTKiIAO2S8vhZmvlZgAa2ot+QFIMqpczXKbIPCizVws7KfBZ
-         fbJabF7iSgXAzRMEkulSKUm+WYYawfTmf7+UnIIZCgZWFLbTh+n2S2B94o51WMCea8Iv
-         RTQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVG9Y7fwRzbuaipSdNLtd7ZhN+tHbHbO80iRxArkgvB22ZtrTxKehvtElxk+cQXtAztMFkNXj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlbabPhn8aICCSaBwrO1zUdSZQJS44UnYGUAy+fClxo5pB8KTI
-	VA+5AYojGMoVsIrVYLpyZTulrjhYt4uBoxN0LsfduOHiYE+XiCEV7AbZLublaytTjYrySk1XOpt
-	7i/KUMyuEXmnvuMwSqESk2vn1lg+V0DAe+Pc2
-X-Google-Smtp-Source: AGHT+IGRirQUTUs43IAYcReXl0EvbBGWtade4ytNJlT9/pAyB7YZGBvddZQaFl4GNDeiuwukPx5yEImABPr95O01a0M=
-X-Received: by 2002:a05:6a20:29a7:b0:1d6:e593:1d6b with SMTP id
- adf61e73a8af0-1d6e5931deamr10398837637.6.1728310620266; Mon, 07 Oct 2024
- 07:17:00 -0700 (PDT)
+	s=arc-20240116; t=1728310654; c=relaxed/simple;
+	bh=9c6RrjNGOG4XZv7JW3ZCZzhn7dUc8ULtYyQgSmm/Rk0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Lf3nPUh9wv5ylqbT1Bt1Jp53rFCLQDYofnSDqiFcUf7dAgE9Aj7w2YoqOPDuSK/sF8+JApwfZJlpTZQv9p9yLQzkIBqndulW3d5DiJtH9drZBy9rZ1v/5gBG4Q+r9vVdPNHB1onMBD+fe5N8D32IT76dH1FJP2oeBC5/x/4msoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <jre@pengutronix.de>)
+	id 1sxoY4-0008LN-Rj; Mon, 07 Oct 2024 16:17:20 +0200
+From: Jonas Rebmann <jre@pengutronix.de>
+Subject: [PATCH 0/2] improve multicast join group performance
+Date: Mon, 07 Oct 2024 16:17:10 +0200
+Message-Id: <20241007-igmp-speedup-v1-0-6c0a387890a5@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com> <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
- <ZwG8H7u3ddYH6gRx@boqun-archlinux> <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux> <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
- <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com> <ZwPsdvzxQVsD7wHm@boqun-archlinux>
-In-Reply-To: <ZwPsdvzxQVsD7wHm@boqun-archlinux>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 7 Oct 2024 16:16:46 +0200
-Message-ID: <CAH5fLgigW6STtMBxBRTvTtGqPkSSk+EjjphpHXAwXDuCDDfVRw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu, 
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGbtA2cC/x3OUQqDMBCE4atInrs1kVJrryJ9iOuoCzWGrJWCe
+ PfGPv4wH8xuFEmg5lnsJmETlSXkcJfC8OTDCJI+t6lsdXPW1iTjHEkj0H8iVewt113jHk1vMum
+ 8grrkA08n2u5XZ8t1icJlwFoOCVD2b9DMXleKSMOS5jzHqWPCIN//mfZ1HD8rGxiEnAAAAA==
+X-Change-ID: 20241007-igmp-speedup-2ca0c7b9189d
+To: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Madalin Bucur <madalin.bucur@nxp.com>, 
+ Sean Anderson <sean.anderson@seco.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel@pengutronix.de, Jonas Rebmann <jre@pengutronix.de>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:1101:1d::ac
+X-SA-Exim-Mail-From: jre@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Oct 7, 2024 at 4:14=E2=80=AFPM Boqun Feng <boqun.feng@gmail.com> wr=
-ote:
->
-> On Mon, Oct 07, 2024 at 04:08:48PM +0200, Alice Ryhl wrote:
-> > On Mon, Oct 7, 2024 at 3:48=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wro=
-te:
-> > >
-> > > On Mon, Oct 07, 2024 at 05:28:28AM -0700, Boqun Feng wrote:
-> > > > On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
-> > > > However, this is actually a special case: currently we want to use =
-klint
-> > > > [1] to detect all context mis-matches at compile time. So the above=
- rule
-> > > > extends for kernel: any type-checked *and klint-checked* code that =
-only
-> > > > calls safe Rust functions cannot be unsafe. I.e. we add additional
-> > > > compile time checking for unsafe code. So if might_sleep() has the
-> > > > proper klint annotation, and we actually enable klint for kernel co=
-de,
-> > > > then we can make it safe (along with preemption disable functions b=
-eing
-> > > > safe).
-> > > >
-> > > > > where you use a sleeping function in atomic context. Depending on=
- why
-> > > > > you are in atomic context, it might appear to work, until it does=
- not
-> > > > > actually work, and bad things happen. So it is not might_sleep() =
-which
-> > > > > is unsafe, it is the Rust code calling it.
-> > > >
-> > > > The whole point of unsafe functions is that calling it may result i=
-nto
-> > > > unsafe code, so that's why all extern "C" functions are unsafe, so =
-are
-> > > > might_sleep() (without klint in the picture).
-> > >
-> > > There is a psychological part to this. might_sleep() is a good debug
-> > > tool, which costs very little in normal builds, but finds logic bugs
-> > > when enabled in debug builds. What we don't want is Rust developers
-> > > not scattering it though their code because it adds unsafe code, and
-> > > the aim is not to have any unsafe code.
-> >
-> > We can add a safe wrapper for it:
-> >
-> > pub fn might_sleep() {
-> >     // SAFETY: Always safe to call.
-> >     unsafe { bindings::might_sleep() };
->
-> It's not always safe to call, because might_sleep() has a
-> might_resched() and in preempt=3Dvoluntary kernel, that's a
-> cond_resched(), which may eventually call __schedule() and report a
-> quiescent state of RCU. This could means an unexpected early grace
-> period, and that means a potential use-afer-free.
+This series seeks to improve performance on updating igmp group
+memberships such as with IP_ADD_MEMBERSHIP or MCAST_JOIN_SOURCE_GROUP.
 
-Atomicity violations are intended to be caught by klint. If you want
-to change that decision, you'll have to add unsafe to all functions
-that sleep including Mutex::lock, CondVar::wait, and many others.
+Our use case was to add 2000 multicast memberships on a TQMLS1046A which
+took about 3.6 seconds for the membership additions alone. Our userspace
+reproducer tool was instrumented to log runtimes of the individual
+setsockopt invocations which clearly indicated quadratic complexity of
+setting up the membership with regard to the total number of multicast
+groups to be joined. We used perf to locate the hotspots and
+subsequently optimized the most costly sections of code.
 
-Alice
+This series includes a patch to Linux igmp handling as well as a patch
+to the DPAA/Freescale driver. With both patches applied, our memberships can
+be set up in only about 87 miliseconds, which corresponds to a speedup
+of around 40.
+
+While we have acheived practically linear run-time complexity on the
+kernel side, a small quadratic factor remains in parts of the freescale
+driver code which we haven't yet optimized. We have by now payed little
+attention to the optimization potential in dropping group memberships,
+yet the dpaa patch applies to joining and leaving groups alike.
+
+Overall, this patch series brings great improvements in use cases
+involving large numbers of multicast groups, particularly when using the
+fsl_dpa driver, without noteworthy drawbacks in other scenarios.
+
+Signed-off-by: Jonas Rebmann <jre@pengutronix.de>
+---
+Jonas Rebmann (2):
+      net: ipv4: igmp: optimize ____ip_mc_inc_group() using mc_hash
+      net: dpaa: use __dev_mc_sync in dpaa_set_rx_mode()
+
+ drivers/net/ethernet/freescale/dpaa/dpaa_eth.c   | 20 +++++++++--
+ drivers/net/ethernet/freescale/fman/fman_dtsec.c |  1 -
+ drivers/net/ethernet/freescale/fman/fman_memac.c |  1 -
+ drivers/net/ethernet/freescale/fman/fman_tgec.c  |  1 -
+ drivers/net/ethernet/freescale/fman/mac.c        | 42 ------------------------
+ drivers/net/ethernet/freescale/fman/mac.h        |  2 --
+ net/ipv4/igmp.c                                  | 26 ++++++++++++---
+ 7 files changed, 39 insertions(+), 54 deletions(-)
+---
+base-commit: 8b641b5e4c782464c8818a71b443eeef8984bf34
+change-id: 20241007-igmp-speedup-2ca0c7b9189d
+
+Best regards,
+-- 
+Jonas Rebmann <jre@pengutronix.de>
+
 
