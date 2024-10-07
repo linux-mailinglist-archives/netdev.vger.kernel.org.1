@@ -1,134 +1,100 @@
-Return-Path: <netdev+bounces-132645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4F5992A31
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:29:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F1992A35
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:29:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C107B2271C
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:29:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E6FA1C22930
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A5B1CACC0;
-	Mon,  7 Oct 2024 11:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F181B1AD401;
+	Mon,  7 Oct 2024 11:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="P9vyEk6X"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2AA2AD05
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 11:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0C01D1319;
+	Mon,  7 Oct 2024 11:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728300551; cv=none; b=oajicV3CY/sYUB7Jl2O04OcFTSSf0Ylv253RtQqQBvaaEnreHSIFImJD+zDUMR4St3tybtH+xscbTrF3mC5O6BCz/cuYT5vpJFCyjV45PxI8sIZDF3hroKg+JN9qHBVb0qVeNMSAN+udg0ZfjIPmXWExmhtmZg9k9K4vxUHtc94=
+	t=1728300578; cv=none; b=hIKMmqx24ogfA4XmwN1U037JFJdLSCr+qONfjLxen9NbPD0vv96kbyR8sDlAE5zvz1hoTZIy49BlTWWWYYqrvM5kDjMxcNu+cYbn5+VEa3jZdrvIPKE6t1oYfd0hWFiNcgmx1zvRtaNA4mknWk1/6o5lhYxebiVWgMRjYOntV44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728300551; c=relaxed/simple;
-	bh=Zcb9bTja9eypmKC5oGkEJ2RmUr8BxDhQokPpviezBpY=;
+	s=arc-20240116; t=1728300578; c=relaxed/simple;
+	bh=SxQ51OTOzRyiDYMTgAY8ft6J9j6FMH0+aAgvxnpok0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YWvS1Rk2kwlfwQcr7AVVBlJY4LI+gXA/BZEtdoYACwwYl/cWKDCEMjTZeOfRBsBnm1WjO/c/yTNWus2cCmNdVjxnLVi1JaZBq0zm7aYk4R9H4a9BotqC7RyI3Gos0Sp18ao+b6t7yijpSR5BIK6XjgO248uBWCFZlH6DNbY7isQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1sxlvE-000797-8c; Mon, 07 Oct 2024 13:29:04 +0200
-Date: Mon, 7 Oct 2024 13:29:04 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Florian Westphal <fw@strlen.de>, Ben Greear <greearb@candelatech.com>,
-	netdev <netdev@vger.kernel.org>, kent.overstreet@linux.dev,
-	pablo@netfilter.org
-Subject: Re: nf-nat-core: allocated memory at module unload.
-Message-ID: <20241007112904.GA27104@breakpoint.cc>
-References: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
- <20241001193606.GA10530@breakpoint.cc>
- <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rr1O7VBE+lOX69MrjU3kKvBLFmTCXk25hTzt2RmGyt2nf+n7PPCvmr9vPAxgB1/t/92ZqYTf8P4yNGynDdSVnhFIBQDCyfoC7DV9R/109i+mauzwGzPN/LCYLbPGhfnZaVaRN+dYC6vjtI9U+zS3l4k9ZIJvXAJI8GnQ29LwZ1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=P9vyEk6X; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=+fkSsHwtdQgMvduYygfi3dN2uWiuZvcckNGTJy3sukA=; b=P9vyEk6XN/M1SE/F
+	B09Q9SbMd9S0Lw04fs4eOy/E77tdgdLmGHAphbCYlrJCg5/QKHYdS+r7Ql6ghZ71+QQqKY1okJid/
+	FwEBB7N24X3FVAdaSS2/WnpgWqkATL2bFSLVtqErk1jiMB3o8DrpNJgjqQacF+9MmbmDcIg8APOPy
+	apf0h0c4SVtKgFlbEdtBtswQGHp3FQphrGLIJXfyCepVtL6E5MnlDxkEqYouOqNqq37mP8pzPhnMi
+	zRdbWHZUXoz6stoJ7Wl0GcFi/HWzjtNK0WKoBJawXBP0sGT9MqbnXCxoFCRT5XKlTiE0zViZqP4dw
+	CP2QJ6YjHu4zHlqVqg==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1sxlvc-009QSb-1A;
+	Mon, 07 Oct 2024 11:29:28 +0000
+Date: Mon, 7 Oct 2024 11:29:28 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] cfg80211: Remove unused cfg80211_vendor_ functions
+Message-ID: <ZwPGGBxdTGP3tPtW@gallifrey>
+References: <20241006225303.121445-1-linux@treblig.org>
+ <20241006225303.121445-3-linux@treblig.org>
+ <d402977d8681c86c4a0e09962d396964ccdcb4a8.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <d402977d8681c86c4a0e09962d396964ccdcb4a8.camel@sipsolutions.net>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 11:28:48 up 151 days, 22:42,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Suren Baghdasaryan <surenb@google.com> wrote:
-> On Tue, Oct 1, 2024 at 12:36 PM Florian Westphal <fw@strlen.de> wrote:
-> >
-> > Ben Greear <greearb@candelatech.com> wrote:
-> >
-> > [ CCing codetag folks ]
+* Johannes Berg (johannes@sipsolutions.net) wrote:
+> On Sun, 2024-10-06 at 23:53 +0100, linux@treblig.org wrote:
+> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> > 
+> > cfg80211_vendor_cmd_get_sender() and cfg80211_vendor_event_alloc_ucast()
+> > were added in 2019 by commit
+> > 55c1fdf0d6c5 ("cfg80211: allow sending vendor events unicast")
+> > 
+> > but never used.
+> > 
 > 
-> Thanks! I've been on vacation and just saw this report.
-> 
-> >
-> > > Hello,
-> > >
-> > > I see this splat in 6.11.0 (plus a single patch to fix vrf xmit deadlock).
-> > >
-> > > Is this a known issue?  Is it a serious problem?
-> >
-> > Not known to me.  Looks like an mm (rcu)+codetag problem.
-> >
-> > > ------------[ cut here ]------------
-> > > net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register_fn has 256 allocated at module unload
-> > > WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_unload+0x22b/0x3f0
-> > > Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat msdos fat
-> > ...
-> > > Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
-> > > RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
-> > >  codetag_unload_module+0x19b/0x2a0
-> > >  ? codetag_load_module+0x80/0x80
-> > >  ? up_write+0x4f0/0x4f0
-> >
-> > "Well, yes, but actually no."
-> >
-> > At this time, kfree_rcu() has been called on all 4 objects.
-> >
-> > Looks like kfree_rcu no longer cares even about rcu_barrier(), and
-> > there is no kvfree_rcu_barrier() in 6.11.
-> >
-> > The warning goes away when I replace kfree_rcu with call_rcu+kfree
-> > plus rcu_barrier in module exit path.
-> >
-> > But I don't think its the right thing to do.
-> >
-> > (referring to nf_nat_unregister_fn(), kfree_rcu(priv, rcu_head);).
-> >
-> > Reproducer:
-> > unshare -n iptables-nft -t nat -A PREROUTING -p tcp
-> > grep nf_nat /proc/allocinfo # will list 4 allocations
-> > rmmod nft_chain_nat
-> > rmmod nf_nat                # will WARN.
-> >
-> > Without rmmod, the 4 allocations go away after a few seconds,
-> > grep will no longer list them and then rmmod won't splat.
-> 
-> I see. So, the kfree_rcu() was already called but freeing did not
-> happen yet, in the meantime we are unloading the module.
+> Yeah ... we have out-of-tree code using this for CSI matrix stuff
+> (sensing), but I guess we can keep this API out-of-tree just as well,
+> though it'll make it harder to integrate in ChromeOS.
 
-Yes.
+Obviously it's the maintainers call as which way to go.
+I guess the best outcome would be for that out-of-tree code to land in
+the tree!
 
-> We could add
-> a synchronize_rcu() at the beginning of codetag_unload_module() so
-> that all pending kfree_rcu()s complete before we check codetag
-> counters:
-> 
-> bool codetag_unload_module(struct module *mod)
-> {
->         struct codetag_type *cttype;
->         bool unload_ok = true;
-> 
->         if (!mod)
->                 return true;
-> 
-> +      synchronize_rcu();
->         mutex_lock(&codetag_lock);
+Dave
 
-This doesn't help as kfree_rcu doesn't wait for this.
-
-Use of kvfree_rcu_barrier() instead does work though.
+> johannes
+> 
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
