@@ -1,154 +1,138 @@
-Return-Path: <netdev+bounces-132583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1FC29923ED
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 07:42:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49CC0992412
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 08:02:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AB98282ADA
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 05:42:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B7EA1F22EAB
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 06:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8D671422A8;
-	Mon,  7 Oct 2024 05:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63AD52F76;
+	Mon,  7 Oct 2024 06:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fVWIMxIQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gc8juExq"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A6813B797;
-	Mon,  7 Oct 2024 05:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839F8A31;
+	Mon,  7 Oct 2024 06:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728279721; cv=none; b=mf5yx7afa+KoxffibooqC39hZnbiJdPnXVxix+B6Vy0y3Jb3pHhFBKQLSl0YX9bN+Ch25c3HvR/4yAgTTm7guHLlRBdX1MonLGje66DHhAuIuBiqfy9pmZ/lXBonddhBpyFTB2DCmp1dsssWtkTqk72GdVkqpOxGxCrNSDo+SNY=
+	t=1728280915; cv=none; b=lQc5Evg4yaPlq2nVLpTzkR8UantXbf6IVIMcPvsyHpSCH57mCBkqnXY0sFmbJNSu+Acu8W54Xq0vbhCLVsbz9ktNL/SQl8OFVN785uBGaKmcdL8kCOYfaT1nARuxwyKWrqvz+koFdGJ3MZ7c9XUMX2T7JIqbgEpOuPT6+Kfud34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728279721; c=relaxed/simple;
-	bh=P5WpJSFMhe/LxeegZADuRdkunnCVSBG6Td4FAA9WJcQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LoFDGBfNIyIRvIc07v647nMJjLXaCu5oZuI/7QOV7Q1ZaTrhKWWpG3a+/YwYHkbHcsopD4J1/3gHWh/FAq0A1sMf9vC6eRxdXdrZ+78zc1LlV6rf98Oavf+3aW7CaDr/BwCFTd0MMxxBpcabuMpIJ9NEj7i0YdNnHitEAartc0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fVWIMxIQ; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4975fS7K119825;
-	Mon, 7 Oct 2024 00:41:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1728279688;
-	bh=nP6DdgH29tvlsuXDNcF1Ajyp5JiV1/oAb/SSYPduwc0=;
-	h=From:To:CC:Subject:Date;
-	b=fVWIMxIQlb3CsUZwKYUQXe3OXGlrYg7j7xoUCNI3kbx9a7k6H6SZCeTDBEWBu2b6H
-	 4/dywVxIxjh43oCaCfFVXl6ZanJlh/M7n5S1NsH6f9szhfIT+XpNyuXfzhI8ZRhpuV
-	 o3Nyx5mv0UvGeb8q4pdaHcGWbHVpWEg2Wlrm1f4k=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4975fS5o013121
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Mon, 7 Oct 2024 00:41:28 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 7
- Oct 2024 00:41:28 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 7 Oct 2024 00:41:27 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4975fSr5082390;
-	Mon, 7 Oct 2024 00:41:28 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4975fR05013265;
-	Mon, 7 Oct 2024 00:41:27 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: <robh@kernel.org>, <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>,
-        <andrew@lunn.ch>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net v2] net: ti: icssg-prueth: Fix race condition for VLAN table access
-Date: Mon, 7 Oct 2024 11:11:24 +0530
-Message-ID: <20241007054124.832792-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1728280915; c=relaxed/simple;
+	bh=KYNOeI9N+sOifMy5pLstLILjwARWC2MFr7qfMAQ3dI0=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=GCkUY2Sb/rostgandzmfB6OdexPTAdb3jSo8koIs4Qr+vK4jsfJdE4A64m1tdIruK5M7F8wloMq1zzu8yTZi0nOUVSKZpa+3nKrHnKXuo2k8yHhbkCnEWXixDfNBtRbw/pQvwfUovjgedcIR/IzrUIYLNGVP0ksFOO/cXaKqe08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gc8juExq; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e18aa9f06dso2816211a91.0;
+        Sun, 06 Oct 2024 23:01:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728280914; x=1728885714; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QzX0UywappLJKLK2XrwCSa+6DnJKn2Rts/dAW5nMYjU=;
+        b=gc8juExqCbDSgntNZd5jAOlKPApeI+JMcuZS1ck8EYn9JEomLj31Y1o8azR2TzbWqS
+         W3wf1p8z7zI1k9UIjp8eFnUH4EOifUMk0ohBcTzUBdf/jLg+fAjauGOgAT5Xc/sQG0BR
+         OmxNMBnADuT8X+T1jmRzKDkC6Bjue5nSJk0KnSccbLLcr7TuA0Ig0ffOMwxkwIHp4/VC
+         50Ku/j4IZg9UzSKIUKOnVuM6A+zpwMFVFd7txSuExmMDIOKdfuvGcRCt5QVH4HZq60nj
+         Cfy1i0cO6NDpU8iYI3nLsDIuAl6pujWNmp6+z0VhVSD2CuPxQIh1M/Tbngrir+SNPyF0
+         TXPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728280914; x=1728885714;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=QzX0UywappLJKLK2XrwCSa+6DnJKn2Rts/dAW5nMYjU=;
+        b=nKW8VbVIljmNJQhvp0QuvNbEbaoX5/vDmAhuBzeC/0Ywt7/ok5SdFRqmdwv3lHs4V0
+         M9uTaygBq/X8vk/Ych57Ww4BJjDUdzLolM/obZIFXLoPTydqM8cj1EW56CzwHF/85ZFa
+         PcixoqzL6lbiXzuEo68hin89wVWiSPU2swbEUuJvTUVnLt0+D+8PHqPZU4rm3xjgceZh
+         VN5kISYKgrnvyQBTNQXxBbMf+Ft94QBnOR9DIZlkLFV/r8taW1ejDOEE7JVZAA1ZaKNZ
+         pAkpGpNz5HiV6Sv47Osw1fxkZbulD7RdSSYcfT8Z1s+M41W+MLd5m6qzpMNTnWndxYo3
+         HdMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGZcD6+UbjJapSifgJ2sJEdxjS/vGygNJV3n58OznK0KBSKbeARmHX+l+SGXeSHfPeC2SqbC2LA+OpiLF4rkA=@vger.kernel.org, AJvYcCUgnNey2IAuh9+YDpfF1sX/bexsZkazBSkT8JXWx/ar0a3MEsz2OY+njfYhtKDacdNSIxNJwsIlVNeHaHY=@vger.kernel.org, AJvYcCVZLFATdJcqwtrpPTwBUfzBloGi6vNldDxpT7XaZSvJLc3eDF5ZVLIDMu1TtEFlQeNNHOJx/pCp@vger.kernel.org
+X-Gm-Message-State: AOJu0YxESQzqLVPMG03ifCGTw4qy15EWNYBZLq6ZsZZrGjUnuctzaasX
+	5gNd1DwG0+/XFEjGAbPnUWUIfeI7zkaJTdIXfUSn01WFgW9mq0wt
+X-Google-Smtp-Source: AGHT+IGdElkbOFUhxRqqOKaFkrVvZi9IrVm6Dj0UpNbZIP7loO1uN+Yr9NYs1JnsBE9EtInnvTOHfg==
+X-Received: by 2002:a17:90b:3709:b0:2e0:7b03:1908 with SMTP id 98e67ed59e1d1-2e1b38c7582mr22177385a91.10.1728280913706;
+        Sun, 06 Oct 2024 23:01:53 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138d0cbdsm33022735ad.113.2024.10.06.23.01.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Oct 2024 23:01:53 -0700 (PDT)
+Date: Mon, 07 Oct 2024 15:01:48 +0900 (JST)
+Message-Id: <20241007.150148.1812176549368696434.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu,
+ ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/6] rust: time: Introduce Delta type
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <3848736d-7cc8-44f4-9386-c30f0658ed9b@lunn.ch>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+	<20241005122531.20298-3-fujita.tomonori@gmail.com>
+	<3848736d-7cc8-44f4-9386-c30f0658ed9b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-The VLAN table is a shared memory between the two ports/slices
-in a ICSSG cluster and this may lead to race condition when the
-common code paths for both ports are executed in different CPUs.
+On Sat, 5 Oct 2024 20:02:55 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-Fix the race condition access by locking the shared memory access
+>> +/// A span of time.
+>> +#[derive(Copy, Clone)]
+>> +pub struct Delta {
+>> +    nanos: i64,
+> 
+> Is there are use case for negative Deltas ? Should this be u64?
 
-Fixes: 487f7323f39a ("net: ti: icssg-prueth: Add helper functions to configure FDB")
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
-v1 - v2:
-*) Fixed kdoc and checkpatch warning by moving kdoc inline for vtbl_lock
-as suggested by Jakub Kicinski <kuba@kernel.org>
+I thought that logically Delta could be negative but considering Ktime
+APIs like the following, I think that u64 is more appropriate now.
 
-v1 https://lore.kernel.org/all/20241003105940.533921-1-danishanwar@ti.com/
+static inline ktime_t ktime_add_us(const ktime_t kt, const u64 usec)
+{
+        return ktime_add_ns(kt, usec * NSEC_PER_USEC);
+}
 
- drivers/net/ethernet/ti/icssg/icssg_config.c | 2 ++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 1 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.h | 2 ++
- 3 files changed, 5 insertions(+)
+static inline ktime_t ktime_sub_us(const ktime_t kt, const u64 usec)
+{
+        return ktime_sub_ns(kt, usec * NSEC_PER_USEC);
+}
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 72ace151d8e9..5d2491c2943a 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -735,6 +735,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
- 	u8 fid_c1;
- 
- 	tbl = prueth->vlan_tbl;
-+	spin_lock(&prueth->vtbl_lock);
- 	fid_c1 = tbl[vid].fid_c1;
- 
- 	/* FID_C1: bit0..2 port membership mask,
-@@ -750,6 +751,7 @@ void icssg_vtbl_modify(struct prueth_emac *emac, u8 vid, u8 port_mask,
- 	}
- 
- 	tbl[vid].fid_c1 = fid_c1;
-+	spin_unlock(&prueth->vtbl_lock);
- }
- EXPORT_SYMBOL_GPL(icssg_vtbl_modify);
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 5fd9902ab181..5c20ceb164df 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1442,6 +1442,7 @@ static int prueth_probe(struct platform_device *pdev)
- 		icss_iep_init_fw(prueth->iep1);
- 	}
- 
-+	spin_lock_init(&prueth->vtbl_lock);
- 	/* setup netdev interfaces */
- 	if (eth0_node) {
- 		ret = prueth_netdev_init(prueth, eth0_node);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index bba6da2e6bd8..8722bb4a268a 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -296,6 +296,8 @@ struct prueth {
- 	bool is_switchmode_supported;
- 	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
- 	int default_vlan;
-+	/** @vtbl_lock: Lock for vtbl in shared memory */
-+	spinlock_t vtbl_lock;
- };
- 
- struct emac_tx_ts_response {
+>> +}
+>> +
+>> +impl Delta {
+>> +    /// Create a new `Delta` from a number of nanoseconds.
+>> +    #[inline]
+>> +    pub fn from_nanos(nanos: u16) -> Self {
+> 
+> So here you don't allow negative values.
+> 
+> But why limit it to u16, when the base value is a 63 bits? 65535 nS is
+> not very long.
 
-base-commit: 9234a2549cb6ac038bec36cc7c084218e9575513
--- 
-2.34.1
+I thought that from_secs(u16) gives long enough duration but
+how about the following APIs?
 
+pub fn from_nanos(nanos: u64)
+pub fn from_micros(micros: u32)
+pub fn from_millis(millis: u16) 
+
+You can create the maximum via from_nanos. from_micros and from_millis
+don't cause wrapping.
 
