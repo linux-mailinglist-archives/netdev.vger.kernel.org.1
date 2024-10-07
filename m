@@ -1,115 +1,163 @@
-Return-Path: <netdev+bounces-132618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35566992750
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:42:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF439927A4
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C0F41C221FD
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 08:42:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0B951F2101C
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 08:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C798D18BC32;
-	Mon,  7 Oct 2024 08:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE75A18B48F;
+	Mon,  7 Oct 2024 08:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3hM/k9lL"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="y5JfrriS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC7418BBA1
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 08:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422D2136354;
+	Mon,  7 Oct 2024 08:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728290499; cv=none; b=R2caINODraEoWj3sEiQMYrn6Zczv5nWkqTNgwfUBw76PoIgKxBTbCoYzHfv42fb2HtBl7BA7gy/RvJQl8KSzj4gpP/DlavIG0pQ5TjZHXc5wPIjyBw56XaJQxADDmGk/uY8kWbuR5KazTN8o8EQDgU6K7ePZHLlOqzNNKTRfEms=
+	t=1728291402; cv=none; b=o8BC3o9xKyc1wS30NxfLIo+4SuqgIAwtHHKSrtruL/K9/qycIu1cwoNhs3rAEwQDpg8722McLwrHkiMRN+ESvr2gaJg9x5XzCs9aGVnCweJTvAVzjYmXq3xC1qbsleib1toYV4iJ6HU21pgPcbVYBAFpmf8VoMaqdK2frDFwDhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728290499; c=relaxed/simple;
-	bh=lZq9penah7gAuMo7VonFN6z7LH5CuCz+KTWzrVG0Kkg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rQmO/l5r5Cg7KaFsqkkvRLBec139GH1uoF/18w3bgy39mtLx8LgyFR5oz/c/ALrro9h67eZ2LRGKYrqOXP+UkfeQLjIYRLbCrx96D48Mm0gvPIde/WqFGBBOYUXWjddNAwQFUkqXP1vR4L2nkrKzzm44n6Fm9Fw197fkhzJUyyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3hM/k9lL; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42cb2191107so35925175e9.1
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 01:41:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728290496; x=1728895296; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lZq9penah7gAuMo7VonFN6z7LH5CuCz+KTWzrVG0Kkg=;
-        b=3hM/k9lLi4Lrhjpkdhvk7bALNKUdSPjDlAyaNHCY+7KAAW1qvf5B0sKPhZVU+qlHzY
-         /TgWNSeETECbzwLv/CqLDctjwyjpub6v90FzdFa/8+pHCH8mP46bLsuqelOYdAbBEgUE
-         zLVt9wXC/k/80SRkGiOiEGca2M8w4/pmhss9JCkd2RNEPSJjaD3HmzW33yWQ1KISeiBJ
-         /y4Kw5KcH/p9MUny7MAzjm8RswvrJrmliOiUF/415+fBDE2qtXSJryXm1uxUsCTqflll
-         9kpM+x6THpwe0t7En1MWDG4qGVhpxwRFmrxRoxD8pdj1RNBr9UzYM9dIsRiNGCc1G9oA
-         PwRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728290496; x=1728895296;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lZq9penah7gAuMo7VonFN6z7LH5CuCz+KTWzrVG0Kkg=;
-        b=l+mHjIRDpw94ufDDehpkFvHEq+MbhYpA/m6DvyuIL654MMarFzyr0WN6i6zjmZyK/g
-         eW6EMbnuZfAtYXoq/3aDih73Dk9g0sgG+ya54p3rCI0cxMIK+oVDK1wKALTQvenppwdh
-         laix4eMljngGUIo+iLoELxo5O+zqJRq7MlABAzSPlXGso7kz0bJTlTGZ6VGZoFz7oPcX
-         S+BZKX5NtRrVYZusyBhjqgMQJgSLCoP2dSSQV07o6tjJTPXeg0VZYkDHCLRQLhVr7QP9
-         7yh5auazWcQTj5wSBGQJLYACs3LWYM+VsiEjcgjmgwO8rVi8zJyBOUM/auh1D8ttlpgf
-         57gQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXDEhVpVmvEr+jlVC0XHCn5vr1OfTflh5mhtIxv7Gx6VspKa83OabJfvxgNAitVahCjQ4gj1ZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yweei1808WEY4S7WLLRszcgHw65xfTktP9bbS1H/P6qu9LF0ty/
-	SaE9Lg0y0c9J4E795VClSIzbMZk23JpDyek+TGdYWQYqxOPZHqwr9VXF+qRHwF20s5A90Dc3q6X
-	odPyG/ws0FaGDX8rAwQO2by/eKQLh0hut5q0KT1v2m29IObgZDQ==
-X-Google-Smtp-Source: AGHT+IGTRgHCCYQ9wvmh2HAydK1cwGiHD4ib1IG2CJRk6JiPA1BuIRNRo/7C2CaH7YWebj5QH1G8ucz5efiqpGwNw7o=
-X-Received: by 2002:a5d:6149:0:b0:37c:cd71:2ba2 with SMTP id
- ffacd0b85a97d-37d0e7bcdf8mr5314481f8f.38.1728290496403; Mon, 07 Oct 2024
- 01:41:36 -0700 (PDT)
+	s=arc-20240116; t=1728291402; c=relaxed/simple;
+	bh=zdL2OcUuWCghfLpMOEvzNQUziLhVJFXLB5fd3Zh4+vQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p9PFN4pIsut4eaMR21Y0t9LYzFkpL9EQ6eNE++aoARGSRUxWM5eFjugPX4qxOp3K/VjcbtZ0M3cmzCKPv2v6xydK6c4+44l29ihtSi3U57qOWb34y9z/T07BG9qlDbAmU+x/ULDy0nCz/w4UoBBSS2AN+u8AWaw0U8pthqCB0JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=y5JfrriS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZhAwQv8M5oa7k3C/vYB3Gden64SJwRJoj/egCMnNt54=; b=y5JfrriST8SoZsDWw+xk7OWUZo
+	2/E4A40U4RSLMuLIJXLjADhPkH3qP3c1IGXaEkDL6LMo/QLT14HvP3zbSeOneza00aoGAKp9uTVhy
+	zf6VkutzcyRB07qJVlPdXg2Jl3+yq84tFkGlOxPWlUP2lMK6q9Y/qN1v60HwUgCoU9m5wv0U2mErt
+	GjJWtwMGyFyErSk0+1cZE6kphHiviwR5TwtlNkQ17mPBxUHcP/h2SXVoP6GANAyoHwrrl8jSc3rod
+	d0I/vU/VNvS0w0+77454vxm2Gda2pPGhFDf0kMcM/R9lJ2n4JLogOJXSN+Ws/Z6PLbSlDYbnVnokX
+	ik06eL8A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33786)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sxjXV-0005Qd-34;
+	Mon, 07 Oct 2024 09:56:25 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sxjXR-00045U-2M;
+	Mon, 07 Oct 2024 09:56:21 +0100
+Date: Mon, 7 Oct 2024 09:56:21 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Mohammed Anees <pvmohammedanees2003@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, f.fainelli@gmail.com, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	olteanv@gmail.com, pabeni@redhat.com
+Subject: Re: [PATCH] net: dsa: Fix conditional handling of Wake-on-Lan
+ configuration in dsa_user_set_wol
+Message-ID: <ZwOiNQSNJ7CzqbO1@shell.armlinux.org.uk>
+References: <0d151801-f27c-4f53-9fb1-ce459a861b82@lunn.ch>
+ <20241006161032.14393-1-pvmohammedanees2003@gmail.com>
+ <32b408a4-8b2d-4425-9757-0f8cbfddf21c@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-2-fujita.tomonori@gmail.com> <3D24A2BA-E6CC-4B82-95EF-DE341C7C665B@kloenk.dev>
- <20241007.143707.787219256158321665.fujita.tomonori@gmail.com>
-In-Reply-To: <20241007.143707.787219256158321665.fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 7 Oct 2024 10:41:23 +0200
-Message-ID: <CAH5fLgirPLNMXnqJBuGhpuoj+s32FAS=e3MGgpoeSbkfxxjjLQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/6] rust: time: Implement PartialEq and
- PartialOrd for Ktime
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: finn@kloenk.dev, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
-	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
-	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32b408a4-8b2d-4425-9757-0f8cbfddf21c@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Oct 7, 2024 at 7:37=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> On Sun, 06 Oct 2024 12:28:59 +0200
-> Fiona Behrens <finn@kloenk.dev> wrote:
->
-> >> Implement PartialEq and PartialOrd trait for Ktime by using C's
-> >> ktime_compare function so two Ktime instances can be compared to
-> >> determine whether a timeout is met or not.
-> >
-> > Why is this only PartialEq/PartialOrd? Could we either document why or =
-implement Eq/Ord as well?
->
-> Because what we need to do is comparing two Ktime instances so we
-> don't need them?
+On Sun, Oct 06, 2024 at 09:57:26PM +0200, Andrew Lunn wrote:
+> On Sun, Oct 06, 2024 at 09:40:32PM +0530, Mohammed Anees wrote:
+> > Considering the insight you've provided, I've written the code below
+> > 
+> > static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
+> > {
+> > 	struct dsa_port *dp = dsa_user_to_port(dev);
+> > 	struct dsa_switch *ds = dp->ds;
+> > 	int ret;
+> > 
+> > 	ret = phylink_ethtool_set_wol(dp->pl, w);
+> > 
+> > 	if (ret != -EOPNOTSUPP)
+> > 		return ret;
+> > 
+> > 	if (ds->ops->set_wol)
+> > 		ret = ds->ops->set_wol(ds, dp->index, w);
+> > 		if (ret != -EOPNOTSUPP)
+> > 			return ret;
+> 
+> This can be simplified to just:
+> 
+> > 	if (ds->ops->set_wol)
+> > 		return ds->ops->set_wol(ds, dp->index, w);
+> > 
+> > 	return -EOPNOTSUPP;
+> > }
 
-When you implement PartialEq without Eq, you are telling the reader
-that this is a weird type such as floats where there exists values
-that are not equal to themselves. That's not the case here, so don't
-confuse the reader by leaving out `Eq`.
+I don't think the above is correct. While the simplification is, the
+overall logic is not.
 
-Alice
+Let's go back to what Andrew said in his previous reply:
+
+"So userspace could say pumbagsf, with the PHY supporting pmub and the
+MAC supporting agsf, and the two need to cooperate."
+
+The above does not do this. Let's go back further:
+
+        phylink_ethtool_set_wol(dp->pl, w);
+
+        if (ds->ops->set_wol)
+                ret = ds->ops->set_wol(ds, dp->index, w);
+
+The original code _does_ do this, allowing the PHY and MAC to set
+their modes, although the return code is not correct.
+
+I notice V2 of the patch has been posted - in my opinion prematurely
+because there's clearly the discussion on the first version has not
+reached a conclusion yet.
+
+What I would propose is the following:
+
+	int phy_ret, mac_ret;
+
+	phy_ret = phylink_ethtool_set_wol(dp->pl, w);
+	if (phy_ret != 0 && phy_ret != -EOPNOTSUPP)
+		return phy_ret;
+
+	if (ds->ops->set_wol)
+		mac_ret = ds->ops->set_wol(ds, dp->index, w);
+	else
+		mac_ret = -EOPNOTSUPP;
+
+	if (mac_ret != 0 && mac_ret != -EOPNOTSUPP)
+		return mac_ret;
+
+	/* Combine the two return codes. If either returned zero,
+	 * then we have been successful.
+	 */
+	if (phy_ret == 0 || mac_ret == 0)
+		return 0;
+	
+	return -EOPNOTSUPP;
+
+Which I think is the closest one can get to - there is the possibility
+for phylink_ethtool_set_wol() to have modified the WoL state, but
+ds->ops->set_wol() to fail with an error code, causing this to return
+failure, but I don't see that as being avoidable without yet more
+complexity.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
