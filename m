@@ -1,79 +1,91 @@
-Return-Path: <netdev+bounces-132803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87229933A2
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:42:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10ED89933A5
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:43:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F271287FE8
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:42:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AE66B21639
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:43:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96B91D7E28;
-	Mon,  7 Oct 2024 16:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950AE1DB545;
+	Mon,  7 Oct 2024 16:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eFwaITMn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jTj7CMPF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AEC1D1E8A
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 16:42:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7FA1D9334;
+	Mon,  7 Oct 2024 16:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728319366; cv=none; b=meyl4wDzTZ2hAVj1mF/w36HLs0u7EMVWH5rGrp8+hJeMBn/iZ1P+yF9ss3Vd/W3ZArt000+SGdsqV2cl7eSGx+O7kCkqcwKVqMXjeix00sRiQ8ar1/fLRXkBYcE5c6lu9JbTrAzBCO0IGNyRGVVqG9NUAXZn7AJzzTmOiH0qWd4=
+	t=1728319427; cv=none; b=JbvxwoNH8zXmRyCVYYi3qubXHt+kdDMeZTlm/AktJVKLWJAGf10j4F5qxqLnAAXS0MR/ti/pehznRchsXwgfJnlsZon3CJS4QnQDrLfBZTCTsTZ1xqnOnWZYWZr99gw5GCsn+/99hueyrKmipeaIkBHt7cu3RH5iWouCV8sKK00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728319366; c=relaxed/simple;
-	bh=OsFjrnHgCqteocAbZ0ZL286L+omyoHWMkj/C3qTonCY=;
+	s=arc-20240116; t=1728319427; c=relaxed/simple;
+	bh=8f3RQB7P4qUomcOQqA3IO4AAy8F3BeamBsISpOXSYB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FY4I/aN3NnQzPeQbCo80XepGV/1FKb9jDAm6oT7WGYb/aAvyU9p4hkdWFo4GWG+/4ZvBFYSiXkFsVj4uH/GOqgsnU6A8hea1srtYwKKkGaOpoH9EVT2Qgl1FopRPhDu7nxx5JgN3PhrsS8NPwwElD6c0CF+ivpbNRUyXTqaHKXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=eFwaITMn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 644B9C4CEC6;
-	Mon,  7 Oct 2024 16:42:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eFwaITMn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1728319363;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OsFjrnHgCqteocAbZ0ZL286L+omyoHWMkj/C3qTonCY=;
-	b=eFwaITMnwUmkmR5Zf4HFCg1K49h2Cq/xEzjQSVJOQB1zv9Uof0qCy6oBGex6knaSZHKm6b
-	XUEVEaSmKKznkNQjAW+l85zpvLMtqEri2XTyDQn8h83vcSerKYl/S4+AN3+XecDezjeZb6
-	d2nA2fYxUBMgGiIEUK3V6NDECFO5l3o=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 381477e3 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 7 Oct 2024 16:42:43 +0000 (UTC)
-Date: Mon, 7 Oct 2024 18:42:41 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: kuba@kernel.org, edumazet@google.com, aspsk@isovalent.com, m@lambda.lt,
-	netdev@vger.kernel.org, wireguard@lists.zx2c4.com
-Subject: Re: [PATCH net-next v2] wireguard: Wire-up big tcp support
-Message-ID: <ZwQPgbwio38LWqKS@zx2c4.com>
-References: <20241004165518.120567-1-daniel@iogearbox.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SD0dQh9ONVdpU8sA8DgD2ROJkq9/XEVD/2uWTs4HfZ34s+nvBUt3+Q0OSaM2WVTkG4V7LtqQOdaFa3fL+qmev9cVzL9Squtr+uGhEnxFtSjmYAAFPRSO/ivw8DS5vBQaP35DJ/bWMijOENrw8pr/52kNxIiWpmdZXc8PZEbBb/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jTj7CMPF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nZn2zBYwD3KVGDJRDwqzdWgsyBsBIG+PSLhrDiYTSkI=; b=jTj7CMPFET8NvqA9jI7csO/LsH
+	1L8AL6Z09Tmxzj/S5n6issZjj4VO9EI3QRCynoKwPN+r6+lBPWpX43KiYncp9EKoZJuDOjLF2hNgU
+	hDDUlHHPlHbNIH5ts/UvglQ2HQmyGh7X4uVjuFTtjVPbOgIIRucbYUZdnhwQ+f9KK+dw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sxqph-009Hvz-RE; Mon, 07 Oct 2024 18:43:41 +0200
+Date: Mon, 7 Oct 2024 18:43:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 0/9] Allow isolating PHY devices
+Message-ID: <025dc294-2d81-4817-8ec6-7939f1dd8827@lunn.ch>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+ <ZwAfoeHUGOnDz1Y1@shell.armlinux.org.uk>
+ <20241007122513.4ab8e77b@device-21.home>
+ <ZwQD_ByawFLEQ1MZ@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004165518.120567-1-daniel@iogearbox.net>
+In-Reply-To: <ZwQD_ByawFLEQ1MZ@shell.armlinux.org.uk>
 
-Hi Daniel,
+> Looking at 802.3, there is no support for isolation in the clause 45
+> register set - the isolate bit only appears in the clause 22 BMCR.
+> Clause 22 registers are optional for clause 45 PHYs.
 
-On Fri, Oct 04, 2024 at 06:55:18PM +0200, Daniel Borkmann wrote:
-> Advertise GSO_MAX_SIZE as TSO max size in order support BIG TCP for wireguard.
-> This helps to improve wireguard performance a bit when enabled as it allows
-> wireguard to aggregate larger skbs in wg_packet_consume_data_done() via
-> napi_gro_receive(), but also allows the stack to build larger skbs on xmit
-> where the driver then segments them before encryption inside wg_xmit().
+That was also an observation i had, the code goes straight to C22
+operations, without even considering if the PHY has phydev->is_c45 is
+set.  I think we need an op for this, which will default to NULL. The
+driver can then opt-in by using the genphy function, or its own driver
+method.
 
-Thanks, I'll queue this up. Do you have any perf numbers on the speedup,
-btw?
+But lets get the big picture understood first, before we focus on the
+details.
 
-Jason
+	Andrew
 
