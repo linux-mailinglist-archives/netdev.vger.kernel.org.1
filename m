@@ -1,66 +1,65 @@
-Return-Path: <netdev+bounces-132609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3793099267D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 09:57:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69E4999268D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C93CCB2080D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 07:57:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19ADB1F22A1E
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 08:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4000714C5B5;
-	Mon,  7 Oct 2024 07:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E181C16849F;
+	Mon,  7 Oct 2024 08:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="C+tb8sSn"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="feyub4zu"
 X-Original-To: netdev@vger.kernel.org
 Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5888541C7F;
-	Mon,  7 Oct 2024 07:57:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1951292CE
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 08:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728287824; cv=none; b=IlT3gLLhZfy8BqMQ142oGBUchYIxsFYik4UwPrEUB8xOcLcAAb/GWjnsNAb2k75qq/9Zx8t6hXLmVpJ7WP63fg0T2aKxHuIXIRrOhh2hVAEitGdcr9kR/RMhRpuWgsZkEoLjg4+BrSismNRqWsbOuuXjLksSqQtBsJ+maw6Q8hI=
+	t=1728288103; cv=none; b=kP1yAw5wkIS7AyiXpo5jp/HT1Jr7Kqn/M5CYhfKvw8psro9SdyLyR4rGbS8ueBwhEK0pUwe9rcPLNNfDbv08V46QEQKYIp4YxddBKR/WCrusAfUqXYp3wQMBvs6VXfVSbuiB87YDQw1q1RrHDUrCYUjQinIwjTXEabgMwTPDjrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728287824; c=relaxed/simple;
-	bh=lFoTegalWJz/926ecIf2O6zlRXbba6SLin82MoKM0BI=;
+	s=arc-20240116; t=1728288103; c=relaxed/simple;
+	bh=qVGevAljTYytmlrJD2uw9N2ydsoxMTEZq9RwDFGbd48=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EJbZWDKBmfyQstyAUZFi7lNlNRmL074Y/7kfWPgeaCVM0d1ZxAQz4mjx0Mc6hyJaG3cmh+f3TurQYqdB3W/1FC4hb5K/PD0xiSMH9cC2A+QoXnCQ1prVCnASGUMjZEB+RYMh++k2U4rTXZew+5AxxJY4s4hGX4aba5x05/Q1hBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=C+tb8sSn; arc=none smtp.client-ip=85.214.62.61
+	 MIME-Version:Content-Type; b=TyUkngSWPuNkDG2R1/Plr9boIUfUuDxPZdpIqHO8kCpAb5BQqrLeDVFevLfhsWXvW54qbpWmZd2F/Yea4NVHHsbjbfdWC0vlCW6Qf3lix++YfORwLNEDtAYVhLdNevs2mOLCddB9aH1U+aoPlw2iOb5j21hyNFFn3SVk8LSPCTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=feyub4zu; arc=none smtp.client-ip=85.214.62.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4313588D5B;
-	Mon,  7 Oct 2024 09:56:54 +0200 (CEST)
+	by phobos.denx.de (Postfix) with ESMTPSA id 9853188C63;
+	Mon,  7 Oct 2024 10:01:39 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1728287815;
-	bh=9BGnMXQSavohhC2EYGCXy1MOGene7VMC5//c/dvJgl0=;
+	s=phobos-20191101; t=1728288100;
+	bh=YOYqzEswg07UG3xOehbcINnh8Y6YSQe4cZREqK+0Z5Q=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=C+tb8sSnxl1LHPYeyT3Ljrv+uWXQjUQFJHyuGbl2yGS5S3vXiTgYb6LRLekWH19Bx
-	 84NAK/miZnyHB2C2nOylbWor2Qza7LYNNLvk/9Crs02QqKkQr8PELDcenyOAq8IwnZ
-	 OTmCHZu7xDPxOZ7yzUDOIE9xkM4YM7MJ33DYZX0mr/9OQ2CA0DQcXmrqLWJfpsf85k
-	 vNmxmC5l5QjdjNKxX/x1ep1ltXbdn9ck/vMBY9j0noaddToO9FlOeSHJnL+sVgM2eX
-	 4yBcY48PTWM4T4b80tz80UUKiSOOWrHUPoXgtpfBcIjfwcHZGkbbwPnzgaTHb/OkRm
-	 o6SlKiaOcD9Uw==
-Date: Mon, 7 Oct 2024 09:56:53 +0200
+	b=feyub4zuEtPm0lYq5mvDxmrosfrOsYP4DI0apyychO+7h6YuTFKos5zKLdMm5hvkS
+	 zSGhrFtCBQuG/Be3NSI0K49gygIxMsAuEtAoRU0PirmWzgRZSYk94b+WTTDNVmBArz
+	 KwaGMdMyFgq1orCB6OchuSTp53Zqbu/SZ51M2UT86q3cOOHZJkv+OYHV9igAUtdcMo
+	 wz81Ykc3vJYvoMA379Ro/Ylm4v9biX2WhdBaSARm5fbX2mZbmCoJKtpnaelFmaW89B
+	 NhGqnszqALlLydcNZaYRAwRpPzcI2Pfo8/0udvqa0Q7rYB9s7cxz/A62nTkQvQuk2X
+	 1jR2wZynhvTKA==
+Date: Mon, 7 Oct 2024 10:01:38 +0200
 From: Lukasz Majewski <lukma@denx.de>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: <jiri@resnulli.us>, <aleksander.lobakin@intel.com>, <horms@kernel.org>,
- <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
- <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
- <edumazet@google.com>, <davem@davemloft.net>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
- <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next 0/3] Introduce VLAN support in HSR
-Message-ID: <20241007095653.4534664e@wsk>
-In-Reply-To: <20241004074715.791191-1-danishanwar@ti.com>
-References: <20241004074715.791191-1-danishanwar@ti.com>
+To: Zichen Xie <zichenxie0106@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, aleksander.lobakin@intel.com,
+ n.zhandarovich@fintech.ru, ricardo@marliere.net, m-karicheri2@ti.com,
+ netdev@vger.kernel.org, Zijie Zhao <zzjas98@gmail.com>, Chenyuan Yang
+ <chenyuan0y@gmail.com>
+Subject: Re: net/hsr: Question about hsr_port_get_hsr() and possbile
+ null-pointer-dereference
+Message-ID: <20241007100138.643f5c61@wsk>
+In-Reply-To: <CANdh5G7KBdzVcyrf5dPG2fbXQ5KCzr0LXu_p38H2-Cd4_FNsxw@mail.gmail.com>
+References: <CANdh5G7KBdzVcyrf5dPG2fbXQ5KCzr0LXu_p38H2-Cd4_FNsxw@mail.gmail.com>
 Organization: denx.de
 X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -69,44 +68,65 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=pg.V_ZyQHlB1UmJVii8Ao.";
+Content-Type: multipart/signed; boundary="Sig_/ao48C/QlA6XHTwYGhfNjTuA";
  protocol="application/pgp-signature"; micalg=pgp-sha512
 X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
 X-Virus-Status: Clean
 
---Sig_/=pg.V_ZyQHlB1UmJVii8Ao.
+--Sig_/ao48C/QlA6XHTwYGhfNjTuA
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hi MD Danish Anwar,
+Hi Zichen,
 
-> This series adds VLAN support to HSR framework.
-> This series also adds VLAN support to HSR mode of ICSSG Ethernet
-> driver.
+> Dear Developers for NETWORKING [GENERAL],
 >=20
+> We are curious about the function hsr_port_get_hsr().
+> The function may return NULL when it cannot find a corresponding port.
+> But there is no NULL check in hsr_check_carrier_and_operstate() here:
+> https://elixir.bootlin.com/linux/v6.12-rc1/source/net/hsr/hsr_device.c#L93
+> The relevant code is:
+> ```
+> master =3D hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+> /* netif_stacked_transfer_operstate() cannot be used here since
+> * it doesn't set IF_OPER_LOWERLAYERDOWN (?)
+> */
+> has_carrier =3D hsr_check_carrier(master);
+> hsr_set_operstate(master, has_carrier);
+> hsr_check_announce(master->dev);
+> ```
+> There may be possible NULL Pointer Dereference.
+> However, in hsr_dev_xmit() the NULL checker exists.
 
-Could you add proper test script for this code?
+This function is called when NETDEV_UP/DOWN/CHANGE is called for hsr
+net device.
 
-Something similar to:
-https://elixir.bootlin.com/linux/v6.12-rc2/source/tools/testing/selftests/n=
-et/hsr
+IMHO, this cannot be called without having first created hsr network
+device (with iproute2 command).
 
-> Murali Karicheri (1):
->   net: hsr: Add VLAN CTAG filter support
+> ```
+> master =3D hsr_port_get_hsr(hsr, HSR_PT_MASTER);
+> if (master) {
+> skb->dev =3D master->dev;
+> skb_reset_mac_header(skb);
+> skb_reset_mac_len(skb);
+> spin_lock_bh(&hsr->seqnr_lock);
+> hsr_forward_skb(skb, master);
+> spin_unlock_bh(&hsr->seqnr_lock);
+> } else {
+> dev_core_stats_tx_dropped_inc(dev);
+> dev_kfree_skb_any(skb);
+> }
+> ```
+> So we are curious if this NULL check is necessary. The function
+> hsr_port_get_hsr() is called several times, but NULL checks seem to
+> exist occasionally.
 >=20
-> Ravi Gunasekaran (1):
->   net: ti: icssg-prueth: Add VLAN support for HSR mode
+> Please kindly correct us if we missed any key information. Looking
+> forward to your response!
 >=20
-> WingMan Kwok (1):
->   net: hsr: Add VLAN support
->=20
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 45 +++++++++++-
->  net/hsr/hsr_device.c                         | 76
-> ++++++++++++++++++-- net/hsr/hsr_forward.c                        |
-> 19 +++-- 3 files changed, 128 insertions(+), 12 deletions(-)
->=20
->=20
-> base-commit: 6b67e098c9c95bdccb6b0cd2d63d4db9f5b64fbd
+> Best,
+> Zichen
 
 
 
@@ -121,21 +141,21 @@ DENX Software Engineering GmbH,      Managing Director: Erika Unter
 HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
 Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
 
---Sig_/=pg.V_ZyQHlB1UmJVii8Ao.
+--Sig_/ao48C/QlA6XHTwYGhfNjTuA
 Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmcDlEUACgkQAR8vZIA0
-zr3YGAf/fM+Kqhnwy73uU2jUhB0riGuH8wbJwxOZikSdORexG/l9qCgrC3Rungcw
-8Ure6w+NNegVQHZns4p51VLzWiVqwTq9ZtQJXpjEjT/GY6dv6zRvvkMNC73rgjKb
-1JjsBo1NWG2yWVa59J3XDrLf/0y+FQ2nXOtRIpSVckcttkL8EqSV/0n0C+zvorY6
-beaxCVlPElynZ37iRBColDkYbshyFTojrYDs2n23OR+wvoe3Wpq9/TDtc3l9VVZk
-uEJT/3xmpha90xksU/eDEmR6ncJif9gBl1uudSe+ep/QXHxik/LePTIJQz3htQbZ
-vx9q4UV1KAkJP1WLZfHNjXTiuYGH2w==
-=fOuJ
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmcDlWIACgkQAR8vZIA0
+zr3O9gf7BJOeJ6gSVIxNK2fwHJuSerR+2KHIvqf3tnyMScvlcy/5KioAoYdLVkbj
+9ztIG3Jvgp/1YXTqfM/87DQMjIddmX+2BQ3gv3yC8fYY3UI0H95q+sdApa9tvEAG
+klNH4rXL0B66w8b4cSFK3Af08SAZ9CASCQJHN1lPkAunAozrG13kn4RzXVG570qC
+81U+dOfdRWRIen/RsZV78lffFyOQo8vQtop8kouXgW2JEzzAbbe74SP+tOk7G+i9
+YG+O8uho0MtjlQoJ6DXVvvtyxk4FVVT92Au51C96CWjmf2xW7hSkAPebOhQTiiHy
+tMc/mtQd4poliXlzjXNnxs/+NVMgjw==
+=SR9q
 -----END PGP SIGNATURE-----
 
---Sig_/=pg.V_ZyQHlB1UmJVii8Ao.--
+--Sig_/ao48C/QlA6XHTwYGhfNjTuA--
 
