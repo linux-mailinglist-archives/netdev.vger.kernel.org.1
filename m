@@ -1,141 +1,188 @@
-Return-Path: <netdev+bounces-132702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68189992DB1
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:48:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B54C992DB4
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:48:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C24A1C220EB
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:48:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F36111F2153B
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FC61D4326;
-	Mon,  7 Oct 2024 13:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105C31D433B;
+	Mon,  7 Oct 2024 13:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v7eN2z1T"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fWotVD8O"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BAC1D2223;
-	Mon,  7 Oct 2024 13:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFE81BB6B8;
+	Mon,  7 Oct 2024 13:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728308912; cv=none; b=hf3ifbTYMVcAjdH+K4iPqkB/Dr/joFD69mpEMaZXJ6JH5yddf6T1xhXORrjlCA0K/sDf+G3nO2aVTI/XlVqp3f5n77Iw8Z6cIWMpD2D7gWKwUF7a6Vfg/tGfZPg42QYwrX+syHG2sPcc1KLXzZBHH03S6md41im1QMEIbfZTY4I=
+	t=1728308930; cv=none; b=FfCsMmnPSGAgEGSAWUpzFKULIHemjIDMI6cvb+xsX0UTgyWswMt9flsF28KVwm+vMQ87Jk9iqBYNqKDm6jwlsynlv9rzY88Bl/8P0cqdv3fohqezLDZMJuZ44bNytvGpMNfYSUsym1UZ44DaBDaHCck7IJ9TjbZLqphVYoQUrqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728308912; c=relaxed/simple;
-	bh=aNfKhpR+COGAnurrQ1qEerAhVLsQXkQtnBVsPQoSfMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pcozi52amN1dE7eVNGPYtfxd6i3SAb7DEZMq3EG+xmDeh+s1Q0oCT8KMYhyEZeqelzyiZf9TqAYCvOU02N8Z4Pzoy5/4eyRxMoQBGcwbrNjBBYGVd+FqI0aHyM11XmJDWyPgCkvNYEHwpwlrUUPYnKoqwzSh/Nef2439C0wiTMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v7eN2z1T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zbDRG+fwMPbFuvhcpRI9/YsPLmcflro4JIwDOxVyV7E=; b=v7eN2z1TVnKvaGtrEhYPpmvcqG
-	1vKz3QGMgAEt0Ox91HV2wx8QhJPUTklG3d6XyHc7A/IFc3aSxI+QcJABcvvwltGpZ+JpiR9V6V8Df
-	grGl2TlUGkTQkI6VWfqS5ejQxh64lRBc9HRqqwJbfCAFAXYJnzroYtwm+1CzuDVAdjQE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sxo5p-009GeI-5l; Mon, 07 Oct 2024 15:48:09 +0200
-Date: Mon, 7 Oct 2024 15:48:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Boqun Feng <boqun.feng@gmail.com>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com,
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	arnd@arndb.de, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com>
- <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
- <ZwG8H7u3ddYH6gRx@boqun-archlinux>
- <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux>
+	s=arc-20240116; t=1728308930; c=relaxed/simple;
+	bh=aZONHblDLOY8a/SXia5FmXg/1mJCZXX1QQMv3hMv52c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rx37j9JOahq1/weO5T75cQuYx76vjzOLFxp9kN/Bj0FlsxyOcCzgtYXuPq4h9MFMAvpcYMw5/6Qv+a8EdZnNUTuk5wAohqZ1vAE5Y9XSaQt16/tenvNhTvePwVHCwOfCJGuuMpGWdGMqFLevGkLsvmG8AhnMGbfKBXwNjKVLTlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fWotVD8O; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1188B20004;
+	Mon,  7 Oct 2024 13:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728308923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DhKBFeZGHSyyHDSTFhWo3W2+i/2nHGpX6rDWz/1Zozs=;
+	b=fWotVD8OTKFI8SebqJJNxcR4CgvHyhpV3IuVjgCGRg/S1eCRSG/8NwXtwLKH90r7y1X0QO
+	iCk/KOwGBBoOFh1WKSRjY1hK8npcjwfuPNjbDyzL1G/CWK8RyqXhgxYPVdQQfMYC/ke8ST
+	eSMrPn+43ptiHFgRJNMVjYdZMF72wZHNzP2HQOKL4VOFW9/qUa4uPFxh7DekDx9Rnk6K+V
+	anH49L80z5x5+7dAwPMA9rhJWbyHjLGR3lLSfLcDuj+sjSO4MZOPpgcIfySbqzCOz+MkE8
+	qVyIcU+HA+z6rbEuglXSa2HH3R9foMBwAI7+1s+pqnXpdxwVOXLtj0Zv43CdNA==
+Date: Mon, 7 Oct 2024 15:48:39 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
+ get and set phy configuration
+Message-ID: <20241007154839.4b9c6a02@device-21.home>
+In-Reply-To: <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+	<20241004161601.2932901-8-maxime.chevallier@bootlin.com>
+	<4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
+	<ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
+	<20241007123751.3df87430@device-21.home>
+	<6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwPT7HZvG1aYONkQ@boqun-archlinux>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon, Oct 07, 2024 at 05:28:28AM -0700, Boqun Feng wrote:
-> On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
-> [...]
-> > > > > +    if sleep {
-> > > > > +        // SAFETY: FFI call.
-> > > > > +        unsafe { bindings::might_sleep() }
-> > > > > +    }
-> > > > 
-> > > > What is actually unsafe about might_sleep()? It is a void foo(void)
-> > > 
-> > > Every extern "C" function is by default unsafe, because C doesn't have
-> > > the concept of safe/unsafe. If you want to avoid unsafe, you could
-> > > introduce a Rust's might_sleep() which calls into
-> > > `bindings::might_sleep()`:
-> > > 
-> > > 	pub fn might_sleep() {
-> > > 	    // SAFETY: ??
-> > > 	    unsafe { bindings::might_sleep() }
-> > > 	}
-> > > 
-> > > however, if you call a might_sleep() in a preemption disabled context
-> > > when CONFIG_DEBUG_ATOMIC_SLEEP=n and PREEMPT=VOLUNTERY, it could means
-> > > an unexpected RCU quiescent state, which results an early RCU grace
-> > > period, and that may mean a use-after-free. So it's not that safe as you
-> > > may expected.
+Hi Andrew,
+
+On Mon, 7 Oct 2024 15:01:50 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> > It seems I am missing details in my cover and the overall work I'm
+> > trying to achieve.
 > > 
-> > If you call might_sleep() in a preemption disabled context you code is
-> > already unsafe, since that is the whole point of it, to find bugs
+> > This series focuses on isolating the PHY in the case where only one
+> > PHY is attached to the MAC.  
 > 
-> Well, in Rust, the rule is: any type-checked (compiled successfully)
-> code that only calls safe Rust functions cannot be unsafe. So the fact
-> that calling might_sleep() in a preemption disabled context is unsafe
-> means that something has to be unsafe.
+> I can understand implementing building blocks, but this patchset seems
+> to be more than that, it seems to be a use case of its own. But is
+> isolating a single PHY a useful use case? Do we want a kAPI for this?
+
+That's a legit point. I mentioned in the cover for V1 that this in
+itself doesn't really bring anything useful. The only point being that
+it makes it easy to test if a PHY has a working isolation mode, but
+given that we'll assume that it doesn't by default, that whole point
+is moot.
+
+I would therefore understand if you consider that having a kAPI for
+that isn't very interesting and that I shall include this work as part
+of the multi-PHY support.
+
+> > I have followup work to support multi-PHY
+> > interfaces. I will do my best to send the RFC this week so that you can
+> > take a look. I'm definitely not saying the current code supports that.
+> > 
+> > To tell you some details, it indeed works as Russell says, I
+> > detach/re-attach the PHYs, ndev->phydev is the "currently active" PHY.
+> > 
+> > I'm using a new dedicated "struct phy_mux" for that, which has :
+> > 
+> >  - Parent ops (that would be filled either by the MAC, or by phylink,
+> > in the same spirit as phylink can be an sfp_upstream), which manages
+> > PHY attach / detach to the netdev, but also the state-machine or the
+> > currently inactive PHY.
+> > 
+> >  - multiplexer ops, that implement the switching logic, if any (drive a
+> > GPIO, write a register, this is in the case of real multiplexers like
+> > we have on some of the Turris Omnia boards, which the phy_mux framework
+> > would support)
+> > 
+> >  - child ops, that would be hooks to activate/deactivate a PHY itself
+> > (isoalte/unisolate, power-up/power-down).  
 > 
-> This eventually can turn into a "blaming game" in the design space: we
-> can either design the preemption disable function as unsafe or the
-> might_sleep() function as unsafe. But one of them has to be unsafe
-> function, otherwise we are breaking the safe code guarantee.
+> Does the kAPI for a single PHY get used, and extended, in this setup?
 
-Just keep in mind, it could of been C which put you into atomic
-context before calling into Rust. An interrupt handler would be a good
-example, and i'm sure there are others.
+For isolation, no.
 
-> However, this is actually a special case: currently we want to use klint
-> [1] to detect all context mis-matches at compile time. So the above rule
-> extends for kernel: any type-checked *and klint-checked* code that only
-> calls safe Rust functions cannot be unsafe. I.e. we add additional
-> compile time checking for unsafe code. So if might_sleep() has the
-> proper klint annotation, and we actually enable klint for kernel code,
-> then we can make it safe (along with preemption disable functions being
-> safe).
 > 
-> > where you use a sleeping function in atomic context. Depending on why
-> > you are in atomic context, it might appear to work, until it does not
-> > actually work, and bad things happen. So it is not might_sleep() which
-> > is unsafe, it is the Rust code calling it.
+> > I'll send the RFC ASAP, I still have a few rough edges that I will
+> > mention in the cover.
+> >   
+> > > However, I still want to hear whether multiple PHYs can be on the same
+> > > MII bus from a functional electrical perspective.  
+> > 
+> > Yup, I have that hardware.  
 > 
-> The whole point of unsafe functions is that calling it may result into
-> unsafe code, so that's why all extern "C" functions are unsafe, so are
-> might_sleep() (without klint in the picture).
+> Can you talk a bit more about that hardware? What PHYs do you have?
+> What interface modes are they using?
 
-There is a psychological part to this. might_sleep() is a good debug
-tool, which costs very little in normal builds, but finds logic bugs
-when enabled in debug builds. What we don't want is Rust developers
-not scattering it though their code because it adds unsafe code, and
-the aim is not to have any unsafe code.
+Sure thing. There are multiple devices out-there that may have multiple
+PHYs accessible from the MAC, through muxers (I'm trying to be generic
+enough to address all cases, gpio muxers, mmio-controlled muxers, etc.),
+but let me describe the HW I'm working on that's a bit more problematic.
 
-	Andrew
+The first such platform I have has an fs_enet MAC, a pair of LXT973
+PHYs for which the isolate mode doesn't work, and no on-board circuitry to
+perform the isolation. Here, we have to power one PHY down when unused :
+
+                /--- LXT973
+fs_enet -- MII--|
+                \--- LXT973
+
+
+The second board has a fs_enet MAC and a pair of KSZ8041 PHYs connected
+in MII.
+
+The third one has a pair of KSZ8041 PHYs connected to a
+ucc_geth MAC in RMII.
+
+On both these boards, we isolate the PHYs when unused, and we also
+drive a GPIO to toggle some on-board circuitry to disconnect the MII
+lines as well for the unused PHY. I'd have to run some tests to see if
+this circuitry could be enough, without relying at all on PHY
+isolation :
+
+                   /--- KSZ8041
+                   |
+      MAC ------ MUX
+                 | | 
+  to SoC <-gpio--/ \--- KSZ8041
+
+
+One point is, if you look at the first case (no mux), we need to know
+if the PHYs are able to isolate or not in order to use the proper
+switching strategy (isolate or power-down).
+
+I hope this clarifies the approach a little bit ?
+
+Thanks,
+
+Maxime 
 
