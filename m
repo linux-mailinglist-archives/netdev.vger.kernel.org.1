@@ -1,57 +1,88 @@
-Return-Path: <netdev+bounces-132757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EADD993035
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:57:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 711929930A1
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C14CF1F23E9A
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:57:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FEDF1C22D44
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:07:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD8F1D6DAE;
-	Mon,  7 Oct 2024 14:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EF01D8E09;
+	Mon,  7 Oct 2024 15:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="U05b0bqV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out02.mta.xmission.com (out02.mta.xmission.com [166.70.13.232])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2078.outbound.protection.outlook.com [40.107.243.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABB611D2B35
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:57:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.70.13.232
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728313044; cv=none; b=WB5bxfDz+FfM/kESJCeNREu/O2K7Yom007bs6ZSV07X3yDY3cc8gULbo2IZK6isjxpI2AkZsqA1739r7y2QJZtcSHMXznE2FgD4tu62o9aGQb8/DDKXFHj6bJAQyjFf+9F6lBLyiLHwFl25/oPCGd2XP0k7l4I+kt+EpoaxCIz4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728313044; c=relaxed/simple;
-	bh=IFUHodKCbsnrifi01l3w+LiPZ5E3LtH8rgpj6AMbHZo=;
-	h=From:To:Cc:References:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type:Subject; b=GDTDYyzAz1m8d+L0+MXLL98wIVuoJ0xbmfMim3aqdBPKvk4p2iz9IlVxluY2yLA3k5EUpO4cuKCqCrwZOhiVzJnDE97ZiLkKXrE6HZp09lajEF8/5d947+Zzwdks1l4VEPjsvmY/8rhXrSK8O46XTmQZfd04ux6xfk/GwAPu+ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com; spf=pass smtp.mailfrom=xmission.com; arc=none smtp.client-ip=166.70.13.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
-Received: from in02.mta.xmission.com ([166.70.13.52]:33350)
-	by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1sxpAe-00Bc8l-UB; Mon, 07 Oct 2024 08:57:12 -0600
-Received: from ip72-198-198-28.om.om.cox.net ([72.198.198.28]:50190 helo=email.froward.int.ebiederm.org.xmission.com)
-	by in02.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <ebiederm@xmission.com>)
-	id 1sxpAd-00FKPp-Q6; Mon, 07 Oct 2024 08:57:12 -0600
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Kuniyuki Iwashima <kuni1840@gmail.com>,
-  <netdev@vger.kernel.org>
-References: <20241007124459.5727-1-kuniyu@amazon.com>
-	<20241007124459.5727-6-kuniyu@amazon.com>
-Date: Mon, 07 Oct 2024 09:56:44 -0500
-In-Reply-To: <20241007124459.5727-6-kuniyu@amazon.com> (Kuniyuki Iwashima's
-	message of "Mon, 7 Oct 2024 05:44:58 -0700")
-Message-ID: <87h69ohsgj.fsf@email.froward.int.ebiederm.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB6A1D8A06;
+	Mon,  7 Oct 2024 15:06:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728313591; cv=fail; b=X5TXesxnzAhWKfXMDP47KvwDYUXxYb5V224Vx+aMg/C7YlD6hC84xlrIK1N/vbhDRK1Te+Egvt1fzjqNAJPAZidWb8DOEsBqA/kAT3doDSDd+rU8R923ANrQMM4JoHp8e+5Sk9OLbxVMWDL6LAaMe7CFV3w/lHD0hwhLpN7kOQY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728313591; c=relaxed/simple;
+	bh=0wedgcbvDNzSv6/UguL1supzKNnz/okCj6qpElhr2oM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cSgVvO2BdNCz0C6MNrQeOT/vP7MS/0RzXDY9fi+QSXm2U7IfIatttYXZcUHm3ZRyysIjIEXE6/A21QRhcz66762s1zVmKPAsqPM2ed9+QQG1SIqU/8dgl7MCVNKrdrl0wvPZR5rXfzJ3r2vxtBBdgnGN1k5LhER2onjdbrqFkNU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=U05b0bqV; arc=fail smtp.client-ip=40.107.243.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=IET5aVBijV9qB2NRmA4h+kPjXnh8ykta087p2FnooabM9bZinj/snSSDHlZMI22shj1nkwflOm9BelajsasuKPLtqldCup/FERrEQVeYxy/0FE0i+YACPR6UOnKDdyzkpU+66S9k4YxJGFx8lXkGLLOzqRwG8y5KeVl3SP5+uzNJh2pOe04AeYATS7PFcundkr53Tqf2Nl368ejz8FhO99Jfvq427A+xZWopSI7pXD7GlAErBvXtUWq1kVse8DKSIkFq36Jui4CBPqvF2gRShKcyNNa5QjZU4jMH24fFRIvYuikzzKXQJzaQVQFGMum2Nip9hf1sgG9h9vLovmzgDg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rQdORdduLhnZfjT1P0pddrNbfBct02jEvbe5kkfFYg4=;
+ b=hVPIyUrcmz+x0tL/Ry80DAyCzejlvyODT8QUxukwGV4HACdu3C5T9JQyyzOfMWexFYhtef95Ra7jrpd6UHzm4p+8RJCEcYkf7dYEvi3dpFp2+Bn5AUAZG56dzDLKz5H2T43hxTBlGZa06P3EGENakUwcTpIK5kiyVejx/N4ywhZ3Vn47EPq5Y5IT4k1a2gh31h7W7bXsdrJg+qZ/u6ZF8I8MDaCXT72DLDAt+2+1Hc3c2LgGTHBKA0inAvHpO9xX1pINUgrDhhKUxiBvFyVu7IOzQ21UBoslxbmo26QsBUoElZvhv3Pscd0gmz7RPIL7CgxwZctdYJqL2U4IXaSs1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rQdORdduLhnZfjT1P0pddrNbfBct02jEvbe5kkfFYg4=;
+ b=U05b0bqVNDCcO1u7pYET/1NobyDfBi+PGalvezZqzWs9YW6HXwIwJquSLSD4h/QwYg0bMojJWsD4EKpKpFaMaprvVE8r4OqC7bvKoEG+gRW46I61qwOlWOSX+JZOVm1L1zB7B0vuVH6Wq5MDOWIRvHnjH4irdhrzKoyMzO0qUfs=
+Received: from SN7P220CA0021.NAMP220.PROD.OUTLOOK.COM (2603:10b6:806:123::26)
+ by LV2PR12MB5750.namprd12.prod.outlook.com (2603:10b6:408:17e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.22; Mon, 7 Oct
+ 2024 15:06:23 +0000
+Received: from SN1PEPF0002636B.namprd02.prod.outlook.com
+ (2603:10b6:806:123:cafe::2a) by SN7P220CA0021.outlook.office365.com
+ (2603:10b6:806:123::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.23 via Frontend
+ Transport; Mon, 7 Oct 2024 15:06:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SN1PEPF0002636B.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8048.13 via Frontend Transport; Mon, 7 Oct 2024 15:06:22 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 7 Oct
+ 2024 10:06:19 -0500
+Received: from xhdradheys41.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Mon, 7 Oct 2024 10:06:15 -0500
+From: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+	<conor+dt@kernel.org>, <michal.simek@amd.com>, <harini.katakam@amd.com>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<git@amd.com>, Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+Subject: [PATCH net-next v2 0/3] net: xilinx: emaclite: Adopt clock support
+Date: Mon, 7 Oct 2024 20:36:00 +0530
+Message-ID: <1728313563-722267-1-git-send-email-radhey.shyam.pandey@amd.com>
+X-Mailer: git-send-email 2.1.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,135 +90,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-XM-SPF: eid=1sxpAd-00FKPp-Q6;;;mid=<87h69ohsgj.fsf@email.froward.int.ebiederm.org>;;;hst=in02.mta.xmission.com;;;ip=72.198.198.28;;;frm=ebiederm@xmission.com;;;spf=pass
-X-XM-AID: U2FsdGVkX19KLk7+QQ7X1k8fATQV1a3yHz+N0z+j4Co=
-X-Spam-Level: 
-X-Spam-Report: 
-	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-	*      [score: 0.4999]
-	*  0.7 XMSubLong Long Subject
-	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-	*      [sa07 1397; Body=1 Fuz1=1 Fuz2=1]
-	*  0.0 T_TooManySym_03 6+ unique symbols in subject
-	*  0.0 T_TooManySym_02 5+ unique symbols in subject
-	*  0.0 T_TooManySym_01 4+ unique symbols in subject
-	*  0.0 T_TooManySym_04 7+ unique symbols in subject
-X-Spam-DCC: XMission; sa07 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: ;Kuniyuki Iwashima <kuniyu@amazon.com>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 515 ms - load_scoreonly_sql: 0.04 (0.0%),
-	signal_user_changed: 11 (2.2%), b_tie_ro: 10 (1.9%), parse: 1.14
-	(0.2%), extract_message_metadata: 14 (2.7%), get_uri_detail_list: 2.3
-	(0.5%), tests_pri_-2000: 14 (2.7%), tests_pri_-1000: 2.6 (0.5%),
-	tests_pri_-950: 1.40 (0.3%), tests_pri_-900: 1.05 (0.2%),
-	tests_pri_-90: 125 (24.3%), check_bayes: 123 (23.9%), b_tokenize: 10
-	(1.9%), b_tok_get_all: 8 (1.6%), b_comp_prob: 3.0 (0.6%),
-	b_tok_touch_all: 98 (18.9%), b_finish: 1.09 (0.2%), tests_pri_0: 325
-	(63.2%), check_dkim_signature: 0.57 (0.1%), check_dkim_adsp: 10 (1.9%),
-	 poll_dns_idle: 0.49 (0.1%), tests_pri_10: 2.2 (0.4%), tests_pri_500:
-	14 (2.7%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v3 net 5/6] mpls: Handle error of rtnl_register_module().
-X-SA-Exim-Connect-IP: 166.70.13.52
-X-SA-Exim-Rcpt-To: netdev@vger.kernel.org, kuni1840@gmail.com, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net, kuniyu@amazon.com
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-SA-Exim-Scanned: No (on out02.mta.xmission.com); SAEximRunCond expanded to false
+Received-SPF: None (SATLEXMB03.amd.com: radhey.shyam.pandey@amd.com does not
+ designate permitted sender hosts)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002636B:EE_|LV2PR12MB5750:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d9168e0-8056-4f07-5610-08dce6e19b3c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?rShp2/54Oh+gwbSI0sVtWfS0dCgeG83l1U4WyhDHDtVC70TAR2bEs0aceiNR?=
+ =?us-ascii?Q?ItuPwisODzHu1zichkpQZpMF9QhL+3wU22dv5UCIUaix7ontfMBqupnywTFw?=
+ =?us-ascii?Q?l/YaVrwg4aKxFTr2KhodrKzTLtkdsnKDShqNNHEElR4vXmEmCzH3wGAllQzF?=
+ =?us-ascii?Q?zS1sI9YpaazzMg+1YG+SnXkwoDQTbCAsUCjNiAHV6wKDSfI6m3CHnRK8r66+?=
+ =?us-ascii?Q?jig5DfdON01J0sReV8lgjEv+03hALoCayYspqxZVGhLIh6nNeo83oOoD/8AT?=
+ =?us-ascii?Q?TBk26DZgDG8wm+PtM/B3spuegZdIVBGhy3oHwfm6CcmZBnqp7s5Fnbao7C6h?=
+ =?us-ascii?Q?093FUZ/NwMmjzxCKC7OtAKZjoElix1ftsFJIZVSnA6eMMAhwu9Fgjhes516Z?=
+ =?us-ascii?Q?BgLta3TK0LLfu+veBDIzLnkXJzV+YVdGxsY7SZTih7LcoApcLTCyStLFItVm?=
+ =?us-ascii?Q?freY3E8WgfIjCZtaiTOCe0cZZASB9AyFiT+2wcXW6r8hb1feI6iTw5txuTY1?=
+ =?us-ascii?Q?XUoxIE4b0V3UHrR6Ul6XaEVTpYWl5ggGOtSyPuCimE/4yVQ/z+lrvORPCHNs?=
+ =?us-ascii?Q?7ZW1Vh89HGxsBVSxfg4BMsaT2w4Ik4P2qaJXvo9SqNUg7HxBR+TohXqSKhOE?=
+ =?us-ascii?Q?ZDiHHu9OoNWo30E93ndGA6TjmA+zcKhVEOhpDlk9ur9gSWy/aexY06lBuveu?=
+ =?us-ascii?Q?zkZ8/OoWKEic5vd+DWcG+8L+A7okMBaciNtfyv1HVXfWAB/yAtH3ScWkJKTe?=
+ =?us-ascii?Q?TmyFa6rzUMMOkQuIhQFFxBm/3IzTLPmImG9HAZxAcj2pBzXH8+vl3YIBRFSU?=
+ =?us-ascii?Q?NwOEQYLCbxPNkBqqD6MufbcsaJt5xMZV7kb+9MXHR3XwmwgCkPqAPZy9Qdzv?=
+ =?us-ascii?Q?ShBvvmWmfEVE2lTW6Nk8TdWloSREIkffS2inmdjnQq78F7jrfVXnTVrB0+xX?=
+ =?us-ascii?Q?45+MwpbawXjwnskuTpoWaxvJIaF2kI/5aVpDDqhXtsnQMuDpYjs9+u6Hxsu7?=
+ =?us-ascii?Q?n4Fy7FVDmL3jZWslTBb2ay0A5mbSdkBeUKkKqxv7tr47Hs6ZkunWf2o7hlpO?=
+ =?us-ascii?Q?PGQ1je93UZ34I/I7Q/++vJSkET/JYvZOlqH3GlJACy2Mac5SPM+hyMZXufpU?=
+ =?us-ascii?Q?NsFV9wkluWBGgqSoSnFdKfSWbfjQEEMEaqaQp1q+Jwk0UJznvbOPYZTsGbt6?=
+ =?us-ascii?Q?tmtSnAaF9O32WIizIzMNozUEqLflup823+uXLUaZZt//aWku6l6tGaonqa/c?=
+ =?us-ascii?Q?9RScBs+tCY7qa5tD4r+rbnOIVEUAC1Ar2AgOztUatgb1DoRCY9nXhQRsU7Dw?=
+ =?us-ascii?Q?Sk4dmP6zCUVE812zKcj3UeNcJvM9eyAFLM5+7aiinmqV/hXLES2xpcG9XYCI?=
+ =?us-ascii?Q?77Jni5+qPmaYarMgfu9r1djIGcp9?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Oct 2024 15:06:22.5283
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d9168e0-8056-4f07-5610-08dce6e19b3c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002636B.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5750
 
-Kuniyuki Iwashima <kuniyu@amazon.com> writes:
+This patchset adds emaclite clock support. AXI Ethernet Lite IP can also
+be used on SoC platforms like Zynq UltraScale+ MPSoC which combines
+powerful processing system (PS) and user-programmable logic (PL) into
+the same device. On these platforms it is mandatory to explicitly enable
+IP clocks for proper functionality.
 
-> Since introduced, mpls_init() has been ignoring the returned
-> value of rtnl_register_module(), which could fail.
-
-As I recall that was deliberate.  The module continues to work if the
-rtnetlink handlers don't operate, just some functionality is lost.
-
-I don't strongly care either way, but I want to point out that bailing
-out due to a memory allocation failure actually makes the module
-initialization more brittle.
-
-> Let's handle the errors by rtnl_register_many().
-
-Can you describe what the benefit is from completely giving up in the
-face of a memory allocation failure versus having as much of the module
-function as possible?
-
-> Fixes: 03c0566542f4 ("mpls: Netlink commands to add, remove, and dump routes")
-
-A fix?  Not really no.  You are making the code work less well in the
-face of adversity.  I really don't think that is a fix.  Certainly not
-without a better justification.
-
-I get this as a code cleanup to make things more uniform and easier
-to reason about.  Still you are adding more code paths that are going
-to go untested so I don't see how this winds up being any better
-in practice that deliberately limping along.
-
-Eric
+Changes for v2:
+- Make clocks as required property.
 
 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
-> Cc: "Eric W. Biederman" <ebiederm@xmission.com>
-> ---
->  net/mpls/af_mpls.c | 32 +++++++++++++++++++++-----------
->  1 file changed, 21 insertions(+), 11 deletions(-)
->
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index aba983531ed3..df62638b6498 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -2728,6 +2728,15 @@ static struct rtnl_af_ops mpls_af_ops __read_mostly = {
->  	.get_stats_af_size = mpls_get_stats_af_size,
->  };
->  
-> +static const struct rtnl_msg_handler mpls_rtnl_msg_handlers[] __initdata_or_module = {
-> +	{THIS_MODULE, PF_MPLS, RTM_NEWROUTE, mpls_rtm_newroute, NULL, 0},
-> +	{THIS_MODULE, PF_MPLS, RTM_DELROUTE, mpls_rtm_delroute, NULL, 0},
-> +	{THIS_MODULE, PF_MPLS, RTM_GETROUTE, mpls_getroute, mpls_dump_routes, 0},
-> +	{THIS_MODULE, PF_MPLS, RTM_GETNETCONF,
-> +	 mpls_netconf_get_devconf, mpls_netconf_dump_devconf,
-> +	 RTNL_FLAG_DUMP_UNLOCKED},
-> +};
-> +
->  static int __init mpls_init(void)
->  {
->  	int err;
-> @@ -2746,24 +2755,25 @@ static int __init mpls_init(void)
->  
->  	rtnl_af_register(&mpls_af_ops);
->  
-> -	rtnl_register_module(THIS_MODULE, PF_MPLS, RTM_NEWROUTE,
-> -			     mpls_rtm_newroute, NULL, 0);
-> -	rtnl_register_module(THIS_MODULE, PF_MPLS, RTM_DELROUTE,
-> -			     mpls_rtm_delroute, NULL, 0);
-> -	rtnl_register_module(THIS_MODULE, PF_MPLS, RTM_GETROUTE,
-> -			     mpls_getroute, mpls_dump_routes, 0);
-> -	rtnl_register_module(THIS_MODULE, PF_MPLS, RTM_GETNETCONF,
-> -			     mpls_netconf_get_devconf,
-> -			     mpls_netconf_dump_devconf,
-> -			     RTNL_FLAG_DUMP_UNLOCKED);
-> -	err = ipgre_tunnel_encap_add_mpls_ops();
-> +	err = rtnl_register_many(mpls_rtnl_msg_handlers);
->  	if (err)
-> +		goto out_unregister_rtnl_af;
-> +
-> +	err = ipgre_tunnel_encap_add_mpls_ops();
-> +	if (err) {
->  		pr_err("Can't add mpls over gre tunnel ops\n");
-> +		goto out_unregister_rtnl;
-> +	}
->  
->  	err = 0;
->  out:
->  	return err;
->  
-> +out_unregister_rtnl:
-> +	rtnl_unregister_many(mpls_rtnl_msg_handlers);
-> +out_unregister_rtnl_af:
-> +	rtnl_af_unregister(&mpls_af_ops);
-> +	dev_remove_pack(&mpls_packet_type);
->  out_unregister_pernet:
->  	unregister_pernet_subsys(&mpls_net_ops);
->  	goto out;
+Abin Joseph (3):
+  dt-bindings: net: emaclite: Add clock support
+  net: emaclite: Replace alloc_etherdev() with devm_alloc_etherdev()
+  net: emaclite: Adopt clock support
+
+ .../bindings/net/xlnx,emaclite.yaml           |  5 +++++
+ drivers/net/ethernet/xilinx/xilinx_emaclite.c | 22 ++++++++++---------
+ 2 files changed, 17 insertions(+), 10 deletions(-)
+
+-- 
+2.34.1
+
 
