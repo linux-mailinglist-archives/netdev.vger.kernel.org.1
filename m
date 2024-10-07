@@ -1,112 +1,133 @@
-Return-Path: <netdev+bounces-132895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D981993A88
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:43:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5755993AA1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF422B22DDD
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 22:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E61E01C22DB1
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:03:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C737518FDBB;
-	Mon,  7 Oct 2024 22:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2219D17D896;
+	Mon,  7 Oct 2024 23:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZ39d/I4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eQMSxbn4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1A918C333;
-	Mon,  7 Oct 2024 22:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB0513D8B1;
+	Mon,  7 Oct 2024 23:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728341009; cv=none; b=VYiU/P6HGJ2QPiAB5wOkKEFcDv8GPfEm1QTnmx9iQ8a3GnupiFyiN1+NSyjoxnOpz1D0SjPujTPVPkfxbHv58KXz784fr2oka0RZaWK9hVKtqpRQwMUVQLZ6MscCMNUKZIxWjCoPc5eopl51Fu9WsVZ9ts8zshePRylfXZtWbsA=
+	t=1728342185; cv=none; b=Sd2iEqUKyqvTprjKBARAolX7jAODbydvKqAH20F+B4Xb5Z+ddtw2AUGM0oUjUPQRjLsTMvtNYpTfQGtEF7K6irzKPOzKXcxbffqbFFXKA5g3PGQ0z3Sd1QOBN1gRX0PZ9e94Hn0j+VTGNHkeYFbqXAse36p/TmAmSb6Gpie7tBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728341009; c=relaxed/simple;
-	bh=lMYr2w8i5EOn1Iyc14B2K72ENicpFWQ5cRvac1pVhik=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZtkEJFdEOuv5kPE04WGwNafjIvVyn/b9wfKtdutr3Y/dWY76Dv984ESa2ZZejaJjmCDjyy/IhtZKeuxz+eHGV+e4P86AHlZz8+0675frPYsX7aIeqqepVF0aTFWd2wHkXka/IR5wOzLaaLWeDKopMdsbQ4GfIqirbtu8DTH8nk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZ39d/I4; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71de776bc69so2320061b3a.1;
-        Mon, 07 Oct 2024 15:43:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728341008; x=1728945808; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4zRoCM50PjP2pcT5bjxQTZPPZeLxrPi8dWpj13KWPYc=;
-        b=TZ39d/I4iysUUzvZDR/8UMLjXmKJzgzurCybJ06HMAEVfeKKA+S2l4pLnKuyfu6MPL
-         CL/7qN8Vr5gMKRKXn/lzwc+TkE6f8xDpDsAeNm3buoLZf/1y1Y4V4zMESzJrVuHQJnoT
-         DbyOaqQLKT0wufedu1MOrtLwVA/+iCKR4zhS4JvxS/BAP3wuoLsY6Hh4frqsWjRerw8/
-         qTFnBtQoa3nlhOs0Fh7SHIAQu6FDUCVMFeU0sJZXkBzQkLw/gRHklaPxGFez/OP5l25p
-         ygKZvp48mZg3MpRyi4I5rJzs2372hCu7GakR+i0xoPLpgj957LTz/ZuUg2jz5xaWCd6b
-         J2Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728341008; x=1728945808;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4zRoCM50PjP2pcT5bjxQTZPPZeLxrPi8dWpj13KWPYc=;
-        b=R2O493Fzwq0CTmgwDfzrqqRmhkpAMC4hiDzMLj2N+Nwmi2hrfr66uWBdv4HeKMhwsE
-         nPPrIoP6LCis5TIH0c5TrSKcrBeFMLjk/GmQwOaQ701nMAejIsx+kXkVS11eKSsO5L3L
-         c2l1nlqAP4F04oNSG3wKopy3K5Tg5MTh3A0Cd1Apn3F2ksW87HusoKhzZdcFZf3ssPi4
-         YxEW3zh4IIZqYHkZMpWtSJ744t307Om6dMCPfmX/Qro6BqRE6w0VhSTX69o9hKyDeOtB
-         Y5PeatwDSUOjfy9wJ/p8Bt3Mth01OSf5QHADH3UDCN06nQgwVyo7lCZ7Ab3LAIliyM7R
-         3vpw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/eUUEFg6u3i0FkrSfaJQ4UAjND30AJwk/c1ovFOV/UQiuj8PjQVh5e2w9fn65wUxZPbWjtxxPjJcESWg=@vger.kernel.org, AJvYcCVO9gsYUIWbsKo3bKOaXcz3I2Oc0OksoIFV5JdzP8+bUm2SsHPqgseNiD+vEDjfEpO3pHgm4+wV@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb2LBYN5bIcWoVtId+BWWCtX56/ZHfY4ANg/77W+NNS0/Wp/s3
-	GjK4ERL4aLY0hey3mqW+ffp4HomVSwDpEEd4ZuqNYQZ8aqyIUHbVxM6ChCX4
-X-Google-Smtp-Source: AGHT+IFxh30knrR1pZ3LGf4mcUqQSvDXDXfeA5GtXLVadVkxIy0dW8y7bbTesM8g4tf/aqQpDzctHQ==
-X-Received: by 2002:a05:6a21:3416:b0:1d6:d5c1:e504 with SMTP id adf61e73a8af0-1d6dfa46c48mr18472259637.26.1728341007615;
-        Mon, 07 Oct 2024 15:43:27 -0700 (PDT)
-Received: from archlinux.. ([2405:201:e00c:517f:5e87:9cff:fe63:6000])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71df0d7d1c2sm4899137b3a.209.2024.10.07.15.43.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 15:43:26 -0700 (PDT)
-From: Mohammed Anees <pvmohammedanees2003@gmail.com>
-To: olteanv@gmail.com
-Cc: andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	pvmohammedanees2003@gmail.com
-Subject: Re: [PATCH] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
-Date: Tue,  8 Oct 2024 04:13:08 +0530
-Message-ID: <20241007224310.4261-1-pvmohammedanees2003@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241007222234.ekpqibldugchuvk7@skbuf>
-References: <20241007222234.ekpqibldugchuvk7@skbuf>
+	s=arc-20240116; t=1728342185; c=relaxed/simple;
+	bh=Duo4y6dwJDlWYCUCaXKo3IgzU776UNw0umD4Fhn68fY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=btVMR9Dj8ObgcrfWIUTvxwS2Gzbco4YxSftoCbCRlxzk05cEMPAEbKtBjnBIv36JvP3d84cfs5jKVMtYikIQRqpqORUr+BjbiQU7AdlOLhlwTv22931NmZxVJdVdZeNokcd4+ocblSqxxr24pLOSOUdDIlORokTnvzaJo6A0sMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eQMSxbn4; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728342183; x=1759878183;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=Duo4y6dwJDlWYCUCaXKo3IgzU776UNw0umD4Fhn68fY=;
+  b=eQMSxbn4+7S4qU86OunMwMWJ5QDvwmCMq/PT8x+jmATiDH1xuw5fDNck
+   1FGP2ko5hoZR9meEsFzvCdj80w6io37a3s7rAZ85S4GYgquw2dl1zraQF
+   6Sm++RgMQioOjPF18X/uMtXnPtWS6cM+LbMQ73OSBevzad+Gi8p8zMJy6
+   HidHu6hMyjpMtPSV+Fm4O4kLDreT211PG51EyS1MrZJp3k1tSgf/S26ap
+   Wr2UXjqDen5KhPfdHu0+C+Rc7g2Li/P+WU8DQtobmB1aD496XWBqYFvm9
+   b3bgjpSBu+QezTIl+S+SUznsYMdDegsqrxnpfOIoqG3kJkFwMDGRNWNuZ
+   A==;
+X-CSE-ConnectionGUID: 9X8dwLDcQcypWlpIZrBh5w==
+X-CSE-MsgGUID: OWhwGhDPTLOLXXhACH4jRw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="27454571"
+X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
+   d="scan'208";a="27454571"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 16:03:03 -0700
+X-CSE-ConnectionGUID: G9AYz1QISK6vASQrVyCYHA==
+X-CSE-MsgGUID: YoOhUAmDRXmN0/OTIzzNug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
+   d="scan'208";a="75185870"
+Received: from gargmani-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.97])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 16:03:01 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
+Cc: Joe Damato <jdamato@fastly.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "moderated
+ list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, Jakub
+ Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: [RFC net-next 0/2] igc: Link IRQs and queues to NAPIs
+In-Reply-To: <20241003233850.199495-1-jdamato@fastly.com>
+References: <20241003233850.199495-1-jdamato@fastly.com>
+Date: Mon, 07 Oct 2024 16:03:00 -0700
+Message-ID: <87h69ntt23.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Vladimir,
+Joe Damato <jdamato@fastly.com> writes:
 
-Thank you for your thoughtful feedback; I really appreciate it. I want 
-to be honest, I’m quite new to this process and have been exploring the 
-the code to learn as much as I can, which was when i noticed this. I was 
-excited to contribute and took a more theoretical approach without fully
-grasping the importance of testing to see if this is ever possible.
+> Greetings:
+>
+> This is an RFC to get feedback before submitting an actual series and
+> because I have a question for igc maintainers, see below.
+>
+> This series addss support for netdev-genl to igc so that userland apps
+> can query IRQ, queue, and NAPI instance relationships. This is useful
+> because developers who have igc NICs (for example, in their Intel NUCs)
+> who are working on epoll-based busy polling apps and using
+> SO_INCOMING_NAPI_ID, need access to this API to map NAPI IDs back to
+> queues.
+>
+> See the commit messages of each patch for example output I got on my igc
+> hardware.
+>
+> My question for maintainers:
+>
+> In patch 2, the linking should be avoided for XDP queues. Is there a way
+> to test that somehow in the driver? I looked around a bit, but didn't
+> notice anything. Sorry if I'm missing something obvious.
+>
 
-I completely understand your points now and apologize for not testing 
-this. I haven’t had the chance to experiment with it on any platform yet, 
-but I plan to do so to see if I encounter any issues. If I do run into 
-problems, I’ll definitely continue with this patch and work on resolving them.
+From a quick look, it seems that you could "unlink" the XDP queues in
+igc_xdp_enable_pool() and (re-)link them in igc_xdp_disable_poll().
 
-Thanks once more for your guidance and for clarifying the intricacies 
-of MAC WoL and PHY WoL interaction.
+Or just the existence of the flag IGC_RING_FLAG_AF_XDP_ZC in the rings
+associated with the queue is enough?
+
+I still have to take a better look at your work to help more, sorry.
+
+> Thanks,
+> Joe
+>
+> Joe Damato (2):
+>   igc: Link IRQs to NAPI instances
+>   igc: Link queues to NAPI instances
+>
+>  drivers/net/ethernet/intel/igc/igc.h      |  1 +
+>  drivers/net/ethernet/intel/igc/igc_main.c | 33 ++++++++++++++++++++---
+>  2 files changed, 30 insertions(+), 4 deletions(-)
+>
+> -- 
+> 2.25.1
+>
+>
+
+Cheers,
+-- 
+Vinicius
 
