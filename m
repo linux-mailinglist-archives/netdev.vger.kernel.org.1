@@ -1,208 +1,131 @@
-Return-Path: <netdev+bounces-132644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAEB992A2A
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:26:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11E0C992A08
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85CA01C22943
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:26:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC8A51F22FA0
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D3B1C1AAA;
-	Mon,  7 Oct 2024 11:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFEF1C9DC8;
+	Mon,  7 Oct 2024 11:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOrGhj8L"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 407F52AD05;
-	Mon,  7 Oct 2024 11:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006DA2AD05;
+	Mon,  7 Oct 2024 11:09:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728300373; cv=none; b=ghYMhkg7tPF8+bL9ZQ4C1pge299bEhYjeZZA3lf5jrwEEpvOodvIMq2T/D5llCj+sb2LDixIV3SkP3fKcr6/NH8XTir2tvVwNLCVlLkjFA3ape3bhcwsiZoU/OJ+gmAw/FZhiD2H1gY9JfSBTbCSr61FCGf6Fylu+Nr41Kl8pdg=
+	t=1728299394; cv=none; b=ARG1/BNh4aFWe4XZLIMuDA5DzAgYLiqzMYGlbCNYzm08BdLtyPl5l5jcDrWIQNBPFY71paBpof1Ix2HLLQOZO3lTlv/JWCHePHx5dmHKPwRFRNbBM5BPtjKzUHbO6F2ynqOL+Js7ipTACG+/lClahX7/GJv6enDfLpM9xTkB8R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728300373; c=relaxed/simple;
-	bh=WbP7IFHD4Op/uqoUMJOL1wlTaq7Jp2l76U8wVR9kpP4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=entYcVqKQCAQH7r8Cg5tTwnXT2WonkCJdXSV9BIFHrG6dhJVpwsd7+23keky1MYed1c0IzDwFQ9xAodc3N0awJMucEUu9B9idQkK8ETLkilhHRNcfoFKcvl8+bimIMqFVgog/EsmbU9ckl8iTz3jSAM8dKrJRcCxj65x8ogX+0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XMbt45Mtmz1j9ND;
-	Mon,  7 Oct 2024 19:05:48 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 47AAD1402CD;
-	Mon,  7 Oct 2024 19:06:51 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 7 Oct 2024 19:06:47 +0800
-Message-ID: <9ae80f8c-1fb4-715f-87e1-b605ea4af59c@huawei-partners.com>
-Date: Mon, 7 Oct 2024 14:06:42 +0300
+	s=arc-20240116; t=1728299394; c=relaxed/simple;
+	bh=5wbY/RQk+dZVFTuD2NZblqMNoawXgnQwA7gGNgkOd8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+pQd1DEsLqwMGCgYZtX1kR4aR/txCQRcLpFjTerg7fqetNwRTcdmIf7pWkeh1DRS0v1+EKYI7SWdBIf8Bxkto4u0n0ZOEU/N8dSplYjg4Ch0XlRp28jOoAm33lKtjcvvuLI2qkID4cLCR4GaCaOc4CpbZByLkj6e1jO9/tB4Ws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOrGhj8L; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e07d85e956so3490983a91.3;
+        Mon, 07 Oct 2024 04:09:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728299392; x=1728904192; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cqk+8hebPA4ti95Da2Yr/B6Svo5BcjtL6Vb/SKjC1tw=;
+        b=XOrGhj8LR7V9F4d1Q5IBuc/XwVor9r4PhtQxjhCO9goEqDRjtauFysLMNGZGTpxtsk
+         E19BXmL5jHv5w9DrQ4faOcgWjSALMBMOYDlxVcKkb2i8gLqmJaI55F8l/L0jh5uVk7dq
+         YMUxMRJnQhfGZYxU6JCwGXdmWapW+z82rdoPV76L8xb9D3PentVjeSr+BO1BaOmdhDQY
+         4INDwn1mEN40nI9QSGB4RdPooK1vuOogECGczg+xR4aD6IhMhOtv8HqqxJMqwhL20Gj9
+         Z4gdMojx32mvFInnkb1HVWG4xDZN0q27MgZhP1pZGiaCn5Q0rwO4awr683FRtoYAtWY/
+         Giow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728299392; x=1728904192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cqk+8hebPA4ti95Da2Yr/B6Svo5BcjtL6Vb/SKjC1tw=;
+        b=ubFwaS4Vm1BpKrhVMRUIqgMKS32lEtOS0LCt5i0nuU1ToWprcOEBTLaDpicYCEj44k
+         jlaaI57VjqjvBmyWTFgNKRlN4m3bZ9CF285REgyk4un2wIOcK3r0tQ3DeRTgCz0cSTBM
+         uNAlVhRrOfBIkblNI5O8xWpkuuUubgpcFcH8lJFISpYhKzh6TxJp3UhbDo408mQvWL0r
+         NbEechxi7oc3NYN7YVK9YI41f3iyMqxRAzZVJI/udLGjn581NHBJBIvLcuyjBq0jMXeu
+         wdenURhyAAgzaEOZTLKN2adFmuu++gcnt/F5tT/KZnDrXrXckxWyfXmWnwWnFaAjNL9M
+         pGKg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1RkHReYkCV1MOwwj++V/garPHDLEUkdPwJ1JqZI6brotOSE4sEi7VDlO1iUfQzEHR+2X/ZR+Rj3c=@vger.kernel.org, AJvYcCWuNBcC0Or/gEH2a/iDjuLHf2idsGKSiVK/BXwrCXQzv5Ixe5CxD2C/1JdsLAemLNPp5ZacQF1E@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRnNTkU6wRxFu+PjsE4fISqw5oobi65PeU5/4dv+paG6gzuzNA
+	ab6HElXeH1FrDWWIHUW/WKuXOPoAaWziOe5aLaATM3QcdQ63ydNY
+X-Google-Smtp-Source: AGHT+IH1i/YLuuYzyJRautzgLh1IeiNrFLRhSMUkMmzG3WVXdLa7AlCZLM4wJywivW5iMKi0OsFxGA==
+X-Received: by 2002:a17:90a:e7c7:b0:2e0:9b59:c0d0 with SMTP id 98e67ed59e1d1-2e1e63e3315mr10767696a91.41.1728299391946;
+        Mon, 07 Oct 2024 04:09:51 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20b12e245sm5046992a91.52.2024.10.07.04.09.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 04:09:51 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id D22464422BC6; Mon, 07 Oct 2024 18:09:45 +0700 (WIB)
+Date: Mon, 7 Oct 2024 18:09:45 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+Cc: donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v3] doc: net: Fix .rst rendering of
+ net_cachelines pages
+Message-ID: <ZwPBeSnyNyaYCDql@archie.me>
+References: <20241006113536.96717-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 1/2] landlock: Fix non-TCP sockets restriction
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, Paul Moore
-	<paul@paul-moore.com>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, Matthieu Buffet
-	<matthieu@buffet.re>
-References: <20241003143932.2431249-1-ivanov.mikhail1@huawei-partners.com>
- <20241003143932.2431249-2-ivanov.mikhail1@huawei-partners.com>
- <20241003.wie1aiphaeCh@digikod.net>
- <8f023c51-bac1-251e-0f40-24dbe2bba729@huawei-partners.com>
- <20241004.rel9ja7IeDo4@digikod.net>
- <0774e9f1-994f-1131-17f9-7dd8eb96738f@huawei-partners.com>
- <20241005.eeKoiweiwe8a@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241005.eeKoiweiwe8a@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Fz7Re0cZD2nr0VQd"
+Content-Disposition: inline
+In-Reply-To: <20241006113536.96717-1-donald.hunter@gmail.com>
 
-On 10/5/2024 6:49 PM, Mickaël Salaün wrote:
-> On Fri, Oct 04, 2024 at 09:16:56PM +0300, Mikhail Ivanov wrote:
->> On 10/4/2024 1:13 PM, Mickaël Salaün wrote:
->>> On Fri, Oct 04, 2024 at 12:30:02AM +0300, Mikhail Ivanov wrote:
->>>> On 10/3/2024 8:45 PM, Mickaël Salaün wrote:
->>>>> Please also add Matthieu in Cc for the network patch series.
->>>>>
->>>>> On Thu, Oct 03, 2024 at 10:39:31PM +0800, Mikhail Ivanov wrote:
->>>>>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
->>>>>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
->>>>>> should not restrict bind(2) and connect(2) for non-TCP protocols
->>>>>> (SCTP, MPTCP, SMC).
->>>>>>
->>>>>> Closes: https://github.com/landlock-lsm/linux/issues/40
->>>>>> Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
->>>>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->>>>>> ---
->>>>>>     security/landlock/net.c | 2 +-
->>>>>>     1 file changed, 1 insertion(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/security/landlock/net.c b/security/landlock/net.c
->>>>>> index bc3d943a7118..6f59dd98bb13 100644
->>>>>> --- a/security/landlock/net.c
->>>>>> +++ b/security/landlock/net.c
->>>>>> @@ -68,7 +68,7 @@ static int current_check_access_socket(struct socket *const sock,
->>>>>>     		return -EACCES;
->>>>>>     	/* Checks if it's a (potential) TCP socket. */
->>>>>
->>>>> We can extend this comment to explain that we don't use sk_is_tcp()
->>>>> because we need to handle the AF_UNSPEC case.
->>>>
->>>> Indeed, I'll do this.
->>
->> I've noticed that we still should check sk->sk_family = AF_INET{,6}
->> here (so sk_is_tcp() is suitable). AF_UNSPEC can be only related to
->> addresses and we should not provide any checks (for address) if socket
->> is unrestrictable (i.e. it's not TCP). It's not useful and might lead to
->> error incosistency for non-TCP sockets.
-> 
-> Good catch, let's use sk_is_tcp().
-> 
->>
->> Btw, I suppose we can improve error consistency by bringing more checks
->> from INET/TCP stack. For example it may be useful to return EISCONN
->> instead of EACCES while connect(2) is called on a connected socket.
-> 
-> Yes, that would be nice (with the related tests).
-> 
->>
->> This should be done really carefully and only for some useful cases.
->> Anyway it's not related to the current patch (since it's not a bug).
-> 
-> Sure.
 
-I have a little question to clarify before sending a next version. Are
-we condisering order of network checks for error consistency?
+--Fz7Re0cZD2nr0VQd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For example, in the current_check_access_socket() we have following
-order of checks for ipv4 connect(2) action:
-(1) addrlen < sizeof(struct sockaddr_in) -> return -EINVAL
-(2) sa_family != sk_family -> return -EINVAL
+On Sun, Oct 06, 2024 at 12:35:36PM +0100, Donald Hunter wrote:
+> The doc pages under /networking/net_cachelines are unreadable because
+> they lack .rst formatting for the tabular text.
+>=20
+> Add simple table markup and tidy up the table contents:
+>=20
+> - remove dashes that represent empty cells because they render
+>   as bullets and are not needed
+> - replace 'struct_*' with 'struct *' in the first column so that
+>   sphinx can render links for any structs that appear in the docs
+>=20
 
-The ipv4 stack has a check for sock->state before (1) and (2), which can
-return -EISCONN if the socket is already connected.
+The doc LGTM, thanks!
 
-This results in the possiblity of two following scenarios:
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Landlock enabled:
-1. socket(ipv4) -> OK
-2. connect(ipv4 address) -> OK
-3. connect(ipv6 address) -> -EINVAL (sa_family != sk_family)
+--=20
+An old man doll... just what I always wanted! - Clara
 
-Landlock disabled:
-1. socket(ipv4) -> OK
-2. connect(ipv4 address) -> OK
-3. connect(ipv6 address) -> -EISCONN (socket is already connected)
+--Fz7Re0cZD2nr0VQd
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I have always considered the order of network checks as part of error
-consistency, and I'd like to make sure that we're on the same page
-before extending current patch with error inconsistency fixes.
+-----BEGIN PGP SIGNATURE-----
 
-> 
-> The following patch series could probably be extended for all LSM to
-> benefit from these fixes:
-> https://lore.kernel.org/all/20240327120036.233641-1-mic@digikod.net/
-> 
-> Mikhail, according to your SCTP tests with SELinux, it looks like this
-> patch series should be updated, but that should be simple.
-> 
-> Paul, what is the status of this LSM patch series?  Could Mikhail
-> integrate this LSM patch (with the SCTP fix) as part of the current
-> Landlock patch series?  This would help fixing the Landlock tests (which
-> check SCTP error consistency) when run with SELinux.
-> 
->>
->>>>
->>>>>
->>>>>> -	if (sock->type != SOCK_STREAM)
->>>>>> +	if (sock->type != SOCK_STREAM || sock->sk->sk_protocol != IPPROTO_TCP)
->>>>>
->>>>> I think we should check sock->sk->sk_type instead of sock->type (even if
->>>>> it should be the same).  To make it simpler, we should only use sk in
->>>>> current_check_access_socket():
->>>>> struct sock *sk = sock->sk;
->>>>
->>>> Agreed.
->>>>
->>>>>
->>>>> Could you please also do s/__sk_common\.skc_/sk_/g ?
->>>>
->>>> Ofc
->>>>
->>>> Btw, there is probably incorrect read of skc_family in this function
->>>> [1]. I'll add READ_ONCE for sk->sk_family.
->>>>
->>>> [1] https://lore.kernel.org/all/20240202095404.183274-1-edumazet@google.com/
->>>
->>> I think it should not be a bug with the current code (IPv6 -> IPV4, and
->>> socket vs. sock) but we should indeed use READ_ONCE() (and add this link
->>> to the commit message).
->>
->> ok
->>
->>>
->>>>
->>>>>
->>>>>>     		return 0;
->>>>>>     	/* Checks for minimal header length to safely read sa_family. */
->>>>>> -- 
->>>>>> 2.34.1
->>>>>>
->>>>>>
->>>>
->>
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZwPBdAAKCRD2uYlJVVFO
+ozwGAP4/coDHQrhUmkSBHDX0x/ec0iWraLQ4QnxbZyScSTQI0wD/R+sYJci4t5sh
+hHySaerPFQQ3WpA5aG/PnaXlWbBPegg=
+=Zt80
+-----END PGP SIGNATURE-----
+
+--Fz7Re0cZD2nr0VQd--
 
