@@ -1,113 +1,83 @@
-Return-Path: <netdev+bounces-132706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303BE992E10
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:00:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47AC9992E43
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60E171C22F5C
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:00:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6C51C22ED2
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13CF1D54D3;
-	Mon,  7 Oct 2024 13:59:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A601D47C8;
+	Mon,  7 Oct 2024 14:05:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRspQEpE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h02O71oi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3968BE574;
-	Mon,  7 Oct 2024 13:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB221D4159;
+	Mon,  7 Oct 2024 14:05:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728309576; cv=none; b=mFS7PByV5nGFFDGVW/rl/VOUI6X9F9TtDpToFVhki/hhonA9XDe0zNd9Je5ePRNjXnaOaFzsmx5zBv7b9W8T78Hl52hrHWG4rrRKwXS3dw3HNj9zkDttYcGRzJTuLzruT42EAKQRvtoH56AegSXGAdfOAleeKjka+UpTru61pSw=
+	t=1728309916; cv=none; b=MT5F/aRVw/RYuo3CK8mHbgt8r3QVNSs7dYfrd66huqJjgeRX+rrnQ/u0yMuV34aiGNJNH5wR9dUcKC9UJY6Vyi37Ygo5LJ8k+LtDpXf7iPt1BKdv0kO/y5DBwW4VfagW/VN2RWFwnJrt04X6olit4Tjne7iDl9HX2yERX1HkNaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728309576; c=relaxed/simple;
-	bh=c4D2tFJcwKKpOfBcISbbCxnM6psVd+aTip+l75EN1eo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=rTVrG0KGvVskVFckh7SSJbDkL+CrznJpspv/sI7LhL4URdbkqvaAUIW74PV8ZsAZF0em3/FOZGribZA7J1xxZag7LePmp7YmunMY4cQDWGNz9tOtsYStBoMym/QIAczkCtnhkAbSIgKkvdbCpc0BDGHLd5Q+8XxauV15VOzyrlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XRspQEpE; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c5cf26b95aso5857357a12.3;
-        Mon, 07 Oct 2024 06:59:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728309572; x=1728914372; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZA7sOYakjtLA5O1zDRt0AGiMrhjDOP7RuvFdqZmmnQ=;
-        b=XRspQEpE4JAHaLYxqvmwE70QPWgjFmjaTiOc3Tpi4Uo9Ih8lbhBAKGlNL2HptitFZj
-         PrvPjAquDYZ9Py5Y6AGsZbv6suxeGUxXiCu6rOQTTSXg2kyx1mGahdKgQWWJZLwoW+tK
-         JTX7aDk2b/hnE8Ow9VAJKkWFMXm7ZM0a2KFvkChW6Y2clGj3GFpKk77UwT2a72c/FHFF
-         RuqEAtlFJQvWiUKPAjHp1veTaZTHKQaSdzo/dnD8RONlPBuD9eM7xjvNrwSyHlN54ESu
-         9s187NfSPm1AMNGoD23qiivdfLw4QU7L35beXCqiW/IWSl+rtLt2rlLFakJqwb5B60Og
-         ld8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728309572; x=1728914372;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jZA7sOYakjtLA5O1zDRt0AGiMrhjDOP7RuvFdqZmmnQ=;
-        b=sqSQlJ5euhlUlE+D0DZvfhtNahGjg/ZRYS/PAJ7FmdC6FHIIQl//1MTLZHsY90hNIp
-         ExnosqUsRFLgdhsll+TtOj34/h7cz+Fcv7JdXfF8Sg9S9zw2NbMj31t0heZou0QY695Q
-         ENpFBoVwcVPAER0gfQabNM+R3RSqtp5s0/6dXal8xEigehXdgVglYc8FHpQN5WkSi919
-         JTV4Vv7UEyV0fIneI6w2pYmh9OOC+QbRekm8iSLx/4m1OLKf3Qq7cpPKejaaCkCuILr1
-         91taAGONLBmU3LO0wGtJ07c27EWFkyvozD/fsWZB5s7bNr8H9gEP2kn+dc9qMc0dy5O6
-         YOWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+lFIVH9HSCkVCMSVWp9cPPPSv7Vgzvse1V/s5CetkaIHp4G3T/fiZzlYw2xqL2gtqqPXFOIhd@vger.kernel.org, AJvYcCVE62XbBn2Qjtw/bdGqq1X+5111U9pf55bd/txF9qwJ/ww1SsaDGfMIhR5bop+S0HIrDiak+4Fjc8HDYA==@vger.kernel.org, AJvYcCWVjpdiQFQyckU7Fke42H3ktl6bC/lYg1gqTqohw/DlpDpUNI/QrmEwN3yzfTS+T52+MRbxRENRDAYXimk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywuozi/ulGhqvKlHT5zGDnZYJLVqh3/TvwOUcOtQQV33TL6fmpZ
-	V1eQbONHba3viKDtb2I9iAdtp0keiW/IF+47I8E4ToqQJwqbk5PXuESCPgW1
-X-Google-Smtp-Source: AGHT+IFtrU90hO1foCtNOcdJ7UH+emPjbmgYZRb9io4Awmt2HRY1jCtk8wiNlNHP/UP0FxJKLgWMdw==
-X-Received: by 2002:a05:6402:5386:b0:5c8:8381:c1f8 with SMTP id 4fb4d7f45d1cf-5c8d2e15074mr8657330a12.9.1728309572346;
-        Mon, 07 Oct 2024 06:59:32 -0700 (PDT)
-Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05eb604sm3213582a12.71.2024.10.07.06.59.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 06:59:31 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Michael Chan <michael.chan@broadcom.com>,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-mips@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] firmware: tee_bnxt: remove redundant assignment to variable nbytes
-Date: Mon,  7 Oct 2024 14:59:30 +0100
-Message-Id: <20241007135930.1198619-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1728309916; c=relaxed/simple;
+	bh=P0n/3590GbJGBAjfPkSlxpmGPbRbqNRvCyX1abCKZOw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aA+DIclIG0COG0k0QuVhOeN04eRdlkQfbIsooDxLcKT2LOKC+EdUBfbYUgwuRofoVfzhzFeisWyHjb8dCU1qrtJffB2dIdjhjFVC7UqaHoVqeiUenZJMROpLHFT2XFty4NL8t7+EJ1vbHhmOEt8hHmV6DuCKmj3e/FF726v9rK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h02O71oi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 570CBC4CEC6;
+	Mon,  7 Oct 2024 14:05:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728309915;
+	bh=P0n/3590GbJGBAjfPkSlxpmGPbRbqNRvCyX1abCKZOw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h02O71oicZ+rGzpYOFZQJQ1I0gMxPJp067CsX+/EqCc8WjlofMjith1/Vncmqf4tf
+	 CcxJ3RlK5IQ0wRAbO1GoDeKTDtsThgyYlB/9yklYJ/26xAk8e+56GvcBUwTTBnlBzD
+	 PgYgvQ+Rr4miMGNU6ii064G6C1WEOzL0hqXCWmFsVlAJz3YyQkhC70WRUN0qrNP7g5
+	 49vs9SuJYHuTS6BnK3gDxiw/Y5x6Ae3ZMZP85kPPTWyXjewv53MLOm7zEKcPGoElr4
+	 s2IkdyyszD1hdc5rhHZxlEpV33ZqpuArXhjqLfSHtDW5GFlpaCXt3Fo3tHWYvkdUuC
+	 MJgEptVQNtWug==
+Date: Mon, 7 Oct 2024 07:05:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net,
+ chunkeey@gmail.com
+Subject: Re: [PATCH net-next v3 17/17] net: ibm: emac: mal: move dcr map
+ down
+Message-ID: <20241007070514.4439425d@kernel.org>
+In-Reply-To: <CAKxU2N-F+Gcv_LVvH5uB+x5gGABwzFsvxZOg+ApQ-DAHaFz3iw@mail.gmail.com>
+References: <20241003021135.1952928-1-rosenp@gmail.com>
+	<20241003021135.1952928-18-rosenp@gmail.com>
+	<20241004163613.553b8abe@kernel.org>
+	<CAKxU2N-F+Gcv_LVvH5uB+x5gGABwzFsvxZOg+ApQ-DAHaFz3iw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Variable nbytes is being assigned a value that is never read, it is
-being re-assigned a new value immediately afterwards. The assignment
-is redundant and can be removed.
+On Fri, 4 Oct 2024 16:43:48 -0700 Rosen Penev wrote:
+> > On Wed,  2 Oct 2024 19:11:35 -0700 Rosen Penev wrote:  
+> > > There's actually a bug above where it returns instead of calling goto.
+> > > Instead of calling goto, move dcr_map and friends down as they're used
+> > > right after the spinlock in mal_reset.  
+> >
+> > Not a fix?  
+> It's a fix for a prior commit, yes. 6d3ba097ee81d if I'm using git
+> blame correctly.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/firmware/broadcom/tee_bnxt_fw.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/firmware/broadcom/tee_bnxt_fw.c b/drivers/firmware/broadcom/tee_bnxt_fw.c
-index 40e3183a3d11..e0ea4ddb9a74 100644
---- a/drivers/firmware/broadcom/tee_bnxt_fw.c
-+++ b/drivers/firmware/broadcom/tee_bnxt_fw.c
-@@ -143,8 +143,6 @@ int tee_bnxt_copy_coredump(void *buf, u32 offset, u32 size)
- 	prepare_args(TA_CMD_BNXT_COPY_COREDUMP, &arg, param);
- 
- 	while (rbytes)  {
--		nbytes = rbytes;
--
- 		nbytes = min_t(u32, rbytes, param[0].u.memref.size);
- 
- 		/* Fill additional invoke cmd params */
--- 
-2.39.5
-
+Hm, I don't have this hash in my local tree.
+What I'm getting at is that if it's a fix for a patch already in
+networking trees the patch needs to have a Fixes tag. And if the 
+bug is present in net - the patch needs to go to net rather than
+net-next.
 
