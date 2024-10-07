@@ -1,126 +1,136 @@
-Return-Path: <netdev+bounces-132821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9CF993534
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:41:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 632D9993538
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:42:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D01671C22F39
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:41:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 956921C228D7
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE6561DD9DB;
-	Mon,  7 Oct 2024 17:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DLTK1Ieg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112351DD9DF;
+	Mon,  7 Oct 2024 17:42:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from finn.localdomain (finn.gateworks.com [108.161.129.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918AC1D6DCE;
-	Mon,  7 Oct 2024 17:41:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F4751DD9D3;
+	Mon,  7 Oct 2024 17:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.161.129.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728322868; cv=none; b=HkB9xBgTObAEypHzm/d9+9nF5hp1pARNVy175df15XbpzvHBFvif/wp5GofCP9JgAT/DeB0Q3ybt9pl13TKCliogJRrY7CyrPuOUmy4foUZk66/4tmzkINttI3DnMXbIoNTm5Nc7A+hVJkenzkl79FRCQc2n6sYJm/qmbt2V2tk=
+	t=1728322959; cv=none; b=nmXZgnL424tQaLdjzK86XYT7VVQyrRdb9N9qezmhSG/5U4KbOUwfFu5HTT2CTOB1E7cYUIFz3idAoE17II2qwysDmhKCVhl74N2DUX2RzyTzMPgFep7IfWB0Is01f+wTCv8fwR5VOOM+PmiKdVBjWo9syO47GZjRLTayZ4LeSrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728322868; c=relaxed/simple;
-	bh=dSfnVQ4JAFzyMREkoETp/HHuCtLwsJ6pu0JR7N/AEkE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=HcgdDAz2zW1mv1fo57BDhhnuNgMZA6FvWLn9XgUuaKUCW6bq89LWAxcpm6WB3v1O9zXELwMpOBdDZNagkbffjEWSRo2AOvT5mRGYWyAeWIabPb7Kh2Ffka7CI4If5p+uvsDIi93DMaB6W0bQXPRPOr9WM+jbNfUnPGuDgf7ZGZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DLTK1Ieg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 305FAC4CEC6;
-	Mon,  7 Oct 2024 17:41:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728322868;
-	bh=dSfnVQ4JAFzyMREkoETp/HHuCtLwsJ6pu0JR7N/AEkE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=DLTK1IegbE8t4wKnvUOyjU5hb4agfrbk0pyT1qftq/wQXpAAQmYCjc2rGmVnP6CnP
-	 fXwIa1faXxF1m7bFIR4nNpHucuhZFhTxLVc8UCgH9egC6QEHqlMnZz4CDxi7T6y+zF
-	 D2nky0edGQ6AL8TDYv5Yto3buBASpIv9xSR+wr+wtvzO9ycB4WCuZhYFIb0xQmxer7
-	 hDpvXSFYBhvY2z8XKIdGv7jPoPIrd0M6pXDJ2RkT8n1t7qhY7/8aiEDimGKjfQSpWN
-	 1HcyGipecqHQOfrLy2hM5efXiksLTvgUfAOGa/LOdsrM/cv2Et8ekf2XVbLdgDFgOA
-	 h9C9FX8MvQmpg==
-From: Kalle Valo <kvalo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Johannes Berg <johannes@sipsolutions.net>,  Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>,
-  linux-kernel@vger.kernel.org,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net 1/2] MAINTAINERS: consistently exclude wireless
- files from NETWORKING [GENERAL]
-References: <20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org>
-	<20241004-maint-net-hdrs-v1-1-41fd555aacc5@kernel.org>
-	<87setb7us5.fsf@kernel.org> <20241007141305.GD32733@kernel.org>
-Date: Mon, 07 Oct 2024 20:41:04 +0300
-In-Reply-To: <20241007141305.GD32733@kernel.org> (Simon Horman's message of
-	"Mon, 7 Oct 2024 15:13:05 +0100")
-Message-ID: <87ed4r4xqn.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1728322959; c=relaxed/simple;
+	bh=KTCDxkuciJcgeGKWyDCmnFVFa2SRDkclGWps7hBAY7E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EfvktRmQ5MmTfRFQ+fd05ir52JVYyfMWOmQ96KD4e1d18rq05HXwD7MLh0tFEronLN3MJOx1K9wCb1XvftWRYsFHLCodOqRidS2oanva2sy5GW/NP4bzX1tyv5mpMENBQQsSm3tGisUWLCr+LyahInqCCJt2ZW2e/WQ/tAp0BIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; arc=none smtp.client-ip=108.161.129.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
+Received: from syn-068-189-091-139.biz.spectrum.com ([68.189.91.139] helo=tharvey.pdc.gateworks.com)
+	by finn.localdomain with esmtp (Exim 4.95)
+	(envelope-from <tharvey@gateworks.com>)
+	id 1sxrkZ-000mTr-Ft;
+	Mon, 07 Oct 2024 17:42:27 +0000
+From: Tim Harvey <tharvey@gateworks.com>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Lukasz Majewski <lukma@denx.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Tim Harvey <tharvey@gateworks.com>
+Subject: [PATCH net v3] net: phy: disable eee due to errata on various KSZ switches
+Date: Mon,  7 Oct 2024 10:42:11 -0700
+Message-Id: <20241007174211.3511506-1-tharvey@gateworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Simon Horman <horms@kernel.org> writes:
+The well-known errata regarding EEE not being functional on various KSZ
+switches has been refactored a few times. Recently the refactoring has
+excluded several switches that the errata should also apply to.
 
-> On Fri, Oct 04, 2024 at 06:27:38PM +0300, Kalle Valo wrote:
->
->> Simon Horman <horms@kernel.org> writes:
->> 
->> > We already exclude wireless drivers from the netdev@ traffic, to
->> > delegate it to linux-wireless@, and avoid overwhelming netdev@.
->> >
->> > Many of the following wireless-related sections MAINTAINERS
->> > are already not included in the NETWORKING [GENERAL] section.
->> > For consistency, exclude those that are.
->> >
->> > * 802.11 (including CFG80211/NL80211)
->> > * MAC80211
->> > * RFKILL
->> >
->> > Signed-off-by: Simon Horman <horms@kernel.org>
->> > ---
->> >  MAINTAINERS | 11 +++++++++++
->> >  1 file changed, 11 insertions(+)
->> >
->> > diff --git a/MAINTAINERS b/MAINTAINERS
->> > index c27f3190737f..ea3ea2c0d3fa 100644
->> > --- a/MAINTAINERS
->> > +++ b/MAINTAINERS
->> > @@ -16197,8 +16197,19 @@ F:	lib/random32.c
->> >  F:	net/
->> >  F:	tools/net/
->> >  F:	tools/testing/selftests/net/
->> > +X:	Documentation/networking/mac80211-injection.rst
->> > +X:	Documentation/networking/mac80211_hwsim/
->> > +X:	Documentation/networking/regulatory.rst
->> > +X:	include/net/cfg80211.h
->> > +X:	include/net/ieee80211_radiotap.h
->> > +X:	include/net/iw_handler.h
->> > +X:	include/net/mac80211.h
->> > +X:	include/net/wext.h
->> 
->> Should we add also lib80211.h?
->
-> Thanks, I missed that one. Perhaps it should have:
->
-> * An F: entry in the MAC80211
-> * An X: entry in the NETWORKING [GENERAL]
->
-> If so, perhaps I can just add that to a v2 of this patch.
-> Let me know what you think.
+Disable EEE for additional switches with this errata.
 
-Like Johannes said, the cfg80211 entry is more approriate but otherwise
-sounds like a good plan, thanks!
+The original workaround for the errata was applied with a register
+write to manually disable the EEE feature in MMD 7:60 which was being
+applied for KSZ9477/KSZ9897/KSZ9567 switch ID's.
 
+Then came commit ("26dd2974c5b5 net: phy: micrel: Move KSZ9477 errata
+fixes to PHY driver") and commit ("6068e6d7ba50 net: dsa: microchip:
+remove KSZ9477 PHY errata handling") which moved the errata from the
+switch driver to the PHY driver but only for PHY_ID_KSZ9477 (PHY ID)
+however that PHY code was dead code because an entry was never added
+for PHY_ID_KSZ9477 via MODULE_DEVICE_TABLE.
+
+This was apparently realized much later and commit ("54a4e5c16382 net:
+phy: micrel: add Microchip KSZ 9477 to the device table") added the
+PHY_ID_KSZ9477 to the PHY driver but as the errata was only being
+applied to PHY_ID_KSZ9477 it's not completely clear what switches
+that relates to.
+
+Later commit ("6149db4997f5 net: phy: micrel: fix KSZ9477 PHY issues
+after suspend/resume") breaks this again for all but KSZ9897 by only
+applying the errata for that PHY ID.
+
+The most recent time this was affected was with commit ("08c6d8bae48c
+net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)") which
+removes the blatant register write to MMD 7:60 and replaces it by
+setting phydev->eee_broken_modes = -1 so that the generic phy-c45 code
+disables EEE but this is only done for the KSZ9477_CHIP_ID (Switch ID).
+
+Fixes: 08c6d8bae48c ("net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)")
+Signed-off-by: Tim Harvey <tharvey@gateworks.com>
+---
+v3: added missing fixes tag
+v2: added fixes tag and history of issue
+---
+ drivers/net/dsa/microchip/ksz_common.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index b074b4bb0629..d2bd82a1067c 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2578,11 +2578,19 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
+ 		if (!port)
+ 			return MICREL_KSZ8_P1_ERRATA;
+ 		break;
++	case KSZ8795_CHIP_ID:
++	case KSZ8794_CHIP_ID:
++	case KSZ8765_CHIP_ID:
++		/* KSZ87xx DS80000687C Module 2 */
++	case KSZ9896_CHIP_ID:
++		/* KSZ9896 Errata DS80000757A Module 2 */
++	case KSZ9897_CHIP_ID:
++		/* KSZ9897 Errata DS00002394C Module 4 */
++	case KSZ9567_CHIP_ID:
++		/* KSZ9567 Errata DS80000756A Module 4 */
+ 	case KSZ9477_CHIP_ID:
+-		/* KSZ9477 Errata DS80000754C
+-		 *
+-		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
+-		 * be manually disabled
++		/* KSZ9477 Errata DS80000754C Module 4 */
++		/* Energy Efficient Ethernet (EEE) feature select must be manually disabled
+ 		 *   The EEE feature is enabled by default, but it is not fully
+ 		 *   operational. It must be manually disabled through register
+ 		 *   controls. If not disabled, the PHY ports can auto-negotiate
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.25.1
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
