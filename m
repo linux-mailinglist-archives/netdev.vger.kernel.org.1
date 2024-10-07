@@ -1,228 +1,240 @@
-Return-Path: <netdev+bounces-132886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C33993A0C
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:18:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56981993A11
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446D11C23E33
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 22:18:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A46BCB2366D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 22:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FE301DE4EA;
-	Mon,  7 Oct 2024 22:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="01wA2JLY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3CA18C00C;
+	Mon,  7 Oct 2024 22:19:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out02.mta.xmission.com (out02.mta.xmission.com [166.70.13.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AF01DE2C7
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 22:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41323FB9F
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 22:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.70.13.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728339408; cv=none; b=AJOOo2tFZpjtJyG6C4kYJB4Z+tweVic0LZuvNRHBtP5LOvD+VSMCrbXe0mLvwRcznqgWEUZuV3GbIcyfW+FJtFLAi2MxSnyxNfoEXr52RQZu1oCBTWtVRit8LMXCEV4Dgjfwe6q+Hq5SCElzcZIqnnSyzi0k4ZenK3Q/YDHGHcY=
+	t=1728339577; cv=none; b=pWSbLTjCxVN4YfBEtEf0ebBCtCQnbgAWEq09HfFvzGZfOinKCFZqfA8OKsvJpWC6R8sILx8LmUY5R/pNbDAKnDWrvHV+BYcfQVx2IVdZp4oi5uiqT4vnOIwwhrV+lpau8MZviYdsw75m5/bYrj3k23wwSUxhPNfPKMJcMTq4qls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728339408; c=relaxed/simple;
-	bh=8byHPkmyqil4BRS4TqeQPgrllEa8K8cBiR2yYsnDLjQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D1fzjhEDTTf5K1kFn22yTyHVYJ7ux9Ed4sdzn+EGmUz4gTHXwrnhaK0WSKC6y2reOrG5gMPGzbRov7TMvpwVuC8HDn48HSW00GXsv2WKsrO4P6O8+u1HA3Toxpcmgw9b4BNwR3sejaHmqMEFBs4XyRTprQ8JE/pWp//D1J2Dng0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=01wA2JLY; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-6bce380eb96so3028892a12.0
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 15:16:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1728339406; x=1728944206; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wZx20d5L+OyVbNtxxiSkP5O3ww6PEtO7CAmaLbxuvto=;
-        b=01wA2JLYGHgSeBiGQFVtPj5XmmWpJyM7P8CTNjiVl2KJ2Ji/XfmK5cBgAQoYxCRUN2
-         YQ6s7WZVfgFZ1VZeUOiaZLKy4f6bZz4308VNwOHyEDHOT/gMpjs5Nmo0GE9fgVIwE+CS
-         77KtoGsXtMJAoD6aD8ck7HFfGmb2sLbOT13uUwuzokkLIm51VJemVI8rdLp36lhZ09uj
-         BotTSEeLEg1EI0r9AcWty5VAaII4BAxYrhl3uIDx6n/dEkUgUy+3OPxhGh+VRfSp0Mwx
-         KD+iAhe5O6SSJdEhWE1pBSaNBOxei6apLJdA9EjOP3YDXS8gpanCcWARAztTj2Vy+GbJ
-         0feQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728339406; x=1728944206;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wZx20d5L+OyVbNtxxiSkP5O3ww6PEtO7CAmaLbxuvto=;
-        b=bKCvvFW2wfogkOqo02XfoYQBbNXk2fxZSBWYf2p8Y2k6/lI4L4r00LHdv7kx2huLmB
-         aQqU6R4gLa6+bUbsmt/tJu+3MkBE/8Yz+od7dvdFpPizdgMHaCJFj7NrkiFpq4cnJ9xk
-         itjB8QBQ8BYppKyAqeotI+rrIaD5myS9BvpsKKSxfJic592GjiTj7t4mfwsRg2dXDQbM
-         +noyNLznhQnOiCm1a3NVJXve84dkSiRrxd6D2T6h1ROOf+ktV5GrvmAViaVFriZhJhKA
-         QglXCJHFmtHY1agFgLibQRSqzvDn8D3wslWa5we6vDS5/C3TVgQSFIazogdAg4eCOGI4
-         PoLA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVuKLxVctA6mmMx9Nx88ykTxBf/36618WPal5ehLl5WFM0pdSql4yAID3IwB/kK9UPRs+57x8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQSbUAfRvR6WHH4LWSk7SRGk4EAH1MrAcXZ1/LdBvtFiWaoyCV
-	61KT76RR3nvMs0f5+OqNhIK4UPzFPVfE0e1kU2l7EULiS5LxWw7YSkvXkHmWZ7w=
-X-Google-Smtp-Source: AGHT+IGG+x8hF8UTMd+j5BFtku8i621L8kiAlMLyUacTPS2TDiYZJc55o5i83AgH/0u7kK+7KB6Q2A==
-X-Received: by 2002:a17:903:234f:b0:20c:3d9e:5f2b with SMTP id d9443c01a7336-20c3d9e60acmr48053035ad.57.1728339406294;
-        Mon, 07 Oct 2024 15:16:46 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-024.fbsv.net. [2a03:2880:ff:18::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c139a1792sm44280965ad.293.2024.10.07.15.16.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 15:16:45 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: David Wei <dw@davidwei.uk>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH v1 15/15] io_uring/zcrx: throttle receive requests
-Date: Mon,  7 Oct 2024 15:16:03 -0700
-Message-ID: <20241007221603.1703699-16-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241007221603.1703699-1-dw@davidwei.uk>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
+	s=arc-20240116; t=1728339577; c=relaxed/simple;
+	bh=+vP315ZvfEs5R0eYQ0wr9WLvq1aLTKvP17aYZz/d2bk=;
+	h=From:To:Cc:References:Date:In-Reply-To:Message-ID:MIME-Version:
+	 Content-Type:Subject; b=M1gqLhZNDanGahEdY5bw8vHi/i9I/nKiwpLRTFRvqZFKwVr/Hlo+mnYF3n79hWMMVMQnQT6ZqAtyLzh9oKf7s+Q3BL9xgK4UUgMXnUv+jqiWWlC2JUYusa9i5yFYgRBfNBInjv+NbpoMSwdZh8b/dr6h+vMgZWTrEA3hogOFlIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com; spf=pass smtp.mailfrom=xmission.com; arc=none smtp.client-ip=166.70.13.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=xmission.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xmission.com
+Received: from in01.mta.xmission.com ([166.70.13.51]:44150)
+	by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1sxw4k-00CMbz-BB; Mon, 07 Oct 2024 16:19:34 -0600
+Received: from ip72-198-198-28.om.om.cox.net ([72.198.198.28]:35658 helo=email.froward.int.ebiederm.org.xmission.com)
+	by in01.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.93)
+	(envelope-from <ebiederm@xmission.com>)
+	id 1sxw4i-00ET1M-R9; Mon, 07 Oct 2024 16:19:33 -0600
+From: "Eric W. Biederman" <ebiederm@xmission.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: <davem@davemloft.net>,  <edumazet@google.com>,  <kuba@kernel.org>,
+  <kuni1840@gmail.com>,  <netdev@vger.kernel.org>,  <pabeni@redhat.com>
+References: <87v7y3g9no.fsf@email.froward.int.ebiederm.org>
+	<20241007182106.39342-1-kuniyu@amazon.com>
+Date: Mon, 07 Oct 2024 17:18:59 -0500
+In-Reply-To: <20241007182106.39342-1-kuniyu@amazon.com> (Kuniyuki Iwashima's
+	message of "Mon, 7 Oct 2024 11:21:06 -0700")
+Message-ID: <8734l7d0a4.fsf@email.froward.int.ebiederm.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-XM-SPF: eid=1sxw4i-00ET1M-R9;;;mid=<8734l7d0a4.fsf@email.froward.int.ebiederm.org>;;;hst=in01.mta.xmission.com;;;ip=72.198.198.28;;;frm=ebiederm@xmission.com;;;spf=pass
+X-XM-AID: U2FsdGVkX19Eo68qq12ypR9eMly1lwpqiiJ8lC4iG/0=
+X-Spam-Level: 
+X-Spam-Report: 
+	* -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+	*  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+	*      [score: 0.4995]
+	*  0.7 XMSubLong Long Subject
+	*  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+	* -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+	*      [sa06 1397; Body=1 Fuz1=1 Fuz2=1]
+	*  0.0 XM_B_AI_SPAM_COMBINATION Email matches multiple AI-related
+	*      patterns
+	*  0.2 XM_B_SpammyWords One or more commonly used spammy words
+	*  0.0 T_TooManySym_01 4+ unique symbols in subject
+	*  0.0 T_TooManySym_03 6+ unique symbols in subject
+	*  0.0 T_TooManySym_02 5+ unique symbols in subject
+	*  0.0 T_TooManySym_04 7+ unique symbols in subject
+X-Spam-DCC: XMission; sa06 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: ;Kuniyuki Iwashima <kuniyu@amazon.com>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 663 ms - load_scoreonly_sql: 0.07 (0.0%),
+	signal_user_changed: 12 (1.9%), b_tie_ro: 11 (1.6%), parse: 1.27
+	(0.2%), extract_message_metadata: 16 (2.4%), get_uri_detail_list: 4.2
+	(0.6%), tests_pri_-2000: 14 (2.1%), tests_pri_-1000: 2.7 (0.4%),
+	tests_pri_-950: 1.34 (0.2%), tests_pri_-900: 1.12 (0.2%),
+	tests_pri_-90: 122 (18.4%), check_bayes: 120 (18.1%), b_tokenize: 14
+	(2.1%), b_tok_get_all: 43 (6.4%), b_comp_prob: 6 (0.9%),
+	b_tok_touch_all: 54 (8.1%), b_finish: 1.03 (0.2%), tests_pri_0: 478
+	(72.1%), check_dkim_signature: 0.66 (0.1%), check_dkim_adsp: 2.6
+	(0.4%), poll_dns_idle: 0.72 (0.1%), tests_pri_10: 2.2 (0.3%),
+	tests_pri_500: 8 (1.2%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v3 net 5/6] mpls: Handle error of rtnl_register_module().
+X-SA-Exim-Connect-IP: 166.70.13.51
+X-SA-Exim-Rcpt-To: pabeni@redhat.com, netdev@vger.kernel.org, kuni1840@gmail.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net, kuniyu@amazon.com
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-SA-Exim-Scanned: No (on out02.mta.xmission.com); SAEximRunCond expanded to false
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+Kuniyuki Iwashima <kuniyu@amazon.com> writes:
 
-io_zc_rx_tcp_recvmsg() continues until it fails or there is nothing to
-receive. If the other side sends fast enough, we might get stuck in
-io_zc_rx_tcp_recvmsg() producing more and more CQEs but not letting the
-user to handle them leading to unbound latencies.
+> From: "Eric W. Biederman" <ebiederm@xmission.com>
+> Date: Mon, 07 Oct 2024 11:28:11 -0500
+>> Kuniyuki Iwashima <kuniyu@amazon.com> writes:
+>> 
+>> > From: "Eric W. Biederman" <ebiederm@xmission.com>
+>> > Date: Mon, 07 Oct 2024 09:56:44 -0500
+>> >> Kuniyuki Iwashima <kuniyu@amazon.com> writes:
+>> >> 
+>> >> > Since introduced, mpls_init() has been ignoring the returned
+>> >> > value of rtnl_register_module(), which could fail.
+>> >> 
+>> >> As I recall that was deliberate.  The module continues to work if the
+>> >> rtnetlink handlers don't operate, just some functionality is lost.
+>> >
+>> > It's ok if it wasn't a module.  rtnl_register() logs an error message
+>> > in syslog, but rtnl_register_module() doesn't.  That's why this series
+>> > only changes some rtnl_register_module() calls.
+>> 
+>> You talk about the series.  Is there an introductory letter I should
+>> lookup on netdev that explains things in more detail?
+>> 
+>> I have only seen the patch that is sent directly to me.
+>
+> Some context here.
+> https://lore.kernel.org/netdev/20241007124459.5727-1-kuniyu@amazon.com/
+>
+> Before addf9b90de22, rtnl_register_module() didn't actually need
+> error handling for some callers, but even after the commit, some
+> modules copy-and-pasted the wrong code.
 
-Break out of it based on an arbitrarily chosen limit, the upper layer
-will either return to userspace or requeue the request.
+That is wrong. As far back as commit e284986385b6 ("[RTNL]: Message
+handler registration interface") it was possible for rtnl_register to
+error.  Of course that dates back to the time when small allocations
+were guaranteed to succeed or panic the kernel.  So I expect it was
+the change to small allocations that actually made it possible to
+see failures from rtnl_register.
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- io_uring/net.c  |  5 ++++-
- io_uring/zcrx.c | 17 ++++++++++++++---
- io_uring/zcrx.h |  6 ++++--
- 3 files changed, 22 insertions(+), 6 deletions(-)
+That said there is a difference between code that generates an error,
+and callers that need to handle the error.  Even today I do not
+see that MPLS needs to handle the error.
 
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 482e138d2994..c99e62c7dcfb 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -1253,10 +1253,13 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
- 	if (!ifq)
- 		return -EINVAL;
- 
--	ret = io_zcrx_recv(req, ifq, sock, zc->msg_flags | MSG_DONTWAIT);
-+	ret = io_zcrx_recv(req, ifq, sock, zc->msg_flags | MSG_DONTWAIT,
-+			   issue_flags);
- 	if (unlikely(ret <= 0) && ret != -EAGAIN) {
- 		if (ret == -ERESTARTSYS)
- 			ret = -EINTR;
-+		if (ret == IOU_REQUEUE)
-+			return IOU_REQUEUE;
- 
- 		req_set_fail(req);
- 		io_req_set_res(req, ret, 0);
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 7939f830cf5b..a78d82a2d404 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -26,10 +26,13 @@
- 
- #if defined(CONFIG_PAGE_POOL) && defined(CONFIG_INET)
- 
-+#define IO_SKBS_PER_CALL_LIMIT	20
-+
- struct io_zcrx_args {
- 	struct io_kiocb		*req;
- 	struct io_zcrx_ifq	*ifq;
- 	struct socket		*sock;
-+	unsigned		nr_skbs;
- };
- 
- struct io_zc_refill_data {
-@@ -708,6 +711,9 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- 	int i, copy, end, off;
- 	int ret = 0;
- 
-+	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
-+		return -EAGAIN;
-+
- 	if (unlikely(offset < skb_headlen(skb))) {
- 		ssize_t copied;
- 		size_t to_copy;
-@@ -785,7 +791,8 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- }
- 
- static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--				struct sock *sk, int flags)
-+				struct sock *sk, int flags,
-+				unsigned int issue_flags)
- {
- 	struct io_zcrx_args args = {
- 		.req = req,
-@@ -811,6 +818,9 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 			ret = -ENOTCONN;
- 		else
- 			ret = -EAGAIN;
-+	} else if (unlikely(args.nr_skbs > IO_SKBS_PER_CALL_LIMIT) &&
-+		   (issue_flags & IO_URING_F_MULTISHOT)) {
-+		ret = IOU_REQUEUE;
- 	} else if (sock_flag(sk, SOCK_DONE)) {
- 		/* Make it to retry until it finally gets 0. */
- 		ret = -EAGAIN;
-@@ -821,7 +831,8 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- }
- 
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags)
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags)
- {
- 	struct sock *sk = sock->sk;
- 	const struct proto *prot = READ_ONCE(sk->sk_prot);
-@@ -830,7 +841,7 @@ int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 		return -EPROTONOSUPPORT;
- 
- 	sock_rps_record_flow(sk);
--	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags);
-+	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags, issue_flags);
- }
- 
- #endif
-diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index ddd68098122a..bb7ca61a251e 100644
---- a/io_uring/zcrx.h
-+++ b/io_uring/zcrx.h
-@@ -46,7 +46,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx);
- void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx);
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags);
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags);
- #else
- static inline int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 					struct io_uring_zcrx_ifq_reg __user *arg)
-@@ -60,7 +61,8 @@ static inline void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- {
- }
- static inline int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--			       struct socket *sock, unsigned int flags)
-+				struct socket *sock, unsigned int flags,
-+				unsigned int issue_flags)
- {
- 	return -EOPNOTSUPP;
- }
--- 
-2.43.5
+Other than for policy objectives such as making it harder for
+syzkaller to get confused, and making the code more like other
+callers I don't see a need for handling such an error in MPLS.
+
+>> > What if the memory pressure happend to be relaxed soon after the module
+>> > was loaded incompletely ?
+>> 
+>> Huh?  The module will load completely.  It will just won't have full
+>> functionality.  The rtnetlink functionality simply won't work.
+>> 
+>> > Silent failure is much worse to me.
+>> 
+>> My point is from the point of view of the MPLS functionality it isn't
+>> a __failure__.
+>
+> My point is it _is_ failure for those who use MPLS rtnetlink
+> functionality, it's uAPI.  Not everyone uses the plain MPLS
+> without rtnetlink.
+
+No matter what the code does userspace attempting to use rtnetlink to
+configure mpls will fail.  Either the MPLS module will fail to load, and
+nothing works, or the module will load and do the best it can with what
+it has.  Allowing the folks you don't need the rtnetlink uAPI to
+succeed.
+
+It isn't a uAPI failure.  It is a lack of uAPI availability.  There
+is nothing else it can be.
+
+In general the kernel tries to limp along the best it can without
+completely failing.
+
+> Also, I don't want to waste resource due to such an issue on QEMU w/ 2GB
+> RAM where I'm running syzkaller and often see OOM.  syzkaller searches
+> and loads modules and exercises various uAPIs randomly, and it handles
+> module-load-failure properly.
+
+Then please mention that use case in your change description.  That is
+the only real motivation I see to for this change in behavior. Perhaps
+something like:
+
+    Handler errors from rtnetlink registration allowing syzkaller to view a
+    module as an all or nothing thing in terms of the functionality it
+    provides.  This prevents syzkaller from reporting spurious errors
+    from it's tests.
+
+That seems like a fine motivation and a fine reason.  But if you don't
+say that, people will make changes that don't honor that, and people
+won't be able to look into the history and figure out why such a change
+was made.
+
+Recording the real reasons for changes in the history really matters.
+Because sometimes people need to revisit things, and if you don't
+include those reasons people don't have a chance of taking your reaons
+into account when the revisit a change for another set of reasons.
+Unless somehow someone remembers something when it comes to code review
+time.
+
+
+>> The flip side is I tried very hard to minimize the amount of code in
+>> af_mpls, to make maintenance simpler, and to reduce the chance of bugs.
+>> You are busy introducing what appears to me to be an untested error
+>> handling path which may result in something worse that not logging a
+>> message.  Especially when someone comes along and makes another change.
+>> 
+>> It is all such a corner case and I really don't care, but I just don't
+>> want this to be seen as a change that is obviously the right way to go
+>> and that has no downside.
+>
+> I don't see how this small change has downside that affects maintenability.
+> Someone who wants to add a new code there can just add a new function call
+> and goto label, that's simple enough.
+
+Strictly speaking when testing code both branches of every if statement
+need to be tested.  It is the untested code where mistakes slip in.
+People being human we don't get it right 100% of the time.
+
+It isn't a large maintenance cost increase, but it is a maintenance cost
+increase.
+
+One if statement isn't a big deal but at the end of the day it adds up.
+
+If code becomes simpler and there is noticeably less for it to do the
+code winds up having measurably fewer bugs.  If code becomes more
+complex, with more cases to handle and more branches after a time code
+winds up having measurably more bugs.
+
+When I look at any part of the linux kernel with which I am familiar I
+can very much guarantee that most of it has become more complex over
+time, leading to measurably more bugs.   Tools like syzkaller help, but
+that don't completely compensate for more complex code.
+
+
+
+In this case I expect in balance fewer spurious errors from syzkall
+is seems like it would be a net win.  But I most definitely see a
+tradeoff being made here.
+
+Eric
 
 
