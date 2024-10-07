@@ -1,152 +1,156 @@
-Return-Path: <netdev+bounces-132854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED6219938CE
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:14:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F20199393D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF1328415E
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 21:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D1228301F
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 21:35:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D971DE4EE;
-	Mon,  7 Oct 2024 21:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F84E18C34B;
+	Mon,  7 Oct 2024 21:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Awgs3+rR"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YsrItt43"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3126313698F;
-	Mon,  7 Oct 2024 21:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FCD728EA
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 21:35:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728335659; cv=none; b=OR5hU1gJ9UKZr8ckHnHhOb+D8di1LPyKAADJGJTaxFLqJZnhSEQrSUTTc9KA1zUN0o4huwHKs6hNWtfwU8+9h4r2GhE+0o6qXM/bGeWw+VMVwARFlEDBdOPTG/xNl9ojQ+eFOkGwnjjC1h4ltUuh1DKsK5oq3E0OhTGBKMAxSak=
+	t=1728336936; cv=none; b=SeY3KVq1Ps/45pKff3tey+jod11iXeQJRDP2NG1TZ7iIXdOdg3G82zMiy6/+aUsM+WsCxJSlxhTa0y6U9AcqO86ErV7jvj3QoVh1hhGkHj5YxvODkfbOS+vPcCs0adrVuEal7cGlK9g8r1fBUpFGkcIoAiLsKeroqMgU0eW2C6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728335659; c=relaxed/simple;
-	bh=myn0LaGgPDnuYmsJ3XpcmcFx6LG52VM3eP42s2hw6l0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q7+9DwKiZZP7RiZiZD81qj9q1jQhahZBBv3JobW4vaHGsMTJzQH+Q25nYepcTNq9APCOZiVf9dOCyrE8Mcbd8gp1MfxuF6GSOBxIBSd+gPQqSzkMeObofzW+XMIqmuzk+G8c8yl1t1Q4/1dsg1ay2Cxm8AOJ0NnF55ru+u5W7HE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Awgs3+rR; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728335658; x=1759871658;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=myn0LaGgPDnuYmsJ3XpcmcFx6LG52VM3eP42s2hw6l0=;
-  b=Awgs3+rRGykgiedv/DnzxjZNbFBWj1d7eIDBm3c60AfJ8lTho/hrbumD
-   ty0akVNHk8lLbVLXUPEe+hwoLYkNraSHeH6uUflrZ5HQGqOGDzC0KyPC9
-   obPzzE4iVIsd1cEH8uVwsiF98qTx/unRGqt2HfqF4LSts8h/liIEMg+/Q
-   MfTTsEXIUZNBN1M9g64WQ8G0MPusCg19usrC0loKB7f5s2vrMma4S+/AD
-   BuEEjajUkdo3C+ni58uFbeYKZ0bXUnMMekj0VM5/w844Lbcskv4jpjhzS
-   s/8cbB2qRFQLaygtTvomZWkFxwmgqORXyImxC2/9W+RnHPhUN4C3eJePP
-   g==;
-X-CSE-ConnectionGUID: StKMNmeAQFS+VmvB84buiA==
-X-CSE-MsgGUID: 8dO76rGRTZOkEcvIyHNwvw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="26963069"
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="26963069"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 14:14:18 -0700
-X-CSE-ConnectionGUID: mE9aykswSt2I/Ex5Ki+iOQ==
-X-CSE-MsgGUID: g3j6tNFlT5KZ7UdNFjCdyg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="79590986"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 07 Oct 2024 14:14:15 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sxv3V-0005Wu-0C;
-	Mon, 07 Oct 2024 21:14:13 +0000
-Date: Tue, 8 Oct 2024 05:13:24 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mohammed Anees <pvmohammedanees2003@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1728336936; c=relaxed/simple;
+	bh=Cj/g2VTG0C81FjDq7sBsvd4h8InwdCQJmL5VU9F0Z9Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kf9WXpV1BqKYYyC7VqlXXoUlzvfYJ7v7F8RbOHD1uHNySnsSt+GLQQWtDCNX7eM5wdHX+NRKvTvrxxUQ5Ie48kXlmCqANmETo1OHNS9UzWoZ75NSFngJnhryhQI1u6a4GUVRNa84t1zmj0d3Wd8QFZHwzgNZs7zzeOJTDRgGji4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YsrItt43; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cae6bb895so50682875e9.1
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 14:35:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1728336932; x=1728941732; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jrqMOPb+Ys+vm2FHKNfe83E/YEHFtEwX37/HgcffrLo=;
+        b=YsrItt43njWe4aw+ykZd/UEPseVGMOZjD0t3/bWccbWX/hc4Qb1wzL3A2/9nSjtQFu
+         90S7U5/c/lYwBLL/6koIGOTJynxk1S3kCOCM2vtPPsx3vzUCjU7AQBH/DfkFP5hoqHOA
+         vfB+/nBhtSB2AvFgE+R7rq6stUTeqVmW8lUDexWnnOnlv5RXwL1Ruox4UhQ5BBcAoqYw
+         bIQbNgqU5FLGJIAJYkABvf1R52isIKe0kT/Dqy0WHCW1EMDZoctcy1MlTApLozI8vUmU
+         CWXV/TtaKYugUxkU2Q3m68XgF+j1b+ZaDwLaxSH4lPrjRH5Z3epL28z8oBQyu/S4j742
+         wLCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728336932; x=1728941732;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jrqMOPb+Ys+vm2FHKNfe83E/YEHFtEwX37/HgcffrLo=;
+        b=lLOPpUDWp4JSHLvbDLNUCH44j1nxz91xUjns7DC4SfNmmjrgSq/vm5drTScThp3OzJ
+         s8Y/HY988hZPTXDEI+1loOha4Fypd8Pfdb9T0qpx9DSuzPRAyw0WYsTM2DJo1+63tlKW
+         0Jsl25SbgGlbGvObiJCjDhtdIRuilqtqxIil2NWtBzi4PLHiHI4p1Dve4s1SQcWHoF5R
+         hCBGUNK0feWGfaQO5Qa5lGMp4oa4acv2nnlX18m81tihglLVOliZ4eBBG31UexPtb9Qi
+         h3ElCmtKEtwv2bMe19VDaSR3wxUENlZ41Lex7RrxYUQoQThZjx1yX1QEztsLYqYPQa6D
+         njhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU+wwqtF6QshvuDqiWwUBtDD7ETniatgbkqonEw1xSkCO81P67o9OARDiBvV8dUrygyvO5hue0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAcFYtYnYRXIvFvqN8tek+KBVaPeqIfLBBjzEgLSecHMXUDLKz
+	sL7YhNEUEHfjYcyhx3pc2AAGDgdmlewqqDkhuct9/ynMCT2iBmjYr8CFtFUvmrY=
+X-Google-Smtp-Source: AGHT+IHlG2I62I2zeXAxqMGyHeNmGHzkATxTykamA43gyhtpvqM0nGUZ+C0M68aJb9FCrknBGd5udA==
+X-Received: by 2002:a05:600c:5804:b0:42c:b1ee:4b04 with SMTP id 5b1f17b1804b1-42f85ae918amr92954035e9.28.1728336932471;
+        Mon, 07 Oct 2024 14:35:32 -0700 (PDT)
+Received: from localhost.localdomain ([104.28.192.66])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691a4absm6535887f8f.29.2024.10.07.14.35.30
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 07 Oct 2024 14:35:31 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Mohammed Anees <pvmohammedanees2003@gmail.com>
-Subject: Re: [PATCH v2] net: dsa: Fix conditional handling of Wake-on-Lan
- configuration in dsa_user_set_wol
-Message-ID: <202410080459.sbnWWj91-lkp@intel.com>
-References: <20241006231938.4382-1-pvmohammedanees2003@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	linux-wpan@vger.kernel.org
+Cc: kernel-team@cloudflare.com,
+	kuniyu@amazon.com,
+	alibuda@linux.alibaba.com,
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH v2 0/8] do not leave dangling sk pointers in pf->create functions
+Date: Mon,  7 Oct 2024 22:34:54 +0100
+Message-Id: <20241007213502.28183-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241006231938.4382-1-pvmohammedanees2003@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Mohammed,
+Some protocol family create() implementations have an error path after
+allocating the sk object and calling sock_init_data(). sock_init_data()
+attaches the allocated sk object to the sock object, provided by the
+caller.
 
-kernel test robot noticed the following build errors:
+If the create() implementation errors out after calling sock_init_data(),
+it releases the allocated sk object, but the caller ends up having a
+dangling sk pointer in its sock object on return. Subsequent manipulations
+on this sock object may try to access the sk pointer, because it is not
+NULL thus creating a use-after-free scenario.
 
-[auto build test ERROR on net/main]
-[also build test ERROR on net-next/main linus/master v6.12-rc2 next-20241004]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+While the first patch in the series should be enough to handle this
+scenario Eric Dumazet suggested that it would be a good idea to refactor
+the code for the af_packet implementation to avoid the error path, which
+leaves a dangling pointer, because it may be better for some tools like
+kmemleak. I went a bit further and tried to actually fix all the
+implementations, which could potentially leave a dangling sk pointer.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mohammed-Anees/net-dsa-Fix-conditional-handling-of-Wake-on-Lan-configuration-in-dsa_user_set_wol/20241007-072229
-base:   net/main
-patch link:    https://lore.kernel.org/r/20241006231938.4382-1-pvmohammedanees2003%40gmail.com
-patch subject: [PATCH v2] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
-config: arc-allmodconfig (https://download.01.org/0day-ci/archive/20241008/202410080459.sbnWWj91-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241008/202410080459.sbnWWj91-lkp@intel.com/reproduce)
+Changes in V2:
+  * reverted the change introduced in 6cd4a78d962b ("net: do not leave a
+    dangling sk pointer, when socket creation fails")
+  * added optional commits to all pf->create implementaions to clear the
+    sk pointer on error after sock_init_data()
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410080459.sbnWWj91-lkp@intel.com/
+Ignat Korchagin (8):
+  net: explicitly clear the sk pointer, when pf->create fails
+  af_packet: avoid erroring out after sock_init_data() in
+    packet_create()
+  Bluetooth: L2CAP: do not leave dangling sk pointer on error in
+    l2cap_sock_create()
+  Bluetooth: RFCOMM: avoid leaving dangling sk pointer in
+    rfcomm_sock_alloc()
+  net: af_can: do not leave a dangling sk pointer in can_create()
+  net: ieee802154: do not leave a dangling sk pointer in
+    ieee802154_create()
+  net: inet: do not leave a dangling sk pointer in inet_create()
+  inet6: do not leave a dangling sk pointer in inet6_create()
 
-All errors (new ones prefixed by >>):
-
-   net/dsa/user.c: In function 'dsa_user_set_wol':
->> net/dsa/user.c:1220:13: error: void value not ignored as it ought to be
-    1220 |         ret = phylink_ethtool_get_wol(dp->pl, w);
-         |             ^
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [m]:
-   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
-
-
-vim +1220 net/dsa/user.c
-
-  1213	
-  1214	static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
-  1215	{
-  1216		struct dsa_port *dp = dsa_user_to_port(dev);
-  1217		struct dsa_switch *ds = dp->ds;
-  1218		int ret;
-  1219	
-> 1220		ret = phylink_ethtool_get_wol(dp->pl, w);
-  1221	
-  1222		if (ret != -EOPNOTSUPP)
-  1223			return ret;
-  1224	
-  1225		if (ds->ops->set_wol)
-  1226			return ds->ops->set_wol(ds, dp->index, w);
-  1227	
-  1228		return -EOPNOTSUPP;
-  1229	}
-  1230	
+ net/bluetooth/l2cap_sock.c  |  1 +
+ net/bluetooth/rfcomm/sock.c | 10 +++++-----
+ net/can/af_can.c            |  1 +
+ net/core/sock.c             |  3 ---
+ net/ieee802154/socket.c     | 12 +++++++-----
+ net/ipv4/af_inet.c          | 22 ++++++++++------------
+ net/ipv6/af_inet6.c         | 22 ++++++++++------------
+ net/packet/af_packet.c      | 12 ++++++------
+ net/socket.c                |  7 ++++++-
+ 9 files changed, 46 insertions(+), 44 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.5
+
 
