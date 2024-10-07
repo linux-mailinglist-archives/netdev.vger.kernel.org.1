@@ -1,100 +1,121 @@
-Return-Path: <netdev+bounces-132646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F1992A35
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:29:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71898992A3D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E6FA1C22930
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:29:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B291F23097
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F181B1AD401;
-	Mon,  7 Oct 2024 11:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="P9vyEk6X"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CAB1CACC0;
+	Mon,  7 Oct 2024 11:31:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0C01D1319;
-	Mon,  7 Oct 2024 11:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0C9101C4;
+	Mon,  7 Oct 2024 11:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728300578; cv=none; b=hIKMmqx24ogfA4XmwN1U037JFJdLSCr+qONfjLxen9NbPD0vv96kbyR8sDlAE5zvz1hoTZIy49BlTWWWYYqrvM5kDjMxcNu+cYbn5+VEa3jZdrvIPKE6t1oYfd0hWFiNcgmx1zvRtaNA4mknWk1/6o5lhYxebiVWgMRjYOntV44=
+	t=1728300681; cv=none; b=Xu6Tll7q8LvyX2VDP5F78ZrjC9d/WBnc/O0xW5G5rU10BW+GaLVJVihV2vTny64V87wJVYhEVe1QmukQDOlFSG1ipjnFBtbEKuV0gghqy4Bj0QvSBM7nDvQ4kSuiPuC/o699wgIygdv/XpSqOwj0gz6N0GMT9V+KgKUWu/a3aWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728300578; c=relaxed/simple;
-	bh=SxQ51OTOzRyiDYMTgAY8ft6J9j6FMH0+aAgvxnpok0k=;
+	s=arc-20240116; t=1728300681; c=relaxed/simple;
+	bh=7tFqPXIR8Oj7mN8Mv3E1ReRdWth6sARj/sqyo2PSm6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rr1O7VBE+lOX69MrjU3kKvBLFmTCXk25hTzt2RmGyt2nf+n7PPCvmr9vPAxgB1/t/92ZqYTf8P4yNGynDdSVnhFIBQDCyfoC7DV9R/109i+mauzwGzPN/LCYLbPGhfnZaVaRN+dYC6vjtI9U+zS3l4k9ZIJvXAJI8GnQ29LwZ1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=P9vyEk6X; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=+fkSsHwtdQgMvduYygfi3dN2uWiuZvcckNGTJy3sukA=; b=P9vyEk6XN/M1SE/F
-	B09Q9SbMd9S0Lw04fs4eOy/E77tdgdLmGHAphbCYlrJCg5/QKHYdS+r7Ql6ghZ71+QQqKY1okJid/
-	FwEBB7N24X3FVAdaSS2/WnpgWqkATL2bFSLVtqErk1jiMB3o8DrpNJgjqQacF+9MmbmDcIg8APOPy
-	apf0h0c4SVtKgFlbEdtBtswQGHp3FQphrGLIJXfyCepVtL6E5MnlDxkEqYouOqNqq37mP8pzPhnMi
-	zRdbWHZUXoz6stoJ7Wl0GcFi/HWzjtNK0WKoBJawXBP0sGT9MqbnXCxoFCRT5XKlTiE0zViZqP4dw
-	CP2QJ6YjHu4zHlqVqg==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sxlvc-009QSb-1A;
-	Mon, 07 Oct 2024 11:29:28 +0000
-Date: Mon, 7 Oct 2024 11:29:28 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] cfg80211: Remove unused cfg80211_vendor_ functions
-Message-ID: <ZwPGGBxdTGP3tPtW@gallifrey>
-References: <20241006225303.121445-1-linux@treblig.org>
- <20241006225303.121445-3-linux@treblig.org>
- <d402977d8681c86c4a0e09962d396964ccdcb4a8.camel@sipsolutions.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pfxri3hzE1l0Qsmnzb7CbOEE8ZR2HTbe5iMOWcBp07Ox43/PObLO4sXCNr1QZGctQaoEa5Ve2vjM0LDMGhK0QQEmC2HmTZBIlTR3ybyC4jz4z+nTfkWWKszWw2DTAAe+V6+zbRUoPwlIf1HvLGFA5JOD4DWB12aCpmSZWBeWIls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sxlx9-000000002KX-3SEU;
+	Mon, 07 Oct 2024 11:31:03 +0000
+Date: Mon, 7 Oct 2024 12:30:53 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Xu Liang <lxu@maxlinear.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Robert Marko <robimarko@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Abhishek Chauhan <quic_abchauha@quicinc.com>,
+	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: leds: add 'active-high'
+ property
+Message-ID: <ZwPGbUWImzlbEqb-@makrotopia.org>
+References: <e91ca84ac836fc40c94c52733f8fc607bcbed64c.1728145095.git.daniel@makrotopia.org>
+ <4qk3lpdx47b27ru47avpiygijtu5kkax44t3o4wb2wv5m5djoz@uziseiklyq3d>
+ <ZwKK4xMlqq3TyDyt@makrotopia.org>
+ <6d3hvesqhslk7jaszo44orbaqabl7go6duzpu4beye44sa6lpn@b3c56bp6x3ce>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d402977d8681c86c4a0e09962d396964ccdcb4a8.camel@sipsolutions.net>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 11:28:48 up 151 days, 22:42,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <6d3hvesqhslk7jaszo44orbaqabl7go6duzpu4beye44sa6lpn@b3c56bp6x3ce>
 
-* Johannes Berg (johannes@sipsolutions.net) wrote:
-> On Sun, 2024-10-06 at 23:53 +0100, linux@treblig.org wrote:
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Mon, Oct 07, 2024 at 08:38:27AM +0200, Krzysztof Kozlowski wrote:
+> On Sun, Oct 06, 2024 at 02:04:35PM +0100, Daniel Golle wrote:
+> > On Sun, Oct 06, 2024 at 02:44:44PM +0200, Krzysztof Kozlowski wrote:
+> > > I think this should be just string enum, see marvell,marvell10g.yaml
 > > 
-> > cfg80211_vendor_cmd_get_sender() and cfg80211_vendor_event_alloc_ucast()
-> > were added in 2019 by commit
-> > 55c1fdf0d6c5 ("cfg80211: allow sending vendor events unicast")
+> > I found the vendor-specific 'marvell,polarity' property in
+> > https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231214201442.660447-5-tobias@waldekranz.com/
 > > 
-> > but never used.
+> > However, I can't find that file in any Linux tree.
 > > 
+> > Looking at the suggested patch on patchwork, I got a few questions on
+> > how to deal with the situation as of today:
+> > 
+> > So should the existing support for the 'active-low' and
+> > 'inactive-high-impedance' properties be replaced by that string enum?
+> > Or should the string property be interpreted in addition to the
+> > bools defined in leds/common.yaml?
+> > 
+> > Should the string property be defined for each PHY or should we move
+> > it into a common file?
+> > 
+> > If so, should that common file also be leds/common.yaml or should we
+> > create a new file only for PHY LEDs instead?
+> > 
+> > Sorry for being confused, I don't mind going down what ever path to have
+> > LED polarity configurable properly in DT.
 > 
-> Yeah ... we have out-of-tree code using this for CSI matrix stuff
-> (sensing), but I guess we can keep this API out-of-tree just as well,
-> though it'll make it harder to integrate in ChromeOS.
-
-Obviously it's the maintainers call as which way to go.
-I guess the best outcome would be for that out-of-tree code to land in
-the tree!
-
-Dave
-
-> johannes
+> Let's ignore my idea.
 > 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+> However I still wonder whether your choice for lack of properties is
+> appropriate. Lack of properties as "bootloader default" means it can
+> change. Why would anyone prefer to keep bootloader default? The wiring
+> is fixed - it's never "we design PCB based on bootloader, so with new
+> bootloader we will change PCB"?
+> 
+> And if you meant bootstrapping through some hardwired configuration,
+> then again it is known and defined.
+
+I agree, and my original intention was to just always apply polarity
+settings and force people to correctly declare them in DT.
+However, that would break DT compatibility on devices not making use
+of those properties and relying only on strapping or bootloader
+defaults. See also RFC discussed here:
+
+https://patchwork.kernel.org/project/netdevbpf/patch/473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org/
 
