@@ -1,114 +1,158 @@
-Return-Path: <netdev+bounces-132845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF049936E1
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 20:54:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DFAC9936F4
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 21:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBE0F283727
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:54:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C76681F2418D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F061DE3B2;
-	Mon,  7 Oct 2024 18:50:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Js3xa75k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF871DDA18;
+	Mon,  7 Oct 2024 19:05:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1DD1DE3DC;
-	Mon,  7 Oct 2024 18:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC1C22098;
+	Mon,  7 Oct 2024 19:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728327022; cv=none; b=d91lvGQqwi/ks9Wcjq0UbqnAeyjpqtNF2UlGx1TaiXCqGzZbUGUWS1kslpWXPtBJizplBorhdiaRGimC8l0JIxpVs1I3sA1kGT3ggJWUssMWVxLjepn3/KHtd5Yg9a6jb88MA5wpYsFAG4AV5IWcvL0HrelvCONvpBqRQkLvhHU=
+	t=1728327931; cv=none; b=MvQ3rA0jEJZB6hcJxWkOtTZxvMAnqRGeUITuuhGlnPFHK/XL3VlwX6GC5mAkbFsDVfPOPRZJVmc3jfAQJ7rVFdgEBLw+S2AUY6UCoaZIuO7bsohdn93dLgxWkoRpwghrvXUFvNDIpMFxDQTZksaLG+1oBf/Dmm/N1hyp0jU387I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728327022; c=relaxed/simple;
-	bh=OTYr2YeyN6tlmEsUdubvcgRN9nXBDqRzsid4g3QK+gY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HMwupgdZ2oS3amdQZkx5SBl0Eurd6gYNtNbKPj+qGQdjmGCKCGwvTNcoEZEHujQkoWYkSZAZkNIusJVl/sCviur8FOdsUtJXt2SI7VISOoV0hktdZn2JX4p5jXGXLgkThb0QY1iNur0+zPFdZqPjIciVAZeK1Ce1IfBeOFWHwXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Js3xa75k; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cbc22e1c4so37955435e9.2;
-        Mon, 07 Oct 2024 11:50:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728327019; x=1728931819; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OTYr2YeyN6tlmEsUdubvcgRN9nXBDqRzsid4g3QK+gY=;
-        b=Js3xa75kmpvQaV5b5EnBXOgo30yOjUUXZzJQbgHVszru8DlpfjhQjmeqPoOx3GxHAZ
-         JaqYTzZbvtMWt4dqBkz02MU9KJwprIazno5fDVBQNsYrodNBeceUTOorkbPbQfr074oF
-         wGshxwcy42zDyzx6nHYE5X32O9mw2/r0xtVQOjOr7mJrN+GIALSACdgOOH1Nyr5SNfgS
-         3v/Ndupo3pSt808qi13KMkIEMr9ogwJWxdqWI5l905ssuvLaa5BoKen+d1A2yKRTaG09
-         j3B3DhxFBlI/1QGOh6PNb1yiOWykfgjxz9MCKxPaLjKrfCmgcSk+QySrom0mDr+b29Yo
-         lEWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728327019; x=1728931819;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OTYr2YeyN6tlmEsUdubvcgRN9nXBDqRzsid4g3QK+gY=;
-        b=VY+oW9HJwJ+Okerqf5sP7ud5issLMah+aL+FhsE/efhPE5lRoyf+pzcMxH9bXjWfcC
-         FSxlno7MqVejs+s1aGsKycZpnWWn/j3RSzJ5+emQzDywo1VIAmvM8oAJ9e+fqIHH03w8
-         8HnI0+WwSLAyP4sSWoeiRNikissugHpTOrQARkM+s8hbosboII+4F2kx9Rp9r/vE/P6A
-         0CHtH5mA5rFigwqhOqYJYd7RMh6ogNuMBbPQutG/08DdnPLPOSF2LMhr8kPWFsJcr8O+
-         lZRduC1+MRI0m4KEhA1Wn+MunV/ux/JC94k6LMDm+lUpnF/9fA9bVCIN/2nXlqpECuyK
-         cE9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVO3419eNua1E5SoCnoGfk/vAWbLGmhT5xt3TiHdF4gasmjfqCVSDgIAJyYT2KSLsgW4lPAiLE4@vger.kernel.org, AJvYcCWvvXW/qWjufrcyLNWsC8yrsv9RiLF2W2Dzv9axXHnqaZBXDpoJVZXVzcUnmZ/WyOv5eEzkuz2PdbZ2lLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3Xm4tQJb2F9Dvne2XmR+QlZMRc74y5DxZ1w3NpG6nJh8sAQ0D
-	Kg8aJcKSNQAR4BgN0fB+fAhgJUXcZyMOYBhQjqvzjiKetfjc3+wPmypPj4UTO1R1EmAl2LESwhw
-	bhm/954ZPj+I+JluamrCuNA5enIE=
-X-Google-Smtp-Source: AGHT+IHXPX/Ep/NBLa02S0kuubhhcF9yvuM6iCmzjgSdT95cFikVa6mIkvCw3Xn56dL0pU0xtclJ78y5vnSb+Zdq4No=
-X-Received: by 2002:a05:600c:3b9c:b0:426:593c:935d with SMTP id
- 5b1f17b1804b1-42f85aa1a32mr93478785e9.5.1728327019299; Mon, 07 Oct 2024
- 11:50:19 -0700 (PDT)
+	s=arc-20240116; t=1728327931; c=relaxed/simple;
+	bh=5C8FnDYbKcBoRPSYMx5j7pldvPgXbkOVg9Ey6mLyces=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nveqElak30gV5xrIEjSEL2EBwbzqJvMg6YMVylWC1qplBtCYeV0dnUXPPFf5VsB3MKBvE8sI4EjZmmQuCleSGvRG0CQel4LxXw2ZqjniA2WbJo6Kyr/2zlmIM2eSdKBsIfu5s5TOr1RWHcW9ry+z64mtB03J91mTJptCRH4MLuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.100] (213.87.153.120) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 7 Oct
+ 2024 22:05:08 +0300
+Message-ID: <a733e3df-1fc3-41a1-9025-0eb02c5ffd0a@omp.ru>
+Date: Mon, 7 Oct 2024 22:05:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241001075858.48936-1-linyunsheng@huawei.com>
- <20241001075858.48936-10-linyunsheng@huawei.com> <CAKgT0UeSbXTXoOuTZS918pZQcCVZBXiTseN-NUBTGt71ctQ2Vw@mail.gmail.com>
- <c9860411-fa9c-4e1b-bca2-a10e6737f9b0@gmail.com> <CAKgT0UfY5JtfqsFUG-Cj6ZkOOiWFWJ3w9=35c6c0QWbktKbvLg@mail.gmail.com>
- <218513be-857b-4457-8bd8-c12e170233b7@gmail.com>
-In-Reply-To: <218513be-857b-4457-8bd8-c12e170233b7@gmail.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 7 Oct 2024 11:49:41 -0700
-Message-ID: <CAKgT0Ue=tX+hKWiXQaM-6ypZ8fGvcUagGKfVrNGtRHVuhMX80g@mail.gmail.com>
-Subject: Re: [PATCH net-next v19 09/14] net: rename skb_copy_to_page_nocache() helper
-To: Yunsheng Lin <yunshenglin0825@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Eric Dumazet <edumazet@google.com>, 
-	David Ahern <dsahern@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next] net: ravb: Only advertise Rx/Tx timestamps if hardware
+ supports it
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Claudiu
+ Beznea <claudiu.beznea.uj@bp.renesas.com>, Paul Barker
+	<paul.barker.ct@bp.renesas.com>, Biju Das <biju.das.jz@bp.renesas.com>, Lad
+ Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, <netdev@vger.kernel.org>
+CC: <linux-renesas-soc@vger.kernel.org>
+References: <20241005121411.583121-1-niklas.soderlund+renesas@ragnatech.se>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20241005121411.583121-1-niklas.soderlund+renesas@ragnatech.se>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/07/2024 18:47:22
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188276 [Oct 07 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 39 0.3.39
+ e168d0b3ce73b485ab2648dd465313add1404cce
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info:
+	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;213.87.153.120:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.153.120
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/07/2024 18:51:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/7/2024 5:10:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Mon, Oct 7, 2024 at 7:29=E2=80=AFAM Yunsheng Lin <yunshenglin0825@gmail.=
-com> wrote:
->
-> On 10/7/2024 12:18 AM, Alexander Duyck wrote:
->
-> ...
->
-> >
-> > I could probably live with sk_copy_to_skb_data_nocache since we also
-> > refer to the section after the page section with data_len. The basic
-> > idea is we are wanting to define what the function does with the
-> > function name rather than just report the arguments it is accepting.
->
-> Yes, looking more closely:
-> skb_add_data_nocache() does memcpy'ing to skb->data and update skb->len
-> only by calling skb_put(), and skb_copy_to_page_nocache() does
-> memcpy'ing to skb frag by updating both skb->len and skb->data_len
-> through the calling of skb_len_add().
->
-> Perhaps skb_add_frag_nocache() might seems a better name for now, and
-> the 'sk_' prefix might be done in the future if it does make sense.
+On 10/5/24 15:14, Niklas Söderlund wrote:
 
-That works for me.
+> Recent work moving the reporting of Rx software timestamps to the core
+> [1] highlighted an issue where hardware time stamping where advertised
+> for the platforms where it is not supported.
+> 
+> Fix this by covering advertising support for hardware timestamps only if
+> the hardware supports it. Due to the Tx implementation in RAVB software
+> Tx timestamping is also only considered if the hardware supports
+> hardware timestamps. This should be addressed in future, but this fix
+> only reflects what the driver currently implements.
+> 
+> 1. Commit 277901ee3a26 ("ravb: Remove setting of RX software timestamp")
+> 
+> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+[...]
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index d2a6518532f3..907af4651c55 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -1750,20 +1750,19 @@ static int ravb_get_ts_info(struct net_device *ndev,
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	const struct ravb_hw_info *hw_info = priv->info;
+>  
+> -	info->so_timestamping =
+> -		SOF_TIMESTAMPING_TX_SOFTWARE |
+> -		SOF_TIMESTAMPING_TX_HARDWARE |
+> -		SOF_TIMESTAMPING_RX_HARDWARE |
+> -		SOF_TIMESTAMPING_RAW_HARDWARE;
+> -	info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
+> -	info->rx_filters =
+> -		(1 << HWTSTAMP_FILTER_NONE) |
+> -		(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
+> -		(1 << HWTSTAMP_FILTER_ALL);
+> -	if (hw_info->gptp || hw_info->ccc_gac)
+> +	if (hw_info->gptp || hw_info->ccc_gac) {
+> +		info->so_timestamping =
+> +			SOF_TIMESTAMPING_TX_SOFTWARE |
+> +			SOF_TIMESTAMPING_TX_HARDWARE |
+> +			SOF_TIMESTAMPING_RX_HARDWARE |
+> +			SOF_TIMESTAMPING_RAW_HARDWARE;
+> +		info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
+> +		info->rx_filters =
+> +			(1 << HWTSTAMP_FILTER_NONE) |
+> +			(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
+> +			(1 << HWTSTAMP_FILTER_ALL);
+>  		info->phc_index = ptp_clock_index(priv->ptp.clock);
+> -	else
+> -		info->phc_index = 0;
+
+   Is it OK to remove this line?
+
+> +	}
+[...]
+
+MBR, Sergey
+
 
