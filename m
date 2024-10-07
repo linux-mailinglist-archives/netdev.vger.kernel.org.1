@@ -1,131 +1,84 @@
-Return-Path: <netdev+bounces-132898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD665993AAB
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:14:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE95993AC2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEB5D1C22926
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:14:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB95FB231E9
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7433B18C333;
-	Mon,  7 Oct 2024 23:14:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976161C233C;
+	Mon,  7 Oct 2024 23:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPh7CTTp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BwhMWQRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F8917DFF7;
-	Mon,  7 Oct 2024 23:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5C61C1ADA;
+	Mon,  7 Oct 2024 23:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728342848; cv=none; b=eKWdMHPR5gkgccGoGv7xZzx/pQ5/ZsTo8WTz/T4axMN4opn6G7nErKhsgOZ8nmffPE9reJouj6GmfoEgxVbKz4w8Kktkd39FxrNVBPztL9bGxki0RvBJt0BR7gyaCIEWFDRnjsqaScGllF4qrEhQZRZIcOe4xRVGzQVxd58sbqc=
+	t=1728342987; cv=none; b=NHKWs1lDwIYzbSg4V2BELnu53+2WZooi9ZLyZuMFgBuAZVKIimPp3TVNnznGOPBRRvZ2pfkbWMVR8Str/+HTV4lOWgx/UausWvO1UC2DBZ1Ct4yxqItSyBYZjcbkom8ZMyGAa1mfrEgpJBhpfqjoKd7f2RHFVUpGUEevHLrFkjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728342848; c=relaxed/simple;
-	bh=0AIF3ULaOZP5ywMFjAOjrAHSRlFKos1R1CPdoyvj3jk=;
+	s=arc-20240116; t=1728342987; c=relaxed/simple;
+	bh=DUb7kz4JTXYdL6/EMDIBmQrN8NitqplSXw+fsyqrMFI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTGeEvCw8WDZuak4r0ye3bt8n3V+0EpUcpFdetuhtudBofBYBhvC9BgBrRdTmeT4GQ4VZ+ESKHfrozhIQEleNiwUw490M2H1/hv0kxmrH8UcClekfEG+M1T506d5lylrn0Pb2OsuEIsrXkfKIq2I/iBTevBfok52S/EqTMNo92c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPh7CTTp; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7ae6f77f3a0so354090685a.1;
-        Mon, 07 Oct 2024 16:14:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728342846; x=1728947646; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BJVPy1ShKEKA/LRD1c1fr7tzzJ2Qr9H3SAkL7CrlS9Q=;
-        b=bPh7CTTpMJKRah3BYdEpI5l7jUVUfELtqxrDXtqFhEeZNr8O44ZwNPKbLasybGr2zD
-         xP/+X4x9RYo/Uo7uMF4CpRSj2aVl1T612fNHFQjFfkifaN9EE1/oW7qJXSlz8NkiC2ZY
-         /RSCl5+dempimIXsZdYXIziS5cooRZqCXFyELhpS4PfIaX3keewhU1xpqsOtDjVtxe51
-         csCHejjK6c03GXr394P1RUVz4/Kd1QTBIS+tdy2bGq51YutkRE39EJI4EGjh0qVB5krv
-         nrnt16IiLltpNRXAHDh2rKpHTQeRN/lHU9rknrWfNtmucEyv2vkNj21WC5cnhZgUAw5+
-         k4uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728342846; x=1728947646;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BJVPy1ShKEKA/LRD1c1fr7tzzJ2Qr9H3SAkL7CrlS9Q=;
-        b=XsEh3PnEAgcDkP+oOEceUo1GwOgfYtIf4vIflmTlfF/ixOJZiS4AATgTwLdBYJJNwJ
-         DSms6U4WDHn8V49dahu3+qNLp94VDMFMzztl9QOH/Rk4p47+B7x+45K2ao92vrrrlwwF
-         6P51rzQRP0G3GMDmCGMi7HvY/ZUmXtMRW4HvOD4pVUb8rtVH/XsCK+HHLokk6ZPTA4pl
-         OKUSeP5yb2nh4h2tySbArIS4A3U4VKrEMKNg1xSSwLhMGDVsMHwEW+zEFXi/890EidVk
-         EkzOswqKiEAZYfZu9/M8/YdF3OX0uvcxOyZ2SPHAUSEuQXZ5dHOOEelSq6H64ri60zby
-         eXrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjUN4/8kVtAsNdUR6kXud1aUCBMB6FqHWWTLxkBZHH5BM/+gg0P1I3LpzSSxAyEx/PTFGoOuMUbwb+bZI+IEo=@vger.kernel.org, AJvYcCWkJNMf/pcxoz6PeenQSlAWJidBYz6LVGfjBAEUWCszvYY9UUX5+JGfCI9awYSYPImDmaliBeOi@vger.kernel.org, AJvYcCXyN2M004vGCODl85gtcUhKDj4asGt6ZqWAC34fDtg75k4iMm4LfdfHcwZ9rsM+EVVEVww0m2ikm9y/utg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI/Pm8hmhBOzSnbQWTHBCfl9LOHwf3IDpnJOCUueTlIFrMt58Z
-	yJEv80L+tYKsDaciJXUpm0NUkCOllbA37cDhkMqsbL8bJGkIoNC+
-X-Google-Smtp-Source: AGHT+IHmqyYpdfvoMjIamOL93vd5f2EVytwWntxMlitBH43vYlwBH2oFB2agTYHQuZWcaPE7L+4Pmw==
-X-Received: by 2002:a05:620a:19a2:b0:7a4:d685:caa9 with SMTP id af79cd13be357-7ae6f488699mr2106721685a.48.1728342845676;
-        Mon, 07 Oct 2024 16:14:05 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7afc59627eesm2096185a.53.2024.10.07.16.14.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 16:14:05 -0700 (PDT)
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 7B3F51200071;
-	Mon,  7 Oct 2024 19:14:04 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Mon, 07 Oct 2024 19:14:04 -0400
-X-ME-Sender: <xms:PGsEZwLEzswepd5YIxHNRFlgeMh8KQMA-zHsCMQCXXskpWnfv650jQ>
-    <xme:PGsEZwJd8a1ISG7fYwtfAASnAhn66mnY7ni6AqMDM7tIJCCjzE5W5dXqj7CwhC6Ht
-    5I9Ysts-F74hVQQdA>
-X-ME-Received: <xmr:PGsEZwu-jFrC_aoDE90d8_gCUNC1FI7LgECIoI29PbPLoTR4bAYAylFOyl9afQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeftddgvddtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
-    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
-    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
-    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
-    mhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
-    eprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheprghlihgtvghrhihhlhesghho
-    ohhglhgvrdgtohhmpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesghhmrg
-    hilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
-    ghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgt
-    phhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupdhrtghpthhtohepohhjvggurg
-    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghi
-    lhdrtghomh
-X-ME-Proxy: <xmx:PGsEZ9Y4sgHSHIzPoUVddkhodcZLG_gEHwgDH4kUB4fSaXrRx-9dSQ>
-    <xmx:PGsEZ3Y7fg3ALo24zfV-XzZiMbCqt8SvIMTh8S3POz1_4d3ZtrB6fg>
-    <xmx:PGsEZ5Dx2c0U_hDglMHw2A7C8jNaNdFtNNsj7y02rF0HLsEMj5LiSg>
-    <xmx:PGsEZ9bLMHgvsiG1Za9h2dVJdFDnnt_2F0c0DyttSx0TNtXnzVhEqA>
-    <xmx:PGsEZ_ra4Ym8QIYONV-kFQEICIiTEhbgK-ogcEEZYT2xElpqzGhFvwnz>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Oct 2024 19:14:04 -0400 (EDT)
-Date: Mon, 7 Oct 2024 16:12:44 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alice Ryhl <aliceryhl@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, anna-maria@linutronix.de,
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+	 Content-Type:Content-Disposition:In-Reply-To; b=IHOYcxiDX6mlY/x6eVIg+50eGnrZ0K4vq3HREpT+4i1wzNL5o2yonGKMuZPPiDzV+i6PnoK/Y+0/XMRBoq1DpVt+4PORuPv6s06UcCZj/QA2d0h/RkE//GeLZbLW/AgcjFfnEMkUEibxuvnWFgmAI8lxs1S+EfdWuzIq5MSY9ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BwhMWQRh; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728342986; x=1759878986;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=DUb7kz4JTXYdL6/EMDIBmQrN8NitqplSXw+fsyqrMFI=;
+  b=BwhMWQRhQzOCknkg0Q+4xLKc0tAZr8oEHkNoQxjBwEbg58jrpFJrW+y0
+   vXYMUQPwhoGllMBgqAzVEvpxKqt12af20Scyi2PZ2LIc2mUmlwxZfp8wC
+   yuqKTgv0AZWGvwd9l07Xn/snPtEDz+Ags1QmE5QScPzJyxWnaNvA3uWOx
+   yfG4gKc7hKC21xmIjvo1mciOptvOih9twP0zkR/3L6DNwDD9GmtOYB5w9
+   TQPD1Hv+MMzZgUn1GqIkk3PNexzMpxdFuLUoSs7Vb2rVd/ZsEHNYoqFn0
+   DLkb6P/C+Q395i8Rde5Y+/LruDmhKyaBndhidD1wIVBh0VWHZVgmtAPLJ
+   g==;
+X-CSE-ConnectionGUID: tsgUourMTF2TnjL401mP+w==
+X-CSE-MsgGUID: soKaP/LEQwuzJ5PoJUs1cA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="50043024"
+X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
+   d="scan'208";a="50043024"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 16:16:26 -0700
+X-CSE-ConnectionGUID: WdcWUlizRpy4GVkqUpX3QQ==
+X-CSE-MsgGUID: imA9qnRfQd67i0hrQfr+LA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
+   d="scan'208";a="106479378"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 07 Oct 2024 16:16:22 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sxwxf-0005eO-2j;
+	Mon, 07 Oct 2024 23:16:19 +0000
+Date: Tue, 8 Oct 2024 07:15:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mohammed Anees <pvmohammedanees2003@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <ZwRq7PzAPzCAIBVv@boqun-archlinux>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com>
- <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
- <ZwG8H7u3ddYH6gRx@boqun-archlinux>
- <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux>
- <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
- <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
- <ZwPsdvzxQVsD7wHm@boqun-archlinux>
- <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Mohammed Anees <pvmohammedanees2003@gmail.com>
+Subject: Re: [PATCH v2] net: dsa: Fix conditional handling of Wake-on-Lan
+ configuration in dsa_user_set_wol
+Message-ID: <202410080616.wpZV4fAa-lkp@intel.com>
+References: <20241006231938.4382-1-pvmohammedanees2003@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -134,83 +87,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
+In-Reply-To: <20241006231938.4382-1-pvmohammedanees2003@gmail.com>
 
-On Mon, Oct 07, 2024 at 07:13:40PM +0200, Andrew Lunn wrote:
-> > > pub fn might_sleep() {
-> > >     // SAFETY: Always safe to call.
-> > >     unsafe { bindings::might_sleep() };
-> > 
-> > It's not always safe to call, because might_sleep() has a
-> > might_resched() and in preempt=voluntary kernel, that's a
-> > cond_resched(), which may eventually call __schedule() and report a
-> > quiescent state of RCU. This could means an unexpected early grace
-> > period, and that means a potential use-afer-free.
-> 
-> How does C handle this?
-> 
-> I'm not an RCU person...
-> 
-> But if you have called might_sleep() you are about to do something
-> which could sleep. If it does sleep, the scheduler is going to be
-> called, the grace period has ended, and RCU is going to do its
-> thing. If that results in a use-after-free, your code is
-> broken. might_sleep makes no difference here, the code is still
-> broken, it just happens to light the fuse for the explosion a bit
-> earlier.
-> 
+Hi Mohammed,
 
-Because of the might_resched() in might_sleep(), it will report the
-quiescent state of the current CPU, and RCU will pass a grace period if
-all CPUs have passed a quiescent state. So for example if someone writes
-the following:
+kernel test robot noticed the following build errors:
 
-    <reader>			<updater>
-    rcu_read_lock();
-    p = rcu_dereference(gp);
-    might_sleep():
-      might_resched():
-				todo = gp;
-				rcu_assign_pointer(gp, NULL);
-				synchronize_rcu();
+[auto build test ERROR on net/main]
+[also build test ERROR on net-next/main linus/master v6.12-rc2 next-20241004]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-        rcu_all_qs(); // report a quiescent state inside RCU read-side
-	              // critical section, which may make a grace period
-		      // pass even there is an active RCU reader
+url:    https://github.com/intel-lab-lkp/linux/commits/Mohammed-Anees/net-dsa-Fix-conditional-handling-of-Wake-on-Lan-configuration-in-dsa_user_set_wol/20241007-072229
+base:   net/main
+patch link:    https://lore.kernel.org/r/20241006231938.4382-1-pvmohammedanees2003%40gmail.com
+patch subject: [PATCH v2] net: dsa: Fix conditional handling of Wake-on-Lan configuration in dsa_user_set_wol
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20241008/202410080616.wpZV4fAa-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project fef3566a25ff0e34fb87339ba5e13eca17cec00f)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241008/202410080616.wpZV4fAa-lkp@intel.com/reproduce)
 
-				kfree(todo);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410080616.wpZV4fAa-lkp@intel.com/
 
-    a = READ_ONCE(p->a); // UAF
-    rcu_read_unlock();
+All errors (new ones prefixed by >>):
 
-We probably call the reader side code a "wrong annotation", however,
-it's still unsafe code because of the UAF. Also you seems to assume that
-might_sleep() is always attached to a sleepable function, which is not
-an invalid assumption, but we couldn't use it for reasoning the
-safe/unsafe property of Rust functions unless we can encode this in the
-type system. For Rust code, without klint rule, might_sleep() needs to
-be unsafe. So we have two options for might_sleep().
+   In file included from net/dsa/user.c:8:
+   In file included from include/linux/etherdevice.h:20:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:10:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   In file included from net/dsa/user.c:8:
+   In file included from include/linux/etherdevice.h:20:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
+     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
+         |                                                      ^
+   In file included from net/dsa/user.c:8:
+   In file included from include/linux/etherdevice.h:20:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
+         |                                                           ^
+   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
+     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
+         |                                                      ^
+   In file included from net/dsa/user.c:8:
+   In file included from include/linux/etherdevice.h:20:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:28:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:9:
+   In file included from arch/s390/include/asm/io.h:93:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:693:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     693 |         readsb(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:701:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     701 |         readsw(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:709:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     709 |         readsl(PCI_IOBASE + addr, buffer, count);
+         |                ~~~~~~~~~~ ^
+   include/asm-generic/io.h:718:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     718 |         writesb(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:727:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     727 |         writesw(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+   include/asm-generic/io.h:736:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     736 |         writesl(PCI_IOBASE + addr, buffer, count);
+         |                 ~~~~~~~~~~ ^
+>> net/dsa/user.c:1220:6: error: assigning to 'int' from incompatible type 'void'
+    1220 |         ret = phylink_ethtool_get_wol(dp->pl, w);
+         |             ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   16 warnings and 1 error generated.
 
-* Since we rely on klint for atomic context detection, we can mark the
-  trivial wrapper (as what Alice presented in the other email) as safe,
-  but we need to begin to add klint annotation for that function, unless
-  Gary finds a smart way to auto-annotate functions.
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for MODVERSIONS
+   Depends on [n]: MODULES [=y] && !COMPILE_TEST [=y]
+   Selected by [y]:
+   - RANDSTRUCT_FULL [=y] && (CC_HAS_RANDSTRUCT [=y] || GCC_PLUGINS [=n]) && MODULES [=y]
 
-* Instead of might_sleep(), we provide the wrapper of __might_sleep(),
-  since it doesn't have might_resched() in it, it should be safe. And
-  all we care about here is the debugging rather than voluntary context
-  switch. (Besides I think preempt=volunatry is eventually going to be
-  gone because of PREEMPT_AUTO [1], if that happens I think the
-  might_resched() might be dropped entirely).
 
-Does this make sense?
+vim +1220 net/dsa/user.c
 
-[1]: https://lore.kernel.org/lkml/20240528003521.979836-1-ankur.a.arora@oracle.com/
+  1213	
+  1214	static int dsa_user_set_wol(struct net_device *dev, struct ethtool_wolinfo *w)
+  1215	{
+  1216		struct dsa_port *dp = dsa_user_to_port(dev);
+  1217		struct dsa_switch *ds = dp->ds;
+  1218		int ret;
+  1219	
+> 1220		ret = phylink_ethtool_get_wol(dp->pl, w);
+  1221	
+  1222		if (ret != -EOPNOTSUPP)
+  1223			return ret;
+  1224	
+  1225		if (ds->ops->set_wol)
+  1226			return ds->ops->set_wol(ds, dp->index, w);
+  1227	
+  1228		return -EOPNOTSUPP;
+  1229	}
+  1230	
 
-Regards,
-Boqun
-
-> Or, i'm missing something, not being an RCU person.
-> 
-> 	Andrew
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
