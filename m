@@ -1,184 +1,114 @@
-Return-Path: <netdev+bounces-132630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE749928C0
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:06:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52E69928D3
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:10:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D50C1C239E8
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:06:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53C75285E71
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFCF1BB6B7;
-	Mon,  7 Oct 2024 10:04:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DE71A76A2;
+	Mon,  7 Oct 2024 10:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="OwfHSKDB"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="KiSalISL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7731A0BE6
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 10:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048CB231CA9
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 10:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728295465; cv=none; b=t3ZBE57pWaU2hwbb+g0vDYc4JJFROqkxSOqXzejsS4P3OlED9OC/EBw3QuG1PWclrWXSc4d0KHLP+VXU+hj3PoNUkrObn20WI8QumJ344gOS/urnCdzWaGfouO41Qzpjl4YaUnk+bedDIV3N22O+c3mD62noKja5+dnR2EymSg0=
+	t=1728295814; cv=none; b=l9/FO/+k1KcNFz5S6RZAiAHXARYlDBls4QGSnesyAIpgClXUY8c2MuV7LqMxVpjb7wT4oDlg6m8LAoPWmwk4ipBbufWtL+GZt7MB9GlzSxTNZtg5RLLAYLBnXYAgrmeT7O5pi59K2Mxq4a+9DwjdRWQDBGGUrwlunLZ/Bu/ya0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728295465; c=relaxed/simple;
-	bh=ChnF36euALpyYjrslbFWg1ZKHmzg/57fTmXHPuGpKQA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qT2ecSkCfNIH+O88gQXYzMxbTlLelrhcfljb4G7sDRLq+ula0DMcEsxLVhc0YAX0jXoZXWCpi5Oay6wdhu2lJaQoj4tKt8StiMOJhgiJX5zZstM/7RWObKSKu+ry6xTvgGhQps5nZJ67Y8hyyMproT19+mCc+HJkER0in/Be7ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=OwfHSKDB; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37cd3419937so2567165f8f.0
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 03:04:23 -0700 (PDT)
+	s=arc-20240116; t=1728295814; c=relaxed/simple;
+	bh=ukxnln4+Kp/4FY1LSjEJ6dgfnkvanK2/a7JnKT0JHT8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=rJnKiEW2kMYvTr/qgqf01sV9C2MOfYiQBSprizArmmgvGNxsS7JBYYuvJpG5UMC/XNqWaG7l8GY501cXyg2UX0nJN1NUHI/JFrFodA5p5uB5hKCJp+WhlbmwKSVhE2S++0+ihA7H5N5TsU/XXhT4ynfbCrkyE40nmjxQGv3MPEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=KiSalISL; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1728295462; x=1728900262; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NuQVqhahf1Jz4tT/fjagwPK72T8/bE0LW699MmZGlaQ=;
-        b=OwfHSKDBF/XoVENQojW5Vu2AudD++ZgFnzc21DmcsVCYf3LrwBLynRjiQ3iPunMNup
-         mIqsu0891LnhvXcIl6AbMkPyQL3DWkeZGxJWGifdWjs9HZghL2ih8bIsICW80KeA4pTp
-         fPoWlfFR7SlGA/Tyxo5j0HctC8MpoK0Jp9A1kTSER6haZnKzHMWqMGIhgEzzYUUAp9pH
-         0Igm44L0srar4Hf7cekjKvVIBby5bXK8vUQGdgGGxJR8auarxxc1ENjMf3kowByiTVMK
-         3YbV5xGio1sve5W+llxChySzTGTH0YXjNLJEJWhDajolQ4EN810CQvEBKRtneUXNuhEG
-         9WDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728295462; x=1728900262;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NuQVqhahf1Jz4tT/fjagwPK72T8/bE0LW699MmZGlaQ=;
-        b=l2VsNwBAVqHWSPFhjik8TRELnjil5hbozu1bLlRUsTklXHp2Il+PPrjc0tL2Pm+kZ0
-         HeZTyZ8+0wp5QMqAIfb5qRkTbWi4l8c8qyg54YzYO7q4UIzZzwkfh06OoD01401tpeoq
-         e6poVzCXvYuXWxD31Q+ju5XWnwyB+oQf+jh6+pJvcVqg9LI2kVMNXXexC+sAiJ9OvclX
-         VV/n+JXVzYM4C2/ofDK1Sf7agXpncMcTkZxIMRvhcEHve0Bs22n+9qTABvV30btWKpLo
-         ce5sjni3WuBjw5bDXYTc8QUJ8g24eUzct6CUk/NqslNK9cdGbOKhwmMHew3t+tJTPXR6
-         KNOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrQf8VOnvVWUKyW2ObBxaJHWtoAWf3YwCkEXiV/Bk8PYzJHqdJxSYQia1401R2Xyx5cvCjZ30=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9lOVnkuYKFEV/OInsaOcnZXfA62kKPCDBfjQCx3hQUVVMwJNe
-	3h1m7OeEn15NnlDmpcnU8ootaN+8hFgt9s9TLFY2dj/PdeoAhgiEoDtAfB2KiF8=
-X-Google-Smtp-Source: AGHT+IFiOMOtDWrPLesR2YJI+T+TdB6ghsVgNuyfeGu7LKXq2EfNxD4KWjWvAly9Tu54tUuOs/JPVw==
-X-Received: by 2002:a5d:598c:0:b0:374:fa0a:773c with SMTP id ffacd0b85a97d-37d0eafa3admr7113034f8f.47.1728295461909;
-        Mon, 07 Oct 2024 03:04:21 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:efc3:b0c0:f886:97ea? ([2001:67c:2fbc:1:efc3:b0c0:f886:97ea])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1690f25asm5354842f8f.11.2024.10.07.03.04.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Oct 2024 03:04:21 -0700 (PDT)
-Message-ID: <e09ea6b5-fe0c-4f90-8943-83aa410ccc1f@openvpn.net>
-Date: Mon, 7 Oct 2024 12:04:22 +0200
+	d=codeconstruct.com.au; s=2022a; t=1728295800;
+	bh=ukxnln4+Kp/4FY1LSjEJ6dgfnkvanK2/a7JnKT0JHT8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=KiSalISL9x93Wd6/jCI2myaAtdj7CjZtzqoUQ/o10AD3/wrEX1vFgi2fSSbg9q5fu
+	 DwpkkjnojLVIf0BR6ljuoAgr+8DJaNNyEWwwU2/hF7E6wL8SXpL16PR6reOEAzbg0p
+	 y+3kzzV9B+xe4OW1XVQJ5AvAR0ykI5fbeGlrEZqcpWEXuPMX9o7aR+lDhn9KTMcIJH
+	 JpJyWAX11Wfgw9E94CG9wCFLRYUP/AIU6FPHVLhCe+JuNZvWj1QbDOP2pP9ZwZbM4Z
+	 5cYxmHfEQD37+I/89v93RXPG5obW26+Zwv/75VlH5K4wlp+o0AVR++3Dw39zfWYMLX
+	 LkDpUpNAgFRag==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 57F5E6497F;
+	Mon,  7 Oct 2024 18:10:00 +0800 (AWST)
+Message-ID: <dcaa0489e90f7c294f6b5e4858b98210766383dc.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v2 net 4/6] mctp: Handle error of rtnl_register_module().
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, Matt
+	Johnston <matt@codeconstruct.com.au>
+Date: Mon, 07 Oct 2024 18:09:59 +0800
+In-Reply-To: <20241004222358.79129-5-kuniyu@amazon.com>
+References: <20241004222358.79129-1-kuniyu@amazon.com>
+	 <20241004222358.79129-5-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 01/24] netlink: add NLA_POLICY_MAX_LEN macro
-To: Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- sd@queasysnail.net, ryazanov.s.a@gmail.com
-References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
- <20241002-b4-ovpn-v8-1-37ceffcffbde@openvpn.net> <m2msjkf2jn.fsf@gmail.com>
- <20241004063855.1a693dd1@kernel.org>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20241004063855.1a693dd1@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-Hi,
+SGkgS3VuaXl1a2ksCgo+IFNpbmNlIGludHJvZHVjZWQsIG1jdHAgaGFzIGJlZW4gaWdub3Jpbmcg
+dGhlIHJldHVybmVkIHZhbHVlCj4gb2YgcnRubF9yZWdpc3Rlcl9tb2R1bGUoKSwgd2hpY2ggY291
+bGQgZmFpbC4KPiAKPiBMZXQncyBoYW5kbGUgdGhlIGVycm9ycyBieSBydG5sX3JlZ2lzdGVyX21v
+ZHVsZV9tYW55KCkuCgpTb3VuZHMgZ29vZCEKCkp1c3QgYSBjb3VwbGUgb2YgbWlub3IgdGhpbmdz
+IGlubGluZSwgYnV0IHJlZ2FyZGxlc3M6CgpSZXZpZXdlZC1ieTogSmVyZW15IEtlcnIgPGprQGNv
+ZGVjb25zdHJ1Y3QuY29tLmF1PgoKPiBkaWZmIC0tZ2l0IGEvbmV0L21jdHAvZGV2aWNlLmMgYi9u
+ZXQvbWN0cC9kZXZpY2UuYwo+IGluZGV4IGFjYjk3YjI1NzQyOC4uZDcwZTY4OGFjODg2IDEwMDY0
+NAo+IC0tLSBhL25ldC9tY3RwL2RldmljZS5jCj4gKysrIGIvbmV0L21jdHAvZGV2aWNlLmMKPiBA
+QCAtNTI0LDI1ICs1MjQsMzEgQEAgc3RhdGljIHN0cnVjdCBub3RpZmllcl9ibG9jayBtY3RwX2Rl
+dl9uYiA9IHsKPiDCoMKgwqDCoMKgwqDCoMKgLnByaW9yaXR5ID0gQUREUkNPTkZfTk9USUZZX1BS
+SU9SSVRZLAo+IMKgfTsKPiDCoAo+IC12b2lkIF9faW5pdCBtY3RwX2RldmljZV9pbml0KHZvaWQp
+Cj4gK3N0YXRpYyBzdHJ1Y3QgcnRubF9tc2dfaGFuZGxlciBtY3RwX2RldmljZV9ydG5sX21zZ19o
+YW5kbGVyc1tdID0gewo+ICvCoMKgwqDCoMKgwqDCoHtQRl9NQ1RQLCBSVE1fTkVXQUREUiwgbWN0
+cF9ydG1fbmV3YWRkciwgTlVMTCwgMH0sCj4gK8KgwqDCoMKgwqDCoMKge1BGX01DVFAsIFJUTV9E
+RUxBRERSLCBtY3RwX3J0bV9kZWxhZGRyLCBOVUxMLCAwfSwKPiArwqDCoMKgwqDCoMKgwqB7UEZf
+TUNUUCwgUlRNX0dFVEFERFIsIE5VTEwsIG1jdHBfZHVtcF9hZGRyaW5mbywgMH0sCj4gK307CgpD
+YW4gdGhpcyAoYW5kIHRoZSBvdGhlciBoYW5kbGVyIGFycmF5cykgYmUgY29uc3Q/IEFuZCBjb25z
+ZXF1ZW50bHksIHRoZQpwb2ludGVyIGFyZ3VtZW50IHRoYXQgeW91IHBhc3MgdG8gcnRubF9yZWdp
+c3Rlcl9tb2R1bGVfbWFueSgpIGZyb20gMS82PwoKPiDCoGludCBfX2luaXQgbWN0cF9yb3V0ZXNf
+aW5pdCh2b2lkKQo+IMKgewo+ICvCoMKgwqDCoMKgwqDCoGludCBlcnI7Cj4gKwo+IMKgwqDCoMKg
+wqDCoMKgwqBkZXZfYWRkX3BhY2soJm1jdHBfcGFja2V0X3R5cGUpOwo+IMKgCj4gLcKgwqDCoMKg
+wqDCoMKgcnRubF9yZWdpc3Rlcl9tb2R1bGUoVEhJU19NT0RVTEUsIFBGX01DVFAsIFJUTV9HRVRS
+T1VURSwKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgIE5VTEwsIG1jdHBfZHVtcF9ydGluZm8sIDApOwo+IC3CoMKgwqDCoMKgwqDCoHJ0bmxf
+cmVnaXN0ZXJfbW9kdWxlKFRISVNfTU9EVUxFLCBQRl9NQ1RQLCBSVE1fTkVXUk9VVEUsCj4gLcKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtY3Rw
+X25ld3JvdXRlLCBOVUxMLCAwKTsKPiAtwqDCoMKgwqDCoMKgwqBydG5sX3JlZ2lzdGVyX21vZHVs
+ZShUSElTX01PRFVMRSwgUEZfTUNUUCwgUlRNX0RFTFJPVVRFLAo+IC3CoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbWN0cF9kZWxyb3V0ZSwgTlVM
+TCwgMCk7Cj4gK8KgwqDCoMKgwqDCoMKgZXJyID0gcmVnaXN0ZXJfcGVybmV0X3N1YnN5cygmbWN0
+cF9uZXRfb3BzKTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoZXJyKQo+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqBnb3RvIGZhaWxfcGVybmV0Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBlcnIg
+PSBydG5sX3JlZ2lzdGVyX21vZHVsZV9tYW55KG1jdHBfcm91dGVfcnRubF9tc2dfaGFuZGxlcnMp
+Owo+ICvCoMKgwqDCoMKgwqDCoGlmIChlcnIpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoGdvdG8gZmFpbF9ydG5sOwo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgcmV0dXJuIHJlZ2lzdGVy
+X3Blcm5ldF9zdWJzeXMoJm1jdHBfbmV0X29wcyk7Cj4gK291dDoKPiArwqDCoMKgwqDCoMKgwqBy
+ZXR1cm4gZXJyOwo+ICsKPiArZmFpbF9ydG5sOgo+ICvCoMKgwqDCoMKgwqDCoHVucmVnaXN0ZXJf
+cGVybmV0X3N1YnN5cygmbWN0cF9uZXRfb3BzKTsKPiArZmFpbF9wZXJuZXQ6Cj4gK8KgwqDCoMKg
+wqDCoMKgZGV2X3JlbW92ZV9wYWNrKCZtY3RwX3BhY2tldF90eXBlKTsKPiArwqDCoMKgwqDCoMKg
+wqBnb3RvIG91dDsKPiDCoH0KCkp1c3QgYHJldHVybiBlcnI7YCBoZXJlIC0gbm8gbmVlZCBmb3Ig
+dGhlIGJhY2t3YXJkcyBnb3RvIHRvIHRoZSByZXR1cm4uCgpBbmQgb25seSBpZiB5b3UgZW5kIHVw
+IHJlLXJvbGxpbmcgdGhlIHBhdGNoOiBjYW4gdGhlc2UgbGFiZWxzIGJlIGVycl8qLApzbyB0aGF0
+IHdlJ3JlIGNvbnNpc3RlbnQgd2l0aCB0aGUgcmVzdCBvZiB0aGUgZmlsZT8KCkNoZWVycywKCgpK
+ZXJlbXkK
 
-On 04/10/2024 15:38, Jakub Kicinski wrote:
-> On Fri, 04 Oct 2024 13:58:04 +0100 Donald Hunter wrote:
->>> @@ -466,6 +466,8 @@ class TypeBinary(Type):
->>>       def _attr_policy(self, policy):
->>>           if 'exact-len' in self.checks:
->>>               mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
->>> +        elif 'max-len' in self.checks:
->>> +            mem = 'NLA_POLICY_MAX_LEN(' + str(self.get_limit('max-len')) + ')'
->>
->> This takes precedence over min-length. What if both are set? The logic
->> should probably check and use NLA_POLICY_RANGE
-> 
-> Or we could check if len(self.checks) <= 1 early and throw our hands up
-> if there is more, for now?
-
-We already perform the same check in the 'else' branch below.
-It'd be about moving it at the beginning of the function and bail out if 
-true, right?
-
-Should I modify this patch and move the check above?
-
-
-Cheers,
-
-> 
->>>           else:
->>>               mem = '{ '
->>>               if len(self.checks) == 1 and 'min-len' in self.checks:
->>
->> Perhaps this should use NLA_POLICY_MIN_LEN ? In fact the current code
->> looks broken to me because the NLA_BINARY len check in validate_nla() is
->> a max length check, right?
->>
->> https://elixir.bootlin.com/linux/v6.11.1/source/lib/nlattr.c#L499
->>
->> The alternative is you emit an explicit initializer that includes the
->> correct NLA_VALIDATE_* type and sets type, min and/or max.
-> 
-> Yeah, this code leads to endless confusion. We use NLA_UNSPEC (0)
-> if min-len is set (IOW we don't set .type to NLA_BINARY). NLA_UNSPEC
-> has different semantics for len.
-> 
-> Agreed that we should probably clean this up, but no bug AFAICT.
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
 
