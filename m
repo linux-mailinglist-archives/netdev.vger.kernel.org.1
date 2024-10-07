@@ -1,132 +1,216 @@
-Return-Path: <netdev+bounces-132897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE68993AAA
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:09:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD665993AAB
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5C63B22F89
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:09:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEB5D1C22926
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:14:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D71A18BC16;
-	Mon,  7 Oct 2024 23:09:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7433B18C333;
+	Mon,  7 Oct 2024 23:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dua3BJ/Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bPh7CTTp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FF416D4E6
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 23:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F8917DFF7;
+	Mon,  7 Oct 2024 23:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728342559; cv=none; b=ZoIcseMwwPUZCkSrp2AR6uqaTZglYFsMUJbZNEIZgHmGTLbvyYBOt5SOTQVM3/xRS9zN163HmxEwOtesPC6jXpOAb3j/Q1PXaD2aJyq+MPIQGHb87eILitlMJQbnz0ClJMU3gIXNKZoedZ726cT78IVlOlVs+aI1dprPU18Esr8=
+	t=1728342848; cv=none; b=eKWdMHPR5gkgccGoGv7xZzx/pQ5/ZsTo8WTz/T4axMN4opn6G7nErKhsgOZ8nmffPE9reJouj6GmfoEgxVbKz4w8Kktkd39FxrNVBPztL9bGxki0RvBJt0BR7gyaCIEWFDRnjsqaScGllF4qrEhQZRZIcOe4xRVGzQVxd58sbqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728342559; c=relaxed/simple;
-	bh=KyxI4gAK1qf0wgwy6LgHewlej+0hnpc9z38XZNdGTh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mvwXRm+n4hWuGQdio7DWnU1iRbSURaxkbFY1FclyxH5KHgLre/bfSIXNBgsmkge0htFa8e+8obzA0J+Z3D3TSs+4DvLkU7pk79zKTepluxDUxeI2dqSvjWxLCc/hTnl1pNGRMN2mZ88VngJZX5Ztf8ufOo2gKSccYeK3hABKB+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dua3BJ/Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C3F1C4CEC6;
-	Mon,  7 Oct 2024 23:09:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728342558;
-	bh=KyxI4gAK1qf0wgwy6LgHewlej+0hnpc9z38XZNdGTh4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dua3BJ/Q3zzzVT95A68kuYI9VpFUT8mTdAsR4QQ4vuYqVQrISV1P1xtYsn+tCMlUD
-	 8yMbIlVaOMxVPGl+cS1CYg6d3B9dWYIOvpbooPxAx19PwTWCRcwIoaOqAC07V43Lfn
-	 DWmyEm3QgyFAmWyXBYXsRfyhACqfWnqWizpv6TPL7JwxwplvfF9VEydrMPK78HRCbG
-	 CYI2XkD4Q/kZb502oCelpXcUaiSGkpM59YM4NpN3YnhajXzYiuOSJl0WuInVzrHu98
-	 k1JiZWlvibyl6mjnnXaCbY6a4Nb9KIOi+ab9Knjns3riDSL0IPPqWXc7Gz70EH2lJG
-	 9Er9JEVhmbTeg==
-Date: Mon, 7 Oct 2024 16:09:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, Vadim Fedorenko
- <vadfed@meta.com>, David Ahern <dsahern@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Alexander
- Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org, Richard Cochran
- <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next v3 2/5] eth: fbnic: add initial PHC support
-Message-ID: <20241007160917.591c2d5d@kernel.org>
-In-Reply-To: <e6f541f8-ac28-4180-989a-84ee4587e21c@linux.dev>
-References: <20241003123933.2589036-1-vadfed@meta.com>
-	<20241003123933.2589036-3-vadfed@meta.com>
-	<9513f032-de89-4a6b-8e16-d142316b2fc9@intel.com>
-	<e6f541f8-ac28-4180-989a-84ee4587e21c@linux.dev>
+	s=arc-20240116; t=1728342848; c=relaxed/simple;
+	bh=0AIF3ULaOZP5ywMFjAOjrAHSRlFKos1R1CPdoyvj3jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTGeEvCw8WDZuak4r0ye3bt8n3V+0EpUcpFdetuhtudBofBYBhvC9BgBrRdTmeT4GQ4VZ+ESKHfrozhIQEleNiwUw490M2H1/hv0kxmrH8UcClekfEG+M1T506d5lylrn0Pb2OsuEIsrXkfKIq2I/iBTevBfok52S/EqTMNo92c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bPh7CTTp; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7ae6f77f3a0so354090685a.1;
+        Mon, 07 Oct 2024 16:14:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728342846; x=1728947646; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BJVPy1ShKEKA/LRD1c1fr7tzzJ2Qr9H3SAkL7CrlS9Q=;
+        b=bPh7CTTpMJKRah3BYdEpI5l7jUVUfELtqxrDXtqFhEeZNr8O44ZwNPKbLasybGr2zD
+         xP/+X4x9RYo/Uo7uMF4CpRSj2aVl1T612fNHFQjFfkifaN9EE1/oW7qJXSlz8NkiC2ZY
+         /RSCl5+dempimIXsZdYXIziS5cooRZqCXFyELhpS4PfIaX3keewhU1xpqsOtDjVtxe51
+         csCHejjK6c03GXr394P1RUVz4/Kd1QTBIS+tdy2bGq51YutkRE39EJI4EGjh0qVB5krv
+         nrnt16IiLltpNRXAHDh2rKpHTQeRN/lHU9rknrWfNtmucEyv2vkNj21WC5cnhZgUAw5+
+         k4uA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728342846; x=1728947646;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BJVPy1ShKEKA/LRD1c1fr7tzzJ2Qr9H3SAkL7CrlS9Q=;
+        b=XsEh3PnEAgcDkP+oOEceUo1GwOgfYtIf4vIflmTlfF/ixOJZiS4AATgTwLdBYJJNwJ
+         DSms6U4WDHn8V49dahu3+qNLp94VDMFMzztl9QOH/Rk4p47+B7x+45K2ao92vrrrlwwF
+         6P51rzQRP0G3GMDmCGMi7HvY/ZUmXtMRW4HvOD4pVUb8rtVH/XsCK+HHLokk6ZPTA4pl
+         OKUSeP5yb2nh4h2tySbArIS4A3U4VKrEMKNg1xSSwLhMGDVsMHwEW+zEFXi/890EidVk
+         EkzOswqKiEAZYfZu9/M8/YdF3OX0uvcxOyZ2SPHAUSEuQXZ5dHOOEelSq6H64ri60zby
+         eXrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVjUN4/8kVtAsNdUR6kXud1aUCBMB6FqHWWTLxkBZHH5BM/+gg0P1I3LpzSSxAyEx/PTFGoOuMUbwb+bZI+IEo=@vger.kernel.org, AJvYcCWkJNMf/pcxoz6PeenQSlAWJidBYz6LVGfjBAEUWCszvYY9UUX5+JGfCI9awYSYPImDmaliBeOi@vger.kernel.org, AJvYcCXyN2M004vGCODl85gtcUhKDj4asGt6ZqWAC34fDtg75k4iMm4LfdfHcwZ9rsM+EVVEVww0m2ikm9y/utg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI/Pm8hmhBOzSnbQWTHBCfl9LOHwf3IDpnJOCUueTlIFrMt58Z
+	yJEv80L+tYKsDaciJXUpm0NUkCOllbA37cDhkMqsbL8bJGkIoNC+
+X-Google-Smtp-Source: AGHT+IHmqyYpdfvoMjIamOL93vd5f2EVytwWntxMlitBH43vYlwBH2oFB2agTYHQuZWcaPE7L+4Pmw==
+X-Received: by 2002:a05:620a:19a2:b0:7a4:d685:caa9 with SMTP id af79cd13be357-7ae6f488699mr2106721685a.48.1728342845676;
+        Mon, 07 Oct 2024 16:14:05 -0700 (PDT)
+Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7afc59627eesm2096185a.53.2024.10.07.16.14.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 16:14:05 -0700 (PDT)
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfauth.phl.internal (Postfix) with ESMTP id 7B3F51200071;
+	Mon,  7 Oct 2024 19:14:04 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Mon, 07 Oct 2024 19:14:04 -0400
+X-ME-Sender: <xms:PGsEZwLEzswepd5YIxHNRFlgeMh8KQMA-zHsCMQCXXskpWnfv650jQ>
+    <xme:PGsEZwJd8a1ISG7fYwtfAASnAhn66mnY7ni6AqMDM7tIJCCjzE5W5dXqj7CwhC6Ht
+    5I9Ysts-F74hVQQdA>
+X-ME-Received: <xmr:PGsEZwu-jFrC_aoDE90d8_gCUNC1FI7LgECIoI29PbPLoTR4bAYAylFOyl9afQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeftddgvddtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
+    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
+    gtohhmqeenucggtffrrghtthgvrhhnpefhtedvgfdtueekvdekieetieetjeeihedvteeh
+    uddujedvkedtkeefgedvvdehtdenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepsghoqhhunhdo
+    mhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqieelvdeghedtieegqddujeejke
+    ehheehvddqsghoqhhunhdrfhgvnhhgpeepghhmrghilhdrtghomhesfhhigihmvgdrnhgr
+    mhgvpdhnsggprhgtphhtthhopeduledpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoh
+    eprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtoheprghlihgtvghrhihhlhesghho
+    ohhglhgvrdgtohhmpdhrtghpthhtohepfhhujhhithgrrdhtohhmohhnohhrihesghhmrg
+    hilhdrtghomhdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopehruhhsthdqfhhorhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprhgt
+    phhtthhopehtmhhgrhhoshhssehumhhitghhrdgvughupdhrtghpthhtohepohhjvggurg
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvgigrdhgrgihnhhorhesghhmrghi
+    lhdrtghomh
+X-ME-Proxy: <xmx:PGsEZ9Y4sgHSHIzPoUVddkhodcZLG_gEHwgDH4kUB4fSaXrRx-9dSQ>
+    <xmx:PGsEZ3Y7fg3ALo24zfV-XzZiMbCqt8SvIMTh8S3POz1_4d3ZtrB6fg>
+    <xmx:PGsEZ5Dx2c0U_hDglMHw2A7C8jNaNdFtNNsj7y02rF0HLsEMj5LiSg>
+    <xmx:PGsEZ9bLMHgvsiG1Za9h2dVJdFDnnt_2F0c0DyttSx0TNtXnzVhEqA>
+    <xmx:PGsEZ_ra4Ym8QIYONV-kFQEICIiTEhbgK-ogcEEZYT2xElpqzGhFvwnz>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 7 Oct 2024 19:14:04 -0400 (EDT)
+Date: Mon, 7 Oct 2024 16:12:44 -0700
+From: Boqun Feng <boqun.feng@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Alice Ryhl <aliceryhl@google.com>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, anna-maria@linutronix.de,
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
+Message-ID: <ZwRq7PzAPzCAIBVv@boqun-archlinux>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+ <20241005122531.20298-6-fujita.tomonori@gmail.com>
+ <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+ <ZwG8H7u3ddYH6gRx@boqun-archlinux>
+ <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
+ <ZwPT7HZvG1aYONkQ@boqun-archlinux>
+ <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
+ <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
+ <ZwPsdvzxQVsD7wHm@boqun-archlinux>
+ <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
 
-On Mon, 7 Oct 2024 14:07:17 +0100 Vadim Fedorenko wrote:
-> On 05/10/2024 00:05, Jacob Keller wrote:
-> > On 10/3/2024 5:39 AM, Vadim Fedorenko wrote:  
-> >> +/* FBNIC timing & PTP implementation
-> >> + * Datapath uses truncated 40b timestamps for scheduling and event reporting.
-> >> + * We need to promote those to full 64b, hence we periodically cache the top
-> >> + * 32bit of the HW time counter. Since this makes our time reporting non-atomic
-> >> + * we leave the HW clock free running and adjust time offsets in SW as needed.
-> >> + * Time offset is 64bit - we need a seq counter for 32bit machines.
-> >> + * Time offset and the cache of top bits are independent so we don't need
-> >> + * a coherent snapshot of both - READ_ONCE()/WRITE_ONCE() + writer side lock
-> >> + * are enough.
-> >> + */
-> >> +  
+On Mon, Oct 07, 2024 at 07:13:40PM +0200, Andrew Lunn wrote:
+> > > pub fn might_sleep() {
+> > >     // SAFETY: Always safe to call.
+> > >     unsafe { bindings::might_sleep() };
 > > 
-> > If you're going to implement adjustments only in software anyways, can
-> > you use a timecounter+cyclecounter instead of re-implementing?  
+> > It's not always safe to call, because might_sleep() has a
+> > might_resched() and in preempt=voluntary kernel, that's a
+> > cond_resched(), which may eventually call __schedule() and report a
+> > quiescent state of RCU. This could means an unexpected early grace
+> > period, and that means a potential use-afer-free.
 > 
-> Thanks for pointing this out, I'll make it with timecounter/cyclecounter
-
-Please don't, the clock is synthonized, we only do simple offsetting.
-
-> >> +/* Period of refresh of top bits of timestamp, give ourselves a 8x margin.
-> >> + * This should translate to once a minute.
-> >> + * The use of nsecs_to_jiffies() should be safe for a <=40b nsec value.
-> >> + */
-> >> +#define FBNIC_TS_HIGH_REFRESH_JIF	nsecs_to_jiffies((1ULL << 40) / 16)
-> >> +
-> >> +static struct fbnic_dev *fbnic_from_ptp_info(struct ptp_clock_info *ptp)
-> >> +{
-> >> +	return container_of(ptp, struct fbnic_dev, ptp_info);
-> >> +}
-> >> +
-> >> +/* This function is "slow" because we could try guessing which high part
-> >> + * is correct based on low instead of re-reading, and skip reading @hi
-> >> + * twice altogether if @lo is far enough from 0.
-> >> + */
-> >> +static u64 __fbnic_time_get_slow(struct fbnic_dev *fbd)
-> >> +{
-> >> +	u32 hi, lo;
-> >> +
-> >> +	lockdep_assert_held(&fbd->time_lock);
-> >> +
-> >> +	do {
-> >> +		hi = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI);
-> >> +		lo = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_LO);
-> >> +	} while (hi != fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI));
-> >> +  
-> > 
-> > How long does it take hi to overflow? You may be able to get away
-> > without looping.  
+> How does C handle this?
 > 
-> According to comment above it may take up to 8 minutes to overflow, but
-> the updates to the cache should be done every minute. We do not expect
-> this cycle to happen often.
+> I'm not an RCU person...
 > 
-> > I think another way to implement this is to read lo, then hi, then lo
-> > again, and if lo2 is smaller than lo, you know hi overflowed and you can
-> > re-read hi  
+> But if you have called might_sleep() you are about to do something
+> which could sleep. If it does sleep, the scheduler is going to be
+> called, the grace period has ended, and RCU is going to do its
+> thing. If that results in a use-after-free, your code is
+> broken. might_sleep makes no difference here, the code is still
+> broken, it just happens to light the fuse for the explosion a bit
+> earlier.
 > 
-> That's an option too, I'll think of it, thanks!
 
-The triple read is less neat in case hi jumps by more than 1.
+Because of the might_resched() in might_sleep(), it will report the
+quiescent state of the current CPU, and RCU will pass a grace period if
+all CPUs have passed a quiescent state. So for example if someone writes
+the following:
 
+    <reader>			<updater>
+    rcu_read_lock();
+    p = rcu_dereference(gp);
+    might_sleep():
+      might_resched():
+				todo = gp;
+				rcu_assign_pointer(gp, NULL);
+				synchronize_rcu();
+
+        rcu_all_qs(); // report a quiescent state inside RCU read-side
+	              // critical section, which may make a grace period
+		      // pass even there is an active RCU reader
+
+				kfree(todo);
+
+    a = READ_ONCE(p->a); // UAF
+    rcu_read_unlock();
+
+We probably call the reader side code a "wrong annotation", however,
+it's still unsafe code because of the UAF. Also you seems to assume that
+might_sleep() is always attached to a sleepable function, which is not
+an invalid assumption, but we couldn't use it for reasoning the
+safe/unsafe property of Rust functions unless we can encode this in the
+type system. For Rust code, without klint rule, might_sleep() needs to
+be unsafe. So we have two options for might_sleep().
+
+* Since we rely on klint for atomic context detection, we can mark the
+  trivial wrapper (as what Alice presented in the other email) as safe,
+  but we need to begin to add klint annotation for that function, unless
+  Gary finds a smart way to auto-annotate functions.
+
+* Instead of might_sleep(), we provide the wrapper of __might_sleep(),
+  since it doesn't have might_resched() in it, it should be safe. And
+  all we care about here is the debugging rather than voluntary context
+  switch. (Besides I think preempt=volunatry is eventually going to be
+  gone because of PREEMPT_AUTO [1], if that happens I think the
+  might_resched() might be dropped entirely).
+
+Does this make sense?
+
+[1]: https://lore.kernel.org/lkml/20240528003521.979836-1-ankur.a.arora@oracle.com/
+
+Regards,
+Boqun
+
+> Or, i'm missing something, not being an RCU person.
+> 
+> 	Andrew
 
