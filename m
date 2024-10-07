@@ -1,168 +1,141 @@
-Return-Path: <netdev+bounces-132701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83EC3992DAE
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:48:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68189992DB1
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 048091F21A56
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:48:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C24A1C220EB
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36871D4326;
-	Mon,  7 Oct 2024 13:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FC61D4326;
+	Mon,  7 Oct 2024 13:48:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fcXenWxY";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="uycR1gYD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="v7eN2z1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA901D2B1B;
-	Mon,  7 Oct 2024 13:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BAC1D2223;
+	Mon,  7 Oct 2024 13:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728308886; cv=none; b=sKvIGgv7VLUtxU/LP8H8uu6e6yEz+ePhLED9bujTrW9wxuS2YZcj9g6/Sr9Qicdc2syFJk1apvF+jZTO1ejYpqCIKlLD7vWssUDxJpVIqGgXqXCagM8l4wDHZPAfiQZQQ2mEkQ+eEaEHak/NJBnagpyK4uKFh+HG5oV3Z134Vqw=
+	t=1728308912; cv=none; b=hf3ifbTYMVcAjdH+K4iPqkB/Dr/joFD69mpEMaZXJ6JH5yddf6T1xhXORrjlCA0K/sDf+G3nO2aVTI/XlVqp3f5n77Iw8Z6cIWMpD2D7gWKwUF7a6Vfg/tGfZPg42QYwrX+syHG2sPcc1KLXzZBHH03S6md41im1QMEIbfZTY4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728308886; c=relaxed/simple;
-	bh=xo5Qc8fWt2E4M176sLxxEYhptKrDLxzLQqtDN34v9b0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f1pMFWR/e7O5/w3LHOrSfOvS42frZ1U/Kcd6jVn0z5Uc3IuHwbG1S003A5mzOX+OxEAabPR0VosjUlifawsHJgVTXhQPK2NSBCG80zd6e8McdRsnuU3ULTQ+XNoPdlSz+ymtIuI1uMMoRiaAW5ngWkYkiw8RLc5VMrU1liD8b5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fcXenWxY; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=uycR1gYD; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1728308883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/CMEPpVEE6fy3UEb+JX8XqWy4ReKkQZ2Nee5KJh8d/0=;
-	b=fcXenWxYppf4B3MgjuL064fGlAUEFe1lUp1CKZVXRONISZCaqx34CPlgsA9H3QSGAbYqEK
-	cjNvhGMGB7TLtyzmvfQAGl7ci9uo6to4sfuK6miJHymST2UKXaUxiqlisyyufbDIejlAkX
-	qxw9Z1hIxAelAYaLwwf32j2XFt/fhzwP1tnXr7O1pZU2ymcbgl/DlXFIWgc9VEAYmlTxsu
-	Ph5ZXfjoLr0tv2kxhaZ58obNzONOPNYrxXqvcw0U65tm0yq3l+WqNNXgy64njzlXE5aTp/
-	b5evre4s09feOeHeZCa5ju6yUw/NpHhylZAjHn3n3+6Wsawkk4tXTuIlKyFLNw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1728308883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/CMEPpVEE6fy3UEb+JX8XqWy4ReKkQZ2Nee5KJh8d/0=;
-	b=uycR1gYDgxQPnbwBcdIYakrl/MLcbeIXwkYNCh6hLRKdncJULrn57s71HsL7JlVFPJK8g4
-	BVBnxR7dPoRnulAw==
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Richard Cochran
- <richardcochran@gmail.com>, Sriram Yagnaraman
- <sriram.yagnaraman@ericsson.com>, Benjamin Steinke
- <benjamin.steinke@woks-audio.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, Sriram Yagnaraman
- <sriram.yagnaraman@est.tech>
-Subject: Re: [PATCH iwl-next v7 5/5] igb: Add AF_XDP zero-copy Tx support
-In-Reply-To: <ZwPfARyIRE+MvqyK@boxer>
-References: <20241007-b4-igb_zero_copy-v7-0-23556668adc6@linutronix.de>
- <20241007-b4-igb_zero_copy-v7-5-23556668adc6@linutronix.de>
- <ZwPfARyIRE+MvqyK@boxer>
-Date: Mon, 07 Oct 2024 15:48:01 +0200
-Message-ID: <87h69o3tym.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1728308912; c=relaxed/simple;
+	bh=aNfKhpR+COGAnurrQ1qEerAhVLsQXkQtnBVsPQoSfMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pcozi52amN1dE7eVNGPYtfxd6i3SAb7DEZMq3EG+xmDeh+s1Q0oCT8KMYhyEZeqelzyiZf9TqAYCvOU02N8Z4Pzoy5/4eyRxMoQBGcwbrNjBBYGVd+FqI0aHyM11XmJDWyPgCkvNYEHwpwlrUUPYnKoqwzSh/Nef2439C0wiTMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=v7eN2z1T; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=zbDRG+fwMPbFuvhcpRI9/YsPLmcflro4JIwDOxVyV7E=; b=v7eN2z1TVnKvaGtrEhYPpmvcqG
+	1vKz3QGMgAEt0Ox91HV2wx8QhJPUTklG3d6XyHc7A/IFc3aSxI+QcJABcvvwltGpZ+JpiR9V6V8Df
+	grGl2TlUGkTQkI6VWfqS5ejQxh64lRBc9HRqqwJbfCAFAXYJnzroYtwm+1CzuDVAdjQE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sxo5p-009GeI-5l; Mon, 07 Oct 2024 15:48:09 +0200
+Date: Mon, 7 Oct 2024 15:48:09 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Boqun Feng <boqun.feng@gmail.com>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
+Message-ID: <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+ <20241005122531.20298-6-fujita.tomonori@gmail.com>
+ <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
+ <ZwG8H7u3ddYH6gRx@boqun-archlinux>
+ <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
+ <ZwPT7HZvG1aYONkQ@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZwPT7HZvG1aYONkQ@boqun-archlinux>
 
---=-=-=
-Content-Type: text/plain
+On Mon, Oct 07, 2024 at 05:28:28AM -0700, Boqun Feng wrote:
+> On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
+> [...]
+> > > > > +    if sleep {
+> > > > > +        // SAFETY: FFI call.
+> > > > > +        unsafe { bindings::might_sleep() }
+> > > > > +    }
+> > > > 
+> > > > What is actually unsafe about might_sleep()? It is a void foo(void)
+> > > 
+> > > Every extern "C" function is by default unsafe, because C doesn't have
+> > > the concept of safe/unsafe. If you want to avoid unsafe, you could
+> > > introduce a Rust's might_sleep() which calls into
+> > > `bindings::might_sleep()`:
+> > > 
+> > > 	pub fn might_sleep() {
+> > > 	    // SAFETY: ??
+> > > 	    unsafe { bindings::might_sleep() }
+> > > 	}
+> > > 
+> > > however, if you call a might_sleep() in a preemption disabled context
+> > > when CONFIG_DEBUG_ATOMIC_SLEEP=n and PREEMPT=VOLUNTERY, it could means
+> > > an unexpected RCU quiescent state, which results an early RCU grace
+> > > period, and that may mean a use-after-free. So it's not that safe as you
+> > > may expected.
+> > 
+> > If you call might_sleep() in a preemption disabled context you code is
+> > already unsafe, since that is the whole point of it, to find bugs
+> 
+> Well, in Rust, the rule is: any type-checked (compiled successfully)
+> code that only calls safe Rust functions cannot be unsafe. So the fact
+> that calling might_sleep() in a preemption disabled context is unsafe
+> means that something has to be unsafe.
+> 
+> This eventually can turn into a "blaming game" in the design space: we
+> can either design the preemption disable function as unsafe or the
+> might_sleep() function as unsafe. But one of them has to be unsafe
+> function, otherwise we are breaking the safe code guarantee.
 
-On Mon Oct 07 2024, Maciej Fijalkowski wrote:
->> +bool igb_xmit_zc(struct igb_ring *tx_ring)
->> +{
->> +	unsigned int budget = igb_desc_unused(tx_ring);
->> +	struct xsk_buff_pool *pool = tx_ring->xsk_pool;
->> +	u32 cmd_type, olinfo_status, nb_pkts, i = 0;
->> +	struct xdp_desc *descs = pool->tx_descs;
->> +	union e1000_adv_tx_desc *tx_desc = NULL;
->> +	struct igb_tx_buffer *tx_buffer_info;
->> +	unsigned int total_bytes = 0;
->> +	dma_addr_t dma;
->> +
->> +	if (!netif_carrier_ok(tx_ring->netdev))
->> +		return true;
->> +
->> +	if (test_bit(IGB_RING_FLAG_TX_DISABLED, &tx_ring->flags))
->> +		return true;
->> +
->> +	nb_pkts = xsk_tx_peek_release_desc_batch(pool, budget);
->> +	if (!nb_pkts)
->> +		return true;
->> +
->> +	while (nb_pkts-- > 0) {
->> +		dma = xsk_buff_raw_get_dma(pool, descs[i].addr);
->> +		xsk_buff_raw_dma_sync_for_device(pool, dma, descs[i].len);
->> +
->> +		tx_buffer_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
->> +		tx_buffer_info->bytecount = descs[i].len;
->> +		tx_buffer_info->type = IGB_TYPE_XSK;
->> +		tx_buffer_info->xdpf = NULL;
->> +		tx_buffer_info->gso_segs = 1;
->> +		tx_buffer_info->time_stamp = jiffies;
->> +
->> +		tx_desc = IGB_TX_DESC(tx_ring, tx_ring->next_to_use);
->> +		tx_desc->read.buffer_addr = cpu_to_le64(dma);
->> +
->> +		/* put descriptor type bits */
->> +		cmd_type = E1000_ADVTXD_DTYP_DATA | E1000_ADVTXD_DCMD_DEXT |
->> +			   E1000_ADVTXD_DCMD_IFCS;
->> +		olinfo_status = descs[i].len << E1000_ADVTXD_PAYLEN_SHIFT;
->> +
->> +		cmd_type |= descs[i].len | IGB_TXD_DCMD;
->
-> I forgot if we spoke about this but you still set RS bit for each produced
-> desc. Probably we agreed that since cleaning side is shared with 'slow'
-> path it would be too much of an effort to address that?
+Just keep in mind, it could of been C which put you into atomic
+context before calling into Rust. An interrupt handler would be a good
+example, and i'm sure there are others.
 
-Yes, and i believe we agreed that this needs to be addressed later, also
-for igc.
+> However, this is actually a special case: currently we want to use klint
+> [1] to detect all context mis-matches at compile time. So the above rule
+> extends for kernel: any type-checked *and klint-checked* code that only
+> calls safe Rust functions cannot be unsafe. I.e. we add additional
+> compile time checking for unsafe code. So if might_sleep() has the
+> proper klint annotation, and we actually enable klint for kernel code,
+> then we can make it safe (along with preemption disable functions being
+> safe).
+> 
+> > where you use a sleeping function in atomic context. Depending on why
+> > you are in atomic context, it might appear to work, until it does not
+> > actually work, and bad things happen. So it is not might_sleep() which
+> > is unsafe, it is the Rust code calling it.
+> 
+> The whole point of unsafe functions is that calling it may result into
+> unsafe code, so that's why all extern "C" functions are unsafe, so are
+> might_sleep() (without klint in the picture).
 
->
-> Could you add a FIXME/TODO here so that we won't lose this from our
-> radars?
+There is a psychological part to this. might_sleep() is a good debug
+tool, which costs very little in normal builds, but finds logic bugs
+when enabled in debug builds. What we don't want is Rust developers
+not scattering it though their code because it adds unsafe code, and
+the aim is not to have any unsafe code.
 
-Sure.
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcD5pETHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgsWdD/9yy16yaYLB4R5GpXSpQa/47OdSmlNU
-38nE4hLd6bLrnhVvu5XEoglQyPn0jciYPw69b45JXi5y/Fe/Whegtw+jYC8/StB1
-j3RPnd47yX5vvmwn6+413ybpiE+fk1yBKmhjhMj8VLjGb6ejFC7J6L65q0k4CvbZ
-jx1XfF+0b58+ZTyjSLAi3KJhjkMFfsmdosVm6Rqqqeui5ZICTXTrjKWizj/8rDR0
-nv4DLRFgPdhYpD+xbjtDT5D7eBnkXI3kwznQHdVreimI2Niv5TOqc9vHa8RIbqHw
-rdFK3ihLAmcKm4vApDXdHnkAl3SQMdWQX5JNE+X4DL4Cd1DP2iMpsXYn9RNgtdw+
-2Ogmn9joZiVrtXAzt0aijkXzQFO8S7fo36EjJ8Wkx9mMHcUjHth1WJn3i/tB/1+5
-Y/m0HxSvGGreoQ1ApECJJkToYcaWZwmyd66C7u2mg0jQSEipqtTavFNWyaBIq7OR
-REIlkZTfoRaa7mrcJXMEbNprJGFZwQ3VlXUii7ps02Yce35+QAZF5cB44IPue77O
-5uWWIWKX2QGMyXdx2NTSWngo0iidI+VQfxBNKut5zIcBBEBxZDOjumJevWedPsrV
-3SlQOW3uoopIdRbu18Cw3TZQoSR2/Nxn6zfWO3R+pyplWRH3gDWcrVW7Dewic+2v
-PYzAZE+2VlG36w==
-=b4js
------END PGP SIGNATURE-----
---=-=-=--
+	Andrew
 
