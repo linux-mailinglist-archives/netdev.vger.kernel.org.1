@@ -1,63 +1,96 @@
-Return-Path: <netdev+bounces-132773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F4209931E4
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:47:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 651629931EC
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46A0C283710
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:47:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D91028153D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BB1D1DA0E3;
-	Mon,  7 Oct 2024 15:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020601D7E26;
+	Mon,  7 Oct 2024 15:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fspEXU0c"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gset2AdH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8B21D9586;
-	Mon,  7 Oct 2024 15:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B951D9678
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 15:47:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728315965; cv=none; b=TrzVxtA8B8bZmzo+T+hTjqQ+LaXE39MvTPKtbMywLiDvIIk/vLSKFE6lHA4KLQ1bYxozIxo2tYuUVvBpA0oIIrB+MBbci5Gd/uFuJI5rMkjCeRgjrME9Rf5zsmU//5LbGIJbit7kUG7o0xNQCOWp5X7IWbJv4uXc/2LvRQuFevk=
+	t=1728316033; cv=none; b=BxZ8TSNH0WweZhHxXFWNr3WGAPsB70m1eDdipxlRAdbhJZhGqVwXaiv0Sqp53cbYFWFY5Piin95Lxqj+CeVmXxEfWghfia2pgPFYScQW4bk+XT6UiwL6vL8xdvwNYkmUeHppwaa5bk0KyvfuW6OX/Xy/WIKPv1u/DCMMW3Np3IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728315965; c=relaxed/simple;
-	bh=YF2quWFfUxbOrdhVM7of8Em3TPYeDZiF/j8pa4mXDek=;
+	s=arc-20240116; t=1728316033; c=relaxed/simple;
+	bh=DQZCNIJ48pE5/m76HV8ZC97oJTUUoycjro9TNIIqwwI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sMNo/if3/fufAHH4KjRj8LKA/YX1I+gKTR9QNwdSVJDIyxMY3TyEdQBP9+4z5apaUCwKGSV0Z0b9A8awlEQVPvFLBg15XPHurKW3sjZmLpy/1f/5LkgJcj+Z0f6Ol5tBAsDoD0mOFdRHZltQkDkD7hw2TPa0QIHRNdoXCJUyEcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fspEXU0c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 852ECC4CEC6;
-	Mon,  7 Oct 2024 15:46:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728315964;
-	bh=YF2quWFfUxbOrdhVM7of8Em3TPYeDZiF/j8pa4mXDek=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fspEXU0c388pwr2EOSeCw0NAENjD5s0jyPIPf/QqmL8O3E0ZTpQDFkdFOy/xkMSsa
-	 JWrT2wIpNqnkP3tdllbHQzoLW/QCKxRYvcki8DYSO4kIWLtMo5awHJZu/r8H6VyVBZ
-	 dl1D/7dM8Upv6++EprLBkvD9rI9LAJpnmuukM6Q7G+FdYJs1UnAYLAiwVuEINKEINF
-	 ZblExvqFYQWWWTFghbKBJd8jPT1sEcnSEjpdoyMH2IYXaFdHRkhPyWNJbDDgW6dZSt
-	 3JSzrIFWUCnARlDmDlxwut+WR9Et5zihcF9bplqsUrNEUVO23qwoAzP3GETwQxB+PL
-	 w822gcFLC8YDA==
-Date: Mon, 7 Oct 2024 16:46:00 +0100
-From: Simon Horman <horms@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FuMAT7ur9BoJ0rxZ6Glrb2ojhBPjjXQJfJnAo2riy/lisiHQcswq6IyQ0PmIDgTF1mSw3X58Arnr34BvlEdM8DSIdlWEhpqlO5rHV95SUNtMtBWrp9FNqvPXG8oB/l+8Obw7ksyDa1tDJiyFhJZseGZ58w5+EftmAwPahGPKYto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gset2AdH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728316031;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j/qSM1gi+xzbWol0GgR9iU7ZEDf5izrAUc1BvVzk/UM=;
+	b=gset2AdHW3G7CNgu3YRex9lVmKwCC8IwvtP/WOSic/5A7d530JEO5b/49ySfk2M6QfmcCn
+	Dm8ASKrAhsOiefdsA7zF94Y0ACbIdWl4g/MegATC1l9KRh+ljM8Q492hMGjxkVDaMz0/Qq
+	/hHAAupzlJmmBUcmhYfB4VIv0YV/TcE=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-110-fHE-UqrTOeeXA3bN-b7bdA-1; Mon, 07 Oct 2024 11:47:09 -0400
+X-MC-Unique: fHE-UqrTOeeXA3bN-b7bdA-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5398b8cb3cdso3442473e87.1
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 08:47:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728316028; x=1728920828;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j/qSM1gi+xzbWol0GgR9iU7ZEDf5izrAUc1BvVzk/UM=;
+        b=MnUpvZTBhFOLAn+7C7DU3U/vD2aPPSA0o+dDpfoCRau1UxXb4mGXVTtfS8dAg4oqkt
+         bruMUYlJlnfnbTuCMYuxAnN0hZHQ0wVywz4ZPeAum9H3OSFEAqxou0QgqplH6jws/w89
+         w+FaXrmksqeOJeU+1UYfwcdMBcUUtLvxZWWV31NX/3DhtJL1KHO48/KR2rxBDlmZ8YGH
+         Opth/t5N/urTpFBYruOyxrQgy089/JpZ+7s8y11xvH1/ODau5k1J6Avyqtmgo+uSGkd4
+         PX2/NazMCaPYLKnR3VB/O7lOIUcnZMZ7hp2al0uY8xEpVfS7towvwfXSmbla8AwQxq79
+         py3g==
+X-Forwarded-Encrypted: i=1; AJvYcCVZGhBp8RUHGVBzCD5JDAuwSSip/1b22Q68bg0u7j8DbK39c07a8eeVu60w7waGVAc2P3QKV4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN53gd72fs4pQSLxJGwAaUCzpVeQUKD/vlkos1FUEWFmBz+uzS
+	RYmiO14CxUSZMqinZVHoM5W437ARNb6gYA5TQPCuNoa0kOAfFz9FSATlTwM0Z92bSYjQ5EMdvDk
+	OH4xX540bf1Zdpd5+BOpKISfhgq26+I4sS1M6bxd1RrSVUkOdZxs7iA==
+X-Received: by 2002:a05:6512:3b20:b0:52c:dbe7:cfd5 with SMTP id 2adb3069b0e04-539ab88ad63mr5809844e87.32.1728316028359;
+        Mon, 07 Oct 2024 08:47:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFI5CdxaS7NGjXGnhFpfvKBPg6dFQrE1IAMYDLqlZB8GcB73cj72b1bEGAmRYzgtVhZ1Lo4Kw==
+X-Received: by 2002:a05:6512:3b20:b0:52c:dbe7:cfd5 with SMTP id 2adb3069b0e04-539ab88ad63mr5809803e87.32.1728316027827;
+        Mon, 07 Oct 2024 08:47:07 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:174:8906:45ec:feb4:98e4:6184])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-539aff1d13bsm890443e87.139.2024.10.07.08.47.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 08:47:07 -0700 (PDT)
+Date: Mon, 7 Oct 2024 11:46:59 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+Cc: linux-kernel@vger.kernel.org, Christian Brauner <brauner@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Luigi Leonardi <luigi.leonardi@outlook.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Lennart Franzen <lennart@lfdomain.com>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Marco Pinna <marco.pinn95@gmail.com>,
+	virtualization@lists.linux.dev, kvm@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error
- handling path in adin1110_read_fifo()
-Message-ID: <20241007154600.GH32733@kernel.org>
-References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
- <63dbd539-2f94-4b68-ab4e-c49e7b9d2ddd@stanley.mountain>
- <20241004110952.545402d0@kernel.org>
+Subject: Re: [PATCH] vsock/virtio: use GFP_ATOMIC under RCU read lock
+Message-ID: <20241007114637-mutt-send-email-mst@kernel.org>
+References: <3fbfb6e871f625f89eb578c7228e127437b1975a.1727876449.git.mst@redhat.com>
+ <20241007083920.185578a7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,17 +99,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004110952.545402d0@kernel.org>
+In-Reply-To: <20241007083920.185578a7@kernel.org>
 
-On Fri, Oct 04, 2024 at 11:09:52AM -0700, Jakub Kicinski wrote:
-> On Fri, 4 Oct 2024 14:47:22 +0300 Dan Carpenter wrote:
-> > It's a pity that deliberately doing a "return ret;" when ret is zero is so
-> > common.  Someone explained to me that it was "done deliberately to express that
-> > we were propagating the success from frob_whatever()".  No no no!
+On Mon, Oct 07, 2024 at 08:39:20AM -0700, Jakub Kicinski wrote:
+> On Wed, 2 Oct 2024 09:41:42 -0400 Michael S. Tsirkin wrote:
+> > virtio_transport_send_pkt in now called on transport fast path,
+> > under RCU read lock. In that case, we have a bug: virtio_add_sgs
+> > is called with GFP_KERNEL, and might sleep.
+> > 
+> > Pass the gfp flags as an argument, and use GFP_ATOMIC on
+> > the fast path.
 > 
-> FWIW I pitched to Linus that we should have a err_t of some sort for
-> int variables which must never be returned with value of 0.
-> He wasn't impressed, but I still think it would be useful :)
+> Hi Michael! The To: linux-kernel@vger.kernel.org doesn't give much info
+> on who you expect to apply this ;) Please let us know if you plan to
+> take it via your own tree, otherwise we'll ship it to Linus on Thu.
 
-FWIIW, I think something like that would be quite nice.
+Hi!
+It's in my tree, was in the process of sending a pull request actually.
+
 
