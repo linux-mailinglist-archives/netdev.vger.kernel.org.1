@@ -1,147 +1,169 @@
-Return-Path: <netdev+bounces-132659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52055992B80
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:20:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EC5A992B9A
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16140286465
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:20:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D6D6B231AA
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C16BD1D2B10;
-	Mon,  7 Oct 2024 12:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28181D2716;
+	Mon,  7 Oct 2024 12:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Rz397/jq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OOrKqUFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B6B1D2780;
-	Mon,  7 Oct 2024 12:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244141D26EE
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 12:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728303567; cv=none; b=UWvKcEEbR7MksdQ9Zo6RiuREl/+LJDZfwq6uEglJ4K/7MFSbLiuYmaTB4mgvbzfFySfBfd2jttDXwQz9Au073RfNgjIpVXmzwy8NJv22UJQW8V2T+7SMHJragENe07HnebyCCqJAEfO3xvAIs8LELBvm0ChauZw0Pi66qqlX4Hw=
+	t=1728303859; cv=none; b=s4AsqSfkGzEkD108a3nOBjlsPv6zD+0r36pXQojGMhV+HDhRva3YH233ltg/m+iuiEbYPiRipGwwChR/5vrPaBwG1bv61LeGH8zMMAyAKkDsXlKQQf5IorrvzcleY3zfXzne3DQ7SEuN8emD02mHxptjF7qmp7S3IShrOmP8MEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728303567; c=relaxed/simple;
-	bh=XVB7UJJCr/qf0hPwflV9ZKUcwosiuI4w7GG7pLjN4kg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y8wyFe667bYL2Fq2RvgJvwBryiuYIeBX3GGk0sZws1Xp0bvT868tyWElTlQ08pIUaEoEH9bJ469Sw0P6CmMMbduI+B0gS1ZJxuKu9xZ2GReOp+wg8B0GCGkEBwTMfR182DfI7GMTmqRpK4ctFVIulTUK/SU2sn9Vb/BT20S9Ym4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Rz397/jq; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6896020005;
-	Mon,  7 Oct 2024 12:19:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728303557;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pg580Ry3VlAsGHyS5CkIwdwzGTxEmOyviaHGBYrll7U=;
-	b=Rz397/jqnTAX2f3W9lIe5fqhET3C/f0si4x4DYwKOQwJbigCR+dSvf5JQWnrNejcNwvBTQ
-	FrgHfZSHvnCtl9FydhqGEMlpUQ2A28DBj+/1iz5ClI18JswkDp3g9AITBVkpIstTvOmd9B
-	3QuZDxNSOeaMZGbhcsk+iDFW7qdbHFlfKZ+NiG2+b6FZG3rW8wZIbd5qrOtzSeL2yhHFzk
-	9kX5szIgfwZ8FFCJwb09U+Fn6K1Pw3FlJwLdAvJYwsEfkNDs4NRhXSLhOaEx+FFps5qjhi
-	3L9k8jbN4uRfAw2JXuKgsd0bZh8XZgJzojxXvyEDhr24T5T/QSxcMbdn86Tqnw==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Mon, 07 Oct 2024 14:18:50 +0200
-Subject: [PATCH ethtool-next v2 2/2] ethtool.8: Add documentation for new
- C33 PSE features
+	s=arc-20240116; t=1728303859; c=relaxed/simple;
+	bh=t8H6KKTU1kUFSyofCbDB6hb4GjQoj/UNpvlIreQ4WHo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=svvPirOinidyT6DXu3apO4i15QA7G7QzN7Hf+VuC99vzYjVrrH1UgwZz7IXhrIHtoFQmE6zwGyiaEVNHPiLQGHLRVXDCdywnZU45l8t4492tAjCdX+k6HcJx6ppVDXXqbTEoKuhAAfyo7GIguE3gVQDqI1nltJTSlb8xO3o8nSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OOrKqUFV; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37cd26c6dd1so4364744f8f.3
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 05:24:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728303856; x=1728908656; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ku7dHoXpcBGzxmDwFlzy5O2yX7mMKyvUeFGB5ab/Z98=;
+        b=OOrKqUFVGN+til1KTL10MXwaAlvqfhdBAA8OaV/VrMm2yGAP2b+K+rBLws5vWOHClL
+         ysNc9YSd83jY9R+nvpyM16sgL51fZuB4lSgLcGPHKLKNljiOJqu+6eFiIZSM5lLYkNA8
+         ipzPteLU7kLOh6v+kFFqkcJ64PNn4JPqRzxjp7UdAJ/CZCgOAzDUZZQ/suNyknQIli93
+         9frkwkis11dzWOdgunlLuqd37ysfAm+XCAVrD+EGCemfJBxrZYeP0JmxuRdAyYaecUCm
+         oR6RbUoYasV6Nzd4Bf2OxK0wsMBc4FQ7X+Cl95JzEOByYKs4DCxhV2P1GLHkxLTfEQOP
+         kTNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728303856; x=1728908656;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ku7dHoXpcBGzxmDwFlzy5O2yX7mMKyvUeFGB5ab/Z98=;
+        b=Nvg+TZG1eaK/sDHLQVwhWtYw/QNTaG2i+J+HQ3LsWL2pIERbGde95PZIYFYp6UuH/0
+         8y3BxARabqFiUxG54W8zBwzu8Q4lUyotXr5V9V9HV1OQzXoMHjcxTJkU2svpPsVQyAwC
+         ywibTgxAh8J8JZSVMnAhKKX2Bs+BBjlKjgMEd56qFSr305S0RKH9nqUZDeLapNezq93/
+         k4ecraQzMCBZs8riJmntbpSR/i4EXffxfPfWZlhjw0nXK6kjtnxPER1SHKc1vPzryNF4
+         a3hjzGysStFX3ZVLuV/tCY1BHQDvYjdjNqzkL+VtPRRjZX7B+ydhwaD6il+BezrpB5aL
+         dVUw==
+X-Gm-Message-State: AOJu0YyB0bHLetsZ9bI0xkfx2ZWEYpb+mB8C8Arw2MTzOlwyb1ZbpBGF
+	yj2qgKnZ+UaFLODEhfMbIR0+C0XtTyzwzEo6WlTqICHRlVYqNOVmVpVart98pivEJaWvWQQ7n9L
+	D4qt5qx3p3a9LZ609dq1QAUCP8PRL5lVPqJRyy6SRM+Jum07TbQ==
+X-Google-Smtp-Source: AGHT+IH8HYWMusOnnggysgcNaVoQpA7Kkf52UHiKBHrYYgnQi3e5Rs2SF/yP/clJCEOjCdyXWS+b5b1JKOiSHyD1iX0=
+X-Received: by 2002:a5d:61ca:0:b0:37c:fbf8:fc4 with SMTP id
+ ffacd0b85a97d-37d0eaea686mr9189645f8f.59.1728303856278; Mon, 07 Oct 2024
+ 05:24:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241007-feature_poe_power_cap-v2-2-cbd1aa1064df@bootlin.com>
-References: <20241007-feature_poe_power_cap-v2-0-cbd1aa1064df@bootlin.com>
-In-Reply-To: <20241007-feature_poe_power_cap-v2-0-cbd1aa1064df@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Andrew Lunn <andrew@lunn.ch>, Michal Kubecek <mkubecek@suse.cz>
-Cc: Kyle Swenson <kyle.swenson@est.tech>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.15-dev-8cb71
-X-GND-Sasl: kory.maincent@bootlin.com
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com> <20241005122531.20298-5-fujita.tomonori@gmail.com>
+In-Reply-To: <20241005122531.20298-5-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Mon, 7 Oct 2024 14:24:03 +0200
+Message-ID: <CAH5fLgjTifsDKrxZTUTo74HR34X1zusO_7h0ftWWH-iZR_NXNA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/6] rust: time: add wrapper for fsleep function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On Sat, Oct 5, 2024 at 2:26=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Add a wrapper for fsleep, flexible sleep functions in
+> `include/linux/delay.h` which deals with hardware delays.
+>
+> The kernel supports several `sleep` functions to handle various
+> lengths of delay. This adds fsleep, automatically chooses the best
+> sleep method based on a duration.
+>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/helpers/time.c |  6 ++++++
+>  rust/kernel/time.rs | 16 ++++++++++++++++
+>  2 files changed, 22 insertions(+)
+>
+> diff --git a/rust/helpers/time.c b/rust/helpers/time.c
+> index 60dee69f4efc..0c85bb06af63 100644
+> --- a/rust/helpers/time.c
+> +++ b/rust/helpers/time.c
+> @@ -1,7 +1,13 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>
+> +#include <linux/delay.h>
+>  #include <linux/ktime.h>
+>
+> +void rust_helper_fsleep(unsigned long usecs)
+> +{
+> +       fsleep(usecs);
+> +}
+> +
+>  ktime_t rust_helper_ktime_add_ns(const ktime_t kt, const u64 nsec)
+>  {
+>         return ktime_add_ns(kt, nsec);
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index 3e00ad22ed89..5cca9c60f74a 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -5,9 +5,12 @@
+>  //! This module contains the kernel APIs related to time and timers that
+>  //! have been ported or wrapped for usage by Rust code in the kernel.
+>  //!
+> +//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
+>  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.=
+h).
+>  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
+>
+> +use core::ffi::c_ulong;
+> +
+>  /// The number of nanoseconds per microsecond.
+>  pub const NSEC_PER_USEC: i64 =3D bindings::NSEC_PER_USEC as i64;
+>
+> @@ -178,3 +181,16 @@ fn add(self, delta: Delta) -> Ktime {
+>          Ktime::from_raw(t)
+>      }
+>  }
+> +
+> +/// Sleeps for a given duration.
+> +///
+> +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
+> +/// which automatically chooses the best sleep method based on a duratio=
+n.
+> +///
+> +/// `Delta` must be longer than one microsecond.
+> +///
+> +/// This function can only be used in a nonatomic context.
+> +pub fn fsleep(delta: Delta) {
+> +    // SAFETY: FFI call.
+> +    unsafe { bindings::fsleep(delta.as_micros() as c_ulong) }
+> +}
 
-Add documentation to described the newly C33 PSE features supported.
+This rounds down. Should this round it up to the nearest microsecond
+instead? It's generally said that fsleep should sleep for at least the
+provided duration, but that it may sleep for longer under some
+circumstances. By rounding up, you preserve that guarantee.
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- ethtool.8.in | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Also, the note about always sleeping for "at least" the duration may
+be a good fit for the docs here as well.
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 151e520..1bd524d 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -545,6 +545,7 @@ ethtool \- query or control network driver and hardware settings
- .BR enable | disable ]
- .RB [ c33\-pse\-admin\-control
- .BR enable | disable ]
-+.BN c33\-pse\-avail\-pw\-limit N
- .HP
- .B ethtool \-\-flash\-module\-firmware
- .I devname
-@@ -1815,6 +1816,36 @@ status depend on internal PSE state machine and automatic PD classification
- support. It corresponds to IEEE 802.3-2022 30.9.1.1.5
- (aPSEPowerDetectionStatus) with potential values being
- .B disabled, searching, delivering power, test, fault, other fault
-+.TP
-+.B c33-pse-extended-state
-+This attribute indicates the Extended state of the c33 PSE. The extended
-+state correlated with the c33 PSE Extended Substate allows to have more
-+detail on the c33 PSE current error state.
-+It corresponds to IEEE 802.3-2022 33.2.4.4 Variables.
-+.TP
-+.B c33-pse-extended-substate
-+This attribute indicates the Extended substate of the c33 PSE. Correlated
-+with the c33 PSE Extended state value, it allows to have more detail on the
-+c33 PSE current error state.
-+.TP
-+.B c33-pse-power-class
-+This attribute identifies the power class of the c33 PSE. It depends on
-+the class negotiated between the PSE and the PD. It corresponds to
-+IEEE 802.3-2022 30.9.1.1.8 (aPSEPowerClassification).
-+.TP
-+.B c33-pse-actual-power
-+This attribute identifies the actual power drawn by the c33 PSE. It
-+corresponds to ``IEEE 802.3-2022`` 30.9.1.1.23 (aPSEActualPower). Actual
-+power is reported in mW.
-+.TP
-+.B c33-pse-available-power-limit
-+This attribute identifies the configured c33 PSE power limit in mW.
-+.TP
-+.B c33-pse-power-limit-ranges
-+This attribute specifies the allowed power limit ranges in mW for
-+configuring the c33-pse-avail-pw-limit parameter. It defines the valid
-+power levels that can be assigned to the c33 PSE in compliance with the
-+c33 standard.
- 
- .RE
- .TP
-@@ -1829,6 +1860,11 @@ This parameter manages PoDL PSE Admin operations in accordance with the IEEE
- .A2 c33-pse-admin-control \ enable disable
- This parameter manages c33 PSE Admin operations in accordance with the IEEE
- 802.3-2022 30.9.1.2.1 (acPSEAdminControl) specification.
-+.TP
-+.B c33-pse-avail-pw-limit \ N
-+This parameter manages c33 PSE Available Power Limit in mW, in accordance
-+with the IEEE 802.3-2022 33.2.4.4 Variables (pse_available_power)
-+specification.
- 
- .RE
- .TP
-
--- 
-2.34.1
-
+Alice
 
