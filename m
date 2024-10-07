@@ -1,115 +1,116 @@
-Return-Path: <netdev+bounces-132771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3019931A8
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:42:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A739931BF
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:45:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2853F28424D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:42:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 894C2B240A9
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC561D9321;
-	Mon,  7 Oct 2024 15:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBF51D9679;
+	Mon,  7 Oct 2024 15:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lT0hyBAb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EMHBplOO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9797D1D7E3D
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 15:42:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F6B1D95B3;
+	Mon,  7 Oct 2024 15:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728315747; cv=none; b=fmCfe8wfARDz1e6zjN4ML8B5pVwqS4T87Vi11kb0kSSg5s8ITAhZVT0eJRi0fjS4TF4nv7gINAL269dd48uTll+ehnFnazAT3l+sqTeZ/ct1iQl2GumoQfOL4uCx4jVvjRPBJAs+j/82olYsbcl8uv+eRXhUlEcPCOuCE/2b2TY=
+	t=1728315910; cv=none; b=QWJOMOnWu7Rqs5WsIrgv4eQ2zODbnrdtuF0vhhmlx7lHCDl5Y/2ebBVu0IdKFDiEMpzyvhZo+00HCibXtSd2DLao6PZSF+CpXj1VgskKWimbPiQtj/SUvZEvCE4sjvaF2HYtnSOZ7CGBHqB+a6FKXER5E4M5Ywm38DH9zm9m+Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728315747; c=relaxed/simple;
-	bh=TqLKueBMqf9jTKYen4U+juDcJr2WjeOMHHozB2f2kks=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=klrNPgdTj5Ix/zY1CzIgQmq3vvw9Bj/jr87yIh5hwmfuvdsHYe/lElxMlmkbhDPlnk4WMJMkv0sNhDp0eQadmsesXWUsCSRYl70M9Vgu80JAVBwD/RBqu7wiz40X/yUP05wT3P3jJixqEsxZreUkX2+0Mkk517BzBezjaS6cHRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lT0hyBAb; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728315746; x=1759851746;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oUNTW725DQeC3Z+ZhdGlU1B6jsQEQ89jS8JqIAkvLfA=;
-  b=lT0hyBAbZNlXPzoBBqrH8VzKHPV5iKkxxzIL0UUXTvIp3jZgd+iHyNO2
-   MIZu/5DHR7RVfyXWUkoXN22ilFMvmKzvPdqsP8ObF9Bz1WIh5e6SxHEHl
-   l7T4LShNcvYD8Wnm94p6Xf3+BYcem2XyAkn1WHO8LtL6Ru+z9VxulEvr9
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
-   d="scan'208";a="237359171"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 15:42:22 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:35572]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.26:2525] with esmtp (Farcaster)
- id f972aa19-53be-4014-a4c9-4b961062f212; Mon, 7 Oct 2024 15:42:21 +0000 (UTC)
-X-Farcaster-Flow-ID: f972aa19-53be-4014-a4c9-4b961062f212
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 15:42:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.221.239) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 7 Oct 2024 15:42:18 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ebiederm@xmission.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v3 net 5/6] mpls: Handle error of rtnl_register_module().
-Date: Mon, 7 Oct 2024 08:42:10 -0700
-Message-ID: <20241007154210.22366-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <87h69ohsgj.fsf@email.froward.int.ebiederm.org>
-References: <87h69ohsgj.fsf@email.froward.int.ebiederm.org>
+	s=arc-20240116; t=1728315910; c=relaxed/simple;
+	bh=pdY49v+4fS4cdD0PwxaqWdkKTtbiEkF5VlMpD72D/o8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dytEJyS+jQyA5CU1g+cpjkOOv2BeRLT8wJutNs5qrJB1wnbsCjtelVzhYvECwzbctSwIh9PruDfEfA8QAe5szjoU4LikXikKnPD2HOoh9saVznoYzUpcoHoXoeX5weCgRQI9omwrJg1C+0zt/6o1N+h6xrEA4if6EqVFje9HWYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EMHBplOO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA7DCC4CEC6;
+	Mon,  7 Oct 2024 15:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728315909;
+	bh=pdY49v+4fS4cdD0PwxaqWdkKTtbiEkF5VlMpD72D/o8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EMHBplOOQSyDsy88RYdl6IgDj9tJMiCzOV1iM77Kf8V6UQ0S6PDXRN8kr2Tz4s66k
+	 4sygnQwabHDnVePga89lmOi23kh2gK2m/cBVtVDn/dQJhSPnDw7UQHeYxR+52eM8uY
+	 cd4BdwyKxWhCfV7s0CQaIIZq2V994PjNbQRxDHO+Y3waJJFGMQFnDFjHx6c/9MwcU0
+	 Et2x8h2ye8axf0sYxF8RNTXkTEAH42el4Nz7XVkZvUh9cIUbLF7fLpsuAN3S3Krrsi
+	 QIR6GuVsoUmtMKe3OV0i/CFhLEHyBpTV7oMjEpxIgk6IMyJu0yNASXM3pZZJufjhb8
+	 oGD8DUxx3VEhA==
+Date: Mon, 7 Oct 2024 16:45:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lennart Franzen <lennart@lfdomain.com>,
+	Alexandru Tachici <alexandru.tachici@analog.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ethernet: adi: adin1110: Fix some error
+ handling path in adin1110_read_fifo()
+Message-ID: <20241007154505.GG32733@kernel.org>
+References: <8ff73b40f50d8fa994a454911b66adebce8da266.1727981562.git.christophe.jaillet@wanadoo.fr>
+ <20241004113735.GF1310185@kernel.org>
+ <2669052d-752f-416a-9d5e-a03848f30904@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <2669052d-752f-416a-9d5e-a03848f30904@wanadoo.fr>
 
-From: "Eric W. Biederman" <ebiederm@xmission.com>
-Date: Mon, 07 Oct 2024 09:56:44 -0500
-> Kuniyuki Iwashima <kuniyu@amazon.com> writes:
+On Fri, Oct 04, 2024 at 03:15:39PM +0200, Christophe JAILLET wrote:
+> Le 04/10/2024 à 13:37, Simon Horman a écrit :
+> > On Thu, Oct 03, 2024 at 08:53:15PM +0200, Christophe JAILLET wrote:
+> > > If 'frame_size' is too small or if 'round_len' is an error code, it is
+> > > likely that an error code should be returned to the caller.
+> > > 
+> > > Actually, 'ret' is likely to be 0, so if one of these sanity checks fails,
+> > > 'success' is returned.
+> > 
+> > Hi Christophe,
+> > 
+> > I think we can say "'ret' will be 0".
 > 
-> > Since introduced, mpls_init() has been ignoring the returned
-> > value of rtnl_register_module(), which could fail.
+> Agreed.
 > 
-> As I recall that was deliberate.  The module continues to work if the
-> rtnetlink handlers don't operate, just some functionality is lost.
-
-It's ok if it wasn't a module.  rtnl_register() logs an error message
-in syslog, but rtnl_register_module() doesn't.  That's why this series
-only changes some rtnl_register_module() calls.
-
-
+> 	ret = adin1110_read_reg()
+> 	--> spi_sync_transfer()
+> 	--> spi_sync()
 > 
-> I don't strongly care either way, but I want to point out that bailing
-> out due to a memory allocation failure actually makes the module
-> initialization more brittle.
+> which explicitly documents "zero on success, else a negative error code."
 > 
-> > Let's handle the errors by rtnl_register_many().
+> > At least that is what my brief investigation tells me.
+> > 
+> > > 
+> > > Return -EINVAL instead.
+> > 
 > 
-> Can you describe what the benefit is from completely giving up in the
-> face of a memory allocation failure versus having as much of the module
-> function as possible?
+> If the patch is considered as correct, can you confirm that -EINVAL is the
+> correct error code to use? If not, which one would be preferred?
 
-What if the memory pressure happend to be relaxed soon after the module
-was loaded incompletely ?
+-EINVAL seems reasonable to me.
 
-Silent failure is much worse to me.
+> > Please include some information on how this was found and tested.
+> > e.g.
+> > 
+> > Found by inspection / Found using widget-ng.
+> 
+> I would say: found by luck! :)
+> 
+> The explanation below will be of no help in the commit message and won't be
+> added. I just give you all the gory details because you asked for it ;-)
+> 
+> (and after reading bellow, you can call me crazy!)
 
-rtnl_get_link() will return NULL and users will see -EOPNOTSUPP even
-though the module was loaded "successfully".
+:)
 
