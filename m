@@ -1,132 +1,115 @@
-Return-Path: <netdev+bounces-132723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE31992E69
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:10:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 581F0992E65
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:09:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F9521C231AD
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:10:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 029A71F23AC9
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378FB1D6182;
-	Mon,  7 Oct 2024 14:09:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97D61D47D9;
+	Mon,  7 Oct 2024 14:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3M1+eG1D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RasZrjhp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835421D5CEA
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:09:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939431D47D4
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728310145; cv=none; b=c7+R7en7EhPdMV8/maZkPLXL++KXdPUuh7BYjAvt6ETycfpASzJNCY/xh4R1Ve9HfLNduy2dy0n4qZWuseqZs95nhtUVWIEvprhpyJr+nNHl7uorqd+5c21j2kaJygjIAPTiPbXrtsvOKjZbJhuegq+SVZL3FUgMmy8FBRykvR8=
+	t=1728310134; cv=none; b=sSFC0OjJTjU/4OHJziPLRs0oAqCU1Ukn0ceteSUsKNwZBkCI+Am7dErW5oCmsnbKNyOjLKgCUKuH4VdV2TGKPMiEXZNG5Ny9H7cfJbbIx7sDTbjZBof6jxm/cNQjpRcCOF2nPT4nq8XYS9d7VocI/gFNGnamzFffsiIXqGGv8jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728310145; c=relaxed/simple;
-	bh=ivFBOmv6ledmK5xGubGTRk1bSWqSMt6FdYU0h0kX9pQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SNVIjfesDLs/108r4iWBk7J2tCESFIt/IqNyvbIrRCS2Fr8aP57jX+89gsa39W7oHZEj6VNu8RyIbGfgNC8FJo7+kEfYkHGTDJEKhn+JCIzu6Vo8AXjMeru4TWg/y0YvkWk38tq60fOoP3yqyjehVNfm8SKwHkByvXxBR6mDL/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3M1+eG1D; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5398e7dda5fso4423226e87.0
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 07:09:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728310142; x=1728914942; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EKZvIK45MDR9TD/1XroJvoyFAFi7DQfKK13CSD5BTzY=;
-        b=3M1+eG1D4TyrOavhNcz6nmkr0W278/ovBoPe5T09mRDlSExFKYnKoCU/6nB7WNyFWY
-         TX6p2Dg5EfUXhL1NFX4DHPdkN6/yaAY3GeodnZCQGnuNoIM8NXToP/ZJIgzAZNDzKNcI
-         VKVnPI2DutdOQAGHh+KpRvMlQIiVGpL35zS7H3o7CK427jrvbJGgJqVHpGmgEGG0ynL6
-         Gq4p1CgnbB1xz/T/wizs0IgovexygPtoGQu0BgTaRezh2bhiCQOTe6ayPn3M1xkTJYkk
-         MTfefzmzQdymou3+XuIPR5+2NBoN6pJEaD9/f52QccAiEsQk4nQwfTh1+aAHJjrF0x0j
-         LgnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728310142; x=1728914942;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EKZvIK45MDR9TD/1XroJvoyFAFi7DQfKK13CSD5BTzY=;
-        b=fshcrFLpPT69pELrFw7ZRKsVlMEvJagVwcisOm5JR11dvEq9LMKY7pYLD+5MrQOy8A
-         wmE5h0miBdsOiSpMBAc5tYCxgkH6n1r27t/faRL9M9j+jyuUYNtPLYxhzoJcCGRSw3mx
-         liTN3AyQ/k+gcPuC3ShDerDdti+643DScQJBz5lywPIl39UeAdb7nQTJa+5Ca/phRrZM
-         ORic7F7mVyFuFlHj1PZEav5ih4f329KcTgnSMhq6VvWHfWdex4qX6jFfuiQU6+CC9+R5
-         Fq+IJzEbKYpJVQJQVcbdN2iJe5guBTPGrqh/Lxs4AjrVYxV+1ED+6aQCEZ3TQi64jz3E
-         wqQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWvUYHq3WKUIHGflAlkNvP+D46AOf/HC7LwBqBPXpsx9RCf7WWUlcAnBjbqrUEaVm3GLzJi9S0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvaA+L6zf7mevoZQYl1uYHan1zwIsEE+xpnaaMc2qA1RvvAqUR
-	cSc8MVNF/BdO2SpjZDcEvwbqL3pc7w1tpwBZgM2ULnRNu4nOIvJCKtTPBYlmYyFfPe/sQQ+SS2w
-	oRlnUm0RzXxa4Y9Q0dVxCKfz4qayqQvQSOftBaRRGuUSEieEA2/jf
-X-Google-Smtp-Source: AGHT+IFwTrVIqhDUFyPdVl34T+oKrSGlMdjLolmnCNjPhVYLj4MboC4l1jWOzAigrl97+qSrM8ogZYoRsH321EcL9EY=
-X-Received: by 2002:a05:6512:e93:b0:52c:daa4:2f5c with SMTP id
- 2adb3069b0e04-539ab9d0331mr5921302e87.42.1728310141515; Mon, 07 Oct 2024
- 07:09:01 -0700 (PDT)
+	s=arc-20240116; t=1728310134; c=relaxed/simple;
+	bh=9QvCN6UDCahzHiBNUMVQxw4kqfccsQYR6OZ1AXQzzYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YY/gPNJJxZ5N9xhqjSzYNszj5q/CFp94tQNJm9ogo5p19sPIM3X5eth0ohOFg3N8AfStCiIMktNJCp9fQyBKaFMbW+ztSBNMWAMvgQd2jIcI2kO1xXgin6vCuSL8pV1MoEXs696IcLyn7BG0TbaF493ZiQqAvpmc2Q0F1PHItqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RasZrjhp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C0D4C4CEC6;
+	Mon,  7 Oct 2024 14:08:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728310134;
+	bh=9QvCN6UDCahzHiBNUMVQxw4kqfccsQYR6OZ1AXQzzYw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RasZrjhp4O3t0yIa/tBZoJFxOwDH3cDGN9XUmUKoDTdFFOyuj+854ayDElcrjlUpi
+	 DF/7Z4eBa7nKF37Xe08ZQETWcGyL66BtJjyCN6FvARSYag9NQ9TqURvEGM+/SwCPQQ
+	 v1SzmMiOCEUyFS6nwzdTSJkKPnCR5zLXRphqD8HB7DADfKVkmE2ei6teFyNoq/0Tmv
+	 mGseLSAQwortleCy8M2mpq0tB2Y5v9vvC6b8XiHbQLmObUW2Hr2JSh0Pcq23jsVQWn
+	 aMGG3yC4wjuWRn6MpJUSezUamp/Ga18XFfpzmTXiAss5s66yvv2JBSGeE03/0SOhW4
+	 6e+0L/OZqByFw==
+Date: Mon, 7 Oct 2024 15:08:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Alexandre Ferrieux <alexandre.ferrieux@orange.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 4/4] ipv4: remove fib_info_devhash[]
+Message-ID: <20241007140850.GC32733@kernel.org>
+References: <20241004134720.579244-1-edumazet@google.com>
+ <20241004134720.579244-5-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com> <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
- <ZwG8H7u3ddYH6gRx@boqun-archlinux> <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux> <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
-In-Reply-To: <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 7 Oct 2024 16:08:48 +0200
-Message-ID: <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Boqun Feng <boqun.feng@gmail.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241004134720.579244-5-edumazet@google.com>
 
-On Mon, Oct 7, 2024 at 3:48=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Mon, Oct 07, 2024 at 05:28:28AM -0700, Boqun Feng wrote:
-> > On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
-> > However, this is actually a special case: currently we want to use klin=
-t
-> > [1] to detect all context mis-matches at compile time. So the above rul=
-e
-> > extends for kernel: any type-checked *and klint-checked* code that only
-> > calls safe Rust functions cannot be unsafe. I.e. we add additional
-> > compile time checking for unsafe code. So if might_sleep() has the
-> > proper klint annotation, and we actually enable klint for kernel code,
-> > then we can make it safe (along with preemption disable functions being
-> > safe).
-> >
-> > > where you use a sleeping function in atomic context. Depending on why
-> > > you are in atomic context, it might appear to work, until it does not
-> > > actually work, and bad things happen. So it is not might_sleep() whic=
-h
-> > > is unsafe, it is the Rust code calling it.
-> >
-> > The whole point of unsafe functions is that calling it may result into
-> > unsafe code, so that's why all extern "C" functions are unsafe, so are
-> > might_sleep() (without klint in the picture).
->
-> There is a psychological part to this. might_sleep() is a good debug
-> tool, which costs very little in normal builds, but finds logic bugs
-> when enabled in debug builds. What we don't want is Rust developers
-> not scattering it though their code because it adds unsafe code, and
-> the aim is not to have any unsafe code.
+On Fri, Oct 04, 2024 at 01:47:20PM +0000, Eric Dumazet wrote:
+> Upcoming per-netns RTNL conversion needs to get rid
+> of shared hash tables.
+> 
+> fib_info_devhash[] is one of them.
+> 
+> It is unclear why we used a hash table, because
+> a single hlist_head per net device was cheaper and scalable.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  .../networking/net_cachelines/net_device.rst  |  1 +
+>  include/linux/netdevice.h                     |  2 ++
+>  net/ipv4/fib_semantics.c                      | 35 ++++++++-----------
+>  3 files changed, 18 insertions(+), 20 deletions(-)
+> 
+> diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+> index 22b07c814f4a4575d255fdf472d07c549536e543..a8e2a7ce0383343464800be8db31aeddd791f086 100644
+> --- a/Documentation/networking/net_cachelines/net_device.rst
+> +++ b/Documentation/networking/net_cachelines/net_device.rst
+> @@ -83,6 +83,7 @@ unsigned_int                        allmulti
+>  bool                                uc_promisc                                                      
+>  unsigned_char                       nested_level                                                    
+>  struct_in_device*                   ip_ptr                  read_mostly         read_mostly         __in_dev_get
+> +struct hlist_head                   fib_nh_head
+>  struct_inet6_dev*                   ip6_ptr                 read_mostly         read_mostly         __in6_dev_get
+>  struct_vlan_info*                   vlan_info                                                       
+>  struct_dsa_port*                    dsa_ptr                                                         
 
-We can add a safe wrapper for it:
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 4d20c776a4ff3d0e881b8d9b99901edb35f66da2..cda20a3fe1adf54c1e6df5b5a8882ef7830e1b46 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2209,6 +2209,8 @@ struct net_device {
+>  
+>  	/* Protocol-specific pointers */
+>  	struct in_device __rcu	*ip_ptr;
+> +	struct hlist_head	fib_nh_head;
+> +
+>  #if IS_ENABLED(CONFIG_VLAN_8021Q)
+>  	struct vlan_info __rcu	*vlan_info;
+>  #endif
 
-pub fn might_sleep() {
-    // SAFETY: Always safe to call.
-    unsafe { bindings::might_sleep() };
-}
+Hi Eric,
 
-Alice
+A minor nit from my side: Kernel-doc should be updated for this new field.
+
+...
 
