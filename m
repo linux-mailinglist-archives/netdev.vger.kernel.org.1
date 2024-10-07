@@ -1,114 +1,153 @@
-Return-Path: <netdev+bounces-132631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A52E69928D3
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:10:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 142A89926F8
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53C75285E71
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 10:10:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD95128255B
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 08:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DE71A76A2;
-	Mon,  7 Oct 2024 10:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E6F18B462;
+	Mon,  7 Oct 2024 08:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="KiSalISL"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R3fdxtJI"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048CB231CA9
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 10:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9529F17C20F;
+	Mon,  7 Oct 2024 08:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728295814; cv=none; b=l9/FO/+k1KcNFz5S6RZAiAHXARYlDBls4QGSnesyAIpgClXUY8c2MuV7LqMxVpjb7wT4oDlg6m8LAoPWmwk4ipBbufWtL+GZt7MB9GlzSxTNZtg5RLLAYLBnXYAgrmeT7O5pi59K2Mxq4a+9DwjdRWQDBGGUrwlunLZ/Bu/ya0o=
+	t=1728289684; cv=none; b=oqgpXs7WfB1JsaCqpCHafBE6nVsNzgIqkTUCL3BR7Im9rJOQakG8IZ9VbdRpH8LDqAW7M3KFLhZJjJUteeJbVfucNpXm26zpehzC7vbrQT0BWRV/KJY7aIe7NRVPGDAM8901a0K3fO3K701Tt1whJl/oRl15aNaxJ7vu2GY7BgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728295814; c=relaxed/simple;
-	bh=ukxnln4+Kp/4FY1LSjEJ6dgfnkvanK2/a7JnKT0JHT8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rJnKiEW2kMYvTr/qgqf01sV9C2MOfYiQBSprizArmmgvGNxsS7JBYYuvJpG5UMC/XNqWaG7l8GY501cXyg2UX0nJN1NUHI/JFrFodA5p5uB5hKCJp+WhlbmwKSVhE2S++0+ihA7H5N5TsU/XXhT4ynfbCrkyE40nmjxQGv3MPEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=KiSalISL; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1728295800;
-	bh=ukxnln4+Kp/4FY1LSjEJ6dgfnkvanK2/a7JnKT0JHT8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=KiSalISL9x93Wd6/jCI2myaAtdj7CjZtzqoUQ/o10AD3/wrEX1vFgi2fSSbg9q5fu
-	 DwpkkjnojLVIf0BR6ljuoAgr+8DJaNNyEWwwU2/hF7E6wL8SXpL16PR6reOEAzbg0p
-	 y+3kzzV9B+xe4OW1XVQJ5AvAR0ykI5fbeGlrEZqcpWEXuPMX9o7aR+lDhn9KTMcIJH
-	 JpJyWAX11Wfgw9E94CG9wCFLRYUP/AIU6FPHVLhCe+JuNZvWj1QbDOP2pP9ZwZbM4Z
-	 5cYxmHfEQD37+I/89v93RXPG5obW26+Zwv/75VlH5K4wlp+o0AVR++3Dw39zfWYMLX
-	 LkDpUpNAgFRag==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 57F5E6497F;
-	Mon,  7 Oct 2024 18:10:00 +0800 (AWST)
-Message-ID: <dcaa0489e90f7c294f6b5e4858b98210766383dc.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v2 net 4/6] mctp: Handle error of rtnl_register_module().
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller"
-	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, Matt
-	Johnston <matt@codeconstruct.com.au>
-Date: Mon, 07 Oct 2024 18:09:59 +0800
-In-Reply-To: <20241004222358.79129-5-kuniyu@amazon.com>
-References: <20241004222358.79129-1-kuniyu@amazon.com>
-	 <20241004222358.79129-5-kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1728289684; c=relaxed/simple;
+	bh=kpf8VNlOFh0AUiR7vUtF1GKwXGg++z0c9xqDVp0WfVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JsPJ5IjkVnewpbpys3CbGYp+UZJ/6Lb/QlUTMmaVQOD6z0aki6Rq45CQxBqPolhZrvswSJiT0zvTicYyab09+pOHVlEYGk/9hJscSy/pLdO/Z/5ypaLuu8lH07TjJPr+2joT+lN3ShOzytWb0kk2/zX94AoqIDBwBIrn9jTmBzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R3fdxtJI; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay8-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::228])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id A9EF1C1FF8;
+	Mon,  7 Oct 2024 08:27:24 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D08B81BF204;
+	Mon,  7 Oct 2024 08:27:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728289637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RDlA1X7tGs3142aa6D/JEOTJoAWg3dIH40lOQBP02kw=;
+	b=R3fdxtJIxcXhhUkm9VQMwfMFsiGqQYjaeiAeB7qGedH07dwtd6wXyG+sTwrnE7YrHqeFLw
+	45ZzuDHNCPE5LUmdMoMzvT53VeJiGgav2zbgQvI8W9WVb4kiPHpkrew2SBgT1BXmooyg9N
+	Fuq+EjkkcIPcE2DY4kYYkgMUoIbGJ6bvnv7ENLtiV5dzZJbViyOSnTpr0L8OiKse8ER1Le
+	FccFecqNRUgKXPGldbmHkEInA2J6Gx6nIXfs4YEX+M25zzxnVMCeJZhrdvi9h9PipP3TTW
+	WDb9i9HX2Ec5tpUpos4rpgORi9AUz7cLDVLRg2Cl9Jgj6w91jPtKm0qX7Cm4ew==
+Date: Mon, 7 Oct 2024 12:25:13 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 0/9] Allow isolating PHY devices
+Message-ID: <20241007122513.4ab8e77b@device-21.home>
+In-Reply-To: <ZwAfoeHUGOnDz1Y1@shell.armlinux.org.uk>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+	<ZwAfoeHUGOnDz1Y1@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-SGkgS3VuaXl1a2ksCgo+IFNpbmNlIGludHJvZHVjZWQsIG1jdHAgaGFzIGJlZW4gaWdub3Jpbmcg
-dGhlIHJldHVybmVkIHZhbHVlCj4gb2YgcnRubF9yZWdpc3Rlcl9tb2R1bGUoKSwgd2hpY2ggY291
-bGQgZmFpbC4KPiAKPiBMZXQncyBoYW5kbGUgdGhlIGVycm9ycyBieSBydG5sX3JlZ2lzdGVyX21v
-ZHVsZV9tYW55KCkuCgpTb3VuZHMgZ29vZCEKCkp1c3QgYSBjb3VwbGUgb2YgbWlub3IgdGhpbmdz
-IGlubGluZSwgYnV0IHJlZ2FyZGxlc3M6CgpSZXZpZXdlZC1ieTogSmVyZW15IEtlcnIgPGprQGNv
-ZGVjb25zdHJ1Y3QuY29tLmF1PgoKPiBkaWZmIC0tZ2l0IGEvbmV0L21jdHAvZGV2aWNlLmMgYi9u
-ZXQvbWN0cC9kZXZpY2UuYwo+IGluZGV4IGFjYjk3YjI1NzQyOC4uZDcwZTY4OGFjODg2IDEwMDY0
-NAo+IC0tLSBhL25ldC9tY3RwL2RldmljZS5jCj4gKysrIGIvbmV0L21jdHAvZGV2aWNlLmMKPiBA
-QCAtNTI0LDI1ICs1MjQsMzEgQEAgc3RhdGljIHN0cnVjdCBub3RpZmllcl9ibG9jayBtY3RwX2Rl
-dl9uYiA9IHsKPiDCoMKgwqDCoMKgwqDCoMKgLnByaW9yaXR5ID0gQUREUkNPTkZfTk9USUZZX1BS
-SU9SSVRZLAo+IMKgfTsKPiDCoAo+IC12b2lkIF9faW5pdCBtY3RwX2RldmljZV9pbml0KHZvaWQp
-Cj4gK3N0YXRpYyBzdHJ1Y3QgcnRubF9tc2dfaGFuZGxlciBtY3RwX2RldmljZV9ydG5sX21zZ19o
-YW5kbGVyc1tdID0gewo+ICvCoMKgwqDCoMKgwqDCoHtQRl9NQ1RQLCBSVE1fTkVXQUREUiwgbWN0
-cF9ydG1fbmV3YWRkciwgTlVMTCwgMH0sCj4gK8KgwqDCoMKgwqDCoMKge1BGX01DVFAsIFJUTV9E
-RUxBRERSLCBtY3RwX3J0bV9kZWxhZGRyLCBOVUxMLCAwfSwKPiArwqDCoMKgwqDCoMKgwqB7UEZf
-TUNUUCwgUlRNX0dFVEFERFIsIE5VTEwsIG1jdHBfZHVtcF9hZGRyaW5mbywgMH0sCj4gK307CgpD
-YW4gdGhpcyAoYW5kIHRoZSBvdGhlciBoYW5kbGVyIGFycmF5cykgYmUgY29uc3Q/IEFuZCBjb25z
-ZXF1ZW50bHksIHRoZQpwb2ludGVyIGFyZ3VtZW50IHRoYXQgeW91IHBhc3MgdG8gcnRubF9yZWdp
-c3Rlcl9tb2R1bGVfbWFueSgpIGZyb20gMS82PwoKPiDCoGludCBfX2luaXQgbWN0cF9yb3V0ZXNf
-aW5pdCh2b2lkKQo+IMKgewo+ICvCoMKgwqDCoMKgwqDCoGludCBlcnI7Cj4gKwo+IMKgwqDCoMKg
-wqDCoMKgwqBkZXZfYWRkX3BhY2soJm1jdHBfcGFja2V0X3R5cGUpOwo+IMKgCj4gLcKgwqDCoMKg
-wqDCoMKgcnRubF9yZWdpc3Rlcl9tb2R1bGUoVEhJU19NT0RVTEUsIFBGX01DVFAsIFJUTV9HRVRS
-T1VURSwKPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIE5VTEwsIG1jdHBfZHVtcF9ydGluZm8sIDApOwo+IC3CoMKgwqDCoMKgwqDCoHJ0bmxf
-cmVnaXN0ZXJfbW9kdWxlKFRISVNfTU9EVUxFLCBQRl9NQ1RQLCBSVE1fTkVXUk9VVEUsCj4gLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBtY3Rw
-X25ld3JvdXRlLCBOVUxMLCAwKTsKPiAtwqDCoMKgwqDCoMKgwqBydG5sX3JlZ2lzdGVyX21vZHVs
-ZShUSElTX01PRFVMRSwgUEZfTUNUUCwgUlRNX0RFTFJPVVRFLAo+IC3CoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbWN0cF9kZWxyb3V0ZSwgTlVM
-TCwgMCk7Cj4gK8KgwqDCoMKgwqDCoMKgZXJyID0gcmVnaXN0ZXJfcGVybmV0X3N1YnN5cygmbWN0
-cF9uZXRfb3BzKTsKPiArwqDCoMKgwqDCoMKgwqBpZiAoZXJyKQo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqBnb3RvIGZhaWxfcGVybmV0Owo+ICsKPiArwqDCoMKgwqDCoMKgwqBlcnIg
-PSBydG5sX3JlZ2lzdGVyX21vZHVsZV9tYW55KG1jdHBfcm91dGVfcnRubF9tc2dfaGFuZGxlcnMp
-Owo+ICvCoMKgwqDCoMKgwqDCoGlmIChlcnIpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGdvdG8gZmFpbF9ydG5sOwo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgcmV0dXJuIHJlZ2lzdGVy
-X3Blcm5ldF9zdWJzeXMoJm1jdHBfbmV0X29wcyk7Cj4gK291dDoKPiArwqDCoMKgwqDCoMKgwqBy
-ZXR1cm4gZXJyOwo+ICsKPiArZmFpbF9ydG5sOgo+ICvCoMKgwqDCoMKgwqDCoHVucmVnaXN0ZXJf
-cGVybmV0X3N1YnN5cygmbWN0cF9uZXRfb3BzKTsKPiArZmFpbF9wZXJuZXQ6Cj4gK8KgwqDCoMKg
-wqDCoMKgZGV2X3JlbW92ZV9wYWNrKCZtY3RwX3BhY2tldF90eXBlKTsKPiArwqDCoMKgwqDCoMKg
-wqBnb3RvIG91dDsKPiDCoH0KCkp1c3QgYHJldHVybiBlcnI7YCBoZXJlIC0gbm8gbmVlZCBmb3Ig
-dGhlIGJhY2t3YXJkcyBnb3RvIHRvIHRoZSByZXR1cm4uCgpBbmQgb25seSBpZiB5b3UgZW5kIHVw
-IHJlLXJvbGxpbmcgdGhlIHBhdGNoOiBjYW4gdGhlc2UgbGFiZWxzIGJlIGVycl8qLApzbyB0aGF0
-IHdlJ3JlIGNvbnNpc3RlbnQgd2l0aCB0aGUgcmVzdCBvZiB0aGUgZmlsZT8KCkNoZWVycywKCgpK
-ZXJlbXkK
+Hello Russell
+
+On Fri, 4 Oct 2024 18:02:25 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> I'm going to ask a very basic question concerning this.
+> 
+> Isolation was present in PHYs early on when speeds were low, and thus
+> electrical reflections weren't too much of a problem, and thus star
+> topologies didn't have too much of an effect. A star topology is
+> multi-drop. Even if the PCB tracks go from MAC to PHY1 and then onto
+> PHY2, if PHY2 is isolated, there are two paths that the signal will
+> take, one to MAC and the other to PHY2. If there's no impediance match
+> at PHY2 (e.g. because it's in high-impedance mode) then that
+> transmission line is unterminated, and thus will reflect back towards
+> the MAC.
+> 
+> As speeds get faster, then reflections from unterminated ends become
+> more of an issue.
+> 
+> I suspect the reason why e.g. 88x3310, 88E1111 etc do not support
+> isolate mode is because of this - especially when being used in
+> serdes mode, the topology is essentially point-to-point and any
+> side branches can end up causing data corruption.
+
+I suspect indeed that this won't work on serdes interfaces. I didn't
+find any reliable information on that, but so far the few PHYs I've
+seen seem to work that way.
+
+The 88e1512 supports that, but I was testing in RGMII.
+
+> 
+> So my questions would be, is adding support for isolation mode in
+> PHYs given todays network speeds something that is realistic, and
+> do we have actual hardware out there where there is more than one
+> PHY in the bus. If there is, it may be useful to include details
+> of that (such as PHY interface type) in the patch series description.
+
+I do have some hardware with this configuration (I'd like to support
+that upstream, the topology work was preliminary work for that, and the
+next move would be to send an RFC for these topolopgies exactly).
+
+I am working with 3 different HW platforms with this layout :
+
+      /--- PHY
+      |
+MAC  -|  phy_interface_mode == MII so, 100Mbps Max.
+      |
+      \--- PHY
+
+and another that is similar but with RMII. I finally have one last case
+with MII interface, same layout, but the PHYs can't isolate so we need
+to make sure all but one PHYs are powered-down at any given time.
+
+I will include that in the cover.
+
+Could we consider limiting the isolation to non-serdes interfaces ?
+that would be :
+
+ - MII
+ - RMII
+ - GMII
+ - RGMII and its -[TX|RX] ID flavours
+ - TBI and RTBI ?? (I'm not sure about these)
+
+Trying to isolate a PHY that doesn't have any of the interfaces above
+would result in -EOPNOTSUPP ?
+
+Thanks,
+
+Maxime
 
 
