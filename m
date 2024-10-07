@@ -1,121 +1,104 @@
-Return-Path: <netdev+bounces-132647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71898992A3D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:31:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F4BC992A46
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B291F23097
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:31:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2C801F230EA
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CAB1CACC0;
-	Mon,  7 Oct 2024 11:31:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89D481D222A;
+	Mon,  7 Oct 2024 11:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="SntZXmet"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0C9101C4;
-	Mon,  7 Oct 2024 11:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1007018C010;
+	Mon,  7 Oct 2024 11:33:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728300681; cv=none; b=Xu6Tll7q8LvyX2VDP5F78ZrjC9d/WBnc/O0xW5G5rU10BW+GaLVJVihV2vTny64V87wJVYhEVe1QmukQDOlFSG1ipjnFBtbEKuV0gghqy4Bj0QvSBM7nDvQ4kSuiPuC/o699wgIygdv/XpSqOwj0gz6N0GMT9V+KgKUWu/a3aWA=
+	t=1728300828; cv=none; b=O/4RcHg7+uMit+UJTzCOHt71XcsipkDYHqS9dIBk2tMti/5vSD8IJrUfqe++xZrIka7+oWXn3wo+KXGptyXOCuu+l4X14ylIN+cjyv8EKmQLYk6YrQ2u8a3uYJmDc7EbNngXqs4qz7aemYozveywO1im3uOzc1heCXyU1MPRai4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728300681; c=relaxed/simple;
-	bh=7tFqPXIR8Oj7mN8Mv3E1ReRdWth6sARj/sqyo2PSm6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pfxri3hzE1l0Qsmnzb7CbOEE8ZR2HTbe5iMOWcBp07Ox43/PObLO4sXCNr1QZGctQaoEa5Ve2vjM0LDMGhK0QQEmC2HmTZBIlTR3ybyC4jz4z+nTfkWWKszWw2DTAAe+V6+zbRUoPwlIf1HvLGFA5JOD4DWB12aCpmSZWBeWIls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sxlx9-000000002KX-3SEU;
-	Mon, 07 Oct 2024 11:31:03 +0000
-Date: Mon, 7 Oct 2024 12:30:53 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1728300828; c=relaxed/simple;
+	bh=xKf4y0Jr8/LqYaeSglDR5RFuVmUMwn39i4VfwuxQRZE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eHeQfB/pOcofbi04JAsNkIquKJtLBWvXkdyON78PuyEON3wwlSuIKs5cII3KeAy0sdBiSAta6wK4cFEzhPFv486Lw/P9Y1sBIQ0x1b3NZftJdI+51EpUd5OdFpaLWO/wJlYLxNUq0aDbdreTzfkt2M425XMnlVla10R45fC+8jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=SntZXmet; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1728300809; x=1728905609; i=wahrenst@gmx.net;
+	bh=h/dH6z1VSRHTq33+ShAFdkC4Q0hfIyeIUwjhK6BYJN8=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=SntZXmetWJJFI1gneNJSm225h7wAvrkhxgrowViO0hkmbtK9LSsf63OPVSDkXGZj
+	 AkQ0KWMDtro4QQTAzW4yARD6b5LA/wbEEk/kWKp5XvS+zBtAWATPZG23aGBLOnbZW
+	 C0QflFpQZpLZar78sjIWav+FhtRupP+Bdb6jLUm98LFr7Bm137jYGkkaVpf4xTWIY
+	 BQhDWjh3Sedb058z4AvmiovuTwaZZbOfYW3ZlrLJLXXGWOyIxFRO9AlwQDLP904rl
+	 FJCidBbllWBuJ7eMC25Ti4Np/9mLgp1a8HHgiOmQsrGBnjxLqoW2lgc6CwBaVsRhs
+	 3SLl0ZkHW8746UOLnw==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MQMyZ-1tJRc00zI1-00PuCA; Mon, 07
+ Oct 2024 13:33:29 +0200
+From: Stefan Wahren <wahrenst@gmx.net>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xu Liang <lxu@maxlinear.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Abhishek Chauhan <quic_abchauha@quicinc.com>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	linux-leds@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] dt-bindings: leds: add 'active-high'
- property
-Message-ID: <ZwPGbUWImzlbEqb-@makrotopia.org>
-References: <e91ca84ac836fc40c94c52733f8fc607bcbed64c.1728145095.git.daniel@makrotopia.org>
- <4qk3lpdx47b27ru47avpiygijtu5kkax44t3o4wb2wv5m5djoz@uziseiklyq3d>
- <ZwKK4xMlqq3TyDyt@makrotopia.org>
- <6d3hvesqhslk7jaszo44orbaqabl7go6duzpu4beye44sa6lpn@b3c56bp6x3ce>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Heimpold <mhei@heimpold.de>,
+	Christoph Fritz <chf.fritz@googlemail.com>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH 0/2 net-next] qca_spi: Improvements to QCA7000 sync
+Date: Mon,  7 Oct 2024 13:33:10 +0200
+Message-Id: <20241007113312.38728-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6d3hvesqhslk7jaszo44orbaqabl7go6duzpu4beye44sa6lpn@b3c56bp6x3ce>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:nnbAoTjReWKIET9yrsv0bAR7IB+3jf4JyOtXcWTzVO5MD2UzcBY
+ XCNdiog6P3gVZr/QCsnH08jLFOmI2QcwS5rraJGAErXrMG1NOBpSPFbL6ObR6QGuWudUrxc
+ NWf1M0juGeuwxkJwKoB3I30PZgK1wZAHWOf3d5w6VUFqCyyQ1KZFSKnT27jj2EECS8JwjCn
+ /DIyYM9OWoa3T8f9Adp9Q==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:oLtj2MWjjK4=;F5gKXbh33g3xyWh3K7gjvQqIHm9
+ n0TBByumIVvk8jUWfIEOjEQK76lDSygTkxdTcQgzulMOuPp/WipttxbGr6rDB5kN7C1tkTN82
+ 67SCBKb5fGZKk3qZ23Mabt30sCSYXUCjM/mF6lZupwTE2c+c8XBbDWqrsT5VJP2Tz6fC3oNLB
+ ZExyaSqlZGbCJpjMR8vifH3Fm2F8vAIy1y5pRdMLt4zLhQSf5Svkp2q8HQlHm5vEVufsvOx+K
+ YSW7CuTWErbPOK7DAah+r2JmJ7HnLWbjsoIQ2al7NaUcd75d2S0qshIEz02BDOLAKdcmOH1Gh
+ FRIgPZfCPsxrLV4KIkxVV94N3GPr/Er6QJNhmXV7AoP4WjCBXZenOJEWYKdZcNLZCohi9cCqC
+ ucPRCIb9ycuQU3zYz3nH9XcV3PEWbsL6NcCPJM93lm9jK02E9rFwH+qNvkrMKcUHozzUmwbTx
+ dys9woDApqrIhO+tZWLV3ILAYy1PnF5M+FHQtvNz8WKPe9rakOa9KuSBk/boO977k8kmuIbYf
+ 4a/uUYpnk2sYjf58EAk8PJg1lLJegxHtcSJahJAbL8rubsIFLwKG8CaQEbn9j0Hf+AcdDiXXc
+ SQVvSBmsqcfQxiN5zIaIbkCLWoAt9CLXWN65tgxhrkkMu27RFgY4lUXUMsoM4fqwaAWw5qIDh
+ iC2HIuAaMrdZyhifl6daPqvyEhbkKPsKr3MVVDjvWgJFJIYSYsEoOkl2O7WDGoXy0Mak7r+0c
+ B3Kw+QYPYXyXW7l+FrIfhkDGOtLAGfNV2RoOqS4e9rJbv+nQRKRVXT0ufIqIlIQZ7NBu6aso1
+ a1HP9U5iUm6HSdj4Lw1uQTMA==
 
-On Mon, Oct 07, 2024 at 08:38:27AM +0200, Krzysztof Kozlowski wrote:
-> On Sun, Oct 06, 2024 at 02:04:35PM +0100, Daniel Golle wrote:
-> > On Sun, Oct 06, 2024 at 02:44:44PM +0200, Krzysztof Kozlowski wrote:
-> > > I think this should be just string enum, see marvell,marvell10g.yaml
-> > 
-> > I found the vendor-specific 'marvell,polarity' property in
-> > https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20231214201442.660447-5-tobias@waldekranz.com/
-> > 
-> > However, I can't find that file in any Linux tree.
-> > 
-> > Looking at the suggested patch on patchwork, I got a few questions on
-> > how to deal with the situation as of today:
-> > 
-> > So should the existing support for the 'active-low' and
-> > 'inactive-high-impedance' properties be replaced by that string enum?
-> > Or should the string property be interpreted in addition to the
-> > bools defined in leds/common.yaml?
-> > 
-> > Should the string property be defined for each PHY or should we move
-> > it into a common file?
-> > 
-> > If so, should that common file also be leds/common.yaml or should we
-> > create a new file only for PHY LEDs instead?
-> > 
-> > Sorry for being confused, I don't mind going down what ever path to have
-> > LED polarity configurable properly in DT.
-> 
-> Let's ignore my idea.
-> 
-> However I still wonder whether your choice for lack of properties is
-> appropriate. Lack of properties as "bootloader default" means it can
-> change. Why would anyone prefer to keep bootloader default? The wiring
-> is fixed - it's never "we design PCB based on bootloader, so with new
-> bootloader we will change PCB"?
-> 
-> And if you meant bootstrapping through some hardwired configuration,
-> then again it is known and defined.
+This series contains patches which improve the QCA7000 sync behavior.
 
-I agree, and my original intention was to just always apply polarity
-settings and force people to correctly declare them in DT.
-However, that would break DT compatibility on devices not making use
-of those properties and relying only on strapping or bootloader
-defaults. See also RFC discussed here:
+Stefan Wahren (2):
+  qca_spi: Count unexpected WRBUF_SPC_AVA after reset
+  qca_spi: Improve reset mechanism
 
-https://patchwork.kernel.org/project/netdevbpf/patch/473d62f268f2a317fd81d0f38f15d2f2f98e2451.1728056697.git.daniel@makrotopia.org/
+ drivers/net/ethernet/qualcomm/qca_debug.c |  4 +--
+ drivers/net/ethernet/qualcomm/qca_spi.c   | 30 ++++++++++++++---------
+ drivers/net/ethernet/qualcomm/qca_spi.h   |  2 +-
+ 3 files changed, 21 insertions(+), 15 deletions(-)
+
+=2D-
+2.34.1
+
 
