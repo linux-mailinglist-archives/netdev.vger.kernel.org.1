@@ -1,71 +1,86 @@
-Return-Path: <netdev+bounces-132848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C497993810
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 22:17:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 765DD993868
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 22:39:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232371F2202D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 20:17:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25C531F22CA0
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 20:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF4A21DACB1;
-	Mon,  7 Oct 2024 20:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BA61DE4E9;
+	Mon,  7 Oct 2024 20:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YhmcOEen"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m5bGq9Ak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926D881727
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 20:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5381D31A0;
+	Mon,  7 Oct 2024 20:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728332253; cv=none; b=FnplOx+9Sr2Nbw6eIVE/KnKqqUSwPF2GhHeaRPRA5PrKzKIah704pRY30gLefppTwNXLfP4rKzNX9Qkh1vBmqNd1SpEpTtitL89UKk2dKo7YDzBZg7o/KU76i8fDcHfCBIP2hfX5a8ax2nMUhLvEB11JmxjPzp9Vs8gDaPiOSUc=
+	t=1728333568; cv=none; b=PKWnaxsKgZo3UdjsHFHIPS9vx1iGtnOoA8qLtoyyHI6cUaZ4iEPld53CNjk0KuzGnLzbWeQW+/lO/YFgMtRC746ToLLPA2zLZyqDai4fOfvRebSg0mS+sK9bmP9ftwgCC7/zrmZceQ7q2+hFowOcOrjH+J7rLWOzMDbRlG8NoPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728332253; c=relaxed/simple;
-	bh=t8eRMXgHM65A8SAT5uZ6vgW3918+43f43JG1igKF8M8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D5FjPN82e8mMQwwu+uDI/+7P1BwcgK2jDk0yDrpYYsiAhdhB0++wm4bbfOLQzhCN9VGCwgxvRTwxGP1xTzW91od9mdhB95YWVgzJ1dA6kcYd2p7CD6God0MNS4sALitrbXzDEBa+akdbeodVvWNhP9u6Prc2a96vOj/CxuCFxC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YhmcOEen; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728332252; x=1759868252;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=t8eRMXgHM65A8SAT5uZ6vgW3918+43f43JG1igKF8M8=;
-  b=YhmcOEenrS85tbfJoA1eeGpjRazrCBEUkJBLhRzQLLNBj6Pf5uG7roTg
-   ad0RFRL/IzuIlXBewtjr4mUX+ymjNqPGT34YFvUuSD/zEQJeEqzGnDikR
-   f0RHyDgG4jrOitYMwRP69QW/IxCEURyI5ZVxdG0f+lXAEY0sLL6Wc5TAd
-   c94HM7GPiAgxfACW8p1E30GLjxGVA0oLjaCnFnUWfgS8VBZvsr40dmUA9
-   Ey/V9nkhzHzUJaCLOyMFhoNDL6o74AUKCPprsIVvEpxt6dKksq9H5Cphe
-   34WxCTfq4VvdJ5Ch+eFVZNFfLyeueeb8ErNg1JxxLmbEoMtqeeNfS16Da
-   w==;
-X-CSE-ConnectionGUID: 3v142GhMTvKnaNFJp0Qf9w==
-X-CSE-MsgGUID: OZUgXtL8QhamzyCj7Zu4bw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="38066444"
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="38066444"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 13:17:31 -0700
-X-CSE-ConnectionGUID: h+KGnEy/QVydIlyV5f6wiw==
-X-CSE-MsgGUID: MrRYPvxqQ+i+0IqF8kEnsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
-   d="scan'208";a="76023755"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.13])
-  by orviesa007.jf.intel.com with ESMTP; 07 Oct 2024 13:17:31 -0700
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: aleksander.lobakin@intel.com,
-	madhu.chittim@intel.com,
-	netdev@vger.kernel.org
-Subject: [Intel-wired-lan][PATCH iwl-net] idpf: set completion tag for "empty" bufs associated with a packet
-Date: Mon,  7 Oct 2024 13:24:35 -0700
-Message-Id: <20241007202435.664345-1-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1728333568; c=relaxed/simple;
+	bh=5TT17y3RjAcT06/ywoplkLucZ8ruotI+ZhLh6wB2mxk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tnAVs/ujODqoIZCRdsgu42s65nHqkigJ7LtfJfCIVLLM8Ki2XYPbIT5oSC0bkIVrqS80WJ2urnGuhsMsz9qVXTPy0sZrYRA7Kac8K+YwdqZfqUe4GV84dygjWlqBcX7bDO0bmTC8uvGELUiSRo65FQ4QcVkHX9nqYN9FhObnNaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m5bGq9Ak; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e0c7eaf159so3786939a91.1;
+        Mon, 07 Oct 2024 13:39:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728333566; x=1728938366; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=J+WTgadYP/jr9gAydYiukIu6hRrw9XfPtLwLH3kbWpw=;
+        b=m5bGq9AkI1mAfo/jI+0w6fyS2M+oWQj0DiToNzbzqDqNetqOyad6vW+JEoCAz1el3W
+         HcvmKk8uui2HMY2RLGLZ33RqKoQruAgD3f54dFYzPooiySCI5axaYRDVky6wbL7TNUja
+         lDHoIC72yHYMwvzHXOewVd4gCJHeOHnfzg+NElygsvY7sxkyyB03Imh3g6g2RIpeAE84
+         cQetsiZAQZkOrRKBskpb+8y/h5+aWb9mXjiw0w8daslAhWzmPuoeMj6KBgLWjSwxFjW0
+         lynAlr/qhg7b0yGZxfvkHIoAPUFEZrWFBLSY4Rap3TG5Bh5uxbJlsCX6jnSQYytnXlGK
+         YI+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728333566; x=1728938366;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=J+WTgadYP/jr9gAydYiukIu6hRrw9XfPtLwLH3kbWpw=;
+        b=CGHgCOIlsjs2hBwOe+gDCFx7qh3rg0VJUpfc1u3ZF3s+jMR/tQpDt10cjDzIVbj9fO
+         iPlg4iBhZQqf3vP5IykNSSzNjLUPM0mCvfO2kVHNriDRREDqZ/vSwxO1fLTQc/hmazQw
+         pvsFKJlYbLwWdNiELHu38s/HCEWH/i4IAEv563qemHkWaNxWLRDn2jPs1gQL1Wce/Sar
+         RfYTWfDQG2ACqtmr/k9FFGcZiSAyKiCMI89FfEJPEyTVPIUxtcnG8IPrfRpzbpYeclsX
+         XgFTAsRz0DAHp95FVDXMY97pw4ovrGc3Jb/FRoO8XVGR9dYnhXCTOm58qVBY6a1kBnYe
+         k/NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/wyXbD9tVIsbie/rpUuh2sVtEgBb91cmcy6KHd/7t74RuszPZOhUKplp6Su6d3nMIp0TbyGCayO8C+5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWsknHn+XgbS/8ndlTvk3eKXTgNLt/bVYQb4JoNkrqSXG3YMnM
+	tFrrwqHhVvqF8KS2R7ekCirruQbHkZFokWKAMdvZIlU7meVh7a0wK2kSIw==
+X-Google-Smtp-Source: AGHT+IEdPceQvCoPhguVFHp2GuqFzM7wgm3in8NUX6mhioQSetBuRqjEeqW+AKeJo3i1U9aRmSPpLw==
+X-Received: by 2002:a17:90a:fd87:b0:2da:6812:c1bd with SMTP id 98e67ed59e1d1-2e1e621f1e7mr14095494a91.15.1728333566480;
+        Mon, 07 Oct 2024 13:39:26 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e281aee517sm84544a91.0.2024.10.07.13.39.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 13:39:26 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCH net] net: ibm: emac: mal: add dcr_unmap to _remove
+Date: Mon,  7 Oct 2024 13:39:23 -0700
+Message-ID: <20241007203923.15544-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,54 +89,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit d9028db618a6 ("idpf: convert to libeth Tx buffer completion")
-inadvertently removed code that was necessary for the tx buffer cleaning
-routine to iterate over all buffers associated with a packet.
+It's done in probe so it should be done in remove.
 
-When a frag is too large for a single data descriptor, it will be split
-across multiple data descriptors. This means the frag will span multiple
-buffers in the buffer ring in order to keep the descriptor and buffer
-ring indexes aligned. The buffer entries in the ring are technically
-empty and no cleaning actions need to be performed. These empty buffers
-can precede other frags associated with the same packet. I.e. a single
-packet on the buffer ring can look like:
+Fixes: 1ff0fcfcb1a6 ("ibm_newemac: Fix new MAL feature handling")
 
-	buf[0]=skb0.frag0
-	buf[1]=skb0.frag1
-	buf[2]=empty
-	buf[3]=skb0.frag2
-
-The cleaning routine iterates through these buffers based on a matching
-completion tag. If the completion tag is not set for buf2, the loop will
-end prematurely. Frag2 will be left uncleaned and next_to_clean will be
-left pointing to the end of packet, which will break the cleaning logic
-for subsequent cleans. This consequently leads to tx timeouts.
-
-Assign the empty bufs the same completion tag for the packet to ensure
-the cleaning routine iterates over all of the buffers associated with
-the packet.
-
-Fixes: d9028db618a6 ("idpf: convert to libeth Tx buffer completion")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Madhu chittim <madhu.chittim@intel.com>
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/ibm/emac/mal.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index d4e6f0e10487..60d15b3e6e2f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -2448,6 +2448,7 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
- 			 * rest of the packet.
- 			 */
- 			tx_buf->type = LIBETH_SQE_EMPTY;
-+			idpf_tx_buf_compl_tag(tx_buf) = params->compl_tag;
+diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
+index 1e1860ddc363..b1a32070f03a 100644
+--- a/drivers/net/ethernet/ibm/emac/mal.c
++++ b/drivers/net/ethernet/ibm/emac/mal.c
+@@ -715,6 +715,8 @@ static void mal_remove(struct platform_device *ofdev)
  
- 			/* Adjust the DMA offset and the remaining size of the
- 			 * fragment.  On the first iteration of this loop,
+ 	free_netdev(mal->dummy_dev);
+ 
++	dcr_unmap(mal->dcr_host, 0x100);
++
+ 	dma_free_coherent(&ofdev->dev,
+ 			  sizeof(struct mal_descriptor) *
+ 				  (NUM_TX_BUFF * mal->num_tx_chans +
 -- 
-2.39.2
+2.46.2
 
 
