@@ -1,167 +1,185 @@
-Return-Path: <netdev+bounces-132621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3469927E4
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:15:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2672D9927F0
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:18:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F75B1F22276
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 09:15:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 557CC1C224C5
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 09:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83C518DF88;
-	Mon,  7 Oct 2024 09:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFA8118B464;
+	Mon,  7 Oct 2024 09:18:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UEPMYj8U";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Iw/bEKIx"
+	dkim=pass (2048-bit key) header.d=ideco.ru header.i=@ideco.ru header.b="cRDzPYcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.ideco.ru (smtp.ideco.ru [46.36.23.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166F618C326;
-	Mon,  7 Oct 2024 09:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBF4231CA9;
+	Mon,  7 Oct 2024 09:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.36.23.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728292497; cv=none; b=OHq8qguVxUHFr0R5CDqUI9l7/4Rn4YW1aS0lR23F1k3hJtps6CTxsXIPg0xZQPFow+pDlh6UIUC9hRbGTa9dEeFDNTK8SyD+LejlZ7/LWTAcV+V61fBfkR+9yfdWxBwPLI4gurmCOU32VTwW9YbMB7U0MoqBoEyp2TCUG85r4AE=
+	t=1728292728; cv=none; b=AccunXIg+JiQbVU/MUDGP05fCFY2TCQAwPUCQnUJRmzHqCxlHzVnSjU7CqN5i8uVsJuisC6TCV7FNl1TAPfaS+Q15xeeq1jNCilZ2bQakR6eLarVBKRaxbN0PzKfDosk87y+Xw8mvg/mxEeBpSlj12swcTPJJNf8VD/oKulC464=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728292497; c=relaxed/simple;
-	bh=W3hDRAYPSXIkW9gYM4sT+DAxCx8yaov54LZrcMTrwuA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=cII+N/CDlixDs+y1k6akClsbhgjDqIHYKUGBthSdU6Ze0hkWe6TY3oDuivUkyXAt9c/oxV7FfN//xxZNBzEPNI8a4MlrHsPjK82WFn71et3xMJYvOtclkRelwmGHEajJSGjBGQPCGIqQEFB8RkX6e2Soz3XvnLZmdbjJrDkPkM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UEPMYj8U; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Iw/bEKIx; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1728292493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ILhejzyvsn9kCBk/pLYqb1pHNvOKTywyx34p8dgeWWo=;
-	b=UEPMYj8U8PeoCIDMxrM9YIBlbJQ+LGt6Dear3XCNWOJgJRS4o0gI6rFb3omUQaDXQQ8lso
-	kpm7AddJjyESCchyMLoQ1o73X/uZT0RP1jATKDV2oxTsxLe6Ie7xTbTQQXiqzIJe7ZRgCB
-	yT+SwYjDjet6m4HUguyyoZZdrQqHJRNqcamJVWl+bZhbVdqdoG0P90OmKpgoyHg//W46q8
-	qY/yP2Em0u7/PF0kATyuhaCIwYegxhYhFdXAF0WtYp9BhhTI1dLoQQQ5KNi+AH+IVmtGXX
-	LI00PUuZJKagKRvs9DX3vNhPzQQff7495ylcC87kfiXp/z68Z8yP2TozEfeYUw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1728292493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ILhejzyvsn9kCBk/pLYqb1pHNvOKTywyx34p8dgeWWo=;
-	b=Iw/bEKIxzy+PzeYK32U1OyNVFCDn4052LD0tJJ8oC4ZYEtIyChQCVP+FOasBkjg7C/SNDO
-	mfEDG6GggTG4F5CQ==
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "moderated list:INTEL ETHERNET DRIVERS"
- <intel-wired-lan@lists.osuosl.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next 2/2] igc: Link queues to NAPI instances
-In-Reply-To: <20241003233850.199495-3-jdamato@fastly.com>
-References: <20241003233850.199495-1-jdamato@fastly.com>
- <20241003233850.199495-3-jdamato@fastly.com>
-Date: Mon, 07 Oct 2024 11:14:51 +0200
-Message-ID: <87msjg46lw.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1728292728; c=relaxed/simple;
+	bh=ah0plcJH83K1nD114MbEzQZq47uOyGUTf9PS1Y6wva0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DNma3/y9Bwyf7Dt8Ze7FrMt+HO4v6xQEv2kp7C4kgyILF/mXL9PD8qnnXnzUy+LMDokzL21qXBxYci80n8JHS6ZL9IAFxDFOuwU8mBw0/Nz1oEqxjXHIMs4jzaORafMus1ar/if7G3zvf+v8+X1K8NRn1FO5BN0cFTVbU4z7wF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideco.ru; spf=none smtp.mailfrom=ideco.ru; dkim=pass (2048-bit key) header.d=ideco.ru header.i=@ideco.ru header.b=cRDzPYcG; arc=none smtp.client-ip=46.36.23.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideco.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ideco.ru
+Received: from [169.254.254.254] (localhost [127.0.0.1])
+	by smtp.ideco.ru (Postfix) with ESMTP id 450E57005C82;
+	Mon,  7 Oct 2024 14:18:34 +0500 (+05)
+Received: from localhost.localdomain (unknown [5.189.15.141])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp.ideco.ru (Postfix) with ESMTPSA id 806E97005C83;
+	Mon,  7 Oct 2024 14:18:23 +0500 (+05)
+DKIM-Filter: OpenDKIM Filter v2.11.0 smtp.ideco.ru 806E97005C83
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ideco.ru; s=ics;
+	t=1728292713; bh=bimnxKSsAOXhIzvh1rNS6NDuEAGgMtlXMv87QwpErdI=;
+	h=From:To:Cc:Subject:Date;
+	b=cRDzPYcGFhLatFGClhk6y/zk9o2HOawdfe3p8QwfEwBbajelZiYIzYb2qwy8NNdOI
+	 JqSShxRDLrvY+Fh9ul1N2WvMz6eWhT8xrNQl8jbkBrdi8rW7bsBLSNmh9wIUAV4ANu
+	 yVoI9uReBxzXwCRcs5U9VdNHgQmfG0viM+dt13cMJ4h6FPBuZTteDQbHbnqVrWdOQ2
+	 0TPrS3ddcSk7+h0bVLwvZX+nJElxZuVZW1YF7u1oE8D5oEWXw1zRvPCCd/Asu/dpwp
+	 xy9bzIOhtobNBeC+LQSb3LQLGfnicLrY5O3F/bV2YCiFXW5flRkgewL2AsPr1u8J/h
+	 JbJPdd6sMpmMA==
+From: Petr Vaganov <p.vaganov@ideco.ru>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Petr Vaganov <p.vaganov@ideco.ru>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Antony Antony <antony.antony@secunet.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org,
+	Boris Tonofa <b.tonofa@ideco.ru>
+Subject: [PATCH ipsec v2] xfrm: fix one more kernel-infoleak in algo dumping
+Date: Mon,  7 Oct 2024 14:16:05 +0500
+Message-ID: <20241007091611.15755-1-p.vaganov@ideco.ru>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 8bit
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+During fuzz testing, the following issue was discovered:
 
-Hi Joe,
+BUG: KMSAN: kernel-infoleak in _copy_to_iter+0x598/0x2a30
+ _copy_to_iter+0x598/0x2a30
+ __skb_datagram_iter+0x168/0x1060
+ skb_copy_datagram_iter+0x5b/0x220
+ netlink_recvmsg+0x362/0x1700
+ sock_recvmsg+0x2dc/0x390
+ __sys_recvfrom+0x381/0x6d0
+ __x64_sys_recvfrom+0x130/0x200
+ x64_sys_call+0x32c8/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
 
-On Thu Oct 03 2024, Joe Damato wrote:
-> Link queues to NAPI instances via netdev-genl API so that users can
-> query this information with netlink:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
->
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
->
-> Since igc uses only combined queues, you'll note that the same NAPI ID
-> is present for both rx and tx queues at the same index, for example
-> index 0:
->
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
-> {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
->
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  drivers/net/ethernet/intel/igc/igc_main.c | 30 ++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethe=
-rnet/intel/igc/igc_main.c
-> index 7964bbedb16c..b3bd5bf29fa7 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -4955,6 +4955,7 @@ static int igc_sw_init(struct igc_adapter *adapter)
->  void igc_up(struct igc_adapter *adapter)
->  {
->  	struct igc_hw *hw =3D &adapter->hw;
-> +	struct napi_struct *napi;
->  	int i =3D 0;
->=20=20
->  	/* hardware has been reset, we need to reload some things */
-> @@ -4962,8 +4963,17 @@ void igc_up(struct igc_adapter *adapter)
->=20=20
->  	clear_bit(__IGC_DOWN, &adapter->state);
->=20=20
-> -	for (i =3D 0; i < adapter->num_q_vectors; i++)
-> -		napi_enable(&adapter->q_vector[i]->napi);
-> +	for (i =3D 0; i < adapter->num_q_vectors; i++) {
-> +		napi =3D &adapter->q_vector[i]->napi;
-> +		napi_enable(napi);
-> +		/* igc only supports combined queues, so link each NAPI to both
-> +		 * TX and RX
-> +		 */
+Uninit was stored to memory at:
+ copy_to_user_state_extra+0xcc1/0x1e00
+ dump_one_state+0x28c/0x5f0
+ xfrm_state_walk+0x548/0x11e0
+ xfrm_dump_sa+0x1e0/0x840
+ netlink_dump+0x943/0x1c40
+ __netlink_dump_start+0x746/0xdb0
+ xfrm_user_rcv_msg+0x429/0xc00
+ netlink_rcv_skb+0x613/0x780
+ xfrm_netlink_rcv+0x77/0xc0
+ netlink_unicast+0xe90/0x1280
+ netlink_sendmsg+0x126d/0x1490
+ __sock_sendmsg+0x332/0x3d0
+ ____sys_sendmsg+0x863/0xc30
+ ___sys_sendmsg+0x285/0x3e0
+ __x64_sys_sendmsg+0x2d6/0x560
+ x64_sys_call+0x1316/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
 
-igc has IGC_FLAG_QUEUE_PAIRS. For example there may be 2 queues
-configured, but 4 vectors active (and 4 IRQs). Is your patch working
-with that?  Can be tested easily with `ethtool -L <inf> combined 2` or
-by booting with only 2 CPUs.
+Uninit was created at:
+ __kmalloc+0x571/0xd30
+ attach_auth+0x106/0x3e0
+ xfrm_add_sa+0x2aa0/0x4230
+ xfrm_user_rcv_msg+0x832/0xc00
+ netlink_rcv_skb+0x613/0x780
+ xfrm_netlink_rcv+0x77/0xc0
+ netlink_unicast+0xe90/0x1280
+ netlink_sendmsg+0x126d/0x1490
+ __sock_sendmsg+0x332/0x3d0
+ ____sys_sendmsg+0x863/0xc30
+ ___sys_sendmsg+0x285/0x3e0
+ __x64_sys_sendmsg+0x2d6/0x560
+ x64_sys_call+0x1316/0x3cc0
+ do_syscall_64+0xd8/0x1c0
+ entry_SYSCALL_64_after_hwframe+0x79/0x81
 
-Thanks,
-Kurt
+Bytes 328-379 of 732 are uninitialized
+Memory access of size 732 starts at ffff88800e18e000
+Data copied to user address 00007ff30f48aff0
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+CPU: 2 PID: 18167 Comm: syz-executor.0 Not tainted 6.8.11 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
 
------BEGIN PGP SIGNATURE-----
+This patch fixes copying of xfrm algorithms where some random
+data of the structure fields can end up in userspace.
+Padding in structures may be filled with random (possibly sensitve)
+data and should never be given directly to user-space.
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmcDposTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgkVmD/9qaFbTuNtod2nGZcKugdGzZE7UPryI
-vjNn7+3IRXDCkRsCXqZpU+Ay4i78xFdFH3z4C8r1YK8Idl7xWvNYbSHicN1/dFea
-zCGVkCyDr2cG/Nen2ty1+BaMyY3xVkmPKsO3/i5bTwJ8iLHr1RI20SQl7AlDdj4w
-ZzrtmH28A12Vt6zf+Jw3cKHCCzP+V44Qkd6yeYL8W7Tqyu4nefLnmkGC4pL1aAKm
-5Hck67WdesDYi3QmzVfB8WcUbtG/SIAheYz80rIA+1YGgxXJ163slMis458w2gxQ
-t3vqFLHAxcDVq39DUhJOqFA6821BGUGzebA/2nq7vjnti8JA9lIn6hbzTj2Ficwi
-AezoP1W6G1vyMlha7q4+AKcHfY0L6CelU5fF1PVkCFcld4HEMM5CmZ6yeOKHCQ8s
-P5ylfIJJPO1l8GrKJrtuY8bshBz4yHv8aKoepydkO/VgFnfQ+x/orzcYrAYSBOoC
-8VkQdadBeoD8qCvttQv1GbDUM+3My1exs3k0lB836+bYfz29Yi+Rj3KKuzPPzw5D
-44ic3S0Qv84pydQBNxiXH0/Nmc+GhZRfIURSV1BwLqluwImh4xaC89W+4ltypwhL
-gA/V3nipKhx2nzx3NAsAhm8sk+17B11j1Ba5G+lmLv8JG4Bv+GirXVlmraiYruhK
-LfqS6xN2o9s2GQ==
-=LMbF
------END PGP SIGNATURE-----
---=-=-=--
+A similar issue was resolved in the commit
+8222d5910dae ("xfrm: Zero padding when dumping algos and encap")
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Fixes: c7a5899eb26e ("xfrm: redact SA secret with lockdown confidentiality")
+Cc: stable@vger.kernel.org
+Co-developed-by: Boris Tonofa <b.tonofa@ideco.ru>
+Signed-off-by: Boris Tonofa <b.tonofa@ideco.ru>
+Signed-off-by: Petr Vaganov <p.vaganov@ideco.ru>
+---
+v2: Fixed typo in sizeof(sizeof(ap->alg_name) expression.
+The third argument for the strscpy_pad macro was chosen by
+analogy with those in other functions of this file - as did
+commit 8222d5910dae ("xfrm: Zero padding when dumping algos and encap").
+I still think it would be better to leave the strscpy_pad() macro with
+three arguments in this patch, mainly so that it would be consistent 
+with the existing similar code in this module.
+Regarding strncpy() above, we don't think it is
+a real issue since the uncopied parts should be already padded with zeroes
+by nla_reserve().
+
+ net/xfrm/xfrm_user.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 55f039ec3d59..0083faabe8be 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1098,7 +1098,9 @@ static int copy_to_user_auth(struct xfrm_algo_auth *auth, struct sk_buff *skb)
+ 	if (!nla)
+ 		return -EMSGSIZE;
+ 	ap = nla_data(nla);
+-	memcpy(ap, auth, sizeof(struct xfrm_algo_auth));
++	strscpy_pad(ap->alg_name, auth->alg_name, sizeof(ap->alg_name));
++	ap->alg_key_len = auth->alg_key_len;
++	ap->alg_trunc_len = auth->alg_trunc_len;
+ 	if (redact_secret && auth->alg_key_len)
+ 		memset(ap->alg_key, 0, (auth->alg_key_len + 7) / 8);
+ 	else
+-- 
+2.46.1
+
 
