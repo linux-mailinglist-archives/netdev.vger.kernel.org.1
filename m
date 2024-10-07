@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-132682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2775F992C4F
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:47:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D0E992C53
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:48:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23831F2354D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:47:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C54A11C22901
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 12:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1A0D1D1E65;
-	Mon,  7 Oct 2024 12:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90791D4356;
+	Mon,  7 Oct 2024 12:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ppci4A1z"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YJmxOg3v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003641E884
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 12:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39A331D45F3
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 12:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728305142; cv=none; b=DTbrhxkGXk2g5ZJ6iE11ydhHCWFEj2tNQkyWOBSJ/HuttQqxgvi8Ok2mOwKWUIkFtrqhzgdD0+P89DrnH/zgk2Dg+JrZXoQwzrtse7gyOmESn/CEysvzwjFaDj7ISfgIA3sDY2L1+gxrukFeoEKuP9w0gAi+2/aJTi+JU2LEcRo=
+	t=1728305165; cv=none; b=awGhmykSOBng1PVFCr57kye8QWvq2/DmtXk669n8CFwlB0n+YCfhIHgH7WwAtE3NXd1HG03KAsZ0pnB2umhYet2za+i8el7tGG1iFRgwDkYHJZfCO/1N9i82gMYNJ4rYPn9HW7b2NQ4GGiYSbL1pnLVnnJz7MdEACpbQjlcocbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728305142; c=relaxed/simple;
-	bh=WqblpNmWSvhG1EjD33q4dhAvgk3Z/IY1lI1U6Wd6PkM=;
+	s=arc-20240116; t=1728305165; c=relaxed/simple;
+	bh=cpuJ4YppAsmgbh6HDmfwcQSmtFlt6MpqkLGD+ZK9Fms=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C2KVeSpaeXCkEN366hg4W0RjoRb5kgV0jag6SmhW23/O+pE5DzwaMXTyI8Mk4Oyq/OLTWU3F7zNWPiJ5pmxvGptpjMZ3+AxhOmY4cU2TTdvDC0LE6CIuVyr+C3cUfrsMXlma9lUQn3+579q9fkaMim7gPQIrzfFZlAxAGplh6WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ppci4A1z; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=N5og9pGhU8devgipxWD5AwGOy6VQVHUuMIQaff3mglJ367ztyJ9hdYx1H91ntLJGz+IiBvEcsMqOQ9ACWWwZfUHxw4Ac8PPYB4vYrT1xw5X/LF7IFC5PoNy8QjzGnf1+YVG/GfCvapyo/DA9XdcWHErJbKa3sPv0qkNZ0iZHyZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YJmxOg3v; arc=none smtp.client-ip=99.78.197.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728305142; x=1759841142;
+  t=1728305164; x=1759841164;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iwRoDgJs8x0TrBhXwWLyrpqsKh8/XiWSFO0OjI7fJD8=;
-  b=ppci4A1zqn/nqjg639uLR6uiw5Zik3AIJo/54TswmLTy5Dd38QJEYl4i
-   QH/t7jYo+2sO0bApWxvcCoPBvTFli/u0cdOar2RHqLtTsvAEsWP0720WD
-   Dgfc/Bg4jZd3pgAQ2mrMGuK7n0R8gtff+k5uO784RKpG9tf4t/FpAsOFd
-   A=;
+  bh=pcGz1bAMUO11YQ77zYSzdrt0wEAnYUKQFQTgjNqs4Xk=;
+  b=YJmxOg3vN4Y/7ZPWHY+i+7zW1/gjH+JmPPNe4gCPPydcLof0DxrM3zCo
+   tesh7MWOBVizlSdA/CCtwIxqZsmjsDd/+Rc4fcjs2GmPBhCHr8H3AgGYk
+   UgrML8lwTXRfBjbtqt5ormDf1tJwS/bgA+GjkER5pxyelxwS0ROBguCQY
+   s=;
 X-IronPort-AV: E=Sophos;i="6.11,184,1725321600"; 
-   d="scan'208";a="438827231"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 12:45:38 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:38144]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.198:2525] with esmtp (Farcaster)
- id c4fd5ebc-8744-4e28-916b-e18febc5d35a; Mon, 7 Oct 2024 12:45:37 +0000 (UTC)
-X-Farcaster-Flow-ID: c4fd5ebc-8744-4e28-916b-e18febc5d35a
+   d="scan'208";a="340627099"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 12:46:02 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:17832]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.223:2525] with esmtp (Farcaster)
+ id ab992476-abbb-4b31-9f55-5335193094ec; Mon, 7 Oct 2024 12:46:01 +0000 (UTC)
+X-Farcaster-Flow-ID: ab992476-abbb-4b31-9f55-5335193094ec
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 7 Oct 2024 12:45:36 +0000
+ Mon, 7 Oct 2024 12:46:01 +0000
 Received: from 88665a182662.ant.amazon.com (10.119.221.239) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 7 Oct 2024 12:45:34 +0000
+ Mon, 7 Oct 2024 12:45:58 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net 1/6] rtnetlink: Add bulk registration helpers for rtnetlink message handlers.
-Date: Mon, 7 Oct 2024 05:44:54 -0700
-Message-ID: <20241007124459.5727-2-kuniyu@amazon.com>
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>
+Subject: [PATCH v3 net 2/6] vxlan: Handle error of rtnl_register_module().
+Date: Mon, 7 Oct 2024 05:44:55 -0700
+Message-ID: <20241007124459.5727-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20241007124459.5727-1-kuniyu@amazon.com>
 References: <20241007124459.5727-1-kuniyu@amazon.com>
@@ -77,103 +78,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
+X-ClientProxiedBy: EX19D044UWB004.ant.amazon.com (10.13.139.134) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Before commit addf9b90de22 ("net: rtnetlink: use rcu to free rtnl message
-handlers"), once rtnl_msg_handlers[protocol] was allocated, the following
-rtnl_register_module() for the same protocol never failed.
+Since introduced, vxlan_vnifilter_init() has been ignoring the
+returned value of rtnl_register_module(), which could fail.
 
-However, after the commit, rtnl_msg_handler[protocol][msgtype] needs to
-be allocated in each rtnl_register_module(), so each call could fail.
+Let's handle the errors by rtnl_register_many().
 
-Many callers of rtnl_register_module() do not handle the returned error,
-and we need to add many error handlings.
-
-To handle that easily, let's add wrapper functions for bulk registration
-of rtnetlink message handlers.
-
+Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
- include/net/rtnetlink.h | 17 +++++++++++++++++
- net/core/rtnetlink.c    | 29 +++++++++++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+Cc: Roopa Prabhu <roopa@nvidia.com>
+---
+ drivers/net/vxlan/vxlan_core.c      |  6 +++++-
+ drivers/net/vxlan/vxlan_private.h   |  2 +-
+ drivers/net/vxlan/vxlan_vnifilter.c | 19 +++++++++----------
+ 3 files changed, 15 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
-index b45d57b5968a..2d3eb7cb4dff 100644
---- a/include/net/rtnetlink.h
-+++ b/include/net/rtnetlink.h
-@@ -29,6 +29,15 @@ static inline enum rtnl_kinds rtnl_msgtype_kind(int msgtype)
- 	return msgtype & RTNL_KIND_MASK;
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 53dcb9fffc04..6e9a3795846a 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -4913,9 +4913,13 @@ static int __init vxlan_init_module(void)
+ 	if (rc)
+ 		goto out4;
+ 
+-	vxlan_vnifilter_init();
++	rc = vxlan_vnifilter_init();
++	if (rc)
++		goto out5;
+ 
+ 	return 0;
++out5:
++	rtnl_link_unregister(&vxlan_link_ops);
+ out4:
+ 	unregister_switchdev_notifier(&vxlan_switchdev_notifier_block);
+ out3:
+diff --git a/drivers/net/vxlan/vxlan_private.h b/drivers/net/vxlan/vxlan_private.h
+index b35d96b78843..76a351a997d5 100644
+--- a/drivers/net/vxlan/vxlan_private.h
++++ b/drivers/net/vxlan/vxlan_private.h
+@@ -202,7 +202,7 @@ int vxlan_vni_in_use(struct net *src_net, struct vxlan_dev *vxlan,
+ int vxlan_vnigroup_init(struct vxlan_dev *vxlan);
+ void vxlan_vnigroup_uninit(struct vxlan_dev *vxlan);
+ 
+-void vxlan_vnifilter_init(void);
++int vxlan_vnifilter_init(void);
+ void vxlan_vnifilter_uninit(void);
+ void vxlan_vnifilter_count(struct vxlan_dev *vxlan, __be32 vni,
+ 			   struct vxlan_vni_node *vninode,
+diff --git a/drivers/net/vxlan/vxlan_vnifilter.c b/drivers/net/vxlan/vxlan_vnifilter.c
+index 9c59d0bf8c3d..d2023e7131bd 100644
+--- a/drivers/net/vxlan/vxlan_vnifilter.c
++++ b/drivers/net/vxlan/vxlan_vnifilter.c
+@@ -992,19 +992,18 @@ static int vxlan_vnifilter_process(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	return err;
  }
  
-+struct rtnl_msg_handler {
-+	struct module *owner;
-+	int protocol;
-+	int msgtype;
-+	rtnl_doit_func doit;
-+	rtnl_dumpit_func dumpit;
-+	int flags;
+-void vxlan_vnifilter_init(void)
++static const struct rtnl_msg_handler vxlan_vnifilter_rtnl_msg_handlers[] = {
++	{THIS_MODULE, PF_BRIDGE, RTM_GETTUNNEL, NULL, vxlan_vnifilter_dump, 0},
++	{THIS_MODULE, PF_BRIDGE, RTM_NEWTUNNEL, vxlan_vnifilter_process, NULL, 0},
++	{THIS_MODULE, PF_BRIDGE, RTM_DELTUNNEL, vxlan_vnifilter_process, NULL, 0},
 +};
 +
- void rtnl_register(int protocol, int msgtype,
- 		   rtnl_doit_func, rtnl_dumpit_func, unsigned int flags);
- int rtnl_register_module(struct module *owner, int protocol, int msgtype,
-@@ -36,6 +45,14 @@ int rtnl_register_module(struct module *owner, int protocol, int msgtype,
- int rtnl_unregister(int protocol, int msgtype);
- void rtnl_unregister_all(int protocol);
- 
-+int __rtnl_register_many(const struct rtnl_msg_handler *handlers, int n);
-+void __rtnl_unregister_many(const struct rtnl_msg_handler *handlers, int n);
-+
-+#define rtnl_register_many(handlers)				\
-+	__rtnl_register_many(handlers, ARRAY_SIZE(handlers))
-+#define rtnl_unregister_many(handlers)				\
-+	__rtnl_unregister_many(handlers, ARRAY_SIZE(handlers))
-+
- static inline int rtnl_msg_family(const struct nlmsghdr *nlh)
++int vxlan_vnifilter_init(void)
  {
- 	if (nlmsg_len(nlh) >= sizeof(struct rtgenmsg))
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index f0a520987085..e30e7ea0207d 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -384,6 +384,35 @@ void rtnl_unregister_all(int protocol)
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_GETTUNNEL, NULL,
+-			     vxlan_vnifilter_dump, 0);
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_NEWTUNNEL,
+-			     vxlan_vnifilter_process, NULL, 0);
+-	rtnl_register_module(THIS_MODULE, PF_BRIDGE, RTM_DELTUNNEL,
+-			     vxlan_vnifilter_process, NULL, 0);
++	return rtnl_register_many(vxlan_vnifilter_rtnl_msg_handlers);
  }
- EXPORT_SYMBOL_GPL(rtnl_unregister_all);
  
-+int __rtnl_register_many(const struct rtnl_msg_handler *handlers, int n)
-+{
-+	const struct rtnl_msg_handler *handler;
-+	int i, err;
-+
-+	for (i = 0, handler = handlers; i < n; i++, handler++) {
-+		err = rtnl_register_internal(handler->owner, handler->protocol,
-+					     handler->msgtype, handler->doit,
-+					     handler->dumpit, handler->flags);
-+		if (err) {
-+			__rtnl_unregister_many(handlers, i);
-+			break;
-+		}
-+	}
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(__rtnl_register_many);
-+
-+void __rtnl_unregister_many(const struct rtnl_msg_handler *handlers, int n)
-+{
-+	const struct rtnl_msg_handler *handler;
-+	int i;
-+
-+	for (i = n - 1, handler = handlers + n - 1; i >= 0; i--, handler--)
-+		rtnl_unregister(handler->protocol, handler->msgtype);
-+}
-+EXPORT_SYMBOL_GPL(__rtnl_unregister_many);
-+
- static LIST_HEAD(link_ops);
- 
- static const struct rtnl_link_ops *rtnl_link_ops_get(const char *kind)
+ void vxlan_vnifilter_uninit(void)
+ {
+-	rtnl_unregister(PF_BRIDGE, RTM_GETTUNNEL);
+-	rtnl_unregister(PF_BRIDGE, RTM_NEWTUNNEL);
+-	rtnl_unregister(PF_BRIDGE, RTM_DELTUNNEL);
++	rtnl_unregister_many(vxlan_vnifilter_rtnl_msg_handlers);
+ }
 -- 
 2.30.2
 
