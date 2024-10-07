@@ -1,133 +1,132 @@
-Return-Path: <netdev+bounces-132896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5755993AA1
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:03:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE68993AAA
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:09:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E61E01C22DB1
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:03:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5C63B22F89
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 23:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2219D17D896;
-	Mon,  7 Oct 2024 23:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D71A18BC16;
+	Mon,  7 Oct 2024 23:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eQMSxbn4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dua3BJ/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB0513D8B1;
-	Mon,  7 Oct 2024 23:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FF416D4E6
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 23:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728342185; cv=none; b=Sd2iEqUKyqvTprjKBARAolX7jAODbydvKqAH20F+B4Xb5Z+ddtw2AUGM0oUjUPQRjLsTMvtNYpTfQGtEF7K6irzKPOzKXcxbffqbFFXKA5g3PGQ0z3Sd1QOBN1gRX0PZ9e94Hn0j+VTGNHkeYFbqXAse36p/TmAmSb6Gpie7tBg=
+	t=1728342559; cv=none; b=ZoIcseMwwPUZCkSrp2AR6uqaTZglYFsMUJbZNEIZgHmGTLbvyYBOt5SOTQVM3/xRS9zN163HmxEwOtesPC6jXpOAb3j/Q1PXaD2aJyq+MPIQGHb87eILitlMJQbnz0ClJMU3gIXNKZoedZ726cT78IVlOlVs+aI1dprPU18Esr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728342185; c=relaxed/simple;
-	bh=Duo4y6dwJDlWYCUCaXKo3IgzU776UNw0umD4Fhn68fY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=btVMR9Dj8ObgcrfWIUTvxwS2Gzbco4YxSftoCbCRlxzk05cEMPAEbKtBjnBIv36JvP3d84cfs5jKVMtYikIQRqpqORUr+BjbiQU7AdlOLhlwTv22931NmZxVJdVdZeNokcd4+ocblSqxxr24pLOSOUdDIlORokTnvzaJo6A0sMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eQMSxbn4; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728342183; x=1759878183;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=Duo4y6dwJDlWYCUCaXKo3IgzU776UNw0umD4Fhn68fY=;
-  b=eQMSxbn4+7S4qU86OunMwMWJ5QDvwmCMq/PT8x+jmATiDH1xuw5fDNck
-   1FGP2ko5hoZR9meEsFzvCdj80w6io37a3s7rAZ85S4GYgquw2dl1zraQF
-   6Sm++RgMQioOjPF18X/uMtXnPtWS6cM+LbMQ73OSBevzad+Gi8p8zMJy6
-   HidHu6hMyjpMtPSV+Fm4O4kLDreT211PG51EyS1MrZJp3k1tSgf/S26ap
-   Wr2UXjqDen5KhPfdHu0+C+Rc7g2Li/P+WU8DQtobmB1aD496XWBqYFvm9
-   b3bgjpSBu+QezTIl+S+SUznsYMdDegsqrxnpfOIoqG3kJkFwMDGRNWNuZ
-   A==;
-X-CSE-ConnectionGUID: 9X8dwLDcQcypWlpIZrBh5w==
-X-CSE-MsgGUID: OWhwGhDPTLOLXXhACH4jRw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="27454571"
-X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
-   d="scan'208";a="27454571"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 16:03:03 -0700
-X-CSE-ConnectionGUID: G9AYz1QISK6vASQrVyCYHA==
-X-CSE-MsgGUID: YoOhUAmDRXmN0/OTIzzNug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,185,1725346800"; 
-   d="scan'208";a="75185870"
-Received: from gargmani-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.97])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 16:03:01 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "moderated
- list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, Jakub
- Kicinski <kuba@kernel.org>, open list <linux-kernel@vger.kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: Re: [RFC net-next 0/2] igc: Link IRQs and queues to NAPIs
-In-Reply-To: <20241003233850.199495-1-jdamato@fastly.com>
-References: <20241003233850.199495-1-jdamato@fastly.com>
-Date: Mon, 07 Oct 2024 16:03:00 -0700
-Message-ID: <87h69ntt23.fsf@intel.com>
+	s=arc-20240116; t=1728342559; c=relaxed/simple;
+	bh=KyxI4gAK1qf0wgwy6LgHewlej+0hnpc9z38XZNdGTh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mvwXRm+n4hWuGQdio7DWnU1iRbSURaxkbFY1FclyxH5KHgLre/bfSIXNBgsmkge0htFa8e+8obzA0J+Z3D3TSs+4DvLkU7pk79zKTepluxDUxeI2dqSvjWxLCc/hTnl1pNGRMN2mZ88VngJZX5Ztf8ufOo2gKSccYeK3hABKB+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dua3BJ/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C3F1C4CEC6;
+	Mon,  7 Oct 2024 23:09:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728342558;
+	bh=KyxI4gAK1qf0wgwy6LgHewlej+0hnpc9z38XZNdGTh4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dua3BJ/Q3zzzVT95A68kuYI9VpFUT8mTdAsR4QQ4vuYqVQrISV1P1xtYsn+tCMlUD
+	 8yMbIlVaOMxVPGl+cS1CYg6d3B9dWYIOvpbooPxAx19PwTWCRcwIoaOqAC07V43Lfn
+	 DWmyEm3QgyFAmWyXBYXsRfyhACqfWnqWizpv6TPL7JwxwplvfF9VEydrMPK78HRCbG
+	 CYI2XkD4Q/kZb502oCelpXcUaiSGkpM59YM4NpN3YnhajXzYiuOSJl0WuInVzrHu98
+	 k1JiZWlvibyl6mjnnXaCbY6a4Nb9KIOi+ab9Knjns3riDSL0IPPqWXc7Gz70EH2lJG
+	 9Er9JEVhmbTeg==
+Date: Mon, 7 Oct 2024 16:09:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jacob Keller <jacob.e.keller@intel.com>, Vadim Fedorenko
+ <vadfed@meta.com>, David Ahern <dsahern@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Alexander
+ Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org, Richard Cochran
+ <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next v3 2/5] eth: fbnic: add initial PHC support
+Message-ID: <20241007160917.591c2d5d@kernel.org>
+In-Reply-To: <e6f541f8-ac28-4180-989a-84ee4587e21c@linux.dev>
+References: <20241003123933.2589036-1-vadfed@meta.com>
+	<20241003123933.2589036-3-vadfed@meta.com>
+	<9513f032-de89-4a6b-8e16-d142316b2fc9@intel.com>
+	<e6f541f8-ac28-4180-989a-84ee4587e21c@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Joe Damato <jdamato@fastly.com> writes:
+On Mon, 7 Oct 2024 14:07:17 +0100 Vadim Fedorenko wrote:
+> On 05/10/2024 00:05, Jacob Keller wrote:
+> > On 10/3/2024 5:39 AM, Vadim Fedorenko wrote:  
+> >> +/* FBNIC timing & PTP implementation
+> >> + * Datapath uses truncated 40b timestamps for scheduling and event reporting.
+> >> + * We need to promote those to full 64b, hence we periodically cache the top
+> >> + * 32bit of the HW time counter. Since this makes our time reporting non-atomic
+> >> + * we leave the HW clock free running and adjust time offsets in SW as needed.
+> >> + * Time offset is 64bit - we need a seq counter for 32bit machines.
+> >> + * Time offset and the cache of top bits are independent so we don't need
+> >> + * a coherent snapshot of both - READ_ONCE()/WRITE_ONCE() + writer side lock
+> >> + * are enough.
+> >> + */
+> >> +  
+> > 
+> > If you're going to implement adjustments only in software anyways, can
+> > you use a timecounter+cyclecounter instead of re-implementing?  
+> 
+> Thanks for pointing this out, I'll make it with timecounter/cyclecounter
 
-> Greetings:
->
-> This is an RFC to get feedback before submitting an actual series and
-> because I have a question for igc maintainers, see below.
->
-> This series addss support for netdev-genl to igc so that userland apps
-> can query IRQ, queue, and NAPI instance relationships. This is useful
-> because developers who have igc NICs (for example, in their Intel NUCs)
-> who are working on epoll-based busy polling apps and using
-> SO_INCOMING_NAPI_ID, need access to this API to map NAPI IDs back to
-> queues.
->
-> See the commit messages of each patch for example output I got on my igc
-> hardware.
->
-> My question for maintainers:
->
-> In patch 2, the linking should be avoided for XDP queues. Is there a way
-> to test that somehow in the driver? I looked around a bit, but didn't
-> notice anything. Sorry if I'm missing something obvious.
->
+Please don't, the clock is synthonized, we only do simple offsetting.
 
-From a quick look, it seems that you could "unlink" the XDP queues in
-igc_xdp_enable_pool() and (re-)link them in igc_xdp_disable_poll().
+> >> +/* Period of refresh of top bits of timestamp, give ourselves a 8x margin.
+> >> + * This should translate to once a minute.
+> >> + * The use of nsecs_to_jiffies() should be safe for a <=40b nsec value.
+> >> + */
+> >> +#define FBNIC_TS_HIGH_REFRESH_JIF	nsecs_to_jiffies((1ULL << 40) / 16)
+> >> +
+> >> +static struct fbnic_dev *fbnic_from_ptp_info(struct ptp_clock_info *ptp)
+> >> +{
+> >> +	return container_of(ptp, struct fbnic_dev, ptp_info);
+> >> +}
+> >> +
+> >> +/* This function is "slow" because we could try guessing which high part
+> >> + * is correct based on low instead of re-reading, and skip reading @hi
+> >> + * twice altogether if @lo is far enough from 0.
+> >> + */
+> >> +static u64 __fbnic_time_get_slow(struct fbnic_dev *fbd)
+> >> +{
+> >> +	u32 hi, lo;
+> >> +
+> >> +	lockdep_assert_held(&fbd->time_lock);
+> >> +
+> >> +	do {
+> >> +		hi = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI);
+> >> +		lo = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_LO);
+> >> +	} while (hi != fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI));
+> >> +  
+> > 
+> > How long does it take hi to overflow? You may be able to get away
+> > without looping.  
+> 
+> According to comment above it may take up to 8 minutes to overflow, but
+> the updates to the cache should be done every minute. We do not expect
+> this cycle to happen often.
+> 
+> > I think another way to implement this is to read lo, then hi, then lo
+> > again, and if lo2 is smaller than lo, you know hi overflowed and you can
+> > re-read hi  
+> 
+> That's an option too, I'll think of it, thanks!
 
-Or just the existence of the flag IGC_RING_FLAG_AF_XDP_ZC in the rings
-associated with the queue is enough?
+The triple read is less neat in case hi jumps by more than 1.
 
-I still have to take a better look at your work to help more, sorry.
-
-> Thanks,
-> Joe
->
-> Joe Damato (2):
->   igc: Link IRQs to NAPI instances
->   igc: Link queues to NAPI instances
->
->  drivers/net/ethernet/intel/igc/igc.h      |  1 +
->  drivers/net/ethernet/intel/igc/igc_main.c | 33 ++++++++++++++++++++---
->  2 files changed, 30 insertions(+), 4 deletions(-)
->
-> -- 
-> 2.25.1
->
->
-
-Cheers,
--- 
-Vinicius
 
