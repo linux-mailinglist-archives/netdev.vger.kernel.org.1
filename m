@@ -1,129 +1,136 @@
-Return-Path: <netdev+bounces-132779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9300D993219
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:55:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FD14993253
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4CDD1C2362E
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 15:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6572283F2D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628F21DA0F1;
-	Mon,  7 Oct 2024 15:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9531D5CDE;
+	Mon,  7 Oct 2024 16:00:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lKaIcxAa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWw9gKTg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B0C1D9340;
-	Mon,  7 Oct 2024 15:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0198A1D2B2F;
+	Mon,  7 Oct 2024 16:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728316525; cv=none; b=T31jaBRZF1l2Ln2jTBrIp332RHs9JY9gKmCLnvEucdv/UupY6dQKYC6+OTe01USryohYCsgWiREz/3hQtgdnI79ShL0L+RsHLu2G/IrZROjjZZtffYk+/o2tEesFHt49BD5G/kkm07JACIYdKyAjcbrvm+dVggRpA0717AGC/9o=
+	t=1728316849; cv=none; b=nkrOKvYrJvslnP1hN0aCxxtu2yWPWklXxPSU1qhpZmVKdc+9LUYb1N6agfML2oMVghQuUqygBH+JSzgf404vS/6pNkb+LpKhsBJoTznh8o5mPzbgzITg2/vKyI4N9yTM9edI8ti4uvQ7OUfK2SwCcaqO9yMEjB31bdecC79v5Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728316525; c=relaxed/simple;
-	bh=xUgQ12yWyVmh9UezQ+B9+CBgyoHn1hM31OEXrAfgu44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QnJTZwThZirzQhe91ttF5KHNJp/lbHxJQ8KMWiozOao0eY4mppWUdVm+15tNTYWw5DDa68roVcyaFjjBSGnRH429J0o4VCl+9C6z9uSP3tNLHQHagu/pAQkfiebmn1qCLdZFY1CVdQhQkYlsfAuoqKElhdvUjMaA3G03ebGxFnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lKaIcxAa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CF13C4CEC6;
-	Mon,  7 Oct 2024 15:55:23 +0000 (UTC)
+	s=arc-20240116; t=1728316849; c=relaxed/simple;
+	bh=PHuV8i42D3IcLa5ai+RwLXHJQ2M2sbKr33lxihFuD3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z4V+XiIW81PMst5l/0b784DKfpI7Lkv7KilRBqC6JnYlegdt23wrZYR9sSuOEP1Ck9xADDpSpish+Tfa+PwbDk+uZvlin1b4ZatbcsBbu8k7pX/gGHPRsyclB95RzJ1b+AsxQ9Kqkds/ahlmd5UpG6+2X1nNEmj1GKSiuPYS5dE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWw9gKTg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37B33C4CEC6;
+	Mon,  7 Oct 2024 16:00:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728316524;
-	bh=xUgQ12yWyVmh9UezQ+B9+CBgyoHn1hM31OEXrAfgu44=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lKaIcxAa0SNDiuN8sPVPp3hwCzROG0gdKoSKZo7LIq4d7t0JJoQau20VvyblvGWDQ
-	 2i3H/lV/DYdkYT7FquT+4rzQtxu0I5fvCEDiYGjccq+BbTO5ccZmbz2uUOs3PXTfVj
-	 +PPqudV5YQSWUV3YFCcBb1dZlBqEHgESIbL0n8sEU9hSVo0kaiJUfp86RxxrK8shji
-	 DmercezjSMquFo/OGoFYJVcGA+G4y6m6iWGN4Uq5mFGa4cIifWQ0JlZoUd5I9aDisr
-	 RO9j8cEDxWddr3RH29A6DaUy2QFbkHtwao6xhpKSldArh3/TrPuiLvsTt7ZP9e/Gvp
-	 5Bhg0+2dnKxcQ==
-Date: Mon, 7 Oct 2024 16:55:21 +0100
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	workflows@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH RFC net] docs: netdev: document guidance on cleanup
- patches
-Message-ID: <20241007155521.GI32733@kernel.org>
-References: <20241004-doc-mc-clean-v1-1-20c28dcb0d52@kernel.org>
- <20241007082430.21de3848@kernel.org>
+	s=k20201202; t=1728316848;
+	bh=PHuV8i42D3IcLa5ai+RwLXHJQ2M2sbKr33lxihFuD3U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tWw9gKTggu0sXA/A49DmgnIJP8c49cyXOarpEH3diPKuTNLhdwWufl1+PuP65Mwqo
+	 eVFx+kJ/hDELX6s4qDErCuqj/KZWjNTXUgza7wCMTn/UqrZoS22srj5VFQwBuzurYv
+	 ik841qJa8r3aG55RVnPLCIfTyjjL31TNbVuL3TYvWU4nOcjupJM9IcplsLtqKzuhyF
+	 zmeL31+nKM2I93q7Ui1R1PiRsHx7RZvloX4+76V5kpcV/LwwIx+5qZLuEHSSA1kzL9
+	 cyuoz0uxBIiSCWTblf6nneXVQqdy6/yEqrhG0J0IS+QINmtzA5vcSJuybXNnNz3mw8
+	 6xdYwiEPT9fOA==
+Date: Mon, 7 Oct 2024 09:00:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: <Parthiban.Veerasooran@microchip.com>
+Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <ramon.nordin.rodriguez@ferroamp.se>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
+ <Thorsten.Kummermehr@microchip.com>
+Subject: Re: [PATCH net-next v3 2/7] net: phy: microchip_t1s: update new
+ initial settings for LAN865X Rev.B0
+Message-ID: <20241007090047.07483ee1@kernel.org>
+In-Reply-To: <2fb5dab7-f266-4304-a637-2b9eabb1184f@microchip.com>
+References: <20241001123734.1667581-1-parthiban.veerasooran@microchip.com>
+	<20241001123734.1667581-3-parthiban.veerasooran@microchip.com>
+	<20241004115006.4876eed1@kernel.org>
+	<2fb5dab7-f266-4304-a637-2b9eabb1184f@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241007082430.21de3848@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 07, 2024 at 08:24:30AM -0700, Jakub Kicinski wrote:
-> On Fri, 04 Oct 2024 10:49:53 +0100 Simon Horman wrote:
-> > The purpose of this section is to document what is the current practice
-> > regarding clean-up patches which address checkpatch warnings and similar
-> > problems. I feel there is a value in having this documented so others
-> > can easily refer to it.
+On Mon, 7 Oct 2024 07:51:36 +0000 Parthiban.Veerasooran@microchip.com
+wrote:
+> On 05/10/24 12:20 am, Jakub Kicinski wrote:
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
 > > 
-> > Clearly this topic is subjective. And to some extent the current
-> > practice discourages a wider range of patches than is described here.
-> > But I feel it is best to start somewhere, with the most well established
-> > part of the current practice.
+> > On Tue, 1 Oct 2024 18:07:29 +0530 Parthiban Veerasooran wrote:  
+> >> +     cfg_results[0] = FIELD_PREP(GENMASK(15, 10), (9 + offsets[0]) & 0x3F) |
+> >> +                      FIELD_PREP(GENMASK(15, 4), (14 + offsets[0]) & 0x3F) |
+> >> +                      0x03;
+> >> +     cfg_results[1] = FIELD_PREP(GENMASK(15, 10), (40 + offsets[1]) & 0x3F);  
 > > 
-> > --
-> > I did think this was already documented. And perhaps it is.
-> > But I was unable to find it after a quick search.
+> > It's really strange to OR together FIELD_PREP()s with overlapping
+> > fields. What's going on here? 15:10 and 15:4 ranges overlap, then
+> > there is 0x3 hardcoded, with no fields size definition.  
+> This calculation has been implemented based on the logic provided in the 
+> configuration application note (AN1760) released with the product. 
+> Please refer the link [1] below for more info.
 > 
-> Thanks a lot for documenting it, this is great!
-> All the suggestions below are optional, happy to merge as is.
+> As mentioned in the AN1760 document, "it provides guidance on how to 
+> configure the LAN8650/1 internal PHY for optimal performance in 
+> 10BASE-T1S networks." Unfortunately we don't have any other information 
+> on those each and every parameters and constants used for the 
+> calculation. They are all derived by design team to bring up the device 
+> to the nominal state.
 > 
-> > +Clean-Up Patches
-> > +~~~~~~~~~~~~~~~~
+> It is also mentioned as, "The following parameters must be calculated 
+> from the device configuration parameters mentioned above to use for the
+> configuration of the registers."
 > 
-> nit: other sections use sentence-like capitalization (only capitalizing
-> the first word), is that incorrect? Or should we ay "Clean-up patches"
-> here?
-
-I think we should be consistent here
-(I'm intentionally avoiding answering what is correct :)
-
+> uint16 cfgparam1 = (uint16) (((9 + offset1) & 0x3F) << 10) | (uint16) 
+> (((14 + offset1) & 0x3F) << 4) | 0x03
+> uint16 cfgparam2 = (uint16) (((40 + offset2) & 0x3F) << 10)
 > 
-> > +Netdev discourages patches which perform simple clean-ups, which are not in
-> > +the context of other work. For example addressing ``checkpatch.pl``
-> > +warnings, or :ref:`local variable ordering<rcs>` issues. This is because it
-> > +is felt that the churn that such changes produce comes at a greater cost
-> > +than the value of such clean-ups.
+> This is the reason why the above logic has been implemented.
+
+In this case the code should simply be:
+
+     cfg_results[0] = FIELD_PREP(GENMASK(15, 10), 9 + offsets[0]) |
+                      FIELD_PREP(GENMASK(9, 4), 14 + offsets[0]) |
+
+the fields are clearly 6b each. FILED_PREP() already masks.
+
+> > Could you clarify and preferably name as many of the constants
+> > as possible?  
+> I would like to do that but as I mentioned above there is no info on 
+> those constants in the application note.
+> > 
+> > Also why are you masking the result of the sum with 0x3f?
+> > Can the result not fit? Is that safe or should we error out?  
+> Hope the above info clarifies this as well.
+> >   
+> >> +             ret &= GENMASK(4, 0);  
+> > ?               if (ret & BIT(4))
+> > 
+> > GENMASK() is nice but naming the fields would be even nicer..
+> > What's 3:0, what's 4:4 ?  
+> As per the information provided in the application note, the offset 
+> value expected range is from -5 to 15. Offsets are stored as signed 
+> 5-bit values in the addresses 0x04 and 0x08. So 0x1F is used to mask the 
+> 5-bit value and if the 4th bit is set then the value from 27 to 31 will 
+> be considered as -ve value from -5 to -1.
 > 
-> Should we add "conversions to managed APIs"? It's not a recent thing,
-> people do like to post patches doing bulk conversions which bring very
-> little benefit.
+> I think adding the above comment in the above code snippet will clarify 
+> the need. What do you think?
 
-Well yes, I agree that is well established, and a common target of patches.
-But isn't that covered by the previous section?
-
-   "Using device-managed and cleanup.h constructs
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-   "Netdev remains skeptical about promises of all “auto-cleanup” APIs,
-    including even devm_ helpers, historically. They are not the preferred
-    style of implementation, merely an acceptable one.
-
-    ...
-
-   https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
-
-We could merge or otherwise rearrange that section with the one proposed by
-this patch. But I didn't feel it was necessary last week.
-
-> On the opposite side we could mention that spelling fixes are okay.
-> Not sure if that would muddy the waters too much..
-
-I think we can and should. Perhaps another section simply stating
-that spelling (and grammar?) fixes are welcome.
+Oh yes, a comment, e.g. /* 5-bit signed value, sign extend */
+would help a lot, thanks!
 
