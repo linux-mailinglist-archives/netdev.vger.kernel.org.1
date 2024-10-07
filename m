@@ -1,142 +1,132 @@
-Return-Path: <netdev+bounces-132813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 222D2993478
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:09:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68FC699347E
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ACCA1C2260D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:09:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AE1F1C23BE3
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1AF1DCB10;
-	Mon,  7 Oct 2024 17:09:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ADC51DCB15;
+	Mon,  7 Oct 2024 17:10:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from finn.localdomain (finn.gateworks.com [108.161.129.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A42E1DCB0A;
-	Mon,  7 Oct 2024 17:09:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AE31DCB0C;
+	Mon,  7 Oct 2024 17:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=108.161.129.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728320975; cv=none; b=hoBkDN8aoAFADRuv9jSx4EsLcpJcA4PGBFPpXxsAPfRPwwXZmWLZpFmZkwXgFa/luUKYgHWZZRqCutk+6cL0iDEFxAy8y7akSRPvnx76CVNrquFqkxa1yk6iPkmUmT/0o7i5cktuHAHoWyhHn13fqskp/oPnU7sHa6oi8akoLy4=
+	t=1728321048; cv=none; b=RXXKVuZBbd3MMaoM3WQQmsV1hUQZHMzSfcLeTJmBdC009dm546VBC+SBCWANEkYYGtdoqh2EtP4nR9DJOrxboSPaWWhttMJnxUMuf3qpbnHB03BXdTO3XdWlH84BBnghvMB8VMYp3+EtmiBimNP2EVRZ7GZQSrYdVuu+6OqpiQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728320975; c=relaxed/simple;
-	bh=icNVlLzTCqAZ1hLnxOTXJhScS09pcofSsGvrCvZ1Sb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5YYKhwDv1iH4Dtplyx727S9COWbXdBK7RoPip9zq/yjWaR5Nw6NlZ2HpOq40x0pPetZHqTTSjXMPlFIRxKKvuFLU5a18qpnwpglRqlEBbfSWDhnaCPW6i8q2s94LHPosUBkKXwJGO+e59VfCNFxApSwl3tFDi2E8TG5PiyyAZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c88e6926e5so5489921a12.3;
-        Mon, 07 Oct 2024 10:09:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728320972; x=1728925772;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bzQJu2S+cF08b3R0TD9yNtu8OgKssIiP0a9XzvPgjqI=;
-        b=NMPwxFGuWMRRJ90TzWRv6nnq777BUBbXDw//SyQrP3ERUoTzSD5b0DlF7N7/7ywWGZ
-         lEd0SR27lKUbGLB+9Q7zAiZF8BLsg8f6T4EJRcOzCUFhafT3YqjZsCAaLXJ1N/gDP/pq
-         U2Qelm0dgwIw1QfFM1rm8ll3yIhu6jISLwr/P8uqVBIMAxNnOc13ptjqnW6XVcM3eROt
-         zYQd1bWrzj/L3w/PZVH1C7IprVkO2ItkFJx5UYEZSkqv8J3XdAtnBpVHFcEJAyDFKPuO
-         S4LIvmAHEaoRs71ReH1bp4GAD/4SRsNbWUcDX+1/9qYyeK3d/CHGrNNSIf9gyRPTxdHi
-         SBqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmcEP6EtHaHwzWyi5kc6ek0Ist8iLRDg0guCuZrdkGB3msI6nr74eg+W5PmF2FaqEsM8mZaEdgL9Vd1svO@vger.kernel.org, AJvYcCWUG9XBofu7uidrw2m6bbdVzvO/GIP0ZziB8RwBfwKqpuH5k0AL8lgQPDGJ2QAn5hJblClkE6h9MP8=@vger.kernel.org, AJvYcCX6GMJx7t9il7nhHiPG8hWdX+2fd6w0I1mhyakfpYbjFvonikapI8tZmIsxCpO01RY8wIh9zNfl@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8t//XDNnK2Q4Sm/gYwblq/DGgDClkZuY4FOZ/HGfz9sC9I8wE
-	ftxyyP19xqqaJxUy2daOFdhZ9V2jAX9NscSOz9l0ieVOOnlsm+UX
-X-Google-Smtp-Source: AGHT+IEwwJlSpT58wKvS5BI3ETf6Hj0RGN8LQtRHHAOFmRIj/CrZYtj5Fkr+MLYxnOCiJybcqp5T2A==
-X-Received: by 2002:a05:6402:2792:b0:5c8:9f44:a24d with SMTP id 4fb4d7f45d1cf-5c8d2e14e98mr6968692a12.9.1728320971502;
-        Mon, 07 Oct 2024 10:09:31 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05f3c8csm3540583a12.83.2024.10.07.10.09.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 10:09:30 -0700 (PDT)
-Date: Mon, 7 Oct 2024 10:09:27 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Akinobu Mita <akinobu.mita@gmail.com>, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	Jonathan Corbet <corbet@lwn.net>, horms@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Mina Almasry <almasrymina@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: Implement fault injection forcing skb
- reallocation
-Message-ID: <20241007-phenomenal-literate-hog-619ad0@leitao>
-References: <20241002113316.2527669-1-leitao@debian.org>
- <CAC5umyjkmkY4111CG_ODK6s=rcxT_HHAQisOiwRp5de0KJkzBA@mail.gmail.com>
- <20241007-flat-steel-cuscus-9bffda@leitao>
- <9386a9fc-a8b5-41fc-9f92-f621e56a918d@gmail.com>
+	s=arc-20240116; t=1728321048; c=relaxed/simple;
+	bh=+Lf6Lx4ZUuyRtEXHzSyOLeGyiwoNL+r+8vUo7hDjvVc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m/CyCA9tB1Dq9F2GhczbdkoSpxiFmyGXDCHohKfHG5mHkKAUQG5cclqXlXtdAw/xZYgiHdkPi/38Y7Ofd3BqHpyiNE/Bu0O+5FHITnJFYt7BY6LET2qLdNXOsYpvL/TQwP1NIzEah+agMxNaD50KWbddcMjfOWEchi8oQ774ymA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; arc=none smtp.client-ip=108.161.129.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
+Received: from syn-068-189-091-139.biz.spectrum.com ([68.189.91.139] helo=tharvey.pdc.gateworks.com)
+	by finn.localdomain with esmtp (Exim 4.95)
+	(envelope-from <tharvey@gateworks.com>)
+	id 1sxrFi-000mSJ-JR;
+	Mon, 07 Oct 2024 17:10:34 +0000
+From: Tim Harvey <tharvey@gateworks.com>
+To: Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Tim Harvey <tharvey@gateworks.com>
+Subject: [PATCH v2] net: phy: disable eee due to errata on various KSZ switches
+Date: Mon,  7 Oct 2024 10:10:32 -0700
+Message-Id: <20241007171032.3510003-1-tharvey@gateworks.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <9386a9fc-a8b5-41fc-9f92-f621e56a918d@gmail.com>
 
-Hello Pavel,
+The well-known errata regarding EEE not being functional on various KSZ
+switches has been refactored a few times. Recently the refactoring has
+excluded several switches that the errata should also apply to.
 
-On Mon, Oct 07, 2024 at 05:48:39PM +0100, Pavel Begunkov wrote:
-> On 10/7/24 17:20, Breno Leitao wrote:
-> > On Sat, Oct 05, 2024 at 01:38:59PM +0900, Akinobu Mita wrote:
-> > > 2024年10月2日(水) 20:37 Breno Leitao <leitao@debian.org>:
-> > > > 
-> > > > Introduce a fault injection mechanism to force skb reallocation. The
-> > > > primary goal is to catch bugs related to pointer invalidation after
-> > > > potential skb reallocation.
-> > > > 
-> > > > The fault injection mechanism aims to identify scenarios where callers
-> > > > retain pointers to various headers in the skb but fail to reload these
-> > > > pointers after calling a function that may reallocate the data. This
-> > > > type of bug can lead to memory corruption or crashes if the old,
-> > > > now-invalid pointers are used.
-> > > > 
-> > > > By forcing reallocation through fault injection, we can stress-test code
-> > > > paths and ensure proper pointer management after potential skb
-> > > > reallocations.
-> > > > 
-> > > > Add a hook for fault injection in the following functions:
-> > > > 
-> > > >   * pskb_trim_rcsum()
-> > > >   * pskb_may_pull_reason()
-> > > >   * pskb_trim()
-> > > > 
-> > > > As the other fault injection mechanism, protect it under a debug Kconfig
-> > > > called CONFIG_FAIL_SKB_FORCE_REALLOC.
-> > > > 
-> > > > This patch was *heavily* inspired by Jakub's proposal from:
-> > > > https://lore.kernel.org/all/20240719174140.47a868e6@kernel.org/
-> > > > 
-> > > > CC: Akinobu Mita <akinobu.mita@gmail.com>
-> > > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > 
-> > > This new addition seems sensible.  It might be more useful to have a filter
-> > > that allows you to specify things like protocol family.
-> > 
-> > I think it might make more sense to be network interface specific. For
-> > instance, only fault inject in interface `ethx`.
-> 
-> Wasn't there some error injection infra that allows to optionally
-> run bpf? That would cover the filtering problem. ALLOW_ERROR_INJECTION,
-> maybe?
+Disable EEE for additional switches with this errata.
 
-Isn't ALLOW_ERROR_INJECTION focused on specifying which function could
-be faulted? I.e, you can mark that function as prone for fail injection?
+The original workaround for the errata was applied with a register
+write to manually disable the EEE feature in MMD 7:60 which was being
+applied for KSZ9477/KSZ9897/KSZ9567 switch ID's.
 
-In my the case I have in mind, I want to pass the interface that it
-would have the error injected. For instance, only inject errors in
-interface eth1. In this case, I am not sure ALLOW_ERROR_INJECTION will
-help.
+Then came commit ("26dd2974c5b5 net: phy: micrel: Move KSZ9477 errata
+fixes to PHY driver") and commit ("6068e6d7ba50 net: dsa: microchip:
+remove KSZ9477 PHY errata handling") which moved the errata from the
+switch driver to the PHY driver but only for PHY_ID_KSZ9477 (PHY ID)
+however that PHY code was dead code because an entry was never added
+for PHY_ID_KSZ9477 via MODULE_DEVICE_TABLE.
 
-Thanks
---breno
+This was apparently realized much later and commit ("54a4e5c16382 net:
+phy: micrel: add Microchip KSZ 9477 to the device table") added the
+PHY_ID_KSZ9477 to the PHY driver but as the errata was only being
+applied to PHY_ID_KSZ9477 it's not completely clear what switches
+that relates to.
+
+Later commit ("6149db4997f5 net: phy: micrel: fix KSZ9477 PHY issues
+after suspend/resume") breaks this again for all but KSZ9897 by only
+applying the errata for that PHY ID.
+
+The most recent time this was affected was with commit ("08c6d8bae48c
+net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)") which
+removes the blatant register write to MMD 7:60 and replaces it by
+setting phydev->eee_broken_modes = -1 so that the generic phy-c45 code
+disables EEE but this is only done for the KSZ9477_CHIP_ID (Switch ID).
+
+Signed-off-by: Tim Harvey <tharvey@gateworks.com>
+---
+v2: added fixes tag and history of issue
+---
+ drivers/net/dsa/microchip/ksz_common.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index b074b4bb0629..d2bd82a1067c 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2578,11 +2578,19 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
+ 		if (!port)
+ 			return MICREL_KSZ8_P1_ERRATA;
+ 		break;
++	case KSZ8795_CHIP_ID:
++	case KSZ8794_CHIP_ID:
++	case KSZ8765_CHIP_ID:
++		/* KSZ87xx DS80000687C Module 2 */
++	case KSZ9896_CHIP_ID:
++		/* KSZ9896 Errata DS80000757A Module 2 */
++	case KSZ9897_CHIP_ID:
++		/* KSZ9897 Errata DS00002394C Module 4 */
++	case KSZ9567_CHIP_ID:
++		/* KSZ9567 Errata DS80000756A Module 4 */
+ 	case KSZ9477_CHIP_ID:
+-		/* KSZ9477 Errata DS80000754C
+-		 *
+-		 * Module 4: Energy Efficient Ethernet (EEE) feature select must
+-		 * be manually disabled
++		/* KSZ9477 Errata DS80000754C Module 4 */
++		/* Energy Efficient Ethernet (EEE) feature select must be manually disabled
+ 		 *   The EEE feature is enabled by default, but it is not fully
+ 		 *   operational. It must be manually disabled through register
+ 		 *   controls. If not disabled, the PHY ports can auto-negotiate
+-- 
+2.25.1
+
 
