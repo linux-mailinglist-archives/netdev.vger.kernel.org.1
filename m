@@ -1,136 +1,104 @@
-Return-Path: <netdev+bounces-132780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD14993253
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:00:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00908993281
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6572283F2D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:00:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4EE4B2475A
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9531D5CDE;
-	Mon,  7 Oct 2024 16:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897381DA0FC;
+	Mon,  7 Oct 2024 16:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWw9gKTg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eojz/ph1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0198A1D2B2F;
-	Mon,  7 Oct 2024 16:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200EF1DA0EB;
+	Mon,  7 Oct 2024 16:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728316849; cv=none; b=nkrOKvYrJvslnP1hN0aCxxtu2yWPWklXxPSU1qhpZmVKdc+9LUYb1N6agfML2oMVghQuUqygBH+JSzgf404vS/6pNkb+LpKhsBJoTznh8o5mPzbgzITg2/vKyI4N9yTM9edI8ti4uvQ7OUfK2SwCcaqO9yMEjB31bdecC79v5Rw=
+	t=1728317219; cv=none; b=uXMwGkZ6j0yl32Uh3CyNUcg9UL6jDpzCLiXlUb6yHASHs9enJH2oKWSOhNYn91s//c4oBVbBFHuQ0MWRpf4d0FTn2+5ZDx9qBqjketFyo8VtAkGc6yAl1FiWJQDBZ0BnyxhoOpgtnAROj2zyyiaBKWStWeRyGKHguXe4IaNJdjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728316849; c=relaxed/simple;
-	bh=PHuV8i42D3IcLa5ai+RwLXHJQ2M2sbKr33lxihFuD3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z4V+XiIW81PMst5l/0b784DKfpI7Lkv7KilRBqC6JnYlegdt23wrZYR9sSuOEP1Ck9xADDpSpish+Tfa+PwbDk+uZvlin1b4ZatbcsBbu8k7pX/gGHPRsyclB95RzJ1b+AsxQ9Kqkds/ahlmd5UpG6+2X1nNEmj1GKSiuPYS5dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWw9gKTg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37B33C4CEC6;
-	Mon,  7 Oct 2024 16:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728316848;
-	bh=PHuV8i42D3IcLa5ai+RwLXHJQ2M2sbKr33lxihFuD3U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tWw9gKTggu0sXA/A49DmgnIJP8c49cyXOarpEH3diPKuTNLhdwWufl1+PuP65Mwqo
-	 eVFx+kJ/hDELX6s4qDErCuqj/KZWjNTXUgza7wCMTn/UqrZoS22srj5VFQwBuzurYv
-	 ik841qJa8r3aG55RVnPLCIfTyjjL31TNbVuL3TYvWU4nOcjupJM9IcplsLtqKzuhyF
-	 zmeL31+nKM2I93q7Ui1R1PiRsHx7RZvloX4+76V5kpcV/LwwIx+5qZLuEHSSA1kzL9
-	 cyuoz0uxBIiSCWTblf6nneXVQqdy6/yEqrhG0J0IS+QINmtzA5vcSJuybXNnNz3mw8
-	 6xdYwiEPT9fOA==
-Date: Mon, 7 Oct 2024 09:00:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Parthiban.Veerasooran@microchip.com>
-Cc: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <ramon.nordin.rodriguez@ferroamp.se>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <UNGLinuxDriver@microchip.com>,
- <Thorsten.Kummermehr@microchip.com>
-Subject: Re: [PATCH net-next v3 2/7] net: phy: microchip_t1s: update new
- initial settings for LAN865X Rev.B0
-Message-ID: <20241007090047.07483ee1@kernel.org>
-In-Reply-To: <2fb5dab7-f266-4304-a637-2b9eabb1184f@microchip.com>
-References: <20241001123734.1667581-1-parthiban.veerasooran@microchip.com>
-	<20241001123734.1667581-3-parthiban.veerasooran@microchip.com>
-	<20241004115006.4876eed1@kernel.org>
-	<2fb5dab7-f266-4304-a637-2b9eabb1184f@microchip.com>
+	s=arc-20240116; t=1728317219; c=relaxed/simple;
+	bh=tHxOVl6yyxhBtmf6brubWmR0Vv+AWpuqnMgAqpriaDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JrQXAezXUqXA1dqITRTmyc2Sirr/1oawiz6W4lbvlow2XFojB79K6CXbZmtgXqjG7GGqJFCDe2WfuA6Vg0u7kYlU6uPb0AzCORsAH86SFVfodYZa1EeEFDXiaqg9utlAumI9m+Z71SERkY5kTp9ZEbQZ7vH90koJwJUCp3t1EyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eojz/ph1; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b9b35c7c3so48321045ad.3;
+        Mon, 07 Oct 2024 09:06:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728317217; x=1728922017; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gf+PiJeuT5YXR8uf468cVOB4GwgU6SzIkTri3Fs5PWk=;
+        b=eojz/ph1LEVK81ILYjKHf02rhJuxHYQeAFIGpMMw4o8/HiXGUnG+IKxtk/q5/8PFDa
+         2fpMJITHb1FASyATVZi+cvWPL737B5lkzPXKUa8QopeROJpUUriulWt0mpowHhuQaPG8
+         sBzXN6TjrRsNOgIP6GEmL+2E/+FpyfUoem9+F9rgCPtTyEp+kY4+bZgA8xE97hXYquKT
+         EeIQM7wAxquMXM9XBVgMzvzz5DDL8HX/EGK9f5SNLMsjNSv2SYODIsqDuSlUXKCruPEG
+         zn+G/QjGjpzXGxYZGAbLVdEFgIvvIWqvDGFBVh3dn6WBgAgw+V35NMhV/GlpEsQm606m
+         +K2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728317217; x=1728922017;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gf+PiJeuT5YXR8uf468cVOB4GwgU6SzIkTri3Fs5PWk=;
+        b=jV96/xPMCw0d2Vb/QZEu342VYECSl4JlRwZgEeO71njte0W2wqwTKw1UVS0An4O1zR
+         dQYL0eBWZimWKHup9zYn+K9srmXQttpU1c2+05LpuApMnCDVpKueAyROmEe3PFDu4L2c
+         aZexFRdAmyCmgKco4uPE8R8Pp59CSmjPcbOOfTi0BkjE5JpB2qTQIRBpxA3vdmbYjCBa
+         mgxP2Z4v7Zmr/PzKoC3FUNZk4Vx/j8n/Fuo0W7HPB8/J15IOs5cLv3D4zQrhEmmkfYC2
+         Zx8WZrP58xAxxzEVqpcsEZ/0N6cCHsP6C9Yq4peJFOH7S9MYuzdYXfnLZOAprc0Rt55J
+         Bt7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWW33CGfQCIZRJ3qn7LJlBbSd9D/u4WAzJ1cxJLmaYYAUlX2vgBNoNXEhv6AyQ9aHrOEyFNx4EGaVp4gas=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybJkFS1LoiMjkQxHKhkQeyqIXzG+W3cUazydf9tQpMNdos3801
+	Tn9T/xOcic1bHXf4WRG8mBYK7BGbjQbQ4T2mnN8YyIud0fX2bWim
+X-Google-Smtp-Source: AGHT+IEGwDAT9Cv1y8WQER1FRIlOllCMCIASgGerSdmRnTWkgRQSganVf2GcG1sGdzVp1JMLrYG0ew==
+X-Received: by 2002:a17:903:244e:b0:20b:ab6a:3a18 with SMTP id d9443c01a7336-20bfdfd4372mr211059575ad.17.1728317216962;
+        Mon, 07 Oct 2024 09:06:56 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([198.59.164.146])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138afd1dsm41264245ad.36.2024.10.07.09.06.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 09:06:56 -0700 (PDT)
+Date: Mon, 7 Oct 2024 09:06:54 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [RFC PATCH 0/2] ptp: add control over HW timestamp latch point
+Message-ID: <ZwQHHmLeBUBpH71p@hoboy.vegasvil.org>
+References: <20241003213754.926691-1-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241003213754.926691-1-arkadiusz.kubalewski@intel.com>
 
-On Mon, 7 Oct 2024 07:51:36 +0000 Parthiban.Veerasooran@microchip.com
-wrote:
-> On 05/10/24 12:20 am, Jakub Kicinski wrote:
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> > 
-> > On Tue, 1 Oct 2024 18:07:29 +0530 Parthiban Veerasooran wrote:  
-> >> +     cfg_results[0] = FIELD_PREP(GENMASK(15, 10), (9 + offsets[0]) & 0x3F) |
-> >> +                      FIELD_PREP(GENMASK(15, 4), (14 + offsets[0]) & 0x3F) |
-> >> +                      0x03;
-> >> +     cfg_results[1] = FIELD_PREP(GENMASK(15, 10), (40 + offsets[1]) & 0x3F);  
-> > 
-> > It's really strange to OR together FIELD_PREP()s with overlapping
-> > fields. What's going on here? 15:10 and 15:4 ranges overlap, then
-> > there is 0x3 hardcoded, with no fields size definition.  
-> This calculation has been implemented based on the logic provided in the 
-> configuration application note (AN1760) released with the product. 
-> Please refer the link [1] below for more info.
+On Thu, Oct 03, 2024 at 11:37:52PM +0200, Arkadiusz Kubalewski wrote:
+> HW support of PTP/timesync solutions in network PHY chips can be
+> achieved with two different approaches, the timestamp maybe latched
+> either in the beginning or after the Start of Frame Delimiter (SFD) [1].
 > 
-> As mentioned in the AN1760 document, "it provides guidance on how to 
-> configure the LAN8650/1 internal PHY for optimal performance in 
-> 10BASE-T1S networks." Unfortunately we don't have any other information 
-> on those each and every parameters and constants used for the 
-> calculation. They are all derived by design team to bring up the device 
-> to the nominal state.
-> 
-> It is also mentioned as, "The following parameters must be calculated 
-> from the device configuration parameters mentioned above to use for the
-> configuration of the registers."
-> 
-> uint16 cfgparam1 = (uint16) (((9 + offset1) & 0x3F) << 10) | (uint16) 
-> (((14 + offset1) & 0x3F) << 4) | 0x03
-> uint16 cfgparam2 = (uint16) (((40 + offset2) & 0x3F) << 10)
-> 
-> This is the reason why the above logic has been implemented.
+> Allow ptp device drivers to provide user with control over the timestamp
+> latch point.
 
-In this case the code should simply be:
+This looks okay to me.
 
-     cfg_results[0] = FIELD_PREP(GENMASK(15, 10), 9 + offsets[0]) |
-                      FIELD_PREP(GENMASK(9, 4), 14 + offsets[0]) |
+Sorry for the late reply, but I'm travelling untill Oct 11 and may not
+response to messages right away.
 
-the fields are clearly 6b each. FILED_PREP() already masks.
-
-> > Could you clarify and preferably name as many of the constants
-> > as possible?  
-> I would like to do that but as I mentioned above there is no info on 
-> those constants in the application note.
-> > 
-> > Also why are you masking the result of the sum with 0x3f?
-> > Can the result not fit? Is that safe or should we error out?  
-> Hope the above info clarifies this as well.
-> >   
-> >> +             ret &= GENMASK(4, 0);  
-> > ?               if (ret & BIT(4))
-> > 
-> > GENMASK() is nice but naming the fields would be even nicer..
-> > What's 3:0, what's 4:4 ?  
-> As per the information provided in the application note, the offset 
-> value expected range is from -5 to 15. Offsets are stored as signed 
-> 5-bit values in the addresses 0x04 and 0x08. So 0x1F is used to mask the 
-> 5-bit value and if the 4th bit is set then the value from 27 to 31 will 
-> be considered as -ve value from -5 to -1.
-> 
-> I think adding the above comment in the above code snippet will clarify 
-> the need. What do you think?
-
-Oh yes, a comment, e.g. /* 5-bit signed value, sign extend */
-would help a lot, thanks!
+Thanks,
+Richard
 
