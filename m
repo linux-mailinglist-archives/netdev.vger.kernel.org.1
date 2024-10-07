@@ -1,131 +1,134 @@
-Return-Path: <netdev+bounces-132643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E0C992A08
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:10:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4F5992A31
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:29:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC8A51F22FA0
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:09:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C107B2271C
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFEF1C9DC8;
-	Mon,  7 Oct 2024 11:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XOrGhj8L"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A5B1CACC0;
+	Mon,  7 Oct 2024 11:29:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006DA2AD05;
-	Mon,  7 Oct 2024 11:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2AA2AD05
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 11:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728299394; cv=none; b=ARG1/BNh4aFWe4XZLIMuDA5DzAgYLiqzMYGlbCNYzm08BdLtyPl5l5jcDrWIQNBPFY71paBpof1Ix2HLLQOZO3lTlv/JWCHePHx5dmHKPwRFRNbBM5BPtjKzUHbO6F2ynqOL+Js7ipTACG+/lClahX7/GJv6enDfLpM9xTkB8R0=
+	t=1728300551; cv=none; b=oajicV3CY/sYUB7Jl2O04OcFTSSf0Ylv253RtQqQBvaaEnreHSIFImJD+zDUMR4St3tybtH+xscbTrF3mC5O6BCz/cuYT5vpJFCyjV45PxI8sIZDF3hroKg+JN9qHBVb0qVeNMSAN+udg0ZfjIPmXWExmhtmZg9k9K4vxUHtc94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728299394; c=relaxed/simple;
-	bh=5wbY/RQk+dZVFTuD2NZblqMNoawXgnQwA7gGNgkOd8A=;
+	s=arc-20240116; t=1728300551; c=relaxed/simple;
+	bh=Zcb9bTja9eypmKC5oGkEJ2RmUr8BxDhQokPpviezBpY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H+pQd1DEsLqwMGCgYZtX1kR4aR/txCQRcLpFjTerg7fqetNwRTcdmIf7pWkeh1DRS0v1+EKYI7SWdBIf8Bxkto4u0n0ZOEU/N8dSplYjg4Ch0XlRp28jOoAm33lKtjcvvuLI2qkID4cLCR4GaCaOc4CpbZByLkj6e1jO9/tB4Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XOrGhj8L; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e07d85e956so3490983a91.3;
-        Mon, 07 Oct 2024 04:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728299392; x=1728904192; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cqk+8hebPA4ti95Da2Yr/B6Svo5BcjtL6Vb/SKjC1tw=;
-        b=XOrGhj8LR7V9F4d1Q5IBuc/XwVor9r4PhtQxjhCO9goEqDRjtauFysLMNGZGTpxtsk
-         E19BXmL5jHv5w9DrQ4faOcgWjSALMBMOYDlxVcKkb2i8gLqmJaI55F8l/L0jh5uVk7dq
-         YMUxMRJnQhfGZYxU6JCwGXdmWapW+z82rdoPV76L8xb9D3PentVjeSr+BO1BaOmdhDQY
-         4INDwn1mEN40nI9QSGB4RdPooK1vuOogECGczg+xR4aD6IhMhOtv8HqqxJMqwhL20Gj9
-         Z4gdMojx32mvFInnkb1HVWG4xDZN0q27MgZhP1pZGiaCn5Q0rwO4awr683FRtoYAtWY/
-         Giow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728299392; x=1728904192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cqk+8hebPA4ti95Da2Yr/B6Svo5BcjtL6Vb/SKjC1tw=;
-        b=ubFwaS4Vm1BpKrhVMRUIqgMKS32lEtOS0LCt5i0nuU1ToWprcOEBTLaDpicYCEj44k
-         jlaaI57VjqjvBmyWTFgNKRlN4m3bZ9CF285REgyk4un2wIOcK3r0tQ3DeRTgCz0cSTBM
-         uNAlVhRrOfBIkblNI5O8xWpkuuUubgpcFcH8lJFISpYhKzh6TxJp3UhbDo408mQvWL0r
-         NbEechxi7oc3NYN7YVK9YI41f3iyMqxRAzZVJI/udLGjn581NHBJBIvLcuyjBq0jMXeu
-         wdenURhyAAgzaEOZTLKN2adFmuu++gcnt/F5tT/KZnDrXrXckxWyfXmWnwWnFaAjNL9M
-         pGKg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1RkHReYkCV1MOwwj++V/garPHDLEUkdPwJ1JqZI6brotOSE4sEi7VDlO1iUfQzEHR+2X/ZR+Rj3c=@vger.kernel.org, AJvYcCWuNBcC0Or/gEH2a/iDjuLHf2idsGKSiVK/BXwrCXQzv5Ixe5CxD2C/1JdsLAemLNPp5ZacQF1E@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRnNTkU6wRxFu+PjsE4fISqw5oobi65PeU5/4dv+paG6gzuzNA
-	ab6HElXeH1FrDWWIHUW/WKuXOPoAaWziOe5aLaATM3QcdQ63ydNY
-X-Google-Smtp-Source: AGHT+IH1i/YLuuYzyJRautzgLh1IeiNrFLRhSMUkMmzG3WVXdLa7AlCZLM4wJywivW5iMKi0OsFxGA==
-X-Received: by 2002:a17:90a:e7c7:b0:2e0:9b59:c0d0 with SMTP id 98e67ed59e1d1-2e1e63e3315mr10767696a91.41.1728299391946;
-        Mon, 07 Oct 2024 04:09:51 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20b12e245sm5046992a91.52.2024.10.07.04.09.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 04:09:51 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id D22464422BC6; Mon, 07 Oct 2024 18:09:45 +0700 (WIB)
-Date: Mon, 7 Oct 2024 18:09:45 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Cc: donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3] doc: net: Fix .rst rendering of
- net_cachelines pages
-Message-ID: <ZwPBeSnyNyaYCDql@archie.me>
-References: <20241006113536.96717-1-donald.hunter@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YWvS1Rk2kwlfwQcr7AVVBlJY4LI+gXA/BZEtdoYACwwYl/cWKDCEMjTZeOfRBsBnm1WjO/c/yTNWus2cCmNdVjxnLVi1JaZBq0zm7aYk4R9H4a9BotqC7RyI3Gos0Sp18ao+b6t7yijpSR5BIK6XjgO248uBWCFZlH6DNbY7isQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sxlvE-000797-8c; Mon, 07 Oct 2024 13:29:04 +0200
+Date: Mon, 7 Oct 2024 13:29:04 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Florian Westphal <fw@strlen.de>, Ben Greear <greearb@candelatech.com>,
+	netdev <netdev@vger.kernel.org>, kent.overstreet@linux.dev,
+	pablo@netfilter.org
+Subject: Re: nf-nat-core: allocated memory at module unload.
+Message-ID: <20241007112904.GA27104@breakpoint.cc>
+References: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
+ <20241001193606.GA10530@breakpoint.cc>
+ <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Fz7Re0cZD2nr0VQd"
-Content-Disposition: inline
-In-Reply-To: <20241006113536.96717-1-donald.hunter@gmail.com>
-
-
---Fz7Re0cZD2nr0VQd
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Sun, Oct 06, 2024 at 12:35:36PM +0100, Donald Hunter wrote:
-> The doc pages under /networking/net_cachelines are unreadable because
-> they lack .rst formatting for the tabular text.
->=20
-> Add simple table markup and tidy up the table contents:
->=20
-> - remove dashes that represent empty cells because they render
->   as bullets and are not needed
-> - replace 'struct_*' with 'struct *' in the first column so that
->   sphinx can render links for any structs that appear in the docs
->=20
+Suren Baghdasaryan <surenb@google.com> wrote:
+> On Tue, Oct 1, 2024 at 12:36 PM Florian Westphal <fw@strlen.de> wrote:
+> >
+> > Ben Greear <greearb@candelatech.com> wrote:
+> >
+> > [ CCing codetag folks ]
+> 
+> Thanks! I've been on vacation and just saw this report.
+> 
+> >
+> > > Hello,
+> > >
+> > > I see this splat in 6.11.0 (plus a single patch to fix vrf xmit deadlock).
+> > >
+> > > Is this a known issue?  Is it a serious problem?
+> >
+> > Not known to me.  Looks like an mm (rcu)+codetag problem.
+> >
+> > > ------------[ cut here ]------------
+> > > net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register_fn has 256 allocated at module unload
+> > > WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_unload+0x22b/0x3f0
+> > > Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat msdos fat
+> > ...
+> > > Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
+> > > RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
+> > >  codetag_unload_module+0x19b/0x2a0
+> > >  ? codetag_load_module+0x80/0x80
+> > >  ? up_write+0x4f0/0x4f0
+> >
+> > "Well, yes, but actually no."
+> >
+> > At this time, kfree_rcu() has been called on all 4 objects.
+> >
+> > Looks like kfree_rcu no longer cares even about rcu_barrier(), and
+> > there is no kvfree_rcu_barrier() in 6.11.
+> >
+> > The warning goes away when I replace kfree_rcu with call_rcu+kfree
+> > plus rcu_barrier in module exit path.
+> >
+> > But I don't think its the right thing to do.
+> >
+> > (referring to nf_nat_unregister_fn(), kfree_rcu(priv, rcu_head);).
+> >
+> > Reproducer:
+> > unshare -n iptables-nft -t nat -A PREROUTING -p tcp
+> > grep nf_nat /proc/allocinfo # will list 4 allocations
+> > rmmod nft_chain_nat
+> > rmmod nf_nat                # will WARN.
+> >
+> > Without rmmod, the 4 allocations go away after a few seconds,
+> > grep will no longer list them and then rmmod won't splat.
+> 
+> I see. So, the kfree_rcu() was already called but freeing did not
+> happen yet, in the meantime we are unloading the module.
 
-The doc LGTM, thanks!
+Yes.
 
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> We could add
+> a synchronize_rcu() at the beginning of codetag_unload_module() so
+> that all pending kfree_rcu()s complete before we check codetag
+> counters:
+> 
+> bool codetag_unload_module(struct module *mod)
+> {
+>         struct codetag_type *cttype;
+>         bool unload_ok = true;
+> 
+>         if (!mod)
+>                 return true;
+> 
+> +      synchronize_rcu();
+>         mutex_lock(&codetag_lock);
 
---=20
-An old man doll... just what I always wanted! - Clara
+This doesn't help as kfree_rcu doesn't wait for this.
 
---Fz7Re0cZD2nr0VQd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZwPBdAAKCRD2uYlJVVFO
-ozwGAP4/coDHQrhUmkSBHDX0x/ec0iWraLQ4QnxbZyScSTQI0wD/R+sYJci4t5sh
-hHySaerPFQQ3WpA5aG/PnaXlWbBPegg=
-=Zt80
------END PGP SIGNATURE-----
-
---Fz7Re0cZD2nr0VQd--
+Use of kvfree_rcu_barrier() instead does work though.
 
