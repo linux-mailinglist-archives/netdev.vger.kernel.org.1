@@ -1,131 +1,92 @@
-Return-Path: <netdev+bounces-132739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F020992EE9
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:21:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6B3992EFC
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:23:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31A2A28396D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:21:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 268511F222F6
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 14:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773E11D54DC;
-	Mon,  7 Oct 2024 14:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B123D1D61B1;
+	Mon,  7 Oct 2024 14:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GO37LcoC"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="d2q7JpoF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD671D2F4B;
-	Mon,  7 Oct 2024 14:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2401715D5A1
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 14:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728310878; cv=none; b=J0sCf9rDFKnXpjY0YslNMEKFhcFelmPVzwXN+SKhxr11JlC1hj/axTN+y+oOBhfdKR/bDbghfifzInhuXqTbNIMOkqMnuXDVWPHUmg9kPKfNrIHkepgWkSWpHcRUz7FNwFwczNHADxt4LUXvAZNpGwh64/FTf4zrl3xgSEK1Aoo=
+	t=1728311024; cv=none; b=bWJizcufM8TF2f3NhpwKZmhFyUtdK1m7v91OBvrYX8fleZqWxHKzQZgZvbfpKt1wv4ud7PMfLv6V7G5zveEMnop/XejgDxeWhBLeU13QHxlJCcu1SzV8Pz7Kac9blD6y7UiwyfzymvTOJ5by664Wg4RQfSdoOlClE3SsI2ZyJzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728310878; c=relaxed/simple;
-	bh=wXq6DEfl+otX2OUYDSxRKZTFFqZwgJsq20ZiWsYFZ3Y=;
+	s=arc-20240116; t=1728311024; c=relaxed/simple;
+	bh=qPkc80T79/3wKLGesQKA66tQkMTXZTDkU/peITunfJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mFnhLJwR9hk6v1Z3M4PJ3DfEP5cMSQ/DwYd603vhFrIP48gfB2J+Vtp8/4Pi+qgMf191WqYUk7lNULQy7M1kl+Vrinbr3tn+DrWfKJgmsjl/Q3CzZE+PJnUqnXs1TgpbSaRDzlEQDegCjxvwi5APmn8X+9A+Y8CQNATe8kWWT1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GO37LcoC; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6cb2ad51162so41084316d6.3;
-        Mon, 07 Oct 2024 07:21:16 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNlUdsI1lqS0soM0xo2BbMhDrD7fIc/ehJ4gh2Pm7F+08kpBdEn7DVCbgpWAMjAfZeF07zGMiMs05dYTP1ag1m00aIdEGk433eFngg4KxPJwHvF/4CNNbO1GcuikfYUeH4Zfbm/Vydaz7XATgoUpHupA/pwu76xAc9HDNo6zw1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=d2q7JpoF; arc=none smtp.client-ip=209.85.128.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-6e2e41bd08bso14694177b3.2
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 07:23:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728310876; x=1728915676; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1728311022; x=1728915822; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zAK4XymC3L6i3k241V0wt6B7pOPxNyzbjvvZCbkfkKY=;
-        b=GO37LcoCamNNtpCcRc2RdmBeOhZWAZNtM8+BDRfp9fSYZceaDQrhdmWxWQfTiuDxej
-         cS+zUgk4NYr81vFtV0Ian+MnfZqtbuSvHIg60x0QPRq3zwS3inPtOOW6lQte6r2whnwO
-         sKCjWD48HFvsWIk146qSJj1h/XHjUKExZ/B55533ZHNe0B3u4ajtqNIMQ9yQiX7YOl4G
-         LoFQ3hnk6RrJ7RLz9ox1mEv3wlFOjAj1KrdBUrHgh3FZKNhj6Ka8D8lcyXdFJ6+ASeIz
-         KP5JuIpr93tj/04bYZPRCyDZLm1J3u/vh+R8dV3OabpEr5yviFAuTKTS4O04U1ziMPIx
-         o9QQ==
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EqXbZQYfVYevus2Ea2D1rGElGIX5S/l9x3dZpDMo980=;
+        b=d2q7JpoFu1oV7Esiflgkre+qnF3//vD2zcGlij8EHOwRW8SlansmTFdZz7+ILUsHZj
+         sv3y5NJ4sSdTj1PL7gKAhDE+IqTwuulR0XMYcjjIWkW7vSFZJsch07nF7A/N+BM4avso
+         F953L32omoJaLB+2cx774B1xWhmj9I13xAVrk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728310876; x=1728915676;
+        d=1e100.net; s=20230601; t=1728311022; x=1728915822;
         h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zAK4XymC3L6i3k241V0wt6B7pOPxNyzbjvvZCbkfkKY=;
-        b=im1XW9pVSn70Jkl1jQjFOBuEEBt2kzTbjKsEPI/fq1trN2GxvurF9UKPpvabTAGk3V
-         N2ca1QCb2aPOI9f0zCHqDKmnYS2agurBqVgg7oJLaxMcTENJnM7bz9Xc4I+54ve7xNd4
-         DN+PX3Ix+yMLDW91zamou94dp4upMFiAyyI0+ydN4Nd8gVTlnowq/nvMRhb4CYj9GHqS
-         ZdPBwROQCxENudluVWV4sqUIn0MXIxdlRNVi+m2ROAgThm2Xa8+sIuJPUqVnxgonZzq3
-         3dXiMDoU4z+3VhFGgk5vZMsmt8WKXwD3QeTWx9GOl8k2sE6HOGB7Nhil2sqwPqe3rBjV
-         r+kg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVLgVXKheFjG0taI5DEOO7jBkck/9xmtifxZ8ZXAGdlyNhtoGDsxk9IRYaG+0o7P0q6KWj8uiI2NpVSaruGGk=@vger.kernel.org, AJvYcCVw80w4WUK+3BCLus5e0ubpyWiIASdzndq4qBrOX1D4OUt8zBUhw6ZlXyA/ap/Xettb29/3n0IQBA7BZyo=@vger.kernel.org, AJvYcCXGc4vnzuQRd+WYw84bN+/Jjx/itrXOOSLtVdeR2yFDYp7pFnbt3xE8ikadmU0RyueEGlD/HnRW@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbLkKUyZd1DfgOe+whK964ubi9jVP2AtvgybZLFEIl9VajIANV
-	q4pxEM+Lq4pNd+c36pjOyJGHsfzXzcZUE+nAR2DVnoAuFpBnTASs
-X-Google-Smtp-Source: AGHT+IGRJoduihx98XE39c8bw2PlpbXpydpc9CbQWwkox+aktEDVzndR66sqj0UTcswncSC6H7Za4g==
-X-Received: by 2002:a05:6214:4993:b0:6c3:5e7c:8613 with SMTP id 6a1803df08f44-6cb9a2f586amr205645026d6.16.1728310875729;
-        Mon, 07 Oct 2024 07:21:15 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cba46cebccsm25706456d6.21.2024.10.07.07.21.15
+        bh=EqXbZQYfVYevus2Ea2D1rGElGIX5S/l9x3dZpDMo980=;
+        b=e8NtkFY7AdfdSgqOwN57zb4d3xQaXNbLbxPysTmVEjIbUC+kFO2fZ9sB66spPDN+dA
+         6UIvUZq2LFcN2R6S1CpMJ6FfiARS0G9neq2+pj3k2BTbaqXSOToBUTiHZI1amXibJCXz
+         dMi3l+DX7Tiq1JXf6eHSVCZKcb32gQf7G/AIRMWJwgVMypux2wZ/KWq7HxhBG4B2tHvV
+         Myrfz5KQKdTKArxP9En3XHjYaHha6xVuCjCtTBkYRqw6FB/whPDRrobyiU6YOoc1CMxi
+         c1aUf7zznIJdp91oomMBny5XPZIoez1WglKGzplBNXx4Tc58CDRlNZkN1Jt0YSzJNFsZ
+         q7sQ==
+X-Gm-Message-State: AOJu0Yxe/r1RBHdDQjZEDsmC5KCxgUT0UbbC6NoysWcQoc8pE0XObgZm
+	1fiGhNvzLEY5VyzsGKofFWloPW1+oeV1poVlmk+UHTXoFdlnGqs6rNLpmSKIgMIwcNoMh0nnkih
+	u
+X-Google-Smtp-Source: AGHT+IH+3lKVY8TPqMmtsQQH5l/1gFUoFYoqJHj9oZr6huCTqgMbfHMoNgylaEpPIc3DLqlRk/C26g==
+X-Received: by 2002:a05:690c:2c86:b0:6d3:be51:6d03 with SMTP id 00721157ae682-6e2c7234549mr66163357b3.23.1728311022220;
+        Mon, 07 Oct 2024 07:23:42 -0700 (PDT)
+Received: from LQ3V64L9R2 ([208.45.240.186])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e2d93d3e54sm10337857b3.101.2024.10.07.07.23.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2024 07:21:15 -0700 (PDT)
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfauth.phl.internal (Postfix) with ESMTP id E4814120006E;
-	Mon,  7 Oct 2024 10:21:14 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Mon, 07 Oct 2024 10:21:14 -0400
-X-ME-Sender: <xms:Wu4DZ8ya6MHD3a5kScy-k4euejkfWV2i_cUaQB9GnRQhkEZgiZ5Uwg>
-    <xme:Wu4DZwRNI286qyLwDS5ZdKRxUoP3Ss__cP6yiNSdNqokfuLjto_15MQ7gLrO1hXkK
-    RW9FF7xPKud0JlQBA>
-X-ME-Received: <xmr:Wu4DZ-W6SXjIIHoOUFDhQIR_qT7CsRGhW11uNO-fQayKUbWrNYd998h9A6w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvddvledgjeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilh
-    drtghomheqnecuggftrfgrthhtvghrnhepvefghfeuveekudetgfevudeuudejfeeltdfh
-    gfehgeekkeeigfdukefhgfegleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghl
-    ihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepgh
-    hmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopeduledpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghlihgtvghrhihhlhesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepfhhu
-    jhhithgrrdhtohhmohhnohhrihesghhmrghilhdrtghomhdprhgtphhtthhopehnvghtug
-    gvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehruhhsthdqfhhorhdq
-    lhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehhkhgrlhhlfi
-    gvihhtudesghhmrghilhdrtghomhdprhgtphhtthhopehtmhhgrhhoshhssehumhhitghh
-    rdgvughupdhrtghpthhtohepohhjvggurgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    eprghlvgigrdhgrgihnhhorhesghhmrghilhdrtghomh
-X-ME-Proxy: <xmx:Wu4DZ6i9TZs7C-fP7GPW4CDfrG7K0k7J8B6CYgYVaz-w8QHdSld8Xg>
-    <xmx:Wu4DZ-B0orvb_WiSEOTCaubwqoulMwpD_nAsMsVbBZdnwz9Aw94Gmw>
-    <xmx:Wu4DZ7Kfk1gtRUdNhd8pTcshofhvD577R4tN3czBiqZipA1n7KRJhQ>
-    <xmx:Wu4DZ1B8Cl9moU7ckKOg6Leofrb1ImodvGMxyFFr62r3ghFEKmMxtg>
-    <xmx:Wu4DZ-yal-UwvjnqKHhQtEsTZL3Jb-mUCNozW5uCh3sW7IPEUfIIpWgl>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 7 Oct 2024 10:21:14 -0400 (EDT)
-Date: Mon, 7 Oct 2024 07:19:56 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Alice Ryhl <aliceryhl@google.com>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, anna-maria@linutronix.de,
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <ZwPuDE16YBS4PKkx@boqun-archlinux>
-References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
- <20241005122531.20298-6-fujita.tomonori@gmail.com>
- <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch>
- <ZwG8H7u3ddYH6gRx@boqun-archlinux>
- <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux>
- <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
- <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
- <ZwPsdvzxQVsD7wHm@boqun-archlinux>
- <CAH5fLgigW6STtMBxBRTvTtGqPkSSk+EjjphpHXAwXDuCDDfVRw@mail.gmail.com>
+        Mon, 07 Oct 2024 07:23:41 -0700 (PDT)
+Date: Mon, 7 Oct 2024 10:23:40 -0400
+From: Joe Damato <jdamato@fastly.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next v3 2/2] tg3: Link queues to NAPIs
+Message-ID: <ZwPu7DmYwwK_uDmD@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Michael Chan <michael.chan@broadcom.com>, netdev@vger.kernel.org,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Michael Chan <mchan@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20241005145717.302575-1-jdamato@fastly.com>
+ <20241005145717.302575-3-jdamato@fastly.com>
+ <CACKFLiknyPntcYXrhsVkz5Mpt9kep0cnkYBGVb1f74x5+HS4Cg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -135,66 +96,31 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH5fLgigW6STtMBxBRTvTtGqPkSSk+EjjphpHXAwXDuCDDfVRw@mail.gmail.com>
+In-Reply-To: <CACKFLiknyPntcYXrhsVkz5Mpt9kep0cnkYBGVb1f74x5+HS4Cg@mail.gmail.com>
 
-On Mon, Oct 07, 2024 at 04:16:46PM +0200, Alice Ryhl wrote:
-> On Mon, Oct 7, 2024 at 4:14 PM Boqun Feng <boqun.feng@gmail.com> wrote:
-> >
-> > On Mon, Oct 07, 2024 at 04:08:48PM +0200, Alice Ryhl wrote:
-> > > On Mon, Oct 7, 2024 at 3:48 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > > >
-> > > > On Mon, Oct 07, 2024 at 05:28:28AM -0700, Boqun Feng wrote:
-> > > > > On Sun, Oct 06, 2024 at 04:45:21PM +0200, Andrew Lunn wrote:
-> > > > > However, this is actually a special case: currently we want to use klint
-> > > > > [1] to detect all context mis-matches at compile time. So the above rule
-> > > > > extends for kernel: any type-checked *and klint-checked* code that only
-> > > > > calls safe Rust functions cannot be unsafe. I.e. we add additional
-> > > > > compile time checking for unsafe code. So if might_sleep() has the
-> > > > > proper klint annotation, and we actually enable klint for kernel code,
-> > > > > then we can make it safe (along with preemption disable functions being
-> > > > > safe).
-> > > > >
-> > > > > > where you use a sleeping function in atomic context. Depending on why
-> > > > > > you are in atomic context, it might appear to work, until it does not
-> > > > > > actually work, and bad things happen. So it is not might_sleep() which
-> > > > > > is unsafe, it is the Rust code calling it.
-> > > > >
-> > > > > The whole point of unsafe functions is that calling it may result into
-> > > > > unsafe code, so that's why all extern "C" functions are unsafe, so are
-> > > > > might_sleep() (without klint in the picture).
-> > > >
-> > > > There is a psychological part to this. might_sleep() is a good debug
-> > > > tool, which costs very little in normal builds, but finds logic bugs
-> > > > when enabled in debug builds. What we don't want is Rust developers
-> > > > not scattering it though their code because it adds unsafe code, and
-> > > > the aim is not to have any unsafe code.
-> > >
-> > > We can add a safe wrapper for it:
-> > >
-> > > pub fn might_sleep() {
-> > >     // SAFETY: Always safe to call.
-> > >     unsafe { bindings::might_sleep() };
-> >
-> > It's not always safe to call, because might_sleep() has a
-> > might_resched() and in preempt=voluntary kernel, that's a
-> > cond_resched(), which may eventually call __schedule() and report a
-> > quiescent state of RCU. This could means an unexpected early grace
-> > period, and that means a potential use-afer-free.
+On Mon, Oct 07, 2024 at 12:30:09AM -0700, Michael Chan wrote:
+> On Sat, Oct 5, 2024 at 7:57 AM Joe Damato <jdamato@fastly.com> wrote:
+> > +               if (tnapi->tx_buffers) {
+> > +                       netif_queue_set_napi(tp->dev, txq_idx,
+> > +                                            NETDEV_QUEUE_TYPE_TX,
+> > +                                            &tnapi->napi);
+> > +                       txq_idx++;
+> > +               } else if (tnapi->rx_rcb) {
 > 
-> Atomicity violations are intended to be caught by klint. If you want
+> Shouldn't this be "if" instead of "else if" ?  A napi can be for both
+> a TX ring and an RX ring in some cases.
+> Thanks.
 
-Yes, I already mentioned this to Andrew previously.
+BTW: tg3 set_channels doesn't seem to support combined queues;
+combined_count is not even examined in set_channels. But maybe
+the link queue can be a combined queue, I don't know.
 
-> to change that decision, you'll have to add unsafe to all functions
-> that sleep including Mutex::lock, CondVar::wait, and many others.
+Regardless, I'll still make the change you requested as there is
+similar code in tg3_request_irq.
 
-No, I'm not trying to change that decision, just to make it clear that
-we can mark might_sleep() as safe because of the decision, not because
-it's really safe even without klint...
+But what I really would like to get feedback on is the rxq and txq
+indexing with the running counters, please. That was called out
+explicitly in the cover letter.
 
-Regards,
-Boqun
-
-> 
-> Alice
+Thanks.
 
