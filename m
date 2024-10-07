@@ -1,114 +1,162 @@
-Return-Path: <netdev+bounces-132816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A8089934A8
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:17:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD6EF993501
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 19:28:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38DA71C215EA
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:17:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 407A4B216CD
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 17:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663441DCB1D;
-	Mon,  7 Oct 2024 17:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138781DD55D;
+	Mon,  7 Oct 2024 17:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GK4X/xXT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AELZbK/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7241DA2E5;
-	Mon,  7 Oct 2024 17:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980EF1DD55F
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 17:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728321445; cv=none; b=pqtUA2YrKCitceT6+A0l/Pthvvn9VYaP49KTacY2O7Z+BEoOTTNCRflr4bf8mC+A/ExIi+i10BZKlwmmtGdqouahvk9IWviSLN2Xk+hheIiIYg4Jhk1R6oMnRbgyJT+6kIyJIsl3px43vsiHI3p6HvPCf+mUjUhlN1L/PBY6Pqw=
+	t=1728322127; cv=none; b=MglpShJh3KFkBNi2m8Hxl+0BWUJMRqu7YyC8EvInb8LWLheBVxLQHLANGpIWWqwjZGKQ6t1SiXgP/mYbW4hHQQP6H+dq4pj/othL/Z8c1jxEMJ/L7CX/06y394SWEU/Cz9SFgMx66Xjxz6aZCvTaDembf05xdu0AZVrmsPcQAM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728321445; c=relaxed/simple;
-	bh=VxGBX0ULYi2EAq+yRPUREoOPa1Wmckf4kqo5VQMoH8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gOg9yKjVTvmH7TABcMmEgQClAcB5o2J3wfhijRccKG7xiorDTzk0N3s4odX6pSi1j9NVCzjaBJrEMoTamOz2WwT4yw0JXBL2mauoTSa6eRQLaLcwbaK2Viby8NVJ42sNSr5AuACwGpYoHcPp/8iI2gVPdsnK7ILqDsJ1yI49H98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GK4X/xXT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mZjJh1i9ljUXC8dDHtmmP0zanIYCPR10JoyaAII1NYo=; b=GK4X/xXT2YGi2t+0cHu5xqF+n1
-	eUZ1kLTcTxIyzxkHnVPNy4wUhkaZo/ZNdH0zoV8jeQ/IrileC1PXcVgAnREk/x912Mcxvzz6MOgew
-	ewYHlWMMyBBV0pALXNV+XmmAk36TB3t6yBO3gpxMVVmhrTsHAVwNv17YmzAkEBF5V99E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sxrMA-009I9K-Lj; Mon, 07 Oct 2024 19:17:14 +0200
-Date: Mon, 7 Oct 2024 19:17:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tim Harvey <tharvey@gateworks.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: phy: disable eee due to errata on various KSZ
- switches
-Message-ID: <013420e6-12c7-45df-986c-22b3e2c1f610@lunn.ch>
-References: <20241007171032.3510003-1-tharvey@gateworks.com>
+	s=arc-20240116; t=1728322127; c=relaxed/simple;
+	bh=3CJvxuJ6KqxdJiUfgEGSn5hJJ5U9bsLjc3awc4rHEQ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Ck83kz/eEzygA25XeYG9/o8aokdr9Bo0lGicJBJ5olodFHuuesApHRUw6919AARCmZ0JsHkb5KoIGTVRHy9zMEfqU5MJam8XO0fsOYOa3wcwnfT1tII+LPkDipQdKk3IV6Xs5gBywh7TwNf6y34r+IpcvZ/QdK0OMiqslpXUFNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AELZbK/4; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20b5fb2e89dso35882405ad.1
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 10:28:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728322125; x=1728926925; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=/MVLiebyBqKMOWwjWUN1n0h3eMZlRkRs9MYlwTgHAG4=;
+        b=AELZbK/4OykyUSFWryuMSIIDjy6pL9YHY9oWF8YJWIlEzAE7d+w/SyLcO959XH3TNS
+         pQ9cmsTlEQRJ8O/BATfXmE34yq5ZH8Gi8hS/TojyVas6BtAKLCz99k+qVHqksUAj+IKZ
+         6fjXgFh2LesCEVqLqyTqwvfU5IBe4Qde74sKlYu4GlJ0IK4RiQos3JI8wcKERa0Kflt/
+         1m58KJYUXCnqO35lB8j3TVmQ8zjTIJONWR5D9xgcTLJ9AbN27sCfe11AVQet69LtTYzQ
+         EgH4r7MAYNN9kQiGhjgki7ghkCxI04lnVkLkKM5Bv9bMbGp9IgLR0k5KzaSHRukRvCos
+         MdGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728322125; x=1728926925;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/MVLiebyBqKMOWwjWUN1n0h3eMZlRkRs9MYlwTgHAG4=;
+        b=uiDoKs9o30OWXlc+aAStnuSFAQPixBbyR+Gx+UMeX2eNp0vQaslSAC5oGd3BPF13yt
+         Q8zVgjxiGS4UFti/WhuNKifg47EU2VJ7ptNoauJhFs+i+CqrSxxm7khWmzg6EYOTLJ/T
+         dYPALhJgt6soiFoeDOkA7WFjNY1xUKewzFkb5dJJ+pfaivcmHyY0LSfz0TWgJepEsdCd
+         E2Wvkmyb3Q/Yb8LvHtnldCHZKaQwD3vjOoyATVxtzEt7Puh1FggTSQNXaSuUuqPWQePE
+         jto3kgTiigHWFqyGoZvnFb684p8q0CJhpJ0aSGiigNLuFVV1SBzk8n5KqDNUWJifSbwq
+         tczg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlQos4RC+wYsT01tRJv9XjE0vNbeDdrXJFW31LApBWN1/Ger5mhyA4Imy65sAAjRZBxsfEVps=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR+sDLnMzYRvG1V1yXqr19YPqDsgbb17ca0smYehJ+oRUAc7d3
+	v47MgCRtNExvIeu1hJJQ0dQ/knoKwFLGWLr2NIAvA+FzJPT1DzXOqO4/AQ==
+X-Google-Smtp-Source: AGHT+IFl6aswS+BLrAFwmuBr2dE4rUQ+o+CuIIUiE56uQwCtH9lgg7PURlUEh7Lidrh1xWpgNIMc4g==
+X-Received: by 2002:a17:90a:77c4:b0:2e1:ce67:5d29 with SMTP id 98e67ed59e1d1-2e1e62a197dmr15321552a91.21.1728322124748;
+        Mon, 07 Oct 2024 10:28:44 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e1e83ca284sm7433538a91.11.2024.10.07.10.28.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 07 Oct 2024 10:28:44 -0700 (PDT)
+Message-ID: <c572529e-78c4-42d5-a799-1027fd5fca29@gmail.com>
+Date: Mon, 7 Oct 2024 10:28:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241007171032.3510003-1-tharvey@gateworks.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Linux network PHY initial configuration for ports not 'up'
+To: Tim Harvey <tharvey@gateworks.com>, netdev <netdev@vger.kernel.org>
+References: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 07, 2024 at 10:10:32AM -0700, Tim Harvey wrote:
-> The well-known errata regarding EEE not being functional on various KSZ
-> switches has been refactored a few times. Recently the refactoring has
-> excluded several switches that the errata should also apply to.
+On 10/7/24 09:48, Tim Harvey wrote:
+> Greetings,
 > 
-> Disable EEE for additional switches with this errata.
+> What is the policy for configuration of network PHY's for ports that
+> are not brought 'up'?
 > 
-> The original workaround for the errata was applied with a register
-> write to manually disable the EEE feature in MMD 7:60 which was being
-> applied for KSZ9477/KSZ9897/KSZ9567 switch ID's.
+> I work with boards with several PHY's that have invalid link
+> configuration which does not get fixed until the port is brought up.
+> One could argue that this is fine because the port isn't up but in the
+> case of LED misconfiguration people wonder why the LED's are not
+> configured properly until the port is brought up (or they wonder why
+> LEDs are ilumnated at all for a port that isn't up). Another example
+> would be a PHY with EEE errata where EEE should be disabled but this
+> doesn't happen utnil the port is brought up yet while the port is
+> 'down' a link with EEE is still established at the PHY level with a
+> link partner. One could also point out that power is being used to
+> link PHY's that should not even be linked.
 > 
-> Then came commit ("26dd2974c5b5 net: phy: micrel: Move KSZ9477 errata
-> fixes to PHY driver") and commit ("6068e6d7ba50 net: dsa: microchip:
-> remove KSZ9477 PHY errata handling") which moved the errata from the
-> switch driver to the PHY driver but only for PHY_ID_KSZ9477 (PHY ID)
-> however that PHY code was dead code because an entry was never added
-> for PHY_ID_KSZ9477 via MODULE_DEVICE_TABLE.
-> 
-> This was apparently realized much later and commit ("54a4e5c16382 net:
-> phy: micrel: add Microchip KSZ 9477 to the device table") added the
-> PHY_ID_KSZ9477 to the PHY driver but as the errata was only being
-> applied to PHY_ID_KSZ9477 it's not completely clear what switches
-> that relates to.
-> 
-> Later commit ("6149db4997f5 net: phy: micrel: fix KSZ9477 PHY issues
-> after suspend/resume") breaks this again for all but KSZ9897 by only
-> applying the errata for that PHY ID.
-> 
-> The most recent time this was affected was with commit ("08c6d8bae48c
-> net: phy: Provide Module 4 KSZ9477 errata (DS80000754C)") which
-> removes the blatant register write to MMD 7:60 and replaces it by
-> setting phydev->eee_broken_modes = -1 so that the generic phy-c45 code
-> disables EEE but this is only done for the KSZ9477_CHIP_ID (Switch ID).
-> 
-> Signed-off-by: Tim Harvey <tharvey@gateworks.com>
-> ---
-> v2: added fixes tag and history of issue
+> In other words, should a MAC driver somehow trigger a PHY to get
+> initialized (as in fixups and allowing a physical link) even if the
+> MAC port is not up? If so, how is this done currently?
 
-You did?
+There are drivers that have historically brought up Ethernet PHYs in the 
+MAC's probe routine. This is fine in premise, and you get a bit of speed 
+up because by the time the network interface is opened by user-space you 
+have usually finished auto-negotiation. This does mean that usually the 
+PHY is already in the UP state.
 
-Also, you need to set the subject line to net.
+The caveat with that approach is that it does not conserve power, and it 
+assumes that the network device will end-up being used shortly 
+thereafter, which is not a given.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+For LEDs, I would argue that if you care about having some sensible 
+feedback, the place where this belongs is the boot loader, because you 
+can address any kernel short comings there: lack of a kernel driver for 
+said PHY/MAC, network never being brought up, etc.
 
-       Andrew
+For errata like EEE, it seems fine to address that at link up time.
+-- 
+Florian
 
