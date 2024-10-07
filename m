@@ -1,157 +1,116 @@
-Return-Path: <netdev+bounces-132800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5373D993398
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:39:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 327BC99339D
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 18:39:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B61287098
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE381C239DF
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 16:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CBF1DB52C;
-	Mon,  7 Oct 2024 16:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1C41DB531;
+	Mon,  7 Oct 2024 16:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aQ1giZv7"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="eiVrCxCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC81E1DB52D;
-	Mon,  7 Oct 2024 16:37:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9234D1DA610
+	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 16:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728319062; cv=none; b=MpThhTfsLoc90KFveIEzYj7JcY75AXsvJjX8UTbz7Ef+dOMcEPy2lTVPj1wp2QZ/DTokkzcbfJhDVoTRALdXO/BjczpiYfo9MQL1MOmzrlk6Fy6pjgkx9W0suxvA/ETeKEcULYM/S83x8KhlNv8CCYeqByg6II3pZ61Yw5y2S/0=
+	t=1728319105; cv=none; b=BFx3HpKKDwBQI76zgs0hPJ53xQ+e5FbiR/VDobt5w53ikapaFi8D/PFAdPw32GhIaHSOuR7fKzRtNoR82bUl2smgLGCldODTam+1hw68kd519aIpsQjypY1HfT9zz9tp/wOWg+StQFbiJNV/mVpUfZcwvNBKYc8dEhECXW5e5pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728319062; c=relaxed/simple;
-	bh=Lq/eNFVmbw//izU0negRbSA85YJCCc+D86S80+3pHKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9Lcplp+z7/5CPP/1aymL2KXOewpVR9Cqdys2hVc8tFuF3gKmsJuQwIPFiDfqatAbMi84uPk/rG46IbppVAfnPVC38e7ADNzb4qEZcIq7cQe6Q2MtBoiZ+wOOxBuNsoAWKMjlDUHa1/nMyNIx4hE4y5xqX3DljBcG1vr6KdZebU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aQ1giZv7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8WQC+zge7I/36UTRcsd6tBHsBYEQ6bykbj8mleJfkbQ=; b=aQ1giZv7A1oM0cVEKUVVv4d+71
-	fgDphdxDSVZsT/nz+3qZruToOl7AqOTNBNgnBJ9zBPbP9I7Ywj5iflbVHFIjDxwESW4F68LgzBy8m
-	SEYQwelR3fhKNjBHhGqgYYyJzhornDZWRSF6WQGhAS2lVOSpzpUT2BRjg2BkRhXjKsWI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sxqjh-009Ht7-Cv; Mon, 07 Oct 2024 18:37:29 +0200
-Date: Mon, 7 Oct 2024 18:37:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
- get and set phy configuration
-Message-ID: <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
- <20241004161601.2932901-8-maxime.chevallier@bootlin.com>
- <4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
- <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
- <20241007123751.3df87430@device-21.home>
- <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
- <20241007154839.4b9c6a02@device-21.home>
+	s=arc-20240116; t=1728319105; c=relaxed/simple;
+	bh=14hcJr6OfPPOEu402w1kAdGgKIKqcXDs4lXvFfP1H6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VkPgGwaQnICPp+kPyxbJTQUdow0nGfIzCNbfs8kQAMIw57yihCD27iEJ2VKRByyD6H4mwTKC2+36gji1zcQ3K4XhYY1yV8szAHMUGggwMy+Q6KmFRCkwEpwOS1R3lI5Smo2KT+hZONfUVKt7FMAhG+y0VYL2UQHF5qRwSURRd8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=eiVrCxCG; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-20b6c311f62so39987155ad.0
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 09:38:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1728319103; x=1728923903; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yc77PjJUiDeXng7rXZFp7DhaHfvl24R+UoJhU9+/xy4=;
+        b=eiVrCxCGZJEeC7jrIAvqijD4JUVNNFO4PB42C1ChPSd0FOQJm0LLWDctYv5DdLHTv2
+         R3vJvGDs1alN/h4Qu6OzMT3k65YwFKJ1K7fRtQ16SoNFn1AMi4cMUBS4pCgtlzKA96wB
+         m8klZqqpbIKKfyJ7VEXYF2SVgzfmXNKF44D8hEiLFKphzrixy3WFIqKOLpYA2NymtIgB
+         XyvxKWJUOcyZLbCKIOVdSKAxS9qg6Kj11wlgD2p9nl4st1Tpdo7LdCbrHDnVzSdySLf5
+         y7iISEaq2IfJQblZC+iEI4kNAmgjQask3cd+U0wqXe/K+HNk6pRQ8+TFcOzx9iQm5VX8
+         NBzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728319103; x=1728923903;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yc77PjJUiDeXng7rXZFp7DhaHfvl24R+UoJhU9+/xy4=;
+        b=H4zCwxailvlmoxDjV9QT/qVAs7q6oxlq3PnA9kns0X2HSF8l37KJBZ9TKdkOzfC9KZ
+         HRuSTudvdn+RUYAr8OHl5IlnPK8VxwvaRvoVVKu36xaYbty/TM0KGxSpz3mn559AM55M
+         ATBhoxAbRItOi8ONk8MZQ8/VukLZ6Hs9g6kXFhCTwK7tb9R2Hete4pQrYfLvruRwBLOh
+         DHMwqKX+AQP5LgXrl/ILH2xdvNRopEM6CzdE1OBGpNywvtc3W3j2T+S/qLv09Gika9i5
+         i5QmdTjdw6XHIljLE8t5GIuXhABDygSFdw1MBtjqVaKRP5q92yStuLJ1eZftOifM4eBG
+         xf4w==
+X-Gm-Message-State: AOJu0Yy4C3ZCJbQmmwMHCRaeBhELEU03I/jVyIx5dEsFmqkiNMzKK2H4
+	aizeCVLGeG1PrBVDP2jMGwX4mKOv8n5TQ39MCWjx0Jm8yv3AIU5viWk4p1xsw+lSF7arLCjZnKl
+	o
+X-Google-Smtp-Source: AGHT+IHjd9SkVGVbEYqymkj8WiT7fsLxCD6hh+NbqtkeqTN8naq33T7upXdlTXTRjyaT2fX41fcZhw==
+X-Received: by 2002:a17:902:db03:b0:20b:9841:b44a with SMTP id d9443c01a7336-20bff227da1mr156585515ad.61.1728319102849;
+        Mon, 07 Oct 2024 09:38:22 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c1398a767sm41534845ad.273.2024.10.07.09.38.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 09:38:22 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute] netem: swap transposed calloc args
+Date: Mon,  7 Oct 2024 09:38:04 -0700
+Message-ID: <20241007163812.499944-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241007154839.4b9c6a02@device-21.home>
+Content-Transfer-Encoding: 8bit
 
-> That's a legit point. I mentioned in the cover for V1 that this in
-> itself doesn't really bring anything useful. The only point being that
-> it makes it easy to test if a PHY has a working isolation mode, but
-> given that we'll assume that it doesn't by default, that whole point
-> is moot.
-> 
-> I would therefore understand if you consider that having a kAPI for
-> that isn't very interesting and that I shall include this work as part
-> of the multi-PHY support.
+Gcc with -Wextra complains about transposed args to calloc
+in netem.
 
-kAPI add a lot of Maintenance burden. So we should not add them unless
-they are justified. to me, there is not a good justification for this.
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ tc/q_netem.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> Sure thing. There are multiple devices out-there that may have multiple
-> PHYs accessible from the MAC, through muxers (I'm trying to be generic
-> enough to address all cases, gpio muxers, mmio-controlled muxers, etc.),
-> but let me describe the HW I'm working on that's a bit more problematic.
-> 
-> The first such platform I have has an fs_enet MAC, a pair of LXT973
-> PHYs for which the isolate mode doesn't work, and no on-board circuitry to
-> perform the isolation. Here, we have to power one PHY down when unused :
-> 
->                 /--- LXT973
-> fs_enet -- MII--|
->                 \--- LXT973
-
-So you have at least regulators under Linux control? Is that what you
-mean by power down? Pulling the plug and putting it back again is
-somewhat different to isolation. All its state is going to be lost,
-meaning phylib needs to completely initialise it again. Or can you
-hide this using PM? Just suspend/resume it?
-
-> The second board has a fs_enet MAC and a pair of KSZ8041 PHYs connected
-> in MII.
-> 
-> The third one has a pair of KSZ8041 PHYs connected to a
-> ucc_geth MAC in RMII.
-> 
-> On both these boards, we isolate the PHYs when unused, and we also
-> drive a GPIO to toggle some on-board circuitry to disconnect the MII
-> lines as well for the unused PHY. I'd have to run some tests to see if
-> this circuitry could be enough, without relying at all on PHY
-> isolation :
-> 
->                    /--- KSZ8041
->                    |
->       MAC ------ MUX
->                  | | 
->   to SoC <-gpio--/ \--- KSZ8041
-> 
-> 
-> One point is, if you look at the first case (no mux), we need to know
-> if the PHYs are able to isolate or not in order to use the proper
-> switching strategy (isolate or power-down).
-
-That explains the hardware, but what are the use cases? How did the
-hardware designer envision this hardware being used?
-
-If you need to power the PHY off, you cannot have dynamic behaviour
-where the first to have link wins. But if you can have the media side
-functional, you can do some dynamic behaviours. Although, is it wise
-for the link to come up, yet to be functionally dead because it has no
-MAC connected?
-
-There are some Marvell Switches which support both internal Copper
-PHYs and a SERDES port. The hardware allows first to get link to have
-a functional MAC. But in Linux we have not supported that, and we
-leave the unused part down so it does not get link.
-
-Maybe we actually want energy detect, not link, to decide which PHY
-should get the MAC?  But i have no real idea what you can do with
-energy detect, and it would also mean building out the read_status()
-call to report additional things, etc.
-
-	Andrew
+diff --git a/tc/q_netem.c b/tc/q_netem.c
+index 90b26136..c48fde11 100644
+--- a/tc/q_netem.c
++++ b/tc/q_netem.c
+@@ -414,7 +414,7 @@ random_loss_model:
+ 			}
+ 		} else if (matches(*argv, "distribution") == 0) {
+ 			NEXT_ARG();
+-			dist_data = calloc(sizeof(dist_data[0]), MAX_DIST);
++			dist_data = calloc(MAX_DIST, sizeof(dist_data[0]));
+ 			if (dist_data == NULL)
+ 				return -1;
+ 
+@@ -479,7 +479,7 @@ random_loss_model:
+ 				if (strcmp(*argv, "distribution") == 0) {
+ 					present[TCA_NETEM_SLOT] = 1;
+ 					NEXT_ARG();
+-					slot_dist_data = calloc(sizeof(slot_dist_data[0]), MAX_DIST);
++					slot_dist_data = calloc(MAX_DIST, sizeof(slot_dist_data[0]));
+ 					if (!slot_dist_data)
+ 						return -1;
+ 					slot_dist_size = get_distribution(*argv, slot_dist_data, MAX_DIST);
+-- 
+2.45.2
 
 
