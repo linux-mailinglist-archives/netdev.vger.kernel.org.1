@@ -1,103 +1,107 @@
-Return-Path: <netdev+bounces-132581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 082E49923D7
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 07:16:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0279923E6
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 07:37:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0D21C2219F
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 05:16:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C6C61C22129
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 05:37:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2AE13A40D;
-	Mon,  7 Oct 2024 05:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2782D136352;
+	Mon,  7 Oct 2024 05:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JiQkSGt/"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2214C101C4
-	for <netdev@vger.kernel.org>; Mon,  7 Oct 2024 05:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D03F23AB;
+	Mon,  7 Oct 2024 05:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728278154; cv=none; b=u1mitoVdoe145TKGnE8r7h2eCr4EOIRupUbkgYabAkA82fx2EX6f90GGXEF2I0/bii29vQqu+mjKgREUOq+Tpm73Z5yDnArrPronud0o1gUgg02R1zV0ImS6+zYrR9g2g+GJfaSa+SKSIwSSHOpmgj7CFcqkBvmp1iSgx/3uHyc=
+	t=1728279435; cv=none; b=qkJC72xfBaxgs4AbaNVpwtUEPrDIs6+JECVPcllHzTC+DY9Hjh7x0XiX+G1nGSlBlSfj+pXZas4+KacDFat6psnCL2TdgwpD2Ee/dk1yonXPfI58IwpFiy2halPgevyrX1K/S4pHEhDFgnpwD9eTnQHo+7Oz1tCFrlq5lgKq0PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728278154; c=relaxed/simple;
-	bh=9so6lN5/t0+Y9t0klCmPZB2QfktB7FCjnuGZfNWmkZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WtibkIVf17SuyU+JzsMbxBgXJew1flhw+kwEMbk6+mEar0nQFJ4LRn4T2+GvYyRDOqskjzbjXUoBbKTrXT+LFIwxpmn9386d4mdh2iZ0/+99gbtAaroX6/LdS6ntRsGTOjek1ggWcjv5MIP/jJJ55lNQVwDyJatzZK6dYAu+XqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sxg5V-0006HC-Sr; Mon, 07 Oct 2024 07:15:17 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sxg5T-0003KR-UZ; Mon, 07 Oct 2024 07:15:15 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sxg5T-00G32z-2i;
-	Mon, 07 Oct 2024 07:15:15 +0200
-Date: Mon, 7 Oct 2024 07:15:15 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Divya.Koppera@microchip.com,
-	hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, f.fainelli@gmail.com, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 1/2] dt-bindings: net: ethernet-phy: Add
- timing-role role property for ethernet PHYs
-Message-ID: <ZwNuY02MNN5LDI_F@pengutronix.de>
-References: <20241001073704.1389952-1-o.rempel@pengutronix.de>
- <20241001073704.1389952-2-o.rempel@pengutronix.de>
- <CO1PR11MB47715E80B4261E5BDF86153BE2712@CO1PR11MB4771.namprd11.prod.outlook.com>
- <a11860cc-5804-4a15-9603-624406a29dba@lunn.ch>
- <Zv6XOXveg-dU_t8V@pengutronix.de>
- <19207165-1708-4717-9883-19d914aea5c3@lunn.ch>
- <20241004095154.5810afbf@kernel.org>
+	s=arc-20240116; t=1728279435; c=relaxed/simple;
+	bh=JCadmrC3h0MujzKXcT8U0aRt9DPEEGzc5jwPr2ZooF8=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=S5xhQTGGWEjFUtCN6fQYoKfpXfdUtixbKZ2Rn7VFEWAIFzB32qstH1/cw/6z3M1hN58hiDDQE7I3Gq2QyUC+xKdQZpib2X0KfxN3XwRMk81l7seEMMk78AaPPqaG5RzGgfQ5DFiZdsBz9izy3Fm+sNoqpu3fy4Z1t2btifzO9ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JiQkSGt/; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20b90984971so41798905ad.3;
+        Sun, 06 Oct 2024 22:37:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728279432; x=1728884232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cF9L8ZHjqNNLKF2lJh0mQWJpMrn9fQAJhxqakMnEFAI=;
+        b=JiQkSGt/F5Oeo5CIeVL8Qw9o5y69W1zWDs+AvVd6fGO+9Xvoi9IEfpN9LmHcHD+OZM
+         vANIWOcAuOq7L3DwThrS16pnLhAeCu0vA5E4nAgZH1uN7tqvm3lT6SrmwsKMZK0EgP7y
+         lbqIn+ersa7EuNVng193bc4/FVzZs3hanaxAtH16qdCJRKGn+8/2WfN0KWFg8jbPqjbr
+         auowu0H3XDKG4FjoqOpAbHNmsAcJDaqcdakKlpGvuM7nMAGMoDapQeQIEkfVoFC0TRDT
+         ILGTgBMuEnncqgNit2lqu0xg8aYZamxxG3G6mH204FvZPiecd6DK7n14ER0qqQ159LuP
+         N/qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728279432; x=1728884232;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cF9L8ZHjqNNLKF2lJh0mQWJpMrn9fQAJhxqakMnEFAI=;
+        b=jeX0vgDgp/rRMS5Clm3Ypir153+zeHe59foP2EzJLP2o27MhcW8fA6xrDDcWqXb5vq
+         ZsKlNoMP/HOuF5Id+Ky5MbNAwK3C2sJZTN17WaARxxNX0DHzK/5vwmpEURO+lAJzm30C
+         3PmKqP4WNKEdi9Bo3MMXe+YJRpjyPtyjutSEomEXVNeaqR8ivYGmTrShkrnBJMJd36l2
+         SDccGLyedk4OcJBnZt6HYjZ4dXzZaf+/6JHQG+LE3vHy7HqbKH30XUZbqY7obIci3z14
+         Ror8XZSU1o7mAbQg7L1E6MT40/tq3UJoK+HHLqf1PY6Wha7r/ZY4sQpQu45Y8M+1ISHu
+         5lYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwbJYLnTmY/PR1PE5D2a5eUU4KTw74zKeKBDdovQo4N90AAIrzw4EmwoWSBEajUt1pKNFy5Vc0WVwjhP9vCo0=@vger.kernel.org, AJvYcCVeg/WawCNYI0ueVL5jI94QqC3Co4x1J/QcBKKQgVI4NNAhzrPZTeIndH9zfW0QFk73bBOjsySEfOmHljw=@vger.kernel.org, AJvYcCXq+hnDdk9XDNcpanXOc8c08PDawJn+LAaLMckUvtBOoJfGUT1HmeCG17OPAkxxYqMPNArPDUz4@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqzxGyfY/4K+zijlRfklgW0wmEfqNcESMFW8M7yHdF7jH7HXU1
+	x6CVh0qFqBLxioHTBBTm0xX45FmNIcyY/ByAc4p+qyGJN5AcNCnd
+X-Google-Smtp-Source: AGHT+IFV3bfcM3/+6NJSr4u/aMHjiq8zXz5plHNqa6mGpBlqdEH6TUKOc5eNKUGE5sjlVkCXrY5w7w==
+X-Received: by 2002:a17:902:c941:b0:20b:937e:ca34 with SMTP id d9443c01a7336-20bfe05d555mr113149585ad.34.1728279432506;
+        Sun, 06 Oct 2024 22:37:12 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c1393175csm32539055ad.140.2024.10.06.22.37.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Oct 2024 22:37:12 -0700 (PDT)
+Date: Mon, 07 Oct 2024 14:37:07 +0900 (JST)
+Message-Id: <20241007.143707.787219256158321665.fujita.tomonori@gmail.com>
+To: finn@kloenk.dev
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/6] rust: time: Implement PartialEq and
+ PartialOrd for Ktime
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <3D24A2BA-E6CC-4B82-95EF-DE341C7C665B@kloenk.dev>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+	<20241005122531.20298-2-fujita.tomonori@gmail.com>
+	<3D24A2BA-E6CC-4B82-95EF-DE341C7C665B@kloenk.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241004095154.5810afbf@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 09:51:54AM -0700, Jakub Kicinski wrote:
-> On Thu, 3 Oct 2024 19:05:58 +0200 Andrew Lunn wrote:
-> > > 802.3 use "Multiport device" for "preferred master" and "single-port device"
-> > > for "preferred slave". We decided to use other wording back in the past
-> > > to avoid confusing and align it with forced master/slave configurations.   
-> > 
-> > ethtool is preferred, so it would be more consistent with preferred
-> > 
-> > [Shrug]
+On Sun, 06 Oct 2024 12:28:59 +0200
+Fiona Behrens <finn@kloenk.dev> wrote:
+
+>> Implement PartialEq and PartialOrd trait for Ktime by using C's
+>> ktime_compare function so two Ktime instances can be compared to
+>> determine whether a timeout is met or not.
 > 
-> IIUC we have two weak preferences for "preferred"?
-> LMK if I misunderstood.
+> Why is this only PartialEq/PartialOrd? Could we either document why or implement Eq/Ord as well?
 
-Ahm... yes :)
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Because what we need to do is comparing two Ktime instances so we
+don't need them?
 
