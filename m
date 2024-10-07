@@ -1,81 +1,144 @@
-Return-Path: <netdev+bounces-132653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58270992A9D
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:48:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0304992ADC
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 13:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D4EA1F236DF
-	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:48:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599931F239BA
+	for <lists+netdev@lfdr.de>; Mon,  7 Oct 2024 11:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 960CD1B4F2F;
-	Mon,  7 Oct 2024 11:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 316B61D1F4F;
+	Mon,  7 Oct 2024 11:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gENxy5AY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MzQIEgMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6D218A6AD;
-	Mon,  7 Oct 2024 11:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2091534E6;
+	Mon,  7 Oct 2024 11:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728301703; cv=none; b=nB5d5BXJD9FpwhFwogWQeO8LoLqujnWqkWKa+qVQoMZj+WINMsZU0oJ8BJe7cClaVjB8TWwAE5q/7g+c+h/MJJkGBhzCoqcOTT47e/DkGiw4gvs2imhMKHu9OvvrE0hxkKMmQLewFoShhkx1WWDCok6wWDEjSrDx6J53l4zkgU0=
+	t=1728302214; cv=none; b=jCOIqsJCCoS0JPy7Kayt64TSQ7X2tMMzZKgx+3jUfTeLw1rWoq1luDmG/opnKn2bBVS/ifWkzJBpHifQtJ71fUbKGXaarx3lNvoyqUmyVf/6lpKpQ85JESCuFRioqRf5Oxrrovq0KDHj5fOE6eoRfROMpRZOhCHjsi3T1CEM1tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728301703; c=relaxed/simple;
-	bh=385W9W9QYNTyfuD6FUYa8ebktE7Q2QSi8i4s3DwWVPg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VMUFXX6xsFBMJEVZDRcNvRsJhAulv75rRiDfaiaplyQtEmldMYaczTCBf3R3mSwDb5sZ7z17030RTO6LxgKiqwbJGAHklLWWg1v+Nsghjl7dijHjTEnkJggYdLj/ixK+Am+AsAZHLgxKRKeJzV4l4MERVeM+kd6zhE7zgCX/dfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gENxy5AY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000B4C4CEC6;
-	Mon,  7 Oct 2024 11:48:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728301703;
-	bh=385W9W9QYNTyfuD6FUYa8ebktE7Q2QSi8i4s3DwWVPg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=gENxy5AYP9qM7KkOxjjoibALNHn9iljkoW+UY7NPcxKhMyAvZ/dIecYLxCT/PojIu
-	 04r+asy/SeC7JVqw16e/6zMXN3C+nGRCcVhbCCMsMwdiwWfnH+idjPd4wZ21UHcZpc
-	 znfz9qXfLQbTat27nyPawY2Nf/WeGH3WIRYNhT2pclC+/QyLBYOfImUVv8yB3uO7dI
-	 xlLK8E3FU4mUJnTnhQs9+it9uKwVzBFE2De1Ich4q/kmHGBOBSrdKiUjwibHOhhUAN
-	 V+fbPRjJEIIu/4MKGFb82TdWCPmRDiC7YmhCS5WViu/NRbUwtth8+HIiuqHofdZmBR
-	 PbYdJNO527yfA==
-Message-ID: <dc17ed49-aed6-4c44-97e9-d6b21e5966dd@kernel.org>
-Date: Mon, 7 Oct 2024 14:48:17 +0300
+	s=arc-20240116; t=1728302214; c=relaxed/simple;
+	bh=e/hYXfaMp9AxjhYF6SyFGgQP6z/DT34maWpVHJiBtBQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mb+d16VORfzPT228bt+5BPhM6ry14cWpzh3sbdP5wzYDm8bL1yG3Seq1MlQdYFL+Preurs9Z4HKQJwJKUwwqPlvt9IaxeUtBrR0kxctDHTQzjCJNAuJnvo76g4uQ5MIM3mAEATCbCfyRH+6+nNKY7r7eWsUjcZY/Nk6hgloiy5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MzQIEgMj; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728302212; x=1759838212;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=e/hYXfaMp9AxjhYF6SyFGgQP6z/DT34maWpVHJiBtBQ=;
+  b=MzQIEgMj5SmpxnjeaIgiiGRCPQfhP1qRK1QN22ShfY+awz+t2fJG+Bgk
+   mW9MXxSfVd1HsTrWn+m0Xt60EtJuvkYmR87o4645Lhx70Hvit8JNjlokP
+   jI+9RC6P5JD80UI9sE2TFllzB1hPI19Di1FpHboMp0Stam/MayJHOtCWN
+   hRv6t0Wh1UTWvS2fBNwdlVtcZXn2Kl2ptgLHmfGsmZhMaTxVwmJdmrb/S
+   u40PGy0cPy3Bp+234bS8AldzqtF6Uwj0BA1aGrw4ZRZsmFVLw0cwfJdH8
+   tz/7So0lfMyiFAodxW/a6pTMc5Ihvwy0nCb1Dd/UjM+jY80uCvMEE1uk+
+   A==;
+X-CSE-ConnectionGUID: xJxgttXeR3KkmTdpYmOxRQ==
+X-CSE-MsgGUID: vxqVLmOQTL6X37XK36ICvw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11217"; a="31148596"
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="31148596"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 04:56:51 -0700
+X-CSE-ConnectionGUID: bHj2Lw4wStejy5l4Gyq+AQ==
+X-CSE-MsgGUID: dIB0D4UzQgCgiz7EUB5jGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="75285451"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 07 Oct 2024 04:56:48 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sxmM2-0004wy-07;
+	Mon, 07 Oct 2024 11:56:46 +0000
+Date: Mon, 7 Oct 2024 19:55:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Yang <danielyangkang@gmail.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	danielyangkang@gmail.com,
+	syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
+Subject: Re: [PATCH v2] resolve gtp possible deadlock warning
+Message-ID: <202410071937.ikrY4umF-lkp@intel.com>
+References: <20241005045411.118720-1-danielyangkang@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix race condition for VLAN
- table access
-To: MD Danish Anwar <danishanwar@ti.com>, robh@kernel.org,
- jan.kiszka@siemens.com, diogo.ivo@siemens.com, andrew@lunn.ch,
- pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>
-References: <20241007054124.832792-1-danishanwar@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241007054124.832792-1-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241005045411.118720-1-danielyangkang@gmail.com>
+
+Hi Daniel,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.12-rc2 next-20241004]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Yang/resolve-gtp-possible-deadlock-warning/20241005-125510
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20241005045411.118720-1-danielyangkang%40gmail.com
+patch subject: [PATCH v2] resolve gtp possible deadlock warning
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20241007/202410071937.ikrY4umF-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241007/202410071937.ikrY4umF-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410071937.ikrY4umF-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/smc/af_smc.c:22:9: warning: "pr_fmt" redefined
+      22 | #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+         |         ^~~~~~
+   In file included from include/linux/kernel.h:31,
+                    from include/linux/uio.h:8,
+                    from include/linux/socket.h:8,
+                    from net/smc/af_smc.c:20:
+   include/linux/printk.h:380:9: note: this is the location of the previous definition
+     380 | #define pr_fmt(fmt) fmt
+         |         ^~~~~~
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
 
 
+vim +/pr_fmt +22 net/smc/af_smc.c
 
-On 07/10/2024 08:41, MD Danish Anwar wrote:
-> The VLAN table is a shared memory between the two ports/slices
-> in a ICSSG cluster and this may lead to race condition when the
-> common code paths for both ports are executed in different CPUs.
-> 
-> Fix the race condition access by locking the shared memory access
-> 
-> Fixes: 487f7323f39a ("net: ti: icssg-prueth: Add helper functions to configure FDB")
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+ac7138746e1413 Ursula Braun 2017-01-09 @22  #define pr_fmt(fmt) KMSG_COMPONENT ": " fmt
+ac7138746e1413 Ursula Braun 2017-01-09  23  
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
