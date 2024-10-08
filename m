@@ -1,119 +1,92 @@
-Return-Path: <netdev+bounces-133200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB7C999549A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:38:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 813899954A1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60C8AB21F94
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:38:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2CD61C255E3
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0834A1E0DD6;
-	Tue,  8 Oct 2024 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3031E0E07;
+	Tue,  8 Oct 2024 16:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGfbdkFQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2DQ44bp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B46C1EA73;
-	Tue,  8 Oct 2024 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714BA1E0DF7;
+	Tue,  8 Oct 2024 16:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728405512; cv=none; b=Q7XLnxI5K6edlxiG6JaCPhp3OEsrBtLFiCW8pPgVJdM3nEZiNSzuP98R1XxvJ+JwoawYeEk1brSF/WFP27i6jxD7MlkLpnZrgOj3LiWIyg6m9ybCXZpguIkpGuy0PZIOUO0RRZW/FWYkdyUAmXlCMeEFfWemLQeZCBsdNk8Yz58=
+	t=1728405640; cv=none; b=l8pTrRmVEm1gaCXPlgZjbzoySmzBzhr5OYnBHeFYa1aa3sFuPkOuj+wQDtpY1r/ICM5Dc95GgY9gq8b8pOyyiyfrZazATNtLlOVGYHtv01kxxYP9/R9ABzrvAKf/hX2AMtMO18sps9zmUc+FpC4DmXzyKG6PDsZgNV3TlIiSK0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728405512; c=relaxed/simple;
-	bh=APiEZvSQ4+74Mpl2ZriW5Q0ddg+dm9Lx96hQVKYHiyA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=buCF43gzRfn6zScu5fhaarrC6lR5QreDNY/JhCeBKWzzSN9FF/rIovJbCRz05cXsXltEAQwSTQE6J66QduW7YAJ+JmtwLZkrcBdt2zar9xiP1KA9Nmdi7W7LVAALCAPxUKTd2913+MITl2m3dmCfyAfCGR4uLgqB2tavOSu63gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGfbdkFQ; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53997328633so7794399e87.3;
-        Tue, 08 Oct 2024 09:38:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728405509; x=1729010309; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=etnZixNFm1ZgckVO36UeCfgwjCkfr82ej68XX+uqH54=;
-        b=bGfbdkFQhAKL/VKRRL2pMhZ7byZpQamrHiCbFYuM79tLwsKJOzmCIzxAnLV4l6WXhg
-         +8k8La+/mAbURXHkwIrvDf5HnMdLD1qke85NSn2Qvyboeeobk6Z10BuHv8Gf86kTlluQ
-         nUHP+NpIMXdpm7Rze7IDqAnf5hGK84MErzshZUzciYzt0aZlHb6PUXa3YZFmrGPkM7g4
-         YJLF/L18BSX7Sc4MF6PKGz8e4JK5oVcDT0EZ79P6eDu+jZZVvwTBwwIQp8U5WCFoVH7k
-         S6NkZrv+JbTuvap5DvYO48381rDUYLmqmMbH2uwiFom5J6A0LMQObCHo/nxCEI+XhniU
-         Antw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728405509; x=1729010309;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=etnZixNFm1ZgckVO36UeCfgwjCkfr82ej68XX+uqH54=;
-        b=q304aO4YaYPC8FtLsEyHarODy8G+ckgOF7dyBv8sjIdnx79r/ELKpr9i3wpwjEy5xc
-         4BS1/xyqVK1ndpvugb2Aiby+daQOL/lkrOwpYtgQytzyeZvEZ89D1DLUHbZehU0EuBpb
-         izf+hcxFD4hW6XqI6bhmB8StU3a42TEOtdwNpdhNB/VqeTnJcNGwqWHDq7XhaX+8EqBf
-         Y4ryGPI6uaz8dw+6WoyHjZiTsGhKDYboVcUNMMTryooL846PITpzG4Eh2/ofMQ+3qfOq
-         ngdOUGslN+lc7gZnxtooPftR3hMh5HueOXdK/MxoATugFrRFmVjs+p/2kUKzmjUZ41Na
-         HQkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUtCfk9XyVs3AalwPcYiBdZ7EEL9CVzM/BS7YzI3mUDd5OAkjdhJTuoD3sEq/lAUVwQbJIyRRo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxUbXYhraCX2knz3+KQE6UwufFSHjYN0SF0okOqlYcQfK0lsTn
-	xjX81d2M2kBf6eSYXkWFNT8Cds9+7gd2/O0SDQdTp8CYvwEJfw+K
-X-Google-Smtp-Source: AGHT+IHLn1svCzhEnQKtzvBkpo+TV8x7FbWOyFNdKrm/0JQkIN/YKTlDtLo0eYZMNUCLbfV4ccdMIg==
-X-Received: by 2002:a05:6512:234a:b0:539:9fbb:4331 with SMTP id 2adb3069b0e04-539ab9e6f3cmr11835705e87.54.1728405509196;
-        Tue, 08 Oct 2024 09:38:29 -0700 (PDT)
-Received: from [192.168.42.249] ([148.252.145.180])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9953d48594sm300862666b.176.2024.10.08.09.38.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 09:38:28 -0700 (PDT)
-Message-ID: <f50b9631-808c-4925-b77b-0f8cf4b4c8f1@gmail.com>
-Date: Tue, 8 Oct 2024 17:39:05 +0100
+	s=arc-20240116; t=1728405640; c=relaxed/simple;
+	bh=tahjeGOR1Rbp76f0sBahQKgPgEwRlKxvMliVN1RuazE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ixdaM9aolyGvH+wECs2LLx2IAdJOQFBUdvnaYYFSs8OHq2YRBMPjEZzkyiZV7ZFS1OxpWKuX2lekXwavUZH79+KnRZFqUc1qjHBwFdNgI0NTm+vDRges5je7o0E60W3kM/GIo3aAOp9SAO15L6oV1H54dIDAQtM63QWY3cMxly0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2DQ44bp7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mvnXt7hhelUbdZmwS4HXJ3Ys87mx2FXWRRjMG52QDwQ=; b=2DQ44bp73UGEx9UkxOs2UoS/Gt
+	TecWF1syckL1CzQve2clKgNN9mhP6abJor+zbaK4DeZa8lFoIria99/vByOHdfl2zjUjMXaF6aq7E
+	mO5PhrIakMhtvStYsNLujAoIXzQUPIFS/h6NvgvtMH0bTnV7Uz0x9/rSTJM8lJS1zxtU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1syDG8-009OOI-CC; Tue, 08 Oct 2024 18:40:28 +0200
+Date: Tue, 8 Oct 2024 18:40:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] net: dsa: mv88e6xxx: leds: fix leds refcount
+Message-ID: <3efe3c1a-7ce6-4055-a9b1-31a7e23f9417@lunn.ch>
+References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
+ <20241008-mv88e6xxx_leds_fwnode_put-v1-3-cfd7758cd176@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 13/15] io_uring/zcrx: add copy fallback
-To: Stanislav Fomichev <stfomichev@gmail.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <20241007221603.1703699-14-dw@davidwei.uk> <ZwVWrAeKsVj5gbXY@mini-arch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZwVWrAeKsVj5gbXY@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008-mv88e6xxx_leds_fwnode_put-v1-3-cfd7758cd176@gmail.com>
 
-On 10/8/24 16:58, Stanislav Fomichev wrote:
-> On 10/07, David Wei wrote:
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> There are scenarios in which the zerocopy path might get a normal
->> in-kernel buffer, it could be a mis-steered packet or simply the linear
->> part of an skb. Another use case is to allow the driver to allocate
->> kernel pages when it's out of zc buffers, which makes it more resilient
->> to spikes in load and allow the user to choose the balance between the
->> amount of memory provided and performance.
-> 
-> Tangential: should there be some clear way for the users to discover that
-> (some counter of some entry on cq about copy fallback)?
-> 
-> Or the expectation is that somebody will run bpftrace to diagnose
-> (supposedly) poor ZC performance when it falls back to copy?
+> -	leds = fwnode_get_named_child_node(p->fwnode, "leds");
+> +	struct fwnode_handle *leds __free(fwnode_handle) =
+> +		fwnode_get_named_child_node(p->fwnode, "leds");
 
-We had some notification for testing before, but that's left out
-of the series to follow up patches to keep it simple. We can post
-a special CQE to notify the user about that from time to time, which
-should be just fine as it's a slow path.
+https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
 
--- 
-Pavel Begunkov
+  Low level cleanup constructs (such as __free()) can be used when
+  building APIs and helpers, especially scoped iterators. However,
+  direct use of __free() within networking core and drivers is
+  discouraged. Similar guidance applies to declaring variables
+  mid-function.
+
+    Andrew
+
+---
+pw-bot: cr
 
