@@ -1,151 +1,178 @@
-Return-Path: <netdev+bounces-133236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114A89955F3
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:46:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37B7B9955F6
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD1B528995F
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:46:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B55282009
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BE820CCDC;
-	Tue,  8 Oct 2024 17:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6288320B209;
+	Tue,  8 Oct 2024 17:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FTVFpDCW"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gmokPjIA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEF1139587;
-	Tue,  8 Oct 2024 17:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C9C1E0E0D;
+	Tue,  8 Oct 2024 17:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728409613; cv=none; b=meSMaAI7RlJ51Zd0N28mNJ2z1qgcemt492m+kDCrrahtG4whAjye8J96bXXPU3vthrrwYfcjvbKgrSpCxE7jUoSowh9G6Ao7sVQNtggySespZEWIYYDKbhBkkdM5s3q1ybzu1qKLgKS/1DeBECpBqGp8SynuAuCP2qdOyrzbwKE=
+	t=1728409687; cv=none; b=tl/WIXPOh6u4ypccAINwGcWWnLgZGqCkgFEhN/DZglROmM/iZTRwBQWK0uvu4lT7KRPwZPxiJwAnKyt48oufwC+30/Zdu9pg58vxqB7Wo+csqyl4G9Oubhp8smncLmr+FjTr4X8ud/1OXd3jIF+Vf8FrhHgyDihL48UYw0XmYps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728409613; c=relaxed/simple;
-	bh=zap9Y1r3CTsZpH6RVcLM37SN7eOid2giqGc41s1965g=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3UmU3Pfr1kFQ8EHcGx3bPPeOSjeQrKXQzU59uhEivqx3pfRaOs816DoVGS+ps+UU0xsZblHZWyyL0hzH2yULENq1itaCuNtcO3TYr0LnOFm5ORCW2SgUxtKf2HnXReN8FGQjvT9ta79eRGjdsJ7GaWUaOfz+znP2RSRGU7JH/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FTVFpDCW; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cc8782869so60669225e9.2;
-        Tue, 08 Oct 2024 10:46:51 -0700 (PDT)
+	s=arc-20240116; t=1728409687; c=relaxed/simple;
+	bh=RgWxgKNOG24VS/qCaBqQTpp+xpNvvfArZGbRGOmvIA8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CnXY+vbuybwPC/cZkFm9KUZgCRSGi4KafMl0me/aVgGy8uQa4OP5xRRwf8Th80khCb8lEEWKDQqnndXTgyCFeo6Q8QjTpFgS8bqyAGdEzBMrP6K9wS33wBS6X7ptIPNB2fnHWYuomG/WasXmPOJqhEPru4mmq532dOKj1Zr4NOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gmokPjIA; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728409610; x=1729014410; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7CVddQOjiXC5Qq86dbbfKMXV0SltWWfZ5nFDUlos9uc=;
-        b=FTVFpDCWLO+A1ZnvKWUV+r3A/RmLkH2xTpB4awTSJt6B2n3XChb7QC7XCgqTxxn4Gp
-         rLG8I8jUtjLpJ1lUOARs4XyqIec/375gjkUopfWDBgPphXG1dSL27E+ct/3IdtoSAwzs
-         Vhz0Xoo/ZVHSq6N76+5SBKDG9Ta9bpc01ZeiLNgegvoxJHJUjexGKXuFlPmKmEB6zgQu
-         eF2IU3FgI82DakPIlM1TOOcQE9ggR4J4JhlDo5N+vnFKGFvRCESRNEP0KFxhIcYN2zXt
-         I1htpRdq/1ETay0HjoJBFn/bXlTV/tkcXcUDlBKV4KcC0F02RUA68gp2i65moifn7oMi
-         6nTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728409610; x=1729014410;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7CVddQOjiXC5Qq86dbbfKMXV0SltWWfZ5nFDUlos9uc=;
-        b=RogGDmGnH2vMhuiwpIP1YE9mB4uD4iCYV5G/H7Gu59PodKiw1uTq/PjpMT/nMd4gt9
-         Z3wAbDhonRcnBytUabzy8JEufiMtj11wAW/YovwCriAg57/XtP7ZMDx5cY5N5tkytso3
-         ka7mpKmH1H7zSbe91rvINIB2CR0Vw1QdxaxPI3m+L09E04aVt1YLBJhBDpH0+WyN+p3h
-         92fDi4qnCXOZqhLSNqy3IZs1t4d4Wvd7vD+4vq8FXvf4XkSzmqCozkoqDiBs/vUK0GMT
-         67UBaL00Ud5Otmq1a/JHEfuqyEKJZYBznAhPPuxjlYVqNo+eCPGid3sis7EymBSBNA02
-         V6lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUqr5jaxbUEJp+Gj2PJd3neEfsVIsi98FWwDHT5AiGbB3pE+l4TvwMPeag8/6QHhUPG9SU=@vger.kernel.org, AJvYcCVD+RN+dLPjloPX/z+NTd0br5bsME6yYCKNJl8d0eo46xD+bkuSTgRIgY2w//dpw8urtzNP1NgI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+B29Kn51My3yH2ozEcy0Z/HHhu4fGYvE0sermyspOj8td76h7
-	q3MSYcWAjfqVYQeAZf8YncNJZXrz35/8ASyhOteRY6GnFtIQNg80
-X-Google-Smtp-Source: AGHT+IGFweY4PqKarTbtzZS0maqV/JS3VWektN2kmxdO9SZDvQn8kioBh0QlR/O/maCeMtTP+mNOnA==
-X-Received: by 2002:a05:600c:1e29:b0:42c:acb0:dda5 with SMTP id 5b1f17b1804b1-42f85a6c5camr138675075e9.1.1728409609940;
-        Tue, 08 Oct 2024 10:46:49 -0700 (PDT)
-Received: from krava (ip-94-113-247-30.net.vodafone.cz. [94.113.247.30])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b1d5fesm133903635e9.24.2024.10.08.10.46.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 10:46:49 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Tue, 8 Oct 2024 19:46:46 +0200
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Simon Sundberg <simon.sundberg@kau.se>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH bpf 4/4] selftests/bpf: Add test for kfunc module order
-Message-ID: <ZwVwBiT8XASa7Jy_@krava>
-References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
- <20241008-fix-kfunc-btf-caching-for-modules-v1-4-dfefd9aa4318@redhat.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728409686; x=1759945686;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Zf9YAPZnVHLiv61BoxQUx3KbaKBkOZlqQ4LrmxK5WSk=;
+  b=gmokPjIAgmTJwyzYSlSqmD0/XLuybDK8KVnoNTC/Cx2JxYeeMt+jQatm
+   5u/WcSuRpm/aPltEkS2cNRhq91/r9BgBa+bi1izIwpsX9mCZbVHppDNgW
+   fbkUMoN82COf08nGUPqKvFhNPVGr8BZ8cuECyD8Du/KME0aQdbfq4Z83O
+   k=;
+X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
+   d="scan'208";a="237721142"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 17:48:03 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:33737]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id 064efbfd-710e-439c-af15-e93a74588667; Tue, 8 Oct 2024 17:48:01 +0000 (UTC)
+X-Farcaster-Flow-ID: 064efbfd-710e-439c-af15-e93a74588667
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 8 Oct 2024 17:48:01 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 8 Oct 2024 17:47:58 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <alexandre.ferrieux@gmail.com>
+CC: <alexandre.ferrieux@orange.com>, <edumazet@google.com>,
+	<horms@kernel.org>, <netdev@vger.kernel.org>, Johannes Berg
+	<johannes@sipsolutions.net>, <linux-wireless@vger.kernel.org>,
+	<kuniyu@amazon.com>
+Subject: Re: RFC: Should net namespaces scale up (>10k) ?
+Date: Tue, 8 Oct 2024 10:47:51 -0700
+Message-ID: <20241008174751.2995-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
+References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241008-fix-kfunc-btf-caching-for-modules-v1-4-dfefd9aa4318@redhat.com>
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Oct 08, 2024 at 12:35:19PM +0200, Toke Høiland-Jørgensen wrote:
++Johannes and wireless ML.
 
-SNIP
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Date: Sun, 15 Sep 2024 22:49:22 +0200
+> (thanks Simon, reposting with another account to avoid the offending disclaimer)
+> 
+> Hi,
+> 
+> Currently, netns don't really scale beyond a few thousands, for
+> mundane reasons (see below). But should they ? Is there, in the
+> design, an assumption that tens of thousands of network namespaces are
+> considered "unreasonable" ?
+> 
+> A typical use case for such ridiculous numbers is a tester for
+> firewalls or carrier-grade NATs. In these, you typically want tens of
+> thousands of tunnels, each of which is perfectly instantiated as an
+> interface. And, to avoid an explosion in source routing rules, you
+> want them in separate namespaces.
+> 
+> Now why don't they scale *today* ? For two independent, seemingly
+> accidental, O(N) scans of the netns list.
+> 
+> 1. The "netdevice notifier" from the Wireless Extensions subsystem
+> insists on scanning the whole list regardless of the nature of the
+> change, nor wondering whether all these namespaces hold any wireless
+> interface, nor even whether the system has _any_ wireless hardware...
+> 
+>         for_each_net(net) {
+>                 while ((skb = skb_dequeue(&net->wext_nlevents)))
+>                         rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
+>                                     GFP_KERNEL);
+>         }
+>
 
-> +static int test_run_prog(const struct bpf_program *prog,
-> +			 struct bpf_test_run_opts *opts, int expect_val)
-> +{
-> +	int err;
-> +
-> +	err = bpf_prog_test_run_opts(bpf_program__fd(prog), opts);
-> +	if (!ASSERT_OK(err, "bpf_prog_test_run_opts"))
-> +		return err;
-> +
-> +	if (!ASSERT_EQ((int)opts->retval, expect_val, bpf_program__name(prog)))
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +void test_kfunc_module_order(void)
-> +{
-> +	struct kfunc_module_order *skel;
-> +	char pkt_data[64] = {};
-> +	int err = 0;
-> +
-> +	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, test_opts, .data_in = pkt_data,
-> +			    .data_size_in = sizeof(pkt_data));
-> +
-> +	err = load_module("bpf_test_modorder_x.ko",
-> +			  env_verbosity > VERBOSE_NONE);
-> +	if (!ASSERT_OK(err, "load bpf_test_modorder_x.ko"))
-> +		return;
-> +
-> +	err = load_module("bpf_test_modorder_y.ko",
-> +			  env_verbosity > VERBOSE_NONE);
-> +	if (!ASSERT_OK(err, "load bpf_test_modorder_y.ko"))
-> +		goto exit_modx;
-> +
-> +	skel = kfunc_module_order__open_and_load();
-> +	if (!ASSERT_OK_PTR(skel, "kfunc_module_order__open_and_load()")) {
-> +		err = -EINVAL;
-> +		goto exit_mods;
-> +	}
-> +
-> +	test_run_prog(skel->progs.call_kfunc_xy, &test_opts, 0);
-> +	test_run_prog(skel->progs.call_kfunc_yx, &test_opts, 0);
+Alex forwarded this mail to me and asked about 1.
 
-nit, no need to pass expect_val, it's always 0
+I checked 8bf862739a778, but I didn't see why wext_netdev_notifier_call()
+needs to iterate all netns.
 
-jirka
+Is there a case where flushing messages in the notified dev's netns is not
+enough for wext dev ?
+
+---8<---
+diff --git a/net/wireless/wext-core.c b/net/wireless/wext-core.c
+index 838ad6541a17..d4b613fc650c 100644
+--- a/net/wireless/wext-core.c
++++ b/net/wireless/wext-core.c
+@@ -343,17 +343,22 @@ static const int compat_event_type_size[] = {
+ 
+ /* IW event code */
+ 
+-void wireless_nlevent_flush(void)
++static void wireless_nlevent_flush_net(struct net *net)
+ {
+ 	struct sk_buff *skb;
++
++	while ((skb = skb_dequeue(&net->wext_nlevents)))
++		rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
++			    GFP_KERNEL);
++}
++
++void wireless_nlevent_flush(void)
++{
+ 	struct net *net;
+ 
+ 	down_read(&net_rwsem);
+-	for_each_net(net) {
+-		while ((skb = skb_dequeue(&net->wext_nlevents)))
+-			rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
+-				    GFP_KERNEL);
+-	}
++	for_each_net(net)
++		wireless_nlevent_flush_net(net);
+ 	up_read(&net_rwsem);
+ }
+ EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
+@@ -361,6 +366,8 @@ EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
+ static int wext_netdev_notifier_call(struct notifier_block *nb,
+ 				     unsigned long state, void *ptr)
+ {
++	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++
+ 	/*
+ 	 * When a netdev changes state in any way, flush all pending messages
+ 	 * to avoid them going out in a strange order, e.g. RTM_NEWLINK after
+@@ -368,7 +375,7 @@ static int wext_netdev_notifier_call(struct notifier_block *nb,
+ 	 * or similar - all of which could otherwise happen due to delays from
+ 	 * schedule_work().
+ 	 */
+-	wireless_nlevent_flush();
++	wireless_nlevent_flush_net(dev_net(dev));
+ 
+ 	return NOTIFY_OK;
+ }
+---8<---
 
