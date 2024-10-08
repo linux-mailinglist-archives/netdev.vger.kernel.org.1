@@ -1,118 +1,83 @@
-Return-Path: <netdev+bounces-133297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B110D9957DD
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:50:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0152E9957DF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:52:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 656471F25D19
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:50:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 850C7B22FC2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AC3213ED6;
-	Tue,  8 Oct 2024 19:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAABE213EF0;
+	Tue,  8 Oct 2024 19:52:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kH+SQUwL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SiCRucH6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6665E8BE7;
-	Tue,  8 Oct 2024 19:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5A5213EDA;
+	Tue,  8 Oct 2024 19:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728417026; cv=none; b=d+/6L8iIn9HTGDuolFbQAl0+Df6TT7MFcd4pD/YP3NJHuDz5kqtttjGhRSRdn3f7lOnygzyjK/Z3FINnu64S2D28Yhf3d3L4Xf7QdV1ir2uePEcb9QfStTA2VJWEKJfs265SMCjbFnRJCEeIln8NxzwHXpr6LvKmZ186ILBURj8=
+	t=1728417122; cv=none; b=pjerhsdgoQhmEqxCgtjxqFWxDN4iUegTNaPvhIJk65d9rymbhZnrvISX5S/jrIbbZ72g55ev59qzLYIyjnbuxP7IITmhG5EplcopeN8o3aLkCvPdaqu1Hgr3s/Iqamj8P0taWOXvmfpcLAtwG1uo04Yed0cqN/nOa3t/1XtSDUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728417026; c=relaxed/simple;
-	bh=x1AuM38/r2D143PMJypMNRQhPhELDWOB+s6uV2hnfhs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aHnkgeIiXNUMEg7zvxmqq2VpLyBDJ4GmHMtaG8J9nxPnKFYNhdIUndf+xFMthueTrYIwwdQCP9SF1Bbnwf2TGQEY+Jc5yQH/8KMobfHNHnYEXCTPw/8fEy1HFIFVYZBD7rF/4Tz4G6rO6C/Sg7XTs0wa7peAaIagDcEQS8xvsOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kH+SQUwL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0112C4CEC7;
-	Tue,  8 Oct 2024 19:50:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728417025;
-	bh=x1AuM38/r2D143PMJypMNRQhPhELDWOB+s6uV2hnfhs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kH+SQUwLUvinr3axdQLNB6uh0LovwTEfQKupa5qOVPfqBYngqBElQ0iCkM86d0B3U
-	 Pr0slYEstbfayTjCsTS/EXdfABXBQUomorPlrRqZVcBhJdT/WrcaaQQ9Lz10z7/yIw
-	 RZn3uU24Y+dtThoeQbVQakq6LAF5tHRetTRr86sE0s5x0T8NeTUhJz58y3jRQYhu6b
-	 Sob2qvkkff6ANxUl4TgjLMnsQKmfIqmHL673+KolUQ4yQicT2MGg6y+W+715vZ2pdy
-	 4y2jL44HZ8MRfRWpZIgTSIOXpEIxMMRnrKffdyNDy6ToN3XLRpFQk+dhsYwk4BdIEY
-	 X09uk4CKuXtsg==
-Date: Tue, 8 Oct 2024 12:50:23 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>, davem@davemloft.net,
- pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net,
- michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch,
- maxime.chevallier@bootlin.com, danieller@nvidia.com,
- hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
- asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
- aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com,
- bcreeley@amd.com
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory
- tcp
-Message-ID: <20241008125023.7fbc1f64@kernel.org>
-In-Reply-To: <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
-References: <20241003160620.1521626-1-ap420073@gmail.com>
-	<20241003160620.1521626-8-ap420073@gmail.com>
-	<CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
-	<CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
+	s=arc-20240116; t=1728417122; c=relaxed/simple;
+	bh=NdHk3ANhAEQl/5m6gjkQIVlXtyKOXVD1nAmw2csFKQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hgdXw4KupsaJdBtw2Tgj+JtUMCdAxRk5OcC502QbOPLHUOlhiuPobjxCgUugHkyLCRtoFLcUluTH0FbAgCpe+Dv+d2zdR86LNbgEi51Zj5G9NAVoLo19sgVLp343+pai+jIz1YA70frH96jkORFkNdafrT+7Pc3RXcLU2s+eXAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SiCRucH6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vosV0UbV9CptMF/mNMauCpgANbudJBFcILvy+5yZnQc=; b=SiCRucH6UI7eHu/r8UaDFewo+/
+	+VIekPwGcXckTUKhzwki8KUhS2ebgHUh8CcOR1lM9e96FqqiT+kIQ6ckeCBx0+KeyWze6R1SK0/xx
+	XPRa7po/gkc4aNh0rLapDQe44ULIyxR0shGyixpJyVgCGAMOP6Q4UrN+eJcUg2dSoTus=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1syGFI-009PMn-Lb; Tue, 08 Oct 2024 21:51:48 +0200
+Date: Tue, 8 Oct 2024 21:51:48 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v3] net: phy: Validate PHY LED OPs presence
+ before registering
+Message-ID: <c8f375e7-782e-4f2f-9a5e-f15a188c6f72@lunn.ch>
+References: <20241008194718.9682-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008194718.9682-1-ansuelsmth@gmail.com>
 
-On Fri, 4 Oct 2024 19:34:45 +0900 Taehee Yoo wrote:
-> > Our intention with the whole netmem design is that drivers should
-> > never have to call netmem_to_page(). I.e. the driver should use netmem
-> > unaware of whether it's page or non-page underneath, to minimize
-> > complexity driver needs to handle.
-> >
-> > This netmem_to_page() call can be removed by using
-> > skb_frag_fill_netmem_desc() instead of the page variant. But, more
-> > improtantly, why did the code change here? The code before calls
-> > skb_frag_fill_page_desc, but the new code sometimes will
-> > skb_frag_fill_netmem_desc() and sometimes will skb_add_rx_frag_netmem.
-> > I'm not sure why that logic changed.  
+On Tue, Oct 08, 2024 at 09:47:16PM +0200, Christian Marangi wrote:
+> Validate PHY LED OPs presence before registering and parsing them.
+> Defining LED nodes for a PHY driver that actually doesn't supports them
+> is redundant and useless.
 > 
-> The reason why skb_add_rx_frag_netmem() is used here is to set
-> skb->unreadable flag. the skb_frag_fill_netmem_desc() doesn't set
-> skb->unreadable because it doesn't handle skb, it only handles frag.
-> As far as I know, skb->unreadable should be set to true for devmem
-> TCP, am I misunderstood?
-> I tested that don't using skb_add_rx_frag_netmem() here, and it
-> immediately fails.
-
-Yes, but netmem_ref can be either a net_iov or a normal page,
-and skb_add_rx_frag_netmem() and similar helpers should automatically
-set skb->unreadable or not.
-
-IOW you should be able to always use netmem-aware APIs, no?
-
-> > This is not the intended use of PP_FLAG_ALLOW_UNREADABLE_NETMEM.
-> >
-> > The driver should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when it's able
-> > to handle unreadable netmem, it should not worry about whether
-> > rxq->mp_params.mp_priv is set or not.
-> >
-> > You should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when HDS is enabled.
-> > Let core figure out if mp_params.mp_priv is enabled. All the driver
-> > needs to report is whether it's configured to be able to handle
-> > unreadable netmem (which practically means HDS is enabled).  
+> It's also the case with Generic PHY driver used and a DT having LEDs
+> node for the specific PHY.
 > 
-> The reason why the branch exists here is the PP_FLAG_ALLOW_UNREADABLE_NETMEM
-> flag can't be used with PP_FLAG_DMA_SYNC_DEV.
+> Skip it and report the error with debug print enabled.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Hm. Isn't the existing check the wrong way around? Is the driver
-supposed to sync the buffers for device before passing them down?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
