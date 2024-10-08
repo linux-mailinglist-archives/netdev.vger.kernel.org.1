@@ -1,246 +1,108 @@
-Return-Path: <netdev+bounces-133105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F017994C68
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:54:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E54AA994CB4
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:57:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0845DB29AF0
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:52:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 197B81C2160B
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114301DED4E;
-	Tue,  8 Oct 2024 12:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A471DF964;
+	Tue,  8 Oct 2024 12:56:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Yl2WGF56"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HYbN/Mop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59011CCB32
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 12:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9785A1DE8A0;
+	Tue,  8 Oct 2024 12:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728391948; cv=none; b=QqAy2kJhNA+j4Sd6jKeYLT3k61aNlONT2VXib0O2U3lg++Iito+RuFwmbxkvSQVQrEcsO0K+6t0mqYPziCLpODPghLYTgbuAkkUhtkhSVI3MdQ4q1ZKhetVpZJSfI63r6IHuSaRQeTWXyfL96TlWadibpAkdjW/kY2vEsc2JirQ=
+	t=1728392189; cv=none; b=HhHn6FD86bCyHstMv56fv8Ps5u40rFBnr6VoDYdYqSRdhJam1PHP1PhD4+ykyAc9rnp2semtEcFSO2B/Lmz69/tbkaMWaYylwtcidc74iSipVEL8pyItsAFcwr7B9hPBP640hMavLZOCQUBIIdGmG/bqjft1OH+papH1vGZzpcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728391948; c=relaxed/simple;
-	bh=JMshcVMusAsqmQZoYah7ZfPoxXpiT1Bsht/XLT2r6z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IjF/Zw64wQkus6V1EgldooXMyaWCPL19MS3IWwG+I4P5OsqtZDMeO+ffgU/zeBArjMGZDS6ZX2n+3tH6SS+gxbdAShXoTUcg5RKsN5tvXkkLg/OorGfDmDV1hDMZ1pXAnAN1q6nwxmbekabafh/nuBkXNTJjJY/4KVTWHZHG8IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Yl2WGF56; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9957588566so271099466b.3
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 05:52:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1728391944; x=1728996744; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pxHs9R/2TfkMyix7gCD8tG/uOFvym8ppDh3PaOKH1vQ=;
-        b=Yl2WGF56xVGBRHa7Xn4COs3LcXcIZZjLZm8lgITzt+hDnfNFwmiW/Pf+MMU8DY0nrq
-         jf+FvYzcBOlxpfv+UrEvJ2kJHAoR2U7ZGladn2bu11vP7DdUUwqs4Qqd7p+lxZkdfHeK
-         NlysMLBWAt9ifq7iLlLIkBbw/vr/nkxO6EFv0RxhQItiXyUgErjdHT+WpR+Ytpx0eKGb
-         QpezBiCeoRv7L49TYvjP4iFgHLcfKgoDfgHwvZKB53UlzkMVwkVbGaP0D1omwX9BwWsb
-         0ZjIxOAh9JDfvxr/5ZGwXVWUsMOrUlD431MP/MgUtk1T5y6q6j3LLT+cjYSeWebNZ1oE
-         jAYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728391944; x=1728996744;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pxHs9R/2TfkMyix7gCD8tG/uOFvym8ppDh3PaOKH1vQ=;
-        b=ecu3IJp5zqmJDuNQVtVfQ4dIlwBpeozeBPwSf3d4geoKHT6CoqMIWsa7RVXCWB5VxJ
-         VIjQZGJq8ce5UJIeKeosTMntULwrjbOjb9g3IkmBIESUwkBumT63z5KxANO1SzUhp9Am
-         LTxxS3WFpmQaMqQWL7GiD3zMHBYNgErRG1JWTp1V92YO2l+EYgw1IwbDnUxCNobYpNJv
-         5iBjFFaugfr5CVd7NXqtzI/WQCDLg7eL8n0kyMGsq4uiI+hkAd9PVuZOXa/P1WKX9O0T
-         KEDYOtq/5C5RKlkcY4fhU8tnv6fouGQG20fvW4PfsgqEyiKpPOfDXLtTsgpRw4oWdjRx
-         wtyg==
-X-Forwarded-Encrypted: i=1; AJvYcCWnqQaqIOjfbiJ8qcXHJ5/2Cl6cMb/b+CXyWNa6ES9LbJBQHNJhpKYay1GZ2idNtf9OGZBYaFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFkRxavw1o2xL5itJ2GBEgaze2FYRew6wFbCO1NZwlEvSfVl8d
-	OYsP6PkhkasAvjvgiCtpVBRUOnpV6MwkIeymBmyvdNjXg0jP50fC54NmqWcR7S4=
-X-Google-Smtp-Source: AGHT+IHanEgNUHcSFgygM+nbbFB/JCZNDfEfGDY4jiCtoGQrZ8QE351YXwlTA5o0pX0acLAotexNWg==
-X-Received: by 2002:a17:907:7f2a:b0:a99:5c22:fef6 with SMTP id a640c23a62f3a-a995c22ffdbmr518620066b.1.1728391943907;
-        Tue, 08 Oct 2024 05:52:23 -0700 (PDT)
-Received: from localhost (37-48-49-80.nat.epc.tmcz.cz. [37.48.49.80])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9942c5216fsm407883666b.3.2024.10.08.05.52.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 05:52:22 -0700 (PDT)
-Date: Tue, 8 Oct 2024 14:52:18 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: ryazanov.s.a@gmail.com, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	sd@queasysnail.net
-Subject: Re: [PATCH net-next v8 03/24] ovpn: add basic netlink support
-Message-ID: <ZwUrAn8xrF2BCrMp@nanopsycho.orion>
-References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
- <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
- <ZwP-_-qawQJIBZnv@nanopsycho.orion>
- <fd952c28-1f17-45da-bd64-48917a7db651@openvpn.net>
- <ZwT0SkGHu5VHQ9Hd@nanopsycho.orion>
- <056588a7-de1b-4416-8553-750c8d20dc97@openvpn.net>
+	s=arc-20240116; t=1728392189; c=relaxed/simple;
+	bh=BJav8e+HcALTipfP/NLFD+NrSKZ2vTYocgEXeZdKx3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ip1kDDi/L0rv6OigBmMm43RUaq5JASD3HBW1p5a2VgMjEKU1qxnCXSukZlEPYAo9dfhA03nxVAEHeQ3XhTeE9ro6rGV+q+c6iGpQF/sJPBdPlm8qYrZ31svLuiuGvrFHJZbY5DmE6TU+0A7JMt7Msf2QRQp15MJCxOVJNI0Ivho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HYbN/Mop; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1D32820005;
+	Tue,  8 Oct 2024 12:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728392179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BJav8e+HcALTipfP/NLFD+NrSKZ2vTYocgEXeZdKx3U=;
+	b=HYbN/MopgVOwhbm94jUtKR3niX7PPJ0/GQfIoI5KcrRc2eZol/OFPY1TA73qzramgLsS3p
+	JP5MG9rDv7jGu+/P7YaUR+k/ic65bSoML8+JuAb/XseyWvn3PxviiV0jiWtuEIli7TU5mG
+	MRKaWOxmRhm/9ntz1Lz2/+zBB0Pimfoj3DzE62zoHRujPUS2HNB3NOSTsns37kCy5okXI4
+	Cn/jEQ+qDCz5i7Kr+1IgNSJJUY+eQqnhjeenc2i6lR7MZ2meX5u7NrzAp2DNfqw7wOPt37
+	yiy8RE424U7Db1AqAluXZdNzlUohnQ8zD6TmnazEjLdHf350OCwOrkK16XkeiA==
+Date: Tue, 8 Oct 2024 14:56:17 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 06/12] net: ethtool: Add PSE new port priority
+ support feature
+Message-ID: <20241008145617.23254843@kmaincent-XPS-13-7390>
+In-Reply-To: <20241008122300.37c77493@kmaincent-XPS-13-7390>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+	<20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
+	<ZwDcHCr1aXeGWXIh@pengutronix.de>
+	<20241007113026.39c4a8c2@kmaincent-XPS-13-7390>
+	<ZwPr2chTq4sX_I_b@pengutronix.de>
+	<20241008122300.37c77493@kmaincent-XPS-13-7390>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <056588a7-de1b-4416-8553-750c8d20dc97@openvpn.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Tue, Oct 08, 2024 at 11:16:01AM CEST, antonio@openvpn.net wrote:
->On 08/10/2024 10:58, Jiri Pirko wrote:
->> Tue, Oct 08, 2024 at 10:01:40AM CEST, antonio@openvpn.net wrote:
->> > Hi,
->> > 
->> > On 07/10/24 17:32, Jiri Pirko wrote:
->> > > Wed, Oct 02, 2024 at 11:02:17AM CEST, antonio@openvpn.net wrote:
->> > > 
->> > > [...]
->> > > 
->> > > 
->> > > > +operations:
->> > > > +  list:
->> > > > +    -
->> > > > +      name: dev-new
->> > > > +      attribute-set: ovpn
->> > > > +      flags: [ admin-perm ]
->> > > > +      doc: Create a new interface of type ovpn
->> > > > +      do:
->> > > > +        request:
->> > > > +          attributes:
->> > > > +            - ifname
->> > > > +            - mode
->> > > > +        reply:
->> > > > +          attributes:
->> > > > +            - ifname
->> > > > +            - ifindex
->> > > > +    -
->> > > > +      name: dev-del
->> > > 
->> > > Why you expose new and del here in ovn specific generic netlink iface?
->> > > Why can't you use the exising RTNL api which is used for creation and
->> > > destruction of other types of devices?
->> > 
->> > That was my original approach in v1, but it was argued that an ovpn interface
->> > needs a userspace program to be configured and used in a meaningful way,
->> > therefore it was decided to concentrate all iface mgmt APIs along with the
->> > others in the netlink family and to not expose any RTNL ops.
->> 
->> Can you please point me to the message id?
->
-><CAHNKnsQnHAdxC-XhC9RP-cFp0d-E4YGb+7ie3WymXVL9N-QS6A@mail.gmail.com> from
->Sergey and subsequent replies.
->RTNL vs NL topic starts right after the definition of 'ovpn_link_ops'
+On Tue, 8 Oct 2024 12:23:00 +0200
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-Yeah, does not make sense to me. All devices should implement common
-rtnl ops, the extra-config, if needed, could be on a separate channel.
-I don't find Sergey's argumentation valid.
+> On Mon, 7 Oct 2024 16:10:33 +0200
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+>=20
+> > User will not understand why devices fail to provide enough power by
+> > attaching two device to one domain and not failing by attaching to
+> > different domains. Except we provide this information to the user space.
+>=20
+> What you are explaining seems neat on the paper but I don't know the best=
+ way
+> to implement it. It needs more brainstorming.
 
+Is it ok for you if we go further with this patch series and continue talki=
+ng
+about PSE power domain alongside?
+It should not be necessary to be supported with port priority as the two PSE
+supported controller can behave autonomously on a power domain.
+I hope I will have time in the project to add its support when we will have=
+ a
+more precise idea of how.
 
->
->Recently Kuniyuki commented on this topic as well in:
-><20240919055259.17622-1-kuniyu@amazon.com>
->and that is why I added a default dellink implemetation.
-
-Having dellink without newlink implemented is just wrong.
-
-
->
->> 
->> 
->> > 
->> > However, recently we decided to add a dellink implementation for better
->> > integration with network namespaces and to allow the user to wipe a dangling
->> > interface.
->> 
->> Hmm, one more argument to have symmetric add/del impletentation in RTNL
->> 
->> 
->> > 
->> > In the future we are planning to also add the possibility to create a
->> > "persistent interface", that is an interface created before launching any
->> > userspace program and that survives when the latter is stopped.
->> > I can guess this functionality may be better suited for RTNL, but I am not
->> > sure yet.
->> 
->> That would be quite confusing to have RTNL and genetlink iface to
->> add/del device. From what you described above, makes more sent to have
->> it just in RTNL
->
->All in all I tend to agree.
->
->> 
->> > 
->> > @Jiri: do you have any particular opinion why we should use RTNL ops and not
->> > netlink for creating/destroying interfaces? I feel this is mostly a matter of
->> > taste, but maybe there are technical reasons we should consider.
->> 
->> Well. technically, you can probabaly do both. But it is quite common
->> that you can add/delete these kind of devices over RTNL. Lots of
->> examples. People are used to it, aligns with existing flows.
->
->The only counterargument I see is the one brought by Sergey: "the ovpn
->interface is not usable after creation, if no openvpn process is running".
->
->However, allowing to create "persistent interfaces" will define a use-case
->for having an ovpn device without any userspace process.
->
->@Sergey what is your opinion here? I am not sure persistent interfaces were
->discussed at the time you brought your point about RTNL vs NL.
->
->
->Regards,
->
->
->> 
->> > 
->> > Thanks a lot for your contribution.
->> > 
->> > Regards,
->> > 
->> > 
->> > > 
->> > > 
->> > > ip link add [link DEV | parentdev NAME] [ name ] NAME
->> > > 		    [ txqueuelen PACKETS ]
->> > > 		    [ address LLADDR ]
->> > > 		    [ broadcast LLADDR ]
->> > > 		    [ mtu MTU ] [index IDX ]
->> > > 		    [ numtxqueues QUEUE_COUNT ]
->> > > 		    [ numrxqueues QUEUE_COUNT ]
->> > > 		    [ netns { PID | NETNSNAME | NETNSFILE } ]
->> > > 		    type TYPE [ ARGS ]
->> > > 
->> > > ip link delete { DEVICE | dev DEVICE | group DEVGROUP } type TYPE [ ARGS ]
->> > > 
->> > > Lots of examples of existing types creation is for example here:
->> > > https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking
->> > > 
->> > > 
->> > > 
->> > > > +      attribute-set: ovpn
->> > > > +      flags: [ admin-perm ]
->> > > > +      doc: Delete existing interface of type ovpn
->> > > > +      do:
->> > > > +        pre: ovpn-nl-pre-doit
->> > > > +        post: ovpn-nl-post-doit
->> > > > +        request:
->> > > > +          attributes:
->> > > > +            - ifindex
->> > > 
->> > > [...]
->> > 
->> > -- 
->> > Antonio Quartulli
->> > OpenVPN Inc.
->
->-- 
->Antonio Quartulli
->OpenVPN Inc.
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
