@@ -1,45 +1,77 @@
-Return-Path: <netdev+bounces-133109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD1A994E59
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:16:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBD9994E6A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CBEBB2C39A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:13:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C473FB248D9
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D091DEFE6;
-	Tue,  8 Oct 2024 13:13:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832461DEFC9;
+	Tue,  8 Oct 2024 13:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEvV+gp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA711DE88F;
-	Tue,  8 Oct 2024 13:13:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57041DE4CD;
+	Tue,  8 Oct 2024 13:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728393187; cv=none; b=RscnbGFEhKpKqVqW+w4SnhaNjNIb1fwgBF0fNjt6Santtr2XBEk6lK487lqJU7Chq7hF0OHliOswxD0NQ2HHHaX5SZZ3UV+uWZia4ahNzruUOCircTECdv8tYcVPAoO4OJ7go0h0WPbk1R3XXcWJiNkkIhHfGy9c2VBf+5AQNzw=
+	t=1728393222; cv=none; b=oebKCnplskjBPPi038xXHt9VJTuN3ygJnBc1QKevULC2xg1vcvE49bLbUAU1GFqxwiEMOVlzXNxcfmd9K5M4RDgj4hrzMD5W6K5lVkXydeRtDvFiT8BaVwnuAnR/JEkECSBTeBd6XiunzeEFpeM4fJh5BnM4aHmoKae5fIROGdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728393187; c=relaxed/simple;
-	bh=kWolaxy9BFb65skdKEyMGtyjqIelsjI/f70XBk08Rcg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wz6oBAns9Lc8zIMOJxN9UAd+umvIu2fH2Q9b83V9WqgkOdCCkR2jX689o0vsbssHl7lNvmklgDleXDyAWntCS5cYDL6SRpI3SWyR214zrUDZv09U7OL2OBFFpgRnZlIomSgeXHs0eGBjZablCzxwdNfjUstbDbhZGW/gZJGVXr0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1syA1L-000000000AX-1fe6;
-	Tue, 08 Oct 2024 13:12:59 +0000
-Date: Tue, 8 Oct 2024 14:12:55 +0100
-From: Daniel Golle <daniel@makrotopia.org>
+	s=arc-20240116; t=1728393222; c=relaxed/simple;
+	bh=HB2X+1cgA42e71mYG+axOAoHb2tW9up9sEJ3ZOfoDyU=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n0hdsv/NVU8RzWjHxjoDjohakH3LqHCp9IJrVCYwC8q0jkuoG0jhO3f0cqVKtu3hwhAdOwrnyaEeAhonwvqhAdL3vKHjynQXLDM3iFlosAdiotppqlnQ/dxgxGHT4V9KcVDxLbHqNtD0wz2hHqP4WMgrafoRpDzLna6asUH9dsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEvV+gp7; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cc43454d5so45098795e9.3;
+        Tue, 08 Oct 2024 06:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728393219; x=1728998019; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+3nNuHTEY1yCn0MC03snttILQ8g327zVvBFongvgvc=;
+        b=NEvV+gp7q11y6e2i3CTBtWKSdeIkFV+Ugl9FYA4Y3eSXkA3fNMY73L943vBB47EACW
+         9eNt/b3qUr2qO8Bn0cn79tINbN+3OK2cJ4+WUGriJcd1YWSA+vMAuNARcOGBDS9Da33p
+         pcjajCtXHrSMhRsio7jPvHN+hbyAMrYXoWU7CPNAbAc3X855gZrZQc3w4J+YmFTJkDqA
+         47skLdYJlDJ2W/UO3ile/xO56mRGA1WTJbGZzVLmnJ6BUqt9PMefkm8w4ZhbHAJ2PKS3
+         JRmACtNLZ0LSVWpelYvu76Q59PCFPZSjiPWYq1T6JMO56r2FYf9WndyS6nIF5kljhQtM
+         Z6hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728393219; x=1728998019;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+3nNuHTEY1yCn0MC03snttILQ8g327zVvBFongvgvc=;
+        b=hSZm4OeBdhBNF6GjdIISX1hiTir6scCz8EixR8KYHrskKW6goK3iBqNXUwGSA+T3oh
+         n9BRVN3BRKEeq0yyKocM1lL+gcYyI8EXC1ngnF5+AwVqcjIEZ9vwhYFK6QOIvwpV/ixm
+         NiYuHGX+LOwJJoRRwyT6C1x+UX4LM+dyKVdBvk2U7X6zuu24UbhIqnVnMC4Mk9iN9dqa
+         uqN4qyNWDtTaefCgEPLm31EHgcdI3FUrV2F3LCwCLlxSNDUyjhfxvMDlW3AGoOSdc6/w
+         eiLmJPmTqpupb052C938eE5nIDkAI/v2Ip2chi8y9dXvAKmyJlMW0PdRg/w5NkHKm+ja
+         6P7A==
+X-Forwarded-Encrypted: i=1; AJvYcCULcA8+vX5Hp6lcXCjfUOYzA9JDkG89uHXRMmx2AJoDXT2fftq16nY/e1WLCw+dN2kwQQzHiAcq@vger.kernel.org, AJvYcCUUU0OHTX9pRTS7Tc6TVCfOM4bjgJDJomVOWhs1eb2NB7dmVMBzTkCwWbKlquw+h+eZNJ+VfaqZVYFj4ow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ9UYYNlz99Kj4iRMWSpmlCziJeuYp+j8VQtBaFR0NURG0OlxJ
+	2TQIKWfPza71BRmDY1I/KODy7ju2E5S1c7GXLwZH8E0wSRJuxEmM
+X-Google-Smtp-Source: AGHT+IE4Stw/XNORaS3bEyUc3ys0SxWN35LG6c+Lgtu04NEpny6nANutfe3eEzGGUtGLdLPaFJt+Ww==
+X-Received: by 2002:a05:600c:c12:b0:42c:ad30:678 with SMTP id 5b1f17b1804b1-42f85aee7efmr98609065e9.28.1728393218749;
+        Tue, 08 Oct 2024 06:13:38 -0700 (PDT)
+Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89e85dd0sm109746525e9.4.2024.10.08.06.13.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 06:13:38 -0700 (PDT)
+Message-ID: <67053002.050a0220.63ee8.6d11@mx.google.com>
+X-Google-Original-Message-ID: <ZwUv_jkcITPhkEyq@Ansuel-XPS.>
+Date: Tue, 8 Oct 2024 15:13:34 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -47,7 +79,6 @@ Cc: Christian Marangi <ansuelsmth@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [net-next PATCH v2] net: phy: Validate PHY LED OPs presence
  before registering
-Message-ID: <ZwUv15SUVhRukqVr@makrotopia.org>
 References: <20241004183312.14829-1-ansuelsmth@gmail.com>
  <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
 Precedence: bulk
@@ -70,12 +101,12 @@ On Tue, Oct 08, 2024 at 03:08:32PM +0200, Andrew Lunn wrote:
 > 
 > I think this condition is too strong. All that should be required is
 > led_brightness_set(). The rest can be done in software.
+>
 
-Some drivers do not offer led_brightness_set().
-See for example
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/phy/realtek.c#n1303
+Mhh the idea was really to check if one of the 3 is declared. Ideally to
+future proof case where some led will only expose led_hw_control_set or
+only led_blink_set?
 
-Afaik there aren't any drivers which only offer led_blink_set(), that
-would indeed be a bit weird. But only offering led_hw_control_set() is a
-(rather sad) reality.
+-- 
+	Ansuel
 
