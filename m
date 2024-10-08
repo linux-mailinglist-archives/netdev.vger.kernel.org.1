@@ -1,71 +1,98 @@
-Return-Path: <netdev+bounces-132933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A24D4993C54
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 03:40:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5B4A993C6C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 03:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37D60B21074
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:40:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42157B21081
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:44:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C67E171D2;
-	Tue,  8 Oct 2024 01:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vrcBEivz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB37218651;
+	Tue,  8 Oct 2024 01:44:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F6F847C
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 01:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BAB114A91
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 01:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728351637; cv=none; b=Bcqbbiug/NmBKbpTLBe1EP8f1bB087YEUOPZ7pn1E9xN5/8l0RxymSOfsTVnyaC8mMCSU9Wv2hU7jAutnNCZSKbxw49DA+/AivWNf/nudRr3mv0P0iyw9csWui5N6/z/BdgmyQqTo/BIHqC5+kvUmSa1M2njo+7nQVH673slmms=
+	t=1728351844; cv=none; b=IfVM7Qi/ZcIXIDHTbOIQ+8CTwzjHnX/vZ0lXuU8IANNbUT4N9cOPtgDUCfeTz7Nb1bvbl+uN5nGC1erBLbijLEItMxMRJmtCSkHifqUu/S5Ie/aA0WPRmTMECdYQkoajfbGE6iBSE3mvVPO+Hgd9KU//A+SnM5nk9W5CiK8y+AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728351637; c=relaxed/simple;
-	bh=B2GRuWWO+zkJJO3Yxi5A+sBodIFq92iiXD5DjhoPg0Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZPhI9/0DVPNqRNp4tZdvY0+7hZyqhCt5maYOwii/+kfoWoNnvtNn94beYQfeI2Pio8Ys2UYMBcEcGWmabEp+Xt36sd9AGSsg67FCS+gHweOs16wGVbOUy4ifLxAJGFhdU/fF9k8tQ4YoCg1BONEXduE5vLzGVZyoQ/lzWMHvWCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vrcBEivz; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <72385fe9-e34d-4642-a62c-61083395c722@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728351633;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=B2GRuWWO+zkJJO3Yxi5A+sBodIFq92iiXD5DjhoPg0Y=;
-	b=vrcBEivz48gYUo8grTfiwdmnEIj4OAJH25XMI34C1Gq//D6JeUSyNKG2+tZCuZBUeILEcN
-	yICNHYS7FZ7ITDq7IWb1dqVqV68FnGVhQCePuIWm66Gu62OZTZuhz3tbWrzvgYOqeeRqvq
-	PUiZ9OhCiIhUze1rcGPmNnDsizW4GeU=
-Date: Mon, 7 Oct 2024 18:40:26 -0700
+	s=arc-20240116; t=1728351844; c=relaxed/simple;
+	bh=zEiGXPNNi+qV0aR54ss4qOfQqs8mEO+IEjrR6uv8Tx8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=MI+RSrmge8EfJg9ioLG2MFQehFytf5yUh1jw7II0zw9Z7rfMpclLdLrWIiLLLmQsJkwsSWdOc43irkOSTNC49t7+Z7xAxMNBSOv/WwaEclScg5JzBzWLp6n6yY6q70okNL9fK/7g+KYBdzKfTAXtH4/H2mR0SMmXWjeFhi9aJLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a1a6d8bb03so53379605ab.0
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 18:44:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728351842; x=1728956642;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G1J06SoFiK32YSSK7pd1LagUMG6E/yMnS5Pg/4wxUAM=;
+        b=Tkyt/ACg8WPRYJudmeZeOFKSdhHA5ptvEr46E/sLvJU+YEK5RzBt7AaX5Ds9TJgbZg
+         /FIDL+cWCzrb6VJ1xsXr1Nw5lK0K6hXw3IclX2GjzHmj/dn/mfQkGniCs/yUpvqLMRkO
+         d3SZdRH+eQpQn2aSad4fM7GzVnQOPKNEvb9th61drREDm3ZB76R7Re74nP+ksqBQrkI0
+         z+v7Df8zqeORbcoDRSd7bMlxDDzaaZGxFhHKG7szUuR/ZhVW1Hk2bUFlrZCTn60cur7a
+         w1mri6+2QksqMPEZq8Hqfmpym4PZCTEeWC4FAIexC9rWb4x4UGCg25YgT3+JbeJg3Oc0
+         2OsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVruD4b8EI5CSoBBxJ9fMbkbelQAYiEwSg9B3l/WU6+0vTO3O5JEOx9m08aEQk6jM2rI/vUbrk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA+ZzpfYsx2AA///AfUWG7CI1WJ+EDJknt5ApUIDQanIgmIh8M
+	RqEwPf9v+6OAq/XDhC6mbfz66WhRvgkVWVsfizCMNBXfwQ8+a7vpSf8qDwWxUrmohKUdob4uHBP
+	Sdnm1I5A/D05pWNPJucRHAD5J390VQ6Hnh8xLz4ecXad/nKNxtX9VI74=
+X-Google-Smtp-Source: AGHT+IEtrMwclXwLk1T+D4m61HcZKuVnKmJ+oYAzW76+X+uCSIGFo56jfuhfh3UacTn3YPpAjTVxw5WCYw2XQx4rootXFgdHencz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 5/5] selftests/bpf: Extend netkit tests to
- validate skb meta data
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: razor@blackwall.org, kuba@kernel.org, jrife@google.com,
- tangchen.1@bytedance.com, bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20241004101335.117711-1-daniel@iogearbox.net>
- <20241004101335.117711-5-daniel@iogearbox.net>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241004101335.117711-5-daniel@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:1541:b0:3a2:f7b1:2f89 with SMTP id
+ e9e14a558f8ab-3a375bb2c30mr134150875ab.18.1728351842553; Mon, 07 Oct 2024
+ 18:44:02 -0700 (PDT)
+Date: Mon, 07 Oct 2024 18:44:02 -0700
+In-Reply-To: <000000000000657ecd0614456af8@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67048e62.050a0220.49194.051e.GAE@google.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
+From: syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>
+To: ahmed.zaki@intel.com, andrew@lunn.ch, boqun.feng@gmail.com, 
+	cmeiohas@nvidia.com, davem@davemloft.net, dkirjanov@suse.de, 
+	ecree.xilinx@gmail.com, edumazet@google.com, hdanton@sina.com, jgg@ziepe.ca, 
+	kalesh-anakkur.purayil@broadcom.com, kirjanov@gmail.com, kuba@kernel.org, 
+	leon@kernel.org, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	michaelgur@nvidia.com, msanalla@nvidia.com, naveenm@marvell.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, penguin-kernel@i-love.sakura.ne.jp, 
+	przemyslaw.kitszel@intel.com, rkannoth@marvell.com, 
+	syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/4/24 3:13 AM, Daniel Borkmann wrote:
-> +void serial_test_tc_netkit_scrub_type(int scrub)
+syzbot has bisected this issue to:
 
-nit. This can be static. Others lgtm. I can adjust before landing.
+commit 5f8ca04fdd3c66a322ea318b5f1cb684dd56e5b2
+Author: Chiara Meiohas <cmeiohas@nvidia.com>
+Date:   Mon Sep 9 17:30:22 2024 +0000
+
+    RDMA/device: Remove optimization in ib_device_get_netdev()
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16db2327980000
+start commit:   c4a14f6d9d17 ipv4: ip_gre: Fix drops of small packets in i..
+git tree:       net
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=15db2327980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=11db2327980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b2d4fdf18a83ec0b
+dashboard link: https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11eca3d0580000
+
+Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
+Fixes: 5f8ca04fdd3c ("RDMA/device: Remove optimization in ib_device_get_netdev()")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
