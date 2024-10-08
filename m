@@ -1,108 +1,205 @@
-Return-Path: <netdev+bounces-133106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54AA994CB4
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:57:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0ED994D0F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:01:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 197B81C2160B
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:57:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 773571F2421B
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A471DF964;
-	Tue,  8 Oct 2024 12:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B97E1DE8A0;
+	Tue,  8 Oct 2024 13:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HYbN/Mop"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Jr+LQZcw"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9785A1DE8A0;
-	Tue,  8 Oct 2024 12:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B1918F2FA;
+	Tue,  8 Oct 2024 13:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728392189; cv=none; b=HhHn6FD86bCyHstMv56fv8Ps5u40rFBnr6VoDYdYqSRdhJam1PHP1PhD4+ykyAc9rnp2semtEcFSO2B/Lmz69/tbkaMWaYylwtcidc74iSipVEL8pyItsAFcwr7B9hPBP640hMavLZOCQUBIIdGmG/bqjft1OH+papH1vGZzpcU=
+	t=1728392460; cv=none; b=sSddg0IZ5jkGQe35m/7bSCjj2N1LJpoqeZ2yLanngd6FjY8ekNdrB2wF2dlSj+8+8Zce8ajHhlX7zDcJ8syxSZGja7nCTo1oZpB9d23XOyCUugQuMluoS1JJgU1oQXUzRDAGYLjquposa6eMEBcBzgtqr2yCcDQtIT6HtKEUdpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728392189; c=relaxed/simple;
-	bh=BJav8e+HcALTipfP/NLFD+NrSKZ2vTYocgEXeZdKx3U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ip1kDDi/L0rv6OigBmMm43RUaq5JASD3HBW1p5a2VgMjEKU1qxnCXSukZlEPYAo9dfhA03nxVAEHeQ3XhTeE9ro6rGV+q+c6iGpQF/sJPBdPlm8qYrZ31svLuiuGvrFHJZbY5DmE6TU+0A7JMt7Msf2QRQp15MJCxOVJNI0Ivho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HYbN/Mop; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1D32820005;
-	Tue,  8 Oct 2024 12:56:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728392179;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BJav8e+HcALTipfP/NLFD+NrSKZ2vTYocgEXeZdKx3U=;
-	b=HYbN/MopgVOwhbm94jUtKR3niX7PPJ0/GQfIoI5KcrRc2eZol/OFPY1TA73qzramgLsS3p
-	JP5MG9rDv7jGu+/P7YaUR+k/ic65bSoML8+JuAb/XseyWvn3PxviiV0jiWtuEIli7TU5mG
-	MRKaWOxmRhm/9ntz1Lz2/+zBB0Pimfoj3DzE62zoHRujPUS2HNB3NOSTsns37kCy5okXI4
-	Cn/jEQ+qDCz5i7Kr+1IgNSJJUY+eQqnhjeenc2i6lR7MZ2meX5u7NrzAp2DNfqw7wOPt37
-	yiy8RE424U7Db1AqAluXZdNzlUohnQ8zD6TmnazEjLdHf350OCwOrkK16XkeiA==
-Date: Tue, 8 Oct 2024 14:56:17 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 06/12] net: ethtool: Add PSE new port priority
- support feature
-Message-ID: <20241008145617.23254843@kmaincent-XPS-13-7390>
-In-Reply-To: <20241008122300.37c77493@kmaincent-XPS-13-7390>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
-	<20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
-	<ZwDcHCr1aXeGWXIh@pengutronix.de>
-	<20241007113026.39c4a8c2@kmaincent-XPS-13-7390>
-	<ZwPr2chTq4sX_I_b@pengutronix.de>
-	<20241008122300.37c77493@kmaincent-XPS-13-7390>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728392460; c=relaxed/simple;
+	bh=h0eqizrzvYl6Uq7wcFh5HCi7VcoChZjTWjuB7JRAYw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gJQbpyB+axKR0R9Ac71cX1H92ZYE+JETlwuuyKxwS8ptjpS+hyUrhhsEBZa9JtBtAJVbMKCS52GlkvOqsku4k1z1/sz85YwjamrANPIiMSXPcwLpaidqpcZEf8rSAWBXPCVdMX768PqQu3mVoES1huCPexJtdsclmiVJx7Wlimk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Jr+LQZcw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=efcnzor9FQOZgn8Q7CqORQfIwqJ3qUcW4F3Xo2K+mYQ=; b=Jr+LQZcwGpvAIqdCVIyWaSeeLx
+	+FWB4e1QxTJcCs1P7UO2dV4mpqu+5RQRwr4cdyHD5VAAHxF3y2kVJSyASrVn6WYK9z5zrtqpiv7m4
+	rCE3RIwjFN97YvWg73XhE80Sju8BaUWx6Ik9heVUSKvR6Os9Zcob9ENm9bF/N2BfDDaQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sy9pd-009N4E-PT; Tue, 08 Oct 2024 15:00:53 +0200
+Date: Tue, 8 Oct 2024 15:00:53 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
+ get and set phy configuration
+Message-ID: <f1af0323-23f5-44fd-a980-686815957b5a@lunn.ch>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+ <20241004161601.2932901-8-maxime.chevallier@bootlin.com>
+ <4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
+ <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
+ <20241007123751.3df87430@device-21.home>
+ <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+ <20241007154839.4b9c6a02@device-21.home>
+ <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
+ <20241008092557.50db7539@device-21.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241008092557.50db7539@device-21.home>
 
-On Tue, 8 Oct 2024 12:23:00 +0200
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+> > So you have at least regulators under Linux control? Is that what you
+> > mean by power down? Pulling the plug and putting it back again is
+> > somewhat different to isolation. All its state is going to be lost,
+> > meaning phylib needs to completely initialise it again. Or can you
+> > hide this using PM? Just suspend/resume it?
+> 
+> Ah no, I wasn't referring to regulators but rather the BMCR PDOWN bit to
+> just shut the PHY down, as in suspend.
 
-> On Mon, 7 Oct 2024 16:10:33 +0200
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
->=20
-> > User will not understand why devices fail to provide enough power by
-> > attaching two device to one domain and not failing by attaching to
-> > different domains. Except we provide this information to the user space.
->=20
-> What you are explaining seems neat on the paper but I don't know the best=
- way
-> to implement it. It needs more brainstorming.
+Ah! I wounder what 802.3 says about PDOWN? Does it say anything about
+it being equivalent to ISOLATE? That the pins go HI-Z? Are we talking
+about something semi-reliable, or something which just happens to work
+for this PHY?
 
-Is it ok for you if we go further with this patch series and continue talki=
-ng
-about PSE power domain alongside?
-It should not be necessary to be supported with port priority as the two PSE
-supported controller can behave autonomously on a power domain.
-I hope I will have time in the project to add its support when we will have=
- a
-more precise idea of how.
+> Indeed the state is lost. The way I'm supporting this is :
+> 
+>  - If one PHY has the link, it keeps it until link-down
+>  - When link-down, I round-robin between the 2 phys: 
+> 
+>   - Attach the PHY to the netdev
+>   - See if it can establish link and negotiate with LP
+>   - If there's nothing after a given period ( 2 seconds default ), then
+> I detach the PHY, attach the other one, and start again, until one of
+> them has link.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+This sounds pretty invasive to the MAC driver. I don't think you need
+to attach/detach each cycle, since you don't need to send/receive any
+packets. You could hide this all in phylib. But that should be
+considered as part of the bigger picture.
+
+I assume it is not actually 2 seconds, but some random number in the
+range 1-3 seconds, so when both ends are searching they do eventually
+find each other?
+
+> > That explains the hardware, but what are the use cases? How did the
+> > hardware designer envision this hardware being used?
+> 
+> The use-case is link redundancy, if one PHY loses the link, we hope
+> that we still have link on the other one and switchover. This is one of
+> the things I discussed at netdev 0x17.
+
+> > If you need to power the PHY off, you cannot have dynamic behaviour
+> > where the first to have link wins. But if you can have the media side
+> > functional, you can do some dynamic behaviours.
+> 
+> True.
+> 
+> > Although, is it wise
+> > for the link to come up, yet to be functionally dead because it has no
+> > MAC connected?
+> 
+> Good point. What would you think ? I already deal with the identified
+> issue which is that both PHYs are link-up with LP, both connected to
+> the same switch. When we switch between the active PHYs, we send a
+> gratuitous ARP on the new PHY to refresh the switch's FDB.
+
+It seems odd to me you have redundant cables going to one switch? I
+would have the cables going in opposite directions, to two different
+switches, and have the switches in at a minimum a ring, or ideally a
+mesh.
+
+I don't think the ARP is necessary. The link peer switch should flush
+its tables when the link goes down. But switches further away don't
+see such link events, yet they learn about the new location of the
+host. I would also expect the host sees a loss of carrier and then the
+carrier restored, which probably flushes all its tables, so it is
+going to ARP anyway.
+
+> 
+> Do you see that as being an issue, having the LP see link-up when the
+> link cannot actually convey data ? Besides the energy detect feature
+> you mention, I don't see what other options we can have unfortunately :(
+
+Maybe see what 802.3 says about advertising with no link
+modes. Autoneg should complete, in that the peers exchange messages,
+but the result of the autoneg is that they have no common modes, so
+the link won't come up. Is it clearly defined what should happen in
+this case? But we are in a corner case, similar to ISOLATE, which i
+guess rarely gets tested, so is often broken. I would guess power
+detection would be more reliable when implemented. 
+
+> > There are some Marvell Switches which support both internal Copper
+> > PHYs and a SERDES port. The hardware allows first to get link to have
+> > a functional MAC. But in Linux we have not supported that, and we
+> > leave the unused part down so it does not get link.
+> 
+> My plan is to support these as well. For the end-user, it makes no
+> difference wether the HW internally has 2 PHYs each with one port, or 1
+> phy with 2 ports. So to me, if we want to support phy_mux, we should
+> also support the case you mention above. I have some code to support
+> this, but that's the part where I'm still getting things ironed-out,
+> this is pretty tricky to represent that properly, especially in DT.
+> 
+> >
+> > Maybe we actually want energy detect, not link, to decide which PHY
+> > should get the MAC?  But i have no real idea what you can do with
+> > energy detect, and it would also mean building out the read_status()
+> > call to report additional things, etc.
+> 
+> Note that I'm trying to support a bigger set of use-cases besides the
+> pure 2-PHY setup. One being that we have a MUX within the SoC on the
+> SERDES lanes, allowing to steer the MII interface between a PHY and an
+> SFP bus (Turris Omnia has such a setup). Is it possible to have an
+> equivalent "energy detect" on all kinds of SFPs ?
+
+The LOS pin, which indicates if there is light entering the SFP.
+
+> As a note, I do see that both Russell and you may think you're being
+> "drip-fed" (I learned that term today) information, that's not my
+> intent at all, I wasn't expecting this discussion now, sorry about that.
+
+It is a difficult set of problems, and you are addressing it from the
+very niche end first using mechanisms which i expect are not reliably
+implemented. So we are going to ask lots of questions.
+
+You probably would of got less questions if you have started with the
+use cases for the Turris Omnia and Marvell Ethernet switch, which are
+more mainstream, and then extended it with your niche device. But i
+can understand this order, you probably have a customer with this
+niche device...
+
+	Andrew
 
