@@ -1,96 +1,77 @@
-Return-Path: <netdev+bounces-132927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB097993BE1
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:40:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59CE9993BE4
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:46:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84D071F24FD7
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:40:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9133C1C23ED9
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422308494;
-	Tue,  8 Oct 2024 00:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C3E8488;
+	Tue,  8 Oct 2024 00:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UmzXtG5H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/+VIOdU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B20429A5
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 00:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C42AD5B;
+	Tue,  8 Oct 2024 00:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728348025; cv=none; b=t4y7BESUejGr8m8jiJCTUtYmJ/3JJdW4tRiJ1NkjrTmgEYqYDcirNWJ6XACQSLbwwRr2Okt19xq8Gss8zLlO6/j2mByl6zd6NMx37pgnG9c81lQhyiVTQMRG0mPX8sxzRnsQeUtPYOz45PTO9Ti1DXYkQhTEaB5BCF2FPNxi8II=
+	t=1728348389; cv=none; b=hbFsoaQb2/Z2LgTOWHdNOdIojdCaBV0jxVDQI1kC8sxkO5Z7AMvidmlN+TQqx5oJwEGdQccUBUk6/RpK5yFx1U83jf0vHGJPkZAWGyb8LWniGzHjShPYWwmqGHDEWmvGFX5kLT3zmjYuhb1M9V8ZdT1cPBHkhn558vOZVw112rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728348025; c=relaxed/simple;
-	bh=ngoL8tWnqZwdr61VyVfbRw1NEBAJJIYMc6WKSCo/joA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mfaKLNf4uyixTScK6yn7Syt6MBj7Rj2Km3YBoBXxqk/LFWYgxKtmNQlZDBBpbd32f9g2TcCzTh5CQJDBgx5yYGzq2GZEcOjRXGg7x+MOcQJwoPgD/+Hs9DBrhCN2c8cbqtf/lOaHgV2Rt+Gm1csAma4cD4yEUd1RIB6OuUO2KPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UmzXtG5H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A320C4CEC6;
-	Tue,  8 Oct 2024 00:40:24 +0000 (UTC)
+	s=arc-20240116; t=1728348389; c=relaxed/simple;
+	bh=rbufBsG5dVWcAFbqrpOe245n2KhuK4HWy5jDbknH/MQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TkxbJZFmdtiounXc0BQB1Imdpzl3m6NJGx/pCNoNCcePn2JSqz/r2Eq9mi2bZM3wHPNwS/TbgCSMb+/SZASO0fwocjXHBgddjZkCcVjer3nDzBg+s0k4+uzjeoGZljioLzPnPA0d8bxGxLoAVq2fbUDNz8HAXm1A3+/qK7LrP84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/+VIOdU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEC9FC4CEC6;
+	Tue,  8 Oct 2024 00:46:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728348024;
-	bh=ngoL8tWnqZwdr61VyVfbRw1NEBAJJIYMc6WKSCo/joA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=UmzXtG5Ht6QMy7jWPXeZqckQChXYja8q0NRB3IoiGlyn3+8aPb4QYkAD5TuiRhHEm
-	 sTolPsBfOjDMFxfuaaV+vwCfEeWK5SHsu+8ilN3s6Pp9KErfPkszMlRa9yoV2T2FTf
-	 uUBc3jEv7nbZjOi+d2D1NcEktCsyIpSf5o+yA1HAsUb/UAISPOe8IZ0DrFVYjke/x+
-	 31Zf2n73hI4dK78Vti2QV7A9VfOaJ7OMNPSjXXO/WwqT2fLSKGVgyngYoxG1892mMr
-	 4E4haErqyE4OBXvYaD5jnvzTEqj8xQuKCf1LdovtrTesJq8EOOtT00xRPT7GcTgQ+E
-	 zZzNkeR85sg0Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFCF3803262;
-	Tue,  8 Oct 2024 00:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728348388;
+	bh=rbufBsG5dVWcAFbqrpOe245n2KhuK4HWy5jDbknH/MQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=M/+VIOdU0EhGiVTf85FLLYQD8YNydCcSjNBbZr9B+MjK3UNzGlIrR3aa/YtT7JkR9
+	 smkPLFVv89zXjUB4d3uJ7+Q34e6+FJd/v6NchEM3MQr1hJ7uBq84Y+RfhEFyW1NiD7
+	 wu/t/A9+0cuiWdF9nGfx4Hca0Pi9/ywO+VrIPPQmYqE15dLZdkGGOwLPWZb5vJvtlX
+	 QthMPzLTygdlgwNkqBnsJPk3xcMRPFOZAO5p2qb/WKIn7DpUlHLIVX9nesaaRO0Q0V
+	 mLf4U+76BgwZoJA6tZNNNlZpEgwPyarqF6glVylFAdhO8Ia4pzglKCwJGtzllXgZRh
+	 p4CoP62gaVMCQ==
+Date: Mon, 7 Oct 2024 17:46:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net,
+ chunkeey@gmail.com
+Subject: Re: [PATCH net] net: ibm: emac: mal: add dcr_unmap to _remove
+Message-ID: <20241007174626.0c199c24@kernel.org>
+In-Reply-To: <20241007172122.6624c1ec@kernel.org>
+References: <20241007203923.15544-1-rosenp@gmail.com>
+	<20241007172122.6624c1ec@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: airoha: Update tx cpu dma ring idx at the end of
- xmit loop
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172834802875.31485.3860611664672766759.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Oct 2024 00:40:28 +0000
-References: <20241004-airoha-eth-7581-mapping-fix-v1-1-8e4279ab1812@kernel.org>
-In-Reply-To: <20241004-airoha-eth-7581-mapping-fix-v1-1-8e4279ab1812@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 04 Oct 2024 15:51:26 +0200 you wrote:
-> Move the tx cpu dma ring index update out of transmit loop of
-> airoha_dev_xmit routine in order to not start transmitting the packet
-> before it is fully DMA mapped (e.g. fragmented skbs).
+On Mon, 7 Oct 2024 17:21:22 -0700 Jakub Kicinski wrote:
+> On Mon,  7 Oct 2024 13:39:23 -0700 Rosen Penev wrote:
+> > Fixes: 1ff0fcfcb1a6 ("ibm_newemac: Fix new MAL feature handling")
+> > 
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>  
 > 
-> Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-> Reported-by: Felix Fietkau <nbd@nbd.name>
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> 
-> [...]
+> I'll fix this one when applying but please make sure there is no empty
+> lines between tags in the future.
 
-Here is the summary with links:
-  - [net] net: airoha: Update tx cpu dma ring idx at the end of xmit loop
-    https://git.kernel.org/netdev/net/c/3dc6e998d18b
-
-You are awesome, thank you!
+I take that back, 'cause it also doesn't apply
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
