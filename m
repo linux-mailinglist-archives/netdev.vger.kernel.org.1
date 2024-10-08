@@ -1,80 +1,57 @@
-Return-Path: <netdev+bounces-133001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B234E99437F
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:06:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4FA3994394
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F6AB1F267E1
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:06:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C8C41F236C2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3696C1D095C;
-	Tue,  8 Oct 2024 09:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9CE1DEFFE;
+	Tue,  8 Oct 2024 09:02:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLoeG1BD"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="Kum/5HWy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953A31667DA
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA871144D21;
+	Tue,  8 Oct 2024 09:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728378072; cv=none; b=GMBorqCzE3PqgaartomjFlEvUSrIe5irQbbqeCXd7I+6EnI+nRQtfnphbt+rvlVtOGUVxBMFqCGqRgJYxvHV26kKnx7d41Ftu7kuDfaRTIASk5gfDx4qS0IQleGxhD2UimwP/TsK3CJ/Rv2+jiGp1Z1yVLBdKP/uPp9bGQxK+Z4=
+	t=1728378156; cv=none; b=r20CP8jtxC/6Nn2XPJxMQgSZ4xsgaJpaL2rhoNUfKqABr82gGNxPuIahxqQN2or4Wdj47ke4ATQuTeSuR9rYRlCXjDxgKxkSpZ+iVYRDC+/F4RqNDTSYvGVm42Ii70M9ZjmPNW2NqDmFSiMTKQm4UI7F3Oe8uY0uFkOIz2FeiJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728378072; c=relaxed/simple;
-	bh=CWk6qOrLNWMBar35EmC3B/ynBzAUfUHitiAJSmo+FG4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nzS4UW4ybOCZnz6diH1/G1epVI9QKwv0hfuD1cQbh+Ifqc8bVOOPAty0rdHPXevQdNjehgvxD6rIIZASA9dSLvmapghbC2qcE2jg1IULERj6Jds/reuGt3OCt2KeaRZccPTmm0VpCL1FsAoF4c3M7aYf1JrGMwbGuAJn7xs1dKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gLoeG1BD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728378069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Az/KMPreXaGl91pZI4523wJ5r8ejn+YnIG+Mof+90Ek=;
-	b=gLoeG1BDrEOHTotR44qJAmZbKTO2bzCpM5rUzg7R65gpk1wAmEbwohWUVgvpFY8ZLXUFd7
-	aMmzeNyHn3sWTm6bFUyksUkLBB7MP2lu7dx54nL80UugGcvf95iFFlpC62YkdspDUTa94U
-	jApWD39bOgW2NZL1EPAJd1MzKzw/wC8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-104-K5Sb0p3vNhW4WlEUquJZYA-1; Tue, 08 Oct 2024 05:01:08 -0400
-X-MC-Unique: K5Sb0p3vNhW4WlEUquJZYA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37ccc21ceb1so2530100f8f.2
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:01:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728378067; x=1728982867;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Az/KMPreXaGl91pZI4523wJ5r8ejn+YnIG+Mof+90Ek=;
-        b=ssr53Ov7Koapq7YjNoVhhHXuONpvoOmtK6OKpWP/9OAfJU3M10rV/KsX1UYa8RsHhW
-         wYLLk9A52sHMnHXy69t5BqHLdmVb7NotUXw4bvlA7E/C8s2uaA1nGwOWnidEY/Sc0vBN
-         zouADkT7rReLPFL2MISk0C4NSgUI6kdmHn/sJmrpy8PpncGyYB4MUruMOrW09v8UaVV8
-         aOA6GCG0mUZiSGHxkeCsQus5wyt5KgcbhDWNetQCz/zYGTomPBRWjeu8w3aketbDbsl5
-         7IyT9ABArj/Dvbchxw1oLexq3O9RMJr1Y0YO1+0nVmWLoGgTMVpwyNnS/705pWbFrBwA
-         DdeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXyYNrfKR38vqF3wMQvjiWGx7D8EbVjK4jIWO8+N8PkHHWhrYQAc+8aNQH5eSrDA7Z1Qproz5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDO7w/4JzpPaMcFI3dDJItM7jh1L2E/fbaPrp6WWPzekaDRSs1
-	2nfNgRq4Tv39iVqDyHAybAq0t6D6adddX+QIPSklj2cJeZJGrC6HlkrFnoBYVNmTYyF4j19uLSa
-	uNvk/QwD7yM+oAKyjiw9HSB8bdWz9f62XUmL1LPQjiX/FW8Vn0N3EDA==
-X-Received: by 2002:a5d:64e7:0:b0:374:c040:b00e with SMTP id ffacd0b85a97d-37d0e7d43c8mr10304850f8f.39.1728378067027;
-        Tue, 08 Oct 2024 02:01:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIFwLBzdlSN+s2luoQEVwbNKJu+jYd1X+INDAyIvF4Y/gn2XGZgzsLbGQxoIp6iqg9MixO4A==
-X-Received: by 2002:a5d:64e7:0:b0:374:c040:b00e with SMTP id ffacd0b85a97d-37d0e7d43c8mr10304829f8f.39.1728378066670;
-        Tue, 08 Oct 2024 02:01:06 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691a4d8sm7587775f8f.36.2024.10.08.02.01.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 02:01:06 -0700 (PDT)
-Message-ID: <24e50bd4-05e7-48be-b943-b361f4e73fdf@redhat.com>
-Date: Tue, 8 Oct 2024 11:01:04 +0200
+	s=arc-20240116; t=1728378156; c=relaxed/simple;
+	bh=Z+xX2hO+f6E9zNQiPiOWxzg4gaZDgAqj12yTVOPS7wk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ttZbquQEkxBz2AqEOpiw4r9X5NsftcLONZdZ8cQIQ3xvdLsL/OVj4VQUvm/p1mUu+SQAisCwUxVYOS5Qe8nwLn/hts6JQ/Z8I11sGUVReBF/dSrSfcxz3A3TXNwQkrO+RCJcgAIjohyFgNxtTJ70VO0pExt73XKTsX2xciNt50Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=Kum/5HWy; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id EEA04A0365;
+	Tue,  8 Oct 2024 11:02:24 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=3OUMxFnYySkHZFxMjl63
+	3WdFfTbIPbjkXbDMeFM8SHw=; b=Kum/5HWyjLJ8XrhOgPSD6ADADRCE0EKaaDv7
+	XRpa4oinShiKCufUn0FiedkBb8pVW8PnX6qkppg8WoOhYOKw/JP4/ZzvQDnnyLF9
+	oP2hRxJjWuMDJu/tiD3fHmQN8jEY/ttf4z/v+4IoieyuSsKNznXKzZ6EBr2uooI+
+	k0tKFqNc4asesFyec6vGBnZrufkc4Q6n2lXrFBiyblLrEBly99LVPPMm73oKdGBP
+	eqytXrvtCRUmQkU2VgWfqIC74+mKU9mQmVxT31/WmVyVd/8acTgTo0Uep1mEJ1Or
+	HB5q2TCmakRitfxTa8mXrVHPL6S5K130pMMnIUpM4bEL9PWtQgHASXKR/Z95eWiC
+	CDT4xuEwJYM9Lggt2iyh5smfroDLCfYobYHUbSeT3JmF/GhrjdzWUcZ1umD0JrQS
+	sxAHwAwPWhWMtrw/v9spUs/yaduwO05z4vai/5n0Gtq98NZZwANK61iGKf0NQhz/
+	JNzPRzkY5dC3mESYsmD+3J+X+B40fsmkCBTR8nu+NLXzMgzpInjTrWWHMbZz/l2o
+	8pJkN2lYiu0K3HOYWGtStdT6ozRVTb0IwdN/Wwz7xjeS4PsvU30D0n/dugY7lNK7
+	3v28kj4wOPtuQZK0njYM80p/nZOJ77hSl0KNQIsnF1Cf/uWfwDcK1KF5WaFGWN56
+	o6rB8WE=
+Message-ID: <da9833c7-ad3d-48f5-b846-add3e57433a0@prolan.hu>
+Date: Tue, 8 Oct 2024 11:02:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,51 +59,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 08/13] net: pcs: xpcs: use FIELD_PREP() and
- FIELD_GET()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Jiawen Wu <jiawenwu@trustnetic.com>, Jose Abreu <joabreu@synopsys.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
- Vladimir Oltean <olteanv@gmail.com>
-References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
- <E1swfQz-006Dfg-5U@rmk-PC.armlinux.org.uk>
+Subject: Re: [PATCH net] net: fec: don't save PTP state if PTP is unsupported
+To: Wei Fang <wei.fang@nxp.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <richardcochran@gmail.com>,
+	<shenwei.wang@nxp.com>, <xiaoning.wang@nxp.com>
+CC: <linux@roeck-us.net>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241008061153.1977930-1-wei.fang@nxp.com>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <E1swfQz-006Dfg-5U@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <20241008061153.1977930-1-wei.fang@nxp.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94855657D63
 
-Hi,
+On 2024. 10. 08. 8:11, Wei Fang wrote:
+> Some platforms (such as i.MX25 and i.MX27) do not support PTP, so on
+> these platforms fec_ptp_init() is not called and the related members
+> in fep are not initialized. However, fec_ptp_save_state() is called
+> unconditionally, which causes the kernel to panic. Therefore, add a
+> condition so that fec_ptp_save_state() is not called if PTP is not
+> supported.
+> 
+> Fixes: a1477dc87dc4 ("net: fec: Restart PPS after link state change")
+> Reported-by: Guenter Roeck <linux@roeck-us.net>
+> Closes: https://lore.kernel.org/lkml/353e41fe-6bb4-4ee9-9980-2da2a9c1c508@roeck-us.net/
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+>   drivers/net/ethernet/freescale/fec_main.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index 60fb54231ead..1b55047c0237 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -1077,7 +1077,8 @@ fec_restart(struct net_device *ndev)
+>   	u32 rcntl = OPT_FRAME_SIZE | 0x04;
+>   	u32 ecntl = FEC_ECR_ETHEREN;
+>   
+> -	fec_ptp_save_state(fep);
+> +	if (fep->bufdesc_ex)
+> +		fec_ptp_save_state(fep);
+>   
+>   	/* Whack a reset.  We should wait for this.
+>   	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> @@ -1340,7 +1341,8 @@ fec_stop(struct net_device *ndev)
+>   			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
+>   	}
+>   
+> -	fec_ptp_save_state(fep);
+> +	if (fep->bufdesc_ex)
+> +		fec_ptp_save_state(fep);
+>   
+>   	/* Whack a reset.  We should wait for this.
+>   	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
 
-On 10/4/24 12:21, Russell King (Oracle) wrote:
-> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-> index 805856cabba1..f55bc180c624 100644
-> --- a/drivers/net/pcs/pcs-xpcs.c
-> +++ b/drivers/net/pcs/pcs-xpcs.c
-> @@ -592,7 +592,8 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
->   		ret = DW_VR_MII_EEE_LTX_EN | DW_VR_MII_EEE_LRX_EN |
->   		      DW_VR_MII_EEE_TX_QUIET_EN | DW_VR_MII_EEE_RX_QUIET_EN |
->   		      DW_VR_MII_EEE_TX_EN_CTRL | DW_VR_MII_EEE_RX_EN_CTRL |
-> -		      mult_fact_100ns << DW_VR_MII_EEE_MULT_FACT_100NS_SHIFT;
-> +		      FIELD_PREP(DW_VR_MII_EEE_MULT_FACT_100NS,
-> +				 mult_fact_100ns);
->   	} else {
->   		ret &= ~(DW_VR_MII_EEE_LTX_EN | DW_VR_MII_EEE_LRX_EN |
->   		       DW_VR_MII_EEE_TX_QUIET_EN | DW_VR_MII_EEE_RX_QUIET_EN |
+Thanks, it seems fec_ptp_restore_state() was properly guarded, but 
+save_state() was not. Sorry for that.
 
-Very minor and non blocking thing: perhaps consider renaming 
-DW_VR_MII_EEE_MULT_FACT_100NS to DW_VR_MII_EEE_MULT_FACT_100NS_MASK - 
-possibly in a later work?
-
-Cheers,
-
-Paolo
+Reviewed-by: Csókás, Bence <csokas.bence@prolan.hu>
 
 
