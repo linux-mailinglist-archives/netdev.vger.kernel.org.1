@@ -1,138 +1,113 @@
-Return-Path: <netdev+bounces-133061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54370994646
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:12:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1934994648
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12DDE283782
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:12:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14DA71C229DF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049401D040B;
-	Tue,  8 Oct 2024 11:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DFD1D0E34;
+	Tue,  8 Oct 2024 11:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ta/y6hj/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wc1NIPSR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9391CFEB9;
-	Tue,  8 Oct 2024 11:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EB71CFEB9
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 11:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728385833; cv=none; b=PQcO/5j6DyUu5K1YwkBRrc/i5LgmyCe4nCkndpQUyYoZafca6TimpaAN9669wrfVd5GjA7SfPon/KiajRl2Hu6SpDAQwUTJ9RNVzDx7qW85MMLKpVIt+RaGATTNkbd3gbcQiSLPu0CHDxKVO4nIPjrkNfkScl0SS7Kns6cEAogA=
+	t=1728385851; cv=none; b=i5GditW3+hbSAGrt1/Lv8pMkwdE+LO4XHxGHj2gyYfnwVBcQViHTgLWogaX1T1wFmt9IXZuv5vIg618jPGYOevtx30QszqY3kPoLWyC8ker4Bs9t4I2aCglItzowlufJQG0rpKV6auk+fGRw9fcM1UyrcFs2wZumNiEcMzlOFhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728385833; c=relaxed/simple;
-	bh=3ET1Qz3wXIHI+cCAf3eMU+xCAZXNWSg8aYu3dyeJxn8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F4K13tWDsOirvc+15vWI779Kq3639smPHR/7MvfBIgdpX3QfcSO3paxRZTigPv2XYLZc+HO04Rh/PMH4qmnUGJG2G0kasLqH3QOH/55hJ0sg7iWOFlyvtLzBJHfPord4GR58dG9iPUFj89tJ1zemSAgOMyaUDsoDuN+hlsp3N3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ta/y6hj/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QEKJ8M3LnDCbZQxwZJbLvUnxjOuG9PsICmqV9wsjbug=; b=ta/y6hj/pdJH2yYbxBJtAjF3S0
-	bVH9eFmq5tu/lXqgki4OY1cihMEt0OT/p4ID4OCxSY/DPnsXfsH2ZznnQFwMpboSynWzillR74V9O
-	cHslranDZjjLzAPPSpGGrtb/CLmd4gXG9q9+TUG2cuQQ9Z5mWFc3JUTjcSp4yLdQcxQemnWwJS+T+
-	VmYTsA6BjZ5hr9cae1FJMd5yyI0AkLydzhkYZyB10ir181rOOS0KHWahk+ebJ+/YABaUfAohIwEZ8
-	tLQHaTDRnQ37jVjaquYwWD5rtJdG2IebGOV3J7/vQRr5DfjaRvt5RKK/oWOI4i27HtftrNyuQXBQ/
-	ZNwWGviA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56822)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sy86X-0007Ko-0Y;
-	Tue, 08 Oct 2024 12:10:12 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sy86R-00058l-1r;
-	Tue, 08 Oct 2024 12:10:07 +0100
-Date: Tue, 8 Oct 2024 12:10:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
- link-partner advertisement
-Message-ID: <ZwUTDw0oqJ1dvzPq@shell.armlinux.org.uk>
-References: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
- <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
- <ZwBmycWDB6ui4Y7j@makrotopia.org>
+	s=arc-20240116; t=1728385851; c=relaxed/simple;
+	bh=WQ7tYIHofTVr66pMBsJXvo+aThpW4ME/6RPNDVhYrdw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ijVY9Iq/ZeIn3597LWW+THUVnzCemHdEjd+wisHBWGxWHRFl1vnDSoQeVA8+hyRO9Yf0v1xNQs0E1qzpFs/qqcmcprE2spSpqj1jYOUweYOJPYD8d9afewQXG0Qq9SMFbg/Alenx3JZI4X725SJBGuOUiYJavIv+OYlNM8uqf24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wc1NIPSR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728385848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EwxVsgf7pGRut7fzyjOAmYDyHUbQsUNHRLe+n0zipP0=;
+	b=Wc1NIPSRcTZWhg9MN9PN37RDaMVEwBy+C8Dliy8PYBsnx7e986shF4KPZVZ21Lzn5fp2bw
+	0RiKRPEUz4zyhSBi5lKrGkwiaoVC23Wlm2QgtLa8u5fktgf9kA8M1vfCfYEfx1HRTShINw
+	6M53p/xC9r84cEj1smEDB2JVuL+E0XY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-22-d17pNRAsMfK9rgnJkH5Tnw-1; Tue, 08 Oct 2024 07:10:46 -0400
+X-MC-Unique: d17pNRAsMfK9rgnJkH5Tnw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cb940cd67so60810405e9.0
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 04:10:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728385845; x=1728990645;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EwxVsgf7pGRut7fzyjOAmYDyHUbQsUNHRLe+n0zipP0=;
+        b=uZLXn+wNE9Wmg4FRSa2tQYqsaVnusOXOjvuaeuazDxYoW9STRXfc4OSXr28Cah6fVu
+         1F1MRVgkoSBihII274+NKBucJ7pnyWdvpeD5Ksw75S7ZvWwkMKYGJfR6CtPTAL4Cx9ge
+         yYuzpMdF6hSciSz+DpYYigeT4Oimfwi6ptHDwz2zehUQZz9eqIlxIu5PA48oGMiX2n1+
+         q9tBx39Ez7euTTLxzZIHJrrGJDpNk0Z5M+k4DithxUQdxjaDI2wfnT4VjBTHrtdNlzmn
+         pNW3oDoMl3kEBHOhGLXF2z28l+aNGFJa86mV3fQjSa+ZJJjSRorLNY/+yNrOniqe+VIV
+         AAxA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/2d5S68X18mmCWOPyIzIsxJ4Fsbvv944e/dhwT/+TdszdGgfTkdYeH0G4/vRj0/1eL2tvCEA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA72cuifX89jNHbTuId9JMx8CXYGzhlMQDG29bAWbRPMn/dtkh
+	fGlD9/mGdItT7WRKFvXrDs/qJY45TovfcJH6hOn/Nx2VLneI0/cIqnvrKfNxQY7bVoD43O1qzkI
+	oS5EidI9uJt1bIj8l0SZwI9HFSjEFSXhnJsxPaMtnIxjadfz4roo6rg==
+X-Received: by 2002:a05:600c:1c90:b0:42c:bcc8:5882 with SMTP id 5b1f17b1804b1-42f85a6e05dmr150921255e9.7.1728385845588;
+        Tue, 08 Oct 2024 04:10:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/QE7qttY1+a7qCTREIE0n6Hq/vU/jc3g2PLUq3gMDjdOWSljVp6xmWxnqY3Tzkpapwo5hoQ==
+X-Received: by 2002:a05:600c:1c90:b0:42c:bcc8:5882 with SMTP id 5b1f17b1804b1-42f85a6e05dmr150920905e9.7.1728385845125;
+        Tue, 08 Oct 2024 04:10:45 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43054aa7733sm11188385e9.35.2024.10.08.04.10.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 04:10:44 -0700 (PDT)
+Message-ID: <810bc6e9-1872-4357-a571-2ed4837b74f9@redhat.com>
+Date: Tue, 8 Oct 2024 13:10:43 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwBmycWDB6ui4Y7j@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 4/4] ipv4: Retire global IPv4 hash table
+ inet_addr_lst.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>
+Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20241004195958.64396-1-kuniyu@amazon.com>
+ <20241004195958.64396-5-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241004195958.64396-5-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 04, 2024 at 11:06:01PM +0100, Daniel Golle wrote:
-> On Fri, Oct 04, 2024 at 11:17:28PM +0200, Andrew Lunn wrote:
-> > On Fri, Oct 04, 2024 at 04:50:36PM +0100, Daniel Golle wrote:
-> > > Only use link-partner advertisement bits for 10GbE modes if they are
-> > > actually valid. Check LOCALOK and REMOTEOK bits and clear 10GbE modes
-> > > unless both of them are set.
-> > > This prevents misinterpreting the stale 2500M link-partner advertisement
-> > > bit in case a subsequent linkpartner doesn't do any NBase-T
-> > > advertisement at all.
-> > > 
-> > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > > ---
-> > >  drivers/net/phy/realtek.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > > index c4d0d93523ad..d276477cf511 100644
-> > > --- a/drivers/net/phy/realtek.c
-> > > +++ b/drivers/net/phy/realtek.c
-> > > @@ -927,6 +927,10 @@ static int rtl822x_read_status(struct phy_device *phydev)
-> > >  		if (lpadv < 0)
-> > >  			return lpadv;
-> > >  
-> > > +		if (!(lpadv & MDIO_AN_10GBT_STAT_REMOK) ||
-> > > +		    !(lpadv & MDIO_AN_10GBT_STAT_LOCOK))
-> > > +			lpadv = 0;
-> > > +
-> > >  		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
-> > >  						  lpadv);
-> > 
-> > I know lpadv is coming from a vendor register, but does
-> > MDIO_AN_10GBT_STAT_LOCOK and MDIO_AN_10GBT_STAT_REMOK apply if it was
-> > also from the register defined in 802.3? I'm just wondering if this
-> > test should be inside mii_10gbt_stat_mod_linkmode_lpa_t()?
+On 10/4/24 21:59, Kuniyuki Iwashima wrote:
+> No one uses inet_addr_lst anymore, so let's remove it.
 > 
-> Yes, it does apply and I thought the same, but as
-> mii_10gbt_stat_mod_linkmode_lpa_t is used in various places without
-> checking those two bits we may break other PHYs which may not use
-> them (and apparently this is mostly a problem on RealTek PHYs where
-> all the other bits in the register persist in case of a non-NBase-T-
-> capable subsequent link-partner after initially being connected to
-> an NBase-T-capable one).
-> 
-> Maybe we could introduce a new function
-> mii_10gbt_stat_mod_linkmode_lpa_validate_t()
-> which calls mii_10gbt_stat_mod_linkmode_lpa_t() but checks LOCOK and
-> REMOK as a precondition?
+> While at it, we can remove net_hash_mix() from the hash calculation.
 
-Isn't the link status supposed to indicate link down of LOCOK
-is clear?
+Is that really safe? it will make hash collision predictable in a 
+deterministic way.
 
-Maybe checking these bits should be included in the link status
-check, and if not set, then phydev->link should be cleared?
+FTR, IPv6 still uses the net seed.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks,
+
+Paolo
+
 
