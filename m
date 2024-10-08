@@ -1,205 +1,207 @@
-Return-Path: <netdev+bounces-132951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D04993D22
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 04:57:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7B7993D70
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 05:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 376391F24A05
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9768D1F23595
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 03:20:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A564B224F0;
-	Tue,  8 Oct 2024 02:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A1C33986;
+	Tue,  8 Oct 2024 03:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="2VGnmY1O"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hk7ckB0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B53381B1
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 02:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C7B2AE8C
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 03:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728356224; cv=none; b=UFEBnrhvKKIbLxIDDLcSz9Le8MaRZhmPqsFoAOlK9EWW6oaVTG082BoRzfh/FZTd0NikBYpKhYq1CHOUEaMS92m0sxvULOUw0sGxL0pkJUav7+tOeAhjujBMbHXOp4SjfGT0hKBC7O1LpRSlFCglwjoHXZmKsh2Xm9/hKMhv05I=
+	t=1728357643; cv=none; b=HYLfwP744jPPt2M+dwVLH90rfZlVwTrG4Q8gWkrD66vxgGx4xciH4KhdCu5ZnavM9Tbat1QSb6CkCvxukDJndDXLDfRaG0rxlAi8eiLbgQbjRGZF32k30ocGPcJwSmZZpMQYt3rOVujMFVWFIKp1Rpkjzu8yQnvhINcCGpf4Bmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728356224; c=relaxed/simple;
-	bh=8GkUSNf25Cn9J4JQ9XYwCOdVwonJE2PEmlrutdyF10Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Akid7wigfnb0qeTzNYiMw76HrEoZ7maPXUhjczbg9ZE9xzbQx5SAXB6lUaog65CfsxGXenXsXTOOlb7V0liZTKfa9N2HCGfa5e2fMSccJZ2a+QTD5ngi4U+cQV/GqsMS48LmPNsQ/hUi11W/fPOlFYOCbxzhvKHBxALzxX9pFjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=2VGnmY1O; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-20c593d6b1cso624705ad.0
-        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 19:57:02 -0700 (PDT)
+	s=arc-20240116; t=1728357643; c=relaxed/simple;
+	bh=ZE1YbacyrYOKXVi7KxJt+r0ThIE1K06OJs44ut3Xq1E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ne2Z/XIg8helBE6FGjpsbhD26GEE+jaRuBYIEXLQuhB+OS27pTSvTNuIl+vnBRq38GNy0fLi3AX2U9S1NVI1lu0lB2EiJgtPnzvZuaDhNNMfyzGaKRLOUjz70Nb2S8SJ52IZhZDMx0Wp53smrqg+tVILx1HH2lVBNcuw1AM2Ovk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hk7ckB0x; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5389917ef34so5873512e87.2
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 20:20:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1728356222; x=1728961022; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/eZTXyt3O/zLAFP72VFPp+UUj+qAFqeGbguv+KwTUOE=;
-        b=2VGnmY1OJnjN3v7+Qdbt90dBabZ6DwSzDr7ym4UDmAP+xD1c2sNGtu2atJbvys7Uql
-         L9IWXZRvFV5FtnI/VCjMPjfqkWzz+OfULIc3bNx0OEFbrhu0/Wo/zW+sW2Vl2E+zQzsp
-         MOsGKxMZQo8LRXGSJyGLRz3NvcDLTbOnWkg4xjdrD+A4Liuya0GRMXcn5L+HJ/ve0oxt
-         F98SzCAra55r0tt06/A4AbBmm3VkPmpllsrXLoD73cTDT4RiZimmPG/P2AdeW3QjtKtz
-         K6/jLf+Mb6USdAk1u8cgFZX+79xvvR1lJWrSzu2QJyRaRNDuvR/d+7RtxYNQrySR9xD0
-         dT9A==
+        d=broadcom.com; s=google; t=1728357639; x=1728962439; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=awq09QHH3rvN6KvXBH5uUMFC13JRAP2vzJ5PlZOuk0U=;
+        b=hk7ckB0xJLIYC7BEuv9buE8yDyZ0ggS5LX5o4yfjtoVSDrLEa/dMYqv6thlvNXt7XF
+         Xf0sOx5e4fB6oyTV2ENQU04AFjRFu8UmqpA8CBvzUTJa137kkFL9XBumbth+F4W/6HHo
+         BdxsGZw/jyz+2V3s1igffzd1kF/MDQUy3b3Qw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728356222; x=1728961022;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/eZTXyt3O/zLAFP72VFPp+UUj+qAFqeGbguv+KwTUOE=;
-        b=ecPS8j9s4/0dcXkPD5NudR3tuBEH74EhVBwn0D+MyDcdWh7dbI5nNbRt4bCspssxo7
-         cXokXUZneD77srTB8+j+02xvGDXnixWqrCHHJ03Z+DUpoozGU5tPEYj8E0ao+hwhghNI
-         MuoBTgNjANQVemrWegoW8rfxssubchVpdVLykRDdV/fEMpZJuf5ub7BFS7yyuzOHrN5+
-         Cdmog2P8f06OFABP9AJQAawYi2SuVOovD7+dFYp4/nhxYrZ0ODnPDtzLAovNp5BNHxxq
-         0QfC9qY1Ql5a9S/lzuZfC+qEvJV4arvXvHAhoHC/T+cJdeV1C48hp2+Mf5ioR4lwo20Y
-         AYjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXcmRDGzDjbXWXRKyCMLW6CaAl7UqQwOS/aM00F3CMe61ZVmiM3pcgxNdEwYqsTwXNeEsAiNY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSjANfOjn85nJSQ7SDmylt9/U1/CI+4qnOqggMLVHa7VX3wQV3
-	d68cijLJMq9rLWGS8X7HKsOkmnn4Bz5vW4R87QAUXVWtnVf3dSLt4E6r7bSLbDc=
-X-Google-Smtp-Source: AGHT+IHN52YLdi9YsfHSIXKQJAGggabVSwrgLe8V8XoGt/QgSPui2fK6CCX85siC6Db8p5XpvtQt4Q==
-X-Received: by 2002:a17:903:4408:b0:20b:b455:eb7c with SMTP id d9443c01a7336-20bff176f0cmr195979445ad.56.1728356221688;
-        Mon, 07 Oct 2024 19:57:01 -0700 (PDT)
-Received: from [192.168.1.24] (174-21-189-109.tukw.qwest.net. [174.21.189.109])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c1398d184sm46395945ad.263.2024.10.07.19.57.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Oct 2024 19:57:01 -0700 (PDT)
-Message-ID: <18255eaf-a2ce-4cd1-b47b-2482b6c42e08@davidwei.uk>
-Date: Mon, 7 Oct 2024 19:57:00 -0700
+        d=1e100.net; s=20230601; t=1728357639; x=1728962439;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=awq09QHH3rvN6KvXBH5uUMFC13JRAP2vzJ5PlZOuk0U=;
+        b=UEh5224topfy9BYXUZIBYUHmVCAFlpTuBynqoX1oTrOlEJqx/3C2M2Wupom8ABGcU/
+         82aQA27bh7ziMh9Y96Y0aj4l085XI2rS1zJl0MDrYAQ9IrrTsiFoUz9mAZfDNUeKlWiA
+         25AtfLwEqn9yjmi/kfDqxfZ7HFgSVoPhsIGXYdCrF5POjfSulLJfs9qBF1R69cZbUyYd
+         arDX02MESST2TW5AsHpGhfyKRJdawtYIn+nMHC1SwEWXcazetJVQp8oyAJcCUMt5ib5h
+         IMZporSj0z33BzpiX4C8nlDhlxfLWonIrigQuKnOTrwpB4Da4BPNg33vM/zr4Kef/DtY
+         FADw==
+X-Forwarded-Encrypted: i=1; AJvYcCVTjmzzIam6xT10iQMsiIrrN8IXYpi60IzYvEW/fCgKg9TTXX6jlsrinEFJkkPS1oJiSU8XAPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsIjuSPTZ88wZsM9FQdzHIEo2jqJekMveyqUynxq/CenqgL/Pb
+	1lMCUq+wBuT5k6mh9jp289GuwOQ2n0jmuPJd/vLIPIO7Br1G/5yWUfH/I+dVI8qsJZQEWGAGaBR
+	svdF3CVaEJruuuZ4BbIY6TyeWCs11TLxC/R2G
+X-Google-Smtp-Source: AGHT+IEHa6+eNK5U1LhIiO0/6B2GPO1KeLdYhSCgr67Xox2/uhjVlf1uVwGjcy90Fg6Dhckr6MzhP99E2xnVESp7/l8=
+X-Received: by 2002:a05:6512:3989:b0:52c:dfa0:dca0 with SMTP id
+ 2adb3069b0e04-539ab9d031bmr7280919e87.43.1728357638784; Mon, 07 Oct 2024
+ 20:20:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory
- tcp
-Content-Language: en-GB
-To: Taehee Yoo <ap420073@gmail.com>, Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com,
- kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com,
- danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
- asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
- aleksander.lobakin@intel.com, sridhar.samudrala@intel.com, bcreeley@amd.com,
- David Wei <dw@davidwei.uk>
-References: <20241003160620.1521626-1-ap420073@gmail.com>
- <20241003160620.1521626-8-ap420073@gmail.com>
- <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
- <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241004204953.2223536-1-sanman.p211993@gmail.com>
+ <CAH-L+nO6U12TRCUWNxjAFTSwaMfeadt+iHYtYFZHVJFOZH0sdw@mail.gmail.com> <20241007165611.3ee5bc73@kernel.org>
+In-Reply-To: <20241007165611.3ee5bc73@kernel.org>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Tue, 8 Oct 2024 08:50:26 +0530
+Message-ID: <CAH-L+nOrXuffynLQpPWvd8WaBJMseRCD3vR33CJ2er2fN1-06g@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] eth: fbnic: Add hardware monitoring support
+ via HWMON interface
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Sanman Pradhan <sanman.p211993@gmail.com>, netdev@vger.kernel.org, alexanderduyck@fb.com, 
+	kernel-team@meta.com, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, jdelvare@suse.com, linux@roeck-us.net, horms@kernel.org, 
+	mohsin.bashr@gmail.com, sanmanpradhan@meta.com, andrew@lunn.ch, 
+	linux-hwmon@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000020c9460623ee9f6d"
 
-On 2024-10-04 03:34, Taehee Yoo wrote:
-> On Fri, Oct 4, 2024 at 3:43 AM Mina Almasry <almasrymina@google.com> wrote:
->>> @@ -3608,9 +3629,11 @@ static void bnxt_free_rx_rings(struct bnxt *bp)
->>>
->>>  static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
->>>                                    struct bnxt_rx_ring_info *rxr,
->>> +                                  int queue_idx,
->>>                                    int numa_node)
->>>  {
->>>         struct page_pool_params pp = { 0 };
->>> +       struct netdev_rx_queue *rxq;
->>>
->>>         pp.pool_size = bp->rx_agg_ring_size;
->>>         if (BNXT_RX_PAGE_MODE(bp))
->>> @@ -3621,8 +3644,15 @@ static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
->>>         pp.dev = &bp->pdev->dev;
->>>         pp.dma_dir = bp->rx_dir;
->>>         pp.max_len = PAGE_SIZE;
->>> -       pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
->>> +       pp.order = 0;
->>> +
->>> +       rxq = __netif_get_rx_queue(bp->dev, queue_idx);
->>> +       if (rxq->mp_params.mp_priv)
->>> +               pp.flags = PP_FLAG_DMA_MAP | PP_FLAG_ALLOW_UNREADABLE_NETMEM;
->>
->> This is not the intended use of PP_FLAG_ALLOW_UNREADABLE_NETMEM.
->>
->> The driver should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when it's able
->> to handle unreadable netmem, it should not worry about whether
->> rxq->mp_params.mp_priv is set or not.
->>
->> You should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when HDS is enabled.
->> Let core figure out if mp_params.mp_priv is enabled. All the driver
->> needs to report is whether it's configured to be able to handle
->> unreadable netmem (which practically means HDS is enabled).
-> 
-> The reason why the branch exists here is the PP_FLAG_ALLOW_UNREADABLE_NETMEM
-> flag can't be used with PP_FLAG_DMA_SYNC_DEV.
-> 
->  228         if (pool->slow.flags & PP_FLAG_DMA_SYNC_DEV) {
->  229                 /* In order to request DMA-sync-for-device the page
->  230                  * needs to be mapped
->  231                  */
->  232                 if (!(pool->slow.flags & PP_FLAG_DMA_MAP))
->  233                         return -EINVAL;
->  234
->  235                 if (!pool->p.max_len)
->  236                         return -EINVAL;
->  237
->  238                 pool->dma_sync = true;                //here
->  239
->  240                 /* pool->p.offset has to be set according to the address
->  241                  * offset used by the DMA engine to start copying rx data
->  242                  */
->  243         }
-> 
-> If PP_FLAG_DMA_SYNC_DEV is set, page->dma_sync is set to true.
-> 
-> 347 int mp_dmabuf_devmem_init(struct page_pool *pool)
-> 348 {
-> 349         struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
-> 350
-> 351         if (!binding)
-> 352                 return -EINVAL;
-> 353
-> 354         if (!pool->dma_map)
-> 355                 return -EOPNOTSUPP;
-> 356
-> 357         if (pool->dma_sync)                      //here
-> 358                 return -EOPNOTSUPP;
-> 359
-> 360         if (pool->p.order != 0)
-> 361                 return -E2BIG;
-> 362
-> 363         net_devmem_dmabuf_binding_get(binding);
-> 364         return 0;
-> 365 }
-> 
-> In the mp_dmabuf_devmem_init(), it fails when pool->dma_sync is true.
+--00000000000020c9460623ee9f6d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This won't work for io_uring zero copy into user memory. We need all
-PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV | PP_FLAG_ALLOW_UNREADABLE_NETMEM
-set.
+On Tue, Oct 8, 2024 at 5:26=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Sat, 5 Oct 2024 09:53:30 +0530 Kalesh Anakkur Purayil wrote:
+> > [Kalesh] You should change this label to "hwmon_unregister" as you
+> > should unregister hwmon in case of failure here.
+>
+> Not really, but you're right that there's a problem with the error path
+> here..
+>
+> > > @@ -297,7 +299,7 @@ static int fbnic_probe(struct pci_dev *pdev, cons=
+t struct pci_device_id *ent)
+> > >         netdev =3D fbnic_netdev_alloc(fbd);
+> > >         if (!netdev) {
+> > >                 dev_err(&pdev->dev, "Netdev allocation failed\n");
+> > > -               goto init_failure_mode;
+> > > +               goto hwmon_unregister;
+> > >         }
+>
+>
+> .. I don't think we should unregister HWMON if netdev alloc fails.
+> We will enter "init failure mode" (IFM), and leave the driver bound.
+> HWMON interface can remain registered, just like devlink and other
+> auxiliary interfaces.
+[Kalesh] I see. Thank you Kuba for the explanation.
+> --
+> pw-bot: cr
 
-I agree with Mina that the driver should not be poking at the mp_priv
-fields. How about setting all the flags and then letting the mp->init()
-figure it out? mp_dmabuf_devmem_init() is called within page_pool_init()
-so as long as it resets dma_sync if set I don't see any issues.
 
-> 
-> tcp-data-split can be used for normal cases, not only devmem TCP case.
-> If we enable tcp-data-split and disable devmem TCP, page_pool doesn't
-> have PP_FLAG_DMA_SYNC_DEV.
-> So I think mp_params.mp_priv is still useful.
-> 
-> Thanks a lot,
-> Taehee Yoo
-> 
->>
->>
->> --
->> Thanks,
->> Mina
+
+--=20
+Regards,
+Kalesh A P
+
+--00000000000020c9460623ee9f6d
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEINSJR/+yUC+w+TNEWXo3r+VBk/qlu1akpi1d5QPMtHlJMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAwODAzMjAzOVowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB64iDQc7ht
+wOQDW4i8/6QfDGkP452NCi6+zhriqqevgoaPyBbjcafA8T6Hw0eps3HiP+cwCuRd9eEuQnKdQtmM
+nYDHBHPos90M1aHCUJGtGdsfWK2jCfosa7kCmmyrrsToZJ1aVAOzmoT8sIm9wEffCMv3LXadfLu/
+qR8J94eo24pLPYko1BCdfpPzqyAO+Xo33YEGhfCkA/OaZAU6f3OpYFBzFkQhKk/PGE+CYmOffGSf
+N+OuB4H9IAebWEbXiVQvjMxab5Q2+u4P+ZYhrzABEOgdYlrO1Sgkvujf6oyzijPiU26qTCAlQhpi
+ccqyKeam/IX+Yd+f/EZMJb9kVLYP
+--00000000000020c9460623ee9f6d--
 
