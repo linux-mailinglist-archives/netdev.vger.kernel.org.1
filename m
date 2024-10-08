@@ -1,167 +1,167 @@
-Return-Path: <netdev+bounces-133255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0C099565D
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:22:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 591F399565F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E04CF1C25417
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:22:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FF2E1C25440
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3020B212D0F;
-	Tue,  8 Oct 2024 18:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C98C212647;
+	Tue,  8 Oct 2024 18:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Ao4PoGI9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gE4Kw4Mx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3AE20ADE2
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:22:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9B11FA25F
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411772; cv=none; b=ttm+bVM6qhzC+D/riyZwKFFUbAV9rACTSnD1intNffRz4ScARggRCQj02tWiMyPdm+jbr+Aq5n6L5e2b3kdH93vctoy+QoPDvTkkGiv8FJcjNevoRWCRp/p2zWdOmUAbvp6ildppB52cCYZYMaG5I/Z7t+Zdaw96vuKGJB1ainQ=
+	t=1728411819; cv=none; b=GaBCRHutmDl6n0W5+2CKuMVoFCGMdWHOc50Q295S0Ss8AbPjnBd/aZNZLwrjHa3gzheI3CexerdYeX6tY5xJ+VwMnFstjMFYPOTCG7XZ3hVCowgJaU8YXXIE+SCuFyn5iuiJlRJUwt+G6eDbZ1sNF5BOx/CtFQTzrC7i+9LT7oI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411772; c=relaxed/simple;
-	bh=Soj8mFaLd1Cyy0ejjBioY9cxLP9QIIW58JDFeiu2ts0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B6PJq3Ln67A39SVetKd9ClzsySxS0cY8nAec1wZ5EVqyThTLI4+PUu22Bac2KBouoQm1dGdCfDw/3SbI35PZRUtWNx+HD+i5tqeE8qYQPsja8WuYRzhrpoKwpcgvzZOi1/FTh52C/ucKF4dg0GYA2JC1rhnmMKvg7Cqrhh3anfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Ao4PoGI9; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20b9b35c7c3so62564995ad.3
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 11:22:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1728411770; x=1729016570; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mfgCpS5PaaDvZjkTJaE/xBzcbJqmdBm8+yyCnyw3De8=;
-        b=Ao4PoGI9vwBp2XBS9TbUrC82t+VibfUVIqpnOWesXqezv0Br5BL3Ty6wA+tIYl1bwg
-         Gl3KwX7OxATwATQ4aFYcSBL764vZgdr5lfvNManB36kYOHUNNMjmJjglTqDhY7hkgNAh
-         S6g4uoFnk9dwmJfotqQFxrZf4dItl8v4X5YDU=
+	s=arc-20240116; t=1728411819; c=relaxed/simple;
+	bh=QT1T0IupaRLSifJ+RTMvxTlMl+w41dvAcOZCuAwcrOs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jk5UUOEBjbLNKKx+4+B2HPSjRA+2ufDf6MjGzzSQEn0FIQPtAeCaHWIwK/gk4GxBywqv6il1pXPZII747NLaGNwXwp6Z5p5oo4wGJLF1dBzugSVEt96+CnZNcA7bYtc+NfpdUdxUf930KZQu3D1svn3TwQkD0IW5aKZl6A7Kpsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gE4Kw4Mx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728411816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QT1T0IupaRLSifJ+RTMvxTlMl+w41dvAcOZCuAwcrOs=;
+	b=gE4Kw4MxAliHqMm7ipsgMlY6MM+ss6e+VoSCE1VmQFC4Bw9g29AO93Q+5kw0h9II2EBQ2k
+	WUktSZ5KCZ2Zm8N9KXOFSfs8DlUus6Z9/ckRmmtTgBDx6agzooe8Ck1uxo3Bzyp2V2B6n2
+	smCXlusSaStSnGrmJ71iHhEjwV+bU0A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-xLJGQuWSNKuCE8CTpG0MeA-1; Tue, 08 Oct 2024 14:23:35 -0400
+X-MC-Unique: xLJGQuWSNKuCE8CTpG0MeA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cbadcbb6eso52154835e9.2
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 11:23:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728411770; x=1729016570;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mfgCpS5PaaDvZjkTJaE/xBzcbJqmdBm8+yyCnyw3De8=;
-        b=MW1EfhYJc2LrCcMc4Gs+LKML84MEHawlxRwcPWBJ/X/q71yn8GWJNUlpB+YTg/MbOB
-         aH2/kva1tNleHVgg9tPz8KgFJ3/q18k2pssku0Gcl/5/vQEz5MNSceIzySRS2mrOOx4W
-         HPzpt8Z7R9VVAH2jBGBJlsxA6oQ2+KFZfE5xqH1aIe64bAoIc8ans1A3rOUHNDLMvpPS
-         NuO86NRj0WBzgj1zd4Ht/gc8es+rtWgRyW0XhyNCENGxg1CtuvFey4wQpSNrB75JitWT
-         cz0vKBqWpKTH1T4vPbWrEsuoPqm4+i/Jm7ACB7DqXqM+zTzHLpK1H+2X+SzdpCbMNl/K
-         D5UQ==
-X-Gm-Message-State: AOJu0YyKbTH6ojIc0V0WaSM8dVydezfxuCWN27ckX50kCwV4xzjj4+mt
-	T5UJY+R11BTqMNWd2PGM/PVvvU2eiYj+prLS8c7BzEwef3cxqdHnNtR5mpftc9IALzlPZgQfDBU
-	ap3KGpH0rMwYHYDeRvqjfctrTdQjWfVaHfypGp5YRoYbcnDmdFL80KesOoIRY8Lj7qbYquhkyqM
-	rKJsALyolpO223HuUDCmtixMSf7EB/H9l89Wc=
-X-Google-Smtp-Source: AGHT+IGLwKH5D8GmqT91lF+IEqFV1bkPlXaOCwMdX6WQyBYQ2vbuWPbJ2h7utnI4zy5Lzw/E/iDnDg==
-X-Received: by 2002:a17:902:ea0f:b0:20b:a431:8f17 with SMTP id d9443c01a7336-20bff1c4055mr294243605ad.58.1728411769685;
-        Tue, 08 Oct 2024 11:22:49 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c1395a408sm58422345ad.193.2024.10.08.11.22.47
+        d=1e100.net; s=20230601; t=1728411814; x=1729016614;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QT1T0IupaRLSifJ+RTMvxTlMl+w41dvAcOZCuAwcrOs=;
+        b=t4IzUtT4cHDxHuHScVcTfMXKXGEPasnvVbtLjQ8b1liCG572JAj7WCpstig+S0k2SI
+         nN2c3LeLAcFI1K34/jXgnAFbykKu3XqgAYJHVKD+0FB942+8cbalAQuB2QjVbO92VFd3
+         sCNXjwXAbuRnattD1UeOOdJ8bz0IxFY3dvllkDXYf8WSoyNGj1lbGkVxnEkUk77XwxXe
+         IS6OxLKaVVAQGTXcN/5YNltylRyNgX+u6XG3Ct1G8Wdgvung6gpVnYWiz1JseF5teqEt
+         agP+JPrMyoWnOddiOYfz3o07aKvzDJN9euVt7YFPzv2C+M/CDkN+Hm7mSdcQPCFvYjfT
+         m+IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXewGaFEzvIr3z4qofqMo8yFKpTaT7lWObqN8jPPt8vkjguMf8jy3KX6WGdpDu0n41ZFgkUUuQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvJsxNTB2LJ4r0Ox1WQmmSccj5pI9KbNmlR32RsfkKXMF3ERlg
+	Ym9KUvLnJCgRP6YEa9uF4BUen7w1MMZqKM0gW/xryk6TjGWNAz13/TxD/w4gd2UU8KZ5ZOCCFbI
+	Qfx/wD1v1L52+X0kPF2N6CoXGiIefavacJnQ7J2fWZ3MiNOOU71Kq7g==
+X-Received: by 2002:a05:600c:3c83:b0:42c:b037:5fce with SMTP id 5b1f17b1804b1-42f85a6c5d5mr133510605e9.3.1728411814171;
+        Tue, 08 Oct 2024 11:23:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGmS6JLmeixjyN9tqj9ltRwcrgP3TJf4cIZp+RtyX56Pa2J25VMfpSue5hJhJ9yNS5s1/078g==
+X-Received: by 2002:a05:600c:3c83:b0:42c:b037:5fce with SMTP id 5b1f17b1804b1-42f85a6c5d5mr133510285e9.3.1728411813778;
+        Tue, 08 Oct 2024 11:23:33 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86a0a8a0sm135269295e9.6.2024.10.08.11.23.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 11:22:49 -0700 (PDT)
-Date: Tue, 8 Oct 2024 11:22:45 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
-	bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
-Subject: Re: [RFC net-next v4 3/9] net: napi: Make gro_flush_timeout per-NAPI
-Message-ID: <ZwV4dUxPZIVG366J@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
-	bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
-References: <20241001235302.57609-1-jdamato@fastly.com>
- <20241001235302.57609-4-jdamato@fastly.com>
+        Tue, 08 Oct 2024 11:23:33 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 9A5CC15F3BD2; Tue, 08 Oct 2024 20:23:31 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jiri Olsa <olsajiri@gmail.com>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Simon
+ Sundberg <simon.sundberg@kau.se>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH bpf 2/4] selftests/bpf: Consolidate kernel modules into
+ common directory
+In-Reply-To: <ZwV3d5-sBYtgt2vi@krava>
+References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
+ <20241008-fix-kfunc-btf-caching-for-modules-v1-2-dfefd9aa4318@redhat.com>
+ <ZwVv_ZOvh2mTGAlK@krava> <87ploascn2.fsf@toke.dk> <ZwV3d5-sBYtgt2vi@krava>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 08 Oct 2024 20:23:31 +0200
+Message-ID: <87ed4qsbbw.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001235302.57609-4-jdamato@fastly.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 01, 2024 at 11:52:34PM +0000, Joe Damato wrote:
+Jiri Olsa <olsajiri@gmail.com> writes:
 
-[...]
+> On Tue, Oct 08, 2024 at 07:55:13PM +0200, Toke H=C3=B8iland-J=C3=B8rgense=
+n wrote:
+>> Jiri Olsa <olsajiri@gmail.com> writes:
+>>=20
+>> > On Tue, Oct 08, 2024 at 12:35:17PM +0200, Toke H=C3=B8iland-J=C3=B8rge=
+nsen wrote:
+>> >
+>> > SNIP
+>> >
+>> >> diff --git a/tools/testing/selftests/bpf/bpf_testmod/.gitignore b/too=
+ls/testing/selftests/bpf/test_kmods/.gitignore
+>> >> similarity index 100%
+>> >> rename from tools/testing/selftests/bpf/bpf_testmod/.gitignore
+>> >> rename to tools/testing/selftests/bpf/test_kmods/.gitignore
+>> >> diff --git a/tools/testing/selftests/bpf/test_kmods/Makefile b/tools/=
+testing/selftests/bpf/test_kmods/Makefile
+>> >> new file mode 100644
+>> >> index 0000000000000000000000000000000000000000..393f407f35baf7e2b657b=
+5d7910a6ffdecb35910
+>> >> --- /dev/null
+>> >> +++ b/tools/testing/selftests/bpf/test_kmods/Makefile
+>> >> @@ -0,0 +1,25 @@
+>> >> +TEST_KMOD_DIR :=3D $(realpath $(dir $(abspath $(lastword $(MAKEFILE_=
+LIST)))))
+>> >> +KDIR ?=3D $(abspath $(TEST_KMOD_DIR)/../../../../..)
+>> >> +
+>> >> +ifeq ($(V),1)
+>> >> +Q =3D
+>> >> +else
+>> >> +Q =3D @
+>> >> +endif
+>> >> +
+>> >> +MODULES =3D bpf_testmod.ko bpf_test_no_cfi.ko
+>> >> +
+>> >> +$(foreach m,$(MODULES),$(eval obj-m +=3D $(m:.ko=3D.o)))
+>> >> +
+>> >> +CFLAGS_bpf_testmod.o =3D -I$(src)
+>> >> +
+>> >> +all: modules.built
+>> >> +
+>> >> +modules.built: *.[ch]
+>> >
+>> > curious, the top Makefile already checks for test_kmods/*.[ch], do we
+>> > need *.[ch] ?
+>>=20
+>> Not really for building from the top-level Makefile, that is for running
+>> 'make' inside the subdir, in case anyone tries that. Don't feel strongly
+>> about it, so can remove it if you prefer?
+>
+> no strong feelings either ;-) I was just wondering what was the
+> purpose
 
-> Note that idpf has embedded napi_struct in its internals and has
-> established some series of asserts that involve the size of napi
-> structure. Since this change increases the napi_struct size from 400 to
-> 416 (according to pahole on my system), I've increased the assertion in
-> idpf by 16 bytes. No attention whatsoever was paid to the cacheline
-> placement of idpf internals as a result of this change.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  .../networking/net_cachelines/net_device.rst  |  2 +-
->  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  2 +-
->  include/linux/netdevice.h                     |  3 +-
->  net/core/dev.c                                | 12 +++---
->  net/core/dev.h                                | 40 +++++++++++++++++++
->  net/core/net-sysfs.c                          |  2 +-
->  6 files changed, 51 insertions(+), 10 deletions(-)
+Actually, removing it means the .ko files may not be rebuilt. But it's
+not enough with just that dependency either; will give it another try
+and see if I can avoid a .PHONY (or just add that if not)...
 
-[...]
+-Toke
 
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> index f0537826f840..fcdf73486d46 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> @@ -438,7 +438,7 @@ struct idpf_q_vector {
->  	__cacheline_group_end_aligned(cold);
->  };
->  libeth_cacheline_set_assert(struct idpf_q_vector, 112,
-> -			    424 + 2 * sizeof(struct dim),
-> +			    440 + 2 * sizeof(struct dim),
->  			    8 + sizeof(cpumask_var_t));
->  
->  struct idpf_rx_queue_stats {
-
-Now that idpf was fixed separately [1], this will be removed in the
-v5.
-
-[1]: https://lore.kernel.org/netdev/20241004105407.73585-1-jdamato@fastly.com/
 
