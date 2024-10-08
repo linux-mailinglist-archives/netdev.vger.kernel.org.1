@@ -1,95 +1,134 @@
-Return-Path: <netdev+bounces-133164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0729F99525A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:50:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73BE0995274
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BC661C25308
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5AB41C22520
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5521DF73C;
-	Tue,  8 Oct 2024 14:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F227B1DF755;
+	Tue,  8 Oct 2024 14:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+sIumao"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QADCXBO/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565581F951
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:50:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7153A1DEFF4
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728399019; cv=none; b=fa8rz2EgN0o2vw8nBbzfHIK6meu5oXHxPbUmOT1Ol1lVIsFmK2ksTNZEw12Dil3YDBn+AmHsmz9G3Cn/wgfo0IfR3l9lFo1vSn30gqkAo6smnM/GinLLkpwNa6rZz5lB8fMn/iv9DpjO5zapInZBfMuEC1ppXHSEBuqJi0GUvxU=
+	t=1728399209; cv=none; b=VAYvfL+N6ZQg8tTusCTfouXYUKUBG8ohkwmNxdYWivtVhDKytx8wBppIxj866HtKR7ru/6z8r3Fl1lVuC+JfvqD9I1uaoxZmIcqKxKvZaYIlvkVDNlO/WU/CjfrfdZgAGy9w3jQX6C0Swl4rfpcCTNuPkvHwFQiasQSH1OBr83A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728399019; c=relaxed/simple;
-	bh=+j+v3UYpnMzW7J7g6sIYcIpEgGF78nSWnO/jzThNHHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vE2CgkjVazsgpNcGSJOQerqZcYj/A2XS99xs9xIy4VPKLppNzL77+QqtIVgWM7ap+FJaQbv/0gwESZv2U8CHNnRo7Sv20+qPYUnftp1Us6BU4z1tK3mxeYQ/f0GyuvkufDIV032e3o/OgNZOFclhG8iAVhqboN+X4qH+SBV738w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+sIumao; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 985C7C4CECD;
-	Tue,  8 Oct 2024 14:50:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728399018;
-	bh=+j+v3UYpnMzW7J7g6sIYcIpEgGF78nSWnO/jzThNHHE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o+sIumao3hoRJJUbNc8aty/yjFpQ8opdDVYYe/DDZBYxcTrFLu4RiUUfQPW18AiJC
-	 XvJ5tunBaWoK779OUxFfOd4Ao2FKnabQ7iGSOo0mZK2Ku/kOZf9eKNptK5XEdsJyln
-	 EpAlN/lCx+WTmDAojwNP9GVkk0Lny4PNYLKvVPubbVzrZqr7U7e3LHwJNK4lEp3t/1
-	 x5ce1oOWCpZ/ne1ekxyDvqxiEZIyTw1uIpW78KqvfoJQb6EZX8KkEW/zKXfAhbxYNW
-	 fyTBR7H0SB5xMTIW2kMQXLiBGwrdYEwN5C3QnHWkagTj2DZ7RwtKjP9G/Wldn3v/or
-	 Dq7b7oeZ6aR5w==
-Message-ID: <c2781afc-7b89-4f70-8a37-bb2436716a91@kernel.org>
-Date: Tue, 8 Oct 2024 08:50:17 -0600
+	s=arc-20240116; t=1728399209; c=relaxed/simple;
+	bh=dJ+phDu608OwfoSQL8OjPwYHi2jN2anIiwC0f3VDGvA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PgARIHUOLVLyaXP2s/9e+N70QEvYja6p+PKNxSv7cV+B8DXDPAnqCiIV78PGtvMaQJ12Y0wF91A1HUdd62KmBgdo7SRI4f4obWnQndgNtHzhvgdLRoJKaQ4ZCzWmZOoA9wAqYgHsn0T30Xmg3KTA5ejZ+rs6BToDIyXZlKievuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QADCXBO/; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728399209; x=1759935209;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=PMFonxy8Bo1S3VCyJqYN3YIMsw0zvRhenazbSD7CoWU=;
+  b=QADCXBO/50Q7m9H0cwPj1Jo5I5frQS7pL+lcAzNoyh30bdCOpNUVnDVJ
+   MFCRzCaUwUO4eDX8oQ9/AI7BPTijzeWrfjOn0odTZOSmlnsQdFx9t0fVA
+   lzL+xQAW8iwkncWmkdqZxl+YnT5cNzBkPPc+EnElzJMBCk0s5nWhsUNBM
+   M=;
+X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
+   d="scan'208";a="764745431"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 14:53:21 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:44772]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.239:2525] with esmtp (Farcaster)
+ id 7fd53068-02e6-496b-8ecd-2fbbcd3312ac; Tue, 8 Oct 2024 14:53:20 +0000 (UTC)
+X-Farcaster-Flow-ID: 7fd53068-02e6-496b-8ecd-2fbbcd3312ac
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 8 Oct 2024 14:53:20 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 8 Oct 2024 14:53:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 1/2] Convert neighbour-table to use hlist
+Date: Tue, 8 Oct 2024 07:53:10 -0700
+Message-ID: <20241008145310.85530-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241008073855.811502-1-gnaaman@drivenets.com>
+References: <20241008073855.811502-1-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/7] ipv4: Convert __fib_validate_source() and
- its callers to dscp_t.
-Content-Language: en-US
-To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <cover.1728302212.git.gnault@redhat.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <cover.1728302212.git.gnault@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWB004.ant.amazon.com (10.13.138.104) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/7/24 12:24 PM, Guillaume Nault wrote:
-> This patch series continues to prepare users of ->flowi4_tos to a
-> future conversion of this field (__u8 to dscp_t). This time, we convert
-> __fib_validate_source() and its call chain.
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Tue,  8 Oct 2024 07:38:55 +0000
+> > > @@ -388,21 +366,20 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
+> > >  
+> > >  	for (i = 0; i < (1 << nht->hash_shift); i++) {
+> > >  		struct neighbour *n;
+> > > -		struct neighbour __rcu **np = &nht->hash_buckets[i];
+> > > +		struct neighbour __rcu **np =
+> > > +			(struct neighbour __rcu **)&nht->hash_buckets[i].first;
+> > 
+> > This will be no longer needed for doubly linked list,
 > 
-> The objective is to eventually make all users of ->flowi4_tos use a
-> dscp_t value. Making ->flowi4_tos a dscp_t field will help avoiding
-> regressions where ECN bits are erroneously interpreted as DSCP bits.
+> This is not as-necessary with a doubly-linked list, but unfortunately
+> I cannot eliminate it completely, as the `n` might be released in the loop
+> body.
 > 
-> Guillaume Nault (7):
->   ipv4: Convert ip_route_use_hint() to dscp_t.
->   ipv4: Convert ip_mkroute_input() to dscp_t.
->   ipv4: Convert __mkroute_input() to dscp_t.
->   ipv4: Convert ip_route_input_mc() to dscp_t.
->   ipv4: Convert ip_mc_validate_source() to dscp_t.
->   ipv4: Convert fib_validate_source() to dscp_t.
->   ipv4: Convert __fib_validate_source() to dscp_t.
-> 
->  include/net/ip_fib.h    |  3 ++-
->  include/net/route.h     |  7 +++---
->  net/ipv4/fib_frontend.c |  9 +++----
->  net/ipv4/ip_input.c     |  4 ++--
->  net/ipv4/route.c        | 52 ++++++++++++++++++-----------------------
->  net/ipv4/udp.c          |  4 ++--
->  6 files changed, 38 insertions(+), 41 deletions(-)
-> 
+> I can convert this function to use a `struct neighour *next` instead,
+> if it is more palatable.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Yes, using hlist_for_each_entry_safe() is more preferable.
 
+Mixing for() and while() is harder to read.
+
+
+[...]
+> > > @@ -693,11 +666,10 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
+> > >  		goto out_tbl_unlock;
+> > >  	}
+> > >  
+> > > -	for (n1 = rcu_dereference_protected(nht->hash_buckets[hash_val],
+> > > -					    lockdep_is_held(&tbl->lock));
+> > > -	     n1 != NULL;
+> > > -	     n1 = rcu_dereference_protected(n1->next,
+> > > -			lockdep_is_held(&tbl->lock))) {
+> > > +	hlist_for_each_entry_rcu(n1,
+> > > +				 &nht->hash_buckets[hash_val],
+> > > +				 list,
+> > > +				 lockdep_is_held(&tbl->lock)) {
+> > 
+> > Let's define hlist_for_each_entry_rcu() as neigh-specific macro.
+> 
+> Can you elaborate on this?
+> Do you want the `list` parameter to be eliminated?
+
+I mean like
+
+#define neigh_for_each(...)		\
+	hlist_for_each_entry(...)
+
+#define neigh_for_each_rcu(...)		\
+	hlist_for_each_entry_rcu(...)
+
+are better if there's repeated arguments.
 
