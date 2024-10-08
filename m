@@ -1,122 +1,114 @@
-Return-Path: <netdev+bounces-133083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76DEC994764
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:39:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83419994792
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A89D91C2131B
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:39:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE1061C22954
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF2318C34B;
-	Tue,  8 Oct 2024 11:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1294F1C32EB;
+	Tue,  8 Oct 2024 11:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WGoxvEFS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xR4kWAEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBFC7603F
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 11:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF0C17E46E
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 11:47:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728387572; cv=none; b=HuC6CNKT0knuZn9cTcGn/naP2V/U0AoA7NCKN/CeRfnXBMBD8REwfY7F6HuUS4Si708VYZ3E9T+nm4BbDbEomGELohwRmTlOgY1baUS59DLiK8dz3cAYM9fZAE2sxJv6HQJorGUnFgCyVcNLPqoBti7V39cnawrWnImi9xP5aac=
+	t=1728388026; cv=none; b=upGkz3zY3XgJfeJUYs8B/RIVz59Ox3wWQoNuZpiIjoMSAjaadON8hJNEjk0lkNqspGP9P41IXkGSVqa19ByNChZSXjOGzEEQI3r0/kOq47iUJWq6mKEtueJOPMfQgeK8Tv2nXxufOBwUjL7qbwIU0suDnCto00TI8z929ZtfceU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728387572; c=relaxed/simple;
-	bh=vVv2HQeualJzsRiKRMlBt4GSWwOleNVZKFGNx217o9Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eCCzgnZFEPllrbQisR4PpSUJDyYIHKdXFXJq0iEDDhk48SmElbp1mtBpF7yKowsCVnT/0pxsXaD7zHI1EV31F5CGj3ZsYcdMp7g5gQiJRxKTb8wPm82RmiRxjk3yjZ6oxqay+qc0KQ7DlGNo4ZLKQfQL83f+lMkXlGCOuFfWU5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WGoxvEFS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728387569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FxDGgvkDT/57XpSGr5RK8tkhMx+n1nu73Cyl/CUOtxM=;
-	b=WGoxvEFSp+xhlmwn0+ZePv2+yfoBYXMrqseC2TqqIuuEXWEB+1xUWJ9wbffnbV/H8F3Iy2
-	g6+Jk7l0MFdEfo2mZC/raIsRujLTiT7T9NWXkNGiBP1VLPYDBLONcHyB1Fl2JgwjZvbD5t
-	9MFyxlC4DxPdcGyN9Saf5BPp/1JTm5I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-635-UV8w9AvANtu-nkhsa9Th9w-1; Tue, 08 Oct 2024 07:39:28 -0400
-X-MC-Unique: UV8w9AvANtu-nkhsa9Th9w-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d325e2b47so234816f8f.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 04:39:28 -0700 (PDT)
+	s=arc-20240116; t=1728388026; c=relaxed/simple;
+	bh=8eBLVsF7+Qd4Em+92lzMOio71Jz+DnLv/+w9kHCnyMQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=um0HWgQHS/Ur7Jqs/z4SrUB+FAkfYFWZ1cFp2vVvawJPRGM8hd5lzKWWMvYOquX05zlRFMetf6FVVhh0WqgVKD4L+Smdo3EzsMmLIRS/QiJRrgUXLQBArwwMZzvWmhybYjn9AH5QuGFumMUQ2b+FForNvIzUj+RQGtovINLT7Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xR4kWAEy; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c8967dd2c7so6882922a12.1
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 04:47:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728388022; x=1728992822; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yn5bvQYXbahh0w5GMTaNY7/TGpX6grGsSZGo3CNlfBE=;
+        b=xR4kWAEyEyy2+XImiT6EEaMtQwNTOoXtvx/0QREJ0pXtIF7fBJwIRU1NyScRY9dkpa
+         jVIaFJJ7hPdud9ab65jBW/6Ir+y6NQ456k4q564yzn/zryWssFomF2DZVi26BB38zePR
+         gqZP1QQlePsAbMGZBCfDcP+YXxKGr0jDi+Gg6V3UA6qwx5K5hVoMBjOUvd4h7GOP5Wxy
+         4Cc6jWqv+7O9Fu4YR2lqsV+eyhNPq2WsXRFvXId5pf4cFQJHuxO1xv9P01iPKHXaWwOQ
+         Ba8rrp15P+GxPf5KnP6pFXxJ2rRb4C86D1gHSwDEE0bK1StDbRQxVjZMmQQOhuVsClBM
+         rgew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728387567; x=1728992367;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FxDGgvkDT/57XpSGr5RK8tkhMx+n1nu73Cyl/CUOtxM=;
-        b=LPmlxA+fP48FYfSeNdPS9zWg3kAka5q9ixi6oofS0pncqyGUT9HsqXbSnzbULOemte
-         T2gKX9ilMgCUAZlh97vonhb9CAPRr44kDQjKoVjR60IMJBB9FZZ/lfVr4dAcY01h2fTb
-         PfVlmNTb1V2FMfEObMLfrywJ1C4ruYN0fsFn7JSti67GnjZsaOkAWziB0G16aTJepcCX
-         P0OwEo0IkDEMaS3YrVVZRItVus8z7hy/Kt0ZI2/a5l/nCSa7dqj9jiIDKlguQKTrD1U9
-         jQWh+RV37m/arFFZ5QRZkHNCjRSIaAbiEait52sGA9RPa2GZwbuFKH29u0N7KOdBh1j3
-         t5nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXda/LSawEnSor1lwjXpxpvltbncY6WG2RWg7/eH4MvPG+sWAlvneJNG5KNJEfRxrWVWYaTfWQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqY3XQ9VCibBtDLDXnp13EtxsPVtG0pBE7W6y/VifJ/s+m7cpi
-	luUz4dP4KQqYx2iCct2bTB+QgFrD+t5Et60Ng9+ITXR8dUhjA6gmIqihMvz60h0hA8ZiMTF05vz
-	py2wpgSv9lXd2fdWycgF8d9T43idhACwSPXmMmMA0NxI3Fpa+izY3ZA==
-X-Received: by 2002:a05:6000:4388:b0:37d:3735:8fe9 with SMTP id ffacd0b85a97d-37d373591d2mr358508f8f.27.1728387567161;
-        Tue, 08 Oct 2024 04:39:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2DVqn4uMhCYJiG0NuR9jrs7EDGISRMPqzuswPK0QuRhTb3Wl5kro0l1tRlN0DgD2tl+hi+w==
-X-Received: by 2002:a05:6000:4388:b0:37d:3735:8fe9 with SMTP id ffacd0b85a97d-37d373591d2mr358497f8f.27.1728387566775;
-        Tue, 08 Oct 2024 04:39:26 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89e89624sm106260925e9.12.2024.10.08.04.39.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 04:39:26 -0700 (PDT)
-Message-ID: <9bb97d2c-878f-479a-b092-8e74893ebb2d@redhat.com>
-Date: Tue, 8 Oct 2024 13:39:24 +0200
+        d=1e100.net; s=20230601; t=1728388022; x=1728992822;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yn5bvQYXbahh0w5GMTaNY7/TGpX6grGsSZGo3CNlfBE=;
+        b=cIQCzhIiXiUu8FQXecPqd4QefWiB36oE070E/srognxSWpnodV7VfyQBaQWjtZNkAr
+         0rvL2dTYcGiC16A/NIqhs+baCb+seuK1yGs1yf67aVolCK4oAzmrL2ODqFnil17emR+g
+         wGCJURC1my6HXeoUeHmp3x8CaoHtRgOjGIedV5GeH5e9KDkwpk2HuJGvMPlIIsJMCQnl
+         Zm+RXlMM/AKbIsrmDDAnv/mrD8jmXq72MXOtZLB0Tm2+vYp84QrNOA2Au3JY3u9yJ2Vj
+         gnZ3dcV/uALMp7k9RPyQxrp+4IRuFqypRQM5moxxGUXLf4uSA3ugNd5sqyipSJww4KbH
+         3wbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWwQESV48SiCtXtRy97SxTGP8/CQNACx8TR3QH8g46XuOYN76T/ICPsz6uqtUHuOrvD0z4ALG4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsvJPC9GtlkJhVqXrblqW+9HrMDEqA/OEWdw4cksiCZS2vrAfs
+	PuIeGYuLCPAi5/LIOWq3WRMGd1P+NLdUuGJzKh33Wx0BccDjhKEbCSDIva71Zyel97CcDfSgZid
+	4prc9Kosc6t/kqbyAYBMc46eThCHd4xG1TA5w
+X-Google-Smtp-Source: AGHT+IFPp3s0/AADwLxt68BA1G/oYZCKr4rkZahFkqxz9X+HDwtkqKMUMFkKgtxKQnuP/Wij6rxItL3AwQoy/VRGPw8=
+X-Received: by 2002:a17:907:94d2:b0:a99:76bc:db6c with SMTP id
+ a640c23a62f3a-a9976bcddd2mr148398166b.52.1728388022306; Tue, 08 Oct 2024
+ 04:47:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+References: <20241004221031.77743-1-kuniyu@amazon.com> <20241004221031.77743-4-kuniyu@amazon.com>
+ <9bb97d2c-878f-479a-b092-8e74893ebb2d@redhat.com>
+In-Reply-To: <9bb97d2c-878f-479a-b092-8e74893ebb2d@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Oct 2024 13:46:50 +0200
+Message-ID: <CANn89iKcbZQhmTV2tbv-7u9WSg2rFkiMRWLieBz-a7c6xT1o5A@mail.gmail.com>
 Subject: Re: [PATCH v3 net-next 3/4] rtnetlink: Add assertion helpers for
  per-netns RTNL.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-References: <20241004221031.77743-1-kuniyu@amazon.com>
- <20241004221031.77743-4-kuniyu@amazon.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241004221031.77743-4-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Oct 8, 2024 at 1:39=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> Hi,
+>
+> On 10/5/24 00:10, Kuniyuki Iwashima wrote:
+> > Once an RTNL scope is converted with rtnl_net_lock(), we will replace
+> > RTNL helper functions inside the scope with the following per-netns
+> > alternatives:
+> >
+> >    ASSERT_RTNL()           -> ASSERT_RTNL_NET(net)
+> >    rcu_dereference_rtnl(p) -> rcu_dereference_rtnl_net(net, p)
+> >
+> > Note that the per-netns helpers are equivalent to the conventional
+> > helpers unless CONFIG_DEBUG_NET_SMALL_RTNL is enabled.
+> >
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>
+> I guess Kuniyuki stripped the ack received on v2 due to the edit here.
+>
+> @Kuniyuki: in the next iterations, please include a per patch changelog
+> to simplify the review.
+>
+> @Eric: would you mind acking it again? Thanks!
 
-On 10/5/24 00:10, Kuniyuki Iwashima wrote:
-> Once an RTNL scope is converted with rtnl_net_lock(), we will replace
-> RTNL helper functions inside the scope with the following per-netns
-> alternatives:
-> 
->    ASSERT_RTNL()           -> ASSERT_RTNL_NET(net)
->    rcu_dereference_rtnl(p) -> rcu_dereference_rtnl_net(net, p)
-> 
-> Note that the per-netns helpers are equivalent to the conventional
-> helpers unless CONFIG_DEBUG_NET_SMALL_RTNL is enabled.
-> 
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-I guess Kuniyuki stripped the ack received on v2 due to the edit here.
-
-@Kuniyuki: in the next iterations, please include a per patch changelog 
-to simplify the review.
-
-@Eric: would you mind acking it again? Thanks!
-
-Paolo
-
+Let me check this new version :)
 
