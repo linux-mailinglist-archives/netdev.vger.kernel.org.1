@@ -1,172 +1,219 @@
-Return-Path: <netdev+bounces-133312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C950B995947
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:30:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFE4995883
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9381F244EB
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:30:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C2B31F25C3F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7D0215024;
-	Tue,  8 Oct 2024 21:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31003212EF2;
+	Tue,  8 Oct 2024 20:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b="c/w4o3H2"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2099.outbound.protection.partner.outlook.cn [139.219.146.99])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 714FC215F41;
-	Tue,  8 Oct 2024 21:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728423008; cv=fail; b=somZIy31EID8NHM5RKuFU+usFKc4/ce1kztzIvj1YSbrbTdUEf8vY++89HbKEBXaoM2b6Kr5sfk1gE21HS36yTBinzgfqSShTQtl/Gazd6uVlTjg0TehtTWF40TeYT6U/9bpH+4t84rUVEK3QAuLMF2CAlPXOhtduPXHWJ05DZ4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728423008; c=relaxed/simple;
-	bh=WNA5Vi+Wws8szwYywwSUDVbf+/xf6pyHD5DBb+OG+vY=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=PgdvURus/HdF2Yz7oL6gMm4JF3OIC9sQ1Fa78wCcPiBwH6fCSOojB3VvZyJchcyD0Tr/hHv25I76ldcoLgV97IOY3BzSo/yRUmjLjSnoIfl+d2Q5r+KAmiE9Dr2JoYs0h9J3TX8vnthwkBoBwCn4GKQbIdamfOB0ZfVUfovFeyo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-Received: from SHXPR01MB0526.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1d::11) by BJSPR01MB0516.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:10::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Tue, 8 Oct
- 2024 21:30:00 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ktAyFTVGUaJp6vKc8y66S1E/uyCf8Vxdl8mIRoFKw6U6oQs+g33V6IVY4q1K4EK8sBN6dEjuLyv0fKfQz5nnaAPiaXOQIeeaFgMh7DRGLntbWdpm18DkFGnXHzzsczLcPqiKijBNBy0vzOLrBRReWJA7pWNphgmcfKwahDosHY8TyoJ65aixmFqHMQ1IqV/W/glNa0biE5EDjriZvLqS36MgUeLHeY5Yi0szkIcH6NDLVBDmZ67gD8V9WYdxhxoOCCWLKB/nMxigxGODWlRv/68Go9bhifQ5W5BOtLYiud3vpWB9CZP+O9/ywAsXhtLHFZfIj8ksHCzGMiTbB+GL3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WNA5Vi+Wws8szwYywwSUDVbf+/xf6pyHD5DBb+OG+vY=;
- b=IGPGznEGy7ZQzxCopqFAblyiKYG7s7RabmxZOZU5qyi+cYKsredwUHnDfn/LviWaixsziKhxEO2Aq+IJZIcy2f/JHBCoTHSfPQ0ImCo/BKQBC4bvku0RMaUZVcoIrj0h+3jy2qy7q/lzM0Deyh1q7eXrimHBGGBE0QSVZ9R/N/csIrCvbOossynOq6k4KQSjxxJpvyIMoc2KHeknKEYc/2W+NVC4/Zy28Cl54hUgSWuIVDY0idAm/9RwFhyBcA9Ye4Y3IqA2x9RVl+dkWe9HcatoiH7hQtnFnQUtrD3E8z5Dd4wTn9dqlTUJkL5NT++uCWhOUTSXLyDJX9P9vWEGOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0526.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1d::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.31; Tue, 8 Oct
- 2024 10:22:54 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::3f35:8db2:7fdf:9ffb]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::3f35:8db2:7fdf:9ffb%5])
- with mapi id 15.20.8005.031; Tue, 8 Oct 2024 10:22:54 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Serge Semin <fancer.lancer@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>
-Subject: Re: [PATCH net-next v2] net: stmmac: dwmac4: Add ip payload error
- statistics
-Thread-Index: AQHbEyg0iEwAqHsLX0OP4iFSwMjpobJzf9+AgABNhwCACORZkA==
-Date: Tue, 8 Oct 2024 10:22:53 +0000
-Message-ID:
- <SHXPR01MB0863DEE88A17DF86B4657F4EE67E2@SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic:
-	SHXPR01MB0863:EE_|SHXPR01MB0526:EE_|BJSPR01MB0516:EE_
-x-ms-office365-filtering-correlation-id: 400a8f28-37b4-4e60-8e75-08dce7832bb8
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|41320700013|7416014|38070700018;
-x-microsoft-antispam-message-info:
- rOYPRtdicSIZf8blDsG2hp+L4+o1oDLEEUVFBXeL0noE6zh5PnPMgevXslrciY4zKnA8K8WI+GFCRAEgtRSYPWq/6CR0Z4WThbUxjNn5JAufc8B3tUwuMG9DMOEsB+BiYfXDjHHKuz3G37741ao7VDGmV1fxOYoTCZEaOfDuUKLHTFStJmK6b3kTsA4RyzJ0XaCkiDBrr1o1PYD1HLubXRx40JOHngnYIEFi5zy/YyZCRSXCUpr/PeDmpYPW9/BMraTq8JKeHq/nD03+BbUmlZvyNB0S74w7lNBc9c8PKi+G79J6y/mJF9a/44GOxpeyFayGmqMCGZyp5bmocnu9neZGW9TDWLraqziDJ+uHW4dM8qP+3CocaCL/JQbipZw0Cy7/gdcB2n39UaWeNrYD3CXGgIxoGHZrvM+63MyTrnW+HIAdyVnOiAuovCY1zf9INWoP6frgMkDrUBGN6JE20JT6G8dK4dlIVbGHj43tibakWI405FcB3ZEHkHVmuw0zlEMQgP6T/gKHIMJMfBDugjnvtObJtj/uMZbB/FQmqGW+ppemKQUn0dN0paAQ8ESu5I/iwKojPBM48/ugVd8R8E59gvTQuXmgLygcFXo7Ca8BUOjqnp/Nn5OtBVF9uR2w
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(41320700013)(7416014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?cm5VME9xNVdRdS81VHFoemloejRyWkNIV0lrZC9WdzlmMVhNMUdYMzJGdksx?=
- =?utf-8?B?dkpFMkN2cS9IUGhySmp3cnp2ejlGL1JPTWh2L21VRnR4UjhFdkJLejY3UFZ1?=
- =?utf-8?B?aUZLdjZLMnV2OWhHd3dPdEM3MERic0wveW1xb2REbllhWWJnb1JZcW5VNnhn?=
- =?utf-8?B?ZjUwSnhSUFZzdlM5VGtzRmFmRUcyVi94eGt1bmxQQ0JXZ3JOY2JiMjNoa2RH?=
- =?utf-8?B?SXZOMTNNRUtTMXBycTdJYi8yeDBtdUtWV0laN2JTRTRJek9aWEpEVFUrSll5?=
- =?utf-8?B?TS93NDlHTnhuWFFXelpNSm1mMWdhYWRRNWlVZWhTSFNhTjFWa2EvOEt6NHU0?=
- =?utf-8?B?KzlGUDdTWG1sMXVWUnc0bUhsNkcxVGlZdVFwa2sxZXlDWHl3cmxiNUZxNURw?=
- =?utf-8?B?NVQ2cUpMWitvbzBIdkdVeitUQ0FNS2FrVUV4YTRPYzFyZE9Qb1dINnovZGtW?=
- =?utf-8?B?V0dlN0hCdTRwQ2phSXJvbUwyc2E2bWgwTFBjT1dKUGdQWkpucmFDWGx4aUZ4?=
- =?utf-8?B?bVJybTMyRTRjU3E1L1Fqd0s5UmhIbHo2UStjYzlEOUN3cUFjOGc3VHp0MFhq?=
- =?utf-8?B?ZDNFSVZ0dUtmT1FhMlcvTWZRMWtxOTZIaFVydzlkQzFjRi9MRms1VHRCSHVk?=
- =?utf-8?B?V2JZQm1DaDdOT0svQXRVWFdFMWRDQVEwamsrZThNSHUyRzJGTWxFVW1laDZF?=
- =?utf-8?B?WEhLS3dJSmVMV2ZBRnZ6VzNRRElKWGdDOFBRTTZpaG9ySjlvOERCVjhMTnRl?=
- =?utf-8?B?eFVKMHFQelZBdkQvOUI5YXU0NTRFMEpWakpCampickJsa25hbkk1ekZSUnFJ?=
- =?utf-8?B?dVFNeWhQelJaVGM0UGFVdE5YYm1jM2V0dmlEdWNQRnBoR0NWMXVkR2tocFA0?=
- =?utf-8?B?WnJhVnZFQnZBM29qaG9aUTg4Q1YzTUY0TGJ5Y2JIdGdibWwvaXFXd0tMMWlz?=
- =?utf-8?B?U05rZFBZZm5GRTZXWk9lRDIyaTZXVzhIM1paVUtRRFYxbVNGb0VkaE01VU5h?=
- =?utf-8?B?cVh5NitBREp6UUZaVnNPaThycmpXd3NLb09mUFUxOTk1ZlB2MThPeGs2aXU4?=
- =?utf-8?B?dDN3YmRob0dFRzh0cjlJUUxYRnM3MStxMTRZUlNNMWFtU3gyVE5BcjFOcmFJ?=
- =?utf-8?B?ekR3dEZaWGxvSzZhd1ZINitDL1QzL1BLVE84Nk43RC8vSkJ4SG9mSldlTVBo?=
- =?utf-8?B?QzhBMElPMUdidGp4ZmY2NlRXVC9IV2dHTEppbHFWQlEyQWtQbG9DREh2SUNi?=
- =?utf-8?B?eC85YWhndHR2enFJVzEvMWxUQUwvemExOVoyZ0lpam1nZzZqMlRqL1UxWVBr?=
- =?utf-8?B?MEN2c0swcVJwcFdnT2lhQVBuNmEwYlVYQmdvNWxYTlBmR2hCSEtzcWFZNnoz?=
- =?utf-8?B?UWV1SzVCQXh0MUFRTy9xSy9sem80T1pMN3c0ekFxYzRXRzZidHBqWFZuRWNx?=
- =?utf-8?B?dG5sRHlNdHo1UExRck8vaVRva0FyQmZzSkl1d2VNWENSTDRjdURWWkJEK0w4?=
- =?utf-8?B?bG9TaDNhOG5nbDNzZm5kSzI3S2NRV002VmYzN2QxVmRURmE1aXBvRkhoamtG?=
- =?utf-8?B?ekxUbS9KTVFNbkFqWVZtRHBlcmVaTnNkcWtlWUlNSElsZFJJcmFSZWlQV1pI?=
- =?utf-8?B?MytTeWNlZWtPUDBremo0S3NVMnlmSEoyTHFyeG0rYkFhVCtHVjc2WGhNTkNx?=
- =?utf-8?B?eGdPRFB2WUE1N0M1S0RKb1RySmEzNUJCbnA0b1RKZS9QRmpUOTltbmJZeTBH?=
- =?utf-8?B?R3gxSDVZaFQ3SDdQU3BhcS9TR3BWVjJVOEtvVlFVQ1ZHclF2MTVIVnRCWHpB?=
- =?utf-8?B?dlhBZUpkVlBvVWdYZGNEUVJFKzd4aDM0UTdKWU00dlJEM3hmaCtNWGY0a1hJ?=
- =?utf-8?B?YWI2QTVaUmloSkNvMWxraml6eU9EZUxnZnl3T1NKN2JOdnJrdExVcU14ZUJn?=
- =?utf-8?B?ZzdIQzRVSUhueGorWGNyR2ErcTVMQTQvUUtYK0NaTHIzWmZrT29aV29NTUZn?=
- =?utf-8?B?UThnR29Kd3Y4VkZoRXdRQlYyYlhqTnVUQVhiRytTam02MGlQSGZ4ZmJHU21C?=
- =?utf-8?B?VzNJNGk2MTk0R20xZXQxUk5uZ0IvSUlqUitpSFozc3lSR0JSWEhuZUdtR2lJ?=
- =?utf-8?Q?BEDBzgi/eWr9BREnDKdUC7sp9?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3814F7DA76
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 20:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728419715; cv=none; b=D76AjYhKv80SGLeVrhKCW5w1kZb7U8k1iVMkRB4m/efmdBHaLeY88abLHGUjk5TaOHimsV9gDv30BaJcwIE14TlKF6orhPmMdH+8a6tkxvkT/tSLh2rbQYxSKsmmPhQV1Xw5sgpOY+ijht2HUd1liFnONQRh8xlvZxc92h7iZdA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728419715; c=relaxed/simple;
+	bh=HFoXHfJtEe/wRLoPmYwcVpYKrHu2SAwKxZMlpyf+Hmg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jOkD5antrdsSfTED/p+7hMJ3r0gfykOsQzMOuqBn/q+VsbmOqrFtO3FZpsxZ5zxkf0KBmgxvqAipUluDfQ5YXtpb5SNs73V7P4S6zQf9ksL53hQQYrgaDx9lrSsrcwYNEEwxMx6VZSAJ0SGNcLSv7PVdg7Z/pCfxrOLaA09KmQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com; spf=pass smtp.mailfrom=gateworks.com; dkim=pass (2048-bit key) header.d=gateworks.com header.i=@gateworks.com header.b=c/w4o3H2; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gateworks.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gateworks.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e25cc9e94eeso5306609276.3
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 13:35:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gateworks.com; s=google; t=1728419712; x=1729024512; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HFoXHfJtEe/wRLoPmYwcVpYKrHu2SAwKxZMlpyf+Hmg=;
+        b=c/w4o3H2LyCLc/ja4XSvIVKx2tdwQC3ZLOXoVGhTXUbcuqYCSxf7GDOXs1n/rfuf8v
+         8eBEShOpQ3ubjW7DmH5FIAd1rTLT90CqB3cyLx8QpCp0QxW2sR9fMgkyMMXoOgRU9i19
+         NzV2WD+CJYJp7cMWvXrBKQLjYMD/lygILDZ8cNf70b1l8iAqQuXLVmMwjaHmyCcGIZhM
+         R6khjnvtiCHsuAzhKie3x5nYicOYY4EwYilQDjiC1sZyRBsDM/8MXBdcwOb55xscn7Dw
+         wJLdXP81Ut+Qsb1Brjg5YzndexVw5f/NTpn/L1WFXsm+rx/L86fX13R7Q6uP5OD34752
+         2xuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728419712; x=1729024512;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HFoXHfJtEe/wRLoPmYwcVpYKrHu2SAwKxZMlpyf+Hmg=;
+        b=rpdl53Ja2MgBjnbQW7YwZWwqHXvMORIN51ujWi3Lt2RLyBwcBm76oz5342kgunYsyK
+         pmNV35EtgFp73MRyGjVR0QfRq7sPbt6EwAtXduHzSsQKJMGALO65X71R0ZUg9UDrWT1S
+         zF8doWA+riVSp3nqbCjqUSozwu9+Kl0p/qier4DJx45onV8aXLyNtA24I04Bh5NtkYJt
+         p5IbZzbsxCXVtKEluLVvcZJnJwWRV1SBZd17ZUtgJ6uV8AeV6d1jfaVsUkZ9SWbeA4ok
+         e6DYZl486ctmG6G/yb+djXEqXtFEsTGe22BgCsAKFbqVApwiqA//3u+haL1MkJzRHuLs
+         JumA==
+X-Gm-Message-State: AOJu0YyVSBRzEiV4OBclF0GQeIC3m1GAjg6TawzU/vkz8+iTN2ZNOEE/
+	Lv+TwNj8hSatLbeO3EaO0nT0OM2rGZoUbP7tBfjGkewQ/YImAMAHxGPjPY/qLUPAyUUFmgjcchX
+	qvwgMuF8K9oYP6o09Hw5Jai06zN/FDnMyfU19S4MHPH6+y/xK
+X-Google-Smtp-Source: AGHT+IGlBOizMcT0HMp19V9hMj2cvOve+bcbzVxtpbO8hMP+et4LuaIKXJNiOVIP4cO3dHLmWywwNDQaqZdhZubN4dU=
+X-Received: by 2002:a05:6902:e0c:b0:e13:d5e7:b1f9 with SMTP id
+ 3f1490d57ef6-e28fe3891e1mr513874276.25.1728419711979; Tue, 08 Oct 2024
+ 13:35:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: 400a8f28-37b4-4e60-8e75-08dce7832bb8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Oct 2024 10:22:53.9508
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1SUqyf06oGM3ozxlQVBqV5lia+sXPb3yqaRtMajvikehsOP3MZ7OeUlRXTqz548l9PBhN93ERvifFcJoAmJ5VNq91NtwjcwaUL7pUDFhfgo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0526
-X-OriginatorOrg: starfivetech.com
+References: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
+ <c572529e-78c4-42d5-a799-1027fd5fca29@gmail.com> <CAJ+vNU3qCKzsK2XFj6Gj0vr4JfE=URYadWsr3xvxOO__MVNsPw@mail.gmail.com>
+ <009d90a1-16e6-4f6b-bfe7-8282e9deeeb3@gmail.com>
+In-Reply-To: <009d90a1-16e6-4f6b-bfe7-8282e9deeeb3@gmail.com>
+From: Tim Harvey <tharvey@gateworks.com>
+Date: Tue, 8 Oct 2024 13:35:01 -0700
+Message-ID: <CAJ+vNU3u62Z6Nr=5AmWtBRC6M3bR_0SMf8RbKXe9os6Ru4w2Vw@mail.gmail.com>
+Subject: Re: Linux network PHY initial configuration for ports not 'up'
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DQoNCj4gDQo+IEhpIEpha3ViDQo+IA0KPiBPbiBXZWQsIE9jdCAwMiwgMjAyNCBhdCAwNjo1ODow
-MUFNIEdNVCwgSmFrdWIgS2ljaW5za2kgd3JvdGU6DQo+ID4gT24gTW9uLCAzMCBTZXAgMjAyNCAx
-OTowMjowNSArMDgwMCBNaW5kYSBDaGVuIHdyb3RlOg0KPiA+ID4gQWRkIGR3bWFjNCBpcCBwYXls
-b2FkIGVycm9yIHN0YXRpc3RpY3MsIGFuZCByZW5hbWUgZGlzY3JpcHRlciBiaXQNCj4gPiA+IG1h
-Y3JvDQo+ID4NCj4gPiBkZXNjcmlwdG9yDQo+ID4gICAgICAgICBeDQo+ID4NCj4gPiA+IGJlY2F1
-c2UgbGF0ZXN0IHZlcnNpb24gZGVzY3JpcHRvciBJUENFIGJpdCBjbGFpbXMgaXAgY2hlY2tzdW0g
-ZXJyb3INCj4gPiA+IG9yDQo+ID4gPiBsNCBzZWdtZW50IGxlbmd0aCBlcnJvci4NCj4gPg0KPiAN
-Ckkgd2lsbCBtb2RpZnkgdGhpcy4NCg0KPiA+IFdoYXQgaXMgYW4gTDQgc2VnbWVudCBsZW5ndGgg
-ZXJyb3Igb24gUng/DQo+ID4gU2VlbXMgdG8gbWUgdGhhdCByZXVzaW5nIGlwX3BheWxvYWRfZXJy
-IGhlcmUgd2lsbCBiZSBjb25mdXNpbmcNCj4gDQo+IEZyb20gdGhlIGN1cnJlbnQgImlwX3BheWxv
-YWRfZXJyIiBmaWVsZCBzZW1hbnRpY3MsIE1pbmRhIGlzIGNvcnJlY3QgdG8gdXNlIGl0IGZvcg0K
-PiB0aGUgUnggSVAtcGF5bG9hZCBlcnJvciBzdGF0aXN0aWNzLiBIZXJlIGlzIHRoZSBkZWZpbml0
-aW9uIG9mIHRoZSBJUENFIGZsYWcgKHBhcnQgb2YNCj4gdGhlIFJERVM0IGRlc2NyaXB0b3IgZmll
-bGQpIGNpdGVkIGZyb20gdGhlIFN5bm9wc3lzIERXIFFvUyBFdGggdjUgSFctbWFudWFsOg0KPiAN
-Cj4gQml0ICBOYW1lICBEZXNjcmlwdGlvbg0KPiAgNyAgIElQQ0UgIElQIFBheWxvYWQgRXJyb3IN
-Cj4gICAgICAgICAgICBXaGVuIHRoaXMgYml0IGlzIHNldCwgaXQgaW5kaWNhdGVzIGVpdGhlciBv
-ZiB0aGUgZm9sbG93aW5nOg0KPiAgICAgICAgICAgIOKWoCBUaGUgMTYtYml0IElQIHBheWxvYWQg
-Y2hlY2tzdW0gKHRoYXQgaXMsIHRoZSBUQ1AsIFVEUCwgb3IgSUNNUA0KPiBjaGVja3N1bSkgY2Fs
-Y3VsYXRlZCBieSB0aGUNCj4gICAgICAgICAgICAgIE1BQyBkb2VzIG5vdCBtYXRjaCB0aGUgY29y
-cmVzcG9uZGluZyBjaGVja3N1bSBmaWVsZCBpbiB0aGUNCj4gcmVjZWl2ZWQgc2VnbWVudC4NCj4g
-ICAgICAgICAgICDilqAgVGhlIFRDUCwgVURQLCBvciBJQ01QIHNlZ21lbnQgbGVuZ3RoIGRvZXMg
-bm90IG1hdGNoIHRoZQ0KPiBwYXlsb2FkIGxlbmd0aCB2YWx1ZSBpbiB0aGUgSVAgSGVhZGVyDQo+
-ICAgICAgICAgICAgICBmaWVsZC4NCj4gICAgICAgICAgICDilqAgVGhlIFRDUCwgVURQLCBvciBJ
-Q01QIHNlZ21lbnQgbGVuZ3RoIGlzIGxlc3MgdGhhbiBtaW5pbXVtDQo+IGFsbG93ZWQgc2VnbWVu
-dCBsZW5ndGggZm9yIFRDUCwNCj4gICAgICAgICAgICAgIFVEUCwgb3IgSUNNUC4NCj4gDQogVGhh
-bmtzIGZvciBhZGRpbmcgZGVzY3JpcHRpb24uLiBJIHdpbGwgYWRkIHRoZSB0aGlzIHRvIGNvbW1p
-dCBtZXNzYWdlLg0KDQoNCg==
+On Mon, Oct 7, 2024 at 11:35=E2=80=AFAM Florian Fainelli <f.fainelli@gmail.=
+com> wrote:
+>
+> On 10/7/24 11:18, Tim Harvey wrote:
+> > On Mon, Oct 7, 2024 at 10:28=E2=80=AFAM Florian Fainelli <f.fainelli@gm=
+ail.com> wrote:
+> >>
+> >> On 10/7/24 09:48, Tim Harvey wrote:
+> >>> Greetings,
+> >>>
+> >>> What is the policy for configuration of network PHY's for ports that
+> >>> are not brought 'up'?
+> >>>
+> >>> I work with boards with several PHY's that have invalid link
+> >>> configuration which does not get fixed until the port is brought up.
+> >>> One could argue that this is fine because the port isn't up but in th=
+e
+> >>> case of LED misconfiguration people wonder why the LED's are not
+> >>> configured properly until the port is brought up (or they wonder why
+> >>> LEDs are ilumnated at all for a port that isn't up). Another example
+> >>> would be a PHY with EEE errata where EEE should be disabled but this
+> >>> doesn't happen utnil the port is brought up yet while the port is
+> >>> 'down' a link with EEE is still established at the PHY level with a
+> >>> link partner. One could also point out that power is being used to
+> >>> link PHY's that should not even be linked.
+> >>>
+> >>> In other words, should a MAC driver somehow trigger a PHY to get
+> >>> initialized (as in fixups and allowing a physical link) even if the
+> >>> MAC port is not up? If so, how is this done currently?
+> >>
+> >> There are drivers that have historically brought up Ethernet PHYs in t=
+he
+> >> MAC's probe routine. This is fine in premise, and you get a bit of spe=
+ed
+> >> up because by the time the network interface is opened by user-space y=
+ou
+> >> have usually finished auto-negotiation. This does mean that usually th=
+e
+> >> PHY is already in the UP state.
+> >
+> > Hi Florian,
+> >
+> > Can you point me to an example of a driver that does 'not' do this? I
+> > can not find an example where the PHY isn't UP regardless of the MAC
+> > state (maybe I'm biased due to the boards I've been working with most
+> > in the last couple of years) but then again its not because the MAC
+> > driver brought the PHY up, its because it doesn't take it down and it
+> > was up on power-up.
+>
+> Essentially any Ethernet MAC driver that calls phy_connect() in their
+> .probe() routine would be doing this. bgmac.c is one such example, most,
+> if not all of the time it deals with fixed-link PHYs because it is the
+> Ethernet controller used with integrated switches, though occasionally
+> there might an external PHY connected to it. There are certainly more
+> examples.
+>
+> >
+> > Some examples that I just looked at where if your OS does not bring up
+> > the MAC the PHY is still UP
+> > - imx8m FEC with DP83867 PHY
+> > - KSZ9897S (ksz9447) switch/phy
+> >
+> >>
+> >> The caveat with that approach is that it does not conserve power, and =
+it
+> >> assumes that the network device will end-up being used shortly
+> >> thereafter, which is not a given.
+> >
+> > agreed... it seems wrong from a power perspective to have those PHY's
+> > up. I recall not to many years ago when a Gbit PHY link cost 1W... and
+> > I think we are currently way worse than that for a 10Gbps PHY link.
+>
+> Quite likely, yes.
+>
+> >
+> > Then again think of the case where you have a switch with ports
+> > unconfigured yet connected to a partner and all the LED's are lit up
+> > (giving the impression visually that the ports are up).
+> >
+> >>
+> >> For LEDs, I would argue that if you care about having some sensible
+> >> feedback, the place where this belongs is the boot loader, because you
+> >> can address any kernel short comings there: lack of a kernel driver fo=
+r
+> >> said PHY/MAC, network never being brought up, etc.
+> >
+> > I agree that boot firmware can and perhaps should do this but often
+> > the PHY config that is done in the boot loader gets undone in the
+> > Linux PHY driver if the reset pin is exposed to the Linux or in some
+> > cases by soft reset done in the Linux PHY driver, or in other cases
+> > blatant re-configuration of LED's in the Linux PHY driver without
+> > using DT properties (intel-xway.c does this).
+>
+> Unfortunately if you care about consistency or independence between the
+> boot stages, you have to duplicate things a tiny bit, for the reasons I
+> mentioned that while you might bring-up networking in u-boot, you may
+> not in Linux, or vice versa.
+>
+> It's all wonderful if you can come to an agreement as to what belongs to
+> the boot loader configuration and what belongs to the OS configuration,
+> but in practice there is quite a bit of overlap due to each one being
+> somewhat independent. I don't think there is a hard and fast set of
+> rules, because all of this is inherently PHY specific, but there should
+> be some general consistency that applies, starting with LEDs. Best if
+> you can just HW strap though...
+>
+> >
+> >>
+> >> For errata like EEE, it seems fine to address that at link up time.
+> >
+> > one would think that makes sense as well but the case I just ran into
+> > was where a KSZ9897S switch had a network cable to a link partner and
+> > the link partner would 'flap' with its link giong up and down due to
+> > EEE errata until the KSZ9897S port was brought up which disabled EEE.
+> > In this specific case EEE could have been disabled in U-Boot but that
+> > would also require some changes as U-Boot does the same thing as Linux
+> > currently - it only configures PHY's that are active.
+>
+> OK, but unfortunately I don't see how you can avoid not making those
+> changes in u-boot.
+
+So you are thinking the right place to address this is in boot
+firmware and the network switch init there should go and disable all
+PHY's by default then? I'm good with that approach and can code that
+up.
+
+But then based on the point that Linux and boot loader should be doing
+the same things and be independent from each other I would think the
+kernel should do this as well.
+
+Best Regards,
+
+Tim
 
