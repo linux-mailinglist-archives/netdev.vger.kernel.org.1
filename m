@@ -1,163 +1,113 @@
-Return-Path: <netdev+bounces-133216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FA0B99554A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:06:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C01995554
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C94A61F218AF
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:06:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27BE4B21C59
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377221E1035;
-	Tue,  8 Oct 2024 17:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64901E0DDB;
+	Tue,  8 Oct 2024 17:09:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mbuDmZ0g"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="uwLthmQw"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1B1E0E0E;
-	Tue,  8 Oct 2024 17:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0422F1E0DD0
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 17:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728407120; cv=none; b=meDm+vGLzJxm9+OBklYuX3uKfRcIqSElNIZ7BcE69uuqqrtXB7O0iT/qGFFUOAMJb64SdDLy/W8oNBsQSwGtIwyHn+ge/Z01vYAVCYS+gDPkgela7bQ/r+yaOZ/pvnaROl/K0nV2UgNTYNXQd/6776ftKwvF4hUwStUBJs17nO0=
+	t=1728407368; cv=none; b=Xr4xG24UDV51pvchfP53JBB5TdWYGLDBeYJN/ZdeJRxgB8v4LE2tVYxHlF+y6w88Q8uLjNVdlbjvT1G56NuUPrl69tj1Lkha1FVF+Vx/mUKvIGM89zDpJiVvDXku6LE3g/SBqLLLXADeu1G0bQAczLVzh2WZlbdIvzF0Pd4mFiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728407120; c=relaxed/simple;
-	bh=QXn/G5xtVS7Q95i0Xd2gs08GSFv4v6Vo/5ih6xJnUPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iGZ7MA+B8VCeMg5JseiDFxy4De7s//2BEeXE3NLEwUJ8z5dqvYZbCM/gxdknkwjWoyWspDEGU0Y2r/1Z1qGo1XANFYQ4C903Hai5ZXAPuS6TZFhHUn77IMn9xha8Vj9o3/5jRUbeX0tFfrNinAPxSSmAm5JwVZunGbbVIQNGj3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mbuDmZ0g; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=f/YCGlfnMCPMa/11Eh/72PxGnnmSI98rKvi4lX48Y2U=; b=mbuDmZ0g171uQygCWjestigXvj
-	wLdrxn+7nl8VvC0mJYJmtwmjlFifPv9TBDy2k5pJ2wYeyzAstduYcTSjaPB5ux8oHWo//86hWWafU
-	8aGTBigaXVwbHmj0ekKDguviIiOGa2h35BlatEvGiu/Y3meD3ZydPGEXEmnwSHvQKmgX0cWNWN7DL
-	+jpntTPEgLhAiwH93781GjAFQK6tigRWvQq05f7inDd+lVSNBehnkT3Re+8NSoRCyF+2QEzE93qVp
-	yHX6VFliSHy3KHGp9xbhChoTdx9OmW1Oh5aO6lIZlUuQhkSfzjRxyvlJDh4+P3c3qwxKdwjK32Jpz
-	F3HAppvQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51246)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1syDe3-0007mG-24;
-	Tue, 08 Oct 2024 18:05:11 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1syDdy-0005MP-0U;
-	Tue, 08 Oct 2024 18:05:06 +0100
-Date: Tue, 8 Oct 2024 18:05:05 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
- get and set phy configuration
-Message-ID: <ZwVmQXVJMmkIbY1D@shell.armlinux.org.uk>
-References: <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
- <20241007123751.3df87430@device-21.home>
- <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
- <20241007154839.4b9c6a02@device-21.home>
- <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
- <20241008092557.50db7539@device-21.home>
- <f1af0323-23f5-44fd-a980-686815957b5a@lunn.ch>
- <20241008165742.71858efa@device-21.home>
- <ZwVPb1Prm_zQScH0@shell.armlinux.org.uk>
- <20241008184102.5d1c3a9e@device-21.home>
+	s=arc-20240116; t=1728407368; c=relaxed/simple;
+	bh=Z8xI+ZcafAWVcAese76pHRNu9/MY3/Ah8jSu0fpemjQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fswK9VMCk6xwvVS6mlADRer7Tai45NsqnSHmyNyP+FS8LUJFGAUAsnRDou7qaFMYWmNnmHdgZ6p/XUDjhrJIlVY0Yk5ydC/SxYyLREi84YNi5kKeWZcN5lUD2ZIxuqjcs68U0tbd3bMIEa79Jg+7c94N7jXKTG8TswAjyDDW2VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=uwLthmQw; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728407367; x=1759943367;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FOQO6eyfHfX7KXtr2U9N6PjiGqNcYtkrixtUO6PyVRA=;
+  b=uwLthmQwYwk3yzHX+dg/Uq6NJjoBw/COw6lwuaspfzgXDeXlnjU39zbg
+   sR0PFR+yd+SkYmggaz9sQ6jTq09sjeM35dJW9zauAdLzWZwWSYm8tlGCJ
+   TeJDyY+jkoSqelUIcU8xEAR0phqcTkm45DLjSTKgFBlx3A9Hl+Iw+khrQ
+   g=;
+X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
+   d="scan'208";a="439225158"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 17:09:22 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:43855]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.38.26:2525] with esmtp (Farcaster)
+ id ed7bf527-d62c-4595-ab7a-50d51d4db8c8; Tue, 8 Oct 2024 17:09:21 +0000 (UTC)
+X-Farcaster-Flow-ID: ed7bf527-d62c-4595-ab7a-50d51d4db8c8
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 8 Oct 2024 17:09:16 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 8 Oct 2024 17:09:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next 4/4] ipv4: Retire global IPv4 hash table inet_addr_lst.
+Date: Tue, 8 Oct 2024 10:09:06 -0700
+Message-ID: <20241008170906.98082-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iJKu_ZnkP0WjDXmFQpBKK=LRPvsoPiHiv8hkmoq123K0w@mail.gmail.com>
+References: <CANn89iJKu_ZnkP0WjDXmFQpBKK=LRPvsoPiHiv8hkmoq123K0w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008184102.5d1c3a9e@device-21.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Oct 08, 2024 at 06:41:02PM +0200, Maxime Chevallier wrote:
-> On Tue, 8 Oct 2024 16:27:43 +0100
-> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Oct 2024 13:21:08 +0200
+> On Tue, Oct 8, 2024 at 1:10 PM Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> > On 10/4/24 21:59, Kuniyuki Iwashima wrote:
+> > > No one uses inet_addr_lst anymore, so let's remove it.
+> > >
+> > > While at it, we can remove net_hash_mix() from the hash calculation.
+> >
+> > Is that really safe? it will make hash collision predictable in a
+> > deterministic way.
+> >
+> > FTR, IPv6 still uses the net seed.
 > 
-> > On Tue, Oct 08, 2024 at 04:57:42PM +0200, Maxime Chevallier wrote:
-> > > Oh but I plan to add support for the marvell switch, mcbin, and turris
-> > > first,  
-> > 
-> > What do you think needs adding for the mcbin?
-> > 
-> > For the single-shot version, the serdes lines are hard-wired to the
-> > SFP cages, so it's a MAC with a SFP cage directly connected.
-> > 
-> > For the double-shot, the switching happens dynamically within the
-> > 88x3310 PHY, so there's no need to fiddle with any isolate modes.
+> I was planning to switch ipv6 to a safer hash, because the
+> ipv6_addr_hash() is also predictable.
+> It is easy for an attacker to push 10000 ipv6 addresses on the same slot.
 > 
-> Nothing related to isolate mode regarding the mcbin :) They aren't
-> even implemented on the 3310 PHYs anyway :)
-> 
-> > 
-> > The only thing that is missing is switching the 88x3310's fibre
-> > interface from the default 10gbase-r to 1000base-X and/or SGMII, and
-> > allowing PHYs to be stacked on top. The former I have untested
-> > patches for but the latter is something that's waiting for
-> > networking/phylib to gain support for stacked PHY.
-> 
-> That's one part of it indeed
-> 
-> > Switching the interface mode is very disruptive as it needs the PHY
-> > to be software-reset, and if the RJ45 has link but one is simply
-> > plugging in a SFP, hitting the PHY with a software reset will
-> > disrupt that link.
-> > 
-> > Given that the mcbin has one SFP cage that is capable of 2500base-X,
-> > 1000base-X and SGMII, and two SFP cages that can do 10gbase-r, with
-> > a PHY that can do 10/100/1G/2.5G/5G/10G over the RJ45, I'm not sure
-> > adding more complexity really gains us very much other than...
-> > additional complexity.
-> 
-> What I mean is the ability for users to see, from tools like ethtool,
-> that the MCBin doubleshot's eth0 and eth1 interfaces have 2 ports
-> (copper + sfp), and potentially allow picking which one to use in case
-> both ports are connected.
-> 
-> There are mutliple devices out-there with such configurations (some
-> marvell switches for example). Do you not see some value in this ?
+> We have netns isolation for sure, but being able to use a big amount
+> of cpu cycles in the kernel is an issue.
 
-Many PHYs that have two media facing ports give configuration of the
-priority between the two interfaces, and yes, there would definitely be
-value in exposing that to userspace, thereby allowing userspace to
-configure the policy there.
+I'll keep inet_addr_hash() as is in patch 4, and once the IPv6
+changes are applied, I'll post another patch to follow the change
+in IPv4 using __ipv4_addr_hash().
 
-This would probably be more common than the two-PHY issue that we're
-starting with - as I believe the 88e151x PHYs support exactly the same
-thing when used with a RGMII host interface. The serdes port becomes
-available for "fiber" and it is only 1000base-X there.
-
-I was trying to work out what the motivation was for this platform.
-
-Sorry if you mentioned it at NetdevConf and I've forgotten it all,
-it was quite a while ago now!
+static inline u32 __ipv4_addr_hash(const struct net *net, __be32 ip)
+{
+	return jhash_1word((__force u32)ip, net_hash_mix(net));
+}
 
 Thanks!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
