@@ -1,292 +1,225 @@
-Return-Path: <netdev+bounces-132981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2004A994089
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:07:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C19993FA5
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A723F2879EC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 08:06:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54DE71F21E71
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 07:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5852010EC;
-	Tue,  8 Oct 2024 07:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1F41DEFC8;
+	Tue,  8 Oct 2024 07:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="MXRdpNSy"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N9OPW9gh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAE3208A7
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 07:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B6C1DE4F3;
+	Tue,  8 Oct 2024 07:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728371764; cv=none; b=BlWCojtwL/VqdZ9TTY/8re+E5MMKt2O3XbmbqkYNuk5GHV7tAgEoRFUjYwQV1sq6uZkoEHfwQ9+rm6ecli9pB5GUmGfEIOhzaUrllc+uXh360lOdcVhHav0jCl9BKTDmmhcRPL2s+vcTyV/KEpSZ9nhVMdT7KDkV3qRkdkSpcmU=
+	t=1728372364; cv=none; b=fTUp2d7vCJwtjPuyc5221PuYDnuDCHYlP6UMceqSOR7mMAnD8SY/SYhA7+Lj6gTYnj5OMweJSSUyUb+NqrJgiyQtFwubp9e+dOgo6QOrK2tsqghDIA03L9CemF0UsLhFiau1VixEWyadbm1rVSCdhQgGXtQZHt+Ryf63K/fTmt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728371764; c=relaxed/simple;
-	bh=VFjX1QavLeLzJwyUCKTDugF+FWb3RbCevKvof29zq78=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=iMR91EC7CMDP0/muS21kePj9gpoozOCIaXrvpnXrIVWQW6JolK1y+rhxpgZrhXbIbVThM4x+KSRYOj+CgruM7EPt678yYoO4LQZIS/T8R/jNSJHZKQG0XLswgjUB1xkRAP8xlQRNQVv5yE3qlPOxYJUN5vcDy7IyTGVW3irywYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=MXRdpNSy; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d00322446so4045821f8f.2
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 00:16:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1728371759; x=1728976559; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S2ueIGZGFFuijyr+mi84RMycpanED72itl8B8kGLf0A=;
-        b=MXRdpNSyD8Jlq19ig7miW+dvvBtMZP2sMLM7M974egVjIE4VAjRzhEifhRsLlp/OxH
-         xErBYZlAijv15p9f+CeyHi415ik7/UF6F3ZTLOhvFEpyLCo2D2lUhTpCziwgRR/1/YZe
-         XWUXkBMSYA6bmp3YppfbB3DGmTfa+c7FqcMUedbbfBiWdxkZyu+PGbKtY0Ih4zuQxxEO
-         kBFBky7sK1M0MqRpb3Dj8e2CvaBoV8n3BcJ4ivJLTj87J5ifM6J3pK54aaE2ooUp++Zj
-         G37xGOyZ+FhvKwpx/UPtcmSKyWDy37gUPuiDNCTfH9VUt36W1Y7xHWupahl7IFPaIP0G
-         4THA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728371759; x=1728976559;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=S2ueIGZGFFuijyr+mi84RMycpanED72itl8B8kGLf0A=;
-        b=vkuF2sWTPHnm0QcAE2FhH3Bhem8tQM3fGoombMEeuQKQeTw+l36UVQp0//ImyDv1pv
-         RNY+FWAru+XgpCchnhsh5hGmtunWdzRqliHMpdJzy+oJz3FRBllZdwfGU6L5kDuqZTzy
-         ayfegDDjtm889Pfg2MZ1wxFb4wbhQ8hidprkicHVeBoujL00XUl3BgqQbdp1LzfCePdO
-         lMlolGvWhY09Ai3a+279I/1DhhB/NHO4qRMPU0u0D+f8DwG8I1rZGMZyA6O4BQzzxX4D
-         uyVidb+KJAS26t1V29JmmPQy+S3YT4hT/Iu9033c0yrxCTlbB1KwBy9lRMPTU6TWni7v
-         SXWw==
-X-Forwarded-Encrypted: i=1; AJvYcCV674bfJlIHwdNlGogFQ6dQueYSnOvzOc07Cob+9uJ0gvsII9rJ0FzXtauAuvx1lLabZ9V8awc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC7kP9Bma2jr3sYKXkZ4tZcI/Mr3VcQQFN7CGz2x5rNicRoyfo
-	E19URs7Nv8TI7PvaMXwFrOWB/M4qxpG7agXMJrax3dwG3PIXBP8U+OjhpltMW4U=
-X-Google-Smtp-Source: AGHT+IHLIvf/mdkUVnE3YZebgoJmimuDbqbaYR4qzhNrK3mnyNkUciw2Q6Oqe3tYnWECPsRjHMl9cA==
-X-Received: by 2002:a5d:5e0f:0:b0:37d:3256:76e4 with SMTP id ffacd0b85a97d-37d32567825mr266216f8f.11.1728371759077;
-        Tue, 08 Oct 2024 00:15:59 -0700 (PDT)
-Received: from localhost ([2a09:bac1:27c0:58::241:66])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1690f767sm7340969f8f.20.2024.10.08.00.15.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 00:15:58 -0700 (PDT)
+	s=arc-20240116; t=1728372364; c=relaxed/simple;
+	bh=z2P9eJzMxO7Wy9K/gU2Ripg7WG5/Qq2PJ4dUe+DraPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IEeTQkLFEN4dLqN9SiJgjxCD1oArLe9n6TZ/LX4FfBO+840RX1UCc/C793rxXs/fNMN0C0kP33ucIlAj2yQlbHwq8fCAp5psP8CNL4fAtwpjKhhGBAfs2ICdIMQCSGNRAiMRBCzG1kkKzB2PfYmA9IJ/CSV8s6ddkdnhTtlSXfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N9OPW9gh; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 12AFEE0004;
+	Tue,  8 Oct 2024 07:25:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728372359;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y2Eov6yFpaMhBa+zRN8cKs/RYWnxfaxocRnMjKu5r/s=;
+	b=N9OPW9ghUApwMwLVnBcXpiSVmIgOeRi3NcixPpyq4UcWVz5fFLn4G4h9bokE7Y6jyFjjBd
+	hSqsmYbjS7UV/w8MAhFrSxDEYtH32oLyhnZV3Bk2CT1dRCXBUKFzKbQKbXM4ujMGYGqWwC
+	y24XT12GTiJV7hp786Lms6QgpfX4Mq4YXVo7w4BP3NObjCerBqFZiSMWO2n4rjnUHRTs09
+	tHPj2IGrvMCbPFlG3VzxGzhFx/ICzGbmChQTsZWXTxbyulPn7PfWBz0X1JvxdYnz3gl7l5
+	lIk3tOl/KBhGeCBkPgWpAVNMbuupDN8LGJmfgMcNniwMgKBbFzW4nzZZM+WNMg==
+Date: Tue, 8 Oct 2024 09:25:57 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
+ get and set phy configuration
+Message-ID: <20241008092557.50db7539@device-21.home>
+In-Reply-To: <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
+References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
+	<20241004161601.2932901-8-maxime.chevallier@bootlin.com>
+	<4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
+	<ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
+	<20241007123751.3df87430@device-21.home>
+	<6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+	<20241007154839.4b9c6a02@device-21.home>
+	<b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 08 Oct 2024 09:15:56 +0200
-Message-Id: <D4Q8NJRMZCYY.QRM4L1W95PE2@bobby>
-Cc: "Jesper Dangaard Brouer" <hawk@kernel.org>, "Daniel Xu" <dxu@dxuuu.xyz>,
- "Lorenzo Bianconi" <lorenzo@kernel.org>, "Lorenzo Bianconi"
- <lorenzo.bianconi@redhat.com>, "Jakub Sitnicki" <jakub@cloudflare.com>,
- "Alexander Lobakin" <aleksander.lobakin@intel.com>, <bpf@vger.kernel.org>,
- <netdev@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <davem@davemloft.net>, <kuba@kernel.org>, <john.fastabend@gmail.com>,
- <edumazet@google.com>, <pabeni@redhat.com>, <sdf@fomichev.me>,
- <tariqt@nvidia.com>, <saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>,
- <przemyslaw.kitszel@intel.com>, <intel-wired-lan@lists.osuosl.org>,
- <mst@redhat.com>, <jasowang@redhat.com>, <mcoquelin.stm32@gmail.com>,
- <alexandre.torgue@foss.st.com>, "kernel-team" <kernel-team@cloudflare.com>,
- "Yan Zhai" <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-From: "Arthur Fabre" <afabre@cloudflare.com>
-To: "Stanislav Fomichev" <stfomichev@gmail.com>,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-X-Mailer: aerc 0.8.2
-References: <87zfnnq2hs.fsf@toke.dk> <Zv18pxsiTGTZSTyO@mini-arch>
- <87ttdunydz.fsf@toke.dk> <Zv3N5G8swr100EXm@mini-arch>
- <D4LYNKGLE7G0.3JAN5MX1ATPTB@bobby> <Zv794Ot-kOq1pguM@mini-arch>
- <2fy5vuewgwkh3o3mx5v4bkrzu6josqylraa4ocgzqib6a7ozt4@hwsuhcibtcb6>
- <038fffa3-1e29-4c6d-9e27-8181865dca46@kernel.org>
- <ZwArrsqrYx7IM5tq@mini-arch> <87ldz1edaz.fsf@toke.dk>
- <ZwQtAHpg2LB-7en_@mini-arch>
-In-Reply-To: <ZwQtAHpg2LB-7en_@mini-arch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Mon Oct 7, 2024 at 8:48 PM CEST, Stanislav Fomichev wrote:
-> On 10/06, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > Stanislav Fomichev <stfomichev@gmail.com> writes:
-> >=20
-> > > On 10/04, Jesper Dangaard Brouer wrote:
-> > >>=20
-> > >>=20
-> > >> On 04/10/2024 04.13, Daniel Xu wrote:
-> > >> > On Thu, Oct 03, 2024 at 01:26:08PM GMT, Stanislav Fomichev wrote:
-> > >> > > On 10/03, Arthur Fabre wrote:
-> > >> > > > On Thu Oct 3, 2024 at 12:49 AM CEST, Stanislav Fomichev wrote:
-> > >> > > > > On 10/02, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > >> > > > > > Stanislav Fomichev <stfomichev@gmail.com> writes:
-> > >> > > > > >=20
-> > >> > > > > > > On 10/01, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > >> > > > > > > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> > >> > > > > > > >=20
-> > >> > > > > > > > > > On Mon Sep 30, 2024 at 1:49 PM CEST, Lorenzo Bianc=
-oni wrote:
-> > >> > > > > > > > > > > > Lorenzo Bianconi <lorenzo@kernel.org> writes:
-> > >> > > > > > > > > > > >=20
-> > >> [...]
-> > >> > > > > > > > > > > > >=20
-> > >> > > > > > > > > > > > > I like this 'fast' KV approach but I guess w=
-e should really evaluate its
-> > >> > > > > > > > > > > > > impact on performances (especially for xdp) =
-since, based on the kfunc calls
-> > >> > > > > > > > > > > > > order in the ebpf program, we can have one o=
-r multiple memmove/memcpy for
-> > >> > > > > > > > > > > > > each packet, right?
-> > >> > > > > > > > > > > >=20
-> > >> > > > > > > > > > > > Yes, with Arthur's scheme, performance will be=
- ordering dependent. Using
-> > >>=20
-> > >> I really like the *compact* Key-Value (KV) store idea from Arthur.
-> > >>  - The question is it is fast enough?
-> > >>=20
-> > >> I've promised Arthur to XDP micro-benchmark this, if he codes this u=
-p to
-> > >> be usable in the XDP code path.  Listening to the LPC recording I he=
-ard
-> > >> that Alexei also saw potential and other use-case for this kind of
-> > >> fast-and-compact KV approach.
-> > >>=20
-> > >> I have high hopes for the performance, as Arthur uses POPCNT instruc=
-tion
-> > >> which is *very* fast[1]. I checked[2] AMD Zen 3 and 4 have Ops/Laten=
-cy=3D1
-> > >> and Reciprocal throughput 0.25.
-> > >>=20
-> > >>  [1] https://www.agner.org/optimize/blog/read.php?i=3D853#848
-> > >>  [2] https://www.agner.org/optimize/instruction_tables.pdf
-> > >>=20
-> > >> [...]
-> > >> > > > There are two different use-cases for the metadata:
-> > >> > > >=20
-> > >> > > > * "Hardware" metadata (like the hash, rx_timestamp...). There =
-are only a
-> > >> > > >    few well known fields, and only XDP can access them to set =
-them as
-> > >> > > >    metadata, so storing them in a struct somewhere could make =
-sense.
-> > >> > > >=20
-> > >> > > > * Arbitrary metadata used by services. Eg a TC filter could se=
-t a field
-> > >> > > >    describing which service a packet is for, and that could be=
- reused for
-> > >> > > >    iptables, routing, socket dispatch...
-> > >> > > >    Similarly we could set a "packet_id" field that uniquely id=
-entifies a
-> > >> > > >    packet so we can trace it throughout the network stack (thr=
-ough
-> > >> > > >    clones, encap, decap, userspace services...).
-> > >> > > >    The skb->mark, but with more room, and better support for s=
-haring it.
-> > >> > > >=20
-> > >> > > > We can only know the layout ahead of time for the first one. A=
-nd they're
-> > >> > > > similar enough in their requirements (need to be stored somewh=
-ere in the
-> > >> > > > SKB, have a way of retrieving each one individually, that it s=
-eems to
-> > >> > > > make sense to use a common API).
-> > >> > >=20
-> > >> > > Why not have the following layout then?
-> > >> > >=20
-> > >> > > +---------------+-------------------+---------------------------=
--------------+------+
-> > >> > > | more headroom | user-defined meta | hw-meta (potentially fixed=
- skb format) | data |
-> > >> > > +---------------+-------------------+---------------------------=
--------------+------+
-> > >> > >                  ^                                              =
-              ^
-> > >> > >              data_meta                                          =
-            data
-> > >> > >=20
-> > >> > > You obviously still have a problem of communicating the layout i=
-f you
-> > >> > > have some redirects in between, but you, in theory still have th=
-is
-> > >> > > problem with user-defined metadata anyway (unless I'm missing
-> > >> > > something).
-> > >> > >=20
-> > >>=20
-> > >> Hmm, I think you are missing something... As far as I'm concerned we=
- are
-> > >> discussing placing the KV data after the xdp_frame, and not in the X=
-DP
-> > >> data_meta area (as your drawing suggests).  The xdp_frame is stored =
-at
-> > >> the very top of the headroom.  Lorenzo's patchset is extending struc=
-t
-> > >> xdp_frame and now we are discussing to we can make a more flexible A=
-PI
-> > >> for extending this. I understand that Toke confirmed this here [3]. =
- Let
-> > >> me know if I missed something :-)
-> > >>=20
-> > >>  [3] https://lore.kernel.org/all/874j62u1lb.fsf@toke.dk/
-> > >>
-> > >> As part of designing this flexible API, we/Toke are trying hard not =
-to
-> > >> tie this to a specific data area.  This is a good API design, keepin=
-g it
-> > >> flexible enough that we can move things around should the need arise=
-.
-> > >>=20
-> > >> I don't think it is viable to store this KV data in XDP data_meta ar=
-ea,
-> > >> because existing BPF-prog's already have direct memory (write) acces=
-s
-> > >> and can change size of area, which creates too much headache with
-> > >> (existing) BPF-progs creating unintentional breakage for the KV stor=
-e,
-> > >> which would then need extensive checks to handle random corruptions
-> > >> (slowing down KV-store code).
-> > >
-> > > Yes, I'm definitely missing the bigger picture. If we want to have a =
-global
-> > > metadata registry in the kernel, why can't it be built on top of the =
-existing
-> > > area?
-> >=20
-> > Because we have no way of preventing existing XDP programs from
-> > overwriting (corrupting) the area using the xdp_adjust_meta() API and
-> > data_meta field.
+On Mon, 7 Oct 2024 18:37:29 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
+
+> > That's a legit point. I mentioned in the cover for V1 that this in
+> > itself doesn't really bring anything useful. The only point being that
+> > it makes it easy to test if a PHY has a working isolation mode, but
+> > given that we'll assume that it doesn't by default, that whole point
+> > is moot.
+> > 
+> > I would therefore understand if you consider that having a kAPI for
+> > that isn't very interesting and that I shall include this work as part
+> > of the multi-PHY support.  
+> 
+> kAPI add a lot of Maintenance burden. So we should not add them unless
+> they are justified. to me, there is not a good justification for this.
+
+That's fine by me.
+
+> 
+> > Sure thing. There are multiple devices out-there that may have multiple
+> > PHYs accessible from the MAC, through muxers (I'm trying to be generic
+> > enough to address all cases, gpio muxers, mmio-controlled muxers, etc.),
+> > but let me describe the HW I'm working on that's a bit more problematic.
+> > 
+> > The first such platform I have has an fs_enet MAC, a pair of LXT973
+> > PHYs for which the isolate mode doesn't work, and no on-board circuitry to
+> > perform the isolation. Here, we have to power one PHY down when unused :
+> > 
+> >                 /--- LXT973
+> > fs_enet -- MII--|
+> >                 \--- LXT973  
+> 
+> So you have at least regulators under Linux control? Is that what you
+> mean by power down? Pulling the plug and putting it back again is
+> somewhat different to isolation. All its state is going to be lost,
+> meaning phylib needs to completely initialise it again. Or can you
+> hide this using PM? Just suspend/resume it?
+
+Ah no, I wasn't referring to regulators but rather the BMCR PDOWN bit to
+just shut the PHY down, as in suspend.
+
+Indeed the state is lost. The way I'm supporting this is :
+
+ - If one PHY has the link, it keeps it until link-down
+ - When link-down, I round-robin between the 2 phys: 
+
+  - Attach the PHY to the netdev
+  - See if it can establish link and negotiate with LP
+  - If there's nothing after a given period ( 2 seconds default ), then
+I detach the PHY, attach the other one, and start again, until one of
+them has link.
+
+That's very limited indeed, we have no way of saying "first that has
+link wins".
+
+
+> > The second board has a fs_enet MAC and a pair of KSZ8041 PHYs connected
+> > in MII.
+> > 
+> > The third one has a pair of KSZ8041 PHYs connected to a
+> > ucc_geth MAC in RMII.
+> > 
+> > On both these boards, we isolate the PHYs when unused, and we also
+> > drive a GPIO to toggle some on-board circuitry to disconnect the MII
+> > lines as well for the unused PHY. I'd have to run some tests to see if
+> > this circuitry could be enough, without relying at all on PHY
+> > isolation :
+> > 
+> >                    /--- KSZ8041
+> >                    |
+> >       MAC ------ MUX
+> >                  | | 
+> >   to SoC <-gpio--/ \--- KSZ8041
+> > 
+> > 
+> > One point is, if you look at the first case (no mux), we need to know
+> > if the PHYs are able to isolate or not in order to use the proper
+> > switching strategy (isolate or power-down).  
+> 
+> That explains the hardware, but what are the use cases? How did the
+> hardware designer envision this hardware being used?
+
+The use-case is link redundancy, if one PHY loses the link, we hope
+that we still have link on the other one and switchover. This is one of
+the things I discussed at netdev 0x17.
+
+> If you need to power the PHY off, you cannot have dynamic behaviour
+> where the first to have link wins. But if you can have the media side
+> functional, you can do some dynamic behaviours.
+
+True.
+
+> Although, is it wise
+> for the link to come up, yet to be functionally dead because it has no
+> MAC connected?
+
+Good point. What would you think ? I already deal with the identified
+issue which is that both PHYs are link-up with LP, both connected to
+the same switch. When we switch between the active PHYs, we send a
+gratuitous ARP on the new PHY to refresh the switch's FDB.
+
+Do you see that as being an issue, having the LP see link-up when the
+link cannot actually convey data ? Besides the energy detect feature
+you mention, I don't see what other options we can have unfortunately :(
+
+> There are some Marvell Switches which support both internal Copper
+> PHYs and a SERDES port. The hardware allows first to get link to have
+> a functional MAC. But in Linux we have not supported that, and we
+> leave the unused part down so it does not get link.
+
+My plan is to support these as well. For the end-user, it makes no
+difference wether the HW internally has 2 PHYs each with one port, or 1
+phy with 2 ports. So to me, if we want to support phy_mux, we should
+also support the case you mention above. I have some code to support
+this, but that's the part where I'm still getting things ironed-out,
+this is pretty tricky to represent that properly, especially in DT.
+
 >
-> True, but this can be solved with some new BPF_F_XDP_HAS_FRAGS-like
-> flag (which can reject loading if there is some incompatibility)?
-> Even in the new KV-metadata world, 2+ programs still need to be
-> aware of the new method to work correctly. But I do see your point
-> that it's better to not apply any metadata than apply something
-> that's corrupt/overridden.
+> Maybe we actually want energy detect, not link, to decide which PHY
+> should get the MAC?  But i have no real idea what you can do with
+> energy detect, and it would also mean building out the read_status()
+> call to report additional things, etc.
 
-Currently the new KV-metadata will be tied to XDP, because most NICs only
-reserve enough headroom if an XDP program is attached.
+Note that I'm trying to support a bigger set of use-cases besides the
+pure 2-PHY setup. One being that we have a MUX within the SoC on the
+SERDES lanes, allowing to steer the MII interface between a PHY and an
+SFP bus (Turris Omnia has such a setup). Is it possible to have an
+equivalent "energy detect" on all kinds of SFPs ?
 
-But longer-term, I'm hoping to lift this restriction to let users not using
-XDP (eg using TC only, or other hook points) use the KV metadata too.
-Enabling it with an XDP flag would make that hard.
+As a note, I do see that both Russell and you may think you're being
+"drip-fed" (I learned that term today) information, that's not my
+intent at all, I wasn't expecting this discussion now, sorry about that.
 
-We also want to store the new KV metadata at the start of the headroom=20
-(right after xdp_frame) so that we don't have to move it for every=20
-xdp_adjust_head() call.
+I was saying to Russell that I would start a new thread, but we already
+have a discussion going here, let me know if we shall continue the
+discussion here or on a new thread.
 
-That makes it very easy for them to coexist, it's just a few bounds
-checks when we grow each one.
+Thanks,
 
-> > But in a sense the *memory area* is shared between the two APIs, in the
-> > sense that they both use the headroom before the packet data, just from
-> > opposite ends. So if you store lots of data using the new KV API, that
-> > space will no longer be available for xdp_adjust_{head,meta}. But the
-> > kernel can enforce this so we don't get programs corrupting the KV
-> > format.
->
-> Ack, let's see how it shapes out. My main concern comes from the
-> growing api surface where for af_xdp it's one mechanism, for xdp
-> redirect it's another. And for Jakub's consumption from userspace
-> it's gonna be another special case probably (to read it out from the
-> headroom head)? Idk, maybe it's fine as long as each case is clearly
-> documented.
-
-You're right, there's going to be relatively big API surface. Hopefully
-the APIs should all be very similar, and we'll document them.
+Maxime
 
