@@ -1,146 +1,104 @@
-Return-Path: <netdev+bounces-133185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6FD699541D
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CCB7995424
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74C05B28BA9
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:11:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2CF9B28F86
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD7F11E131D;
-	Tue,  8 Oct 2024 16:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5CC1E0DA5;
+	Tue,  8 Oct 2024 16:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pstc5aoK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DzwISJwZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41131E0E1B;
-	Tue,  8 Oct 2024 16:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78D31DF73A
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 16:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728403842; cv=none; b=fVL2+XWmd3mOtUPe2mRCpYO8qB64LjVk8xzX5tQVDGpwHWJCxGzzSjyiMBbeUj/zT1g/RGdc3bpuUL29HDYgJv0RrK7aVbE2gqa2UZcYAWFrbLgOerG1w74E2jahb2tebItMGlrZdA1ql0sS+ceadCDeLGU/CzWFqYmjm+MM/bs=
+	t=1728403949; cv=none; b=F87zqQt+GQNmUPGvmPrQfu8Ab2iLcfDIxIJRyDd+MfcyrrWY6q8XgfhX8wYm6zO6WI3DFOOBbEqG62d04xLdqk28/zOZeCdzJW0xccFoFVKavC43K8OeK64iZJ6i5RwGMHJX6VRoFcNjYneXSDu2RpHoniff38P/0nK+W5MLApA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728403842; c=relaxed/simple;
-	bh=cWyudSNwMdAoPLDHpxMU3t/7IYAcpd1uRUv+IKIqdyE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AShsH8pzkf7V9QbEVsTJwD/OX3PItNfY3welWbu19ogPuwxZQ8DC1j7JfOInKGJQl6Z3lMPhKpIm2ad6kiDAAlHAowlvWjbc414Ia5lkca31L82/C2SfRFPYGC8OYFi8rd1M9X8VyQhPQZqYyddst913M2I+KePIu2KpO2P9uck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pstc5aoK; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43056d99a5aso3826295e9.0;
-        Tue, 08 Oct 2024 09:10:40 -0700 (PDT)
+	s=arc-20240116; t=1728403949; c=relaxed/simple;
+	bh=PwIBzBtCMxPX3gim1jb6wGk323exibSdhDQQEpL42Eg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kaPDkSoNEK3IhV6teweMdJDojxA6GK/3ZA/l5HDPEZyfdjZLv0uP0gMKQOSKCumcvTebsehDxX4UUsC9pxyjgWf0MBz/z4Yh97Ed3Xk+g/IAXfEUE01tr50g5PVihdt3UAEtcNI4nzSlbU3gV+IzLVACJFTxdYu3TM81/Blgdkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DzwISJwZ; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728403839; x=1729008639; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MKEcyPzV2K4r+AP5/PHCK58XwhBSe6yI2S077zk0qgU=;
-        b=Pstc5aoKtRGP5YQVeCVZXRokGeOGMS/l3LyMRI/eO4bsf0bY9gCAaQ3EoHi++xiSxK
-         CBNxO6DNFxfymE9bSZiSpD441+QkImA9WMSf4OJMdTgwTZi2xJzNI5k/WpK50to3+WcC
-         OeBZyJOEYhW/ubqOoIt/xJ8nAteNyz/vpNTgSDTHazS0+JOU9ReiPNCdDcn9gC1Lzf9o
-         DaBpI4/lBMTSap6axxBUAQCZVD8aIF/TZYMGmy6kIS1j/znCOa3AAvF+IuAQWMBnBieS
-         2QWIRpHlo8jYmsMPk50o7uFjz6DB7AUMOMP2uuA3lKuUUISV1N+HgVYbwwP/Oi7qmhvn
-         V74g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728403839; x=1729008639;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MKEcyPzV2K4r+AP5/PHCK58XwhBSe6yI2S077zk0qgU=;
-        b=SwnzQgNQG3DFTKkDc2SRbNel+A26N2TikqCHJP8wvLEPe/eiWqb4WFBuvQaO81Av3R
-         0SxkOPFoSx7pZoUmFkcJWYLyhHxpObIeJb55+YtUpp0ex7yi31YzmABbipqsTX5AsuFL
-         mEbAx9VuCfOtJbXzqcURTVZXQouPm4ntJD9YVw0OJi5cGYsdSOxuZ7mKDTXypQ1URTdE
-         0RwUiNsL1yZx9VzukBJ4UEJahGMuL17aPU5JKQZQyK4EDTVl56a+/hC3jNBrHj4VXYYq
-         RJnZesnp0VlL5gpJ8ADYCu9hFto+t/hgQbsOWiep/L5AKJ5Z4T1q/75nWdWUhJDw5kYG
-         Ws7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUUeK7aqdjeRba8brnv/UoX1mvY8gFvIT5FMsG2/CzId61c/jVUq5BDT8ERN3ZVRjbwceeDxJeE@vger.kernel.org, AJvYcCWATiFvDrMh70BkSAUZ6WzBd5kpS7CMFM+IQhtsssAx78PDvfN/Pi75EjDmAZb0Zso3yNs5JnRCE0NzBbU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx13XYKkbm7pN1v16MqJpVxqVvIn2I4L2aMsCW1LqUVmKnpzfAA
-	2nvIDxkUH+sdauMgM+Qg0E66nEu6r/16PZg6J+dnrONuaLhn04BtZPS+Uoyy
-X-Google-Smtp-Source: AGHT+IGNjyCJTmyTOfXgVwWxpuw+hFn0QXE40kSv7Ekdba6rn3qd+huk2emCJAp/YE7300IIDQiy5w==
-X-Received: by 2002:a05:600c:4748:b0:426:64c1:8388 with SMTP id 5b1f17b1804b1-43057b96e01mr4863305e9.17.1728403838405;
-        Tue, 08 Oct 2024 09:10:38 -0700 (PDT)
-Received: from [127.0.1.1] (2a02-8389-41cf-e200-f2f2-fc2e-cc91-5c72.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:f2f2:fc2e:cc91:5c72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89ec71aesm113505385e9.33.2024.10.08.09.10.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 09:10:37 -0700 (PDT)
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Date: Tue, 08 Oct 2024 18:10:29 +0200
-Subject: [PATCH net-next 3/3] net: dsa: mv88e6xxx: leds: fix leds refcount
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728403947; x=1759939947;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=iziHSwjODokZRjtqdI3f8BzpxmpJono3bEfemU2GgPc=;
+  b=DzwISJwZOyCS9ZGJqiGWEzxp3lAKmhIiUcZA3zGlkX0g9y2eXRQPlK5Q
+   nPf5C7JHyVmwDodZatddvD7xLgXeLNLYOPTjgAJIRA5uo+svP+e/cg078
+   u2+Scy3O1ZY6Z5a99BR3ipy/CRBpralGzRd42kzYqNird8al+3lc/kQzP
+   M=;
+X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
+   d="scan'208";a="237691525"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 16:12:23 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:29570]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
+ id 4665a49c-323c-4bbe-8983-482abf0dcd9f; Tue, 8 Oct 2024 16:12:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 4665a49c-323c-4bbe-8983-482abf0dcd9f
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 8 Oct 2024 16:12:22 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 8 Oct 2024 16:12:20 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 net-next 3/4] rtnetlink: Add assertion helpers for per-netns RTNL.
+Date: Tue, 8 Oct 2024 09:12:11 -0700
+Message-ID: <20241008161211.92974-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <9bb97d2c-878f-479a-b092-8e74893ebb2d@redhat.com>
+References: <9bb97d2c-878f-479a-b092-8e74893ebb2d@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241008-mv88e6xxx_leds_fwnode_put-v1-3-cfd7758cd176@gmail.com>
-References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
-In-Reply-To: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, 
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- Daniel Scally <djrscally@gmail.com>, 
- Heikki Krogerus <heikki.krogerus@linux.intel.com>, 
- Sakari Ailus <sakari.ailus@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Linus Walleij <linus.walleij@linaro.org>
-Cc: linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, Javier Carrasco <javier.carrasco.cruz@gmail.com>
-X-Mailer: b4 0.14-dev
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1728403830; l=1498;
- i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
- bh=cWyudSNwMdAoPLDHpxMU3t/7IYAcpd1uRUv+IKIqdyE=;
- b=R+xeU5F94QPGHpYg+aR9IRcr5vI7nx8crw+ihr1x9cAGGvKTllbNcIVDyIuV/1uGByQv5Zu1N
- KB5AHretsNrCiMl+l8E2WSCN30YHNBCwKUZd/kJg+/TMoKi5/vrZTbP
-X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
- pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The 'leds' fwnode_handle is initialized by calling
-fwnode_get_named_child_node(), which requires an explicit call to
-fwnode_handle_put() when the node is not required anymore.
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 8 Oct 2024 13:39:24 +0200
+> On 10/5/24 00:10, Kuniyuki Iwashima wrote:
+> > Once an RTNL scope is converted with rtnl_net_lock(), we will replace
+> > RTNL helper functions inside the scope with the following per-netns
+> > alternatives:
+> > 
+> >    ASSERT_RTNL()           -> ASSERT_RTNL_NET(net)
+> >    rcu_dereference_rtnl(p) -> rcu_dereference_rtnl_net(net, p)
+> > 
+> > Note that the per-netns helpers are equivalent to the conventional
+> > helpers unless CONFIG_DEBUG_NET_SMALL_RTNL is enabled.
+> > 
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> 
+> I guess Kuniyuki stripped the ack received on v2 due to the edit here.
+> 
+> @Kuniyuki: in the next iterations, please include a per patch changelog 
+> to simplify the review.
 
-Instead of adding the missing call, and considering that this driver was
-recently introduced, use the automatic clenaup mechanism to release the
-node when it goes out of scope.
+Sure, will include changelog per-patch basis for future submission.
 
-Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
-Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
----
- drivers/net/dsa/mv88e6xxx/leds.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/mv88e6xxx/leds.c b/drivers/net/dsa/mv88e6xxx/leds.c
-index 92a57552beda..b9959e1f3c9e 100644
---- a/drivers/net/dsa/mv88e6xxx/leds.c
-+++ b/drivers/net/dsa/mv88e6xxx/leds.c
-@@ -744,7 +744,6 @@ mv88e6xxx_led1_hw_control_get_device(struct led_classdev *ldev)
- 
- int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
- {
--	struct fwnode_handle *leds = NULL;
- 	struct led_init_data init_data = { };
- 	enum led_default_state state;
- 	struct mv88e6xxx_port *p;
-@@ -763,7 +762,8 @@ int mv88e6xxx_port_setup_leds(struct mv88e6xxx_chip *chip, int port)
- 
- 	dev = chip->dev;
- 
--	leds = fwnode_get_named_child_node(p->fwnode, "leds");
-+	struct fwnode_handle *leds __free(fwnode_handle) =
-+		fwnode_get_named_child_node(p->fwnode, "leds");
- 	if (!leds) {
- 		dev_dbg(dev, "No Leds node specified in device tree for port %d!\n",
- 			port);
-
--- 
-2.43.0
-
+Thanks!
 
