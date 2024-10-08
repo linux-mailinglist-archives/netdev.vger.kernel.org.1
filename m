@@ -1,51 +1,45 @@
-Return-Path: <netdev+bounces-133108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C98C994DBD
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:09:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DD1A994E59
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4ED0A1C24F7B
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:09:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CBEBB2C39A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 957141DEFF7;
-	Tue,  8 Oct 2024 13:08:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hI2kh+//"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D091DEFE6;
+	Tue,  8 Oct 2024 13:13:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AAF1DF24B;
-	Tue,  8 Oct 2024 13:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA711DE88F;
+	Tue,  8 Oct 2024 13:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728392922; cv=none; b=JhSM/ATYqXUBB3hmMm2k6Hqd8B3YpQHAN7dq0qOHqJ6ccU/sk0TIl6xkebhOMA6x09AkA8zwDgImedZIHANhGhmUL5tzFwDye2A2gmuee/4ULquEyBGCyn1/L8f+x8T3bkapeGZf3GXxFSdBFrf4xcpZ1hNBlqDUGnX1sF/YD94=
+	t=1728393187; cv=none; b=RscnbGFEhKpKqVqW+w4SnhaNjNIb1fwgBF0fNjt6Santtr2XBEk6lK487lqJU7Chq7hF0OHliOswxD0NQ2HHHaX5SZZ3UV+uWZia4ahNzruUOCircTECdv8tYcVPAoO4OJ7go0h0WPbk1R3XXcWJiNkkIhHfGy9c2VBf+5AQNzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728392922; c=relaxed/simple;
-	bh=JgXP1AYIwXhdzdxK4cNJHJCGrxsYLtDEhm7vjrryyy8=;
+	s=arc-20240116; t=1728393187; c=relaxed/simple;
+	bh=kWolaxy9BFb65skdKEyMGtyjqIelsjI/f70XBk08Rcg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuGhMA9Bixilakx6zNkAiuosBvd9JcrV+gPCuOfs/RVrJxSlwNYWgslNUNfbuaGBj/hCNz6VfH4S6gjw42kbxHhqaJyDCq5hBndwFdNFWKCivQ0Gh5FuV2br1FZN6prBgrRjGfS4xUviO77jlizbGv1gZwCxx58WzTZIMzRwY88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hI2kh+//; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=k8HRf5BUMurO5bidlS62jMLhyjLeJVd4qVtNlJc2ON4=; b=hI2kh+//z5eD7c0Q01XX3x/wX+
-	UXvriQSsNXT+QzBYEkT7EQwkxXHWMozv/2QSO6BcHxUYfs/pZ+AMb+HlQFK2ZzD4JNR9FT0aDreom
-	bdyxdKADYh2LzifJrz6ydTa4YG6b0Q1dW+Y7cCRMU1pNCTZo7z2Cfld5nJTJCjhzrO/8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sy9x2-009N8S-Hg; Tue, 08 Oct 2024 15:08:32 +0200
-Date: Tue, 8 Oct 2024 15:08:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wz6oBAns9Lc8zIMOJxN9UAd+umvIu2fH2Q9b83V9WqgkOdCCkR2jX689o0vsbssHl7lNvmklgDleXDyAWntCS5cYDL6SRpI3SWyR214zrUDZv09U7OL2OBFFpgRnZlIomSgeXHs0eGBjZablCzxwdNfjUstbDbhZGW/gZJGVXr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1syA1L-000000000AX-1fe6;
+	Tue, 08 Oct 2024 13:12:59 +0000
+Date: Tue, 8 Oct 2024 14:12:55 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -53,8 +47,9 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [net-next PATCH v2] net: phy: Validate PHY LED OPs presence
  before registering
-Message-ID: <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
+Message-ID: <ZwUv15SUVhRukqVr@makrotopia.org>
 References: <20241004183312.14829-1-ansuelsmth@gmail.com>
+ <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,21 +58,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241004183312.14829-1-ansuelsmth@gmail.com>
+In-Reply-To: <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
 
-> +	/* Check if the PHY driver have at least an OP to
-> +	 * set the LEDs.
-> +	 */
-> +	if (!phydev->drv->led_brightness_set &&
-> +	    !phydev->drv->led_blink_set &&
-> +	    !phydev->drv->led_hw_control_set) {
+On Tue, Oct 08, 2024 at 03:08:32PM +0200, Andrew Lunn wrote:
+> > +	/* Check if the PHY driver have at least an OP to
+> > +	 * set the LEDs.
+> > +	 */
+> > +	if (!phydev->drv->led_brightness_set &&
+> > +	    !phydev->drv->led_blink_set &&
+> > +	    !phydev->drv->led_hw_control_set) {
+> 
+> I think this condition is too strong. All that should be required is
+> led_brightness_set(). The rest can be done in software.
 
-I think this condition is too strong. All that should be required is
-led_brightness_set(). The rest can be done in software.
+Some drivers do not offer led_brightness_set().
+See for example
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/phy/realtek.c#n1303
 
-
-    Andrew
-
----
-pw-bot: cr
+Afaik there aren't any drivers which only offer led_blink_set(), that
+would indeed be a bit weird. But only offering led_hw_control_set() is a
+(rather sad) reality.
 
