@@ -1,183 +1,234 @@
-Return-Path: <netdev+bounces-133064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B39994651
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:15:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD835994659
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:16:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1503E1F25F86
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:15:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE981C23DA1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853131CEEAD;
-	Tue,  8 Oct 2024 11:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D574199E92;
+	Tue,  8 Oct 2024 11:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mjZmb2sh"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2137.outbound.protection.partner.outlook.cn [139.219.17.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6E518C91B;
-	Tue,  8 Oct 2024 11:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.137
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728386099; cv=fail; b=CYQ2Y8TCyrcuLuzLgvM2JE1BZHFAxe7pq+vA08Jd5AjVqnu+bisKNEOOHaACtVNeGTH9SWkHvYApMntr+jY+k3VyfoSvhF9mBmME3rpeV51yjSANqKFLdrMGyZjQZsv/b1CooxF+eDvd0BZ6amRB9lUgchCqjNeubm1OEZuICI0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728386099; c=relaxed/simple;
-	bh=2oQR0AavmINpCsu0s6TXmTpO0FW3LmjPUxlNJd29y0Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=jvXOH2w6nU6EqTCaJ61XftgyXnuGz/N8LlhzwEQ2nohwIc1L9CbJiyQFHAFuOGpirGRQf8O1Nznnw3FXXwGMHtCtWFl/jUC3a3l6zKJnbp+KurcQN/NK3JDTtJPsNaybJ2uGH3uVudgZuIvRuD3PxaVUwnQj0L5EsRjPLaoo5k4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=INlcg5QIQNOM1tGFpfAy/8DWrBGqskB7TxU/FrqpGJUmqSNRBUajbFQcGV7FvFirE9f81lmelHdAgH0LCgFWI5fny8EA2NN7PcKGUfK85Xi5DwzjNbdUjEzWLn6qWMFqu1LIwG/Z4jeV2hfqNFBqHjK90nxd82xofeHF3+VxcqgWJzDX/qEpty6PeD59AZBkvhW2nxesV34lsdYQQzAQpN74qqtjU90AnQwdwokP/toPqyZhzhT8aGTiwfS8xQ6WFXVAGh5k1hy5Fd2hLOTAtLWPeANd+0Wvv+GCC5NyY5E3574jYfmmQnzgeM0m46bJ/YxLQ8YYFC4VEf/T5IrZqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jdt8+2f9OFteckO8x32hLGOtZuJB4TbXJN2FXtkqkus=;
- b=Y9ZiM0M08pHppJxEzniIH0wWlnXNuqKuYN1h1LDBEypSpE4xQmC/Vw/gxhnxce/kgZ95GD3CfJjTQnKIMS8/oB298rUq81LP3q6ikxcX0AaOZLCUQu2FWnWYYTO6DK0rlMJaIhK3H2UouVdTPRiQmlQUWFlxIBkbja02TUZirHgo/pOFnszrjRhBEtjclgtC5GADv7vpM1O5nOmz8FpkWQIih0svibF8zJHSyOGrW7TztrJpkNVxR8cbnsS0aDMGxpW2SxGmjSbxM83wBPe9d475DV3DvIsxb/m6MAxtFcATxYF47jAC1jertciOarUgrB+02mb01NVr8HMZtbVo9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0718.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.31; Tue, 8 Oct
- 2024 11:14:52 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::3f35:8db2:7fdf:9ffb]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::3f35:8db2:7fdf:9ffb%5])
- with mapi id 15.20.8005.031; Tue, 8 Oct 2024 11:14:52 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Minda Chen <minda.chen@starfivetech.com>
-Subject: [PATCH net-next v3] net: stmmac: Add DW QoS Eth v4/v5 ip payload error statistics
-Date: Tue,  8 Oct 2024 19:14:43 +0800
-Message-Id: <20241008111443.81467-1-minda.chen@starfivetech.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: SHXPR01CA0006.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1b::15) To SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE0918C900
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 11:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728386168; cv=none; b=V8NJ3P0zLUvAaH+zs8fNthXK6XJwC5U0NB1YMuU4TJBiomtTOuH74K/BYbgsK9Tn7i9WQWZ+LYusDCh8VMWUbL+2kwXlCDZlZ0+kgGLjPIx8aV/gK185q+OuxQnxhoOHkrlD+QAP23yals98cOxbEkSvyETpvacmUYv91lJwA0Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728386168; c=relaxed/simple;
+	bh=4bjVuoaEqOg9kTKBVPX6HtmLxvp6STF3+bBMsHNqYjo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YwY7BRE330DzFePQEg0HQ86pltuWEKWdhUJA9KjAJsXPWhiGM9OnIrtAJMfUX5mhaKrEZey8i1IGPEfl9WD0LMpvQlDb4E5pjcQLW+dXgLddZ+5YmSV4YkTUE6V6o+Za6jWLbXROR0keV3jIpJdAS9ilFbh4STfZpshTSNQc+CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mjZmb2sh; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e21dcc7044so77968907b3.1
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 04:16:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728386166; x=1728990966; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RtQHNgBmIFqK1ii3HgJLr+jMF62s09rx1muiZr/MtG0=;
+        b=mjZmb2sh4UZuvuosN+fOcOkW+tAG83MYd0Cz979KtW87BkCCOlU4QgoplZxjc02U+R
+         BIrGu0E5yN5ex2jnYYnIktYK+sWMqeNKIyurDHoBaxcB94KHvG+NlLI9S5Ig3OPnmg92
+         t2rNm/wlF3YxjwvbWfVrVILDAWtroMsFr83Sa0CESxsVZxx5EmoUhzWy3bpEknrFkcH8
+         4eSbIRrzoKjVxj6Bb7S1TN8bUoPK1+s4djoxifx9qw1qh8TkF9t3kjDauyjmXYM9BXph
+         AebYffC79RuXBCZgDqMfkE4flOtvQ1vSRG1HWSBPXwUkD1ddTDJhIafYWvxGqBNrEZ8g
+         ulAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728386166; x=1728990966;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RtQHNgBmIFqK1ii3HgJLr+jMF62s09rx1muiZr/MtG0=;
+        b=mDKHXY8LCLWbiP4J4F1Pv0dlcIyHXe4soxSJDU5jPz67a66r5Zd2Z17E9GqVbDL6Bw
+         5X03K/+ewijO2oidAM2ZhmIoDaDk65as3sGEjEW41JokjAzlVVVZk3k0qHECCmiaJrEj
+         4Fa5YuKYJxzCungQxI8dcpX4qzOFWAlLjWvisqHG5Sb2T+uMJiDPUHP58pD/HDsaBth+
+         4PbLScvAt5/KIA55wosTw/GhG6+vNQZRwFvMiGu5I0hhKP3H61hCjkTlBjFuFXBzVzaq
+         yCMKcK9EGKYdIq9M92407eye2WI8PFPaVa8pM7ToqQRc1NKwhf2zg091dEmD7WWo+DGq
+         xZxw==
+X-Forwarded-Encrypted: i=1; AJvYcCWon0CW1LUQB4ZLOLX+a+JsGZFUrhm2R6hxgtnfej9/PuShx6Y/ANq26cAvhq74HrT2eWrypbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeFYN/cXNAshtehDaS+LGH96oMhVsX13lwzgoPt3rkK2ydPkmx
+	iibmyn5+CUsDeb7ws1kA7qMeK8XOQBtt8vkPawVArOHxZ+BSydWdEEsMbp+HjVKYAayGqXwfg1t
+	TDAsoKYU5jQ==
+X-Google-Smtp-Source: AGHT+IGVFwx/N04q+WX+emofPypV+2wjByU0qpUR1aI0ODWWPJgt5I7JMXPqoqBcAh0MRpX7wxknUuiWBZeXJw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a05:690c:4b8f:b0:6e2:19f3:ff75 with SMTP
+ id 00721157ae682-6e2c72933e5mr2970867b3.6.1728386165778; Tue, 08 Oct 2024
+ 04:16:05 -0700 (PDT)
+Date: Tue,  8 Oct 2024 11:16:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0718:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1f03d98f-429e-4317-ca48-08dce78a6e5d
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|1800799024|52116014|7416014|41320700013|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	ZFBbELpTRizk7ivNWeED2qixav0vhP9fnCTYHQmz/IkmLkdN616LuUh0zeFIDofDoh14FwK1x9xbliBylIaNJikogvVx9dhkrw8cK2rdL7h2kXK37gxcrBWwUSOnVtPZWIfJ67m9g+6cM4q/Ujax3oypwUgA0sBUQhG9SmM9Nf0cU01p5wdaGi0RZirVqh+qmoPFnzlvOMn7ISVpPMB7GhBYDa0q9yLeCEVW1qhy7zK/OqSr9E9l53BkkxNEq44lZo411jnOYMSg+sts32Ui8R2yuVSexVN04aSz9S0FA+ZFktiwpOzHYKwaJAs/6XTZu89To9WKqRfmGfSZspRisVhNWlp60xPAKCdIZN00xAFKypNPK+Gz2H+j3leBsnBpnfMjq1OBlvCddnSxMSvWBXLJfxHBWvpkikuk9qgCKwMY7W9erRMkWOnUmaKMvVJwZaPHtrXcnCQ8qzrEwrHJ/mKb/iwwmnzlUe2TEslzvSCQgt2CbYyEO+etqc58k3Lc+ksCzjrRKMTROdpebFcNrr2uHH4f50AiFcb3g48uarr6BfydvJyhCaJiVJnX7RlRt81WhE5zt5kFd9twdgxlbn2H/ILtPt9x6wAxKMp++bgstntscTEhN0jLyyMUP3Fs
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(52116014)(7416014)(41320700013)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ezEbAHGIeJPGsEWYbIOtha9e0t8z5lMBUYyae7c5V8VO8ka2L5o4m8h/Abmc?=
- =?us-ascii?Q?fFENjLmNRn7HqTNQ2hU/sAtlRoaHaPv4jjxhpHFLjbczpgc+gjsQyuYtiuB4?=
- =?us-ascii?Q?abiGHiDvF02HGt4niFCmLNWUI51lalsaZCPAJNEL8L+NTArAG/JXR/PuvFnX?=
- =?us-ascii?Q?ltQxXilQjmm7mmn55YPogXFakrbcag2n6SbINSg4+025+a36oIAJGnrvq5Gy?=
- =?us-ascii?Q?e+V3KblZauJBAxs4DNGQbCPKncraw/oTtRQaijs4fsHImDugrhkwiH7zCa49?=
- =?us-ascii?Q?xHFCImULUUHOT/WtFsQBg/A5Gy6ojTunurHCb3DxDXOzZksDP5i2RM4GFRIk?=
- =?us-ascii?Q?oIMa/NF8OZmUbrd8mc/cXFfJrrGNXWrq2nsxhemtFplzS7w64+5LzPNDKLpC?=
- =?us-ascii?Q?MQz5zC4HfhyY3HN0UVZofGiTEs2ngXwYRjYK7K3lWh7/TzEWiNIoqgEf67ep?=
- =?us-ascii?Q?4fMj5sFXwdmbB5qMguLmlQIeVwn70OVmHCdu1mPd9T/DEh5bWe5lN30hbbTZ?=
- =?us-ascii?Q?ixTf9b2Z5HBYK8qbZAMDD7KxeZQ6mmh/bm2gkTbGjKnc513eRVle/AIFfe9+?=
- =?us-ascii?Q?EDY9Vh0gix1vR0GLpqxaPGFPpdOP/HLt6uPnfxH69OUzbUy5xEhSH7D2Ro9l?=
- =?us-ascii?Q?Mg92nEbqxguK9Gh10qHqMFn7flQSwxLUvzgHuFke1+Z+uxRGVpncO0Q2WgX/?=
- =?us-ascii?Q?trl7jw6c+gefQjE3YXPhK+iQF+4ljUw6HvTRip/6kczmWUpz4BugQf34Ozac?=
- =?us-ascii?Q?74dm1JtxNuZvVd9jTxpih6IFgKl8R0I5u56+R2xclwauFceHatxDpj7uy8NA?=
- =?us-ascii?Q?nLprIIQINbalgnS0GBgtkmMPQ4xV0tiBySUD43RO0mdBIxPVa50LczOE+00v?=
- =?us-ascii?Q?SODw314+ElW1lYZXZ7fTwhfqzKrSHVhmrgstAKJvjrcNMyXvD9zIoQoBK6QH?=
- =?us-ascii?Q?VQqXuGl3hl6lJbruZmZkAMAvAfqstw1XCz6s4HqnSEn7aaob2tHeLXITzNxY?=
- =?us-ascii?Q?CpwffaKGVLWGBxlORvyxGKhrMAcxJVxgIFgg/iPUO5xeAXsY3DIFPtRikt18?=
- =?us-ascii?Q?llk+lXCAJRoHLcTYTAEr9EUHzPh4DSOGa4QKXD1oT30LIF2uy7q99op1G4F7?=
- =?us-ascii?Q?B0gYxyhGBeJKxS4lgu7hGlEH7OWQ07SnbztUOpYeIzlgk6kYfQ+McGcXnJ5v?=
- =?us-ascii?Q?aS9ukB53wx8O5f/JAI8WitwXHwxrf3/DcV0Gr5644KHUPoA9XxdP47JtBrer?=
- =?us-ascii?Q?HaqvyFRyYfZ6G+ZXBJnP9BcVl2Ui3jeP5/56ZzYGoYL3ZYpHu5rk/ZEjTWYl?=
- =?us-ascii?Q?afpPC37atQQ/2MCwL4gM3+xkOhAyCzL/NrAVQBtZIz/1gBVcAR/As+tgQ/JN?=
- =?us-ascii?Q?z5I3w3WQaJYYPYqYE5WaDeCNItHNTic4Xw8VQGXAtZ68JMWVqQaW5NSR0zz1?=
- =?us-ascii?Q?sdMo7Qjr5/elbJi6YYkAROTvCPRR9MHKNJAjMQm0jfXXBTh4y0P1dv3marzD?=
- =?us-ascii?Q?ADmKauZ9GU6VUy30d/kB+RBwgPOGJ0CIUIDGdI11uyNaqRKfM7RaVJEWPp4O?=
- =?us-ascii?Q?wbQ5IXNMEnODw4EO2E/neTIKfiA0IQlR7POmucgoQtow+qXqI3E84abLVxYA?=
- =?us-ascii?Q?tg=3D=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f03d98f-429e-4317-ca48-08dce78a6e5d
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2024 11:14:52.3732
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MclU9HpPgnw6MtJU4z3SKkWbK4tNCsvC0pqJe/aerAJy7vxjtf3x7gtZQ+gtudd/VXYIffLOOEktSJzfV55wltmsn+Ftu7h8UmiIEW+KAqI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0718
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241008111603.653140-1-edumazet@google.com>
+Subject: [PATCH net-next] net_sched: sch_sfq: handle bigger packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Add DW QoS Eth v4/v5 ip payload error statistics, and rename descriptor
-bit macro because v4/v5 descriptor IPCE bit claims ip checksum
-error or TCP/UDP/ICMP segment length error.
+SFQ has an assumption on dealing with packets smaller than 64KB.
 
-Here is bit description from DW QoS Eth data book(Part 19.6.2.2)
+Even before BIG TCP, TCA_STAB can provide arbitrary big values
+in qdisc_pkt_len(skb)
 
-bit7 IPCE: IP Payload Error
-When this bit is programmed, it indicates either of the following:
-1).The 16-bit IP payload checksum (that is, the TCP, UDP, or ICMP
-   checksum) calculated by the MAC does not match the corresponding
-   checksum field in the received segment.
-2).The TCP, UDP, or ICMP segment length does not match the payload
-   length value in the IP  Header field.
-3).The TCP, UDP, or ICMP segment length is less than minimum allowed
-   segment length for TCP, UDP, or ICMP.
+It is time to switch (struct sfq_slot)->allot to a 32bit field.
 
-Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+sizeof(struct sfq_slot) is now 64 bytes, giving better cache locality.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c | 2 ++
- drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ net/sched/sch_sfq.c | 39 +++++++++++++--------------------------
+ 1 file changed, 13 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-index e99401bcc1f8..a5fb31eb0192 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-@@ -118,6 +118,8 @@ static int dwmac4_wrback_get_rx_status(struct stmmac_extra_stats *x,
- 		x->ipv4_pkt_rcvd++;
- 	if (rdes1 & RDES1_IPV6_HEADER)
- 		x->ipv6_pkt_rcvd++;
-+	if (rdes1 & RDES1_IP_PAYLOAD_ERROR)
-+		x->ip_payload_err++;
+diff --git a/net/sched/sch_sfq.c b/net/sched/sch_sfq.c
+index 3b9245a3c767a6feed5e06f90459ae896b217c23..a4b8296a2fa1caf2e8337610d705cc9b06b1a2f8 100644
+--- a/net/sched/sch_sfq.c
++++ b/net/sched/sch_sfq.c
+@@ -77,12 +77,6 @@
+ #define SFQ_EMPTY_SLOT		0xffff
+ #define SFQ_DEFAULT_HASH_DIVISOR 1024
  
- 	if (message_type == RDES_EXT_NO_PTP)
- 		x->no_ptp_rx_msg_type_ext++;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-index 6da070ccd737..1ce6f43d545a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-@@ -95,7 +95,7 @@
- #define RDES1_IPV4_HEADER		BIT(4)
- #define RDES1_IPV6_HEADER		BIT(5)
- #define RDES1_IP_CSUM_BYPASSED		BIT(6)
--#define RDES1_IP_CSUM_ERROR		BIT(7)
-+#define RDES1_IP_PAYLOAD_ERROR		BIT(7)
- #define RDES1_PTP_MSG_TYPE_MASK		GENMASK(11, 8)
- #define RDES1_PTP_PACKET_TYPE		BIT(12)
- #define RDES1_PTP_VER			BIT(13)
+-/* We use 16 bits to store allot, and want to handle packets up to 64K
+- * Scale allot by 8 (1<<3) so that no overflow occurs.
+- */
+-#define SFQ_ALLOT_SHIFT		3
+-#define SFQ_ALLOT_SIZE(X)	DIV_ROUND_UP(X, 1 << SFQ_ALLOT_SHIFT)
+-
+ /* This type should contain at least SFQ_MAX_DEPTH + 1 + SFQ_MAX_FLOWS values */
+ typedef u16 sfq_index;
+ 
+@@ -104,7 +98,7 @@ struct sfq_slot {
+ 	sfq_index	next; /* next slot in sfq RR chain */
+ 	struct sfq_head dep; /* anchor in dep[] chains */
+ 	unsigned short	hash; /* hash value (index in ht[]) */
+-	short		allot; /* credit for this slot */
++	int		allot; /* credit for this slot */
+ 
+ 	unsigned int    backlog;
+ 	struct red_vars vars;
+@@ -120,7 +114,6 @@ struct sfq_sched_data {
+ 	siphash_key_t 	perturbation;
+ 	u8		cur_depth;	/* depth of longest slot */
+ 	u8		flags;
+-	unsigned short  scaled_quantum; /* SFQ_ALLOT_SIZE(quantum) */
+ 	struct tcf_proto __rcu *filter_list;
+ 	struct tcf_block *block;
+ 	sfq_index	*ht;		/* Hash table ('divisor' slots) */
+@@ -456,7 +449,7 @@ sfq_enqueue(struct sk_buff *skb, struct Qdisc *sch, struct sk_buff **to_free)
+ 		 */
+ 		q->tail = slot;
+ 		/* We could use a bigger initial quantum for new flows */
+-		slot->allot = q->scaled_quantum;
++		slot->allot = q->quantum;
+ 	}
+ 	if (++sch->q.qlen <= q->limit)
+ 		return NET_XMIT_SUCCESS;
+@@ -493,7 +486,7 @@ sfq_dequeue(struct Qdisc *sch)
+ 	slot = &q->slots[a];
+ 	if (slot->allot <= 0) {
+ 		q->tail = slot;
+-		slot->allot += q->scaled_quantum;
++		slot->allot += q->quantum;
+ 		goto next_slot;
+ 	}
+ 	skb = slot_dequeue_head(slot);
+@@ -512,7 +505,7 @@ sfq_dequeue(struct Qdisc *sch)
+ 		}
+ 		q->tail->next = next_a;
+ 	} else {
+-		slot->allot -= SFQ_ALLOT_SIZE(qdisc_pkt_len(skb));
++		slot->allot -= qdisc_pkt_len(skb);
+ 	}
+ 	return skb;
+ }
+@@ -595,7 +588,7 @@ static void sfq_rehash(struct Qdisc *sch)
+ 				q->tail->next = x;
+ 			}
+ 			q->tail = slot;
+-			slot->allot = q->scaled_quantum;
++			slot->allot = q->quantum;
+ 		}
+ 	}
+ 	sch->q.qlen -= dropped;
+@@ -628,7 +621,8 @@ static void sfq_perturbation(struct timer_list *t)
+ 	rcu_read_unlock();
+ }
+ 
+-static int sfq_change(struct Qdisc *sch, struct nlattr *opt)
++static int sfq_change(struct Qdisc *sch, struct nlattr *opt,
++		      struct netlink_ext_ack *extack)
+ {
+ 	struct sfq_sched_data *q = qdisc_priv(sch);
+ 	struct tc_sfq_qopt *ctl = nla_data(opt);
+@@ -646,14 +640,10 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt)
+ 	    (!is_power_of_2(ctl->divisor) || ctl->divisor > 65536))
+ 		return -EINVAL;
+ 
+-	/* slot->allot is a short, make sure quantum is not too big. */
+-	if (ctl->quantum) {
+-		unsigned int scaled = SFQ_ALLOT_SIZE(ctl->quantum);
+-
+-		if (scaled <= 0 || scaled > SHRT_MAX)
+-			return -EINVAL;
++	if ((int)ctl->quantum < 0) {
++		NL_SET_ERR_MSG_MOD(extack, "invalid quantum");
++		return -EINVAL;
+ 	}
+-
+ 	if (ctl_v1 && !red_check_params(ctl_v1->qth_min, ctl_v1->qth_max,
+ 					ctl_v1->Wlog, ctl_v1->Scell_log, NULL))
+ 		return -EINVAL;
+@@ -663,10 +653,8 @@ static int sfq_change(struct Qdisc *sch, struct nlattr *opt)
+ 			return -ENOMEM;
+ 	}
+ 	sch_tree_lock(sch);
+-	if (ctl->quantum) {
++	if (ctl->quantum)
+ 		q->quantum = ctl->quantum;
+-		q->scaled_quantum = SFQ_ALLOT_SIZE(q->quantum);
+-	}
+ 	WRITE_ONCE(q->perturb_period, ctl->perturb_period * HZ);
+ 	if (ctl->flows)
+ 		q->maxflows = min_t(u32, ctl->flows, SFQ_MAX_FLOWS);
+@@ -762,12 +750,11 @@ static int sfq_init(struct Qdisc *sch, struct nlattr *opt,
+ 	q->divisor = SFQ_DEFAULT_HASH_DIVISOR;
+ 	q->maxflows = SFQ_DEFAULT_FLOWS;
+ 	q->quantum = psched_mtu(qdisc_dev(sch));
+-	q->scaled_quantum = SFQ_ALLOT_SIZE(q->quantum);
+ 	q->perturb_period = 0;
+ 	get_random_bytes(&q->perturbation, sizeof(q->perturbation));
+ 
+ 	if (opt) {
+-		int err = sfq_change(sch, opt);
++		int err = sfq_change(sch, opt, extack);
+ 		if (err)
+ 			return err;
+ 	}
+@@ -878,7 +865,7 @@ static int sfq_dump_class_stats(struct Qdisc *sch, unsigned long cl,
+ 	if (idx != SFQ_EMPTY_SLOT) {
+ 		const struct sfq_slot *slot = &q->slots[idx];
+ 
+-		xstats.allot = slot->allot << SFQ_ALLOT_SHIFT;
++		xstats.allot = slot->allot;
+ 		qs.qlen = slot->qlen;
+ 		qs.backlog = slot->backlog;
+ 	}
 -- 
-2.17.1
+2.47.0.rc0.187.ge670bccf7e-goog
 
 
