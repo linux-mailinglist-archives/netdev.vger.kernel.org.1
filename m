@@ -1,183 +1,214 @@
-Return-Path: <netdev+bounces-133162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCFD199522E
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:45:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81F7A995255
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:49:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BE921F23403
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:45:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B04E1F26148
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B5E1DFD86;
-	Tue,  8 Oct 2024 14:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="mqbEA6uk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914321DFE36;
+	Tue,  8 Oct 2024 14:49:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EB61DE4C1
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:45:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F38A18CBED;
+	Tue,  8 Oct 2024 14:49:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728398749; cv=none; b=U5xm2n9O6Tcsvuvacl8TLJvVddnMVjBEd9U/LUW5xSZpDCtqVj0fO2QjQQE44dq/10V53p6f3TT0YIyXQ9iR09BSBnjEXpJhZspNgpcBzsZX2brluBBytt2IfatjpzuMXA79qjY0JwIB1QtRshcIPAAvpeJ2kpD1DOlPG1XYf34=
+	t=1728398945; cv=none; b=ZmwTpLDww2J55lDQBXib+zzHrFjysCgzAyjAG0wNqvB/nXIFpN2Sz9QQz1mIVICses4Qi2IWw+16ZmGxbPOhEXICgig6CWdnhEzIpLMPbARvnk2KV9dJDSuBB+G7KTtM3+AlStDuwvbc/3RH5CtPa6RSgW2NH1geiiQ1E82VH8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728398749; c=relaxed/simple;
-	bh=OEPIoOSafXbHth2X0cZbo48ef5bM+/sWgUUWroovlLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hrJDLz71qRNWLZw+ViiMlRXfZJuiLjaulNi7KemEU7ZOL4RWXzVtbwmb3KxsIY5wqBXbdwllbl69X1dxp2OlX07aYT0wa0QkAbIrZ6/CGZ/718PGFPT2FVAyCdnFcaX4Xs100JcAgcguDCePyTa4aBJTc2ftjb41H/7Vr8JLtno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=mqbEA6uk; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37ce9644daaso3727994f8f.3
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 07:45:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1728398746; x=1729003546; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gyA0o4MkgtBHEt4wv5eC/jzDocCl8Fg8KhFwA03Dsp8=;
-        b=mqbEA6ukgwRZPTNdc2kPHjiM9uSGj1BnQSJjJ1K9EDj06ZEMlXAtW3i/zQYdOyaeZm
-         5uPWd4ykWGei3+M78ZBoXtT4vGcaalVQz+BD6badABHDCF6fSUDailtzXq5WMJ3K/AJ/
-         8DQVk2z9jlEt+axc3MMyCwvPXNlOqMwFtTgjmHneJWgKPByhOIAEsMxk6yTIsEgkz3LW
-         F9FBxbfEq4hUkuiGCKpN+Tc+fby099a+oJJBFrC4AmNVMMlka3GF4rsCMeq/ozMtoRTy
-         NxOz1G5aAWDt3IpCSbahgtNoptgssqDgzvzAdJWJ0/ppNP8a3fY4vYR1bs+m5+jl6rvs
-         7gEg==
+	s=arc-20240116; t=1728398945; c=relaxed/simple;
+	bh=XKowxwTPMI21GpoEJnctf3c/oGvqsrrVGpbwFNyfq+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pcs0DxUJ5L0RUfPis5Oh3VT/mpLJz/0O5xsU1h3iWZ29t9A6WaM8hVYtO3WtcLDxlUhGZcQcy/rO/yPmiz1yeRdxMN9HE0uVxvF0TfUAQsJ4VGW5SfFLF5LdRFqcnljJXjTL5+b3J0st+ZqVVmhy2bnemiQwBEHgroR24cuiI2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c91756c9easo571110a12.1;
+        Tue, 08 Oct 2024 07:49:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728398746; x=1729003546;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1728398942; x=1729003742;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gyA0o4MkgtBHEt4wv5eC/jzDocCl8Fg8KhFwA03Dsp8=;
-        b=i1CF2Dk97vy6aKRCveZlnklbanzmWNhwcWiD6zuT6gkekcHd3jK66OUu8DFM6F4gOu
-         3BxlOY2PlkSHJ6nU3waYh/EcBZgmbWh/HYniY7cdaeLGeliofc6MyH8fi3GjVPZXzqCJ
-         wi7L5QOZgIt4rPDI4t/bE5OAhJ3BjeqJ/TgABqbYOcJVPU1yplEbcjzRO341Lx8r++3d
-         120pMlet7E/07Uk2sOkcTAZByzd+vPOyL8g5eHy3ACQD4++hrZmT6iRNSGETMeTupHIc
-         ALI6KDPl4CpVselEmXmEdi/AejKL23dYip6FnldWHFS0nQjtqrZPDht1n7D4wCRyJqnT
-         To8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWYEFu0huXS/+FlK92Af9AetCbOiXQU2pSpnTluhtUW4XTME7WDC8slQZMPjHlAC+8bAOqiG1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwdQnlZcWkci28O5H8Y7PaS9UdFZzW06ANXyna7JwtLivat2/dC
-	a44yJ5Bt9oSIn8YOgQiJMPL2RFpXdQzXgK7/kvIjwxyOHffeDuriWyKEOFamDCc=
-X-Google-Smtp-Source: AGHT+IHnpqRbMJPQQ/KRJ6k8Ul3NfjlAwYMFqUBQC1j92wKGfsiXs0AaFgp4Y7hJhUm28QP/eeU1yQ==
-X-Received: by 2002:a5d:5c88:0:b0:37d:370a:5248 with SMTP id ffacd0b85a97d-37d370a5384mr837280f8f.39.1728398746139;
-        Tue, 08 Oct 2024 07:45:46 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1697024fsm8246403f8f.95.2024.10.08.07.45.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 07:45:45 -0700 (PDT)
-Message-ID: <8f285237-757b-4637-a76d-a35f27e4e748@blackwall.org>
-Date: Tue, 8 Oct 2024 17:45:44 +0300
+        bh=fxVRdComUo2k6leQZfyiZWZY58sZ35wB+q5/Ll7FGvE=;
+        b=YRo6/ramJPrMQipRp5MG9utorKaGOfRwGk9riqMNXhBDQc8zHnzD+KmCRKUEpMeTgX
+         It7+qgzUTzULfv/8qLCfIxpABsKqlawKxy8luWJoC3yMV1tIZeJvbU39Zeb11DDluits
+         vt/Ez9N2dvebgMqXQ3+XKRb60kSJPOpw0g3Wb4CYUwg3Xo3ZfbryyLoibYSygUELqZMl
+         IxNtbX73XegyKGzMH+a/37PB4ZSreOum0Dg33DfJcFtGjg3UzcUtWplejITcMIngWGDy
+         OxTpMK4Y2QXLhvyWdiiRMSN+LwRmDFKV/aAfocE4mCCaY6GHzoSQ5tTjgjyMV+c0Wc6o
+         1C6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUiqSPbrV4l76+nrdYD+4z9F8aRgUB/Q18nXhAja6EYwiM+Dl5RjpZY8EtogS3m+W+Joqkx858MNOn5g8Y=@vger.kernel.org, AJvYcCVXhsHYbPpU2S/iC7iO1SxKrvG1QNxWNJIMiNMmQj1D2FCRa5NFDMKzA13zMD623+oIQEQDDdTN@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKmEg5cSfxidfohS8Uoe/PlY2V59w8YJYeLAr9gdjntr4d2pAL
+	uLuibuqhdC/E50ulUzI2xR0u75oB5YqStpMFx3o2eYqadm/9dwO1
+X-Google-Smtp-Source: AGHT+IGmhSJudwI/2rA5wyGGws8Vw5QBROVXlUHYPBQ0FsaXq/rDvfF4EhmocfeynIL42e4sg0wsMA==
+X-Received: by 2002:a17:907:7ba1:b0:a77:ca3b:996c with SMTP id a640c23a62f3a-a99847176e5mr42406666b.16.1728398941606;
+        Tue, 08 Oct 2024 07:49:01 -0700 (PDT)
+Received: from gmail.com ([2620:10d:c092:500::7:e36b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a992e7e18a2sm516190966b.188.2024.10.08.07.49.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 07:49:01 -0700 (PDT)
+Date: Tue, 8 Oct 2024 15:48:59 +0100
+From: Breno Leitao <leitao@debian.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, rmikey@meta.com,
+	kernel-team@meta.com, horms@kernel.org,
+	"open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: Optimize IPv6 path in ip_neigh_for_gw()
+Message-ID: <ZwVGW7FexXBNm_8F@gmail.com>
+References: <20241004162720.66649-1-leitao@debian.org>
+ <2234f445-848b-4edc-9d6d-9216af9f93a3@kernel.org>
+ <20241004-straight-prompt-auk-ada09a@leitao>
+ <759f82f0-0498-466c-a4c2-a87a86e06315@redhat.com>
+ <ZwU8l8KSnVPIC5yU@gmail.com>
+ <CANn89iKBzOOMSQv5U8vpRcNtEYmPtOzqOWLxNgyjAnGOC=Bx+A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bridge: use promisc arg instead of skb flags
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Amedeo Baragiola <ingamedeo@gmail.com>, Roopa Prabhu <roopa@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241005014514.1541240-1-ingamedeo@gmail.com>
- <c06d9227-dcac-4131-9c2d-83dace086a5d@blackwall.org>
- <ZwVCC3DYWw0aiOcJ@calendula>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <ZwVCC3DYWw0aiOcJ@calendula>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKBzOOMSQv5U8vpRcNtEYmPtOzqOWLxNgyjAnGOC=Bx+A@mail.gmail.com>
 
-On 08/10/2024 17:30, Pablo Neira Ayuso wrote:
-> Hi Nikolay,
-> 
-> On Sat, Oct 05, 2024 at 05:06:56PM +0300, Nikolay Aleksandrov wrote:
->> On 05/10/2024 04:44, Amedeo Baragiola wrote:
->>> Since commit 751de2012eaf ("netfilter: br_netfilter: skip conntrack input hook for promisc packets")
->>> a second argument (promisc) has been added to br_pass_frame_up which
->>> represents whether the interface is in promiscuous mode. However,
->>> internally - in one remaining case - br_pass_frame_up checks the device
->>> flags derived from skb instead of the argument being passed in.
->>> This one-line changes addresses this inconsistency.
->>>
->>> Signed-off-by: Amedeo Baragiola <ingamedeo@gmail.com>
->>> ---
->>>  net/bridge/br_input.c | 3 +--
->>>  1 file changed, 1 insertion(+), 2 deletions(-)
->>>
->>> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
->>> index ceaa5a89b947..156c18f42fa3 100644
->>> --- a/net/bridge/br_input.c
->>> +++ b/net/bridge/br_input.c
->>> @@ -50,8 +50,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
->>>  	 * packet is allowed except in promisc mode when someone
->>>  	 * may be running packet capture.
->>>  	 */
->>> -	if (!(brdev->flags & IFF_PROMISC) &&
->>> -	    !br_allowed_egress(vg, skb)) {
->>> +	if (!promisc && !br_allowed_egress(vg, skb)) {
->>>  		kfree_skb(skb);
->>>  		return NET_RX_DROP;
->>>  	}
->>
->> This is subtle, but it does change behaviour when a BR_FDB_LOCAL dst
->> is found it will always drop the traffic after this patch (w/ promisc) if it
->> doesn't pass br_allowed_egress(). It would've been allowed before, but current
->> situation does make the patch promisc bit inconsistent, i.e. we get
->> there because of BR_FDB_LOCAL regardless of the promisc flag.
->>
->> Because we can have a BR_FDB_LOCAL dst and still pass up such skb because of
->> the flag instead of local_rcv (see br_br_handle_frame_finish()).
->>
->> CCing also Pablo for a second pair of eyes and as the original patch
->> author. :)
->>
->> Pablo WDYT?
->>
->> Just FYI we definitely want to see all traffic if promisc is set, so
->> this patch is a no-go.
-> 
-> promisc is always _false_ for BR_FDB_LOCAL dst:
-> 
->         if (dst) {
->                 unsigned long now = jiffies;
-> 
->                 if (test_bit(BR_FDB_LOCAL, &dst->flags))
->                         return br_pass_frame_up(skb, false);
-> 
->                 ...
->         }
-> 
->         if (local_rcv)
->                 return br_pass_frame_up(skb, promisc);
-> 
->>> -	if (!(brdev->flags & IFF_PROMISC) &&
->>> -	    !br_allowed_egress(vg, skb)) {
->>> +	if (!promisc && !br_allowed_egress(vg, skb)) {
-> 
-> Then, this is not equivalent.
-> 
-> But, why is br_allowed_egress() skipped depending on brdev->flags & IFF_PROMISC?
-> 
-> I mean, how does this combination work?
-> 
-> BR_FDB_LOCAL dst AND (brdev->flags & IFF_PROMISC) AND BR_INPUT_SKB_CB(skb)->vlan_filtered
+Hello Eric,
 
-The bridge should see all packets come up if promisc flag is set, regardless if the
-vlan exists or not, so br_allowed_egress() is skipped entirely. As I commented
-separately the patch changes that behaviour and suddenly these packets
-(BR_FDB_LOCAL fdb + promisc bit set on the bridge dev) won't be sent up to
-the bridge. I think the current code should stay as-is, but wanted to get
-your opinion if we can still hit the warning that was fixed because we can
-still hit that code with a BR_FDB_LOCAL dst with promisc flag set and
-the promisc flag will be == false in that case.
+On Tue, Oct 08, 2024 at 04:15:37PM +0200, Eric Dumazet wrote:
+> On Tue, Oct 8, 2024 at 4:07 PM Breno Leitao <leitao@debian.org> wrote:
+> >
+> > Hello Paolo,
+> >
+> > On Tue, Oct 08, 2024 at 12:51:05PM +0200, Paolo Abeni wrote:
+> > > On 10/4/24 19:37, Breno Leitao wrote:
+> > > > On Fri, Oct 04, 2024 at 11:01:29AM -0600, David Ahern wrote:
+> > > > > On 10/4/24 10:27 AM, Breno Leitao wrote:
+> > > > > > Branch annotation traces from approximately 200 IPv6-enabled hosts
+> > > > > > revealed that the 'likely' branch in ip_neigh_for_gw() was consistently
+> > > > > > mispredicted. Given the increasing prevalence of IPv6 in modern networks,
+> > > > > > this commit adjusts the function to favor the IPv6 path.
+> > > > > >
+> > > > > > Swap the order of the conditional statements and move the 'likely'
+> > > > > > annotation to the IPv6 case. This change aims to improve performance in
+> > > > > > IPv6-dominant environments by reducing branch mispredictions.
+> > > > > >
+> > > > > > This optimization aligns with the trend of IPv6 becoming the default IP
+> > > > > > version in many deployments, and should benefit modern network
+> > > > > > configurations.
+> > > > > >
+> > > > > > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > > > > > ---
+> > > > > >   include/net/route.h | 6 +++---
+> > > > > >   1 file changed, 3 insertions(+), 3 deletions(-)
+> > > > > >
+> > > > > > diff --git a/include/net/route.h b/include/net/route.h
+> > > > > > index 1789f1e6640b..b90b7b1effb8 100644
+> > > > > > --- a/include/net/route.h
+> > > > > > +++ b/include/net/route.h
+> > > > > > @@ -389,11 +389,11 @@ static inline struct neighbour *ip_neigh_for_gw(struct rtable *rt,
+> > > > > >         struct net_device *dev = rt->dst.dev;
+> > > > > >         struct neighbour *neigh;
+> > > > > > -       if (likely(rt->rt_gw_family == AF_INET)) {
+> > > > > > -               neigh = ip_neigh_gw4(dev, rt->rt_gw4);
+> > > > > > -       } else if (rt->rt_gw_family == AF_INET6) {
+> > > > > > +       if (likely(rt->rt_gw_family == AF_INET6)) {
+> > > > > >                 neigh = ip_neigh_gw6(dev, &rt->rt_gw6);
+> > > > > >                 *is_v6gw = true;
+> > > > > > +       } else if (rt->rt_gw_family == AF_INET) {
+> > > > > > +               neigh = ip_neigh_gw4(dev, rt->rt_gw4);
+> > > > > >         } else {
+> > > > > >                 neigh = ip_neigh_gw4(dev, ip_hdr(skb)->daddr);
+> > > > > >         }
+> > > > >
+> > > > > This is an IPv4 function allowing support for IPv6 addresses as a
+> > > > > nexthop. It is appropriate for IPv4 family checks to be first.
+> > > >
+> > > > Right. In which case is this called on IPv6 only systems?
+> > > >
+> > > > On my IPv6-only 200 systems, the annotated branch predictor is showing
+> > > > it is mispredicted 100% of the time.
+> > >
+> > > perf probe -a ip_neigh_for_gw; perf record -e probe:ip_neigh_for_gw -ag;
+> > > perf script
+> > >
+> > > should give you an hint.
+> >
+> > Thanks. That proved to be very useful.
+> >
+> > As I said above, all the hosts I have a webserver running, I see this
+> > that likely mispredicted. Same for this server:
+> >
+> >         # cat /sys/kernel/tracing/trace_stat/branch_annotated | grep ip_neigh_for_gw
+> >          correct incorrect  %        Function                  File              Line
+> >                0    17127 100 ip_neigh_for_gw                route.h              393
+> >
+> > It is mostly coming from ip_finish_output2() and tcp_v4. Important to
+> > say that these machine has no IPv4 configured, except 127.0.0.1
+> > (localhost).
+> 
+> Now run the experiment on a typical server using IPv4 ?
+> 
+> I would advise removing the likely() if it really bothers you.
+> (I doubt this has any impact)
 
+Thanks. I am mostly concerned about likely/unlikely() that are wrong
+100% the time when running production workloads in modern hardware.
 
+I just got a few hundreds host to able to run annotated
+branches enabled, and I am looking on how it can help us to understand
+our code flow better.
 
+Regarding performance impact, I agree with you that performance is
+minimal (at least on x86). On other architectures, such as powerpc
+things can be more evident, given that the branch hint is encoded in the
+instruction itself, so, the hardware knows where to predict.
 
+That said, I think the best approach is just to remove the likely() from
+that code path.
 
+> But assuming everything is IPv6 is too soon.
+> 
+> There are more obvious changes like :
+> 
+> diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
+> index b6e7d4921309741193a8c096aeb278255ec56794..445f4fe712603e8c14b1006ad4cbaac278bae4ea
+> 100644
+> --- a/net/ipv4/ip_input.c
+> +++ b/net/ipv4/ip_input.c
+> @@ -462,7 +462,7 @@ static struct sk_buff *ip_rcv_core(struct sk_buff
+> *skb, struct net *net)
+>         /* When the interface is in promisc. mode, drop all the crap
+>          * that it receives, do not try to analyse it.
+>          */
+> -       if (skb->pkt_type == PACKET_OTHERHOST) {
+> +       if (unlikely(skb->pkt_type == PACKET_OTHERHOST)) {
+>                 dev_core_stats_rx_otherhost_dropped_inc(skb->dev);
+>                 drop_reason = SKB_DROP_REASON_OTHERHOST;
+>                 goto drop;
+> diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
+> index 70c0e16c0ae6837d1c64d0036829c8b61799578b..3d0797afa499fa880eb5452a0dea8a23505b3e60
+> 100644
+> --- a/net/ipv6/ip6_input.c
+> +++ b/net/ipv6/ip6_input.c
+> @@ -153,7 +153,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff
+> *skb, struct net_device *dev,
+>         u32 pkt_len;
+>         struct inet6_dev *idev;
+> 
+> -       if (skb->pkt_type == PACKET_OTHERHOST) {
+> +       if (unlikely(skb->pkt_type == PACKET_OTHERHOST)) {
+>                 dev_core_stats_rx_otherhost_dropped_inc(skb->dev);
+>                 kfree_skb_reason(skb, SKB_DROP_REASON_OTHERHOST);
+>                 return NULL;
 
+Agree, that would be obvious changes also.
 
