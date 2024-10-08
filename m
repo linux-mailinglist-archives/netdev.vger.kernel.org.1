@@ -1,97 +1,63 @@
-Return-Path: <netdev+bounces-133122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8676599500E
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:32:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99EB994FFC
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:31:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54A3FB23B02
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:31:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21BAF1C24CFD
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6021DF726;
-	Tue,  8 Oct 2024 13:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25D31DF99C;
+	Tue,  8 Oct 2024 13:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m81DBkuN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sci+9BO6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5919D1DF26B
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 13:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC3E1DF98E;
+	Tue,  8 Oct 2024 13:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728394229; cv=none; b=ZOlVNAfSCoUS6W9S1Hxt41E3yzooRHVtxIUegRSXk+uqRwNWntd4lvyMbmPX2tRRwlplmc8yAJCpos2wrWhgRVmTWb+daeoG2Ne2J6gaIwcxl5T9d4qOwlxpih1Pfu022TDkqHX+2kzAEPi4x+ExhcX8xHd7d+DtcRQ6hCPGvDs=
+	t=1728394234; cv=none; b=aXMHiaYtJNOyagWteZOQ99g7s5xY7LwK/Uxv8T4KJbhKl9om2uI84HyQU9ZoYkRxyk43CHULdfTRhFzs1WOjvs01pZCU27NAXemxJju0ImT6fMiIASVho2hBw/MpJoKbb1y3M+KbQMOF4qHZpcH5KhZK3IyU1cC/UhRtM5rfz6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728394229; c=relaxed/simple;
-	bh=786uSdWkNmoYywABZQ4OHwULaDWHSASwqM2gVZuAUGo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=O52LXFC4Z0yCVuGGbfKUzk92v4GClR13VQlTcsi97nzK+EL6MbS/7aTNuCGDMPI8c2lxdiZWOCsBSCe9+Y6aW6nMw2LquAM6PRZXFtsFwhjusMG/jt+cSFa0ZHuSPbefqPtS+gaGGBV34S53Mpski2jj7OOPYvS4s76MeCHiQ0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m81DBkuN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A4E0C4CEC7;
-	Tue,  8 Oct 2024 13:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728394229;
-	bh=786uSdWkNmoYywABZQ4OHwULaDWHSASwqM2gVZuAUGo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m81DBkuNndRVOFgRGEVvX0pcGJAtIbh3gQWe0xz8rhAp59dZVKa7yG0p8PZhCE4Z7
-	 6fVgh/HlXm9oypeaEko/sXME34jP+vd1V+I7Jx/L0UtBnN+yB1AzWXrbCTxB54g2sd
-	 d4ubOKi7wYkCOsuRYb+1M2FOIfmZX6u5KiOCiLH8YbJWAgP4mMLZbzOw9Y5u5dKqM5
-	 S8eGTJ0FBkOzZjdPAmPxP7e1/N6ic9r5Uz4XPr++hMAysca22tjNV/0NTGbdPhyoAP
-	 A35+nroLAU+1Vwa4mK4gmGPB3Z2yvxK2f8oDvtzaOocMA2ctK7j5iyk9m1WYrnPu4b
-	 j6zyMvsYLcmLA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71C5B3810938;
+	s=arc-20240116; t=1728394234; c=relaxed/simple;
+	bh=beV6SdRSwNqYllIoaIoTbiYyj61QRycYZIvCSA2a8MU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=TUsh0S9qVuiOKh5nSXD83nod3yX+8sFvxIRqXRupAuuu0WF7wNacOPj111wByeCd1p1A/ZIL7nXajJzvcwsxUBHJzB40d4DELP9uDL9A0FpdoIdQPAx0pTfp+Y62RuI3eQ1JEV0xhcrP5hZs9xTHxxnMhuNbl3Zx/8Q0SqW+bi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sci+9BO6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31CDEC4CED1;
 	Tue,  8 Oct 2024 13:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728394234;
+	bh=beV6SdRSwNqYllIoaIoTbiYyj61QRycYZIvCSA2a8MU=;
+	h=Date:From:To:Subject:From;
+	b=Sci+9BO6jleKfv1QN/Q1K3i/7ohteTGd6JgBUchUJQEa2ACSfcFgUyUulIG+Ns6E/
+	 tAkvxROmy01U+0rq+s3PBv8rBtm7AdyP3EsxH+AF1PRd66HMyiVUpx+WftEp1ocbpi
+	 Ya2PrSVY+/Q3Yd36hZ/A31Nl5ndLNLwouLEq15uBqqbw7tsHbSfMAB8r/s788gmhbw
+	 2MuYr/KJABrR0MzFNG/S0nbKv5eF2oQ+y6ELSjyJD+HEOOUY2/HlCGXCDb7vzXKrsG
+	 S9MstNcAfYBloTNFBFXCVdOaXLCFuUJodkDy4fmKIwuveiERPKTCJEW7lHDu1Dp7bq
+	 BNQAektON3zbA==
+Date: Tue, 8 Oct 2024 06:30:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>
+Subject: [ANN] no netdev call today
+Message-ID: <20241008063033.301278c0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 0/4] rtnetlink: Per-netns RTNL.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172839423326.544106.8422984141500816476.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Oct 2024 13:30:33 +0000
-References: <20241004221031.77743-1-kuniyu@amazon.com>
-In-Reply-To: <20241004221031.77743-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi!
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 4 Oct 2024 15:10:27 -0700 you wrote:
-> rtnl_lock() is a "Big Kernel Lock" in the networking slow path and
-> serialised all rtnetlink requests until 4.13.
-> 
-> Since RTNL_FLAG_DOIT_UNLOCKED and RTNL_FLAG_DUMP_UNLOCKED have been
-> introduced in 4.14 and 6.9, respectively, rtnetlink message handlers
-> are ready to be converted to RTNL-less/free.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v3,net-next,1/4] Revert "rtnetlink: add guard for RTNL"
-    https://git.kernel.org/netdev/net-next/c/ec763c234d7f
-  - [v3,net-next,2/4] rtnetlink: Add per-netns RTNL.
-    https://git.kernel.org/netdev/net-next/c/76aed95319da
-  - [v3,net-next,3/4] rtnetlink: Add assertion helpers for per-netns RTNL.
-    https://git.kernel.org/netdev/net-next/c/844e5e7e656d
-  - [v3,net-next,4/4] rtnetlink: Add ASSERT_RTNL_NET() placeholder for netdev notifier.
-    https://git.kernel.org/netdev/net-next/c/03fa53485659
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I don't think there's anything urgent to discuss, and my patch queue
+is still quite long after recent vacation, so no call today :(
 
