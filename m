@@ -1,138 +1,182 @@
-Return-Path: <netdev+bounces-133356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3EC995BA9
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:31:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0CD995BB7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:34:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1FEA2874BE
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:31:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4DEC1F220A4
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4A93216458;
-	Tue,  8 Oct 2024 23:31:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA5418C335;
+	Tue,  8 Oct 2024 23:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kTHIxwpA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LCc3Zz30"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3348D216439;
-	Tue,  8 Oct 2024 23:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD4913C9DE
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728430283; cv=none; b=aQHvXvO3l2B5V50gG47uYePS+JPd00AuLUxkZOTvFdLHfigzzQOTmuD2fXGWLFkAtaOtcehghn8N3dlhjo5sfOuMLYMVct9QYxPpqbaKfGj/4bY0fFWCDKb3GfZIn5aS9P6MSq/e7Rq2Lle18qYMXS4H0mWgBXf+XsG1oa5kz5E=
+	t=1728430488; cv=none; b=UqleEZT5hkFpghGlGxVc9xkrDPo92t8nLdjbOnpCXx9IB1UnoPMySafuou5cFNfM7W6twJjhT0eXlfJ6jZPvr2poMiYqVrQQueEnwxJOUAfROv5c5/P2SDWFCMGnHikszxS1f4BKIcEDD4HbDwp3t9gAmW2jNTT7hIWp6Dhc6Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728430283; c=relaxed/simple;
-	bh=VDGMU5WZHuvqxr7FgPWeyyE7QtGVwNYJyd8BIB0gy8A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hhO+EZqLKkeOlGVzgweu9i8gX4yEO5kVcpr8O8YSDDaSkAHkQX2EkBheVr1kLLOtHqmAXdb88u4iXCRKEwcA9ziN0NTOQ590W4ZtGuHXvn9B9Jo7eunmweK0eWgrNKSsbMazVIXbKDNTKWvY/yIIssNZUOshX+vKjvMJwm5o4yA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kTHIxwpA; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42e5e758093so54801725e9.1;
-        Tue, 08 Oct 2024 16:31:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728430280; x=1729035080; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BFPM3Wu9TF6M2qSYi4YrdZFh2UBbej9+288IJ9sOEks=;
-        b=kTHIxwpAJYm93NvZB6H6HaY84dlmDj65BPvl+6+42MwxR3/q+OCNNNSAdkoh2NQTDU
-         s/BTfPj41wKBx5sj5wjkLiad2sRNZ0kQniP9sJQHOlZkLdf2eLtQ6hAEDd7EyZ+PKIBd
-         0L4qZQsEfs8Z1JiNBfB8iP0gs6NS2jJM4jvIR4bl9w1pnii0BBZGOlyuPKPJhxEBJF9l
-         CtI3IySwZfdKumP3SGrakTE1a4JZxShdHsYmUM+BthN5QKwPg/PsIphg0uiYLjktmCTn
-         mC4niirB8AqxCg0NH2WbT7Rj1YbkAd0hLQxZFGk+7QLqcLq2Ed1at0vi//33wPw+IA6j
-         kh0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728430280; x=1729035080;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BFPM3Wu9TF6M2qSYi4YrdZFh2UBbej9+288IJ9sOEks=;
-        b=th2slyC/c26/lrRXRojEHwTBqqd15icE72YcjJEau2MlNQ038trm6gzeihE3bN7fIS
-         assiszcjva5xpnXd6RI/gLV4m92160Tenvr3QS/B72sPUlbmFoh+S/Ku5O3ZQhJfU86+
-         gkO0WtySqDR9JBL/dzVRVVMOpUF7Pm15Oqsplno3MR6pE0/r55ZELiYWVyTeExpcKc08
-         CnMGyAePgLlEZwlbz1nGkWQrvA3aNe6392/V6zWhgjCQHJxr7G6Ej7WIPD8juK7kacJX
-         jOvFvSrpgp9k52F0NdHxwk37WD+qwsCl2akxsqGBqPb5PqPG70GbOMNJfrPeeISmkLXZ
-         D1rA==
-X-Forwarded-Encrypted: i=1; AJvYcCUu0/jZoo7cQ8Ed6kqRl/eBC86Bg8cKuOGrLIZw7LTQJEPs03sjBIhwS1viUnA2qwHOxFA+hAQe@vger.kernel.org, AJvYcCVMSuTYptPki7k1O01A/QnJIi4TFwzVGa2irXpCJls0+czfSVIs0bkPyUq8kcM8sbwLvAHWJhqbbVBP@vger.kernel.org, AJvYcCVu6xGschgeGDOZATjIrlSoA0ce9VbDf+WwC2booTF2quqD1JYPvv5kUzUx9guLsQd/hBA9pUzRRQ34nnJ6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2LNcWK0pNtNI4B2S9qtaKMnvr6fIzrgntpTSz5iMnEJ+9rXk1
-	ytNM9qti1U10s3LpwG0RvjRNa4nZ2v8n7g/f7yt+5RFn6FRrG+93
-X-Google-Smtp-Source: AGHT+IElCc/NZmfKE5im85XAtFU56QqkH32fN2ZtakhdcpQajRct3r2xKETt6ywaKeiJ0dt5pk97sw==
-X-Received: by 2002:a05:600c:34c8:b0:42f:8ac6:5198 with SMTP id 5b1f17b1804b1-430ccf31c52mr1897525e9.18.1728430280175;
-        Tue, 08 Oct 2024 16:31:20 -0700 (PDT)
-Received: from ?IPV6:2a02:8389:41cf:e200:9b9e:5f2c:2784:bd78? (2a02-8389-41cf-e200-9b9e-5f2c-2784-bd78.cable.dynamic.v6.surfer.at. [2a02:8389:41cf:e200:9b9e:5f2c:2784:bd78])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430d70b41bfsm2733565e9.29.2024.10.08.16.31.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 16:31:18 -0700 (PDT)
-Message-ID: <3a325efb-af05-4e39-b9ae-587d55af9b0b@gmail.com>
-Date: Wed, 9 Oct 2024 01:31:14 +0200
+	s=arc-20240116; t=1728430488; c=relaxed/simple;
+	bh=Dq86mjf9ut9DZCn7BwtpcLDXQCGPiYD2m2015sshmWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YFH9hMysRIhZSatFxpwmQJ0Le6kwTkq1DC8fDe25HzExVPTwYQUADw/KUIcJTNggmscmXHq8Ga+Z0QGKB17f011AnnIrzAZh8R/AoJnZLJh7F3vWWLcYiQLHC0Elib+ZaPgOqtZcVOB9/HztQAriGQOLneQ2pWSGO4hw8bm7v50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LCc3Zz30; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728430487; x=1759966487;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Dq86mjf9ut9DZCn7BwtpcLDXQCGPiYD2m2015sshmWA=;
+  b=LCc3Zz30sTQq9DB37q/0k+Axv3sfq26APb/KOBa+5uw99yRycONzkuiR
+   qPKtbMMrFWe5vQIxkZz0mTamzpn+E+KkVNRrv7lQtIbFaFwr3V28atzzB
+   ziPp9UKHD8p24k/dWO/9xN9co2U7pM7ApXzC6XCuYhUTZY4EQQWTt0l3f
+   NXWIs7gOvcnCPi+IF7m4UBLAN628PmGSoOIhpS8OuzLyuIMzFnOWwOsTT
+   AnycpbhUqhEJcI/mJWt886t+Je+8LBPz9VXhtj2FpjIe4PdewHrYz0oi1
+   rhWxdnf7lsZk5yuDNnRouyorc9MvvyEEvhGkx0Jxn3ZrogVoEwEw+1KOk
+   w==;
+X-CSE-ConnectionGUID: SFCi6NZRR0+sT83xL3TzCQ==
+X-CSE-MsgGUID: wHKSapxeTM+/nlSmfTeHAw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="27779853"
+X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
+   d="scan'208";a="27779853"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 16:34:46 -0700
+X-CSE-ConnectionGUID: JhXzHq7YTD2O/5U0C4PtAw==
+X-CSE-MsgGUID: bX4Mg5oOSbe7hVXKHWFstw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
+   d="scan'208";a="106794173"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa001.fm.intel.com with ESMTP; 08 Oct 2024 16:34:47 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 00/12][pull request] Intel Wired LAN Driver Updates 2024-10-08 (ice, iavf, igb, e1000e, e1000)
+Date: Tue,  8 Oct 2024 16:34:26 -0700
+Message-ID: <20241008233441.928802-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: dsa: mv88e6xxx: leds: fix leds refcount
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Daniel Scally <djrscally@gmail.com>,
- Heikki Krogerus <heikki.krogerus@linux.intel.com>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Linus Walleij <linus.walleij@linaro.org>,
- linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
- <20241008-mv88e6xxx_leds_fwnode_put-v1-3-cfd7758cd176@gmail.com>
- <3efe3c1a-7ce6-4055-a9b1-31a7e23f9417@lunn.ch>
-Content-Language: en-US, de-AT
-From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-In-Reply-To: <3efe3c1a-7ce6-4055-a9b1-31a7e23f9417@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 08/10/2024 18:40, Andrew Lunn wrote:
->> -	leds = fwnode_get_named_child_node(p->fwnode, "leds");
->> +	struct fwnode_handle *leds __free(fwnode_handle) =
->> +		fwnode_get_named_child_node(p->fwnode, "leds");
-> 
-> https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
-> 
->   Low level cleanup constructs (such as __free()) can be used when
->   building APIs and helpers, especially scoped iterators. However,
->   direct use of __free() within networking core and drivers is
->   discouraged. Similar guidance applies to declaring variables
->   mid-function.
-> 
->     Andrew
-> 
-> ---
-> pw-bot: cr
+This series contains updates to ice, iavf, igb, e1000e, and e1000
+drivers.
 
+For ice:
 
-Hi Andrew,
+Wojciech adds support for ethtool reset.
 
-Thanks for your review. I have seen that the __free() macro is used in
-multiple net drivers, especially (but not only) __free(kfree). Why would
-this one would be discouraged?
+Paul adds support for hardware based VF mailbox limits for E830 devices.
 
-I would have nothing against declaring the variable at the top and
-initializing it to NULL if that is the preferred way in the networking
-subsystem, but the __free() macro seems to be well established, and it
-simplifies the code.
+Jake adjusts to a common iterator in ice_vc_cfg_qs_msg() and moves
+storing of max_frame and rx_buf_len from VSI struct to the ring
+structure.
 
-Otherwise 4 calls to fwnode_handle_put() or a couple of goto jumps will
-be required to get the same result. Moreover, if any other error path is
-introduced, the mechanism will automatically account for it.
+Hongbo Li uses assign_bit() to replace an open-coded instance.
 
-Best regards,
-Javier Carrasco
+Markus Elfring adjusts a couple of PTP error paths to use a common,
+shared exit point.
+
+Yue Haibing removes unused declarations.
+
+For iavf:
+
+Yue Haibing removes unused declarations.
+
+For igb:
+
+Yue Haibing removes unused declarations.
+
+For e1000e:
+
+Takamitsu Iwai removes unneccessary writel() calls.
+
+Joe Damato adds support for netdev-genl support to query IRQ, NAPI,
+and queue information.
+
+For e1000:
+
+Joe Damato adds support for netdev-genl support to query IRQ, NAPI,
+and queue information.
+
+The following are changes since commit 42b2331081178785d50d116c85ca40d728b48291:
+  tools: ynl-gen: refactor check validation for TypeBinary
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Hongbo Li (1):
+  ice: Make use of assign_bit() API
+
+Jacob Keller (2):
+  ice: consistently use q_idx in ice_vc_cfg_qs_msg()
+  ice: store max_frame and rx_buf_len only in ice_rx_ring
+
+Joe Damato (2):
+  e1000e: Link NAPI instances to queues and IRQs
+  e1000: Link NAPI instances to queues and IRQs
+
+Markus Elfring (1):
+  ice: Use common error handling code in two functions
+
+Paul Greenwalt (1):
+  ice: add E830 HW VF mailbox message limit support
+
+Takamitsu Iwai (1):
+  e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
+
+Wojciech Drewek (1):
+  ice: Implement ethtool reset support
+
+Yue Haibing (3):
+  ice: Cleanup unused declarations
+  iavf: Remove unused declarations
+  igb: Cleanup unused declarations
+
+ .../device_drivers/ethernet/intel/ice.rst     | 31 ++++++++
+ drivers/net/ethernet/intel/e1000/e1000_main.c |  5 ++
+ drivers/net/ethernet/intel/e1000e/netdev.c    | 17 ++--
+ drivers/net/ethernet/intel/iavf/iavf.h        | 10 ---
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |  3 -
+ drivers/net/ethernet/intel/ice/ice.h          |  4 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     | 34 ++++----
+ drivers/net/ethernet/intel/ice/ice_eswitch.h  |  5 --
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 77 +++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_flex_pipe.h    |  3 -
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |  3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  3 +
+ drivers/net/ethernet/intel/ice/ice_lib.h      |  2 -
+ drivers/net/ethernet/intel/ice/ice_main.c     | 27 +++++--
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 32 ++++----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  3 -
+ drivers/net/ethernet/intel/ice/ice_sriov.c    |  3 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  3 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  1 -
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   | 26 ++++++-
+ drivers/net/ethernet/intel/ice/ice_vf_mbx.c   | 32 ++++++++
+ drivers/net/ethernet/intel/ice/ice_vf_mbx.h   |  9 +++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 34 ++++----
+ drivers/net/ethernet/intel/igb/e1000_mac.h    |  1 -
+ drivers/net/ethernet/intel/igb/e1000_nvm.h    |  1 -
+ 25 files changed, 269 insertions(+), 100 deletions(-)
+
+-- 
+2.42.0
+
 
