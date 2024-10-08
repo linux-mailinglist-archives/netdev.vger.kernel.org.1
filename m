@@ -1,225 +1,211 @@
-Return-Path: <netdev+bounces-132985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C19993FA5
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:36:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D38B9940B2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54DE71F21E71
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 07:36:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD380B2573F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 08:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF1F41DEFC8;
-	Tue,  8 Oct 2024 07:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C3C206E86;
+	Tue,  8 Oct 2024 07:26:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N9OPW9gh"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="P6AVOoyf"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011026.outbound.protection.outlook.com [52.101.70.26])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B6C1DE4F3;
-	Tue,  8 Oct 2024 07:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728372364; cv=none; b=fTUp2d7vCJwtjPuyc5221PuYDnuDCHYlP6UMceqSOR7mMAnD8SY/SYhA7+Lj6gTYnj5OMweJSSUyUb+NqrJgiyQtFwubp9e+dOgo6QOrK2tsqghDIA03L9CemF0UsLhFiau1VixEWyadbm1rVSCdhQgGXtQZHt+Ryf63K/fTmt0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728372364; c=relaxed/simple;
-	bh=z2P9eJzMxO7Wy9K/gU2Ripg7WG5/Qq2PJ4dUe+DraPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IEeTQkLFEN4dLqN9SiJgjxCD1oArLe9n6TZ/LX4FfBO+840RX1UCc/C793rxXs/fNMN0C0kP33ucIlAj2yQlbHwq8fCAp5psP8CNL4fAtwpjKhhGBAfs2ICdIMQCSGNRAiMRBCzG1kkKzB2PfYmA9IJ/CSV8s6ddkdnhTtlSXfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N9OPW9gh; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 12AFEE0004;
-	Tue,  8 Oct 2024 07:25:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728372359;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y2Eov6yFpaMhBa+zRN8cKs/RYWnxfaxocRnMjKu5r/s=;
-	b=N9OPW9ghUApwMwLVnBcXpiSVmIgOeRi3NcixPpyq4UcWVz5fFLn4G4h9bokE7Y6jyFjjBd
-	hSqsmYbjS7UV/w8MAhFrSxDEYtH32oLyhnZV3Bk2CT1dRCXBUKFzKbQKbXM4ujMGYGqWwC
-	y24XT12GTiJV7hp786Lms6QgpfX4Mq4YXVo7w4BP3NObjCerBqFZiSMWO2n4rjnUHRTs09
-	tHPj2IGrvMCbPFlG3VzxGzhFx/ICzGbmChQTsZWXTxbyulPn7PfWBz0X1JvxdYnz3gl7l5
-	lIk3tOl/KBhGeCBkPgWpAVNMbuupDN8LGJmfgMcNniwMgKBbFzW4nzZZM+WNMg==
-Date: Tue, 8 Oct 2024 09:25:57 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
- get and set phy configuration
-Message-ID: <20241008092557.50db7539@device-21.home>
-In-Reply-To: <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
-References: <20241004161601.2932901-1-maxime.chevallier@bootlin.com>
-	<20241004161601.2932901-8-maxime.chevallier@bootlin.com>
-	<4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
-	<ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
-	<20241007123751.3df87430@device-21.home>
-	<6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
-	<20241007154839.4b9c6a02@device-21.home>
-	<b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A161DE8AE;
+	Tue,  8 Oct 2024 07:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.26
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728372365; cv=fail; b=O4f+UFDRGH2TjXOaENDlv9vXhGxgfQbTXdq/v6Z1zLV2BS1OsKSw1kcY+gEjI9pLj7F3GG1FXfQqi2zMIRakdLu5j0Twy+oph0L9IDYqQkkuPbbioxPDyg+IGGdiAOBuPyBmCTcIK0ZiZEKa9B6M1cJCqWuw1WE+NLbBfCQrh4k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728372365; c=relaxed/simple;
+	bh=tICp2GXmkdiVkCSbTjLFCwXstegasUr0LX3w7RgmyJ4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XlFXPD92GaF+8Zid7W9vZDWxFqz2Kyt2tADvYCJrRworda8TR5afGUZFU5qvXyT0s2Nba8YUD5dF5AcCx3cOADvHm5ro329Ik1qzokfii5u9+lZW5P8msDOO8UgCioKUiCVjnPpax2Sf/mEMLuJEv2U3GXpXH50arMGChyTrxeQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=P6AVOoyf; arc=fail smtp.client-ip=52.101.70.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Jnutv6biwnIXgZ8LzD1B4xxCmPHru7VWEwB5D8/zp1RG/ByAnpcgJJ0Uu9J4f1ztjiPSoObrqw+6X8TCdwbkUbRmts4wJ/6llv/DDYXzkc8OuodEwUdWIqgRdmFqXupR1XQBphDTp6fbB4cmMDLMQWR7ufQZSUc1E28kYtCzBF4YPvUxDMHCYYQ8mNbCWsI91cBp08i+Rbw2zs2TnWK4VKcQ2gU0JChk4uY7NybNSptAR0WDvZFfv+eSvZuEUk9Tq5GE8RpgAzn38fiS4lSNUWqHgGaapkIbiYuYJX/F9UV9wNM5zykQ/KVj9D5KjOoqXQPNxCbMCBFj/UeC+HX+pA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tICp2GXmkdiVkCSbTjLFCwXstegasUr0LX3w7RgmyJ4=;
+ b=voFbKlp3SjrrAV20ldpJmuSEOo6qJ4l26LbAx0RcXv+efiKXRQcm8KEaeRMkFBW/YA2I4xE0DJ/w49+EKYkKE438p/eQxw2d4ryK9hYaWV0k3be/FwCxxb4KQvBWDJ64P1jE8XHI8FXSmgmZFjF11AC53TlK7vHCyNv8Bz3BEAwEHUAwAPG8mm8afqjzRtusMo9iosbUepOkottvfSlzvl5KLYnKQtLmQAVE9n7DRY1l90TxpIouIXY7MuFXqNAx8xdiRjaNkMCvlLIx8Vl0fg3daK8PaKIzGQC3oiB53dl9SVJkHjxx0CqNJiJR1A1ABnWrkklUoaP0/UiG9qWZQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tICp2GXmkdiVkCSbTjLFCwXstegasUr0LX3w7RgmyJ4=;
+ b=P6AVOoyfsvZKcEuSnZGTZqVNECv4KUPMGlSkVoK9s1Tl16/67dJokany0RC0h3dZ+Sm0+55B50PD4vBHy7A9niqukXphBAtpZzzsCe9ROvAx2MiB4decjkUp3dsZ6is2UNxutruO7NlmqB8MrIeoejriiDWM0jFoyQcDaSA8biC2qFwfCC6Q8nYIfKkKdqt0XPA/otCema2jsgxsf6QQJlOn2GO9z7UThwBHH+i422UGWakvOs689k1+pu5XSDMXW539NShUzW1roe9laTdCbrJoMai6uNNgqzlDOd2QbPorZqic4/nCjpxunQp/cTyAuX3c0btIZvg8P2zkqGf62Q==
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DB9PR04MB9577.eurprd04.prod.outlook.com (2603:10a6:10:304::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.22; Tue, 8 Oct
+ 2024 07:25:59 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8026.019; Tue, 8 Oct 2024
+ 07:25:59 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>
+CC: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "imx@lists.linux.dev"
+	<imx@lists.linux.dev>
+Subject: RE: [PATCH v2 net-next 0/2] make PHY output RMII reference clock
+Thread-Topic: [PATCH v2 net-next 0/2] make PHY output RMII reference clock
+Thread-Index: AQHbGVL6nJ4E1WHcRkSZDR1a91kfhrJ8c58Q
+Date: Tue, 8 Oct 2024 07:25:59 +0000
+Message-ID:
+ <PAXPR04MB85106EE705637048AA0B3377887E2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20241008070708.1985805-1-wei.fang@nxp.com>
+In-Reply-To: <20241008070708.1985805-1-wei.fang@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DB9PR04MB9577:EE_
+x-ms-office365-filtering-correlation-id: aa5cfe9a-b9bd-4616-3499-08dce76a74f2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018|921020;
+x-microsoft-antispam-message-info:
+ =?gb2312?B?WlRMd2JuQmhPNC8xdDE1bVNiRnZWUFFvbDFZOWxaRk5nOCttMmFWR0NuUnhM?=
+ =?gb2312?B?QXc1aW5xOTNxdXhrRHhSdkYyMXVYREdyY0FWNFZaejJJRjlYSEN5aGRlaWcx?=
+ =?gb2312?B?Wm12UnUzYndlM3lvSTlldVhkWnlTOXhlN3FtaHM1dHJFRmNFeGIxcTRsaHBl?=
+ =?gb2312?B?RDdZc25XNkRLVkh2L1ViM1dIY0NjVzZpMWJsVkVhbVlya2xEQjh0YVNGVmkx?=
+ =?gb2312?B?VFBCREx2WXE4UXBLa2RlMTM2cjdVK1RJM0JwblFpZzdGYU9jdjdTdVJ6TEhK?=
+ =?gb2312?B?VENnTnRJeHVzR09xZXg4S0pXZDlQMzlFRXY1dzM4RzFDd1ZwcmJtWHB0U29H?=
+ =?gb2312?B?enBSd0tRcXZCUmNhQ2h0UlFSamdDd29sYkxZUDRIVjNXM1Jkc2ZCVytBSWh5?=
+ =?gb2312?B?WjdtZWN2ZkNJc2lJanZDd1FUbmVaOVpTYXRaeTVjdGhQZDFxejdsMDJwZXZP?=
+ =?gb2312?B?ZGxNNDVzNllIc1FSNzVKbXdSdjh5Mlp2Zm9qUkJiTGhOQzFOQ24xYS9PSkRi?=
+ =?gb2312?B?a0dFZ3ZJdHk5akgvcDNRY1RLckQ4VWFhaUlIT0g2cFhFOWh0UXdLTDM1M0g3?=
+ =?gb2312?B?WUxzZGNqMmtQZ1BKcUlGOFFpdEhGNTRYZDRBN1g4UzFyNWNLcFd5bVNwank5?=
+ =?gb2312?B?UmRUa3hTd1IzNjlQcmFmcVRBM0RVb2w3MUhKcDduTndiWHBESktIaGRtTWxm?=
+ =?gb2312?B?OWlVTy9ZWUdibGd3SnptRnhEREVRaHZPVEdUR3dWak5NcG9PWkFPOEdkZVZJ?=
+ =?gb2312?B?cUVjRm1DODhUZVJrMFNsR2RVRm82UlFUL0JTMnlkNmY1dmF2d2hYREhNTzBO?=
+ =?gb2312?B?bWFFamxHUHFiUldWVGVEQmc4N3BxNzQ0bVErMmI3WUQ4aEZMbGJGdHRYa3dW?=
+ =?gb2312?B?WC9QUzZ6SzVSRmRSaisrTVhVUklMTVVmd2pjb1FybVdFbHQzazdMdzB1THRY?=
+ =?gb2312?B?SjdLUlVWTlZlNkRpY1VzZy85ZkpmQmRJaDU0aC9kN2VmRkJLL0N0bFJob2x3?=
+ =?gb2312?B?YjNnekF1ZDQxaW92ell2VGxJUDk3ekUvbmNxanhKb09YdXJicUcrazBDR1BD?=
+ =?gb2312?B?bkRrYklzS0E2cis1dlYyZ1ROd3I5N1BIOGNwQkozSEpLbTEwcjMyaEZJZDRD?=
+ =?gb2312?B?TDhKL1ZMTU94ODZKbkRMUDRMa0FuV1BwTUFuS0EzRVA3dG1XMmloYXNxWGRo?=
+ =?gb2312?B?MW5WU1RvZ2sydkhYR28rc3FtRkg1cTBjaFNGVkdWWUpFMVJYYzFGZWo3cVFL?=
+ =?gb2312?B?YnV2YTAwQU5mU3NGazNVTnBDMENaNEhUNXZ3d0RsNFdmZVN1dkMxN3Z6dUhm?=
+ =?gb2312?B?ZjQ4OEg2d05EZUhHV3FvaGJpL0kwbUVrbTljZXc3bjNENTR4OVU0RTBKMzA1?=
+ =?gb2312?B?cFZYakw4SERWU3FySzJ0R1JyVkZGeFFWaTNNQndPVEZZSGJGOGl2V3lOMjVU?=
+ =?gb2312?B?cVlrc0doZk4vYjBBdGZrSWFucnRzL2NRNTVZS0MzbG00ZGpUQXZ4amcrWE54?=
+ =?gb2312?B?SEs2R3J4YWdWdjkxSEE2b2RkbmFtWE5NdURpeDVPUEVGZE1lQVl5R2hBbUNt?=
+ =?gb2312?B?bGZHSGFpUitqQVNHd2o2eCs0Wmxsck4rZGNNdUpwa080T3I2bjdDSExuMTAz?=
+ =?gb2312?B?UWZDSldNekYySldDZ3B2cWpESklVcysrUzQ0Yks5cW5sSW9qYWVQTzc5c1VP?=
+ =?gb2312?B?Y3Z0WGpJZkg2akcydlJFTEtnaVVUZ2h1VXMzMVh0Zkt1MWJMLytONlBKZjNU?=
+ =?gb2312?B?bG9QKy83WXAxeXAvak1RaDh0NkgzN2QreVE2L213OEVqVVZEOXlnL284QzhF?=
+ =?gb2312?Q?NiFDYMCYeo+kbnsVrnHKuj7ytwwyVEGWDJqjI=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?gb2312?B?L3pORElzTTBFcXBCVDNXeDNtRXNZTzZNckV5bUx5SW5weHB3U0NWd21HS29Y?=
+ =?gb2312?B?NmlGTTR3YXZQRWhjWk9hMUhvY0RvYzZKS2ZMajZiRDZYeGZnajZKMU1tckdh?=
+ =?gb2312?B?SVd0eHdZQ09FL2dvYysvUERMQWpnc1hUdC9LbzdIZVFER0tvSUp4QVVRdW5I?=
+ =?gb2312?B?eU1YdnFsQi9aSGNpSXRxb1FRQ05PVS9mWjA0d3ErZEhwUTd0RFlybWtMWlFG?=
+ =?gb2312?B?ZjZVSUpsR3VqS3ZLOWpYYlg5ZjN4MUN0T3cxUlN5dlNrdkwyN2hlcnI1NE1K?=
+ =?gb2312?B?S21wQjdLNTdRSGNWUXQvQndqbFpTZElmMWY2ZDIrL2ViS1BtdHVnTzE4aEk4?=
+ =?gb2312?B?WTFnQWNJNlp3QWVzZ29vUTRTR0hyZk9oTFBwVTBubmlMdmhFdmJpSFI5cU41?=
+ =?gb2312?B?SHZjdm1sdjVWV0hpeGt6SG5tUmMvckg3RUNyc2ttVUo5NG5jMVRHb1FTclU0?=
+ =?gb2312?B?QThkR2JXS1IwNFVtNHhBTU5NVGE2MHd1NnF4WUpVYU1sYmlldnBXQTAzK3l2?=
+ =?gb2312?B?VzAwcXRGeVViT0VWY2xxSDl3dVUwcjdrYkxTd2dLeEkwYXphbVRONGhoNXBK?=
+ =?gb2312?B?MW4vd3pUcXNPRDFHd1A0b2NzdzJpTVNRc3NDYW80Rm9semdiejJiWnpra0h5?=
+ =?gb2312?B?QmZLcWFsSS9KcStGZm1QbTk1OFRRbW5mVW4wTEV5QVg0Slg2d1ZDU3YxZlFR?=
+ =?gb2312?B?Ynlpa281S1B2SlN5VWdTZGtleEh2ZHludU80MXlDa1UyczRSN3Y2SFRjRFI2?=
+ =?gb2312?B?a1ZLNEpzUXJGcGNLL00vZHczaDUxWUgwQlMvWkZPdWxIOTB0cDdVQjk1M2Vp?=
+ =?gb2312?B?bklnSVhRbFZIelo4bjVDeXFWZTZTSUVhcElMNlovNk9vS1hyUTB2VHBUYkF2?=
+ =?gb2312?B?ODJrQVF4dk5LWmI5UFlFUlZXUkhkS2p6dDdvaFk2U3JnQ1hxR3ZKTWU4S3FU?=
+ =?gb2312?B?Z0ZNUXNXYVVVc3lRR29SdHpkMGJlQ1U2c1FBclZWSUVxdjRud3FHLzNkc3Zl?=
+ =?gb2312?B?SW9UeE1CVmRXblVCSDMwVDVMTm1Wa1o0d1d1QW13aGc4OXExQjlBTGo5Y1Va?=
+ =?gb2312?B?cFhINDZaNEsrejI2Y2IxUkUyQTdrMkxDa3hiQmg5MWFJaTh2czQ1WUxndGxO?=
+ =?gb2312?B?cFVCWUJWeTJYdnNzdjlFS3pOamE1ZWVHQk1oK2UyRU9ITUpNUWJhNUxpRFV5?=
+ =?gb2312?B?R1g4a3JSc1ZhSFJ3dFBlbEhCYy84NVFpaUlIOXkxdmpMcFdWNkRzSG5jNzlE?=
+ =?gb2312?B?cmFYajJ6SFdKSERPWHpqYXU3TExUNkJ1Q2FnZVFTMVY0U1BrYmc3Z09TQ0lo?=
+ =?gb2312?B?MlVxQUhBTFdXcmNWTVdoTVFTQk5WMVhwUXRzMGJpTHduT1NzeHZYTHFIbHd4?=
+ =?gb2312?B?TlkvaVI0MkQxOEhEc0RqTWo1RDJmdWgybEY3WHJEdk1WeDloTFVPWndPM2xO?=
+ =?gb2312?B?Y25jcFpOZ3dYSTdjcndGa0pyUzBITTNrNFVmekZ6dWZzWEdBZjRMNkY2aGtZ?=
+ =?gb2312?B?WkNkdzQ2N0RIaFRmNnhkZXM0RXdaT1FuT0JjMmgzS2NlK0VNaWtIMEQxWml2?=
+ =?gb2312?B?eGZlc1hCaHJHQVlyajI2dWo3NFdJd0dlQzR3ZFJCdGljR1hueHl1Qm1tbGdG?=
+ =?gb2312?B?RFJreDJ5b2JHT3hDNGdMQUdVSmhMTDBkTThnaGNWVEFYUXZmYzk1NE9JYTQz?=
+ =?gb2312?B?Nyt6MlhvWXBuUi82bmJ5ZWg4MnM1bXJ0NFoxbmMzSW0zUzBHR0VVbFVFMzUz?=
+ =?gb2312?B?cWdGMmZOOTFvRDJteHVVWjZtOGpLSWgrNFVyVCs5VnpaVzN3Sm5BYXRrZytV?=
+ =?gb2312?B?cXlWWGErTXUzU3pFL1BkSS9oaU9ZOFdhVzR3ZnhrOVhFb2dySFBCUXNEY0Ry?=
+ =?gb2312?B?YXFaQXluME9iM3hXWjczYkM3Z1VTaFRzRk9zYVAyUUlSTDdMM1Q2Yitrb1Vi?=
+ =?gb2312?B?ZW1WSU4yOUlNOERJSHpxU0ZGZnRtaTdxajVWN3FNYVhDOHlNb2pQN0JzOXkr?=
+ =?gb2312?B?TkhNczJxbTZHTXVIVDhaejZESTMvSnc2R3Z2NUxYM2c2dWYrOGhKM3BpcGhh?=
+ =?gb2312?B?dmtEVktyWEw0R1hhRjRLY1lZUDczRVpsbmdTSC83Q05FU0sxNlhmQXBObEhw?=
+ =?gb2312?Q?BAV4=3D?=
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa5cfe9a-b9bd-4616-3499-08dce76a74f2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Oct 2024 07:25:59.3998
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Z5RTTQbd+plDkLTKuqBSpUYNj4krVjTK1PJHiuAvPg2wsu1DNKQL69x17UvQFtsWTREVKZFYKGUch/mntcuUgg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9577
 
-On Mon, 7 Oct 2024 18:37:29 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > That's a legit point. I mentioned in the cover for V1 that this in
-> > itself doesn't really bring anything useful. The only point being that
-> > it makes it easy to test if a PHY has a working isolation mode, but
-> > given that we'll assume that it doesn't by default, that whole point
-> > is moot.
-> > 
-> > I would therefore understand if you consider that having a kAPI for
-> > that isn't very interesting and that I shall include this work as part
-> > of the multi-PHY support.  
-> 
-> kAPI add a lot of Maintenance burden. So we should not add them unless
-> they are justified. to me, there is not a good justification for this.
-
-That's fine by me.
-
-> 
-> > Sure thing. There are multiple devices out-there that may have multiple
-> > PHYs accessible from the MAC, through muxers (I'm trying to be generic
-> > enough to address all cases, gpio muxers, mmio-controlled muxers, etc.),
-> > but let me describe the HW I'm working on that's a bit more problematic.
-> > 
-> > The first such platform I have has an fs_enet MAC, a pair of LXT973
-> > PHYs for which the isolate mode doesn't work, and no on-board circuitry to
-> > perform the isolation. Here, we have to power one PHY down when unused :
-> > 
-> >                 /--- LXT973
-> > fs_enet -- MII--|
-> >                 \--- LXT973  
-> 
-> So you have at least regulators under Linux control? Is that what you
-> mean by power down? Pulling the plug and putting it back again is
-> somewhat different to isolation. All its state is going to be lost,
-> meaning phylib needs to completely initialise it again. Or can you
-> hide this using PM? Just suspend/resume it?
-
-Ah no, I wasn't referring to regulators but rather the BMCR PDOWN bit to
-just shut the PHY down, as in suspend.
-
-Indeed the state is lost. The way I'm supporting this is :
-
- - If one PHY has the link, it keeps it until link-down
- - When link-down, I round-robin between the 2 phys: 
-
-  - Attach the PHY to the netdev
-  - See if it can establish link and negotiate with LP
-  - If there's nothing after a given period ( 2 seconds default ), then
-I detach the PHY, attach the other one, and start again, until one of
-them has link.
-
-That's very limited indeed, we have no way of saying "first that has
-link wins".
-
-
-> > The second board has a fs_enet MAC and a pair of KSZ8041 PHYs connected
-> > in MII.
-> > 
-> > The third one has a pair of KSZ8041 PHYs connected to a
-> > ucc_geth MAC in RMII.
-> > 
-> > On both these boards, we isolate the PHYs when unused, and we also
-> > drive a GPIO to toggle some on-board circuitry to disconnect the MII
-> > lines as well for the unused PHY. I'd have to run some tests to see if
-> > this circuitry could be enough, without relying at all on PHY
-> > isolation :
-> > 
-> >                    /--- KSZ8041
-> >                    |
-> >       MAC ------ MUX
-> >                  | | 
-> >   to SoC <-gpio--/ \--- KSZ8041
-> > 
-> > 
-> > One point is, if you look at the first case (no mux), we need to know
-> > if the PHYs are able to isolate or not in order to use the proper
-> > switching strategy (isolate or power-down).  
-> 
-> That explains the hardware, but what are the use cases? How did the
-> hardware designer envision this hardware being used?
-
-The use-case is link redundancy, if one PHY loses the link, we hope
-that we still have link on the other one and switchover. This is one of
-the things I discussed at netdev 0x17.
-
-> If you need to power the PHY off, you cannot have dynamic behaviour
-> where the first to have link wins. But if you can have the media side
-> functional, you can do some dynamic behaviours.
-
-True.
-
-> Although, is it wise
-> for the link to come up, yet to be functionally dead because it has no
-> MAC connected?
-
-Good point. What would you think ? I already deal with the identified
-issue which is that both PHYs are link-up with LP, both connected to
-the same switch. When we switch between the active PHYs, we send a
-gratuitous ARP on the new PHY to refresh the switch's FDB.
-
-Do you see that as being an issue, having the LP see link-up when the
-link cannot actually convey data ? Besides the energy detect feature
-you mention, I don't see what other options we can have unfortunately :(
-
-> There are some Marvell Switches which support both internal Copper
-> PHYs and a SERDES port. The hardware allows first to get link to have
-> a functional MAC. But in Linux we have not supported that, and we
-> leave the unused part down so it does not get link.
-
-My plan is to support these as well. For the end-user, it makes no
-difference wether the HW internally has 2 PHYs each with one port, or 1
-phy with 2 ports. So to me, if we want to support phy_mux, we should
-also support the case you mention above. I have some code to support
-this, but that's the part where I'm still getting things ironed-out,
-this is pretty tricky to represent that properly, especially in DT.
-
->
-> Maybe we actually want energy detect, not link, to decide which PHY
-> should get the MAC?  But i have no real idea what you can do with
-> energy detect, and it would also mean building out the read_status()
-> call to report additional things, etc.
-
-Note that I'm trying to support a bigger set of use-cases besides the
-pure 2-PHY setup. One being that we have a MUX within the SoC on the
-SERDES lanes, allowing to steer the MII interface between a PHY and an
-SFP bus (Turris Omnia has such a setup). Is it possible to have an
-equivalent "energy detect" on all kinds of SFPs ?
-
-As a note, I do see that both Russell and you may think you're being
-"drip-fed" (I learned that term today) information, that's not my
-intent at all, I wasn't expecting this discussion now, sorry about that.
-
-I was saying to Russell that I would start a new thread, but we already
-have a discussion going here, let me know if we shall continue the
-discussion here or on a new thread.
-
-Thanks,
-
-Maxime
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBXZWkgRmFuZw0KPiBTZW50OiAy
+MDI0xOoxMNTCOMjVIDE1OjI0DQo+IFRvOiBkYXZlbUBkYXZlbWxvZnQubmV0OyBlZHVtYXpldEBn
+b29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7DQo+IHBhYmVuaUByZWRoYXQuY29tOyByb2JoQGtl
+cm5lbC5vcmc7IGtyemsrZHRAa2VybmVsLm9yZzsNCj4gY29ub3IrZHRAa2VybmVsLm9yZzsgYW5k
+cmV3QGx1bm4uY2g7IGYuZmFpbmVsbGlAZ21haWwuY29tOw0KPiBoa2FsbHdlaXQxQGdtYWlsLmNv
+bTsgQW5kcmVpIEJvdGlsYSAoT1NTKSA8YW5kcmVpLmJvdGlsYUBvc3MubnhwLmNvbT47DQo+IGxp
+bnV4QGFybWxpbnV4Lm9yZy51aw0KPiBDYzogZGV2aWNldHJlZUB2Z2VyLmtlcm5lbC5vcmc7IGxp
+bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7IGlt
+eEBsaXN0cy5saW51eC5kZXYNCj4gU3ViamVjdDogW1BBVENIIHYyIG5ldC1uZXh0IDAvMl0gbWFr
+ZSBQSFkgb3V0cHV0IFJNSUkgcmVmZXJlbmNlIGNsb2NrDQo+IA0KPiBUaGUgVEpBMTF4eCBQSFlz
+IGhhdmUgdGhlIGNhcGFiaWxpdHkgdG8gcHJvdmlkZSA1ME1IeiByZWZlcmVuY2UgY2xvY2sNCj4g
+aW4gUk1JSSBtb2RlIGFuZCBvdXRwdXQgb24gUkVGX0NMSyBwaW4uIFRoZXJlZm9yZSwgYWRkIHRo
+ZSBuZXcgcHJvcGVydHkNCj4gIm54cCxybWlpLXJlZmNsay1vdXRwdXQiIHRvIHN1cHBvcnQgdGhp
+cyBmZWF0dXJlLiBUaGlzIHByb3BlcnR5IGlzIG9ubHkNCj4gYXZhaWxhYmxlIGZvciBQSFlzIHdo
+aWNoIHVzZSBueHAtYzQ1LXRqYTExeHggZHJpdmVyLCBzdWNoIGFzIFRKQTExMDMsDQo+IFRKQTEx
+MDQsIFRKQTExMjAgYW5kIFRKQTExMjEuDQo+IA0KPiAtLS0NCj4gdjIgTGluazoNCj4gaHR0cHM6
+Ly9sb3JlLmtlcm5lbC5vcmcvbmV0ZGV2LzIwMjQwODIzLWplcnNleS1jb25kdWNpdmUtNzA4NjNk
+ZDZmZDI3QHNwdQ0KPiBkL1QvDQo+IHYzIExpbmw6DQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3Jn
+L2lteC8yMDI0MDgyNjA1MjcwMC4yMzI0NTMtMS13ZWkuZmFuZ0BueHAuY29tLw0KPiAtLS0NCj4g
+DQo+IFdlaSBGYW5nICgyKToNCj4gICBkdC1iaW5kaW5nczogbmV0OiB0amExMXh4OiBhZGQgIm54
+cCxybWlpLXJlZmNsay1vdXQiIHByb3BlcnR5DQo+ICAgbmV0OiBwaHk6IGM0NS10amExMXh4OiBh
+ZGQgc3VwcG9ydCBmb3Igb3V0cHV0aW5nIFJNSUkgcmVmZXJlbmNlIGNsb2NrDQo+IA0KPiAgLi4u
+L2RldmljZXRyZWUvYmluZGluZ3MvbmV0L254cCx0amExMXh4LnlhbWwgIHwgMTggKysrKysrKysr
+KysrDQo+ICBkcml2ZXJzL25ldC9waHkvbnhwLWM0NS10amExMXh4LmMgICAgICAgICAgICAgfCAy
+OSArKysrKysrKysrKysrKysrKy0tDQo+ICBkcml2ZXJzL25ldC9waHkvbnhwLWM0NS10amExMXh4
+LmggICAgICAgICAgICAgfCAgMSArDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDQ2IGluc2VydGlvbnMo
+KyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiAtLQ0KPiAyLjM0LjENCg0KU29ycnkgZm9yIHRoZSB3
+cm9uZyAidjIiIGRlc2NyaXB0b3IgaW4gdGhlIHRpbGUsIGl0IHNob3VsZCBiZSAidjQiLiA6KA0K
 
