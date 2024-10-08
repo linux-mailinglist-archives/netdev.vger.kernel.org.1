@@ -1,228 +1,166 @@
-Return-Path: <netdev+bounces-133150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16E6B9951B3
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:31:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F8A9951C0
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B1B31C25618
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F50EB28A43
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B5D1DFDB7;
-	Tue,  8 Oct 2024 14:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8A71DFE15;
+	Tue,  8 Oct 2024 14:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="d5Mfbreg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZjglNPd"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 594CF1DF97C;
-	Tue,  8 Oct 2024 14:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DCD1DF995
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:29:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728397659; cv=none; b=SK5vuoyg029W3v/03SgRmjxhFUAck2D4Zbi8zVTi8PNNOy8Lh0zXUSI/EaN7IIONfxJy48xJRFfEXx5S2ODiJ16VJd/Y58d1edY9iQee/4krVuLm3DUzrtSeUXU829pkBCTtzzYIWNancpo5GK4FnJmutG5adJgZxEvjE2JLzX0=
+	t=1728397748; cv=none; b=UHmnIC9iJF99hh99A1/6sVZal3V8la2rocXlb3XMySnaCEs3PqqO0AyBoHhSAAy/PJnBRA65ceCtR989eYiupVxhY+oE7CzpKoQ12V0WMrc8XTNfBvrZyprhhYGusAlcG0eS68/Khbc9H7LdvAmxuT/5Fw3XFcuKYcHhAEWjcfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728397659; c=relaxed/simple;
-	bh=cqF1IIkxJrWVAPrYmX/qgSgwLz6GPiFD607tDN6UK9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FsiIG+01OPoiVYu/DusRmzaesB8/1PC1oxIea8IAF+ABBItNEvwsuT4xcpE39cCvzG8erG4rgFQcoL3QqEeGAGzO/MVEPz+lQzdymu0P0pzi+VSpM8zqZBNPZTLFTLJRZGU2sgNZdSYntAoMsz0q6jK8Gb19sHv51sGZsLYM7ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=d5Mfbreg; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=a+DkmiR6iBjQTpDltHH1Nmd5nsx6wlgZv69FbKbaRbM=; b=d5MfbregxMAtRARB3jZ6BQgusn
-	johk4FaL3qHonV14S90IKc0bNPwO40xd0c7mEyOe3oLPuyJZz+EQkI+9cSuHgiva0c5s85T6f6Tnn
-	hRPqemOze8k1kwmDgwNTxdQalrff+O4WPXR0ZD1vt20eCm6ld06KeqTvKfS62duZmNwdeKNFbwVZX
-	J1zajTQqDPcfKGyRMve5v+/fSzQsj6ChQVgz4wLhnIwmiTD+n0bsL6SzJGCTi1Sb13PgtYO08BCEd
-	whNlaB6two9xhcOqj8UojT/38nzjyYVHeAyu40pbzjQYnjy0RtQjp7k6qgYl0U6zY7A/KCQufnfd6
-	vQhq1vag==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46250)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1syBBO-0007bI-0Z;
-	Tue, 08 Oct 2024 15:27:25 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1syBBK-0005GB-02;
-	Tue, 08 Oct 2024 15:27:22 +0100
-Date: Tue, 8 Oct 2024 15:27:21 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
- link-partner advertisement
-Message-ID: <ZwVBSaS7UGCwbqDs@shell.armlinux.org.uk>
-References: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
- <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
- <ZwBmycWDB6ui4Y7j@makrotopia.org>
- <ZwUTDw0oqJ1dvzPq@shell.armlinux.org.uk>
- <ZwUelSBiPSP_JDSy@makrotopia.org>
- <ZwUpT9HRdl33gv_G@shell.armlinux.org.uk>
+	s=arc-20240116; t=1728397748; c=relaxed/simple;
+	bh=AQV70qMch8hhEtaG44BgcSwH2OpGfzCZIHGwcfPQkvI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mwUG5eW3HhmJBrgS1IgCshsB1VbEYiHcq8tetOOXALEf0wTlscO7sV6yB3CfyCi9YQufKgFLjWv+PkHfySxQ1T0c7Ngq2LdRFvUdRU0jIE8HzSOhA84SKAEQ3HKiU+xJ9GwhBJVNiQbt/izdGZbwELwNmLRQWzURFdYu3RasmPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZjglNPd; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a9968114422so127635966b.2
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 07:29:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728397745; x=1729002545; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iFiC4SJXKBU4ih5rRxQAyTk1/b3JdHl7fhN1gWSDsoA=;
+        b=dZjglNPdmU3lbLTZlVlLZmmP+WMODqSiuEZpxP+JPDLwAp9O3jdSIuxImkBON0CQVm
+         8cGlZi3/u/5OGzrV4RQPfFkRTyVfQ7jkaGKt//5FpNYemOzz1F1qZ3pCq+9ljV2ewTJP
+         EGgHHC5TUrmK2ttIkxIpiuMaMzQnroZ7lciu3tJiOR2HWY9sDjI9jsq2hh7mPe9dRZrv
+         btA79HEqkhwWRBtpHEulZBtmsVUqPzmK76+C+CM+pemMjRv/Gl7Eb1PetEgQnoO1P7Xh
+         3dTUPDcu9osSly4gm+xc5/pKGbuDWppTNv6b1F/QMIOd7YgqePqGivZ0mGQjbcCb9LQG
+         3tDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728397745; x=1729002545;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iFiC4SJXKBU4ih5rRxQAyTk1/b3JdHl7fhN1gWSDsoA=;
+        b=L+dpSrg6vxLEwPoC6w9gNxmhXABX8ygZebIbALuBst1TDjx9CbIRCjcvfjm56lI37p
+         Y8Wsvz39oINwmE3B+yBuVPxTuQiKRivGiAI8kdwajiBxc9klTzur/6aKye80LPDgY9F/
+         +zYrqg1i3cYar95VprfDK9HvEgeecMwrBAo+dFDnhB2IkmjMvg/GZIXb7LmMvTfkNAAC
+         5nU8O+Md54qsRHIcs9xWt2jbFO3SA/5EiNbQ91NQehUT8dXZgIJ9Z8hGbfO21qNWgFki
+         srEFzc1oUdiuQTXsPkqnrxOBln6sdmYYrnTr0dwkHQPLmGsL7GY2y8IGh/iRTaaaLTeX
+         PFYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXV7DLO8nmTSxJBJUE8AHBIk8rliln18XVawgUQRfY7fogEXfo61qKz5HgjsYbxYGpP6WG8Exs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhTUjI4uPykjUKgfHcp1MHqmY3pUkb2jFqAqYdFOMhxDpmstbg
+	Nxe4ic4gHGJuscOujO7VDHbEd1mBIK84ZZ1AA/KSnBV6xOYjRLKVeHyj+BwzkrgAb6io2bnqcyP
+	zG0x5Qii27IFqtQ+p5U3mDlMLBTlIqZqgk1yH
+X-Google-Smtp-Source: AGHT+IEFFudRZvMQQp2jHi91uAj0fRT51bJ/7DDUENc5oBNeJIlIA/kyuwYa9EjUVyQiOUTw8G/ESMex4G/pgRNui98=
+X-Received: by 2002:a17:907:94c7:b0:a99:446f:1f1a with SMTP id
+ a640c23a62f3a-a99446f1fd0mr1069676366b.35.1728397744759; Tue, 08 Oct 2024
+ 07:29:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwUpT9HRdl33gv_G@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <CANn89iKWPDs8UXTu8NU+18DM4XE4wHz=CKeSY2AMoxB7tvLyKw@mail.gmail.com>
+ <20241008142125.81471-1-kuniyu@amazon.com>
+In-Reply-To: <20241008142125.81471-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Oct 2024 16:28:53 +0200
+Message-ID: <CANn89iLUqJrO8VR2PTqNaZOb7Jn_CO1F792ec3cLNfXwgAdyrg@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp/dccp: Don't use timer_pending() in reqsk_queue_unlink().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	kuni1840@gmail.com, martin.lau@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 08, 2024 at 01:45:03PM +0100, Russell King (Oracle) wrote:
-> Let's start checking what we're doing with regards to this register.
-> 
-> 7.33.11 (Link Partner 10GBASE-T capability) states that this is only
-> valid when the Page received bit (7.1.6) has been set. This is the
-> BMSR_ANEGCOMPLETE / MDIO_AN_STAT1_COMPLETE bit.
-> 
-> Looking at rtl822x_read_status, which is called directly as a
-> .read_status() method, it reads some register that might be the
-> equivalent of MMD 7 Register 33 (if that's what 0xa5d, 0x13 is,
-> 0xa5d, 0x12 seems to be MDIO_AN_10GBT_CTRL) whether or not the link
-> is up and whether or not AN has completed. It's only conditional on
-> Autoneg being enabled.
-> 
-> However, we don't look at 7.1.6, which is wrong according to 802.3.
-> So I think the first thing that's needed here is that needs fixing
-> - we should only be reading the LP ability registers when (a) we
-> have link, and (b) when the PHY indicates that config pages have
-> been received.
-> 
-> The next thing that needs fixing is to add support for checking
-> these LOCOK/REMOK bits - and if these are specific to the result of
-> the negotiation (there's some hints in 802.3 that's the case, as
-> there are other registers with similar bits in, but I haven't
-> looked deeply at it) then, since the resolution is done in core
-> PHY code, I think we need another method into drivers to check
-> these bits once resolution has occurred.
+On Tue, Oct 8, 2024 at 4:21=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Tue, 8 Oct 2024 11:54:21 +0200
+> > On Tue, Oct 8, 2024 at 1:53=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > From: Jakub Kicinski <kuba@kernel.org>
+> > > Date: Mon, 7 Oct 2024 16:26:10 -0700
+> > > > On Mon, 7 Oct 2024 07:15:57 -0700 Kuniyuki Iwashima wrote:
+> > > > > Martin KaFai Lau reported use-after-free [0] in reqsk_timer_handl=
+er().
+> > > > >
+> > > > >   """
+> > > > >   We are seeing a use-after-free from a bpf prog attached to
+> > > > >   trace_tcp_retransmit_synack. The program passes the req->sk to =
+the
+> > > > >   bpf_sk_storage_get_tracing kernel helper which does check for n=
+ull
+> > > > >   before using it.
+> > > > >   """
+> > > >
+> > > > I think this crashes a bunch of selftests, example:
+> > > >
+> > > > https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/805581/8-nft-=
+queue-sh/stderr
+> > >
+> > > Oops, sorry, I copy-and-pasted __inet_csk_reqsk_queue_drop()
+> > > for different reqsk.  I'll squash the diff below.
+> > >
+> > > ---8<---
+> > > diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connecti=
+on_sock.c
+> > > index 36f03d51356e..433c80dc57d5 100644
+> > > --- a/net/ipv4/inet_connection_sock.c
+> > > +++ b/net/ipv4/inet_connection_sock.c
+> > > @@ -1188,7 +1190,7 @@ static void reqsk_timer_handler(struct timer_li=
+st *t)
+> > >         }
+> > >
+> > >  drop:
+> > > -       __inet_csk_reqsk_queue_drop(sk_listener, nreq, true);
+> > > +       __inet_csk_reqsk_queue_drop(sk_listener, oreq, true);
+> > >         reqsk_put(req);
+> > >  }
+> > >
+> > > ---8<---
+> > >
+> > > Thanks!
+> >
+> > Just to clarify. In the old times rsk_timer was pinned, right ?
+> >
+> > 83fccfc3940c4 ("inet: fix potential deadlock in reqsk_queue_unlink()")
+> > was fine I think.
+> >
+> > So the bug was added recently ?
+> >
+> > Can we give a precise Fixes: tag ?
+>
+> TIMER_PINNED was used in reqsk_queue_hash_req() in v6.4 mentioned
+> by Martin and still used in the latest net-next.
+>
+> $ git blame -L:reqsk_queue_hash_req net/ipv4/inet_connection_sock.c v6.4
+> 079096f103fac (Eric Dumazet             2015-10-02 11:43:32 -0700 1095) s=
+tatic void reqsk_queue_hash_req(struct request_sock *req,
+> 079096f103fac (Eric Dumazet             2015-10-02 11:43:32 -0700 1096)  =
+                                unsigned long timeout)
+> fa76ce7328b28 (Eric Dumazet             2015-03-19 19:04:20 -0700 1097) {
+> 59f379f9046a9 (Kees Cook                2017-10-16 17:29:19 -0700 1098)  =
+       timer_setup(&req->rsk_timer, reqsk_timer_handler, TIMER_PINNED);
+>
+> Maybe the connection was localhost, or unlikely but RPS was
+> configured after SYN+ACK, or setup like ff46e3b44219 was used ??
 
-Okay, I think the problem is down to the order in which Realtek is
-doing stuff.
-
-genphy_read_status() calls genphy_update_link(), which updates
-phydev->link and phydev->autoneg_complete from the BMSR, and then
-goes on to call genphy_read_lpa().
-
-Looking at genphy_read_lpa():
-
-        if (phydev->autoneg == AUTONEG_ENABLE) {
-                if (!phydev->autoneg_complete) {
-                        mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising,
-                                                        0);
-                        mii_lpa_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-                        return 0;
-                }
-
-So, if BMSR_ANEGCOMPLETE is not set, then we zero the 1G FD/HD,
-Autoneg, Pause, Asym Pause and 100/10M FD/HD fields in the LPA leaving
-everything else alone - and then do nothing further. In other words,
-we don't read the LPA registers and update these bits.
-
-Looking at genphy_c45_read_lpa():
-
-        if (!(val & MDIO_AN_STAT1_COMPLETE)) {
-                linkmode_clear_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-                                   phydev->lp_advertising);
-                mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-                mii_adv_mod_linkmode_adv_t(phydev->lp_advertising, 0);
-                phydev->pause = 0;
-                phydev->asym_pause = 0;
-
-                return 0;
-
-So that's basically the same thing - if the MDIO_AN_STAT1_COMPLETE
-is clear, then we clear the 10G stuff. I think that
-mii_adv_mod_linkmode_adv_t() is wrong here, it should be
-mii_lpa_mod_linkmode_lpa_t().
-
-However, the principle here is that if !autoneg_complete, then the
-modes that would've been set by the respective function need to be
-cleared.
-
-Now, rtl822x_read_status() reads the 10G status, modifying
-phydev->lp_advertising before then going on to call
-rtlgen_read_status(), which then calls genphy_read_status(), which
-in turn will then call genphy_read_lpa().
-
-First, this is the wrong way around. Realtek needs to call
-genphy_read_status() so that phydev->link and phydev->autoneg_complete
-are both updated to the current status.
-
-Then, it needs to check whether AN is enabled, and whether autoneg
-has completed and deal with both situations.
-
-Afterwards, it then *possibly* needs to read its speed register and
-decode that to phydev->speed, but I don't see the point of that when
-it's (a) not able to also decode the duplex from that register, and
-(b) when we've already resolved it ourselves from the link mode.
-What I'd be worried about is if the PHY does a down-shift to a
-different speed _and_ duplex from what was resolved - and thus
-whether we should even be enabling downshift on this PHY. Maybe
-there's a bit in 0xa43 0x12 that gives us the duplex as well?
-
-In other words:
-
-static int rtl822x_read_status(struct phy_device *phydev)
-{
-	int lpadv, ret;
-
-	ret = rtlgen_read_status(phydev);
-	if (ret < 0)
-		return ret;
-
-	if (phydev->autoneg == AUTONEG_DISABLE)
-		return 0;
-
-	if (!phydev->autoneg_complete) {
-		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-		return 0;
-	}
-
-	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
-	if (lpadv < 0)
-		return lpadv;
-
-	mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, lpadv);
-	phy_resolve_aneg_linkmode(phydev);
-
-	return 0;
-}
-
-That should at least get proper behaviour in the link partner
-advertising bitmap rather than the weirdness that Realtek is doing.
-(BTW, other drivers should be audited for the same bug!)
-
-Now, if we still have the stale 2500M problem, then I'd suggest:
-
-	if (phydev->speed >= 2500 && !(lpadv & MDIO_AN_10GBT_STAT_LOCOK)) {
-		/* Possible stale advertisement causing incorrect
-		 * resolution.
-		 */
-		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-		phy_resolve_aneg_linkmode(phydev);
-	}
-
-here.
-
-However, if we keep the rtlgen_decode_speed() stuff, and can fix the
-duplex issue, then the phy_resolve_aneg_linkmode() calls should not
-be necessary, and it should be moved _after_ this to ensure that
-phydev->speed (and phydev->duplex) are correctly set.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I do not really understand the issue.
+How a sk can be 'closed' with outstanding request sock ?
+They hold a refcount on the listener.
 
