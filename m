@@ -1,177 +1,102 @@
-Return-Path: <netdev+bounces-133034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF564994540
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:23:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC769994563
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35A07281602
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:23:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1891C24D9D
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83BC9192B91;
-	Tue,  8 Oct 2024 10:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CJJ54ngw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F39199225;
+	Tue,  8 Oct 2024 10:29:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A8813AA45;
-	Tue,  8 Oct 2024 10:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6151779B1;
+	Tue,  8 Oct 2024 10:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728382986; cv=none; b=EK/IzgHeakJqLvow89wA4+FCkNOapaQao27/AsAwmZJ7CtVsfQL+/RJsJ02OUBq7YCO7WHafWOjTv6RTp6w265wGFFzIIMg+e5+TWzB1a/gzjKeDKfMxH+9mSs1re5bn5yenpLkWN10TFlF62IH3P4KAn/4fUMGNyJCdqOBU7TA=
+	t=1728383361; cv=none; b=oMtbhElgEXwWr8hwNnv0QzSWYM7xeZXdzBFmCZArpvxlty5DnSJlVT6+f6KfM69V4V9Fh5ymyQG4gDzZW8VJL8yceB6anGMkv0m/IzdSIL3s6rbW/wbTCbn+WvF7go6EmcTbcwCNmtKDRI6FWuqnH/lPvl8pm13O1V2t44TBDdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728382986; c=relaxed/simple;
-	bh=BFzMvSREEOum8MgZFnWfpoN7ulQ/dV9nEUsqkTYXgV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j08JCT4/No+OOMApHbEzOAKVPprqOlcT9AvQdD5WA+ECrUjXG5dpopsqlx0K/azF95fScr3TugjguTpF4wSvFjlNQ+F51umq+yx8W8yYrRvVcDSH0sI5IKf7eWBV45xS9Yr8YdoaUaeXSesVohiC2MfE4uVS5/cZOv9XzpDe3iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CJJ54ngw; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 35792FF80D;
-	Tue,  8 Oct 2024 10:23:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728382982;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PIbHxWMCVw9IFtJ8fRNey20NVfyWWoKwUnEtUaybiYI=;
-	b=CJJ54ngwZcL7URuTbYdbrVlqR2wUbuEXMnBFiod1qQ/EQd5RYWr/VjvFv7hRRMTuHn78St
-	rNozbHvUwssWLtOKDUfRL7lXdFxb6xRiPb1cS+0wVAyhWeODQspxHOYvHAzJhIt3W7iu7/
-	QkNbHu8hXSjPJiWwveYb2IWN4KX2xhEHVGhmFym2Q/DBCulgbOKLKy/2JZNX5V+y3yGxhz
-	SIOjsT9oORETkutfLM/JvZI8ixavFo1RiVtQPp/XpNTXFkRlS9t9adh5nbwMD3qoqOoYjD
-	Czg4i8gdTFrsEZlOM8xtPu8kkqKB6h9c0afqXD+GYN13FhE88p+dEJbRtZNQjw==
-Date: Tue, 8 Oct 2024 12:23:00 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
-Subject: Re: [PATCH net-next 06/12] net: ethtool: Add PSE new port priority
- support feature
-Message-ID: <20241008122300.37c77493@kmaincent-XPS-13-7390>
-In-Reply-To: <ZwPr2chTq4sX_I_b@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
-	<20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
-	<ZwDcHCr1aXeGWXIh@pengutronix.de>
-	<20241007113026.39c4a8c2@kmaincent-XPS-13-7390>
-	<ZwPr2chTq4sX_I_b@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728383361; c=relaxed/simple;
+	bh=cSxMEZo4dYqlh8/0TzamPzyRZ/MF1/XyyCo33WuItSA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jg2+HnM6YVdo4YsZRAgD4C+AFqG7knppwvpCuDoRHs2wttNFwJoP11ThE3pToLwAFg7X3xuxJaSuTuQ1wHbUGlCFodGAyzANUPx+MqJTlzfXCRRbuUgmAbawSna6J8eQ8BPmdBC1aU7TZRb0K6QiH2oE68eXat8CMBpgG6pOI7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XNC021ryRz6J6rb;
+	Tue,  8 Oct 2024 18:28:02 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6BF411402C6;
+	Tue,  8 Oct 2024 18:29:16 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 8 Oct
+ 2024 12:29:10 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: Gur Stavi <gur.stavi@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: [PATCH net-next v02 0/2] net: af_packet: allow joining a fanout when link is down
+Date: Tue, 8 Oct 2024 13:27:57 +0300
+Message-ID: <cover.1728382839.git.gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On Mon, 7 Oct 2024 16:10:33 +0200
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+PACKET socket can retain its fanout membership through link down and up
+and leave a fanout while closed regardless of link state.
+However, socket was forbidden from joining a fanout while it was not
+RUNNING.
 
-> >=20
-> > Currently the priority is managed by the PSE controller so the port is =
-the
-> > only information needed. The user interface is ethtool, and I don't see=
- why
-> > he would need such things like controller id or power domain id. Instea=
-d,
-> > it could be managed by the PSE core depending on the power domains
-> > described in the devicetree. The user only wants to know if he can allo=
-w a
-> > specific power budget on a Ethernet port and configure port priority in
-> > case of over power-budget event. =20
->=20
-> Budget is important but different topic. If user do not know how much
-> the budget is, there is nothing usable user can configure. Imagine you
-> do not know how much money can spend and the only way to find it out is
-> by baying things.
+This patch allows PACKET socket to join a fanout while not RUNNING.
+Selftest psock_fanout is extended to test this scenario.
+This is the only test that was performed.
 
-Yes I agree, but I thought this could be done at the driver level specified=
- in
-the power limit ranges for now.
-I don't really know the Power Domain API but I don't think it can currently
-support what you are expecting for PSE. Maybe through the regulator API, or
-something specific to PSE API.
-Maybe we should define the power domain PSE concept as it seems something P=
-SE
-specific.
+This scenario was identified while studying DPDK pmd_af_packet_drv.
+Since sockets are only created during initialization, there is no reason
+to fail the initialization if a single link is temporarily down.
 
-> But, budget is the secondary topic withing context of this patch set.
-> The primer topic here is the prioritization, so the information user
-> need to know it the context: do A has higher prio in relation to B? Do A
-> and B actually in the same domain?
->=20
->=20
-> > I don't have hardware with several PSE controllers. Is there already su=
-ch
-> > hardware existing in the market? =20
->=20
-> Please correct me if i'm wrong, but in case of pd692x0 based devices,
-> every manager (for example PD69208M) is own power domain. There are
-> following limiting factors:
->                           PI 1
->                    L4    /
-> 		 PD69208M - PI 2
->               L3 //      \
->  L1      L2     //        PI 3
-> PSU =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D'
->                 \\        PI 4
->                  \\      /
-> 		 PD69208M - PI 5
->                          \
-> 			  PI 6
->=20
-> L1 - limits defined by Power Supply Unit
-> L2 - Limits defined by main supply rail ob PCB
-> L3 - Limits defined by rail attached to one specific manager
-> L4 - Limits defined by manager. In case of PD69208M it is Max 0.627A
-> (for all or per port?)
+I hope it is not considered as breaking user space and that applications
+are not designed to expect this failure.
 
-Should the rail really have an impact on power limit? I am not a hardware
-designer but having limit defined by the rails seems the best way to create
-magic smoke.
-Don't know how you find this 0.627A value but it seems a bit low. Port curr=
-ent
-limit is 1300mA according to the datasheet.
 
-I first though that hardware should support all ports being powered at the =
-same
-time. Indeed this might not be the case be and there is a command to config=
-ure
-the power bank (PD69208M) power limit.
-=20
-> Assuming PSU provides enough budget to covert Max supported current for
-> every manager, then the limiting factor is actual manager. It means,
-> setting prio for PI 4 in relation to PI 1 makes no real sense, because
-> it is in different power domain.
+Changes:
 
-In fact it does for our case as the PD692x0 consider all the ports in the s=
-ame
-power domain. There is no mention of port priority per PD69208M.
-We can only get PD69208M events and status.
+V02:
+* psock_fanout: use explicit loopback up/down instead of toggle.
+* psock_fanout: don't try to restore loopback state on failure.
+* Rephrase commit message about "leaving a fanout".
 
-> User will not understand why devices fail to provide enough power by
-> attaching two device to one domain and not failing by attaching to
-> different domains. Except we provide this information to the user space.
+V01: https://lore.kernel.org/netdev/cover.1728303615.git.gur.stavi@huawei.com/
 
-What you are explaining seems neat on the paper but I don't know the best w=
-ay
-to implement it. It needs more brainstorming.
+Gur Stavi (2):
+  af_packet: allow fanout_add when socket is not RUNNING
+  selftests: net/psock_fanout: socket joins fanout when link is down
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+ net/packet/af_packet.c                     | 10 +++---
+ tools/testing/selftests/net/psock_fanout.c | 42 ++++++++++++++++++++--
+ 2 files changed, 44 insertions(+), 8 deletions(-)
+
+
+base-commit: f95b4725e796b12e5f347a0d161e1d3843142aa8
+-- 
+2.45.2
+
 
