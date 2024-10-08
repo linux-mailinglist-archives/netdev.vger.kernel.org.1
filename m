@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-133019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC26C9944B7
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:50:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2EBC9944BE
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:51:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61C801F262C9
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:50:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 780F61F22524
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40785192D7A;
-	Tue,  8 Oct 2024 09:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199CF18C035;
+	Tue,  8 Oct 2024 09:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QCmQJyuZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MIq+O07B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D03518BC19
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:48:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62D2173336;
+	Tue,  8 Oct 2024 09:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728380909; cv=none; b=ritT6jAmpRlJQGgmuEIMURn/p9b5PZPOaFlb+Qk47Tu5Qhof9UdIRN1JVT1xOHny/bgESlJnNtdqASwEgZM3yP3uO1kj22Yk0oNpbxQnVuiLnle3ud6QoUv5ZY0mVEy3uNInAX0SphDc/SHqguwQ58CAr+qL4vzYaLmVRaLZreg=
+	t=1728381028; cv=none; b=RYS3Knfdgg6942uduTs8mISwnyjGZqjf3denseD2BAioP8QASvmxXVXm7Epe7j9kwmqe21OiL0cnvyvUdgEsXLeR0FTZWBrUz21MoD/axwu1Ia/t96Au77h/X0/RGIgnnlTUT75kDPilPFSAQIfA9OlWH6Mpy4D7w92dkmvCBbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728380909; c=relaxed/simple;
-	bh=N8CYO6QPTSLwDEqv4tdy5bBmn751XJOsucRrT/fANaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sm40EddCU+388ylA5qea7fYyA5AJW/nk6EggoXBjbtfzyTYbd03SnckC2duCjRyS9SeTrAMuav81Gkytk7/42vRZ9Z6mzdDRpggeq2QXZXPp/UKLMKpyw2w7Ck9R6KdX/xfbfwCYXM75PH2gZ9jG/13uPeCqtc4ANHicnef9PNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QCmQJyuZ; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a99543ab209so253900466b.2
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:48:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728380906; x=1728985706; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U/4TUtGT0qF27zzldT6VQeAk/QB3sw8Q5sHlbOD6kdQ=;
-        b=QCmQJyuZwvc7zX6ptveY6RAe/aZjZzGRaRBvPhpvGPpZXvzed1ucbcIi4fya0rPwvU
-         mPRcoeckUJfRfdi9vHukBM+PNiT3H6PncjZpYtbiORF61nago6bUjEwB757wLzPxL0DZ
-         P/XdioBOaYRe2qQz6/4PNMamR8/TzbhlbuWRnvPdRzQVZztSmayWgdVPNH/bS7HfRkX4
-         zpoukJGaS1fFQLJ8sO7dFYAk2ufBkMuLVB95qEXR5tqXekVHujWxsle6HLsKamBHHlDd
-         1K2OeZ/yhggxhY+PtEZR1u5ZVTPkj181nJvy/duDZTkm8KqNLLs26IvDjTNhvL0GbF0w
-         sf4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728380906; x=1728985706;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U/4TUtGT0qF27zzldT6VQeAk/QB3sw8Q5sHlbOD6kdQ=;
-        b=wr8Z4WO5DoXT+uD6Bf25huWjw2OytlutJOwdh+aAY+9FVhQIqzPY6O5DUbPTAh7Clm
-         A0+qbFBew37CUAI5T4aq2TDQwVojvGtXXtQwA2lwnVJ/ayHzcxRoKzPcekT8Zi7dF2HC
-         f+nzGmhMaUS4GudP5osqnhT8seZCqoWMLNS8ghoBQwCkeHVUOohENTsOAxtxpMt05L58
-         3gc8pUu1mclEEr2ZAh7XCHlMfPOlY4Qhl6WsTsunNmPeiAyyjsq2CTxMhcVMkwFlg4Va
-         3LBB6wmn+KyDbPdRFTcpZ4DBRsV1DPfBszw5sDefTGbWFKXjOeMrUPstPf2qgaa4reNH
-         HYUw==
-X-Gm-Message-State: AOJu0Yxhf12yeYuYbkUgY1gN0ziRbjDY9JRnIsBPBsBuue6JFB2/A98P
-	nXpOqwEWejPdEmrfYihoLfMF801idCTo/d+lFKMDQx+BWoXfaTr7UwqewcCf++EYNNIvD2908/i
-	5w3MrAy3qCNE9yECL2q0jzm321HxNNZjGoLR3
-X-Google-Smtp-Source: AGHT+IGg5Y095mOz9yt/6P5OQ3BIvNF5S9gD0jJRLB8FN6Ha3aQLmZS/XnMabK45M44TzGsj5tRx9hhCkjevaoq5RtE=
-X-Received: by 2002:a17:907:ea7:b0:a99:5ee8:93d0 with SMTP id
- a640c23a62f3a-a995ee893e8mr395959466b.27.1728380905400; Tue, 08 Oct 2024
- 02:48:25 -0700 (PDT)
+	s=arc-20240116; t=1728381028; c=relaxed/simple;
+	bh=XEm2ORiPKfTRSrw0KpulPUwOgoWHLL9ryCeASyTK1ec=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZA1fTjl2D5hJRi0AU1ozRNcyFnudB0n0mzvtkaRA1Y036+t7RW9MwhlTeXM9V+0Unc5xTzaDsxGAO+6wjvmtS0Xkxe8cypTDx+vdoXX2XaD9+zXq6uaXCqyhDKFRGCeE+WO3vI1V5OpeBk2M+sdGVi9/YMsNE1UZWxvztUihJXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MIq+O07B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C444C4CEC7;
+	Tue,  8 Oct 2024 09:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728381026;
+	bh=XEm2ORiPKfTRSrw0KpulPUwOgoWHLL9ryCeASyTK1ec=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=MIq+O07BVQWa6upj60nCwdO1Qt7nViDEdOxFbQm+bk1Aye7F78rmUZiEjFvQKgGTv
+	 ccujhfrgiLAfYrG16rAo3SoIi+G8UTvzlZ9x2yS8MyOFAJELNlX3Rdgu20NUxOIZaP
+	 mxw0g+xJ7a3JYLvvFwK1yPZhx4d95j5hjFroMI6cfxlcrRe4jM0Yh+YzWzmdHldyN3
+	 3hBm9eb5CaTpZ9rQjD9DXafrJC619vsIbUJYsb6icbKEEtbXTaGr2E7GLPwsofxeIE
+	 dc6Jb3bSIlVOr82+MZcq7fHIPKEobwE/7K3s4sk46PUztdtVocnChZBlWNbmnTdFvd
+	 LK2auw7HfBMtA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD203810938;
+	Tue,  8 Oct 2024 09:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008093848.355522-1-edumazet@google.com>
-In-Reply-To: <20241008093848.355522-1-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 8 Oct 2024 11:48:12 +0200
-Message-ID: <CANn89iJ7ts91-pEqL3wAHAu9Cco6MDPZfr++fUjTUxY8Qu3L2w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: add kdoc for dev->fib_nh_head
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 1/1] Documentation: networking: add Twisted Pair
+ Ethernet diagnostics at OSI Layer 1
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172838103051.472898.7922396138133362766.git-patchwork-notify@kernel.org>
+Date: Tue, 08 Oct 2024 09:50:30 +0000
+References: <20241004121824.1716303-1-o.rempel@pengutronix.de>
+In-Reply-To: <20241004121824.1716303-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, f.fainelli@gmail.com, maxime.chevallier@bootlin.com,
+ kory.maincent@bootlin.com, lukma@denx.de, corbet@lwn.net,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux@armlinux.org.uk, Divya.Koppera@microchip.com
 
-On Tue, Oct 8, 2024 at 11:38=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Simon reported that fib_nh_head kdoc was missing.
->
-> Fixes: a3f5f4c2f9b6 ("ipv4: remove fib_info_devhash[]")
-> Closes: https://lore.kernel.org/netdev/20241007140850.GC32733@kernel.org/=
-raw
-> Reported-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->  include/linux/netdevice.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 3baf8e539b6f33caaf83961c4cf619b799e5e41d..b5a5a2b555cda76ce2c0b3b3b=
-2124b34409d1d69 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -1842,6 +1842,7 @@ enum netdev_reg_state {
->   *     @tipc_ptr:      TIPC specific data
->   *     @atalk_ptr:     AppleTalk link
->   *     @ip_ptr:        IPv4 specific data
-> + *     @fib_nh_head:   list of fib_nh attached to this device
->   *     @ip6_ptr:       IPv6 specific data
->   *     @ax25_ptr:      AX.25 specific data
->   *     @ieee80211_ptr: IEEE 802.11 specific data, assign before register=
-ing
-> --
-> 2.47.0.rc0.187.ge670bccf7e-goog
->
+Hello:
 
-Hmm... maybe not needed, I saw Jakub added inline:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-/** @fib_nh_head: nexthops associated with this netdev */
+On Fri,  4 Oct 2024 14:18:24 +0200 you wrote:
+> This patch introduces a diagnostic guide for troubleshooting Twisted
+> Pair  Ethernet variants at OSI Layer 1. It provides detailed steps for
+> detecting  and resolving common link issues, such as incorrect wiring,
+> cable damage,  and power delivery problems. The guide also includes
+> interface verification  steps and PHY-specific diagnostics.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> 
+> [...]
 
-Thanks !
+Here is the summary with links:
+  - [net-next,v3,1/1] Documentation: networking: add Twisted Pair Ethernet diagnostics at OSI Layer 1
+    https://git.kernel.org/netdev/net-next/c/e793b86ae44e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
