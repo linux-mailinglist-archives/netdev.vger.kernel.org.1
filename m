@@ -1,141 +1,177 @@
-Return-Path: <netdev+bounces-133368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0076995BC3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:35:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0467F995BC7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C1F328730B
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:35:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27D131C20FDB
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309EC2194BB;
-	Tue,  8 Oct 2024 23:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E15218588;
+	Tue,  8 Oct 2024 23:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7TUjj4U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgwBfIIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAAD219494
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AB313C3CD;
+	Tue,  8 Oct 2024 23:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728430497; cv=none; b=VXTiFsiTkDaDt1ZdvgEAyxTW2yg94b3wBUc6ELr8aHhHDk7/Tb+Rbb7aaf7//6D7hVh4Su+DXsk9eGEKV4yZngdoCmpvnx89CVkw+FNN+iZi7m3OdCh/akorY03yvOYNJreenxqkY4df0PU4O2srZ9H+X0e0Q/8RvjkUCmz0JLU=
+	t=1728430678; cv=none; b=JZlkID8thy7Te9yynx9ZFY+yamUYZWIHR87XkLn4Tws6i7gQ+lvYksabRY+v5OOtlSIOIwO6aOGCIWuf5kCkw0AGKmHp71bMaOxvJ0t1nlBdv0n1rPgDltLcwKOOz5T61iBmY2Vy4tRT3CVlP//z8ANW2HpR9vZgyEAJj6SnDg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728430497; c=relaxed/simple;
-	bh=MG80zLeDivzbzlhRayw18/+xZjnuyZEvNlfeT2mt1WA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pv84wE0EncUtVipx9lY5UorB3qAg62i3A+GsRwE0QhUEOnC9JGgBFNt6ZPDXn8C+8zNQrksw5l0MBEKn/Loa08arK467Fg5KuFF2tsOI+1jWJnOpeNV+PzBLjstu+xRDe4GlbhnksuTRNy0SeIr6EZijl6qB2fVZsAysNP1ys9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7TUjj4U; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728430496; x=1759966496;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MG80zLeDivzbzlhRayw18/+xZjnuyZEvNlfeT2mt1WA=;
-  b=Q7TUjj4UjhVVa0KPMvZDgcyHBO0bC8bCCyAagJQlf3V9UrozMq7lpi9U
-   h6jehkXTIUxKXgRdIn2cbHCN+ReXgXjieNoXk2GP8AnNp/xWBC3trvbB3
-   bKeVhiSZ/Gdkk2+ezSUcwirWj1CnxSBRgrB2zb11rLmoR0p504wviYwng
-   gJfSs5f1Ig5jdgOk3juU8qpbhRRJeZizLAbjocg348/xnrzhyxEwfikKF
-   2vnexv1wTCbSCG9FHSO+GCOY4HNCugNhxt4yjat+a0I9xW5ZjMsrjxOgV
-   Egb61oDw96uFcWwxuNqF8/nYR4ixmqN5WHbLfGU61y/5UsWiAXMfTV+/O
-   Q==;
-X-CSE-ConnectionGUID: rBVrd9q0ReSqMntCnbBslw==
-X-CSE-MsgGUID: ikMt1sJsQOamb5SH5uoMWg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="27779935"
-X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
-   d="scan'208";a="27779935"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 16:34:51 -0700
-X-CSE-ConnectionGUID: tyhi8iUzQSeE+kFqAbw+qQ==
-X-CSE-MsgGUID: WegMTxcHSXu+NapD1oJKJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
-   d="scan'208";a="106794214"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa001.fm.intel.com with ESMTP; 08 Oct 2024 16:34:51 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next 12/12] e1000: Link NAPI instances to queues and IRQs
-Date: Tue,  8 Oct 2024 16:34:38 -0700
-Message-ID: <20241008233441.928802-13-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
-In-Reply-To: <20241008233441.928802-1-anthony.l.nguyen@intel.com>
-References: <20241008233441.928802-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1728430678; c=relaxed/simple;
+	bh=ujsj3DMawkb/Wltjnad+uYMoFLGr3e0vWCsEiDRyiq0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y6F9gT9fyzRr8BWdVDQ7zPesF/LIqKGGTN3txdbRv72Jglrmnl5JAwuf5o5N/zRzQNiGqzRsqcivDk8r2Dz2/kA4AK92McAKL59kBykLb+Hir+Peh2pDFxO3IdrHnNsrqzdmee5LKhFoDGvMZ2ha4/buLsZ1xdYA9Bl49QLfBKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgwBfIIR; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82fa0ccb0cdso219054939f.3;
+        Tue, 08 Oct 2024 16:37:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728430676; x=1729035476; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cOGZpsnR8Gju+cDRXQcnsLpWSL2hRVraCtbjXlFumqo=;
+        b=OgwBfIIRfCzgYL7KFwvOvRJEg7KQgRYrn+5qsiSAyuGLpc/bmvHLN5LERbjr0HmRWF
+         Imj0tNz3p7nBO5izBcyWPr4dLpMHYFGnZ2eC9coOPWYc8Dps3nZnk9BAzdMrFvlSo1xm
+         GRiVQNaOw1f0i3e9v7whDeuYh7O6NbD7odD8XqMMoQXYtFMc8lbRR6z57su2jbenrcsT
+         tcjsTlhpa/IX3497/Yf1lzAUX9ut0VmFvDtrWWwkKYCP3qOxyyypLQJ49RaduMWEdnTp
+         Sz5C9naEQ5pOUD3egM+Ep9vQsJJ9Aen/3H6eg2L80FXqhINexQlcYXlvwYArnWADzMZG
+         IM3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728430676; x=1729035476;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cOGZpsnR8Gju+cDRXQcnsLpWSL2hRVraCtbjXlFumqo=;
+        b=eV6OkaJTBBVBP1oWhPNKyPmVjaVZSwE5lAS5yy9cU7oTsHf5Rou7hlCNKdG8dZybAY
+         waoW7sSATJCSrucoTVVKOwpu/uiVWjXH2qApUXVXnhmN6IeCLJI4xbssxjLhf7AG0SPN
+         BgfhrsiJXbhhTwm0cYr6ukbkI5X/LwRj/I2k3R8xmD7KKIQe6tLrNV5a2cE0vIYAjr1B
+         lvoIvcPcN0Y+JgWev8m5v8gLuOI3W+0xbxkFFI+yk73Rg4kjLEPHIu+cfj22sDOE3emW
+         zMyAiO9Pv/DN7E/w599cxBV+zPNVwWRx8taI39t+P5oafcKtuK6O4cV8FpHQmbNcI+Ol
+         E+Xw==
+X-Forwarded-Encrypted: i=1; AJvYcCU1q9HCp9nSAalS3bX9iRjWdzYvhlRG3HGCYWQx47/YsS6WRyYk2GOOgy+S9/LnTctwaB8=@vger.kernel.org, AJvYcCXchRZKUOE6RNh+4shm6vYoOP/R9wJWd4NANXZ5I1wIyZu42XV1cA7UIlxTHiWby/KKHw+DmLLP@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2ATN26/C85F4qKvumCsAUe5bBhWIaNfJdoalIvSN5idH0ueqP
+	TdZvTfxZAKGZ+VOMv2Y/737YoGtxFwSPH43s7SmJB19WaKRkXKGNuFeHP8sx5wzEJKaonjp9MjR
+	HezrU9OgJtI3HY39izXMg+ah1vmk=
+X-Google-Smtp-Source: AGHT+IHZtqUI9H0D9ktq4iWlm7zz1lf1nbUIexTjWwBBup/DK+q/OHY0tZ7tLPnltptDRFnrT87ScKPDA3hUWVhlVQI=
+X-Received: by 2002:a05:6e02:168c:b0:3a3:76c3:fcb0 with SMTP id
+ e9e14a558f8ab-3a397d1c1ecmr4921525ab.26.1728430675806; Tue, 08 Oct 2024
+ 16:37:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-6-kerneljasonxing@gmail.com> <67057fa71f8a9_1a41992946d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67057fa71f8a9_1a41992946d@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 07:37:20 +0800
+Message-ID: <CAL+tcoDwdhqqSNcM7i5VcW0yGDd1hQ+3VMM0Nc=6DoQOX1P2xA@mail.gmail.com>
+Subject: Re: [PATCH net-next 5/9] net-timestamp: ready to turn on the button
+ to generate tx timestamps
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Joe Damato <jdamato@fastly.com>
+On Wed, Oct 9, 2024 at 2:53=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Once we set BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB_FLAG flag here, there
+> > are three points in the previous patches where generating timestamps
+> > works. Let us make the basic bpf mechanism for timestamping feature
+> >  work finally.
+> >
+> > We can use like this as a simple example in bpf program:
+> > __section("sockops")
+> >
+> > case BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB:
+> >       dport =3D bpf_ntohl(skops->remote_port);
+> >       sport =3D skops->local_port;
+> >       skops->reply =3D SOF_TIMESTAMPING_TX_SCHED;
+> >       bpf_sock_ops_cb_flags_set(skops, BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB=
+_FLAG);
+> > case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
+> >       bpf_printk(...);
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> >  /* List of TCP states. There is a build check in net/ipv4/tcp.c to det=
+ect
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index 82cc4a5633ce..ddf4089779b5 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -477,12 +477,37 @@ void tcp_init_sock(struct sock *sk)
+> >  }
+> >  EXPORT_SYMBOL(tcp_init_sock);
+> >
+> > +static u32 bpf_tcp_tx_timestamp(struct sock *sk)
+> > +{
+> > +     u32 flags;
+> > +
+> > +     flags =3D tcp_call_bpf(sk, BPF_SOCK_OPS_TX_TS_OPT_CB, 0, NULL);
+> > +     if (flags <=3D 0)
+> > +             return 0;
+> > +
+> > +     if (flags & ~SOF_TIMESTAMPING_MASK)
+> > +             return 0;
+> > +
+> > +     if (!(flags & SOF_TIMESTAMPING_TX_RECORD_MASK))
+> > +             return 0;
+> > +
+> > +     return flags;
+> > +}
+> > +
+> >  static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *so=
+ckc)
+> >  {
+> >       struct sk_buff *skb =3D tcp_write_queue_tail(sk);
+> >       u32 tsflags =3D sockc->tsflags;
+> > +     u32 flags;
+> > +
+> > +     if (!skb)
+> > +             return;
+> > +
+> > +     flags =3D bpf_tcp_tx_timestamp(sk);
+> > +     if (flags)
+> > +             tsflags =3D flags;
+>
+> So this feature overwrites the flags set by the user?
 
-Add support for netdev-genl, allowing users to query IRQ, NAPI, and queue
-information.
+It only overrides each last skb instead of the whole socket so that
+some time if we don't want to use this bpf program any more, we could
+easily and directly detach it without having to find a proper time to
+clear the fields in struct sock. That's the advantage of setting
+through each sendmsg call, compared to bpf_setsockopt method.
 
-After this patch is applied, note the IRQ assigned to my NIC:
+> Ideally we would use an entirely separate field for BPF admin
+> timestamping requests.
 
-$ cat /proc/interrupts | grep enp0s8 | cut -f1 --delimiter=':'
- 18
+I understand what you mean. I'm not that familiar with how a bpf
+extension actually implements, so I dug into how RTO min time can be
+affected by bpf programs (see BPF_SOCK_OPS_TIMEOUT_INIT as an
+example). It also modifies the existing field.
 
-Note the output from the cli:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 2}'
-[{'id': 513, 'ifindex': 2, 'irq': 18}]
-
-This device supports only 1 rx and 1 tx queue, so querying that:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 513, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 513, 'type': 'tx'}]
-
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index ab7ae418d294..4de9b156b2be 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -513,6 +513,8 @@ void e1000_down(struct e1000_adapter *adapter)
- 	 */
- 	netif_carrier_off(netdev);
- 
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
- 	napi_disable(&adapter->napi);
- 
- 	e1000_irq_disable(adapter);
-@@ -1392,7 +1394,10 @@ int e1000_open(struct net_device *netdev)
- 	/* From here on the code is the same as e1000_up() */
- 	clear_bit(__E1000_DOWN, &adapter->flags);
- 
-+	netif_napi_set_irq(&adapter->napi, adapter->pdev->irq);
- 	napi_enable(&adapter->napi);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, &adapter->napi);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, &adapter->napi);
- 
- 	e1000_irq_enable(adapter);
- 
--- 
-2.42.0
-
+Thanks,
+Jason
 
