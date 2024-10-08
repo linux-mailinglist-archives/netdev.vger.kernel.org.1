@@ -1,161 +1,145 @@
-Return-Path: <netdev+bounces-133342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA015995B6E
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:15:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93DAB995B7F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:19:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5690EB21E8A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:15:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5EB1F21A3C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E604221643A;
-	Tue,  8 Oct 2024 23:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AADE217907;
+	Tue,  8 Oct 2024 23:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mn2Ym7el"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBBD21264F;
-	Tue,  8 Oct 2024 23:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B756C2178FE;
+	Tue,  8 Oct 2024 23:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728429323; cv=none; b=DfTq+rTkrpjosfDg0Fc3dUyNeIoUJfZA3fovmvw8mnf45jTdghIxqZNkiIy13SZji3sbI2UpyqNs9cgca0HsWZ0hN2Vh9LxY0IVE8wzw/HkMhnnma685y1P+WjetHXMClXN0UiYfjD2FB2oKokldKpasmlSJ48Pr8WgxTKM7CNk=
+	t=1728429549; cv=none; b=QITNUPjoRy6Te9KDKFvvIO+UbxtVkoQfo/gtVOJjehDbC43iiRqqu+1pCATxYlUwfk1iwnXw3IXngYfy7YSYUBFjLNGGW1iADaZrqWUwcBoyNukXD3LZWRKinP4GbPgy223KCTvmgngcqDRDIuhV8CVi4vg4t0rVhQ5MW67ZtZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728429323; c=relaxed/simple;
-	bh=UBe9cFKnQOBsg9HTbpgJGUx1WksSoSj07Oz2tCtQwis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qOF89B9Mds8uPHW7IYjqdaCKkUI33B3GWwx+IthQz2E3U9vBcODTFNoc7fI6tEwh7tMUzTjry0YmeHSpy2tZSj44wFV/+3m8gbEhPT72BvrIvlxTUcbrvG+fOCLme6cfQc452M/6VrRCGPMOtcxxH2o0PiunrpOmzuoOLqOiKUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1syJQ5-000000002aM-1OOp;
-	Tue, 08 Oct 2024 23:15:09 +0000
-Date: Wed, 9 Oct 2024 00:15:05 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
- link-partner advertisement
-Message-ID: <ZwW8-Xi8sStL50uw@makrotopia.org>
-References: <fb736ae9a0af7616c20c36264aaec8702abc84ae.1728056939.git.daniel@makrotopia.org>
- <8fb5c25d-8ef5-4126-b709-0cfe2d722330@lunn.ch>
- <ZwBmycWDB6ui4Y7j@makrotopia.org>
- <ZwUTDw0oqJ1dvzPq@shell.armlinux.org.uk>
- <ZwUelSBiPSP_JDSy@makrotopia.org>
- <ZwUpT9HRdl33gv_G@shell.armlinux.org.uk>
- <ZwVBSaS7UGCwbqDs@shell.armlinux.org.uk>
+	s=arc-20240116; t=1728429549; c=relaxed/simple;
+	bh=UWx7R+D4wTTqvKoZ9J90B2LDFN/v+psmFlgqBnJJ5ZY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pX+iU0tvdZebcOm1lICkMbjqB9dYWuvMBg5MjQyh1eR1sIOTT6JsYxif0ghuDF0rTAQS8bVWPnlkXwSAM/FLVTo97AZd50NKyLZqx7j0+ncNC/4pDuUVWvD90GuNMWvmY1XAdOxIUo9IDbe0YM0vIhhNLOopYwkGribpjmmTdxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mn2Ym7el; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-835393b3c05so13802539f.2;
+        Tue, 08 Oct 2024 16:19:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728429547; x=1729034347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e8V3pavK9gEFR3Y/ZpTYwjDhBxTLh7nk+LEHCLIgYUk=;
+        b=Mn2Ym7el8VWsz9tV4pp3DTv9JxKgLsIfwp8q/7E8NJbQO9t7tLlZexuEv1sGI0xQYH
+         owNoGzBwj6XgQz+5xRA14Qls26nyA7Iws35b2QHF+sT/NQ9RTLkqAX4WgWm8dlZ7wssY
+         v4KGax992BwjXe9F/N6soki0e7wCk+5GDjJgP+vpEQavzRiQz/BQx+qQB8FhAD++DLsI
+         d6BYp1R0pCYuznQE3FvZEtN/Op5s3y7UjNSLMg1Z8k1eKkme9xzndV18IwFh2U5TgdFi
+         i9rauqB8tt9uOiQsNsXKFLzhm3kH9skSLp2usihP2ekSC0NzP6lOd9FQ9ctQjl4QWecR
+         M6sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728429547; x=1729034347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=e8V3pavK9gEFR3Y/ZpTYwjDhBxTLh7nk+LEHCLIgYUk=;
+        b=muWoIbDD7mBxCzqEkgptKMH63xVyaBu3jAK1tTh+hGoJJHzUppM3OliUx6Wfx4+5LB
+         5KKivrGOwtPg1n2/fQP8n1/DhW+vHcqhmU3vUowsi1Qqm46/ebQKIjeJcyxLIf3Mtuz0
+         p6emTR+MglOe18kYK8npqPTGXfmW+KfzqCEJsaLmrpQAed/iWTvs9ROY3RYM23Cq9fGO
+         OvfxnstbYlYZq1JrQe3PrZjCNTUJKIoi+fzfjMbVDP6t32FLu6Nf51jyIaDR2BhY5uu+
+         fi2a/yyDvBqxZiilioOAT7qzB5GvLmnyU6zucBkbTKH31NfdTDa8P3dVhjehYOjaJsHE
+         wblg==
+X-Forwarded-Encrypted: i=1; AJvYcCVn7qLMWmGO1OsnkUxscaHdm+DyZzWKB6aC0IoD+Of/d0+klVZ51Ozvx+Ox14zUIaq6vhCgrk0Z@vger.kernel.org, AJvYcCWqc3WS+4E1x7xmjjRyzDN83sATxOPQomGQzxlca6xuvF69F4bb55lLh2jnhtJOgWtGAUk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0g4YKxdFGoKegKi4ncJCDYsjgh3DrYq/pLGHi0wQQJMjhs6RE
+	3OYBrUCLgi7ix7+Jzailxc8yivRxZDRGNAvj+u7m4ke8Ea5gGbZEDv7GVCE3hz/G5P+Z19sidvu
+	miowHH0YzLS4AxMW2znn+cLYsVspJIVTU
+X-Google-Smtp-Source: AGHT+IEF1bl05RbryFjU1WHWXSQpyLnCbbHGfsuMLSddfL6821lwuyuTa70yEFqo4fRGVKMV9ZzaQyo3yFB1Cn2jQJk=
+X-Received: by 2002:a05:6e02:1d82:b0:3a0:8e92:ecd1 with SMTP id
+ e9e14a558f8ab-3a397ce886cmr4883685ab.2.1728429546782; Tue, 08 Oct 2024
+ 16:19:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwVBSaS7UGCwbqDs@shell.armlinux.org.uk>
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-7-kerneljasonxing@gmail.com> <6705804318fa1_1a41992941a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6705804318fa1_1a41992941a@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 07:18:30 +0800
+Message-ID: <CAL+tcoA_HwCYG+_DtdRHNL-L07RYqQfxY+pmT2fUvs-N1HYV9g@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/9] net-timestamp: add tx OPT_ID_TCP support for
+ bpf case
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
+On Wed, Oct 9, 2024 at 2:56=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > We can set OPT_ID|OPT_ID_TCP before we initialize the last skb
+> > from each sendmsg. We only set the socket once like how we use
+> > setsockopt() with OPT_ID|OPT_ID_TCP flags.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/core/skbuff.c | 16 +++++++++++++---
+> >  net/ipv4/tcp.c    | 19 +++++++++++++++----
+> >  2 files changed, 28 insertions(+), 7 deletions(-)
+> >
+>
+> > @@ -491,10 +491,21 @@ static u32 bpf_tcp_tx_timestamp(struct sock *sk)
+> >       if (!(flags & SOF_TIMESTAMPING_TX_RECORD_MASK))
+> >               return 0;
+> >
+> > +     /* We require users to set both OPT_ID and OPT_ID_TCP flags
+> > +      * together here, or else the key might be inaccurate.
+> > +      */
+> > +     if (flags & SOF_TIMESTAMPING_OPT_ID &&
+> > +         flags & SOF_TIMESTAMPING_OPT_ID_TCP &&
+> > +         !(sk->sk_tsflags & (SOF_TIMESTAMPING_OPT_ID | SOF_TIMESTAMPIN=
+G_OPT_ID_TCP))) {
+> > +             atomic_set(&sk->sk_tskey, (tcp_sk(sk)->write_seq - copied=
+));
+> > +             sk->sk_tsflags |=3D (SOF_TIMESTAMPING_OPT_ID | SOF_TIMEST=
+AMPING_OPT_ID_TCP);
+>
+> So user and BPF admin conflict on both sk_tsflags and sktskey?
+>
+> I think BPF resetting this key, or incrementing it, may break user
+> expectations.
 
-On Tue, Oct 08, 2024 at 03:27:21PM +0100, Russell King (Oracle) wrote:
-> Okay, I think the problem is down to the order in which Realtek is
-> doing stuff.
-> [...]
-> Now, rtl822x_read_status() reads the 10G status, modifying
-> phydev->lp_advertising before then going on to call
-> rtlgen_read_status(), which then calls genphy_read_status(), which
-> in turn will then call genphy_read_lpa().
-> 
-> First, this is the wrong way around. Realtek needs to call
-> genphy_read_status() so that phydev->link and phydev->autoneg_complete
-> are both updated to the current status.
+Yes, when it comes to OPT_ID and OPT_ID_TCP, conflict could happen.
+The reason why I don't use it like BPF_SOCK_OPS_TS_SCHED_OPT_CB flags
+(which is set along with each last skb) is that OPT_ID logic is a
+little bit complex. If we want to avoid touching sk_tsflags field in
+struct sock, we have to re-implement a similiar logic as you've
+already done in these years.
 
-First of all thanks a lot for diving down that rabbit hole with me!
+Now, this patch is easier but as you said it may "break" users... But
+I wonder if we can give the bpf program the first priority like what
+TCP_BPF_RTO_MIN does. TCP_BPF_RTO_MIN can override icsk_rto_min field
+in struct inet_connection_sock.
 
-> 
-> Then, it needs to check whether AN is enabled, and whether autoneg
-> has completed and deal with both situations.
-> 
-> Afterwards, it then *possibly* needs to read its speed register and
-> decode that to phydev->speed, but I don't see the point of that when
-> it's (a) not able to also decode the duplex from that register, and
-> (b) when we've already resolved it ourselves from the link mode.
-> What I'd be worried about is if the PHY does a down-shift to a
-> different speed _and_ duplex from what was resolved - and thus
-> whether we should even be enabling downshift on this PHY. Maybe
-> there's a bit in 0xa43 0x12 that gives us the duplex as well?
-> 
-> In other words:
-> 
-> static int rtl822x_read_status(struct phy_device *phydev)
-> {
-> 	int lpadv, ret;
-> 
-> 	ret = rtlgen_read_status(phydev);
-> 	if (ret < 0)
-> 		return ret;
-> 
-> 	if (phydev->autoneg == AUTONEG_DISABLE)
-> 		return 0;
-> 
-> 	if (!phydev->autoneg_complete) {
-> 		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-> 		return 0;
-> 	}
-> 
-> 	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
-> 	if (lpadv < 0)
-> 		return lpadv;
-> 
-> 	mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, lpadv);
-> 	phy_resolve_aneg_linkmode(phydev);
-> 
-> 	return 0;
-> }
-> 
-> That should at least get proper behaviour in the link partner
-> advertising bitmap rather than the weirdness that Realtek is doing.
-> (BTW, other drivers should be audited for the same bug!)
-
-Got it, always do genphy_read_status() first thing, as that will
-clear things and set autoneg_complete.
-
-Similarly, when dealing with the same PHY in C45 mode, I noticed that
-phy->autoneg_complete never gets set, but rather we have to check it
-via genphy_c45_aneg_done(phydev) and clear bits set by
-mii_stat1000_mod_linkmode_lpa_t().
-
-Doing so for C45 access, and following your suggestion above for C22
-resolves the issue without any need to check MDIO_AN_10GBT_STAT_LOCOK
-or MDIO_AN_10GBT_STAT_REMOK.
-
-> [...]
-> However, if we keep the rtlgen_decode_speed() stuff, and can fix the
-> duplex issue, then the phy_resolve_aneg_linkmode() calls should not
-> be necessary, and it should be moved _after_ this to ensure that
-> phydev->speed (and phydev->duplex) are correctly set.
-
-PHY Specific Status Register, MMD 31.0xA434 also carries duplex
-information in bit 3 as well as more useful information.
-Probably rtlgen_decode_speed() should be renamed to rtlgen_decode_physr()
-and decode most of that.
-
-I'll post a series taking care of all of that shortly.
-
-
-Again, thanks a lot for the extremely insightful lesson!
-
-
-Cheers
-
-
-Daniel
+Thanks,
+Jason
 
