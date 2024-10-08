@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-133114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4734C994EB9
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:20:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B238994EC2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CC991C2545A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:20:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEEA3287FF7
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC291DEFED;
-	Tue,  8 Oct 2024 13:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056A41DEFF8;
+	Tue,  8 Oct 2024 13:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hJX/dR6I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VHw2QOAL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FA81DE89A;
-	Tue,  8 Oct 2024 13:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04031DE4CD;
+	Tue,  8 Oct 2024 13:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728393629; cv=none; b=CJV04VDNXmvmEKaYyooMd3SEEnCwqOj5pMuNq4SA/edCnivsaK8Wj8BaZxJSQHKCLLvaA1jt61FYiJXGX/1gLsBKpxZw85iWz5SOAj1KulSb/FfN2QwAVQYR3gO717BgCqnNZSKTsT1SHEjs583BuEgleMcnIvOTHi2WHbZ6AH0=
+	t=1728393648; cv=none; b=RZNrKJCB1frEaJFD1QrUFf6/RFZZRyTAF3uGgtTAC1Ohw0+Ulkh1hShCd85jCXOPUQTvwOC8sjCQhEvnb+dcfx+Enmq0aQqRUEU/8TrMzAm/zjeKm0QYzjSS7G7ectdAhTG3WeThnXjpdknMEQure3PFE0w5/PLDngvqofdRIG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728393629; c=relaxed/simple;
-	bh=8QYTu2R3ELrntIPpNwS8RKOjH7wjZR6yhFMJDm91l7w=;
+	s=arc-20240116; t=1728393648; c=relaxed/simple;
+	bh=p79jGiXG+OxbAT9GE0rpDt15shpU2r8+2KOa97rwmOI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QpABNNCPNao2g6YP6xRzPb57YpaXRiXkHp+QfVk4giQ7m2/8s3bNJEF3OVmb10wmjYN9QZeShheUclTT9skv92C/tTGNKhnrJRpntmDd660eei5I/HpF6emOLEZ3c7TAkEwkGyWDtTQxbBDAqGpkorQO15vCaeYgyrQ4XoHcL3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hJX/dR6I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16A73C4CEC7;
-	Tue,  8 Oct 2024 13:20:25 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rmSAHlIpcw2h0Bk4HScbCm87TFAy19e/6jnyhg3aPXo3k5RicWJc10w0isEOYETR9uASafe8ReROnwU50/HAbES7ndR8tkICnWgK3LX2CvOUKCo3Ol2MUhSfp95a90XLSmB6LKZHrOcBp5lCs+MSAscHWNgzq3qUSqocEXpYi0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VHw2QOAL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F532C4CECD;
+	Tue,  8 Oct 2024 13:20:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728393628;
-	bh=8QYTu2R3ELrntIPpNwS8RKOjH7wjZR6yhFMJDm91l7w=;
+	s=k20201202; t=1728393648;
+	bh=p79jGiXG+OxbAT9GE0rpDt15shpU2r8+2KOa97rwmOI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hJX/dR6Ijk12GM3SUUecYFxU5IMrnLVyy+pxGkPJJqK+XXOSbRNss7Bmi//ImV0aG
-	 uQ/xCfVfz3n5I5DE/7AkIRWmgyYudZA6q82zw/sWX/h7Yqe9kx32fYVjf/d1lEJHbT
-	 H4QJII1Ct1lSAoz0ZPMD+TtK4uvMdGKok/XFvgJgdbs2duDwc5Nt1N3GxOCnn06Vbb
-	 s+drfZVPQVLgUucDRpv2O8+wIUk7t55KXyykXSirEthkUDp8xuLv+/UAfZQVVKmVMm
-	 TVrQ19IH+jVlZPymBxd6BcFUERPpPTwQEC1ucNtrE+Z/yjbKY6YMsgJUHZhxTgVlNp
-	 98V0aDhaPGo/A==
-Date: Tue, 8 Oct 2024 14:20:24 +0100
+	b=VHw2QOALTuP987NgBuT3FoSq4iXey0rN8urT4U9UfDp28aKUDxSP4a2DenL6YioH9
+	 AE56AAsJkhCdhiU4A34aIL9bUdVFLtbTlNktU3XcpqkO8ce8X/zKmG13oSmrgrLvfB
+	 K2RAcX3UwDrQE1Hk1LlUsvyJydsnrToVfVyNTb7meOKj1T2GWOl8gCdr4taFqSNG8E
+	 KAK+HMBHsafVnuMmCftl6lU/cIvFo0YRyypmOkiAQQ96e4fvYtjCyOF9/G0WLhBWtM
+	 m965l3w1zauOZAqjR+Y699JoCjAzyktYNAwN8Q1GSJyOKkcuNLdrAQyOyC86pS4uim
+	 AeGl38spIlIZw==
+Date: Tue, 8 Oct 2024 14:20:44 +0100
 From: Simon Horman <horms@kernel.org>
 To: Dipendra Khadka <kdipendra88@gmail.com>
 Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
 	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3 0/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
-Message-ID: <20241008132024.GN32733@kernel.org>
-References: <20241006163832.1739-1-kdipendra88@gmail.com>
+Subject: Re: [PATCH net v3 3/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
+ in otx2_flows.c
+Message-ID: <20241008132044.GO32733@kernel.org>
+References: <20241006164322.2015-1-kdipendra88@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,43 +60,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241006163832.1739-1-kdipendra88@gmail.com>
+In-Reply-To: <20241006164322.2015-1-kdipendra88@gmail.com>
 
-On Sun, Oct 06, 2024 at 04:38:31PM +0000, Dipendra Khadka wrote:
-> This patch series improves error handling in the Marvell OcteonTX2
-> NIC driver. Specifically, it adds error pointer checks after
-> otx2_mbox_get_rsp() to ensure the driver handles error cases more
-> gracefully.
+On Sun, Oct 06, 2024 at 04:43:21PM +0000, Dipendra Khadka wrote:
+> Adding error pointer check after calling otx2_mbox_get_rsp().
 > 
-> Changes in v3:
-> - Created a patch-set as per the feedback
-> - Corrected patch subject
-> - Added error handling in the new files
-> 
-> Dipendra Khadka (6):
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_common.c
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_ethtool.c
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_flows.c
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in cn10k.c
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dmac_flt.c
->   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dcbnl.c
-> 
->  drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c   |  5 +++++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_common.c |  4 ++++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c  |  5 +++++
->  .../ethernet/marvell/octeontx2/nic/otx2_dmac_flt.c   |  9 +++++++++
->  .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c    | 10 ++++++++++
+> Fixes: 9917060fc30a ("octeontx2-pf: Cleanup flow rule management")
+> Fixes: f0a1913f8a6f ("octeontx2-pf: Add support for ethtool ntuple filters")
+> Fixes: 674b3e164238 ("octeontx2-pf: Add additional checks while configuring ucast/bcast/mcast rules")
+> Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> ---
+> v3:
+>  - Included in the patch set
+>  - Changed patch subject
+>  - Added Fixes: tag
+> v2: https://lore.kernel.org/all/20240923063323.1935-1-kdipendra88@gmail.com/
+>  - Changed the subject to net
+>  - Changed the typo of the vairable from bfvp to pfvf
+> v1: https://lore.kernel.org/all/20240922185235.50413-1-kdipendra88@gmail.com/
 >  .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c  | 12 ++++++++++++
->  6 files changed, 45 insertions(+)
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> index 98c31a16c70b..c96f115995f8 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+> @@ -119,6 +119,10 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
+> 
+>  		rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
+>  			(&pfvf->mbox.mbox, 0, &req->hdr);
+> +		if (IS_ERR(rsp)) {
+> +			allocated = PTR_ERR(rsp);
+> +			goto exit;
 
-Thanks for bundling this up in a patch-set.
+This does not seem consistent with other error handling within the same
+loop. I'm unsure if it is correct, but my reading that the current approach
+is:
 
-For reference, it does seem that the threading of this patchset is broken.
-Perhaps there was some option you passed to git send-email that caused
-this. In any case, please look into this for future submissions.
+		if (IS_ERR(rsp))
+			goto exit;
 
-Also, please use ./scripts/get_maintainer.pl patch_file to generate
-the CC list for patches.
+> +		}
+> 
+>  		for (ent = 0; ent < rsp->count; ent++)
+>  			flow_cfg->flow_ent[ent + allocated] = rsp->entry_list[ent];
 
-Lastly, b4 can help with both of the above.
+...
 
