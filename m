@@ -1,102 +1,143 @@
-Return-Path: <netdev+bounces-133045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDA24994596
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:40:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F63D99459D
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 216BA1F2569A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:40:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D1C31C248B3
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DA31C1AB8;
-	Tue,  8 Oct 2024 10:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA111C2DBA;
+	Tue,  8 Oct 2024 10:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R4oSGpxX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RINhXa6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 991B91779B1;
-	Tue,  8 Oct 2024 10:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD388179953
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 10:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728384032; cv=none; b=oGJrajKvnA6Ho2JyD41yAAOn909bA37Li0cc0Za0Cs397C/lPJrbsPWjFb/hq3pJ7Ys/z/wkv7BtrY6o1gtSpCln9KPVoBU95Yt0ALdVEPzQq8C+52EH7fpmSvJVGmlqF+sGcGPLZK0wzelkwSUizTj5BT3RQQbTBgzHL9+U+G4=
+	t=1728384093; cv=none; b=Sgm8FQHbN0KlHTZfDJXKTyczfaUpZRtZ7nfSFN+nGWYJWbM/IE9X/S1QsZQkuU4sjLfnznKpW7XFvSwNlWEXAK0QouE/7a/LzreCHDY+FjhUxxHMe3kDxE5rbXqyc9r1qlu6AIMgkWB+pknSqbZ7+YzbVnjVdlbC/QGKfWwIFvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728384032; c=relaxed/simple;
-	bh=A0YhKsiXP2Xt18H5UHnW7+vMopAENwLVs835p9iWjjE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NPSa9u9DeMNqaGNJnCNsUVUzP9eVPjDuIAih8sV5O/Dbyr3ZNJExRnOowMJqbPGDrI28ozC1cGuDJgVmZEuYOJorLtNf3/6nGwlb72Z69t3clWq4LojxdEevVlNks4YZ2U2/3wlGZq4CUIYLPDYfan5xr2ZOttDWmqMiUA4wGCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R4oSGpxX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21D6AC4CEC7;
-	Tue,  8 Oct 2024 10:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728384032;
-	bh=A0YhKsiXP2Xt18H5UHnW7+vMopAENwLVs835p9iWjjE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R4oSGpxXrm4k8oHsZEaPcGJ6huOlT3dJbsCtUHoIXhqTjr51iovBmkHz18fcmFBjJ
-	 5OvMzRAmRDz8a4WCZTfeqYKnrSevIB1DpgV80YkTY4v5W6LyDyu272OqC7m3G/nZ5z
-	 TxLPAi1HKTR9a2GhAXk+mdIcrDIFx0uMKr4YGAWYtaw38gYkFIOHo8/7c2qvaSyFwY
-	 UglkBV1lYd5u83fTEItQ8K+U70pMJFl+8+x4NRZuNwnPEglOoHmrtB2maHtd9rC5UL
-	 b5WD/ihkrLqHiKL+gGWBhpEeYdJenVAnh/7NshRPvaC42Dqvwb1Hd+E4q0Q6WoaaCN
-	 KhNqDvE9dE8gA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 728F83810938;
-	Tue,  8 Oct 2024 10:40:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1728384093; c=relaxed/simple;
+	bh=WgKxJ9pCWs4GQb+jzYCJZb306YSOQP54ctM/2u9ohKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=NbqZQzzPTn0UBAtONYCrSahaEcpcQjJ0Quo94VIj38Cz1e/+dSJ6idiO41uhKNW81Q43z9Ov9mXduSlzp+8Ib0EU9JBDthVHMsIpBGiPLH3BGAuAJ0ldL+Cvyzgd5929xcJgXph82Kr8fC3fZXHuPjs1RGAVQAIeSqA2Gul5oNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RINhXa6E; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728384090;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gHHd2icZKgk4pSzuMgOd1pN2aINhcj29NSO/V6FULLo=;
+	b=RINhXa6EELW790JJQwlmcsp495hCzPyU6meT/MK3Q2Kfdis3UT9i4kNSoKY8iHNg3SqaQu
+	8iMgmmrn8Mn1C7Zy+9E7baPzm89qSVDFtb6gXlNmXBrJMX5vP8Qha60GegvynjR/vHpXB0
+	R70FbVXZUAC4VIG01/RRJm06afZGDYc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-qcYPJV7aNBOHn04POBwSdQ-1; Tue, 08 Oct 2024 06:41:29 -0400
+X-MC-Unique: qcYPJV7aNBOHn04POBwSdQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37cccd94a69so2812389f8f.0
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 03:41:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728384088; x=1728988888;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gHHd2icZKgk4pSzuMgOd1pN2aINhcj29NSO/V6FULLo=;
+        b=aV97DmcWBd/88YZZMp4nm6HcjwTMx09iFUHLQm6pw/gNRQA7nWJf9FKKWxp3hAiOcz
+         XOA+6XGh7KGt7mDTAwNTkOLNHKEeTMJFWBeoXXvz3wbcwKLzUoxNB1FnNjhotOi5y16m
+         8ai7UoqDBKfe3SYF0jrE5ylH3E1fvqG7f4NS3RmSKDHYeZQACdutYQ17Zt+y2B6bi865
+         /DX6HEdaMabPn0/wnGdgUMa/78ZWsgCmTFR7PyB3QqnDBvSot7ZBGlDBOXnZb1uZO0nx
+         y2yGEalbgsbZcE9r/e0DDkBrcyDikqvJp2pVY1xz0Z4bpn+iAHQVl1CIWsMnMPjxn8p0
+         Z8lw==
+X-Gm-Message-State: AOJu0YzX0KcjWDjVMnI4vhEctXC0T2UGCFmz70OS1ENrfE51oQoBAH23
+	aDTciobusaXHCaqtKtVunIxjp6djKjueIw7wejUjPRPaXGTYaQqw5cw9zOwEKo+z/3v5noA7vlx
+	4rH7Db9er5iIMc9bvSenJWzIs4qokwB8GVvRO/8XVy8A2x3HrQiSe5Q==
+X-Received: by 2002:a5d:59a1:0:b0:367:9d05:cf1f with SMTP id ffacd0b85a97d-37d0e7374acmr12444786f8f.14.1728384088064;
+        Tue, 08 Oct 2024 03:41:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE14dLeeJaBUEZBUmRwSG+MoB9O5AptGScWNuvSxEgmBpzkSQf1bA8IQGcOzD/JBRRzXAhfQg==
+X-Received: by 2002:a5d:59a1:0:b0:367:9d05:cf1f with SMTP id ffacd0b85a97d-37d0e7374acmr12444768f8f.14.1728384087665;
+        Tue, 08 Oct 2024 03:41:27 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1688a486sm7837056f8f.0.2024.10.08.03.41.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 03:41:27 -0700 (PDT)
+Message-ID: <89dd313f-e135-4369-8818-f5259c0879b8@redhat.com>
+Date: Tue, 8 Oct 2024 12:41:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] net: fec: add PPS channel configuration
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172838403627.487135.12470699672942876836.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Oct 2024 10:40:36 +0000
-References: <20241004152419.79465-1-francesco@dolcini.it>
-In-Reply-To: <20241004152419.79465-1-francesco@dolcini.it>
-To: Francesco Dolcini <francesco@dolcini.it>
-Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- shawnguo@kernel.org, s.hauer@pengutronix.de, kernel@pengutronix.de,
- festevam@gmail.com, richardcochran@gmail.com, linux-imx@nxp.com,
- francesco.dolcini@toradex.com, imx@lists.linux.dev, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: realtek: check validity of 10GbE
+ link-partner advertisement
+To: Daniel Golle <daniel@makrotopia.org>
+References: <ZwBmycWDB6ui4Y7j () makrotopia ! org>
+Content-Language: en-US
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZwBmycWDB6ui4Y7j () makrotopia ! org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri,  4 Oct 2024 17:24:16 +0200 you wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+On 10/5/24 00:06, Daniel Golle wrote:
+> On Fri, Oct 04, 2024 at 11:17:28PM +0200, Andrew Lunn wrote:
+>> On Fri, Oct 04, 2024 at 04:50:36PM +0100, Daniel Golle wrote:
+>>> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+>>> index c4d0d93523ad..d276477cf511 100644
+>>> --- a/drivers/net/phy/realtek.c
+>>> +++ b/drivers/net/phy/realtek.c
+>>> @@ -927,6 +927,10 @@ static int rtl822x_read_status(struct phy_device *phydev)
+>>>   		if (lpadv < 0)
+>>>   			return lpadv;
+>>>   
+>>> +		if (!(lpadv & MDIO_AN_10GBT_STAT_REMOK) ||
+>>> +		    !(lpadv & MDIO_AN_10GBT_STAT_LOCOK))
+>>> +			lpadv = 0;
+>>> +
+>>>   		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
+>>>   						  lpadv);
+>>
+>> I know lpadv is coming from a vendor register, but does
+>> MDIO_AN_10GBT_STAT_LOCOK and MDIO_AN_10GBT_STAT_REMOK apply if it was
+>> also from the register defined in 802.3? I'm just wondering if this
+>> test should be inside mii_10gbt_stat_mod_linkmode_lpa_t()?
 > 
-> Make the FEC Ethernet PPS channel configurable from device tree.
+> Yes, it does apply and I thought the same, but as
+> mii_10gbt_stat_mod_linkmode_lpa_t is used in various places without
+> checking those two bits we may break other PHYs which may not use
+> them (and apparently this is mostly a problem on RealTek PHYs where
+> all the other bits in the register persist in case of a non-NBase-T-
+> capable subsequent link-partner after initially being connected to
+> an NBase-T-capable one).
 > 
-> v3: https://lore.kernel.org/all/20240809094804.391441-1-francesco@dolcini.it/
-> v2: https://lore.kernel.org/all/20240809091844.387824-1-francesco@dolcini.it/
-> v1: https://lore.kernel.org/all/20240807144349.297342-1-francesco@dolcini.it/
-> 
-> [...]
+> Maybe we could introduce a new function
+> mii_10gbt_stat_mod_linkmode_lpa_validate_t()
+> which calls mii_10gbt_stat_mod_linkmode_lpa_t() but checks LOCOK and
+> REMOK as a precondition?
 
-Here is the summary with links:
-  - [net-next,v4,1/3] dt-bindings: net: fec: add pps channel property
-    https://git.kernel.org/netdev/net-next/c/1aa772be0444
-  - [net-next,v4,2/3] net: fec: refactor PPS channel configuration
-    https://git.kernel.org/netdev/net-next/c/bf8ca67e2167
-  - [net-next,v4,3/3] net: fec: make PPS channel configurable
-    https://git.kernel.org/netdev/net-next/c/566c2d83887f
+I think this last option would be preferable.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks,
 
+Paolo
 
 
