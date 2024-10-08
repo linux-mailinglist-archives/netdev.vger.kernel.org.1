@@ -1,202 +1,169 @@
-Return-Path: <netdev+bounces-132999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDAC7994340
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:02:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A9C99436F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:04:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73AFF1F24508
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:02:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42F5B1F211A0
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027C917ADE1;
-	Tue,  8 Oct 2024 08:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="g8AJc2iv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EF81D4166;
+	Tue,  8 Oct 2024 09:00:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2473542A9B
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 08:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB01D2B23
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728377935; cv=none; b=vGK+U00BH+Kfjd+ohf6g6ma/Mhs0x6/tPFXdJmGL2gXiDX3QTlshjl3UXSSIIEnO7/mv4ffmv6aaztn262GYAMXGcdR1neRif2f+8aTpX5OE1e+bPUXhisG55p+Aup2xGKmO89I+fpt4VFhmTa6M3FOraNNo5hajOWGKk5WpFcA=
+	t=1728378030; cv=none; b=Sby2k6EKeFYUZavNgpzbcStdbP5hX3G5dWgV3vriXX+0OjMcogfuOU/1ERvTB2QTTZ19MkHE710hmNgnzMdpBh3IM3u/HeMyOkB4uyC6x7PeYSyA5fRpnr6g1arUL/hpS8984gsQx3NRKZ5j9bxc2T6xic0sutpNiEcOxMKql3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728377935; c=relaxed/simple;
-	bh=mYq0W3JfnsZ9YHN+okCBI2WA+xEvSuEf2EbiZ6Ovh/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rs5/gQLElh5sFE0Y8Z2p00akBL1+/uejQEBJwkJASv3tPZwCNzZDU3EnM/sAC746/dV/vj/Q0VAL0YU3tOimpfDOkIruq0wnheMum0nGoYxV7f0ZqpsRCmcjgRdkq6XMtw12WubTUtDXnrh2WwuXkVZfPytR4Cjp0oUHKRS78hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=g8AJc2iv; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a86e9db75b9so825848966b.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 01:58:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1728377932; x=1728982732; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XjXpaathreNKCP59NrT7WsmFRCx9KxRN96jUPQWsCvw=;
-        b=g8AJc2ivQCc1zZfoEOW0b1T7C5ezSeZODPTaGXiLEL0ctjcyirh9ZGaFz+BT/VFmrR
-         a6ugorTzq+1PRFSHCNCR6mjmDNUGVZAvBDi93KCoOpvoP5fp3O9LbRBQVUHowRwyoQF6
-         BF06nupQI2OXHQ20USPitddrHunARNn/tFogt8tvIfafmwN5ecHD14KQCZxcA6v3dV2S
-         Tg4lMZWvx+QzQVwAT83rUsCxbjURIgaw35xkwQ3tyh5KKeCE7hwkRDEfHbRoDIGTfvZ8
-         qnw3TG+2j+cLhs3VO8ruM9h+IrUrV/rN0cUb79HFkQrHyEkMbVBub9tbiyLV4uKWiEKe
-         45tQ==
+	s=arc-20240116; t=1728378030; c=relaxed/simple;
+	bh=uHR1R80Adv/3OX5IIqsonPHDhsdT1S7T6yIqAFdBMl8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d9Pjh15JaXeqLQv1sRkiJuxzJMoM2Wlrn8LUxfJOZUwVhDJm8V+Xs+tX9E6L9/FeXljgrMRrAXXLMpRf3w6400hnBxQtLHFqh2Cep5QJJV0c1gS451tc0BjbUlAYZRi2eevsYxu3M9wLeC40+S5V1V/Nloo1M4NsU1M2Nk/TqRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82aa8af04feso544409139f.1
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:00:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728377932; x=1728982732;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XjXpaathreNKCP59NrT7WsmFRCx9KxRN96jUPQWsCvw=;
-        b=iZL3YPgN0hDtYG68APCtUxj3XN7Cu5q3VmOa9IDeVpaXAc3GQBeVYOezb6fz5EANap
-         +JgqfRt/IMawXPE1TsUXTrBHrfBGjJI4zHgl/Zt6W1uGOgYQgwchd6ksR/HwMG+aU+sF
-         3wvLiJyOsUa30j9+U3SRBQSGgK+EIsbY9ZDTKnqe6EcUqgXX5SY46w3qHJ6KuDDXh4yJ
-         sywP85dYEjmgHBkcmv/kiisma8vs1ZQkKj+mfplfWyZV5Q6c9QnQndHJ2PtxlKaugUY9
-         cwnVqh2i8t5dVWpS8sjKGw8ApylUq0tuaod7DMD5S+xB9nB7AvT/nudR5dFQWGKMIdKm
-         gY8A==
-X-Forwarded-Encrypted: i=1; AJvYcCW1gapQCCVykdc/kFc48+akR72DDWqdPJ4IhQPZvEZyPI6HEXjUXj+b69NJMjKIrD48m+SjU10=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxvw1H+yvp3xUuPyarkfvcWcXSKOT96wGQHquWBo4SZ1UY9wq0k
-	tJfDlsLNk31ZQuMjushKGAs3xoOOzs4AVTunFV6fCKrEWkghsL+ZXSSzYlcFecw=
-X-Google-Smtp-Source: AGHT+IEG5w6DR6LJP2zGgeelozQpEvKOlSYsN3e5PMbQ7LfoTwR8Znz5TilKR/exdqgfTVZAFxMJGQ==
-X-Received: by 2002:a17:907:9809:b0:a99:3f4e:6de8 with SMTP id a640c23a62f3a-a993f4e6e28mr1083333666b.64.1728377932129;
-        Tue, 08 Oct 2024 01:58:52 -0700 (PDT)
-Received: from localhost (37-48-49-80.nat.epc.tmcz.cz. [37.48.49.80])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9958fee567sm214116166b.158.2024.10.08.01.58.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 01:58:51 -0700 (PDT)
-Date: Tue, 8 Oct 2024 10:58:50 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	sd@queasysnail.net, ryazanov.s.a@gmail.com
-Subject: Re: [PATCH net-next v8 03/24] ovpn: add basic netlink support
-Message-ID: <ZwT0SkGHu5VHQ9Hd@nanopsycho.orion>
-References: <20241002-b4-ovpn-v8-0-37ceffcffbde@openvpn.net>
- <20241002-b4-ovpn-v8-3-37ceffcffbde@openvpn.net>
- <ZwP-_-qawQJIBZnv@nanopsycho.orion>
- <fd952c28-1f17-45da-bd64-48917a7db651@openvpn.net>
+        d=1e100.net; s=20230601; t=1728378027; x=1728982827;
+        h=content-transfer-encoding:to:from:subject:message-id:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j94wRKw6nS2yrDFlGU+jZw1Tw/r3v8/FcnZfF7tvw/A=;
+        b=CSrjCg/9mDctmylh3WkhFiPardDB5x7jCSftIqc5rVkEtJoOYne+yCAvCnxvKLSeH8
+         XTwD7SHupeu3qFtGz+feVGcjf63YvmdR9yG2RrvyOfc3Bh4zbWew5CJZkiNlRnrjr+pY
+         G6/SR4Kk7vmwMfh7zS8bVeJVrImhOHcTkjVkRScClPX5FvxgBN6O7log2w3NSxhUqXnj
+         lg1NH4nfq0YlP8aQyliSmMen9K7X8lt/41SIH08YZu0H2crSCLwo+Hik7FX9Z1vq/o4K
+         MnlAaQSR9PSDJjYRbjVnjZk0oI2wn+AlKiDbBxh+R3JqVz7p05WUWOb1lKlUa6IzN2c2
+         BCug==
+X-Forwarded-Encrypted: i=1; AJvYcCXP1dUFHOvUj0Gt1j+rZP5bRSlC3K6zDjdUPK6f8NNIF1vDnCWKAstDKHgOizZ0RfohGcG4MBw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+giZ9i3wFrnSCKxWFxn+Eg4r5NQQezODMRJAZkWiJVG7R5eU5
+	dUCraat2ZzqBTIlM1P2LAhYckYRV/7MF9asOnECGY0wKPek4s+vBNDcB1C/rxkEeWQNjFk/9dGH
+	gemm0E2rUBz96gB8nbTH3lrgv8HInP0KjUEJCQn7oW6p/btP3c4aaIK4=
+X-Google-Smtp-Source: AGHT+IEMi3ia6FJ6/yZhkhWx5b/zE0neag648rPPZpWk7fdw+owYWsZZSCv8yj75cuLjdGzrri77lTm1veH2N1XWoVEycsXMxy4u
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd952c28-1f17-45da-bd64-48917a7db651@openvpn.net>
+X-Received: by 2002:a05:6e02:2189:b0:3a0:8c68:7705 with SMTP id
+ e9e14a558f8ab-3a375bd2324mr137101675ab.21.1728378027047; Tue, 08 Oct 2024
+ 02:00:27 -0700 (PDT)
+Date: Tue, 08 Oct 2024 02:00:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6704f4ab.050a0220.1e4d62.0089.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in restore_regulatory_settings (3)
+From: syzbot <syzbot+e10709ac3c44f3d4e800@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Oct 08, 2024 at 10:01:40AM CEST, antonio@openvpn.net wrote:
->Hi,
->
->On 07/10/24 17:32, Jiri Pirko wrote:
->> Wed, Oct 02, 2024 at 11:02:17AM CEST, antonio@openvpn.net wrote:
->> 
->> [...]
->> 
->> 
->> > +operations:
->> > +  list:
->> > +    -
->> > +      name: dev-new
->> > +      attribute-set: ovpn
->> > +      flags: [ admin-perm ]
->> > +      doc: Create a new interface of type ovpn
->> > +      do:
->> > +        request:
->> > +          attributes:
->> > +            - ifname
->> > +            - mode
->> > +        reply:
->> > +          attributes:
->> > +            - ifname
->> > +            - ifindex
->> > +    -
->> > +      name: dev-del
->> 
->> Why you expose new and del here in ovn specific generic netlink iface?
->> Why can't you use the exising RTNL api which is used for creation and
->> destruction of other types of devices?
->
->That was my original approach in v1, but it was argued that an ovpn interface
->needs a userspace program to be configured and used in a meaningful way,
->therefore it was decided to concentrate all iface mgmt APIs along with the
->others in the netlink family and to not expose any RTNL ops.
+Hello,
 
-Can you please point me to the message id?
+syzbot found the following issue on:
+
+HEAD commit:    3840cbe24cf0 sched: psi: fix bogus pressure spikes from ag.=
+.
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=3D169ff527980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df95955e3f7b5790=
+c
+dashboard link: https://syzkaller.appspot.com/bug?extid=3De10709ac3c44f3d4e=
+800
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debia=
+n) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14310d8058000=
+0
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D119ff527980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7fe=
+b34a89c2a/non_bootable_disk-3840cbe2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/55888d19e055/vmlinux-=
+3840cbe2.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f6b8ca10a019/bzI=
+mage-3840cbe2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit=
+:
+Reported-by: syzbot+e10709ac3c44f3d4e800@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+Unexpected user alpha2: =EF=BF=BD=EF=BF=BD
+WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 is_user_regdom_saved ne=
+t/wireless/reg.c:440 [inline]
+WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 restore_alpha2 net/wire=
+less/reg.c:3424 [inline]
+WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 restore_regulatory_sett=
+ings+0x3c0/0x1e50 net/wireless/reg.c:3516
+Modules linked in:
+CPU: 0 UID: 0 PID: 1338 Comm: kworker/0:3 Not tainted 6.12.0-rc1-syzkaller-=
+00114-g3840cbe24cf0 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16=
+.3-2~bpo12+1 04/01/2014
+Workqueue: events_power_efficient crda_timeout_work
+RIP: 0010:is_user_regdom_saved net/wireless/reg.c:440 [inline]
+RIP: 0010:restore_alpha2 net/wireless/reg.c:3424 [inline]
+RIP: 0010:restore_regulatory_settings+0x3c0/0x1e50 net/wireless/reg.c:3516
+Code: 88 44 24 1c e9 95 01 00 00 e8 ac 4f 84 f6 90 0f b6 35 34 5c 6e 0f 0f =
+b6 15 4d 5c 6e 0f 48 c7 c7 00 e6 28 8d e8 31 44 45 f6 90 <0f> 0b 90 90 4c 8=
+b 35 d5 e0 df 04 4d 85 f6 0f 84 85 00 00 00 4c 89
+RSP: 0000:ffffc90002cdfaa0 EFLAGS: 00010246
+RAX: 75bf7dfc993e6800 RBX: 0000000000000000 RCX: ffff8880003c4880
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc90002cdfba8 R08: ffffffff8155daa2 R09: 1ffff11003f8519a
+R10: dffffc0000000000 R11: ffffed1003f8519b R12: ffffffff8ff07980
+R13: ffffffff815e9c86 R14: ffffc90002cdfb40 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:000000000000000=
+0
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd4b8ff8760 CR3: 0000000011d4a000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ crda_timeout_work+0x27/0x50 net/wireless/reg.c:542
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
 
->
->However, recently we decided to add a dellink implementation for better
->integration with network namespaces and to allow the user to wipe a dangling
->interface.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Hmm, one more argument to have symmetric add/del impletentation in RTNL
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
->
->In the future we are planning to also add the possibility to create a
->"persistent interface", that is an interface created before launching any
->userspace program and that survives when the latter is stopped.
->I can guess this functionality may be better suited for RTNL, but I am not
->sure yet.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-That would be quite confusing to have RTNL and genetlink iface to
-add/del device. From what you described above, makes more sent to have
-it just in RTNL
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
->
->@Jiri: do you have any particular opinion why we should use RTNL ops and not
->netlink for creating/destroying interfaces? I feel this is mostly a matter of
->taste, but maybe there are technical reasons we should consider.
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-Well. technically, you can probabaly do both. But it is quite common
-that you can add/delete these kind of devices over RTNL. Lots of
-examples. People are used to it, aligns with existing flows.
-
->
->Thanks a lot for your contribution.
->
->Regards,
->
->
->> 
->> 
->> ip link add [link DEV | parentdev NAME] [ name ] NAME
->> 		    [ txqueuelen PACKETS ]
->> 		    [ address LLADDR ]
->> 		    [ broadcast LLADDR ]
->> 		    [ mtu MTU ] [index IDX ]
->> 		    [ numtxqueues QUEUE_COUNT ]
->> 		    [ numrxqueues QUEUE_COUNT ]
->> 		    [ netns { PID | NETNSNAME | NETNSFILE } ]
->> 		    type TYPE [ ARGS ]
->> 
->> ip link delete { DEVICE | dev DEVICE | group DEVGROUP } type TYPE [ ARGS ]
->> 
->> Lots of examples of existing types creation is for example here:
->> https://developers.redhat.com/blog/2018/10/22/introduction-to-linux-interfaces-for-virtual-networking
->> 
->> 
->> 
->> > +      attribute-set: ovpn
->> > +      flags: [ admin-perm ]
->> > +      doc: Delete existing interface of type ovpn
->> > +      do:
->> > +        pre: ovpn-nl-pre-doit
->> > +        post: ovpn-nl-post-doit
->> > +        request:
->> > +          attributes:
->> > +            - ifindex
->> 
->> [...]
->
->-- 
->Antonio Quartulli
->OpenVPN Inc.
+If you want to undo deduplication, reply with:
+#syz undup
 
