@@ -1,69 +1,63 @@
-Return-Path: <netdev+bounces-133320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC2139959D6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:10:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0E49959E1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:17:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBA8D1F22106
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:10:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 762011C217DC
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489F0215F47;
-	Tue,  8 Oct 2024 22:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C2B1E0DC1;
+	Tue,  8 Oct 2024 22:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQI3fZjh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ad8l4zUt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E13214A82;
-	Tue,  8 Oct 2024 22:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38992C859;
+	Tue,  8 Oct 2024 22:17:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728425419; cv=none; b=ExRnFDlVJbVH0JV0KPxDe47BL/yF1rdCORjPFfRrKkeLXXrfBCLMh5bMtvXL+KhKAn0POV0oiSQhdsidu97qSqyYMAy/td/rvYFbAr454oahaQ7f13GdmgMEsF9LAwibqhpOHT7YEP24WWrJrslP6mUo1ZOQm91TTgyUuvEorbE=
+	t=1728425823; cv=none; b=dyiCD3oopTOqJ4ughCwFWX1Oo3ky7hdUnV1Sgy5jvlL9jb3HqGSZq3yWEH43C/NuPhexImNnrkosCiFMSQn8MNoiX9aeYRAn6OlQ4Lh52MYGRpUIhMPf9SY5s9+X3vmCtzijlS/BtT0OnPD8jkroTMD8LCGZbWDwQQ/M7sMjS0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728425419; c=relaxed/simple;
-	bh=sK1P7HoZN41Pt/ym/ha4xE4SRoOw6oIzWTyHU8q1KDg=;
+	s=arc-20240116; t=1728425823; c=relaxed/simple;
+	bh=SAU/WFf/lqUbxGwwxejYn8EGgUsUCEDLUm+rVG7rgV4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R0o+jc4LJw6/t7bdKbrSekYlMXjeZ2wwaUIEXiiDpnJdNAQan3iEGWlbRLdofFMtlxX+1NEJl+KICcf9+YAdEcMOCSB+e0JhxOa9SjWtoAmT42oZ0y0UXQkdolX+oioxvfZA1IFrkYeWxctTVYdOol74EQEyVfnC2JIhCIkJGoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQI3fZjh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD42C4CEC7;
-	Tue,  8 Oct 2024 22:10:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UE9C+EBxY8EFWkKcZ7QLF704/hvYNvxxMGqL74KXuXp7BbWKDsv6oo7wJ4sGmzQPSZcwI/7RFBvBg1WjVW4RmAkIUN0Is9NEF15pJyp9BXYIErNw8+rhUliOQjJrXeBXeeAbF93ttSiSZ+n0qWyFDOut/1YMmj6DEowLTPFjKhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ad8l4zUt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B383C4CEC7;
+	Tue,  8 Oct 2024 22:17:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728425418;
-	bh=sK1P7HoZN41Pt/ym/ha4xE4SRoOw6oIzWTyHU8q1KDg=;
+	s=k20201202; t=1728425823;
+	bh=SAU/WFf/lqUbxGwwxejYn8EGgUsUCEDLUm+rVG7rgV4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kQI3fZjhPvWJN2UW7SHebKncT/c3sfK/ba2b+eClfc1qI7PwR5JKgqvncTslwt3kT
-	 kbF44Ph6i9jopCTsIxRAOLoqcO4Dd6yAg2kRal0PwhEhwCE67GPGpbb+kxvNKPcTGw
-	 gRugCs/UMsKPa8rv8yI9F0wsVv1ci3k/Gja2FtbEtURTTXRlxy5uIdL1YQXmSfdPJt
-	 f9s4+FKXkLxRCywDJGUKwak6ZdHXF7/reNqR1Q4EXcIcQXsN07Smf81YjferbY2CIC
-	 f5CfqipVULxsVBUd2fytzl/0seDB4ADnAWY4lKxRbh2jp6d+6pmEwDkAWJxa7qSiol
-	 OAZQ+CwG1qLRQ==
-Date: Tue, 8 Oct 2024 15:10:16 -0700
+	b=ad8l4zUtNzKp5K3lyaK6sU2d2mkkml76VlI/RDuk/LHpfpLE+m2DtcOIwrE/ylBe3
+	 IcwnfquG+iwlfXfsokPly2T+ybWLT8TrecG4ApE6Pffk7504/e1jM8HLILROuQmhtP
+	 E+vJJQMVRnouX7IPPnXr1Mf8SUgyIwS8j2caPVOFRTZU+sm36AK3doLgONZ4rR324d
+	 kx6ER9XBEF4HWcM9Ly0POhiAPCiIvUuDVRp8NlZDMT5GPe8cRvPA1X1FAcfSd95eQa
+	 Clp3Ax9gPN64lumwA01/Yp+A/1yXlZDKyTa5qaYCHET5abH1lO9HOOb71gFSvCvk0F
+	 bOGzoNZl97i+w==
+Date: Tue, 8 Oct 2024 15:17:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Joe Damato <jdamato@fastly.com>
 Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
  sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
  sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com, "David S.
  Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Jiri Pirko <jiri@resnulli.us>, Sebastian
- Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi
- <lorenzo@kernel.org>, David Ahern <dsahern@kernel.org>, Kory Maincent
- <kory.maincent@bootlin.com>, Johannes Berg <johannes.berg@intel.com>, Breno
- Leitao <leitao@debian.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, linux-doc@vger.kernel.org (open
- list:DOCUMENTATION), linux-kernel@vger.kernel.org (open list),
- intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS)
-Subject: Re: [RFC net-next v4 3/9] net: napi: Make gro_flush_timeout
- per-NAPI
-Message-ID: <20241008151016.2e6a7d93@kernel.org>
-In-Reply-To: <20241001235302.57609-4-jdamato@fastly.com>
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jiri Pirko
+ <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Johannes Berg
+ <johannes.berg@intel.com>, linux-doc@vger.kernel.org (open
+ list:DOCUMENTATION), linux-kernel@vger.kernel.org (open list)
+Subject: Re: [RFC net-next v4 5/9] net: napi: Add napi_config
+Message-ID: <20241008151701.6f8bb389@kernel.org>
+In-Reply-To: <20241001235302.57609-6-jdamato@fastly.com>
 References: <20241001235302.57609-1-jdamato@fastly.com>
-	<20241001235302.57609-4-jdamato@fastly.com>
+	<20241001235302.57609-6-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,18 +67,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue,  1 Oct 2024 23:52:34 +0000 Joe Damato wrote:
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 55764efc5c93..33897edd16c8 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -377,6 +377,7 @@ struct napi_struct {
->  	struct list_head	dev_list;
->  	struct hlist_node	napi_hash_node;
->  	int			irq;
-> +	unsigned long		gro_flush_timeout;
->  	u32			defer_hard_irqs;
->  };
+On Tue,  1 Oct 2024 23:52:36 +0000 Joe Damato wrote:
+>  static inline void netdev_set_defer_hard_irqs(struct net_device *netdev,
+>  					      u32 defer)
+>  {
+> +	unsigned int count = max(netdev->num_rx_queues,
+> +				 netdev->num_tx_queues);
+>  	struct napi_struct *napi;
+> +	int i;
+>  
+>  	WRITE_ONCE(netdev->napi_defer_hard_irqs, defer);
+>  	list_for_each_entry(napi, &netdev->napi_list, dev_list)
+>  		napi_set_defer_hard_irqs(napi, defer);
+> +
+> +	if (netdev->napi_config)
 
-Same story
+Could this ever be NULL ?
+
+> +		for (i = 0; i < count; i++)
+> +			netdev->napi_config[i].defer_hard_irqs = defer;
+>  }
 
