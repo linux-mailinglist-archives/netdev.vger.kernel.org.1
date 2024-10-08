@@ -1,568 +1,129 @@
-Return-Path: <netdev+bounces-133300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D319957F4
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:56:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC9399580A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D110E1F22CAC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:56:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D13261F2273E
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD633213EF6;
-	Tue,  8 Oct 2024 19:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF87C213EEA;
+	Tue,  8 Oct 2024 20:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="C0VlMrnF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rN+E6v8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68971E0488
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 19:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F64238DD6;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728417370; cv=none; b=TN7nYG4858K8VIkNWMfGoPtAs0N8dsA/tOzdWI7vyNMOYCS1q4oiyyBX5F2s6/Jpde7vJVajiC94opTPOyM3SsrNynU+5aZSRgG9XyEWes4tnfdBvbmLW6ZiI51wwEzhE26QU17YQEVsnNQShHdQ1GIMgNe2B9TXbigyFHlwybI=
+	t=1728417746; cv=none; b=XnZ8GUmHQfB9wZhIN03KB7n7quy50H1Zd6twTmkUVMEu0ZT61Si5ZosCKqSW6//FJaU0brsRGvp+Ie1eG3XTHvftGI8WmiQGjwcQ6qS089FeSzIs9LT9Z0vz+FtPgsnOmlbnEW1yaKICXBJ64i8+J3oGcHtK9LAHaiOr7rYHwBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728417370; c=relaxed/simple;
-	bh=BlMociG+9VPQCetw24ErmbohkXazpLpbe9/p/hgBKFc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mXjvpEzMSr4sQlOcB2/osdFCiFLKveQBDFJ3an9vTeuZ1r/HDFIJnAWaQA57nMNjJq9382ist2goGb/zraGsVw3+QcUJDF4Q+BHCgzs6EgL3NeWjrqLihTnMRdr9FThdk8skSBeaEiIPyiTdWTfFcEETMw8CT5fy4e0lM7eRT7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=C0VlMrnF; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a341ab4573so25421945ab.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 12:56:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1728417368; x=1729022168; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j4vn+4lLSvAqRJ8lycEHTPdIKM80bx3ygsBdojCZ4zw=;
-        b=C0VlMrnFHDY4arpocTRu/6UapXOjBehKj8U4UmOZFjLA0oHNCCrq89ue1FpKCLvxTM
-         yQlr06iTUrTGAgJcaCYW4iVgttjXFO1e3eSyH/ApOyLLtcipOlfItSb8j8hlDeAqHLMn
-         MX3pegAC1bVEhJ2OdHLOK2x1XsLnvF+X4GGYQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728417368; x=1729022168;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j4vn+4lLSvAqRJ8lycEHTPdIKM80bx3ygsBdojCZ4zw=;
-        b=OafuHyYmrsNIl3HX/WMDaMPL13fUrPRxzdoRCA+HCT2hO+wlUv9slNaB6HeZfE9hj9
-         RPmuETti8zEtZHi9LSQitRn9nnak2o5wTlqax1hK86Ka3l3VJ2X3ihCpUKX4Iyd0K2wh
-         9GHE5ECAUNFzy7mP/1FJSJyLVZHQb7kiak2i9hLGK4NeF+xtMgnRGslaeUTxTW6jXV67
-         lwMYGBaxS+/fRm70wIvHlr7zAJikG92uWa8J2oRao/xr3o5YXRDyLJIRoU6j0g5O+5aY
-         gCWiRYsgCFCQCilPmhphsH9XzBzcoCSCQcxLlQq2vLXXqsTB/bppoW/QNNpX27sJv8/j
-         FcWA==
-X-Gm-Message-State: AOJu0YzDzJ66/f8NqnO52BHNUmUz0ho7ApnCtiP1DjL1N7wcGO/qD2b/
-	UZNn1IHt7yg7GA49cbpLH6dMplDWjxl+bjDgbDfG2TH82CyMwQlAmPcwrAyb7BY=
-X-Google-Smtp-Source: AGHT+IGy1JUD7mrjzrplO29fC4VCeuozkUy5c3M+kAWfdgfyzeeyzoIph75DLODLXY/7EB1kP/WFgQ==
-X-Received: by 2002:a05:6e02:b41:b0:3a3:67b1:3080 with SMTP id e9e14a558f8ab-3a397ce4ed9mr475555ab.7.1728417367678;
-        Tue, 08 Oct 2024 12:56:07 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db900b6b4dsm738208173.98.2024.10.08.12.56.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Oct 2024 12:56:07 -0700 (PDT)
-Message-ID: <cb1acab0-a4c9-4e31-b6f6-70b8049f1663@linuxfoundation.org>
-Date: Tue, 8 Oct 2024 13:56:05 -0600
+	s=arc-20240116; t=1728417746; c=relaxed/simple;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q1cIcYBCVNp+r5958RzSWAtJhnMaiL5euuPCKQL5pMVioAfzAKJmSrJQfUO+/nVOgA0zSrCyJn09aeVYiT0aPRQcVCNb+KSJhjVGS4i/ECavHN/HZ+tMCE8xMs/wjbKDP0+2kwoHE0THApl+GH01VNEjRNUD+yG2eIQHyk3R5hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rN+E6v8u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAF43C4CEC7;
+	Tue,  8 Oct 2024 20:02:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728417745;
+	bh=mwnu9JDu0/QJ39vaeqgzPRoqn/uQOdBvX8cshH9rI2M=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=rN+E6v8uF4ioUNKLIm91KJY7WajT816xax0xLKmMg82r/VdNKxRi2SuPyaYp5mvMp
+	 3iEUmIoUxBqAzw3S+3xHFwxDjNUXJ1ms4vvTgy40qSQdbS1e5YsXgihqx/FlfH41CR
+	 B5yXHM1xV2RQDH8pdQ+oYSffGAkWue72wxmp8FzHSdYe8F0+gQDgEtxtt3iMaFayap
+	 QQgLNNDuCW4krxkjKxBJa5Jy1wKnBCXJ8lwHOvYQ4u/HYgc6yow8XGPEF6rU7+hsiS
+	 Kkfhf7h/1UX7Uoiu1m8M2TLxAcmXcKHBMcjwCNjgHqioPraMS1As8rwzYnC/B4K15R
+	 l1T7CHnBap8VA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 56F9BCE0DD1; Tue,  8 Oct 2024 13:02:25 -0700 (PDT)
+Date: Tue, 8 Oct 2024 13:02:25 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <acf7a96b-facb-469b-8079-edbec7770780@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
+ <ZnVInAV8BXhgAjP_@pc636>
+ <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+ <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
+ <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 01/14] mm: page_frag: add a test module for
- page_frag
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Alexander Duyck <alexanderduyck@fb.com>,
- Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20241008112049.2279307-1-linyunsheng@huawei.com>
- <20241008112049.2279307-2-linyunsheng@huawei.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20241008112049.2279307-2-linyunsheng@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37807ec7-d521-4f01-bcfc-a32650d5de25@suse.cz>
 
-On 10/8/24 05:20, Yunsheng Lin wrote:
-> The testing is done by ensuring that the fragment allocated
-> from a frag_frag_cache instance is pushed into a ptr_ring
-> instance in a kthread binded to a specified cpu, and a kthread
-> binded to a specified cpu will pop the fragment from the
-> ptr_ring and free the fragment.
+On Tue, Oct 08, 2024 at 06:41:12PM +0200, Vlastimil Babka wrote:
+> On 7/24/24 15:53, Paul E. McKenney wrote:
+> > On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
+> >> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+> >> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> >> > One question. Maybe it is already late but it is better to ask rather than not.
+> >> > 
+> >> > What do you think if we have a small discussion about it on the LPC 2024 as a
+> >> > topic? It might be it is already late or a schedule is set by now. Or we fix
+> >> > it by a conference time.
+> >> > 
+> >> > Just a thought.
+> >> 
+> >> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+> >> propose a slab topic. We could discuss in hallway track or a BOF, but
+> >> hopefully if the current direction taken by my RFC brings no unexpected
+> >> surprise, and the necessary RCU barrier side is also feasible, this will be
+> >> settled by time of plumbers.
+> > 
+> > That would be even better!
+> > 
+> > 							Thanx, Paul
 > 
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+> Hah, so it was close but my hope was fulfilled in the end!
 
-Signed-off-by should be last. Same comment on all the other
-patches in this series. When you have 4 patches, it is a good
-practice to add cover-letter.
+Nice, and thank you!!!
 
-> ---
->   tools/testing/selftests/mm/Makefile           |   3 +
->   tools/testing/selftests/mm/page_frag/Makefile |  18 ++
->   .../selftests/mm/page_frag/page_frag_test.c   | 173 ++++++++++++++++++
->   tools/testing/selftests/mm/run_vmtests.sh     |   8 +
->   tools/testing/selftests/mm/test_page_frag.sh  | 171 +++++++++++++++++
->   5 files changed, 373 insertions(+)
->   create mode 100644 tools/testing/selftests/mm/page_frag/Makefile
->   create mode 100644 tools/testing/selftests/mm/page_frag/page_frag_test.c
->   create mode 100755 tools/testing/selftests/mm/test_page_frag.sh
+							Thanx, Paul
+
+> commit bdf56c7580d267a123cc71ca0f2459c797b76fde
+> Merge: efdfcd40ad5e ecc4d6af979b
+> Author: Linus Torvalds <torvalds@linux-foundation.org>
+> Date:   Wed Sep 18 08:53:53 2024 +0200
 > 
-> diff --git a/tools/testing/selftests/mm/Makefile b/tools/testing/selftests/mm/Makefile
-> index 02e1204971b0..acec529baaca 100644
-> --- a/tools/testing/selftests/mm/Makefile
-> +++ b/tools/testing/selftests/mm/Makefile
-> @@ -36,6 +36,8 @@ MAKEFLAGS += --no-builtin-rules
->   CFLAGS = -Wall -I $(top_srcdir) $(EXTRA_CFLAGS) $(KHDR_INCLUDES) $(TOOLS_INCLUDES)
->   LDLIBS = -lrt -lpthread -lm
->   
-> +TEST_GEN_MODS_DIR := page_frag
-> +
->   TEST_GEN_FILES = cow
->   TEST_GEN_FILES += compaction_test
->   TEST_GEN_FILES += gup_longterm
-> @@ -126,6 +128,7 @@ TEST_FILES += test_hmm.sh
->   TEST_FILES += va_high_addr_switch.sh
->   TEST_FILES += charge_reserved_hugetlb.sh
->   TEST_FILES += hugetlb_reparenting_test.sh
-> +TEST_FILES += test_page_frag.sh
->   
->   # required by charge_reserved_hugetlb.sh
->   TEST_FILES += write_hugetlb_memory.sh
-> diff --git a/tools/testing/selftests/mm/page_frag/Makefile b/tools/testing/selftests/mm/page_frag/Makefile
-> new file mode 100644
-> index 000000000000..58dda74d50a3
-> --- /dev/null
-> +++ b/tools/testing/selftests/mm/page_frag/Makefile
-> @@ -0,0 +1,18 @@
-> +PAGE_FRAG_TEST_DIR := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
-> +KDIR ?= $(abspath $(PAGE_FRAG_TEST_DIR)/../../../../..)
-> +
-> +ifeq ($(V),1)
-> +Q =
-> +else
-> +Q = @
-> +endif
-> +
-> +MODULES = page_frag_test.ko
-> +
-> +obj-m += page_frag_test.o
-> +
-> +all:
-> +	+$(Q)make -C $(KDIR) M=$(PAGE_FRAG_TEST_DIR) modules
-> +
-> +clean:
-> +	+$(Q)make -C $(KDIR) M=$(PAGE_FRAG_TEST_DIR) clean
-> diff --git a/tools/testing/selftests/mm/page_frag/page_frag_test.c b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-> new file mode 100644
-> index 000000000000..eeb2b6bc681a
-> --- /dev/null
-> +++ b/tools/testing/selftests/mm/page_frag/page_frag_test.c
-> @@ -0,0 +1,173 @@
-> +// SPDX-License-Identifier: GPL-2.0
-
-I think this would throw a checkpatch warning about
-comment should be "/*" and not "//"
-> +
-> +/*
-> + * Test module for page_frag cache
-> + *
-> + * Copyright (C) 2024 Yunsheng Lin <linyunsheng@huawei.com>
-> + */
-> +
-> +#include <linux/mm.h>
-> +#include <linux/module.h>
-> +#include <linux/cpumask.h>
-> +#include <linux/completion.h>
-> +#include <linux/ptr_ring.h>
-> +#include <linux/kthread.h>
-> +
-> +static struct ptr_ring ptr_ring;
-> +static int nr_objs = 512;
-> +static atomic_t nthreads;
-> +static struct completion wait;
-> +static struct page_frag_cache test_nc;
-> +static int test_popped;
-> +static int test_pushed;
-> +
-> +static int nr_test = 2000000;
-> +module_param(nr_test, int, 0);
-> +MODULE_PARM_DESC(nr_test, "number of iterations to test");
-> +
-> +static bool test_align;
-> +module_param(test_align, bool, 0);
-> +MODULE_PARM_DESC(test_align, "use align API for testing");
-> +
-> +static int test_alloc_len = 2048;
-> +module_param(test_alloc_len, int, 0);
-> +MODULE_PARM_DESC(test_alloc_len, "alloc len for testing");
-> +
-> +static int test_push_cpu;
-> +module_param(test_push_cpu, int, 0);
-> +MODULE_PARM_DESC(test_push_cpu, "test cpu for pushing fragment");
-> +
-> +static int test_pop_cpu;
-> +module_param(test_pop_cpu, int, 0);
-> +MODULE_PARM_DESC(test_pop_cpu, "test cpu for popping fragment");
-> +
-> +static int page_frag_pop_thread(void *arg)
-> +{
-> +	struct ptr_ring *ring = arg;
-> +
-> +	pr_info("page_frag pop test thread begins on cpu %d\n",
-> +		smp_processor_id());
-> +
-> +	while (test_popped < nr_test) {
-> +		void *obj = __ptr_ring_consume(ring);
-> +
-> +		if (obj) {
-> +			test_popped++;
-> +			page_frag_free(obj);
-> +		} else {
-> +			cond_resched();
-> +		}
-> +	}
-> +
-> +	if (atomic_dec_and_test(&nthreads))
-> +		complete(&wait);
-> +
-> +	pr_info("page_frag pop test thread exits on cpu %d\n",
-> +		smp_processor_id());
-> +
-> +	return 0;
-> +}
-> +
-> +static int page_frag_push_thread(void *arg)
-> +{
-> +	struct ptr_ring *ring = arg;
-> +
-> +	pr_info("page_frag push test thread begins on cpu %d\n",
-> +		smp_processor_id());
-> +
-> +	while (test_pushed < nr_test) {
-> +		void *va;
-> +		int ret;
-> +
-> +		if (test_align) {
-> +			va = page_frag_alloc_align(&test_nc, test_alloc_len,
-> +						   GFP_KERNEL, SMP_CACHE_BYTES);
-> +
-> +			WARN_ONCE((unsigned long)va & (SMP_CACHE_BYTES - 1),
-> +				  "unaligned va returned\n");
-> +		} else {
-> +			va = page_frag_alloc(&test_nc, test_alloc_len, GFP_KERNEL);
-> +		}
-> +
-> +		if (!va)
-> +			continue;
-> +
-> +		ret = __ptr_ring_produce(ring, va);
-> +		if (ret) {
-> +			page_frag_free(va);
-> +			cond_resched();
-> +		} else {
-> +			test_pushed++;
-> +		}
-> +	}
-> +
-> +	pr_info("page_frag push test thread exits on cpu %d\n",
-> +		smp_processor_id());
-> +
-> +	if (atomic_dec_and_test(&nthreads))
-> +		complete(&wait);
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init page_frag_test_init(void)
-> +{
-> +	struct task_struct *tsk_push, *tsk_pop;
-> +	ktime_t start;
-> +	u64 duration;
-> +	int ret;
-> +
-> +	test_nc.va = NULL;
-> +	atomic_set(&nthreads, 2);
-> +	init_completion(&wait);
-> +
-> +	if (test_alloc_len > PAGE_SIZE || test_alloc_len <= 0 ||
-> +	    !cpu_active(test_push_cpu) || !cpu_active(test_pop_cpu))
-> +		return -EINVAL;
-> +
-> +	ret = ptr_ring_init(&ptr_ring, nr_objs, GFP_KERNEL);
-> +	if (ret)
-> +		return ret;
-> +
-> +	tsk_push = kthread_create_on_cpu(page_frag_push_thread, &ptr_ring,
-> +					 test_push_cpu, "page_frag_push");
-> +	if (IS_ERR(tsk_push))
-> +		return PTR_ERR(tsk_push);
-> +
-> +	tsk_pop = kthread_create_on_cpu(page_frag_pop_thread, &ptr_ring,
-> +					test_pop_cpu, "page_frag_pop");
-> +	if (IS_ERR(tsk_pop)) {
-> +		kthread_stop(tsk_push);
-> +		return PTR_ERR(tsk_pop);
-> +	}
-> +
-> +	start = ktime_get();
-> +	wake_up_process(tsk_push);
-> +	wake_up_process(tsk_pop);
-> +
-> +	pr_info("waiting for test to complete\n");
-> +
-> +	while (!wait_for_completion_timeout(&wait, msecs_to_jiffies(10000)))
-> +		pr_info("page_frag_test progress: pushed = %d, popped = %d\n",
-> +			test_pushed, test_popped);
-> +
-> +	duration = (u64)ktime_us_delta(ktime_get(), start);
-> +	pr_info("%d of iterations for %s testing took: %lluus\n", nr_test,
-> +		test_align ? "aligned" : "non-aligned", duration);
-> +
-> +	ptr_ring_cleanup(&ptr_ring, NULL);
-> +	page_frag_cache_drain(&test_nc);
-> +
-> +	return -EAGAIN;
-> +}
-> +
-> +static void __exit page_frag_test_exit(void)
-> +{
-> +}
-> +
-> +module_init(page_frag_test_init);
-> +module_exit(page_frag_test_exit);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_AUTHOR("Yunsheng Lin <linyunsheng@huawei.com>");
-> +MODULE_DESCRIPTION("Test module for page_frag");
-> diff --git a/tools/testing/selftests/mm/run_vmtests.sh b/tools/testing/selftests/mm/run_vmtests.sh
-> index c5797ad1d37b..2c5394584af4 100755
-> --- a/tools/testing/selftests/mm/run_vmtests.sh
-> +++ b/tools/testing/selftests/mm/run_vmtests.sh
-> @@ -75,6 +75,8 @@ separated by spaces:
->   	read-only VMAs
->   - mdwe
->   	test prctl(PR_SET_MDWE, ...)
-> +- page_frag
-> +	test handling of page fragment allocation and freeing
->   
->   example: ./run_vmtests.sh -t "hmm mmap ksm"
->   EOF
-> @@ -456,6 +458,12 @@ CATEGORY="mkdirty" run_test ./mkdirty
->   
->   CATEGORY="mdwe" run_test ./mdwe_test
->   
-> +CATEGORY="page_frag" run_test ./test_page_frag.sh smoke
-> +
-> +CATEGORY="page_frag" run_test ./test_page_frag.sh aligned
-> +
-> +CATEGORY="page_frag" run_test ./test_page_frag.sh nonaligned
-> +
->   echo "SUMMARY: PASS=${count_pass} SKIP=${count_skip} FAIL=${count_fail}" | tap_prefix
->   echo "1..${count_total}" | tap_output
->   
-> diff --git a/tools/testing/selftests/mm/test_page_frag.sh b/tools/testing/selftests/mm/test_page_frag.sh
-> new file mode 100755
-> index 000000000000..d750d910c899
-> --- /dev/null
-> +++ b/tools/testing/selftests/mm/test_page_frag.sh
-> @@ -0,0 +1,171 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Copyright (C) 2024 Yunsheng Lin <linyunsheng@huawei.com>
-> +# Copyright (C) 2018 Uladzislau Rezki (Sony) <urezki@gmail.com>
-> +#
-> +# This is a test script for the kernel test driver to test the
-> +# correctness and performance of page_frag's implementation.
-> +# Therefore it is just a kernel module loader. You can specify
-> +# and pass different parameters in order to:
-> +#     a) analyse performance of page fragment allocations;
-> +#     b) stressing and stability check of page_frag subsystem.
-> +
-> +DRIVER="./page_frag/page_frag_test.ko"
-> +CPU_LIST=$(grep -m 2 processor /proc/cpuinfo | cut -d ' ' -f 2)
-> +TEST_CPU_0=$(echo $CPU_LIST | awk '{print $1}')
-> +
-> +if [ $(echo $CPU_LIST | wc -w) -gt 1 ]; then
-> +	TEST_CPU_1=$(echo $CPU_LIST | awk '{print $2}')
-> +	NR_TEST=100000000
-> +else
-> +	TEST_CPU_1=$TEST_CPU_0
-> +	NR_TEST=1000000
-> +fi
-> +
-> +# 1 if fails
-> +exitcode=1
-> +
-> +# Kselftest framework requirement - SKIP code is 4.
-> +ksft_skip=4
-> +
-> +#
-> +# Static templates for testing of page_frag APIs.
-> +# Also it is possible to pass any supported parameters manually.
-> +#
-> +SMOKE_PARAM="test_push_cpu=$TEST_CPU_0 test_pop_cpu=$TEST_CPU_1"
-> +NONALIGNED_PARAM="$SMOKE_PARAM test_alloc_len=75 nr_test=$NR_TEST"
-> +ALIGNED_PARAM="$NONALIGNED_PARAM test_align=1"
-> +
-> +check_test_requirements()
-> +{
-> +	uid=$(id -u)
-> +	if [ $uid -ne 0 ]; then
-> +		echo "$0: Must be run as root"
-> +		exit $ksft_skip
-> +	fi
-> +
-> +	if ! which insmod > /dev/null 2>&1; then
-> +		echo "$0: You need insmod installed"
-> +		exit $ksft_skip
-> +	fi
-> +
-> +	if [ ! -f $DRIVER ]; then
-> +		echo "$0: You need to compile page_frag_test module"
-> +		exit $ksft_skip
-> +	fi
-> +}
-> +
-> +run_nonaligned_check()
-> +{
-> +	echo "Run performance tests to evaluate how fast nonaligned alloc API is."
-> +
-> +	insmod $DRIVER $NONALIGNED_PARAM > /dev/null 2>&1
-> +	echo "Done."
-> +	echo "Check the kernel ring buffer to see the summary."
-> +}
-> +
-> +run_aligned_check()
-> +{
-> +	echo "Run performance tests to evaluate how fast aligned alloc API is."
-> +
-> +	insmod $DRIVER $ALIGNED_PARAM > /dev/null 2>&1
-> +	echo "Done."
-> +	echo "Check the kernel ring buffer to see the summary."
-> +}
-> +
-> +run_smoke_check()
-> +{
-> +	echo "Run smoke test."
-> +
-> +	insmod $DRIVER $SMOKE_PARAM > /dev/null 2>&1
-> +	echo "Done."
-> +	echo "Check the kernel ring buffer to see the summary."
-> +}
-> +
-> +usage()
-> +{
-> +	echo -n "Usage: $0 [ aligned ] | [ nonaligned ] | | [ smoke ] | "
-> +	echo "manual parameters"
-> +	echo
-> +	echo "Valid tests and parameters:"
-> +	echo
-> +	modinfo $DRIVER
-> +	echo
-> +	echo "Example usage:"
-> +	echo
-> +	echo "# Shows help message"
-> +	echo "$0"
-> +	echo
-> +	echo "# Smoke testing"
-> +	echo "$0 smoke"
-> +	echo
-> +	echo "# Performance testing for nonaligned alloc API"
-> +	echo "$0 nonaligned"
-> +	echo
-> +	echo "# Performance testing for aligned alloc API"
-> +	echo "$0 aligned"
-> +	echo
-> +	exit 0
-> +}
-> +
-> +function validate_passed_args()
-> +{
-> +	VALID_ARGS=`modinfo $DRIVER | awk '/parm:/ {print $2}' | sed 's/:.*//'`
-> +
-> +	#
-> +	# Something has been passed, check it.
-> +	#
-> +	for passed_arg in $@; do
-> +		key=${passed_arg//=*/}
-> +		valid=0
-> +
-> +		for valid_arg in $VALID_ARGS; do
-> +			if [[ $key = $valid_arg ]]; then
-> +				valid=1
-> +				break
-> +			fi
-> +		done
-> +
-> +		if [[ $valid -ne 1 ]]; then
-> +			echo "Error: key is not correct: ${key}"
-> +			exit $exitcode
-> +		fi
-> +	done
-> +}
-> +
-> +function run_manual_check()
-> +{
-> +	#
-> +	# Validate passed parameters. If there is wrong one,
-> +	# the script exists and does not execute further.
-> +	#
-> +	validate_passed_args $@
-> +
-> +	echo "Run the test with following parameters: $@"
-
-Is this marker good enough to isolate the test results in the
-dmesg? Include the test name in the message.
-
-
-> +	insmod $DRIVER $@ > /dev/null 2>&1
-> +	echo "Done."
-
-Is this marker good enough to isolate the test results in the
-dmesg? Include the test name in the message.
-
-> +	echo "Check the kernel ring buffer to see the summary."
-
-Usually the test would run dmesg and filter out the test results
-from the dmesg and include them in the test script output.
-
-You can refer to other tests that do that: powerpc/scripts/hmi.sh
-is one example.
-
-> +}
-> +
-> +function run_test()
-> +{
-> +	if [ $# -eq 0 ]; then
-> +		usage
-> +	else
-> +		if [[ "$1" = "smoke" ]]; then
-> +			run_smoke_check
-> +		elif [[ "$1" = "nonaligned" ]]; then
-> +			run_nonaligned_check
-> +		elif [[ "$1" = "aligned" ]]; then
-> +			run_aligned_check
-> +		else
-> +			run_manual_check $@
-> +		fi
-> +	fi
-> +}
-> +
-> +check_test_requirements
-> +run_test $@
-> +
-> +exit 0
-
-thanks,
--- Shuah
+>     Merge tag 'slab-for-6.12' of
+> git://git.kernel.org/pub/scm/linux/kernel/git/vbabka/slab
+> 
+> So that was at 8:53 Vienna time, and Plumbers started at 10:00...
 
