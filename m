@@ -1,98 +1,154 @@
-Return-Path: <netdev+bounces-133291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A281499579A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:28:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5098D9957A6
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:32:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 193A0B25861
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:28:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 829591C25C7F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F02213EC7;
-	Tue,  8 Oct 2024 19:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEFF62139D7;
+	Tue,  8 Oct 2024 19:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eaCkyej6"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hcw3sg8p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE69C212F1D;
-	Tue,  8 Oct 2024 19:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC291E517;
+	Tue,  8 Oct 2024 19:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728415703; cv=none; b=RWYu51d0+tglfR+u08XyEYr8OSi+fY9f/rzz8Tf1lUA79/VAdeHOWc6sw4lcQYwE7vE8TGA6vXuQWzaR0KxQJC/8UR+faAz0aI2UOeZqDJh3Vzg1K2INlKxN/Utq0BzsU2LtPGA+GzxccF80QWrTKwoga9aSEfuj5ICqeGgWCGU=
+	t=1728415931; cv=none; b=UeFx5RVNngdVvW/4apLcFWFZfgzYAemhaWBQX+sSiRjRe7MY36YK0IBuuIKs2MOjcWC/NAuF0py6IDA0VyOG/1ZTztqTSeXUalSzEhlyN2aQyAXhUqZSkWp6KEH5ODWAAAb3XaxP/t13QrZayJcK1gFRFw7hsxc44KPnpQqfwes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728415703; c=relaxed/simple;
-	bh=RK25T107lI4DmIJDuzw6Hn5qqZ616GbPfczJPYgzaQU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lTs9MxXlBek/LnNlA09Xx8qq4tatH1AN/tIeMU+fZuv9AUlHmE2pGBi2BsAwe+cYYb7PrEF+cglbZxmGDVbaHZT1KOisXZ/vR3KgSh9foUY4k9uiLylBAjRSkIoKrb6zYrpB0XJ1P1D/EgoBvGH1lvHQ/RkOvRIfJJZKe5Qv9D0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eaCkyej6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207DFC4AF09;
-	Tue,  8 Oct 2024 19:28:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728415702;
-	bh=RK25T107lI4DmIJDuzw6Hn5qqZ616GbPfczJPYgzaQU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eaCkyej6FjktBi9FIK7a6xbjyvMg4zh5OFyjp6VfVMc6g9BtkGTJAWqLkNkTqAghk
-	 qnlJLI5rVhI0aBMbVG35BtBlYqmMqmg7TqEsRlfeIe0jyEJHlDua/3qBeqUlgERSok
-	 L4QImpOnjmiCBDf2AIRY8fJMM7FHjKm9pZGeva2g152Lt9hgxi6D2quiI+4ij0UMJc
-	 Z2d3mhSkOwisQ7TlT0CWt9CQlnX0XvDS7lUMDmqErgr0ArG0bbFkshJEVmgswEhCa8
-	 aTlRFirfqCKz4oL0hRCFe40Fg0xSbE5pklLEpa4HZHaew/kb6pKtkSaG0ECZnfP8/q
-	 LqmBIjDTsiOlw==
-Date: Tue, 8 Oct 2024 12:28:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Brett Creeley <bcreeley@amd.com>, Taehee Yoo <ap420073@gmail.com>,
- davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, donald.hunter@gmail.com,
- corbet@lwn.net, michael.chan@broadcom.com, kory.maincent@bootlin.com,
- andrew@lunn.ch, maxime.chevallier@bootlin.com, danieller@nvidia.com,
- hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
- przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
- paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
- asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
- aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com
-Subject: Re: [PATCH net-next v3 5/7] net: devmem: add ring parameter
- filtering
-Message-ID: <20241008122820.71f67378@kernel.org>
-In-Reply-To: <CAHS8izPmg8CJNYVQfdJB9BoyE75qf+wrz_68pTDdYffpEWDQMg@mail.gmail.com>
-References: <20241003160620.1521626-1-ap420073@gmail.com>
-	<20241003160620.1521626-6-ap420073@gmail.com>
-	<70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com>
-	<CAHS8izPmg8CJNYVQfdJB9BoyE75qf+wrz_68pTDdYffpEWDQMg@mail.gmail.com>
+	s=arc-20240116; t=1728415931; c=relaxed/simple;
+	bh=faytTXk+uqTHy4zXaIDPNs9YeqQDluL+Hk+nqWOjePc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NCnPICsgb6KKg89yayy83mxVvsoB/pZXCir78WWr0vwBHAQHFYOkl6wJMfqtgkwFXyFGPezLcty1jfrZMhs8CNtI22oqYb2Q510RPlHt7lGO4/nMAsg//YbxwmbHmzTJeXitdlVCkMeM1G8+4oC99ykae/C0B5AfJeYe6EpbxE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hcw3sg8p; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498HND7K001584;
+	Tue, 8 Oct 2024 19:31:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	dK3Uj3Os+q7X+jZMmv23Lrl/nUfarJP2UorvyQJ2m7Y=; b=hcw3sg8pSlsB+IsQ
+	8xrZv+YQPYCIatCDoX46htsZPsKXcDGwkx7LssImHVTAyNsm+haT4xux5rpjKUQP
+	mTJHLKZpsQl7Leb/L9STTDb/uVZBSPIHF06wkNg4/Yt6YfJrC/Q6RPMsCsYLene8
+	exgCelI8ZBKJC3jllL8Kz3C/dvqtf/tZ11PpRXaZo8Bp2HMCEFbEwfOS4OwHlkdY
+	3pu8f/UzassXoHkZLPMnpnO1cb0Q2SN6UtpfLAvFBGl46JoWsQL40xWkl6IL+C/a
+	5cy33UlJnY55x4t05TrA/AzW+qORGkMTxjOA5iIx0EiBWOATlVa1KbYdxXujPwib
+	hiawWA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42513u1xte-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Oct 2024 19:31:42 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 498JVfeH022873
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 8 Oct 2024 19:31:41 GMT
+Received: from [10.216.57.107] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 8 Oct 2024
+ 12:31:33 -0700
+Message-ID: <8178704d-b389-4521-a07b-707737aff234@quicinc.com>
+Date: Wed, 9 Oct 2024 01:01:29 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: RFC: Advice on adding support for Qualcomm IPQ9574 SoC Ethernet
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Bjorn Andersson <quic_bjorande@quicinc.com>, <netdev@vger.kernel.org>,
+        Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        Russell King <linux@armlinux.org.uk>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <vsmuthu@qti.qualcomm.com>,
+        <arastogi@qti.qualcomm.com>, <linchen@qti.qualcomm.com>,
+        <john@phrozen.org>, Luo Jie
+	<quic_luoj@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>,
+        "Suruchi
+ Agarwal (QUIC)" <quic_suruchia@quicinc.com>,
+        "Lei Wei (QUIC)"
+	<quic_leiwei@quicinc.com>
+References: <f0f0c065-bf7c-4106-b5e2-bfafc6b52101@quicinc.com>
+ <d2929bd2-bc9e-4733-a89f-2a187e8bf917@quicinc.com>
+ <817a0d2d-e3a6-422c-86d2-4e4216468fe6@lunn.ch>
+ <c7d8109d-8f88-4f4c-abb7-6ebfa1f1daa3@quicinc.com>
+ <Zv7ubCFWz2ykztcR@hu-bjorande-lv.qualcomm.com>
+ <7f413748-905d-4250-ad57-fc83969aad28@quicinc.com>
+ <ac4b5546-366b-437a-a05b-52a53c3bd8a8@lunn.ch>
+Content-Language: en-US
+From: Kiran Kumar C.S.K <quic_kkumarcs@quicinc.com>
+In-Reply-To: <ac4b5546-366b-437a-a05b-52a53c3bd8a8@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 4ziwulbnVqfjMOjQJEs80UV7mZmWMTbT
+X-Proofpoint-GUID: 4ziwulbnVqfjMOjQJEs80UV7mZmWMTbT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=709 malwarescore=0 spamscore=0
+ priorityscore=1501 impostorscore=0 phishscore=0 suspectscore=0 bulkscore=0
+ mlxscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410080126
 
-On Thu, 3 Oct 2024 11:49:50 -0700 Mina Almasry wrote:
-> > > +       dev->ethtool_ops->get_ringparam(dev, &ringparam,
-> > > +                                       &kernel_ringparam, extack);
-> > > +       if (kernel_ringparam.tcp_data_split != ETHTOOL_TCP_DATA_SPLIT_ENABLED ||
-> > > +           kernel_ringparam.tcp_data_split_thresh) {
-> > > +               NL_SET_ERR_MSG(extack,
-> > > +                              "tcp-header-data-split is disabled or threshold is not zero");
-> > > +               return -EINVAL;
-> > > +       }
-> > > +  
-> > Maybe just my personal opinion, but IMHO these checks should be separate
-> > so the error message can be more concise/clear.
-> >  
+
+
+On 10/4/2024 8:20 PM, Andrew Lunn wrote:
+>> The only compile-time dependency from PCS driver to NSS CC driver is
+>> with the example section in PCS driver's dtbindings file. The PCS DTS
+>> node example definitions include a header file exported by the NSS CC
+>> driver, to access certain macros for referring to the MII Rx/Tx clocks.
 > 
-> Good point. The error message in itself is valuable.
+>> So, although there is no dependency in the driver code, a successful
+>> dtbindings check will require the NSS CC driver to be available.
+> 
+> You are doing something wrong. A clock is just a phandle. The
+> dtbindings check does not care where the phandle points to, just that
+> it looks like a phandle. You can hard code the instance to 42 and all
+> is good.
+> 
 
-If you mean that the error message is more intuitive than debugging why
-PP_FLAG_ALLOW_UNREADABLE_NETMEM isn't set - I agree :)
+Understand, we will specify it as a phandle and get rid of this dependency.
 
-I vote to keep the patch, FWIW. Maybe add a comment that for now drivers
-should not set PP_FLAG_ALLOW_UNREADABLE_NETMEM, anyway, but this gives
-us better debuggability, and in the future we may find cases where
-doing a copy is cheaper than buffer circulation (and therefore may lift
-this check).
+> And this is all just basic getting SoC stuff merged, nothing
+> special. So why do you not know this? Have you not been subscribed to
+> arm-soc for the last six months and watched other drivers get merged?
+> I also really hope you have been on the netdev list for the last few
+> months and have watched other pcs and ethernet drivers get merged.
+>
+
+We will pay closer attention to ongoing reviews going forward to avoid
+these gaps. Thank you for all the inputs in this thread.
+
+> 	Andrew
 
