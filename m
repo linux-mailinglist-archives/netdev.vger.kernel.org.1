@@ -1,104 +1,115 @@
-Return-Path: <netdev+bounces-133168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5965A9952AC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:59:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EAC79952DD
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:03:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE9A1C213D5
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D4311C25772
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24931E0DA6;
-	Tue,  8 Oct 2024 14:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mFdqnmcO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEC51E04BC;
+	Tue,  8 Oct 2024 15:01:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D29F1E0B99;
-	Tue,  8 Oct 2024 14:58:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9F41E04B7
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 15:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728399538; cv=none; b=PAZSig1dMQSHSpy2xJ8DGUWkmEe/4kQvqIKe9uO4o039Zu8+5hx3NxFOxunIfMlt5TsxzYDBolH7vh9m8Sf/8y7UNcocO2IzTqbaVWA9TceSSsB2qyWjqcFo9uGb8rmfrJhfVpBObmz1slGJvDnq0kSRQDruGqZleAryzU/BJyI=
+	t=1728399689; cv=none; b=aNF8etI9oP41O1d9nbctoOXk0R5CwjPvBKkbOB7ixiCwPXG7dWlxP9QxEEgqO+ycprT3LI9YwGFAQCWzM4Booj7MgXpFBFMbVZgQAUD9Iuiiw1LMAKZkcXnqZhMxFjvdLcL9Dxf3rcoVQybTkXQ2MnX1+SiYVL6PVKEoVYNl9js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728399538; c=relaxed/simple;
-	bh=CyKKUKkcrI+LgAe13dPO3Obvi2OrZ3eQc7gWUVSDEHY=;
+	s=arc-20240116; t=1728399689; c=relaxed/simple;
+	bh=+W5OZ6dooplYBQPBLHswZ9NRnDap1swU6HEYSLanpko=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IDZBzCgjTeMjmdjWyzExwckcyk0TVCSXjtlLFu21EhhzVO5A/rIDxweZ2ZZN9BkDUnsMIoRqjD88dd2S1/5VWO28rpx4T3mwdrZ6hbd9nndhIps/vg38CDZ5HOFtkNkyFtLRoGO3KWQSpInPdD13O8aOCyHh9fuyfQ9v7o3GRPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mFdqnmcO; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7e6d04f74faso4564978a12.1;
-        Tue, 08 Oct 2024 07:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728399537; x=1729004337; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sna4b8ikajnvFGNs9sBJQ8Lc8sqSFWsEsjg4zLiyr/Q=;
-        b=mFdqnmcO2SI9l30XSOABZvg2pRLnajLCCVTt8/t+wAAD3WaGfI1nb0pBTkBiji7Fq/
-         O/pnMBixuSYTra1+eCRBFo8aXQ3BlHhz6uNoN0cg8fGRul3C1gO2IPqf6xZSyh92FvnW
-         RQWKmKy7oQu+Xl2F9EMA5zyWUQmph/k+FbYkp5JvW2tHKnwaVVK5ZbpuN6i56QSfKDLn
-         KMGhI48wdxopRT6qKcmlSk205vgYLr+8fr9d3LFppwDQ3IvAiu0wKf7BQCQbN1eLxOKp
-         UmISp8VuU09iEn094NNtn2FIbOCmDsXB2OMtVUATwmvEsXHts5CeVq1J8w7KuPgMC0WB
-         F4cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728399537; x=1729004337;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sna4b8ikajnvFGNs9sBJQ8Lc8sqSFWsEsjg4zLiyr/Q=;
-        b=JoseXOxG6KQyHUVKfa2lNHkdNoRAsTOuJ0txBV/LfTpEKeA3M6GFezKqxdd2VcbjAE
-         LLZwz9KnBFZ/lxyudMHSI+tiB+vbGM7j9VVOh0tXkx29Hk9F88G3P5IempOiQHWH/sb4
-         VEZHZiPRItm+Zl0YRT+zowfwnkrmKrlsIpvf/sv+v40lZ9vKV3NlIM63QMJvoNDTL9sf
-         KlH1mgjcRx4DRuCnCOpsvcdYKRk5Zb477X+N3/aDWmxEnu0cCbBTUCUQiqClcT0GkIZ4
-         5r18ZfgP+/Q6HYtGiCIBh1Dkp3vcp27l4M6FVPdfStNm0JiQkRYpwqpu3l6QDYomlDkA
-         vrbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUoPpjKAiEw0QybjD/I3zIjuf3TU6i7jHsTjW3GSBDP0ebsVMm5dx+0agX8HMEIfKBJ+19b+V+k@vger.kernel.org, AJvYcCV2dkK40qTBIaW293xRLk0gKEOHmiBkpeE6s/kCw5dg5foyWTmF7Ng62bARls8HFuhwUvsQENepI5UMvDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP+W6I99zGTFXQbQAS2EGhI4pcchftuP2D8ZOfJ2oioiVt3DU7
-	naPItbbAW2CQoGL4cdPoUQjZw2zEO9FU72NB8ebXYDG2gq0KFesA
-X-Google-Smtp-Source: AGHT+IEOwNX2FdEFw9qlhIWwqEhDWsikRVRjPhgp4Mq5gi85AotQqoWgoTac4JNSja0gXQvsU8YEIQ==
-X-Received: by 2002:a17:90a:c788:b0:2e0:f035:8027 with SMTP id 98e67ed59e1d1-2e298aeeb14mr691112a91.2.1728399536594;
-        Tue, 08 Oct 2024 07:58:56 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([198.59.164.146])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e20aebb7e5sm7884827a91.18.2024.10.08.07.58.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 07:58:55 -0700 (PDT)
-Date: Tue, 8 Oct 2024 07:58:53 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, anna-maria@linutronix.de,
-	frederic@kernel.org, tglx@linutronix.de, johnstul@us.ibm.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 0/2] posix-clock: Fix missing timespec64 check for PTP
- clock
-Message-ID: <ZwVIrW647UNeMZW-@hoboy.vegasvil.org>
-References: <20241008091101.713898-1-ruanjinjie@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LGlwCniB+/RUCCRdK9r1XNvk4NkQco2Um4lKdKIECmmLWr/GiS52MCt+2MG9hkGEvkK95M5A1EwLfsnfcHqbR1cV4UKnA/ocvyxLSaiwwbGc4na7cw746NW/soEOFju2slyQU5igWaGohJvKYu9L5CNpLjfLioDIBB7iixQWoWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBi6-0002sj-4i; Tue, 08 Oct 2024 17:01:14 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBi2-000OEm-JT; Tue, 08 Oct 2024 17:01:10 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBi2-000Qkx-1a;
+	Tue, 08 Oct 2024 17:01:10 +0200
+Date: Tue, 8 Oct 2024 17:01:10 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next 06/12] net: ethtool: Add PSE new port priority
+ support feature
+Message-ID: <ZwVJNomEzQJOr8jx@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-6-787054f74ed5@bootlin.com>
+ <ZwDcHCr1aXeGWXIh@pengutronix.de>
+ <20241007113026.39c4a8c2@kmaincent-XPS-13-7390>
+ <ZwPr2chTq4sX_I_b@pengutronix.de>
+ <20241008122300.37c77493@kmaincent-XPS-13-7390>
+ <20241008145617.23254843@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241008091101.713898-1-ruanjinjie@huawei.com>
+In-Reply-To: <20241008145617.23254843@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Oct 08, 2024 at 05:10:59PM +0800, Jinjie Ruan wrote:
-> Check timespec64 in pc_clock_settime() for PTP clock as
-> the man manual of clock_settime() said.
+On Tue, Oct 08, 2024 at 02:56:17PM +0200, Kory Maincent wrote:
+> On Tue, 8 Oct 2024 12:23:00 +0200
+> Kory Maincent <kory.maincent@bootlin.com> wrote:
 > 
-> Changes in v5:
-> - Use timespec64_valid_strict() instead of timespec64_valid()
->   as Thomas suggested.
-> - Add fix tag.
-> - Update the commit message.
+> > On Mon, 7 Oct 2024 16:10:33 +0200
+> > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> > 
+> > > User will not understand why devices fail to provide enough power by
+> > > attaching two device to one domain and not failing by attaching to
+> > > different domains. Except we provide this information to the user space.
+> > 
+> > What you are explaining seems neat on the paper but I don't know the best way
+> > to implement it. It needs more brainstorming.
+> 
+> Is it ok for you if we go further with this patch series and continue talking
+> about PSE power domain alongside?
+> It should not be necessary to be supported with port priority as the two PSE
+> supported controller can behave autonomously on a power domain.
+> I hope I will have time in the project to add its support when we will have a
+> more precise idea of how.
 
-For the series:
+Ok.
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
