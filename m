@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-133215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A0D5995544
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:05:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FA0B99554A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5BDAB24A28
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:05:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C94A61F218AF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491CB1E0DF2;
-	Tue,  8 Oct 2024 17:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 377221E1035;
+	Tue,  8 Oct 2024 17:05:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GRrFwc82"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mbuDmZ0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF6B1E0DDB;
-	Tue,  8 Oct 2024 17:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E1B1E0E0E;
+	Tue,  8 Oct 2024 17:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728407101; cv=none; b=CCKrcozZ9dAPZG26nM/HNMypCa8iOkH+qIiwwwgYsm5tGN37ng9W9VuOXZLHRD00k3hGmB5mWffRo5EBl+r51c/azC4gSulgGWaIvsd6kVHz/rcMOU6xbbBHFFTvRZ7kzrL9QZLmI/WmyBAec+vegi9HgTtdmHIE/hit55eQ7IU=
+	t=1728407120; cv=none; b=meDm+vGLzJxm9+OBklYuX3uKfRcIqSElNIZ7BcE69uuqqrtXB7O0iT/qGFFUOAMJb64SdDLy/W8oNBsQSwGtIwyHn+ge/Z01vYAVCYS+gDPkgela7bQ/r+yaOZ/pvnaROl/K0nV2UgNTYNXQd/6776ftKwvF4hUwStUBJs17nO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728407101; c=relaxed/simple;
-	bh=Ef/F0ql35nGbjKTRVh+Ybbc9GSaSifVk/OXqChMbje8=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c1ad8Z4lGNfYsbvT/fplgvLbzlx/LB3vpR3dV+vyAIEtZp9przYlnYjFxbvXMNITADif58iIq4K4CfMJFuKfExPoNQCt14upT2/XEnps97tH01E09Ek0j4tndsD82+nSEkPelvFzAt+J+JrJqi+a2LMMqUE0fg3V4M8HdKpdqFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GRrFwc82; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539983beb19so7331277e87.3;
-        Tue, 08 Oct 2024 10:04:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728407098; x=1729011898; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=sV25p3p0AZj5gbkOQsaFZy2qZUkBS8f2wwinSGp8NsI=;
-        b=GRrFwc82GXhusHQJJE5nirD1E1pd3Y8aEFBCzVU8ndpN9f0gVdkWUNVjsnGxliz5/9
-         ljscSbnkxMEbvQtRtw9+t8SpYcN8NTEyUKRve0VeGT8FyBsmXQhd9Ym8HQClFD6TXuLg
-         UmOqAxjmBx+0w7oujlnvYUOHk6CReXdYje4Q2b6vk65gjFCPANZvvafrRBeXktaw9SNN
-         DFjykElW8dc0mpiBiNM8LgzSnqwSxMMJhG0XElJbzdphD/fkM5CGRAZZYnaOkqiX5Au8
-         u0LikWRu0LZCIBNixCDvT6Ab+ecA/h5KHFTHQVfEgnlDqF8FKprNvmGTbKd9oroNWMf4
-         Jb6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728407098; x=1729011898;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sV25p3p0AZj5gbkOQsaFZy2qZUkBS8f2wwinSGp8NsI=;
-        b=lBnLnnkh1IrpCLBGBUJ6YOQFokpGHLiOAZLaKOByxX4RaevYJFIhpNma1XngN0sqRG
-         uyoKLIGuw4fDBzhIo4/SXdA4N2JRORLV4tazJWU7adJA4B7wZLCArGfAo3340bHsDDrW
-         Ik6LijBpC+4/tBlCrOrqcQugIa7Eu7rNt/jcqBzF7oqEWh8BrtXgI7RZZjKnz4KXStod
-         NcjLipVgB9z+3dA+Pl+NTTK9ZY51xtwXH3wzAlGBbEo2W/7L5kDAQrz3RbHWtAvO+JZf
-         vo7UtgHt6eQLCHGsI6/6ElcfZOXGrW8Dj/mVJ1XFPrWaPdFlEvd7TLLV983OzM6srngo
-         hOCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjsHek3qB30vlvNJHaCrqE8KrNjc1lsxxkjB10tMqB0YdnfrWUUkXpKUWu26vzlYwGzsyqYLlTTypWlv8=@vger.kernel.org, AJvYcCVWm5El5RLyvaBrYemFyF3h/El+DdBFJna2r2GEnf0ynKeEP2ofA6lGaNLR4eFO2XYWWLCDMvdQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8ju9jDjSdwRM4jX86OPlJPliOJpcb/fXVJ2wJRv6XW2yudluG
-	h4LaccNdjv1BvXXOWs0ZUTm06ZGp/eJB2RoxRnwBOwdDWgH5drgn
-X-Google-Smtp-Source: AGHT+IFsyAihu1FRJ9mpa6itKK5ZBborXJn6yq8sKvbEIfrbzDZSK2IfEDLUjTGaAZmwQnuFv2rrvg==
-X-Received: by 2002:a05:6512:138e:b0:539:9505:7e5 with SMTP id 2adb3069b0e04-539ab87e201mr7970572e87.36.1728407097278;
-        Tue, 08 Oct 2024 10:04:57 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d3963413dsm151122f8f.45.2024.10.08.10.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 10:04:56 -0700 (PDT)
-Message-ID: <67056638.050a0220.179d84.0dc1@mx.google.com>
-X-Google-Original-Message-ID: <ZwVmNlfpC0olCPkf@Ansuel-XPS.>
-Date: Tue, 8 Oct 2024 19:04:54 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2] net: phy: Validate PHY LED OPs presence
- before registering
-References: <20241004183312.14829-1-ansuelsmth@gmail.com>
- <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
- <67053002.050a0220.63ee8.6d11@mx.google.com>
- <9ed5fd73-b4e8-4be1-9642-9dbeb8bfd892@lunn.ch>
+	s=arc-20240116; t=1728407120; c=relaxed/simple;
+	bh=QXn/G5xtVS7Q95i0Xd2gs08GSFv4v6Vo/5ih6xJnUPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iGZ7MA+B8VCeMg5JseiDFxy4De7s//2BEeXE3NLEwUJ8z5dqvYZbCM/gxdknkwjWoyWspDEGU0Y2r/1Z1qGo1XANFYQ4C903Hai5ZXAPuS6TZFhHUn77IMn9xha8Vj9o3/5jRUbeX0tFfrNinAPxSSmAm5JwVZunGbbVIQNGj3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mbuDmZ0g; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=f/YCGlfnMCPMa/11Eh/72PxGnnmSI98rKvi4lX48Y2U=; b=mbuDmZ0g171uQygCWjestigXvj
+	wLdrxn+7nl8VvC0mJYJmtwmjlFifPv9TBDy2k5pJ2wYeyzAstduYcTSjaPB5ux8oHWo//86hWWafU
+	8aGTBigaXVwbHmj0ekKDguviIiOGa2h35BlatEvGiu/Y3meD3ZydPGEXEmnwSHvQKmgX0cWNWN7DL
+	+jpntTPEgLhAiwH93781GjAFQK6tigRWvQq05f7inDd+lVSNBehnkT3Re+8NSoRCyF+2QEzE93qVp
+	yHX6VFliSHy3KHGp9xbhChoTdx9OmW1Oh5aO6lIZlUuQhkSfzjRxyvlJDh4+P3c3qwxKdwjK32Jpz
+	F3HAppvQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51246)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1syDe3-0007mG-24;
+	Tue, 08 Oct 2024 18:05:11 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1syDdy-0005MP-0U;
+	Tue, 08 Oct 2024 18:05:06 +0100
+Date: Tue, 8 Oct 2024 18:05:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
+ get and set phy configuration
+Message-ID: <ZwVmQXVJMmkIbY1D@shell.armlinux.org.uk>
+References: <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
+ <20241007123751.3df87430@device-21.home>
+ <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+ <20241007154839.4b9c6a02@device-21.home>
+ <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
+ <20241008092557.50db7539@device-21.home>
+ <f1af0323-23f5-44fd-a980-686815957b5a@lunn.ch>
+ <20241008165742.71858efa@device-21.home>
+ <ZwVPb1Prm_zQScH0@shell.armlinux.org.uk>
+ <20241008184102.5d1c3a9e@device-21.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,39 +90,74 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9ed5fd73-b4e8-4be1-9642-9dbeb8bfd892@lunn.ch>
+In-Reply-To: <20241008184102.5d1c3a9e@device-21.home>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Oct 08, 2024 at 07:02:18PM +0200, Andrew Lunn wrote:
-> On Tue, Oct 08, 2024 at 03:13:34PM +0200, Christian Marangi wrote:
-> > On Tue, Oct 08, 2024 at 03:08:32PM +0200, Andrew Lunn wrote:
-> > > > +	/* Check if the PHY driver have at least an OP to
-> > > > +	 * set the LEDs.
-> > > > +	 */
-> > > > +	if (!phydev->drv->led_brightness_set &&
-> > > > +	    !phydev->drv->led_blink_set &&
-> > > > +	    !phydev->drv->led_hw_control_set) {
-> > > 
-> > > I think this condition is too strong. All that should be required is
-> > > led_brightness_set(). The rest can be done in software.
-> > >
+On Tue, Oct 08, 2024 at 06:41:02PM +0200, Maxime Chevallier wrote:
+> On Tue, 8 Oct 2024 16:27:43 +0100
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+> 
+> > On Tue, Oct 08, 2024 at 04:57:42PM +0200, Maxime Chevallier wrote:
+> > > Oh but I plan to add support for the marvell switch, mcbin, and turris
+> > > first,  
 > > 
-> > Mhh the idea was really to check if one of the 3 is declared. Ideally to
-> > future proof case where some led will only expose led_hw_control_set or
-> > only led_blink_set?
+> > What do you think needs adding for the mcbin?
+> > 
+> > For the single-shot version, the serdes lines are hard-wired to the
+> > SFP cages, so it's a MAC with a SFP cage directly connected.
+> > 
+> > For the double-shot, the switching happens dynamically within the
+> > 88x3310 PHY, so there's no need to fiddle with any isolate modes.
 > 
-> Ah, i read it wrong. Sorry.
+> Nothing related to isolate mode regarding the mcbin :) They aren't
+> even implemented on the 3310 PHYs anyway :)
 > 
-> Maybe apply De Morgan's laws to make it more readable?
+> > 
+> > The only thing that is missing is switching the 88x3310's fibre
+> > interface from the default 10gbase-r to 1000base-X and/or SGMII, and
+> > allowing PHYs to be stacked on top. The former I have untested
+> > patches for but the latter is something that's waiting for
+> > networking/phylib to gain support for stacked PHY.
 > 
-> +	if (!(phydev->drv->led_brightness_set ||
-> +	      phydev->drv->led_blink_set ||
-> +	      phydev->drv->led_hw_control_set)) {
+> That's one part of it indeed
 > 
-> However, it is correct as is.
->
+> > Switching the interface mode is very disruptive as it needs the PHY
+> > to be software-reset, and if the RJ45 has link but one is simply
+> > plugging in a SFP, hitting the PHY with a software reset will
+> > disrupt that link.
+> > 
+> > Given that the mcbin has one SFP cage that is capable of 2500base-X,
+> > 1000base-X and SGMII, and two SFP cages that can do 10gbase-r, with
+> > a PHY that can do 10/100/1G/2.5G/5G/10G over the RJ45, I'm not sure
+> > adding more complexity really gains us very much other than...
+> > additional complexity.
+> 
+> What I mean is the ability for users to see, from tools like ethtool,
+> that the MCBin doubleshot's eth0 and eth1 interfaces have 2 ports
+> (copper + sfp), and potentially allow picking which one to use in case
+> both ports are connected.
+> 
+> There are mutliple devices out-there with such configurations (some
+> marvell switches for example). Do you not see some value in this ?
 
-Happy to send v3. Np!
+Many PHYs that have two media facing ports give configuration of the
+priority between the two interfaces, and yes, there would definitely be
+value in exposing that to userspace, thereby allowing userspace to
+configure the policy there.
+
+This would probably be more common than the two-PHY issue that we're
+starting with - as I believe the 88e151x PHYs support exactly the same
+thing when used with a RGMII host interface. The serdes port becomes
+available for "fiber" and it is only 1000base-X there.
+
+I was trying to work out what the motivation was for this platform.
+
+Sorry if you mentioned it at NetdevConf and I've forgotten it all,
+it was quite a while ago now!
+
+Thanks!
 
 -- 
-	Ansuel
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
