@@ -1,179 +1,114 @@
-Return-Path: <netdev+bounces-133305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E92995895
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:38:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 585889958FC
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673031C21A82
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:38:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A8CF1C21419
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC07D216425;
-	Tue,  8 Oct 2024 20:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09300215F54;
+	Tue,  8 Oct 2024 21:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="18fWZBkO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eBNO0PQh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D67215016
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 20:38:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD121DF99B;
+	Tue,  8 Oct 2024 21:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728419890; cv=none; b=VdJM+gmikBEx4DELvj/jYDq9aUoXoL+ebxi9pEFGIvkWzRzZQk32s//Sw8BTyR+gHYZDpDkXdfT9gHDHGX19sVFRFZXzqWjYrCADkpS9NQrBtONzwVlYVobfosMzltLkeosJ/E/Bsm2+I+vlhF3oXh0NQhTOdhPljOMvPp0S0bk=
+	t=1728422056; cv=none; b=d8IrkF1hBYvRztp3Yr3YuIruKfBeAdi9jdVgxg7w89BGaB8DmqesSM4ke2snQ0PNMVp0VNy8n1z/xZSj9kub++WEvcoXbFapFuIM1D8mPnuDNlRxVJY/YgeotQJywfrt6hNcklufnZxWNBEjPjvIrwy2FyKbXW8geyaocbBShqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728419890; c=relaxed/simple;
-	bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+	s=arc-20240116; t=1728422056; c=relaxed/simple;
+	bh=/dliGEewKRZribczQoNeiV6X+4qsNadUl7k0K75up9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R9hxaFCZfFLwnFxoE8pcsaXAydYU0GwOgr6rmCIpMx5h37u2P1xfx0CYRFXuLNDr9PGcovNB3FjmTovUUbKSdbeWgDCwU6ohDhLNESS2h6hWDxuFyTM1f5joi0uLr58h9u/KFnYHmubIdTLd+NWQR8uJat4+UppM/s1D+YqgT2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=18fWZBkO; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a83562f9be9so664688066b.0
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 13:38:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728419885; x=1729024685; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
-        b=18fWZBkO9cDHNP5XkQ39MRLClR2iDC1zySqkncD3SsZKu5Rgs7Dl8pH8lKJp2p962M
-         ZQCXVVOIGzjU5UY81OJcQw0kiLkVxi82epBgL4dI4RqabJSCfzsJV/w4rEU39jnWCoY7
-         yG6e+6Huic3MWrYC1oSE1/3jjgRJEPNAKN3ZTXu7yDRI5rDcTHA6JVJ03K88LUsNIndN
-         hxu1wyd0FmRvkB0XvGhYzl60f9BZXhmzkblJFg6rToFyXPRB5BLZ/aQ9AquxPwlKwAUC
-         26vZdSJyysWVJfHabIaR2zJD8Gkd7meZi0reyXepjlExZa64VCzKDkCcaGkjDZZZyvzq
-         ni5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728419885; x=1729024685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
-        b=TySXra9pBaJv/h4oz0QNSWxSefFBetgXBAWCz844B7EsTHPPqg5tsKNqOKKdP68ncU
-         1Ajv86w7FWWP7dMlI1Cu7Px6iaBX7hG/bNA0CwJ3Nd5XMHBxkSCd+XSs9L46gBWjvrK8
-         /+CuAm7ztFaumjujGDv6KJkDgZROYfQtjPt0Zn1HerpRUgUMz/HUFK40dkfkCPHnIl/I
-         fBfah3Db+2vV8F8IinrdT7dbSMF0Nnb5ga5mlnhYbVG6Sp37+3Unw4TAYnqGiDfx7Mrg
-         4c2jIthLqy3UwAnga1Qw+griLGQNhdGMDSdFBqvmodxzbJ6K0iUjmDKhjCNJEa3M1spU
-         iqDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWt/g1uRLa1iGcw88jygK0XdNXdBtJfRwMGcftolmrfIt72HJfJqWQiZx3KsDxriGt0OinuHIk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjwhmVbiKMvro0xF+6BFmk+UItxyejJpRq29ooGQMBboq3Qv8b
-	f6G7y+OtF7BVjmQOQQKt7J4vMTu/yZGDd94jveJv+YQ1FZRB5JZEP0MtCKC7yLc=
-X-Google-Smtp-Source: AGHT+IFQsuFQDnMORn6KRqls83kXMRALTmz1xji/Zv3nzyXsaV17OwyYMIY5gtZ7u9n9SjQRNHRlFg==
-X-Received: by 2002:a17:907:94d4:b0:a8d:250a:52b2 with SMTP id a640c23a62f3a-a998d114bbemr3268366b.6.1728419884897;
-        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
-Received: from localhost ([2a02:8071:b783:6940:c420:a9b6:c5e1:5b65])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a996274deeesm196971266b.103.2024.10.08.13.38.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
-Date: Tue, 8 Oct 2024 22:38:02 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, 
-	Sakari Ailus <sakari.ailus@linux.intel.com>, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	dmaengine@vger.kernel.org, linux-gpio@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
-	nouveau@lists.freedesktop.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org, 
-	linux-iio@vger.kernel.org, linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
-	iommu@lists.linux.dev, imx@lists.linux.dev, linux-mediatek@lists.infradead.org, 
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, linux-staging@lists.linux.dev, 
-	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
-	asahi@lists.linux.dev, rafael@kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>
-Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
-Message-ID: <ttmnzgsdyng5vab63pvj7csrotbsmwnultjelvdotrvyg2snac@iv7afgect5f3>
-References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
- <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
- <20241007184924.GH14766@pendragon.ideasonboard.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pIIMf5uFo5yaryukwc25CelnmxBpRmhnlHpXrZZ1A1juCfSCor0i9jdIST6UlPfJ7v1c79X7HoUcZ/tkyQi9xfrTlU7P7hGkrrcHjMhX/mMCqcc3dvak6qY8Fz3vaXorLK30Te/nI8ENaaXaFKeaFfwNmFhRTrMkO8FMhTFprbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eBNO0PQh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=fXa2rjQqSmEEprIVSsvVh1O3dTW7jIaPiGYIOj8vgEM=; b=eBNO0PQh9wrStrPWtR3+RdCmzS
+	sZ3xchEC5hgUFjuibTqsvYiII76/6KkDsPUZjeWacGXigWFVqbEn1dsHjSmqHzbmuHjlIvS2BpWfO
+	2jqiOak5ArKMU/IccXFpcGH9JmtJnLigHycizAvV+mnXyhmfwPRRJkop5A+E/vlvkJ+4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1syHWn-009Pka-Jq; Tue, 08 Oct 2024 23:13:57 +0200
+Date: Tue, 8 Oct 2024 23:13:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Robert Marko <robimarko@gmail.com>,
+	=?utf-8?B?UGF3ZcWC?= Owoc <frut3k7@gmail.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net: phy: aquantia: allow forcing order
+ of MDI pairs
+Message-ID: <c5339983-d768-4a1c-a951-dbc99ae16b21@lunn.ch>
+References: <7ccf25d6d7859f1ce9983c81a2051cfdfb0e0a99.1728058550.git.daniel@makrotopia.org>
+ <9ed760ff87d5fc456f31e407ead548bbb754497d.1728058550.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2ocqjla6tcmukjn3"
-Content-Disposition: inline
-In-Reply-To: <20241007184924.GH14766@pendragon.ideasonboard.com>
-
-
---2ocqjla6tcmukjn3
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <9ed760ff87d5fc456f31e407ead548bbb754497d.1728058550.git.daniel@makrotopia.org>
 
-Hello,
+On Fri, Oct 04, 2024 at 05:18:16PM +0100, Daniel Golle wrote:
+> Despite supporting Auto MDI-X, it looks like Aquantia only supports
+> swapping pair (1,2) with pair (3,6) like it used to be for MDI-X on
+> 100MBit/s networks.
+> 
+> When all 4 pairs are in use (for 1000MBit/s or faster) the link does not
+> come up with pair order is not configured correctly, either using
+> MDI_CFG pin or using the "PMA Receive Reserved Vendor Provisioning 1"
+> register.
+> 
+> Normally, the order of MDI pairs being either ABCD or DCBA is configured
+> by pulling the MDI_CFG pin.
+> 
+> However, some hardware designs require overriding the value configured
+> by that bootstrap pin. The PHY allows doing that by setting a bit in
+> "PMA Receive Reserved Vendor Provisioning 1" register which allows
+> ignoring the state of the MDI_CFG pin and another bit configuring
+> whether the order of MDI pairs should be normal (ABCD) or reverse
+> (DCBA). Pair polarity is not affected and remains identical in both
+> settings.
+> 
+> Introduce property "marvell,mdi-cfg-order" which allows forcing either
+> normal or reverse order of the MDI pairs from DT.
+> 
+> If the property isn't present, the behavior is unchanged and MDI pair
+> order configuration is untouched (ie. either the result of MDI_CFG pin
+> pull-up/pull-down, or pair order override already configured by the
+> bootloader before Linux is started).
+> 
+> Forcing normal pair order is required on the Adtran SDG-8733A Wi-Fi 7
+> residential gateway.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-On Mon, Oct 07, 2024 at 09:49:24PM +0300, Laurent Pinchart wrote:
-> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
-> > On Fri, 4 Oct 2024 at 11:41, Sakari Ailus <sakari.ailus@linux.intel.com=
-> wrote:
-> > >
-> > > Hello everyone,
-> > >
-> > > This set will switch the users of pm_runtime_put_autosuspend() to
-> > > __pm_runtime_put_autosuspend() while the former will soon be re-purpo=
-sed
-> > > to include a call to pm_runtime_mark_last_busy(). The two are almost
-> > > always used together, apart from bugs which are likely common. Going
-> > > forward, most new users should be using pm_runtime_put_autosuspend().
-> > >
-> > > Once this conversion is done and pm_runtime_put_autosuspend() re-purp=
-osed,
-> > > I'll post another set to merge the calls to __pm_runtime_put_autosusp=
-end()
-> > > and pm_runtime_mark_last_busy().
-> >=20
-> > That sounds like it could cause a lot of churns.
-> >=20
-> > Why not add a new helper function that does the
-> > pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
-> > things? Then we can start moving users over to this new interface,
-> > rather than having this intermediate step?
->=20
-> I think the API would be nicer if we used the shortest and simplest
-> function names for the most common use cases. Following
-> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is that
-> most common use case. That's why I like Sakari's approach of repurposing
-> pm_runtime_put_autosuspend(), and introducing
-> __pm_runtime_put_autosuspend() for the odd cases where
-> pm_runtime_mark_last_busy() shouldn't be called.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-That's ok for me. However this patch series isn't the optimal path to
-there because most drivers (i.e. those that already today do
-pm_runtime_mark_last_busy() in combination with
-pm_runtime_put_autosuspend()) have to be patched twice.
-
-The saner route is: Only convert the drivers with a sole
-pm_runtime_put_autosuspend() (i.e. without pm_runtime_mark_last_busy())
-to __pm_runtime_put_autosuspend(). Then add the mark_last_busy() bits to
-pm_runtime_put_autosuspend() and then drop the explicit calls to
-pm_runtime_mark_last_busy() before pm_runtime_put_autosuspend().
-
-(Note this doesn't take into account Rafael's position that
-pm_runtime_put() might be the saner option. My argument applies for that
-conversion analogously.)
-
-Best regards
-Uwe
-
---2ocqjla6tcmukjn3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmcFmCEACgkQj4D7WH0S
-/k6xnwf/QOZhbtT562rFFa3JIiBatDxTcqyEXoXClrP7jSyQFY/VFzq2S2jRHOFt
-wM6zQUX1bTUqDtC4HozJIbQDjLxd3qFgc5RoTRLV8VhRJbcq9cOo5Nf1h4KJ5Ip9
-nhpzoHwUHoEjEHj1f9UvEWfnFAVCSLFxgb14ZDHZyb2pQue3G5OYI2f2cJYT8YVB
-xQktDFp7rUu4xWDTzoIxNKvR1Ipy5fGxdf9R2/+IQhW64sWuDG2ZH6tAmfn6mEb8
-ecspbesJx+NMbZ06Zl7wqBvyj/DpQGgPaCnWUQ5cI0Of/kOzqxh4+65JK68CLLs0
-/Goin2zz55IZITGC5zHuAA07bW/c7Q==
-=7Wup
------END PGP SIGNATURE-----
-
---2ocqjla6tcmukjn3--
+    Andrew
 
