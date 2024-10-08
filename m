@@ -1,140 +1,167 @@
-Return-Path: <netdev+bounces-133254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4014D99565A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:22:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD0C099565D
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:22:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA15128890A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:22:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E04CF1C25417
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FB020ADE2;
-	Tue,  8 Oct 2024 18:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3020B212D0F;
+	Tue,  8 Oct 2024 18:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Q13Rmxep"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Ao4PoGI9"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67FA1E0DD1;
-	Tue,  8 Oct 2024 18:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3AE20ADE2
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411765; cv=none; b=n0x+MFcYY99H0jOMJOH93AZccHQpe36rK4Iv31Sx5Fq4+1DlscqMsKjMskcQgImZ+SrVPRk2a17n8JW+pznDPJxm9pHnOlUIMCmp73hLJZeUMoAZ0M8iKN/kBK1QcGZQoOoiD4mtXuJM0bNsyD5428SUAowCyj2zkvEQSWBi0UY=
+	t=1728411772; cv=none; b=ttm+bVM6qhzC+D/riyZwKFFUbAV9rACTSnD1intNffRz4ScARggRCQj02tWiMyPdm+jbr+Aq5n6L5e2b3kdH93vctoy+QoPDvTkkGiv8FJcjNevoRWCRp/p2zWdOmUAbvp6ildppB52cCYZYMaG5I/Z7t+Zdaw96vuKGJB1ainQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411765; c=relaxed/simple;
-	bh=Bw7tHAzRnNX9JlhTidWbpwRPbZZIBq1pJaHcu3O/D9U=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DlUg59z87Msl1w+d3imZrzNg/mqk7NBFva5MTT41HeE+UStJIVna8u/t+i92tRxvPaARJVyjVBbsWwsPH3jRHmhtcGZNGmggg6LIr0qYPfTzPb2lVekp6XTxjVyEpRUqbAdUHvItQCZdoZJQPNxWl6DZdT355QpPAR2lj9UE8x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Q13Rmxep; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=FYiFRoNGJ9hNi3r1QAXGk4nUc9gJVOt2/pUqvZG6Z1I=;
-	t=1728411763; x=1729621363; b=Q13Rmxeph9LEnojOeMNCBQNrlvP6R1WzWh48UP0b7qNhsOi
-	5CrvV7w//aaAbUCPmywvsToWXaM47M86JqVtUtNqqaP4sLyvoxB82h/iOSnD0seII4ftvVRVIxl/q
-	g1e5NB0l8XaNrFy3OA2zsewCPgtLfr42An4h0k8EpPgMlMJGqyylUoQgltUAhqjU60ripYucXO/6D
-	j92cupL6ydqmxxOH7GxEflfclTwC7QJ65MkYuGV4rL0WsFpmetwcslr/gb9kSoyX4EuW3nvT/ZMZ1
-	ZTjLpbcJL4Iw8aoudAtRQelW9xfDR7bRtO5sJ9qiAysGGqv1Tf0t93XhLJ3YrTLQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1syEr1-00000004LXn-1si8;
-	Tue, 08 Oct 2024 20:22:39 +0200
-Message-ID: <cd8045c03573a012f71a1afdcfb5d9c108b6fefa.camel@sipsolutions.net>
-Subject: Re: RFC: Should net namespaces scale up (>10k) ?
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>, alexandre.ferrieux@gmail.com
-Cc: alexandre.ferrieux@orange.com, edumazet@google.com, horms@kernel.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Date: Tue, 08 Oct 2024 20:22:38 +0200
-In-Reply-To: <20241008174751.2995-1-kuniyu@amazon.com>
-References: 
-	<CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
-	 <20241008174751.2995-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1728411772; c=relaxed/simple;
+	bh=Soj8mFaLd1Cyy0ejjBioY9cxLP9QIIW58JDFeiu2ts0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B6PJq3Ln67A39SVetKd9ClzsySxS0cY8nAec1wZ5EVqyThTLI4+PUu22Bac2KBouoQm1dGdCfDw/3SbI35PZRUtWNx+HD+i5tqeE8qYQPsja8WuYRzhrpoKwpcgvzZOi1/FTh52C/ucKF4dg0GYA2JC1rhnmMKvg7Cqrhh3anfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Ao4PoGI9; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20b9b35c7c3so62564995ad.3
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 11:22:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1728411770; x=1729016570; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mfgCpS5PaaDvZjkTJaE/xBzcbJqmdBm8+yyCnyw3De8=;
+        b=Ao4PoGI9vwBp2XBS9TbUrC82t+VibfUVIqpnOWesXqezv0Br5BL3Ty6wA+tIYl1bwg
+         Gl3KwX7OxATwATQ4aFYcSBL764vZgdr5lfvNManB36kYOHUNNMjmJjglTqDhY7hkgNAh
+         S6g4uoFnk9dwmJfotqQFxrZf4dItl8v4X5YDU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728411770; x=1729016570;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mfgCpS5PaaDvZjkTJaE/xBzcbJqmdBm8+yyCnyw3De8=;
+        b=MW1EfhYJc2LrCcMc4Gs+LKML84MEHawlxRwcPWBJ/X/q71yn8GWJNUlpB+YTg/MbOB
+         aH2/kva1tNleHVgg9tPz8KgFJ3/q18k2pssku0Gcl/5/vQEz5MNSceIzySRS2mrOOx4W
+         HPzpt8Z7R9VVAH2jBGBJlsxA6oQ2+KFZfE5xqH1aIe64bAoIc8ans1A3rOUHNDLMvpPS
+         NuO86NRj0WBzgj1zd4Ht/gc8es+rtWgRyW0XhyNCENGxg1CtuvFey4wQpSNrB75JitWT
+         cz0vKBqWpKTH1T4vPbWrEsuoPqm4+i/Jm7ACB7DqXqM+zTzHLpK1H+2X+SzdpCbMNl/K
+         D5UQ==
+X-Gm-Message-State: AOJu0YyKbTH6ojIc0V0WaSM8dVydezfxuCWN27ckX50kCwV4xzjj4+mt
+	T5UJY+R11BTqMNWd2PGM/PVvvU2eiYj+prLS8c7BzEwef3cxqdHnNtR5mpftc9IALzlPZgQfDBU
+	ap3KGpH0rMwYHYDeRvqjfctrTdQjWfVaHfypGp5YRoYbcnDmdFL80KesOoIRY8Lj7qbYquhkyqM
+	rKJsALyolpO223HuUDCmtixMSf7EB/H9l89Wc=
+X-Google-Smtp-Source: AGHT+IGLwKH5D8GmqT91lF+IEqFV1bkPlXaOCwMdX6WQyBYQ2vbuWPbJ2h7utnI4zy5Lzw/E/iDnDg==
+X-Received: by 2002:a17:902:ea0f:b0:20b:a431:8f17 with SMTP id d9443c01a7336-20bff1c4055mr294243605ad.58.1728411769685;
+        Tue, 08 Oct 2024 11:22:49 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c1395a408sm58422345ad.193.2024.10.08.11.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 11:22:49 -0700 (PDT)
+Date: Tue, 8 Oct 2024 11:22:45 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
+	bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
+Subject: Re: [RFC net-next v4 3/9] net: napi: Make gro_flush_timeout per-NAPI
+Message-ID: <ZwV4dUxPZIVG366J@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
+	bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>
+References: <20241001235302.57609-1-jdamato@fastly.com>
+ <20241001235302.57609-4-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241001235302.57609-4-jdamato@fastly.com>
 
-On Tue, 2024-10-08 at 10:47 -0700, Kuniyuki Iwashima wrote:
+On Tue, Oct 01, 2024 at 11:52:34PM +0000, Joe Damato wrote:
 
-> > 1. The "netdevice notifier" from the Wireless Extensions subsystem
-> > insists on scanning the whole list regardless of the nature of the
-> > change, nor wondering whether all these namespaces hold any wireless
-> > interface, nor even whether the system has _any_ wireless hardware...
-> >=20
-> >         for_each_net(net) {
-> >                 while ((skb =3D skb_dequeue(&net->wext_nlevents)))
-> >                         rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
-> >                                     GFP_KERNEL);
-> >         }
-> >=20
->=20
-> Alex forwarded this mail to me and asked about 1.
->=20
-> I checked 8bf862739a778, but I didn't see why wext_netdev_notifier_call()
-> needs to iterate all netns.
+[...]
 
-Agree. That code is ancient, and I don't remember why, but I'd think
-it's just because I was lazy then.
+> Note that idpf has embedded napi_struct in its internals and has
+> established some series of asserts that involve the size of napi
+> structure. Since this change increases the napi_struct size from 400 to
+> 416 (according to pahole on my system), I've increased the assertion in
+> idpf by 16 bytes. No attention whatsoever was paid to the cacheline
+> placement of idpf internals as a result of this change.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>  .../networking/net_cachelines/net_device.rst  |  2 +-
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  2 +-
+>  include/linux/netdevice.h                     |  3 +-
+>  net/core/dev.c                                | 12 +++---
+>  net/core/dev.h                                | 40 +++++++++++++++++++
+>  net/core/net-sysfs.c                          |  2 +-
+>  6 files changed, 51 insertions(+), 10 deletions(-)
 
-> diff --git a/net/wireless/wext-core.c b/net/wireless/wext-core.c
-> index 838ad6541a17..d4b613fc650c 100644
-> --- a/net/wireless/wext-core.c
-> +++ b/net/wireless/wext-core.c
-> @@ -343,17 +343,22 @@ static const int compat_event_type_size[] =3D {
-> =20
->  /* IW event code */
-> =20
-> -void wireless_nlevent_flush(void)
-> +static void wireless_nlevent_flush_net(struct net *net)
->  {
->  	struct sk_buff *skb;
-> +
-> +	while ((skb =3D skb_dequeue(&net->wext_nlevents)))
-> +		rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
-> +			    GFP_KERNEL);
-> +}
-> +
-> +void wireless_nlevent_flush(void)
-> +{
->  	struct net *net;
-> =20
->  	down_read(&net_rwsem);
-> -	for_each_net(net) {
-> -		while ((skb =3D skb_dequeue(&net->wext_nlevents)))
-> -			rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
-> -				    GFP_KERNEL);
-> -	}
-> +	for_each_net(net)
-> +		wireless_nlevent_flush_net(net);
->  	up_read(&net_rwsem);
->  }
->  EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
+[...]
 
-Note 1: I just posted this patch yesterday:
-https://lore.kernel.org/linux-wireless/20241007214715.3dd736dc3ac0.I1388536=
-e99c37f28a007dd753c473ad21513d9a9@changeid/
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+> index f0537826f840..fcdf73486d46 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+> @@ -438,7 +438,7 @@ struct idpf_q_vector {
+>  	__cacheline_group_end_aligned(cold);
+>  };
+>  libeth_cacheline_set_assert(struct idpf_q_vector, 112,
+> -			    424 + 2 * sizeof(struct dim),
+> +			    440 + 2 * sizeof(struct dim),
+>  			    8 + sizeof(cpumask_var_t));
+>  
+>  struct idpf_rx_queue_stats {
 
-so that would conflict here, I'd think.
+Now that idpf was fixed separately [1], this will be removed in the
+v5.
 
-Note 2: the only other caller to wireless_nlevent_flush() is from
-wireless_nlevent_process()/wireless_nlevent_work, and that work could
-easily be made per netns since it comes along with net->wext_nlevents,
-and then we don't need any global function at all. Seems this could be
-implemented in wext_pernet_init()/wext_pernet_exit() pretty easily?
-
-johannes
+[1]: https://lore.kernel.org/netdev/20241004105407.73585-1-jdamato@fastly.com/
 
