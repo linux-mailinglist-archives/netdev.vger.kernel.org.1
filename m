@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-133350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD495995B8F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:21:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3FD995B93
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D07C1B236E3
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:21:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49034285646
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC72219CA1;
-	Tue,  8 Oct 2024 23:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FE72185A4;
+	Tue,  8 Oct 2024 23:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dfD7NWBj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILumA5YD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272D5219C9C;
-	Tue,  8 Oct 2024 23:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537AE218594
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728429635; cv=none; b=M70h4DJmaN/wK3rEtimoLFtJVjMD8SFGWnbLKUf9/gAKVtSva1zqin9GXIDlwFQzGgpE3JajAHcXwguNAzYP7sjPZtkS3kykzDxepXeQrlswQCWv/zh3iGwVum3iwUKV28zJcTZII8qE1gnyGSFvUefWT5UgbcBCE2bjLY8gCnk=
+	t=1728429678; cv=none; b=uMCTiy59TXUyCMhrjcb37Xiqej6hSELzIn8SFUNgNr8xiu3zaBUZVOeUaPyBCkdSJKdPxxqpZCnzPj2zVh2JRWK4T3g5fNEGOe61LfE7QwLknYmxM74doG86wWC12zBI04aMXc7EkOXgcWJaBSHy0Rs55EANCSe1n6NET7raW2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728429635; c=relaxed/simple;
-	bh=s6GlbP8OJ1MJm4pGr4Tvsiz8CQseoJ6ksn1gXjU6EwU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rvMXJJ7henthcihVKmp8OYH5RdaOIXQDg6sgQKOOHGw5HG38a34eb6DhqzWXem2U/zqMWyOzUl7tDMhg2HdEsWbTLfsUqdhN5xK5/HDoaQ7PIc90gxrf/ueYDDV7JWeA3rJbpFLW/9jpAb/CXT1xCyl+bTUrhdjVr6cd0hpy1iU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dfD7NWBj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 017D2C4CECD;
-	Tue,  8 Oct 2024 23:20:35 +0000 (UTC)
+	s=arc-20240116; t=1728429678; c=relaxed/simple;
+	bh=TSCizON5lR9Cjf1v9ABJPi4tqtOgZIyr2vFmSq606gs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rJoFM+seQbE07JcXRqCMqV6Oz6C/T0X1wYB0qZ4rN7n5eY3DbANoAgEEcNHBG8nb2SfCXn+Im2Uuxt7P/ulP+PP/bX0uCt7tcP4SZxVHIXOHvxdEOrX0dqgIvoFdTbElgVGsb7qj3y/H08SBGXIwbbeT7CyB7eCA6vfMp804TaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILumA5YD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E94AC4CEC7;
+	Tue,  8 Oct 2024 23:21:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728429635;
-	bh=s6GlbP8OJ1MJm4pGr4Tvsiz8CQseoJ6ksn1gXjU6EwU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dfD7NWBjpH4qjir0vz0l1u1xqrb2gIlUEOyR2BqfBy+fxEU9pqFJ0ihdwIXCCvQdo
-	 7CafPJSWYdHVjcPnBGV/zu/EFrB9A34MOW6Ra6lqcViPL91m5Uh02OwlmGFzFYpSzK
-	 5Qv7aHR7g3xWcChhFq4mM0ws4kVIrZY12E/PX0L0R186toHLBbNA2CtGAlMLBvyNtI
-	 0IP+a1iU8Wd7SDE6EfD/roGjoxoplBKDYe5OU+zRCnP2jJX9VQsX8ozejZ8E4SAlgo
-	 DmWvWNlJTw3s0EpRoESmTiFWWnmguAgtIRb9UEpvv/WBu5etFAaIiDUskKFMGCYu0Y
-	 JdZ08fDQH+TaQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C003A8D14D;
-	Tue,  8 Oct 2024 23:20:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728429678;
+	bh=TSCizON5lR9Cjf1v9ABJPi4tqtOgZIyr2vFmSq606gs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ILumA5YDIdjkZdG4Soz78Qc/eorLST1D2LkCxrxLpHQZQv2LKSCYDWMx7xNoTnw4c
+	 wVlIZ2VKwn3/1xS0+Vcro2s5bzsQ7Ugz9HTcnRbliBZIBIXPGzs92V6of855bb+JGD
+	 bhw6SyC6+vfnIHsz/fnEhDJqXGCQWTtXXWZvx4ZZDT7fYbcazLoTparSYaU5HDcOyy
+	 NMVvFyfJSqIDXg/yZLy2IF9Rw3V9FnL10AhYZ0q+9WmZ4hLdUbGJX4y01oPzNee7Ba
+	 XM6z0oJj7yVEUUbLoSDF30ZzUdDuirceucvcO9ozEdhlzSEeqWEe1F4juRlyqx5+1M
+	 3QxQqNOUwGFpw==
+Date: Tue, 8 Oct 2024 16:21:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, edumazet@google.com, Stanislav Fomichev
+ <stfomichev@gmail.com>
+Subject: Re: [PATCH v8 net-next 00/15] net: introduce TX H/W shaping API
+Message-ID: <20241008162116.7c63d85a@kernel.org>
+In-Reply-To: <cover.1727704215.git.pabeni@redhat.com>
+References: <cover.1727704215.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] chelsio/chtls: Remove unused chtls_set_tcb_tflag
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172842963898.718280.1085931231285223325.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Oct 2024 23:20:38 +0000
-References: <20241007004652.150065-1-linux@treblig.org>
-In-Reply-To: <20241007004652.150065-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: ayush.sawal@chelsio.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 30 Sep 2024 15:53:47 +0200 Paolo Abeni wrote:
+> We have a plurality of shaping-related drivers API, but none flexible
+> enough to meet existing demand from vendors[1].
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  7 Oct 2024 01:46:52 +0100 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> chtls_set_tcb_tflag() has been unused since 2021's commit
-> 827d329105bf ("chtls: Remove invalid set_tcb call")
-> 
-> Remove it.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] chelsio/chtls: Remove unused chtls_set_tcb_tflag
-    https://git.kernel.org/netdev/net-next/c/35213cfeefa5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Does not apply, you'll have to repost.
 
