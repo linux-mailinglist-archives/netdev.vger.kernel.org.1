@@ -1,112 +1,175 @@
-Return-Path: <netdev+bounces-133323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A77D995A07
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:22:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B975C995A0A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:25:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6AE8283429
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:22:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4322EB21885
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:25:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42166215005;
-	Tue,  8 Oct 2024 22:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639B3215003;
+	Tue,  8 Oct 2024 22:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V1JHCNHM"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="O8c5nTIm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEBC2139A8
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 22:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D47D714A82
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 22:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728426148; cv=none; b=AZGwwLWuGiLMrQIQfvN2V/OTrz/wQVyT5OXGdCdWWXsXakdLq3WQy9UZammF/KrQlor3hdSF69JgimmHySxl2IOfYkkhV5flWDMqEKOtoSKSarnZr8HhF4TTEHbBxAIBbAjzJO9Pbd79lL3vYpk+vHv6flkpJjr/MCIGBUn9aCM=
+	t=1728426312; cv=none; b=pwJGCwQ5lUXG2nSn/OlnXnPPC80qajm+9dMVp7nCeaSouZypujUbBbqgESv0L5ggBpG7kfVmfDWNGIz8DNFxwNyPfDZHxg1FqzkMkjJLXxYrTnGTc/mn0i2Img7vbK01N4uvFbacV53wyMA6Dcc3ncT1pJSoLlMiNE4QoAjpM0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728426148; c=relaxed/simple;
-	bh=MccBu7KW7dTQw0QT8KNJWntrJS4ZIEa0v6xwKmeKxb0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=i8yxV2ZEFRTIxgjrmhH6qlRq3ihrFoswPtIhsYCV8tiT2jOqK2O5oiNs299bb8KhMeFtofTybesLvJFco1GVpZFmD6zaBUzPN+IxiKRMQ1CFNkpaM/MX1e7CrrXl3siCz3O+LuivY0ZIuc5JBrqTqkNmDgnev+El2S6sBRqA7gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V1JHCNHM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC52C4CECD;
-	Tue,  8 Oct 2024 22:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728426146;
-	bh=MccBu7KW7dTQw0QT8KNJWntrJS4ZIEa0v6xwKmeKxb0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=V1JHCNHMAWZlI32H7SWOFNxGbaXRPEPegtkHpt5JHInfFurbF2AgEM71jSxZfx6lc
-	 LX0XaXGpFZUsPRWRkR7bdPF8KdizYUQVL29v9L2cErouCYP93/n9rgvDcCf5jeZbfb
-	 K4uqjt2eMtLKSrsRNsouGZ9tNMsG33rdUGLK3v2A/yh3PK0n0oxTL9r417K0jVG5lf
-	 6Npe1UhwWlve7lxE7GQu1AtwanalPJItIiDvBwbAOp3Piyavp7nJqYCX1UavzrDoUL
-	 SegwDV8jGI+J0Wb9+X9vMMX7yui4LGEO+RNDcNjshUxcGSyD48Wnidterm6NhEfNUO
-	 Dv3uv5Ekiy4LA==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Wed, 09 Oct 2024 00:21:47 +0200
-Subject: [PATCH net-next v2] net: airoha: Fix EGRESS_RATE_METER_EN_MASK
- definition
+	s=arc-20240116; t=1728426312; c=relaxed/simple;
+	bh=6xjWqoMjoS04Fu8Y/ReLttlzp2emX/zBTrOXdY7poa8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CEaO3/0vo5zhE/aE1Q1L6NRkwtvKCW3LBxrnv81PwlRZd5DxVms/mijC/qaBpxrzt3ohoUjg7uiGmh/7c6hVUL/WlPg76SWpE4lWDhuU9V3mGdDTi0jpbdy9j5jnNWs5eysWu4FQVz9Jc24qFlS+c7FP2hFT3mVSxb8Dn1Kv8oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=O8c5nTIm; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-208cf673b8dso68126855ad.3
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 15:25:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1728426310; x=1729031110; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oBtjijl+VgecyHMO/fQ1xjwWXBxhVsIl5s6BOBtNKSs=;
+        b=O8c5nTImXTJp4j6EzN34BiN1vfiu7mrRI4PpEkFBFyrYrLLGk3YC/IE0/JGATKZJud
+         bI+t1GLegHlMnaIPJi1nSUFagKTyUWHKaLwt12l2cqM8njjSrNbjNuKNZCpKqBpsqMvW
+         odFGVSbU5o69A3R+q6EPPlpVR3mLTsZtusqp8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728426310; x=1729031110;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oBtjijl+VgecyHMO/fQ1xjwWXBxhVsIl5s6BOBtNKSs=;
+        b=DiFNDAsehjlqQ0oSYM2Z9kGCmZZUhyjzoDa+z/31sn/7eWCSsx6i3IUEE9t7hifDvf
+         ILYehoo5KduSOeWdYuG3YxUfuKDH92kmO9urLufQU64QJNaafXc31+SzlLSDtLEIuJyV
+         LNM0LJZSLyYJi8ttWhTtE5Z0vF2tJ0+z0KpIG9xEvsAzkUap5nJTY1G9KGiw5kzALgli
+         3Km2FD/IcaSQ52LEaa16RAR396Zw7FwigM2CuzrWQiQ8+lrd8EXDL+bbKpPST6Mqgl3r
+         hpbVKnKi+HpWAVSuMqHXAAbPdBNGXSs3mXDTxW1RPC0i5HWRp7NpdXi/6w6iCgJNFxET
+         3fCg==
+X-Forwarded-Encrypted: i=1; AJvYcCX8kU0N/TCFGB0j4dFyZaEfg82/dbf4OxdflXiwsM6KTQ0sn5aWYNTsoGANSnxPh7K+hPAyykA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw1+Ai6iJ+kL0J781UGfenEyxAgaL09+q2XpE0aBRSTcM9nsIc6
+	V16z2B8DEKYuU8soOjHv9RGt/UmcSFyyaieRZGN3MJaiFnDRuzMNDMArtfdNJAI=
+X-Google-Smtp-Source: AGHT+IHjokayAWXB/wBd7DPiiHew11bkwY08IBmzQRFlhWrxAfQO5L7a6FUAkg0Z9Ei5TUfmPNeyWg==
+X-Received: by 2002:a17:903:187:b0:20b:b0ab:4fc3 with SMTP id d9443c01a7336-20c6378d269mr6733225ad.49.1728426310185;
+        Tue, 08 Oct 2024 15:25:10 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cbbc2sm59955925ad.78.2024.10.08.15.25.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 15:25:09 -0700 (PDT)
+Date: Tue, 8 Oct 2024 15:25:06 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH v1 08/15] net: add helper executing custom callback from
+ napi
+Message-ID: <ZwWxQjov3Zc_oeiR@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-9-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241009-airoha-fixes-v2-1-18af63ec19bf@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAHqwBWcC/3WMQQrCMBBFr1Jm7UgSAymuvId0Ma3TZlAamUhQS
- u5u7N7l+5/3NsiswhnO3QbKRbKktYE7dDBFWhdGuTUGZ5y3xngk0RQJZ3lzxp6IehvC6E4emvJ
- U3o9mXIfGUfIr6WevF/tb/4SKRYtuDGQsz1Nw4XJnXflxTLrAUGv9AtFxLQCpAAAA
-X-Change-ID: 20241004-airoha-fixes-8aaa8177b234
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Mark Lee <Mark-MC.Lee@mediatek.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Jacob Keller <jacob.e.keller@intel.com>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241007221603.1703699-9-dw@davidwei.uk>
 
-Fix typo in EGRESS_RATE_METER_EN_MASK mask definition. This bus in not
-introducing any user visible problem since, even if we are setting
-EGRESS_RATE_METER_EN_MASK bit in REG_EGRESS_RATE_METER_CFG register,
-egress QoS metering is not supported yet since we are missing some other
-hw configurations (e.g token bucket rate, token bucket size).
+On Mon, Oct 07, 2024 at 03:15:56PM -0700, David Wei wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
 
-Introduced by commit 23020f049327 ("net: airoha: Introduce ethernet support
-for EN7581 SoC")
+[...]
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
-Changes in v2:
-- improve commit log
-- Link to v1: https://lore.kernel.org/r/20241004-airoha-fixes-v1-1-2b7a01efc727@kernel.org
----
- drivers/net/ethernet/mediatek/airoha_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> However, from time to time we need to synchronise with the napi, for
+> example to add more user memory or allocate fallback buffers. Add a
+> helper function napi_execute that allows to run a custom callback from
+> under napi context so that it can access and modify napi protected
+> parts of io_uring. It works similar to busy polling and stops napi from
+> running in the meantime, so it's supposed to be a slow control path.
+> 
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 942fcfc5b79972e1bbda06e6e5c07302cab0affa..b3601a56bda3ec63500e0df4809102f3f0ec940f 100644
---- a/drivers/net/ethernet/mediatek/airoha_eth.c
-+++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -554,7 +554,7 @@
- #define FWD_DSCP_LOW_THR_MASK		GENMASK(17, 0)
- 
- #define REG_EGRESS_RATE_METER_CFG		0x100c
--#define EGRESS_RATE_METER_EN_MASK		BIT(29)
-+#define EGRESS_RATE_METER_EN_MASK		BIT(31)
- #define EGRESS_RATE_METER_EQ_RATE_EN_MASK	BIT(17)
- #define EGRESS_RATE_METER_WINDOW_SZ_MASK	GENMASK(16, 12)
- #define EGRESS_RATE_METER_TIMESLICE_MASK	GENMASK(10, 0)
+[...]
 
----
-base-commit: 42b2331081178785d50d116c85ca40d728b48291
-change-id: 20241004-airoha-fixes-8aaa8177b234
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1e740faf9e78..ba2f43cf5517 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -6497,6 +6497,59 @@ void napi_busy_loop(unsigned int napi_id,
+>  }
+>  EXPORT_SYMBOL(napi_busy_loop);
+>  
+> +void napi_execute(unsigned napi_id,
+> +		  void (*cb)(void *), void *cb_arg)
+> +{
+> +	struct napi_struct *napi;
+> +	bool done = false;
+> +	unsigned long val;
+> +	void *have_poll_lock = NULL;
+> +
+> +	rcu_read_lock();
+> +
+> +	napi = napi_by_id(napi_id);
+> +	if (!napi) {
+> +		rcu_read_unlock();
+> +		return;
+> +	}
+> +
+> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+> +		preempt_disable();
+> +	for (;;) {
+> +		local_bh_disable();
+> +		val = READ_ONCE(napi->state);
+> +
+> +		/* If multiple threads are competing for this napi,
+> +		* we avoid dirtying napi->state as much as we can.
+> +		*/
+> +		if (val & (NAPIF_STATE_DISABLE | NAPIF_STATE_SCHED |
+> +			  NAPIF_STATE_IN_BUSY_POLL))
+> +			goto restart;
+> +
+> +		if (cmpxchg(&napi->state, val,
+> +			   val | NAPIF_STATE_IN_BUSY_POLL |
+> +				 NAPIF_STATE_SCHED) != val)
+> +			goto restart;
+> +
+> +		have_poll_lock = netpoll_poll_lock(napi);
+> +		cb(cb_arg);
 
-Best regards,
--- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+A lot of the above code seems quite similar to __napi_busy_loop, as
+you mentioned.
 
+It might be too painful, but I can't help but wonder if there's a
+way to refactor this to use common helpers or something?
+
+I had been thinking that the napi->state check /
+cmpxchg could maybe be refactored to avoid being repeated in both
+places?
 
