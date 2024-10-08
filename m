@@ -1,134 +1,158 @@
-Return-Path: <netdev+bounces-133177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FFAC99538C
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:43:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC658995391
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:44:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5947F2867CF
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:43:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AA881C2566C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840101DFE2A;
-	Tue,  8 Oct 2024 15:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q11gW83x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7323B1E0B89;
+	Tue,  8 Oct 2024 15:44:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E93751E00A9;
-	Tue,  8 Oct 2024 15:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9423218C327;
+	Tue,  8 Oct 2024 15:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728402212; cv=none; b=MnqvTeDAcxmjAlvx4nde7QsTV9MRnCLIZmyNt/S/taQDJvaJsr775gwUbt+OArWxzNEW2FzbpW4ELnT9+eNt/Vnbs6R7+MFP18liHxqhaRbpBcBwo4HvPf0WCTl9IbGHherjtWpXyFnUIDNMMXA0LsOWNera+mVt5H/NxnC+MPw=
+	t=1728402268; cv=none; b=NPilWDZw+2iDn7/NB4wGr1w1gq5OXZeCn/NuavRKb+vReHSMr93CW7I96/gSuVF7+8GuzC0TITyU4/EimhgElGwfvtjb7Lhe8+d62ZbA8m7dBBbozXp1ko/TKQDXKXmjStQ+ddhoypwXE76n/+4mJ892dwxfrTiUfNPH8ct96KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728402212; c=relaxed/simple;
-	bh=brHLlY72/GncTnEuBgT8e226cpJvC5KqmOW0N8WnbLA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Lq0wuLSxcPlsjxENCD5Zl0/d3lfJdEG6GNWwZRJyWAv+r0nDM5cHHSKqDFfKGO7kEq5FGKXd3Qhoovj8y9E6BT1gcT2C7gwngKo38dhioQwCuwU70gTSscBiFusV6PmtQFHp8aUVfWS8w0ElJm8AWVFHiV63pvsLXF4Td498tas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q11gW83x; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-50a0bf4d4b8so1685621e0c.2;
-        Tue, 08 Oct 2024 08:43:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728402210; x=1729007010; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsNjO1HOPCQFWV2E8M3vz66X/+fWZEsDvarBeVLdydA=;
-        b=Q11gW83xrrEX6B+qoU+/zV+RZtEzmxA+rzk9AYTMbud7Y8kPBlASuK3PwABMJLZp3a
-         R6arUhY0VQedrQGXhC6zKTNDQIcDlM/RUFfB3eowezRFEX+dgepOOPjyggBAJsytwdEG
-         Cwh8RZ4dX+tKwYDQSIk8Yey5W48iWESe8NabFZW9djp83vXjkLXD11rUj/IN6/4EhMud
-         iN2B3ms1W8pNaOTOk+Z1kHh1Ws/lyyhst//MENvGPQcJ+kVONEzDucspqAJEvt6Cq1Eo
-         nW4ONI96O1yG59ZUsNhq2d0RgViH2egWE7T25RvwVOO5opVEAOuylDNbvW8Ci/wyjI0L
-         KwcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728402210; x=1729007010;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QsNjO1HOPCQFWV2E8M3vz66X/+fWZEsDvarBeVLdydA=;
-        b=tAJPf25wDKC4xGPGV8JwPeYptEghqQ4rRzMx3zKtryYKq9UDSJ524DpJl9kkMILv1y
-         WDcqXyNeMFqASKgz/iNk5ptSMyHFSCYiBKsfUtSjh+T4dX6pAlnDT9cqqqcgS1kUL2rP
-         c/6+jmzAfSYjU+zkL+KH2FMfnMmnXD9DDKvNwPtws4utPalTlIbviY8TkEtiBsrbrsnS
-         t601JhrbDxLTdVgDm4ECIRH/oEU6EFtZesa+7KbVa8jgZZDv7ye4poDoGJ+k36F4rGRx
-         mOsUOfJzt+Ksx3RCGPfXFMB7AGpMfnQOkp9zzCRUh+9tzSpae9tpxEHuSliWgV50k/iO
-         9HaA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5p4EIoAQPAcchiJ+aiTY+XPiOijvJi+HYMKd9AxIb3/9hSkOnR/ZiWMn/UZC2lXt4cVHLXX5d/nwvdgk=@vger.kernel.org, AJvYcCXCW+HsmIp2lKExgkwbIxmZ3YrPjDQsXjVRgbQ5O/YsCDR+ntHsLx6N0Nbz6C8OVvJyVCsXt56Y@vger.kernel.org
-X-Gm-Message-State: AOJu0YztwF3i3dEX2K4K4WcZhs0NDcCsHWvShtCArqKNFPUEDB35zh6V
-	CiZ5FwRQNoDQ8YkMq1zIG52XTd7HTjA1NBP2FZPB51E5k6uDDCdKtNnpd3q8w9U2OvKiivrjK18
-	uOXBC0tPhnafXuGoNFRAsYSCXh9rY0w==
-X-Google-Smtp-Source: AGHT+IENMVPLWqbIiJCBonkG/yvO/XS8srG6VQJqZeMk6pUio0yBGJab8roG+JjwjeZMfaeMCfXVJXtbQhdK9IdS13A=
-X-Received: by 2002:a05:6122:91d:b0:50a:318:b39d with SMTP id
- 71dfb90a1353d-50c8543a748mr10364358e0c.2.1728402209777; Tue, 08 Oct 2024
- 08:43:29 -0700 (PDT)
+	s=arc-20240116; t=1728402268; c=relaxed/simple;
+	bh=j2O2vvbQsRzozuJK5x8FZ7BszygrUj3FutD9s91tQs4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VjWfB+AWtRxhr/9oj1NRZv+93ZBEB1M2zU2es4BZyJfu+0Fb5HbLpD9KbFpkA1Ep/GuFP2Uq1AGCTWX7ujh7xwJCE7qcFncc6MuucSvjmJjxYYTqeFbBkfNvMX0zbmaKWaJlp/BryPzLfm07VVFUH3XOn0DW+sDGWjGFcDcZ3IA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=53202 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1syCNo-008k9X-1n; Tue, 08 Oct 2024 17:44:22 +0200
+Date: Tue, 8 Oct 2024 17:44:18 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Amedeo Baragiola <ingamedeo@gmail.com>, Roopa Prabhu <roopa@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	bridge@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] bridge: use promisc arg instead of skb flags
+Message-ID: <ZwVTUt_ie0sMsjbk@calendula>
+References: <20241005014514.1541240-1-ingamedeo@gmail.com>
+ <c06d9227-dcac-4131-9c2d-83dace086a5d@blackwall.org>
+ <ZwVCC3DYWw0aiOcJ@calendula>
+ <8f285237-757b-4637-a76d-a35f27e4e748@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241006163832.1739-1-kdipendra88@gmail.com> <20241008132024.GN32733@kernel.org>
-In-Reply-To: <20241008132024.GN32733@kernel.org>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Tue, 8 Oct 2024 21:28:18 +0545
-Message-ID: <CAEKBCKMrtLm1j3dU+H12Oy8635Ra2bZ6eFfxdixTvYwSEEyaJQ@mail.gmail.com>
-Subject: Re: [PATCH net v3 0/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
-To: Simon Horman <horms@kernel.org>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, maxime.chevallier@bootlin.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8f285237-757b-4637-a76d-a35f27e4e748@blackwall.org>
+X-Spam-Score: -1.8 (-)
 
-Hi Simon,
+On Tue, Oct 08, 2024 at 05:45:44PM +0300, Nikolay Aleksandrov wrote:
+> On 08/10/2024 17:30, Pablo Neira Ayuso wrote:
+> > Hi Nikolay,
+> > 
+> > On Sat, Oct 05, 2024 at 05:06:56PM +0300, Nikolay Aleksandrov wrote:
+> >> On 05/10/2024 04:44, Amedeo Baragiola wrote:
+> >>> Since commit 751de2012eaf ("netfilter: br_netfilter: skip conntrack input hook for promisc packets")
+> >>> a second argument (promisc) has been added to br_pass_frame_up which
+> >>> represents whether the interface is in promiscuous mode. However,
+> >>> internally - in one remaining case - br_pass_frame_up checks the device
+> >>> flags derived from skb instead of the argument being passed in.
+> >>> This one-line changes addresses this inconsistency.
+> >>>
+> >>> Signed-off-by: Amedeo Baragiola <ingamedeo@gmail.com>
+> >>> ---
+> >>>  net/bridge/br_input.c | 3 +--
+> >>>  1 file changed, 1 insertion(+), 2 deletions(-)
+> >>>
+> >>> diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
+> >>> index ceaa5a89b947..156c18f42fa3 100644
+> >>> --- a/net/bridge/br_input.c
+> >>> +++ b/net/bridge/br_input.c
+> >>> @@ -50,8 +50,7 @@ static int br_pass_frame_up(struct sk_buff *skb, bool promisc)
+> >>>  	 * packet is allowed except in promisc mode when someone
+> >>>  	 * may be running packet capture.
+> >>>  	 */
+> >>> -	if (!(brdev->flags & IFF_PROMISC) &&
+> >>> -	    !br_allowed_egress(vg, skb)) {
+> >>> +	if (!promisc && !br_allowed_egress(vg, skb)) {
+> >>>  		kfree_skb(skb);
+> >>>  		return NET_RX_DROP;
+> >>>  	}
+> >>
+> >> This is subtle, but it does change behaviour when a BR_FDB_LOCAL dst
+> >> is found it will always drop the traffic after this patch (w/ promisc) if it
+> >> doesn't pass br_allowed_egress(). It would've been allowed before, but current
+> >> situation does make the patch promisc bit inconsistent, i.e. we get
+> >> there because of BR_FDB_LOCAL regardless of the promisc flag.
+> >>
+> >> Because we can have a BR_FDB_LOCAL dst and still pass up such skb because of
+> >> the flag instead of local_rcv (see br_br_handle_frame_finish()).
+> >>
+> >> CCing also Pablo for a second pair of eyes and as the original patch
+> >> author. :)
+> >>
+> >> Pablo WDYT?
+> >>
+> >> Just FYI we definitely want to see all traffic if promisc is set, so
+> >> this patch is a no-go.
+> > 
+> > promisc is always _false_ for BR_FDB_LOCAL dst:
+> > 
+> >         if (dst) {
+> >                 unsigned long now = jiffies;
+> > 
+> >                 if (test_bit(BR_FDB_LOCAL, &dst->flags))
+> >                         return br_pass_frame_up(skb, false);
+> > 
+> >                 ...
+> >         }
+> > 
+> >         if (local_rcv)
+> >                 return br_pass_frame_up(skb, promisc);
+> > 
+> >>> -	if (!(brdev->flags & IFF_PROMISC) &&
+> >>> -	    !br_allowed_egress(vg, skb)) {
+> >>> +	if (!promisc && !br_allowed_egress(vg, skb)) {
+> > 
+> > Then, this is not equivalent.
+> > 
+> > But, why is br_allowed_egress() skipped depending on brdev->flags & IFF_PROMISC?
+> > 
+> > I mean, how does this combination work?
+> > 
+> > BR_FDB_LOCAL dst AND (brdev->flags & IFF_PROMISC) AND BR_INPUT_SKB_CB(skb)->vlan_filtered
+> 
+> The bridge should see all packets come up if promisc flag is set, regardless if the
+> vlan exists or not, so br_allowed_egress() is skipped entirely.
 
-On Tue, 8 Oct 2024 at 19:05, Simon Horman <horms@kernel.org> wrote:
->
-> On Sun, Oct 06, 2024 at 04:38:31PM +0000, Dipendra Khadka wrote:
-> > This patch series improves error handling in the Marvell OcteonTX2
-> > NIC driver. Specifically, it adds error pointer checks after
-> > otx2_mbox_get_rsp() to ensure the driver handles error cases more
-> > gracefully.
-> >
-> > Changes in v3:
-> > - Created a patch-set as per the feedback
-> > - Corrected patch subject
-> > - Added error handling in the new files
-> >
-> > Dipendra Khadka (6):
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_common.c
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_ethtool.c
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_flows.c
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in cn10k.c
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dmac_flt.c
-> >   octeontx2-pf: handle otx2_mbox_get_rsp errors in otx2_dcbnl.c
-> >
-> >  drivers/net/ethernet/marvell/octeontx2/nic/cn10k.c   |  5 +++++
-> >  .../net/ethernet/marvell/octeontx2/nic/otx2_common.c |  4 ++++
-> >  .../net/ethernet/marvell/octeontx2/nic/otx2_dcbnl.c  |  5 +++++
-> >  .../ethernet/marvell/octeontx2/nic/otx2_dmac_flt.c   |  9 +++++++++
-> >  .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c    | 10 ++++++++++
-> >  .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c  | 12 ++++++++++++
-> >  6 files changed, 45 insertions(+)
->
-> Thanks for bundling this up in a patch-set.
->
-> For reference, it does seem that the threading of this patchset is broken.
-> Perhaps there was some option you passed to git send-email that caused
-> this. In any case, please look into this for future submissions.
->
-> Also, please use ./scripts/get_maintainer.pl patch_file to generate
-> the CC list for patches.
->
-> Lastly, b4 can help with both of the above.
+I see, but does this defeat the purpose of the vlan bridge filtering
+for BR_FDB_LOCAL dst while IFF_PROMISC is on?
 
-Sure, thanks for this.
-Do I have to send all the patches again with v4 with the new changes
-to the few patches and the same old unchanged patches?
+> As I commented separately the patch changes that behaviour and
+> suddenly these packets (BR_FDB_LOCAL fdb + promisc bit set on the
+> bridge dev) won't be sent up to the bridge.
 
-Best Regard,
-Dipendra Khadka
+I agree this proposed patch does not improve the situation.
+
+> I think the current code should stay as-is, but wanted to get your
+> opinion if we can still hit the warning that was fixed because we
+> can still hit that code with a BR_FDB_LOCAL dst with promisc flag
+> set and the promisc flag will be == false in that case.
+
+Packets with BR_FDB_LOCAL dst are unicast packets but
+skb->pkt_type != PACKET_HOST?
 
