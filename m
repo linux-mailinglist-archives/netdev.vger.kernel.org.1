@@ -1,101 +1,133 @@
-Return-Path: <netdev+bounces-133223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE15B995573
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:17:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3C599557E
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:20:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A0D41F21B86
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:17:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F16651C217C1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67D81F9A9F;
-	Tue,  8 Oct 2024 17:17:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F7F1F9AAF;
+	Tue,  8 Oct 2024 17:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fAh0ynRY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O9GbM27K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33A781F943E;
-	Tue,  8 Oct 2024 17:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327881E1A08;
+	Tue,  8 Oct 2024 17:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728407824; cv=none; b=gdVFzvDBhp4k4Zb6lkY4J9fwaDv2iq3UGYGwZicDcjznEgJC2gpgdan87RDht6hYl7LRvLzrUx4oNi8h9SmAbzgKvvWozo0LdmmIDacRbluXGgxZUyik0Cjt+BKJRF6f+iToC51gn1xjNxOKUDeEvcfe/Vh9cVnvW3H3YKoE4nw=
+	t=1728408006; cv=none; b=Rn25ZCbpbyRh54CSPTNraWdmmzdQ7Rr70A/o34Rfyk9dYZJuXOkHy9KKKILVyNC3VHMwApQWMgtZaG+bpvar0GDqB2B0G8uICmfdQQSNDYJMbEaNLt686dodd6Jlt7vBLHhM3nk6MqzLkZwIZHV2Jmv8pljDEKbz4woD8+TxPDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728407824; c=relaxed/simple;
-	bh=OjUSR2PF13JtkSK4P44cBDx3HSO9zrtYh8NlSmy4W0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJH4KVrzh6ePu7LTgV6QskhYXjRMnRn3KpjLMnywLrYRjF/6WnfFqT6gos/nqk1Q1TOBgyQmosmLEHwhhyqFSUINJvyfkbCYYzz22zLDh3dRRJGVDTWO+VCXzHZE8W++TQP0Jq6mjYL4CBPMafK4RmeQBgK9YPrTCF3HwNhauXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fAh0ynRY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=BYelIuhdwCMOp3hSfF4Y8G97oI/WtzSte+kcZyAyHKI=; b=fA
-	h0ynRYZ6/Vf0avTjGHz/KkJjBpq7V/rlFiFTnOM68+y0adeEbG3leHqJkp8wG1zoFleHFHqoVjP2K
-	6RQmBUEfm3r6/nvcPH+S5kckWJDDn7+TIkRAGO/FEkGi4T3Rago9VvFaULgFtqnk1xc3Me4e83vaH
-	oS22lCoY8zM6u2g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1syDpC-009Ob7-R5; Tue, 08 Oct 2024 19:16:42 +0200
-Date: Tue, 8 Oct 2024 19:16:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>, Alice Ryhl <aliceryhl@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, anna-maria@linutronix.de,
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <df2c9ea8-fa3a-416e-affd-b3891b2ab3f7@lunn.ch>
-References: <ZwG8H7u3ddYH6gRx@boqun-archlinux>
- <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch>
- <ZwPT7HZvG1aYONkQ@boqun-archlinux>
- <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
- <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
- <ZwPsdvzxQVsD7wHm@boqun-archlinux>
- <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
- <ZwRq7PzAPzCAIBVv@boqun-archlinux>
- <c3955011-e131-45c9-bf74-da944e336842@lunn.ch>
- <CANiq72m3WFj9Eb2iRUM3mLFibWW+cupAoNQt+cqtNa4O9=jq7Q@mail.gmail.com>
+	s=arc-20240116; t=1728408006; c=relaxed/simple;
+	bh=V4zdqUC6VB1LXKRGgJUj/RJKtO246Elyw+hwclk5nik=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jkk/Zkk9R9bT3blpT6NBKQJdORnoyJzZ7MI7wUKTyiNq8wv3Pu8xMLoNeoefOidPrzbcuJ8LlYM9zyGc9oRPbY9MLcEd4pBRv//7D5/M/xMJDhb1KFtNzGO5LrOGyuAc5UG62r3rqa93PIDUW0kkb6l+nr6gV5Ediv+DWVihzBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O9GbM27K; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0844540006;
+	Tue,  8 Oct 2024 17:19:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728408001;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dq0/sc4JpzgfCBB0HQCf5pqmInt6zBed91zJbKhlDwg=;
+	b=O9GbM27K1fmfdiJxxGVRU3ymaoYMzq41KRPUN6VlG7+YMkBhXbh/QD575GoEeIP3wfQidf
+	WjM7+S/1yY4gT4JqmAeU0fLJ7jy0b915Kxj5aDBNLc2UyK6cDx8XPRCjaSpNcAq1NoD+6Y
+	y2L5z4DCs41SyD/dtkOeS/5OR60DfoVTwM9cd46+jNjoUojumFLyrtEPmUDDSx1Tz9XM+7
+	KJstTty7+cxPugNxMCBiniC8hx/Anhwtp8ulmrZWlGUbwY0Pj8mjKby8DVJVJjJqYyDbFr
+	6ru5MMVljLOafVEjG4V7BkY9jeND66nkaarvdPsQWvHONiyMeQ/Ev1hEbJVhcw==
+Date: Tue, 8 Oct 2024 19:19:58 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
+ get and set phy configuration
+Message-ID: <20241008191958.712a2f51@device-21.home>
+In-Reply-To: <ZwVmQXVJMmkIbY1D@shell.armlinux.org.uk>
+References: <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
+	<20241007123751.3df87430@device-21.home>
+	<6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
+	<20241007154839.4b9c6a02@device-21.home>
+	<b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
+	<20241008092557.50db7539@device-21.home>
+	<f1af0323-23f5-44fd-a980-686815957b5a@lunn.ch>
+	<20241008165742.71858efa@device-21.home>
+	<ZwVPb1Prm_zQScH0@shell.armlinux.org.uk>
+	<20241008184102.5d1c3a9e@device-21.home>
+	<ZwVmQXVJMmkIbY1D@shell.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANiq72m3WFj9Eb2iRUM3mLFibWW+cupAoNQt+cqtNa4O9=jq7Q@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Oct 08, 2024 at 03:14:05PM +0200, Miguel Ojeda wrote:
-> On Tue, Oct 8, 2024 at 2:13 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > As far as i see, might_sleep() will cause UAF where there is going to
-> > be a UAF anyway. If you are using it correctly, it does not cause UAF.
+On Tue, 8 Oct 2024 18:05:05 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
+> > What I mean is the ability for users to see, from tools like ethtool,
+> > that the MCBin doubleshot's eth0 and eth1 interfaces have 2 ports
+> > (copper + sfp), and potentially allow picking which one to use in case
+> > both ports are connected.
+> > 
+> > There are mutliple devices out-there with such configurations (some
+> > marvell switches for example). Do you not see some value in this ?  
 > 
-> This already implies that it is an unsafe function (in general, i.e.
-> modulo klint, or a way to force the user to have to write `unsafe`
-> somewhere else, or what I call ASHes -- "acknowledged soundness
-> holes").
+> Many PHYs that have two media facing ports give configuration of the
+> priority between the two interfaces, and yes, there would definitely be
+> value in exposing that to userspace, thereby allowing userspace to
+> configure the policy there.
+
+Great !
+
+> This would probably be more common than the two-PHY issue that we're
+> starting with - as I believe the 88e151x PHYs support exactly the same
+> thing when used with a RGMII host interface. The serdes port becomes
+> available for "fiber" and it is only 1000base-X there.
+
+True, I've seen several setups with this so far indeed, as well as with
+PHYs from other vendors.
+
+> I was trying to work out what the motivation was for this platform.
+
+It also turns out that the MCBin is one of the only boards that has a
+permanent spot on my desk, as it's a pretty nice platform to experiment
+with various PHY aspects.
+
 > 
-> If we consider as safe functions that, if used correctly, do not cause
-> UB, then all functions would be safe.
+> Sorry if you mentioned it at NetdevConf and I've forgotten it all,
+> it was quite a while ago now!
 
-From what i hear, klint is still WIP. So we have to accept there will
-be bad code out there, which will UAF. We want to find such bad code,
-and the easiest way to find it at the moment is to make it UAF as fast
-as possible. might_sleep() does that, __might_sleep() does not, and
-using neither is the slowest way.
+No worries :)
 
-	Andrew
+> 
+> Thanks!
+
+Thanks for your feedback on that whole topic,
+
+Maxime 
+
 
