@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-133261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB9F9956A0
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:34:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EB89956A2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 528E0B20B6A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:34:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC16D1F25B75
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F8C212D38;
-	Tue,  8 Oct 2024 18:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED81D213ED1;
+	Tue,  8 Oct 2024 18:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="f2hn3F6L"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ri0VqNx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2071.outbound.protection.outlook.com [40.107.92.71])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2061.outbound.protection.outlook.com [40.107.237.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6D8212D3F
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A28213EFE
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728412399; cv=fail; b=dY1ytBfaZD6QLbp9pilvngKDfoA6YpD7B4rVU/a+qC/LTUAjveBNHwNw1aNhb0dF/3Oe/YJPxuTQ+/7dzSp52DaOKiegVHEJD/1lGYLZdR3AUI5yC/zQNZNNdvTohYKtjT3XvzuKsCrBCqbFLLTsjs2Ps3b7uDn8Ypzy6ujbUaY=
+	t=1728412411; cv=fail; b=dVh0ZTDADUGr8amyWiF756JGbkqMlAWvRFWWahFYaC6BSN1KlQdLtA51J/7zKiU3eS6Cl5cCz8OX2W2iQ8+csNcuxYpSCEy18JpIq4UnV0b1H7lRsPHzx3PCSaEtonpZ47Gi+m3y96kYmAFjgtZxKVZp8vjzQw3yAY7duX3ZMYc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728412399; c=relaxed/simple;
-	bh=//qYrnhUvNz8H4i99vBYhXHPEb0fEcIa6X+wLf7sliA=;
+	s=arc-20240116; t=1728412411; c=relaxed/simple;
+	bh=Mtfz4zXMaFpZJhOzpw7xif/mWEK3K2tGVr3qdLx9SC0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t7kGg2xx9+ogAMgGvkqAxpY1O7TMYFZqJcFzhy/0FzDV0/V5RXDXyxbFtUBxJ2g10sJtejxlmol4fMgsmqOIVWpKuSEp1j9oUSnpnSUUNcPTtfpsRco2XiAhy2PmX4YPu1wqHFBvE/6NBUhX4psRcTaw3LlobrrWfVsUuGFkdfo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=f2hn3F6L; arc=fail smtp.client-ip=40.107.92.71
+	 MIME-Version:Content-Type; b=BwAcD8dcRKmzx5gGXsYEssbXSnnSYYVtEEI12DL2rfe/L3KRyDf3BQmyxKBnJoGsGu6vdjSEoapMvFX6DCmmkAW9QBlhyW7785Wc1HAVvH6W3LqWn7tDl/b1hb6/4dO7WaUFFP0TyQiLlFnMxg9PU/kotbp39Da0KkIBVSZE+Ko=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ri0VqNx9; arc=fail smtp.client-ip=40.107.237.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=saQQcHJDCVuLXmRRYI03eH9r9Yf0tLZONqFAboCt6jZqOOmyuXlLPLD7bQlNdB/OLaNn9OJaRNNC4QwtSsFWtQByucp6Vu9ZmPdQPQ1585c5wRY8cCvXPjT34MjZJbAUbNLmv2hKHvz9PNqBtUIMV/yTYnh7JbhyjL5hnoKeWkd7n5kTjzIsisMRPAhbgdh0G6oGEY+CuulLvU74UcUoLAsIoRw9v1XwU+sov6YjTeDo/LT4AwvvIfb5w3aRYJ7LNF3sy6E/jSbFuDjHJJiJmOaP/30dBmBX2yKsxTiiAtdIjesWvp1JYbybAf6dDr0eiQjzFBrHsQ9Qiaq7BchWvw==
+ b=GlGBusjZBP5vNJQj4D7hVFHmHYhPWMGIyX83K0zoKRA3938fLEwuNIFYb8y8FHnjoPNuUaVTFSYOKdxBtn8JGk37tY7jx/w4AliMozHMLvq2ocdyHAryiNgQFVc142JjqtoKbaa9Zxqk1XUCmzcBe1U+MNyj7vH9JAWOJPwuO7Ss+uqY/RYeI2ajjsJcKVBpvmM2WZRCbLYCpQ07wvhehVd91imA0c3fTkD33DtfDnlBQqFsVD5KgT81/7AEixbilJMAvjE1BlNXuGihT+JlDYd83FzYwaCFl8WT0msyD3Df+Fqmz3/Zvmbgvd9L8jHNoerxGXGOQ1VPKyDxkfRK0A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PDLVhTgRfXfdma4BKzVztYkU3ugJUF28Vp8kwVGjAoA=;
- b=xgCci/3rReCuDZ9Bs2dNEvYeBGneXFCxp+kBlBRcLqo0YociPpPiz77IdRsFgUKG3yqmQ6Tb+3YlRwb31XSF3k0q0Y2kLirTnqbPTCbw1mUd6vozPwJHjO4R4RKnXdmq5h/rgCYUnmdk203rZD4edJItOC4sAKsBDAZ4ZyYjQIwqA6pxcvfNR6k17l3Pi3qrr9qOd4PC2CAenHkGs2Xi+itP8D2m2+lup+g60cA+TuW/YKuaVCPmWujQnEz5+HrmjnLO26otod6yq3DEVuxMEBNKffqEdVvpS4Dhd7f+LpqdhA76eUe6NgsYxtTyg+SPq+QOpVopg++vuHsJiqgGaQ==
+ bh=YWgY10692yxidj2M5/1VaQ8/XE1lo5yllzVLXHqyMKQ=;
+ b=ZupRoX4bpNWylzF4f0+ckh+DDXPpe3dCDRp9+z8QClgMEc4DXZmphyl2dBxnGaQWMbD2cPb8EZGE7wphXJz48j7A0fLqoqsa6T0nwQqsAjRlkh9gQ9kKKTNbGEHWlTJI/OSAVNPluG1Bozlfwd/EcCPLspw3NaN0VvYkeixr23GAyRjCQoqFRjcmM2SAGPa5Wv6fGoAA6TiUgQOyZM4CjlQqPWWATV7HNemc19ldw3riA/CVo5VrGQZvKpl1f2WcpvdjM4b12Hmmx3G2opeR7GyXFvSRSHV+vyqr2gJxNB7IuFnp0noW5R3EPy1665z6FJZnEzIV6yqr85R0eEXzOA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PDLVhTgRfXfdma4BKzVztYkU3ugJUF28Vp8kwVGjAoA=;
- b=f2hn3F6LsqUFEOULvt4svWRqIzwQ+qr4FXXzIJtTx+BNcxBq6tJiasFErjoj5Vqfw1MVrXfzP9ZtjVs93c/a3zl7Mv8kMRmaNtyxQUkGzaf7NzcjLcZCmqy4DDgHuLmLOTYJ5+0+auZW1QEBTe3xYXdqzBZt0PT4euqqV2+1c26gmK6o8/DmP+GIMwjvZZ1YoTWnDmgYFPT/yvDn+oh0UKkU0etumoE4csmn+0SdWFXPypoE1h4qA5qsMi7I0iMiszHfpOwt8Yd2+mA1KjMNr1oy8YEesmA20wd6LFD6+afRYZEqkCLRpeCW1kWDp8+F3SMBvJuZ9yukkbkJhL3bHQ==
-Received: from CY5PR22CA0080.namprd22.prod.outlook.com (2603:10b6:930:80::19)
- by CY8PR12MB7242.namprd12.prod.outlook.com (2603:10b6:930:59::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16; Tue, 8 Oct
- 2024 18:33:12 +0000
-Received: from CY4PEPF0000E9DA.namprd05.prod.outlook.com
- (2603:10b6:930:80:cafe::ac) by CY5PR22CA0080.outlook.office365.com
- (2603:10b6:930:80::19) with Microsoft SMTP Server (version=TLS1_2,
+ bh=YWgY10692yxidj2M5/1VaQ8/XE1lo5yllzVLXHqyMKQ=;
+ b=ri0VqNx9vNMhUrLsGjrYAypBXrL4MgE073NZ+GQOtK0MQZO39Y2nJYg8Im7GzBUu0E74MJa6aZSrGP+c5MpHnaGtNXfohZ4+9pcaQtSaTIuG6LQNMjUx2nr+C/jRa6uksUEk6T50FxMb4QdnX/3XwNb/LRPLCUxs6xbZchiM8tQHwgpyGM+8pdqmLZ1NlIE6M6V1wbK7WJvD6NyYPvNyJnCOdjVTeIdeDvqaIAnI5NSg3LsR6Acc7C+F5mL24b3FLDWeQ9ZcqWNT7igtVGvky0ITf1fFVw0fjypBRBYtfwPgzkVG1uN4xkX3Q9OOwzYyE3Cur+3x8dSubsDfD0dAzg==
+Received: from CY5PR13CA0005.namprd13.prod.outlook.com (2603:10b6:930::19) by
+ MN0PR12MB6342.namprd12.prod.outlook.com (2603:10b6:208:3c1::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8026.23; Tue, 8 Oct 2024 18:33:17 +0000
+Received: from CY4PEPF0000E9DB.namprd05.prod.outlook.com
+ (2603:10b6:930:0:cafe::2f) by CY5PR13CA0005.outlook.office365.com
+ (2603:10b6:930::19) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.17 via Frontend
- Transport; Tue, 8 Oct 2024 18:33:12 +0000
+ Transport; Tue, 8 Oct 2024 18:33:17 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -64,29 +63,29 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.117.161 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000E9DA.mail.protection.outlook.com (10.167.241.73) with Microsoft
+ CY4PEPF0000E9DB.mail.protection.outlook.com (10.167.241.74) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.13 via Frontend Transport; Tue, 8 Oct 2024 18:33:12 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ 15.20.8048.13 via Frontend Transport; Tue, 8 Oct 2024 18:33:16 +0000
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
  (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Oct 2024
- 11:33:01 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ 11:33:04 -0700
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail205.nvidia.com
+ (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Oct 2024
- 11:33:00 -0700
+ 11:33:03 -0700
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
  with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 8 Oct
- 2024 11:32:57 -0700
+ 2024 11:33:01 -0700
 From: Tariq Toukan <tariqt@nvidia.com>
 To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
 CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
 	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, <cjubran@nvidia.com>,
 	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next 01/14] net/mlx5: qos: Flesh out element_attributes in mlx5_ifc.h
-Date: Tue, 8 Oct 2024 21:32:09 +0300
-Message-ID: <20241008183222.137702-2-tariqt@nvidia.com>
+Subject: [PATCH net-next 02/14] net/mlx5: qos: Rename vport 'tsar' into 'sched_elem'.
+Date: Tue, 8 Oct 2024 21:32:10 +0300
+Message-ID: <20241008183222.137702-3-tariqt@nvidia.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20241008183222.137702-1-tariqt@nvidia.com>
 References: <20241008183222.137702-1-tariqt@nvidia.com>
@@ -101,226 +100,244 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9DA:EE_|CY8PR12MB7242:EE_
-X-MS-Office365-Filtering-Correlation-Id: 362af8cd-5e39-4f64-4191-08dce7c7aa6c
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9DB:EE_|MN0PR12MB6342:EE_
+X-MS-Office365-Filtering-Correlation-Id: 86b9abc1-449b-4776-a91c-08dce7c7ace4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?JVeYIY5evGXYUZhNZ82osCk1BjsMPSluNXiqL9P6903t0D3MDVM5R9/eX3mi?=
- =?us-ascii?Q?QPNEEmnKUsFT+OJY1srnYFHOLBDkst9huXYChhYZkdR68KiOCUs+CdSpoRkM?=
- =?us-ascii?Q?fru+WtJ+1iAZRL1XDvJ8mZNkOTgrHy5I3AoH4Y9YzRFadD94hVrUAJQbNTAF?=
- =?us-ascii?Q?enCj6tHUHgecb/5jlTzjzGGurnJaxRudLt2qtV7+bjIdiietfN2VZMYxGGNt?=
- =?us-ascii?Q?4TlqwbFA1D8wHFR9MYJumIdPNbwfPEWKG+ajo4s9osSAZj3B5kgmLhHqNSt4?=
- =?us-ascii?Q?xy4PxOb39D8gujDRD//iHHH0wi7wjrFjCY77KVw10FCl24Fhj8Hi5KftixmM?=
- =?us-ascii?Q?gMZfwk/ZhEs7AeeKl8srgqM8ocnxrtguuLlGl+YCBOcKYUDabfi8HXMAQs+f?=
- =?us-ascii?Q?RsdqRh2fPhGcV7+P9ikUgu0oEurSP2szgJ70gQCManoTx/EdT3iKTS0zZGIM?=
- =?us-ascii?Q?h+L/MaybyZKtCMXiDwipZGMu4MZEWMzL4RePKqLTiHepH/ZdGXP2mFZskEIF?=
- =?us-ascii?Q?Nqlk5hPXM8zfJqSfHCRatfHICVuXJz3N1YP0arXW6ZxeCRmkLrMO0f32J16T?=
- =?us-ascii?Q?dsmAil8MYV4zBeNGnNguRqti6XtnEuN6RMfvvYCvQX0DP+2zyANPz+yzLJ/v?=
- =?us-ascii?Q?MqVVvym6K2MbSgbBBRQnMRH/m74cYoT39WwUYYOgYsZ5sFdwWF43kZfDulRG?=
- =?us-ascii?Q?wRgSGUaNv6xD56GDPCJoL0zPV6puyWjiv5givtzZuqNO2+5fXX5UF2u3jd1+?=
- =?us-ascii?Q?xO7+zo7xT6DR/UmfhKDC4pIECCSx7YiEYU9OPUGPFJ07FAP9Z//M2IIvIIKj?=
- =?us-ascii?Q?KoCdzGpsCNwE1ULBQc5bkoTrD+Rpzupq1+cgdXp+sLavXGhFdpPDJd+i/cD4?=
- =?us-ascii?Q?/EgXh6IWkn2bzw2yWwlNz4Ofi6Z6TXE5/cn8AVzyLfCkT7Nb4zB9u8pUkvWm?=
- =?us-ascii?Q?86EAsnSxfiGiZcbbXvZzfx0Ubs9MlfbhfnnM1R0Y1fDxsAShnzasn4DGDLqE?=
- =?us-ascii?Q?Q3Y/9nWY6fTYEkCOGfzNmeR5tBhJY4Sas96SBRq3EBybRHCHCf2SnR/NdADw?=
- =?us-ascii?Q?ayVZ2X2gLMGGkNsnsmt8rF4UEGxrB5v6YP9NOz2JPnpRJOP0ssEA8HH9ywZi?=
- =?us-ascii?Q?/V/sYkwnNH6sdhZXz3AZ1UbJ02AIFRep3nvUOW3nxtHjvGLRfu/eVzajuIJq?=
- =?us-ascii?Q?5llsMl3CvN2KEbIX/W9P7fO+7obJwqtdt6FkZy5FyBcxb40gjACg70hcQ4vh?=
- =?us-ascii?Q?Mkwxmcm5KzGTo9/wlQGg6SaZppfjwq3Vu8kdJ2nkgEL4DMFTT+XDR2zWfCZL?=
- =?us-ascii?Q?1JkzJvC/wZ0UeMyrOxJA5qaAixGXRIEVZn3glwi2IFNtY7ZAJh/b4iAKi5q8?=
- =?us-ascii?Q?2RHy3p612dsGelsT5tl6LqD7Z8xS?=
+	=?us-ascii?Q?GrT9J/gfVEbxBhC/ZsETYfMc+QEPFywHfzBxEWyeMM2E/vbIabR/nRjO9um+?=
+ =?us-ascii?Q?uZ9wx9YDt2JTI5U0Vh+bBhsdOUWJaEe7EaPtXq52YnLmrIJqhrmc8Lm3WVW/?=
+ =?us-ascii?Q?2ZuLakYC9wGszcYsF+f8zsXUq4SzIdRCV7NdteAU9H7wxT7meph7gYkB0HbR?=
+ =?us-ascii?Q?LD0UiJdl0qq6qt8Nf49Iz7DseT+Qq2vv7Y+t2Z1GGYuclzm2ycEoFi5VPV9M?=
+ =?us-ascii?Q?nOItLtxuGIEiZnec4xwSR8mAzX+OWpi/GmL/4n4g5nwGZlWUUge4OAgW1ObI?=
+ =?us-ascii?Q?082T93S/aeTMkDZEWzVLMUpoGh2zlZnQ4BaJ/4kuOrGNe/JNzELVwUEAJDSJ?=
+ =?us-ascii?Q?vNExD/jRqmqJZbObHqZyTZBITRYFTyZe5hHW5pBFvyQw7NA80bPC2S354k9E?=
+ =?us-ascii?Q?UF8/TX7EnT78dMJZFnzIFNYFuVqN3b4mH0Kk6RABX8WOtabyjDuoN3+0nlo/?=
+ =?us-ascii?Q?H/0r1C5JItjC7kAuTd+JwxWua3cc30VbzFrkl6QVCyXG9kCMVPtjrxrCSPFc?=
+ =?us-ascii?Q?x+fqOl290oDQ3DaEz+T3/F8xHRXtLeVwTX6i9Og56JjHZIAnujdlWfyJqmrf?=
+ =?us-ascii?Q?N25HvD9NGIqGcDnMhvijawsZLfACw4pfBvwA29AONEl+0izgVjwsGhTcDuSv?=
+ =?us-ascii?Q?THIFu0ytZwMAWIdwoq+EnY5mV5l+KLqYhJJjGjlVHRBCdPlYzSc9mUI9aBp4?=
+ =?us-ascii?Q?fXU3eznsGmeUkooapO1CVJRLME3FfqTQFVarnoIvY0sjw3FchQi+hgc/IAaf?=
+ =?us-ascii?Q?Fj60M+3Svt8BGEjuc9lxJIFNv/km+9kRgAXWXWf8zTFF1qyXKo4clAgk1Nev?=
+ =?us-ascii?Q?nnRutsj7efjmXtEO1mMPiRfyvhcMWBv7CTHm2EZWbJeD9V66Ukd2iX9a1tWQ?=
+ =?us-ascii?Q?cW0T2oIAiGWuKPae8LNEVyPvnDaZS4PD1j+51XFezjj24ygDmElHxc48/lHb?=
+ =?us-ascii?Q?p+AajOb6jy15HCFMAYvXbXigw/TWNXUIT+Q1SrnjLGop+soII9sycov5DSFV?=
+ =?us-ascii?Q?I1JwEs1rv4wuFpPPObe4Es9kWmGDARl8XIYUoMahgCjFpbO5KAVshoOpDvfU?=
+ =?us-ascii?Q?ydNxpngLGU4Kqe3JvK/KIpJQW78omApjCRTETuYt4rWCaaKsH00wuVdiHMFQ?=
+ =?us-ascii?Q?LGBcoEinepf9oPP+YMnNcOhdZtbHZlq44q2dmpoiYx3dK3buRe20/dlOYZ8A?=
+ =?us-ascii?Q?hp76ZjQWN8iOei92xeHEvJa/4oVuB4UbGdIjCHaXhSQGZ4FdKkWF4eF78ST7?=
+ =?us-ascii?Q?tVb4D0PGVIoIUw0jrYqqbbclQRT2hf/Rn9KQqibXkYrzb2pra3tfaogJZoGe?=
+ =?us-ascii?Q?BNoBYMjFzdtA8jdmfKxmYo36Rimzjagi8mJE2hV/wawmSfes/7ks1PY9SbNY?=
+ =?us-ascii?Q?r1iO2AKYAGVu2f9U0vlkfMehAeA6?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2024 18:33:12.2559
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2024 18:33:16.3848
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 362af8cd-5e39-4f64-4191-08dce7c7aa6c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 86b9abc1-449b-4776-a91c-08dce7c7ace4
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9DA.namprd05.prod.outlook.com
+	CY4PEPF0000E9DB.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7242
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6342
 
 From: Cosmin Ratiu <cratiu@nvidia.com>
 
-This is used for multiple purposes, depending on the scheduling element
-created. There are a few helper struct defined a long time ago, but they
-are not easy to find in the file and they are about to get new members.
-This commit cleans up this area a bit by:
-- moving the helper structs closer to where they are relevant.
-- defining a helper union to include all of them to help
-  discoverability.
-- making use of it everywhere element_attributes is used.
-- using a consistent 'attr' name.
+Vports do not use TSARs (Transmit Scheduling ARbiters), which are used
+for grouping multiple entities together. Use the correct name in
+variables and functions for clarity.
+Also move the scheduling context to a local variable in the
+esw_qos_sched_elem_config function instead of an empty parameter that
+needs to be provided by all callers.
+There is no functional change here.
 
 Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 18 +++--
- include/linux/mlx5/mlx5_ifc.h                 | 67 ++++++++++---------
- 2 files changed, 45 insertions(+), 40 deletions(-)
+ .../mlx5/core/esw/diag/qos_tracepoint.h       | 16 ++++-----
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c | 35 +++++++++----------
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  6 ++--
+ 3 files changed, 27 insertions(+), 30 deletions(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/diag/qos_tracepoint.h b/drivers/net/ethernet/mellanox/mlx5/core/esw/diag/qos_tracepoint.h
+index 1ce332f21ebe..0ebbd699903d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/diag/qos_tracepoint.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/diag/qos_tracepoint.h
+@@ -15,14 +15,14 @@ TRACE_EVENT(mlx5_esw_vport_qos_destroy,
+ 	    TP_ARGS(vport),
+ 	    TP_STRUCT__entry(__string(devname, dev_name(vport->dev->device))
+ 			     __field(unsigned short, vport_id)
+-			     __field(unsigned int,   tsar_ix)
++			     __field(unsigned int,   sched_elem_ix)
+ 			     ),
+ 	    TP_fast_assign(__assign_str(devname);
+ 		    __entry->vport_id = vport->vport;
+-		    __entry->tsar_ix = vport->qos.esw_tsar_ix;
++		    __entry->sched_elem_ix = vport->qos.esw_sched_elem_ix;
+ 	    ),
+-	    TP_printk("(%s) vport=%hu tsar_ix=%u\n",
+-		      __get_str(devname), __entry->vport_id, __entry->tsar_ix
++	    TP_printk("(%s) vport=%hu sched_elem_ix=%u\n",
++		      __get_str(devname), __entry->vport_id, __entry->sched_elem_ix
+ 		      )
+ );
+ 
+@@ -31,20 +31,20 @@ DECLARE_EVENT_CLASS(mlx5_esw_vport_qos_template,
+ 		    TP_ARGS(vport, bw_share, max_rate),
+ 		    TP_STRUCT__entry(__string(devname, dev_name(vport->dev->device))
+ 				     __field(unsigned short, vport_id)
+-				     __field(unsigned int, tsar_ix)
++				     __field(unsigned int, sched_elem_ix)
+ 				     __field(unsigned int, bw_share)
+ 				     __field(unsigned int, max_rate)
+ 				     __field(void *, group)
+ 				     ),
+ 		    TP_fast_assign(__assign_str(devname);
+ 			    __entry->vport_id = vport->vport;
+-			    __entry->tsar_ix = vport->qos.esw_tsar_ix;
++			    __entry->sched_elem_ix = vport->qos.esw_sched_elem_ix;
+ 			    __entry->bw_share = bw_share;
+ 			    __entry->max_rate = max_rate;
+ 			    __entry->group = vport->qos.group;
+ 		    ),
+-		    TP_printk("(%s) vport=%hu tsar_ix=%u bw_share=%u, max_rate=%u group=%p\n",
+-			      __get_str(devname), __entry->vport_id, __entry->tsar_ix,
++		    TP_printk("(%s) vport=%hu sched_elem_ix=%u bw_share=%u, max_rate=%u group=%p\n",
++			      __get_str(devname), __entry->vport_id, __entry->sched_elem_ix,
+ 			      __entry->bw_share, __entry->max_rate, __entry->group
+ 			      )
+ );
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index 02a3563f51ad..7154eeff4fd4 100644
+index 7154eeff4fd4..73127f1dbf6e 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -339,7 +339,7 @@ static int esw_qos_vport_create_sched_element(struct mlx5_eswitch *esw,
- 	struct mlx5_esw_rate_group *group = vport->qos.group;
- 	struct mlx5_core_dev *dev = esw->dev;
- 	u32 parent_tsar_ix;
--	void *vport_elem;
-+	void *attr;
- 	int err;
+@@ -22,9 +22,10 @@ struct mlx5_esw_rate_group {
+ 	struct list_head list;
+ };
  
- 	if (!esw_qos_element_type_supported(dev, SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT))
-@@ -348,8 +348,8 @@ static int esw_qos_vport_create_sched_element(struct mlx5_eswitch *esw,
- 	parent_tsar_ix = group ? group->tsar_ix : esw->qos.root_tsar_ix;
- 	MLX5_SET(scheduling_context, sched_ctx, element_type,
- 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_VPORT);
--	vport_elem = MLX5_ADDR_OF(scheduling_context, sched_ctx, element_attributes);
--	MLX5_SET(vport_element, vport_elem, vport_number, vport->vport);
-+	attr = MLX5_ADDR_OF(scheduling_context, sched_ctx, element_attributes);
-+	MLX5_SET(vport_element, attr, vport_number, vport->vport);
- 	MLX5_SET(scheduling_context, sched_ctx, parent_element_id, parent_tsar_ix);
- 	MLX5_SET(scheduling_context, sched_ctx, max_average_bw, max_rate);
- 	MLX5_SET(scheduling_context, sched_ctx, bw_share, bw_share);
-@@ -443,8 +443,8 @@ __esw_qos_create_rate_group(struct mlx5_eswitch *esw, struct netlink_ext_ack *ex
+-static int esw_qos_tsar_config(struct mlx5_core_dev *dev, u32 *sched_ctx,
+-			       u32 tsar_ix, u32 max_rate, u32 bw_share)
++static int esw_qos_sched_elem_config(struct mlx5_core_dev *dev, u32 sched_elem_ix,
++				     u32 max_rate, u32 bw_share)
  {
- 	u32 tsar_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
- 	struct mlx5_esw_rate_group *group;
--	__be32 *attr;
- 	u32 divider;
-+	void *attr;
- 	int err;
- 
- 	group = kzalloc(sizeof(*group), GFP_KERNEL);
-@@ -453,12 +453,10 @@ __esw_qos_create_rate_group(struct mlx5_eswitch *esw, struct netlink_ext_ack *ex
- 
- 	MLX5_SET(scheduling_context, tsar_ctx, element_type,
- 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR);
--
--	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
--	*attr = cpu_to_be32(TSAR_ELEMENT_TSAR_TYPE_DWRR << 16);
--
- 	MLX5_SET(scheduling_context, tsar_ctx, parent_element_id,
- 		 esw->qos.root_tsar_ix);
-+	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
-+	MLX5_SET(tsar_element, attr, tsar_type, TSAR_ELEMENT_TSAR_TYPE_DWRR);
- 	err = mlx5_create_scheduling_element_cmd(esw->dev,
- 						 SCHEDULING_HIERARCHY_E_SWITCH,
- 						 tsar_ctx,
-@@ -559,7 +557,7 @@ static int esw_qos_create(struct mlx5_eswitch *esw, struct netlink_ext_ack *exta
- {
- 	u32 tsar_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
- 	struct mlx5_core_dev *dev = esw->dev;
--	__be32 *attr;
-+	void *attr;
- 	int err;
++	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	u32 bitmask = 0;
  
  	if (!MLX5_CAP_GEN(dev, qos) || !MLX5_CAP_QOS(dev, esw_scheduling))
-@@ -573,7 +571,7 @@ static int esw_qos_create(struct mlx5_eswitch *esw, struct netlink_ext_ack *exta
- 		 SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR);
+@@ -38,20 +39,17 @@ static int esw_qos_tsar_config(struct mlx5_core_dev *dev, u32 *sched_ctx,
+ 	return mlx5_modify_scheduling_element_cmd(dev,
+ 						  SCHEDULING_HIERARCHY_E_SWITCH,
+ 						  sched_ctx,
+-						  tsar_ix,
++						  sched_elem_ix,
+ 						  bitmask);
+ }
  
- 	attr = MLX5_ADDR_OF(scheduling_context, tsar_ctx, element_attributes);
--	*attr = cpu_to_be32(TSAR_ELEMENT_TSAR_TYPE_DWRR << 16);
-+	MLX5_SET(tsar_element, attr, tsar_type, TSAR_ELEMENT_TSAR_TYPE_DWRR);
+ static int esw_qos_group_config(struct mlx5_eswitch *esw, struct mlx5_esw_rate_group *group,
+ 				u32 max_rate, u32 bw_share, struct netlink_ext_ack *extack)
+ {
+-	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	struct mlx5_core_dev *dev = esw->dev;
+ 	int err;
  
+-	err = esw_qos_tsar_config(dev, sched_ctx,
+-				  group->tsar_ix,
+-				  max_rate, bw_share);
++	err = esw_qos_sched_elem_config(dev, group->tsar_ix, max_rate, bw_share);
+ 	if (err)
+ 		NL_SET_ERR_MSG_MOD(extack, "E-Switch modify group TSAR element failed");
+ 
+@@ -65,20 +63,18 @@ static int esw_qos_vport_config(struct mlx5_eswitch *esw,
+ 				u32 max_rate, u32 bw_share,
+ 				struct netlink_ext_ack *extack)
+ {
+-	u32 sched_ctx[MLX5_ST_SZ_DW(scheduling_context)] = {};
+ 	struct mlx5_core_dev *dev = esw->dev;
+ 	int err;
+ 
+ 	if (!vport->qos.enabled)
+ 		return -EIO;
+ 
+-	err = esw_qos_tsar_config(dev, sched_ctx, vport->qos.esw_tsar_ix,
+-				  max_rate, bw_share);
++	err = esw_qos_sched_elem_config(dev, vport->qos.esw_sched_elem_ix, max_rate, bw_share);
+ 	if (err) {
+ 		esw_warn(esw->dev,
+-			 "E-Switch modify TSAR vport element failed (vport=%d,err=%d)\n",
++			 "E-Switch modify vport scheduling element failed (vport=%d,err=%d)\n",
+ 			 vport->vport, err);
+-		NL_SET_ERR_MSG_MOD(extack, "E-Switch modify TSAR vport element failed");
++		NL_SET_ERR_MSG_MOD(extack, "E-Switch modify vport scheduling element failed");
+ 		return err;
+ 	}
+ 
+@@ -357,9 +353,10 @@ static int esw_qos_vport_create_sched_element(struct mlx5_eswitch *esw,
  	err = mlx5_create_scheduling_element_cmd(dev,
  						 SCHEDULING_HIERARCHY_E_SWITCH,
-diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
-index 96d369112bfa..c79ba6197673 100644
---- a/include/linux/mlx5/mlx5_ifc.h
-+++ b/include/linux/mlx5/mlx5_ifc.h
-@@ -4105,11 +4105,47 @@ enum {
- 	ELEMENT_TYPE_CAP_MASK_QUEUE_GROUP	= 1 << 4,
- };
+ 						 sched_ctx,
+-						 &vport->qos.esw_tsar_ix);
++						 &vport->qos.esw_sched_elem_ix);
+ 	if (err) {
+-		esw_warn(esw->dev, "E-Switch create TSAR vport element failed (vport=%d,err=%d)\n",
++		esw_warn(vport->dev,
++			 "E-Switch create vport scheduling element failed (vport=%d,err=%d)\n",
+ 			 vport->vport, err);
+ 		return err;
+ 	}
+@@ -378,9 +375,9 @@ static int esw_qos_update_group_scheduling_element(struct mlx5_eswitch *esw,
  
-+enum {
-+	TSAR_ELEMENT_TSAR_TYPE_DWRR = 0x0,
-+	TSAR_ELEMENT_TSAR_TYPE_ROUND_ROBIN = 0x1,
-+	TSAR_ELEMENT_TSAR_TYPE_ETS = 0x2,
-+};
-+
-+enum {
-+	TSAR_TYPE_CAP_MASK_DWRR		= 1 << 0,
-+	TSAR_TYPE_CAP_MASK_ROUND_ROBIN	= 1 << 1,
-+	TSAR_TYPE_CAP_MASK_ETS		= 1 << 2,
-+};
-+
-+struct mlx5_ifc_tsar_element_bits {
-+	u8         reserved_at_0[0x8];
-+	u8         tsar_type[0x8];
-+	u8         reserved_at_10[0x10];
-+};
-+
-+struct mlx5_ifc_vport_element_bits {
-+	u8         reserved_at_0[0x10];
-+	u8         vport_number[0x10];
-+};
-+
-+struct mlx5_ifc_vport_tc_element_bits {
-+	u8         traffic_class[0x4];
-+	u8         reserved_at_4[0xc];
-+	u8         vport_number[0x10];
-+};
-+
-+union mlx5_ifc_element_attributes_bits {
-+	struct mlx5_ifc_tsar_element_bits tsar;
-+	struct mlx5_ifc_vport_element_bits vport;
-+	struct mlx5_ifc_vport_tc_element_bits vport_tc;
-+	u8 reserved_at_0[0x20];
-+};
-+
- struct mlx5_ifc_scheduling_context_bits {
- 	u8         element_type[0x8];
- 	u8         reserved_at_8[0x18];
+ 	err = mlx5_destroy_scheduling_element_cmd(esw->dev,
+ 						  SCHEDULING_HIERARCHY_E_SWITCH,
+-						  vport->qos.esw_tsar_ix);
++						  vport->qos.esw_sched_elem_ix);
+ 	if (err) {
+-		NL_SET_ERR_MSG_MOD(extack, "E-Switch destroy TSAR vport element failed");
++		NL_SET_ERR_MSG_MOD(extack, "E-Switch destroy vport scheduling element failed");
+ 		return err;
+ 	}
  
--	u8         element_attributes[0x20];
-+	union mlx5_ifc_element_attributes_bits element_attributes;
+@@ -683,9 +680,9 @@ void mlx5_esw_qos_vport_disable(struct mlx5_eswitch *esw, struct mlx5_vport *vpo
  
- 	u8         parent_element_id[0x20];
+ 	err = mlx5_destroy_scheduling_element_cmd(esw->dev,
+ 						  SCHEDULING_HIERARCHY_E_SWITCH,
+-						  vport->qos.esw_tsar_ix);
++						  vport->qos.esw_sched_elem_ix);
+ 	if (err)
+-		esw_warn(esw->dev, "E-Switch destroy TSAR vport element failed (vport=%d,err=%d)\n",
++		esw_warn(esw->dev, "E-Switch destroy vport scheduling element failed (vport=%d,err=%d)\n",
+ 			 vport->vport, err);
  
-@@ -4798,35 +4834,6 @@ struct mlx5_ifc_register_loopback_control_bits {
- 	u8         reserved_at_20[0x60];
- };
+ 	memset(&vport->qos, 0, sizeof(vport->qos));
+@@ -809,7 +806,7 @@ int mlx5_esw_qos_modify_vport_rate(struct mlx5_eswitch *esw, u16 vport_num, u32
+ 		err = mlx5_modify_scheduling_element_cmd(esw->dev,
+ 							 SCHEDULING_HIERARCHY_E_SWITCH,
+ 							 ctx,
+-							 vport->qos.esw_tsar_ix,
++							 vport->qos.esw_sched_elem_ix,
+ 							 bitmask);
+ 	}
+ 	mutex_unlock(&esw->state_lock);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index f44b4c7ebcfd..9bf05ae58af0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -213,9 +213,9 @@ struct mlx5_vport {
+ 	struct mlx5_vport_info  info;
  
--struct mlx5_ifc_vport_tc_element_bits {
--	u8         traffic_class[0x4];
--	u8         reserved_at_4[0xc];
--	u8         vport_number[0x10];
--};
--
--struct mlx5_ifc_vport_element_bits {
--	u8         reserved_at_0[0x10];
--	u8         vport_number[0x10];
--};
--
--enum {
--	TSAR_ELEMENT_TSAR_TYPE_DWRR = 0x0,
--	TSAR_ELEMENT_TSAR_TYPE_ROUND_ROBIN = 0x1,
--	TSAR_ELEMENT_TSAR_TYPE_ETS = 0x2,
--};
--
--enum {
--	TSAR_TYPE_CAP_MASK_DWRR		= 1 << 0,
--	TSAR_TYPE_CAP_MASK_ROUND_ROBIN	= 1 << 1,
--	TSAR_TYPE_CAP_MASK_ETS		= 1 << 2,
--};
--
--struct mlx5_ifc_tsar_element_bits {
--	u8         reserved_at_0[0x8];
--	u8         tsar_type[0x8];
--	u8         reserved_at_10[0x10];
--};
--
- enum {
- 	MLX5_TEARDOWN_HCA_OUT_FORCE_STATE_SUCCESS = 0x0,
- 	MLX5_TEARDOWN_HCA_OUT_FORCE_STATE_FAIL = 0x1,
+ 	struct {
+-		bool            enabled;
+-		u32             esw_tsar_ix;
+-		u32             bw_share;
++		bool enabled;
++		u32 esw_sched_elem_ix;
++		u32 bw_share;
+ 		u32 min_rate;
+ 		u32 max_rate;
+ 		struct mlx5_esw_rate_group *group;
 -- 
 2.44.0
 
