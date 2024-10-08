@@ -1,169 +1,131 @@
-Return-Path: <netdev+bounces-133037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9AAB994568
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:30:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6F3994580
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 12:32:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACC0286D4C
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:30:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3FE28925D
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2771B6536;
-	Tue,  8 Oct 2024 10:29:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275281C2315;
+	Tue,  8 Oct 2024 10:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QmTu2ZI+"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA85F198836;
-	Tue,  8 Oct 2024 10:29:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CE9C1C1AAD;
+	Tue,  8 Oct 2024 10:31:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728383372; cv=none; b=CiZmKiC8SREaZ/JpCcf2VTcZ4IRZr9o/p9Y6eI6hG5UwwroTrPjoZggzUivFpaIXTYcTyWYknfoklHSYpgGFL6J2TDU0X3wf5kEmK8zpHaFOU01SiBQDCSvnA6UCOIom9jsdaPDMRLozJh7SoJotHe8VwbTpvGKG01C7nj7GOBY=
+	t=1728383502; cv=none; b=BSkzoxNjf33LeFF/wx3ee9kNGUs6hRU2jNOYlMfzo0+yykSoTR8gZm1N+7SGHPB4Tj/IARIxsM+AUZczArKnwKOIGwPaMmdfEko0CSsRe1y+MjL2ViFQ+8tW9FjeYtsuKKr2hZ+knM3HE+/TjYx/Hp9h4fHRWHiTXdX8qGVypig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728383372; c=relaxed/simple;
-	bh=n6Pyknfvtq8jCstOTEB1lqtTghs0zco2bDfrzky9UhI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kGo4hQ0xVRjgo8vixjkKxO3pLIphhTNbeScNLR0/kDUSydkA7EPj4edZCLXw43ckBmVmRc3oGrCMMOK7Ucw3MqBzq0HZR88UWcSnq1l7GZe6qJZz3c71onDSQ3dgK+LVt9TSzxAE+9o7nw8wr2do4NwYAP7qjYNZzbQxeB4wG0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XNBwk4ZdMz6GFMH;
-	Tue,  8 Oct 2024 18:25:10 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4424E1402C6;
-	Tue,  8 Oct 2024 18:29:28 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 8 Oct
- 2024 12:29:22 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: Gur Stavi <gur.stavi@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v02 2/2] selftests: net/psock_fanout: socket joins fanout when link is down
-Date: Tue, 8 Oct 2024 13:27:59 +0300
-Message-ID: <6a30be3ddff2f18f803236ace6a61a552aa324ce.1728382839.git.gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1728382839.git.gur.stavi@huawei.com>
-References: <cover.1728382839.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1728383502; c=relaxed/simple;
+	bh=ZA5yjaJFpQo15G7hj/YB+wmAae/fHZXL7PrhkwMKI7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RHMSoeb6pOpsF0Sj/QZVJtyQqKOYKvZLcLYcZ6WXXiXv51CWkQ7RqbNEr+boPnrzumVzuZMNKKp8zFb1RVGXUB++yuJWIuFbAYg6kEUdZ2/v3WTLnu2dqjbpabpsf6Ev+LIAPq5BSij88c+hmw4GoEI0bgSV8ITPLvnAOGJYul0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QmTu2ZI+; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbc08e7495so3349926d6.3;
+        Tue, 08 Oct 2024 03:31:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728383499; x=1728988299; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qWXOZiTJ524Ki2B43JslWFwUVw4xgtE+zBy4K0YjIxM=;
+        b=QmTu2ZI+Hebpb//5devPDbTptbSAIMl6kdCf18TSqBTqDqFGajVERk+ryqWOPBm89U
+         sk3A/flB/Tl72MBr3qkmlmpaeKJzZMJi288nNM5l9Z76a9S/or5ezc6mqAlM9Y9b/3Tr
+         3U++9rB/FHtaDdjveQJZkaseAnrkmMWFLLJuYnp15nGXkavUpkYJsp0stV9B/z4StEp9
+         OY6weYJiaCDPh71ewA7kRzX2uyDJrhV9FWyR/nMSEBGYSa3qIB+5pg5E7NkgpUfTLL/G
+         3NHpYTjBjYQWNhCLR1ABNHgnkIIL4fDbjx9nbnBw7bENLVl7imNBrxjIv+h8iofFwlzk
+         weiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728383499; x=1728988299;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qWXOZiTJ524Ki2B43JslWFwUVw4xgtE+zBy4K0YjIxM=;
+        b=g4HlehZUKC57BIkvH1WGqCXrN+bhnW2lNqmPhPyC5/eLa6xXhB2oR2jEnUQr++ScwR
+         7/hZMxtzew4ekCIsW9eMRwAzjsdr3ECC5Y2LYQEZ5GPzWwztIpc8h1HreCOG4DzngeKw
+         2UgLtUwANTF8LAfqtIooGEYMm9jpWyx506W8IQaHl+b4eKDITQO/M82yywZh/eAMeAnf
+         7bxFqL2n6wGXrC5CD0L+StlDS5RypbTQ3n7+z8O4SMetnWEQDP1dOQEHmbChQqVChE7m
+         4O/Q8WlZ1PiYoImXHw+UHS1WujPwptpAs6UMOphWQxkdve90kRsPwNwlE4Yv6aExBeBL
+         Wn/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWxMtadIAXXOfjlSEx61s4oPWhAdURHCM0tpj/lYYzY22Q3ZvJ+UyxB/CAKYR8lnSKE/xyyhKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbiPW4oY+FnA9dtDc2DZmIpdmUgXkiW32ajBUYrifhBWTH/I8I
+	tv5gcvnZPz8Z6CEMsUGhDYeSjw19rXZJpgY2ay02m3uAmcOOalFAEKtEHgcrgRJSJjMLIBwiL0I
+	r9f0uwitOhT/hdtLnsVVg+V7yDRE=
+X-Google-Smtp-Source: AGHT+IHmAgxptQBJ8oR5hJSMNW8SP1QgScTRozbkAajjcegzzj76mb0Pbapw3eRx+ncxmEVlwQYNoBFfQWFE8+8942c=
+X-Received: by 2002:a05:6214:449d:b0:6cb:ae56:1965 with SMTP id
+ 6a1803df08f44-6cbae56198bmr132780746d6.15.1728383499382; Tue, 08 Oct 2024
+ 03:31:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+References: <20241007122458.282590-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20241007122458.282590-1-maciej.fijalkowski@intel.com>
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+Date: Tue, 8 Oct 2024 12:31:28 +0200
+Message-ID: <CAJ8uoz1giCLozes9kYpzwns1Vb+sLfV=7t4jXvpGZgDD26-sdA@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 0/6] xsk: struct diet and cleanups
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
+	bjorn@kernel.org, vadfed@meta.com
+Content-Type: text/plain; charset="UTF-8"
 
-Modify test_control_group to have toggle parameter.
-When toggle is non-zero, loopback device will be set down for the
-initialization of fd[1] which is still expected to successfully join
-the fanout.
+On Mon, 7 Oct 2024 at 14:27, Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> Hi all,
+>
+> this modest work brings back size of xdp_buff_xsk back to two cache
+> lines which in turn improves performance. Interestingly I was able to
+> observe on ice with HW rings sized to 512 around 12% better performance
+> when running xdpsock in l2fwd scenario. First three patches are behind
+> this. Other setups were not that impressive, I believe results may vary
+> based on the underlying CPU. Bottom line is that shrinking this struct
+> takes off a bit of work from CPU's shoulders.
+>
+> Other three patches are rather cleanups.
+>
+> Thanks,
+> Maciej
 
-Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
----
- tools/testing/selftests/net/psock_fanout.c | 42 ++++++++++++++++++++--
- 1 file changed, 39 insertions(+), 3 deletions(-)
+Thanks for these improvements Maciej.
 
-diff --git a/tools/testing/selftests/net/psock_fanout.c b/tools/testing/selftests/net/psock_fanout.c
-index 4f31e92ebd96..acdfae8f8a9a 100644
---- a/tools/testing/selftests/net/psock_fanout.c
-+++ b/tools/testing/selftests/net/psock_fanout.c
-@@ -48,6 +48,7 @@
- #include <string.h>
- #include <sys/mman.h>
- #include <sys/socket.h>
-+#include <sys/ioctl.h>
- #include <sys/stat.h>
- #include <sys/types.h>
- #include <unistd.h>
-@@ -59,6 +60,33 @@
- 
- static uint32_t cfg_max_num_members;
- 
-+static void loopback_set_up_down(int state_up)
-+{
-+	struct ifreq ifreq = {};
-+	int fd, err;
-+
-+	fd = socket(AF_PACKET, SOCK_RAW, 0);
-+	if (fd < 0) {
-+		perror("socket loopback");
-+		exit(1);
-+	}
-+	strcpy(ifreq.ifr_name, "lo");
-+	err = ioctl(fd, SIOCGIFFLAGS, &ifreq);
-+	if (err) {
-+		perror("SIOCGIFFLAGS");
-+		exit(1);
-+	}
-+	if (state_up != !!(ifreq.ifr_flags & IFF_UP)) {
-+		ifreq.ifr_flags ^= IFF_UP;
-+		err = ioctl(fd, SIOCSIFFLAGS, &ifreq);
-+		if (err) {
-+			perror("SIOCSIFFLAGS");
-+			exit(1);
-+		}
-+	}
-+	close(fd);
-+}
-+
- /* Open a socket in a given fanout mode.
-  * @return -1 if mode is bad, a valid socket otherwise */
- static int sock_fanout_open(uint16_t typeflags, uint16_t group_id)
-@@ -264,17 +292,22 @@ static void test_control_single(void)
- }
- 
- /* Test illegal group with different modes or flags */
--static void test_control_group(void)
-+static void test_control_group(int toggle)
- {
- 	int fds[2];
- 
--	fprintf(stderr, "test: control multiple sockets\n");
-+	if (toggle)
-+		fprintf(stderr, "test: control multiple sockets with link down toggle\n");
-+	else
-+		fprintf(stderr, "test: control multiple sockets\n");
- 
- 	fds[0] = sock_fanout_open(PACKET_FANOUT_HASH, 0);
- 	if (fds[0] == -1) {
- 		fprintf(stderr, "ERROR: failed to open HASH socket\n");
- 		exit(1);
- 	}
-+	if (toggle)
-+		loopback_set_up_down(0);
- 	if (sock_fanout_open(PACKET_FANOUT_HASH |
- 			       PACKET_FANOUT_FLAG_DEFRAG, 0) != -1) {
- 		fprintf(stderr, "ERROR: joined group with wrong flag defrag\n");
-@@ -294,6 +327,8 @@ static void test_control_group(void)
- 		fprintf(stderr, "ERROR: failed to join group\n");
- 		exit(1);
- 	}
-+	if (toggle)
-+		loopback_set_up_down(1);
- 	if (close(fds[1]) || close(fds[0])) {
- 		fprintf(stderr, "ERROR: closing sockets\n");
- 		exit(1);
-@@ -489,7 +524,8 @@ int main(int argc, char **argv)
- 	int port_off = 2, tries = 20, ret;
- 
- 	test_control_single();
--	test_control_group();
-+	test_control_group(0);
-+	test_control_group(1);
- 	test_control_group_max_num_members();
- 	test_unique_fanout_group_ids();
- 
--- 
-2.45.2
+For the series:
+Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
+> v1->v2:
+> * fix build issues on patch 1 (Daniel, CI)
+> * be smarter about xsk_buff_pool layout in patch 4 (Vadim)
+>
+> Maciej Fijalkowski (6):
+>   xsk: get rid of xdp_buff_xsk::xskb_list_node
+>   xsk: s/free_list_node/list_node
+>   xsk: get rid of xdp_buff_xsk::orig_addr
+>   xsk: carry a copy of xdp_zc_max_segs within xsk_buff_pool
+>   xsk: wrap duplicated code to function
+>   xsk: use xsk_buff_pool directly for cq functions
+>
+>  include/net/xdp_sock_drv.h  | 14 +++++-----
+>  include/net/xsk_buff_pool.h | 23 +++++++++-------
+>  net/xdp/xsk.c               | 38 +++++++++++++-------------
+>  net/xdp/xsk_buff_pool.c     | 54 ++++++++++++++++++++-----------------
+>  net/xdp/xsk_queue.h         |  2 +-
+>  5 files changed, 69 insertions(+), 62 deletions(-)
+>
+> --
+> 2.34.1
+>
+>
 
