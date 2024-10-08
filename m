@@ -1,134 +1,138 @@
-Return-Path: <netdev+bounces-133165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73BE0995274
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E1CF995278
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5AB41C22520
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:53:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A9CC28852E
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F227B1DF755;
-	Tue,  8 Oct 2024 14:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QADCXBO/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2883D1DFE2B;
+	Tue,  8 Oct 2024 14:54:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7153A1DEFF4
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA551DEFF4
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:54:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728399209; cv=none; b=VAYvfL+N6ZQg8tTusCTfouXYUKUBG8ohkwmNxdYWivtVhDKytx8wBppIxj866HtKR7ru/6z8r3Fl1lVuC+JfvqD9I1uaoxZmIcqKxKvZaYIlvkVDNlO/WU/CjfrfdZgAGy9w3jQX6C0Swl4rfpcCTNuPkvHwFQiasQSH1OBr83A=
+	t=1728399253; cv=none; b=HpLX/X3bjCtdSBMM3aKfecI+hKn+Nvk0Bs+dsuarhKjZgEO8GVEcHp2+x8sOm+J4BptezCiZBRPkPtjImj2kyCa1+POfzRnYX1bRrrgGUwSS/IZ0DxIvmpuB3e+/Ys+2c+DfWlIS/pPgoGn0AWkIIs6xd23pqMCZVWNggaHpzXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728399209; c=relaxed/simple;
-	bh=dJ+phDu608OwfoSQL8OjPwYHi2jN2anIiwC0f3VDGvA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PgARIHUOLVLyaXP2s/9e+N70QEvYja6p+PKNxSv7cV+B8DXDPAnqCiIV78PGtvMaQJ12Y0wF91A1HUdd62KmBgdo7SRI4f4obWnQndgNtHzhvgdLRoJKaQ4ZCzWmZOoA9wAqYgHsn0T30Xmg3KTA5ejZ+rs6BToDIyXZlKievuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QADCXBO/; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728399209; x=1759935209;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=PMFonxy8Bo1S3VCyJqYN3YIMsw0zvRhenazbSD7CoWU=;
-  b=QADCXBO/50Q7m9H0cwPj1Jo5I5frQS7pL+lcAzNoyh30bdCOpNUVnDVJ
-   MFCRzCaUwUO4eDX8oQ9/AI7BPTijzeWrfjOn0odTZOSmlnsQdFx9t0fVA
-   lzL+xQAW8iwkncWmkdqZxl+YnT5cNzBkPPc+EnElzJMBCk0s5nWhsUNBM
-   M=;
-X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
-   d="scan'208";a="764745431"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 14:53:21 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:44772]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.239:2525] with esmtp (Farcaster)
- id 7fd53068-02e6-496b-8ecd-2fbbcd3312ac; Tue, 8 Oct 2024 14:53:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 7fd53068-02e6-496b-8ecd-2fbbcd3312ac
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 8 Oct 2024 14:53:20 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 8 Oct 2024 14:53:17 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gnaaman@drivenets.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 1/2] Convert neighbour-table to use hlist
-Date: Tue, 8 Oct 2024 07:53:10 -0700
-Message-ID: <20241008145310.85530-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241008073855.811502-1-gnaaman@drivenets.com>
-References: <20241008073855.811502-1-gnaaman@drivenets.com>
+	s=arc-20240116; t=1728399253; c=relaxed/simple;
+	bh=rxMQfeehLdt2xkvh6dUxYyoIor1byeZvAt5ilMZZD+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8rMkzno+MyTJpiWe4oppGpu5KWPktcXLiWq/W2Qsb2ZG6N1tUjyFUaDOBeYjmnJCBmp5gPLjv67c3VysRB/6WhlqfWqrbo6DpbIwfPQNCqVLipTMEPLm1AlB2lBVuRhvjsXesMoHcdiDxt2NwSSpC/j1J3L0sezzuXRmjaeReE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBb6-00025u-Tz; Tue, 08 Oct 2024 16:54:00 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBb5-000O8u-Gt; Tue, 08 Oct 2024 16:53:59 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syBb5-000QW1-1L;
+	Tue, 08 Oct 2024 16:53:59 +0200
+Date: Tue, 8 Oct 2024 16:53:59 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for PSE
+ PI priority feature
+Message-ID: <ZwVHhxd5KLD5GXh2@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
+ <1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
+ <ZwU6QuGSbWF36hhF@pengutronix.de>
+ <20241008162120.18aa0a6c@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB004.ant.amazon.com (10.13.138.104) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <20241008162120.18aa0a6c@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Gilad Naaman <gnaaman@drivenets.com>
-Date: Tue,  8 Oct 2024 07:38:55 +0000
-> > > @@ -388,21 +366,20 @@ static void neigh_flush_dev(struct neigh_table *tbl, struct net_device *dev,
-> > >  
-> > >  	for (i = 0; i < (1 << nht->hash_shift); i++) {
-> > >  		struct neighbour *n;
-> > > -		struct neighbour __rcu **np = &nht->hash_buckets[i];
-> > > +		struct neighbour __rcu **np =
-> > > +			(struct neighbour __rcu **)&nht->hash_buckets[i].first;
+On Tue, Oct 08, 2024 at 04:21:20PM +0200, Kory Maincent wrote:
+> On Tue, 8 Oct 2024 15:57:22 +0200
+> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> 
+> > On Thu, Oct 03, 2024 at 01:41:02AM +0200, Andrew Lunn wrote:
+> > > > +	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
+> > > > +	msg.sub[2] = id;
+> > > > +	/* Controller priority from 1 to 3 */
+> > > > +	msg.data[4] = prio + 1;  
+> > > 
+> > > Does 0 have a meaning? It just seems an odd design if it does not.  
 > > 
-> > This will be no longer needed for doubly linked list,
-> 
-> This is not as-necessary with a doubly-linked list, but unfortunately
-> I cannot eliminate it completely, as the `n` might be released in the loop
-> body.
-> 
-> I can convert this function to use a `struct neighour *next` instead,
-> if it is more palatable.
-
-Yes, using hlist_for_each_entry_safe() is more preferable.
-
-Mixing for() and while() is harder to read.
-
-
-[...]
-> > > @@ -693,11 +666,10 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
-> > >  		goto out_tbl_unlock;
-> > >  	}
-> > >  
-> > > -	for (n1 = rcu_dereference_protected(nht->hash_buckets[hash_val],
-> > > -					    lockdep_is_held(&tbl->lock));
-> > > -	     n1 != NULL;
-> > > -	     n1 = rcu_dereference_protected(n1->next,
-> > > -			lockdep_is_held(&tbl->lock))) {
-> > > +	hlist_for_each_entry_rcu(n1,
-> > > +				 &nht->hash_buckets[hash_val],
-> > > +				 list,
-> > > +				 lockdep_is_held(&tbl->lock)) {
+> > 0 is not documented. But there are sub-priority which are not directly
+> > configured by user, but affect the system behavior.
 > > 
-> > Let's define hlist_for_each_entry_rcu() as neigh-specific macro.
+> > Priority#: Critical – 1; high – 2; low – 3
+> >  For ports with the same priority, the PoE Controller sets the
+> >  sub-priority according to the logic port number. (Lower number gets
+> >  higher priority).
+> > 
+> > Port priority affects:
+> > 1. Power-up order: After a reset, the ports are powered up according to
+> >  their priority, highest to lowest, highest priority will power up first.
+> > 2. Shutdown order: When exceeding the power budget, lowest priority
+> >  ports will turn off first.
+> > 
+> > Should we return sub priorities on the prio get request?
+> > 
+> > If i see it correctly, even if user do not actively configures priorities,
+> > they are always present. For example port 0 will have always a Prio
+> > higher than Port 10.
 > 
-> Can you elaborate on this?
-> Do you want the `list` parameter to be eliminated?
+> We could add a subprio ehtool attribute, but it won't be configurable.
+> In fact it could be configurable by changing the port matrix order but it is not
+> a good idea. Applying a new port matrix turn off all the ports.
+> 
+> I am not sure if it is specific to Microchip controller or if it is generic
+> enough to add the attribute.
+> I would say not to return it for now.
 
-I mean like
+The generic attribute do not reflect the behavior of two different
+controllers. Currently implemented prio attribute is in this case TI
+specific and do not work for Microchip case.
 
-#define neigh_for_each(...)		\
-	hlist_for_each_entry(...)
+Please note, I do not care about configurability in this case, I only
+care about information the user get.
 
-#define neigh_for_each_rcu(...)		\
-	hlist_for_each_entry_rcu(...)
-
-are better if there's repeated arguments.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
