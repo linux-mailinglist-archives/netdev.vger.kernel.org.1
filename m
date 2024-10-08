@@ -1,214 +1,212 @@
-Return-Path: <netdev+bounces-133329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4CBF995B09
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:52:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CBA9995B20
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22B3BB2118E
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:52:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF1931C20A55
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F139217910;
-	Tue,  8 Oct 2024 22:44:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB37E21B44B;
+	Tue,  8 Oct 2024 22:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+4NUAGP"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="EOo9JOty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011009.outbound.protection.outlook.com [52.101.70.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8778221503B;
-	Tue,  8 Oct 2024 22:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728427455; cv=none; b=qdk6ABpWOn1LCn4+ZOw2WJssf87aaPRbQ/iAyhr1Js5l9PBwEtp5ZdaE1WOynbhvRKvijKMZ5pgG/a/1+jjJIvfW9WoOWnPAgRqes9Bo4orqJuNNh2SrdpHfY3XEcIvDALMukF28fsVhxkScFjnuKfAW85WmpFlYIcMGfkOUjs4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728427455; c=relaxed/simple;
-	bh=/FRhju6OZTXPmsTdnMH8o1bOozrFFjuoN85+xzVaq2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O7KEodmc6EDIfM2DPtdWjphGiMshQonUfC8q1nv0pDwNW4rlxw8+InGmkoAalHXESoKKVcO/flRe50UeKHrysG2zYHI9IIPUoHrF/vYe3ziqpO2cBLbGuCqov6jdjDDo87bOA/Av/ZsR8eny+CAgLCbujRLtqXlZ7px7s+1ga3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+4NUAGP; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4582f9abb43so41795341cf.2;
-        Tue, 08 Oct 2024 15:44:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728427452; x=1729032252; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RqgiQbZha4FLfEseXSQzK7NvkT/59J//hj+63erYNfQ=;
-        b=g+4NUAGPdTx18bExxntdvsvU/e44bGAHT9ZrDXRDKJQErPZlst29Lb87bhBWI2HKNA
-         0gUJJ8lS6Ng0+U06bKIhlFawDxI/StF2UvJ/UL7oGKN7GSK32zUFeKuspKHEEIqqzmib
-         29XV4pMrm6ppmKdh2sPxTPgYA/ChOSgqbcaMm59zrC57yxGmVeEdZdTmjnEemyxxzzSD
-         C86PgGAMNGwINMClXhEYIblGUL2M2N1lBuD2TBE9BS38yvGj7D/T9Hw7OoT/aFWCykn8
-         /dXN7IpG/Uu51l95NBACln+6n0dpRm/oeynL1MJe6O3Bp223LxnGNaV2Yn0oL4q8/ZYF
-         Aucw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728427452; x=1729032252;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RqgiQbZha4FLfEseXSQzK7NvkT/59J//hj+63erYNfQ=;
-        b=VL6wVBruW4hH5E7o834weVWXnVMNCvCm+LbOA9q7Skjm/J3GW2RxO2/La0NzBwU8kI
-         ZvJSFWz2bpAwR29Nxdn4xz7Ot5ECEWfiUkPhznJu5kxqBHPaTkE5JSoAFHLe+KYjVQwN
-         ZcOgVMfx5qlFpC0FXsfQRpyetBFQwuLDqDa9KTmyTdPiWsD25Ad3IhfxB50MejWyMOWv
-         hddMD3rPOhgXAUPaUVDiIpn/MOeG0dlGS9CdDlehD9dzE1xC8B97xg9E4gHmQ+5bDg0I
-         d3Uh0Jn8g+DiCaVBxDOdRKcOcyxuUPgy49rYVjsd5trDb9t0LjNz+E0vtRpSo69o3oWL
-         niMw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDJxmVq/Z4ssm2MU7YHB7o1dfEUamJZMzgtYrSaOAItbbjREWzKttZOJ8A9j9kKzAO0aM/Jv4uy5fOUZUIlns=@vger.kernel.org, AJvYcCVQAZdhDyxKmAo6UZOWlE2phqa8fUOyhUnykq9HTl4ZOJnRUFCpyEl4hFK2rP+IiYIUZbAjU9iH@vger.kernel.org, AJvYcCX9AM/nI/ktRzYI2k+7+TjLqPIfstJ1B126POn2pScOgD6IVg7OF7xQDFkw9gbQOxswvHvqUp18EfyHBx0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+VTRL1Fwz6Kon4q6NncY4sMpFJSmFyMt6148NnXR9emA/aV22
-	RuFc1EjDRbLGnc14EYocXW7Prercdy0sBhhsy7FsqXnymyiJe926
-X-Google-Smtp-Source: AGHT+IFRhQDWVAzs6gHbC0s4ucr7t2+ntbhqLuufaTyWmm0uy2soT0GvyU5CtpvXOzNcwAP8GF3uzQ==
-X-Received: by 2002:a05:622a:1f18:b0:45d:9236:89f2 with SMTP id d75a77b69052e-45f9f994740mr6346581cf.2.1728427452407;
-        Tue, 08 Oct 2024 15:44:12 -0700 (PDT)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7afce5892ffsm60230485a.45.2024.10.08.15.44.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 15:44:12 -0700 (PDT)
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 8840E1200066;
-	Tue,  8 Oct 2024 18:44:11 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Tue, 08 Oct 2024 18:44:11 -0400
-X-ME-Sender: <xms:u7UFZ5KIPPxzWPR-PhWShF9O32Ni2Z8qkud6hjD0DQORQ2RnLNouig>
-    <xme:u7UFZ1JuB5MCVaNguSGppi6FBKnZYCTCvX0aj3zFbG7V5KzzqJcFkKhqUDhXE1nGf
-    rSmCYGgX3GzAi7PaA>
-X-ME-Received: <xmr:u7UFZxv9Pw6ZiZ_OMDf9itShdc312qYzQl5Brmf3Jmw_6BawWvx_MiCFrjX4ZQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdefvddgudefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpeeuohhquhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilh
-    drtghomheqnecuggftrfgrthhtvghrnhepvefghfeuveekudetgfevudeuudejfeeltdfh
-    gfehgeekkeeigfdukefhgfegleefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepsghoqhhunhdomhgvshhmthhprghuthhhphgvrhhsohhnrghl
-    ihhthidqieelvdeghedtieegqddujeejkeehheehvddqsghoqhhunhdrfhgvnhhgpeepgh
-    hmrghilhdrtghomhesfhhigihmvgdrnhgrmhgvpdhnsggprhgtphhtthhopedvtddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtg
-    hpthhtohepmhhighhuvghlrdhojhgvuggrrdhsrghnughonhhishesghhmrghilhdrtgho
-    mhdprhgtphhtthhopegrlhhitggvrhihhhhlsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopehfuhhjihhtrgdrthhomhhonhhorhhisehgmhgrihhlrdgtohhmpdhrtghpthhtohep
-    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprhhushhtqd
-    hfohhrqdhlihhnuhigsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhk
-    rghllhifvghithdusehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhmghhrohhsshesuh
-    hmihgthhdrvgguuhdprhgtphhtthhopehojhgvuggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:u7UFZ6ZybJIzDKgLRLCR73JzP5FB0T2YKeIvuHteDkk9q_K9fnIJYw>
-    <xmx:u7UFZwa5eahnWS1huXUgcxjdQZK-WsUhOlZyVlRfZAbOhst568pARg>
-    <xmx:u7UFZ-DHfV5oAXienUrEcsAAT0o2dvfD_D8sAET00csJks27x5PKMg>
-    <xmx:u7UFZ-brPjKhEuh2tNGTFMYFXg8bN9s4EohnbsL1eCB29w_E0Ei0qA>
-    <xmx:u7UFZ8rhc-HbVL00hIDfZDJ8-3YMRKJJ2arw94Xru5Dti1nkAJ_Hu_qI>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Oct 2024 18:44:11 -0400 (EDT)
-Date: Tue, 8 Oct 2024 15:42:49 -0700
-From: Boqun Feng <boqun.feng@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Alice Ryhl <aliceryhl@google.com>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com,
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
-	gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, anna-maria@linutronix.de,
-	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
-Message-ID: <ZwW1aUGqEj6i4ywb@boqun-archlinux>
-References: <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch>
- <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
- <ZwPsdvzxQVsD7wHm@boqun-archlinux>
- <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
- <ZwRq7PzAPzCAIBVv@boqun-archlinux>
- <c3955011-e131-45c9-bf74-da944e336842@lunn.ch>
- <CANiq72m3WFj9Eb2iRUM3mLFibWW+cupAoNQt+cqtNa4O9=jq7Q@mail.gmail.com>
- <df2c9ea8-fa3a-416e-affd-b3891b2ab3f7@lunn.ch>
- <ZwWp9C2X_QIrTJEq@boqun-archlinux>
- <32e97ba4-a47b-488a-b098-725faae21d7d@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA282185A7;
+	Tue,  8 Oct 2024 22:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728427700; cv=fail; b=FhTGOzyufPa+4b2Cmax54arH/p27VI829N0zRbMHRs3mvFxfDb3l/CyoiultBUR3zWmODNwoR+F0zOCzn9nwUaxDtgYebMf5MwEQEkil8xFQXWaI4I3GuRz+ZM+Tui7jfeq8hD2FwSH2BO0YZWUeDUL9WQPrbP1g0s9soV8NUGg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728427700; c=relaxed/simple;
+	bh=ij0y+0VK0EV0SE7Zzk2IePDUrjyj6LkqfLFJpbypKQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UC7mtpgeiRdLJVsMOiHeF9rgIuXrH9MmjRI8Y7jw0I+xyRQpINVnc13x+zHvfEuAJHPoR33nXmdE3xuKWNXUC6U60pHph3IIdSLt0Ln7RxUcUUnU2hpv6Q8B4AimvSwHOoMbQjj/IB3Chg+Of95/p+niwOsWiLkcYebKl/BMyfQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=EOo9JOty; arc=fail smtp.client-ip=52.101.70.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BTJzQTSbgT0w0Ib+MtRacrG3VlI7zeQF5lqOvwzamWEcMqRc6SFWpeaXWtNHTwp812vCko+D+bsLvr5qjVf+4jgh0R+SBiaBstzBkzpoDyY965bKL9GqW9z+kyHFyoxGrRgapf32WUTc5zIgsLEkCLULRVteLqVafhOymeVl0603Ceqelp8beSrs2VbmNAWRgEn8BNvLts3XJdFx8sHXjZIOSx98CKxzA0qTQGgODTNH9y/Fh9Tnk6/6W7rW4fo9UkcuxtwIReueGSV6ZRrLFqfJuL5WmrRVIedS0ekUWGyOyLhyBCjO7vsC1V1cQwO7TItfBi3wvp4QrsvZsQQJoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aIroOgaTRGy19/KvUuPzHIQVYoDEA11qR+BegddLGhg=;
+ b=P0KC6SaFG3k6sUMOF0684te/kV03qvEWjwnSeqq0cxlJblanX2SaJ9ifBLWRtz1+Op7Vx2i7FmJhRauTstC8p+rEbryQW6QrKN3UloRZFYFkSvO/cxBJ75D3F5KO9akCq8PhN4cnVoYUrqdVRxctMgQ+nU+XTMGUnOMMmZlFeashhw9rYinG8uLux04ATkIiWHDwxUYpxKz2RLT04qHp4AGDEGLGB88sTd/fRguoyrKgk6sepixtH8YNhTRhCKkFlYJIeMYShSKvwTquwKfC3fcEQdUCS5RiyioC1nMPgrz82fn63neFzxUV83ybTUVJKwJxaTKTRsD+wqpL+f6j2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aIroOgaTRGy19/KvUuPzHIQVYoDEA11qR+BegddLGhg=;
+ b=EOo9JOtySQDMRyusz5FgUod3hLHC6ggrOFunvLefu6L0eQoNRbxlp1Oi8vvwhyPDtZ9zBkNJ2AmFwifarJo7KRG/p+1ZHgjqTBu2iC2GhmUH+gZWJSt1pnI0wOxuo5jmPPT/Rfy2UiVclccd02vP6Pb4wbjuRr7WhStvELsb7RIDz7udmguoCdonmdYiH8xJAVHyAwRY3ttO+KPjO3f8smW4VQCuojA4wUVuZtNC/ITl5UvQowig9ybN1cuZuBcAEA0RTXYTt+W2Vivz7MxzmriPHiRG3jbA1UFhcFBDb+mvjzd9cOnTJ1i9mU1x9r8vwWMGSRTS/ok7laBElr2koQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by GVXPR04MB10381.eurprd04.prod.outlook.com (2603:10a6:150:1e1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.23; Tue, 8 Oct
+ 2024 22:48:09 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8048.013; Tue, 8 Oct 2024
+ 22:48:09 +0000
+Date: Wed, 9 Oct 2024 01:48:06 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"rkannoth@marvell.com" <rkannoth@marvell.com>,
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
+	"sbhatta@marvell.com" <sbhatta@marvell.com>
+Subject: Re: [PATCH v2 net 3/3] net: enetc: disable IRQ after Rx and Tx BD
+ rings are disabled
+Message-ID: <20241008224806.2onzkt3gbslw5jxb@skbuf>
+References: <20240929024506.1527828-1-wei.fang@nxp.com>
+ <20240929024506.1527828-4-wei.fang@nxp.com>
+ <20240930220249.dio23fh7mqw4pojn@skbuf>
+ <PAXPR04MB85102EFDDEBED7C602ACBD4888772@PAXPR04MB8510.eurprd04.prod.outlook.com>
+ <PAXPR04MB85101B7AC1C1F46E8DD59958887E2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PAXPR04MB85101B7AC1C1F46E8DD59958887E2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+X-ClientProxiedBy: VE1PR03CA0006.eurprd03.prod.outlook.com
+ (2603:10a6:802:a0::18) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <32e97ba4-a47b-488a-b098-725faae21d7d@lunn.ch>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|GVXPR04MB10381:EE_
+X-MS-Office365-Filtering-Correlation-Id: 293bf33b-6913-4786-2006-08dce7eb483c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?jEXABSbn9LGD3qqhqTLEITUoh8dBB/7Li6ktgNAtFMqqTAOqX3517bV4fOfs?=
+ =?us-ascii?Q?AwhufRrLyzh6TKIRKi5FJowoqPgpEnNihHHEDt/YGzsiP6E8REDCCkAx5er5?=
+ =?us-ascii?Q?J3PpP0Lk0xM2ZIqaBRrch8x5WH1lNdio7fC3ZpLtDQvtx7YxI++ZMS+wcKtc?=
+ =?us-ascii?Q?F1M9ta7CiZiC3zn3KGIKi3aHKHISOpSVIUl59AtpNCZa8M/MlhuSt7y7bh/4?=
+ =?us-ascii?Q?GG0HuSbZoSA/KhqH7vQL+FL/En8PuC39JCqTq11Dt0xkVvXZRot8fAkMbE5c?=
+ =?us-ascii?Q?cIlNitx1R3gvAEG5uazEMNzQPz0gcvkDc1fNxs/jrmVBEeVdQur4QKKILUtQ?=
+ =?us-ascii?Q?AGm4cr0oinVfD8LCDtv7eaGBS8ervoHXqGU9R/DYnvar1L0vFL93gDf9+K/9?=
+ =?us-ascii?Q?ooigbGRv4o5P8cVCh0mDyLHYJQ2EF9FaZ9hGzhaVh8NuHcOSX34mLvJ6yivA?=
+ =?us-ascii?Q?7Iq8QWnslcocWQKIyI/QIhbQ/YQ+M1iv/a4Dg48CoRA6Yr9swcovew/rYrtY?=
+ =?us-ascii?Q?2Mz8kdDiIRy5tPbASTjYrsrS59lLg9AWA0746iw+A3JQaNMcHlIgAg0zmcSu?=
+ =?us-ascii?Q?zTBs4IeSFEfBgJeGQnuRuKw2ODyW4hYmy8OCp6WUE/jSulWL+153dZ311M3Q?=
+ =?us-ascii?Q?rIYDvFTpTiIBiJ4jzFuUr7jujfszu9/TT6xzFPKUjuywNXHVvyJMeaDujAve?=
+ =?us-ascii?Q?JSEkx6Qeu4/pH5UcwmSck3qu+Wu85ConMmxf6LD7ppGgER0/UoriLVJ7jtf3?=
+ =?us-ascii?Q?TxFsaGHFEQJlIJ3ZJPurRdP350Jhp00hb3h5z6++wpB/chHuktG+lOelNvT7?=
+ =?us-ascii?Q?oT1Yc726yCwQdfIGR9SCIRJbakQ2jI+1gkJLROXX9Oo2cTApWRTfS0QUh1Wo?=
+ =?us-ascii?Q?MaOhk4QGCZBTajllmHAAh9Rs2C3PJYL82YiPV0+aBhYd104rroh6pxHosTTD?=
+ =?us-ascii?Q?eth+kYFVv+WUJfPDRdiMy7k3+0CZgQmNYM9F9Byca4ej5MpGm9dlqK8xqn49?=
+ =?us-ascii?Q?BVd63zCs1JJIyXrlnwT+z/jGaDAWu3PxKvS3Ufp8vSpBALPilZe36BlZI7a4?=
+ =?us-ascii?Q?Z/0HZ9R7MaY7+FEyrVvX/+IzE8i+/EkXmwb0RJOuzUqvnwIA9r3qm27R2+3p?=
+ =?us-ascii?Q?G7nFRIvXzHFCfvMS5a1CIn5BKY+yw5FczwtzU6mrxjm4HL3TgRtqh/EkEuvV?=
+ =?us-ascii?Q?o6Gwc+stMiFFV0rcLOHglRpzOEBjTyZRa6fCNPcrjwYTJeVtrS9+6L8ge5EL?=
+ =?us-ascii?Q?AK6o29wlX4SrjolRwVvbxcOedJoOK3jGgJTiLa4iwg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?PMo0isPy6yEO589TeYRfcKj7mvSAL7JDbEImQKu4+32GtgT/eZEW/4oQxRfG?=
+ =?us-ascii?Q?xSnbEdhxMdJghEXYTLrhYgipV020QdykOOLGHy+P7oZ2DivBVTF4ZQ1gJ1F3?=
+ =?us-ascii?Q?GS/6GZUI+aNJcv/yRqejaaNK60wocCao42YDELHawqkWICjW34/lfMRgVO4W?=
+ =?us-ascii?Q?ugufORCHzv7q+Et+UEbUuUVLXbHIcgkN2IV3gME9eAFusxDfRVzHmAubaH/t?=
+ =?us-ascii?Q?HyiBFOX7w3uEC2mm3Q5d0nAgfFXw04YNr/WiARWBU07r/FWaNlSfwtMLnZk4?=
+ =?us-ascii?Q?9Erc7hS4YlBzQJATTm4kbNYO0zNvvhT3VT8hEh/r1LCJskrBu2OwI+OaN+5y?=
+ =?us-ascii?Q?mm9SMP4qWylYMs8AaBKSxgYMcdS0QzrefbpzSiS+Q9eF7LjFOnWFiMq5ZNP3?=
+ =?us-ascii?Q?78GP2rqZBlqh+kUpqFnCJpgqWca/YwtLsNgY+JRbhZhIWZWiqbLVyR/BJSl5?=
+ =?us-ascii?Q?gw+Y/gImMCR8bnF67LUiohlCPGZ8Tog3/0GxGeVaekgb0YIeQPHOS/5u/N+H?=
+ =?us-ascii?Q?ASGur6B6/8KUa4MGhPhm/sQRYk7T1nwa18bHYdCIHioEkYYJkZiFTPBWhHp9?=
+ =?us-ascii?Q?mg0j0wN8y8i1QNcYCahoWHfAoAqow40FH8u8r+mW+i4pJihuFfF/RXcs/pK4?=
+ =?us-ascii?Q?LIJHqTWAf7az+XpNvuRU24YYhnO1p1VIaTU2DDlfYzhXuy6fmBjxTI6IUM8D?=
+ =?us-ascii?Q?7ivLiyu5an+sIeDdyIw1ErwxgkaCYGAOmRETyBxc1Vgga76VKXH3bY4YftA7?=
+ =?us-ascii?Q?o+WxBxY2y/1ZSSpHeoYbleXkadxaci1wpoub61ew73oBhccOE48l5iRy+B+5?=
+ =?us-ascii?Q?V3Nz35A+LQy5mJYEEHL1w9y61Awli5o33SJojBetKX2gs3f/x0VlRQei8rF5?=
+ =?us-ascii?Q?eGy/xaf4v6t8CdzrPl9XMc8reYKC0qNbrM08T5f0MkAnR3Fu4+BxX+UTpcAb?=
+ =?us-ascii?Q?oXZvzhzF2EIm4QPUpUoHRXlxOJHWbKOGaGPx117kZ6/0HtpFfTUoltoJhU2e?=
+ =?us-ascii?Q?mD1kB2EwHIkiCxfwC+REuLkgBpahi3isi0CEGwig4xo8ro3oJnJDZ8p4XDxp?=
+ =?us-ascii?Q?V6p6QbFp5XQSaUOrPoVeG0rcd7CnzhvUXddwpeydgzU1FtJiFcMfnSp51F3F?=
+ =?us-ascii?Q?VDAtl5MnkqNY9miA4Vs8mDRIX5GeuIEnzucqFG+/6g0Zf6sUw36l0fh/doN9?=
+ =?us-ascii?Q?su84HMwTOqoBc55miIw28Ag60SAbt6atoFJYpXcUV3n92S3l1HbswiDU+NL4?=
+ =?us-ascii?Q?z25raBQIFFWtMLUhXX6FwdLXbeHtRrVFzsLbNmSx7I8Gmyu7C+1N8ppExcx4?=
+ =?us-ascii?Q?RHfAzYz/45fEqK/n/XExbJ+RPBoMfG+igvIf2BMLndkKL/TCxkXbvzs+MqTA?=
+ =?us-ascii?Q?1wo9z6w92IRWYaNGu2+/zxujhEMb7ZOfa5et6nPKoHcGye1upM+BcrZOd0f/?=
+ =?us-ascii?Q?hLFyzI+HELHGAVVT6z3mEAOMh4Acy+STMWvLNE3VC6wKskHt29yFr9nn3hMZ?=
+ =?us-ascii?Q?ZRmYobLwwmGY6RoGuvIg3l7Jo/ixgc7URxwiGn+c/Lq68t03E1cdlya2woSj?=
+ =?us-ascii?Q?1gfTf5zXU1p5BWz0q7B4c/vOZf0FtEeRMu2aE3yh76nrg/bkO65Y30WrXiA3?=
+ =?us-ascii?Q?lg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 293bf33b-6913-4786-2006-08dce7eb483c
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2024 22:48:09.6539
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: civ8GF1ItZe4Z8vx/xTSv/RZpyT5wCtJ5l6ISEs9wLgm3GRhVT+h3KW63wrtIQWBOD1H/DLWUv5KT+BI/pLCkg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10381
 
-On Wed, Oct 09, 2024 at 12:26:00AM +0200, Andrew Lunn wrote:
-> On Tue, Oct 08, 2024 at 02:53:56PM -0700, Boqun Feng wrote:
-> > On Tue, Oct 08, 2024 at 07:16:42PM +0200, Andrew Lunn wrote:
-> > > On Tue, Oct 08, 2024 at 03:14:05PM +0200, Miguel Ojeda wrote:
-> > > > On Tue, Oct 8, 2024 at 2:13 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > > > >
-> > > > > As far as i see, might_sleep() will cause UAF where there is going to
-> > > > > be a UAF anyway. If you are using it correctly, it does not cause UAF.
-> > > > 
-> > > > This already implies that it is an unsafe function (in general, i.e.
-> > > > modulo klint, or a way to force the user to have to write `unsafe`
-> > > > somewhere else, or what I call ASHes -- "acknowledged soundness
-> > > > holes").
-> > > > 
-> > > > If we consider as safe functions that, if used correctly, do not cause
-> > > > UB, then all functions would be safe.
-> > > 
-> > > From what i hear, klint is still WIP. So we have to accept there will
-> > > be bad code out there, which will UAF. We want to find such bad code,
-> > 
-> > If you don't believe in klint
+On Tue, Oct 08, 2024 at 06:30:49AM +0300, Wei Fang wrote:
+> I think the reason is that Rx BDRs are disabled when enetc_stop() is called,
+> but there are still many unprocessed frames on Rx BDR. These frames will
+> be processed by XDP program and put into Tx BDR. So enetc_wait_txbdr()
+> will timeout and cause xdp_tx_in_flight will not be cleared.
 > 
-> I did not say that. It is WIP, and without it i assume nothing is
-> detecting at compile time that the code is broken. Hence we need to
-> find the problem at runtime, which is what might_sleep() is all about.
+> So based on this patch, we should add a separate patch, similar to the patch
+> 2 ("net: enetc: fix the issues of XDP_REDIRECT feature "), which prevents the
+> XDP_TX frames from being put into Tx BDRs when the ENETC_TX_DOWN flag
+> is set. The new patch is shown below. After adding this new patch, I followed
+> your test steps and tested for more than 30 minutes, and the issue cannot be
+> reproduced anymore (without this patch, this problem would be reproduced
+> within seconds).
 > 
-> > might_sleep() is useful because it checks preemption count and task
-> > state, which is provided by __might_sleep() as well. I don't think
-> > causing UAF helps we detect atomic context violation faster than what
-> > __might_sleep() already have. Again, could you provide an example that
-> > help me understand your reasoning here?
-> 
-> > > while (1) {
-> > >     <reader>                        <updater>
-> > >     rcu_read_lock();
-> > >     p = rcu_dereference(gp);
-> > >     mutex_lock(&lock)
-> > >     a = READ_ONCE(p->a);
-> > >     mutex_unlock(&lock)
-> > >     rcu_read_unlock();
-> > > }
-> 
-> The mutex lock is likely to be uncontested, so you don't sleep, and so
-> don't trigger the UAF. The code is clearly broken, but you survive.
-> Until the lock is contested, you do sleep, RCU falls apart, resulting
-> in a UAF.
-> 
-> Now if you used might_sleep(), every time you go around that loop you
-> do some of the same processing as actually sleeping, so are much more
-> likely to trigger the UAF.
-> 
-> might_sleep() as you pointed out, is also active when
-> CONFIG_DEBUG_ATOMIC_SLEEP is false. Thus it is also going to trigger
-> the broken code to UAF faster. And i expect a lot of testing is done
-> without CONFIG_DEBUG_ATOMIC_SLEEP and CONFIG_PROVE_LOCKING.
-> 
+> --- a/drivers/net/ethernet/freescale/enetc/enetc.c
+> +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
+> @@ -1606,6 +1606,12 @@ static int enetc_clean_rx_ring_xdp(struct enetc_bdr *rx_ring,
+>                         break;
+>                 case XDP_TX:
+>                         tx_ring = priv->xdp_tx_ring[rx_ring->index];
+> +                       if (unlikely(test_bit(ENETC_TX_DOWN, &priv->flags))) {
+> +                               enetc_xdp_drop(rx_ring, orig_i, i);
+> +                               tx_ring->stats.xdp_tx_drops++;
+> +                               break;
+> +                       }
+> +
+>                         xdp_tx_bd_cnt = enetc_rx_swbd_to_xdp_tx_swbd(xdp_tx_arr,
+>                                                                      rx_ring,
+>                                                                      orig_i, i);
 
-Hmm.. but that means we need to quickly detect UAF and track down to the
-source, right? In a build without CONFIG_DEBUG_ATOMIC_SLEEP and
-CONFIG_PROVE_LOCKING, may I assume memory sanitizer is also not
-available? Then how do we detect UAF relatively quickly? Or memory
-sanitizer is in fact relatively cheap, so it can still be enabled,
-what's the configuration of netdev CI/testing?
+Yeah, it works on my side as well. Thanks for following up.
 
-Regards,
-Boqun
-
-> Once klint is completed, and detects all these problems at compile
-> time, we can then discard all this might_sleep stuff. But until then,
-> the faster code explodes, the more likely it is going to be quickly
-> and cheaply fixed.
-> 
-> 	Andrew
+I would argue that the above snippet should be a fixup for the
+"net: enetc: fix the issues of XDP_REDIRECT feature" change, and a
+rewrite of the commit message is in order. Currently, as a reader, I get
+the impression that only XDP_REDIRECT needs to check the ENETC_TX_DOWN
+flag, only for the next patch to come and say "remember what was said
+about the TX ring not being allowed to actively transmit frames while
+disabling it? well, that patch wasn't sufficient to ensure this condition,
+because XDP_TX needs to respect that flag as well!"
 
