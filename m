@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-133159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D74995217
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:41:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD03C995218
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F35991F25E00
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:41:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CDD01F2600C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C395E1DFDAB;
-	Tue,  8 Oct 2024 14:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BEB1DF998;
+	Tue,  8 Oct 2024 14:41:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Az0hbCkN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="W5LsTAQt"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C70D1DFD80
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E151DF73C
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728398506; cv=none; b=Swhymi/FbyvUhmZBZBZhZcANWERhrQf+F275/KDoj21hiaj1w1g8P2u+V2XLQ3hJ80+3zb57CrNJswBP+bqVx2MOu9+OxB7n5HSDvjBNtt0s59rFRZxJkOaXRvgGzE1upxSTdg3hUM70s4W4RMugPmY5CMbV8BWoe4bMcjtzAYY=
+	t=1728398514; cv=none; b=osesEx6sbYThSO1CAYJPF8wC3RHaz2YuyIDUnkqlcE3sOD7elPpTJtpRDpH93EqZR6BKzarNfrzygZBwVLAf/NI+REmork1aNP+MS6vDAYMHzwJCFhrtpXOZvw9uB8h2J8d7064jFEtlGeBEVuLCpXGV5G6jQt4GJmqk/PiTYqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728398506; c=relaxed/simple;
-	bh=NRzt4vEd+fFdZlNDJvoGsC4ACxSgKz9bpb67V6XnKq8=;
+	s=arc-20240116; t=1728398514; c=relaxed/simple;
+	bh=Vz0gFYM6a9ZLN2umEBCP+vIbgy9k3/ReuAZETMW0/kc=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Na3SqH0JuEgcpGhvdwo3uzjyN5Hhpq2jtZz20tQBCvTN3x5GmQdsqxn02tUV4jAajIw34mAfTxAomiuXkzL5Zz3GBSxNzLmNpONMbSpQ2f2L1woDsrZ5134Xuzyl9XCLIRltmOicXUFjNQ9jEaQuq4aXJpSwSw6l7TpqwsqsLN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Az0hbCkN; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=CQlhcvc7KepGuA9P41UiWzpcNC2ZlSR1tIyyosveauF0nHO1ta0fw2zRdJccQSmuCFfuDghfXtjAadWIbmYK61/p0ihfmLguGP+B3YO/rJryhLiRvblEBsslfPiWfQDtwGaA3xJFLegoTWCs46KwE2uRjBntIpWi2INdCDjivY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=W5LsTAQt; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=E7usBhorOp87ClqjW9UTVeA+osR8rUTJnPMF5IMx074=; b=Az0hbCkNSDmHPMc18maKLPCqFv
-	QOugYdIVLKmK8BpTTmn4auZT13uk877ZdeFXuVzaojnup23ucAHj0gEBcRERug/USl7RvX9OBiTZA
-	xFCA4ViWWse7NLLegis2x1SGoR6Y9u0VWDOZlis50QUvocFRhLerHalUC+gPxbXI7ZU/hFrUGUAn+
-	cf4XcjcdtqO98TYFly/Fh2Aa0h4xHRtcT8o3QHaOF1wtcx8N1WkVseHbGg70dcNjZGTaacukIcNdr
-	JHG6PVy9j+8XNen3a3Biln4rrTiww0vEHvyyFJ60n6gK4LhUflLqIEipZJMtD/cmrgRLPcFLCLZ5F
-	ZaIjBQ0Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57358 helo=rmk-PC.armlinux.org.uk)
+	bh=rd5GuzrzONkq21TVGGwDwpRHf3yYF0nOc1Y+j6ndNLM=; b=W5LsTAQtZxLKCfNwUXSc9rP79j
+	ZTtYNgUuabTwBT28V1eHSBfkAjiMWscuCDhmhoU5+cD9MeGXOZc9ETIgIgOc5r/Qb6pr4c0hZ2/8e
+	b+y6StWV7aYrxtr0SAcr1hoVPb491zh+QihnXxsd9SItdnBHQ5RLzHbeMwy/bSfBFkXeI2hppnNDn
+	vAJFgP98MmaBzZpmkBS5bK3Sp5nRecW3w4LaG9bQa05UbVn35U9YYl6JTc6UDHPMMkjrMK6BedtO0
+	1BG8VlLpPqLdEuvK6lN+7YI9t6tRKbL2q0R2/u+vx/Lxy+ctDM3pdEM+yuWb+7ajARc2j2iwch4qG
+	n8OGYhwg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57368 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1syBPB-0007cX-0f;
-	Tue, 08 Oct 2024 15:41:40 +0100
+	id 1syBPG-0007cj-1E;
+	Tue, 08 Oct 2024 15:41:45 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1syBP9-006Unb-Q3; Tue, 08 Oct 2024 15:41:39 +0100
+	id 1syBPE-006Unh-TL; Tue, 08 Oct 2024 15:41:44 +0100
 In-Reply-To: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
 References: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -64,8 +64,7 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 2/3] net: dsa: mv88e6xxx: return NULL when no PCS is
- present
+Subject: [PATCH net-next 3/3] net: phylink: remove "using_mac_select_pcs"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,32 +74,82 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1syBP9-006Unb-Q3@rmk-PC.armlinux.org.uk>
+Message-Id: <E1syBPE-006Unh-TL@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 08 Oct 2024 15:41:39 +0100
+Date: Tue, 08 Oct 2024 15:41:44 +0100
 
-Rather than returning an EOPNOTSUPP error pointer when the switch
-has no support for PCS, return NULL to indicate that no PCS is
-required.
+With DSA's implementation of the mac_select_pcs() method removed, we
+can now remove the detection of mac_select_pcs() implementation.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/phy/phylink.c | 14 +++-----------
+ 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index ddc832e33f4b..af02a9f27189 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -868,7 +868,7 @@ mv88e6xxx_mac_select_pcs(struct phylink_config *config,
- {
- 	struct dsa_port *dp = dsa_phylink_to_port(config);
- 	struct mv88e6xxx_chip *chip = dp->ds->priv;
--	struct phylink_pcs *pcs = ERR_PTR(-EOPNOTSUPP);
-+	struct phylink_pcs *pcs = NULL;
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 4309317de3d1..8f86599d3d78 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -79,7 +79,6 @@ struct phylink {
+ 	unsigned int pcs_state;
  
- 	if (chip->info->ops->pcs_ops)
- 		pcs = chip->info->ops->pcs_ops->pcs_select(chip, dp->index,
+ 	bool mac_link_dropped;
+-	bool using_mac_select_pcs;
+ 
+ 	struct sfp_bus *sfp_bus;
+ 	bool sfp_may_have_phy;
+@@ -661,12 +660,12 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
+ 	int ret;
+ 
+ 	/* Get the PCS for this interface mode */
+-	if (pl->using_mac_select_pcs) {
++	if (pl->mac_ops->mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+ 		if (IS_ERR(pcs))
+ 			return PTR_ERR(pcs);
+ 	} else {
+-		pcs = pl->pcs;
++		pcs = NULL;
+ 	}
+ 
+ 	if (pcs) {
+@@ -1182,7 +1181,7 @@ static void phylink_major_config(struct phylink *pl, bool restart,
+ 						state->interface,
+ 						state->advertising);
+ 
+-	if (pl->using_mac_select_pcs) {
++	if (pl->mac_ops->mac_select_pcs) {
+ 		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+ 		if (IS_ERR(pcs)) {
+ 			phylink_err(pl,
+@@ -1698,7 +1697,6 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 			       phy_interface_t iface,
+ 			       const struct phylink_mac_ops *mac_ops)
+ {
+-	bool using_mac_select_pcs = false;
+ 	struct phylink *pl;
+ 	int ret;
+ 
+@@ -1709,11 +1707,6 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	if (mac_ops->mac_select_pcs &&
+-	    mac_ops->mac_select_pcs(config, PHY_INTERFACE_MODE_NA) !=
+-	      ERR_PTR(-EOPNOTSUPP))
+-		using_mac_select_pcs = true;
+-
+ 	pl = kzalloc(sizeof(*pl), GFP_KERNEL);
+ 	if (!pl)
+ 		return ERR_PTR(-ENOMEM);
+@@ -1732,7 +1725,6 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 		return ERR_PTR(-EINVAL);
+ 	}
+ 
+-	pl->using_mac_select_pcs = using_mac_select_pcs;
+ 	pl->phy_state.interface = iface;
+ 	pl->link_interface = iface;
+ 	if (iface == PHY_INTERFACE_MODE_MOCA)
 -- 
 2.30.2
 
