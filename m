@@ -1,122 +1,135 @@
-Return-Path: <netdev+bounces-133017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED6B994492
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:44:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D3D994495
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8874E1F25CBC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:44:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 946FF1C24BEF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C17119067C;
-	Tue,  8 Oct 2024 09:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A4F184551;
+	Tue,  8 Oct 2024 09:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nmlh7FCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E8A18BC19;
-	Tue,  8 Oct 2024 09:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7241865EF
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728380626; cv=none; b=iTfJUXsw7TmMtB1m0YCM8BY1c6/qndBhhS37MtV3OkDQ60VDAzyjAviuj5+zXmIPqEPVV6nqOZfe9Wb5xDSEp/5ZqFxl5r3XqsdfQLK7sBHbFFjcWC8lPEfSWAl6/67n+/x9qF1fTDNb159SpQoQ6S0IgpAelDpGaEggYjyuOS8=
+	t=1728380659; cv=none; b=sV/1sHWwQxPHXlq1u4b0+QBox/9OV2W2o0e+cT5WzS25PS9SLbUallpJdORGcLI57OstS1tYgYX8cYVpcbrh1CfF9UYnx+wWF4hX1NsEC2lb5kpVUw9v8y6R9p+9y8rUR40ItsatvuLY7vqM1X/9pZGTKlkxPoD7W/21R9A6zSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728380626; c=relaxed/simple;
-	bh=HXy8CJWNF6qH50hLohSF2IGSgGAjFAwW/OWKaY0iWfo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LcKtLYVe6RrSobs1g0go8NMp6ScxKNafM8PBcXBBUcHnvUa8O/vCyi5ViiCLrHcjJEg3MrBMO/aF56+Dl7lpn5Q4QlZ4foe6D1eIggDxQMhYJxTuCG3TH24H+Qb6FgDptPYSOfY6U0Ayzm7UhtJHN61sLHZpyLNq9QFnsSfng0c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2fac187eef2so63919061fa.3;
-        Tue, 08 Oct 2024 02:43:44 -0700 (PDT)
+	s=arc-20240116; t=1728380659; c=relaxed/simple;
+	bh=SDDLtyGwN3boJU9vuDQmf/lWBtfwjCJZjBYvHpbuZ8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=t4Q05nvfJB7beZCyvMyBrkpAwEJK1Y0y3Lo3xH4X/rHi/3ktTaciG5Rtpn1EaXS8znKoD6h11YF4WPJU/93F6Wm5RECyT92ujYocsOBbeAAuxpc5+GJidsuUpKY4v+jwXzAOaLda4m8RQ+APsv7WFsFweCmYd7TCxoPFF1znVT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nmlh7FCL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728380657;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BX5Wg/uFyRBw2TJnom7CLx4mNcqX+J1yoWEepUCTp/c=;
+	b=Nmlh7FCLE5zq+yLDzuMdTpX8Y010FRd4UTip/FwepyuyKrN8RwDcQPPotUfw84Z6oPtwWg
+	y/8jKeWtVBKbxpdIhIO3eNok66lBSbCOXjI12EXKQLWM7ztRXEmVsi4Tawk39l54Kd0UYe
+	cpgsd5AU2KOi9I85awmLZWP9jER+I/E=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-73-6WG2F2RHNvG0DspAFqmeMQ-1; Tue, 08 Oct 2024 05:44:15 -0400
+X-MC-Unique: 6WG2F2RHNvG0DspAFqmeMQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37ccd39115bso3520536f8f.0
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:44:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728380622; x=1728985422;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=swh5VTqB4q1vjh5aJ5th+EjDQhZ/dHlb0hXmSyJKUpk=;
-        b=gFd1FzI92oQIpsGRVVteJ4KurW04dAzH62A2eXcVpWIBLpYH+jUUnxGB10QPeqBdhv
-         7+1DTwtQJFrecQje7yiyPUviiRMYg4SN22MnEzTHMgsYuH1SodVQ/jbcUc6csae2vna/
-         HYUuu/G+DtorRx70cUXEsaJHiE7NOze7KPj1tln4KbH9EkrgAh0E0WTM/Io3TJcaTMKQ
-         YY4JhqngExkHRk9DDpwS9B/V5DA37tY39MFJ/poM48z+BxXFlTEnuG4tYY2MzT18Ou07
-         WaKbm2RzKsiYn3YdsfvBDH1k3t5SzOLvS9IC22IH5FiGbm34tSAvgywrgGZp204yr+H9
-         w6og==
-X-Forwarded-Encrypted: i=1; AJvYcCWAT8S+mhYY+6TDKXBw81410XV1qUCoTp3QTrH7tjrLMng8g65g1psf3CWRKxOmhG5Xufk3EpVR@vger.kernel.org, AJvYcCX1Smlvd3tE/J4EjvYTx/LXozQLpC1RDcDqzYblOWbDKIs7f4Q1zyniJ+3nUyeKqLKFEIfaF4LuMQldJ/M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsPsZmWWzCwd4huPO62umGsr7zeMvMHdB6Vdgvipoq9Agx7o3g
-	jucSaqQLhMRBUX3F9+BZDWMWzs2psrHiS8rvrwAD9jEair/a+Vv5
-X-Google-Smtp-Source: AGHT+IHGz+7RqFpca06yAzjxBPQFAJG4/E9xG4FhYAaDwwuh4IV8a5uADHH5W0m/3+TJFlSB5wEqxQ==
-X-Received: by 2002:a2e:bc19:0:b0:2fa:cf5b:1e8e with SMTP id 38308e7fff4ca-2faf3c2ff8emr65352401fa.2.1728380622073;
-        Tue, 08 Oct 2024 02:43:42 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c8e05eb7f0sm4137427a12.72.2024.10.08.02.43.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 02:43:40 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthew Wood <thepacketgeek@gmail.com>
-Cc: kernel-team@meta.com,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: netconsole: fix wrong warning
-Date: Tue,  8 Oct 2024 02:43:24 -0700
-Message-ID: <20241008094325.896208-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
+        d=1e100.net; s=20230601; t=1728380655; x=1728985455;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BX5Wg/uFyRBw2TJnom7CLx4mNcqX+J1yoWEepUCTp/c=;
+        b=lmSBZfdgDtTGmRqmnvOvjcbNdiSDPhBRwFXUVKSTrQPHdB9fCh1qi6lCijiQWSlgsA
+         jW0iZgS8iUQFKPIB/vt8e6iEqPx9LbZ1brt9+bQH9SyGIpzPV4S7LnhW8VaNQL4N3ZKq
+         vl2ZAksEfF+kZyDjsHgGdzaj2xu4d9jk7veh7cjdjFaDKt21bc1ByRdMPJ3fuTK1lDQH
+         hAU63UE0QTJqnIy5UW9qLk9UU9hgJ4N15u4Y2N9VmR5AWzrnjCDPb8OcZmQLGvTEhAsJ
+         BM+lCSu7yE3zo2SqJqePgwlyDp0gPk6IqegpMSOSce67I01FqeMiWLBL2SsSdt5Kgye/
+         T1LA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9bYRcKzNZITPPEOyDXoi+EKGc+i/73AjHV3Amn8EUbtkvvKK6Eou34GwogB6fMxA+VMrdw1g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuclqReoFLtzikKA/uHRyaIJIly4WamKoeUl4PWQOebTkvwf/H
+	OLgfDqV/4EtYWzEcc7e7RYDTQ2FcsSWhaiCPDKTzT/H0U00kLH9In+FlaoneFnfKWOAU2b3/08f
+	kVAIMH/1wQkYnbnP5Hy1Fm0bc5bWgg/QdaRSEA4waLD/4lYztVVcl0A==
+X-Received: by 2002:a5d:526d:0:b0:374:c1de:5525 with SMTP id ffacd0b85a97d-37d0e6bb844mr8595646f8f.6.1728380654556;
+        Tue, 08 Oct 2024 02:44:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEE0ymeMn3DM2N0eULYBv2CdhcxLdElwe23PHauaKbNKnWEklD4+BLjiRWhCHYTYJucujP0uw==
+X-Received: by 2002:a5d:526d:0:b0:374:c1de:5525 with SMTP id ffacd0b85a97d-37d0e6bb844mr8595617f8f.6.1728380654086;
+        Tue, 08 Oct 2024 02:44:14 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1697024fsm7658040f8f.95.2024.10.08.02.44.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 02:44:13 -0700 (PDT)
+Message-ID: <460778bb-aa3c-4b5b-9bbc-a65833b9035c@redhat.com>
+Date: Tue, 8 Oct 2024 11:44:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/1] Documentation: networking: add Twisted
+ Pair Ethernet diagnostics at OSI Layer 1
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Kory Maincent <kory.maincent@bootlin.com>, Lukasz Majewski <lukma@denx.de>,
+ Jonathan Corbet <corbet@lwn.net>
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ Divya.Koppera@microchip.com
+References: <20241004121824.1716303-1-o.rempel@pengutronix.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241004121824.1716303-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-A warning is triggered when there is insufficient space in the buffer
-for userdata. However, this is not an issue since userdata will be sent
-in the next iteration.
+Hi,
 
-Current warning message:
+On 10/4/24 14:18, Oleksij Rempel wrote:
+> This patch introduces a diagnostic guide for troubleshooting Twisted
+> Pair  Ethernet variants at OSI Layer 1. It provides detailed steps for
+> detecting  and resolving common link issues, such as incorrect wiring,
+> cable damage,  and power delivery problems. The guide also includes
+> interface verification  steps and PHY-specific diagnostics.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-    ------------[ cut here ]------------
-     WARNING: CPU: 13 PID: 3013042 at drivers/net/netconsole.c:1122 write_ext_msg+0x3b6/0x3d0
-      ? write_ext_msg+0x3b6/0x3d0
-      console_flush_all+0x1e9/0x330
+Very nice documentation! Just a minor not blocking note below.
 
-The code incorrectly issues a warning when this_chunk is zero, which is
-a valid scenario. The warning should only be triggered when this_chunk
-is negative.
+[...]
+> +- **Next Steps**:
+> +
+> +  - Record the output provided by `ethtool`, particularly noting the
+> +    **master-slave status**, **speed**, **duplex**, and other relevant fields.
+> +    This information will be useful for further analysis or troubleshooting.
+> +    Once the **ethtool** output has been collected and stored, move on to the
+> +    next diagnostic step.
 
-Fixes: 1ec9daf95093 ("net: netconsole: append userdata to fragmented netconsole messages")
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- drivers/net/netconsole.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Likely we will have to reword the this specific ethtool output at same 
+point, and we will need to update this guide accordingly.
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 01cf33fa7503..de20928f7402 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -1161,8 +1161,14 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
- 
- 			this_chunk = min(userdata_len - sent_userdata,
- 					 MAX_PRINT_CHUNK - preceding_bytes);
--			if (WARN_ON_ONCE(this_chunk <= 0))
-+			if (WARN_ON_ONCE(this_chunk < 0))
-+				/* this_chunk could be zero if all the previous
-+				 * message used all the buffer. This is not a
-+				 * problem, userdata will be sent in the next
-+				 * iteration
-+				 */
- 				return;
-+
- 			memcpy(buf + this_header + this_offset,
- 			       userdata + sent_userdata,
- 			       this_chunk);
--- 
-2.43.5
+Cheers,
+
+Paolo
 
 
