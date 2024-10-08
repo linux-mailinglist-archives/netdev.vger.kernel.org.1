@@ -1,198 +1,151 @@
-Return-Path: <netdev+bounces-133249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9D8995643
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:15:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823FB995649
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C48632859ED
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:15:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B32DB1C229CF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D76C212D2C;
-	Tue,  8 Oct 2024 18:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E96420CCDC;
+	Tue,  8 Oct 2024 18:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="FGKoiC6y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fanD8ZR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE42212D20
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925A420ADE2;
+	Tue,  8 Oct 2024 18:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411310; cv=none; b=uf2u2DPDnYfG2fuXvZsuWFcM2QrIIkZXxWs+M1GgeXNO1YZeM7n6N/GCNDPVIRcSU7zR7wxWQPIDIdpYFC+V6sY3PvJRIZjHS/E8qxlljUUROFVKNNujvahPvtbY7gwuM0fN7u/r3dS/V2B2tmENBgYvcSONh8JQ6pP9IgCEuKg=
+	t=1728411518; cv=none; b=FbBJa/CBZ17gyuBfw4mlcDGD6V2G4CAztlgFC+3xQCaeU5Ncio3YoJmKlyWHQMgw6u7LiV8BIi32wV00hIJQPmA1KTwBfgDQ+f+XstQBb1S8tajIRPq5TUPZBqihzHTFQ37p6q22kHKIquEw77fizStSR5dUz9YLiMZWD4+aQM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411310; c=relaxed/simple;
-	bh=LhAGVG1zJbyn/z4IQpBmvzBmP2EOryb15cZYfxQJ+p0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oryB+mXZBP5C9Hz+vLIgUOtENvKVRZzAuT++7+MtC08tSDLlLC9L1+aoTPbUqWwSK81sOIaaxkA86JrGYlSDfp/NVN0/dr+NY6nkNQ2yTzzlyc0f03vNpXNkZ0KODgA6sO2OOLmPglfoGKFwpD4jRRbYVWXa61CBXjIPWLkD8q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=FGKoiC6y; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498GcIvc023369;
-	Tue, 8 Oct 2024 11:15:00 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=s2048-2021-q4;
-	 bh=NNgvCxVXRQ7gaKGjuyLHjJ1aFLPwVtPCkF//3+db8Uw=; b=FGKoiC6ynJhy
-	NElCF6eIA/XGjfSSCU2UyITDuvqAU1iGzrIOkBdc8oarSFJfEC/9/scArXWhxx8j
-	vaTaZdXDK4peiH0WsfhK6/K89ie9dVmEvl57ztGDgHTLkCaL9frFolwhHClxnLJL
-	IHXMz5qF5I8ZZnrdIthwK1S3f2QFGw7dM+2tnLIgLK8PD4nQtqIKkMl/qrW8ZPkb
-	jOV+JVh1d88gm2K+MrxqEpJcKEoEiBFWU/9zVfACTq3VOvLFgPl8/DEMmWieCbGb
-	ulrSnxvAjvuH35oVUed2YSyyYTKuDx28HwhhT5KUYGACKo6kxiTqK/VJy8/Y2FCm
-	5RgNWZhqag==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 42339s279v-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Tue, 08 Oct 2024 11:15:00 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
- 15.2.1544.11; Tue, 8 Oct 2024 18:14:54 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexander Duyck
-	<alexanderduyck@fb.com>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
-        "Richard
- Cochran" <richardcochran@gmail.com>
-Subject: [PATCH net-next v4 5/5] eth: fbnic: add ethtool timestamping statistics
-Date: Tue, 8 Oct 2024 11:14:36 -0700
-Message-ID: <20241008181436.4120604-6-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241008181436.4120604-1-vadfed@meta.com>
-References: <20241008181436.4120604-1-vadfed@meta.com>
+	s=arc-20240116; t=1728411518; c=relaxed/simple;
+	bh=zcCo+naKQ+6xHi3XDFC+ZU21mkrShiOyjKx/GJqC87U=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B17EN6QWHt+e9+KLSY21hQIlT32/Nn/w68Z+jEuDblgiFJRK4zrpHA4mHWkr2A40+quO5hNFubiix9y0Nejj3OEiAjAIuJ/Zt+8+LYUrIWUYaHb+ZPwsxY0btipGwUhDxsSYtSLiRm6KczWaxfKvyll11NyAhR9JKnbXuQ1kpaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fanD8ZR1; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cc43454d5so47965435e9.3;
+        Tue, 08 Oct 2024 11:18:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728411515; x=1729016315; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=47h+WttSju8q0HbSBeD7ZI3w1+wXMpgqyxIWAg/Pnu8=;
+        b=fanD8ZR1cn1ZyX/6LUiRDs3/sGj5WHNNUUUypdJv2HKBWz8xx1ol8bGSzy5SCdeSxI
+         ysHSI4xXn4Zs2URuRLfXCaKW/yIA7Ly5itqoXPktzopLvScOGaGMvjzFYaqWtxI+Qb/1
+         l/Y8oOn+Xu/76+zQ2Jra+KWrBoM/E15ar4ZxuXztif8pUgCefOtf0l8MMeCrsaA6Q3Oc
+         dgOqbt077m3kdmIvbvVTrulrIUL9WZqTZCZ+9LGGsS3pG5SBM7Fs8lOiQCwzlZv7d5SL
+         xipODmr9mQBQOyveCApeciIbOW/rc2grhq/ie1ob1WrLUBwYyCOEGMvk9DRdnjGk54FD
+         uadg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728411515; x=1729016315;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=47h+WttSju8q0HbSBeD7ZI3w1+wXMpgqyxIWAg/Pnu8=;
+        b=m8VcHiYhgcKhajBwQwOo9gjWqKQyp4UxFNCqKdCRx9taiOasycNNzeN++SYFcQWmKk
+         HDb/0bDa9nQb6xqImF9myF9VphAECikjC65VdroreotnrXZjNP7b3ITTqz9k4ZUCZ+fK
+         urRCDdOjiI8yAooiQ5BDiXzEggrbt1qiSOP2bqIdScK2CNDm0gA+FYFUqvwBtOy3cEBo
+         iaS7DoYqSXnF5fJ30Zy8jutiQM/i7FV/h4sehHSVoyuFMSW+zpNHztPxHRljTHE0Q/9j
+         e0u5kqvHu0Jzf8ATry3yUzLMDvO3KeWa1yPGdGFRs/MAexoWaxFV6YVzwDjViN305G+a
+         Bd8A==
+X-Forwarded-Encrypted: i=1; AJvYcCU8pOFwOJ+tUQ0vKN2yQMpkCnpjO7jUoka/BqZWqrQJF0Zh6rmNg1ChPpurjvQnv2b7Qi0=@vger.kernel.org, AJvYcCW3spLvqcW7aoaNsvYMYBsV2Qwtwf/cteUrap7nRXo6v2fW1mZZhMsGwuwvmrwM6Kz5RNXm1iN1@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfQqc4UlTxj8h68jH0df+7cRfaUix5Fw3BhKEKm/hQKW2yAugJ
+	/SqplR55d8mE2NNBwrbzUeF4Thi/vGnnwT8ax9PjgH6PY0aL8VWw
+X-Google-Smtp-Source: AGHT+IE9KDMQK2rADBlPUW3pV7FCsILciLufwIQGADHY2crqenBECqAhUw2W1Xdgb7N8WC3FoNOLyg==
+X-Received: by 2002:a05:600c:4fcf:b0:425:80d5:b8b2 with SMTP id 5b1f17b1804b1-42f85abeab0mr120700175e9.16.1728411514545;
+        Tue, 08 Oct 2024 11:18:34 -0700 (PDT)
+Received: from krava (ip-94-113-247-30.net.vodafone.cz. [94.113.247.30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43017466e4fsm19574595e9.0.2024.10.08.11.18.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 11:18:34 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Tue, 8 Oct 2024 20:18:31 +0200
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Jiri Olsa <olsajiri@gmail.com>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Simon Sundberg <simon.sundberg@kau.se>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf 2/4] selftests/bpf: Consolidate kernel modules into
+ common directory
+Message-ID: <ZwV3d5-sBYtgt2vi@krava>
+References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
+ <20241008-fix-kfunc-btf-caching-for-modules-v1-2-dfefd9aa4318@redhat.com>
+ <ZwVv_ZOvh2mTGAlK@krava>
+ <87ploascn2.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: Qia-NCtd1Yj0qO8DKkMmFMtmjpxS1C9K
-X-Proofpoint-ORIG-GUID: Qia-NCtd1Yj0qO8DKkMmFMtmjpxS1C9K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_03,2024-10-04_01,2024-09-30_01
+In-Reply-To: <87ploascn2.fsf@toke.dk>
 
-Add counters of packets with HW timestamps requests and lost timestamps
-with no associated skbs. Use ethtool interface to report these counters.
+On Tue, Oct 08, 2024 at 07:55:13PM +0200, Toke Høiland-Jørgensen wrote:
+> Jiri Olsa <olsajiri@gmail.com> writes:
+> 
+> > On Tue, Oct 08, 2024 at 12:35:17PM +0200, Toke Høiland-Jørgensen wrote:
+> >
+> > SNIP
+> >
+> >> diff --git a/tools/testing/selftests/bpf/bpf_testmod/.gitignore b/tools/testing/selftests/bpf/test_kmods/.gitignore
+> >> similarity index 100%
+> >> rename from tools/testing/selftests/bpf/bpf_testmod/.gitignore
+> >> rename to tools/testing/selftests/bpf/test_kmods/.gitignore
+> >> diff --git a/tools/testing/selftests/bpf/test_kmods/Makefile b/tools/testing/selftests/bpf/test_kmods/Makefile
+> >> new file mode 100644
+> >> index 0000000000000000000000000000000000000000..393f407f35baf7e2b657b5d7910a6ffdecb35910
+> >> --- /dev/null
+> >> +++ b/tools/testing/selftests/bpf/test_kmods/Makefile
+> >> @@ -0,0 +1,25 @@
+> >> +TEST_KMOD_DIR := $(realpath $(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+> >> +KDIR ?= $(abspath $(TEST_KMOD_DIR)/../../../../..)
+> >> +
+> >> +ifeq ($(V),1)
+> >> +Q =
+> >> +else
+> >> +Q = @
+> >> +endif
+> >> +
+> >> +MODULES = bpf_testmod.ko bpf_test_no_cfi.ko
+> >> +
+> >> +$(foreach m,$(MODULES),$(eval obj-m += $(m:.ko=.o)))
+> >> +
+> >> +CFLAGS_bpf_testmod.o = -I$(src)
+> >> +
+> >> +all: modules.built
+> >> +
+> >> +modules.built: *.[ch]
+> >
+> > curious, the top Makefile already checks for test_kmods/*.[ch], do we
+> > need *.[ch] ?
+> 
+> Not really for building from the top-level Makefile, that is for running
+> 'make' inside the subdir, in case anyone tries that. Don't feel strongly
+> about it, so can remove it if you prefer?
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 24 +++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  |  9 ++++++-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  2 ++
- 3 files changed, 34 insertions(+), 1 deletion(-)
+no strong feelings either ;-) I was just wondering what was the purpose
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-index 24e059443264..1117d5a32867 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-@@ -93,9 +93,33 @@ fbnic_get_eth_mac_stats(struct net_device *netdev,
- 			  &mac_stats->eth_mac.FrameTooLongErrors);
- }
- 
-+static void fbnic_get_ts_stats(struct net_device *netdev,
-+			       struct ethtool_ts_stats *ts_stats)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+	u64 ts_packets, ts_lost;
-+	struct fbnic_ring *ring;
-+	unsigned int start;
-+	int i;
-+
-+	ts_stats->pkts = fbn->tx_stats.ts_packets;
-+	ts_stats->lost = fbn->tx_stats.ts_lost;
-+	for (i = 0; i < fbn->num_tx_queues; i++) {
-+		ring = fbn->tx[i];
-+		do {
-+			start = u64_stats_fetch_begin(&ring->stats.syncp);
-+			ts_packets = ring->stats.ts_packets;
-+			ts_lost = ring->stats.ts_lost;
-+		} while (u64_stats_fetch_retry(&ring->stats.syncp, start));
-+		ts_stats->pkts += ts_packets;
-+		ts_stats->lost += ts_lost;
-+	}
-+}
-+
- static const struct ethtool_ops fbnic_ethtool_ops = {
- 	.get_drvinfo		= fbnic_get_drvinfo,
- 	.get_ts_info		= fbnic_get_ts_info,
-+	.get_ts_stats		= fbnic_get_ts_stats,
- 	.get_eth_mac_stats	= fbnic_get_eth_mac_stats,
- };
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 2e3d06946e74..b5050fabe8fe 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -385,7 +385,7 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
- 			     struct fbnic_ring *ring, bool discard,
- 			     unsigned int hw_head)
- {
--	u64 total_bytes = 0, total_packets = 0;
-+	u64 total_bytes = 0, total_packets = 0, ts_lost = 0;
- 	unsigned int head = ring->head;
- 	struct netdev_queue *txq;
- 	unsigned int clean_desc;
-@@ -404,6 +404,7 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
- 			FBNIC_XMIT_CB(skb)->hw_head = hw_head;
- 			if (likely(!discard))
- 				break;
-+			ts_lost++;
- 		}
- 
- 		ring->tx_buf[head] = NULL;
-@@ -443,6 +444,7 @@ static void fbnic_clean_twq0(struct fbnic_napi_vector *nv, int napi_budget,
- 	if (unlikely(discard)) {
- 		u64_stats_update_begin(&ring->stats.syncp);
- 		ring->stats.dropped += total_packets;
-+		ring->stats.ts_lost += ts_lost;
- 		u64_stats_update_end(&ring->stats.syncp);
- 
- 		netdev_tx_completed_queue(txq, total_packets, total_bytes);
-@@ -504,6 +506,9 @@ static void fbnic_clean_tsq(struct fbnic_napi_vector *nv,
- 	}
- 
- 	skb_tstamp_tx(skb, &hwtstamp);
-+	u64_stats_update_begin(&ring->stats.syncp);
-+	ring->stats.ts_packets++;
-+	u64_stats_update_end(&ring->stats.syncp);
- }
- 
- static void fbnic_page_pool_init(struct fbnic_ring *ring, unsigned int idx,
-@@ -1060,6 +1065,8 @@ static void fbnic_aggregate_ring_tx_counters(struct fbnic_net *fbn,
- 	fbn->tx_stats.bytes += stats->bytes;
- 	fbn->tx_stats.packets += stats->packets;
- 	fbn->tx_stats.dropped += stats->dropped;
-+	fbn->tx_stats.ts_lost += stats->ts_lost;
-+	fbn->tx_stats.ts_packets += stats->ts_packets;
- }
- 
- static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index 682d875f08c0..8d626287c3f4 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -57,6 +57,8 @@ struct fbnic_queue_stats {
- 	u64 packets;
- 	u64 bytes;
- 	u64 dropped;
-+	u64 ts_packets;
-+	u64 ts_lost;
- 	struct u64_stats_sync syncp;
- };
- 
--- 
-2.43.5
-
+thanks,
+jirka
 
