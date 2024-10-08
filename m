@@ -1,73 +1,136 @@
-Return-Path: <netdev+bounces-133351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A3FD995B93
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:22:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C90995B96
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49034285646
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:22:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EBEB1C2207C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FE72185A4;
-	Tue,  8 Oct 2024 23:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA732178EA;
+	Tue,  8 Oct 2024 23:23:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILumA5YD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LrRDPL1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537AE218594
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13321E0DC2;
+	Tue,  8 Oct 2024 23:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728429678; cv=none; b=uMCTiy59TXUyCMhrjcb37Xiqej6hSELzIn8SFUNgNr8xiu3zaBUZVOeUaPyBCkdSJKdPxxqpZCnzPj2zVh2JRWK4T3g5fNEGOe61LfE7QwLknYmxM74doG86wWC12zBI04aMXc7EkOXgcWJaBSHy0Rs55EANCSe1n6NET7raW2I=
+	t=1728429785; cv=none; b=nc3iSxZYsP2aAk4ukNXSEg/JMG6w6z6YpVokm7tS32oKTfE5qQNHpCYiS9+FiQZ6om+KNnMMIazIQYzDjZeyQ2xmAkLO2RhpW74LfbraJnE4NpsyqvJznXf0S4EaJS0BVDBF+DMr7goSHj5Rlrdnv3DB3Vw6zyTkfNr5Wfm70Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728429678; c=relaxed/simple;
-	bh=TSCizON5lR9Cjf1v9ABJPi4tqtOgZIyr2vFmSq606gs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rJoFM+seQbE07JcXRqCMqV6Oz6C/T0X1wYB0qZ4rN7n5eY3DbANoAgEEcNHBG8nb2SfCXn+Im2Uuxt7P/ulP+PP/bX0uCt7tcP4SZxVHIXOHvxdEOrX0dqgIvoFdTbElgVGsb7qj3y/H08SBGXIwbbeT7CyB7eCA6vfMp804TaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILumA5YD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E94AC4CEC7;
-	Tue,  8 Oct 2024 23:21:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728429678;
-	bh=TSCizON5lR9Cjf1v9ABJPi4tqtOgZIyr2vFmSq606gs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ILumA5YDIdjkZdG4Soz78Qc/eorLST1D2LkCxrxLpHQZQv2LKSCYDWMx7xNoTnw4c
-	 wVlIZ2VKwn3/1xS0+Vcro2s5bzsQ7Ugz9HTcnRbliBZIBIXPGzs92V6of855bb+JGD
-	 bhw6SyC6+vfnIHsz/fnEhDJqXGCQWTtXXWZvx4ZZDT7fYbcazLoTparSYaU5HDcOyy
-	 NMVvFyfJSqIDXg/yZLy2IF9Rw3V9FnL10AhYZ0q+9WmZ4hLdUbGJX4y01oPzNee7Ba
-	 XM6z0oJj7yVEUUbLoSDF30ZzUdDuirceucvcO9ozEdhlzSEeqWEe1F4juRlyqx5+1M
-	 3QxQqNOUwGFpw==
-Date: Tue, 8 Oct 2024 16:21:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com, Stanislav Fomichev
- <stfomichev@gmail.com>
-Subject: Re: [PATCH v8 net-next 00/15] net: introduce TX H/W shaping API
-Message-ID: <20241008162116.7c63d85a@kernel.org>
-In-Reply-To: <cover.1727704215.git.pabeni@redhat.com>
-References: <cover.1727704215.git.pabeni@redhat.com>
+	s=arc-20240116; t=1728429785; c=relaxed/simple;
+	bh=psJWj8NmEz8rud9AhNt4JBzl5JH9mf8yUtQW9ZRp9wo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=e98gb7yLPkdpubFqXuG7hzvNWeZ+gL67vWxgRE/u/fvNbXw/bljBQb32/ecEn1WdMUY/7VznUKvuS8EERxo+/6TBHasQkjCj5FF/LwIxYwjHUAR6e5SvMBTFouKiz2V9rPbiCLMS6K7/lFZgTnQZ0GFpdZNhkRADG8HzCd6iin0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LrRDPL1C; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-82ab349320fso257474139f.1;
+        Tue, 08 Oct 2024 16:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728429783; x=1729034583; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=psJWj8NmEz8rud9AhNt4JBzl5JH9mf8yUtQW9ZRp9wo=;
+        b=LrRDPL1CngynORxRxDe30/v8mUUIvceiD1qk2H87/XfjPPp6FEHoLlnxqXZPARGois
+         wrLmI+Lx8pKvDlHwTTZ/uG9F/PfHlzOEdNjF5zjyEwb+WAwCqUCkA2oGvfGIO79a++k+
+         hEkNbZJtz11qKAUk17BndqAK5osZJA5VsFNQ453P8WQLgjhF4VkIVrmR4IEnB7usZPPX
+         FbasDlu4nK/TPbAbQRP+FY4FDWHroh7e6tFVhKqQNhF9WyFIyW43IdLaBwOOY1oOYG1P
+         Nk5Xrwnh5suA0jeQ/AVj8kGH5mPw4BoeaRPK+3fxR3AgMw68iQofB0qiP0GUy3hU3n4q
+         s9cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728429783; x=1729034583;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=psJWj8NmEz8rud9AhNt4JBzl5JH9mf8yUtQW9ZRp9wo=;
+        b=YCx9xpV4i7w55tuKS8gy++d+xFcLi3hNkTamwAeXt3piE5O7NILmS6Cy+UtZqu7jTf
+         ApMdn7qco6mRb0O649itJaVHjfq6pP+O30oCLBbcuoyKXahc98Psk952jnLBmVmAj2tR
+         qVR4oTIahU/PxIb3R2VeWdiIRichRZ//YKh/4Ppm2Pw0DucA3pcmSJ8YWxowgaTrmLEK
+         NringWUPVvjk5fVjKJrCvHKU3iL4SSW1d5gkRp8YtMhxEHRcIJzzGvdrZrVocbrfsblU
+         viz3HsL52/sCjGR7LPhhx7VDZZ5R/EwZDyfWn7wWm7jG0nYy5AowAAXirRH7ecScjOGQ
+         fVrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFEtM2J3A/VOI5ZEIYXgw5oeqTcEm7yAEm15Lm5OYVhEVXBHGdLOOJ+Ae0McHxciZZpXFtDkbT@vger.kernel.org, AJvYcCXwKPI59nOKkBx2dG+TQy0QKs4zm1tqo+UHQ+bCzOm0UZVvVA56ryBYYwzgua9iAdubvH0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQUjtPzTNBXjyKjWET3ZfdF3d/fe7KLZal3O0Ikpq0eZzrgbXB
+	78SOi34dHy//iagVivr7yDcWQCRsFC2GqmKKVDndkukWO3HBzTvX5txNfxtbhWDbSDTI778Gl4w
+	VaPrOsZK19KzVG8OQCKFASGFats4=
+X-Google-Smtp-Source: AGHT+IEQuAC+JInKKHAaocIa8SfikAGKlHdkTVZfrcbk/WaCYj9wp76m38cY7WGNg9K/GigGbxPLMTSjZrHowv8ocYs=
+X-Received: by 2002:a05:6e02:17c9:b0:3a0:8ecb:a1dc with SMTP id
+ e9e14a558f8ab-3a397cfc9f3mr5086225ab.15.1728429782864; Tue, 08 Oct 2024
+ 16:23:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com> <67057d89796b_1a41992944c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67057d89796b_1a41992944c@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 07:22:26 +0800
+Message-ID: <CAL+tcoBGQZWZr3PU4Chn1YiN8XO_2UXGOh3yxbvymvojH3r13g@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/9] net-timestamp: bpf extension to equip
+ applications transparently
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 30 Sep 2024 15:53:47 +0200 Paolo Abeni wrote:
-> We have a plurality of shaping-related drivers API, but none flexible
-> enough to meet existing demand from vendors[1].
+On Wed, Oct 9, 2024 at 2:44=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > A few weeks ago, I planned to extend SO_TIMESTMAMPING feature by using
+> > tracepoint to print information (say, tstamp) so that we can
+> > transparently equip applications with this feature and require no
+> > modification in user side.
+> >
+> > Later, we discussed at netconf and agreed that we can use bpf for bette=
+r
+> > extension, which is mainly suggested by John Fastabend and Willem de
+> > Bruijn. Many thanks here! So I post this series to see if we have a
+> > better solution to extend.
+> >
+> > This approach relies on existing SO_TIMESTAMPING feature, for tx path,
+> > users only needs to pass certain flags through bpf program to make sure
+> > the last skb from each sendmsg() has timestamp related controlled flag.
+> > For rx path, we have to use bpf_setsockopt() to set the sk->sk_tsflags
+> > and wait for the moment when recvmsg() is called.
+>
+> As you mention, overall I am very supportive of having a way to add
+> timestamping by adminstrators, without having to rebuild applications.
+> BPF hooks seem to be the right place for this.
+>
+> There is existing kprobe/kretprobe/kfunc support. Supporting
+> SO_TIMESTAMPING directly may be useful due to its targeted feature
+> set, and correlation between measurements for the same data in the
+> stream.
+>
+> > After this series, we could step by step implement more advanced
+> > functions/flags already in SO_TIMESTAMPING feature for bpf extension.
+>
+> My main implementation concern is where this API overlaps with the
+> existing user API, and how they might conflict. A few questions in the
+> patches.
 
-Does not apply, you'll have to repost.
+Agreed. That's also what I'm concerned about. So I decided to ask for
+related experts' help.
+
+How to deal with it without interfering with the existing apps in the
+right way is the key problem.
 
