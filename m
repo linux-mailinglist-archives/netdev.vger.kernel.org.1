@@ -1,217 +1,197 @@
-Return-Path: <netdev+bounces-133303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD22995884
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:36:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D075995887
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 705771F25D02
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:36:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ACD51C21A46
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD28215000;
-	Tue,  8 Oct 2024 20:36:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Y3pgWfir"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D032921500F;
+	Tue,  8 Oct 2024 20:36:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5528B213EF9
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 20:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2844B213EF9;
+	Tue,  8 Oct 2024 20:36:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728419760; cv=none; b=Qo3GCAdDn4AUn+9JiNmhJmbF9vYRCYO2ES/76b9fGEJZa/JgKMVK9EIhPj/EKxwWJpFBx+YxlpunWmoB/yMwTz+hTQDJCpwPYkUywrDVvttpoIeEwNkaG+wivoUPi7BkzvWFJ5Pz+SHVsc95LvMq8R3OHdG08hAZFGRPZ9knRh8=
+	t=1728419774; cv=none; b=HPCTj0n7rh23dH1t66XbcVF4j9BaxHk852o77xs6ane5eNN5mCivbA9EWThFwFSW4v2nsJgoEKElTLuvVwUmYDyFBgo8VhfeewSyTaIVqRCKUnqdfBdX9sS//UjAChswNqMTfmjHRTjmKLzBEmfEhAsgh+u+y50c05i1tBUq+k0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728419760; c=relaxed/simple;
-	bh=uIkvKQkviz93ZCDlYArD/IY9k8pSXyA30cR3n7rNS/g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MMuYi+m9shhc3bpf1ukCnLqL7OEi3pC6on2FLMZfEqU9LWcjULkQX+VfP0Ui0eqd1XSEYKECZcVCeEsF4RGMRKsVdeZDDZQ88AdT21LjKKFDSEqiIfhmZpfMhV6yfvgQk5rNLP/VPqlwQUTocKRejrsZPY9U+RYymG9h2xusyhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Y3pgWfir; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c8967dd2c7so7552516a12.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 13:35:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728419757; x=1729024557; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HdRjrGQN4YRD0nn4Hk8Nawpx1NGHye7d18EtXKWaj3A=;
-        b=Y3pgWfirYfaB7DZyUy1B4zBncQnhnmYK16KKapxvEQWTZPVsp+DtjeQgFlxq7KtuCV
-         dT6yRFylbz7gxAq7nW3xjugU5Tiwb+DUUpNckUQYKtQeVROFRstBZ3Q/MwvzmkzVNh//
-         bWj1LLEX4/FYrl4J7Rzz2DUBTKfwgLwbRggJM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728419757; x=1729024557;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HdRjrGQN4YRD0nn4Hk8Nawpx1NGHye7d18EtXKWaj3A=;
-        b=XOK4tqerKWlGEt6oFMpz36FjguOyb0ZWk8b4Ls82bNbIQE+dud2KlL6cnkpwt/D6Mo
-         /rZUitYQjW3lyC5N93kwXmLfu4gvahEYgj55GSkDes57eu5Lsn3lxFQoEYXRwj1pLad1
-         /L4L2kaJSe1F6LuQnBOtC+eXYQBOD3s00CgGm6I0ACdE2LinmL0GZDmR/X1HrBdwegCY
-         K8Hj635sSFBTg5MaKMe4XGz1wn7gfxrSP1towRPBhgAckS+JVSLI36coGiunFUpCMHkW
-         LQxbH/Vhbpah28p4a+kYr2IAXZTAS1gW1GLS2umyhnnpUh4txsFc8rnh1SMCWf53UyIG
-         viHA==
-X-Forwarded-Encrypted: i=1; AJvYcCVPO/ECYFqVFSvdhcmkfQaftcInZRzMTegKRIoBXgbfblN+eg6BLz3xBvxoGeWj5qjUbUMv2E4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydS6iqXTKVeCTlIBJNDmtwzWqiZS5/Bzhj/A+jFusTRrh4bc0d
-	QcIA3Z/VIb387o/SQswe9eN1mvOXpgOL/aSWfKQooJUEIRHQvHo4+CluzcIS+pa/iyurVP/CBBM
-	GT+QpwsuHlgoJu9N9uS/qUUiicZXqQck5Vyhy
-X-Google-Smtp-Source: AGHT+IGhtkgrWne5rKYAmCGmkJPDL5OMQeIr9zWffcXVpFBBy/eWZQtG9sZNAqAECdrX8A9cl15BBn8Ce7uZMyyphGw=
-X-Received: by 2002:a05:6402:3582:b0:5c8:9f44:a10a with SMTP id
- 4fb4d7f45d1cf-5c91d66569fmr129124a12.25.1728419756645; Tue, 08 Oct 2024
- 13:35:56 -0700 (PDT)
+	s=arc-20240116; t=1728419774; c=relaxed/simple;
+	bh=wgqyHfk/ndHoYa6+URH97TEM/hg5nZNzH6pNcRMhlk8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=BRD6emBBjc7oSSYPh7QptPGT8RCOAQGAn2yMzrQsnaUsvciHu6N0KC6vrSTqrtW7T6minNg+B4rY18JdXI3ycVUv2s2asXn72JqKBFxY4Sc0tjUFmo80HAD88qrzaOmta2V9+VFBjxlfcQ/DimCMaQsZDCf6Cl+07KTFWW8JNdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.101] (213.87.132.215) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 8 Oct
+ 2024 23:35:54 +0300
+Message-ID: <3ece7089-6881-47b9-bcde-cafb15115167@omp.ru>
+Date: Tue, 8 Oct 2024 23:35:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-2-ap420073@gmail.com>
- <CACKFLi=1h=GBq5bN7L1pq9w8cSiHA16CZz0p8HJoGdO+_5OqFw@mail.gmail.com>
- <CAMArcTXUjb5XuzvKx03_xGrEcA4OEP6aXW2P0eCpjk9_WaUS8Q@mail.gmail.com>
- <CACKFLikCqgxTuV1wV4m-kdDvXhiFE7P=G_4Va_FmPsui9v2t4g@mail.gmail.com>
- <a3bd0038-60e0-4ffc-a925-9ac7bd5c30ae@lunn.ch> <CAMArcTUgDLawxxvFKsfavJiBs0yrEBD3rZOUcicYOAWYr+XYyQ@mail.gmail.com>
- <20241008111058.6477e60c@kernel.org> <CACKFLikDqgewWCutDG9ar6UFup_EUefUEaXShEg0kmxC5yiHMg@mail.gmail.com>
- <20241008125326.2e17dce9@kernel.org>
-In-Reply-To: <20241008125326.2e17dce9@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 8 Oct 2024 13:35:44 -0700
-Message-ID: <CACKFLinfkA9dBh6WHcxC5dDnq--uRT9SC=Zw4iyAPCNzkWMx9Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/7] bnxt_en: add support for rx-copybreak
- ethtool command
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Taehee Yoo <ap420073@gmail.com>, Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, 
-	pabeni@redhat.com, edumazet@google.com, almasrymina@google.com, 
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org, donald.hunter@gmail.com, 
-	corbet@lwn.net, kory.maincent@bootlin.com, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000a42a570623fd15f8"
-
---000000000000a42a570623fd15f8
+User-Agent: Mozilla Thunderbird
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [net-next] net: ravb: Only advertise Rx/Tx timestamps if hardware
+ supports it
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Paul
+ Barker <paul.barker.ct@bp.renesas.com>, Biju Das
+	<biju.das.jz@bp.renesas.com>, Lad Prabhakar
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>
+References: <20241005121411.583121-1-niklas.soderlund+renesas@ragnatech.se>
+ <a733e3df-1fc3-41a1-9025-0eb02c5ffd0a@omp.ru>
+ <6737d975-cf87-452b-92b2-abc7141a98cd@omp.ru>
+ <20241008174512.GA4146181@ragnatech.se>
+Content-Language: en-US
+Organization: Open Mobile Platform
+In-Reply-To: <20241008174512.GA4146181@ragnatech.se>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 10/08/2024 20:26:32
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 188310 [Oct 08 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 39 0.3.39
+ e168d0b3ce73b485ab2648dd465313add1404cce
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.215 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.132.215 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.132.215
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/08/2024 20:29:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 10/8/2024 7:32:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Tue, Oct 8, 2024 at 12:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 8 Oct 2024 12:38:18 -0700 Michael Chan wrote:
-> > > Where does the min value of 64 come from? Ethernet min frame length?
-> >
-> > The length is actually the ethernet length minus the 4-byte CRC.  So
-> > 60 is the minimum length that the driver will see.  Anything smaller
-> > coming from the wire will be a runt frame discarded by the chip.
->
-> Also for VF to VF traffic?
+On 10/8/24 8:45 PM, Niklas Söderlund wrote:
+[...]
 
-Good point.  Loopback traffic is not subject to padding and can be
-smaller than 60 bytes.  So, lower limit checking doesn't make much
-sense anymore.
+> Sorry for missing your comment earlier.
 
->
-> > > IIUC the copybreak threshold is purely a SW feature, after this serie=
-s.
-> > > If someone sets the copybreak value to, say 13 it will simply never
-> > > engage but it's not really an invalid setting, IMHO. Similarly settin=
-g
-> > > it to 0 makes intuitive sense (that's how e1000e works, AFAICT).
-> >
-> > Right, setting it to 0 or 13 will have the same effect of disabling
-> > it.  0 makes more intuitive sense.
->
-> Agreed on 0 making sense, but not sure if rejecting intermediate values
-> buys us anything. As Andrew mentioned consistency is important. I only
-> checked two drivers (e1000e and gve) and they don't seem to check
-> the lower limit.
+   I prolly shouldn't have stamped my R-b tag so easily before
+asking a question. :-)
 
-Sure, so the range should be 0 to 1024.  Any value close to 0 will
-effectively disable it.
+[...]
 
---000000000000a42a570623fd15f8
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+>>>> Recent work moving the reporting of Rx software timestamps to the core
+>>>> [1] highlighted an issue where hardware time stamping where advertised
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJYx3oQ+YW+vF/dPEOXHO/tkctgikGxD
-1sphe0F/FlVxMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAw
-ODIwMzU1N1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB0XbAFDdsDDyYGg+mXYKIf3G7/bxMcr+iqnntTO35LqS+D8P4u
-zmWlYuDrjdUOfYo47DjA60a+uKYyc8HDJXY5Hox+vzeAUJJalOoLnhEdwhFBey3QcSfj2B6d0LVe
-d6MLj7+1tNnTszqYg/yFReMnIKCNO2XMKstCiF5S/65B0igDV9sllGkfhS4z3DHIRkZws0twDhkc
-59u4TRFuvpoLtgb9iMhnpSv/ciUqXLaWjOJ5jqp3u4cOKbf84K6hicC8RJnRuW+a9uIdB1S61Y5V
-8csAmWTxliFcMQFNI3LGEflJgirM/WfpaUj/SCag6Du+GXBF/hZVWosKpaU9KWeW
---000000000000a42a570623fd15f8--
+   s/where/was/.
+
+>>>> for the platforms where it is not supported.
+>>>>
+>>>> Fix this by covering advertising support for hardware timestamps only if
+>>>> the hardware supports it. Due to the Tx implementation in RAVB software
+>>>> Tx timestamping is also only considered if the hardware supports
+>>>> hardware timestamps. This should be addressed in future, but this fix
+>>>> only reflects what the driver currently implements.
+>>>>
+>>>> 1. Commit 277901ee3a26 ("ravb: Remove setting of RX software timestamp")
+>>>>
+>>>> Fixes: 7e09a052dc4e ("ravb: Exclude gPTP feature support for RZ/G2L")
+>>>> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+>>> [...]
+>>>
+>>> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>>>
+>>>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> index d2a6518532f3..907af4651c55 100644
+>>>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>>>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>>>> @@ -1750,20 +1750,19 @@ static int ravb_get_ts_info(struct net_device *ndev,
+>>>>  	struct ravb_private *priv = netdev_priv(ndev);
+>>>>  	const struct ravb_hw_info *hw_info = priv->info;
+>>>>  
+>>>> -	info->so_timestamping =
+>>>> -		SOF_TIMESTAMPING_TX_SOFTWARE |
+>>>> -		SOF_TIMESTAMPING_TX_HARDWARE |
+>>>> -		SOF_TIMESTAMPING_RX_HARDWARE |
+>>>> -		SOF_TIMESTAMPING_RAW_HARDWARE;
+>>>> -	info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
+>>>> -	info->rx_filters =
+>>>> -		(1 << HWTSTAMP_FILTER_NONE) |
+>>>> -		(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
+>>>> -		(1 << HWTSTAMP_FILTER_ALL);
+>>>> -	if (hw_info->gptp || hw_info->ccc_gac)
+>>>> +	if (hw_info->gptp || hw_info->ccc_gac) {
+>>>> +		info->so_timestamping =
+>>>> +			SOF_TIMESTAMPING_TX_SOFTWARE |
+>>>> +			SOF_TIMESTAMPING_TX_HARDWARE |
+>>>> +			SOF_TIMESTAMPING_RX_HARDWARE |
+>>>> +			SOF_TIMESTAMPING_RAW_HARDWARE;
+>>>> +		info->tx_types = (1 << HWTSTAMP_TX_OFF) | (1 << HWTSTAMP_TX_ON);
+>>>> +		info->rx_filters =
+>>>> +			(1 << HWTSTAMP_FILTER_NONE) |
+>>>> +			(1 << HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
+>>>> +			(1 << HWTSTAMP_FILTER_ALL);
+>>>>  		info->phc_index = ptp_clock_index(priv->ptp.clock);
+>>>> -	else
+>>>> -		info->phc_index = 0;
+>>>
+>>>    Is it OK to remove this line?
+> 
+> Yes it is OK, see the discussion that sparked this patch.
+> 
+> https://lore.kernel.org/netdev/20240829204429.GA3708622@ragnatech.se/
+
+   Ah, now I'm seeing where that 0 came from... :-)
+
+>>    Also, how about inverting the *if* condition above (and doing an early
+>> *return*) and avoiding reindenting the code below it?
+> 
+> I thought about that but opted not to do so. The same check is used all 
+> over the code and I think it's value in keeping it similar. I will go 
+> over all this code again as Gen4 will need more work to fully enable 
+> gPTP. My hope is to abstract the check into something bore descriptive 
+
+   s/bore/more/? :-)
+
+> instead of sprinkling yet more conditions on to this one. Is it OK for 
+> you to keep them aligned for now?
+
+   Fine by me.
+
+>> [...]
+
+MBR, Sergey
 
