@@ -1,249 +1,237 @@
-Return-Path: <netdev+bounces-133273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AECB9956AC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:35:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A361599569C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EEE51C23534
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:35:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31B2C1F25C4A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D6521503B;
-	Tue,  8 Oct 2024 18:34:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A858212D0E;
+	Tue,  8 Oct 2024 18:33:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZBA5mNMH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGs2Pmp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2071.outbound.protection.outlook.com [40.107.93.71])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8898C212D17
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:33:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728412441; cv=fail; b=hPkYwCDlVTq2tcangaXJdyyO+m931dh+VG+NnWJAweuekmejlkSB8flj9vQnmWAzG9pb0yQAVbOF8kJaKn5Q0HLWRC3DMLUoAY57tOo7L+p2Ih8AbuuxR4cVSi5HlNQKRX8lh1KcjOlq8ia9uhr0wKvVReHqTWCkBSbFwrvFX5w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728412441; c=relaxed/simple;
-	bh=kbkJOv++vTX2mCVHEaPPN3aq41wADSV0LRsAN8EYpbU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FcTH+GnzkgO/WHzYllEwYOGmYcegwstCAhYI4MWkNWLhEH2H5awawFkNjG7g60P5VlqGjsykg0RgVr6Ydpl+ZgTb2OXB+tGPepIxiCcbjLnrHyRhLF5p2lhOwQfcD0iThibyzPNsEtb2+yCJXsWwz/NX8sZjpu+ZXIWF+NuTugw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZBA5mNMH; arc=fail smtp.client-ip=40.107.93.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=m6I40MPlbBvo0cA1SlaKbbiZqHsvBXqhXUN2/Aqjk4inWGPaermMoW8zTuxwMthxbsqfKjbXiY/EcCCVpFc/LgHrWfj8xQHmuZ8mgAACar6psC21Cq8Rj+ZWwFEApuJafYfemHvrF0WYT+nNZyLhSEclkVEVFUXAEsJN+ce+Uu7LhiPPUyWvKAB1jw3280tA39IJhi2n5FDLzCPbBwA9YF2pKlbCTP70H7vMyzI4yqlRx50JzCipxkavxRpI/2EK1DTbbiHcBsrwgw02eB8ZwJx7QYT5CeG8/fPqs4PsjI4t0upfRwHQKUDxy88G6kbPR//UNqGRI+9NzOw1W/mgAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BA2bEXaWtJGPc4jKsovtrtOPcHUWBPydYKHHCP2fZ3U=;
- b=QqSW2i1R1b7BW5ABq+GF8ptUudpbHYuJaAcHe6ulleeU7pfKftM03L71BKKiRIJe4Pu7emtm0ls1y1r/jbPvEbOADsy+C2qwd+h9W8+g2/YZVfLCPTWJ8KCBMIbuB17gG+obnrrBJcclGCEiMjnq6fBINJksYRxGk4/VnVeaXEMj8NQk/XcoQ7VgFoJKekOZfQyrlR8G5Dqk5AXDfZxlDJTK/AKhz0ynl4lFydh5BWoZw44+uyOcx0H0yvWC8ThoYfyuVM0p0f1p1HZBj9WfZdwaG2MmTMvxZ35WmcIlT877qQXu56zm2XoCv991Om4APsedndq5leHG0prA96yIFA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BA2bEXaWtJGPc4jKsovtrtOPcHUWBPydYKHHCP2fZ3U=;
- b=ZBA5mNMHuZJzbON6XCR0WCsWuX00KZcgR5/H1I0dgDuzKBAuCE85JNIwHhD7FgB4W6HjZ4khZlDPL408cAmbH6N6XICu9BD/jElmWbg+LJe/Mk5p0/AECVzfUMjucagJq20m3kHz48Nta/kkZXhcpjorxMMypj8xI1lS3aO/UgBxD8RagtMW4a7QjFlooGDgESCnqqA6GGU9lbQ+ZlU7As8Be8h687JnLC5FYwbk/qQWzOG0IHt1rgEAavBu2rYnJ1MVq20N40mZDiQRf2X7eTKKYt/aG4cRqqj9JMbmZSCJetuVnHr9qPCZFMi6mPZ6UW0R2eOeRJ46jfzHCLqSbA==
-Received: from CH5P222CA0017.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::21)
- by BL1PR12MB5779.namprd12.prod.outlook.com (2603:10b6:208:392::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.23; Tue, 8 Oct
- 2024 18:33:56 +0000
-Received: from DS2PEPF00003447.namprd04.prod.outlook.com
- (2603:10b6:610:1ee:cafe::75) by CH5P222CA0017.outlook.office365.com
- (2603:10b6:610:1ee::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.17 via Frontend
- Transport; Tue, 8 Oct 2024 18:33:55 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS2PEPF00003447.mail.protection.outlook.com (10.167.17.74) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8048.13 via Frontend Transport; Tue, 8 Oct 2024 18:33:55 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Oct 2024
- 11:33:43 -0700
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 8 Oct 2024
- 11:33:42 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.6)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 8 Oct
- 2024 11:33:40 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, <cjubran@nvidia.com>,
-	<cratiu@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net-next 14/14] net/mlx5: Add support check for TSAR types in QoS scheduling
-Date: Tue, 8 Oct 2024 21:32:22 +0300
-Message-ID: <20241008183222.137702-15-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241008183222.137702-1-tariqt@nvidia.com>
-References: <20241008183222.137702-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51211E1319;
+	Tue,  8 Oct 2024 18:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728412397; cv=none; b=mkMuqkV4wvN/K8YAr1Lk7eGoNHGmQX2coCnDlqddO7NBin/9MJVfXrs60b8LWJ7xY5iy7OkNMQ42HtUW2KiLwlWtqn/sIdpBnsS8gOrTQb2HTwBVVnOluY+4ZwNzX7Y2VxiSI11ua9ldngzxdVa0oHYljpKPsjcPKTJPeZhj9J8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728412397; c=relaxed/simple;
+	bh=divFETgwfAY9iZU+jpEIBPKO18PS8DtSvhwWZozhADY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=erio4vJhGpzArGm9fxcYSYz5n1WVAmFl+auHkLzMlk9DhufWFA7dXoC9tAZgVhCSe1TfraqZGjvWGRCukSeJBAXbMr90bXFSBYNbd3GpOv4h4l5R4KWxl8esD2OSHpY7Yr/ohbRQqjfZdIkANYzAQ7CbAyXO4WrieDx4ukyr7ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGs2Pmp1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F54BC4CEC7;
+	Tue,  8 Oct 2024 18:33:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728412396;
+	bh=divFETgwfAY9iZU+jpEIBPKO18PS8DtSvhwWZozhADY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZGs2Pmp1zNXEcOqQH11MRWzUchWAhdAA2luF1Hys3QA3aR8uCLapK3CgeNcQ4B+3w
+	 piySQDyQWfhccVesw4Lyxdr+93F2F8C4LCsqJ0vPhLakMlts+1LMKIgjr+950sowO0
+	 zPWNaytrWFsj/212Fba/eYcA/V8KsMw7lDrIOFyxmjy+sVGdpBJQNXnuZqTwJnWKZ/
+	 W7+aRp5OXnZiq2ha/ckYgD5Z8EwmxeK3NHbmVZK0scwMxKGFeWWm1cUSpGDJso608Z
+	 Gwq9RBYFADWttfoCU0Fvm73PyzZ6vgGrXRjp1/uRuFPwK9MuHyE5vrt8eE1+x28I6D
+	 tq4G25+AUOeMg==
+Date: Tue, 8 Oct 2024 11:33:14 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ almasrymina@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com,
+ kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com,
+ danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
+ asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
+ aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com,
+ bcreeley@amd.com
+Subject: Re: [PATCH net-next v3 3/7] net: ethtool: add support for
+ configuring tcp-data-split-thresh
+Message-ID: <20241008113314.243f7c36@kernel.org>
+In-Reply-To: <20241003160620.1521626-4-ap420073@gmail.com>
+References: <20241003160620.1521626-1-ap420073@gmail.com>
+	<20241003160620.1521626-4-ap420073@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003447:EE_|BL1PR12MB5779:EE_
-X-MS-Office365-Filtering-Correlation-Id: 65efe0d1-94bb-4045-a1bf-08dce7c7c461
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?2FFhb2Ov0bTTni1Lh6TQas1cBBTCTV5xQgzaJYTd+YapOBQorrYVhZD8iYUp?=
- =?us-ascii?Q?OgQ2gyvMSXovVZGZKmpTg4CpCumIBTWn9UyQwx/aXcCqnnMrthh9K124NNJ8?=
- =?us-ascii?Q?1gyr4u6//3djOBWcFSwEtl2NxqW+0eksoLGz7tSCcPY8n1hR5bNZ6k6Ia8Y6?=
- =?us-ascii?Q?lxOPd1rPCdIWphm59/3xbRkixeImC/02UqSFlZ6EbBLTt+O2tZUC1x4pMfRk?=
- =?us-ascii?Q?2arcRANu+wepqaIDVduotN6GI1dUdV/lvodFzUSDIg4OZC/yLUrlmgFlL/Si?=
- =?us-ascii?Q?Xj0Wwnj3OxYZIpbZEGjq60rDJPPFi6qSvZHnJa82Yw0gEGTUNrjsONVH0Jth?=
- =?us-ascii?Q?b990WtXuLxVCpJWSWTOTFWOA8+UH2xpgQI4NUQ86NHYlY+ed0SIe74WuXk21?=
- =?us-ascii?Q?L6Kg2B8B0zyZ21z7BB+uG9JjVctSZwzvAh6/ZjZaEifvddFrk4Bpw56pYyt7?=
- =?us-ascii?Q?nBnhePXGX9S7fQduetQuk72uWXYpHvopgIDd0H1b8Kh9lqF1GzSkbiuob0qA?=
- =?us-ascii?Q?j0E1QOyumRUz4ANJ5xpvI2BnUqJaonb3hgQvcmAaWEa4OJUvf3gGxw+N7+s3?=
- =?us-ascii?Q?dwDmDU4ueK15ffMGwJT92MYhdb8nQEEfSTytQafIQ+ZM/DVRPjC2gD/yYn6l?=
- =?us-ascii?Q?eGQdbi0TE+zVm9T1JED5cLSxqrOMDMVBcMuGN1AHP4DInW6dhHJl2d71qV/k?=
- =?us-ascii?Q?32zKOo2+O4+1xtu7G6OGteaG/1zgRhKhx58iEBdpk0fVvmYfIfm/080ns+uc?=
- =?us-ascii?Q?KUCZoTq0Zu82kqP7slqZDboqr9+PxoY63i0XiWKh2qDH/WfnadbePFUH1F/9?=
- =?us-ascii?Q?WaaBKpjayXVbXkUdKvImxFEuZ9RMO8J2Dn179ljKTwdDcjoydB0o6n4qr6Gq?=
- =?us-ascii?Q?AeRy/vxaGPEy3GPGQdzmRyhHwFZ9AWJwoqLm73u85f/TpLetouDIGj19Oy7k?=
- =?us-ascii?Q?kryyIOxgNgplaRGi/ViNweWXENABaH9J23vU913FAGqlxJBYeFs78qYChPgE?=
- =?us-ascii?Q?CtZnjZrxNypPKCMQVFLhB6+RyzDuPZIGdkqkY7TNqmO0MNidcLYJk/lgY+e7?=
- =?us-ascii?Q?xUi/ANCl8UBsy+Fce5UVLc7nJWoOKu/xfW9MBt5iGZhPcU7vtmhd6dh9/6P1?=
- =?us-ascii?Q?9VVo3EH8XusT1sMBh1gvINCzsb5K1EzJkuC6lFexkls88Nf6TBQgYWaSi5kC?=
- =?us-ascii?Q?WO+QPxAerpBXbYEEPzZfxJfNZzkCrayYNWj6fS/XNvFB9znZCIvFon/SSb2s?=
- =?us-ascii?Q?27NtZErrp2s0I8YbNTmPzowD1B1kl1MDkLw29c329uwJDi9/h84rn4jOakMO?=
- =?us-ascii?Q?qXgVFhfqwMCI3QVOv5sJx0YIBPG3SRL+HpcO3Sqi60xGa4FL2uVYIj9RHZWU?=
- =?us-ascii?Q?g7amcuNPns2j5mfmfSgQRNPakhSB?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Oct 2024 18:33:55.7602
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 65efe0d1-94bb-4045-a1bf-08dce7c7c461
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003447.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5779
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Carolina Jubran <cjubran@nvidia.com>
+On Thu,  3 Oct 2024 16:06:16 +0000 Taehee Yoo wrote:
+> The tcp-data-split-thresh option configures the threshold value of
+> the tcp-data-split.
+> If a received packet size is larger than this threshold value, a packet
+> will be split into header and payload.
+> The header indicates TCP header, but it depends on driver spec.
+> The bnxt_en driver supports HDS(Header-Data-Split) configuration at
+> FW level, affecting TCP and UDP too.
+> So, like the tcp-data-split option, If tcp-data-split-thresh is set,
+> it affects UDP and TCP packets.
+> 
+> The tcp-data-split-thresh has a dependency, that is tcp-data-split
+> option. This threshold value can be get/set only when tcp-data-split
+> option is enabled.
+> 
+> Example:
+>    # ethtool -G <interface name> tcp-data-split-thresh <value>
+> 
+>    # ethtool -G enp14s0f0np0 tcp-data-split on tcp-data-split-thresh 256
+>    # ethtool -g enp14s0f0np0
+>    Ring parameters for enp14s0f0np0:
+>    Pre-set maximums:
+>    ...
+>    TCP data split thresh:  256
+>    Current hardware settings:
+>    ...
+>    TCP data split:         on
+>    TCP data split thresh:  256
+> 
+> The tcp-data-split is not enabled, the tcp-data-split-thresh will
+> not be used and can't be configured.
+> 
+>    # ethtool -G enp14s0f0np0 tcp-data-split off
+>    # ethtool -g enp14s0f0np0
+>    Ring parameters for enp14s0f0np0:
+>    Pre-set maximums:
+>    ...
+>    TCP data split thresh:  256
+>    Current hardware settings:
+>    ...
+>    TCP data split:         off
+>    TCP data split thresh:  n/a
 
-Introduce a new function, mlx5_qos_tsar_type_supported(), to handle the
-validation of TSAR types within QoS scheduling contexts.
+My reply to Sridhar was probably quite unclear on this point, but FWIW
+I do also have a weak preference to drop the "TCP" from the new knob.
+Rephrasing what I said here:
+https://lore.kernel.org/all/20240911173150.571bf93b@kernel.org/
+the old knob is defined as being about TCP but for the new one we can
+pick how widely applicable it is (and make it cover UDP as well).
 
-Refactor the existing code to use this new function, replacing direct
-checks for TSAR type support in the NIC scheduling hierarchy.
+> The default/min/max values are not defined in the ethtool so the drivers
+> should define themself.
+> The 0 value means that all TCP and UDP packets' header and payload
+> will be split.
 
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/esw/qos.c |  4 ++-
- .../ethernet/mellanox/mlx5/core/mlx5_core.h   |  1 +
- drivers/net/ethernet/mellanox/mlx5/core/qos.c |  4 ++-
- drivers/net/ethernet/mellanox/mlx5/core/rl.c  | 27 +++++++++++++++++++
- 4 files changed, 34 insertions(+), 2 deletions(-)
+> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> index 12f6dc567598..891f55b0f6aa 100644
+> --- a/include/linux/ethtool.h
+> +++ b/include/linux/ethtool.h
+> @@ -78,6 +78,8 @@ enum {
+>   * @cqe_size: Size of TX/RX completion queue event
+>   * @tx_push_buf_len: Size of TX push buffer
+>   * @tx_push_buf_max_len: Maximum allowed size of TX push buffer
+> + * @tcp_data_split_thresh: Threshold value of tcp-data-split
+> + * @tcp_data_split_thresh_max: Maximum allowed threshold of tcp-data-split-threshold
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-index ea68d86ea6ea..ee6f76a6f0b5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c
-@@ -602,7 +602,9 @@ static int esw_qos_create(struct mlx5_eswitch *esw, struct netlink_ext_ack *exta
- 	if (!mlx5_qos_element_type_supported(dev,
- 					     SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR,
- 					     SCHEDULING_HIERARCHY_E_SWITCH) ||
--	    !(MLX5_CAP_QOS(dev, esw_tsar_type) & TSAR_TYPE_CAP_MASK_DWRR))
-+	    !mlx5_qos_tsar_type_supported(dev,
-+					  TSAR_ELEMENT_TSAR_TYPE_DWRR,
-+					  SCHEDULING_HIERARCHY_E_SWITCH))
- 		return -EOPNOTSUPP;
- 
- 	MLX5_SET(scheduling_context, tsar_ctx, element_type,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-index 5bb62051adc2..99de67c3aa74 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/mlx5_core.h
-@@ -225,6 +225,7 @@ int mlx5_core_sriov_set_msix_vec_count(struct pci_dev *vf, int msix_vec_count);
- int mlx5_core_enable_hca(struct mlx5_core_dev *dev, u16 func_id);
- int mlx5_core_disable_hca(struct mlx5_core_dev *dev, u16 func_id);
- bool mlx5_qos_element_type_supported(struct mlx5_core_dev *dev, int type, u8 hierarchy);
-+bool mlx5_qos_tsar_type_supported(struct mlx5_core_dev *dev, int type, u8 hierarchy);
- int mlx5_create_scheduling_element_cmd(struct mlx5_core_dev *dev, u8 hierarchy,
- 				       void *context, u32 *element_id);
- int mlx5_modify_scheduling_element_cmd(struct mlx5_core_dev *dev, u8 hierarchy,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/qos.c
-index 4d353da3eb7b..6be9981bb6b1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/qos.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/qos.c
-@@ -52,7 +52,9 @@ int mlx5_qos_create_inner_node(struct mlx5_core_dev *mdev, u32 parent_id,
- 	if (!mlx5_qos_element_type_supported(mdev,
- 					     SCHEDULING_CONTEXT_ELEMENT_TYPE_TSAR,
- 					     SCHEDULING_HIERARCHY_NIC) ||
--	    !(MLX5_CAP_QOS(mdev, nic_tsar_type) & TSAR_TYPE_CAP_MASK_DWRR))
-+	    !mlx5_qos_tsar_type_supported(mdev,
-+					  TSAR_ELEMENT_TSAR_TYPE_DWRR,
-+					  SCHEDULING_HIERARCHY_NIC))
- 		return -EOPNOTSUPP;
- 
- 	MLX5_SET(scheduling_context, sched_ctx, parent_element_id, parent_id);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/rl.c b/drivers/net/ethernet/mellanox/mlx5/core/rl.c
-index efadd575fb35..e393391966e0 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/rl.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/rl.c
-@@ -34,6 +34,33 @@
- #include <linux/mlx5/driver.h>
- #include "mlx5_core.h"
- 
-+bool mlx5_qos_tsar_type_supported(struct mlx5_core_dev *dev, int type, u8 hierarchy)
-+{
-+	int cap;
-+
-+	switch (hierarchy) {
-+	case SCHEDULING_HIERARCHY_E_SWITCH:
-+		cap =  MLX5_CAP_QOS(dev, esw_tsar_type);
-+		break;
-+	case SCHEDULING_HIERARCHY_NIC:
-+		cap = MLX5_CAP_QOS(dev, nic_tsar_type);
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	switch (type) {
-+	case TSAR_ELEMENT_TSAR_TYPE_DWRR:
-+		return cap & TSAR_TYPE_CAP_MASK_DWRR;
-+	case TSAR_ELEMENT_TSAR_TYPE_ROUND_ROBIN:
-+		return cap & TSAR_TYPE_CAP_MASK_ROUND_ROBIN;
-+	case TSAR_ELEMENT_TSAR_TYPE_ETS:
-+		return cap & TSAR_TYPE_CAP_MASK_ETS;
-+	}
-+
-+	return false;
-+}
-+
- bool mlx5_qos_element_type_supported(struct mlx5_core_dev *dev, int type, u8 hierarchy)
- {
- 	int cap;
--- 
-2.44.0
+Please wrap at 80 chars:
+
+./scripts/checkpatch.pl --max-line-length=80 --strict $patch..
+
+>  static int rings_fill_reply(struct sk_buff *skb,
+> @@ -108,7 +110,13 @@ static int rings_fill_reply(struct sk_buff *skb,
+>  	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN_MAX,
+>  			  kr->tx_push_buf_max_len) ||
+>  	      nla_put_u32(skb, ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN,
+> -			  kr->tx_push_buf_len))))
+> +			  kr->tx_push_buf_len))) ||
+> +	    (kr->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
+
+Please add a new ETHTOOL_RING_USE_* flag for this, or fix all the
+drivers which set ETHTOOL_RING_USE_TCP_DATA_SPLIT already and use that.
+I don't think we should hide the value when HDS is disabled.
+
+> +	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH,
+> +			 kr->tcp_data_split_thresh))) ||
+
+nit: unnecessary brackets around the nla_put_u32()
+
+> +	    (kr->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
+> +	     (nla_put_u32(skb, ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX,
+> +			 kr->tcp_data_split_thresh_max))))
+>  		return -EMSGSIZE;
+>  
+>  	return 0;
+
+> +	if (tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH] &&
+> +	    !(ops->supported_ring_params & ETHTOOL_RING_USE_TCP_DATA_SPLIT)) {
+
+here you use the existing flag, yet gve and idpf set that flag and will
+ignore the setting silently. They need to be changed or we need a new
+flag.
+
+> +		NL_SET_ERR_MSG_ATTR(info->extack,
+> +				    tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
+> +				    "setting tcp-data-split-thresh is not supported");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	if (tb[ETHTOOL_A_RINGS_CQE_SIZE] &&
+>  	    !(ops->supported_ring_params & ETHTOOL_RING_USE_CQE_SIZE)) {
+>  		NL_SET_ERR_MSG_ATTR(info->extack,
+> @@ -196,9 +213,9 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+>  	struct kernel_ethtool_ringparam kernel_ringparam = {};
+>  	struct ethtool_ringparam ringparam = {};
+>  	struct net_device *dev = req_info->dev;
+> +	bool mod = false, thresh_mod = false;
+>  	struct nlattr **tb = info->attrs;
+>  	const struct nlattr *err_attr;
+> -	bool mod = false;
+>  	int ret;
+>  
+>  	dev->ethtool_ops->get_ringparam(dev, &ringparam,
+> @@ -222,9 +239,30 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+>  			tb[ETHTOOL_A_RINGS_RX_PUSH], &mod);
+>  	ethnl_update_u32(&kernel_ringparam.tx_push_buf_len,
+>  			 tb[ETHTOOL_A_RINGS_TX_PUSH_BUF_LEN], &mod);
+> -	if (!mod)
+> +	ethnl_update_u32(&kernel_ringparam.tcp_data_split_thresh,
+> +			 tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
+> +			 &thresh_mod);
+> +	if (!mod && !thresh_mod)
+>  		return 0;
+>  
+> +	if (kernel_ringparam.tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED &&
+> +	    thresh_mod) {
+> +		NL_SET_ERR_MSG_ATTR(info->extack,
+> +				    tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH],
+> +				    "tcp-data-split-thresh can not be updated while tcp-data-split is disabled");
+> +		return -EINVAL;
+> +	}
+
+I'm not sure we need to reject changing the setting when HDS is
+disabled. Driver can just store the value until HDS gets enabled?
+WDYT? I don't have a strong preference.
+
+> +	if (kernel_ringparam.tcp_data_split_thresh >
+> +	    kernel_ringparam.tcp_data_split_thresh_max) {
+> +		NL_SET_ERR_MSG_ATTR_FMT(info->extack,
+> +					tb[ETHTOOL_A_RINGS_TCP_DATA_SPLIT_THRESH_MAX],
+> +					"Requested tcp-data-split-thresh exceeds the maximum of %u",
+
+No need for the string, just NL_SET_BAD_ATTR() + ERANGE is enough
+
+> +					kernel_ringparam.tcp_data_split_thresh_max);
+> +
+> +		return -EINVAL;
+
+ERANGE
+
+> +	}
+> +
+>  	/* ensure new ring parameters are within limits */
+>  	if (ringparam.rx_pending > ringparam.rx_max_pending)
+>  		err_attr = tb[ETHTOOL_A_RINGS_RX];
 
 
