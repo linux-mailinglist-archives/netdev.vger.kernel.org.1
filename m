@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-133365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 479CE995BC0
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:35:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 864FF995BC4
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F246D1F250D6
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:35:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B80BA1C21921
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A22219493;
-	Tue,  8 Oct 2024 23:34:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C482219494;
+	Tue,  8 Oct 2024 23:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B0t3hhtZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cvzh42x2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBEEA218D84
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACEE2194B8
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728430495; cv=none; b=uEDsg7iXLNBYSDaB57hku0Jf/RbH/QNJMsThWZMYPBnq2c/5/E4BHZFpOW94nEYTTv0ynknwWd/jvWepVsyIgFNnn1BZggaOah7z6+9wVCJF4YXRyZZUdeEs/cK423ybndIwQQKmw45v5NIDnqzVaA4OyDEFn3NHbMgxhcZK2Go=
+	t=1728430498; cv=none; b=qduEIniTfBAmVqRv9o3jhr2wovAP1xv/jc2kn6fZUNCFlC+JnH8XDZH4zN9gL8m6yGRLnG7wd7FWEp82XT3PY7bZwepRlq1hWdy4NFTaH85uPAFYvpkgr5G3eKyoA1zX9ppb8WkPBdetJDFxr/t5z5zjwY+FUM3cHGRaO0NhzqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728430495; c=relaxed/simple;
-	bh=03IHojh6ZLY1Fn80mqlzdo8+VyEkmGkgh1HH4eAfHHw=;
+	s=arc-20240116; t=1728430498; c=relaxed/simple;
+	bh=0pLD0W2uiRVaynJVwkI2CACBXZFRwjX6N9xtOcV5yqk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iW+7Ayc3U9NjpKcauhYkNYJS+DCq41q8bsFsym78SF5s39lhpG9VRoIAMRHpj8uF80iOKmnobS4LokYZeSY6KlWOuMRFDDTstpiQmqS9Kp3ItMnIfGirAX0uRsBkcHHd8re5btaGbYHre17j8q1YvOuGXWvvj8EtqTN5dbr0/q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B0t3hhtZ; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=ibwDWA4dClVjPJrT/nksb02nUX19QB23jJXlDjbMBmUdok9pOlf/gtKIpyLRNl1HipJAijnRFwCVowDxamRfgTHL1dXUyHtH6tg6OSlQrqutOOO2pYZoBqvubiEv5xHMARGJrWHKhArBtXLRGvWYim3aQREcp1BbEu2bWzKQfg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cvzh42x2; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728430494; x=1759966494;
+  t=1728430497; x=1759966497;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=03IHojh6ZLY1Fn80mqlzdo8+VyEkmGkgh1HH4eAfHHw=;
-  b=B0t3hhtZ7MSa4pZOu8DFHcmwVtP0xHCTdBcoN80xyzLSTK4t0clM7p4I
-   qKZdbuVdKDODcY7bWEG2MNHInfGnAOH7kMTYb3vmi6xQeg+QVeh/Gj+Yl
-   yWZeuyfUUKER9nEcpD8Wny86IJjTawZ91Q5/JKX0bWnlxlqoHiKvijHty
-   V+wIU4nVn9eHTN024YXOhT62oEId+6hUy9E+oms3buEs8R3R3u+dcjbCB
-   u3qatsKPwj4S9OZwoW3BNhrbUbczxClpgH/stfiC2kltqsGoQpW7ftLpv
-   4hisf+vNEvjZ9qjqJz+qGx8JcJi58jQ+Su+AZhKDjZqV0ZiPUVDIMozP6
-   Q==;
-X-CSE-ConnectionGUID: D7JV2z2STty73enwmRgHIg==
-X-CSE-MsgGUID: od1711dWSqCCcyPrBAToPQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="27779912"
+  bh=0pLD0W2uiRVaynJVwkI2CACBXZFRwjX6N9xtOcV5yqk=;
+  b=Cvzh42x2qFH6ULhoGblkmpC7SIZflMhSoNmKBxZlU7Mth1fQrii1lx+2
+   CNCrW2ghzWFVJ2wt0z/2Qnil4w4BAfxW54I+hqqDU7Iv9uUnNJ0ELcCEc
+   jPPCp2qHDrWA4kA7h/1+B0cBZPeXS5voCkD3uu4OT68maopIheWzF7ZR1
+   Q4f2mb78fawEWfvm+aXUteK+EoSn5LCmPy6KlM+YRWBAQL9bFpufStW50
+   JpxRiJ9w4NuWciHows06txzB1C9xB31rEthms0wX8X6Xr4Xey7PcKsMid
+   pd1yxIM76HaiT2FUJ9Qn894tX8cDI7a5JCOjdcgIUHM0IUbJTCb4ltCBg
+   g==;
+X-CSE-ConnectionGUID: XR4uAC9mRbOzXC+ZnAXjvg==
+X-CSE-MsgGUID: reqk7UaQRAGaSSqmIcOJcQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11219"; a="27779919"
 X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
-   d="scan'208";a="27779912"
+   d="scan'208";a="27779919"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 16:34:50 -0700
-X-CSE-ConnectionGUID: uMFKAM8+SLK1A3OKJSZl/w==
-X-CSE-MsgGUID: R8eaU9aCRzm40Q2c/zYEaA==
+X-CSE-ConnectionGUID: /BbD8l2LTZ2bv38DHuaOrQ==
+X-CSE-MsgGUID: DpEoax27QRCewWuYZ1iDzA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,188,1725346800"; 
-   d="scan'208";a="106794203"
+   d="scan'208";a="106794208"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa001.fm.intel.com with ESMTP; 08 Oct 2024 16:34:50 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,12 +64,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Yue Haibing <yuehaibing@huawei.com>,
+Cc: Takamitsu Iwai <takamitz@amazon.co.jp>,
 	anthony.l.nguyen@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH net-next 09/12] igb: Cleanup unused declarations
-Date: Tue,  8 Oct 2024 16:34:35 -0700
-Message-ID: <20241008233441.928802-10-anthony.l.nguyen@intel.com>
+	vitaly.lifshits@intel.com,
+	dima.ruinskiy@intel.com,
+	andrew@lunn.ch,
+	Kohei Enju <enjuk@amazon.com>,
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>
+Subject: [PATCH net-next 10/12] e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
+Date: Tue,  8 Oct 2024 16:34:36 -0700
+Message-ID: <20241008233441.928802-11-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 In-Reply-To: <20241008233441.928802-1-anthony.l.nguyen@intel.com>
 References: <20241008233441.928802-1-anthony.l.nguyen@intel.com>
@@ -81,44 +85,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yue Haibing <yuehaibing@huawei.com>
+From: Takamitsu Iwai <takamitz@amazon.co.jp>
 
-e1000_init_function_pointers_82575() is never implemented and used since
-commit 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet driver").
-And commit 9835fd7321a6 ("igb: Add new function to read part number from
-EEPROM in string format") removed igb_read_part_num() implementation.
+Duplicated register initialization codes exist in e1000_configure_tx()
+and e1000_configure_rx().
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+For example, writel(0, tx_ring->head) writes 0 to tx_ring->head, which
+is adapter->hw.hw_addr + E1000_TDH(0).
+
+This initialization is already done in ew32(TDH(0), 0).
+
+ew32(TDH(0), 0) is equivalent to __ew32(hw, E1000_TDH(0), 0). It
+executes writel(0, hw->hw_addr + E1000_TDH(0)). Since variable hw is
+set to &adapter->hw, it is equal to writel(0, tx_ring->head).
+
+We can remove similar four writel() in e1000_configure_tx() and
+e1000_configure_rx().
+
+commit 0845d45e900c ("e1000e: Modify Tx/Rx configurations to avoid
+null pointer dereferences in e1000_open") has introduced these
+writel(). This commit moved register writing to
+e1000_configure_tx/rx(), and as result, it caused duplication in
+e1000_configure_tx/rx().
+
+This patch modifies the sequence of register writing, but removing
+these writes is safe because the same writes were already there before
+the commit.
+
+I also have checked the datasheets [0] [1] and have not found any
+description that we need to write RDH, RDT, TDH and TDT registers
+twice at initialization. Furthermore, we have tested this patch on an
+I219-V device physically.
+
+Link: https://www.intel.com/content/dam/www/public/us/en/documents/datasheets/82577-gbe-phy-datasheet.pdf [0]
+Link: https://www.intel.com/content/www/us/en/content-details/613460/intel-82583v-gbe-controller-datasheet.html [1]
+Tested-by: Kohei Enju <enjuk@amazon.com>
+Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
+Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igb/e1000_mac.h | 1 -
- drivers/net/ethernet/intel/igb/e1000_nvm.h | 1 -
- 2 files changed, 2 deletions(-)
+ drivers/net/ethernet/intel/e1000e/netdev.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/e1000_mac.h b/drivers/net/ethernet/intel/igb/e1000_mac.h
-index 6e110f28f922..529b7d18b662 100644
---- a/drivers/net/ethernet/intel/igb/e1000_mac.h
-+++ b/drivers/net/ethernet/intel/igb/e1000_mac.h
-@@ -63,6 +63,5 @@ enum e1000_mng_mode {
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index f103249b12fa..9c9d4cb7c735 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -2928,11 +2928,8 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
+ 	tx_ring->head = adapter->hw.hw_addr + E1000_TDH(0);
+ 	tx_ring->tail = adapter->hw.hw_addr + E1000_TDT(0);
  
- #define E1000_MNG_DHCP_COOKIE_STATUS_VLAN	0x2
+-	writel(0, tx_ring->head);
+ 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
+ 		e1000e_update_tdt_wa(tx_ring, 0);
+-	else
+-		writel(0, tx_ring->tail);
  
--void e1000_init_function_pointers_82575(struct e1000_hw *hw);
+ 	/* Set the Tx Interrupt Delay register */
+ 	ew32(TIDV, adapter->tx_int_delay);
+@@ -3253,11 +3250,8 @@ static void e1000_configure_rx(struct e1000_adapter *adapter)
+ 	rx_ring->head = adapter->hw.hw_addr + E1000_RDH(0);
+ 	rx_ring->tail = adapter->hw.hw_addr + E1000_RDT(0);
  
- #endif
-diff --git a/drivers/net/ethernet/intel/igb/e1000_nvm.h b/drivers/net/ethernet/intel/igb/e1000_nvm.h
-index 091cddf4ada8..4f652ab713b3 100644
---- a/drivers/net/ethernet/intel/igb/e1000_nvm.h
-+++ b/drivers/net/ethernet/intel/igb/e1000_nvm.h
-@@ -7,7 +7,6 @@
- s32  igb_acquire_nvm(struct e1000_hw *hw);
- void igb_release_nvm(struct e1000_hw *hw);
- s32  igb_read_mac_addr(struct e1000_hw *hw);
--s32  igb_read_part_num(struct e1000_hw *hw, u32 *part_num);
- s32  igb_read_part_string(struct e1000_hw *hw, u8 *part_num,
- 			  u32 part_num_size);
- s32  igb_read_nvm_eerd(struct e1000_hw *hw, u16 offset, u16 words, u16 *data);
+-	writel(0, rx_ring->head);
+ 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
+ 		e1000e_update_rdt_wa(rx_ring, 0);
+-	else
+-		writel(0, rx_ring->tail);
+ 
+ 	/* Enable Receive Checksum Offload for TCP and UDP */
+ 	rxcsum = er32(RXCSUM);
 -- 
 2.42.0
 
