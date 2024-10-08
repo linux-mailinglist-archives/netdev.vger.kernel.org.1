@@ -1,57 +1,60 @@
-Return-Path: <netdev+bounces-132923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450BC993BA8
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:21:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBF25993BC4
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:27:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76F231C23EDB
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192251C246DB
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3451B79C0;
-	Tue,  8 Oct 2024 00:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 278DA8488;
+	Tue,  8 Oct 2024 00:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIJaIsVJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V8+a4Syx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A03F6AA1;
-	Tue,  8 Oct 2024 00:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39A06AA1;
+	Tue,  8 Oct 2024 00:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728346884; cv=none; b=h0BKHwFa2j4K/I1q87xq2uQIhgbCHRchVdZGqNB3Dc1s275kXFjdqohKqAR8YjBM+Mu4gpZQlBgWGhZz+G+aEzTRnOn/OSuMYgpCwG6MP6b1ahYax2fSUVfCf1NgXzYKbxSBu3iZ9UfPTMsk8BdxZ6dH8ebd69zNvqcSlQu93po=
+	t=1728347237; cv=none; b=TTcGNL0D19pClED2m0WL51JRJihQ0IF6serGP/Azx/XUu0L68xlMmBbR6LDsxqdvIjikOx82I6uG9km9GjQuxOblhLZuPa4CqUlEU2J8rOtIEHOydcNa+estAu0DXaYeT/vUdOy/ezOWYQ0CcjUtjuyZrzgEMCgbkobkHx8Sz0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728346884; c=relaxed/simple;
-	bh=KR2Ypbof7fqw9S7256Ff1zDPZlQAMxBLEB5g0hsgCZo=;
+	s=arc-20240116; t=1728347237; c=relaxed/simple;
+	bh=9ckwQwJYGFfdEsVWgHL6UxfIO2okKG7QZhUNQy9R3nY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V99i9hDteo5FlSQhV/oXTH5M52CYOALkbUoXrPd/jv8pVPf/irtnDwxVQvBuVu085deG+cHeqfzVgG1jV/gZjDGUnfWbBTlHGwnLsvDDZWtqdBA/c5FR/lzcuIZTdi7beGmsvzATpD13aASFETjP7chUaZ5MCHeHraRgLJVCoqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIJaIsVJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25CA7C4CEC6;
-	Tue,  8 Oct 2024 00:21:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=k4KdylV7jDMYnvGsdlmmczg4uiPk5laMb/ZvNhEG6c6FPPqGmtXeRtO/xVXfHLrS79sApWI5L10EZWTy5ZRydu0luSKwEJu2qiUGwrrhPyf9Cx7z3dA6kRKQYtkA0unCX9Y0lbGhz8C0u5QDRct2DuPpnJzZW4Kxx4sufxnjLlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V8+a4Syx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29A4AC4CEC6;
+	Tue,  8 Oct 2024 00:27:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728346883;
-	bh=KR2Ypbof7fqw9S7256Ff1zDPZlQAMxBLEB5g0hsgCZo=;
+	s=k20201202; t=1728347236;
+	bh=9ckwQwJYGFfdEsVWgHL6UxfIO2okKG7QZhUNQy9R3nY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZIJaIsVJ34+zdvuDnp7Dl5OPRS+eCx1i1ukMtkrah40cZotU6y8j/g+TEThMc+tCe
-	 b7pE/vOVrW586WGd/3bDUrjo/01jyylT1aW4pMy0B2EeUg37dk8/tvHkwm66Nvu931
-	 mpdoUBMIcEpWR4Aik/MWyafpQLMIGxUOzjS7t2AaMdPkhU3HYf8YOzo8wIxrvsCoCZ
-	 2llvApPIA+HH40GNRXRXcXrXy6NAg9bMjuHLfgDE+lQj02pxS8dit2uKmyi86WBQLu
-	 i5he+pxrUwEvMYEs0RbZF6VnhVEaEbORc1g1HM+3aPXa7shG3nhGEavMTewubOzxyd
-	 yv7fm8sWXMu/Q==
-Date: Mon, 7 Oct 2024 17:21:22 -0700
+	b=V8+a4Syx4JSjL7Uo/tA30qb7Al/PQ1Em05CSpt/NmetpT0pJKJJfM1WAvsMW4y2+Z
+	 9Rys3VfrzSfvi6mGZPyX8aQqzGsCrB+pb3j1hCnuzeayA4733APuy1f9la52xAFrkQ
+	 4QHCe/lTJdMY5TIDHvRbQLHtp7nue+M5/PcHz/MTYIFMSfGZ+3mGKZOu/WcBt4IIBO
+	 RG8vKNiySc91BsGkF40dvQsW+vFW2+kXwT3U4VbhCsitv4IGGRYUfw5oRHdJdJOaTG
+	 Lpr+u9R/YIWeiKkw9WcdSqVK/veK2LJ4uho+KTcGA9HLTL0L5RXY7cNIHofyZXCEhN
+	 6ztJqgrWjAl+w==
+Date: Mon, 7 Oct 2024 17:27:15 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net,
- chunkeey@gmail.com
-Subject: Re: [PATCH net] net: ibm: emac: mal: add dcr_unmap to _remove
-Message-ID: <20241007172122.6624c1ec@kernel.org>
-In-Reply-To: <20241007203923.15544-1-rosenp@gmail.com>
-References: <20241007203923.15544-1-rosenp@gmail.com>
+To: Rand Deeb <rand.sec96@gmail.com>
+Cc: Chris Snook <chris.snook@gmail.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Christian Marangi <ansuelsmth@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ deeb.rand@confident.ru, lvc-project@linuxtesting.org,
+ voskresenski.stanislav@confident.ru
+Subject: Re: [PATCH] drivers:atlx: Prevent integer overflow in statistics
+ aggregation
+Message-ID: <20241007172715.649822ba@kernel.org>
+In-Reply-To: <20241007092936.53445-1-rand.sec96@gmail.com>
+References: <20241007092936.53445-1-rand.sec96@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,11 +64,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  7 Oct 2024 13:39:23 -0700 Rosen Penev wrote:
-> Fixes: 1ff0fcfcb1a6 ("ibm_newemac: Fix new MAL feature handling")
+On Mon,  7 Oct 2024 12:29:36 +0300 Rand Deeb wrote:
+> The `atl1_inc_smb` function aggregates various RX and TX error counters
+> from the `stats_msg_block` structure. Currently, the arithmetic operations
+> are performed using `u32` types, which can lead to integer overflow when
+> summing large values. This overflow occurs before the result is cast to
+> a `u64`, potentially resulting in inaccurate network statistics.
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> To mitigate this risk, each operand in the summation is explicitly cast to
+> `u64` before performing the addition. This ensures that the arithmetic is
+> executed in 64-bit space, preventing overflow and maintaining accurate
+> statistics regardless of the system architecture.
 
-I'll fix this one when applying but please make sure there is no empty
-lines between tags in the future.
+Thanks for the nice commit message, but honestly I don't think
+the error counters can overflow u32 on an ancient NIC like this.
+-- 
+pw-bot: reject
 
