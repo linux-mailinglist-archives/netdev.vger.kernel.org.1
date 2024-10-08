@@ -1,228 +1,141 @@
-Return-Path: <netdev+bounces-133030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB649944CC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:53:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 104A39944D6
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CCFB287BA4
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:53:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAB60281330
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB871993B7;
-	Tue,  8 Oct 2024 09:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ECBD15B12F;
+	Tue,  8 Oct 2024 09:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eT4qJswF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eK2HlAzD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4187C199225;
-	Tue,  8 Oct 2024 09:52:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E026942AB1
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728381123; cv=none; b=XzQxbzq2pZVtOS6lALhCVnz4fWRYTvSx99WLiDW/fIqWrIH2BUlDnbfJZiSNkGQx+q57YLVcswWGmYgoj9FV/lR3q/alOyEFeP+XaThusr/mRNT+VpiCguyBHh+xcQ1XMk7ZxD4vzKIgpFMsLuVRMFYhmh1trHsEzRcNuuoFB2c=
+	t=1728381276; cv=none; b=bJH0Y1AKOihIiDEv9GqAp56xPDGfmOGPkdUPfqeNHCmaA033Ix8xH5T/1qV+d6eFBFKMbINowyjfpqvn9/a53n7Eyj6v/li+sW/lmpzB84mtPD/NOu1FnGrbHg1MhEUY48cRgx9gAXWnBwQKHg7+/PgaF1YnGCe7qCy8amk8W3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728381123; c=relaxed/simple;
-	bh=MJshw9h40ymJ3Nc5HZrkDmJA46p/ympzLgaX5/Ab3AM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VDxWWoTFmpIl/94P8WzHuu2wQJcZqEUjNPfzM6KuXmmQxqbXILyOxrnh3TwhADtGTqzM3B/JH9Fz0qT0Chgg5t7MjU8ubqxo1u8hLBLz3jA/OmrxKE08yAXlxRoitC9n+0q0j/L34Z1curKrTL0YtUuHdOzpT7nICr85YHSzgXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eT4qJswF; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20b7eb9e81eso64436535ad.2;
-        Tue, 08 Oct 2024 02:52:02 -0700 (PDT)
+	s=arc-20240116; t=1728381276; c=relaxed/simple;
+	bh=rP3lq2lC2auj3AgMgQLGsKD6mc5uIrDwpFl+MpKOr9U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BXh8Ov3RP8uHLJ2w65mDh5Z0yIhABv4FG0uq7XeRFaIhPC6QbYSXmnWsGrvV7XWyhsf5D8EQi4ipakxRYoqNlAiRGrVWhMVjRqFJ3rDrSilJGV8wUNpy5rLgH0gViJEhd9lfziUPiQIsGLAUiVmhu4lucQLq1EzV64A8+3LO2FY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eK2HlAzD; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c5b9bf9d8bso3967403a12.1
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728381122; x=1728985922; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1728381273; x=1728986073; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QUComqhPeUxBF0aXy60LKQQCYmV3hHWBJE0MF5/cSug=;
-        b=eT4qJswF5N860zomFa1gdpM31oc/eIcBQPTL8qcL+rqj4WFVrSBmuGmxipJjN355bA
-         kM7L4rzIVEY5KZ+VTv5obxaRcYXwik66Sj5PEw+a9i87q6f9Rib4bGPGZFxyyCOYYu00
-         nDVt6oQqUVc5sOYU/3cpOhKIB8XO+mpc6sixf0ARwmbuZjCj0d+8RXI67Okm9wsDyu22
-         y5Ga8c1s586nh0Cbg8wbZXy4PsCpAGlAWj1P0lrb6WU73UngATBJIPHTszP7agpj/dt8
-         q6dPpO0gIW5nVjGy8NGUDK57TExErgOLbEg/qMLWNOk27xyqLM17qqZwrwROBmcDt+90
-         WRvw==
+        bh=J6XIMLwhQrKyZBAfEpAT8GFwc8+6i8Pmfz25y2Peo0I=;
+        b=eK2HlAzDa2phgXD5Bhzo1ftDJEigUI5Lk+3K4XNlh+Zd+2hYQ4ls3OhhcJQqEqfVw8
+         ae1EpnCyUiFgfQhJTGXrNDENOzbvQKp7qnoM0XOjrjgEqsDkJ3a96Q3fqNFVgYMjK+X2
+         YwtpxlplbKK9/8kVzdTKC8nkfX/HKUAF1w6DhGQOzpc0TbKDErFba526G04pjSe78h8t
+         u3zdDGPzcFszMYnlanig7UREwP6gMp7KpBwZ5KPbMG1pRF5UnsVb6qQ+Qou7O+Mk4Zif
+         Op1JQX2aE/T4uM9uHgAM6heGZOxrfSITWcUOWvbv9tIdl8Cjf7LmGbDdHMlPvxRxqXpP
+         ombA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728381122; x=1728985922;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728381273; x=1728986073;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QUComqhPeUxBF0aXy60LKQQCYmV3hHWBJE0MF5/cSug=;
-        b=eVaNjZJdTrdrBuqTPy1H1uvMB7uqpiVZ4azJ47S+GRaKpS6jXeo/gZzN2FLTNeYYjm
-         9oZ7OPslN6qTV52bl/nLVgE9kRz/Ekn/6mrR6hcWegPTCI31OG0pvXsFyWno7M3M0bjy
-         DWXTyvDYDsd941RMTBfzfkz+xqDPM+AmIG6SNdY1lzH9JVLFAH6rUarOGP0f4QBZK9Sl
-         iiOiJ9WZCuyI2Em5+YZBL2QSZrOextTMoy33Uof99i9SCizXCJX+QpyizNFaEOhNgvoB
-         rV4PCnEIvinX8PElTwkdohPh8Lh25tWG0PqelA1Am7prJM6V91gR+UblLhx/dCoOBO1N
-         xo8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW8bx/i8ZNk72pP+moolnSKQ4Ikd9pTy5hmrOWJ2xYKQVYvOBS8gQQAfwSoo1dLILR6cXFquwg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjersDqjWoLWCpgnk4oOrGiM4hGqgQjXAG3yya82ZVBfMEDRHG
-	tIEROJm26VScbsgu6Yqgmy1sRfvK9ejngdURBHGZTvwN1nHS5DwTO3GLig==
-X-Google-Smtp-Source: AGHT+IELp7iJAl1g8RI4hS7+vxFcLa36F2p1sSzf3KervtMfeEq37sWtPBKzjDFft6AlQ0rnKrBJJw==
-X-Received: by 2002:a17:903:2452:b0:20b:8c13:533f with SMTP id d9443c01a7336-20bfdff0141mr175711685ad.24.1728381121713;
-        Tue, 08 Oct 2024 02:52:01 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.21])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cfd25sm52527345ad.73.2024.10.08.02.51.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 02:52:01 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 9/9] net-timestamp: add bpf support for rx software/hardware timestamp
-Date: Tue,  8 Oct 2024 17:51:09 +0800
-Message-Id: <20241008095109.99918-10-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20241008095109.99918-1-kerneljasonxing@gmail.com>
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+        bh=J6XIMLwhQrKyZBAfEpAT8GFwc8+6i8Pmfz25y2Peo0I=;
+        b=OCgRcqOMxnQ2MCb/7s0aB3Ov0JTYoxnx08ULBt7FEDt1IsFf4yGXYZyV3q/lM1Qo3Y
+         eeyUO+NhGrcnxbV9OS1Hc/pn+v93nNLWUwzqgKBJYjHD6JC8ubpSK45gxopMDcTOwQIe
+         ySINNbfRPxcmH9xHNqWeIjwRz9PHj3qpAxP+RzczWu9PvSg2BDU2eXGuklXJAwjDmp4c
+         bvBkwRHmrmwne9F/po9Fece8qHqR0yOiPcL4mjHO4KyQ3JCWo7ikmvuX+qAnFAstcq8N
+         xjTMzMEAyH332iDawDK9wLQy/0lSQ+nBcunK6a8HqcbElekPwrodOPCn3QliF4dI7V+N
+         Jl6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWhtChO9Ayf86VmYxirSSP4fXwftubDCCGY/IxVAFOVCpDcTpjLQp4L2O0x7fq5WY1img7KM4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt/0irWhUE94NnAWLHTv6H3E288gys9LncYvkZf5Cgi+qi48Z5
+	VFLD4JvbaB3s0+UgjMYhE48E3i1F7QmX+nCdMC6ur4zvoOnjvNeZozaEunFGkfk9wWaPtLvqdPv
+	LFG/aq+Zr0L3W9hLvSqm/JjaM//MA6umc3ATn
+X-Google-Smtp-Source: AGHT+IFWVJa2J/41N2MbQNkksw/7bmKQ+X/VWsOsUqzvQh9Ckmb7a4bnS93ITLaYleeFTdp6lZyd5G6GcCgLuhk3qyg=
+X-Received: by 2002:a05:6402:2791:b0:5c5:b9bb:c341 with SMTP id
+ 4fb4d7f45d1cf-5c8d2e9f8bdmr23483582a12.26.1728381272852; Tue, 08 Oct 2024
+ 02:54:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241007162610.7d9482dc@kernel.org> <20241007235251.84189-1-kuniyu@amazon.com>
+In-Reply-To: <20241007235251.84189-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 8 Oct 2024 11:54:21 +0200
+Message-ID: <CANn89iKWPDs8UXTu8NU+18DM4XE4wHz=CKeSY2AMoxB7tvLyKw@mail.gmail.com>
+Subject: Re: [PATCH v1 net] tcp/dccp: Don't use timer_pending() in reqsk_queue_unlink().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: kuba@kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	kuni1840@gmail.com, martin.lau@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Tue, Oct 8, 2024 at 1:53=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Mon, 7 Oct 2024 16:26:10 -0700
+> > On Mon, 7 Oct 2024 07:15:57 -0700 Kuniyuki Iwashima wrote:
+> > > Martin KaFai Lau reported use-after-free [0] in reqsk_timer_handler()=
+.
+> > >
+> > >   """
+> > >   We are seeing a use-after-free from a bpf prog attached to
+> > >   trace_tcp_retransmit_synack. The program passes the req->sk to the
+> > >   bpf_sk_storage_get_tracing kernel helper which does check for null
+> > >   before using it.
+> > >   """
+> >
+> > I think this crashes a bunch of selftests, example:
+> >
+> > https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/805581/8-nft-queu=
+e-sh/stderr
+>
+> Oops, sorry, I copy-and-pasted __inet_csk_reqsk_queue_drop()
+> for different reqsk.  I'll squash the diff below.
+>
+> ---8<---
+> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_s=
+ock.c
+> index 36f03d51356e..433c80dc57d5 100644
+> --- a/net/ipv4/inet_connection_sock.c
+> +++ b/net/ipv4/inet_connection_sock.c
+> @@ -1188,7 +1190,7 @@ static void reqsk_timer_handler(struct timer_list *=
+t)
+>         }
+>
+>  drop:
+> -       __inet_csk_reqsk_queue_drop(sk_listener, nreq, true);
+> +       __inet_csk_reqsk_queue_drop(sk_listener, oreq, true);
+>         reqsk_put(req);
+>  }
+>
+> ---8<---
+>
+> Thanks!
 
-Now it's time to let the bpf for rx timestamp take effect.
+Just to clarify. In the old times rsk_timer was pinned, right ?
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/net/tcp.h              | 14 ++++++++++++++
- include/uapi/linux/bpf.h       |  5 +++++
- net/ipv4/tcp.c                 | 28 +++++++++++++++++++++++++++-
- tools/include/uapi/linux/bpf.h |  5 +++++
- 4 files changed, 51 insertions(+), 1 deletion(-)
+83fccfc3940c4 ("inet: fix potential deadlock in reqsk_queue_unlink()")
+was fine I think.
 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 739a9fb83d0c..416a039da472 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2676,6 +2676,14 @@ static inline int tcp_call_bpf_3arg(struct sock *sk, int op, u32 arg1, u32 arg2,
- 	return tcp_call_bpf(sk, op, 3, args);
- }
- 
-+static inline int tcp_call_bpf_4arg(struct sock *sk, int op, u32 arg1, u32 arg2,
-+				    u32 arg3, u32 arg4)
-+{
-+	u32 args[4] = {arg1, arg2, arg3, arg4};
-+
-+	return tcp_call_bpf(sk, op, 4, args);
-+}
-+
- #else
- static inline int tcp_call_bpf(struct sock *sk, int op, u32 nargs, u32 *args)
- {
-@@ -2693,6 +2701,12 @@ static inline int tcp_call_bpf_3arg(struct sock *sk, int op, u32 arg1, u32 arg2,
- 	return -EPERM;
- }
- 
-+static inline int tcp_call_bpf_4arg(struct sock *sk, int op, u32 arg1, u32 arg2,
-+				    u32 arg3, u32 arg4)
-+{
-+	return -EPERM;
-+}
-+
- #endif
- 
- static inline u32 tcp_timeout_init(struct sock *sk)
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 3c28d74d14ea..ffaa483f1362 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -7045,6 +7045,11 @@ enum {
- 					 * flag for other three tx timestamp
- 					 * use.
- 					 */
-+	BPF_SOCK_OPS_TS_RX_OPT_CB,	/* Called when tcp layer tries to
-+					 * receive skbs with timestamps when
-+					 * SO_TIMESTAMPING feature is on
-+					 * It indicates the recorded timestamp.
-+					 */
- };
- 
- /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 938e2bff4fa6..f6addd26db9f 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2278,10 +2278,36 @@ static int tcp_zerocopy_receive(struct sock *sk,
- 
- static bool tcp_bpf_recv_timestamp(struct sock *sk, struct scm_timestamping_internal *tss)
- {
-+	u32 tsflags = READ_ONCE(sk->sk_tsflags);
- 	struct tcp_sock *tp = tcp_sk(sk);
- 
--	if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_RX_TIMESTAMPING_OPT_CB_FLAG))
-+	if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_RX_TIMESTAMPING_OPT_CB_FLAG)) {
-+		u32 hw_sec, hw_nsec, sw_sec, sw_nsec;
-+
-+		if (!(tsflags & (SOF_TIMESTAMPING_RX_SOFTWARE |
-+		      SOF_TIMESTAMPING_RX_HARDWARE)))
-+			return true;
-+
-+		if (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) {
-+			sw_sec = tss->ts[0].tv_sec;
-+			sw_nsec = tss->ts[0].tv_nsec;
-+		} else {
-+			sw_sec = 0;
-+			sw_nsec = 0;
-+		}
-+
-+		if (tsflags & SOF_TIMESTAMPING_RX_HARDWARE) {
-+			hw_sec = tss->ts[2].tv_sec;
-+			hw_nsec = tss->ts[2].tv_nsec;
-+		} else {
-+			hw_sec = 0;
-+			hw_nsec = 0;
-+		}
-+
-+		tcp_call_bpf_4arg(sk, BPF_SOCK_OPS_TS_RX_OPT_CB,
-+				  sw_sec, sw_nsec, hw_sec, hw_nsec);
- 		return true;
-+	}
- 
- 	return false;
- }
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index ff17cd820bde..8a87fee2e012 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -7044,6 +7044,11 @@ enum {
- 					 * flag for other three tx timestamp
- 					 * use.
- 					 */
-+	BPF_SOCK_OPS_TS_RX_OPT_CB,	/* Called when tcp layer tries to
-+					 * receive skbs with timestamps when
-+					 * SO_TIMESTAMPING feature is on
-+					 * It indicates the recorded timestamp.
-+					 */
- };
- 
- /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
--- 
-2.37.3
+So the bug was added recently ?
 
+Can we give a precise Fixes: tag ?
+
+Thank you.
 
