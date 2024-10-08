@@ -1,83 +1,101 @@
-Return-Path: <netdev+bounces-133298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0152E9957DF
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:52:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4CC49957E2
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:53:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 850C7B22FC2
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:52:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B908F1C20D18
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAABE213EF0;
-	Tue,  8 Oct 2024 19:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251D5213EF1;
+	Tue,  8 Oct 2024 19:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SiCRucH6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tMcvCFei"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE5A5213EDA;
-	Tue,  8 Oct 2024 19:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0557212D21;
+	Tue,  8 Oct 2024 19:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728417122; cv=none; b=pjerhsdgoQhmEqxCgtjxqFWxDN4iUegTNaPvhIJk65d9rymbhZnrvISX5S/jrIbbZ72g55ev59qzLYIyjnbuxP7IITmhG5EplcopeN8o3aLkCvPdaqu1Hgr3s/Iqamj8P0taWOXvmfpcLAtwG1uo04Yed0cqN/nOa3t/1XtSDUA=
+	t=1728417209; cv=none; b=tV/Y//KXgpaovXO3iYgr0yS3SwfuWUmocgR1ZW2N0AQlTv+tSDWgQ1HGofXT2zOaA1pE2bUyHc/GJGqO5Ok6pk/IlwdZ+6PvilgVNAYEbqIkhfbb5pkqQOSul/rfgG9M/CLUVUHVrMeZCUZPIY9/Pd/Nspu02ZGSYxIqk8gUApg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728417122; c=relaxed/simple;
-	bh=NdHk3ANhAEQl/5m6gjkQIVlXtyKOXVD1nAmw2csFKQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hgdXw4KupsaJdBtw2Tgj+JtUMCdAxRk5OcC502QbOPLHUOlhiuPobjxCgUugHkyLCRtoFLcUluTH0FbAgCpe+Dv+d2zdR86LNbgEi51Zj5G9NAVoLo19sgVLp343+pai+jIz1YA70frH96jkORFkNdafrT+7Pc3RXcLU2s+eXAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SiCRucH6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vosV0UbV9CptMF/mNMauCpgANbudJBFcILvy+5yZnQc=; b=SiCRucH6UI7eHu/r8UaDFewo+/
-	+VIekPwGcXckTUKhzwki8KUhS2ebgHUh8CcOR1lM9e96FqqiT+kIQ6ckeCBx0+KeyWze6R1SK0/xx
-	XPRa7po/gkc4aNh0rLapDQe44ULIyxR0shGyixpJyVgCGAMOP6Q4UrN+eJcUg2dSoTus=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1syGFI-009PMn-Lb; Tue, 08 Oct 2024 21:51:48 +0200
-Date: Tue, 8 Oct 2024 21:51:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v3] net: phy: Validate PHY LED OPs presence
- before registering
-Message-ID: <c8f375e7-782e-4f2f-9a5e-f15a188c6f72@lunn.ch>
-References: <20241008194718.9682-1-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1728417209; c=relaxed/simple;
+	bh=Hy3ldGLiANp9fWX1F9t74ZmDpnYJQWtMHogoLeUFvM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OTJd7GLhWDM5zRSSVVGmpJm4xbfnduGU0HTd/X/ZkaoOc1XYoOFPfj2VnNqK4WQtBR1wYG++I9+B8dciGiJgSMKKa56BK83RDZfYxdyDGYR1TsDgnJgGYHVD/Zgycogsn7yMBpQoayF2tuCu/3Q4E6+HHr75nWB+NxbSMOqR2lU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tMcvCFei; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39E7FC4CEC7;
+	Tue,  8 Oct 2024 19:53:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728417208;
+	bh=Hy3ldGLiANp9fWX1F9t74ZmDpnYJQWtMHogoLeUFvM0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tMcvCFeieUr5lTimHf1M2JeI+yy7q6tEO62xmPpcRxoUOj6jdxvFUk6D3j6eQ2HvV
+	 NQqkxiWb1JJg7irZJtLTvCwscn4goZDeSVx+6Jgzvrdc0KGti/xh9lhiuapVQVKpEf
+	 3TYIWeq4q1wqCnzmgvngOa8kBaW9fp99O4QZkT0QcEgrOQaalhsIwoLNlprXyWZ067
+	 De//3m0v8h5R1ycaeatyz5filB0PzH+7ovcwQpZPcv5lJ9SOhTtSES0RAf4DiNpM8P
+	 avoPpFtdfo7qg3m7hEtrvRBYklf4LMxNHS82FIvBFZAOBVe6FSX4YXwsqoIebz7lQf
+	 YCczw3AUV2qLA==
+Date: Tue, 8 Oct 2024 12:53:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Taehee Yoo <ap420073@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ almasrymina@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ donald.hunter@gmail.com, corbet@lwn.net, kory.maincent@bootlin.com,
+ maxime.chevallier@bootlin.com, danieller@nvidia.com,
+ hengqi@linux.alibaba.com, ecree.xilinx@gmail.com,
+ przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com,
+ paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
+ asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com,
+ aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com,
+ bcreeley@amd.com
+Subject: Re: [PATCH net-next v3 1/7] bnxt_en: add support for rx-copybreak
+ ethtool command
+Message-ID: <20241008125326.2e17dce9@kernel.org>
+In-Reply-To: <CACKFLikDqgewWCutDG9ar6UFup_EUefUEaXShEg0kmxC5yiHMg@mail.gmail.com>
+References: <20241003160620.1521626-1-ap420073@gmail.com>
+	<20241003160620.1521626-2-ap420073@gmail.com>
+	<CACKFLi=1h=GBq5bN7L1pq9w8cSiHA16CZz0p8HJoGdO+_5OqFw@mail.gmail.com>
+	<CAMArcTXUjb5XuzvKx03_xGrEcA4OEP6aXW2P0eCpjk9_WaUS8Q@mail.gmail.com>
+	<CACKFLikCqgxTuV1wV4m-kdDvXhiFE7P=G_4Va_FmPsui9v2t4g@mail.gmail.com>
+	<a3bd0038-60e0-4ffc-a925-9ac7bd5c30ae@lunn.ch>
+	<CAMArcTUgDLawxxvFKsfavJiBs0yrEBD3rZOUcicYOAWYr+XYyQ@mail.gmail.com>
+	<20241008111058.6477e60c@kernel.org>
+	<CACKFLikDqgewWCutDG9ar6UFup_EUefUEaXShEg0kmxC5yiHMg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008194718.9682-1-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 08, 2024 at 09:47:16PM +0200, Christian Marangi wrote:
-> Validate PHY LED OPs presence before registering and parsing them.
-> Defining LED nodes for a PHY driver that actually doesn't supports them
-> is redundant and useless.
+On Tue, 8 Oct 2024 12:38:18 -0700 Michael Chan wrote:
+> > Where does the min value of 64 come from? Ethernet min frame length?
 > 
-> It's also the case with Generic PHY driver used and a DT having LEDs
-> node for the specific PHY.
-> 
-> Skip it and report the error with debug print enabled.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> The length is actually the ethernet length minus the 4-byte CRC.  So
+> 60 is the minimum length that the driver will see.  Anything smaller
+> coming from the wire will be a runt frame discarded by the chip.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Also for VF to VF traffic?
 
-    Andrew
+> > IIUC the copybreak threshold is purely a SW feature, after this series.
+> > If someone sets the copybreak value to, say 13 it will simply never
+> > engage but it's not really an invalid setting, IMHO. Similarly setting
+> > it to 0 makes intuitive sense (that's how e1000e works, AFAICT).  
+> 
+> Right, setting it to 0 or 13 will have the same effect of disabling
+> it.  0 makes more intuitive sense.
+
+Agreed on 0 making sense, but not sure if rejecting intermediate values
+buys us anything. As Andrew mentioned consistency is important. I only
+checked two drivers (e1000e and gve) and they don't seem to check 
+the lower limit.
 
