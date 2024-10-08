@@ -1,98 +1,286 @@
-Return-Path: <netdev+bounces-132945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2668B993CE7
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 04:32:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1AE993CD3
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 04:27:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEE321F246B2
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:32:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C291F225B4
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7E713A86C;
-	Tue,  8 Oct 2024 02:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AD11EA85;
+	Tue,  8 Oct 2024 02:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kfocus-org.20230601.gappssmtp.com header.i=@kfocus-org.20230601.gappssmtp.com header.b="rkhzLX1q"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f195.google.com (mail-il1-f195.google.com [209.85.166.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9752D1F60A;
-	Tue,  8 Oct 2024 02:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE7921E535
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 02:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728354636; cv=none; b=q2eVr1V7dc4riN0acjybuiMNeOvw7oLoS2DyTw+8ONiNH4UH9sNUpcUoHn3Vm257PTUt0U3oKJr3CSQyU+g1GnMFLVFdNI/I4gmnUj72eDxTwiV4sEUS7orMFGtXq8HdHJNajvMWJmk8K++sJM/jhw73E9tJYHdnioQzBS4EPR8=
+	t=1728354461; cv=none; b=gkK0lIIbs6Sn3TVsPf1pmX+ldg4dz+EnQxDfXhULwH00khm8RU4nORjBG5SpBLfia35DBYZ+oCPu9dSuPhBQAHoOxx6BuYCa5fr1ZiYCtu0eB/YgOzuqdV8awrWZ0lj9XqMor2AvWHgTdymDsXzAluIaV+annw8hcUPSS/adZJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728354636; c=relaxed/simple;
-	bh=eVk/6znkIvhLWdFUkVUnt5EJsWbQQ/8E7L7rqK+GR90=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sx7bkP8crGBEReJBueNfd0cwcPa7zGf6XADGdM/JYEeBnZ2rUwEECcmZkXMt+S44PD2/8uE6gdz3xkc6wlemRJtINAjbw9y37l7fHnoaIBuIJyiTsORZHQZznAgA7ByD3Lu/skHOeRbxQGBZTV8A9Yz/QvvPhcxVR/EXS8VwYaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XN0Ms0WwPz2Dd7Z;
-	Tue,  8 Oct 2024 10:29:29 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 95BDD1400D2;
-	Tue,  8 Oct 2024 10:30:32 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 8 Oct 2024 10:30:31 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<andrew@lunn.ch>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<kalesh-anakkur.purayil@broadcom.com>, <christophe.jaillet@wanadoo.fr>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH V11 net-next 10/10] net: hibmcge: Add maintainer for hibmcge
-Date: Tue, 8 Oct 2024 10:23:58 +0800
-Message-ID: <20241008022358.863393-11-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20241008022358.863393-1-shaojijie@huawei.com>
-References: <20241008022358.863393-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1728354461; c=relaxed/simple;
+	bh=l8ndyz3RQaEsFJHJYlXGVVJLYKHeF1rnK0WUWDY7nSU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=kGMwOh7MnSPGLj8n/SdmPz1pT8sO3CkeutRLzX2R1VFwWhCcNXB7Y6k5uJ3rKIpWR7Bb5rhpeU3f3hif23V2YR2vBtSarC4EhTSGjeArLO/8qiPm9oxYVzJ+QzOqYOHYicPtefVhIypfsZSW/aqwIDmL3Uc6De543LnGy547HiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kfocus.org; spf=pass smtp.mailfrom=kfocus.org; dkim=pass (2048-bit key) header.d=kfocus-org.20230601.gappssmtp.com header.i=@kfocus-org.20230601.gappssmtp.com header.b=rkhzLX1q; arc=none smtp.client-ip=209.85.166.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kfocus.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kfocus.org
+Received: by mail-il1-f195.google.com with SMTP id e9e14a558f8ab-3a363feabc6so19461545ab.1
+        for <netdev@vger.kernel.org>; Mon, 07 Oct 2024 19:27:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kfocus-org.20230601.gappssmtp.com; s=20230601; t=1728354459; x=1728959259; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:organization:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=PXG6JQjHvw8er20xtShXcOScOW4eWRr0M+PpnzpPqAI=;
+        b=rkhzLX1q2Q87OqNocQTSemiIIZ471KYiOwyokg5sU+ZjXI3Jbl6KZroRZW0wp/b00N
+         T6TtWCvqhWWS6mO703x+TaYrip7XUT60/nLdHuu1VBhZTsTwpKSTX6XpLfOl511nbFOg
+         DXkfdyX0jKUhblBO1U38fM3HMuSlKvsR5XsJwTm1P6KGaoWDHAoNcz6FufB/vWp+iaoD
+         JjMRVXSSvWLIfoe3JRs76VYwJnE4nVHyV0Xm5gb6k9ixQfs1F3TjfwDGtaVSewvSIc/l
+         SmJmsW2DLtBjgLr3NvXLOJge52osBgYDVKVEzfV4/QcgsQX/K2UOF5YNBgx2llTP5rPs
+         sBmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728354459; x=1728959259;
+        h=content-transfer-encoding:mime-version:organization:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PXG6JQjHvw8er20xtShXcOScOW4eWRr0M+PpnzpPqAI=;
+        b=eiLcMUXbkK/zmtpnjTdRDGCn9BT7rgyIwkNNlczF3N/Zh9A9Ef5w+jMirXWtuUGMem
+         MChYXEmNhHH9u9LkYWyEMpvwJUTEkVhmr9UD7joK4sXqjTVU5bhEyDh6LdbRwVVm0d4x
+         7ORLLc+NQC0wgTMM68ij9ftUPQDMpghhIO75YSxCIWbhuXGT+16hakZ+07Oel5NyDmGD
+         oSV9k95YV3cpaTtepuVES56ch49t03V4cFQTg4hrxUchn3iG9ghzecg/MDlNdJE2nAVv
+         lBdN2Z+jnF2WQwmgNuWOxmABB8pq/I18qr4iQRvepASbMRgGGZTa38LhUxTQclFfalo9
+         dDuA==
+X-Gm-Message-State: AOJu0YzTVCPoj97eJwUlSzg1i8lPfPnNoAN+pd2wILmKIpHgg11wixnH
+	qjcknJqW25aAmgUxJZjv0s1NkZ6IJRg2GBmfhjRmcjOLUUKOZivKy6P6BxM2YyFNf29VrjQEju1
+	wJNhSlg==
+X-Google-Smtp-Source: AGHT+IGaUtB7PSLdAn7KrJ4oucdF64tDcRHURpLUrOxXJwE3X+W0t87oxYYeoWZu+QFSS1rpZrN3qw==
+X-Received: by 2002:a05:6e02:1d0e:b0:39f:5def:a23d with SMTP id e9e14a558f8ab-3a38af1e5demr12435145ab.5.1728354458633;
+        Mon, 07 Oct 2024 19:27:38 -0700 (PDT)
+Received: from kf-ir16 ([2607:fb91:11a8:8b87:1343:77ca:e075:fe49])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db6eb86f45sm1428399173.78.2024.10.07.19.27.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Oct 2024 19:27:38 -0700 (PDT)
+Date: Mon, 7 Oct 2024 21:27:35 -0500
+From: Aaron Rainbolt <arainbolt@kfocus.org>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, edumazet@google.com, Jason@zx2c4.com,
+ davem@davemloft.net, adrelanos@kicksecure.com
+Subject: [PATCH] net: add option for using randomized TCP ISNs
+Message-ID: <20241007212735.460dc0eb@kf-ir16>
+Organization: Kubuntu Focus
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Add myself as the maintainer for the hibmcge ethernet driver.
+This patch is not yet ready for merging into the kernel. While there's
+nothing in particular wrong with it that would keep it from being
+usable in its current state (that I'm aware of), I'm conscious of the
+fact that we are well past the merge window and am posting this
+primarily for feedback. There's also some testing code left over to
+make it easy for people to test the patch, as well as detailed
+instructions on how to test it.
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+The current algorithm for generating TCP Initial Sequence Numbers
+(ISNs) is to take data about the TCP connection, hash it with a
+one-time generated key and SipHash, then add a system timer value to
+it. This algorithm has the drawback of exposing relative timestamps to
+servers. There are both known[1] and suspected[2] timing attacks that
+can be carried out when relative timestamp values are used, and while
+these may not be a concern for most, they are potentially concerning to
+some subset of Linux users. Currently the only good solution for issues
+who are worried about this is to use a third-party, out-of-tree kernel
+module[3] that hot-patches the `secure_tcpv6_seq` and `secure_tcp_seq`
+functions.
+
+While the TCP protocol may suffer slight performance issues when ISNs
+are not managed in an orderly fashion like the kernel currently does,
+in practice it appears to not cause substantial issues in a desktop use
+case. (I have not yet benchmarked this, but the author of [2] seems to
+have not found the performance impact concerning, and whatever impact
+there was, was unnoticeable for me in my limited testing.) Therefore it
+is likely practical to simply use entirely random 32-bit numbers for
+TCP ISNs, which is what this patch allows. Due to the possible
+performance impact, this is not something that would be appropriate to
+apply to all users of the Linux kernel, and so it is instead
+implemented as an optional feature that can be toggled with a kernel
+parameter.
+
+To make testing easier, there are a couple of lines marked as "TODO:
+Remove before merge" that print every ISN that is generated to
+the kernel log. To test:
+
+* Apply this patch to Linux 6.12-rc2, build it, and boot from it. Do
+  not add `tcp_rand_isn` to the kernel command line.
+* Create two Python scripts, "hammer.py" and "anvil.py". The content of
+  these scripts should be as follows:
+
+      hammer.py:
+      #!/usr/bin/python3
+      import socket
+      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+      s.bind(('', 4434))
+      s.connect(("127.0.0.1", 7899))
+      s.close()
+
+      anvil.py:
+      #!/usr/bin/python3
+      import socket
+      import time
+      s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+      s.bind(("127.0.0.1", 7899))
+      s.listen(100)
+      while True:
+          conn, addr = s.accept()
+          data = conn.recv(1024)
+          print(repr(data))
+          time.sleep(0.001)
+          conn.close()
+
+* In one terminal, run `tail -f` on your logfile (for systemd-based
+  distros use `journalctl -f`) to observe the kernel's notifications
+  about generated ISNs.
+* In a second terminal, run `python3 anvil.py`. It will block.
+* In a third terminal, run `while true; do python3 hammer.py; done`.
+  This will repeatedly establish a connection to the anvil.py server,
+  then disconnect. The connections will always be established from the
+  same source port. You should see a flood of ISN notifications in your
+  kernel log. The number shown should constantly increment by small
+  amounts.
+* Reboot with the `tcp_rand_isn` kernel parameter, then run anvil.py
+  and hammer.py as shown above while watching the syslog. You should
+  see a flood of ISN notifications in your kernel log, and the number
+  shown should change unpredictably.
+
+[1]: https://murdoch.is/papers/ccs06hotornot.pdf
+[2]: https://bitguard.wordpress.com/2019/09/03/an-analysis-of-tcp-secure-sn-generation-in-linux-and-its-privacy-issues/
+[3]: https://github.com/0xsirus/tirdad/
+
+Signed-off-by: Aaron Rainbolt <arainbolt@kfocus.org>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e71d066dc919..ee09be384816 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10275,6 +10275,13 @@ S:	Maintained
- W:	http://www.hisilicon.com
- F:	drivers/net/ethernet/hisilicon/hns3/
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 1518343bbe22..26472137086c 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -6645,6 +6645,16 @@
+ 			neutralize any effect of /proc/sys/kernel/sysrq.
+ 			Useful for debugging.
  
-+HISILICON NETWORK HIBMCGE DRIVER
-+M:	Jijie Shao <shaojijie@huawei.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+W:	http://www.hisilicon.com
-+F:	drivers/net/ethernet/hisilicon/hibmcge/
++	tcp_rand_isn
++			[NET]
++			Enables randomized TCP Initial Sequence Number (ISN)
++			generation. When disabled, the kernel will use an
++			algorithm for ISN generation that provides better
++			performance at the cost of potentially leaking timing
++			information over the network. When enabled, TCP ISNs
++			will be randomly generated, providing better security
++			with a potential performance hit.
 +
- HISILICON NETWORK SUBSYSTEM DRIVER
- M:	Yisen Zhuang <yisen.zhuang@huawei.com>
- M:	Salil Mehta <salil.mehta@huawei.com>
--- 
-2.33.0
-
+ 	tcpmhash_entries= [KNL,NET]
+ 			Set the number of tcp_metrics_hash slots.
+ 			Default value is 8192 or 16384 depending on total
+diff --git a/net/core/secure_seq.c b/net/core/secure_seq.c
+index b0ff6153be62..9982e8fcd679 100644
+--- a/net/core/secure_seq.c
++++ b/net/core/secure_seq.c
+@@ -22,6 +22,14 @@
+ static siphash_aligned_key_t net_secret;
+ static siphash_aligned_key_t ts_secret;
+ 
++static bool tcp_rand_isn;
++static int __init parse_tcp_rand_isn(char *arg)
++{
++	tcp_rand_isn = true;
++	return 0;
++}
++early_param("tcp_rand_isn", parse_tcp_rand_isn);
++
+ #define EPHEMERAL_PORT_SHUFFLE_PERIOD (10 * HZ)
+ 
+ static __always_inline void net_secret_init(void)
+@@ -76,23 +84,33 @@ EXPORT_SYMBOL(secure_tcpv6_ts_off);
+ u32 secure_tcpv6_seq(const __be32 *saddr, const __be32 *daddr,
+ 		     __be16 sport, __be16 dport)
+ {
+-	const struct {
+-		struct in6_addr saddr;
+-		struct in6_addr daddr;
+-		__be16 sport;
+-		__be16 dport;
+-	} __aligned(SIPHASH_ALIGNMENT) combined = {
+-		.saddr = *(struct in6_addr *)saddr,
+-		.daddr = *(struct in6_addr *)daddr,
+-		.sport = sport,
+-		.dport = dport
+-	};
+ 	u32 hash;
+ 
+-	net_secret_init();
+-	hash = siphash(&combined, offsetofend(typeof(combined), dport),
+-		       &net_secret);
+-	return seq_scale(hash);
++	if (tcp_rand_isn) {
++		get_random_bytes(((char *)&hash), sizeof(hash));
++	} else {
++		const struct {
++			struct in6_addr saddr;
++			struct in6_addr daddr;
++			__be16 sport;
++			__be16 dport;
++		} __aligned(SIPHASH_ALIGNMENT) combined = {
++			.saddr = *(struct in6_addr *)saddr,
++			.daddr = *(struct in6_addr *)daddr,
++			.sport = sport,
++			.dport = dport
++		};
++
++		net_secret_init();
++		hash = siphash(&combined, offsetofend(typeof(combined),
++						      dport),
++			       &net_secret);
++		hash = seq_scale(hash);
++	}
++
++	// TODO: Remove before merge
++	printk("secure_seq: tcpv6 isn: %u", hash);
++	return hash;
+ }
+ EXPORT_SYMBOL(secure_tcpv6_seq);
+ 
+@@ -138,11 +156,19 @@ u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
+ {
+ 	u32 hash;
+ 
+-	net_secret_init();
+-	hash = siphash_3u32((__force u32)saddr, (__force u32)daddr,
+-			    (__force u32)sport << 16 | (__force u32)dport,
+-			    &net_secret);
+-	return seq_scale(hash);
++	if (tcp_rand_isn) {
++		get_random_bytes(((char *)&hash), sizeof(hash));
++	} else {
++		net_secret_init();
++		hash = siphash_3u32((__force u32)saddr, (__force u32)daddr,
++				    (__force u32)sport << 16 | (__force u32)dport,
++				    &net_secret);
++		hash = seq_scale(hash);
++	}
++
++	// TODO: Remove before merge
++	printk("secure_seq: tcp isn: %u", hash);
++	return hash;
+ }
+ EXPORT_SYMBOL_GPL(secure_tcp_seq);
+ 
 
