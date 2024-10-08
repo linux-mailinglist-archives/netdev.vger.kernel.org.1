@@ -1,108 +1,174 @@
-Return-Path: <netdev+bounces-133353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4624995B9B
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:25:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E9C2995BA4
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:28:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CE4DB2141D
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:25:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AABBB22CEA
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55E32178FF;
-	Tue,  8 Oct 2024 23:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885E221791B;
+	Tue,  8 Oct 2024 23:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gnshrd0h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EbS+n4nR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAE71E0B8C
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DB52178FE;
+	Tue,  8 Oct 2024 23:28:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728429902; cv=none; b=tHKNNtlVE3NsKjcMw4YukeuUwoI8DfZmwipjWvPZYzf3p6fD5omFiIjjN6zwAyADdUpalHCIant86X/w95+efdyipzVOnYgX0JhE7XiIinaWDGe5did5c2IHmaiOuoAt8zIe1oar4e+RRmR+eVJloX8coLXFMamDlYMS/fV3wsE=
+	t=1728430097; cv=none; b=H3KNXC66XFkk8UO+2g6IUoTfi34R6ELU1eM5qA1N6y8tv1FbEndjEEyIi5ufYwNHdwZ/w/T2WWeV08FJdseXPhaNjNmlRUT6M0KtD7NFC4l+KXmQDiDbiZPrPwZtYbUM7uxWmECt4QKFJO7i/NPmt1SVwFjXPheIVpd4vkn9DUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728429902; c=relaxed/simple;
-	bh=4zRoGe2JJ8/4US/mlK2Mlni9sJqG3odIX+vMxUIOgzI=;
+	s=arc-20240116; t=1728430097; c=relaxed/simple;
+	bh=nLL/p/2e52NVIaX0e8HX/qHox/VKxcmsARraMumXAKU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PmH6ok0lfzxomdwZE9uKNY6m52oZafhtync4M8FFoI+5Vs/MpmCKw9Mkwj31q1WgMDj9aCzPEfT/+zQOXmNzDooGGkV3VYXMB8QY7NudXcOn/R3O0IqgAQgkZsM2n48LQHyMdr2AD12G74II4MiywTv52sdVqDdav2oNFm16gHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gnshrd0h; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=q0Z3oqF4uzsZyiC4wQWnxATEgMSdxVxy+2UbYMTFoMyTuKTHYsy1+G/3lhtlcufPSh0vqz9v3ScatPc822Iczm/NZuwa9yMeuc/68ftMh/Jom8OM59SxmpCP5Qych6equ7cv1w0zMucUqmHOqNnLjApK5q5bYrkedcl/PY+M+B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EbS+n4nR; arc=none smtp.client-ip=209.85.166.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2facaa16826so53341791fa.0
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 16:25:00 -0700 (PDT)
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-37636c3872bso20291145ab.3;
+        Tue, 08 Oct 2024 16:28:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728429899; x=1729034699; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728430095; x=1729034895; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4zRoGe2JJ8/4US/mlK2Mlni9sJqG3odIX+vMxUIOgzI=;
-        b=Gnshrd0hS3NnM/jz9j2KD9GfJTuIFEcJjNsO2VMIGAwMuv2Gf4DaonkZTlzCVtahp1
-         /MV6oT9qcRBEM6l1P4rsHReW4IoB1ziwai6xfTZvPbFbL2JvOwRY0kLWkjevDl42Kk6N
-         ZpSoYLQ6SWueE2m/WLF09Ame+QXr424041m6Sf3kAvERnrko4AIEBCDeyf/OW1NbRawa
-         2G7c7SCG8FdFLYTCuyz8fU+0Kq38a2DdXiGVuZoxmE8HmNep3EfZm8VPL5/8BI8mFfy4
-         50RYR8UuBWwdohEnbnMnhxQzXkfFQItQVPHrzVwSVdsocgnGRb+eDPIrYUqF5v1z34S4
-         fy7A==
+        bh=Hx7zye3cnljlInNHTYIeTXJ6WNf7NduswCnrK2MuPTI=;
+        b=EbS+n4nRO0rzaqrRj4p23JLJ55bsxYb8BuyQf03Sh0on0s6hlLTJldpkDkxJdVtwO6
+         NRca6uFLRtPVBqe8cRODwK0z+eR/cyWttpxMGGnxjdql73HcIlhkcNKB8jWE4ReH7Pnf
+         fDcwHHwO31Eg7+KPc1B/xoKhbV3pxqG/KtCcNHFNl+CgqiDedUv43OowhYfaTendwwP9
+         NPna0UQhaYEG6BbyFoS67KEw51qGfhnk0tzwD/gATr2as5PFQ1RIibBb8jWP/2YBg01W
+         USzfd0iWUQVaTzugFyIEyUNH30Zkm/e/NHNQ5Bft6NqXeametD8F9OTfHjV4Jq9nKYah
+         G99w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728429899; x=1729034699;
+        d=1e100.net; s=20230601; t=1728430095; x=1729034895;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4zRoGe2JJ8/4US/mlK2Mlni9sJqG3odIX+vMxUIOgzI=;
-        b=BwmQYJopmZ0AGr3ywieFiH5yjrdorTXjCHtLN/fSRGC9lll3NC3OfFQq985nXveqF5
-         oQxs8ojbqbkEW31sAzsJiTNNMyMdUltCUAn13zx8kO3JGmBsrBnTo02zcNxyafjlPTeA
-         gHpUBFXWLluZBDJPVuvxFZvVzKNvYdApE8qStnNNgLbwgOITZCF8toReWzJFP+t+NSkJ
-         m1yrWVkUKM0RKbgbQqlX9qp/Qf/JeJ6rFTfrsw/pL8D1kmvqJ45oEL9KWcpn4vlI8k7i
-         NMUVwO2YE4XW13eVoKAxYQcUOwHskzherHKXEQWuD7HLSXUa6tLX4zSLS4T4ITOwrsTo
-         mgsg==
-X-Gm-Message-State: AOJu0Yz9XqYfxLeCN720CkhdBpysHhQ7VGx+mafn8xVbTteVnjN6MYkB
-	wbMD388SCjzoTFBF4zEC69dc8NuRR4REerx9K/Xhu2L7s6v1OUXwUv5llkc+z2JU5+HnQ4RYGia
-	EjKoFQjMbkTSe2JqO1oc++Wne6Q==
-X-Google-Smtp-Source: AGHT+IGUvqXgeVQ2KenYResePQEVvO6NDzLv+c0inziuFnlOF0wwRjc/+uwFPRDkL1fMETLV7BclRo9BA6N88kkWSyk=
-X-Received: by 2002:a05:651c:2126:b0:2ef:296d:1dd5 with SMTP id
- 38308e7fff4ca-2fb18615fa2mr4485451fa.0.1728429898756; Tue, 08 Oct 2024
- 16:24:58 -0700 (PDT)
+        bh=Hx7zye3cnljlInNHTYIeTXJ6WNf7NduswCnrK2MuPTI=;
+        b=PGyDnZXuSKlxful0J04zIA3nUybY0BBpbBhVsXgCNgjNTN8TYlgzHUfdsr3cvZpmqx
+         vIr1feYOOxM3BLz3EEHuEoJU6zUxYiNIDmRySFwLSMF0E+OV3fCSS6fJ4xsmeqKiMLpL
+         m6VVk7HthewviK9kHuXx1RRAVcwsLd89T3toLOxkPwPc8um9EkkJqsdIIBtFqZrJOFpN
+         JiFrHtn7Lu5jIUek0+giTmI27smPJ5oMFxCSr++i1VxTcMlLU97nPSDAeXBVuUI03zKC
+         jx8MDD94oGZ120x81jdQkGRJ4gV1J6UutvDpmUETjCT1Lib/ZOmDwpyM/mGpoNkwBE6i
+         RpmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrquffXnHGBaxz2H7oAN9rmpHeQMZ4gkuNmErlipxqvaGTDuXsRx9uxpf8vaforBd2kvIz6Ujd@vger.kernel.org, AJvYcCUssUQ2icGpR1itl6PUri2Jp6vlUeRXQaw/RxX30jg4Oh3kqcc9QdmWUFA/+ZTv1SwJ5YU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyusRWifD8JY/fRjmKXPSOxdidxunAjoCdwt24sMDK6Im6SQqd
+	h1gO4A7MTHsqMzctwrInLstEYH6CbpQriU+BtlueyaeucLwdBhSNd/uisO1rvh56ysYFg8TO3WU
+	ffTP/g3p9YVdYlKedwexdGnc6Tlg=
+X-Google-Smtp-Source: AGHT+IFyQ78KSyq1si+/WqCze5UiUsG630xaDeTIdmVAp7z/O4LhldI0d32dIF5XU6iFZN+QfwKl/js+3b6YGdYe7Go=
+X-Received: by 2002:a05:6e02:1ca1:b0:3a0:4a91:224f with SMTP id
+ e9e14a558f8ab-3a397ce85b3mr5026325ab.1.1728430095097; Tue, 08 Oct 2024
+ 16:28:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALk3=6u+PTcc2xhCx3YgWrx3_SzazpXTk1ndDmik+AOi==oq9Q@mail.gmail.com>
- <608e4396-69b2-4a04-9229-e6bff8de1fc3@redhat.com>
-In-Reply-To: <608e4396-69b2-4a04-9229-e6bff8de1fc3@redhat.com>
-From: Budimir Markovic <markovicbudimir@gmail.com>
-Date: Wed, 9 Oct 2024 01:24:47 +0200
-Message-ID: <CALk3=6v7kFoBv3wTwYasH7-G39tLjATEn1mqnJVVaBy0b3LYKw@mail.gmail.com>
-Subject: Re: Use-after-free from netem/hfsc interaction
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-2-kerneljasonxing@gmail.com> <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 07:27:38 +0800
+Message-ID: <CAL+tcoALeCguB0+HpTq+MHitHZft3drF5OunPh1Qme8XGifiNw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/9] net-timestamp: add bpf infrastructure to
+ allow exposing more information later
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 8, 2024 at 10:23=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Wed, Oct 9, 2024 at 2:45=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> If I read correctly, that could happen only via netem peek, right?
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Implement basic codes so that we later can easily add each tx points.
+> > Introducing BPF_SOCK_OPS_ALL_CB_FLAGS used as a test statement can help=
+ use
+> > control whether to output or not.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  include/uapi/linux/bpf.h       |  5 ++++-
+> >  net/core/skbuff.c              | 18 ++++++++++++++++++
+> >  tools/include/uapi/linux/bpf.h |  5 ++++-
+> >  3 files changed, 26 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > index c6cd7c7aeeee..157e139ed6fc 100644
+> > --- a/include/uapi/linux/bpf.h
+> > +++ b/include/uapi/linux/bpf.h
+> > @@ -6900,8 +6900,11 @@ enum {
+> >        * options first before the BPF program does.
+> >        */
+> >       BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG =3D (1<<6),
+> > +     /* Call bpf when the kernel is generating tx timestamps.
+> > +      */
+> > +     BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG =3D (1<<7),
+> >  /* Mask of all currently supported cb flags */
+> > -     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0x7F,
+> > +     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0xFF,
+> >  };
+> >
+> >  /* List of known BPF sock_ops operators.
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 74149dc4ee31..5ff1a91c1204 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -5539,6 +5539,21 @@ void skb_complete_tx_timestamp(struct sk_buff *s=
+kb,
+> >  }
+> >  EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+> >
+> > +static bool bpf_skb_tstamp_tx(struct sock *sk, u32 scm_flag,
+> > +                           struct skb_shared_hwtstamps *hwtstamps)
+> > +{
+> > +     struct tcp_sock *tp;
+> > +
+> > +     if (!sk_is_tcp(sk))
+> > +             return false;
+> > +
+> > +     tp =3D tcp_sk(sk);
+> > +     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_C=
+B_FLAG))
+> > +             return true;
+> > +
+> > +     return false;
+> > +}
+> > +
+> >  void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> >                    const struct sk_buff *ack_skb,
+> >                    struct skb_shared_hwtstamps *hwtstamps,
+> > @@ -5551,6 +5566,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> >       if (!sk)
+> >               return;
+> >
+> > +     if (bpf_skb_tstamp_tx(sk, tstype, hwtstamps))
+> > +             return;
+> > +
+>
+> Eventually, this whole feature could probably be behind a
+> static_branch.
 
-Yes
+You want to implement another toggle to control it? But for tx path
+"BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)"
+works as a per-netns toggle. I would like to know what you exactly
+want to do in the next move?
 
-> what about constraining the fix into the netem peek callback?
-
-I'm not sure what a good way to do this is.
-
-One solution is to try to detect when peek is being called from an enqueue
-function. My patch attempted to do that, but I've realized it is possible t=
-o
-bypass it by calling qdisc_enqueue() from a netem parent during netem_deque=
-ue()
-(Eric also pointed out that qdisc_is_running() should not be called from a
-qdisc).
-
-Another option would be to move qdisc_enqueue() from netem_dequeue() to
-netem_enqueue(), but then there needs to be an alternate way to keep track =
-of
-each packet's delay.
+Thanks,
+Jason
 
