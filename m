@@ -1,169 +1,132 @@
-Return-Path: <netdev+bounces-133000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A9C99436F
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:04:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B234E99437F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 11:06:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42F5B1F211A0
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:04:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F6AB1F267E1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 09:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EF81D4166;
-	Tue,  8 Oct 2024 09:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3696C1D095C;
+	Tue,  8 Oct 2024 09:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gLoeG1BD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB01D2B23
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953A31667DA
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 09:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728378030; cv=none; b=Sby2k6EKeFYUZavNgpzbcStdbP5hX3G5dWgV3vriXX+0OjMcogfuOU/1ERvTB2QTTZ19MkHE710hmNgnzMdpBh3IM3u/HeMyOkB4uyC6x7PeYSyA5fRpnr6g1arUL/hpS8984gsQx3NRKZ5j9bxc2T6xic0sutpNiEcOxMKql3c=
+	t=1728378072; cv=none; b=GMBorqCzE3PqgaartomjFlEvUSrIe5irQbbqeCXd7I+6EnI+nRQtfnphbt+rvlVtOGUVxBMFqCGqRgJYxvHV26kKnx7d41Ftu7kuDfaRTIASk5gfDx4qS0IQleGxhD2UimwP/TsK3CJ/Rv2+jiGp1Z1yVLBdKP/uPp9bGQxK+Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728378030; c=relaxed/simple;
-	bh=uHR1R80Adv/3OX5IIqsonPHDhsdT1S7T6yIqAFdBMl8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=d9Pjh15JaXeqLQv1sRkiJuxzJMoM2Wlrn8LUxfJOZUwVhDJm8V+Xs+tX9E6L9/FeXljgrMRrAXXLMpRf3w6400hnBxQtLHFqh2Cep5QJJV0c1gS451tc0BjbUlAYZRi2eevsYxu3M9wLeC40+S5V1V/Nloo1M4NsU1M2Nk/TqRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82aa8af04feso544409139f.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:00:27 -0700 (PDT)
+	s=arc-20240116; t=1728378072; c=relaxed/simple;
+	bh=CWk6qOrLNWMBar35EmC3B/ynBzAUfUHitiAJSmo+FG4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nzS4UW4ybOCZnz6diH1/G1epVI9QKwv0hfuD1cQbh+Ifqc8bVOOPAty0rdHPXevQdNjehgvxD6rIIZASA9dSLvmapghbC2qcE2jg1IULERj6Jds/reuGt3OCt2KeaRZccPTmm0VpCL1FsAoF4c3M7aYf1JrGMwbGuAJn7xs1dKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gLoeG1BD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728378069;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Az/KMPreXaGl91pZI4523wJ5r8ejn+YnIG+Mof+90Ek=;
+	b=gLoeG1BDrEOHTotR44qJAmZbKTO2bzCpM5rUzg7R65gpk1wAmEbwohWUVgvpFY8ZLXUFd7
+	aMmzeNyHn3sWTm6bFUyksUkLBB7MP2lu7dx54nL80UugGcvf95iFFlpC62YkdspDUTa94U
+	jApWD39bOgW2NZL1EPAJd1MzKzw/wC8=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-104-K5Sb0p3vNhW4WlEUquJZYA-1; Tue, 08 Oct 2024 05:01:08 -0400
+X-MC-Unique: K5Sb0p3vNhW4WlEUquJZYA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37ccc21ceb1so2530100f8f.2
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 02:01:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728378027; x=1728982827;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=j94wRKw6nS2yrDFlGU+jZw1Tw/r3v8/FcnZfF7tvw/A=;
-        b=CSrjCg/9mDctmylh3WkhFiPardDB5x7jCSftIqc5rVkEtJoOYne+yCAvCnxvKLSeH8
-         XTwD7SHupeu3qFtGz+feVGcjf63YvmdR9yG2RrvyOfc3Bh4zbWew5CJZkiNlRnrjr+pY
-         G6/SR4Kk7vmwMfh7zS8bVeJVrImhOHcTkjVkRScClPX5FvxgBN6O7log2w3NSxhUqXnj
-         lg1NH4nfq0YlP8aQyliSmMen9K7X8lt/41SIH08YZu0H2crSCLwo+Hik7FX9Z1vq/o4K
-         MnlAaQSR9PSDJjYRbjVnjZk0oI2wn+AlKiDbBxh+R3JqVz7p05WUWOb1lKlUa6IzN2c2
-         BCug==
-X-Forwarded-Encrypted: i=1; AJvYcCXP1dUFHOvUj0Gt1j+rZP5bRSlC3K6zDjdUPK6f8NNIF1vDnCWKAstDKHgOizZ0RfohGcG4MBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+giZ9i3wFrnSCKxWFxn+Eg4r5NQQezODMRJAZkWiJVG7R5eU5
-	dUCraat2ZzqBTIlM1P2LAhYckYRV/7MF9asOnECGY0wKPek4s+vBNDcB1C/rxkEeWQNjFk/9dGH
-	gemm0E2rUBz96gB8nbTH3lrgv8HInP0KjUEJCQn7oW6p/btP3c4aaIK4=
-X-Google-Smtp-Source: AGHT+IEMi3ia6FJ6/yZhkhWx5b/zE0neag648rPPZpWk7fdw+owYWsZZSCv8yj75cuLjdGzrri77lTm1veH2N1XWoVEycsXMxy4u
+        d=1e100.net; s=20230601; t=1728378067; x=1728982867;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Az/KMPreXaGl91pZI4523wJ5r8ejn+YnIG+Mof+90Ek=;
+        b=ssr53Ov7Koapq7YjNoVhhHXuONpvoOmtK6OKpWP/9OAfJU3M10rV/KsX1UYa8RsHhW
+         wYLLk9A52sHMnHXy69t5BqHLdmVb7NotUXw4bvlA7E/C8s2uaA1nGwOWnidEY/Sc0vBN
+         zouADkT7rReLPFL2MISk0C4NSgUI6kdmHn/sJmrpy8PpncGyYB4MUruMOrW09v8UaVV8
+         aOA6GCG0mUZiSGHxkeCsQus5wyt5KgcbhDWNetQCz/zYGTomPBRWjeu8w3aketbDbsl5
+         7IyT9ABArj/Dvbchxw1oLexq3O9RMJr1Y0YO1+0nVmWLoGgTMVpwyNnS/705pWbFrBwA
+         DdeA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyYNrfKR38vqF3wMQvjiWGx7D8EbVjK4jIWO8+N8PkHHWhrYQAc+8aNQH5eSrDA7Z1Qproz5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDO7w/4JzpPaMcFI3dDJItM7jh1L2E/fbaPrp6WWPzekaDRSs1
+	2nfNgRq4Tv39iVqDyHAybAq0t6D6adddX+QIPSklj2cJeZJGrC6HlkrFnoBYVNmTYyF4j19uLSa
+	uNvk/QwD7yM+oAKyjiw9HSB8bdWz9f62XUmL1LPQjiX/FW8Vn0N3EDA==
+X-Received: by 2002:a5d:64e7:0:b0:374:c040:b00e with SMTP id ffacd0b85a97d-37d0e7d43c8mr10304850f8f.39.1728378067027;
+        Tue, 08 Oct 2024 02:01:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIFwLBzdlSN+s2luoQEVwbNKJu+jYd1X+INDAyIvF4Y/gn2XGZgzsLbGQxoIp6iqg9MixO4A==
+X-Received: by 2002:a5d:64e7:0:b0:374:c040:b00e with SMTP id ffacd0b85a97d-37d0e7d43c8mr10304829f8f.39.1728378066670;
+        Tue, 08 Oct 2024 02:01:06 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-82-174.dyn.eolo.it. [146.241.82.174])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d1691a4d8sm7587775f8f.36.2024.10.08.02.01.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Oct 2024 02:01:06 -0700 (PDT)
+Message-ID: <24e50bd4-05e7-48be-b943-b361f4e73fdf@redhat.com>
+Date: Tue, 8 Oct 2024 11:01:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2189:b0:3a0:8c68:7705 with SMTP id
- e9e14a558f8ab-3a375bd2324mr137101675ab.21.1728378027047; Tue, 08 Oct 2024
- 02:00:27 -0700 (PDT)
-Date: Tue, 08 Oct 2024 02:00:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6704f4ab.050a0220.1e4d62.0089.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in restore_regulatory_settings (3)
-From: syzbot <syzbot+e10709ac3c44f3d4e800@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 08/13] net: pcs: xpcs: use FIELD_PREP() and
+ FIELD_GET()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Jose Abreu <joabreu@synopsys.com>,
+ Jose Abreu <Jose.Abreu@synopsys.com>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+ Vladimir Oltean <olteanv@gmail.com>
+References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+ <E1swfQz-006Dfg-5U@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <E1swfQz-006Dfg-5U@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Hi,
 
-syzbot found the following issue on:
+On 10/4/24 12:21, Russell King (Oracle) wrote:
+> diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+> index 805856cabba1..f55bc180c624 100644
+> --- a/drivers/net/pcs/pcs-xpcs.c
+> +++ b/drivers/net/pcs/pcs-xpcs.c
+> @@ -592,7 +592,8 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
+>   		ret = DW_VR_MII_EEE_LTX_EN | DW_VR_MII_EEE_LRX_EN |
+>   		      DW_VR_MII_EEE_TX_QUIET_EN | DW_VR_MII_EEE_RX_QUIET_EN |
+>   		      DW_VR_MII_EEE_TX_EN_CTRL | DW_VR_MII_EEE_RX_EN_CTRL |
+> -		      mult_fact_100ns << DW_VR_MII_EEE_MULT_FACT_100NS_SHIFT;
+> +		      FIELD_PREP(DW_VR_MII_EEE_MULT_FACT_100NS,
+> +				 mult_fact_100ns);
+>   	} else {
+>   		ret &= ~(DW_VR_MII_EEE_LTX_EN | DW_VR_MII_EEE_LRX_EN |
+>   		       DW_VR_MII_EEE_TX_QUIET_EN | DW_VR_MII_EEE_RX_QUIET_EN |
 
-HEAD commit:    3840cbe24cf0 sched: psi: fix bogus pressure spikes from ag.=
-.
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D169ff527980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df95955e3f7b5790=
-c
-dashboard link: https://syzkaller.appspot.com/bug?extid=3De10709ac3c44f3d4e=
-800
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debia=
-n) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14310d8058000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D119ff527980000
+Very minor and non blocking thing: perhaps consider renaming 
+DW_VR_MII_EEE_MULT_FACT_100NS to DW_VR_MII_EEE_MULT_FACT_100NS_MASK - 
+possibly in a later work?
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7fe=
-b34a89c2a/non_bootable_disk-3840cbe2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/55888d19e055/vmlinux-=
-3840cbe2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f6b8ca10a019/bzI=
-mage-3840cbe2.xz
+Cheers,
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+e10709ac3c44f3d4e800@syzkaller.appspotmail.com
+Paolo
 
-------------[ cut here ]------------
-Unexpected user alpha2: =EF=BF=BD=EF=BF=BD
-WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 is_user_regdom_saved ne=
-t/wireless/reg.c:440 [inline]
-WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 restore_alpha2 net/wire=
-less/reg.c:3424 [inline]
-WARNING: CPU: 0 PID: 1338 at net/wireless/reg.c:442 restore_regulatory_sett=
-ings+0x3c0/0x1e50 net/wireless/reg.c:3516
-Modules linked in:
-CPU: 0 UID: 0 PID: 1338 Comm: kworker/0:3 Not tainted 6.12.0-rc1-syzkaller-=
-00114-g3840cbe24cf0 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16=
-.3-2~bpo12+1 04/01/2014
-Workqueue: events_power_efficient crda_timeout_work
-RIP: 0010:is_user_regdom_saved net/wireless/reg.c:440 [inline]
-RIP: 0010:restore_alpha2 net/wireless/reg.c:3424 [inline]
-RIP: 0010:restore_regulatory_settings+0x3c0/0x1e50 net/wireless/reg.c:3516
-Code: 88 44 24 1c e9 95 01 00 00 e8 ac 4f 84 f6 90 0f b6 35 34 5c 6e 0f 0f =
-b6 15 4d 5c 6e 0f 48 c7 c7 00 e6 28 8d e8 31 44 45 f6 90 <0f> 0b 90 90 4c 8=
-b 35 d5 e0 df 04 4d 85 f6 0f 84 85 00 00 00 4c 89
-RSP: 0000:ffffc90002cdfaa0 EFLAGS: 00010246
-RAX: 75bf7dfc993e6800 RBX: 0000000000000000 RCX: ffff8880003c4880
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: ffffc90002cdfba8 R08: ffffffff8155daa2 R09: 1ffff11003f8519a
-R10: dffffc0000000000 R11: ffffed1003f8519b R12: ffffffff8ff07980
-R13: ffffffff815e9c86 R14: ffffc90002cdfb40 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fd4b8ff8760 CR3: 0000000011d4a000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- crda_timeout_work+0x27/0x50 net/wireless/reg.c:542
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
