@@ -1,96 +1,88 @@
-Return-Path: <netdev+bounces-132931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A448993C0B
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 03:16:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF22B993C4C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 03:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB571C23D2E
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:16:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ED1B284E48
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 01:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED21E79C2;
-	Tue,  8 Oct 2024 01:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E134E14A82;
+	Tue,  8 Oct 2024 01:36:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1jQZ3HS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xfFRDcja"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88E413AC1
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 01:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418A1F9EC
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 01:36:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728350165; cv=none; b=B/O+nof9ZoIiPmoAliJke/8Zf+p8SbFlXlCkDdCIrrex9OwocSp1Zs7P5IUdJR5CHSxrGIe3E9dcdWhn+u/KGF8272O6tzzaB2kaoVn4pBZjeEbgdSWIQKo4YDxUmgjgeVDRKFjjSHSasoOeD5vO7pKrB9spv4L+931/D7yFGN0=
+	t=1728351389; cv=none; b=Mwb9dVPUOaRj+vqu//rSjqPNsRllVJ85LhGP4Lq8KGaCXardPvbGoJ9BBSgFr3qCjhHJZgZS2xu0OJIRZMWF1et2aSg/KY3pRUtjfdhdmIQesaVux1PPSVqzr2d5kmHgg0/KjWPfhAO5Zz7f5XAfVwzG8uYR5pk7SvatqofVzUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728350165; c=relaxed/simple;
-	bh=JBL6/a4FSioJF4HQpe6EcttVKQeTepl/J0XoJlx95nk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rcwS5sK5YWNsG1F48TsntZAiHoDgUnkktasgHo9geWZ7/N4GiMeZkskTTnOHCX1mg8PinW6GfyUhdAJGrKn8EdNsJDta9HJOEsvqsy1cVUp43nffCktAE+e/zbEAgASrYZHxfGVp+m1rhB76SO3KG2VtIphxtcvWDkss0x0igXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1jQZ3HS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22DA8C4CECD;
-	Tue,  8 Oct 2024 01:16:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728350165;
-	bh=JBL6/a4FSioJF4HQpe6EcttVKQeTepl/J0XoJlx95nk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c1jQZ3HS2MM58aKkQHAnM+NmSIQQSjt/IQXr74iKXmFxGHOkaGFpYNsFauGnXvAIR
-	 L/kPNM25m8M2az9v43HGElzWWVxleKAQqSCt3jd/lqzXRamh/knI2fVC7uczWE5lpH
-	 o+YgdcqVpyztaW4ldyaIcL5eCpDWFkl9As99FFu9/OFubXOY1kxvWM2w9/gEqtnVJH
-	 gavm0ZhdvZBwbPh3u8JkqijGaP6r3oX/xrxrsc9hCfgSAGeSIxzivaXpE5AhAPdfoW
-	 u6FHUJYigN8/m5F3OR48hwW/tZsIV7/FF4DFmrcZWgh9y6AupqqpoFT10H8y82Vdhf
-	 abScWRpnHWEwQ==
-Date: Mon, 7 Oct 2024 18:16:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Vadim Fedorenko
- <vadfed@meta.com>, David Ahern <dsahern@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, "Alexander
- Duyck" <alexanderduyck@fb.com>, <netdev@vger.kernel.org>, Richard Cochran
- <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next v3 2/5] eth: fbnic: add initial PHC support
-Message-ID: <20241007181604.32b5a330@kernel.org>
-In-Reply-To: <a836c401-d071-42b2-9d2f-45d821941286@intel.com>
-References: <20241003123933.2589036-1-vadfed@meta.com>
-	<20241003123933.2589036-3-vadfed@meta.com>
-	<9513f032-de89-4a6b-8e16-d142316b2fc9@intel.com>
-	<e6f541f8-ac28-4180-989a-84ee4587e21c@linux.dev>
-	<20241007160917.591c2d5d@kernel.org>
-	<a836c401-d071-42b2-9d2f-45d821941286@intel.com>
+	s=arc-20240116; t=1728351389; c=relaxed/simple;
+	bh=oJydzKPElYQB1w5RWKEMB3N08RMJuEPSvO04+qCcbBs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZBCDK1Bud/yngCkgLVOWkvR4uB3jAsxywewpLHCuhx1v257uYL6cPj7DH1SOi5bLu1kwkEZj+AkIO7hXmzfYgskNb5B2efhoWudn3y1pTQsdgo94UvDp97bT8cGcQAePjTb20eokXmfo8C2Y/kJH2R/U4PrQ+KQD01cy1dHGSHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xfFRDcja; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <75bb08f0-45ab-4fa9-b343-82772e9af0f3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728351384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=btVF5zTAEiCokPrMKsEhRjMAfdYG4djhBtNnW2z85B8=;
+	b=xfFRDcjauj9RDKc7xqFc9x/n/xeLQvV7i8wUuL53G9mrfsJPPOrz8p2VIguAlllHiWhzvV
+	kEPiZWS57S48mNn+RpFdq0uJaCCdsimJNIfoCd7W357mWEg3AKLiGrI/1KUK12BP9dQY2A
+	C+0ni7Krb5m+kwy+8N17fIU0lRFlTBo=
+Date: Mon, 7 Oct 2024 18:36:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v2 4/5] tools: Sync if_link.h uapi tooling header
+To: Stephen Hemminger <stephen@networkplumber.org>,
+ Daniel Borkmann <daniel@iogearbox.net>
+Cc: razor@blackwall.org, kuba@kernel.org, jrife@google.com,
+ tangchen.1@bytedance.com, bpf@vger.kernel.org, netdev@vger.kernel.org
+References: <20241004101335.117711-1-daniel@iogearbox.net>
+ <20241004101335.117711-4-daniel@iogearbox.net>
+ <20241005090254.061c1317@hermes.local>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20241005090254.061c1317@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 7 Oct 2024 16:49:45 -0700 Jacob Keller wrote:
-> >> Thanks for pointing this out, I'll make it with timecounter/cyclecounter  
-> > 
-> > Please don't, the clock is synthonized, we only do simple offsetting.
-> >   
-> I still think it makes sense to re-use the logic for converting cycles
-> to full 64bit time values if possible.
+On 10/5/24 9:02 AM, Stephen Hemminger wrote:
+> On Fri,  4 Oct 2024 12:13:34 +0200
+> Daniel Borkmann <daniel@iogearbox.net> wrote:
 > 
-> If you're already doing offset adjustment, you still have to apply the
-> same logic to every timestamp, which is exactly what a timecounter does
-> for you.
-
-"exactly what a timecounter does for you" is an overstatement.
-timecounter tracks the overflows by itself and synthonizes. 
-We have the 64b value, just need to combine the top bits.
-
-> You can even use a timecounter and cyclecounter without using its
-> ability to do syntonizing, by just setting the cyclecounter values
-> appropriately, and leaving the syntonizing to the hardware mechanism.
+>> Sync if_link uapi header to the latest version as we need the refresher
+>> in tooling for netkit device. Given it's been a while since the last sync
+>> and the diff is fairly big, it has been done as its own commit.
+>>
+>> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
 > 
-> I think the result is much easier to understand and follow than
-> re-implementing a different mechanism for offset correction with bespoke
-> code.
+> It would be good to have a script to do this automatically, similar
+> to the 'make headers_install'. I use one for iproute and do it every kernel rc.
 
-This is fast path code, I hope we can get a simple addition and
-an overflow check right.
+would be nice not having to sync the if_link.h uapi header. I think it
+would be even better if it can directly use the headers installed by
+'make headers_install'. There was an earlier attempt to use $(KHDR_INCLUDES),
+may be some of the ideas can be reused. I think there is another parallel
+effort to do this also: https://lore.kernel.org/bpf/CAEf4BzaWneXBv401rOdW8ijBTqRn_Ut4FFvhbsPShh5_pjV33A@mail.gmail.com/
+
+This uapi header improvement will probably need a separate effort/followup.
 
