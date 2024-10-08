@@ -1,215 +1,123 @@
-Return-Path: <netdev+bounces-133132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCCA5995162
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:22:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FEC49951CC
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCCF3B26458
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:15:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 499FFB220BF
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 14:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A96F1DF985;
-	Tue,  8 Oct 2024 14:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663C31DF96B;
+	Tue,  8 Oct 2024 14:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kaNL9cxv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VKXdr3c4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD541DF25E
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 14:15:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AABE1DE2AE;
+	Tue,  8 Oct 2024 14:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728396954; cv=none; b=W7iFveHyNs8fvdhrHoLS43CLS0HZn801lvvzC1FjyHWj9tgzLsckrEFtRhBQ4UbLdyEGA8YDmQERfaDhEUifMaLVO7kyIY6EXLWD4HWVLHbCLGeBaikAAAIUrSptYohHKwmccuQeFidc+b7RIIcS6TuxO3U5JPYEGyk9k4JC/YE=
+	t=1728397292; cv=none; b=e/p8bgAxKjIuG4w9pgnRX0S9u00OzwIxizCHUmteox5s/2jpYtnTnQ9GC9qC3Umi1cCJ3YKWZFX3AsoKN3ZyORHIYDN7Cd6JbWQ7Jdg0H5MD1F71ZH5Vbr4DN7x51+7xEIRo9lwS415cy1QaO81vTUpCQrrqTIfuIXfsl6cAqN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728396954; c=relaxed/simple;
-	bh=gkeeqDTDDubVJYRwtdiPdEysGDVPCBeFN0D6UddIiJo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AfTrS9axNIlpR7iGSYixsPLqUOcc78NsGGdTYltTMIpoXMyRDLkdrEOg6Cnlec0e30+mRcnMW+VAKlp7CfIsYIF2J0hA/ZyZrci4+q6/fSc4MtG5gZzg6X7TJwL+4gLEo5GwaSrN19ZYb3uK7ZnOYHT/odCk2fHiEYS3uk2rW38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kaNL9cxv; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53992157528so6070196e87.2
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 07:15:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728396951; x=1729001751; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iodlSeFvKO9O9lc2vubxBeazS52YJzq6TJTLiQpLA28=;
-        b=kaNL9cxvGS62DZ31csoImPqpaykkWMhZZPyTNLbmGvMLarHXBBJDZI18d7C0ptd5Cx
-         JCOEjN4QAFLyy743c29J86T/qGY+xcjAM0aZ/L4O1MFsdz7FKLBKibBgKIWj+E0RKMFe
-         stpszTjXh2sFW/nFzwnt4FtI1sfhCV516+xUq5gJf7G7jPl928za9u3FvWnXzavOw7vY
-         74yukO27yZwU14r/QToIcpquTXHInxz1sVCON+RcpYM8hzPzMLfyFWvGiwiOuuuW/RZY
-         tOJe6gI9/3Tml5FkN2t2oGjwmFwxx/CQzDG/Jkt/CWF/vEXV8GpfKBAipnW9yK8vk9Zv
-         /PYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728396951; x=1729001751;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iodlSeFvKO9O9lc2vubxBeazS52YJzq6TJTLiQpLA28=;
-        b=UD+Y2Qbti0SB4McZ2ktmmh9pDILcPC4GRiiu9UsqZ1QGWY22jU9HowK1qe5Xv58sZV
-         whDOISlLN17qzFoCa6B++5UYW01aaYEVYN//BffS44+aSgtQS/sXmsnCkVOkRuk5SOP7
-         7EltyXUZdHSSkC7FZXZ/5WNena9HTd1EPjVHIQyUusx1aj3NfJzDKeGZ8hYdP6dbAmUG
-         RT5C5/hlFxxE7tR+7khL3DaXLy4QiMOl/FZFzkoST5uGGavV/9YtSWNUXMRB4Bmqc3w9
-         f/Uys1DxpdtvQOkjBqgJceFvSpMaanmXx6IU4a4miNTMnWvDj5diUUIn8OEdoAW+peqV
-         dM5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXH06Q3oCjmA01aTZC7I0Rf1DZJUoMsQH8iGiTS3Mbtnw7vktjruhIBWqzqv5/yJVPiocakaeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8vWox0po1e1VPcOsGfPZPppceGv18bnxeuiX9RlT2qaXxD3QZ
-	YutGn8KNnF/mu3qec2Q2QrwZ6E6qToD7puTlD9sRxMVbIqahX9dEYmG/Z1fvS7TYGQZdmVWcMl4
-	EC2rpZ2lINeRIPmnuxjJx2GPnOXIf77uGs9+I
-X-Google-Smtp-Source: AGHT+IF3JZ0aU7P3DH+wfLO5j082Jriq88QMvx27KyZ0zh69K7klO4Qc/o+LBXdGIVCAlvjZnmQ0NSdIIQFlIkL0EE0=
-X-Received: by 2002:a05:6512:33d0:b0:533:cf5a:eb32 with SMTP id
- 2adb3069b0e04-539ab8741c0mr8296779e87.19.1728396950549; Tue, 08 Oct 2024
- 07:15:50 -0700 (PDT)
+	s=arc-20240116; t=1728397292; c=relaxed/simple;
+	bh=m3KUbwqtWaR6bmYjQdpyjFp9exQ2YBNqwsD4RVETg4E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MEehA/5K2isabZ2p0cq1cQHW0BD8XedCwsK5rdrfoSjDmG00dPFkf5cLVMn2aSIjlxzbt+JVFs4xC+290AHviC7E4krngpalayZiYiV2Tv8Nkbsu0THIwHR02g33XPuS7KRvPeZ9ohLxOjU72k9xEj1P09rgFAn0S3mhfZFoA14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VKXdr3c4; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 15ADC1BF209;
+	Tue,  8 Oct 2024 14:21:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728397282;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CoL/bQFuFrffN2073/mKg1lZJ27Axt4FPy1eN4O+9UI=;
+	b=VKXdr3c4M5o41DAk1jDy79n2+zNorAmkWoU/pF14M0VWxfjOc5JerD+Qshy8kIBZTNjqot
+	LCapaHsnf75IYAjMSFpRfZZsq+3GC2hdlBfKV63djAn+rij4qirR5wGMBTYOJQyi4vlXmV
+	b31NIQQuv/QX+0BS8S11DqXxDJB5jPDIskJNWeifvFLFJvVLlUGnj+HaD8rMhONVN990JS
+	6AZLEQL1PF/EubycMUI6+30BYvnYJaQJmrOiHj/9GFpI14YMwJs551iSjEy56i9j4pFj/E
+	pfctNULpcPf/osR0GeYnIHhuX/WGfANkfhPN1KBTnymFExsKWmx6zFqxAwmUSg==
+Date: Tue, 8 Oct 2024 16:21:20 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for
+ PSE PI priority feature
+Message-ID: <20241008162120.18aa0a6c@kmaincent-XPS-13-7390>
+In-Reply-To: <ZwU6QuGSbWF36hhF@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+	<20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
+	<1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
+	<ZwU6QuGSbWF36hhF@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241004162720.66649-1-leitao@debian.org> <2234f445-848b-4edc-9d6d-9216af9f93a3@kernel.org>
- <20241004-straight-prompt-auk-ada09a@leitao> <759f82f0-0498-466c-a4c2-a87a86e06315@redhat.com>
- <ZwU8l8KSnVPIC5yU@gmail.com>
-In-Reply-To: <ZwU8l8KSnVPIC5yU@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 8 Oct 2024 16:15:37 +0200
-Message-ID: <CANn89iKBzOOMSQv5U8vpRcNtEYmPtOzqOWLxNgyjAnGOC=Bx+A@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Optimize IPv6 path in ip_neigh_for_gw()
-To: Breno Leitao <leitao@debian.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, rmikey@meta.com, 
-	kernel-team@meta.com, horms@kernel.org, 
-	"open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Oct 8, 2024 at 4:07=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
-te:
->
-> Hello Paolo,
->
-> On Tue, Oct 08, 2024 at 12:51:05PM +0200, Paolo Abeni wrote:
-> > On 10/4/24 19:37, Breno Leitao wrote:
-> > > On Fri, Oct 04, 2024 at 11:01:29AM -0600, David Ahern wrote:
-> > > > On 10/4/24 10:27 AM, Breno Leitao wrote:
-> > > > > Branch annotation traces from approximately 200 IPv6-enabled host=
-s
-> > > > > revealed that the 'likely' branch in ip_neigh_for_gw() was consis=
-tently
-> > > > > mispredicted. Given the increasing prevalence of IPv6 in modern n=
-etworks,
-> > > > > this commit adjusts the function to favor the IPv6 path.
-> > > > >
-> > > > > Swap the order of the conditional statements and move the 'likely=
-'
-> > > > > annotation to the IPv6 case. This change aims to improve performa=
-nce in
-> > > > > IPv6-dominant environments by reducing branch mispredictions.
-> > > > >
-> > > > > This optimization aligns with the trend of IPv6 becoming the defa=
-ult IP
-> > > > > version in many deployments, and should benefit modern network
-> > > > > configurations.
-> > > > >
-> > > > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > > > ---
-> > > > >   include/net/route.h | 6 +++---
-> > > > >   1 file changed, 3 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/include/net/route.h b/include/net/route.h
-> > > > > index 1789f1e6640b..b90b7b1effb8 100644
-> > > > > --- a/include/net/route.h
-> > > > > +++ b/include/net/route.h
-> > > > > @@ -389,11 +389,11 @@ static inline struct neighbour *ip_neigh_fo=
-r_gw(struct rtable *rt,
-> > > > >         struct net_device *dev =3D rt->dst.dev;
-> > > > >         struct neighbour *neigh;
-> > > > > -       if (likely(rt->rt_gw_family =3D=3D AF_INET)) {
-> > > > > -               neigh =3D ip_neigh_gw4(dev, rt->rt_gw4);
-> > > > > -       } else if (rt->rt_gw_family =3D=3D AF_INET6) {
-> > > > > +       if (likely(rt->rt_gw_family =3D=3D AF_INET6)) {
-> > > > >                 neigh =3D ip_neigh_gw6(dev, &rt->rt_gw6);
-> > > > >                 *is_v6gw =3D true;
-> > > > > +       } else if (rt->rt_gw_family =3D=3D AF_INET) {
-> > > > > +               neigh =3D ip_neigh_gw4(dev, rt->rt_gw4);
-> > > > >         } else {
-> > > > >                 neigh =3D ip_neigh_gw4(dev, ip_hdr(skb)->daddr);
-> > > > >         }
-> > > >
-> > > > This is an IPv4 function allowing support for IPv6 addresses as a
-> > > > nexthop. It is appropriate for IPv4 family checks to be first.
-> > >
-> > > Right. In which case is this called on IPv6 only systems?
-> > >
-> > > On my IPv6-only 200 systems, the annotated branch predictor is showin=
-g
-> > > it is mispredicted 100% of the time.
-> >
-> > perf probe -a ip_neigh_for_gw; perf record -e probe:ip_neigh_for_gw -ag=
-;
-> > perf script
-> >
-> > should give you an hint.
->
-> Thanks. That proved to be very useful.
->
-> As I said above, all the hosts I have a webserver running, I see this
-> that likely mispredicted. Same for this server:
->
->         # cat /sys/kernel/tracing/trace_stat/branch_annotated | grep ip_n=
-eigh_for_gw
->          correct incorrect  %        Function                  File      =
-        Line
->                0    17127 100 ip_neigh_for_gw                route.h     =
-         393
->
-> It is mostly coming from ip_finish_output2() and tcp_v4. Important to
-> say that these machine has no IPv4 configured, except 127.0.0.1
-> (localhost).
+On Tue, 8 Oct 2024 15:57:22 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-Now run the experiment on a typical server using IPv4 ?
+> On Thu, Oct 03, 2024 at 01:41:02AM +0200, Andrew Lunn wrote:
+> > > +	msg =3D pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
+> > > +	msg.sub[2] =3D id;
+> > > +	/* Controller priority from 1 to 3 */
+> > > +	msg.data[4] =3D prio + 1; =20
+> >=20
+> > Does 0 have a meaning? It just seems an odd design if it does not. =20
+>=20
+> 0 is not documented. But there are sub-priority which are not directly
+> configured by user, but affect the system behavior.
+>=20
+> Priority#: Critical =E2=80=93 1; high =E2=80=93 2; low =E2=80=93 3
+>  For ports with the same priority, the PoE Controller sets the
+>  sub-priority according to the logic port number. (Lower number gets
+>  higher priority).
+>=20
+> Port priority affects:
+> 1. Power-up order: After a reset, the ports are powered up according to
+>  their priority, highest to lowest, highest priority will power up first.
+> 2. Shutdown order: When exceeding the power budget, lowest priority
+>  ports will turn off first.
+>=20
+> Should we return sub priorities on the prio get request?
+>=20
+> If i see it correctly, even if user do not actively configures priorities,
+> they are always present. For example port 0 will have always a Prio
+> higher than Port 10.
 
-I would advise removing the likely() if it really bothers you.
-(I doubt this has any impact)
+We could add a subprio ehtool attribute, but it won't be configurable.
+In fact it could be configurable by changing the port matrix order but it i=
+s not
+a good idea. Applying a new port matrix turn off all the ports.
 
-But assuming everything is IPv6 is too soon.
+I am not sure if it is specific to Microchip controller or if it is generic
+enough to add the attribute.
+I would say not to return it for now.
 
-There are more obvious changes like :
-
-diff --git a/net/ipv4/ip_input.c b/net/ipv4/ip_input.c
-index b6e7d4921309741193a8c096aeb278255ec56794..445f4fe712603e8c14b1006ad4c=
-baac278bae4ea
-100644
---- a/net/ipv4/ip_input.c
-+++ b/net/ipv4/ip_input.c
-@@ -462,7 +462,7 @@ static struct sk_buff *ip_rcv_core(struct sk_buff
-*skb, struct net *net)
-        /* When the interface is in promisc. mode, drop all the crap
-         * that it receives, do not try to analyse it.
-         */
--       if (skb->pkt_type =3D=3D PACKET_OTHERHOST) {
-+       if (unlikely(skb->pkt_type =3D=3D PACKET_OTHERHOST)) {
-                dev_core_stats_rx_otherhost_dropped_inc(skb->dev);
-                drop_reason =3D SKB_DROP_REASON_OTHERHOST;
-                goto drop;
-diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-index 70c0e16c0ae6837d1c64d0036829c8b61799578b..3d0797afa499fa880eb5452a0de=
-a8a23505b3e60
-100644
---- a/net/ipv6/ip6_input.c
-+++ b/net/ipv6/ip6_input.c
-@@ -153,7 +153,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff
-*skb, struct net_device *dev,
-        u32 pkt_len;
-        struct inet6_dev *idev;
-
--       if (skb->pkt_type =3D=3D PACKET_OTHERHOST) {
-+       if (unlikely(skb->pkt_type =3D=3D PACKET_OTHERHOST)) {
-                dev_core_stats_rx_otherhost_dropped_inc(skb->dev);
-                kfree_skb_reason(skb, SKB_DROP_REASON_OTHERHOST);
-                return NULL;
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
