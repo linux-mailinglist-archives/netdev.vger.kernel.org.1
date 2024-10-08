@@ -1,128 +1,94 @@
-Return-Path: <netdev+bounces-133175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 839FC995364
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:28:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE4099537A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:37:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31924283A20
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:28:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AD041C24CB0
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA011E0082;
-	Tue,  8 Oct 2024 15:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DB718C327;
+	Tue,  8 Oct 2024 15:37:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="WLDmjm41"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rwU+2M7i"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02F91DFE00;
-	Tue,  8 Oct 2024 15:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE2443B182
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 15:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728401277; cv=none; b=fM0pj4ZfH9T18ETpvXxgWEA4mDHyetFIRlO8gJbV8dgZwK7QL9Kgk7Ub7IJu2bJ9yhHy/RE0m3VXjx4oPaF6kAzPGuphA0ij5VbbxDYpeNB2g1aj3+8XAjsfCQ5ZnlW17BYEV5Zb6u5+h7iwf5EoENhntMORjo3dV0HYvSEfU6c=
+	t=1728401840; cv=none; b=Vhz2AukkC69Injzsh/vSCADlhLxUIe+nn6bFAjY0LlR55D1H14FMgYhgERcMe+xqadTlw5riNvNtgV8QI0Q98SeXHX6fqXLyil8tcT4D3EtPkbcYj0H1htgYGqsNptuIJ1C0MixLOF9K81QgAN0dLhz+Xl7LCWJC/oAKrPpPNTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728401277; c=relaxed/simple;
-	bh=/nNNkCPa14tl4T8/iPpdXojCkRsEih3ZlyZ5E/c0n6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QDYhiQO02RpQR5HEOc1MHovPDTx7dKQqqNjtnYEdQxfkwqrg0mal/wBrvxFKzi1W3UjbdZm5WEOZzVFUwB/g7H9gmpke/7ZMeegyuAzotqcBiJyHR7xvhb2EFcbDHR5xxRoRYWXDfoaZOjZT98JSZUBaaJT/uuW2S2C1N476U6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=WLDmjm41; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FST8qW+eM/NUtJ2BpKAboGn3/932eVgmWk4GHR1qc08=; b=WLDmjm41bOzYWnzltA5tU7XUeN
-	tpinM0bbWHJ2wVuCPjmIHQT20SU7dZNhOyORzUafZZ8fGc5aa1v0cySxTGj8pwZIk3AU/2m4eAsIt
-	5isCs9k3YjjQ3g41LdMGMuL2OSDZnfo+j06R01PkzrJB5pjUV0DRNxv0z7TygUeXfKHeRilQi/QHK
-	xkvrh7yY+pd5Sbazd8nPLgL3WzpsiniEYo3bhazy0zvlolr21t88jfpuPivFnmfqUZ7zZa8EZOEe5
-	oFGNI1e6TlxD52RzCRgJvqqrF/KvOkp6Dbm/DJtHAbghv1aV0xQ1vwCMaxQ8hL4/72bTt/XhOh6dy
-	CI//Ludg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49600)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1syC7o-0007h9-1d;
-	Tue, 08 Oct 2024 16:27:48 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1syC7j-0005Im-36;
-	Tue, 08 Oct 2024 16:27:43 +0100
-Date: Tue, 8 Oct 2024 16:27:43 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v2 7/9] net: phy: introduce ethtool_phy_ops to
- get and set phy configuration
-Message-ID: <ZwVPb1Prm_zQScH0@shell.armlinux.org.uk>
-References: <20241004161601.2932901-8-maxime.chevallier@bootlin.com>
- <4d4c0c85-ec27-4707-9613-2146aa68bf8c@lunn.ch>
- <ZwA7rRCdJjU9BUUq@shell.armlinux.org.uk>
- <20241007123751.3df87430@device-21.home>
- <6bdaf8de-8f7e-42db-8c29-1e8a48c4ddda@lunn.ch>
- <20241007154839.4b9c6a02@device-21.home>
- <b71aa855-9a48-44e9-9287-c9b076887f67@lunn.ch>
- <20241008092557.50db7539@device-21.home>
- <f1af0323-23f5-44fd-a980-686815957b5a@lunn.ch>
- <20241008165742.71858efa@device-21.home>
+	s=arc-20240116; t=1728401840; c=relaxed/simple;
+	bh=/4681f8Dj1sF/J44wHOESOOI+3iDokqhncOC9KUJEVg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l4QhZGCqUaY3G0Tg/06XxdMwlAuaKMqSfQqhpZ5Z0fKmQMBqJdjwFq7ldEkKNuJUqd6Knu3vVIQQ2XPTa15Xs35ImqtIuNQaSKzaugd33/dLdlyK6vuJe01yKw5h3VCyWdgk7h0YSbipxUTRCnizQlg9lUQbC6+U7AZhkI2W7dM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rwU+2M7i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D67EBC4CEC7;
+	Tue,  8 Oct 2024 15:37:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728401840;
+	bh=/4681f8Dj1sF/J44wHOESOOI+3iDokqhncOC9KUJEVg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rwU+2M7i0oCrvaK0WKe4si8Cs+p9Q+2K3ljB71TmJ2EFvC2S7IoEUqahaAJ/e4vVY
+	 PA+sJzYhLLvCexxH7GayD+c5AqEHra+NliN5E7YR1W3wDQ7d9DSFYa8pMD/c53p6Tp
+	 tAwp+6RmWBEfA6+PBkfjGEE8rzv75W3y+nP9SvpXpmkibS/HJIbz612oPpg2IY/3C1
+	 PqK3WdJkIxgBISITFtd0inqCqA8eQ/dVO7D5TXC3KOOH5IVnEfogYeRzKMGOF4wEbP
+	 vIh4I6NwSR4tKmcHLtjgzv6Kt++vo2ejGbsQpE4MkBJ2+wsy1zfshqvgwiTSX6HsoI
+	 DIvn4m4tmKa2Q==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	konstantin@linuxfoundation.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net] MAINTAINERS: remove Yisen Zhuang from HISILICON NETWORK drivers
+Date: Tue,  8 Oct 2024 08:37:11 -0700
+Message-ID: <20241008153711.1444085-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008165742.71858efa@device-21.home>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 08, 2024 at 04:57:42PM +0200, Maxime Chevallier wrote:
-> Oh but I plan to add support for the marvell switch, mcbin, and turris
-> first,
+Konstantin reported that the email address bounces.
+Delete it, git logs show a single contribution from this person.
 
-What do you think needs adding for the mcbin?
+Link: https://lore.kernel.org/20240924-muscular-wise-stingray-dce77b@lemur
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ MAINTAINERS | 2 --
+ 1 file changed, 2 deletions(-)
 
-For the single-shot version, the serdes lines are hard-wired to the
-SFP cages, so it's a MAC with a SFP cage directly connected.
-
-For the double-shot, the switching happens dynamically within the
-88x3310 PHY, so there's no need to fiddle with any isolate modes.
-
-The only thing that is missing is switching the 88x3310's fibre
-interface from the default 10gbase-r to 1000base-X and/or SGMII, and
-allowing PHYs to be stacked on top. The former I have untested
-patches for but the latter is something that's waiting for
-networking/phylib to gain support for stacked PHY.
-
-Switching the interface mode is very disruptive as it needs the PHY
-to be software-reset, and if the RJ45 has link but one is simply
-plugging in a SFP, hitting the PHY with a software reset will
-disrupt that link.
-
-Given that the mcbin has one SFP cage that is capable of 2500base-X,
-1000base-X and SGMII, and two SFP cages that can do 10gbase-r, with
-a PHY that can do 10/100/1G/2.5G/5G/10G over the RJ45, I'm not sure
-adding more complexity really gains us very much other than...
-additional complexity.
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index af635dc60cfe..e5311fc990c4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10267,7 +10267,6 @@ F:	Documentation/devicetree/bindings/arm/hisilicon/low-pin-count.yaml
+ F:	drivers/bus/hisi_lpc.c
+ 
+ HISILICON NETWORK SUBSYSTEM 3 DRIVER (HNS3)
+-M:	Yisen Zhuang <yisen.zhuang@huawei.com>
+ M:	Salil Mehta <salil.mehta@huawei.com>
+ M:	Jijie Shao <shaojijie@huawei.com>
+ L:	netdev@vger.kernel.org
+@@ -10276,7 +10275,6 @@ W:	http://www.hisilicon.com
+ F:	drivers/net/ethernet/hisilicon/hns3/
+ 
+ HISILICON NETWORK SUBSYSTEM DRIVER
+-M:	Yisen Zhuang <yisen.zhuang@huawei.com>
+ M:	Salil Mehta <salil.mehta@huawei.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.46.2
+
 
