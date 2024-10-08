@@ -1,212 +1,107 @@
-Return-Path: <netdev+bounces-133112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C371994E69
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:17:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B702E994EB1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34F881C25349
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:17:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E97401C253C7
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3AE51DEFCE;
-	Tue,  8 Oct 2024 13:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E962F1DE89F;
+	Tue,  8 Oct 2024 13:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBFwvvvf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5MC3edB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A161DDA36
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 13:16:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35EE18C333;
+	Tue,  8 Oct 2024 13:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728393419; cv=none; b=Ycy8/p8Yrww1jOZcNUaDODIYh/HzRCHV+8rni5y7eKRs/bmSYnkWghpQ4aQPwFci7hTqXvXAtbQDZoGA3qlw0cn5vHHfsUCW44w9Ame4UZogn64eRwbBb2+Ksq30XoozgHvvfR41Eaa4HZVfxddmQqWhB/yoJKoHRgEfYF5TjnI=
+	t=1728393611; cv=none; b=aZk3KYjp9QCrZINgDvPlvBsdIq5sPyOrHhKZTv3GFHHXn9//uPkIJOrfExDZQtN1i9+/0UbFI6KDkProfgHA5R2HMSqEJaJ9Hw4Zm5vA6OnqdLrUm2nbkn0vqAG4BV3ZblcSei2sozn3I2NL/MWfmQA9+olKpbiN4DQQ78Diga0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728393419; c=relaxed/simple;
-	bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=boMkqeuu+YhVMWIjCY0EHulS1S5qXUCuI2vO6Bnsoix2txRHrqjCs8YWp5r/7TBplDUFsCwzTN/n6zcaqkcgfK1fMblbJ0sC5DvVRgo+Fiju9HWSh5uFktaxLqNGdJOMPD+jjsEDnmZ566L3Ai5tNfYVC3u77ZzxnSV4LeEdb5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TBFwvvvf; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728393417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-	b=TBFwvvvfiEKSd/wLzyHYxjIyBfyPSmI0bgfa0TkLC+o9UVLJJ2J50IjOE28+JwFYQ1RmmQ
-	a3yXaFvpq/iYtYS3vAqZqnTpW6kuqaIc0js3E0Vzt0S5jeenDoaK5c5EJV9OHnjTE3++Kc
-	kosdJbIdM8Ffp3Vp+dsE8bEk0gyyiGc=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-2e2Ap_XAP7-MJTVMNryAuA-1; Tue, 08 Oct 2024 09:16:56 -0400
-X-MC-Unique: 2e2Ap_XAP7-MJTVMNryAuA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a994dfbb8b9so209508466b.3
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 06:16:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728393415; x=1728998215;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4qzCr/863Vf+2oDWeHcab0ZGKqVZCNqD9ak/lC92cUE=;
-        b=UvquSw/195a3BE16uCs2yKci0RPfp/I8sE3nZ781VZZtMFdI+khrQQGsGOhSbq4SE+
-         85vP0HXq26nOpf+nu+GuCwX9Gw0vjvoETEbY+EXAJBuwjZQ/rAFngDnQyGChjUr5vxYN
-         rsOwRUHnlFQgTNeWbnwaemxdS/CuEb5HsGkQWM1uf3yGE2NudxNY7MyYDvJYzXLZR/2X
-         tas2p4mRF//HtuenBJsyxAig3Nkloj/V0sYMQiqUjiD51uSFnNLM3xlslEB9eWrnivrb
-         XRQfZ8k/j2T8jKnbmCDepEeEYn5IxqnsR1VmForUIV/G8gBjcWqfEUcMGZ4vqkH0DrsP
-         UggA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqoOul7K0A8czFSejfnBYp57KtwHEnJjlSa2gO7Kh0GH+fkEl5+2akwUeGxqFeYFpYRV5Omms=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3rREzvjqz6mrJSQ1RT2iZQtnk4HdP3yKmgR3fqJp0iR6mzC0p
-	7RwijE/jLy3uiROy2w+zOIs7zTToqj3zQ1kQD8ixydXYz5zhp1qPSax9hV2FEp8ecdJZtTB1Ej4
-	s9kV2mC7qjwgynq2EE2uVxwmljbMblWee0CsBhopv/MJZXp8fPEHRUQ==
-X-Received: by 2002:a17:907:3e05:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a991bd16c3fmr1579990066b.13.1728393414767;
-        Tue, 08 Oct 2024 06:16:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEFEZcrmlRMftqLlmOZSsoDK/ZCIPnc3OiarQfc2zlGz6X81vFDMyJSw+zoGP5nEXTggdgtw==
-X-Received: by 2002:a17:907:3e05:b0:a93:d5d3:be4 with SMTP id a640c23a62f3a-a991bd16c3fmr1579987666b.13.1728393414320;
-        Tue, 08 Oct 2024 06:16:54 -0700 (PDT)
-Received: from eisenberg.fritz.box (200116b82d43760013399881f4bcf5cb.dip.versatel-1u1.de. [2001:16b8:2d43:7600:1339:9881:f4bc:f5cb])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a993ed35544sm441427066b.73.2024.10.08.06.16.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 06:16:53 -0700 (PDT)
-Message-ID: <dfe23f1344f0a74d05d5a605aa78c5989be22619.camel@redhat.com>
-Subject: Re: [PATCH v6 0/5] PCI: Remove most pcim_iounmap_regions() users
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, John Garry
- <john.g.garry@oracle.com>, Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pci@vger.kernel.org
-Date: Tue, 08 Oct 2024 15:16:52 +0200
-In-Reply-To: <20240902062342.10446-2-pstanner@redhat.com>
-References: <20240902062342.10446-2-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1728393611; c=relaxed/simple;
+	bh=OitgDUOVP367trg7vVeSHNToJ0hVFr5bgKklQJCIdlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nW21TroOzv+BUA2EFiWD/tm1nKrYQg8k04UDFzXUnnDoIA+cYjpEuglRpdF4aO0+sQH5YXZskRqZ70YVcqff5ZoosYztUkErhwX8t0KS8Prku28FEu382zLPDWcKFaxbTmghfKyXb2v5Q1cVN4Xbs9H2chOErNGVKncKnuAXHrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U5MC3edB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44BCCC4CEC7;
+	Tue,  8 Oct 2024 13:20:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728393611;
+	bh=OitgDUOVP367trg7vVeSHNToJ0hVFr5bgKklQJCIdlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U5MC3edBoXDdW0APCtZXrr3biuw9cfkiwUE/tr7E0xtjjcgOKN14niY1EW6c+E27g
+	 vtNdODDlyTWhd9FExRiYuNOqi6XGv/D7CSXSPeOK4jqtlxE4h2lTSAWTuQLqmwXg8D
+	 0G7RWI0MoRA25Q+HruTVQp/YXekk5Bqr4IsipAnNhDiCunIwbeHcgQMjx/MhVVchr9
+	 lGZ80y5EoPyQylvfhKcvVFURiZxI8E5bHvrZvg7htlOJm3e7TDgFEv0oph/DlFN+AH
+	 6tgGK3kMEjXMYcRbiTb3/6nTs+g9NElNH+MA8TRFnkW64HR9SpXyqe0xEltokBE1Eu
+	 Hc5i6AwXk4fMQ==
+Date: Tue, 8 Oct 2024 14:20:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Dipendra Khadka <kdipendra88@gmail.com>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, maxime.chevallier@bootlin.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3 2/6] octeontx2-pf: handle otx2_mbox_get_rsp errors
+ in otx2_ethtool.c
+Message-ID: <20241008132007.GM32733@kernel.org>
+References: <20241006164210.1961-1-kdipendra88@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241006164210.1961-1-kdipendra88@gmail.com>
 
-@Bjorn:
+On Sun, Oct 06, 2024 at 04:42:09PM +0000, Dipendra Khadka wrote:
+> Add error pointer check after calling otx2_mbox_get_rsp().
+> 
+> Fixes: 75f36270990c ("octeontx2-pf: Support to enable/disable pause frames via ethtool")
+> Fixes: d0cf9503e908 ("octeontx2-pf: ethtool fec mode support")
+> Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> ---
+> v3:
+>  - Included in the patch set
+>  - Changed the patch subject
+>  - Added Fixes: tag
+> v2: Skipped for consitency in the patch set
+> v1: https://lore.kernel.org/all/20240923113135.4366-1-kdipendra88@gmail.com/
+>  .../net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c  | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 
-How do you feel about this for v6.13? :)
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-All Reviews / Acks are in place.
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> index 0db62eb0dab3..09317860e738 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> @@ -343,6 +343,11 @@ static void otx2_get_pauseparam(struct net_device *netdev,
+>  	if (!otx2_sync_mbox_msg(&pfvf->mbox)) {
+>  		rsp = (struct cgx_pause_frm_cfg *)
+>  		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
+> +		if (IS_ERR(rsp)) {
+> +			mutex_unlock(&pfvf->mbox.lock);
+> +			return;
+> +		}
+> +
 
-P.
+FWIIW, a goto label would ordinarily be preferred here.
+However, I see that what you have done is consistent with
+existing error handling within this function.
+So I think the approach you have taken is ok.
 
-On Mon, 2024-09-02 at 08:23 +0200, Philipp Stanner wrote:
-> Changes in v6:
-> =C2=A0 - Remove the patches for "vdpa: solidrun" since the maintainer
-> seems
-> =C2=A0=C2=A0=C2=A0 unwilling to review and discuss, not to mention approv=
-e, anything
-> =C2=A0=C2=A0=C2=A0 that is part of a wider patch series across other subs=
-ystems.
-> =C2=A0 - Change series's name to highlight that not all callers are
-> removed
-> =C2=A0=C2=A0=C2=A0 by it.
->=20
-> Changes in v5:
-> =C2=A0 - Patch "ethernet: cavium": Re-add accidentally removed
-> =C2=A0=C2=A0=C2=A0 pcim_iounmap_region(). (Me)
-> =C2=A0 - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
->=20
-> Changes in v4:
-> =C2=A0 - Drop the "ethernet: stmicro: [...] patch since it doesn't apply
-> to
-> =C2=A0=C2=A0=C2=A0 net-next, and making it apply to that prevents it from=
- being
-> =C2=A0=C2=A0=C2=A0 applyable to PCI ._. (Serge, me)
-> =C2=A0 - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
-> =C2=A0=C2=A0=C2=A0 stimicro" as the last user for now.
-> =C2=A0 - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet"
-> instead of
-> =C2=A0=C2=A0=C2=A0 "snet"). (Christophe)
-> =C2=A0 - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
-> =C2=A0 - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - Apply Reviewed-by's from Andy and Xu Yilun.
->=20
-> Changes in v3:
-> =C2=A0 - fpga/dfl-pci.c: remove now surplus wrapper around
-> =C2=A0=C2=A0=C2=A0 pcim_iomap_region(). (Andy)
-> =C2=A0 - block: mtip32xx: remove now surplus label. (Andy)
-> =C2=A0 - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
-> =C2=A0=C2=A0=C2=A0 occurs. (Andy, Christophe)
-> =C2=A0 - Some minor wording improvements in commit messages. (Me)
->=20
-> Changes in v2:
-> =C2=A0 - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
-> =C2=A0=C2=A0=C2=A0 patch, put stable kernel on CC. (Christophe, Andy).
-> =C2=A0 - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
-> =C2=A0 - Consequently, drop patch "PCI: Make pcim_release_region() a
-> public
-> =C2=A0=C2=A0=C2=A0 function", since there's no user anymore. (obsoletes t=
-he squash
-> =C2=A0=C2=A0=C2=A0 requested by Damien).
-> =C2=A0 - vdap/solidrun:
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 make 'i' an 'unsigned short' (Andy, me)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Use 'continue' to simplify loop (Andy)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Remove leftover blank line
-> =C2=A0 - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
->=20
->=20
-> Important things first:
-> This series is based on [1] and [2] which Bjorn Helgaas has currently
-> queued for v6.12 in the PCI tree.
->=20
-> This series shall remove pcim_iounmap_regions() in order to make way
-> to
-> remove its brother, pcim_iomap_regions().
->=20
-> Regards,
-> P.
->=20
-> [1]
-> https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
-> [2]
-> https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
->=20
-> Philipp Stanner (5):
-> =C2=A0 PCI: Deprecate pcim_iounmap_regions()
-> =C2=A0 fpga/dfl-pci.c: Replace deprecated PCI functions
-> =C2=A0 block: mtip32xx: Replace deprecated PCI functions
-> =C2=A0 gpio: Replace deprecated PCI functions
-> =C2=A0 ethernet: cavium: Replace deprecated PCI functions
->=20
-> =C2=A0drivers/block/mtip32xx/mtip32xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 18 ++++++++--------
-> --
-> =C2=A0drivers/fpga/dfl-pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++------------
-> =C2=A0drivers/gpio/gpio-merrifield.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 14 +++++++--=
------
-> =C2=A0.../net/ethernet/cavium/common/cavium_ptp.c=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 7 +++----
-> =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++++++--
-> =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A06 files changed, 29 insertions(+), 35 deletions(-)
->=20
+>  		pause->rx_pause = rsp->rx_pause;
+>  		pause->tx_pause = rsp->tx_pause;
+>  	}
 
+...
 
