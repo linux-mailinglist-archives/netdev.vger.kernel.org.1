@@ -1,141 +1,140 @@
-Return-Path: <netdev+bounces-133253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130B1995658
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:21:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4014D99565A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 20:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44E091C25501
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:21:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA15128890A
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD457212D13;
-	Tue,  8 Oct 2024 18:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FB020ADE2;
+	Tue,  8 Oct 2024 18:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="W0mZNS7q"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Q13Rmxep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0786B1E0E1D
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 18:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67FA1E0DD1;
+	Tue,  8 Oct 2024 18:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411655; cv=none; b=KlONK6pAzk/77F7YbKDDleopl6ad33S44o7To16bWh8DWQr4meFqXYjMTNBz8tESs0O2JxpwP6954Qkr1HS//ADA2x3N682IvTrt/Us6TsmSQUINiqgLSA0ytD6MX/X01yh5E1/6pjgSF+q5g85BUXOYAe9lkPYkjCYyo6hqo+M=
+	t=1728411765; cv=none; b=n0x+MFcYY99H0jOMJOH93AZccHQpe36rK4Iv31Sx5Fq4+1DlscqMsKjMskcQgImZ+SrVPRk2a17n8JW+pznDPJxm9pHnOlUIMCmp73hLJZeUMoAZ0M8iKN/kBK1QcGZQoOoiD4mtXuJM0bNsyD5428SUAowCyj2zkvEQSWBi0UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411655; c=relaxed/simple;
-	bh=maT2ElR+ztAXb8N7d6RAwLafiZW6/aQk5wJi3IPWR0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=to3eVOS34mkocC8U7/E12uEecldsjte0leMuTLQ2INccA61whgET4vjQj6AQeH+Qjnhsf6ZSYILqYyHcd0oRmnjXdTbvkHe4YUJETnklvrhtolsJD4NppxzXovCXyJ+ontTwe5dpoBzbc/r7h3xGI3h2ba9zPQthnKD0GzC6VxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=W0mZNS7q; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71df67c67fcso2278346b3a.2
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 11:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1728411651; x=1729016451; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PdixHRRhJR+67cK5BvTRI84FxCdkiNcyBDRYQb0ntbk=;
-        b=W0mZNS7q7PNrGpkL4TlMsJmeQC+19gKX5M0W49Vpy5OArPeUvd9EJ+U//n5sWYSJ2B
-         EZlaomI38+v8b1AQUHAI3yxwHQFexWc9ZvBjaxgFrtFD54Bt4D+h1Dzi5+PJJnhH9oAd
-         /RrqwJ2qEDg9daaZzT72U/4sB1WQI92HTQTJ0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728411651; x=1729016451;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PdixHRRhJR+67cK5BvTRI84FxCdkiNcyBDRYQb0ntbk=;
-        b=ZiCRGUcMTNoZkRABHQTeXTv1ZdR+ZNqajuWJripx07TU+ccXOuNgtRJta/V7JvRPe5
-         XSMTpFMN1SVmmanvTA+jL0UTEAnwtQ2Y4UtZ342ScOy19a1ZpNRqUK60fPvowZLIHAvm
-         /35ZRVYurHPfc+6zX3JaewLJH1jt5Vrkn3baYvmxgEvObxaU9tPBH2nCpEQEfN8U32z/
-         jF9UVZaaYMVJeIReO/C/eNcmUep9Tjpffc6OFebuR5gtvfmHIhpP8jiV2zU8u8ZBZlda
-         RclDrW4kphQf2+syN/NRjNI0nThNuZjHZ+Q3ZpzD7kJlH+FOY4pOklUJlzalcmJzfQdm
-         GzMg==
-X-Gm-Message-State: AOJu0YwhGA6gIf429aBbn0yx9FUzISh2COnV7afUUyJNqHiMelVA5Nml
-	q/0qdkP9ZXVgtBtvCq7SYOFYjbnjwNc91lvh7QzIdoZyVlmtNlQfqver/SCyTUO/b3fDVop3Kb0
-	XiFgT4Wz0aPc7Kb0cryv/RSTnBQMlE4zHMtqAc2EPDHpRbfyLSCJPqFaQ4aXOUvhjvYGr3AOdAn
-	nPuEQdrPqAJ1uylQwptwQ0DT+xMQaUwI9KqmI=
-X-Google-Smtp-Source: AGHT+IHcgv+kRTgXo20tsQSHIv8ZWddq4lfnoSxMVWL9FKQSzZc7w/QjVIgngvmNyac2gK8yiL0N6g==
-X-Received: by 2002:a05:6a00:3a14:b0:710:6e83:cd5e with SMTP id d2e1a72fcca58-71de22e1e3fmr27948867b3a.0.1728411651549;
-        Tue, 08 Oct 2024 11:20:51 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e9f6c4915asm7122825a12.86.2024.10.08.11.20.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 11:20:50 -0700 (PDT)
-Date: Tue, 8 Oct 2024 11:20:47 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
-	bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v4 6/9] netdev-genl: Support setting per-NAPI
- config values
-Message-ID: <ZwV3_3K_ID1Va6rT@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
-	bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241001235302.57609-1-jdamato@fastly.com>
- <20241001235302.57609-7-jdamato@fastly.com>
+	s=arc-20240116; t=1728411765; c=relaxed/simple;
+	bh=Bw7tHAzRnNX9JlhTidWbpwRPbZZIBq1pJaHcu3O/D9U=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DlUg59z87Msl1w+d3imZrzNg/mqk7NBFva5MTT41HeE+UStJIVna8u/t+i92tRxvPaARJVyjVBbsWwsPH3jRHmhtcGZNGmggg6LIr0qYPfTzPb2lVekp6XTxjVyEpRUqbAdUHvItQCZdoZJQPNxWl6DZdT355QpPAR2lj9UE8x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Q13Rmxep; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=FYiFRoNGJ9hNi3r1QAXGk4nUc9gJVOt2/pUqvZG6Z1I=;
+	t=1728411763; x=1729621363; b=Q13Rmxeph9LEnojOeMNCBQNrlvP6R1WzWh48UP0b7qNhsOi
+	5CrvV7w//aaAbUCPmywvsToWXaM47M86JqVtUtNqqaP4sLyvoxB82h/iOSnD0seII4ftvVRVIxl/q
+	g1e5NB0l8XaNrFy3OA2zsewCPgtLfr42An4h0k8EpPgMlMJGqyylUoQgltUAhqjU60ripYucXO/6D
+	j92cupL6ydqmxxOH7GxEflfclTwC7QJ65MkYuGV4rL0WsFpmetwcslr/gb9kSoyX4EuW3nvT/ZMZ1
+	ZTjLpbcJL4Iw8aoudAtRQelW9xfDR7bRtO5sJ9qiAysGGqv1Tf0t93XhLJ3YrTLQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1syEr1-00000004LXn-1si8;
+	Tue, 08 Oct 2024 20:22:39 +0200
+Message-ID: <cd8045c03573a012f71a1afdcfb5d9c108b6fefa.camel@sipsolutions.net>
+Subject: Re: RFC: Should net namespaces scale up (>10k) ?
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, alexandre.ferrieux@gmail.com
+Cc: alexandre.ferrieux@orange.com, edumazet@google.com, horms@kernel.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Date: Tue, 08 Oct 2024 20:22:38 +0200
+In-Reply-To: <20241008174751.2995-1-kuniyu@amazon.com>
+References: 
+	<CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
+	 <20241008174751.2995-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241001235302.57609-7-jdamato@fastly.com>
+X-malware-bazaar: not-scanned
 
-On Tue, Oct 01, 2024 at 11:52:37PM +0000, Joe Damato wrote:
-> Add support to set per-NAPI defer_hard_irqs and gro_flush_timeout.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  Documentation/netlink/specs/netdev.yaml | 11 ++++++
->  include/uapi/linux/netdev.h             |  1 +
->  net/core/netdev-genl-gen.c              | 14 ++++++++
->  net/core/netdev-genl-gen.h              |  1 +
->  net/core/netdev-genl.c                  | 45 +++++++++++++++++++++++++
->  tools/include/uapi/linux/netdev.h       |  1 +
->  6 files changed, 73 insertions(+)
+On Tue, 2024-10-08 at 10:47 -0700, Kuniyuki Iwashima wrote:
 
-[...]
+> > 1. The "netdevice notifier" from the Wireless Extensions subsystem
+> > insists on scanning the whole list regardless of the nature of the
+> > change, nor wondering whether all these namespaces hold any wireless
+> > interface, nor even whether the system has _any_ wireless hardware...
+> >=20
+> >         for_each_net(net) {
+> >                 while ((skb =3D skb_dequeue(&net->wext_nlevents)))
+> >                         rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
+> >                                     GFP_KERNEL);
+> >         }
+> >=20
+>=20
+> Alex forwarded this mail to me and asked about 1.
+>=20
+> I checked 8bf862739a778, but I didn't see why wext_netdev_notifier_call()
+> needs to iterate all netns.
 
-> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-> index b28424ae06d5..901c6f65b735 100644
-> --- a/net/core/netdev-genl-gen.c
-> +++ b/net/core/netdev-genl-gen.c
-> @@ -87,6 +87,13 @@ static const struct nla_policy netdev_bind_rx_nl_policy[NETDEV_A_DMABUF_FD + 1]
->  	[NETDEV_A_DMABUF_QUEUES] = NLA_POLICY_NESTED(netdev_queue_id_nl_policy),
->  };
->  
-> +/* NETDEV_CMD_NAPI_SET - set */
-> +static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT + 1] = {
-> +	[NETDEV_A_NAPI_ID] = { .type = NLA_U32, },
-> +	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = { .type = NLA_S32 },
+Agree. That code is ancient, and I don't remember why, but I'd think
+it's just because I was lazy then.
 
-Noticed this while re-reading the code; planning on changing this
-from NLA_S32 to NLA_U32 for v5.
+> diff --git a/net/wireless/wext-core.c b/net/wireless/wext-core.c
+> index 838ad6541a17..d4b613fc650c 100644
+> --- a/net/wireless/wext-core.c
+> +++ b/net/wireless/wext-core.c
+> @@ -343,17 +343,22 @@ static const int compat_event_type_size[] =3D {
+> =20
+>  /* IW event code */
+> =20
+> -void wireless_nlevent_flush(void)
+> +static void wireless_nlevent_flush_net(struct net *net)
+>  {
+>  	struct sk_buff *skb;
+> +
+> +	while ((skb =3D skb_dequeue(&net->wext_nlevents)))
+> +		rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
+> +			    GFP_KERNEL);
+> +}
+> +
+> +void wireless_nlevent_flush(void)
+> +{
+>  	struct net *net;
+> =20
+>  	down_read(&net_rwsem);
+> -	for_each_net(net) {
+> -		while ((skb =3D skb_dequeue(&net->wext_nlevents)))
+> -			rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
+> -				    GFP_KERNEL);
+> -	}
+> +	for_each_net(net)
+> +		wireless_nlevent_flush_net(net);
+>  	up_read(&net_rwsem);
+>  }
+>  EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
+
+Note 1: I just posted this patch yesterday:
+https://lore.kernel.org/linux-wireless/20241007214715.3dd736dc3ac0.I1388536=
+e99c37f28a007dd753c473ad21513d9a9@changeid/
+
+so that would conflict here, I'd think.
+
+Note 2: the only other caller to wireless_nlevent_flush() is from
+wireless_nlevent_process()/wireless_nlevent_work, and that work could
+easily be made per netns since it comes along with net->wext_nlevents,
+and then we don't need any global function at all. Seems this could be
+implemented in wext_pernet_init()/wext_pernet_exit() pretty easily?
+
+johannes
 
