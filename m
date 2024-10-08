@@ -1,55 +1,69 @@
-Return-Path: <netdev+bounces-133198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7FE099548F
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:37:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004E899549B
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 18:39:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25C9AB283FE
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:37:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE4C1282EFC
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 16:39:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21051E0DD3;
-	Tue,  8 Oct 2024 16:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6501E0DD2;
+	Tue,  8 Oct 2024 16:39:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eMSaxAzK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2yhxPyFO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7911B1E0DBB;
-	Tue,  8 Oct 2024 16:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA38E1DED55;
+	Tue,  8 Oct 2024 16:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728405433; cv=none; b=UDvpjRbmXONIt4o7dhSGnlPgoIGokczf+5JLwBmQlw7smPljhv5C5/8KDCIuD6qppEL9rOSsau2HZnRHkZ41NsyG3s9NDiozgrVMUcFUJVrnFtzU/83Sx2j1oMjuVpSQmOD6SwF0nvx0H0vwdSkGaviw0tBI5LXVNIP+Th5+YMQ=
+	t=1728405544; cv=none; b=Ba3tVoD1DCJdIXTBydt3Xgo1ia+RnTnSCW2ffoQJJuhHNPdZBMOi9iJjbA9/+Tk+QYtchq+Tvaw+XPa05FtFJGijY/GnMwDbTqcgVby5FQartj12eT1TzlEcA9mJshtQ9Hyuw+9smhNtjC0Bzqk6IeU0nmxYMbqE4QcC8DmqSDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728405433; c=relaxed/simple;
-	bh=Et7/X+kGjmeCGGVKG9k0uplKblXWJ8NNGdWbvurdZuc=;
+	s=arc-20240116; t=1728405544; c=relaxed/simple;
+	bh=cXLrnwbGDu54isWKgSKeu/RBK5nb1X4fHzuJBcTmJME=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KTlspa6ari2+Zr+Gx6wI+Fdl7yi6npxvm3xraAmXXL9xQb0eZvdI5UzyjVRY47Y1RFjsiowC6DhBBJA3Iba1cFYpORlBXyJrwbERasdMQLRb6h9jxy9/yAZ1lr6LG4ZN1ebaq1PGQCr6s9i8Y++EJH+/OlBIrbMeP79SVFXN6hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eMSaxAzK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72F01C4CEC7;
-	Tue,  8 Oct 2024 16:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728405433;
-	bh=Et7/X+kGjmeCGGVKG9k0uplKblXWJ8NNGdWbvurdZuc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eMSaxAzK3AZUhTWcbPCMtJo75D2sWr/XmCPgl0xgtZutHoR3GJD5bevVXMk+Hbc28
-	 VY3EbemjGUwjewXc2u7mgj7wB06gG3236sVuKZMaoqU4pSD6WYVSihMmNH+91VOfAp
-	 XPdNGOkFkMuNFf0vgy7mbvFVkaZtOqobG5lQOQSpQkXjGdNxfyvdCN0MEpfH+Uzwa8
-	 BWqYXwml+vnU8Pxx8JhJvc/9HsGeLBNOErq2hekJ1OdTIhK3MT+M6UrpcUEsPbzU99
-	 Z16fsgj6csYIH4pKyQ0VZ9KONKO0a3u/bsr1pu+PiPtukWC6wUoO6Btk4qH8WBlIkx
-	 bZPWrHk1Xlkvw==
-Date: Tue, 8 Oct 2024 17:37:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: linux@treblig.org
-Cc: ayush.sawal@chelsio.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] chelsio/chtls: Remove unused chtls_set_tcb_tflag
-Message-ID: <20241008163709.GC99782@kernel.org>
-References: <20241007004652.150065-1-linux@treblig.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=EWSBiY5iRW6KI8MJl6Tr/kYXk5r3uh4r6I3FSbIbcOb72TuM093qn1wbmFqw9bvseCeTLv3Hcp7qT6o1fOPCAfNMry5g443ZRMGV4+NGntv1uVqUDlsmDd3H8lm8tObRpUyAb05BOjzyeO1boLB/CsKrZdv9+0LZ49FpCpmkk54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2yhxPyFO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ken4YUAxm4Qit6mgswAP4SvlfA9kMoDip02jsaPefVo=; b=2yhxPyFOH2uJQLuuO5NuW4ZMef
+	NUBvdJf+JxpLKoRRhnJM5LWfFDbndNakpz9KrjdNmuSdxR5dFdbCfU9w1WRMCsCOTbjHQwlZQIU3I
+	vwaq2R0KalDga8BHfnYRCMT80Ws09WgIwYXUq71fGa88WFsGBtwOUu+YkiPnSp/EoiP8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1syDEP-009OMv-B0; Tue, 08 Oct 2024 18:38:41 +0200
+Date: Tue, 8 Oct 2024 18:38:41 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Daniel Scally <djrscally@gmail.com>,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Sakari Ailus <sakari.ailus@linux.intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] net: dsa: mv88e6xxx: leds: fix led refcount
+ in error path
+Message-ID: <5791caf0-05dd-4aa2-932d-626cf9158c4d@lunn.ch>
+References: <20241008-mv88e6xxx_leds_fwnode_put-v1-0-cfd7758cd176@gmail.com>
+ <20241008-mv88e6xxx_leds_fwnode_put-v1-2-cfd7758cd176@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,18 +72,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241007004652.150065-1-linux@treblig.org>
+In-Reply-To: <20241008-mv88e6xxx_leds_fwnode_put-v1-2-cfd7758cd176@gmail.com>
 
-On Mon, Oct 07, 2024 at 01:46:52AM +0100, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Tue, Oct 08, 2024 at 06:10:28PM +0200, Javier Carrasco wrote:
+> The 'led' fwnode_handle within fwnode_for_each_child_node() must be
+> released upon early exits by means of an explicit call to
+> fwnode_handle_put(), which in this case is missing.
 > 
-> chtls_set_tcb_tflag() has been unused since 2021's commit
-> 827d329105bf ("chtls: Remove invalid set_tcb call")
+> Instead of adding the missing call, and considering that this driver was
+> recently introduced, use a scoped variant of the loop to automatically
+> decrement the child's refcount when it goes out of scope.
 > 
-> Remove it.
+> Note that the _avaialable_ version of the loop has been used, as there
+> is no apparent reason to walk over unavailable nodes.
 > 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> Fixes: 94a2a84f5e9e ("net: dsa: mv88e6xxx: Support LED control")
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
+    Andrew
 
