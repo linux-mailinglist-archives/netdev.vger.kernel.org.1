@@ -1,122 +1,82 @@
-Return-Path: <netdev+bounces-133318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06BBD9959BE
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5C49959D1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:08:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 887DBB23E02
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1832286C28
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 22:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA762185B8;
-	Tue,  8 Oct 2024 22:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1625C215F64;
+	Tue,  8 Oct 2024 22:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nPVx3ZA/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5U2rcg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7895F2185A4;
-	Tue,  8 Oct 2024 22:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9ACE215F47;
+	Tue,  8 Oct 2024 22:08:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728424911; cv=none; b=P/FU/Ui7I4vDw1JwIMqJPlLbJ6cbAmNRsOVs6FmYWWgPQW9cq8PGrYZCXZBKYqE1CggkLV9aQWbkieMTwCobOXESa1OY3WvS7TpneQa1GNO7Y8pCm3n3BIgi74yqLCt5Q7cTYTiOF3pzjQrO258F9pVsdrkDPNz0XqgFrRRTQPk=
+	t=1728425316; cv=none; b=jZMa+xqgj0L3G8VUeH+OoKzDQGUKS3OCw9wV/Fj8l+x+6S4Yqr2dBRAUD4UiEdnz35W+QbEXCaZBYjMhiBPh58zbkuLQg/X6+MyaNK6wGgrRcs7vArV3Ia/wnbpcrLxv+B18KIEwsKymwroIIC+Y9cWcalTkLAJpcdbdKLESP6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728424911; c=relaxed/simple;
-	bh=HxlKc/Ygqvx8mvscuPoL7nSKaG2WOPrulhDeOr5LOKk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VLfs9wRG2iK28edQmsw+bsz9eiz3LvnjKrynZlupE0LPwpL+QjY3d0ftEwtFystlm3Q3lMLvuzSEiksfC/OuSV65zhnDyQFqHV6DFIvGf0FDTtNerltmjYmicomHWGRThgOUafCCprQCJIEZzDxFXE4iLcc3rljE5XKCUWRwp2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nPVx3ZA/; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-37ce8458ae3so5503591f8f.1;
-        Tue, 08 Oct 2024 15:01:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728424908; x=1729029708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9iT4t6likmZ6EV867VVWYvGZ/+8qv062JeJ0/JhHlhs=;
-        b=nPVx3ZA/kZkEjsHXqz6zmC52X4eB6pH9pQSQts1TDN1SigluJvg5Pk6JTwSaujl7Ld
-         XB9uZ4+XKqzCfgFve1NP66Cr4MzZ5vTurrEFFS/jpOR+iKR6WGBJJAIziSifXoB8Gws8
-         YjpaIsYqH7Jgy8C/0LsoxHRl0T3KmwLRXn9ulR7vXcJO3rW0YLm6YxSngosSiU64Ik9g
-         2q16lNllkDp9jf9CDuapeRDAHKW5mrVIEF+odgxjBn6ro91ah8j7+IBufr+t7gfev3j/
-         G2E1YrL6OpKX1FAhqNZz6IuRUco5Bao4/AvNGFAz8xuMRzR+UvN5rVVo7w9QoBiFEuUu
-         icvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728424908; x=1729029708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9iT4t6likmZ6EV867VVWYvGZ/+8qv062JeJ0/JhHlhs=;
-        b=ZAZRebO4r8EOsr15+YzLYDW2YEKXW5hx5CE2IFY2MPEPtvt2cRjgcqVQROJiL0CPvX
-         5GgrTUL2q9TMYJLkgJqqfCuFv/hv3vY4+iY5ATNERV1pvgpZr1wk9sEAVMYXU8MbbIMI
-         R+aNYtKl/lQa4+E3b3glrx+v7onAmZOW56Pn/bqPME/IN7Li0VgCRbv8KgYaknzrUJwj
-         QzG07HFUmTvAYsgFqRxKae2+jAuowcBXFP9jNOCnbGyXAF7xuIWAioq6/LLQR0iczJpS
-         VA4PFkD0onregFqUQMwzno5scfI+L/zthvYvAFtNZJjSZ5tEw07C2sTebN3Nrgv/NbN2
-         U9tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU0wkrBvQbYO6hCWel9hfBP198YjhFJbTu1ZOpnZhXh1YMI1ri/d31hQ53WLU81Zn29iAxBZVTS2Z7Bk0/5DPjj@vger.kernel.org, AJvYcCXj1CBgmPLrIQhq3qq2C7rEQsX+1pzlRs+kyfd/zqs3FhgTHnqWDTmHcw8XqLXo3PeaHNef5jm5@vger.kernel.org, AJvYcCXzmVBU6n9TaxRayh7pucpbakmTHYdCoPg4dazNA5nbe0XlNw0Ky5Qznsk0H/ox8OdKZC2+JU8oJci73j4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKMIhusjQZKV/DWEw3HCqtag9fxK1opf5c1yqQIAOHJbhenBfH
-	v71GZ2oBTQH+UI8TI6HlBtWUBE5E5678kLDDOpRCz8HiFtve8BL3
-X-Google-Smtp-Source: AGHT+IFPuRDk0r9ueLuuhxbfkB4+EacuR8rQLWAJFXyxwWdoKcIhBC6PRqkhwbzdF4UqaS2JoSH/mw==
-X-Received: by 2002:a5d:4e0e:0:b0:374:c8eb:9b18 with SMTP id ffacd0b85a97d-37d3aa570c3mr257037f8f.24.1728424907438;
-        Tue, 08 Oct 2024 15:01:47 -0700 (PDT)
-Received: from alessandro-pc.station (net-2-44-97-22.cust.vodafonedsl.it. [2.44.97.22])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a992e5bbca1sm557062766b.5.2024.10.08.15.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 15:01:46 -0700 (PDT)
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	dw@davidwei.uk,
-	martin.lau@kernel.org
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	anupnewsmail@gmail.com
-Subject: [PATCH] selftests: drivers: net: fix name not defined
-Date: Wed,  9 Oct 2024 00:01:33 +0200
-Message-ID: <20241008220137.274660-1-alessandro.zanni87@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1728425316; c=relaxed/simple;
+	bh=jG1CndrXsVGOVLrPEIIVi6Syu8ufJXW4Gso7dXRmJgA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M0adeA4UaXnZM6QU3B+MtQl1eVjuhRtHL/CZGSYKQyijv1VPha6zL+7x9R5DmumdqdrC50VBvowY1YsTIdOwRr7yS14dNEByzfHy1PtXSlkYy0c70bKdXlF3D6nZA36iMTdJ8mCdmu/kw/ULt0i+9YLAcjBbt9OYS/yXwmphywo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5U2rcg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D6B2C4CEC7;
+	Tue,  8 Oct 2024 22:08:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728425315;
+	bh=jG1CndrXsVGOVLrPEIIVi6Syu8ufJXW4Gso7dXRmJgA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=k5U2rcg9HYME+J9y7JVv+BmqK9dmrau5TL6CnTEnOMWmhRiSkJyM8KcTktvOH7UWE
+	 1+gqldSI9qGmVgVhpRkYGomUmKKg07v60EJwS4nkAUerdHV3En0ZTKX7z1P5diSGWf
+	 plY+cOHY2LYU2RNpRXA4msCJAjI2fffuePeu3PBzm3lnikQMjqFA9kr8ZY7vmfgB7m
+	 LEzP1+ZmsmONEhDFMVDY4gYdDX4po0wXMfCPvcTEkBquc48cp6oHTAwytBBAZSk0cJ
+	 M1DVyZ/bdF9y55HGT+RXYneMuIKZ9LBJj9qEyF8PPVTfnWavxNTJPMx26k6xcuHhnt
+	 0QvAgnL2qxakQ==
+Date: Tue, 8 Oct 2024 15:08:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
+ sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Jiri Pirko
+ <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Kory Maincent
+ <kory.maincent@bootlin.com>, Johannes Berg <johannes.berg@intel.com>, Breno
+ Leitao <leitao@debian.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, linux-doc@vger.kernel.org (open
+ list:DOCUMENTATION), linux-kernel@vger.kernel.org (open list)
+Subject: Re: [RFC net-next v4 1/9] net: napi: Make napi_defer_hard_irqs
+ per-NAPI
+Message-ID: <20241008150833.4385ea50@kernel.org>
+In-Reply-To: <20241001235302.57609-2-jdamato@fastly.com>
+References: <20241001235302.57609-1-jdamato@fastly.com>
+	<20241001235302.57609-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This fix solves this error, when calling kselftest with targets "drivers/net":
+On Tue,  1 Oct 2024 23:52:32 +0000 Joe Damato wrote:
+> @@ -377,6 +377,7 @@ struct napi_struct {
+>  	struct list_head	dev_list;
+>  	struct hlist_node	napi_hash_node;
+>  	int			irq;
+> +	u32			defer_hard_irqs;
 
-File "tools/testing/selftests/net/lib/py/nsim.py", line 64, in __init__
-  if e.errno == errno.ENOSPC:
-NameError: name 'errno' is not defined
-
-The module errno makes available standard error system symbols.
-
-Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
----
- tools/testing/selftests/net/lib/py/nsim.py | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/net/lib/py/nsim.py b/tools/testing/selftests/net/lib/py/nsim.py
-index f571a8b3139b..1a8cbe9acc48 100644
---- a/tools/testing/selftests/net/lib/py/nsim.py
-+++ b/tools/testing/selftests/net/lib/py/nsim.py
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
-+import errno
- import json
- import os
- import random
--- 
-2.43.0
-
+This will be read on every unmasking, let's put it above 
+the "/* control-path-only fields follow */" comment
 
