@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-133307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B606995924
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:16:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94E6899593F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:23:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3515B280DBF
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:16:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62211C21059
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 21:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5055A17C7BE;
-	Tue,  8 Oct 2024 21:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC881C1AD4;
+	Tue,  8 Oct 2024 21:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="38rrlBxw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z73u6AO7"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C84E2574B
-	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 21:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE09C1791ED
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 21:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728422202; cv=none; b=JutMEO1xpqAoHfsWek/s3oWv2W0INlETnvNch2YBKJTHeI33xky+6XY3OVtcYAFJpdxfImdoUEmyYzXDem/T6fH4vXtiWgPHiWNFy9rU7+VvRcUFufafc1qn1Uq+4CUtv0p1pedwbWmaeSCiLcEF6d1Z0Y/DvBRSKcpRpqwoDBQ=
+	t=1728422583; cv=none; b=D/rkQL6GkLMP+Pn/5unEclhcXZitkf2mzGUemi2958PU6fv0zvy5ke+INc/07w8M9du4IECfxtT6QLJKashuc2c7r+xTSJdG54sPI1RAZWOvL8HuzFzG2kTOpnF61B1gXpCLpIir/bNgYb4B7UucRaSsyK/vSIyw5JQoGOLaUsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728422202; c=relaxed/simple;
-	bh=/kX+Zm+j0o71BxpwBPtyJSAjKl0KSg4OpDtGA17IIOM=;
+	s=arc-20240116; t=1728422583; c=relaxed/simple;
+	bh=b+nb8jhg8Bwp9P/k+ZqmrCMDrQPZuHm3fEc40YOrwb4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=inZosdJXeigeX3aVbARXwTUKsKQZZNmad3Itq4mQLR3d6ZeUmSxVBEWCSVd2+7CElvy+7060bzidlMZsj42Dj4g3MoB7hfyREHkoe8gYAlp7+/do1yBSViomvie6Kq6BgNjrqMQosh3Ie05d8n+5hJ1wNbVtub5j/JQqLY4soP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=38rrlBxw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=nSPWkeZb5JEjLZzzXO9NzBowlqHw0SqI20TQcCTD8ipfbKyyxaOT8vEJo6KeH0680fo0TbahXhiXiO8ooZc7VN5btrDXZgmn7ivA9L6l6zuMrwPLHDRmhDquAGZy4i74Owt3KDbWYIDtZkwxOKcBUNOd0O/BBLPWVhKIsU0Dw3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z73u6AO7; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gD7EX2Me6nbxffN8Kbhn07VmENOi9AlNhZYasvYT2Z0=; b=38rrlBxwifmVFQWxSomcXNZxrV
-	zZZlH0/sWGV6r1P876CNh9XIZis/s390nJcTAm2N7SkVgxUTtLkM/jtgZZgDUiaBI+U2p5/4e7LQJ
-	J1ALMKGMjvN7QYB9ArUQRyki3pl5OeHsaE8A8XbXTPzohWM56oC93i7qpxiNSGcwFCrU=;
+	bh=mRSHcF/vAfmzlhniOtJY8Bmdumz9/1SoRC6qJcjHI5I=; b=Z73u6AO7iiKgJD2rfdhMRrjZW2
+	YaZ0SHxkP+tSr2jm5922b/dyW5V+8ethd+ypLb3YojoQKayFpXrpP8SHQYgCbfSWwhb6IX8IP9Z9m
+	N8yY63EzuCLIzJ8GOY6/Ou2iMe3Xy23oaE7ah6ffvLonSZuuI8tkIGzzOmPAmK8s7OqE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1syHZN-009Plm-TY; Tue, 08 Oct 2024 23:16:37 +0200
-Date: Tue, 8 Oct 2024 23:16:37 +0200
+	id 1syHfX-009Pnz-RY; Tue, 08 Oct 2024 23:22:59 +0200
+Date: Tue, 8 Oct 2024 23:22:59 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Shenghao Yang <me@shenghaoyang.info>
 Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
 	pavana.sharma@digi.com, ashkan.boldaji@digi.com, kabel@kernel.org
-Subject: Re: [PATCH net v2 1/3] net: dsa: mv88e6xxx: group cycle counter
- coefficients
-Message-ID: <7b49ecfd-8fb8-4817-be35-14cb9e3bfc1c@lunn.ch>
+Subject: Re: [PATCH net v2 2/3] net: dsa: mv88e6xxx: read cycle counter
+ period from hardware
+Message-ID: <9b1fe702-39b2-4492-b107-f1b3e7f3c2a9@lunn.ch>
 References: <20241006145951.719162-1-me@shenghaoyang.info>
- <20241006145951.719162-2-me@shenghaoyang.info>
+ <20241006145951.719162-3-me@shenghaoyang.info>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,16 +60,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241006145951.719162-2-me@shenghaoyang.info>
+In-Reply-To: <20241006145951.719162-3-me@shenghaoyang.info>
 
-On Sun, Oct 06, 2024 at 10:59:45PM +0800, Shenghao Yang wrote:
-> Instead of having them as individual fields in ptp_ops, wrap the
-> coefficients in a separate struct so they can be referenced together.
-> 
-> Fixes: de776d0d316f ("net: dsa: mv88e6xxx: add support for mv88e6393x family")
-> Signed-off-by: Shenghao Yang <me@shenghaoyang.info>
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+> index bd66189a593f..a54682240839 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.h
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.h
+> @@ -206,6 +206,7 @@ struct mv88e6xxx_gpio_ops;
+>  struct mv88e6xxx_avb_ops;
+>  struct mv88e6xxx_ptp_ops;
+>  struct mv88e6xxx_pcs_ops;
+> +struct mv88e6xxx_cc_coeffs;
+>  
+>  struct mv88e6xxx_irq {
+>  	u16 masked;
+> @@ -408,6 +409,7 @@ struct mv88e6xxx_chip {
+>  	struct cyclecounter	tstamp_cc;
+>  	struct timecounter	tstamp_tc;
+>  	struct delayed_work	overflow_work;
+> +	const struct mv88e6xxx_cc_coeffs *cc_coeffs;
+>  
+>  	struct ptp_clock	*ptp_clock;
+>  	struct ptp_clock_info	ptp_clock_info;
+> @@ -714,8 +716,6 @@ struct mv88e6xxx_avb_ops {
+>  	int (*tai_write)(struct mv88e6xxx_chip *chip, int addr, u16 data);
+>  };
+>  
+> -struct mv88e6xxx_cc_coeffs;
+> -
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+It is better to put it in the correct place with the first patch,
+rather than move it in the second patch.
 
-    Andrew
+>  	memset(&chip->tstamp_cc, 0, sizeof(chip->tstamp_cc));
+>  	chip->tstamp_cc.read	= mv88e6xxx_ptp_clock_read;
+>  	chip->tstamp_cc.mask	= CYCLECOUNTER_MASK(32);
+> -	chip->tstamp_cc.mult	= ptp_ops->cc_coeffs->cc_mult;
+> -	chip->tstamp_cc.shift	= ptp_ops->cc_coeffs->cc_shift;
+> +	chip->tstamp_cc.mult	= chip->cc_coeffs->cc_mult;
+> +	chip->tstamp_cc.shift	= chip->cc_coeffs->cc_shift;
+
+Once these patches are merged, it would be nice to remove
+chip->tstamp_cc.mult and chip->tstamp_cc.shift and use
+chip->cc_coeffs->cc_mult and chip->cc_coeffs->cc_shift. We don't need
+the same values in two places.
+
+	Andrew
 
