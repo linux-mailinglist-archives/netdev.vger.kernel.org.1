@@ -1,161 +1,123 @@
-Return-Path: <netdev+bounces-133340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD171995B64
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:08:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC69995B67
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:11:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6EBA1C20CDC
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:08:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4930CB20BB6
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B871A217900;
-	Tue,  8 Oct 2024 23:08:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F317321644C;
+	Tue,  8 Oct 2024 23:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQjxh3cK"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Bbm7eZ0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA6D2178FF;
-	Tue,  8 Oct 2024 23:08:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F5F8215011
+	for <netdev@vger.kernel.org>; Tue,  8 Oct 2024 23:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728428923; cv=none; b=iu1ILSElKVzgweLlTlYMiXjllFQj47Dy0B1es83fxtJ8djTQYNdqB13gWmQBAiZ/69dQw7pwTlEU/BSjqCQs4VCKL/SPPnMoGD+dNGThukEfD93XbYa4UlavKAdQQZFm1lBfIJAjUQ7SLrn0W3iIdZ9y52BFqEipv4QLlmqPSTM=
+	t=1728429058; cv=none; b=FSmE929lVMg8GGv/xbMW7QS9pkn/1rJW39g+rkPC+WKuqCHNnciddFJYJ7y4qHvbzvcozLqV7cJ6YpBgWO2Ev12RHSBgp3ygrDVM74tceO/TrMQf8/ajasysTFBDJpWOKU1hLEj1Txlkq8jGwHIin//gOhRLVg//l8kDyZuXNU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728428923; c=relaxed/simple;
-	bh=srZ/Uhr70S2RnP/s0nx9PpuHPHu1mU7k5PbwG8SNTeY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LlW77FwtfX/ttd4Z9wl8ahn6mJgcLlDkWldB5IQpL+abe9werZevsMMWF0hX/4HOydWn6IJO7DP/puC/QWWQhoVbhH3p6dcD6KAykW6tt2nIaUHthInsWlxGAZmY/0HK5hdTGf+GlZfT87bbDWpXRUG8/0xU8Ltvzyas8wUwvbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQjxh3cK; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a34802247eso34820095ab.0;
-        Tue, 08 Oct 2024 16:08:40 -0700 (PDT)
+	s=arc-20240116; t=1728429058; c=relaxed/simple;
+	bh=OrDfRlp1iNBH87y8hqvKBX66BOV7jtvZcKUjL2jvQ9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=euVYD4J3LZOlkkclW6KmkhUpQwlLz1W7a0rHeEaekPvUwrc2Vg2x49DSMzL9KeQiAcCaJOObF51ciqrCRQYKLpVV1z8LC6+TV4UXkmwTcHS2L9xNG1z3G/JsHWyReazwq5FVYagJGiCRZm8DXujoqsMv0udQuLN+MxwyLPrJvjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Bbm7eZ0l; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e0a5088777so4758161a91.2
+        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 16:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728428920; x=1729033720; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lyGxrD+ZOkEIkxHoOi9HvRjk7gMiKGRRO8sZGQYAf0E=;
-        b=jQjxh3cKJOgALVSmODP86g0C0k4EJ7/rTcShmNRTecm5x8LZccUbt+lmCxcDkuEO+s
-         +x6iemP+utTxgwV4AG0rj6AgEEEYjBicKhsLV3vWdr0FRoKwRR8Nry2QvKwurpHv0qR3
-         sK34s24kZEqgRhPLXffAA/2O6cBkdemgo2L1QwreNpRrqZdTzjOBpqILolrAZ73HSMld
-         5eA/cw6ONK030+K1kbMNINTQkfbXIcFhlInl2RYOn55GaNUN/XFx3v/0QoxdbryTgCj0
-         +HD2NHjfVmrV/zKJD+fuoRB33Jkoyq742JbTnSLAtyyxOnkdU0FinRk1wgJPR0OanLcG
-         kHTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728428920; x=1729033720;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1728429057; x=1729033857; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lyGxrD+ZOkEIkxHoOi9HvRjk7gMiKGRRO8sZGQYAf0E=;
-        b=nsyR92p+NgOwZIEj3ummObWX9z2izbd/IvUGeFiI70PcLh0bYSj3m8009T1GHv9DrI
-         bqiUL8+RhpzB+cD99IsM4KAwIKieNjJydVtxbfC60otmiqRATZiTuU9/aK8BmOSxpBXf
-         aR4R9lJVNSIW/4VtNfJduoa47w6ui6iOdS3e01ob/vnDdvkORi0VofQSDzfuc81c0WoM
-         1duFG8UN7CJBoXmbIlpuv2MQPQjfHEvZFmoxmhSgNaSD5wlKh1I2vCzenef4eU4XKBa9
-         wRw6EPLN7qQ07817XSmVlD8fxDZLS1XYa4Qz2d+T+yIeuim6zrzKJ5PMgIw+z2BbMX4K
-         csIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVkFGZvymWzP1TL2Q1LIpeyPsPKydOQdm0EA9D5YjLRmoJELdf0iQ2gcPT+KlZHKXnvMXU=@vger.kernel.org, AJvYcCWKOz0MVz0vZTwJw/EmY2Y3h6819PBJySGMwAr7zL5Le+3PeSVts+GVnP5126g03N59wge9oDQF@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVDFpzL/HXCtjfDW+PY5S+a7dZ2rogEZM9IbA85IXbwxlxOEe8
-	Hg9LiLDEnO0wKuOEdF6EwEGrJ5OGg5XNaPaPsvT8EdbmYOevqqKi+rNGtoINdS8b4lTiaZdVc5F
-	n3M0v7dpar1nt+FQng0iGBSHeDtE=
-X-Google-Smtp-Source: AGHT+IG51EoVP+DmksX2lzgKLLvdHVspXyLGifOooywc0CM6GlITChjrUoYdupOylHuLhxB3Wl3aU8V6fdI+U1+gJ3M=
-X-Received: by 2002:a05:6e02:1d81:b0:3a0:abec:da95 with SMTP id
- e9e14a558f8ab-3a397d19872mr4048755ab.22.1728428920109; Tue, 08 Oct 2024
- 16:08:40 -0700 (PDT)
+        bh=XN6Cw0MLTHJuavZQ2ZdlLC7OXqpw9Yt4DNbtA6+RtoY=;
+        b=Bbm7eZ0lCP2ckU779LKj5Mm0/Oa6Tw3Ah99ilshHAqoKkrufg19mGTdiBLtW90wLYv
+         PS9EZNNy+AJqq5tKSE5jlXxPAuoDHRknwT55qlKiJFr6gs3YpxsjAXDxFQHfLhQqRyCl
+         0A8v2W7eWL+tXNlVa5Fyr7RiCSYsNsfrYyjGs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728429057; x=1729033857;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XN6Cw0MLTHJuavZQ2ZdlLC7OXqpw9Yt4DNbtA6+RtoY=;
+        b=toFfGuimmk/8J0XbZOoXM0Pt4R7ND56aeLwo4H1BST2XTiy3Wlu6+ffNqYJFFSboLb
+         mppgFpc6zNbzi9KF6kdh26B05WWfGR1uoDQojFRVgSdCu//GPxSD4xX/8vdjYy0Eh1In
+         b6MYUBcfJ/0XWImTM0e5NAssa3DGbTSxZ2xDvJ7kHI1r9kRTyyCFxnC8rWAGMNYcxH/I
+         hVu79A8b98g/27izHaF+zxqvRA3617Fjik/Q3wxaVEFE/PRdnt/CpvcdcaN4arpHJSkX
+         AO92svzWLNPVX7dV54P6kH02LpxcgAFMqKlHLrp4rBE1RLDUP0Y2YwXNs7c/x3gYCG8m
+         HaoA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYfobTh5bo/Jyh/0eAZjMJj6SI86SvREMSiD9BY9+Dx9dpOLuMT21FpExlKuX2sIdIKcv909A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6DKUr9c0TsYpsun6prqI3iY9JZ2T7Lf5KdOeB2pPdCStrPHsV
+	VWpU7zubU4fw+GwQTYiIKqkaqCV84HcmoObXgnPUvp0LsSq+T+r6UTSh9oF47i8=
+X-Google-Smtp-Source: AGHT+IGdEM+CgDYtUPFE0hetYr8rtz/LejORp83EfMoPgRqvDg+8LpOI5w8Z/rlAqQNLtKuj8ZnAvQ==
+X-Received: by 2002:a17:90a:bf07:b0:2e2:92cf:69c with SMTP id 98e67ed59e1d1-2e2a24784b8mr685846a91.18.1728429056807;
+        Tue, 08 Oct 2024 16:10:56 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c4d0c801csm19992185ad.22.2024.10.08.16.10.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 16:10:56 -0700 (PDT)
+Date: Tue, 8 Oct 2024 16:10:53 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
+Message-ID: <ZwW7_cRr_UpbEC-X@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <20241008095109.99918-4-kerneljasonxing@gmail.com> <8f35cf0f-c56b-4fd0-93ef-e7e4f1c49dba@linux.dev>
-In-Reply-To: <8f35cf0f-c56b-4fd0-93ef-e7e4f1c49dba@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 9 Oct 2024 07:08:04 +0800
-Message-ID: <CAL+tcoBxdcEyigGjdPLM=LzDwx-q87t+_CewF7PvxRSavi8Utw@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/9] net-timestamp: introduce TS_SW_OPT_CB to
- generate driver timestamp
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241007221603.1703699-1-dw@davidwei.uk>
 
-On Wed, Oct 9, 2024 at 3:13=E2=80=AFAM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 08/10/2024 10:51, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > When the skb is about to send from driver to nic, we can print timestam=
-p
-> > by setting BPF_SOCK_OPS_TS_SW_OPT_CB in bpf program.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   include/uapi/linux/bpf.h       | 5 +++++
-> >   net/core/skbuff.c              | 8 +++++++-
-> >   tools/include/uapi/linux/bpf.h | 5 +++++
-> >   3 files changed, 17 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index 3cf3c9c896c7..0d00539f247a 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -7024,6 +7024,11 @@ enum {
-> >                                        * feature is on. It indicates th=
-e
-> >                                        * recorded timestamp.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_SW_OPT_CB,      /* Called when skb is about to se=
-nd
-> > +                                      * to the nic when SO_TIMESTAMPIN=
-G
-> > +                                      * feature is on. It indicates th=
-e
-> > +                                      * recorded timestamp.
-> > +                                      */
-> >   };
-> >
-> >   /* List of TCP states. There is a build check in net/ipv4/tcp.c to de=
-tect
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index e697f50d1182..8faaa96c026b 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5556,11 +5556,17 @@ static bool bpf_skb_tstamp_tx(struct sock *sk, =
-u32 scm_flag,
-> >               case SCM_TSTAMP_SCHED:
-> >                       cb_flag =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> >                       break;
-> > +             case SCM_TSTAMP_SND:
-> > +                     cb_flag =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
-> > +                     break;
-> >               default:
-> >                       return true;
-> >               }
-> >
-> > -             tstamp =3D ktime_to_timespec64(ktime_get_real());
-> > +             if (hwtstamps)
-> > +                     tstamp =3D ktime_to_timespec64(hwtstamps->hwtstam=
-p);
-> > +             else
-> > +                     tstamp =3D ktime_to_timespec64(ktime_get_real());
->
-> Looks like this chunk belongs to another patch?
+On Mon, Oct 07, 2024 at 03:15:48PM -0700, David Wei wrote:
+> This patchset adds support for zero copy rx into userspace pages using
+> io_uring, eliminating a kernel to user copy.
+> 
+> We configure a page pool that a driver uses to fill a hw rx queue to
+> hand out user pages instead of kernel pages. Any data that ends up
+> hitting this hw rx queue will thus be dma'd into userspace memory
+> directly, without needing to be bounced through kernel memory. 'Reading'
+> data out of a socket instead becomes a _notification_ mechanism, where
+> the kernel tells userspace where the data is. The overall approach is
+> similar to the devmem TCP proposal.
+> 
+> This relies on hw header/data split, flow steering and RSS to ensure
+> packet headers remain in kernel memory and only desired flows hit a hw
+> rx queue configured for zero copy. Configuring this is outside of the
+> scope of this patchset.
 
-Makes sense. I could remove it here and write them when we need to
-implement hwtstamp logic.
+This looks super cool and very useful, thanks for doing this work.
 
-Thanks,
-Jason
+Is there any possibility of some notes or sample pseudo code on how
+userland can use this being added to Documentation/networking/ ?
 
