@@ -1,178 +1,228 @@
-Return-Path: <netdev+bounces-133237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B7B9955F6
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:48:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8B8C99560C
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 19:54:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2B55282009
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:48:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B12C1C249B1
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 17:54:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6288320B209;
-	Tue,  8 Oct 2024 17:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D357320CCD6;
+	Tue,  8 Oct 2024 17:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gmokPjIA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/5sJnpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C9C1E0E0D;
-	Tue,  8 Oct 2024 17:48:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AA41DF75D;
+	Tue,  8 Oct 2024 17:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728409687; cv=none; b=tl/WIXPOh6u4ypccAINwGcWWnLgZGqCkgFEhN/DZglROmM/iZTRwBQWK0uvu4lT7KRPwZPxiJwAnKyt48oufwC+30/Zdu9pg58vxqB7Wo+csqyl4G9Oubhp8smncLmr+FjTr4X8ud/1OXd3jIF+Vf8FrhHgyDihL48UYw0XmYps=
+	t=1728410076; cv=none; b=Va0dSyoDpeY6BB2btyHIEaJ60pvuSo9HP+gjapzBKXen0F8baBLmo9lLxXA7WDT8bSiU+j9IqMCM7OI6q+r2qJKCDaJ+CqbSjSt5CmOlbkBzeQ8CT3SJH7y/imWqy3/DTrP9kTQ1/9pVnnzuRRIBz/qx40a/7ZecyXa5Xw7vETU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728409687; c=relaxed/simple;
-	bh=RgWxgKNOG24VS/qCaBqQTpp+xpNvvfArZGbRGOmvIA8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CnXY+vbuybwPC/cZkFm9KUZgCRSGi4KafMl0me/aVgGy8uQa4OP5xRRwf8Th80khCb8lEEWKDQqnndXTgyCFeo6Q8QjTpFgS8bqyAGdEzBMrP6K9wS33wBS6X7ptIPNB2fnHWYuomG/WasXmPOJqhEPru4mmq532dOKj1Zr4NOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gmokPjIA; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1728410076; c=relaxed/simple;
+	bh=Bv9fMiN54E0Kkjoe1UdCXQUuxnMPqO4c7Y8+ivYX/ZY=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BiBZbKwYGnX42dVAAhzqKySzqz1kWWoU7ukFRR7IT0GkLKLQ7L76PhvNMY9NqCZgdGP0lZl2bCSkbtqWZ9zQPhU7p3uCpc94vrDEu2jC5MoUPccOk8OslI9hTx8Xw83bzGcZ8nZ3E6LLqDFeKgFAdCqipKJN604yasmUjXCflGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/5sJnpI; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42cba8340beso296395e9.1;
+        Tue, 08 Oct 2024 10:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728409686; x=1759945686;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Zf9YAPZnVHLiv61BoxQUx3KbaKBkOZlqQ4LrmxK5WSk=;
-  b=gmokPjIAgmTJwyzYSlSqmD0/XLuybDK8KVnoNTC/Cx2JxYeeMt+jQatm
-   5u/WcSuRpm/aPltEkS2cNRhq91/r9BgBa+bi1izIwpsX9mCZbVHppDNgW
-   fbkUMoN82COf08nGUPqKvFhNPVGr8BZ8cuECyD8Du/KME0aQdbfq4Z83O
-   k=;
-X-IronPort-AV: E=Sophos;i="6.11,187,1725321600"; 
-   d="scan'208";a="237721142"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2024 17:48:03 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:33737]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.23:2525] with esmtp (Farcaster)
- id 064efbfd-710e-439c-af15-e93a74588667; Tue, 8 Oct 2024 17:48:01 +0000 (UTC)
-X-Farcaster-Flow-ID: 064efbfd-710e-439c-af15-e93a74588667
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 8 Oct 2024 17:48:01 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 8 Oct 2024 17:47:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <alexandre.ferrieux@gmail.com>
-CC: <alexandre.ferrieux@orange.com>, <edumazet@google.com>,
-	<horms@kernel.org>, <netdev@vger.kernel.org>, Johannes Berg
-	<johannes@sipsolutions.net>, <linux-wireless@vger.kernel.org>,
-	<kuniyu@amazon.com>
-Subject: Re: RFC: Should net namespaces scale up (>10k) ?
-Date: Tue, 8 Oct 2024 10:47:51 -0700
-Message-ID: <20241008174751.2995-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
-References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
+        d=gmail.com; s=20230601; t=1728410073; x=1729014873; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=siLQZ6ACpRPUiQZUIGdfiGQ0P00Sl7v6O1f0GY3NWZE=;
+        b=c/5sJnpIyuuFWVl8P4sRwXJTLBB46cSSIfp4uBL7aolZWeS9EyBl81BaVBwh4qXjfP
+         gh7Ty1AD6Tr5dd1WTYA9sG9mLsyFtrI1JjAbAxQB6FPKmToqcqZjhNhhhD6LZ8rm5INp
+         1dc5Np7t6Tkt9zsZlQDRzqSyycMdKRwdxmgW8pEw/uZaf1C7rRehuQIgBNemGoK07T0e
+         uZSthxk7fjXf1moGJj0nKw9KLV8uUIsGyPYIU0TKXiTjyqYYKHtkSA3DwvgM7I2jcfxM
+         dbOvtgvwQ+183DnwLYY4ufHaT2qNhLfT7U3nnq21oQZnQPiUV/3ftZgUCcJ6Zbb2vLMp
+         ohZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728410073; x=1729014873;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=siLQZ6ACpRPUiQZUIGdfiGQ0P00Sl7v6O1f0GY3NWZE=;
+        b=VKBHX36lxoW0JZrm0bOO1gskYQEyRnFlReetUCr7IYqYCyWP1acc0svRiMS8/zHBuY
+         j7eFLwqLHescvnbOgOlA+gn3+GaHzWd9NrA0iO2NUuQ0YmqZJPQQPylEL+rXZdfLsF8Z
+         lffwAJF+Rg/Vws0adN6vX+03HgWoUXfe873kZshEmfSFdn8tpucGhLHB4YhgWxoIzbsl
+         badnCpO3ENLnPRdmn5ntZK6xsyC9t+05OviydU5rrcltKo5YWQL56Fw2OSC38p7ZCT19
+         g1wDYgJG60lCFEtzog/6eSyJ0p5y3yldoQezv6OQA/F3RquGazLjSMk9kjA3gNJCUjG0
+         oYYg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFqyL1NWNZlVk2mZgMK4VX3nNzqVzdJmn2hNjWVeIfGKvP6mSQUFyv8tX+11QGUWzzx9c=@vger.kernel.org, AJvYcCVD3GKz63iFERHYwz6qobhyLAf78BsKVwd2rFKypatndLCe+UzqOWKkT8TO6LAATww5+CUWNznC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5XEFO86T8/9bGaohPNyofOQEYnYH9cfEeT+76XMTGgyqj6+HB
+	4z9+r0Vr0PDGzd3WU25aIR7ZVVz9v61cHoSygpxt9fFhVBNdO/q7
+X-Google-Smtp-Source: AGHT+IFSkRDfpR16LGykBW7umn5eUqaHRlfdsi44vM9LmIpteO5uZqlu5mLpxT1al/YFR/IKpUjoeg==
+X-Received: by 2002:a05:600c:1c8b:b0:430:4db2:2b88 with SMTP id 5b1f17b1804b1-43057b639b3mr7847275e9.5.1728410072913;
+        Tue, 08 Oct 2024 10:54:32 -0700 (PDT)
+Received: from krava (ip-94-113-247-30.net.vodafone.cz. [94.113.247.30])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f86b4affesm134999175e9.47.2024.10.08.10.54.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 10:54:32 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Tue, 8 Oct 2024 19:54:30 +0200
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
+	Simon Sundberg <simon.sundberg@kau.se>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bpf 3/4] selftests/bpf: Provide a generic [un]load_module
+ helper
+Message-ID: <ZwVx1qFvDQXuUbIz@krava>
+References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
+ <20241008-fix-kfunc-btf-caching-for-modules-v1-3-dfefd9aa4318@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB002.ant.amazon.com (10.13.139.185) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <20241008-fix-kfunc-btf-caching-for-modules-v1-3-dfefd9aa4318@redhat.com>
 
-+Johannes and wireless ML.
+On Tue, Oct 08, 2024 at 12:35:18PM +0200, Toke Høiland-Jørgensen wrote:
+> From: Simon Sundberg <simon.sundberg@kau.se>
+> 
+> Generalize the previous [un]load_bpf_testmod() helpers (in
+> testing_helpers.c) to the more generic [un]load_module(), which can
+> load an arbitrary kernel module by name. This allows future selftests
+> to more easily load custom kernel modules other than bpf_testmod.ko.
+> Refactor [un]load_bpf_testmod() to wrap this new helper.
+> 
+> Signed-off-by: Simon Sundberg <simon.sundberg@kau.se>
+> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
 
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Date: Sun, 15 Sep 2024 22:49:22 +0200
-> (thanks Simon, reposting with another account to avoid the offending disclaimer)
-> 
-> Hi,
-> 
-> Currently, netns don't really scale beyond a few thousands, for
-> mundane reasons (see below). But should they ? Is there, in the
-> design, an assumption that tens of thousands of network namespaces are
-> considered "unreasonable" ?
-> 
-> A typical use case for such ridiculous numbers is a tester for
-> firewalls or carrier-grade NATs. In these, you typically want tens of
-> thousands of tunnels, each of which is perfectly instantiated as an
-> interface. And, to avoid an explosion in source routing rules, you
-> want them in separate namespaces.
-> 
-> Now why don't they scale *today* ? For two independent, seemingly
-> accidental, O(N) scans of the netns list.
-> 
-> 1. The "netdevice notifier" from the Wireless Extensions subsystem
-> insists on scanning the whole list regardless of the nature of the
-> change, nor wondering whether all these namespaces hold any wireless
-> interface, nor even whether the system has _any_ wireless hardware...
-> 
->         for_each_net(net) {
->                 while ((skb = skb_dequeue(&net->wext_nlevents)))
->                         rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
->                                     GFP_KERNEL);
->         }
->
+Acked-by: Jiri Olsa <jolsa@kernel.org>
 
-Alex forwarded this mail to me and asked about 1.
+jirka
 
-I checked 8bf862739a778, but I didn't see why wext_netdev_notifier_call()
-needs to iterate all netns.
-
-Is there a case where flushing messages in the notified dev's netns is not
-enough for wext dev ?
-
----8<---
-diff --git a/net/wireless/wext-core.c b/net/wireless/wext-core.c
-index 838ad6541a17..d4b613fc650c 100644
---- a/net/wireless/wext-core.c
-+++ b/net/wireless/wext-core.c
-@@ -343,17 +343,22 @@ static const int compat_event_type_size[] = {
- 
- /* IW event code */
- 
--void wireless_nlevent_flush(void)
-+static void wireless_nlevent_flush_net(struct net *net)
- {
- 	struct sk_buff *skb;
-+
-+	while ((skb = skb_dequeue(&net->wext_nlevents)))
-+		rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
-+			    GFP_KERNEL);
-+}
-+
-+void wireless_nlevent_flush(void)
-+{
- 	struct net *net;
- 
- 	down_read(&net_rwsem);
--	for_each_net(net) {
--		while ((skb = skb_dequeue(&net->wext_nlevents)))
--			rtnl_notify(skb, net, 0, RTNLGRP_LINK, NULL,
--				    GFP_KERNEL);
--	}
-+	for_each_net(net)
-+		wireless_nlevent_flush_net(net);
- 	up_read(&net_rwsem);
- }
- EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
-@@ -361,6 +366,8 @@ EXPORT_SYMBOL_GPL(wireless_nlevent_flush);
- static int wext_netdev_notifier_call(struct notifier_block *nb,
- 				     unsigned long state, void *ptr)
- {
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+
- 	/*
- 	 * When a netdev changes state in any way, flush all pending messages
- 	 * to avoid them going out in a strange order, e.g. RTM_NEWLINK after
-@@ -368,7 +375,7 @@ static int wext_netdev_notifier_call(struct notifier_block *nb,
- 	 * or similar - all of which could otherwise happen due to delays from
- 	 * schedule_work().
- 	 */
--	wireless_nlevent_flush();
-+	wireless_nlevent_flush_net(dev_net(dev));
- 
- 	return NOTIFY_OK;
- }
----8<---
+> ---
+>  tools/testing/selftests/bpf/testing_helpers.c | 34 +++++++++++++++++----------
+>  tools/testing/selftests/bpf/testing_helpers.h |  2 ++
+>  2 files changed, 24 insertions(+), 12 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/testing_helpers.c b/tools/testing/selftests/bpf/testing_helpers.c
+> index d3c3c3a24150f99abd13ecb7d7b11d8f7351560d..5e9f16683be5460b1a295fb9754df761cbd090ea 100644
+> --- a/tools/testing/selftests/bpf/testing_helpers.c
+> +++ b/tools/testing/selftests/bpf/testing_helpers.c
+> @@ -367,7 +367,7 @@ int delete_module(const char *name, int flags)
+>  	return syscall(__NR_delete_module, name, flags);
+>  }
+>  
+> -int unload_bpf_testmod(bool verbose)
+> +int unload_module(const char *name, bool verbose)
+>  {
+>  	int ret, cnt = 0;
+>  
+> @@ -375,11 +375,11 @@ int unload_bpf_testmod(bool verbose)
+>  		fprintf(stdout, "Failed to trigger kernel-side RCU sync!\n");
+>  
+>  	for (;;) {
+> -		ret = delete_module("bpf_testmod", 0);
+> +		ret = delete_module(name, 0);
+>  		if (!ret || errno != EAGAIN)
+>  			break;
+>  		if (++cnt > 10000) {
+> -			fprintf(stdout, "Unload of bpf_testmod timed out\n");
+> +			fprintf(stdout, "Unload of %s timed out\n", name);
+>  			break;
+>  		}
+>  		usleep(100);
+> @@ -388,41 +388,51 @@ int unload_bpf_testmod(bool verbose)
+>  	if (ret) {
+>  		if (errno == ENOENT) {
+>  			if (verbose)
+> -				fprintf(stdout, "bpf_testmod.ko is already unloaded.\n");
+> +				fprintf(stdout, "%s.ko is already unloaded.\n", name);
+>  			return -1;
+>  		}
+> -		fprintf(stdout, "Failed to unload bpf_testmod.ko from kernel: %d\n", -errno);
+> +		fprintf(stdout, "Failed to unload %s.ko from kernel: %d\n", name, -errno);
+>  		return -1;
+>  	}
+>  	if (verbose)
+> -		fprintf(stdout, "Successfully unloaded bpf_testmod.ko.\n");
+> +		fprintf(stdout, "Successfully unloaded %s.ko.\n", name);
+>  	return 0;
+>  }
+>  
+> -int load_bpf_testmod(bool verbose)
+> +int load_module(const char *path, bool verbose)
+>  {
+>  	int fd;
+>  
+>  	if (verbose)
+> -		fprintf(stdout, "Loading bpf_testmod.ko...\n");
+> +		fprintf(stdout, "Loading %s...\n", path);
+>  
+> -	fd = open("bpf_testmod.ko", O_RDONLY);
+> +	fd = open(path, O_RDONLY);
+>  	if (fd < 0) {
+> -		fprintf(stdout, "Can't find bpf_testmod.ko kernel module: %d\n", -errno);
+> +		fprintf(stdout, "Can't find %s kernel module: %d\n", path, -errno);
+>  		return -ENOENT;
+>  	}
+>  	if (finit_module(fd, "", 0)) {
+> -		fprintf(stdout, "Failed to load bpf_testmod.ko into the kernel: %d\n", -errno);
+> +		fprintf(stdout, "Failed to load %s into the kernel: %d\n", path, -errno);
+>  		close(fd);
+>  		return -EINVAL;
+>  	}
+>  	close(fd);
+>  
+>  	if (verbose)
+> -		fprintf(stdout, "Successfully loaded bpf_testmod.ko.\n");
+> +		fprintf(stdout, "Successfully loaded %s.\n", path);
+>  	return 0;
+>  }
+>  
+> +int unload_bpf_testmod(bool verbose)
+> +{
+> +	return unload_module("bpf_testmod", verbose);
+> +}
+> +
+> +int load_bpf_testmod(bool verbose)
+> +{
+> +	return load_module("bpf_testmod.ko", verbose);
+> +}
+> +
+>  /*
+>   * Trigger synchronize_rcu() in kernel.
+>   */
+> diff --git a/tools/testing/selftests/bpf/testing_helpers.h b/tools/testing/selftests/bpf/testing_helpers.h
+> index d55f6ab124338ccab33bc120ca7e3baa18264aea..46d7f7089f636b0d2476859fd0fa5e1c4b305419 100644
+> --- a/tools/testing/selftests/bpf/testing_helpers.h
+> +++ b/tools/testing/selftests/bpf/testing_helpers.h
+> @@ -38,6 +38,8 @@ int unload_bpf_testmod(bool verbose);
+>  int kern_sync_rcu(void);
+>  int finit_module(int fd, const char *param_values, int flags);
+>  int delete_module(const char *name, int flags);
+> +int load_module(const char *path, bool verbose);
+> +int unload_module(const char *name, bool verbose);
+>  
+>  static inline __u64 get_time_ns(void)
+>  {
+> 
+> -- 
+> 2.47.0
+> 
 
