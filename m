@@ -1,174 +1,119 @@
-Return-Path: <netdev+bounces-133354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9C2995BA4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:28:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED26995BA7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AABBB22CEA
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:28:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA11C1F25237
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 23:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885E221791B;
-	Tue,  8 Oct 2024 23:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EB982141A6;
+	Tue,  8 Oct 2024 23:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EbS+n4nR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlAIqGmL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DB52178FE;
-	Tue,  8 Oct 2024 23:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB96192B6F;
+	Tue,  8 Oct 2024 23:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728430097; cv=none; b=H3KNXC66XFkk8UO+2g6IUoTfi34R6ELU1eM5qA1N6y8tv1FbEndjEEyIi5ufYwNHdwZ/w/T2WWeV08FJdseXPhaNjNmlRUT6M0KtD7NFC4l+KXmQDiDbiZPrPwZtYbUM7uxWmECt4QKFJO7i/NPmt1SVwFjXPheIVpd4vkn9DUU=
+	t=1728430255; cv=none; b=Ooc/znZRA1yogIF4KsXg1c8lnhSDc1iDAouMEeDQunqW3AtLuANy1dTJMlmAY+KhBNzmbcf+P9UrnHO0315XMAAcHRu8BXiCYvf34bDPOUQD9YSKd1PHQuLQkKNu7B4VxEljTQrNeKaw0W2VfaVOr7agLB+Cd+fHwHh+X5CdfAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728430097; c=relaxed/simple;
-	bh=nLL/p/2e52NVIaX0e8HX/qHox/VKxcmsARraMumXAKU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q0Z3oqF4uzsZyiC4wQWnxATEgMSdxVxy+2UbYMTFoMyTuKTHYsy1+G/3lhtlcufPSh0vqz9v3ScatPc822Iczm/NZuwa9yMeuc/68ftMh/Jom8OM59SxmpCP5Qych6equ7cv1w0zMucUqmHOqNnLjApK5q5bYrkedcl/PY+M+B8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EbS+n4nR; arc=none smtp.client-ip=209.85.166.180
+	s=arc-20240116; t=1728430255; c=relaxed/simple;
+	bh=2+cfVs98NAbMVMei9tVtS/3Ha5ACjYkKn/NQ7+yiwVs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mK02L4AJnYXDIjQvlZORzlLtXNL1ZYrL+Zmk1jlAWDkkWaSE3A5vkDl4QoJY2Grt5jv3UxH3eSKcfmlX+8/Tjzep1kC6HtolEzpayest2X3FnrNkbQkfe2QC40lEQeQNjUZG/Fqoz2aR3lH9P/DrlVckL8WZ1xdg2aiuEAyG+Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlAIqGmL; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-37636c3872bso20291145ab.3;
-        Tue, 08 Oct 2024 16:28:15 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-718e9c8bd83so182054b3a.1;
+        Tue, 08 Oct 2024 16:30:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728430095; x=1729034895; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hx7zye3cnljlInNHTYIeTXJ6WNf7NduswCnrK2MuPTI=;
-        b=EbS+n4nRO0rzaqrRj4p23JLJ55bsxYb8BuyQf03Sh0on0s6hlLTJldpkDkxJdVtwO6
-         NRca6uFLRtPVBqe8cRODwK0z+eR/cyWttpxMGGnxjdql73HcIlhkcNKB8jWE4ReH7Pnf
-         fDcwHHwO31Eg7+KPc1B/xoKhbV3pxqG/KtCcNHFNl+CgqiDedUv43OowhYfaTendwwP9
-         NPna0UQhaYEG6BbyFoS67KEw51qGfhnk0tzwD/gATr2as5PFQ1RIibBb8jWP/2YBg01W
-         USzfd0iWUQVaTzugFyIEyUNH30Zkm/e/NHNQ5Bft6NqXeametD8F9OTfHjV4Jq9nKYah
-         G99w==
+        d=gmail.com; s=20230601; t=1728430253; x=1729035053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W8h4OuAkaeKlVdzZdGipoiLGad1VH1PX/36iQieLhsE=;
+        b=DlAIqGmLxdEN5LOd1kunM86lixpYAED9TvrKDVhAC3fVDCcvqt7qD7qiFSQF/peu8p
+         RgS2Sk/dqSYsTmEwfmsNXnKsiO8qXFknoy60F+G64TC3fCuA5ODpbzYI3UXmr5ZrUP17
+         xtrEhgyLpHoVTL8174d0oqPc++vJdSPNdIt5XPH9h7GTnKdyK/PrV9AFDNSkLj+YXbu8
+         fnS2KIq/lsEaNtjXmbTOtYPUbgfeu35LBBsZqG+nSY0aNMikpo0R4R//3Mnx+cGrc1et
+         qLpcx/BudrBNr6MwDNrpUY0X7FRKaO5JtU2Ce3zmK0BzD/KM5TkPnUJINmMTZQ2urm2j
+         Zjhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728430095; x=1729034895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hx7zye3cnljlInNHTYIeTXJ6WNf7NduswCnrK2MuPTI=;
-        b=PGyDnZXuSKlxful0J04zIA3nUybY0BBpbBhVsXgCNgjNTN8TYlgzHUfdsr3cvZpmqx
-         vIr1feYOOxM3BLz3EEHuEoJU6zUxYiNIDmRySFwLSMF0E+OV3fCSS6fJ4xsmeqKiMLpL
-         m6VVk7HthewviK9kHuXx1RRAVcwsLd89T3toLOxkPwPc8um9EkkJqsdIIBtFqZrJOFpN
-         JiFrHtn7Lu5jIUek0+giTmI27smPJ5oMFxCSr++i1VxTcMlLU97nPSDAeXBVuUI03zKC
-         jx8MDD94oGZ120x81jdQkGRJ4gV1J6UutvDpmUETjCT1Lib/ZOmDwpyM/mGpoNkwBE6i
-         RpmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrquffXnHGBaxz2H7oAN9rmpHeQMZ4gkuNmErlipxqvaGTDuXsRx9uxpf8vaforBd2kvIz6Ujd@vger.kernel.org, AJvYcCUssUQ2icGpR1itl6PUri2Jp6vlUeRXQaw/RxX30jg4Oh3kqcc9QdmWUFA/+ZTv1SwJ5YU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyusRWifD8JY/fRjmKXPSOxdidxunAjoCdwt24sMDK6Im6SQqd
-	h1gO4A7MTHsqMzctwrInLstEYH6CbpQriU+BtlueyaeucLwdBhSNd/uisO1rvh56ysYFg8TO3WU
-	ffTP/g3p9YVdYlKedwexdGnc6Tlg=
-X-Google-Smtp-Source: AGHT+IFyQ78KSyq1si+/WqCze5UiUsG630xaDeTIdmVAp7z/O4LhldI0d32dIF5XU6iFZN+QfwKl/js+3b6YGdYe7Go=
-X-Received: by 2002:a05:6e02:1ca1:b0:3a0:4a91:224f with SMTP id
- e9e14a558f8ab-3a397ce85b3mr5026325ab.1.1728430095097; Tue, 08 Oct 2024
- 16:28:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728430253; x=1729035053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W8h4OuAkaeKlVdzZdGipoiLGad1VH1PX/36iQieLhsE=;
+        b=LD6PQJ9V2Sk8d77EyAxLTMeoRTlN8vdm1vKp7uEeAemDTC/klgyj+DX+rE5+4uxnkm
+         gobIVx81HVGKp7AobF2tmR5THoNw/bLK2PR5LpcR5gMX9Mobc6ExsXd5TGRHQ7UXU2kX
+         y2zIGETfugYLx4iNQ7wUdFdG4TIcwaSFADlr8OqGxzYp1YTP/lf9vFrgeCqnqt5S4EYM
+         ZSP/kuVTr7v2PbNwm8B3cSsCJVCKfMWoVYC6wcgI1CmrHJWR2BE+FTqO5Zi8071jkSTm
+         lwXFXlo6Wit7Ps5dax202HvmWrLKGe8RbA1fWQpHe4IVVKXk/9k6qQc66jzLsTAL4cKJ
+         6Pig==
+X-Forwarded-Encrypted: i=1; AJvYcCXMhEeekRnz70Fxc77YIvGL3CehMdVmPcJHjUNazdRzr8X4EhK1rOu1St/y4so1e1sBq5LCl15Sfd2X51g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHuybKfSoYCuj3Rvs13Fmq0KDLOOkNhVVoW+GJSRa3XmSvCwON
+	DFHSNM9JE8DOBAiGlchWg5z760ZlSX/vL6VvllEsd1AaiESM1+Ui+79kDVRC
+X-Google-Smtp-Source: AGHT+IH2YC4dLf7BX27VSYGuwuKPHmzw9NZyrrR42wywP8BQi2byS3lvz9tj6mcmP5jXwA9w3s/ZFA==
+X-Received: by 2002:a05:6a21:501:b0:1d5:377c:2244 with SMTP id adf61e73a8af0-1d8a35300b4mr952450637.20.1728430253108;
+        Tue, 08 Oct 2024 16:30:53 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d7b9e1sm6670000b3a.188.2024.10.08.16.30.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 16:30:52 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rosen Penev <rosenp@gmail.com>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>,
+	Breno Leitao <leitao@debian.org>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	David Gibson <david@gibson.dropbear.id.au>,
+	Jeff Garzik <jeff@garzik.org>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net] net: ibm: emac: mal: add dcr_unmap to _remove
+Date: Tue,  8 Oct 2024 16:30:50 -0700
+Message-ID: <20241008233050.9422-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <20241008095109.99918-2-kerneljasonxing@gmail.com> <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 9 Oct 2024 07:27:38 +0800
-Message-ID: <CAL+tcoALeCguB0+HpTq+MHitHZft3drF5OunPh1Qme8XGifiNw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/9] net-timestamp: add bpf infrastructure to
- allow exposing more information later
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 9, 2024 at 2:45=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Implement basic codes so that we later can easily add each tx points.
-> > Introducing BPF_SOCK_OPS_ALL_CB_FLAGS used as a test statement can help=
- use
-> > control whether to output or not.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  include/uapi/linux/bpf.h       |  5 ++++-
-> >  net/core/skbuff.c              | 18 ++++++++++++++++++
-> >  tools/include/uapi/linux/bpf.h |  5 ++++-
-> >  3 files changed, 26 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index c6cd7c7aeeee..157e139ed6fc 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -6900,8 +6900,11 @@ enum {
-> >        * options first before the BPF program does.
-> >        */
-> >       BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG =3D (1<<6),
-> > +     /* Call bpf when the kernel is generating tx timestamps.
-> > +      */
-> > +     BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG =3D (1<<7),
-> >  /* Mask of all currently supported cb flags */
-> > -     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0x7F,
-> > +     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0xFF,
-> >  };
-> >
-> >  /* List of known BPF sock_ops operators.
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 74149dc4ee31..5ff1a91c1204 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -5539,6 +5539,21 @@ void skb_complete_tx_timestamp(struct sk_buff *s=
-kb,
-> >  }
-> >  EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
-> >
-> > +static bool bpf_skb_tstamp_tx(struct sock *sk, u32 scm_flag,
-> > +                           struct skb_shared_hwtstamps *hwtstamps)
-> > +{
-> > +     struct tcp_sock *tp;
-> > +
-> > +     if (!sk_is_tcp(sk))
-> > +             return false;
-> > +
-> > +     tp =3D tcp_sk(sk);
-> > +     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_C=
-B_FLAG))
-> > +             return true;
-> > +
-> > +     return false;
-> > +}
-> > +
-> >  void __skb_tstamp_tx(struct sk_buff *orig_skb,
-> >                    const struct sk_buff *ack_skb,
-> >                    struct skb_shared_hwtstamps *hwtstamps,
-> > @@ -5551,6 +5566,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
-> >       if (!sk)
-> >               return;
-> >
-> > +     if (bpf_skb_tstamp_tx(sk, tstype, hwtstamps))
-> > +             return;
-> > +
->
-> Eventually, this whole feature could probably be behind a
-> static_branch.
+It's done in probe so it should be done here.
 
-You want to implement another toggle to control it? But for tx path
-"BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)"
-works as a per-netns toggle. I would like to know what you exactly
-want to do in the next move?
+Fixes: 1d3bb996 ("Device tree aware EMAC driver")
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: Rebase and add proper fixes line.
+ drivers/net/ethernet/ibm/emac/mal.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks,
-Jason
+diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
+index a93423035325..c634534710d9 100644
+--- a/drivers/net/ethernet/ibm/emac/mal.c
++++ b/drivers/net/ethernet/ibm/emac/mal.c
+@@ -742,6 +742,8 @@ static void mal_remove(struct platform_device *ofdev)
+ 
+ 	free_netdev(mal->dummy_dev);
+ 
++	dcr_unmap(mal->dcr_host, 0x100);
++
+ 	dma_free_coherent(&ofdev->dev,
+ 			  sizeof(struct mal_descriptor) *
+ 			  (NUM_TX_BUFF * mal->num_tx_chans +
+-- 
+2.46.2
+
 
