@@ -1,92 +1,71 @@
-Return-Path: <netdev+bounces-132921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA10993BA0
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:20:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 450BC993BA8
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 02:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE19E283898
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76F231C23EDB
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 00:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8136AA1;
-	Tue,  8 Oct 2024 00:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3451B79C0;
+	Tue,  8 Oct 2024 00:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIDiF6dL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZIJaIsVJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9051520ED;
-	Tue,  8 Oct 2024 00:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A03F6AA1;
+	Tue,  8 Oct 2024 00:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728346827; cv=none; b=fjpqS8LOlq8KAsK0EiahdHBaseVfccMAm7DjPn8R8uwK10fYaZPrwTcJGMc0Bx/0dJytB2j+jiK0s3xzYsB8FJr/jDz3MMPbPq7y8aYsNVVUPDFDltiFhTR9FE2QE7O6g7jWH8m4t8nUZxC0XM5cnDtxwvOQJ6WpELbuw/tcWuc=
+	t=1728346884; cv=none; b=h0BKHwFa2j4K/I1q87xq2uQIhgbCHRchVdZGqNB3Dc1s275kXFjdqohKqAR8YjBM+Mu4gpZQlBgWGhZz+G+aEzTRnOn/OSuMYgpCwG6MP6b1ahYax2fSUVfCf1NgXzYKbxSBu3iZ9UfPTMsk8BdxZ6dH8ebd69zNvqcSlQu93po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728346827; c=relaxed/simple;
-	bh=Q6766DG4cdHnSnIF+A+ih2RPc+QKp2dbPZAGXtcQcR4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=VBfaS+HBHS2XIrc82aQxv7hYDncdRrGg3Njev7XfIW8a29mfG6ROwNFOriPquXidTHpPk+Typzq4ioKj1kqmwqfVDWmBTIXxnUytFvleU8xcSbMILmorHxOBKv76ztOclPYmdQjxKvUko2jIhVVCr3PUjpxcvMILf+NBGeAgPNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIDiF6dL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE91C4CEC6;
-	Tue,  8 Oct 2024 00:20:27 +0000 (UTC)
+	s=arc-20240116; t=1728346884; c=relaxed/simple;
+	bh=KR2Ypbof7fqw9S7256Ff1zDPZlQAMxBLEB5g0hsgCZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V99i9hDteo5FlSQhV/oXTH5M52CYOALkbUoXrPd/jv8pVPf/irtnDwxVQvBuVu085deG+cHeqfzVgG1jV/gZjDGUnfWbBTlHGwnLsvDDZWtqdBA/c5FR/lzcuIZTdi7beGmsvzATpD13aASFETjP7chUaZ5MCHeHraRgLJVCoqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZIJaIsVJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25CA7C4CEC6;
+	Tue,  8 Oct 2024 00:21:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728346827;
-	bh=Q6766DG4cdHnSnIF+A+ih2RPc+QKp2dbPZAGXtcQcR4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IIDiF6dLEl+ECBfiqqtpt0B9x6Gj78IeYaNMeKU8n4gBia9jwiWWTHIOMnvr73epn
-	 v4uuj1eTCzW5lDkWraUhX9GwUEF4uxGmgG+93TD+g9akzuNiIYOc+Fn22x0uF8Jyni
-	 nAi8Koff6ciCxNb57jQ6QdRqSft/17o69xCNAp0a5soF8jfB93LPERPyUxH6EW7bR6
-	 ak/pBJaqaOsLsrXm61BwDM8ENWIVZdx5V5vmcyYRpT3SMTjDoR3aHFL4szGWBML5Fp
-	 lXYHsfNZRB7F0hgHV5lQJQXTLngSauJHVxihzwL/mPS8s6/bzu+HU78/aDwxA9mLMx
-	 zBBClnUamWEbg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D2C3803262;
-	Tue,  8 Oct 2024 00:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1728346883;
+	bh=KR2Ypbof7fqw9S7256Ff1zDPZlQAMxBLEB5g0hsgCZo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZIJaIsVJ34+zdvuDnp7Dl5OPRS+eCx1i1ukMtkrah40cZotU6y8j/g+TEThMc+tCe
+	 b7pE/vOVrW586WGd/3bDUrjo/01jyylT1aW4pMy0B2EeUg37dk8/tvHkwm66Nvu931
+	 mpdoUBMIcEpWR4Aik/MWyafpQLMIGxUOzjS7t2AaMdPkhU3HYf8YOzo8wIxrvsCoCZ
+	 2llvApPIA+HH40GNRXRXcXrXy6NAg9bMjuHLfgDE+lQj02pxS8dit2uKmyi86WBQLu
+	 i5he+pxrUwEvMYEs0RbZF6VnhVEaEbORc1g1HM+3aPXa7shG3nhGEavMTewubOzxyd
+	 yv7fm8sWXMu/Q==
+Date: Mon, 7 Oct 2024 17:21:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net,
+ chunkeey@gmail.com
+Subject: Re: [PATCH net] net: ibm: emac: mal: add dcr_unmap to _remove
+Message-ID: <20241007172122.6624c1ec@kernel.org>
+In-Reply-To: <20241007203923.15544-1-rosenp@gmail.com>
+References: <20241007203923.15544-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-10-04
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172834683125.26998.2164850499316241911.git-patchwork-notify@kernel.org>
-Date: Tue, 08 Oct 2024 00:20:31 +0000
-References: <20241004210124.4010321-1-luiz.dentz@gmail.com>
-In-Reply-To: <20241004210124.4010321-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  4 Oct 2024 17:01:24 -0400 you wrote:
-> The following changes since commit 500257db81d067c1ad5a202501a085a8ffea10f1:
+On Mon,  7 Oct 2024 13:39:23 -0700 Rosen Penev wrote:
+> Fixes: 1ff0fcfcb1a6 ("ibm_newemac: Fix new MAL feature handling")
 > 
->   Merge branch 'ibmvnic-fix-for-send-scrq-direct' (2024-10-04 12:04:12 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-04
-> 
-> [...]
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 
-Here is the summary with links:
-  - pull request: bluetooth 2024-10-04
-    https://git.kernel.org/netdev/net/c/f61060fb29e5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I'll fix this one when applying but please make sure there is no empty
+lines between tags in the future.
 
