@@ -1,112 +1,111 @@
-Return-Path: <netdev+bounces-133110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CBD9994E6A
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:17:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7388D994E3F
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 15:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C473FB248D9
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:14:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56FF1C23E80
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 13:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832461DEFC9;
-	Tue,  8 Oct 2024 13:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C911DEFC9;
+	Tue,  8 Oct 2024 13:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEvV+gp7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fT18YtRT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57041DE4CD;
-	Tue,  8 Oct 2024 13:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90E116FF26;
+	Tue,  8 Oct 2024 13:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728393222; cv=none; b=oebKCnplskjBPPi038xXHt9VJTuN3ygJnBc1QKevULC2xg1vcvE49bLbUAU1GFqxwiEMOVlzXNxcfmd9K5M4RDgj4hrzMD5W6K5lVkXydeRtDvFiT8BaVwnuAnR/JEkECSBTeBd6XiunzeEFpeM4fJh5BnM4aHmoKae5fIROGdw=
+	t=1728393260; cv=none; b=DctJgiNnDHyc/I3d9CSIgPvIdf2FrT6Bk02zXKM3VnhqIEIOWpTzh2IZXpz4LF0SAB988dYEvNQujUoObLn0aWNReWTJih7mvuaWzirjvdYrCoewstMfqoc5t6fR66Nv0eLxRdWpuh6j6l8AENj1lBXYwi6ayntUu/lnw+wIqrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728393222; c=relaxed/simple;
-	bh=HB2X+1cgA42e71mYG+axOAoHb2tW9up9sEJ3ZOfoDyU=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n0hdsv/NVU8RzWjHxjoDjohakH3LqHCp9IJrVCYwC8q0jkuoG0jhO3f0cqVKtu3hwhAdOwrnyaEeAhonwvqhAdL3vKHjynQXLDM3iFlosAdiotppqlnQ/dxgxGHT4V9KcVDxLbHqNtD0wz2hHqP4WMgrafoRpDzLna6asUH9dsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEvV+gp7; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1728393260; c=relaxed/simple;
+	bh=NMxQjc2T8csseIw5lnqI5Gms21LeoC5nw88NrOvZtiQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K/feyX7Hmy0jvxgBC4km9KiT662xDyCisD+0+R9G5IdI/iWV1JDvYnBy9Y0me/rdK6c7/6uQr6T0HK2M6W3nbfUFRmcc2izgLZ7CrEx4yepMchFL/V9uvsRVeTty2peUlnYizZdx3knxYO3UnDxBxnpDGtBNKkUO56QMF+N+U1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fT18YtRT; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cc43454d5so45098795e9.3;
-        Tue, 08 Oct 2024 06:13:40 -0700 (PDT)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-717839f9eb6so673843b3a.3;
+        Tue, 08 Oct 2024 06:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728393219; x=1728998019; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=e+3nNuHTEY1yCn0MC03snttILQ8g327zVvBFongvgvc=;
-        b=NEvV+gp7q11y6e2i3CTBtWKSdeIkFV+Ugl9FYA4Y3eSXkA3fNMY73L943vBB47EACW
-         9eNt/b3qUr2qO8Bn0cn79tINbN+3OK2cJ4+WUGriJcd1YWSA+vMAuNARcOGBDS9Da33p
-         pcjajCtXHrSMhRsio7jPvHN+hbyAMrYXoWU7CPNAbAc3X855gZrZQc3w4J+YmFTJkDqA
-         47skLdYJlDJ2W/UO3ile/xO56mRGA1WTJbGZzVLmnJ6BUqt9PMefkm8w4ZhbHAJ2PKS3
-         JRmACtNLZ0LSVWpelYvu76Q59PCFPZSjiPWYq1T6JMO56r2FYf9WndyS6nIF5kljhQtM
-         Z6hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728393219; x=1728998019;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728393258; x=1728998058; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e+3nNuHTEY1yCn0MC03snttILQ8g327zVvBFongvgvc=;
-        b=hSZm4OeBdhBNF6GjdIISX1hiTir6scCz8EixR8KYHrskKW6goK3iBqNXUwGSA+T3oh
-         n9BRVN3BRKEeq0yyKocM1lL+gcYyI8EXC1ngnF5+AwVqcjIEZ9vwhYFK6QOIvwpV/ixm
-         NiYuHGX+LOwJJoRRwyT6C1x+UX4LM+dyKVdBvk2U7X6zuu24UbhIqnVnMC4Mk9iN9dqa
-         uqN4qyNWDtTaefCgEPLm31EHgcdI3FUrV2F3LCwCLlxSNDUyjhfxvMDlW3AGoOSdc6/w
-         eiLmJPmTqpupb052C938eE5nIDkAI/v2Ip2chi8y9dXvAKmyJlMW0PdRg/w5NkHKm+ja
-         6P7A==
-X-Forwarded-Encrypted: i=1; AJvYcCULcA8+vX5Hp6lcXCjfUOYzA9JDkG89uHXRMmx2AJoDXT2fftq16nY/e1WLCw+dN2kwQQzHiAcq@vger.kernel.org, AJvYcCUUU0OHTX9pRTS7Tc6TVCfOM4bjgJDJomVOWhs1eb2NB7dmVMBzTkCwWbKlquw+h+eZNJ+VfaqZVYFj4ow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ9UYYNlz99Kj4iRMWSpmlCziJeuYp+j8VQtBaFR0NURG0OlxJ
-	2TQIKWfPza71BRmDY1I/KODy7ju2E5S1c7GXLwZH8E0wSRJuxEmM
-X-Google-Smtp-Source: AGHT+IE4Stw/XNORaS3bEyUc3ys0SxWN35LG6c+Lgtu04NEpny6nANutfe3eEzGGUtGLdLPaFJt+Ww==
-X-Received: by 2002:a05:600c:c12:b0:42c:ad30:678 with SMTP id 5b1f17b1804b1-42f85aee7efmr98609065e9.28.1728393218749;
-        Tue, 08 Oct 2024 06:13:38 -0700 (PDT)
-Received: from Ansuel-XPS. (93-34-90-105.ip49.fastwebnet.it. [93.34.90.105])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42f89e85dd0sm109746525e9.4.2024.10.08.06.13.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 06:13:38 -0700 (PDT)
-Message-ID: <67053002.050a0220.63ee8.6d11@mx.google.com>
-X-Google-Original-Message-ID: <ZwUv_jkcITPhkEyq@Ansuel-XPS.>
-Date: Tue, 8 Oct 2024 15:13:34 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v2] net: phy: Validate PHY LED OPs presence
- before registering
-References: <20241004183312.14829-1-ansuelsmth@gmail.com>
- <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
+        bh=NMxQjc2T8csseIw5lnqI5Gms21LeoC5nw88NrOvZtiQ=;
+        b=fT18YtRTM/GauX11FhWrJ7wxYEDZLmebbrKa3XstyDMT3mUg1TcjUd/FsHwXezWpVG
+         7r1R3bNkS5y5uT0do6wiSNRqs/gdqtziC3zYcomO/tCd2z8nPn7+Of7xVgO3PLqCe5uY
+         KTe9PrzuDhzz/xQdiUxaPOpiC3lkt3ntmwIHkDj/GlYNLbVCMlnyHXEFvionoM/Ldspm
+         chsfgK1x6/MPRRt4OW8NfkmU4TjbS0/+gzZBPRMNzJVEtOXMIm3TNesCBQhmFv6VgX/F
+         73/1cBrwIVi9lGIgPd9cfrcuWbhICEzsWnogPhub40c8w1CL6y1kERmA/j9EdJfTxBVZ
+         GKow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728393258; x=1728998058;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NMxQjc2T8csseIw5lnqI5Gms21LeoC5nw88NrOvZtiQ=;
+        b=Zkc11njBE3fYR5COe+lPHMZ2QgzuA7pbY58Pa8DvXySPwkS3P7pyB/jvWj23I7Iqr8
+         PNNtezteY6nbFjrYTIa3aE446vvGEm2y9CafkdGxvYn7i1lT8EdMUAYzDeLNep1YEcwC
+         zg5RtsTM7PJJwSaNFDyHLjtBVvWT57KY4Ah8+xBSI0G5Qkhavs8ltPFf+4xNertKJwjh
+         oKmEmj5JakqeJtOIL2MokN0frA/lpYZU1vnTHXSIb1Au2M7L2VQw5iVboSTH6NJ0MPpt
+         Q7Awe1xuVrUNj+ACjsCh9WgOO0f/1RKH5SY4d4SVJYMQL5Qw/JKkWKgqQDRU+g1cIV7D
+         DiFw==
+X-Forwarded-Encrypted: i=1; AJvYcCV2Npxic0tYEDpdG2jf1DSgH4dNNV5llJ1Pe8H6PYEN/Xyy+L+V2R05KQbjC3sKoURRQb/RCXbDohFmzqKNzDU=@vger.kernel.org, AJvYcCVHsuKqeX09qMOpzwBt1rRwemwQt0/P81fMEfKSZgqiMuGYkKY/8SwydjRtQiOf3WgrU+Ui4M0t@vger.kernel.org, AJvYcCX9hP2gs9B5EGLybJ3nYwkgQaccjKOti512DwO20lGT29kr5X6DObMyWtNSxz6VtniFhtUDqLoGvJAakzM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweUS6024j0+Ae1XiIvASJEFVIeYiWa0GlIfMi69n90sR3yysdD
+	Z8+qJSWpW8itNm21maEk0acK9TCinmpNN2Zyhn1+3uGT/roZO6DLJL1FVCZb28t+bg0l72lzXTV
+	CyISdxcqIuHxvmEyUCoWYcWIrxHg=
+X-Google-Smtp-Source: AGHT+IFIuvyES4s9VElGPqNkC2xj2m2K4rPwfHrrItKyso51Yi8CEyESeZiYUdAkjVNkI+7vvtUAuf75lShL5tVVHd0=
+X-Received: by 2002:a05:6a00:84f:b0:71e:1225:77f0 with SMTP id
+ d2e1a72fcca58-71e12257b7fmr1664544b3a.6.1728393258158; Tue, 08 Oct 2024
+ 06:14:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <851ebd20-0f7a-438d-8035-366964d2c4d8@lunn.ch>
+References: <20241005122531.20298-6-fujita.tomonori@gmail.com>
+ <06cbea6a-d03e-4c89-9c05-4dc51b38738e@lunn.ch> <ZwG8H7u3ddYH6gRx@boqun-archlinux>
+ <e17c0b80-7518-4487-8278-f0d96fce9d8c@lunn.ch> <ZwPT7HZvG1aYONkQ@boqun-archlinux>
+ <0555e97b-86aa-44e0-b75b-0a976f73adc0@lunn.ch> <CAH5fLgjL9DA7+NFetJGDdi_yW=8YZCYYa_5Ps_bkhBTYwNCgMQ@mail.gmail.com>
+ <ZwPsdvzxQVsD7wHm@boqun-archlinux> <5368483b-679a-4283-8ce2-f30064d07cad@lunn.ch>
+ <ZwRq7PzAPzCAIBVv@boqun-archlinux> <c3955011-e131-45c9-bf74-da944e336842@lunn.ch>
+In-Reply-To: <c3955011-e131-45c9-bf74-da944e336842@lunn.ch>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 8 Oct 2024 15:14:05 +0200
+Message-ID: <CANiq72m3WFj9Eb2iRUM3mLFibWW+cupAoNQt+cqtNa4O9=jq7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/6] rust: Add read_poll_timeout function
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Boqun Feng <boqun.feng@gmail.com>, Alice Ryhl <aliceryhl@google.com>, 
+	FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, hkallweit1@gmail.com, tmgross@umich.edu, 
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 08, 2024 at 03:08:32PM +0200, Andrew Lunn wrote:
-> > +	/* Check if the PHY driver have at least an OP to
-> > +	 * set the LEDs.
-> > +	 */
-> > +	if (!phydev->drv->led_brightness_set &&
-> > +	    !phydev->drv->led_blink_set &&
-> > +	    !phydev->drv->led_hw_control_set) {
-> 
-> I think this condition is too strong. All that should be required is
-> led_brightness_set(). The rest can be done in software.
+On Tue, Oct 8, 2024 at 2:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 >
+> As far as i see, might_sleep() will cause UAF where there is going to
+> be a UAF anyway. If you are using it correctly, it does not cause UAF.
 
-Mhh the idea was really to check if one of the 3 is declared. Ideally to
-future proof case where some led will only expose led_hw_control_set or
-only led_blink_set?
+This already implies that it is an unsafe function (in general, i.e.
+modulo klint, or a way to force the user to have to write `unsafe`
+somewhere else, or what I call ASHes -- "acknowledged soundness
+holes").
 
--- 
-	Ansuel
+If we consider as safe functions that, if used correctly, do not cause
+UB, then all functions would be safe.
+
+Cheers,
+Miguel
 
