@@ -1,98 +1,125 @@
-Return-Path: <netdev+bounces-132992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-132993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505DF994242
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:40:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22ADC9942AA
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 10:49:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 820AB1C20EB1
-	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 08:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5520D1C20DE8
+	for <lists+netdev@lfdr.de>; Tue,  8 Oct 2024 08:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AFE51F4724;
-	Tue,  8 Oct 2024 08:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC911DF96D;
+	Tue,  8 Oct 2024 08:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oARTCco1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8movRQh"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BBC71DACBE;
-	Tue,  8 Oct 2024 08:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4D31DF963;
+	Tue,  8 Oct 2024 08:23:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728375160; cv=none; b=lIDGfUEP7nwwDMuzdLL4dyX4uNq7Osp+MmHvsp/77bYcoLMHHsOzHrr6H2ZUUzoiWHq/81PtRJcAI8KkqtKSmhYwmSsZbPZbPhs8fthPIkG1Y6WAKqzgOl5JaucG0F3mc2t/zHrdGEzIriW4MHXa1Va9EQpIwqkNNR531m6TP08=
+	t=1728375800; cv=none; b=BQds/4d4jKXaS2vaYUumMm5gBHksk7fbtPH5A+jFAbKdoSZFcIB3zJr/rDtos9dknfCbD0BatkSBY7RJSX72Squ+jPaELF7ER3lBj2W4VSLmcfaMuWLUwmG6Qulob1SAW1cYxsXg6j9Cv8YRIeDHF58W2ZeSlLKWxHKwBFoSVqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728375160; c=relaxed/simple;
-	bh=B3ysfxiqFRhVVNCstervNndWXGwXlQgXohHe/DyQ+g8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=titD5ljhx8i8PVLRQCjg/YUVG+IYadTXPd4RYgQpLMrtCoYg/0CgdIFcPC3B0ct4S+2PCG0nOT33gydu1YZgxe4EWw4bPpJm1DlM2n3elgHdegmz8LniextXNY9fQlyGmTe/Im3jZEIw3zF5uccG07nEO3ajl88pAuGR90CZy5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oARTCco1; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 56F2F40005;
-	Tue,  8 Oct 2024 08:12:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728375155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxOr0+Orzjei2/3t3Lr8z6xjWY7VkO+u4ngNgmdCxmk=;
-	b=oARTCco1tu8VcZP2stCjjo6TSwMv7A8HWGKO2gATZmkeIp75C/KpMPHPZuFEIlq9DB7Cj1
-	9uDVKYJD2XG3ktFd7MsS0R2dbXBBxbf6TJT8mRWgw0zZyE433PQ7CDYTYu7kplprzkYbdZ
-	69ifxQMzF/M4jj6qbxv0Ta4vJkn2Jp3eYwWhjbKtroaob067OblmAa86jwxZ9JqgaKi0Xn
-	0bXqR4Tz2REqsdWUP7VfsSD6aQGAMC9bz2qjMRs6KYN92luQEu64YE/UWjQ7nyaag/38Ct
-	AkKFICym00WreIWFMgqqtSEfi42XGF/VCdxYh+ooK58fW5LNvERbf1ctEmstQQ==
-Date: Tue, 8 Oct 2024 10:12:32 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Alexander Aring <alex.aring@gmail.com>, Stefan
- Schmidt <stefan@datenfreihafen.org>, David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
- linux-wpan@vger.kernel.org, kernel-team@cloudflare.com, kuniyu@amazon.com,
- alibuda@linux.alibaba.com
-Subject: Re: [PATCH v2 6/8] net: ieee802154: do not leave a dangling sk
- pointer in ieee802154_create()
-Message-ID: <20241008101232.123389e1@xps-13>
-In-Reply-To: <20241007213502.28183-7-ignat@cloudflare.com>
-References: <20241007213502.28183-1-ignat@cloudflare.com>
-	<20241007213502.28183-7-ignat@cloudflare.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728375800; c=relaxed/simple;
+	bh=RWOAE4MweFGFHqk44mg0r5fF0fKHiALbSiPG95q8K8w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u3aGg9aC5Pkfu6pRv8ioEd+p6Y6cIs3AtBTr8pAVJYujfd9vb547Fx6pjRk/cKWXdBxB5mdPSvCXBy/qqCBmzcam2NYbk3rfFIiqua/0z8glmaYANTzFJrm5IVVlpCDVkoERV6ZxjyZ/4HLBjOEor8pviD2uLug25Y8aImKowf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8movRQh; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7aa086b077so609493866b.0;
+        Tue, 08 Oct 2024 01:23:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728375796; x=1728980596; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=djJAyVG7J3OsehU/h2QIGR2xQex/DGz8ceOHDlVaN1E=;
+        b=S8movRQhPbG75LRnfeTH+7V5eu+iDv6BIV2gdQ4AxkvEs3voquTtigeBsqvZiOvwza
+         hMWYGMGpHUprQlCNLewMUXJLN0iMfOBndi8Nq2Ej/AP18wAQuaqqYyIvtZjBj8vMMYlq
+         DjloSpc0tBz3zqdQxmSWgJJgg17KseIjR9COAOBh3BWXl1btz0x7kvBmd6RAssfBISpa
+         k6t+gcJzr0Ld/fBezkFnxH80wXSLX6+4Yf+edF6+bH7RvLfMta/5hWLANPPNGTJXhy2V
+         uDa5qpDkQHbT1cecmg806Y/5yuolY3nFdDxrqjLxl9SyXh/wbzwC00vDlxDIz5hBmGKD
+         e14Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728375796; x=1728980596;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=djJAyVG7J3OsehU/h2QIGR2xQex/DGz8ceOHDlVaN1E=;
+        b=YMjWVdew31pmSuO7Q7TgMHE4z7/JQ2QL9pBsTxQE+qEN1fZdK2tm2L3tQuPavs/j1h
+         l2xnFNtJ86DbPFLdPCSGL9zXEE/s3nPZrP9DtSqe2Io7HoR0NywIvqWv0sYwt1DaVSUW
+         usEmSzqmseq4LHWJX6yevocg5eRXQVKOChr97Xm7he2yWxShEE8XZXxU5pUzD/aFxAmM
+         LI2djhBRiDCY+PhKpUzXkF14/CPnrpKCXsaLO6C7scZ5sFzp6e0D5x5LvZUZDKSOwj1q
+         dzn+spQZ+Rwevjpk9glkTGQvn7AEwI+AOLGhk09t2z/S52VeIP4fHXexmClPULcjm3jP
+         ygjw==
+X-Forwarded-Encrypted: i=1; AJvYcCU2M0RvqwQHlJX8ZH4bwDiojHXqMb1Ysy2GBqWhFQ5DykpBi4sH1OAMmIs107IpMHUkm5eeE8Ps8sJfHg==@vger.kernel.org, AJvYcCUF7PzoO2N0YlOtaRBZAk8xDUu0Stg1klxRy0FvHzsZzsMEwTYnKY3QnCVUbxl2PtvnRvE5sWcDqc/tPakhIJnR@vger.kernel.org, AJvYcCV3crgU3wlAteP0ZHSU/qAorBqk+8tBCmg1Sbkdf5i6gf5uU54LB/PXIce0ECKjN7D+tCOvj6UL@vger.kernel.org, AJvYcCXHIT9jRgGaBNLVIaiEAWiTs3pBNkV9zw+swFitH2ZVbEpnFJUPc6jVCdcy96G7yQ2En27rUNekDMdcFfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzE1kjN1L9UQohaWoTjYKylfJmyGUoqQ5RLMozijcz6ymQgs+xB
+	YDtX0XZqlXaqCxtKf2lPnRfB0qgIhFu5tmMu88s+1z+RvJ52t5C/HNDURZqS
+X-Google-Smtp-Source: AGHT+IHyysSybHkcoMkwVz5HgbvluJ6B2uGZuT/0p0yQrNdJoaDvn4mWo1AH/YsKGHuikilHJdImCw==
+X-Received: by 2002:a17:907:961e:b0:a99:61cd:3160 with SMTP id a640c23a62f3a-a9961cd3177mr403636566b.14.1728375795790;
+        Tue, 08 Oct 2024 01:23:15 -0700 (PDT)
+Received: from alessandro-pc.station (net-93-66-197-114.cust.vodafonedsl.it. [93.66.197.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9936bc91f4sm445602366b.56.2024.10.08.01.23.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 01:23:15 -0700 (PDT)
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: allison.henderson@oracle.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	anupnewsmail@gmail.com
+Subject: [PATCH] selftests: net: rds: fix module not found
+Date: Tue,  8 Oct 2024 10:22:53 +0200
+Message-ID: <20241008082259.243476-1-alessandro.zanni87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hi Ignat,
+This fix solves this error, when calling kselftest with targets "net/rds":
 
-ignat@cloudflare.com wrote on Mon,  7 Oct 2024 22:35:00 +0100:
+selftests: net/rds: test.py
+Traceback (most recent call last):
+  File "tools/testing/selftests/net/rds/./test.py", line 17, in <module>
+    from lib.py import ip
+ModuleNotFoundError: No module named 'lib'
 
-> sock_init_data() attaches the allocated sk object to the provided sock
-> object. If ieee802154_create() fails later, the allocated sk object is
-> freed, but the dangling pointer remains in the provided sock object, which
-> may allow use-after-free.
->=20
-> Clear the sk pointer in the sock object on error.
->=20
-> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+---
+ tools/testing/selftests/net/rds/test.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
+index e6bb109bcead..112a8059c030 100755
+--- a/tools/testing/selftests/net/rds/test.py
++++ b/tools/testing/selftests/net/rds/test.py
+@@ -14,8 +14,9 @@ import sys
+ import atexit
+ from pwd import getpwuid
+ from os import stat
+-from lib.py import ip
+ 
++sys.path.append("..")
++from lib.py.utils import ip
+ 
+ libc = ctypes.cdll.LoadLibrary('libc.so.6')
+ setns = libc.setns
+-- 
+2.43.0
 
-Thanks,
-Miqu=C3=A8l
 
