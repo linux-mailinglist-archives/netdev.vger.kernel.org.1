@@ -1,185 +1,168 @@
-Return-Path: <netdev+bounces-133875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED266997517
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:47:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ACB9997519
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:50:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94B042848BC
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:47:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076141F23600
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33A613A244;
-	Wed,  9 Oct 2024 18:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FC05198A0D;
+	Wed,  9 Oct 2024 18:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OxBfxbdc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A84h3SZE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CD955684
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD307EDE;
+	Wed,  9 Oct 2024 18:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728499637; cv=none; b=aJIT4JuoywSqI9i87b3mqhKccollS64Yp7qyX4E/zd5ku1mSA8/OcAbdvX+lXKgdfAIj8an54VZHYy9P/CSdc6joWzgV+i7khzbvzQ//uBlgwhnNq3F1KsjAnS3aIIbC4EihiBP/vZrHV6U9HVzyjab+PzzEnVCBvyKQZlf6ORo=
+	t=1728499832; cv=none; b=h5MUdxIZpLH9I7Vv3OHiZ0is8oGVPEWjfwNjGz5b+E4GeQLFgQV+HMQ83k4bXy9VIivDNumTtB4LpAx3v3okR4ibI6WAvu+fYENmNgT+sc6/c+ZDOIFZTbv7QPKwVpyjVu7FsXcU3cxOqsyoj2KaPgYdqjKuwaKLkfChgbX7Ouw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728499637; c=relaxed/simple;
-	bh=mqQXb1PRcCkiH0OpP5ASsUkHVa4zm5DVcQJVseI3wvs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PI3DZtQf6rP0o/CBwEsjJYom4MY/DJzWi6mxN59DWS0RgFWQ8c4fMmTYyJcjEwvgRTbO4np/9Y8vwo/GdCvgUKmG39B8UjclwO5r6X5v6/8IVUElKWPu+twdyq/B9577l7lqTxMmVFPI/ahfyjJZ93yjwdZV+qiCfRlEG3Kaw7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OxBfxbdc; arc=none smtp.client-ip=209.85.222.178
+	s=arc-20240116; t=1728499832; c=relaxed/simple;
+	bh=Fv8D1RIDpudXb1fJcaG3kX158HctkF1KAUsM62jfQmc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SL6FHP7plg7iaBKW35nOAkAHVAVwDxh5nDOFySgMWG3KOnub/3sY6c7c879WsDX3Z0PyZSITh1WS7b3tF5jwU9l33kEiazyXzHRuuV/C9o9jh8DfDVmseL5a+wKArfw1mloeqsi83gYlQisfKkSPai2uY2DgGD5G9vGfJKqY4PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A84h3SZE; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7a99e4417c3so4533285a.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:47:15 -0700 (PDT)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9951fba3b4so21211266b.1;
+        Wed, 09 Oct 2024 11:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728499635; x=1729104435; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zfBCp52mvk68I7rc+l3mFAeNp86IoOAUXWouNKdT8ys=;
-        b=OxBfxbdcHwc59pMnq0rGRzB/kNIaKq/LknrObT1hjlytCGajsnUiXkLDl8Ed6n+AMs
-         GVPhXF++yBX4IY2AQ3rAUMOz1smFJ42p4zElyhgnhVnY8mbq6XlmnVnUAtmaI33eHk83
-         eD7VueCQG94pr+naz1hjth1LQmyqRltcxZhhVnjOlH71cUmWYR/KybIXsEGcmLayxuxv
-         9Z8G2UEQD2Dys1VTAeHUm6vz/dl3XL/AnRiVs3Qk7vI+aqP6Vmqus7gW7/XjZKkEYXel
-         5TxBsHaU7WOrOuisPRuTbzjWSARmBk/60+0ziQfoiOdA31fU9pB/UqmAsjHIoehOud/u
-         kWmQ==
+        d=gmail.com; s=20230601; t=1728499829; x=1729104629; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=80twF2LO5hczYznwoL2osuEFf2d8bIx1CYdqruI2Mx0=;
+        b=A84h3SZEA5r+5MHCS9V8xW+BrCSfapAL3+QBFcDLkP1Tkd9VPOWxnn/4ya5SG3i+li
+         DMhNm+kN+uri3Ltc59XN7cIrr+KhRIvYQ8b4PLsYctIVKzSm+5r3u5pO6n83dwwO1tCQ
+         H2NczIv4+wHevj8Wmh/aN45ILC7e8AKgahVIlWuZqqU7CK4M8yOWobbdcS9BIJcC+bOI
+         yNG0Nw92W6g3ueCFcN3JW14dDyfsEAdSeuPri4ZyRHHcp+iE61hWVWo+veslpv50nNzV
+         47DN3oRxSskGlh2m6XRMuU9jRtRl2m84TKFfO/amRGPc0gYhzS4ktRT/DLR6SVmcYiNX
+         6GAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728499635; x=1729104435;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zfBCp52mvk68I7rc+l3mFAeNp86IoOAUXWouNKdT8ys=;
-        b=G/O7gVFRtF/OHMXQJgKBJF+l2svlqaXBH9jcvkwYyqql1/8Tbsuwv5iAEri1DqZPy2
-         TUXXUKrND5vR9lsn2E31AWZfFib7JAGTAN10hZ3lo6h0TPbJt8pb4xLpw7ATOMJWgdJk
-         Abyb2iS6ZtDfebBziKFJDzbH5Wth5NKOoPzQslXqrCCEo1c/SVE3mP8WBDchDiTUdiQb
-         l79eimqoS4FoDCKpaXhswzic682f3moV1setixc+AAVuu5WbWuD3Y2Yq3/JJ5rmE8U03
-         yiNAAIKjah/6USmS/IVQCfcpGnrMNs4pcm5R/A6IzDwXIKYbH96owAtK0F0I5QCJyzox
-         R5Pg==
-X-Gm-Message-State: AOJu0Yw4d6sbArEbs2yri5BgE4rgArkTAS0+PFYv7MNQOO41H/G73S5W
-	sHIpEZPXhjvgW9x4g2jLbM5dVhlTRRdZea3ze177zV91tCYKZ3Rn0mL43Q==
-X-Google-Smtp-Source: AGHT+IEiPk1RY+Wb3MMraOqBozTCjZKYcb1eL2ctwTAdGKkE73Lmsjd+DGO7lAqA23R9QpIbf/IOUA==
-X-Received: by 2002:a05:620a:3197:b0:7af:cdf9:8c13 with SMTP id af79cd13be357-7b07954f1f1mr655737385a.36.1728499634821;
-        Wed, 09 Oct 2024 11:47:14 -0700 (PDT)
-Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ae756611b5sm479330385a.77.2024.10.09.11.47.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 11:47:14 -0700 (PDT)
-From: Xin Long <lucien.xin@gmail.com>
-To: network dev <netdev@vger.kernel.org>
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Mahesh Bandewar <maheshb@google.com>
-Subject: [PATCH net] ipv4: give an IPv4 dev to blackhole_netdev
-Date: Wed,  9 Oct 2024 14:47:13 -0400
-Message-ID: <3000792d45ca44e16c785ebe2b092e610e5b3df1.1728499633.git.lucien.xin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1728499829; x=1729104629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=80twF2LO5hczYznwoL2osuEFf2d8bIx1CYdqruI2Mx0=;
+        b=LC5x8UnuMmfvI4By+Cha8d/49BjUg2Ha9f5rEKdU+BaGS/yFfZtvzIVlKbS+mcTT/C
+         sJond/R2MIVTWW4ruIal4eieBKimi9whKPtYg7d1tdPNMkG8LlH/ZIKwNeHqO9AbDord
+         H0x8AbBcocLeVodG+TjeCbc3lBgqujJcGZwQMtjwM4Zs4i5LqIFBsKSX5h4ylpfnBI0Y
+         r3mP8lCGV4R+xiNBDkVZR26fa6cY9jQfBtPFuZ06rHjCbyvbBuurYSCFioMsu0a4rYxz
+         pKS+TNpHmre06x0zEqM1NpwIJNtZ3lu2sXaXjX9NBYVvGmGepXqu+m5t/y2vzb4/+NYY
+         3bOg==
+X-Forwarded-Encrypted: i=1; AJvYcCWVbU9RyQz2+Uq+YNNjzuExqeMdMS4v8HVbRJEtzKSoXQhq2DQPYkYFnUiWCVfrF1Yzxk2XwIg1@vger.kernel.org, AJvYcCXrAaxeYH+suvB9PV3nbvMLoO+dKs7Yvb4WMyaBtGZWkslbkQNT2gbWPT+OJumOrjCNM8D9Co5S9Q==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzcg9IyGgwLfhTD231hz7cdGGIvVaex/rApvD9lDCDBFCMv2Ii2
+	NCLPDqXf5kam2qTdPXk+eOksz+Keagg/G/PVBaa2JG/wFIAah9MV
+X-Google-Smtp-Source: AGHT+IGpWySytZnXxzMz1WlP5REdCDvDldXRlvcbvW0MISCPMV+ADzQdFTXUika4jmTnb3q3Z88U8Q==
+X-Received: by 2002:a17:907:e88:b0:a99:7177:3f6a with SMTP id a640c23a62f3a-a998d34dd19mr288519066b.63.1728499828636;
+        Wed, 09 Oct 2024 11:50:28 -0700 (PDT)
+Received: from [192.168.42.9] ([148.252.145.180])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9952ac6d82sm463174366b.65.2024.10.09.11.50.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 11:50:28 -0700 (PDT)
+Message-ID: <f2ab35ef-ef19-4280-bc39-daf9165c3a51@gmail.com>
+Date: Wed, 9 Oct 2024 19:51:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 12/15] io_uring/zcrx: add io_recvzc request
+To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-13-dw@davidwei.uk>
+ <703c9d90-bca1-4ee7-b1f3-0cfeaf38ef8f@kernel.dk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <703c9d90-bca1-4ee7-b1f3-0cfeaf38ef8f@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-After commit 8d7017fd621d ("blackhole_netdev: use blackhole_netdev to
-invalidate dst entries"), blackhole_netdev was introduced to invalidate
-dst cache entries on the TX path whenever the cache times out or is
-flushed.
+On 10/9/24 19:28, Jens Axboe wrote:
+>> diff --git a/io_uring/net.c b/io_uring/net.c
+>> index d08abcca89cc..482e138d2994 100644
+>> --- a/io_uring/net.c
+>> +++ b/io_uring/net.c
+>> @@ -1193,6 +1201,76 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+>>   	return ret;
+>>   }
+>>   
+>> +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>> +{
+>> +	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+>> +	unsigned ifq_idx;
+>> +
+>> +	if (unlikely(sqe->file_index || sqe->addr2 || sqe->addr ||
+>> +		     sqe->len || sqe->addr3))
+>> +		return -EINVAL;
+>> +
+>> +	ifq_idx = READ_ONCE(sqe->zcrx_ifq_idx);
+>> +	if (ifq_idx != 0)
+>> +		return -EINVAL;
+>> +	zc->ifq = req->ctx->ifq;
+>> +	if (!zc->ifq)
+>> +		return -EINVAL;
+> 
+> This is read and assigned to 'zc' here, but then the issue handler does
+> it again? I'm assuming that at some point we'll have ifq selection here,
+> and then the issue handler will just use zc->ifq. So this part should
+> probably remain, and the issue side just use zc->ifq?
 
-When two UDP sockets (sk1 and sk2) send messages to the same destination
-simultaneously, they are using the same dst cache. If the dst cache is
-invalidated on one path (sk2) while the other (sk1) is still transmitting,
-sk1 may try to use the invalid dst entry.
+Yep, fairly overlooked. It's not a real problem, but should
+only be fetched and checked here.
 
-         CPU1                   CPU2
+>> +	/* All data completions are posted as aux CQEs. */
+>> +	req->flags |= REQ_F_APOLL_MULTISHOT;
+> 
+> This puzzles me a bit...
 
-      udp_sendmsg(sk1)       udp_sendmsg(sk2)
-      udp_send_skb()
-      ip_output()
-                                             <--- dst timeout or flushed
-                             dst_dev_put()
-      ip_finish_output2()
-      ip_neigh_for_gw()
+Well, it's a multishot request. And that flag protects from cq
+locking rules violations, i.e. avoiding multishot reqs from
+posting from io-wq.
 
-This results in a scenario where ip_neigh_for_gw() returns -EINVAL because
-blackhole_dev lacks an in_dev, which is needed to initialize the neigh in
-arp_constructor(). This error is then propagated back to userspace,
-breaking the UDP application.
+>> +	zc->flags = READ_ONCE(sqe->ioprio);
+>> +	zc->msg_flags = READ_ONCE(sqe->msg_flags);
+>> +	if (zc->msg_flags)
+>> +		return -EINVAL;
+> 
+> Maybe allow MSG_DONTWAIT at least? You already pass that in anyway.
 
-The patch fixes this issue by assigning an in_dev to blackhole_dev for
-IPv4, similar to what was done for IPv6 in commit e5f80fcf869a ("ipv6:
-give an IPv6 dev to blackhole_netdev"). This ensures that even when the
-dst entry is invalidated with blackhole_dev, it will not fail to create
-the neigh entry.
+What would the semantics be? The io_uring nowait has always
+been a pure mess because it's not even clear what it supposed
+to mean for async requests.
 
-As devinet_init() is called ealier than blackhole_netdev_init() in system
-booting, it can not assign the in_dev to blackhole_dev in devinet_init().
-As Paolo suggested, add a separate late_initcall() in devinet.c to ensure
-inet_blackhole_dev_init() is called after blackhole_netdev_init().
 
-Fixes: 8d7017fd621d ("blackhole_netdev: use blackhole_netdev to invalidate dst entries")
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
----
- net/ipv4/devinet.c | 35 +++++++++++++++++++++++++----------
- 1 file changed, 25 insertions(+), 10 deletions(-)
+>> +	if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
+>> +		return -EINVAL;
+>> +
+>> +
+>> +#ifdef CONFIG_COMPAT
+>> +	if (req->ctx->compat)
+>> +		zc->msg_flags |= MSG_CMSG_COMPAT;
+>> +#endif
+>> +	return 0;
+>> +}
+> 
+> Heh, we could probably just return -EINVAL for that case, but since this
+> is all we need, fine.
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index ab76744383cf..7cf5f7d0d0de 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -298,17 +298,19 @@ static struct in_device *inetdev_init(struct net_device *dev)
- 	/* Account for reference dev->ip_ptr (below) */
- 	refcount_set(&in_dev->refcnt, 1);
- 
--	err = devinet_sysctl_register(in_dev);
--	if (err) {
--		in_dev->dead = 1;
--		neigh_parms_release(&arp_tbl, in_dev->arp_parms);
--		in_dev_put(in_dev);
--		in_dev = NULL;
--		goto out;
-+	if (dev != blackhole_netdev) {
-+		err = devinet_sysctl_register(in_dev);
-+		if (err) {
-+			in_dev->dead = 1;
-+			neigh_parms_release(&arp_tbl, in_dev->arp_parms);
-+			in_dev_put(in_dev);
-+			in_dev = NULL;
-+			goto out;
-+		}
-+		ip_mc_init_dev(in_dev);
-+		if (dev->flags & IFF_UP)
-+			ip_mc_up(in_dev);
- 	}
--	ip_mc_init_dev(in_dev);
--	if (dev->flags & IFF_UP)
--		ip_mc_up(in_dev);
- 
- 	/* we can receive as soon as ip_ptr is set -- do this last */
- 	rcu_assign_pointer(dev->ip_ptr, in_dev);
-@@ -347,6 +349,19 @@ static void inetdev_destroy(struct in_device *in_dev)
- 	in_dev_put(in_dev);
- }
- 
-+static int __init inet_blackhole_dev_init(void)
-+{
-+	int err = 0;
-+
-+	rtnl_lock();
-+	if (!inetdev_init(blackhole_netdev))
-+		err = -ENOMEM;
-+	rtnl_unlock();
-+
-+	return err;
-+}
-+late_initcall(inet_blackhole_dev_init);
-+
- int inet_addr_onlink(struct in_device *in_dev, __be32 a, __be32 b)
- {
- 	const struct in_ifaddr *ifa;
+Well, there is no msghdr, cmsg nor iovec there, so doesn't even
+make sense to set it. Can fail as well, I don't anyone would care.
+
 -- 
-2.43.0
-
+Pavel Begunkov
 
