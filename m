@@ -1,115 +1,109 @@
-Return-Path: <netdev+bounces-133927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0CD9977C3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:47:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EDF199776A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:24:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEC7C1C21F81
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:47:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C03831F234E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6154319308C;
-	Wed,  9 Oct 2024 21:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD5E1E2312;
+	Wed,  9 Oct 2024 21:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lx3Sij3P"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="TukQrfPB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E132710E4;
-	Wed,  9 Oct 2024 21:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D922119
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728510410; cv=none; b=Io6k1mzD3MXZx3HQpu5V0Lg0NgB4Jjlm+LAJa0yQcE5MYJP16jcRDJGuBkVyFZJOLE5RlYLZn1vnVYH2rlXwh8wPwFDVvB+SAdVEHIQRs4oNE+uuGNQa2/Hils7CUKmUk/zTD0A+VmK1fjhHUlkaEwOzFuuHubdyd3lGyaVZwxg=
+	t=1728509088; cv=none; b=XNlGbMJ3rRC+4ItGN5z/PZogb19+1+gSgFFif6p9gff5UJytGaxUKqngZjfFqKvG3CN1EL9YqZuMBMQsF9jf40WUZ66cgw55cdLGbhzB8Hm3Ttg+odUgTRMFjqgMvOL3/y2MemIrA4ua5NHzoqpi9VCBm5V9/CmKRbthlsQNHJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728510410; c=relaxed/simple;
-	bh=e3SrNTsK0dGD9xesl4OQqQipb7Tulhm6OyotiGyjymc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AD+Ye5FaKEQwsWNstJMxHFeA9yrRR+XyIjvOyXcm02CyayRnASj2lksCocLpNdPyg5WuCqmUushjbWuOR46KfaW3cNGlacJEckpfWPYFrCX7n7Ogb2iNzQFkeDojVd+o7dZeNVv8myq7yDrttWV924pxcReS2I67lM6t+4PP8L4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lx3Sij3P; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sye8e-001i73-AQ; Wed, 09 Oct 2024 23:22:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=F+RJd+JIpP4NiuqPuwFGdxJw5I73YccdWoYTGb3P+Vo=; b=lx3Sij3PRHC9LVPPD2VBO1LF6W
-	YScFaPpOmYXnga6tKXoPUsc3aWpaaDeRYB2mMJgsEgXUL03orAgB5geetyqDbDQ2zc2EI+ePU5Rwd
-	sbJrBtP/QwxBp7lbLF/8bfwytr5T68ZiEluzLwdSmblSo9vqA7eazq+G+uORbIzvrU0x6zYxfN5g+
-	ZsPLMf2rgA8Yc/E+CnMiyle2e3EY/esZ+Ia7yl7lWpmNumaA2BponFJwYGY5RDBV/8TCYe32npQ+E
-	b5ri6i4Miu8EtmLqzHZYkU9tMtzZQYMLWXWcth/vcLlNqR4v78JDhG4zI54YKNRrkj4fxmUs/VVAW
-	M+ebBXhw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sye8d-0004h3-PV; Wed, 09 Oct 2024 23:22:32 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sye8S-00EL6w-Il; Wed, 09 Oct 2024 23:22:20 +0200
-From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 09 Oct 2024 23:20:53 +0200
-Subject: [PATCH bpf 4/4] bpf, vsock: Drop static vsock_bpf_prot
- initialization
+	s=arc-20240116; t=1728509088; c=relaxed/simple;
+	bh=XkHTIL5ybZufqNUnm8IrxZ7npMRbQ/hDL0sjfcRz70o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jmxHybAvn6DGdihbqX43NisFXR6EUPDrsGB7H0wO9DeMZEme4bIGIqbjeqAwir938ASq40LSfkaIRQoTkflKgFPBmeNmoFmBHtmYEVqAqI9iLnjFx6224vn9JiLASVsjdDwdp+0qKXaKADlwLxsX8t+6OAepTcIf/a42nLlVrI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=TukQrfPB; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 8DB862C011D;
+	Thu, 10 Oct 2024 10:24:37 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1728509077;
+	bh=a9DXvHVrOAXnUtvjBlxwLT7e72jk38nPPA7GGqjeS98=;
+	h=From:To:Cc:Subject:Date:From;
+	b=TukQrfPBQlLFwizFZA/1XVtyavcxoZSGqVwIt1b1TxmLP5iaWKOYAMlFxHd15lclm
+	 vYps7ONsDoTBMVRas/XJx+yluLwtfXYPVEo+98HMAPtVZK860q3+hQSMNoi1sdJuLb
+	 RhXNiISTZ3mF6xZrXpgP21/A3x5/sWCdyK/8XOb3ZlxVkODThe8AITrE800aIT8PZq
+	 dcam3poP6NeJZhyPOZpQhR/lbyUi8CMQdJTLSdiVjrniFBNN+zYcZTV2Xx9ypEQ0jl
+	 aLORveE0C0NRAsPau3a42qjtD1RsSlJ5ZuLxC4G3k7HlYkR2t7gJ+l9c2oWBmB/mxO
+	 XKNnnrbbeBG7g==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B6706f4950000>; Thu, 10 Oct 2024 10:24:37 +1300
+Received: from aryans-dl.ws.atlnz.lc (aryans-dl.ws.atlnz.lc [10.33.22.38])
+	by pat.atlnz.lc (Postfix) with ESMTP id 4BB9013ED7B;
+	Thu, 10 Oct 2024 10:24:37 +1300 (NZDT)
+Received: by aryans-dl.ws.atlnz.lc (Postfix, from userid 1844)
+	id 476672A0BF8; Thu, 10 Oct 2024 10:24:37 +1300 (NZDT)
+From: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v0] net: dsa: mv88e6xxx: Fix uninitialised err value
+Date: Thu, 10 Oct 2024 10:23:19 +1300
+Message-ID: <20241009212319.1045176-1-aryan.srivastava@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241009-vsock-fixes-for-redir-v1-4-e455416f6d78@rbox.co>
-References: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
-In-Reply-To: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- Bobby Eshleman <bobby.eshleman@bytedance.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=6706f495 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=DAUX931o1VcA:10 a=1RBs_uGY3QX_kSjkThsA:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
-vsock_bpf_prot is set up at runtime. Remove the superfluous init.
+The err value in mv88e6xxx_region_atu_snapshot is now potentially
+uninitialised on return. Initialise err as 0.
 
-No functional change intended.
-
-Fixes: 634f1a7110b4 ("vsock: support sockmap")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
+Fixes: ada5c3229b32 ("net: dsa: mv88e6xxx: Add FID map cache")
+Signed-off-by: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
 ---
- net/vmw_vsock/vsock_bpf.c | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/net/dsa/mv88e6xxx/devlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-index c42c5cc18f324108e044772e957c8d42c92ead8c..4aa6e74ec2957b28b9e9d8ce0b5f4d5c289a9276 100644
---- a/net/vmw_vsock/vsock_bpf.c
-+++ b/net/vmw_vsock/vsock_bpf.c
-@@ -114,14 +114,6 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 	return copied;
- }
- 
--/* Copy of original proto with updated sock_map methods */
--static struct proto vsock_bpf_prot = {
--	.close = sock_map_close,
--	.recvmsg = vsock_bpf_recvmsg,
--	.sock_is_readable = sk_msg_is_readable,
--	.unhash = sock_map_unhash,
--};
--
- static void vsock_bpf_rebuild_protos(struct proto *prot, const struct proto *base)
- {
- 	*prot        = *base;
-
--- 
-2.46.2
+diff --git a/drivers/net/dsa/mv88e6xxx/devlink.c b/drivers/net/dsa/mv88e6=
+xxx/devlink.c
+index ef3643bc43db..795c8df7b6a7 100644
+--- a/drivers/net/dsa/mv88e6xxx/devlink.c
++++ b/drivers/net/dsa/mv88e6xxx/devlink.c
+@@ -376,7 +376,7 @@ static int mv88e6xxx_region_atu_snapshot(struct devli=
+nk *dl,
+ 	struct dsa_switch *ds =3D dsa_devlink_to_ds(dl);
+ 	struct mv88e6xxx_devlink_atu_entry *table;
+ 	struct mv88e6xxx_chip *chip =3D ds->priv;
+-	int fid =3D -1, count, err;
++	int fid =3D -1, err =3D 0, count;
+=20
+ 	table =3D kmalloc_array(mv88e6xxx_num_databases(chip),
+ 			      sizeof(struct mv88e6xxx_devlink_atu_entry),
+--=20
+2.46.0
 
 
