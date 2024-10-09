@@ -1,83 +1,278 @@
-Return-Path: <netdev+bounces-133382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48996995C4F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:31:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09074995C5C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB4C21F24E3C
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:31:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4B6B286541
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E16518EAD;
-	Wed,  9 Oct 2024 00:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD45D3C24;
+	Wed,  9 Oct 2024 00:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Zsu1dF1F"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="nMLWrDcL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01DA8E573
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 00:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA01F6FC3;
+	Wed,  9 Oct 2024 00:38:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728433855; cv=none; b=ZW19VGSustEheZ3gJkTUFl9NcUnkFa1AXlvnXvdY9hwJJtM0KyBg3U6QKrkiUkLbLHRzvsO4jcbbua1u3v0BqtmemT9eAzzSJhdJENyEM9IdAwjrdZ2/ZLsE8UC6hDwwlVt6Ap8k9s7Y4P22ZFswZznC/VaqBmnf1tK2Qz9EpJ4=
+	t=1728434331; cv=none; b=gXrRuEU1h6BJiJ2xbZPrEDbtKdBLW/Lkin5Ady2JWFaVkfK5ofWRSdCec9rBDthg2A8VG6GyLo33uT4336d1WVxJalIE62yS7GMhSTNvgSOowjnQeixtymVHrLBK37tFgtxuGmbSyGbeOLbWgetznrY4dSyHRipyatBsoTEVOEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728433855; c=relaxed/simple;
-	bh=URG0fvEJEdQV1QWKsX6LOW/8A/YUeslmrBphbQZXR6Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qLSnQ3NTV00stjLC5EX6LOnqnctI19hpybyhluTUhX7K7MmJl8A2ojk6SPnL+8vtXEeLwu2C3W+9No3cFZ56LQnmdCBg2Lr3oJ4bWQ1M2atdkFyWkPG5FOAKkizzi9YXQzNYQt2PR1Eu/Z5AmtWMSEp05cJpXoF9zWDxj9FTpoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Zsu1dF1F; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1dCQdiAohakR4r8shl44ML2JrrQKhCgF4jFCM2YYqE0=; b=Zsu1dF1FjwIj1IgjqnGYPzC+8h
-	ZlVNUspjTW01eFreP9QvNz1qGOtINR5KIeO7O0DSffIee1zUztwX1EdIVXLty9S8wmSNwgA0fC3FN
-	jzwJvs1JztueuW+2SvOZCFzHv/oVqyg/jS25pgoHQFm2PvAorDbE/srbI+lqOoC/n+ZE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1syKbL-009Qck-4H; Wed, 09 Oct 2024 02:30:51 +0200
-Date: Wed, 9 Oct 2024 02:30:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tim Harvey <tharvey@gateworks.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	netdev <netdev@vger.kernel.org>
-Subject: Re: Linux network PHY initial configuration for ports not 'up'
-Message-ID: <dccfed75-bf35-49fc-b949-1067f4d7e794@lunn.ch>
-References: <CAJ+vNU12DeT3QWp8aU+tSL-PF00yJu5M36Bmx_tw_3oXsyb76g@mail.gmail.com>
- <c572529e-78c4-42d5-a799-1027fd5fca29@gmail.com>
- <CAJ+vNU3qCKzsK2XFj6Gj0vr4JfE=URYadWsr3xvxOO__MVNsPw@mail.gmail.com>
- <009d90a1-16e6-4f6b-bfe7-8282e9deeeb3@gmail.com>
- <CAJ+vNU3u62Z6Nr=5AmWtBRC6M3bR_0SMf8RbKXe9os6Ru4w2Vw@mail.gmail.com>
+	s=arc-20240116; t=1728434331; c=relaxed/simple;
+	bh=FNiGcNDdWZAfqdOlNLP8MEL4gG75wdC6blEwsW0IXF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=grjgEWaim4mP0m0Zc/3Jx0RoRO0GsNO9nGfIFucR3wuBiYFuwCKTlH+ZtSQ4a0L4px+20Irt6v6K76ayFq53izYsAJdqMYcuhbsFbWMQzxettKf/ErPBh0nw6S/OKbmHxA2uCZuJH+aV8/BapviDjB42JGNdlQpPTh6zAY2OBQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=nMLWrDcL; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=Y9ujbLGcNFl7q8q9tH5BMo3oqehtyT+2F1O/LhXoBoM=; b=nMLWrDcLoixfAuLS
+	RRgIo5tdo4r9N0P525la1hceb0TW5HBIqxAoZ8Cu1cX6EuHvEOJ21A6PMIT6JSoiat+gbU1UCv2aJ
+	uz27y/Fjcs5TEWIlBauZOIgNzl2LR3R8SXYgeA3uDCD2xAWUc2HRYrvCPQCZZSZwRE/EYU1sxZBur
+	RsS1omPRRYfcBzOKYVU/hu1cy1NM6ayLLJxFG2/mXYW7iShZR7RF3ylAaTHVO6REZth3cdDqxzjx+
+	h7Fkz4l753bHqRl17cxu3sv0H2XP0YHj+eqLFqKIfzg6Jci256gTFDNFATQy93/RqYOtPeFUPcUun
+	7f9insdf00TuaO2RLA==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1syKiw-009q6V-1r;
+	Wed, 09 Oct 2024 00:38:42 +0000
+From: linux@treblig.org
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] net: liquidio: Remove unused cn23xx_dump_pf_initialized_regs
+Date: Wed,  9 Oct 2024 01:38:41 +0100
+Message-ID: <20241009003841.254853-1-linux@treblig.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJ+vNU3u62Z6Nr=5AmWtBRC6M3bR_0SMf8RbKXe9os6Ru4w2Vw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-> So you are thinking the right place to address this is in boot
-> firmware and the network switch init there should go and disable all
-> PHY's by default then? I'm good with that approach and can code that
-> up.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-I've seen some use cases where the link should be up as fast as
-possible. If you force the link down until it is configured up, you
-can be adding a little over 1 second delay for autoneg to
-complete. I've even see cases there u-boot kicks off autoneg, before
-jumping into Linux so that by the time Linux userspace is running and
-admin up the interface, autoneg has completed and the link is usable.
+cn23xx_dump_pf_initialized_regs() was added in 2016's commit
+72c0091293c0 ("liquidio: CN23XX device init and sriov config")
 
-There are diverse requirements here and any changes somebody wants to
-make is likely to cause a regression for somebody.
+but hasn't been used.
 
-	Andrew
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ .../cavium/liquidio/cn23xx_pf_device.c        | 169 ------------------
+ .../cavium/liquidio/cn23xx_pf_device.h        |   2 -
+ 2 files changed, 171 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
+index b3c81a2e9d46..9ad49aea2673 100644
+--- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
++++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.c
+@@ -36,175 +36,6 @@
+  */
+ #define CN23XX_INPUT_JABBER 64600
+ 
+-void cn23xx_dump_pf_initialized_regs(struct octeon_device *oct)
+-{
+-	int i = 0;
+-	u32 regval = 0;
+-	struct octeon_cn23xx_pf *cn23xx = (struct octeon_cn23xx_pf *)oct->chip;
+-
+-	/*In cn23xx_soft_reset*/
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%llx\n",
+-		"CN23XX_WIN_WR_MASK_REG", CVM_CAST64(CN23XX_WIN_WR_MASK_REG),
+-		CVM_CAST64(octeon_read_csr64(oct, CN23XX_WIN_WR_MASK_REG)));
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_SCRATCH1", CVM_CAST64(CN23XX_SLI_SCRATCH1),
+-		CVM_CAST64(octeon_read_csr64(oct, CN23XX_SLI_SCRATCH1)));
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_RST_SOFT_RST", CN23XX_RST_SOFT_RST,
+-		lio_pci_readq(oct, CN23XX_RST_SOFT_RST));
+-
+-	/*In cn23xx_set_dpi_regs*/
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_DPI_DMA_CONTROL", CN23XX_DPI_DMA_CONTROL,
+-		lio_pci_readq(oct, CN23XX_DPI_DMA_CONTROL));
+-
+-	for (i = 0; i < 6; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_DPI_DMA_ENG_ENB", i,
+-			CN23XX_DPI_DMA_ENG_ENB(i),
+-			lio_pci_readq(oct, CN23XX_DPI_DMA_ENG_ENB(i)));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_DPI_DMA_ENG_BUF", i,
+-			CN23XX_DPI_DMA_ENG_BUF(i),
+-			lio_pci_readq(oct, CN23XX_DPI_DMA_ENG_BUF(i)));
+-	}
+-
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n", "CN23XX_DPI_CTL",
+-		CN23XX_DPI_CTL, lio_pci_readq(oct, CN23XX_DPI_CTL));
+-
+-	/*In cn23xx_setup_pcie_mps and cn23xx_setup_pcie_mrrs */
+-	pci_read_config_dword(oct->pci_dev, CN23XX_CONFIG_PCIE_DEVCTL, &regval);
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_CONFIG_PCIE_DEVCTL",
+-		CVM_CAST64(CN23XX_CONFIG_PCIE_DEVCTL), CVM_CAST64(regval));
+-
+-	dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-		"CN23XX_DPI_SLI_PRTX_CFG", oct->pcie_port,
+-		CN23XX_DPI_SLI_PRTX_CFG(oct->pcie_port),
+-		lio_pci_readq(oct, CN23XX_DPI_SLI_PRTX_CFG(oct->pcie_port)));
+-
+-	/*In cn23xx_specific_regs_setup */
+-	dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_S2M_PORTX_CTL", oct->pcie_port,
+-		CVM_CAST64(CN23XX_SLI_S2M_PORTX_CTL(oct->pcie_port)),
+-		CVM_CAST64(octeon_read_csr64(
+-			oct, CN23XX_SLI_S2M_PORTX_CTL(oct->pcie_port))));
+-
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_RING_RST", CVM_CAST64(CN23XX_SLI_PKT_IOQ_RING_RST),
+-		(u64)octeon_read_csr64(oct, CN23XX_SLI_PKT_IOQ_RING_RST));
+-
+-	/*In cn23xx_setup_global_mac_regs*/
+-	for (i = 0; i < CN23XX_MAX_MACS; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_PKT_MAC_RINFO64", i,
+-			CVM_CAST64(CN23XX_SLI_PKT_MAC_RINFO64(i, oct->pf_num)),
+-			CVM_CAST64(octeon_read_csr64
+-				(oct, CN23XX_SLI_PKT_MAC_RINFO64
+-					(i, oct->pf_num))));
+-	}
+-
+-	/*In cn23xx_setup_global_input_regs*/
+-	for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_IQ_PKT_CONTROL64", i,
+-			CVM_CAST64(CN23XX_SLI_IQ_PKT_CONTROL64(i)),
+-			CVM_CAST64(octeon_read_csr64
+-				(oct, CN23XX_SLI_IQ_PKT_CONTROL64(i))));
+-	}
+-
+-	/*In cn23xx_setup_global_output_regs*/
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_OQ_WMARK", CVM_CAST64(CN23XX_SLI_OQ_WMARK),
+-		CVM_CAST64(octeon_read_csr64(oct, CN23XX_SLI_OQ_WMARK)));
+-
+-	for (i = 0; i < CN23XX_MAX_OUTPUT_QUEUES; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_PKT_CONTROL", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_PKT_CONTROL(i)),
+-			CVM_CAST64(octeon_read_csr(
+-				oct, CN23XX_SLI_OQ_PKT_CONTROL(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_PKT_INT_LEVELS", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_PKT_INT_LEVELS(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_OQ_PKT_INT_LEVELS(i))));
+-	}
+-
+-	/*In cn23xx_enable_interrupt and cn23xx_disable_interrupt*/
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"cn23xx->intr_enb_reg64",
+-		CVM_CAST64((long)(cn23xx->intr_enb_reg64)),
+-		CVM_CAST64(readq(cn23xx->intr_enb_reg64)));
+-
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"cn23xx->intr_sum_reg64",
+-		CVM_CAST64((long)(cn23xx->intr_sum_reg64)),
+-		CVM_CAST64(readq(cn23xx->intr_sum_reg64)));
+-
+-	/*In cn23xx_setup_iq_regs*/
+-	for (i = 0; i < CN23XX_MAX_INPUT_QUEUES; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_IQ_BASE_ADDR64", i,
+-			CVM_CAST64(CN23XX_SLI_IQ_BASE_ADDR64(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_IQ_BASE_ADDR64(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_IQ_SIZE", i,
+-			CVM_CAST64(CN23XX_SLI_IQ_SIZE(i)),
+-			CVM_CAST64(octeon_read_csr
+-				(oct, CN23XX_SLI_IQ_SIZE(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_IQ_DOORBELL", i,
+-			CVM_CAST64(CN23XX_SLI_IQ_DOORBELL(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_IQ_DOORBELL(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_IQ_INSTR_COUNT64", i,
+-			CVM_CAST64(CN23XX_SLI_IQ_INSTR_COUNT64(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_IQ_INSTR_COUNT64(i))));
+-	}
+-
+-	/*In cn23xx_setup_oq_regs*/
+-	for (i = 0; i < CN23XX_MAX_OUTPUT_QUEUES; i++) {
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_BASE_ADDR64", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_BASE_ADDR64(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_OQ_BASE_ADDR64(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_SIZE", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_SIZE(i)),
+-			CVM_CAST64(octeon_read_csr
+-				(oct, CN23XX_SLI_OQ_SIZE(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_BUFF_INFO_SIZE", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_BUFF_INFO_SIZE(i)),
+-			CVM_CAST64(octeon_read_csr(
+-				oct, CN23XX_SLI_OQ_BUFF_INFO_SIZE(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_PKTS_SENT", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_PKTS_SENT(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_OQ_PKTS_SENT(i))));
+-		dev_dbg(&oct->pci_dev->dev, "%s(%d)[%llx] : 0x%016llx\n",
+-			"CN23XX_SLI_OQ_PKTS_CREDIT", i,
+-			CVM_CAST64(CN23XX_SLI_OQ_PKTS_CREDIT(i)),
+-			CVM_CAST64(octeon_read_csr64(
+-				oct, CN23XX_SLI_OQ_PKTS_CREDIT(i))));
+-	}
+-
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_PKT_TIME_INT",
+-		CVM_CAST64(CN23XX_SLI_PKT_TIME_INT),
+-		CVM_CAST64(octeon_read_csr64(oct, CN23XX_SLI_PKT_TIME_INT)));
+-	dev_dbg(&oct->pci_dev->dev, "%s[%llx] : 0x%016llx\n",
+-		"CN23XX_SLI_PKT_CNT_INT",
+-		CVM_CAST64(CN23XX_SLI_PKT_CNT_INT),
+-		CVM_CAST64(octeon_read_csr64(oct, CN23XX_SLI_PKT_CNT_INT)));
+-}
+-
+ static int cn23xx_pf_soft_reset(struct octeon_device *oct)
+ {
+ 	octeon_write_csr64(oct, CN23XX_WIN_WR_MASK_REG, 0xFF);
+diff --git a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
+index e6f31d0d5c0b..234b96b4f488 100644
+--- a/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
++++ b/drivers/net/ethernet/cavium/liquidio/cn23xx_pf_device.h
+@@ -59,8 +59,6 @@ int validate_cn23xx_pf_config_info(struct octeon_device *oct,
+ 
+ u32 cn23xx_pf_get_oq_ticks(struct octeon_device *oct, u32 time_intr_in_us);
+ 
+-void cn23xx_dump_pf_initialized_regs(struct octeon_device *oct);
+-
+ int cn23xx_sriov_config(struct octeon_device *oct);
+ 
+ int cn23xx_fw_loaded(struct octeon_device *oct);
+-- 
+2.46.2
+
 
