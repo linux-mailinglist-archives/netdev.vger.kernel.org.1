@@ -1,101 +1,141 @@
-Return-Path: <netdev+bounces-133583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2660E99665C
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:02:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A405D996668
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF6A7B2573A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:02:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EC0D28182A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8980418C900;
-	Wed,  9 Oct 2024 10:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2582518B482;
+	Wed,  9 Oct 2024 10:05:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HyM3Rd6K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFVaA5S8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3D915382F;
-	Wed,  9 Oct 2024 10:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23C817E012;
+	Wed,  9 Oct 2024 10:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728468139; cv=none; b=jOMMqMZQ7/ydVonsMLiy43ZVOWpItOX2M1qh4hpDRp0X7f/kj8XkyoHoe1xVFTPN5THkDkO5h/41toD0Bpuxa109en9M05DtQlHPdyBiMXpJCHzn+LmX70IPjiwUFNUrnLb9muOdUvze9jdRScqIZqFLwaEl0nXkCugnFkybib8=
+	t=1728468333; cv=none; b=pozG8MMC7Koewj1cYsM+WWRM/GQO4cf1Nyj2b+xW1rOBKmK0QbCMy7HseSKjCDZHotYHdX7iRG5dXdRb2tpJjbgg+X1fVQfv1FKb49BRKGCE7RX6JXpOHhYUyfP4SNE/TXke4LYSemKTYI3cjZo5dXHPsJeL9SuAMQAsSDqBD0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728468139; c=relaxed/simple;
-	bh=fFhZ5yj/ZxR2o5xfilsh66lO0PAntRJA0HDbYd4k/h4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DGblAB6+mnqW01vgNzXfbOaEmcJ2sweiWE8YpgMn/GUbHeF5igX/eiit4d/PoKUtpPXIz7keMxZQBftHsapEMfAsnfiHolztncBeguePRfJJbOLATVeFvFZ1K1R61Ta5qKEWrX0jPCpKH5WX0OVqs6EMpPEtoKgPLY/Rf3rYKKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HyM3Rd6K; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ueEdb1+ly/wSFqjFR74BysYq/bPJvI7Xo0vEBOm9Eg0=; b=HyM3Rd6KES4FjeuJXXYLocsAfP
-	yjWruA+frfcaZ0yqLpl7DHuwJRSKAWOmFDYJeEkwdrGLNWaJpc3zoiRTYWOXxDmqJXkBH768vbsql
-	9Tb4Td53RgyuTgYH9EhdTwe+Gg1ZRaHlcdOIr/gLwuhMFBsUyWykAaevuc5cEXt9VTmzIDG5Edpep
-	3lgorpmU/2XqdJkxDdoKH1zHbuS5F8f57s5kyMwrdZmjpgHCEul391wBp4nk9Kkwesnx2VqbcWP4y
-	JXH/nSH3OQjWSJ6/8tEnElB//8e8bT1KEgb3T5N4GuSDQZX2VRC810n9ePNTFcIGmCU1ScdJQSZJX
-	NHoalZYA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35924)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1syTW8-0000Kd-2R;
-	Wed, 09 Oct 2024 11:02:05 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1syTW4-0006CI-0d;
-	Wed, 09 Oct 2024 11:02:00 +0100
-Date: Wed, 9 Oct 2024 11:01:59 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: phy: realtek: read duplex and gbit
- master from PHYSR register
-Message-ID: <ZwZUl1jG0bc2q8Le@shell.armlinux.org.uk>
-References: <66d82d3f04623e9c096e12c10ca51141c345ee84.1728438615.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1728468333; c=relaxed/simple;
+	bh=98a6KyiTpUrUZYit/BsRgKAgBjUVUFZLNZTtJTqMcuU=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iCRvLyXqzb2PmR+EfKbo3cw7tmB8tb7w7JL5nmY3vO9w68h5K01E12sHPsDPT/lQv25pXkDM3rRwPgsXQfPbfvqw9KkGuA9NniFS9oznaZXN3XvhFfMWhsdof0mOuM8PRhaIxP2V6zYiLvVXL4z3n/TTPMnalafdyfkWbu/B6eQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFVaA5S8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47D16C4CEC5;
+	Wed,  9 Oct 2024 10:05:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728468332;
+	bh=98a6KyiTpUrUZYit/BsRgKAgBjUVUFZLNZTtJTqMcuU=;
+	h=From:Date:Subject:To:Cc:From;
+	b=GFVaA5S8wf5g5aOQy/zuImIU3G1xneje2BDCAZVretbJCGJYjODY5YtJjkry37wZU
+	 RXg3IWyJsJ+H6HhXN5PrhvFnpOVT9xB0gZ4ZBNNSfwihK3PfX/84GojGtlvTFBvoxz
+	 8A5qriEORTEHWJHBMr/KjTVKtTnCNqXEeqtQwfFrruoanGo1Rd86Oy/Evu9zZF7GUJ
+	 3hZyErV729gyaC8tDb2tB8N01FKupUAiM2rwNFHMNXG7QvUdH6pUA60C79D5XHC9xe
+	 aE226+CtTUNC3KredWJkD1lV0fUgTjVURB4oV2njitUx0LXJqlsY13hDNXxpxJKc2I
+	 6BkofraS87eiw==
+From: Simon Horman <horms@kernel.org>
+Date: Wed, 09 Oct 2024 11:05:21 +0100
+Subject: [PATCH net-next] net/smc: Address spelling errors
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66d82d3f04623e9c096e12c10ca51141c345ee84.1728438615.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241009-smc-starspell-v1-1-b8b395bbaf82@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGBVBmcC/x3MQQqAIBBA0avErBswCYWuEi1CxxowC0ciCO+et
+ HyL/18QykwCU/dCppuFz9Qw9B24fU0bIftm0EqPSiuDcjiUsma5KEYMwY02GG+t0dCaK1Pg5//
+ NkKhgoqfAUusH8S5RcGkAAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+ Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-s390@vger.kernel.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-On Wed, Oct 09, 2024 at 02:53:03AM +0100, Daniel Golle wrote:
-> -static void rtlgen_decode_speed(struct phy_device *phydev, int val)
-> +static void rtlgen_decode_physr(struct phy_device *phydev, int val)
->  {
-> -	switch (val & RTLGEN_SPEED_MASK) {
-> +	/* bit 2
-> +	 * 0: Link not OK
-> +	 * 1: Link OK
-> +	 */
-> +	phydev->link = !!(val & RTL_VND2_PHYSR_LINK);
+Address spelling errors flagged by codespell.
 
-Be careful with this. The link status bit in the BMSR is latched-low,
-meaning that it guarantees to inform the reader that the link failed at
-some point between the preceding read and current read.
+This patch is intended to cover all files under drivers/smc
 
-This is important to know, so code can react to a possibly different
-negotiation result (we must see a link-fail to recognise a different
-set of negotiation results.)
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ net/smc/smc.h      | 2 +-
+ net/smc/smc_clc.h  | 2 +-
+ net/smc/smc_core.c | 2 +-
+ net/smc/smc_core.h | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+diff --git a/net/smc/smc.h b/net/smc/smc.h
+index ad77d6b6b8d3..78ae10d06ed2 100644
+--- a/net/smc/smc.h
++++ b/net/smc/smc.h
+@@ -278,7 +278,7 @@ struct smc_connection {
+ 						 */
+ 	u64			peer_token;	/* SMC-D token of peer */
+ 	u8			killed : 1;	/* abnormal termination */
+-	u8			freed : 1;	/* normal termiation */
++	u8			freed : 1;	/* normal termination */
+ 	u8			out_of_sync : 1; /* out of sync with peer */
+ };
+ 
+diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+index 5625fda2960b..5fd6f5b8ef03 100644
+--- a/net/smc/smc_clc.h
++++ b/net/smc/smc_clc.h
+@@ -156,7 +156,7 @@ struct smc_clc_msg_proposal_prefix {	/* prefix part of clc proposal message*/
+ } __aligned(4);
+ 
+ struct smc_clc_msg_smcd {	/* SMC-D GID information */
+-	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requestor */
++	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requester */
+ 	__be16 v2_ext_offset;	/* SMC Version 2 Extension Offset */
+ 	u8 vendor_oui[3];	/* vendor organizationally unique identifier */
+ 	u8 vendor_exp_options[5];
+diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+index 4e694860ece4..500952c2e67b 100644
+--- a/net/smc/smc_core.c
++++ b/net/smc/smc_core.c
+@@ -2321,7 +2321,7 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
+ 		}
+ 		if (lgr->buf_type == SMCR_PHYS_CONT_BUFS)
+ 			goto out;
+-		fallthrough;	// try virtually continguous buf
++		fallthrough;	// try virtually contiguous buf
+ 	case SMCR_VIRT_CONT_BUFS:
+ 		buf_desc->order = get_order(bufsize);
+ 		buf_desc->cpu_addr = vzalloc(PAGE_SIZE << buf_desc->order);
+diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
+index 0db4e5f79ac4..69b54ecd6503 100644
+--- a/net/smc/smc_core.h
++++ b/net/smc/smc_core.h
+@@ -30,7 +30,7 @@
+ 					 */
+ #define SMC_CONN_PER_LGR_PREFER	255	/* Preferred connections per link group used for
+ 					 * SMC-R v2.1 and later negotiation, vendors or
+-					 * distrubutions may modify it to a value between
++					 * distributions may modify it to a value between
+ 					 * 16-255 as needed.
+ 					 */
+ 
+@@ -181,7 +181,7 @@ struct smc_link {
+ 					 */
+ #define SMC_LINKS_PER_LGR_MAX_PREFER	2	/* Preferred max links per link group used for
+ 						 * SMC-R v2.1 and later negotiation, vendors or
+-						 * distrubutions may modify it to a value between
++						 * distributions may modify it to a value between
+ 						 * 1-2 as needed.
+ 						 */
+ 
+
 
