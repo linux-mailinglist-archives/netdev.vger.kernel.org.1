@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-133822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B4A9972BA
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:13:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D156B9972BB
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:13:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EC861F22BEC
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:13:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6A01F21401
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C631A0B0C;
-	Wed,  9 Oct 2024 17:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5231AD3E0;
+	Wed,  9 Oct 2024 17:12:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDA51974FA
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 17:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF901126C17
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 17:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728493976; cv=none; b=I+1WAE6XY1FT1Unwi+4oApi/dmqGfeTR046lA5o1jp6ULk+2IM8+Fqccf8/6W+2IgDAfN+PeDLIdROFSdf5togwlJma522NbLubjPsL9Q+XKQhXkwPGShuEMyMR8Jp87pBqpsZ++x8oH4UsppYLQFO7Vst+1LNOWw+apsOwKAqE=
+	t=1728493977; cv=none; b=q3mYox5PSnai26Z7BWlxwe/WrW9KrtBeZqjqz/DOTpjltHBydv5uL13aqY8iv+48uav6dN/UF+VurVsyJ8OIrVtwsN407LXyqcPDlYCQmI4UMp1r6OJmIyOP25HQaTKdTwAUDdlHuUK8KE1YVLOU8asiflsQUgm7ob9DeqWK9KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728493976; c=relaxed/simple;
-	bh=cBThCaPqAFQxgxw17rsPz9Q4kdonuuOwkzDDjeTqKRI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o1+5i0LUiMRVpHDdL51xNWHWYGC2vP5i3CzDtuCTCufSPn2zg89bvgFpE6rnCSNds68REaxlAEOjvPGH8IbVY0fsVAmoF4YoTQO/Bv/MJ6HqV1czSp1axhkZXB6UotfWs4ZPAokxJVuuse20NbHsOYpNMm8XvlbwFSYWIklsS1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1728493977; c=relaxed/simple;
+	bh=DbSfoMlzpZVhU+8FFsUY3AHTX/zbUMYdVXfjpyEzHfU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=b7mprV44TaAp/oAro241SDSUzhu0SX2Yo+p69wA5B10/3/Ja+FhcjwvM/CF1j0dYFukJOq5wQ1Eg3k3/+DDi8Y41BqePIIUaCxFg4Y7Rc0AZIqlgmfOTCQZQr11whl5gkRNgckymb724BmKkHC9ntVt5zbpM+8mHMlwCITMTDvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e053cf1f3so32682b3a.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 10:12:54 -0700 (PDT)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7db908c9c83so4519022a12.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 10:12:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728493973; x=1729098773;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y4MH+OVopgiP9KTBosr1WQuN8qhtEA0FVfO6WhH4iJk=;
-        b=ENM2AYZGl4mxxwJUERJU5r+DnuM9WP0L1FiMhnMrnhwAv5J72hXuntFGjcxGCyBrmz
-         wrlcH41yjF4NIJhPsVbbvuGHKos9G3k4hlG1CAlC6Nzs+VFar9IdAUMPziQuQrg7KXBm
-         xW42kdNc1TpX5qd3g/VlzOKGOb2Pn91UwgXu0DpRm7KoI2Jrqe/tsInYo42Y+5jj52Wl
-         8j25WgG6+BrrW1N8uEMmM9Cm9vhZf4cLg8nxNBxRZfSYw/5WnuNqQ+2wIQwOfkV9BWQh
-         J/a0KQ1dSbB78XeZb+aA5yat1sif6gAlsmEVkEcF3BSVEM6H8C3j40Ql1s+BHqWhygUc
-         yOgw==
-X-Gm-Message-State: AOJu0Yztn3SYLZfb7va5Ez5c5IEi+sDVn2ZgRb16WF/3bU3glQNGKKt4
-	bY1JQuCNCWkLzFgtcnAMIabZ4kmQwHIS6xXg+X8O33xNR24nkfC8SnVu
-X-Google-Smtp-Source: AGHT+IF3ThYYyDo09M78eEFdKJy7bJFwX3XAcGcrr3TRhTrPZGAuSTU+1PxYUpMP3ddac1K/LlHNKw==
-X-Received: by 2002:a05:6a21:4006:b0:1d4:fd63:95bc with SMTP id adf61e73a8af0-1d8a3be149bmr6360666637.9.1728493973566;
-        Wed, 09 Oct 2024 10:12:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728493975; x=1729098775;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fYIgIfdOM+KXAHby1i+hfUVdj9h7/069nIsE/U1uz/s=;
+        b=f7+KCpIKfAw1JRfJ06PfJqLdP6jmm7H0f9iEjkTHzReGgBjtvzyd+gnLAyaJlm/4Tq
+         ouI5WpRvc+U2ljouxctL/SCmYy1d6I8xQJhM43SJuLVzi4hUhybqsbz4T2DLNQgvGH57
+         +nIKvs6AWrLJ+LysI6kA6tye47/eliR6mdQI9ZhbXN+wSQkLeaKwf60jXgU9bjfClSc0
+         tH+wMHsZgun9R3n6MvzpUg76vEhU6Qud5m0wAWo1KKh543p6UhonfM86aeukPz7fdrEM
+         2GUTwAlmGj3CiRssi33oN61K1JxiOufHcXPLeQgOUK+LcwS0Af+xXrNY5oUQRVgEjrDw
+         IN1Q==
+X-Gm-Message-State: AOJu0Yw2WM+N/3GKG9w49MzDGROFgO6aQ4VEYb+xDnuTUTwJ+aKLVzqL
+	++YeKmtx56/Tu/KtcPLg7gWpX6XSUaDv/iRUWO8HbiW1103DwkSaVz8g
+X-Google-Smtp-Source: AGHT+IGCzknJBKugY1sWVLPyTEpYvHRGAV/e3BhlUyD4G7uzZOoK2iVZ4ADVRLCrOb0pQFFXtm/Nrg==
+X-Received: by 2002:a05:6a21:1643:b0:1d8:aca7:912 with SMTP id adf61e73a8af0-1d8aca7102emr1642105637.28.1728493974706;
+        Wed, 09 Oct 2024 10:12:54 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d4530dsm8032460b3a.102.2024.10.09.10.12.52
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0ccc4b2sm7977845b3a.45.2024.10.09.10.12.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 10:12:53 -0700 (PDT)
+        Wed, 09 Oct 2024 10:12:54 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -58,10 +59,12 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next v3 00/12] selftests: ncdevmem: Add ncdevmem to ksft
-Date: Wed,  9 Oct 2024 10:12:40 -0700
-Message-ID: <20241009171252.2328284-1-sdf@fomichev.me>
+Subject: [PATCH net-next v3 01/12] selftests: ncdevmem: Redirect all non-payload output to stderr
+Date: Wed,  9 Oct 2024 10:12:41 -0700
+Message-ID: <20241009171252.2328284-2-sdf@fomichev.me>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241009171252.2328284-1-sdf@fomichev.me>
+References: <20241009171252.2328284-1-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,60 +73,212 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The goal of the series is to simplify and make it possible to use
-ncdevmem in an automated way from the ksft python wrapper.
+That should make it possible to do expected payload validation on
+the caller side.
 
-ncdevmem is slowly mutated into a state where it uses stdout
-to print the payload and the python wrapper is added to
-make sure the arrived payload matches the expected one.
+Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ tools/testing/selftests/net/ncdevmem.c | 61 +++++++++++++-------------
+ 1 file changed, 30 insertions(+), 31 deletions(-)
 
-v3:
-- keep and refine the comment about ncdevmem invocation (Mina)
-- add the comment about not enforcing exit status for ntuple reset (Mina)
-- make configure_headersplit more robust (Mina)
-- use num_queues/2 in selftest and let the users override it (Mina)
-- remove memory_provider.memcpy_to_device (Mina)
-- keep ksft as is (don't use -v validate flags): we are gonna
-  need a --debug-disable flag to make it less chatty; otherwise
-  it times out when sending too much data; so leaving it as
-  a separate follow up
-
-v2:
-- don't remove validation (Mina)
-- keep 5-tuple flow steering but use it only when -c is provided (Mina)
-- remove separate flag for probing (Mina)
-- move ncdevmem under drivers/net/hw, not drivers/net (Jakub)
-
-Cc: Mina Almasry <almasrymina@google.com>
-
-Stanislav Fomichev (12):
-  selftests: ncdevmem: Redirect all non-payload output to stderr
-  selftests: ncdevmem: Separate out dmabuf provider
-  selftests: ncdevmem: Unify error handling
-  selftests: ncdevmem: Make client_ip optional
-  selftests: ncdevmem: Remove default arguments
-  selftests: ncdevmem: Switch to AF_INET6
-  selftests: ncdevmem: Properly reset flow steering
-  selftests: ncdevmem: Use YNL to enable TCP header split
-  selftests: ncdevmem: Remove hard-coded queue numbers
-  selftests: ncdevmem: Run selftest when none of the -s or -c has been
-    provided
-  selftests: ncdevmem: Move ncdevmem under drivers/net/hw
-  selftests: ncdevmem: Add automated test
-
- .../selftests/drivers/net/hw/.gitignore       |   1 +
- .../testing/selftests/drivers/net/hw/Makefile |  10 +
- .../selftests/drivers/net/hw/devmem.py        |  46 ++
- .../selftests/drivers/net/hw/ncdevmem.c       | 761 ++++++++++++++++++
- tools/testing/selftests/net/.gitignore        |   1 -
- tools/testing/selftests/net/Makefile          |   9 -
- tools/testing/selftests/net/ncdevmem.c        | 570 -------------
- 7 files changed, 818 insertions(+), 580 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/hw/.gitignore
- create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
- create mode 100644 tools/testing/selftests/drivers/net/hw/ncdevmem.c
- delete mode 100644 tools/testing/selftests/net/ncdevmem.c
-
+diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
+index 64d6805381c5..9245d3f158dd 100644
+--- a/tools/testing/selftests/net/ncdevmem.c
++++ b/tools/testing/selftests/net/ncdevmem.c
+@@ -88,7 +88,6 @@ void print_nonzero_bytes(void *ptr, size_t size)
+ 
+ 	for (i = 0; i < size; i++)
+ 		putchar(p[i]);
+-	printf("\n");
+ }
+ 
+ void validate_buffer(void *line, size_t size)
+@@ -120,7 +119,7 @@ void validate_buffer(void *line, size_t size)
+ 		char command[256];                                      \
+ 		memset(command, 0, sizeof(command));                    \
+ 		snprintf(command, sizeof(command), cmd, ##__VA_ARGS__); \
+-		printf("Running: %s\n", command);                       \
++		fprintf(stderr, "Running: %s\n", command);                       \
+ 		system(command);                                        \
+ 	})
+ 
+@@ -128,22 +127,22 @@ static int reset_flow_steering(void)
+ {
+ 	int ret = 0;
+ 
+-	ret = run_command("sudo ethtool -K %s ntuple off", ifname);
++	ret = run_command("sudo ethtool -K %s ntuple off >&2", ifname);
+ 	if (ret)
+ 		return ret;
+ 
+-	return run_command("sudo ethtool -K %s ntuple on", ifname);
++	return run_command("sudo ethtool -K %s ntuple on >&2", ifname);
+ }
+ 
+ static int configure_headersplit(bool on)
+ {
+-	return run_command("sudo ethtool -G %s tcp-data-split %s", ifname,
++	return run_command("sudo ethtool -G %s tcp-data-split %s >&2", ifname,
+ 			   on ? "on" : "off");
+ }
+ 
+ static int configure_rss(void)
+ {
+-	return run_command("sudo ethtool -X %s equal %d", ifname, start_queue);
++	return run_command("sudo ethtool -X %s equal %d >&2", ifname, start_queue);
+ }
+ 
+ static int configure_channels(unsigned int rx, unsigned int tx)
+@@ -153,7 +152,7 @@ static int configure_channels(unsigned int rx, unsigned int tx)
+ 
+ static int configure_flow_steering(void)
+ {
+-	return run_command("sudo ethtool -N %s flow-type tcp4 src-ip %s dst-ip %s src-port %s dst-port %s queue %d",
++	return run_command("sudo ethtool -N %s flow-type tcp4 src-ip %s dst-ip %s src-port %s dst-port %s queue %d >&2",
+ 			   ifname, client_ip, server_ip, port, port, start_queue);
+ }
+ 
+@@ -187,7 +186,7 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+ 		goto err_close;
+ 	}
+ 
+-	printf("got dmabuf id=%d\n", rsp->id);
++	fprintf(stderr, "got dmabuf id=%d\n", rsp->id);
+ 	dmabuf_id = rsp->id;
+ 
+ 	netdev_bind_rx_req_free(req);
+@@ -314,8 +313,8 @@ int do_server(void)
+ 	if (ret)
+ 		error(errno, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+ 
+-	printf("binding to address %s:%d\n", server_ip,
+-	       ntohs(server_sin.sin_port));
++	fprintf(stderr, "binding to address %s:%d\n", server_ip,
++		ntohs(server_sin.sin_port));
+ 
+ 	ret = bind(socket_fd, &server_sin, sizeof(server_sin));
+ 	if (ret)
+@@ -329,14 +328,14 @@ int do_server(void)
+ 
+ 	inet_ntop(server_sin.sin_family, &server_sin.sin_addr, buffer,
+ 		  sizeof(buffer));
+-	printf("Waiting or connection on %s:%d\n", buffer,
+-	       ntohs(server_sin.sin_port));
++	fprintf(stderr, "Waiting or connection on %s:%d\n", buffer,
++		ntohs(server_sin.sin_port));
+ 	client_fd = accept(socket_fd, &client_addr, &client_addr_len);
+ 
+ 	inet_ntop(client_addr.sin_family, &client_addr.sin_addr, buffer,
+ 		  sizeof(buffer));
+-	printf("Got connection from %s:%d\n", buffer,
+-	       ntohs(client_addr.sin_port));
++	fprintf(stderr, "Got connection from %s:%d\n", buffer,
++		ntohs(client_addr.sin_port));
+ 
+ 	while (1) {
+ 		struct iovec iov = { .iov_base = iobuf,
+@@ -349,14 +348,13 @@ int do_server(void)
+ 		ssize_t ret;
+ 
+ 		is_devmem = false;
+-		printf("\n\n");
+ 
+ 		msg.msg_iov = &iov;
+ 		msg.msg_iovlen = 1;
+ 		msg.msg_control = ctrl_data;
+ 		msg.msg_controllen = sizeof(ctrl_data);
+ 		ret = recvmsg(client_fd, &msg, MSG_SOCK_DEVMEM);
+-		printf("recvmsg ret=%ld\n", ret);
++		fprintf(stderr, "recvmsg ret=%ld\n", ret);
+ 		if (ret < 0 && (errno == EAGAIN || errno == EWOULDBLOCK))
+ 			continue;
+ 		if (ret < 0) {
+@@ -364,7 +362,7 @@ int do_server(void)
+ 			continue;
+ 		}
+ 		if (ret == 0) {
+-			printf("client exited\n");
++			fprintf(stderr, "client exited\n");
+ 			goto cleanup;
+ 		}
+ 
+@@ -373,7 +371,7 @@ int do_server(void)
+ 			if (cm->cmsg_level != SOL_SOCKET ||
+ 			    (cm->cmsg_type != SCM_DEVMEM_DMABUF &&
+ 			     cm->cmsg_type != SCM_DEVMEM_LINEAR)) {
+-				fprintf(stdout, "skipping non-devmem cmsg\n");
++				fprintf(stderr, "skipping non-devmem cmsg\n");
+ 				continue;
+ 			}
+ 
+@@ -384,7 +382,7 @@ int do_server(void)
+ 				/* TODO: process data copied from skb's linear
+ 				 * buffer.
+ 				 */
+-				fprintf(stdout,
++				fprintf(stderr,
+ 					"SCM_DEVMEM_LINEAR. dmabuf_cmsg->frag_size=%u\n",
+ 					dmabuf_cmsg->frag_size);
+ 
+@@ -395,12 +393,13 @@ int do_server(void)
+ 			token.token_count = 1;
+ 
+ 			total_received += dmabuf_cmsg->frag_size;
+-			printf("received frag_page=%llu, in_page_offset=%llu, frag_offset=%llu, frag_size=%u, token=%u, total_received=%lu, dmabuf_id=%u\n",
+-			       dmabuf_cmsg->frag_offset >> PAGE_SHIFT,
+-			       dmabuf_cmsg->frag_offset % getpagesize(),
+-			       dmabuf_cmsg->frag_offset, dmabuf_cmsg->frag_size,
+-			       dmabuf_cmsg->frag_token, total_received,
+-			       dmabuf_cmsg->dmabuf_id);
++			fprintf(stderr,
++				"received frag_page=%llu, in_page_offset=%llu, frag_offset=%llu, frag_size=%u, token=%u, total_received=%lu, dmabuf_id=%u\n",
++				dmabuf_cmsg->frag_offset >> PAGE_SHIFT,
++				dmabuf_cmsg->frag_offset % getpagesize(),
++				dmabuf_cmsg->frag_offset,
++				dmabuf_cmsg->frag_size, dmabuf_cmsg->frag_token,
++				total_received, dmabuf_cmsg->dmabuf_id);
+ 
+ 			if (dmabuf_cmsg->dmabuf_id != dmabuf_id)
+ 				error(1, 0,
+@@ -438,15 +437,15 @@ int do_server(void)
+ 		if (!is_devmem)
+ 			error(1, 0, "flow steering error\n");
+ 
+-		printf("total_received=%lu\n", total_received);
++		fprintf(stderr, "total_received=%lu\n", total_received);
+ 	}
+ 
+-	fprintf(stdout, "%s: ok\n", TEST_PREFIX);
++	fprintf(stderr, "%s: ok\n", TEST_PREFIX);
+ 
+-	fprintf(stdout, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
++	fprintf(stderr, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
+ 		page_aligned_frags, non_page_aligned_frags);
+ 
+-	fprintf(stdout, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
++	fprintf(stderr, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
+ 		page_aligned_frags, non_page_aligned_frags);
+ 
+ cleanup:
+@@ -551,7 +550,7 @@ int main(int argc, char *argv[])
+ 			ifname = optarg;
+ 			break;
+ 		case '?':
+-			printf("unknown option: %c\n", optopt);
++			fprintf(stderr, "unknown option: %c\n", optopt);
+ 			break;
+ 		}
+ 	}
+@@ -559,7 +558,7 @@ int main(int argc, char *argv[])
+ 	ifindex = if_nametoindex(ifname);
+ 
+ 	for (; optind < argc; optind++)
+-		printf("extra arguments: %s\n", argv[optind]);
++		fprintf(stderr, "extra arguments: %s\n", argv[optind]);
+ 
+ 	run_devmem_tests();
+ 
 -- 
 2.47.0
 
