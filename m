@@ -1,160 +1,178 @@
-Return-Path: <netdev+bounces-133879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB34599752F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 562AE99755A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F0331F248FB
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF4E1C228C9
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657DD1A255A;
-	Wed,  9 Oct 2024 18:58:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B8A1E105F;
+	Wed,  9 Oct 2024 19:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RLrJTNyK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="grc9m9ZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DC6EDE
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E1D1E0E18
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 19:01:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728500289; cv=none; b=NvrfAgEMS38bFsGoeaVpEAIC2R963mWu/O8JVeUFqV4M/LzzkqaqhvwM4CAIGzKzxDDk8hEnOrp1AXq3O0In3mtow0dUpdg60E7eU+Fzu8lDmXc2EPgiUS8rZRv5NbeUf5d+6nJVyoenbaBfb+JSqx+COLpgLDIHXFIKROj9O9k=
+	t=1728500509; cv=none; b=vGnQOOAspnIuB/i0kh1SFTdRxy2tQo7ILFNecgvReqvW7UDWMGu722P6L1xIRuX9lTtNt1KHWqRaWWJTLilsy/TC+ZZVtB+AKhWzDZjos00TZgtP8ODQKsu04TpLPh+sLcyuNKH/IZlbibKb8tTtr3XY3wb2pQLHNHNluSxZWYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728500289; c=relaxed/simple;
-	bh=2dNfI7ohoEm2l4pzidddX4PqbCejCiK8fpWSOObpnJQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=BQiPeTEHAfAMvRin7nNcm4zdWcZAlFXogNJi2as4uloixRdxeHV/bLqrbXFe0XDSMkdzLxyPFlzGZoIyC4PvaFIS6nVOBQH0nfD5dBPz11GOm1ued0Pg3F2dXrxbbQI8Gq+1M1sz9cWrnZCRP3opwTshlHGpokGCMNK1jWhdaGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RLrJTNyK; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e20e22243dso5146817b3.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:58:07 -0700 (PDT)
+	s=arc-20240116; t=1728500509; c=relaxed/simple;
+	bh=ZERkZQUmj3NIzKvPv2s4yZoZAzwUZW6hwxGwTDLSIiY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u8MAZordubae/nNrBK7nVvjKHhEq1LmNvGLTYdzUw84RgbQG5REH36pViUnEW/NFzgSf6lQV1TGjPtPH5HXvpFzwPX4YMdqlCAB9Uf0IpdExZJ1H8NIXD/6NbxzaaYgK0dXnVcEojZFum7cTmRVXTmfPq+1QCA7vpJM3YE5HD6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=grc9m9ZX; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a39620ff54so935825ab.1
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 12:01:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728500287; x=1729105087; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=39OoYBv4TyCG/D6QGBULIPLdhsNaCPjHK43vqbbdJEM=;
-        b=RLrJTNyKX+MExRCO1xiLY8Uwu6VNg7k3xiDF5PzlFLMfYC85QjYQqZBeWke9X4DpD5
-         baP+F+HHTTgPoKENks29b9qPoxGjX5BHUDRzGQGK72y/hL45q+oGqA3d9QlCg4Uv4Yy/
-         c51i78WphNV4wysojbfKf0akg1CCD9KimiiQRW/FYjYXK0Hre7QO9nVCx7/AUAfvV4xz
-         Om44SXb+TMjBOq2pP9LNSkOFACDG9QyKIOv6hFyjsMdpLk5hb9sirBuKi3oPzpdRvysW
-         JLOgXti419w51g8vbS0IBuBhqbBRjTjtkYjOpJPpsqCqVVx2Y3OihyuDqJsUcOlUEq09
-         2vtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728500287; x=1729105087;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728500506; x=1729105306; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=39OoYBv4TyCG/D6QGBULIPLdhsNaCPjHK43vqbbdJEM=;
-        b=V+RmRIHJuqnAy7IU+6/C8teR+3eZkCh2ltZOfZpc8Df7yJF07DC+OKVUoDGvKcRZ2w
-         8A+s/kIjjffM6oY35wvprJPyRZ2oy+vZ4N57MGv4Wks/rfJrnF9jFdJD4kgP6CCewMrO
-         hG/0XevG7V8HY2wGBqtn1e34MJnWZ7pjVGTlpmG0YMb1AOFu/rUl0njT79uCMG8/mhi7
-         6BhoUkif5hYRNM1CvYG/AfiSVlgpJmqBHG+35Wfn0nZB5dD17LjiDw2boScvC5YH5FET
-         M0jp6GiJqUYkNW7mcySBUnumrK7udMuSQ9NCjiUAadu3iZYvp9ke+WLxGgsckZTT8hq2
-         QNLg==
-X-Gm-Message-State: AOJu0YxeotFien33U/2epJ6DhbN+oFpxlsEBxOqkonFz60micKmJqpjQ
-	m91HJ5MWLTBFjFRiECSjZOFkRxN/gk9ZqrS/6O8nF52N8SOy0acLHoG4Lg4giMButZrw4kd671h
-	tKuAQ5ZhNQQ==
-X-Google-Smtp-Source: AGHT+IHQ7pkLC3hnHyAF0sSMJoj3CAbNdpbo0qsLUogfpyUsKhWgzVrv4WSgJW1VzFdZDbfj0X7XN08uj2fPww==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:f20e:0:b0:e11:5e87:aa9 with SMTP id
- 3f1490d57ef6-e28fe421dd3mr3039276.8.1728500286677; Wed, 09 Oct 2024 11:58:06
- -0700 (PDT)
-Date: Wed,  9 Oct 2024 18:58:02 +0000
+        bh=dOS2JisAoHa0cARLuAlDWjfKWnjZWZhuSgzV0J+AbPc=;
+        b=grc9m9ZX8Vde3l1KWdMiLNe9ggyUr6mzNy7opyfPHjJaElnvPkz8EdHrpUYJOpmnP5
+         FUqTeE3PpFLDj6JTkLDfjPniyolamdJUFnX8dM/vpQVwCIF2gVnt7Prss2cNrMKd8Zxs
+         43QY59ITinsTd/pcQJuqpImyaBfW9ud+uxoAzCx34dy+GNCQn9OTq5rxEWZi1cC9gth3
+         XwB5CLCa/YUaTKsTpOIfGasGV/9zGjpj6QnlRRGZK8+vwE4CG+KQxz7K/0qLzUxrClLl
+         jmtLbj0yF1M/XmGIBEuWiddlJWP70Iv14ufETiDNDaxzRGu7bfBqTDNU3XNx7rPu6oiT
+         v1OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728500506; x=1729105306;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOS2JisAoHa0cARLuAlDWjfKWnjZWZhuSgzV0J+AbPc=;
+        b=wdNchFxnazNyo8eyZl8HF6awWAIL+c2NhW83ROxnuYoNm1QMNLi/FcSVSslH9zRO9G
+         P6qfMxkth21j/u6/xGkxXqIovWKwJ9WN27gM4MGY5DaNX/PXNC9omcD1CXcDTHvn+FNG
+         kpSs73yzBuh2ldwqC3EhSIVH3Q+TKrOpGQZ8qHT4A6a/8ydTIVfzjJM0JfUyFANUmCvM
+         VXXfl9jTM275Rj97ipmwu7Z3xN26K2tDHAhJgI1697ijFYpYp9HobC71yP6oe0LJQO3g
+         ng9qwqXlDIGnGOHuE6+jjdohnHTJaPGpcM8z1Jh8b+lefQEAv3oc/hA5KZGvjzVhOy8q
+         OzGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMN7rB658NTs9xGAKB4bFvSBHsB+NGQfBYS2c8yxdItODAB1+L39npVrT1BMhhXz3wUVbTk2c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/9EQQLC9RRP1i9jp0OVvu+lTR1BEWAxKOKldE6A0f2WTVyMh6
+	Fyzv5hnoy5nOiM0XE+D9cSUQ50uT5Q46tU9cnjzNres42RNoq7cdklTfYdvO574=
+X-Google-Smtp-Source: AGHT+IEvFaEf6WOrpba+7ebLWeo7XarhalgW21yIs6hXxoOesfE8rZRObCC8M5O3r+v2g06mtjJLSA==
+X-Received: by 2002:a92:c54d:0:b0:3a0:9b56:a69 with SMTP id e9e14a558f8ab-3a397cf7cbemr45910245ab.7.1728500506114;
+        Wed, 09 Oct 2024 12:01:46 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a3a030a20fsm3091455ab.8.2024.10.09.12.01.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 12:01:45 -0700 (PDT)
+Message-ID: <af74b2db-8cf4-4b5a-9390-e7c1cfd8b409@kernel.dk>
+Date: Wed, 9 Oct 2024 13:01:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241009185802.3763282-1-edumazet@google.com>
-Subject: [PATCH net] ppp: fix ppp_async_encode() illegal access
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+1d121645899e7692f92a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 12/15] io_uring/zcrx: add io_recvzc request
+To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-13-dw@davidwei.uk>
+ <703c9d90-bca1-4ee7-b1f3-0cfeaf38ef8f@kernel.dk>
+ <f2ab35ef-ef19-4280-bc39-daf9165c3a51@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <f2ab35ef-ef19-4280-bc39-daf9165c3a51@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot reported an issue in ppp_async_encode() [1]
+On 10/9/24 12:51 PM, Pavel Begunkov wrote:
+> On 10/9/24 19:28, Jens Axboe wrote:
+>>> diff --git a/io_uring/net.c b/io_uring/net.c
+>>> index d08abcca89cc..482e138d2994 100644
+>>> --- a/io_uring/net.c
+>>> +++ b/io_uring/net.c
+>>> @@ -1193,6 +1201,76 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+>>>       return ret;
+>>>   }
+>>>   +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>>> +{
+>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+>>> +    unsigned ifq_idx;
+>>> +
+>>> +    if (unlikely(sqe->file_index || sqe->addr2 || sqe->addr ||
+>>> +             sqe->len || sqe->addr3))
+>>> +        return -EINVAL;
+>>> +
+>>> +    ifq_idx = READ_ONCE(sqe->zcrx_ifq_idx);
+>>> +    if (ifq_idx != 0)
+>>> +        return -EINVAL;
+>>> +    zc->ifq = req->ctx->ifq;
+>>> +    if (!zc->ifq)
+>>> +        return -EINVAL;
+>>
+>> This is read and assigned to 'zc' here, but then the issue handler does
+>> it again? I'm assuming that at some point we'll have ifq selection here,
+>> and then the issue handler will just use zc->ifq. So this part should
+>> probably remain, and the issue side just use zc->ifq?
+> 
+> Yep, fairly overlooked. It's not a real problem, but should
+> only be fetched and checked here.
 
-In this case, pppoe_sendmsg() is called with a zero size.
-Then ppp_async_encode() is called with an empty skb.
+Right
 
-BUG: KMSAN: uninit-value in ppp_async_encode drivers/net/ppp/ppp_async.c:545 [inline]
- BUG: KMSAN: uninit-value in ppp_async_push+0xb4f/0x2660 drivers/net/ppp/ppp_async.c:675
-  ppp_async_encode drivers/net/ppp/ppp_async.c:545 [inline]
-  ppp_async_push+0xb4f/0x2660 drivers/net/ppp/ppp_async.c:675
-  ppp_async_send+0x130/0x1b0 drivers/net/ppp/ppp_async.c:634
-  ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2280 [inline]
-  ppp_input+0x1f1/0xe60 drivers/net/ppp/ppp_generic.c:2304
-  pppoe_rcv_core+0x1d3/0x720 drivers/net/ppp/pppoe.c:379
-  sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1113
-  __release_sock+0x1da/0x330 net/core/sock.c:3072
-  release_sock+0x6b/0x250 net/core/sock.c:3626
-  pppoe_sendmsg+0x2b8/0xb90 drivers/net/ppp/pppoe.c:903
-  sock_sendmsg_nosec net/socket.c:729 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:744
-  ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
-  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
-  __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
-  __do_sys_sendmmsg net/socket.c:2771 [inline]
-  __se_sys_sendmmsg net/socket.c:2768 [inline]
-  __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
-  x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>>> +    /* All data completions are posted as aux CQEs. */
+>>> +    req->flags |= REQ_F_APOLL_MULTISHOT;
+>>
+>> This puzzles me a bit...
+> 
+> Well, it's a multishot request. And that flag protects from cq
+> locking rules violations, i.e. avoiding multishot reqs from
+> posting from io-wq.
 
-Uninit was created at:
-  slab_post_alloc_hook mm/slub.c:4092 [inline]
-  slab_alloc_node mm/slub.c:4135 [inline]
-  kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4187
-  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
-  __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
-  alloc_skb include/linux/skbuff.h:1322 [inline]
-  sock_wmalloc+0xfe/0x1a0 net/core/sock.c:2732
-  pppoe_sendmsg+0x3a7/0xb90 drivers/net/ppp/pppoe.c:867
-  sock_sendmsg_nosec net/socket.c:729 [inline]
-  __sock_sendmsg+0x30f/0x380 net/socket.c:744
-  ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
-  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
-  __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
-  __do_sys_sendmmsg net/socket.c:2771 [inline]
-  __se_sys_sendmmsg net/socket.c:2768 [inline]
-  __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
-  x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Maybe make it more like the others and require that
+IORING_RECV_MULTISHOT is set then, and set it based on that?
 
-CPU: 1 UID: 0 PID: 5411 Comm: syz.1.14 Not tainted 6.12.0-rc1-syzkaller-00165-g360c1f1f24c6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>>> +    zc->flags = READ_ONCE(sqe->ioprio);
+>>> +    zc->msg_flags = READ_ONCE(sqe->msg_flags);
+>>> +    if (zc->msg_flags)
+>>> +        return -EINVAL;
+>>
+>> Maybe allow MSG_DONTWAIT at least? You already pass that in anyway.
+> 
+> What would the semantics be? The io_uring nowait has always
+> been a pure mess because it's not even clear what it supposed
+> to mean for async requests.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+1d121645899e7692f92a@syzkaller.appspotmail.com
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- drivers/net/ppp/ppp_async.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Yeah can't disagree with that. Not a big deal, doesn't really matter,
+can stay as-is.
 
-diff --git a/drivers/net/ppp/ppp_async.c b/drivers/net/ppp/ppp_async.c
-index a940b9a67107a9f1523ecaae5d49448d977cfe00..c97406c6004d421623c1a3b0b8e30e9237c1dfeb 100644
---- a/drivers/net/ppp/ppp_async.c
-+++ b/drivers/net/ppp/ppp_async.c
-@@ -542,7 +542,7 @@ ppp_async_encode(struct asyncppp *ap)
- 	 * and 7 (code-reject) must be sent as though no options
- 	 * had been negotiated.
- 	 */
--	islcp = proto == PPP_LCP && 1 <= data[2] && data[2] <= 7;
-+	islcp = proto == PPP_LCP && count >= 3 && 1 <= data[2] && data[2] <= 7;
- 
- 	if (i == 0) {
- 		if (islcp)
+>>> +    if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
+>>> +        return -EINVAL;
+>>> +
+>>> +
+>>> +#ifdef CONFIG_COMPAT
+>>> +    if (req->ctx->compat)
+>>> +        zc->msg_flags |= MSG_CMSG_COMPAT;
+>>> +#endif
+>>> +    return 0;
+>>> +}
+>>
+>> Heh, we could probably just return -EINVAL for that case, but since this
+>> is all we need, fine.
+> 
+> Well, there is no msghdr, cmsg nor iovec there, so doesn't even
+> make sense to set it. Can fail as well, I don't anyone would care.
+
+Then let's please just kill it, should not need a check for that then.
+
 -- 
-2.47.0.rc0.187.ge670bccf7e-goog
-
+Jens Axboe
 
