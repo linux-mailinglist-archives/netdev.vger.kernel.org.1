@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-133871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38341997512
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:44:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 776A9997513
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:44:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CC611C2178E
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:44:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C59D1C217A0
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4071E133D;
-	Wed,  9 Oct 2024 18:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797A21E1305;
+	Wed,  9 Oct 2024 18:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q29BYG/k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B5sm/8z9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5151C1E1305
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE07D1E1331
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728499452; cv=none; b=uD85D1+KW3ajoNukhI2eG8Ig9yPX+/MlyO2PzryxMK31bsxSZ3urRr+tyFErcIs8FNOM+bBsHbX1Bg9/NXH7ZnHtsNtgt7Y1jrfhMKx0Oo4jlxNfOhpw4WbDjUKWB2q/rRaaEfoI8P5UcNlQGDIHlbNrrZSvRAQMzYow7bFBuJc=
+	t=1728499454; cv=none; b=cikbF4pOgE06KaNrUFyuTp+E5GORJBoO/ze8BUNSVEKKUNzkTf80d9T9K19nt/K1XY/k2we7XQhksSsqzdtV9B9bpjURdjZgYqzgzNYsmSBr0vF8rraXxcWr/gA1kq442/HOrXtzNJ2ID62gAtAoa1RBzG3W02+Qwy46z+NyQOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728499452; c=relaxed/simple;
-	bh=U8fsdmCWU5tm80pdUdUWzBotyCsl5fCry4pinonfIkQ=;
+	s=arc-20240116; t=1728499454; c=relaxed/simple;
+	bh=OQkr6ZAA/DrRW6NsX1hc847jsnbcVIb1yQI5A7ZG7QQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ReJ7earsrEmeRPta0KHGZfvfdkHBjAKpKSD2GaeyDTlMlaiWLYkBgxX8ZhyDVLu4prwjdghRFKgGxo+Xwg+gZhgqp4um3qSSrUXr9D9eprO8DhxV5x3PVeskaSQFYndam2a2oZSXu7hK+QxovgfrU/SNSaWAwSPNpDFsjLUzLdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q29BYG/k; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=JgEql+s9cqBpxiDTshA4Co19C7mib8Io1n/pmb7rTldYpCjDy/Hhw4Bg6XOtvJFY13hichvKnOHJU+yWOfHeon8b6+Q65UiNc7lecpduggGT10Fn5Taf7diOjhGGtwiP9Soi+KzGO1z3sOSJIkUSlwMd+8V7akjBlbHnNisHrUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B5sm/8z9; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e25cae769abso102356276.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:44:11 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e28fdb4f35fso162703276.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:44:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728499450; x=1729104250; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728499452; x=1729104252; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MVHu6Oqjpe1Zjs4nXBUh0ng8MyB/abNtjZH5mQJ4Iao=;
-        b=q29BYG/k2dB8QJrWF4Y51fVwCYudmpIbKNHe3spL29HJcpKppmCpXP/PaQ0ZlDj1o5
-         by4C9YcPP0xyI16BFdn7ZykTAr+iuFYFEsnZrmVaGfGrZB3e0vcf1eBBOBF7RzhUOCsJ
-         5x0vn94j08xxUJJvKuM48NzDrdt+Qg/NimeKuJen7dl4VVrV6GkjLmoLynoFC8dyExou
-         7ZgRR3XD+XsF+QRCdcoAfnqOBNb5xgEJgAMQCDBemODI8FHRnmPxBHYqsS1iY88gmGuv
-         gASp1uYWvvHjF6IsEDlHFQSrm127n9WJo9U20urxTls3JG9w2AsL/sgTWOjTScGF+qxH
-         lxeQ==
+        bh=zNapo1VlcBbiHxg0tBKVZ2iSK7BFeqVQinD62G/1cF4=;
+        b=B5sm/8z9CtFeumcQpV9jLHyjTwXX16aIICl4sPtmwZq+pBZeqsBFj7oOaYzZrFDpc9
+         jqJyYuz/eXM4vpiMTUaQQiHUpxKwYdKhyb93TLfmd5TlpO1edaUJ5lDIJJYHmR0+yxWu
+         CUGtuTnVkzx7bhLGdRpoIGWP+MwV7BeY0W3/2zz5wNzG9cj/49ytdrm9ZHSciFQ5lsDg
+         b30wdN+w1u8bDs3uv9A/l6srz1F2FivWm0Z5VpHyxLUnna8qFVkTu6iNiHqu+DXAGtm8
+         l0h8s0hhlWpJbLLE+AJI6zKi5z1pPqe8QbureNIhd2jExIhhIqp+/L99ad3fBUy2MSA2
+         K/NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728499450; x=1729104250;
+        d=1e100.net; s=20230601; t=1728499452; x=1729104252;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MVHu6Oqjpe1Zjs4nXBUh0ng8MyB/abNtjZH5mQJ4Iao=;
-        b=Vlg7KNA69fPjDsURJ5mZ766HozArfI2N+Y/Uq/S4qazWuyZpXcf2xKMSfkq94O2p7p
-         wT0lwbPsnQBfb/YGUf+OsLvxkQionpXL2VXZj/7hxAdrmlSVPW5VLCLZ7m4vZrdeiSU9
-         yLWC1O6Znb2gBLc3jaAM+pVM500xwCaU08OMglnwIP2/YvvyHOxyKRYjlEF+npJC7AGq
-         rWIyK9J7D6cg23odAl8whGihzS7iRBIe4gWUmBBb4us5N2I1v0YxessK7Lgaa+kct6GH
-         72qrekb3PjeMC9pVM7qlIMbL26K7cHGlTykIbRJAnxrqKkKob9224jTLSSCJvb9odgVK
-         PFdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXThE+nDRqlT8DBUVyZQxUDm1zDjJ4QwtvN/83bvv17qVNx6sEeWG1dW2DoCs5yQyKTF0CxaOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE4D+6tF5wkIVgnpoPiz4Dam3hl9xllYj3nHO6YPAu2sne2SGF
-	9N524fKMgfeuaPusOEIAM/7AYPN8hClsY5TRcf/RfP56c/LKHAtBdgp/FWrS9d5tx5IZnzbUprD
-	md7AUt4mHqA==
-X-Google-Smtp-Source: AGHT+IGbJTJMIVOUbd/sb+2rk4KTK7bMR4N9htGC+Tw71BP+sR6E2EoUjKpMRb3OG44T7oWdIgjD9Mw7VZqgvQ==
+        bh=zNapo1VlcBbiHxg0tBKVZ2iSK7BFeqVQinD62G/1cF4=;
+        b=BtS0E+18PiOhmqwBo7pWWsuXiToYIMhlWe1Al8e8Mfcw6qHsg5trNISeg5gO8s7Bwu
+         t+fUr8EGpPouhhjHyU5M1t++7yFAcA1eKLSPN5kSAH71D+Ii9M80RBxzFYjen3Ib7XI6
+         PBjj13x9WuvMJF7YKPt/sYAoX1xSBM5tIKAMR1nS5QsqzDFg1kfIH46ulkY6d7NI+VKk
+         Q030GUrOr1n7S2+Wf7r9tBeHKeVpKyapHLydj/15pELxmav0QvD7Yk0QoAh9N5mbHuZR
+         x7vhrTNwv9FZRYOslGb/VBYNGucvD9P99IUJpzb1eelPWjzQ2ijOvQzfPON9NSqT1Jap
+         UXnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXjcozuWMBOQQrZLJ7k1nt2A7lEfM2oMFRTBTHbnNn7XHTcXxKymgTSCX1FzhdLIht4wTxOCYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPfvfyAN6qXLZ4ekQ+qy7YT4J+6IKt9ZCVKW10k6PgLWOmIn2a
+	K42aLASFD5fX3FzcHINZUI5Mu0wAkAB2IGpJIELmEkimhOGF47r8GVq1Ju5bCpiruSr6Ki7K/dB
+	u/T2oMP20gw==
+X-Google-Smtp-Source: AGHT+IG0GJ8qpYbl6XIrr5LGu+3QQnPK+YNmW+W8q2+wSPL/BcSEslyavrCMfIzUauywEGNapLgpBUpRsFIg8A==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:6904:0:b0:e28:ee84:e4d8 with SMTP id
- 3f1490d57ef6-e28fe3559f3mr2209276.3.1728499450235; Wed, 09 Oct 2024 11:44:10
+ (user=edumazet job=sendgmr) by 2002:a25:8287:0:b0:e29:4a5:4555 with SMTP id
+ 3f1490d57ef6-e2904a548b7mr1891276.11.1728499451785; Wed, 09 Oct 2024 11:44:11
  -0700 (PDT)
-Date: Wed,  9 Oct 2024 18:44:02 +0000
+Date: Wed,  9 Oct 2024 18:44:03 +0000
 In-Reply-To: <20241009184405.3752829-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241009184405.3752829-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
-Message-ID: <20241009184405.3752829-3-edumazet@google.com>
-Subject: [PATCH net-next 2/5] ipv4: use READ_ONCE()/WRITE_ONCE() on net->ipv4.fib_seq
+Message-ID: <20241009184405.3752829-4-edumazet@google.com>
+Subject: [PATCH net-next 3/5] ipv6: use READ_ONCE()/WRITE_ONCE() on fib6_table->fib_seq
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -89,88 +89,122 @@ Using RTNL to protect ops->fib_rules_seq reads seems a big hammer.
 Writes are protected by RTNL.
 We can use READ_ONCE() when reading it.
 
-Constify 'struct net' argument of fib4_rules_seq_read()
+Constify 'struct net' argument of fib6_tables_seq_read() and
+fib6_rules_seq_read().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/ip_fib.h     | 4 ++--
- include/net/netns/ipv4.h | 2 +-
- net/ipv4/fib_notifier.c  | 8 ++++----
- net/ipv4/fib_rules.c     | 2 +-
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ include/net/ip6_fib.h |  8 ++++----
+ net/ipv6/fib6_rules.c |  2 +-
+ net/ipv6/ip6_fib.c    | 14 +++++++-------
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/include/net/ip_fib.h b/include/net/ip_fib.h
-index 967e4dc555face31a736f6108cea6b929478beba..4c2e2d1481ebff5292b9e433f56fa7289ba8e139 100644
---- a/include/net/ip_fib.h
-+++ b/include/net/ip_fib.h
-@@ -347,7 +347,7 @@ static inline int fib4_rules_dump(struct net *net, struct notifier_block *nb,
- 	return 0;
- }
+diff --git a/include/net/ip6_fib.h b/include/net/ip6_fib.h
+index 6cb867ce4878423fbb9049e69445a6dbf8f31ba7..7c87873ae211c5fa80d34e8f3b8df0e813976390 100644
+--- a/include/net/ip6_fib.h
++++ b/include/net/ip6_fib.h
+@@ -394,7 +394,7 @@ struct fib6_table {
+ 	struct fib6_node	tb6_root;
+ 	struct inet_peer_base	tb6_peers;
+ 	unsigned int		flags;
+-	unsigned int		fib_seq;
++	unsigned int		fib_seq; /* writes protected by rtnl_mutex */
+ 	struct hlist_head       tb6_gc_hlist;	/* GC candidates */
+ #define RT6_TABLE_HAS_DFLT_ROUTER	BIT(0)
+ };
+@@ -563,7 +563,7 @@ int call_fib6_notifiers(struct net *net, enum fib_event_type event_type,
+ int __net_init fib6_notifier_init(struct net *net);
+ void __net_exit fib6_notifier_exit(struct net *net);
  
--static inline unsigned int fib4_rules_seq_read(struct net *net)
-+static inline unsigned int fib4_rules_seq_read(const struct net *net)
+-unsigned int fib6_tables_seq_read(struct net *net);
++unsigned int fib6_tables_seq_read(const struct net *net);
+ int fib6_tables_dump(struct net *net, struct notifier_block *nb,
+ 		     struct netlink_ext_ack *extack);
+ 
+@@ -632,7 +632,7 @@ void fib6_rules_cleanup(void);
+ bool fib6_rule_default(const struct fib_rule *rule);
+ int fib6_rules_dump(struct net *net, struct notifier_block *nb,
+ 		    struct netlink_ext_ack *extack);
+-unsigned int fib6_rules_seq_read(struct net *net);
++unsigned int fib6_rules_seq_read(const struct net *net);
+ 
+ static inline bool fib6_rules_early_flow_dissect(struct net *net,
+ 						 struct sk_buff *skb,
+@@ -676,7 +676,7 @@ static inline int fib6_rules_dump(struct net *net, struct notifier_block *nb,
  {
  	return 0;
  }
-@@ -411,7 +411,7 @@ static inline bool fib4_has_custom_rules(const struct net *net)
- bool fib4_rule_default(const struct fib_rule *rule);
- int fib4_rules_dump(struct net *net, struct notifier_block *nb,
- 		    struct netlink_ext_ack *extack);
--unsigned int fib4_rules_seq_read(struct net *net);
-+unsigned int fib4_rules_seq_read(const struct net *net);
+-static inline unsigned int fib6_rules_seq_read(struct net *net)
++static inline unsigned int fib6_rules_seq_read(const struct net *net)
+ {
+ 	return 0;
+ }
+diff --git a/net/ipv6/fib6_rules.c b/net/ipv6/fib6_rules.c
+index 04a9ed5e8310f23cb7d947b732be5dd19916bf39..c85c1627cb16ed0bdfe4c6026bb0132cdd7be6b7 100644
+--- a/net/ipv6/fib6_rules.c
++++ b/net/ipv6/fib6_rules.c
+@@ -56,7 +56,7 @@ int fib6_rules_dump(struct net *net, struct notifier_block *nb,
+ 	return fib_rules_dump(net, nb, AF_INET6, extack);
+ }
  
- static inline bool fib4_rules_early_flow_dissect(struct net *net,
- 						 struct sk_buff *skb,
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 276f622f3516871c438be27bafe61c039445b335..10c0a8dc37a23e793007ee47706b402fffbd08da 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -263,7 +263,7 @@ struct netns_ipv4 {
+-unsigned int fib6_rules_seq_read(struct net *net)
++unsigned int fib6_rules_seq_read(const struct net *net)
+ {
+ 	return fib_rules_seq_read(net, AF_INET6);
+ }
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index eb111d20615c6274647eeb413d0b9475aaa3ae6c..cea160b249d2d75d03c867d2298da76eb0c7114e 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -345,17 +345,17 @@ static void __net_init fib6_tables_init(struct net *net)
+ 
  #endif
  
- 	struct fib_notifier_ops	*notifier_ops;
--	unsigned int	fib_seq;	/* protected by rtnl_mutex */
-+	unsigned int	fib_seq;	/* writes protected by rtnl_mutex */
- 
- 	struct fib_notifier_ops	*ipmr_notifier_ops;
- 	unsigned int	ipmr_seq;	/* protected by rtnl_mutex */
-diff --git a/net/ipv4/fib_notifier.c b/net/ipv4/fib_notifier.c
-index 0e23ade74493ce10a3f2572c39e091f132684884..21c85c80de641112d66a28645b1fb17c7071863f 100644
---- a/net/ipv4/fib_notifier.c
-+++ b/net/ipv4/fib_notifier.c
-@@ -22,15 +22,15 @@ int call_fib4_notifiers(struct net *net, enum fib_event_type event_type,
- 	ASSERT_RTNL();
- 
- 	info->family = AF_INET;
--	net->ipv4.fib_seq++;
-+	/* Paired with READ_ONCE() in fib4_seq_read() */
-+	WRITE_ONCE(net->ipv4.fib_seq, net->ipv4.fib_seq + 1);
- 	return call_fib_notifiers(net, event_type, info);
- }
- 
- static unsigned int fib4_seq_read(struct net *net)
+-unsigned int fib6_tables_seq_read(struct net *net)
++unsigned int fib6_tables_seq_read(const struct net *net)
  {
--	ASSERT_RTNL();
--
--	return net->ipv4.fib_seq + fib4_rules_seq_read(net);
-+	/* Paired with WRITE_ONCE() in call_fib4_notifiers() */
-+	return READ_ONCE(net->ipv4.fib_seq) + fib4_rules_seq_read(net);
+ 	unsigned int h, fib_seq = 0;
+ 
+ 	rcu_read_lock();
+ 	for (h = 0; h < FIB6_TABLE_HASHSZ; h++) {
+-		struct hlist_head *head = &net->ipv6.fib_table_hash[h];
+-		struct fib6_table *tb;
++		const struct hlist_head *head = &net->ipv6.fib_table_hash[h];
++		const struct fib6_table *tb;
+ 
+ 		hlist_for_each_entry_rcu(tb, head, tb6_hlist)
+-			fib_seq += tb->fib_seq;
++			fib_seq += READ_ONCE(tb->fib_seq);
+ 	}
+ 	rcu_read_unlock();
+ 
+@@ -400,7 +400,7 @@ int call_fib6_entry_notifiers(struct net *net,
+ 		.rt = rt,
+ 	};
+ 
+-	rt->fib6_table->fib_seq++;
++	WRITE_ONCE(rt->fib6_table->fib_seq, rt->fib6_table->fib_seq + 1);
+ 	return call_fib6_notifiers(net, event_type, &info.info);
  }
  
- static int fib4_dump(struct net *net, struct notifier_block *nb,
-diff --git a/net/ipv4/fib_rules.c b/net/ipv4/fib_rules.c
-index b07292d50ee76603f983c81a55d45abca89266e1..8325224ef07232d05b59c58011625daae847af30 100644
---- a/net/ipv4/fib_rules.c
-+++ b/net/ipv4/fib_rules.c
-@@ -74,7 +74,7 @@ int fib4_rules_dump(struct net *net, struct notifier_block *nb,
- 	return fib_rules_dump(net, nb, AF_INET, extack);
+@@ -416,7 +416,7 @@ int call_fib6_multipath_entry_notifiers(struct net *net,
+ 		.nsiblings = nsiblings,
+ 	};
+ 
+-	rt->fib6_table->fib_seq++;
++	WRITE_ONCE(rt->fib6_table->fib_seq, rt->fib6_table->fib_seq + 1);
+ 	return call_fib6_notifiers(net, event_type, &info.info);
  }
  
--unsigned int fib4_rules_seq_read(struct net *net)
-+unsigned int fib4_rules_seq_read(const struct net *net)
- {
- 	return fib_rules_seq_read(net, AF_INET);
+@@ -427,7 +427,7 @@ int call_fib6_entry_notifiers_replace(struct net *net, struct fib6_info *rt)
+ 		.nsiblings = rt->fib6_nsiblings,
+ 	};
+ 
+-	rt->fib6_table->fib_seq++;
++	WRITE_ONCE(rt->fib6_table->fib_seq, rt->fib6_table->fib_seq + 1);
+ 	return call_fib6_notifiers(net, FIB_EVENT_ENTRY_REPLACE, &info.info);
  }
+ 
 -- 
 2.47.0.rc0.187.ge670bccf7e-goog
 
