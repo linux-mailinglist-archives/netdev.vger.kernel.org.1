@@ -1,180 +1,146 @@
-Return-Path: <netdev+bounces-133489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8409961E4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:10:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C37A99622F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A187428B368
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:10:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DCD41F21D53
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9A3187843;
-	Wed,  9 Oct 2024 08:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8165188A18;
+	Wed,  9 Oct 2024 08:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SzfJSiNB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MxpUjIhD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D021537D7;
-	Wed,  9 Oct 2024 08:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43770188733
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 08:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728461397; cv=none; b=WEMTipmd1EgNe1xP+QaWHtyG19Ot16taOmRDmsjwHGmsBRqD7N6N+y3SpoQCGFQ6yT9VVK2d+4nQe5G9qSNCHMB56MC8zvFnFaAtqzbDMSWcr6kat6FsUx14b/Y4uvVGLBHpQG4xZVD6yZifnBllTeF1r031RX3obEQtsaYgaTU=
+	t=1728461703; cv=none; b=dAM7G7kpj3sy2szwAcMugucHp423NszQ/WgMqKU5gox1ibByh9XD5gaZTvES9Fvz6SpBe+6i46tIdwPBALOLvZhjVru1i7hPHtkp/jTXQ8IgQI1at261vt0kfDkbrd7gT7EpWCnidgFBpvj2ZPEJc+tqipSsSfwa0F+krMzhzI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728461397; c=relaxed/simple;
-	bh=IkTkrVyRCSwv3EpNMmPZLNdcW9UepVkbdkRW2pKFUbQ=;
+	s=arc-20240116; t=1728461703; c=relaxed/simple;
+	bh=AXLP2KyrAqjaejcHnTbI8HMVGaKN1T0qdKQjIwPuqBE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jyqjefKdN24j7Gq4eRr4erpCAeOUzKZbYZAQIXuT5Wgpdi9oGS+n9iT7k2TwVQOUsc0aAF4eLsI282kV4uUOC4cvmWc4eAOVO5tNcR9TqpqZ/6k6rjnJDOvbrC8CjQgzS2uRvkoyTfjIbK5EhiEQf4dphDhcliA2hCEeT1wcl78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SzfJSiNB; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3636ddad6so23478045ab.2;
-        Wed, 09 Oct 2024 01:09:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728461395; x=1729066195; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OqiAzVjZxlsttYgwKg8hz8xAiwvJXOp3NWV6IWxbUCg=;
-        b=SzfJSiNBozcdaJQWqQ7wsdM9ou5fTAu9Me8y2QiKySjuRz4u6LFrVpgX1vISn5JRnw
-         ieFFhxCvUNdZuv1SvhhL8ORD0x4g6zFZ0kKUh+pmorRr3DRQ0shkhh2ltl11CaBA9s+z
-         wPLXwBqFkXyfmxrHTsIzamhSx4h9eMudyAsv91uJutcn8hjcRddAjzerl9Nxh42cMJE3
-         ZqH/aM01Ua43ZlnHLvEM/CYZ5zjXbrAD2BrpBceAvbmtJ0aF8ST8GxPuiUJQKSpX8lmS
-         RuWjYndTE4QswV1Grx42QyuNMxtCPRZ/tzt8zd3agbJmtiWqxp8gpDEHFdg/JCNRiO8f
-         1qcw==
+	 To:Cc:Content-Type; b=jezyl5Paow6nwFi2bF/tUaxMC31wEtH9RNp82UwJ9S/IukSzDS5R8c5MqzdEaJCPgKa1sO5V8iYjPMTrb2WOnlKoFl/1S5BvfYK8phY5mo60MWVDuweU3Z9pSFhy451gIk44DFEwDcSUSEe5EFRvgwjeQ5lXYrz6qo+u6Q5QzNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MxpUjIhD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728461701;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H7WnLoztQpWL0UuoG5WJ33odis8tMGytHkOB4fwng3Y=;
+	b=MxpUjIhDhUfisNAmQ3skP8ogg1R3B8QpiN9KDidyfWel/s7MsEcim2uTGkU4g4r1Ft3TsW
+	zIGK+DEF5DBLeU6iikqYsy5sr68jlkysSHaG5EzVBWnP1c1jWB2QVVD1uzcDnMeS5ALRZi
+	emkEpluhdtkzWUOcE4dHCc2jZkqa5YI=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-159-wgy8G4L0PBeaQXL-2sgTkQ-1; Wed, 09 Oct 2024 03:45:22 -0400
+X-MC-Unique: wgy8G4L0PBeaQXL-2sgTkQ-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e28d7928d8so1709257a91.3
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 00:45:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728461395; x=1729066195;
+        d=1e100.net; s=20230601; t=1728459912; x=1729064712;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OqiAzVjZxlsttYgwKg8hz8xAiwvJXOp3NWV6IWxbUCg=;
-        b=qOF7v9YvvrFWCAAIA9EwczLY/KX/EzWcmUwuaBsHsgH7FuV72eWLZWyR2fF+r4f+G8
-         hnJcGc4rPw7u1NOYxd/KxCmcCaI5Ash/Cq9EmIoodjJKIbks+qX1UcJpfb/frQks8n5L
-         3WeLpgtbj6bQSmjF6OIh9NCaTpPdO61/XAOxRIGaP+BFnK08W4dO6f1LMS9YC1nSMSqM
-         qUAy+IFK+poJkmTH1tnIEqAn2gwzCU9RaCpuu5jK6j694gvnemk/3bkNLth5PA5CdyIY
-         LGqdcJHaYsPszyjdYlbtbXrnHkrLB0ymghed1u2gU/FTL5XmLgkAu3Hdajg4aCT998cU
-         GwqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdYvaTJjFFKL4d2iu7QHxPCAm5RDk7X+iF5SSmLZ8tDxndQFTtA2/ADMWvqXJfwQQwC+u81CIS@vger.kernel.org, AJvYcCXeto+isb/xPFfw0Lr9HDBqKCAIPG50T9mlo5LTq5QBwNLThwfv4y5Mn9COQryRyIaNwoU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrDKhjMH3/zfvs6BYhB+4al0yqzb7EqGwy6j51hJXhR5JnnuDp
-	4bj6p/Y6znTgo7FG1cJkwR6mPhegT9cdSs2oSwmJ8njM38z2nABQqHm5Hd9gu78Df3n+LFEr2b/
-	pE+1+nSwm5j2uuAt59iy+vARtETw=
-X-Google-Smtp-Source: AGHT+IEMZ8RaR5dhZS1Ehs7tfyrTBHG2qN3dN+U0VBBoBIHpjfkqIPrL0Y+zPETkfzCP7AWL0ErUcwMBpmybEr4mNHQ=
-X-Received: by 2002:a05:6e02:13a7:b0:3a0:933a:2a0a with SMTP id
- e9e14a558f8ab-3a397ce693bmr16418605ab.7.1728461395498; Wed, 09 Oct 2024
- 01:09:55 -0700 (PDT)
+        bh=H7WnLoztQpWL0UuoG5WJ33odis8tMGytHkOB4fwng3Y=;
+        b=Cwp6uTrl7lIHJbkbDJv3FeBl3YRPjnOjaoQGqVijKTkuoi62MXgyNWoFiJTnGJQFki
+         TjQnOX99BUszDjXNcwVktUMA6A3mZ+Im6ju9kt57e/POUDZr1+LQzvvonRPik7FWwPDb
+         kj8QSjzpm9hyaRv/j4lHBdv7JRtHSD1DO0Jqt9jb804is3BYzHzMPYIfy2GW14ryZn+c
+         Mn0BmhTuek+cAraHUN5+DvCEuTVnr9HShZooI8EWGqQELGnCgdYNODgb01DPM0m2/L56
+         19ywFti2OVPPcZUINBTpOlQA6AmDuDx1l5PV76m2HWk0zMzA91BRbY2hL5sPj8G5zo9i
+         92ng==
+X-Forwarded-Encrypted: i=1; AJvYcCX2OGO+rW5RF/g60ziwpKidM5HJhA6gzRUOJFVu1nfGm7VWecVxaDBkFv0gTn0BVr2PTo4wwhc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh+4TwB6+bu6sg9fiKGJMu9N3bOe7/w/TyBgWIC8BELOIOG90a
+	88Ms4iyR3qZJPis1k9qAVF3ZpvygF01qfn3PiZWJ3rPCjRKU+fgnncj2+1xMS/7Lq21mE9s2XOp
+	eXw3/1e5zzkK3gL2Fav62eJOg+uN1n6+CbhAxkmq467RhK7hcQJR1WGi8eK65DJPKs/fEvFfaAo
+	2pEaU0fsLLE+X5WApIYq1es/g3qwtS
+X-Received: by 2002:a17:90b:4a52:b0:2e2:991c:d795 with SMTP id 98e67ed59e1d1-2e2a2587e6cmr1772577a91.40.1728459911719;
+        Wed, 09 Oct 2024 00:45:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUXS3Vu8tqbV1XHkGBTCNaL2VDRz7beWlworvX+yKRqbV5bgZG5ofneJzBijB1Dsili4oRB7g3ygL6aKFSPxI=
+X-Received: by 2002:a17:90b:4a52:b0:2e2:991c:d795 with SMTP id
+ 98e67ed59e1d1-2e2a2587e6cmr1771623a91.40.1728459881543; Wed, 09 Oct 2024
+ 00:44:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <20241008095109.99918-8-kerneljasonxing@gmail.com> <9d5dce58-c019-48b3-8815-b9e0f9d4e8cb@linux.dev>
-In-Reply-To: <9d5dce58-c019-48b3-8815-b9e0f9d4e8cb@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 9 Oct 2024 16:09:19 +0800
-Message-ID: <CAL+tcoBGe83v+1ej6GYpZpDkFt_hnuzw_mG8E3vEEhSQbUkreA@mail.gmail.com>
-Subject: Re: [PATCH net-next 7/9] net-timestamp: open gate for bpf_setsockopt
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241008-rss-v5-0-f3cf68df005d@daynix.com> <20241008-rss-v5-5-f3cf68df005d@daynix.com>
+In-Reply-To: <20241008-rss-v5-5-f3cf68df005d@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 9 Oct 2024 15:44:30 +0800
+Message-ID: <CACGkMEt054F1AZP7V0ocbUce_AvQV_Cw-K21y7Ky1gWa=eSpCA@mail.gmail.com>
+Subject: Re: [PATCH RFC v5 05/10] tun: Pad virtio header with zero
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 3:19=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
+On Tue, Oct 8, 2024 at 2:55=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
 >
-> On 10/8/24 2:51 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Now we allow users to set tsflags through bpf_setsockopt. What I
-> > want to do is passing SOF_TIMESTAMPING_RX_SOFTWARE flag, so that
-> > we can generate rx timestamps the moment the skb traverses through
-> > driver.
-> >
-> > Here is an example:
-> >
-> > case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-> > case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
-> >       sock_opt =3D SOF_TIMESTAMPING_RX_SOFTWARE;
-> >       bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING,
-> >                      &sock_opt, sizeof(sock_opt));
-> >       break;
-> >
-> > In this way, we can use bpf program that help us generate and report
-> > rx timestamp.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   net/core/filter.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> >
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index bd0d08bf76bb..9ce99d320571 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5225,6 +5225,9 @@ static int sol_socket_sockopt(struct sock *sk, in=
-t optname,
-> >               break;
-> >       case SO_BINDTODEVICE:
-> >               break;
-> > +     case SO_TIMESTAMPING_NEW:
-> > +     case SO_TIMESTAMPING_OLD:
+> tun used to simply advance iov_iter when it needs to pad virtio header,
+> which leaves the garbage in the buffer as is. This is especially
+> problematic when tun starts to allow enabling the hash reporting
+> feature; even if the feature is enabled, the packet may lack a hash
+> value and may contain a hole in the virtio header because the packet
+> arrived before the feature gets enabled or does not contain the
+> header fields to be hashed. If the hole is not filled with zero, it is
+> impossible to tell if the packet lacks a hash value.
 >
-> I believe this change was proposed before. It will change the user expect=
-ation
-> on the sk_error_queue. It needs some bits/fields/knobs for bpf. I think t=
-his
-> point is similar to other's earlier comments in this thread.
-
-Thanks for your reply.
-
-After seeing what you mentioned, I searched through the mailing list
-and found one [1] which was designed to fetch hardware timestamps.
-
-[1]=EF=BC=9Ahttps://lore.kernel.org/bpf/51fd5249-140a-4f1b-b20e-703f159e88a=
-3@linux.dev/T/
-
+> In theory, a user of tun can fill the buffer with zero before calling
+> read() to avoid such a problem, but leaving the garbage in the buffer is
+> awkward anyway so fill the buffer in tun.
 >
-> I only have a chance to briefly look at it. I think it is useful. This
-> bpf/timestamp feature request has come up before.
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-At the very beginning, I had no intention to use bpf_setsockopt() to
-retrieve the rx timestamp because it will override sk_tsflags, but I
-cannot implement a good way like what I did to tx path: only setting
-skb's field. I'm not sure if this override behaviour is acceptable, so
-I post it to know what the bpf experts' suggestions are.
+This sounds like an independent fix that is worth going to -net first.
 
+Thanks
+
+> ---
+>  drivers/net/tun_vnet.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> A high level comment. The current timestamp should work for non tcp sock?=
- The
-> bpf/timestamp solution should be able to also.
-
-For now, it only supports TCP proto. I would like to quickly implement
-a framework which is also suitable for other protos. TCP is just a
-start point.
-
+> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+> index 7c7f3f6d85e9..c40bde0fdf8c 100644
+> --- a/drivers/net/tun_vnet.h
+> +++ b/drivers/net/tun_vnet.h
+> @@ -138,7 +138,8 @@ static inline int tun_vnet_hdr_put(int sz, struct iov=
+_iter *iter,
+>         if (copy_to_iter(hdr, sizeof(*hdr), iter) !=3D sizeof(*hdr))
+>                 return -EFAULT;
 >
-> sockops is tcp centric. From looking at patch 9 that needs to initialize =
-4 args,
-> this interface feels old and not sure we want to extend to other sock typ=
-es.
-> This needs some thoughts.
+> -       iov_iter_advance(iter, sz - sizeof(*hdr));
+> +       if (iov_iter_zero(sz - sizeof(*hdr), iter) !=3D sz - sizeof(*hdr)=
+)
+> +               return -EFAULT;
+>
+>         return 0;
+>  }
+>
+> --
+> 2.46.2
+>
 
-For me, I have interests to extend to other sock types. But I'm
-supposed to ask Willem's opinion first.
-
-+Willem de Bruijn Do you want this bpf extension feature to extend to
-other protos?
-
-Thanks,
-Jason
 
