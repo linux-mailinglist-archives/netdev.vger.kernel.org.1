@@ -1,111 +1,153 @@
-Return-Path: <netdev+bounces-133911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDDE7997754
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:16:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C4997837
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7B691C2128D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:16:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCB06283A69
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744E11885BF;
-	Wed,  9 Oct 2024 21:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A2C1E282D;
+	Wed,  9 Oct 2024 22:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwbLokYm"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="DeJCF/z3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7762119
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B10017BB0C;
+	Wed,  9 Oct 2024 22:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728508568; cv=none; b=NIXLEi7o1rMo5a8j1Dk/c+L6deOvEgLVBiPr5GUw0Dnh2gMYiv019Y+xgBr7FhuEIszXZbzCjeyAYuIR4gEdyFAlSEekdqCOj4Te71l+CK7IgL1eg4CSpBQNrTIKieF0+AhUy1DSQbbgJrFyDQEzpIrAqv0SJ9XP0iqfM9W/+jE=
+	t=1728511696; cv=none; b=VQ1UBH0ecUhrQPxgQgsxcYmpOPCwd4/etPjj2OPfNS+8wHUcMHqPl2lkE5LbYRcOLU4DTdQ+orRI3+wv0bVzt7yKFm1YZHpcjEsseBTGjM8sx70KSmOQBEv8ZkR/RZvTj++UF3ST74Y9/PFt8FsqqUKxWEfz9Ko/+ukjMiBl3as=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728508568; c=relaxed/simple;
-	bh=xIsQ1d+v7oHmtaK2VQlPK34wIEw2pJt0Hqe5ull5w5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bznVrsI1j+sKRIwZzHhNu7k604hoJRkjNGYpyG0yulPqdrrn+czwp131Vs7YdD/lcI73oWJKlL/ubij9dj8rBba2Vhkv7fDZMEylUj/qkBY0/7kjcskfMdmPo3w3LhMY2ImpgtYWcgniPC1Zmioo/aPwERo3frNIkSKXN4ei5S8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwbLokYm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD4F1C4CED2;
-	Wed,  9 Oct 2024 21:16:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728508567;
-	bh=xIsQ1d+v7oHmtaK2VQlPK34wIEw2pJt0Hqe5ull5w5s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CwbLokYmR8aq9eH2I82PdYsIr8VIYQcyHIsCOUo2cu/bgkg7kzvbZHPf68P/E5Tvs
-	 drUHRha7cktm7mzerYupl2hKpvdNQ+FnjL9fUFqK8gCx/oDHz2tKX/6bkWAPHyI2YB
-	 tY3CIS4+57+ettbHVWWsGqxWIRhPz91HY9XcOtOzCsxYinU4uXaHdas87j9TTCrJeQ
-	 b4Pz/AJdnR342HPyolxCWndM2C2/mZkvOE6j702naEEqErr+CVK0hqrW6zTRgBST+O
-	 MK+0sOqy5aYSyW391mK2FHIRqDoKTQmdHBzXRYRwdeTUoGUN/zdOyzPmSRYAIojJP6
-	 GphVoT/alhGFg==
-Message-ID: <8be5e4f4-436e-41fb-a6c1-c22e9225505a@kernel.org>
-Date: Wed, 9 Oct 2024 15:16:05 -0600
+	s=arc-20240116; t=1728511696; c=relaxed/simple;
+	bh=ATz0ke/Gyqfq12BWInrt1+S0gvlwRss8NN0cvFIE+XI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=GrbMN+0d1zdviwzo4kI0rbhmXArKs8q6/rj+s/DTGXJt1OJL9wkVoXVG9d9Xv9/YXCsm+P4DbB24nVyFDxlqCxJczK0xz8aZHYe+NWA6rXQoNGGDWMG91SDmqZxG2OL4qL06Pmsr30CIl9ca6sBwRsGYmU2hxz5oJYyVhHfcc7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=DeJCF/z3; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sye8a-001i4v-Ve; Wed, 09 Oct 2024 23:22:29 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=L1Tce96RUTs2pMiFj61EXXUMJFuuEoy26u+9hdzmS0A=; b=DeJCF/z3xEPseATxpW3MpZ6w/+
+	B30z4dEt9p06OApaznhC+h4H1KDUbyYTCAimYW85u/bWbCV4bvTc1OBN2lOp0TbSy7B6RCfcbU0Ai
+	e2bltKkPDws295rjOzrpTSsJ0QvgY28PJ/V5M0ASs5x+TKw6M3lYfVXFjldhaZnszrHTPjogse0Cp
+	WNUcMOJk20LTuDI8ggmKpgnJgKDmrjV6OxxN4uiefOGgNpwKjSy3D4C8XqanaVb45CvZ2SXrpVPEp
+	92AqHn11r2WpU7KSY52dSrjG7q0DfGItgiOa4PdTETLCDzhBOhh4Z/PVI8tnCow6pzDgFPdpueu53
+	G4HcZweg==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sye8a-0000IK-0r; Wed, 09 Oct 2024 23:22:28 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sye8Q-00EL6w-OY; Wed, 09 Oct 2024 23:22:18 +0200
+From: Michal Luczaj <mhal@rbox.co>
+Date: Wed, 09 Oct 2024 23:20:50 +0200
+Subject: [PATCH bpf 1/4] bpf, sockmap: SK_DROP on attempted redirects of
+ unsupported af_vsock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/5] net: remove RTNL from fib_seq_sum()
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Jiri Pirko <jiri@resnulli.us>,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20241009184405.3752829-1-edumazet@google.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20241009184405.3752829-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20241009-vsock-fixes-for-redir-v1-1-e455416f6d78@rbox.co>
+References: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
+In-Reply-To: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On 10/9/24 12:44 PM, Eric Dumazet wrote:
-> This series is inspired by a syzbot report showing
-> rtnl contention and one thread blocked in:
-> 
-> 7 locks held by syz-executor/10835:
->   #0: ffff888033390420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2931 [inline] 
->   #0: ffff888033390420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
->   #1: ffff88806df6bc88 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
->   #2: ffff888026fcf3c8 (kn->active#50){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
->   #3: ffffffff8f56f848 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
->   #4: ffff88805e0140e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1014 [inline] 
->   #4: ffff88805e0140e8 (&dev->mutex){....}-{3:3}, at: __device_attach+0x8e/0x520 drivers/base/dd.c:1005
->   #5: ffff88805c5fb250 (&devlink->lock_key#55){+.+.}-{3:3}, at: nsim_drv_probe+0xcb/0xb80 drivers/net/netdevsim/dev.c:1534
->   #6: ffffffff8fcd1748 (rtnl_mutex){+.+.}-{3:3}, at: fib_seq_sum+0x31/0x290 net/core/fib_notifier.c:46
-> 
-> This is not a bug fix, unless I am mistaken, thus targeting net-next.
-> 
-> 
-> Eric Dumazet (5):
->   fib: rules: use READ_ONCE()/WRITE_ONCE() on ops->fib_rules_seq
->   ipv4: use READ_ONCE()/WRITE_ONCE() on net->ipv4.fib_seq
->   ipv6: use READ_ONCE()/WRITE_ONCE() on fib6_table->fib_seq
->   ipmr: use READ_ONCE() to read net->ipv[46].ipmr_seq
->   net: do not acquire rtnl in fib_seq_sum()
-> 
->  include/net/fib_notifier.h |  2 +-
->  include/net/fib_rules.h    |  2 +-
->  include/net/ip6_fib.h      |  8 ++++----
->  include/net/ip_fib.h       |  4 ++--
->  include/net/netns/ipv4.h   |  2 +-
->  net/core/fib_notifier.c    |  2 --
->  net/core/fib_rules.c       | 14 ++++++++------
->  net/ipv4/fib_notifier.c    | 10 +++++-----
->  net/ipv4/fib_rules.c       |  2 +-
->  net/ipv4/ipmr.c            | 10 ++++------
->  net/ipv6/fib6_notifier.c   |  2 +-
->  net/ipv6/fib6_rules.c      |  2 +-
->  net/ipv6/ip6_fib.c         | 14 +++++++-------
->  net/ipv6/ip6mr.c           | 10 ++++------
->  14 files changed, 40 insertions(+), 44 deletions(-)
-> 
+Don't mislead the callers of bpf_{sk,msg}_redirect_{map,hash}(): make sure
+to immediately and visibly fail the forwarding of unsupported af_vsock
+packets.
 
-For the set:
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Fixes: 634f1a7110b4 ("vsock: support sockmap")
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+ include/net/sock.h  | 5 +++++
+ net/core/sock_map.c | 8 ++++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/include/net/sock.h b/include/net/sock.h
+index c58ca8dd561b7312ffc0836585c04d9fe917a124..c87295f3476db23934d4fcbeabc7851c61ad2bc4 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -2715,6 +2715,11 @@ static inline bool sk_is_stream_unix(const struct sock *sk)
+ 	return sk->sk_family == AF_UNIX && sk->sk_type == SOCK_STREAM;
+ }
+ 
++static inline bool sk_is_vsock(const struct sock *sk)
++{
++	return sk->sk_family == AF_VSOCK;
++}
++
+ /**
+  * sk_eat_skb - Release a skb if it is no longer needed
+  * @sk: socket to eat this skb from
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 242c91a6e3d3870ec6da6fa095d180a933d1d3d4..07d6aa4e39ef606aab33bd0d95711ecf156596b9 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -647,6 +647,8 @@ BPF_CALL_4(bpf_sk_redirect_map, struct sk_buff *, skb,
+ 	sk = __sock_map_lookup_elem(map, key);
+ 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+ 		return SK_DROP;
++	if ((flags & BPF_F_INGRESS) && sk_is_vsock(sk))
++		return SK_DROP;
+ 
+ 	skb_bpf_set_redir(skb, sk, flags & BPF_F_INGRESS);
+ 	return SK_PASS;
+@@ -675,6 +677,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
+ 		return SK_DROP;
+ 	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
+ 		return SK_DROP;
++	if (sk_is_vsock(sk))
++		return SK_DROP;
+ 
+ 	msg->flags = flags;
+ 	msg->sk_redir = sk;
+@@ -1249,6 +1253,8 @@ BPF_CALL_4(bpf_sk_redirect_hash, struct sk_buff *, skb,
+ 	sk = __sock_hash_lookup_elem(map, key);
+ 	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+ 		return SK_DROP;
++	if ((flags & BPF_F_INGRESS) && sk_is_vsock(sk))
++		return SK_DROP;
+ 
+ 	skb_bpf_set_redir(skb, sk, flags & BPF_F_INGRESS);
+ 	return SK_PASS;
+@@ -1277,6 +1283,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
+ 		return SK_DROP;
+ 	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
+ 		return SK_DROP;
++	if (sk_is_vsock(sk))
++		return SK_DROP;
+ 
+ 	msg->flags = flags;
+ 	msg->sk_redir = sk;
+
+-- 
+2.46.2
 
 
