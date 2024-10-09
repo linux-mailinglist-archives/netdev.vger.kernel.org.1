@@ -1,129 +1,189 @@
-Return-Path: <netdev+bounces-133798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E001E997133
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:24:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C0399713C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:24:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD531C2152E
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DF728264B
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9984F1E0DCD;
-	Wed,  9 Oct 2024 16:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EF91F4730;
+	Wed,  9 Oct 2024 16:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="BkdffbjI"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="XoVKaUu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FE01EF957
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 16:12:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AFA1F4707
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 16:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728490346; cv=none; b=oC8OhwJeYGE75xYR3V2BUorfBcKj+jUC+DWzz/u9wMhweRX05SXyAlzDMBcxRVzWCRdrOVqCINRRSLrMlENzWiPkf3kVhLXinpao1gEF0XYUjjcYh256yWOuxNj2XcNsTs8wQKFqvyUx09/jh6yjVte0kojwt2kDziGL2DgvilM=
+	t=1728490429; cv=none; b=T3VTAuclcpN4lFrQNVN4MWYDxT0X7ghHzPoYG3DX2U6+r3NeaMpz9mJw+lcDSORHL1LzRjG5YVtT7Q3ko5H4biVDm8bpYwCoNVb2PNNLM1e+bNqsFpOcIjqRE0eOrTIkusM8HMaHAOBmbP1u2nzaUPYwSrzmlXZUe81v4GpiD+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728490346; c=relaxed/simple;
-	bh=2/449nv6Z8d1fs0P8CsWazVQNwMwmSnTu0mwfAfQTp8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=h9edN2mXVYmkA5VX9/MQW/981TSw54BIhRMALDD4h3N2/m8ZCu5E3sZ0jCSTDgosEBo/k3LzJMLizO9xeygJe6hMgWf5Bg9D3GGRGX6PC/HL+xseMNohHTfuwbTu/UsS4v6tt3Vn1cS7PNJLT5WuBqjaTR7WaeqL78vFNtDyWd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=BkdffbjI; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a0be4d803eso138835ab.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 09:12:24 -0700 (PDT)
+	s=arc-20240116; t=1728490429; c=relaxed/simple;
+	bh=qRDhwbKc4gqUv4odZFgBRE0svDDR1jk8/VJtFT5BLpw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aHz+WqqlPS0MHUCoSbFbCqWMwu8ZhWlcXVUU5ZqWWL5eVrxqsXo5UyXeC6HWezg8LlE+qPwK3FzgqQBAluf3V96+n6KLr7SwJIOFvmmVj4XjA/PbILf5j6sCRUniFc6xPvrjEekw6xcStRdPNh1eAGPdzaCbt6RX3mX9k/ZqH64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=XoVKaUu0; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71df7632055so4156143b3a.3
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 09:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728490344; x=1729095144; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=ypdbOnq03K8zB/BMpNatlqc15a91nVgbkFIt4prHA3c=;
-        b=BkdffbjIJKdVEQ+KtezANdLyfJv5R3DTJT5sHU+RfiEcikhXalTY/GDuJQbLVyBCIm
-         vUEhHf1vMwJPV3V1FlZMXBIhc9iNfARk12ir8FESMpPRHOkwqr49gEAAxx3iXuA2Oceq
-         QQDevd4x/5Wrh7rHj7klJxb5ziysa67SVZVrHEJMJt5k/1Z3/lf4J9i3fOEM4xaMwWg4
-         ff0VbUKdCAVqJ2Hjl9FqoL1Xta25s2VIWTEAcPG3k8UxqI9MWtKbt+UyUveQLAaAQ5aD
-         RP8r7JS52soBvh6QkqANBkSQ59PRtsejAmE/ZxJgxd9kzG/yI8xBhR0i4k42qUzzmKk9
-         QzZg==
+        d=fastly.com; s=google; t=1728490426; x=1729095226; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I33A6jYeY45I8ALsp4gxb0eFudKjIyGKk+ralmB1OTU=;
+        b=XoVKaUu0G1Rst4uSlyRoYXVfFtnrboa/r9k4ROZ3JBauitnIZwVtHZcheD4q55SBNs
+         nJq1dqNOghuDvZW44ATEXNHUfykrfxu9tuqTPPxzKE4GqcNvr3f56+YAWR1ueV+arm7u
+         WOa5nnVRCG0A7ylr0cUrcg80l/fgCzjtnl8C8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728490344; x=1729095144;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1728490426; x=1729095226;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ypdbOnq03K8zB/BMpNatlqc15a91nVgbkFIt4prHA3c=;
-        b=MY2dey25Xx1bgrJgfOK7uDl3w8lZqnrAtoDw3x8d6UbW8hUWPrXGaie/Tyx6vFsdie
-         UHlU5LTigg9/pQA4fgGyz9M9B/ipZ7NHhdjNV9fl8Tsu/iP7pnMiAwlL9Nl0MADaVIDQ
-         cjzTPNqVOPVm0NZHAoxdUgyQV2f2iscTlEjPAwo4NEsExv8shWc9jcxGxMfcG3ahmNO4
-         x4yuXGIKcK/08PCtmhkKB6HrBbbogWMIC/53eMM4rfQt/6YFeTRMas7hCjsJtBOG8fW8
-         r1eebuzADhswb4qSiVChr/SaEnKZhKD9H7uwf1C04ZRNm2zwyN1tc7CNCFOOJPSqZLhb
-         Idow==
-X-Forwarded-Encrypted: i=1; AJvYcCWGYXF3nqeLPpRHdeJg/IXvj8oqDuY90SiRAoeqZRFyhk6ULDb3mWC0edokovzwtDw2JkKqmLA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3lPVj2CEfeTrlFwoAfMGIg1f1bd1NCBB8YAtrM3vJRQLX7acm
-	mMcJAi479C1WM15buNJ4FtPQzLb+F8c+MnoqK6dnKD/rOjgQGyamD88/sW7hi4E=
-X-Google-Smtp-Source: AGHT+IG/Qv3PJ++ptVRD9eqi50eCXlsUBJJwWjJBIny0JwyvooG4qrB89lQiMxJZaHsEsXYec8B+ug==
-X-Received: by 2002:a05:6e02:1caf:b0:39f:53b3:ca63 with SMTP id e9e14a558f8ab-3a397cd8a7fmr25801405ab.3.1728490343684;
-        Wed, 09 Oct 2024 09:12:23 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a396c271f1sm4666975ab.53.2024.10.09.09.12.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 09:12:23 -0700 (PDT)
-Message-ID: <4e285394-3a07-4946-b7a4-c4e503f9a964@kernel.dk>
-Date: Wed, 9 Oct 2024 10:12:22 -0600
+        bh=I33A6jYeY45I8ALsp4gxb0eFudKjIyGKk+ralmB1OTU=;
+        b=Rag5Vho63G04DUbTFVJ9RUewx7ru/LgdIfcDjea4jV8OuWtwQEWV0pjznAcC0RVibN
+         zqrIpRuM1l1gRaM0AvzFKxzyoGov0B7yohQqT2Q5RV8eZL1X8H5EfWDeGDm07YiOMlEQ
+         HAm3npaiEIDBkTk7bnSYoFyd4EFfrx6FLbdF1cId8uZF32QDguRu1Bm3vUowYJuGFFKR
+         PlToHG89rTSpvNK3tAAOIZ5wc7/pvxyKc7Nt7FyBAw+dXOGnpJf+917MKzZsY1jdkYcy
+         31sYR7ApO8xIel4iv6JOyr8LvfXqaBEAHS0RVuwmyocKHlTiWWubIKuVURIXFk2jlXtP
+         SZEw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwAXi99GaB3FpmXmrO0aV1HWZ7Pi3Nll0zuisbZKvPZIATrKCLxH9y0wfkwBe8Ft2s/GsaItU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIAUU4gPsuDvXHDeQMOli4AffuIcgLm4UYaS3axPlfgjXfV22A
+	cTDnPic+I2tf+AOFGp2cWEPDBeINhc5irNLTCk1UCBiA/88eXqncKyEMVpAVKog=
+X-Google-Smtp-Source: AGHT+IE+LFDDXBBvy4teY9len83ORvaHirPjVhFZMIZBw5XnRw0clMLhZarJLPm7Q34wgwkMUTUgLw==
+X-Received: by 2002:a05:6a00:2d83:b0:71d:e93e:f53b with SMTP id d2e1a72fcca58-71e1dbbc1cemr5337089b3a.22.1728490426111;
+        Wed, 09 Oct 2024 09:13:46 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbba1csm7968933b3a.33.2024.10.09.09.13.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 09:13:45 -0700 (PDT)
+Date: Wed, 9 Oct 2024 09:13:43 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+	netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+Subject: Re: [PATCH v1 08/15] net: add helper executing custom callback from
+ napi
+Message-ID: <ZwartzLxnL7MXam6@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+	io-uring@vger.kernel.org, netdev@vger.kernel.org,
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-9-dw@davidwei.uk>
+ <ZwWxQjov3Zc_oeiR@LQ3V64L9R2>
+ <6e20af86-8b37-4e84-8ac9-ab9f8c215d00@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-To: Pavel Begunkov <asml.silence@gmail.com>, Joe Damato <jdamato@fastly.com>,
- David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <ZwW7_cRr_UpbEC-X@LQ3V64L9R2>
- <6a45f884-f9d3-4b18-9881-3bfd3a558ea8@gmail.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <6a45f884-f9d3-4b18-9881-3bfd3a558ea8@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e20af86-8b37-4e84-8ac9-ab9f8c215d00@gmail.com>
 
-On 10/9/24 9:07 AM, Pavel Begunkov wrote:
-> On 10/9/24 00:10, Joe Damato wrote:
->> On Mon, Oct 07, 2024 at 03:15:48PM -0700, David Wei wrote:
->>> This patchset adds support for zero copy rx into userspace pages using
->>> io_uring, eliminating a kernel to user copy.
->>>
->>> We configure a page pool that a driver uses to fill a hw rx queue to
->>> hand out user pages instead of kernel pages. Any data that ends up
->>> hitting this hw rx queue will thus be dma'd into userspace memory
->>> directly, without needing to be bounced through kernel memory. 'Reading'
->>> data out of a socket instead becomes a _notification_ mechanism, where
->>> the kernel tells userspace where the data is. The overall approach is
->>> similar to the devmem TCP proposal.
->>>
->>> This relies on hw header/data split, flow steering and RSS to ensure
->>> packet headers remain in kernel memory and only desired flows hit a hw
->>> rx queue configured for zero copy. Configuring this is outside of the
->>> scope of this patchset.
->>
->> This looks super cool and very useful, thanks for doing this work.
->>
->> Is there any possibility of some notes or sample pseudo code on how
->> userland can use this being added to Documentation/networking/ ?
+On Wed, Oct 09, 2024 at 04:09:53PM +0100, Pavel Begunkov wrote:
+> On 10/8/24 23:25, Joe Damato wrote:
+> > On Mon, Oct 07, 2024 at 03:15:56PM -0700, David Wei wrote:
+> > > From: Pavel Begunkov <asml.silence@gmail.com>
+> > 
+> > [...]
+> > 
+> > > However, from time to time we need to synchronise with the napi, for
+> > > example to add more user memory or allocate fallback buffers. Add a
+> > > helper function napi_execute that allows to run a custom callback from
+> > > under napi context so that it can access and modify napi protected
+> > > parts of io_uring. It works similar to busy polling and stops napi from
+> > > running in the meantime, so it's supposed to be a slow control path.
+> > > 
+> > > Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> > > Signed-off-by: David Wei <dw@davidwei.uk>
+> > 
+> > [...]
+> > 
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index 1e740faf9e78..ba2f43cf5517 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -6497,6 +6497,59 @@ void napi_busy_loop(unsigned int napi_id,
+> > >   }
+> > >   EXPORT_SYMBOL(napi_busy_loop);
+> > > +void napi_execute(unsigned napi_id,
+> > > +		  void (*cb)(void *), void *cb_arg)
+> > > +{
+> > > +	struct napi_struct *napi;
+> > > +	bool done = false;
+> > > +	unsigned long val;
+> > > +	void *have_poll_lock = NULL;
+> > > +
+> > > +	rcu_read_lock();
+> > > +
+> > > +	napi = napi_by_id(napi_id);
+> > > +	if (!napi) {
+> > > +		rcu_read_unlock();
+> > > +		return;
+> > > +	}
+> > > +
+> > > +	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+> > > +		preempt_disable();
+> > > +	for (;;) {
+> > > +		local_bh_disable();
+> > > +		val = READ_ONCE(napi->state);
+> > > +
+> > > +		/* If multiple threads are competing for this napi,
+> > > +		* we avoid dirtying napi->state as much as we can.
+> > > +		*/
+> > > +		if (val & (NAPIF_STATE_DISABLE | NAPIF_STATE_SCHED |
+> > > +			  NAPIF_STATE_IN_BUSY_POLL))
+> > > +			goto restart;
+> > > +
+> > > +		if (cmpxchg(&napi->state, val,
+> > > +			   val | NAPIF_STATE_IN_BUSY_POLL |
+> > > +				 NAPIF_STATE_SCHED) != val)
+> > > +			goto restart;
+> > > +
+> > > +		have_poll_lock = netpoll_poll_lock(napi);
+> > > +		cb(cb_arg);
+> > 
+> > A lot of the above code seems quite similar to __napi_busy_loop, as
+> > you mentioned.
+> > 
+> > It might be too painful, but I can't help but wonder if there's a
+> > way to refactor this to use common helpers or something?
+> > 
+> > I had been thinking that the napi->state check /
+> > cmpxchg could maybe be refactored to avoid being repeated in both
+> > places?
 > 
-> io_uring man pages would need to be updated with it, there are tests
-> in liburing and would be a good idea to add back a simple exapmle
-> to liburing/example/*. I think it should cover it
+> Yep, I can add a helper for that, but I'm not sure how to
+> deduplicate it further while trying not to pollute the
+> napi polling path.
 
-man pages for sure, but +1 to the example too. Just a basic thing would
-get the point across, I think.
+It was just a minor nit; I wouldn't want to hold back this important
+work just for that.
 
--- 
-Jens Axboe
+I'm still looking at the code myself to see if I can see a better
+arrangement of the code.
+
+But that could always come later as a cleanup for -next ?
 
