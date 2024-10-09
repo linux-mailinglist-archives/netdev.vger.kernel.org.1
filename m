@@ -1,221 +1,163 @@
-Return-Path: <netdev+bounces-133752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47FAB996F2A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:05:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E471996F5D
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:14:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EDEAB284D3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:05:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8DBFB22A87
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A554A1A0AFA;
-	Wed,  9 Oct 2024 15:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914931E1A08;
+	Wed,  9 Oct 2024 15:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Wr1SNHRW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OhWnPVmQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F3DE1A070D;
-	Wed,  9 Oct 2024 15:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A5D1E104F
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728486253; cv=none; b=tbLIKbMjZkTJuoIvVMLZJIBtCihXmf06AcD0F/5ZNtgnNoJ6zlvwu78jyom2OtLTRXHr7Kay3A2261MGoetNqqyL/cmHimQ3lnM0jS7dbrSrDE7UvBfio4ZOtPchKyhx52iCkzHJCEOvLgLafZWWAkumJeSVr8vCq6Z+xUdTiyo=
+	t=1728486311; cv=none; b=l+8W8xxZc4hVbU94sPzc+gnY1E3vJv4mxc3o0GZRhVuku4ewKq9UWLMjJaHCVzuj1H1+eZUoi/pehO6VdCAy419HAyMC421JK7dqPL9W23v43frr3sOtvPuccL41Z+rUrZTGMHRLKrEPyL772KmJtOr1DZhIa2o+OY5z8wOLQYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728486253; c=relaxed/simple;
-	bh=bKIcvQUy8WMdIAm6C6WJ61OnDfoqPH27UagpXtPpork=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iXx3AIYWN7M7OL+a69Ft8c2mj6EPQAlwNhxuPJ8P2FSAqLvzsHMKqXuJRFKwsvi3ftkrP5w15DvjPt7mevnRoRC4OT2g8Yw95i7R2mTLgb2CWb+FkylHqXq/8lXCWHGck+ganzlc0OYJa/8tG4qD+7bTRxjapGF/CCqAruElTSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Wr1SNHRW; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7B083240004;
-	Wed,  9 Oct 2024 15:04:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728486242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ie2PgRzn8m1kOriOpNVQSt76EWBuZBIfrODwjPlTR7o=;
-	b=Wr1SNHRWnaI7oacMbDz6+CBg0aLbBVCd28XSmkn7kUzWC0IvelZQg8J2GxHxwa7y6Irv+p
-	6hCJJNUEpTW2StF/bFOzrtKxdDgQv92MT5ROpAs3oRWbT/Zmrpb04CpmQpZ7uNEYSah/wP
-	K52jQW7uf7FrZyyukhSX4r9/GMip+gl79r63h+yu0HICQ7GsqVW8sa/BirdAv4j1KZpbNA
-	OGhs25lAf6Ga22+7MDcgctyNyyTg2gABkZwfXJmwrD+h+MwSSrpaqB/xXA/7L97CpnbV7V
-	fpazSR+mS1duWfyn65tig/oHdxOK3yzMtJ5SHIwBw6757cwz0smOKKa/ttCnug==
-Date: Wed, 9 Oct 2024 17:04:00 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Kyle Swenson <kyle.swenson@est.tech>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, Dent Project
- <dentproject@linuxfoundation.org>, "kernel@pengutronix.de"
- <kernel@pengutronix.de>
-Subject: Re: [PATCH net-next 00/12] Add support for PSE port priority
-Message-ID: <20241009170400.3988b2ac@kmaincent-XPS-13-7390>
-In-Reply-To: <ZwaLDW6sKcytVhYX@p620.local.tld>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
-	<ZwaLDW6sKcytVhYX@p620.local.tld>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1728486311; c=relaxed/simple;
+	bh=JoziAmfLurZf1irmSz9RdqM3egsJYeOZG3BdDq82Kuc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sfhKM2wVklH5n0u3OPsFlAHCTaOB7fIIPQU7v9/IFfJJGXRjhD0Omqar21qYD+ou1WEBuDANd7uFqyxHWHohs8J0jpx+U8LNj1UJDNa4VOCxAExk0GHWjYEd+EvK0PEllKwe2S0LmAySMjZ32gSlVYQDaY2BY6pqNaHt5eQY2dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OhWnPVmQ; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e22f8dc491so118962467b3.1
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 08:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728486309; x=1729091109; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RNk0Yy2Dh2od6LIXP+aNNUI8kMbNRe4FzprlmuNJ1j0=;
+        b=OhWnPVmQv9FUgXbl0t2VumI0mmpm0u+aJsPZbWCIWqdablTVWPCH84yYI8Ss6DFnUl
+         5i7lXBqDCEhL9YdEvFRwYWVTWZ+oScDOsDIy9LHWcmwRqGJ7Y+Ybx+5znarvahMfghFX
+         K/y7HoAV5cNZdAlkStkblte3ayzclDETWKvRThw4RXblXFhgAU6nBuFeDHkzDkSB0eGe
+         Y+S3PAVp2FjTfW5JFB50q57wWrkAqv0BpQ9RQQaQuJp/iuP5ZVXl6Fso5KWNwbyAzJIx
+         9tCbnacSFcJLvYiYQ3oDLMujcK2wcVwa+EVmqR51aoi19ds5sxlyVsvXKJkLd3dVFprv
+         EAFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728486309; x=1729091109;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RNk0Yy2Dh2od6LIXP+aNNUI8kMbNRe4FzprlmuNJ1j0=;
+        b=Ykcy0MH27vP7cw5Psu8n+9HwDNwbI1b4ZRlA/meNr5x58rERK14ShQh/pdFnFpQuVo
+         ezvJ/UQLm+27q5SApR0kdioqmNnXIHGllwBcmKi7Po6aQvkCtftebTuuMa6ZGVtTaX3f
+         pLmN5DB6YZWCrIX0uuElN+OZdje8vFYuA1N/62HKfRMCtrmeMlKDQGYuJZRlDBbH+JSb
+         xEq4prcP8QGEXmLr7aI504sfeyja6QJvGe+jpRMzCTIvWyQN9iSCymjAfpTK6K1JgXGT
+         xXd8dH6pmPAmGgUyQjW1weKnoOs0Yk8iEsmq8Fm5ftMsmyPy/3sjzF8a+tvcMbpfEYd9
+         EeRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDWxEgPAUfD/VDsX5PdkyC/updYqANd8VACtp0zhbp2IHbSk0XCIPyGPLW/rITilxvxt7l9zI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYOIu6xrQFz170Spfq2nHS1RAptnw4dY8qMgxnPG6CpEYc0L6T
+	m0zuiFEy3foSiyzB3asblaS7bA3opFKYGtpusGpXmdxQllh3msmw6sLWMp4oA/RtlIjO/64lVQ6
+	9QhcuJ+ogHw==
+X-Google-Smtp-Source: AGHT+IHqGGOnNpln7tvaqCKnhK91ZR4IMRUYSNrDmKocZXhc6iyTJOmXGNdQcL9ecL7Sn/x0u41Rn8RgYOrOaA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a25:103:0:b0:e28:f6f6:81a5 with SMTP id
+ 3f1490d57ef6-e28fe347af5mr2229276.0.1728486308982; Wed, 09 Oct 2024 08:05:08
+ -0700 (PDT)
+Date: Wed,  9 Oct 2024 15:05:04 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241009150504.2871093-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp: move sysctl_tcp_l3mdev_accept to netns_ipv4_read_rx
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Wei Wang <weiwan@google.com>, Coco Li <lixiaoyan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Kyle,
+sysctl_tcp_l3mdev_accept is read from TCP receive fast path from
+tcp_v6_early_demux(),
+ __inet6_lookup_established,
+  inet_request_bound_dev_if().
 
-On Wed, 9 Oct 2024 13:54:51 +0000
-Kyle Swenson <kyle.swenson@est.tech> wrote:
+Move it to netns_ipv4_read_rx.
 
-> Hello Kory,
->=20
-> On Wed, Oct 02, 2024 at 06:27:56PM +0200, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> >=20
-> > This series brings support for port priority in the PSE subsystem.
-> > PSE controllers can set priorities to decide which ports should be
-> > turned off in case of special events like over-current. =20
->=20
-> First off, great work here.  I've read through the patches in the series =
-and
-> have a pretty good idea of what you're trying to achieve- use the PSE
-> controller's idea of "port priority" and expose this to userspace via eth=
-tool.
->=20
-> I think this is probably sufficient but I wanted to share my experience
-> supporting a system level PSE power budget with PSE port priorities across
-> different PSE controllers through the same userspace interface such that
-> userspace doesn't know or care about the underlying PSE controller.
->=20
-> Out of the three PSE controllers I'm aware of (Microchip's PD692x0, TI's
-> TPS2388x, and LTC's LT4266), the PD692x0 definitely has the most advanced
-> configuration, supporting concepts like a system (well, manager) level bu=
-dget
-> and powering off lower priority ports in the event that the port power
-> consumption is greater than the system budget.
->=20
-> When we experimented with this feature in our routers, we found it to be =
-using
-> the dynamic power consumed by a particular port- literally, the summation=
- of
-> port current * port voltage across all the ports.  While this behavior
-> technically saves the system from resetting or worse, it causes a bit of a
-> problem with lower priority ports getting powered off depending on the
-> behavior (power consumption) of unrelated devices. =20
->=20
-> As an example, let's say we've got 4 devices, all powered, and we're clos=
-e to
-> the power budget.  One of the devices starts consuming more power (perhaps
-> it's modem just powered on), but not more than it's class limit.  Say this
-> device consumes enough power to exceed the configured power budget, causi=
-ng
-> the lowest priority device to be powered off.  This is the documented and
-> intended behavior of the PD692x0 chipset, but causes an unpleasant user
-> experience because it's not really clear why some device was powered down=
- all
-> the sudden. Was it because someone unplugged it? Or because the modem on =
-the
-> high priority device turned on?  Or maybe that device had an overcurrent?
-> It'd be impossible to tell, and even worse, by the time someone is able to
-> physically look at the switch, the low priority device might be back onli=
-ne
-> (perhaps the modem on the high priority device powered off).
->=20
-> This behavior is unique to the PD692x0- I'm much less familiar with the
-> TPS2388x's idea of port priority but it is very different from the PD692x=
-0.
-> Frankly the behavior of the OSS pin is confusing and since we don't use t=
-he
-> PSE controllers' idea of port priority, it was safe to ignore it. Finally=
-, the
-> LTC4266 has a "masked shutdown" ability where a predetermined set of port=
-s are
-> shutdown when a specific pin (MSD) is driven low.  Like the TPS2388x's OSS
-> pin, We ignore this feature on the LTC4266.
->=20
-> If the end-goal here is to have a device-independent idea of "port priori=
-ty" I
-> think we need to add a level of indirection between the port priority con=
-cept
-> and the actual PSE hardware.  The indirection would enable a system with
-> multiple (possibly heterogeneous even) PSE chips to have a unified idea of
-> port priority.  The way we've implemented this in our routers is by putti=
-ng
-> the PSE controllers in "semi-auto" mode, where they continually detect and
-> classify PDs (powered device), but do not power them until instructed to =
-do
-> so.  The mechanism that decides to power a particular port or not (for la=
-ck
-> of a better term, "budgeting logic") uses the available system power budg=
-et
-> (configured from userspace), the relative port priorities (also configured
-> from userspace) and the class of a detected PD.  The classification resul=
-t is
-> used to determine the _maximum_ power a particular PD might draw, and tha=
-t is
-> the value that is subtracted from the power budget.
->=20
-> Using the PD's classification and then allocating it the maximum power for
-> that class enables a non-technical installer to plug in all the PDs at the
-> switch, and observe if all the PDs are powered (or not).  But the importa=
-nt
-> part is (unless the port priorities or power budget are changed from
-> userspace) the devices that are powered won't change due to dynamic power
-> consumption of the other devices.
->=20
-> I'm not sure what the right path is for the kernel, and I'm not sure how =
-this
-> would look with the regulator integration, nor am I sure what the userspa=
-ce
-> API should look like (we used sysfs, but that's probably not ideal for
-> upstream). It's also not clear how much of the budgeting logic should be =
-in
-> the kernel, if any. Despite that, hopefully sharing our experience is
-> insightful and/or helpful.  If not, feel free to ignore it.  In any case,
-> you've got my
+Remove the '#ifdef CONFIG_NET_L3_MASTER_DEV' that was guarding
+its definition.
 
-Thanks for your review and for sharing your PSE experience.
-It indeed is insightful for further development and update of this series.
+Note this adds a hole of three bytes that could be filled later.
 
-So you are saying that from a use experience the port priority feature is n=
-ot
-user-friendly as we don't know why a port has been shutdown.
-Even if we can report the over-current event of which port caused it, you s=
-till
-thinks it is not useful?
+Fixes: 18fd64d25422 ("netns-ipv4: reorganize netns_ipv4 fast path variables")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Wei Wang <weiwan@google.com>
+Cc: Coco Li <lixiaoyan@google.com>
+---
+ .../networking/net_cachelines/netns_ipv4_sysctl.rst          | 2 +-
+ include/net/netns/ipv4.h                                     | 5 ++---
+ net/core/net_namespace.c                                     | 4 +++-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
-We could have several cases for over power budget event:
-- The power limit exceeded is the one configured for the ports.
-  We should shutdown only that port without taking care about priority.
-  TPS23881 has this behavior when power exceed Pcut.
-  I think the PD692x0 does the same. Need to verify.
-- The power limit exceeded is the global (or manager PD69208M) power budget.
-  Here port priority is interesting.
-  Is there a way to know which port create this global power limit excess?
-  Should we turn off this port even if he don't exceed his own power limit =
-or
-  should we turn off low priority ports?
-  I can't find global power budget concept for the TPS23881.=20
-  I could't test this case because I don't have enough load. In fact, maybe=
- by
-  setting the PD692x0 power bank limit low it could work.
+diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+index 9b87089a84c61eddaa4e048da6cbb68c5e934ad6..b9855d95fc0d189db65aebae92564336ddeae7bd 100644
+--- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
++++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
+@@ -58,7 +58,7 @@ u8                              sysctl_udp_early_demux
+ u8                              sysctl_nexthop_compat_mode                   -                   -                   
+ u8                              sysctl_fwmark_reflect                        -                   -                   
+ u8                              sysctl_tcp_fwmark_accept                     -                   -                   
+-u8                              sysctl_tcp_l3mdev_accept                     -                   -                   
++u8                              sysctl_tcp_l3mdev_accept                     -                   read_mostly         __inet6_lookup_established/inet_request_bound_dev_if
+ u8                              sysctl_tcp_mtu_probing                       -                   -                   
+ int                             sysctl_tcp_mtu_probe_floor                   -                   -                   
+ int                             sysctl_tcp_base_mss                          -                   -                   
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 276f622f3516871c438be27bafe61c039445b335..42866649901e36fbdd4e9f55645b22bdb6f86891 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -76,6 +76,8 @@ struct netns_ipv4 {
+ 	__cacheline_group_begin(netns_ipv4_read_rx);
+ 	u8 sysctl_ip_early_demux;
+ 	u8 sysctl_tcp_early_demux;
++	u8 sysctl_tcp_l3mdev_accept;
++	/* 3 bytes hole, try to pack */
+ 	int sysctl_tcp_reordering;
+ 	int sysctl_tcp_rmem[3];
+ 	__cacheline_group_end(netns_ipv4_read_rx);
+@@ -151,9 +153,6 @@ struct netns_ipv4 {
+ 
+ 	u8 sysctl_fwmark_reflect;
+ 	u8 sysctl_tcp_fwmark_accept;
+-#ifdef CONFIG_NET_L3_MASTER_DEV
+-	u8 sysctl_tcp_l3mdev_accept;
+-#endif
+ 	u8 sysctl_tcp_mtu_probing;
+ 	int sysctl_tcp_mtu_probe_floor;
+ 	int sysctl_tcp_base_mss;
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index a5bc1fd8b0341f401b6b48ea7c26b2ac07d1ddb6..0a86aff17f512bbeaa2795ab56748d8bb3b3fb71 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -1159,11 +1159,13 @@ static void __init netns_ipv4_struct_check(void)
+ 				      sysctl_ip_early_demux);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+ 				      sysctl_tcp_early_demux);
++	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
++				      sysctl_tcp_l3mdev_accept);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+ 				      sysctl_tcp_reordering);
+ 	CACHELINE_ASSERT_GROUP_MEMBER(struct netns_ipv4, netns_ipv4_read_rx,
+ 				      sysctl_tcp_rmem);
+-	CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_rx, 18);
++	CACHELINE_ASSERT_GROUP_SIZE(struct netns_ipv4, netns_ipv4_read_rx, 22);
+ }
+ #endif
+ 
+-- 
+2.47.0.rc0.187.ge670bccf7e-goog
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
