@@ -1,205 +1,156 @@
-Return-Path: <netdev+bounces-133863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811589974E5
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:28:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA65F9974E6
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2D48B248A3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A05DD282A83
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A11731C2DB8;
-	Wed,  9 Oct 2024 18:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E911C2DB8;
+	Wed,  9 Oct 2024 18:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="HJ2oOBgd"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="qvipQYIp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.164])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D981714A4
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B81714A4
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.164
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728498494; cv=none; b=GtVTbe6Bk2sQWQd1CW3yFih7FC/WdMy0DGosP6DSbeFwQKRIkiMH1A3jc8969YJP2Bc29e5bxGAcBFpD32U5Jj864jzhyT1KVgPjovApQYp3BLdV7BPoGDTN1Y889sYnEsTTLh3a2iwCF8nuF8BaCsUop3iXrB7EVjuKENB0RrE=
+	t=1728498534; cv=none; b=utrLFMHYCfUf7mgaNT6lXJzPkfhffR6yOoADH7SuMDIgufTNbJ39/EOpgIknENfTj72Kbzbe4H8DRsBFxz0HuasQMfFDuxV/VQiF+fAVRpCrmtOcO8p5wW03kGAtdsSW7NmOZ/kKUhzmPVoMNr23DnYxtMGvyg/jPfBQ5EYGNBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728498494; c=relaxed/simple;
-	bh=DlR5C3N8lf7Sd6QJ/PXzbLiO2dai4102AS6Ho0DrBfo=;
+	s=arc-20240116; t=1728498534; c=relaxed/simple;
+	bh=OOoD2ITxqqhia7AncvgDfL9wFU9PNwPHS9XtXhaKNbY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mm0F13aPaaXxPtWWsvLW7a3KxhYb5M5s/h46OBubp4sTJ1YNDxBom6xwWnYbw6aDN9MHQOwG8bJvE/qXaA2C49wXBRWpzdajXXmGq2y6fZXyTWC8bXG5UzQ4JYCtqQ3NQu27uNFUZUg5dtAmD+oU2Z1U5yC7TJJjs4mt4344X6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=HJ2oOBgd; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a0c8c40560so601345ab.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:28:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728498490; x=1729103290; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6jtbe9EClknasbAeRY+gshgY/lQEX5MzFFXUzmJP/WE=;
-        b=HJ2oOBgdXVeT1tzaAaZb/sc4nCz/q6GCZNyillrJc73NZOCrP3hZOjj0A2ookcMRIy
-         +yiCmJwmZkktu0brJCwziog3jjBbycRLVRk7artffB2LPk/cJsf5YHEAtItZaObr0IhD
-         1+ZeD4r2bOWmPQzTthk18e8KxruLNFZ7kW4rTvGHdW6I3yMRG7eJ/E3num4DCHw6lJIm
-         Hx3WKPTCNT4RZBtPMibz7BdLsjasEO2Lzk7tlHHsEjlDB/eqCAQHu8o5yvl6E4NYL7Lf
-         /a1AGwwjDeU0fAbANSCtqBvMq2TmC80b1wxyeCmSnpunuVGT1Y9VEoxQEas040oLknKu
-         Zw+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728498490; x=1729103290;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jtbe9EClknasbAeRY+gshgY/lQEX5MzFFXUzmJP/WE=;
-        b=By/+etLuVScbcH0vjX2kI3cNVvFm8ZALZGEcANhB8mIC0FNvsa+wAZj4F1O64sAmHx
-         N99wEHWMBzPwgftElSASMLVxf7o5b2ARXU6JXm0x+gcDx4iXQ+OIGOdJMoBLBUY4I8aO
-         Jt8xrmHCV1WA1GPp3QpxxXUOrpezK3C2S2X7N2LjOJBDt46CDQW59cSYZy64l6ockB9+
-         ZewA8pXIdtt4C/RdAJRcbRVqqn/R0ImhScAdZw6Gihsn3fIi32yVkD0+XGh7x6qVRakx
-         dxQvnF9reFUk3NoQKEV5awh6HiwfnCuimYantE9dwqzjyi4YteRBii/375dCl68xiT5I
-         AJyw==
-X-Forwarded-Encrypted: i=1; AJvYcCWeeVr9RzXgkF4IGAqdyUlblbP29rfiBVVF14uSkRL+6C5+RWnmoosbAGNEOl+ZD8Esie94nBk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSYedUNXUTkgbUfhtePZY8+Ef0AwswFPFg3pRcHu3yFtZZobEq
-	xySPhNyEfdqadsl/sqg15Rq2t8uKI905UGD0oGYjCHra1pFs/uhrYj/bOuDjmBY=
-X-Google-Smtp-Source: AGHT+IGQrKens2QtTw8cd8USva5Ahs2lit+5Usqb34DUpy4X9GC3miEJvLbIhn70WaxdChPziQUhjw==
-X-Received: by 2002:a05:6e02:b29:b0:3a0:9026:3b65 with SMTP id e9e14a558f8ab-3a397d2654emr41799835ab.25.1728498490259;
-        Wed, 09 Oct 2024 11:28:10 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a39bdb7f5asm3877875ab.33.2024.10.09.11.28.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 11:28:09 -0700 (PDT)
-Message-ID: <703c9d90-bca1-4ee7-b1f3-0cfeaf38ef8f@kernel.dk>
-Date: Wed, 9 Oct 2024 12:28:08 -0600
+	 In-Reply-To:Content-Type; b=lf5SqGHH8iSREGLWL9bdEhcP/dVlX4zM8x9LFdU1aMmxykabJyYqnnaGUZDP87JfeGhuPrHAeiMgPAgTpT13tMkbHnclRV5ESjVlyUO64nj77Gyn5cRU4+Z7qasHWb7+GC78JHuwxQI0RfkgXvNbId9K9cjoYdo4G1bPKOdvkzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=qvipQYIp; arc=none smtp.client-ip=67.231.154.164
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 267C98008E;
+	Wed,  9 Oct 2024 18:28:50 +0000 (UTC)
+Received: from [192.168.100.159] (unknown [50.251.239.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id 6FA2D13C2B0;
+	Wed,  9 Oct 2024 11:28:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 6FA2D13C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1728498529;
+	bh=OOoD2ITxqqhia7AncvgDfL9wFU9PNwPHS9XtXhaKNbY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qvipQYIpq7cllw+gH7rsP4bMzx8xh2rrTuANqlS7tH616EXz6YQtlXuZrKjaHbpIR
+	 v7mAKWtZuXw20tEqdA5ED1jTtqZA83oH96oiRNMWrQ7TXiXYaW0u25b4gE7TQUyLsq
+	 DyryY+IMQo69xdSKxJ4YAkLrgQRuUaG2HtjUORPk=
+Message-ID: <ce4efdf4-dd01-7363-f037-137815c43226@candelatech.com>
+Date: Wed, 9 Oct 2024 11:28:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 12/15] io_uring/zcrx: add io_recvzc request
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <20241007221603.1703699-13-dw@davidwei.uk>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: nf-nat-core: allocated memory at module unload.
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241007221603.1703699-13-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: Suren Baghdasaryan <surenb@google.com>
+Cc: Florian Westphal <fw@strlen.de>, netdev <netdev@vger.kernel.org>,
+ kent.overstreet@linux.dev, pablo@netfilter.org
+References: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
+ <20241001193606.GA10530@breakpoint.cc>
+ <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
+ <20241007112904.GA27104@breakpoint.cc>
+ <CAJuCfpEDKkiXm1ye=gs3ohLDJM7gqQc0WwS=6egddbsZ1qRF9A@mail.gmail.com>
+ <64e4009e-3a02-a139-4f82-f120f395e369@candelatech.com>
+ <CAJuCfpH_g2ousOyUe19hwUpTGsQZa=w8sK9TCvU-aUsNKDdJTw@mail.gmail.com>
+From: Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+In-Reply-To: <CAJuCfpH_g2ousOyUe19hwUpTGsQZa=w8sK9TCvU-aUsNKDdJTw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-MDID: 1728498531-uaJv6O3SOJmH
+X-MDID-O:
+ us5;at1;1728498531;uaJv6O3SOJmH;<greearb@candelatech.com>;2813669969b2b118972aacad644a9cd7
+X-PPE-TRUSTED: V=1;DIR=OUT;
 
-> diff --git a/io_uring/net.c b/io_uring/net.c
-> index d08abcca89cc..482e138d2994 100644
-> --- a/io_uring/net.c
-> +++ b/io_uring/net.c
-> @@ -1193,6 +1201,76 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
->  	return ret;
->  }
->  
-> +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-> +{
-> +	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
-> +	unsigned ifq_idx;
-> +
-> +	if (unlikely(sqe->file_index || sqe->addr2 || sqe->addr ||
-> +		     sqe->len || sqe->addr3))
-> +		return -EINVAL;
-> +
-> +	ifq_idx = READ_ONCE(sqe->zcrx_ifq_idx);
-> +	if (ifq_idx != 0)
-> +		return -EINVAL;
-> +	zc->ifq = req->ctx->ifq;
-> +	if (!zc->ifq)
-> +		return -EINVAL;
+On 10/9/24 11:23, Suren Baghdasaryan wrote:
+> On Wed, Oct 9, 2024 at 11:20 AM Ben Greear <greearb@candelatech.com> wrote:
+>>
+>> On 10/7/24 08:10, Suren Baghdasaryan wrote:
+>>> On Mon, Oct 7, 2024 at 4:29 AM Florian Westphal <fw@strlen.de> wrote:
+>>>>
+>>>> Suren Baghdasaryan <surenb@google.com> wrote:
+>>>>> On Tue, Oct 1, 2024 at 12:36 PM Florian Westphal <fw@strlen.de> wrote:
+>>>>>>
+>>>>>> Ben Greear <greearb@candelatech.com> wrote:
+>>>>>>
+>>>>>> [ CCing codetag folks ]
+>>>>>
+>>>>> Thanks! I've been on vacation and just saw this report.
+>>>>>
+>>>>>>
+>>>>>>> Hello,
+>>>>>>>
+>>>>>>> I see this splat in 6.11.0 (plus a single patch to fix vrf xmit deadlock).
+>>>>>>>
+>>>>>>> Is this a known issue?  Is it a serious problem?
+>>>>>>
+>>>>>> Not known to me.  Looks like an mm (rcu)+codetag problem.
+>>>>>>
+>>>>>>> ------------[ cut here ]------------
+>>>>>>> net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register_fn has 256 allocated at module unload
+>>>>>>> WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_unload+0x22b/0x3f0
+>>>>>>> Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat msdos fat
+>>>>>> ...
+>>>>>>> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
+>>>>>>> RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
+>>>>>>>    codetag_unload_module+0x19b/0x2a0
+>>>>>>>    ? codetag_load_module+0x80/0x80
+>>>>>>>    ? up_write+0x4f0/0x4f0
+>>>>>>
+>>>>>> "Well, yes, but actually no."
+>>>>>>
+>>>>>> At this time, kfree_rcu() has been called on all 4 objects.
+>>>>>>
+>>>>>> Looks like kfree_rcu no longer cares even about rcu_barrier(), and
+>>>>>> there is no kvfree_rcu_barrier() in 6.11.
+>>>>>>
+>>>>>> The warning goes away when I replace kfree_rcu with call_rcu+kfree
+>>>>>> plus rcu_barrier in module exit path.
+>>>>>>
+>>>>>> But I don't think its the right thing to do.
+>>
+>> Hello,
+>>
+>> Is this approach just ugly, or plain wrong?
+> 
+> I think the approach is correct.
+> 
+>>
+>> kvfree_rcu_barrier does not existing in 6.10 kernel.
+> 
+> Yeah, I'll try backporting kvfree_rcu_barrier() to 6.10 and 6.11 for
+> this change.
 
-This is read and assigned to 'zc' here, but then the issue handler does
-it again? I'm assuming that at some point we'll have ifq selection here,
-and then the issue handler will just use zc->ifq. So this part should
-probably remain, and the issue side just use zc->ifq?
+Ok, I will be happy to help test.
 
-> +	/* All data completions are posted as aux CQEs. */
-> +	req->flags |= REQ_F_APOLL_MULTISHOT;
+Please respond on this thread if you post something, pointing to whatever patch(es) should
+be tested.
 
-This puzzles me a bit...
+Thanks,
+Ben
 
-> +	zc->flags = READ_ONCE(sqe->ioprio);
-> +	zc->msg_flags = READ_ONCE(sqe->msg_flags);
-> +	if (zc->msg_flags)
-> +		return -EINVAL;
-
-Maybe allow MSG_DONTWAIT at least? You already pass that in anyway.
-
-> +	if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
-> +		return -EINVAL;
-> +
-> +
-> +#ifdef CONFIG_COMPAT
-> +	if (req->ctx->compat)
-> +		zc->msg_flags |= MSG_CMSG_COMPAT;
-> +#endif
-> +	return 0;
-> +}
-
-Heh, we could probably just return -EINVAL for that case, but since this
-is all we need, fine.
-
-> +
-> +int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
-> +{
-> +	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
-> +	struct io_zcrx_ifq *ifq;
-> +	struct socket *sock;
-> +	int ret;
-> +
-> +	if (!(req->flags & REQ_F_POLLED) &&
-> +	    (zc->flags & IORING_RECVSEND_POLL_FIRST))
-> +		return -EAGAIN;
-> +
-> +	sock = sock_from_file(req->file);
-> +	if (unlikely(!sock))
-> +		return -ENOTSOCK;
-> +	ifq = req->ctx->ifq;
-> +	if (!ifq)
-> +		return -EINVAL;
-
-	irq = zc->ifq;
-
-and then that check can go away too, as it should already have been
-errored at prep time if this wasn't valid.
-
-> +static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
-> +			      struct io_zcrx_ifq *ifq, int off, int len)
-> +{
-> +	struct io_uring_zcrx_cqe *rcqe;
-> +	struct io_zcrx_area *area;
-> +	struct io_uring_cqe *cqe;
-> +	u64 offset;
-> +
-> +	if (!io_defer_get_uncommited_cqe(req->ctx, &cqe))
-> +		return false;
-> +
-> +	cqe->user_data = req->cqe.user_data;
-> +	cqe->res = len;
-> +	cqe->flags = IORING_CQE_F_MORE;
-> +
-> +	area = io_zcrx_iov_to_area(niov);
-> +	offset = off + (net_iov_idx(niov) << PAGE_SHIFT);
-> +	rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
-> +	rcqe->off = offset + ((u64)area->area_id << IORING_ZCRX_AREA_SHIFT);
-> +	memset(&rcqe->__pad, 0, sizeof(rcqe->__pad));
-
-Just do
-
-	rcqe->__pad = 0;
-
-since it's a single field.
-
-Rest looks fine to me.
 
 -- 
-Jens Axboe
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
+
+
 
