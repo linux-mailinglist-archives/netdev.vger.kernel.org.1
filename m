@@ -1,158 +1,106 @@
-Return-Path: <netdev+bounces-133601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1229966C3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:14:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1579966CD
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB1C52811D1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:14:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DF431C223EF
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2875191F85;
-	Wed,  9 Oct 2024 10:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jWqPrOf+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5096918E74D;
+	Wed,  9 Oct 2024 10:15:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C46B18F2C4;
-	Wed,  9 Oct 2024 10:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3316188587
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 10:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728468748; cv=none; b=McSKLL1fisDVDm5R/vHlvoFqSPRNznxD2taJ0vmriIUeyaQoRe+HrzjdPK23lGJt4doRJ64XaxvfGdhVB/Isb2z3OouQQzekLaaBLsrgcBWaHbV1xyNIZlCEuIRtVThnRXJwvO0+IMS4Kro5vi83e8W8QZBByYqsLkSwfec/UIw=
+	t=1728468955; cv=none; b=JH3PSdfHNDvxfkvM0LQODu5txWankGkDg3omzVuukUV/ZHoWq4q71QWlUBRYx8XFzWdDMHc5i23c4J5d0CPcI6IPPgDzq5r8qi7LxTTYkkM8mmNCufI3WvFoQHZ9HjLFEYwqPj6vf1OHHfMNtVd4OiRd6QE2omkm26ua5F4y3Q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728468748; c=relaxed/simple;
-	bh=7j9vq35pXyRAcVc3ZRAoNyo9ZAAvkSUotw0OPx7aaTk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DHApQmHICmwc9DDx0RnmcxQUKlGgQ7PuDjT9PLvfnd4fU9EuYs2uXngW1Vx6kLMYjvao0jWYYBQTPJcOvYaWOBet4gFqo7KmiM5qDqoijqjEUuldXJw9OG6TfwwI9sQw0/94y3SLPoQXCFGAJDJFO47FC8EHsekturjIweSFfLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jWqPrOf+; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 358D6FF811;
-	Wed,  9 Oct 2024 10:12:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1728468739;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Eu33JTzN4sTvi1v3XIuk8Ur/NqSxuhd85F01Nc7EkjU=;
-	b=jWqPrOf+md0dM+VyGixNbUyMEKSVYnqKNr1kzG3n6cFeVhHJRK8lg9Xo962x8AXu+GK0Uq
-	h2wKJ5wgpdI5GeSyWdHlFZUD4v8ycu6Zz/Xe4QCsffKMNBT9CGxRYYMQJHYSfH9rDn02F/
-	VffH2ys9zpw2rlGHWt39VdbKML2F6PkY+AMkNTFP/RMt1pLk212msqDgIssC4wcGTO+qWE
-	7qyyO0rwsi0xUfj2flV1g36HjqijYH+8WlNs4//X0HOAmmft5PCpCC75QPanOFwkjWVxpe
-	OlamNvFgykUM/2HDzsTRrTaRT1i6PQ0kCzf0sblhP6hXg20PtDNwz81bQlr26g==
-From: =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-Date: Wed, 09 Oct 2024 12:12:09 +0200
-Subject: [PATCH bpf-next v3 3/3] selftests/bpf: check program redirect in
- xdp_cpumap_attach
+	s=arc-20240116; t=1728468955; c=relaxed/simple;
+	bh=yRYz0Zsqxya1VheS4IuNYc94S2kSLleMvc7LIeAdnm4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=N4R+q+DjIBjMR2uZ1cu+2/qBKzGBX0B0dyTczOewtYt92q3nNhkYA2riDpWCAjVUMYlkV+s7748jFqC68RtGYvdRjLENDbEU4ch7xrMPN10VNnOf5uLOyjCh90XyCii+koWhY4Sqbe9ibCJqUZpN5H445t9zZjUO3B8XksmJMNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1syTj3-0007zK-PU; Wed, 09 Oct 2024 12:15:25 +0200
+Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1syTj1-000a0s-NJ; Wed, 09 Oct 2024 12:15:23 +0200
+Received: from pza by lupine with local (Exim 4.96)
+	(envelope-from <p.zabel@pengutronix.de>)
+	id 1syTiw-0006sP-1q;
+	Wed, 09 Oct 2024 12:15:18 +0200
+Message-ID: <7c9f8ccc145bc9f62d3e5baaab24d1e4f6378436.camel@pengutronix.de>
+Subject: Re: [PATCH v7 3/6] reset: mchp: sparx5: Map cpu-syscon locally in
+ case of LAN966x
+From: Philipp Zabel <p.zabel@pengutronix.de>
+To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, Simon
+ Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Lars Povlsen
+ <lars.povlsen@microchip.com>, Steen Hegelund
+ <Steen.Hegelund@microchip.com>,  Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew
+ Lunn <andrew@lunn.ch>,  devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Allan
+ Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
+ <luca.ceresoli@bootlin.com>,  Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>
+Date: Wed, 09 Oct 2024 12:15:18 +0200
+In-Reply-To: <20241003081647.642468-4-herve.codina@bootlin.com>
+References: <20241003081647.642468-1-herve.codina@bootlin.com>
+	 <20241003081647.642468-4-herve.codina@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241009-convert_xdp_tests-v3-3-51cea913710c@bootlin.com>
-References: <20241009-convert_xdp_tests-v3-0-51cea913710c@bootlin.com>
-In-Reply-To: <20241009-convert_xdp_tests-v3-0-51cea913710c@bootlin.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: ebpf@linuxfoundation.org, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- =?utf-8?q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>
-X-Mailer: b4 0.14.2
-X-GND-Sasl: alexis.lothore@bootlin.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: p.zabel@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-xdp_cpumap_attach, in its current form, only checks that an xdp cpumap
-program can be executed, but not that it performs correctly the cpu
-redirect as configured by userspace (bpf_prog_test_run_opts will return
-success even if the redirect program returns an error)
+On Do, 2024-10-03 at 10:16 +0200, Herve Codina wrote:
+> In the LAN966x PCI device use case, the syscon API cannot be used as
+> it does not support device removal [1]. A syscon device is a core
+> "system" device and not a device available in some addon boards and so,
+> it is not supposed to be removed. The syscon API follows this assumption
+> but this assumption is no longer valid in the LAN966x use case.
+>=20
+> In order to avoid the use of the syscon API and so, support for removal,
+> use a local mapping of the syscon device.
+>=20
+> Link: https://lore.kernel.org/all/20240923100741.11277439@bootlin.com/ [1=
+]
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
 
-Add a check to ensure that the program performs the configured redirect
-as well. The check is based on a global variable incremented by a
-chained program executed only if the redirect program properly executes.
+Reviewed-by: Philipp Zabel <p.zabel@pengutronix.de>
 
-Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
----
-Changes in v3:
-- new patch
----
- tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c     | 10 ++++++++--
- .../testing/selftests/bpf/progs/test_xdp_with_cpumap_helpers.c |  5 +++++
- 2 files changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-index 31c225f0239613f6b5adad36b5b0e6e85eeddd9a..57d1661dc72aeb152c7cb9c2f63e3b47bf1799d8 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-@@ -62,8 +62,11 @@ static void test_xdp_with_cpumap_helpers(void)
- 	err = bpf_prog_test_run_opts(prog_redir_fd, &opts);
- 	ASSERT_OK(err, "XDP test run");
- 
--	/* wait for the packets to be flushed */
-+	/* wait for the packets to be flushed, then check that redirect has been
-+	 * performed
-+	 */
- 	kern_sync_rcu();
-+	ASSERT_NEQ(skel->bss->redirect_count, 0, "redirected packets");
- 
- 	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
- 	ASSERT_OK(err, "XDP program detach");
-@@ -203,8 +206,11 @@ static void test_xdp_with_cpumap_helpers_veth(void)
- 	err = bpf_prog_test_run_opts(cm_fd_redir, &opts);
- 	ASSERT_OK(err, "XDP test run");
- 
--	/* wait for the packets to be flushed */
-+	/* wait for the packets to be flushed, then check that redirect has been
-+	 * performed
-+	 */
- 	kern_sync_rcu();
-+	ASSERT_NEQ(skel->bss->redirect_count, 0, "redirected packets");
- 
- 	err = bpf_xdp_detach(ifindex_src, XDP_FLAGS_DRV_MODE, NULL);
- 	ASSERT_OK(err, "XDP program detach");
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_with_cpumap_helpers.c b/tools/testing/selftests/bpf/progs/test_xdp_with_cpumap_helpers.c
-index d848fe96924e32a72e1e0327e3afffeb349b933e..3619239b01b741dfd81bbebf5d9a62e0cf71e4f4 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_with_cpumap_helpers.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_with_cpumap_helpers.c
-@@ -12,6 +12,8 @@ struct {
- 	__uint(max_entries, 4);
- } cpu_map SEC(".maps");
- 
-+__u32 redirect_count = 0;
-+
- SEC("xdp")
- int xdp_redir_prog(struct xdp_md *ctx)
- {
-@@ -27,6 +29,9 @@ int xdp_dummy_prog(struct xdp_md *ctx)
- SEC("xdp/cpumap")
- int xdp_dummy_cm(struct xdp_md *ctx)
- {
-+	if (bpf_get_smp_processor_id() == 0)
-+		redirect_count++;
-+
- 	if (ctx->ingress_ifindex == IFINDEX_LO)
- 		return XDP_DROP;
- 
-
--- 
-2.46.2
-
+regards
+Philipp
 
