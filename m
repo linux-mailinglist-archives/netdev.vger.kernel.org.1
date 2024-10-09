@@ -1,156 +1,244 @@
-Return-Path: <netdev+bounces-133864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA65F9974E6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:28:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 521629974F2
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:32:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A05DD282A83
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:28:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC221281603
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E911C2DB8;
-	Wed,  9 Oct 2024 18:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0813A1E0E05;
+	Wed,  9 Oct 2024 18:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="qvipQYIp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SgfV2Jq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.164])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B81714A4
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:28:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.154.164
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BCE13A244;
+	Wed,  9 Oct 2024 18:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728498534; cv=none; b=utrLFMHYCfUf7mgaNT6lXJzPkfhffR6yOoADH7SuMDIgufTNbJ39/EOpgIknENfTj72Kbzbe4H8DRsBFxz0HuasQMfFDuxV/VQiF+fAVRpCrmtOcO8p5wW03kGAtdsSW7NmOZ/kKUhzmPVoMNr23DnYxtMGvyg/jPfBQ5EYGNBc=
+	t=1728498758; cv=none; b=mZftwqCsMZpUbfA6I0GNmU2FdulQ9CwPPE2pcvJvIPswjYGtkNphWru9qndrZrDaNSYpUiM/bcoboIJm5O06bwLM1dqz+ie1vgyneu4G0jXhtFJPNAEVW3EP+eutQFmXEqKGobwKEIrDsUxGSNMC4tu87mCGUus+S1k+v6WN7Zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728498534; c=relaxed/simple;
-	bh=OOoD2ITxqqhia7AncvgDfL9wFU9PNwPHS9XtXhaKNbY=;
+	s=arc-20240116; t=1728498758; c=relaxed/simple;
+	bh=bSSiGC3g3GabtARrnMj44CZqyy3E+8f4NuRq+RhgMPI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lf5SqGHH8iSREGLWL9bdEhcP/dVlX4zM8x9LFdU1aMmxykabJyYqnnaGUZDP87JfeGhuPrHAeiMgPAgTpT13tMkbHnclRV5ESjVlyUO64nj77Gyn5cRU4+Z7qasHWb7+GC78JHuwxQI0RfkgXvNbId9K9cjoYdo4G1bPKOdvkzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=qvipQYIp; arc=none smtp.client-ip=67.231.154.164
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
-X-Virus-Scanned: Proofpoint Essentials engine
-Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
-	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id 267C98008E;
-	Wed,  9 Oct 2024 18:28:50 +0000 (UTC)
-Received: from [192.168.100.159] (unknown [50.251.239.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail3.candelatech.com (Postfix) with ESMTPSA id 6FA2D13C2B0;
-	Wed,  9 Oct 2024 11:28:49 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 6FA2D13C2B0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
-	s=default; t=1728498529;
-	bh=OOoD2ITxqqhia7AncvgDfL9wFU9PNwPHS9XtXhaKNbY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qvipQYIpq7cllw+gH7rsP4bMzx8xh2rrTuANqlS7tH616EXz6YQtlXuZrKjaHbpIR
-	 v7mAKWtZuXw20tEqdA5ED1jTtqZA83oH96oiRNMWrQ7TXiXYaW0u25b4gE7TQUyLsq
-	 DyryY+IMQo69xdSKxJ4YAkLrgQRuUaG2HtjUORPk=
-Message-ID: <ce4efdf4-dd01-7363-f037-137815c43226@candelatech.com>
-Date: Wed, 9 Oct 2024 11:28:49 -0700
+	 In-Reply-To:Content-Type; b=Iscotjju6fB/iXrIF9+SDqfPC5M3YP+1kyNxoyXmBl3Tfw+8jg5DlfrwlTroXADtXFR8Y6ZRdFMntHoj1EQfyFCp69VsXr480DP2urvf/Zc2J3dW0ottFu/62McOkK9T/IjQT9lBZsYhPEze0TEFmgr5ftMmVmIOmuNJ8mmN1JA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SgfV2Jq2; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a994cd82a3bso16661766b.2;
+        Wed, 09 Oct 2024 11:32:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728498755; x=1729103555; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tHWLAGUkGjurq/EbYyrSVR7K+eem2ACfoMVdEJSkJug=;
+        b=SgfV2Jq2Y3pcrmUWLH1hY/zX6x8h1pFkALQwT43mvaKhPs2Aodk13+6Y0GeUmgLRlo
+         ZlzbtKdnjnBKDGfHEXabF9jmCjqmXOFnLdxHTu/kUNyBWOwnN6LKXqADw/oIF75p2v31
+         MS2xrQDl3IzVO/pmv3Eussump4teL3fIw0icZdRD/Ib3fqRVh88e/Un3Zcytg1f/uQNa
+         DA343D5CoXh5SXYk60XGBQ2ew3iEiGkaaENf5Vc6MZgWLdXc03ywG/rZO4A1m5DE5GRX
+         XyDNjDNMNDF6k3E4LhKfP9u2h7eDMnCNOn4biskvi13Wjj8bPIVzVnwMyiS/+NkKjonA
+         kTqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728498755; x=1729103555;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tHWLAGUkGjurq/EbYyrSVR7K+eem2ACfoMVdEJSkJug=;
+        b=DP246i7+Vh8gR5i380Npio5ejUSUu7Zx50kfGX4Em2upMrP5BtQLWcfrgxbC4oxubp
+         ceTjiXhQgr7Wasy/C+rPludbTgRHY0/foGxwh/132rjLn9PMTWcmqQAHarxE9Sk59qaG
+         vdJRhfKtsle3jyuxzVDw5y/ZcOPATJk6cBP/SVXNwkqfaaLY1/MikHJigf6qlxDy+P07
+         95ZGNCXwPPIzlMJXDE0/ywYcldoJDqWqverTB6g/IDK0a3FdIbtbtwPcccSFCTt12OBW
+         G8hgYLSya3EyUyvhjzq2/SEQV+9g4BD9ZkTNdhOd54Pt+0yWTHAEFTRyMLI4EnrYmNxh
+         qmxw==
+X-Forwarded-Encrypted: i=1; AJvYcCVBx0f/L7p0Q90Mpor/u1u+Sf2+zTgg3QOO38qIvcH4kKrNL41Uy2gHKeh7hAscmgidMxM=@vger.kernel.org, AJvYcCVhyJG+c7BOdYg+xFAezl6r6sApwtfhfCbMw+FNKizbHNUi/aTydIRg3BZ3z1YmfQ1aZUWikLHY+LWN7cTT@vger.kernel.org, AJvYcCVv2P+YTSwY2woFfO9YO/fmXxRP6ChcLQGp76yzdMNMsxJpmq6uD4eR7gkw+fJECDvNUmQluLXO9SQ6gkc=@vger.kernel.org, AJvYcCW6Nz5AB6S2UQ39Ei0pEye0PD2hf2rggajNjHZNMLRUXzUEpBgZ/qJFsbFFiomS2sJhOZn2yrW4BgkA@vger.kernel.org, AJvYcCWGvS9swU+lCBTX4fCgtdBkg4CC0B7FfD3HwfH0VPOCsn2G430WamX/9sQZlZqx32uiNz8EfO2J@vger.kernel.org, AJvYcCXHywX6mH5lRfGHSFA/2uZzKsESDeEFg71XNmTOWPOZJgcshHt6S98kTpVMLA7SIh2jrxeZ/RbsRj0PYXI=@vger.kernel.org, AJvYcCXPRXCN/AjO7n+9jB9r/cQIjvEVml3qfOcyTC7fmmn9WU4A9xI+ANvMB1ZCw49NKbdrySPeUcxVrXC8s6yU+/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyzR4oAjLyC6jFFMYp0nQa3z5nhu73mNM/e39u1A6oEDJLEQzE
+	Ll0KcnStsP5zcXnN576w9IDdxPrW7Y7+iA4YCby1FlBDSdFUzBDx3i4h9bb6
+X-Google-Smtp-Source: AGHT+IEBv3GCm8Aviv10dRX1hBYK+NueR4e/GzPds1/fWd5JaekK6CwLsS7GL+rfjHYS5z/u2KXZwg==
+X-Received: by 2002:a17:907:970e:b0:a99:89ea:593e with SMTP id a640c23a62f3a-a998d117e60mr306519666b.13.1728498755241;
+        Wed, 09 Oct 2024 11:32:35 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:b338:6300:ac71:eea5:34f6:504b? (dynamic-2a02-3100-b338-6300-ac71-eea5-34f6-504b.310.pool.telefonica.de. [2a02:3100:b338:6300:ac71:eea5:34f6:504b])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a996167411csm356771566b.14.2024.10.09.11.32.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 11:32:33 -0700 (PDT)
+Message-ID: <8643a212-884c-48de-a2d0-0f068fc49ca2@gmail.com>
+Date: Wed, 9 Oct 2024 20:32:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: nf-nat-core: allocated memory at module unload.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/13] Remove implicit devres from pci_intx()
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
+ <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
+ <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
+ Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
+ <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
+ Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Mostafa Saleh <smostafa@google.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+ =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+ Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+ Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-sound@vger.kernel.org
+References: <20241009083519.10088-1-pstanner@redhat.com>
 Content-Language: en-US
-To: Suren Baghdasaryan <surenb@google.com>
-Cc: Florian Westphal <fw@strlen.de>, netdev <netdev@vger.kernel.org>,
- kent.overstreet@linux.dev, pablo@netfilter.org
-References: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
- <20241001193606.GA10530@breakpoint.cc>
- <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
- <20241007112904.GA27104@breakpoint.cc>
- <CAJuCfpEDKkiXm1ye=gs3ohLDJM7gqQc0WwS=6egddbsZ1qRF9A@mail.gmail.com>
- <64e4009e-3a02-a139-4f82-f120f395e369@candelatech.com>
- <CAJuCfpH_g2ousOyUe19hwUpTGsQZa=w8sK9TCvU-aUsNKDdJTw@mail.gmail.com>
-From: Ben Greear <greearb@candelatech.com>
-Organization: Candela Technologies
-In-Reply-To: <CAJuCfpH_g2ousOyUe19hwUpTGsQZa=w8sK9TCvU-aUsNKDdJTw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-MDID: 1728498531-uaJv6O3SOJmH
-X-MDID-O:
- us5;at1;1728498531;uaJv6O3SOJmH;<greearb@candelatech.com>;2813669969b2b118972aacad644a9cd7
-X-PPE-TRUSTED: V=1;DIR=OUT;
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20241009083519.10088-1-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/9/24 11:23, Suren Baghdasaryan wrote:
-> On Wed, Oct 9, 2024 at 11:20 AM Ben Greear <greearb@candelatech.com> wrote:
->>
->> On 10/7/24 08:10, Suren Baghdasaryan wrote:
->>> On Mon, Oct 7, 2024 at 4:29 AM Florian Westphal <fw@strlen.de> wrote:
->>>>
->>>> Suren Baghdasaryan <surenb@google.com> wrote:
->>>>> On Tue, Oct 1, 2024 at 12:36 PM Florian Westphal <fw@strlen.de> wrote:
->>>>>>
->>>>>> Ben Greear <greearb@candelatech.com> wrote:
->>>>>>
->>>>>> [ CCing codetag folks ]
->>>>>
->>>>> Thanks! I've been on vacation and just saw this report.
->>>>>
->>>>>>
->>>>>>> Hello,
->>>>>>>
->>>>>>> I see this splat in 6.11.0 (plus a single patch to fix vrf xmit deadlock).
->>>>>>>
->>>>>>> Is this a known issue?  Is it a serious problem?
->>>>>>
->>>>>> Not known to me.  Looks like an mm (rcu)+codetag problem.
->>>>>>
->>>>>>> ------------[ cut here ]------------
->>>>>>> net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register_fn has 256 allocated at module unload
->>>>>>> WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_unload+0x22b/0x3f0
->>>>>>> Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat msdos fat
->>>>>> ...
->>>>>>> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
->>>>>>> RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
->>>>>>>    codetag_unload_module+0x19b/0x2a0
->>>>>>>    ? codetag_load_module+0x80/0x80
->>>>>>>    ? up_write+0x4f0/0x4f0
->>>>>>
->>>>>> "Well, yes, but actually no."
->>>>>>
->>>>>> At this time, kfree_rcu() has been called on all 4 objects.
->>>>>>
->>>>>> Looks like kfree_rcu no longer cares even about rcu_barrier(), and
->>>>>> there is no kvfree_rcu_barrier() in 6.11.
->>>>>>
->>>>>> The warning goes away when I replace kfree_rcu with call_rcu+kfree
->>>>>> plus rcu_barrier in module exit path.
->>>>>>
->>>>>> But I don't think its the right thing to do.
->>
->> Hello,
->>
->> Is this approach just ugly, or plain wrong?
+On 09.10.2024 10:35, Philipp Stanner wrote:
+> Hi all,
 > 
-> I think the approach is correct.
+> this series removes a problematic feature from pci_intx(). That function
+> sometimes implicitly uses devres for automatic cleanup. We should get
+> rid of this implicit behavior.
 > 
->>
->> kvfree_rcu_barrier does not existing in 6.10 kernel.
+> To do so, a pci_intx() version that is always-managed, and one that is
+> never-managed are provided. Then, all pci_intx() users are ported to the
+> version they need. Afterwards, pci_intx() can be cleaned up and the
+> users of the never-managed version be ported back to pci_intx().
 > 
-> Yeah, I'll try backporting kvfree_rcu_barrier() to 6.10 and 6.11 for
-> this change.
+> This way we'd get this PCI API consistent again.
+> 
+AFAICS pci_intx() is used only by drivers which haven't been converted
+to the pci_alloc_irq_vectors() API yet. Wouldn't it be better to do this
+instead of trying to improve pci_intx()?
+Eventually pci_intx() would have to be used in PCI core only.
 
-Ok, I will be happy to help test.
-
-Please respond on this thread if you post something, pointing to whatever patch(es) should
-be tested.
-
-Thanks,
-Ben
-
-
--- 
-Ben Greear <greearb@candelatech.com>
-Candela Technologies Inc  http://www.candelatech.com
-
+> The last patch obviously reverts the previous patches that made drivers
+> use pci_intx_unmanaged(). But this way it's easier to review and
+> approve. It also makes sure that each checked out commit should provide
+> correct behavior, not just the entire series as a whole.
+> 
+> Merge plan for this would be to enter through the PCI tree.
+> 
+> Please say so if you've got concerns with the general idea behind the
+> RFC.
+> 
+> Regards,
+> P.
+> 
+> Philipp Stanner (13):
+>   PCI: Prepare removing devres from pci_intx()
+>   ALSA: hda: hda_intel: Use always-managed version of pcim_intx()
+>   drivers/xen: Use never-managed version of pci_intx()
+>   net/ethernet: Use never-managed version of pci_intx()
+>   net/ntb: Use never-managed version of pci_intx()
+>   misc: Use never-managed version of pci_intx()
+>   vfio/pci: Use never-managed version of pci_intx()
+>   PCI: MSI: Use never-managed version of pci_intx()
+>   ata: Use always-managed version of pci_intx()
+>   staging: rts5280: Use always-managed version of pci_intx()
+>   wifi: qtnfmac: use always-managed version of pcim_intx()
+>   HID: amd_sfh: Use always-managed version of pcim_intx()
+>   Remove devres from pci_intx()
+> 
+>  drivers/ata/ahci.c                            |  2 +-
+>  drivers/ata/ata_piix.c                        |  2 +-
+>  drivers/ata/pata_rdc.c                        |  2 +-
+>  drivers/ata/sata_sil24.c                      |  2 +-
+>  drivers/ata/sata_sis.c                        |  2 +-
+>  drivers/ata/sata_uli.c                        |  2 +-
+>  drivers/ata/sata_vsc.c                        |  2 +-
+>  drivers/hid/amd-sfh-hid/amd_sfh_pcie.c        |  4 ++--
+>  drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c |  2 +-
+>  .../wireless/quantenna/qtnfmac/pcie/pcie.c    |  2 +-
+>  drivers/pci/devres.c                          | 24 +++----------------
+>  drivers/pci/pci.c                             | 14 +----------
+>  drivers/staging/rts5208/rtsx.c                |  2 +-
+>  include/linux/pci.h                           |  1 +
+>  sound/pci/hda/hda_intel.c                     |  2 +-
+>  15 files changed, 18 insertions(+), 47 deletions(-)
+> 
 
 
