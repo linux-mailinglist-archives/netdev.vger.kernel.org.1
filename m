@@ -1,145 +1,176 @@
-Return-Path: <netdev+bounces-133724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 822E0996CC4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:53:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F07996CD1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3997E1F21378
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:53:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0B50281161
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F5819925B;
-	Wed,  9 Oct 2024 13:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BE621993B6;
+	Wed,  9 Oct 2024 13:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b="iv+bV3V4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qi6OYb35"
 X-Original-To: netdev@vger.kernel.org
-Received: from wilbur.contactoffice.com (wilbur.contactoffice.com [212.3.242.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE4F198E7B
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.3.242.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C893319924E;
+	Wed,  9 Oct 2024 13:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728481986; cv=none; b=PLyzDa8WvzOLeyfB6QrJRDhZMNLmRo3/AdY8AdMg3yC6RQz+gcmOorLByl5lXtTfJaiHcooWT2nLZLTFJhGQ1dl/+72rDgCWYYwyufCI+bxiIR2qJ1ExEXVd92cAauI9joS+vvE2sid4YdAO5dbWu2DVqHrObSZW5kucpPFFOqI=
+	t=1728482073; cv=none; b=lKEV5IKnRb9Sp2tUV2mKv4UxD69PP+QLPWU1XdQlxaaN/Zmn53J/bdWZJ0O4ThzzXkvT40A7KtXU/JwzoxOh4le2ro5hAwm6/AEdu/dIghVm8WmZj8T5nWc3m1/S74aZS+ZWpCzOdOxlDaygs+naHtGxHG6hing9BnVw5o4X2bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728481986; c=relaxed/simple;
-	bh=WadcYvP8DxOSO/GZf0Bdt2QVNMYzz3tlYzLrLydjC48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nspCswm4duj/o5EqjmsdzlvAovscsY5Q4Rd9V9ZgoVyrM2bXFBU3ErsmujTn1qXle21X1aGSLOcqyrmDXyKm0IGMWLqrXeHH2TD3Kwl7oTQZZVEkj5TlR00OMgJ2hnS6CjkD/+yH1pSPRnMi84Dy43X91ttomviLuGImzQNxjrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc; spf=pass smtp.mailfrom=unstable.cc; dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b=iv+bV3V4; arc=none smtp.client-ip=212.3.242.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unstable.cc
-Received: from smtpauth2.co-bxl (smtpauth2.co-bxl [10.2.0.24])
-	by wilbur.contactoffice.com (Postfix) with ESMTP id 609E241D8;
-	Wed,  9 Oct 2024 15:53:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1728481982;
-	s=20220809-q8oc; d=unstable.cc; i=a@unstable.cc;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=lCk96be09nsEHc8xwiP87ZSlr1LNPoLpLxcT7lU3aPc=;
-	b=iv+bV3V4SYGgCLRFUihO8LepEDwwN5+IusvSLVPXq2UUieYehKFE2DGrTkh0for4
-	Q8MGeUh33gt2MvV9Rf/lhGMnJPNEWGGR1clOOvgDLQ/59TTevOnv5avyk+8cBj2yLW7
-	0z5SMCoNqdV491iUAzvZPJKgiBRbHvh1ojHPY3oVDlZv2G+lI4jlZ4vPpxnBha/JdFk
-	ZfFyza9IR5LxQozxqQw2PI2F6LTKUJmKvSoy13LVRqs2sxEsD85LMAFNw9p0g6FDSk/
-	HiW58QDD2TrVcUg6uMdItPwf/0+FeU1G0p+8l56RV38WvMuHh4aU11LLsasxVTLv9/x
-	7dI6iSJ55Q==
-Received: by smtp.mailfence.com with ESMTPSA ; Wed, 9 Oct 2024 15:53:00 +0200 (CEST)
-Message-ID: <fcd54618-bed6-4fd4-8438-ff148b7e8b99@unstable.cc>
-Date: Wed, 9 Oct 2024 15:53:02 +0200
+	s=arc-20240116; t=1728482073; c=relaxed/simple;
+	bh=DLUxj1QpXcALt1BYmUq7sAlHYzpC53S44ER7P9Hixl4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VGe3IM3dxoWms3I1p7C/U2gUXotytFTk/+pg7a6MmHv3UewxQv52xbYj/A+C+NHeKoN0ab5IYqhQIEmLtnv9oakyssIOr1nHYV5zQhqsIFXR5Gq8FyDIMN4TXuMpaaF9FS95Qar/LYWU5bsiXAAcmoDGeK17b2IMu31XaJSX29o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qi6OYb35; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2e0b93157caso702417a91.0;
+        Wed, 09 Oct 2024 06:54:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728482070; x=1729086870; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7pyLW9a6lrN00PH16ImjCSZBswmH53POX6zszKYt0JA=;
+        b=Qi6OYb35sjEi0kLEtjNeKaL9MV/8ygIMjzm/iqMXtlPd873gZwE5HwHTfuyKpHWEvx
+         tlPPhmT33VwOV+tUrLJAAmODbE/6rG7cP8PmgxoquzpNPVm4l1kNgZcEvXJC5N4deeMS
+         IA6D8PoND5pFDo8p+jG33NXdAio9BnPuD1d8a6yAuB3zjI1XjdEnpJB9D5wxqGUyLUOJ
+         w+uhzBlhlB/smZWmgOeWXCqlGdfTUR4O1bdEH1Hxg7idbi/crCc99ZfO9u3o4E/GFzd6
+         tA7VWXJ/yPLkN+0+Qs5CcznjQOQnxgDFctfWObLKUwJuO3NjPRFfnUA2UnzMAM0ri8P4
+         qzwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728482070; x=1729086870;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7pyLW9a6lrN00PH16ImjCSZBswmH53POX6zszKYt0JA=;
+        b=vLAQYqRTuV62uhYI4B3ziIZ6dzUJhnISgpks9snKT2e9GayKZixQhOQcN7SeslFgUu
+         udxYW3i3q12I+kP5waJod1vDy4/K7efbnPE6TWrQD1++xoxD+v2/X/oj1XWZTsZLS4Hk
+         cFgfEzOIY6Q7wHDiRiMxgtK5vLhZiYQRZRqRswllnR1gnPYTcJoGgzrP0f5wbizPJ/3C
+         AKC5JFmohQGYYSMetoEUExsbdqoRT2uFMMAXGZWBKnVFfHbu7/SMopqJs1uu/+Nq6AB4
+         0u1sIKbnj+uIJfBrHOGc5+V+FMP0Im9DRffZpL3DlF9eCQF7vKf4Qocc+27y6BjbsQVJ
+         4hMA==
+X-Forwarded-Encrypted: i=1; AJvYcCUbtDcB/Epoae+tDpi3zWMVcWEJozvWOTBwosh9tk4pCtlDUc3c9g2glocOo08pYsMW4KoDDUdP@vger.kernel.org, AJvYcCWUAuvFD/iYvmuusf2bjWOd4VGQX3dmfpgnpccLgPda+8/uOgVhVAuHE6kWcH+gQ0fVWNx0gVrYPB4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvpSuV3y/ctr03h+KG7eL+PSAROMB5KZF1v2N5zFuZlSFH5FEl
+	8njfU7fmyWM4Y531xl7e1CGF1XG3rUrKpvGJtgvLKGI8g2PuSqSddWSJjtKlQo6ibyFlpd+s0YB
+	DYGIhEfpRhDI3w8HYL6JxmyyXwpI=
+X-Google-Smtp-Source: AGHT+IFMCaKvNsK5UpbJHwGy5zDxB8XYQy7Z82bp1DDriom8Gmx2woGLhozTzh5eGdUz4twuab9GbqN0GdYKcqUpLxk=
+X-Received: by 2002:a17:90a:6387:b0:2d8:b510:170f with SMTP id
+ 98e67ed59e1d1-2e27df999camr9088553a91.20.1728482070202; Wed, 09 Oct 2024
+ 06:54:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] tools: ynl-gen: include auto-generated uAPI header only
- once
-To: Jiri Pirko <jiri@resnulli.us>, Andrew Lunn <andrew@lunn.ch>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, donald.hunter@gmail.com,
- pabeni@redhat.com, davem@davemloft.net, edumazet@google.com
-References: <20241009121235.4967-1-a@unstable.cc>
- <ZwZ7_qjDH_y0JIcN@nanopsycho.orion>
- <fbfc65b2-7614-44a1-9fcb-daa1a8f1e780@unstable.cc>
- <ZwaHF8ZEEHXV7yCE@nanopsycho.orion>
-Content-Language: en-US
-From: Antonio Quartulli <a@unstable.cc>
-In-Reply-To: <ZwaHF8ZEEHXV7yCE@nanopsycho.orion>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ContactOffice-Account: com:375058688
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-3-ap420073@gmail.com>
+ <20241008111926.7056cc93@kernel.org>
+In-Reply-To: <20241008111926.7056cc93@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Wed, 9 Oct 2024 22:54:17 +0900
+Message-ID: <CAMArcTU+r+Pj_y7rUvRwTrDWqg57xy4e-OacjWCfKRCUa8A-aw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/7] bnxt_en: add support for tcp-data-split
+ ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/10/2024 15:37, Jiri Pirko wrote:
-> Wed, Oct 09, 2024 at 03:00:42PM CEST, a@unstable.cc wrote:
->> On 09/10/2024 14:50, Jiri Pirko wrote:
->>> Wed, Oct 09, 2024 at 02:12:35PM CEST, a@unstable.cc wrote:
->>>> The auto-generated uAPI file is currently included in both the
->>>> .h and .c netlink stub files.
->>>> However, the .c file already includes its .h counterpart, thus
->>>> leading to a double inclusion of the uAPI header.
->>>>
->>>> Prevent the double inclusion by including the uAPI header in the
->>>> .h stub file only.
->>>>
->>>> Signed-off-by: Antonio Quartulli <a@unstable.cc>
->>>> ---
->>>> drivers/dpll/dpll_nl.c     | 2 --
->>>> drivers/net/team/team_nl.c | 2 --
->>>> fs/nfsd/netlink.c          | 2 --
->>>> net/core/netdev-genl-gen.c | 1 -
->>>> net/devlink/netlink_gen.c  | 2 --
->>>> net/handshake/genl.c       | 2 --
->>>> net/ipv4/fou_nl.c          | 2 --
->>>> net/mptcp/mptcp_pm_gen.c   | 2 --
->>>> tools/net/ynl/ynl-gen-c.py | 4 +++-
->>>> 9 files changed, 3 insertions(+), 16 deletions(-)
->>>>
->>>> diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
->>>> index fe9b6893d261..9a739d9dcfbd 100644
->>>> --- a/drivers/dpll/dpll_nl.c
->>>> +++ b/drivers/dpll/dpll_nl.c
->>>> @@ -8,8 +8,6 @@
->>>>
->>>> #include "dpll_nl.h"
->>>>
->>>> -#include <uapi/linux/dpll.h>
->>>
->>> What seems to be the problem? The uapi headers are protected for double
->>> inclusion, no?
->>> #ifndef _UAPI_LINUX_DPLL_H
->>> #define _UAPI_LINUX_DPLL_H
->>
->> There is no problem to fix, this is just a compile-time micro-optimization by
->> reducing the number of includes to follow.
->>
->> I was recently told there is ongoing effort to reduce the amount of useless
->> includes in order to speed up the compilation process.
-> 
-> Do you have some numbers?
-> 
-> So far I had impression that the common practise is to include header
-> directly when needed and not to depend on indirect include.
+On Wed, Oct 9, 2024 at 3:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
 
-That's the same rule I had been following in the past, but Andrew 
-advised to do differently here:
+Hi Jakub,
+Thanks a lot for your reviews!
 
-<07050ffc-aa8e-417a-b35b-0cf627fc226f@lunn.ch>
+> On Thu,  3 Oct 2024 16:06:15 +0000 Taehee Yoo wrote:
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/driver=
+s/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > index fdecdf8894b3..e9ef65dd2e7b 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > @@ -829,12 +829,16 @@ static void bnxt_get_ringparam(struct net_device =
+*dev,
+> >       if (bp->flags & BNXT_FLAG_AGG_RINGS) {
+> >               ering->rx_max_pending =3D BNXT_MAX_RX_DESC_CNT_JUM_ENA;
+> >               ering->rx_jumbo_max_pending =3D BNXT_MAX_RX_JUM_DESC_CNT;
+> > -             kernel_ering->tcp_data_split =3D ETHTOOL_TCP_DATA_SPLIT_E=
+NABLED;
+> >       } else {
+> >               ering->rx_max_pending =3D BNXT_MAX_RX_DESC_CNT;
+> >               ering->rx_jumbo_max_pending =3D 0;
+> > -             kernel_ering->tcp_data_split =3D ETHTOOL_TCP_DATA_SPLIT_D=
+ISABLED;
+> >       }
+> > +
+> > +     if (bp->flags & BNXT_FLAG_HDS)
+> > +             kernel_ering->tcp_data_split =3D ETHTOOL_TCP_DATA_SPLIT_E=
+NABLED;
+> > +     else
+> > +             kernel_ering->tcp_data_split =3D ETHTOOL_TCP_DATA_SPLIT_D=
+ISABLED;
+>
+> This breaks previous behavior. The HDS reporting from get was
+> introduced to signal to user space whether the page flip based
+> TCP zero-copy (the one added some years ago not the recent one)
+> will be usable with this NIC.
+>
+> When HW-GRO is enabled HDS will be working.
+>
+> I think that the driver should only track if the user has set the value
+> to ENABLED (forced HDS), or to UKNOWN (driver default). Setting the HDS
+> to disabled is not useful, don't support it.
 
-He also says:
-"There is a massive patch series crossing the entire kernel which 
-significantly reduces the kernel build time by optimising includes."
+Okay, I will remove the disable feature in a v4 patch.
+Before this patch, hds_threshold was rx-copybreak value.
+How do you think hds_threshold should still follow rx-copybreak value
+if it is UNKNOWN mode?
+I think hds_threshold need to follow new tcp-data-split-thresh value in
+ENABLE/UNKNOWN and make rx-copybreak pure software feature.
+But if so, it changes the default behavior.
+How do you think about it?
 
-I trusted his word and I just assumed this was the wanted direction 
-nowadays.
+>
+> >       ering->tx_max_pending =3D BNXT_MAX_TX_DESC_CNT;
+> >
+> >       ering->rx_pending =3D bp->rx_ring_size;
+> > @@ -854,9 +858,25 @@ static int bnxt_set_ringparam(struct net_device *d=
+ev,
+> >           (ering->tx_pending < BNXT_MIN_TX_DESC_CNT))
+> >               return -EINVAL;
+> >
+> > +     if (kernel_ering->tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT_DISA=
+BLED &&
+> > +         BNXT_RX_PAGE_MODE(bp)) {
+> > +             NL_SET_ERR_MSG_MOD(extack, "tcp-data-split can not be ena=
+bled with XDP");
+> > +             return -EINVAL;
+> > +     }
+>
+> Technically just if the XDP does not support multi-buffer.
+> Any chance we could do this check in the core?
 
-@Andrew: maybe you have a pointer to the series?
-
-Thanks.
-
-Regards,
-
-
--- 
-Antonio Quartulli
+I think we can access xdp_rxq_info with netdev_rx_queue structure.
+However, xdp_rxq_info is not sufficient to distinguish mb is supported
+by the driver or not. I think prog->aux->xdp_has_frags is required to
+distinguish it correctly.
+So, I think we need something more.
+Do you have any idea?
 
