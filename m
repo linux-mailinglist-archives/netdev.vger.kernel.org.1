@@ -1,93 +1,78 @@
-Return-Path: <netdev+bounces-133396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39C4995C97
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:58:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1932995C9B
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:59:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 793601F25911
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:58:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 560F0283B45
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAE51514CC;
-	Wed,  9 Oct 2024 00:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A66E15E8B;
+	Wed,  9 Oct 2024 00:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Rz0gI6bP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="L/ZtzLJH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC90A14B941
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 00:56:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A07D2EAD2;
+	Wed,  9 Oct 2024 00:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728435380; cv=none; b=WH3CMWMqVwCsAVkh4O3SnBJb6nzGtvKUfewqzmopOhFAIUjdZbFPHmVnrafMCBHCrjlSCTas2qt5Je5UaLJq+FTTloI/2rnG5W9pNcybF590ee1YhBoqOkPc/2pWxea9OnI+uqnnx/NgrgBJ++9R6WHDVsqXVOxCORKBhBAmjAA=
+	t=1728435553; cv=none; b=ZVtTfr/mP7Z9CIVbyZAkQU1gRihd7lQ4iP0/PyjrUg/NDx1o0UDhY2OsMeLc0aNECCp5MWIU3fvmwuOUCuqIr5taPzGrnvlZgIETnff8Q17Y5Uh22anOqoBO/c7/O8SEP4NRxfSf709Xjtb4i6g3YBcY1QppSN/fqZmVt70mi8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728435380; c=relaxed/simple;
-	bh=w3PyoCLDwvBpb9QcaTe+IfR5xAs/HBKMLh3YZwzD30c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nbdu5Qq74YVXtxuUiIpzrTAYD5Ab1pd4U/nS7ePNSC/5pmcDHd8/MMYv+/FsEzZdKl+d3N3LOoDDSPwAW02l0EKH+iUyBSrE7NGtFhVQPHELBWfUOiHgFarBi64x6jBkJyvNv4MsldoqEZfhJWOjjAmYqnuCgNSkYl+eguf2hPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Rz0gI6bP; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c5a7b2908so10033505ad.1
-        for <netdev@vger.kernel.org>; Tue, 08 Oct 2024 17:56:17 -0700 (PDT)
+	s=arc-20240116; t=1728435553; c=relaxed/simple;
+	bh=SUHcnqAr8yhu077rKx9IiGHuJXgRJPVcwk783FOMTck=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=u97LpZ3rY8qLu4wX7PIWgkHwRV2UnwUMfzPs1UTS8QyYV9Te9qt3+FikTHBLxBF1Jstx6WLeFask8V40N/J8C93+kTSEgk558DpJfGgDIvZ6Qvmtyp/QqfSg+94iAsoSAc5BdAKyl1RimMYvVQpRIDlxwP/+wH6wx7dZhmRq/30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=L/ZtzLJH; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1728435376; x=1729040176; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5Z75IqLrMWdIhV00xNDkOvX+v1lJa5CtaV8sWjNm85A=;
-        b=Rz0gI6bPkY2U5VG3VCfjpfObFPsG2+U/jQgsOgszmifH7Mp5RnIabIBEun5O2S5/8s
-         DZ/Z1PrHtTXRxkw5XJdcdSvA43hujlgA7owMhPbQoZxRQ2gAfdbGC0nAYZh0TS0OCmOK
-         oQqLNmAGVIDaRxZvfLBCdBE9OlOYIMZ84I+RY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728435376; x=1729040176;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5Z75IqLrMWdIhV00xNDkOvX+v1lJa5CtaV8sWjNm85A=;
-        b=JBRyseKn1FPpF+vOnIs8gWJWhLp0m17ndAe/7joBTLV6KfFa7iXFpNeAsHEUnO1Rji
-         t+3wpPpR+TqA8tSotvhpZtIOO8hBh/rWdLvfDuuy4sfHMBmiXOhWZLH4uk+dd4iQEkXk
-         /mgac8QYAWsiyHfA3fmOCZI3tyRpS7t8+XfuFg8MZtNwzTMVLMMhAp3ZcmuZItU2HSNW
-         wmBAcB9a22KBkYP4Tc7Qe7lPj031EFyN3exTKF+WXh4vQUEAB01mW5NqU1N3seQJZRAZ
-         ConbIKsaWHe1p8DDEc1aHQV6Ta9GcgNdI8ph2aml4hVpeOnWJvl5DFrmAQcnYQnrbQoE
-         Z0+w==
-X-Gm-Message-State: AOJu0YyWSP7a4TsxRrTM3jDxaNHyvKSinvryXzLEqHgj9AekdG4V933b
-	8EgzRB++JYkAWkbHzfyxRoEC62WpHpIQXEeHpNul/3SYyXLeO+P7rq1w99WL4o2/YnOfn+nTtxV
-	4laWbSV4aKFvRDaGCEGc9L3MbMwEKrD4pqYL3kDH+/TnNY7o0JeXBDz+f/PR9M+hHVhPnqxysYW
-	5Ys8ei2GVk5joo4w+4NDdiIJ1W/MXTMYhHb54=
-X-Google-Smtp-Source: AGHT+IFKh8PQ2F6a8qI4cgzTsO1otx8ErNT8oz4yduW9Kr/C9SXF+H773RpC0hS0cgYHwndSbOKE+Q==
-X-Received: by 2002:a17:903:2349:b0:20b:6d5c:8e1 with SMTP id d9443c01a7336-20c636dd062mr11743245ad.7.1728435376507;
-        Tue, 08 Oct 2024 17:56:16 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c138cec92sm60996045ad.101.2024.10.08.17.56.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 17:56:16 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	skhawaja@google.com,
-	sdf@fomichev.me,
-	bjorn@rivosinc.com,
-	amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	willemdebruijn.kernel@gmail.com,
-	Joe Damato <jdamato@fastly.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-rdma@vger.kernel.org (open list:MELLANOX MLX4 core VPI driver),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [net-next v5 9/9] mlx4: Add support for persistent NAPI config to RX CQs
-Date: Wed,  9 Oct 2024 00:55:03 +0000
-Message-Id: <20241009005525.13651-10-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241009005525.13651-1-jdamato@fastly.com>
-References: <20241009005525.13651-1-jdamato@fastly.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728435551; x=1759971551;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=UmGmVF0qSS3224D/cSwIPdCaKUsdhZx5Q13P7JykaYA=;
+  b=L/ZtzLJHww1QRWR91/B+zHM0PF1AquUIff7rHIKcAeCvop0GKtePPZkK
+   TBjATC6bOslxXQ1VAS+kdRL8XdN+3UY0Ky98bPPYmE3EbO8CaBfnymwiV
+   fkYQ2DuyFK0ovmuVUl3uwluxF+b2yWm0/vhu/wb/6d56DNRRP5ReFqBCO
+   g=;
+X-IronPort-AV: E=Sophos;i="6.11,188,1725321600"; 
+   d="scan'208";a="374484136"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 00:59:06 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:43078]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
+ id 04d2f9e0-b978-40f4-a80f-8044b4c2cc65; Wed, 9 Oct 2024 00:59:06 +0000 (UTC)
+X-Farcaster-Flow-ID: 04d2f9e0-b978-40f4-a80f-8044b4c2cc65
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 9 Oct 2024 00:59:04 +0000
+Received: from 88665a182662.ant.amazon.com (10.88.149.159) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 9 Oct 2024 00:59:00 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<eddyz87@gmail.com>, <edumazet@google.com>, <haoluo@google.com>,
+	<john.fastabend@gmail.com>, <jolsa@kernel.org>, <kernelxing@tencent.com>,
+	<kpsingh@kernel.org>, <kuba@kernel.org>, <martin.lau@linux.dev>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <sdf@fomichev.me>,
+	<song@kernel.org>, <willemb@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<yonghong.song@linux.dev>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next 1/9] net-timestamp: add bpf infrastructure to allow exposing more information later
+Date: Tue, 8 Oct 2024 17:58:46 -0700
+Message-ID: <20241009005846.40046-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20241008095109.99918-2-kerneljasonxing@gmail.com>
+References: <20241008095109.99918-2-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,33 +80,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB001.ant.amazon.com (10.13.139.148) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Use netif_napi_add_config to assign persistent per-NAPI config when
-initializing RX CQ NAPIs.
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue,  8 Oct 2024 17:51:01 +0800
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Implement basic codes so that we later can easily add each tx points.
+> Introducing BPF_SOCK_OPS_ALL_CB_FLAGS used as a test statement can help use
+> control whether to output or not.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  include/uapi/linux/bpf.h       |  5 ++++-
+>  net/core/skbuff.c              | 18 ++++++++++++++++++
+>  tools/include/uapi/linux/bpf.h |  5 ++++-
+>  3 files changed, 26 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index c6cd7c7aeeee..157e139ed6fc 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6900,8 +6900,11 @@ enum {
+>  	 * options first before the BPF program does.
+>  	 */
+>  	BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG = (1<<6),
+> +	/* Call bpf when the kernel is generating tx timestamps.
+> +	 */
+> +	BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG = (1<<7),
+>  /* Mask of all currently supported cb flags */
+> -	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
+> +	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0xFF,
 
-Presently, struct napi_config only has support for two fields used for
-RX, so there is no need to support them with TX CQs, yet.
+I remember this change makes two selftests fail and needs diff
+in this link.
+https://lore.kernel.org/bpf/20231016161134.25365-1-kuniyu@amazon.com/
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/mellanox/mlx4/en_cq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx4/en_cq.c b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-index 461cc2c79c71..0e92956e84cf 100644
---- a/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_cq.c
-@@ -156,7 +156,8 @@ int mlx4_en_activate_cq(struct mlx4_en_priv *priv, struct mlx4_en_cq *cq,
- 		break;
- 	case RX:
- 		cq->mcq.comp = mlx4_en_rx_irq;
--		netif_napi_add(cq->dev, &cq->napi, mlx4_en_poll_rx_cq);
-+		netif_napi_add_config(cq->dev, &cq->napi, mlx4_en_poll_rx_cq,
-+				      cq_idx);
- 		netif_napi_set_irq(&cq->napi, irq);
- 		napi_enable(&cq->napi);
- 		netif_queue_set_napi(cq->dev, cq_idx, NETDEV_QUEUE_TYPE_RX, &cq->napi);
--- 
-2.34.1
-
+Also, adding a bpf selftest or extending some for this series
+would be nice.
 
