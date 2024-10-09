@@ -1,108 +1,122 @@
-Return-Path: <netdev+bounces-133907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4738997721
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:00:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CF856997723
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:01:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5490DB23CA1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:00:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DE3AB23EB7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7361E1A13;
-	Wed,  9 Oct 2024 21:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9179B199FA5;
+	Wed,  9 Oct 2024 21:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xXQDrUBl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U97bJR4e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4430C188CDC
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BE815FA74
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728507648; cv=none; b=pND0Xc09iBVLrUOKO4DNyviKtin0s8QDQ2X6TzAa4Y/OpmX8OnuVnre+whKF9oGUwrUQ5V0fACv+6HIW/LeRkOj5RoVfvLulX35KtC4AqwPY4ePvZzXFK5GBySC0RLdrbz8p3yEVBmiSU3wS/aDc5hgk7XGxDm/kbH9XoeRPGzY=
+	t=1728507656; cv=none; b=Jw6MN0f94jYeX33Hx3NjfJjKAWsHA9f1I2JywlPv2KkIed/LiQYD5zHico4C49kUVHC4xdfPyw6h4M51oywyVB1tpvXQEwdaL2U1/LI0rhQ4qZMUaSWf8iZ8O8mq718fq/jAk7dHN/AzOkPA42TrJwnJ4K+DzkOARg1qul5OC9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728507648; c=relaxed/simple;
-	bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
+	s=arc-20240116; t=1728507656; c=relaxed/simple;
+	bh=2mz49rEZUDSSSMogUQ/PTLDIqGUKzRNzHFIRJ4BW1lo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WheT3G/M4lVIukQksROOdD8U1vsEmj4K+K0D+IMEvYDVeDGN7HkkWUquhRA43RGZz+srec8EEZujLOrFRTlmyiiwM+yVdy5FLn6a/vT3vo5tVFol8JTYBjCocxWFP/15YmqcEfOUlhDOXTSicjiZZwASKrIiPWx0jHlinT6lIV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xXQDrUBl; arc=none smtp.client-ip=209.85.218.43
+	 To:Cc:Content-Type; b=O8COLs8z0ymnMAyWa8Xa6F4E2hgSl10qpS+wlARxonJB1lRBwFb4smqywWOtTrnVNPK9byqtVViIVsHfruY/xpVdjcCTvGuq9GOAzBYD1wW9CNvs7Fs/lWVk5/fM+pNc06YT90UeEJ20Y4r5XWAjtv0xA5daHIQj37e/5Pa+DvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U97bJR4e; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9963e47b69so37642466b.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 14:00:46 -0700 (PDT)
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-460395fb1acso87881cf.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 14:00:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728507645; x=1729112445; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728507654; x=1729112454; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
-        b=xXQDrUBlNlEBM0ZXcZqCw5VsstnXL9Ewpd9tc2m8oKO/yj6Lrhu+hshudCg81/fJD+
-         5W3tjFPurUlUB5XNevMdtjmNdTeW+dRAxoTgJXRr2j4w6752dlWxAix5MVpkY1hTzJPc
-         tRu3ih3I4fR2e/rI7OGGwT+rfomoWMuh7OihaDm4v6y+8B8bGrJeKjWnbQgZVn93QHBK
-         G2hV3346/8hXbHLPTxpThrRbrBJxH/1A/OXxM3RfQ+uXvH4yW5poQlbPEKRUqh/w6LAi
-         lVTHexlYERXmonivSr7pQQ41NMdPJ99ye8ygGA3zOikoar6G0Liwq1RTuEXI85+w+h3N
-         Y8qA==
+        bh=2mz49rEZUDSSSMogUQ/PTLDIqGUKzRNzHFIRJ4BW1lo=;
+        b=U97bJR4ejt1BNIwxDQm7VcYW3FghtBIrQH7zrWO4eC6vc41dsaZPPVV1v7VgNCE5iL
+         Ek+bW9cAUx5JcG0re1DamBuohF6wxyj52PDmWQwjlp1DUA7Q0nEDBrvKiaq9tS+TZnwH
+         HqqQ4j09UTiLheqaEzc1NuNQoPoHCql27gj+kBzWV59P0/U0cx4+mdFO0wXPgAUIlAiD
+         RmRvlouZlzyJTZ3lFcLgzFMpPY1F6l/MsT3QaWBUvmIDYTf4t5+XnNQ7ioAlTQ0kOae7
+         OBRPvzKjrI3Ve6Q6KmoBkfjsHGzVFJJD94XevL6V71ZTJADzqRsaQ4Bp5B3W77T68zlO
+         V+iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728507645; x=1729112445;
+        d=1e100.net; s=20230601; t=1728507654; x=1729112454;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
-        b=g1z4jfGvGW+e2xMz1c4Evw1xwYGioQfcKVsLT53JuqhUdD/5dZGNy1tW2GBecFX7zs
-         5ElW6i02Bb8yvAhszm0s78+pLrK18sq/Iqs1l5syREQT3Uw6gdf4m5l3Y+ykotkLiusw
-         PtARjz+FxBvRctnCQnLSDNNTIrn0tKk+1DICPTL3hjd2/5o1pypLAOullq7oEZpNVGQV
-         SQRwtQy8AVyRs6iDa2OcxOOHvvrEu21ALdbbWqeXebMbrvIfa5JPITXW5Xu6hg7TdlsF
-         LMKGslykTS/I44hgsZmACpdIE4aix7qSHqlA1LjKOZVTTVL0lehn5SaxlSUiw71AjtiY
-         UiEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWTdWwxg4oQXtm9Df+T9cicuSa53FpRRRKaT5CUb6gwRywfbVziVA2L6H+IGLnosgszfGjbjEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGfV0LSvyLEeyFmh6KfvAv6We9RCvHlHi/JmKIhPtWxAUXgo/E
-	rbBifsuktBUROmsfRaVpKdCCs1bPTJkoddYykT0MAlejx8/k7hMh7ulNJlTeh8MYf/72vWpYml4
-	LRJgVAFsy73x1JgXiQlDUSJn2YH6Fw2Vi2xY=
-X-Google-Smtp-Source: AGHT+IG6hF8OnOMd+ncEae7qi/hQ3JtWKyHhEKQxLhE0HVwRV7e37ko5qcN3yswQ/SlB99ADuvXLGXhSs8eLCCuAZOc=
-X-Received: by 2002:a17:907:7ba9:b0:a99:3a96:fa9b with SMTP id
- a640c23a62f3a-a999e8f3fe7mr134337166b.58.1728507644343; Wed, 09 Oct 2024
- 14:00:44 -0700 (PDT)
+        bh=2mz49rEZUDSSSMogUQ/PTLDIqGUKzRNzHFIRJ4BW1lo=;
+        b=lez85eCwxeLY5A2xy6r7HdgWzznrgs4o1AkPCeOD9MM5Pj7fFRWxDhQ8yjIg7eYch0
+         b+Q29bAcloshn/zg8BfAuCFbRR5RMsIrxmvJwpJWq3azSJeoOULr/NE8DyqjNNrpFMny
+         gOMh2mxbSOCQJ57KKhT6Q3LP8hy5HK0cTpnVj2k9GFDsk1qR3bZIGXyjJQkBeb3QC0ky
+         KnyfsCwCd3PcGF9zqH3dttWykk76O19KzoyHmZq/p4NYyRMgG1nhG3gdp+HsOKNmsnxm
+         IIkO4lKql0a1p6/muvJjujsbazoI8S3pK92n20EEMmnwbirZC2oq/TBNAzGMyBIi8k8l
+         pK1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUPPW5LgKhPBaYDS/1pdGzhhwGVxI0fPhSDVCbTaSuLpgzB/4D6KI4QieqDwXGnVFfOD9XW7TA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzfo++ZErkLGRxRL2Pwx5qvKiQj9MwIQ+oHlTbFimiapEmTmCIy
+	o74t4l9MLPU7RBDiGcD0eYWCgKZRLYjOj4RRaYtPZHHmby3M867sOPwZb2cJJyziDpWTw7Km+60
+	JXoyTJoIdiHjCpj89ygUy0usQ6miydJpePkSn
+X-Google-Smtp-Source: AGHT+IERpFJXwIdQCaz6JVxNCGO9tWecB5hDzS+Hq1qriM+TfdKc4CNMgfEevgAdoVeeof+MLEZB7QaSut6cJPiicA8=
+X-Received: by 2002:a05:622a:560d:b0:456:7ec0:39a9 with SMTP id
+ d75a77b69052e-4604119ee8dmr209921cf.5.1728507653567; Wed, 09 Oct 2024
+ 14:00:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-0-554456a44a15@linutronix.de>
- <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-5-554456a44a15@linutronix.de>
-In-Reply-To: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-5-554456a44a15@linutronix.de>
-From: John Stultz <jstultz@google.com>
-Date: Wed, 9 Oct 2024 14:00:32 -0700
-Message-ID: <CANDhNCr8NL0ZgOdoOmFJffkQxAvGfJLekszuE0DGvdHiRNkgQw@mail.gmail.com>
-Subject: Re: [PATCH v2 05/25] timekeeping: Simplify code in timekeeping_advance()
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Christopher S Hall <christopher.s.hall@intel.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-7-dw@davidwei.uk>
+In-Reply-To: <20241007221603.1703699-7-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 9 Oct 2024 14:00:35 -0700
+Message-ID: <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com>
+Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider callback
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 1:29=E2=80=AFAM Anna-Maria Behnsen
-<anna-maria@linutronix.de> wrote:
+On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
 >
-> From: Thomas Gleixner <tglx@linutronix.de>
+> From: Pavel Begunkov <asml.silence@gmail.com>
 >
-> From: Thomas Gleixner <tglx@linutronix.de>
+> page pool is now waiting for all ppiovs to return before destroying
+> itself, and for that to happen the memory provider might need to push
+> some buffers, flush caches and so on.
 >
-> timekeeping_advance() takes the timekeeper_lock and releases it before
-> returning. When an early return is required, goto statements are used to
-> make sure the lock is realeased properly. When the code was written the
-> locking guard() was not yet available.
+> todo: we'll try to get by without it before the final release
 >
-> Use the guard() to simplify the code and while at it cleanup ordering of
-> function variables. No functional change.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 
-Acked-by: John Stultz <jstultz@google.com>
+Is the intention to drop this todo and stick with this patch, or to
+move ahead with this patch?
+
+To be honest, I think I read in a follow up patch that you want to
+unref all the memory on page_pool_destory, which is not how the
+page_pool is used today. Tdoay page_pool_destroy does not reclaim
+memory. Changing that may be OK.
+
+But I'm not sure this is generic change that should be put in the
+page_pool providers. I don't envision other providers implementing
+this. I think they'll be more interested in using the page_pool the
+way it's used today.
+
+I would suggest that instead of making this a page_pool provider
+thing, to instead have your iouring code listen to a notification that
+a new generic notificatino that page_pool is being destroyed or an
+rx-queue is being destroyed or something like that, and doing the
+scrubbing based on that, maybe?
+
+--=20
+Thanks,
+Mina
 
