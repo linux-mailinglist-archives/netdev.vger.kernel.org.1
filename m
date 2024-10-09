@@ -1,407 +1,178 @@
-Return-Path: <netdev+bounces-133795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E43A7997101
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:19:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C5F997125
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:22:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E90DB215B0
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:18:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6108286CB2
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C23AF199230;
-	Wed,  9 Oct 2024 16:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4526A1E32CB;
+	Wed,  9 Oct 2024 16:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kRtTpEhy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82997191F66
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 16:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6836E1E32CE;
+	Wed,  9 Oct 2024 16:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728489636; cv=none; b=g034WOO/seWSrqxMU4hWrhl9QFmBBUEy6x6x74/aXEvrFdPQVAxYdT5JIz8IDwBxLEcdNMKyaycSrsZl2ITFDE7exAgHGqRqrPTfYLHZCICtUTo/j3iN3TDDBhyXb8gTLJRsNlxJytnGk7SPaCUom9NwPE9XTrooT18VVFwOgEI=
+	t=1728490185; cv=none; b=cxXhUNdgw1WQdEcfyn29iEH88WbUe9SIq8TqebAajvlGzWwYrD8A7+0kx4h7ImvgfB9M5Lil7g9kG+9dZyHqoiPQm+gRvXs8uUpM6RMmpY2GRTWHFwtLP2vkzVsL2m1x8rnHar4MaXYGTgxg4KbwFQ4lYgAxO+miNmpmUWEoWXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728489636; c=relaxed/simple;
-	bh=tLFq2rYbKr3kWtMGKuRZlFFNNbSbzktVTTz9OPKLxDM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=t5Qok/UfavQZ1URCcD0x8zd9J9e19slqLK42F/JzuHTVqElVgjU2B2LEw+JexHvoPF61q8vVpZm/ebVRLSLInQBqFgtGdng8CXuOKaPJcKjdua9a3qtZzUyvwPEQmnGGcz7zH3JfvqzZLiNk0Yp954x5UIdkfFB/TJBBpUaV/zQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a342e7e49cso294355ab.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 09:00:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728489633; x=1729094433;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9wUGfyWYG+Mv+ZbCwuJkV8NkgcbRhZCqqHtFvIBA2I8=;
-        b=SXhFGbdpklpyxCU4GAD7MWEDmY94xicZASlcBY/8k9EY2nrM12NIZJOQfRGCIKgSr7
-         pYVXHjNae2XzZYPDrKWblsU/lLCO84TPJXql86BJM3Z+7cHEsnkNsc4w6jtkvonpXGfe
-         Mnm9H9d8lasr/N71qhWFxKEO6VFy1z32Cp+iFX1wcsZ51noj2HmHwl90jb0X5iSHdSQM
-         eC3hNvYR02udO9VnhbhwVhqwMrFRjOP7wRZ0J5b4Lz1kGMDDjiRYpk/DMCv0NFWSxh+Z
-         N1lg1UNz4XFUiv6iz3twFvb4/op+JwrKVT1Cx4LKhTs0pPzi8sx+UZW7rr/IQInrPO9B
-         4Z5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUcIvrm4rUsoaRVmfkquFsMH26E5cYRJcvkOfGU6MdCMco1OaYZvMbmZtO5ic53XuNemJ29AoY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe1q8XDpOHmARlw/7vDFrvfkq+aT/r+dv+QxrXuNB5/GO5C1xs
-	9Lt5K6LUOV72QwnPzFY3XugfToBAZTSIsnLhe9TxQEplhCt0wiCN/jb3Hm5t1DN87O6EJ8hVAIU
-	Sr6UbmCHqBhp7rn5H1B1wIGy/TmcgT3UEy5hotIswx1XkO6oguYKY3FU=
-X-Google-Smtp-Source: AGHT+IFEqWpHFoJcS79AQvenubV5/CRTKUu1MZBacWLM2r3WzfV/oYAZ84FPkMXDVjzusAutf/+OWMUk8DQC5WvCFT9LOMKyMglK
+	s=arc-20240116; t=1728490185; c=relaxed/simple;
+	bh=zHFZh0+NMiMWYYJ4ABAZdyr64m8aYnHfZn/F21PIQ/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hbMbHW4ir5e7j9kOgQBXdTghSq/UzrsKeiuHTuxAvlgitIDTFZrcgVnfqQqXdYFidNaLjJM2VQIn/yKyakovM6H9e002O3S6Pzm5UpYIj4N7A5oQ4p3Mu6qPAaqQnvoulNAceHLP+cz0maZ9WuB/HwGUjRxBspiLE5Qg7YmzoIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kRtTpEhy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ACLnXv8vy+mXWC64mZBSTow4VmehlxdQjUKWeB/19WQ=; b=kR
+	tTpEhyogUX5xwRBQHGmMMvaheMFjOaB8YYklRjpplD3+QS1hf62S7tkAnmYb/tKkH79N8aYgs0ZG3
+	qnYCzF3K8sJwTGOLm8wiu91sK8P0LxnzrY/qi34FAnPFtU2sFEwx5S6ojj9W4PXe2vyCirIGz+80f
+	37i/nE/HNFHG55U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1syZFk-009W8n-9w; Wed, 09 Oct 2024 18:09:32 +0200
+Date: Wed, 9 Oct 2024 18:09:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for PSE
+ PI priority feature
+Message-ID: <9e58bfec-c915-4c30-9d75-979a309e3f69@lunn.ch>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
+ <1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
+ <ZwU6QuGSbWF36hhF@pengutronix.de>
+ <9c77d97e-6494-4f86-9510-498d93156788@lunn.ch>
+ <ZwYt0WT-tdOM0Abj@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1548:b0:3a3:3e1f:1168 with SMTP id
- e9e14a558f8ab-3a397d10fccmr26673695ab.17.1728489633457; Wed, 09 Oct 2024
- 09:00:33 -0700 (PDT)
-Date: Wed, 09 Oct 2024 09:00:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6706a8a1.050a0220.67064.004b.GAE@google.com>
-Subject: [syzbot] [wireless?] INFO: task hung in cfg80211_dfs_channels_update_work
- (8)
-From: syzbot <syzbot+0e0f5ef531ead9783803@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZwYt0WT-tdOM0Abj@pengutronix.de>
 
-Hello,
+On Wed, Oct 09, 2024 at 09:16:33AM +0200, Oleksij Rempel wrote:
+> Hi Andrew,
+> 
+> On Tue, Oct 08, 2024 at 06:50:25PM +0200, Andrew Lunn wrote:
+> > On Tue, Oct 08, 2024 at 03:57:22PM +0200, Oleksij Rempel wrote:
+> > > On Thu, Oct 03, 2024 at 01:41:02AM +0200, Andrew Lunn wrote:
+> > > > > +	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
+> > > > > +	msg.sub[2] = id;
+> > > > > +	/* Controller priority from 1 to 3 */
+> > > > > +	msg.data[4] = prio + 1;
+> > > > 
+> > > > Does 0 have a meaning? It just seems an odd design if it does not.
+> > > 
+> > > 0 is not documented. But there are sub-priority which are not directly
+> > > configured by user, but affect the system behavior.
+> > > 
+> > > Priority#: Critical – 1; high – 2; low – 3
+> > >  For ports with the same priority, the PoE Controller sets the
+> > >  sub-priority according to the logic port number. (Lower number gets
+> > >  higher priority).
+> > 
+> > With less priorities than ports, there is always going to be something
+> > like this.
+> > 
+> > > 
+> > > Port priority affects:
+> > > 1. Power-up order: After a reset, the ports are powered up according to
+> > >  their priority, highest to lowest, highest priority will power up first.
+> > > 2. Shutdown order: When exceeding the power budget, lowest priority
+> > >  ports will turn off first.
+> > > 
+> > > Should we return sub priorities on the prio get request?
+> > 
+> > I should be optional, since we might not actually know what a
+> > particular device is doing. It could pick at random, it could pick a
+> > port which is consuming just enough to cover the shortfall if it was
+> > turned off, it could pick the highest consumer of the lowest priority
+> > etc. Some of these conditions are not going to be easy to describe
+> > even if we do know it.
+> 
+> After reviewing the manuals for LTC4266 and TPS2388x, I realized that these
+> controllers expose interfaces, but they don't implement prioritization concepts
+> themselves.
+> 
+> The LTC4266 and TPS2388x controllers provide only interfaces that allow the
+> kernel to manage shutdown and prioritization policies. For TPS2388x, fast
+> shutdown is implemented as a port bitmask with only two priorities, handled via
+> the OSS pin. Fast shutdown is triggered by the kernel on request by toggling
+> the corresponding pin, and the policy - when and why this pin is toggled - is
+> defined by the kernel or user space. Slow shutdown, on the other hand, is
+> managed via the I2C bus and allows for more refined control, enabling a wider
+> range of priorities and more granular policies.
+> 
+> I'll tend to hope we can reuse the proposed ETHTOOL_A_C33_PSE_PRIO interface
+> across different PSE controllers. However, it is already being mapped to
+> different shutdown concepts: PD692x0 firmware seems to rely on a slow shutdown
+> backed by internal policies, while TPS2388x maps it to fast shutdown with
+> driver specific policy. This inconsistency could force us to either break the
+> UAPI or introduce a new, inconsistent one once we realize TPS2388x fast
+> shutdown isn't what we actually need.
 
-syzbot found the following issue on:
+We should try to avoid fragmentation of the API, but given there is no
+standardisation here, vendors are free to do whatever they want, this
+may be difficult. Still, we should try to avoid it.
 
-HEAD commit:    5b7c893ed5ed Merge tag 'ntfs3_for_6.12' of https://github...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1648d7d0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd9e7e4a8a0a15b
-dashboard link: https://syzkaller.appspot.com/bug?extid=0e0f5ef531ead9783803
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Maybe we want to consider a generic simple prioritization in the
+kernel, plus export a generic model of PSE to user space to allow a
+user space manager? This is really policy, and ideally we don't want
+policy in the kernel. The in kernel implementation can use the
+hardware prioritisation if it supports it, otherwise provide a library
+of code which a driver can use to implement simple software
+prioritisation?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+For a user space manager, we already talked about an event to signal
+that we are entering overload. I guess we additionally need an API to
+get the current runtime state, what each consumer is actually
+consuming, and a management API to shutdown or enable a port due to
+overload, which is separate to the administrative state of a port.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/508d25adbdbb/disk-5b7c893e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ecd795cf996e/vmlinux-5b7c893e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d5433a3025f3/bzImage-5b7c893e.xz
+The hardware/firmware might provide lots of options and capabilities,
+but sometimes it is better it ignore them. Export a basic set which we
+expect most PSE controllers can offer, and do the rest in our software
+which we have full insight into, and debug and share, unlike firmware
+which is a broken black box.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0e0f5ef531ead9783803@syzkaller.appspotmail.com
+If we decide this is the way we want to go, we should not need to
+extend the API for LTC4266 and TPS2388x, you just implement a basic
+prioritisation in the driver. If it turns out to be not ideal, it does
+not matter so much, so long as we have the understanding that
+eventually we can have something better in userspace.
 
-INFO: task kworker/u8:1:12 blocked for more than 156 seconds.
-      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:1    state:D stack:20944 pid:12    tgid:12    ppid:2      flags:0x00004000
-Workqueue: cfg80211 cfg80211_dfs_channels_update_work
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- cfg80211_dfs_channels_update_work+0xbf/0x610 net/wireless/mlme.c:1021
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task kworker/u8:6:2870 blocked for more than 157 seconds.
-      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u8:6    state:D stack:21264 pid:2870  tgid:2870  ppid:2      flags:0x00004000
-Workqueue: events_unbound linkwatch_event
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- linkwatch_event+0xe/0x60 net/core/link_watch.c:276
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task dhcpcd:4898 blocked for more than 158 seconds.
-      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:dhcpcd          state:D stack:19736 pid:4898  tgid:4898  ppid:4897   flags:0x00000002
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- rtnl_lock net/core/rtnetlink.c:79 [inline]
- rtnl_dumpit+0x99/0x200 net/core/rtnetlink.c:6505
- netlink_dump+0x647/0xd80 net/netlink/af_netlink.c:2325
- __netlink_dump_start+0x5a2/0x790 net/netlink/af_netlink.c:2440
- netlink_dump_start include/linux/netlink.h:339 [inline]
- rtnetlink_dump_start net/core/rtnetlink.c:6535 [inline]
- rtnetlink_rcv_msg+0xb3d/0xcf0 net/core/rtnetlink.c:6602
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:744
- __sys_sendto+0x39b/0x4f0 net/socket.c:2209
- __do_sys_sendto net/socket.c:2221 [inline]
- __se_sys_sendto net/socket.c:2217 [inline]
- __x64_sys_sendto+0xde/0x100 net/socket.c:2217
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc13d7fdad7
-RSP: 002b:00007ffe7cb63fc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007ffe7cb650f0 RCX: 00007fc13d7fdad7
-RDX: 0000000000000014 RSI: 00007ffe7cb65010 RDI: 0000000000000018
-RBP: 00007ffe7cb65080 R08: 00007ffe7cb64ff4 R09: 000000000000000c
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000012
-R13: 00007ffe7cb64ff4 R14: 00007ffe7cb65010 R15: 0000000000000105
- </TASK>
-INFO: task kworker/0:7:5304 blocked for more than 160 seconds.
-      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/0:7     state:D stack:19184 pid:5304  tgid:5304  ppid:2      flags:0x00004000
-Workqueue: events rfkill_global_led_trigger_worker
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- rfkill_global_led_trigger_worker+0x27/0xd0 net/rfkill/core.c:182
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-INFO: task syz.3.1434:13868 blocked for more than 160 seconds.
-      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz.3.1434      state:D stack:22000 pid:13868 tgid:13864 ppid:12830  flags:0x00004006
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5315 [inline]
- __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
- __schedule_loop kernel/sched/core.c:6752 [inline]
- schedule+0x14b/0x320 kernel/sched/core.c:6767
- schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
- __mutex_lock_common kernel/locking/mutex.c:684 [inline]
- __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
- cfg80211_rfkill_set_block+0x1e/0x50 net/wireless/core.c:311
- rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:346
- rfkill_fop_write+0x5b8/0x790 net/rfkill/core.c:1301
- vfs_write+0x29c/0xc90 fs/read_write.c:681
- ksys_write+0x183/0x2b0 fs/read_write.c:736
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f28e037dff9
-RSP: 002b:00007f28dfd58038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f28e0536130 RCX: 00007f28e037dff9
-RDX: 0000000000000008 RSI: 0000000020000080 RDI: 000000000000000b
-RBP: 00007f28e03f0296 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f28e0536130 R15: 00007f28e065fa28
- </TASK>
+We can maybe do a rough sketch of what the kAPI looks like for a user
+space manager, but we can kick the implementation down the road while
+the in kernel prioritization is good enough.
 
-Showing all locks held in the system:
-3 locks held by kworker/0:0/8:
- #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc900000d7d00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc900000d7d00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: reg_check_chans_work+0x99/0xfd0 net/wireless/reg.c:2480
-3 locks held by kworker/u8:1/12:
- #0: ffff888145ae5148 ((wq_completion)cfg80211){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff888145ae5148 ((wq_completion)cfg80211){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90000117d00 ((work_completion)(&(&rdev->dfs_update_channels_wk)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90000117d00 ((work_completion)(&(&rdev->dfs_update_channels_wk)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: cfg80211_dfs_channels_update_work+0xbf/0x610 net/wireless/mlme.c:1021
-1 lock held by khungtaskd/30:
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
-3 locks held by kworker/u8:6/2870:
- #0: ffff88801ac89148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801ac89148 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90009947d00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90009947d00 ((linkwatch_work).work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: linkwatch_event+0xe/0x60 net/core/link_watch.c:276
-1 lock held by syslogd/4666:
- #0: ffff8880b863ea98 (&rq->__lock){-.-.}-{2:2}, at: raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:593
-2 locks held by dhcpcd/4898:
- #0: ffff88807d8846c8 (nlk_cb_mutex-ROUTE){+.+.}-{3:3}, at: __netlink_dump_start+0x119/0x790 net/netlink/af_netlink.c:2404
- #1: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #1: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_dumpit+0x99/0x200 net/core/rtnetlink.c:6505
-2 locks held by getty/4991:
- #0: ffff88802ef9e0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
- #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
-3 locks held by kworker/1:4/5281:
- #0: ffff88801ac80948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801ac80948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90004177d00 (deferred_process_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90004177d00 (deferred_process_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: switchdev_deferred_process_work+0xe/0x20 net/switchdev/switchdev.c:104
-3 locks held by kworker/0:7/5304:
- #0: ffff88801ac80948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801ac80948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90004287d00 ((work_completion)(&rfkill_global_led_trigger_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90004287d00 ((work_completion)(&rfkill_global_led_trigger_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8ffa9168 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_global_led_trigger_worker+0x27/0xd0 net/rfkill/core.c:182
-2 locks held by kworker/u8:8/5450:
-5 locks held by kworker/u8:12/9626:
- #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc90002e5fd00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc90002e5fd00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcc52d0 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:580
- #3: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: cleanup_net+0x6af/0xcc0 net/core/net_namespace.c:616
- #4: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: exp_funnel_lock kernel/rcu/tree_exp.h:297 [inline]
- #4: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: synchronize_rcu_expedited+0x381/0x830 kernel/rcu/tree_exp.h:976
-3 locks held by kworker/u8:13/9628:
- #0: ffff88814b3ef148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
- #0: ffff88814b3ef148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
- #1: ffffc9000324fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
- #1: ffffc9000324fd00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
- #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+0xd0/0x16f0 net/ipv6/addrconf.c:4196
-1 lock held by syz-executor/12440:
- #0: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: exp_funnel_lock kernel/rcu/tree_exp.h:329 [inline]
- #0: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: synchronize_rcu_expedited+0x451/0x830 kernel/rcu/tree_exp.h:976
-1 lock held by syz-executor/13657:
- #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
-1 lock held by syz-executor/13702:
- #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
- #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
-7 locks held by syz-executor/13787:
- #0: ffff8880323a8420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2931 [inline]
- #0: ffff8880323a8420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
- #1: ffff888059ab7488 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
- #2: ffff888027eb9e18 (kn->active#49){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
- #3: ffffffff8f56fea8 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: del_device_store+0xfc/0x480 drivers/net/netdevsim/bus.c:216
- #4: ffff88805865b0e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1014 [inline]
- #4: ffff88805865b0e8 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1095 [inline]
- #4: ffff88805865b0e8 (&dev->mutex){....}-{3:3}, at: device_release_driver_internal+0xce/0x7c0 drivers/base/dd.c:1293
- #5: ffff888058659250 (&devlink->lock_key#65){+.+.}-{3:3}, at: nsim_drv_remove+0x50/0x160 drivers/net/netdevsim/dev.c:1672
- #6: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: nsim_destroy+0x71/0x5c0 drivers/net/netdevsim/netdev.c:773
-2 locks held by syz.3.1434/13868:
- #0: ffffffff8ffa9168 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_write+0x1a6/0x790 net/rfkill/core.c:1293
- #1: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: cfg80211_rfkill_set_block+0x1e/0x50 net/wireless/core.c:311
-2 locks held by syz-executor/13914:
- #0: ffff88806cd64118 (&data->open_mutex){+.+.}-{3:3}, at: vhci_create_device+0x34/0x6a0 drivers/bluetooth/hci_vhci.c:469
- #1: ffffffff8ffa9168 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_register+0x34/0x8c0 net/rfkill/core.c:1071
-2 locks held by syz-executor/13920:
- #0: ffff8881c2079118 (&data->open_mutex){+.+.}-{3:3}, at: vhci_create_device+0x34/0x6a0 drivers/bluetooth/hci_vhci.c:469
- #1: ffffffff8ffa9168 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_register+0x34/0x8c0 net/rfkill/core.c:1071
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
- nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
- watchdog+0xff4/0x1040 kernel/hung_task.c:379
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 13921 Comm: syz-executor Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__debug_check_no_obj_freed lib/debugobjects.c:979 [inline]
-RIP: 0010:debug_check_no_obj_freed+0x24e/0x580 lib/debugobjects.c:1019
-Code: bc c0 a8 50 59 9a 48 89 7c 24 20 e8 dc ae 0c 07 48 89 44 24 18 4c 89 fb 48 c1 eb 03 48 b8 00 00 00 00 00 fc ff df 80 3c 03 00 <74> 08 4c 89 ff e8 58 06 3c fd 49 8b 07 48 85 c0 0f 84 eb 02 00 00
-RSP: 0018:ffffc900044df720 EFLAGS: 00000046
-RAX: dffffc0000000000 RBX: 1ffffffff34ca93f RCX: 0000000000000001
-RDX: dffffc0000000000 RSI: 0000000000000004 RDI: ffffc900044df600
-RBP: ffffc900044df868 R08: 0000000000000003 R09: fffff5200089bec0
-R10: dffffc0000000000 R11: fffff5200089bec0 R12: ffff88805e5b3000
-R13: ffff88805e5b2000 R14: 0000000000000000 R15: ffffffff9a6549f8
-FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005568deb02f20 CR3: 000000000e734000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <TASK>
- free_pages_prepare mm/page_alloc.c:1115 [inline]
- free_unref_page+0x41b/0xf20 mm/page_alloc.c:2638
- vfree+0x186/0x2e0 mm/vmalloc.c:3361
- kcov_put kernel/kcov.c:439 [inline]
- kcov_close+0x28/0x50 kernel/kcov.c:535
- __fput+0x23f/0x880 fs/file_table.c:431
- task_work_run+0x24f/0x310 kernel/task_work.c:228
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0xa2f/0x28e0 kernel/exit.c:939
- do_group_exit+0x207/0x2c0 kernel/exit.c:1088
- get_signal+0x16a3/0x1740 kernel/signal.c:2917
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:337
- exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0xc9/0x370 kernel/entry/common.c:218
- do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc04337dbfb
-Code: Unable to access opcode bytes at 0x7fc04337dbd1.
-RSP: 002b:00007ffdb51fe900 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: fffffffffffffff4 RBX: 0000000000040000 RCX: 00007fc04337dbfb
-RDX: 0000000000040000 RSI: ffffffff80086301 RDI: 00000000000000df
-RBP: 00007fc043536600 R08: 00000000000000da R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000003 R14: 0000000000000009 R15: 0000000000000000
- </TASK>
+	Andrew
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
