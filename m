@@ -1,189 +1,136 @@
-Return-Path: <netdev+bounces-133568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1579964CF
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:18:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CBA199652E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:24:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81DD71C2092F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:18:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25187B27F77
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FED818A959;
-	Wed,  9 Oct 2024 09:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC95918EFCC;
+	Wed,  9 Oct 2024 09:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qsUUPuSn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="AUB20Dct"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F323C18B463
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 09:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0939189520;
+	Wed,  9 Oct 2024 09:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728465426; cv=none; b=moePdVCHC/uRFVqaQ+8mcRapTqoXznTITcuh5OeyOvOVNCq4+70JlZzCPkwWgTqJb5CvtZfd4JueipziqKtBO7oZGWuPhswBKZVMOHSqpU76XDK68XDVXiZOI8eLXuTd7Bz6Ggt+YcivcLAMIHp7SWwidxjbEOWMHoPU6fI3rTU=
+	t=1728465614; cv=none; b=MRl1FiDGONufcdvo6Ci/PMv7ZyVjVaTA+4ScYoIaiJmKViaR1oWZGTntH05/Wr/ywz6KkNMFPnjUk+ypE7sYwAX0/Ft5XeJJwgc44gmnAXPJUBum21Tfv97h9H3652FbSHbofpLLYQm4CVR6kU2edFvgIuFuirQIafAanOj8KxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728465426; c=relaxed/simple;
-	bh=1bi01EMqWEaA+vrK0+7LEkl25gRd1evQhlIC8Zil7dI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cxrP0JyVbw0b4HXuRlr08Cy+QvPgB/zEdTPIl8QEdF8yXMlm3Hj++o4KjFG2REW+o4PvMF/f2ekENErb5enjnmYJBMN26eaaIlYO71wCQasQ8rTqRoPLd4SuEDtqyLeOLo9QX/h7IwVso6rwXFtXlYMdeaLd/0pJYt+GJYbGHNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qsUUPuSn; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <842adc49-b75e-49b1-89ea-9c5229a44447@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728465419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eirhv/tXpQ82QkTFoIxmPOYSAd/dxtreJiwAdIXrTeM=;
-	b=qsUUPuSnvP1tOQtKd9j0i0Ef2JXFL1J07jlPvoT0Yjznvavo61+zW0jcryS1bIhKz53pz4
-	M0K70crPYumtzp23jQvumhvXNnaa7+uktKpD4oOi+4vXCSlCautXaFRr8YqPOfXCurv8xR
-	V9wGNrB+OsNRuhgh+4UvNdCFZZ0IKQU=
-Date: Wed, 9 Oct 2024 10:16:53 +0100
+	s=arc-20240116; t=1728465614; c=relaxed/simple;
+	bh=bAMqCfrwaXqFtyx4AvFX7ZFSSTTt4lqyv0dvCuSH7Tc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AAU4M22QIm6Uo8nrpm5Un/lRBUYUakA5hUZkjeNBBlx2j0lTA1nYfNOpCssvy+rgZCwt3TgAW6ZRNqwGjneRfc/J+Ag1DmLcmtvNUrfBiJa+RPEGjBBpFTyKrAyVWUoVCKaaEWQK8tDiC48o373YCfQ9DF4jKMuegVsc86eHT0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=AUB20Dct; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=H2DwZUbEHckuGa0hfYPz82REyIpT7y3SCXZ306JtGkc=; b=AUB20DcteP860IY8sIhZEjo0kT
+	2SpZuG6aF/WvAMB9+18aLTw1/5nTptJoqzrUHYFtam9uqW3ybNRCxd098Li3wp2vE+FwiJfc+WeJu
+	dfNJso8EKnE1OoJhLIDFxUb7Nh26UeSOHJEI2xP7JGMGmWfEk0glgDdz8PaOTKt5aKHupzzGwIW3o
+	Y+HLfMYAZGWbBGsupVnW9BavfdOku/FE6cb9kM8Z/A+LioK9smPtaaa8Tk5A/1XyEPeWi3o2VfLgn
+	CXjeoXlZJm41Je/rgkE62zUtF/a/1v9Dqv/DenlgaRTiOS7mBWgLDfvj74tAiwEqQ3ZNl9axBo/oa
+	kzp9Dwaw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49396)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sySrO-0000Gf-09;
+	Wed, 09 Oct 2024 10:19:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sySrK-0006Ar-34;
+	Wed, 09 Oct 2024 10:19:55 +0100
+Date: Wed, 9 Oct 2024 10:19:54 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, andrew@lunn.ch, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	git@amd.com
+Subject: Re: [RFC PATCH net-next 4/5] net: macb: Configure High Speed Mac for
+ given speed.
+Message-ID: <ZwZKumS3IEy54Jsk@shell.armlinux.org.uk>
+References: <20241009053946.3198805-1-vineeth.karumanchi@amd.com>
+ <20241009053946.3198805-5-vineeth.karumanchi@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 5/9] net-timestamp: ready to turn on the button
- to generate tx timestamps
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <20241008095109.99918-6-kerneljasonxing@gmail.com>
- <b82d7025-188d-41dc-a70c-06aa0fb26d24@linux.dev>
- <CAL+tcoAbYF2k88r84VW-3COU5W8dOQ2gFHBq3OiXig3Ze+reXg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAL+tcoAbYF2k88r84VW-3COU5W8dOQ2gFHBq3OiXig3Ze+reXg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009053946.3198805-5-vineeth.karumanchi@amd.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 09/10/2024 00:48, Jason Xing wrote:
-> On Wed, Oct 9, 2024 at 3:18 AM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 08/10/2024 10:51, Jason Xing wrote:
->>> From: Jason Xing <kernelxing@tencent.com>
->>>
->>> Once we set BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB_FLAG flag here, there
->>> are three points in the previous patches where generating timestamps
->>> works. Let us make the basic bpf mechanism for timestamping feature
->>>    work finally.
->>>
->>> We can use like this as a simple example in bpf program:
->>> __section("sockops")
->>>
->>> case BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB:
->>>        dport = bpf_ntohl(skops->remote_port);
->>>        sport = skops->local_port;
->>>        skops->reply = SOF_TIMESTAMPING_TX_SCHED;
->>>        bpf_sock_ops_cb_flags_set(skops, BPF_SOCK_OPS_TX_TIMESTAMP_OPT_CB_FLAG);
->>> case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
->>>        bpf_printk(...);
->>>
->>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
->>> ---
->>>    include/uapi/linux/bpf.h       |  8 ++++++++
->>>    net/ipv4/tcp.c                 | 27 ++++++++++++++++++++++++++-
->>>    tools/include/uapi/linux/bpf.h |  8 ++++++++
->>>    3 files changed, 42 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
->>> index 1b478ec18ac2..6bf3f2892776 100644
->>> --- a/include/uapi/linux/bpf.h
->>> +++ b/include/uapi/linux/bpf.h
->>> @@ -7034,6 +7034,14 @@ enum {
->>>                                         * feature is on. It indicates the
->>>                                         * recorded timestamp.
->>>                                         */
->>> +     BPF_SOCK_OPS_TX_TS_OPT_CB,      /* Called when the last skb from
->>> +                                      * sendmsg is going to push when
->>> +                                      * SO_TIMESTAMPING feature is on.
->>> +                                      * Let user have a chance to switch
->>> +                                      * on BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG
->>> +                                      * flag for other three tx timestamp
->>> +                                      * use.
->>> +                                      */
->>>    };
->>>
->>>    /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
->>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
->>> index 82cc4a5633ce..ddf4089779b5 100644
->>> --- a/net/ipv4/tcp.c
->>> +++ b/net/ipv4/tcp.c
->>> @@ -477,12 +477,37 @@ void tcp_init_sock(struct sock *sk)
->>>    }
->>>    EXPORT_SYMBOL(tcp_init_sock);
->>>
->>> +static u32 bpf_tcp_tx_timestamp(struct sock *sk)
->>> +{
->>> +     u32 flags;
->>> +
->>> +     flags = tcp_call_bpf(sk, BPF_SOCK_OPS_TX_TS_OPT_CB, 0, NULL);
->>> +     if (flags <= 0)
->>> +             return 0;
->>> +
->>> +     if (flags & ~SOF_TIMESTAMPING_MASK)
->>> +             return 0;
->>> +
->>> +     if (!(flags & SOF_TIMESTAMPING_TX_RECORD_MASK))
->>> +             return 0;
->>> +
->>> +     return flags;
->>> +}
->>> +
->>>    static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
->>>    {
->>>        struct sk_buff *skb = tcp_write_queue_tail(sk);
->>>        u32 tsflags = sockc->tsflags;
->>> +     u32 flags;
->>> +
->>> +     if (!skb)
->>> +             return;
->>> +
->>> +     flags = bpf_tcp_tx_timestamp(sk);
->>> +     if (flags)
->>> +             tsflags = flags;
->>
->> In this case it's impossible to clear timestamping flags from bpf
+On Wed, Oct 09, 2024 at 11:09:45AM +0530, Vineeth Karumanchi wrote:
+> HS Mac configuration steps:
+> - Configure speed and serdes rate bits of USX_CONTROL register from
+>   user specified speed in the device-tree.
+> - Enable HS Mac for 5G and 10G speeds.
+> - Reset RX receive path to achieve USX block lock for the
+>   configured serdes rate.
+> - Wait for USX block lock synchronization.
 > 
-> It cannot be cleared only from the last skb until the next round of
-> recvmsg. Since the last skb is generated and bpf program is attached,
-> I would like to know why we need to clear the related fields in the
-> skb? Please note that I didn't hack the sk_tstflags in struct sock :)
+> Move the initialization instances to macb_usx_pcs_link_up().
 
->> program, but it may be very useful. Consider providing flags from
->> socket cookie to the program or maybe add an option to combine them?
-> 
-> Thanks for this idea. May I ask what the benefits are through adding
-> an option because the bpf test statement (BPF_SOCK_OPS_TEST_FLAG) is a
-> good option to take a whole control? Or could you provide more details
-> about how you expect to do so?
+It only partly moves stuff there, creating what I can only call a mess
+which probably doesn't work correctly.
 
-Well, as Willem mentioned, you are overriding flags completely. But what
-if an application is waiting for some type of timestamp to arrive, but
-bpf program rewrites flags and disables this type of timestamp? It will
-confuse application.
+Please consider the MAC and PCS as two separate boxes - register
+settings controlled in one box should not be touched by the other box.
 
-Thinking twice, clearing flags might not be useful because of the very
-same issue though.
+For example, macb_mac_config() now does this:
 
+        old_ncr = ncr = macb_or_gem_readl(bp, NCR);
+...
+        } else if (macb_is_gem(bp)) {
+...
+                ncr &= ~GEM_BIT(ENABLE_HS_MAC);
+...
+        if (old_ncr ^ ncr)
+                macb_or_gem_writel(bp, NCR, ncr);
 
-> 
-> Thanks,
-> Jason
+meanwhile:
 
+> @@ -564,14 +565,59 @@ static void macb_usx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+>  				 int duplex)
+>  {
+>  	struct macb *bp = container_of(pcs, struct macb, phylink_usx_pcs);
+...
+> +	/* Enable HS MAC for high speeds */
+> +	if (hs_mac) {
+> +		config = macb_or_gem_readl(bp, NCR);
+> +		config |= GEM_BIT(ENABLE_HS_MAC);
+> +		macb_or_gem_writel(bp, NCR, config);
+> +	}
+
+Arguably, the time that this would happen is when the interface mode
+changes which would cause a full reconfiguration and thus both of
+these functions will be called, but it's not easy to follow that's
+what is going on here.
+
+It also looks like you're messing with MAC registers in the PCS code,
+setting the MAC speed there. Are the PCS and MAC so integrated together
+that abstracting the PCS into its own separate code block leads to
+problems?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
