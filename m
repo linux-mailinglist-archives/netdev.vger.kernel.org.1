@@ -1,136 +1,158 @@
-Return-Path: <netdev+bounces-133472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08259960C3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:24:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296849960C6
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7E581F21C5B
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:24:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB58D287B87
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47828185B69;
-	Wed,  9 Oct 2024 07:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C6917BB06;
+	Wed,  9 Oct 2024 07:25:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DA017CA17;
-	Wed,  9 Oct 2024 07:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C860117E918
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728458664; cv=none; b=e0BngkvSY7WFvsAyjZRcf6d1CQsygF0mVUo1o+4/DsEIU+JeY5TwZysClwUplMLnTmR8tGxrYXE1Mj1fqiSbE9245aJN/9KuRrwVARlaRHirelMClcTPRvlG3UcaFlaW4u9++jLKCm6CDDMk4bK8woVikpJznIfKqSl1hg2cxKA=
+	t=1728458727; cv=none; b=RpyoeBccoBuRjpcJg5fSausX7gZ1/L7nXZtqKuBjAElYum02Qt/JtXjGyR9Eil4zKikGcTXGZ16vtcIvLXYhIjwYsUNzql+vOgVzGw5eRbVmLp3HtsZGOzzkcl9fDbB/sMZiJ8EW61C05JepSZ/VTHax6gy0sr0mC/SYh9m1HVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728458664; c=relaxed/simple;
-	bh=4T99RvwuCjhQmYqT6+qr/kE99JxKL65Mc53QM88Ti4M=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EzMmeWV7mqGSqSttJd78S9sWPvwsbJy9VuQznl1Ij7CA6N0P97JwG59p9Sze8uho8LK2cjivuuU/eMJNd4qfkMvb0aoHZvX1wi4fFbmAbdqMAbNklccKg+HD3tEou4U+ggLkXM+Zo/myPBBfMsgRdtuS7WrFM1gjXW/RY7ovsKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XNkrM0rghz2DdK3;
-	Wed,  9 Oct 2024 15:23:15 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2FD8C140134;
-	Wed,  9 Oct 2024 15:24:20 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
- (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 9 Oct
- 2024 15:24:19 +0800
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-To: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<anna-maria@linutronix.de>, <frederic@kernel.org>, <tglx@linutronix.de>,
-	<richardcochran@gmail.com>, <johnstul@us.ibm.com>,
-	<UNGLinuxDriver@microchip.com>, <jstultz@google.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH v5 RESEND 2/2] net: lan743x: Remove duplicate check
-Date: Wed, 9 Oct 2024 15:23:02 +0800
-Message-ID: <20241009072302.1754567-3-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241009072302.1754567-1-ruanjinjie@huawei.com>
-References: <20241009072302.1754567-1-ruanjinjie@huawei.com>
+	s=arc-20240116; t=1728458727; c=relaxed/simple;
+	bh=Ty5eMVVvVY5MCaKiPLxYbiTFsrUClvu/JT4lPiqjxXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RvHeNmjXh2O7oOvFDRcY2XsKRBwa7Owl/uTdwi3qLdE+YzWQozYCm9WMkhIY1E7kgrAntj3TLwGyo/YhDFQItKKJIZBbqhDdTh5biHkjIH9y6TXVAr5vdHdK625f/5BKtyqP6e2h5S9M3C2was4BOZY5nuxWpQb5eldHbFcIK5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syR4J-0002qF-Ra; Wed, 09 Oct 2024 09:25:11 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syR4I-000YHt-V7; Wed, 09 Oct 2024 09:25:10 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1syR4I-0022uJ-2j;
+	Wed, 09 Oct 2024 09:25:10 +0200
+Date: Wed, 9 Oct 2024 09:25:10 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next 12/12] net: pse-pd: tps23881: Add support for
+ PSE events and interrupts
+Message-ID: <ZwYv1qunWpqhC9IH@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Since timespec64_valid() has been checked in higher layer
-pc_clock_settime(), the duplicate check in lan743x_ptpci_settime64()
-can be removed.
+Hi Kory,
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
----
-v5-> resend
-- Add Acked-by.
-- Also Cc John Stultz.
-v4:
-- Update the commit message.
-v2:
-- Check it in ptp core instead of using NSEC_PER_SEC macro.
-- Remove the NULL check.
----
- drivers/net/ethernet/microchip/lan743x_ptp.c | 35 ++++++++------------
- 1 file changed, 14 insertions(+), 21 deletions(-)
+On Wed, Oct 02, 2024 at 06:28:08PM +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> Add support for PSE event reporting through interrupts. Set up the newly
+> introduced devm_pse_irq_helper helper to register the interrupt. Events are
+> reported for over-current and over-temperature conditions.
+> 
+> This patch also adds support for an OSS GPIO line to turn off all low
+> priority ports in case of an over-current event.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
-index dcea6652d56d..4a777b449ecd 100644
---- a/drivers/net/ethernet/microchip/lan743x_ptp.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
-@@ -401,28 +401,21 @@ static int lan743x_ptpci_settime64(struct ptp_clock_info *ptpci,
- 	u32 nano_seconds = 0;
- 	u32 seconds = 0;
+...
+> +static int tps23881_irq_handler(int irq, struct pse_irq_data *pid,
+> +				unsigned long *dev_mask)
+> +{
+> +	struct tps23881_priv *priv = (struct tps23881_priv *)pid->data;
+> +	struct i2c_client *client = priv->client;
+> +	struct pse_err_state *stat;
+> +	int ret, i;
+> +	u16 val;
+> +
+> +	*dev_mask = 0;
+> +	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
+> +		stat = &pid->states[i];
+> +		stat->notifs = 0;
+> +		stat->errors = 0;
+> +	}
+> +
+> +	ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT);
+> +	if (ret < 0)
+> +		return PSE_FAILED_RETRY;
+> +
+> +	val = (u16)ret;
+> +	if (val & TPS23881_REG_IT_SUPF) {
+> +		ret = i2c_smbus_read_word_data(client, TPS23881_REG_SUPF_EVENT);
+> +		if (ret < 0)
+> +			return PSE_FAILED_RETRY;
+> +
+> +		if (ret & TPS23881_REG_TSD) {
+> +			for (i = 0; i < TPS23881_MAX_CHANS; i++) {
+> +				stat = &pid->states[i];
+> +				*dev_mask |= 1 << i;
+> +				stat->notifs = PSE_EVENT_OVER_TEMP;
+> +				stat->errors = PSE_ERROR_OVER_TEMP;
+> +			}
+> +		}
+> +	}
+> +
+> +	if (val & (TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_IFAULT << 8)) {
+> +		ret = i2c_smbus_read_word_data(client, TPS23881_REG_FAULT);
+> +		if (ret < 0)
+> +			return PSE_FAILED_RETRY;
+> +
+> +		val = (u16)(ret & 0xf0f);
+> +
+> +		/* Power cut detected, shutdown low priority port */
+> +		if (val && priv->oss)
+> +			tps23881_turn_off_low_prio(priv);
+
+Sorry, this is policy and even not the best one.
+The priority concept is related to the power budget, but this
+implementation will shutdown all low prios ports only if some
+port/channel has over-current event. It means, in case high prio port
+has over-current event, it will be not shut down.
  
--	if (ts) {
--		if (ts->tv_sec > 0xFFFFFFFFLL ||
--		    ts->tv_sec < 0) {
--			netif_warn(adapter, drv, adapter->netdev,
--				   "ts->tv_sec out of range, %lld\n",
--				   ts->tv_sec);
--			return -ERANGE;
--		}
--		if (ts->tv_nsec >= 1000000000L ||
--		    ts->tv_nsec < 0) {
--			netif_warn(adapter, drv, adapter->netdev,
--				   "ts->tv_nsec out of range, %ld\n",
--				   ts->tv_nsec);
--			return -ERANGE;
--		}
--		seconds = ts->tv_sec;
--		nano_seconds = ts->tv_nsec;
--		lan743x_ptp_clock_set(adapter, seconds, nano_seconds, 0);
--	} else {
--		netif_warn(adapter, drv, adapter->netdev, "ts == NULL\n");
--		return -EINVAL;
-+	if (ts->tv_sec > 0xFFFFFFFFLL) {
-+		netif_warn(adapter, drv, adapter->netdev,
-+			   "ts->tv_sec out of range, %lld\n",
-+			   ts->tv_sec);
-+		return -ERANGE;
-+	}
-+	if (ts->tv_nsec < 0) {
-+		netif_warn(adapter, drv, adapter->netdev,
-+			   "ts->tv_nsec out of range, %ld\n",
-+			   ts->tv_nsec);
-+		return -ERANGE;
- 	}
-+	seconds = ts->tv_sec;
-+	nano_seconds = ts->tv_nsec;
-+	lan743x_ptp_clock_set(adapter, seconds, nano_seconds, 0);
- 
- 	return 0;
- }
+I'll propose not to add prio support for this chip right now, it will
+need more software infrastructure to handle it nearly in similar way as
+it is done by pd692x0.
 -- 
-2.34.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
