@@ -1,138 +1,190 @@
-Return-Path: <netdev+bounces-133728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C951996CDC
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:55:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092AD996CEC
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE3261F23C98
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:55:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9701F2408A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C2F199949;
-	Wed,  9 Oct 2024 13:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D7D199949;
+	Wed,  9 Oct 2024 13:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hplsf10h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZDgaowdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA22188722;
-	Wed,  9 Oct 2024 13:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B85238DE5;
+	Wed,  9 Oct 2024 13:57:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728482150; cv=none; b=RWavoVqNuZt6GFoIRkSmOUTkKyJSheH59nvrQxZ4PEkNqhXR3XZ5MwaVIbkWkO+Tb9nVVHO0FHjPdB8W1f9uDLdi3YJ9Jeacrylw10p+4zMuyBh0lEkBFp5noSdbjQqqUS1vaV5mb3SFvgpVd0NS2rXW8lqQzO0vDVnMTPlXrSU=
+	t=1728482279; cv=none; b=bgkUKEzmkxOzoQu9rJndtMZw6ciF3BTKlHqp1Zrdz3Ha2U3/HetZsgcSqg7Y8tVRhBM3p/yVEFiscvIMyGArjwj4O2zGoiKKnWwthg/3HsV+sh9oXNvIRCdHRyKRTdDl7d9H00VwX3y7nqqKFfeNNGX5hNSYHeivhPtd/9qafCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728482150; c=relaxed/simple;
-	bh=ZmiVMK6ztxb9hHv41yV8uT13LIdkutdZjhOKK9Mbmuc=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=EdVGXtj/VNPtM1N5YQnVB2bnOR35f6kqx+PXn3o2Ili7rgnpyDibv/d4LKUdEmeIc8SAlzEasBLDrbzYgfFT9trMTeE6zKDUjC1xRq0xR+ZZrtEqbckp7C1N3xuAi4iaxpbB+GHJo1+rdivlt77r3EZPlqIztSB9O+hGykmWfLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hplsf10h; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1728482279; c=relaxed/simple;
+	bh=X4UBPVCBF59pppgeYeaEuC/R1Gs3Gk8FhNEbxSfClek=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CWS9o3A9hDjzV40uVb2V5L7LThB6NadvNchDcBF1KrcucmWLYi5UZqpty0yoIs1CzqWfLrok9BthU9dAOHmwh7ucYfhxhJZcYepdobeLFrJI+3HljnlgB/1YVcn0VqtlpUl0Q5ppU3ldDfJdC4neUqMv3rlKCyCiwUJLNK11aQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZDgaowdA; arc=none smtp.client-ip=209.85.166.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbcd8ce5f9so4127056d6.2;
-        Wed, 09 Oct 2024 06:55:48 -0700 (PDT)
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-835393376e1so64857339f.1;
+        Wed, 09 Oct 2024 06:57:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728482148; x=1729086948; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728482277; x=1729087077; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HXe51mvGhfEwWJHFEltEwZF8MBYYvVcNp5ZwNgaG/kc=;
-        b=Hplsf10hNReBNiL9nNMsdSSbu37f2NdveDbR5302vVXhqrZjmXgzTM5OB3qE0agnHm
-         N4mQ5mXNTMiSOYEv3O4yYQCqIiApCiPeAVRHDY4SNovOcRBUfZee05bobXPMOBl36+Hu
-         FbE4Y0EUMfsXQdtWJnRcadPOW8ldTIv4N5l9pzIHy6x5zif974bkgdN96knsn7NmevV0
-         wj1hCKnaT4u/LdSdsAcrZc98D5Cm+NSFyKJVhbjBUcsaA+qa0MIPgEHzvpircJrgi604
-         zXMvkOD10l386djhHPm68Ezdrq1c6PuGWC+tkxAs2GQ9Ze6h7rqBzES9h+RrmLXWI3aZ
-         2HIA==
+        bh=29OQgHkNKFjTrF9fYLuzeX4nKMiHAwoZghal1wz0P3s=;
+        b=ZDgaowdAkzDLdeOMdv45YQwW5aeEk2wCQs6+3x9na+cgKrTGjyx1+2/i96+vlT+avy
+         e3prTlLQEiXQGeinQrcX46F6DeqI2bR9UMKHpaSwHTKjswCb2aTcKREhrufK48AXQWcg
+         zWPPwYF8hACQRCsr5Nvu0vO3W5maVZOHOGFDoROyszhSlIApT4REk0XGZ105heGNVahB
+         zV7h5niMeIiKuEcguz1Ydiuud0tJEoWLhayEq46f5Kq5QMMO8PEr1BnFiLGkPSePD/Fw
+         ZcBnjiBYTcBPUk7BStVHDIzqSbOfmLnW8Y0nrU5CfbBJsLwZCgQohmUkHirQ3ID1l3jG
+         zDSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728482148; x=1729086948;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728482277; x=1729087077;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HXe51mvGhfEwWJHFEltEwZF8MBYYvVcNp5ZwNgaG/kc=;
-        b=cjrv3nLOAUvTJUeZBIgJ75E5DlDPTpz0H7xR7w7FlGj8edR2iL88dhLkSoLiyu6Ji8
-         rNR47wS2wgbXp8l2l9ReC/AxH5DNdMJbUkKlU57bVkLAFDitZ3G3p0Fk8Irdn4jxj4Te
-         fdVnfga20dQc1+Uqiwq9R45wex9NtzOw3iTkKsWDomED3fFzmgxa+wGt3XnGhrbbKUVD
-         NplBqkP+V1rRWu7G1b8YWlY5rMoZbDmc9CdGHAYMUp/3fTVixZ24sjwI7qOfvTqoG/6A
-         rqTitA6kUsjNN/g9uG1fyy6y8IG3RtQVQX5P2de306+4Mcg1Z2TkWnmcPvo8XsTlYYFz
-         Z5Xg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbTdG4FJs8twCuLi0QJZ/bm7k+9DQRl5VaZNxfzOBw7Jg4n8aJf/CkWhQAb9qTld68i2qoNSC4Dme4fLVwKOGP@vger.kernel.org, AJvYcCVAxWwygYNLVLjpVQ4z8yaHts5Ml/uYCSYs+kO88Tb65N/pKZdBsFz+GZeOzpwVyHwQ0wA=@vger.kernel.org, AJvYcCWjQhqI2VfRgPQe6gR2zYzt5xDbDvhpAvGW88SbX/oA775gXrCMq/gCsAEAxHLLCTGRSnGvezdgM15y@vger.kernel.org, AJvYcCWkw8m7iqDIZSJP3xz3FuGevex0YhiiiqDyhbyvLc+0Bybwl75FYkl7y0FDXuAgt/u/r6rrli894Kzu7Dw3@vger.kernel.org, AJvYcCWzZVVd1p6vX05ASLFT6Xv4kmAr5FWFIGVZCSdcbNAwFdnYaAvtt5CG+w5fbaM6utZlVkJGxEAO@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdbq6JQ4945WM9IX4YY08N5HYE1KqOwxogDhILafW5i3U/kXn4
-	N0UqgVK4WaJJ9Kopxj6pw6+PbZDjXNPcCrqu/dseq1EjpZdvDJ/q
-X-Google-Smtp-Source: AGHT+IHmYx3bfmg/RlYhB/KBBRbGOAep6vvua+Aei8GWXcm7XpACan6FRH/ojiSHoStLQfx//viWDw==
-X-Received: by 2002:a05:6214:2b86:b0:6cb:22ea:5e07 with SMTP id 6a1803df08f44-6cbc943269amr41560246d6.30.1728482147816;
-        Wed, 09 Oct 2024 06:55:47 -0700 (PDT)
-Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cba4760436sm46098496d6.124.2024.10.09.06.55.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 06:55:47 -0700 (PDT)
-Date: Wed, 09 Oct 2024 09:55:47 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-ID: <67068b632d2d2_1cca3129484@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241008-rss-v5-4-f3cf68df005d@daynix.com>
-References: <20241008-rss-v5-0-f3cf68df005d@daynix.com>
- <20241008-rss-v5-4-f3cf68df005d@daynix.com>
-Subject: Re: [PATCH RFC v5 04/10] tun: Unify vnet implementation
+        bh=29OQgHkNKFjTrF9fYLuzeX4nKMiHAwoZghal1wz0P3s=;
+        b=m+6gJfy835jVj4kutojDMBj+iGNqFrWvOp1APXPlIzU2RU6zi4I7RpXTvI2DkTPMKV
+         PHvLQ7V/9WMa/1WvKgR+Wpo2w2Hsf34rxJ9UNx252CV9lvIhrcdtQg7M9YlVbKA+04Me
+         vQey/NGSOKN3kZUPHLcHJHZVaIfioZrCYGzQMsMHmYcEneAQJ4U+/CR44hrryAx/OA61
+         8Ya/BOiBJoBf92PpzUF+Mhpb91nDAcYbfrubd6OWR8WjFTyOSX9pior+M2UFjv6P1zR1
+         2hnEqgSC1pF8Xd/5ZE7gGHTuCnRepIrzO4Q6t/yBfMObldXD/a0NT2kVRKZuJr/hC3VP
+         WbdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUk4zono0isAPiL9wjejT6nBGC1oi8zfbVXSksRjmm7Gu/r6/B38OdBA8Yyq+WQdQWNskHqsv4S@vger.kernel.org, AJvYcCVq2Y9EH81iHVDCLXaPBN7HKK9KVdjaBebIevvi7XEn5qBdf+gMmP7qRyDtChm37z58xhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzt66aljOSGcoOodfN/0c6Bak+RXz/bSrh5w08dD1YxYj1r3QJU
+	oE7kPRZ+Rg8acdDysFM6DCVsHfyPiyNxQzO38cCS84HW6UyLJo6XHmTTqWGb4wJVih+7FW3pfII
+	ecov4OGW+/BD5mEhhEGKEQbPJRsk=
+X-Google-Smtp-Source: AGHT+IHa/JDiZwqOtKHb61N4+pRsNVlSL5KfmzgXVH8c4lIuoXjrh4Qh0elVRM8j1XPzvcsjQcwdzdcUZC7Np9iJe6U=
+X-Received: by 2002:a05:6e02:144b:b0:3a0:98e9:1b7a with SMTP id
+ e9e14a558f8ab-3a397cedc49mr23097585ab.2.1728482277391; Wed, 09 Oct 2024
+ 06:57:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-2-kerneljasonxing@gmail.com> <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
+ <CAL+tcoALeCguB0+HpTq+MHitHZft3drF5OunPh1Qme8XGifiNw@mail.gmail.com> <6706839620038_1cca31294cf@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6706839620038_1cca31294cf@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 21:57:21 +0800
+Message-ID: <CAL+tcoAKeAkWMsUjoVW6EZaJg4eKgrfznk9XkvV5PcT9y+Poag@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/9] net-timestamp: add bpf infrastructure to
+ allow exposing more information later
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Akihiko Odaki wrote:
-> Both tun and tap exposes the same set of virtio-net-related features.
-> Unify their implementations to ease future changes.
-> 
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  MAINTAINERS            |   1 +
->  drivers/net/tap.c      | 172 ++++++----------------------------------
->  drivers/net/tun.c      | 208 ++++++++-----------------------------------------
->  drivers/net/tun_vnet.h | 181 ++++++++++++++++++++++++++++++++++++++++++
+On Wed, Oct 9, 2024 at 9:22=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Wed, Oct 9, 2024 at 2:45=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Implement basic codes so that we later can easily add each tx point=
+s.
+> > > > Introducing BPF_SOCK_OPS_ALL_CB_FLAGS used as a test statement can =
+help use
+> > > > control whether to output or not.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >  include/uapi/linux/bpf.h       |  5 ++++-
+> > > >  net/core/skbuff.c              | 18 ++++++++++++++++++
+> > > >  tools/include/uapi/linux/bpf.h |  5 ++++-
+> > > >  3 files changed, 26 insertions(+), 2 deletions(-)
+> > > >
+> > > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > > > index c6cd7c7aeeee..157e139ed6fc 100644
+> > > > --- a/include/uapi/linux/bpf.h
+> > > > +++ b/include/uapi/linux/bpf.h
+> > > > @@ -6900,8 +6900,11 @@ enum {
+> > > >        * options first before the BPF program does.
+> > > >        */
+> > > >       BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG =3D (1<<6),
+> > > > +     /* Call bpf when the kernel is generating tx timestamps.
+> > > > +      */
+> > > > +     BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG =3D (1<<7),
+> > > >  /* Mask of all currently supported cb flags */
+> > > > -     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0x7F,
+> > > > +     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0xFF,
+> > > >  };
+> > > >
+> > > >  /* List of known BPF sock_ops operators.
+> > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > index 74149dc4ee31..5ff1a91c1204 100644
+> > > > --- a/net/core/skbuff.c
+> > > > +++ b/net/core/skbuff.c
+> > > > @@ -5539,6 +5539,21 @@ void skb_complete_tx_timestamp(struct sk_buf=
+f *skb,
+> > > >  }
+> > > >  EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+> > > >
+> > > > +static bool bpf_skb_tstamp_tx(struct sock *sk, u32 scm_flag,
+> > > > +                           struct skb_shared_hwtstamps *hwtstamps)
+> > > > +{
+> > > > +     struct tcp_sock *tp;
+> > > > +
+> > > > +     if (!sk_is_tcp(sk))
+> > > > +             return false;
+> > > > +
+> > > > +     tp =3D tcp_sk(sk);
+> > > > +     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_O=
+PT_CB_FLAG))
+> > > > +             return true;
+> > > > +
+> > > > +     return false;
+> > > > +}
+> > > > +
+> > > >  void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> > > >                    const struct sk_buff *ack_skb,
+> > > >                    struct skb_shared_hwtstamps *hwtstamps,
+> > > > @@ -5551,6 +5566,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb=
+,
+> > > >       if (!sk)
+> > > >               return;
+> > > >
+> > > > +     if (bpf_skb_tstamp_tx(sk, tstype, hwtstamps))
+> > > > +             return;
+> > > > +
+> > >
+> > > Eventually, this whole feature could probably be behind a
+> > > static_branch.
+> >
+> > You want to implement another toggle to control it? But for tx path
+> > "BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)"
+> > works as a per-netns toggle. I would like to know what you exactly
+> > want to do in the next move?
+>
+> Not another toggle. A static branch that enables the datapath logic
+> when a BPF program becomes active. See also for instance ipv4_min_ttl.
 
-Same point: should not be in a header.
+Thanks, I see. Then we can totally use the bpf_setsockopt() interface
+with a new tsflag field, or something like this, to implement just
+like how ip4_min_ttl works.
 
-Also: I've looked into deduplicating code between the various tun, tap
-and packet socket code as well.
+I will give it a try to see if it can easily work.
 
-In general it's a good idea. The main counter arguments is that such a
-break in continuity also breaks backporting fixes to stable. So the
-benefit must outweight that cost.
-
-In this case, the benefits in terms of LoC are rather modest. Not sure
-it's worth it.
-
-Even more importantly: are the two code paths that you deduplicate
-exactly identical? Often in the past the two subtly diverged over
-time, e.g., due to new features added only to one of the two.
-
-If so, call out any behavioral changes to either as a result of
-deduplicating explicitly.
+Thanks,
+Jason
 
