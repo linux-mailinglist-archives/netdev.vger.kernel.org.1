@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-133448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750A6995F0E
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:41:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA47995F10
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:41:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE971C23819
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 05:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41F0F1C238F5
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 05:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4427169397;
-	Wed,  9 Oct 2024 05:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3A616EBE9;
+	Wed,  9 Oct 2024 05:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tJDUcpzX"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zyAnyuWB"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2041.outbound.protection.outlook.com [40.107.244.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ECF017B439;
-	Wed,  9 Oct 2024 05:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3926216D9DF;
+	Wed,  9 Oct 2024 05:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.41
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728452416; cv=fail; b=IDL6neWunL6ycAAzgmfwpAWF2F6X0l8YsM1+FcEXlXkJEiPdhl4CDH0SvDeH+dDJanXqaYyfGQUb4Pvuy2JiUXf/MIAggphwtDfCDPRm6PTF+pPtTdN0d3whEM/4CL8BIcReHHh31YfUBhbG/QdA4zjyqqp/3XVK+dF6/2lMH2k=
+	t=1728452423; cv=fail; b=JByDH7z4jP1GCdMqn09izLOak4e8DlrCB6bQdwVWS3PPYKnU2MmfB7YuiPEKhZ00Y5j1MnNN/J27BBdPYQzS7qmyg0Lz4YgFi4+GrhSQAvOPlvXCGkM/aucPpY/KjiMcl2uS/n2Stz5uxnNjgbpzl2zPMgsDApBW47byDMoPkKk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728452416; c=relaxed/simple;
-	bh=1hvu3v9Qfka8m9gIWIrEYtfbE1GCJlqPTvNeHXqEs7s=;
+	s=arc-20240116; t=1728452423; c=relaxed/simple;
+	bh=h65GPFoHy3K35Hcq1NlV2adpWtqDfOBloob6x1IWmQ8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kZ9ISzkBMK84knGdSStA37omRrj/GEiEZRGXRhrX2lsZ8JDo5nYe7QwwAq0NG8IBanHijcQ4zkhxtJOZI7El0gBs59igzk/ppTcWgZV+pnBNf6TnqS2z3ubgAiAqLXQSocqD/BlyR3rg4KJG+z74s5vne6uR+CBl4qnkp0wZ18s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tJDUcpzX; arc=fail smtp.client-ip=40.107.223.64
+	 MIME-Version:Content-Type; b=ZbEj8FYGqgdLq5sbRemtV10UdRaeRF3+/fe+tA1wFMCsfyjpf2lJfq11U5Ed7vNBucr12tn0Nhke/svCwX4j+bl4BTT9IFuKL/px3MZ7qr0GA9v6L6jIbrKJNxL3nEpVw2vtStOG/rgU5oJ5GS7CQVJPlkRbXg9mtsdaEwkjuqo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zyAnyuWB; arc=fail smtp.client-ip=40.107.244.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o+LyJyjy9YU7J7+hRJV66wv0IQ6wYpKyw7cHRUyKMZDwM4lCqHE8sVWm0Pehf3k+XqOv/bpPrO4Bsao++QsCYUazCPah9OCy7GWcy1/F3r6IcCMu8FO9SaNoNVXIk8Opd4LwkIx5Y8BmY/4RMgUE+W61fws7C7I/94X2OqSNA+pjcZphVHCY+Z+sf++t41xKe0EiAwJ+sqhaaseS78aqju+51LtA1hsvlVgp4yX4sjilav+cn4dD1pE826vaeaAlOu5ipNC92bcSTkx/WnK1o0RZWwEVbsda0/L5hPnOtJ1/ZSB+F83ABvkniOxD+++b5tF/4fXtnrbed2gjuRdt1Q==
+ b=ET2PIDKLWeBKUlNmuy0cCUPf2VZn6CEPj32RUFaTvP+4Bg/+ZuT42DGBnEACao5oNLBxG09TbtzQAhGAtXF1or2eL69uQoOWCHro5gcKXnACqQuSGJz7Nlsn6VtY2plEZegPZgdjl0R2d2xPWNykEoJIRhD6ZWYAbHd8drESesvcStfjI0uSoLLto4CiWNFzg7l3hUvJ3bhnWS/G3wCb+xLiJBJyQimAjw5ETIew8Q8d43uNYpuZIBCBGwZlmpDRQb9N3RuF5nDEMZE+IQOQ0cu+mUAPbpmSCta8N/H+PXLQ1FGm8HcscPZCQLEnLC1qkV9NEZaWOSdxe5HuRRRsJw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Pzf9aDcmR3z6M/HY0FJbU4U8fVqFs6i+hMu1HBmWqtI=;
- b=key+WPeAvZNpZtet0IlwqV9tw97+zLQLhpSE+J9hwMhwSwHLjChGKfPtEgOVWMpWcgOu3bHv6dOaNQi6UnWG2yga7W9o4MOlytw/VxMMVZQ7BC3nnVqkaX/mdE9aQcUofjVCbmHk1XLWPFf+18d1H18HmvvfA31aBFiYWtuGzf/zP7G9fp4eSlXh3feN0CeZV/l4AGC0uVJ2WwZ6Wv7fVK7pJKVmheIna92L2LzfV42FC35kNH9bmZWfnwueomFVy9Upa/hN+Ap06aolipQ5oTxKyysijt3uAYJNtqDx+TYmwBfbtE6jKnUTU4RCu20dK69wkPK+Og62Qkq12eZ3CQ==
+ bh=Af07Pp4nY4LDf+fuaiHzGvP5U2695RdA3KVAArfvLQM=;
+ b=Nr7ixRbTmIDzd9L8/+tjJ7HT09u6LDiYOE0pY19xGCXTz+ddX4RH3Jmxiu8yCO0T4TbnyPFXhEKQeOUEz0ooAmu1jrDehq16jI78kN3i6w7Yf6HbgMI0PK6IWVk0/mjfjB8VWpq+x1aQ+DZFrRbujt16FUlJg5QzbNkTHS/qCXoL0lhYzyTWmJVfV2bwbGIy5YywKM6HGUIN4/nP4MARxRw0WmgSAPXq8RHRyUQ1vV5bZsUBCILSyt/XBBp5QV5g7mep6fYNauEIVB+WcMQRfaZunJuFs1vZQtElH6IEONRD9tviVZvzRPeKEChVWtuO0mDNty3CM8wZOdq1kLmwOQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=microchip.com smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Pzf9aDcmR3z6M/HY0FJbU4U8fVqFs6i+hMu1HBmWqtI=;
- b=tJDUcpzX40oWnmj8DdCSrvJt4uVI3mrp3ZQh7e8WqY1etldAeqlSW1ok0FbCwcySbDzG5qBTro35+i68tFV5muScK+AXuqL8yeQpw13Tkl6VtmRkNaMjvs0gQF74sKVREhUYmuccUhsQqzDktM2bmdfr0bjUChRzqqdpSCJexPE=
-Received: from BY5PR17CA0007.namprd17.prod.outlook.com (2603:10b6:a03:1b8::20)
- by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
+ bh=Af07Pp4nY4LDf+fuaiHzGvP5U2695RdA3KVAArfvLQM=;
+ b=zyAnyuWBnn6aOHzi4zGWNmwuNiRNEshWSG6n8NDAihyxgGAeyHjj7laemkOIaVi54L+0y8Qm8e2wRaUJ2tAjdhZtrKZ+tUh7y+X6Q+4kCLw1Xq4qBD2cesUjE9kgz584k3k2kRYfZPQaf7cOVTHJUgUO6ZuWS9fUqh5ZdxTl/i8=
+Received: from SJ0PR13CA0016.namprd13.prod.outlook.com (2603:10b6:a03:2c0::21)
+ by CH3PR12MB7739.namprd12.prod.outlook.com (2603:10b6:610:151::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.23; Wed, 9 Oct
- 2024 05:40:12 +0000
-Received: from SJ1PEPF00002324.namprd03.prod.outlook.com
- (2603:10b6:a03:1b8:cafe::ff) by BY5PR17CA0007.outlook.office365.com
- (2603:10b6:a03:1b8::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.17 via Frontend
- Transport; Wed, 9 Oct 2024 05:40:12 +0000
+ 2024 05:40:14 +0000
+Received: from SJ1PEPF00002325.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c0:cafe::b9) by SJ0PR13CA0016.outlook.office365.com
+ (2603:10b6:a03:2c0::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.16 via Frontend
+ Transport; Wed, 9 Oct 2024 05:40:14 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,20 +63,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
- SJ1PEPF00002324.mail.protection.outlook.com (10.167.242.87) with Microsoft
+ SJ1PEPF00002325.mail.protection.outlook.com (10.167.242.88) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8048.13 via Frontend Transport; Wed, 9 Oct 2024 05:40:12 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
+ 15.20.8048.13 via Frontend Transport; Wed, 9 Oct 2024 05:40:13 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 9 Oct
- 2024 00:40:09 -0500
-Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ 2024 00:40:12 -0500
+Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
+ (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 9 Oct
- 2024 00:40:06 -0500
+ 2024 00:40:11 -0500
 Received: from xhdvineethc40.xilinx.com (10.180.168.240) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
- Transport; Wed, 9 Oct 2024 00:40:02 -0500
+ Transport; Wed, 9 Oct 2024 00:40:07 -0500
 From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -84,9 +84,9 @@ To: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
 	<conor+dt@kernel.org>, <linux@armlinux.org.uk>, <andrew@lunn.ch>
 CC: <vineeth.karumanchi@amd.com>, <netdev@vger.kernel.org>,
 	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
-Subject: [RFC PATCH net-next 3/5] net: macb: Update USX_CONTROL reg's bitfields and constants.
-Date: Wed, 9 Oct 2024 11:09:44 +0530
-Message-ID: <20241009053946.3198805-4-vineeth.karumanchi@amd.com>
+Subject: [RFC PATCH net-next 4/5] net: macb: Configure High Speed Mac for given speed.
+Date: Wed, 9 Oct 2024 11:09:45 +0530
+Message-ID: <20241009053946.3198805-5-vineeth.karumanchi@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241009053946.3198805-1-vineeth.karumanchi@amd.com>
 References: <20241009053946.3198805-1-vineeth.karumanchi@amd.com>
@@ -98,114 +98,175 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: vineeth.karumanchi@amd.com does not
- designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002324:EE_|BY5PR12MB4275:EE_
-X-MS-Office365-Filtering-Correlation-Id: a92a416f-2294-4e76-bcbc-08dce824d829
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002325:EE_|CH3PR12MB7739:EE_
+X-MS-Office365-Filtering-Correlation-Id: 68d0c577-ee81-4e66-6dcd-08dce824d91f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014|7416014|921020;
+	BCL:0;ARA:13230040|376014|1800799024|7416014|36860700013|82310400026|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?g6D2Owr1H22YuHkMMFucW0aE8U37st7U5xJYvuPhiD/p+mdTJV/RAscjn+y2?=
- =?us-ascii?Q?cfYxPX0pBi9xAG3Fe5tjLZmzaBAX3gc+B+2nAu5YrF9JD1O8qfSY9MdOQ3Ql?=
- =?us-ascii?Q?r5Ic18vzX0p5BYFI1F9ux3bzWHTxdNFMPh7YNaL5IsuBeUZ5dhuZf2QRChEm?=
- =?us-ascii?Q?3jwmEH2pBXTYOx1M3HTntrnwkBEHHtCkjqy9Xjyk7JO9LwdDx3/dEjCT9TXe?=
- =?us-ascii?Q?XdJ8Td2rAqARMbyNnyHIq1saco7z82Oij4PAjWSO4zP4YJiW/ksc3Eod8gL3?=
- =?us-ascii?Q?R9ufr3nbwRRB07/2mIXDa9sy90mgvn8mREIqAyKqoRf9Mx5AHN0N0Rq6yhG1?=
- =?us-ascii?Q?nKiCRhUpyNnc//btI9cFb7P6bNxE+Vxr8Bw1tRaHn25vY2CNyJnEIKAY1KVy?=
- =?us-ascii?Q?7zaTLUm5q3TUpyOTpVKH5Et18wCCw/KyZ+ZngyIFzBo3bT5hJIgKq+HSPxHf?=
- =?us-ascii?Q?+2LDoYWpMYyHaZ/kXttSrrU7N8olxJM+DzXeZHRTKQMf65iLp3D7PoSOJOBc?=
- =?us-ascii?Q?04FrTpa+BEk3XGbscXv533An6/PDei6ogvFkz6UILGU4wfhLKzc9+EeefU3c?=
- =?us-ascii?Q?Jeu8cMXUm9JGLYqTh7UylppRDUsKPZqqg3wqxfLh7JyU8OqZmOi/2+4A6eS6?=
- =?us-ascii?Q?qNdLku6W8tMR2oDbwuvu+nJGxFCQr9pJLyfhSinBnXsrAM1l/7CohvF6fhOM?=
- =?us-ascii?Q?OYkSQTPg3jmOGHTU94D8aldgmHLHaF40x17t7xEEJOk+QBamBsGqFKN81A9v?=
- =?us-ascii?Q?rrFU5us6WhWbqmrpRX4TV7qsuo5BcwWr0m1lYq7IQE8KWoEnPlZQH+B8V8zj?=
- =?us-ascii?Q?B/TU7wEaDwHfne5v4Y1/3CDa0DAYFoTll87QaPQVqEq8Xiq5iiSNj0epSeND?=
- =?us-ascii?Q?1NeflZYaz4isdcOqlnW0piat3ENzKjmicL1xXwCNGp5R4Sbl83GsbavHNEgS?=
- =?us-ascii?Q?OCGn+AoIjNBiz3NFCdcs+o5hO8XTvazzenDiCs0VEhkc2pkgmocDj0kbK8+e?=
- =?us-ascii?Q?2srzej8T71eoJMYOjo5TbcR0BMapfMg4fwjEvR3TjZJmQSRRzcbBGQtpFX4y?=
- =?us-ascii?Q?c/2DJaXGwcIXalwX7U8SRvnh9w5q2m5N8J/8d77dMM/kaUtkwxY18Lf1Qzq0?=
- =?us-ascii?Q?kQJchNX01CNMtKDr6YDr/BPw2fp9tfOvowumPBEndvvxfywWUUUVuLbaQM2C?=
- =?us-ascii?Q?EdTEh/6A3kSzqBSmydJ0uMOq4LtFfZDVZahyLJ36hGtwFTFgeplhVn+6HJJV?=
- =?us-ascii?Q?+T1K6sOAHYk9qJfKlIeOCZzmK930DFWs40aH5aKARGD3YzDZlhXvDE1Q35Fy?=
- =?us-ascii?Q?8kGl/9vGxCiJGK4QlkxEV8Z6/oXspzWoN9GkBJmnkKSdoPICoz74rQNLcty5?=
- =?us-ascii?Q?/iiskLwZ8xZ6Z7/lo74gUyvZ12rR?=
+	=?us-ascii?Q?w3ud4zo9WP19Ay8W+Hb7Mi74Kyyl/0iqC44MblYnrAWlFKXAvFVpOuNAxhdD?=
+ =?us-ascii?Q?SxD0EGkvK3DM/MWh5LVSzZ09DYnzkzSLUeRNu3gbtFymuMldpEeIAVg2AzUp?=
+ =?us-ascii?Q?ElzfyPnpc8EyepzHs/8jfPhNSiCSAoYCpi2+9zufsaCgyJH8DDfw4FodU8g7?=
+ =?us-ascii?Q?9oFlG5NgwRlhqYbfp/pI8rC8Yl2iuJSVQDcfOGymoTdnlak/cxGsskHZ1pT8?=
+ =?us-ascii?Q?gs/GE/XMoe1eycCqcEsBwx1sxUWu6vVtAzQYcRqz+zDBXI5RNqvgsABt0gDB?=
+ =?us-ascii?Q?7Xa155s0KKIvVtKfzDRnYcQXGj/9+v3T9v9deHA+d8SYYjm/JVgRNR+IjtZ0?=
+ =?us-ascii?Q?2LsIv2NLxI3TMivJjm+OnAK16Xvdij2FaBzBFBeu39IQWJ/3/FAEfkKZThrN?=
+ =?us-ascii?Q?iYKZh4xI37lXipbZv652BAmZLSqugd4+KaHod1u6SXFmz9VHOiN+am5glC/a?=
+ =?us-ascii?Q?EKnAEuFxHGVn2r1uNQ9QIcW08TDNYY6xblJp4w2N+pfrZB0BYuo7ZsOHKfKN?=
+ =?us-ascii?Q?vncaNZVFLkvgwA03WhyIzxECE2ZIlRFzX1AUMEAoLP8yleqoGlyT/g6lWkV4?=
+ =?us-ascii?Q?41ynOT2CaOClNcm39WidzBB1teo30qV6FT4JnYSK6JEoxTfPdFpXpiPPeO5F?=
+ =?us-ascii?Q?lr20k8Z/anhp9JFy9BPOl5rQMOR752UL/vvJa+zqpVG3xOY2XAWCmWd75Ytz?=
+ =?us-ascii?Q?sOzaBqwmWMaigXEDnt9bvWncp2SnKyQd0lwp+p1YyxG+6NkKYiHYfXAFnffw?=
+ =?us-ascii?Q?cCMld5MSCVPw3QLMVP9QB4owvi1GoU7jpzBFoHA76RtSIGXoSmGBEDRDCqlV?=
+ =?us-ascii?Q?IVE9ZoWaG3kI7MXEIHIb1amkTKr6XcDuT5UEg5RkW1Q38xUxViEo6MmVdlzZ?=
+ =?us-ascii?Q?TT1qlR8GzOJMpaOx/UtWZr9yWWETeqq/lKDQKjVZDJVGgQxsW7cVigUlYD/p?=
+ =?us-ascii?Q?rjgMKVV9qU2DsX+80X5BjQBSEDt3I+USTyIHsbQvg15EkjPz1KSKey4/LPdu?=
+ =?us-ascii?Q?qSoxmxdd7HZkeAgOQVn030++ZVk3hn9IRG4uRTXVWtvjguozKCu4uayHDR2e?=
+ =?us-ascii?Q?t+otzlkArkAyRKL/ZvxvTw6jKgWqZlA3n2wtqfmuhhLbtoopRSeUVfQqRkh8?=
+ =?us-ascii?Q?dd0TWwpg8DkVtwC02fztlAUQ1veSX1WX6+jWVmllSBN2Kiw6kwaxkPY93+S2?=
+ =?us-ascii?Q?8q03dNwDytpS1QuNTdC2IWBfM44ntJ8gkSy0WpnYBoSQYOJp3WgZbDPJQsPj?=
+ =?us-ascii?Q?1sFhIY7C/VjUVfewK6xtnBZWBdxlj8AoT6OH5yy6KpNC3QO/DgHKa28s+rP4?=
+ =?us-ascii?Q?m0YNL7Qtm66oxIMHYOmVaYkWP5AZovGz6KIVQaWpmSVaeSrUhKkHyXzxbyoy?=
+ =?us-ascii?Q?2Xfoi7jCJup7eDkmmtHKo7JmYyz7?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2024 05:40:12.1129
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Oct 2024 05:40:13.7543
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a92a416f-2294-4e76-bcbc-08dce824d829
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68d0c577-ee81-4e66-6dcd-08dce824d91f
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002324.namprd03.prod.outlook.com
+	SJ1PEPF00002325.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7739
 
-New bitfeilds of USX_CONTROL register:
-- GEM_RX_SYNC: RX Reset: Reset the receive datapath.
+HS Mac configuration steps:
+- Configure speed and serdes rate bits of USX_CONTROL register from
+  user specified speed in the device-tree.
+- Enable HS Mac for 5G and 10G speeds.
+- Reset RX receive path to achieve USX block lock for the
+  configured serdes rate.
+- Wait for USX block lock synchronization.
 
-Constants of the bitfeilds in USX_CONTROL reg:
-- HS_SPEED_*: Multiple speed constants of USX_SPEED bitfeild.
-- MACB_SERDES_RATE_*: Multiple serdes rate constants of
-  SERDES_RATE bitfeild.
-
-Since MACB_SERDES_RATE_* and HS_SPEED_* are register constants,
-move them to the header file.
+Move the initialization instances to macb_usx_pcs_link_up().
 
 Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
 ---
- drivers/net/ethernet/cadence/macb.h      | 12 ++++++++++++
- drivers/net/ethernet/cadence/macb_main.c |  3 ---
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/cadence/macb.h      |  1 +
+ drivers/net/ethernet/cadence/macb_main.c | 57 ++++++++++++++++++++----
+ 2 files changed, 50 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/cadence/macb.h b/drivers/net/ethernet/cadence/macb.h
-index 5740c98d8c9f..47e80fa72865 100644
+index 47e80fa72865..ed4edeac3a59 100644
 --- a/drivers/net/ethernet/cadence/macb.h
 +++ b/drivers/net/ethernet/cadence/macb.h
-@@ -563,11 +563,23 @@
- #define GEM_RX_SCR_BYPASS_SIZE			1
- #define GEM_TX_SCR_BYPASS_OFFSET		8
- #define GEM_TX_SCR_BYPASS_SIZE			1
-+#define GEM_RX_SYNC_RESET_OFFSET		2
-+#define GEM_RX_SYNC_RESET_SIZE			1
- #define GEM_TX_EN_OFFSET			1
- #define GEM_TX_EN_SIZE				1
- #define GEM_SIGNAL_OK_OFFSET			0
- #define GEM_SIGNAL_OK_SIZE			1
+@@ -825,6 +825,7 @@
+ 	})
  
-+/* Constants for USX_CONTROL */
-+#define HS_SPEED_10000M				4
-+#define HS_SPEED_5000M				3
-+#define HS_SPEED_2500M				2
-+#define HS_SPEED_1000M				1
-+#define MACB_SERDES_RATE_10G			1
-+#define MACB_SERDES_RATE_5G			0
-+#define MACB_SERDES_RATE_2_5G			0
-+#define MACB_SERDES_RATE_1G			0
-+
- /* Bitfields in USX_STATUS. */
- #define GEM_USX_BLOCK_LOCK_OFFSET		0
- #define GEM_USX_BLOCK_LOCK_SIZE			1
+ #define MACB_READ_NSR(bp)	macb_readl(bp, NSR)
++#define MACB_READ_USX_STATUS(bp)	gem_readl(bp, USX_STATUS)
+ 
+ /* struct macb_dma_desc - Hardware DMA descriptor
+  * @addr: DMA address of data buffer
 diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 8f893f035289..3f9dc0b037c0 100644
+index 3f9dc0b037c0..7beb775a0bd7 100644
 --- a/drivers/net/ethernet/cadence/macb_main.c
 +++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -87,9 +87,6 @@ struct sifive_fu540_macb_mgmt {
+@@ -94,6 +94,7 @@ struct sifive_fu540_macb_mgmt {
+ #define MACB_PM_TIMEOUT  100 /* ms */
  
- #define MACB_WOL_ENABLED		BIT(0)
+ #define MACB_MDIO_TIMEOUT	1000000 /* in usecs */
++#define GEM_SYNC_TIMEOUT	2500000 /* in usecs */
  
--#define HS_SPEED_10000M			4
--#define MACB_SERDES_RATE_10G		1
+ /* DMA buffer descriptor might be different size
+  * depends on hardware configuration:
+@@ -564,14 +565,59 @@ static void macb_usx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 				 int duplex)
+ {
+ 	struct macb *bp = container_of(pcs, struct macb, phylink_usx_pcs);
+-	u32 config;
++	u32 speed_val, serdes_rate, config;
++	bool hs_mac = false;
++
++	switch (speed) {
++	case SPEED_1000:
++		speed_val = HS_SPEED_1000M;
++		serdes_rate = MACB_SERDES_RATE_1G;
++		break;
++	case SPEED_2500:
++		speed_val = HS_SPEED_2500M;
++		serdes_rate = MACB_SERDES_RATE_2_5G;
++		break;
++	case SPEED_5000:
++		speed_val = HS_SPEED_5000M;
++		serdes_rate = MACB_SERDES_RATE_5G;
++		hs_mac = true;
++		break;
++	case SPEED_10000:
++		speed_val = HS_SPEED_10000M;
++		serdes_rate = MACB_SERDES_RATE_10G;
++		hs_mac = true;
++		break;
++	default:
++		netdev_err(bp->dev, "Specified speed not supported\n");
++		return;
++	}
++
++	/* Enable HS MAC for high speeds */
++	if (hs_mac) {
++		config = macb_or_gem_readl(bp, NCR);
++		config |= GEM_BIT(ENABLE_HS_MAC);
++		macb_or_gem_writel(bp, NCR, config);
++	}
++
++	/* Configure HS MAC for specified speed */
++	config = gem_readl(bp, HS_MAC_CONFIG);
++	config = GEM_BFINS(HS_MAC_SPEED, speed_val, config);
++	gem_writel(bp, HS_MAC_CONFIG, config);
+ 
+ 	config = gem_readl(bp, USX_CONTROL);
+-	config = GEM_BFINS(SERDES_RATE, MACB_SERDES_RATE_10G, config);
+-	config = GEM_BFINS(USX_CTRL_SPEED, HS_SPEED_10000M, config);
++	config = GEM_BFINS(SERDES_RATE, serdes_rate, config);
++	config = GEM_BFINS(USX_CTRL_SPEED, speed_val, config);
+ 	config &= ~(GEM_BIT(TX_SCR_BYPASS) | GEM_BIT(RX_SCR_BYPASS));
++	config |= GEM_BIT(RX_SYNC_RESET);
++	gem_writel(bp, USX_CONTROL, config);
++	mdelay(250);
++	config &= ~GEM_BIT(RX_SYNC_RESET);
+ 	config |= GEM_BIT(TX_EN);
+ 	gem_writel(bp, USX_CONTROL, config);
++
++	if (readx_poll_timeout(MACB_READ_USX_STATUS, bp, config, config & GEM_BIT(USX_BLOCK_LOCK),
++			       1, GEM_SYNC_TIMEOUT))
++		netdev_err(bp->dev, "USX PCS block lock not achieved\n");
+ }
+ 
+ static void macb_usx_pcs_get_state(struct phylink_pcs *pcs,
+@@ -662,7 +708,6 @@ static void macb_mac_config(struct phylink_config *config, unsigned int mode,
+ 			ctrl |= GEM_BIT(SGMIIEN) | GEM_BIT(PCSSEL);
+ 		} else if (state->interface == PHY_INTERFACE_MODE_10GBASER) {
+ 			ctrl |= GEM_BIT(PCSSEL);
+-			ncr |= GEM_BIT(ENABLE_HS_MAC);
+ 		} else if (bp->caps & MACB_CAPS_MIIONRGMII &&
+ 			   bp->phy_interface == PHY_INTERFACE_MODE_MII) {
+ 			ncr |= MACB_BIT(MIIONRGMII);
+@@ -766,10 +811,6 @@ static void macb_mac_link_up(struct phylink_config *config,
+ 
+ 	macb_or_gem_writel(bp, NCFGR, ctrl);
+ 
+-	if (bp->phy_interface == PHY_INTERFACE_MODE_10GBASER)
+-		gem_writel(bp, HS_MAC_CONFIG, GEM_BFINS(HS_MAC_SPEED, HS_SPEED_10000M,
+-							gem_readl(bp, HS_MAC_CONFIG)));
 -
- /* Graceful stop timeouts in us. We should allow up to
-  * 1 frame time (10 Mbits/s, full-duplex, ignoring collisions)
-  */
+ 	spin_unlock_irqrestore(&bp->lock, flags);
+ 
+ 	if (!(bp->caps & MACB_CAPS_MACB_IS_EMAC))
 -- 
 2.34.1
 
