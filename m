@@ -1,104 +1,138 @@
-Return-Path: <netdev+bounces-133895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11E35997617
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:59:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BB7997622
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8991E1F22CA0
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:59:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278CC284769
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8C81E1051;
-	Wed,  9 Oct 2024 19:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66AC1A0BE0;
+	Wed,  9 Oct 2024 20:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e/3o8xwf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAyyZ0VV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613191D318A
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 19:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E9D173336;
+	Wed,  9 Oct 2024 20:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728503928; cv=none; b=YaBqX+igia6Xk/WfXLVLur/i3zyPJd09zqjfyvPLZbuBiQ/WTedhYNWwbVtrKITqhzAxfNQ3NaqDMjPXGU8YX3amk6hfTmt+HeZhaALl0ETPEeaI47Zndy0WEkqIt+QENIqB7B2kcBwlPmCR6WMOSpjpjq8mtDksxqyFnFEAtNA=
+	t=1728504152; cv=none; b=PNn7JSkqnlLBWxprZn5801SDPqQH0v0fg1jBEErEvwXSqcKTi5nrb6iVyusQEtrURBlzp9S1XZiMo1pMTFYJTYXGGU7PEJIvWFcD/GvpJmP76Ea1pH/6C8Gj8IrGMnWcYJqb/k0TAIziqgjzQ/ME3U0UNNe9C2cLX4PvIGkj9+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728503928; c=relaxed/simple;
-	bh=NfHTMlcLeIvdDweTgtwVoYY5GdBkXiWBWcHPSsaJyA0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IyY6UhP01DUUO2OweLjDzogVrMkTaU+E6lL636vrj5wdr7YtPVUycqC/FiyceXgzxLeTe2/cC5st8lShkB3RHEmL+Q6dOYrNW1kmlmN4upmTJk0k2fktPNWPCM+t+EfGXsRFaXwE11a/9byiYDlm1BvhbuJ2DZ7XB6juvq8NqA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e/3o8xwf; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c924667851so106662a12.3
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 12:58:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728503925; x=1729108725; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NfHTMlcLeIvdDweTgtwVoYY5GdBkXiWBWcHPSsaJyA0=;
-        b=e/3o8xwf7X/zfSnovyyvLNt8yAoaHMXLObgzChX+HVr2cv0RgPpnLerNfN8O3XT1Dz
-         nXvlYjBLl0VzNjTJheahwRAnHGYDaxqEdjT1pIaBEhPNdSLbr3tsW8naExMUIS1ajKQ3
-         j1xzCIh/zmATjxjHCJBaGeppExHAE2IwGlIhtPpgqUA8S/sKhCnxuXIPy78/YV5VnHfc
-         JjXMCEzt/2lzU39+k3wUxm5NJabXEQXixhKuqywjD89nLZGIBqRlIIn1BM3/gJE+IsmI
-         UAfQTwHIcnJ2FvQGLDnkk7M5TQgDsgk7iAjU3zrKplpX14A5uEqYISK4nFxChQG1gJKp
-         5h4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728503925; x=1729108725;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NfHTMlcLeIvdDweTgtwVoYY5GdBkXiWBWcHPSsaJyA0=;
-        b=hJ6ASZwyySuY0uBdZekJZY0+GXFmXgWz7gP0qaz8YFwT3Xkad11mfPY3P2NGzCRL0Y
-         2jUi40G9iDspgyBcPG7YB4TTWczR1xDwZhu8LVDDmMh5Bo8AN7L2zA6fm5P/crbnzo0D
-         V/hniAPphtZ3ktYfmi1imCSJdMRua3xJl8v+z0rqxnaT2yYrHOECdNLp4mParKH4s+cO
-         FZHX87XsdkE3rRifTTj2qJUd51WdR5MTj+DrTw2/wdatE+TQGYVZ6K9k+e5ImdHXBFYg
-         0MQ0YYiUWOzW/H8YrOhKFLP4ZpCe7D8FJG777BvKbiqOnW3YQbkEqfFeAMI/LA+uGLHo
-         72vg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxf8E7LLXxlonKaJO02idLadihyezu86m59h0KWx6Hi+E+5ui91iTrir3ASDcbCjnp/NmXtWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztcFRRFFPV+GqT81f+2iVdkr3ltStgEzLPBxZwhYIJ3mx2E/9w
-	y1Wbt16xQ0kXJO2r9X1ZIyxLw6bsQP87ERgPkKtjXG2rOiljeeRqn+A5JvGMNO+TZo5n8JXiJDc
-	vb0//hWVbC4Hc5QECwKPe/5/kyGMH/d8n++A=
-X-Google-Smtp-Source: AGHT+IHxtYkLIkxNlDjK87qi1yhBQTPxuSD3L45q7+j8+ET8HOF9fuHAjTNBiHXNu0dr5D6OrP/tk5ih65g65aAxdqc=
-X-Received: by 2002:a17:907:1c16:b0:a8a:6c5d:63b2 with SMTP id
- a640c23a62f3a-a999e695b1dmr120436566b.18.1728503924422; Wed, 09 Oct 2024
- 12:58:44 -0700 (PDT)
+	s=arc-20240116; t=1728504152; c=relaxed/simple;
+	bh=fgFWJ/oEjnladuvaBsVXpkihxJsAI1TGvExLtbgb5ts=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VtZCrNIi0MpuSJmYWeR0T3KahPw/jo/SBdweD1oHHDVB7yl2dlbnrJFHeHKpKkDMlHDrcOvXgbZ5oA2H0RdKpp8VgOTZTnx40jlHQnmH4eTZF3afiB8FJiLP+uQL38sLco1W87b67ED1m2KJ6gd1ywDIaOQ3T1IFyslnVmgsdLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAyyZ0VV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1C2C4CEC3;
+	Wed,  9 Oct 2024 20:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728504152;
+	bh=fgFWJ/oEjnladuvaBsVXpkihxJsAI1TGvExLtbgb5ts=;
+	h=From:Date:Subject:To:Cc:From;
+	b=WAyyZ0VVAQNVFpEs0S0ZmBeAclishnvxjKFUe8JiVW0wDb/mzu7fATm1+uFfrjCrH
+	 paXDunQcP0B4OEB9g4fzkX31JNSUf0QwJVTNPNVixN/r4O4WrvYGibrZKGM2o0dFrU
+	 O7txuLEI6rEiYcrMnP6onyl/HQhYGgeqioF81qiBEc5XxFY1nkcd5i2uaNC4R0q+VB
+	 8SeGzEFlNqmDq8hI0B9DNn+A2q7RKpm3RX9eaaymzGZ9Y0lhSPnGHu1ro35a4HaWTk
+	 0u+AsT/KYP7csBiksyJ9g9znHzDwEPuN99NIg/N1za6zCRtPXnED+dYqbGTInalw2I
+	 BN8hrnnW5lqVw==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 09 Oct 2024 16:02:21 -0400
+Subject: [PATCH RFC] sunrpc: always set RPC_TASK_SOFTCONN in
+ rpcb_register_call()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-0-554456a44a15@linutronix.de>
- <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-4-554456a44a15@linutronix.de>
-In-Reply-To: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-4-554456a44a15@linutronix.de>
-From: John Stultz <jstultz@google.com>
-Date: Wed, 9 Oct 2024 12:58:32 -0700
-Message-ID: <CANDhNCojYH=c8Dqgi2nPP4tK7QPqxpQMLCCAyrDJbyhv2761gg@mail.gmail.com>
-Subject: Re: [PATCH v2 04/25] timekeeping: Abort clocksource change in case of failure
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Christopher S Hall <christopher.s.hall@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241009-nfsd-next-v1-1-058496d8960f@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEzhBmcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDAwNL3by04hTdvNSKEl0zw8TEJEMjI8MUU0sloPqCotS0zAqwWdFKQW7
+ OSrG1tQCVw6LWYAAAAA==
+X-Change-ID: 20241009-nfsd-next-61aab1221d59
+To: Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ syzbot+e7baeb70aa00c22ed45e@syzkaller.appspotmail.com, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1811; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=fgFWJ/oEjnladuvaBsVXpkihxJsAI1TGvExLtbgb5ts=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnBuFWQiWFs+1ydwTEjkd2Zk0m33kf5jdPXA+A9
+ tZjinl55p2JAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZwbhVgAKCRAADmhBGVaC
+ Fb7rD/sHGYMlrrmpufdLkyBGnJGvGX+cc2SN8ax9hbzpauITPC4Br+y1aCWRi3LKGUNGCrMTL50
+ unoKUCO3VkP5NyK5V508TEuojCl84wPAn+arbcaqgPayeUBOk8Pdze6Gw6gk9wyDKfQbNBNe0oX
+ oDyE4RfGjbZGCWBRjjiqh6L1+eOxjT8abRaT0Aioj+lSLoxNVhLh4RkQU+nxEC30LP8rXwI9lN8
+ 3+RcyfNQUT5mWqPkNZ+Cr7zSqpj25iMR8xEYVlQszJSsHlqUSONTikWG6ZXGsJk8MUq1w1ngAT3
+ K3Vrvswha+uqg+fdiHYdsHq1PTr19euHUgAFL9EXWuHu6gdMVpGA2aVQYi205EKH4f2ZkufMFEF
+ XTp0vd36Hs2RnzW2nmoq/+hYekTDzxaoLfmUEnVXwv9q0Mj+uvu2vguOYQL5lchzKL5sub0BhxI
+ WEYNZbxqArRFxiC5Vz/4vveNV/w5LIhfgzmYabXjIHss1C74FUml4kl2IQH+WbdRqpJTOFZ0k37
+ acOkNhfqndXuv5hRd4mpowwFyXDKEheNtVYhfhfHW/BijF8HlOINtfuJKWjpiSxa4qQcJUTxmuc
+ caVbI0KGUT3TfJAa1kGTyf5IYGVN1IGwUmido4kVdVGvtRJn8ZIIIOMR84PADaTFDSCkR2cc6lE
+ crr00JVlow7hcfQ==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Wed, Oct 9, 2024 at 1:29=E2=80=AFAM Anna-Maria Behnsen
-<anna-maria@linutronix.de> wrote:
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> There is no point to go through a full timekeeping update when acquiring =
-a
-> module reference or enabling the new clocksource fails.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+We've had a few hung task reports from syzbot fuzzing the nfsd netlink
+control interfaces. We don't have hard evidence of this, but one way
+this could happen is for userland to send down a large number of
+listening sockets and for them all to get stuck dealing with the
+portmapper.
 
-Acked-by: John Stultz <jstultz@google.com>
+Set RPC_TASK_SOFTCONN unconditionally in rpcb_register_call, instead of
+only doing that on set requests or when rpcbind isn't using an AF_LOCAL
+socket.
+
+Reported-by: syzbot+e7baeb70aa00c22ed45e@syzkaller.appspotmail.com
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+This is a bit of a Hail Mary play, as we don't have any firm evidence
+that this is the problem. Still, the scenario seems plausible, and it
+doesn't seem to make much sense using different RPC_TASK flags on
+rpcbind set and unset operations.
+---
+ net/sunrpc/rpcb_clnt.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/net/sunrpc/rpcb_clnt.c b/net/sunrpc/rpcb_clnt.c
+index 102c3818bc54d4f9a1fc5f854c3a841289974869..f0cad9bb0752d51f82733b2f7533f2269b4c69c4 100644
+--- a/net/sunrpc/rpcb_clnt.c
++++ b/net/sunrpc/rpcb_clnt.c
+@@ -402,14 +402,10 @@ static struct rpc_clnt *rpcb_create(struct net *net, const char *nodename,
+ 
+ static int rpcb_register_call(struct sunrpc_net *sn, struct rpc_clnt *clnt, struct rpc_message *msg, bool is_set)
+ {
+-	int flags = RPC_TASK_NOCONNECT;
+ 	int error, result = 0;
+ 
+-	if (is_set || !sn->rpcb_is_af_local)
+-		flags = RPC_TASK_SOFTCONN;
+ 	msg->rpc_resp = &result;
+-
+-	error = rpc_call_sync(clnt, msg, flags);
++	error = rpc_call_sync(clnt, msg, RPC_TASK_SOFTCONN);
+ 	if (error < 0)
+ 		return error;
+ 
+
+---
+base-commit: 144cb1225cd863e1bd3ae3d577d86e1531afd932
+change-id: 20241009-nfsd-next-61aab1221d59
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
