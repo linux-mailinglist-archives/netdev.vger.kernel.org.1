@@ -1,625 +1,318 @@
-Return-Path: <netdev+bounces-133507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8063399622D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:15:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4652D99624C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05B661F21CFF
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:15:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FEB71C22248
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DF718873F;
-	Wed,  9 Oct 2024 08:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FJBgocl3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13671891A8;
+	Wed,  9 Oct 2024 08:20:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACECF17279E
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 08:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9706188A3A
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 08:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728461702; cv=none; b=YDHZjJhrbgqWfAymJTIpDCrdS6GHaSrHQIq1RxC5hDg8XtOxCD+NhJSeiOQmOL4YfM3iH8cwVYbFnAP1djOqwkVKkvGIjHZ1U+jJfQ8q0KetOCp4E7u24g0LqLKeNuV+mE5Zjp4i3cFpU81yU4K7vkfVwNZz5GjuQkFNFylGkeM=
+	t=1728462030; cv=none; b=uvC0HX1SXU7kzTWKicIwyNcZgCrqalvH+7OisEkxhqmhg3vCKJSVkiDgQZ2RtmtSupRIYucKnI6bSeeHRQJ6EmlcH7moUBteHz/IfxhgefVF0YhgV7tw1q5sGup6Ftr1F1z0sxB/ZEgWGdhpD9CU029cRIJ2BDOggDJ/0ao4cfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728461702; c=relaxed/simple;
-	bh=dHmAdtyowOOqOuCiAn5XLz30uoc7uI7uEMltn6ut7+s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YRa3Qe5thbDEl0iDFMvHI+RdG7a8+5zZX1NQRfbDROWs2kOG/ipSUECWR1MDb0qgZNMoQwSbpv+lC767qyNXZfjnv/6R6bmZJSq3/g3k+YUmddF783evQ8sDv/WuIaxuqayAgCJP7nBc1ms+D1NmRllh1XqtQ9tPFdxWwTOt6b4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FJBgocl3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728461699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mHbsa77UElIEBSMfz/c53qskt8LH36YYM6tWPiPc/MA=;
-	b=FJBgocl3XZIRLCazFfC6n5G0OWI2SnIcmwWLDplSXWnXxPdhxSgPL7YvxYel8FgozeTcMA
-	tw70tYzZQi/yilHZktXZ/5gmLf0YgwziSUmM+6MJsesf8cbL5l2snhXomXueWgaI/O0tkY
-	iBq2kFkqjsMNovThtxetgfrXTveKGPs=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-119-VpIOLfiPPUKaAc8j4ZldJQ-1; Wed, 09 Oct 2024 04:14:55 -0400
-X-MC-Unique: VpIOLfiPPUKaAc8j4ZldJQ-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-20c56938075so20912455ad.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 01:14:55 -0700 (PDT)
+	s=arc-20240116; t=1728462030; c=relaxed/simple;
+	bh=m1OUkGtvY+Hi0BWH+KBTwbhRWSdoHHGqgTc+v6OOJ1I=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=PEKV7MdtNwLniF9cFaj/rGzAQn1opFC4gyfDkwRYTOr7pd+o79LBRyjzEAel3RnzFeLQcOw+ZHjlnz2rgeImQL2Ryi+BZy+meRuO1useBA8UsLdHF0mgE7yzQIFG+72Cyu84GvtJ6xh8rIWfJzIABGE21WlRedZoUAenhRjvUyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-832160abde4so55734539f.1
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 01:20:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728461694; x=1729066494;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mHbsa77UElIEBSMfz/c53qskt8LH36YYM6tWPiPc/MA=;
-        b=KQP1FT0JHbd81ZBBU58mf6S5UYoHZoGidPRysVzctZ+fwSZYo/DBoNDkuTyPcvC/X3
-         3C35AE4KFRUENn+NT16l2zanFMdoclv+P11VoH6iBqRwVepjALzMSQT/2cpxpVH/+aJe
-         MPx6jTEcLYkGkZbXEpFNhiPbu4UXOn7tUGO9MOxPyG88dol5kyoe6Frj2kivVtlRoi4G
-         oTrsL+0oBcEqic9V1Tv0gKkcfOrtbv1SleZuJ8pSee4nl4cPK1vKP9gwPenNbqROjg3P
-         qkqtB9IzNmxjdP7YIiwBkQtW81rqoXACgf9tf5lFimgdcsqwVL4uGojiiQmP/DldeCoe
-         FiFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVZGr3DmrzliC3C3WUIhCPQhi/KbxxWEzIR4qRzwVld+NgwS87V6YSd27EJPmcvSUuxJ/ZUqc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPVYBoCu8vvq7tyjWt84m5P5cWAE6DvDAcW55k1p7eE2YWKlCk
-	PKiz6Z+3MV8ZFPTIpLc6Xe/RojrgTeTB2dboHtrrTLWVIGAnZgEV93JGhZat4nyjhjhL/6BKtKi
-	TuSh5tfFSOAvErrEaovsLzVXvV9PytcmQD6QEu1R+DHfJUj3SvuF/ObVSqRkRLoKrXeio+vTpXB
-	mTW1LxoqTWXAmpbt9yB2MQyT892WIj
-X-Received: by 2002:a17:902:cec7:b0:20b:4f95:9335 with SMTP id d9443c01a7336-20c637f77c8mr35370535ad.43.1728461694248;
-        Wed, 09 Oct 2024 01:14:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH4dyOPW8dtp5miOwuRsmOi+ob0tZdSiMbuYW2/dryq3WCfd9tVeV+A6uHmbXGgJTqFtXZewdRUsNINGh/+tEA=
-X-Received: by 2002:a17:902:cec7:b0:20b:4f95:9335 with SMTP id
- d9443c01a7336-20c637f77c8mr35370135ad.43.1728461693618; Wed, 09 Oct 2024
- 01:14:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728462028; x=1729066828;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aKtYnZpLW00TayaO42hrnKURGmLYf8kT1tzKb4ZE8jw=;
+        b=D4FMImyJfjd3CfEkM38iTtZC9qSq52AApTwR9VfO3dyyoHpgGwfOA0Qju4IGyxYCL6
+         hhg9Ch0JY5cP/RUipT5ZIh2FgtBPHgIhEG38SmVQT2tu16ojkcJVKALEoduy2h1kvjbC
+         eojXYQW/o674YS1MC5VA831mUgyjVM2lEu1vKNIWhlc//wn0kBcj4rR3eQX7/Qv+kHUS
+         T/offseRB4rAuJeVM+2BCF8/T9p10RYulcbu89zqOQ0RVZyUijjq2QTIdKer5hAlrqPJ
+         fQktN6GyrjyIa9sRIQIYQwAsNutKsWCIe38ZswKT4K+2eLQXXrONpvU6TM89qhxnp6Ce
+         /oww==
+X-Forwarded-Encrypted: i=1; AJvYcCX1qzoroVWFobi3YgcO1cR/DqSJG0XOAinCaornERyRPUxx3H8r+SNK4Op+uBiQkd95ynEfH78=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxKFCvWU6Ddl86sjLPv3f75E7LSgag8ML4fIbciFwpZ/3bzohI
+	fgeZekmIFMRD7+yZIu54HQwKyQ18qeO8l69O4uAG/JbyR8TgkKPtdDrdPpTiRzgFtksjvLzySm4
+	xqyY5G4FHptb8LqeEb3w++qpv+OfKJCpabujOMqDuo3go/MFqxABeGxg=
+X-Google-Smtp-Source: AGHT+IEVORNLYt3OfC+xyLzRjpMveDCSW7DOnfRYhg2wzA0byMjAxtWK2BjrsPriYp+BCpSnObQbdd67HFxYZ7pMQ/nruGIOgZ9h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008-rss-v5-0-f3cf68df005d@daynix.com> <20241008-rss-v5-7-f3cf68df005d@daynix.com>
-In-Reply-To: <20241008-rss-v5-7-f3cf68df005d@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 9 Oct 2024 16:14:41 +0800
-Message-ID: <CACGkMEsPNTr3zcstsQGoOiQdCFQ+6EG6cSGiZzNxONsH9Xm=Aw@mail.gmail.com>
-Subject: Re: [PATCH RFC v5 07/10] tun: Introduce virtio-net RSS
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com
+X-Received: by 2002:a05:6e02:2161:b0:3a2:763b:c83e with SMTP id
+ e9e14a558f8ab-3a3974efe24mr13838755ab.5.1728462027851; Wed, 09 Oct 2024
+ 01:20:27 -0700 (PDT)
+Date: Wed, 09 Oct 2024 01:20:27 -0700
+In-Reply-To: <66f5a0ca.050a0220.46d20.0002.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67063ccb.050a0220.22840d.0010.GAE@google.com>
+Subject: Re: [syzbot] [net?] INFO: task hung in new_device_store (5)
+From: syzbot <syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com>
+To: boqun.feng@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	hdanton@sina.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, penguin-kernel@i-love.sakura.ne.jp, 
+	syzkaller-bugs@googlegroups.com, torvalds@linux-foundation.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 8, 2024 at 2:55=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
->
-> RSS is a receive steering algorithm that can be negotiated to use with
-> virtio_net. Conventionally the hash calculation was done by the VMM.
-> However, computing the hash after the queue was chosen defeats the
-> purpose of RSS.
->
-> Another approach is to use eBPF steering program. This approach has
-> another downside: it cannot report the calculated hash due to the
-> restrictive nature of eBPF steering program.
->
-> Introduce the code to perform RSS to the kernel in order to overcome
-> thse challenges. An alternative solution is to extend the eBPF steering
-> program so that it will be able to report to the userspace, but I didn't
-> opt for it because extending the current mechanism of eBPF steering
-> program as is because it relies on legacy context rewriting, and
-> introducing kfunc-based eBPF will result in non-UAPI dependency while
-> the other relevant virtualization APIs such as KVM and vhost_net are
-> UAPIs.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  drivers/net/tap.c           | 11 +++++-
->  drivers/net/tun.c           | 57 ++++++++++++++++++++-------
->  drivers/net/tun_vnet.h      | 96 +++++++++++++++++++++++++++++++++++++++=
-++----
->  include/linux/if_tap.h      |  4 +-
->  include/uapi/linux/if_tun.h | 27 +++++++++++++
->  5 files changed, 169 insertions(+), 26 deletions(-)
->
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 5e2fbe63ca47..a58b83285af4 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -207,6 +207,7 @@ static struct tap_queue *tap_get_queue(struct tap_dev=
- *tap,
->          * racing against queue removal.
->          */
->         int numvtaps =3D READ_ONCE(tap->numvtaps);
-> +       struct tun_vnet_hash_container *vnet_hash =3D rcu_dereference(tap=
-->vnet_hash);
->         __u32 rxq;
->
->         *tap_add_hash(skb) =3D (struct virtio_net_hash) { .report =3D VIR=
-TIO_NET_HASH_REPORT_NONE };
-> @@ -217,6 +218,12 @@ static struct tap_queue *tap_get_queue(struct tap_de=
-v *tap,
->         if (numvtaps =3D=3D 1)
->                 goto single;
->
-> +       if (vnet_hash && (vnet_hash->common.flags & TUN_VNET_HASH_RSS)) {
-> +               rxq =3D tun_vnet_rss_select_queue(numvtaps, vnet_hash, sk=
-b, tap_add_hash);
-> +               queue =3D rcu_dereference(tap->taps[rxq]);
-> +               goto out;
-> +       }
-> +
->         if (!skb->l4_hash && !skb->sw_hash) {
->                 struct flow_keys keys;
->
-> @@ -234,7 +241,7 @@ static struct tap_queue *tap_get_queue(struct tap_dev=
- *tap,
->
->         /* Check if we can use flow to select a queue */
->         if (rxq) {
-> -               tun_vnet_hash_report(&tap->vnet_hash, skb, &keys_basic, r=
-xq, tap_add_hash);
-> +               tun_vnet_hash_report(vnet_hash, skb, &keys_basic, rxq, ta=
-p_add_hash);
->                 queue =3D rcu_dereference(tap->taps[rxq % numvtaps]);
->                 goto out;
->         }
-> @@ -1058,7 +1065,7 @@ static long tap_ioctl(struct file *file, unsigned i=
-nt cmd,
->                 tap =3D rtnl_dereference(q->tap);
->                 ret =3D tun_vnet_ioctl(&q->vnet_hdr_sz, &q->flags,
->                                      tap ? &tap->vnet_hash : NULL, -EINVA=
-L,
-> -                                    cmd, sp);
-> +                                    true, cmd, sp);
->                 rtnl_unlock();
->                 return ret;
->         }
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 27308417b834..18528568aed7 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -209,7 +209,7 @@ struct tun_struct {
->         struct bpf_prog __rcu *xdp_prog;
->         struct tun_prog __rcu *steering_prog;
->         struct tun_prog __rcu *filter_prog;
-> -       struct tun_vnet_hash vnet_hash;
-> +       struct tun_vnet_hash_container __rcu *vnet_hash;
->         struct ethtool_link_ksettings link_ksettings;
->         /* init args */
->         struct file *file;
-> @@ -468,7 +468,9 @@ static const struct virtio_net_hash *tun_find_hash(co=
-nst struct sk_buff *skb)
->   * the userspace application move between processors, we may get a
->   * different rxq no. here.
->   */
-> -static u16 tun_automq_select_queue(struct tun_struct *tun, struct sk_buf=
-f *skb)
-> +static u16 tun_automq_select_queue(struct tun_struct *tun,
-> +                                  const struct tun_vnet_hash_container *=
-vnet_hash,
-> +                                  struct sk_buff *skb)
->  {
->         struct flow_keys keys;
->         struct flow_keys_basic keys_basic;
-> @@ -493,7 +495,7 @@ static u16 tun_automq_select_queue(struct tun_struct =
-*tun, struct sk_buff *skb)
->                 .control =3D keys.control,
->                 .basic =3D keys.basic
->         };
-> -       tun_vnet_hash_report(&tun->vnet_hash, skb, &keys_basic, skb->l4_h=
-ash ? skb->hash : txq,
-> +       tun_vnet_hash_report(vnet_hash, skb, &keys_basic, skb->l4_hash ? =
-skb->hash : txq,
->                              tun_add_hash);
->
->         return txq;
-> @@ -523,10 +525,17 @@ static u16 tun_select_queue(struct net_device *dev,=
- struct sk_buff *skb,
->         u16 ret;
->
->         rcu_read_lock();
-> -       if (rcu_dereference(tun->steering_prog))
-> +       if (rcu_dereference(tun->steering_prog)) {
->                 ret =3D tun_ebpf_select_queue(tun, skb);
-> -       else
-> -               ret =3D tun_automq_select_queue(tun, skb);
-> +       } else {
-> +               struct tun_vnet_hash_container *vnet_hash =3D rcu_derefer=
-ence(tun->vnet_hash);
-> +
-> +               if (vnet_hash && (vnet_hash->common.flags & TUN_VNET_HASH=
-_RSS))
-> +                       ret =3D tun_vnet_rss_select_queue(READ_ONCE(tun->=
-numqueues), vnet_hash,
-> +                                                       skb, tun_add_hash=
-);
-> +               else
-> +                       ret =3D tun_automq_select_queue(tun, vnet_hash, s=
-kb);
-> +       }
->         rcu_read_unlock();
->
->         return ret;
-> @@ -2248,6 +2257,9 @@ static void tun_free_netdev(struct net_device *dev)
->         security_tun_dev_free_security(tun->security);
->         __tun_set_ebpf(tun, &tun->steering_prog, NULL);
->         __tun_set_ebpf(tun, &tun->filter_prog, NULL);
-> +       rtnl_lock();
-> +       kfree_rcu_mightsleep(rtnl_dereference(tun->vnet_hash));
-> +       rtnl_unlock();
->  }
->
->  static void tun_setup(struct net_device *dev)
-> @@ -2946,13 +2958,9 @@ static int tun_set_queue(struct file *file, struct=
- ifreq *ifr)
->  }
->
->  static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **=
-prog_p,
-> -                       void __user *data)
-> +                       int fd)
->  {
->         struct bpf_prog *prog;
-> -       int fd;
-> -
-> -       if (copy_from_user(&fd, data, sizeof(fd)))
-> -               return -EFAULT;
->
->         if (fd =3D=3D -1) {
->                 prog =3D NULL;
-> @@ -3019,6 +3027,7 @@ static long __tun_chr_ioctl(struct file *file, unsi=
-gned int cmd,
->         int sndbuf;
->         int ret;
->         bool do_notify =3D false;
-> +       struct tun_vnet_hash_container *vnet_hash;
->
->         if (cmd =3D=3D TUNSETIFF || cmd =3D=3D TUNSETQUEUE ||
->             (_IOC_TYPE(cmd) =3D=3D SOCK_IOC_TYPE && cmd !=3D SIOCGSKNS)) =
-{
-> @@ -3078,7 +3087,7 @@ static long __tun_chr_ioctl(struct file *file, unsi=
-gned int cmd,
->         }
->
->         if (!tun) {
-> -               ret =3D tun_vnet_ioctl(NULL, NULL, NULL, -EBADFD, cmd, ar=
-gp);
-> +               ret =3D tun_vnet_ioctl(NULL, NULL, NULL, -EBADFD, true, c=
-md, argp);
->                 goto unlock;
->         }
->
-> @@ -3256,11 +3265,27 @@ static long __tun_chr_ioctl(struct file *file, un=
-signed int cmd,
->                 break;
->
->         case TUNSETSTEERINGEBPF:
-> -               ret =3D tun_set_ebpf(tun, &tun->steering_prog, argp);
-> +               if (get_user(ret, (int __user *)argp)) {
-> +                       ret =3D -EFAULT;
-> +                       break;
-> +               }
-> +
-> +               vnet_hash =3D rtnl_dereference(tun->vnet_hash);
-> +               if (ret !=3D -1 && vnet_hash && (vnet_hash->common.flags =
-& TUN_VNET_HASH_RSS)) {
-> +                       ret =3D -EBUSY;
-> +                       break;
-> +               }
-> +
-> +               ret =3D tun_set_ebpf(tun, &tun->steering_prog, ret);
->                 break;
->
->         case TUNSETFILTEREBPF:
-> -               ret =3D tun_set_ebpf(tun, &tun->filter_prog, argp);
-> +               if (get_user(ret, (int __user *)argp)) {
-> +                       ret =3D -EFAULT;
-> +                       break;
-> +               }
-> +
-> +               ret =3D tun_set_ebpf(tun, &tun->filter_prog, ret);
->                 break;
->
->         case TUNSETCARRIER:
-> @@ -3280,7 +3305,9 @@ static long __tun_chr_ioctl(struct file *file, unsi=
-gned int cmd,
->
->         default:
->                 ret =3D tun_vnet_ioctl(&tun->vnet_hdr_sz, &tun->flags,
-> -                                    &tun->vnet_hash, -EINVAL, cmd, argp)=
-;
-> +                                    &tun->vnet_hash, -EINVAL,
-> +                                    !rtnl_dereference(tun->steering_prog=
-),
-> +                                    cmd, argp);
->         }
->
->         if (do_notify)
-> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-> index 589a97dd7d02..f5de4fe9d14e 100644
-> --- a/drivers/net/tun_vnet.h
-> +++ b/drivers/net/tun_vnet.h
-> @@ -9,6 +9,13 @@
->  typedef struct virtio_net_hash *(*tun_vnet_hash_add)(struct sk_buff *);
->  typedef const struct virtio_net_hash *(*tun_vnet_hash_find)(const struct=
- sk_buff *);
->
-> +struct tun_vnet_hash_container {
-> +       struct tun_vnet_hash common;
-> +       struct tun_vnet_hash_rss rss;
-> +       u32 rss_key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
-> +       u16 rss_indirection_table[];
-> +};
-> +
->  static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
->  {
->         return !(IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) && (flags & TUN_VNE=
-T_BE)) &&
-> @@ -62,14 +69,16 @@ static inline __virtio16 cpu_to_tun_vnet16(unsigned i=
-nt flags, u16 val)
->  }
->
->  static inline long tun_vnet_ioctl(int *sz, unsigned int *flags,
-> -                                 struct tun_vnet_hash *hash, long fallba=
-ck,
-> +                                 struct tun_vnet_hash_container __rcu **=
-hashp,
-> +                                 long fallback, bool can_rss,
->                                   unsigned int cmd, void __user *argp)
->  {
->         static const struct tun_vnet_hash cap =3D {
-> -               .flags =3D TUN_VNET_HASH_REPORT,
-> +               .flags =3D TUN_VNET_HASH_REPORT | TUN_VNET_HASH_RSS,
->                 .types =3D VIRTIO_NET_SUPPORTED_HASH_TYPES
->         };
->         struct tun_vnet_hash hash_buf;
-> +       struct tun_vnet_hash_container *hash;
->         int __user *sp =3D argp;
->         int s;
->
-> @@ -132,13 +141,57 @@ static inline long tun_vnet_ioctl(int *sz, unsigned=
- int *flags,
->                 return copy_to_user(argp, &cap, sizeof(cap)) ? -EFAULT : =
-0;
->
->         case TUNSETVNETHASH:
-> -               if (!hash)
-> +               if (!hashp)
->                         return -EBADFD;
->
->                 if (copy_from_user(&hash_buf, argp, sizeof(hash_buf)))
->                         return -EFAULT;
-> +               argp =3D (struct tun_vnet_hash __user *)argp + 1;
-> +
-> +               if (hash_buf.flags & TUN_VNET_HASH_RSS) {
-> +                       struct tun_vnet_hash_rss rss;
-> +                       size_t indirection_table_size;
-> +                       size_t key_size;
-> +                       size_t size;
-> +
-> +                       if (!can_rss)
-> +                               return -EBUSY;
-> +
-> +                       if (copy_from_user(&rss, argp, sizeof(rss)))
+syzbot has found a reproducer for the following issue on:
 
-This seems to be a change of the uAPI of TUNSETVNETHASH.
+HEAD commit:    5b7c893ed5ed Merge tag 'ntfs3_for_6.12' of https://github...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11c09f9f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7cd9e7e4a8a0a15b
+dashboard link: https://syzkaller.appspot.com/bug?extid=05f9cecd28e356241aba
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1635f707980000
 
-> +                               return -EFAULT;
-> +                       argp =3D (struct tun_vnet_hash_rss __user *)argp =
-+ 1;
-> +
-> +                       indirection_table_size =3D ((size_t)rss.indirecti=
-on_table_mask + 1) * 2;
-> +                       key_size =3D virtio_net_hash_key_length(hash_buf.=
-types);
-> +                       size =3D struct_size(hash, rss_indirection_table,
-> +                                          (size_t)rss.indirection_table_=
-mask + 1);
-> +
-> +                       hash =3D kmalloc(size, GFP_KERNEL);
-> +                       if (!hash)
-> +                               return -ENOMEM;
-> +
-> +                       if (copy_from_user(hash->rss_indirection_table,
-> +                                          argp, indirection_table_size))=
- {
-> +                               kfree(hash);
-> +                               return -EFAULT;
-> +                       }
-> +                       argp =3D (u16 __user *)argp + rss.indirection_tab=
-le_mask + 1;
-> +
-> +                       if (copy_from_user(hash->rss_key, argp, key_size)=
-) {
-> +                               kfree(hash);
-> +                               return -EFAULT;
-> +                       }
-> +
-> +                       virtio_net_toeplitz_convert_key(hash->rss_key, ke=
-y_size);
-> +                       hash->rss =3D rss;
-> +               } else {
-> +                       hash =3D kmalloc(sizeof(hash->common), GFP_KERNEL=
-);
-> +                       if (!hash)
-> +                               return -ENOMEM;
-> +               }
->
-> -               *hash =3D hash_buf;
-> +               hash->common =3D hash_buf;
-> +               kfree_rcu_mightsleep(rcu_replace_pointer_rtnl(*hashp, has=
-h));
->                 return 0;
->
->         default:
-> @@ -146,7 +199,7 @@ static inline long tun_vnet_ioctl(int *sz, unsigned i=
-nt *flags,
->         }
->  }
->
-> -static inline void tun_vnet_hash_report(const struct tun_vnet_hash *hash=
-,
-> +static inline void tun_vnet_hash_report(const struct tun_vnet_hash_conta=
-iner *hash,
->                                         struct sk_buff *skb,
->                                         const struct flow_keys_basic *key=
-s,
->                                         u32 value,
-> @@ -154,7 +207,7 @@ static inline void tun_vnet_hash_report(const struct =
-tun_vnet_hash *hash,
->  {
->         struct virtio_net_hash *report;
->
-> -       if (!(hash->flags & TUN_VNET_HASH_REPORT))
-> +       if (!hash || !(hash->common.flags & TUN_VNET_HASH_REPORT))
->                 return;
->
->         report =3D vnet_hash_add(skb);
-> @@ -162,11 +215,40 @@ static inline void tun_vnet_hash_report(const struc=
-t tun_vnet_hash *hash,
->                 return;
->
->         *report =3D (struct virtio_net_hash) {
-> -               .report =3D virtio_net_hash_report(hash->types, keys),
-> +               .report =3D virtio_net_hash_report(hash->common.types, ke=
-ys),
->                 .value =3D value
->         };
->  }
->
-> +static inline u16 tun_vnet_rss_select_queue(u32 numqueues,
-> +                                           const struct tun_vnet_hash_co=
-ntainer *hash,
-> +                                           struct sk_buff *skb,
-> +                                           tun_vnet_hash_add vnet_hash_a=
-dd)
-> +{
-> +       struct virtio_net_hash *report;
-> +       struct virtio_net_hash ret;
-> +       u16 txq, index;
-> +
-> +       if (!numqueues)
-> +               return 0;
-> +
-> +       virtio_net_hash_rss(skb, hash->common.types, hash->rss_key, &ret)=
-;
-> +
-> +       if (!ret.report)
-> +               return hash->rss.unclassified_queue % numqueues;
-> +
-> +       if (hash->common.flags & TUN_VNET_HASH_REPORT) {
-> +               report =3D vnet_hash_add(skb);
-> +               if (report)
-> +                       *report =3D ret;
-> +       }
-> +
-> +       index =3D ret.value & hash->rss.indirection_table_mask;
-> +       txq =3D READ_ONCE(hash->rss_indirection_table[index]);
-> +
-> +       return txq % numqueues;
-> +}
-> +
->  static inline int tun_vnet_hdr_get(int sz, unsigned int flags,
->                                    struct iov_iter *from,
->                                    struct virtio_net_hdr *hdr)
-> diff --git a/include/linux/if_tap.h b/include/linux/if_tap.h
-> index 5bbb343a6dba..7334c46a3f10 100644
-> --- a/include/linux/if_tap.h
-> +++ b/include/linux/if_tap.h
-> @@ -4,7 +4,6 @@
->
->  #include <net/sock.h>
->  #include <linux/skb_array.h>
-> -#include <uapi/linux/if_tun.h>
->
->  struct file;
->  struct socket;
-> @@ -32,6 +31,7 @@ static inline struct ptr_ring *tap_get_ptr_ring(struct =
-file *f)
->  #define MAX_TAP_QUEUES 256
->
->  struct tap_queue;
-> +struct tun_vnet_hash_container;
->
->  struct tap_dev {
->         struct net_device       *dev;
-> @@ -44,7 +44,7 @@ struct tap_dev {
->         int                     numqueues;
->         netdev_features_t       tap_features;
->         int                     minor;
-> -       struct tun_vnet_hash    vnet_hash;
-> +       struct tun_vnet_hash_container __rcu *vnet_hash;
->
->         void (*update_features)(struct tap_dev *tap, netdev_features_t fe=
-atures);
->         void (*count_tx_dropped)(struct tap_dev *tap);
-> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
-> index d11e79b4e0dc..4887f97500a8 100644
-> --- a/include/uapi/linux/if_tun.h
-> +++ b/include/uapi/linux/if_tun.h
-> @@ -75,6 +75,14 @@
->   *
->   * The argument is a pointer to &struct tun_vnet_hash.
->   *
-> + * The argument is a pointer to the compound of the following in order i=
-f
-> + * %TUN_VNET_HASH_RSS is set:
-> + *
-> + * 1. &struct tun_vnet_hash
-> + * 2. &struct tun_vnet_hash_rss
-> + * 3. Indirection table
-> + * 4. Key
-> + *
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/508d25adbdbb/disk-5b7c893e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ecd795cf996e/vmlinux-5b7c893e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d5433a3025f3/bzImage-5b7c893e.xz
 
-Let's try not modify uAPI. We can introduce new ioctl if necessary.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+05f9cecd28e356241aba@syzkaller.appspotmail.com
 
->   * The %TUN_VNET_HASH_REPORT flag set with this ioctl will be effective =
-only
->   * after calling the %TUNSETVNETHDRSZ ioctl with a number greater than o=
-r equal
->   * to the size of &struct virtio_net_hdr_v1_hash.
-> @@ -148,6 +156,13 @@ struct tun_filter {
->   */
->  #define TUN_VNET_HASH_REPORT   0x0001
->
-> +/**
-> + * define TUN_VNET_HASH_RSS - Request virtio_net RSS
-> + *
-> + * This is mutually exclusive with eBPF steering program.
-> + */
-> +#define TUN_VNET_HASH_RSS      0x0002
-> +
->  /**
->   * struct tun_vnet_hash - virtio_net hashing configuration
->   * @flags:
-> @@ -163,4 +178,16 @@ struct tun_vnet_hash {
->         __u32 types;
->  };
->
-> +/**
-> + * struct tun_vnet_hash_rss - virtio_net RSS configuration
-> + * @indirection_table_mask:
-> + *             Bitmask to be applied to the indirection table index
-> + * @unclassified_queue:
-> + *             The index of the queue to place unclassified packets in
-> + */
-> +struct tun_vnet_hash_rss {
-> +       __u16 indirection_table_mask;
-> +       __u16 unclassified_queue;
-> +};
-> +
->  #endif /* _UAPI__IF_TUN_H */
->
-> --
-> 2.46.2
->
+INFO: task syz-executor:5469 blocked for more than 143 seconds.
+      Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor    state:D stack:21680 pid:5469  tgid:5469  ppid:5459   flags:0x00000000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5315 [inline]
+ __schedule+0x1895/0x4b30 kernel/sched/core.c:6675
+ __schedule_loop kernel/sched/core.c:6752 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6767
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6824
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a7/0xd70 kernel/locking/mutex.c:752
+ new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
+ kernfs_fop_write_iter+0x3a0/0x500 fs/kernfs/file.c:334
+ new_sync_write fs/read_write.c:590 [inline]
+ vfs_write+0xa6d/0xc90 fs/read_write.c:683
+ ksys_write+0x183/0x2b0 fs/read_write.c:736
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f5edcf7cadf
+RSP: 002b:00007f5edd25f220 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f5edcf7cadf
+RDX: 0000000000000003 RSI: 00007f5edd25f270 RDI: 0000000000000005
+RBP: 00007f5edcff13d2 R08: 0000000000000000 R09: 00007f5edd25f077
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
+R13: 00007f5edd25f270 R14: 00007f5eddc64620 R15: 0000000000000003
+ </TASK>
 
-Thanks
+Showing all locks held in the system:
+2 locks held by kworker/u8:0/11:
+2 locks held by kworker/u8:1/12:
+1 lock held by khungtaskd/30:
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+ #0: ffffffff8e937de0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6720
+3 locks held by kworker/u8:3/52:
+5 locks held by kworker/u9:0/54:
+ #0: ffff888218331148 ((wq_completion)hci6){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff888218331148 ((wq_completion)hci6){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90000bf7d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90000bf7d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff88802a7b0d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:327
+ #3: ffff88802a7b0078 (&hdev->lock){+.+.}-{3:3}, at: hci_abort_conn_sync+0x1ea/0xde0 net/bluetooth/hci_sync.c:5567
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:1957 [inline]
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_failed+0x15d/0x300 net/bluetooth/hci_conn.c:1262
+1 lock held by kswapd1/89:
+3 locks held by kworker/u8:5/1060:
+ #0: ffff88814b89a948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88814b89a948 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90003ee7d00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90003ee7d00 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+0xd0/0x16f0 net/ipv6/addrconf.c:4196
+3 locks held by kworker/1:2/1852:
+3 locks held by kworker/u8:8/2936:
+4 locks held by kworker/u8:12/3063:
+ #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801baed948 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90009ce7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90009ce7d00 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcc52d0 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:580
+ #3: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: wg_destruct+0x25/0x2e0 drivers/net/wireguard/device.c:246
+1 lock held by klogd/4679:
+2 locks held by udevd/4690:
+1 lock held by dhcpcd/4903:
+2 locks held by getty/4995:
+ #0: ffff88802e5950a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc900031332f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6a6/0x1e00 drivers/tty/n_tty.c:2211
+3 locks held by kworker/1:3/5284:
+ #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90003fc7d00 ((crda_timeout).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90003fc7d00 ((crda_timeout).work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: crda_timeout_work+0x15/0x50 net/wireless/reg.c:540
+5 locks held by kworker/u9:5/5333:
+ #0: ffff888175b57948 ((wq_completion)hci8){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff888175b57948 ((wq_completion)hci8){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90003da7d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90003da7d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff88807caccd80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:327
+ #3: ffff88807cacc078 (&hdev->lock){+.+.}-{3:3}, at: hci_abort_conn_sync+0x1ea/0xde0 net/bluetooth/hci_sync.c:5567
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:1957 [inline]
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_failed+0x15d/0x300 net/bluetooth/hci_conn.c:1262
+6 locks held by kworker/u9:6/5335:
+ #0: ffff888219140948 ((wq_completion)hci7){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff888219140948 ((wq_completion)hci7){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90003c27d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90003c27d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff88804a2e4d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:327
+ #3: ffff88804a2e4078 (&hdev->lock){+.+.}-{3:3}, at: hci_abort_conn_sync+0x1ea/0xde0 net/bluetooth/hci_sync.c:5567
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:1957 [inline]
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_failed+0x15d/0x300 net/bluetooth/hci_conn.c:1262
+ #5: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: exp_funnel_lock kernel/rcu/tree_exp.h:297 [inline]
+ #5: ffffffff8e93d378 (rcu_state.exp_mutex){+.+.}-{3:3}, at: synchronize_rcu_expedited+0x381/0x830 kernel/rcu/tree_exp.h:976
+5 locks held by kworker/u9:7/5337:
+ #0: ffff888218333948 ((wq_completion)hci5){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff888218333948 ((wq_completion)hci5){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc90003c07d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc90003c07d00 ((work_completion)(&hdev->cmd_sync_work)){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffff88807edc8d80 (&hdev->req_lock){+.+.}-{3:3}, at: hci_cmd_sync_work+0x1ec/0x400 net/bluetooth/hci_sync.c:327
+ #3: ffff88807edc8078 (&hdev->lock){+.+.}-{3:3}, at: hci_abort_conn_sync+0x1ea/0xde0 net/bluetooth/hci_sync.c:5567
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_connect_cfm include/net/bluetooth/hci_core.h:1957 [inline]
+ #4: ffffffff8fe3e668 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_failed+0x15d/0x300 net/bluetooth/hci_conn.c:1262
+3 locks held by kworker/1:5/5405:
+4 locks held by kworker/0:5/5438:
+ #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3204 [inline]
+ #0: ffff88801ac81948 ((wq_completion)events_power_efficient){+.+.}-{0:0}, at: process_scheduled_works+0x93b/0x1850 kernel/workqueue.c:3310
+ #1: ffffc9000360fd00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3205 [inline]
+ #1: ffffc9000360fd00 ((reg_check_chans).work){+.+.}-{0:0}, at: process_scheduled_works+0x976/0x1850 kernel/workqueue.c:3310
+ #2: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: reg_check_chans_work+0x99/0xfd0 net/wireless/reg.c:2480
+ #3: ffff8880787d0768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:6014 [inline]
+ #3: ffff8880787d0768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_leave_invalid_chans net/wireless/reg.c:2468 [inline]
+ #3: ffff8880787d0768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: reg_check_chans_work+0x164/0xfd0 net/wireless/reg.c:2483
+1 lock held by syz-executor/5463:
+ #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+1 lock held by syz-executor/5464:
+ #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
+3 locks held by syz-executor/5465:
+4 locks held by syz-executor/5469:
+ #0: ffff8880322e8420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2931 [inline]
+ #0: ffff8880322e8420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
+ #1: ffff888085516888 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
+ #2: ffff8880272140f8 (kn->active#56){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
+ #3: ffffffff8f56fea8 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
+7 locks held by syz-executor/5470:
+ #0: ffff8880322e8420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2931 [inline]
+ #0: ffff8880322e8420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
+ #1: ffff888084d7e888 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
+ #2: ffff8880272141e8 (kn->active#55){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
+ #3: ffffffff8f56fea8 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: del_device_store+0xfc/0x480 drivers/net/netdevsim/bus.c:216
+ #4: ffff88807fb830e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1014 [inline]
+ #4: ffff88807fb830e8 (&dev->mutex){....}-{3:3}, at: __device_driver_lock drivers/base/dd.c:1095 [inline]
+ #4: ffff88807fb830e8 (&dev->mutex){....}-{3:3}, at: device_release_driver_internal+0xce/0x7c0 drivers/base/dd.c:1293
+ #5: ffff88807fb84250 (&devlink->lock_key#4){+.+.}-{3:3}, at: nsim_drv_remove+0x50/0x160 drivers/net/netdevsim/dev.c:1672
+ #6: ffffffff8fcd1dc8 (rtnl_mutex){+.+.}-{3:3}, at: unregister_nexthop_notifier+0x17/0x40 net/ipv4/nexthop.c:3913
 
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 UID: 0 PID: 30 Comm: khungtaskd Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:162 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:223 [inline]
+ watchdog+0xff4/0x1040 kernel/hung_task.c:379
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 UID: 0 PID: 4690 Comm: udevd Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:mark_lock+0x3/0x360 kernel/locking/lockdep.c:4686
+Code: 04 ff ff ff e8 9e b9 54 0a 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 55 41 57 <41> 56 41 55 41 54 53 48 83 ec 10 49 89 f7 48 89 3c 24 49 bd 00 00
+RSP: 0018:ffffc9000305f2c8 EFLAGS: 00000006
+RAX: 000000000005054b RBX: ffff88807eb664e0 RCX: ffffffff9a3cc903
+RDX: 0000000000000003 RSI: ffff88807eb664e0 RDI: ffff88807eb65a00
+RBP: ffffc9000305f388 R08: ffffffff901cee2f R09: 1ffffffff2039dc5
+R10: dffffc0000000000 R11: fffffbfff2039dc6 R12: ffff88807eb66500
+R13: 0000000000000000 R14: ffff88807eb664d8 R15: 1ffff1100fd6cc9b
+FS:  00007efdac2c9c80(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c00091d660 CR3: 000000007e158000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ mark_held_locks kernel/locking/lockdep.c:4321 [inline]
+ __trace_hardirqs_on_caller kernel/locking/lockdep.c:4339 [inline]
+ lockdep_hardirqs_on_prepare+0x282/0x780 kernel/locking/lockdep.c:4406
+ trace_hardirqs_on+0x28/0x40 kernel/trace/trace_preemptirq.c:61
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+ _raw_spin_unlock_irqrestore+0x8f/0x140 kernel/locking/spinlock.c:194
+ __debug_check_no_obj_freed lib/debugobjects.c:998 [inline]
+ debug_check_no_obj_freed+0x561/0x580 lib/debugobjects.c:1019
+ free_pages_prepare mm/page_alloc.c:1115 [inline]
+ free_unref_page+0x41b/0xf20 mm/page_alloc.c:2638
+ discard_slab mm/slub.c:2677 [inline]
+ __put_partials+0xeb/0x130 mm/slub.c:3145
+ put_cpu_partial+0x17c/0x250 mm/slub.c:3220
+ __slab_free+0x2ea/0x3d0 mm/slub.c:4449
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x9a/0x140 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:329
+ kasan_slab_alloc include/linux/kasan.h:247 [inline]
+ slab_post_alloc_hook mm/slub.c:4085 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ kmem_cache_alloc_noprof+0x135/0x2a0 mm/slub.c:4141
+ anon_vma_chain_alloc mm/rmap.c:143 [inline]
+ anon_vma_fork+0x1fa/0x580 mm/rmap.c:365
+ dup_mmap kernel/fork.c:713 [inline]
+ dup_mm kernel/fork.c:1674 [inline]
+ copy_mm+0xd7c/0x1f40 kernel/fork.c:1723
+ copy_process+0x1845/0x3d50 kernel/fork.c:2372
+ kernel_clone+0x226/0x8f0 kernel/fork.c:2784
+ __do_sys_clone kernel/fork.c:2927 [inline]
+ __se_sys_clone kernel/fork.c:2911 [inline]
+ __x64_sys_clone+0x258/0x2a0 kernel/fork.c:2911
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7efdabefca12
+Code: 41 5d 41 5e 41 5f c3 64 48 8b 04 25 10 00 00 00 45 31 c0 31 d2 31 f6 bf 11 00 20 01 4c 8d 90 d0 02 00 00 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 76 10 48 8b 15 e7 43 0f 00 f7 d8 64 89 02 48 83
+RSP: 002b:00007ffde4edde98 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
+RAX: ffffffffffffffda RBX: 0000559c91bf0801 RCX: 00007efdabefca12
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
+RBP: 0000000000000003 R08: 0000000000000000 R09: 0000559c91be0910
+R10: 00007efdac2c9f50 R11: 0000000000000246 R12: 0000559c91c06ae0
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000559c91be0910
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
