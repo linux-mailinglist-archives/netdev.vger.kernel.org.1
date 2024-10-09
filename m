@@ -1,126 +1,162 @@
-Return-Path: <netdev+bounces-133619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9869967E1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:59:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5857C9967F9
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA72B284098
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:59:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E87FF28B649
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECA3190671;
-	Wed,  9 Oct 2024 10:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC931917C9;
+	Wed,  9 Oct 2024 11:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BdGsIKZ9"
+	dkim=pass (2048-bit key) header.d=monogon-tech.20230601.gappssmtp.com header.i=@monogon-tech.20230601.gappssmtp.com header.b="u+t8q+YK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F15D19049B;
-	Wed,  9 Oct 2024 10:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5751A18C35F
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 11:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728471548; cv=none; b=V/o5HhZUfuX4wOu3UbJ4F/MrP5fl5G8g1DN4WyKMnaY0p1fETlnZI4wdgIuSRuD0gEadaPx4PTGy0dJbNsnHHxcr7cRyzqwoE20ufupFzWbSDTMw5LzDWupbws3+ogOWI1/Ws5Rt1WWnvc1h2CIyYt8BRCkrjdiB/TUp736Kwp4=
+	t=1728471868; cv=none; b=t8+cVYWS8smZR5/HpyGA4oXnXx3b0S5EBFH72ddJCj3kfc5Q/4yn1E5afmV3SA9llwv2juUdg39+gQE0tZ0EYrPz0kuZDIqJJms4k4P/tp2tVIgqRh++FBNoV6AwKiZ1C2J6wENy3JIQhngi4WpGUa5iIkZmQWz1gIb2z0tcUMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728471548; c=relaxed/simple;
-	bh=xeAjzDULJnF+69KjJwTqAoX43npj68BsDBynQYrVTjM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=miZ2PcTAkbdt/VHQKOTfFJ+5VA2RLxC1qcWPzydEZ/yd8h/pf8rM93c++3uFmnrDyrUVg85J5ZiBFDxVbRmuKVj8NQQdgYgE1wkTUEmYnPIFw44ZDrqaIVVcQ6RNQZ3vlm8FkuHfszPW8jVruPDr6HbRCCQF6NnFXnXhKNonoFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BdGsIKZ9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 988FBC4CEC5;
-	Wed,  9 Oct 2024 10:59:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728471547;
-	bh=xeAjzDULJnF+69KjJwTqAoX43npj68BsDBynQYrVTjM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BdGsIKZ9BeXI3qHoiOHlRfowyKiZj8WdV74MVwV3oawwnSt85m5qcg3zMUBkV0w19
-	 SPK/bufEcKbJSMsSOrU1EMS3CnTxKE4KIcT6f8KOJwV8g4ebzU4pAz3yYlyvudCNvI
-	 v5aLm6/aUs0o/pmIUZQKsmzoWXIyUcM4oRpqXQGVuW4VfWzINDBj62gdvLRajOu79h
-	 YoIae6J1tiV0CJ2eUAXjUf5C/EDm6jt0NBWXEtUIeyJ3cw3kk4ZlfruFsQ+5EKkeOX
-	 pLTHC9+SYPu6oVFfx5TnDMAjnrlhVJrkX10k/QRgDbhh9ATu9KGnjFtwEwPrTZggzB
-	 ufoZ3F9MJW+bQ==
-Date: Wed, 9 Oct 2024 11:58:59 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Steen Hegelund <steen.hegelund@microchip.com>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Simon Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1728471868; c=relaxed/simple;
+	bh=Dla4E8Is21IGTGFswn/kaSTmohX8k9I1UVRn5uS1fhI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XSIzGD3cKphN36jU+T4EJe9md+zCznZPshx/enXbesXb3hb0z3ErefPZrsdlNysOB3KqqABI/MdhHd4vUEumj4ho4KcP+mxYm1gQQ8jx6HxE5KsNhVeGLiR3U6PHfXZf1/yP8nZXfdlMTqnNSMDAxkVoQltadCGQrinqRQTR8v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=monogon.tech; spf=pass smtp.mailfrom=monogon.tech; dkim=pass (2048-bit key) header.d=monogon-tech.20230601.gappssmtp.com header.i=@monogon-tech.20230601.gappssmtp.com header.b=u+t8q+YK; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=monogon.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=monogon.tech
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d375ddfc0so879878f8f.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 04:04:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=monogon-tech.20230601.gappssmtp.com; s=20230601; t=1728471864; x=1729076664; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=F0HzVzYREO0kj7Rj+vnq/jPWQKZs1T4yzmSnt22r46g=;
+        b=u+t8q+YKTfOZU5Wupq+THxh9lLoPrI4uN80AYb4mhkHMAnhjAKUw4dxGbeRY+RIHmp
+         3pY9STiNxkIv0oDMdGAOYszzV0QXcF87Frnhz42m63QMCoGdZWOSBFDzd+WXProovXfq
+         ZZc3jzDjNVKNh1XV7FrlKeTEWnbD0effhWl2KIacSi354xS5rb9EAmT6m9zRbb+EdAjr
+         Xh+am3mDBN8b4B/6eT49Q2ZWaLK1E5rchl3OKFJbuNXUv2ZQKj3ifJODY/1c+hWNT5GY
+         Q1prLmrVe8qvDqdVByuyD3mNgzUHAeeTW77DIfVRarOGDnDiEx4QZ2zf7BjWRmbD9Gda
+         z10g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728471864; x=1729076664;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=F0HzVzYREO0kj7Rj+vnq/jPWQKZs1T4yzmSnt22r46g=;
+        b=DmF7pHS4N85tioaBaR5EONrrL9IeEGA9kZxMAKcu8CCcjMHrYscKqJ+/TJ2Nn7DXHI
+         pl+red7Azvpz9TnbtryS2/2qp0PDSTGXThjO10NevmZXtMCENxGZo58kXA9rQ9ALDGAY
+         hawXgAdKDWPDWopr7dqcLF+6fReN/KXleNcpCaaMzcls0F1cegnHR3PgD0T0Rqcr8Rit
+         1gZbvyXqHM3dSgeO/XX/NQ3vtt2BEjmN6kV6FYqSCkhDwPosycHcUOHNRbe5wvrU7GNQ
+         uLkmOBvSqmV+mQA4hYLhIxfcIxywqBm1Sk+dw767svJedEGgcpyvVK51dkLeKhF+31M1
+         u6VA==
+X-Gm-Message-State: AOJu0Yw8MMKxaFVBTycY7uB6wK2wUPErehIFJ7nnJlrEaTHgTMHTmWn9
+	mkaOoQdtgOLSAVmSYfmePmFu+2WiNP0KxlV9DV/Tax5+gRl+A0kB646RK8aONzM=
+X-Google-Smtp-Source: AGHT+IGmgqqX84W8yv6zX1VXkidZuQOjkulSHglaFq4Tl6PcujRGTMrah+ivKAgH+vZdKk4dkeh/og==
+X-Received: by 2002:a5d:4112:0:b0:374:c621:62a6 with SMTP id ffacd0b85a97d-37d3aab5d6fmr1400374f8f.47.1728471864279;
+        Wed, 09 Oct 2024 04:04:24 -0700 (PDT)
+Received: from localhost ([2a02:168:4f87:c:154e:9e64:f4ec:cbd2])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-37d3e86a39dsm1008810f8f.75.2024.10.09.04.04.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 04:04:23 -0700 (PDT)
+From: Lorenz Brun <lorenz@monogon.tech>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v7 3/6] reset: mchp: sparx5: Map cpu-syscon locally in
- case of LAN966x
-Message-ID: <20241009-walnut-unending-aed5b687454c@spud>
-References: <20241003081647.642468-1-herve.codina@bootlin.com>
- <20241003081647.642468-4-herve.codina@bootlin.com>
- <71fb65a929e5d5be86f95ab76591beb77e641c14.camel@microchip.com>
- <CAMuHMdVR8UfZyGUS1c3nZqvPYBNs7oSe5p1GjCA3BYwrz8-bdQ@mail.gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RESEND] net: add config option for tunnel fallback devs
+Date: Wed,  9 Oct 2024 13:04:19 +0200
+Message-ID: <20241009110421.41187-1-lorenz@monogon.tech>
+X-Mailer: git-send-email 2.44.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="cndNbLBuvwOtOy9M"
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVR8UfZyGUS1c3nZqvPYBNs7oSe5p1GjCA3BYwrz8-bdQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
+This adds a Kconfig option to set the default behavior regarding tunnel
+fallback devices.
+For setups where the initial namespace should also not have these, the
+only preexisting option is to use a kernel command line option which
+needs to be passed to every kernel invocation, which can be inconvenient
+in certain setups.
+If a kernel is built for a specific environment this knob allows
+disabling the compatibility behavior outright, without requiring any
+additional actions.
 
---cndNbLBuvwOtOy9M
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Lorenz Brun <lorenz@monogon.tech>
+---
+ net/Kconfig                | 33 +++++++++++++++++++++++++++++++++
+ net/core/sysctl_net_core.c |  2 +-
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
-On Wed, Oct 09, 2024 at 12:20:32PM +0200, Geert Uytterhoeven wrote:
-> Hi Steve,
->=20
-> On Wed, Oct 9, 2024 at 9:30=E2=80=AFAM Steen Hegelund
-> <steen.hegelund@microchip.com> wrote:
-> > On Thu, 2024-10-03 at 10:16 +0200, Herve Codina wrote:
-> > > EXTERNAL EMAIL: Do not click links or open attachments unless you
-> > > know the content is safe
->=20
-> Hmm, the email I received directly from Herv=C3=A9 did not have the part
-> you are quoting, so it looks like you are subject to a MiTM-attack ;-)
+diff --git a/net/Kconfig b/net/Kconfig
+index d27d0deac0bf..e4429a017e47 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -447,6 +447,39 @@ config LWTUNNEL_BPF
+ 	  Allows to run BPF programs as a nexthop action following a route
+ 	  lookup for incoming and outgoing packets.
+ 
++choice
++	prompt "Create fallback tunnel devices"
++	default FB_TUNNELS_DEFAULT_ALL
++	help
++	  Fallback tunnel devices predate the Netlink API for managing network
++	  devices in Linux and get created when the respective tunnel kernel module
++	  is loaded. With a modern userspace these are no longer used but for
++	  compatibility reasons the default is to keep them around as the kernel
++	  cannot know if a given userspace needs them.
++	  There is a sysctl (net.core.fb_tunnels_only_for_init_net) for changing
++	  this, but it cannot retroactively remove fallback tunnel devices created
++	  before it was changed.
++
++	  This knob provides the possibility to set this behavior in the kernel,
++	  making it work in all cases. Note that changing this value to anything
++	  other than the default will break compatibility with old userspace.
++
++	config FB_TUNNELS_DEFAULT_ALL
++		bool "In every namespace"
++
++	config FB_TUNNELS_DEFAULT_INITNS
++		bool "Only in the initial namespace"
++
++	config FB_TUNNELS_DEFAULT_NONE
++		bool "Never"
++endchoice
++
++config FB_TUNNELS_DEFAULT
++	int
++	default 0 if FB_TUNNELS_DEFAULT_ALL
++	default 1 if FB_TUNNELS_DEFAULT_INITNS
++	default 2 if FB_TUNNELS_DEFAULT_NONE
++
+ config DST_CACHE
+ 	bool
+ 	default n
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index 86a2476678c4..d9a0b13ceb4a 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -37,7 +37,7 @@ static int min_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE;
+ 
+ static int net_msg_warn;	/* Unused, but still a sysctl */
+ 
+-int sysctl_fb_tunnels_only_for_init_net __read_mostly = 0;
++int sysctl_fb_tunnels_only_for_init_net __read_mostly = CONFIG_FB_TUNNELS_DEFAULT;
+ EXPORT_SYMBOL(sysctl_fb_tunnels_only_for_init_net);
+ 
+ /* 0 - Keep current behavior:
+-- 
+2.44.1
 
-Yeah, unfortunately we are subjected to that. This one at least just
-adds some text, there's another "MiTM attacker" we have that sometimes
-crops up and has a side effect of tab-to-space conversion. The joys of
-corporate IT.
-
---cndNbLBuvwOtOy9M
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZwZh8wAKCRB4tDGHoIJi
-0lfaAQDEiHS7Rxt7GPKHgI4elepFbJpqoYoimbiJmOxyO003UgD/UVz8BnS0gXHT
-d4vnv47DPKzMLjGYw5WnRL1P8t+NmQs=
-=nI7S
------END PGP SIGNATURE-----
-
---cndNbLBuvwOtOy9M--
 
