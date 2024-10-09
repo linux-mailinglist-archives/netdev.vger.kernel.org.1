@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-133789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61137997084
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:07:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD31997081
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:07:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4D22830AE
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:07:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7C9BB24CA2
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D351FB3FE;
-	Wed,  9 Oct 2024 15:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CA51E25E7;
+	Wed,  9 Oct 2024 15:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="o3ioEtHr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CT6Vcdes"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2919B1E25F9
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24151E04BC;
+	Wed,  9 Oct 2024 15:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728488640; cv=none; b=qAUaRaAe2nf3jscjP+AJkcWBATooM5WMvmZP+fKMK3k7ReeJ3tU3fOUqNhY0zl6s6at3gIM8s3v2VKOrNtlMYMkqglCke6RFc07B73Va+1Fby5bcTBuo0ZDooPo1NuZKy1I1kbjnem0zJxmliNNSwCwhpIvWGWPLI3uVtkh6HEM=
+	t=1728488633; cv=none; b=hHanQFQ6Tkr9ySTyiztGNjzbuxDheiuw1KBWYvg4n2EzW3CLSoxGK8Le1SDKkLj5yCq+QXgiPg/M9WzxTkI7tCzXk2D4pKH7eW02tayDquIp2Hgz+bz1M10KttTxeM7B6bebWqwnw6yny+Gx1RVDvDedtFvbtZO5IEtx/XEukm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728488640; c=relaxed/simple;
-	bh=+dPTyHZ7xWPO2OXlyf8gYxdODQHxdbuxkfl3bmskjjg=;
+	s=arc-20240116; t=1728488633; c=relaxed/simple;
+	bh=ALCn5nX2IVltGWpCr8Pfx5ViOJxPdmVSP4zL12BOUm8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bVvgI6TfEcM0aZZMjFpHNKfM8hmKSKNMVIuYkiTTHWcq9NKC3loDNSjUcY3h7EJwqEBRcib2kRylpxL/AGmpa+THWXIITW+KPztxG2gZcNtqzdheZt1k6e8d7LtjCmTwk0BuRZvdbwWVRl3COYbFrxGMQdJmd0KV2PYeHmNsAU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=o3ioEtHr; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-8353f5862a7so28424239f.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 08:43:57 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=IVc2Y24JxDfpT7ZyaW8P1vyS8vfqyRyR7Fol2w96+N1VMV0V+OzUsaZlRqHu+eu+FGdvV5/fS4aJOPUdJ0DG/34vu7TYQk/hl624wRxOZUhFF+Pfsoe/qyODqYoUcpSjGE090HgATKiTcl+VbiQvWo4Y0u2ZZ8wbD/VJZtCPaok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CT6Vcdes; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7aa086b077so826845266b.0;
+        Wed, 09 Oct 2024 08:43:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728488637; x=1729093437; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728488630; x=1729093430; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+pWT4XdkGymjBMFALAcO1+UWkw4U1Rus/WqwCMqO8uY=;
-        b=o3ioEtHrZ80bXll9DeVFMaXqV8GXaQ21WO5+IKEkoTxGYgj2kEOJsZcEnV2zL7fOnX
-         iFmyS/zRam4uau7kngJMW9INXvh6tYbA4mDGHlkSCDEexcismvARL4I+sRsJd1LYhrZz
-         GrbrsWXxTKuz6gbEwLMcNe1l2fNHLAIs3ay51v6Sz9dAGB5A+k9cgbY3M5o2a7wFA8qf
-         2WM6Objwrm5UM4f9HDyP4jsfMpCHx7JKLWR+2yBcOpPO6g8151UzgXbb+ulKmcurRfd2
-         hQtlyHYYYeCFBkpySI7dsr1xclHilhOQaiM6vw/5vHZG3bRVn9yvugouof9DL8wyIz6/
-         V0lA==
+        bh=anu0cTMQYHGCKMgsjTpzIjdO1NCpBTN/hmAIcwURhZ8=;
+        b=CT6VcdesT2PykXFCNMa9ogBSx/8y3cLa281gfoy2pJT5Rmjs7rhSl3+iyc+4Eisthm
+         gd3uNdbLGdHQC4ZcnLXDPJE6ic5MsWKk6HN7oM5wJZCa1303RsmGFo/U/tkzHyf7LnjF
+         RDX0347MxxCq5lFeifcjPqjylbcCny6TDAF3n2lEndcCd2i8E6fEg+5OgF1GT++BRgtt
+         vyFhTEwXW8aCv+XW0ipwsQtP6yo+GDksnpIG3sKzk5fJ+jITn3jT0z474i8whB/GwXLt
+         jlTFqCyQ4Bm14hgX4lVNh1x0gY0ufytcdiwP3dHuFHD878GbRz2PyNivnfkKOZ0fNn4N
+         m4RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728488637; x=1729093437;
+        d=1e100.net; s=20230601; t=1728488630; x=1729093430;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+pWT4XdkGymjBMFALAcO1+UWkw4U1Rus/WqwCMqO8uY=;
-        b=j6IuafI+aShqQKNpdo9mHXYSAh4L8JIwhe71rs/r35aKTa0nh3rOOq7HKvpGuZGvOs
-         AWgzqNjFakcsv7KKjeMxKmAZoiNO4gEWoM2EAAU1OKmT2kBk8xALfdPjU4JaH2RJbmCR
-         3eOG0iP0IfoYHrGuUfBVkvDX6yxhICuBLJ6A+Wd/AnJVF5v56+V+Z1fjf8NYaSsWZVQ6
-         L6SIdF15RGwS1wVhUGyrlJg6QcOx2E6LGurfUDKtF5/Epsouvk8R/VTt3OTASZArYtnU
-         LiCdpSvd8vYLP/kWeXYABY1YTq1NKJk/V3ecGJo4u2sJhcijLJi6rSt4aOicMQPQQHOU
-         oDvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWauIqh1x++k0k7xpvgmQ4i7RF0C/DMddGtcf5KEo0/furUfrjR6FQFhO946Q+0pb6J0bX/qgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz2aukk5dF86JLL9D5vn+8a/8a3DDGHYAwRVdByRxeH+1KMa51j
-	3OvUzg7cEQEDU7DsS8geEh4DORDlw3bdMCtfNJofNrpTEln7RbW/Emq+q4oF66w=
-X-Google-Smtp-Source: AGHT+IErIIr4wPlQFrZzsnhru5PNlkPfP6bOKBipcqNGKjvMFCSINtKRFUCiLKezGy7OcuyCJnRrlA==
-X-Received: by 2002:a05:6602:2c0a:b0:82d:9b0:ecb7 with SMTP id ca18e2360f4ac-8353d47c5e9mr340456339f.3.1728488637187;
-        Wed, 09 Oct 2024 08:43:57 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db86b66c6csm1418933173.44.2024.10.09.08.43.56
+        bh=anu0cTMQYHGCKMgsjTpzIjdO1NCpBTN/hmAIcwURhZ8=;
+        b=L0/MjGHif+eqOPgBj63RjCAfDkNBmYrYSMSfXr2ZdAUuBS4Ng88+MYvFqi6GPMc1pk
+         G+V5sU2ZIFPT7tQh/hkE9Av0+/pteJyAfIywuJCJlauMnY/TEX619T5Cmug78SkS9ADG
+         iYaWvfZ5JXQ4MxtB6vQAgzs69UtEUo/equ1gTyL5d4CHgwIv9rjyArPW1f1prhUzfuGP
+         Va1l8deAzJw1UjgDlwrRxbJM1nclrHX2dgJ9nLDGikvrg1xOr5fu1L2z4IlpCTJS+XbW
+         vi+FOf9r1b6ijRO+GLRPbWdFjODJVoCRrdJv0A0lI1kPZGei3jKpsDl6LE0a2mgu8Vcz
+         452g==
+X-Forwarded-Encrypted: i=1; AJvYcCWifpDtasRwej+r3BP4WKB06HgeSWPbHoReX3PUCkQTQvYa/0Z3FABbiSO0mo5hSD20A+BUTzs/Fq47byw=@vger.kernel.org, AJvYcCX1lSLKls0x7MscdhchH425reB7ejb/Z4n/gyBFTNHwreGl4GMRZTiqZYBjKB1Ec5rsHuiIGQrs@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMd39SQ2MJQTmbruB95brpahjlEUrwG34ciYib3JYSNJyeE69s
+	/E227Z4WWnLQ8kFWxylAKVfgtOD+9rqNXnzc1Qz14Zij4uOi7ipM
+X-Google-Smtp-Source: AGHT+IGMEn8xUymg5M9O0Cbi2djrOzdY6QGvxyYG/ZDhLZVh3ETv3LF4VWiQ4wB4z45ZIcnINUh+OQ==
+X-Received: by 2002:a17:906:c14b:b0:a99:89e9:a43d with SMTP id a640c23a62f3a-a999e81aa13mr63814366b.39.1728488629601;
+        Wed, 09 Oct 2024 08:43:49 -0700 (PDT)
+Received: from [192.168.42.207] ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a992e62392csm677484666b.52.2024.10.09.08.43.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 08:43:56 -0700 (PDT)
-Message-ID: <2144827e-ad7e-4cea-8e38-05fb310a85f5@kernel.dk>
-Date: Wed, 9 Oct 2024 09:43:55 -0600
+        Wed, 09 Oct 2024 08:43:49 -0700 (PDT)
+Message-ID: <f88adb83-618b-4be3-8357-0aabcf3a2db8@gmail.com>
+Date: Wed, 9 Oct 2024 16:44:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,98 +76,93 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
- <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
+Subject: Re: 6.12-rc1: Lockdep regression bissected
+ (virtio-net/console/scheduler)
+To: John Ogness <john.ogness@linutronix.de>, Petr Mladek <pmladek@suse.com>,
+ Breno Leitao <leitao@debian.org>
+Cc: Peter Zijlstra <peterz@infradead.org>, gregkh@linuxfoundation.org,
+ mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ kuba@kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, vschneid@redhat.com, axboe@kernel.dk,
+ Heng Qi <hengqi@linux.alibaba.com>
+References: <20241003-savvy-efficient-locust-ae7bbc@leitao>
+ <20241003153231.GV5594@noisy.programming.kicks-ass.net>
+ <20241003-mahogany-quail-of-reading-eeee7e@leitao>
+ <20241004-blazing-rousing-lynx-8c4dc9@leitao>
+ <Zv_IR9LAecB2FKNz@pathway.suse.cz> <8434l6sjwz.fsf@jogness.linutronix.de>
 Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <8434l6sjwz.fsf@jogness.linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10/9/24 9:38 AM, David Ahern wrote:
-> On 10/9/24 9:27 AM, Jens Axboe wrote:
->> On 10/7/24 4:15 PM, David Wei wrote:
->>> ===========
->>> Performance
->>> ===========
+On 10/8/24 16:18, John Ogness wrote:
+> On 2024-10-04, Petr Mladek <pmladek@suse.com> wrote:
+>> On Fri 2024-10-04 02:08:52, Breno Leitao wrote:
+>>> 	 =====================================================
+>>> 	 WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
+>>> 	 6.12.0-rc1-kbuilder-virtme-00033-gd4ac164bde7a #50 Not tainted
+>>> 	 -----------------------------------------------------
+>>> 	 swapper/0/1 [HC0[0]:SC0[0]:HE0:SE1] is trying to acquire:
+>>> 	 ff1100010a260518 (_xmit_ETHER#2){+.-.}-{2:2}, at: virtnet_poll_tx (./include/linux/netdevice.h:4361 drivers/net/virtio_net.c:2969)
 >>>
->>> Test setup:
->>> * AMD EPYC 9454
->>> * Broadcom BCM957508 200G
->>> * Kernel v6.11 base [2]
->>> * liburing fork [3]
->>> * kperf fork [4]
->>> * 4K MTU
->>> * Single TCP flow
+>>> 	and this task is already holding:
+>>> 	 ffffffff86f2b5b8 (target_list_lock){....}-{2:2}, at: write_ext_msg (drivers/net/netconsole.c:?)
+>>> 	 which would create a new lock dependency:
+>>> 	  (target_list_lock){....}-{2:2} -> (_xmit_ETHER#2){+.-.}-{2:2}
 >>>
->>> With application thread + net rx softirq pinned to _different_ cores:
->>>
->>> epoll
->>> 82.2 Gbps
->>>
->>> io_uring
->>> 116.2 Gbps (+41%)
->>>
->>> Pinned to _same_ core:
->>>
->>> epoll
->>> 62.6 Gbps
->>>
->>> io_uring
->>> 80.9 Gbps (+29%)
->>
->> I'll review the io_uring bits in detail, but I did take a quick look and
->> overall it looks really nice.
->>
->> I decided to give this a spin, as I noticed that Broadcom now has a
->> 230.x firmware release out that supports this. Hence no dependencies on
->> that anymore, outside of some pain getting the fw updated. Here are my
->> test setup details:
->>
->> Receiver:
->> AMD EPYC 9754 (recei
->> Broadcom P2100G
->> -git + this series + the bnxt series referenced
->>
->> Sender:
->> Intel(R) Xeon(R) Platinum 8458P
->> Broadcom P2100G
->> -git
->>
->> Test:
->> kperf with David's patches to support io_uring zc. Eg single flow TCP,
->> just testing bandwidth. A single cpu/thread being used on both the
->> receiver and sender side.
->>
->> non-zc
->> 60.9 Gbps
->>
->> io_uring + zc
->> 97.1 Gbps
+>>> 	but this new dependency connects a HARDIRQ-irq-safe lock:
+>>> 	  (console_owner){-...}-{0:0}
 > 
-> so line rate? Did you look at whether there is cpu to spare? meaning it
-> will report higher speeds with a 200G setup?
+> ...
+> 
+>>> 	to a HARDIRQ-irq-unsafe lock:
+>>> 	  (_xmit_ETHER#2){+.-.}-{2:2}
+> 
+> ...
+> 
+>>> 	other info that might help us debug this:
+>>>
+>>> 	 Chain exists of:
+>>> 	console_owner --> target_list_lock --> _xmit_ETHER#2
+>>>
+>>> 	  Possible interrupt unsafe locking scenario:
+>>>
+>>> 		CPU0                    CPU1
+>>> 		----                    ----
+>>> 	   lock(_xmit_ETHER#2);
+>>> 					local_irq_disable();
+>>> 					lock(console_owner);
+>>> 					lock(target_list_lock);
+>>> 	   <Interrupt>
+>>> 	     lock(console_owner);
+> 
+> I can trigger this lockdep splat on v6.11 as well.
+> 
+> It only requires a printk() call within any interrupt handler, sometime
+> after the netconsole is initialized and has had at least one run from
+> softirq context.
+> 
+>> My understanding is that the fix is to always take "_xmit_ETHER#2"
+>> lock with interrupts disabled.
+> 
+> That seems to be one possible solution. But maybe there is reasoning why
+> that should not be done. (??) Right now it is clearly a spinlock that is
 
-Yep basically line rate, I get 97-98Gbps. I originally used a slower box
-as the sender, but then you're capped on the non-zc sender being too
-slow. The intel box does better, but it's still basically maxing out the
-sender at this point. So yeah, with a faster (or more efficient sender),
-I have no doubts this will go much higher per thread, if the link bw was
-there. When I looked at CPU usage for the receiver, the thread itself is
-using ~30% CPU. And then there's some softirq/irq time outside of that,
-but that should ammortize with higher bps rates too I'd expect.
+It's expensive, and it's a hot path if I understand correctly which
+lock that is. And, IIRC the driver might spend there some time, it's
+always nicer to keep irqs enabled if possible.
 
-My nic does have 2 100G ports, so might warrant a bit more testing...
+> being taken from both interrupt and softirq contexts and does not
+> disable interrupts.
+
+It rather seems the xmit lock is bh protected, but printk is a one
+off case taking it with irqs disabled. I wonder if the printk side
+could help with that, e.g. offloading sending from hardirq to softirq?
+
+> I will check if there is some previous kernel release where this problem
+> does not exist.
 
 -- 
-Jens Axboe
+Pavel Begunkov
 
