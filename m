@@ -1,123 +1,138 @@
-Return-Path: <netdev+bounces-133727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C61C5996CD6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:55:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C951996CDC
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:55:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA702820C4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:55:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE3261F23C98
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CF0199920;
-	Wed,  9 Oct 2024 13:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C2F199949;
+	Wed,  9 Oct 2024 13:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oCG8j05w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hplsf10h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7E71993AE
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA22188722;
+	Wed,  9 Oct 2024 13:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728482113; cv=none; b=uUeXtsUunmEluxRBUlCI8YfTM9DihUQw6BYgGT2j2wtaA53fqzhKcvL8v2MNBKH+jowpvQSP3knoPqg83pWca9Y8rNUGbLRI/9Y9juQN5nCOcjQxQzvlf4CuR93/m8XOh9ez4h1i6gs2znCV/5pgZmT1Eex0R15OFpUOaJi8g+c=
+	t=1728482150; cv=none; b=RWavoVqNuZt6GFoIRkSmOUTkKyJSheH59nvrQxZ4PEkNqhXR3XZ5MwaVIbkWkO+Tb9nVVHO0FHjPdB8W1f9uDLdi3YJ9Jeacrylw10p+4zMuyBh0lEkBFp5noSdbjQqqUS1vaV5mb3SFvgpVd0NS2rXW8lqQzO0vDVnMTPlXrSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728482113; c=relaxed/simple;
-	bh=k7DdMpwjWrSVnF70efu9Nz576OUVbA8sKqdX/14wnt0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u4w7f8nUHiuRuavD598zpL1dOTSFYAkYqB3zD+ANgAJkPAPeuuEFye9/7XslO4pm6XO0heBmBhAfveWENrZTdS0XLftoiKbS+MRMfFTtAB0OMTQtLxWkiDt/+ydo3gduj/Ktrs4Nwfh9QY2rKBWzrYyswveLXiCSGmHRj6n1huE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oCG8j05w; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c46c2bf490so3911481a12.3
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 06:55:11 -0700 (PDT)
+	s=arc-20240116; t=1728482150; c=relaxed/simple;
+	bh=ZmiVMK6ztxb9hHv41yV8uT13LIdkutdZjhOKK9Mbmuc=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=EdVGXtj/VNPtM1N5YQnVB2bnOR35f6kqx+PXn3o2Ili7rgnpyDibv/d4LKUdEmeIc8SAlzEasBLDrbzYgfFT9trMTeE6zKDUjC1xRq0xR+ZZrtEqbckp7C1N3xuAi4iaxpbB+GHJo1+rdivlt77r3EZPlqIztSB9O+hGykmWfLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hplsf10h; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbcd8ce5f9so4127056d6.2;
+        Wed, 09 Oct 2024 06:55:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728482110; x=1729086910; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1728482148; x=1729086948; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SZu/+gdB6bHOpVTSHgDrGd7M0vlZH+wWHXs8Fc7Ognc=;
-        b=oCG8j05wTvCRp6vvzQmviTE+7OxKi2R33pYXFANxx/MoQpPtxXbadjuFE3LAlxp5UX
-         AbFmeoLKcmiWcsl0UW/E64zZH3r9oVdxKbWKpBH04Lc+IPRCj/wozgCxdMxo9o/3hrse
-         J2vzv8LLWzdP0Mivo24woY9fql9xSSl8SZpi+uKx3CKvc+9ySyjwKQ0rP6yEkSd38Mt0
-         hgSFLNYwdZ/ihhUrJSTcPWG5fbCIxFx++eH5GN2h40VDP0BEt9iwBM5w8NevAFrDWN9c
-         RZFHgK0t+g65896P1/tcnREi+LaIqdatwjAM7CtJdt2RWt2ZZ/iI9P97C6LDAcNdUCPQ
-         LW4g==
+        bh=HXe51mvGhfEwWJHFEltEwZF8MBYYvVcNp5ZwNgaG/kc=;
+        b=Hplsf10hNReBNiL9nNMsdSSbu37f2NdveDbR5302vVXhqrZjmXgzTM5OB3qE0agnHm
+         N4mQ5mXNTMiSOYEv3O4yYQCqIiApCiPeAVRHDY4SNovOcRBUfZee05bobXPMOBl36+Hu
+         FbE4Y0EUMfsXQdtWJnRcadPOW8ldTIv4N5l9pzIHy6x5zif974bkgdN96knsn7NmevV0
+         wj1hCKnaT4u/LdSdsAcrZc98D5Cm+NSFyKJVhbjBUcsaA+qa0MIPgEHzvpircJrgi604
+         zXMvkOD10l386djhHPm68Ezdrq1c6PuGWC+tkxAs2GQ9Ze6h7rqBzES9h+RrmLXWI3aZ
+         2HIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728482110; x=1729086910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1728482148; x=1729086948;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SZu/+gdB6bHOpVTSHgDrGd7M0vlZH+wWHXs8Fc7Ognc=;
-        b=k0py7Xer7BvDIncMXvaqnKADJSl844ivzoXS+3qLLeYOyUtkz7cv+oIIWZWj/BI07k
-         TX1+26ocG/PGl5B8RaBlmnq5Tae6fDF+H9nibjKmWZeAkN7zWUX9fy7fAN0p4bstAtzF
-         iKYQs2VOL6vlAdF5GHmj0MrleH1UpezkyjqDXMrSioeyU2+a+ZEGrEWcZmax++UjKce3
-         lo8ObuwIyh20GkyItfQ3a/JumNep3HAbGPO1ocHZ8jAxVKgvLXXMzKjgP6n5UUbK/6dt
-         O6HdukR/ugjp+r200CTHgAic5oWQW1mUNfcU9ZNZXKQ7gsKdlabKnwoFurxXxUeD5+ju
-         ZYrw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5DQ4T9EgYGuqpoiGWXpbYuCJWiPKBJ4xI8V24lMD9r/q0dPREE3LEA3l6U0UL1wmtxjhg/Uo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzkB/iHK4NHcpacIQYNTSUcg+ZERwWeV/VvLDDyBbm0NkNVfeh
-	YaXgX5ct3LphuPijeAG+lfz2KJ29tGwyol2IeiMjZgX11Zl3zOXTsFDMyiVM+/BSj6va/XAFPjr
-	WVYvTQgUEb170po+UABgIGk/qalykikTsVhT4
-X-Google-Smtp-Source: AGHT+IEtAzSUDyXHbQ3P6oqVQMFsthgaasp7xwpxPc8RphUDDeGCLQ4wnkjhhmtyLiaqxF2Wb39RmFXqv580ZGOJAew=
-X-Received: by 2002:a50:8dc7:0:b0:5c9:1b62:48f4 with SMTP id
- 4fb4d7f45d1cf-5c91d58cedamr2219054a12.15.1728482109811; Wed, 09 Oct 2024
- 06:55:09 -0700 (PDT)
+        bh=HXe51mvGhfEwWJHFEltEwZF8MBYYvVcNp5ZwNgaG/kc=;
+        b=cjrv3nLOAUvTJUeZBIgJ75E5DlDPTpz0H7xR7w7FlGj8edR2iL88dhLkSoLiyu6Ji8
+         rNR47wS2wgbXp8l2l9ReC/AxH5DNdMJbUkKlU57bVkLAFDitZ3G3p0Fk8Irdn4jxj4Te
+         fdVnfga20dQc1+Uqiwq9R45wex9NtzOw3iTkKsWDomED3fFzmgxa+wGt3XnGhrbbKUVD
+         NplBqkP+V1rRWu7G1b8YWlY5rMoZbDmc9CdGHAYMUp/3fTVixZ24sjwI7qOfvTqoG/6A
+         rqTitA6kUsjNN/g9uG1fyy6y8IG3RtQVQX5P2de306+4Mcg1Z2TkWnmcPvo8XsTlYYFz
+         Z5Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbTdG4FJs8twCuLi0QJZ/bm7k+9DQRl5VaZNxfzOBw7Jg4n8aJf/CkWhQAb9qTld68i2qoNSC4Dme4fLVwKOGP@vger.kernel.org, AJvYcCVAxWwygYNLVLjpVQ4z8yaHts5Ml/uYCSYs+kO88Tb65N/pKZdBsFz+GZeOzpwVyHwQ0wA=@vger.kernel.org, AJvYcCWjQhqI2VfRgPQe6gR2zYzt5xDbDvhpAvGW88SbX/oA775gXrCMq/gCsAEAxHLLCTGRSnGvezdgM15y@vger.kernel.org, AJvYcCWkw8m7iqDIZSJP3xz3FuGevex0YhiiiqDyhbyvLc+0Bybwl75FYkl7y0FDXuAgt/u/r6rrli894Kzu7Dw3@vger.kernel.org, AJvYcCWzZVVd1p6vX05ASLFT6Xv4kmAr5FWFIGVZCSdcbNAwFdnYaAvtt5CG+w5fbaM6utZlVkJGxEAO@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzdbq6JQ4945WM9IX4YY08N5HYE1KqOwxogDhILafW5i3U/kXn4
+	N0UqgVK4WaJJ9Kopxj6pw6+PbZDjXNPcCrqu/dseq1EjpZdvDJ/q
+X-Google-Smtp-Source: AGHT+IHmYx3bfmg/RlYhB/KBBRbGOAep6vvua+Aei8GWXcm7XpACan6FRH/ojiSHoStLQfx//viWDw==
+X-Received: by 2002:a05:6214:2b86:b0:6cb:22ea:5e07 with SMTP id 6a1803df08f44-6cbc943269amr41560246d6.30.1728482147816;
+        Wed, 09 Oct 2024 06:55:47 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cba4760436sm46098496d6.124.2024.10.09.06.55.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 06:55:47 -0700 (PDT)
+Date: Wed, 09 Oct 2024 09:55:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-ID: <67068b632d2d2_1cca3129484@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241008-rss-v5-4-f3cf68df005d@daynix.com>
+References: <20241008-rss-v5-0-f3cf68df005d@daynix.com>
+ <20241008-rss-v5-4-f3cf68df005d@daynix.com>
+Subject: Re: [PATCH RFC v5 04/10] tun: Unify vnet implementation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20241008163205.3939629-1-leitao@debian.org> <cea1458c-6445-45d0-bfa1-3c093384cc90@kernel.org>
-In-Reply-To: <cea1458c-6445-45d0-bfa1-3c093384cc90@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 9 Oct 2024 15:54:56 +0200
-Message-ID: <CANn89iLH=Y0GuZz3b2p5d7MtEcPFt62+Z4LBbdiRDtE157ER1w@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: Remove likely from l3mdev_master_ifindex_by_index
-To: David Ahern <dsahern@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kernel-team@meta.com, 
-	"open list:L3MDEV" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 8, 2024 at 8:25=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
->
-> On 10/8/24 10:32 AM, Breno Leitao wrote:
-> > The likely() annotation in l3mdev_master_ifindex_by_index() has been
-> > found to be incorrect 100% of the time in real-world workloads (e.g.,
-> > web servers).
-> >
-> > Annotated branches shows the following in these servers:
-> >
-> >       correct incorrect  %        Function                  File       =
-       Line
-> >             0 169053813 100 l3mdev_master_ifindex_by_index l3mdev.h    =
-         81
-> >
-> > This is happening because l3mdev_master_ifindex_by_index() is called
-> > from __inet_check_established(), which calls
-> > l3mdev_master_ifindex_by_index() passing the socked bounded interface.
-> >
-> >       l3mdev_master_ifindex_by_index(net, sk->sk_bound_dev_if);
-> >
-> > Since most sockets are not going to be bound to a network device,
-> > the likely() is giving the wrong assumption.
-> >
-> > Remove the likely() annotation to ensure more accurate branch
-> > prediction.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  include/net/l3mdev.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
->
-> Reviewed-by: David Ahern <dsahern@kernel.org>
+Akihiko Odaki wrote:
+> Both tun and tap exposes the same set of virtio-net-related features.
+> Unify their implementations to ease future changes.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  MAINTAINERS            |   1 +
+>  drivers/net/tap.c      | 172 ++++++----------------------------------
+>  drivers/net/tun.c      | 208 ++++++++-----------------------------------------
+>  drivers/net/tun_vnet.h | 181 ++++++++++++++++++++++++++++++++++++++++++
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Same point: should not be in a header.
+
+Also: I've looked into deduplicating code between the various tun, tap
+and packet socket code as well.
+
+In general it's a good idea. The main counter arguments is that such a
+break in continuity also breaks backporting fixes to stable. So the
+benefit must outweight that cost.
+
+In this case, the benefits in terms of LoC are rather modest. Not sure
+it's worth it.
+
+Even more importantly: are the two code paths that you deduplicate
+exactly identical? Often in the past the two subtly diverged over
+time, e.g., due to new features added only to one of the two.
+
+If so, call out any behavioral changes to either as a result of
+deduplicating explicitly.
 
