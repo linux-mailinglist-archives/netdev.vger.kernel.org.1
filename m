@@ -1,111 +1,152 @@
-Return-Path: <netdev+bounces-133694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83783996B5F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:08:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C34996B6F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:13:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FE7CB21A85
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1841B2832E9
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97064191489;
-	Wed,  9 Oct 2024 13:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6Ev8wWy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3108192B70;
+	Wed,  9 Oct 2024 13:13:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30A21E4AE
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C94022EEF
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728479292; cv=none; b=Gg3H2QWSfunnfPJ+q6ryUhOQjc+qYRYazt8wd6pWcVsKksJBDirFW56j6OtCvPV54W282EZDXJED4j2Vpnv3EzYpp3W7t16HYhh8Ye3ORdEldAOIRwqp8I/S1zyU9+bg4KPo946GIjEb2t28Rv8ubdjJFK2bEY/BzUtlNgu9Pio=
+	t=1728479607; cv=none; b=sKJLTFfcI/bTmxs3wanc3ocurVTC+ZJt8KSC214w8exFohnVuRnaiUvGMtTcJ9SeYqBk3ZU3VvG03wO1thCluT7eCBwBQOWGMk86mNzEwp7P1iA2SpmQlBBFrDfE5ZVE+hD8sM72r58OJzw4ExUKt1BEpCmXiBQQAUrvmfOmVMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728479292; c=relaxed/simple;
-	bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Bx4I2vuAsmNYeTLVobVQMZ7g5e82COagxSVC4ZxkrEicx6IfNbkcgi/A8YC5BkGly3hcc+q5TIJYthOZ59PbGUqg12rf07Ade3JpLz5RpIEHzLqh4Z+Di9OMFJLLiAEVnrYW2wvAtMwXgXh/MjrCVNC0toevEjWP45vyN3sB7cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6Ev8wWy; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so1730451a12.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 06:08:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728479289; x=1729084089; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
-        b=i6Ev8wWyrJJ0Yl0c1tbvd5CmJHJjJWPTrfBJb1pGNFjIepCCc7/a8hDS7cnDANcLP4
-         HfExdkHtbZOImNku/VdHtl70314hhzYL/2FOeiUswb/7LNWofZ0Zes7g3YGn6CkvGKwo
-         auzUAv6CswEdvouXHjR+60F7cUH06Rri5UWzKLJKu8IrzhtQFRB3WVWueJt666buz9Bm
-         t/paGayUYqTD6Uxc9Zvl7dEOKqxa94w2UxrKno7377DrMNYdEL0QK1gBSXIiDMZ6bGED
-         48fq921UWwAcnDG9+8u7WjgfKj+Hcn1GKAwE4CyGlkyAr7sdUVNzjAPkC73xm30zCYou
-         i9BA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728479289; x=1729084089;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
-        b=I24HrYUZDU5ZxRJYzAc+ud27CMQSlTI3k3DRnUOrNcMKBMbQBzQoVieSiGHPhbH/Cr
-         KJ0oLYYa6skKKjVLn7i1Ddg0c8ukfj+RA5V9YayrMcFzG1El166cEO4TtqF3qwI2iKdD
-         gihxDXx3iCr8tO1j4bdoeiDvqekGb1Lq89BErH+ZC+AFCUUYWMLyac+QR3ejWH3e4MM2
-         CKGbZ4oH7s6U5kSkN+N6QusJn6WYqvPO2qKLm2GQTYm79Sqnuq/8orxOis2wOR7VjnLf
-         byWAZPyMcqLhcqnp0MzRs0x1wS1b/m171ueE+ziozdMC71KF4lGKUVm3fy+qd421B3Sn
-         r5Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxub4xTw+8U4p8Q3DWsnEg1SXenPbQ167IYjhusBptK9emdEKYB1wiM3YSepD+IJ4J6z6Q8Sk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxciGOQuF9MonL5q+6tA9pkuvGoTW17pVKPiB67AceOxhUaJRnn
-	Hq2YaMqlBgYASND0SpG1eeQDKntpWMXJzsw5hL2fpc0z0n2+KkI48X3fkNT62S64oBMY2EU08po
-	Ws/QiuAiMc+PqnW1FEejxEmUCejrp4irEDyQM
-X-Google-Smtp-Source: AGHT+IFwK3xKFaDSSCvmmCWjZJRLZHvuDOCWYPKnAPbZzhaE0XDUbBsW+cRSZvarCC5CcONpOhTI9Gbt8lX1yJczGgs=
-X-Received: by 2002:a05:6402:26cd:b0:5c5:c444:4e3a with SMTP id
- 4fb4d7f45d1cf-5c91ce41ba7mr2845945a12.0.1728479288868; Wed, 09 Oct 2024
- 06:08:08 -0700 (PDT)
+	s=arc-20240116; t=1728479607; c=relaxed/simple;
+	bh=NQUyS3dmETQuC3MXADOj5mnivYwyMk0ZbjZP3QZeNhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=U5a8DTZ6Ob8rkajGD0JPdJ6/fH7FIR1qWGBTq6W2crlC2GZH0pGuO/inNpv4KpxFhkZLzIq6nY3i8X+V8ufdqkkXG1Q6lAdY6bobRjCC8tIErQx/8TZ+nMUmriPM1qNTG0xqB4NL4tte0udY4y7tGUt029dB0ihJGhluCyExRnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3335A61E5FE05;
+	Wed,  9 Oct 2024 15:12:59 +0200 (CEST)
+Message-ID: <3a5591f9-a8fe-4557-b6c4-ea393dd28913@molgen.mpg.de>
+Date: Wed, 9 Oct 2024 15:12:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1728456916-67035-1-git-send-email-alibuda@linux.alibaba.com>
-In-Reply-To: <1728456916-67035-1-git-send-email-alibuda@linux.alibaba.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 9 Oct 2024 15:07:54 +0200
-Message-ID: <CANn89iLHwsKVQo_aVwVQAt3fpZ2E3SL3eM2-v+RacwbOdUqePg@mail.gmail.com>
-Subject: Re: [PATCH net] net/smc: fix lacks of icsk_syn_mss with IPPROTO_SMC
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
-	wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org, 
-	davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: Fix use after free during
+ unload with ports in bridge
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+References: <20241009124912.9774-2-marcin.szycik@linux.intel.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20241009124912.9774-2-marcin.szycik@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 9, 2024 at 8:55=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com>=
- wrote:
->
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
->
-> Eric report a panic on IPPROTO_SMC, and give the facts
-> that when INET_PROTOSW_ICSK was set, icsk->icsk_sync_mss must be set too.
->
->
+Dear Marcin,
 
-> This patch add a toy implementation that performs a simple return to
-> prevent such panic. This is because MSS can be set in sock_create_kern
-> or smc_setsockopt, similar to how it's done in AF_SMC. However, for
-> AF_SMC, there is currently no way to synchronize MSS within
-> __sys_connect_file. This toy implementation lays the groundwork for us
-> to support such feature for IPPROTO_SMC in the future.
->
-> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+
+Thank you for the patch, and the reproducer and detailed commit message.
+
+Am 09.10.24 um 14:49 schrieb Marcin Szycik:
+> Unloading the ice driver while switchdev port representors are added to
+> a bridge can lead to kernel panic. Reproducer:
+> 
+>    modprobe ice
+> 
+>    devlink dev eswitch set $PF1_PCI mode switchdev
+> 
+>    ip link add $BR type bridge
+>    ip link set $BR up
+> 
+>    echo 2 > /sys/class/net/$PF1/device/sriov_numvfs
+>    sleep 2
+> 
+>    ip link set $PF1 master $BR
+>    ip link set $VF1_PR master $BR
+>    ip link set $VF2_PR master $BR
+>    ip link set $PF1 up
+>    ip link set $VF1_PR up
+>    ip link set $VF2_PR up
+>    ip link set $VF1 up
+> 
+>    rmmod irdma ice
+
+For people hitting the issue, an excerpt from the panic would also be 
+nice, so it can be found more easily.
+
+> When unloading the driver, ice_eswitch_detach() is eventually called as
+> part of VF freeing. First, it removes a port representor from xarray,
+> then unregister_netdev() is called (via repr->ops.rem()), finally
+> representor is deallocated. The problem comes from the bridge doing its
+> own deinit at the same time. unregister_netdev() triggers a notifier
+> chain, resulting in ice_eswitch_br_port_deinit() being called. It should
+> set repr->br_port = NULL, but this does not happen since repr has
+> already been removed from xarray and is not found. Regardless, it
+> finishes up deallocating br_port. At this point, repr is still not freed
+> and an fdb event can happen, in which ice_eswitch_br_fdb_event_work()
+> takes repr->br_port and tries to use it, which causes a panic (use after
+> free).
+> 
+> Note that this only happens with 2 or more port representors added to
+> the bridge, since with only one representor port, the bridge deinit is
+> slightly different (ice_eswitch_br_port_deinit() is called via
+> ice_eswitch_br_ports_flush(), not ice_eswitch_br_port_unlink()).
+> 
+> A workaround is available: brctl setageing $BR 0, which stops the bridge
+> from adding fdb entries altogether.
+> 
+> Change the order of operations in ice_eswitch_detach(): move the call to
+> unregister_netdev() before removing repr from xarray. This way
+> repr->br_port will be correctly set to NULL in
+> ice_eswitch_br_port_deinit(), preventing a panic.
+> 
+> Fixes: fff292b47ac1 ("ice: add VF representors one by one")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 > ---
+>   drivers/net/ethernet/intel/ice/ice_eswitch.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> index c0b3e70a7ea3..fb527434b58b 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+> @@ -552,13 +552,14 @@ int ice_eswitch_attach_sf(struct ice_pf *pf, struct ice_dynamic_port *sf)
+>   static void ice_eswitch_detach(struct ice_pf *pf, struct ice_repr *repr)
+>   {
+>   	ice_eswitch_stop_reprs(pf);
+> +	repr->ops.rem(repr);
+> +
+>   	xa_erase(&pf->eswitch.reprs, repr->id);
+>   
+>   	if (xa_empty(&pf->eswitch.reprs))
+>   		ice_eswitch_disable_switchdev(pf);
+>   
+>   	ice_eswitch_release_repr(pf, repr);
+> -	repr->ops.rem(repr);
+>   	ice_repr_destroy(repr);
+>   
+>   	if (xa_empty(&pf->eswitch.reprs)) {
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
