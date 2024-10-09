@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-133409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C08995D71
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 03:53:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B69E6995D76
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 03:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC69A1F2442D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:53:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E5C51F25BC2
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524C639FD9;
-	Wed,  9 Oct 2024 01:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F117D1E49F;
+	Wed,  9 Oct 2024 01:54:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBF8383;
-	Wed,  9 Oct 2024 01:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614CD4084D;
+	Wed,  9 Oct 2024 01:54:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728438791; cv=none; b=TI3aHNYspTPmeVUYq3djoDzLd3w89YgIZ7YU+jB0tKjSXgfHOlb/QhBZbMJ5OBJ6qf+7PAxIFKtjDOqf6tQwWZpA9YV282mSZSe+Pd6H/Oaar7G/TBQ8Hj8ycbPsPfmsvPKSUzVVxHfMjKVGOJtRPdaMRu4nHg6YbprAEbsQyKk=
+	t=1728438891; cv=none; b=oUVa4TFERWTAPgLXPgfXdGCc34ngLCqirbHPLf2M4nbKS+JwxPsvVta54jOIgrd1a4Qj65rdYeLdAUyZUYZndPFUjVWHf1AK9Ce5N/UxfSpoX+C6AcSuIREY9aQmoWNm8HryRxshT24xsfJ/K8PRVT4RqNtjtpfz2aTdcfwj36M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728438791; c=relaxed/simple;
-	bh=rzONIBT2xHW7ECDdWtokFD/Xfd59nQLmQrZC7TpWLAc=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qeML9XmWzXYgZ2W/WO0OsJdMhuNaClMbGZiL9nXDbpzBGWMxhSM2t4OQN/QmMfI0FAY6SXAO/MJ4X8FAcAXwd8VCP7dEa3VljEyeRKDkceQapE10oyc84I9pg9idukDU9xLVJ/cxswjZjR/S1OtgeZh5kBt3C9ef1bi6ivsgTlk=
+	s=arc-20240116; t=1728438891; c=relaxed/simple;
+	bh=3C8O1PAu44Cvvhh+q7cPn0mbyFC6tQ09mhZZ0xN7ga4=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TltUiRWI1KeRL7yoVhfmEju6Aw8WDK04gWIR9k9iTFNS6f0vBBj9P58dR6UE4D5P7uzIxwavH3/PDfeGWE1t5iVwG0xbqPXiB8a4tVwwQo3bES6kobhAU8X7LWHzvK+eBdLMqZTDlnZU0O2mlBIKYzffKTrShoVk+n9JxxzjXt4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1syLsw-000000003El-1eZh;
-	Wed, 09 Oct 2024 01:53:06 +0000
-Date: Wed, 9 Oct 2024 02:53:03 +0100
+	id 1syLuY-000000003HX-1Yqf;
+	Wed, 09 Oct 2024 01:54:46 +0000
+Date: Wed, 9 Oct 2024 02:54:43 +0100
 From: Daniel Golle <daniel@makrotopia.org>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
@@ -43,9 +43,10 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/3] net: phy: realtek: read duplex and gbit master
- from PHYSR register
-Message-ID: <66d82d3f04623e9c096e12c10ca51141c345ee84.1728438615.git.daniel@makrotopia.org>
+Subject: [PATCH net-next 2/3] net: phy: realtek: change order of calls in C22
+ read_status()
+Message-ID: <60787816b201fbdd093e0de31e2c5c780ea7678f.1728438615.git.daniel@makrotopia.org>
+References: <66d82d3f04623e9c096e12c10ca51141c345ee84.1728438615.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,114 +55,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <66d82d3f04623e9c096e12c10ca51141c345ee84.1728438615.git.daniel@makrotopia.org>
 
-The PHYSR MMD register is present and defined equally for all RTL82xx
-Ethernet PHYs.
-Read duplex and Gbit master bits from rtlgen_decode_speed() and rename
-it to rtlgen_decode_physr().
+Always call rtlgen_read_status() first, so genphy_read_status() which
+is called by it clears bits in case auto-negotiation has not completed.
+Also clear 10GBT link-partner advertisement bits in case auto-negotiation
+is disabled or has not completed.
 
+Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
- drivers/net/phy/realtek.c | 48 ++++++++++++++++++++++++++++++++-------
- 1 file changed, 40 insertions(+), 8 deletions(-)
+ drivers/net/phy/realtek.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index c15d2f66ef0d..717284a71667 100644
+index 717284a71667..895008738ec0 100644
 --- a/drivers/net/phy/realtek.c
 +++ b/drivers/net/phy/realtek.c
-@@ -80,15 +80,19 @@
+@@ -956,17 +956,25 @@ static void rtl822xb_update_interface(struct phy_device *phydev)
  
- #define RTL822X_VND2_GANLPAR				0xa414
- 
--#define RTL822X_VND2_PHYSR				0xa434
--
- #define RTL8366RB_POWER_SAVE			0x15
- #define RTL8366RB_POWER_SAVE_ON			BIT(12)
- 
- #define RTL9000A_GINMR				0x14
- #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
- 
--#define RTLGEN_SPEED_MASK			0x0630
-+#define RTL_VND2_PHYSR				0xa434
-+#define RTL_VND2_PHYSR_LINK			BIT(2)
-+#define RTL_VND2_PHYSR_DUPLEX			BIT(3)
-+#define RTL_VND2_PHYSR_SPEEDL			GENMASK(5, 4)
-+#define RTL_VND2_PHYSR_SPEEDH			GENMASK(10, 9)
-+#define RTL_VND2_PHYSR_MASTER			BIT(11)
-+#define RTL_VND2_PHYSR_SPEED_MASK		(RTL_VND2_PHYSR_SPEEDL | RTL_VND2_PHYSR_SPEEDH)
- 
- #define RTL_GENERIC_PHYID			0x001cc800
- #define RTL_8211FVD_PHYID			0x001cc878
-@@ -660,9 +664,24 @@ static int rtl8366rb_config_init(struct phy_device *phydev)
- }
- 
- /* get actual speed to cover the downshift case */
--static void rtlgen_decode_speed(struct phy_device *phydev, int val)
-+static void rtlgen_decode_physr(struct phy_device *phydev, int val)
+ static int rtl822x_read_status(struct phy_device *phydev)
  {
--	switch (val & RTLGEN_SPEED_MASK) {
-+	/* bit 2
-+	 * 0: Link not OK
-+	 * 1: Link OK
-+	 */
-+	phydev->link = !!(val & RTL_VND2_PHYSR_LINK);
-+
-+	/* bit 3
-+	 * 0: Half Duplex
-+	 * 1: Full Duplex
-+	 */
-+	if (val & RTL_VND2_PHYSR_DUPLEX)
-+		phydev->duplex = DUPLEX_FULL;
-+	else
-+		phydev->duplex = DUPLEX_HALF;
-+
-+	switch (val & RTL_VND2_PHYSR_SPEED_MASK) {
- 	case 0x0000:
- 		phydev->speed = SPEED_10;
- 		break;
-@@ -684,6 +703,19 @@ static void rtlgen_decode_speed(struct phy_device *phydev, int val)
- 	default:
- 		break;
+-	if (phydev->autoneg == AUTONEG_ENABLE) {
+-		int lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
++	int lpadv, ret;
+ 
+-		if (lpadv < 0)
+-			return lpadv;
++	ret = rtlgen_read_status(phydev);
++	if (ret < 0)
++		return ret;
+ 
+-		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising,
+-						  lpadv);
++	if (phydev->autoneg == AUTONEG_DISABLE ||
++	    !phydev->autoneg_complete) {
++		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
++		return 0;
  	}
+ 
+-	return rtlgen_read_status(phydev);
++	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
++	if (lpadv < 0)
++		return lpadv;
 +
-+	/* bit 11
-+	 * 0: Slave Mode
-+	 * 1: Master Mode
-+	 */
-+	if (phydev->speed >= 1000) {
-+		if (val & RTL_VND2_PHYSR_MASTER)
-+			phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
-+		else
-+			phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
-+	} else {
-+		phydev->master_slave_state = MASTER_SLAVE_STATE_UNSUPPORTED;
-+	}
++	mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, lpadv);
++
++	return 0;
  }
  
- static int rtlgen_read_status(struct phy_device *phydev)
-@@ -701,7 +733,7 @@ static int rtlgen_read_status(struct phy_device *phydev)
- 	if (val < 0)
- 		return val;
- 
--	rtlgen_decode_speed(phydev, val);
-+	rtlgen_decode_physr(phydev, val);
- 
- 	return 0;
- }
-@@ -1007,11 +1039,11 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
- 		return 0;
- 
- 	/* Read actual speed from vendor register. */
--	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_PHYSR);
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, RTL_VND2_PHYSR);
- 	if (val < 0)
- 		return val;
- 
--	rtlgen_decode_speed(phydev, val);
-+	rtlgen_decode_physr(phydev, val);
- 
- 	return 0;
- }
+ static int rtl822xb_read_status(struct phy_device *phydev)
 -- 
 2.47.0
 
