@@ -1,125 +1,111 @@
-Return-Path: <netdev+bounces-133510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E37C0996254
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC1399625C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 155C81C210FE
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 601D52822BB
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C7E188008;
-	Wed,  9 Oct 2024 08:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412AC185923;
+	Wed,  9 Oct 2024 08:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mID/6cel"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A782183CA7;
-	Wed,  9 Oct 2024 08:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6323178CC5;
+	Wed,  9 Oct 2024 08:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728462188; cv=none; b=sXbycmm/ox4k2TPvxpVafctT7w0V3YKd7OCgWGvO71Ooc9Htqr8CLnxaarUqUwJXwbTsbOljRew7zv8EhSliVfNPx/RpiLXYulvYzuRQfMyQDI2o4eF4jR/xadALl8Bxd16NsqQzHcs+X7FzkiyZnyRgrsIY4dv/1JQWXRab0Go=
+	t=1728462336; cv=none; b=fGxPACfSEnDr++x3lAMquO07/F/z29jGbHZ03CyvArek1HiTkBNybQ/X+1z2QeCDK3wYxZJFT2GFGns5s+uH/DTCUKG6+eHycigYsfa0hueAOwp169NBPlpkrESQVE6tQferRR9XPHSa8HBMbbB7LtVfYnTioqKJJ3vAIj44AH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728462188; c=relaxed/simple;
-	bh=OWWHz4CYp9wbQBeMK6ZGclMLjxPNjr3c9tu4Ka7VYL0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hBFNgnN0WwR+PFR3cbA0ltpChGfShr332W4viP3kyUxYv6olK7qKRYC/OLmCzOeUK+WOTREVxqUXM+OWUSLdRYv/VUe7kkz/q0CoKzabhwN0JFE2jE8A06hRJzbMzEMNQRikDQ+OxMHryNH8aZ5+VEIe1ID6M6oK92B4YEWLthQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9952ea05c5so463520866b.2;
-        Wed, 09 Oct 2024 01:23:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728462185; x=1729066985;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FQTACUhFeFr0g9FiP7m95mpmdKBO100vPkvIghW0C9A=;
-        b=YpAfNWkZ3NElCnrTFU48uwg92nXJeWDIp/D8997+cd+/9NLwWnO9/ZsqTFc6Drj7SX
-         WQ62VA/NyScXzwtx6p4HoS0qNYKxpqxUMhVsC4u/97N7HTxSVideV9lqYFgV0R9RERqV
-         kRsivbWWL5PKcGg3fJ3VKc6uMc06zQ1RTgHiT6ucW3LueLbVQOJfgn2AfCTa0as4XEnX
-         hVWFz4ku6xaA+KbQSfLlTxnZRVMmwSdqpnNSx+odSw8UWWdyCQFE1bqa3rNnZd04tDuD
-         2cI/1iMIRWKhebt4CciItL8seIKSDTIWMVPJhMrjSxDsDgVOl0CAtvB8+OVkdm5NMDnH
-         N1iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlRPwQEODmz9boH/ImomqjFqWPoxYuinN3LQgvA0rPJz7wZNsUxg+f5WfMh1e5Z1wu/2TYDarC25Vd+QQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ8IXDeJTvqOnxqVAsKxwO9vjNH1geVfXsvNbBUx9y52R9XD4B
-	KmlqUXB1J+H1i5PbwE9QC/kxVd2IhxHeMnEM5O5uZyLJsG4oRzzY
-X-Google-Smtp-Source: AGHT+IHPiv3gAPsHrEJebDtaMKefHj3kMSI9yPHBKQpQBb980qL/DVK37VNaKHJcNKW1JAHj8HCSRg==
-X-Received: by 2002:a17:907:2da3:b0:a8c:78a5:8fb7 with SMTP id a640c23a62f3a-a998d314e4dmr134343166b.45.1728462185169;
-        Wed, 09 Oct 2024 01:23:05 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a994a1464a1sm474369366b.106.2024.10.09.01.23.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 01:23:04 -0700 (PDT)
-Date: Wed, 9 Oct 2024 01:23:02 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	David Gibson <david@gibson.dropbear.id.au>,
-	Jeff Garzik <jeff@garzik.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCHv2 net] net: ibm: emac: mal: add dcr_unmap to _remove
-Message-ID: <20241009-precise-wasp-from-ganymede-defeeb@leitao>
-References: <20241008233050.9422-1-rosenp@gmail.com>
+	s=arc-20240116; t=1728462336; c=relaxed/simple;
+	bh=UxNnh2WzJ8CLTLei4znEPmYJnr+OQynZNUK60qagLRw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qgM3pYzomtNBeNYAfVUsi9023f7WsNBCtenLNgcxB7yix94xUuWdDPyjxWKC/BDmgBWqJWSz0JbsfnPjHOQXEBFN/59RGtmUTFFq3rVe1YE39Kv6MJheJ2Z2sYnW/jj/wpxkrtV6+JpOTqsbseNP3tLH35mqHs3+Dza/DXmlI+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mID/6cel; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0711E20004;
+	Wed,  9 Oct 2024 08:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1728462331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SZHV98coS7hPa6Orw7gMJo2fGrkTDHuf4Kv65CNkK/Y=;
+	b=mID/6celJW3fnQf3g20HfFs4LLTrKAspxVdfjHEQRInXes6a03Dkj5a+piX2QNWiPJiy+E
+	Y5NxGeDoF3kPKZsGxb+NMNnMI51lrdNnZeJ44aqdMysqcam2ULIrbP+jLbF1Wfj3G8yfGH
+	OWLz1xuV+vSR4QXgqT4wU2+xfJUea5W3SSjy0IOqcPgZfu1k3CP1oe0MjDb5ziGFMj2Hnz
+	gi/NGOs5PILuacyHdRfOX06lYNTN7WFVfQDPp1u0SIVPfmMpL0Z8DdIiXSngSLaqbSn5as
+	YaXbqOqRuxzjxF8enim2PT7ms2d7dVbN6YZ3QPvlARvgeGiHa5N2x1WYFsZ8TA==
+Date: Wed, 9 Oct 2024 10:25:26 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
+ <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
+ Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de
+Subject: Re: [PATCH net-next 12/12] net: pse-pd: tps23881: Add support for
+ PSE events and interrupts
+Message-ID: <20241009102526.0db933f2@kmaincent-XPS-13-7390>
+In-Reply-To: <ZwYv1qunWpqhC9IH@pengutronix.de>
+References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
+	<20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
+	<ZwYv1qunWpqhC9IH@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008233050.9422-1-rosenp@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello Rosen,
+On Wed, 9 Oct 2024 09:25:10 +0200
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-On Tue, Oct 08, 2024 at 04:30:50PM -0700, Rosen Penev wrote:
-> It's done in probe so it should be done here.
-> 
-> Fixes: 1d3bb996 ("Device tree aware EMAC driver")
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  v2: Rebase and add proper fixes line.
->  drivers/net/ethernet/ibm/emac/mal.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ibm/emac/mal.c b/drivers/net/ethernet/ibm/emac/mal.c
-> index a93423035325..c634534710d9 100644
-> --- a/drivers/net/ethernet/ibm/emac/mal.c
-> +++ b/drivers/net/ethernet/ibm/emac/mal.c
-> @@ -742,6 +742,8 @@ static void mal_remove(struct platform_device *ofdev)
->  
->  	free_netdev(mal->dummy_dev);
->  
-> +	dcr_unmap(mal->dcr_host, 0x100);
-> +
->  	dma_free_coherent(&ofdev->dev,
->  			  sizeof(struct mal_descriptor) *
->  			  (NUM_TX_BUFF * mal->num_tx_chans +
+> > +
+> > +	if (val & (TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_IFAULT << 8)) {
+> > +		ret =3D i2c_smbus_read_word_data(client, TPS23881_REG_FAULT);
+> > +		if (ret < 0)
+> > +			return PSE_FAILED_RETRY;
+> > +
+> > +		val =3D (u16)(ret & 0xf0f);
+> > +
+> > +		/* Power cut detected, shutdown low priority port */
+> > +		if (val && priv->oss)
+> > +			tps23881_turn_off_low_prio(priv); =20
+>=20
+> Sorry, this is policy and even not the best one.
+> The priority concept is related to the power budget, but this
+> implementation will shutdown all low prios ports only if some
+> port/channel has over-current event. It means, in case high prio port
+> has over-current event, it will be not shut down.
+> =20
+> I'll propose not to add prio support for this chip right now, it will
+> need more software infrastructure to handle it nearly in similar way as
+> it is done by pd692x0.
 
-The fix per see seems correct, but, there are a few things you might
-want to improve:
+Yes, I have expected some debate around this support.
+I was not sure of the policy while developing it.
+Ok, let's remove it for now.
 
-1) Fixes: format
-Your "Fixes:" line does not follow the expected format, as detected by
-checkpatch. you might want something as:
-
-	Fixes: 1d3bb996481e ("Device tree aware EMAC driver")
-
-
-2) The description can be improved. For instance, you say it is done in
-probe but not in remove. Why should it be done in remove instead of
-removed from probe()? That would help me to review it better, instead of
-going into the code and figure it out.
-
-Once you have fixed it, feel free to add:
-
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
