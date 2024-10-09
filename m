@@ -1,131 +1,108 @@
-Return-Path: <netdev+bounces-133906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF9E997711
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:57:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4738997721
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:00:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6614E1F21CE8
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:57:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5490DB23CA1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF01B1E32DF;
-	Wed,  9 Oct 2024 20:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7361E1A13;
+	Wed,  9 Oct 2024 21:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oJEUBz/5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xXQDrUBl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F164340849
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 20:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4430C188CDC
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728507411; cv=none; b=HTn2At9Zkv/gROFIWRVUSu1wSiMZyPZSTRQhL6+AGC+kSJ6lhTxCbzIPoaR3rKNRrC/EZXIgmKJNvu9tBoN/M6cfQAoGMevO+EInC7J0+n6n3KXyA5Vesxg4AHOGSLL14qihX5sQsbVEAIwyr5HIidX3D4NJi7NYAG4yZ3Ivg3o=
+	t=1728507648; cv=none; b=pND0Xc09iBVLrUOKO4DNyviKtin0s8QDQ2X6TzAa4Y/OpmX8OnuVnre+whKF9oGUwrUQ5V0fACv+6HIW/LeRkOj5RoVfvLulX35KtC4AqwPY4ePvZzXFK5GBySC0RLdrbz8p3yEVBmiSU3wS/aDc5hgk7XGxDm/kbH9XoeRPGzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728507411; c=relaxed/simple;
-	bh=Dxarsn1U4GHc2gwi6pMoZFV3rL7A/nPYDOpDpzibF3g=;
+	s=arc-20240116; t=1728507648; c=relaxed/simple;
+	bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KNhyL+DQNTGKgo+QmRTbOV38QEOqZcWw1u8NyNLeFioHjsFqkBZtx6xNUDDV5j/cxjPhVtaN6PLgmhDtvcP/8NfNzb7IJwrJsOGU8Jw8gwz4i4B/6lw3zCW8SfuCwBuQhvuG1yp74tbqh1CuXw2Ji1M6HKFe/IZvpzhW+GxLUcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oJEUBz/5; arc=none smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=WheT3G/M4lVIukQksROOdD8U1vsEmj4K+K0D+IMEvYDVeDGN7HkkWUquhRA43RGZz+srec8EEZujLOrFRTlmyiiwM+yVdy5FLn6a/vT3vo5tVFol8JTYBjCocxWFP/15YmqcEfOUlhDOXTSicjiZZwASKrIiPWx0jHlinT6lIV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xXQDrUBl; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-45fb0ebb1d0so28481cf.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 13:56:48 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9963e47b69so37642466b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 14:00:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728507408; x=1729112208; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728507645; x=1729112445; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UIWPVQ7a6qiEeFf03ned4m4WhXcJXhc8NgItOtvYSr8=;
-        b=oJEUBz/5YpM4L5TY/E1jrCYM31R73OaHevnRfRFyILD0T7jOdBXQtOfDX8IVa7aqHF
-         gP2JcWLBxCE+FX5aUW5gXq7NSGrzFQCXPgFx7pdg30mYZ+J1bwCW43B+sPP+YFV4acde
-         AsV4hDIRxm4U5T4ZC+hEj0ktZIhvgUPUdRLtiCqBydx9soatrYOPcohYT9Ke9OrQMOuy
-         SN26EkUWfUOGbEF+Vma5EfE/Zzpka605Ugv3hcAoJI1+m9cknyLcm4qez0M+/uO0nPID
-         BSdXjc+ykg0V6U4KeSSZ72YG/qVF9LzBZfm8Bb46lS02XwPhEO9krEUw/vGTS0rt2zAx
-         jgKA==
+        bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
+        b=xXQDrUBlNlEBM0ZXcZqCw5VsstnXL9Ewpd9tc2m8oKO/yj6Lrhu+hshudCg81/fJD+
+         5W3tjFPurUlUB5XNevMdtjmNdTeW+dRAxoTgJXRr2j4w6752dlWxAix5MVpkY1hTzJPc
+         tRu3ih3I4fR2e/rI7OGGwT+rfomoWMuh7OihaDm4v6y+8B8bGrJeKjWnbQgZVn93QHBK
+         G2hV3346/8hXbHLPTxpThrRbrBJxH/1A/OXxM3RfQ+uXvH4yW5poQlbPEKRUqh/w6LAi
+         lVTHexlYERXmonivSr7pQQ41NMdPJ99ye8ygGA3zOikoar6G0Liwq1RTuEXI85+w+h3N
+         Y8qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728507408; x=1729112208;
+        d=1e100.net; s=20230601; t=1728507645; x=1729112445;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UIWPVQ7a6qiEeFf03ned4m4WhXcJXhc8NgItOtvYSr8=;
-        b=GFdPOLC16PZmxTaZK8NrGcXDPgjzDL63x0cRKQzwxQ/KHqd1qslmO8jC7sWDnMY3RX
-         ZFsHypUuTbMfnMfW8DYlbP5O3ykb15DVf/ydzYDLBQqdRKhzh1tley4PXoDODbU91wEL
-         34pDtD7zk7OJNRyjA7Cg6GN8OQESRT7lVdlaoRKba24sh08+OZFG2cpgQxot94F9IZBv
-         XbBxIgTxuhYGbj1nyWc5YEdR1UezJZponKNthkflNOcanXbK/GtnMVOpZkGM9jR1cKuU
-         zcnnuNdVkPUnmUa4Qb0afiP7sTAhQZKycBALsrjw3RsZFMW/PXAOtDGGnk2JEBUge5Zx
-         uwPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuk8IuAwXuF7curjZrKAOE0ktBPJ/NEZjA/E91Z8LaZdCO9XdMgMiav7HQ4fNa1Qno8CFp4ck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySkIqGYgUkJH8Buq8IcWKw/15fX9PUmmrkmcZPB1coMJN7Gjs4
-	Da0NGBPNbWLWzX60mkxOSGhuuyCjPZyPupgOvfRExGlR/O/LPness2q9if3oMVeu6SsB9x+gkfV
-	77VotW7t1ej1Hzgse+fDKVndkG7998pdkDk+M3glGkEKXxpDj83my
-X-Google-Smtp-Source: AGHT+IEEFPF82MH9ZifDRxy+ToxZdjRH3bj3JRzDevvnPFKbY7+isgzmSeGm4vCLmfZM+WQ76FIVwM9KeUa2CF6Difw=
-X-Received: by 2002:a05:622a:2991:b0:458:1d2b:35f6 with SMTP id
- d75a77b69052e-4604044223fmr866711cf.24.1728507407719; Wed, 09 Oct 2024
- 13:56:47 -0700 (PDT)
+        bh=Nd9XarDquioNchNr7M+UyQNGXD34fv9mmtYNvewQiEs=;
+        b=g1z4jfGvGW+e2xMz1c4Evw1xwYGioQfcKVsLT53JuqhUdD/5dZGNy1tW2GBecFX7zs
+         5ElW6i02Bb8yvAhszm0s78+pLrK18sq/Iqs1l5syREQT3Uw6gdf4m5l3Y+ykotkLiusw
+         PtARjz+FxBvRctnCQnLSDNNTIrn0tKk+1DICPTL3hjd2/5o1pypLAOullq7oEZpNVGQV
+         SQRwtQy8AVyRs6iDa2OcxOOHvvrEu21ALdbbWqeXebMbrvIfa5JPITXW5Xu6hg7TdlsF
+         LMKGslykTS/I44hgsZmACpdIE4aix7qSHqlA1LjKOZVTTVL0lehn5SaxlSUiw71AjtiY
+         UiEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTdWwxg4oQXtm9Df+T9cicuSa53FpRRRKaT5CUb6gwRywfbVziVA2L6H+IGLnosgszfGjbjEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGfV0LSvyLEeyFmh6KfvAv6We9RCvHlHi/JmKIhPtWxAUXgo/E
+	rbBifsuktBUROmsfRaVpKdCCs1bPTJkoddYykT0MAlejx8/k7hMh7ulNJlTeh8MYf/72vWpYml4
+	LRJgVAFsy73x1JgXiQlDUSJn2YH6Fw2Vi2xY=
+X-Google-Smtp-Source: AGHT+IG6hF8OnOMd+ncEae7qi/hQ3JtWKyHhEKQxLhE0HVwRV7e37ko5qcN3yswQ/SlB99ADuvXLGXhSs8eLCCuAZOc=
+X-Received: by 2002:a17:907:7ba9:b0:a99:3a96:fa9b with SMTP id
+ a640c23a62f3a-a999e8f3fe7mr134337166b.58.1728507644343; Wed, 09 Oct 2024
+ 14:00:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-6-dw@davidwei.uk>
-In-Reply-To: <20241007221603.1703699-6-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 9 Oct 2024 13:56:33 -0700
-Message-ID: <CAHS8izOqNBpoOTXPU9bJJAs9L2QRmEg_tva3sM2HgiyWd=ME0g@mail.gmail.com>
-Subject: Re: [PATCH v1 05/15] net: prepare for non devmem TCP memory providers
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-0-554456a44a15@linutronix.de>
+ <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-5-554456a44a15@linutronix.de>
+In-Reply-To: <20241009-devel-anna-maria-b4-timers-ptp-timekeeping-v2-5-554456a44a15@linutronix.de>
+From: John Stultz <jstultz@google.com>
+Date: Wed, 9 Oct 2024 14:00:32 -0700
+Message-ID: <CANDhNCr8NL0ZgOdoOmFJffkQxAvGfJLekszuE0DGvdHiRNkgQw@mail.gmail.com>
+Subject: Re: [PATCH v2 05/25] timekeeping: Simplify code in timekeeping_advance()
+To: Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
+	Christopher S Hall <christopher.s.hall@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+On Wed, Oct 9, 2024 at 1:29=E2=80=AFAM Anna-Maria Behnsen
+<anna-maria@linutronix.de> wrote:
 >
-> From: Pavel Begunkov <asml.silence@gmail.com>
+> From: Thomas Gleixner <tglx@linutronix.de>
 >
-> There is a good bunch of places in generic paths assuming that the only
-> page pool memory provider is devmem TCP. As we want to reuse the net_iov
-> and provider infrastructure, we need to patch it up and explicitly check
-> the provider type when we branch into devmem TCP code.
+> From: Thomas Gleixner <tglx@linutronix.de>
 >
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  net/core/devmem.c         |  4 ++--
->  net/core/page_pool_user.c | 15 +++++++++------
->  net/ipv4/tcp.c            |  6 ++++++
->  3 files changed, 17 insertions(+), 8 deletions(-)
+> timekeeping_advance() takes the timekeeper_lock and releases it before
+> returning. When an early return is required, goto statements are used to
+> make sure the lock is realeased properly. When the code was written the
+> locking guard() was not yet available.
 >
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index 83d13eb441b6..b0733cf42505 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -314,10 +314,10 @@ void dev_dmabuf_uninstall(struct net_device *dev)
->         unsigned int i;
+> Use the guard() to simplify the code and while at it cleanup ordering of
+> function variables. No functional change.
 >
->         for (i =3D 0; i < dev->real_num_rx_queues; i++) {
-> -               binding =3D dev->_rx[i].mp_params.mp_priv;
-> -               if (!binding)
-> +               if (dev->_rx[i].mp_params.mp_ops !=3D &dmabuf_devmem_ops)
->                         continue;
->
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 
-Sorry if I missed it (and please ignore me if I did), but
-dmabuf_devmem_ops are maybe not defined yet?
-
-I'm also wondering how to find all the annyoing places where we need
-to check this. Looks like maybe a grep for net_devmem_dmabuf_binding
-is the way to go? I need to check whether these are all the places we
-need the check but so far looks fine.
-
---=20
-Thanks,
-Mina
+Acked-by: John Stultz <jstultz@google.com>
 
