@@ -1,166 +1,195 @@
-Return-Path: <netdev+bounces-133764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0D9996FCD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:35:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9129B996FD9
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:40:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9E111C22115
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:35:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B7B41F23F52
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:40:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2CF188917;
-	Wed,  9 Oct 2024 15:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FA31E0494;
+	Wed,  9 Oct 2024 15:28:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="LawUZK5R"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L0KRP1Rt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360DB1A256B
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:27:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170BB1A2630;
+	Wed,  9 Oct 2024 15:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728487631; cv=none; b=e9pnF3nGTglCLqhtsJo6hT5MU5BQQUkpBjZKh6GwykMJl6g+bWgUp5yS3jhWwjmqAh2h+euc1QXxo5tBJE4bo5VKSPgoVvYDzJ8D0791qI+FD1rtJdLGujCVP2hCseJsRFQs7UVpHJXHPTv4XTYbltknGFDep/Mm9hV081GiYQk=
+	t=1728487719; cv=none; b=Td6RPBAkAGp2Eh+pDXFgx/AB6mcNYl5Nvk4iMcfeA58ElvO5z1tm/jeMB+1OahvuM234wRmoH9L/r7ZD8Ev+bSxt+/9+saX59HGQ5WeefioDsbwWa5DKRPHrrGNPkdE9n4fh/fRIg8Uyp/vhDfoXvuvqJDeg1jfqZ/eOKmXnc1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728487631; c=relaxed/simple;
-	bh=nHhYT90i9k8z39HqFNoz3Vmu86He0hEF2pqu8ZMAp8M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KifhFxf2Kt+vU5rpWXlMjudVeVB3hQ3jafe26Y8o5Ny9jD8KoK/5+ibGo3mhseA9gZhbanYmmepOWVloQHtMlf/IituzrqPQRVwjRyyPbqJoe32TnQEAUMUlaqaS0sjygCUqHvsfgag+kym7028oQBrScfjKz1OXcOJo8dYcXAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=LawUZK5R; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a394418442so5039875ab.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 08:27:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728487629; x=1729092429; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PTyFpPeleynuNWUtVcj5JZexBLSzJgt3M7J02jY/6wo=;
-        b=LawUZK5R0Nqaz1BQan+UifF9U8sIFM9HWDUeO62t/Wsu9ORd2fIn0YJkIz4cnIg3eq
-         WJXRcet2kJDeIhHacSdjObJWwoGhJJmc7DLvB9L9HmG/bfkIpKsV8ZpdlgPUwT6YKr11
-         5TDLeHEdHx8zTjnVTniDcrjQneGHTMDawQuj0eKskq2igWYBQX4f1c5tIsZrrq4S1mtD
-         5fN2dKQvVUdpLJ+ZXbjZycXzuOL0Uh4CaNzK1TUC2g5lLdq7pv1Nc1rPUbYGjh225Iic
-         w8cXWXHg8NbYHJoPcgcXE1d0qfbFFsrCyAM8+86juOlcLWSonPQucciUwWDOBHBVpyUR
-         ln9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728487629; x=1729092429;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PTyFpPeleynuNWUtVcj5JZexBLSzJgt3M7J02jY/6wo=;
-        b=oBTiiGSrTg+1bpb6jKIvA0CuRbbSOthpw+EPsDQwd0rR+M57lXSEGLH+pxs6RtfQ/v
-         3iUsPDcwAHFQLsUlrixoSYkU2GDmfBfZwQ3sFqI0YUbrR7p2SUWcWpQ1/yLsq7p+ijmf
-         9PH7v3bBqoHYZnEQfO0A1He7l/+k/LO+m+VLGjClvFZC6S6ypnhpNghQZcQ34e/+i41Z
-         9esO0JfA/Nh+58QSV3KIkAubSLUup1WIfLOenAV512zvCQ6Y0t8m9XA3HfntICdjgT2L
-         5yKTMrb7oe/sNJI8WqwuxMfvH5H2CGoJX+iG3v2Cl0Swk9URHamWztMlxMML2iMmajpa
-         H1aA==
-X-Forwarded-Encrypted: i=1; AJvYcCVXfOnf9hUZKVDngvYHwX12CpAzk1N5364QNJojRCGZ/mt6tmrMJ+Uq8EBxahXOlGUjkSvz7OY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3T6B2XDY87hAx8+WgjIyfiY58S3LtpPRSvhvi1p0sbsu3gj5K
-	UikSBfz8YuKMEsrdU188JW307ZfpaFnVfYH0BuABb9252w5m/rW52MWE/am6f7g=
-X-Google-Smtp-Source: AGHT+IESb0NCNYTlclocLPr5eVXgtgLbfc8mN+fnubYvs85sTWJT+ORAWc5diDFcdiNtnTrA+1HhzQ==
-X-Received: by 2002:a92:ca4a:0:b0:3a0:97df:997e with SMTP id e9e14a558f8ab-3a397d0d0efmr29017595ab.14.1728487629165;
-        Wed, 09 Oct 2024 08:27:09 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3a39fe90428sm2390635ab.32.2024.10.09.08.27.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 08:27:08 -0700 (PDT)
-Message-ID: <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
-Date: Wed, 9 Oct 2024 09:27:07 -0600
+	s=arc-20240116; t=1728487719; c=relaxed/simple;
+	bh=qor5oKVZ0f0YphXLdqbFq9ooAP3Cp1QdipBUG5qGRbk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ny8IcIF05u5qqOlxFlE942ekRe7pJGacgDQdHyTK6nvqw8IzzfJJYA8vdRd6aVJGAWQEhAssDo3YniLJZOjNhbIeIbB3UVEt8ivJtX9zW9ZlBVqzp8AqmODAnlHf0UXvzDciPRlAP7zsVooCZvXA/v0BFDbgFgXg/kQrbAXcSw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L0KRP1Rt; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728487717; x=1760023717;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qor5oKVZ0f0YphXLdqbFq9ooAP3Cp1QdipBUG5qGRbk=;
+  b=L0KRP1Rt0a/tdKuMmnmTNaGOLwOjEiEVxnyT74sfWQ6PrY3q/OsY1rOE
+   tTvrepaRuPMAJ8wHrW7pWHHUKL+MeO300PIIPI9fVQ6haz8o0xNIfMbio
+   pw/Es1NCsNDnIjI8OOt/sgzjjoBpNFMC4rtShKHSP//n21f87Zm6TaV1B
+   Me2Tlf0Go2w9gvz6W4hM0/NZmNBZ8d2AatEv4pkMVrekJIGP/QI2YPc8s
+   LhblXMCaE2wxjTnNwmUyioiww1XCxbFHMQihFuv5owveHDAy8ZNK0vj24
+   /qgROlxihxLids1AgdfklmxoB8IrhrhuZmy6/LeCuA9WjrgnAZqR11H9G
+   w==;
+X-CSE-ConnectionGUID: jYQ8kHbPQPaMKBVsXlsrWQ==
+X-CSE-MsgGUID: U0UQ+movS6yFdngpvZZVEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27675670"
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="27675670"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:28:36 -0700
+X-CSE-ConnectionGUID: TJjpBHFITlyCTnekg6tM7A==
+X-CSE-MsgGUID: rcZAiaprQk2fbrUSKDhElA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="81305733"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa004.jf.intel.com with ESMTP; 09 Oct 2024 08:28:32 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 00/18] idpf: XDP chapter III: core XDP changes (+libeth_xdp)
+Date: Wed,  9 Oct 2024 17:27:38 +0200
+Message-ID: <20241009152756.3113697-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241007221603.1703699-1-dw@davidwei.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/7/24 4:15 PM, David Wei wrote:
-> ===========
-> Performance
-> ===========
-> 
-> Test setup:
-> * AMD EPYC 9454
-> * Broadcom BCM957508 200G
-> * Kernel v6.11 base [2]
-> * liburing fork [3]
-> * kperf fork [4]
-> * 4K MTU
-> * Single TCP flow
-> 
-> With application thread + net rx softirq pinned to _different_ cores:
-> 
-> epoll
-> 82.2 Gbps
-> 
-> io_uring
-> 116.2 Gbps (+41%)
-> 
-> Pinned to _same_ core:
-> 
-> epoll
-> 62.6 Gbps
-> 
-> io_uring
-> 80.9 Gbps (+29%)
+XDP for idpf is currently 5 chapters:
+* convert Rx to libeth;
+* convert Tx and stats to libeth;
+* generic XDP and XSk code changes (this);
+* actual XDP for idpf via libeth_xdp;
+* XSk for idpf (^).
 
-I'll review the io_uring bits in detail, but I did take a quick look and
-overall it looks really nice.
+Part III does the following:
+* does some cleanups with marking read-only bpf_prog and xdp_buff
+  arguments const for some generic functions;
+* allows attaching already registered XDP memory model to Rxq info;
+* allows mixing pages from several Page Pools within one XDP frame;
+* optimizes &xdp_frame structure and removes no-more-used field;
+* adds generic functions to build skbs from xdp_buffs (regular and
+  XSk) and attach frags to xdp_buffs (regular and XSk);
+* adds helper to optimize XSk xmit in drivers;
+* extends libeth Rx to support XDP requirements (headroom etc.) on Rx;
+* adds libeth_xdp -- libeth module with common XDP and XSk routines.
 
-I decided to give this a spin, as I noticed that Broadcom now has a
-230.x firmware release out that supports this. Hence no dependencies on
-that anymore, outside of some pain getting the fw updated. Here are my
-test setup details:
+They are implemented mostly as inlines with inline callback arguments.
+They will be then uninlined in the drivers with sane function sizes,
+but without any indirect calls.
+All those inlines and macros really removes tons of driver code, which
+is mostly the same across the drivers minus HW-specific part. You just
+basically need functions which read Rx descriptors and fill Tx
+descriptors, call a couple macros and that's it. The rest is written
+once in libeth_xdp.
+All exception and cold code are external. Error handling etc, anything
+that don't happen at line rates, are external. Only the hottest things
+are inlined ensuring driver code doesn't bloat for no gain and that
+cold code won't push hot code into more cachelines than wanted.
 
-Receiver:
-AMD EPYC 9754 (recei
-Broadcom P2100G
--git + this series + the bnxt series referenced
+Note on diffstat: don't be scared, almost 1500 lines are documentation
+explaining everything in details. The actual new code is around 2500.
 
-Sender:
-Intel(R) Xeon(R) Platinum 8458P
-Broadcom P2100G
--git
+Alexander Lobakin (17):
+  jump_label: export static_key_slow_{inc,dec}_cpuslocked()
+  skbuff: allow 2-4-argument skb_frag_dma_map()
+  unroll: add generic loop unroll helpers
+  bpf, xdp: constify some bpf_prog * function arguments
+  xdp, xsk: constify read-only arguments of some static inline helpers
+  xdp: allow attaching already registered memory model to xdp_rxq_info
+  page_pool: make page_pool_put_page_bulk() actually handle array of
+    pages
+  page_pool: allow mixing PPs within one bulk
+  xdp: get rid of xdp_frame::mem.id
+  xdp: add generic xdp_buff_add_frag()
+  xdp: add generic xdp_build_skb_from_buff()
+  xsk: allow attaching XSk pool via xdp_rxq_info_reg_mem_model()
+  xsk: make xsk_buff_add_frag really add a frag via
+    __xdp_buff_add_frag()
+  xsk: add generic XSk &xdp_buff -> skb conversion
+  xsk: add helper to get &xdp_desc's DMA and meta pointer in one go
+  libeth: support native XDP and register memory model
+  libeth: add a couple of XDP helpers (libeth_xdp)
 
-Test:
-kperf with David's patches to support io_uring zc. Eg single flow TCP,
-just testing bandwidth. A single cpu/thread being used on both the
-receiver and sender side.
+Toke Høiland-Jørgensen (1):
+  net: Register system page pool as an XDP memory model
 
-non-zc
-60.9 Gbps
-
-io_uring + zc
-97.1 Gbps
-
-or +59% faster. There's quite a bit of IRQ side work, I'm guessing I
-might need to tune it a bit. But it Works For Me, and the results look
-really nice.
-
-I did run into an issue with the bnxt driver defaulting to shared tx/rx
-queues, and it not working for me in that configuration. Once I disabled
-that, it worked fine. This may or may not be an issue with the flow rule
-to direct the traffic, the driver queue start, or something else. Don't
-know for sure, will need to check with the driver folks. Once sorted, I
-didn't see any issues with the code in the patchset.
+ drivers/net/ethernet/intel/libeth/Kconfig     |    6 +
+ drivers/net/ethernet/intel/libeth/Makefile    |    6 +
+ include/net/libeth/types.h                    |  102 +-
+ include/net/page_pool/types.h                 |    7 +-
+ drivers/net/ethernet/intel/libeth/priv.h      |   37 +
+ include/linux/bpf.h                           |   12 +-
+ include/linux/filter.h                        |    9 +-
+ include/linux/netdevice.h                     |    7 +-
+ include/linux/skbuff.h                        |   49 +-
+ include/linux/unroll.h                        |   43 +
+ include/net/libeth/rx.h                       |    6 +-
+ include/net/libeth/tx.h                       |   34 +-
+ include/net/libeth/xdp.h                      | 1864 +++++++++++++++++
+ include/net/libeth/xsk.h                      |  684 ++++++
+ include/net/xdp.h                             |  185 +-
+ include/net/xdp_sock_drv.h                    |   52 +-
+ include/net/xsk_buff_pool.h                   |   10 +-
+ .../net/ethernet/freescale/dpaa/dpaa_eth.c    |    2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   30 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |   32 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   22 +-
+ drivers/net/ethernet/intel/libeth/tx.c        |   39 +
+ drivers/net/ethernet/intel/libeth/xdp.c       |  444 ++++
+ drivers/net/ethernet/intel/libeth/xsk.c       |  264 +++
+ drivers/net/veth.c                            |    4 +-
+ kernel/bpf/cpumap.c                           |    2 +-
+ kernel/bpf/devmap.c                           |    8 +-
+ kernel/jump_label.c                           |    2 +
+ net/bpf/test_run.c                            |    2 +-
+ net/core/dev.c                                |   20 +-
+ net/core/filter.c                             |   41 +-
+ net/core/page_pool.c                          |   50 +-
+ net/core/skbuff.c                             |    2 +-
+ net/core/xdp.c                                |  311 ++-
+ net/xdp/xsk_buff_pool.c                       |   40 +
+ 35 files changed, 4215 insertions(+), 213 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libeth/priv.h
+ create mode 100644 include/net/libeth/xdp.h
+ create mode 100644 include/net/libeth/xsk.h
+ create mode 100644 drivers/net/ethernet/intel/libeth/tx.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xdp.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xsk.c
 
 -- 
-Jens Axboe
+2.46.2
+
 
