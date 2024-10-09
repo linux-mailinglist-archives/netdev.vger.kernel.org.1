@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-133428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDFA4995DCE
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 04:31:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE30E995DD0
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 04:31:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81F23287471
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21701C21753
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19E66175D4A;
-	Wed,  9 Oct 2024 02:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348D914B970;
+	Wed,  9 Oct 2024 02:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZXYckZcv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4EgHiFL"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977E61714A4;
-	Wed,  9 Oct 2024 02:29:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BDF71714A4;
+	Wed,  9 Oct 2024 02:29:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728440986; cv=none; b=Ia1+GL6XcYAfIB5qa6dECsB7U4xBK+bXjxF3+7EihmCQX/F9Bo28SD1ZlNqoiyvr4RKr4jTE0bzwRJ26twIU+/nkZ3YWeLAC92IGR/Gehd+gTkzbFwdtXZyDP2MbtZUibe1lk2bMMAW956CY7jYY872RcuvPp5jowv3+dGiYRPQ=
+	t=1728440992; cv=none; b=Cek7jK+Kn4ICqRYhcExibw8a9a7jv83bQsfBUYstxqY8uPfJ+oUhSxYaqz+GaNGtvCmGXarfhCCRoHpjA4m9CJyF0/boYOMlflBoiIp912Dn4bDLdiWCM/QGeKDPuMn+cYhzoDUZ5/ZJ+HJti1Mrj/wfOAHePuebBQrlfQ9sZms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728440986; c=relaxed/simple;
-	bh=4xIH7Aio0f4PBcaIE51Qch3dJo9N/MMWAobYuTWQmmc=;
+	s=arc-20240116; t=1728440992; c=relaxed/simple;
+	bh=ZAosg6sRSO83NLhdq2XSdXeuJvr4vRDwWp0MpG86sgU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZJH2r1lw15FJavvzHv9PUiRuM6pAgI39sYLa5FLBTQQK0zLDud+MK1NqL9ICYOtZVDjnc10AVoQ4wbLwUfffKviP7sdCK79h8ZfLvYkid+/Ss1Am794hbVhbhdqiXX0Z+crfgDL7BHE6t+bCx3fAWTeeMredVGGUoLpcnFLFjLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZXYckZcv; arc=none smtp.client-ip=209.85.216.68
+	 MIME-Version; b=DeYTvRxsobe0PaNaq1QesVMTGojjP9Tw7d8utpA4TC7f4QXoMFUoPQX6ARxK77NwLPTqzOT6QlZ55NscJtCDka4L4VijH0UAo32Ycb8m4CkRnd3CyZmZFpXndNntWPY4iCOLxnF+sT2u9ic92jfP5gJGSXF6tD2+M9eTcts8Lqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4EgHiFL; arc=none smtp.client-ip=209.85.216.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-2e28ba2d96aso1048820a91.3;
-        Tue, 08 Oct 2024 19:29:44 -0700 (PDT)
+Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-2e18293a5efso4354442a91.3;
+        Tue, 08 Oct 2024 19:29:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728440984; x=1729045784; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728440989; x=1729045789; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mQoyYqReGxg6xit/tJWU0LNVGXnn5CuHq60bShXa6OE=;
-        b=ZXYckZcvmW0zYSipoRbGkTd3wgOklMtE2PPJA2v4nMfybHSMCGWw/JPZjSApcIEnz0
-         ZmKlpOoOu9MuCKKM1Uh541j7R6abQDwVMI+fZsyKaWOkoNniuU6P2cEp4wVg4i+F9fHv
-         qw8V7YwxDvA0IGy6lu5bHX6s+fK4TZ1ADbWXsKTgH4cJGOs/zdYDzUi2yPaGP0oW78je
-         4F4v8ln3FiE/tOUS9AyQqnmt/nZLAMV7fxM+HJ62OVMB/YRSgI6BsHRfC8vct7ZCoKGM
-         JhKjlf6M9cyIk1itpmSDWhL643OZocFgaXwZ4HoVXMue6he4vYYC3dKSyawafIOeFGg2
-         aJ5w==
+        bh=ACzfDnBPZ2zKMK1LA1OtfcN5HTpxaKXpt8zIEOrq06Y=;
+        b=P4EgHiFLNF7WMLg8PSBK9kRAkxQQ32O/wqv6vcqdGsp0Z7rK28Gw+WsU1t52YMV6qW
+         0auO2ovWsEuH0+7WH70BY3QRTCMLj2FcSYK/Z5EzUBUiL7eLGpGWlLA7UoOIm6S9IVyJ
+         7usWB+pE/rsb+yviwfJ1b34wHbSqH7kQfcIwIRrQzDNAf+KZlpYGsNIjYmt20j0Fp3aA
+         +R1OdBwXi4Q9zwHUgJV+tWtBEVhmha2sPovGpwkxpr+REL0ZZMCqLlGF6KWm/TKfeVWc
+         aqN9Yn8ElLZDJ4rCM2BsVCdZ4KsubwLLVHNNqD3C8hhf5TbUmon6M2EfEb/Wl1wn/4fs
+         +pOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728440984; x=1729045784;
+        d=1e100.net; s=20230601; t=1728440989; x=1729045789;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mQoyYqReGxg6xit/tJWU0LNVGXnn5CuHq60bShXa6OE=;
-        b=BCDYyhgulKidS+sxvnHwBqELdKSkjrtyKDsCDXNEKeA8jFqY5QPtLc6cAHM85PmoQv
-         10UqK+k+WHwIG3PtaWvaSjXFKrzwZYwBjKIrK5xQSFYMlw7s7mzLvdTMC1fsQNjOdubg
-         x6+1f2hDTo6QFempOCAlU6bo2KEfrZErComszqyRugqw/MNDHqKuGlO+4kgDmoxs7ezm
-         fnmOGGC/ZB5GcAqSk2nAP8R4fe3kNZBrxtFjJ6TQ1DCvJsq39EpI9kGcXXw/oHHK5wiS
-         syS7IDY+Yikmnaxq4Me0KKhpXcT9fif0v3zk30N+iYaptdJANlI7pfAo0/qY4r/dW9V5
-         MwGw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaKEFPwKxuauTC5J0yjWUknAsTaowGVT4T97+KldZb3F368F+CIf4PjQDXxifyBRHU8bkn4vB7@vger.kernel.org, AJvYcCUkvE9Kod1WWdAIUazXLDi6GZNpXV4dIc9bTS8L3BSaJfB7tiumzYoQMPlG7JuKRENGFAxDzWbf2Cbb0yY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqMwrW3KbQRixb3V6qh4Lv7uKKkZaLecWJ2Q3WJMTSLqDZKsTm
-	CdOK3WygIN9m5N06cL7vkKq5EzqKTniVv8wGbh/eBDc02Q1SnbR+
-X-Google-Smtp-Source: AGHT+IHcvi5PnR39Ef4kXioKWX3qb43ZnLATfsF6eNlxApMNwEwu+bMTSMCk3eLp2HYAFibQTy3OYA==
-X-Received: by 2002:a17:90a:bd97:b0:2e0:a508:77f2 with SMTP id 98e67ed59e1d1-2e2a2525fb1mr1226791a91.25.1728440983919;
-        Tue, 08 Oct 2024 19:29:43 -0700 (PDT)
+        bh=ACzfDnBPZ2zKMK1LA1OtfcN5HTpxaKXpt8zIEOrq06Y=;
+        b=WtYvYKRFeFijIh7hXO9Kc2jq0GeG9QgUaajBv5P4fTmImkxZYuc+5XD9sSkwZak/vu
+         gweXRW42VoiePLDF7y8ogXTT2gxfbWN11oxLmFESRjP/M3+XdpFxuCJQhEYe+mPXkIoU
+         4pKusAH17CizsWPJnst3gHnfq6gNekXRhoeI8VttwCzs2AKuaH0j8+rM6MwQGK91LEAM
+         zNnNF61WSasC14Z1YQoQ4qhDtey4AWwONeSErkiJGGQTxLWH3UTcw9wgJWWGqLHcoeDV
+         pL+jr03VgfMX+0HpEvkdcNgVVoHFy/Fi1yBejMvoJKsoaG2NqxEOHmddImPfZmcT53pF
+         etAw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+Yp5XvLNe440PrGMyq/j390mPTArOagRxmzbr7ONTPzXcig4visybHRpwfamuysu+DKrLZG5GM+9J3EQ=@vger.kernel.org, AJvYcCW8Z/C6ttRrUdVF2P2HdbF3zWiSf2c5EAOn8SOfb0tt7Q/Iy35bXw7i3YDJvBfVjXw5f12QACBh@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfSb/9GBLFEgaBR1idIf2kM1W7OoZ1CPePd9eo7qw9Hq9jUKuc
+	4+nsUqL8u+7bZj8K6XId0O6Jcu8Gf33/Ss4wAR+7xLu/I1LJ+xYA
+X-Google-Smtp-Source: AGHT+IH2HkD13szisgeE038Q7wOZH06A/YQxPXdL8g0hH/xvkHd36kJIorLKFigLqtRRu5rgK9tmcQ==
+X-Received: by 2002:a17:90a:1b86:b0:2e2:af53:9326 with SMTP id 98e67ed59e1d1-2e2af539345mr156947a91.30.1728440988736;
+        Tue, 08 Oct 2024 19:29:48 -0700 (PDT)
 Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a5706e8bsm336202a91.18.2024.10.08.19.29.39
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a5706e8bsm336202a91.18.2024.10.08.19.29.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Oct 2024 19:29:43 -0700 (PDT)
+        Tue, 08 Oct 2024 19:29:48 -0700 (PDT)
 From: Menglong Dong <menglong8.dong@gmail.com>
 X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
 To: idosch@nvidia.com,
@@ -86,9 +86,9 @@ Cc: davem@davemloft.net,
 	petrm@nvidia.com,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v7 07/12] net: vxlan: make vxlan_set_mac() return drop reasons
-Date: Wed,  9 Oct 2024 10:28:25 +0800
-Message-Id: <20241009022830.83949-8-dongml2@chinatelecom.cn>
+Subject: [PATCH net-next v7 08/12] net: vxlan: use kfree_skb_reason() in vxlan_xmit()
+Date: Wed,  9 Oct 2024 10:28:26 +0800
+Message-Id: <20241009022830.83949-9-dongml2@chinatelecom.cn>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20241009022830.83949-1-dongml2@chinatelecom.cn>
 References: <20241009022830.83949-1-dongml2@chinatelecom.cn>
@@ -100,100 +100,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Change the return type of vxlan_set_mac() from bool to enum
-skb_drop_reason. In this commit, the drop reason
-"SKB_DROP_REASON_LOCAL_MAC" is introduced for the case that the source
-mac of the packet is a local mac.
+Replace kfree_skb() with kfree_skb_reason() in vxlan_xmit(). Following
+new skb drop reasons are introduced for vxlan:
+
+/* no remote found for xmit */
+SKB_DROP_REASON_VXLAN_NO_REMOTE
+/* packet without necessary metadata reached a device which is
+ * in "external" mode
+ */
+SKB_DROP_REASON_TUNNEL_TXINFO
 
 Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
 Reviewed-by: Simon Horman <horms@kernel.org>
 ---
+v7:
+- fix some typos in the document for SKB_DROP_REASON_TUNNEL_TXINFO
+v6:
+- fix some typos in the document for SKB_DROP_REASON_TUNNEL_TXINFO
 v5:
-- modify the document of SKB_DROP_REASON_LOCAL_MAC
-v3:
-- adjust the call of vxlan_set_mac()
-- add SKB_DROP_REASON_LOCAL_MAC
+- modify the document for SKB_DROP_REASON_TUNNEL_TXINFO
+v2:
+- move the drop reason "TXINFO" from vxlan to core
+- rename VXLAN_DROP_REMOTE to VXLAN_DROP_NO_REMOTE
 ---
- drivers/net/vxlan/vxlan_core.c | 19 ++++++++++---------
- include/net/dropreason-core.h  |  6 ++++++
- 2 files changed, 16 insertions(+), 9 deletions(-)
+ drivers/net/vxlan/vxlan_core.c | 6 +++---
+ include/net/dropreason-core.h  | 9 +++++++++
+ 2 files changed, 12 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 1a81a3957327..41191a28252a 100644
+index 41191a28252a..b677ec901807 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -1609,9 +1609,9 @@ static void vxlan_parse_gbp_hdr(struct vxlanhdr *unparsed,
- 	unparsed->vx_flags &= ~VXLAN_GBP_USED_BITS;
- }
- 
--static bool vxlan_set_mac(struct vxlan_dev *vxlan,
--			  struct vxlan_sock *vs,
--			  struct sk_buff *skb, __be32 vni)
-+static enum skb_drop_reason vxlan_set_mac(struct vxlan_dev *vxlan,
-+					  struct vxlan_sock *vs,
-+					  struct sk_buff *skb, __be32 vni)
- {
- 	union vxlan_addr saddr;
- 	u32 ifindex = skb->dev->ifindex;
-@@ -1622,7 +1622,7 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
- 
- 	/* Ignore packet loops (and multicast echo) */
- 	if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
--		return false;
-+		return SKB_DROP_REASON_LOCAL_MAC;
- 
- 	/* Get address from the outer IP header */
- 	if (vxlan_get_sk_family(vs) == AF_INET) {
-@@ -1635,11 +1635,11 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
- #endif
+@@ -2730,7 +2730,7 @@ static netdev_tx_t vxlan_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			if (info && info->mode & IP_TUNNEL_INFO_TX)
+ 				vxlan_xmit_one(skb, dev, vni, NULL, false);
+ 			else
+-				kfree_skb(skb);
++				kfree_skb_reason(skb, SKB_DROP_REASON_TUNNEL_TXINFO);
+ 			return NETDEV_TX_OK;
+ 		}
+ 	}
+@@ -2793,7 +2793,7 @@ static netdev_tx_t vxlan_xmit(struct sk_buff *skb, struct net_device *dev)
+ 			dev_core_stats_tx_dropped_inc(dev);
+ 			vxlan_vnifilter_count(vxlan, vni, NULL,
+ 					      VXLAN_VNI_STATS_TX_DROPS, 0);
+-			kfree_skb(skb);
++			kfree_skb_reason(skb, SKB_DROP_REASON_VXLAN_NO_REMOTE);
+ 			return NETDEV_TX_OK;
+ 		}
+ 	}
+@@ -2816,7 +2816,7 @@ static netdev_tx_t vxlan_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		if (fdst)
+ 			vxlan_xmit_one(skb, dev, vni, fdst, did_rsc);
+ 		else
+-			kfree_skb(skb);
++			kfree_skb_reason(skb, SKB_DROP_REASON_VXLAN_NO_REMOTE);
  	}
  
--	if ((vxlan->cfg.flags & VXLAN_F_LEARN) &&
--	    vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source, ifindex, vni))
--		return false;
-+	if (!(vxlan->cfg.flags & VXLAN_F_LEARN))
-+		return SKB_NOT_DROPPED_YET;
- 
--	return true;
-+	return vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source,
-+			   ifindex, vni);
- }
- 
- static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
-@@ -1774,7 +1774,8 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 	}
- 
- 	if (!raw_proto) {
--		if (!vxlan_set_mac(vxlan, vs, skb, vni))
-+		reason = vxlan_set_mac(vxlan, vs, skb, vni);
-+		if (reason)
- 			goto drop;
- 	} else {
- 		skb_reset_mac_header(skb);
+ 	return NETDEV_TX_OK;
 diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 1cb8d7c953be..fbf92d442c1b 100644
+index fbf92d442c1b..d59bb96c5a02 100644
 --- a/include/net/dropreason-core.h
 +++ b/include/net/dropreason-core.h
-@@ -97,6 +97,7 @@
+@@ -96,7 +96,9 @@
+ 	FN(VXLAN_VNI_NOT_FOUND)		\
  	FN(MAC_INVALID_SOURCE)		\
  	FN(VXLAN_ENTRY_EXISTS)		\
++	FN(VXLAN_NO_REMOTE)		\
  	FN(IP_TUNNEL_ECN)		\
-+	FN(LOCAL_MAC)			\
++	FN(TUNNEL_TXINFO)		\
+ 	FN(LOCAL_MAC)			\
  	FNe(MAX)
  
- /**
-@@ -443,6 +444,11 @@ enum skb_drop_reason {
+@@ -439,11 +441,18 @@ enum skb_drop_reason {
+ 	 * entry or an entry pointing to a nexthop.
+ 	 */
+ 	SKB_DROP_REASON_VXLAN_ENTRY_EXISTS,
++	/** @SKB_DROP_REASON_VXLAN_NO_REMOTE: no remote found for xmit */
++	SKB_DROP_REASON_VXLAN_NO_REMOTE,
+ 	/**
+ 	 * @SKB_DROP_REASON_IP_TUNNEL_ECN: skb is dropped according to
  	 * RFC 6040 4.2, see __INET_ECN_decapsulate() for detail.
  	 */
  	SKB_DROP_REASON_IP_TUNNEL_ECN,
 +	/**
-+	 * @SKB_DROP_REASON_LOCAL_MAC: the source MAC address is equal to
-+	 * the MAC address of the local netdev.
++	 * @SKB_DROP_REASON_TUNNEL_TXINFO: packet without necessary metadata
++	 * reached a device which is in "external" mode.
 +	 */
-+	SKB_DROP_REASON_LOCAL_MAC,
++	SKB_DROP_REASON_TUNNEL_TXINFO,
  	/**
- 	 * @SKB_DROP_REASON_MAX: the maximum of core drop reasons, which
- 	 * shouldn't be used as a real 'reason' - only for tracing code gen
+ 	 * @SKB_DROP_REASON_LOCAL_MAC: the source MAC address is equal to
+ 	 * the MAC address of the local netdev.
 -- 
 2.39.5
 
