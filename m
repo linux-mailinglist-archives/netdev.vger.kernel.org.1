@@ -1,179 +1,204 @@
-Return-Path: <netdev+bounces-133679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1D21996AB6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:51:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A169B996B7A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:14:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 690F2289AD4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:51:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 315A41F21D15
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2941A070D;
-	Wed,  9 Oct 2024 12:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75D3196450;
+	Wed,  9 Oct 2024 13:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1j+opvo"
+	dkim=pass (2048-bit key) header.d=cirrus.com header.i=@cirrus.com header.b="WI0sVayc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001ae601.pphosted.com (mx0a-001ae601.pphosted.com [67.231.149.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01D0198A32;
-	Wed,  9 Oct 2024 12:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56932291E;
+	Wed,  9 Oct 2024 13:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728478081; cv=none; b=OwdzoDoGRlP4Fk8eGq5A37/ksZWKiokrn8jRW+WVBezKjIqsiVIYxoZ1VzHbTIeKp6XVIF5a/mbAA3J/nGReXN5N4F4aowOMk6od61GoDEllNF9thE6L3U2oTMgZ2KCW/CEpOM+Kmp7THOQa3MtImCBRlRiCgu9lQfLVLON6Nq8=
+	t=1728479673; cv=none; b=apr2C+vhmbZwswFjUiiLZjE6r5TkWlxQaGbN+gcqJRhGAi7dCb2w9Ynx//VKXBP0jrlAQS584jElRaj3xBtJoqfGxlM1BBQRBfUwFIgOkM27nL3oAuggrOBDP8yRNNGpmIOlVrV9NAzhqwtVGTuGukBtAsqbYeIwGLI3ufXe8LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728478081; c=relaxed/simple;
-	bh=qzv4ucf9GRL1iYIedFvD/yrU1VM4gBM94xHUwsCGszI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H5IeZ9otpya50u5Vq+jmkfJs9OvrLcbAsodinnlXcPgbMlw2tCsNj/qxTzQBwunsys0F5LlTO7JjRVOZokXhRaSPnhAA1NZV/Goh3iNoXnjkr2m2bWNp4QJbSNjLi5/Ut8OE9HIUzaLzjG8XG/CWdd+9lY65CeI8Gz0bUKVY39M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1j+opvo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D37A9C4CEC5;
-	Wed,  9 Oct 2024 12:48:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728478081;
-	bh=qzv4ucf9GRL1iYIedFvD/yrU1VM4gBM94xHUwsCGszI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1j+opvoqLub5t7SGUPcYBxM4EP4F+IHarwuXv4B6m58MqVCCq94BRbNqnCX/E0DU
-	 p12VDctGgZuMFvLVeHhzkTPYPzALRVzjSD4qIRlcvreG+THwkiqUsmZc4DUFfHShNv
-	 NxbjWcDLiQeIUlMyZWKzoPvPNl8Ga41KWLPKjPULkE0U6SivFPTAQwHwDckV644fpT
-	 5cmUS4dt+kgXtE2TCVuY/2ClNHiIewaOJstXFM/efE9e4RvER87Gf5t+cfJwNRTytO
-	 33JY2+24MMzqdHAlhyT7IE6FzLmCYNwIvzeYaW9rW4ab+V1ZCCVsSzfiuCAP1jFXcX
-	 BSO29p6FRYO8Q==
-Date: Wed, 9 Oct 2024 14:47:58 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, bpf@vger.kernel.org, kuba@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	john.fastabend@gmail.com, hawk@kernel.org, martin.lau@linux.dev,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, lorenzo.bianconi@redhat.com
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Message-ID: <ZwZ7fr_STZStsnln@lore-desk>
-References: <cover.1726480607.git.lorenzo@kernel.org>
- <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
- <ZwZe6Bg5ZrXLkDGW@lore-desk>
- <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+	s=arc-20240116; t=1728479673; c=relaxed/simple;
+	bh=YINrfZsek2PYwQzx5aXAqFR5N5hGjnKx66rviiTj1Yw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YS+pyLemzjnTE0fRNtxOYrvsSJrTgTwoEqEfmDpAs25sPM+Gw0CmKDxQSPZV1qOE0jbHEPigc8EWFjta6r0kKFRH5SkUQHJRpord6nveTPWGGNOIdpiTLN12Qvva2BTb25b/AKxInxhdxmzn5JsWFy0WdR3eejWUfkmKugUlOnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensource.cirrus.com; spf=pass smtp.mailfrom=opensource.cirrus.com; dkim=pass (2048-bit key) header.d=cirrus.com header.i=@cirrus.com header.b=WI0sVayc; arc=none smtp.client-ip=67.231.149.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensource.cirrus.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensource.cirrus.com
+Received: from pps.filterd (m0077473.ppops.net [127.0.0.1])
+	by mx0a-001ae601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4994xc0x003245;
+	Wed, 9 Oct 2024 07:48:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cirrus.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	PODMain02222019; bh=b9CbWLDMZti2ojgRTihH3RA0WYLUzEcG7aX6pdihoQY=; b=
+	WI0sVaycTZYkwMgmtYcXXMdvigsiua8Ix4Qh02mNCGH2fBXcoCmYBNNsEO5BXVde
+	1Bz9WSIl3H9aytV4MjeLGq5iNgl4nMnifXKD7gZBG7Nh0M0RDNAmEax34ZlRrQpc
+	BqxwXp6rQsj7d8HBI3neZNecBDiZiUXrqk9SjO/XH7GSP3KBa0vc3lo3Nh2evgTs
+	vMpU/eouIhXwHQgJkPlVYadHgMk2W3tKDA7WeoPiKLk9i2DcqwNiAeCbgFtNS1E3
+	D/03y3ryRn8KcZ7U0bo3WMxdHCmB9tG9qfIm/V0gyX7oGE/Hh+fOgbX3EkFod4UH
+	WWLlkgIPTShr+Vylj7CyYA==
+Received: from ediex02.ad.cirrus.com ([84.19.233.68])
+	by mx0a-001ae601.pphosted.com (PPS) with ESMTPS id 4232uy5xfs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Oct 2024 07:48:17 -0500 (CDT)
+Received: from ediex01.ad.cirrus.com (198.61.84.80) by ediex02.ad.cirrus.com
+ (198.61.84.81) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 9 Oct 2024
+ 13:48:15 +0100
+Received: from ediswmail9.ad.cirrus.com (198.61.86.93) by
+ anon-ediex01.ad.cirrus.com (198.61.84.80) with Microsoft SMTP Server id
+ 15.2.1544.9 via Frontend Transport; Wed, 9 Oct 2024 13:48:15 +0100
+Received: from [198.90.208.18] (ediswws06.ad.cirrus.com [198.90.208.18])
+	by ediswmail9.ad.cirrus.com (Postfix) with ESMTP id 33C5E82024A;
+	Wed,  9 Oct 2024 12:48:15 +0000 (UTC)
+Message-ID: <41a0ad69-912b-4eb3-84f7-fb385433c056@opensource.cirrus.com>
+Date: Wed, 9 Oct 2024 13:48:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="kDUuMoXxf1257TOa"
-Content-Disposition: inline
-In-Reply-To: <55d2ac1c-0619-4b24-b8ab-6eb5f553c1dd@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
+To: "Rafael J. Wysocki" <rafael@kernel.org>,
+        Ulf Hansson
+	<ulf.hansson@linaro.org>,
+        Laurent Pinchart
+	<laurent.pinchart@ideasonboard.com>,
+        Sakari Ailus
+	<sakari.ailus@linux.intel.com>
+CC: <dri-devel@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
+        <linux-gpio@vger.kernel.org>, <amd-gfx@lists.freedesktop.org>,
+        <nouveau@lists.freedesktop.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        <linux-i3c@lists.infradead.org>, <linux-iio@vger.kernel.org>,
+        <linux-input@vger.kernel.org>, <patches@opensource.cirrus.com>,
+        <iommu@lists.linux.dev>, <imx@lists.linux.dev>,
+        <linux-mediatek@lists.infradead.org>, <linux-media@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <linux-mtd@lists.infradead.org>,
+        <netdev@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+        <linux-pci@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-pwm@vger.kernel.org>, <linux-remoteproc@vger.kernel.org>,
+        <linux-sound@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-staging@lists.linux.dev>, <linux-usb@vger.kernel.org>,
+        <linux-serial@vger.kernel.org>, <greybus-dev@lists.linaro.org>,
+        <asahi@lists.linux.dev>, Andy Shevchenko <andy.shevchenko@gmail.com>
+References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
+ <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
+ <20241007184924.GH14766@pendragon.ideasonboard.com>
+ <CAPDyKFpQVnF7eQv3dup8k-3EijnMjuveCG9sZ=Rpey1Y6MBJEg@mail.gmail.com>
+ <20241007222502.GG30699@pendragon.ideasonboard.com>
+ <CAPDyKFrGNwna6Y2pqSRaBbRYHKRaD2ayqQHLtoqLPOu9Et7qTg@mail.gmail.com>
+ <CAJZ5v0jvJyS7D5-wURi2kyWN-rmNa+YqupeQJ000pQRVd9VBcQ@mail.gmail.com>
+Content-Language: en-GB
+From: Richard Fitzgerald <rf@opensource.cirrus.com>
+In-Reply-To: <CAJZ5v0jvJyS7D5-wURi2kyWN-rmNa+YqupeQJ000pQRVd9VBcQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: ltWPFp1gnPUjzPmaRQ9EaXCq91PhMVjU
+X-Proofpoint-ORIG-GUID: ltWPFp1gnPUjzPmaRQ9EaXCq91PhMVjU
+X-Proofpoint-Spam-Reason: safe
 
+On 08/10/2024 7:24 pm, Rafael J. Wysocki wrote:
+> On Tue, Oct 8, 2024 at 12:35 AM Ulf Hansson <ulf.hansson@linaro.org> wrote:
+>>
+>> On Tue, 8 Oct 2024 at 00:25, Laurent Pinchart
+>> <laurent.pinchart@ideasonboard.com> wrote:
+>>>
+>>> Hi Ulf,
+>>>
+>>> On Tue, Oct 08, 2024 at 12:08:24AM +0200, Ulf Hansson wrote:
+>>>> On Mon, 7 Oct 2024 at 20:49, Laurent Pinchart wrote:
+>>>>> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
+>>>>>> On Fri, 4 Oct 2024 at 11:41, Sakari Ailus wrote:
+>>>>>>>
+>>>>>>> Hello everyone,
+>>>>>>>
+>>>>>>> This set will switch the users of pm_runtime_put_autosuspend() to
+>>>>>>> __pm_runtime_put_autosuspend() while the former will soon be re-purposed
+>>>>>>> to include a call to pm_runtime_mark_last_busy(). The two are almost
+>>>>>>> always used together, apart from bugs which are likely common. Going
+>>>>>>> forward, most new users should be using pm_runtime_put_autosuspend().
+>>>>>>>
+>>>>>>> Once this conversion is done and pm_runtime_put_autosuspend() re-purposed,
+>>>>>>> I'll post another set to merge the calls to __pm_runtime_put_autosuspend()
+>>>>>>> and pm_runtime_mark_last_busy().
+>>>>>>
+>>>>>> That sounds like it could cause a lot of churns.
+>>>>>>
+>>>>>> Why not add a new helper function that does the
+>>>>>> pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
+>>>>>> things? Then we can start moving users over to this new interface,
+>>>>>> rather than having this intermediate step?
+>>>>>
+>>>>> I think the API would be nicer if we used the shortest and simplest
+>>>>> function names for the most common use cases. Following
+>>>>> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is that
+>>>>> most common use case. That's why I like Sakari's approach of repurposing
+>>>>> pm_runtime_put_autosuspend(), and introducing
+>>>>> __pm_runtime_put_autosuspend() for the odd cases where
+>>>>> pm_runtime_mark_last_busy() shouldn't be called.
+>>>>
+>>>> Okay, so the reason for this approach is because we couldn't find a
+>>>> short and descriptive name that could be used in favor of
+>>>> pm_runtime_put_autosuspend(). Let me throw some ideas at it and maybe
+>>>> you like it - or not. :-)
+>>>
+>>> I like the idea at least :-)
+>>>
+>>>> I don't know what options you guys discussed, but to me the entire
+>>>> "autosuspend"-suffix isn't really that necessary in my opinion. There
+>>>> are more ways than calling pm_runtime_put_autosuspend() that triggers
+>>>> us to use the RPM_AUTO flag for rpm_suspend(). For example, just
+>>>> calling pm_runtime_put() has the similar effect.
+>>>
+>>> To be honest, I'm lost there. pm_runtime_put() calls
+>>> __pm_runtime_idle(RPM_GET_PUT | RPM_ASYNC), while
+>>> pm_runtime_put_autosuspend() calls __pm_runtime_suspend(RPM_GET_PUT |
+>>> RPM_ASYNC | RPM_AUTO).
+>>
+>> __pm_runtime_idle() ends up calling rpm_idle(), which may call
+>> rpm_suspend() - if it succeeds to idle the device. In that case, it
+>> tags on the RPM_AUTO flag in the call to rpm_suspend(). Quite similar
+>> to what is happening when calling pm_runtime_put_autosuspend().
+> 
+> Right.
+> 
+> For almost everybody, except for a small bunch of drivers that
+> actually have a .runtime_idle() callback, pm_runtime_put() is
+> literally equivalent to pm_runtime_put_autosuspend().
+> 
+> So really the question is why anyone who doesn't provide a
+> .runtime_idle() callback bothers with using this special
+> pm_runtime_put_autosuspend() thing,
 
---kDUuMoXxf1257TOa
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Because they are following the documentation? It says:
 
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
-> Date: Wed, 9 Oct 2024 12:46:00 +0200
->=20
-> >> Hi Lorenzo,
-> >>
-> >> On Mon, Sep 16, 2024 at 12:13:42PM GMT, Lorenzo Bianconi wrote:
-> >>> Add GRO support to cpumap codebase moving the cpu_map_entry kthread t=
-o a
-> >>> NAPI-kthread pinned on the selected cpu.
-> >>>
-> >>> Changes in rfc v2:
-> >>> - get rid of dummy netdev dependency
-> >>>
-> >>> Lorenzo Bianconi (3):
-> >>>   net: Add napi_init_for_gro routine
-> >>>   net: add napi_threaded_poll to netdevice.h
-> >>>   bpf: cpumap: Add gro support
-> >>>
-> >>>  include/linux/netdevice.h |   3 +
-> >>>  kernel/bpf/cpumap.c       | 123 ++++++++++++++++--------------------=
---
-> >>>  net/core/dev.c            |  27 ++++++---
-> >>>  3 files changed, 73 insertions(+), 80 deletions(-)
-> >>>
-> >>> --=20
-> >>> 2.46.0
-> >>>
-> >>
-> >> Sorry about the long delay - finally caught up to everything after
-> >> conferences.
-> >>
-> >> I re-ran my synthetic tests (including baseline). v2 is somehow showing
-> >> 2x bigger gains than v1 (~30% vs ~14%) for tcp_stream. Again, the only
-> >> variable I changed is kernel version - steering prog is active for bot=
-h.
-> >>
-> >>
-> >> Baseline (again)						=09
-> >>
-> >> ./tcp_rr -c -H $TASK_IP -p 50,90,99 -T4 -F8 -l30			        ./tcp_strea=
-m -c -H $TASK_IP -T8 -F16 -l30
-> >> 						=09
-> >> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throug=
-hput (Mbit/s)
-> >> Run 1	2560252	        0.00009087	0.00010495	0.00011647		Run 1	15479.31
-> >> Run 2	2665517	        0.00008575	0.00010239	0.00013311		Run 2	15162.48
-> >> Run 3	2755939	        0.00008191	0.00010367	0.00012287		Run 3	14709.04
-> >> Run 4	2595680	        0.00008575	0.00011263	0.00012671		Run 4	15373.06
-> >> Run 5	2841865	        0.00007999	0.00009471	0.00012799		Run 5	15234.91
-> >> Average	2683850.6	0.000084854	0.00010367	0.00012543		Average	15191.76
-> >> 						=09
-> >> cpumap NAPI patches v2						=09
-> >> 						=09
-> >> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throug=
-hput (Mbit/s)
-> >> Run 1	2577838	        0.00008575	0.00012031	0.00013695		Run 1	19914.56
-> >> Run 2	2729237	        0.00007551	0.00013311	0.00017663		Run 2	20140.92
-> >> Run 3	2689442	        0.00008319	0.00010495	0.00013311		Run 3	19887.48
-> >> Run 4	2862366	        0.00008127	0.00009471	0.00010623		Run 4	19374.49
-> >> Run 5	2700538	        0.00008319	0.00010367	0.00012799		Run 5	19784.49
-> >> Average	2711884.2	0.000081782	0.00011135	0.000136182		Average	19820.388
-> >> Delta	1.04%	        -3.62%	        7.41%	        8.57%			        30.47%
-> >>
-> >> Thanks,
-> >> Daniel
-> >=20
-> > Hi Daniel,
-> >=20
-> > cool, thx for testing it.
-> >=20
-> > @Olek: how do we want to proceed on it? Are you still working on it or =
-do you want me
-> > to send a regular patch for it?
->=20
-> Hi,
->=20
-> I had a small vacation, sorry. I'm starting working on it again today.
+"Drivers should call pm_runtime_mark_last_busy() to update this field
+after carrying out I/O, typically just before calling
+pm_runtime_put_autosuspend()."
 
-ack, no worries. Are you going to rebase the other patches on top of it
-or are you going to try a different approach?
+and
 
-Regards,
-Lorenzo
+"In order to use autosuspend, subsystems or drivers must call
+pm_runtime_use_autosuspend() (...), and thereafter they should use the
+various `*_autosuspend()` helper functions instead of the non#
+autosuspend counterparts"
 
->=20
-> >=20
-> > Regards,
-> > Lorenzo
->=20
-> Thanks,
-> Olek
+So the documentation says I should be using pm_runtime_put_autosuspend()
+instead of pm_runtime_put().
 
---kDUuMoXxf1257TOa
-Content-Type: application/pgp-signature; name="signature.asc"
+Seems unfair to criticise people for following the documentation.
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZwZ7fgAKCRA6cBh0uS2t
-rMNJAQCW5cGMnsVDgt+mpnZyRJ6bKHxvq+zejW/Eo0aPKGpFcQEA1dH42YaVhnT/
-l2f04ZVlZCk10WPkRXb8G4TJhLmrzgc=
-=Yyo1
------END PGP SIGNATURE-----
-
---kDUuMoXxf1257TOa--
 
