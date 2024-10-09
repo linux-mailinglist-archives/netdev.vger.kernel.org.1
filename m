@@ -1,231 +1,112 @@
-Return-Path: <netdev+bounces-133560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AF53996431
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:56:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F333996451
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6A772896B0
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:56:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A61DB21D4A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62047198A2C;
-	Wed,  9 Oct 2024 08:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669983BB48;
+	Wed,  9 Oct 2024 09:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9G7ZWkU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KbQPJZj9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5B1198A01;
-	Wed,  9 Oct 2024 08:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED91EADC;
+	Wed,  9 Oct 2024 09:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728463905; cv=none; b=ctsvPECxbQn8BXw4wVgy34rGKJ8FRFI94AdqK/tBep06JiOrqSLdNXj9avifBLuTtnvGv7xgSQNFHp0DmhObh325FRkuY14hTkaViLO+NdLT81N43lHVJAgnxn2V4nVPfhDFYQ8U8EvygCbG5aWKTYyLcVf+cdgZ4dV62Mz7Ibw=
+	t=1728464493; cv=none; b=PjrPVrOWcVh1npIyAWBQldd82rUyPx0brDcrHW7tbRl7kcY/sOf47AfFbaDj6FT1uziS6ulyw3aCjc6AQXAcTLuO+i+B8AR8IH++9/uxlaTUdkbw3bcGKDy7LNSJFRtiuN/5MNW6qDSEE3GTk9fcj0g570QHw5JVauNBkt3+B/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728463905; c=relaxed/simple;
-	bh=b+116RTJglq8hKTMJPN3ihohHycl1ODOr7MG5VEIobs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GI7cZfTQA+tOxQ2HWseZr286hAcSUFhgPORiAvhl8LIN0ASvUBWHSw9ZT1P+J5jUFpZAZ30imHKq3Q+nJykUnP8e4WFM1oXgrLlgB9TWfER0C7mPUsBYa55Dn65n96V9pRFbO5nfh6SDad2XgBjcsBhGnZvUIOXKXF4l5A5Ox4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9G7ZWkU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E7B7C4CEC5;
-	Wed,  9 Oct 2024 08:51:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728463904;
-	bh=b+116RTJglq8hKTMJPN3ihohHycl1ODOr7MG5VEIobs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o9G7ZWkUiZ2jhvq5Xffn69FYVlVdQLJ2vD2vq0OH8pOa8Pn2o184IsyAtOJxwSAhG
-	 we51csfH2s/J3u4NwHuVw/Dua+LFoCmX2iprgUu13LHO8hXrFUkOJWqn6Yoe8JUNM5
-	 UQzL1jZsg1xzOyZDIDpbPns/vU1fLfp7uT/2QwJ1ankVmgSZ7JxhyzIhIqq/GTlzo1
-	 shGeQGD5ddN997v99g192UiOAWF2uno4uyLJUyM7z+ace2KK0y8tWbgtVRtOWwWwbH
-	 wlL09TdEbFYJlE2bUuqk+VPUMQG/2vEwvQc44WN1H1e5n4GlbrhWh0e/Uq480U1VKK
-	 RWMwG6nRnJW/g==
-Message-ID: <95b23ff9-eb17-4e1c-b7a3-2d3691ffc48f@kernel.org>
-Date: Wed, 9 Oct 2024 17:51:34 +0900
+	s=arc-20240116; t=1728464493; c=relaxed/simple;
+	bh=t4XV67XwT9AqpZE1BMpvVqUY/3bEjFjl116GcFX6tw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YveVOSp/ORZckLJW+p76nUwCWY9ZYib6xpJNWDQyE8LCYXCjCh3/fuvPdQ+byL0xp1193EWVsRGTFFFH1V4U+SO7wdGS/BFrHka0tRxxnjswkPb2iFsIYP9R2dSTfzim+Jnf0aBYxQiTwyYjCfpr4CeJ42XuVnISxhFH/EYDEO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KbQPJZj9; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=O0/uxb+Q2DMRDFmKQ9galN4+KgTPVjf1vmB8NeLKKX0=; b=KbQPJZj9/Pma3mpqAb+48jv3eK
+	b3DYw6yBiR89YmqHiuPDhg+TugDN/BaJ6uHCNAMl3P5W1PQrnQlnW5cgj6z0tI7IQnXm3XEav2foY
+	TWh9aD8EruHE2LuVIoYf73lSPIs/YlXN4+OzVNru0DfzeQglcoN6Z9OhPVhDfNkBdUlSXaqy9tLN7
+	GItgUq7u2dqS948aPzXl0H0YrdruWLzO+OSWxRJkbL55+1Lp8AFXtipO4yoZAxLWSvdKxE9AjSsyU
+	yLz0nfttmLLln9v7TBLdUNS6SbvurKLKuIWkV3Am5amyAfdHBOfNkzMXUAmfzKfFJdQAGLPvZ4Xqg
+	7TPe1Gdg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43336)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sySZG-0000EL-1M;
+	Wed, 09 Oct 2024 10:01:14 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sySZB-00069W-2S;
+	Wed, 09 Oct 2024 10:01:09 +0100
+Date: Wed, 9 Oct 2024 10:01:09 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: populate host_interfaces when
+ attaching PHY
+Message-ID: <ZwZGVRL_j62tH9Mp@shell.armlinux.org.uk>
+References: <ae53177a7b68964b2a988934a09f74a4931b862d.1728438951.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 09/13] ata: Use always-managed version of pci_intx()
-To: Philipp Stanner <pstanner@redhat.com>, Niklas Cassel <cassel@kernel.org>,
- Sergey Shtylyov <s.shtylyov@omp.ru>,
- Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
- <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
- <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
- <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
- Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mostafa Saleh <smostafa@google.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
- =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Kai Vehmanen <kai.vehmanen@linux.intel.com>,
- Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
- Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-sound@vger.kernel.org
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-10-pstanner@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20241009083519.10088-10-pstanner@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ae53177a7b68964b2a988934a09f74a4931b862d.1728438951.git.daniel@makrotopia.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/9/24 17:35, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> All users in ata enable their PCI-Device with pcim_enable_device(). Thus,
-> they need the always-managed version.
-> 
-> Replace pci_intx() with pci_intx_unmanaged().
+On Wed, Oct 09, 2024 at 02:57:03AM +0100, Daniel Golle wrote:
+> Use bitmask of interfaces supported by the MAC for the PHY to choose
+> from if the declared interface mode is among those using a single pair
+> of SerDes lanes.
+> This will allow 2500Base-T PHYs to switch to SGMII on most hosts, which
+> results in half-duplex being supported in case the MAC supports that.
+> Without this change, 2500Base-T PHYs will always operate in 2500Base-X
+> mode with rate-matching, which is not only wasteful in terms of energy
+> consumption, but also limits the supported interface modes to
+> full-duplex only.
 
-This contradicts the sentence above and the patche replaces pci_intx() with
-pcim_intx()... So s/pci_intx_unmanaged/pcim_intx in the above sentence ?
+We've had a similar patch before, and it's been NAK'd. The problem is
+that supplying the host_interfaces for built-in PHYs means that the
+hardware strapping for the PHY interface mode becomes useless, as does
+the DT property specifying it - and thus we may end up selecting a
+mode that both the MAC and PHY support, but the hardware design
+doesn't (e.g. signals aren't connected, signal speed to fast.)
 
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->  drivers/ata/ahci.c       | 2 +-
->  drivers/ata/ata_piix.c   | 2 +-
->  drivers/ata/pata_rdc.c   | 2 +-
->  drivers/ata/sata_sil24.c | 2 +-
->  drivers/ata/sata_sis.c   | 2 +-
->  drivers/ata/sata_uli.c   | 2 +-
->  drivers/ata/sata_vsc.c   | 2 +-
->  7 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/ata/ahci.c b/drivers/ata/ahci.c
-> index 45f63b09828a..9273ff3d4732 100644
-> --- a/drivers/ata/ahci.c
-> +++ b/drivers/ata/ahci.c
-> @@ -1985,7 +1985,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	if (ahci_init_msi(pdev, n_ports, hpriv) < 0) {
->  		/* legacy intx interrupts */
-> -		pci_intx(pdev, 1);
-> +		pcim_intx(pdev, 1);
->  	}
->  	hpriv->irq = pci_irq_vector(pdev, 0);
->  
-> diff --git a/drivers/ata/ata_piix.c b/drivers/ata/ata_piix.c
-> index 093b940bc953..d441246fa357 100644
-> --- a/drivers/ata/ata_piix.c
-> +++ b/drivers/ata/ata_piix.c
-> @@ -1725,7 +1725,7 @@ static int piix_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	 * message-signalled interrupts currently).
->  	 */
->  	if (port_flags & PIIX_FLAG_CHECKINTR)
-> -		pci_intx(pdev, 1);
-> +		pcim_intx(pdev, 1);
->  
->  	if (piix_check_450nx_errata(pdev)) {
->  		/* This writes into the master table but it does not
-> diff --git a/drivers/ata/pata_rdc.c b/drivers/ata/pata_rdc.c
-> index 0a9689862f71..09792aac7f9d 100644
-> --- a/drivers/ata/pata_rdc.c
-> +++ b/drivers/ata/pata_rdc.c
-> @@ -340,7 +340,7 @@ static int rdc_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  		return rc;
->  	host->private_data = hpriv;
->  
-> -	pci_intx(pdev, 1);
-> +	pcim_intx(pdev, 1);
->  
->  	host->flags |= ATA_HOST_PARALLEL_SCAN;
->  
-> diff --git a/drivers/ata/sata_sil24.c b/drivers/ata/sata_sil24.c
-> index 72c03cbdaff4..b771ebd41252 100644
-> --- a/drivers/ata/sata_sil24.c
-> +++ b/drivers/ata/sata_sil24.c
-> @@ -1317,7 +1317,7 @@ static int sil24_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  
->  	if (sata_sil24_msi && !pci_enable_msi(pdev)) {
->  		dev_info(&pdev->dev, "Using MSI\n");
-> -		pci_intx(pdev, 0);
-> +		pcim_intx(pdev, 0);
->  	}
->  
->  	pci_set_master(pdev);
-> diff --git a/drivers/ata/sata_sis.c b/drivers/ata/sata_sis.c
-> index ef8724986de3..b8b6d9eff3b8 100644
-> --- a/drivers/ata/sata_sis.c
-> +++ b/drivers/ata/sata_sis.c
-> @@ -290,7 +290,7 @@ static int sis_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	}
->  
->  	pci_set_master(pdev);
-> -	pci_intx(pdev, 1);
-> +	pcim_intx(pdev, 1);
->  	return ata_host_activate(host, pdev->irq, ata_bmdma_interrupt,
->  				 IRQF_SHARED, &sis_sht);
->  }
-> diff --git a/drivers/ata/sata_uli.c b/drivers/ata/sata_uli.c
-> index 60ea45926cd1..52894ff49dcb 100644
-> --- a/drivers/ata/sata_uli.c
-> +++ b/drivers/ata/sata_uli.c
-> @@ -221,7 +221,7 @@ static int uli_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	}
->  
->  	pci_set_master(pdev);
-> -	pci_intx(pdev, 1);
-> +	pcim_intx(pdev, 1);
->  	return ata_host_activate(host, pdev->irq, ata_bmdma_interrupt,
->  				 IRQF_SHARED, &uli_sht);
->  }
-> diff --git a/drivers/ata/sata_vsc.c b/drivers/ata/sata_vsc.c
-> index d39b87537168..a53a2dfc1e17 100644
-> --- a/drivers/ata/sata_vsc.c
-> +++ b/drivers/ata/sata_vsc.c
-> @@ -384,7 +384,7 @@ static int vsc_sata_init_one(struct pci_dev *pdev,
->  		pci_write_config_byte(pdev, PCI_CACHE_LINE_SIZE, 0x80);
->  
->  	if (pci_enable_msi(pdev) == 0)
-> -		pci_intx(pdev, 0);
-> +		pcim_intx(pdev, 0);
->  
->  	/*
->  	 * Config offset 0x98 is "Extended Control and Status Register 0"
+For example, take a board designed to use RXAUI and the host supports
+10GBASE-R. The first problem is, RXAUI is not listed in the SFP
+interface list because it's not usable over a SFP cage. So, the
+host_interfaces excludes that, and thus the PHY thinks that's not
+supported. It looks at the mask and sees only 10GBASE-R, and
+decides to use that instead with rate matching. The MAC doesn't have
+support for flow control, and thus can't use rate matching.
 
+Not only have the electrical charateristics been violated by selecting
+a faster interface than the hardware was designed for, but we now have
+rate matching being used when it shouldn't be.
 
 -- 
-Damien Le Moal
-Western Digital Research
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
