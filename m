@@ -1,146 +1,167 @@
-Return-Path: <netdev+bounces-133888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA999975B4
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:32:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A0D9975CD
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:41:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A6A11C22AAE
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:32:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7802A1F232D5
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA29C17C7B6;
-	Wed,  9 Oct 2024 19:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AD71E1305;
+	Wed,  9 Oct 2024 19:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1P7Idaee"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="haTjw/NP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B92F14BF86
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 19:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8CC1D356C;
+	Wed,  9 Oct 2024 19:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728502374; cv=none; b=noJcC9Gx76JuPXta9vayNyokouXXna5AzMm1GZwz1UeiNxDntZaJCdK5sjezRwoXzTXC3ysJG9n5tPEInCEnS34Q+rQdlNHoghzE+i+FrGPCNiAocLjBsAq9aIrqo6RwqczyTLTgKSFL//a1mjiuun1xSrmtRthP3vn295Q281w=
+	t=1728502895; cv=none; b=g1cC/aaL6EWSSH0Hag/8kR3uWC0lD61aWlT0m9Bs5EQuepG8JzgAntotFhOSskSW6QFYHt4e3UfxGNsok/klRqfbJZaMSnlZY8DFA099KAr9unM+4mBUITyVflL0O5JqFvKr8G3nBDbP5BhLFSE+fIm1FL02JSLhyKBzzJyWt1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728502374; c=relaxed/simple;
-	bh=2Cvp7Z0BO4ZCgzPNjWv2x823Ve/JFfbBH8uEE2NOshI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hr62yxuxLJ22F2bV/RKFb3aSDrhLsrKXiay3yWTzEzh+h7c9w26pCL+R45zMrxYPL5pKyt4AP9s0btSiYSFzBQmbqdDJty5/9z9RlVlhAkp9S1ZdDbFkRRse1O8/Nl5mRWBR3T1+hvXdCjCcrRvwnskWpfGnb1J2cOSHfYX8jL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1P7Idaee; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4603d3e0547so62021cf.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 12:32:52 -0700 (PDT)
+	s=arc-20240116; t=1728502895; c=relaxed/simple;
+	bh=PDYidJaYfrjomUChvobIVbDDlDk1zVlAhYjbjjNl6kk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o+H6CCfb8S18xrvBoRqcrxuvK2RRal1DHcSnX2ZBkqtDbClthcm0cRGwortuoHHDu2cK1bhUCvdxzZRQqAXZKR40/e9WddzRxpcwGHlg4TlAXJO62R7Wswi5m0J0MtwmQqqcZd5aTdSD/EblOfl1EO6oF392m2GoH/6bKpoBKxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=haTjw/NP; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5398e4ae9efso144254e87.1;
+        Wed, 09 Oct 2024 12:41:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728502372; x=1729107172; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2Cvp7Z0BO4ZCgzPNjWv2x823Ve/JFfbBH8uEE2NOshI=;
-        b=1P7IdaeeYGwJDzFCA9UQ5SOHfL8aLEnQvhUh16EgUX5if539PEt3wvz0SYc8LsVtxS
-         6L/+Abx1n2GpnIfRWS31l7yEdlj/Uroh/r7BVjoZYbeBVVFexvhPHNkXHKmbUW9AmDA+
-         bfxnKKtERdHzR9oe4lrOG5tWjZAf7QUa9KLvgQGrDzFX/QCCpMfHe4rU4c9vqEKyGtcK
-         NZ0TDdHtAVoZbdbZ1/xUzP1bwFfAOG19XUtA//uzjGrVxTvqGKQyKDZ0zGBVB2zFZ4Ai
-         1NhmO/iQiCH7m8iFUWuu9Uac0JKhdy4F3nzPp4+cKf9wOjn7opoPGg/QxWyQtqrSqQjx
-         F/JA==
+        d=gmail.com; s=20230601; t=1728502891; x=1729107691; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Io1G2uneGwHsYKAwtaIvvynFX0xlOmokHD97rmisdy0=;
+        b=haTjw/NP+LFmeIQsSVNPf46SPLroR5wQ6AWCHPRSbBBpgw+F6LbzczPdcsxcj+Ntjb
+         Nz53fEVzXDtDgQNHs4YvCQFq3scwom4q7Jfy/LNzPIlpg3NjS37nVLmv76Yp9FkUm/kg
+         73M4DFwUZ2524KA7afsKQ6mC5Pd0PSaXtdRuveZK6UuySuZr2OvgF0+hDhkQ8SZzxkAG
+         g6xqFbldrYLghmZ79erydEMRhTRtzoGlntkYwY4GZhkHaa1ndHkSN+4U3G30rSQtJ011
+         DQ7bN805MPsPBhc76d1uB6IcsFmR1ph0njamTa6rC3IvoAUaAbLnGFbA7vNfoh2rb1aE
+         8uMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728502372; x=1729107172;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2Cvp7Z0BO4ZCgzPNjWv2x823Ve/JFfbBH8uEE2NOshI=;
-        b=R58PTx7j51qAHM71TPpl4RmMwvs6ypy9F1VJiCvZa9Ian77DokLzi4WbI4TM1AfUwf
-         x7lIUTJlyLvvZ+pkjRj9ROnCdQof/C9H/56Mtmj3stBUZRLp9rGIp1zwRDxmqYQ+4KKJ
-         eCQIpkZ3cORdRIMjrEBtXUlFqNoQYg/ESw7SeEq+29dPN7p8K7nLNNuuU5xq44llCHTF
-         xXOt/fIa/dLzHg5263Zie+pzRmcEX3sjNLX4KMlWaPHm206QVAUD2fLHV/zOS90PLoLq
-         RltC7F65/F7zTZy7ijr2jrxIPe1TKir3B9ARJpaglYd3Lpb4cvOto8jDFtR+ogZtMTKa
-         gDQw==
-X-Forwarded-Encrypted: i=1; AJvYcCWNj4AvEgA/bu/wJspyKYHIHAfJ/wZqdmGCJykfp8gQ7oehuw3qOqGEYh+h/ytLXibksv0vSZw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv0AQ7C5XU3L578qPgRk/5zKNHliWqIml+JtFcm7yEts+grRpw
-	lyNkrGOljxJmtBUha7Ulqysosi7OQECubIRFi53hv3WV7tHs74VODTL9d5m5WT8noVjJ5HZSROd
-	B4/6IrecZo1RLzpP7Vgc9wutkC6/pDB3JPw3A
-X-Google-Smtp-Source: AGHT+IHLWvU627n5aUnUIgUnk5bcyJ1UsZTeTdc5R2gxTZL5uDVqsEQL4xxDfqML+gZJPjOCoiXlqMAevpEHowZSwNM=
-X-Received: by 2002:a05:622a:a609:b0:45f:506:4d08 with SMTP id
- d75a77b69052e-460404743acmr543851cf.28.1728502371714; Wed, 09 Oct 2024
- 12:32:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728502891; x=1729107691;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Io1G2uneGwHsYKAwtaIvvynFX0xlOmokHD97rmisdy0=;
+        b=TAHtC2oKWz/rC+oStk+Qrp/2m4qlyakCppJiS7x7wfGdcouh/eWmtns7uDUZj9Qw27
+         cBKExlIULxsPuMzdsRD6IxIppMFX5qOJTKaws07idfRt5yp4RYHKO6CqArLCTgat2aGe
+         1qICug8nF/H5/hkFTqwsKABKFTx2NUKj1+1bsDyU8y5T14uFzJKpDi2M79m46Gw0H9H0
+         Vb7NKBdFQxV+b/ABO9c17eksRs/f0AdxzCidUXTca2kdv7rQdLxoXUjZfajnC/+aquOx
+         lEf7h7VRvKUsrgyF8JMJZYR3hlBjvy1ZdG+mhrDaUiTnraDa9VRGX3hV7zbgaugt441Y
+         6Pzg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+FoGUdopiBLaS396PRGQ1dcvifUv6/uOOjMI30S6hw3fkdIs7nB4JZ/qVJ95DMA1o5YQ=@vger.kernel.org, AJvYcCU22lMiFkBD47zTH1OVp42UllylRYTA8BaPK+5oeWsurulvQ+FZepWEvOQsJjjjFcXyOvhqkJgYunpWqOqI@vger.kernel.org, AJvYcCUQIOAiUh1+OhuV1XKs2WYqtdbhRK6gBiThEMqZ7QXlEf0FPi19sSH5QC0X63R6E0rKwjWqAykhCnB7A8c=@vger.kernel.org, AJvYcCUpn7+BKorWkP5TURiNPAFZkDACudsaiEgtA0rBqo3UPCz9+GDst1+fYYC71HJNqssh8sBzMKqIB4VtRvk=@vger.kernel.org, AJvYcCVHZSJTCpiYlUTG4ZzaCDn2rN5OfROlhYPZb3RzvEgCgNtQG60k2FcCfxV8ovfUKFZ5t7cL/mD0Xeh5@vger.kernel.org, AJvYcCVKQT4GGqBKq28G8wsXdWfAOZsHyzXXW7f8ubmcG9ZYwEWZ5VFX4ZLSEqjoICk2kNrlQELg9zcQ@vger.kernel.org, AJvYcCWm/ZJt1tfbyTgNklluDJ+yVCuB/1Lp6Qg+ebxjMwl2gQNVL7YiS26V+QQSIEG+uDA8Wh6WaoGSHlMAxTS69Jg=@vger.kernel.org, AJvYcCX7HocRTfGz+82QIOjFXYcnVjkZeWdZ4mo51gwqzInVN5VgXiiFeJfEsaqMh7j/xLAZWi1ZTrhccfqz@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywufx1+08hjwgh9xWcbKb/6OFM0cKZ9CbuFaDBBBwAsM56qqrra
+	zESJ3Bw/q7PzGQAIUJ+CZ/6u+0zoLRHL+9U3B/k8CRaRppt660RY
+X-Google-Smtp-Source: AGHT+IEJ7Hh7KYSEFQ7TnvOgBW+KHHTbn0YpY2aq9eVXupaQTxUm7Wi9eOrRO7yFgrSR7VO5SquDug==
+X-Received: by 2002:a05:6512:224b:b0:539:921a:44af with SMTP id 2adb3069b0e04-539c4967bbemr2532382e87.48.1728502891046;
+        Wed, 09 Oct 2024 12:41:31 -0700 (PDT)
+Received: from [192.168.2.105] (p54a0712c.dip0.t-ipconnect.de. [84.160.113.44])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf5f3adsm28720915e9.22.2024.10.09.12.41.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Oct 2024 12:41:30 -0700 (PDT)
+Message-ID: <411f3c94-58b5-471e-bc58-e23d89d2078f@gmail.com>
+Date: Wed, 9 Oct 2024 21:41:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <CAHS8izOv9cB60oUbxz_52BMGi7T4_u9rzTOCb23LGvZOX0QXqg@mail.gmail.com>
- <016059c6-b84d-4b55-937c-e56edbedc53a@kernel.dk>
-In-Reply-To: <016059c6-b84d-4b55-937c-e56edbedc53a@kernel.dk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 9 Oct 2024 12:32:37 -0700
-Message-ID: <CAHS8izOF5dM7WUrzDhGrR_UP7t_Mg7=sgti_TSbqG4x00UBfXA@mail.gmail.com>
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-To: Jens Axboe <axboe@kernel.dk>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 10/13] staging: rts5280: Use always-managed version of
+ pci_intx()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Philipp Stanner <pstanner@redhat.com>
+Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
+ <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Alex Dubov <oakad@yahoo.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
+ GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
+ Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
+ Sanjay R Mehta <sanju.mehta@amd.com>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
+ <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
+ Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
+ Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Mostafa Saleh <smostafa@google.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
+ =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>,
+ Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Kai Vehmanen <kai.vehmanen@linux.intel.com>,
+ Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
+ Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>,
+ linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
+ kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
+ linux-sound@vger.kernel.org
+References: <20241009083519.10088-1-pstanner@redhat.com>
+ <20241009083519.10088-11-pstanner@redhat.com>
+ <2024100936-brunette-flannels-0d82@gregkh>
+Content-Language: en-US
+From: Philipp Hortmann <philipp.g.hortmann@gmail.com>
+In-Reply-To: <2024100936-brunette-flannels-0d82@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 9, 2024 at 9:57=E2=80=AFAM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 10/9/24 10:55 AM, Mina Almasry wrote:
-> > On Mon, Oct 7, 2024 at 3:16?PM David Wei <dw@davidwei.uk> wrote:
-> >>
-> >> This patchset adds support for zero copy rx into userspace pages using
-> >> io_uring, eliminating a kernel to user copy.
-> >>
-> >> We configure a page pool that a driver uses to fill a hw rx queue to
-> >> hand out user pages instead of kernel pages. Any data that ends up
-> >> hitting this hw rx queue will thus be dma'd into userspace memory
-> >> directly, without needing to be bounced through kernel memory. 'Readin=
-g'
-> >> data out of a socket instead becomes a _notification_ mechanism, where
-> >> the kernel tells userspace where the data is. The overall approach is
-> >> similar to the devmem TCP proposal.
-> >>
-> >> This relies on hw header/data split, flow steering and RSS to ensure
-> >> packet headers remain in kernel memory and only desired flows hit a hw
-> >> rx queue configured for zero copy. Configuring this is outside of the
-> >> scope of this patchset.
-> >>
-> >> We share netdev core infra with devmem TCP. The main difference is tha=
-t
-> >> io_uring is used for the uAPI and the lifetime of all objects are boun=
-d
-> >> to an io_uring instance.
-> >
-> > I've been thinking about this a bit, and I hope this feedback isn't
-> > too late, but I think your work may be useful for users not using
-> > io_uring. I.e. zero copy to host memory that is not dependent on page
-> > aligned MSS sizing. I.e. AF_XDP zerocopy but using the TCP stack.
->
-> Not David, but come on, let's please get this moving forward. It's been
-> stuck behind dependencies for seemingly forever, which are finally
-> resolved.
+On 10/9/24 11:38, Greg Kroah-Hartman wrote:
+> On Wed, Oct 09, 2024 at 10:35:16AM +0200, Philipp Stanner wrote:
+>> pci_intx() is a hybrid function which can sometimes be managed through
+>> devres. To remove this hybrid nature from pci_intx(), it is necessary to
+>> port users to either an always-managed or a never-managed version.
+>>
+>> rts5208 enables its PCI-Device with pcim_enable_device(). Thus, it needs the
+>> always-managed version.
+>>
+>> Replace pci_intx() with pcim_intx().
+>>
+>> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+>> ---
+>>   drivers/staging/rts5208/rtsx.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> 
 
-Part of the reason this has been stuck behind dependencies for so long
-is because the dependency took the time to implement things very
-generically (memory providers, net_iovs) and provided you with the
-primitives that enable your work. And dealt with nacks in this area
-you now don't have to deal with.
+Hi Philipp,
 
-> I don't think this is a reasonable ask at all for this
-> patchset. If you want to work on that after the fact, then that's
-> certainly an option.
+this driver (rts5208) will be removed soon - patch is send in.
 
-I think this work is extensible to sockets and the implementation need
-not be heavily tied to io_uring; yes at least leaving things open for
-a socket extension to be done easier in the future would be good, IMO.
-I'll look at the series more closely to see if I actually have any
-concrete feedback along these lines. I hope you're open to some of it
-:-)
+Discussion about removal:
+https://lore.kernel.org/linux-staging/2024100943-shank-washed-a765@gregkh/T/#t
 
---
-Thanks,
-Mina
+Thanks for your support.
+
+Bye Philipp
+
 
