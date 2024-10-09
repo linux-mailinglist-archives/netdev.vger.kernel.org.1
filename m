@@ -1,181 +1,200 @@
-Return-Path: <netdev+bounces-133701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748C9996BBA
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:21:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 490F6996BBF
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:22:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A64D11C23E6B
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:21:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79F221C250DB
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48199199949;
-	Wed,  9 Oct 2024 13:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB36195390;
+	Wed,  9 Oct 2024 13:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SOz/nLYu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WzvRmXox"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37711126C0F;
-	Wed,  9 Oct 2024 13:21:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2476E193417;
+	Wed,  9 Oct 2024 13:22:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728480076; cv=none; b=m9w87yQZU8KCaNaoqa0D0FIhyrko4BTFjis52unWkuKRgyAvPem2WZc9SaXKJ+AOKCG/GhPGQ+fOJ1qgWJvM6oMqNh+i9QRSu37CKRrgsxMorLzpjzmvIH1lhpLH6z35XVcxyuoZby8VmnPkuYz20B8THIrYZRUCFa0WnX8AzcI=
+	t=1728480153; cv=none; b=aYbu5GhvXHePQGEPstTwIpVrwK8RP1C+qFTFK5eptqw6fZiNFnsWTaqzLUiwbIrc57LeV6Rj4senk4rGMNGFHkj02ACfHWPIDXfsIUT/dg6Edmws22DMQWXjDdc+65vwZNNpXC78SJQjoF4KI0GMgnWCsAJTEfxrvTvrifH+Cno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728480076; c=relaxed/simple;
-	bh=id0daXtFOzbrelYtwicjbB38DtPm66zoZR+OFqNlhLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WO/npOqjvd9/iQHnOwij7GtY3jrrCk2p9eOKU9ipCXFdC9JWp+lXRGUQpXGBSPP0LfyGQ/H7uXIgnjydAIbznsRpfHObYDlnj/3PIrvuWBVRdArP18KnmfslU9DGDFgjBYKry+dQEdUQTSZPRAZhtrUgAL8XIswEID2uINvWN+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SOz/nLYu; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728480075; x=1760016075;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=id0daXtFOzbrelYtwicjbB38DtPm66zoZR+OFqNlhLY=;
-  b=SOz/nLYuPVtDKz3C1ianfm/jgpR88TjMThdpWI7oZhJjIHZPtDt9q7cg
-   +RsKCViKhRJCtb/cip0IUrDAaACFIY2Y3TjoBMf67COoHfFZ/TUY10iwA
-   4TPc/Fl8vDURDIJ553yjsZP771KCTdnmu53NP68JnqQm0ZzIzdY+SQkAR
-   XzgAEC8rjJd9ubrfdN6rsGFrxulO4+DFwGOkRwHuFtWXpbF7jO326yFHB
-   YQZsXCOvqNpHAq8mISa0aLnf+c/EtV0OQNFknrVVgCiBCKCWB/kWPxw2k
-   wEqhfoEN6hUcsoEdgHJ5gZpdX0abRhIVl2H0cz+Yt7HxHtl/6y1cq2wvi
-   A==;
-X-CSE-ConnectionGUID: nzCzdMzXSqagM2swKn5Gxg==
-X-CSE-MsgGUID: w4MlxcJ8S1uOg8geUA4o3w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="45246568"
-X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
-   d="scan'208";a="45246568"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 06:21:14 -0700
-X-CSE-ConnectionGUID: N651c8blRcCjdYDnrpfqYQ==
-X-CSE-MsgGUID: 0YREzMx2RYCssUEeog/gMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
-   d="scan'208";a="76472441"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 06:21:11 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1syWcm-000000018Pi-1Da7;
-	Wed, 09 Oct 2024 16:21:08 +0300
-Date: Wed, 9 Oct 2024 16:21:08 +0300
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
-	amadeuszx.slawinski@linux.intel.com,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Subject: Re: [PATCH v2] cleanup: adjust scoped_guard() to avoid potential
- warning
-Message-ID: <ZwaDRJBs82oFMbZ8@smile.fi.intel.com>
-References: <20241009114446.14873-1-przemyslaw.kitszel@intel.com>
+	s=arc-20240116; t=1728480153; c=relaxed/simple;
+	bh=c/Ke8cDlAz88Ko+wNmc1PhKLHi97ZVMKhNUuuDBCu/A=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=H1YZFpPjfq0CHbSAxyuzW0osnpD+A78a47zsY3OyHl1Bu+Blk2Y9CWbNiSJN4RSpRDbF2KPJbNYSv3FhRhlj1p6to2DAqb+/vwV9ibaRlisfuXqos7M4qYeWR4Fw2Ts5HOcIF4tx52gGYKhmqwhrWhT31cAjdC/6mNvgvLcUcc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WzvRmXox; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-45d8f76eca7so69046441cf.2;
+        Wed, 09 Oct 2024 06:22:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728480151; x=1729084951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yNn4132JGdlb6IgsmTiaZ35isnkVMyU3YX8J61T2h5o=;
+        b=WzvRmXoxfUbemhHTRFlC0w1zbhkzYT+An2I9JO4gimOk0k44t39hRIl57PR3xhygwz
+         DPGcpZ5qAMs0/XTy6g0dbsHOnVaGAWThL5nCfPHqJ4PT5wn7sZf4w+sFpdNvUbd6aNJc
+         jOoIV6gRWzG95T8KbSfd0j1toyQTSG0+1RSQqMV8dhZnUAWaMqR+hWA+3QtOSuNT+Vfz
+         8XD4c99UfYMaFlQOXCp8ArjM5UonKRgzgtvKpbSrzL4ORRSCts4ZUZ1HSC1qHsKSi2Js
+         HDnx2AzH5wzlDPeNgk5tBq7bMswPb2mlRAvWMUUcmxvklNFnYAU2zLVi6syfsu0k3hqW
+         uJgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728480151; x=1729084951;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=yNn4132JGdlb6IgsmTiaZ35isnkVMyU3YX8J61T2h5o=;
+        b=HMC6Vg5rNuFd/CrKDpPY5DKmeVfcHVtV9yKZAYdfRCi7CWdt1a5RJA/o1hJVLRuB2V
+         xCNLt14Su9LTuErAxi9DMXcJ89DJFxjFUhDC0wE7pKc1KcUbo9P7Q+KtwFDRuea9/EPd
+         yB0KcBQW1ljHTco8TPuBYcNMtVCOX36O7lvG/nComSwJySywN8X7lUfAZhjQXzJLJPOI
+         bcrBLktOU+JobP8l6H9cvhgkdL7iwJJFhwJ9tXev6Rhogm+24JoZrwzgooc2d5rAmdKf
+         1R6F3setlzo+RdMweD3a7BtJmOetwO5YSIWvokHJzqfRPe3QroWYeg6LwGmTbsDfMGwU
+         rocQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVESbcW/4stvW4PmI+smbGZ0A7spALL6CjelAeE14amiaI+tDQxZAuNim2FSrkDARZTY5+JLsL/@vger.kernel.org, AJvYcCVwhlvSEyonQDE3IPUdYHslhg6h3ROgjuZR8J+sdOd+DMOETvJq5KJbuqCPdxkijrdzp/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+d3PEE/KXMUi9+VYsdx/JBEWmApNaneFb8Yc4b46Q1CeY9Ppz
+	xLugGi/ROFcP4riixvfQ5E/I6x0iAU3+n1a5rOe4CKp0KRkqZpu0
+X-Google-Smtp-Source: AGHT+IH6VWWMV9xFZXmvX2a2OpfO4zxXiGGzkkRr4dAiQufxsF3RN315juaHLNyr6oR4VCnOzQm0AQ==
+X-Received: by 2002:a05:622a:138c:b0:458:2230:a478 with SMTP id d75a77b69052e-45fb0e893fbmr39832141cf.50.1728480150940;
+        Wed, 09 Oct 2024 06:22:30 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45da74b52bdsm46293841cf.18.2024.10.09.06.22.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 06:22:30 -0700 (PDT)
+Date: Wed, 09 Oct 2024 09:22:30 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemb@google.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <6706839620038_1cca31294cf@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoALeCguB0+HpTq+MHitHZft3drF5OunPh1Qme8XGifiNw@mail.gmail.com>
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-2-kerneljasonxing@gmail.com>
+ <67057db07a8c6_1a4199294b6@willemb.c.googlers.com.notmuch>
+ <CAL+tcoALeCguB0+HpTq+MHitHZft3drF5OunPh1Qme8XGifiNw@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/9] net-timestamp: add bpf infrastructure to
+ allow exposing more information later
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009114446.14873-1-przemyslaw.kitszel@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 09, 2024 at 01:44:17PM +0200, Przemek Kitszel wrote:
-> Change scoped_guard() to make reasoning about it easier for static
-> analysis tools (smatch, compiler diagnostics), especially to enable them
-> to tell if the given scoped_guard() is conditional (interruptible-locks,
-> try-locks) or not (like simple mutex_lock()).
-> 
-> Add compile-time error if scoped_cond_guard() is used for non-conditional
-> lock class.
-> 
-> Beyond easier tooling and a little shrink reported by bloat-o-meter:
-> add/remove: 3/2 grow/shrink: 45/55 up/down: 1573/-2069 (-496)
-> this patch enables developer to write code like:
-> 
-> int foo(struct my_drv *adapter)
-> {
-> 	scoped_guard(spinlock, &adapter->some_spinlock)
-> 		return adapter->spinlock_protected_var;
-> }
-> 
-> Current scoped_guard() implementation does not support that,
-> due to compiler complaining:
-> error: control reaches end of non-void function [-Werror=return-type]
-> 
-> Technical stuff about the change:
-> scoped_guard() macro uses common idiom of using "for" statement to declare
-> a scoped variable. Unfortunately, current logic is too hard for compiler
-> diagnostics to be sure that there is exactly one loop step; fix that.
-> 
-> To make any loop so trivial that there is no above warning, it must not
-> depend on any non-const variable to tell if there are more steps. There is
-> no obvious solution for that in C, but one could use the compound
-> statement expression with "goto" jumping past the "loop", effectively
-> leaving only the subscope part of the loop semantics.
-> 
-> More impl details:
-> one more level of macro indirection is now needed to avoid duplicating
-> label names;
-> I didn't spot any other place that is using the
-> "for (...; goto label) if (0) label: break;" idiom, so it's not packed
-> for reuse, what makes actual macros code cleaner.
-> 
-> There was also a need to introduce const true/false variable per lock
-> class, it is used to aid compiler diagnostics reasoning about "exactly
-> 1 step" loops (note that converting that to function would undo the whole
-> benefit).
-> 
-> Big thanks to Andy Shevchenko for help on this patch, both internal and
-> public, ranging from whitespace/formatting, through commit message
-> clarifications, general improvements, ending with presenting alternative
-> approaches - all despite not even liking the idea.
-> 
-> Big thanks to Dmitry Torokhov for the idea of compile-time check for
-> scoped_cond_guard(), and general improvements for the patch.
+Jason Xing wrote:
+> On Wed, Oct 9, 2024 at 2:45=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Implement basic codes so that we later can easily add each tx point=
+s.
+> > > Introducing BPF_SOCK_OPS_ALL_CB_FLAGS used as a test statement can =
+help use
+> > > control whether to output or not.
+> > >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > >  include/uapi/linux/bpf.h       |  5 ++++-
+> > >  net/core/skbuff.c              | 18 ++++++++++++++++++
+> > >  tools/include/uapi/linux/bpf.h |  5 ++++-
+> > >  3 files changed, 26 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > > index c6cd7c7aeeee..157e139ed6fc 100644
+> > > --- a/include/uapi/linux/bpf.h
+> > > +++ b/include/uapi/linux/bpf.h
+> > > @@ -6900,8 +6900,11 @@ enum {
+> > >        * options first before the BPF program does.
+> > >        */
+> > >       BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG =3D (1<<6),
+> > > +     /* Call bpf when the kernel is generating tx timestamps.
+> > > +      */
+> > > +     BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG =3D (1<<7),
+> > >  /* Mask of all currently supported cb flags */
+> > > -     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0x7F,
+> > > +     BPF_SOCK_OPS_ALL_CB_FLAGS       =3D 0xFF,
+> > >  };
+> > >
+> > >  /* List of known BPF sock_ops operators.
+> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > index 74149dc4ee31..5ff1a91c1204 100644
+> > > --- a/net/core/skbuff.c
+> > > +++ b/net/core/skbuff.c
+> > > @@ -5539,6 +5539,21 @@ void skb_complete_tx_timestamp(struct sk_buf=
+f *skb,
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+> > >
+> > > +static bool bpf_skb_tstamp_tx(struct sock *sk, u32 scm_flag,
+> > > +                           struct skb_shared_hwtstamps *hwtstamps)=
 
-...
+> > > +{
+> > > +     struct tcp_sock *tp;
+> > > +
+> > > +     if (!sk_is_tcp(sk))
+> > > +             return false;
+> > > +
+> > > +     tp =3D tcp_sk(sk);
+> > > +     if (BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_O=
+PT_CB_FLAG))
+> > > +             return true;
+> > > +
+> > > +     return false;
+> > > +}
+> > > +
+> > >  void __skb_tstamp_tx(struct sk_buff *orig_skb,
+> > >                    const struct sk_buff *ack_skb,
+> > >                    struct skb_shared_hwtstamps *hwtstamps,
+> > > @@ -5551,6 +5566,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb=
+,
+> > >       if (!sk)
+> > >               return;
+> > >
+> > > +     if (bpf_skb_tstamp_tx(sk, tstype, hwtstamps))
+> > > +             return;
+> > > +
+> >
+> > Eventually, this whole feature could probably be behind a
+> > static_branch.
+> =
 
-> @@ -149,14 +149,21 @@ static inline class_##_name##_t class_##_name##ext##_constructor(_init_args) \
->   *      similar to scoped_guard(), except it does fail when the lock
->   *      acquire fails.
->   *
-> + *	Only for conditional locks.
+> You want to implement another toggle to control it? But for tx path
+> "BPF_SOCK_OPS_TEST_FLAG(tp, BPF_SOCK_OPS_TX_TIMESTAMPING_OPT_CB_FLAG)"
+> works as a per-netns toggle. I would like to know what you exactly
+> want to do in the next move?
 
-> + *
-
-Slipped redundant blank line.
-
->   */
-
-...
-
-> +/* helper for the scoped_guard() macro
-
- /*
-  * This is wrong style of the comment block, it's not network
-  * related code where it's acceptable. Also, respect English,
-  * i.e. capitalisation and punctuation in the sentences.
-  */
-
-> + *
-> + * Note that the "!__is_cond_ptr(_name)" part of the condition ensures
-> + * that compiler would be sure that for unconditional locks the body of
-> + * the loop could not be skipped; it is needed because the other
-> + * part - "__guard_ptr(_name)(&scope)" - is too hard to deduce (even if
-> + * could be proven true for unconditional locks).
-> + */
-
--- 
-With Best Regards,
-Andy Shevchenko
-
+Not another toggle. A static branch that enables the datapath logic
+when a BPF program becomes active. See also for instance ipv4_min_ttl.
 
 
