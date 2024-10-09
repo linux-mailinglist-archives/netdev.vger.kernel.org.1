@@ -1,85 +1,178 @@
-Return-Path: <netdev+bounces-133733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE73F996D17
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:02:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982BB996D1E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:03:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86A691F2578A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:02:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C96A11C20F58
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824DC199FAC;
-	Wed,  9 Oct 2024 14:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B8619CC3E;
+	Wed,  9 Oct 2024 14:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WE0ZyA1F"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CZPrXMov"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5D338DC8;
-	Wed,  9 Oct 2024 14:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D6F19CC34
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 14:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728482488; cv=none; b=O7GBrxFJIdP1tgW7kTbCBAKpiphIWDYqMRLt6fxulr8ORJBnC9LoQASad00D90+3/M3WWJB/xyPp7w6NwQ3pNCVQ6l2FnDNl1zKs+eqnsEIwhYDTl9uV8CImn2lnp2f2W88xBrhErmAyaXpKs8spbw7Ncs2NrJd6LvhmES3Ty7M=
+	t=1728482500; cv=none; b=c+z1R04nUMeV0DApNRQ+CaEghkmiNjlRev++2P7f/QUlZUBWmK80kjkZZnwW2z/BtdRiXeO93lOqCN+N2KAnp3mpVNsokXrCl2yr59PbvratA2SoAQ9cV9qzS4jKIn5Z1WBmJsWMrCowWImsNufbmAaPWiLw02PlJ2fKk9sa7n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728482488; c=relaxed/simple;
-	bh=2JbLa20JN/3ywK6IVx4oCdQ05OVI4F87l8ogZWYm4b8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ewRzx1XIAqKnm3k51WgpQvIE/wEyANrVSDiWVldoVChW7yA+sDurqr7b1IqZFhunrynyrlL/zfZVp6CN0Abty9yfJq6KQzfOiQsgcRSGu29pxw6jkHjSVzs86nsb+BSL/DslHNUFWZi3qr7z2p6o+dGBN/yzdJK+MiyP13p2psU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WE0ZyA1F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 988B8C4CEC3;
-	Wed,  9 Oct 2024 14:01:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728482487;
-	bh=2JbLa20JN/3ywK6IVx4oCdQ05OVI4F87l8ogZWYm4b8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WE0ZyA1FKozwqrzhRTUbwsoHEoDe/V4nqQsAYDl4Sjg/M2hsCLi2UxgSJ46HKdR2X
-	 MCNy9HoWCH5g23SBcYbtLWfR49guY+tXkN0wTcdQxEowBgjFLEd9xpsgqHiPb+sEwu
-	 x/BH5Uk8qHRTqDkITI53DsX8ptgRZCNmGW+aIySnuig/05u0C4D823o+l9OrUp9aTj
-	 VfsUetTdUzYCnGiPV/LQHGWv4aAZFpayRDvPXR34HoiMPPw5LKm2bTsfTCtDwNXDEY
-	 gyO9yoL2xXruXJf9LmJ7hpBNJ0W5R3UuRz6VcQ35gkz7e+jOKekKsgQuEo8K6pFTTe
-	 abZCif0mdttHQ==
-Date: Wed, 9 Oct 2024 15:01:23 +0100
-From: Simon Horman <horms@kernel.org>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: sparx5: fix source port register when mirroring
-Message-ID: <20241009140123.GB99782@kernel.org>
-References: <20241009-mirroring-fix-v1-1-9ec962301989@microchip.com>
+	s=arc-20240116; t=1728482500; c=relaxed/simple;
+	bh=xuA9fUHFtoQblXYKldwTdTtapCWeMBROK2X3/1kWnbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=udYRHExQZU5TEwuMHB6m+qFPtPKe9i9ZpPjRaojCxn/qZmZYVTrKTC2sjFFFgmvFiO/K3Xa+JnUt+W7USlia4PFPsqmCm8Slytxql5othE/857derJHf40Sue0tZO33DQgQvpzqMl4eO1B7FNokpS5uDxSxrRzo5UX4690nTEpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CZPrXMov; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728482498; x=1760018498;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xuA9fUHFtoQblXYKldwTdTtapCWeMBROK2X3/1kWnbE=;
+  b=CZPrXMov16YvebH/DknVyR/cOFu6rQPDR4kbJMdaDzQsVqbTIUPygFJP
+   hV/amEwsMTgtqiA25rA//nqTobxpyF3Pj79T4JKWUadF5tBdxlIIZPZrK
+   AgKdG1K9lGCwJaatwA45vaDrGRj15MDgeIBtZpdhirv3ImV/M/VR1Amvg
+   D47fz11XqZuwbj+IDFgHNXL7H2oqqJ2dMHeN9zb95VuZsgqzhg+++Ysr6
+   ci0Ogo40Age1vm5pw2W7TXCw/OjNu+lO6QFG9sAxx311GMaLJahneOUc/
+   075w8xb/1xKLAyHe2dtBiBlhFCbpcp47qBsaDjW37R5kWSlInQjRHDeSA
+   w==;
+X-CSE-ConnectionGUID: YitLpPOgRM6O3vwzuqn4Rg==
+X-CSE-MsgGUID: NlzbfIQzTJK6V/cKu1unAQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="31678204"
+X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
+   d="scan'208";a="31678204"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 07:01:38 -0700
+X-CSE-ConnectionGUID: OUkyTY60Tp+7rz+utcNmuQ==
+X-CSE-MsgGUID: uEZbFkRFSy6pIODMto7p/w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
+   d="scan'208";a="81281274"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.245.120.122]) ([10.245.120.122])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 07:01:36 -0700
+Message-ID: <4bd4eca1-91d7-4ffb-92d9-ad708d83248c@linux.intel.com>
+Date: Wed, 9 Oct 2024 16:01:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009-mirroring-fix-v1-1-9ec962301989@microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: Fix use after free during
+ unload with ports in bridge
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+References: <20241009124912.9774-2-marcin.szycik@linux.intel.com>
+ <3a5591f9-a8fe-4557-b6c4-ea393dd28913@molgen.mpg.de>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <3a5591f9-a8fe-4557-b6c4-ea393dd28913@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 09, 2024 at 02:49:56PM +0200, Daniel Machon wrote:
-> When port mirroring is added to a port, the bit position of the source
-> port, needs to be written to the register ANA_AC_PROBE_PORT_CFG.  This
-> register is replicated for n_ports > 32, and therefore we need to derive
-> the correct register from the port number.
+
+
+On 09.10.2024 15:12, Paul Menzel wrote:
+> Dear Marcin,
 > 
-> Before this patch, we wrongly calculate the register from portno /
-> BITS_PER_BYTE, where the divisor ought to be 32, causing any port >=8 to
-> be written to the wrong register. We fix this, by using do_div(), where
-> the dividend is the register, the remainder is the bit position and the
-> divisor is now 32.
 > 
-> Fixes: 4e50d72b3b95 ("net: sparx5: add port mirroring implementation")
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> Thank you for the patch, and the reproducer and detailed commit message.
+> 
+> Am 09.10.24 um 14:49 schrieb Marcin Szycik:
+>> Unloading the ice driver while switchdev port representors are added to
+>> a bridge can lead to kernel panic. Reproducer:
+>>
+>>    modprobe ice
+>>
+>>    devlink dev eswitch set $PF1_PCI mode switchdev
+>>
+>>    ip link add $BR type bridge
+>>    ip link set $BR up
+>>
+>>    echo 2 > /sys/class/net/$PF1/device/sriov_numvfs
+>>    sleep 2
+>>
+>>    ip link set $PF1 master $BR
+>>    ip link set $VF1_PR master $BR
+>>    ip link set $VF2_PR master $BR
+>>    ip link set $PF1 up
+>>    ip link set $VF1_PR up
+>>    ip link set $VF2_PR up
+>>    ip link set $VF1 up
+>>
+>>    rmmod irdma ice
+> 
+> For people hitting the issue, an excerpt from the panic would also be nice, so it can be found more easily.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Will add in v2, thanks.
+Marcin
 
-...
+>> When unloading the driver, ice_eswitch_detach() is eventually called as
+>> part of VF freeing. First, it removes a port representor from xarray,
+>> then unregister_netdev() is called (via repr->ops.rem()), finally
+>> representor is deallocated. The problem comes from the bridge doing its
+>> own deinit at the same time. unregister_netdev() triggers a notifier
+>> chain, resulting in ice_eswitch_br_port_deinit() being called. It should
+>> set repr->br_port = NULL, but this does not happen since repr has
+>> already been removed from xarray and is not found. Regardless, it
+>> finishes up deallocating br_port. At this point, repr is still not freed
+>> and an fdb event can happen, in which ice_eswitch_br_fdb_event_work()
+>> takes repr->br_port and tries to use it, which causes a panic (use after
+>> free).
+>>
+>> Note that this only happens with 2 or more port representors added to
+>> the bridge, since with only one representor port, the bridge deinit is
+>> slightly different (ice_eswitch_br_port_deinit() is called via
+>> ice_eswitch_br_ports_flush(), not ice_eswitch_br_port_unlink()).
+>>
+>> A workaround is available: brctl setageing $BR 0, which stops the bridge
+>> from adding fdb entries altogether.
+>>
+>> Change the order of operations in ice_eswitch_detach(): move the call to
+>> unregister_netdev() before removing repr from xarray. This way
+>> repr->br_port will be correctly set to NULL in
+>> ice_eswitch_br_port_deinit(), preventing a panic.
+>>
+>> Fixes: fff292b47ac1 ("ice: add VF representors one by one")
+>> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_eswitch.c | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> index c0b3e70a7ea3..fb527434b58b 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+>> @@ -552,13 +552,14 @@ int ice_eswitch_attach_sf(struct ice_pf *pf, struct ice_dynamic_port *sf)
+>>   static void ice_eswitch_detach(struct ice_pf *pf, struct ice_repr *repr)
+>>   {
+>>       ice_eswitch_stop_reprs(pf);
+>> +    repr->ops.rem(repr);
+>> +
+>>       xa_erase(&pf->eswitch.reprs, repr->id);
+>>         if (xa_empty(&pf->eswitch.reprs))
+>>           ice_eswitch_disable_switchdev(pf);
+>>         ice_eswitch_release_repr(pf, repr);
+>> -    repr->ops.rem(repr);
+>>       ice_repr_destroy(repr);
+>>         if (xa_empty(&pf->eswitch.reprs)) {
+> 
+> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> 
+> Kind regards,
+> 
+> Paul
+
 
