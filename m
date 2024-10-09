@@ -1,145 +1,94 @@
-Return-Path: <netdev+bounces-133757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EEE4996F8A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:23:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C991996F8D
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:24:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CEDF1C21716
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:23:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 761F4283EFE
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:24:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D9C1A0B06;
-	Wed,  9 Oct 2024 15:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B693719F113;
+	Wed,  9 Oct 2024 15:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QEjTCNDy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DhfX5C4L"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29C72AD1C;
-	Wed,  9 Oct 2024 15:12:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9226D1990C8
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728486746; cv=none; b=PrxaJ7q0TZZhhCvPa18CnFDojYBGj0MR+q+5h/MhXVtzF0cqQwq2B0/3BH+ybPVobIOm0E7XdpL0AXjpMlGp6zdao+MtSmvkbBAcq7aZn0JM5bmXbGlorSf00YJMbX/8Z21u3OmsIwk+rSI/sp5SPW4V/iMcvoGKG2RIXQj/SaQ=
+	t=1728486780; cv=none; b=T0r/uZo/1cUTDpiC4zLHE57LBg5OyFjHGeP7hVDkYmnxb1xFSnNc3IBks7V6F/PqjkaLUBUIEXY8ZEmPPp/62qNrfVHbZGgMAmVZbV6CtxoYTBfTkyTaLux1MnhcUNwOBV3VYyr8eLl6QkSAjoLMGjH76klqzUiS0S1IIopaTd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728486746; c=relaxed/simple;
-	bh=Nm+qU5w3dxZgTOqL/lq95V9u3ynP5UfvFPdgv/Ekz+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hI/YpWm5iEhg6dvHzwXNXoUlKap1QbP6XkiJtAsEKgl0Zg53CBVVwKpRHveVvjB0VWsqd+n8VZJVQOi/YaWlUmXes+aqDIvO/xq5tYixE7NMGd9YHa+mxn8lI7B5JJOieCkY4rNGbcXMFalsl5FGkcy3aqXK+z4/6iHoe7dJAWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QEjTCNDy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33AC2C4CEC3;
-	Wed,  9 Oct 2024 15:12:25 +0000 (UTC)
+	s=arc-20240116; t=1728486780; c=relaxed/simple;
+	bh=zdSphCSZipCi8uIqyeJNwy4vicuODOk4mqoVP4x4TXM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QYm28AE5WjflVcIwGVtHPOygMnj6VffaSM49rGZV12YFAlpVUwXgamzMiC4mdGF7B6kNNcDwbW9pC3ybStwyabcCeCc+PTa82v8KD01k+PUuunNQcmEyA+xPTTidToqUli3q2HQKVzQKy9Ce44Py0YUb1QFvwhO6lOqd4UskKkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DhfX5C4L; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2330DC4CEC5;
+	Wed,  9 Oct 2024 15:13:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728486745;
-	bh=Nm+qU5w3dxZgTOqL/lq95V9u3ynP5UfvFPdgv/Ekz+k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QEjTCNDylhVEyIt4djWXFTall6q8pE6U3D3idS7nQeL+nKUZhZLqlyXUXuMLxaeHc
-	 O+dBMvk9iIjzXVcR5p+FTMx0ydzvjXnRRxDL/KFALcLm2LsxsDn0hPVGzl4XqML15D
-	 T2pan7yiSkN9gUSQmbx9wtZ41/XG5w63RpambP84NCRR/SoAJIB0jhoddeYluB78Dg
-	 U8J0KjkgPQ1LW20ZUI9xBsBsesE2V5eYSjMvm1g9vC52o9uAvVPqECtwjFxk+EhJ1W
-	 9S38zVNF5v+vZQTyEAmHkkTMP1OGb9n5nLbGQ7Won5ZxgilwqCAGCJmD7GXLfLSIRC
-	 zlv6L+Bi8LYww==
-Date: Wed, 9 Oct 2024 10:12:23 -0500
-From: Rob Herring <robh@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
-	andrew@lunn.ch, f.fainelli@gmail.com, hkallweit1@gmail.com,
-	andrei.botila@oss.nxp.com, linux@armlinux.org.uk,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 net-next 1/2] dt-bindings: net: tja11xx: add
- "nxp,rmii-refclk-out" property
-Message-ID: <20241009151223.GA522364-robh@kernel.org>
-References: <20241008070708.1985805-1-wei.fang@nxp.com>
- <20241008070708.1985805-2-wei.fang@nxp.com>
+	s=k20201202; t=1728486780;
+	bh=zdSphCSZipCi8uIqyeJNwy4vicuODOk4mqoVP4x4TXM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=DhfX5C4L4geb3xZJo54ldwzsULzerjve9dC//GwhnpdkUfJ40XC+hp5UUmlWw9uj9
+	 DKy6ZPMaD2yyiOn9W92OpEfv51ne+vakcbQCKobT1JtLojMxp8XR21ULUlBxQVcvok
+	 zY5UJ8+YA10vgLrld8MWmBdwwbHqOqDTdtNEgj2Xz2GCi30Nil351pfn9WCh98w6PW
+	 WxJE0qTAGtGm28zv28ZKdyYkvKYRx6gxQprAS9nPnYDgPXzDdSfL5KWFGz01g05JZ8
+	 lDkI2b4t+i01Ic2ywkCwMotJJGHrmCIqV5/raWC/TKItC+7kB790yghk9AcxkEUOS7
+	 HNactBxuK5U1A==
+Message-ID: <8b946bb4-4918-4072-9f6c-d7cfc96f1f48@kernel.org>
+Date: Wed, 9 Oct 2024 09:12:59 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241008070708.1985805-2-wei.fang@nxp.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tcp: move sysctl_tcp_l3mdev_accept to
+ netns_ipv4_read_rx
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ Wei Wang <weiwan@google.com>, Coco Li <lixiaoyan@google.com>
+References: <20241009150504.2871093-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20241009150504.2871093-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 08, 2024 at 03:07:07PM +0800, Wei Fang wrote:
-> Per the RMII specification, the REF_CLK is sourced from MAC to PHY
-> or from an external source. But for TJA11xx PHYs, they support to
-> output a 50MHz RMII reference clock on REF_CLK pin. Previously the
-> "nxp,rmii-refclk-in" was added to indicate that in RMII mode, if
-> this property is present, REF_CLK is input to the PHY, otherwise
-> it is output. This seems inappropriate now. Because according to
-> the RMII specification, the REF_CLK is originally input, so there
-> is no need to add an additional "nxp,rmii-refclk-in" property to
-> declare that REF_CLK is input.
+On 10/9/24 9:05 AM, Eric Dumazet wrote:
+> sysctl_tcp_l3mdev_accept is read from TCP receive fast path from
+> tcp_v6_early_demux(),
+>  __inet6_lookup_established,
+>   inet_request_bound_dev_if().
 > 
-> Unfortunately, because the "nxp,rmii-refclk-in" property has been
-> added for a while, and we cannot confirm which DTS use the TJA1100
-> and TJA1101 PHYs, changing it to switch polarity will cause an ABI
-> break. But fortunately, this property is only valid for TJA1100 and
-> TJA1101. For TJA1103/TJA1104/TJA1120/TJA1121 PHYs, this property is
-> invalid because they use the nxp-c45-tja11xx driver, which is a
-> different driver from TJA1100/TJA1101. Therefore, for PHYs using
-> nxp-c45-tja11xx driver, add "nxp,rmii-refclk-out" property to
-> support outputting RMII reference clock on REF_CLK pin.
+> Move it to netns_ipv4_read_rx.
 > 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> Remove the '#ifdef CONFIG_NET_L3_MASTER_DEV' that was guarding
+> its definition.
+> 
+> Note this adds a hole of three bytes that could be filled later.
+> 
+> Fixes: 18fd64d25422 ("netns-ipv4: reorganize netns_ipv4 fast path variables")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Wei Wang <weiwan@google.com>
+> Cc: Coco Li <lixiaoyan@google.com>
 > ---
-> V2 changes:
-> 1. Change the property name from "nxp,reverse-mode" to
-> "nxp,phy-output-refclk".
-> 2. Simplify the description of the property.
-> 3. Modify the subject and commit message.
-> V3 changes:
-> 1. Keep the "nxp,rmii-refclk-in" property for TJA1100 and TJA1101.
-> 2. Rephrase the commit message and subject.
-> V3 changes:
-> 1. Change the property name from "nxp,phy-output-refclk" to
-> "nxp,rmii-refclk-out", which means the opposite of "nxp,rmii-refclk-in".
-> 2. Refactor the patch after fixing the original issue with this YAML.
-> ---
->  .../devicetree/bindings/net/nxp,tja11xx.yaml   | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
+>  .../networking/net_cachelines/netns_ipv4_sysctl.rst          | 2 +-
+>  include/net/netns/ipv4.h                                     | 5 ++---
+>  net/core/net_namespace.c                                     | 4 +++-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-> index a754a61adc2d..1e688c7a497d 100644
-> --- a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-> +++ b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-> @@ -62,6 +62,24 @@ allOf:
->              reference clock output when RMII mode enabled.
->              Only supported on TJA1100 and TJA1101.
->  
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - ethernet-phy-id001b.b010
-> +              - ethernet-phy-id001b.b013
-> +              - ethernet-phy-id001b.b030
-> +              - ethernet-phy-id001b.b031
-> +
-> +    then:
-> +      properties:
-> +        nxp,rmii-refclk-out:
-> +          type: boolean
-> +          description: |
 
-Don't need '|' if no formatting.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-> +            Enable 50MHz RMII reference clock output on REF_CLK pin. This
-> +            property is only applicable to nxp-c45-tja11xx driver.
 
-Reword this to not be about some driver.
-
-> +
->  patternProperties:
->    "^ethernet-phy@[0-9a-f]+$":
->      type: object
-> -- 
-> 2.34.1
-> 
 
