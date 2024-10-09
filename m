@@ -1,150 +1,111 @@
-Return-Path: <netdev+bounces-133693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C22F9996B4A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:04:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83783996B5F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC4EC1C24A17
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:04:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FE7CB21A85
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C76193403;
-	Wed,  9 Oct 2024 13:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97064191489;
+	Wed,  9 Oct 2024 13:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SbGy+v32"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6Ev8wWy"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E8218E038;
-	Wed,  9 Oct 2024 13:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30A21E4AE
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728478952; cv=none; b=p3hMMd/AgB1IazFqRBP/loguLMr1iFGRHpaLgDnKAdYy3I7p8u5clyIopT/XR8oM8r4FteGGaCJh8wLRGYNCza1BQu+fZ9vjIxFhoz8oQdlliwuAI27wrNcXBC9mckxMVyOJznLqLv7AycZ3XiYUpmyhd1PAFdO5rr7GIZpsatg=
+	t=1728479292; cv=none; b=Gg3H2QWSfunnfPJ+q6ryUhOQjc+qYRYazt8wd6pWcVsKksJBDirFW56j6OtCvPV54W282EZDXJED4j2Vpnv3EzYpp3W7t16HYhh8Ye3ORdEldAOIRwqp8I/S1zyU9+bg4KPo946GIjEb2t28Rv8ubdjJFK2bEY/BzUtlNgu9Pio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728478952; c=relaxed/simple;
-	bh=6jfgjtG53RSMP1IWcGQFVut+4sA8wCXZ9Ber8vftB/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JYgB7zE0AwNjpMJQifhGqfBrII0BKFBI+foMFDV/CUK457pRyauYoa1vn4JP/CgK/ny+lsqGTBNbjtBi1s/yrzf/FkieYC6PCyEDBggOSKyffiD+CH5dZQE3AVxtzRHoyd+ZNFIsuebiUbn/uR8ehlg9t2NYVc7Q5UYl2GqCEoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SbGy+v32; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728478941; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=4DfXJQrk0KOHxCBycuEU10Zxg7Y2vXiwsgBxn0Lgu5o=;
-	b=SbGy+v32y76kyPqhmt9gsrqvgzq3GF04gHPgbLEElJ34gGb1o5+sWX71xC0mqe9LVt1XdNG43iGrrOiyHXklKL8b+rtREgR4g853XU2QOkfMmTtkhmYACfSLpPhsTPdtYSVl0V/kHEawOZap0isYx8mlK2cr+NSBHj10AntWHVg=
-Received: from 30.221.100.29(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WGiq8XA_1728478939)
-          by smtp.aliyun-inc.com;
-          Wed, 09 Oct 2024 21:02:21 +0800
-Message-ID: <e1abb0e5-2da1-49e6-8af0-2cd2531eb6ec@linux.alibaba.com>
-Date: Wed, 9 Oct 2024 21:02:19 +0800
+	s=arc-20240116; t=1728479292; c=relaxed/simple;
+	bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Bx4I2vuAsmNYeTLVobVQMZ7g5e82COagxSVC4ZxkrEicx6IfNbkcgi/A8YC5BkGly3hcc+q5TIJYthOZ59PbGUqg12rf07Ade3JpLz5RpIEHzLqh4Z+Di9OMFJLLiAEVnrYW2wvAtMwXgXh/MjrCVNC0toevEjWP45vyN3sB7cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6Ev8wWy; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so1730451a12.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 06:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728479289; x=1729084089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
+        b=i6Ev8wWyrJJ0Yl0c1tbvd5CmJHJjJWPTrfBJb1pGNFjIepCCc7/a8hDS7cnDANcLP4
+         HfExdkHtbZOImNku/VdHtl70314hhzYL/2FOeiUswb/7LNWofZ0Zes7g3YGn6CkvGKwo
+         auzUAv6CswEdvouXHjR+60F7cUH06Rri5UWzKLJKu8IrzhtQFRB3WVWueJt666buz9Bm
+         t/paGayUYqTD6Uxc9Zvl7dEOKqxa94w2UxrKno7377DrMNYdEL0QK1gBSXIiDMZ6bGED
+         48fq921UWwAcnDG9+8u7WjgfKj+Hcn1GKAwE4CyGlkyAr7sdUVNzjAPkC73xm30zCYou
+         i9BA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728479289; x=1729084089;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vCQMT4/OGh33l5VSSGRJ9d7C/T789iko1vgWGYbPl3c=;
+        b=I24HrYUZDU5ZxRJYzAc+ud27CMQSlTI3k3DRnUOrNcMKBMbQBzQoVieSiGHPhbH/Cr
+         KJ0oLYYa6skKKjVLn7i1Ddg0c8ukfj+RA5V9YayrMcFzG1El166cEO4TtqF3qwI2iKdD
+         gihxDXx3iCr8tO1j4bdoeiDvqekGb1Lq89BErH+ZC+AFCUUYWMLyac+QR3ejWH3e4MM2
+         CKGbZ4oH7s6U5kSkN+N6QusJn6WYqvPO2qKLm2GQTYm79Sqnuq/8orxOis2wOR7VjnLf
+         byWAZPyMcqLhcqnp0MzRs0x1wS1b/m171ueE+ziozdMC71KF4lGKUVm3fy+qd421B3Sn
+         r5Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxub4xTw+8U4p8Q3DWsnEg1SXenPbQ167IYjhusBptK9emdEKYB1wiM3YSepD+IJ4J6z6Q8Sk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxciGOQuF9MonL5q+6tA9pkuvGoTW17pVKPiB67AceOxhUaJRnn
+	Hq2YaMqlBgYASND0SpG1eeQDKntpWMXJzsw5hL2fpc0z0n2+KkI48X3fkNT62S64oBMY2EU08po
+	Ws/QiuAiMc+PqnW1FEejxEmUCejrp4irEDyQM
+X-Google-Smtp-Source: AGHT+IFwK3xKFaDSSCvmmCWjZJRLZHvuDOCWYPKnAPbZzhaE0XDUbBsW+cRSZvarCC5CcONpOhTI9Gbt8lX1yJczGgs=
+X-Received: by 2002:a05:6402:26cd:b0:5c5:c444:4e3a with SMTP id
+ 4fb4d7f45d1cf-5c91ce41ba7mr2845945a12.0.1728479288868; Wed, 09 Oct 2024
+ 06:08:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: Address spelling errors
-To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20241009-smc-starspell-v1-1-b8b395bbaf82@kernel.org>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20241009-smc-starspell-v1-1-b8b395bbaf82@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <1728456916-67035-1-git-send-email-alibuda@linux.alibaba.com>
+In-Reply-To: <1728456916-67035-1-git-send-email-alibuda@linux.alibaba.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 9 Oct 2024 15:07:54 +0200
+Message-ID: <CANn89iLHwsKVQo_aVwVQAt3fpZ2E3SL3eM2-v+RacwbOdUqePg@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: fix lacks of icsk_syn_mss with IPPROTO_SMC
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
+	wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org, 
+	davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Oct 9, 2024 at 8:55=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com>=
+ wrote:
+>
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+> Eric report a panic on IPPROTO_SMC, and give the facts
+> that when INET_PROTOSW_ICSK was set, icsk->icsk_sync_mss must be set too.
+>
+>
 
-
-On 2024/10/9 18:05, Simon Horman wrote:
-> Address spelling errors flagged by codespell.
-> 
-> This patch is intended to cover all files under drivers/smc
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+> This patch add a toy implementation that performs a simple return to
+> prevent such panic. This is because MSS can be set in sock_create_kern
+> or smc_setsockopt, similar to how it's done in AF_SMC. However, for
+> AF_SMC, there is currently no way to synchronize MSS within
+> __sys_connect_file. This toy implementation lays the groundwork for us
+> to support such feature for IPPROTO_SMC in the future.
+>
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Reported-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
 > ---
->  net/smc/smc.h      | 2 +-
->  net/smc/smc_clc.h  | 2 +-
->  net/smc/smc_core.c | 2 +-
->  net/smc/smc_core.h | 4 ++--
->  4 files changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/smc/smc.h b/net/smc/smc.h
-> index ad77d6b6b8d3..78ae10d06ed2 100644
-> --- a/net/smc/smc.h
-> +++ b/net/smc/smc.h
-> @@ -278,7 +278,7 @@ struct smc_connection {
->  						 */
->  	u64			peer_token;	/* SMC-D token of peer */
->  	u8			killed : 1;	/* abnormal termination */
-> -	u8			freed : 1;	/* normal termiation */
-> +	u8			freed : 1;	/* normal termination */
->  	u8			out_of_sync : 1; /* out of sync with peer */
->  };
->  
-> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-> index 5625fda2960b..5fd6f5b8ef03 100644
-> --- a/net/smc/smc_clc.h
-> +++ b/net/smc/smc_clc.h
-> @@ -156,7 +156,7 @@ struct smc_clc_msg_proposal_prefix {	/* prefix part of clc proposal message*/
->  } __aligned(4);
->  
->  struct smc_clc_msg_smcd {	/* SMC-D GID information */
-> -	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requestor */
-> +	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requester */
->  	__be16 v2_ext_offset;	/* SMC Version 2 Extension Offset */
->  	u8 vendor_oui[3];	/* vendor organizationally unique identifier */
->  	u8 vendor_exp_options[5];
-> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-> index 4e694860ece4..500952c2e67b 100644
-> --- a/net/smc/smc_core.c
-> +++ b/net/smc/smc_core.c
-> @@ -2321,7 +2321,7 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
->  		}
->  		if (lgr->buf_type == SMCR_PHYS_CONT_BUFS)
->  			goto out;
-> -		fallthrough;	// try virtually continguous buf
-> +		fallthrough;	// try virtually contiguous buf
->  	case SMCR_VIRT_CONT_BUFS:
->  		buf_desc->order = get_order(bufsize);
->  		buf_desc->cpu_addr = vzalloc(PAGE_SIZE << buf_desc->order);
-> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
-> index 0db4e5f79ac4..69b54ecd6503 100644
-> --- a/net/smc/smc_core.h
-> +++ b/net/smc/smc_core.h
-> @@ -30,7 +30,7 @@
->  					 */
->  #define SMC_CONN_PER_LGR_PREFER	255	/* Preferred connections per link group used for
->  					 * SMC-R v2.1 and later negotiation, vendors or
-> -					 * distrubutions may modify it to a value between
-> +					 * distributions may modify it to a value between
->  					 * 16-255 as needed.
->  					 */
->  
-> @@ -181,7 +181,7 @@ struct smc_link {
->  					 */
->  #define SMC_LINKS_PER_LGR_MAX_PREFER	2	/* Preferred max links per link group used for
->  						 * SMC-R v2.1 and later negotiation, vendors or
-> -						 * distrubutions may modify it to a value between
-> +						 * distributions may modify it to a value between
->  						 * 1-2 as needed.
->  						 */
->  
-> 
 
-LGTM.
-
-Reviewed-by: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-
-Thanks,
-Guangguan Wang.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
