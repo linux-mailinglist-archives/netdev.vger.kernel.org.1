@@ -1,158 +1,190 @@
-Return-Path: <netdev+bounces-133717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E103C996CA1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:49:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BA58996CA6
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8161C217DD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:49:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16E19283D20
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1BD19A298;
-	Wed,  9 Oct 2024 13:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970CA19995D;
+	Wed,  9 Oct 2024 13:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIfT12Gj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAE6199396
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA46197A77;
+	Wed,  9 Oct 2024 13:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728481709; cv=none; b=oH7N+PRCGtu7r3KZFD4MaUemyfv21i0OiitS0puzBID/hDxQHoAAfykGhlTHwXFFSwyCOHSt9LV083C0jOi3RRS9JF2JOee0w9adFGLCCi5nMVfTbyH6t7B1sjmiCyD6CgNrvJiBnb6cyT1l629zM9JczR6CzVijC7WpCzPxTW0=
+	t=1728481760; cv=none; b=Ejrv1+zMmApuWJmQCT2wHbFq+UBOmRmPqWB5JQtaUwnuXhrOGFQ5aqkrAwPiqVOgqksUfdk5qDhLASrEUl12PjITDh9I6wmmi7tbClRMPUBOF7AuzHoUoJw4rIugThTi1g8WqIWA4cFZkdj/vXexfN5/ScKMtdooSyT8cK0cqkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728481709; c=relaxed/simple;
-	bh=sqyEKgaEIHBixzMZSz6UpRg/Re7a8fMiFsRaftKTxRc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HJIuZ3RFDNT7ICNPTzU5qpinfCmu/8+Da48itrC2Po5K+TyzgLqDI+QMdjHc4N2q7hLagEByw2C2dnBLPWb6TEPtj1lNLBk9T1hUevXqWMhPB5MlC58gL1LTpbQJzxpKjs7APAOfWP8I/pYoju9MWleX5hz9syiTOXTQWwWLbkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-83542775244so37008339f.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 06:48:26 -0700 (PDT)
+	s=arc-20240116; t=1728481760; c=relaxed/simple;
+	bh=oEdZ8vauAp9BR5eYPfjb8EauOKchYEei3bMtlPMO0TM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TP83FdKnGHJjIH5BLaE6ibviYc7HyhkbQx7KLchbD6CbCCNj8eHzhVHy4DBsH2KJqs7NnrYLji5kc14Deixdl7YN0jD2HdE6USKIe23Isymz+BoMoZvVl2ZFH8rQ0mzDnEas/rsWBchVUgiacio5xGMVNsBeTdyJGxgvf3PaN8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FIfT12Gj; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-82aab679b7bso267372339f.0;
+        Wed, 09 Oct 2024 06:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728481758; x=1729086558; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tlPVMs74xuZ0O9OsS83QdlqJFeHqND+s0RhvzLMyKnc=;
+        b=FIfT12GjopJZjgUDWNGAxv5yZ1ixsC4pvoYwZMCQ15ri4Ax7ot7rweihCJwdVysU+1
+         cTycXYV4QPkbMHGEgRKj0wZjFVzjtC8S14KTAuqLwizXvdSUOsdGpR7i5ms+a7ruwqwq
+         YVH05HAg0/kDzsbx+TjhKk4qsEeLtd507hMluOKxDnV54GjA8RVtVL+PROOEF0774EKT
+         4E77GvooEzYJspGGK2PO9w9qZggvCUBr43ah/tozpWfQh98BWGF2FKyMIJGxP77C9Cbk
+         QdOHVZAjdWWgFJZDEhZowoC0DRNX277uLhJ3KBdiPCUZWOHAXnycd0QEbluQ0cp12+VT
+         3+dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728481705; x=1729086505;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UBH+agA01deK2EnfnEgoMg09FaDLd24PoeelaCAABlk=;
-        b=YE+yfCejsHRve8WySLxzmncbQ5ff9H6mc5UyP44HMuluoRra/9ajVYQL6CBxkNY8al
-         A/1Ku9FV/8sp1wh0EFNSy5SV3+dluPpJW5RlED+6jWmd/OvkleE42XwTw3z/myUhTVxV
-         xfPDQS9b+l6hJTwbxg0CQnvPFJqrERGLGlUTpllXr+3Fx9rCM/uFNpzYLRwVrYtpqQ22
-         4HRDoeWW8OnAIuuM+8rUqiQUC9PHdU05xta0+CTQc/ehkHpEroGJsTGZQc0nLF4R0Uyw
-         zkjSNnE4/bcwhfnbDhi7Utda6yyxbAcXtGZShtwsB4w5LE7kU45zexE39p35nAZfOama
-         uf8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUihOybr0NZPb6nFKYfZwwaQQW8/IVFgsNDAwbh+w96Vu7OMmZZ2TGijS/2xmnO6z39/G1xKow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUBLABD4oyEe53jOvo43e+cQ/yW7NWeEsNnaso9SFeRtnU846W
-	ZvbvmAYTGFJuIQgKgf29HSNhxC7/fldap3C7pKGfBARjesqCZB4Gf5p6b+LkWfcuxVW37NqZln5
-	hITMhv1pSVV31tAsI0AFeGzhOLDXIR3/E331pi6Fqz4VsBahf3WJ26dc=
-X-Google-Smtp-Source: AGHT+IHnMe5lc2Q03NLolZQmZ+SxAAXJagk4vihG3rU3/wbu5RXvNTAzmQuKlUs/gwZxmfyCClVkU8aNs0eqlhPt59da4so5AqSR
+        d=1e100.net; s=20230601; t=1728481758; x=1729086558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tlPVMs74xuZ0O9OsS83QdlqJFeHqND+s0RhvzLMyKnc=;
+        b=wspdJLoeDfUx6pusH7ZPQFOtcxYe0mQSNEzXNpwAXDoKmbIS4bCgoa1rlSfycwPMV3
+         MWtCBviwzpsPUEDbjCgKQo2YGy8B64G6OkyQL8HAHTMFpclfSgTEFdvLTpHWlAHFGSUQ
+         6mIuofLYZ93KXdviBN76ixDYFcfBJNcFxCAxHp1UhTJmKJuDR2JTuu5qSnzzA2pfjkQ9
+         7YqsiT/1SzPTnNjMEZyHvGbOudNaM8RXUXHeC0cN5ZzDKvu34EyrU03nCflE3MzQOIlT
+         ZCldiTyxBDl2psdz/jkO/GTskPbYpmtP582xGAeezVKOgrapxy0kTrts8wlDEsHmsh7p
+         ulMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUp9as+3nGm+CC191iGYY4N989pa+2/Xc2iXym73bCVlB1wN/zCpQ1eNy6JRY2MQFueWFwD/NhH@vger.kernel.org, AJvYcCWhxCy3WVp8Q/iNdNZ2sS37TWtEk3IdD4+sWsUfLVB6TjaIv5p3r5y/zLP4JqlGQ9/wZls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxceblSnbeFv69txDrqkQJuCEOAFcp3xFl5vqF2Gjf1kRDOp73
+	Yq/OM1ID9YOoyIkxz/cL7fbaET3wJNwteBQUxdiFGXWCUtiH+liSAqylhlDNrFltMup24mNWYqs
+	3p9JJ/GzCsdfezIC9qZlcMwaauO8=
+X-Google-Smtp-Source: AGHT+IGFbZ/wtI2Ux9GLqrFrFUjEQd6scE8BHhVYDPsWmIa7g0WTRAJ6Tpm3UezMS7G0pRn2RoURrAHcO5aO2WmufnY=
+X-Received: by 2002:a05:6e02:3d48:b0:3a1:a3bd:adcc with SMTP id
+ e9e14a558f8ab-3a397ce56b2mr19889425ab.6.1728481757986; Wed, 09 Oct 2024
+ 06:49:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1548:b0:3a1:a2b4:6665 with SMTP id
- e9e14a558f8ab-3a397546271mr23260295ab.12.1728481705316; Wed, 09 Oct 2024
- 06:48:25 -0700 (PDT)
-Date: Wed, 09 Oct 2024 06:48:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <670689a9.050a0220.67064.0047.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_tx_monitor
-From: syzbot <syzbot+26bc0430f38b1093a293@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-8-kerneljasonxing@gmail.com> <9d5dce58-c019-48b3-8815-b9e0f9d4e8cb@linux.dev>
+ <CAL+tcoBGe83v+1ej6GYpZpDkFt_hnuzw_mG8E3vEEhSQbUkreA@mail.gmail.com> <670683ea7b8a5_1cca3129485@willemb.c.googlers.com.notmuch>
+In-Reply-To: <670683ea7b8a5_1cca3129485@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 9 Oct 2024 21:48:42 +0800
+Message-ID: <CAL+tcoB+-J9ezV==TEToanr6cxFaJSA1UvE5ui7wzfgsBraK2g@mail.gmail.com>
+Subject: Re: [PATCH net-next 7/9] net-timestamp: open gate for bpf_setsockopt
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Wed, Oct 9, 2024 at 9:23=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Wed, Oct 9, 2024 at 3:19=E2=80=AFPM Martin KaFai Lau <martin.lau@lin=
+ux.dev> wrote:
+> > >
+> > > On 10/8/24 2:51 AM, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Now we allow users to set tsflags through bpf_setsockopt. What I
+> > > > want to do is passing SOF_TIMESTAMPING_RX_SOFTWARE flag, so that
+> > > > we can generate rx timestamps the moment the skb traverses through
+> > > > driver.
+> > > >
+> > > > Here is an example:
+> > > >
+> > > > case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
+> > > > case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
+> > > >       sock_opt =3D SOF_TIMESTAMPING_RX_SOFTWARE;
+> > > >       bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING,
+> > > >                      &sock_opt, sizeof(sock_opt));
+> > > >       break;
+> > > >
+> > > > In this way, we can use bpf program that help us generate and repor=
+t
+> > > > rx timestamp.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >   net/core/filter.c | 3 +++
+> > > >   1 file changed, 3 insertions(+)
+> > > >
+> > > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > > index bd0d08bf76bb..9ce99d320571 100644
+> > > > --- a/net/core/filter.c
+> > > > +++ b/net/core/filter.c
+> > > > @@ -5225,6 +5225,9 @@ static int sol_socket_sockopt(struct sock *sk=
+, int optname,
+> > > >               break;
+> > > >       case SO_BINDTODEVICE:
+> > > >               break;
+> > > > +     case SO_TIMESTAMPING_NEW:
+> > > > +     case SO_TIMESTAMPING_OLD:
+> > >
+> > > I believe this change was proposed before. It will change the user ex=
+pectation
+> > > on the sk_error_queue. It needs some bits/fields/knobs for bpf. I thi=
+nk this
+> > > point is similar to other's earlier comments in this thread.
+> >
+> > Thanks for your reply.
+> >
+> > After seeing what you mentioned, I searched through the mailing list
+> > and found one [1] which was designed to fetch hardware timestamps.
+> >
+> > [1]=EF=BC=9Ahttps://lore.kernel.org/bpf/51fd5249-140a-4f1b-b20e-703f159=
+e88a3@linux.dev/T/
+> >
+> > >
+> > > I only have a chance to briefly look at it. I think it is useful. Thi=
+s
+> > > bpf/timestamp feature request has come up before.
+> >
+> > At the very beginning, I had no intention to use bpf_setsockopt() to
+> > retrieve the rx timestamp because it will override sk_tsflags, but I
+> > cannot implement a good way like what I did to tx path: only setting
+> > skb's field. I'm not sure if this override behaviour is acceptable, so
+> > I post it to know what the bpf experts' suggestions are.
+> >
+> > >
+> > > A high level comment. The current timestamp should work for non tcp s=
+ock? The
+> > > bpf/timestamp solution should be able to also.
+> >
+> > For now, it only supports TCP proto. I would like to quickly implement
+> > a framework which is also suitable for other protos. TCP is just a
+> > start point.
+> >
+> > >
+> > > sockops is tcp centric. From looking at patch 9 that needs to initial=
+ize 4 args,
+> > > this interface feels old and not sure we want to extend to other sock=
+ types.
+> > > This needs some thoughts.
+> >
+> > For me, I have interests to extend to other sock types. But I'm
+> > supposed to ask Willem's opinion first.
+> >
+> > +Willem de Bruijn Do you want this bpf extension feature to extend to
+> > other protos?
+>
+> There would likely be users for other protocols too, just like
+> SO_TIMESTAMPING. Though TCP is probably the most widely used case by
+> far.
 
-syzbot found the following issue on:
-
-HEAD commit:    87d6aab2389e Merge tag 'for_linus' of git://git.kernel.org..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17dd3b80580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fb6ea01107fa96bd
-dashboard link: https://syzkaller.appspot.com/bug?extid=26bc0430f38b1093a293
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-87d6aab2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7a670c730bf1/vmlinux-87d6aab2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/069744babdba/bzImage-87d6aab2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+26bc0430f38b1093a293@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 1113 at net/mac80211/status.c:909 ieee80211_tx_monitor+0x202a/0x2520 net/mac80211/status.c:909
-Modules linked in:
-CPU: 0 UID: 0 PID: 1113 Comm: kworker/u32:9 Not tainted 6.12.0-rc2-syzkaller-00006-g87d6aab2389e #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound macvlan_process_broadcast
-RIP: 0010:ieee80211_tx_monitor+0x202a/0x2520 net/mac80211/status.c:909
-Code: 0f 9e c2 84 c0 0f 95 c0 84 c2 0f 84 a0 eb ff ff 48 8b 7c 24 18 be 02 00 00 00 e8 51 50 66 f7 e9 8c eb ff ff e8 d7 d9 04 f7 90 <0f> 0b 90 48 c7 c7 00 cf be 8c e8 97 8c e4 f6 4c 89 ff e8 1f 8c 6b
-RSP: 0018:ffffc90000007c70 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: 000000000000000d RCX: ffffffff8a8893e0
-RDX: ffff888026828000 RSI: ffffffff8a88a779 RDI: 0000000000000004
-RBP: ffffc90000007e00 R08: 0000000000000004 R09: 0000000000000000
-R10: 000000000000000d R11: 0000000000000000 R12: 000000000000000d
-R13: 0000000000000000 R14: 0000000000000000 R15: ffff88804f976140
-FS:  0000000000000000(0000) GS:ffff88806a600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b2e219ff8 CR3: 000000004f2e2000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- __ieee80211_tx_status net/mac80211/status.c:1111 [inline]
- ieee80211_tx_status_ext+0x1b13/0x2ca0 net/mac80211/status.c:1233
- ieee80211_tx_status_skb+0x133/0x2d0 net/mac80211/status.c:1131
- ieee80211_handle_queued_frames+0xf1/0x130 net/mac80211/main.c:443
- tasklet_action_common+0x24c/0x3e0 kernel/softirq.c:784
- handle_softirqs+0x213/0x8f0 kernel/softirq.c:554
- do_softirq kernel/softirq.c:455 [inline]
- do_softirq+0xb2/0xf0 kernel/softirq.c:442
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- netif_rx net/core/dev.c:5251 [inline]
- netif_rx+0x93/0xb0 net/core/dev.c:5240
- macvlan_broadcast+0x37d/0x680 drivers/net/macvlan.c:290
- macvlan_multicast_rx drivers/net/macvlan.c:302 [inline]
- macvlan_multicast_rx+0xd6/0x100 drivers/net/macvlan.c:296
- macvlan_process_broadcast+0x225/0x690 drivers/net/macvlan.c:338
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3391
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Agreed !
 
