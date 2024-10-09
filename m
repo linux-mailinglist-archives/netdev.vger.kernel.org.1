@@ -1,142 +1,240 @@
-Return-Path: <netdev+bounces-133565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F89D996480
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:10:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE304996486
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38DB11C24A61
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:10:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1BB7B233A0
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727F418A6A3;
-	Wed,  9 Oct 2024 09:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10758189B9D;
+	Wed,  9 Oct 2024 09:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="apgg8LYb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MbNrvE81"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4F0137C2A;
-	Wed,  9 Oct 2024 09:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B79C188920
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 09:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728465049; cv=none; b=NA+iMhkOQLp7Z+0Ztu+dFwvsr2rzz2jUNimp2UBLErZYTBL4ljoskOCPkX+cNDL4UDuGU1iURZg0E6XqKtrf+tyZLpDF1dQKxRhn/kiZZ1Y65AH6m0pTwFH1GQeEBjfNF8o6oE5RV1794OUnG6jdf5CkysHb9o7xlpt4SxNCv9Q=
+	t=1728465097; cv=none; b=QmdzV1dIfIJ8nuKUPi0nlNqnjAfNzAFTdIln44a2l/rpiyZ+lbl8CMc5Erxh0EeO39D/ZGB3AAVUuGbp8D/gCVGdYWO480JKcLNRfS3tcvZF/L8WBtT2CwsQRYWF+qYodS2WraYDzUGs4fwOBc9Z4QUzgoPncVvMon/HIzmmYlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728465049; c=relaxed/simple;
-	bh=SeiKUnM1DO48iG3Gr3JzhpZfh6fszoAqw+yG9jEe454=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aSTU9xhoZlwWrsDLTczz6mH6j/s3JFHC4ZDXX7HpVn03m0it4QI5lINv4BYsERaiTPaJE4upeb3Ax6p+hHxdZ9W3/9WBH6fO9J5k9YkK0WSg3UFkyWIZyaBhzroWFBQxjbuUxJjGh8wEb5vKKXnpbp6lv1ranLwJ2StGlq0VQ7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=apgg8LYb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C87BC4CEC5;
-	Wed,  9 Oct 2024 09:10:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728465048;
-	bh=SeiKUnM1DO48iG3Gr3JzhpZfh6fszoAqw+yG9jEe454=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=apgg8LYblMD4qcg07qq3Mkgt0ywwQuc+3xw0JHmyyo9R1mWrfGxw8wTc4OdVdv86c
-	 9NvoStQW9y9swxeftz9Y/d+2+eWrhl8IJ+ehaoOKL5kcWGNnsVpJgR/dEBQtmS3u1T
-	 rdBzExB9GsjgYbIOJpmcB5A2VggPdQMDCHWytgB566ZNT/uK6NwYLIDILg88BAHeQz
-	 vk/SHdbAb6yjKubsySQAdtJ9+53NgxwB7giJMbQu+dDrvvT9iCnDXeZaC9YE6mq48L
-	 2OdUXj462FwW5nDBk2woP+WbDOgZfiJhnt/gsiFXjp+bfi2iB8hwnrHQlGtidEcPDH
-	 jr9p8eMo3AZKg==
-Message-ID: <5f785dda-b2d7-466f-96c3-23faf0b80975@kernel.org>
-Date: Wed, 9 Oct 2024 18:10:39 +0900
+	s=arc-20240116; t=1728465097; c=relaxed/simple;
+	bh=l+YWo9Vs04RelazyMAUswd97OfSGxlRxxmArV4fSApA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RBjQE6J1EhZgsMlrz8NZKshtjLNLPFd9kHZ6v/0EuGdcIgYB1CgRld363mniVAzMdoaz73yZ9FvGYFE++xv1u/Wcf8hqjTTBsuCTOKRbOv+rBbMfJQUhx2krulnMC33P6zHcxuGRuOFjNX+N78/GXK2rxjm4ofGDmu4WI5BsgeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MbNrvE81; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e02fff66a83so9421310276.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 02:11:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728465094; x=1729069894; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8NVpx56jOSB/h3tSDix+tzqqh+wpJLjTBsRYxqGHQBg=;
+        b=MbNrvE81Ug6TaItwguEUs0RVZ8NOZRNltLvUPmuxRuuA1NypO0DTHXprGw+kgRbqAM
+         62wUYAAzL2lnX1H3KKzZafVHNFIACfxqUdvXlsE/Iqm1s88rHelj7pCNWu+ED7RhGJyH
+         v2OiGn6yAe0fqSHIylY8Xc9WrVXd6xqsU1l2QdOgGOBEzaxAxMAa4Fcd2w/kP6KrJomO
+         UmQQuL9Pa+kNPNVF9ufPy4xfWIp5JdxSDFM5nl/kuVyCNYNs0qyXACHO+KZiOks7/CHM
+         qyal5G/MH916zyIg9GIICxGY/jfCPj8O+HP5pHsCNjD5ChKeqxNLDbufmvecqAz6Vm32
+         D1Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728465094; x=1729069894;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8NVpx56jOSB/h3tSDix+tzqqh+wpJLjTBsRYxqGHQBg=;
+        b=UKnQ8xLPxCGoyDJo1uxhSl5fmAsjPe4lRKDEJI3GnVPN92r8CxZ4LEsPQwp+N5ej2c
+         8+2PmsjoMqnWutHODP82Gng+PxZ9ucmNyoVb+Tg72hnLt397EFbiWCBTq4l5grQSTFl8
+         bl3qcsAW589WHErNqRrTwUyMcmb++ganZtt7/afBkQNW0tl0gUIw3ofbzE2+6DtGKdsF
+         fU6yVwt3S+2qSVDDTiObdRwQ+i3hBLCi9n80UgyAxkjGueUbiBYo+WEp+oWUFWq0FnR6
+         /uSl7H3rwUsL4hMvhEqbxrLdhciArAWsxJU0gklymKuN/eGOHDzgrPmfr0bfyS34p0PI
+         qwOg==
+X-Gm-Message-State: AOJu0Yz4cXuh2u/RVmDczgxUmqJkiQ6u/gdckTOtNiCqYbX5Bh8NqoWf
+	Gk7olGyeWG0SMUIPKiTbWHX8iCeFKk8HoMHtCNDWHima8TzK2rPeAw3+qyZfzRsDJgIeHwQtb68
+	4Zf01R65Cng==
+X-Google-Smtp-Source: AGHT+IHAG6Tnhl9HjX8VM3M59B1Hec/IwBYlbnl3Ch8OzJTjwR2YRYKMSwNpO3iqxmjvFg9lb/zL5k+FfFhUzQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a25:abad:0:b0:e11:44fb:af26 with SMTP id
+ 3f1490d57ef6-e28fe31ff16mr1352276.2.1728465093772; Wed, 09 Oct 2024 02:11:33
+ -0700 (PDT)
+Date: Wed,  9 Oct 2024 09:11:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 01/13] PCI: Prepare removing devres from pci_intx()
-To: Philipp Stanner <pstanner@redhat.com>, Niklas Cassel <cassel@kernel.org>,
- Sergey Shtylyov <s.shtylyov@omp.ru>,
- Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri Kosina
- <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov
- <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
- Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Alex Williamson <alex.williamson@redhat.com>, Juergen Gross
- <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>,
- Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Mario Limonciello <mario.limonciello@amd.com>, Chen Ni <nichen@iscas.ac.cn>,
- Ricky Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>,
- Breno Leitao <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>,
- Thomas Gleixner <tglx@linutronix.de>,
- =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Mostafa Saleh <smostafa@google.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
- Soumya Negi <soumya.negi97@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Yi Liu <yi.l.liu@intel.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
- Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
- =?UTF-8?Q?Marek_Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Kai Vehmanen <kai.vehmanen@linux.intel.com>,
- Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
- Rui Salvaterra <rsalvaterra@gmail.com>, Marc Zyngier <maz@kernel.org>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-input@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org, linux-staging@lists.linux.dev,
- kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
- linux-sound@vger.kernel.org
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-2-pstanner@redhat.com>
-From: Damien Le Moal <dlemoal@kernel.org>
-Content-Language: en-US
-Organization: Western Digital Research
-In-Reply-To: <20241009083519.10088-2-pstanner@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.rc0.187.ge670bccf7e-goog
+Message-ID: <20241009091132.2136321-1-edumazet@google.com>
+Subject: [PATCH net] slip: make slhc_remember() more robust against malicious packets
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+2ada1bc857496353be5a@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/9/24 17:35, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which sometimes performs devres
-> operations, depending on whether pcim_enable_device() has been used to
-> enable the pci_dev. This sometimes-managed nature of the function is
-> problematic. Notably, it causes the function to allocate under some
-> circumstances which makes it unusable from interrupt context.
-> 
-> To, ultimately, remove the hybrid nature from pci_intx(), it is first
-> necessary to provide an always-managed and a never-managed version
-> of that function. Then, all callers of pci_intx() can be ported to the
-> version they need, depending whether they use pci_enable_device() or
-> pcim_enable_device().
-> 
-> An always-managed function exists, namely pcim_intx(), for which
-> __pcim_intx(), a never-managed version of pci_intx() had been
+syzbot found that slhc_remember() was missing checks against
+malicious packets [1].
 
-s/had/has ? Not sure about this, English is not my first language :)
+slhc_remember() only checked the size of the packet was at least 20,
+which is not good enough.
 
-> implemented.
-> 
-> Make __pcim_intx() a public function under the name
-> pci_intx_unmanaged(). Make pcim_intx() a public function.
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+We need to make sure the packet includes the IPv4 and TCP header
+that are supposed to be carried.
 
-Regardless of the above nit, looks OK to me.
+Add iph and th pointers to make the code more readable.
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+[1]
 
+BUG: KMSAN: uninit-value in slhc_remember+0x2e8/0x7b0 drivers/net/slip/slhc.c:666
+  slhc_remember+0x2e8/0x7b0 drivers/net/slip/slhc.c:666
+  ppp_receive_nonmp_frame+0xe45/0x35e0 drivers/net/ppp/ppp_generic.c:2455
+  ppp_receive_frame drivers/net/ppp/ppp_generic.c:2372 [inline]
+  ppp_do_recv+0x65f/0x40d0 drivers/net/ppp/ppp_generic.c:2212
+  ppp_input+0x7dc/0xe60 drivers/net/ppp/ppp_generic.c:2327
+  pppoe_rcv_core+0x1d3/0x720 drivers/net/ppp/pppoe.c:379
+  sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1113
+  __release_sock+0x1da/0x330 net/core/sock.c:3072
+  release_sock+0x6b/0x250 net/core/sock.c:3626
+  pppoe_sendmsg+0x2b8/0xb90 drivers/net/ppp/pppoe.c:903
+  sock_sendmsg_nosec net/socket.c:729 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:744
+  ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
+  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
+  __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
+  __do_sys_sendmmsg net/socket.c:2771 [inline]
+  __se_sys_sendmmsg net/socket.c:2768 [inline]
+  __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
+  x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+  slab_post_alloc_hook mm/slub.c:4091 [inline]
+  slab_alloc_node mm/slub.c:4134 [inline]
+  kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
+  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+  __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
+  alloc_skb include/linux/skbuff.h:1322 [inline]
+  sock_wmalloc+0xfe/0x1a0 net/core/sock.c:2732
+  pppoe_sendmsg+0x3a7/0xb90 drivers/net/ppp/pppoe.c:867
+  sock_sendmsg_nosec net/socket.c:729 [inline]
+  __sock_sendmsg+0x30f/0x380 net/socket.c:744
+  ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
+  ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
+  __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
+  __do_sys_sendmmsg net/socket.c:2771 [inline]
+  __se_sys_sendmmsg net/socket.c:2768 [inline]
+  __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
+  x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5460 Comm: syz.2.33 Not tainted 6.12.0-rc2-syzkaller-00006-g87d6aab2389e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+
+Fixes: b5451d783ade ("slip: Move the SLIP drivers")
+Reported-by: syzbot+2ada1bc857496353be5a@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/670646db.050a0220.3f80e.0027.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ drivers/net/slip/slhc.c | 57 ++++++++++++++++++++++++-----------------
+ 1 file changed, 34 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/net/slip/slhc.c b/drivers/net/slip/slhc.c
+index 252cd757d3a2e5e1ed8c7dd059aa783ede48c953..ee9fd3a94b96fe11c02eb5da56deb876f6ac5a81 100644
+--- a/drivers/net/slip/slhc.c
++++ b/drivers/net/slip/slhc.c
+@@ -643,46 +643,57 @@ slhc_uncompress(struct slcompress *comp, unsigned char *icp, int isize)
+ int
+ slhc_remember(struct slcompress *comp, unsigned char *icp, int isize)
+ {
+-	struct cstate *cs;
+-	unsigned ihl;
+-
++	const struct tcphdr *th;
+ 	unsigned char index;
++	struct iphdr *iph;
++	struct cstate *cs;
++	unsigned int ihl;
+ 
+-	if(isize < 20) {
+-		/* The packet is shorter than a legal IP header */
++	/* The packet is shorter than a legal IP header.
++	 * Also make sure isize is positive.
++	 */
++	if (isize < (int)sizeof(struct iphdr)) {
++runt:
+ 		comp->sls_i_runt++;
+-		return slhc_toss( comp );
++		return slhc_toss(comp);
+ 	}
++	iph = (struct iphdr *)icp;
+ 	/* Peek at the IP header's IHL field to find its length */
+-	ihl = icp[0] & 0xf;
+-	if(ihl < 20 / 4){
+-		/* The IP header length field is too small */
+-		comp->sls_i_runt++;
+-		return slhc_toss( comp );
+-	}
+-	index = icp[9];
+-	icp[9] = IPPROTO_TCP;
++	ihl = iph->ihl;
++	/* The IP header length field is too small,
++	 * or packet is shorter than the IP header followed
++	 * by minimal tcp header.
++	 */
++	if (ihl < 5 || isize < ihl * 4 + sizeof(struct tcphdr))
++		goto runt;
++
++	index = iph->protocol;
++	iph->protocol = IPPROTO_TCP;
+ 
+ 	if (ip_fast_csum(icp, ihl)) {
+ 		/* Bad IP header checksum; discard */
+ 		comp->sls_i_badcheck++;
+-		return slhc_toss( comp );
++		return slhc_toss(comp);
+ 	}
+-	if(index > comp->rslot_limit) {
++	if (index > comp->rslot_limit) {
+ 		comp->sls_i_error++;
+ 		return slhc_toss(comp);
+ 	}
+-
++	th = (struct tcphdr *)(icp + ihl * 4);
++	if (th->doff < sizeof(struct tcphdr) / 4)
++		goto runt;
++	if (isize < ihl * 4 + th->doff * 4)
++		goto runt;
+ 	/* Update local state */
+ 	cs = &comp->rstate[comp->recv_current = index];
+ 	comp->flags &=~ SLF_TOSS;
+-	memcpy(&cs->cs_ip,icp,20);
+-	memcpy(&cs->cs_tcp,icp + ihl*4,20);
++	memcpy(&cs->cs_ip, iph, sizeof(*iph));
++	memcpy(&cs->cs_tcp, th, sizeof(*th));
+ 	if (ihl > 5)
+-	  memcpy(cs->cs_ipopt, icp + sizeof(struct iphdr), (ihl - 5) * 4);
+-	if (cs->cs_tcp.doff > 5)
+-	  memcpy(cs->cs_tcpopt, icp + ihl*4 + sizeof(struct tcphdr), (cs->cs_tcp.doff - 5) * 4);
+-	cs->cs_hsize = ihl*2 + cs->cs_tcp.doff*2;
++	  memcpy(cs->cs_ipopt, &iph[1], (ihl - 5) * 4);
++	if (th->doff > 5)
++	  memcpy(cs->cs_tcpopt, &th[1], (th->doff - 5) * 4);
++	cs->cs_hsize = ihl*2 + th->doff*2;
+ 	cs->initialized = true;
+ 	/* Put headers back on packet
+ 	 * Neither header checksum is recalculated
 -- 
-Damien Le Moal
-Western Digital Research
+2.47.0.rc0.187.ge670bccf7e-goog
+
 
