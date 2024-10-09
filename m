@@ -1,154 +1,126 @@
-Return-Path: <netdev+bounces-133467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAB5499607D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:17:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBB29960A7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C132827C7
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:17:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B8121F22F3E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B03A42070;
-	Wed,  9 Oct 2024 07:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE7617C208;
+	Wed,  9 Oct 2024 07:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="afl4Jm0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F95117C7CE
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160C117BEC5
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:19:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728458228; cv=none; b=ANA6+DGjxZiodZQB/jutR2MEMc3h3ofm3aAarL1m/dCvRkl7lOkS6pyN80KRN6xARpr1p/ySLFPCZ92qIKMP66sKMydPfblXXKjjIgSx8EkSgcpEr8T5VBi4R0zTg3CGKpkYj7swmnmlx6Upk2iAgqXrb/rzG7EUdorHeIGGuws=
+	t=1728458369; cv=none; b=FZNmJV9dNMDvazucjEA92zTXQb5LqiguZK2xgTDtOcfGg7GvTQmCjVxir9IeRHtMsJVruWkuQYQWcXdzqIPgjjKNYkTugnsqO6E8nCJUJjSdHNmtzRa5Wace8VWOEzVG4qpTHNjtbENyTYrLBxVlZtFvh3wOV0ym1AAMFAUFX5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728458228; c=relaxed/simple;
-	bh=np+BwCZZY3k0G+CBznbfSMezUMPRfGaDPUyW4ghdgiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sN4h6hK+NW7fpUb9SpK+FGZ7QOijrRQz/JAuzQHLJa1Zal5d7oJz97Af4GdVNAYj3onVYeyecVBGDZq2GG8cuXOrihYz9dFRUz0kGTay3zbxpMoWRMM/97lo9Z45ezGzivLoUxS12t51YEbdplIUDQ4hiDipFVIWR0XtU5bpD80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syQvy-0002Hf-RC; Wed, 09 Oct 2024 09:16:34 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syQvx-000YH4-By; Wed, 09 Oct 2024 09:16:33 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syQvx-0022qQ-0o;
-	Wed, 09 Oct 2024 09:16:33 +0200
-Date: Wed, 9 Oct 2024 09:16:33 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 08/12] net: pse-pd: pd692x0: Add support for PSE
- PI priority feature
-Message-ID: <ZwYt0WT-tdOM0Abj@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-8-787054f74ed5@bootlin.com>
- <1e9cdab6-f15e-4569-9c71-eb540e94b2fe@lunn.ch>
- <ZwU6QuGSbWF36hhF@pengutronix.de>
- <9c77d97e-6494-4f86-9510-498d93156788@lunn.ch>
+	s=arc-20240116; t=1728458369; c=relaxed/simple;
+	bh=fiTKaLYnk2N+K7YtREEaty2l1wAEuWmaETfj5Oi8Jhg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H2QjqVuAp+ZmGLaEbQq8grE197Y4cD2E2MJmbyTL0+kZARA7JJJyLJY3zds3MMJ0JcEppBjQ3vYo/kb15F+2pNLsMiAVn4ArdwqFnFZqxcxivR5kNjecZlYHzlnH/Loz677zURa1fSkw1Z9LTQqy9S++CIAnss3umoszn5KlVM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=afl4Jm0x; arc=none smtp.client-ip=91.218.175.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9d5dce58-c019-48b3-8815-b9e0f9d4e8cb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728458364;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=t7D1cLhC0H0BdEs8wP77uRQRSDHt70rq5UM6c5/x9BA=;
+	b=afl4Jm0xzQfHtHS4ymCCKAU/paRo8ZenfPfRA3RnPgsYgqGVD7xVP2BuQKTrTBruRZGWRv
+	kPd2AtbtAY7VCPRBjRi5DyEvDMFIfTMMisnlwoSVI4VE9RLH6FMidR8a7CrsvoYJf+5dbQ
+	sxxhC6pdbVQnKZKvsQ5IvTOp6TisBss=
+Date: Wed, 9 Oct 2024 00:19:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9c77d97e-6494-4f86-9510-498d93156788@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 7/9] net-timestamp: open gate for bpf_setsockopt
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
+ <20241008095109.99918-8-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20241008095109.99918-8-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Andrew,
-
-On Tue, Oct 08, 2024 at 06:50:25PM +0200, Andrew Lunn wrote:
-> On Tue, Oct 08, 2024 at 03:57:22PM +0200, Oleksij Rempel wrote:
-> > On Thu, Oct 03, 2024 at 01:41:02AM +0200, Andrew Lunn wrote:
-> > > > +	msg = pd692x0_msg_template_list[PD692X0_MSG_SET_PORT_PARAM];
-> > > > +	msg.sub[2] = id;
-> > > > +	/* Controller priority from 1 to 3 */
-> > > > +	msg.data[4] = prio + 1;
-> > > 
-> > > Does 0 have a meaning? It just seems an odd design if it does not.
-> > 
-> > 0 is not documented. But there are sub-priority which are not directly
-> > configured by user, but affect the system behavior.
-> > 
-> > Priority#: Critical – 1; high – 2; low – 3
-> >  For ports with the same priority, the PoE Controller sets the
-> >  sub-priority according to the logic port number. (Lower number gets
-> >  higher priority).
+On 10/8/24 2:51 AM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> With less priorities than ports, there is always going to be something
-> like this.
+> Now we allow users to set tsflags through bpf_setsockopt. What I
+> want to do is passing SOF_TIMESTAMPING_RX_SOFTWARE flag, so that
+> we can generate rx timestamps the moment the skb traverses through
+> driver.
 > 
-> > 
-> > Port priority affects:
-> > 1. Power-up order: After a reset, the ports are powered up according to
-> >  their priority, highest to lowest, highest priority will power up first.
-> > 2. Shutdown order: When exceeding the power budget, lowest priority
-> >  ports will turn off first.
-> > 
-> > Should we return sub priorities on the prio get request?
+> Here is an example:
 > 
-> I should be optional, since we might not actually know what a
-> particular device is doing. It could pick at random, it could pick a
-> port which is consuming just enough to cover the shortfall if it was
-> turned off, it could pick the highest consumer of the lowest priority
-> etc. Some of these conditions are not going to be easy to describe
-> even if we do know it.
+> case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
+> case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
+> 	sock_opt = SOF_TIMESTAMPING_RX_SOFTWARE;
+> 	bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING,
+> 		       &sock_opt, sizeof(sock_opt));
+> 	break;
+> 
+> In this way, we can use bpf program that help us generate and report
+> rx timestamp.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>   net/core/filter.c | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index bd0d08bf76bb..9ce99d320571 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5225,6 +5225,9 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+>   		break;
+>   	case SO_BINDTODEVICE:
+>   		break;
+> +	case SO_TIMESTAMPING_NEW:
+> +	case SO_TIMESTAMPING_OLD:
 
-After reviewing the manuals for LTC4266 and TPS2388x, I realized that these
-controllers expose interfaces, but they don't implement prioritization concepts
-themselves.
+I believe this change was proposed before. It will change the user expectation 
+on the sk_error_queue. It needs some bits/fields/knobs for bpf. I think this 
+point is similar to other's earlier comments in this thread.
 
-The LTC4266 and TPS2388x controllers provide only interfaces that allow the
-kernel to manage shutdown and prioritization policies. For TPS2388x, fast
-shutdown is implemented as a port bitmask with only two priorities, handled via
-the OSS pin. Fast shutdown is triggered by the kernel on request by toggling
-the corresponding pin, and the policy - when and why this pin is toggled - is
-defined by the kernel or user space. Slow shutdown, on the other hand, is
-managed via the I2C bus and allows for more refined control, enabling a wider
-range of priorities and more granular policies.
+I only have a chance to briefly look at it. I think it is useful. This 
+bpf/timestamp feature request has come up before.
 
-I'll tend to hope we can reuse the proposed ETHTOOL_A_C33_PSE_PRIO interface
-across different PSE controllers. However, it is already being mapped to
-different shutdown concepts: PD692x0 firmware seems to rely on a slow shutdown
-backed by internal policies, while TPS2388x maps it to fast shutdown with
-driver specific policy. This inconsistency could force us to either break the
-UAPI or introduce a new, inconsistent one once we realize TPS2388x fast
-shutdown isn't what we actually need.
+A high level comment. The current timestamp should work for non tcp sock? The 
+bpf/timestamp solution should be able to also.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+sockops is tcp centric. From looking at patch 9 that needs to initialize 4 args, 
+this interface feels old and not sure we want to extend to other sock types.
+This needs some thoughts.
+
+> +		break;
+>   	default:
+>   		return -EINVAL;
+>   	}
+
 
