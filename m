@@ -1,431 +1,103 @@
-Return-Path: <netdev+bounces-133655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAD89969C5
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:17:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE159969C4
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:17:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E2981F24668
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:17:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C221EB22574
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B96A192B63;
-	Wed,  9 Oct 2024 12:17:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCC21922F2;
+	Wed,  9 Oct 2024 12:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJLOwvyj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A33ELTOz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 100C518C024;
-	Wed,  9 Oct 2024 12:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C0418C024
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 12:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728476259; cv=none; b=d2PYYR74OyuUWqPxvcTpdBZOeZ8yzAmCvGcC647/wH1Y7o7PVgpnESNFBnwg2TJJUjU5enH1dN8ER6NWCYhvGghSuGWuSe+GVtDOkludm/0L3r1rdSO+XomUDAvaaG229mWik0N0nNYoxlEHGCu7aBA3PCq4a0cPS8omF9I/96M=
+	t=1728476249; cv=none; b=QIXKwosBgXpTVoAFO8/63TpMZc6LxtmTgbrBGu+2Ckbxmi0N00e9VP1x7gveO8UX2PIlYmy78QnZXe77khBJaLc7H4dNnQqL+dPBCTKdGoid4bp/nt3zZaLffWekHU8Ifze9Q/aEB7XYz4WOg+M3H7qjXAVSH7Tc0AQwkCuIVIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728476259; c=relaxed/simple;
-	bh=B4J4+35ZkEEZNUv1nt5oYMHGf5gODjj0gFVMM2qZhyw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QpkOI9uGgmz9VDpEBdY/Y1wRPi1omJAC1+xR7pm3Aieq7sMQKz8IiB+CGSJ/pvwKdya/KCnyUPbq9+/LXPV//IaQjBYq39sBM40C7uf8/Hf9Y6QXoJ7mou6GWbqKg6qDx66kKf29mWZxW7EFGXW/OxJpjtVDBXNDQeFeRVtOxDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IJLOwvyj; arc=none smtp.client-ip=209.85.214.193
+	s=arc-20240116; t=1728476249; c=relaxed/simple;
+	bh=JfIzDYGFDTnHvQxGUy3rCox328LHJOzjRRSWg0iem9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pRLEEcnChGA5QKzBCxg2lmL64cn58Wrp/vRNGMyaG8QwtzJo4G7MKmmfLofU8tyLp8qe4TkuGaXYw78xil0NgGABnILwn8raEfI5f3+QDDZRPfKMqzDwqFgLbMXC8Bloss5LJhojVR6qkSPiQp/drBWlLEQfhrPiKt6LOnLHWwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A33ELTOz; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-20c544d345cso6685135ad.1;
-        Wed, 09 Oct 2024 05:17:36 -0700 (PDT)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9952a6020fso37301666b.1
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 05:17:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728476256; x=1729081056; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wkvO+2d6HTmJRMr+gX2Cspi+zOFLXQM1vP+t78ffuJ0=;
-        b=IJLOwvyjVX37Wsec3Zv1x05/WEQeMNk80nCYPgitmId23YQ26DgYyLY6skZMDmVMs4
-         kYQCuWS/zQ6FDJ9pf+9exH/vMoO4lQejvyYckF9fT91KZ55TRXGiY1ApJfJITZuwAWeR
-         YaV26VXtIMtbBT+XnjeG3IpQo1t3ys0D7h7HfPBjOOF6aCeO7AiMpu5X3Q7xm8nfwjnG
-         rb1IzvtZZCg91VZwDx5cRTF69oS3+uI7/42HxAaynCv36P2ZtCtUgfw3u7WXqz5vCcOC
-         JtoLj3apx2TS2D+CGICrAY09Zl6MUcFDfhLJiVY500CZ/KPR6p+0YN2w8Frjz/2CvyzP
-         I/1A==
+        d=gmail.com; s=20230601; t=1728476246; x=1729081046; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wThhtfPUrHZAn4fE1IUoD5BwwnG5VY9T+V5Lx5JDStw=;
+        b=A33ELTOz7jD5x/McreNWi5XY7G50tUTV9PfdCwDT71fnhrAvMKsg3PAWgz2LE9hcfS
+         34IEmlqgZgcEyfxg1E+oGyGBeRDB43SKL/Dt/19EAjhc+4+N9VSmpP8/z/pH7/fzb2g9
+         9s1RcAQh9K6KpfprRpu1FY1+3xk35FDZayXk1vyZdEnZX4noU9Rk9noaK8fUmOYRERkB
+         ZA3CRz0V5xV1F0e3d7ZuaBoeGfdd4RARuMwvu41udKcDrlxeWZ7/IMZIC8vid2ZSBkuY
+         eWq/+RTHI/+hV8Zv5ld63Y50XkY7nwj9aMCGMZGL96B2P8ZosD3mocjB9xyyIa2U0Fku
+         tEIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728476256; x=1729081056;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wkvO+2d6HTmJRMr+gX2Cspi+zOFLXQM1vP+t78ffuJ0=;
-        b=kDoF7cw235oCdKdtZbt1WZjY20iQQB3vQNwR+uKlJ5+81p5E3hdP1MG84W8YCEoNse
-         1A05E54+0Kug65mr42PVvTW+c9KT6i3cAZAS09OjGi3PTcBK6OD7awneQH4yQ+5nn2UA
-         o9Og9BTsIelR1Wn4tQCbPiXXJwJLmi7bsLPSWHFyTxbRhcTRWNcZiyAa9Q9R4kuAqMIA
-         7W0ZKWoLI9wvpUrXuKwzF4SDGY3jICzBOudNfV1DFdOUb+ucixqzSoUsPY4uUOS2mL2x
-         Vr0Q2jrnAgDcmlOMBZhNKvnkdc9I9rbneFyV4D4N3MP90fF12E15Cns/vk65nKfCW54c
-         woJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlSC2ZcxQhq+wQspkzcOyTtr21RhsFDzbN5O/dYd8lg2GBxTatx9fdJldbzczVijGtlg5J79ZaSzlyruI=@vger.kernel.org, AJvYcCWQkQvq+qRoVuZmQYb2PzeGYXiw+ARFdIbLcAvxmPH7/8H2c0mLkunvyB6N2l3sEUpEfjczVPl0ae1fl7TXrAfxO7Tz@vger.kernel.org, AJvYcCXSuy5RWQ1Sobfn5ABBKY/B0RyJ5n86SOg2vdT/kBFKxR0husTUzQtg1krtlzL9Tvvmll6/WBKL@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOC8luK0sS41Fh2mAvTKSNHczlO28jIrMNoWOF0HZwsplXJ0Zu
-	xwhPwdDtShHBQuihjbvLpNyOFFYxkkUIy2fzWQDzMC3Ne4XOw1f7
-X-Google-Smtp-Source: AGHT+IGV1ROpLDXeq4Wu39yx7vteMJRuXWJvpQZ5ubWodIxNO0hFMDAkT5qT8l5w3xHwjqrRcuRv8A==
-X-Received: by 2002:a17:902:f78b:b0:205:7007:84fa with SMTP id d9443c01a7336-20c6354e470mr37016305ad.28.1728476256128;
-        Wed, 09 Oct 2024 05:17:36 -0700 (PDT)
-Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20c6c30dc3dsm9164435ad.162.2024.10.09.05.17.31
+        d=1e100.net; s=20230601; t=1728476246; x=1729081046;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wThhtfPUrHZAn4fE1IUoD5BwwnG5VY9T+V5Lx5JDStw=;
+        b=hKJ7LcovTNS6Q1FOX0qkfuRlWRSK8S5w+a/LjntFYPXOxAClvZvNdSpTh7a6gVcul7
+         LKEntzfRy3ipvr/xxJRfLd0cp00E9e9lK3YC3ZhpiVZYdYGwN5uKu1LVC7uurFzDPn4a
+         BvkOrAtS06Gb7yQK/BhPVpoAgPKsvTiDEBIqDhfFnIwb8Ee5B1Ywjuf4WfuNCl/bFLVH
+         jt6yZ+fG34cfBpvS/qoZzFAYUjIwNAr58bKs1DIS9saanAqTTZop8uEzoRJMeQAlortn
+         CfBpFM7yC/06WKDydyZIa8lQ2SOKFtq8kKL0RzESq1JDTCTu1MAN594K+7dszkJxS5hQ
+         I7Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCX794NmPt7DNs4Su6GHQLz8gpHo/7LRRODEGvB1MKjyfSkmjsqy8okTDXn0JiwbpumBVdvmTDw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGplh5tM0+y0Igk9W23AJJRESIs6u0djCnazIGRLKaHKjvfs58
+	683i0YQ8lds+eGKcJOS+RpxqMrSaG9zQcz0agK/j0xe8uo9fWwrX
+X-Google-Smtp-Source: AGHT+IFLzG9i8ADfD0HOhuu3i+fGcKp+OUI0upODPVW9TOw9lEVmwcQv37wmGVE9+BeGqt+ymGDDIg==
+X-Received: by 2002:a17:907:7f87:b0:a80:a23e:fbf9 with SMTP id a640c23a62f3a-a998d19eaccmr84945166b.6.1728476245553;
+        Wed, 09 Oct 2024 05:17:25 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a995babdbe0sm358804166b.172.2024.10.09.05.17.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 05:17:35 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	dsahern@kernel.org,
-	yan@cloudflare.com,
-	dongml2@chinatelecom.cn,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: tcp: add tracepoint skb_latency for latency monitor
-Date: Wed,  9 Oct 2024 20:17:05 +0800
-Message-Id: <20241009121705.850222-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
+        Wed, 09 Oct 2024 05:17:24 -0700 (PDT)
+Date: Wed, 9 Oct 2024 15:17:22 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/3] net: dsa: remove
+ dsa_port_phylink_mac_select_pcs()
+Message-ID: <20241009121722.2bvkc2iykbqspwex@skbuf>
+References: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
+ <E1syBP4-006UnV-Lk@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1syBP4-006UnV-Lk@rmk-PC.armlinux.org.uk>
 
-In this commit, we introduce a new tracepoint "skb_latency", which is
-used to trace the latency on sending or receiving packet. For now, only
-TCP is supported. Maybe we should call it "tcp_latency"?
+On Tue, Oct 08, 2024 at 03:41:34PM +0100, Russell King (Oracle) wrote:
+> There is no longer any reason to implement the mac_select_pcs()
+> callback in DSA. Returning ERR_PTR(-EOPNOTSUPP) is functionally
+> equivalent to not providing the function.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
 
-There are 6 stages are introduced in this commit to trace the networking
-latency.
-
-The existing SO_TIMESTAMPING and MSG_TSTAMP_* can obtain the timestamping
-of sending and receiving packet, but it's not convenient.
-
-First, most applications didn't use this function when implement, and we
-can't make them implement it right now when networking latency happens.
-
-Second, it's inefficient, as it need to get the timestamping from the
-error queue with syscalls.
-
-Third, the timestamping it offers is not enough to analyse the latency
-on sending or receiving packet.
-
-As for me, the main usage of this tracepoint is to be hooked by my BPF
-program, and do some filter, and capture the latency that I interested
-in.
-
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- include/linux/skbuff.h     | 32 ++++++++++++++++++++++++++++++++
- include/trace/events/skb.h | 30 ++++++++++++++++++++++++++++++
- net/core/dev.c             |  2 ++
- net/core/net-traces.c      |  1 +
- net/core/skbuff.c          | 20 ++++++++++++++++++++
- net/ipv4/tcp.c             |  5 +++++
- net/ipv4/tcp_input.c       |  1 +
- net/ipv4/tcp_ipv4.c        |  2 ++
- net/ipv4/tcp_output.c      |  7 +++++++
- 9 files changed, 100 insertions(+)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 39f1d16f3628..77fcda96f1fd 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -1104,6 +1104,35 @@ struct sk_buff {
- #endif
- #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
- 
-+enum skb_latency_type {
-+	/* the latency from the skb being queued in the send buffer to the
-+	 * skb is passed to L3 from L4. The latency in this case can be
-+	 * caused by the nagle.
-+	 */
-+	SKB_LATENCY_SEND,
-+	/* the latency from L3 to the skb entering the paccket scheduler
-+	 * in output path.
-+	 */
-+	SKB_LATENCY_SCHED,
-+	/* the latency from L3 to the skb entering the driver in output path */
-+	SKB_LATENCY_NIC,
-+	/* the latency from L3 to the skb being acknowledged by peer. This
-+	 * including the latency caused by delay ack. If the skb is
-+	 * retransmitted, this imply the last retransmitted skb.
-+	 */
-+	SKB_LATENCY_ACK,
-+	/* the latency from the driver to the skb entering the L4 in input path */
-+	SKB_LATENCY_RECV,
-+	/* the latency from the driver to the skb being peeked from the
-+	 * recv queue by the user in input path.
-+	 */
-+	SKB_LATENCY_PICK,
-+	SKB_LATENCY_MAX,
-+};
-+
-+extern int skb_latency_regfunc(void);
-+extern void skb_latency_unregfunc(void);
-+
- #ifdef __KERNEL__
- /*
-  *	Handling routines are only of interest to the kernel
-@@ -4500,6 +4529,9 @@ static inline void skb_tx_timestamp(struct sk_buff *skb)
- 		skb_tstamp_tx(skb, NULL);
- }
- 
-+void skb_latency_notify(struct sk_buff *skb, struct sock *sk,
-+			enum skb_latency_type type);
-+
- /**
-  * skb_complete_wifi_ack - deliver skb with wifi status
-  *
-diff --git a/include/trace/events/skb.h b/include/trace/events/skb.h
-index b877133cd93a..26825dac4347 100644
---- a/include/trace/events/skb.h
-+++ b/include/trace/events/skb.h
-@@ -92,6 +92,36 @@ TRACE_EVENT(skb_copy_datagram_iovec,
- 	TP_printk("skbaddr=%p len=%d", __entry->skbaddr, __entry->len)
- );
- 
-+TRACE_EVENT_FN(skb_latency,
-+
-+	TP_PROTO(struct sk_buff *skb, struct sock *sk, enum skb_latency_type type),
-+
-+	TP_ARGS(skb, sk, type),
-+
-+	TP_STRUCT__entry(
-+		__field(void *,		skbaddr)
-+		__field(void *,		skaddr)
-+		__field(u64,		latency)
-+		__field(enum skb_latency_type,	type)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->skbaddr = skb;
-+		__entry->skaddr = sk;
-+		__entry->type = type;
-+		__entry->latency = skb->tstamp ?
-+			(skb->tstamp_type == SKB_CLOCK_REALTIME ?
-+				net_timedelta(skb->tstamp) :
-+				ktime_get_ns() - skb->tstamp) : 0;
-+	),
-+
-+	TP_printk("skbaddr=%p skaddr=%p type=%d latency=%lluns",
-+		  __entry->skbaddr, __entry->skaddr, __entry->type,
-+		  __entry->latency),
-+
-+	skb_latency_regfunc, skb_latency_unregfunc
-+);
-+
- #endif /* _TRACE_SKB_H */
- 
- /* This part must be outside protection */
-diff --git a/net/core/dev.c b/net/core/dev.c
-index ea5fbcd133ae..ab036bbadc9a 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4347,6 +4347,8 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
- 	if (unlikely(skb_shinfo(skb)->tx_flags & SKBTX_SCHED_TSTAMP))
- 		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SCHED);
- 
-+	skb_latency_notify(skb, NULL, SKB_LATENCY_SCHED);
-+
- 	/* Disable soft irqs for various locks below. Also
- 	 * stops preemption for RCU.
- 	 */
-diff --git a/net/core/net-traces.c b/net/core/net-traces.c
-index f2fa34b1d78d..a0c1e32a5928 100644
---- a/net/core/net-traces.c
-+++ b/net/core/net-traces.c
-@@ -57,6 +57,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(neigh_event_send_dead);
- EXPORT_TRACEPOINT_SYMBOL_GPL(neigh_cleanup_and_release);
- 
- EXPORT_TRACEPOINT_SYMBOL_GPL(kfree_skb);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(skb_latency);
- 
- EXPORT_TRACEPOINT_SYMBOL_GPL(napi_poll);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 00afeb90c23a..041947d7049c 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5521,6 +5521,7 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
- {
- 	struct sock *sk = skb->sk;
- 
-+	skb_latency_notify(skb, sk, SKB_LATENCY_NIC);
- 	if (!skb_may_tx_timestamp(sk, false))
- 		goto err;
- 
-@@ -5539,6 +5540,24 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
- }
- EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
- 
-+void skb_latency_notify(struct sk_buff *skb, struct sock *sk,
-+			enum skb_latency_type type)
-+{
-+	trace_skb_latency(skb, sk, type);
-+}
-+EXPORT_SYMBOL_GPL(skb_latency_notify);
-+
-+int skb_latency_regfunc(void)
-+{
-+	net_enable_timestamp();
-+	return 0;
-+}
-+
-+void skb_latency_unregfunc(void)
-+{
-+	net_disable_timestamp();
-+}
-+
- void __skb_tstamp_tx(struct sk_buff *orig_skb,
- 		     const struct sk_buff *ack_skb,
- 		     struct skb_shared_hwtstamps *hwtstamps,
-@@ -5599,6 +5618,7 @@ EXPORT_SYMBOL_GPL(__skb_tstamp_tx);
- void skb_tstamp_tx(struct sk_buff *orig_skb,
- 		   struct skb_shared_hwtstamps *hwtstamps)
- {
-+	skb_latency_notify(orig_skb, NULL, SKB_LATENCY_NIC);
- 	return __skb_tstamp_tx(orig_skb, NULL, hwtstamps, orig_skb->sk,
- 			       SCM_TSTAMP_SND);
- }
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 82cc4a5633ce..b4e7bd9c4b6f 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -283,6 +283,7 @@
- #include <net/busy_poll.h>
- #include <net/hotdata.h>
- #include <trace/events/tcp.h>
-+#include <trace/events/skb.h>
- #include <net/rps.h>
- 
- #include "../core/devmem.h"
-@@ -688,6 +689,7 @@ void tcp_skb_entail(struct sock *sk, struct sk_buff *skb)
- 		tp->nonagle &= ~TCP_NAGLE_PUSH;
- 
- 	tcp_slow_start_after_idle_check(sk);
-+	skb_set_delivery_time(skb, tp->tcp_clock_cache, SKB_CLOCK_MONOTONIC);
- }
- 
- static inline void tcp_mark_urg(struct tcp_sock *tp, int flags)
-@@ -1137,6 +1139,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 
- 	/* Ok commence sending. */
- 	copied = 0;
-+	tcp_mstamp_refresh(tp);
- 
- restart:
- 	mss_now = tcp_send_mss(sk, &size_goal, flags);
-@@ -1318,6 +1321,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
- 			goto do_error;
- 
- 		mss_now = tcp_send_mss(sk, &size_goal, flags);
-+		tcp_mstamp_refresh(tp);
- 	}
- 
- out:
-@@ -1519,6 +1523,7 @@ void tcp_cleanup_rbuf(struct sock *sk, int copied)
- 
- static void tcp_eat_recv_skb(struct sock *sk, struct sk_buff *skb)
- {
-+	skb_latency_notify(skb, sk, SKB_LATENCY_PICK);
- 	__skb_unlink(skb, &sk->sk_receive_queue);
- 	if (likely(skb->destructor == sock_rfree)) {
- 		sock_rfree(skb);
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index cc05ec1faac8..99218ec5faa8 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -3293,6 +3293,7 @@ static void tcp_ack_tstamp(struct sock *sk, struct sk_buff *skb,
- {
- 	const struct skb_shared_info *shinfo;
- 
-+	skb_latency_notify(skb, sk, SKB_LATENCY_ACK);
- 	/* Avoid cache line misses to get skb_shinfo() and shinfo->tx_flags */
- 	if (likely(!TCP_SKB_CB(skb)->txstamp_ack))
- 		return;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 985028434f64..de7a9fd7773a 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -85,6 +85,7 @@
- #include <linux/scatterlist.h>
- 
- #include <trace/events/tcp.h>
-+#include <trace/events/skb.h>
- 
- #ifdef CONFIG_TCP_MD5SIG
- static int tcp_v4_md5_hash_hdr(char *md5_hash, const struct tcp_md5sig_key *key,
-@@ -2222,6 +2223,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 	if (!sk)
- 		goto no_tcp_socket;
- 
-+	skb_latency_notify(skb, sk, SKB_LATENCY_RECV);
- 	if (sk->sk_state == TCP_TIME_WAIT)
- 		goto do_time_wait;
- 
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 08772395690d..db4bae23986f 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -48,6 +48,7 @@
- #include <linux/skbuff_ref.h>
- 
- #include <trace/events/tcp.h>
-+#include <trace/events/skb.h>
- 
- /* Refresh clocks of a TCP socket,
-  * ensuring monotically increasing values.
-@@ -2512,6 +2513,7 @@ static int tcp_mtu_probe(struct sock *sk)
- 	skb = tcp_send_head(sk);
- 	skb_copy_decrypted(nskb, skb);
- 	mptcp_skb_ext_copy(nskb, skb);
-+	nskb->tstamp = skb->tstamp;
- 
- 	TCP_SKB_CB(nskb)->seq = TCP_SKB_CB(skb)->seq;
- 	TCP_SKB_CB(nskb)->end_seq = TCP_SKB_CB(skb)->seq + probe_size;
-@@ -2540,6 +2542,7 @@ static int tcp_mtu_probe(struct sock *sk)
- 			break;
- 	}
- 	tcp_init_tso_segs(nskb, nskb->len);
-+	skb_latency_notify(nskb, sk, SKB_LATENCY_SEND);
- 
- 	/* We're ready to send.  If this fails, the probe will
- 	 * be resegmented into mss-sized pieces by tcp_write_xmit().
-@@ -2827,6 +2830,7 @@ static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
- 		if (TCP_SKB_CB(skb)->end_seq == TCP_SKB_CB(skb)->seq)
- 			break;
- 
-+		skb_latency_notify(skb, sk, SKB_LATENCY_SEND);
- 		if (unlikely(tcp_transmit_skb(sk, skb, 1, gfp)))
- 			break;
- 
-@@ -3616,6 +3620,7 @@ void tcp_send_fin(struct sock *sk)
- 		/* FIN eats a sequence byte, write_seq advanced by tcp_queue_skb(). */
- 		tcp_init_nondata_skb(skb, tp->write_seq,
- 				     TCPHDR_ACK | TCPHDR_FIN);
-+		skb_set_delivery_time(skb, tcp_clock_ns(), SKB_CLOCK_MONOTONIC);
- 		tcp_queue_skb(sk, skb);
- 	}
- 	__tcp_push_pending_frames(sk, tcp_current_mss(sk), TCP_NAGLE_OFF);
-@@ -4048,6 +4053,7 @@ static int tcp_send_syn_data(struct sock *sk, struct sk_buff *syn)
- 		goto done;
- 	}
- 
-+	skb_set_delivery_time(syn_data, tp->tcp_clock_cache, SKB_CLOCK_MONOTONIC);
- 	/* data was not sent, put it in write_queue */
- 	__skb_queue_tail(&sk->sk_write_queue, syn_data);
- 	tp->packets_out -= tcp_skb_pcount(syn_data);
-@@ -4353,6 +4359,7 @@ int tcp_write_wakeup(struct sock *sk, int mib)
- 		} else if (!tcp_skb_pcount(skb))
- 			tcp_set_skb_tso_segs(skb, mss);
- 
-+		skb_latency_notify(skb, sk, SKB_LATENCY_SEND);
- 		TCP_SKB_CB(skb)->tcp_flags |= TCPHDR_PSH;
- 		err = tcp_transmit_skb(sk, skb, 1, GFP_ATOMIC);
- 		if (!err)
--- 
-2.39.5
-
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Tested-by: Vladimir Oltean <olteanv@gmail.com> # dsa_loop
 
