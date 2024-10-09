@@ -1,114 +1,111 @@
-Return-Path: <netdev+bounces-133910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE3E99774F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:12:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDDE7997754
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:16:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E03C0B22AA0
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:12:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7B691C2128D
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 21:16:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28EF1E32D6;
-	Wed,  9 Oct 2024 21:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744E11885BF;
+	Wed,  9 Oct 2024 21:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yaTZXXa7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwbLokYm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205321E32BE
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7762119
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 21:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728508321; cv=none; b=pVXKYu/5ly6YAZ/i09Ba/ACbatgphgoeGgBk8oECiN9NkOfWiJmJET1p3ATucng0Pke8dUM/2ZX0DEDIsnq+NZYixfVWxQOnTUP6La/IPkgcDTlwrE55+B/VcBEl5JbfBbIKGalX+oHJTW8HAjZrJ6JnO1xG0PU+O93fEVOIm00=
+	t=1728508568; cv=none; b=NIXLEi7o1rMo5a8j1Dk/c+L6deOvEgLVBiPr5GUw0Dnh2gMYiv019Y+xgBr7FhuEIszXZbzCjeyAYuIR4gEdyFAlSEekdqCOj4Te71l+CK7IgL1eg4CSpBQNrTIKieF0+AhUy1DSQbbgJrFyDQEzpIrAqv0SJ9XP0iqfM9W/+jE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728508321; c=relaxed/simple;
-	bh=tDiQmmnYC8QCBHjTCFKNaYKTLQOcG0YvoNcNUVkKLFI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NhiFEHDzItu++m7i3fLs9ibvbsNm8FV/rA556nithnyV0TXIGM97x/UMUQOiIaim6XjITG1132zPQL1nR/FXZzwx2SEGFf4OYnoeOilUhmrn/dHbnLKu7nJexIt3SygcUmpvs7V8NGs0r7+A4hF1Oaiof8JSXxUDdC0sj9whDBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yaTZXXa7; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-45fb0ebb1d0so33111cf.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 14:11:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728508319; x=1729113119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tDiQmmnYC8QCBHjTCFKNaYKTLQOcG0YvoNcNUVkKLFI=;
-        b=yaTZXXa7plY6DXwuASLh3W590a5yjdWfAqV6EoiBpyQFWCGVHrTbJ2pOyIgpidPE50
-         0iGDfKNr/A7E1PiZapbVo6hcLanXnb5yckhca7Vq4JcCz1CooXmoYX/0kEOJ9YSm5TsC
-         YqFU3Dt/tH+V60ZQOc5OcBFPM5eXNgSDlaaNVOa0l4nnvUzp5LM0Y06a+q5+68ssyYeC
-         u5uZ/wb2oXlKv6DL9IhXdSsOqAca0m9PM0L4Twer2k87vincnpdzL06CCohntJXox4s1
-         3KBot3yN7g9V4z3bpMvZjP/WBwNIZsSyc2ytX5Mw/M93VNnxMcw9joRLEdFCbV/yT7b0
-         cqqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728508319; x=1729113119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tDiQmmnYC8QCBHjTCFKNaYKTLQOcG0YvoNcNUVkKLFI=;
-        b=A1ptVbXLeNZ46WdDO0imDHg/JjTajBqBoMumiLbykG9cCzT/vRpndyd75550qA4Vbq
-         x9ow0LBlXPrC2wbxCJ9GCsiYJBI27zYbkMybxhpBp64FYUSBsbjl+nZl1UiW9sTHqHvm
-         Oun5zT1zZh2W20f9JNFnrNoNsskfeH0TmKg3u3KQR1rPEWu4H7dtpX7m4rxLZZahF1IR
-         J0GerYv4SfRcRcFBWAoG4VrJEIfPodu1u9uKTWXwKQJJdGkdDsYbIf8ub6L5ofcxm07R
-         8cV6RWCubgLLOQG9JOFOqzIBEzbvIVSwI9ImDwa2TGp6vy3mvHW2XV1gVMFuqqXWY1Tk
-         kD6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVybO7xQFKcoCliBoFpAno7ArTLBZRD0iXJ8l0450e5oq4GTRy1lIRw+mmlFQ1yCTIN1Ot+FFk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSAJv0ulwiQbVtG+2IrVguLHJuaN7qWZIjgdmGuPUiXpWjO7+x
-	3hzBUoVCRXCzRpIS34iJFTZGIK7FNR7+dlqAHu2ukEWuRlfpaYMNkvjNx4yDJbaRJLZnvD+wtXG
-	GgvV2uHeJiLvJXFEg9MQPZKXb7EUYuajX0HRq
-X-Google-Smtp-Source: AGHT+IG0CkxSS2KNR9g9xFhl+BGJZe4WWWDqAEC6C1Ey/4/z6ysY4E3GxuJTsY9lca7U4j6L4LhiBrbXUTutH2ue/XY=
-X-Received: by 2002:a05:622a:5e89:b0:45f:924:6bcd with SMTP id
- d75a77b69052e-46040440db2mr1007721cf.22.1728508318768; Wed, 09 Oct 2024
- 14:11:58 -0700 (PDT)
+	s=arc-20240116; t=1728508568; c=relaxed/simple;
+	bh=xIsQ1d+v7oHmtaK2VQlPK34wIEw2pJt0Hqe5ull5w5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bznVrsI1j+sKRIwZzHhNu7k604hoJRkjNGYpyG0yulPqdrrn+czwp131Vs7YdD/lcI73oWJKlL/ubij9dj8rBba2Vhkv7fDZMEylUj/qkBY0/7kjcskfMdmPo3w3LhMY2ImpgtYWcgniPC1Zmioo/aPwERo3frNIkSKXN4ei5S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwbLokYm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD4F1C4CED2;
+	Wed,  9 Oct 2024 21:16:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728508567;
+	bh=xIsQ1d+v7oHmtaK2VQlPK34wIEw2pJt0Hqe5ull5w5s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CwbLokYmR8aq9eH2I82PdYsIr8VIYQcyHIsCOUo2cu/bgkg7kzvbZHPf68P/E5Tvs
+	 drUHRha7cktm7mzerYupl2hKpvdNQ+FnjL9fUFqK8gCx/oDHz2tKX/6bkWAPHyI2YB
+	 tY3CIS4+57+ettbHVWWsGqxWIRhPz91HY9XcOtOzCsxYinU4uXaHdas87j9TTCrJeQ
+	 b4Pz/AJdnR342HPyolxCWndM2C2/mZkvOE6j702naEEqErr+CVK0hqrW6zTRgBST+O
+	 MK+0sOqy5aYSyW391mK2FHIRqDoKTQmdHBzXRYRwdeTUoGUN/zdOyzPmSRYAIojJP6
+	 GphVoT/alhGFg==
+Message-ID: <8be5e4f4-436e-41fb-a6c1-c22e9225505a@kernel.org>
+Date: Wed, 9 Oct 2024 15:16:05 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-8-dw@davidwei.uk>
-In-Reply-To: <20241007221603.1703699-8-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 9 Oct 2024 14:11:45 -0700
-Message-ID: <CAHS8izPuRgGPz9Fg8NcsJzUaX5+8zSvT33XEp=LqdKMdm=KzbA@mail.gmail.com>
-Subject: Re: [PATCH v1 07/15] net: page pool: add helper creating area from pages
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/5] net: remove RTNL from fib_seq_sum()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, Jiri Pirko <jiri@resnulli.us>,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20241009184405.3752829-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20241009184405.3752829-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Add a helper that takes an array of pages and initialises passed in
-> memory provider's area with them, where each net_iov takes one page.
-> It's also responsible for setting up dma mappings.
->
-> We keep it in page_pool.c not to leak netmem details to outside
-> providers like io_uring, which don't have access to netmem_priv.h
-> and other private helpers.
->
+On 10/9/24 12:44 PM, Eric Dumazet wrote:
+> This series is inspired by a syzbot report showing
+> rtnl contention and one thread blocked in:
+> 
+> 7 locks held by syz-executor/10835:
+>   #0: ffff888033390420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2931 [inline] 
+>   #0: ffff888033390420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x224/0xc90 fs/read_write.c:679
+>   #1: ffff88806df6bc88 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1ea/0x500 fs/kernfs/file.c:325
+>   #2: ffff888026fcf3c8 (kn->active#50){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20e/0x500 fs/kernfs/file.c:326
+>   #3: ffffffff8f56f848 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
+>   #4: ffff88805e0140e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:1014 [inline] 
+>   #4: ffff88805e0140e8 (&dev->mutex){....}-{3:3}, at: __device_attach+0x8e/0x520 drivers/base/dd.c:1005
+>   #5: ffff88805c5fb250 (&devlink->lock_key#55){+.+.}-{3:3}, at: nsim_drv_probe+0xcb/0xb80 drivers/net/netdevsim/dev.c:1534
+>   #6: ffffffff8fcd1748 (rtnl_mutex){+.+.}-{3:3}, at: fib_seq_sum+0x31/0x290 net/core/fib_notifier.c:46
+> 
+> This is not a bug fix, unless I am mistaken, thus targeting net-next.
+> 
+> 
+> Eric Dumazet (5):
+>   fib: rules: use READ_ONCE()/WRITE_ONCE() on ops->fib_rules_seq
+>   ipv4: use READ_ONCE()/WRITE_ONCE() on net->ipv4.fib_seq
+>   ipv6: use READ_ONCE()/WRITE_ONCE() on fib6_table->fib_seq
+>   ipmr: use READ_ONCE() to read net->ipv[46].ipmr_seq
+>   net: do not acquire rtnl in fib_seq_sum()
+> 
+>  include/net/fib_notifier.h |  2 +-
+>  include/net/fib_rules.h    |  2 +-
+>  include/net/ip6_fib.h      |  8 ++++----
+>  include/net/ip_fib.h       |  4 ++--
+>  include/net/netns/ipv4.h   |  2 +-
+>  net/core/fib_notifier.c    |  2 --
+>  net/core/fib_rules.c       | 14 ++++++++------
+>  net/ipv4/fib_notifier.c    | 10 +++++-----
+>  net/ipv4/fib_rules.c       |  2 +-
+>  net/ipv4/ipmr.c            | 10 ++++------
+>  net/ipv6/fib6_notifier.c   |  2 +-
+>  net/ipv6/fib6_rules.c      |  2 +-
+>  net/ipv6/ip6_fib.c         | 14 +++++++-------
+>  net/ipv6/ip6mr.c           | 10 ++++------
+>  14 files changed, 40 insertions(+), 44 deletions(-)
+> 
 
-Initial feeling is that this belongs somewhere in the provider. The
-functions added here don't seem generically useful to the page pool to
-be honest.
+For the set:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-The challenge seems to be netmem/net_iov dependencies. The only thing
-I see you're calling is net_iov_to_netmem() and friends. Are these the
-issue? I think these are in netmem.h actually. Consider including that
-in the provider implementation, if it makes sense to you.
-
---=20
-Thanks,
-Mina
 
