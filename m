@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-133682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F5BF996ACD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:53:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57C3996ACC
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:53:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D960A2893A6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:53:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E4CF28904F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:53:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75508199FB0;
-	Wed,  9 Oct 2024 12:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD405199E9D;
+	Wed,  9 Oct 2024 12:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mbLOS8LA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5niaz9h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F189419994D;
-	Wed,  9 Oct 2024 12:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913D4199E8C;
+	Wed,  9 Oct 2024 12:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728478226; cv=none; b=GwnPHrdPg1/FqjfInEM7sKUjviQBtDQRoNW3P/bmgk4LRCyziDF4FerDgY3i/ItL4ebZsGJ8VfpfkmBiwKTqPi7qdHCpMkt3mz8ut+rLVNJtWh7Edc7eEQ53u7JVgmtjFHm/LfB6411A0oc6CgbYj9cATZJ7OroK+jpSHxCG54Q=
+	t=1728478225; cv=none; b=MkKxRgtahLnoCd92h4RXx/rpp1gFbNpaWbKo40OJtL5WE+IiN5yqedpsLKurhMrdtF1WleLPlXa5z7rphn30Z3oXzARYAEwMlDbIIwPHamL7Pyu8TGpKN6phbBcJu229Tp5ahbwUYkC44W2HkV4g9VLXX2CeWBaxNf336VM0RVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728478226; c=relaxed/simple;
-	bh=s1mIiqMmmaEtZ0dP0CPxz2xMQYHzsDsHkZVkJ8OBgYk=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=dUegBy935F6BHFTTdzvMsInClU5azPCu2L53SZxzzirYzgoXxzzbYB8HWUWnoiv5EV/9BF2Pks7PKzPiUJPKihygLo3NW7QOvg9QYcOV6YTL7sa1CD8jN+zH7EWeWgntoGjp0TT3SCqRDfpRJTZFp4sPO+SGt9hqmOD4y0jZdv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mbLOS8LA; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e053cf1f3so2806848b3a.2;
-        Wed, 09 Oct 2024 05:50:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728478224; x=1729083024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ApKT91N+hZarPH0QWF7H2pMrlw9wQXXopki5JRgABI=;
-        b=mbLOS8LAGJNNtca2vr9BLWmUtO089gku589pg4DEZ6z/ofD23BA9nly7ksYkwK/i3q
-         4kyS046UKRaGRDu5yyvEN04f9CMcBqqFVU/7Ie86DvZIwbGRlFfBTDWlidxjUd0BLQIy
-         TcZBMMb1lqYnLj9TY4yhE+SlqBKUPVsblY7w50brMuTP0NmOY9a+F6a7WWGC40HQuCzz
-         SyUIgW0MzXkNDBCgVtnpem0r/yVY5Jf/ldA9IsG6ZDZtR7ulc/fU0qepeutC/L1F907P
-         B+qmz7ndb+YsU0hN94QZ1hHgJ3qIhHCl/XI1JChbIamGBXk1HaI+k2VAe/HINt5+CnmV
-         U1KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728478224; x=1729083024;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4ApKT91N+hZarPH0QWF7H2pMrlw9wQXXopki5JRgABI=;
-        b=T8lWIcbThUyqxsCJS+zqAoabW8pAaXtOv1/pQaHI3q6MUp0T6Z8hu0sfKUfba6Fycx
-         qXVM36w1Jddp2/eXlt9XJ6d05c9naNfy9BwuHfy0+uLJAzSdXUpOZmqfb5xAWBId5dgo
-         Z7RjE6F63oqo//pVGZ49FggWMlk4RSoxshwUBklFK5u9lF9ol6EL3Eexoh1hO9AaPu8o
-         wPgfHz5E+HwitAoEGvOufAG64BbTkYN9jOhFDdb5Kl1Y84UAI459gSrNTcj8bN+j3+HD
-         g4qUD4aylvYaOrAhULyO/YSOS9ItP+nuFH8T4+12UcANz1331FBarV77sPvq61RoJdsd
-         taJA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4sibkJCtHFU2bqT/qja/LI0iFjw1nxndlUBUv6sYHbeKGUj201IlF0rT9tIuCgyAcGYCK/UPDelX384Q=@vger.kernel.org, AJvYcCW4fxex1kVF7ekzSCxD5s7kfPmlRDbmi89JDd1MHa/8+NJWjqemcXoFk9pASbD/hhXSZEWbTrZi@vger.kernel.org, AJvYcCXBcOJ2NM24Lgw01bKDj/NZ/X0/bjZzsb5WTZRanxI9ziX6ZdzRt71PrQLHIuOp/cg9G+1LYsvXuWYbv/tgOvc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7UdVvW+8rQJhYfpTzLMktYl+MSUJk+dO6WT4mrnjabeu0nTaB
-	0cYwf6gOb5JfhoFHVfgfd8I+ZDEe7+ElXtMfDzq3cNjjN5VMX3Wi
-X-Google-Smtp-Source: AGHT+IGBBVNYSoULlN6iyMI/oeDgYEpcddcsccCGoj7dipFWXC5XBHhHJ00hcK3HLM5V9FYXS4atlw==
-X-Received: by 2002:a05:6a21:4d8a:b0:1cf:31b6:18dd with SMTP id adf61e73a8af0-1d8a3c86810mr4142684637.40.1728478223860;
-        Wed, 09 Oct 2024 05:50:23 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d4a278sm7952878b3a.140.2024.10.09.05.50.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 05:50:23 -0700 (PDT)
-Date: Wed, 09 Oct 2024 21:50:08 +0900 (JST)
-Message-Id: <20241009.215008.101897405575050011.fujita.tomonori@gmail.com>
-To: aliceryhl@google.com
-Cc: fujita.tomonori@gmail.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, miguel.ojeda.sandonis@gmail.com,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com, arnd@arndb.de,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/6] rust: time: Implement addition of
- Ktime and Delta
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CAH5fLghps=Aa69Aye5PCGu6LuoHomMcQYEN1USTd5JiBkLdJLQ@mail.gmail.com>
-References: <CANiq72=YAumHrwE4fCSy2TqaSYBHgxFTJmvnp336iQBKmGGTMw@mail.gmail.com>
-	<20241007.151707.748215468112346610.fujita.tomonori@gmail.com>
-	<CAH5fLghps=Aa69Aye5PCGu6LuoHomMcQYEN1USTd5JiBkLdJLQ@mail.gmail.com>
+	s=arc-20240116; t=1728478225; c=relaxed/simple;
+	bh=yvNe98Z7L5t99Iq3TS1CIPsDhczn7uicq7Rg6gMTksA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I3yPM7zLwgjFgvPE9FFfszzLwTe/8/ZKLnGKe+SJVvE1+AtU6P0JQtjOIcOM00MFTq4ZRaifQYnIod6n6rJe2gOP0AOOZ/xrbm/h1wGimQ9SaAmT0MQtP9+gmtLExf1IdwNf7HVUsCQJmhrX56nnqhoJAmz32H+biKN/sdcfsJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5niaz9h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BE7FC4CEC5;
+	Wed,  9 Oct 2024 12:50:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728478225;
+	bh=yvNe98Z7L5t99Iq3TS1CIPsDhczn7uicq7Rg6gMTksA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=N5niaz9h1SMc8Ggb1E/Jq7F8qVs8Hq0wDWXLIp1bOBJqpNqz84OIG0p6xBV5mlnZT
+	 1+inNEMCsVUAwALouSqOMzOGECoC3ylw0l05/FM1egEsA6pzX6Bh7zK8eSzzXZ4lO1
+	 Oze9mm0YfhpHWwYfXc6+Ll09Tu1S5d7feaZhv1Io2KIEQFuNNKGZIfYWiE//XSsxyX
+	 VjUebrK7aLpCO04NYwJx+0ThZsWw9iWhkD7VG7N+8wtqzZlx0BdqtW6/l+jRfhPlVv
+	 BLpf5RTE4XSGnWdcutQxgLx2/IRSarTv941e0RE7+iBiwycjHErui5ml4WqsFJ7n8u
+	 i97P1IuH9uTLw==
+Date: Wed, 9 Oct 2024 13:50:21 +0100
+From: Simon Horman <horms@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	workflows@vger.kernel.org, linux-doc@vger.kernel.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH net v2] docs: netdev: document guidance on cleanup patches
+Message-ID: <20241009125021.GU99782@kernel.org>
+References: <20241009-doc-mc-clean-v2-1-e637b665fa81@kernel.org>
+ <01c97823-d560-4f89-b757-752e18940f31@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01c97823-d560-4f89-b757-752e18940f31@intel.com>
 
-On Mon, 7 Oct 2024 16:24:28 +0200
-Alice Ryhl <aliceryhl@google.com> wrote:
-
->> > or not (even if we still promise it is the same type underneath). It
->> > means having to define helpers, adding `unsafe` code and `SAFETY`
->> > comments, a call penalty in non-LTO, losing overflow checking (if we
->> > want it for these types), and so on.
->>
->> Yeah, if we are allowed to touch ktime_t directly instead of using the
->> accessors, it's great for the rust side.
->>
->> The timers maintainers, what do you think?
+On Wed, Oct 09, 2024 at 11:42:14AM +0200, Przemek Kitszel wrote:
+> On 10/9/24 11:12, Simon Horman wrote:
+> > The purpose of this section is to document what is the current practice
+> > regarding clean-up patches which address checkpatch warnings and similar
+> > problems. I feel there is a value in having this documented so others
+> > can easily refer to it.
+> > 
+> > Clearly this topic is subjective. And to some extent the current
+> > practice discourages a wider range of patches than is described here.
+> > But I feel it is best to start somewhere, with the most well established
+> > part of the current practice.
+> > 
+> > --
+> > I did think this was already documented. And perhaps it is.
+> > But I was unable to find it after a quick search.
+> > 
+> > Signed-off-by: Simon Horman <horms@kernel.org>
 > 
-> We already do that in the existing code. The Ktime::sub method touches
-> the ktime_t directly and performs a subtraction using the - operator
-> rather than call a ktime_ method for it.
+> Looks like you wanted to say "please don't submit autogenerated clenups"
 
-I'll touch ktime_t directly in the next version.
+:)
+
+> > ---
+> > Changes in v2:
+> > - Drop RFC designation
+> > - Correct capitalisation of heading
+> > - Add that:
+> >    + devm_ conversions are also discouraged, outside the context of other work
+> 
+> devm_ is generally discouraged in netdev, so much that I will welcome
+> the opposite cleanup :)
+> 
+> Your write-up on this is correct, no objections.
+> 
+> Perhaps we could say more about the status of the code that is fixed -
+> Maintained/Odd fixes/Orphaned - I would don't touch anything below
+> "Maintained" for good reason
+
+I agree that there is room to expand on that.  But I would rather defer on
+that, because, as mentioned by Jakub in his review of v1, that quickly
+becomes quite subjective.
+
+IOW, let's start with something and improve on it later.
+
+...
 
