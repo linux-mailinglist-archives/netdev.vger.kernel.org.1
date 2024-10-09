@@ -1,159 +1,102 @@
-Return-Path: <netdev+bounces-133945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E567299788C
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:37:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99570997892
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC8491C21504
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:37:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7598B22928
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9011E282E;
-	Wed,  9 Oct 2024 22:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B04AF1E105C;
+	Wed,  9 Oct 2024 22:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="d1klbw4R"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZDf/WZSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DBE185949
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 22:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3A61885BE
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 22:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728513436; cv=none; b=c3Q0Q3XAgyd656Rr+3jdKbfeYVyqg3lKWTgKhmxTs287bRMEvTuaCRsTgO9gkHX1/r3sdlIRQka++yTZZhiglE5oT0UWWuk/u2YMxC3xYQcMfFu+IUkQnulbx7/W4KQ445XXWdUyTVXVfvDmId8qUkbyqqlb6ebIGjeShay1JzM=
+	t=1728513653; cv=none; b=bO4+M03gm8nAZ45R9L1xbgFLYnBo6XVsrrofZqkqAy1KyS3LW/xPsBVGtp6hEvnJW4T55VhbwJrP4yd/Svw7SeTlC1M8hoEmHdmQUA1N7fL9ljWBcr/V1mtFxMuNkoEvXuaj4MM16yxT0hQZDkWDtS9x7Aa6gJzAmLYUx9tkTq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728513436; c=relaxed/simple;
-	bh=HDnfZrWE1Px8hpsm/g2XLlT+3Gkd0A8Un7hzh8e4U+Y=;
+	s=arc-20240116; t=1728513653; c=relaxed/simple;
+	bh=/tIBqQ+/kOc+EdSsd1Q/m6jIpcJ2daPGELJw4AbVEm8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EaJsJTpdhv2RzUzwm5uHrSahFLhUXCuz4NtkJRzn/O3jpcU9raxJT4c3CJmz6mY2ogEBHhw0bA7Mpx6NOu1fg8o/YzcTH1ApWPY/k0oa/TDYxtO3oT4BnIOcRv6MJwyN3cEK/GDa1Nht0V8f7H2t85VgKvP6qD6GQlJM2NlFK+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=d1klbw4R; arc=none smtp.client-ip=209.85.218.51
+	 To:Cc:Content-Type; b=F1MMn6jz/WulxpzNzXMtzboVsFg1LHRWtnIx3mcMjDnlGWT5wqVpTqJkCbQNWGQxQTNUWPOEj3mcAOYaNl0aKXlFUQTuEv2X63djw5b3Kp+wRlI3TfLAM/O4hyhT7AH2+Fcdu8Bo3MTD7awmfC9hAqHyxTYzg1FMQ4V2TyM0+eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZDf/WZSp; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a993a6348e0so18983666b.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 15:37:13 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2fabfc06c26so2254221fa.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 15:40:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728513432; x=1729118232; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1728513650; x=1729118450; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2o26BlLcF2XXnU0FLNvHUIL9hQ1b0y0WSAOErGUPj7s=;
-        b=d1klbw4R0gwCNz9beaXlMtY59bdXOkp9p39jrL6TDc1MoYhC7dwy8Itz1Jy/ypA0Yp
-         NZlDJdJuC2vuhDfxCnTKA6S0mHnqZauO47Pqh43qQbXYNHbUmOfx4ZucvsRMcVgEmo6I
-         YGAy8dkzMHDWc2kT5OuUY4hNrYS501tpINDHA=
+        bh=/tIBqQ+/kOc+EdSsd1Q/m6jIpcJ2daPGELJw4AbVEm8=;
+        b=ZDf/WZSpAWag/5YabOPvLMxzBmWjFMpGpWCWuKjslUzsIcX9hIfNYUDg/OaVROsmLW
+         mV0hJmyKuGqYdGPe9aMmf28194vyY0UNtln/23ss0YXAn7t2cu8Azlh78HXcGGRfFitu
+         irwaEemxYafXasnZBfJw44/8hr35cAHiqZH/U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728513432; x=1729118232;
+        d=1e100.net; s=20230601; t=1728513650; x=1729118450;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2o26BlLcF2XXnU0FLNvHUIL9hQ1b0y0WSAOErGUPj7s=;
-        b=uCqdxJUZPJ2ngb6mJ4ojDDZ4B9Hh8JDF7vn4YFOuX8lCceVczHJMhvwmYPw+ibtTMH
-         uckOAi+RUyK1bl4czauMcbBIlllyYPS+4c7IWWPCJHZG86sa4mc6erg6GWWDLyw6wigI
-         fcDqGHse8u5i57OzkP3U01siFz9iDh2OOHgQrRPDwPYKI73vxqTeH4wpcSePHHaUoIlm
-         TAdi/p23CbVL1fhaJ3O2MlvM61Hc0sXkuIbD1yBXJASg1OwgrZj9sDxljFFpwXVH2hho
-         r2pzdyEjEJBXHvUMYKpgfVvbgD1v1Ae1mNnEcMWWtB830bPbl0N08VTtOjkH7ERrIAAY
-         LokA==
-X-Gm-Message-State: AOJu0Yzm0H0PVnOacjErVRlsZPlcxD1w8n/Nu5GbQNXHVKdz9wnaju9N
-	zExpTvYUK5i7FERnTSQ2D0kLpkTjhd0H4x8y7IYbDkT0J+fLQ1vHELFAfEQu4eUvqeHqD1tleU8
-	d7vmtv9Zk0/2dKFv8SBays7NXK3IquYUrthKw
-X-Google-Smtp-Source: AGHT+IEARU/d1avivKsEP20FI9lwifazKhVrFWA/ndg3ezif0mpNK2OoPSiTN2v0Km+nFtYplV5XaABrc7etUwOq6LY=
-X-Received: by 2002:a05:6402:510f:b0:5c9:21aa:b145 with SMTP id
- 4fb4d7f45d1cf-5c921aab83amr3143078a12.36.1728513431953; Wed, 09 Oct 2024
- 15:37:11 -0700 (PDT)
+        bh=/tIBqQ+/kOc+EdSsd1Q/m6jIpcJ2daPGELJw4AbVEm8=;
+        b=f72Z2FwDeAnxWdhoJYLvQEHw1LGybjMym1Imr2d/09pM4anK+W0ebcDHSOc9Y1DDcx
+         kLozAOnvizGz8x8gDvIDJOcdi6eyUeazHtQcMp/QadyodHRP6NBhTbLpnfns/FNJjBt8
+         3gU6a+z4C0eGLpjjsA1xY6eJkwztRoQy0cNTAhCgWNQ24M7Qm5fssm3MeKCeC4DQan8C
+         N9XKaYC594BfxdeYX2Zb5gETTZevIjle1cLNp0/6aafDVf93uoHiYYmpQvWw5EqWFkml
+         nDKNoV19pjlStd3Re3CT0rpdFA2amqqvUH775EQcmDV/r0roJ+pWTsAumNFaeFY2x4qr
+         YYHw==
+X-Gm-Message-State: AOJu0YyM6BfTFbJMBKSvewjwcs2i6OtZ1v4fXWm2KdVjDsCNnABI9PaQ
+	/TMh3FiCcebpDlHbaVJmBW8X2Sjx/o6nQwD/bwK8BznAIdo1a/wwulUFi6bnkHUmDm4zXjUolVe
+	zBrb2maeRs/dMK0alf45je++TsIoWGOLbMGoL
+X-Google-Smtp-Source: AGHT+IGJnwNcjSn2Z/VfZkzvyLpLSQti/7v7b1HdnmoYZsKWSdLaZyB7QO+tUzo9awPyk2tgLvEldG1MVSSKE+QW9c0=
+X-Received: by 2002:a05:651c:221f:b0:2f7:5f6e:d894 with SMTP id
+ 38308e7fff4ca-2fb18782372mr27515791fa.25.1728513649944; Wed, 09 Oct 2024
+ 15:40:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009175509.31753-1-jdamato@fastly.com> <20241009175509.31753-3-jdamato@fastly.com>
-In-Reply-To: <20241009175509.31753-3-jdamato@fastly.com>
+References: <20241009175509.31753-1-jdamato@fastly.com> <20241009175509.31753-2-jdamato@fastly.com>
+In-Reply-To: <20241009175509.31753-2-jdamato@fastly.com>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 9 Oct 2024 15:36:59 -0700
-Message-ID: <CACKFLimL=x_KQeyOy_2FLcew=TFD0MjvKJbH_BaydCEG_Oa0Cw@mail.gmail.com>
-Subject: Re: [net-next v4 2/2] tg3: Link queues to NAPIs
+Date: Wed, 9 Oct 2024 15:40:38 -0700
+Message-ID: <CACKFLikre0Av3xKdEnSzkxJp3AB9Gzwj5OLOiFzLeT1Znd0yGw@mail.gmail.com>
+Subject: Re: [net-next v4 1/2] tg3: Link IRQs to NAPI instances
 To: Joe Damato <jdamato@fastly.com>
 Cc: netdev@vger.kernel.org, pavan.chebbi@broadcom.com, 
 	Michael Chan <mchan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	open list <linux-kernel@vger.kernel.org>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000020352c062412e579"
+	boundary="0000000000001f941d062412f295"
 
---00000000000020352c062412e579
+--0000000000001f941d062412f295
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Oct 9, 2024 at 10:55=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
 te:
 >
-> Link queues to NAPIs using the netdev-genl API so this information is
-> queryable.
->
-> First, test with the default setting on my tg3 NIC at boot with 1 TX
-> queue:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
->
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'}]
+> Link IRQs to NAPI instances with netif_napi_set_irq. This information
+> can be queried with the netdev-genl API.
 >
 
-This is correct.  When TSS is not enabled (1 TX ring only), the TX
-ring uses NAPI 0 and the RSS RX rings use NAPI 1, 2, 3, 4.
-
-> Now, adjust the number of TX queues to be 4 via ethtool:
->
-> $ sudo ethtool -L eth0 tx 4
-> $ sudo ethtool -l eth0 | tail -5
-> Current hardware settings:
-> RX:             4
-> TX:             4
-> Other:          n/a
-> Combined:       n/a
->
-> Despite "Combined: n/a" in the ethtool output, /proc/interrupts shows
-> the tg3 has renamed the IRQs to be combined:
->
-> 343: [...] eth0-0
-> 344: [...] eth0-txrx-1
-> 345: [...] eth0-txrx-2
-> 346: [...] eth0-txrx-3
-> 347: [...] eth0-txrx-4
->
-> Now query this via netlink to ensure the queues are linked properly to
-> their NAPIs:
->
-> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
->                          --dump queue-get --json=3D'{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8960, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8961, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8962, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8963, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'napi-id': 8960, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8961, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8962, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8963, 'type': 'tx'}]
->
-
-This is also correct after reviewing the driver code.  When TSS is
-enabled, NAPI 0 is no longer used for any TX ring.  All TSS and RSS
-rings start from NAPI 1.  NAPI 0 is only used for link change and
-other error interrupts.
-
-> As you can see above, id 0 for both TX and RX share a NAPI, NAPI ID
-> 8960, and so on for each queue index up to 3.
->
 > Signed-off-by: Joe Damato <jdamato@fastly.com>
-
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Thanks.
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
---00000000000020352c062412e579
+--0000000000001f941d062412f295
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -224,14 +167,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGu8llsUBlw5bdRuY2EsjxvVhpCoE12Q
-ZsuBC3qyT3VHMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAw
-OTIyMzcxMlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMlGZZ4f030dOZDEGFx3C0D7H/HgTBlw
+O8HuhyXlfwTTMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAw
+OTIyNDA1MFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQA+uxdMuC6EG67B1quat9vFtk+aRu9X6pVWMVNE+oGLWH1XcK7u
-BDPf0a1JwdcXLVr2UCuEiv8ma6/FffzuVfQruS5Vt7GlwNhtgpseqMErObOUKTV0CemMZ1Dvrz9c
-y2rmPisA3n+wSD6HcSe1GD+xc9Fl53/oiHGwhU9dd6yay835b3sRKLqQIvBYjk5Dmk4oqI928+8X
-0KfVVEvUFXvuCtFuI6/I8SPoVPT7a5mNa6RBEQuua9QOy1cIOBGc98VYHIqepc57xfnOHPKzPjQn
-MM/sBOwtwzScF5D6y1i4H+rRyvAls8QxmY+Qrkg2RRqxxvT+GsSDddMAaYqARkTe
---00000000000020352c062412e579--
+ATANBgkqhkiG9w0BAQEFAASCAQAKfH8TG4HP5TsMHer3Bl6f1iXh4+0cOr6PI5ZiR6lx9DdOkZ6U
+Z7q88HLOXn/W6gqSviDVMuv60z4+PYmgG2NYkgoAER1yfnO+rjoC1iaaPTOztpNoQFJUF+gkTtZg
+aJdhbiX3snz/b7KJVcPQnXDt322UsnXRioQLe70kZFGHX7SF3wCSriW6pV/p4Ec+7H/k4/JsLRTf
+lYjO2Qf4PyLYqV/w75KWMYzEAzNrtElNXhfklaUXPi8GTC7tozCp7/6LwblyPfmfd2EnI7tZV3Ke
+xlUyjBgbnr3rv7pv5y+ZbigTkELe2QN2dsmvi11oolzWmkrNuvn1jDyPdaAf8VEw
+--0000000000001f941d062412f295--
 
