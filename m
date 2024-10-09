@@ -1,137 +1,169 @@
-Return-Path: <netdev+bounces-133459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D96996000
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:44:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57CB399602E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11458286A0C
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 06:44:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12DC22838D4
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 06:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F8D1714A5;
-	Wed,  9 Oct 2024 06:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77136176AB5;
+	Wed,  9 Oct 2024 06:55:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ghqWcBVA"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="NES5GyDT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473B316631C;
-	Wed,  9 Oct 2024 06:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B542040849;
+	Wed,  9 Oct 2024 06:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728456243; cv=none; b=sAidBPUWZ87fiwfw2l7bjE0GLuHokoqMkG7w6ujm0p0y7taWXh6ZbEhNodEub+hhrJJDWxFvb/0b8PfDQYqMwcznPkDg+h41tLmAOEQ4V1Es2xckfIeRuMx/zT4iTWWlTHFMtA3U5K6asYS1tqusNG7zwJqOe1yexwdlc4EFr6g=
+	t=1728456927; cv=none; b=d3DgnzRYdj8DSAq93xui7F/9HgBfrvttYqntTHygOPNnCeku5utwa/mO2CSb2ZT3ILgSIdwn+IaeBzIQwZ8fF74JWy9jOWyCko7fQG1zMSqWKIcJ95E8AtWeL4BCNSKGULKZJHMQmkvKJa5hVtFnvQA0p8auBRf9PUf21AJR4Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728456243; c=relaxed/simple;
-	bh=MYZYvkKcCYKm3oXbBR1W/5fky/EswjYaR8YPuI91iro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GWvkL1JVwG1Y+c06I+AWWKdG6jlRzKAtlj0iJGG2m3qLS7k8/C3dbT+6t0I4M+MdYuo9JD1V/OvzEJsR7nad/n5FEHbyAnVeMeCWvBNPYTENG+ynfZMgyO32dRlM4VqYgRlZJKh/guy2DpmiGA5pJutXo3u68WbpnAih04SXtnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ghqWcBVA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29E79C4CEC5;
-	Wed,  9 Oct 2024 06:43:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728456242;
-	bh=MYZYvkKcCYKm3oXbBR1W/5fky/EswjYaR8YPuI91iro=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ghqWcBVAU6LrbdiL1uBwPJGhEfRTGc2z6DNrpCI1/LUjGZnuEHasMrJ5cqMhV3Dxc
-	 mRVkpLeCGiHsmLPzq9VQ6zuEetGrIUrqIXrX8AvGV/Jv5eGjJ5feyoENsoLIq4cLiJ
-	 v+OwBdIIZg9I9eZOQYq3Aua2f7THs9SeS9O8qhIu/bdnua0rTzBUn35s01Fec8z8QX
-	 mE3Ah6PPsV6IYEYdGBUouDUTNKUJeXkdM29htTdBksTwOIGhd9tc1iQg0QaSYUd761
-	 5zXNNnAfzHjP5T4Yx7ZjI7tJKZQirdW6B/lyf156iTPl1tM7in2nzNgeanrj71kodx
-	 onwZyJ+wW/8OQ==
-Message-ID: <980db342-79a6-44dd-9ee5-0c4845644de1@kernel.org>
-Date: Wed, 9 Oct 2024 08:43:54 +0200
+	s=arc-20240116; t=1728456927; c=relaxed/simple;
+	bh=Bd7iXoEa9UzFsOA5nZ4yG/NgHNPsFlJ16NHvU3fklNs=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=iRFZhr12wUppK5vLxIKchkvRI76MQfD8qqPzwYTjte0Gieuu1zbi23ODakqHyB6xja4pZGuwQXcbL4p5bQZ6mTVw9b5KFIbZOhJ3vP/LAQldGDNIF9EhNjVecmf+HWv2LAEtfPFvay3He24V8RDhXh4CkeuSQaWpX0U39tzj0ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=NES5GyDT; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728456921; h=From:To:Subject:Date:Message-Id;
+	bh=WQW8mgJmkTslYa2D7to3QWwlV3Xf9E2iC1P1rqJMGEM=;
+	b=NES5GyDTxNjsfKNKAFfA+QKeQa/mosys9CX6o9nf32QACOQMWnxpz5xd3HqiMcQaYZRkP4maZvR7G0JP2+oZl26B6ZLW0lIpzO95ld8AG7j7fVj5NkNc3mV3k7H+sErC2Mt1nzbEjxzYIKRXLmEWTO2ayK8L/IFGBGfsYVrUHoY=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WGhiQZL_1728456917)
+          by smtp.aliyun-inc.com;
+          Wed, 09 Oct 2024 14:55:20 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net] net/smc: fix lacks of icsk_syn_mss with IPPROTO_SMC
+Date: Wed,  9 Oct 2024 14:55:16 +0800
+Message-Id: <1728456916-67035-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 1/5] dt-bindings: net: macb: Add support for
- versal2 10gbe device
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, linux@armlinux.org.uk,
- andrew@lunn.ch
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, git@amd.com
-References: <20241009053946.3198805-1-vineeth.karumanchi@amd.com>
- <20241009053946.3198805-2-vineeth.karumanchi@amd.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20241009053946.3198805-2-vineeth.karumanchi@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 09/10/2024 07:39, Vineeth Karumanchi wrote:
-> 10GBE IP is a high speed mac supporting 10G, 5G, 2.5G and 1G speeds.
-> It has USX pcs for higher speed  and SGMII PCS for low transmission.
-> 
-> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-> ---
->  Documentation/devicetree/bindings/net/cdns,macb.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> index 3c30dd23cd4e..3870e4846e8a 100644
-> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
-> @@ -28,6 +28,7 @@ properties:
->        - items:
->            - enum:
->                - xlnx,versal-gem       # Xilinx Versal
-> +              - amd,versal2-10gbe     # AMD Versal2 10gbe
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-Keep the alphabetical order.
+Eric report a panic on IPPROTO_SMC, and give the facts
+that when INET_PROTOSW_ICSK was set, icsk->icsk_sync_mss must be set too.
 
-Best regards,
-Krzysztof
+Bug: Unable to handle kernel NULL pointer dereference at virtual address
+0000000000000000
+Mem abort info:
+ESR = 0x0000000086000005
+EC = 0x21: IABT (current EL), IL = 32 bits
+SET = 0, FnV = 0
+EA = 0, S1PTW = 0
+FSC = 0x05: level 1 translation fault
+user pgtable: 4k pages, 48-bit VAs, pgdp=00000001195d1000
+[0000000000000000] pgd=0800000109c46003, p4d=0800000109c46003,
+pud=0000000000000000
+Internal error: Oops: 0000000086000005 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 UID: 0 PID: 8037 Comm: syz.3.265 Not tainted
+6.11.0-rc7-syzkaller-g5f5673607153 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine,
+BIOS Google 08/06/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : 0x0
+lr : cipso_v4_sock_setattr+0x2a8/0x3c0 net/ipv4/cipso_ipv4.c:1910
+sp : ffff80009b887a90
+x29: ffff80009b887aa0 x28: ffff80008db94050 x27: 0000000000000000
+x26: 1fffe0001aa6f5b3 x25: dfff800000000000 x24: ffff0000db75da00
+x23: 0000000000000000 x22: ffff0000d8b78518 x21: 0000000000000000
+x20: ffff0000d537ad80 x19: ffff0000d8b78000 x18: 1fffe000366d79ee
+x17: ffff8000800614a8 x16: ffff800080569b84 x15: 0000000000000001
+x14: 000000008b336894 x13: 00000000cd96feaa x12: 0000000000000003
+x11: 0000000000040000 x10: 00000000000020a3 x9 : 1fffe0001b16f0f1
+x8 : 0000000000000000 x7 : 0000000000000000 x6 : 000000000000003f
+x5 : 0000000000000040 x4 : 0000000000000001 x3 : 0000000000000000
+x2 : 0000000000000002 x1 : 0000000000000000 x0 : ffff0000d8b78000
+Call trace:
+0x0
+netlbl_sock_setattr+0x2e4/0x338 net/netlabel/netlabel_kapi.c:1000
+smack_netlbl_add+0xa4/0x154 security/smack/smack_lsm.c:2593
+smack_socket_post_create+0xa8/0x14c security/smack/smack_lsm.c:2973
+security_socket_post_create+0x94/0xd4 security/security.c:4425
+__sock_create+0x4c8/0x884 net/socket.c:1587
+sock_create net/socket.c:1622 [inline]
+__sys_socket_create net/socket.c:1659 [inline]
+__sys_socket+0x134/0x340 net/socket.c:1706
+__do_sys_socket net/socket.c:1720 [inline]
+__se_sys_socket net/socket.c:1718 [inline]
+__arm64_sys_socket+0x7c/0x94 net/socket.c:1718
+__invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
+el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Code: ???????? ???????? ???????? ???????? (????????)
+---[ end trace 0000000000000000 ]---
+
+This patch add a toy implementation that performs a simple return to
+prevent such panic. This is because MSS can be set in sock_create_kern
+or smc_setsockopt, similar to how it's done in AF_SMC. However, for
+AF_SMC, there is currently no way to synchronize MSS within
+__sys_connect_file. This toy implementation lays the groundwork for us
+to support such feature for IPPROTO_SMC in the future.
+
+Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+Reported-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+---
+ net/smc/smc_inet.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/net/smc/smc_inet.c b/net/smc/smc_inet.c
+index a5b20416..a944e7d 100644
+--- a/net/smc/smc_inet.c
++++ b/net/smc/smc_inet.c
+@@ -108,12 +108,23 @@ struct smc6_sock {
+ };
+ #endif /* CONFIG_IPV6 */
+ 
++static unsigned int smc_sync_mss(struct sock *sk, u32 pmtu)
++{
++	/* No need pass it through to clcsock, mss can always be set by
++	 * sock_create_kern or smc_setsockopt.
++	 */
++	return 0;
++}
++
+ static int smc_inet_init_sock(struct sock *sk)
+ {
+ 	struct net *net = sock_net(sk);
+ 
+ 	/* init common smc sock */
+ 	smc_sk_init(net, sk, IPPROTO_SMC);
++
++	inet_csk(sk)->icsk_sync_mss = smc_sync_mss;
++
+ 	/* create clcsock */
+ 	return smc_create_clcsk(net, sk, sk->sk_family);
+ }
+-- 
+1.8.3.1
 
 
