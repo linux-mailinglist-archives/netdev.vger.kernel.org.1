@@ -1,112 +1,129 @@
-Return-Path: <netdev+bounces-133743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C984996DF1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:32:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C49F996E2C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 16:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C1B7B225CF
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B75F28591F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:36:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C0B19DF9E;
-	Wed,  9 Oct 2024 14:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C47E2AD1C;
+	Wed,  9 Oct 2024 14:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="avk6S32U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReWbcZvA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE3DE18EAD;
-	Wed,  9 Oct 2024 14:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D7B18EAD;
+	Wed,  9 Oct 2024 14:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728484315; cv=none; b=jp495fhmkg2jnNuflOVnywzyd6jEIO5AKpcAVxRO1VSjfG/IwZr+7OBDOiea8yJuBEuDXL0TeJJ4CMmg76AonWIAkv/xh+5g08zGUnWUrt8ihnWS+lpPBUtU6vr1We4iQot5PxYXtWA/DbBNse/n22680R+yobxv8jCdP4CIII0=
+	t=1728484535; cv=none; b=ZRpGkWSxFgrE3q05DjwNOwcQm/Vkx4t5lyhzEKnbUlAiRtskCYIIXMcQ/+3e0Itp378aHVpykNnNdblvAbfM92lCJXEVu9l8+cWpJKgdKiizJd4nqRG5mlwZYofkv6jI3lJC+5y7bOSJPey+6k5G9nDz59Wcat4LVyjU9IjWS9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728484315; c=relaxed/simple;
-	bh=iMzRXSdkwWFziA/rp1mxrwUI676zhrMiukMc7fUObAk=;
+	s=arc-20240116; t=1728484535; c=relaxed/simple;
+	bh=Mq5bnIHHkjxk/ai0sXp0RDz0fGxZm4gwe0mCN2r/AwI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C2zPdpoY2cQ8lavLOjAWPndmjSaE60Kpt5bLCQoV83OY/1D7MdczfcXPEVHdXucW+9D6XgAa8ti92wCfmD/WvPPdhFlA1ZD/Yjl4t36klQC+9RmHWLYSxUkm5XILsd7vixrvHf+nVnS0x78aNtIIeEKnddyI/811sicGAGx5/qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=avk6S32U; arc=none smtp.client-ip=209.85.216.50
+	 To:Cc:Content-Type; b=rqzrMGaR5wEXYL9G2lARWI/F9+4gr5ORqXq0+2gg9GffSja/KN/XKMCd7Z24aKxUXHQCVmppuIoVTCC85AZHkQxDjHuVPe7K8FouidkHF0Ttmyn8926dSLCUNpk8y7gX8ckMLichw97g9R2hMSiFndSmvFdcn4mZ4rdFPOXU0ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReWbcZvA; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e29555a1b2so1060061a91.3;
-        Wed, 09 Oct 2024 07:31:53 -0700 (PDT)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e27f9d2354so1694145a91.0;
+        Wed, 09 Oct 2024 07:35:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728484313; x=1729089113; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728484533; x=1729089333; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ucnG7AGyb9qxKd5nqWkFKwfhBljiCMIoSbX043WdVr4=;
-        b=avk6S32Uci3FTWywsSUuK6prmVJGwvs9/Q5ajiPH9m0u7tR9c9sKYhea0teM9UZn7I
-         uHH9g7fiLroXGnPO3T4LBPuW3qG5AKWFM2NNSmRs8yYZQJ4v7NWlA6kxCnw5DJB8l4pa
-         VlN91tMW+j9v2w9yUbxnd/u/SUeVisGrOXJA4KQNALu8Qoq6K9TExrfCYJuswZA794lR
-         TigjewGN8XCbVbc7TKfUZwnsW8fOmRa9Yy0vojIWNMi5DcQimc5bF5cYE3PYh/qxnaFp
-         FdUb/TRWFTozIn3cy9cWP+WMjHteahqYvcU+TlBZDTMOhFEJfAxqazNql70v/x7GGi5p
-         PHnw==
+        bh=bE8w138OJh2+67SyRoXpLa5Q4XosqnHKS62oM+A/S94=;
+        b=ReWbcZvAFh4tTq1j3nko+qQoZyd9kXiw+CR6dqHVIP/gvESBCjPowjKojzyNq4V7dy
+         iC2xS7upxxRW7D9qd80liUKC04MCG7Xc+mK0hbEV7ZRxtw9/VzLIxrlBtWY+/dX3Ma+I
+         RGba1FiMhjZMMWPNxpVeQU6hORFEaM3obD4qW8SmxlXrkHoJOcFWGA3kcB/e39yPP3WH
+         d+iJvDZXcX/qmwsgONPwUK85kmuYb77rU/3dDKD0jCx9ytEhdzHooBNeGlD4AUob2t0S
+         KwiXkiSn0BmG1+jmwA7Xg/9Jlx+XIJhTSP7N2EdBUjOgrYAYawI0Oww59LnYfhq2BkQC
+         abhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728484313; x=1729089113;
+        d=1e100.net; s=20230601; t=1728484533; x=1729089333;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ucnG7AGyb9qxKd5nqWkFKwfhBljiCMIoSbX043WdVr4=;
-        b=n425yUaQfm7uaUkF4xatm36I6TFoDmSbNMXjJS+++j/VXbi8gedZ0WYBmaKhzsRSP6
-         TAYRoMh9Vo1taiaItg+pjSe0hO3g7rVWuPujKliUJ5XkEVFLWWeKqyCmZT9uPadASPWe
-         PjHQo99+K8Hf5gPBt/at/SzRuN9P4mNb1UqosVdeq+5xeXI5OLFJhjy8/bU0YTAx+pHn
-         rVkIZfawQYmAJOT7dtvXCZlAISk3hOEj8N57vtR0eZeZxRM0G/t0krzH0/ICsx1z+Pvp
-         jnx6z04+XR7J8TcQ+a2jfIl4v0faEnzZPiarlHU7BSqotbrwH3Po4Hb0I4tIe+BpvWdZ
-         x4UA==
-X-Forwarded-Encrypted: i=1; AJvYcCVE0iUTgfDick5cIBuXybu2/A1HseoIOVDje5PrtpSWfAZpuJp9nYr4McDlrbGz5AlO+dq+/RchAzs=@vger.kernel.org, AJvYcCVQtJyTXPrQC+PLDw52/mU1K4TEMN5NGEU5PNxj0IJa0bHNtPh5nnxNHxoJBEvo+59AVTlCVtGF@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLKUKKRQdBtxmsJLSx34MjY07omtAFrKZ23HHk66p1HhWUgCwm
-	8dH8LANKBBTEPQ2GbXeBJ1dHh9zcU73a7lXzkfPCoOquC2aiz/OlZclp8o/2JC4zZa+EX/Pn8Gw
-	deKxwdUCBUGGm/x01793AO9fZof0=
-X-Google-Smtp-Source: AGHT+IEy2Eg1pYizkcJwGz6JWnr/Dcd04pur1rI+tGUnMJ8tUsB5lDp7M/fQsD4AqksRhwYh7Am0KgKw3LMtmrtbB1o=
-X-Received: by 2002:a17:90a:4741:b0:2d6:1981:bbf7 with SMTP id
- 98e67ed59e1d1-2e2a25246famr3145375a91.32.1728484283317; Wed, 09 Oct 2024
- 07:31:23 -0700 (PDT)
+        bh=bE8w138OJh2+67SyRoXpLa5Q4XosqnHKS62oM+A/S94=;
+        b=grYzO1gHS1Tihf5EsnvAITI58KyUnT4ijOQVSKskypG7jjE0TEisaCeLPCm5SwBeUZ
+         Zex0MeyjYuJzYu0GtjbEVeBVTtT+YYI7KUK8fIOS4Liy4VVa6t6XLrcUowwd1BMyaT+b
+         svF1srqLlbRtA0UaSmRpFSjtflwwBvAWV7ck6XcTK+4vLnvVAZ8l2yU0KlK2WjmgJGtX
+         Atbi/+F3K2x5CrKZ/Rwp5Ehcu4Cg7r6m58Ky4Om1CKCA2p5ByAAq6H6HgWZu83xt1OuB
+         Ahf7Oywe3K4oirGH+pFIZU0VTXHVqpZbkQfUbMd0oVIv0sGTU5WrNaHVVW6BituedEic
+         RnFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWId93ha97znv70VR7AyK21fS20eAvGoH8EbgUnu2ENJi2UbXAFKNNpRLop3hVjKzSTl3yvZ3cHtNo=@vger.kernel.org, AJvYcCWwwRjqQ1br+FGgGTarX1IuMmT2Jh1QEIy9vM9a/p9huc7GIVv26IWebtY88ZYjV/RDjwVVS3ym@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwDMg1pOq5PDgkEbvUPtulVzzwgR6pbR4lFHKZlNiRMWOZMsYI
+	4GM3PRkkkmxDxAjA+hQluMEpxjHAPJqPES/rH0+ojsF13aZ7K6IrA8NzX+SDUgITPjEHDGPXhDk
+	/hMdgvQfHcYE5utVkGclIZKBh+3w=
+X-Google-Smtp-Source: AGHT+IHdkZaGC2dh3CpEOkff6JT6TMjx9kV42HT4uMaGHFi17K3oPaymgywwLQGumYgnDTG4Dpr+o1UECUabWOlp6G8=
+X-Received: by 2002:a17:90b:33d0:b0:2e2:991c:d790 with SMTP id
+ 98e67ed59e1d1-2e2c6304845mr289387a91.8.1728484532922; Wed, 09 Oct 2024
+ 07:35:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-5-ap420073@gmail.com>
- <20241008113538.5e920b12@kernel.org>
-In-Reply-To: <20241008113538.5e920b12@kernel.org>
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-6-ap420073@gmail.com>
+ <70c16ec6-c1e8-4de2-8da7-a9cc83df816a@amd.com> <CAHS8izPmg8CJNYVQfdJB9BoyE75qf+wrz_68pTDdYffpEWDQMg@mail.gmail.com>
+ <20241008122820.71f67378@kernel.org>
+In-Reply-To: <20241008122820.71f67378@kernel.org>
 From: Taehee Yoo <ap420073@gmail.com>
-Date: Wed, 9 Oct 2024 23:31:10 +0900
-Message-ID: <CAMArcTWxPASRynkB=JA7XJXcJ448-FiCc_H-DCN=3tm8k5DN4g@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/7] bnxt_en: add support for
- tcp-data-split-thresh ethtool command
+Date: Wed, 9 Oct 2024 23:35:19 +0900
+Message-ID: <CAMArcTX7qP6B7Evjv96kVNq5DFinaDOK=xq7OYXYXbhE+CrdPQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/7] net: devmem: add ring parameter filtering
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	almasrymina@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
-	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
-	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
-	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
-	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
-	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
-	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
-	bcreeley@amd.com
+Cc: Mina Almasry <almasrymina@google.com>, Brett Creeley <bcreeley@amd.com>, davem@davemloft.net, 
+	pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, paul.greenwalt@intel.com, rrameshbabu@nvidia.com, 
+	idosch@nvidia.com, asml.silence@gmail.com, kaiyuanz@google.com, 
+	willemb@google.com, aleksander.lobakin@intel.com, dw@davidwei.uk, 
+	sridhar.samudrala@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 3:35=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+On Wed, Oct 9, 2024 at 4:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
 te:
 >
-> On Thu,  3 Oct 2024 16:06:17 +0000 Taehee Yoo wrote:
-> > +#define BNXT_HDS_THRESHOLD_MAX       256
-> > +     u16                     hds_threshold;
+> On Thu, 3 Oct 2024 11:49:50 -0700 Mina Almasry wrote:
+> > > > +       dev->ethtool_ops->get_ringparam(dev, &ringparam,
+> > > > +                                       &kernel_ringparam, extack);
+> > > > +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_S=
+PLIT_ENABLED ||
+> > > > +           kernel_ringparam.tcp_data_split_thresh) {
+> > > > +               NL_SET_ERR_MSG(extack,
+> > > > +                              "tcp-header-data-split is disabled o=
+r threshold is not zero");
+> > > > +               return -EINVAL;
+> > > > +       }
+> > > > +
+> > > Maybe just my personal opinion, but IMHO these checks should be separ=
+ate
+> > > so the error message can be more concise/clear.
+> > >
+> >
+> > Good point. The error message in itself is valuable.
 >
-> From the cover letter it sounded like the max is 1023.
-> Did I misread that ?
+> If you mean that the error message is more intuitive than debugging why
+> PP_FLAG_ALLOW_UNREADABLE_NETMEM isn't set - I agree :)
+>
+> I vote to keep the patch, FWIW. Maybe add a comment that for now drivers
+> should not set PP_FLAG_ALLOW_UNREADABLE_NETMEM, anyway, but this gives
+> us better debuggability, and in the future we may find cases where
+> doing a copy is cheaper than buffer circulation (and therefore may lift
+> this check).
 
-Based on my test, the maximum value seems to be 1023.
-But I'm not sure that all NICs, that use bnxt_en driver support 1023 value.
-(At least all NICs I have support 1023).
-I decided 256 as the maximum value, that was default value so all
-NICs can use it safely. If Broadcom Engineer confirms 1023 is right
- for all NICs, I would like to change it.
+Okay, I will not drop this patch in v4 patch.
+So, I just will fix what Brett and Mina pointed out.
 
