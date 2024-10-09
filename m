@@ -1,197 +1,139 @@
-Return-Path: <netdev+bounces-133851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737459973C9
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:52:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9F299973D3
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 19:55:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C99FB23311
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:52:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D28401C21971
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 312891CEEAD;
-	Wed,  9 Oct 2024 17:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321961E131F;
+	Wed,  9 Oct 2024 17:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="uWuC1gbF"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="hx1NARyO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16932152E1C
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 17:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A4F1DFE24
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 17:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728496264; cv=none; b=VdQVchxE4hGLf7iiPzu0hxfZE0ItdMRLmlFIsjwWJDpoP5U37ys0SezkgxADc1r8YNv/JyuCdTUy8gqix79Y9TX9c7GbO4cJAP8k97Bwq1W3qa5wxVyv08YPKY0iMC+VwKRpAvE3/LbNmhbuwEbLw0GbhpM5dMWA42Su4g+sLcM=
+	t=1728496521; cv=none; b=obFtkJ3hHqivc9olS//DIdqXRlZryN9avuuYwBPcB3cOA8VEv04iLQvup8SDeHzLq+zvjeYrHoMNy6PzyBm5sOt8qaFUqHV/rhbwbwb/PFvzHdwK9nnu9b0ZkVcTOKzqBzIDYxHAmJyiMKjbGoDSlcKgbEZGHX/m7cvo1LBG/nU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728496264; c=relaxed/simple;
-	bh=4i36E0HSCccunx0kzjIUDX+/+nDKsSBowEeA9pn9rIo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mjrx5atgBHCbJXVQqZ9x6gXS4zJ+gwDgsoQrJqQpXaFeTcCNBtc8KXt8LHQbb6BZD3TcpuWYEJ272V7HewiVBSRL2iigBe6N0DizmY/Wn6EX3D/GYmFjkbCbvBiFL+IWnJZsTFKOXlnjgm9pS7X99/WhvkdpgPOB7sNE6qI1EPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=uWuC1gbF; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-835426c0fefso2889939f.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 10:51:00 -0700 (PDT)
+	s=arc-20240116; t=1728496521; c=relaxed/simple;
+	bh=vGJLzVn6ACBjNyAxufJAhPEnZGXpgNZxXi22jQsdtlA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OjOiwDk4rt39pQbfrWnpcP27VWJYBSNvTfVE7C1TDmTs3AQKy8n5451EPGhrDJgRDkNu9z9DciT8pFSiFDG74g/IDe4YLcgFsNiK8vxCXDiZW9HqxU2hwzuljjkEfL7Mg7repLpFRrgTnp28Zx9h6GiEbXPMjiTUZH3W61gFUjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=hx1NARyO; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ea03ecf191so44300a12.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 10:55:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728496260; x=1729101060; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9XFwGgVNjw/cDgrOx9m5m+ogNycoQ9YJxefk4jhY6aU=;
-        b=uWuC1gbF3ryzbFBBJxh++F6YmHf2u1z6olaEvMTolxCf8q9rTl7NcbWKQOJb0v0H1r
-         v2a6wnr0rvGSL0QX1o/CTJQ+Y368N4GsHA1oYo5u5Dov9d4HZ/aYp65lCJCYYurJVs9H
-         K5YMD9UcTQWvlV0mLq94I91F4W/weMY9bS2fwAqfcRp9JTmbEr1gKooo+Tj8WdqdzQmE
-         xJ955xodcQQA40AEo5fnOmjj66aVf9O84zg4UsEdyiYknEyrLsKPg6GEPoUnz5wyvJJk
-         LnBLM+cw5/DG7iEumpOsKWpzGiw0fINg65VpS1je1pqY750+sl9vdB00zpHhAZGIdvc6
-         uAmg==
+        d=fastly.com; s=google; t=1728496519; x=1729101319; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HH/gzvG8N4NA1DWdDdAxFZw2FZEGnZKbz4/QrTFxK6c=;
+        b=hx1NARyOL2a0DI7RBtYxOxfIZuY35W4mM01XcImPuOOAT//F9g5L8v2KX0jI/jOjuk
+         7rFFDRKnCN+xw9M+xHVTkzqJ5oy8KHvGA1lPK5QnuD3kLJJ4iCLWzN6bDVYFkpYXiqP0
+         RAlZqPNj0t3HcTbxeXk2PxsmorovdMvrSsgkk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728496260; x=1729101060;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9XFwGgVNjw/cDgrOx9m5m+ogNycoQ9YJxefk4jhY6aU=;
-        b=ZAX27DVCl/UWcIEs8SRyatVag68nsrN3s/lCwY2qv2QE/gXClr8WVGFJNGRDenDLig
-         nF4LQAZ7SfIC361dLVpzuvs/65pZOlzpKCKBqKUcCSpd5Ytj8pyLHsMqdzBvspBbtEpP
-         K+T/ph4ToCTzC06WbrXosLs5tOYonEnJTlR4ZX8yNyvIBDmWs24fCoPitt5uIwXyWlSN
-         q9hWQm7CSz4gzu1kLqbbxLSQgX8gxqjE2Q0U+vddiIMLXe8/J+LglfzOGjZT/ZIPPm80
-         zX158msElIabsNTeGcdDdE7xpvivr7SC8uuD2ZcVoZTOsupFiEF73sVx7671vUC2ls5H
-         BpLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2x9YM1QwYREtMYte1VHd15LqEnEBAAls+av+Ubuo6z5TtZgok1zU8rzzJHN055PzfPVysQCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLjJHfkzjMIxwxxUtKFDiWDmoRF/OQ4aYEU/5ISwzsnRcUkdNN
-	pJhm5YZxTdvtPynthN/6RPIeYkiE02rRMwrXvtukYZaK8lhc66eZqzVqdWjqFNk=
-X-Google-Smtp-Source: AGHT+IE4Df99qpBr7EzorPpyTK9nax5lgyUMWyHwUmcD328v6/A4stlyvSaKLj6v7C5qL3p8pFGvpQ==
-X-Received: by 2002:a05:6e02:1a86:b0:3a0:abd0:122 with SMTP id e9e14a558f8ab-3a3a71d1c4fmr4583275ab.8.1728496260028;
-        Wed, 09 Oct 2024 10:51:00 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4db6eb35fd9sm2143665173.16.2024.10.09.10.50.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 10:50:59 -0700 (PDT)
-Message-ID: <8075828d-74c8-4a0c-8505-45259181f6bb@kernel.dk>
-Date: Wed, 9 Oct 2024 11:50:58 -0600
+        d=1e100.net; s=20230601; t=1728496519; x=1729101319;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HH/gzvG8N4NA1DWdDdAxFZw2FZEGnZKbz4/QrTFxK6c=;
+        b=rDAYktSNiXWnAN1kX50uQhWKtXv/09ycnf+wcO6s1kxH0Ycv85aq5cqNLmFIjO3y6N
+         X1kadP42n1Xmnhh8n3xvTqp1SuM0dKowG0MqDhTQe01ypL/JUZHZDu4HoHCmwj/RLlfk
+         ZynNc8Ob+lOLCoX2s4e+UWlZZjt/SQeO3OTqkV03rXCQpXi8MUtcN5Y2+pHibh/tz4IH
+         hlFPnDejX3fR6qYAh5BVFGSBfZcmLX/jsSFO8IdjCjNtjFEYLCqInWIJoQCytp5Hhp97
+         7r+Vpj40FmwE67nsM+MT4+keyrPrnQSJ9063Gcs8KO+rnliHhZ9+7EsoxWES6N7WFd/k
+         JIFg==
+X-Gm-Message-State: AOJu0YwAIgvw+Fln4zYQDXW/QycnYbJzZ3N5w2oc/5vYwAwR5Idplu9I
+	dyUUvcoU0jWByCAAtRYTCOgzq2RHKctWJmZKXI+XE27vRJ7IvLP6bB3j0BveZ2MKR+Fq6wMl2d0
+	JyOcdyXYSmIIEFKiAvEzf0JYKB+2I97ycYmQUTXMPw8342vzQca5tOoF5PIyw4OfYVf6l+by9M5
+	08zjRjfv65DHFymn+ZyROhXqCnrmJYYWk07vg=
+X-Google-Smtp-Source: AGHT+IGn4oqdTz2c/4KgQ/JCXeWAlimaFO1vIWCBGOUjzPUnpUWNpMDvCnm/bUqgZsWrH4Un5kvs+Q==
+X-Received: by 2002:a05:6a20:d494:b0:1cf:6953:2872 with SMTP id adf61e73a8af0-1d8a3c4e2b9mr4667261637.48.1728496518543;
+        Wed, 09 Oct 2024 10:55:18 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0cbc86csm8044685b3a.27.2024.10.09.10.55.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 10:55:18 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: michael.chan@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	Joe Damato <jdamato@fastly.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-kernel@vger.kernel.org (open list),
+	Michael Chan <mchan@broadcom.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [net-next v4 0/2] tg3: Link IRQs, NAPIs, and queues
+Date: Wed,  9 Oct 2024 17:55:07 +0000
+Message-Id: <20241009175509.31753-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 09/15] io_uring/zcrx: add interface queue and refill
- queue
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <20241007221603.1703699-10-dw@davidwei.uk>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20241007221603.1703699-10-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/7/24 4:15 PM, David Wei wrote:
-> From: David Wei <davidhwei@meta.com>
-> 
-> Add a new object called an interface queue (ifq) that represents a net rx queue
-> that has been configured for zero copy. Each ifq is registered using a new
-> registration opcode IORING_REGISTER_ZCRX_IFQ.
-> 
-> The refill queue is allocated by the kernel and mapped by userspace using a new
-> offset IORING_OFF_RQ_RING, in a similar fashion to the main SQ/CQ. It is used
-> by userspace to return buffers that it is done with, which will then be re-used
-> by the netdev again.
-> 
-> The main CQ ring is used to notify userspace of received data by using the
-> upper 16 bytes of a big CQE as a new struct io_uring_zcrx_cqe. Each entry
-> contains the offset + len to the data.
-> 
-> For now, each io_uring instance only has a single ifq.
+Greetings:
 
-Looks pretty straight forward to me, but please wrap your commit
-messages at ~72 chars or it doesn't read so well in the git log.
+Welcome to v4, now an actual submission instead of an RFC.
 
-A few minor comments...
+This follows from a previous RFC (wherein I botched the subject lines of
+all the messages) [1].
 
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index adc2524fd8e3..567cdb89711e 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -595,6 +597,9 @@ enum io_uring_register_op {
->  	IORING_REGISTER_NAPI			= 27,
->  	IORING_UNREGISTER_NAPI			= 28,
->  
-> +	/* register a netdev hw rx queue for zerocopy */
-> +	IORING_REGISTER_ZCRX_IFQ		= 29,
-> +
+I've taken Michael Chan's suggestion on modifying patch 2 and I've
+updated the commit messages of both patches to test and show the output
+for the default 1 TX 4 RX queues and the 4 TX and 4 RX queues cases.
 
-Will need to change as the current tree has moved a bit beyond this. Not
-a huge deal, just an FYI as it obviously impacts userspace too.
+Reviewers: please check the commit messages carefully to ensure the
+output is correct (or on your own systems to verify, if you like). I am
+not a tg3 expert and it's possible that I got something wrong.
 
-> +struct io_uring_zcrx_rqe {
-> +	__u64	off;
-> +	__u32	len;
-> +	__u32	__pad;
-> +};
-> +
-> +struct io_uring_zcrx_cqe {
-> +	__u64	off;
-> +	__u64	__pad;
-> +};
+Thanks,
+Joe
 
-Would be nice to avoid padding for this one as it doubles its size. But
-at the same time, always nice to have padding for future proofing...
+[1]: https://lore.kernel.org/all/20241005145717.302575-3-jdamato@fastly.com/T/
 
-Always a good idea to add padding, but 
+v4:
+  - Upgraded from RFC to official submission
+  - Patch 1:
+    - Updated commit message to test more cases, no code or functional
+      changes, so I retained the Reviewed-by
+  - Patch 2:
+    - Switched the if ... else if ... to two ifs as per Michael Chan's
+      suggestion when tg3 uses combined tx and rx queues
+    - Updated commit message to test more cases, including combined tx
+      and rx queues
 
-> diff --git a/io_uring/Makefile b/io_uring/Makefile
-> index 61923e11c767..1a1184f3946a 100644
-> --- a/io_uring/Makefile
-> +++ b/io_uring/Makefile
-> @@ -10,6 +10,7 @@ obj-$(CONFIG_IO_URING)		+= io_uring.o opdef.o kbuf.o rsrc.o notif.o \
->  					epoll.o statx.o timeout.o fdinfo.o \
->  					cancel.o waitid.o register.o \
->  					truncate.o memmap.o
-> +obj-$(CONFIG_PAGE_POOL)	+= zcrx.o
->  obj-$(CONFIG_IO_WQ)		+= io-wq.o
->  obj-$(CONFIG_FUTEX)		+= futex.o
->  obj-$(CONFIG_NET_RX_BUSY_POLL) += napi.o
+rfcv3:
+  - Patch 1:
+    - Line wrap to 80 characters, no functional changes
+    - Added Pavan Chebbi's Reviewed-by
+  - Patch 2:
+    - changed tg3_napi_enable and tg3_napi_disable to use running
+      counters to number the queues as there is no explicit queue index
+      assigned in tg3
 
-I wonder if this should be expressed a bit differently. Probably have a
-CONFIG_IO_URING_ZCRX which depends on CONFIG_INET and CONFIG_PAGE_POOL.
-And then you can also use that rather than doing:
+Joe Damato (2):
+  tg3: Link IRQs to NAPI instances
+  tg3: Link queues to NAPIs
 
-#if defined(CONFIG_PAGE_POOL) && defined(CONFIG_INET)
-
-in some spots. Not a big deal, it'll work as-is. And honestly should
-probably cleanup the existing IO_WQ symbol while at it, so perhaps
-better left for after the fact.
-
-> +static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
-> +				 struct io_uring_zcrx_ifq_reg *reg)
-> +{
-> +	size_t off, size;
-> +	void *ptr;
-> +
-> +	off = sizeof(struct io_uring);
-> +	size = off + sizeof(struct io_uring_zcrx_rqe) * reg->rq_entries;
-> +
-> +	ptr = io_pages_map(&ifq->rqe_pages, &ifq->n_rqe_pages, size);
-> +	if (IS_ERR(ptr))
-> +		return PTR_ERR(ptr);
-> +
-> +	ifq->rq_ring = (struct io_uring *)ptr;
-> +	ifq->rqes = (struct io_uring_zcrx_rqe *)((char *)ptr + off);
-> +	return 0;
-> +}
-
-No need to cast that ptr to char *.
-
-Rest looks fine to me.
+ drivers/net/ethernet/broadcom/tg3.c | 47 ++++++++++++++++++++++++-----
+ 1 file changed, 40 insertions(+), 7 deletions(-)
 
 -- 
-Jens Axboe
+2.25.1
+
 
