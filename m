@@ -1,218 +1,181 @@
-Return-Path: <netdev+bounces-133760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CD7996F9F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:27:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E951A996FA7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:28:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2A55283F2F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:27:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CB62832E2
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4035D1E04A0;
-	Wed,  9 Oct 2024 15:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59B41E1044;
+	Wed,  9 Oct 2024 15:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a4HXVmip"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2A61E009C
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A301E1027
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 15:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728486998; cv=none; b=gt7nF2CLY5UacMt0GqrFusiOGQS3y+eUmNaIQyEDQpGzYyXGXKT5toEo/kcBebwwOFg1nmqfAfgNGTaQja2YblWTJ7w93rJl8L32jF2CxY8jG6MC3LN1zIF9mq0+nYJT7BpPkPTusi5erzfDMkwvTFxCw7e/7DDMYpgarixXveE=
+	t=1728487045; cv=none; b=LypG+0ce/8DAL/c3ZMFwfXBv6sH6+CPfcbQKMCFjERso4/9aFlN5WyrpIjSCSq2O5oJA1uZyVomDE+f6P0hRhcfB6PNlsNGwchhOyxPvxRDiX1T4OwR8IeTpV5d0ZCssXnYxXMh6In58xJckTYjHhTQj2PP7zr4xdgsjMVEQbBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728486998; c=relaxed/simple;
-	bh=erbjsBtCILmKJ+nigxio9EUrqkSXvbmuLoXoTa3lE+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZvSLyGISkZRi8CTNG/VhHuDSAb+kSftHYp8UJfbqZNzHihOAlJabnR4k5vDrhrEH37Iy2VXWmqRh/XzNH/9znJXiRsDio/5d5Dludefwo2qZcfq99eMM8i63MuMjW/D1jwDuwdxF6DXgYj/2T34XRwNKQQtsXQhVhSmy9a/q+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syYQK-0000cM-0b; Wed, 09 Oct 2024 17:16:24 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syYQG-000dE4-In; Wed, 09 Oct 2024 17:16:20 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syYQG-002AnD-1Y;
-	Wed, 09 Oct 2024 17:16:20 +0200
-Date: Wed, 9 Oct 2024 17:16:20 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 04/12] net: pse-pd: tps23881: Add support for
- power limit and measurement features
-Message-ID: <ZwaeRL9z310dBBlh@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-4-787054f74ed5@bootlin.com>
- <ZwYOboTdMppaZVmX@pengutronix.de>
- <20241009110501.5f776c9b@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1728487045; c=relaxed/simple;
+	bh=dmk/apIGRnSDL5xBcTWe4gL2fhF7Op6JH5roKVU2tkk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MVGmFExPGFa3wQb9DyAR6BvxRHRk7IVOwxHZfbtU/ZMvh964P2OAUOh8RW7RN0jFJLqCghUt12/pdW/bS3HqbQiO+FWKBTqdT4DI08207nor+5zZCLDq5RZHKKY1lkbI7xPyT+yrLbf9jq5dH/jyssJ8pX1H67g6fc4AULXV+cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a4HXVmip; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728487044; x=1760023044;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dmk/apIGRnSDL5xBcTWe4gL2fhF7Op6JH5roKVU2tkk=;
+  b=a4HXVmiph4/dWFoyre6N9mqlawPMTVBUQp2TE8s9WwunfgfYa6FUu9ga
+   jU88NT02sf+mlV5o8Y8F0TBD4R4epSOsHZlaq/1VngPvBwx6xhB8xKTz3
+   L2wZ1tIoa32kmxD/q2Y0lP/hIY126bnDOMYDqCzXyj1FF0QHZlsNlqS9w
+   MR1pV8d940VVbX2mrjtm7PJqpgUKT5AwK17fgPcP/T2rUR/z5gpbChZNr
+   BPxrD3u3t3raXhmLt83Lua1korwsnRTGi2yqqfk5B59oFHAOSEahRYtFW
+   2VlqL7fHhsLUbQb7lWQhAUmhIrj6GTGw3Nqa+Nn6tjGonmcmFwDB1WTj2
+   A==;
+X-CSE-ConnectionGUID: BQZ4H6MYTUSOP+8ePiVMyw==
+X-CSE-MsgGUID: GbUHnlG3Tt2BUXbNmPJhVA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="27272942"
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="27272942"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 08:17:23 -0700
+X-CSE-ConnectionGUID: aB/ciRaIQ8+reIotUQ5HEg==
+X-CSE-MsgGUID: 46SAPP+gQheSoruV2rrMsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,190,1725346800"; 
+   d="scan'208";a="76744430"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa007.jf.intel.com with ESMTP; 09 Oct 2024 08:17:21 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 5BEA32FC5B;
+	Wed,  9 Oct 2024 16:17:19 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: [PATCH iwl-net v2] ice: Fix use after free during unload with ports in bridge
+Date: Wed,  9 Oct 2024 17:18:35 +0200
+Message-ID: <20241009151835.5971-1-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241009110501.5f776c9b@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 09, 2024 at 11:05:01AM +0200, Kory Maincent wrote:
-> On Wed, 9 Oct 2024 07:02:38 +0200
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> 
-> > On Wed, Oct 02, 2024 at 06:28:00PM +0200, Kory Maincent wrote:
-> > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> > > 
-> > > Expand PSE callbacks to support the newly introduced
-> > > pi_get/set_current_limit() and pi_get_voltage() functions. These callbacks
-> > > allow for power limit configuration in the TPS23881 controller.
-> > > 
-> > > Additionally, the patch includes the detected class, the current power
-> > > delivered and the power limit ranges in the status returned, providing more
-> > > comprehensive PoE status reporting.
-> > > 
-> > > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>  
-> > 
-> > > +static int tps23881_pi_get_class(struct tps23881_priv *priv, int id)
-> > > +{  
-> > ....
-> > > +	if (chan < 4)
-> > > +		class = ret >> 4;
-> > > +	else
-> > > +		class = ret >> 12;  
-> > 
-> > ....
-> > > +tps23881_pi_set_2p_pw_limit(struct tps23881_priv *priv, u8 chan, u8 pol)
-> > > +{  
-> > ....
-> > > +	reg = TPS23881_REG_2PAIR_POL1 + (chan % 4);
-> > > +	ret = i2c_smbus_read_word_data(client, reg);
-> > > +	if (ret < 0)
-> > > +		return ret;
-> > > +
-> > > +	if (chan < 4)
-> > > +		val = (ret & 0xff00) | pol;
-> > > +	else
-> > > +		val = (ret & 0xff) | (pol << 8);  
-> > 
-> > This is a common pattern in this driver, we read and write two registers
-> > in one run and then calculate bit offset for the channel, can you please
-> > move it in to separate function. This can be done in a separate patch if
-> > you like.
-> 
-> The pattern is common but the operations are always different so I didn't found
-> a clean way of doing it.
-> Here is a listing of it:
-> 	if (chan < 4)
-> 		class = ret >> 4;
-> 	else
-> 		class = ret >> 12;
-> 
-> 	if (chan < 4)
-> 		val = (ret & 0xff00) | pol;
-> 	else
-> 		val = (ret & 0xff) | (pol << 8);  
-> 
->         if (chan < 4)                                                           
->                 val = (u16)(ret | BIT(chan));                                   
->         else                                                                    
->                 val = (u16)(ret | BIT(chan + 4));
-> 
-> 	if (chan < 4)
-> 		mW = (ret & 0xff) * TPS23881_MW_STEP;
-> 	else
-> 		mW = (ret >> 8) * TPS23881_MW_STEP;
-> 
-> 
-> Any idea?
-> 
+Unloading the ice driver while switchdev port representors are added to
+a bridge can lead to kernel panic. Reproducer:
 
-something like this:
+  modprobe ice
 
-/*
- * Helper to extract a value from a u16 register value, which is made of two u8 registers.
- * The function calculates the bit offset based on the channel and extracts the relevant
- * bits using a provided field mask.
- *
- * @param reg_val: The u16 register value (composed of two u8 registers).
- * @param chan: The channel number (0-7).
- * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
- * @param field_mask: The mask to apply to extract the required bits.
- * @return: The extracted value for the specific channel.
- */
-static u16 tps23881_calc_val(u16 reg_val, u8 chan, u8 field_offset, u16 field_mask)
-{
-        u8 bit_offset;
+  devlink dev eswitch set $PF1_PCI mode switchdev
 
-        if (chan < 4) {
-                bit_offset = field_offset;
-        } else {
-                bit_offset = field_offset;
-                reg_val >>= 8;
-        }
+  ip link add $BR type bridge
+  ip link set $BR up
 
-        return (reg_val >> bit_offset) & field_mask;
-}
+  echo 2 > /sys/class/net/$PF1/device/sriov_numvfs
+  sleep 2
 
-/*
- * Helper to combine individual channel values into a u16 register value.
- * The function sets the value for a specific channel in the appropriate position.
- *
- * @param reg_val: The current u16 register value.
- * @param chan: The channel number (0-7).
- * @param field_offset: The base bit offset to apply (e.g., 0 or 4).
- * @param field_mask: The mask to apply for the field (e.g., 0x0F).
- * @param field_val: The value to set for the specific channel (masked by field_mask).
- * @return: The updated u16 register value with the channel value set.
- */
-static u16 tps23881_set_val(u16 reg_val, u8 chan, u8 field_offset, u16 field_mask, u16 field_val)
-{
-        u8 bit_offset;
+  ip link set $PF1 master $BR
+  ip link set $VF1_PR master $BR
+  ip link set $VF2_PR master $BR
+  ip link set $PF1 up
+  ip link set $VF1_PR up
+  ip link set $VF2_PR up
+  ip link set $VF1 up
 
-        field_val &= field_mask;
+  rmmod irdma ice
 
-        if (chan < 4) {
-                bit_offset = field_offset;
-                reg_val &= ~(field_mask << bit_offset);
-                reg_val |= (field_val << bit_offset);
-        } else {
-                bit_offset = field_offset;
-                reg_val &= ~(field_mask << (bit_offset + 8));
-                reg_val |= (field_val << (bit_offset + 8));
-        }
+When unloading the driver, ice_eswitch_detach() is eventually called as
+part of VF freeing. First, it removes a port representor from xarray,
+then unregister_netdev() is called (via repr->ops.rem()), finally
+representor is deallocated. The problem comes from the bridge doing its
+own deinit at the same time. unregister_netdev() triggers a notifier
+chain, resulting in ice_eswitch_br_port_deinit() being called. It should
+set repr->br_port = NULL, but this does not happen since repr has
+already been removed from xarray and is not found. Regardless, it
+finishes up deallocating br_port. At this point, repr is still not freed
+and an fdb event can happen, in which ice_eswitch_br_fdb_event_work()
+takes repr->br_port and tries to use it, which causes a panic (use after
+free).
 
-        return reg_val;
-}
+Note that this only happens with 2 or more port representors added to
+the bridge, since with only one representor port, the bridge deinit is
+slightly different (ice_eswitch_br_port_deinit() is called via
+ice_eswitch_br_ports_flush(), not ice_eswitch_br_port_unlink()).
+
+Trace:
+  Oops: general protection fault, probably for non-canonical address 0xf129010fd1a93284: 0000 [#1] PREEMPT SMP KASAN NOPTI
+  KASAN: maybe wild-memory-access in range [0x8948287e8d499420-0x8948287e8d499427]
+  (...)
+  Workqueue: ice_bridge_wq ice_eswitch_br_fdb_event_work [ice]
+  RIP: 0010:__rht_bucket_nested+0xb4/0x180
+  (...)
+  Call Trace:
+   (...)
+   ice_eswitch_br_fdb_find+0x3fa/0x550 [ice]
+   ? __pfx_ice_eswitch_br_fdb_find+0x10/0x10 [ice]
+   ice_eswitch_br_fdb_event_work+0x2de/0x1e60 [ice]
+   ? __schedule+0xf60/0x5210
+   ? mutex_lock+0x91/0xe0
+   ? __pfx_ice_eswitch_br_fdb_event_work+0x10/0x10 [ice]
+   ? ice_eswitch_br_update_work+0x1f4/0x310 [ice]
+   (...)
+
+A workaround is available: brctl setageing $BR 0, which stops the bridge
+from adding fdb entries altogether.
+
+Change the order of operations in ice_eswitch_detach(): move the call to
+unregister_netdev() before removing repr from xarray. This way
+repr->br_port will be correctly set to NULL in
+ice_eswitch_br_port_deinit(), preventing a panic.
+
+Fixes: fff292b47ac1 ("ice: add VF representors one by one")
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+v2: Added trace excerpt
+---
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+index c0b3e70a7ea3..fb527434b58b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
+@@ -552,13 +552,14 @@ int ice_eswitch_attach_sf(struct ice_pf *pf, struct ice_dynamic_port *sf)
+ static void ice_eswitch_detach(struct ice_pf *pf, struct ice_repr *repr)
+ {
+ 	ice_eswitch_stop_reprs(pf);
++	repr->ops.rem(repr);
++
+ 	xa_erase(&pf->eswitch.reprs, repr->id);
  
-
+ 	if (xa_empty(&pf->eswitch.reprs))
+ 		ice_eswitch_disable_switchdev(pf);
+ 
+ 	ice_eswitch_release_repr(pf, repr);
+-	repr->ops.rem(repr);
+ 	ice_repr_destroy(repr);
+ 
+ 	if (xa_empty(&pf->eswitch.reprs)) {
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.45.0
+
 
