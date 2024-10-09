@@ -1,112 +1,162 @@
-Return-Path: <netdev+bounces-133561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F333996451
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:01:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3AD99645C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:03:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A61DB21D4A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:01:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 043ABB23F3B
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669983BB48;
-	Wed,  9 Oct 2024 09:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KbQPJZj9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF89418873F;
+	Wed,  9 Oct 2024 09:03:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED91EADC;
-	Wed,  9 Oct 2024 09:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D027188714
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 09:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728464493; cv=none; b=PjrPVrOWcVh1npIyAWBQldd82rUyPx0brDcrHW7tbRl7kcY/sOf47AfFbaDj6FT1uziS6ulyw3aCjc6AQXAcTLuO+i+B8AR8IH++9/uxlaTUdkbw3bcGKDy7LNSJFRtiuN/5MNW6qDSEE3GTk9fcj0g570QHw5JVauNBkt3+B/s=
+	t=1728464605; cv=none; b=O+hR/c45z9UdvxLzasE0SXr4AaUp6haXXKLkAJ/swyXBQpahmj0jQJrizOzuQex/w9pjxgKxCTyLAF3Iv/owiDv+yytY0YqcQZrG+IVRImc4/eG3mBT91VD+YILCrlleM/pSjChIcOOCodb1v8MjC2Ep3rkwWx9E2QdUva43VbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728464493; c=relaxed/simple;
-	bh=t4XV67XwT9AqpZE1BMpvVqUY/3bEjFjl116GcFX6tw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YveVOSp/ORZckLJW+p76nUwCWY9ZYib6xpJNWDQyE8LCYXCjCh3/fuvPdQ+byL0xp1193EWVsRGTFFFH1V4U+SO7wdGS/BFrHka0tRxxnjswkPb2iFsIYP9R2dSTfzim+Jnf0aBYxQiTwyYjCfpr4CeJ42XuVnISxhFH/EYDEO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KbQPJZj9; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=O0/uxb+Q2DMRDFmKQ9galN4+KgTPVjf1vmB8NeLKKX0=; b=KbQPJZj9/Pma3mpqAb+48jv3eK
-	b3DYw6yBiR89YmqHiuPDhg+TugDN/BaJ6uHCNAMl3P5W1PQrnQlnW5cgj6z0tI7IQnXm3XEav2foY
-	TWh9aD8EruHE2LuVIoYf73lSPIs/YlXN4+OzVNru0DfzeQglcoN6Z9OhPVhDfNkBdUlSXaqy9tLN7
-	GItgUq7u2dqS948aPzXl0H0YrdruWLzO+OSWxRJkbL55+1Lp8AFXtipO4yoZAxLWSvdKxE9AjSsyU
-	yLz0nfttmLLln9v7TBLdUNS6SbvurKLKuIWkV3Am5amyAfdHBOfNkzMXUAmfzKfFJdQAGLPvZ4Xqg
-	7TPe1Gdg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43336)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sySZG-0000EL-1M;
-	Wed, 09 Oct 2024 10:01:14 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sySZB-00069W-2S;
-	Wed, 09 Oct 2024 10:01:09 +0100
-Date: Wed, 9 Oct 2024 10:01:09 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: populate host_interfaces when
- attaching PHY
-Message-ID: <ZwZGVRL_j62tH9Mp@shell.armlinux.org.uk>
-References: <ae53177a7b68964b2a988934a09f74a4931b862d.1728438951.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1728464605; c=relaxed/simple;
+	bh=4RxzKt9AdiqrZ3Sgb4kWJgk0XPTLw5NWgV4yIMXAUuE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=K2MItRawWcCLliHSCU3QxoTQVvatJKLbNB1CMjzC2qtK2lyjOzrqPt0MRTYzZY6mLTArqkNX8jTG3JMq4ayOv7rY1ySjF5g/jVX3LV67jIK6H9ugJH0vUAQItF4Cgruz6+4dNeVZTdMnu167rKmD1o3ef0KXNq11pJZ/Z1LDb1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a348ebb940so69281805ab.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 02:03:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728464603; x=1729069403;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3mgEOmnUX6coHhgRX9RRDK0ny28wu1T0TEIt8tmjoOA=;
+        b=ViwuuNYEvLyDbEn4bGYTfwsdoZdS8iNqIoLl6CSp8ZNH9tcLLoM7PzQww9TR9VrxcC
+         13koS52kWaSzSI4csJVD9XfJxxtXutE7amig76N4gIxciU7AoNCduXehqvbsikqVFVlK
+         2gz/EZowfsJ+RROH78sFTmEpxmGAJwjEf8Z1uAaX7iN9FK0XFvXsvnG4BtZbVs5Tp2vf
+         xyb7RaOh8XbcfEAojYyaUGfHlWB1YK6ptGWPao34JosLxhb3v/seLx/+IqPBDILfa1MZ
+         HsxPo0gLoTT5lkdDNqyRvyb4pCSxsBrRPHHtparViLFsjHDm1INTTc2opTMtMgcwkLmI
+         f1GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXgyZ7KL0D/qpuD7fwZICk+3H9Q/9u8eUbjY59EdzYqqy1NJp8MY1vaQozICUR49yCumtE7VCw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9UHT4aBCN3IfbZ9WNujUxJHbDk3zep2xOy+tu23ZSTUWwGdCc
+	FdBe0JE2jRIKlSGyucTzK0DGQtl2zxl6gxYZyC/h/hz4OZ4EcwIo4a2WIL2msLkp2mIMETRwvRu
+	vTIEGktJfEY/NeT2FRNa79bMpZwgoiYV81Tg0ovTS6FgCwEGr3L0hExA=
+X-Google-Smtp-Source: AGHT+IG2Y/mzwL7g8buGQB9p0laeAgoTLzgQRjxMTrpLxXfKzCwD8bWUHXS6VxKVCilDHO0poIXZHGMGfhKyBifP7/ZX2bN7KOxk
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae53177a7b68964b2a988934a09f74a4931b862d.1728438951.git.daniel@makrotopia.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6e02:16c8:b0:3a3:6b5d:7011 with SMTP id
+ e9e14a558f8ab-3a397d10f3amr19353465ab.19.1728464603496; Wed, 09 Oct 2024
+ 02:03:23 -0700 (PDT)
+Date: Wed, 09 Oct 2024 02:03:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <670646db.050a0220.3f80e.0027.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in slhc_remember
+From: syzbot <syzbot+2ada1bc857496353be5a@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 09, 2024 at 02:57:03AM +0100, Daniel Golle wrote:
-> Use bitmask of interfaces supported by the MAC for the PHY to choose
-> from if the declared interface mode is among those using a single pair
-> of SerDes lanes.
-> This will allow 2500Base-T PHYs to switch to SGMII on most hosts, which
-> results in half-duplex being supported in case the MAC supports that.
-> Without this change, 2500Base-T PHYs will always operate in 2500Base-X
-> mode with rate-matching, which is not only wasteful in terms of energy
-> consumption, but also limits the supported interface modes to
-> full-duplex only.
+Hello,
 
-We've had a similar patch before, and it's been NAK'd. The problem is
-that supplying the host_interfaces for built-in PHYs means that the
-hardware strapping for the PHY interface mode becomes useless, as does
-the DT property specifying it - and thus we may end up selecting a
-mode that both the MAC and PHY support, but the hardware design
-doesn't (e.g. signals aren't connected, signal speed to fast.)
+syzbot found the following issue on:
 
-For example, take a board designed to use RXAUI and the host supports
-10GBASE-R. The first problem is, RXAUI is not listed in the SFP
-interface list because it's not usable over a SFP cage. So, the
-host_interfaces excludes that, and thus the PHY thinks that's not
-supported. It looks at the mask and sees only 10GBASE-R, and
-decides to use that instead with rate matching. The MAC doesn't have
-support for flow control, and thus can't use rate matching.
+HEAD commit:    5b7c893ed5ed Merge tag 'ntfs3_for_6.12' of https://github...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=131de327980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=981fe2ff8a1e457a
+dashboard link: https://syzkaller.appspot.com/bug?extid=2ada1bc857496353be5a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Not only have the electrical charateristics been violated by selecting
-a faster interface than the hardware was designed for, but we now have
-rate matching being used when it shouldn't be.
+Unfortunately, I don't have any reproducer for this issue yet.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6bb953eff17f/disk-5b7c893e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/0e63ae322aa8/vmlinux-5b7c893e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a0ed59d4302c/bzImage-5b7c893e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2ada1bc857496353be5a@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in slhc_remember+0x2e8/0x7b0 drivers/net/slip/slhc.c:666
+ slhc_remember+0x2e8/0x7b0 drivers/net/slip/slhc.c:666
+ ppp_receive_nonmp_frame+0xe45/0x35e0 drivers/net/ppp/ppp_generic.c:2455
+ ppp_receive_frame drivers/net/ppp/ppp_generic.c:2372 [inline]
+ ppp_do_recv+0x65f/0x40d0 drivers/net/ppp/ppp_generic.c:2212
+ ppp_input+0x7dc/0xe60 drivers/net/ppp/ppp_generic.c:2327
+ pppoe_rcv_core+0x1d3/0x720 drivers/net/ppp/pppoe.c:379
+ sk_backlog_rcv+0x13b/0x420 include/net/sock.h:1113
+ __release_sock+0x1da/0x330 net/core/sock.c:3072
+ release_sock+0x6b/0x250 net/core/sock.c:3626
+ pppoe_sendmsg+0x2b8/0xb90 drivers/net/ppp/pppoe.c:903
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:744
+ ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
+ __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
+ __do_sys_sendmmsg net/socket.c:2771 [inline]
+ __se_sys_sendmmsg net/socket.c:2768 [inline]
+ __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
+ x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
+ alloc_skb include/linux/skbuff.h:1322 [inline]
+ sock_wmalloc+0xfe/0x1a0 net/core/sock.c:2732
+ pppoe_sendmsg+0x3a7/0xb90 drivers/net/ppp/pppoe.c:867
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:744
+ ____sys_sendmsg+0x903/0xb60 net/socket.c:2602
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2656
+ __sys_sendmmsg+0x3c1/0x960 net/socket.c:2742
+ __do_sys_sendmmsg net/socket.c:2771 [inline]
+ __se_sys_sendmmsg net/socket.c:2768 [inline]
+ __x64_sys_sendmmsg+0xbc/0x120 net/socket.c:2768
+ x64_sys_call+0xb6e/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 1 UID: 0 PID: 11151 Comm: syz.3.1054 Not tainted 6.12.0-rc2-syzkaller-00050-g5b7c893ed5ed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
