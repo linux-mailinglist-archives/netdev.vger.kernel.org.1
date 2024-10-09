@@ -1,69 +1,112 @@
-Return-Path: <netdev+bounces-133385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3065D995C6A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:43:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34B3C995C71
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 02:50:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB0528670E
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2585286A27
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 00:50:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D135B79EA;
-	Wed,  9 Oct 2024 00:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7BB9476;
+	Wed,  9 Oct 2024 00:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q/KW0Sns"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="ECwHrA8t"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB35717736;
-	Wed,  9 Oct 2024 00:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1232846BF;
+	Wed,  9 Oct 2024 00:49:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728434632; cv=none; b=AaODUqqorBCtKn/YRMy6BFHV9VEEtHzOI6z7nrTj2+k9CG4psnj+bkZ8mEeXoGqSPX1VC+zLkekTY8dM9ymz+H7PuFz25/WWKrRnXZ8gPOBpV1XHOQZ+0RVvUDrxkXnMXcopx2d1rZ9PBYPP4SIQpDnZvsATI9og31/6bTAZm94=
+	t=1728434996; cv=none; b=XAf3JCWV+cH3O/APme79m0g00Yjfaz9bKP2240vx3RJM4Y2N2OL/rwYSuXNQYZzEUyhLV3sqTvb74cXV8jrUqNe3ECLdNGQxYlDGtJ9dXlGH8tA8bbH0WvtYh0/nBBIf91amcSaIM7FjwZgpHKFF4F7MHUf9OoU7EyLX8YoRWxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728434632; c=relaxed/simple;
-	bh=+KtawNoVqw4hPRzxMqpCWUA1p0+Zssu2Ey9oH/NftTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MNLSUR96OPPHXvA0caeYWt36tY35jgoXIB3Q1UtyVsHujRg64wlXo7J54+MfHj96AurpfWYuJ2V0iejNl8fT1bUPXeZrw0uJ8T8vr/q9dUABg70J76qnTgvP3UmNw/m720inO94a2u292nkQ6DIF+vyUeg3ncM6fcQVNjAskelg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q/KW0Sns; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E97B3C4CECC;
-	Wed,  9 Oct 2024 00:43:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728434632;
-	bh=+KtawNoVqw4hPRzxMqpCWUA1p0+Zssu2Ey9oH/NftTI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q/KW0SnsCBF90EYh7IG4qfqbHGOk68XsQh6rL99S+j0hTxb1rj6o4pIfGDuQm8jIi
-	 hWd9uTbp/S+a9thYBnfuAxCOvUGKF6sEdP4ekqwDtjieaypcWbrXfcO9vOlCWl3ph5
-	 Rb0Gr1CFEO3VVKqpeugYwdELo6Uvsf8c6ifAbGCMadYV4q7cNyUeDt++za8m4ORonu
-	 e1jBToRv7LA55v3jftH4hugV+VF1zFh+JtEfDYQ4iYKXZ2qisu/l8RLibbasTRt+4U
-	 +iNjBxtdmjAp8Ac6vEVuyCGjT3bbpO3q4Y4V9aVgXW3r3cYoWBVDLBs7lyUiHNeNRc
-	 IXQjiowtJ+S2Q==
-Date: Tue, 8 Oct 2024 17:43:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [PATCH net-next v20 14/14] mm: page_frag: add an entry in
- MAINTAINERS for page_frag
-Message-ID: <20241008174350.7b0d3184@kernel.org>
-In-Reply-To: <20241008112049.2279307-15-linyunsheng@huawei.com>
-References: <20241008112049.2279307-1-linyunsheng@huawei.com>
-	<20241008112049.2279307-15-linyunsheng@huawei.com>
+	s=arc-20240116; t=1728434996; c=relaxed/simple;
+	bh=STOQI0Qlp2ZzzoWNxsdgR+qGL+o+mt73TtkNoE8PtNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=tyqE/f5efemQlJjvuLxrthMianHntwr2Kgs0jDnyNypuEPd8CZBjS8cLbRfmnmBYBC4Do87eJNNzlybUPAsu+FnQfBpoqnp+hRpXms4sczURhD5/tQztuazK3vfPVmUQHZ//L6pWc3MLqyrI187F4TugD66awXq8PYb2haY2GZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=ECwHrA8t; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1728434992;
+	bh=Are+66SNPt+XSuJv5WmVQwCztHRVCez4JL75YAeAqhY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=ECwHrA8taoCzQNHhzVUmjBt9uZHRe5uWj1qtG13/jviNVtQmc66/Zffki2AePZ+9v
+	 tF1iVmcFw/Cg3BpsolxNcYVxeOv4FAr92RqqLCXqFKdDsHmbNCaGx6x1cUhoTvH+UL
+	 lvpDDVew3LE+QLqQLa+DPgUDTybRKQ8bmn7XuwyQlhDnIHf1ONw5RFw1OWJ+I7cV35
+	 2nx1wvjLNT+aQNvGkbv8tMv9QKru57QiI1uilePDFvBlkq//jKbFkmXZLC8K7dV48l
+	 69/ogyFU/zd2xlDLdYtZFB33DHz9Binyuhyf3KjLpe2Zil0JEgIAjr6AjSXSsgP2By
+	 YWSz9c7lyPklg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XNZ6R48QSz4wbx;
+	Wed,  9 Oct 2024 11:49:51 +1100 (AEDT)
+Date: Wed, 9 Oct 2024 11:49:51 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
+ <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patches in the bluetooth tree
+Message-ID: <20241009114951.101e4794@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/t7ORZhJQiG_hYqcuISwYoML";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/t7ORZhJQiG_hYqcuISwYoML
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 8 Oct 2024 19:20:48 +0800 Yunsheng Lin wrote:
-> +M:	Yunsheng Lin <linyunsheng@huawei.com>
+Hi all,
 
-The bar for maintaining core code is very high, if you'd 
-like to be a maintainer please start small.
+The following commits are also in the net tree as different commits
+(but the same patches):
+
+  81b3e33bb054 ("Bluetooth: btusb: Don't fail external suspend requests")
+  a691ff3d3280 ("Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync")
+  ffb3f98d4dae ("Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_stat=
+e_change")
+
+These are commits
+
+  610712298b11 ("Bluetooth: btusb: Don't fail external suspend requests")
+  18fd04ad856d ("Bluetooth: hci_conn: Fix UAF in hci_enhanced_setup_sync")
+  08d1914293da ("Bluetooth: RFCOMM: FIX possible deadlock in rfcomm_sk_stat=
+e_change")
+
+in the net tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/t7ORZhJQiG_hYqcuISwYoML
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcF0y8ACgkQAVBC80lX
+0GzgEQf8DK9ftS3ARrmNcMH1JlLcowfZ465amDyBmOVH2MrFBzUCXE9d438lm+zW
+TfSaEPgPUl49WIz3iNW0Ec+7ylDfWr1g99RfNET/IG+ksJU82lZhs8wpzX10KyMY
+mnOA/oy/bcFW9r6F85V348S1MSBmoieuhC1Kc4DsdAyXi6zrVb4axYxDcqQMfwoI
+9nK8tp0F0MMdE2SYBj/FHIKc04uwDPdXmihKyr/uzpLkuqTQdLzEt+Q6efv+30C/
+qjWgtdWhy7j75g3xxb7q2UOs1t5AckjWK7DPjhzrpb1eVcO9IionngwB0yN83/Ah
+VXyVtOy2v9M3kHXoCiZUQ/xnG1k3Kg==
+=vKLv
+-----END PGP SIGNATURE-----
+
+--Sig_/t7ORZhJQiG_hYqcuISwYoML--
 
