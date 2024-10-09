@@ -1,160 +1,136 @@
-Return-Path: <netdev+bounces-133762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC293996FBD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:31:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A857996FC1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C3F11C21EDD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:31:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9265A1C220A5
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 787D81E1C1F;
-	Wed,  9 Oct 2024 15:21:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A738D1E133D;
+	Wed,  9 Oct 2024 15:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmxXkUaE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dpMQVrY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFDF1E1A29;
-	Wed,  9 Oct 2024 15:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A70419EED7;
+	Wed,  9 Oct 2024 15:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728487276; cv=none; b=DkibC247Vc7+UgeKuspmwPzlUMWSP3+ZLXFXbWcCfmE8jaVD/Kf7U1ZhsyU3ku6nxWPco7CSHeOQc2Tt/r2ozXLir6pJADug+1r4BQlkp6PXyRB3qMMrIVFx8ccGGaBhTNGKkUkuReaLW5NeLZlVCKnwgU0bxlGdmJeAmDYoEP0=
+	t=1728487336; cv=none; b=p0bv7kD6rxiapCF6J2ffDQCNIYFtU1cTb69bVcLvg8rkVWnOpE1gVgdhOIzB0kd9tJJwOCTPhAaBEH96qAtuDu9oOTsFZJpoDsjIoTPB9jBVJiYGEXtDkggMQXO2qbem+hKV36t6LyjEVFlIEOfqtjO9MLMAAFL7kiJYrToNxp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728487276; c=relaxed/simple;
-	bh=m2EgZEpLKsurnu1KfvL67QdBNjFqJUFkS0WFntfgbc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hYASa3hmtr2EREY51kZhFg5ZoCGuofYYiwZtB4cZHNnOeU7PPT7M0IB+XZ8WTp6vldqLr1tF0V77yFFkVx3Fe4HS2ydSWAnxPXNxziFWKZN+s5RQS16z+OHecc2P1afgswmKIQy8hU/wlURpkN1nUM0bouwjRulRT9fSxfIDUAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OmxXkUaE; arc=none smtp.client-ip=209.85.166.171
+	s=arc-20240116; t=1728487336; c=relaxed/simple;
+	bh=rfG3NG0F4WKGAPp0s+kcQ2M05K3xc7lDAlk3oHDgJHs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=okLi1cn4zE1ZgPGAJgE57joq0oxVVSsETY+i0DftekzvgNMOyHSDNPazuat5EF3IqYNP6pV1LgSJ++uXSiSB6TOF0F4tX21e0jureKJMUn1gJiBzMCRqKtqC2yp3uWiesjUZBkBak+582+NYBJ13WHTS+svwzeY/clbboP1sP4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dpMQVrY2; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a3a309154aso1444865ab.2;
-        Wed, 09 Oct 2024 08:21:13 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ea03ecf191so3062641a12.0;
+        Wed, 09 Oct 2024 08:22:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728487273; x=1729092073; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WYFx1+jm9C+kJjx2suHj28i7T4NiuCW9l32ZHsnAVlc=;
-        b=OmxXkUaEQpwXbrk4hvEmnGW0oOTwD03rlXbAN/oMU/7g95faPPEdqNWXYIiYMRM0Uc
-         TeQVfCwQkPnn4TTdWdeckuQijK01Tqi+zDBrw2fM4M3nkcbWH6A3nTd+TPDVWTOGz2A9
-         L4mGG59W5y4YiLgthpzTTmTDbcxDMWZP9VmCDZ14a0pCSgZ54X97yan4/lmoT0rAZGOZ
-         Q+jZa8b/Nn2Ow5lx9Yly9P02TmOICSbh9OVixV5nxg2ziUQTpMtcNCeVN5hh//zWoqmn
-         9PH8dc7WDjrAUOK28eQzXbw42GN4mNjoKzPl7L6exe+SdBRwLA57nAPvIT2kng8Dw7EJ
-         XctA==
+        d=gmail.com; s=20230601; t=1728487334; x=1729092134; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dOo7l585oFLWi0h48Dv3F6DZGgpv66GVVbpXLuIWYn4=;
+        b=dpMQVrY2eVyy0kMDtIyy7aJ8NnR4Hfa8ySv6fbukv8woPhlmVnRtX2A+M/L/eIfeOD
+         6KSiUJOGXhmBWVGjlHwe7jp8O1xIx3XyBt2RN42uwPayI0udvFegW+ofd52oEQI9LqaO
+         lWPrzSonf4BE4N0j/JNevOA/TaaoXJMaErrqan2F/vupUsU1Mi40ceYBMNc1Sk0lbtq8
+         O8tDCH7/eXrBcancAxE3y/vFh41O9DF1IJO4VayUwnz1s28/Ems2XIKRxvAyjKJnBmSC
+         KYqnsZ2A9ViwalXIUm40TYMsDAGzJbuBgnjCj38/AOhR1pFemDya87oJof4enW3nahgs
+         kaXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728487273; x=1729092073;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WYFx1+jm9C+kJjx2suHj28i7T4NiuCW9l32ZHsnAVlc=;
-        b=bl4UtB+jHV0z2j+E3KzWGZaB2y9aAu4kNct59GoVdeoxO0eunwgQCrF2Pwh36/aI+C
-         Lcdjs+oR4wQS3kzEeMD3p2MnlnzQ9GBIgUbP7fbXUzcLv5C4NAK+uKeg9IpqDirMwX3Y
-         4y96FzArb3qHv+VQWsgwLi1pZn3stSCr3aBx5fqPYbnSeGzPuKSKp3Msg8GwCnJhAQRq
-         XMxRtGDdDsDYzyXhH5FXbELE77JsbMjaNkQ3rba/1EuHlYpY4dNQqN5mmuGFxn4FYki1
-         Ol7/sFOxJvk5k1s5Rok1G8v2U2cz3VdyXjjrqjpDekAFHw7UzU/Wlq8mwUAuCR6eeeUg
-         KduQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU8skULot/ebTDe1qJqu+UzBKnr/Qe62GIX1Ha6p3V/SNHtGsthceJ96PWzWJMeVfxfvL4=@vger.kernel.org, AJvYcCVGW08l7S16MMQ9akac8F2ZySj2uHi6RdMUxEh3SdSUVZGQgkcu5bG9VDbL2bbUhtr6ojE6ZbjY@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb71cWxIKDsSjGDSJ2yHZaciv0oOThefugV4n/cB9nQYKg6Zw1
-	buuzoOGPp7YsmXkFUvGs1C7p4FTVkf2s+WUGoXfkKilCK9QOtf/hdCiPOpP3m5/EvisPRp58g0h
-	s3R2htAd97eEvlPJbz+WsgZWgFrU=
-X-Google-Smtp-Source: AGHT+IGqh7wvqUpdqQaSWjvgJG5tzZzy+V3FPejiojTGBO9KR1n5PWvk34mxlDmVtK/VU2MMs5zM+SxddhCk2vSBR+U=
-X-Received: by 2002:a92:cd87:0:b0:3a0:9aff:5047 with SMTP id
- e9e14a558f8ab-3a397d17aeamr33950885ab.22.1728487272833; Wed, 09 Oct 2024
- 08:21:12 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728487334; x=1729092134;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dOo7l585oFLWi0h48Dv3F6DZGgpv66GVVbpXLuIWYn4=;
+        b=oWWq1tkuSEEeDlYnyXML7b4rDmOQWr+s+W5ciWflxWOIo+CGqwtghIy8qgy7SuM5Uq
+         u7+GC3T33crni9ADcnc3thH0hmxAh26Gnmvk+llD++7/WGJ0APlgH95+oBQBN6lp/NQL
+         RWqkFLlQuH+HFvIMkbZpO3ns47/VFoo75E24+iZN72+dvRPzu+b3JaUNANqgDyiQMIeh
+         891skbMgj2/zCBC7MG+EOKzD9u2ZtQas+tZtre1ErDiX3gPn1fo58ykeMNBqmOI97/Ws
+         eJ9qhKG7usKk0eiR9El1A1IF1SC+Tbb4vnY7LrKEygAxyFBUGVUXrdj0gC2eyRSfCzTy
+         TJKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUuFmWqtKKpUp+DIgESTJXiuE/CYDiAWmo1tCuC9rVowDry4Fv+B/AG2gEmALvDbEfX6HSUq8t3@vger.kernel.org, AJvYcCVVOFIGvGq0WxbB1MnIlIhY16x7j4X4uluTt9eWW0M4EYCROnPdQ6OmumurBlxCeK9MwRoLsxIEzU2dq0Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3c9f85sGTeRG9HghP6YP8k/pkVo1t/4ueIck+j80clxZrNNqD
+	NrtJeY14X7SLG5dbcj7/F2KZ5t24nNdjppK9IKbLZANNvPovgME=
+X-Google-Smtp-Source: AGHT+IERHI3+TFSOApS7wrTlzvJJnpbUQPLq1l4NM+ohbHOPKk8gUIRbIhiWO2lycgR0CBUYtCxuqg==
+X-Received: by 2002:a17:90a:ac0b:b0:2e0:d1fa:fdd7 with SMTP id 98e67ed59e1d1-2e2a2528a00mr2927991a91.27.1728487334320;
+        Wed, 09 Oct 2024 08:22:14 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e2a55fe0cdsm1803203a91.23.2024.10.09.08.22.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 08:22:13 -0700 (PDT)
+Date: Wed, 9 Oct 2024 08:22:12 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Jiri Pirko <jiri@resnulli.us>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] netdevsim: print human readable IP address
+Message-ID: <ZwafpMwkVtcGjk0v@mini-arch>
+References: <20241008122134.4343-1-liuhangbin@gmail.com>
+ <20241008122134.4343-2-liuhangbin@gmail.com>
+ <20241009122122.GO99782@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <67057d89796b_1a41992944c@willemb.c.googlers.com.notmuch> <CAL+tcoBGQZWZr3PU4Chn1YiN8XO_2UXGOh3yxbvymvojH3r13g@mail.gmail.com>
- <CAL+tcoC48XCmc3G7Xpb_0=maD1Gi0OLkNbUp4ugwtj69ANPaAw@mail.gmail.com>
- <6b10ed31-c53f-4f99-9c23-e1ba34aa0905@linux.dev> <CAL+tcoBL22WsUbooOv6XXcGGugNyogiDhOpszGR_yj-pCdvCkA@mail.gmail.com>
- <CAL+tcoD47VfZJFPJcQOgPsQuGA=jPfKU2548fJp2NBH14gEoHA@mail.gmail.com>
- <9c5b405c-9b3d-4c1f-b278-303fe24c7926@linux.dev> <CAL+tcoDDmcPQVUMN-AoGFC4SsmRwdVN+q0MAu+gAWY92Xy_zEA@mail.gmail.com>
- <fd159d60-fe59-4bfa-b143-2432671681b5@linux.dev> <CAL+tcoCX4ayowenaT9pBTqGzKQ=pH9BdRPa=1QB2PiJ=+yFxSg@mail.gmail.com>
- <662873cb-a897-464e-bdb3-edf01363c3b2@linux.dev>
-In-Reply-To: <662873cb-a897-464e-bdb3-edf01363c3b2@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 9 Oct 2024 23:20:36 +0800
-Message-ID: <CAL+tcoAPH=KG9eTYY2KeQh7udeBUyEazG_miTbiwe0Ph0-ssdw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/9] net-timestamp: bpf extension to equip
- applications transparently
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241009122122.GO99782@kernel.org>
 
-> It's more like this:
->
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index c58ca8dd561b..93f931dcc4cc 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -234,6 +234,14 @@ struct sock_common {
->   struct bpf_local_storage;
->   struct sk_filter;
->
-> +enum {
-> +       SOCKETOPT_TS_REQUESTOR = 0,
-> +       CMSG_TS_REQUESTOR,
-> +       BPFPROG_TS_REQUESTOR,
-> +
-> +       __MAX_TS_REQUESTOR,
-> +};
-> +
->   /**
->     *    struct sock - network layer representation of sockets
->     *    @__sk_common: shared layout with inet_timewait_sock
-> @@ -444,7 +452,7 @@ struct sock {
->          socket_lock_t           sk_lock;
->          u32                     sk_reserved_mem;
->          int                     sk_forward_alloc;
-> -       u32                     sk_tsflags;
-> +       u32                     sk_tsflags[__MAX_TS_REQUESTOR];
->          __cacheline_group_end(sock_write_rxtx);
->
->          __cacheline_group_begin(sock_write_tx);
->
->
-> And use existing SOF_TIMESTAMPING_* for each element in the array. Not
-> sure that struct sock is the best place though, as some timestamping
-> requests may be on per-packet basis for protocols other than TCP.
->
-> Again, I'm just thinking out loud, kinda wild idea.
+On 10/09, Simon Horman wrote:
+> On Tue, Oct 08, 2024 at 12:21:33PM +0000, Hangbin Liu wrote:
+> > Currently, IPSec addresses are printed in hexadecimal format, which is
+> > not user-friendly. e.g.
+> > 
+> >   # cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+> >   SA count=2 tx=20
+> >   sa[0] rx ipaddr=0x00000000 00000000 00000000 0100a8c0
+> >   sa[0]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+> >   sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+> >   sa[1] tx ipaddr=0x00000000 00000000 00000000 00000000
+> >   sa[1]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+> >   sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+> > 
+> > This patch updates the code to print the IPSec address in a human-readable
+> > format for easier debug. e.g.
+> > 
+> >  # cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+> >  SA count=4 tx=40
+> >  sa[0] tx ipaddr=0.0.0.0
+> >  sa[0]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+> >  sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+> >  sa[1] rx ipaddr=192.168.0.1
+> >  sa[1]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+> >  sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+> >  sa[2] tx ipaddr=::
+> >  sa[2]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+> >  sa[2]    key=0x3167608a ca4f1397 43565909 941fa627
+> >  sa[3] rx ipaddr=2000::1
+> >  sa[3]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+> >  sa[3]    key=0x3167608a ca4f1397 43565909 941fa627
+> > 
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
 
-Thanks. I see.
+Can you also update tools/testing/selftests/net/rtnetlink.sh
+accordingly? There is a part that diffs this file and it now fails due
+to new format.
 
-Requestor or requester? I don't know.
-
-For now, __MAX_TS_REQUESTOR can be two, one is used for the old
-implementation, the other one is used for BPF extension.
-
-One irrelevant question is if we need CMSG_TS_REQUESTOR to split the
-old tsflags into two because the cmsg relies on sk->sk_tsflags which
-works well.
-
-The whole idea is very interesting and inspiring to me! It could be a
-good way to go. But as you said, the memory can be a blocker. And
-where exactly we should add in struct sock is another problem because
-the size of this array could be different if we add more requestors in
-the future.
-
-I think I can write in the next version based on this idea
-(sk_tsflags[MAX] array has two requestor members at the current stage)
-and then seek for other experts' opinions.
-
-+Willem, I'd like to know if you are for or against this idea?
-
-Thanks,
-Jason
+---
+pw-bot: cr
 
