@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-133441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EEAD995EA9
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 06:38:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3386995EA4
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 06:38:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8C141F2534D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 04:38:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 728A21F256AA
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 04:38:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F827153800;
-	Wed,  9 Oct 2024 04:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7EF14A088;
+	Wed,  9 Oct 2024 04:38:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29E9133987
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 04:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F4E133987
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 04:38:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728448733; cv=none; b=ayjWVIBHSKhrb8Y26fM7rRh5M3C0shqZLDEnp5hKIXll1pVG9X1cQDP7RRR+Thts7KLAIowfYsnRgp53xEPJ/QJNuM/wr++dkO97pqDr6Ibu87EI8LAAxnrhly6k+Tfs7Ge8fOtRYuSXxNyYkFCScooRlVl77BAlAzUOEcG/8Xk=
+	t=1728448699; cv=none; b=Gt1P5a4eWmZ6v5bZKMIX/IAKNbvuykNv5RlWBmTluVfhP4iVVighzRQSyRzi//XnC6kFhzR1qPKSDpih7xOzgdP6XdP94KjvDA5+pShyWowUJnkccsbrgg109tdevl9dW+9ZaPu37jRUyiC/sy1Im7/F/HN2g00C2VSmsUus3Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728448733; c=relaxed/simple;
-	bh=HzU1Qy4/GsLTXLWx2P+Y8MkK1/iXVyhP27GumC/QsAw=;
+	s=arc-20240116; t=1728448699; c=relaxed/simple;
+	bh=94qokWWBV+zJu1MoBNVGt+rDmogKYb+rxsgeu8O6Zmw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H1r6gV51xNjelnfe+eSWaXcWwEvcatpNk11j76Sakh/o1fJCeolIP06scQW409/sH/e5TbI7cwOTvXOffFQtRam9ZuRFP7+gLZLFHqHRFBZohph9gMNSwddz2gyeKD58mvHneMKDUZhbeqv3d8//JoYogwJnouBuNy2RL5iMzBc=
+	 Content-Type:Content-Disposition:In-Reply-To; b=c5c87kXw7ZUoIil3Z1T7g2c7GYk//FfHBhXi5nkeTpuoiK+u1Yi3EJ36PfmJSpXExG/QKol+2xBkzxYZ/tf30gdC+D9yi95Kn8+ItZAnbm6u4c5+opmFJ+UlIG36GBnglV9NSf9UN2zdKggCbw6r3QES1KR7iwPDn6tvpi+rGhY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,17 +33,17 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1syORk-0001IC-OS; Wed, 09 Oct 2024 06:37:12 +0200
+	id 1syOSd-0001L3-T4; Wed, 09 Oct 2024 06:38:07 +0200
 Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1syORi-000WbX-EP; Wed, 09 Oct 2024 06:37:10 +0200
+	id 1syOSd-000Wbe-9g; Wed, 09 Oct 2024 06:38:07 +0200
 Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1syORi-0020io-13;
-	Wed, 09 Oct 2024 06:37:10 +0200
-Date: Wed, 9 Oct 2024 06:37:10 +0200
+	id 1syOSd-0020j4-0a;
+	Wed, 09 Oct 2024 06:38:07 +0200
+Date: Wed, 9 Oct 2024 06:38:07 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -56,11 +56,11 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
 	Dent Project <dentproject@linuxfoundation.org>,
 	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 01/12] net: pse-pd: Remove unused
- pse_ethtool_get_pw_limit function declaration
-Message-ID: <ZwYIdhFqLNonbw4B@pengutronix.de>
+Subject: Re: [PATCH net-next 03/12] net: pse-pd: tps23881: Simplify function
+ returns by removing redundant checks
+Message-ID: <ZwYIr4ECxQyOUbC1@pengutronix.de>
 References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-1-787054f74ed5@bootlin.com>
+ <20241002-feature_poe_port_prio-v1-3-787054f74ed5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241002-feature_poe_port_prio-v1-1-787054f74ed5@bootlin.com>
+In-Reply-To: <20241002-feature_poe_port_prio-v1-3-787054f74ed5@bootlin.com>
 X-Sent-From: Pengutronix Hildesheim
 X-URL: http://www.pengutronix.de/
 X-Accept-Language: de,en
@@ -79,15 +79,16 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Oct 02, 2024 at 06:27:57PM +0200, Kory Maincent wrote:
+On Wed, Oct 02, 2024 at 06:27:59PM +0200, Kory Maincent wrote:
 > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Removed the unused pse_ethtool_get_pw_limit() function declaration from
-> pse.h. This function was declared but never implemented or used,
-> making the declaration unnecessary.
+> Cleaned up several functions in tps23881 by removing redundant checks on
+> return values at the end of functions. These check has been removed, and
+> the return statement now directly returns the function result, reducing
+> the code's complexity and making it more concise.
 > 
 > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-
+ 
 Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
 Thank you!
