@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-133959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB16997907
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:20:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27CFA997908
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16267283DD5
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:20:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1F17B20F7D
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DCA1E2853;
-	Wed,  9 Oct 2024 23:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485091E2857;
+	Wed,  9 Oct 2024 23:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ibPSVAC7"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k7Taoy5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0A9183CC1
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 23:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6118183CC1
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 23:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728516008; cv=none; b=SfhTo/Kp1QyUb3piKrQVmg7H1cxzwzaXHfgNJnfYJV63Q1R7OXimiQAP9BWgMQFToVkUmNvoiiRlQ2AWQBIQ7HD9n3CHVigSiTBkxvZf0FeGGcjvW8sogEJgsEvXKN42xjimfdPljAOymWW456vcHvZ8Ka05CaGx9IF7sh3Z3lE=
+	t=1728516033; cv=none; b=tFnPctIgipgAODzIJWlqlBSADnJ9ACCKg7w68fOOnpGAkwzXE3NrbemrbntZTLyqNR4d+KgZ98Ed7c+kSNK89DdKI7Ee4/+UvdgRLEJObz3x2MKh17IvvqjHe24JQcs7aOEFTg8buzD1Vl1saXKxsiSkVaviXImrY4ns1fHtCHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728516008; c=relaxed/simple;
-	bh=CEEGE1UqidslQcLt0lf3HRoHF1o2f1LXA3ybDyPnW6g=;
+	s=arc-20240116; t=1728516033; c=relaxed/simple;
+	bh=ZmgBmoNDzKvddOL6uRK1BXpfDdLMTV9I3wSHjHqM4Xc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qmUr0Wf0vjuaYJgmBQpVgxt6/0unsx0npUNe5AeVMDdyA+s3a3vAwXFwL6Mve2rdSTJd9L/icta38FkVod2d9Mzt0z8zPFeRlziu7nc2oIRYs13zcRbb1me+oxpemdstVr+65qQ9iHqTVcdNBkHJjHoUBe6sLsoZS+24z5EcXqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ibPSVAC7; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=c66V9Ax5vUd9zSHicH8oKzGidS1N+oNCk4BnoRY2q8m2hsj33nr6mMvTmo/aQQGxss9n6FJU122f0PfdkDmdpBqCOel+B3LI81E4dSWVMnlFuctlikJ6ZVXinHC/SdSPBUofY4s97QMnSIZZQmOuMaTVt4JTFIX2Ve+lyeRrOn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k7Taoy5e; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1728516007; x=1760052007;
+  t=1728516029; x=1760052029;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7QaEEJr1XkLb3yuxSRZU13s3su4K2Jcvzr6v8bpWoGs=;
-  b=ibPSVAC7/mnHOqc0oQ6dxHmID5aPNJzn9CMkKhDfOdyCzDQMz6s25rrD
-   AdAGtwKbNe+XMgyGTj0EsMdnsXhXgD6R5sX+GQBkMyGUiekyVAJm3t6yU
-   C5UcTxMwD8yTN/NlL+CKzNR7HczhJWT9xQR1vShBobTNi58R8Lxk+WzEx
-   c=;
+  bh=5Dv5kT5QwJBlAWGz4byvh22avUCmqUEa8gRqZmZQHWA=;
+  b=k7Taoy5eFR+JnB/CLoFIl0rQr5h77NynsJUIqDQJMtS//fO4IaERypJV
+   XvWoPNFLIcDSKV56HjNFqo8iH1yQ2DBnVXJ4XXrjdmiMuKo4isslaEPRJ
+   ElWyQ/n7bYshWA8vp3hvhph7+o0Cxlorf6PjUWF8PwDEHcUItSNCTAq31
+   k=;
 X-IronPort-AV: E=Sophos;i="6.11,191,1725321600"; 
-   d="scan'208";a="238125463"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 23:20:05 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:62964]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.29:2525] with esmtp (Farcaster)
- id 9ee77a73-515a-44b1-bfcb-be4ee9c4a0b7; Wed, 9 Oct 2024 23:20:05 +0000 (UTC)
-X-Farcaster-Flow-ID: 9ee77a73-515a-44b1-bfcb-be4ee9c4a0b7
+   d="scan'208";a="374826794"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 23:20:23 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:11691]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.7.250:2525] with esmtp (Farcaster)
+ id 1cb89540-6ed8-4be1-bea5-a86886deab5c; Wed, 9 Oct 2024 23:20:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 1cb89540-6ed8-4be1-bea5-a86886deab5c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 9 Oct 2024 23:20:03 +0000
+ Wed, 9 Oct 2024 23:20:22 +0000
 Received: from 6c7e67c6786f.amazon.com (10.187.170.17) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 9 Oct 2024 23:20:00 +0000
+ Wed, 9 Oct 2024 23:20:19 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 09/13] rtnetlink: Fetch IFLA_LINK_NETNSID in rtnl_newlink().
-Date: Wed, 9 Oct 2024 16:16:52 -0700
-Message-ID: <20241009231656.57830-10-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 10/13] rtnetlink: Clean up rtnl_dellink().
+Date: Wed, 9 Oct 2024 16:16:53 -0700
+Message-ID: <20241009231656.57830-11-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241009231656.57830-1-kuniyu@amazon.com>
 References: <20241009231656.57830-1-kuniyu@amazon.com>
@@ -77,132 +77,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB004.ant.amazon.com (10.13.138.104) To
+X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Another netns option for RTM_NEWLINK is IFLA_LINK_NETNSID and
-is fetched in rtnl_newlink_create().
+We will push RTNL down to rtnl_delink().
 
-This must be done before holding rtnl_net_lock().
+Let's unify the error path to make it easy to place rtnl_net_lock().
 
-Let's move IFLA_LINK_NETNSID processing to rtnl_newlink().
+While at it, keep the variables in reverse xmas order.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/core/rtnetlink.c | 49 ++++++++++++++++++++++----------------------
- 1 file changed, 24 insertions(+), 25 deletions(-)
+ net/core/rtnetlink.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index fc62f23d2647..70a3a9f411d8 100644
+index 70a3a9f411d8..59a83fd52a92 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -3628,7 +3628,7 @@ static int rtnl_group_changelink(const struct sk_buff *skb,
- 
- static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 			       const struct rtnl_link_ops *ops,
--			       struct net *tgt_net,
-+			       struct net *tgt_net, struct net *link_net,
- 			       const struct nlmsghdr *nlh,
- 			       struct nlattr **tb, struct nlattr **data,
- 			       struct netlink_ext_ack *extack)
-@@ -3638,7 +3638,6 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 	u32 portid = NETLINK_CB(skb).portid;
- 	struct net_device *dev;
- 	char ifname[IFNAMSIZ];
--	struct net *link_net;
- 	int err;
- 
- 	if (!ops->alloc && !ops->setup)
-@@ -3651,22 +3650,6 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 		name_assign_type = NET_NAME_ENUM;
- 	}
- 
--	if (tb[IFLA_LINK_NETNSID]) {
--		int id = nla_get_s32(tb[IFLA_LINK_NETNSID]);
--
--		link_net = get_net_ns_by_id(tgt_net, id);
--		if (!link_net) {
--			NL_SET_ERR_MSG(extack, "Unknown network namespace id");
--			err =  -EINVAL;
--			goto out;
--		}
--		err = -EPERM;
--		if (!netlink_ns_capable(skb, link_net->user_ns, CAP_NET_ADMIN))
--			goto out;
--	} else {
--		link_net = NULL;
--	}
--
- 	dev = rtnl_create_link(link_net ? : tgt_net, ifname,
- 			       name_assign_type, ops, tb, extack);
- 	if (IS_ERR(dev)) {
-@@ -3699,9 +3682,6 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 			goto out_unregister;
- 	}
- out:
--	if (link_net)
--		put_net(link_net);
--
- 	return err;
- out_unregister:
- 	if (ops->newlink) {
-@@ -3717,7 +3697,7 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
- 
- static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			  const struct rtnl_link_ops *ops,
--			  struct net *tgt_net,
-+			  struct net *tgt_net, struct net *link_net,
- 			  struct rtnl_newlink_tbs *tbs,
- 			  struct nlattr **data,
- 			  struct netlink_ext_ack *extack)
-@@ -3766,16 +3746,16 @@ static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		return -EOPNOTSUPP;
- 	}
- 
--	return rtnl_newlink_create(skb, ifm, ops, tgt_net, nlh, tb, data, extack);
-+	return rtnl_newlink_create(skb, ifm, ops, tgt_net, link_net, nlh, tb, data, extack);
- }
- 
- static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+@@ -3362,14 +3362,14 @@ EXPORT_SYMBOL_GPL(rtnl_delete_link);
+ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
  			struct netlink_ext_ack *extack)
  {
- 	struct nlattr **tb, **linkinfo, **data = NULL;
-+	struct net *tgt_net, *link_net = NULL;
- 	struct rtnl_link_ops *ops = NULL;
- 	struct rtnl_newlink_tbs *tbs;
--	struct net *tgt_net;
- 	int ops_srcu_index;
- 	int ret;
++	struct ifinfomsg *ifm = nlmsg_data(nlh);
+ 	struct net *net = sock_net(skb->sk);
+ 	u32 portid = NETLINK_CB(skb).portid;
+-	struct net *tgt_net = net;
+-	struct net_device *dev = NULL;
+-	struct ifinfomsg *ifm;
+ 	struct nlattr *tb[IFLA_MAX+1];
+-	int err;
++	struct net_device *dev = NULL;
++	struct net *tgt_net = net;
+ 	int netnsid = -1;
++	int err;
  
-@@ -3846,8 +3826,27 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto put_ops;
+ 	err = nlmsg_parse_deprecated(nlh, sizeof(*ifm), tb, IFLA_MAX,
+ 				     ifla_policy, extack);
+@@ -3387,27 +3387,20 @@ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			return PTR_ERR(tgt_net);
  	}
  
--	ret = __rtnl_newlink(skb, nlh, ops, tgt_net, tbs, data, extack);
-+	if (tb[IFLA_LINK_NETNSID]) {
-+		int id = nla_get_s32(tb[IFLA_LINK_NETNSID]);
+-	err = -EINVAL;
+-	ifm = nlmsg_data(nlh);
+ 	if (ifm->ifi_index > 0)
+ 		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
+ 	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
+ 		dev = rtnl_dev_get(tgt_net, tb);
 +
-+		link_net = get_net_ns_by_id(tgt_net, id);
-+		if (!link_net) {
-+			NL_SET_ERR_MSG(extack, "Unknown network namespace id");
-+			ret =  -EINVAL;
-+			goto put_net;
-+		}
-+
-+		if (!netlink_ns_capable(skb, link_net->user_ns, CAP_NET_ADMIN)) {
-+			ret = -EPERM;
-+			goto put_net;
-+		}
-+	}
-+
-+	ret = __rtnl_newlink(skb, nlh, ops, tgt_net, link_net, tbs, data, extack);
++	if (dev)
++		err = rtnl_delete_link(dev, portid, nlh);
++	else if (ifm->ifi_index > 0 || tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
++		err = -ENODEV;
+ 	else if (tb[IFLA_GROUP])
+ 		err = rtnl_group_dellink(tgt_net, nla_get_u32(tb[IFLA_GROUP]));
+ 	else
+-		goto out;
+-
+-	if (!dev) {
+-		if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME] || ifm->ifi_index > 0)
+-			err = -ENODEV;
+-
+-		goto out;
+-	}
+-
+-	err = rtnl_delete_link(dev, portid, nlh);
++		err = -EINVAL;
  
-+put_net:
-+	if (link_net)
-+		put_net(link_net);
- 	put_net(tgt_net);
- put_ops:
- 	if (ops)
+-out:
+ 	if (netnsid >= 0)
+ 		put_net(tgt_net);
+ 
 -- 
 2.39.5 (Apple Git-154)
 
