@@ -1,61 +1,64 @@
-Return-Path: <netdev+bounces-133554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BAA499638D
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:48:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F11FA99639F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45DB02821B7
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:48:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE00282546
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA7D18B47E;
-	Wed,  9 Oct 2024 08:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4427318E041;
+	Wed,  9 Oct 2024 08:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWNFSIAN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZgE1VxV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6912C18B465;
-	Wed,  9 Oct 2024 08:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AD918E032;
+	Wed,  9 Oct 2024 08:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728463289; cv=none; b=kzcvGXOIYxxfWqjpd5Ny10U3YNq7gi+/1YSImMrYAoaqwOiZIONFRHzaopva53lXLA5WzPZNAX101kuWk7kU6mbzVLiqY+QpeVGEJQZD2N3rASU4triBQzWa0AiolDmh9PYHcVrPIUaUYIV6+G3P0lComzEacxR+SJdICFbhmo4=
+	t=1728463446; cv=none; b=X8HHJTNhejQ7F8v3k6bN6bREUTV6BRbsFRaaMSII8QQndA8cOr9ajBffxEvuQiCifnDUlTSHOZjwGcF9lOVwC6yM7/SVrri3Ody4Piw/SAEiYp8+Bk1xqVi55VtFaSLachZzVhOeaqGbAXSJg8xGSrEDugI0nU6HZDsdkyO8Rl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728463289; c=relaxed/simple;
-	bh=+M0hTljpFJhCSug/HvxVU/vMs8xMiOATiEGTFmWW7Wg=;
+	s=arc-20240116; t=1728463446; c=relaxed/simple;
+	bh=ceMij/yfbKLvJo6J2VHlzeDQMeXfsggIscfz1kWVik4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/9XVzcteGtBOza1ZMDsvx9EKkX6v4sVTh2QvA8ENG3aI665y3vOaTJEhI12+q373epDyBmamGNtMvGA1bU6YN2FllqXtlZmvslTemdlbLPRZORdnu48+YDpCh15/rBo2lIAoBnrJsKZ3WCQos967H9ABcAyxP/XnIWfpx1SiIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWNFSIAN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3F85C4CEC5;
-	Wed,  9 Oct 2024 08:41:26 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=lPJoPcf5IPTthcylSN+zxhuHqL/cAQkT3ENkt2Py9O77o6GZ4pQpHQR6Dk9Ij0Rz6ZbsYgUUZefNBn18eD6+bM7qvxq8rTTFlo9zxL6E51O3wq25kFSVP02HUT+A5Yfs8sxItZuEWnwsU5KnrTmUbzBpH8kUPorN9fUJy1JUCkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZgE1VxV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EF4FC4CECF;
+	Wed,  9 Oct 2024 08:44:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728463289;
-	bh=+M0hTljpFJhCSug/HvxVU/vMs8xMiOATiEGTFmWW7Wg=;
+	s=k20201202; t=1728463445;
+	bh=ceMij/yfbKLvJo6J2VHlzeDQMeXfsggIscfz1kWVik4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jWNFSIANSpYCFOrIa/lcaOf0qJrFD0TuRH94M3Dk4EUt4qFIU2e2MmFHlILnCDRQ2
-	 HzjxPj5/YaRNgZC9X7BNuy9+VZAKcPQBhJIcBPfVVO95NUPBCQCN48vims1AzDRJO2
-	 PiP5AzMTXP/1//fjIALglyVOtmrCpZ03ceEdnJJa/rj02UGBwlKV9XaMohLOWoULmZ
-	 ydwm1C3LvbqncVaGNiBmdgVXJXY69RM2e59h5p/PYwAqkf68uHWsDmXsgiOFwSmBe5
-	 llsuCVrgTqrYac0Zh1CKNlTvyAnVPaMlkgFPSiYArO8HT7i/SBtwEeAv1P2S9e3Ide
-	 GaMhk+Tp2N6EA==
-Date: Wed, 9 Oct 2024 09:41:24 +0100
+	b=sZgE1VxVx2v/62JJUVZHh+KqF+47rw+KtEoQHosRPAEMQCrgihLVD4FLPln22/PlO
+	 Qw5UOCA9BGcPzWm60t8LKGAlwIx5x53bZfNkEQFG6Z/nfwtSDXKy9/wqR2Hax5bkol
+	 HC5xNucZL1KdzEYPCFk+xqNit6YLzELIffu6Lh4sCSesoTxJR4Aj3iU1YzAR4bjxh+
+	 fveoxVGtGM825lS5LJn7PVrKJ4xOJeZKtrGhhE+vkyEh2uVY9IpG9v6hKTBWXsNurh
+	 FVHjaAAgqa6XZ0TfH74v2IrV20Dd8TC8F9aoIMxIqlyvsmgOwd/e8zV5aUfIVm0a5c
+	 TGZ8zzAQBNiyw==
+Date: Wed, 9 Oct 2024 09:43:56 +0100
 From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>,
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] r8169: add support for the temperature
- sensor being available from RTL8125B
-Message-ID: <20241009084124.GG99782@kernel.org>
-References: <f1658894-4c46-447a-80e6-153c8b788d71@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net 1/2] MAINTAINERS: consistently exclude wireless
+ files from NETWORKING [GENERAL]
+Message-ID: <20241009084356.GH99782@kernel.org>
+References: <20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org>
+ <20241004-maint-net-hdrs-v1-1-41fd555aacc5@kernel.org>
+ <87setb7us5.fsf@kernel.org>
+ <20241007141305.GD32733@kernel.org>
+ <87ed4r4xqn.fsf@kernel.org>
+ <a36f0fec7c007031f55e220a0ca585b48630f205.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,17 +67,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f1658894-4c46-447a-80e6-153c8b788d71@gmail.com>
+In-Reply-To: <a36f0fec7c007031f55e220a0ca585b48630f205.camel@sipsolutions.net>
 
-On Mon, Oct 07, 2024 at 08:34:12PM +0200, Heiner Kallweit wrote:
-> This adds support for the temperature sensor being available from
-> RTL8125B. Register information was taken from r8125 vendor driver.
+On Mon, Oct 07, 2024 at 08:03:22PM +0200, Johannes Berg wrote:
+> On Mon, 2024-10-07 at 20:41 +0300, Kalle Valo wrote:
+> > Simon Horman <horms@kernel.org> writes:
+> > 
+> > > On Fri, Oct 04, 2024 at 06:27:38PM +0300, Kalle Valo wrote:
+> > > 
+> > > > Simon Horman <horms@kernel.org> writes:
+> > > > 
+> > > > > We already exclude wireless drivers from the netdev@ traffic, to
+> > > > > delegate it to linux-wireless@, and avoid overwhelming netdev@.
+> > > > > 
+> > > > > Many of the following wireless-related sections MAINTAINERS
+> > > > > are already not included in the NETWORKING [GENERAL] section.
+> > > > > For consistency, exclude those that are.
+> > > > > 
+> > > > > * 802.11 (including CFG80211/NL80211)
+> > > > > * MAC80211
+> > > > > * RFKILL
+> > > > > 
+> > > > > Signed-off-by: Simon Horman <horms@kernel.org>
+> > > > > ---
+> > > > >  MAINTAINERS | 11 +++++++++++
+> > > > >  1 file changed, 11 insertions(+)
+> > > > > 
+> > > > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > > index c27f3190737f..ea3ea2c0d3fa 100644
+> > > > > --- a/MAINTAINERS
+> > > > > +++ b/MAINTAINERS
+> > > > > @@ -16197,8 +16197,19 @@ F:	lib/random32.c
+> > > > >  F:	net/
+> > > > >  F:	tools/net/
+> > > > >  F:	tools/testing/selftests/net/
+> > > > > +X:	Documentation/networking/mac80211-injection.rst
+> > > > > +X:	Documentation/networking/mac80211_hwsim/
+> > > > > +X:	Documentation/networking/regulatory.rst
+> > > > > +X:	include/net/cfg80211.h
+> > > > > +X:	include/net/ieee80211_radiotap.h
+> > > > > +X:	include/net/iw_handler.h
+> > > > > +X:	include/net/mac80211.h
+> > > > > +X:	include/net/wext.h
+> > > > 
+> > > > Should we add also lib80211.h?
+> > > 
+> > > Thanks, I missed that one. Perhaps it should have:
+> > > 
+> > > * An F: entry in the MAC80211
+> > > * An X: entry in the NETWORKING [GENERAL]
+> > > 
+> > > If so, perhaps I can just add that to a v2 of this patch.
+> > > Let me know what you think.
+> > 
+> > Like Johannes said, the cfg80211 entry is more approriate but otherwise
+> > sounds like a good plan, thanks!
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
-> v2:
-> - don't omit identifiers in definition of r8169_hwmon_is_visible()
+> Actually scratch that, please just ignore it. I'm going to remove that
+> header file entirely and move the functionality into libipw in the
+> ipw2x00 drivers.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks,
 
+In that case I'll post a v2 without any code changes.
+Rather, bumping it to non-RFC and accumulating tags.
 
