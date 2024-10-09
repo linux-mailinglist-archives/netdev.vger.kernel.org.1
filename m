@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-133672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA15996A39
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:40:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D0B3996A3C
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 14:40:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8308F1F24CA2
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:40:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46665B23D74
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D334D194091;
-	Wed,  9 Oct 2024 12:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EDC194C96;
+	Wed,  9 Oct 2024 12:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XA2mnX04"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgDG0C9i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FAD1922E5;
-	Wed,  9 Oct 2024 12:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB991194C85;
+	Wed,  9 Oct 2024 12:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728477627; cv=none; b=jdSc/GOSZlkgx0TAfdCtK2HTqNHhuNyVJDRFvEwbC8T49C8rEPLvLolBQPzSnF9TshtIlwptl9HHs1hMlCm87PEYwAOol6GUXpZk3sTXsIONdvKqDmjl8Tccnpu0TxygB+3NCNC8aiQKS7UHa0geVPHFGHvNGzJ2XY83SiRDGQs=
+	t=1728477628; cv=none; b=VcxRPQyGOlX8mIq0GWmX0UWn2za/G/ePsx0QkjVMP6LgCqQuzlQMzUUQ5K0wkZFhZnvaUjki1NsClNlVN3J45XVVgdtR/AwSGz3m2oz2lmvqNrDnmxwbdhD/og3fek3pb2+w6A2Mxz3h1FT5GSlcAkW5P37zbPEIiCEb0l3Z748=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728477627; c=relaxed/simple;
-	bh=Ee8cRUkaiYMDvin0hMYAT/ky5BHU1sTDYnZQ6aw5tOY=;
+	s=arc-20240116; t=1728477628; c=relaxed/simple;
+	bh=kXFnJ2VqPRqypAvV/VgA3Yu2BhCGwHxNMpMsrjl06Rg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ca6be6kLxjd1tzVe4byLbaAp2OBkGtFdotTauCVuMekr/23z3R0su6g0iF1/6D2+Tf6TDKgvPW0ctWQBzGjMqGVMhISn6vvsphTZRf0T3Yf9f/cLlAk/ztUrPeI8G3rhOLUnAsq8UY+Pp+VykGO75P4R+sBEWO+++G72rj9ms18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XA2mnX04; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79E54C4CEC5;
-	Wed,  9 Oct 2024 12:40:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jxkdjXy7iJJ4CRhidmg0nyTA71Z+LmsVfXyBQ8oq0epLEosn+Yym5Hk5zT1j+yaw63Z34k25tfqJ1MgA2C9i9ZZpDzvlIXNUwUJpqcdGEH6lIUmEXw+OmSA2S0DuNmdXFSDO3quQS/njALhxTXKNt//LVj8clM+9s7mmIMkl0bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgDG0C9i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 368D4C4CECF;
+	Wed,  9 Oct 2024 12:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728477625;
-	bh=Ee8cRUkaiYMDvin0hMYAT/ky5BHU1sTDYnZQ6aw5tOY=;
+	s=k20201202; t=1728477628;
+	bh=kXFnJ2VqPRqypAvV/VgA3Yu2BhCGwHxNMpMsrjl06Rg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XA2mnX04ZPoNbYdhAF4SyGBo/opw07Pye37fxEWqSrrfaeDAudt1EWvfb7bIBplJJ
-	 gk6jO0YQRQBvhIHcrJEMFyxnOmxk72OxUQqTcwLVkAJtPhuOiTiyqCr0i4Ee46WshE
-	 noxEyJDZpMpSmfkSjrP+8X/06HOe76zlcDaHGMnf6umm1zf/nNQ6xmgdDuba+vYqC1
-	 8csORjgNZHC0AYtjfSVPUjF4Va4gjdPkP3YUPSOvf/8GM9Ivn4BirKXKEF5jKzd8BU
-	 gOhSNxfrCfx/6Kb91CzMUxLaNsv5JH+DwMCVIiE6f1phgvY7PjBzIJXEKvt1IwwLhG
-	 ckV6LPms/Adfw==
+	b=MgDG0C9ikfj35BW7twXEz7NqEgwowB2vLVCi9iKD/XiWv4TgEjOmnPgXdvM/RAHdr
+	 X0pJkwuzVAeiiWO0kT5PdrtaWqMAkGWHrJQWHw8Cue7HoQ01T+jU1v9yA8UzrzElpf
+	 d/yLRUrqnUxJ9hVdFcibW+sVnYrFj0FFxsXkF9D2dWPMJNj/lSSXRLlKdl18B+TJAS
+	 v+JQUFtgOlxq5nnyRrM4GTZbB8X8hS089On35pAv0ibKlygivh4tbOSkuOfOAvE36J
+	 Smg02rsGVhK+LDDCGi6MTd/oKoLVxeW9OtTdY/2xvGsHIdWenGO06eAyR6oW7NCFmm
+	 EJZMpzZdZjUQA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADC73806644;
-	Wed,  9 Oct 2024 12:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD3A3806644;
+	Wed,  9 Oct 2024 12:40:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sctp: ensure sk_state is set to CLOSED if hashing fails
- in sctp_listen_start
+Subject: Re: [PATCH net-next v2] r8169: add support for the temperature sensor
+ being available from RTL8125B
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172847762975.1253149.9634978529186307261.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Oct 2024 12:40:29 +0000
-References: <43b03d2daa303fee1995f6b16f5003a1fc0599bf.1728318311.git.lucien.xin@gmail.com>
-In-Reply-To: <43b03d2daa303fee1995f6b16f5003a1fc0599bf.1728318311.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
- marcelo.leitner@gmail.com
+ <172847763248.1253149.14421663946636580043.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Oct 2024 12:40:32 +0000
+References: <f1658894-4c46-447a-80e6-153c8b788d71@gmail.com>
+In-Reply-To: <f1658894-4c46-447a-80e6-153c8b788d71@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, jdelvare@suse.com,
+ linux@roeck-us.net, netdev@vger.kernel.org, linux-hwmon@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Mon,  7 Oct 2024 12:25:11 -0400 you wrote:
-> If hashing fails in sctp_listen_start(), the socket remains in the
-> LISTENING state, even though it was not added to the hash table.
-> This can lead to a scenario where a socket appears to be listening
-> without actually being accessible.
+On Mon, 7 Oct 2024 20:34:12 +0200 you wrote:
+> This adds support for the temperature sensor being available from
+> RTL8125B. Register information was taken from r8125 vendor driver.
 > 
-> This patch ensures that if the hashing operation fails, the sk_state
-> is set back to CLOSED before returning an error.
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> v2:
+> - don't omit identifiers in definition of r8169_hwmon_is_visible()
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] sctp: ensure sk_state is set to CLOSED if hashing fails in sctp_listen_start
-    https://git.kernel.org/netdev/net/c/4d5c70e6155d
+  - [net-next,v2] r8169: add support for the temperature sensor being available from RTL8125B
+    https://git.kernel.org/netdev/net-next/c/1ffcc8d41306
 
 You are awesome, thank you!
 -- 
