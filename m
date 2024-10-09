@@ -1,109 +1,127 @@
-Return-Path: <netdev+bounces-133461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5E199603B
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:00:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8024F996050
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:06:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF529283AB6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:00:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3781C1F22F59
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A4317A924;
-	Wed,  9 Oct 2024 06:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AEA317A584;
+	Wed,  9 Oct 2024 07:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vR8SVwC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FC122EEF;
-	Wed,  9 Oct 2024 06:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1C8154BEE
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728457199; cv=none; b=IgXfOG2V77l5Cgk9PFaNgmLU6w8PkTLlPkjz8pZI7U9PLb+WrBzVnncNWaPSR1Jw5jXAnrduKT1bd1rUNfWDa/Oz3mrNSyoP/qXUuDkREqYSI1BW6cKkdpSOt9FW6FcyD+6gz02gAuNjvJNmvDVeYomO+w9PIO94vBjKH47u7D4=
+	t=1728457600; cv=none; b=t7e2g3JBUaQlLrMhKDVzhJ2sFzubb8BjRigIcnaa31ROIvfwqpKJaNyXLflaKH+Id+pV9rsjQGNP9Jew32Rk8nuQ6RbiDh1vLlrzATNOGL549iici+rcj/pZ9EAZC6MC2jjeskq6ENksdB9LPvP2WnsS/ZiW7/j3JdyEcIjhrh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728457199; c=relaxed/simple;
-	bh=7RypAYANtvjscXzssx+cDk3GNauz3Z3B3l7U+b6IANM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UNfbMBZKDtUxjKOWpjBwLJT6DnV2oIIVJwNwEWvoQQNEDXmu/dGxM4YaRmrzEz13dMt110pL8ppV8M9TwCS3HA55RZDvh9Sz3Wkp8znBraT3nnt4WFAiegnjmMuGEa44WQ9HAPqFaNvUfHwLotm2UExGV+lwInULFPiLksF9Q84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XNkDR0Xmdz6GBSq;
-	Wed,  9 Oct 2024 14:55:35 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id EEDD7140447;
-	Wed,  9 Oct 2024 14:59:53 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 9 Oct
- 2024 08:59:48 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <gur.stavi@huawei.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <shuah@kernel.org>
-Subject: Re: [PATCH net-next v02 1/2] af_packet: allow fanout_add when socket is not RUNNING
-Date: Wed, 9 Oct 2024 09:58:37 +0300
-Message-ID: <20241009065837.354332-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch>
-References: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1728457600; c=relaxed/simple;
+	bh=2PFZc2FVq4xCINxf48pAkG1NV4NqnK/IrZpYg6fCBSU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+4nfH9xiKzUE6Xx6rBon5IvLyNwrsd5Rp/le4pWqT8fNQTvZRObi+9LyiW13DfXKNSyBQMRAOEniYI11RE4keBRQ7OJMebkVP6YNiHkj/k+rkQjQxwwPoJN2B6QCXCDLaWQyW4dg9F+jBwO70mif4AN0az2yGxQm6Ayn+m6gcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vR8SVwC+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90EBCC4CEC5;
+	Wed,  9 Oct 2024 07:06:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728457600;
+	bh=2PFZc2FVq4xCINxf48pAkG1NV4NqnK/IrZpYg6fCBSU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=vR8SVwC+Irs/9n9866eZfQwqDMtdVeEH/l9yC3x6fpKwtFFzrMwtEQSrHwWCQCAcZ
+	 ACTujtiECmPRW8UroUgtZQJG8lx6m7x9ZGLfc+PiJrlsr1rlCvymL3dQvj6F+ZYqYO
+	 YC7SzU8qa+mFmW7rFzsGJNW7VY1UpBsxuvA/qmEymKk643F+RyIF5Z/J4d/sviYx85
+	 fLPDvlSBDRYwutbYgNcIWznVOc+kZhsEPxgxbZpWpw88WsWmCFUtxNhFo/ewia7myG
+	 IuH0gDwVFN+VDLjvTnvUCCQTSP+GX8NZOwRVU2bjjw4EyKuQ+UzVL6ShKave/KTgAH
+	 SXxefklS3/QlQ==
+Date: Wed, 9 Oct 2024 08:06:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: tao <wangtaowt166@163.com>
+Cc: richardcochran@gmail.com, netdev@vger.kernel.org
+Subject: Re: [RFC] ptp: Delete invalided timestamp event queue code
+Message-ID: <20241009070637.GF99782@kernel.org>
+References: <20241007152502.387840-1-wangtaowt166@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- frapeml500005.china.huawei.com (7.182.85.13)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241007152502.387840-1-wangtaowt166@163.com>
 
->> @@ -1846,21 +1846,21 @@ static int fanout_add(struct sock *sk, struct fanout_args *args)
->>  	err = -EINVAL;
->>
->>  	spin_lock(&po->bind_lock);
->> -	if (packet_sock_flag(po, PACKET_SOCK_RUNNING) &&
->> -	    match->type == type &&
->> +	if (match->type == type &&
->>  	    match->prot_hook.type == po->prot_hook.type &&
->>  	    match->prot_hook.dev == po->prot_hook.dev) {
->
-> Remaining unaddressed issue is that the socket can now be added
-> before being bound. See comment in v1.
+On Mon, Oct 07, 2024 at 11:25:02PM +0800, tao wrote:
+> used timestamp event queue In ptp_open func,  queue of ptp_clock_register
+>  already invalid so delete it
+> 
+> Signed-off-by: tao <wangtaowt166@163.com>
+> ---
+>  drivers/ptp/ptp_clock.c | 19 -------------------
+>  1 file changed, 19 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index c56cd0f63909..9be8136cb64c 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -235,7 +235,6 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  				     struct device *parent)
+>  {
+>  	struct ptp_clock *ptp;
+> -	struct timestamp_event_queue *queue = NULL;
+>  	int err, index, major = MAJOR(ptp_devt);
+>  	char debugfsname[16];
+>  	size_t size;
+> @@ -260,20 +259,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  	ptp->devid = MKDEV(major, index);
+>  	ptp->index = index;
+>  	INIT_LIST_HEAD(&ptp->tsevqs);
+> -	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+> -	if (!queue) {
+> -		err = -ENOMEM;
+> -		goto no_memory_queue;
+> -	}
+> -	list_add_tail(&queue->qlist, &ptp->tsevqs);
 
-I extended the psock_fanout test with unbound fanout test.
+Here the queue is connected to ptp->tseqvs,
+as was the case when it was added in
 
-As far as I understand, the easiest way to verify bind is to test that
-po->prot_hook.dev != NULL, since we are under a bind_lock anyway.
-But perhaps a more readable and direct approach to test "bind" would be
-to test po->ifindex != -1, as ifindex is commented as "bound device".
-However, at the moment ifindex is not initialized to -1, I can add such
-initialization, but perhaps I do not fully understand all the logic.
+d26ab5a35ad9 ("ptp: Replace timestamp event queue with linked list")
 
-Any preferences?
+Are you saying that it is no longer used as per that commit?
 
->
->>  		err = -ENOSPC;
->>  		if (refcount_read(&match->sk_ref) < match->max_num_members) {
->> -			__dev_remove_pack(&po->prot_hook);
->> -
->>  			/* Paired with packet_setsockopt(PACKET_FANOUT_DATA) */
->>  			WRITE_ONCE(po->fanout, match);
->>
->>  			po->rollover = rollover;
->>  			rollover = NULL;
->>  			refcount_set(&match->sk_ref, refcount_read(&match->sk_ref) + 1);
->> -			__fanout_link(sk, po);
->> +			if (packet_sock_flag(po, PACKET_SOCK_RUNNING)) {
->> +				__dev_remove_pack(&po->prot_hook);
->> +				__fanout_link(sk, po);
->> +			}
->>  			err = 0;
->>  		}
->>  	}
-> --
+>  	spin_lock_init(&ptp->tsevqs_lock);
+> -	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+> -	if (!queue->mask) {
+> -		err = -ENOMEM;
+> -		goto no_memory_bitmap;
+> -	}
+> -	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+> -	spin_lock_init(&queue->lock);
+>  	mutex_init(&ptp->pincfg_mux);
+>  	mutex_init(&ptp->n_vclocks_mux);
+>  	init_waitqueue_head(&ptp->tsev_wq);
+> @@ -380,11 +366,6 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  kworker_err:
+>  	mutex_destroy(&ptp->pincfg_mux);
+>  	mutex_destroy(&ptp->n_vclocks_mux);
+> -	bitmap_free(queue->mask);
+> -no_memory_bitmap:
+> -	list_del(&queue->qlist);
+> -	kfree(queue);
+> -no_memory_queue:
+>  	xa_erase(&ptp_clocks_map, index);
+>  no_slot:
+>  	kfree(ptp);
+> -- 
+> 2.25.1
+> 
+> 
 
