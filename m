@@ -1,138 +1,129 @@
-Return-Path: <netdev+bounces-133968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54FC8997930
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:37:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E89D0997940
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84F7C1C22081
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:37:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB21628446D
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D331E3DD4;
-	Wed,  9 Oct 2024 23:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3A01E3784;
+	Wed,  9 Oct 2024 23:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NZCJGcXH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V4dqNLTt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647B21E3DD6;
-	Wed,  9 Oct 2024 23:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD951E282B;
+	Wed,  9 Oct 2024 23:41:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728517023; cv=none; b=EJoSFqU0TfNlBCmTzRK5bdxMTQl8vuPOe7l0a3oRJojHP73PhqP1Dx61EnFkRCmUgPLZtgWhZUOjezpSDm1+IQm5/5GyxOb9QlPmso1pypZk9zN2EgwR4fvFKRa740WePZsvBuo9T4xTu66NwlU1zNSPB/rXqfpGygCdrzj9AUw=
+	t=1728517281; cv=none; b=AdTzgjLvTJdQ8iNgyo8c70Aujq99Lmu+1zBaQQH+5fKUgAkXE8eMMCAIpNFWpOCVC/tIpXVZaXovp/lZ/OZclZYx7r6PjhetYIGgD6tVYoI7YgWyU9Ja4JZmREyKkiKyITc92o/9VdktKYL/jKZ2CVIS5EhEMG30ZhL4xV3ZvsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728517023; c=relaxed/simple;
-	bh=wUG1D8/JF0SUTbWugDeCKFgHLZU5zyUNJg6GkytmOrI=;
+	s=arc-20240116; t=1728517281; c=relaxed/simple;
+	bh=CNesG7FGcoT/a+eEEk3+j8joxt3TDHqw+TPFTXvAMfE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hbm5V/rJ4e3GlAE6jxvz/Q4eoP228PCPK9jney1/SZ+pcLkzHi+GsBhSpCRIVJsz2nzx21+uI+OaqE/GkB+0nf7Ou2tK6AvDpeI556PhjtI1xXPenbnHW3RDy6cWyZL9+mkmLTkyOnrhg2XJPOWYKDlN7nGl7nsb99ApKtZklQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NZCJGcXH; arc=none smtp.client-ip=209.85.128.46
+	 To:Cc:Content-Type; b=l7I3B15mwPPj3zHQaRG3Lmw3I/3O6Ld8eTfH6NT2VXKzaU2DVdJxVF3NBEpA5WmZPkdc4CwELHi/3gusWFX/IEQQpKoYObM9dQd/Ai7E0qlDpwn5LzuIMr8UJl4dNjPQ5jHOOiEKEUcKq2mromF3Ez7wAAdGAPoBvs198yvS9pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V4dqNLTt; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42f6bec84b5so2720615e9.1;
-        Wed, 09 Oct 2024 16:37:00 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d49ffaba6so83170f8f.0;
+        Wed, 09 Oct 2024 16:41:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728517019; x=1729121819; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728517278; x=1729122078; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wUG1D8/JF0SUTbWugDeCKFgHLZU5zyUNJg6GkytmOrI=;
-        b=NZCJGcXH6c//taI9sHvZXJn0gXPnLjDw78cqE585NDxdSDsaC+wnle/nJUwgrKpGpp
-         A8ZUMRnR5zv79JiZKZwLXx2KksE1tUySmPHj4jdcbF+0WHpS1Jun9698NEGTJtnqoNAi
-         2gFedPgdacINzA5Stv8PYXp1LUb+X9Omupw01u/RgbRX/lAwygJBYbggIik+/ODHW4ru
-         r003dMYxOlHtGfEci0bKMf+hQFmIdydF42NvNKIrZztC9NliUklqfVhccGnhaX6NadPU
-         2Ut/nii0nKKAnYPK1NcRUb8x021HVQd/TXXFwOLXYAow+FxiqX45VyIMUCP5UCiuPLAv
-         W5OQ==
+        bh=NV6IS5DWa+7uSQHx5EG2LlvpJvo8gaGC4KIn0m9Kmxo=;
+        b=V4dqNLTtW8HpfotDI7NVv+Tt3xdixROiGYQIIiOPWmIbIgU6YdAQlF7NOR/LNmQua4
+         55/XUBjk9b9uPWm9HmhcQTHBQee066atDdHOPxumqdEGx5flWRGIggc9rg3oW94j6TF1
+         1eFRZ3E1KUZL1UDiwoo5eV+BEMp2Dz1sxaqFqjkJwBXjr1aW6MjBtb/KrbHQsp088zGO
+         cdzL3YKn3ytqv684kg/CkTlW6UNqaukRki0rbE0PwyBl0X4IZJ0RQXuBx32y7LtnPNFh
+         3tEJPGUgpuIwWYYIXgKQVByl1f3ShIPrA7qZVh8SmQxhC73yEZGBb/sOxyJUOdEad3Wh
+         evrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728517019; x=1729121819;
+        d=1e100.net; s=20230601; t=1728517278; x=1729122078;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wUG1D8/JF0SUTbWugDeCKFgHLZU5zyUNJg6GkytmOrI=;
-        b=bOz4ZUE3aFMwjXhFucSGXxIydIJXakWIxso5u1Ii1zxcZ7c/hUXGHaYiWhHKlzAB/X
-         Mq97BCkdbzMqCqC06ZRmgXIfimIXH+BCRLEwpzG/0SPcYkKvwVt4bvCPdPEtSSI9QAvr
-         s6wrXnM4Ksa5ZClqCUQfkLH0sZh0RyCXl8Ys/WD9Iir65d0RggV3dkDXH7VtmyBrpA4o
-         lu7Nzx90ZXYHf5X9WoVl91V+uPlDqBlnZ6gSdDqy7jxEe/CJaCeu7nxpopW6lDpsx/WO
-         XmEIIHg9fuOpaZD5PMveYPQu6eAt2poBR1D2CvXDGwIyVZI38vkRANYpUEB9ejYqFF4H
-         58pg==
-X-Forwarded-Encrypted: i=1; AJvYcCUOTKmIIHdE3jIpWOLzNU5wLcPvktrCIETS28ulL5rI6qbNr6MeF1zyi+esrXcdEWa+7SE=@vger.kernel.org, AJvYcCW/NAMelrKv4rAdzXhNnB3+/tg89Ozn9sbXvIih5szfKHQgHihdFbsNCOPXIO2exXKqnFUQGZe6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1zfQS2HKjmxs8BsCTBKBZkXapw43i3fujJS1ccl9kSxKg+8O0
-	m269aEIrdT9XctYk7MFkfrQkoawXmOY6sqqhj28OVcoB8Kb9Bgmz18KAw2FOK1qliCNvcSRXQkg
-	Xb04zTe2NP/AAoQPXaG7czMTHh1c=
-X-Google-Smtp-Source: AGHT+IHqIWbZVifNDlT8DeMkyoyAF2MOb7xZrxOqjs+EkXDp+KFRBCvU+99Fq2KqCJiCcJFUtHOkqVh4DlZLORfSf/g=
-X-Received: by 2002:a05:600c:3ac4:b0:426:602d:a246 with SMTP id
- 5b1f17b1804b1-430d7487f4fmr36662795e9.32.1728517018355; Wed, 09 Oct 2024
- 16:36:58 -0700 (PDT)
+        bh=NV6IS5DWa+7uSQHx5EG2LlvpJvo8gaGC4KIn0m9Kmxo=;
+        b=HPFnr5ALKcG46t20YMaW0pVvex9nBmtkWCqqtu9ibljWNM8YEvUYzhj9ZTdotVstNK
+         2uIf3wo4l7kjtak64FGGWnVs6XSkFF5FdU+B7e5EsHA8+bHTUlesSwIIdQUgPRyDZ7SH
+         qZARUB7GwXFTF37rvyAJEr81flXTFgJIE8OrfM6PPkFzw9DBOPmELWR5OCwJMV+KZwC7
+         2zr13Q0FuoGVkG8LX2vZN49bMygDryQF+OUHajmwqEyBiWB2sqDRLCbNJyeA3X5gvgBY
+         cl+xj1T06tXC1hpDnlaUgz8PVXTx0rNrHZCpOEOlLxgJBOThaAMzd7ctlHEWzOjZlsTM
+         1cFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvKdn3qMcS0sBPIs0OLXuOy+f6JIULa/feS0814WT2p3dS1Yio2avn2DPgbfL+61KH6sptI3pF@vger.kernel.org, AJvYcCW51Gxd6yAzgCJ/B2EWU5ahz0tPh6YU9ZB/LGM+Nh51BsHq6Xtxn1wlZqXnG2mP1CGufAtdYOVAO1Djnpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxy6O2PSM7iYqEi45uhgavmwPLuryMFJKxMNie7rs87mXJkO2Ot
+	8vOQcEEGubJcycPw+yLVD99BYtxdCawbpVk9hwuWmjHnRE8uNLIehmX6eEgPcmzXlA2FkRsZN9U
+	mu/nwVsv9R7u6hTVrquwgb7ttlm/VEg==
+X-Google-Smtp-Source: AGHT+IH6236Rx+1SLLug8rPn5iG8s8FC6z+M5OjhHc3ocP0zbDgQyxE3mAqgxQFxYRpaqgXhMKa30LvOxFCv6SzBgWY=
+X-Received: by 2002:adf:e78d:0:b0:37d:3280:203a with SMTP id
+ ffacd0b85a97d-37d47e93ccbmr1180232f8f.10.1728517277639; Wed, 09 Oct 2024
+ 16:41:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
- <20241008-fix-kfunc-btf-caching-for-modules-v1-2-dfefd9aa4318@redhat.com>
- <CAADnVQKM0Mw=VXp6mX2aZrHoUz1+EpVO5RDMq3FPm9scPkVZXw@mail.gmail.com> <87bjztsp2b.fsf@toke.dk>
-In-Reply-To: <87bjztsp2b.fsf@toke.dk>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 9 Oct 2024 16:36:47 -0700
-Message-ID: <CAADnVQKuw=HqtzRok5NyxMDLoe=AHQfwtBxpe9hs3G1HDRJmfA@mail.gmail.com>
-Subject: Re: [PATCH bpf 2/4] selftests/bpf: Consolidate kernel modules into
- common directory
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>, Simon Sundberg <simon.sundberg@kau.se>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
+References: <20241008112049.2279307-1-linyunsheng@huawei.com> <20241008112049.2279307-10-linyunsheng@huawei.com>
+In-Reply-To: <20241008112049.2279307-10-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 9 Oct 2024 16:40:40 -0700
+Message-ID: <CAKgT0Ue_mp1JB2XffSx-9siR4V6u3U_jEyy91BUqTS9C6TJ5mw@mail.gmail.com>
+Subject: Re: [PATCH net-next v20 09/14] net: rename skb_copy_to_page_nocache() helper
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, David Ahern <dsahern@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 9, 2024 at 12:39=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
+On Tue, Oct 8, 2024 at 4:27=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
 >
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+> Rename skb_copy_to_page_nocache() to skb_add_frag_nocache()
+> to avoid calling virt_to_page() as we are about to pass virtual
+> address directly.
 >
-> > On Tue, Oct 8, 2024 at 3:35=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen=
- <toke@redhat.com> wrote:
-> >>
-> >> The selftests build two kernel modules (bpf_testmod.ko and
-> >> bpf_test_no_cfi.ko) which use copy-pasted Makefile targets. This is a
-> >> bit messy, and doesn't scale so well when we add more modules, so let'=
-s
-> >> consolidate these rules into a single rule generated for each module
-> >> name, and move the module sources into a single directory.
-> >>
-> >> To avoid parallel builds of the different modules stepping on each
-> >> other's toes during the 'modpost' phase of the Kbuild 'make modules', =
-we
-> >> create a single target for all the defined modules, which contains the
-> >> recursive 'make' call into the modules directory. The Makefile in the
-> >> subdirectory building the modules is modified to also touch a
-> >> 'modules.built' file, which we can add as a dependency on the top-leve=
-l
-> >> selftests Makefile, thus ensuring that the modules are always rebuilt =
-if
-> >> any of the dependencies in the selftests change.
-> >
-> > Nice cleanup, but looks unrelated to the fix and hence
-> > not a bpf material.
-> > Why combine them?
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/net/sock.h | 9 +++------
+>  net/ipv4/tcp.c     | 7 +++----
+>  net/kcm/kcmsock.c  | 7 +++----
+>  3 files changed, 9 insertions(+), 14 deletions(-)
 >
-> Because the selftest adds two more kernel modules to the selftest build,
-> so we'd have to add two more directories with a single module in each
-> and copy-pasted Makefile rules. It seemed simpler to just refactor the
-> build of the two existing modules first, after which adding the two new
-> modules means just dropping two more source files into the modules
-> directory.
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index e282127092ab..e0b4e2daca5d 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2192,15 +2192,12 @@ static inline int skb_add_data_nocache(struct soc=
+k *sk, struct sk_buff *skb,
+>         return err;
+>  }
 >
-> I guess we could technically do the single-directory-per-module, and
-> then send this patch as a follow-up once bpf gets merged back into
-> bpf-next, but it seems a bit of a hassle, TBH. WDYT?
+> -static inline int skb_copy_to_page_nocache(struct sock *sk, struct iov_i=
+ter *from,
+> -                                          struct sk_buff *skb,
+> -                                          struct page *page,
+> -                                          int off, int copy)
+> +static inline int skb_add_frag_nocache(struct sock *sk, struct iov_iter =
+*from,
+> +                                      struct sk_buff *skb, char *va, int=
+ copy)
 
-The way it is right it's certainly not going into bpf tree.
-So if you don't want to split then the whole thing is bpf-next then.
+This is not adding a frag. It is copying to a frag. This naming is a
+hard no as there are functions that actually add frags to the skb and
+this is not what this is doing. It sounds like it should be some
+variant on skb_add_rx_frag and it isn't.
+
+Instead of "_add_" I would suggest you stick with "_copy_to_" as the
+action as the alternative would be confusing as it implies you are
+going to be adding this to frags yourself.
 
