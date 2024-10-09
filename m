@@ -1,264 +1,218 @@
-Return-Path: <netdev+bounces-133750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5FC996F10
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:01:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3D5D996F26
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 17:03:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80CB284CF1
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:01:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CA76B281FC
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:02:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3FC1A256B;
-	Wed,  9 Oct 2024 14:59:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EEF81AC8;
+	Wed,  9 Oct 2024 15:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ahjZLxT+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EXg5ONS+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3E61A0BDC
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 14:59:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F5C196D98;
+	Wed,  9 Oct 2024 15:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728485995; cv=none; b=gWH6s7yPaEpremHfUDgxdG2/lXYORS3MbGgbNJ16Tf5gq0QG8Xd72P0LclQhNzF18O9rxHQ0lr8KzXDCyXl8W/BKUMmc40Hn89XY2pm0kWOp6H19mvTadQy+VqedpW32HyLDXY6o6nb0ibRpojXwx9WVzPiaTp4rf5ClmQ/kl7k=
+	t=1728486173; cv=none; b=ODjpgtm98qM+B+ajF3zpqTEsNurLvsdLNn+bpaY3dWXQFkpYqaOnVkUb9O5K+kNTioJh9umhz8gAmD9L0PXD6lhN7jUDY+NLUqudpaYaToUR1X8obuOziY0Rdlpl/LVr7hiJexrQHaqhViVNWee2Wfi9D/tzxvMF2FkhYY88aZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728485995; c=relaxed/simple;
-	bh=qyjfsJwfA1UWxpCp+hU05yXxehld8pBC2ECh6pLqgn4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gNwMk9DslbS8enkZapK7svMTDNnpRG0S2JgLMkodfZe5OO4i6EUQFiiYxDGzacLoPRzGslGjNbV6UoW+iezdENoVWTj4aGsqWJGjxw/12ku9B5y5l3JDbvjHsm5tFYrnGXCfHBjQiKpbmWmPzHB3u8B09Ls09bU9M+TQev7mOUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ahjZLxT+; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <662873cb-a897-464e-bdb3-edf01363c3b2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728485989;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aRwvrKIiasFpos0WTtiMfaYbqIxZ/meilCsw6pjSXtI=;
-	b=ahjZLxT+zbUXkD8gLewZcfK3ubnjZg6WVBon0Ef06j+VLsiV6Np2uvl8YegvvRejtpljeD
-	GAbMk1Z4I4Uv3WtucAosoa8BFCRx/PLAhtE2Wdhz6SNLAFS7EGhf3w2pPFVJVmgkjUvAkS
-	ENruZci8GsjPwyW37h+VwLvOKbgXLAg=
-Date: Wed, 9 Oct 2024 15:59:44 +0100
+	s=arc-20240116; t=1728486173; c=relaxed/simple;
+	bh=Mk44DNlSMwHtbEg19mQvbg2/aNCmQ3rZ/LMVqCQ1yuU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BwtHph5v5vda8GuskdRY6Cg/dT54rcPfejDZIIfRxtmNiqVqvoG2KlWSAtwFXMAkZ8GiYf6uI1auiFDEHM2Hf1HM6awbN9VdJvxdp3SyPAbswHPdm+DyyIU4lMkjrWQI0paV5F+9VhVR3ij3JnUUWjIETowutjVaxVZw9Yo88gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EXg5ONS+; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2e0946f9a8eso4829102a91.1;
+        Wed, 09 Oct 2024 08:02:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728486171; x=1729090971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qaKS53yTMSxp8Q9ePLUQ+BVB9n7Us0sPrHA8rLSAqgw=;
+        b=EXg5ONS+DeD3G9jY+tiKFEAbvYy6AQPFeGyuvqf1vPPn2q/o7tRLyFGKS4fKwiaEW3
+         8ltfAcjPR7EVN2x3tLJEVyxD2PlqDKXRZDTOp9M45mA8V5YbRisMC/3kNBKGcTyvzfMZ
+         aw4/T/S/RWlzQgIVsUNvpzyt/cg/21NQsMHawJcHAjFDUP/ClO31Ov7T67HbNS+uCIdP
+         +0itdz6v38sGYfBOulLD7Kh4ue+zOgu+tirwAdcwCtZEsbl4wyBNLOtdqNfv9WY0jY28
+         fUOFpVXlAyJq9SKNVDjlo1G5b5Zq6+OG1FD/dwDI/VhFnVrOcM+LSb0d9rksvw8uMitQ
+         QI9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728486171; x=1729090971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qaKS53yTMSxp8Q9ePLUQ+BVB9n7Us0sPrHA8rLSAqgw=;
+        b=niMyBwvXSH3EdWRm+S7/ysusEra8RDlFT6JuzIRnWIhw1ecnavm9GHsYz3rzsnDanN
+         MTqJlNbPfxiI+BkZvfvMVsNxuxZhTUuB5WLd1Ca+F3QFoBOy4lNbq0MszmYEEB8J3t1n
+         TIZID1FYPFItax4OmeHyiPVkG0ZD/zhUjHNxn6rPSlt+xKuRzz7I1Jt6lgwPwTxmLCNX
+         iDzOu7HgxQOWTIF5BaB5TFGHfjlpG4ETHQzsv2fJpGxkp53qbXw6sviNmjGIaMwDwhKG
+         lbCawUmHWqzvDPcHvuR0cWF6II15btmwpCLdqWbrasko1DYb/7pb9vp4Y0Pk09PPtUKY
+         A8CA==
+X-Forwarded-Encrypted: i=1; AJvYcCUojJCCBgwZusE/65L+FyyWcsvNUH9EJeM39a+ZRUfO+bb+zmmUWFPa9EeaPPcR99wvJsOmUtTFCC0=@vger.kernel.org, AJvYcCVC/ExAQ9NE5vMglL16CWXqsVgJOABBgNb3IzsqSHStmQ713bOvhXlpQW2pOfx7aYeizkkAPvxR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLNbGAfs08VEQ9hPXHNNEVzyn7W1jwPpmzqoLc0lIhu3aUWqq2
+	dLcSjtuwiGst11fA03gH0SSacVW4Jkax6d2bBwz7q4wqViqJMfYMlHGUg25xCmIP5COlBD8T6n/
+	Ho/zGgUNu3Z9uhmO3Ctqv8S3LGCM=
+X-Google-Smtp-Source: AGHT+IFVFdWxe5akt6EZLNX/2yNuQeocWxGJr1YJen3l9LxlG0R8AHcZNtUGHY6e1V1bp6yreDU+mm1Mx70nAjtBHdU=
+X-Received: by 2002:a17:90a:c2c5:b0:2e2:a650:3070 with SMTP id
+ 98e67ed59e1d1-2e2a6503305mr3042587a91.4.1728486170882; Wed, 09 Oct 2024
+ 08:02:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 0/9] net-timestamp: bpf extension to equip
- applications transparently
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241008095109.99918-1-kerneljasonxing@gmail.com>
- <67057d89796b_1a41992944c@willemb.c.googlers.com.notmuch>
- <CAL+tcoBGQZWZr3PU4Chn1YiN8XO_2UXGOh3yxbvymvojH3r13g@mail.gmail.com>
- <CAL+tcoC48XCmc3G7Xpb_0=maD1Gi0OLkNbUp4ugwtj69ANPaAw@mail.gmail.com>
- <6b10ed31-c53f-4f99-9c23-e1ba34aa0905@linux.dev>
- <CAL+tcoBL22WsUbooOv6XXcGGugNyogiDhOpszGR_yj-pCdvCkA@mail.gmail.com>
- <CAL+tcoD47VfZJFPJcQOgPsQuGA=jPfKU2548fJp2NBH14gEoHA@mail.gmail.com>
- <9c5b405c-9b3d-4c1f-b278-303fe24c7926@linux.dev>
- <CAL+tcoDDmcPQVUMN-AoGFC4SsmRwdVN+q0MAu+gAWY92Xy_zEA@mail.gmail.com>
- <fd159d60-fe59-4bfa-b143-2432671681b5@linux.dev>
- <CAL+tcoCX4ayowenaT9pBTqGzKQ=pH9BdRPa=1QB2PiJ=+yFxSg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAL+tcoCX4ayowenaT9pBTqGzKQ=pH9BdRPa=1QB2PiJ=+yFxSg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-8-ap420073@gmail.com>
+ <CAHS8izO-7pPk7xyY4JdyaY4hZpd7zerbjhGanRvaTk+OOsvY0A@mail.gmail.com>
+ <CAMArcTU61G=fexf-RJDSW_sGp9dZCkJsJKC=yjg79RS9Ugjuxw@mail.gmail.com> <18255eaf-a2ce-4cd1-b47b-2482b6c42e08@davidwei.uk>
+In-Reply-To: <18255eaf-a2ce-4cd1-b47b-2482b6c42e08@davidwei.uk>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Thu, 10 Oct 2024 00:02:37 +0900
+Message-ID: <CAMArcTWsa3Z2Y4Kj-kNia7MsiosW74w56DvaoCQ=9eK5GwC0_w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 7/7] bnxt_en: add support for device memory tcp
+To: David Wei <dw@davidwei.uk>
+Cc: Mina Almasry <almasrymina@google.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org, 
+	linux-doc@vger.kernel.org, donald.hunter@gmail.com, corbet@lwn.net, 
+	michael.chan@broadcom.com, kory.maincent@bootlin.com, andrew@lunn.ch, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, paul.greenwalt@intel.com, rrameshbabu@nvidia.com, 
+	idosch@nvidia.com, asml.silence@gmail.com, kaiyuanz@google.com, 
+	willemb@google.com, aleksander.lobakin@intel.com, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/10/2024 15:35, Jason Xing wrote:
-> On Wed, Oct 9, 2024 at 9:58 PM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
->>
->> On 09/10/2024 14:47, Jason Xing wrote:
->>> On Wed, Oct 9, 2024 at 9:16 PM Vadim Fedorenko
->>> <vadim.fedorenko@linux.dev> wrote:
->>>>
->>>> On 09/10/2024 12:48, Jason Xing wrote:
->>>>> On Wed, Oct 9, 2024 at 7:12 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
->>>>>>
->>>>>> On Wed, Oct 9, 2024 at 5:28 PM Vadim Fedorenko
->>>>>> <vadim.fedorenko@linux.dev> wrote:
->>>>>>>
->>>>>>> On 09/10/2024 02:05, Jason Xing wrote:
->>>>>>>> On Wed, Oct 9, 2024 at 7:22 AM Jason Xing <kerneljasonxing@gmail.com> wrote:
->>>>>>>>>
->>>>>>>>> On Wed, Oct 9, 2024 at 2:44 AM Willem de Bruijn
->>>>>>>>> <willemdebruijn.kernel@gmail.com> wrote:
->>>>>>>>>>
->>>>>>>>>> Jason Xing wrote:
->>>>>>>>>>> From: Jason Xing <kernelxing@tencent.com>
->>>>>>>>>>>
->>>>>>>>>>> A few weeks ago, I planned to extend SO_TIMESTMAMPING feature by using
->>>>>>>>>>> tracepoint to print information (say, tstamp) so that we can
->>>>>>>>>>> transparently equip applications with this feature and require no
->>>>>>>>>>> modification in user side.
->>>>>>>>>>>
->>>>>>>>>>> Later, we discussed at netconf and agreed that we can use bpf for better
->>>>>>>>>>> extension, which is mainly suggested by John Fastabend and Willem de
->>>>>>>>>>> Bruijn. Many thanks here! So I post this series to see if we have a
->>>>>>>>>>> better solution to extend.
->>>>>>>>>>>
->>>>>>>>>>> This approach relies on existing SO_TIMESTAMPING feature, for tx path,
->>>>>>>>>>> users only needs to pass certain flags through bpf program to make sure
->>>>>>>>>>> the last skb from each sendmsg() has timestamp related controlled flag.
->>>>>>>>>>> For rx path, we have to use bpf_setsockopt() to set the sk->sk_tsflags
->>>>>>>>>>> and wait for the moment when recvmsg() is called.
->>>>>>>>>>
->>>>>>>>>> As you mention, overall I am very supportive of having a way to add
->>>>>>>>>> timestamping by adminstrators, without having to rebuild applications.
->>>>>>>>>> BPF hooks seem to be the right place for this.
->>>>>>>>>>
->>>>>>>>>> There is existing kprobe/kretprobe/kfunc support. Supporting
->>>>>>>>>> SO_TIMESTAMPING directly may be useful due to its targeted feature
->>>>>>>>>> set, and correlation between measurements for the same data in the
->>>>>>>>>> stream.
->>>>>>>>>>
->>>>>>>>>>> After this series, we could step by step implement more advanced
->>>>>>>>>>> functions/flags already in SO_TIMESTAMPING feature for bpf extension.
->>>>>>>>>>
->>>>>>>>>> My main implementation concern is where this API overlaps with the
->>>>>>>>>> existing user API, and how they might conflict. A few questions in the
->>>>>>>>>> patches.
->>>>>>>>>
->>>>>>>>> Agreed. That's also what I'm concerned about. So I decided to ask for
->>>>>>>>> related experts' help.
->>>>>>>>>
->>>>>>>>> How to deal with it without interfering with the existing apps in the
->>>>>>>>> right way is the key problem.
->>>>>>>>
->>>>>>>> What I try to implement is let the bpf program have the highest
->>>>>>>> precedence. It's similar to RTO min, see the commit as an example:
->>>>>>>>
->>>>>>>> commit f086edef71be7174a16c1ed67ac65a085cda28b1
->>>>>>>> Author: Kevin Yang <yyd@google.com>
->>>>>>>> Date:   Mon Jun 3 21:30:54 2024 +0000
->>>>>>>>
->>>>>>>>         tcp: add sysctl_tcp_rto_min_us
->>>>>>>>
->>>>>>>>         Adding a sysctl knob to allow user to specify a default
->>>>>>>>         rto_min at socket init time, other than using the hard
->>>>>>>>         coded 200ms default rto_min.
->>>>>>>>
->>>>>>>>         Note that the rto_min route option has the highest precedence
->>>>>>>>         for configuring this setting, followed by the TCP_BPF_RTO_MIN
->>>>>>>>         socket option, followed by the tcp_rto_min_us sysctl.
->>>>>>>>
->>>>>>>> It includes three cases, 1) route option, 2) bpf option, 3) sysctl.
->>>>>>>> The first priority can override others. It doesn't have a good
->>>>>>>> chance/point to restore the icsk_rto_min field if users want to
->>>>>>>> shutdown the bpf program because it is set in
->>>>>>>> bpf_sol_tcp_setsockopt().
->>>>>>>
->>>>>>> rto_min example is slightly different. With tcp_rto_min the doesn't
->>>>>>> expect any data to come back to user space while for timestamping the
->>>>>>> app may be confused directly by providing more data, or by not providing
->>>>>>> expected data. I believe some hint about requestor of the data is needed
->>>>>>> here. It will also help to solve the problem of populating sk_err_queue
->>>>>>> mentioned by Martin.
->>>>>>
->>>>>> Sorry, I don't fully get it. In this patch series, this bpf extension
->>>>>> feature will not rely on sk_err_queue any more to report tx timestamps
->>>>>> to userspace. Bpf program can do that printing.
->>>>>>
->>>>>> Do you mean that it could be wrong if one skb carries the tsflags that
->>>>>> are previously set due to the bpf program and then suddenly users
->>>>>> detach the program? It indeed will put a new/cloned skb into the error
->>>>>> queue. Interesting corner case. It seems I have to re-implement a
->>>>>> totally independent tsflags for bpf extension feature. Do you have a
->>>>>> better idea on this?
->>>>>
->>>>> I feel that if I could introduce bpf new flags like
->>>>> SOF_TIMESTAMPING_TX_ACK_BPF for the last skb based on this patch
->>>>> series, then it will not populate skb in sk_err_queue even users
->>>>> remove the bpf program all of sudden. With this kind of specific bpf
->>>>> flags, we can also avoid conflicting with the apps using
->>>>> SO_TIEMSTAMPING feature. Let me give it a shot unless a better
->>>>> solution shows up.
->>>>
->>>> It doesn't look great to have duplicate flags just to indicate that this
->>>> particular timestamp was asked by a bpf program, even though it looks
->>>
->>> Or introduce a new field in struct sock or struct sk_buff so that
->>> existing SOF_TIMESTAMPING_* can be reused.
->>
->> Well, I was thinking about this way. We can potentially add an array of
->> tsflags meaning the index of the array is the requestor. That will be
->> more flexible in terms of adding new requestor (like scheduler or
->> congestion control algo) if needed. But it comes with increased memory
->> usage on hot path which might be a blocker.
-> 
-> Is the following code snippet what you expect? But I wonder why not
-> just add a u32 field instead and then use each bit of it defined in
-> include/uapi/linux/net_tstamp.h?
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index b32f1424ecc5..4677f53da75a 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -445,6 +445,7 @@ struct sock {
->          u32                     sk_reserved_mem;
->          int                     sk_forward_alloc;
->          u32                     sk_tsflags;
-> +       u32                     new_tsflags[10];
->          __cacheline_group_end(sock_write_rxtx);
-> 
->          __cacheline_group_begin(sock_write_tx);
-> 
-> I could be missing something. Sorry. If possible, could you show me
-> some code snippets?
-> 
-> As for the new requestor, IIUC, do you want to add more tx timestamp
-> generating points in the future?
+On Tue, Oct 8, 2024 at 11:57=E2=80=AFAM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2024-10-04 03:34, Taehee Yoo wrote:
+> > On Fri, Oct 4, 2024 at 3:43=E2=80=AFAM Mina Almasry <almasrymina@google=
+.com> wrote:
+> >>> @@ -3608,9 +3629,11 @@ static void bnxt_free_rx_rings(struct bnxt *bp=
+)
+> >>>
+> >>>  static int bnxt_alloc_rx_page_pool(struct bnxt *bp,
+> >>>                                    struct bnxt_rx_ring_info *rxr,
+> >>> +                                  int queue_idx,
+> >>>                                    int numa_node)
+> >>>  {
+> >>>         struct page_pool_params pp =3D { 0 };
+> >>> +       struct netdev_rx_queue *rxq;
+> >>>
+> >>>         pp.pool_size =3D bp->rx_agg_ring_size;
+> >>>         if (BNXT_RX_PAGE_MODE(bp))
+> >>> @@ -3621,8 +3644,15 @@ static int bnxt_alloc_rx_page_pool(struct bnxt=
+ *bp,
+> >>>         pp.dev =3D &bp->pdev->dev;
+> >>>         pp.dma_dir =3D bp->rx_dir;
+> >>>         pp.max_len =3D PAGE_SIZE;
+> >>> -       pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+> >>> +       pp.order =3D 0;
+> >>> +
+> >>> +       rxq =3D __netif_get_rx_queue(bp->dev, queue_idx);
+> >>> +       if (rxq->mp_params.mp_priv)
+> >>> +               pp.flags =3D PP_FLAG_DMA_MAP | PP_FLAG_ALLOW_UNREADAB=
+LE_NETMEM;
+> >>
+> >> This is not the intended use of PP_FLAG_ALLOW_UNREADABLE_NETMEM.
+> >>
+> >> The driver should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when it's able
+> >> to handle unreadable netmem, it should not worry about whether
+> >> rxq->mp_params.mp_priv is set or not.
+> >>
+> >> You should set PP_FLAG_ALLOW_UNREADABLE_NETMEM when HDS is enabled.
+> >> Let core figure out if mp_params.mp_priv is enabled. All the driver
+> >> needs to report is whether it's configured to be able to handle
+> >> unreadable netmem (which practically means HDS is enabled).
+> >
+> > The reason why the branch exists here is the PP_FLAG_ALLOW_UNREADABLE_N=
+ETMEM
+> > flag can't be used with PP_FLAG_DMA_SYNC_DEV.
+> >
+> >  228         if (pool->slow.flags & PP_FLAG_DMA_SYNC_DEV) {
+> >  229                 /* In order to request DMA-sync-for-device the pag=
+e
+> >  230                  * needs to be mapped
+> >  231                  */
+> >  232                 if (!(pool->slow.flags & PP_FLAG_DMA_MAP))
+> >  233                         return -EINVAL;
+> >  234
+> >  235                 if (!pool->p.max_len)
+> >  236                         return -EINVAL;
+> >  237
+> >  238                 pool->dma_sync =3D true;                //here
+> >  239
+> >  240                 /* pool->p.offset has to be set according to the a=
+ddress
+> >  241                  * offset used by the DMA engine to start copying =
+rx data
+> >  242                  */
+> >  243         }
+> >
+> > If PP_FLAG_DMA_SYNC_DEV is set, page->dma_sync is set to true.
+> >
+> > 347 int mp_dmabuf_devmem_init(struct page_pool *pool)
+> > 348 {
+> > 349         struct net_devmem_dmabuf_binding *binding =3D pool->mp_priv=
+;
+> > 350
+> > 351         if (!binding)
+> > 352                 return -EINVAL;
+> > 353
+> > 354         if (!pool->dma_map)
+> > 355                 return -EOPNOTSUPP;
+> > 356
+> > 357         if (pool->dma_sync)                      //here
+> > 358                 return -EOPNOTSUPP;
+> > 359
+> > 360         if (pool->p.order !=3D 0)
+> > 361                 return -E2BIG;
+> > 362
+> > 363         net_devmem_dmabuf_binding_get(binding);
+> > 364         return 0;
+> > 365 }
+> >
+> > In the mp_dmabuf_devmem_init(), it fails when pool->dma_sync is true.
+>
+> This won't work for io_uring zero copy into user memory. We need all
+> PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV | PP_FLAG_ALLOW_UNREADABLE_NETMEM
+> set.
+>
+> I agree with Mina that the driver should not be poking at the mp_priv
+> fields. How about setting all the flags and then letting the mp->init()
+> figure it out? mp_dmabuf_devmem_init() is called within page_pool_init()
+> so as long as it resets dma_sync if set I don't see any issues.
+>
 
-It's more like this:
+Ah, I haven't thought the failure of PP_FLAG_DMA_SYNC_DEV
+for dmabuf may be wrong.
+IIUC this flag indicates sync between device and CPU.
+But device memory TCP is not related to sync between device and CPU.
+So, I think we need to remove this condition check code in the core.
+How do you think about it?
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index c58ca8dd561b..93f931dcc4cc 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -234,6 +234,14 @@ struct sock_common {
-  struct bpf_local_storage;
-  struct sk_filter;
-
-+enum {
-+       SOCKETOPT_TS_REQUESTOR = 0,
-+       CMSG_TS_REQUESTOR,
-+       BPFPROG_TS_REQUESTOR,
-+
-+       __MAX_TS_REQUESTOR,
-+};
-+
-  /**
-    *    struct sock - network layer representation of sockets
-    *    @__sk_common: shared layout with inet_timewait_sock
-@@ -444,7 +452,7 @@ struct sock {
-         socket_lock_t           sk_lock;
-         u32                     sk_reserved_mem;
-         int                     sk_forward_alloc;
--       u32                     sk_tsflags;
-+       u32                     sk_tsflags[__MAX_TS_REQUESTOR];
-         __cacheline_group_end(sock_write_rxtx);
-
-         __cacheline_group_begin(sock_write_tx);
-
-
-And use existing SOF_TIMESTAMPING_* for each element in the array. Not
-sure that struct sock is the best place though, as some timestamping
-requests may be on per-packet basis for protocols other than TCP.
-
-Again, I'm just thinking out loud, kinda wild idea.
-
+> >
+> > tcp-data-split can be used for normal cases, not only devmem TCP case.
+> > If we enable tcp-data-split and disable devmem TCP, page_pool doesn't
+> > have PP_FLAG_DMA_SYNC_DEV.
+> > So I think mp_params.mp_priv is still useful.
+> >
+> > Thanks a lot,
+> > Taehee Yoo
+> >
+> >>
+> >>
+> >> --
+> >> Thanks,
+> >> Mina
 
