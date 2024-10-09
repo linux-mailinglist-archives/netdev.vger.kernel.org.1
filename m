@@ -1,89 +1,122 @@
-Return-Path: <netdev+bounces-133706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930C5996BD5
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:28:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88251996BD7
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:29:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE9BC281D8F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:28:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DBA0B227B1
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3251990CF;
-	Wed,  9 Oct 2024 13:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55539196C86;
+	Wed,  9 Oct 2024 13:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hYrVwBK+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UQFVHPT4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A1571917E7
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C3C195390;
+	Wed,  9 Oct 2024 13:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728480514; cv=none; b=nX8Vm04VH2h5NUtxUElD5oKo4MNych7pCAjllfhWCf+xS2hbSaInUy1BtFFvChskZ/wyLaZLwyhZKcRJB3KMXmnwT44Z06XfJGcZiktVfqhTPLG/O1bS7qvYVJjQMWt14YYTF7n0Qog0u+uXQtTD1ISJVmh8ig0nph9mHtr5CzY=
+	t=1728480556; cv=none; b=O1Yp+LjX1WaU/0oMeRHYN02DcC7Axq5FLTYHN+15onXWmsNYQuZGlfk+Byp2hH6PO89qg+oZ1PQ2U4XiEJbPw3BFoOBYPvnHf0kzpewKE1rlBjK1s+FoFgP5235zpqsa/umq/GKx3Vc+mSH94TX20zwQw8oIBJNENIIyodkgbEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728480514; c=relaxed/simple;
-	bh=zuTNloecuz4Aml5QxqPlnKQzhdF4g8PBn34VarakOWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rJ0DvjohAX6fjaNm6H7l6s68tkUCUuEzXWVSmqoXYWyd7eHSuYmd60y4sq/bDChPwsGlXSXKpI8/UHAHFuBqu9vvEeeRXT5ZvD8AkFTUXr1ounha6uz7k8uUn+qX9UwHLRGdmdqfzE2xL+ckxLw9GkgJIH2BJl/6ko7t6wqO9V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hYrVwBK+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B8EDC4CECD;
-	Wed,  9 Oct 2024 13:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728480513;
-	bh=zuTNloecuz4Aml5QxqPlnKQzhdF4g8PBn34VarakOWQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hYrVwBK+gJ/X6Y/1CRmIB97c2pMua2YcJnRmouRexAroAbxHIvEeNRA2mha7vlehh
-	 +dZqQ3dko55SAn3imPf8QjIG4lW1Qbdwb7h4VFU3c+2w93o+3pn6OW6+r/r38W6fQk
-	 X0X1YWQ4L3iUU33eBesbRP00EXyUy21ZgfQsofnLbW0l0v9fCNzGIqNTRxc05RTXKn
-	 5yamYhFWxXmnNaHjvv9eAbum29sAP0oXOtdrDyBnVRa2mL37r+FeKsSzRs18Fk7YqT
-	 sxq3/Wza7f59OWtls0iXtWTr13KwxUV00u83ytMz4Jqen1lnJu6tMrLvbpAt8TwbJ/
-	 2s7WSaJ+XimUA==
-Date: Wed, 9 Oct 2024 14:28:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next v2] net: airoha: Fix EGRESS_RATE_METER_EN_MASK
- definition
-Message-ID: <20241009132828.GZ99782@kernel.org>
-References: <20241009-airoha-fixes-v2-1-18af63ec19bf@kernel.org>
+	s=arc-20240116; t=1728480556; c=relaxed/simple;
+	bh=1k5Z6P4xLrJ1uUuXsTql97RdplxvApmoHIaD0t5c50o=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=W+J8V68yHZlnWNssVL5BrCF4M+hglCxNdGNi4to2uxiwOog0X3vdUpHg76vceup+M7vef1EFyqkYtjKdv09FWsRa0AyLcQXXnSCcxV6HbWAfkqyuXUZJi5xVUlB8r4JFyMdFlPKPK0hSjQ/6eP0dURYbRuQykFTLQlz51lf+oq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UQFVHPT4; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-71e0cd1f3b6so2172347b3a.0;
+        Wed, 09 Oct 2024 06:29:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728480554; x=1729085354; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+BT2pvzVWlUY5HlQGpJ61u66kO+PlnsR6y06HdfcaLM=;
+        b=UQFVHPT4QkgXbUrTCrlcxgL2cSFpGivBH6oL0KdY1nx9ITIzK9+Nx0aW/hvWkZw9v/
+         OmUM8Efgr2K8eSUpAZVJPL3qlNoKsQ7c/MkdjwEa5lmwJV8uw3mQBXbvR3wOtmz7yPwk
+         6J6BHrYToSvfQg2+S5H/M17EcVdq8MbnyOD47/DHRXFyk1OZ9nxRP1wiKGglLo346IhC
+         W4KkFtWbs/ldOVDWbcR6FRHJ4qBXY6SPj8fGujqsDtkgvylXp+Da9UdVkohYJWeVbIqC
+         aR4givbwiVODDmtnR2THNdGvbopFCmFk6d5XwbA+vul3uHAShqcYdAPQI6YrigChvBad
+         YmHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728480554; x=1729085354;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+BT2pvzVWlUY5HlQGpJ61u66kO+PlnsR6y06HdfcaLM=;
+        b=BmfShfQJbnrdPVjIQjqVlcTofXcJKj3W9zPXwdu3cb7a9ypAf30f4aquiDcvtHeWDG
+         3sY8QVWZtO8PdJYVBgtTYPas0JrE8hI5j2HRtHYRogGgkBo7WbAuwxkOtx1EZ2GHg6s1
+         KIHnPiUYriWqPEOXFc2EIrXrlr6f3hjaaIeffj8NBHDjNGpH4k12HIZX8dnYlLq1ul0C
+         1bf2ALd7dCOkU+nK5oiFkaa9ySmW6eOHfC8Gjn1OcUb+Diwt7bPBFhi61JWJ1sjtpNTW
+         ZtdNmelGXa++6d1bcw49/UHoNOVSnC3w7aWQsA7GlVH7JQ/E7rvVOUvAf/Q6pBvLnTfF
+         9/Jw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP9RCKoeCq35DxuD4iqi5KCxEi6LqaZCzf/6pwJdL9BQOCN8e4cUM6r5TSdXx1WyNBdXaTk4FF4v+fQxk=@vger.kernel.org, AJvYcCWiw5w1bCHpEU3X/4eNPNtv8pTgbtvbZtMZNDvsgmeVvYnG1P/6e4MZayum9IbfRTME/kYf4KZuhbqyXywLB90=@vger.kernel.org, AJvYcCX0LC3vtHVHcl87wlnWtyyfziywiM3So7xwt2Qyfn5BnN7mZL/b0JIiZKTP3IwsPdX3KUoKTzQv@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQP9Fa1/xMWUD1HLcrexH/k2a5abWq9twkkRbqgc3c6B6RlfB9
+	X5nJPC4PDOPKXjoOXj4GYxwFCwHZVv7VKKQxEpcIK0ryBU8En0qx
+X-Google-Smtp-Source: AGHT+IFkO1nr0stApKsPfqd6wtGEH9NDp4F0QqRs2k+1iFAiYLwP9nloCRJk+2dFE7R1fTva8WXpKQ==
+X-Received: by 2002:a05:6a00:2ea9:b0:71d:fd28:709a with SMTP id d2e1a72fcca58-71e1dbc7bcamr4265810b3a.23.1728480554009;
+        Wed, 09 Oct 2024 06:29:14 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71df0d477d4sm7764244b3a.134.2024.10.09.06.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 09 Oct 2024 06:29:13 -0700 (PDT)
+Date: Wed, 09 Oct 2024 22:28:59 +0900 (JST)
+Message-Id: <20241009.222859.1405378592312581525.fujita.tomonori@gmail.com>
+To: aliceryhl@google.com
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/6] rust: time: add wrapper for fsleep
+ function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CAH5fLgjTifsDKrxZTUTo74HR34X1zusO_7h0ftWWH-iZR_NXNA@mail.gmail.com>
+References: <20241005122531.20298-1-fujita.tomonori@gmail.com>
+	<20241005122531.20298-5-fujita.tomonori@gmail.com>
+	<CAH5fLgjTifsDKrxZTUTo74HR34X1zusO_7h0ftWWH-iZR_NXNA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009-airoha-fixes-v2-1-18af63ec19bf@kernel.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 09, 2024 at 12:21:47AM +0200, Lorenzo Bianconi wrote:
-> Fix typo in EGRESS_RATE_METER_EN_MASK mask definition. This bus in not
-> introducing any user visible problem since, even if we are setting
-> EGRESS_RATE_METER_EN_MASK bit in REG_EGRESS_RATE_METER_CFG register,
-> egress QoS metering is not supported yet since we are missing some other
-> hw configurations (e.g token bucket rate, token bucket size).
+On Mon, 7 Oct 2024 14:24:03 +0200
+Alice Ryhl <aliceryhl@google.com> wrote:
+
+>> +/// Sleeps for a given duration.
+>> +///
+>> +/// Equivalent to the kernel's [`fsleep`], flexible sleep function,
+>> +/// which automatically chooses the best sleep method based on a duration.
+>> +///
+>> +/// `Delta` must be longer than one microsecond.
+>> +///
+>> +/// This function can only be used in a nonatomic context.
+>> +pub fn fsleep(delta: Delta) {
+>> +    // SAFETY: FFI call.
+>> +    unsafe { bindings::fsleep(delta.as_micros() as c_ulong) }
+>> +}
 > 
-> Introduced by commit 23020f049327 ("net: airoha: Introduce ethernet support
-> for EN7581 SoC")
-> 
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> ---
-> Changes in v2:
-> - improve commit log
-> - Link to v1: https://lore.kernel.org/r/20241004-airoha-fixes-v1-1-2b7a01efc727@kernel.org
+> This rounds down. Should this round it up to the nearest microsecond
+> instead? It's generally said that fsleep should sleep for at least the
+> provided duration, but that it may sleep for longer under some
+> circumstances. By rounding up, you preserve that guarantee.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I'll round up in the next version.
 
+> Also, the note about always sleeping for "at least" the duration may
+> be a good fit for the docs here as well.
+
+I see, will add it.
 
