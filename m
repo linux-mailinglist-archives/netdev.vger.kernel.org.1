@@ -1,158 +1,161 @@
-Return-Path: <netdev+bounces-133473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 296849960C6
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:25:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D7629960E3
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB58D287B87
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:25:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECEF028A4BE
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C6917BB06;
-	Wed,  9 Oct 2024 07:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6016E166307;
+	Wed,  9 Oct 2024 07:30:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qVQ8E+o7"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C860117E918
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7720315C144;
+	Wed,  9 Oct 2024 07:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728458727; cv=none; b=RpyoeBccoBuRjpcJg5fSausX7gZ1/L7nXZtqKuBjAElYum02Qt/JtXjGyR9Eil4zKikGcTXGZ16vtcIvLXYhIjwYsUNzql+vOgVzGw5eRbVmLp3HtsZGOzzkcl9fDbB/sMZiJ8EW61C05JepSZ/VTHax6gy0sr0mC/SYh9m1HVA=
+	t=1728459047; cv=none; b=Q7zfVj0TFWhvvURQg5fmjOeXe9niNcPdnJdK3u88DARiE7lKMi7ieV7Z+qVfGhwzscbLocAQM3IY/JPyvdH+J6IAfYNdv0Jzjh53ViGPfy//3D70CGMboiGAFQMeJINacQ7NCbvnDeAg5/5QPUangTexnYzrFFEkXhpF8Mj0Uhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728458727; c=relaxed/simple;
-	bh=Ty5eMVVvVY5MCaKiPLxYbiTFsrUClvu/JT4lPiqjxXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RvHeNmjXh2O7oOvFDRcY2XsKRBwa7Owl/uTdwi3qLdE+YzWQozYCm9WMkhIY1E7kgrAntj3TLwGyo/YhDFQItKKJIZBbqhDdTh5biHkjIH9y6TXVAr5vdHdK625f/5BKtyqP6e2h5S9M3C2was4BOZY5nuxWpQb5eldHbFcIK5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syR4J-0002qF-Ra; Wed, 09 Oct 2024 09:25:11 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syR4I-000YHt-V7; Wed, 09 Oct 2024 09:25:10 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1syR4I-0022uJ-2j;
-	Wed, 09 Oct 2024 09:25:10 +0200
-Date: Wed, 9 Oct 2024 09:25:10 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de
-Subject: Re: [PATCH net-next 12/12] net: pse-pd: tps23881: Add support for
- PSE events and interrupts
-Message-ID: <ZwYv1qunWpqhC9IH@pengutronix.de>
-References: <20241002-feature_poe_port_prio-v1-0-787054f74ed5@bootlin.com>
- <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
+	s=arc-20240116; t=1728459047; c=relaxed/simple;
+	bh=TyPX5RsfEu869eEFs5gjuF1hH+zRkucYDdNB+syyCO4=;
+	h=Message-ID:Subject:From:To:CC:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RX4ZmDQ/CJ1BkbPg5PluuGv1aZR7G1iK34F4aj8Rt55IHumZv12wQ5JcYHCEyVpRkbQO++KcaJVsv5RSUyY3thGzS8BbrVUt1tPN0YM6TLFvIC1xTwwKZFUcjgmCHMmGDurCFeccHwuB/lUAT1ZPdvzf+DiRV5UqB+S0Eo+Bcqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qVQ8E+o7; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1728459045; x=1759995045;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=TyPX5RsfEu869eEFs5gjuF1hH+zRkucYDdNB+syyCO4=;
+  b=qVQ8E+o7rEEZmcRaokE3ZmEGmf1wEwlYvHFM9Tkx9094sBRxMxQy1FCY
+   xGxUAJtDUqzIvetk4LD+ZWGLPUEoUtF0UuQXuiS5dABjwgLbcvZA0ybP4
+   nnp5ByLzF4SxIHUz3hlH+fd2H3zx32SgKyI1mnPAu5FT2yhq0e1VGwgfe
+   6Vvp11bNT97p49qCKUS9W+9sPAkei6o7UzPpBvE1Smel8hNCJdiyP76Gh
+   jvqDNIGOeRZGnQW1vep2qX7KWJKH8DbYO2uNffI/0TuTjDM3OIsr0QJj9
+   7055CONlmrpXK3BjeOxlQRdemdi0I8/mO+xaUH69Xp5fRRN6u66jJlcG4
+   g==;
+X-CSE-ConnectionGUID: qFEgkva4S1qo/8hhkxFAyg==
+X-CSE-MsgGUID: qVQ3upl8TUe5VnRoOX3tPQ==
+X-IronPort-AV: E=Sophos;i="6.11,189,1725346800"; 
+   d="scan'208";a="36104240"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Oct 2024 00:30:38 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 9 Oct 2024 00:29:58 -0700
+Received: from DEN-DL-M31857.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 9 Oct 2024 00:29:53 -0700
+Message-ID: <71fb65a929e5d5be86f95ab76591beb77e641c14.camel@microchip.com>
+Subject: Re: [PATCH v7 3/6] reset: mchp: sparx5: Map cpu-syscon locally in
+ case of LAN966x
+From: Steen Hegelund <steen.hegelund@microchip.com>
+To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
+	<geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, "Simon
+ Horman" <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
+	<arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+	<dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>,
+	Lars Povlsen <lars.povlsen@microchip.com>, Daniel Machon
+	<daniel.machon@microchip.com>, <UNGLinuxDriver@microchip.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Saravana Kannan <saravanak@google.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, "Andrew
+ Lunn" <andrew@lunn.ch>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, "Allan
+ Nielsen" <allan.nielsen@microchip.com>, Luca Ceresoli
+	<luca.ceresoli@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Date: Wed, 9 Oct 2024 09:29:52 +0200
+In-Reply-To: <20241003081647.642468-4-herve.codina@bootlin.com>
+References: <20241003081647.642468-1-herve.codina@bootlin.com>
+	 <20241003081647.642468-4-herve.codina@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241002-feature_poe_port_prio-v1-12-787054f74ed5@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Kory,
+SGkgSGVydmUsCgpPbiBUaHUsIDIwMjQtMTAtMDMgYXQgMTA6MTYgKzAyMDAsIEhlcnZlIENvZGlu
+YSB3cm90ZToKPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0
+YWNobWVudHMgdW5sZXNzIHlvdQo+IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQo+IAo+IEluIHRo
+ZSBMQU45NjZ4IFBDSSBkZXZpY2UgdXNlIGNhc2UsIHRoZSBzeXNjb24gQVBJIGNhbm5vdCBiZSB1
+c2VkIGFzCj4gaXQgZG9lcyBub3Qgc3VwcG9ydCBkZXZpY2UgcmVtb3ZhbCBbMV0uIEEgc3lzY29u
+IGRldmljZSBpcyBhIGNvcmUKPiAic3lzdGVtIiBkZXZpY2UgYW5kIG5vdCBhIGRldmljZSBhdmFp
+bGFibGUgaW4gc29tZSBhZGRvbiBib2FyZHMgYW5kCj4gc28sCj4gaXQgaXMgbm90IHN1cHBvc2Vk
+IHRvIGJlIHJlbW92ZWQuIFRoZSBzeXNjb24gQVBJIGZvbGxvd3MgdGhpcwo+IGFzc3VtcHRpb24K
+PiBidXQgdGhpcyBhc3N1bXB0aW9uIGlzIG5vIGxvbmdlciB2YWxpZCBpbiB0aGUgTEFOOTY2eCB1
+c2UgY2FzZS4KPiAKPiBJbiBvcmRlciB0byBhdm9pZCB0aGUgdXNlIG9mIHRoZSBzeXNjb24gQVBJ
+IGFuZCBzbywgc3VwcG9ydCBmb3IKPiByZW1vdmFsLAo+IHVzZSBhIGxvY2FsIG1hcHBpbmcgb2Yg
+dGhlIHN5c2NvbiBkZXZpY2UuCj4gCj4gTGluazoKPiBodHRwczovL2xvcmUua2VybmVsLm9yZy9h
+bGwvMjAyNDA5MjMxMDA3NDEuMTEyNzc0MzlAYm9vdGxpbi5jb20vwqBbMV0KPiBTaWduZWQtb2Zm
+LWJ5OiBIZXJ2ZSBDb2RpbmEgPGhlcnZlLmNvZGluYUBib290bGluLmNvbT4KPiAtLS0KPiDCoGRy
+aXZlcnMvcmVzZXQvcmVzZXQtbWljcm9jaGlwLXNwYXJ4NS5jIHwgMzUKPiArKysrKysrKysrKysr
+KysrKysrKysrKysrLQo+IMKgMSBmaWxlIGNoYW5nZWQsIDM0IGluc2VydGlvbnMoKyksIDEgZGVs
+ZXRpb24oLSkKPiAKPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9yZXNldC9yZXNldC1taWNyb2NoaXAt
+c3Bhcng1LmMKPiBiL2RyaXZlcnMvcmVzZXQvcmVzZXQtbWljcm9jaGlwLXNwYXJ4NS5jCj4gaW5k
+ZXggNjM2ZTg1YzM4OGIwLi40OGE2MmQ1ZGE3OGQgMTAwNjQ0Cj4gLS0tIGEvZHJpdmVycy9yZXNl
+dC9yZXNldC1taWNyb2NoaXAtc3Bhcng1LmMKPiArKysgYi9kcml2ZXJzL3Jlc2V0L3Jlc2V0LW1p
+Y3JvY2hpcC1zcGFyeDUuYwo+IEBAIC02Miw2ICs2MiwyOCBAQCBzdGF0aWMgY29uc3Qgc3RydWN0
+IHJlc2V0X2NvbnRyb2xfb3BzCj4gc3Bhcng1X3Jlc2V0X29wcyA9IHsKPiDCoMKgwqDCoMKgwqDC
+oCAucmVzZXQgPSBzcGFyeDVfcmVzZXRfbm9vcCwKPiDCoH07Cj4gCj4gK3N0YXRpYyBjb25zdCBz
+dHJ1Y3QgcmVnbWFwX2NvbmZpZyBtY2hwX2xhbjk2Nnhfc3lzY29uX3JlZ21hcF9jb25maWcKPiA9
+IHsKPiArwqDCoMKgwqDCoMKgIC5yZWdfYml0cyA9IDMyLAo+ICvCoMKgwqDCoMKgwqAgLnZhbF9i
+aXRzID0gMzIsCj4gK8KgwqDCoMKgwqDCoCAucmVnX3N0cmlkZSA9IDQsCj4gK307Cj4gKwo+ICtz
+dGF0aWMgc3RydWN0IHJlZ21hcCAqbWNocF9sYW45NjZ4X3N5c2Nvbl90b19yZWdtYXAoc3RydWN0
+IGRldmljZQo+ICpkZXYsCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgc3RydWN0Cj4gZGV2aWNlX25vZGUgKnN5c2Nvbl9ucCkKPiArewo+ICvCoMKgwqDCoMKg
+wqAgc3RydWN0IHJlZ21hcF9jb25maWcgcmVnbWFwX2NvbmZpZyA9Cj4gbWNocF9sYW45NjZ4X3N5
+c2Nvbl9yZWdtYXBfY29uZmlnOwo+ICvCoMKgwqDCoMKgwqAgcmVzb3VyY2Vfc2l6ZV90IHNpemU7
+Cj4gK8KgwqDCoMKgwqDCoCB2b2lkIF9faW9tZW0gKmJhc2U7Cj4gKwo+ICvCoMKgwqDCoMKgwqAg
+YmFzZSA9IGRldm1fb2ZfaW9tYXAoZGV2LCBzeXNjb25fbnAsIDAsICZzaXplKTsKPiArwqDCoMKg
+wqDCoMKgIGlmIChJU19FUlIoYmFzZSkpCj4gK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAg
+cmV0dXJuIEVSUl9DQVNUKGJhc2UpOwo+ICsKPiArwqDCoMKgwqDCoMKgIHJlZ21hcF9jb25maWcu
+bWF4X3JlZ2lzdGVyID0gc2l6ZSAtIDQ7Cj4gKwo+ICvCoMKgwqDCoMKgwqAgcmV0dXJuIGRldm1f
+cmVnbWFwX2luaXRfbW1pbyhkZXYsIGJhc2UsICZyZWdtYXBfY29uZmlnKTsKPiArfQo+ICsKPiDC
+oHN0YXRpYyBpbnQgbWNocF9zcGFyeDVfbWFwX3N5c2NvbihzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNl
+ICpwZGV2LCBjaGFyCj4gKm5hbWUsCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHN0cnVjdCByZWdtYXAgKip0YXJnZXQp
+Cj4gwqB7Cj4gQEAgLTcyLDcgKzk0LDE4IEBAIHN0YXRpYyBpbnQgbWNocF9zcGFyeDVfbWFwX3N5
+c2NvbihzdHJ1Y3QKPiBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYsIGNoYXIgKm5hbWUsCj4gwqDCoMKg
+wqDCoMKgwqAgc3lzY29uX25wID0gb2ZfcGFyc2VfcGhhbmRsZShwZGV2LT5kZXYub2Zfbm9kZSwg
+bmFtZSwgMCk7Cj4gwqDCoMKgwqDCoMKgwqAgaWYgKCFzeXNjb25fbnApCj4gwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgIHJldHVybiAtRU5PREVWOwo+IC3CoMKgwqDCoMKgwqAgcmVnbWFw
+ID0gc3lzY29uX25vZGVfdG9fcmVnbWFwKHN5c2Nvbl9ucCk7Cj4gKwo+ICvCoMKgwqDCoMKgwqAg
+LyoKPiArwqDCoMKgwqDCoMKgwqAgKiBUaGUgc3lzY29uIEFQSSBkb2Vzbid0IHN1cHBvcnQgc3lz
+Y29uIGRldmljZSByZW1vdmFsLgo+ICvCoMKgwqDCoMKgwqDCoCAqIFdoZW4gdXNlZCBpbiBMQU45
+NjZ4IFBDSSBkZXZpY2UsIHRoZSBjcHUtc3lzY29uIGRldmljZQo+IG5lZWRzIHRvIGJlCj4gK8Kg
+wqDCoMKgwqDCoMKgICogcmVtb3ZlZCB3aGVuIHRoZSBQQ0kgZGV2aWNlIGlzIHJlbW92ZWQuCj4g
+K8KgwqDCoMKgwqDCoMKgICogSW4gY2FzZSBvZiBMQU45NjZ4LCBtYXAgdGhlIHN5c2NvbiBkZXZp
+Y2UgbG9jYWxseSB0bwo+IHN1cHBvcnQgdGhlCj4gK8KgwqDCoMKgwqDCoMKgICogZGV2aWNlIHJl
+bW92YWwuCj4gK8KgwqDCoMKgwqDCoMKgICovCj4gK8KgwqDCoMKgwqDCoCBpZiAob2ZfZGV2aWNl
+X2lzX2NvbXBhdGlibGUocGRldi0+ZGV2Lm9mX25vZGUsCj4gIm1pY3JvY2hpcCxsYW45NjZ4LXN3
+aXRjaC1yZXNldCIpKQo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJlZ21hcCA9IG1j
+aHBfbGFuOTY2eF9zeXNjb25fdG9fcmVnbWFwKCZwZGV2LT5kZXYsCj4gc3lzY29uX25wKTsKPiAr
+wqDCoMKgwqDCoMKgIGVsc2UKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZWdtYXAg
+PSBzeXNjb25fbm9kZV90b19yZWdtYXAoc3lzY29uX25wKTsKPiDCoMKgwqDCoMKgwqDCoCBvZl9u
+b2RlX3B1dChzeXNjb25fbnApOwo+IMKgwqDCoMKgwqDCoMKgIGlmIChJU19FUlIocmVnbWFwKSkg
+ewo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBlcnIgPSBQVFJfRVJSKHJlZ21hcCk7
+Cj4gLS0KPiAyLjQ2LjEKPiAKClRoaXMgbG9va3MgZ29vZCB0byBtZS4KClJldmlld2VkLWJ5OiBT
+dGVlbiBIZWdlbHVuZCA8U3RlZW4uSGVnZWx1bmRAbWljcm9jaGlwLmNvbT4KCkJSClN0ZWVuCg==
 
-On Wed, Oct 02, 2024 at 06:28:08PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> 
-> Add support for PSE event reporting through interrupts. Set up the newly
-> introduced devm_pse_irq_helper helper to register the interrupt. Events are
-> reported for over-current and over-temperature conditions.
-> 
-> This patch also adds support for an OSS GPIO line to turn off all low
-> priority ports in case of an over-current event.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-
-...
-> +static int tps23881_irq_handler(int irq, struct pse_irq_data *pid,
-> +				unsigned long *dev_mask)
-> +{
-> +	struct tps23881_priv *priv = (struct tps23881_priv *)pid->data;
-> +	struct i2c_client *client = priv->client;
-> +	struct pse_err_state *stat;
-> +	int ret, i;
-> +	u16 val;
-> +
-> +	*dev_mask = 0;
-> +	for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-> +		stat = &pid->states[i];
-> +		stat->notifs = 0;
-> +		stat->errors = 0;
-> +	}
-> +
-> +	ret = i2c_smbus_read_word_data(client, TPS23881_REG_IT);
-> +	if (ret < 0)
-> +		return PSE_FAILED_RETRY;
-> +
-> +	val = (u16)ret;
-> +	if (val & TPS23881_REG_IT_SUPF) {
-> +		ret = i2c_smbus_read_word_data(client, TPS23881_REG_SUPF_EVENT);
-> +		if (ret < 0)
-> +			return PSE_FAILED_RETRY;
-> +
-> +		if (ret & TPS23881_REG_TSD) {
-> +			for (i = 0; i < TPS23881_MAX_CHANS; i++) {
-> +				stat = &pid->states[i];
-> +				*dev_mask |= 1 << i;
-> +				stat->notifs = PSE_EVENT_OVER_TEMP;
-> +				stat->errors = PSE_ERROR_OVER_TEMP;
-> +			}
-> +		}
-> +	}
-> +
-> +	if (val & (TPS23881_REG_IT_IFAULT | TPS23881_REG_IT_IFAULT << 8)) {
-> +		ret = i2c_smbus_read_word_data(client, TPS23881_REG_FAULT);
-> +		if (ret < 0)
-> +			return PSE_FAILED_RETRY;
-> +
-> +		val = (u16)(ret & 0xf0f);
-> +
-> +		/* Power cut detected, shutdown low priority port */
-> +		if (val && priv->oss)
-> +			tps23881_turn_off_low_prio(priv);
-
-Sorry, this is policy and even not the best one.
-The priority concept is related to the power budget, but this
-implementation will shutdown all low prios ports only if some
-port/channel has over-current event. It means, in case high prio port
-has over-current event, it will be not shut down.
- 
-I'll propose not to add prio support for this chip right now, it will
-need more software infrastructure to handle it nearly in similar way as
-it is done by pd692x0.
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
