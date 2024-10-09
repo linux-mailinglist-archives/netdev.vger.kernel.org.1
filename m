@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-133400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E221995CF5
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 03:30:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B0B0995CF8
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 03:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 566F3283C98
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:30:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88D921C21F2F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 01:30:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613512BB1B;
-	Wed,  9 Oct 2024 01:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903C344C81;
+	Wed,  9 Oct 2024 01:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8g/pILb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vo5WxWuw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383272B2D7;
-	Wed,  9 Oct 2024 01:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698F42BD1D;
+	Wed,  9 Oct 2024 01:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728437424; cv=none; b=Z/qOqVoO1fnGCtnHRB+jusfoVAqb6tcBuwaZUXL3jgRGseaQ+b3D4fFqUJIl9/BP8myb8eGb9nSuOGTQQsYfygVUvBBwGk6O+uKAhLm/Bh98AoE6w3OQLXNmGlT5p1Wqhc2VLqNPvSghwICuhfUwaVmXFMYu9M4/n+cm73DFBao=
+	t=1728437428; cv=none; b=lQxzw1FeHUgqEpqPCEJoGsi82RxBOopo/mwAPEFHWlQa3zzoP7iL1emuQBCIwTPQq/GHjzLi+OjQPKpTJG6BxFmadl8ZapMO1ADA4+kmt5O+KLeXney+4pjKhAfj7RBQHABAZleBGVxm5Fd7dO3pYB+lfsutr+r8OT0deDJzZO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728437424; c=relaxed/simple;
-	bh=10KLiDu7bPn2aGyoXScqazfu+mYTo3nfOXfqhE8rA40=;
+	s=arc-20240116; t=1728437428; c=relaxed/simple;
+	bh=5uEnH8iHglsG7BOdCeBkSt7yFyVK3YkW5mRi7pGjXFo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YZryqBiF3YMunieeLOZrlGE0iL6p6gJO8oho+MUkZsB0MqSpFcJnOQNpxjbQA6lfcrwaVovQymW4wmQQirqRAut+hUOadjsLqWTRpdoWwCV6/RYTXu71vzwH4DpYp1dEUm1dMGSuRZdyg8unR30iuAYf17uI67C3I0Dp5GXIeOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8g/pILb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C411AC4CEC7;
-	Wed,  9 Oct 2024 01:30:23 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=NMQvHKQ3JXX+iKAd5rU7IjyJipY8hShHvWoFq+kHFPLxvTb0dy2XyFvMj8lMEF1+jf6VYF3baZgC76kEIv/c9G5KkIBfpRbmsA+ch1xVQb3blq4B5fRPY0fMDkM7HQJ/t7o7ifnFxMtdN38nF5e1XmAUrJDp/5XOVXrIcV9JmdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vo5WxWuw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0470FC4CEC7;
+	Wed,  9 Oct 2024 01:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728437423;
-	bh=10KLiDu7bPn2aGyoXScqazfu+mYTo3nfOXfqhE8rA40=;
+	s=k20201202; t=1728437428;
+	bh=5uEnH8iHglsG7BOdCeBkSt7yFyVK3YkW5mRi7pGjXFo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t8g/pILbzfAHYULxVcTISvHwWGr/f+3FjQTxbLTVvBsTC9tS/+NHdcXdBNwguBMqV
-	 XqCXwoqFgzdztmpOK/LBowvDMMFovhMl0GRDrUghbQ/TDOsod3/IH2MykGXLRqTd2C
-	 jWqPa46X+Y5rGDjSFpQ1ci+rDtMj2tRHOYPePzW7dwh6xY79CkwgxebR7/uBBtQkIB
-	 +qWNJhXY6DJHAQgdPtdB+gpsKWOc9PzbuzaEGc1sR6/qgX8TJouflw20FBuy1Kg+Iu
-	 /JMPw8MkU4saauCC/gZVjFKHNRuv3n/QCGds/bBGvQLbcheEoYBpPL3FPzHmpPjY51
-	 /rt5YMjCuz2Sw==
+	b=Vo5WxWuw3rxqsr4Yd6CyFiOTGdyw7qlA+lY8ltZWfvqS1ccnbxKP1Tu/7IYI7hwBo
+	 7y3Edm0gEbG6xZkp3wpdKHOU/ncPJicpVFteWarfJSlwiq7/M+rKzybWXl/bh3vap6
+	 LAKypeeikbYHAnrzj3r7REsRaIL6NC0XuC6bvXSo/2UjANoaBEk3dB4FC108cD74VQ
+	 uMm9i6e1rLgnPNo4tJ4Ze8zNdYYAAAf0XVq4jpdx5QWwaB6BL5nFqV5slmn0sYoS+A
+	 fNFMSeIcNHQDcpXqv79GoAE4epvcjdCyBiFdssmF2JEv3XYExCJebU7iFC6p+B4x5a
+	 VMvEvXjcMzaLQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DDF3A8D14D;
-	Wed,  9 Oct 2024 01:30:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 726173A8D14D;
+	Wed,  9 Oct 2024 01:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ibm: emac: mal: fix wrong goto
+Subject: Re: [net-next,v2 0/3] net: phy: marvell-88q2xxx: Enable auto negotiation
+ for mv88q2110
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172843742800.746583.16131100397682063916.git-patchwork-notify@kernel.org>
-Date: Wed, 09 Oct 2024 01:30:28 +0000
-References: <20241007235711.5714-1-rosenp@gmail.com>
-In-Reply-To: <20241007235711.5714-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, jacob.e.keller@intel.com, horms@kernel.org,
- sd@queasysnail.net, chunkeey@gmail.com
+ <172843743198.746583.15521879309788420457.git-patchwork-notify@kernel.org>
+Date: Wed, 09 Oct 2024 01:30:31 +0000
+References: <20241005112412.544360-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20241005112412.544360-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ eichest@gmail.com, dima.fedrau@gmail.com, yoshihiro.shimoda.uh@renesas.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  7 Oct 2024 16:57:11 -0700 you wrote:
-> dcr_map is called in the previous if and therefore needs to be unmapped.
+On Sat,  5 Oct 2024 13:24:09 +0200 you wrote:
+> Hello,
 > 
-> Fixes: 1ff0fcfcb1a6 ("ibm_newemac: Fix new MAL feature handling")
+> This series enables auto negotiation for the mv88q2110 device.
+> Previously this feature have been disabled for mv88q2110, while enabled
+> for other devices supported by this driver.
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/ethernet/ibm/emac/mal.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> The initial driver implementation states this is due to the
+> configuration sequence provided by the vendor did not work. By comparing
+> the initialization sequence of other devices this driver supports and
+> the out-of-tree PHY driver for mv88q2110 found in the Renesas BSP [1] I
+> was able to figure out a working configuration.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] net: ibm: emac: mal: fix wrong goto
-    https://git.kernel.org/netdev/net/c/08c8acc9d8f3
+  - [net-next,v2,1/3] net: phy: marvell-88q2xxx: Align soft reset for mv88q2110 and mv88q2220
+    https://git.kernel.org/netdev/net-next/c/21185019aa9c
+  - [net-next,v2,2/3] net: phy: marvell-88q2xxx: Make register writer function generic
+    https://git.kernel.org/netdev/net-next/c/0e58c188711d
+  - [net-next,v2,3/3] net: phy: marvell-88q2xxx: Enable auto negotiation for mv88q2110
+    https://git.kernel.org/netdev/net-next/c/20c7722a7aa3
 
 You are awesome, thank you!
 -- 
