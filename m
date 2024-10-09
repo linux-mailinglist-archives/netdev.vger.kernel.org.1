@@ -1,288 +1,191 @@
-Return-Path: <netdev+bounces-133936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EDBF997820
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:01:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645D9997827
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8E41C226AC
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:01:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7962C1C22065
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 22:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566DB1E2833;
-	Wed,  9 Oct 2024 22:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE941E2833;
+	Wed,  9 Oct 2024 22:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hOaR3DH/"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="G9kM3YPp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BCF18CC1E
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 22:01:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF52C1C9B99
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 22:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728511300; cv=none; b=OScquatO9V51tij/Wyr46HR3W+8XdLCbUFE5w/znktlpuYXwdjuiAkpADIGF178pihi+dyzdh8M9Y6zMj2Z59O3btao1LMQ1o/LxpsbixOBBYGXyLaNIEWC4xXigdCQMLI3r0dNGJDU/VdqhH444+e7caYnN9Kz9P4FQmM2mGNc=
+	t=1728511377; cv=none; b=hGn4SCKrp/W86yvG1mPYXl2hp+QQ1UXTUPNsk2dFxPpRLxdnZb3m7n9GYrCDET2/xz8C3sYYpo51tOEjGYI4eYwnlnvYTq4UfxLNwtWi6gsngyqdqhAHJ48N0HbQtuC1pj3iQehGKy3vyZsFC4i54agYLgeav0r2L9X+eYakwNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728511300; c=relaxed/simple;
-	bh=6VgQ+Ix4mkwAGsg5/rBbNWdIIMMHaG75IKBpeDw62bo=;
+	s=arc-20240116; t=1728511377; c=relaxed/simple;
+	bh=uZxY76m36ydLtto+ybFprLgpvUQq3up5tcHkr6TI6eY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=csDzK/ZJwqwHGb0TaWtigY+/p6ZM/L+EXQ3YFs3nq5OGKwF2anAR9G44U8VU6ao1qRRo6eUpnN6J80szA+k9dLlAIZGpwLpyvvt4TAjOfOQAVNTrZHZ7Pb7+gbN1rt1Sz+Xi+9lEyU70Vyfjcz+Vsq8Q05c7n+XAHTEv5DiXkSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hOaR3DH/; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-460395fb1acso102511cf.0
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 15:01:38 -0700 (PDT)
+	 To:Cc:Content-Type; b=Bl0bA3sFa071R1wS2UiJdhfveyI1n3RVAAsZ+A5QxuZtRFJrL0UFEhu3Seq0l4b1Wuws2zkEfjbe0Kj8fNgMAr80w8r7i6DWtnUUm5JIn4VmENzXo5U9u666/IPHHYzAmCy1+REnWDX2nGCM5VLAJH0BHFLJx1yi8Y0ObGdN124=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=G9kM3YPp; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6e31413a196so3404497b3.3
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 15:02:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728511297; x=1729116097; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1728511375; x=1729116175; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2L0OrPLeMCuy71leQfpJlftgkEac9OpQkQixsKFM4js=;
-        b=hOaR3DH/Nt9zi+bP2tWiv7vRHmzTff8bMs6rnX+W8VCoaaAD6c/EO6uVk+979Oy7r2
-         c0BSdckwMgssib/5yx8zruoaIE7N6TILlfIRVGTbQkb1uS6lwxwRurS2TW/3D0JOMro5
-         AZT/5iIO+2wvyPl3/T0in7ny6zCpvwyNK9ivdFojdU9KIvTJj8weNDlsDqGs9ya8dWjg
-         tr99SUljkPnIzz8grZ5nA3EB1Bp9XXR9nIiCccofg2Y+Y+gN344nVu3URwTCDEWYbZa2
-         KUNpnhL04LS6MgVlLSdezBnojOg1Vdvt78fxOuwM1YC2ZLts6olNnDwrpA9yD4BhLWaH
-         GrQg==
+        bh=qALeGv0lrJMi11SU4W4SJLWzuz/xtDH2PNt93jl4Qu0=;
+        b=G9kM3YPp9bL6B52kT7rJeGOWinOt1yjMDHhQRztJguXcw0jHVefIgME54gtjrc5ye6
+         OA6b+ty0PnLoAQvOQmk4DzQqKI+jPadjfU8Jhb9YrCAtc9mX9gahlAN9nf0hW/PFlDzH
+         tFkXluKxDDm2ssCoiKUfUKMz1kFb6j5S6zBwviRsZQ1Cqi5B6E6s9B0F1YOSeKUZgHol
+         QRxiNjP5i2L4CA3NsiOuXSm3T4fDbNlL/tD1Q9GkclUbV2DyfOM+JPO/ikR1NqKUimK6
+         ggllE1I/v6dRZk8GFZFU6TOunreyTJEla7i3jTfU7cd9WqSUUN0K6UY8j25Za7Va9veB
+         Z6oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728511297; x=1729116097;
+        d=1e100.net; s=20230601; t=1728511375; x=1729116175;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2L0OrPLeMCuy71leQfpJlftgkEac9OpQkQixsKFM4js=;
-        b=cMyx0qMWz1gQuEryG9fCs4z7xbrtW22MBjkwKmuVK2lgmq29VqDIsRgL800TCMLpl0
-         nZt5glcVVgLkwEZjTNmRnzXpAF4DJHpTtlMaQVeS6FX/8mh/142DFvL6PrickEoJbHTp
-         C/AIER4KvBphHXeIM0IE+0IMvoiouPFp3QxKdOQFIZQrubeztgtaL+Xu6pjH9dee6SC2
-         f22BYQ8GszMOrljSVCeMHcuBvNEg5J3tWC9D/t+vPw1WvC7nIuEFWbvySf7sTxSzIBkm
-         oyaPufD/zx9RI7/NdSl58GFXCXNoFoOFC8sNEfpO5ubhCGSKhGl52B1sqzq6USdhxkQa
-         Kuhw==
-X-Forwarded-Encrypted: i=1; AJvYcCU4w5a6GSynLIxZeAfQ+TwqQQQu6I9cXudlzN2nJgvVuUyx61CX26ixxibtT83GQgJuQjfheBQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzylgPXq1d8gD228HdOK9uU8/PHgzS6hP1j7KNuL9m29qURlhEQ
-	Wzke4cNJ6cAlk8Ppyuld4X5Ggcq+FUW9s09U14279O3sz8raXi1cEe1Yxa4ZS74BRBid/EKd4I4
-	ViZO8njF2cvx6foAyrb7EYM0Xve+sjc53DLW0
-X-Google-Smtp-Source: AGHT+IENLoAUwl1/zRzEz6UE5JfyFPmukMRp8NUqhonCeKjuUk4Q5ugOwSeP3V4ufWoDVzhgAjVzcbosGCf6pxYqRu4=
-X-Received: by 2002:a05:622a:548a:b0:45e:f6e6:2165 with SMTP id
- d75a77b69052e-4604123cb52mr423201cf.7.1728511296683; Wed, 09 Oct 2024
- 15:01:36 -0700 (PDT)
+        bh=qALeGv0lrJMi11SU4W4SJLWzuz/xtDH2PNt93jl4Qu0=;
+        b=hX1bKiyZNRVFcF2yInkB84H4nMKgtMgarO38BBtsAjTlTWHuBH7NVI18a+L2fXHEaB
+         M8nSngBgnxpiKmHH2FnhRdNUzfLlq+LzW6tyWhvIk0WP3wIkJdflKs5tLllvZU1n0Tz4
+         k3jmOWk0waTXvR61jlpVEKHNwSBGdj5NZJTYHxIbm7kxBWzsMPtpUpJOG6cpqiXU2e7E
+         f7LnyMb6+8j8HZkKqJpa0ddPhuzr294qGU11UpnImnmxnjh8Mhj8oxkfSUdGWiYFBGHe
+         60FKMyU6/KtSrfNG1EK5HpjS/cdW3xbbAqFfAe4prmRgU/dan5o2bjeBl2sBvDE1KKOH
+         R/Bg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVxynHtVp8mvrDqPcbK24zpyDNZI/TgUyFA1CXaKQ1cuVMqK5R9QTiDX5HAZyRr63+RxjfjC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0a4VuR0+W3G/PUxbropR6wdNX6fMRvKtdviuXVXdb+79qU7C1
+	KN9skCwuMoiAK9tZ9EZ+EengJo72zLbwzoyQeXpah8VpyZkmCBGv+xHdI1Jxcy2crnfLtgHIMIX
+	3A0LJaOaYQQK6BnF1NbyUXVfehTHH1qUJ8dT9
+X-Google-Smtp-Source: AGHT+IG1hXmGzW6t4TPA1Xvx/ba3I0vLTALPaDTo/4Z8b9Pf7FLaaDUI4r/rqTzCQTCNGBbiARVnORqzWvm00b3PHNQ=
+X-Received: by 2002:a05:690c:5083:b0:6e3:3227:ec64 with SMTP id
+ 00721157ae682-6e33227eff0mr792437b3.35.1728511374654; Wed, 09 Oct 2024
+ 15:02:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-12-dw@davidwei.uk>
-In-Reply-To: <20241007221603.1703699-12-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 9 Oct 2024 15:01:21 -0700
-Message-ID: <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com>
-Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
- memory provider
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20241009203218.26329-1-richard@nod.at>
+In-Reply-To: <20241009203218.26329-1-richard@nod.at>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 9 Oct 2024 18:02:44 -0400
+Message-ID: <CAHC9VhSbAM3iWxhO+rgJ0d0qOtrSouw0McrjstuP5xQw3=A35Q@mail.gmail.com>
+Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
+To: Richard Weinberger <richard@nod.at>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, 
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net, 
+	kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, 
+	upstream+net@sigma-star.at, audit@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+On Wed, Oct 9, 2024 at 4:33=E2=80=AFPM Richard Weinberger <richard@nod.at> =
+wrote:
 >
-> From: Pavel Begunkov <asml.silence@gmail.com>
+> When recording audit events for new outgoing connections,
+> it is helpful to log the user info of the associated socket,
+> if available.
+> Therefore, check if the skb has a socket, and if it does,
+> log the owning fsuid/fsgid.
 >
-> Implement a page pool memory provider for io_uring to receieve in a
-> zero copy fashion. For that, the provider allocates user pages wrapped
-> around into struct net_iovs, that are stored in a previously registered
-> struct net_iov_area.
->
-> Unlike with traditional receives, for which pages from a page pool can
-> be deallocated right after the user receives data, e.g. via recv(2),
-> we extend the lifetime by recycling buffers only after the user space
-> acknowledges that it's done processing the data via the refill queue.
-> Before handing buffers to the user, we mark them by bumping the refcount
-> by a bias value IO_ZC_RX_UREF, which will be checked when the buffer is
-> returned back. When the corresponding io_uring instance and/or page pool
-> are destroyed, we'll force back all buffers that are currently in the
-> user space in ->io_pp_zc_scrub by clearing the bias.
->
-
-This is an interesting design choice. In my experience the page_pool
-works the opposite way, i.e. all the netmems in it are kept alive
-until the user is done with them. Deviating from that requires custom
-behavior (->scrub), which may be fine, but why do this? Isn't it
-better for uapi perspective to keep the memory alive until the user is
-done with it?
-
-> Refcounting and lifetime:
->
-> Initially, all buffers are considered unallocated and stored in
-> ->freelist, at which point they are not yet directly exposed to the core
-> page pool code and not accounted to page pool's pages_state_hold_cnt.
-> The ->alloc_netmems callback will allocate them by placing into the
-> page pool's cache, setting the refcount to 1 as usual and adjusting
-> pages_state_hold_cnt.
->
-> Then, either the buffer is dropped and returns back to the page pool
-> into the ->freelist via io_pp_zc_release_netmem, in which case the page
-> pool will match hold_cnt for us with ->pages_state_release_cnt. Or more
-> likely the buffer will go through the network/protocol stacks and end up
-> in the corresponding socket's receive queue. From there the user can get
-> it via an new io_uring request implemented in following patches. As
-> mentioned above, before giving a buffer to the user we bump the refcount
-> by IO_ZC_RX_UREF.
->
-> Once the user is done with the buffer processing, it must return it back
-> via the refill queue, from where our ->alloc_netmems implementation can
-> grab it, check references, put IO_ZC_RX_UREF, and recycle the buffer if
-> there are no more users left. As we place such buffers right back into
-> the page pools fast cache and they didn't go through the normal pp
-> release path, they are still considered "allocated" and no pp hold_cnt
-> is required.
-
-Why is this needed? In general the provider is to allocate free memory
-and logic as to where the memory should go (to fast cache, to normal
-pp release path, etc) should remain in provider agnostic code paths in
-the page_pool. Not maintainable IMO in the long run to have individual
-pp providers customizing non-provider specific code or touching pp
-private structs.
-
-> For the same reason we dma sync buffers for the device
-> in io_zc_add_pp_cache().
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+> Signed-off-by: Richard Weinberger <richard@nod.at>
 > ---
->  include/linux/io_uring/net.h |   5 +
->  io_uring/zcrx.c              | 229 +++++++++++++++++++++++++++++++++++
->  io_uring/zcrx.h              |   6 +
->  3 files changed, 240 insertions(+)
+>  net/netfilter/xt_AUDIT.c | 27 +++++++++++++++++++++++++--
+>  1 file changed, 25 insertions(+), 2 deletions(-)
 >
-> diff --git a/include/linux/io_uring/net.h b/include/linux/io_uring/net.h
-> index b58f39fed4d5..610b35b451fd 100644
-> --- a/include/linux/io_uring/net.h
-> +++ b/include/linux/io_uring/net.h
-> @@ -5,6 +5,11 @@
->  struct io_uring_cmd;
+> diff --git a/net/netfilter/xt_AUDIT.c b/net/netfilter/xt_AUDIT.c
+> index b6a015aee0cec..d88b5442beaa6 100644
+> --- a/net/netfilter/xt_AUDIT.c
+> +++ b/net/netfilter/xt_AUDIT.c
+> @@ -9,16 +9,19 @@
+>  #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 >
->  #if defined(CONFIG_IO_URING)
-> +
-> +#if defined(CONFIG_PAGE_POOL)
-> +extern const struct memory_provider_ops io_uring_pp_zc_ops;
-> +#endif
-> +
->  int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags=
-);
+>  #include <linux/audit.h>
+> +#include <linux/cred.h>
+> +#include <linux/file.h>
+> +#include <linux/if_arp.h>
+>  #include <linux/module.h>
+>  #include <linux/skbuff.h>
+>  #include <linux/tcp.h>
+>  #include <linux/udp.h>
+> -#include <linux/if_arp.h>
+>  #include <linux/netfilter/x_tables.h>
+>  #include <linux/netfilter/xt_AUDIT.h>
+>  #include <linux/netfilter_bridge/ebtables.h>
+> -#include <net/ipv6.h>
+>  #include <net/ip.h>
+> +#include <net/ipv6.h>
+> +#include <net/sock.h>
 >
->  #else
-> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> index 8382129402ac..6cd3dee8b90a 100644
-> --- a/io_uring/zcrx.c
-> +++ b/io_uring/zcrx.c
-> @@ -2,7 +2,11 @@
->  #include <linux/kernel.h>
->  #include <linux/errno.h>
->  #include <linux/mm.h>
-> +#include <linux/nospec.h>
-> +#include <linux/netdevice.h>
->  #include <linux/io_uring.h>
-> +#include <net/page_pool/helpers.h>
-> +#include <trace/events/page_pool.h>
->
->  #include <uapi/linux/io_uring.h>
->
-> @@ -16,6 +20,13 @@
->
->  #if defined(CONFIG_PAGE_POOL) && defined(CONFIG_INET)
->
-> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_=
-iov *niov)
-> +{
-> +       struct net_iov_area *owner =3D net_iov_owner(niov);
-> +
-> +       return container_of(owner, struct io_zcrx_area, nia);
-
-Similar to other comment in the other patch, why are we sure this
-doesn't return garbage (i.e. it's accidentally called on a dmabuf
-net_iov?)
-
-> +}
-> +
->  static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
->                                  struct io_uring_zcrx_ifq_reg *reg)
+>  MODULE_LICENSE("GPL");
+>  MODULE_AUTHOR("Thomas Graf <tgraf@redhat.com>");
+> @@ -66,7 +69,9 @@ static bool audit_ip6(struct audit_buffer *ab, struct s=
+k_buff *skb)
+>  static unsigned int
+>  audit_tg(struct sk_buff *skb, const struct xt_action_param *par)
 >  {
-> @@ -101,6 +112,9 @@ static int io_zcrx_create_area(struct io_ring_ctx *ct=
-x,
->                 goto err;
+> +       struct sock *sk =3D skb->sk;
+>         struct audit_buffer *ab;
+> +       bool got_uidgid =3D false;
+>         int fam =3D -1;
 >
->         for (i =3D 0; i < nr_pages; i++) {
-> +               struct net_iov *niov =3D &area->nia.niovs[i];
-> +
-> +               niov->owner =3D &area->nia;
->                 area->freelist[i] =3D i;
->         }
+>         if (audit_enabled =3D=3D AUDIT_OFF)
+> @@ -99,6 +104,24 @@ audit_tg(struct sk_buff *skb, const struct xt_action_=
+param *par)
+>         if (fam =3D=3D -1)
+>                 audit_log_format(ab, " saddr=3D? daddr=3D? proto=3D-1");
 >
-> @@ -233,4 +247,219 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
->         lockdep_assert_held(&ctx->uring_lock);
->  }
->
-> +static bool io_zcrx_niov_put(struct net_iov *niov, int nr)
-> +{
-> +       return atomic_long_sub_and_test(nr, &niov->pp_ref_count);
-> +}
+> +       if (sk && sk_fullsock(sk)) {
+> +               read_lock_bh(&sk->sk_callback_lock);
+> +               if (sk->sk_socket && sk->sk_socket->file) {
+> +                       const struct file *file =3D sk->sk_socket->file;
+> +                       const struct cred *cred =3D file->f_cred;
 > +
-> +static bool io_zcrx_put_niov_uref(struct net_iov *niov)
-> +{
-> +       if (atomic_long_read(&niov->pp_ref_count) < IO_ZC_RX_UREF)
-> +               return false;
-> +
-> +       return io_zcrx_niov_put(niov, IO_ZC_RX_UREF);
-> +}
-> +
-> +static inline void io_zc_add_pp_cache(struct page_pool *pp,
-> +                                     struct net_iov *niov)
-> +{
-> +       netmem_ref netmem =3D net_iov_to_netmem(niov);
-> +
-> +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
-> +       if (pp->dma_sync && dma_dev_need_sync(pp->p.dev)) {
+> +                       audit_log_format(ab, " uid=3D%u gid=3D%u",
+> +                                        from_kuid(&init_user_ns, cred->f=
+suid),
+> +                                        from_kgid(&init_user_ns, cred->f=
+sgid));
 
-IIRC we force that dma_sync =3D=3D true for memory providers, unless you
-changed that and I missed it.
+[CC'ing the audit and LSM lists for obvious reasons]
 
-> +               dma_addr_t dma_addr =3D page_pool_get_dma_addr_netmem(net=
-mem);
-> +
-> +               dma_sync_single_range_for_device(pp->p.dev, dma_addr,
-> +                                                pp->p.offset, pp->p.max_=
-len,
-> +                                                pp->p.dma_dir);
+If we're logging the subjective credentials of the skb's associated
+socket, we really should also log the socket's LSM secctx similar to
+what we do with audit_log_task() and audit_log_task_context().
+Unfortunately, I don't believe we currently have a LSM interface that
+return the secctx from a sock/socket, although we do have
+security_inode_getsecctx() which *should* yield the same result using
+SOCK_INODE(sk->sk_socket).
+
+I should also mention that I'm currently reviewing a patchset which is
+going to add proper support for multiple LSMs in audit which will
+likely impact this work.
+
+https://lore.kernel.org/linux-security-module/20241009173222.12219-1-casey@=
+schaufler-ca.com/
+
+> +                       got_uidgid =3D true;
+> +               }
+> +               read_unlock_bh(&sk->sk_callback_lock);
 > +       }
-> +#endif
 > +
-> +       page_pool_fragment_netmem(netmem, 1);
-> +       pp->alloc.cache[pp->alloc.count++] =3D netmem;
+> +       if (!got_uidgid)
+> +               audit_log_format(ab, " uid=3D? gid=3D?");
+> +
+>         audit_log_end(ab);
+>
+>  errout:
+> --
+> 2.35.3
 
-IMO touching pp internals in a provider should not be acceptable.
-
-pp->alloc.cache is a data structure private to the page_pool and
-should not be touched at all by any specific memory provider. Not
-maintainable in the long run tbh for individual pp providers to mess
-with pp private structs and we hunt for bugs that are reproducible
-with 1 pp provider or another, or have to deal with the mental strain
-of provider specific handling in what is supposed to be generic
-page_pool paths.
-
-IMO the provider must implement the 4 'ops' (alloc, free, init,
-destroy) and must not touch pp privates while doing so. If you need to
-change how pp recycling works then it needs to be done in a provider
-agnostic way.
-
-I think both the dmabuf provider and Jakub's huge page provider both
-implemented the ops while never touching pp internals. I wonder if we
-can follow this lead.
-
---
-Thanks,
-Mina
+--=20
+paul-moore.com
 
