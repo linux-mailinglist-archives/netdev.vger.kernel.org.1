@@ -1,125 +1,116 @@
-Return-Path: <netdev+bounces-133949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6B899978F7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:16:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0A99978FC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 547C61F23484
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:16:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24025B22160
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 23:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02CC17B4FE;
-	Wed,  9 Oct 2024 23:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D45B18E348;
+	Wed,  9 Oct 2024 23:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGl7Onth"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="fD9LflgD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009B8149C4F;
-	Wed,  9 Oct 2024 23:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A68E1885BE
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 23:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728515764; cv=none; b=OU0IP777DFVO6n12y4v8+y/V+c4g+KR5xDio+G6FVZIQVEccft1Dp8h5l3aHjwExfp6ZGNJshX6kgVU/qXDEg/1hGS/dQHxWvasKw6z2K+++GY7Tobxzyp5MQHy243VKeiYl8BTFZwdplPv6IqIQmFnNkkd/Bo+dEGIHAO36xqw=
+	t=1728515829; cv=none; b=AZ1SVHAsqv4Euskj8bt81CaZJka3sGdzBarzA+6ma2uzIAoVX4B8C9XBjzoR18y962uBp81gBRr+H0Il4+x2w2Hqenn49BiUHWWMQZVtBIvUs2Qy2RTiTzgk5Qp1QYyDIyrFReapjgXuofL/xL2B1lHbwN7jazw8bQnyR20qg6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728515764; c=relaxed/simple;
-	bh=vTqGZCEk/zBnFttORfT4upYwuKwwziq6Bi6LEe9RMPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VNa9dbpmOGwUSTlZTSRf1VYsdRzAu1U9vw5HEhfiReiWdNFm6BMN6Qrm4Mn5DWp6L9P8qMqOQquqT/ny0BY4/q/k9XjlMpWD9BokQA+5a/JQOumfeniv0m9oTzlFVwMRpMbiqg0lYoKxyKhzyXdFoY11/u7iP8dWFCMmlcVkY84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iGl7Onth; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43056d99a5aso8940675e9.0;
-        Wed, 09 Oct 2024 16:16:02 -0700 (PDT)
+	s=arc-20240116; t=1728515829; c=relaxed/simple;
+	bh=7ROBpVyC5MGXISD10PZotpFpiZ8WmAZkEGCFCV8QNhs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WXhKxJ0L4UUFLzY3Hcl7P0Vo4zhchH7qyzy179ofMjKE0LHkkxTQAVM1szNG8R5gWDkuUVGsnPWBRpsCaH/xjYKfBgIhqHOhLu/VMZvVAAyN3o4o5KidO7t0XrYQeaEeohYhJWXU5Zbx/VJAXy4Llh9WLeR5aSfzc1HhRwCA75U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=fD9LflgD; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728515761; x=1729120561; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=httgxAgVR5a8WQxl6ZZFyi5BU8XXltONSneJVMDwTRw=;
-        b=iGl7Onthz1Rf2nHaflejDIJgccZxhUtLKjoMmMHrNurvYMYDnAQkojRPX87a5LZfo6
-         yJ2c9cvPksOQblK3bgNJXogQIUuvfzs1q5XPaO1HucHsTDoZPBOVFdcg5mZ0uRCPwpI7
-         lLHN85DJ8Pi4gyxLUAi6R/vpazVq9RLi1JZoEPa6snB13DaBqwWXo+WOUMESazRQRN44
-         WS+5yomlXxEr4I4ECm2TdVb9rJVsjNpuJHyBtFCLE7cMy7aieTkxrU6GgRI+frZ84NWC
-         eJ0ST9t2BwfXA+FxnlbhAwkqrMHs2Gp4/VAk9YKi/kuaxfvxa0FrhG6Jzokw8sR2W1n2
-         6FWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728515761; x=1729120561;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=httgxAgVR5a8WQxl6ZZFyi5BU8XXltONSneJVMDwTRw=;
-        b=mSZxin+OUoJDpk3UTdodwhuE0dbSqv1UwYpOQyZgxoG4TUjK5PZVuED+EPfN7NKp1+
-         hWU6pnHhKDHiwvPi8+x1sWgUVqviy4e7m8dPniD34L/vP51HPfEcAa0ST9UDXESzvQlX
-         EtWpPRniuSno2i23589XO84KRU7pmH3gu4DshwKrgiLvLTz94J31YtmLdO0TJQJDC89X
-         5FSj2Bq6jlv+QXTC9q/yxISHEQlnHyuzN2hxxhtu7RMrd1g46t70NaovmdiA83eiXlLK
-         lWTr5jqPk64Yd4v/GBwDcSXlgDZ6DRvqW9JjL3HukNwfsP01Y4+8xvUms9FdDMvfTtsO
-         dgQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYehoX5y87334gf6DPV9XsXItlZS0SeqrNc3Vl+aXjv2QCOAFSSHxH1XL6ld1LgITM66WD4gQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlDVWRnFNfEb+oprxkkgc0SzRqE7vSVGmbhiThaxiCKFv7gOSr
-	ncIFbcXJEUME10gttlWlIYbI+q1tWvxhHuWoSIbpygkMlQob31TV
-X-Google-Smtp-Source: AGHT+IE6GvfmxDSCj3qW/WZsSVLBtqw4g4R372xGsqAo0mPvbnOVjbuscCtQj/xUV14myhmw+xcITw==
-X-Received: by 2002:a05:600c:4fc8:b0:430:56de:d0ae with SMTP id 5b1f17b1804b1-43115acf9f3mr8529315e9.15.1728515760822;
-        Wed, 09 Oct 2024 16:16:00 -0700 (PDT)
-Received: from [192.168.42.9] ([148.252.140.94])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430c7e653absm33031125e9.0.2024.10.09.16.15.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Oct 2024 16:16:00 -0700 (PDT)
-Message-ID: <ed21bca5-5087-4eff-814c-39180078a700@gmail.com>
-Date: Thu, 10 Oct 2024 00:16:34 +0100
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1728515827; x=1760051827;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wiEsbY5l9e0o6XrG8w+/SfftEgiS1Na8YrAsfTHoAEc=;
+  b=fD9LflgD+ajSSbc581nucA5ASyt20BW+vxpg+Cl5J6XRGH9fwJHn6Pz0
+   2NjiQWvLKVNkN6SDIEI9iYa9t0cPV5t3tIZ2TfiVdf3yOAv0YNRMO2ShK
+   43UxgiW8SYjpfria7krzu7RpJTU6WHn30tTR9PW1tkoIYX3TEqTshM2w2
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.11,191,1725321600"; 
+   d="scan'208";a="686428985"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 23:17:04 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:55371]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.108:2525] with esmtp (Farcaster)
+ id 2868d795-306a-4573-90b5-187cc3ec0633; Wed, 9 Oct 2024 23:17:03 +0000 (UTC)
+X-Farcaster-Flow-ID: 2868d795-306a-4573-90b5-187cc3ec0633
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 9 Oct 2024 23:17:03 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 9 Oct 2024 23:17:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 00/13] rtnetlink: Refactor rtnl_{new,del,set}link() for per-netns RTNL.
+Date: Wed, 9 Oct 2024 16:16:43 -0700
+Message-ID: <20241009231656.57830-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 01/15] net: devmem: pull struct definitions out of
- ifdef
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <20241007221603.1703699-2-dw@davidwei.uk>
- <CAHS8izMHmG8-Go6k63UaCtwvEcp=D73Ja0XfrTjNp_b5TUmUFA@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izMHmG8-Go6k63UaCtwvEcp=D73Ja0XfrTjNp_b5TUmUFA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 10/9/24 21:17, Mina Almasry wrote:
-> On Mon, Oct 7, 2024 at 3:16 PM David Wei <dw@davidwei.uk> wrote:
->>
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> Don't hide structure definitions under conditional compilation, it only
->> makes messier and harder to maintain. Move struct
->> dmabuf_genpool_chunk_owner definition out of CONFIG_NET_DEVMEM ifdef
->> together with a bunch of trivial inlined helpers using the structure.
->>
-> 
-> To be honest I think the way it is is better? Having the struct
-> defined but always not set (because the code to set it is always
-> compiled out) seem worse to me.
-> 
-> Is there a strong reason to have this? Otherwise maybe drop this?
-I can drop it if there are strong opinions on that, but I'm
-allergic to ifdef hell and just trying to help to avoid it becoming
-so. I even believe it's considered a bad pattern (is it?).
+This is a prep for the next series where we will push RTNL down to
+rtnl_{new,del,set}link().
 
-As for a more technical description "why", it reduces the line count
-and you don't need to duplicate functions. It's always annoying
-making sure the prototypes stay same, but this way it's always
-compiled and syntactically checked. And when refactoring anything
-like the next patch does, you only need to change one function
-but not both. Do you find that convincing?
+That means, for example, __rtnl_newlink() is always under RTNL, but
+rtnl_newlink() has a non-RTNL section.
+
+As a prerequisite for per-netns RTNL, we will move netns validation
+(and RTNL-independent validations if possible) to that section.
+
+rtnl_link_ops and rtnl_af_ops will be protected with SRCU not to
+depend on RTNL.
+
+
+Kuniyuki Iwashima (13):
+  rtnetlink: Allocate linkinfo[] as struct rtnl_newlink_tbs.
+  rtnetlink: Call validate_linkmsg() in do_setlink().
+  rtnetlink: Factorise do_setlink() path from __rtnl_newlink().
+  rtnetlink: Move simple validation from __rtnl_newlink() to
+    rtnl_newlink().
+  rtnetlink: Move rtnl_link_ops_get() and retry to rtnl_newlink().
+  rtnetlink: Move ops->validate to rtnl_newlink().
+  rtnetlink: Protect struct rtnl_link_ops with SRCU.
+  rtnetlink: Call rtnl_link_get_net_capable() in rtnl_newlink().
+  rtnetlink: Fetch IFLA_LINK_NETNSID in rtnl_newlink().
+  rtnetlink: Clean up rtnl_dellink().
+  rtnetlink: Clean up rtnl_setlink().
+  rtnetlink: Call rtnl_link_get_net_capable() in do_setlink().
+  rtnetlink: Protect struct rtnl_af_ops with SRCU.
+
+ include/net/rtnetlink.h |  10 +-
+ net/core/rtnetlink.c    | 552 ++++++++++++++++++++++------------------
+ 2 files changed, 310 insertions(+), 252 deletions(-)
 
 -- 
-Pavel Begunkov
+2.39.5 (Apple Git-154)
+
 
