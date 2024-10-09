@@ -1,121 +1,205 @@
-Return-Path: <netdev+bounces-133860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 980BE9974CD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:22:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 866589974DB
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 20:24:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C952C1C220D3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:22:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E973281488
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 18:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F981A704B;
-	Wed,  9 Oct 2024 18:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EE41A704B;
+	Wed,  9 Oct 2024 18:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NWc2ukM7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAcNpSW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 914F8381C4
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0191A2567
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 18:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728498120; cv=none; b=mfe+vBtBtN0/qYwMIQHBDALBnNWPxhnodomjWvKCDmyHA9FKtUBPqnGT5Cb5iFbJSkul/TD6i5Zxa9+aYX6I1RSy2RnlzesEqPYHEkYwwDEBXh36s/l39cSj+PkmnGCCEnhAY5ye1NdEGqXwEB8ZlLl2zd2f7hREuw6Kw9RJRMU=
+	t=1728498243; cv=none; b=QHNr4fLQ/jh/36JM0mcZoJo04sjXY4FNpDX5RDysV4jlNqdlV7oeFNcjVDBnM8zLKzyj9qe2v+rACl8kNoM/p92Bd3n8RjQCpbZlNJJkxHVQ4YO3Wv3f2c5+I78zV138q9a8uWnzI6PjTKlrvnXR8LXkgydG9GY5Lpx1p8FWdm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728498120; c=relaxed/simple;
-	bh=Wzi6909bV+ins5nx9GS/3svfICDAPk1DZjX3E7zbJ3g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qm8+5bj5JTBux/3wQFGEk9sTYgJaZG54Luo5T9YsaJqugVl30vK1NxOU3HMV5VtRhOM5SZU1ff0Okmp5QZecgxsAHfMKIdlhd0s7KbF0TF/YZXkMijg1jYjcmY1ohLrCCK1shGkIby+J4pUARO93KAhodxVhGjjVVAIXgBTmj3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NWc2ukM7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D562AC4CEC3;
-	Wed,  9 Oct 2024 18:21:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728498120;
-	bh=Wzi6909bV+ins5nx9GS/3svfICDAPk1DZjX3E7zbJ3g=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NWc2ukM7mZxNkZzAbYi3jiXUj90OZ/5jZaI8PmiD+cdgFmO3fMYCqe0j5zjtWCwVz
-	 suaLfgDwODzQXvYXoDXv+OWxVz4e+fmh3ccopXrTzsuAzE+stPX5uSsQFvs62SQ76p
-	 lcpWTBCKadW7sVxLoq0+U4kqJzBuHjWS1g6BSKU8nudb5SaF3ghRrPo8R7TAJDRO2f
-	 mCJDIv3qe1gJvdxTy0SmG3okttQngLtBH/KHbOSYiJ1bTKAxJdUD7dWAdXYvc7OSqJ
-	 G2aE6GOuRhhQQo2crOKHLdxdo1FOE26uPf6aGK/E3nbiAFFjRQvE8ZvAl6mZzxwxNz
-	 0lhowRaAW1qjA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: stephen@networkplumber.org
-Cc: dsahern@gmail.com,
-	netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH iproute2] ip: netconf: fix overzealous error checking
-Date: Wed,  9 Oct 2024 11:21:54 -0700
-Message-ID: <20241009182154.1784675-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728498243; c=relaxed/simple;
+	bh=Du7MxFnc9fJ5x2sDF7g7GL1lRTPGEzwbKzesjT+w9II=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OZuftsIBawlIBUC/3orfDcHwPgnBIMQ5cGBSRSODyOpQZVNyKQP9WRYi4WoGx86QA6RHLiXtGM8BafFqFEOuKqXVOCEXUMxbG7DKkkitgIHO1U7o5cp0wZzZPIUHs6WoD/vbJ/SnATDAHHqZJFRbykKwVGcd9TXXqQznntIsPZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAcNpSW/; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4603d3e0547so39191cf.0
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 11:24:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728498240; x=1729103040; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=64u/Sszni0jrQotY6FrX9smK68t82YpAAEZc7XF+L40=;
+        b=JAcNpSW/mGDNdhEnCyHChv7IX/+zKD1+q9p5iGRjX+4hPlWRm0q6kD2K6YmowHrxfL
+         hrdti+HO21fCIK02Bcmm2kr1CHyHS+Dg/a7yFdZvq6kJoyL+DgoQ67ZpB7114FmcqJI5
+         X2mSWOPh66yX8OaCEVqzcJ8vDXqDMqGmxXkHt3bqcnVIlODGTyvB/9Wyb6zPrix9CmYF
+         L2eNZeOUJt8xYYxcTDyRdDTfDfzZm6lNy3c1PYgqwvV21Y39w5+BO1CYwy/HwYHEyow2
+         sAvmM084CA1vsflKD9rXMCJ5VUsQoJ+efZZbVFDGkHLfqQlp+wO/9jrXcpe9MGFgrBW7
+         P4bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728498240; x=1729103040;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=64u/Sszni0jrQotY6FrX9smK68t82YpAAEZc7XF+L40=;
+        b=V0bMcCYDscIFC2M5sD3Th8X4fMLmhd7yqnOp3cHSa+mbsi/J+RZdF3ZSCmTmvjmmbd
+         b2THWN0URWlCVmfuscVQXnEKtqIjd5Vgs8DtRowLWUqOMQ6UP1e+UAGSa8GSL/HTyGHI
+         F+RUIk9W282wHguUTKThcG6iL4AkFM1sNDbApYFyKt0LT7a9O4uklUThYB8+LtyfFBF4
+         4BqO5XonJLItziZt0aY2/si5lgSzAcQtCTabn3cML2TDsXnlMbTZONxa8TBrZL4GIgUa
+         8jllsdKLfdEICGjWekb9IOe5XDxE87sR9pfrKuU+XLpB4PNEwqkIFTctFkpbjoswFWlG
+         nSpw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+gJE7Z29MkTMKOSeqlzyCWiKzRlVJloEFzOKxLNsu80/2gYok8PtBRdAv0CsaznCg1aHcnU0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDTJbkzuC2YIqa7mw+Hw6e7+i9DIq1bgEnBKEfCyLOG9gmUL1J
+	TTNoOUvmp/QE4O5qw0qiMS/G3zxSDMfqU0JqyJ914+r6ObKv/Wu7Zi2KqBNmfZHl85HZONYvLJW
+	kUfaYtAIQHAPKYKAZBF6MDwM9NcjKmaK9TqBp
+X-Google-Smtp-Source: AGHT+IExOfgiX94Y6FfFhkG7aRNZJVVTQbGwSdN5NB5R+9DGjQCq2MSHP/m0f0GW7YXBGfnlZ3Ewy5oToJJyOacJ4r8=
+X-Received: by 2002:a05:622a:5497:b0:447:dbac:facd with SMTP id
+ d75a77b69052e-46040469e85mr180651cf.24.1728498239982; Wed, 09 Oct 2024
+ 11:23:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <bdaaef9d-4364-4171-b82b-bcfc12e207eb@candelatech.com>
+ <20241001193606.GA10530@breakpoint.cc> <CAJuCfpGyPNBQ=MTMeXzNZJcoiqok+zuW-3Ti0tFS7drhMFq1iQ@mail.gmail.com>
+ <20241007112904.GA27104@breakpoint.cc> <CAJuCfpEDKkiXm1ye=gs3ohLDJM7gqQc0WwS=6egddbsZ1qRF9A@mail.gmail.com>
+ <64e4009e-3a02-a139-4f82-f120f395e369@candelatech.com>
+In-Reply-To: <64e4009e-3a02-a139-4f82-f120f395e369@candelatech.com>
+From: Suren Baghdasaryan <surenb@google.com>
+Date: Wed, 9 Oct 2024 11:23:47 -0700
+Message-ID: <CAJuCfpH_g2ousOyUe19hwUpTGsQZa=w8sK9TCvU-aUsNKDdJTw@mail.gmail.com>
+Subject: Re: nf-nat-core: allocated memory at module unload.
+To: Ben Greear <greearb@candelatech.com>
+Cc: Florian Westphal <fw@strlen.de>, netdev <netdev@vger.kernel.org>, kent.overstreet@linux.dev, 
+	pablo@netfilter.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The rtnetlink.sh kernel test started reporting errors after
-iproute2 update. The error checking introduced by commit
-under fixes is incorrect. rtnl_listen() always returns
-an error, because the only way to break the loop is to
-return an error from the handler, it seems.
+On Wed, Oct 9, 2024 at 11:20=E2=80=AFAM Ben Greear <greearb@candelatech.com=
+> wrote:
+>
+> On 10/7/24 08:10, Suren Baghdasaryan wrote:
+> > On Mon, Oct 7, 2024 at 4:29=E2=80=AFAM Florian Westphal <fw@strlen.de> =
+wrote:
+> >>
+> >> Suren Baghdasaryan <surenb@google.com> wrote:
+> >>> On Tue, Oct 1, 2024 at 12:36=E2=80=AFPM Florian Westphal <fw@strlen.d=
+e> wrote:
+> >>>>
+> >>>> Ben Greear <greearb@candelatech.com> wrote:
+> >>>>
+> >>>> [ CCing codetag folks ]
+> >>>
+> >>> Thanks! I've been on vacation and just saw this report.
+> >>>
+> >>>>
+> >>>>> Hello,
+> >>>>>
+> >>>>> I see this splat in 6.11.0 (plus a single patch to fix vrf xmit dea=
+dlock).
+> >>>>>
+> >>>>> Is this a known issue?  Is it a serious problem?
+> >>>>
+> >>>> Not known to me.  Looks like an mm (rcu)+codetag problem.
+> >>>>
+> >>>>> ------------[ cut here ]------------
+> >>>>> net/netfilter/nf_nat_core.c:1114 module nf_nat func:nf_nat_register=
+_fn has 256 allocated at module unload
+> >>>>> WARNING: CPU: 1 PID: 10421 at lib/alloc_tag.c:168 alloc_tag_module_=
+unload+0x22b/0x3f0
+> >>>>> Modules linked in: nf_nat(-) btrfs ufs qnx4 hfsplus hfs minix vfat =
+msdos fat
+> >>>> ...
+> >>>>> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/0=
+4/2020
+> >>>>> RIP: 0010:alloc_tag_module_unload+0x22b/0x3f0
+> >>>>>   codetag_unload_module+0x19b/0x2a0
+> >>>>>   ? codetag_load_module+0x80/0x80
+> >>>>>   ? up_write+0x4f0/0x4f0
+> >>>>
+> >>>> "Well, yes, but actually no."
+> >>>>
+> >>>> At this time, kfree_rcu() has been called on all 4 objects.
+> >>>>
+> >>>> Looks like kfree_rcu no longer cares even about rcu_barrier(), and
+> >>>> there is no kvfree_rcu_barrier() in 6.11.
+> >>>>
+> >>>> The warning goes away when I replace kfree_rcu with call_rcu+kfree
+> >>>> plus rcu_barrier in module exit path.
+> >>>>
+> >>>> But I don't think its the right thing to do.
+>
+> Hello,
+>
+> Is this approach just ugly, or plain wrong?
 
-Switch this code to using normal rtnl_talk(), instead of
-the rtnl_listen() abuse. As far as I can tell the use of
-rtnl_listen() was to make get and dump use common handling
-but that's no longer the case, anyway.
+I think the approach is correct.
 
-Before:
-  $ ip -6 netconf show dev lo
-  inet6 lo forwarding off mc_forwarding off proxy_neigh off ignore_routes_with_linkdown off
-  $ echo $?
-  2
+>
+> kvfree_rcu_barrier does not existing in 6.10 kernel.
 
-After:
-  $ ./ip/ip -6 netconf show dev lo
-inet6 lo forwarding off mc_forwarding off proxy_neigh off ignore_routes_with_linkdown off
-  $ echo $?
-  0
+Yeah, I'll try backporting kvfree_rcu_barrier() to 6.10 and 6.11 for
+this change.
 
-Fixes: 00e8a64dac3b ("ip: detect errors in netconf monitor mode")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-We're also missing opening a JSON object here, but I'll send
-that fix separately, to -next?
----
- ip/ipnetconf.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/ip/ipnetconf.c b/ip/ipnetconf.c
-index 77147eb69097..cf27e7e30a5a 100644
---- a/ip/ipnetconf.c
-+++ b/ip/ipnetconf.c
-@@ -187,16 +187,16 @@ static int do_show(int argc, char **argv)
- 	ll_init_map(&rth);
- 
- 	if (filter.ifindex && filter.family != AF_UNSPEC) {
-+		struct nlmsghdr *answer;
-+
- 		req.ncm.ncm_family = filter.family;
- 		addattr_l(&req.n, sizeof(req), NETCONFA_IFINDEX,
- 			  &filter.ifindex, sizeof(filter.ifindex));
- 
--		if (rtnl_send(&rth, &req.n, req.n.nlmsg_len) < 0) {
--			perror("Can not send request");
--			exit(1);
--		}
--		if (rtnl_listen(&rth, print_netconf, stdout) < 0)
-+		if (rtnl_talk(&rth, &req.n, &answer) < 0)
- 			exit(2);
-+
-+		print_netconf2(answer, stdout);
- 	} else {
- 		rth.flags = RTNL_HANDLE_F_SUPPRESS_NLERR;
- dump:
--- 
-2.46.2
-
+>
+> Thanks,
+> Ben
+>
+> >>>>
+> >>>> (referring to nf_nat_unregister_fn(), kfree_rcu(priv, rcu_head);).
+> >>>>
+> >>>> Reproducer:
+> >>>> unshare -n iptables-nft -t nat -A PREROUTING -p tcp
+> >>>> grep nf_nat /proc/allocinfo # will list 4 allocations
+> >>>> rmmod nft_chain_nat
+> >>>> rmmod nf_nat                # will WARN.
+> >>>>
+> >>>> Without rmmod, the 4 allocations go away after a few seconds,
+> >>>> grep will no longer list them and then rmmod won't splat.
+> >>>
+> >>> I see. So, the kfree_rcu() was already called but freeing did not
+> >>> happen yet, in the meantime we are unloading the module.
+> >>
+> >> Yes.
+> >>
+> >>> We could add
+> >>> a synchronize_rcu() at the beginning of codetag_unload_module() so
+> >>> that all pending kfree_rcu()s complete before we check codetag
+> >>> counters:
+> >>>
+> >>> bool codetag_unload_module(struct module *mod)
+> >>> {
+> >>>          struct codetag_type *cttype;
+> >>>          bool unload_ok =3D true;
+> >>>
+> >>>          if (!mod)
+> >>>                  return true;
+> >>>
+> >>> +      synchronize_rcu();
+> >>>          mutex_lock(&codetag_lock);
+> >>
+> >> This doesn't help as kfree_rcu doesn't wait for this.
+> >>
+> >> Use of kvfree_rcu_barrier() instead does work though.
+> >
+> > I see. That sounds like an acceptable fix. Please post it and I'll ack =
+it.
+> > Thanks!
+> >
+> --
+> Ben Greear <greearb@candelatech.com>
+> Candela Technologies Inc  http://www.candelatech.com
+>
+>
 
