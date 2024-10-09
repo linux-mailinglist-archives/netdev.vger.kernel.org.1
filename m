@@ -1,235 +1,233 @@
-Return-Path: <netdev+bounces-133709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9E1A996C16
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:33:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7283996C38
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 15:35:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46E53B27352
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:33:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69AB51F235AF
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 13:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74762196C86;
-	Wed,  9 Oct 2024 13:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F9791991AF;
+	Wed,  9 Oct 2024 13:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M94rIV8+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3neOl0y"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E938F192583
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 13:33:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD05190462;
+	Wed,  9 Oct 2024 13:34:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728480804; cv=none; b=oV3h5Dm0UCf9mUfda70KVvxwWEFze77QsVVU5UOI6HyP9Kb9x21yHtwgNOo/XXRnECcb7TeBcQqeOT/swSouvqJr+dkQyA3tb+XtAFPpLWhmZjipOaiBq/GGkwFY+t6ihLILLoimzzH4JMplEW9nBmqavDJTLMVtF4cDNEvMoJA=
+	t=1728480888; cv=none; b=Z2eINOjI2aU0YxCsNUnHslmhYJbTngidl5avMIkzs7Y4ZR2kvfrbfg3SosxuqFTy+hrw5t5evGGiy7YHEF4LcOQABqP/4igYSp/nSktmr737eDlcAiiTKidlUtZj7S6qrjt0uguK0XdAy3PbKLWtaaBDeRCc7hrcwAu84OaOaJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728480804; c=relaxed/simple;
-	bh=t8Gyvp201gdH0ebX64mK9PMksGJURSETiT+yOjwOA5k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N9qvYbQcRs8Xh0f7y3/ZwMdshDIhPuFXwiIk92niRTWspWCzTKb4ubuqAZPKukp3nwBQTvq4nMRYGGFRyYOsd9ZG2R9dbvHclwjrZ92t7sqiwiDgFJzCPaErHmXZeGP9zKxb2gjSSFrQAcD97omwC1IO1dlI98qme3HxqWZ+rFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M94rIV8+; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0655aa46-498d-4e8e-be6c-be5fb630c006@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1728480800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EVKhJGKvz5hRymisvRJ+RIKCkrs+zd8FmINE0LaAFfk=;
-	b=M94rIV8+pcFydCmphAJD/NW0deCbtW8Sqg6rhbY7ww4n8xbxxBTPbptFHORrARWl7V8nxu
-	k+cJPWG7WSdfD+bQEZknC5MDnViMRfm4KHDPi0qsrLwdAuNQek6SyPLpzWKWaGU/kkAID5
-	nt3i2ydRt+x88+Qf6ZdZV686DpMSB1Q=
-Date: Wed, 9 Oct 2024 14:33:13 +0100
+	s=arc-20240116; t=1728480888; c=relaxed/simple;
+	bh=e0gqHlZkDT5WvXlJLxiiH51AUvpJH6OopoCW36UMFTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hRFVrw3eJcJ+dnhgjvlteKcJ+U4Z1OnxblcpdTkdy4P/MU8bphu3ut4yYISToG0gUycyRkYpms1KC8BtRN8fWn1rELh0RxCCLxV0rNqaSnNgMqafDolaNrdIlBU+mUTVEkFRsYIC24MJeSxGuMO3tnJ0thcnkvKLH+D6wfJZbNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3neOl0y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45939C4CEC5;
+	Wed,  9 Oct 2024 13:34:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728480886;
+	bh=e0gqHlZkDT5WvXlJLxiiH51AUvpJH6OopoCW36UMFTI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=U3neOl0ybb4Ab65jgWhp3xT7HcEy4YMuUgGV+fe0qorbYgOtJiVf4vdBC8aSbF+zk
+	 VaSzmlKJr1Td+ZlEfUnqPwPvP3ItSIxZE3mhiSqTU0Y+ILn1z2LAcj5l0mNd964u9E
+	 IJiiL6vn/nZ84NJqFn6bT+eDEGpN/zUWDJjiTS1Nw44OfqVQU1G+/BklpTTM5qjnQt
+	 qFWcWXBTn592t1uwoUFl7fAOhoRDLvjep0N3/TGk+zJy9Qodx9ZM9pOn4mlQ+m1tjB
+	 +zz3ljVHlk8StJ6aovxl3cW8GcQDcp3o2MYDG6IpoR0lwS4CMa0F2Pi7cYkeI0mOAq
+	 BM9t8zEhFY8Sg==
+Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5e7ae4c504fso3516272eaf.1;
+        Wed, 09 Oct 2024 06:34:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUCYBHtap9eFCW3ArtkPXaJnLn5ePbzRMLF94mTPKDCWvHZaXlO+efrZQ9WoBsAW0rGiCPuWUm/2hvW@vger.kernel.org, AJvYcCUJRLIt8++Asms4Z6YFGduZz8EUvaosy8ELAKdBk+YukWLoGYsCrAtZdLTQc+ePCbKPuLAKP+Q6Zddn@vger.kernel.org, AJvYcCUkPQvB1cQEd6oDHYzl+hw0cOlWz0zA32hTDm3HcGJ0BcYfiF6olPe/8ROtsL9QjfHFIUclxOMX4k1jzLI=@vger.kernel.org, AJvYcCV+aUdQXyBHAQNGH+brWQcmtteeQij7cC3p3WZpGRHm3y8ytXsWqv2rTFgdcJi1SvgsXPm7fj8AfpEI@vger.kernel.org, AJvYcCV/SF2Y8hgvSLREEQc3GPe+mhTti6rVXDdkPnBHdVtfBymF2iS04KGUf2U50I8yY3ugTXfAhBjz8ZxFAfPC@vger.kernel.org, AJvYcCVAYbdllUvcFJHe9+OctVfnyiD1tBGVy8aMJw1USr80rTMmRyHUt2uwlClssBFzEacOJTeSmY3ufPkZ@vger.kernel.org, AJvYcCVx0ILIb2bqJQwGWfceTiTswMWA7qkQBF3IDNK3Y++9GLJQKODRq+kbM8nNuT3GzDjMDDmj/exrfiLmHWxbyWvT@vger.kernel.org, AJvYcCW1arAhCLgfrrrpmNH8RanrE0gw8qbtN97USny55mxxStVROHs0OMiv6MGpBFbXIhOH4kvdsi6qRNOpsrI=@vger.kernel.org, AJvYcCW4uK4pp/SfwHOf8uV1KoMQH4aO0RVtfqyJg//wiE9xXy+VP3lt2iakoAfe5+Nj0B50bs1nkwoVfdhVIPr1ZtZ2kA==@vger.kernel.org, AJvYcCWMWHrYPU+Wj7NG
+ TB2viIz++k/HlsVtqdh7QGTchZSaPcS9eruc6QMo5nmbhl/3j4x7rYQhz199pS5H@vger.kernel.org, AJvYcCWY1lWuqm50sh0wqMQMb+jDeJM+5Al6i42vWPqEiagWwABWr8vmt3d3vq9HKLiTtUNmtX7dEwefsI4=@vger.kernel.org, AJvYcCX3/WApf0RVgTI4rS7fgqUNzwuIRFSnJi0/x3ucVs2nDFYdO2MIrbZYThNNCwEGBOpzAwTK0EbU87Eo@vger.kernel.org, AJvYcCX9EDj4AyeWl5BKC2QlKRGaDYJzv0/hphzvGEfgGlK8Dpcf+46uKBu63g5b0eYIqHhJd6cXfC33@vger.kernel.org, AJvYcCXIB0DquxdKTLyab8yODrwn6Tlh9jjDfSHjxtm9fuMqtD1tpa4wuK65HOYAzXtvvY6TZZau8tiIIz0r/nqHVhc=@vger.kernel.org, AJvYcCXKRq6frWMsrT1XWrvf13RSumJym9g1pd6E8CgisgVautUqJ+mNDLK6my7dU/DRGFhJWvGkjqjJqiDZGFyN@vger.kernel.org, AJvYcCXPLfXcgojrQWn5dzzgPtuZpIGeyk1TBqBpQmBuBV0mwNY8kpNEJ2UCQpLUiUGQ4SwS5+Lz9dHRkffSsg==@vger.kernel.org, AJvYcCXTR+XrB33gvXCC3gkxiLVco9iP2hjj9cKBXmn5FUgvCC43QOGCsSe5OwDUYDubrm3Bj/Wf4fb5KGRj@vger.kernel.org, AJvYcCXchzfBXIXTdWLD8grIaI7Y7jNnWL6rqNLCCErTzbGLYjzIfQamfIqB4MzX1OhILl0fcvzQfiKQwZCq@vger.kernel.org, AJvYcCXsg22ML+HaZwTtG/y6l6UZNcCgdKEpRV1K6j8zuoK+E0qBh2l9gn6y5ubGXUrnxRpAzQaatusnfW3eUYm
+ W@vger.kernel.org, AJvYcCXtXbSqnrF9IfHakH1CLfhw7uDd/khZ9tDC/RwUkUFRD6vTCBh1T2V5L56FXtzBEt3F9UABgnX7rnsRaLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi/Hxvnc7e8NrjIW5/GnwKMx7fVvoVB1d02sUfbqGECs4pEIz/
+	0eY293poLJic+qEAqL8Bod+C1gJLSEuI/VrqBUE4KJxWyf9eWEIbXEm0Zrtg6kTZcTN0xPq9OGG
+	2f1HTVEYCyeoz/zOiJzRTuo8BNxI=
+X-Google-Smtp-Source: AGHT+IGPvjQmX3zbZk+/LQ5kxG4XslEJ8m7y5iETpKVOpmsBmOdZ4tET2kRXnqT/piSrFy5yYrBa2CfwSNatwWXgz3s=
+X-Received: by 2002:a05:6820:270f:b0:5e5:c489:6f3c with SMTP id
+ 006d021491bc7-5e987bc9df9mr1249377eaf.5.1728480885551; Wed, 09 Oct 2024
+ 06:34:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 1/2] dpll: add clock quality level attribute and
- op
-To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- Maciek Machnikowski <maciek@machnikowski.net>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, donald.hunter@gmail.com, arkadiusz.kubalewski@intel.com,
- saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com
-References: <20241009122547.296829-1-jiri@resnulli.us>
- <20241009122547.296829-2-jiri@resnulli.us>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20241009122547.296829-2-jiri@resnulli.us>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
+ <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
+ <20241007184924.GH14766@pendragon.ideasonboard.com> <CAPDyKFpQVnF7eQv3dup8k-3EijnMjuveCG9sZ=Rpey1Y6MBJEg@mail.gmail.com>
+ <20241007222502.GG30699@pendragon.ideasonboard.com> <CAPDyKFrGNwna6Y2pqSRaBbRYHKRaD2ayqQHLtoqLPOu9Et7qTg@mail.gmail.com>
+ <CAJZ5v0jvJyS7D5-wURi2kyWN-rmNa+YqupeQJ000pQRVd9VBcQ@mail.gmail.com> <41a0ad69-912b-4eb3-84f7-fb385433c056@opensource.cirrus.com>
+In-Reply-To: <41a0ad69-912b-4eb3-84f7-fb385433c056@opensource.cirrus.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 9 Oct 2024 15:34:33 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0gbrhMpPT0fHYSC+ES5WS5kv7XkM2hj9M4vpNwFFs6xsQ@mail.gmail.com>
+Message-ID: <CAJZ5v0gbrhMpPT0fHYSC+ES5WS5kv7XkM2hj9M4vpNwFFs6xsQ@mail.gmail.com>
+Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
+To: Richard Fitzgerald <rf@opensource.cirrus.com>, Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, 
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>, dri-devel@lists.freedesktop.org, 
+	linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	amd-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, 
+	linux-i3c@lists.infradead.org, linux-iio@vger.kernel.org, 
+	linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
+	iommu@lists.linux.dev, imx@lists.linux.dev, 
+	linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-staging@lists.linux.dev, linux-usb@vger.kernel.org, 
+	linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
+	asahi@lists.linux.dev, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 09/10/2024 13:25, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
-> 
-> In order to allow driver expose quality level of the clock it is
-> running, introduce a new netlink attr with enum to carry it to the
-> userspace. Also, introduce an op the dpll netlink code calls into the
-> driver to obtain the value.
+On Wed, Oct 9, 2024 at 2:48=E2=80=AFPM Richard Fitzgerald
+<rf@opensource.cirrus.com> wrote:
+>
+> On 08/10/2024 7:24 pm, Rafael J. Wysocki wrote:
+> > On Tue, Oct 8, 2024 at 12:35=E2=80=AFAM Ulf Hansson <ulf.hansson@linaro=
+.org> wrote:
+> >>
+> >> On Tue, 8 Oct 2024 at 00:25, Laurent Pinchart
+> >> <laurent.pinchart@ideasonboard.com> wrote:
+> >>>
+> >>> Hi Ulf,
+> >>>
+> >>> On Tue, Oct 08, 2024 at 12:08:24AM +0200, Ulf Hansson wrote:
+> >>>> On Mon, 7 Oct 2024 at 20:49, Laurent Pinchart wrote:
+> >>>>> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
+> >>>>>> On Fri, 4 Oct 2024 at 11:41, Sakari Ailus wrote:
+> >>>>>>>
+> >>>>>>> Hello everyone,
+> >>>>>>>
+> >>>>>>> This set will switch the users of pm_runtime_put_autosuspend() to
+> >>>>>>> __pm_runtime_put_autosuspend() while the former will soon be re-p=
+urposed
+> >>>>>>> to include a call to pm_runtime_mark_last_busy(). The two are alm=
+ost
+> >>>>>>> always used together, apart from bugs which are likely common. Go=
+ing
+> >>>>>>> forward, most new users should be using pm_runtime_put_autosuspen=
+d().
+> >>>>>>>
+> >>>>>>> Once this conversion is done and pm_runtime_put_autosuspend() re-=
+purposed,
+> >>>>>>> I'll post another set to merge the calls to __pm_runtime_put_auto=
+suspend()
+> >>>>>>> and pm_runtime_mark_last_busy().
+> >>>>>>
+> >>>>>> That sounds like it could cause a lot of churns.
+> >>>>>>
+> >>>>>> Why not add a new helper function that does the
+> >>>>>> pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
+> >>>>>> things? Then we can start moving users over to this new interface,
+> >>>>>> rather than having this intermediate step?
+> >>>>>
+> >>>>> I think the API would be nicer if we used the shortest and simplest
+> >>>>> function names for the most common use cases. Following
+> >>>>> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is th=
+at
+> >>>>> most common use case. That's why I like Sakari's approach of repurp=
+osing
+> >>>>> pm_runtime_put_autosuspend(), and introducing
+> >>>>> __pm_runtime_put_autosuspend() for the odd cases where
+> >>>>> pm_runtime_mark_last_busy() shouldn't be called.
+> >>>>
+> >>>> Okay, so the reason for this approach is because we couldn't find a
+> >>>> short and descriptive name that could be used in favor of
+> >>>> pm_runtime_put_autosuspend(). Let me throw some ideas at it and mayb=
+e
+> >>>> you like it - or not. :-)
+> >>>
+> >>> I like the idea at least :-)
+> >>>
+> >>>> I don't know what options you guys discussed, but to me the entire
+> >>>> "autosuspend"-suffix isn't really that necessary in my opinion. Ther=
+e
+> >>>> are more ways than calling pm_runtime_put_autosuspend() that trigger=
+s
+> >>>> us to use the RPM_AUTO flag for rpm_suspend(). For example, just
+> >>>> calling pm_runtime_put() has the similar effect.
+> >>>
+> >>> To be honest, I'm lost there. pm_runtime_put() calls
+> >>> __pm_runtime_idle(RPM_GET_PUT | RPM_ASYNC), while
+> >>> pm_runtime_put_autosuspend() calls __pm_runtime_suspend(RPM_GET_PUT |
+> >>> RPM_ASYNC | RPM_AUTO).
+> >>
+> >> __pm_runtime_idle() ends up calling rpm_idle(), which may call
+> >> rpm_suspend() - if it succeeds to idle the device. In that case, it
+> >> tags on the RPM_AUTO flag in the call to rpm_suspend(). Quite similar
+> >> to what is happening when calling pm_runtime_put_autosuspend().
+> >
+> > Right.
+> >
+> > For almost everybody, except for a small bunch of drivers that
+> > actually have a .runtime_idle() callback, pm_runtime_put() is
+> > literally equivalent to pm_runtime_put_autosuspend().
+> >
+> > So really the question is why anyone who doesn't provide a
+> > .runtime_idle() callback bothers with using this special
+> > pm_runtime_put_autosuspend() thing,
+>
+> Because they are following the documentation? It says:
+>
+> "Drivers should call pm_runtime_mark_last_busy() to update this field
+> after carrying out I/O, typically just before calling
+> pm_runtime_put_autosuspend()."
+>
+> and
+>
+> "In order to use autosuspend, subsystems or drivers must call
+> pm_runtime_use_autosuspend() (...), and thereafter they should use the
+> various `*_autosuspend()` helper functions instead of the non#
+> autosuspend counterparts"
+>
+> So the documentation says I should be using pm_runtime_put_autosuspend()
+> instead of pm_runtime_put().
+>
+> Seems unfair to criticise people for following the documentation.
 
-The idea is good, it matches with the work Maciek is doing now in terms
-of improving POSIX clock interface. See a comment below.
+I'm not criticising anyone, just wondering why they do what they do.
 
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->   Documentation/netlink/specs/dpll.yaml | 28 +++++++++++++++++++++++++++
->   drivers/dpll/dpll_netlink.c           | 22 +++++++++++++++++++++
->   include/linux/dpll.h                  |  4 ++++
->   include/uapi/linux/dpll.h             | 21 ++++++++++++++++++++
->   4 files changed, 75 insertions(+)
-> 
-> diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-> index f2894ca35de8..77a8e9ddb254 100644
-> --- a/Documentation/netlink/specs/dpll.yaml
-> +++ b/Documentation/netlink/specs/dpll.yaml
-> @@ -85,6 +85,30 @@ definitions:
->             This may happen for example if dpll device was previously
->             locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
->       render-max: true
-> +  -
-> +    type: enum
-> +    name: clock-quality-level
-> +    doc: |
-> +      level of quality of a clock device.
-> +    entries:
-> +      -
-> +        name: prc
-> +        value: 1
-> +      -
-> +        name: ssu-a
-> +      -
-> +        name: ssu-b
-> +      -
-> +        name: eec1
-> +      -
-> +        name: prtc
-> +      -
-> +        name: eprtc
-> +      -
-> +        name: eeec
-> +      -
-> +        name: eprc
-> +    render-max: true
->     -
->       type: const
->       name: temp-divider
-> @@ -252,6 +276,10 @@ attribute-sets:
->           name: lock-status-error
->           type: u32
->           enum: lock-status-error
-> +      -
-> +        name: clock-quality-level
-> +        type: u32
-> +        enum: clock-quality-level
->     -
->       name: pin
->       enum-name: dpll_a_pin
-> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
-> index fc0280dcddd1..689a6d0ff049 100644
-> --- a/drivers/dpll/dpll_netlink.c
-> +++ b/drivers/dpll/dpll_netlink.c
-> @@ -169,6 +169,25 @@ dpll_msg_add_temp(struct sk_buff *msg, struct dpll_device *dpll,
->   	return 0;
->   }
->   
-> +static int
-> +dpll_msg_add_clock_quality_level(struct sk_buff *msg, struct dpll_device *dpll,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
-> +	enum dpll_clock_quality_level ql;
-> +	int ret;
-> +
-> +	if (!ops->clock_quality_level_get)
-> +		return 0;
-> +	ret = ops->clock_quality_level_get(dpll, dpll_priv(dpll), &ql, extack);
-> +	if (ret)
-> +		return ret;
-> +	if (nla_put_u32(msg, DPLL_A_CLOCK_QUALITY_LEVEL, ql))
-> +		return -EMSGSIZE;
-> +
-> +	return 0;
-> +}
-> +
->   static int
->   dpll_msg_add_pin_prio(struct sk_buff *msg, struct dpll_pin *pin,
->   		      struct dpll_pin_ref *ref,
-> @@ -557,6 +576,9 @@ dpll_device_get_one(struct dpll_device *dpll, struct sk_buff *msg,
->   	if (ret)
->   		return ret;
->   	ret = dpll_msg_add_lock_status(msg, dpll, extack);
-> +	if (ret)
-> +		return ret;
-> +	ret = dpll_msg_add_clock_quality_level(msg, dpll, extack);
->   	if (ret)
->   		return ret;
->   	ret = dpll_msg_add_mode(msg, dpll, extack);
-> diff --git a/include/linux/dpll.h b/include/linux/dpll.h
-> index 81f7b623d0ba..e99cdb8ab02c 100644
-> --- a/include/linux/dpll.h
-> +++ b/include/linux/dpll.h
-> @@ -26,6 +26,10 @@ struct dpll_device_ops {
->   			       struct netlink_ext_ack *extack);
->   	int (*temp_get)(const struct dpll_device *dpll, void *dpll_priv,
->   			s32 *temp, struct netlink_ext_ack *extack);
-> +	int (*clock_quality_level_get)(const struct dpll_device *dpll,
-> +				       void *dpll_priv,
-> +				       enum dpll_clock_quality_level *ql,
-> +				       struct netlink_ext_ack *extack);
->   };
->   
->   struct dpll_pin_ops {
-> diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-> index b0654ade7b7e..0572f9376da4 100644
-> --- a/include/uapi/linux/dpll.h
-> +++ b/include/uapi/linux/dpll.h
-> @@ -79,6 +79,26 @@ enum dpll_lock_status_error {
->   	DPLL_LOCK_STATUS_ERROR_MAX = (__DPLL_LOCK_STATUS_ERROR_MAX - 1)
->   };
->   
-> +/**
-> + * enum dpll_clock_quality_level - if previous status change was done due to a
-> + *   failure, this provides information of dpll device lock status error. Valid
-> + *   values for DPLL_A_LOCK_STATUS_ERROR attribute
-> + */
-> +enum dpll_clock_quality_level {
-> +	DPLL_CLOCK_QUALITY_LEVEL_PRC = 1,
-> +	DPLL_CLOCK_QUALITY_LEVEL_SSU_A,
-> +	DPLL_CLOCK_QUALITY_LEVEL_SSU_B,
-> +	DPLL_CLOCK_QUALITY_LEVEL_EEC1,
-> +	DPLL_CLOCK_QUALITY_LEVEL_PRTC,
-> +	DPLL_CLOCK_QUALITY_LEVEL_EPRTC,
-> +	DPLL_CLOCK_QUALITY_LEVEL_EEEC,
-> +	DPLL_CLOCK_QUALITY_LEVEL_EPRC,
+"Because it is documented this way" is a fair answer, but it doesn't
+invalidate the observation that the difference between
+pm_runtime_put_autosuspend() and pm_runtime_put() boils down to the
+cases when the .runtime_idle() callback is present (which are few and
+far between so to speak).  Moreover, there are call sites using
+pm_runtime_*() functions even though they may not know whether or not
+autosuspend is enabled for the target devices, so the advice given in
+the documentation cannot be universally followed regardless.
 
-I think it would be great to provide some explanation of levels here.
-People coming from SDH area may not be familiar with some of them. Or at
-least mention ITU-T/IEEE recommendations documents to get the meanings
-of these levels.
+This thread is about the way to go, generally speaking, and what I'm
+saying is effectively that replacing pm_runtime_put_autosuspend() with
+pm_runtime_put() almost everywhere (if not just everywhere) would be
+fine with me.
 
-> +
-> +	/* private: */
-> +	__DPLL_CLOCK_QUALITY_LEVEL_MAX,
-> +	DPLL_CLOCK_QUALITY_LEVEL_MAX = (__DPLL_CLOCK_QUALITY_LEVEL_MAX - 1)
-> +};
-> +
->   #define DPLL_TEMP_DIVIDER	1000
->   
->   /**
-> @@ -180,6 +200,7 @@ enum dpll_a {
->   	DPLL_A_TEMP,
->   	DPLL_A_TYPE,
->   	DPLL_A_LOCK_STATUS_ERROR,
-> +	DPLL_A_CLOCK_QUALITY_LEVEL,
->   
->   	__DPLL_A_MAX,
->   	DPLL_A_MAX = (__DPLL_A_MAX - 1)
+I also think that the current users of pm_runtime_put_autosuspend()
+that is not immediately preceded by pm_runtime_mark_last_busy() can be
+readily switched over to using pm_runtime_put() instead of it and then
+pm_runtime_put_autosuspend() can be made call
+pm_runtime_mark_last_busy(), so the latter can be removed from the
+code using the former.  Note that this last step does not require
+tree-wide changes, because calling pm_runtime_mark_last_busy() twice
+in a row for the same device is not a problem.
 
+Of course, the documentation needs to be updated in accordance with
+the code changes, which didn't happen when previous changes were made
+to pm_runtime_put() and that likely is why it does not reflect the
+current code.
 
