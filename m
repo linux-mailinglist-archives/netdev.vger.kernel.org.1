@@ -1,131 +1,96 @@
-Return-Path: <netdev+bounces-133484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5880A99613F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:44:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCB6B99614A
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E5A1F265CD
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:44:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9219B284F56
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D671898FC;
-	Wed,  9 Oct 2024 07:42:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IEgiuGd2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048E4186E39;
+	Wed,  9 Oct 2024 07:44:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7DC18952C;
-	Wed,  9 Oct 2024 07:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ADBA186E26
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728459773; cv=none; b=cpvfZNOlfGfdCmu6+5qkO3M/uuoMSfxkxkS2dlIvOjyOX4zDhExMaNYKNYUcuHbUU1Y9zRQrvZNMXyWXvHwYgArXVnyZp9pwe497huifCj+aPpmfD38n6xGGVmtC4W/Jj69qPgiQBqGqPvzrWwqPQoMqylhlkgSg9GVVXG/qsT8=
+	t=1728459845; cv=none; b=fpFhUhh1wc+4jmyyAQMyegfvI4yR+6YE46/jFpk1WXTaMmVqtzTza4MRAsCoKnNbkh+ZUKVq6UEx8RIYNA2+U5DOvorJwBDIvcVK7GZNUdGQKzvcEovL4SqCBXKLhcHKK8c4NYPRaHx59ld9cJJhhUPFLIup94ax97uEC9+of90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728459773; c=relaxed/simple;
-	bh=LFNxH82iYAVOBHknU67wEDKrfnlu0dWmlOBNv9DWLXI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qiPW0wrO0m99S+k8Ek/f6mBZDxFNPKsSaLqEwgsQgI+LWaBsPf9W56wTlZLzsU4LVThnQFs+0nKBCVR3kT2drWO/H4gNa/QtYbaAW3ra6p46/4+8islczuVT6GGDRZTXHfiR6IUJdNGOkv0482qhVF0I4G3ay+ctZVWFkhGcsno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IEgiuGd2; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49978gMY029429;
-	Wed, 9 Oct 2024 07:42:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	f3nItm0Gdi3bI3Zw4m/5gUFjMKwVbzs+35pMUn26fQ0=; b=IEgiuGd2MpqKHUaN
-	/aJQRp0VMcAHSzW2YFe3vWEdCzpB+RkDtK9yeB6i+AAyjczuAABoqWqbv1iHZwxz
-	Mlo1kJO5rNliM+4DSnfEGcDCce3qehFGH92FJJ5Xlo2fYh3go3bv9YXeKtpOYdOV
-	GdOMaGfHR9mTiQlw32SuUmk99RzZCG/5KTHYCuzoPiOs8fyI9pZCHGx7x/V2VYSq
-	ZRdVQvtLV1kosQgWU9CN1bXGKgi7ts8AzogMhBzbLo/cZh1pBNK1M1W3R+mJjqTF
-	eogHcARI6tt2h/HaFB7I3Jf3Bc6kuHGY8Yb7YQhwJ+wU57yfuc4pa+DkEG0cJiIK
-	rRu1pA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 424yj03qv5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 09 Oct 2024 07:42:36 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4997gZ4Z008602
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 9 Oct 2024 07:42:35 GMT
-Received: from hu-mmanikan-blr.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 9 Oct 2024 00:42:28 -0700
-From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
-To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
-        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
-        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
-        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
-        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
-        <neil.armstrong@linaro.org>, <arnd@arndb.de>,
-        <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
-        <quic_mmanikan@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
-        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <netdev@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
-Subject: [PATCH v7 6/6] arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
-Date: Wed, 9 Oct 2024 13:11:25 +0530
-Message-ID: <20241009074125.794997-7-quic_mmanikan@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241009074125.794997-1-quic_mmanikan@quicinc.com>
-References: <20241009074125.794997-1-quic_mmanikan@quicinc.com>
+	s=arc-20240116; t=1728459845; c=relaxed/simple;
+	bh=vro3Bbe+8hKP1n1pXWEdxEnFJNKRiv0zk1QHqAcZZkw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=sESc9O2aDDIw5qXCByKTbplGSHJxBXFHSwseb2sJ/iISRwTJHid29Sq7IF0V1VxltMsM7FasKgu8TR8PNVBhLSkVXK69XroMxG+G/AXaIlpsfURBROJ9dTPiGqE306h1K/w7KlLpHDVJ+hB2yo7CcXrxR8LvJ/JE/OZoYkwHz5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a3a031168eso2237675ab.2
+        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 00:44:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728459843; x=1729064643;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/cIM4FzGaC91vtdSI5kp+oxCUFiOwgoAfMBzSugYPic=;
+        b=d63BtwB+mNUMW4eplmhA03BYbciGJ4IkGPG9Gw351hUCHBltjxInFGkwUsJTXd+8m6
+         yN5LqBfISP4fZlitsq9+CmRhpxPdQpNFHc/a+kFzVzeSPW5tz/lBUydKYygX81bysUCy
+         MOHX85vnxiczIYukyGeyPYf7H20aE/+TjepGLWiZu6cytnHu+HuoUvx2xuXz3VEnkChz
+         RkUgOi7xOtmTlvpO0wSz76AHkVJiZr2KU+VezH92jBhVN3iiWfYyhIxBOfg1I1WFq8Mu
+         couwsagcPRrwon2FlarhBAyDbLJlvzBsZWidaTaMV27pPb866nlj9F1SzqQmuQIejASX
+         ynoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWWMSGQaBTQZIdmNlfN5JvMQOepznRO7/OSWPBkN3j3sRR3d2ORHUxPiSFsx8Ri4ttTJGVqkUQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztR9eapBxTzvMQNMnGwoKmp8lDD4elftf98ZvSotnk3HfvNCoX
+	YSqNob5eQ/8+b4OyjeuSjTY3veTPToW3Adtluf59WeOurx73F+3Pn2Mfbb5Q5vQ1zCf+pujAOr+
+	jrvOppzfeUxajk2f2DavdXvJfobxCiQP3XyFM+FiKpTvPYFtNj7xxNeM=
+X-Google-Smtp-Source: AGHT+IGQUQlE1emHK5BMoVHftqjMHMKZ9WzpGESuX/WJupIlx748u5PWWxzaIpPs7tVEVvN3RxleI5Ir+epplxZsh4OdZn5wVcaV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: x5qNSVyNVt6WX_GW175Ln7MOojH9ZaWZ
-X-Proofpoint-ORIG-GUID: x5qNSVyNVt6WX_GW175Ln7MOojH9ZaWZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- bulkscore=0 mlxlogscore=946 mlxscore=0 adultscore=0 clxscore=1015
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410090050
+X-Received: by 2002:a05:6e02:152b:b0:3a2:463f:fd9e with SMTP id
+ e9e14a558f8ab-3a397ce4910mr11518575ab.6.1728459843585; Wed, 09 Oct 2024
+ 00:44:03 -0700 (PDT)
+Date: Wed, 09 Oct 2024 00:44:03 -0700
+In-Reply-To: <66fa2708.050a0220.aab67.0025.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67063443.050a0220.22840d.000f.GAE@google.com>
+Subject: Re: [syzbot] [wireguard?] INFO: task hung in wg_destruct (2)
+From: syzbot <syzbot+7da6c19dc528c2ebc612@syzkaller.appspotmail.com>
+To: Jason@zx2c4.com, bsegall@google.com, davem@davemloft.net, 
+	dietmar.eggemann@arm.com, dsahern@kernel.org, edumazet@google.com, 
+	jason@zx2c4.com, juri.lelli@redhat.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, mgorman@suse.de, mingo@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, peterz@infradead.org, 
+	rostedt@goodmis.org, syzkaller-bugs@googlegroups.com, 
+	vincent.guittot@linaro.org, vschneid@redhat.com, wireguard@lists.zx2c4.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Devi Priya <quic_devipriy@quicinc.com>
+syzbot has bisected this issue to:
 
-NSSCC driver is needed to enable the ethernet interfaces present
-in RDP433 based on IPQ9574. Since this is not necessary for bootup
-enabling it as a module.
+commit dfa0a574cbc47bfd5f8985f74c8ea003a37fa078
+Author: Peter Zijlstra <peterz@infradead.org>
+Date:   Wed Jun 5 10:09:11 2024 +0000
 
-Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
----
-Changes in V7:
-	- Updated commit message
+    sched/uclamg: Handle delayed dequeue
 
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13c2d7d0580000
+start commit:   e32cde8d2bd7 Merge tag 'sched_ext-for-6.12-rc1-fixes-1' of..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1022d7d0580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=17c2d7d0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=286b31f2cf1c36b5
+dashboard link: https://syzkaller.appspot.com/bug?extid=7da6c19dc528c2ebc612
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=146ae580580000
 
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index 5fdbfea7a5b2..3727155b67b3 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1313,6 +1313,7 @@ CONFIG_IPQ_GCC_5332=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_9574=m
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_MMCC_8994=m
- CONFIG_MSM_GCC_8994=y
--- 
-2.34.1
+Reported-by: syzbot+7da6c19dc528c2ebc612@syzkaller.appspotmail.com
+Fixes: dfa0a574cbc4 ("sched/uclamg: Handle delayed dequeue")
 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
