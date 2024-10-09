@@ -1,134 +1,100 @@
-Return-Path: <netdev+bounces-133555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F11FA99639F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:48:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0FCC9963B9
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:50:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE00282546
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:48:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F5EA28531E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4427318E041;
-	Wed,  9 Oct 2024 08:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F73189F58;
+	Wed,  9 Oct 2024 08:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZgE1VxV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ULCsfG5p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AD918E032;
-	Wed,  9 Oct 2024 08:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EB61898FC;
+	Wed,  9 Oct 2024 08:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728463446; cv=none; b=X8HHJTNhejQ7F8v3k6bN6bREUTV6BRbsFRaaMSII8QQndA8cOr9ajBffxEvuQiCifnDUlTSHOZjwGcF9lOVwC6yM7/SVrri3Ody4Piw/SAEiYp8+Bk1xqVi55VtFaSLachZzVhOeaqGbAXSJg8xGSrEDugI0nU6HZDsdkyO8Rl8=
+	t=1728463663; cv=none; b=RgbqGZeIIC0CxBrEPIGzGvzLZ1YhEo4hRnPqsCyvDsIMe/MO195XLcplLSnBBfakF5ph+7zde7l66LojrtYCEgv+H//9Xq2ysoXVtobSoMtB7ZvY30sFNtb5fK1sMEdVB/wxVFzP2uzqJa1oYtHvhTJF+rCi4SClxa/MC5Dqm0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728463446; c=relaxed/simple;
-	bh=ceMij/yfbKLvJo6J2VHlzeDQMeXfsggIscfz1kWVik4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lPJoPcf5IPTthcylSN+zxhuHqL/cAQkT3ENkt2Py9O77o6GZ4pQpHQR6Dk9Ij0Rz6ZbsYgUUZefNBn18eD6+bM7qvxq8rTTFlo9zxL6E51O3wq25kFSVP02HUT+A5Yfs8sxItZuEWnwsU5KnrTmUbzBpH8kUPorN9fUJy1JUCkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZgE1VxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EF4FC4CECF;
-	Wed,  9 Oct 2024 08:44:00 +0000 (UTC)
+	s=arc-20240116; t=1728463663; c=relaxed/simple;
+	bh=31+/Gr5Hh872ec0kd5KrNPTPKQ7X2rRUENhvrK5beSU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aUtp32s9IwqlMdR3+p7329Zu6oTmv1E6c754HWZTVLn4YXhARovB5fNZSv+ygCaAM2U0r1jSoI5G3ywfaPrh8qCAK/tS3TLT0AsJCmgIce/x4u7yNaTDnN5tYN3h9uCG0V/9PSJehJNKQV4bCBqx1cUmmsWmcsX9+1h97k9J7Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ULCsfG5p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF936C4CEC5;
+	Wed,  9 Oct 2024 08:47:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728463445;
-	bh=ceMij/yfbKLvJo6J2VHlzeDQMeXfsggIscfz1kWVik4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sZgE1VxVx2v/62JJUVZHh+KqF+47rw+KtEoQHosRPAEMQCrgihLVD4FLPln22/PlO
-	 Qw5UOCA9BGcPzWm60t8LKGAlwIx5x53bZfNkEQFG6Z/nfwtSDXKy9/wqR2Hax5bkol
-	 HC5xNucZL1KdzEYPCFk+xqNit6YLzELIffu6Lh4sCSesoTxJR4Aj3iU1YzAR4bjxh+
-	 fveoxVGtGM825lS5LJn7PVrKJ4xOJeZKtrGhhE+vkyEh2uVY9IpG9v6hKTBWXsNurh
-	 FVHjaAAgqa6XZ0TfH74v2IrV20Dd8TC8F9aoIMxIqlyvsmgOwd/e8zV5aUfIVm0a5c
-	 TGZ8zzAQBNiyw==
-Date: Wed, 9 Oct 2024 09:43:56 +0100
+	s=k20201202; t=1728463663;
+	bh=31+/Gr5Hh872ec0kd5KrNPTPKQ7X2rRUENhvrK5beSU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=ULCsfG5pmD+57N1jwdOhX/wAYT2OaINiooDlkzykm76qEWFfE6rXFHNtYTE/40Mjn
+	 Ssr6RhptNv3yS+3OHwWvE8EY6lkzCrEyBQ+n89fOcQi6MTuu+YUyR8UN9w5mD780TE
+	 BHG3dL+NDSx6+TS56V36+1GPOj15gxDkARC0mCx7McAoD3kBt4WOTrIvrB3ptDSbHj
+	 ZoaviXhwRjihNksZfsi7DChyNnbaPed+Fav949zQlMyiDD2LQH95MzJ0sHyBcCLiOe
+	 8rd5/kGesIqCWlk4GtDenU+lnOsAXRo34y6PrDNc6FydYHs7cp+NmIBSxzJwg0lwXH
+	 kr83PJ4MbE5Zg==
 From: Simon Horman <horms@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net 1/2] MAINTAINERS: consistently exclude wireless
- files from NETWORKING [GENERAL]
-Message-ID: <20241009084356.GH99782@kernel.org>
-References: <20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org>
- <20241004-maint-net-hdrs-v1-1-41fd555aacc5@kernel.org>
- <87setb7us5.fsf@kernel.org>
- <20241007141305.GD32733@kernel.org>
- <87ed4r4xqn.fsf@kernel.org>
- <a36f0fec7c007031f55e220a0ca585b48630f205.camel@sipsolutions.net>
+Subject: [PATCH net v2 0/2] MAINTAINERS: Networking file coverage updates
+Date: Wed, 09 Oct 2024 09:47:21 +0100
+Message-Id: <20241009-maint-net-hdrs-v2-0-f2c86e7309c8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a36f0fec7c007031f55e220a0ca585b48630f205.camel@sipsolutions.net>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABlDBmcC/3WNTQ6CMBCFr0Jm7ZgWqAFX3sOwqO0AE7WQaUM0p
+ He3Ye/y/X1vh0jCFOFa7SC0ceQlFFGfKnCzDRMh+6KhVnWrlWrxbTkkDJRw9hJx7EznH5eemr6
+ BMlqFRv4cwDuUFgzFnDmmRb7HyaaP6B9v06iw1aM3xljrnLk9SQK9zotMMOScf5uGkg+yAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+ netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+X-Mailer: b4 0.14.0
 
-On Mon, Oct 07, 2024 at 08:03:22PM +0200, Johannes Berg wrote:
-> On Mon, 2024-10-07 at 20:41 +0300, Kalle Valo wrote:
-> > Simon Horman <horms@kernel.org> writes:
-> > 
-> > > On Fri, Oct 04, 2024 at 06:27:38PM +0300, Kalle Valo wrote:
-> > > 
-> > > > Simon Horman <horms@kernel.org> writes:
-> > > > 
-> > > > > We already exclude wireless drivers from the netdev@ traffic, to
-> > > > > delegate it to linux-wireless@, and avoid overwhelming netdev@.
-> > > > > 
-> > > > > Many of the following wireless-related sections MAINTAINERS
-> > > > > are already not included in the NETWORKING [GENERAL] section.
-> > > > > For consistency, exclude those that are.
-> > > > > 
-> > > > > * 802.11 (including CFG80211/NL80211)
-> > > > > * MAC80211
-> > > > > * RFKILL
-> > > > > 
-> > > > > Signed-off-by: Simon Horman <horms@kernel.org>
-> > > > > ---
-> > > > >  MAINTAINERS | 11 +++++++++++
-> > > > >  1 file changed, 11 insertions(+)
-> > > > > 
-> > > > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > > > index c27f3190737f..ea3ea2c0d3fa 100644
-> > > > > --- a/MAINTAINERS
-> > > > > +++ b/MAINTAINERS
-> > > > > @@ -16197,8 +16197,19 @@ F:	lib/random32.c
-> > > > >  F:	net/
-> > > > >  F:	tools/net/
-> > > > >  F:	tools/testing/selftests/net/
-> > > > > +X:	Documentation/networking/mac80211-injection.rst
-> > > > > +X:	Documentation/networking/mac80211_hwsim/
-> > > > > +X:	Documentation/networking/regulatory.rst
-> > > > > +X:	include/net/cfg80211.h
-> > > > > +X:	include/net/ieee80211_radiotap.h
-> > > > > +X:	include/net/iw_handler.h
-> > > > > +X:	include/net/mac80211.h
-> > > > > +X:	include/net/wext.h
-> > > > 
-> > > > Should we add also lib80211.h?
-> > > 
-> > > Thanks, I missed that one. Perhaps it should have:
-> > > 
-> > > * An F: entry in the MAC80211
-> > > * An X: entry in the NETWORKING [GENERAL]
-> > > 
-> > > If so, perhaps I can just add that to a v2 of this patch.
-> > > Let me know what you think.
-> > 
-> > Like Johannes said, the cfg80211 entry is more approriate but otherwise
-> > sounds like a good plan, thanks!
-> 
-> Actually scratch that, please just ignore it. I'm going to remove that
-> header file entirely and move the functionality into libipw in the
-> ipw2x00 drivers.
+Hi,
 
-Thanks,
+The aim of this proposal is to make the handling of some files,
+related to Networking and Wireless, more consistently. It does so by:
 
-In that case I'll post a v2 without any code changes.
-Rather, bumping it to non-RFC and accumulating tags.
+1. Adding some more headers to the UDP section, making it consistent
+   with the TCP section.
+
+2. Excluding some files relating to Wireless from NETWORKING [GENERAL],
+   making their handling consistent with other files related to
+   Wireless.
+
+The aim of this is to make things more consistent.  And for MAINTAINERS
+to better reflect the situation on the ground.  I am more than happy to
+be told that the current state of affairs is fine. Or for other ideas to
+be discussed.
+
+---
+Changes in v2:
+- Dropped RFC designation
+- Added tags: Thanks Willem and Johannes!
+- Link to v1: https://lore.kernel.org/r/20241004-maint-net-hdrs-v1-0-41fd555aacc5@kernel.org
+
+---
+Simon Horman (2):
+      MAINTAINERS: consistently exclude wireless files from NETWORKING [GENERAL]
+      MAINTAINERS: Add headers and mailing list to UDP section
+
+ MAINTAINERS | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+base-commit: 08c8acc9d8f3f70d62dd928571368d5018206490
+
 
