@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-133500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E19B996217
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A79B996218
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:13:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B83BB1F23027
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:12:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A632F1F22E1E
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 08:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEAE188010;
-	Wed,  9 Oct 2024 08:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC121885B2;
+	Wed,  9 Oct 2024 08:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gy7S4X8O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ACkKi696"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94B2169397
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 08:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2BC1885B4
+	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 08:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728461527; cv=none; b=dcrtHoMFD2+oXDH0GUuJL+h4OPMSpWCagF2yqkaLV/77ZTPsSLBHcrKcWCN8c5tKKceCCcRPhoR8DN02X3wZVTacgKMTtdicOXtBXaPACYyD84whseT7zci1CutpYRE2wkqUxzjuTAbfCe0twIfREMrzd/J/m0Kv+Ubv2yju/q0=
+	t=1728461534; cv=none; b=leH1C2c7YF0VsXLJGqHwVpfwb+anQc2q57WzJ6jjhjv+Do0uTluPJcfDdv/OEWGS3AlEeSwLvQP2I9ohhkPdXq5AlRqh/e9k1BuXvWrIrPZ5g99MPltjGPDWYBY4aHDS01P0WmT8czdoyoWp3978CHh6b8HpM9wwMeFeOWvNer0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728461527; c=relaxed/simple;
-	bh=E+e4zCdn9MBuB4RbTmtdtyyyqdtUfYmz5bQqcrs21LU=;
+	s=arc-20240116; t=1728461534; c=relaxed/simple;
+	bh=p5J0ZuaTDeq1z1FHiT82p6ADdy7U5SRpzgPZI88m+no=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SL9Wc9+izAnT1d3hunrtmzUGGfHJt1Rwce3uXmVMWPYn2b1KInVLg4fz5suGh2unXl4b2uAjEhRwbHWuQ4BXD6y11yKBUp45hzmo6UNt+267BEhzozGnTfQ13g2ml174MmfAr/Cqf4661OyHnfvnf73QfPPdlHOAY/2iO6CuK9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gy7S4X8O; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=cTMqyVu1Dd+i3C8lwtSbkjfqyLp/jN+UxTrmvLJUSZN4SnzAHa5oOlZtILjSBmK1xlyUf7JE78b01cvucwTmYkXQB2hd59To7cONDiCxwt5iJzuQW9ojJXVpuJTOIb98uiC1Wdn4d0fl72DOfsLxPF0sylkvsvnkDj1/Ey/+hkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ACkKi696; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728461524;
+	s=mimecast20190719; t=1728461531;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Ui21vtQ9Y0ZI7kwDjtD8LMAKsxRAA3Cme1XltEsqmkI=;
-	b=gy7S4X8OirdiFrOVgGKlki89cCRjl0Ui3YBvDXXyTQ3ydlJLCgDdZoQTEhHCAiZmrHhBNn
-	z6qKmljLdfqtyiYWPd5yD1ZRaFetTbGHYtE/2utd2VuKYE+jAtlNmd8Isjc+URLoOXIguW
-	InH9D59Z8lyh905baOcs0r9MlUvZ/lA=
+	bh=ow+m6VO/g4MnTygjXzgI2kzm9CE2XHnJv0mKZrbytsE=;
+	b=ACkKi696xTUTnNrVGRn9PichjmUPBOGEUMGjqXQxTTGqVW7qBbCyFRxySp4Ai3PGmILMrO
+	6+3ELjI0tusbmFBmqsTqBAZP9Ar0XbvALJVx14gkYAecBTJ10vZnCZBOq/z63l1lotHfNj
+	I9FRnL2FkPyTpKMvLO/h6yGdW8uvTAk=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-411-MjhL4zL5PgiuYDAhs7F3Rg-1; Wed,
- 09 Oct 2024 04:12:00 -0400
-X-MC-Unique: MjhL4zL5PgiuYDAhs7F3Rg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-240-4dYbln3fOwqXGtfboSzRbg-1; Wed,
+ 09 Oct 2024 04:12:05 -0400
+X-MC-Unique: 4dYbln3fOwqXGtfboSzRbg-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 87C761953945;
-	Wed,  9 Oct 2024 08:11:09 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5D17919AAED5;
+	Wed,  9 Oct 2024 08:11:16 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.225.249])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A5F081956046;
-	Wed,  9 Oct 2024 08:11:03 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3CD9E19560B2;
+	Wed,  9 Oct 2024 08:11:09 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -72,9 +72,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	intel-wired-lan@lists.osuosl.org,
 	edumazet@google.com,
 	Stanislav Fomichev <stfomichev@gmail.com>
-Subject: [PATCH v9 net-next 09/15] net: shaper: implement introspection support
-Date: Wed,  9 Oct 2024 10:09:55 +0200
-Message-ID: <66eb62f22b3a5ba06ca91d01ae77515e5f447e15.1728460186.git.pabeni@redhat.com>
+Subject: [PATCH v9 net-next 10/15] net-shapers: implement cap validation in the core
+Date: Wed,  9 Oct 2024 10:09:56 +0200
+Message-ID: <54667601813e4c0348f39bf8ad2446ffc9fcd383.1728460186.git.pabeni@redhat.com>
 In-Reply-To: <cover.1728460186.git.pabeni@redhat.com>
 References: <cover.1728460186.git.pabeni@redhat.com>
 Precedence: bulk
@@ -86,171 +86,166 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The netlink op is a simple wrapper around the device callback.
+Use the device capabilities to reject invalid attribute values before
+pushing them to the H/W.
 
-Extend the existing fetch_dev() helper adding an attribute argument
-for the requested device. Reuse such helper in the newly implemented
-operation.
+Note that validating the metric explicitly avoids NL_SET_BAD_ATTR()
+usage, to provide unambiguous error messages to the user.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Validating the nesting requires the knowledge of the new parent for
+the given shaper; as such is a chicken-egg problem: to validate the
+leaf nesting we need to know the node scope, to validate the node
+nesting we need to know the leafs parent scope.
+
+To break the circular dependency, place the leafs nesting validation
+after the parsing.
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
 Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v5 -> v6:
- - update to new API
-
-v4 -> v5:
- - replace net_device* with binding* in most functions
- - de-deplicate some code thanks to more generic helpers in previous
-   patches
-
-v3 -> v4:
- - another dev_put() -> netdev_put() conversion, missed in previous
-   iteration
-
-RFC v2 -> v3:
- - dev_put() -> netdev_put()
+v6 -> v7:
+  - validate the queue id vs real_num_tx_queues
+  - some mangling upon rebase, as 'node' is now always not NULL
+    in net_shaper_parse_leaf()
 ---
- net/shaper/shaper.c | 98 +++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 95 insertions(+), 3 deletions(-)
+ net/shaper/shaper.c | 101 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 101 insertions(+)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index 92c8da046391..f9399984165a 100644
+index f9399984165a..15463062fe7b 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -601,22 +601,29 @@ int net_shaper_nl_post_dumpit(struct netlink_callback *cb)
- int net_shaper_nl_cap_pre_doit(const struct genl_split_ops *ops,
- 			       struct sk_buff *skb, struct genl_info *info)
- {
--	return -EOPNOTSUPP;
-+	return net_shaper_generic_pre(info, NET_SHAPER_A_CAPS_IFINDEX);
+@@ -439,6 +439,74 @@ static int net_shaper_parse_handle(const struct nlattr *attr,
+ 	return 0;
  }
  
- void net_shaper_nl_cap_post_doit(const struct genl_split_ops *ops,
- 				 struct sk_buff *skb, struct genl_info *info)
- {
-+	net_shaper_generic_post(info);
- }
- 
- int net_shaper_nl_cap_pre_dumpit(struct netlink_callback *cb)
- {
--	return -EOPNOTSUPP;
-+	struct net_shaper_nl_ctx *ctx = (struct net_shaper_nl_ctx *)cb->ctx;
-+
-+	return net_shaper_ctx_setup(genl_info_dump(cb),
-+				    NET_SHAPER_A_CAPS_IFINDEX, ctx);
- }
- 
- int net_shaper_nl_cap_post_dumpit(struct netlink_callback *cb)
- {
--	return -EOPNOTSUPP;
-+	struct net_shaper_nl_ctx *ctx = (struct net_shaper_nl_ctx *)cb->ctx;
-+
-+	net_shaper_ctx_cleanup(ctx);
-+	return 0;
- }
- 
- int net_shaper_nl_get_doit(struct sk_buff *skb, struct genl_info *info)
-@@ -1147,14 +1154,99 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
- 	goto free_leaves;
- }
- 
-+static int
-+net_shaper_cap_fill_one(struct sk_buff *msg,
-+			struct net_shaper_binding *binding,
-+			enum net_shaper_scope scope, unsigned long flags,
-+			const struct genl_info *info)
++static int net_shaper_validate_caps(struct net_shaper_binding *binding,
++				    struct nlattr **tb,
++				    const struct genl_info *info,
++				    struct net_shaper *shaper)
 +{
-+	unsigned long cur;
-+	void *hdr;
++	const struct net_shaper_ops *ops = net_shaper_ops(binding);
++	struct nlattr *bad = NULL;
++	unsigned long caps = 0;
 +
-+	hdr = genlmsg_iput(msg, info);
-+	if (!hdr)
-+		return -EMSGSIZE;
++	ops->capabilities(binding, shaper->handle.scope, &caps);
 +
-+	if (net_shaper_fill_binding(msg, binding, NET_SHAPER_A_CAPS_IFINDEX) ||
-+	    nla_put_u32(msg, NET_SHAPER_A_CAPS_SCOPE, scope))
-+		goto nla_put_failure;
++	if (tb[NET_SHAPER_A_PRIORITY] &&
++	    !(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_PRIORITY)))
++		bad = tb[NET_SHAPER_A_PRIORITY];
++	if (tb[NET_SHAPER_A_WEIGHT] &&
++	    !(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_WEIGHT)))
++		bad = tb[NET_SHAPER_A_WEIGHT];
++	if (tb[NET_SHAPER_A_BW_MIN] &&
++	    !(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_BW_MIN)))
++		bad = tb[NET_SHAPER_A_BW_MIN];
++	if (tb[NET_SHAPER_A_BW_MAX] &&
++	    !(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_BW_MAX)))
++		bad = tb[NET_SHAPER_A_BW_MAX];
++	if (tb[NET_SHAPER_A_BURST] &&
++	    !(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_BURST)))
++		bad = tb[NET_SHAPER_A_BURST];
 +
-+	for (cur = NET_SHAPER_A_CAPS_SUPPORT_METRIC_BPS;
-+	     cur <= NET_SHAPER_A_CAPS_MAX; ++cur) {
-+		if (flags & BIT(cur) && nla_put_flag(msg, cur))
-+			goto nla_put_failure;
++	if (!caps)
++		bad = tb[NET_SHAPER_A_HANDLE];
++
++	if (bad) {
++		NL_SET_BAD_ATTR(info->extack, bad);
++		return -EOPNOTSUPP;
 +	}
 +
-+	genlmsg_end(msg, hdr);
++	if (shaper->handle.scope == NET_SHAPER_SCOPE_QUEUE &&
++	    binding->type == NET_SHAPER_BINDING_TYPE_NETDEV &&
++	    shaper->handle.id >= binding->netdev->real_num_tx_queues) {
++		NL_SET_ERR_MSG_FMT(info->extack,
++				   "Not existing queue id %d max %d",
++				   shaper->handle.id,
++				   binding->netdev->real_num_tx_queues);
++		return -ENOENT;
++	}
 +
++	/* The metric is really used only if there is *any* rate-related
++	 * setting, either in current attributes set or in pre-existing
++	 * values.
++	 */
++	if (shaper->burst || shaper->bw_min || shaper->bw_max) {
++		u32 metric_cap = NET_SHAPER_A_CAPS_SUPPORT_METRIC_BPS +
++				 shaper->metric;
++
++		/* The metric test can fail even when the user did not
++		 * specify the METRIC attribute. Pointing to rate related
++		 * attribute will be confusing, as the attribute itself
++		 * could be indeed supported, with a different metric.
++		 * Be more specific.
++		 */
++		if (!(caps & BIT(metric_cap))) {
++			NL_SET_ERR_MSG_FMT(info->extack, "Bad metric %d",
++					   shaper->metric);
++			return -EOPNOTSUPP;
++		}
++	}
 +	return 0;
-+
-+nla_put_failure:
-+	genlmsg_cancel(msg, hdr);
-+	return -EMSGSIZE;
 +}
 +
- int net_shaper_nl_cap_get_doit(struct sk_buff *skb, struct genl_info *info)
- {
-+	struct net_shaper_binding *binding;
-+	const struct net_shaper_ops *ops;
-+	enum net_shaper_scope scope;
-+	unsigned long flags = 0;
-+	struct sk_buff *msg;
-+	int ret;
+ static int net_shaper_parse_info(struct net_shaper_binding *binding,
+ 				 struct nlattr **tb,
+ 				 const struct genl_info *info,
+@@ -487,6 +555,28 @@ static int net_shaper_parse_info(struct net_shaper_binding *binding,
+ 
+ 	if (tb[NET_SHAPER_A_WEIGHT])
+ 		shaper->weight = nla_get_u32(tb[NET_SHAPER_A_WEIGHT]);
 +
-+	if (GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_CAPS_SCOPE))
-+		return -EINVAL;
++	ret = net_shaper_validate_caps(binding, tb, info, shaper);
++	if (ret < 0)
++		return ret;
 +
-+	binding = net_shaper_binding_from_ctx(info->ctx);
-+	scope = nla_get_u32(info->attrs[NET_SHAPER_A_CAPS_SCOPE]);
-+	ops = net_shaper_ops(binding);
-+	ops->capabilities(binding, scope, &flags);
-+	if (!flags)
++	return 0;
++}
++
++static int net_shaper_validate_nesting(struct net_shaper_binding *binding,
++				       const struct net_shaper *shaper,
++				       struct netlink_ext_ack *extack)
++{
++	const struct net_shaper_ops *ops = net_shaper_ops(binding);
++	unsigned long caps = 0;
++
++	ops->capabilities(binding, shaper->handle.scope, &caps);
++	if (!(caps & BIT(NET_SHAPER_A_CAPS_SUPPORT_NESTING))) {
++		NL_SET_ERR_MSG_FMT(extack,
++				   "Nesting not supported for scope %d",
++				   shaper->handle.scope);
 +		return -EOPNOTSUPP;
-+
-+	msg = genlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	ret = net_shaper_cap_fill_one(msg, binding, scope, flags, info);
-+	if (ret)
-+		goto free_msg;
-+
-+	ret =  genlmsg_reply(msg, info);
-+	if (ret)
-+		goto free_msg;
++	}
  	return 0;
-+
-+free_msg:
-+	nlmsg_free(msg);
-+	return ret;
  }
  
- int net_shaper_nl_cap_get_dumpit(struct sk_buff *skb,
- 				 struct netlink_callback *cb)
- {
-+	const struct genl_info *info = genl_info_dump(cb);
-+	struct net_shaper_binding *binding;
-+	const struct net_shaper_ops *ops;
-+	enum net_shaper_scope scope;
-+	int ret;
-+
-+	binding = net_shaper_binding_from_ctx(cb->ctx);
-+	ops = net_shaper_ops(binding);
-+	for (scope = 0; scope <= NET_SHAPER_SCOPE_MAX; ++scope) {
-+		unsigned long flags = 0;
-+
-+		ops->capabilities(binding, scope, &flags);
-+		if (!flags)
-+			continue;
-+
-+		ret = net_shaper_cap_fill_one(skb, binding, scope, flags,
-+					      info);
-+		if (ret)
+@@ -517,6 +607,13 @@ static int net_shaper_parse_leaf(struct net_shaper_binding *binding,
+ 		return -EINVAL;
+ 	}
+ 
++	if (node->handle.scope == NET_SHAPER_SCOPE_NODE) {
++		ret = net_shaper_validate_nesting(binding, shaper,
++						  info->extack);
++		if (ret < 0)
 +			return ret;
 +	}
 +
+ 	if (!exists)
+ 		net_shaper_default_parent(&shaper->handle, &shaper->parent);
  	return 0;
- }
+@@ -858,6 +955,10 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
+ 					   node->parent.scope, node->parent.id);
+ 			return -ENOENT;
+ 		}
++
++		ret = net_shaper_validate_nesting(binding, node, extack);
++		if (ret < 0)
++			return ret;
+ 	}
  
+ 	if (update_node) {
 -- 
 2.45.2
 
