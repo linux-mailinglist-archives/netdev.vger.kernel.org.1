@@ -1,156 +1,150 @@
-Return-Path: <netdev+bounces-133612-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238BF99678F
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:46:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BAB15996799
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 12:47:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3D50B24719
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:46:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E262B24C4F
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 10:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C1F19004B;
-	Wed,  9 Oct 2024 10:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D464C18F2C1;
+	Wed,  9 Oct 2024 10:47:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gupJofFz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="M9Q71tuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC8EA18E351;
-	Wed,  9 Oct 2024 10:46:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F5A18E046;
+	Wed,  9 Oct 2024 10:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728470764; cv=none; b=o1Byvcxmiv7Kem8nFcdqmzMDzBhbin3i9k+cF284AG6JZc/sBlQzryKMf+HqPD9Qe3CNXvm6n/2z7VBZ9oR5g4F7d2UDqbUen5E02V55j/Q6OjmUhiPnBy6eKqvBDxf6oj5rp2+uA7BgqdVBJKqauPjDu8lSx9fj3jT0ugzwGRQ=
+	t=1728470862; cv=none; b=jcMZHSzVBTzdWyBNZSiyEc/zoGsjnf0pSJdZsBUgqQEuy+Ql2fpv1V/Bm1PBMH0FTTwIx3uM4LOkBytusAx90qSzyY72KavsFIJT6heL1fvVLLDZjU4OYoEhYIg7Cbzu32BtqXQP7mhogSW3onoF3a5OgGOdkqMy7GXuneT/klM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728470764; c=relaxed/simple;
-	bh=7ogfy63NCCHiSq49N0zXYSztoBG+LmVx6sEdMeXj01U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kz8pMq35b6iQ9uIbDDgbGDm0XOLVUzH7PIJ7KZiShWtD8AqCxRkfQiZhE0MvnXLUd57iswB3z9nFr+KBuqUVEFIsYvEkxY6rhwJ3KbF0/HQcr70nRhKVLCwRad/nRciFRXK1QMjrAfiPYOokfg55tJhlhhang4cADQXow1J8RLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gupJofFz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9CE2C4CEC5;
-	Wed,  9 Oct 2024 10:46:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728470763;
-	bh=7ogfy63NCCHiSq49N0zXYSztoBG+LmVx6sEdMeXj01U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gupJofFz/1KFx5SHdOOc4kiE9gC3+gLfGr9td62OwqUsqLTWrK/GpaVql4Vh7AciM
-	 t5xyQ1PrvkBIidDk6sCIYHWKi2zxqCfCZCU4pABNqqC6snStLEwYSlads5xWLwWyMS
-	 aXaz/9kaER5BVJdnAYPVa449NhlqC3nt8ol/8PG6GsVxkWP1rj45PthxVtKKj6dH+W
-	 /ifqA0QffMGxZNSD7x7Rbb5RPT3psi+RsiGZZRzuYMaBDReLlIBrRdRtWWmW6QtbKM
-	 uxoRS6dgWgAX71nGhw/IcnTId2d5Rhr9Ey5pv8GQZkh82QCRNf8H7bVsbE03a7nm+n
-	 Qdfe+lh8CqZlQ==
-Date: Wed, 9 Oct 2024 12:46:00 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: bpf@vger.kernel.org, kuba@kernel.org, aleksander.lobakin@intel.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	john.fastabend@gmail.com, hawk@kernel.org, martin.lau@linux.dev,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	netdev@vger.kernel.org, lorenzo.bianconi@redhat.com
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-Message-ID: <ZwZe6Bg5ZrXLkDGW@lore-desk>
-References: <cover.1726480607.git.lorenzo@kernel.org>
- <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
+	s=arc-20240116; t=1728470862; c=relaxed/simple;
+	bh=DeGGr8eRNM1sOG5ooc1oEBYLMlvCiRdc/MY/Z+V1QGE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hKsBY7zK2H8ePsCBhoR0eRwA+j6WdtNw6UlJpFSe4JZ/qSvMmfMoraOZpfTCxYN2QpVoKhkEVn6NY/G3tVRVDz/Pdo7ycfW6guiEOmoJwReM8tOhdvJ8kdZ/FYWk+6YEtP2SpASZapXdxm2j2KDemw+ufjnkbhY/rQ4OBPK6ykM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=M9Q71tuw; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1728470851; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=cU67mvjUuCR3ylemxoenE5dWbfUp5sHbHLvCaaUCjVQ=;
+	b=M9Q71tuwmA3nmRPNFiUJAHFXQdWGhM8c8rDGf39K1vJkf1fBIBD3gC76hiUar2pWJHi5kbiCe02/gx6NX6WbUr68bWcwR28nPtBVPS1949DHsa1HSt/bSBOZT6myHluTSM+WMFsgnLpvHwtZMTPDnfz4b0UJJe3DDjxvks6Zwz8=
+Received: from 30.221.113.24(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WGidf1L_1728470849)
+          by smtp.aliyun-inc.com;
+          Wed, 09 Oct 2024 18:47:30 +0800
+Message-ID: <0d21c4e5-f014-44b0-b7bd-82e4608e6228@linux.alibaba.com>
+Date: Wed, 9 Oct 2024 18:47:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="4BEHZd7sa3dhiYCn"
-Content-Disposition: inline
-In-Reply-To: <amx5t3imrrh56m7vtsmlhdzlggtv2mlhywk6266syjmijpgs2o@s2z7dollcf7l>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: Address spelling errors
+To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ Jan Karcher <jaka@linux.ibm.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ Wen Gu <guwen@linux.alibaba.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20241009-smc-starspell-v1-1-b8b395bbaf82@kernel.org>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20241009-smc-starspell-v1-1-b8b395bbaf82@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---4BEHZd7sa3dhiYCn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-> Hi Lorenzo,
->=20
-> On Mon, Sep 16, 2024 at 12:13:42PM GMT, Lorenzo Bianconi wrote:
-> > Add GRO support to cpumap codebase moving the cpu_map_entry kthread to a
-> > NAPI-kthread pinned on the selected cpu.
-> >=20
-> > Changes in rfc v2:
-> > - get rid of dummy netdev dependency
-> >=20
-> > Lorenzo Bianconi (3):
-> >   net: Add napi_init_for_gro routine
-> >   net: add napi_threaded_poll to netdevice.h
-> >   bpf: cpumap: Add gro support
-> >=20
-> >  include/linux/netdevice.h |   3 +
-> >  kernel/bpf/cpumap.c       | 123 ++++++++++++++++----------------------
-> >  net/core/dev.c            |  27 ++++++---
-> >  3 files changed, 73 insertions(+), 80 deletions(-)
-> >=20
-> > --=20
-> > 2.46.0
-> >=20
->=20
-> Sorry about the long delay - finally caught up to everything after
-> conferences.
->=20
-> I re-ran my synthetic tests (including baseline). v2 is somehow showing
-> 2x bigger gains than v1 (~30% vs ~14%) for tcp_stream. Again, the only
-> variable I changed is kernel version - steering prog is active for both.
->=20
->=20
-> Baseline (again)						=09
->=20
-> ./tcp_rr -c -H $TASK_IP -p 50,90,99 -T4 -F8 -l30			        ./tcp_stream -=
-c -H $TASK_IP -T8 -F16 -l30
-> 						=09
-> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughpu=
-t (Mbit/s)
-> Run 1	2560252	        0.00009087	0.00010495	0.00011647		Run 1	15479.31
-> Run 2	2665517	        0.00008575	0.00010239	0.00013311		Run 2	15162.48
-> Run 3	2755939	        0.00008191	0.00010367	0.00012287		Run 3	14709.04
-> Run 4	2595680	        0.00008575	0.00011263	0.00012671		Run 4	15373.06
-> Run 5	2841865	        0.00007999	0.00009471	0.00012799		Run 5	15234.91
-> Average	2683850.6	0.000084854	0.00010367	0.00012543		Average	15191.76
-> 						=09
-> cpumap NAPI patches v2						=09
-> 						=09
-> 	Transactions	Latency P50 (s)	Latency P90 (s)	Latency P99 (s)			Throughpu=
-t (Mbit/s)
-> Run 1	2577838	        0.00008575	0.00012031	0.00013695		Run 1	19914.56
-> Run 2	2729237	        0.00007551	0.00013311	0.00017663		Run 2	20140.92
-> Run 3	2689442	        0.00008319	0.00010495	0.00013311		Run 3	19887.48
-> Run 4	2862366	        0.00008127	0.00009471	0.00010623		Run 4	19374.49
-> Run 5	2700538	        0.00008319	0.00010367	0.00012799		Run 5	19784.49
-> Average	2711884.2	0.000081782	0.00011135	0.000136182		Average	19820.388
-> Delta	1.04%	        -3.62%	        7.41%	        8.57%			        30.47%
->=20
-> Thanks,
-> Daniel
+On 10/9/24 6:05 PM, Simon Horman wrote:
+> Address spelling errors flagged by codespell.
+> 
+> This patch is intended to cover all files under drivers/smc
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   net/smc/smc.h      | 2 +-
+>   net/smc/smc_clc.h  | 2 +-
+>   net/smc/smc_core.c | 2 +-
+>   net/smc/smc_core.h | 4 ++--
+>   4 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/smc/smc.h b/net/smc/smc.h
+> index ad77d6b6b8d3..78ae10d06ed2 100644
+> --- a/net/smc/smc.h
+> +++ b/net/smc/smc.h
+> @@ -278,7 +278,7 @@ struct smc_connection {
+>   						 */
+>   	u64			peer_token;	/* SMC-D token of peer */
+>   	u8			killed : 1;	/* abnormal termination */
+> -	u8			freed : 1;	/* normal termiation */
+> +	u8			freed : 1;	/* normal termination */
+>   	u8			out_of_sync : 1; /* out of sync with peer */
+>   };
+>   
+> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+> index 5625fda2960b..5fd6f5b8ef03 100644
+> --- a/net/smc/smc_clc.h
+> +++ b/net/smc/smc_clc.h
+> @@ -156,7 +156,7 @@ struct smc_clc_msg_proposal_prefix {	/* prefix part of clc proposal message*/
+>   } __aligned(4);
+>   
+>   struct smc_clc_msg_smcd {	/* SMC-D GID information */
+> -	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requestor */
+> +	struct smc_clc_smcd_gid_chid ism; /* ISM native GID+CHID of requester */
+>   	__be16 v2_ext_offset;	/* SMC Version 2 Extension Offset */
+>   	u8 vendor_oui[3];	/* vendor organizationally unique identifier */
+>   	u8 vendor_exp_options[5];
+> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> index 4e694860ece4..500952c2e67b 100644
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.c
+> @@ -2321,7 +2321,7 @@ static struct smc_buf_desc *smcr_new_buf_create(struct smc_link_group *lgr,
+>   		}
+>   		if (lgr->buf_type == SMCR_PHYS_CONT_BUFS)
+>   			goto out;
+> -		fallthrough;	// try virtually continguous buf
+> +		fallthrough;	// try virtually contiguous buf
+>   	case SMCR_VIRT_CONT_BUFS:
+>   		buf_desc->order = get_order(bufsize);
+>   		buf_desc->cpu_addr = vzalloc(PAGE_SIZE << buf_desc->order);
+> diff --git a/net/smc/smc_core.h b/net/smc/smc_core.h
+> index 0db4e5f79ac4..69b54ecd6503 100644
+> --- a/net/smc/smc_core.h
+> +++ b/net/smc/smc_core.h
+> @@ -30,7 +30,7 @@
+>   					 */
+>   #define SMC_CONN_PER_LGR_PREFER	255	/* Preferred connections per link group used for
+>   					 * SMC-R v2.1 and later negotiation, vendors or
+> -					 * distrubutions may modify it to a value between
+> +					 * distributions may modify it to a value between
+>   					 * 16-255 as needed.
+>   					 */
+>   
+> @@ -181,7 +181,7 @@ struct smc_link {
+>   					 */
+>   #define SMC_LINKS_PER_LGR_MAX_PREFER	2	/* Preferred max links per link group used for
+>   						 * SMC-R v2.1 and later negotiation, vendors or
+> -						 * distrubutions may modify it to a value between
+> +						 * distributions may modify it to a value between
+>   						 * 1-2 as needed.
+>   						 */
+>   
+> 
 
-Hi Daniel,
+LGTM.
 
-cool, thx for testing it.
+Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
 
-@Olek: how do we want to proceed on it? Are you still working on it or do y=
-ou want me
-to send a regular patch for it?
+D. Wythe
 
-Regards,
-Lorenzo
-
---4BEHZd7sa3dhiYCn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZwZe6AAKCRA6cBh0uS2t
-rFVuAQCeYYTrJAMzE3J5ypktdAIYHT8ShePpXG4KJvD7gJokTAEAhY1ua80JsgUL
-XZ1oa28DT9S5HUC5xR6nbEy5dvOuQQE=
-=xdqd
------END PGP SIGNATURE-----
-
---4BEHZd7sa3dhiYCn--
 
