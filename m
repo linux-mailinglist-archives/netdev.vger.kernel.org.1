@@ -1,128 +1,87 @@
-Return-Path: <netdev+bounces-133578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29699965A3
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:38:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15DFF9965A8
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 11:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E093B231DF
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:38:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A4D82812BA
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:40:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B21C156242;
-	Wed,  9 Oct 2024 09:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="AcLymq+h"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147261885B9;
+	Wed,  9 Oct 2024 09:40:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27A4C18A92C;
-	Wed,  9 Oct 2024 09:38:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DC0817;
+	Wed,  9 Oct 2024 09:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728466729; cv=none; b=prFeuXZjxjZBc93wv8edNPbqcUY1KofiAl5gt6F1U2olnTZJTVY7jBw0FAp1AH+Jtmz3qOitdoP5botYwkKbfXAtgai+BMC4YUUNhLYpkII8cQnbCd7JqpmMbACAT84AYuY6e30o/UgM0a2NpudWHZITDXhXhddnwoFDsVleVjg=
+	t=1728466800; cv=none; b=jbbJDFHqrqxUsDWhxnPARf/iqPOxE2gi1YRFMmvvGnF4vw/jQ7nqYchUSFdN7mm1uKaZ0DyNo3sushpionuUakZ6IIH2hGDcoc0lLsPqMzsfXOU0EgapGvuJqxDjaPYlMo01H186yjdQjJ810YkaNwbD2lca12aM0B2Ra5tPWGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728466729; c=relaxed/simple;
-	bh=Jw9m9MFXObg+vZ7wq05G3wqyWtyj3AK1eBeQfJJK90U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBlxEih2Csikk9VWf4y7W32fhYH4ScQE7t2bYKCeDP3giTH2VRNUpP9HVnbJmTsdAAEc1U9vteu+PNRk6E1rZBJsHb748tm6n5wVcPCDGwXrjBbuHGus/jVA863Kve8xMVKb3t9GLN7RA3XKnJ7MPKhq4ScYwVtTEUw39Ma8gGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=AcLymq+h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B808BC4CEC5;
-	Wed,  9 Oct 2024 09:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1728466728;
-	bh=Jw9m9MFXObg+vZ7wq05G3wqyWtyj3AK1eBeQfJJK90U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AcLymq+hoDLhN3h3N8nHp58BgFOa4jDynBqk5dzipxHtlbGOU9EoJHZr1xWIGUvqd
-	 1/8BzU9GNB5AWykOOa82//nU/OkQpZ2Tl07ETsLRXZZMd4MYEMeaOwuFdvt3dbdEkn
-	 E0Fd5uSJFrxi3J4FjD1qWeIfBp1sHnDUf7i3tpjk=
-Date: Wed, 9 Oct 2024 11:38:45 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>, Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>,
-	Soumya Negi <soumya.negi97@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [RFC PATCH 10/13] staging: rts5280: Use always-managed version
- of pci_intx()
-Message-ID: <2024100936-brunette-flannels-0d82@gregkh>
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-11-pstanner@redhat.com>
+	s=arc-20240116; t=1728466800; c=relaxed/simple;
+	bh=f5m5XNYlzeu/Vrbj4WqB2ACnZwBMTiPZMWd1USbuw00=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=jYiMaJEA1okTa1P/mdJFFxBxT0qpsNyoJZQCqQKlPxfSsNbht+ZYvMgCfiQhUKLdzAIhQlF0NnJUgTolbE/jTGLe9/ELBZosvFbefqRmMeYc7M8mzd103Inl7j5aFQ6E4HL9WkOPJKTN9dVt4QOnTVpPLtzK1En7aXxT3GR9Jm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=50364 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1syTAe-00AfKI-CX; Wed, 09 Oct 2024 11:39:54 +0200
+Date: Wed, 9 Oct 2024 11:39:51 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: kmemleak in flowtable xdp
+Message-ID: <ZwZPZ_xguhEchEv0@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241009083519.10088-11-pstanner@redhat.com>
+X-Spam-Score: -1.8 (-)
 
-On Wed, Oct 09, 2024 at 10:35:16AM +0200, Philipp Stanner wrote:
-> pci_intx() is a hybrid function which can sometimes be managed through
-> devres. To remove this hybrid nature from pci_intx(), it is necessary to
-> port users to either an always-managed or a never-managed version.
-> 
-> rts5208 enables its PCI-Device with pcim_enable_device(). Thus, it needs the
-> always-managed version.
-> 
-> Replace pci_intx() with pcim_intx().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> ---
->  drivers/staging/rts5208/rtsx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Lorenzo,
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+kmemleak is not happy here when running tests:
+
+    [<00000000be65a589>] __kmalloc_cache_noprof+0x280/0x310
+    [<00000000c6569ad4>] nf_flow_offload_xdp_setup+0x70/0x8d0 [nf_flow_table]
+    [<000000001efe6e35>] nf_flow_table_offload_setup+0x324/0x610 [nf_flow_table]
+    [<000000005d9c9ad6>] nft_register_flowtable_net_hooks+0x3f4/0x890 [nf_tables]
+    [<00000000de9071ee>] nf_tables_newflowtable+0xf61/0x18c0 [nf_tables]
+    [<00000000924f5d86>] nfnetlink_rcv_batch+0x12c1/0x1c50 [nfnetlink]
+    [<000000003fa07104>] nfnetlink_rcv+0x2a3/0x320 [nfnetlink]
+    [<000000009fd1c990>] netlink_unicast+0x588/0x7f0
+    [<00000000ee126795>] netlink_sendmsg+0x702/0xba0
+    [<000000000ddf29fb>] ____sys_sendmsg+0x7cd/0x9a0
+    [<0000000027b80416>] ___sys_sendmsg+0xd6/0x140
+    [<00000000edfe1eb5>] __sys_sendmsg+0xba/0x150
+    [<000000009d5eb571>] do_syscall_64+0x47/0x110
+    [<0000000077c3a21e>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+nf_flow_offload_xdp_setup+0x70
+
+56
+57              ft_elem = kzalloc(sizeof(*ft_elem), GFP_KERNEL_ACCOUNT);
+58              if (!ft_elem)
+59                      return -ENOMEM;
+60
+61              ft_elem->ft = ft; <--- HERE
+62
+63              mutex_lock(&nf_xdp_hashtable_lock);
+64
+65              hash_for_each_possible(nf_xdp_hashtable,
+
+Thanks.
 
