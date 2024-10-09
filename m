@@ -1,144 +1,131 @@
-Return-Path: <netdev+bounces-133478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 980D899611A
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:40:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179DF996118
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 09:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA27B1C23E11
-	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:40:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98CA0B25593
+	for <lists+netdev@lfdr.de>; Wed,  9 Oct 2024 07:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E410B188591;
-	Wed,  9 Oct 2024 07:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E6F18756D;
+	Wed,  9 Oct 2024 07:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9BfDryM"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NTsv2DQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F53A18787A
-	for <netdev@vger.kernel.org>; Wed,  9 Oct 2024 07:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CB5183CD9;
+	Wed,  9 Oct 2024 07:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728459599; cv=none; b=Ek8RISfEL0tSLmou8k1nZG1h/mDfIWunEOz1+BlUkeEl2Q5pW82PhwkhcecHZd1blixtOxtVwF5D/nEK3fa4Ha8ial6KSg+oG+Ak9+FsZkJmPjupZZ6xEHp2scBMKxkU80NqK1+4w8D85Mt3xCkRHE2cut1JgMLJbjoQ96+P8xE=
+	t=1728459597; cv=none; b=Pd/02B/RQWpi2g6SKpz7eCBrhTtQ4smlkeJsxLuOrNVrFnxTFXBPhYSHXrOI6CaZ6eIH7xiaQHuDUvVnSroFyDWWXVp6oEKIA3L+Umg5Y8vi1ScdiLDkD++RKCIWKONFzGP1OiKlrFX3v0Xevj8u9SONAz9d518WmT41qCvCkS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728459599; c=relaxed/simple;
-	bh=9dJzKEPFAD4JUvaS3jyOf92XvdpMOg2X+Hnh+1QsXE4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Nqoy7dtwS2WwPTRqHp2bSFpHQMJIr/N1JJ1lmKlpzfCBcwaz8hCmhYQz6nm2b9CMhq7gc/sJ1rU/SCxbep4ibih20FPyjikLYKFqXaMgMak/m4yEf2CdtFPTZu0fCTXynV2regrKBt4G3a2hsxIWbQOHX0/rfIcjKUmIYgIdqnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R9BfDryM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728459597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9dJzKEPFAD4JUvaS3jyOf92XvdpMOg2X+Hnh+1QsXE4=;
-	b=R9BfDryMtafKM49YBcbqgGFRYgzOtOj8QeXqjmyNogMqZ7eMGDL9dwwHExeWeHT9ZB7b5F
-	L8wgbpcaAYQqws0pWPs+y2iDIZOiUyaNGERMtBKRqlONWVpzGBuWUglxTBJpOyVCNRVVBg
-	g+tUUUXFce0Gr/7BtHMG0pg1TLw9YZY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-418-YswQTLczMwKB5cIEq9TFaA-1; Wed, 09 Oct 2024 03:39:13 -0400
-X-MC-Unique: YswQTLczMwKB5cIEq9TFaA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37cd19d0e83so3017246f8f.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 00:39:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728459552; x=1729064352;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9dJzKEPFAD4JUvaS3jyOf92XvdpMOg2X+Hnh+1QsXE4=;
-        b=cS9ZWcWKB7le34icQM5yopy441n5FgHyrz+HD8BR1tNQaPpjxZbbLi55CEqvGOi4q9
-         HxeW2XDcdRNerPftkpx/MDr+xHkv/ouo1gXVctAW6uXJdzhl/op1/xc4Zx2bz1CpgYGz
-         NdL1rHRLO94jcieBJVgycMVTBv2lEo4bMPpCf/manHT0wGw0ePrtbmVu4cU7+5TQidkt
-         yJHCKZVEUIkJS6JK1NtJNC8hPhdDEKtvA5nuUUeQTB73hZtidIk716qA/FmR/mBfcUAH
-         pkBanCERe22YeCEdz4o1XZkBoHAazZtUDqJqhnAe1XshwgIr1QzqYWR8S738ZQcKNsga
-         3/kQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWF0qYcLO1s8Hsrc/hbhex7WvIf1UUuAk+RDQ8jzqvBxQ7ESXCbGP3Fm4p2s+FXOleXN62w5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+DMW4mOVD6FdTujN/b0c7gWLnNPbZtcwS1cvlNVRO/MeKIxtg
-	ldQulKj9tQJiXkMEkG8x9rAmNn346ABpIn6OFWahckO5G2SFInSESoIxZbvgJ0mvMGj3JAnpmwS
-	Ngw4moTls6KQjcFwu/PvF4YYXBmJylWVeBfdKx9kDZnyEQ+OMSxhrsw==
-X-Received: by 2002:a5d:6a0f:0:b0:374:c56e:1d44 with SMTP id ffacd0b85a97d-37d3aa83f66mr741050f8f.48.1728459551775;
-        Wed, 09 Oct 2024 00:39:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEYf5a/YJ8kLTN40pKDIOibKodHb2C12vO2gw43Om2R8cyTwst05scLhW8CZw3n+kl2AFVxTA==
-X-Received: by 2002:a5d:6a0f:0:b0:374:c56e:1d44 with SMTP id ffacd0b85a97d-37d3aa83f66mr741029f8f.48.1728459551321;
-        Wed, 09 Oct 2024 00:39:11 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430d748dd50sm11261915e9.47.2024.10.09.00.39.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 00:39:09 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 7136315F3D4A; Wed, 09 Oct 2024 09:39:08 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, Simon
- Sundberg <simon.sundberg@kau.se>, bpf <bpf@vger.kernel.org>, Network
- Development <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf 2/4] selftests/bpf: Consolidate kernel modules into
- common directory
-In-Reply-To: <CAADnVQKM0Mw=VXp6mX2aZrHoUz1+EpVO5RDMq3FPm9scPkVZXw@mail.gmail.com>
-References: <20241008-fix-kfunc-btf-caching-for-modules-v1-0-dfefd9aa4318@redhat.com>
- <20241008-fix-kfunc-btf-caching-for-modules-v1-2-dfefd9aa4318@redhat.com>
- <CAADnVQKM0Mw=VXp6mX2aZrHoUz1+EpVO5RDMq3FPm9scPkVZXw@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 09 Oct 2024 09:39:08 +0200
-Message-ID: <87bjztsp2b.fsf@toke.dk>
+	s=arc-20240116; t=1728459597; c=relaxed/simple;
+	bh=ZXALps+EHwY7XPezKlK/CkIw6NgcRIiespUxDFCgz7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=k8jYmZHFPVjZLOvd6TGqRg0y8QVjI8d/bU55cpuqdmh7/23HfQTMWZmhUP6rpxIZUCIEkrCTtD7yjH7nDbauzBfFR4HF3tcl4FQ+uf/Dp6YO2jmFbxBtpkEBfwVYNRZRavgVzG7stwe+oBrEFWfBez1xV3SrIOOMkC6wELGkDWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NTsv2DQ+; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498MMg02000677;
+	Wed, 9 Oct 2024 07:39:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	vnsPQONfZ61MaZhMi/vcxe9LQ679D9pa2oHkYGdMnqs=; b=NTsv2DQ+2lpXJdUy
+	7YTQ6IuB/wGcEmL6xmIOYpcJL9ffprnUL9fh4+H2CWLWkczXtjmatlNYgkb5JYeR
+	e5JZ9O3qQ8QHLYDSCfXHQ+xRa2WVAQdVguSq+tyyqivHSg2SikwciZ+5RHoDs1Hv
+	QlVQo0oXj700MFE05QJSD6xkqo6SXytnXMw5EjGZFx4tKJVkH0yiCOr7yZ2uURhX
+	egQy9BFNPIa7mdR4xaM8rD+MIxgarg1ziHnQ7SL+CRrgdePnA19w2+cfEXGe4Zn7
+	sAcFDGhkLhmMzTxpqLenPMpjTanjqkPpsphPxynyQNrPk5C4YjzxorYT8r5RCYBK
+	P3STdg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4252wstyyx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 09 Oct 2024 07:39:38 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4997dbPO014720
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 9 Oct 2024 07:39:37 GMT
+Received: from [10.152.195.140] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 9 Oct 2024
+ 00:39:30 -0700
+Message-ID: <7383268f-4655-433a-9b9b-ebc9ac3d57ea@quicinc.com>
+Date: Wed, 9 Oct 2024 13:09:27 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <neil.armstrong@linaro.org>,
+        <arnd@arndb.de>, <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
+References: <20241004080332.853503-1-quic_mmanikan@quicinc.com>
+ <20241004080332.853503-6-quic_mmanikan@quicinc.com>
+ <72r4uowjwoxkeqq6bxhdv72wq4rqogirb3yyp2ku66rr2cnzbs@i2lk6sgfvenh>
+Content-Language: en-US
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+In-Reply-To: <72r4uowjwoxkeqq6bxhdv72wq4rqogirb3yyp2ku66rr2cnzbs@i2lk6sgfvenh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: cumxdSoADtOksco1skilAfCwCTXFKRac
+X-Proofpoint-GUID: cumxdSoADtOksco1skilAfCwCTXFKRac
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=727 priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410090049
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 
-> On Tue, Oct 8, 2024 at 3:35=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <=
-toke@redhat.com> wrote:
+
+On 10/7/2024 1:32 AM, Dmitry Baryshkov wrote:
+> On Fri, Oct 04, 2024 at 01:33:30PM GMT, Manikanta Mylavarapu wrote:
+>> From: Devi Priya <quic_devipriy@quicinc.com>
 >>
->> The selftests build two kernel modules (bpf_testmod.ko and
->> bpf_test_no_cfi.ko) which use copy-pasted Makefile targets. This is a
->> bit messy, and doesn't scale so well when we add more modules, so let's
->> consolidate these rules into a single rule generated for each module
->> name, and move the module sources into a single directory.
+>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>> devices.
 >>
->> To avoid parallel builds of the different modules stepping on each
->> other's toes during the 'modpost' phase of the Kbuild 'make modules', we
->> create a single target for all the defined modules, which contains the
->> recursive 'make' call into the modules directory. The Makefile in the
->> subdirectory building the modules is modified to also touch a
->> 'modules.built' file, which we can add as a dependency on the top-level
->> selftests Makefile, thus ensuring that the modules are always rebuilt if
->> any of the dependencies in the selftests change.
->
-> Nice cleanup, but looks unrelated to the fix and hence
-> not a bpf material.
-> Why combine them?
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+>> ---
+>> Changes in V6:
+>> 	- Remove 'nsscc_ipq9574_desc' and use 'nss_cc_ipq9574_desc' in
+>> 	  probe()
+>> 	- Drop of_clk_get() and clk_prepare_enable() in probe() because
+>> 	  ethernet node will subscribe to GCC_NSSCC_CLK and enable it.
+> 
+> Does the cllock supply the clock controller? If not, it should be
+> dropped from bindings too.
+> 
+Hi Dmitry,
 
-Because the selftest adds two more kernel modules to the selftest build,
-so we'd have to add two more directories with a single module in each
-and copy-pasted Makefile rules. It seemed simpler to just refactor the
-build of the two existing modules first, after which adding the two new
-modules means just dropping two more source files into the modules
-directory.
+Since GCC_NSSCC_CLK is the source for the NSS clock controller, there is no need to drop it from the bindings.
 
-I guess we could technically do the single-directory-per-module, and
-then send this patch as a follow-up once bpf gets merged back into
-bpf-next, but it seems a bit of a hassle, TBH. WDYT?
-
--Toke
-
+Thanks & Regards,
+Manikanta.
 
