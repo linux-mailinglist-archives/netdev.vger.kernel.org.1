@@ -1,73 +1,74 @@
-Return-Path: <netdev+bounces-134401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11C599934B
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:02:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 05AE3999357
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:08:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C35601C212E7
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:02:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1EEF1C20F79
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:08:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01A401D0BA3;
-	Thu, 10 Oct 2024 20:02:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49901CEAD8;
+	Thu, 10 Oct 2024 20:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Rmg20+EL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bYCKTvji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7164E1CFEA0
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C13E188A08
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728590552; cv=none; b=rhFY+NoZaU7yzDoxABIwgQUF9/TGgi/N4KUglc8xzs6RnMu0JdKcvdwO16s7EilBQ5p4gFAdnXA+JdJVJNdSssjW/Ok3pGkHXnCtRWt+rcihXTP7vrRh5DVp1ekvg5UR2AhWoedp5mUkamW2ihV5ROJ/HtZH4R3vVQYWZZGlxPQ=
+	t=1728590886; cv=none; b=nP5EkBrWS0v6BXbBYwJROFDRRSsaPz8hOghahKoxM76b1aS63khVA4TKHoQ2fT3lQWrKrozo+8LCCgCpirCw+1Tg4LpQytm+pyStGwoCHiVRDYIVNAeSSm7VjMnpuP6oaXYytMihbzrNBXUosvk/yYLZ3jI1DTb2E18noB2ezHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728590552; c=relaxed/simple;
-	bh=Ufq4Rv9QkWwA0R4+C4jJuCBL5lj03dyp/eJyqA12F7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XzPVM/aEV+err938e//k9tLCkOXwT53oQBvw9Pz9H9rO76basITZ7LTF9gh3HQpXhL5yX70GSJM3n7eFf2vx/yp5wbG7mnV53fifLgL7SNPTVrcbh31H47MjJBpyBQGVkJqMtu+v3+wxcQNaBz99WiJ6w/QAflYMMcHrTNBImU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Rmg20+EL; arc=none smtp.client-ip=209.85.210.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-717d2b8c08aso417701a34.1
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:02:31 -0700 (PDT)
+	s=arc-20240116; t=1728590886; c=relaxed/simple;
+	bh=q1Dbxy2oSJz+fI5Eq3EIbME3PNazC9b6hZf46TNWfUo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dwogs9q5z0ZObfokHuuZfLCZsWvI+SAwG9T/swwaA/qwx4JRgjLYpQ8UxgD1EWG+YFrFDEfJsL020GuBwViEz/WCkY7t4flnQ0zp0+kL3c/cFUPnYKsScJz6fImeeC6SPwnr8abPSJTRIaP3WP1WYS4CTn0tzRHw1+EqHPUse8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bYCKTvji; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c924667851so1588162a12.3
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:08:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1728590550; x=1729195350; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=THpwMhu/eHO/78nRRmMM5iJs132pKlZiyFjAiDnKR3c=;
-        b=Rmg20+EL8dJWvKufD92ezz4QKnViMH8/2z8aEebPc7TVDNUwtRoAZVBam9+Ixn5b2a
-         NcUeHjKPIzp5FR/ZH/SX2xZ3U2N9W4+/XvewR2sVxMgBr9p9lsi4B9j66WoqD/1xCkwI
-         KDnjuwm+o4d5GO7XWz5O6cV1GXkRvQQCas1aM=
+        d=gmail.com; s=20230601; t=1728590883; x=1729195683; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=9uKypuGUrFMAV96E6Fg8fBL+I6FVZam4/4rBokIhdkg=;
+        b=bYCKTvjiH6+PA+IGVyY/tTPdIuz4MDkFFM3jNRSBRJDCrigK8OuDuq6dRhuVQbiCp9
+         HbI7s+LDv4OncTMI/orssmnB0D2GGW1nRodFGhJdVHdsmYMQ+0Cok174XnOuFbMkuiNJ
+         LnupIxYXH4CzlQD/3tNtkL0mEZUQs/6YGCP+Q3RrMuQ/2R6V1awJrsfoFb3O5yw04LDR
+         bxpPCMWdUdnrV7n/pJJbShqimRNATy0BDn0gAFWuQxPntlOHz4XVkHpRSw7QPg690jpM
+         V/4L9S8twVDZj1M48Vo0TFONJXHL/ihyYC3PyM+eGCmD2P47cv7wDbYeDx0bOct8i3tV
+         uM7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728590550; x=1729195350;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=THpwMhu/eHO/78nRRmMM5iJs132pKlZiyFjAiDnKR3c=;
-        b=jCAIqlBV5b3fTI0t9GWZLPPR/HfgEd4tDAM39e3SYoLTrZMsiVJle3CNDPL0v72qK4
-         JLoV9P1hI+NnkKTwCeap5pDES0DUlfeHoxGsgJb7OxFOU2qmxkqnOvVsitfK0f9DWc5U
-         kxtUzXijxsWURh/UkuMswdj/JyJqrEyXb05nWojal2oV1TrGhVYK9KKI2muQlOkdWyzC
-         +gUsXMngKNNZ0DoduxBmq3wSAWK3XBhXFFDUOGZsd5wi1+8nKxrB0hx+9/ODz7rnXYY2
-         nQEfq6EB0q6etavJ/Tftiv22p6PpbFVAjzZylzeQWIiv9YIUKk948HmFrk7mpLbnOmq/
-         Av6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVKOatMFVxGxzBbeXAgQUJpNjqmiRjx3W8NMjRv4k6PPTUh2v446Aw+j+tJvBgigkq6Zaeio7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBx6kARtQc+vXWz7VNwg3X0Lk22t9YvDSYKu6q6Sy1VnwwKjUm
-	JBEyHWbrl4yM4A81bvU+D1rZc8yxZBkEBh4EGvg0LAIZvO3E9d1TTD/lhaBGjtbJt96pZJOPbIw
-	=
-X-Google-Smtp-Source: AGHT+IEZ/Bc/CinBvfrLNeiAe3TCEEadIJS543gwE1faUks/hMrtvwB7xxEYxmMroK5+u3OxFw2y/Q==
-X-Received: by 2002:a05:6358:5286:b0:1b5:fa68:4208 with SMTP id e5c5f4694b2df-1c32bc8ca67mr30817555d.28.1728590550300;
-        Thu, 10 Oct 2024 13:02:30 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b1148d69fesm73075585a.41.2024.10.10.13.02.28
+        d=1e100.net; s=20230601; t=1728590883; x=1729195683;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9uKypuGUrFMAV96E6Fg8fBL+I6FVZam4/4rBokIhdkg=;
+        b=t1gt+CtkrgJD5bUFEGP9RxJTpMeQqAqkd9unSdZuDbXnLoVV9myjh0BImkExXaZd99
+         QkpghVh0xj9M/BkPewAs9R64Aw+kOvNGzFJ4fx3vtzhbiFfnjSvao4msz1cY+FT34CSM
+         x+NMPgEqCQT3bELkIRKcPKHJH43WGyF512a/KfN2uTd/I83gT5zMOH2hTsctFd7fhxjB
+         DRlFE+KpMz0BlKhJycSmHGt/6JhhaPaKNIzauOLseB5g/418gmUjbSGNXDf67K9xPIT2
+         HAWkDntR78HErTJbLNG1PwA/6sGIHFrzbIJtarKRPkI9R1zK4dVdza96aSzpJOvX6jg8
+         NHMQ==
+X-Gm-Message-State: AOJu0Yx27kHIk11WnKHMe5mZX0075bBZrvlaCnC5l45ow6zIay3bCxQd
+	2xxGaERz7/VqgTlpaxYPej2RzcHt8yaJYy6LrO3DaoAIc+jarJlP
+X-Google-Smtp-Source: AGHT+IEu92E+uJEnjS0mMOj4ncZZp6fuOwxIy7JNwBWbIKdKlatcgQOPlQc1IVGJ6eOIA/YMTBMKsw==
+X-Received: by 2002:a17:907:97cd:b0:a8d:4631:83a9 with SMTP id a640c23a62f3a-a99b9307049mr15006566b.3.1728590882999;
+        Thu, 10 Oct 2024 13:08:02 -0700 (PDT)
+Received: from ?IPV6:2a02:3100:ac3e:8500:8533:85c:8e6e:f61b? (dynamic-2a02-3100-ac3e-8500-8533-085c-8e6e-f61b.310.pool.telefonica.de. [2a02:3100:ac3e:8500:8533:85c:8e6e:f61b])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a99a80f2187sm130525566b.201.2024.10.10.13.08.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 13:02:29 -0700 (PDT)
-Message-ID: <76756326-d14d-4c70-a897-b01dd44066e3@broadcom.com>
-Date: Thu, 10 Oct 2024 13:02:27 -0700
+        Thu, 10 Oct 2024 13:08:02 -0700 (PDT)
+Message-ID: <30edd5d2-13aa-409f-9b12-f0c775c81f02@gmail.com>
+Date: Thu, 10 Oct 2024 22:08:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,57 +76,139 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: broadcom: remove select MII from brcmstb
- Ethernet drivers
-To: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, bcm-kernel-feedback-list@broadcom.com
-References: <20241010191332.1074642-1-justin.chen@broadcom.com>
+Subject: Re: [PATCH net-next v2] r8169: use the extended tally counter
+ available from RTL8125
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <43b100c5-9d53-46eb-bee0-940ab948722a@gmail.com>
 Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20241010191332.1074642-1-justin.chen@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <43b100c5-9d53-46eb-bee0-940ab948722a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/10/24 12:13, Justin Chen wrote:
-> The MII driver isn't used by brcmstb Ethernet drivers. Remove it
-> from the BCMASP, GENET, and SYSTEMPORT drivers.
+On 10.10.2024 12:50, Heiner Kallweit wrote:
+> The new hw stat fields partially duplicate existing fields, but with a
+> larger field size now. Use these new fields to reduce the risk of
+> overflows. In addition add support for relevant new fields which are
+> available from RTL8125 only.
 > 
-> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+> v2:
+> - added code for enabling the extended tally counter
+> - included relevant new fields 
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 40 ++++++++++++++++++++++-
+>  1 file changed, 39 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 665105430..71339910b 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -1777,11 +1777,26 @@ static const char rtl8169_gstrings[][ETH_GSTRING_LEN] = {
+>  	"tx_underrun",
+>  };
+>  
+> +static const char rtl8125_gstrings[][ETH_GSTRING_LEN] = {
+> +	"tx_bytes",
+> +	"rx_bytes",
+> +	"tx_pause_on",
+> +	"tx_pause_off",
+> +	"rx_pause_on",
+> +	"rx_pause_off",
+> +};
+> +
+>  static int rtl8169_get_sset_count(struct net_device *dev, int sset)
+>  {
+>  	switch (sset) {
+>  	case ETH_SS_STATS:
+> -		return ARRAY_SIZE(rtl8169_gstrings);
+> +		struct rtl8169_private *tp = netdev_priv(dev);
+> +
+> +		if (rtl_is_8125(tp))
+> +			return ARRAY_SIZE(rtl8169_gstrings) +
+> +			       ARRAY_SIZE(rtl8125_gstrings);
+> +		else
+> +			return ARRAY_SIZE(rtl8169_gstrings);
+>  	default:
+>  		return -EOPNOTSUPP;
+>  	}
+> @@ -1873,13 +1888,33 @@ static void rtl8169_get_ethtool_stats(struct net_device *dev,
+>  	data[10] = le32_to_cpu(counters->rx_multicast);
+>  	data[11] = le16_to_cpu(counters->tx_aborted);
+>  	data[12] = le16_to_cpu(counters->tx_underrun);
+> +
+> +	if (rtl_is_8125(tp)) {
+> +		data[5] = le32_to_cpu(counters->align_errors32);
+> +		data[10] = le64_to_cpu(counters->rx_multicast64);
+> +		data[11] = le32_to_cpu(counters->tx_aborted32);
+> +		data[12] = le32_to_cpu(counters->tx_underrun32);
+> +
+> +		data[13] = le64_to_cpu(counters->tx_octets);
+> +		data[14] = le64_to_cpu(counters->rx_octets);
+> +		data[15] = le32_to_cpu(counters->tx_pause_on);
+> +		data[16] = le32_to_cpu(counters->tx_pause_off);
+> +		data[17] = le32_to_cpu(counters->rx_pause_on);
+> +		data[18] = le32_to_cpu(counters->rx_pause_off);
+> +	}
+>  }
+>  
+>  static void rtl8169_get_strings(struct net_device *dev, u32 stringset, u8 *data)
+>  {
+>  	switch(stringset) {
+>  	case ETH_SS_STATS:
+> +		struct rtl8169_private *tp = netdev_priv(dev);
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+patchwork lists the following warning for a clang build:
+warning: label followed by a declaration is a C23 extension [-Wc23-extensions]
+
+gcc 14.2.1 however had no problem with this code, and also checkpatch didn't
+complain. Is this code acceptable or should it be changed?
+
 
