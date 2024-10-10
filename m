@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-134104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F77998052
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:42:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E99099804F
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:42:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DDA1C22AC8
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:42:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25D091F2562C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470F61BDA97;
-	Thu, 10 Oct 2024 08:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62F731C9EA4;
+	Thu, 10 Oct 2024 08:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="iHJQl2Tn"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="OFWcrvZb"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886CF29AF;
-	Thu, 10 Oct 2024 08:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9103E192B78;
+	Thu, 10 Oct 2024 08:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728548587; cv=none; b=XsRhesnKpWtBMbWhAiHIWNnn4C/j73LvwTh8Z2p4LUYL219djH7l/+jUndhODcPkJ+aX+KRQwgSJuOtuNgiwNJOaqUx4VapJy6cCEs5nCftWNl403HfR07nT0JsYCJDOSclGsQ+VUQqZVmF0yNBMcX3lGN6FXmSyyK2P0jn2e0k=
+	t=1728548564; cv=none; b=bBXqKff/Fj0ZUdSyrXEeRQkBQHsxEQ6sBrINDmLvpIr1ijvps86VRGvrm/m/Wwg/JRao/3ZEqQxXoIPllrxttO1y5B6cCYmpGgUon8/8JxsK2nT8z05h4IbTZwLD83BGoLJzTEYtTYN54SLElGhmimRfLq8REs84azU3NthhFtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728548587; c=relaxed/simple;
-	bh=TJYdYUWIaCsfY6opptDdB86/VBA/8p6URsH2BCkPorU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=V5mvJF2LgRtbYJFdtGy9DRFZFGJZxuF68J8RfobF1AhsVpC53MpTOStxNbKOx+dQgzTlJae2wElbw0yryolIp7l5Ci1HQZ02HufyZQELt3pOTPYYXbsZlFWnw67g/v2odd0/32gsEoroic+AX6ZJ550M7FKOsppdbGR2muz4vUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=iHJQl2Tn; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1728548564; c=relaxed/simple;
+	bh=j0vLyCJPFlst34XH3yVWN9TjDQ7Y3e3Ov6+1OgCePC4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WCrrvjIeozmqJ+YUq7GSctnQa6y9KdfSG2Kx6Sp12DjdI0yqI07OOB5RIjAYoE1VGQB6cRT0gZ1tKw3WNYtpT3vduATC/z/LnOPwimgswpRmGNY1AWScJkj8bDFIqzuzB1mQACJYXMdPnUJV34bs3NLzaKKVMLCoyrGU7QXkXpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=OFWcrvZb; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1728548585; x=1760084585;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=TJYdYUWIaCsfY6opptDdB86/VBA/8p6URsH2BCkPorU=;
-  b=iHJQl2Tnh79kuwxs0CPRixFVYO0zGzNr15H1OEyfyRqY1JTa3ODdJZW/
-   L6Le0lfFaTXJY+BEzQK2nMlk5bk9V7qAY6Nxgnd2CR8JGxfC8HKjTzPOb
-   nLRREW3DN1+02+duQU8P/zL4qq/hmeUiZL77Nn7ev/STY4oD1PnirnQyd
-   xDak4gZlPLpQfmuhr5IVEYz1czZ59Nee/Ldy5SPUngwfHpczQRXqY/nkV
-   B0eADQgXQB9sH8EKt9YTpamuPxQ+Ynd3habA5Uo8N4Ho/sU6xHT28ZHzZ
-   zjPt29XnN9yxabSeheDnSDOrIDxIsag1sHFRvs+JvaTGyqalfs701AW34
+  t=1728548562; x=1760084562;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=j0vLyCJPFlst34XH3yVWN9TjDQ7Y3e3Ov6+1OgCePC4=;
+  b=OFWcrvZbnpipwkt0kR+vE3nWMURI1Jo9FKaImM2UBvAycYqoPNyFrbOM
+   0WWNJICI0s01D1/o9tuRh/NKLoOzBRZcNh0EC+6OR0ymfCOvfcjBHXDjJ
+   brnl78a/z19SszYrnqlFbkIFnMpjSHOwrRfQVl4pVDRK0g6/EgQq37Aic
+   18CEsHTOz3CS+nhdHKOj06FviuQ+hqzBQOeFKsM1ZS0q5BmpOpqmU04at
+   NYMqBdRet0huqG0jcfYEE2kJyBjIgngSjIA1hAT+3wBYWIozeVbcAsmHP
+   xxxiWYW/+n1farMS2rtBW2DFKTnLZFVaSv4/TxIfCeSCCnqUxn64BlWTb
    A==;
-X-CSE-ConnectionGUID: x5SKfw9ZTYWBZMz1Nje/Ew==
-X-CSE-MsgGUID: IJKZUi8sQICBJwnpaL37jQ==
+X-CSE-ConnectionGUID: guzCieAiRJ+z8jrS4dvLsQ==
+X-CSE-MsgGUID: 6D/vm6A/SGue7z3Z89Lrzg==
 X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
-   d="scan'208";a="36163250"
+   d="scan'208";a="33418975"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2024 01:22:58 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2024 01:22:36 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 10 Oct 2024 01:22:25 -0700
+ 15.1.2507.35; Thu, 10 Oct 2024 01:22:30 -0700
 Received: from che-ll-i17164.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 10 Oct 2024 01:22:21 -0700
+ 15.1.2507.35 via Frontend Transport; Thu, 10 Oct 2024 01:22:26 -0700
 From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
 To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -64,10 +65,12 @@ To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<Thorsten.Kummermehr@microchip.com>
-Subject: [PATCH net-next v4 0/7] microchip_t1s: Update on Microchip 10BASE-T1S PHY driver
-Date: Thu, 10 Oct 2024 13:51:58 +0530
-Message-ID: <20241010082205.221493-1-parthiban.veerasooran@microchip.com>
+Subject: [PATCH net-next v4 1/7] net: phy: microchip_t1s: restructure cfg read/write functions arguments
+Date: Thu, 10 Oct 2024 13:51:59 +0530
+Message-ID: <20241010082205.221493-2-parthiban.veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241010082205.221493-1-parthiban.veerasooran@microchip.com>
+References: <20241010082205.221493-1-parthiban.veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,48 +80,97 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch series contain the below updates:
-- Restructured lan865x_write_cfg_params() and lan865x_read_cfg_params()
-  functions arguments to more generic.
-- Updated new/improved initial settings of LAN865X Rev.B0 from latest
-  AN1760.
-- Added support for LAN865X Rev.B1 from latest AN1760.
-- Moved LAN867X reset handling to a new function for flexibility.
-- Added support for LAN867X Rev.C1/C2 from latest AN1699.
-- Disabled/enabled collision detection based on PLCA setting.
+Restructure lan865x_write_cfg_params() and lan865x_read_cfg_params()
+functions arguments to more generic which will be useful for the next
+patch which updates the improved initial configuration for LAN8650/1
+Rev.B0 published in the Configuration Note.
 
-v2:
-- Fixed indexing issue in the configuration parameter setup.
+Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+---
+ drivers/net/phy/microchip_t1s.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
 
-v3:
-- Replaced 0x1F with GENMASK(4, 0).
-- Corrected typo.
-- Cover letter updated with proper details.
-- All the patches commit messages changed to imperative mode.
-
-v4:
-- Removed 0x3F masking in the configuration calculation and adjusted
-  GENMASK() as FIELD_PREP() already masks.
-- Added comment for 5-bit signed value calculation and handling.
-
-Parthiban Veerasooran (7):
-  net: phy: microchip_t1s: restructure cfg read/write functions
-    arguments
-  net: phy: microchip_t1s: update new initial settings for LAN865X
-    Rev.B0
-  net: phy: microchip_t1s: add support for Microchip's LAN865X Rev.B1
-  net: phy: microchip_t1s: move LAN867X reset handling to a new function
-  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C1
-  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C2
-  net: phy: microchip_t1s: configure collision detection based on PLCA
-    mode
-
- drivers/net/phy/Kconfig         |   4 +-
- drivers/net/phy/microchip_t1s.c | 300 +++++++++++++++++++++++++-------
- 2 files changed, 240 insertions(+), 64 deletions(-)
-
-
-base-commit: 09cf85ef183a5603db49d542264ddbece3258e55
+diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
+index 3614839a8e51..24f992aba7d7 100644
+--- a/drivers/net/phy/microchip_t1s.c
++++ b/drivers/net/phy/microchip_t1s.c
+@@ -112,7 +112,7 @@ static int lan865x_revb0_indirect_read(struct phy_device *phydev, u16 addr)
+ /* This is pulled straight from AN1760 from 'calculation of offset 1' &
+  * 'calculation of offset 2'
+  */
+-static int lan865x_generate_cfg_offsets(struct phy_device *phydev, s8 offsets[2])
++static int lan865x_generate_cfg_offsets(struct phy_device *phydev, s8 offsets[])
+ {
+ 	const u16 fixup_regs[2] = {0x0004, 0x0008};
+ 	int ret;
+@@ -130,13 +130,15 @@ static int lan865x_generate_cfg_offsets(struct phy_device *phydev, s8 offsets[2]
+ 	return 0;
+ }
+ 
+-static int lan865x_read_cfg_params(struct phy_device *phydev, u16 cfg_params[])
++static int lan865x_read_cfg_params(struct phy_device *phydev,
++				   const u16 cfg_regs[], u16 cfg_params[],
++				   u8 count)
+ {
+ 	int ret;
+ 
+-	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs); i++) {
++	for (int i = 0; i < count; i++) {
+ 		ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
+-				   lan865x_revb0_fixup_cfg_regs[i]);
++				   cfg_regs[i]);
+ 		if (ret < 0)
+ 			return ret;
+ 		cfg_params[i] = (u16)ret;
+@@ -145,13 +147,14 @@ static int lan865x_read_cfg_params(struct phy_device *phydev, u16 cfg_params[])
+ 	return 0;
+ }
+ 
+-static int lan865x_write_cfg_params(struct phy_device *phydev, u16 cfg_params[])
++static int lan865x_write_cfg_params(struct phy_device *phydev,
++				    const u16 cfg_regs[], u16 cfg_params[],
++				    u8 count)
+ {
+ 	int ret;
+ 
+-	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs); i++) {
+-		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
+-				    lan865x_revb0_fixup_cfg_regs[i],
++	for (int i = 0; i < count; i++) {
++		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2, cfg_regs[i],
+ 				    cfg_params[i]);
+ 		if (ret)
+ 			return ret;
+@@ -162,8 +165,8 @@ static int lan865x_write_cfg_params(struct phy_device *phydev, u16 cfg_params[])
+ 
+ static int lan865x_setup_cfgparam(struct phy_device *phydev)
+ {
++	u16 cfg_results[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
+ 	u16 cfg_params[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
+-	u16 cfg_results[5];
+ 	s8 offsets[2];
+ 	int ret;
+ 
+@@ -171,7 +174,8 @@ static int lan865x_setup_cfgparam(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = lan865x_read_cfg_params(phydev, cfg_params);
++	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
++				      cfg_params, ARRAY_SIZE(cfg_params));
+ 	if (ret)
+ 		return ret;
+ 
+@@ -190,7 +194,8 @@ static int lan865x_setup_cfgparam(struct phy_device *phydev)
+ 			  FIELD_PREP(GENMASK(15, 8), 17 + offsets[0]) |
+ 			  (22 + offsets[0]);
+ 
+-	return lan865x_write_cfg_params(phydev, cfg_results);
++	return lan865x_write_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
++					cfg_results, ARRAY_SIZE(cfg_results));
+ }
+ 
+ static int lan865x_revb0_config_init(struct phy_device *phydev)
 -- 
 2.34.1
 
