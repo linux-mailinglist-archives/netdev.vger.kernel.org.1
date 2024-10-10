@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A63E997AB3
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:50:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED11C997AB6
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C591F22E38
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:50:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25F771C21885
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971B117E00B;
-	Thu, 10 Oct 2024 02:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B9A188A0C;
+	Thu, 10 Oct 2024 02:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldy37X2n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNWEEi+h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FA6170A14;
-	Thu, 10 Oct 2024 02:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C68188000;
+	Thu, 10 Oct 2024 02:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728528628; cv=none; b=tAwPEoKeo/a7miDNLiaxVty9LpvgK5oj3idhQrb//tpQ25q8xm0OrGL2bPSPSsSzh0+5pMKP5zYzkrSCVfsuPh2sOy2ssGXadRqKfSl/2VLR431hLdZOaaGGKLxX5CzZFyOH+QpZcuYo+At1jvzGoyKdl9fHsgG/HMacFUumoJQ=
+	t=1728528629; cv=none; b=Bt/EfSbV29Mo/fA41y8kGvcn7d7xDoGl9oA6ZT0W5STs6LjGhE+6EKEmsQmfB9+cDFijauhT8M/HGm/Jej3DmSFxEVZ7rYMTavwtlc4InViD+35SXZQk5WQM5GcbcvdpRNO51jgOD2GQAzh8xChirOFN7CpjVYAjA4NFylCNA1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728528628; c=relaxed/simple;
-	bh=jNdxhNigsNuT3EpLL13jdD3S4+hvo/Ai+KX6gJbhB2c=;
+	s=arc-20240116; t=1728528629; c=relaxed/simple;
+	bh=i+qyl4CRczxO+Wnas3t84So0uuLSVlqua8L8kuRqYMY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gSX7ERLYYTTxUfel4oxE1yasxvimbYF/KV0JArZznPk+vdPypmFI/4MfcDoxoqJKzd9awbZHa9uODbHLwErp6+wVgKym7gAhBqxbT6Xjwax1qvbcRF+fsp2k6O2FCGgzESyUSBfwetIaKsGxiRMaT4o2bTqCvaJ4SSgUHZ7qodk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldy37X2n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE965C4CEC3;
-	Thu, 10 Oct 2024 02:50:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ms/q4vL3IV10STh0XidwESnpZRYullD8CQQh4E5/c9U797FeGTq3M5R6QTbfSMLyOn9pBHDvo3Xqumf9t07xK0zL+QAaEPzuPceW66YHF1ranyV4CdQ9qSJBephr324uf4BrSQdLHZmnpznPcOlgklbR+I+JJSIH9ZeyjAtcGrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNWEEi+h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29E5CC4CECD;
+	Thu, 10 Oct 2024 02:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728528625;
-	bh=jNdxhNigsNuT3EpLL13jdD3S4+hvo/Ai+KX6gJbhB2c=;
+	s=k20201202; t=1728528627;
+	bh=i+qyl4CRczxO+Wnas3t84So0uuLSVlqua8L8kuRqYMY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ldy37X2nVnh7nCD7aPxtagHdqX1/R+2iXFaxyThQhkvWqEtOWJMwO4yXarB+Naubs
-	 q73muPKX4kU63/koKKyp4C7AV9G12kWvNDu/c1dV5PsR8JxY9epNOdRq/yKihxL5al
-	 AMVUK3Yg3m7MQ74cS2jQEvgMp11qhjJ9cFIGG3zYLT2IthuyyQwAIm8BU/OSk04em0
-	 wxnQCbAxnCs2fzTzH3dkX4wxw7WRlFeMONxL7qb3fzhIaf4+8HLMXhYoJIKoiQ6mNW
-	 YhC2uOEI/aCIoRjDHCKY3DAOo7SYM0MEdCG976ySJxeEyMJwdV5givSgyJT543Qpve
-	 vpz5Hv3Fcw4qg==
+	b=VNWEEi+h7XQSuh/DYzPldjZcFDzBT0iO/+dU/8xs8TSKXLVnVOashH5VJJdcgrLPM
+	 FfPHON4vb4TTqXoEeBk8cSfnQtgUaOvFdPtTIM+ig+mvwkiPf8IBtXQqvav7eDi6Tl
+	 etpwn1MitngiXR1py4bqF1Bz+3CsRAsoa9hhTA9zs7Q3hHqv5AA3L1vXKmIT2HSTg4
+	 nmF6Mms4kDTQZREykBs0agtUsxTdW6GzsgigPPmdARYswo5b1sudugXS21wKtRJIo4
+	 FX+Sa2xzyMyw66tSOzbx7T7uYwjkFR20BJZodpdrLsc0+vP74a5Pd54t8/Z3Yu5LML
+	 FBo40qtayrdUQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7A3806644;
-	Thu, 10 Oct 2024 02:50:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF63806644;
+	Thu, 10 Oct 2024 02:50:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: fec: don't save PTP state if PTP is unsupported
+Subject: Re: [PATCH net 0/4] mptcp: misc. fixes involving fallback to TCP
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172852863006.1545809.11109422606707012340.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 02:50:30 +0000
-References: <20241008061153.1977930-1-wei.fang@nxp.com>
-In-Reply-To: <20241008061153.1977930-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, csokas.bence@prolan.hu,
- shenwei.wang@nxp.com, xiaoning.wang@nxp.com, linux@roeck-us.net,
- imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172852863148.1545809.14189962333547846785.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 02:50:31 +0000
+References: <20241008-net-mptcp-fallback-fixes-v1-0-c6fb8e93e551@kernel.org>
+In-Reply-To: <20241008-net-mptcp-fallback-fixes-v1-0-c6fb8e93e551@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ fw@strlen.de, dsahern@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+ syzbot+d1bff73460e33101f0e7@syzkaller.appspotmail.com, cpaasch@apple.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  8 Oct 2024 14:11:53 +0800 you wrote:
-> Some platforms (such as i.MX25 and i.MX27) do not support PTP, so on
-> these platforms fec_ptp_init() is not called and the related members
-> in fep are not initialized. However, fec_ptp_save_state() is called
-> unconditionally, which causes the kernel to panic. Therefore, add a
-> condition so that fec_ptp_save_state() is not called if PTP is not
-> supported.
+On Tue, 08 Oct 2024 13:04:51 +0200 you wrote:
+> - Patch 1: better handle DSS corruptions from a bugged peer: reducing
+>   warnings, doing a fallback or a reset depending on the subflow state.
+>   For >= v5.7.
+> 
+> - Patch 2: fix DSS corruption due to large pmtu xmit, where MPTCP was
+>   not taken into account. For >= v5.6.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: fec: don't save PTP state if PTP is unsupported
-    https://git.kernel.org/netdev/net/c/6be063071a45
+  - [net,1/4] mptcp: handle consistently DSS corruption
+    https://git.kernel.org/netdev/net/c/e32d262c89e2
+  - [net,2/4] tcp: fix mptcp DSS corruption due to large pmtu xmit
+    https://git.kernel.org/netdev/net/c/4dabcdf58121
+  - [net,3/4] mptcp: fallback when MPTCP opts are dropped after 1st data
+    https://git.kernel.org/netdev/net/c/119d51e225fe
+  - [net,4/4] mptcp: pm: do not remove closing subflows
+    https://git.kernel.org/netdev/net/c/db0a37b7ac27
 
 You are awesome, thank you!
 -- 
