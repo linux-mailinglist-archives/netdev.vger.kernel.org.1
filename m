@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF49997ABD
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:51:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB539997ABE
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DBD9B22DD6
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:51:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EFCA1F22A0D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47348198A24;
-	Thu, 10 Oct 2024 02:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8536C199FA2;
+	Thu, 10 Oct 2024 02:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eKbOd6Iz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwiOhEQm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234E8186607
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:50:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61759199E8B
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728528635; cv=none; b=EaTIOViIQv0/6RIAZgap9mMOqF1bA6iHeBf4TRWklR9Zq0in/BGI+7HKU4w+2q3SNvqhiUHQLJUUVPFLJqZt+CPGyw3ujxJUo0UqE4w4P07TIx3crbZ1r1fzQ8+RVubz46PL2HuMTO5qJoc6qSleROQavCQVPTNE3+7I8emdlwM=
+	t=1728528636; cv=none; b=mBTWrvIyK6N1ksMcc/+IvhtCrOxg0RJ3rbclqzDwsqz6rZpYBCFtqduzAfeEO+jJXKvqSUmsodx7S2CGJ3fpq7r2lBKUpPoABKKIP+BtW3AON1/42/rJQjPL3iOU5lZs/55zWR/Ja6wxI3q2ZBYQidzGeQ1Ay0mJAdaGrdCHuNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728528635; c=relaxed/simple;
-	bh=6dRbKZhOMNFty32mDpIir9d8d99mmMP+Bp1FvmcYcag=;
+	s=arc-20240116; t=1728528636; c=relaxed/simple;
+	bh=2oY2B36dX4uX9QbTFr2Rusv3JNAwK/swd5/LwvucokE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ky65/835+TUSHhESv2+s40weeDuJb7Dx3uUeO0vlqejevJRXx3IiEyBafam9OMbOMtu5R1JKeTzE7nFqv88sV2LDljvBlSg21ro4xea8VzM2FqyT+BZDH5sIaXbY4oitF5NeVXlIUln6mS8pOlnLhGt407XzrkfhkGzonANJ0Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eKbOd6Iz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A831AC4CECF;
-	Thu, 10 Oct 2024 02:50:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=B0ePBhXVXP1ZNTsvcEPdOgMjf80klOSwb2f1xLrj7e3XjH29ziORJRT2lxJ97GYH6U8Fok5xT2RdgZtBOkJ3pG+HNIOcG/kJrizp19o3eIwXPDUUGfxR7PsBDB9Q90bDO7jy9ZkJHFElqbOe9zOYizczy1J1Hq81cMIeo9hJd9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwiOhEQm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32600C4AF09;
+	Thu, 10 Oct 2024 02:50:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728528634;
-	bh=6dRbKZhOMNFty32mDpIir9d8d99mmMP+Bp1FvmcYcag=;
+	s=k20201202; t=1728528636;
+	bh=2oY2B36dX4uX9QbTFr2Rusv3JNAwK/swd5/LwvucokE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eKbOd6IzZN3CY9uCweZ80Yc1qWAUsHM8WzzB59qZi+cqFiho2pkPn2XQ8szjNhJSh
-	 PaC2TfRKWH9bTDJl6KHjgHopJNb8Snid51J1atBAiVe9g0Wnlp4E4+7E6/CE3C6psZ
-	 zRmV1CrkNVohoKLhSddFaWHthgWoHQEfmzJB2nB9FAFI5fS14bflew6V7K8b90oGRq
-	 PhJAqkTjL3i8nbYf/JKd0Ak+FFxEV9EO1kYLuvnGUkt+VUayS3GICqzpLD7Yv0XIHS
-	 HDe7nBwZqXrqNST7qltmS3LZE5T885aApGZsrGMs59Cimt+/83r+8WsMd68pJHL9IQ
-	 8B4NZTrqn0cNg==
+	b=PwiOhEQm+hQYl7s9k22oWq/F40zrMBXhyqdeDd5XW/718QPhlti6emSB/dHJSNjVy
+	 6jYO4a1bvhzgD2G19cn4CMnqBhmi3cCZcqgTmjrUCJg7l2hlXjlw3gyibZPWCCFA+P
+	 38mPHy/MIIzZEl01CVYd7QhpByWJQnW2vgI5+gncZo7wPYbpNowzP2YVrGQtM8PT7K
+	 KcgwRrX0hkX4CW0szuhhS8+VL+dwzrC5JNneZ4oCaAuA4wdg23j40UEXmiz9EaLU8/
+	 8DxX5qAWypMKaLU3OL4dInZ2o9EjPsjraBSRp6PHNLlFl31Gt+wiT9yazSaJ31khq6
+	 a0dMnz+9cSeDw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33AB93806644;
-	Thu, 10 Oct 2024 02:50:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1A3806644;
+	Thu, 10 Oct 2024 02:50:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ipv6: switch inet6_acaddr_hash() to less predictable
- hash
+Subject: Re: [PATCH net-next] ipv6: Remove redundant unlikely()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172852863873.1545809.12714815210092245223.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 02:50:38 +0000
-References: <20241008121307.800040-1-edumazet@google.com>
-In-Reply-To: <20241008121307.800040-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
+ <172852864023.1545809.7403321640423392208.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 02:50:40 +0000
+References: <20241008085454.8087-1-tklauser@distanz.ch>
+In-Reply-To: <20241008085454.8087-1-tklauser@distanz.ch>
+To: Tobias Klauser <tklauser@distanz.ch>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  8 Oct 2024 12:13:07 +0000 you wrote:
-> commit 2384d02520ff ("net/ipv6: Add anycast addresses to a global hashtable")
-> added inet6_acaddr_hash(), using ipv6_addr_hash() and net_hash_mix()
-> to get hash spreading for typical users.
+On Tue,  8 Oct 2024 10:54:54 +0200 you wrote:
+> IS_ERR_OR_NULL() already implies unlikely().
 > 
-> However ipv6_addr_hash() is highly predictable and a malicious user
-> could abuse a specific hash bucket.
-> 
-> [...]
+> Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+> ---
+>  net/ipv6/ip6_output.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next] ipv6: switch inet6_acaddr_hash() to less predictable hash
-    https://git.kernel.org/netdev/net-next/c/4daf4dc275f1
+  - [net-next] ipv6: Remove redundant unlikely()
+    https://git.kernel.org/netdev/net-next/c/3a1beabe1159
 
 You are awesome, thank you!
 -- 
