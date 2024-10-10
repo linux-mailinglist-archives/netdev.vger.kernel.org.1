@@ -1,122 +1,114 @@
-Return-Path: <netdev+bounces-134418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9564E9994EC
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:07:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 894C69994F2
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C541F23FC0
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:07:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23B27B21C9C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807C41E47BB;
-	Thu, 10 Oct 2024 22:07:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B831CFECC;
+	Thu, 10 Oct 2024 22:08:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LrQAoVY0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imYWSHyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA141E47A3
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A60188CAE
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728598055; cv=none; b=LUnsshdIze/uFZobWTKeZRvZTGorhK2pKL8CDnFhWhUVKyDQ2hhA2mQOrUv4UYi+6WJ44dl9VhTnYFhKobFzquOppMbSgZanmSWVw3UbIjzmY2pknaMXR8qPdl7p0PcoA4QQPBCYRAcw2vOX32AX3OT9E/esnO4xOdwNPMzfueY=
+	t=1728598113; cv=none; b=G0V9TWFoPr+Ra7LBpBeF/Png6Uchj2HmLtcoYawAEX+WFGA/Gc8ixaN/BKURWWHGH2zTn22pm05HFn4XrVBCFj2A9CUrRIxiR6EQfjpjvs6aAhD56IyA+j+hBHCtZoVQUHuOeqkRiAAONi4K3WfpeVqEmX9+TA/RZDcTbhfP/kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728598055; c=relaxed/simple;
-	bh=IXWBrb1+4puUbFIrvJvIwqmype/XxNMz1z02jxp5N00=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JAWtrb/IwgIhoLe9ohFXjh1YAyzdTdKNxy3rEM4X++5He7kGr3K7nJnmh0obaLewPNEReEy2LAMax9SFKj7LyKrl80QcEvePYRdsobrnW52W9XKXcCJsUNFwX2e4DqUz7bvipceSL/JBvhntykYAomyCSDXeaYFOn8Jf3tSR+v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LrQAoVY0; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e038f3835so1376000b3a.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:07:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1728598053; x=1729202853; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3yo7xWDDeFDaCm97O1zcq6LH8U4VFuAQ+/J8LotlATE=;
-        b=LrQAoVY0kBfYuVLR3P3sTr1m7GpTfUqsiUqB6GSTx/Rss3Wdv7jsecil0+9CBJGF0m
-         ip3ib+BQL/dLCNOAF2KTh7OIkfLh47d/9cDxRzRPOVTG7AMZ+OvldMwZlsn1suMMC3g4
-         mG5AEBt18KfXkisLkfMgJGRHLPFQROaMyTozg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728598053; x=1729202853;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3yo7xWDDeFDaCm97O1zcq6LH8U4VFuAQ+/J8LotlATE=;
-        b=dMdQnmNN1k1GmZsswZf8htZAS1djkvga94XngYytfjEorWCoVU56J6qc2b8LKoQaSx
-         MY6LVTUeOr9GAViieByHU7RamnpF8boc1dcp27yB/EvpNS0dzetCnbG/Kx0GUN69VL73
-         A+Rcpz57QLGngdpyV4CFLl9SLEf44d62ZagTq4TfwnRMCxtzBSgD/pXBK/BslMDdykUa
-         5U9Xt2VJYht4QP/RLC5T6Se2BZeXkfgqWfbWuEs3jITR+Gr0zw9nSqw3Ok7IvC029qTk
-         2P0vQ1INMrfiqJVzlg0QuKty2QvVwTOjarr6dXk/mIQW7ttpb3hKlSXhnkMwevHb0sdJ
-         wwHA==
-X-Forwarded-Encrypted: i=1; AJvYcCWXOsC3BjoKwuDhvvPr8N3YZyZJ+MDgPDl/2bebOX1YvrErY8zmFsEQSxTX9PgqX8jdqO6EfvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDM/u8FGYqqSMfTHw6Fy1Jp3ytvZsh/5wJGWFm+xjsLcZKaZDB
-	dBoXpdVUV37nt/Uo5cfotYiAsCkFEhfFxC3zmmLRdxvkHadJr8x//8xiaGeo/ZU=
-X-Google-Smtp-Source: AGHT+IHg2zizMgNilSTsoaMSaNju+zKzOxffudg65+pCc7GVqnBSAFewHnqlEuq3Lxq8TICEWC/tqQ==
-X-Received: by 2002:a05:6a00:2ea2:b0:71e:209:512a with SMTP id d2e1a72fcca58-71e37f56a04mr759824b3a.18.1728598053058;
-        Thu, 10 Oct 2024 15:07:33 -0700 (PDT)
-Received: from cache-sql13432 ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2ab0b5dfsm1500337b3a.199.2024.10.10.15.07.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 15:07:32 -0700 (PDT)
-Date: Thu, 10 Oct 2024 22:07:30 +0000
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] tools: ynl-gen: use names of constants in
- generated limits
-Message-ID: <20241010220730.GA260524@cache-sql13432>
-References: <20241010151248.2049755-1-kuba@kernel.org>
+	s=arc-20240116; t=1728598113; c=relaxed/simple;
+	bh=Ece54W/mP9qWGA+F3wl87bPLozoCtYXjR3gjBlwOF4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mlkyw+IX8SgoU2Mu1YzOARgQKVUhYkKOEUlG8WP05JoqN6pCUPokVvW3jcC0/vOb0Zq6Zo7N90AoNvWJlq5AtICxb3v8utpAR44+fb89p9TCtPasCkEPkJYdEnoXh31FLzNswgIgWEgFEry9zJbcUo/G6wzZH5e7Qy194mPlO4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imYWSHyC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24984C4CEC5;
+	Thu, 10 Oct 2024 22:08:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728598113;
+	bh=Ece54W/mP9qWGA+F3wl87bPLozoCtYXjR3gjBlwOF4s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=imYWSHyCi9sKhJyhK1K67SZuIFWHkKXaJMKsv/UZPh79HL6xQwDRRiwZkGLHsM1tj
+	 ENEU7uzJya4EwDe+uK8yAkvFU1jeL7vzjvna4vM6oN/hduEXGpaJMRdrpWRE18uj7i
+	 no6q8ni1x7S9b40FsOMIdjYv+Vxmm+w3ZbsYXX6Q3a1bB32WvlWlZ6fymHOd3Nlxft
+	 JN0XJ8yJ8XSkZ5EaNl9S2gpJSYk6U8NbnbXgMFlCjyNkcYpM/AEcy6v4ej1oJ0xOk6
+	 F9ixcLnTos2XLGsWpyU1a45rhq1dbnho0okRt1ZnppKz5/uAi78rBK2n5WcxIkcb4W
+	 oB0AVvxk8gKXw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	sdf@fomichev.me
+Subject: [PATCH net-next] selftests: net: rebuild YNL if dependencies changed
+Date: Thu, 10 Oct 2024 15:08:26 -0700
+Message-ID: <20241010220826.2215358-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010151248.2049755-1-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 10, 2024 at 08:12:48AM -0700, Jakub Kicinski wrote:
-> YNL specs can use string expressions for limits, like s32-min
-> or u16-max. We convert all of those into their numeric values
-> when generating the code, which isn't always helpful. Try to
-> retain the string representations in the output. Any sort of
-> calculations still need the integers.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  net/core/netdev-genl-gen.c |  4 ++--
->  tools/net/ynl/ynl-gen-c.py | 36 +++++++++++++++++++++++-------------
->  2 files changed, 25 insertions(+), 15 deletions(-)
+Try to rebuild YNL if either user added a new family or the specs
+of the families have changed. Stanislav's ncdevmem cause a false
+positive build failure in NIPA because libynl.a isn't rebuilt
+after ethtool is added to YNL_GENS.
 
-I rebased my per-NAPI changes on top of this commit and gave it a test
-run and it generated this diff:
+Note that sha1sum is already used in other parts of the build system.
 
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 3692c8270c6b..21de7e10be16 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -23,7 +23,7 @@ static const struct netlink_range_validation netdev_a_page_pool_ifindex_range =
- };
-
- static const struct netlink_range_validation netdev_a_napi_defer_hard_irqs_range = {
--       .max    = 2147483647ULL,
-+       .max    = S32_MAX,
- };
-
- /* Common nested types */
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
+CC: sdf@fomichev.me
+---
+ tools/testing/selftests/net/ynl.mk | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-which is much nicer! I am not a python expert, but the code seems
-reasonable to me and the generated output is a huge improvement (IMO).
+diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
+index 1ef24119def0..07bc011e6d9a 100644
+--- a/tools/testing/selftests/net/ynl.mk
++++ b/tools/testing/selftests/net/ynl.mk
+@@ -9,6 +9,8 @@
+ # YNL_GEN_FILES: TEST_GEN_FILES which need YNL
+ 
+ YNL_OUTPUTS := $(patsubst %,$(OUTPUT)/%,$(YNL_GEN_FILES))
++YNL_SPECS := \
++	$(patsubst %,$(top_srcdir)/Documentation/netlink/specs/%.yaml,$(YNL_GENS))
+ 
+ $(YNL_OUTPUTS): $(OUTPUT)/libynl.a
+ $(YNL_OUTPUTS): CFLAGS += \
+@@ -16,10 +18,19 @@ $(YNL_OUTPUTS): CFLAGS += \
+ 	-I$(top_srcdir)/tools/net/ynl/lib/ \
+ 	-I$(top_srcdir)/tools/net/ynl/generated/
+ 
+-$(OUTPUT)/libynl.a:
++# Make sure we rebuild libynl if user added a new family. We can't easily
++# depend on the contents of a variable so create a fake file with a hash.
++YNL_GENS_HASH := $(shell echo $(YNL_GENS) | sha1sum | cut -c1-8)
++$(OUTPUT)/libynl-$(YNL_GENS_HASH).sig:
++	$(Q)rm -f $(OUTPUT)/libynl-*.sig
++	$(Q)touch $(OUTPUT)/libynl-$(YNL_GENS_HASH).sig
++
++$(OUTPUT)/libynl.a: $(YNL_SPECS) $(OUTPUT)/libynl-$(YNL_GENS_HASH).sig
++	$(Q)rm -f $(top_srcdir)/tools/net/ynl/libynl.a
+ 	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
+ 	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
+ 
+ EXTRA_CLEAN += \
+ 	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
+-	$(top_srcdir)/tools/net/ynl/lib/*.[ado]
++	$(top_srcdir)/tools/net/ynl/lib/*.[ado] \
++	$(OUTPUT)/libynl-*.sig
+-- 
+2.46.2
 
-Thanks for doing this.
-
-Reviewed-by: Joe Damato <jdamato@fastly.com>
 
