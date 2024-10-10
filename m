@@ -1,76 +1,58 @@
-Return-Path: <netdev+bounces-134280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF8699897D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 16:28:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3843A9989B7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 16:33:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0A5C1F2618D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:28:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 491CA1C24E5E
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9DE1CCECB;
-	Thu, 10 Oct 2024 14:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V4Mwn73n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357041CC172;
+	Thu, 10 Oct 2024 14:28:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBA71CCEE9
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 14:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B7A1CB316;
+	Thu, 10 Oct 2024 14:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728570199; cv=none; b=kNY2+/Ujjh0yNLfJHLOLlyX4AUHQUU4K9iE5G4Wr7lDatcSxxDAZJeZJz5lAISEvAOY9pv/VSnidYXlXNbwwKKUqVFJVaQIl3RRuc2815IHOX08M2e1GRke1UuRvXoUIqCwolkt/6Gdmlw+kLQY3dHIhIyk4t8i+ouUq6kE08H8=
+	t=1728570510; cv=none; b=r3QUlRiuYugXKkOani3T0C66sWj/QeL83Zwz5QIU5sCiysgxDXlEOfcLRRebLayJE4lYpHmktVvKZy5B0Z81+XKjI8raZmRvztIYL5BzUXY7/oCjVEnJtJgSYcg6MTOpnodrvTKkohOaC7qdYZpohOQA0WAXfQdyLLTssZxuprA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728570199; c=relaxed/simple;
-	bh=9Z7FpbGnvaPZCxnqbIbuabtLp1NKcskB0CrLb1ZzBbY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dU+yE7lYVuhRI7Of/xP3qWcJ3D+woIx1V20m6rWL24DDxjjd5Ir6vVBCO6W7J9y1We8MSh7cfK1iQUwCXTNL6mNkQBSDHGJ1j4neAWxnZA3/bjXkYBo4HjssWb7HDPhL1KHPRLcYAzUkkCdg0hXjAc2YOQdjNV6Fj8UII2AhV18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V4Mwn73n; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1728570198; x=1760106198;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9Z7FpbGnvaPZCxnqbIbuabtLp1NKcskB0CrLb1ZzBbY=;
-  b=V4Mwn73nMC0E1bQA6By2R9QjdY5tVm1PiibdpiZLE9H4pJ1Gip+t1tUx
-   IK7bVO6XnrZUQculmNSowN9LNLjMQ2II6/v9kN3kdHv3EGSkq2Kx72hK/
-   1Ne0giqwjw0gj73dt83VYTYrLNjvpq2EzR+xY0ABi+BxSzf9MAmxGceha
-   yghSY4v3WLUtoWSTR7UFknAHaVWTZtCMg1eIbrp7y3ikVmun+uQAOSOh8
-   gftnlnoQ0l1KSBtc/jLxZmVTEz5YOKmtvDB14PYM8brUDsEB3j2fZ+wJi
-   pVMThUvhHkeMaIKG/euWCJwSTWct+mecDAIfAseqY7y0Q1Ns/81eo8f0t
-   A==;
-X-CSE-ConnectionGUID: chDDInk5SSixsjOIKeaT6A==
-X-CSE-MsgGUID: SOY/pFLuSiq/DzJw7hdGbw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="39321125"
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="39321125"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2024 07:23:18 -0700
-X-CSE-ConnectionGUID: 3q15CtqgQXK64fz0yD432A==
-X-CSE-MsgGUID: oBOwofYjQX+fZkG9aD3zjA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,193,1725346800"; 
-   d="scan'208";a="99937519"
-Received: from kkolacin-desk1.ger.corp.intel.com (HELO kkolacin-desk1.igk.intel.com) ([10.217.160.108])
-  by fmviesa002.fm.intel.com with ESMTP; 10 Oct 2024 07:23:16 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Subject: [PATCH v2 iwl-net 4/4] ice: Add correct PHY lane assignment
-Date: Thu, 10 Oct 2024 16:21:17 +0200
-Message-ID: <20241010142254.2047150-5-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241010142254.2047150-1-karol.kolacinski@intel.com>
-References: <20241010142254.2047150-1-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1728570510; c=relaxed/simple;
+	bh=WhR7JRhlqDvT6PC+KEKiTIWJ+x448tdFPNQbQJzmnV4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HItg80J87wFE4IFvbpH4Y75GstorEXK85/Kp2clqWZ0V/DOZivZ5M+s2+JHLzzR21esm4bk3Zmg200k53/prTyNJv2/sWKky84qEfP+ttGM8Lh1iGIFf2iP0/X8Ar3iCbFmEJQNiuw24Fz1Qanw3pzsBOIeIyPBv45TmYBdyAZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XPXBy3t4yzyS3h;
+	Thu, 10 Oct 2024 22:27:06 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 175551401E9;
+	Thu, 10 Oct 2024 22:28:24 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 10 Oct 2024 22:28:23 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
+	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
+	<andrew@lunn.ch>, <jdamato@fastly.com>, <horms@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>, <christophe.jaillet@wanadoo.fr>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH V12 net-next 00/10] Add support of HIBMCGE Ethernet Driver
+Date: Thu, 10 Oct 2024 22:21:29 +0800
+Message-ID: <20241010142139.3805375-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,266 +60,169 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-Driver always naively assumes, that for PTP purposes, PHY lane to
-configure is corresponding to PF ID.
+This patch set adds the support of Hisilicon BMC Gigabit Ethernet Driver.
 
-This is not true for some port configurations, e.g.:
-- 2x50G per quad, where lanes used are 0 and 2 on each quad, but PF IDs
-  are 0 and 1
-- 100G per quad on 2 quads, where lanes used are 0 and 4, but PF IDs are
-  0 and 1
+This patch set includes basic Rx/Tx functionality. It also includes
+the registration and interrupt codes.
 
-Use correct PHY lane assignment by getting and parsing port options.
-This is read from the NVM by the FW and provided to the driver with
-the indication of active port split.
+This work provides the initial support to the HIBMCGE and
+would incrementally add features or enhancements.
 
-Remove ice_is_muxed_topo(), which is no longer needed.
-
-Fixes: 4409ea1726cb ("ice: Adjust PTP init for 2x50G E825C devices")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Arkadiusz Kubalewski <Arkadiusz.kubalewski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 40 +++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_common.h |  1 +
- drivers/net/ethernet/intel/ice/ice_main.c   |  6 ++--
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 23 +++++-------
- drivers/net/ethernet/intel/ice/ice_ptp.h    |  4 +--
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 22 ------------
- drivers/net/ethernet/intel/ice/ice_type.h   |  1 -
- 7 files changed, 55 insertions(+), 42 deletions(-)
+ChangeLog:
+v11 -> v12:
+  - Fix some warnings detected by checkpatch, suggested by Jakub and Simon Horman.
+     ./scripts/checkpatch.pl --strict --codespell --max-line-length=80
+  - remove the W entry of hibmcge driver from MAINTAINERS, suggested by Jakub.
+  v11: https://lore.kernel.org/all/20241008022358.863393-1-shaojijie@huawei.com/
+v10 -> v11:
+  - Delete devm_netdev_alloc_pcpu_stats to prevent memory leak,
+    suggested by Jakub.
+  - Use the same pattern for 'control' and 'ctrl', suggested by Christophe JAILLET.
+  - hbg_mdio_init_hw() return void because no error patch,
+    suggested by Christophe JAILLET.
+  - Fix a syntax error in comment, suggested by Christophe JAILLET.
+  - return -EBUSY in ndo.change_mtu if interface is running, suggested by Jakub.
+  - Remove unnecessary declares for struct, suggested by Jakub.
+  - fix budget to 128 in TX napi.poll(), suggested by Jakub.
+  - Not call napi_complete_done() if packet_done >= budget in napi.poll(),
+    suggested by Jakub.
+  - Use devm_kmalloc() instead of devm_kzalloc() for tx_ring->tout_log_buf,
+    suggested by Christophe JAILLET.
+  - Not refill the buffers if budget is 0 in RX napi.poll(), suggested by Jakub.
+  - Remove "ccflags-y += -I$(src)" from Makefile, suggested by Jakub.
+  - Use napi_gro_receive() instead of netif_receive_skb(), suggested by Jakub.
+  - Remove ndo.get_stats64() because dev_get_tstats64() do same thing.
+  v10: https://lore.kernel.org/all/20240912025127.3912972-1-shaojijie@huawei.com/
+v9 -> v10:
+  - Drop patch "add ndo_validate_addr check in dev_set_mac_address"
+  - Add validation for mac address in hbg_net_set_mac_address()
+  - Add "select MOTORCOMM_PHY" and "select REALTEK_PHY" in Kconfig.
+  - Use ETH_DATA_LEN instead of HBG_DEFAULT_MTU_SIZE, suggested by Andrew.
+  - Delete error description about genphy in commit log, suggested by Andrew.
+  v9: https://lore.kernel.org/all/20240910075942.1270054-1-shaojijie@huawei.com/
+v8 -> v9:
+  - Remove HBG_NIC_STATE_OPEN in ndo.open() and ndo.stop(),
+    suggested by Kalesh and Andrew
+  v8: https://lore.kernel.org/all/20240909023141.3234567-1-shaojijie@huawei.com/
+v7 -> v8:
+  - Set netdev->pcpu_stat_type to NETDEV_PCPU_STAT_TSTATS, suggested by Jakub
+  v7: https://lore.kernel.org/all/20240905143120.1583460-1-shaojijie@huawei.com/
+v6 -> v7:
+  - Move the define inside the function body to the top of the .c file,
+    suggested by Paolo and Andrew.
+  - Respect the reverse x-mas tree order, suggested by Paolo.
+  - Add check for netif_txq_maybe_stop(), suggested by Paolo.
+  - Use dev_sw_netstats_tx_add() instead of dev->stats, suggested by Paolo.
+  - Modify net_dev to netdev, suggested by Paolo.
+  v6: https://lore.kernel.org/all/20240830121604.2250904-12-shaojijie@huawei.com/
+v5 -> v6:
+  - Delete netif_carrier_off() in .ndo_open() and .ndo_stop(),
+    suggested by Jakub and Andrew.
+  - Remove hbg_txrx_init() from probe path, alloc ring buffer in .ndo_open(),
+    and release ring buffer in .ndo_stop(), suggested by Jakub and Andrew.
+  v5: https://lore.kernel.org/all/20240827131455.2919051-1-shaojijie@huawei.com/
+v4 -> v5:
+  - Delete unnecessary semicolon, suggested by Jakub.
+  v4: https://lore.kernel.org/all/20240826081258.1881385-1-shaojijie@huawei.com/
+v3 -> v4:
+  - Delete INITED_STATE in priv, suggested by Andrew.
+  - Delete unnecessary defensive code in hbg_phy_start()
+    and hbg_phy_stop(), suggested by Andrew.
+  v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
+v2 -> v3:
+  - Add "select PHYLIB" in Kconfig, reported by Jakub.
+  - Use ndo_validate_addr() instead of is_valid_ether_addr()
+    in dev_set_mac_address(), suggested by Jakub and Andrew.
+  v2: https://lore.kernel.org/all/20240820140154.137876-1-shaojijie@huawei.com/
+v1 -> v2:
+  - fix build errors reported by kernel test robot <lkp@intel.com>
+    Closes: https://lore.kernel.org/oe-kbuild-all/202408192219.zrGff7n1-lkp@intel.com/
+    Closes: https://lore.kernel.org/oe-kbuild-all/202408200026.q20EuSHC-lkp@intel.com/
+  v1: https://lore.kernel.org/all/20240819071229.2489506-1-shaojijie@huawei.com/
+RFC v2 -> v1:
+  - Use FIELD_PREP/FIELD_GET instead of union, suggested by Andrew.
+  - Delete unnecessary defensive code, suggested by Andrew.
+  - A few other minor changes.
+  RFC v2: https://lore.kernel.org/all/20240813135640.1694993-1-shaojijie@huawei.com/
+RFC v1 -> RFC v2:
+  - Replace linkmode_copy() with phy_remove_link_mode() to
+    simplify the PHY configuration process, suggested by Andrew.
+  - Delete hbg_get_link_status() from the scheduled task, suggested by Andrew.
+  - Delete validation for mtu in hbg_net_change_mtu(), suggested by Andrew.
+  - Delete validation for mac address in hbg_net_set_mac_address(),
+    suggested by Andrew.
+  - Use napi_complete_done() to simplify the process, suggested by Joe Damato.
+  - Use ethtool_op_get_link(), phy_ethtool_get_link_ksettings(),
+    and phy_ethtool_set_link_ksettings() to simplify the code, suggested by Andrew.
+  - Add the check on the return value of phy_connect_direct(),
+    suggested by Jonathan.
+  - Adjusted the layout to place the fields and register definitions
+    in one place, suggested by Jonathan.
+  - Replace request_irq with devm_request_irq, suggested by Jonathan.
+  - Replace BIT_MASK() with BIT(), suggested by Jonathan.
+  - Introduce irq_handle in struct hbg_irq_info in advance to reduce code changes,
+    suggested by Jonathan.
+  - Delete workqueue for this patch set, suggested by Jonathan.
+  - Support to compile this driver on all arch in Kconfig,
+    suggested by Andrew and Jonathan.
+  - Add a patch to add is_valid_ether_addr check in dev_set_mac_address,
+    suggested by Andrew.
+  - A few other minor changes.
+  RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
+---
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 0eb7f828ed3a..618259f8abdc 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -4065,6 +4065,46 @@ ice_aq_set_port_option(struct ice_hw *hw, u8 lport, u8 lport_valid,
- 	return ice_aq_send_cmd(hw, &desc, NULL, 0, NULL);
- }
- 
-+/**
-+ * ice_get_phy_lane_number - Get PHY lane number for current adapter
-+ * @hw: pointer to the hw struct
-+ *
-+ * Return: PHY lane number on success, negative error code otherwise.
-+ */
-+int ice_get_phy_lane_number(struct ice_hw *hw)
-+{
-+	struct ice_aqc_get_port_options_elem *options __free(kfree);
-+	unsigned int lport = 0;
-+	unsigned int lane;
-+	int err;
-+
-+	options = kcalloc(ICE_AQC_PORT_OPT_MAX, sizeof(*options), GFP_KERNEL);
-+	if (!options)
-+		return -ENOMEM;
-+
-+	for (lane = 0; lane < ICE_MAX_PORT_PER_PCI_DEV; lane++) {
-+		u8 options_count = ICE_AQC_PORT_OPT_MAX;
-+		bool active_valid, pending_valid;
-+		u8 active_idx, pending_idx;
-+
-+		err = ice_aq_get_port_options(hw, options, &options_count, lane,
-+					      true, &active_idx, &active_valid,
-+					      &pending_idx, &pending_valid);
-+		if (err)
-+			return err;
-+
-+		if (!active_valid)
-+			continue;
-+
-+		if (hw->pf_id == lport)
-+			return lane;
-+		lport++;
-+	}
-+
-+	/* PHY lane not found */
-+	return -ENXIO;
-+}
-+
- /**
-  * ice_aq_sff_eeprom
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 27208a60cece..fe6f88cfd948 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -193,6 +193,7 @@ ice_aq_get_port_options(struct ice_hw *hw,
- int
- ice_aq_set_port_option(struct ice_hw *hw, u8 lport, u8 lport_valid,
- 		       u8 new_option);
-+int ice_get_phy_lane_number(struct ice_hw *hw);
- int
- ice_aq_sff_eeprom(struct ice_hw *hw, u16 lport, u8 bus_addr,
- 		  u16 mem_addr, u8 page, u8 set_page, u8 *data, u8 length,
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index b1e7727b8677..72ef1b15b100 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -1144,7 +1144,7 @@ ice_link_event(struct ice_pf *pf, struct ice_port_info *pi, bool link_up,
- 	if (link_up == old_link && link_speed == old_link_speed)
- 		return 0;
- 
--	ice_ptp_link_change(pf, pf->hw.pf_id, link_up);
-+	ice_ptp_link_change(pf, link_up);
- 
- 	if (ice_is_dcb_active(pf)) {
- 		if (test_bit(ICE_FLAG_DCB_ENA, pf->flags))
-@@ -6742,7 +6742,7 @@ static int ice_up_complete(struct ice_vsi *vsi)
- 		ice_print_link_msg(vsi, true);
- 		netif_tx_start_all_queues(vsi->netdev);
- 		netif_carrier_on(vsi->netdev);
--		ice_ptp_link_change(pf, pf->hw.pf_id, true);
-+		ice_ptp_link_change(pf, true);
- 	}
- 
- 	/* Perform an initial read of the statistics registers now to
-@@ -7212,7 +7212,7 @@ int ice_down(struct ice_vsi *vsi)
- 
- 	if (vsi->netdev) {
- 		vlan_err = ice_vsi_del_vlan_zero(vsi);
--		ice_ptp_link_change(vsi->back, vsi->back->hw.pf_id, false);
-+		ice_ptp_link_change(vsi->back, false);
- 		netif_carrier_off(vsi->netdev);
- 		netif_tx_disable(vsi->netdev);
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index ef2e858f49bb..da7b57684d32 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1454,10 +1454,9 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- /**
-  * ice_ptp_link_change - Reconfigure PTP after link status change
-  * @pf: Board private structure
-- * @port: Port for which the PHY start is set
-  * @linkup: Link is up or down
-  */
--void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
-+void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- {
- 	struct ice_ptp_port *ptp_port;
- 	struct ice_hw *hw = &pf->hw;
-@@ -1465,14 +1464,7 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 	if (pf->ptp.state != ICE_PTP_READY)
- 		return;
- 
--	if (WARN_ON_ONCE(port >= hw->ptp.num_lports))
--		return;
--
- 	ptp_port = &pf->ptp.port;
--	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
--		port *= 2;
--	if (WARN_ON_ONCE(ptp_port->port_num != port))
--		return;
- 
- 	/* Update cached link status for this port immediately */
- 	ptp_port->link_up = linkup;
-@@ -3339,10 +3331,17 @@ void ice_ptp_init(struct ice_pf *pf)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
- 	struct ice_hw *hw = &pf->hw;
--	int err;
-+	int lane_num, err;
- 
- 	ptp->state = ICE_PTP_INITIALIZING;
- 
-+	lane_num = ice_get_phy_lane_number(hw);
-+	if (lane_num < 0) {
-+		err = lane_num;
-+		goto err;
-+	}
-+
-+	ptp->port.port_num = (u8)lane_num;
- 	ice_ptp_init_hw(hw);
- 
- 	ice_ptp_init_tx_interrupt_mode(pf);
-@@ -3356,10 +3355,6 @@ void ice_ptp_init(struct ice_pf *pf)
- 			goto err;
- 	}
- 
--	ptp->port.port_num = hw->pf_id;
--	if (ice_is_e825c(hw) && hw->ptp.is_2x50g_muxed_topo)
--		ptp->port.port_num = hw->pf_id * 2;
--
- 	err = ice_ptp_init_port(pf, &ptp->port);
- 	if (err)
- 		goto err;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-index 2db2257a0fb2..44a05c8d2113 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-@@ -331,7 +331,7 @@ void ice_ptp_prepare_for_reset(struct ice_pf *pf,
- 			       enum ice_reset_req reset_type);
- void ice_ptp_init(struct ice_pf *pf);
- void ice_ptp_release(struct ice_pf *pf);
--void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup);
-+void ice_ptp_link_change(struct ice_pf *pf, bool linkup);
- #else /* IS_ENABLED(CONFIG_PTP_1588_CLOCK) */
- static inline int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr)
- {
-@@ -379,7 +379,7 @@ static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf,
- }
- static inline void ice_ptp_init(struct ice_pf *pf) { }
- static inline void ice_ptp_release(struct ice_pf *pf) { }
--static inline void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
-+static inline void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- {
- }
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index f28d0357c88f..3737727231b1 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2699,26 +2699,6 @@ static int ice_get_phy_tx_tstamp_ready_eth56g(struct ice_hw *hw, u8 port,
- 	return 0;
- }
- 
--/**
-- * ice_is_muxed_topo - detect breakout 2x50G topology for E825C
-- * @hw: pointer to the HW struct
-- *
-- * Return: true if it's 2x50 breakout topology, false otherwise
-- */
--static bool ice_is_muxed_topo(struct ice_hw *hw)
--{
--	u8 link_topo;
--	bool mux;
--	u32 val;
--
--	val = rd32(hw, GLGEN_SWITCH_MODE_CONFIG);
--	mux = FIELD_GET(GLGEN_SWITCH_MODE_CONFIG_25X4_QUAD_M, val);
--	val = rd32(hw, GLGEN_MAC_LINK_TOPO);
--	link_topo = FIELD_GET(GLGEN_MAC_LINK_TOPO_LINK_TOPO_M, val);
--
--	return (mux && link_topo == ICE_LINK_TOPO_UP_TO_2_LINKS);
--}
--
- /**
-  * ice_ptp_init_phy_e825 - initialize PHY parameters
-  * @hw: pointer to the HW struct
-@@ -2743,8 +2723,6 @@ static void ice_ptp_init_phy_e825(struct ice_hw *hw)
- 	err = ice_read_phy_eth56g(hw, hw->pf_id, PHY_REG_REVISION, &phy_rev);
- 	if (err || phy_rev != PHY_REVISION_ETH56G)
- 		ptp->phy_model = ICE_PHY_UNSUP;
--
--	ptp->is_2x50g_muxed_topo = ice_is_muxed_topo(hw);
- }
- 
- /* E822 family functions
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 479227bdff75..609f31e0dfde 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -880,7 +880,6 @@ struct ice_ptp_hw {
- 	union ice_phy_params phy;
- 	u8 num_lports;
- 	u8 ports_per_phy;
--	bool is_2x50g_muxed_topo;
- };
- 
- /* Port hardware description */
+Jijie Shao (10):
+  net: hibmcge: Add pci table supported in this module
+  net: hibmcge: Add read/write registers supported through the bar space
+  net: hibmcge: Add mdio and hardware configuration supported in this
+    module
+  net: hibmcge: Add interrupt supported in this module
+  net: hibmcge: Implement some .ndo functions
+  net: hibmcge: Implement .ndo_start_xmit function
+  net: hibmcge: Implement rx_poll function to receive packets
+  net: hibmcge: Implement some ethtool_ops functions
+  net: hibmcge: Add a Makefile and update Kconfig for hibmcge
+  net: hibmcge: Add maintainer for hibmcge
+
+ MAINTAINERS                                   |   6 +
+ drivers/net/ethernet/hisilicon/Kconfig        |  18 +-
+ drivers/net/ethernet/hisilicon/Makefile       |   1 +
+ .../net/ethernet/hisilicon/hibmcge/Makefile   |   8 +
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   | 131 ++++++
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  17 +
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.h  |  11 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 271 ++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  59 +++
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 127 ++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.h  |  11 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 253 +++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 222 ++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |  12 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 143 ++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 409 ++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.h |  39 ++
+ 17 files changed, 1737 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
+
 -- 
-2.46.2
+2.33.0
 
 
