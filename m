@@ -1,124 +1,176 @@
-Return-Path: <netdev+bounces-134181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832029984CD
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:20:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9E049984D2
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F9FFB21AB3
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:20:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C2502838DC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9661BDA9C;
-	Thu, 10 Oct 2024 11:20:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113711C244F;
+	Thu, 10 Oct 2024 11:21:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QIDlh302"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f1HAh1a+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E2E33CD2
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7452A1C2426
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:21:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728559237; cv=none; b=ZiyxaeQUejVAugEuICWe77B8J2evh/IwU+08ykKZrqWa67x15nt6vZJypQBd3UzzIvllUXO2LqCA0NBMDQIfDx2xp3+PthsWmyc0iBjROdBJC1SUxUu22A3HwHQIZdvQ76dzH/Z9FvrkYlUSVD+JgGUK6VzKmmywvRXCCGS0as4=
+	t=1728559316; cv=none; b=UUx9OxpWRIf6rc9k2nURw+17GKBQnCvzA7ozZusgtHI8YWFPpON1a0w4lffvq/m9CxvncxYGFheTOuhU8OnueH3o1MzC9EWh9FJvFB1fbugr55U5gou4IRbTmoTmrAYL4FI1KWxr2ctBFCxGvSZBcynwH/zHXueQinwnhZuZeMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728559237; c=relaxed/simple;
-	bh=Wfx89f/2GnLAyz2Y6WT3tqmWILb+qRc5IL/zvB6kPew=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dLPA9cEe8dB9+N3hD1bfs4WRqCnVkI21Zye1HCKyE8UHwXnZkBveSLa6ondOq5bz35KyMQNT7hlVAOyMce+sxjz4kOaXx2nvTl39aapZusCReRBhzIVF3juwoW/e70s0IdWbUkXgls+J4IBkP6hfu/gWa4aMuKATfJnFVFWUHxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QIDlh302; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3965C4CEC5;
-	Thu, 10 Oct 2024 11:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728559236;
-	bh=Wfx89f/2GnLAyz2Y6WT3tqmWILb+qRc5IL/zvB6kPew=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QIDlh302NdcCQ47qdk7RK+ZYdG68xICju7SbKOyTgyqi5NeAuHN2YK6r80Hhhp3Jh
-	 kTZH4Kx6qT/LuWI0XzOOQDi+vCijNRmyKgsR50rZb1ELWq8MS3sFFO/BhbPT4ULcMi
-	 g2pOorgKRuh1Z3KB7j+ogsmXL/i3cyIJky5Dinfa6Cv0zPtpDUcOPJ633atLtPMiyD
-	 0az36PE4L82g07YS/MK7STXhs/Y8pbHzfC2sDL62r+a3EU8Gqb2lWfB90o7IfGCXod
-	 8Z+dx3gJ7Ycn9L9q+IXvprpAMhtlTBHImit92byo74iwpO6HNqGhEt3lapB7kZODWk
-	 VOxFmd1sCRxCg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E5E3803263;
-	Thu, 10 Oct 2024 11:20:42 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1728559316; c=relaxed/simple;
+	bh=IsJhWl5z3Fwrk8/Wuj9EVNVqymfW8XNXnTBnXXkZ2n4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sb453AcXIiFo+coXTFuEKps9rmy2owW/EEAdA5SGTAnU8cHppCYoJ6Exj0T0WSBB7P++BomJU0DBd6bu8NLjPA5UGFABkf/TeFo2wWiXVzQvar40nsoeT8g/kp8uKaWlP+BwfnKky43x6PYbZSwx7oaP/OkSk1oZhPBNLdUlIk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f1HAh1a+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1i7Psxw/WOb7cOeUIIUZsk+qXYRaaQKBmvfbIjVXdcw=; b=f1HAh1a+bfd5VtKBTucadg7hDl
+	ePw4MbOt6wV7+UrnPYijU1W4Z+XCnyJYpU5KSbvX7tMob1kfrl5mMG7p75E6tQdzinssofn4k1yUT
+	1eMtogDeoST4WCD9AkFVj11iRWDawROVCHFIfQyTprVrsdzGZFbo6Xas+e9GUiGjhAa/NL+YGKy8l
+	eWf/wKrXN5RILlotNhdxiXTpF+2J+5YM1m6XfIeAO0AdacwcHn0jUYQ+qHBm9UndFLHa1xph/IPST
+	ioiq1B2RSsGKRh6LyGG0PwA2BB4/4lxO8PGqH3io+1rJ8Nuk5UWiaQs5RsgqVKaQRCQNYCsw1XDZa
+	fsFNOxvA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37790)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1syrEo-0002CN-0T;
+	Thu, 10 Oct 2024 12:21:45 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1syrEl-0007Fx-0e;
+	Thu, 10 Oct 2024 12:21:43 +0100
+Date: Thu, 10 Oct 2024 12:21:43 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/3] net: phylink: remove "using_mac_select_pcs"
+Message-ID: <Zwe4x0yzPUj6bLV1@shell.armlinux.org.uk>
+References: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
+ <E1syBPE-006Unh-TL@rmk-PC.armlinux.org.uk>
+ <20241009122938.qmrq6csapdghwry3@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/14] net/mlx5: qos: Refactor esw qos to support new
- features
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172855924123.1984107.8570590080883453248.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 11:20:41 +0000
-References: <20241008183222.137702-1-tariqt@nvidia.com>
-In-Reply-To: <20241008183222.137702-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, cjubran@nvidia.com, cratiu@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009122938.qmrq6csapdghwry3@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue, 8 Oct 2024 21:32:08 +0300 you wrote:
-> Hi,
+On Wed, Oct 09, 2024 at 03:29:38PM +0300, Vladimir Oltean wrote:
+> On Tue, Oct 08, 2024 at 03:41:44PM +0100, Russell King (Oracle) wrote:
+> > With DSA's implementation of the mac_select_pcs() method removed, we
+> > can now remove the detection of mac_select_pcs() implementation.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  drivers/net/phy/phylink.c | 14 +++-----------
+> >  1 file changed, 3 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> > index 4309317de3d1..8f86599d3d78 100644
+> > --- a/drivers/net/phy/phylink.c
+> > +++ b/drivers/net/phy/phylink.c
+> > @@ -79,7 +79,6 @@ struct phylink {
+> >  	unsigned int pcs_state;
+> >  
+> >  	bool mac_link_dropped;
+> > -	bool using_mac_select_pcs;
+> >  
+> >  	struct sfp_bus *sfp_bus;
+> >  	bool sfp_may_have_phy;
+> > @@ -661,12 +660,12 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
+> >  	int ret;
+> >  
+> >  	/* Get the PCS for this interface mode */
+> > -	if (pl->using_mac_select_pcs) {
+> > +	if (pl->mac_ops->mac_select_pcs) {
+> >  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+> >  		if (IS_ERR(pcs))
+> >  			return PTR_ERR(pcs);
+> >  	} else {
+> > -		pcs = pl->pcs;
+> > +		pcs = NULL;
 > 
-> This patch series by Cosmin and Carolina prepares the mlx5 qos infra for
-> the upcoming feature of cross E-Switch scheduling.
+> The assignment from the "else" branch could have been folded into the
+> variable initialization.
 > 
-> Noop cleanups:
-> net/mlx5: qos: Flesh out element_attributes in mlx5_ifc.h
-> net/mlx5: qos: Rename vport 'tsar' into 'sched_elem'.
-> net/mlx5: qos: Consistently name vport vars as 'vport'
-> net/mlx5: qos: Refactor and document bw_share calculation
-> net/mlx5: qos: Rename rate group 'list' as 'parent_entry'
-> 
-> [...]
+> Also, maybe a word in the commit message would be good about why the
+> "pcs = pl->pcs" line became "pcs = NULL". I get the impression that
+> these are 2 logical changes in one patch. This second aspect I'm
+> highlighting seems to be cleaning up the last remnants of phylink_set_pcs().
+> Since all phylink users have been converted to mac_select_pcs(), there's
+> no other possible value for "pl->pcs" than NULL if "using_mac_select_pcs"
+> is true.
 
-Here is the summary with links:
-  - [net-next,01/14] net/mlx5: qos: Flesh out element_attributes in mlx5_ifc.h
-    https://git.kernel.org/netdev/net-next/c/016f426a14f0
-  - [net-next,02/14] net/mlx5: qos: Rename vport 'tsar' into 'sched_elem'.
-    https://git.kernel.org/netdev/net-next/c/158205ca4baf
-  - [net-next,03/14] net/mlx5: qos: Consistently name vport vars as 'vport'
-    https://git.kernel.org/netdev/net-next/c/16efefde21f5
-  - [net-next,04/14] net/mlx5: qos: Refactor and document bw_share calculation
-    https://git.kernel.org/netdev/net-next/c/8746eeb7f808
-  - [net-next,05/14] net/mlx5: qos: Maintain rate group vport members in a list
-    https://git.kernel.org/netdev/net-next/c/d3a3b0765e18
-  - [net-next,06/14] net/mlx5: qos: Always create group0
-    https://git.kernel.org/netdev/net-next/c/a87a561b802a
-  - [net-next,07/14] net/mlx5: qos: Drop 'esw' param from vport qos functions
-    https://git.kernel.org/netdev/net-next/c/e9fa32f11086
-  - [net-next,08/14] net/mlx5: qos: Store the eswitch in a mlx5_esw_rate_group
-    https://git.kernel.org/netdev/net-next/c/b9cfe193eb8f
-  - [net-next,09/14] net/mlx5: qos: Add an explicit 'dev' to vport trace calls
-    https://git.kernel.org/netdev/net-next/c/0c4cf09eca83
-  - [net-next,10/14] net/mlx5: qos: Rename rate group 'list' as 'parent_entry'
-    https://git.kernel.org/netdev/net-next/c/43f9011a3d7a
-  - [net-next,11/14] net/mlx5: qos: Store rate groups in a qos domain
-    https://git.kernel.org/netdev/net-next/c/107a034d5c1e
-  - [net-next,12/14] net/mlx5: qos: Refactor locking to a qos domain mutex
-    https://git.kernel.org/netdev/net-next/c/40efb0b7c755
-  - [net-next,13/14] net/mlx5: Unify QoS element type checks across NIC and E-Switch
-    https://git.kernel.org/netdev/net-next/c/f91c69f43c54
-  - [net-next,14/14] net/mlx5: Add support check for TSAR types in QoS scheduling
-    https://git.kernel.org/netdev/net-next/c/e1013c792960
+Hmm. Looking at this again, we're getting into quite a mess because of
+one of your previous review comments from a number of years back.
 
-You are awesome, thank you!
+You stated that you didn't see the need to support a transition from
+having-a-PCS to having-no-PCS. I don't have a link to that discussion.
+However, it is why we've ended up with phylink_major_config() having
+the extra complexity here, effectively preventing mac_select_pcs()
+from being able to remove a PCS that was previously added:
+
+		pcs_changed = pcs && pl->pcs != pcs;
+
+because if mac_select_pcs() returns NULL, it was decided that any
+in-use PCS would not be removed. It seems (at least to me) to be a
+silly decision now.
+
+However, if mac_select_pcs() in phylink_major_config() returns NULL,
+we don't do any validation of the PCS.
+
+So this, today, before these patches, is already an inconsistent mess.
+
+To fix this, I think:
+
+	struct phylink_pcs *pcs = NULL;
+...
+        if (pl->mac_ops->mac_select_pcs) {
+                pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
+                if (IS_ERR(pcs))
+                        return PTR_ERR(pcs);
+	}
+
+	if (!pcs)
+		pcs = pl->pcs;
+
+is needed to give consistent behaviour.
+
+Alternatively, we could allow mac_select_pcs() to return NULL, which
+would then allow the PCS to be removed.
+
+Let me know if you've changed your mind on what behaviour we should
+have, because this affects what I do to sort this out.
+
+However, it is true that if mac_select_pcs() is NULL, since commit
+a5081bad2eac ("net: phylink: remove phylink_set_pcs()") there is no
+way pl->pcs can be non-NULL, since there is no other way for it to
+be set.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
