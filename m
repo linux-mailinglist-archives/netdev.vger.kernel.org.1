@@ -1,115 +1,95 @@
-Return-Path: <netdev+bounces-134309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A807998AFF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:09:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52B01998B34
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 487A7291659
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:09:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A773294E88
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E661C9ECA;
-	Thu, 10 Oct 2024 15:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D758C1CBEB9;
+	Thu, 10 Oct 2024 15:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Bs890czY"
+	dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b="GcUiC6x5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from smtp05-ext.udag.de (smtp05-ext.udag.de [62.146.106.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183941C3F28;
-	Thu, 10 Oct 2024 15:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EAAB646;
+	Thu, 10 Oct 2024 15:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.146.106.75
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728572774; cv=none; b=JYU0e1jerOM2+RBAJNU1g1oQm2kBLRbpBKqLTLkLQ6CKoxvaS9HoYAYhbjPp6C6wLtTnJV8UjjLouAIdYAci/3HbOmmSmN8DI53iTfLrklIpB4I/dbmTAphK7A6HaeJBfqJMICVyqLvH/X2/PfqjAWAfyjzhtAyTR64SayEkt+4=
+	t=1728573489; cv=none; b=lK3Nic9HJ19EK/X+lsYCoXbSuXbTrhJpQOg/pbqrZbPD1b6oIHMEilkXa+FMSaAyD5O2NftuTW6vt5at3DKN5xBlxkIr1uB+emY4m/YaO7fO5lAhsdCxspk5Kc7n9pgCaRx7V+xXqMDVCcHeHV6xww0i17MHWtcZb9un2htgaAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728572774; c=relaxed/simple;
-	bh=m5uw3eXlhRpsgXeXdOs302gE4sX30libvcLIMVUcBAY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pSC0i+OOa5XxV5BiXcD6doO9b1yREPZbkH3wuCU59Y/ncsoUBus0UbjVyWfLS49YRS1tiAh3XtRRGijxV6RWdtthMfq5C80Yd7IVNPilm8Te3irvMaUGWNp0K/sAiG80WuK1PsFIv1n4IkFBIS5uGKiCqvucY4Adpv73xTMDYyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Bs890czY; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49AF5mdq037505;
-	Thu, 10 Oct 2024 10:05:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1728572748;
-	bh=GqRZLvl2DjQ0upPJP7Y+Ph6GptippgBWVgGt23VlipY=;
-	h=From:To:CC:Subject:Date;
-	b=Bs890czYvAfOqPp1SIaX0SIVFs6r3JxXydwN/VqnhuhK6aMrRd5VadUtk6/X/VU0E
-	 yUQ30kPiG3+4byOuaH9CkEBGv3tFtzREVbFODtjfiOhJhfyj3FQYZaI9fyfie7oOiT
-	 Tu/iGRRRDmkhUsm7ylbzWAOGD2XKv8rY+ZB28EBk=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49AF5msw113165
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 10 Oct 2024 10:05:48 -0500
-Received: from DLEE102.ent.ti.com (157.170.170.32) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 10
- Oct 2024 10:05:47 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 10 Oct 2024 10:05:47 -0500
-Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [10.24.72.81])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49AF5hN1030739;
-	Thu, 10 Oct 2024 10:05:44 -0500
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <rogerq@kernel.org>, <dan.carpenter@linaro.org>,
-        <jpanis@baylibre.com>, <u.kleine-koenig@baylibre.com>,
-        <c-vankar@ti.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        <s-vadapalli@ti.com>
-Subject: [PATCH net-next] net: ethernet: ti: am65-cpsw: Enable USXGMII mode for J7200 CPSW5G
-Date: Thu, 10 Oct 2024 20:35:43 +0530
-Message-ID: <20241010150543.2620448-1-s-vadapalli@ti.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1728573489; c=relaxed/simple;
+	bh=YUSySbBWp08I2dMPVF+Lo5oQQvSwVDiGRyoQNS9kAvM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=cAoPODQ+kGrL3lveNL7GEBVZ8hpAO7wxauSoIGtD/cvJP9qcnbeAkAYrYs87g3iZy6CEPXHzqAsHmexHUESzVUi3GEXyRYyie8zaWfYC0fTWIm4ghyEJUIA2dGqmCtImFKI9nZA8aekNYzQq4C2uQgwf8wSjybl6MVDQ7cUTHgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=GcUiC6x5; arc=none smtp.client-ip=62.146.106.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tk154.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tk154.de
+Received: from [10.10.34.132] (unknown [195.37.88.189])
+	by smtp05-ext.udag.de (Postfix) with ESMTPA id 9793DE0361;
+	Thu, 10 Oct 2024 17:11:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=uddkim-202310;
+	t=1728573084;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Q+XKIu6e8sY0nrLlJEOX8BdUbse7XfS6RaSAivR5UEc=;
+	b=GcUiC6x5igoKsl2yUQJs7vc5qYIz0zbnGgfzksVi7dzSyKmzgjg9wGR3ZfiPMBKG6D1X5i
+	IfC1ukGJFT2Ap0Bv+m2coE1i+Ce+Vf/G3B8z3mrBm7CCrs2/ZFUTFh8nHuf1tXjUauxfN0
+	/hfqKxYPJ2P/JoIddytKCBnJFyOyra0CjHYW6+6OVfg5jS1Dx66z+ez1/OB6Ip+1rgGscV
+	L++n9+THXrJUdVDr6c2hMTtFZsbkP5MleTWNRxNUlb2SdQwf/x/pSqM3KemaqPRze6sYN+
+	A7bDCIJTHQ4IfsO1Mz4HJx3oQCnan2AfLg/NtAtgDKUpR1dYqwFXU+QxM1VHKw==
+Message-ID: <bc8ba1b7-e4ad-40b5-b69d-9ea1e7a18a40@tk154.de>
+Date: Thu, 10 Oct 2024 17:11:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-DE
+To: saeedm@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+From: Til Kaiser <mail@tk154.de>
+Subject: [BUG] net/mlx5: missing sysfs hwmon entry for ConnectX-4 cards
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
-
-TI's J7200 SoC supports USXGMII mode. Add USXGMII mode to the
-extra_modes member of the J7200 SoC data.
-
-Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
----
+Authentication-Results: smtp05-ext.udag.de;
+	auth=pass smtp.auth=mail@tk154.de smtp.mailfrom=mail@tk154.de
 
 Hello,
 
-This patch is based on commit
-16aef66643a2 net: phy: Validate PHY LED OPs presence before registering
-of the "main" branch of the net-next tree.
+I noticed on our dual-port 100G ConnectX-4 cards (MT27700 Family) 
+running Linux Kernel version 6.6.56 and the latest ConnectX-4 firmware 
+version 12.28.2302 that we do not have a sysfs hwmon entry for reading 
+temperature values.
+When running Kernel version 6.6.32, the hwmon entry is there again, and 
+I can read the temperature values of those cards.
+Strangely, this problem doesn't occur on our ConnectX-4 Lx cards 
+(MT27710 Family), regardless of which Kernel version I use.
 
-Regards,
-Siddharth.
+I looked into the mlx5 core driver and noticed that it is checking the 
+MCAM register here: 
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/hwmon.c?h=v6.6.56#n380.
+When I removed that check, the hwmon entry reappeared again.
 
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Looking into recent mlx5 commits regarding this MCAM register, I found 
+this commit: 
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.6.56&id=fb035aa9a3f8fd327ab83b15a94929d2b9045995.
+When I reverted this commit, the hwmon entry also reappeared again.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 12ccdd3f19aa..09e57e66ea48 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -3445,7 +3445,8 @@ static const struct am65_cpsw_pdata j7200_cpswxg_pdata = {
- 	.quirks = 0,
- 	.ale_dev_id = "am64-cpswxg",
- 	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
--	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII),
-+	.extra_modes = BIT(PHY_INTERFACE_MODE_QSGMII) | BIT(PHY_INTERFACE_MODE_SGMII) |
-+		       BIT(PHY_INTERFACE_MODE_USXGMII),
- };
- 
- static const struct am65_cpsw_pdata j721e_cpswxg_pdata = {
--- 
-2.40.1
+I also found a firmware bug fix regarding that register inside the 
+ConnectX-4 Lx bug fix history here (Ref. 2339971): 
+https://docs.nvidia.com/networking/display/connectx4lxfirmwarev14321900/bug+fixes+history.
+I couldn't find such a firmware fix for the non-Lx ConnectX-4 cards. So, 
+I'm unsure whether this might be a mlx5 driver or firmware issue.
 
+Kind regards
+Til
 
