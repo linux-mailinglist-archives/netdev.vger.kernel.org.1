@@ -1,144 +1,129 @@
-Return-Path: <netdev+bounces-134235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C34C99876F
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:19:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0590D99876D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A55401C20C73
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:19:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADE531F21D33
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34201C9B88;
-	Thu, 10 Oct 2024 13:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117131C57B0;
+	Thu, 10 Oct 2024 13:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qGlJF3OJ";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="qGlJF3OJ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="YGAKd7/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4121BE245;
-	Thu, 10 Oct 2024 13:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1365C1BE245
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728566382; cv=none; b=k9QDPWWISJLsPVaAuhKtRTjrWNTOd2t2SP0IOReZPFFO3yacAnWxuIYAYaeHq0NdJ0FuqDV3AgymqqGlWuadB/mP2NtLmu+ObxNesLumRE1dmTVlFSx0NZFIHT1QW619R7fiAOeouCsbOdQNJpOef2dD/X4mIfUmQlNdvIh6lAU=
+	t=1728566375; cv=none; b=tG3whyVZUDcBoe7QWRCBzhcs9LQELUoq+GMBAAvkdt5KBOIwXYk4QfK+ujUZpHdmA6zLJK6mY69eQKW0btXGClqp39bSFjfUA+EpwvZnTBztwN+vz4j5W5C8opeKZUdsw0el5iBKpjZuoQGB+v9R6fSYxEAQZ3E7JIwQsQoEme8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728566382; c=relaxed/simple;
-	bh=Kip+g3NUeabI/R2YzpRmlSwA0m5LSlFdee3BzrAlaPw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RWIYCwZ9VnzHixNQfTtjDWyNjvmeuWoPT/VpXYOY/C1ck2nOHlM+akn2Kdsus2QmJzdPN1mdriiH289kJLjPZ1FdpBQxzUgCbYajZq8PUYShuJJoFglNPIHhmIlKJYtnc+3X5JEsR686gGho5LpqPpGABhqmacpi+o81dfRL5gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qGlJF3OJ; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=qGlJF3OJ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B996C1F45A;
-	Thu, 10 Oct 2024 13:19:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1728566377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=yDqItrqmUk+6wjzIhXJNTmX7NNV0awuFoUw0XQgqWkA=;
-	b=qGlJF3OJVLrfjXd/fKZcRjIFd6h7nIqFcznaYFxHs7Z+pDNfo5wi5XmkjT4hiY4llslFa2
-	zZJouCZplHfuW8eTgamjVa4FlOL/UBp8KWHPsdcZS3LcTzQxWC3jC0NiZBCZMnbfwtPQNv
-	LgPmYLM2kWdFMcXzSAO4TFxerD5XTCU=
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=qGlJF3OJ
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1728566377; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=yDqItrqmUk+6wjzIhXJNTmX7NNV0awuFoUw0XQgqWkA=;
-	b=qGlJF3OJVLrfjXd/fKZcRjIFd6h7nIqFcznaYFxHs7Z+pDNfo5wi5XmkjT4hiY4llslFa2
-	zZJouCZplHfuW8eTgamjVa4FlOL/UBp8KWHPsdcZS3LcTzQxWC3jC0NiZBCZMnbfwtPQNv
-	LgPmYLM2kWdFMcXzSAO4TFxerD5XTCU=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 791F213A6E;
-	Thu, 10 Oct 2024 13:19:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id c8JkHGnUB2fvUQAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Thu, 10 Oct 2024 13:19:37 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [PATCH net] net: usb: usbnet: fix race in probe failure
-Date: Thu, 10 Oct 2024 15:19:14 +0200
-Message-ID: <20241010131934.1499695-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.46.1
+	s=arc-20240116; t=1728566375; c=relaxed/simple;
+	bh=cpOaercjncQOB9gV1IYhByw7G5IKZygARcivDskCyR8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lRT0+xwlqCzWFVqofjEIcONqNGaA2mpFXFHVQ2QlEqZlSy62WCcgI3/2x+CAyi6GoF6Janx0sMKachevgJ3kQDsyEbnp7aHdyw+fi5t36ZhoW5pCCHkDWThKK+6Yz2lN1Si5sRY8ZkHtFGQIsMhZGlyOu/l66+pUDm/ZTea/rxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=YGAKd7/h; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-8354cecdf83so16865639f.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:19:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728566372; x=1729171172; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lSOi3DtOdsijIeimPagm2VwpzMqM+VhZby/6Pj6Npv0=;
+        b=YGAKd7/h5XCT6IYGI1E+7L3mXjRYtv0h++Q9RVQjgi3PGgnF4nLM6HlHUd03TvNhiD
+         jM8J9iGspikMQ4pFc99eVTho1wMkrALqnzMMP5srwsBi6h+uf/steGzn+SUEUszYa8I2
+         wMaiobOVOP8QxZkagnEXrf0f5KNrRzixhi0MGf7wXlbXxWdjxfcpM3xNQT+uwOQ7rp9b
+         aI0qvmFt7cvK/3i0r42RQhsSx871Ndh3VMotj1EnFeOYVj8/e6bG9NJVNKdSrdppIiFx
+         jtLY9WSfW6MQCakSfOeWfD1xhQDoTp3JHeIYlcO4+BiXHAimqEPPYm5TgvFVIaxdgsZu
+         CVeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728566372; x=1729171172;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lSOi3DtOdsijIeimPagm2VwpzMqM+VhZby/6Pj6Npv0=;
+        b=QySfZUoJm1IK1stkss3Eo6jOP/p7wxBDOwO4zhLVhnvl3+TQjfxOM5A1ChvG/osmyE
+         DXbptJaPRyZZVgtvKy4Fra15FVmbprWmo4vXu+C/k5Vtq3pefrycq7smUoWgNAQEj11g
+         AdF9aY1g4W8k8vSSjzmbTu3UNfaL3aM1865RbFD+c8ltmOE8ylNmlTY1UoPiuTWVBQVS
+         hKks3P3rbE/jQxn0fP0jEZf6skC/T0V3ity68Ndnl9bNQherTN1IgwiBZVWhOoGZF3e+
+         aNwGnp/oaJegYR+PdT0PaAyESfqa+XHyAhRl4Vii960XPDIOuXchNRffha8sjdj9iwKU
+         vcXA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGdLD83kfQauHSfY2IXjBNvx+7n92zBCKO9GQ/tzzILgWO2QvotJFfK6M/PU17/BOzbW/YkK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbEjBazStzkQCJsFJb9cI5ktyhVa9ZM9SBm/2VEH2O0YzNP9oQ
+	+jAfqzPIdgNPmGpLFbZGe9x/fnWqY7ANBKsyUAfs89XHAg3iT/7sLsceTQkf0K8=
+X-Google-Smtp-Source: AGHT+IEfuaThIrnTiZMf+XnJ5qGwySu3D9xl7h3sdOh4Z8U7QUEwy1QmNLOVYuh7HK0DKH/HbrPwCA==
+X-Received: by 2002:a05:6602:2dcd:b0:82a:ab20:f4bf with SMTP id ca18e2360f4ac-8353d47c380mr522731139f.1.1728566371817;
+        Thu, 10 Oct 2024 06:19:31 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbad9d604fsm239318173.52.2024.10.10.06.19.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 06:19:31 -0700 (PDT)
+Message-ID: <6f8a5e79-e496-4f94-93df-84c66a10e73a@kernel.dk>
+Date: Thu, 10 Oct 2024 07:19:30 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: B996C1F45A
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.com:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid,suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 14/15] io_uring/zcrx: set pp memory provider for an rx
+ queue
+To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-15-dw@davidwei.uk>
+ <53f1284c-6298-4b55-b7e8-9d480148ec5b@kernel.dk>
+ <678babf5-4694-4b65-b32a-55b87017ed87@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <678babf5-4694-4b65-b32a-55b87017ed87@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The same bug as in the disconnect code path also exists
-in the case of a failure late during the probe process.
-The flag must also be set.
+On 10/10/24 7:09 AM, Pavel Begunkov wrote:
+> On 10/9/24 19:42, Jens Axboe wrote:
+>> On 10/7/24 4:16 PM, David Wei wrote:
+>>> From: David Wei <davidhwei@meta.com>
+> ...
+>>>       if (copy_to_user(arg, &reg, sizeof(reg))) {
+>>> +        io_close_zc_rxq(ifq);
+>>>           ret = -EFAULT;
+>>>           goto err;
+>>>       }
+>>>       if (copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
+>>> +        io_close_zc_rxq(ifq);
+>>>           ret = -EFAULT;
+>>>           goto err;
+>>>       }
+>>>       ctx->ifq = ifq;
+>>>       return 0;
+>>
+>> Not added in this patch, but since I was looking at rtnl lock coverage,
+>> it's OK to potentially fault while holding this lock? I'm assuming it
+>> is, as I can't imagine any faulting needing to grab it. Not even from
+>> nbd ;-)
+> 
+> I believe it should be fine to fault, but regardless neither this
+> chunk nor page pinning is under rtnl. Only netdev_rx_queue_restart()
+> is under it from heavy stuff, intentionally trying to minimise the
+> section as it's a global lock.
 
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
----
- drivers/net/usb/usbnet.c | 1 +
- 1 file changed, 1 insertion(+)
+Yep you're right, it is dropped before this section anyway.
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 2506aa8c603e..ee1b5fd7b491 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -1870,6 +1870,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
- 	 * may trigger an error resubmitting itself and, worse,
- 	 * schedule a timer. So we kill it all just in case.
- 	 */
-+	usbnet_mark_going_away(dev);
- 	cancel_work_sync(&dev->kevent);
- 	del_timer_sync(&dev->delay);
- 	free_netdev(net);
 -- 
-2.46.1
-
+Jens Axboe
 
