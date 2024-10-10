@@ -1,325 +1,282 @@
-Return-Path: <netdev+bounces-134374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B90998FAE
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:19:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1814998FB7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:21:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18294282A07
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:19:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C88C282810
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC9819D06D;
-	Thu, 10 Oct 2024 18:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8CF71CDFC2;
+	Thu, 10 Oct 2024 18:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bV226qJp"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="GheaFGd1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CY4PR02CU008.outbound.protection.outlook.com (mail-westcentralusazolkn19011025.outbound.protection.outlook.com [52.103.7.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6DA199395
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728584366; cv=none; b=lsKTpt2OEsTsx1ZFDIzwB2i6g690CVmaiirzePeaFDrFTr2SD+pT6wtOgK/jUjEYmMZaTsSN/aBKaqNIdQrvMoEimTj0sBSxbIagm8UScECxnAiyqJG+1ohxFW3GEmrfG12geab8ZDXyd3e7NYuZLwDubNAulFNZedyBaP5Uhiw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728584366; c=relaxed/simple;
-	bh=seg6PtxdKCw6658t/6NR1j0MiC5hlzZnwwtAhGtHVfo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=buSSSirn/QGGWUNP0PHnq+4msfStgP5FXgZ5Ytq03aJitfpXbnsJ3M7FHxE77CwknKlKSPar8dO0wrMGtmawKmgq0Ytq1KIpMu9DQBST+akB4S2/SVta/37NGuBbz7RwlyJRNnf5jMCEbM1cVH1M25CHj5w/NHpPWMijedBWax4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bV226qJp; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4603d3e0547so37141cf.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728584362; x=1729189162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yHYB0Fms1iMmJeXSNk7809G+fS3DYVxsl+/gdvz9aeY=;
-        b=bV226qJppKo0w9CG5Gqw/5WKDEhkgD1CjzRIKNHksglfoDAAKcKGr9fCErD1iJ5qdH
-         Mpnyy7ae1KEycOQtuynw1OTtvuZ1YV9pLGDKN/zOA/xCgNYqZWY5N+EM0h+r2q8NZSc9
-         1Uv5glE6j1Rd37F1M46ttnGu9ajBLLXJhBJRbuN2+2nbelFv3SXM+fupVbLrVvHpXw1r
-         q5zu/A0rVTEc/eH5vHHzzKg8WDfMaKKTRnUuowndj03eZnE4PkJ4S1OfV7tKhXSNSNud
-         A+lsCYTmn9X3EA5X+quCdZhsD5OrQuQTilZYadfRL/roolLYrOFAXiMOXaVLY87/Ob47
-         Etuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728584362; x=1729189162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yHYB0Fms1iMmJeXSNk7809G+fS3DYVxsl+/gdvz9aeY=;
-        b=Epqo83+DUlXrAm9mi55dHYwZPySF3oqL0VECMsI04YM1328RxOVhvGFcnNOjf5fybJ
-         aFX3yy0MehGhM/vyI5VMGs+qnlB5vFuR1jzci36E5wiDszxaP1YF2pOcACa+lYxvK5bf
-         eoGktTJyhzD6nlphzJe4pY/zx3lCxUdJxlaDkCX3jFTX+gOmj6/hnqTcGFtmuWar717B
-         BNWTYfALRNbZQgFRi5w2HPTZ028paUuY9QzOGKLHbPRMrQ5Ys6rWm0swIv2n5BbrBM1R
-         UDT2piAVUogg9d7xtEEAPmRNp/T/B4HdTGn1vAYMqzSetxlgQgXdJSapW50EqCXFfr6Z
-         fWbw==
-X-Forwarded-Encrypted: i=1; AJvYcCVbJfO8wyyWoUHM8/wtv568j7Ry8tvhFSyrVEK/Nj01SPCmP3LyNEX921CSOVmstVVWiVI/uW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZWDwSChau2iQyPKb3aKN5anurcDaRdjE9QzG8oRCYjvxuxG+y
-	nsGel3F4Wck8HWpJ/QRZuA6+6O5td1P9VQhWKe4sGcEcGno9HvMB8fhgY0RssIcXtB6mq4uXlkH
-	CHv1ClEdpdDQS4bYBp2K32vqV6RwNkUdZf0wV
-X-Google-Smtp-Source: AGHT+IFCTPnVHq+c88/tOkZYn15HiMN/SkgvHU1nzR91Y4dEF/ooNzJiMjoYRo1jH7+bhU2oHUoV1gPX/PH431Dl8B4=
-X-Received: by 2002:a05:622a:5f0b:b0:453:5b5a:e77c with SMTP id
- d75a77b69052e-4604ac30a8cmr308901cf.10.1728584362284; Thu, 10 Oct 2024
- 11:19:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B451A303E;
+	Thu, 10 Oct 2024 18:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.7.25
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728584494; cv=fail; b=Rk0O8U23M5VTuzs0addn/uZ1PiLXRhumInt3bbIBsRy8LQS81D0XTr40hheNX8TdA9g8l7RszcQM+Hj6y9G3vk/KsA6lE8PWceicEWHfMfAbr2p4uLwF70bat6zRyZ6bXaIUg58oUfjODy9aUYH3SSPSK0awq23jWm2MTsOBqss=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728584494; c=relaxed/simple;
+	bh=noX6FyuVjxq7V+/g8eZdzuLegOyxugCQBWsOf6lnq58=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Reg1mOssalOLsTbZZ+C4s/C2o6Urj4tlmK8aul8xDPYoH14Ql3q1CT3vNMKkuC1hrCbC0UB3k7TZ/PakHDfR7imWEXwQX0W+ZPGanJt2P9sU53m/JCVpNgiEBUFGi8I9ZaXHikCSDH7aEhpS9c65y23B0xKljgF0cupvL736eL0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=GheaFGd1; arc=fail smtp.client-ip=52.103.7.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ewwpaDX5izSyNhb3Xjnk3Gpa+qEuBYpGBj19VCHU8yMMA5IOrROx+smVvF3aGIt6wel4gktn2MIEktyZRPB1Kx/b2J1qcvDlcP5Njq1UZYU3VIEXXLZXROmH7bNmQQGC0o/8aTQMxoaXAQIJdkfbVwmkYoNshXrUc2VTTFUq2WVDUA8g+Dqwsn8Xhj04TMUBIVVNpBgyCq70Pe/SMiCkTPrzcTP/IT1E1j0ffhmAue6/VEu8j0MY6PvwXtAW7DpRyp0tl/4EFnTnNOltWnuiQg/+LxPiwOivBssxFVjuLPMNWvba2VbzOibi0Bm/LcDHhvmxbrXt1MLG+rZHS3r55Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sr+nc7AY++tXOGAc+Ufu5zfZRflk7UdYks6SnelkzjI=;
+ b=uIwh0ZnSoxJ38zhUYnkEaD8LDfYPH0coRybktWW7IpHums6zjk7OoFozAmE5nItIU5nF3D3ho/mmWVEmAMoh0flgEQH9pc14hBrIZ2eoqgQMb6UkrTEt+0rpA4O8Gf+N212ncg+LmFH/WoACe5DuAfAR21Y+/NNDfyVr5tzuDAF+faVxnWX9J++6d+W643aYMPHChlPei7zCMvHkoOSwWOhup2wfdsliIksNdmiPr8uAsVlGV2RFFq0b+AkI9Fs3bKiHQa/Sl2ciHRfUrfxtS49GUBe3IbBJAktU3ITI4uZDcMogssAR/pirXHf3YYOFg41KaEsSsvqS37SKl7nRPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sr+nc7AY++tXOGAc+Ufu5zfZRflk7UdYks6SnelkzjI=;
+ b=GheaFGd1FMEEEaxmS8SrZSr5H0DXlWrNmHNTxvo5FVfCJtRAfzofo+iqWrWjYXofXQpGJgnchcl+FIC4D6jkhRSxkoGOOYWuxP0Q2t2hCbYtUAvIWVFWqm4I4dHIeBgCQOec0+2KZe7gIpyi2zWujSeDOOnaPrih6m2sv/7xR4t8XeTlKb6wG7fuoxdIcHFu25rVhE5kD0mKQED/6xkk25+vKniwS8Peiy2owFQ/z5yT7UQuUoHvlQp/nnZqgV1v9BqwV1jlcLyXN2IbFHByxqTi+WBcfw7DMPY9EqwsKbKHCdBkwSNl3WVz6zFhNitd14p3ykOK3momczHE92L63g==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by LV3PR02MB10761.namprd02.prod.outlook.com (2603:10b6:408:281::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Thu, 10 Oct
+ 2024 18:21:28 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%3]) with mapi id 15.20.8026.020; Thu, 10 Oct 2024
+ 18:21:28 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-pci@vger.kernel.org"
+	<linux-pci@vger.kernel.org>, "linux-arch@vger.kernel.org"
+	<linux-arch@vger.kernel.org>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>
+CC: "kys@microsoft.com" <kys@microsoft.com>, "haiyangz@microsoft.com"
+	<haiyangz@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"decui@microsoft.com" <decui@microsoft.com>, "catalin.marinas@arm.com"
+	<catalin.marinas@arm.com>, "will@kernel.org" <will@kernel.org>,
+	"luto@kernel.org" <luto@kernel.org>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
+	<bp@alien8.de>, "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>,
+	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>, "joro@8bytes.org"
+	<joro@8bytes.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "lpieralisi@kernel.org"
+	<lpieralisi@kernel.org>, "kw@linux.com" <kw@linux.com>, "robh@kernel.org"
+	<robh@kernel.org>, "bhelgaas@google.com" <bhelgaas@google.com>,
+	"arnd@arndb.de" <arnd@arndb.de>, "sgarzare@redhat.com" <sgarzare@redhat.com>,
+	"jinankjain@linux.microsoft.com" <jinankjain@linux.microsoft.com>,
+	"muminulrussell@gmail.com" <muminulrussell@gmail.com>,
+	"skinsburskii@linux.microsoft.com" <skinsburskii@linux.microsoft.com>,
+	"mukeshrathor@microsoft.com" <mukeshrathor@microsoft.com>
+Subject: RE: [PATCH 0/5] Add new headers for Hyper-V Dom0
+Thread-Topic: [PATCH 0/5] Add new headers for Hyper-V Dom0
+Thread-Index: AQHbFc3gheIHrTrmm0yVUene//yVY7J/bLBw
+Date: Thu, 10 Oct 2024 18:21:28 +0000
+Message-ID:
+ <SN6PR02MB4157F6EA7B2454D2F6CBF2ECD4782@SN6PR02MB4157.namprd02.prod.outlook.com>
+References:
+ <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+In-Reply-To:
+ <1727985064-18362-1-git-send-email-nunodasneves@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|LV3PR02MB10761:EE_
+x-ms-office365-filtering-correlation-id: 59106c8f-f636-437a-ec4f-08dce9585bbb
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|8060799006|15080799006|7042599007|461199028|19110799003|8062599003|440099028|3412199025|4302099013|56899033|1602099012|10035399004|102099032;
+x-microsoft-antispam-message-info:
+ aRFcZDHgQd8oYVvQEKvi4jLqOhsq91Ji6wIag2/nomFmbey9Gmjgw6TdR2BN5evGWZRxp+2dJ/pOriTPd15qZymkUyIJwWwutAyLAFWOG0tTVv+t7IvIGxBot/O44a/66ioHUuHkgGTunPqj/mhUe1lFkeu1W1TxZ/V1y6MMEjPgqmGrkomdsinf4U3jZgjUSmEPFKzEVGzGbDqmzEtQK5NHfFd4WzVvrWKxqBXDZXGLOhj4nPX8BKaplA2k8OIMqb80P/LHU9/gZuQhiQ80KqdbeGRHgDbGXIhWmMM1J26bQLakTbRdu9Uu8XFN4zwJeABFgFSaX7OC4+AOJj4+ruGvmFBLMnMrfUuAhtWz7OzMNH9iRLcqvNxwGhNUh4yfK9i6tzu+BoklxtQiYCi8mJwIePGNUHV7cZRTKrZLeTIx/FwKqgSu304J0LFuD9wQOFfOzsTTZ5ZH24v6Kgk6pAHVYckAWGok6AraY1hannB6FVJeNUmgB3tmjjsd2xEie03Z2NImRTnnwNsd5E4BKqIcvnX+3XP+tCiRsOPU4ycLzXraEBFNXAJys+jaHpYrEHg72urM9PonQG4czD3HQvA2sx6rM9eRHxSjoZsfAAhijyBtRSq5XmQYPURKX0S9ytI6mFIEykokYYH+dC5N459Iiak5QWe6TU7mwk6ew573fBE317WyeAZlZQFu766UCghVPK9I0iZFhqcb2dcEQP28yAqtVluPIdsdQz+y4zAUoNsu4LSb/40tjQrwufQyV5jOOLsaZEwxjZxyKvG4FDMRWjDr+B7d51RdsHEHduoSsD+NQXdZQnPbYeMygxaO2/i3Sm0iDF28iIzlzJtU+dRkP+ZGH4Ni7XWH2DVpoD7hbm3s/euL8xMLQ85OukH5MX24lnDmnt3pCyDkSUWU/CuykxBdI/w8Ijgb7MZxnCk=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?y+dEHloI1Y/ghQhxbscCatnBnrWYrUe/ZZ8QAw7F7j3upE7Brmsrogs83ONk?=
+ =?us-ascii?Q?NvXxUQmQNH15TzS6lM3/h80mkUjnFcoUyllUnxbAx8E4oZ/ry00xpLJhgaJD?=
+ =?us-ascii?Q?4K1Nkng8BrPGxaAX3F2mc4MyBHXDIPjEGb9k7VSXec6s84SHFiPmmCF25PqZ?=
+ =?us-ascii?Q?2ZMfM++zUAHLgDhJiY7R3UA3LzzJP2nwrVLZdBNF0QjTwLhQxafgeyMwFYPa?=
+ =?us-ascii?Q?ns9SbPmOVGZE2YeM2pgfZ6KiUn7KFPYMmYlRtGGkTx8cAjFhQRZC7rYBnSrI?=
+ =?us-ascii?Q?0spYgDkY6A7R1Grl08rNsgGp5AurDeo+2cz7Hhsj06jH92X5RRa5dtDTLhF3?=
+ =?us-ascii?Q?gfxR2XucQ2yuA51EajvVshHc277nLRwfItVj7y9oPlOaS09arcveKMlNWqoi?=
+ =?us-ascii?Q?8VpWJLo8iXUWv61uc6IB8yQ5Pz0tYwehmLoHmpjp/JeGhSsJQwvcxFfoNmKQ?=
+ =?us-ascii?Q?vs4w7w4uRFnYmK5UephbiJeuZo+sdKYZH/2DnpXZFI/H0Ym9yKfLtff1FJlD?=
+ =?us-ascii?Q?PrtLMytwbDsi0YXH7m7x0zjdZMsa6PUkXEOGMLHkYq4000BRLS2W18bSYxGh?=
+ =?us-ascii?Q?zh2BdWiPA2lLvjBsdAuoqQHDDuzNNZVid1L/oM0zVZtN6lk8IPgcoQ2mfhLr?=
+ =?us-ascii?Q?qxIfjYN8HtuF70lSvV0Lh2pXQyjRwygvqepZG4x2wP7epLVdrQYWzLkICJPk?=
+ =?us-ascii?Q?ShImQIiVCpN9jkWBjtRyVnmNeG1ZWt0KnKjLYkKQSJpWpw5qg9+PQXb8whvV?=
+ =?us-ascii?Q?bC1DaxbCd6zSgTWm4fEpRs0OYYYXU8O/tTuqpq7rvwqchw+nJNou1LOMlUGn?=
+ =?us-ascii?Q?3m3ZhMudCvWw1T3oigwe6mY4i6aDv/UdWUihylM1Ag4wDS9FkUYEeACmE9gt?=
+ =?us-ascii?Q?Tb+D4Wyk1vUlj6qQXb9qOkLNbUSw5g7tDXnQlxM6Z4vcM5/FJ9eVmC5cVtu5?=
+ =?us-ascii?Q?RLH8/3nq3pudVLGa8D6kI3J7rJ0AtxdKugcodwCQD77FdzrRNNj5ospoE9OI?=
+ =?us-ascii?Q?XWk6cgG8XVYMwsL4MgV8KfZbedsmpRzTsodha+MLXcNxjosup4KkJnnl+3iK?=
+ =?us-ascii?Q?eqEztzt6cYphUKg5/zS2UJG5ihPDiMeDmeYlk09k+J2i3zx0tbj8nix8qOuD?=
+ =?us-ascii?Q?ekzy4decC7O6uQZIoOyUuIQ45Hz/InYo23IXLpar6jq0CXjk2cUiO51EuJ99?=
+ =?us-ascii?Q?9frmI7so7/LNWSKjuvlWdUANBINHvcS6kKtDYukJJcNYqJXknNO0KnKk05M?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-12-dw@davidwei.uk>
- <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com> <94a22079-0858-473c-b07f-89343d9ba845@gmail.com>
-In-Reply-To: <94a22079-0858-473c-b07f-89343d9ba845@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 10 Oct 2024 11:19:08 -0700
-Message-ID: <CAHS8izPjHv_J8=Hz6xZmfa857st+zyA7MLSe+gCJTdZewPOmEw@mail.gmail.com>
-Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
- memory provider
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59106c8f-f636-437a-ec4f-08dce9585bbb
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Oct 2024 18:21:28.4712
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR02MB10761
 
-On Wed, Oct 9, 2024 at 3:57=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 10/9/24 23:01, Mina Almasry wrote:
-> > On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote=
-:
-> >>
-> >> From: Pavel Begunkov <asml.silence@gmail.com>
-> >>
-> >> Implement a page pool memory provider for io_uring to receieve in a
-> >> zero copy fashion. For that, the provider allocates user pages wrapped
-> >> around into struct net_iovs, that are stored in a previously registere=
-d
-> >> struct net_iov_area.
-> >>
-> >> Unlike with traditional receives, for which pages from a page pool can
-> >> be deallocated right after the user receives data, e.g. via recv(2),
-> >> we extend the lifetime by recycling buffers only after the user space
-> >> acknowledges that it's done processing the data via the refill queue.
-> >> Before handing buffers to the user, we mark them by bumping the refcou=
-nt
-> >> by a bias value IO_ZC_RX_UREF, which will be checked when the buffer i=
-s
-> >> returned back. When the corresponding io_uring instance and/or page po=
-ol
-> >> are destroyed, we'll force back all buffers that are currently in the
-> >> user space in ->io_pp_zc_scrub by clearing the bias.
-> >>
-> >
-> > This is an interesting design choice. In my experience the page_pool
-> > works the opposite way, i.e. all the netmems in it are kept alive
-> > until the user is done with them. Deviating from that requires custom
-> > behavior (->scrub), which may be fine, but why do this? Isn't it
-> > better for uapi perspective to keep the memory alive until the user is
-> > done with it?
->
-> It's hardly interesting, it's _exactly_ the same thing devmem TCP
-> does by attaching the lifetime of buffers to a socket's xarray,
-> which requires custom behaviour. Maybe I wasn't clear on one thing
-> though, it's accounting from the page pool's perspective. Those are
-> user pages, likely still mapped into the user space, in which case
-> they're not going to be destroyed.
->
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com> Sent: Thursday, Oct=
+ober 3, 2024 12:51 PM
+>=20
+> To support Hyper-V Dom0 (aka Linux as root partition), many new
+> definitions are required.
+>=20
+> The plan going forward is to directly import headers from
+> Hyper-V. This is a more maintainable way to import definitions
+> rather than via the TLFS doc. This patch series introduces
+> new headers (hvhdk.h, hvgdk.h, etc, see patch #3) directly
+> derived from Hyper-V code.
+>=20
+> This patch series replaces hyperv-tlfs.h with hvhdk.h, but only
+> in Microsoft-maintained Hyper-V code where they are needed. This
+> leaves the existing hyperv-tlfs.h in use elsewhere - notably for
+> Hyper-V enlightenments on KVM guests.
 
-I think we miscommunicated. Both devmem TCP and io_uring seem to bump
-the refcount of memory while the user is using it, yes. But devmem TCP
-doesn't scrub the memory when the page_pool dies. io_uring seems to
-want to scrub the memory when the page_pool dies. I'm wondering about
-this difference. Seems it's better from a uapi prespective to keep the
-memory alive until the user returns it or crash. Otherwise you could
-have 1 thread reading user memory and 1 thread destroying the
-page_pool and the memory will be pulled from under the read, right?
+Could you elaborate on why the bifurcation is necessary? Is it an
+interim step until the KVM code can use the new scheme as well?
+Also, does "Hyper-V enlightenments on KVM guests" refer to
+nested KVM running at L1 on an L0 Hyper-V, and supporting L2 guests?
+Or is it the more general KVM support for mimicking Hyper-V for
+the purposes of running Windows guests? From these patches, it
+looks like your intention is for all KVM support for Hyper-V
+functionality to continue to use the existing hyperv-tlfs.h file.
 
-> >> Refcounting and lifetime:
-> >>
-> >> Initially, all buffers are considered unallocated and stored in
-> >> ->freelist, at which point they are not yet directly exposed to the co=
-re
-> >> page pool code and not accounted to page pool's pages_state_hold_cnt.
-> >> The ->alloc_netmems callback will allocate them by placing into the
-> >> page pool's cache, setting the refcount to 1 as usual and adjusting
-> >> pages_state_hold_cnt.
-> >>
-> >> Then, either the buffer is dropped and returns back to the page pool
-> >> into the ->freelist via io_pp_zc_release_netmem, in which case the pag=
-e
-> >> pool will match hold_cnt for us with ->pages_state_release_cnt. Or mor=
-e
-> >> likely the buffer will go through the network/protocol stacks and end =
-up
-> >> in the corresponding socket's receive queue. From there the user can g=
-et
-> >> it via an new io_uring request implemented in following patches. As
-> >> mentioned above, before giving a buffer to the user we bump the refcou=
-nt
-> >> by IO_ZC_RX_UREF.
-> >>
-> >> Once the user is done with the buffer processing, it must return it ba=
-ck
-> >> via the refill queue, from where our ->alloc_netmems implementation ca=
-n
-> >> grab it, check references, put IO_ZC_RX_UREF, and recycle the buffer i=
-f
-> >> there are no more users left. As we place such buffers right back into
-> >> the page pools fast cache and they didn't go through the normal pp
-> >> release path, they are still considered "allocated" and no pp hold_cnt
-> >> is required.
-> >
-> > Why is this needed? In general the provider is to allocate free memory
->
-> I don't get it, what "this"? If it's refill queue, that's because
-> I don't like actively returning buffers back via syscall / setsockopt
-> and trying to transfer them into the napi context (i.e.
-> napi_pp_put_page) hoping it works / cached well.
->
-> If "this" is IO_ZC_RX_UREF, it's because we need to track when a
-> buffer is given to the userspace, and I don't think some kind of
-> map / xarray in the hot path is the best for performance solution.
->
+>=20
+> An intermediary header "hv_defs.h" is introduced to conditionally
+> include either hyperv-tlfs.h or hvhdk.h. This is required because
+> several headers which today include hyperv-tlfs.h, are shared
+> between Hyper-V and KVM code (e.g. mshyperv.h).
 
-Sorry I wasn't clear. By 'this' I'm referring to:
+Have you considered user space code that uses
+include/linux/hyperv.h? Which of the two schemes will it use? That code
+needs to compile correctly on x86 and ARM64 after your changes.
+User space code includes the separate DPDK project, and some of the
+tools in the kernel tree under tools/hv. Anything that uses the
+uio_hv_generic.c driver falls into this category.
 
-"from where our ->alloc_netmems implementation can grab it, check
-references, put IO_ZC_RX_UREF, and recycle the buffer if there are no
-more users left"
+I think there's also user space code that is built for vDSO that might pull
+in the .h files you are modifying. There are in-progress patches dealing
+with vDSO include files, such as [1]. My general comment on vDSO
+is to be careful in making #include file changes that it uses, but I'm
+not knowledgeable enough on how vDSO is built to give specific
+guidance. :-(
 
-This is the part that I'm not able to stomach at the moment. Maybe if
-I look deeper it would make more sense, but my first feelings is that
-it's really not acceptable.
+Michael
 
-alloc_netmems (and more generically page_pool_alloc_netmem), just
-allocates a netmem and gives it to the page_pool code to decide
-whether to put it in the cache, in the ptr ring, or directly to the
-user, etc.
+[1] https://lore.kernel.org/lkml/20241010135146.181175-1-vincenzo.frascino@=
+arm.com/
 
-The provider should not be overstepping or overriding the page_pool
-logic to recycle pages or deliver them to the user. alloc_netmem
-should just just alloc the netmem and hand it to the page_pool to
-decide what to do with it.
+>=20
+> Summary:
+> Patch 1-2: Cleanup patches
+> Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+> Patch 4: Add hv_defs.h and use it in mshyperv.h, svm.h,
+>          hyperv_timer.h
+> Patch 5: Switch to the new headers, only in Hyper-V code
+>=20
+> Nuno Das Neves (5):
+>   hyperv: Move hv_connection_id to hyperv-tlfs.h
+>   hyperv: Remove unnecessary #includes
+>   hyperv: Add new Hyper-V headers
+>   hyperv: Add hv_defs.h to conditionally include hyperv-tlfs.h or
+>     hvhdk.h
+>   hyperv: Use hvhdk.h instead of hyperv-tlfs.h in Hyper-V code
+>=20
+>  arch/arm64/hyperv/hv_core.c              |    3 +-
+>  arch/arm64/hyperv/mshyperv.c             |    1 +
+>  arch/arm64/include/asm/mshyperv.h        |    2 +-
+>  arch/x86/entry/vdso/vma.c                |    1 +
+>  arch/x86/hyperv/hv_apic.c                |    2 +-
+>  arch/x86/hyperv/hv_init.c                |    3 +-
+>  arch/x86/hyperv/hv_proc.c                |    4 +-
+>  arch/x86/hyperv/hv_spinlock.c            |    1 +
+>  arch/x86/hyperv/hv_vtl.c                 |    1 +
+>  arch/x86/hyperv/irqdomain.c              |    1 +
+>  arch/x86/hyperv/ivm.c                    |    2 +-
+>  arch/x86/hyperv/mmu.c                    |    2 +-
+>  arch/x86/hyperv/nested.c                 |    2 +-
+>  arch/x86/include/asm/kvm_host.h          |    1 -
+>  arch/x86/include/asm/mshyperv.h          |    3 +-
+>  arch/x86/include/asm/svm.h               |    2 +-
+>  arch/x86/include/asm/vdso/gettimeofday.h |    1 +
+>  arch/x86/kernel/cpu/mshyperv.c           |    2 +-
+>  arch/x86/kernel/cpu/mtrr/generic.c       |    1 +
+>  arch/x86/kvm/vmx/vmx_onhyperv.h          |    1 -
+>  arch/x86/mm/pat/set_memory.c             |    2 -
+>  drivers/clocksource/hyperv_timer.c       |    2 +-
+>  drivers/hv/channel.c                     |    1 +
+>  drivers/hv/channel_mgmt.c                |    1 +
+>  drivers/hv/connection.c                  |    1 +
+>  drivers/hv/hv.c                          |    1 +
+>  drivers/hv/hv_balloon.c                  |    5 +-
+>  drivers/hv/hv_common.c                   |    2 +-
+>  drivers/hv/hv_kvp.c                      |    1 -
+>  drivers/hv/hv_snapshot.c                 |    1 -
+>  drivers/hv/hv_util.c                     |    1 +
+>  drivers/hv/hyperv_vmbus.h                |    1 -
+>  drivers/hv/ring_buffer.c                 |    1 +
+>  drivers/hv/vmbus_drv.c                   |    1 +
+>  drivers/iommu/hyperv-iommu.c             |    1 +
+>  drivers/net/hyperv/netvsc.c              |    1 +
+>  drivers/pci/controller/pci-hyperv.c      |    1 +
+>  include/asm-generic/hyperv-tlfs.h        |    9 +
+>  include/asm-generic/mshyperv.h           |    2 +-
+>  include/clocksource/hyperv_timer.h       |    2 +-
+>  include/hyperv/hv_defs.h                 |   29 +
+>  include/hyperv/hvgdk.h                   |   66 ++
+>  include/hyperv/hvgdk_ext.h               |   46 +
+>  include/hyperv/hvgdk_mini.h              | 1212 ++++++++++++++++++++++
+>  include/hyperv/hvhdk.h                   |  733 +++++++++++++
+>  include/hyperv/hvhdk_mini.h              |  310 ++++++
+>  include/linux/hyperv.h                   |   12 +-
+>  net/vmw_vsock/hyperv_transport.c         |    1 -
+>  48 files changed, 2442 insertions(+), 40 deletions(-)
+>  create mode 100644 include/hyperv/hv_defs.h
+>  create mode 100644 include/hyperv/hvgdk.h
+>  create mode 100644 include/hyperv/hvgdk_ext.h
+>  create mode 100644 include/hyperv/hvgdk_mini.h
+>  create mode 100644 include/hyperv/hvhdk.h
+>  create mode 100644 include/hyperv/hvhdk_mini.h
+>=20
+> --
+> 2.34.1
+>=20
 
-> > and logic as to where the memory should go (to fast cache, to normal
-> > pp release path, etc) should remain in provider agnostic code paths in
-> > the page_pool. Not maintainable IMO in the long run to have individual
->
-> Please do elaborate what exactly is not maintainable here
->
-
-In the future we will have N memory providers. It's not maintainable
-IMO for each of them to touch pp->alloc.cache and other internals in M
-special ways and for us to have to handle N * M edge cases in the
-page_pool code because each provider is overstepping on our internals.
-
-The provider should just provide memory. The page_pool should decide
-to fill its alloc.cache & ptr ring & give memory to the pp caller as
-it sees fit.
-
-> > pp providers customizing non-provider specific code or touching pp
-> > private structs.
->
-> ...
-> >> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> >> index 8382129402ac..6cd3dee8b90a 100644
-> >> --- a/io_uring/zcrx.c
-> >> +++ b/io_uring/zcrx.c
-> >> @@ -2,7 +2,11 @@
-> ...
-> >> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct n=
-et_iov *niov)
-> >> +{
-> >> +       struct net_iov_area *owner =3D net_iov_owner(niov);
-> >> +
-> >> +       return container_of(owner, struct io_zcrx_area, nia);
-> >
-> > Similar to other comment in the other patch, why are we sure this
-> > doesn't return garbage (i.e. it's accidentally called on a dmabuf
-> > net_iov?)
->
-> There couldn't be any net_iov at this point not belonging to
-> the current io_uring instance / etc. Same with devmem TCP,
-> devmem callbacks can't be called for some random net_iov, the
-> only place you need to explicitly check is where it comes
-> from generic path to a devmem aware path like that patched
-> chunk in tcp.c
->
-> >> +static inline void io_zc_add_pp_cache(struct page_pool *pp,
-> >> +                                     struct net_iov *niov)
-> >> +{
-> >> +       netmem_ref netmem =3D net_iov_to_netmem(niov);
-> >> +
-> >> +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
-> >> +       if (pp->dma_sync && dma_dev_need_sync(pp->p.dev)) {
-> >
-> > IIRC we force that dma_sync =3D=3D true for memory providers, unless yo=
-u
-> > changed that and I missed it.
->
-> I'll take a look, might remove it.
->
-> >> +               dma_addr_t dma_addr =3D page_pool_get_dma_addr_netmem(=
-netmem);
-> >> +
-> >> +               dma_sync_single_range_for_device(pp->p.dev, dma_addr,
-> >> +                                                pp->p.offset, pp->p.m=
-ax_len,
-> >> +                                                pp->p.dma_dir);
-> >> +       }
-> >> +#endif
-> >> +
-> >> +       page_pool_fragment_netmem(netmem, 1);
-> >> +       pp->alloc.cache[pp->alloc.count++] =3D netmem;
-> >
-> > IMO touching pp internals in a provider should not be acceptable.
->
-> Ok, I can add a page pool helper for that.
->
-
-To be clear, adding a helper will not resolve the issue I'm seeing.
-IMO nothing in the alloc_netmem or any helpers its calling should
-touch pp->alloc.cache. alloc_netmem should just allocate the memory
-and let the non-provider pp code decide what to do with the memory.
-
-> > pp->alloc.cache is a data structure private to the page_pool and
-> > should not be touched at all by any specific memory provider. Not
-> > maintainable in the long run tbh for individual pp providers to mess
-> > with pp private structs and we hunt for bugs that are reproducible
-> > with 1 pp provider or another, or have to deal with the mental strain
-> > of provider specific handling in what is supposed to be generic
-> > page_pool paths.
->
-> I get what you're trying to say about not touching internals,
-> I agree with that, but I can't share the sentiment about debugging.
-> It's a pretty specific api, users running io_uring almost always
-> write directly to io_uring and we solve it. If happens it's not
-> the case, please do redirect the issue.
->
-> > IMO the provider must implement the 4 'ops' (alloc, free, init,
->
-> Doing 1 buffer per callback wouldn't be scalable at speeds
-> we're looking at.
->
-
-I doubt this is true or at least there needs to be more info here. The
-page_pool_alloc_netmem() pretty much allocates 1 buffer per callback
-for all its current users (regular memory & dmabuf), and that's good
-enough to drive 200gbps NICs. What is special about io_uring use case
-that this is not good enough?
-
-The reason it is good enough in my experience is that
-page_pool_alloc_netmem() is a slow path. netmems are allocated from
-that function and heavily recycled by the page_pool afterwards.
-
-
---=20
-Thanks,
-Mina
 
