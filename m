@@ -1,104 +1,155 @@
-Return-Path: <netdev+bounces-134132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AFE39981E1
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:18:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B88B89981EB
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:19:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593851C2620A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:18:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA3C01C266D3
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17561C2335;
-	Thu, 10 Oct 2024 09:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E431A0AF5;
+	Thu, 10 Oct 2024 09:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ONJaXOp9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PuD8pwBk";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ONJaXOp9";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PuD8pwBk"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED65192B78;
-	Thu, 10 Oct 2024 09:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7B7C18DF81;
+	Thu, 10 Oct 2024 09:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728551685; cv=none; b=FEknfpR+bk2tuQDzNlqFVC4rqRfDExx31/2iZ39UDVqQiCsI/4ZKCc+lWvQ+zlW+nziHc+0R0JclWIissoBs8NYD1iZFlYaCRjAiqfspo3W8Ma5LJzpSmHlVd4i3hxqMXyRmjOtzuOHsVtY4r0fJQTSTAP42hnDr3MHhFN1hWMU=
+	t=1728551825; cv=none; b=UMRJZFfkscTVXkG4yDiBFy+4KCiKiq88eszgzIKEVKuv0V+D1XUmUZfy8bfB66yjmfYjYZgbrg4b2d4j8QO48WMxOf8h+72CT78Zr7hFtbMNEswq2ZxpRahDjqSaoI205zuxafSLo417RY1gtBHIYA7B162tuabpPc7svQjg5VI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728551685; c=relaxed/simple;
-	bh=CljuXAkiklBjjcflk23mN/Np2eZe6Y4+FidqPD/vwQI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tlJ6GM2AQzNs6kj0EiTZgi4rj21d1gL/lbu2zqyAAYH17gIlblP2LPoVaM4NneyH8hCIpEmOFuDlcRFq3ipffTWVC7dvAOnwSOAoD9viAa4E3lAJTHyfmFopKtChWOWuwkUA/D4/plhQzubGZmnbscl5FlEeW4WRuKxMbCkCEDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XPPDs3RQqzyScP;
-	Thu, 10 Oct 2024 17:13:17 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id C78261402CB;
-	Thu, 10 Oct 2024 17:14:34 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 10 Oct 2024 17:14:34 +0800
-Message-ID: <1cf2b294-d0b4-4116-bd14-a937bce7da4a@huawei.com>
-Date: Thu, 10 Oct 2024 17:14:34 +0800
+	s=arc-20240116; t=1728551825; c=relaxed/simple;
+	bh=eWbWk7S/yzvCT8vmbo/px6f16ARqtAMQDMyE16C0G6Q=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=iBuV5oSFJOdeU185kCmot+xAlmoEjktIiUqafH8ZhdoOwohiqCmSpW5pGr5608sr3Dbhu3fYCC+2ghSw9RFAT4jylBzmVqEQkwrCjBFQYu728Ka2lJBl7NHWzD+dJmRWyKj5Rhq8KM2PiFQOLAdrR3BTVmOBne0sJTquXEeTbzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ONJaXOp9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PuD8pwBk; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ONJaXOp9; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PuD8pwBk; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 0CE561FE5F;
+	Thu, 10 Oct 2024 09:17:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1728551822; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Oqr//Vj/gnTSMHS8Vy/JDYrOW8AZs9pfFe+9IS2+v8=;
+	b=ONJaXOp9oO1GkrLu5oZfqtn+yl+Mp8Q8ryaKbAV3ikZhlV7EiqrSfcmBy3MHpxlDi5x6xf
+	uFDalbfaglVJXWXJNDqSVjUzMtk+JfUNqpuVa6gfMuB5SnJk/nNpAmbAm549bKhnFDwcKX
+	lSQ+Tva4n7Wv08gCZdPSJkYJTctQROw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1728551822;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Oqr//Vj/gnTSMHS8Vy/JDYrOW8AZs9pfFe+9IS2+v8=;
+	b=PuD8pwBkGoocNWRRBDPZ8LagPRc0Rf8M1JuP7TzS+fNAoYQMsoOZGoNKgJYh+fag+qFuXC
+	GggY1sQYMCrPeLDg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1728551822; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Oqr//Vj/gnTSMHS8Vy/JDYrOW8AZs9pfFe+9IS2+v8=;
+	b=ONJaXOp9oO1GkrLu5oZfqtn+yl+Mp8Q8ryaKbAV3ikZhlV7EiqrSfcmBy3MHpxlDi5x6xf
+	uFDalbfaglVJXWXJNDqSVjUzMtk+JfUNqpuVa6gfMuB5SnJk/nNpAmbAm549bKhnFDwcKX
+	lSQ+Tva4n7Wv08gCZdPSJkYJTctQROw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1728551822;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Oqr//Vj/gnTSMHS8Vy/JDYrOW8AZs9pfFe+9IS2+v8=;
+	b=PuD8pwBkGoocNWRRBDPZ8LagPRc0Rf8M1JuP7TzS+fNAoYQMsoOZGoNKgJYh+fag+qFuXC
+	GggY1sQYMCrPeLDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 0067213A6E;
+	Thu, 10 Oct 2024 09:17:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id NhiWO42bB2e3fwAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Thu, 10 Oct 2024 09:17:01 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/2] page_pool: fix timing for checking and
- disabling napi_local
+Date: Thu, 10 Oct 2024 09:17:01 +0000
+From: Denis Kirjanov <dkirjanov@suse.de>
 To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, <zhangkun09@huawei.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
-	<edumazet@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240925075707.3970187-1-linyunsheng@huawei.com>
- <20240925075707.3970187-2-linyunsheng@huawei.com>
- <20241008174022.0b6d92b9@kernel.org>
- <e420a11f-1c07-4a3f-85b4-b7679b4e50ce@huawei.com>
- <20241009081314.611a5825@kernel.org>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20241009081314.611a5825@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, kda@linux-powerpc.org, arnd@arndb.de,
+ tsbogend@alpha.franken.de, mpe@ellerman.id.au, npiggin@gmail.com,
+ christophe.leroy@csgroup.eu, naveen@kernel.org, maddy@linux.ibm.com,
+ pctammela@mojatatu.com, victor@mojatatu.com, coelacanthushex@gmail.com,
+ jhs@mojatatu.com, horms@kernel.org, shannon.nelson@amd.com,
+ sd@queasysnail.net, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next] eth: remove the DLink/Sundance (ST201) driver
+In-Reply-To: <20241008154824.1448370-1-kuba@kernel.org>
+References: <20241008154824.1448370-1-kuba@kernel.org>
+User-Agent: Roundcube Webmail
+Message-ID: <6a5ad6ad6b432e56817883e890a0550d@suse.de>
+X-Sender: dkirjanov@suse.de
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+X-Spam-Score: -4.29
+X-Spamd-Result: default: False [-4.29 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	XM_UA_NO_VERSION(0.01)[];
+	RCPT_COUNT_TWELVE(0.00)[22];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,google.com,redhat.com,linux-powerpc.org,arndb.de,alpha.franken.de,ellerman.id.au,gmail.com,csgroup.eu,kernel.org,linux.ibm.com,mojatatu.com,amd.com,queasysnail.net,lists.ozlabs.org];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 2024/10/9 23:13, Jakub Kicinski wrote:
-> On Wed, 9 Oct 2024 11:33:02 +0800 Yunsheng Lin wrote:
->> Or I am missing something obvious here?
+On 2024-10-08 15:48, Jakub Kicinski wrote:
+> Konstantin reports the maintainer's address bounces.
+> There is no other maintainer and the driver is quite old.
+> There is a good chance nobody is using this driver any more.
+> Let's try to remove it completely, we can revert it back in
+> if someone complains.
 > 
-> Seemingly the entire logic of how the safety of the lockless caching 
-> is ensured.
-
-I looked at it more closely, it seems what you meant ensuring is by setting
-the napi->list_owner to -1 when disabling NAPI, right?
-
-But letting skb_defer_free_flush() holding on the napi instance to check
-the napi->list_owner without synchronizing with page_pool_destroy() seems
-a little surprised to me, as page_pool_destroy() may return to driver to
-free the napi even if it is a very very small time window, causing a
-possible used-after-free problem?
-
-          CPU 0                           CPU1
-           .                               .
-           .                   skb_defer_free_flush()
-           .                               .
-           .                  napi = READ_ONCE(pool->p.napi);
-           .                               .
-page_pool_disable_direct_recycling()       .
-    driver free napi memory                .
-           .                               .
-           .              napi && READ_ONCE(napi->list_owner) == cpuid
-           .                               .
-
-> 
-> But I don't think you don't trust my opinion so I'll let others explain
-> this to you..
+> Link: 
+> https://lore.kernel.org/20240925-bizarre-earwig-from-pluto-1484aa@lemu/
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+Acked-by: Denis Kirjanov <dkirjanov@suse.de>
 
