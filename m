@@ -1,168 +1,143 @@
-Return-Path: <netdev+bounces-134178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D89F998463
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:04:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 389E699847A
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:07:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC14B285053
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:04:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681581C210F1
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDED1C232C;
-	Thu, 10 Oct 2024 11:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762001C2DD4;
+	Thu, 10 Oct 2024 11:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c9CzpfCl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cJig6mhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D58D29AF;
-	Thu, 10 Oct 2024 11:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C7C1BFE12;
+	Thu, 10 Oct 2024 11:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728558268; cv=none; b=SXuV/q1crVPFvux9b0xp9CtdOdxSmgnpUe/pUhvWps6xiHROyD2IHjTWENki8yiJB7tEHM+LPHxeMlD+q+1L+esaNJx+PP4W9iIqPz4JP+Bf8NPWTPR1DOxoL+Vq3VBHERR3XNbFnlq4qu0f32K26ouCzijMr5n2Zh7E+5pHv5M=
+	t=1728558382; cv=none; b=Ft5a1hzFX4Vopx7nC9sijPJfNNUPZJcQp6swGcOGh1l6rG1iMb3YA41AJ6Zccrhe5qdG7iEUwAZr1YuqjEMWqEX7Iwg/PwVCPTIUq/32ZmdWNv+h/siYxtwhhgOvZuXq5yaHGdUgi1+HIoY08I2Ng6oGGkljrf9b7QT9TSzLMik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728558268; c=relaxed/simple;
-	bh=6TMgSvGiDN6j/aETnpccRiSZui1zKiAqfIErIRFhoAE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=maOp3fmxVE+7udSH/28Yl02BXPHGNP1THVyVtFAMzojLPMcMLEwBIocISAgboTuOuKuyLjGzzOs6sufI5QrIGYNmKyl8PWrd6KxJwri1Jn5uPoNtHynwFuDHBX6X7t+u0TFKsbd//gvW3zebVSDKD0rk3TcMjy8eiy4Y/BT+ZAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c9CzpfCl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFDCEC4CEC6;
-	Thu, 10 Oct 2024 11:04:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728558268;
-	bh=6TMgSvGiDN6j/aETnpccRiSZui1zKiAqfIErIRFhoAE=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=c9CzpfClOoeeZPFOvP1nVC4mppmn395JbKixYEukMIE/O/kby46lN061iY16l7VYX
-	 AAqg+yB2uC4iHPcNBf6BY8MITistn8S5sNVAiWCrThBs6y+ePCDkIflKX+aVbXOum5
-	 fFnlHm8Q934hdSk5aoOaGZ1hZHR2jEagWOkdBQSn7XDu6TqkhyOrCMJRzdgexxksBi
-	 r/fVeCn8xXgRBYi+dp0ujvEXxMoLO6Ac5m+blEy5ZxC1QENX2X4/cljsTxuMlPymbt
-	 D+txoVhtkJ0TsalFLz/01v7D1cxEpcRUYdyZsELV7Bf0yeHxuJTuDjk1H0BBOLNk6j
-	 ZYrgFjNQShZHA==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 10 Oct 2024 12:04:12 +0100
-Subject: [PATCH net-next v2 3/3] net: ethernet: ti: cpsw_ale: Remove unused
- accessor functions
+	s=arc-20240116; t=1728558382; c=relaxed/simple;
+	bh=2U7+swKAAmw08h0DPcAMPCat1Scw7idxysE2ZzSVzJE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mYNEfR0HRg+7jbukJ/vHewpU3r/FIY3Z+ngnNpGa6Nr1VOZXB+b/EpRzV7Jm6C5j+LIdIGiAhPPxHk2uHQ/8S6sGdBVoy2RTEABwHj9s77oDKFjkPgfs4WAXO8sHndr8hi3GG3R2u15NQp1ScfLaDmWy1Ut1mDzph9ZFpOTb0Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cJig6mhT; arc=none smtp.client-ip=209.85.219.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso826322276.0;
+        Thu, 10 Oct 2024 04:06:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728558379; x=1729163179; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2U7+swKAAmw08h0DPcAMPCat1Scw7idxysE2ZzSVzJE=;
+        b=cJig6mhTUZ9K8a9YDNseP93tylbgZdkQaJn0PZSjP3X1quhU64a0si4qrR4akxPYWB
+         0DxjFxDfvyGwo5v8TXTduG1eI76T4jSkov/yp7vdERZa18O5TrbYDfxEMKhwi/iHoi/e
+         f35uifEQ4dtQb/ijsDhF++PawaDTbenyEYXBFvHmL6q/rqI5FRqXY125hyi6uBUY1gbt
+         gHdozKOcgdixaftrcD91oBgGPLhxrAxlPY3/kPiPX2QfYn+Y5WoTfJ68GnpQuFbAaXH7
+         ANax7GoHc9mRlwvUzgVfFvnHS3iHqiEvwf0t9EzbsWiQIiZJ5jmrpssf99M3dzrBuifi
+         4ivQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728558379; x=1729163179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2U7+swKAAmw08h0DPcAMPCat1Scw7idxysE2ZzSVzJE=;
+        b=M0ESPE2qRPfpA+Iri7Z866IT0dM9EuYU3zZMpUoHwjOVr/+WZVDHddrfH84XJ1ow8z
+         gmlCqmiV5iR4gPGegLignbGF8ZvkGGUTaj8BJSjZZLGPvxz0K5S+WkMMggrfpMSS+YZf
+         olICAZBFLHLvnC8FRV1HLdXbCKDpW0qw/Vjoplx6BJxWhmpqXIc7Pxyx2hdQts8Z38LN
+         vXO4bxlX7j9f6QRZoOdTkMmin5yxD4xp9VGnEhmI26TUEQmUnWQvEuLM/xvcIvLxWJLI
+         Ab2EU5AwEYyeVORwN75yh8QEQD0ZE1+m3DQ07jtLOZ+EfwUIF7G9R+jPbl8x5DNBJke4
+         LHYw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSGulo1940gsDVU+EOV6g6F8o9rZEEqp6v0GNmu/VPT4g3MCDS9k5BLhVe1VQTM9XDZ99CGup8@vger.kernel.org, AJvYcCXASYKy/iox44Vqyaz3e5jB5CbrgGz+YTrxdSWseWLOds0b95MS0Mc3mDADm4y9pmLsPhz1BL76PXmYOog=@vger.kernel.org, AJvYcCXnVkhKaqlX9L1+ghl+9R6k69JoecXWFW72jstLw8OkCrBIX8sf5FV4dmdMlDvrCuSm4ljAVjTGIUM29Bu0P5SBwl4J@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWpKpcb8s5DtIDi+tzqbHXCSYgwLPftz287Ti1NW3cn8sBUgJg
+	9esTyxc4AyJAY7XC+wU5grQrf9x09BkTz2eL0zz/DCjfwWOYoxOpmL26ND4qC8M4PDjMcrr7wfO
+	4LMQBzaVTOrdq3p/hOttGY3lDE3M=
+X-Google-Smtp-Source: AGHT+IFVVZzZzpFh1Fx2ik7fwEcjo6mL58ZZLuyObjsrW8NPsx7AoOnKFrHOY58Oywki1hSOLCcNo65JzO3qJLGyrT4=
+X-Received: by 2002:a05:6902:18c6:b0:e28:75c8:49b with SMTP id
+ 3f1490d57ef6-e2909b34092mr4244261276.0.1728558379383; Thu, 10 Oct 2024
+ 04:06:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241010-ti-warn-v2-3-9c8304af5544@kernel.org>
-References: <20241010-ti-warn-v2-0-9c8304af5544@kernel.org>
-In-Reply-To: <20241010-ti-warn-v2-0-9c8304af5544@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Roger Quadros <rogerq@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, netdev@vger.kernel.org, 
- linux-omap@vger.kernel.org, llvm@lists.linux.dev
-X-Mailer: b4 0.14.0
+References: <20241009121705.850222-1-dongml2@chinatelecom.cn> <CANn89iLKVh0_wkgZ-a2+Dr9xz6wOs58CE8PpwzZEH8ZHMn=jsA@mail.gmail.com>
+In-Reply-To: <CANn89iLKVh0_wkgZ-a2+Dr9xz6wOs58CE8PpwzZEH8ZHMn=jsA@mail.gmail.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 10 Oct 2024 19:07:01 +0800
+Message-ID: <CADxym3YonoJ5GUToUxJTnVpd3O-_SsSZK2tPMmUkXCzs3Oy-XQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: tcp: add tracepoint skb_latency for latency monitor
+To: Eric Dumazet <edumazet@google.com>, vadim.fedorenko@linux.dev, 
+	Jason Xing <kerneljasonxing@gmail.com>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	dsahern@kernel.org, yan@cloudflare.com, dongml2@chinatelecom.cn, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-W=1 builds flag that some accessor functions for ALE fields are unused.
+On Wed, Oct 9, 2024 at 11:53=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Oct 9, 2024 at 2:17=E2=80=AFPM Menglong Dong <menglong8.dong@gmai=
+l.com> wrote:
+> >
+> > In this commit, we introduce a new tracepoint "skb_latency", which is
+> > used to trace the latency on sending or receiving packet. For now, only
+> > TCP is supported. Maybe we should call it "tcp_latency"?
+> >
+> > There are 6 stages are introduced in this commit to trace the networkin=
+g
+> > latency.
+> >
+> > The existing SO_TIMESTAMPING and MSG_TSTAMP_* can obtain the timestampi=
+ng
+> > of sending and receiving packet, but it's not convenient.
+> >
+> > First, most applications didn't use this function when implement, and w=
+e
+> > can't make them implement it right now when networking latency happens.
+> >
+> > Second, it's inefficient, as it need to get the timestamping from the
+> > error queue with syscalls.
+> >
+> > Third, the timestamping it offers is not enough to analyse the latency
+> > on sending or receiving packet.
+> >
+> > As for me, the main usage of this tracepoint is to be hooked by my BPF
+> > program, and do some filter, and capture the latency that I interested
+> > in.
+> >
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+>
+> Big NACK from my side.
+>
+> Adding tcp_mstamp_refresh() all over the place is not what I call 'tracin=
+g'.
 
-Address this by splitting up the macros used to define these
-accessors to allow only those that are used to be declared.
+The tcp_mstamp_refresh() is optional, as we can update skb->tstamp with
+tcp_clock_ns() directly instead (maybe with a control of the static branch)=
+.
 
-The warnings are verbose, but for example, the mcast_state case is
-flagged by clang-18 as:
+As @Vadim says, @Jason Xing already has a similar series on the
+networking latency monitor before, which is based on BPF.
 
-.../cpsw_ale.c:220:1: warning: unused function 'cpsw_ale_get_mcast_state' [-Wunused-function]
-  220 | DEFINE_ALE_FIELD(mcast_state,           62,     2)
-      | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-.../cpsw_ale.c:145:19: note: expanded from macro 'DEFINE_ALE_FIELD'
-  145 | static inline int cpsw_ale_get_##name(u32 *ale_entry)                   \
-      |                   ^~~~~~~~~~~~~~~~~~~
-<scratch space>:196:1: note: expanded from here
-  196 | cpsw_ale_get_mcast_state
-      | ^~~~~~~~~~~~~~~~~~~~~~~~
+(what a coincidence :/)
 
-Compile tested only.
-No functional change intended.
+So let's focus on Jason's series.
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/ti/cpsw_ale.c | 30 +++++++++++++++++++++---------
- 1 file changed, 21 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index 8d02d2b21429..d361caa80d05 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -162,27 +162,39 @@ static inline void cpsw_ale_set_field(u32 *ale_entry, u32 start, u32 bits,
- 	ale_entry[idx] |=  (value << start);
- }
- 
--#define DEFINE_ALE_FIELD(name, start, bits)				\
-+#define DEFINE_ALE_FIELD_GET(name, start, bits)				\
- static inline int cpsw_ale_get_##name(u32 *ale_entry)			\
- {									\
- 	return cpsw_ale_get_field(ale_entry, start, bits);		\
--}									\
-+}
-+
-+#define DEFINE_ALE_FIELD_SET(name, start, bits)				\
- static inline void cpsw_ale_set_##name(u32 *ale_entry, u32 value)	\
- {									\
- 	cpsw_ale_set_field(ale_entry, start, bits, value);		\
- }
- 
--#define DEFINE_ALE_FIELD1(name, start)					\
-+#define DEFINE_ALE_FIELD(name, start, bits)				\
-+DEFINE_ALE_FIELD_GET(name, start, bits)					\
-+DEFINE_ALE_FIELD_SET(name, start, bits)
-+
-+#define DEFINE_ALE_FIELD1_GET(name, start)				\
- static inline int cpsw_ale_get_##name(u32 *ale_entry, u32 bits)		\
- {									\
- 	return cpsw_ale_get_field(ale_entry, start, bits);		\
--}									\
-+}
-+
-+#define DEFINE_ALE_FIELD1_SET(name, start)				\
- static inline void cpsw_ale_set_##name(u32 *ale_entry, u32 value,	\
- 		u32 bits)						\
- {									\
- 	cpsw_ale_set_field(ale_entry, start, bits, value);		\
- }
- 
-+#define DEFINE_ALE_FIELD1(name, start)					\
-+DEFINE_ALE_FIELD1_GET(name, start)					\
-+DEFINE_ALE_FIELD1_SET(name, start)
-+
- enum {
- 	ALE_ENT_VID_MEMBER_LIST = 0,
- 	ALE_ENT_VID_UNREG_MCAST_MSK,
-@@ -238,14 +250,14 @@ static const struct ale_entry_fld vlan_entry_k3_cpswxg[] = {
- 
- DEFINE_ALE_FIELD(entry_type,		60,	2)
- DEFINE_ALE_FIELD(vlan_id,		48,	12)
--DEFINE_ALE_FIELD(mcast_state,		62,	2)
-+DEFINE_ALE_FIELD_SET(mcast_state,	62,	2)
- DEFINE_ALE_FIELD1(port_mask,		66)
- DEFINE_ALE_FIELD(super,			65,	1)
- DEFINE_ALE_FIELD(ucast_type,		62,     2)
--DEFINE_ALE_FIELD1(port_num,		66)
--DEFINE_ALE_FIELD(blocked,		65,     1)
--DEFINE_ALE_FIELD(secure,		64,     1)
--DEFINE_ALE_FIELD(mcast,			40,	1)
-+DEFINE_ALE_FIELD1_SET(port_num,		66)
-+DEFINE_ALE_FIELD_SET(blocked,		65,     1)
-+DEFINE_ALE_FIELD_SET(secure,		64,     1)
-+DEFINE_ALE_FIELD_GET(mcast,		40,	1)
- 
- #define NU_VLAN_UNREG_MCAST_IDX	1
- 
-
--- 
-2.45.2
-
+Thanks!
+Menglong Dong
 
