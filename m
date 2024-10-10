@@ -1,131 +1,148 @@
-Return-Path: <netdev+bounces-134164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 234FD99838A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BCFE998391
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5396B1C210AF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:27:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96DC1C226DF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA381BFDE7;
-	Thu, 10 Oct 2024 10:26:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41F31BCA14;
+	Thu, 10 Oct 2024 10:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDtu03AV"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DB229AF;
-	Thu, 10 Oct 2024 10:26:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665B018DF81;
+	Thu, 10 Oct 2024 10:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728556017; cv=none; b=AiFG8q/0/U/LAsCLrNFDoq0PXazIsawTuHqs5NI73UZIvJ2mJG5izaji7WwJTnQYBHpxDYbVzyjgX4B5Izp8HpyV/pMN+zO2yC/d3gYislf3HphByKXIqu9p9kAfK7yc7Uq1qunabpkE+rSTPFpF0JBAaYiWAB/qgOjOAjpnp7w=
+	t=1728556286; cv=none; b=sRDCxy7zn7oI0mHyYhiDp/pcNFI0R9Kqp+xLh1X0Gv5R+V5VLqtc7k0m7S/fuUKWbA5PoPAqFUiqijrYKF9E5TbffeQVC+d4YFJ7qO20va82YkjQxZdvePAiFaZE2aJB6l7T92knqO+iCeGTvOzFKgmd1HnS4+BO4ccg1TTJKa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728556017; c=relaxed/simple;
-	bh=CFzNbzW1eEnEF6SnRyQ57jkQR8QwGYNI0Fag43gdHio=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZwEKNF+x87CV5lI6WQWW7Ri2XuIDV5wAI69x9weU806OuhQR4M1eoz2TBLhq+zIu6iWmAaQyMM0jNvsUdHT+aniUKea59+MpQ8PAIBrByYlcj/4//bGaQdkxVL8ckdPh9E16bEOtoeoLrivWQZOEGBzkRUjnOkj7L01S0E7AEfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XPQmp0YYfz6L75q;
-	Thu, 10 Oct 2024 18:22:34 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id AF0D01400DD;
-	Thu, 10 Oct 2024 18:26:54 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 10 Oct
- 2024 12:26:49 +0200
-From: Gur Stavi <gur.stavi@huawei.com>
-To: Gur Stavi <gur.stavi@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	<linux-kselftest@vger.kernel.org>
-Subject: [PATCH net-next v03 3/3] selftests: net/psock_fanout: unbound socket fanout
-Date: Thu, 10 Oct 2024 13:25:14 +0300
-Message-ID: <1ad413755ce7b113d70063adfee9caf7cafcc7b9.1728555449.git.gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <cover.1728555449.git.gur.stavi@huawei.com>
-References: <cover.1728555449.git.gur.stavi@huawei.com>
+	s=arc-20240116; t=1728556286; c=relaxed/simple;
+	bh=C+R3quKQAACONYpfCvEEsIGDujowRhq/G5P9rbG4u0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GgH6ZoOk86dOKGf54NTDP4XK+aALKC3ST7bP/LOU2FRKujoxWnQBJ/DZlUc3l4Kze2i7Uk70BPx/nW7ycEm0T2Dq071+CzkAfnVYVmK9C4MgK+QIDZ9Vre6kqSHqs2mHDXZuPehplWfRRSaIOFnptKPfr/VJRR8YUK356gwK1zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDtu03AV; arc=none smtp.client-ip=209.85.219.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e28fc40fdccso691749276.1;
+        Thu, 10 Oct 2024 03:31:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728556284; x=1729161084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wKNhb1nvZLLHpBckwNjKfJyhW0Ri+mcPrYZdsnjTA94=;
+        b=QDtu03AV0c/WkIJyBkcNc9XVOEtU5GIEiazeMtgyh0tnRTzRIkv796hK14Ut207VzB
+         /6hYuDPe9Ib3W4P1ZnDDLiu82svJRj5iI5Da/gI6bQafSrVw2HOKOWH/PlhJXb/mDcbg
+         Ig/NW+lkwj4eKtHIlphr1O6PYcQI2ukN5S5XpsgOLoeWtJwNn/R/5hhwe64p0VAMwLUH
+         F7AjpMKpOCf9bL/iQ+FzmhzV09PoWOELxPgtRq1udBRH1GGMkST1LqVOU6Oth+ryJNvx
+         65n9Lk7ot3vYPmyfBBQ5wIo9KOZQ1Y709BKKsUK1RdGAq9zS78yBCdoYIwdGe9HxxlJ/
+         2aTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728556284; x=1729161084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wKNhb1nvZLLHpBckwNjKfJyhW0Ri+mcPrYZdsnjTA94=;
+        b=hXRRzWyutoIbRJGQUYySyDLKAjc+s0N5wB8GbRA7mUlhNH6qBM7fxU4SvANgWKqWmL
+         GbzCDTuGDu4zX7LUHHeukRXrEXEmwGi2/NivBF0NoVW7mCs6vB3B6PMr1oxV0eEcIPVe
+         eB13Rsf0OwapUyoFPNGYJsV7kjwMbyYaWwikdtW7MdAmbnvaJVbd8ms4Z7DMnPYIz0FL
+         LYePJ1hWtR4mrERRJEBsLacCTRTS1nXBFxMjwRRV6NLoOR13zfMnjZRrIM1EI6wVScBX
+         5/VICaEOoh1xa9a3Ho697wcp8lKrqjYqD8Gyg4OXgvrtMpiEKCdzceS6/jpzsYS8MbdP
+         TZpA==
+X-Forwarded-Encrypted: i=1; AJvYcCUK7oT+RdW7qURPxG/5gd0+Tu2UagqA6DxPW33Tg0+qu8DCZltXHtVpYKtB6MfZ4H1aL9Q=@vger.kernel.org, AJvYcCV4Bif0aS8PWBZgzzQyjUOflGd4wzdJgFrVCBSu9eCuCfy8ubgZW9spIXZgFUmmb5Es1RaB/PH7@vger.kernel.org, AJvYcCVa70wqQ7Gq3LAbAiR0ireKs+PezF1QFiFBQ0uIqm4enEwk2XOTMGcYmBvgybTyTE+PkexzcRLAE7sqImkj@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA+qP4l7tug3uaz1LndJS1dzq42koZ0ISDn0heATqVsnPBOSUm
+	8plOMWn2AuOKvY6mgE5UjfMR6utxX9V/dpGgs8Rv+VDrMwCeEHZiOs8zp9An5BU9SQS0GhWtG52
+	4TYu93IQPVrdteCW8Dssd1Wk9VcE=
+X-Google-Smtp-Source: AGHT+IGHJd8gLn+Lonc754L1GSxm5wP1TN4ZAOzPICzVlYFF9trcRXtsd6JSZQmz4IzHDPvlaFPk8Y4Zl6BvC+Fsums=
+X-Received: by 2002:a05:6902:2b8d:b0:e24:fea0:f9b4 with SMTP id
+ 3f1490d57ef6-e28fe40fdeemr5072145276.38.1728556284331; Thu, 10 Oct 2024
+ 03:31:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- frapeml500005.china.huawei.com (7.182.85.13)
+References: <20241007074702.249543-1-dongml2@chinatelecom.cn> <3c2ad895-3546-4269-8e6d-6f187035f4b5@redhat.com>
+In-Reply-To: <3c2ad895-3546-4269-8e6d-6f187035f4b5@redhat.com>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 10 Oct 2024 18:32:05 +0800
+Message-ID: <CADxym3aEX7ujBP29aYTKVNmZwKbD82GpATXf_i9VnV51ixXD8A@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/7] net: ip: add drop reasons to input route
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: edumazet@google.com, kuba@kernel.org, davem@davemloft.net, 
+	dsahern@kernel.org, steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	dongml2@chinatelecom.cn, bigeasy@linutronix.de, toke@redhat.com, 
+	idosch@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a test that validates that an unbound packet socket cannot create/join
-a fanout group.
+On Thu, Oct 10, 2024 at 4:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 10/7/24 09:46, Menglong Dong wrote:
+> > In this series, we mainly add some skb drop reasons to the input path o=
+f
+> > ip routing.
+> >
+> > The errno from fib_validate_source() is -EINVAL or -EXDEV, and -EXDEV i=
+s
+> > used in ip_rcv_finish_core() to increase the LINUX_MIB_IPRPFILTER. For
+> > this case, we can check it by
+> > "drop_reason =3D=3D SKB_DROP_REASON_IP_RPFILTER" instead. Therefore, we=
+ can
+> > make fib_validate_source() return -reason.
+> >
+> > Meanwhile, we make the following functions return drop reasons too:
+> >
+> >    ip_route_input_mc()
+> >    ip_mc_validate_source()
+> >    ip_route_input_slow()
+> >    ip_route_input_rcu()
+> >    ip_route_input_noref()
+> >    ip_route_input()
+>
+> A few other functions are excluded, so that the ip input path coverage
+> is not completed - i.e. ip_route_use_hint(), is that intentional?
+>
 
-Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
----
- tools/testing/selftests/net/psock_fanout.c | 36 ++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+Hello,
 
-diff --git a/tools/testing/selftests/net/psock_fanout.c b/tools/testing/selftests/net/psock_fanout.c
-index acdfae8f8a9a..84c524357075 100644
---- a/tools/testing/selftests/net/psock_fanout.c
-+++ b/tools/testing/selftests/net/psock_fanout.c
-@@ -279,6 +279,41 @@ static int sock_fanout_read(int fds[], char *rings[], const int expect[])
- 	return 0;
- }
- 
-+/* Test that creating/joining a fanout group fails for unbound socket without
-+ * a specified protocol
-+ */
-+static void test_unbound_fanout(void)
-+{
-+	int val, fd0, fd1, err;
-+
-+	fprintf(stderr, "test: unbound fanout\n");
-+	fd0 = socket(PF_PACKET, SOCK_RAW, 0);
-+	if (fd0 < 0) {
-+		perror("socket packet");
-+		exit(1);
-+	}
-+	/* Try to create a new fanout group. Should fail. */
-+	val = (PACKET_FANOUT_HASH << 16) | 1;
-+	err = setsockopt(fd0, SOL_PACKET, PACKET_FANOUT, &val, sizeof(val));
-+	if (!err) {
-+		fprintf(stderr, "ERROR: unbound socket fanout create\n");
-+		exit(1);
-+	}
-+	fd1 = sock_fanout_open(PACKET_FANOUT_HASH, 1);
-+	if (fd1 == -1) {
-+		fprintf(stderr, "ERROR: failed to open HASH socket\n");
-+		exit(1);
-+	}
-+	/* Try to join an existing fanout group. Should fail. */
-+	err = setsockopt(fd0, SOL_PACKET, PACKET_FANOUT, &val, sizeof(val));
-+	if (!err) {
-+		fprintf(stderr, "ERROR: unbound socket fanout join\n");
-+		exit(1);
-+	}
-+	close(fd0);
-+	close(fd1);
-+}
-+
- /* Test illegal mode + flag combination */
- static void test_control_single(void)
- {
-@@ -523,6 +558,7 @@ int main(int argc, char **argv)
- 	const int expect_uniqueid[2][2] = { { 20, 20},  { 20, 20 } };
- 	int port_off = 2, tries = 20, ret;
- 
-+	test_unbound_fanout();
- 	test_control_single();
- 	test_control_group(0);
- 	test_control_group(1);
--- 
-2.45.2
+That's not intentional, I just missed them. At the beginning, I
+wanted to organize the drop reasons in ip_route_input_noref(),
+and things become complex when I do it. Let me have a check
+and make the coverage complete.
 
+> In any case does not apply cleanly anymore.
+>
+> Please answer to the above question and question on patch 1 before
+> submitting a new revision. At very least the new revision should include
+> a comment explaining the reasoning for the current choice.
+>
+> Please, include in each patch the detailed changelog after the '---'
+> separator.
+>
+
+Sorry about that. I thought the patches for ip_route_input_noref,
+ip_route_input_rcu, ip_route_input_slow are completely new one,
+and abandoned the changelogs in the patches. I'll complete the
+changelogs in the next version.
+
+Thanks!
+Menglong Dong
+
+
+> Thanks,
+>
+> Paolo
+>
 
