@@ -1,104 +1,93 @@
-Return-Path: <netdev+bounces-134343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC747998E07
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:06:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10FDF998DEB
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4D70B235B2
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 16:58:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91117282B4E
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EED19992D;
-	Thu, 10 Oct 2024 16:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EEA194082;
+	Thu, 10 Oct 2024 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jbNK2JIX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iTLfwWq1"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E22192B71;
-	Thu, 10 Oct 2024 16:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01A338F9C
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728579524; cv=none; b=p8Oimvds+eDbfrMJuNehTqPkHdbRTJ8Vt1SbxzDTXFty1L+KzS0Ij2+KU9IPHTrD+Y3FzTEjJo5a4yHZgT+6L9e60xJE94guRd3opEmMqb/5mU6hehHAxGWB77aNgVaDvwhmWq0l99MuqVwj+aDn4RJxh0hu0wc2cOTJzTGaXo4=
+	t=1728579628; cv=none; b=tonytg/e4wpKnaVN+OGrNQPXMwiJI9krgey34z83Y5uzy2fkmko8iKpvCaEq55tMIvb05C/WYUmfkD+txfBW+2DAOP1Cs+me7//8YvW5PX99CYkQAST5zfjEDROi98Ekr5mMbVPRCEMlmMHBk0s2BK83lFDc2ezT67vGREuWnyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728579524; c=relaxed/simple;
-	bh=u7WMTNhl0Y3Uxvl7H4UJFlDlJpqHEE6FA9fRXNWLedE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VUwE2lOJrfDPpCkn1VslOQhE4cqrkkQhcAplxeSWT86B7pewJWJMTPxg2ZkNMTtBJ4CozTJ+UDNQmAgYCEVEouFO9VBqzai4jeE8zkOb58pVS0LxVRhKaoZFhOv/Uj2kneFTAvkPsNPZlB66Jxney1CMo1NNhrZJIOKn2dzSP6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jbNK2JIX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=o+hQvy7Xpv1AU8dUqccMe+pXHH1TDOTIVsSeW8CICsQ=; b=jbNK2JIX88bpSMJ+ybSemjghQ/
-	W6r9PLK1F43Ft9J0+PM+uZ3/CSFe5vOU4zQQOQPveVu4xzsgj0ewzrNkheEta0qNUhLEmmYlXV5lc
-	KxHSP6fpaisN5HX8z6BCK/9BJC3WKL2goYW+lHp05D8GI0A4ySh9mBsDu2Bh7hrpqC7k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sywUd-009dVV-D6; Thu, 10 Oct 2024 18:58:27 +0200
-Date: Thu, 10 Oct 2024 18:58:27 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: populate host_interfaces when
- attaching PHY
-Message-ID: <cc2b5686-d82b-4578-b9f4-c3e84f2066e4@lunn.ch>
-References: <ZwZGVRL_j62tH9Mp@shell.armlinux.org.uk>
- <ZwZubYpZ4JAhyavl@makrotopia.org>
- <Zwa-j1LKB3V2o2r9@shell.armlinux.org.uk>
- <ZwbQ-thwDxPfqGnW@makrotopia.org>
- <Zwbjlln3X5RXTt8x@shell.armlinux.org.uk>
- <Zwb2RzOQXd2Wfd6O@makrotopia.org>
- <ZwcQZmR0Q40ugXI7@shell.armlinux.org.uk>
- <ZwffopLK0x26n206@makrotopia.org>
- <ZwfrnFpqTlt0GnMn@shell.armlinux.org.uk>
- <ZwgAomacnmOtg8AK@makrotopia.org>
+	s=arc-20240116; t=1728579628; c=relaxed/simple;
+	bh=ooPHrBjcM8dXcybHVr/49cW3P33nFi1bG3RYIMaWJI8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LEN8RjyJ4wlkzFvZXmAcpdBlRu7f4K82MbxvOEHW+2hCYDdG5Hq8qEibsmCOqo+a6hXgeRCoYHuk6dFQrwaH20oDlzrbLCPG05yTHpbEn5TkdBI0YeF7naAPDUEJ3jtw477HLDOq6024i48kk7Eo8FdydlrESq2Sya4idEs0Oa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iTLfwWq1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C48CC4CEC5;
+	Thu, 10 Oct 2024 17:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728579626;
+	bh=ooPHrBjcM8dXcybHVr/49cW3P33nFi1bG3RYIMaWJI8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=iTLfwWq1G0mivEadbuXdA4bvUdDNJZck70MpgZD0HCa3k9a8+uLRm7zLTBF8kOMoV
+	 8U0BKL81+GYhILndNAyma2jgvtEXgZ/mA0bhH+XizSWrcUakGdA71nxMi5yj3bnMvd
+	 mQ03FxKYltDbC195dzyr6MnUNVcck/jRq+Oc9/jLEEXvirFx/fEfDqMtZsEMuqNl0b
+	 MI7T+jgZnc843JQe7iPpUuwwLU1FJVF0ndbLUpMeGGjgOrzf2Y4TzboEnezs0IKJkU
+	 HKzLeEmsIuCrkEBcdEvqV1GHDWfcteQD/wJuuZJaR5SwTLbJ2tOQT8s9i8mjienyQR
+	 L9HzxGIdai9Fw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCD73803263;
+	Thu, 10 Oct 2024 17:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZwgAomacnmOtg8AK@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2] ip/ipmroute: use preferred_family to get prefix
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172857963050.2096226.739914601076298955.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 17:00:30 +0000
+References: <20241009095309.17167-1-liuhangbin@gmail.com>
+In-Reply-To: <20241009095309.17167-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@kernel.org,
+ jishi@redhat.com
 
-> I initially tried to upstream the patch Alexander Couzens had written
-> for that in 2023, and back then we assumed that interface mode switching
-> would always be performed in case 2500Base-X was the main mode.
-> However, I gave up at some point because I was asked for detailed
-> definition of the PHY registers and bits, which, frankly speaking, just
-> doesn't exist, not even in RealTek's under-NDA datasheet which merely
-> lists some magic sequences of register writes.
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Wed,  9 Oct 2024 09:53:09 +0000 you wrote:
+> The mroute family is reset to RTNL_FAMILY_IPMR or RTNL_FAMILY_IP6MR when
+> retrieving the multicast routing cache. However, the get_prefix() and
+> subsequently __get_addr_1() cannot identify these families. Using
+> preferred_family to obtain the prefix can resolve this issue.
 > 
-> https://patchwork.kernel.org/comment/25331309/
+> Fixes: 98ce99273f24 ("mroute: fix up family handling")
+> Reported-by: Jianlin Shi <jishi@redhat.com>
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> 
+> [...]
 
-It is fine to document that these are magic values written into magic
-registers and nobody knows what they are doing, if there is no
-documentation. I just like to push people to actually check if there
-is documentation, otherwise there will be more and more examples of
-this magic.
+Here is the summary with links:
+  - [iproute2] ip/ipmroute: use preferred_family to get prefix
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=f305296e40c5
 
-I've been keeping an eye out for 'magic' registers which are actually
-part of 802.3, and pushing back that these are least should be fully
-documented. And it does happen, particularly in vendor submitted code
-:-(
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-But you said the patch got merged eventually, so it seems like it
-worked out in the end.
 
-	Andrew
 
