@@ -1,114 +1,257 @@
-Return-Path: <netdev+bounces-134419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 894C69994F2
-	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:08:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A67559994F8
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23B27B21C9C
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:08:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35F2A1F24708
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B831CFECC;
-	Thu, 10 Oct 2024 22:08:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064691E47D8;
+	Thu, 10 Oct 2024 22:12:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imYWSHyC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FES7iSty"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A60188CAE
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D6519CD1D;
+	Thu, 10 Oct 2024 22:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728598113; cv=none; b=G0V9TWFoPr+Ra7LBpBeF/Png6Uchj2HmLtcoYawAEX+WFGA/Gc8ixaN/BKURWWHGH2zTn22pm05HFn4XrVBCFj2A9CUrRIxiR6EQfjpjvs6aAhD56IyA+j+hBHCtZoVQUHuOeqkRiAAONi4K3WfpeVqEmX9+TA/RZDcTbhfP/kE=
+	t=1728598329; cv=none; b=c+7X7ckJT0pE5byVtZQb5HHi0zydyUqZgK7H2qmTAitwJfCtQhzZJtT7zjpGbKxKICd9zTCGmXiGFU/4nFyMUpBYTOTmjRK86rp0PUleTdR+QQmBelUQbKEyAEcJ4882nE4pN6aNR4l8msquz+sVwtDsxFDowiqmxUja/dZOleY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728598113; c=relaxed/simple;
-	bh=Ece54W/mP9qWGA+F3wl87bPLozoCtYXjR3gjBlwOF4s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mlkyw+IX8SgoU2Mu1YzOARgQKVUhYkKOEUlG8WP05JoqN6pCUPokVvW3jcC0/vOb0Zq6Zo7N90AoNvWJlq5AtICxb3v8utpAR44+fb89p9TCtPasCkEPkJYdEnoXh31FLzNswgIgWEgFEry9zJbcUo/G6wzZH5e7Qy194mPlO4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imYWSHyC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24984C4CEC5;
-	Thu, 10 Oct 2024 22:08:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728598113;
-	bh=Ece54W/mP9qWGA+F3wl87bPLozoCtYXjR3gjBlwOF4s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=imYWSHyCi9sKhJyhK1K67SZuIFWHkKXaJMKsv/UZPh79HL6xQwDRRiwZkGLHsM1tj
-	 ENEU7uzJya4EwDe+uK8yAkvFU1jeL7vzjvna4vM6oN/hduEXGpaJMRdrpWRE18uj7i
-	 no6q8ni1x7S9b40FsOMIdjYv+Vxmm+w3ZbsYXX6Q3a1bB32WvlWlZ6fymHOd3Nlxft
-	 JN0XJ8yJ8XSkZ5EaNl9S2gpJSYk6U8NbnbXgMFlCjyNkcYpM/AEcy6v4ej1oJ0xOk6
-	 F9ixcLnTos2XLGsWpyU1a45rhq1dbnho0okRt1ZnppKz5/uAi78rBK2n5WcxIkcb4W
-	 oB0AVvxk8gKXw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	sdf@fomichev.me
-Subject: [PATCH net-next] selftests: net: rebuild YNL if dependencies changed
-Date: Thu, 10 Oct 2024 15:08:26 -0700
-Message-ID: <20241010220826.2215358-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1728598329; c=relaxed/simple;
+	bh=xRoe/sdYS0xA14i4NdUwQqxxZL9PlWpiEF1UXmi4Lt4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KLRP5hWFQkxRdGWX8TvBmUxNiDcXLkP7LJOy3jjozhumCFBnInl8c/7gzjRmvwcz0d81/Ra9fg4vJNphSejmOvN/qIeOuVAUmRvokTH4o477EoO4t3UMIbpSice9gKerbMXcUrh2JXmBoXM5LpORl08Ml/LzvqqfDSzjCI0iGp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FES7iSty; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-45f0a0f9687so13059461cf.3;
+        Thu, 10 Oct 2024 15:12:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728598327; x=1729203127; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZGedDGDB+Aoa+74kGdBVBsBsvAGyw2bhj1E12n46Ci8=;
+        b=FES7iStyyITnPi7w/64mtkyj+5OhMwMYJig+rJD66SwbrSweTCDkGksQ4UIMvTFzRX
+         G+77TIzoJVgD4GIjdqvrs0sIotb/0j3zK2glhNFfd31wFJ5Yjq9hHXc4TQ6jRzYuy//x
+         mfao2KC6dw7EYeKDJgL8woE5c3R96W6ttww53V+vhYsY98vHzCnmSEEa4IW+/E+wQPOv
+         3foU06hCLOTxIdhtn1gJVbrHQVt0Mw4u1MCa4pT4Zk/llz71l838Sa5xrmXciuquBPl0
+         3jM/p2ReQTUoMicYCF5+GAQofs6Ft56FbbH+s7mTB0mLOG8M77DpMFX4gY1lUeAYVvQB
+         XnOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728598327; x=1729203127;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ZGedDGDB+Aoa+74kGdBVBsBsvAGyw2bhj1E12n46Ci8=;
+        b=E/FwmBqMVa6lLHUNMDqmDg+QLy5zre9LMXP4rxNb8nuwO0sMe0qIXyPP65jNJYVVVv
+         +wnnCDqZ/SRoQXcJq1mlScEaX9QIXziTPzRbm38NEcVKafHkaIkzn77rmaiYlC4ENNgk
+         hBAdWuaqVkwdAoImxbjd8JhlEuJYaSFyb3X0pnuCYUZX/E7qWghLzUXmpCL8Y5hSJrfF
+         ho5ICzE7BAVYBhChXV77pydREeMWbdLOharHVUoaJ29IRcAKQAZ7K0VQdIReQ4CnQuSF
+         KMK9Sga9Ex/jWac/5PpHz864Gm0pRjY6PYE+EuY2YVDyUSCBFSSdBIDghCQ/E8IZKprZ
+         Ik8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU5N2gCq3aIJ2aQ87D2EEptlFnBqBJk6QXbYH5cgk5dvfBI6hJISt0GaQ6BfUm/EOsx0LXEFzc/@vger.kernel.org, AJvYcCWbftIcjkggBuftVlOMNhwomU1zLzES5mk5XnoP+tKEuZNPJYjLkQRZrL9jB1rV3bnQKnkJFLqg6kqXG2qqnC6h@vger.kernel.org, AJvYcCX+9GpmIdecMO8uhuNmTnTvjferBizHqriKis1sahq32ahIlcuLqVjGlQLef4KN2s+H2uB7+4Omm78jrec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM/JkgL7Ul693XZ+n3SY6Uv38hbEpyR0W0DnxXGvOefnZAFcKD
+	vTnzSDzuDsluA/NtwkHwaO1M/CSrsdCSkXuE5xLGvnX/LkMveGqB
+X-Google-Smtp-Source: AGHT+IHV+SccpDGdFVFMotwlP6rtIqTcPQtRb4YFMfdkC5WWjIzHfuQnY7jobCohB9m/o/pHPr9ciQ==
+X-Received: by 2002:a05:622a:2cb:b0:45b:16b:ecb7 with SMTP id d75a77b69052e-4604bb962camr7068641cf.1.1728598326960;
+        Thu, 10 Oct 2024 15:12:06 -0700 (PDT)
+Received: from localhost (86.235.150.34.bc.googleusercontent.com. [34.150.235.86])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-460427d50efsm9625961cf.22.2024.10.10.15.12.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 15:12:06 -0700 (PDT)
+Date: Thu, 10 Oct 2024 18:12:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Gur Stavi <gur.stavi@huawei.com>, 
+ 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org
+Message-ID: <67085135e4fe2_21530629429@willemb.c.googlers.com.notmuch>
+In-Reply-To: <000101db1b2f$7410c2f0$5c3248d0$@huawei.com>
+References: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch>
+ <20241009065837.354332-1-gur.stavi@huawei.com>
+ <67068a44bff02_1cca3129431@willemb.c.googlers.com.notmuch>
+ <002201db1a75$9a83b420$cf8b1c60$@huawei.com>
+ <67072012c983a_1e805629421@willemb.c.googlers.com.notmuch>
+ <002701db1ae3$368d9b70$a3a8d250$@huawei.com>
+ <6707e3028d844_20573a294f0@willemb.c.googlers.com.notmuch>
+ <000101db1b2f$7410c2f0$5c3248d0$@huawei.com>
+Subject: RE: [PATCH net-next v02 1/2] af_packet: allow fanout_add when socket
+ is not RUNNING
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Try to rebuild YNL if either user added a new family or the specs
-of the families have changed. Stanislav's ncdevmem cause a false
-positive build failure in NIPA because libynl.a isn't rebuilt
-after ethtool is added to YNL_GENS.
+Gur Stavi wrote:
+> > Gur Stavi wrote:
+> > > > Gur Stavi wrote:
+> > > > > > Gur Stavi wrote:
+> > > > > > > >> @@ -1846,21 +1846,21 @@ static int fanout_add(struct sock
+> > *sk,
+> > > > > > struct fanout_args *args)
+> > > > > > > >>  	err = -EINVAL;
+> > > > > > > >>
+> > > > > > > >>  	spin_lock(&po->bind_lock);
+> > > > > > > >> -	if (packet_sock_flag(po, PACKET_SOCK_RUNNING) &&
+> > > > > > > >> -	    match->type == type &&
+> > > > > > > >> +	if (match->type == type &&
+> > > > > > > >>  	    match->prot_hook.type == po->prot_hook.type &&
+> > > > > > > >>  	    match->prot_hook.dev == po->prot_hook.dev) {
+> > > > > > > >
+> > > > > > > > Remaining unaddressed issue is that the socket can now be
+> > added
+> > > > > > > > before being bound. See comment in v1.
+> > > > > > >
+> > > > > > > I extended the psock_fanout test with unbound fanout test.
+> > > > > > >
+> > > > > > > As far as I understand, the easiest way to verify bind is to
+> > test
+> > > > that
+> > > > > > > po->prot_hook.dev != NULL, since we are under a bind_lock
+> > anyway.
+> > > > > > > But perhaps a more readable and direct approach to test "bind"
+> > > > would be
+> > > > > > > to test po->ifindex != -1, as ifindex is commented as "bound
+> > > > device".
+> > > > > > > However, at the moment ifindex is not initialized to -1, I can
+> > add
+> > > > such
+> > > > > > > initialization, but perhaps I do not fully understand all the
+> > > > logic.
+> > > > > > >
+> > > > > > > Any preferences?
+> > > > > >
+> > > > > > prot_hook.dev is not necessarily set if a packet socket is bound.
+> > > > > > It may be bound to any device. See dev_add_pack and ptype_head.
+> > > > > >
+> > > > > > prot_hook.type, on the other hand, must be set if bound and is
+> > only
+> > > > > > modified with the bind_lock held too.
+> > > > > >
+> > > > > > Well, and in packet_create. But setsockopt PACKET_FANOUT_ADD also
+> > > > > > succeeds in case bind() was not called explicitly first to bind
+> > to
+> > > > > > a specific device or change ptype.
+> > > > >
+> > > > > Please clarify the last paragraph? When you say "also succeeds" do
+> > you
+> > > > > mean SHOULD succeed or MAY SUCCEED by mistake if "something"
+> > happens
+> > > > ???
+> > > >
+> > > > I mean it succeeds currently. Which behavior must then be maintained.
+> > > >
+> > > > > Do you refer to the following scenario: socket is created with non-
+> > zero
+> > > > > protocol and becomes RUNNING "without bind" for all devices. In
+> > that
+> > > > case
+> > > > > it can be added to FANOUT without bind. Is that considered a bug or
+> > > > does
+> > > > > the bind requirement for fanout only apply for all-protocol (0)
+> > > > sockets?
+> > > >
+> > > > I'm beginning to think that this bind requirement is not needed.
+> > >
+> > > I agree with that. I think that is an historical mistake that socket
+> > > becomes implicitly bound to all interfaces if a protocol is defined
+> > > during create. Without this bind requirement would make sense.
+> > >
+> > > >
+> > > > All type and dev are valid, even if an ETH_P_NONE fanout group would
+> > > > be fairly useless.
+> > >
+> > > Fanout is all about RX, I think that refusing fanout for socket that
+> > > will not receive any packet is OK. The condition can be:
+> > > if (po->ifindex == -1 || !po->num)
+> > 
+> > Fanout is not limited to sockets bound to a specific interface.
+> > This will break existing users.
+> 
+> For specific interface ifindex >= 1
+> For "any interface" ifindex == 0
+> ifindex is -1 only if the socket was created unbound with proto == 0
+> or for the rare race case that during re-bind the new dev became unlisted.
+> For both of these cases fanout should fail.
 
-Note that sha1sum is already used in other parts of the build system.
+The only case where packet_create does not call __register_prot_hook
+is if proto == 0. If proto is anything else, the socket will be bound,
+whether to a device hook, or ptype_all. I don't think we need this
+extra ifindex condition.
+ 
+> > 
+> > Binding to ETH_P_NONE is useless, but we're not going to slow down
+> > legitimate users with branches for cases that are harmless.
+> > 
+> 
+> With "branch", do you refer to performance or something else?
+> As I said in other mail, ETH_P_NONE could not be used in a fanout
+> before as well because socket cannot become RUNNING with proto == 0.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: sdf@fomichev.me
----
- tools/testing/selftests/net/ynl.mk | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+Good point.
 
-diff --git a/tools/testing/selftests/net/ynl.mk b/tools/testing/selftests/net/ynl.mk
-index 1ef24119def0..07bc011e6d9a 100644
---- a/tools/testing/selftests/net/ynl.mk
-+++ b/tools/testing/selftests/net/ynl.mk
-@@ -9,6 +9,8 @@
- # YNL_GEN_FILES: TEST_GEN_FILES which need YNL
- 
- YNL_OUTPUTS := $(patsubst %,$(OUTPUT)/%,$(YNL_GEN_FILES))
-+YNL_SPECS := \
-+	$(patsubst %,$(top_srcdir)/Documentation/netlink/specs/%.yaml,$(YNL_GENS))
- 
- $(YNL_OUTPUTS): $(OUTPUT)/libynl.a
- $(YNL_OUTPUTS): CFLAGS += \
-@@ -16,10 +18,19 @@ $(YNL_OUTPUTS): CFLAGS += \
- 	-I$(top_srcdir)/tools/net/ynl/lib/ \
- 	-I$(top_srcdir)/tools/net/ynl/generated/
- 
--$(OUTPUT)/libynl.a:
-+# Make sure we rebuild libynl if user added a new family. We can't easily
-+# depend on the contents of a variable so create a fake file with a hash.
-+YNL_GENS_HASH := $(shell echo $(YNL_GENS) | sha1sum | cut -c1-8)
-+$(OUTPUT)/libynl-$(YNL_GENS_HASH).sig:
-+	$(Q)rm -f $(OUTPUT)/libynl-*.sig
-+	$(Q)touch $(OUTPUT)/libynl-$(YNL_GENS_HASH).sig
-+
-+$(OUTPUT)/libynl.a: $(YNL_SPECS) $(OUTPUT)/libynl-$(YNL_GENS_HASH).sig
-+	$(Q)rm -f $(top_srcdir)/tools/net/ynl/libynl.a
- 	$(Q)$(MAKE) -C $(top_srcdir)/tools/net/ynl GENS="$(YNL_GENS)" libynl.a
- 	$(Q)cp $(top_srcdir)/tools/net/ynl/libynl.a $(OUTPUT)/libynl.a
- 
- EXTRA_CLEAN += \
- 	$(top_srcdir)/tools/net/ynl/lib/__pycache__ \
--	$(top_srcdir)/tools/net/ynl/lib/*.[ado]
-+	$(top_srcdir)/tools/net/ynl/lib/*.[ado] \
-+	$(OUTPUT)/libynl-*.sig
--- 
-2.46.2
+> For performance, we removed the RUNNING condition and added this.
+> It is not like we need to perform 5M fanout registrations/sec. It is a
+> syscall after all.
+
+It's as much about code complexity as performance. Both the patch and
+resulting code should be as small and self-evident as possible.
+
+Patch v3 introduces a lot of code churn.
+
+If we don't care about opening up fanout groups to ETH_P_NONE, then
+patch v2 seems sufficient. If explicitly blocking this, the ENXIO
+return can be added, but ideally without touching the other lines.
+
+> > > I realized another possible problem. We should consider adding ifindex
+> > > Field to struct packet_fanout to be used for lookup of an existing
+> > match.
+> > > There is little sense to bind sockets to different interfaces and then
+> > > put them in the same fanout group.
+> > > If you agree, I can prepare a separate patch for that.
+> > >
+> > > > The type and dev must match that of the fanout group, and once added
+> > > > to a fanout group can no longer be changed (bind will fail).
+> > > >
+> > > > I briefy considered the reason might be max_num_members accounting.
+> > > > Since f->num_members counts running sockets. But that is not used
+> > > > when tracking membership of the group, sk_ref is. Every packet socket
+> > > > whose po->rollover is increased increases this refcount.
+> > > >
+> > > > > What about using ifindex to detect bind? Initialize it to -1 in
+> > > > > packet_create and ensure that packet_do_bind, on success, sets it
+> > > > > to device id or 0?
+> > > > >
+> > > > > psock_fanout, should probably be extended with scenarios that test
+> > > > > "all devices" and all/specific protocols. Any specific scenario
+> > > > > suggestions?
+> > > > >
+> > > > >
+> > > >
+> > >
+> > >
+> > 
+> 
+> 
+
 
 
