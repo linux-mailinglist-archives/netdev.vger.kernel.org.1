@@ -1,115 +1,206 @@
-Return-Path: <netdev+bounces-134403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8F099935E
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:09:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC9C999389
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D03D4282E45
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:09:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95DC91C22D98
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068E51CF7CF;
-	Thu, 10 Oct 2024 20:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5511E2833;
+	Thu, 10 Oct 2024 20:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="fvm1hmXw"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="qo5+v33D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007F91C9B67
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B901CFEB1
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728590993; cv=none; b=AYl1UxgcqtbrOdBrKQuPkS8jUOfTIx/sSejtJG6yh8HIr4vRw4FT6nlC5IG12GiO3AMGkGCoLlMtlc5GD3GVEO4AatVnWtFwA3dGqGgS3EqJZWgcf/AIwLGgmMhA+XR49/QvBTUjLM6wN/b1K0hTp3sDPshLR9pL6+BB3IUyAC8=
+	t=1728591212; cv=none; b=VM5FDzaxFA4smrR5S4lgAac8QPYsxX3Jkajppivi8wmE1yZHRTHaTnycAlYxPwq6cD6zCCvZaUcUoVJxj0qdTt71fmZoe7E734mCPCIIfcZ4h9UjGKLABojcs/LpE6eySfQV5IEnazpN5cve7bIm7my1xmt4K7gilRRikVrNeA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728590993; c=relaxed/simple;
-	bh=hfP8kIySYPoXGp3X3utwwBQMk8qm/KR8k9kaAp2Ign8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jp3UtBgAAJACWsxgENyKo5o0UrwjlepaELZdnAUySzSvybYKVZQ80nXH46T8bkqd+z2Q/LYkGEHcX6mJfU1LA+HXKIiD7hj2lhIad8p6PBtoEbHcsQp5SfYdND8bJTZ5WMlXlQmNYk0fv4HMSL+zdbo0Iu5JAGi6PEGIw/HOjmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=fvm1hmXw; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d47eff9acso687896f8f.3
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:09:51 -0700 (PDT)
+	s=arc-20240116; t=1728591212; c=relaxed/simple;
+	bh=0lZIgquyle7fwU0Lucs//hTyP5RHDSTScFN7WgLvCrM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qmINheO6NlF9+JJrnirEeMtubtvoYLSfIjAJPVoPbkTTPDZS/77SdvV1s9AmwYwUQJNJMqo2QzuZREY3/wZVYiJnIxlkfAabEf1ZkFdkrT6YpU8PHjtIdpaR+R46EHcerrTy45CpazcJ0UAgAKQVZLW3hJTQqCXm+/iDol6Fmcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=qo5+v33D; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5e803a607f3so546863eaf.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:13:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sigma-star.at; s=google; t=1728590990; x=1729195790; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hfP8kIySYPoXGp3X3utwwBQMk8qm/KR8k9kaAp2Ign8=;
-        b=fvm1hmXw6bUalnThjM0e5af94TvjIExG7S3vti0VzYleuEr5eM6nNQ3FpKImTvAYIM
-         FDEhySG2BNeU8yDpxLuFxsfd9+Q4PjRdgEBXaVf9KDFP02eFnyNcARz654Tcg7Wquatp
-         BlICzt0i5mIpFkNHPp077Pz9VSReFZYLiOsIoaGWXUDb8WkAghKYlBysWC+aphWYIJK/
-         ZVYb7UeDU73niHRZ14eJ8D5lBIaGa7gHbt/+xJYbp32K65SZJ+20yUtHFN2bnHs1z2Gb
-         jpBRhPEDWfRwgRXW20CeAuGwFgwf48OlOTxAwNRHPleSimv2hs6yXjXmClrj8CYqJg8c
-         KJJw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728591208; x=1729196008; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=846stNI2iGlXdHnVNxjtThkOcz8faJ6vEUWxERkxXQ0=;
+        b=qo5+v33DajWFb1/HHFlfKFz1sLjCTyLCiU0yL9p0fSB6NZ5SFg7qelY174l+zRzun3
+         PO+7XCRs4cvMdrwjjcFNzCiQDGM4noa5nK1Sg7imYGmEGZvFiMM/eVBlHS4m/RH873Fd
+         GMgsIystPFgLs3dJvxsdq/03hXc0ydLLmD/k1i8TM9mXsMoCkFfz095DYBTcGjAKVA30
+         X5EAXa0OkSnarBMFQewHGDNDedC8tFKUawJLtBm0TqfL/GW95dDkl2exB/GjXGOKlf2R
+         Xy693MIqCAtJHUjZPWYqTEKlbnX1IxgOYy9ZxmvHcXQsBTc3OIY7/sN5g0sT8rm7hoz1
+         aOGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728590990; x=1729195790;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hfP8kIySYPoXGp3X3utwwBQMk8qm/KR8k9kaAp2Ign8=;
-        b=eW7m+tDL1VHeTt+ZwNCOHmqe12DaFlbd09cXdO1RxF7C0NJqiSQbY735hJJIHd3RJL
-         j5X/X9R22dW1AOe75+UxH9dlF4cBbdsD/y6S1B+c4JruC7Hg2GsTcfjNB72HRBFEyzBO
-         W/xP0jyZlah2yONYvvOxBXJ1lIcY0iNmkPBJEuSzwz+ATYCoXWthKG24jV9fLBuNXbTf
-         85ESrfHyCtupDIbdOB2ai10gvLsh59zA2NC8SORXwNhYc2yGXWPaR7teEFmtseIs+s5x
-         LZoBRno0Q33pmq8sArHt9+IbaHqIiXvjzD/b2UmRCcGdrA4IEITZ4RAl0/s78O63icIQ
-         9ZKw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqitkIA1iqvcIL2K8ZpghyS+2kKP0WN5ABJISdtTDW9reUT4ye7oXRyjqufT3nxnPGRj0WcoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5/F8CELUuydWcVKTodxgnjGp+zUGDu962A/eW0+hbscSU5e3E
-	oj9Y+HQpxBe/iHK004cm6MWeT/U84etzW9OUWZS/BsTMFAi+7BmdI0SbMEzdYDw=
-X-Google-Smtp-Source: AGHT+IHvYbcRjbuHgWljkcZYeI7PgKjgFCQUwV/nJm9bloQDOoNiOZTe1Ek1HHrlNApudatd2qiKag==
-X-Received: by 2002:a5d:4389:0:b0:37d:5113:cdff with SMTP id ffacd0b85a97d-37d552967a0mr171577f8f.37.1728590990144;
-        Thu, 10 Oct 2024 13:09:50 -0700 (PDT)
-Received: from blindfold.localnet (84-115-238-31.cable.dynamic.surfer.at. [84.115.238.31])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-430ccf204f7sm57729835e9.2.2024.10.10.13.09.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 13:09:49 -0700 (PDT)
-From: Richard Weinberger <richard@sigma-star.at>
-To: Florian Westphal <fw@strlen.de>
-Cc: Richard Weinberger <richard@nod.at>, upstream@sigma-star.at, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net, kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, paul@paul-moore.com, upstream+net@sigma-star.at, Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-Date: Thu, 10 Oct 2024 22:09:48 +0200
-Message-ID: <5243306.KhUVIng19X@somecomputer>
-In-Reply-To: <20241010134827.GC30424@breakpoint.cc>
-References: <20241009203218.26329-1-richard@nod.at> <3048359.FXINqZMJnI@somecomputer> <20241010134827.GC30424@breakpoint.cc>
+        d=1e100.net; s=20230601; t=1728591208; x=1729196008;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=846stNI2iGlXdHnVNxjtThkOcz8faJ6vEUWxERkxXQ0=;
+        b=Y4YBjkTQAeA1JW5KJdWgfd+2grsOP1tq4mXD/0BM/gL0WbVL1t52iJGdqh+I3yGGFH
+         EtacxiuwjkN++bN6HO12xoiUEPyztTA2IU94R9xzZUBKYV2V8GUy4K9/PVTWIs9FhucK
+         IUDq/cjB/0NNjICzVoNHoGymD91R8HASAif2In+G207mdJb4WgNfDAkvBaSx0l5JfZY2
+         n0MW/19OYvkUmotpkgBEFFcKfVpEKmdwmFNcwbHN4utvDJittcD7m3MrcJ08Y36MEnM2
+         aLBk2H5Ya90xbgoV6DVnf1Vc2jx7UL5gDswlD3yKQ1wK/SU3HyG8rAUQWjVRQjp6o95W
+         h4Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCUeesid0fEeI0t3OOBEnluDuDeu4smpYUOSGFeOSeRuHn3r1ABITLub+xm9dVikFDXSzEIyTJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgN1wq3W93IcTZBIxKqUIhMsa9lDF/tYoIwx/I0T5SUkLzehGA
+	ZrFMxdve9PZr+apWjLNPJjQlu34McdgjJQcpccgS9OyTRuVM793d7U8iEmSSbOM=
+X-Google-Smtp-Source: AGHT+IFQuL6oXl0zfaQl7DeN+D+AU9z/iBVtBYOJbjGnwWzlbfCsbHda7ODwq0Y0YBZ5gJeLhBLAVw==
+X-Received: by 2002:a05:6820:1627:b0:5e7:cb2e:dfec with SMTP id 006d021491bc7-5eb1a31324emr34869eaf.8.1728591208394;
+        Thu, 10 Oct 2024 13:13:28 -0700 (PDT)
+Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5eb11600024sm231939eaf.0.2024.10.10.13.13.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 13:13:26 -0700 (PDT)
+Message-ID: <0f4786e9-d738-435d-afb9-8c0c4a028ddb@baylibre.com>
+Date: Thu, 10 Oct 2024 15:13:25 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] cleanup: adjust scoped_guard() to avoid potential
+ warning
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>
+Cc: amadeuszx.slawinski@linux.intel.com,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+ Markus Elfring <Markus.Elfring@web.de>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ Andy Shevchenko <andriy.shevchenko@intel.com>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>
+References: <20241009114446.14873-1-przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+From: David Lechner <dlechner@baylibre.com>
+In-Reply-To: <20241009114446.14873-1-przemyslaw.kitszel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Am Donnerstag, 10. Oktober 2024, 15:48:27 CEST schrieb Florian Westphal:
-> Richard Weinberger <richard@sigma-star.at> wrote:
-> > Am Mittwoch, 9. Oktober 2024, 23:33:45 CEST schrieb Florian Westphal:
-> > > There is no need to follow ->file backpointer anymore, see
-> > > 6acc5c2910689fc6ee181bf63085c5efff6a42bd and
-> > > 86741ec25462e4c8cdce6df2f41ead05568c7d5e,
-> > > "net: core: Add a UID field to struct sock.".
-> >=20
-> > Oh, neat!
+On 10/9/24 6:44 AM, Przemek Kitszel wrote:
+> Change scoped_guard() to make reasoning about it easier for static
+> analysis tools (smatch, compiler diagnostics), especially to enable them
+> to tell if the given scoped_guard() is conditional (interruptible-locks,
+> try-locks) or not (like simple mutex_lock()).
+> 
+> Add compile-time error if scoped_cond_guard() is used for non-conditional
+> lock class.
+> 
+> Beyond easier tooling and a little shrink reported by bloat-o-meter:
+> add/remove: 3/2 grow/shrink: 45/55 up/down: 1573/-2069 (-496)
+> this patch enables developer to write code like:
+> 
+> int foo(struct my_drv *adapter)
+> {
+> 	scoped_guard(spinlock, &adapter->some_spinlock)
+> 		return adapter->spinlock_protected_var;
+> }
+> > 
+> Current scoped_guard() implementation does not support that,
+> due to compiler complaining:
+> error: control reaches end of non-void function [-Werror=return-type]
 
-I gave sock_net_uid() a try, but I kinda fail.
+I was hoping that this would allow us to do the same with
+scoped_cond_guard() so that we could remove a bunch of
+unreachable(); that we had to add in the IIO subsystem. But
+with this patch we still get compile errors if we remove them.
 
-Maybe I have wrong expectations.
-e.g. I expected that sock_net_uid() will return 1000 when
-uid 1000 does something like: unshare -Umr followed by a veth connection
-to the host (initial user/net namespace).
-Shouldn't on the host side a forwarded skb have a ->dev that belongs uid
-1000's net namespace?
+Is it possible to apply the same if/goto magic to scoped_cond_guard()
+to make it better too?
 
-Thanks,
-//richard
+---
 
-=2D-=20
-=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8Bsigma star gmbh | Eduard-Bodem=
-=2DGasse 6, 6020 Innsbruck, AUT
-UID/VAT Nr: ATU 66964118 | FN: 374287y
+Here is a test case if that helps...
+
+For example, I made this change:
+
+diff --git a/drivers/iio/adc/ad7380.c b/drivers/iio/adc/ad7380.c
+index e8bddfb0d07d..f1c85690af1e 100644
+--- a/drivers/iio/adc/ad7380.c
++++ b/drivers/iio/adc/ad7380.c
+@@ -577,7 +577,6 @@ static int ad7380_debugfs_reg_access(struct iio_dev *indio_dev, u32 reg,
+ 		else
+ 			return regmap_write(st->regmap, reg, writeval);
+ 	}
+-	unreachable();
+ }
+ 
+ /*
+@@ -824,7 +823,6 @@ static int ad7380_read_raw(struct iio_dev *indio_dev,
+ 			return ad7380_read_direct(st, chan->scan_index,
+ 						  scan_type, val);
+ 		}
+-		unreachable();
+ 	case IIO_CHAN_INFO_SCALE:
+ 		/*
+ 		 * According to the datasheet, the LSB size is:
+@@ -933,7 +931,6 @@ static int ad7380_write_raw(struct iio_dev *indio_dev,
+ 					FIELD_PREP(AD7380_CONFIG2_RESET,
+ 						   AD7380_CONFIG2_RESET_SOFT));
+ 		}
+-		unreachable();
+ 	default:
+ 		return -EINVAL;
+ 	}
+
+And then I get the following compiler errors/warnings:
+
+/home/david/work/linux/drivers/iio/adc/ad7380.c: In function ‘ad7380_debugfs_reg_access’:
+/home/david/work/linux/drivers/iio/adc/ad7380.c:580:1: error: control reaches end of non-void function [-Werror=return-type]
+  580 | }
+      | ^
+In file included from /home/david/work/linux/include/linux/irqflags.h:17,
+                 from /home/david/work/linux/arch/arm/include/asm/bitops.h:28,
+                 from /home/david/work/linux/include/linux/bitops.h:68,
+                 from /home/david/work/linux/drivers/iio/adc/ad7380.c:20:
+/home/david/work/linux/drivers/iio/adc/ad7380.c: In function ‘ad7380_write_raw’:
+/home/david/work/linux/include/linux/cleanup.h:337:9: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  337 |         for (CLASS(_name, scope)(args), \
+      |         ^~~
+/home/david/work/linux/include/linux/iio/iio.h:689:9: note: in expansion of macro ‘scoped_cond_guard’
+  689 |         scoped_cond_guard(iio_claim_direct_try, fail, iio_dev)
+      |         ^~~~~~~~~~~~~~~~~
+/home/david/work/linux/drivers/iio/adc/ad7380.c:910:17: note: in expansion of macro ‘iio_device_claim_direct_scoped’
+  910 |                 iio_device_claim_direct_scoped(return -EBUSY, indio_dev) {
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/david/work/linux/drivers/iio/adc/ad7380.c:934:9: note: here
+  934 |         default:
+      |         ^~~~~~~
+/home/david/work/linux/drivers/iio/adc/ad7380.c: In function ‘ad7380_read_raw’:
+/home/david/work/linux/include/linux/cleanup.h:337:9: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  337 |         for (CLASS(_name, scope)(args), \
+      |         ^~~
+/home/david/work/linux/include/linux/iio/iio.h:689:9: note: in expansion of macro ‘scoped_cond_guard’
+  689 |         scoped_cond_guard(iio_claim_direct_try, fail, iio_dev)
+      |         ^~~~~~~~~~~~~~~~~
+/home/david/work/linux/drivers/iio/adc/ad7380.c:822:17: note: in expansion of macro ‘iio_device_claim_direct_scoped’
+  822 |                 iio_device_claim_direct_scoped(return -EBUSY, indio_dev) {
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/home/david/work/linux/drivers/iio/adc/ad7380.c:826:9: note: here
+  826 |         case IIO_CHAN_INFO_SCALE:
+      |         ^~~~
+
+Using compiler:
+
+$ arm-linux-gnueabi-gcc --version
+arm-linux-gnueabi-gcc (Ubuntu 13.2.0-23ubuntu4) 13.2.0
 
 
 
