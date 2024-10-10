@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-134364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0806998EBC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:48:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A93998EBD
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:48:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 829EA2800AF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93F591C21DB5
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950D11CB30D;
-	Thu, 10 Oct 2024 17:48:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FC61C9ECA;
+	Thu, 10 Oct 2024 17:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nIlIFBN0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WI6SQKTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C1E19ABC6
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B371CB309
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 17:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728582507; cv=none; b=fQDqdOZcwd6FNeRgd5tV0VmmLpVtM4hL67S63fgEGdMGFaotVcM/6bKohRBQ1Sf4zRD6twCB+ujcd6YnLaAJO1/w5FE8ba7+m5w6q7bnj4y3b632flI54pANa017VfovZQUppu0oiXOh/dI9wvlkrLZGEpW/FxrlugolpdmwyAk=
+	t=1728582508; cv=none; b=EzIQbWGbzr6hkiRX1O2SvfktWAFM3VOjeGmEfhUBwQprXYGo82iw1H7mpXtcN4uuGfhvOAw2dofoaG7IFqsbBTzBdJ2SCahWtvvilWrM8nrgd+Q+Ewhjf8cyUog6xbU7v6CEC/U2gHQb97aD08Fc9/AbD+VjjCF7Yofhb46/kG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728582507; c=relaxed/simple;
-	bh=sKfvKok3fq3eyG/tK+2hXfkWNQA6GdeD6b6mflzlR3I=;
+	s=arc-20240116; t=1728582508; c=relaxed/simple;
+	bh=NzATUbh43EuFGnCyQ3XlFjHgissJsk7ZS5HmjCC4Frs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G0R9y+8paXoSr8P5zXC7tZjdvKf7Egbvr4d1G15OiJE0fanAPIaKrQn5FGQ/Q59qgUddBKVbweXkpkk9lWHEcUgC1mtra2fpooWLH+VdyAHr6199CwiTHnlnsLr39P1Y1skR/Ssc2MuPNYS9LrQJSf4jC65s6nCcE2JvSgaPJLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nIlIFBN0; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=QDkPGnln/XwY3LTCpaZYVcrmXSPxqIIg/NPoGKJ4Q4rfvAzjAALmrY9DgD3v5Z/sZwuWA9rguPu5pxoJoLYn614oulI1Pb/2hxZ4EIXNLRbQEsquRFBnSjb6taMJlXxNcC/E8L23fuvKPD9xSgEp747ROrsROtczr2KZslhHVuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WI6SQKTB; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b117cdb27bso105783485a.2
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:25 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3231725c9so22705827b3.1
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 10:48:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728582505; x=1729187305; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728582506; x=1729187306; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=toLrgx1ltD35Rto733JypjJAuYnc+WvmBoor6BwKd1w=;
-        b=nIlIFBN0RegfILQyIoBJXjYGAjbcULXxOhRyAiV/7zf7YGcUwZwau8awVPrH3ZYGmh
-         CcCW3LquNw09x15VulJNeXMFAVv1WNorfSsTbp+pPHgQqhAzYjRbrUqYpdWIWIKLo7AD
-         sZVMA2KjqmPnP8bsd5rtiGJP3uryzqvv5dEVfY8XYij1uYt8vsaudKm/UF1cvpNCA+07
-         usSaA2WxqXohgCmuIhxOBsSm44CC1eCJMdnI+hW5L+Z4pXyVoBQv1gKJFz+l5Kby3RKI
-         PFG/MDVI1phPE1NewZW/lHNcriqXJ1YbSlz3qrN8XmZZvapWSF+j577MIV7czz1THV3L
-         k7rw==
+        bh=h3wiCBXZ8nr1yKT9yyi5IAvXAKwwla0kpy0xY/U0HUc=;
+        b=WI6SQKTB+qyl+hG+CfMcgJG2cgiiQwzZdOCuvV7HMPushJBLFdlmH3gGHsw+NKohf4
+         mIKS0fM/T+IVn1V50MKiE7dJhazUyQ/npnuCQTvkixzhH3S+GAkyS3cIf+inV1tAfn3B
+         0G4fbdMb9MUMZJjgqdda3BEzlLlCJoNnLedyqP58OCycV7fOI/2KIvjeies9Qs7AaG74
+         m0RRpIFW/rrkVm9RrC8vWLBZt5SQnrTw1J/Olz2V/WFC6czjkMz+7vIbf99IbfuWuG5J
+         PQCRSQF1X8i5e9pw4uvtSdq8WbrpSjmHuYM/K4cESSM6B8KcLEhFsVBScZoqV+/LncxL
+         wTXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728582505; x=1729187305;
+        d=1e100.net; s=20230601; t=1728582506; x=1729187306;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=toLrgx1ltD35Rto733JypjJAuYnc+WvmBoor6BwKd1w=;
-        b=Tt7vkxe9GMc9mmLGAtNnUcoJJNBr8aE09xA9qg/JntjiSOzZhIlzhqER+iwW0xdnwN
-         CjU/QWadShK1AfdBW8vwRrDhr+Q1em3CE2gWxYonacfHy+B6aJ3CuyvKtLQ1rGOerM4z
-         dxKq1HmCQUXKKzMCmv4HWNmn88nozkmTbmfq3dyVwjNCtss2TOI4kmZXOb4giE4Scz03
-         TriVTm7zPwRrpy5kL7p7elEPdGdr1mmExaSr6n04Sq1CTPCLD8QaT40nDqE/R5VaGZ5K
-         AZ6Z6dXqX5qiBY9qugWboFHYCvY//vREeH8H7viBDNNr72/aBIZ6U7V05bVsAYoAy+Ya
-         rJLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW+GBxRV/V/nK3jjXgIte4l2Q+5HeYNYN0GveyYVUPnruuwrg2s64DjLLq6oZQntWh0c/FB99o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLKV2yvzntWhrPjh+yeSN2bnMBFg7Y7xl1XRmv+7QzT5YrZPZC
-	xbia/LIM16XzccgSt8Lw3RRtDIqoT3f1Qto3C5gw3xsaBY3VDI8nj1oKaHz1jUcqqhmQw35A08o
-	HL7ii1moc4w==
-X-Google-Smtp-Source: AGHT+IH62eArbiEmYhE6g3pKu9rRM3SROHYyzoXcn8OCPe3+NNi33Y3J8FjiF8vYfWho59d5iBGzDei+OgJa9Q==
+        bh=h3wiCBXZ8nr1yKT9yyi5IAvXAKwwla0kpy0xY/U0HUc=;
+        b=vhwwKJ4mSENpvB4evIj2xyF/kFEdNE6b0jU0dOmZSqaC5RrhHuI/gQODp3fpwrtwBp
+         1SuH7K9u0GMwOZ+egcjxtgS2wClpOXkMbxaG1PSxxRijowg+1MXzG8OxAfDFiBg4mHg+
+         rUn9rGkUHcnrXm+iuKaRkpiKXHqCvOT6cFTtZTAlvOQ2eHqIdIKL4RPceEjovJE1kmT0
+         DyA/EPpguaWErAfZEb12zBre7mPvnSVqBFOOWZHdYpAp0KaU1NAKfDXyHpL0plXhJj2d
+         vsHeR2re3O8/AX8Ko4DKXHmd8zwCgPw+xO/2XFmlHh1vWondW0NdiYbt43mFjODVDK8d
+         /iHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXJQjikS32q/Jsm7Ctp+vR+CP6fekiZpCsFnZMkOLt+QRzcwOmLl/mo5J1sGCawjoem0KAJMhs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxrq7wHPNbF/ubqrW29QTnlv6UcEEE/FyAk8zSZklGg89wA34+n
+	/AO1cNusCYBFrmyWXd1NXmQc7f1jgYSd/W7fTQ25X/nKKBAJJyXVeBSoJXEARjaY4R6GPDwhcSt
+	8oxR/H2swDw==
+X-Google-Smtp-Source: AGHT+IHO0CfV6PAIF8JSqKWhMs+641yhNfHS7BSmwz6Iu0/Zx+TbUUkxwh6rPx/tVbJyg3FEnGABjMXnZYaDMg==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:620a:137a:b0:7b1:11a1:ab6c with SMTP
- id af79cd13be357-7b111a1b804mr226285a.5.1728582504963; Thu, 10 Oct 2024
- 10:48:24 -0700 (PDT)
-Date: Thu, 10 Oct 2024 17:48:15 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:690c:4046:b0:6e2:1eba:ac07 with SMTP
+ id 00721157ae682-6e32216f5b0mr732147b3.5.1728582506406; Thu, 10 Oct 2024
+ 10:48:26 -0700 (PDT)
+Date: Thu, 10 Oct 2024 17:48:16 +0000
 In-Reply-To: <20241010174817.1543642-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241010174817.1543642-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241010174817.1543642-4-edumazet@google.com>
-Subject: [PATCH v3 net-next 3/5] net: add skb_set_owner_edemux() helper
+Message-ID: <20241010174817.1543642-5-edumazet@google.com>
+Subject: [PATCH v3 net-next 4/5] ipv6: tcp: give socket pointer to control skbs
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,75 +84,35 @@ Cc: Martin KaFai Lau <martin.lau@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.c
 	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This can be used to attach a socket to an skb,
-taking a reference on sk->sk_refcnt.
+tcp_v6_send_response() send orphaned 'control packets'.
 
-This helper might be a NOP if sk->sk_refcnt is zero.
+These are RST packets and also ACK packets sent from TIME_WAIT.
 
-Use it from tcp_make_synack().
+Some eBPF programs would prefer to have a meaningful skb->sk
+pointer as much as possible.
+
+This means that TCP can now attach TIME_WAIT sockets to outgoing
+skbs.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/sock.h    | 9 +++++++++
- net/core/sock.c       | 9 +++------
- net/ipv4/tcp_output.c | 2 +-
- 3 files changed, 13 insertions(+), 7 deletions(-)
+ net/ipv6/tcp_ipv6.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index 703ec6aef927337f7ca6798ff3c3970529af53f9..e5bb64ad92c769f3edb8c2dc72cafb336837cabb 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1758,6 +1758,15 @@ void sock_efree(struct sk_buff *skb);
- #ifdef CONFIG_INET
- void sock_edemux(struct sk_buff *skb);
- void sock_pfree(struct sk_buff *skb);
-+
-+static inline void skb_set_owner_edemux(struct sk_buff *skb, struct sock *sk)
-+{
-+	skb_orphan(skb);
-+	if (refcount_inc_not_zero(&sk->sk_refcnt)) {
-+		skb->sk = sk;
-+		skb->destructor = sock_edemux;
-+	}
-+}
- #else
- #define sock_edemux sock_efree
- #endif
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 083d438d8b6faff60e2e3cf1f982eb306a923cf7..f8c0d4eda888cf190b87fb42e94eef4fb950bf1f 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2592,14 +2592,11 @@ void __sock_wfree(struct sk_buff *skb)
- void skb_set_owner_w(struct sk_buff *skb, struct sock *sk)
- {
- 	skb_orphan(skb);
--	skb->sk = sk;
- #ifdef CONFIG_INET
--	if (unlikely(!sk_fullsock(sk))) {
--		skb->destructor = sock_edemux;
--		sock_hold(sk);
--		return;
--	}
-+	if (unlikely(!sk_fullsock(sk)))
-+		return skb_set_owner_edemux(skb, sk);
- #endif
-+	skb->sk = sk;
- 	skb->destructor = sock_wfree;
- 	skb_set_hash_from_sk(skb, sk);
- 	/*
-diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
-index 1251510f0e58da6b6403d2097b498f3e4cb6d255..4cf64ed13609fdcb72b3858ca9e20a1e65bd3d94 100644
---- a/net/ipv4/tcp_output.c
-+++ b/net/ipv4/tcp_output.c
-@@ -3731,7 +3731,7 @@ struct sk_buff *tcp_make_synack(const struct sock *sk, struct dst_entry *dst,
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 7634c0be6acbdb67bb378cc81bdbf184552d2afc..597920061a3a061a878bf0f7a1b03ac4898918a9 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -967,6 +967,9 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
+ 	}
  
- 	switch (synack_type) {
- 	case TCP_SYNACK_NORMAL:
--		skb_set_owner_w(skb, req_to_sk(req));
-+		skb_set_owner_edemux(skb, req_to_sk(req));
- 		break;
- 	case TCP_SYNACK_COOKIE:
- 		/* Under synflood, we do not attach skb to a socket,
+ 	if (sk) {
++		/* unconstify the socket only to attach it to buff with care. */
++		skb_set_owner_edemux(buff, (struct sock *)sk);
++
+ 		if (sk->sk_state == TCP_TIME_WAIT)
+ 			mark = inet_twsk(sk)->tw_mark;
+ 		else
 -- 
 2.47.0.rc1.288.g06298d1525-goog
 
