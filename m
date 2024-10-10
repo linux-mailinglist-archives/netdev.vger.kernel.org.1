@@ -1,115 +1,75 @@
-Return-Path: <netdev+bounces-134187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD6BA998536
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:40:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE98998556
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60C7828828C
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F7EA1C214A0
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC431C32EC;
-	Thu, 10 Oct 2024 11:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mojZMIJG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1091C2454;
+	Thu, 10 Oct 2024 11:49:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D1DF1C2335;
-	Thu, 10 Oct 2024 11:40:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD577183CD9;
+	Thu, 10 Oct 2024 11:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728560443; cv=none; b=uCwtbCekngdx1OxTrXs1Fb92JNxjvr7cQXO5sK00tLEEteA/CqdnLryIV3X953eEl7D+4s4YCZzcqalGZMebxERgOrj3GQO9k6UlqtWawlxSjeD1DDo2BXpBnctuBl29sgdJAqPVMBmA/sJRb2PhOnQkAna0DNVUG3HPwcT5fV4=
+	t=1728560977; cv=none; b=t8e7mZz3OMUnxnfGJh1IB7yvaq8Zl9yV30iPi51YLV1D8Ek8UrWn2HAbyi9kiUmg+DZ1c6R4nuBNfUshI3PUZs8zJnLAdKoUwt+mOO9e697MhDhiyhU1Ki7OHTVPRU0CH2hUNqqDeDxaa3FynZiqVoFr/YqZ/2spl4RSqtifhcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728560443; c=relaxed/simple;
-	bh=0nhrCr2PZs8ONEkaN8aHwqAMQ0ewXcVDmuq5hAdI4Ao=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ep10/ouSPrKNlHIMaA09spXbz0bdm4oECsVYTqQp64HbJc0h+d7+QXR0+csLap/b9noEnjSKzKWak4HHmqpSKlIgXyBB1I+Q0YX5JKtYMgaIHsJkMprRhqQe//rw+8gNuT1pdZohtY2+8emT8tiXlk/1V7ZTFsrtmupPOLbE70Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mojZMIJG; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e2916a92ffso810241a91.1;
-        Thu, 10 Oct 2024 04:40:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728560441; x=1729165241; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0kfw5SfshTy6Jgglhl1DNAUC4ZZIqSCCMDDYRxuV0D0=;
-        b=mojZMIJGGkyLpWyKftoK6gXjPeFO8x6QOk3M15HjQy8UCtcKxz0RgyOqD2Ba/AfgxP
-         /HVLzl4w/RlrlqYXTSJTTDDLYEEufnWRUmyDG+KPjWfZpn/ngDyQp7v8BaNQHTdDhYlL
-         YJ2xb///AVOJXqFXFWpZMl+GxszroXLRKhtdbCPGosnT7kjwfi5FfKGQuUVJ3PpMjoxq
-         DXl4JGBUInwVAJGDcCGKLL8wVGFlj2siEjA9gAlbqe1VEqzd8EVyT5parzWf2WuXyV7f
-         GuyFvG2SY34ctoWvs1ijfm98iKLN7n1eTj4tPJqEiJwPbI/RvnTD6k8bssh8/3/xjsB8
-         0/og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728560441; x=1729165241;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0kfw5SfshTy6Jgglhl1DNAUC4ZZIqSCCMDDYRxuV0D0=;
-        b=TWxQpzYIz/SFSQtFcToytQyQK79i3UR/KRKAN/VyX+MMSGM676+yPSZnDxhGlmi6S1
-         44SimxjaOJLD2dRtUc6TyOwlqop3iNsdU5tdsxuPqGSsXqKkeYvwB8tpvKLN1d4rBAD7
-         Rg907qKN7rZc1YZQ8C1dVK5KuN7bD7ZCIrR+hqjNFWX1zARidtjATreSyzqzhsI9VOOg
-         tPk1J8Gq7pLHof+UZ12UHe/1pDAuqYD8FNl6RGQKvCTi3JakoyAz22lG21auFji2yoii
-         5nOayFwMXHkccjVy1+EWTdQWvKeEZCQzVgZ/Okm1j86Esr1kSmZETKWrjJlrSjDs8AEv
-         0uDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVVusYpj4gwXvSV8ZBX2mCWKMlq7D8AHb4AZgS4tW0ltqfRy+B8m4RkkHf7ezS/98A2lDEQiBRwtzmj1Qo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yymw0wDX/eI5ee9opBI8+V5ePF5hpvX6Ar3FWX3QZrffeFttriX
-	NUWSH6dXeVv8VHXBMR27MHTtuXmjFVMffc0C0/QpZHll/AsZNflErFLBiQ==
-X-Google-Smtp-Source: AGHT+IEDxQ3iGYqIDhPytQarvl0jfe/KjMrCR6KtdwERdxwXsGade04JshGu0DnkUF57NPQiJSoLQw==
-X-Received: by 2002:a17:90a:ce94:b0:2e2:8995:dd10 with SMTP id 98e67ed59e1d1-2e2a21eeab7mr7340102a91.4.1728560440899;
-        Thu, 10 Oct 2024 04:40:40 -0700 (PDT)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2e2a5aaada6sm3396483a91.37.2024.10.10.04.40.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 04:40:40 -0700 (PDT)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1] page_pool: check for dma_sync_size earlier
-Date: Thu, 10 Oct 2024 19:40:19 +0800
-Message-Id: <20241010114019.1734573-1-0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1728560977; c=relaxed/simple;
+	bh=dsavc7aCLpr1amf6pmWGA9HnXnSGW9kXtxo3xOPhjwU=;
+	h=From:To:CC:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QG1zp0A8UsiE0RBDOek7YXLbYy+9SlyIZdhFhwF0ljm4HF4RZgJXM0KJKfZiOL6QaxxcI3EXgXaSa/0IfHEglhBKIuXibZFMHZD8pHhNRJ4yXGUZVx5fYP5Vy1B1kcw99FXhQrvOPjkcorv4vi8kgijdwaMB328Cuiw1VxzwCEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XPSc65pB6z6LCkk;
+	Thu, 10 Oct 2024 19:45:10 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id 8440E140AE5;
+	Thu, 10 Oct 2024 19:49:31 +0800 (CST)
+Received: from GurSIX1 (10.204.104.168) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 10 Oct
+ 2024 13:49:25 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>
+References: <67054127bb083_18b21e2943f@willemb.c.googlers.com.notmuch> <20241009065837.354332-1-gur.stavi@huawei.com> <67068a44bff02_1cca3129431@willemb.c.googlers.com.notmuch> <002201db1a75$9a83b420$cf8b1c60$@huawei.com> <67072012c983a_1e805629421@willemb.c.googlers.com.notmuch> 
+In-Reply-To:
+Subject: RE: [PATCH net-next v02 1/2] af_packet: allow fanout_add when socket is not RUNNING
+Date: Thu, 10 Oct 2024 14:49:19 +0300
+Message-ID: <003001db1b0a$77bcdad0$67369070$@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHbGWzwQMZqw76ooUWOpIJuIeDZyLJ8x9WAgAEVHYCAAHM4AIAA1CkdgABhFHCAAFwugA==
+Content-Language: en-us
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-Setting dma_sync_size to 0 is not illegal, and several drivers already did.
-We can save a couple of function calls if check for dma_sync_size earlier.
+> I realized another possible problem. We should consider adding ifindex
+> Field to struct packet_fanout to be used for lookup of an existing match.
+> There is little sense to bind sockets to different interfaces and then
+> put them in the same fanout group.
+> If you agree, I can prepare a separate patch for that.
 
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- net/core/page_pool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My mistake: testing match->prot_hook.dev takes care of that.
 
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index a813d30d2135..fac52ba3f7c4 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -454,7 +454,7 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
- 			      netmem_ref netmem,
- 			      u32 dma_sync_size)
- {
--	if (pool->dma_sync && dma_dev_need_sync(pool->p.dev))
-+	if (dma_sync_size && pool->dma_sync && dma_dev_need_sync(pool->p.dev))
- 		__page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
- }
- 
--- 
-2.34.1
 
 
