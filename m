@@ -1,139 +1,185 @@
-Return-Path: <netdev+bounces-134321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A64F998C91
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:59:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 964BB998C99
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:01:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 586DC1C24506
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:59:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B4DD1F2203A
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 16:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EB71CCEE3;
-	Thu, 10 Oct 2024 15:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="AQ5s48re"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766401CBE80;
+	Thu, 10 Oct 2024 16:01:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725811C9B63
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F203E4207F;
+	Thu, 10 Oct 2024 16:01:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728575976; cv=none; b=ZMkafNZwiL1g9t4CwpxUapw9robrJcWSLUhzeA9qO8bcDbyGIV7WUvAKSJAX8dfN5WWUOqW6WZ4l1jGsTQo/hcoy3CytOeedfVp00wlsqPch7O7IHG2u48yi6TBQL4MJ65GwdbsrV0becC14tAvN8Cu3XIHfjiuWTvi8xorf1vA=
+	t=1728576076; cv=none; b=WP3AgubWdFZWewN/EySnk8Xm9UWuQWCFiLYjJkUX47iz25L8LMTYOj6RwwBjo5gZdsXqONguLuyLzossi/Q51WfwMoXZFbs2ElMtxV2LCmGdYgBNdiTy3PZlEbdJNGNYnF4S1zoF2Qlr3leK+JV0uhf0/4A3MzRQb+KcV9axlJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728575976; c=relaxed/simple;
-	bh=PfZeNcFw1bT/pN+WBxONE28O+RahXMikU7YuitEDd84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MJYNFYjhRaUEsZi9C6UeT0dShxa72PHNtSrbZtb9q5fHBMTVIBfIcyW+2pOWEScaWQBm05cAimLfCBGPlVMaF9nV4jXK0xa7ZMjFQFIG0HdvIU+YIaU3g8sa1sH3+K3m3vIBvgJilvNt2aMbKvEgcD0YWvm3SnWkCgMVtQs0tnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=AQ5s48re; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3e039889ca0so621825b6e.3
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:59:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1728575973; x=1729180773; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yeku9+EKhD0eyLZNLUrY1WzCvsvKi1BJ6gq9NUUHrtQ=;
-        b=AQ5s48rekCCbw87iaHEPqcoXvyhDm9vluE6oNylcuF6w+wuBxJVKv56ryVuJkFKOa5
-         ri9P2mcx05hSIH9qyyi92wKEmr6ZD21ffUSYSr+j0NtQhMirHt/IruIgViA8nYqTHJ6x
-         32mpUl8ubnnI42uggIv3yr8QWFwAoYqcZGvmo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728575973; x=1729180773;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yeku9+EKhD0eyLZNLUrY1WzCvsvKi1BJ6gq9NUUHrtQ=;
-        b=lJMh26X5PmLwMWkzlW+hTzipkwjSvt1f6xrphQUu/7on57Jmhq/59HGBUCTV9dXgGj
-         rgXHEjtuh4RUlfANDA8OUy2d1Yk6KQKqVhQXmJxnwO5uItE8yIeg2DZM01mZB4ZLPKMR
-         A9PlwkOkfyE5IXlp048gF5H16qILkIbnt5F0rSU1iYZNNV0rA43JN0L8JASMHcHa4k77
-         8H8qqf6hN7q6FXrE+P2T1s5FxBYoWGFEhHxqJ6AL43pnoYFu17D46deb+TIE6qpwkoDY
-         rRz7zGiqLLb2eIjZ8KwwUO1OUdcGRTyDzCeqLZyUCXuJnPUB+17bWwpKqsTSjS2uzHQB
-         eJTA==
-X-Gm-Message-State: AOJu0Yypau0wZBXvmTUKycILluCneDjl6MSuumGKIUsn0Ahh3JlhOTRE
-	8bvouWS32M0uikNf/nwQWJSlgT4G31CZbTduybWBWYXLPHzdI3LUMxJYCHzaFBY=
-X-Google-Smtp-Source: AGHT+IEtL6WXGzPYuh+MnBkT5NJl2Cl0DdJhepAOU04VKXDoCawCLBlrMQZVO/pkGBZrqJMIhISK1A==
-X-Received: by 2002:a05:6808:1918:b0:3d2:18c1:bf35 with SMTP id 5614622812f47-3e4d71beaddmr4147622b6e.33.1728575973406;
-        Thu, 10 Oct 2024 08:59:33 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea4495d331sm1152526a12.60.2024.10.10.08.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 08:59:32 -0700 (PDT)
-Date: Thu, 10 Oct 2024 08:59:29 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [net-next v5 5/9] net: napi: Add napi_config
-Message-ID: <Zwf54UVvfyx830sk@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
-	bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, willemdebruijn.kernel@gmail.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241009005525.13651-1-jdamato@fastly.com>
- <20241009005525.13651-6-jdamato@fastly.com>
- <CANn89iKytfwyax_d+7U8Xw-Wvj5z1d7xoi4LNhmUQphDiborDQ@mail.gmail.com>
+	s=arc-20240116; t=1728576076; c=relaxed/simple;
+	bh=UH4y1cVuG/rp5iFVwmdeZSf8A6fP63A4SCsHVcjrGq4=;
+	h=From:To:CC:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EkhqTZTkuNv1FerwjRO4ytQXCjuqjYwOprfu5XFTrM63aUod4KvmpOjCMqNmk4//X7CN6QTpNE2FMfXOKGnuBj4EX8jtF5fAV7Zpl9ck5fOXCMSXdR1nGiBYfD7cB3XBvNxDjClJb9Po8KM6AmSt42tlmRKkEEADEhEtQfmbt/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XPZBV4d5xz6J7t4;
+	Thu, 10 Oct 2024 23:56:50 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id CB3FC140518;
+	Fri, 11 Oct 2024 00:01:11 +0800 (CST)
+Received: from GurSIX1 (10.204.104.168) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 10 Oct
+ 2024 18:01:05 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: 'Willem de Bruijn' <willemdebruijn.kernel@gmail.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>
+References: <cover.1728555449.git.gur.stavi@huawei.com> <9e15c0c2cd19d94207a1791de0dc9051a5abb95a.1728555449.git.gur.stavi@huawei.com> <6707d56835f42_2029212942b@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6707d56835f42_2029212942b@willemb.c.googlers.com.notmuch>
+Subject: RE: [PATCH net-next v03 1/3] af_packet: allow fanout_add when socket is not RUNNING
+Date: Thu, 10 Oct 2024 19:00:58 +0300
+Message-ID: <000001db1b2d$9f9a00f0$dece02d0$@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iKytfwyax_d+7U8Xw-Wvj5z1d7xoi4LNhmUQphDiborDQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHbGv7mksA7veRkl0u2n9N9OvQm77J/18cAgABJxLA=
+Content-Language: en-us
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-On Thu, Oct 10, 2024 at 06:20:57AM +0200, Eric Dumazet wrote:
-> On Wed, Oct 9, 2024 at 2:56 AM Joe Damato <jdamato@fastly.com> wrote:
-
-[...]
-
-> > +
-> > +static void napi_hash_add_with_id(struct napi_struct *napi,
-> > +                                 unsigned int napi_id)
-> > +{
-> > +       spin_lock(&napi_hash_lock);
-> > +       __napi_hash_add_with_id(napi, napi_id);
+> Gur Stavi wrote:
+> > PACKET socket can retain its fanout membership through link down and up
+> > and leave a fanout while closed regardless of link state.
+> > However, socket was forbidden from joining a fanout while it was not
+> > RUNNING.
+> >
+> > This patch allows PACKET socket to join fanout while not RUNNING.
+> >
+> > The previous test for RUNNING also implicitly tested that the socket is
+> > bound to a device. An explicit test of ifindex was added instead.
+> >
+> > Signed-off-by: Gur Stavi <gur.stavi@huawei.com>
+> > ---
+> >  net/packet/af_packet.c | 35 +++++++++++++++++++++--------------
+> >  1 file changed, 21 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > index f8942062f776..8137c33ab0fd 100644
+> > --- a/net/packet/af_packet.c
+> > +++ b/net/packet/af_packet.c
+> > @@ -1843,26 +1843,29 @@ static int fanout_add(struct sock *sk, struct
+> fanout_args *args)
+> >  		match->prot_hook.ignore_outgoing = type_flags &
+> PACKET_FANOUT_FLAG_IGNORE_OUTGOING;
+> >  		list_add(&match->list, &fanout_list);
+> >  	}
+> > -	err = -EINVAL;
+> >
+> >  	spin_lock(&po->bind_lock);
+> > -	if (packet_sock_flag(po, PACKET_SOCK_RUNNING) &&
+> > -	    match->type == type &&
+> > -	    match->prot_hook.type == po->prot_hook.type &&
+> > -	    match->prot_hook.dev == po->prot_hook.dev) {
+> > +	if (po->ifindex == -1 || po->num == 0) {
 > 
-> Hmmm... there is no check if 'napi_id' is already used and hashed.
+> This patch is more complex than it needs to be.
 > 
-> I would add
+> No need to block the case of ETH_P_NONE or not bound to a socket.
+
+
+ETH_P_NONE was blocked before as well.
+packet_do_bind will not switch socket to RUNNING when proto is 0.
+
+	if (proto == 0 || !need_rehook)
+		goto out_unlock;
+
+Same for packet_create.
+
+So the old condition could only pass the RUNNING condition if proto
+was non-zero.
+The new condition is exactly equivalent except for allowing IFF_UP
+to be cleared in the bound device.
+
+
+Yes, the same result could be achieved with a FEW less line changes
+but I think that the new logic is more readable where every clause
+explains itself with a comment instead of constructing one large if
+statement. And since the solution does add another nested if for the
+RUNNING the extra indentation started to look ugly.
+
 > 
-> WARN_ON_ONCE(napi_by_id(napi_id));
+> I would have discussed that in v2, but you already respun.
+> 
+> > +		/* Socket can not receive packets */
+> > +		err = -ENXIO;
+> > +	} else if (match->type != type ||
+> > +		   match->prot_hook.type != po->prot_hook.type ||
+> > +		   match->prot_hook.dev != po->prot_hook.dev) {
+> > +		/* Joining an existing group, properties must be identical */
+> > +		err = -EINVAL;
+> > +	} else if (refcount_read(&match->sk_ref) >= match->max_num_members)
+> {
+> >  		err = -ENOSPC;
+> > -		if (refcount_read(&match->sk_ref) < match->max_num_members) {
+> > +	} else {
+> > +		/* Paired with packet_setsockopt(PACKET_FANOUT_DATA) */
+> > +		WRITE_ONCE(po->fanout, match);
+> > +		po->rollover = rollover;
+> > +		rollover = NULL;
+> > +		refcount_set(&match->sk_ref, refcount_read(&match->sk_ref) +
+> 1);
+> > +		if (packet_sock_flag(po, PACKET_SOCK_RUNNING)) {
+> >  			__dev_remove_pack(&po->prot_hook);
+> > -
+> > -			/* Paired with packet_setsockopt(PACKET_FANOUT_DATA) */
+> > -			WRITE_ONCE(po->fanout, match);
+> > -
+> > -			po->rollover = rollover;
+> > -			rollover = NULL;
+> > -			refcount_set(&match->sk_ref, refcount_read(&match-
+> >sk_ref) + 1);
+> >  			__fanout_link(sk, po);
+> > -			err = 0;
+> >  		}
+> > +		err = 0;
+> >  	}
+> >  	spin_unlock(&po->bind_lock);
+> >
+> > @@ -3452,8 +3455,12 @@ static int packet_create(struct net *net, struct
+> socket *sock, int protocol,
+> >  	po->prot_hook.af_packet_net = sock_net(sk);
+> >
+> >  	if (proto) {
+> > +		/* Implicitly bind socket to "any interface" */
+> > +		po->ifindex = 0;
+> >  		po->prot_hook.type = proto;
+> >  		__register_prot_hook(sk);
+> > +	} else {
+> > +		po->ifindex = -1;
+> >  	}
+> >
+> >  	mutex_lock(&net->packet.sklist_lock);
+> > --
+> > 2.45.2
+> >
+> 
 
-Thanks for the careful review, Eric.
 
-I agree that adding this is a good idea and I will do so for the v6.
-
-Jakub: I hope that it's OK if I retain your Reviewed-by tag as the
-change Eric suggested is a minor one?
-
-If you'd prefer I drop your Reviewed-by from this one, please let me
-know.
 
