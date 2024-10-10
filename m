@@ -1,71 +1,76 @@
-Return-Path: <netdev+bounces-133982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 849DD9979B9
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:40:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF339979BC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:41:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96FE11C21B52
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADEAD1C212BF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F331CF9D6;
-	Thu, 10 Oct 2024 00:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5A6FC1D;
+	Thu, 10 Oct 2024 00:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d2ailaP0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntLI+1jf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6EFB663;
-	Thu, 10 Oct 2024 00:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05818653;
+	Thu, 10 Oct 2024 00:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728520845; cv=none; b=ORxEsyuIMNNzk+nYs8yx1BRlPEHRNq1xkE6P+LfUbpBHO6uDvARtwfZUMeWg8/Ie5VtZbLFy5gOQ5g5+V2C1Fo//GZzAf5O65QlPkEtrCuzxFzryP9WoDL9TznIFDcz06lDg8RUwyWiJijJDqpJpfmF0qWnw/qAWx1MAbGkJ7OA=
+	t=1728520862; cv=none; b=MD+vbTP5US5yjfydanoXRSpAx7la8Z/jo3NTst7Fl/ERt2brt2N78RiMe8/gi/Z/dJF7jowYLPCYQOpc1ohoDor6ZkQ8nMVxRqDvgYj/HMPTeRPH6H8+/chL4BjAGlpNpf3biF6h+HxdWlHpmY0HBpE1kT6Ljy0SFV1IzHLBtTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728520845; c=relaxed/simple;
-	bh=LGQQFAe4FHQHQplEGjQktv77dM+d2ZeVL9PVG4kD3UQ=;
+	s=arc-20240116; t=1728520862; c=relaxed/simple;
+	bh=0YPN352ZMIr78s4hQESniUD3jXxZkqYAQV/HlVk90QY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uz3XoYOfDqowUxazW15XKI8FKflX04ymDByWbzMyHPYvTMk5qZ0DbsMyF7255O9M1i1zynQDIa9vAy/YWMTsa0p4P79aHTT+hDv8arRwkM8+inoHYJS98cBr+c+DiUFDCsnUoAUV7GJHC3+4KPHlMeKY3zEUo2Qnm5PVPUULQO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d2ailaP0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12007C4CEC3;
-	Thu, 10 Oct 2024 00:40:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fN8kS9IxhmqzlftHJYi/PODmJwU6c9psmMeezsCSnU9sX6ry/lYluM0luzvZ+JSURVri98gNQZcfYijeEItTq4v9ot0AjDf1NvQ21xnKvyjxloF6VGnWvfV9STh1rAUdHRKIVXUzrSy9UdZViO3Yhjk92s00p2ufrnfjT1V5hl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntLI+1jf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C438C4CED0;
+	Thu, 10 Oct 2024 00:41:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728520845;
-	bh=LGQQFAe4FHQHQplEGjQktv77dM+d2ZeVL9PVG4kD3UQ=;
+	s=k20201202; t=1728520861;
+	bh=0YPN352ZMIr78s4hQESniUD3jXxZkqYAQV/HlVk90QY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d2ailaP0KLqR3VCE0dUQ3JN1ZGhbWnSPWmw7PkNmoAoBJIuKi98bir2R2/BUPXwR3
-	 gncKiVUlSOCQjkzN4Of+sxvgPgiJea/vYhYxpub/OLUK7gT4Lw+Sjj256nyurHiM2M
-	 m2Ze9vFI8lkWFWRXIlr7NNd97ZPQLb4TupeHIeIVb3vAKWlc/0XQHp+vIvw0Jc7X4E
-	 C67br5aaU+/L+np/pUegyO9zzF7aF1StFZktFMQwABfj46Drw7s1EZ7n8gjuZn76J9
-	 O6uH3aeMmxVPwnuJGDhzw1Ilr+lCjQYt0z775u/rgpbMwCNr2Kf3us4uuq+OfqcWrG
-	 USEHWGY5k7ZhA==
-Date: Wed, 9 Oct 2024 17:40:44 -0700
+	b=ntLI+1jfNDaQAtcla1Yrqko/cXXfjy7Fm7F8z0mcbjOyFT2mOPGtmSBujFKkF3Xry
+	 qjPxm92GvieelOkEMWWPFDQojRoL1ezk4TN6dE3zza4UDPAHiKcIolg6/svDcPX3Q8
+	 YwbUDjDaihBecvwYyw7FPP0FtZuo3zn4KKr1vQsgXaMdxnlHAE5qH3KIa2ZbIMRD9Z
+	 +G0n3EN+nPA0em2ILcGDPEX9jX8eBjd0DfPiLiUn9iWeFrzxMvf29kaO7ZZQL39S+H
+	 Bidx2/tHqYPqxWQzRIDkjUXbJ9d5HxbXrKQ6c6dc9iZnrOaTcDnGDGVOTBU+Rwza0x
+	 gOUdEPUEP7Uqw==
+Date: Wed, 9 Oct 2024 17:41:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shengyu Qu <wiagn233@outlook.com>
-Cc: linux@armlinux.org.uk, andrew@lunn.ch, hkallweit1@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v1] net: sfp: change quirks for Alcatel Lucent G-010S-P
-Message-ID: <20241009174044.73e1fce0@kernel.org>
-In-Reply-To: <TYCPR01MB843714CF627B46DFA06E471B98732@TYCPR01MB8437.jpnprd01.prod.outlook.com>
-References: <TYCPR01MB843714CF627B46DFA06E471B98732@TYCPR01MB8437.jpnprd01.prod.outlook.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
+ <rafal@milecki.pl>, Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH] net: bgmac: use devm for register_netdev
+Message-ID: <20241009174100.033a2676@kernel.org>
+In-Reply-To: <20241006013937.948364-1-rosenp@gmail.com>
+References: <20241006013937.948364-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 6 Oct 2024 00:04:29 +0800 Shengyu Qu wrote:
-> Seems Alcatel Lucent G-010S-P also have the same problem that it uses
-> TX_FAULT pin for SOC uart. So apply sfp_fixup_ignore_tx_fault to it.
+On Sat,  5 Oct 2024 18:39:37 -0700 Rosen Penev wrote:
+> Removes need to unregister in _remove.
+>=20
+> Tested on ASUS RT-N16. No change in behavior.
 
-Looks like your email client (or server) has corrupted the patch.
-Please try resending using git send-email?
--- 
-pw-bot: cr
+I defer to the maintainer (Rafa=C5=82) on whether it makes sense or not.
+My personal preference is to leave existing code be.
+*Iff* you get an ack please repost, it's the oldest patch in our
+patchwork now.
+--=20
+pw-bot: defer
 
