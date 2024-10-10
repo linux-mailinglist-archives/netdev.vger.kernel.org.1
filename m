@@ -1,70 +1,74 @@
-Return-Path: <netdev+bounces-134414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71304999450
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 23:19:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 616E6999457
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 23:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A07B21C22769
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:19:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 648A11C21454
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:22:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A920E1E4121;
-	Thu, 10 Oct 2024 21:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441241E1C13;
+	Thu, 10 Oct 2024 21:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bNYWRJjc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I0tTtZBw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC171E1C13
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 21:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA6819CD1B;
+	Thu, 10 Oct 2024 21:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728595143; cv=none; b=rCEIhhz0LcF0oBzwIDoNf+hfzst29SqkXHYRVvUGU18hWbpLFhoEgzTtKDW2mq4MCI5ri1uuW18+k4UbgnfhA/9X6uk2u+wfRfud/2WoViiuT3dFYwCeTLrYWGIrdHiQ9l/oLOwqsR09vybJRDZ0WWS05Ny1zsm2WNnsljILfME=
+	t=1728595337; cv=none; b=hG0+pwdSKBkZwy0uwtC+WoF3eagfDot8dAz8rdm08XY5lG4eYqI4TgPia1JxxmNGU5M+1Qw5qh0XEQkj1AV5V9sFEGBGCqKuXfF3Bqj4ZiJV6L3sFsPDZgGdEZmwbgsfXfOwhqEuEcBXyPJp8e/4tNNjWp13pnymqLrYLUjBj/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728595143; c=relaxed/simple;
-	bh=XgFyRsRqIXnwJJtXgPqzhU6CtjwMWa+ou90c0icQbx0=;
+	s=arc-20240116; t=1728595337; c=relaxed/simple;
+	bh=VmrQkJxFV/UqdyAIDY5SIDP07fndQpvIcz4Z7fpRKZo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IMl2iz4bNmRxAinbXeq7Mfp1utRJlh/Gq7ViCojlgMIyjFSlYrAG/6HUMGCGjBsUicBp83Iw4y2S65HaWlmnGZDnAOngoG57ew8dgNy/ONsPLc/Qkqzdv+SJe3OMKIjUe69xkebr+7xu+bY6RaeHqM1RWBAkS7b3hevz7osJtR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bNYWRJjc; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-835464abfa7so49082939f.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 14:19:00 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=oOjAQx6AmCnO+MnCHM1JY2PgyRKVwtU8wd0RjUq4Zpkt9sJLurCc6kSGEr5SSGlt5blA5BkMbsXhWbhf72G1gnof142kfuuaHX27DB3xjAirjYMtKGS7CrWGIndTjxeUVYOMoyhOfvjpLRJI8gnHy8GLbp5xLhsCNR3c4bKx1Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I0tTtZBw; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c42e7adbddso1696182a12.2;
+        Thu, 10 Oct 2024 14:22:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1728595140; x=1729199940; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728595334; x=1729200134; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=nBZbBlwQa7HT+/mui9xTJE7fZJhA2rmF/mcQQtgNOAo=;
-        b=bNYWRJjc1UpZiY4Iip35UUkTTGmuanbWWaFqetgyZP3a4urjmfcRoli4PiZEWbbTPB
-         IJLAlqfX8Uc/oAB0VM7+45RC7bIq7l7jjJJjHqbmSftZS2Fm9yoSJAyPxJzgHp23F0eG
-         ZTpivwUPD1fUasmUYMKpr4bn78qOESMYRFy6M=
+        bh=xSvAET0RtvVtYiv3KxcsZgImHwHZbzkRtTq+trQbCXw=;
+        b=I0tTtZBwBaqb9ZGHu1gzzWjVyGgupjdtiGHgb1XqlerThGm2+xlgdXB9td0LicFEOw
+         mBN/z8k5kjutBGZ07tZjkzb+LozNJv+/yYqSrSLosPWcnxIq9ajSpyEOSXurb0TgEy7W
+         3xrHdxIX2N4v71SGgdpliUTbT9nX5MBKqjOTOrQzaQU9yf6GKwxBMxUecxIRFPrAmBII
+         x1X2Wzmc2a6NQDi8CeJGcas14DEBbPHBPY3HLkS8bAMNoI6bH2aOShx7Ozsn1BdddWnn
+         nDukGmpRRXAormbgbsVz4NCulXraUQKGhleuRhUXufEpN8UlnLKTnQvMq2dwlGAJjIGQ
+         o2XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728595140; x=1729199940;
+        d=1e100.net; s=20230601; t=1728595334; x=1729200134;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nBZbBlwQa7HT+/mui9xTJE7fZJhA2rmF/mcQQtgNOAo=;
-        b=I8PQTHYTLEpXuz4rXu/siYSkos/r5H5LqC0SiG+6BsvzLvTsf0svI71DcOvuUNGjE9
-         u+rp6aXuVlyxrAbvw4qhxZRbUsEOlUk0LU/QZL9yyIdK41BUm94wJNvhcURv8HF0vGR7
-         0DB2kktmV5TR5LB9nFqXEuQKp12BhGxp2kCCbIgB0NJtgDUgsztKNS/t+j1Qbzl6SNKF
-         GncV9gjZQemtf7Mu0BJ58tJxlCZb1omik6tcBkV882AaaUKEnNcIGUo8ZTvHPhUkx+0+
-         MCjRf22iodH++SeebtYwv0r935NF3jkIanlIwBZ9fATDTTHyD6BTQOeuZ/Njlt+xWmCA
-         El4w==
-X-Gm-Message-State: AOJu0YxsQ1QLCjGkyPVqH8/jthYQ6aGTV+/yh859izQeB88TuAhb4dxw
-	C5dHDiQxcSkgO9X+oZfLfmKNKWDR+aD/qEO7euVSR8ZMagQSGaKhF8OW/UnS2RU=
-X-Google-Smtp-Source: AGHT+IEYkeeNxtQt681in3Sz57PrDzHIA9l/kBVtyF0yM/0puYCqVuivQ2EI5A8y1bdIaBfyBVotKw==
-X-Received: by 2002:a05:6602:1341:b0:835:3ec0:9 with SMTP id ca18e2360f4ac-83794d44d5cmr28566839f.15.1728595139979;
-        Thu, 10 Oct 2024 14:18:59 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbada841ebsm384083173.112.2024.10.10.14.18.58
+        bh=xSvAET0RtvVtYiv3KxcsZgImHwHZbzkRtTq+trQbCXw=;
+        b=dBOPDkwfbISfSfwLwUSA2RQZtYIzaTtzaXx0B6SQyF9jpw3BsDTz5yqTbLJvaeOb/n
+         DhgHQUpwkNR8NOvwSmfgZ427iMkp9L3HBoNr96RX0fGa6x2gV7YG0KIk+1Putd2J1TMh
+         9WdZIFwllPNDszMmMwPiySXSLOVfH6+raSkoBarptMVnQblnXadbZjaZdlgOvyNAvORX
+         jlYXbKPTFgmcfA6WMC2krWaAckakls/NNSUNoN5FbeVpNMxZ8CrMfYJEGcWybUledT3s
+         tw+o+M+mNhXvILEr35ptr9OS2aG+jDG+GG5TCPAHVe7GemcmhfPCoVXMjTIeeiqddC+o
+         cQxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUW7jsTP1osL3SXf0OdEB8dENI+fUMmINeuTy11+pkSEuIq5hQqy5JrhL+He36w0yXoNUgqTZu+@vger.kernel.org, AJvYcCXv8mY2EktjYlvwO5or8L3oAVfjuuJ2TeoJ/lZPrSCBTHsCxFTZhLDiabW6qBFftxwVWes/tJu6JA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjGvOVF/BlKzPXtcmw+bK/ILW6LfP08hfccyPpWkYkGUW3r16G
+	RTl438C3kcv/pqCS6LKlKHOCelloXnqC05qAObo39QLqzL6XVXYO
+X-Google-Smtp-Source: AGHT+IFFRvNZISyxsGhdFx6m+xzlfADh+kknyc0Wq182er6i/QkbltIDXFT39STgRnaWVqlSicyDOQ==
+X-Received: by 2002:a05:6402:42cf:b0:5c8:8db1:1d55 with SMTP id 4fb4d7f45d1cf-5c948ca0884mr139067a12.10.1728595333508;
+        Thu, 10 Oct 2024 14:22:13 -0700 (PDT)
+Received: from [192.168.42.41] ([148.252.140.94])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c937156973sm1288473a12.58.2024.10.10.14.22.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 14:18:59 -0700 (PDT)
-Message-ID: <d4602ac9-8aa2-490e-be2d-edef517bc4f3@linuxfoundation.org>
-Date: Thu, 10 Oct 2024 15:18:58 -0600
+        Thu, 10 Oct 2024 14:22:12 -0700 (PDT)
+Message-ID: <096387ce-64f0-402f-a5d2-6b51653f9539@gmail.com>
+Date: Thu, 10 Oct 2024 22:22:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,98 +76,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v20 01/14] mm: page_frag: add a test module for
- page_frag
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Alexander Duyck <alexanderduyck@fb.com>,
- Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
- linux-mm@kvack.org, linux-kselftest@vger.kernel.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20241008112049.2279307-1-linyunsheng@huawei.com>
- <20241008112049.2279307-2-linyunsheng@huawei.com>
- <cb1acab0-a4c9-4e31-b6f6-70b8049f1663@linuxfoundation.org>
- <f3f882bf-4120-4daa-b35f-8b1b4e0deb2d@huawei.com>
+Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-12-dw@davidwei.uk>
+ <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com>
+ <94a22079-0858-473c-b07f-89343d9ba845@gmail.com>
+ <CAHS8izPjHv_J8=Hz6xZmfa857st+zyA7MLSe+gCJTdZewPOmEw@mail.gmail.com>
+ <f89c65da-197a-42d9-b78a-507951484759@gmail.com>
+ <CAHS8izMrPuQNvwGwAUjh7GAY-CoC81rc5BD1ZMmy-nNds3xDgA@mail.gmail.com>
 Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <f3f882bf-4120-4daa-b35f-8b1b4e0deb2d@huawei.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMrPuQNvwGwAUjh7GAY-CoC81rc5BD1ZMmy-nNds3xDgA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 10/8/24 21:59, Yunsheng Lin wrote:
-> On 2024/10/9 3:56, Shuah Khan wrote:
->> On 10/8/24 05:20, Yunsheng Lin wrote:
->>> The testing is done by ensuring that the fragment allocated
->>> from a frag_frag_cache instance is pushed into a ptr_ring
->>> instance in a kthread binded to a specified cpu, and a kthread
->>> binded to a specified cpu will pop the fragment from the
->>> ptr_ring and free the fragment.
+On 10/10/24 21:53, Mina Almasry wrote:
+> On Thu, Oct 10, 2024 at 1:26 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+...
 >>>
->>> CC: Alexander Duyck <alexander.duyck@gmail.com>
->>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->>> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+>>> Sorry I wasn't clear. By 'this' I'm referring to:
+>>>
+>>> "from where our ->alloc_netmems implementation can grab it, check
+>>> references, put IO_ZC_RX_UREF, and recycle the buffer if there are no
+>>> more users left"
+>>>
+>>> This is the part that I'm not able to stomach at the moment. Maybe if
+>>> I look deeper it would make more sense, but my first feelings is that
+>>> it's really not acceptable.
+>>>
+>>> alloc_netmems (and more generically page_pool_alloc_netmem), just
+>>> allocates a netmem and gives it to the page_pool code to decide
 >>
->> Signed-off-by should be last. Same comment on all the other
+>> That how it works because that's how devmem needs it and you
+>> tailored it, not the other way around. It could've pretty well
+>> been a callback that fills the cache as an intermediate, from
+>> where page pool can grab netmems and return back to the user,
+>> and it would've been a pretty clean interface as well.
+>>
 > 
-> Hi, Shuah
+> It could have been, but that would be a much worse design IMO. The
+> whole point of memory proivders is that they provide memory to the
+> page_pool and the page_pool does its things (among which is recycling)
+> with that memory. In this patch you seem to have implemented a
+> provider which, if the page is returned by io_uring, then it's not
+> returned to the page_pool, it's returned directly to the provider. In
+> other code paths the memory will be returned to the page_pool.
 > 
-> I used 'git am' to collect those tag, it seems that is the order
-> the tool applied, and I checking other applied commit, it seems
-> only Signed-off-by from the committer is the last, like the below
-> recent mm commit:
-> 6901cf55de22
-> ff7f5ad7bce4
+> I.e allocation is always:
+> provider -> pp -> driver
 > 
-
-okay.
-
->> patches in this series. When you have 4 patches, it is a good
->> practice to add cover-letter.
+> freeing from io_uring is:
+> io_uring -> provider -> pp
 > 
-> I guess the cover-letter meant below?
-> https://lore.kernel.org/all/20241008112049.2279307-1-linyunsheng@huawei.com/
-
-Somehow this isn't in my Inbox.
-
+> freeing from tcp stack or driver I'm guessing will be:
+> tcp stack/driver -> pp -> provider
 > 
+> I'm recommending that the model for memory providers must be in line
+> with what we do for pages, devmem TCP, and Jakub's out of tree huge
+> page provider (i.e. everything else using the page_pool). The model is
+> the streamlined:
+
+Let's not go into the normal pages, because 1) it can't work
+any other way in general case, it has to cross the context from
+whenever page is to the napi / page pool, and 2) because devmem
+TCP and io_uring already deviate from the standard page pool,
+by extending lifetime of buffers to user space and more.
+
+And then that's exactly what I'm saying, you recommend it to be
+aligned with devmem TCP. And let's not forget that you had to add
+batching to that exact syscall return path because of
+performance...
+
+...
+>>> I doubt this is true or at least there needs to be more info here. The
 >>
-
-[snip]
-
-> ...
+>> If you don't believe me, then, please, go ahead and do your testing,
+>> or look through patches addressing it across the stack like [1],
+>> but you'll be able to find many more. I don't have any recent numbers
+>> on indirect calls, but I did a fair share of testing before for
+>> different kinds of overhead, it has always been expensive, can easily
+>> be 1-2% per fast block request, which could be much worse if it's per
+>> page.
+>>
+>> [1] https://lore.kernel.org/netdev/cover.1543836966.git.pabeni@redhat.com/
+>>
+>>
+>>> page_pool_alloc_netmem() pretty much allocates 1 buffer per callback
+>>> for all its current users (regular memory & dmabuf), and that's good
+>>> enough to drive 200gbps NICs. What is special about io_uring use case
+>>> that this is not good enough?
+>>>
+>>> The reason it is good enough in my experience is that
+>>> page_pool_alloc_netmem() is a slow path. netmems are allocated from
+>>> that function and heavily recycled by the page_pool afterwards.
+>>
+>> That's because how you return buffers back to the page pool, with
+>> io_uring it is a hot path, even though ammortised exactly because
+>> it doesn't just return one buffer at a time.
+>>
 > 
->>> +function run_manual_check()
->>> +{
->>> +    #
->>> +    # Validate passed parameters. If there is wrong one,
->>> +    # the script exists and does not execute further.
->>> +    #
->>> +    validate_passed_args $@
->>> +
->>> +    echo "Run the test with following parameters: $@"
->>
->> Is this marker good enough to isolate the test results in the
->> dmesg? Include the test name in the message.
->>
->>
->>> +    insmod $DRIVER $@ > /dev/null 2>&1
->>> +    echo "Done."
->>
->> Is this marker good enough to isolate the test results in the
->> dmesg? Include the test name in the message.
->>
->>> +    echo "Check the kernel ring buffer to see the summary."
->>
->> Usually the test would run dmesg and filter out the test results
->> from the dmesg and include them in the test script output.
->>
->> You can refer to other tests that do that: powerpc/scripts/hmi.sh
->> is one example.
-> 
-> Thanks, will check that.
+> Right, I guess I understand now. You need to implement your own
+> recycling in the provider because your model has bypassed the
+> page_pool recycling - which to me is 90% of the utility of the
 
-thanks,
--- Shuah
+So the utility of the page pool is a fast return path for the
+standard page mode, i.e. napi_pp_put_page, which it is and is
+important, I agree. But then even though we have a better IMO
+approach for this "extended to userspace buffer life cycle"
+scenario, it has to use that very same return path because...?
+
+> page_pool. To make matters worse, the bypass is only there if the
+> netmems are returned from io_uring, and not bypassed when the netmems
+> are returned from driver/tcp stack. I'm guessing if you reused the
+> page_pool recycling in the io_uring return path then it would remove
+> the need for your provider to implement its own recycling for the
+> io_uring return case.
+> 
+> Is letting providers bypass and override the page_pool's recycling in
+> some code paths OK? IMO, no. A maintainer will make the judgement call
+
+Mina, frankly, that's nonsense. If we extend the same logic,
+devmem overrides page allocation rules with callbacks, devmem
+overrides and violates page pool buffer lifetimes by extending
+it to user space, devmem violates and overrides the page pool
+object lifetime by binding buffers to sockets. And all of it
+I'd rather name extends and enhances to fit in the devmem use
+case.
+
+> and speak authoritatively here and I will follow, but I do think it's
+> a (much) worse design.
+
+Sure, I have a completely opposite opinion, that's a much
+better approach than returning through a syscall, but I will
+agree with you that ultimately the maintainers will say if
+that's acceptable for the networking or not.
+
+-- 
+Pavel Begunkov
 
