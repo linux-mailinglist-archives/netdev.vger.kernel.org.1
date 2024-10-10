@@ -1,95 +1,179 @@
-Return-Path: <netdev+bounces-134313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52B01998B34
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:18:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C00E998C40
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A773294E88
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:18:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A4E1B36606
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D758C1CBEB9;
-	Thu, 10 Oct 2024 15:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDEC41CC16C;
+	Thu, 10 Oct 2024 15:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b="GcUiC6x5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0yhkLS5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp05-ext.udag.de (smtp05-ext.udag.de [62.146.106.75])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43EAAB646;
-	Thu, 10 Oct 2024 15:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.146.106.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87521CC16A
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728573489; cv=none; b=lK3Nic9HJ19EK/X+lsYCoXbSuXbTrhJpQOg/pbqrZbPD1b6oIHMEilkXa+FMSaAyD5O2NftuTW6vt5at3DKN5xBlxkIr1uB+emY4m/YaO7fO5lAhsdCxspk5Kc7n9pgCaRx7V+xXqMDVCcHeHV6xww0i17MHWtcZb9un2htgaAs=
+	t=1728573176; cv=none; b=XPWfUn3vR8uSiSZ18XCOBYgEPUAHDaDaUEF0dA6EVQNaEzTy07FiYTVPIAz3cDgYI6dqoNG+/6+VVtPAA6V74bBTZj5PV2gCpL56xJg6nhDnO8r1GCyNWsLVKGoIMYEpBIMf3/VQhIqIZ3aJHz2Pv9FsC9f7uIdkrHGZY0lOrdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728573489; c=relaxed/simple;
-	bh=YUSySbBWp08I2dMPVF+Lo5oQQvSwVDiGRyoQNS9kAvM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=cAoPODQ+kGrL3lveNL7GEBVZ8hpAO7wxauSoIGtD/cvJP9qcnbeAkAYrYs87g3iZy6CEPXHzqAsHmexHUESzVUi3GEXyRYyie8zaWfYC0fTWIm4ghyEJUIA2dGqmCtImFKI9nZA8aekNYzQq4C2uQgwf8wSjybl6MVDQ7cUTHgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tk154.de; spf=pass smtp.mailfrom=tk154.de; dkim=pass (2048-bit key) header.d=tk154.de header.i=@tk154.de header.b=GcUiC6x5; arc=none smtp.client-ip=62.146.106.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tk154.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tk154.de
-Received: from [10.10.34.132] (unknown [195.37.88.189])
-	by smtp05-ext.udag.de (Postfix) with ESMTPA id 9793DE0361;
-	Thu, 10 Oct 2024 17:11:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tk154.de; s=uddkim-202310;
-	t=1728573084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Q+XKIu6e8sY0nrLlJEOX8BdUbse7XfS6RaSAivR5UEc=;
-	b=GcUiC6x5igoKsl2yUQJs7vc5qYIz0zbnGgfzksVi7dzSyKmzgjg9wGR3ZfiPMBKG6D1X5i
-	IfC1ukGJFT2Ap0Bv+m2coE1i+Ce+Vf/G3B8z3mrBm7CCrs2/ZFUTFh8nHuf1tXjUauxfN0
-	/hfqKxYPJ2P/JoIddytKCBnJFyOyra0CjHYW6+6OVfg5jS1Dx66z+ez1/OB6Ip+1rgGscV
-	L++n9+THXrJUdVDr6c2hMTtFZsbkP5MleTWNRxNUlb2SdQwf/x/pSqM3KemaqPRze6sYN+
-	A7bDCIJTHQ4IfsO1Mz4HJx3oQCnan2AfLg/NtAtgDKUpR1dYqwFXU+QxM1VHKw==
-Message-ID: <bc8ba1b7-e4ad-40b5-b69d-9ea1e7a18a40@tk154.de>
-Date: Thu, 10 Oct 2024 17:11:21 +0200
+	s=arc-20240116; t=1728573176; c=relaxed/simple;
+	bh=b8l3MYI0KQ0pzc1btVYRmPz6q2XTI0LdCDidezpwqcQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jhxjCwvIT8P+HfalkzXZQyPtjGHhZ+2KON8yjWw7oru6iSUDa0l3WVouxRgbytNIevCehEH6UIquqU/BBF9iYUgrNvE1wADlVDIEax2D5vsTdwiHuMSi03L6bX/RoetLRBTZmB96/SA8SvnhKekukSWx3JrCvo7V+U6xH+A5Odc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0yhkLS5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D53C4CEC5;
+	Thu, 10 Oct 2024 15:12:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728573176;
+	bh=b8l3MYI0KQ0pzc1btVYRmPz6q2XTI0LdCDidezpwqcQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C0yhkLS5L778Ns9rerfGwjZQhdIFm9do4Sb92cXy76ZhIAqUQZjNavIuAymCkHa0A
+	 mBwFvu6otBo8pTvNGLSWUbAqhSos/GdAZBqrZBxuXvl7tzc3G4KHrpct5SStbRvk9B
+	 7AIUaL34ucjHMgFc+f+7OEIg3Q1aN37HY+9P2+x6g1Yunioiclyx0oRFn8AQDaGCSe
+	 q9zlUO8XlN0IqbsHhKsrOnjQ0PX8VQ8kKHBWhGCINwgwAneg2CX/w/dAYEEy1d4YTG
+	 6q7GXJrorZhuH43cyDL7eIVYm88dgpxXTZ/nyVJP+y9YqNnh162R0BUrun4OJzxHh3
+	 nTkSJCYf0l8jg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jdamato@fastly.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next] tools: ynl-gen: use names of constants in generated limits
+Date: Thu, 10 Oct 2024 08:12:48 -0700
+Message-ID: <20241010151248.2049755-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US, de-DE
-To: saeedm@nvidia.com, leonro@nvidia.com, tariqt@nvidia.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
-From: Til Kaiser <mail@tk154.de>
-Subject: [BUG] net/mlx5: missing sysfs hwmon entry for ConnectX-4 cards
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Authentication-Results: smtp05-ext.udag.de;
-	auth=pass smtp.auth=mail@tk154.de smtp.mailfrom=mail@tk154.de
 
-Hello,
+YNL specs can use string expressions for limits, like s32-min
+or u16-max. We convert all of those into their numeric values
+when generating the code, which isn't always helpful. Try to
+retain the string representations in the output. Any sort of
+calculations still need the integers.
 
-I noticed on our dual-port 100G ConnectX-4 cards (MT27700 Family) 
-running Linux Kernel version 6.6.56 and the latest ConnectX-4 firmware 
-version 12.28.2302 that we do not have a sysfs hwmon entry for reading 
-temperature values.
-When running Kernel version 6.6.32, the hwmon entry is there again, and 
-I can read the temperature values of those cards.
-Strangely, this problem doesn't occur on our ConnectX-4 Lx cards 
-(MT27710 Family), regardless of which Kernel version I use.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ net/core/netdev-genl-gen.c |  4 ++--
+ tools/net/ynl/ynl-gen-c.py | 36 +++++++++++++++++++++++-------------
+ 2 files changed, 25 insertions(+), 15 deletions(-)
 
-I looked into the mlx5 core driver and noticed that it is checking the 
-MCAM register here: 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/drivers/net/ethernet/mellanox/mlx5/core/hwmon.c?h=v6.6.56#n380.
-When I removed that check, the hwmon entry reappeared again.
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index b28424ae06d5..226a7e2c023c 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -14,12 +14,12 @@
+ /* Integer value ranges */
+ static const struct netlink_range_validation netdev_a_page_pool_id_range = {
+ 	.min	= 1ULL,
+-	.max	= 4294967295ULL,
++	.max	= U32_MAX,
+ };
+ 
+ static const struct netlink_range_validation netdev_a_page_pool_ifindex_range = {
+ 	.min	= 1ULL,
+-	.max	= 2147483647ULL,
++	.max	= S32_MAX,
+ };
+ 
+ /* Common nested types */
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 9e8254aad578..d64cb2b49c44 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -80,11 +80,21 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         value = self.checks.get(limit, default)
+         if value is None:
+             return value
+-        elif value in self.family.consts:
++        if isinstance(value, int):
++            return value
++        if value in self.family.consts:
++            raise Exception("Resolving family constants not implemented, yet")
++        return limit_to_number(value)
++
++    def get_limit_str(self, limit, default=None, suffix=''):
++        value = self.checks.get(limit, default)
++        if value is None:
++            return ''
++        if isinstance(value, int):
++            return str(value) + suffix
++        if value in self.family.consts:
+             return c_upper(f"{self.family['name']}-{value}")
+-        if not isinstance(value, int):
+-            value = limit_to_number(value)
+-        return value
++        return c_upper(value)
+ 
+     def resolve(self):
+         if 'name-prefix' in self.attr:
+@@ -358,11 +368,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         elif 'full-range' in self.checks:
+             return f"NLA_POLICY_FULL_RANGE({policy}, &{c_lower(self.enum_name)}_range)"
+         elif 'range' in self.checks:
+-            return f"NLA_POLICY_RANGE({policy}, {self.get_limit('min')}, {self.get_limit('max')})"
++            return f"NLA_POLICY_RANGE({policy}, {self.get_limit_str('min')}, {self.get_limit_str('max')})"
+         elif 'min' in self.checks:
+-            return f"NLA_POLICY_MIN({policy}, {self.get_limit('min')})"
++            return f"NLA_POLICY_MIN({policy}, {self.get_limit_str('min')})"
+         elif 'max' in self.checks:
+-            return f"NLA_POLICY_MAX({policy}, {self.get_limit('max')})"
++            return f"NLA_POLICY_MAX({policy}, {self.get_limit_str('max')})"
+         return super()._attr_policy(policy)
+ 
+     def _attr_typol(self):
+@@ -413,11 +423,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+ 
+     def _attr_policy(self, policy):
+         if 'exact-len' in self.checks:
+-            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
++            mem = 'NLA_POLICY_EXACT_LEN(' + self.get_limit_str('exact-len') + ')'
+         else:
+             mem = '{ .type = ' + policy
+             if 'max-len' in self.checks:
+-                mem += ', .len = ' + str(self.get_limit('max-len'))
++                mem += ', .len = ' + self.get_limit_str('max-len')
+             mem += ', }'
+         return mem
+ 
+@@ -476,9 +486,9 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         if len(self.checks) == 0:
+             mem = '{ .type = NLA_BINARY, }'
+         elif 'exact-len' in self.checks:
+-            mem = 'NLA_POLICY_EXACT_LEN(' + str(self.get_limit('exact-len')) + ')'
++            mem = 'NLA_POLICY_EXACT_LEN(' + self.get_limit_str('exact-len') + ')'
+         elif 'min-len' in self.checks:
+-            mem = '{ .len = ' + str(self.get_limit('min-len')) + ', }'
++            mem = '{ .len = ' + self.get_limit_str('min-len') + ', }'
+ 
+         return mem
+ 
+@@ -2166,9 +2176,9 @@ _C_KW = {
+             cw.block_start(line=f'static const struct netlink_range_validation{sign} {c_lower(attr.enum_name)}_range =')
+             members = []
+             if 'min' in attr.checks:
+-                members.append(('min', str(attr.get_limit('min')) + suffix))
++                members.append(('min', attr.get_limit_str('min', suffix=suffix)))
+             if 'max' in attr.checks:
+-                members.append(('max', str(attr.get_limit('max')) + suffix))
++                members.append(('max', attr.get_limit_str('max', suffix=suffix)))
+             cw.write_struct_init(members)
+             cw.block_end(line=';')
+             cw.nl()
+-- 
+2.46.2
 
-Looking into recent mlx5 commits regarding this MCAM register, I found 
-this commit: 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.6.56&id=fb035aa9a3f8fd327ab83b15a94929d2b9045995.
-When I reverted this commit, the hwmon entry also reappeared again.
-
-I also found a firmware bug fix regarding that register inside the 
-ConnectX-4 Lx bug fix history here (Ref. 2339971): 
-https://docs.nvidia.com/networking/display/connectx4lxfirmwarev14321900/bug+fixes+history.
-I couldn't find such a firmware fix for the non-Lx ConnectX-4 cards. So, 
-I'm unsure whether this might be a mlx5 driver or firmware issue.
-
-Kind regards
-Til
 
