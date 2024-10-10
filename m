@@ -1,131 +1,167 @@
-Return-Path: <netdev+bounces-134114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B1599980F4
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:54:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CE8C9980FD
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 10:55:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6B5F281407
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:54:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D420B1F27171
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113651C9B65;
-	Thu, 10 Oct 2024 08:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54FB1BBBD0;
+	Thu, 10 Oct 2024 08:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ER3kuKxV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="byN5CX3T"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C45C1BD018
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F114614386D
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728549881; cv=none; b=RwaZddkg+GBAoZYML/zt6uGtA9zTJxy5up3Eww8RcuLaNPH2fLrBPrrw5eBiVMj56/VHQRVswYlZpf7761zeETG8qrJDuWoYtwwf6BX9zxm1SuT2s+MYFQWRNG/W6QXlL/mCdMwpOj3yAHhfzabb6sJK9JQHq2oKmVfwI9Bp6mI=
+	t=1728550177; cv=none; b=eWa1Vxnw6f1Vc9FXmLtV7hmoQSKVHQViNvGbHA7S20SAzDbvzvuZPm5TxHar/BS5tTaZXBvtxFBJ3gzCsgNvVbii90iCwptnOqHaKpxK4eG4zMGqKEfYCCBTcJbt2TGt70E6VTG7XlvShlplCPja0cK3T97xD8pLhZJ/gh5VmWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728549881; c=relaxed/simple;
-	bh=tiNKt4uEnzIIQUhGxjv1AJIIxBHCpHqZ7kY8G1BxA78=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=b6qqqVQa9f8GrM6J3fEPa5ZlHkoqK8S9CqCzL6D1RO2+08mnmAryRM3vO3j8hIUNCnaJ43uk6EMsKTRQJG5jcsNARD5F8GyGeafz71qYxv4ABeJSWwVDb44Uk/muFgaG2n46XTz5bDTJBgcTiqOPjSpDxiw65TEPwf4V2lx5eH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ER3kuKxV; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1728550177; c=relaxed/simple;
+	bh=68stV1OpW6b+DKiYGjzw+PqPRUZWqvm/GCbQHnNgX1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qy+0eWeYDxv+KnMIpa85+zeiarcmQdefzUmlUGAGiTVqAHHPapIRswjKr7f5igvdX1qeXgKGXTEHu5F/JwAtik7spEPnUJdH9GIVWMoVtk4RUZyqYrvvNBGJodVu2XjhLQEk2GooWcND3Ir47CMQwmaZ4jC8cGYfF2jvWNuT50E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=byN5CX3T; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728549878;
+	s=mimecast20190719; t=1728550175;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nwjJ3rOfKTeE9Owm5oZtqgnJumv4mefikcU3iXTP41o=;
-	b=ER3kuKxV8WOFZMZyqu/8j5PYmoFaKJue5Z+PLrYT6c8dzuaSmGzVK6/G0dQRc4AIlFeOFg
-	sb+UVdPp3krDqr5UWMJ+xQuSSNTDszm2aDSBXBOZyoN3VBf3F8PQBjSZpS6bAf9WS88Rjb
-	kMDWmTw8NHYp84Tr+b2ev6eXSRLG5zU=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WTgUkKZySvZu+l2XKGcPyGoCj4q4zZnZ31rqscd6vJo=;
+	b=byN5CX3TLgO93K+XIS1EFejAObeZOKaiHQMJuP/bWZ1qJac+Z8d8I5szZzTD5wBa3e/Tqe
+	JkYG1K/C1EKFEoZSs9mKQsFnnR77go5OHP69Om4whrVb2aquQiv7wHqM4lpO1H5bFPCPwe
+	2C4adzSlVlUqnmALbLiqO3CC7P/LgIs=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-ctOa5m6tNIq1pcHYjeIRPg-1; Thu, 10 Oct 2024 04:44:36 -0400
-X-MC-Unique: ctOa5m6tNIq1pcHYjeIRPg-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2fac931e7c6so4887741fa.3
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 01:44:36 -0700 (PDT)
+ us-mta-255-_SDqEDCRNZ2wuxmpCoKmdA-1; Thu, 10 Oct 2024 04:49:33 -0400
+X-MC-Unique: _SDqEDCRNZ2wuxmpCoKmdA-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2fad296738fso3937931fa.1
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 01:49:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728549875; x=1729154675;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nwjJ3rOfKTeE9Owm5oZtqgnJumv4mefikcU3iXTP41o=;
-        b=mWQUOF3nigr6/C7NYUturOqycsiGJNc9bpw/k6PlGlxWVdQ5WuCoRy/+Z60PJHDabW
-         HtWpXJd8f2yyXZuCezXh+sB9WQsILB3Sw+v7t7Uq3QSjZVGaleA054HSBjg4jUGOHETZ
-         XDMTlECFQIx5XBWo+AzF8NeiI2c5y3iGmGpVAzzx6JFzm8rh9s3MCvlOI5fohgTVICRS
-         PoApslag2rR2xyokCWrojROW6B00kNhxwf6X1oDG7Xu2NMp5F71fNZaqOyJK2Ngw3cdu
-         AOmJ+2M8QqNy8LdSrWlxiub52wvZLPAYqQdqZj6yNNYvEmiYYI6puAhCBHTFZziVe9Lx
-         ZFMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZVMVhBOWNu8/exVwvVuQQEBpsgWW/TfM7+KyK1OmCJhORP/36IK3NCb/w/mr6JOOCxfqj010=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNnyPc3J76XSs+XoRDDR84O3Y0EnG7EYMldcwJ4eEVhgqKPcgb
-	nGJF6taQpcKoyafeZ4nXhpfa+zHTKnrUuqS3ABlRFU31Ks//MY7/H2R4XTVdjfftpZrqt0DFg41
-	o1Lgmonc7HGv8DQbrcwJ+Cdvx9vfZxBRC/uIMJxbdgD7w+1rSJFO8vg==
-X-Received: by 2002:a05:651c:154a:b0:2fa:cf82:a1b2 with SMTP id 38308e7fff4ca-2fb187ac586mr36261501fa.31.1728549875182;
-        Thu, 10 Oct 2024 01:44:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHuSNyfEREq01qHawidf0JzClj+W8bfm0PNlrHJXvmvs1NiA3EWt9EKpLMmwpk59pMFiMlCvA==
-X-Received: by 2002:a05:651c:154a:b0:2fa:cf82:a1b2 with SMTP id 38308e7fff4ca-2fb187ac586mr36261251fa.31.1728549874733;
-        Thu, 10 Oct 2024 01:44:34 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-27-157.dyn.eolo.it. [146.241.27.157])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b79fd43sm855544f8f.89.2024.10.10.01.44.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 01:44:34 -0700 (PDT)
-Message-ID: <9b36bb45-a31c-4cf7-a6af-cd77cc55e011@redhat.com>
-Date: Thu, 10 Oct 2024 10:44:14 +0200
+        d=1e100.net; s=20230601; t=1728550172; x=1729154972;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WTgUkKZySvZu+l2XKGcPyGoCj4q4zZnZ31rqscd6vJo=;
+        b=f4GY9IQ2Uf6za8vqA6d74ChQkEud3KSTUimaNRXVzllFyue3dXj/xb4rWGKOpgmqP7
+         fr4sEC++XGfeFDPUIacPpHayXfEj+BH0rzFGdZYe55kvh6C6uHh8j2svpt1hBXjCg3yN
+         Andv/Oiqpvm+8tGqupUX1dyHUBTAREvksaqfDJvv5PkmFszp4tSdB9IZNgsOas52szB2
+         5A7RTFcp/uaj8ZfqErTDl/0wI5C3iqTCm1oFIk/L0AaVzaHbL/KjsAlPNMDX7xKl5AYF
+         OwxMLWz8MM9sb2OomfgJFkrfyCgbSj0QXqYdN+n383IzdyOoBRw7BBfySsU3aX6r2Zgc
+         To0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVSXb251XJOt/pY/wuq5l3KpdxNWV+PqJsdzhPA4/j6bgFV4ydLKx4MFDzyHNscMatcGymT7PU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd1LlAbjPEoYBC7/JwRZ499x5rMMmvJjwBd7u6SzpbbXPn3onP
+	6/sKo2/M6xWicvAftkXxYjNa7+gjHHPzLKLvG4APOBUmsIS6L+6KcTzOc2BvGFjUbKfam8Iqfyh
+	/8KwhXIZJW850FX2kP9Mg3cT5snx/NGEBijW1Jn+k38md1TiHtVakwg==
+X-Received: by 2002:a2e:bc0c:0:b0:2fa:cb44:7bde with SMTP id 38308e7fff4ca-2fb1871209dmr37374381fa.4.1728550172073;
+        Thu, 10 Oct 2024 01:49:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEh3c4fKyUkorKvGuaI1mTPxi1c7YQHi5OLwGxivpJhfR3vsBw4cdN68p2gBi+K23ol/4JvnA==
+X-Received: by 2002:a2e:bc0c:0:b0:2fa:cb44:7bde with SMTP id 38308e7fff4ca-2fb1871209dmr37373911fa.4.1728550171329;
+        Thu, 10 Oct 2024 01:49:31 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c937153027sm484047a12.51.2024.10.10.01.49.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 01:49:30 -0700 (PDT)
+Date: Thu, 10 Oct 2024 10:49:24 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>, bobby.eshleman@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, 
+	Jakub Sitnicki <jakub@cloudflare.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf 2/4] vsock: Update rx_bytes on read_skb()
+Message-ID: <mwemnay5bb7ft5zvlrh5emdtkilqvkj42xnxnatnh3hmmtkhce@fqe64sbx6b2z>
+References: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
+ <20241009-vsock-fixes-for-redir-v1-2-e455416f6d78@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] mlx4: update mlx4_clock_read() to provide
- pre/post tstamps
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
- Tariq Toukan <tariqt@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>,
- Richard Cochran <richardcochran@gmail.com>,
- Mahesh Bandewar <mahesh@bandewar.net>
-References: <20241008104646.3276302-1-maheshb@google.com>
- <749706b1-f44a-4548-9573-5f7b3823be67@redhat.com>
-Content-Language: en-US
-In-Reply-To: <749706b1-f44a-4548-9573-5f7b3823be67@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241009-vsock-fixes-for-redir-v1-2-e455416f6d78@rbox.co>
+
+On Wed, Oct 09, 2024 at 11:20:51PM GMT, Michal Luczaj wrote:
+>Make sure virtio_transport_inc_rx_pkt() and virtio_transport_dec_rx_pkt()
+>calls are balanced (i.e. virtio_vsock_sock::rx_bytes doesn't lie) after
+>vsock_transport::read_skb().
+>
+>Failing to update rx_bytes after packet is dequeued leads to a warning on
+>SOCK_STREAM recv():
+>
+>[  233.396654] rx_queue is empty, but rx_bytes is non-zero
+>[  233.396702] WARNING: CPU: 11 PID: 40601 at net/vmw_vsock/virtio_transport_common.c:589
+>
+>Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/virtio_transport_common.c | 11 ++++++++---
+> 1 file changed, 8 insertions(+), 3 deletions(-)
 
 
+The modification looks good to me, but now that I'm looking at it 
+better, I don't understand why we don't also call 
+virtio_transport_send_credit_update().
 
-On 10/10/24 10:36, Paolo Abeni wrote:
-> On 10/8/24 12:46, Mahesh Bandewar wrote:
->> The mlx4_clock_read() function, when called by cycle_counter->read(),
->> previously only returned the raw cycle count. However, for PTP helpers
->> like gettimex64(), which require pre- and post-timestamps, simply
->> returning raw cycles is insufficient. It also needs to provide the
->> necessary timestamps.
->>
->> This update modifies mlx4_clock_read() to return both the cycles and
->> the required timestamps. Additionally, mlx4_en_read_clock() is now
->> responsible for reading and updating the clock_cache. This allows
->> another function, mlx4_en_read_clock_cache(), to act as the cycle
->> reader for cycle_counter->read(), preserving the same interface.
-> 
-> It looks like this patch should be split in two, the first one could be
-> possibly 'net' material and just fix gettimex64()/mlx4_read_clock() and
-> the other one introduces the cache.
+This is to inform the peer that we've freed up space and it has more 
+credit.
 
-My bad, I was too hasty and actually missed that the gettimex64() 
-callback is implemented in the next patch.
+@Bobby do you remember?
 
-The main point still remains: the cache infra should be in a separate 
-patch: it can introduce side effects and we want to be able to bisect.
+I think we should try to unify the receiving path used through BPF or 
+not (not for this series of course).
 
 Thanks,
+Stefano
 
-Paolo
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 884ee128851e5ce8b01c78fcb95a408986f62936..ed1c1bed5700e5988a233cea146cf9fac95426e0 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -1707,6 +1707,7 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> {
+> 	struct virtio_vsock_sock *vvs = vsk->trans;
+> 	struct sock *sk = sk_vsock(vsk);
+>+	struct virtio_vsock_hdr *hdr;
+> 	struct sk_buff *skb;
+> 	int off = 0;
+> 	int err;
+>@@ -1716,10 +1717,14 @@ int virtio_transport_read_skb(struct vsock_sock *vsk, skb_read_actor_t recv_acto
+> 	 * works for types other than dgrams.
+> 	 */
+> 	skb = __skb_recv_datagram(sk, &vvs->rx_queue, MSG_DONTWAIT, &off, &err);
+>-	spin_unlock_bh(&vvs->rx_lock);
+>-
+>-	if (!skb)
+>+	if (!skb) {
+>+		spin_unlock_bh(&vvs->rx_lock);
+> 		return err;
+>+	}
+>+
+>+	hdr = virtio_vsock_hdr(skb);
+>+	virtio_transport_dec_rx_pkt(vvs, le32_to_cpu(hdr->len));
+>+	spin_unlock_bh(&vvs->rx_lock);
+>
+> 	return recv_actor(sk, skb);
+> }
+>
+>-- 
+>2.46.2
+>
 
 
