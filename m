@@ -1,180 +1,277 @@
-Return-Path: <netdev+bounces-134215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABC59986ED
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:00:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 428FB99870D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:03:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 930AA281A9D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:00:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6CF71F22390
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2ECD1C2DC0;
-	Thu, 10 Oct 2024 13:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tCc9xP2I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E441C7B78;
+	Thu, 10 Oct 2024 13:03:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182B51BCA0E
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3831C6F45;
+	Thu, 10 Oct 2024 13:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728565243; cv=none; b=p8T2vwTUEv0bS1e+M9RwMzsNxq9v8ciixseGVvZlYd5J0aO+SJgDtWFeZx6SPb2Xkh7IC1v9x28yNUC+E7IPT7qx+tLccDXrApOHsrldxK7iJU959+RNcZ3eCvYNlDUSf5ORYKviUO2l/E8OwD7oQVijGL8wJYr3eU+Jg/kx1jo=
+	t=1728565406; cv=none; b=ml68ICr6ZBcyBuTYQ66RJhZm+LsEcYgwXNbwEHHEVE087dUZ9kOKL2xY+urQc2uiUtdLWsoM9LJ2qSgpnQifIQ/KWy3ANm9czgciKNb5pV3+loxKpraDMSt2ORqKPh4b93nHZARzU8TeZPxLsJY+uDhripTg+rP1gRQKRNTZ/Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728565243; c=relaxed/simple;
-	bh=p7svB2h4EXYKSowqH5VimIFBZmcTxc0muViOkAFHuyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fdaLQRibr5fPo8AmYfFGmmJrzbK4F5ivRIsH7/svggjcSP8O1LE7HL0zLtmSR27UbmK8bfXE5dHSfk99X/7k8gkrKGu+HGjgBeXTOKV4NxPImJJZyBn02riPtsPIzwn74X/p0X9pQBuR6WAlQUr+7Aky3mkbzivZezgaRYaM8+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tCc9xP2I; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=BgT4mMqzShj8qDMwc0FMAvL3BmOW4M63NstBPGV2AFA=; b=tCc9xP2ICLJnl/Dc5wPMDLegLr
-	snIk1IS7BmxKFZSrhJ3QdmRbFmBX7oz/mrbuXwCcMzz7achgPJqCPSm+2fMlkOfmrqCU2Qv+xU5Dm
-	txY5jIgsmPcBBQX6Bu9oK59JIV2JvHImKZ+2w9diawpzfHgbOpn9EJShFK1CQVMVS37p7uSh9UQNO
-	Dbu1801Mg7UyTPvIu4Qsas24BWqBKFAbW+QxFLdrtH7hYcf2gZwDtdMcI7czraLNEM7OM7KHd5PZ3
-	lOE7SEXFF/ibiDo5/lA+72f8EZfJy5IPnQFYiH5GIWMStQfQaFF7NeYyo8HEAtRrC7DdFuj0Imk3k
-	yaicV27A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41046)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sysmR-0002Ps-1E;
-	Thu, 10 Oct 2024 14:00:34 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sysmO-0007Jz-19;
-	Thu, 10 Oct 2024 14:00:32 +0100
-Date: Thu, 10 Oct 2024 14:00:32 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/3] net: phylink: remove "using_mac_select_pcs"
-Message-ID: <ZwfP8G+2BwNwlW75@shell.armlinux.org.uk>
-References: <ZwVEjCFsrxYuaJGz@shell.armlinux.org.uk>
- <E1syBPE-006Unh-TL@rmk-PC.armlinux.org.uk>
- <20241009122938.qmrq6csapdghwry3@skbuf>
- <Zwe4x0yzPUj6bLV1@shell.armlinux.org.uk>
+	s=arc-20240116; t=1728565406; c=relaxed/simple;
+	bh=ZmT1D62+Iee1fAVc+nunu+UHfvg6b1FGZLMZNnSjuXg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tOOmGhpizOf43FNRtuiYrafi3KRt+k9edpHJvlnp9FuiO/FYHHCb7w6/qH5He+AiTUR4ixT5+FkPcfSD61xhS/7RQzoo5Nnym4a+h+lXlozV4X75yUgUZZV2yQcNRuVzZ39slaGMhZ/wNUklxfUjW/gQGytvP72EaKNSOzADdj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XPVJz1m9Hz1SCPY;
+	Thu, 10 Oct 2024 21:02:11 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id 77762180041;
+	Thu, 10 Oct 2024 21:03:18 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
+ (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 10 Oct
+ 2024 21:03:17 +0800
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+To: <lars.povlsen@microchip.com>, <Steen.Hegelund@microchip.com>,
+	<daniel.machon@microchip.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>,
+	<jensemil.schulzostergaard@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <ruanjinjie@huawei.com>
+Subject: [PATCH] net: microchip: vcap api: Fix memory leaks in vcap_api_encode_rule_test()
+Date: Thu, 10 Oct 2024 21:02:31 +0800
+Message-ID: <20241010130231.3151896-1-ruanjinjie@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zwe4x0yzPUj6bLV1@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-On Thu, Oct 10, 2024 at 12:21:43PM +0100, Russell King (Oracle) wrote:
-> On Wed, Oct 09, 2024 at 03:29:38PM +0300, Vladimir Oltean wrote:
-> > On Tue, Oct 08, 2024 at 03:41:44PM +0100, Russell King (Oracle) wrote:
-> > > With DSA's implementation of the mac_select_pcs() method removed, we
-> > > can now remove the detection of mac_select_pcs() implementation.
-> > > 
-> > > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> > > ---
-> > >  drivers/net/phy/phylink.c | 14 +++-----------
-> > >  1 file changed, 3 insertions(+), 11 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> > > index 4309317de3d1..8f86599d3d78 100644
-> > > --- a/drivers/net/phy/phylink.c
-> > > +++ b/drivers/net/phy/phylink.c
-> > > @@ -79,7 +79,6 @@ struct phylink {
-> > >  	unsigned int pcs_state;
-> > >  
-> > >  	bool mac_link_dropped;
-> > > -	bool using_mac_select_pcs;
-> > >  
-> > >  	struct sfp_bus *sfp_bus;
-> > >  	bool sfp_may_have_phy;
-> > > @@ -661,12 +660,12 @@ static int phylink_validate_mac_and_pcs(struct phylink *pl,
-> > >  	int ret;
-> > >  
-> > >  	/* Get the PCS for this interface mode */
-> > > -	if (pl->using_mac_select_pcs) {
-> > > +	if (pl->mac_ops->mac_select_pcs) {
-> > >  		pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
-> > >  		if (IS_ERR(pcs))
-> > >  			return PTR_ERR(pcs);
-> > >  	} else {
-> > > -		pcs = pl->pcs;
-> > > +		pcs = NULL;
-> > 
-> > The assignment from the "else" branch could have been folded into the
-> > variable initialization.
-> > 
-> > Also, maybe a word in the commit message would be good about why the
-> > "pcs = pl->pcs" line became "pcs = NULL". I get the impression that
-> > these are 2 logical changes in one patch. This second aspect I'm
-> > highlighting seems to be cleaning up the last remnants of phylink_set_pcs().
-> > Since all phylink users have been converted to mac_select_pcs(), there's
-> > no other possible value for "pl->pcs" than NULL if "using_mac_select_pcs"
-> > is true.
-> 
-> Hmm. Looking at this again, we're getting into quite a mess because of
-> one of your previous review comments from a number of years back.
-> 
-> You stated that you didn't see the need to support a transition from
-> having-a-PCS to having-no-PCS. I don't have a link to that discussion.
-> However, it is why we've ended up with phylink_major_config() having
-> the extra complexity here, effectively preventing mac_select_pcs()
-> from being able to remove a PCS that was previously added:
-> 
-> 		pcs_changed = pcs && pl->pcs != pcs;
-> 
-> because if mac_select_pcs() returns NULL, it was decided that any
-> in-use PCS would not be removed. It seems (at least to me) to be a
-> silly decision now.
-> 
-> However, if mac_select_pcs() in phylink_major_config() returns NULL,
-> we don't do any validation of the PCS.
-> 
-> So this, today, before these patches, is already an inconsistent mess.
-> 
-> To fix this, I think:
-> 
-> 	struct phylink_pcs *pcs = NULL;
-> ...
->         if (pl->mac_ops->mac_select_pcs) {
->                 pcs = pl->mac_ops->mac_select_pcs(pl->config, state->interface);
->                 if (IS_ERR(pcs))
->                         return PTR_ERR(pcs);
-> 	}
-> 
-> 	if (!pcs)
-> 		pcs = pl->pcs;
-> 
-> is needed to give consistent behaviour.
-> 
-> Alternatively, we could allow mac_select_pcs() to return NULL, which
-> would then allow the PCS to be removed.
-> 
-> Let me know if you've changed your mind on what behaviour we should
-> have, because this affects what I do to sort this out.
+Commit a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in
+kunit test") fixed the use-after-free error, but introduced below
+memory leaks by removing necessary vcap_free_rule(), add it to fix it.
 
-Here's a link to the original discussion from November 2021:
+	unreferenced object 0xffffff80ca58b700 (size 192):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898264
+	  hex dump (first 32 bytes):
+	    00 12 7a 00 05 00 00 00 0a 00 00 00 64 00 00 00  ..z.........d...
+	    00 00 00 00 00 00 00 00 00 04 0b cc 80 ff ff ff  ................
+	  backtrace (crc 9c09c3fe):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<0000000040a01b8d>] vcap_alloc_rule+0x3cc/0x9c4
+	    [<000000003fe86110>] vcap_api_encode_rule_test+0x1ac/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0400 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    80 04 0b cc 80 ff ff ff 18 b7 58 ca 80 ff ff ff  ..........X.....
+	    39 00 00 00 02 00 00 00 06 05 04 03 02 01 ff ff  9...............
+	  backtrace (crc daf014e9):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<00000000dfdb1e81>] vcap_api_encode_rule_test+0x224/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0480 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    00 05 0b cc 80 ff ff ff 00 04 0b cc 80 ff ff ff  ................
+	    43 00 00 00 02 00 00 00 88 75 32 34 9e b1 ff ff  C........u24....
+	  backtrace (crc b81c2109):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<00000000455bcad8>] vcap_api_encode_rule_test+0x288/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0500 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    80 05 0b cc 80 ff ff ff 80 04 0b cc 80 ff ff ff  ................
+	    26 00 00 00 00 00 00 00 01 01 32 34 9e b1 ff ff  &.........24....
+	  backtrace (crc cd869381):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<0000000019ba4572>] vcap_api_encode_rule_test+0x2f4/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0580 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    00 06 0b cc 80 ff ff ff 00 05 0b cc 80 ff ff ff  ................
+	    2d 00 00 00 00 00 00 00 00 00 32 34 9e b1 ff ff  -.........24....
+	  backtrace (crc b6e93f38):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<000000002686800e>] vcap_api_encode_rule_test+0x3b4/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0600 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    80 06 0b cc 80 ff ff ff 80 05 0b cc 80 ff ff ff  ................
+	    2e 00 00 00 01 00 00 00 05 00 00 00 0f 00 00 00  ................
+	  backtrace (crc 756852a3):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<0000000098d890ee>] vcap_api_encode_rule_test+0x414/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0680 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    00 09 0b cc 80 ff ff ff 00 06 0b cc 80 ff ff ff  ................
+	    2c 00 00 00 01 00 00 00 01 cd ab ff ff ff ff ff  ,...............
+	  backtrace (crc dbfa781b):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<00000000178c94db>] vcap_api_encode_rule_test+0x474/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0700 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    80 07 0b cc 80 ff ff ff 28 b7 58 ca 80 ff ff ff  ........(.X.....
+	    3c 00 00 00 00 00 00 00 01 2f 03 b3 ec ff ff ff  <......../......
+	  backtrace (crc 8d877792):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000006eadfab7>] vcap_rule_add_action+0x2d0/0x52c
+	    [<00000000323475d1>] vcap_api_encode_rule_test+0x4d4/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0780 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    00 08 0b cc 80 ff ff ff 00 07 0b cc 80 ff ff ff  ................
+	    03 00 00 00 01 00 00 00 64 00 00 00 ec ff ff ff  ........d.......
+	  backtrace (crc df76176e):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000006eadfab7>] vcap_rule_add_action+0x2d0/0x52c
+	    [<000000005e4ec13f>] vcap_api_encode_rule_test+0x530/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0800 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    80 08 0b cc 80 ff ff ff 80 07 0b cc 80 ff ff ff  ................
+	    29 00 00 00 01 00 00 00 01 00 00 00 ec ff ff ff  )...............
+	  backtrace (crc 584e934a):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000006eadfab7>] vcap_rule_add_action+0x2d0/0x52c
+	    [<00000000d9812c5f>] vcap_api_encode_rule_test+0x588/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0880 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898265
+	  hex dump (first 32 bytes):
+	    28 b7 58 ca 80 ff ff ff 00 08 0b cc 80 ff ff ff  (.X.............
+	    2a 00 00 00 01 00 00 00 01 00 00 00 ec ff ff ff  *...............
+	  backtrace (crc 69b89f49):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000006eadfab7>] vcap_rule_add_action+0x2d0/0x52c
+	    [<000000005fa426b8>] vcap_api_encode_rule_test+0x5e0/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0900 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898266
+	  hex dump (first 32 bytes):
+	    80 09 0b cc 80 ff ff ff 80 06 0b cc 80 ff ff ff  ................
+	    7d 00 00 00 01 00 00 00 00 00 00 00 ff 00 00 00  }...............
+	  backtrace (crc 34181e56):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<00000000991e3564>] vcap_val_rule+0xcf0/0x13e8
+	    [<00000000fc9868e5>] vcap_api_encode_rule_test+0x678/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
+	unreferenced object 0xffffff80cc0b0980 (size 64):
+	  comm "kunit_try_catch", pid 1215, jiffies 4294898266
+	  hex dump (first 32 bytes):
+	    18 b7 58 ca 80 ff ff ff 00 09 0b cc 80 ff ff ff  ..X.............
+	    67 00 00 00 00 00 00 00 01 01 74 88 c0 ff ff ff  g.........t.....
+	  backtrace (crc 275fd9be):
+	    [<0000000052a0be73>] kmemleak_alloc+0x34/0x40
+	    [<0000000043605459>] __kmalloc_cache_noprof+0x26c/0x2f4
+	    [<000000000ff63fd4>] vcap_rule_add_key+0x2cc/0x528
+	    [<000000001396a1a2>] test_add_def_fields+0xb0/0x100
+	    [<000000006e7621f0>] vcap_val_rule+0xa98/0x13e8
+	    [<00000000fc9868e5>] vcap_api_encode_rule_test+0x678/0x16b0
+	    [<00000000b3595fc4>] kunit_try_run_case+0x13c/0x3ac
+	    [<0000000010f5d2bf>] kunit_generic_run_threadfn_adapter+0x80/0xec
+	    [<00000000c5d82c9a>] kthread+0x2e8/0x374
+	    [<00000000f4287308>] ret_from_fork+0x10/0x20
 
-https://lore.kernel.org/all/E1mpSba-00BXp6-9e@rmk-PC.armlinux.org.uk/
+Cc: stable@vger.kernel.org
+Fixes: a3c1e45156ad ("net: microchip: vcap: Fix use-after-free error in kunit test")
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+ drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Google uselessly refused to find it, so I searched my own mailboxes
-to find the message ID.
-
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
+index f2a5a36fdacd..7251121ab196 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
++++ b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
+@@ -1444,6 +1444,8 @@ static void vcap_api_encode_rule_test(struct kunit *test)
+ 
+ 	ret = vcap_del_rule(&test_vctrl, &test_netdev, id);
+ 	KUNIT_EXPECT_EQ(test, 0, ret);
++
++	vcap_free_rule(rule);
+ }
+ 
+ static void vcap_api_set_rule_counter_test(struct kunit *test)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.34.1
+
 
