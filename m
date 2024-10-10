@@ -1,113 +1,79 @@
-Return-Path: <netdev+bounces-134396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04867999267
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:34:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B558C9992EC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:46:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EE1A1F23C31
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:34:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB2D91C24A7D
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2521CF29E;
-	Thu, 10 Oct 2024 19:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D3B1F4FBC;
+	Thu, 10 Oct 2024 19:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iG9zYQkV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VNYXfswn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B181CEAD5;
-	Thu, 10 Oct 2024 19:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1CF1F4FB7;
+	Thu, 10 Oct 2024 19:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728588882; cv=none; b=m6K8k6TFaXDfRW0GH1Q1hp9ibFsOy3FsxhydpGXpWq7vURIfnHHT1be3Mp8XjGQJl2PWTvL3oBSD2lujLsV3I8q0j3AmowkmDQHva9K7EfNWtZiinh4PFSpyDQpCIw5e4neAg1YAZIPs5awQdY05w4CtjOsfjlCFMqnaVEZhPR8=
+	t=1728589311; cv=none; b=oTb5VUj6JRREhs5Kfla4MHlFb2XI/7a1c/v5/3Xv/EgnHO43uf3OwUMTXo/w3s4Up1ycFNjn2vR9Yi3YiSkRsoDli48FHO3uHlwPo4r974kJwsBV5Hhcr1K3tbvHQB21vqieuGQnzpcs9yt8Ap/xcgvrYnP5hT3qTyMzL4CVNHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728588882; c=relaxed/simple;
-	bh=t75GofhSDibsXkq5vhS4pidBfayrClpUtE6ydgObg+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=EYsvELSdHnU/R4VZnZamw0x95O95wZI85wMyqJHUfWhlIS6tMm9d8nYgCrl+yl8AoH6S9OO5d/lSUkzSGy+KdN+o38owkm+eDUdcHiRZzOrO25bUeNtjhUdooAdi3VVjBqYqw2svdNy3gLZmG5YiWNCXjc+P084M/d7t6X/O+go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iG9zYQkV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AB84C4CED3;
-	Thu, 10 Oct 2024 19:34:41 +0000 (UTC)
+	s=arc-20240116; t=1728589311; c=relaxed/simple;
+	bh=t6uCfFtEFICuupnzh9+lQsalBbungN5YYQ9DTMNH93U=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=E/mx1bFNLhtdCIGtboRqav/+Ruq2kEMpJ09pmFrM6EuS1zbCeiGZqsoD4V7yqHKnSY0EGueh+F6o4cvOv+rc0f9e/oYN2r+npqOZuwNj0OevWGFe5XEMPWOsgkNUT1SCjTo9vdB8tOXbtrR3YyJ3edw2iI6jhJUI18lyyIySnnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VNYXfswn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46E78C4CEC5;
+	Thu, 10 Oct 2024 19:41:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728588881;
-	bh=t75GofhSDibsXkq5vhS4pidBfayrClpUtE6ydgObg+o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=iG9zYQkVZOcHqaRKOI6wrEQfjZr1z2Z1D1IvFmoQOxkYniwUQ5sAxt06tdYj8VKcU
-	 xoTZ1cqyxu9E/OSihCgCRlY3narzag0HOkF5Kfxz4px/KIJZZVM2mdgN8tqPRKgNfI
-	 9fP+3VMNw8pby4faKrqHqyq1mhK7EKFg3knqgEaJUzrnVkyQOk4q9ejfN+SSKNNQnu
-	 fGJVvha/YpE7+9bZeOKyMSLTlmb5bADcEFNzrg/T9lNTjWMearBHlv7zKjxwBJgEo4
-	 R/A6gnNUokMqGUS6b540eVyh+ESwutnNCRc/vzvqxRWg2KU9qTpjGEDlLdEW2VJsjz
-	 dX2Q1jC5z6h7g==
-Date: Thu, 10 Oct 2024 14:34:39 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, vladimir.oltean@nxp.com,
-	claudiu.manoil@nxp.com, xiaoning.wang@nxp.com, Frank.Li@nxp.com,
-	christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
-	bhelgaas@google.com, imx@lists.linux.dev, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next 07/11] PCI: Add NXP NETC vendor ID and device IDs
-Message-ID: <20241010193439.GA574630@bhelgaas>
+	s=k20201202; t=1728589311;
+	bh=t6uCfFtEFICuupnzh9+lQsalBbungN5YYQ9DTMNH93U=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=VNYXfswnGgvPv6wlj5fYj+9C/T3XTv83gpmVjAl+3pi65lqfcbNH0iYCgshciPdk3
+	 DJdyYy1HjRluZVefdgcZy3ioczFnvdVtH9uzs6Md5OVyN2C9Hi1B9XnnOAYP69rVc2
+	 K5ows3r02FaEFa2xXvidrZ36ZBZN2A8vdPva0Rwv3Ps5PknXuAQ98KZ5PjLnHOQp3d
+	 FYU5/ODOSrYN+wwUssFbSw9L/Lmx+lE1vjwcH5vykoMRqsctWDKYmBSMEl5OXv9LgS
+	 j9cOm7ecv0tUF+ff8wUQ91Ngja6fGm9F2hFCPt5bL6pJCOGJg1+/sgJRvJMJFN7e/j
+	 XZxyubVwicqXw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFE33803263;
+	Thu, 10 Oct 2024 19:41:56 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.12-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20241010172641.1027485-1-kuba@kernel.org>
+References: <20241010172641.1027485-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20241010172641.1027485-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.12-rc3
+X-PR-Tracked-Commit-Id: 7b43ba65019e83b55cfacfcfc0c3a08330af54c1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 1d227fcc72223cbdd34d0ce13541cbaab5e0d72f
+Message-Id: <172858931549.2148416.5277556015563366735.pr-tracker-bot@kernel.org>
+Date: Thu, 10 Oct 2024 19:41:55 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241009095116.147412-8-wei.fang@nxp.com>
 
-On Wed, Oct 09, 2024 at 05:51:12PM +0800, Wei Fang wrote:
-> NXP NETC is a multi-function PCIe Root Complex Integrated Endpoint
-> (RCiEP) and it contains multiple PCIe functions, such as EMDIO,
-> PTP Timer, ENETC PF and VF. Therefore, add these device IDs to
-> pci_ids.h
-> 
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+The pull request you sent on Thu, 10 Oct 2024 10:26:41 -0700:
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.12-rc3
 
-OK as-is, but if you have occasion to update this series for other
-reasons:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/1d227fcc72223cbdd34d0ce13541cbaab5e0d72f
 
-  - Slightly redundant to say "multi-function RCiEP ... contains
-    multiple functions".
+Thank you!
 
-  - Mention the drivers that will use these symbols in this commit log
-    so it's obvious that they're used in multiple places.
-
-  - Wrap the commit log to fill 75 columns.
-
-> ---
->  include/linux/pci_ids.h | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/include/linux/pci_ids.h b/include/linux/pci_ids.h
-> index 4cf6aaed5f35..acd7ae774913 100644
-> --- a/include/linux/pci_ids.h
-> +++ b/include/linux/pci_ids.h
-> @@ -1556,6 +1556,13 @@
->  #define PCI_DEVICE_ID_PHILIPS_SAA7146	0x7146
->  #define PCI_DEVICE_ID_PHILIPS_SAA9730	0x9730
->  
-> +/* NXP has two vendor IDs, the other one is 0x1957 */
-> +#define PCI_VENDOR_ID_NXP2		PCI_VENDOR_ID_PHILIPS
-> +#define PCI_DEVICE_ID_NXP2_ENETC_PF	0xe101
-> +#define PCI_DEVICE_ID_NXP2_NETC_EMDIO	0xee00
-> +#define PCI_DEVICE_ID_NXP2_NETC_TIMER	0xee02
-> +#define PCI_DEVICE_ID_NXP2_ENETC_VF	0xef00
-> +
->  #define PCI_VENDOR_ID_EICON		0x1133
->  #define PCI_DEVICE_ID_EICON_DIVA20	0xe002
->  #define PCI_DEVICE_ID_EICON_DIVA20_U	0xe004
-> -- 
-> 2.34.1
-> 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
