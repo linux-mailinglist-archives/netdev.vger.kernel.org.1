@@ -1,120 +1,144 @@
-Return-Path: <netdev+bounces-134406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F8E9993AE
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:30:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 316159993B3
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:31:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 364481C2304D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:30:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5FE31F231C3
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8961CEE8D;
-	Thu, 10 Oct 2024 20:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FEAF1CBEAB;
+	Thu, 10 Oct 2024 20:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4nR2BjE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwVrSsJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540261BBBEB;
-	Thu, 10 Oct 2024 20:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86AE319D064
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 20:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728592221; cv=none; b=a/iLcVIXmhG83+7PVaKcrND5c9Z/5HwpRyTjLVTKMgCRbjjgW5W37NuQ+hVDc4ib5MnPwVaZe+qbJ1hWmLvjv5ZiM/NPgyzrZiK5xcw6y+Z/Im/M5KSfWL8ucr19MSnAWzYoAMEFHVIWJhB6zUfF6Jo3aWwP0AjsUIMilRLp6y8=
+	t=1728592288; cv=none; b=jHjzoKgU0yTfzVbbWEeMGXVrMhub7tiLH5Qkh46rkcs0ksm0xAuYGzRaMBSzAKiCzuSL+NAZnIryqVXTwjqLF5qrD2nCPEfdfBzONfMywjA/DZbFZRjdYEXkfVgc1PA6IWOYDyYFgJW5DRSuzNcPDT2iSB5U/y3I366RoRS81wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728592221; c=relaxed/simple;
-	bh=Xfoy5x4j60RyTDi5mge63ITLR7dG5zN2yb76dSOiyY8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s+GwPpRhgPaorFiRhs6gxFSyqrhmCBZjae4+khOj9IwzXrIhEAIvQ7Rhbou3WJxGDulfivU3K0VrfPEXESqcUJLugkooABPXZk2v453gqMuFjxiNOO+dhJySnAVtTjlAqj6ekSea4nYxf6Z9qEWqOUxEOW5vt5G+SeeMRGUmCvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4nR2BjE; arc=none smtp.client-ip=209.85.128.194
+	s=arc-20240116; t=1728592288; c=relaxed/simple;
+	bh=Ki232wUFcvOlwGHjlwA3DQLGm72SvsI0YLACOtetnZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T4pPEUXie6bODLpMRKl42tlFMIxQ2VxGAV5eD9lqGy4sjWgbIriw5lORwIyyk0FfutZPuNg8uVg+TZ2lywb9ZJ5z0ggQf5VRp0/1k7j0qNhaH2Pe8TJ9Hq2V3xam8QWqIBXQfDe7+2K1xSrlTJeNqH2dxhl0B+E9SuhWwqBAeTA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwVrSsJ4; arc=none smtp.client-ip=209.85.208.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-6e232e260c2so13014767b3.0;
-        Thu, 10 Oct 2024 13:30:20 -0700 (PDT)
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2fac60ab585so13392601fa.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:31:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728592219; x=1729197019; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YroJGO6PjfhfZ20pefw7162KbigTCkcCoLor9Hsx1oU=;
-        b=I4nR2BjEVF550OdIQTCD9jGCRWU4QwjIYJi7re88hcqXkilqY2Nyf5lNGJQFlRBd4X
-         CM1YS2+FTAPSvFUp02nKi2G+6Z7jOP/hDfSkOh8HbA9rlfShpRIwmU4p4QEtH2beBqCc
-         bucaG5U60QSRWdDYHSaxa5Z7ab8L28Sn0N9nWmppuVt9qelGI+py7owkNpiewcuJ80h/
-         q6iZGF8lmYPiSWgQ9z+ZiD+44uk4oXXInkCwE7eP7RS/4F7abMMTgUUcFahGVt4GI6OA
-         4K+YO74J9+jbv77fcq2k/WEXY9a0VAgSP5lDWM7SyI3j9tR9XvMtIqrsmC1kx28zg0h2
-         SDvA==
+        d=gmail.com; s=20230601; t=1728592284; x=1729197084; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3k2MWb0seFKuo7cYNb8ZHsjG7JTps9V/jxdBLKOq6XY=;
+        b=mwVrSsJ4qRVsKuHQdrBeiYj+cwi6j2W/DuQzNHmovbssZwzRj1PPwUr6qoymbf0fFT
+         afr7cnD4vKtoky6jPOBKHOPPBrp43ZAUVGvjSvza+ClbsFeELNTgzPQkOav/8yKfbYUx
+         RF0sQP+IEpyoi9xYn28+tPYJzqSHMokBBNuV+Mhsy50eDjNks8Nh02Tkvfiw91mD7Jxk
+         N9wYSalAi1X+hucY4pjwGpV6Yr4KR0lR8kWsAuLtNz4psPhg1lWiP7N1s8w2miKmmBLi
+         eEGZ+Mu2SbxqHgagshJsw0TGsADoLK6May+kxADmmj8vaaBq+CFw/JYb63PnzJz/3zlC
+         rLow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728592219; x=1729197019;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YroJGO6PjfhfZ20pefw7162KbigTCkcCoLor9Hsx1oU=;
-        b=rwPw+2ik410AIFNe5WffCoUBaRHnUglHPmUKRyXvRP+Ma0awNkphFaKjKOWzETWlSa
-         sYQT0Doft463HwZNWaSS0xobAQ+AI8LcXa4huRwfVkn2eCBjw9OLAN5DZMQ/b3EBd4rY
-         bQlbX/l2m1f5hbRKCxmLmG27bQx5Z/ALMp1LmcaZIJgf6b3CxxNEdRqRvRKFjl8zmFFR
-         XSTcUMT7iyAfoVRJ/naMj87aCFX/cCUetV9NfRcPwUrHVUM8xao6Dxl73lWZ+ie/zl8/
-         tKyMEvRelh1zZoMumOjkH+Jvp1y/i4qAfQaXySj1/4cMMqh9VWpPYnhuxon13Zuy20ul
-         EtvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvd5Dqydl2IaaUc6MOHWHgElet/m7S7wsAU5pAsDHRJQPzYkm2K4WOfXHm+rEbYEs9Ii0GzXK4@vger.kernel.org, AJvYcCWc/JgefZm0nqh6lW6WbWI1NqLDb9tV5ajOfzhnZYQiCnPc+5AoyIKmhSTzTCfFz3k/3yaZ3EqvrDjDl9A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ3y0Iv9MZACO9HkiZMCjtZloGFprcYrgoGUc+RaKLUs0QWx/+
-	0URyPX7Kw7JXBDbti0z2pu/8DpRDBGk0kujMjz85sXeqVXLYccNL
-X-Google-Smtp-Source: AGHT+IFXAqpm+avkXvxFV0INi5HtAmbH2KDLrpqYf71LYyLjMhdCd/QKCvKqB5vWMTyEZdBNrrWsrw==
-X-Received: by 2002:a05:690c:6609:b0:6e3:36cc:eb74 with SMTP id 00721157ae682-6e347c4ce3dmr1412377b3.32.1728592219339;
-        Thu, 10 Oct 2024 13:30:19 -0700 (PDT)
-Received: from dove-Linux.. ([2601:586:8301:5150:3908:7240:1fb2:350f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e332bae464sm3424467b3.58.2024.10.10.13.30.18
+        d=1e100.net; s=20230601; t=1728592284; x=1729197084;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3k2MWb0seFKuo7cYNb8ZHsjG7JTps9V/jxdBLKOq6XY=;
+        b=ojk8A0g38gFax+woeoEfKdw/8O+NTICqgemGEDeq8cOjgms0WXmJommHCBSHwFyxAw
+         x2SHYvszUJX6v6vdGf0UeZjQNc966IkZ7h0TE1CQA2mMp31ybg1sTMYddnadUXu+wHNd
+         BPw9PGSXRijZIKY0fMGYQrmBNpyq6lA98HfiieYwuvOxlZG+isRAdNoGrZp2bkzIACD1
+         /zk/s2+DuTGOEnPlGNDfWtwEna0X+gH4NIlE4rBqkdDvLP9bsdnKd1ym4126ZbEvI46y
+         Zhlf+dFCVcXW4odnejaUhRQZ/vubq1A3I+rTkjdq/i4uXzPf0V+P67vv3ij+XT1mPDy5
+         U94g==
+X-Forwarded-Encrypted: i=1; AJvYcCVsdK/Fi1qX/24BhSylQvF6H9NsubpIp0TtxgOnLrcDqCRp1vDRRep33CQtrW8xYs5OIMLLd0Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/FyxjrTXDsxIfpa5Cey7Gsr5FnWmZfZMJ51tErjFKHwlAXoGC
+	CZWr1CwJVtA+Xgq95iMMr/n8l/keY4AzF5uYbsvHrMSOdVAGwUaS
+X-Google-Smtp-Source: AGHT+IFICGzObqMtyDecknzLwhoDgga4CQl0AhOmnVkzq/uPaeTdp0l6NSqKfI/08veuxhT9YaiAJQ==
+X-Received: by 2002:a2e:b894:0:b0:2fa:c014:4b6b with SMTP id 38308e7fff4ca-2fb32b014b6mr155571fa.41.1728592284063;
+        Thu, 10 Oct 2024 13:31:24 -0700 (PDT)
+Received: from mobilestation ([85.249.18.22])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fb2457983fsm3088341fa.27.2024.10.10.13.31.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 13:30:18 -0700 (PDT)
-From: Iulian Gilca <igilca1980@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: igilca@outlook.com,
-	Iulian Gilca <igilca1980@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] User random address if dt sets so
-Date: Thu, 10 Oct 2024 16:29:37 -0400
-Message-ID: <20241010202949.226488-1-igilca1980@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <b4d4090a-2197-40ce-9bb5-1d651496d414@lunn.ch>
-References: <b4d4090a-2197-40ce-9bb5-1d651496d414@lunn.ch>
+        Thu, 10 Oct 2024 13:31:22 -0700 (PDT)
+Date: Thu, 10 Oct 2024 23:31:18 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Jiawen Wu <jiawenwu@trustnetic.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>
+Subject: Re: [PATCH net-next 00/13] net: pcs: xpcs: cleanups batch 2
+Message-ID: <6x6ysomjef4khxhaflggtyzqca3rwxh2f4wifmbddm3pjasbbz@fc3wingdcoeh>
+References: <Zv_BTd8UF7XbJF_e@shell.armlinux.org.uk>
+ <vjmounqvfxzqpdsvzs5tzlqv7dfb4z2nect3vmuaohtfm6cn3t@qynqp6zqcd3s>
+ <rxv7tlvbl57yq62obsqtgr7r4llnb2ejjlaeausfxpdkxgxpyo@kqrgq2hdodts>
+ <ZwZMglQLdg-5XPwm@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZwZMglQLdg-5XPwm@shell.armlinux.org.uk>
 
----
- net/core/of_net.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Wed, Oct 09, 2024 at 10:27:30AM GMT, Russell King (Oracle) wrote:
+> On Wed, Oct 09, 2024 at 03:02:46AM +0300, Serge Semin wrote:
+> > On Sat, Oct 05, 2024 at 02:40:42AM GMT, Serge Semin wrote:
+> > > Hi
+> > > 
+> > > On Fri, Oct 04, 2024 at 11:19:57AM GMT, Russell King (Oracle) wrote:
+> > > > This is the second cleanup series for XPCS.
+> > > > 
+> > > > ...
+> > > 
+> > > If you don't mind I'll test the series out on Monday or Tuesday on the
+> > > next week after my local-tree changes concerning the DW XPCS driver
+> > > are rebased onto it.
+> > 
+> > As promised just finished rebasing the series onto the kernel 6.12-rc2
+> > and testing it out on the next HW setup:
+> > 
+> > DW XGMAC <-(XGMII)-> DW XPCS <-(10Gbase-R)-> Marvell 88x2222
+> > <-(10gbase-r)->
+> > SFP+ DAC SFP+
+> > <-(10gbase-r)->
+> > Marvell 88x2222 <-(10gbase-r)-> DW XPCS <-(XGMII)-> DW XGMAC
+> > 
+> > No problem has been spotted.
+> > 
+> > Tested-by: Serge Semin <fancer.lancer@gmail.com>
+> 
 
-diff --git a/net/core/of_net.c b/net/core/of_net.c
-index aa4acdffc710..a11f1c12c395 100644
---- a/net/core/of_net.c
-+++ b/net/core/of_net.c
-@@ -142,7 +142,11 @@ int of_get_mac_address(struct device_node *np, u8 *addr)
- 	if (!ret)
- 		return 0;
- 
--	ret = of_get_mac_addr(np, "random-address", addr);
-+	if (of_find_property(np, "random-address", NULL)) {
-+		eth_random_addr(addr);
-+		return 0;
-+	}
-+
- 	if (!ret)
- 		return 0;
- 
--- 
-2.43.0
+> Thanks. However, it looks like patchwork hasn't picked up your
+> tested-by. Maybe it needs to be sent in reply to the cover message
+> and not in a sub-thread?
+> 
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=895512
+> 
+> Maybe netdev folk can add it?
 
+Yeah, the tb-tag hasn't been added to the commits either:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=bb0b8aeca636373a9136a7a5b7594031c7587c5e
+Likely you are right and the patchwork just doesn't detect the
+sub-replies tags. In the meantime the b4-tool does pick them up. I've
+just tested it.
+
+-Serge(y)
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
