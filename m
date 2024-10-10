@@ -1,107 +1,88 @@
-Return-Path: <netdev+bounces-134190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98254998563
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:56:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1F2099856B
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 14:00:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8F7C1C232FD
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:56:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 557D8B20FCF
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 12:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F891C32F1;
-	Thu, 10 Oct 2024 11:56:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AE21C3304;
+	Thu, 10 Oct 2024 12:00:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fOrvlRz5"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RA6GjwHj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49301BE23D;
-	Thu, 10 Oct 2024 11:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F671C3306
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 12:00:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728561398; cv=none; b=sIpNuzJWZ0T9TpinfB9+8K/+necOcepiFDj0u90qZx9lRpxzq7JypdPwOK3lWbYaNU2HOaonItpDeaSubYcGVu/VBPfdQgwLSII0XQMKKg/pAZd/zEIaQyunb2cAvk065IltJ5O6kWEUb2k7epsvvZAvPaSYImEM2bsDRLSE14s=
+	t=1728561604; cv=none; b=L+QilI2At1ZQG/HJxLOpLsX5Viw8i/Hp7s8gNAqTm9SXbNNrl29vm3aaNcDaOPjYYe3vEUQmXXRGhjhb+cr6PkiDjPRE5WWUiEve9hDw1Jc35xY0t8hF2qBcOcyNdsPsvdXgB58CT2LNs/pglOnNho7a9fr+mKZIaZYwoQfkEV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728561398; c=relaxed/simple;
-	bh=g0mJrkgOFjF/EPZobqRoNNKRxR2msN1zVVeJiADVljQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z3idkvMpObDVYcubX9MFLymdvsemEu8ugCSt5c9eJcBQkWMjilu4M0uq4GgJ8SqOg0edEDxLA2xP8loQtFi+QQWRvRXNuk7gKFEd4TUtgpIg1ECAGBQW4OAb5s78ViTS46WQLH3DoFnNcF3YYLAMiOFjF5GUS6IQfzsOijKxvNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fOrvlRz5; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1728561385; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=IE9WTErSsarSbJYkwpClIloeKGivinfPYDinjLv3SYM=;
-	b=fOrvlRz5bqYygNDMeLEOVsq2ykJPfcGSJJUGBjnGnxAXRsDhL748AtJaWP4hSkLBIGz9WgNy08EVIU2ORRF+E+p+Xd0OjV0If48nh5ioQAOQF35mKKqAVt3GbNhZJ6SJSjwg0R185VOoUUZpJH8E6vHm4i6BZ1Ko2nuecL3Lq3o=
-Received: from localhost(mailfrom:KaiShen@linux.alibaba.com fp:SMTPD_---0WGmFPL-_1728561384 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 10 Oct 2024 19:56:25 +0800
-From: Kai Shen <KaiShen@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	guwen@linux.alibaba.com,
-	kuba@kernel.org
-Cc: davem@davemloft.net,
-	tonylu@linux.alibaba.com,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net] net/smc: Fix memory leak when using percpu refs
-Date: Thu, 10 Oct 2024 11:56:24 +0000
-Message-Id: <20241010115624.7769-1-KaiShen@linux.alibaba.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1728561604; c=relaxed/simple;
+	bh=cps4l5o9l7YxbjuwbtsqXI0ouqQFhZDxu43nUYycFX8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DY8Lvnq6cRBvAFiXyQYPt7le+zChGXuMw1sq/IqQ4EKbtiCoL5nPdS9UhjmFW0hK1IZKMm0KMgjlmBSjSVnFCMI4oe1Wch0KlE3dKU1Hd3X6MC7dOKhrEWu39K5J/uejadLujEqXgga7ddonXs4+6wNDUnOpvXqjf0ARHJpoNV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RA6GjwHj; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1728561602; x=1760097602;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cps4l5o9l7YxbjuwbtsqXI0ouqQFhZDxu43nUYycFX8=;
+  b=RA6GjwHj1fKspO7XNb171PcsqULbz+Rhx/YfdOrghHGK6qIWl30CMWZl
+   twJ8Hr1tCzfc66qNZVnro0XGlyXpb5ilC2k5Rc+Ry05tEXY0ZaKYGpUbY
+   PI7n9IqEum+kfBsMzJYqvYYQjN4KzaGKHdz+C0bwuQM8jDTNjNa14HPjr
+   irUkNL/MIHFx3ecs/Dawb+/NS3dAPGVfWH+4w+wsUpinpV3ginMdbsFk7
+   zoqoymmWMgObMLfsGB70sVshkTLVloFaoYTdE4WlNfL4GgMJDaw3zGpUQ
+   neg8HOhvOrJSMTJ+zBsoZUsp9LiDxTaPsF3V0PGjOQj+411chhLUp9i4y
+   g==;
+X-CSE-ConnectionGUID: PazXVJ3DQEeVdRVcM5761Q==
+X-CSE-MsgGUID: QR93AAuqS4q8sK7axmV5pQ==
+X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
+   d="scan'208";a="200279044"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Oct 2024 05:00:01 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 10 Oct 2024 04:59:41 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 10 Oct 2024 04:59:39 -0700
+Date: Thu, 10 Oct 2024 11:59:39 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Ido Schimmel <idosch@nvidia.com>
+CC: <netdev@vger.kernel.org>, <dsahern@gmail.com>,
+	<stephen@networkplumber.org>, <gnault@redhat.com>, <petrm@nvidia.com>
+Subject: Re: [PATCH iproute2-next 1/2] man: Add ip-rule(8) as generation
+ target
+Message-ID: <20241010115939.wmmvfps4fmnlzdev@DEN-DL-M70577>
+References: <20241009062054.526485-1-idosch@nvidia.com>
+ <20241009062054.526485-2-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241009062054.526485-2-idosch@nvidia.com>
 
-This patch adds missing percpu_ref_exit when releasing percpu refs.
-When releasing percpu refs, percpu_ref_exit should be called.
-Otherwise, memory leak happens.
+> In a similar fashion to other man pages, add ip-rule(8) as generation
+> target so that we could use variable substitutions there in a subsequent
+> patch.
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 
-Fixes: 79a22238b4f2 ("net/smc: Use percpu ref for wr tx reference")
-Signed-off-by: Kai Shen <KaiShen@linux.alibaba.com>
----
- net/smc/smc_wr.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/net/smc/smc_wr.c b/net/smc/smc_wr.c
-index 0021065a600a..994c0cd4fddb 100644
---- a/net/smc/smc_wr.c
-+++ b/net/smc/smc_wr.c
-@@ -648,8 +648,10 @@ void smc_wr_free_link(struct smc_link *lnk)
- 	smc_wr_tx_wait_no_pending_sends(lnk);
- 	percpu_ref_kill(&lnk->wr_reg_refs);
- 	wait_for_completion(&lnk->reg_ref_comp);
-+	percpu_ref_exit(&lnk->wr_reg_refs);
- 	percpu_ref_kill(&lnk->wr_tx_refs);
- 	wait_for_completion(&lnk->tx_ref_comp);
-+	percpu_ref_exit(&lnk->wr_tx_refs);
- 
- 	if (lnk->wr_rx_dma_addr) {
- 		ib_dma_unmap_single(ibdev, lnk->wr_rx_dma_addr,
-@@ -912,11 +914,13 @@ int smc_wr_create_link(struct smc_link *lnk)
- 	init_waitqueue_head(&lnk->wr_reg_wait);
- 	rc = percpu_ref_init(&lnk->wr_reg_refs, smcr_wr_reg_refs_free, 0, GFP_KERNEL);
- 	if (rc)
--		goto dma_unmap;
-+		goto cancel_ref;
- 	init_completion(&lnk->reg_ref_comp);
- 	init_waitqueue_head(&lnk->wr_rx_empty_wait);
- 	return rc;
- 
-+cancel_ref:
-+	percpu_ref_exit(&lnk->wr_tx_refs);
- dma_unmap:
- 	if (lnk->wr_rx_v2_dma_addr) {
- 		ib_dma_unmap_single(ibdev, lnk->wr_rx_v2_dma_addr,
--- 
-2.31.1
-
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
 
