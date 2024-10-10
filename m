@@ -1,109 +1,153 @@
-Return-Path: <netdev+bounces-134082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC6B997D2D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:27:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C02E997D37
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 08:32:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4064A1C2279A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 06:27:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C71F1C21EC7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 06:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293801A08B1;
-	Thu, 10 Oct 2024 06:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3881A08B1;
+	Thu, 10 Oct 2024 06:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="ZfsLnDF6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WpyS+KIH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A22C19D8B4
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBFF18DF81;
+	Thu, 10 Oct 2024 06:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728541633; cv=none; b=rhiOx7AeoC5lZKDGA2MOJyn0igVdu9CfHAiJhg1M/rjhW+GUlGzmuCmd7pb+gcCvVkCSSEmDqkSyRDqcjjMl+myHNd3hzlJk26QA+HUKlleiupR/hn5jKR1vO5rJRrk5XP6DQGassa6YXvNO5/kyWShynWx8Nlo7JtuXNL7KFWw=
+	t=1728541919; cv=none; b=i35yZiF54O4JKFEL9YYNYY2258NHW6Pd8IskHU5H6xU954AN18zqD6qkjZehe3FOR5Aj4+3iReXt566WHfoZWPZ2kgMWohcORO7LY2/ufLWL0s7y1NI/iOYVfVfXl5L9OHULIXyEtZ6g3C2Udu985Cz0k1hjkSSvnQoZkgPigkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728541633; c=relaxed/simple;
-	bh=DJaQzZsVBQ4pNi7ZfXCLZjYApmeH7omoEawSV46OekY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b5WEa2XHL86J4VUB+V/QqVU9W5XpKV3N7S3C4tsmZGaSlQizWLx+1dUKymlNYA0tos5BnqpEc2be6x/+ljEt/bRD7QMi2jpzCRUyc1AMYpvCzuoff3Dpp4RLoOye8ZHHcHJNexxDmwhiWi6fmNBhQFIWtwOclk5wXEezecgGyrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=ZfsLnDF6; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43111cff9d3so3702435e9.1
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 23:27:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sigma-star.at; s=google; t=1728541630; x=1729146430; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DJaQzZsVBQ4pNi7ZfXCLZjYApmeH7omoEawSV46OekY=;
-        b=ZfsLnDF61UXFMl8AK0angBwqckqkAaMa0AzAYdffj+2vILcH6nWEv/bPvDDb1A9X0F
-         upMTJfOnfrv0yZxRdoqMfVhOalvD+lqSxAXFEpYvjQgTJez6G4BY1TXWTpUx4JxH6jOp
-         yHm+Y8o3YypBsqaZm2cbNrXY9tMHRvVDZTDC5WuP86GM05leNEKtY6BoG66dG6Oclv2a
-         dCWlHy823tQ8+WnRHS97j+crSXZZbs9AWSDMGd8OJWjEKvz5jPS7UIViJ7xBzFyniM9e
-         9jGqtE5A8hTV/mGMAoRIA8z0kthx+kUnmnROrJrrtSA4LJiDLgCAQkLuYPset/RaisLt
-         co3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728541630; x=1729146430;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DJaQzZsVBQ4pNi7ZfXCLZjYApmeH7omoEawSV46OekY=;
-        b=VX2QPnlAxi6al0FjRAMNc45FCzUYI49l0rk/akD42cToQ22J8p92gUXPufV7X3BhG0
-         f6MQIsB/ejl30i26NLpDW029QkROBQwxYRV1YoF76CU6YWKHDmW0Has+y1bedNOmDU+a
-         xMIvpjisCM5IM9b4DY+bezJzS/898nYPTkmqS3N1XSOKM9sr/bhLq9DdH87u/YGj88fe
-         rrjyqO3YhGqXCSdZ/fbD2qR2wqZqYjVWNhiYFzvjYhMwfTkM046H8h5Qj9GfBoIuGCRW
-         3ywjyEdS5LP/SkWa2t9Yx/GsNM6qedNLyHoeSqlW9t2FcsWG6d9DjZv5OPZ5SSrl0BrF
-         EboQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWrHOlqCFfxabyyPvrsQmeDQnHBVeA6fGjz3rtqUQhQYMVx2qDZ77XJfs5gsMQop/YLE044QRc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHsLUX8wZ1fqmSbqGbEVtzLqyADEAUwtMDUiagGutAcu7mYX1q
-	m+ZNEDyNnyShx72jKN0+yBGANhDC4DW6NdkMsQG8ypWtq2eHMo15X9MzWSOzgqw=
-X-Google-Smtp-Source: AGHT+IG8trf13n+jWHkfYQNs0jAXGzamsgifjFl/jzbdieZPwE+y/eV5VgK4wziB5cnE6mkuFWH/oA==
-X-Received: by 2002:a05:600c:444c:b0:42f:310f:de9 with SMTP id 5b1f17b1804b1-430ccf43d90mr33030595e9.15.1728541629718;
-        Wed, 09 Oct 2024 23:27:09 -0700 (PDT)
-Received: from blindfold.localnet ([82.150.214.1])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d4b79f896sm601043f8f.87.2024.10.09.23.27.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Oct 2024 23:27:09 -0700 (PDT)
-From: Richard Weinberger <richard@sigma-star.at>
-To: Richard Weinberger <richard@nod.at>, upstream@sigma-star.at
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net, kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, paul@paul-moore.com, upstream+net@sigma-star.at, Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-Date: Thu, 10 Oct 2024 08:27:08 +0200
-Message-ID: <3048359.FXINqZMJnI@somecomputer>
-In-Reply-To: <20241009213345.GC3714@breakpoint.cc>
-References: <20241009203218.26329-1-richard@nod.at> <20241009213345.GC3714@breakpoint.cc>
+	s=arc-20240116; t=1728541919; c=relaxed/simple;
+	bh=AOXY/7XJtJw0s2SV+scdj5EAD0vNp2265poPJb6jL9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iOeonlvjN8LMZ4XMIF2mfgPJuSYr0g6EKtpVm7V0SzvTr+bWk/pxNM+Jj8qHaBd/S8ObXICWbgv/Bv84JNa3m/GNaNl9hmkaArUtvkhSK4zRdJnKlw7FQfYn3uHOjV9Mhd+cSXHhgdNVxQYWYyiOYMVlSj3fEWmM+LghvEQdnrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WpyS+KIH; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728541917; x=1760077917;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AOXY/7XJtJw0s2SV+scdj5EAD0vNp2265poPJb6jL9w=;
+  b=WpyS+KIHktYXv481QYTJDhMTEmPX3Rh0RxDwPVBp6NvLZK9mMD1xYNHb
+   vi+hwlbLkmQcmBmnv8lByXW6oc43IgN9KtGhYJZHJiTKuUXwC74q8sZ9a
+   sQg4FWNO8E9ftAxT7jNaVWFqltx5uq5Wuc/4LcwfzCLoY9fwv6appMWMY
+   79nNWDYtGrIQsrROnA1SG53Na50fFCebFs9MA4v+I+gwjTR/t+vNVLET+
+   zjlyCngSA61NV0vNhRPgLkDKgSFj4kgobVc/1m8uIb9GWioZ2KsJ46aEl
+   KIjUPng6hyuywVzSGPUjPMie8nJ8ULr8rU4YBoI4CUYMxtB1lDJWwu+vK
+   A==;
+X-CSE-ConnectionGUID: 2me4YTnzSD6Od4EwQjO+ZQ==
+X-CSE-MsgGUID: nY6kRwlFRJayu7ry55Bm6Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11220"; a="53284277"
+X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
+   d="scan'208";a="53284277"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Oct 2024 23:31:56 -0700
+X-CSE-ConnectionGUID: CSBrZBxxSSaRjHZRjd9Ufw==
+X-CSE-MsgGUID: b11rVd95R0WakFa04NsjHg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,192,1725346800"; 
+   d="scan'208";a="81020464"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 09 Oct 2024 23:31:51 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1symiC-000AHD-2s;
+	Thu, 10 Oct 2024 06:31:48 +0000
+Date: Thu, 10 Oct 2024 14:31:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>, andersson@kernel.org,
+	mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
+	krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org,
+	catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
+	richardcochran@gmail.com, geert+renesas@glider.be,
+	dmitry.baryshkov@linaro.org, neil.armstrong@linaro.org,
+	arnd@arndb.de, nfraprado@collabora.com, quic_anusha@quicinc.com,
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, quic_srichara@quicinc.com,
+	quic_varada@quicinc.com
+Subject: Re: [PATCH v7 4/6] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+Message-ID: <202410101431.tjpSRNTY-lkp@intel.com>
+References: <20241009074125.794997-5-quic_mmanikan@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241009074125.794997-5-quic_mmanikan@quicinc.com>
 
-Am Mittwoch, 9. Oktober 2024, 23:33:45 CEST schrieb Florian Westphal:
-> There is no need to follow ->file backpointer anymore, see
-> 6acc5c2910689fc6ee181bf63085c5efff6a42bd and
-> 86741ec25462e4c8cdce6df2f41ead05568c7d5e,
-> "net: core: Add a UID field to struct sock.".
+Hi Manikanta,
 
-Oh, neat!
-=20
-> I think we could streamline all the existing paths that fetch uid
-> from sock->file to not do that and use sock_net_uid() instead as well.
-=20
-Also xt_owner?
+kernel test robot noticed the following build errors:
 
-Thanks,
-//richard
+[auto build test ERROR on clk/clk-next]
+[also build test ERROR on robh/for-next arm64/for-next/core linus/master v6.12-rc2 next-20241009]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-=2D-=20
-=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8B=E2=80=8Bsigma star gmbh | Eduard-Bodem=
-=2DGasse 6, 6020 Innsbruck, AUT
-UID/VAT Nr: ATU 66964118 | FN: 374287y
+url:    https://github.com/intel-lab-lkp/linux/commits/Manikanta-Mylavarapu/dt-bindings-clock-gcc-ipq9574-Add-definition-for-GPLL0_OUT_AUX/20241009-154517
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
+patch link:    https://lore.kernel.org/r/20241009074125.794997-5-quic_mmanikan%40quicinc.com
+patch subject: [PATCH v7 4/6] clk: qcom: Add NSS clock Controller driver for IPQ9574
+config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20241010/202410101431.tjpSRNTY-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241010/202410101431.tjpSRNTY-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> drivers/clk/qcom/nsscc-ipq9574.c:80:36: error: 'CLK_ALPHA_PLL_TYPE_NSS_HUAYRA' undeclared here (not in a function); did you mean 'CLK_ALPHA_PLL_TYPE_HUAYRA'?
+      80 |         .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
+         |                                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |                                    CLK_ALPHA_PLL_TYPE_HUAYRA
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [y]:
+   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
 
 
+vim +80 drivers/clk/qcom/nsscc-ipq9574.c
+
+    77	
+    78	static struct clk_alpha_pll ubi32_pll_main = {
+    79		.offset = 0x28000,
+  > 80		.regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_NSS_HUAYRA],
+    81		.flags = SUPPORTS_DYNAMIC_UPDATE,
+    82		.clkr = {
+    83			.hw.init = &(const struct clk_init_data) {
+    84				.name = "ubi32_pll_main",
+    85				.parent_data = &(const struct clk_parent_data) {
+    86					.index = DT_XO,
+    87				},
+    88				.num_parents = 1,
+    89				.ops = &clk_alpha_pll_huayra_ops,
+    90			},
+    91		},
+    92	};
+    93	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
