@@ -1,174 +1,325 @@
-Return-Path: <netdev+bounces-134373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85C4998F81
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:12:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B90998FAE
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:19:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 331B4B2642A
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:12:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18294282A07
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64A5F1C9B93;
-	Thu, 10 Oct 2024 18:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC9819D06D;
+	Thu, 10 Oct 2024 18:19:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="dxaE3HBA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bV226qJp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312AA38396
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6DA199395
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728583920; cv=none; b=K9B/lUNWtZyjzHoF2Qplf1f8ZV0weWeUO//AmDfxSvzKOUS7U7EpKTkbR94oh1BZU9O/zAxsac4PNfvo2qtOHeAZ9lkth9FRa1HyAcghDQ+230yNatdh87C4KjseAyCXfogX41CitzdIUpyy+7eCfgUdQHTqEebL5y+5XCyn6is=
+	t=1728584366; cv=none; b=lsKTpt2OEsTsx1ZFDIzwB2i6g690CVmaiirzePeaFDrFTr2SD+pT6wtOgK/jUjEYmMZaTsSN/aBKaqNIdQrvMoEimTj0sBSxbIagm8UScECxnAiyqJG+1ohxFW3GEmrfG12geab8ZDXyd3e7NYuZLwDubNAulFNZedyBaP5Uhiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728583920; c=relaxed/simple;
-	bh=3bWMU9e+fC2FyjouFlvZ8jusiaIzuZ0pgurWY1hHAeU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=injV89iIkVwJnQlrk2XcuZ9M19rBenhsX0bi9NhnIxpcXtYFv8T12YJ7C3Dg/QmhIBNoce+PHLCuIMXj0vdcPRxmIPHVr2ok/tOtGcnhUaU2EVQ0WJUxiHJa/awGhIyaKb8nOz6gBQcvfjvD5C3w0jmsU0ZCPHxhVOCOemr3nYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=dxaE3HBA; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a3445ab7b5so7302985ab.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:11:56 -0700 (PDT)
+	s=arc-20240116; t=1728584366; c=relaxed/simple;
+	bh=seg6PtxdKCw6658t/6NR1j0MiC5hlzZnwwtAhGtHVfo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=buSSSirn/QGGWUNP0PHnq+4msfStgP5FXgZ5Ytq03aJitfpXbnsJ3M7FHxE77CwknKlKSPar8dO0wrMGtmawKmgq0Ytq1KIpMu9DQBST+akB4S2/SVta/37NGuBbz7RwlyJRNnf5jMCEbM1cVH1M25CHj5w/NHpPWMijedBWax4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bV226qJp; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4603d3e0547so37141cf.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:19:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1728583916; x=1729188716; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v+F0BsVfrw8m5gGuuX3A/23c5S/Zo9mD7HI9V9TN0us=;
-        b=dxaE3HBAuI+r2EU60XfKgjDh45MKT3MvQMzP+8IAjIY5NF2an6zDYjwJFwnVrRl4Pe
-         vM5UsERAUWg7DvyR9eMvmBPZ2QojGLkj4bkhDkJQGhVijn0wf8+6RvkWEVsRThD361g/
-         rUJQGGdUgcvi3U8kqFsOpwtbbz7nOm1QqGWtFzSUN9fzQ2UB/7W2GT5I2tq3N2HaU3PV
-         +eSWrEOh4U8W4xwjYErA4F36ISFIx6oUIuNbc2yiSVx/zfHOIMNuJgkuTU8ix6KRfZwz
-         O775ZtFqsjHrxAvbX5HBqLMaqFcJMibyJ/ViZsBhAMWs2z121LoqU5+VHbQDGr9UaFCx
-         bQWg==
+        d=google.com; s=20230601; t=1728584362; x=1729189162; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yHYB0Fms1iMmJeXSNk7809G+fS3DYVxsl+/gdvz9aeY=;
+        b=bV226qJppKo0w9CG5Gqw/5WKDEhkgD1CjzRIKNHksglfoDAAKcKGr9fCErD1iJ5qdH
+         Mpnyy7ae1KEycOQtuynw1OTtvuZ1YV9pLGDKN/zOA/xCgNYqZWY5N+EM0h+r2q8NZSc9
+         1Uv5glE6j1Rd37F1M46ttnGu9ajBLLXJhBJRbuN2+2nbelFv3SXM+fupVbLrVvHpXw1r
+         q5zu/A0rVTEc/eH5vHHzzKg8WDfMaKKTRnUuowndj03eZnE4PkJ4S1OfV7tKhXSNSNud
+         A+lsCYTmn9X3EA5X+quCdZhsD5OrQuQTilZYadfRL/roolLYrOFAXiMOXaVLY87/Ob47
+         Etuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728583916; x=1729188716;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v+F0BsVfrw8m5gGuuX3A/23c5S/Zo9mD7HI9V9TN0us=;
-        b=gxtxin9cIrM2UkJLElfGJlWIiHzqwW5kjgc4VTfY+6+30uCLLsJUdvT+SeQcFiXC1L
-         joH11NSZu+c3CKaTufEnTZV2LNCOIjFZ9N4Cwf9xidUC1CKyIfYK9AxZ4BGSvBKP7SVz
-         w+jetJu6tFL7OdIhrcVOO1fT3GXTWjImD5Y4MbUHD7iix4iAA3p2J+qQrYXKaBqYb3fn
-         rIiN+7Y9MGYgpXzpqPJFO4y0KjRrWV23ueY1lUBTaPcvzF5alfUo4TOdOTWHzqkj+jDz
-         vPcrK7C/i4rXW9gOHWScSDBrI7cBlTieNBvGsHnyMrwg/F69thn009C34iIxBTC+PVT5
-         rpkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUk7q/OL4wTXrjPJOKQVbB1vVd62g/vdslFnHRaeLLzYAYnxUwtBvY7N8BjwsOd7VjLF97NWB4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIb1eJr1SG0nBADmz7HGkVxNQ0COJF//lbumIRI6nHACelOKtL
-	KXLsC6afAzquHRboQIZ8dtvnlRc9yCHuv481So/J11iPx+fHbRjzV4X8OSES40g=
-X-Google-Smtp-Source: AGHT+IGOV2UPuymvEgQ+6c1bH10cOMow3zjQBa5UHT+HcLNwzPNLPC4nhY84w0wxt2FwuHXhTxfzVQ==
-X-Received: by 2002:a92:c24c:0:b0:3a0:9f36:6bf1 with SMTP id e9e14a558f8ab-3a3a71d1af6mr33081815ab.9.1728583916165;
-        Thu, 10 Oct 2024 11:11:56 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4dbadaa91fbsm328259173.141.2024.10.10.11.11.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Oct 2024 11:11:55 -0700 (PDT)
-Message-ID: <9bbab76f-70db-48ef-9dcc-7fedd75582cb@kernel.dk>
-Date: Thu, 10 Oct 2024 12:11:54 -0600
+        d=1e100.net; s=20230601; t=1728584362; x=1729189162;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yHYB0Fms1iMmJeXSNk7809G+fS3DYVxsl+/gdvz9aeY=;
+        b=Epqo83+DUlXrAm9mi55dHYwZPySF3oqL0VECMsI04YM1328RxOVhvGFcnNOjf5fybJ
+         aFX3yy0MehGhM/vyI5VMGs+qnlB5vFuR1jzci36E5wiDszxaP1YF2pOcACa+lYxvK5bf
+         eoGktTJyhzD6nlphzJe4pY/zx3lCxUdJxlaDkCX3jFTX+gOmj6/hnqTcGFtmuWar717B
+         BNWTYfALRNbZQgFRi5w2HPTZ028paUuY9QzOGKLHbPRMrQ5Ys6rWm0swIv2n5BbrBM1R
+         UDT2piAVUogg9d7xtEEAPmRNp/T/B4HdTGn1vAYMqzSetxlgQgXdJSapW50EqCXFfr6Z
+         fWbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbJfO8wyyWoUHM8/wtv568j7Ry8tvhFSyrVEK/Nj01SPCmP3LyNEX921CSOVmstVVWiVI/uW0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZWDwSChau2iQyPKb3aKN5anurcDaRdjE9QzG8oRCYjvxuxG+y
+	nsGel3F4Wck8HWpJ/QRZuA6+6O5td1P9VQhWKe4sGcEcGno9HvMB8fhgY0RssIcXtB6mq4uXlkH
+	CHv1ClEdpdDQS4bYBp2K32vqV6RwNkUdZf0wV
+X-Google-Smtp-Source: AGHT+IFCTPnVHq+c88/tOkZYn15HiMN/SkgvHU1nzR91Y4dEF/ooNzJiMjoYRo1jH7+bhU2oHUoV1gPX/PH431Dl8B4=
+X-Received: by 2002:a05:622a:5f0b:b0:453:5b5a:e77c with SMTP id
+ d75a77b69052e-4604ac30a8cmr308901cf.10.1728584362284; Thu, 10 Oct 2024
+ 11:19:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/15] io_uring zero copy rx
-From: Jens Axboe <axboe@kernel.dk>
-To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20241007221603.1703699-1-dw@davidwei.uk>
- <2e475d9f-8d39-43f4-adc5-501897c951a8@kernel.dk>
- <93036b67-018a-44fb-8d12-7328c58be3c4@kernel.org>
- <2144827e-ad7e-4cea-8e38-05fb310a85f5@kernel.dk>
- <3b2646d6-6d52-4479-b082-eb6264e8d6f7@kernel.org>
- <57391bd9-e56e-427c-9ff0-04cb49d2c6d8@kernel.dk>
- <d0ba9ba9-8969-4bf6-a8c7-55628771c406@kernel.dk>
- <b8fd4a5b-a7eb-45a7-a2f4-fce3b149bd5b@kernel.dk>
- <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
-Content-Language: en-US
-In-Reply-To: <7f8c6192-3652-4761-b2e3-8a4bddb71e29@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-12-dw@davidwei.uk>
+ <CAHS8izO-=ugX7S11dTr5cXp11V+L-gquvwBLQko8hW4AP9vg6g@mail.gmail.com> <94a22079-0858-473c-b07f-89343d9ba845@gmail.com>
+In-Reply-To: <94a22079-0858-473c-b07f-89343d9ba845@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 10 Oct 2024 11:19:08 -0700
+Message-ID: <CAHS8izPjHv_J8=Hz6xZmfa857st+zyA7MLSe+gCJTdZewPOmEw@mail.gmail.com>
+Subject: Re: [PATCH v1 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/10/24 8:21 AM, Jens Axboe wrote:
-> On 10/9/24 11:12 AM, Jens Axboe wrote:
->> On 10/9/24 10:53 AM, Jens Axboe wrote:
->>> On 10/9/24 10:50 AM, Jens Axboe wrote:
->>>> On 10/9/24 10:35 AM, David Ahern wrote:
->>>>> On 10/9/24 9:43 AM, Jens Axboe wrote:
->>>>>> Yep basically line rate, I get 97-98Gbps. I originally used a slower box
->>>>>> as the sender, but then you're capped on the non-zc sender being too
->>>>>> slow. The intel box does better, but it's still basically maxing out the
->>>>>> sender at this point. So yeah, with a faster (or more efficient sender),
->>>>>
->>>>> I am surprised by this comment. You should not see a Tx limited test
->>>>> (including CPU bound sender). Tx with ZC has been the easy option for a
->>>>> while now.
->>>>
->>>> I just set this up to test yesterday and just used default! I'm sure
->>>> there is a zc option, just not the default and hence it wasn't used.
->>>> I'll give it a spin, will be useful for 200G testing.
->>>
->>> I think we're talking past each other. Yes send with zerocopy is
->>> available for a while now, both with io_uring and just sendmsg(), but
->>> I'm using kperf for testing and it does not look like it supports it.
->>> Might have to add it... We'll see how far I can get without it.
->>
->> Stanislav pointed me at:
->>
->> https://github.com/facebookexperimental/kperf/pull/2
->>
->> which adds zc send. I ran a quick test, and it does reduce cpu
->> utilization on the sender from 100% to 95%. I'll keep poking...
-> 
-> Update on this - did more testing and the 100 -> 95 was a bit of a
-> fluke, it's still maxed. So I added io_uring send and sendzc support to
-> kperf, and I still saw the sendzc being maxed out sending at 100G rates
-> with 100% cpu usage.
-> 
-> Poked a bit, and the reason is that it's all memcpy() off
-> skb_orphan_frags_rx() -> skb_copy_ubufs(). At this point I asked Pavel
-> as that made no sense to me, and turns out the kernel thinks there's a
-> tap on the device. Maybe there is, haven't looked at that yet, but I
-> just killed the orphaning and tested again.
-> 
-> This looks better, now I can get 100G line rate from a single thread
-> using io_uring sendzc using only 30% of the single cpu/thread (including
-> irq time). That is good news, as it unlocks being able to test > 100G as
-> the sender is no longer the bottleneck.
-> 
-> Tap side still a mystery, but it unblocked testing. I'll figure that
-> part out separately.
+On Wed, Oct 9, 2024 at 3:57=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 10/9/24 23:01, Mina Almasry wrote:
+> > On Mon, Oct 7, 2024 at 3:16=E2=80=AFPM David Wei <dw@davidwei.uk> wrote=
+:
+> >>
+> >> From: Pavel Begunkov <asml.silence@gmail.com>
+> >>
+> >> Implement a page pool memory provider for io_uring to receieve in a
+> >> zero copy fashion. For that, the provider allocates user pages wrapped
+> >> around into struct net_iovs, that are stored in a previously registere=
+d
+> >> struct net_iov_area.
+> >>
+> >> Unlike with traditional receives, for which pages from a page pool can
+> >> be deallocated right after the user receives data, e.g. via recv(2),
+> >> we extend the lifetime by recycling buffers only after the user space
+> >> acknowledges that it's done processing the data via the refill queue.
+> >> Before handing buffers to the user, we mark them by bumping the refcou=
+nt
+> >> by a bias value IO_ZC_RX_UREF, which will be checked when the buffer i=
+s
+> >> returned back. When the corresponding io_uring instance and/or page po=
+ol
+> >> are destroyed, we'll force back all buffers that are currently in the
+> >> user space in ->io_pp_zc_scrub by clearing the bias.
+> >>
+> >
+> > This is an interesting design choice. In my experience the page_pool
+> > works the opposite way, i.e. all the netmems in it are kept alive
+> > until the user is done with them. Deviating from that requires custom
+> > behavior (->scrub), which may be fine, but why do this? Isn't it
+> > better for uapi perspective to keep the memory alive until the user is
+> > done with it?
+>
+> It's hardly interesting, it's _exactly_ the same thing devmem TCP
+> does by attaching the lifetime of buffers to a socket's xarray,
+> which requires custom behaviour. Maybe I wasn't clear on one thing
+> though, it's accounting from the page pool's perspective. Those are
+> user pages, likely still mapped into the user space, in which case
+> they're not going to be destroyed.
+>
 
-Further update - the above mystery was dhclient, thanks a lot to David
-for being able to figure that out very quickly.
+I think we miscommunicated. Both devmem TCP and io_uring seem to bump
+the refcount of memory while the user is using it, yes. But devmem TCP
+doesn't scrub the memory when the page_pool dies. io_uring seems to
+want to scrub the memory when the page_pool dies. I'm wondering about
+this difference. Seems it's better from a uapi prespective to keep the
+memory alive until the user returns it or crash. Otherwise you could
+have 1 thread reading user memory and 1 thread destroying the
+page_pool and the memory will be pulled from under the read, right?
 
-But the more interesting update - I got both links up on the receiving
-side, providing 200G of bandwidth. I re-ran the test, with proper zero
-copy running on the sending side, and io_uring zcrx on the receiver. The
-receiver is two threads, BUT targeting the same queue on the two nics.
-Both receiver threads bound to the same core (453 in this case). In
-other words, single cpu thread is running all of both rx threads, napi
-included.
+> >> Refcounting and lifetime:
+> >>
+> >> Initially, all buffers are considered unallocated and stored in
+> >> ->freelist, at which point they are not yet directly exposed to the co=
+re
+> >> page pool code and not accounted to page pool's pages_state_hold_cnt.
+> >> The ->alloc_netmems callback will allocate them by placing into the
+> >> page pool's cache, setting the refcount to 1 as usual and adjusting
+> >> pages_state_hold_cnt.
+> >>
+> >> Then, either the buffer is dropped and returns back to the page pool
+> >> into the ->freelist via io_pp_zc_release_netmem, in which case the pag=
+e
+> >> pool will match hold_cnt for us with ->pages_state_release_cnt. Or mor=
+e
+> >> likely the buffer will go through the network/protocol stacks and end =
+up
+> >> in the corresponding socket's receive queue. From there the user can g=
+et
+> >> it via an new io_uring request implemented in following patches. As
+> >> mentioned above, before giving a buffer to the user we bump the refcou=
+nt
+> >> by IO_ZC_RX_UREF.
+> >>
+> >> Once the user is done with the buffer processing, it must return it ba=
+ck
+> >> via the refill queue, from where our ->alloc_netmems implementation ca=
+n
+> >> grab it, check references, put IO_ZC_RX_UREF, and recycle the buffer i=
+f
+> >> there are no more users left. As we place such buffers right back into
+> >> the page pools fast cache and they didn't go through the normal pp
+> >> release path, they are still considered "allocated" and no pp hold_cnt
+> >> is required.
+> >
+> > Why is this needed? In general the provider is to allocate free memory
+>
+> I don't get it, what "this"? If it's refill queue, that's because
+> I don't like actively returning buffers back via syscall / setsockopt
+> and trying to transfer them into the napi context (i.e.
+> napi_pp_put_page) hoping it works / cached well.
+>
+> If "this" is IO_ZC_RX_UREF, it's because we need to track when a
+> buffer is given to the userspace, and I don't think some kind of
+> map / xarray in the hot path is the best for performance solution.
+>
 
-Basic thread usage from top here:
+Sorry I wasn't clear. By 'this' I'm referring to:
 
-10816 root      20   0  396640 393224      0 R  49.0   0.0   0:01.77 server
-10818 root      20   0  396640 389128      0 R  49.0   0.0   0:01.76 server      
+"from where our ->alloc_netmems implementation can grab it, check
+references, put IO_ZC_RX_UREF, and recycle the buffer if there are no
+more users left"
 
-and I get 98.4Gbps and 98.6Gbps on the receiver side, which is basically
-the combined link bw again. So 200G not enough to saturate a single cpu
-thread.
+This is the part that I'm not able to stomach at the moment. Maybe if
+I look deeper it would make more sense, but my first feelings is that
+it's really not acceptable.
 
--- 
-Jens Axboe
+alloc_netmems (and more generically page_pool_alloc_netmem), just
+allocates a netmem and gives it to the page_pool code to decide
+whether to put it in the cache, in the ptr ring, or directly to the
+user, etc.
+
+The provider should not be overstepping or overriding the page_pool
+logic to recycle pages or deliver them to the user. alloc_netmem
+should just just alloc the netmem and hand it to the page_pool to
+decide what to do with it.
+
+> > and logic as to where the memory should go (to fast cache, to normal
+> > pp release path, etc) should remain in provider agnostic code paths in
+> > the page_pool. Not maintainable IMO in the long run to have individual
+>
+> Please do elaborate what exactly is not maintainable here
+>
+
+In the future we will have N memory providers. It's not maintainable
+IMO for each of them to touch pp->alloc.cache and other internals in M
+special ways and for us to have to handle N * M edge cases in the
+page_pool code because each provider is overstepping on our internals.
+
+The provider should just provide memory. The page_pool should decide
+to fill its alloc.cache & ptr ring & give memory to the pp caller as
+it sees fit.
+
+> > pp providers customizing non-provider specific code or touching pp
+> > private structs.
+>
+> ...
+> >> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> >> index 8382129402ac..6cd3dee8b90a 100644
+> >> --- a/io_uring/zcrx.c
+> >> +++ b/io_uring/zcrx.c
+> >> @@ -2,7 +2,11 @@
+> ...
+> >> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct n=
+et_iov *niov)
+> >> +{
+> >> +       struct net_iov_area *owner =3D net_iov_owner(niov);
+> >> +
+> >> +       return container_of(owner, struct io_zcrx_area, nia);
+> >
+> > Similar to other comment in the other patch, why are we sure this
+> > doesn't return garbage (i.e. it's accidentally called on a dmabuf
+> > net_iov?)
+>
+> There couldn't be any net_iov at this point not belonging to
+> the current io_uring instance / etc. Same with devmem TCP,
+> devmem callbacks can't be called for some random net_iov, the
+> only place you need to explicitly check is where it comes
+> from generic path to a devmem aware path like that patched
+> chunk in tcp.c
+>
+> >> +static inline void io_zc_add_pp_cache(struct page_pool *pp,
+> >> +                                     struct net_iov *niov)
+> >> +{
+> >> +       netmem_ref netmem =3D net_iov_to_netmem(niov);
+> >> +
+> >> +#if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
+> >> +       if (pp->dma_sync && dma_dev_need_sync(pp->p.dev)) {
+> >
+> > IIRC we force that dma_sync =3D=3D true for memory providers, unless yo=
+u
+> > changed that and I missed it.
+>
+> I'll take a look, might remove it.
+>
+> >> +               dma_addr_t dma_addr =3D page_pool_get_dma_addr_netmem(=
+netmem);
+> >> +
+> >> +               dma_sync_single_range_for_device(pp->p.dev, dma_addr,
+> >> +                                                pp->p.offset, pp->p.m=
+ax_len,
+> >> +                                                pp->p.dma_dir);
+> >> +       }
+> >> +#endif
+> >> +
+> >> +       page_pool_fragment_netmem(netmem, 1);
+> >> +       pp->alloc.cache[pp->alloc.count++] =3D netmem;
+> >
+> > IMO touching pp internals in a provider should not be acceptable.
+>
+> Ok, I can add a page pool helper for that.
+>
+
+To be clear, adding a helper will not resolve the issue I'm seeing.
+IMO nothing in the alloc_netmem or any helpers its calling should
+touch pp->alloc.cache. alloc_netmem should just allocate the memory
+and let the non-provider pp code decide what to do with the memory.
+
+> > pp->alloc.cache is a data structure private to the page_pool and
+> > should not be touched at all by any specific memory provider. Not
+> > maintainable in the long run tbh for individual pp providers to mess
+> > with pp private structs and we hunt for bugs that are reproducible
+> > with 1 pp provider or another, or have to deal with the mental strain
+> > of provider specific handling in what is supposed to be generic
+> > page_pool paths.
+>
+> I get what you're trying to say about not touching internals,
+> I agree with that, but I can't share the sentiment about debugging.
+> It's a pretty specific api, users running io_uring almost always
+> write directly to io_uring and we solve it. If happens it's not
+> the case, please do redirect the issue.
+>
+> > IMO the provider must implement the 4 'ops' (alloc, free, init,
+>
+> Doing 1 buffer per callback wouldn't be scalable at speeds
+> we're looking at.
+>
+
+I doubt this is true or at least there needs to be more info here. The
+page_pool_alloc_netmem() pretty much allocates 1 buffer per callback
+for all its current users (regular memory & dmabuf), and that's good
+enough to drive 200gbps NICs. What is special about io_uring use case
+that this is not good enough?
+
+The reason it is good enough in my experience is that
+page_pool_alloc_netmem() is a slow path. netmems are allocated from
+that function and heavily recycled by the page_pool afterwards.
+
+
+--=20
+Thanks,
+Mina
 
