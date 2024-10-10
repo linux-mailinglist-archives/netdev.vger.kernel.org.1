@@ -1,135 +1,137 @@
-Return-Path: <netdev+bounces-134317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA745998BA6
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:31:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB3B4998C3E
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 17:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 263CA1C26807
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B3371F21274
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A741CCEE3;
-	Thu, 10 Oct 2024 15:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EFD1CCB59;
+	Thu, 10 Oct 2024 15:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="y28o5JOo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpjEzUaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440DC441D
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB46E7DA62;
+	Thu, 10 Oct 2024 15:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728574241; cv=none; b=R2dNvfoFBpZLiIZNdhXMWCS0Oczr5BbC0M7eELVw9iVQzIrRrm0EPy721xOatUc8K1m5R2KRx7F4T+q2Mlhg1xoMHvhFgKvKOp2k4x7LNnTh+qxMNHoVJTCDV9ljM5CsuM1bCqQnNUfdsiJ3t3Bg4KFNi/dm2uMYegyV8QCurGQ=
+	t=1728575130; cv=none; b=LOP+hhB/3+ZeqLn5CE9eOr9BbBO4e51vIP/2+tOekGbc9wo0QR8BqP6r4Ze7dKlYWFtTYqztpxD2rR/BY4wvj9XWF7ZQtABY/UWVAx+c4a/YCJYQ8qJ0QAMdjUN3kryIudyfqgFhjv4+y0iqjCL2aC1MzIWCqn5rpAKb5wzD0ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728574241; c=relaxed/simple;
-	bh=5IOX7FxQwxjC3mvxRhvOYPkl5nm1OGYylQ14DBcLyLU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=luFuxPEgzOtNq/zVVNZTjyVVMygAZkd6pXxgXUGhXyWcG8HcSIdYcVu4g2HAN/Fvj6fHdNLr9Tj4tHNOIVKCH2X85W/p0Hcf3o3zZmcwDfN86e9IjKV5R4AZrkd7bCIujlt8nVAFahksyagY8Xu/Ivlhd7Wgok/Z6NXhckrvukY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=y28o5JOo; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c883459b19so1186636a12.2
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 08:30:40 -0700 (PDT)
+	s=arc-20240116; t=1728575130; c=relaxed/simple;
+	bh=FaZgrYXc5o2/CBC9caeUU0JWFjKlCFfVDG+pD5/WsRs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=KKzpVbdc3B9QG1ArasfnyYv7wve+E3m0ohlPiCb6ZKGytRLdgZERase1nkSyml1ptsasr2LsKIh8uP2czouWYcY9kBQURsG6SgGbLBa2hI7c2umYPS1qlZnu+aPbWv+TiZGUQo/DJ9SfmhRMKqQClmiTP99eAArrYsJuCiYga3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpjEzUaQ; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c942815197so276363a12.1;
+        Thu, 10 Oct 2024 08:45:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728574238; x=1729179038; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8mwCSYpgr9vQNHEWealZYY4kqQDRjCOUEotDuCTgtRk=;
-        b=y28o5JOoz7Y1gS9ehOHx/vYTgnLHfW0x3mXCsxl2x3HZvTlQAs+luRtxOrcxqKZFq7
-         LhcI5wOZXkCEwUEhpnquU1lSBRgiJMZvq2K3zLCpe0qZtCIavBNxW6Rn8nmlf7JPpgDN
-         ixzSlx1YgxvlEASKassVQ3FsFazKFxpnAd/fN4mwMZ0I1iWlRu4bIFRtSazb7S/1IU/A
-         09bvUut3HHPE9pwl79kP+AxhuvEZvI4RFqkCCaZgAUrnxLRQ8LDCDyro9Ze++aRU1bZV
-         K6lYHVo3xXxE09EJv3Xp/JvbRtIhp7IY/KgVfjX8Chh6APAT/TrEfxXDbTeHxU2x0b4g
-         IZng==
+        d=gmail.com; s=20230601; t=1728575126; x=1729179926; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jTc+I2w2hhlqIY2pAipx9CwfTckiLBy2dTG4NBsK3Ek=;
+        b=hpjEzUaQrRy9xTK2WEfINKwK5BrIS52ZDjAAUEAxyaG+zZ4Dep/66dxaoGCfXkp7EJ
+         YpZ5b2j1XrCJtepvmcGVAQBY6e8iVdDGuZ4vn9M4RiCrMv1C6j8dkBkwJQ4pkoLL0xdH
+         bilG3fqBw6Y9Vw/FVMN5pjnfY/tTuc7FjbrojRIOR+lH/grAGUgwEYF+tMqeFfryJz0K
+         vcbxbmh814VJCA8/lxzoKmJtsd5nZVvdvXUgMfRoNH2mmV05aUufakPsk70wwK/2eK7e
+         klmA+rx/McD6ynrsFAu8O+jSSQ6Mlf9nmRnZlqUO0wH929rNAIBq/NktpyrN6TxP9TKN
+         FcPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728574239; x=1729179039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8mwCSYpgr9vQNHEWealZYY4kqQDRjCOUEotDuCTgtRk=;
-        b=FI0XBRF7MW583OErbSfDnkrEfE6MIvDqmmTj3UeYktIAoytam5a1amyqayh8/1j0Aq
-         EGnqLxxfs1TL+2lgua9RXlHdSCK4Mjo2c0TWClLn7r1ksXlZ14veJdQswZLBdDWWypiH
-         lsECOtADS5UcP7rkexOBx1g+sep+OMXU38r+Mwa/DmVSBfTGJD1h8xnszbLmu7/ld5zu
-         zNjUIqfp2E+bPcrnG7jeNshzTOCxII1CbOJtARioVfgMtKAURZZXcLZwUwcONXsvb5rX
-         EY33wIhrYjQYvMWRe9u5/rC9YquS7aTeuRDWFD4bESC0zkERI68n0rO1RIPNBOqdV/z6
-         a6Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcfnv0ATu2P/qoOWxm5DYS7boL72VVEIJYtriNlSCztntzNBcSCsLp7ymQwdPTYK0MTE9iX2E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBeHJOE+i9LDuNioxLa86312CPVT0Ru3MJPoTkXmYNX5IlHyzk
-	RKKN3DBBGZ7SQ27dcycaiubTy4tDzXzk6Ol6u4zGImxzOFkIZCaILCM/zvrAC7TpnPBDzK+QCPI
-	UBOzrvmNr2R6t5A4vj8UNiuZEzfq9zHXnN3he
-X-Google-Smtp-Source: AGHT+IGH92vSYq1uHIAbNQkPnhT529UhmqKl2DvtGKmBgkIU1jYDv20vl73weke8g55yaEyRykW4FbyfRWM+Ed6yq1E=
-X-Received: by 2002:a05:6402:4402:b0:5c9:1f1f:8317 with SMTP id
- 4fb4d7f45d1cf-5c91f1f86ccmr5319668a12.26.1728574238326; Thu, 10 Oct 2024
- 08:30:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728575126; x=1729179926;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jTc+I2w2hhlqIY2pAipx9CwfTckiLBy2dTG4NBsK3Ek=;
+        b=jNBRQ+npVXc+9WmZKHqhhL3QYB8GPeLJxgIFLdsYEM38JpEiHXtx1G0fvlELedaoYl
+         9ac8BX4EOYNUWMhSiEtm5uH/nqP6LSNE40NsVNSKGltoiVJ4c0zvZp8j9BcymE4ezdAj
+         8p3Vu526g2pOC8F+QQ5furFdptJX72RQCDfz+KSW2P8PSB7/YddNNaVtu397GUeDYaaN
+         sEO1W+IGuGhdWsgt0h3r0quwMm6h732Ia/mprVcngQzMQD//HRxdLrZEcMto9EFof2OU
+         QYDxjoy9J7mfVTbLE81mmU60uwnlhhFITtrJWGD7EmmVTAsE5G9FZ6VR7fhw1ZPhKBwS
+         VaiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVdm7+r6Slfm5scJoem2MbN8FOaMQOce5oCQq5xVUoSYkGAPjO9p+w70rFQGWSqD0UifdMswSlhVTGZ9rY=@vger.kernel.org, AJvYcCWIK8YlrQC8TCfYhxP0Bn+mzXaaNJ/S+PQA/RGdopKLiS/xb+q25dhYzuU2TNmX262FzUcuz4i+@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF1/0EiVOGVsqlBFgnWj8PVZXCZXbk9ujnPlAlnixgqjvikNPL
+	8ptGBCHkNd/apxBOysC4sns1DIbzQfAOhLqyHzQHQ/6JyftSmo1j
+X-Google-Smtp-Source: AGHT+IG0jeJWdLIT94qSOZbGLGB2k9FA+DbhnpHm3ocn7eFqBjG5DNS6xpG0tUS62GqJn4wkY/nnVA==
+X-Received: by 2002:a05:6402:510f:b0:5c9:21aa:b145 with SMTP id 4fb4d7f45d1cf-5c921aab83amr6135256a12.36.1728575120295;
+        Thu, 10 Oct 2024 08:45:20 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c93f78a671sm708180a12.55.2024.10.10.08.45.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Oct 2024 08:45:19 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Naveen Mamindlapalli <naveenm@marvell.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next][V2] octeontx2-af: Fix potential integer overflows on integer shifts
+Date: Thu, 10 Oct 2024 16:45:19 +0100
+Message-Id: <20241010154519.768785-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009005525.13651-1-jdamato@fastly.com> <20241009005525.13651-7-jdamato@fastly.com>
- <CANn89iJ1=xA9WGhXAMcCAeacE3pYgqiWjcBdxiWjGPACP-5n_g@mail.gmail.com> <20241010081923.7714b268@kernel.org>
-In-Reply-To: <20241010081923.7714b268@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 10 Oct 2024 17:30:26 +0200
-Message-ID: <CANn89iK_iDY_nTCgqYUk7D_R8k_qu2qQrs2rUAxxAu_ufrzBnw@mail.gmail.com>
-Subject: Re: [net-next v5 6/9] netdev-genl: Support setting per-NAPI config values
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org, mkarsten@uwaterloo.ca, 
-	skhawaja@google.com, sdf@fomichev.me, bjorn@rivosinc.com, 
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com, 
-	willemdebruijn.kernel@gmail.com, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Mina Almasry <almasrymina@google.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 10, 2024 at 5:19=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 10 Oct 2024 06:24:54 +0200 Eric Dumazet wrote:
-> > > +static const struct netlink_range_validation netdev_a_napi_defer_har=
-d_irqs_range =3D {
-> > > +       .max    =3D 2147483647ULL,
-> >
-> > Would (u64)INT_MAX  work ?
->
-> I sent a codegen change for this. The codegen is a bit of a mess.
->
-> > > +int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *i=
-nfo)
-> > > +{
-> > > +       struct napi_struct *napi;
-> > > +       unsigned int napi_id;
-> > > +       int err;
-> > > +
-> > > +       if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_ID))
-> > > +               return -EINVAL;
-> > > +
-> > > +       napi_id =3D nla_get_u32(info->attrs[NETDEV_A_NAPI_ID]);
-> > > +
-> > > +       rtnl_lock();
-> >
-> > Hmm.... please see my patch there :
-> >
-> >  https://patchwork.kernel.org/project/netdevbpf/patch/20241009232728.10=
-7604-2-edumazet@google.com/
-> >
-> > Lets not add another rtnl_lock() :/
->
-> It's not as easy since NAPIs can come and go at driver's whim.
-> I'm quietly hoping we can convert all netdev-nl NAPI accesses
-> to use the netdev->lock protection I strong-armed Paolo into
-> adding in his shaper series. But perhaps we can do that after
-> this series? NAPI GET already takes RTNL lock.
+The left shift int 32 bit integer constants 1 is evaluated using 32 bit
+arithmetic and then assigned to a 64 bit unsigned integer. In the case
+where the shift is 32 or more this can lead to an overflow. Avoid this
+by shifting using the BIT_ULL macro instead.
 
+Fixes: 019aba04f08c ("octeontx2-af: Modify SMQ flush sequence to drop packets")
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
 
-napi_by_id() is protected by rcu and its own spinlock ( napi_hash_lock )
-I do not see why rtnl is needed.
-This will also be a big issue with per netns-RTNL anyway.
+V2: Fix both (1 << i) shifts, thanks to Dan Carpenter for spotting the
+    second shift that I overlooked in the first patch.
+
+---
+ drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 82832a24fbd8..da69350c6f76 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -2411,7 +2411,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
+ 				 NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link));
+ 		if (!(cfg & BIT_ULL(12)))
+ 			continue;
+-		bmap |= (1 << i);
++		bmap |= BIT_ULL(i);
+ 		cfg &= ~BIT_ULL(12);
+ 		rvu_write64(rvu, blkaddr,
+ 			    NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link), cfg);
+@@ -2432,7 +2432,7 @@ static int nix_smq_flush(struct rvu *rvu, int blkaddr,
+ 
+ 	/* Set NIX_AF_TL3_TL2_LINKX_CFG[ENA] for the TL3/TL2 queue */
+ 	for (i = 0; i < (rvu->hw->cgx_links + rvu->hw->lbk_links); i++) {
+-		if (!(bmap & (1 << i)))
++		if (!(bmap & BIT_ULL(i)))
+ 			continue;
+ 		cfg = rvu_read64(rvu, blkaddr,
+ 				 NIX_AF_TL3_TL2X_LINKX_CFG(tl2_tl3_link_schq, link));
+-- 
+2.39.5
+
 
