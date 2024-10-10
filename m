@@ -1,141 +1,141 @@
-Return-Path: <netdev+bounces-133994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47A3997A55
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:03:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4401C997A5C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:06:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 312C0B22E49
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:03:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 048792847FC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D62374FF;
-	Thu, 10 Oct 2024 02:03:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9551A3B2BB;
+	Thu, 10 Oct 2024 02:05:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="KEg7IOtA"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PucWOVUe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD282A1D3
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:03:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E232B14293;
+	Thu, 10 Oct 2024 02:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728525790; cv=none; b=QZNobVm5MEja9x9Qj2MI6rNZ/aZwWT5QHNrth0bqQH5LVmePyChdcWB7GI1pJ4s9rnehXMDb8ictqOiBAdCiZb9Z2t5nI/tKgvb3ZPSIYfSSkjms8laIG68f+/+8wel4dkUihRlxR+0ouESDxddZJoRP+KVHbTJhcsQT+/yQXA8=
+	t=1728525944; cv=none; b=XxB91ghpg7xF1UsAUy3fzD1gpKR0D3Uyk/VwEN8d/VuFcN3EHYzi0ubU9jxNwnaDWyUG03NQyJanaSD+fbtRsQS3qqfKzQWWc62n5Dc5rAKEd/zDFpgwGQpvfFtnZ6h2wuDt1ijmkvCkAiQM9QDWG1H/EBKixkLg9+WzDqkMI3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728525790; c=relaxed/simple;
-	bh=lm9yALyuk4sK7mcT+xBoNNcgiB4rCPycPd5ZLkZn/J4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t26XC653i+RB63Y4mIV46VNRaAAIlV8GnvrJg0HmOpABpD28xl7aXbg9BaA5LBm+JMuBdE9OPHKtBjvMR2dbymdfOFAa9xIVfM7iqC7wWu8CF91IcbKI1z6H3DDG/lwz9Ixc2wz0/GWTf/WjJXx4q4xAr4BcpniljQcNd+pB7Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=KEg7IOtA; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e290333a62cso336654276.2
-        for <netdev@vger.kernel.org>; Wed, 09 Oct 2024 19:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1728525788; x=1729130588; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1tI22F1lPDInL5Y+wCwfLKOYihiyc18G36615UsHfNM=;
-        b=KEg7IOtAjmr3rX6vTID3q7KhZUTrH0V+V6MX9u2LfgNg5GkKDHQ36VPZ4DFpUEw0jy
-         +gtBLvfSly0lo25ObxQI72jZEFE4Kpgmdg+9fDqxQeibmZX+FqCl+6FTz02j0LMFC3R5
-         y+6e+wBdpoUAVycs+aKLvmIHZzoJvHN91doJaremPYgImn0JdX/bBCAIV9hgBBhd76nK
-         Il9CLcBufHeyDzhLh+jR4PWzQJDrEoM3S2NnPBvSu2QNcP6jyEdxsTyaMgTTxQ9nFpZA
-         o6/oSL2iMxawNjc65RcuZ9uwICNElIXVrbaOxX6CV3whmYI1wjgpIIGs9vFZgv886SaT
-         GSnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728525788; x=1729130588;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1tI22F1lPDInL5Y+wCwfLKOYihiyc18G36615UsHfNM=;
-        b=r1/gAjLMokPQiQ5OmDVG6PKUZDoF+vO2qYvyYEKwi4fVQWWrPiYDjc4kLQ3RA9P2Gv
-         PFIqWwk/EaT/OUrksDeiP1VnaDu96WIjGH3HME049QscUB93G3oAImW1tTVAP0+C8BzW
-         9Sf6iCE5dWIO2V/BtOD+72bdVyx+01MyqCFGWnl2Zw94uqhig9+KleWeAXYQSioCHa8z
-         e8t+Gx5KAG1GWqFKQa0HqA73+3rK49EAA+WlPUJojAClEEFf9mJJxJx7PZxN5Y+JvK1K
-         22p9GatdgAz4kzCHOO/ltTsGX/aqGc2KT65wS3hcZMB83G8vqQHKStzJajVteNdGPubz
-         RbOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVoI4u2upsjTJ9Z/ZagrI/ASpOkOkNP4hLDwMiSfeTcVdYDiuraadWuEt5uTFTlHIO0LRZiz7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywqeecm11NCoBzahN3JVKhbU2I2OGaat2aFN9JUI9mpWzn0s1i5
-	MfVZYUseq0ZJ+hPZCe4I9gBL4jB7n4AhUQKKoKcgYZSWqiJHPSlDi142o5+3+Pw1ycEpy+k5LJi
-	c/lawW4wyuW6nDJ0LTK0MCuWvRiReCXzXsbCd
-X-Google-Smtp-Source: AGHT+IEyeMjrAkKGzbUK/00w0l1RMo2D/Rz84dGLbkxfIaBrFu50KXvg+JrSoF/LLGZHMQ5Qfg+g/KPmdvAxhFISkbQ=
-X-Received: by 2002:a05:690c:397:b0:6b1:8834:1588 with SMTP id
- 00721157ae682-6e3224d1ecdmr47971387b3.35.1728525787839; Wed, 09 Oct 2024
- 19:03:07 -0700 (PDT)
+	s=arc-20240116; t=1728525944; c=relaxed/simple;
+	bh=8zg7uqJ9F9dHFV5MUGZbEkc0C4syuarZNtsPZdOTC1w=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=iwJDdq105JrbZDUnknxWCFKxw7iDFZcVjRqoTxF7fGob/A3dpswEM7gVIJx2X6tgdu9Zy82oUEM3j+5Ld94HIGn7uDm0vvraomf3RL3PumdvIvPTzaeeXClBUivRdgcm53nKOwGSvmSJ/bDwTtkM6fEpsiznIAzy1AjZerU+LRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PucWOVUe; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49A1b1xH026795;
+	Thu, 10 Oct 2024 02:05:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=PwguU8K9q4ElaypTqADSdE
+	jaBpITo1N/cE2UK0wTvlo=; b=PucWOVUectwALyJK6+gH3sMjq8crcTSDQ/4iHJ
+	O+ZWIWIQLkH8210u7bEFFNS0QeUtC7ldmBj6mWjq9k3n9gVAfTZQLVBvCk4D68UR
+	BW0zakZkBuLDKzFh7cM44huQdvjJ0nJrREflhPNUmHXvmsnBoADORLen9fjgVUPw
+	1OYKmUjo8e8K6i5WjL0FWmKj2Lp0jlQvY7pNi6txM7c65qYWiIi11QehEhkHqVZP
+	sgyZ0qGUjjs1aS/5U181yK3eUqusMGvwy3ljVBVaxVb/3mR0bna5Usv2vghWaPjB
+	00hbhbCoc/FUDaHOZ6FrNmKEQ66H/xrDVqk7f9jffhE7s4nA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 425c8qvaqa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 02:05:24 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49A25NNa000712
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 10 Oct 2024 02:05:23 GMT
+Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 9 Oct 2024 19:05:17 -0700
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+Subject: [PATCH 0/3] Add ethernet dts schema for qcs615/qcs8300
+Date: Thu, 10 Oct 2024 10:03:42 +0800
+Message-ID: <20241010-schema-v1-0-98b2d0a2f7a2@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009203218.26329-1-richard@nod.at> <20241009213345.GC3714@breakpoint.cc>
- <CAHC9VhSFHQtg357WLoLrkN8wpPxDRmD_qA55NHOUEwFpE_pbrg@mail.gmail.com> <20241009223409.GE3714@breakpoint.cc>
-In-Reply-To: <20241009223409.GE3714@breakpoint.cc>
-From: Paul Moore <paul@paul-moore.com>
-Date: Wed, 9 Oct 2024 22:02:57 -0400
-Message-ID: <CAHC9VhTC=KAXe6w9xTG_rY4zAnNvPv-brQ7cTYftcty866inCw@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: Record uid and gid in xt_AUDIT
-To: Florian Westphal <fw@strlen.de>
-Cc: Richard Weinberger <richard@nod.at>, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, 
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net, 
-	kadlec@netfilter.org, pablo@netfilter.org, rgb@redhat.com, 
-	upstream+net@sigma-star.at
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP41B2cC/x3MQQrDIBCF4avIrCuMkmDIVUoXjpnEWcQWp5SA5
+ O6xWX7wv9dAuQorzKZB5Z+ovEuHexhIOZaNrSzd4NEPDh1aTZn3aEckpBBC8hNBjz+VVznuo+e
+ rm6KypRpLyv85fzOc5wXYMImIbgAAAA==
+To: Vinod Koul <vkoul@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Paolo
+ Abeni" <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bhupesh
+ Sharma <bhupesh.sharma@linaro.org>,
+        Kishon Vijay Abraham I
+	<kishon@kernel.org>,
+        Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <quic_tingweiz@quicinc.com>,
+        <quic_aiquny@quicinc.com>, Yijie Yang <quic_yijiyang@quicinc.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1728525916; l=1227;
+ i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
+ bh=8zg7uqJ9F9dHFV5MUGZbEkc0C4syuarZNtsPZdOTC1w=;
+ b=oCL7TZG9kQ4YdHZE+54xecj+BYNcwqM1fbzZOQRtv0td5mOVAR6MWjiS6we9TuVamgVX6wdPD
+ tTxcPcMK/VRC4VBiKOeWRGbwVp7XBEEtfx+c7dJFNtYvjR0hMDDFTXJ
+X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
+ pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: kp9LMD8qygJjScGPbJUJBEvHuHGfvBuv
+X-Proofpoint-ORIG-GUID: kp9LMD8qygJjScGPbJUJBEvHuHGfvBuv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 malwarescore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 spamscore=0 phishscore=0 clxscore=1011
+ bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2410100012
 
-On Wed, Oct 9, 2024 at 6:34=E2=80=AFPM Florian Westphal <fw@strlen.de> wrot=
-e:
-> Paul Moore <paul@paul-moore.com> wrote:
-> > On Wed, Oct 9, 2024 at 5:34=E2=80=AFPM Florian Westphal <fw@strlen.de> =
-wrote:
-> > > Richard Weinberger <richard@nod.at> wrote:
-> > > > When recording audit events for new outgoing connections,
-> > > > it is helpful to log the user info of the associated socket,
-> > > > if available.
-> > > > Therefore, check if the skb has a socket, and if it does,
-> > > > log the owning fsuid/fsgid.
-> > >
-> > > AFAIK audit isn't namespace aware at all (neither netns nor userns), =
-so I
-> > > wonder how to handle this.
-> > >
-> > > We can't reject adding a -j AUDIT rule for non-init-net (we could, bu=
-t I'm sure
-> > > it'll break some setups...).
-> > >
-> > > But I wonder if we should at least skip the uid if the user namespace=
- is
-> > > 'something else'.
-> >
-> > This isn't unique to netfilter and the approach we take in the rest of
-> > audit is to always display UIDs/GIDs in the context of the
-> > init_user_ns; grep for from_kuid() in kernel/audit*.c.
->
-> Hmm, audit_netlink_ok() bails with -ECONNREFUSED for current_user_ns()
-> !=3D &init_user_ns, so audit_log_common_recv_msg() won't be called from
-> tasks that reside in a different userns.
+Document the ethernet and SerDes compatible for qcs8300. This platform
+shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
+it.
+Document the ethernet compatible for qcs615. This platform shares the
+same EMAC as sm8150, so the compatible fallback to it.
+Document the compatible for revision 2 of the qcs8300-ride board.
 
-We have a requirement that the audit daemon and audit management tools
-run in the initial user namespace, but these are the audit collection
-and configuration mechanisms, not the audit record generation
-mechanisms.  Regardless of the namespace limitations on auditd and
-auditctl, we want to collect audit records across the system, which is
-what we are doing in audit_tg().
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+This patch series depends on below patch series:
+https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/
+https://lore.kernel.org/all/20240926-add_initial_support_for_qcs615-v3-0-e37617e91c62@quicinc.com/
 
-> If you say its fine and audit can figure out that the retuned
-> uid is not related to the initial user namespace, then ok.
->
-> I was worried audit records could blame wrong/bogus user id.
+---
+Yijie Yang (3):
+      dt-bindings: net: qcom,ethqos: add description for qcs615
+      dt-bindings: phy: describe the Qualcomm SGMII PHY
+      dt-bindings: net: qcom,ethqos: add description for qcs8300
 
-Correct me if I'm wrong, but by using from_kXid(&init_user_ns, Xid) we
-get the ID number that is correct for the init namespace, yes?  If so,
-that's what we want as right now all of the audit records, filters,
-etc. are intended to be set from the context of the initial namespace.
+ .../devicetree/bindings/net/qcom,ethqos.yaml          | 19 ++++++++++++++-----
+ .../bindings/phy/qcom,sa8775p-dwmac-sgmii-phy.yaml    |  7 ++++++-
+ 2 files changed, 20 insertions(+), 6 deletions(-)
+---
+base-commit: 70c6ab36f8b7756260369952a3c13b3362034bd1
+change-id: 20241010-schema-50b0b777c28b
 
---=20
-paul-moore.com
+Best regards,
+-- 
+Yijie Yang <quic_yijiyang@quicinc.com>
+
 
