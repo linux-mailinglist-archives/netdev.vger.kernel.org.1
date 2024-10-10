@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-133989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54BF6997A01
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 03:10:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDC56997A2B
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 03:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0ABC21F237DB
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A2E11C21CB0
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 01:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3E62BD0E;
-	Thu, 10 Oct 2024 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 977BF2AEEE;
+	Thu, 10 Oct 2024 01:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJfq/wiF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hua9PJVt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254AA2B9B0
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 01:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4C34C6C;
+	Thu, 10 Oct 2024 01:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728522629; cv=none; b=CewUsbsGpM3tnW3HxOTeHMV3LotYVyRsK8c2l68OihEDEeNwPT8HjsP+5fEKLeNMFt23iZXJ6jiOLdB+VZfKtXCcL0aE5UnPB8DrGgzVkXeLQxdF4Cnng5xW5IZNUx+hyXidUUte6888EX1kSUQCnvZx/GYDPvO0RzldJemgEgA=
+	t=1728523826; cv=none; b=QEbYafIif94y1G629WusFwDZZ2fcfN5CtqLGMtiE8NjZCVARb5Lbyvql9HGi12CnDHZ49HV58rzR8XUgJmDFJQZbYERdonCftrSECAsLr8XNbGhLnmqzOcs2r/hxYqBiA8PDdP5WNLq5WlgQ1GMJNHIXHCUapWluNemrfefBP2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728522629; c=relaxed/simple;
-	bh=avuKk1PZlkverN7itY/vVQ5VwMmDJwEjddA48ON96aM=;
+	s=arc-20240116; t=1728523826; c=relaxed/simple;
+	bh=QLp0IT+USLybtIEn9rosf67rYcbk9sKmf9oRcZt4NGA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aw76YUsox2Kuz3Ne7IJeZ6R0koiQlR6ckwssAAmbNBU3pKDJiEdo/v/jbpC8MvksjQQPhgbwh5BwxM/vKAG6rrXzUzSFgp1vR6IlDSESnghoF+QCTbD6iJCNgeRYeKfSIp0g3X8k+1RJ00oQvjvLvzfDXtLzgg+Ht51sDXwkzss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJfq/wiF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA4D9C4CED1;
-	Thu, 10 Oct 2024 01:10:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=tcyYL1YVbURDRgh+6UagxPVNribt04jIti+aq5CEPWV8ljigff9CSiRqygdqjnRPep0OMUzd8VNcZdwsHukKZ8zYxwgr4S5y/fB7pwjvJOek73byzh7tUWuw9H4S1zrwe2WsqwVsbTRdhi7PsJdb0gW98YBZIuwWRCzcMwHEam4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hua9PJVt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EE64C4CECE;
+	Thu, 10 Oct 2024 01:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728522628;
-	bh=avuKk1PZlkverN7itY/vVQ5VwMmDJwEjddA48ON96aM=;
+	s=k20201202; t=1728523825;
+	bh=QLp0IT+USLybtIEn9rosf67rYcbk9sKmf9oRcZt4NGA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LJfq/wiFzMrvkDR5yCkxJi9vZDHqdAYQaUaqLKG5u52Y8FVseXilqAun5P+E14J4O
-	 6oLfEOrQBYxMtdc7zIVCutz1bsPFSj/zVrOBNeONQdzuH4WHulLBN0mkGhQ7NoSAS9
-	 VpeMb49SZcwz1tzjUa8+NIV2UpMLCEbA/T2v/Qkvx2W8dGvUKtJL234RaKhtSTVwke
-	 rvqwcBlGxeE/Jm+FEmCVpPpEmgb/1xXbIXUX4Cq79cy99qIh7mskrgi+9YsrFRFe8a
-	 +rdMt2sYrCLBpzidBddX0x88NGykCHTlY389xyGdNVdoorMRG8x9kNmoyXlyWsRbgX
-	 hd6FBe2+lRYtw==
+	b=Hua9PJVtuJX/DNJFfBdnSZv+Hsf74Z0Fo42dgBwfETPvhiV4vfjDSVfvftOF+oJ2S
+	 13BEHeb9EDTrHDledEcub+1YY3oMQeuTGC81PvijgO5KJt/cKMQyarT30cjTw3M/TZ
+	 nLIXsrGNVhfamLgC6GMuSYUrZofz40J9WDXub7IGn4yXOH8nJDzKpxlb2buqAT0lf0
+	 a44m/jxo0NkASm0flaeptTL2lDXuDli05k5iohdJ7g/71WOLwmOIsikbdKzkQDeZSS
+	 mnRPC6IAk0OMH4AdNxZNuJi0HfUbEeXldn5m0B5SiQkvhQWr1jJCvuw4WcdgQBUmqd
+	 tTRZ8Bc4p9utw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342E23806644;
-	Thu, 10 Oct 2024 01:10:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE3473806644;
+	Thu, 10 Oct 2024 01:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] tcp: remove unnecessary update for tp->write_seq
- in tcp_connect()
+Subject: Re: [PATCH bpf] riscv,
+ bpf: Fix possible infinite tailcall when CONFIG_CFI_CLANG is enabled
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172852263301.1528050.5673496766619295375.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 01:10:33 +0000
-References: <1728289544-4611-1-git-send-email-guoxin0309@gmail.com>
-In-Reply-To: <1728289544-4611-1-git-send-email-guoxin0309@gmail.com>
-To: xin.guo <guoxin0309@gmail.com>
-Cc: edumazet@google.com, ncardwell@google.com, netdev@vger.kernel.org
+ <172852382954.1532001.10566819180554959939.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 01:30:29 +0000
+References: <20241008124544.171161-1-pulehui@huaweicloud.com>
+In-Reply-To: <20241008124544.171161-1-pulehui@huaweicloud.com>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org, bjorn@kernel.org, puranjay@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, palmer@dabbelt.com,
+ paul.walmsley@sifive.com, aou@eecs.berkeley.edu
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to bpf/bpf.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-On Mon,  7 Oct 2024 16:25:44 +0800 you wrote:
-> From: "xin.guo" <guoxin0309@gmail.com>
+On Tue,  8 Oct 2024 12:45:44 +0000 you wrote:
+> From: Pu Lehui <pulehui@huawei.com>
 > 
-> Commit 783237e8daf13 ("net-tcp: Fast Open client - sending SYN-data")
-> introduces tcp_connect_queue_skb() and it would overwrite tcp->write_seq,
-> so it is no need to update tp->write_seq before invoking
-> tcp_connect_queue_skb().
+> When CONFIG_CFI_CLANG is enabled, the number of prologue instructions
+> skipped by tailcall needs to include the kcfi instruction, otherwise the
+> TCC will be initialized every tailcall is called, which may result in
+> infinite tailcalls.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] tcp: remove unnecessary update for tp->write_seq in tcp_connect()
-    https://git.kernel.org/netdev/net-next/c/d35bd24cea94
+  - [bpf] riscv, bpf: Fix possible infinite tailcall when CONFIG_CFI_CLANG is enabled
+    https://git.kernel.org/bpf/bpf/c/30a59cc79754
 
 You are awesome, thank you!
 -- 
