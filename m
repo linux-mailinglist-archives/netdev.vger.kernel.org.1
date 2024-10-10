@@ -1,149 +1,122 @@
-Return-Path: <netdev+bounces-134417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC64D9994C0
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 23:54:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9564E9994EC
+	for <lists+netdev@lfdr.de>; Fri, 11 Oct 2024 00:07:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AFF61C22EA6
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:54:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C541F23FC0
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:07:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FF3B1E231B;
-	Thu, 10 Oct 2024 21:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807C41E47BB;
+	Thu, 10 Oct 2024 22:07:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RGfV+uR7"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LrQAoVY0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f194.google.com (mail-yw1-f194.google.com [209.85.128.194])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008E219CD1D;
-	Thu, 10 Oct 2024 21:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA141E47A3
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 22:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728597276; cv=none; b=c+aDgiEE9kVh4lZl4DSu1dsiZyOeC2m8atANhc2om+6yR/sMQCkhVOIjQ0pWLYG0eMGT05hHW1qbd79fSKoI38khl555kw3KYGxxdartjQvckclgYd5eSG2NwBEC511lKvcKvE6k5/WLpugsNfXVSG02O7HwpytqV75TDlz8gVc=
+	t=1728598055; cv=none; b=LUnsshdIze/uFZobWTKeZRvZTGorhK2pKL8CDnFhWhUVKyDQ2hhA2mQOrUv4UYi+6WJ44dl9VhTnYFhKobFzquOppMbSgZanmSWVw3UbIjzmY2pknaMXR8qPdl7p0PcoA4QQPBCYRAcw2vOX32AX3OT9E/esnO4xOdwNPMzfueY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728597276; c=relaxed/simple;
-	bh=YxxwULN3jsVL2YDiLyYMuOtvbkrMujTfd0dCdsQRtE8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DUXJ+5lkmhvjfHJ0fLArHHn9tFajT2grMMH+87cQ09pIql/5oGUnJ766hwnNAftcCYdfygcLrwmQ6+I68l02JvnCfJXySEUMAcNEdfpeLx9UKjumInsloPU8NwIU8fdGwqmYavbKDcfVAx1h5htN0/UeQEJOH1erDRTyXq6l+dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RGfV+uR7; arc=none smtp.client-ip=209.85.128.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f194.google.com with SMTP id 00721157ae682-6e232e260c2so13583127b3.0;
-        Thu, 10 Oct 2024 14:54:34 -0700 (PDT)
+	s=arc-20240116; t=1728598055; c=relaxed/simple;
+	bh=IXWBrb1+4puUbFIrvJvIwqmype/XxNMz1z02jxp5N00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JAWtrb/IwgIhoLe9ohFXjh1YAyzdTdKNxy3rEM4X++5He7kGr3K7nJnmh0obaLewPNEReEy2LAMax9SFKj7LyKrl80QcEvePYRdsobrnW52W9XKXcCJsUNFwX2e4DqUz7bvipceSL/JBvhntykYAomyCSDXeaYFOn8Jf3tSR+v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LrQAoVY0; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e038f3835so1376000b3a.0
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 15:07:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728597274; x=1729202074; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QM0QJYJDC1/d9edGNpZLBo9wu9FFQhHsu7p6s59BFkA=;
-        b=RGfV+uR7XhiyduS0w3/TGUcu0ALsPUFE7JrwI/G1WqgfeIJ5C3Dq1zEMt8D8rCm8VD
-         btHJJBrvvkpIEBSig5jqIdNZ9VKG/A+PNWmFaF9hLTF5jeGLwYjfG2Kms5e6+TtxqF4E
-         v3GsBHfn03BlSFGFH0jld3GDDfrhoFXVKzqMhA213WXLhQWxbAbp0fHmuXJgRUpNwRul
-         xLraLvI0OZGiXc3YRKtxqxs/xuZXYR1ekR7y1J/TUPBp3UuUQXOpl3gfjdp9/mvg+dlq
-         RWgLHoWkD+loW8/Vc8he6Rt9PPTpzoQCV7K+NVYFJfPmFd9by0cga+DksqQ1kOhlyvqj
-         i4bg==
+        d=fastly.com; s=google; t=1728598053; x=1729202853; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3yo7xWDDeFDaCm97O1zcq6LH8U4VFuAQ+/J8LotlATE=;
+        b=LrQAoVY0kBfYuVLR3P3sTr1m7GpTfUqsiUqB6GSTx/Rss3Wdv7jsecil0+9CBJGF0m
+         ip3ib+BQL/dLCNOAF2KTh7OIkfLh47d/9cDxRzRPOVTG7AMZ+OvldMwZlsn1suMMC3g4
+         mG5AEBt18KfXkisLkfMgJGRHLPFQROaMyTozg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728597274; x=1729202074;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QM0QJYJDC1/d9edGNpZLBo9wu9FFQhHsu7p6s59BFkA=;
-        b=e6fm+VOV/OnRXqLp40zvycgrj8JHe2BQTi/CwzA2Xvph31DnI5g8kxL+qeH0iw6EhG
-         hkdzfCmxZLRMmusniv/DgJWjhU2p4QgWL7Eoc3jLHJwGZkA4uTTC/v7Ko269R+WS6dvL
-         POe/aqnYHuEkLd9Ka+DoWaKzdud5CVR951MXZNOty2QM4s+KYch/avRLGsZ6JGS8Mt+q
-         vRfjO5Rko2cq0V8+lm2KUdanIk/dzEo6Zh+NoiK8E/XAiOvpXcyF4fu/1dXUooHCtBw0
-         JgukA+XofNnc1iZY4m3MhtM2NsXzqKr7snuiCBM4DpBWqzscVyNexzAWDWkYlmFXFKAx
-         o4lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUScn2qE1qv8hVwLSHupG4Pfht1dbS5I0PBSXO0OCxGJbylfwAnk71rdcfKiVwKNCKSF1+2bUjx@vger.kernel.org, AJvYcCWKgyIHScs8xcLGXUFRZFftL8oAy1kDs8qCPuKg2dxkYXC4SYHVfMsW4M3/oydP1LIjQz7BkBra21JC+vw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyqk8n6fL9LG7JB5/d0yJWhTtinfXwf4fDgCUP4heZw9gVS+uu
-	7HRlAXGkoXHVdvH7lcVumbKVSlRFx37+OL22JsRbh07dHT7cbWK66Ngkn6paPbM=
-X-Google-Smtp-Source: AGHT+IHObHEo2XXWXYgzR8WvXVZ11p40KQnn86xOIy9bHgxt/Qqgxc/u+Jf/Nhzi7CINHsCw1TM+iw==
-X-Received: by 2002:a05:690c:2b92:b0:6e3:39b6:5370 with SMTP id 00721157ae682-6e347a00c7bmr2914587b3.24.1728597273945;
-        Thu, 10 Oct 2024 14:54:33 -0700 (PDT)
-Received: from dove-Linux.. ([2601:586:8301:5150:3908:7240:1fb2:350f])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e332b89c7csm3656987b3.36.2024.10.10.14.54.33
+        d=1e100.net; s=20230601; t=1728598053; x=1729202853;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3yo7xWDDeFDaCm97O1zcq6LH8U4VFuAQ+/J8LotlATE=;
+        b=dMdQnmNN1k1GmZsswZf8htZAS1djkvga94XngYytfjEorWCoVU56J6qc2b8LKoQaSx
+         MY6LVTUeOr9GAViieByHU7RamnpF8boc1dcp27yB/EvpNS0dzetCnbG/Kx0GUN69VL73
+         A+Rcpz57QLGngdpyV4CFLl9SLEf44d62ZagTq4TfwnRMCxtzBSgD/pXBK/BslMDdykUa
+         5U9Xt2VJYht4QP/RLC5T6Se2BZeXkfgqWfbWuEs3jITR+Gr0zw9nSqw3Ok7IvC029qTk
+         2P0vQ1INMrfiqJVzlg0QuKty2QvVwTOjarr6dXk/mIQW7ttpb3hKlSXhnkMwevHb0sdJ
+         wwHA==
+X-Forwarded-Encrypted: i=1; AJvYcCWXOsC3BjoKwuDhvvPr8N3YZyZJ+MDgPDl/2bebOX1YvrErY8zmFsEQSxTX9PgqX8jdqO6EfvE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDM/u8FGYqqSMfTHw6Fy1Jp3ytvZsh/5wJGWFm+xjsLcZKaZDB
+	dBoXpdVUV37nt/Uo5cfotYiAsCkFEhfFxC3zmmLRdxvkHadJr8x//8xiaGeo/ZU=
+X-Google-Smtp-Source: AGHT+IHg2zizMgNilSTsoaMSaNju+zKzOxffudg65+pCc7GVqnBSAFewHnqlEuq3Lxq8TICEWC/tqQ==
+X-Received: by 2002:a05:6a00:2ea2:b0:71e:209:512a with SMTP id d2e1a72fcca58-71e37f56a04mr759824b3a.18.1728598053058;
+        Thu, 10 Oct 2024 15:07:33 -0700 (PDT)
+Received: from cache-sql13432 ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71e2ab0b5dfsm1500337b3a.199.2024.10.10.15.07.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 14:54:33 -0700 (PDT)
-From: Iulian Gilca <igilca1980@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: igilca@outlook.com,
-	Iulian Gilca <igilca1980@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] of: net: Add option for random mac address
-Date: Thu, 10 Oct 2024 17:54:17 -0400
-Message-ID: <20241010215417.332801-1-igilca1980@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <3287d9dd-94c2-45a8-b1e7-e4f895b75754@lunn.ch>
-References: <3287d9dd-94c2-45a8-b1e7-e4f895b75754@lunn.ch>
+        Thu, 10 Oct 2024 15:07:32 -0700 (PDT)
+Date: Thu, 10 Oct 2024 22:07:30 +0000
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next] tools: ynl-gen: use names of constants in
+ generated limits
+Message-ID: <20241010220730.GA260524@cache-sql13432>
+References: <20241010151248.2049755-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241010151248.2049755-1-kuba@kernel.org>
 
-Embedded devices that don't have a fixed mac address may want
-to use this property. For example dsa switch ports may use this property in
-order avoid setting this from user space. Sometimes, in case of DSA switch
-ports is desirable to use a random mac address rather than using the 
-conduit interface mac address.
+On Thu, Oct 10, 2024 at 08:12:48AM -0700, Jakub Kicinski wrote:
+> YNL specs can use string expressions for limits, like s32-min
+> or u16-max. We convert all of those into their numeric values
+> when generating the code, which isn't always helpful. Try to
+> retain the string representations in the output. Any sort of
+> calculations still need the integers.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/core/netdev-genl-gen.c |  4 ++--
+>  tools/net/ynl/ynl-gen-c.py | 36 +++++++++++++++++++++++-------------
+>  2 files changed, 25 insertions(+), 15 deletions(-)
 
-example device tree config :
+I rebased my per-NAPI changes on top of this commit and gave it a test
+run and it generated this diff:
 
-	....
-	netswitch: swdev@5f {
-		compatible = "microchip,ksz9897";
-		...
-		ports {
-			port@0 {
-				reg = <0>;
-				label = "eth0";
-				random-address;
-			}
-			...
-		}
-	}
+diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+index 3692c8270c6b..21de7e10be16 100644
+--- a/net/core/netdev-genl-gen.c
++++ b/net/core/netdev-genl-gen.c
+@@ -23,7 +23,7 @@ static const struct netlink_range_validation netdev_a_page_pool_ifindex_range =
+ };
 
-	...
+ static const struct netlink_range_validation netdev_a_napi_defer_hard_irqs_range = {
+-       .max    = 2147483647ULL,
++       .max    = S32_MAX,
+ };
 
-This way the switch ports that have the "random-address" property 
-will use a random mac address rather than the conduit mac address.
-
-PS. Sorry for the previous malformed patch
-
-Signed-off-by: Iulian Gilca <igilca1980@gmail.com>
+ /* Common nested types */
 ---
- net/core/of_net.c | 5 +++++
- 1 file changed, 5 insertions(+)
 
-diff --git a/net/core/of_net.c b/net/core/of_net.c
-index 93ea425b9248..8a1fc8a4e87f 100644
---- a/net/core/of_net.c
-+++ b/net/core/of_net.c
-@@ -142,6 +142,11 @@ int of_get_mac_address(struct device_node *np, u8 *addr)
- 	if (!ret)
- 		return 0;
- 
-+	if (of_find_property(np, "random-address", NULL)) {
-+		eth_random_addr(addr);
-+		return 0;
-+	}
-+
- 	return of_get_mac_address_nvmem(np, addr);
- }
- EXPORT_SYMBOL(of_get_mac_address);
--- 
-2.43.0
+which is much nicer! I am not a python expert, but the code seems
+reasonable to me and the generated output is a huge improvement (IMO).
 
+Thanks for doing this.
+
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
