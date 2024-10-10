@@ -1,85 +1,77 @@
-Return-Path: <netdev+bounces-134399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D0F999333
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:53:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED4F0999349
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 22:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95A08288DCC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:53:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221061C213ED
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E1E1C9ED0;
-	Thu, 10 Oct 2024 19:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B8A1CB528;
+	Thu, 10 Oct 2024 20:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HFaHqye8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eSJIRR/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17461CBEAB;
-	Thu, 10 Oct 2024 19:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A07B19D880;
+	Thu, 10 Oct 2024 20:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728589998; cv=none; b=CnGx/1d/XW1rVArpsm+yfKIzulCMC2lYYAcushFlDJ8VYqX9kq1lB7SXb0n9aPqPS65HQNaNuxKw9Tum8RQ+bbriFPGzIcsUaHeyuVX4xIyRjeJ4Qu86V5CpaYHxGuuGDP3IezHiX3LVuEppUBYX4sjvFZhnbHdyhjM3eySazJI=
+	t=1728590550; cv=none; b=N47g6bNygkKjGU2Ls2m8eScZmxOHYMYL/kAxrFSknOh1leiTA3gfSpLaidFls7yCe89hSvx1t8P1PEiPEFJYXzl9OogtxUq2VotlcHZ7JhsCRpUR9LfZgBe7GPf5YJ6xwG8AtOuo7ZCiYBDXGSWjx9c79f0Rk2cmM0c5gjCfRO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728589998; c=relaxed/simple;
-	bh=gLLejnF18JRaBdqLMMz0kV/sqCjBfUTWGoq1CF3hyso=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuvH+wlfxQLEJ17l1aRIskwiSOJWuGQxM+w41taZXWHYJOdkGbjhwq3PHelZHo1p6kUhTHXd4tPgbpxUU5LDMU2kdHtgTte1LoOKvo9KP9z6H7mh2MUPzAOCV+9QezKnw7LIoba/sYZlhcrzcV3/Q8FKkm2xPciEHcc6AqQnFR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HFaHqye8; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oPrHANtDfaFu++DyXSV355UVRr83DEBqjiYMk9rKCkk=; b=HFaHqye8gT7FD1vFqxAaukg2ij
-	OGo85Yu7PRdhCVVbXMx0lu6YUYURb+nG4LaY1duqe5AWsCxD+Moe6nE7ax1Yg6vGX6b+1CBWb09Rv
-	m7lRHcEUujVeKsgCQ7GFvQ3Yg1QA//JbZIG366o+QSvBtm+6AMuq7CjYDU9c1Qvmkl4M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1syzDb-009eKH-4z; Thu, 10 Oct 2024 21:53:03 +0200
-Date: Thu, 10 Oct 2024 21:53:03 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Iulian Gilca <igilca1980@gmail.com>
-Cc: igilca@outlook.com, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] of: net: Add option for random mac address
-Message-ID: <b4d4090a-2197-40ce-9bb5-1d651496d414@lunn.ch>
-References: <20241010190508.196894-1-igilca1980@gmail.com>
+	s=arc-20240116; t=1728590550; c=relaxed/simple;
+	bh=7wPrTtsLkty6XranwcnE7EH4rlE8VJy3bj43pTwsgl0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lL2DRQt3wYObaQs+0XJfyKN3PeKS8luAMxvXSiTosjul8PHNT6LgmGF5sztQBl4HS2bOs2prPdWlArhx8C9US34jklOMncjkGSgeL35q13tNJGV7f/AMKPpN+z+dHf4LTFylDSkfnoD7BVa+xjiV0bw1Gv6izk+CLf4ZhKpoRBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eSJIRR/w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E29C4CEC5;
+	Thu, 10 Oct 2024 20:02:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728590550;
+	bh=7wPrTtsLkty6XranwcnE7EH4rlE8VJy3bj43pTwsgl0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eSJIRR/wtL/RBZODj1yinpN0k8Ewxvje6X3eZu80JS5hxa/KMKrv5N8FVA+mZ0nwH
+	 AdCq3Wb3aoZxHbUY0cw3Q5T1iaH2YE7ej7gN+hpf88LN5SXHlbhgKGh3wcZjxt8rWa
+	 koq9zmGEsYCkuo5tsZEgDhBczYWjZwRthaBW1EXzvXAEjV3IlryJLwBQKxSMeZJpHg
+	 ixZbvVX58rypavCAYT/2izcUqUDIWYfzMwnHCDxPk7zyFnMUsgmmPsOo0yuzIspfhF
+	 eX3Sm+lJRKL4myQdJsPI/YU609NFWLhpwVf6ncIQWZhmNrorQzJLo7ItsSHcAZf9qq
+	 8bVasW6K6V5Uw==
+Message-ID: <08cf2309-4332-48a0-a04e-db7e933dfc12@kernel.org>
+Date: Thu, 10 Oct 2024 23:02:24 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010190508.196894-1-igilca1980@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: Enable USXGMII
+ mode for J7200 CPSW5G
+To: Siddharth Vadapalli <s-vadapalli@ti.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ dan.carpenter@linaro.org, jpanis@baylibre.com, u.kleine-koenig@baylibre.com,
+ c-vankar@ti.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com
+References: <20241010150543.2620448-1-s-vadapalli@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20241010150543.2620448-1-s-vadapalli@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 10, 2024 at 03:05:03PM -0400, Iulian Gilca wrote:
-> Embedded devices that may not have fixed mac address
-> may want to use a randomly generated one.
-> DSA switch ports are some of these.
 
-Sorry, i don't follow what this patch is doing. You are looking in DT
-for a property "random-address". DT is static, so how is it going to
-be random?
 
-I also don't understand you use case. Generally, a MAC driver will try
-to find a fixed MAC address. If one cannot be found, it generates a
-random one.
+On 10/10/2024 18:05, Siddharth Vadapalli wrote:
+> TI's J7200 SoC supports USXGMII mode. Add USXGMII mode to the
+> extra_modes member of the J7200 SoC data.
+> 
+> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 
-For DSA, it takes the MAC address from the conduit interface for the
-user interfaces. If userspace whats to use come other MAC address on
-user ports, it can change the MAC address in the usual way.
-
-	Andrew
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
