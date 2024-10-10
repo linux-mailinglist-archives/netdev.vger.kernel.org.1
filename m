@@ -1,111 +1,115 @@
-Return-Path: <netdev+bounces-134137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AABF998255
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:33:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF64E998288
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 11:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A83A1C22648
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5533B287E78
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 09:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4671B3725;
-	Thu, 10 Oct 2024 09:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010591BC09A;
+	Thu, 10 Oct 2024 09:39:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vqw3SfPg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fzlb/aAw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AC21B5337
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 09:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7321BD017
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 09:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728552820; cv=none; b=Auswe2Rcm/xp0iUgkiXrcmyWZq4tDWI3wjX4vHylh+mRHzao2wlbY/Kr5qI03u6JdRKc4+BMiaD/w4BU6kM50NH+oLakeAI/zwi1+h+VpDqCB5FvKCtuaSE1BD9hsPprsPUVfH6A/1ErpOjv7bAtiw83XZqXK08ajl1GzFvphxE=
+	t=1728553173; cv=none; b=DQplFiTXwg3RGTpOLzmlk9ugl+6vDyX11wqZXVV/S9mzsrO6rc01vZis4YlZFeVhCrC4Bb5ZnH0N9M57zExhkStcr4R6fLZQ8MP7ow9GXRPM87afZ55c/cr+TQgtO/keluxS484NEkGE8wePKxXmW+8kfJkJHqv07NkTkcE/29Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728552820; c=relaxed/simple;
-	bh=9g2GZgX7YLMTfizr3uLJ3YSM33EUN4l2EdYzFB7P/Q8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ao2qhCFNbuaukkY4KfGBF02I7ZwgK7qt6NMt3DhDsdObyUaQdzBND0A/IT515hd5PXP5lT82YqS+E63L9OCAIN8KeY/dR8oKHFhR2gDz+Ugb2AcVBIlqXXq1dU8d8eAcOwnz0BdXc8DRcC3CovbRvs+jGjti5XNgjG9nyXalUxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vqw3SfPg; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c928611371so899171a12.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728552817; x=1729157617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N8ZN3sGcHFW5cNxDCNYw4XoVBsmt6TsaSDQA/98TMGs=;
-        b=vqw3SfPgzp4NoN2ZoWB7a1BuB2ORuvLRJPLdD8w6A/wwSty3oR4Do5EBJ6iwsXzKhU
-         iTihCQkygvoGPz6orjSj+9DbyOLxMpFtx9KS+dS37LWry4e51zWMjPp/wae5xs51EYw2
-         9lbH3SbkmQdCHWBer+j6LdsU/T2NfarTx0yfkDeC7zbpFRAKtIRa9OG4sn9wOpsBjyqP
-         pvFY//leuna9wO9yzYr2bFjVk8qh9iUKdKsNOn77TSeIixYSKBfNafXrAm74EsPDNAPO
-         wE3LeBdBvkxqPb3rBgYom+7ZuMF/WTmnhpIW6qn7JgDfUqEexcGk+nUOrwquvIKWf4Hz
-         MonQ==
+	s=arc-20240116; t=1728553173; c=relaxed/simple;
+	bh=UH1KcN6aJU23wWi1cO1qdQicdr1PoB59i5Ni4SZhtsw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NzIJawG8qBUNXg4ogYG4fFhFL/6SyaUjg6RPGCF3pohySLrpeu37UhiU6LUXwFJqEEK1Nv8diNzOma1Oj9kCPBEI2fjwiywffXrd/ngaHETamFpuruXpihmXTFB1I+1ZbvRLtHuBQM94xbUljg4bs5aevD35tZSHfCfASF2hM6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fzlb/aAw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728553171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DFpkVzZdNC6CnlTTVl2TGiDBeW16kMCAfBnHOOM8DCw=;
+	b=fzlb/aAwoqOj2HD6iLInGPujvNqTC+UQIoMNml4dAfHgbYsk7Y3RTj6yhO2VxXFVO6ZHJ0
+	dzsWzMts651diNI3O2xqyoAswnkYPqeX7TpFvSudk1bXai0QtozP4co1T5Pj7nXwB/5zud
+	9tbY3moCUC/ZwMFiWznbDyvcfyhIhk0=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-677-hTOR2rhHPgCdOkc682_2Ow-1; Thu, 10 Oct 2024 05:39:29 -0400
+X-MC-Unique: hTOR2rhHPgCdOkc682_2Ow-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2fb1c04af0bso5628571fa.1
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:39:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728552817; x=1729157617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N8ZN3sGcHFW5cNxDCNYw4XoVBsmt6TsaSDQA/98TMGs=;
-        b=gMLJznDWFjoMEccSMvvqWRQ3JpY6bpHKSJYN9cRYxbpllXOIEhvmXJ04G5aKYFMar7
-         inaM6exWP/sDrszy/2vxEXIVnjXBvgTgw4IoKTCQhmz4lFP3Dcf4NFLSfIlOM1A7ehKj
-         KuCX/LPdIDrDEz1h8KOvuMeAqF/Kfb8ei+4PK9OKhUSjqlV6qROyqoAmm9KxFv49qj/k
-         75cB4s9SJvxr7NRyvsHnPyJoovnSeexPYp8hIh/MuPiQJ1+Ry35KvRxC/Fi66StHCNnz
-         5XI4xjYW/RQPMI4r4Z5jxlpWT88TkrEA2jupmxIkIBrGhhxWC9xdUohjuj+RN+4G1VJc
-         EbMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbOeDx+V/DIqyXFqjQKajwRKJOZ9IkgU4uVLw5Z3a31WDridyb7BMPO3MzrcP1TUt+Xvtz0Aw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzgfwtlk7nWf/UKJ8pi/agJVKp7vjWRgrDmQlniX2lfd8fxdnAA
-	S76ppONLBWakFPlRDC383c7kn+NgNJqLRw59v8RFnYBpHty9DkTN8eZlCtS3KiSIy1ZsD5RENCV
-	lahY8BsBczuVhNMgqK262TdsrBEKUCXck+896
-X-Google-Smtp-Source: AGHT+IG6f+1+cShAjm+Q/P4EmH5hUmriaWo+nOB8KCxL3gEZC5cUue+lZ847TKGtOySucv9TQcoW/3Agr6kYOY/k8iY=
-X-Received: by 2002:a05:6402:51ca:b0:5c8:9f3c:ea01 with SMTP id
- 4fb4d7f45d1cf-5c91d54d157mr3661316a12.2.1728552816698; Thu, 10 Oct 2024
- 02:33:36 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728553168; x=1729157968;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DFpkVzZdNC6CnlTTVl2TGiDBeW16kMCAfBnHOOM8DCw=;
+        b=iJ9cWvlAkDrrlcbD/fBZ80TozrMdzRg14MdUqVHe5fSVaCB28RFYkNKLEdxpQNeFik
+         WsquyaghuIS8NVwo52vch6nk5Zm0xtnFrN5mV1/6XqrgGWSpbNO85lVMhlHLobGTeNtu
+         geIJTDVflO39rn7Lr1rvun8IA/a4pnisSqbVHOb9WMHR/PIH8aqyuetx0Qp01xq7irSN
+         5MYZJZ3d7iuwGosK+9rTPNXXhkQuSmbo+St3oqoZ0UX5mSaoI9Eahrhgjmn3nCs3dfFy
+         99cHriLUiI/dZFkDN48A615VbqOI8lxtx+G2APRXhYGdK8MdkioYw5Ndl2Y5ZQjmZ0s/
+         GpPw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0nhX6gaXX9wvSSWQixUJ/lXh6pM1a0lqkXyBJgIBll1UIDD4owd2I3b3D7MHXRLEPibuu6XQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywi6uEHquyGxx0WkCtwoKPfQGVedmwMfoWhPrJ/IPYL1oYLRve
+	WOmvDq94e3TQ+9EPy3QuHfum61eboxT7/8Iqsld7eMuFaMq5nZYMeqse8m95GtO+V3/vev1vhaw
+	yofFAKRaNwiLWroK6/gRdM+e7uv04kMh1HEsvdpfIlSHTzGDxgl+e7A==
+X-Received: by 2002:a05:6512:1250:b0:539:8f3c:457c with SMTP id 2adb3069b0e04-539c496ac2amr3163261e87.53.1728553168237;
+        Thu, 10 Oct 2024 02:39:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzYePXXkYHbL1Su4nyf+oLAE79vXYQkaaX3O0Z7jUlyV7RSc07CjqwATXl8but6Sk2WX7kuA==
+X-Received: by 2002:a05:6512:1250:b0:539:8f3c:457c with SMTP id 2adb3069b0e04-539c496ac2amr3163239e87.53.1728553167860;
+        Thu, 10 Oct 2024 02:39:27 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-27-157.dyn.eolo.it. [146.241.27.157])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431183065e2sm10822215e9.28.2024.10.10.02.39.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Oct 2024 02:39:27 -0700 (PDT)
+Message-ID: <25f50405-e36c-44a3-8045-3cc569b37a1e@redhat.com>
+Date: Thu, 10 Oct 2024 11:39:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241010090741.1980100-2-stefan.wiehler@nokia.com> <20241010090741.1980100-9-stefan.wiehler@nokia.com>
-In-Reply-To: <20241010090741.1980100-9-stefan.wiehler@nokia.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 10 Oct 2024 11:33:25 +0200
-Message-ID: <CANn89i++SBxvJzPb8Xp8_P6gJEaBm0M50SFB=z+xNQrmM8jVfA@mail.gmail.com>
-Subject: Re: [PATCH net v3 4/4] ip6mr: Lock RCU before ip6mr_get_table() call
- in ip6mr_get_route()
-To: Stefan Wiehler <stefan.wiehler@nokia.com>
-Cc: "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tipc: Return -EINVAL on error from addr2str()
+ methods
+To: Shigeru Yoshida <syoshida@redhat.com>, jmaloy@redhat.com,
+ ying.xue@windriver.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, tung.q.nguyen@endava.com
+References: <20241008142442.652219-1-syoshida@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241008142442.652219-1-syoshida@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 10, 2024 at 11:12=E2=80=AFAM Stefan Wiehler
-<stefan.wiehler@nokia.com> wrote:
->
-> When IPV6_MROUTE_MULTIPLE_TABLES is enabled, calls to ip6mr_get_table()
-> must be done under RCU or RTNL lock.
->
-> Signed-off-by: Stefan Wiehler <stefan.wiehler@nokia.com>
-> Fixes: d1db275dd3f6 ("ipv6: ip6mr: support multiple tables")
-> ---
+On 10/8/24 16:24, Shigeru Yoshida wrote:
+> The return value 1 on error of the addr2str() methods are not
+> descriptive. Return -EINVAL instead.
+> 
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
 
-Please send a cover letter in your next version.
+I'm sorry if I gave conflicting advice in the past, but I now think this 
+patch falls under the 'small cleanup patches' category we are actively 
+discouraging outside the scope of a wider (functional) change:
 
-Please add a 5th patch in the series reverting
+https://lore.kernel.org/netdev/20241009-doc-mc-clean-v2-1-e637b665fa81@kernel.org/
 
-commit b6dd5acde3f165e364881c36de942c5b252e2a27
-Author: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-Date:   Sat May 16 13:15:15 2020 +0530
+Thanks,
 
-    ipv6: Fix suspicious RCU usage warning in ip6mr
+Paolo
 
-This way, tests will detect more easily if something is wrong.
-
-Thank you.
 
