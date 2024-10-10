@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-134381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA1D99916D
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 20:59:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC66E9991A4
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 21:05:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CC7E1F25A66
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 18:59:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4DC1C23A1C
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 19:05:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2331CCB2A;
-	Thu, 10 Oct 2024 18:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08DC1E7C07;
+	Thu, 10 Oct 2024 18:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SbJseFfK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tC10qpRx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C1831F12FF
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A341E47AC
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 18:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728585301; cv=none; b=VJnTYAxdSYqobReBVRnw+wMH7f/c4GLgWYe3KdgFJ5328RSkmtXdT8ftl1oAgZ6VmamRpcyvyiv9N3VP/wwwJKulglUFOjsFVICrM8B7aYnFaT8Vvjg8el8AlRSDGzpDKhznIEim+1oZ99TYMZ1jlyQe06T7/VjS+jyt+RsKeUo=
+	t=1728586464; cv=none; b=Mq6UGG1SiPMxrQhdn+dm4FfuarIzX5y7IiBjBoLvTU3pX7A81v46W7ukQawvJDd+58J1aelmo34v/tbJ82tJbGVRJTJ52jdGwXz52nUlN6hyXTO4N+OTG5bQp4zIMuutEjhZHSmdTtyJQ0nxPz+nGL2fW/CdBPkbKD+qjKS15bo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728585301; c=relaxed/simple;
-	bh=5H0TXKb7vdMMBfioB1w565xsNdpUuNNsw5k1MJOU+qc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bmzxj0FXZ9V6mwh872FfukrNJJ90PMnCtcGkuUSip9VjgIefU9z384C+Msv1SCvetVwtlw4KofpLqz6KMNegQppPivz7Q/kfoiJyUUa+KLaY4sqcIv6/tUcGelaf9jnVVCoL1eUHNAfwGMu6gJl0x7hmzschlgE7BFANbxBDnzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SbJseFfK; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4311c285bc9so2687665e9.3
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 11:34:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1728585297; x=1729190097; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ytCziD1c5I5FhCXF5EK5g0FeePvbLPZ6YQt0NDF0j9M=;
-        b=SbJseFfKB5iTfiX6Q+huR0onyNzE3nj9ar6pMNaTyUeaj1Ukm2/6KVHBPIbpbhefdN
-         FCaJnJ0XXcGNZb9WnyKF+dygNphBCMKUjYJKEVanq4IiL6QEjfOWDdVXXVgr7AhbHxkt
-         shZ5Uc50rQp22ihdNjuzJaRvHxATDoi7NLjUeFKqN/3U+euQhEU3jnZ811Ah77r9RnhJ
-         1r+5G7E0OWJNSNGAbZ/f9BkGV8BjrhCvo10KO/KeYVhyNgL0ZHw5vAP/6rLjJ2/bU4+c
-         G9E772X9u7u1UVpu7ERvlJIKkuj5jpjSi2l6KrK3O+M4rqUnhpypLMlp/c2ADJlHdgMQ
-         VBTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728585297; x=1729190097;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ytCziD1c5I5FhCXF5EK5g0FeePvbLPZ6YQt0NDF0j9M=;
-        b=X0hDgdeqpYNQw2nPiCZ03vxPEvPZv9gHLCnTB669MbbTlt51Yy/d/QQ8PHpGZv/Nbm
-         SBDcpjWKgv+BY309SFWZCnfsEysx7w+pn2VHAkTpNRgL2qcfv8yK/JADzDKu3L5F3obg
-         MS9EOOyc0aOBETlcnoq/0GZ0Hlh6ccSOjVA6ZSXpWMUrBFNLiGva8tEyggn7dxxAEsMu
-         E1bTrSRo7AZC8fu8iUdwELugqZiItcdR1CzBbwgUAc0FZ1yrQ1DRCojojZFuqCkI7m0c
-         F/smSehH7Wyvx/Tl0kgPBP7gbDO/EsqpHTbEB0iDnyx0s01kVDTf6sA3jYnIvoT+tX/n
-         W4bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUS0uThDlvW4JKyiczHx8P8Jd7dpMTiiXSi27KomCEbZY43Rko4uYaT+Nqg0zca7pvfZJD6ETA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd7XC3pgckR/zYFmTJ6vT5tPICtja/6e5liCmmUT2d6wcGektS
-	QCgaGsUShOvg9QSsLLsSdo9HORK/lvu22VFyQTsZ5DWcZACs+fUP+ppq+lUY+38=
-X-Google-Smtp-Source: AGHT+IGrQtiU9KkPJvVdlsqZUQMKOCUeX11EZAgMHCeWVATX5aFzmtkTu4Efnh91V5tJdIM1vfefqw==
-X-Received: by 2002:a05:600c:46c9:b0:42c:c401:6d86 with SMTP id 5b1f17b1804b1-431157e56e5mr37151355e9.27.1728585297410;
-        Thu, 10 Oct 2024 11:34:57 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4311835696esm23005225e9.37.2024.10.10.11.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 11:34:56 -0700 (PDT)
-Date: Thu, 10 Oct 2024 21:34:53 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Philipp Stanner <pstanner@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Basavaraj Natikar <basavaraj.natikar@amd.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alex Dubov <oakad@yahoo.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rasesh Mody <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com,
-	Igor Mitsyanko <imitsyanko@quantenna.com>,
-	Sergey Matyukevich <geomatsi@gmail.com>,
-	Kalle Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Juergen Gross <jgross@suse.com>,
-	Stefano Stabellini <sstabellini@kernel.org>,
-	Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Mario Limonciello <mario.limonciello@amd.com>,
-	Chen Ni <nichen@iscas.ac.cn>, Ricky Wu <ricky_wu@realtek.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Mostafa Saleh <smostafa@google.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Hannes Reinecke <hare@suse.de>,
-	John Garry <john.g.garry@oracle.com>,
-	Soumya Negi <soumya.negi97@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Reinette Chatre <reinette.chatre@intel.com>,
-	Eric Auger <eric.auger@redhat.com>, Ye Bin <yebin10@huawei.com>,
-	Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
-	Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Kai Vehmanen <kai.vehmanen@linux.intel.com>,
-	Peter Ujfalusi <peter.ujfalusi@linux.intel.com>,
-	Rui Salvaterra <rsalvaterra@gmail.com>,
-	Marc Zyngier <maz@kernel.org>, linux-ide@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-input@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-staging@lists.linux.dev, kvm@vger.kernel.org,
-	xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Subject: Re: [RFC PATCH 13/13] Remove devres from pci_intx()
-Message-ID: <0990d9f9-cab9-44c2-b2e3-bd8fa556cc02@stanley.mountain>
-References: <20241009083519.10088-1-pstanner@redhat.com>
- <20241009083519.10088-14-pstanner@redhat.com>
- <7f624c83-115b-4045-b068-0813a18c8200@stanley.mountain>
- <f42bb5de4c9aca307a3431dd15ace4c9cade1cb9.camel@redhat.com>
- <20241010114314.296db535.alex.williamson@redhat.com>
+	s=arc-20240116; t=1728586464; c=relaxed/simple;
+	bh=Wn8u+ZwqZQCn/jj2BD1MSnA+y5sLcLPJbvtx9C5eif0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=siYS2l7h4iYF/TYYgUsr5Li1aY/cgmZ+UIpl4axgMUnuHeSifFk3XDamIeHTMBDTNAfLKfkA4hAs/5Vx8OiRoy75Fln0DlzfyVTtovJismyvgZWpKStYpsYBkRcYJTq+o0RewL+Gby3LerloAzbXMyt39PCl+L4YxVbV2RfzAzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tC10qpRx; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7f4bf2ad-3085-4190-a9fe-58672f744bae@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1728586459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y2sFU+mhkreogqetewYXW4CuQ+piLzvISb3B3kccdA8=;
+	b=tC10qpRxyAtyodLTz8105efEiKl8Oi8TC1Re3DIsMmqv7g/ZSVBx2CP8NU1l4F16/0Hq55
+	mK3aQRflt16K7TIOaBt5iTL4C1XbIS6I3CgTRtakmySldd2jHuJFTscZuTsvFDkgNES7Uf
+	zqCr7JzM5d+2YAXYPaA0h/k5YBmOAB8=
+Date: Thu, 10 Oct 2024 11:54:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241010114314.296db535.alex.williamson@redhat.com>
+Subject: Re: [PATCH bpf 1/4] bpf, sockmap: SK_DROP on attempted redirects of
+ unsupported af_vsock
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Michal Luczaj <mhal@rbox.co>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
+References: <20241009-vsock-fixes-for-redir-v1-0-e455416f6d78@rbox.co>
+ <20241009-vsock-fixes-for-redir-v1-1-e455416f6d78@rbox.co>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241009-vsock-fixes-for-redir-v1-1-e455416f6d78@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Oct 10, 2024 at 11:43:14AM -0600, Alex Williamson wrote:
-> FWIW, I think pcim_intx() and pci_intx() align better to our naming
-> convention for devres interfaces.  Would it be sufficient if pci_intx()
-> triggered a WARN_ON if called for a pci_is_managed() device?  Thanks,
+On 10/9/24 2:20 PM, Michal Luczaj wrote:
+> Don't mislead the callers of bpf_{sk,msg}_redirect_{map,hash}(): make sure
+> to immediately and visibly fail the forwarding of unsupported af_vsock
+> packets.
+> 
+> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>   include/net/sock.h  | 5 +++++
+>   net/core/sock_map.c | 8 ++++++++
+>   2 files changed, 13 insertions(+)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index c58ca8dd561b7312ffc0836585c04d9fe917a124..c87295f3476db23934d4fcbeabc7851c61ad2bc4 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -2715,6 +2715,11 @@ static inline bool sk_is_stream_unix(const struct sock *sk)
+>   	return sk->sk_family == AF_UNIX && sk->sk_type == SOCK_STREAM;
+>   }
+>   
+> +static inline bool sk_is_vsock(const struct sock *sk)
+> +{
+> +	return sk->sk_family == AF_VSOCK;
+> +}
+> +
+>   /**
+>    * sk_eat_skb - Release a skb if it is no longer needed
+>    * @sk: socket to eat this skb from
+> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+> index 242c91a6e3d3870ec6da6fa095d180a933d1d3d4..07d6aa4e39ef606aab33bd0d95711ecf156596b9 100644
+> --- a/net/core/sock_map.c
+> +++ b/net/core/sock_map.c
+> @@ -647,6 +647,8 @@ BPF_CALL_4(bpf_sk_redirect_map, struct sk_buff *, skb,
+>   	sk = __sock_map_lookup_elem(map, key);
+>   	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+>   		return SK_DROP;
+> +	if ((flags & BPF_F_INGRESS) && sk_is_vsock(sk))
+> +		return SK_DROP;
+>   
+>   	skb_bpf_set_redir(skb, sk, flags & BPF_F_INGRESS);
+>   	return SK_PASS;
+> @@ -675,6 +677,8 @@ BPF_CALL_4(bpf_msg_redirect_map, struct sk_msg *, msg,
+>   		return SK_DROP;
+>   	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
+>   		return SK_DROP;
+> +	if (sk_is_vsock(sk))
+> +		return SK_DROP;
+>   
+>   	msg->flags = flags;
+>   	msg->sk_redir = sk;
+> @@ -1249,6 +1253,8 @@ BPF_CALL_4(bpf_sk_redirect_hash, struct sk_buff *, skb,
+>   	sk = __sock_hash_lookup_elem(map, key);
+>   	if (unlikely(!sk || !sock_map_redirect_allowed(sk)))
+>   		return SK_DROP;
+> +	if ((flags & BPF_F_INGRESS) && sk_is_vsock(sk))
+> +		return SK_DROP;
+>   
+>   	skb_bpf_set_redir(skb, sk, flags & BPF_F_INGRESS);
+>   	return SK_PASS;
+> @@ -1277,6 +1283,8 @@ BPF_CALL_4(bpf_msg_redirect_hash, struct sk_msg *, msg,
+>   		return SK_DROP;
+>   	if (!(flags & BPF_F_INGRESS) && !sk_is_tcp(sk))
+>   		return SK_DROP;
+> +	if (sk_is_vsock(sk))
+> +		return SK_DROP;
+
+Jakub Sitnicki, I think you have been on another thread about this change. 
+Please help to take a look and ack if it looks good. Thanks.
+
+>   
+>   	msg->flags = flags;
+>   	msg->sk_redir = sk;
 > 
 
-To be honest, I also don't mind if you also just merge the patchset as-is.  I
-was mostly just throwing out ideas.
-
-regards,
-dan carpenter
 
