@@ -1,159 +1,190 @@
-Return-Path: <netdev+bounces-133984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-133985-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A8C99979CF
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:51:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DFB59979E3
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CFE21C22669
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:51:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2F471F235C7
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 00:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42948F9CB;
-	Thu, 10 Oct 2024 00:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6725CC153;
+	Thu, 10 Oct 2024 00:56:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="FatR5lce"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1t16P2M"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A5B645
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 00:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D39C645;
+	Thu, 10 Oct 2024 00:56:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728521475; cv=none; b=noykooXurZP2Nq8U5zH5yp3BpVIQ8dEceANn65SnhP+fZji/JEEu5E+XZVmTaHTY8EPk+sE4BU7NzE3/QXbdXXf7PH+lyndJmq87NVeEG/rAAIiL+qXwUi2yxQSNk0W3WmRw2fAxjOTTwsRfLsGTFT7GTGlURpyOH2wP1EVficE=
+	t=1728521778; cv=none; b=cz+kWRtmeenc+vJqFIHWKuP2Eosvf1eTGcM0uvbkCWMr/RaQW9W1LoGT+ij8/CT+mHKdM2zEn0rH07sfkL6Ph7zkP5sIUFu1+iCnBAfmeqKkZ726uid6llQ/NohL4BhcmrMmbOH2EDXH5s3hWKsqTDKTzcXb5Pi9+bV62JhP6hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728521475; c=relaxed/simple;
-	bh=DZ1+Ni+zYQzQzWABkg+ZFJmTNb+vX7MUgbMJrlxAxOY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QToWxBBlC9YV9Ac6v7A7TR6ZRFVO96CXmLHZHebi7gVLbBvMUq7QGlvZ20alrRPwCG9jUDdvM99wUuIBYKwkLTJzEcZj+YiFPgLLZAFy1812r2zq5d+Ao1i5BjgOuIe3V0uNPvpErXFciD74NDAykTByMmCO7hTBScm+7NjqXBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=FatR5lce; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id ECC4A2C01F6;
-	Thu, 10 Oct 2024 13:51:09 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1728521469;
-	bh=wFush8R/tfUQ876cxTMS5lnSrCNVewI9v7fOknWucnE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=FatR5lce087PbElKHflBHo0ljlTEJ3++5Gg2rHf35wgLeY5HBXbq2blNgpunNifeq
-	 OwJ9XdcrAC40BFIcYJNZszDxB3E50+Thtqi6KAG2/3N+uJM8iWh7FqPqJIqAy4Uqe+
-	 bQIIKC5Teh45PdrpBv93fbb1Gy+li1KUC+dpIKkfPVpFAK1KBc6bRNa6+tB8mOUYca
-	 QIgDZws3StiMpQMx++stBGM0cLAYBtED2s5s6A6SPRVh1q90vLJIyaIOZA/L4tdt0C
-	 lAJqgUkUB8/crSBCgQTkv4T8YP4jwC4DV8Hq7xv6YdZcRU6FxmiLAyiM/tcyjrWgWt
-	 f3SQ38q1DOjZg==
-Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B670724fd0000>; Thu, 10 Oct 2024 13:51:09 +1300
-Received: from aryans-dl.ws.atlnz.lc (aryans-dl.ws.atlnz.lc [10.33.22.38])
-	by pat.atlnz.lc (Postfix) with ESMTP id BCB7113ED7B;
-	Thu, 10 Oct 2024 13:51:09 +1300 (NZDT)
-Received: by aryans-dl.ws.atlnz.lc (Postfix, from userid 1844)
-	id B7C572A0BF8; Thu, 10 Oct 2024 13:51:09 +1300 (NZDT)
-From: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v1] net: phy: aquantia: poll status register
-Date: Thu, 10 Oct 2024 13:49:34 +1300
-Message-ID: <20241010004935.1774601-1-aryan.srivastava@alliedtelesis.co.nz>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1728521778; c=relaxed/simple;
+	bh=vPU8eDSK0RCvm9VfT+wiAdV9Sb3h9y1YygQuyN6AqDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fZKM49dBx1fMV4G/A6hDaUso6LvUoi1e9/WFHqp20uKF39+to6DOvFy2nYFgbO14tX/4Eip1EarPPUykq8n6xrBfUveo/FGOhVADzg672vtCATaFdFY2+Vfj+sDJJhyAtcofBPGRSiqpwbx3JTwOTxbiE2MkUOOmwiEXPqSUDYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1t16P2M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760D3C4CEC3;
+	Thu, 10 Oct 2024 00:56:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728521777;
+	bh=vPU8eDSK0RCvm9VfT+wiAdV9Sb3h9y1YygQuyN6AqDY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u1t16P2MA6Hr8Bn/mfs4uV+l8jLpaTHD8QH/9pcQgADSpxZvMULix4ItesEngeZQm
+	 45y8DHwjXoIWNdKBwPdn6rCzIMyN2VBbtCGbwxXnLK1+0oHPrGuv+KyVy33xWaTugF
+	 jOYu32Ujw8ebIRIHKXxzms6apyq5jtOv1hkacJ5Q/h2d3pakz224ERQREqovr0Viyy
+	 mfnK7qli3nYbD+gich6RdoWfpElrKAzj/VhD2wHD0xauGeF0QcUgRY7G+6DW+YSiLl
+	 GpJW1FL548WRFEjEyqvApLD7cnJL2Z1AdF3R/osjd4jNYd0tg5AY700ObOAPZLl7fE
+	 aKuiKdT30cHmQ==
+Date: Wed, 9 Oct 2024 17:56:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenz Brun <lorenz@brun.one>
+Cc: Igor Russkikh <irusskikh@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: atlantic: support reading SFP module info
+Message-ID: <20241009175616.39594837@kernel.org>
+In-Reply-To: <20241006215028.79486-1-lorenz@brun.one>
+References: <20241006215028.79486-1-lorenz@brun.one>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=670724fd a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=DAUX931o1VcA:10 a=CGjx52yEnwgpAtm7to8A:9 a=3ZKOabzyN94A:10
-X-SEG-SpamProfiler-Score: 0
-x-atlnz-ls: pat
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The system interface connection status register is not immediately
-correct upon line side link up. This results in the status being read as
-OFF and then transitioning to the correct host side link mode with a
-short delay. This causes the phylink framework passing the OFF status
-down to all MAC config drivers, resulting in the host side link being
-misconfigured, which in turn can lead to link flapping or complete
-packet loss in some cases.
+On Sun,  6 Oct 2024 23:50:25 +0200 Lorenz Brun wrote:
+> Add support for reading SFP module info and digital diagnostic
+> monitoring data if supported by the module. The only Aquantia
+> controller without an integrated PHY is the AQC100 which belongs to
+> the B0 revision, that's why it's only implemented there.
+> 
+> The register information was extracted from a diagnostic tool made
+> publicly available by Dell, but all code was written from scratch by me.
+> 
+> This has been tested to work with a variety of both optical and direct
+> attach modules I had lying around and seems to work fine with all of
+> them, including the diagnostics if supported by an optical module.
+> All tests have been done with an AQC100 on an TL-NT521F card on firmware
+> version 3.1.121 (current at the time of this patch).
 
-Mitigate this by periodically polling the register until it not showing
-the OFF state. This will be done every 1ms for 10ms, using the same
-poll/timeout as the processor intensive operation reads.
+> +static int aq_ethtool_get_module_info(struct net_device *ndev,
+> +				      struct ethtool_modinfo *modinfo)
+> +{
+> +	int err;
+> +	u8 compliance_val, dom_type;
+> +	struct aq_nic_s *aq_nic = netdev_priv(ndev);
 
-If the phy is still expressing the OFF state after the timeout, then set
-the link to false and pass the NA interface mode onto the phylink
-framework.
+nit:
+Could you reverse the order of variable declarations?
+We prefer longest to shortest lines.
 
-Signed-off-by: Aryan Srivastava <aryan.srivastava@alliedtelesis.co.nz>
----
-Changes in v1:
-- Ignore timeout error
-- Set link status to false in OFF case
+> +
+> +	/* Module EEPROM is only supported for controllers with external PHY */
+> +	if (aq_nic->aq_nic_cfg.aq_hw_caps->media_type != AQ_HW_MEDIA_TYPE_FIBRE)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (!aq_nic->aq_hw_ops->hw_read_module_eeprom)
+> +		return -EOPNOTSUPP;
+> +
+> +	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
+> +		SFF_8472_ID_ADDR, SFF_8472_COMP_ADDR, 1, &compliance_val);
+> +	if (err)
+> +		return err;
+> +
+> +	err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
+> +		SFF_8472_ID_ADDR, SFF_8472_DOM_TYPE_ADDR, 1, &dom_type);
+> +	if (err)
+> +		return err;
+> +
+> +	if (dom_type & SFF_8472_ADDRESS_CHANGE_REQ_MASK || compliance_val == 0x00) {
+> +		modinfo->type = ETH_MODULE_SFF_8079;
+> +		modinfo->eeprom_len = ETH_MODULE_SFF_8079_LEN;
+> +	} else {
+> +		modinfo->type = ETH_MODULE_SFF_8472;
+> +		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
+> +	}
+> +	return 0;
+> +}
+> +
+> +static int aq_ethtool_get_module_eeprom(struct net_device *ndev,
+> +					struct ethtool_eeprom *ee, unsigned char *data)
+> +{
+> +	int err;
+> +	unsigned int first, last, len;
+> +		struct aq_nic_s *aq_nic = netdev_priv(ndev);
 
- drivers/net/phy/aquantia/aquantia_main.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+nit: extra tab here
 
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/a=
-quantia/aquantia_main.c
-index dcad3fa1ddc3..cad9ba4d4dbe 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -42,6 +42,7 @@
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_XAUI	4
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_SGMII	6
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_RXAUI	7
-+#define MDIO_PHYXS_VEND_IF_STATUS_TYPE_OFF	9
- #define MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII	10
-=20
- #define MDIO_AN_VEND_PROV			0xc400
-@@ -348,9 +349,19 @@ static int aqr107_read_status(struct phy_device *phy=
-dev)
- 	if (!phydev->link || phydev->autoneg =3D=3D AUTONEG_DISABLE)
- 		return 0;
-=20
--	val =3D phy_read_mmd(phydev, MDIO_MMD_PHYXS, MDIO_PHYXS_VEND_IF_STATUS)=
-;
--	if (val < 0)
--		return val;
-+	/**
-+	 * The status register is not immediately correct on line side link up.
-+	 * Poll periodically until it reflects the correct ON state.
-+	 * Only return fail for read error, timeout defaults to OFF state.
-+	 */
-+	ret =3D phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PHYXS,
-+					MDIO_PHYXS_VEND_IF_STATUS, val,
-+					(FIELD_GET(MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK, val) !=3D
-+					MDIO_PHYXS_VEND_IF_STATUS_TYPE_OFF),
-+					AQR107_OP_IN_PROG_SLEEP,
-+					AQR107_OP_IN_PROG_TIMEOUT, false);
-+	if (ret && ret !=3D -ETIMEDOUT)
-+		return ret;
-=20
- 	switch (FIELD_GET(MDIO_PHYXS_VEND_IF_STATUS_TYPE_MASK, val)) {
- 	case MDIO_PHYXS_VEND_IF_STATUS_TYPE_KR:
-@@ -377,7 +388,9 @@ static int aqr107_read_status(struct phy_device *phyd=
-ev)
- 	case MDIO_PHYXS_VEND_IF_STATUS_TYPE_OCSGMII:
- 		phydev->interface =3D PHY_INTERFACE_MODE_2500BASEX;
- 		break;
-+	case MDIO_PHYXS_VEND_IF_STATUS_TYPE_OFF:
- 	default:
-+		phydev->link =3D false;
- 		phydev->interface =3D PHY_INTERFACE_MODE_NA;
- 		break;
- 	}
---=20
-2.46.0
+> +	if (!aq_nic->aq_hw_ops->hw_read_module_eeprom)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (ee->len == 0)
+> +		return -EINVAL;
 
+I don't think core will let that happen, you can remove the check
+
+> +	first = ee->offset;
+> +	last = ee->offset + ee->len;
+> +
+> +	if (first < ETH_MODULE_SFF_8079_LEN) {
+> +		len = min_t(unsigned int, last, ETH_MODULE_SFF_8079_LEN);
+
+AFAIU pure min() may work these days
+
+> +		len -= first;
+> +
+> +		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
+> +			SFF_8472_ID_ADDR, first, len, data);
+> +		if (err)
+> +			return err;
+> +
+> +		first += len;
+> +		data += len;
+> +	}
+> +	if (first < ETH_MODULE_SFF_8472_LEN && last > ETH_MODULE_SFF_8079_LEN) {
+> +		len = min_t(unsigned int, last, ETH_MODULE_SFF_8472_LEN);
+> +		len -= first;
+> +		first -= ETH_MODULE_SFF_8079_LEN;
+> +
+> +		err = aq_nic->aq_hw_ops->hw_read_module_eeprom(aq_nic->aq_hw,
+> +			SFF_8472_DIAGNOSTICS_ADDR, first, len, data);
+> +		if (err)
+> +			return err;
+> +	}
+> +	return 0;
+> +}
+> +
+>  const struct ethtool_ops aq_ethtool_ops = {
+>  	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+>  				     ETHTOOL_COALESCE_MAX_FRAMES,
+> @@ -1014,4 +1090,6 @@ const struct ethtool_ops aq_ethtool_ops = {
+>  	.get_ts_info         = aq_ethtool_get_ts_info,
+>  	.get_phy_tunable     = aq_ethtool_get_phy_tunable,
+>  	.set_phy_tunable     = aq_ethtool_set_phy_tunable,
+> +	.get_module_info     = aq_ethtool_get_module_info,
+> +	.get_module_eeprom   = aq_ethtool_get_module_eeprom,
+>  };
+
+> +static int hw_atl_b0_read_module_eeprom(struct aq_hw_s *self, u8 dev_addr,
+> +					u8 reg_start_addr, int len, u8 *data)
+> +{
+> +	int err;
+> +	int i, b;
+> +	u32 val;
+> +
+> +	/* Wait for SMBUS0 to be idle */
+> +	err = readx_poll_timeout_atomic(hw_atl_smb0_bus_busy_get, self,
+> +					val, val == 0, 100U, 10000U);
+
+Why atomic?
+-- 
+pw-bot: cr
 
