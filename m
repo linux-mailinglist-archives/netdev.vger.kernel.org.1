@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-134015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D3C7997ABA
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:51:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAB6997ABC
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 04:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C7532832EC
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:51:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8461C2837FA
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 02:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F24F1925A3;
-	Thu, 10 Oct 2024 02:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC9E199248;
+	Thu, 10 Oct 2024 02:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnKWDs78"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4iKDJ+D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 280041922F3;
-	Thu, 10 Oct 2024 02:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88A051922F3
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 02:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728528630; cv=none; b=VYwjtvGRJUnCGgqCOkO2Q2tDdK+WiIEMXWXZl8Vcxb13ADIlNaqWtKyA9LpNNrlv4+EUYCZ9NTewh75x4/czT6OMk6JXi7VIqOR5X9CvVRdMSpEUHGYI9rbhBN+UkMTILogSqaV4nRz3oDTxHuIgIKzGkNp7sFKrAs881PmyWw0=
+	t=1728528633; cv=none; b=KzZAL1zDq9h5AB/Knq02quAF+r0SosFrqVr/SjOvrZP60VKIssbaTmNIkLoufc+u0xN8I0KmbHLaYpc9d4+us29IetbqT4j3yWRVGobds28jxIft+DzsfoGCOr/G+CJRUejRX+ugSJqfoG1vcQNV/UyGH/bpe3+iF+IlU/6AIIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728528630; c=relaxed/simple;
-	bh=TFczhcOD6nz56p8+h4jan8Lr8MNsRfGB6VgsxVOIIU0=;
+	s=arc-20240116; t=1728528633; c=relaxed/simple;
+	bh=XGbuFpqswUrVwXgE6g2sFYSDK+KaF/AlBp1QBJjQXhM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LcDFHy23XJ0nq8m463rH/owMAvYk1E4ddYhI7eij9LU2nl68/3jB9AmViVNXTSrUDW31f1Wgmn9gg05RBKOvXKHgy11s6RmkjQrz8YubsTvDlbZVaaplVHnV9YHYIXJ5WpTaK1FeldZyVCWiBM2yDiR682WZbI/CGoNYB2jjH6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnKWDs78; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59C4C4CED3;
-	Thu, 10 Oct 2024 02:50:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=uKlGpnLKXkfGbVSdVI7V6KMdKHc4NdbsDlkOMbFBmzduXFwcksPn6zEKdjIsHuF07WAjsHWMmJ7D+i87NVljZ3W/sclHPFVTNK++Z+ar6bl2ErtnhuoZM4+iy9PRvgiU6vArPKGhurBHKcc0NVLLO1hBbtgDIoVmdxsQSvgIvAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4iKDJ+D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2505CC4CECD;
+	Thu, 10 Oct 2024 02:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728528629;
-	bh=TFczhcOD6nz56p8+h4jan8Lr8MNsRfGB6VgsxVOIIU0=;
+	s=k20201202; t=1728528633;
+	bh=XGbuFpqswUrVwXgE6g2sFYSDK+KaF/AlBp1QBJjQXhM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WnKWDs78M/th/YaQXz/+L87Iw2nIp0JH4Vvr0Oc/oGYuhRH4hgebvt8tcbgiey1LM
-	 A6/OlwhdPYdblES5e4s+hX0GlNfWb52SAC1VytwzHu8P4bqvW8X/H1G1OPKQsc49uk
-	 cVFZZpUujdcIocRlXWvFbqEw2YhIPndjUWoPMJuamSzc+UrLJFIejL9Gb7Kfu3AP11
-	 JxFelEM4B1kR7LeMXwhnMTNGgy0PikUOmXYMGsfsZo/J3rTA9inALh22pfb+9CwJQw
-	 2sgmlzZs/SrSh1PEve8R6KqRylMIDFOGx3q198v6i2oqsGNgydjZwgp1tI0bdsyVfm
-	 1ib2euXW+R/QQ==
+	b=W4iKDJ+D1lnUMst9InTLHnLF+7Hg/urXFLYy4BtkfOC7LVTqgAU/fkTRpFbNkeuPH
+	 dRkeiaRMw/gXzTFAA8kJc2ux91d3cPq2O1Oh25zUAqm2ce0ltE8939JXz4V6IsZeC3
+	 BnQvitTLEDRnk0bdMVEtIpJyO7g2UJsoyXWLxHQ/XJU2bfFfZEeWru9TLB1ypAqQo4
+	 4yE/aDUmYMC47F4LtVBJCrSoKmGESgx2oHIoc/a3I9wdcg0zqgJWFL61YelNLJBxtn
+	 JKptR9wUUGEMUR6lp+Cfe+W4rL0bN2ySkhM6w7KUFPBvgFfPrWSNM5LQDZ3xdqBAZE
+	 g2ojXBeB8v+Ug==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C873806644;
-	Thu, 10 Oct 2024 02:50:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC2F3806644;
+	Thu, 10 Oct 2024 02:50:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: netconsole: fix wrong warning
+Subject: Re: [PATCH net-next] ipv6: switch inet6_addr_hash() to less predictable
+ hash
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172852863424.1545809.14043075187480987088.git-patchwork-notify@kernel.org>
-Date: Thu, 10 Oct 2024 02:50:34 +0000
-References: <20241008094325.896208-1-leitao@debian.org>
-In-Reply-To: <20241008094325.896208-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, thepacketgeek@gmail.com, kernel-team@meta.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172852863748.1545809.7044651904264318279.git-patchwork-notify@kernel.org>
+Date: Thu, 10 Oct 2024 02:50:37 +0000
+References: <20241008120101.734521-1-edumazet@google.com>
+In-Reply-To: <20241008120101.734521-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ dsahern@kernel.org, kuniyu@amazon.com, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  8 Oct 2024 02:43:24 -0700 you wrote:
-> A warning is triggered when there is insufficient space in the buffer
-> for userdata. However, this is not an issue since userdata will be sent
-> in the next iteration.
+On Tue,  8 Oct 2024 12:01:01 +0000 you wrote:
+> In commit 3f27fb23219e ("ipv6: addrconf: add per netns perturbation
+> in inet6_addr_hash()"), I added net_hash_mix() in inet6_addr_hash()
+> to get better hash dispersion, at a time all netns were sharing the
+> hash table.
 > 
-> Current warning message:
-> 
+> Since then, commit 21a216a8fc63 ("ipv6/addrconf: allocate a per
+> netns hash table") made the hash table per netns.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: netconsole: fix wrong warning
-    https://git.kernel.org/netdev/net/c/d94785bb46b6
+  - [net-next] ipv6: switch inet6_addr_hash() to less predictable hash
+    https://git.kernel.org/netdev/net-next/c/4a0ec2aa0704
 
 You are awesome, thank you!
 -- 
