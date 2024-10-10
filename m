@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-134230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-134231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7804A998755
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:15:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF45B99875E
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 15:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD33DB2469C
-	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:15:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3741F234D6
+	for <lists+netdev@lfdr.de>; Thu, 10 Oct 2024 13:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581FF1C9DD3;
-	Thu, 10 Oct 2024 13:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2E161C9B75;
+	Thu, 10 Oct 2024 13:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lG32C6ZB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MlBWK7gp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88EF1C9DCB
-	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8481C8FD7
+	for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 13:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728566130; cv=none; b=u/mBKlv3yNCyhOs52mP/r2pvCt6id7fWkTTgPxwUItZzdkONgQGDBef1Rde33A2N4AZbq+SxEmDzW2i6NYoCdDhEMq1cDrTuGRBGeqBpejDp+varlBjwYlXrz1UQxjWc7bTMcjnU5FC/jEiRgYQVcBi6dPcYanTC3bbOQGZLx88=
+	t=1728566195; cv=none; b=d9RoKAM2HSbsBDERQUsi1JF9WREvJ/soD9rOD2ioUIUIeUm0Vg4zR2y3Hy9gkTiksut9LAMEq72B7q5KjaeZRuu6CQffGRf1nEAbrkOyKjFVQZmm5aTvNF21yhgAdp9p9bhUcv4HLZU+Xyx8wZWanwXESK0AR9IK7kXeXIKzXqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728566130; c=relaxed/simple;
-	bh=zKm0s87YxDGUwOyrpRBNwVkOgzJN1WpIj1ZuF3o1pqw=;
+	s=arc-20240116; t=1728566195; c=relaxed/simple;
+	bh=fMI9yXXfFMdiO7yLUT1VSqHvBTbtshbZwmJFn2Ix1WA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YWLIu6/KnumZ8J9qmay1pZ7NVLG8OcHibxrb9B//AJAh0N6q1sjYp0LYrW9U5IHukwlBSPqrHgx2hvb96+hc+4DoRaSwudOn/1241BMZQDHkZhs085X/NzjsUofrszgIMpDaU8h35NCCpV21XzTMG2z89pQTOiGxa5BsIQw8usg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lG32C6ZB; arc=none smtp.client-ip=209.85.208.42
+	 To:Cc:Content-Type; b=fS/j4HuVhbPDsbb16VNV0Nm/4wauI4WBwRk0oL+BuYTtjI+99rMdhh4h2LG+r4tNn4nsbnR6c4UV2HB2R6wWiKTiy7f8c8b75NJE6rdIGaZ0l41p1XcIkon9JtFX9GitPgciRdrxREnbrezojBtje6SCX4k+3gVu5awZcc5rrF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MlBWK7gp; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c920611a86so1138683a12.0
-        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:15:27 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2faccccbca7so7461041fa.2
+        for <netdev@vger.kernel.org>; Thu, 10 Oct 2024 06:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1728566126; x=1729170926; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1728566192; x=1729170992; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zKm0s87YxDGUwOyrpRBNwVkOgzJN1WpIj1ZuF3o1pqw=;
-        b=lG32C6ZBJZDnm/tz8YsBYLDpmqDhnnvE6y3YeaNOTVxjolwerW+EUQk3+lXjJuL5b5
-         KdItrz0eR8Cck703DPGNKfBcz5AtxF7KRLsz1tVO2cmGY9pYn/QRFTz2IkNyA4kWGVJE
-         EdliPILfWgD/+1Qf19ZK/prU1MRQcMo8+9CiWKiHmXNsfzp5nanliBz/EI73xhXraE5p
-         C8RZv323NPuTb7FOidPCNADKWzYltlRW5tPr5hmRBChfa0G8kUg0lEw+t9GBUx0ukqH8
-         t+j0MYKr0LvzGpLAcfPUbPpPT9JUl3YEG/ihhZqnxFVfkbNu0MknYIQlCInMSveHPINX
-         22sw==
+        bh=XIgm+vvOXy8UJRagTVP9jYvUV/jLtiQCLgciuGUZckk=;
+        b=MlBWK7gp48ZtttVHGdOEHn3ZVkIC5sDMiFr1WA9HsiFIjz9FG6gD+TdO2Xh/Ri8Z0D
+         hvC977BEm8nxv4oWrbv8iroBMV5aRyblrR173unJHkn8E1PzOV/LZTbA6BKdELy4egMD
+         0z7neE5r81OdV0FK/0I2cHt698m1NmxHcjuv0yeHD1LJNkO7b+WE5/s7gzNIYJ6PiMho
+         m+8QjAWJrVO4XGht1d03CuRBRAjkLpAF90k4mMnQDDZ8HNhbUFwnbCQeSiaoZ17Itec1
+         FSV+NcuZMnFDiSXahaCg5kUKK6k0MHqYPDSdunQYqPIYl5ylQJDSgunVFJri2PYp4ILp
+         ikvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728566126; x=1729170926;
+        d=1e100.net; s=20230601; t=1728566192; x=1729170992;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zKm0s87YxDGUwOyrpRBNwVkOgzJN1WpIj1ZuF3o1pqw=;
-        b=oOF1rURq7rr+Wnb3/cVFruP+F5R9uqn0357ZElNSsuT0+DINgycwYQaCjWBMFMjzwT
-         8NYjKI1atMJ2NAW+Q6hZUVQBwDGYJl9IdpHIaWx/NXDTTQFZtHT1II2k9rRnEYbcLY1y
-         I8QVjxPBWYwFvqAurhFX8TSNAFBKI7mFyYtQipSpdjFaKrZ5TX2FoB7hd+UDwPbAxWvc
-         NPJw/JTpn8aMmS1S0fGOxurGzo3cs9exF6frfeVUlznkmT5xZsSiyRgspMDDjH2mZxVY
-         fYS/ZNmyiUNstwzSDgvsHV2gLqeEwb4n2GUElk6BsTJ/DDovGfUKPNIF09L5BNoQ7+nh
-         XZ7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWrut2GFw+HDS2hr0VoUEtbSaEwE8Jtv7fwpSZAOa3IQF0boMUd18XurXCWUthFSqnly2sn6KA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQwvpDOtg6l8nwq+jW9ae06wJXzyUJu1RvZPDWwbClP/VzyIzl
-	FZjdLud4RPU20xfUZt9QZBQQ0PgoD7vn1ffL0/noRaCfZSQbuYHCbrvh4pALEQtnng9Shk4Mm/2
-	Zxv79d3fIhqpc0pdU5OntjvitvK54iVha/SkK
-X-Google-Smtp-Source: AGHT+IHTOxdPIeJAjY2f7Lx4oe8SXx+rOyz4SGr5Qt/odla08IK8FSqHcP66BO0u6XOeiidGdyHQYPHoUjBK9v4ndWQ=
-X-Received: by 2002:a05:6402:1d4a:b0:5c8:9459:b9f1 with SMTP id
- 4fb4d7f45d1cf-5c91d59c15emr4244319a12.13.1728566125602; Thu, 10 Oct 2024
- 06:15:25 -0700 (PDT)
+        bh=XIgm+vvOXy8UJRagTVP9jYvUV/jLtiQCLgciuGUZckk=;
+        b=cIYXwjTBbw4sudOQt+EG+1IlTzxLIMWiWkbhnSCwnl9gJiP2mN9GhuZ9fKtdZS8LHh
+         3mjcoksJ3C693lpbPUKVApSrIWXsMRFE2dEXCdfVMLkJRYifR1MamrFyBJovfKNWHoUp
+         Q0pN/HkKvwUNHCmdBrmMO6613I/4QnBcK17NvlDRPAhSF02cFsEgzc6NsuNXkBC8zsye
+         scSpdLQtmdkZaa3MhWprQU7YJ26OXpmyFfCzAmbKqvBi0/g3ksurCREoNqfq2j2TeKm3
+         PW7bg+jmkPyyhVEq/pjPsugYND4xwzCSwSRSvg5rk6tc15qKkV0vVxAYBtQQgr9TDENE
+         M3fg==
+X-Forwarded-Encrypted: i=1; AJvYcCUe6LScrxRLIpgpUV0H0Q0KPq6Zwj9HQElL535/Ow7sQkndRuGKpT9jIWs+gEG1BLko1EUgQpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypVaotgVSjI6fs+KjwtQXpzpAbSe5PCOSYQFo7v0G1DJPPcnLS
+	QCa8zjUE1tBzIJlWJeyKcAPqrP3QkV6Dxx/FR6VlQ3MJjpFDgol4Vyy72RuirYolyEUHHuR5Li3
+	Wuj0IhJxu25iO5vjWMkFCOPVNpXd4GiCYv9r5
+X-Google-Smtp-Source: AGHT+IFOopb7XEdifq+ffnPw/OUPxMhUkqF4qycsNEzsajXQAxxnDTNy9l1QsnBhG5bwXHqNix1B8fXWbkmBiuyh3HI=
+X-Received: by 2002:a2e:460a:0:b0:2f6:5c64:ccc3 with SMTP id
+ 38308e7fff4ca-2fb1873e859mr32439541fa.16.1728566191617; Thu, 10 Oct 2024
+ 06:16:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241009231656.57830-1-kuniyu@amazon.com> <20241009231656.57830-13-kuniyu@amazon.com>
-In-Reply-To: <20241009231656.57830-13-kuniyu@amazon.com>
+References: <20241009231656.57830-1-kuniyu@amazon.com> <20241009231656.57830-14-kuniyu@amazon.com>
+In-Reply-To: <20241009231656.57830-14-kuniyu@amazon.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 10 Oct 2024 15:15:14 +0200
-Message-ID: <CANn89iKw8RY+_ULTBf=Ksnw5cJ93jToJ6eAoyHUY-1EmP5qV_Q@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 12/13] rtnetlink: Call rtnl_link_get_net_capable()
- in do_setlink().
+Date: Thu, 10 Oct 2024 15:16:20 +0200
+Message-ID: <CANn89iJUX3nkQJDOTsj9RN0dH4_u=mVQd4Z9m_mMCLm60Eppug@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 13/13] rtnetlink: Protect struct rtnl_af_ops
+ with SRCU.
 To: Kuniyuki Iwashima <kuniyu@amazon.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
@@ -87,18 +87,106 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Oct 10, 2024 at 1:21=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
 m> wrote:
 >
-> We will push RTNL down to rtnl_setlink().
+> Once RTNL is replaced with rtnl_net_lock(), we need a mechanism to
+> guarantee that rtnl_af_ops is alive during inflight RTM_SETLINK
+> even when its module is being unloaded.
 >
-> RTM_SETLINK could call rtnl_link_get_net_capable() in do_setlink()
-> to move a dev to a new netns, but the netns needs to be fetched before
-> holding rtnl_net_lock().
+> Let's use SRCU to protect rtnl_af_ops.
 >
-> Let's move it to rtnl_setlink() and pass the netns to do_setlink().
+> rtnl_af_lookup() now iterates rtnl_af_ops under RCU and returns
+> SRCU-protected ops pointer.  The caller must call rtnl_af_put()
+> to release the pointer after the use.
 >
-> Now, RTM_NEWLINK paths (rtnl_changelink() and rtnl_group_changelink())
-> can pass the prefetched netns to do_setlink().
+> Also, rtnl_af_unregister() unlinks the ops first and calls
+> synchronize_srcu() to wait for inflight RTM_SETLINK requests to
+> complete.
+>
+> Note that rtnl_af_ops needs to be protected by its dedicated lock
+> when RTNL is removed.
+>
+> Note also that BUG_ON() in do_setlink() is changed to the normal
+> error handling as a different af_ops might be found after
+> validate_linkmsg().
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>  include/net/rtnetlink.h |  5 +++-
+>  net/core/rtnetlink.c    | 58 +++++++++++++++++++++++++++++------------
+>  2 files changed, 46 insertions(+), 17 deletions(-)
+>
+> diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
+> index c873fd6193ed..407a2f56f00a 100644
+> --- a/include/net/rtnetlink.h
+> +++ b/include/net/rtnetlink.h
+> @@ -150,7 +150,8 @@ void rtnl_link_unregister(struct rtnl_link_ops *ops);
+>  /**
+>   *     struct rtnl_af_ops - rtnetlink address family operations
+>   *
+> - *     @list: Used internally
+> + *     @list: Used internally, protected by RTNL and SRCU
+> + *     @srcu: Used internally
+>   *     @family: Address family
+>   *     @fill_link_af: Function to fill IFLA_AF_SPEC with address family
+>   *                    specific netlink attributes.
+> @@ -163,6 +164,8 @@ void rtnl_link_unregister(struct rtnl_link_ops *ops);
+>   */
+>  struct rtnl_af_ops {
+>         struct list_head        list;
+> +       struct srcu_struct      srcu;
+> +
+>         int                     family;
+>
+>         int                     (*fill_link_af)(struct sk_buff *skb,
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index a0702e531331..817165f6d5ef 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -660,18 +660,31 @@ static size_t rtnl_link_get_size(const struct net_d=
+evice *dev)
+>
+>  static LIST_HEAD(rtnl_af_ops);
+>
+> -static const struct rtnl_af_ops *rtnl_af_lookup(const int family)
+> +static struct rtnl_af_ops *rtnl_af_lookup(const int family, int *srcu_in=
+dex)
+>  {
+> -       const struct rtnl_af_ops *ops;
+> +       struct rtnl_af_ops *ops;
+>
+>         ASSERT_RTNL();
+>
+> -       list_for_each_entry(ops, &rtnl_af_ops, list) {
+> -               if (ops->family =3D=3D family)
+> -                       return ops;
+> +       rcu_read_lock();
+> +
+> +       list_for_each_entry_rcu(ops, &rtnl_af_ops, list) {
+> +               if (ops->family =3D=3D family) {
+> +                       *srcu_index =3D srcu_read_lock(&ops->srcu);
+> +                       goto unlock;
+> +               }
+>         }
+>
+> -       return NULL;
+> +       ops =3D NULL;
+> +unlock:
+> +       rcu_read_unlock();
+> +
+> +       return ops;
+> +}
+> +
+> +static void rtnl_af_put(struct rtnl_af_ops *ops, int srcu_index)
+> +{
+> +       srcu_read_unlock(&ops->srcu, srcu_index);
+>  }
+>
+>  /**
+> @@ -683,6 +696,7 @@ static const struct rtnl_af_ops *rtnl_af_lookup(const=
+ int family)
+>  void rtnl_af_register(struct rtnl_af_ops *ops)
+>  {
+>         rtnl_lock();
+> +       init_srcu_struct(&ops->srcu);
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Same remark, this could fail.
 
